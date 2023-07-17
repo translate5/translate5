@@ -32,6 +32,8 @@ END LICENSE AND COPYRIGHT
  * @version 1.0
  */
 
+use MittagQI\Translate5\Task\Import\FileParser\Xlf\Namespaces\ZendXlf;
+
 
 /**
  * Fileparsing for the Zend XLIFF files used for internal translation of translate5
@@ -51,7 +53,7 @@ class editor_Models_Import_FileParser_XlfZend extends editor_Models_Import_FileP
     
     protected function initNamespaces() {
         parent::initNamespaces();
-        $this->namespaces->addNamespace('zxliff', new editor_Models_Import_FileParser_Xlf_Namespaces_ZendXlf());
+        $this->namespaces->addNamespace('zxliff', new ZendXlf());
     }
     
     /**

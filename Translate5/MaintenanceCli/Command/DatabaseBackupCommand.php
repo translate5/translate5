@@ -94,7 +94,8 @@ class DatabaseBackupCommand extends Translate5AbstractCommand
                 $params['username'],
                 $params['password'],
                 [
-                    'compress' => $this->useGzip ? Mysqldump::GZIPSTREAM : Mysqldump::NONE
+                    'compress' => $this->useGzip ? Mysqldump::GZIPSTREAM : Mysqldump::NONE,
+                    'default-character-set' => $params['charset'],
                 ]
             );
 

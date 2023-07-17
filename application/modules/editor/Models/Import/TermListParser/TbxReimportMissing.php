@@ -43,9 +43,9 @@ class editor_Models_Import_TermListParser_TbxReimportMissing extends editor_Mode
      * @var boolean
      */
     protected $autoIds = false;
-    protected $addTermEntryIds = false;
+    protected bool $addTermEntryIds = false;
     protected $addTigIds = false;
-    protected $addTermIds = false;
+    protected bool $addTermIds = false;
 
     /**
      * @var array

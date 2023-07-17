@@ -26,12 +26,8 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-/** #@+
- * @author Marc Mittag
- * @package editor
- * @version 1.0
- */
-
+use editor_Models_Import_FileParser_Xlf_LengthRestriction as XlfLengthRestriction;
+use editor_Models_Import_FileParser_Xlf_SurroundingTagRemover_Abstract as AbstractSurroundingTagRemover;
 use editor_Models_Import_FileParser_XmlParser as XmlParser;
 
 /**
@@ -167,14 +163,14 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
     protected $matchRate = [];
     
     /**
-     * @var editor_Models_Import_FileParser_Xlf_LengthRestriction
+     * @var XlfLengthRestriction
      */
-    protected $lengthRestriction;
+    protected XlfLengthRestriction $lengthRestriction;
     
     /**
-     * @var editor_Models_Import_FileParser_Xlf_SurroundingTagRemover_Abstract
+     * @var AbstractSurroundingTagRemover
      */
-    protected editor_Models_Import_FileParser_Xlf_SurroundingTagRemover_Abstract $surroundingTags;
+    protected AbstractSurroundingTagRemover $surroundingTags;
     
     /**
      * (non-PHPdoc)
@@ -183,21 +179,23 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
     public static function getFileExtensions() {
         return ['xlf','xlif','xliff','mxliff','mqxliff'];
     }
-    
+
     /**
      * Init tagmapping
+     * @throws editor_Models_ConfigException
      */
-    public function __construct(string $path, string $fileName, int $fileId, editor_Models_Task $task) {
+    public function __construct(string $path, string $fileName, int $fileId, editor_Models_Task $task)
+    {
         parent::__construct($path, $fileName, $fileId, $task);
         $this->initNamespaces();
-        $this->contentConverter = ZfExtended_Factory::get('editor_Models_Import_FileParser_Xlf_ContentConverter', [$this->namespaces, $this->task, $fileName]);
-        $this->internalTag = ZfExtended_Factory::get('editor_Models_Segment_InternalTag');
-        $this->segmentBareInstance = ZfExtended_Factory::get('editor_Models_Segment');
-        $this->log = ZfExtended_Factory::get('ZfExtended_Log');
-        $this->lengthRestriction = ZfExtended_Factory::get('editor_Models_Import_FileParser_Xlf_LengthRestriction',[
+        $this->contentConverter = $this->namespaces->getContentConverter($this->task, $fileName);
+        $this->internalTag = ZfExtended_Factory::get(editor_Models_Segment_InternalTag::class);
+        $this->segmentBareInstance = ZfExtended_Factory::get(editor_Models_Segment::class);
+        $this->log = ZfExtended_Factory::get(ZfExtended_Log::class);
+        $this->lengthRestriction = ZfExtended_Factory::get(XlfLengthRestriction::class, [
             $this->task->getConfig()
         ]);
-        $this->surroundingTags = editor_Models_Import_FileParser_Xlf_SurroundingTagRemover_Abstract::factory($this->config);
+        $this->surroundingTags = AbstractSurroundingTagRemover::factory($this->config);
         $this->otherContent = ZfExtended_Factory::get('editor_Models_Import_FileParser_Xlf_OtherContent', [
             $this->contentConverter, $this->segmentBareInstance, $this->task, $fileId
         ]);

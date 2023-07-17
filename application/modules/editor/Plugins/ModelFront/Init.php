@@ -191,26 +191,34 @@ class editor_Plugins_ModelFront_Init extends ZfExtended_Plugin_Abstract {
             return null;
         }
     }
-    
+
     /***
      * Queue ModelFront worker for given $taskGuid
      *
      * @param string $taskGuid
-     * @return boolean
+     * @return void
      */
-    protected function queueWorker(string $taskGuid): bool{
+    protected function queueWorker(string $taskGuid): void
+    {
         $worker = ZfExtended_Factory::get('editor_Plugins_ModelFront_Worker');
         /* @var $worker editor_Plugins_ModelFront_Worker */
         // init worker and queue it
         if (!$worker->init($taskGuid, [])) {
-            error_log('ModelFront-Error on worker init()', __CLASS__.' -> '.__FUNCTION__.'; Worker could not be initialized');
-            return false;
+            error_log(
+                'ModelFront-Error on worker init()'.
+                  __CLASS__.' -> '.__FUNCTION__.'; Worker could not be initialized'
+            );
+            return;
         }
-        $parent=ZfExtended_Factory::get('ZfExtended_Models_Worker');
-        /* @var $parent ZfExtended_Models_Worker */
-        $result = $parent->loadByState(ZfExtended_Models_Worker::STATE_PREPARE, 'editor_Plugins_MatchAnalysis_Worker', $taskGuid);
+        $parent = ZfExtended_Factory::get(ZfExtended_Models_Worker::class);
+        $result = $parent->loadByState(
+            ZfExtended_Models_Worker::STATE_PREPARE,
+            editor_Plugins_MatchAnalysis_Worker::class,
+            $taskGuid
+        );
+
         $parentWorkerId = null;
-        if(!empty($result)){
+        if (!empty($result)) {
             $parentWorkerId = $result[0]['id'];
         }
         

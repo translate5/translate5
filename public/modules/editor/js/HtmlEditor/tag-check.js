@@ -135,16 +135,27 @@ class TagCheck {
         return null;
     }
 
-    getOpeningReferenceTagAtIndex(index) {
-        return this.getReferenceTagAtIndex('open', index);
+    // Since tags ordering is not always in order, we need to check the next tag
+    getReferenceTagAtIndexOrNext(type, index) {
+        for (let i = index; i <= index + 10; i++) {
+            let tag = this.getReferenceTagAtIndex(type, i);
+
+            if (tag) {
+                return tag;
+            }
+        }
     }
 
-    getClosingReferenceTagAtIndex(index) {
-        return this.getReferenceTagAtIndex('close', index);
+    getOpeningReferenceTagAtIndexOrNext(index) {
+        return this.getReferenceTagAtIndexOrNext('open', index);
     }
 
-    getSingleReferenceTagAtIndex(index) {
-        return this.getReferenceTagAtIndex('single', index);
+    getClosingReferenceTagAtIndexOrNext(index) {
+        return this.getReferenceTagAtIndexOrNext('close', index);
+    }
+
+    getSingleReferenceTagAtIndexOrNext(index) {
+        return this.getReferenceTagAtIndexOrNext('single', index);
     }
 
     getWhitespaceReferenceTagAtIndex(index) {
