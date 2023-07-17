@@ -314,7 +314,7 @@ class editor_ConfigController extends ZfExtended_RestController {
 
             $taskConfig = [];
             if (!empty($taskGuid)) {
-                $taskConfig = $this->entity->mergeTaskValues($taskGuid);
+                $taskConfig = $this->entity->mergeTaskValues($taskGuid, [], false);
             }
 
             return array_values($this->entity->mergeUserValues($userGuid, $taskConfig));
