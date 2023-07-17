@@ -643,7 +643,6 @@ Ext.application({
 
         const onLoadedCallback = (store) => (records, operation, success) => {
             counter++;
-            me.unmask();
             if (!success) {
                 Editor.app.getController('ServerException').handleCallback(records, operation, false);
                 return;
@@ -651,6 +650,7 @@ Ext.application({
             store.clearFilter(true);
 
             if (2 === counter) {
+                me.unmask();
                 callback();
             }
         };

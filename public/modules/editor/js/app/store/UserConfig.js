@@ -47,8 +47,10 @@ Ext.define('Editor.store.UserConfig', {
           taskGuid : curentTaskGuid
         });
     proxy.setExtraParams(merged);
-    me.load(callback);
     // rollback for when we leave task and reload store
-    proxy.setExtraParams(existing);
+    me.load(function (records, operation, success) {
+      callback(records, operation, success);
+      proxy.setExtraParams(existing)
+    });
   }
 });
