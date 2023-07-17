@@ -49,4 +49,3 @@ pipelines:
 
             # Run bunch of containers
             - docker-compose -f docker-compose.runtests.yml up --exit-code-from php
-            - 
