@@ -186,7 +186,8 @@ Ext.define('Editor.view.admin.config.Grid', {
                     startCollapsed: true,
                     groupHeaderTpl: '{name} ({rows.length})'
                 }],
-                columns: [{
+                columns: [
+                    {
                     xtype: 'gridcolumn',
                     dataIndex: 'id',
                     hidden:true,
@@ -455,6 +456,7 @@ Ext.define('Editor.view.admin.config.Grid', {
                 if (record.get('defaults').join(',').match('^{[^{}]*?}$')) {
                     returnValue = Ext.JSON.decode(record.get('defaults').join(','))[value];
                 }
+            break;
             case 'map':
                 if(Ext.isObject(value)) {
                     returnValue = Ext.JSON.encode(value);

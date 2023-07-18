@@ -33,8 +33,9 @@ require_once 'vendor/autoload.php';
 const TRANSLATE5_CLI = true;
 
 use Symfony\Component\Console\Application;
-use Translate5\MaintenanceCli\Command\{
-    AuthTokenCommand,
+use Translate5\MaintenanceCli\Command\{AuthTokenCommand,
+    AuthTokenDeleteCommand,
+    AuthTokenListCommand,
     CachePurgeCommand,
     ChangelogCommand,
     ConfigCommand,
@@ -105,6 +106,8 @@ use Translate5\MaintenanceCli\Command\SegmentHistoryCommand;
 $app = new Application('Translate5 CLI Maintenance', '1.0');
 $commands = [
     new AuthTokenCommand(),
+    new AuthTokenListCommand(),
+    new AuthTokenDeleteCommand(),
     new CachePurgeCommand(),
     new ChangelogCommand(),
     new ConfigCommand(),
@@ -155,7 +158,7 @@ $commands = [
     new WorkerListCommand(),
     new WorkerQueueCommand(),
 ];
-if(file_exists('.git')) {
+if (file_exists('.git')) {
     $commands[] = new DevelopmentGithookCommand();
     $commands[] = new DevelopmentNewdbchangeCommand();
     $commands[] = new DevelopmentCreatetestCommand();

@@ -9006,6 +9006,46 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
                 <source><b>Quellsprache ist die Zielsprache</b><br/>Quellsprache gleicht der Zielsprache, deswegen kann der eingegebene Text nicht übersetzt werden.</source>
                 <target><b>Quellsprache ist die Zielsprache</b><br/>Quellsprache gleicht der Zielsprache, deswegen kann der eingegebene Text nicht übersetzt werden.</target>
             </trans-unit>
+            <trans-unit id='QmVzY2hyZWlidW5n'>
+                <source>Beschreibung</source>
+                <target>Beschreibung</target>
+            </trans-unit>
+            <trans-unit id='VmVyZmFsbHNkYXR1bQ=='>
+                <source>Verfallsdatum</source>
+                <target>Verfallsdatum</target>
+            </trans-unit>
+            <trans-unit id='VG9rZW4gZXJzdGVsbGVu'>
+                <source>Token erstellen</source>
+                <target>Token erstellen</target>
+            </trans-unit>
+            <trans-unit id="TMO2c2NoZW4gZGVzIFRva2VucyBiZXN0w6R0aWdlbg==">
+                <source>Löschen des Tokens bestätigen</source>
+                <target>Löschen des Tokens bestätigen</target>
+            </trans-unit>
+            <trans-unit id="U2luZCBTaWUgc2ljaGVyLCBkYXNzIFNpZSBkYXMgVG9rZW4gbMO2c2NoZW4gbcO2Y2h0ZW4/">
+                <source>Sind Sie sicher, dass Sie das Token löschen möchten?</source>
+                <target>Sind Sie sicher, dass Sie das Token löschen möchten?</target>
+            </trans-unit>
+            <trans-unit id='RGVyIFp1Z3JpZmZzdG9rZW4gd2lyZCBudXIgZWlubWFsIGFuZ2V6ZWlndC4gU2llIHdlcmRlbiBuaWNodCBnZXNwZWljaGVydCB1bmQga8O2bm5lbiBuaWNodCBhYmdlcnVmZW4gd2VyZGVuLiBTdGVsbGVuIFNpZSBzaWNoZXIsIGRhc3MgU2llIGVzIGFuIGVpbmVtIHNpY2hlcmVuIE9ydCBhdWZiZXdhaHJlbi48YnIvPjxici8+PGI+ezB9PC9iPg=='>
+                <source>Der Zugriffstoken wird nur einmal angezeigt. Stellen Sie sicher, dass Sie es an einem sicheren Ort aufbewahren<br/><b>{0}</b></source>
+                <target>Der Zugriffstoken wird nur einmal angezeigt. Stellen Sie sicher, dass Sie es an einem sicheren Ort aufbewahren<br/><b>{0}</b></target>
+            </trans-unit>
+            <trans-unit id='RGFzIEFibGF1ZmRhdHVtIGRhcmYgbmljaHQga8O8cnplciBzZWluIGFscyBoZXV0ZQ=='>
+                <source>Das Ablaufdatum darf nicht kürzer sein als heute</source>
+                <target>Expiration date can not be less that today</target>
+            </trans-unit>
+            <trans-unit id='RGllIFBhcmFtZXRlciAidXNlcklkIiB1bmQgImRlc2NyaXB0aW9uIiBzaW5kIGVyZm9yZGVybGljaC4='>
+                <source>Die Parameter "userId" und "description" sind erforderlich.</source>
+                <target>Die Parameter "userId" und "description" sind erforderlich.</target>
+            </trans-unit>
+            <trans-unit id='RG9wcGVsa2xpY2sgenVtIGJlYXJiZWl0ZW4='>
+                <source>Doppelklick zum bearbeiten</source>
+                <target>Doppelklick zum bearbeiten</target>
+            </trans-unit>
+            <trans-unit id='QXBwLVRva2VuIGtvcGllcmVu'>
+                <source>App-Token kopieren</source>
+                <target>App-Token kopieren</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

@@ -27,49 +27,21 @@
  */
 namespace Translate5\MaintenanceCli\Command;
 
-use DateTime;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use ZfExtended_Auth_Token_Entity;
-use ZfExtended_Auth_Token_Token;
 use ZfExtended_Factory;
 
-class AuthTokenCommand extends Translate5AbstractCommand {
-    
-    // the name of the command (the part after "bin/console")
-    protected static $defaultName = 'auth:apptoken:add';
-    
+class AuthTokenDeleteCommand extends Translate5AbstractCommand
+{
+    protected static $defaultName = 'auth:apptoken:delete';
+
     protected function configure()
     {
-        $this
-        // the short description shown while running "php bin/console list"
-        ->setDescription('Generates auth token used for authentication in translate5')
-        
-        // the full command description shown when running the command with
-        // the "--help" option
-        ->setHelp('Generates auth token used for authentication in translate5. The command will generate and display
-        the token witch can be used for authenticating in translate5');
+        $this->setDescription('Deletes auth token used for authentication in translate5');
 
-        $this->addArgument(
-            'login',
-            InputArgument::REQUIRED,
-            'User login for whom this authentication token will be generate for'
-        );
-
-        $this->addArgument(
-            'desc',
-            InputArgument::REQUIRED,
-            'Description for the generated token'
-        );
-
-        $this->addOption(
-            'expires',
-            null,
-            InputOption::VALUE_OPTIONAL,
-            'Expiration time for the generated token',
-        );
+        $this->addArgument('id', InputArgument::REQUIRED, 'Authentication token id');
     }
     
     /**
@@ -82,25 +54,13 @@ class AuthTokenCommand extends Translate5AbstractCommand {
         $this->initInputOutput($input, $output);
         $this->initTranslate5();
         
-        $this->writeTitle('Translate5 authentication token');
-
-        $login = $input->getArgument('login');
-        $desc = $input->getArgument('desc');
-        $expires = $input->getOption('expires');
-
-        $expirationDate = null;
+        $id = $input->getArgument('id');
 
         $auth = ZfExtended_Factory::get(ZfExtended_Auth_Token_Entity::class);
-        if ($expires) {
-            $expirationDate = new DateTime($expires);
-            if ($expirationDate < new DateTime()) {
-                $this->io->error('Expiration date can not be less that today');
+        $auth->load($id);
+        $auth->delete();
 
-                return 1;
-            }
-        }
-
-        $this->writeAssoc(['Token' => $auth->create($login, $desc, $expirationDate)]);
+        $this->io->success('Token deleted');
 
         return 0;
     }

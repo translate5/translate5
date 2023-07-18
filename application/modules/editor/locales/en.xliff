@@ -9183,6 +9183,46 @@ E-Mail: service@MittagQI.com</pre>
                 <source><b>Quellsprache ist die Zielsprache</b><br/>Quellsprache gleicht der Zielsprache, deswegen kann der eingegebene Text nicht übersetzt werden.</source>
                 <target><b>Source language equals target language</b><br/>Source language equals the selected target language, therefore your text can not be translated.</target>
             </trans-unit>
+            <trans-unit id='QmVzY2hyZWlidW5n'>
+                <source>Beschreibung</source>
+                <target>Description</target>
+            </trans-unit>
+            <trans-unit id='VmVyZmFsbHNkYXR1bQ=='>
+                <source>Verfallsdatum</source>
+                <target>Expiration date</target>
+            </trans-unit>
+            <trans-unit id='VG9rZW4gZXJzdGVsbGVu'>
+                <source>Token erstellen</source>
+                <target>Create token</target>
+            </trans-unit>
+            <trans-unit id="TMO2c2NoZW4gZGVzIFRva2VucyBiZXN0w6R0aWdlbg==">
+                <source>Löschen des Tokens bestätigen</source>
+                <target>Confirm token deletion</target>
+            </trans-unit>
+            <trans-unit id="U2luZCBTaWUgc2ljaGVyLCBkYXNzIFNpZSBkYXMgVG9rZW4gbMO2c2NoZW4gbcO2Y2h0ZW4/">
+                <source>Sind Sie sicher, dass Sie das Token löschen möchten?</source>
+                <target>Are you sure you want to delete token?</target>
+            </trans-unit>
+            <trans-unit id='RGVyIFp1Z3JpZmZzdG9rZW4gd2lyZCBudXIgZWlubWFsIGFuZ2V6ZWlndC4gU2llIHdlcmRlbiBuaWNodCBnZXNwZWljaGVydCB1bmQga8O2bm5lbiBuaWNodCBhYmdlcnVmZW4gd2VyZGVuLiBTdGVsbGVuIFNpZSBzaWNoZXIsIGRhc3MgU2llIGVzIGFuIGVpbmVtIHNpY2hlcmVuIE9ydCBhdWZiZXdhaHJlbi48YnIvPjxici8+PGI+ezB9PC9iPg=='>
+                <source>Der Zugriffstoken wird nur einmal angezeigt. Sie werden nicht gespeichert und können nicht abgerufen werden. Stellen Sie sicher, dass Sie es an einem sicheren Ort aufbewahren.<br/><br/><b>{0}</b></source>
+                <target>Access token will be shown only once. It will not be stored and cannot be retrieved. Make sure to save it somewhere safe.<br/><br/><b>{0}</b></target>
+            </trans-unit>
+            <trans-unit id='RGFzIEFibGF1ZmRhdHVtIGRhcmYgbmljaHQga8O8cnplciBzZWluIGFscyBoZXV0ZQ=='>
+                <source>Das Ablaufdatum darf nicht kürzer sein als heute</source>
+                <target>Expiration date can not be less that today</target>
+            </trans-unit>
+            <trans-unit id='RGFzIEFibGF1ZmRhdHVtIGRhcmYgbmljaHQga8O8cnplciBzZWluIGFscyBoZXV0ZQ=='>
+                <source>Die Parameter "userId" und "description" sind erforderlich.</source>
+                <target>Parameters "userId" and "description" are required.</target>
+            </trans-unit>
+            <trans-unit id='RG9wcGVsa2xpY2sgenVtIGJlYXJiZWl0ZW4='>
+                <source>Doppelklick zum bearbeiten</source>
+                <target>Double-click to edit</target>
+            </trans-unit>
+            <trans-unit id='QXBwLVRva2VuIGtvcGllcmVu'>
+                <source>App-Token kopieren</source>
+                <target>Copy application token</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>
