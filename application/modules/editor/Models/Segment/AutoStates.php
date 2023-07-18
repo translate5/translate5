@@ -553,7 +553,7 @@ class editor_Models_Segment_AutoStates {
         $task->loadByTaskGuid($tua->getTaskGuid());
         $sameUserGuid = $task->getPmGuid() === $auth->getUser()->getUserGuid();
         $systemUser = $auth->getUser()->getUserGuid() == ZfExtended_Models_User::SYSTEM_GUID;
-        $editAllTasks = $acl->isInAllowedRoles($auth->getRoles(), 'backend', 'editAllTasks');
+        $editAllTasks = $acl->isInAllowedRoles($auth->getUserRoles(), 'backend', 'editAllTasks');
         return empty($role) && ($editAllTasks || $sameUserGuid || $systemUser);
     }
     

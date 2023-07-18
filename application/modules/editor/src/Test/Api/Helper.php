@@ -95,7 +95,9 @@ final class Helper extends \ZfExtended_Test_ApiHelper
         'testlector' => '{00000000-0000-0000-C100-CCDDEE000002}',
         'testtranslator' => '{00000000-0000-0000-C100-CCDDEE000003}',
         'testapiuser' => '{00000000-0000-0000-C100-CCDDEE000004}',
-        'testtermproposer' => '{00000000-0000-0000-C100-CCDDEE000005}'
+        'testtermproposer' => '{00000000-0000-0000-C100-CCDDEE000005}',
+        'testmanager2' => '{00000000-0000-0000-C100-CCDDEE000006}',
+        'testclientpm' => '{00000000-0000-0000-C100-CCDDEE000007}'
     );
 
     //region Import API

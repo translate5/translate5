@@ -50,7 +50,7 @@ class editor_LanguageresourceresourceController extends ZfExtended_RestControlle
         $result = array();
         
         $acl = ZfExtended_Acl::getInstance();
-        $userRoles = ZfExtended_Authentication::getInstance()->getRoles();
+        $userRoles = ZfExtended_Authentication::getInstance()->getUserRoles();
         $isAllowedFilebased = $acl->isInAllowedRoles($userRoles, 'frontend', 'languageResourcesAddFilebased');
         $isAllowedNonFilebased = $acl->isInAllowedRoles($userRoles, 'frontend', 'languageResourcesAddNonFilebased');
         

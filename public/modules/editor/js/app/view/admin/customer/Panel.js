@@ -86,6 +86,8 @@ Ext.define('Editor.view.admin.customer.Panel', {
 
     initConfig: function(instanceConfig) {
         var me = this,
+            canNotAddCustomer =  ! Editor.app.authenticatedUser.isAllowed('editorAddCustomer'),
+            canNotDeleteCustomer =  ! Editor.app.authenticatedUser.isAllowed('editorDeleteCustomer'),
             config = {
                 title: me.title, //see EXT6UPD-9
                 items: [
@@ -147,12 +149,14 @@ Ext.define('Editor.view.admin.customer.Panel', {
                                     glyph: 'f0c5@FontAwesome5FreeSolid',
                                     tooltip: 'Copy',
                                     scope:'controller',
-                                    handler:'onCopyActionClick'
+                                    handler:'onCopyActionClick',
+                                    hidden: canNotAddCustomer,
                                 },{
                                     glyph: 'f2ed@FontAwesome5FreeSolid',
                                     tooltip:me.strings.remove,
                                     scope:'controller',
-                                    handler:'remove'
+                                    handler:'remove',
+                                    hidden: canNotDeleteCustomer,
                                 }]
                             },{
                                 xtype: 'gridcolumn',
@@ -322,6 +326,7 @@ Ext.define('Editor.view.admin.customer.Panel', {
                                 xtype: 'button',
                                 glyph: 'f067@FontAwesome5FreeSolid',
                                 text: me.strings.addCustomerTitle,
+                                hidden: canNotAddCustomer,
                                 listeners: {
                                     click: {
                                         fn: 'add',

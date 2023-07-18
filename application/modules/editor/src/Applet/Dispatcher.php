@@ -95,7 +95,7 @@ class Dispatcher {
         // we try to load the last used app
         /** @var \editor_Models_UserMeta $meta */
         $meta = \ZfExtended_Factory::get('editor_Models_UserMeta');
-        $meta->loadOrSet(Auth::getInstance()->getUser()->getId());
+        $meta->loadOrSet(Auth::getInstance()->getUserId());
         if($meta->getId() != null && !empty($meta->getLastUsedApp())){
             $this->call($meta->getLastUsedApp());
         }
@@ -155,7 +155,7 @@ class Dispatcher {
             /* @var ZfExtended_Acl $acl */
 
             // get all initial_page acl records for all available user roles
-            $aclModules = $acl->getInitialPageModulesForRoles(Auth::getInstance()->getRoles());
+            $aclModules = $acl->getInitialPageModulesForRoles(Auth::getInstance()->getUserRoles());
 
             // find the module redirect based on the modulesOrder config
             foreach (APPLICATION_MODULES as $module){

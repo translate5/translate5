@@ -310,6 +310,10 @@
                 <source>Benutzer endg&#xFC;ltig l&#xF6;schen?</source>
                 <target>Delete the user completely?</target>
             </trans-unit>
+            <trans-unit id='U2llIHNpbmQgbmljaHQgYmVyZWNodGlndCwgZGllc2VuIEJlbnV0emVyIHp1IGVudGZlcm5lbi4='>
+                <source>Sie sind nicht berechtigt, diesen Benutzer zu entfernen.</source>
+                <target>You are not entitled to remove this user.</target>
+            </trans-unit>
             <trans-unit id="U29sbCBkZXIgZ2V3w6RobHRlIEJlbnV0emVyICJ7MH0iIHdpcmtsaWNoIGVuZGfDvGx0aWcgZ2Vsw7ZzY2h0IHdlcmRlbj8=">
                 <source>Soll der gew&#xE4;hlte Benutzer "{0}" wirklich endg&#xFC;ltig gel&#xF6;scht werden?</source>
                 <target>Do you really want to delete completely the user "{0}"?</target>
@@ -2742,7 +2746,7 @@
                 <target>Kurdish</target>
             </trans-unit>
             <trans-unit id='QXBp'>
-                <source>API</source>
+                <source>Api</source>
                 <target>API</target>
             </trans-unit>
             <trans-unit id='SGVicsOkaXNjaA=='>
@@ -2750,8 +2754,12 @@
                 <target>Hebrew</target>
             </trans-unit>
             <trans-unit id='UG0='>
-                <source>PM</source>
-                <target>PM</target>
+                <source>Pm</source>
+                <target>PM (all clients)</target>
+            </trans-unit>
+            <trans-unit id='Q2xpZW50cG0='>
+                <source>Clientpm</source>
+                <target>PM (selected clients)</target>
             </trans-unit>
             <trans-unit id='TG9rYWxpc2llcnVuZw==='>
                 <source>Lokalisierung</source>
@@ -6334,9 +6342,29 @@ The following task was imported with errors / warnings / notices. Please take ca
                 <source>Der Benutzer hat das Recht, die Sprachressourcen in InstantTranslate &amp; TermPortal zu nutzen, die denselben Kunden zugeordnet sind, denen der Benutzer hier zugeordnet ist.</source>
                 <target>User has the right to use those language resources in InstantTranslate &amp; TermPortal, that are assigned to the same clients, as the user is assigned to here.</target>
             </trans-unit>
-            <trans-unit id='S3VuZGVuIEluc3RhbnRUcmFuc2xhdGUgJmFtcDsgVGVybVBvcnRhbA=='>
-                <source>Kunden InstantTranslate &amp; TermPortal</source>
-                <target>Clients InstantTranslate &amp; TermPortal</target>
+            <trans-unit id='WnVnZXdpZXNlbmUgS3VuZGVuIChCZXRyaWZmdCBSb2xsZW4gUE0sIEluc3RhbnRUcmFuc2xhdGUgdW5kIFRlcm1Qb3J0YWwp'>
+                <source>Zugewiesene Kunden (Betrifft Rollen PM, InstantTranslate und TermPortal)</source>
+                <target>Assigned clients (affect roles PM, InstantTranslate and TermPortal-roles)</target>
+            </trans-unit>
+            <trans-unit id='WnVnw6RuZ2xpY2hlIE1hbmFnZW1lbnTDvGJlcnNpY2h0ZW4gZsO8ciBSb2xsZSBQTQ=='>
+                <source>Zugängliche Managementübersichten für Rolle PM</source>
+                <target>Accessible management overviews for role PM</target>
+            </trans-unit>
+            <trans-unit id='Y2xpZW50cG1fcHJvamVjdHM='>
+                <source>clientpm_projects</source>
+                <target>Projects</target>
+            </trans-unit>
+            <trans-unit id='Y2xpZW50cG1fbGFuZ3Jlc291cmNlcw=='>
+                <source>clientpm_langresources</source>
+                <target>Language resources</target>
+            </trans-unit>
+            <trans-unit id='Y2xpZW50cG1fY3VzdG9tZXJz'>
+                <source>clientpm_customers</source>
+                <target>Clients</target>
+            </trans-unit>
+            <trans-unit id='Y2xpZW50cG1fdXNlcnM='>
+                <source>clientpm_users</source>
+                <target>Users</target>
             </trans-unit>
             <trans-unit id='QmVudXR6ZXIgbmFjaCBJbXBvcnQgYmVuYWNocmljaHRpZ2Vu'>
                 <source>Benutzer nach Import benachrichtigen</source>
@@ -6376,11 +6404,11 @@ The following task was imported with errors / warnings / notices. Please take ca
             </trans-unit>
             <trans-unit id='VGVybVNlYXJjaA=='>
                 <source>TermSearch</source>
-                <target>Term search</target>
+                <target>Search terms</target>
             </trans-unit>
             <trans-unit id='VGVybUN1c3RvbWVyU2VhcmNo'>
                 <source>TermCustomerSearch</source>
-                <target>Term search</target>
+                <target>Search terms</target>
             </trans-unit>
             <trans-unit id='VGVybVByb3Bvc2Vy'>
                 <source>TermProposer</source>
@@ -6396,7 +6424,7 @@ The following task was imported with errors / warnings / notices. Please take ca
             </trans-unit>
             <trans-unit id='VGVybVBN'>
                 <source>TermPM</source>
-                <target>Term PM</target>
+                <target>Term PM (selected clients)</target>
             </trans-unit>
             <trans-unit id='VGVybVBNX2FsbENsaWVudHM'>
                 <source>TermPM_allClients</source>
@@ -6549,6 +6577,10 @@ The following task was imported with errors / warnings / notices. Please take ca
             <trans-unit id='U3ByYWNocmVzc291cmNlICJ7MH0iIGdlbMO2c2NodC4='>
                 <source>Sprachressource "{0}" gelöscht.</source>
                 <target>Language resource "{0}" deleted.</target>
+            </trans-unit>
+            <trans-unit id='U2llIHNpbmQgbmljaHQgYmVyZWNodGlndCwgZGllc2UgU3ByYWNocmVzc291cmNlIHp1IGVudGZlcm5lbi4='>
+                <source>Sie sind nicht berechtigt, diese Sprachressource zu entfernen.</source>
+                <target>You are not entitled to remove this language resource.</target>
             </trans-unit>
             <trans-unit id='QXVmZ2FiZSAiezB9IiBnZWzDtnNjaHQ='>
                 <source>Aufgabe "{0}" gelöscht</source>

@@ -55,7 +55,7 @@ class editor_Models_TermCollection_TermCollection extends editor_Models_Language
         }
 
         if (ZfExtended_Authentication::getInstance()->isAuthenticated()) {
-            return ZfExtended_Authentication::getInstance()->getUser()->getUserGuid();
+            return ZfExtended_Authentication::getInstance()->getUserGuid();
         }
 
         return ZfExtended_Models_User::SYSTEM_GUID;

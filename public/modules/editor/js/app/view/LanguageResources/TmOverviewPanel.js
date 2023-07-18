@@ -91,6 +91,8 @@ Ext.define('Editor.view.LanguageResources.TmOverviewPanel', {
 
     initConfig: function(instanceConfig) {
         var me = this,
+            canNotAddLangresource =  ! Editor.app.authenticatedUser.isAllowed('editorAddLangresource'),
+            canNotDeleteLangresource =  ! Editor.app.authenticatedUser.isAllowed('editorDeleteLangresource'),
             service = function(rec) {
                 return Editor.util.LanguageResources.getService(rec.get('serviceName'));
             },
@@ -161,6 +163,7 @@ Ext.define('Editor.view.LanguageResources.TmOverviewPanel', {
                         tooltip: me.strings.erase,
                         action: 'delete',
                         iconCls: 'ico-tm-delete',
+                        hidden: canNotDeleteLangresource,
                         isDisabled: function( view, rowIndex, colIndex, item, record ) {
                             return record.get('status') === 'novalidlicense' ? true : false;
                         }
@@ -168,7 +171,7 @@ Ext.define('Editor.view.LanguageResources.TmOverviewPanel', {
                         tooltip: me.strings.tasks,
                         action: 'tasks',
                         iconCls: 'ico-tm-tasks',
-                        hidden:true,
+                        hidden: true,
                         isDisabled: function( view, rowIndex, colIndex, item, record ) {
                             item.hidden=!record.get('writable');
                         }
@@ -363,7 +366,8 @@ Ext.define('Editor.view.LanguageResources.TmOverviewPanel', {
                         glyph: 'f067@FontAwesome5FreeSolid',
                         itemId: 'btnAddTm',
                         text: me.strings.addResource,
-                        tooltip: me.strings.addResource
+                        tooltip: me.strings.addResource,
+                        hidden: canNotAddLangresource,
                     }]
                 }]
       };

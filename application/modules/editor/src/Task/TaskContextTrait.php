@@ -33,7 +33,7 @@ use editor_Controllers_Plugins_LoadCurrentTask;
 use editor_Models_Loaders_Taskuserassoc;
 use editor_Models_Task;
 use editor_Models_TaskUserAssoc;
-use editor_User;
+use ZfExtended_Authentication;
 use ZfExtended_Factory;
 use ZfExtended_Models_Entity_NotFoundException;
 
@@ -124,7 +124,7 @@ trait TaskContextTrait
     protected function _loadCurrentJob()
     {
         //load job, if there is no job in usage, throw 403
-        $userGuid = editor_User::instance()->getGuid();
+        $userGuid = ZfExtended_Authentication::getInstance()->getUserGuid();
 
         $this->_currentJob = editor_Models_Loaders_Taskuserassoc::loadFirstInUse($userGuid, $this->_currentTask);
 

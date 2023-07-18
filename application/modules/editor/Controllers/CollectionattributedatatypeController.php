@@ -73,9 +73,8 @@ class editor_CollectionattributedatatypeController extends ZfExtended_RestContro
         // Else we should apply collectionsIds-restriction everywhere, so get accessible collections
         $this->collectionIds =
             $this->isAllowed( 'editor_term', 'anyCollection')
-                ?: ZfExtended_Factory
-                    ::get(editor_Models_TermCollection_TermCollection::class)
-                    ->getAccessibleCollectionIds(editor_User::instance()->getModel());
+                ?: ZfExtended_Factory::get(editor_Models_TermCollection_TermCollection::class)
+                    ->getAccessibleCollectionIds(ZfExtended_Authentication::getInstance()->getUser());
     }
 
     /**

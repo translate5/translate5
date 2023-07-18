@@ -215,10 +215,11 @@ class editor_Models_LanguageResources_CustomerAssoc extends ZfExtended_Models_En
     
     /***
      * Load customer assoc grouped by language resource id.
-     * @return array[]
+     * @param $languageResourceId: if given, assocs for only this resource are fetched
+     * @return array
      */
-    public function loadCustomerIdsGrouped() {
-        $assocs=$this->loadByLanguageResourceId();
+    public function loadCustomerIdsGrouped($languageResourceId = null) {
+        $assocs=$this->loadByLanguageResourceId($languageResourceId);
         $retval=[];
         foreach ($assocs as $assoc){
             if(!isset($retval[$assoc['languageResourceId']])){

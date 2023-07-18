@@ -447,8 +447,7 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
         }
 
         $json->documentName = 'source';
-        $userData = editor_User::instance()->getData();
-        $json->author = $userData->firstName . ' '. $userData->surName;
+        $json->author = ZfExtended_Authentication::getInstance()->getUser()->getUserName();
         $json->context = '';
         $json->addInfo = $json->documentName;
 

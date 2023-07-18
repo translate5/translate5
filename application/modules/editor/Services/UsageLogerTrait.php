@@ -111,7 +111,7 @@ trait editor_Services_UsageLogerTrait {
             //set the request source to instant-translate
             $logger->setRequestSource(editor_Services_Connector::REQUEST_SOURCE_INSTANT_TRANSLATE);
             // for instant translate search use the session user
-            $logger->setUserGuid(editor_User::instance()->getGuid());
+            $logger->setUserGuid(ZfExtended_Authentication::getInstance()->getUserGuid());
         }
 
         // if no user is set from above, try to set one

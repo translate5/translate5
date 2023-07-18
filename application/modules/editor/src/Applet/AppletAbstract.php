@@ -28,6 +28,8 @@ END LICENSE AND COPYRIGHT
 
 namespace MittagQI\Translate5\Applet;
 
+use ZfExtended_Authentication;
+
 /**
  * Abstract Applet to configure applets like (termportal, instanttranslate, etc)
  */
@@ -70,7 +72,7 @@ abstract class AppletAbstract {
      * returns true if the current user has this applet in his initial_page ACLs
      */
     public function hasAsInitialPage(): bool {
-        return \editor_User::instance()->isAllowed('initial_page', $this->initialPage);
+        return ZfExtended_Authentication::getInstance()->isUserAllowed('initial_page', $this->initialPage);
     }
 
     public function getWeight(): int
