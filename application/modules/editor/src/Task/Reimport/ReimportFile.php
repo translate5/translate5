@@ -35,6 +35,7 @@ use editor_Models_Import_FileParser;
 use editor_Models_SegmentFieldManager;
 use editor_Models_Task;
 use MittagQI\Translate5\Task\Import\FileParser\Factory;
+use MittagQI\Translate5\Task\Reimport\DataProvider\FileDto;
 use MittagQI\Translate5\Task\Reimport\SegmentProcessor\Reimport;
 use SplFileInfo;
 use ZfExtended_Factory;
@@ -47,7 +48,7 @@ use ZfExtended_Models_User;
 class ReimportFile
 {
 
-    private Reimport $segmentProcessor;
+    private FileDto $fileDto;
 
     public function __construct(private editor_Models_Task $task, private ZfExtended_Models_User $user)
     {
@@ -81,23 +82,24 @@ class ReimportFile
 
         $parser->setIsReimport();
 
-        $this->segmentProcessor = ZfExtended_Factory::get(Reimport::class, [
+        $segmentProcessor = ZfExtended_Factory::get(Reimport::class, [
             $this->task,
-            $segmentFieldManager,
             $this->user
         ]);
-        $this->segmentProcessor->setSegmentFile($fileId, $parser->getFileName());
-        $this->segmentProcessor->setSaveTimestamp($segmentTimestamp);
 
-        $parser->addSegmentProcessor($this->segmentProcessor);
+        $segmentProcessor->setSegmentFile($fileId, $parser->getFileName());
+        $segmentProcessor->setSaveTimestamp($segmentTimestamp);
+        $segmentProcessor->setFileDto($this->fileDto);
+
+        $parser->addSegmentProcessor($segmentProcessor);
         $parser->parseFile();
     }
 
     /**
-     * @return Reimport
+     * @param FileDto $fileDto
      */
-    public function getSegmentProcessor(): Reimport
+    public function setFileDto(FileDto $fileDto): void
     {
-        return $this->segmentProcessor;
+        $this->fileDto = $fileDto;
     }
 }

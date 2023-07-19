@@ -327,35 +327,31 @@ class editor_Models_Export_FileParser_Xlf extends editor_Models_Export_FileParse
         if(stripos($content, '<sub') === false) {
             return $content;
         }
-        
-        //get the transunit part of the root segment
-        $transunitMid = $this->_segmentEntity->getMid();
-        $transunitMid = explode('_', $transunitMid)[0];
-        
-        $xmlparser = ZfExtended_Factory::get('editor_Models_Import_FileParser_XmlParser');
-        /* @var $xmlparser editor_Models_Import_FileParser_XmlParser */
-        
+
+        $meta = $this->_segmentEntity->meta();
+
+        $xmlparser = ZfExtended_Factory::get(editor_Models_Import_FileParser_XmlParser::class);
+
         //restoring of sub tags is working only if the parent tag has a valid id - this is the identifier for the sub segment content
         $xmlparser->registerElement('sub', function($tag, $attributes, $key) use($xmlparser){
             //disable handling of tags if we reach a sub, this is done recursivly in the loaded content of the found sub
             $xmlparser->disableHandlersUntilEndtag();
-        }, function($tag, $key, $opener) use ($xmlparser, $transunitMid, $field){
+        }, function($tag, $key, $opener) use ($xmlparser, $field,$meta){
             $tagId = $this->getParentTagId($xmlparser);
             if(empty($tagId) && $tagId !== '0') {
                 error_log("Could not restore sub tag content since there is no id in the surrounding <ph>,<bpt>,<ept>,<it> tag!"); //FIXME better logging
                 return;
             }
-            //now we need the segmentId to the found MID:
-            // since the MID of a <sub> segment is defined as:
-            // SEGTRANSUNITID _ SEGNR -sub- TAGID
-            // and we have only the first and the last part, we have to use like to get the segmentId
+
+            // create the mid for the segment to the sub content to load it
+            $mid = $this->createSubSegmentMid($tagId,$meta);
             $s = $this->_segmentEntity->db->select('id')
                 ->where('taskGuid = ?', $this->_taskGuid)
-                ->where('mid like ?', $transunitMid.'_%-sub-'.$tagId);
+                ->where('mid = ?', $mid);
             $segmentRow = $this->_segmentEntity->db->fetchRow($s);
-            
+
             //if we got a segment we have to get its segmentContent and set it as the new content in our resulting XML
-            // since we are calling getSegmentContent recursivly, the <sub> segments are replaced from innerst one out
+            // since we are calling getSegmentContent recursively, the <sub> segments are replaced from innerst one out
             if($segmentRow) {
                 //remove all chunks between the sub tag
                 $xmlparser->replaceChunk($opener['openerKey']+1,'', $key-$opener['openerKey']-1);
@@ -399,5 +395,34 @@ class editor_Models_Export_FileParser_Xlf extends editor_Models_Export_FileParse
             return $this->utilities->tagProtection->unprotect($segment);
         }
         return $segment;
+    }
+
+    /**
+     * Create segment mid for segments out of sub tag
+     * @param string $tagId
+     * @param editor_Models_Segment_Meta $parentSegmentMeta the meta element to the parent segment
+     * @return string
+     */
+    protected function createSubSegmentMid(string $tagId, editor_Models_Segment_Meta $parentSegmentMeta): string
+    {
+        $mid = 'sub-'.$tagId;
+        $includeSubInLength = (bool)$this->config->runtimeOptions->import->xlf->includedSubElementInLengthCalculation;
+
+        if ($includeSubInLength) {
+            // we can reuse the parent segments transunitHash, since it's the same
+            $transunitHash = $parentSegmentMeta->getTransunitHash();
+        } else {
+            // in case the sub elements are not included in the transunit length calculation,
+            // we have to recalulate the transunitHash since it is different as the one of $parentSegmentMeta
+            $transunitHash = $this->transunitHash->createForSub(
+                $parentSegmentMeta->getSourceFileId(),
+                $parentSegmentMeta->getTransunitId(),
+                $mid
+            );
+        }
+
+        // At the end, the segment mid is transunitHash + calculated mid for sub - like on import
+        //@see \editor_Models_Import_FileParser::setMidWithHash
+        return $transunitHash.'_'.$mid;
     }
 }

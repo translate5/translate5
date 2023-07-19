@@ -521,13 +521,19 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
             $numSegmentsInTransUnit++;
             $sourceName = $this->segmentFieldManager->getFirstSourceName();
             $targetName = $this->segmentFieldManager->getFirstTargetName();
+
+            $transUnitHash = $this->transunitHash->create($this->sourceFileId, $this->transunitParser->getTransunitId());
+
             $this->setMid($mid);
-            
+
             //after defining the MID segment we have the mid and can access the attributes object,
             // to set the length attributes
             $attributes = $this->processCxtMetaTagsForSegment($groupCxtIds);
+
+            $attributes->transunitHash = $transUnitHash;
             $attributes->transunitId = $this->transunitParser->getTransunitId();
-            
+            $attributes->mrkMid = $mid;
+
             $this->segmentData[$sourceName] = ['original' => $this->parseSegment($source,true)];
             $this->segmentData[$targetName] = ['original' => $this->parseSegment($target,true)];
             $segmentId = $this->setAndSaveSegmentValues();

@@ -43,6 +43,7 @@ END LICENSE AND COPYRIGHT
  * @method void setTargetLang() setTargetLang(int $target)
  * @method void setRelaisLang() setRelaisLang(int $target)
  * @method void setFileOrder() setFileOrder(int $order)
+ * @method void setIsReimportable() setIsReimportable(int $isReimportable)
  * @method integer getId() getId()
  * @method string getTaskGuid() getTaskGuid()
  * @method string getFileName() getFileName()
@@ -51,6 +52,7 @@ END LICENSE AND COPYRIGHT
  * @method integer getTargetLang() getTargetLang()
  * @method integer getRelaisLang() getRelaisLang()
  * @method integer getFileOrder() getFileOrder()
+ * @method integer getIsReimportable() getIsReimportable()
  */
 class editor_Models_File extends ZfExtended_Models_Entity_Abstract {
     const SKELETON_DIR_NAME = 'skeletonfiles';

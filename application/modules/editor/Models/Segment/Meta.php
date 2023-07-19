@@ -36,6 +36,8 @@ END LICENSE AND COPYRIGHT
  * @method void setSegmentId() setSegmentId(int $id)
  * @method integer getTransunitId() getTransunitId()
  * @method void setTransunitId() setTransunitId(int $id)
+ * @method string getTransunitHash() getTransunitHash()
+ * @method void setTransunitHash() setTransunitHash(string $transunitHash)
  * @method string getSiblingData() getSiblingData()
  * @method integer getMinWidth() getMinWidth()
  * @method void setMinWidth() setMinWidth(int $width)
@@ -63,6 +65,10 @@ END LICENSE AND COPYRIGHT
  * @method void setSourceCharacterCount() setSourceCharacterCount(int $count)
  * @method string getPreTransLangResUuid() getPreTransLangResUuid()
  * @method void setPreTransLangResUuid() setPreTransLangResUuid(string $uuid)
+ * @method string getMrkMid() getMrkMid()
+ * @method void setMrkMid() setMrkMid(string $mrkMid)
+ * @method string getSourceFileId() getSourceFileId()
+ * @method void setSourceFileId() setSourceFileId(string $sourceFileId)
  */
 class editor_Models_Segment_Meta extends ZfExtended_Models_Entity_MetaAbstract {
     protected $dbInstanceClass = 'editor_Models_Db_SegmentMeta';
@@ -102,13 +108,13 @@ class editor_Models_Segment_Meta extends ZfExtended_Models_Entity_MetaAbstract {
      * Updates the additional unit lengths of a transunit
      * Warning: This does not update the materialized view! (Currently not needed since used only in import before mat view creation)
      * @param string $taskGuid
-     * @param string $transunitId
+     * @param string $transunitHash
      * @param integer $additionalUnitLength
      */
-    public function updateAdditionalUnitLength(string $taskGuid, string $transunitId, int $additionalUnitLength) {
+    public function updateAdditionalUnitLength(string $taskGuid, string $transunitHash, int $additionalUnitLength) {
         $this->db->update(['additionalUnitLength' => $additionalUnitLength], [
             'taskGuid = ?' => $taskGuid,
-            'transunitId = ?' => $transunitId,
+            'transunitHash = ?' => $transunitHash,
         ]);
     }
     

@@ -133,7 +133,10 @@ class editor_Models_Import_SegmentProcessor_Review extends editor_Models_Import_
      * @param editor_Models_Segment $seg
      * @param editor_Models_Import_FileParser_SegmentAttributes $attributes
      */
-    protected function processSegmentMeta(editor_Models_Segment $seg, editor_Models_Import_FileParser_SegmentAttributes $attributes) {
+    protected function processSegmentMeta(
+        editor_Models_Segment $seg,
+        editor_Models_Import_FileParser_SegmentAttributes $attributes)
+    {
         $meta = $seg->meta();
         if(!empty($attributes->maxNumberOfLines) && !is_null($attributes->maxNumberOfLines)) {
             $meta->setMaxNumberOfLines($attributes->maxNumberOfLines);
@@ -159,7 +162,15 @@ class editor_Models_Import_SegmentProcessor_Review extends editor_Models_Import_
         if(!empty($attributes->additionalUnitLength)) {
             $meta->setAdditionalUnitLength($attributes->additionalUnitLength);
         }
-        if(!empty($attributes->transunitId) && !is_null($attributes->transunitId)) {
+        if(!empty($attributes->transunitHash) && !is_null($attributes->transunitHash)) {
+            $meta->setTransunitHash($attributes->transunitHash);
+        }
+        else {
+            //transunitHash must not be null, so if no info given we use segmentNr to assume that just the single segment is in a transunit
+            $meta->setTransunitHash($seg->getSegmentNrInTask());
+        }
+
+        if(!empty($attributes->transunitId)) {
             $meta->setTransunitId($attributes->transunitId);
         }
         else {
@@ -174,6 +185,9 @@ class editor_Models_Import_SegmentProcessor_Review extends editor_Models_Import_
         if(!empty($attributes->locked)) {
             $meta->setLocked($attributes->locked);
         }
+
+        $meta->setMrkMid($attributes->mrkMid);
+        $meta->setSourceFileId($attributes->sourceFileId ?? '');
 
         //add custom meta fields
         if(!empty($attributes->customMetaAttributes)) {

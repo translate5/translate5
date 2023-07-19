@@ -177,12 +177,20 @@ class editor_Models_Import_FileParser_Transit extends editor_Models_Import_FileP
             $source = $sourceSegs[$segId]->getText();
             $target = $seg->getText();
             //skip segments, which contain only tags
-            if($this->containsOnlyTagsOrEmpty($source)&&$this->containsOnlyTagsOrEmpty($target)){
+            if ($this->containsOnlyTagsOrEmpty($source) && $this->containsOnlyTagsOrEmpty($target)) {
                 continue;
             }
-            $this->setMid($segId);
+
+            $transunitHash = $this->transunitHash->create($this->sourceFileId, $seg->getId());
+
+            $this->setMidWithHash($transunitHash,$segId);
+
             //segment-id of transit is used as mid and thus used here
-            $attributes = $this->createSegmentAttributes($seg->getId());
+            $attributes = $this->createSegmentAttributes($this->_mid);
+            $attributes->transunitHash = $transunitHash;
+            $attributes->transunitId = $segId;
+            $attributes->mrkMid = $segId;
+
             //from transit we support only the matchRate at the moment, rest is default
             $attributes->matchRate = (int)$seg->getMatchValue();
             $transUnit = array('source'=>$source,'target'=>$target);

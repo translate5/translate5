@@ -59,7 +59,7 @@ class BasicSegmentEditingTest extends editor_Test_JsonTest {
      */
     public function testBasicSegmentValuesAfterImport() {
         //get segment list
-        $segments = static::api()->getSegments();
+        $segments = static::api()->getSegments(fieldsToExclude: []);
         
         $this->assertCount(13, $segments);
         
@@ -148,25 +148,33 @@ class BasicSegmentEditingTest extends editor_Test_JsonTest {
         //test editing a prefilled segment
         $segToTest = $segments[2];
         $segment = static::api()->saveSegment($segToTest->id, 'PHP Handbuch');
-
         //check direct PUT result
         $jsonFileName = 'testSegmentEditing-assert-seg3.json';
         $this->assertSegmentEqualsJsonFile($jsonFileName, $segment);
         
         //check again with GET fresh from server
         $segment = static::api()->getJson('editor/segment/'.$segToTest->id);
+
+        // remove the mid before comparing with the file since it is not unique
+        // (because in the generated has the fileId is included)
+        unset($segment->mid);
+
         $this->assertSegmentEqualsJsonFile($jsonFileName, $segment);
         
         //test editing an empty segment
         $segToTest = $segments[6];
         $segment = static::api()->saveSegment($segToTest->id, 'Apache 2.x auf Unix-Systemen');
-
         //check direct PUT result
         $jsonFileName = 'testSegmentEditing-assert-seg7.json';
         $this->assertSegmentEqualsJsonFile($jsonFileName, $segment);
         
         //check again with GET fresh from server
         $segment = static::api()->getJson('editor/segment/'.$segToTest->id);
+
+        // remove the mid before comparing with the file since it is not unique
+        // (because in the generated has the fileId is included)
+        unset($segment->mid);
+
         $this->assertSegmentEqualsJsonFile($jsonFileName, $segment);
         
         // check correction of overpapped QM Tags (only when there is no contents between them) For this, proper t5qid's are required
@@ -177,26 +185,34 @@ class BasicSegmentEditingTest extends editor_Test_JsonTest {
         $tag2_close = '<img class="close critical qmflag ownttip qmflag-4" data-t5qid="2" data-comment="" src="/modules/editor/images/imageTags/qmsubsegment-4-right.png" />';
         $targetEdit = $tag1_open.'Apache 2.x'.$tag2_open.$tag1_close.' auf'.$tag2_close.' Unix-Systemen';
         $segment = static::api()->saveSegment($segToTest->id, $targetEdit);
-
         //check direct PUT result
         $jsonFileName = 'testSegmentEditing-assert-seg7-a.json';
         $this->assertSegmentEqualsJsonFile($jsonFileName, $segment);
         
         //check again with GET fresh from server
         $segment = static::api()->getJson('editor/segment/'.$segToTest->id);
+
+        // remove the mid before comparing with the file since it is not unique
+        // (because in the generated has the fileId is included)
+        unset($segment->mid);
+
         $this->assertSegmentEqualsJsonFile($jsonFileName, $segment);
         
         // check for overpapped QM Tags with contents between them. They must be not corrected on saving.
         $segToTest = $segments[6];
         $targetEdit = $tag1_open.'Apache 2.x'.$tag2_open.' auf'.$tag1_close.' Unix-Systemen'.$tag2_close;
         $segment = static::api()->saveSegment($segToTest->id, $targetEdit);
-
         //check direct PUT result
         $jsonFileName = 'testSegmentEditing-assert-seg7-b.json';
         $this->assertSegmentEqualsJsonFile($jsonFileName, $segment);
         
         //check again with GET fresh from server
         $segment = static::api()->getJson('editor/segment/'.$segToTest->id);
+
+        // remove the mid before comparing with the file since it is not unique
+        // (because in the generated has the fileId is included)
+        unset($segment->mid);
+
         $this->assertSegmentEqualsJsonFile($jsonFileName, $segment);
         
         $segToTest = $segments[7];

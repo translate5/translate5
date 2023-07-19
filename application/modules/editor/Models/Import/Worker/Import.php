@@ -133,6 +133,9 @@ class editor_Models_Import_Worker_Import {
 
         $filesProcessedAtAll = 0;
         $isReImportable = true;
+
+        $fileModel = ZfExtended_Factory::get(editor_Models_File::class);
+
         foreach ($filelist as $fileId => $path) {
             $filelist[$fileId] = $path = $fileFilter->applyImportFilters($path, $fileId);
             $filePath = $this->importConfig->importFolder.'/'.$path;
@@ -148,6 +151,13 @@ class editor_Models_Import_Worker_Import {
             $parser->addSegmentProcessor($segProc);
             $parser->parseFile();
             $filesProcessedAtAll++;
+
+            // in case the file is re-importable, update the isReimportable flag for the current file
+            if ($parser::IS_REIMPORTABLE){
+                $fileModel->load($fileId);
+                $fileModel->setIsReimportable($parser::IS_REIMPORTABLE);
+                $fileModel->save();
+            }
 
             // task is not reimportable if one of the files is not supported by the reimport parser
             if($parser::IS_REIMPORTABLE === false){

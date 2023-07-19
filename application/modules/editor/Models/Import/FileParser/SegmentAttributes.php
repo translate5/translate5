@@ -28,8 +28,8 @@ END LICENSE AND COPYRIGHT
 
 /**
  * Segment Attributes
- * This class is just used as datatype struct in the import fileparser to have IDE completion here
- * if we have new attrbiutes in the core code, they should be added here.
+ * This class is just used as datatype struct in the import file parser to have IDE completion here
+ * if we have new attributes in the core code, they should be added here.
  * For Plugin purposes and flexible extension there exist the customMetaAttributes array as dynamic container
  */
 class editor_Models_Import_FileParser_SegmentAttributes {
@@ -77,7 +77,8 @@ class editor_Models_Import_FileParser_SegmentAttributes {
     public $autoStateId;
     
     /**
-     * Is the segment editable or not, calculated by the fileparser - locks the segment mutable (auto state BLOCKED - if locked is not already set)
+     * Is the segment editable or not, calculated by the fileparser - locks the segment mutable
+     * (auto state BLOCKED - if locked is not already set)
      * @var boolean
      */
     public $editable;
@@ -133,26 +134,35 @@ class editor_Models_Import_FileParser_SegmentAttributes {
     public $fontSize = null;
     
     /**
-     * Additional string length in transunit before first mrk tag, to be added to the length calculation of the segment once
+     * Additional string length in transunit before first mrk tag,
+     * to be added to the length calculation of the segment once
      * @var integer
      */
     public $additionalUnitLength = 0;
     
     /**
-     * Additional string length of the string between the mrk tag containing that segment and next mrk, or the length of the content after the last mrk tag
-     * This value must be added to the calculated length of each segment on each segment update and on the fly in the frontend
+     * Additional string length of the string between the mrk tag containing that segment and next mrk, or the length
+     * of the content after the last mrk tag This value must be added to the calculated length of each
+     * segment on each segment update and on the fly in the frontend
      * @var integer
      * @deprecated not used anymore for newly imported tasks - still needed for legacy tasks
      */
     public $additionalMrkLength = 0;
     
     /**
-     * The transunitId and fileId (or in general group id) if some segments are belonging together.
-     * For example in XLF there is one transunit with multiple mrk tags.
-     * Each MRK tag is one segment in translate5, through the transunitId the segments are grouped.
-     * The value is fileId_transunitId
+     * Unique hash value generate out of:
+     *
+     * - the current fileId. This is the id of the current file in the LEK_files table
+     * - the value of the original attribute from the file tag (xlf specific)
+     * - the id of the current trans-unit (transunitId)
      *
      * @var string
+     */
+    public $transunitHash;
+
+    /***
+     * Value of the id attribute of the trans-unit element
+     * @var
      */
     public $transunitId;
     
@@ -163,4 +173,11 @@ class editor_Models_Import_FileParser_SegmentAttributes {
      * @var array
      */
     public $customMetaAttributes = [];
+
+    /***
+     * Parsed file identifier. For xlf this is the original attribute from the file tag
+     * @var string
+     */
+    public string $sourceFileId;
+
 }

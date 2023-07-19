@@ -114,8 +114,8 @@ class Worker extends editor_Models_Task_AbstractWorker
                 if (is_null($file->reimportFile)) {
                     continue; //if there was no matching file, we can not process it
                 }
+                $reimportFile->setFileDto($file);
                 $reimportFile->import($fileId, $file->reimportFile, $params['segmentTimestamp']);
-                $this->logReimportedContent($reimportFile, $logger, $file);
             }
         } finally {
             //if it was a PM override, delete it again
@@ -205,39 +205,6 @@ class Worker extends editor_Models_Task_AbstractWorker
     {
         if (is_subclass_of($dataProviderClass, AbstractDataProvider::class)) {
             $dataProviderClass::getForCleanup($task)->cleanup();
-        }
-    }
-
-    /**
-     * @param ReimportFile $reimportFile
-     * @param $log
-     * @param FileDto $file
-     * @return void
-     * @throws JsonException
-     */
-    private function logReimportedContent(ReimportFile $reimportFile, $log, FileDto $file): void
-    {
-        $updatedSegments = $reimportFile->getSegmentProcessor()->getUpdatedSegments();
-        $log->info('E1440', 'Reimport for the file "{filename}" is finished. Total updated segments: {updateCount}.', [
-            'task' => $this->task,
-            'fileId' => $file->fileId,
-            'updateCount' => count($updatedSegments),
-            'segments' => implode(',', $updatedSegments),
-            'filename' => $file->filteredFilePath
-        ]);
-
-        foreach ($reimportFile->getSegmentProcessor()->getSegmentErrors() as $code => $codeErrors) {
-            $extra = [];
-            foreach ($codeErrors as $error) {
-                /* @var ReimportSegmentErrors $error */
-                $extra[] = $error->getData();
-            }
-            $log->warn($code, $codeErrors[0]->getMessage(), [
-                'task' => $this->task,
-                'fileId' => $file->fileId,
-                'filename' => $file->filteredFilePath,
-                'extra' => json_encode($extra, JSON_THROW_ON_ERROR)
-            ]);
         }
     }
 }

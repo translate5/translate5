@@ -578,7 +578,7 @@ final class Helper extends \ZfExtended_Test_ApiHelper
      * @param int $page
      * @return \stdClass|array
      */
-    public function getSegments(string $jsonFileName = null, int $limit = 200, int $start = 0, int $page = 1)
+    public function getSegmentsRequest(string $jsonFileName = null, int $limit = 200, int $start = 0, int $page = 1)
     {
         $url = 'editor/segment?page=' . $page . '&start=' . $start . '&limit=' . $limit;
         return $this->fetchJson($url, 'GET', [], $jsonFileName, false);
@@ -614,17 +614,75 @@ final class Helper extends \ZfExtended_Test_ApiHelper
         return $result;
     }
 
+    /***
+     * Get all segments from jsonFile or from remote api with the option to provide which fields should be removed from
+     * the result list. By default, mid will be removed from the segments array because this field is
+     * not always the same.
+     *
+     * @param string|null $jsonFileName
+     * @param int $limit
+     * @param int $start
+     * @param int $page
+     * @param array $fieldsToExclude
+     * @return array
+     */
+    public function getSegments(
+        string $jsonFileName = null,
+        int    $limit = 200,
+        int    $start = 0,
+        int    $page = 1,
+        array  $fieldsToExclude = ['mid']
+    ): array
+    {
+
+        $segments = $this->getSegmentsRequest($jsonFileName, $limit, $start, $page);
+
+        foreach ($segments as $segment) {
+            foreach ($fieldsToExclude as $field) {
+                if (is_array($segment) && array_key_exists($field, $segment)) {
+                    unset($segment[$field]);
+                }
+                if (is_object($segment) && property_exists($segment, $field)) {
+                    unset($segment->$field);
+                }
+            }
+        }
+        return $segments;
+    }
+
     /**
      * Saves a segment / sends segment put
      * @param int $segmentId
      * @param string $editedTarget
      * @param string|null $editedSource
      * @param string|null $jsonFileName
-     * @param array $additionalPutData : may be used to send additional data. will overwrite programmatical values
+     * @param array $additionalPutData :
      * @param int $duration
      * @return bool|\stdClass
      */
-    public function saveSegment(int $segmentId, string $editedTarget = null, string $editedSource = null, string $jsonFileName = null, array $additionalPutData = [], int $duration = 666)
+    /***
+     * @param int $segmentId
+     * @param string|null $editedTarget
+     * @param string|null $editedSource
+     * @param string|null $jsonFileName
+     * @param array $additionalPutData  may be used to send additional data. will overwrite programmatically values
+     * @param int $duration
+     * @param array $fieldsToExclude  segment field to be excluded in the results array. By default, the segment mid
+     *                                 is removed from the array because it is expected to be unique by a lot of tests.
+     *                                 With the new mid-implementation, the mid is also generated out of segment fileId,
+     *                                 and it is always different for each test run.
+     * @return array|\stdClass
+     * @throws \Zend_Http_Client_Exception
+     */
+    public function saveSegment(
+        int $segmentId,
+        string $editedTarget = null,
+        string $editedSource = null,
+        string $jsonFileName = null,
+        array $additionalPutData = [],
+        int $duration = 666,
+        array $fieldsToExclude = ['mid']
+    ): array|\stdClass
     {
         $data = [
             'id' => $segmentId,
@@ -642,7 +700,18 @@ final class Helper extends \ZfExtended_Test_ApiHelper
         foreach ($additionalPutData as $key => $value) {
             $data[$key] = $value;
         }
-        return $this->putJson('editor/segment/' . $segmentId, $data, $jsonFileName);
+        $result = $this->putJson('editor/segment/' . $segmentId, $data, $jsonFileName);
+
+        foreach ($fieldsToExclude as $field) {
+            if (is_array($result) && array_key_exists($field, $result)) {
+                unset($result[$field]);
+            }
+            if (is_object($result) && property_exists($result, $field)) {
+                unset($result->$field);
+            }
+        }
+
+        return $result;
     }
 
     //endregion

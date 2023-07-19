@@ -1,7 +1,6 @@
 [
     {
         "segmentNrInTask": "1",
-        "mid": "1",
         "userGuid": "{00000000-0000-0000-C100-CCDDEE000001}",
         "userName": "manager test",
         "editable": "1",
@@ -28,7 +27,6 @@
     },
     {
         "segmentNrInTask": "2",
-        "mid": "2",
         "userGuid": "{00000000-0000-0000-C100-CCDDEE000001}",
         "userName": "manager test",
         "editable": "1",
@@ -55,7 +53,6 @@
     },
     {
         "segmentNrInTask": "3",
-        "mid": "3",
         "userGuid": "{00000000-0000-0000-C100-CCDDEE000001}",
         "userName": "manager test",
         "editable": "1",
@@ -82,7 +79,6 @@
     },
     {
         "segmentNrInTask": "4",
-        "mid": "4",
         "userGuid": "{00000000-0000-0000-C100-CCDDEE000001}",
         "userName": "manager test",
         "editable": "1",
@@ -109,7 +105,6 @@
     },
     {
         "segmentNrInTask": "5",
-        "mid": "5",
         "userGuid": "{00000000-0000-0000-C100-CCDDEE000001}",
         "userName": "manager test",
         "editable": "1",
@@ -136,7 +131,6 @@
     },
     {
         "segmentNrInTask": "6",
-        "mid": "6",
         "userGuid": "{00000000-0000-0000-C100-CCDDEE000001}",
         "userName": "manager test",
         "editable": "1",
@@ -163,7 +157,6 @@
     },
     {
         "segmentNrInTask": "7",
-        "mid": "7",
         "userGuid": "{00000000-0000-0000-C100-CCDDEE000001}",
         "userName": "manager test",
         "editable": "1",
@@ -190,7 +183,6 @@
     },
     {
         "segmentNrInTask": "8",
-        "mid": "8",
         "userGuid": "{00000000-0000-0000-C100-CCDDEE000001}",
         "userName": "manager test",
         "editable": "1",
