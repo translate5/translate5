@@ -68,6 +68,16 @@ final class Helper extends \ZfExtended_Test_ApiHelper
     const TEST_CUSTOMER_NUMBER = '123456789';
 
     /**
+     * Customer-number of the second test-customer
+     */
+    const TEST_CUSTOMER_NUMBER_1 = '1234567891';
+
+    /**
+     * Customer-number of the third test-customer
+     */
+    const TEST_CUSTOMER_NUMBER_2 = '1234567892';
+
+    /**
      *
      */
     const SEGMENT_DUPL_SAVE_CHECK = '<img src="data:image/gif;base64,R0lGODlhAQABAID/AMDAwAAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw==" class="duplicatesavecheck" data-segmentid="%s" data-fieldname="%s">';
@@ -248,7 +258,7 @@ final class Helper extends \ZfExtended_Test_ApiHelper
     public function importTask(array $task, bool $failOnError = true, bool $waitForImport = true)
     {
         $this->initTaskPostData($task);
-        $this->test::assertLogin('testmanager'); // make sure testmanager is logged in
+        $this->test::assertLogins(['testmanager', 'testclientpm']); // make sure testmanager or testclientpm is logged in
         $this->task = $this->postJson('editor/task', $task);
         // the project tasks will only be part of the first request
         $projectTasks = (property_exists($this->task, 'projectTasks')) ? $this->task->projectTasks : null;

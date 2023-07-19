@@ -63,6 +63,7 @@ final class Task extends Resource
     private bool $_setToEditAfterImport = false;
     private bool $_waitForImported = true;
     private bool $_failOnError = true;
+    private string $_owner = 'testmanager';
     /**
      * Defines the default-configs that will be applied for all task-imports
      * @var array
@@ -179,6 +180,15 @@ final class Task extends Resource
     }
 
     /**
+     * Sets the owner of the task - the user that imports it (default: "testmanager")
+     * @return string
+     */
+    public function setOwner(string $login): void
+    {
+        $this->_owner = $login;
+    }
+
+    /**
      * Sets the task-usage mode during import
      * @param string $usageMode
      * @return $this
@@ -261,6 +271,15 @@ final class Task extends Resource
     }
 
     /**
+     * Retrieves the owner of the task, the user that imports it (usually testmanager)
+     * @return string
+     */
+    public function getOwner(): string
+    {
+        return $this->_owner;
+    }
+
+    /**
      * @return string
      * @throws Exception
      */
@@ -311,8 +330,8 @@ final class Task extends Resource
         if ($this->_requested) {
             throw new Exception('You cannot import a Task twice.');
         }
-        // tasks will be uploaded as testmanager
-        $api->login('testmanager');
+        // tasks will usually be uploaded as testmanager (if not defined otherwise)
+        $api->login($this->_owner);
 
         // has to be evaluated before the data is re-set by request
         $isMultiLanguage = (is_array($this->targetLang) && count($this->targetLang) > 1);
@@ -433,7 +452,7 @@ final class Task extends Resource
      */
     public function cleanup(Helper $api, Config $config): void
     {
-        $api->login('testmanager');
+        $api->login($this->_owner);
         // TODO FIXME: this is just neccessary because of quirks in the helper API ... see class comment
         if($this->_failOnError){
             $this->reload($api);
@@ -445,11 +464,11 @@ final class Task extends Resource
             // project tasks or tasks in error/import state can not be opened
             // Note that it can not be guaranteed here, that the state of the task is persistent as there is a task-cache in the API still
             if (!$this->isProjectTask() && $taskState !== 'error' && $taskState !== 'import') {
-                $login = ($config->hasTestlectorLogin()) ? 'testlector' : 'testmanager';
+                $login = ($config->hasTestlectorLogin()) ? 'testlector' : $this->_owner;
                 $api->login($login);
                 $api->setTaskToOpen($taskId);
             }
-            $api->login('testmanager');
+            $api->login($this->_owner);
             $api->delete('editor/task/' . $taskId);
         }
         // remnove zipped file when imported by folder
