@@ -34,13 +34,6 @@ Ext.define('Editor.view.LanguageResources.TbxExport', {
     controller: 'tbxexport',
     alias: 'widget.tbxexport',
     itemId: 'tbxExport',
-    strings: {
-    	tbxBasicOnlyLabel: '#UT#Nur TBX Basic Standardattribute + processStatus exportieren',
-    	exportImagesLabel: '#UT#Bilder im Hex-Format exportieren, eingebettet in TBX',
-    	exportButtonText:'#UT#Exportieren',
-    	cancelButtonText:'#UT#Abbrechen',
-    	title:'#UT#Als TBX exportieren'
-    },
     modal:true,
 	width:500,
 	autoScroll:true,
@@ -51,39 +44,74 @@ Ext.define('Editor.view.LanguageResources.TbxExport', {
 	initConfig: function(instanceConfig) {
         var me = this,
         config = {
-    		title:me.strings.title+': '+instanceConfig.record.get('name'),
+			bind: {
+				title: '{l10n.languageResources.tbxExport.title}: ' + instanceConfig.record.get('name')
+			},
 			defaults: {
 				margin: '0 0 0 15'
 			},
             items:[{
         		xtype: 'checkbox',
         		flex: 1,
-        		boxLabel: me.strings.tbxBasicOnlyLabel,
+				bind: {
+					boxLabel: '{l10n.languageResources.tbxExport.tbxBasicOnlyLabel}'
+				},
         		value: 0,
         		name: 'tbxBasicOnly'
         	}, {
         		xtype: 'checkbox',
         		flex: 1,
-        		boxLabel: me.strings.exportImagesLabel,
+				bind: {
+					boxLabel: '{l10n.languageResources.tbxExport.exportImagesLabel}'
+				},
         		value: 1,
         		name: 'exportImages'
-        	}],
+        	}, {
+				xtype: 'radiogroup',
+				simpleValue: true,
+				flex: 1,
+				name: 'exportImagesVia',
+				defaults: {
+					margin: '0 0 0 30'
+				},
+				layout: 'vbox',
+				items: [
+					{
+						bind: {
+							boxLabel: '{l10n.languageResources.tbxExport.exportImagesTbx}'
+						},
+						checked: true,
+						inputValue: 'tbx'
+					}, {
+						bind: {
+							boxLabel: '{l10n.languageResources.tbxExport.exportImagesZip}'
+						},
+						inputValue: 'zip'
+					}
+				]
+			}],
         	dockedItems: [{
                 xtype: 'toolbar',
                 dock: 'bottom',
                 items: [{
                 	xtype:'button',
                 	itemId:'exportButton',
-                	text:me.strings.exportButtonText,
+					bind: {
+						text: '{l10n.languageResources.tbxExport.exportButtonText}'
+					},
                 	handler: function() {
                 		me.getController().exportTbx(
                 			me.down('[name=tbxBasicOnly]'),
-							me.down('[name=exportImages]'), me.record
+							me.down('[name=exportImages]'),
+							me.down('[name=exportImagesVia]'),
+							me.record
 						);
                 	}
                 },{
                 	xtype:'button',
-                	text:me.strings.cancelButtonText,
+					bind: {
+						text: '{l10n.languageResources.tbxExport.cancelButtonText}'
+					},
                 	handler:function(){
                 		this.up('window').destroy();
                 	}
