@@ -64,7 +64,7 @@ class MaintenanceCommand extends Translate5AbstractCommand {
         $this->writeTitle('maintenance mode');
         
         $this->mm = new \ZfExtended_Models_Installer_Maintenance();
-        if($this->mm->isInIni()) {
+        if ($this->mm->isInIni()) {
             $this->io->error(['There is some maintenance configuration in the installation.ini, ', 'please remove it for proper usage of this tool!']);
             return 1;
         }
@@ -96,7 +96,9 @@ class MaintenanceCommand extends Translate5AbstractCommand {
     
     protected function showStatus() {
         $conf = $this->mm->status();
-        
+
+        //FIXME add porcelain here
+
         if(empty($conf->startDate)) {
             $msg = ["  <info>Maintenance mode:</> <fg=green;options=bold>disabled!</>"];
             if(!empty($conf->message)) {

@@ -48,6 +48,8 @@ abstract class editor_Workflow_Default_AbstractHandler {
      * @param string $step task step filterm can be empty
      * @param string $role job step filter can be empty
      * @param string $state job state filter can be empty
+     *
+     * @uses editor_Workflow_Notification::notifyAllFinishOfARole() //FIXME add the others
      */
     protected function callActions(editor_Workflow_Actions_Config $config, $step = null, $role = null, $state = null) {
         $actions = ZfExtended_Factory::get('editor_Models_Workflow_Action');

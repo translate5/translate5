@@ -416,7 +416,7 @@ class editor_Models_Export_FileParser_Xlf extends editor_Models_Export_FileParse
             // we have to recalulate the transunitHash since it is different as the one of $parentSegmentMeta
             $transunitHash = $this->transunitHash->createForSub(
                 $parentSegmentMeta->getSourceFileId(),
-                $parentSegmentMeta->getTransunitId(),
+                (string) $parentSegmentMeta->getTransunitId(),
                 $mid
             );
         }

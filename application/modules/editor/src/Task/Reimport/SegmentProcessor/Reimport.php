@@ -125,8 +125,8 @@ class Reimport extends editor_Models_Import_SegmentProcessor
             return $segment->getId();
         } catch (Throwable $e) {
             // collect the errors in case the segment can not be saved
-            /** @var ReimportSegmentErrors $reimportError */
 
+            /* @var ReimportSegmentErrors $reimportError */
             $this->alignment->addError(new Error(
                 'E1435',
                 'Reimport Segment processor: Unable to save the segment:' . $segment->getSegmentNrInTask(),

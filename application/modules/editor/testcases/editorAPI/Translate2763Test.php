@@ -80,7 +80,7 @@ class Translate2763Test extends editor_Test_JsonTest {
             'deleteProposalsLastTouchedOlderThan' => null,
         ]);
 
-        sleep(10);
+        sleep(30);
 
         // Do tbx-export
         $data = static::api()->get('/editor/languageresourceinstance/tbxexport', [
