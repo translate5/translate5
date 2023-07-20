@@ -28,6 +28,7 @@ END LICENSE AND COPYRIGHT
 
 use MittagQI\Translate5\Test\Api\Helper;
 use MittagQI\Translate5\Test\Import\Config;
+use MittagQI\Translate5\Test\Import\LanguageResource;
 
 /**
  * Tests the Client PM role / multitenancy
@@ -35,6 +36,10 @@ use MittagQI\Translate5\Test\Import\Config;
 class ClientPmTest extends editor_Test_ImportTest
 {
     private static int $newUserId = -1;
+
+    private static LanguageResource $dummyMt0;
+
+    private static LanguageResource $dummyMt1;
 
     protected static function setupImport(Config $config): void
     {
@@ -45,6 +50,20 @@ class ClientPmTest extends editor_Test_ImportTest
         $config->addTask('en', 'de', static::getTestCustomerId(1), '3-segments-en-de.zip')
             ->setProperty('foreignId', '2')
             ->setOwner('testclientpm');
+        self::$dummyMt0 = $config->addLanguageResource(
+            LanguageResource::DUMMY_TM,
+            null,
+            static::getTestCustomerId(),
+            'en',
+            'de'
+        );
+        self::$dummyMt1 = $config->addLanguageResource(
+            LanguageResource::DUMMY_TM,
+            null,
+            static::getTestCustomerId(1),
+            'en',
+            'de'
+        );
     }
 
     /**
@@ -62,6 +81,11 @@ class ClientPmTest extends editor_Test_ImportTest
         $tasks = static::api()->getJson('editor/task');
         static::assertCount(1, $tasks); // sees only one
         static::assertEquals('2', $tasks[0]->foreignId); // identify the one by foreign-id
+
+        // the clientpm must not see tasks he is not entitled for (being the first imported task)
+        $result = static::api()->getJson('editor/task/' . $this->getTaskAt(0)->getId(), [], null, true);
+        static::assertEquals(403, $result->status);
+        static::assertStringContainsString('not accessible due to the users client-restriction', $result->error);
     }
 
     /**
@@ -138,11 +162,22 @@ class ClientPmTest extends editor_Test_ImportTest
         $result = static::api()->getJson('editor/user/' . static::$newUserId, [], null, true);
         static::assertEquals(403, $result->status);
         static::assertStringContainsString('not accessible due to the users client-restriction', $result->error);
-
     }
 
+    /**
+     * tests, if the language-resource-management is following the client-accesibility-restrictions for the client-pm
+     */
     public function testLanguageResources()
     {
+        /*
+        static::api()->login('testmanager');
+        $resources = static::api()->getJson('editor/languageresource');
+        static::assertCount(2, $resources);
+
+        static::api()->login('testclientpm');
+        $resources = static::api()->getJson('editor/languageresource');
+        static::assertCount(2, $resources);
+        */
         static::assertTrue(true);
 
         // echo "\nRESULT:\n\n".json_encode($result, JSON_PRETTY_PRINT|JSON_UNESCAPED_UNICODE)."\n\n";
@@ -170,7 +205,6 @@ class ClientPmTest extends editor_Test_ImportTest
     public static function afterTests(): void
     {
         if(static::$newUserId > 0){
-            static::api()->login('testmanager');
             static::api()->delete('editor/user/', [
                 'id' => static::$newUserId
             ]);

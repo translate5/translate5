@@ -303,6 +303,8 @@ abstract class editor_Test_ApiTest extends TestCase
             if (static::$_appState === null) {
                 self::testRunSetup(static::$_api);
             }
+            // make sure the setup always happens as testmanager
+            static::api()->login('testmanager');
 
             if(static::$skipIfOptionsMissing && !static::api()->checkConfigs(static::$requiredRuntimeOptions)){
 
@@ -337,6 +339,8 @@ abstract class editor_Test_ApiTest extends TestCase
 
     final public static function tearDownAfterClass(): void
     {
+        // ensure the teardown happens as testmanager
+        static::api()->login('testmanager');
         // everything is wrapped in try-catch to make sure, all cleanups are executed. Anyone knows a better way to collect exceptions ?
         $errors = [];
         // for single tests, the cleanup can be prevented via KEEP_DATA
