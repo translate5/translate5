@@ -37,40 +37,23 @@ class ClientPmTest extends editor_Test_ImportTest
 {
     private static int $newUserId = -1;
 
-    private static LanguageResource $dummyMt0;
-
-    private static LanguageResource $dummyMt1;
-
-    protected static function setupImport(Config $config): void
-    {
-        // import one task with the testmanager as owner and the base customer
-        $config->addTask('en', 'de', static::getTestCustomerId(), '3-segments-en-de.zip')
-            ->setProperty('foreignId', '1');
-        // import one task with the testclientpm as owner and customer 1
-        $config->addTask('en', 'de', static::getTestCustomerId(1), '3-segments-en-de.zip')
-            ->setProperty('foreignId', '2')
-            ->setOwner('testclientpm');
-        self::$dummyMt0 = $config->addLanguageResource(
-            LanguageResource::DUMMY_TM,
-            null,
-            static::getTestCustomerId(),
-            'en',
-            'de'
-        );
-        self::$dummyMt1 = $config->addLanguageResource(
-            LanguageResource::DUMMY_TM,
-            null,
-            static::getTestCustomerId(1),
-            'en',
-            'de'
-        );
-    }
-
     /**
      * This tests if the project-view is restricted to the tasks bound to the clientpm and unrestricted for a pm
      */
     public function testProjects()
     {
+        // import the needed tasks
+        $config = static::getConfig();
+        // import one task with the testmanager as owner and the base customer
+        $task0 = $config->addTask('en', 'de', static::getTestCustomerId(), '3-segments-en-de.zip')
+            ->setProperty('foreignId', '1');
+        $config->import($task0);
+        // import one task with the testclientpm as owner and customer 1
+        $task1 = $config->addTask('en', 'de', static::getTestCustomerId(1), '3-segments-en-de.zip')
+            ->setProperty('foreignId', '2')
+            ->setOwner('testclientpm');
+        $config->import($task1);
+
         // the pm should see both tasks
         static::api()->login('testmanager');
         $tasks = static::api()->getJson('editor/task');
@@ -83,7 +66,7 @@ class ClientPmTest extends editor_Test_ImportTest
         static::assertEquals('2', $tasks[0]->foreignId); // identify the one by foreign-id
 
         // the clientpm must not see tasks he is not entitled for (being the first imported task)
-        $result = static::api()->getJson('editor/task/' . $this->getTaskAt(0)->getId(), [], null, true);
+        $result = static::api()->getJson('editor/task/' . $task0->getId(), [], null, true);
         static::assertEquals(403, $result->status);
         static::assertStringContainsString('not accessible due to the users client-restriction', $result->error);
     }
@@ -94,9 +77,11 @@ class ClientPmTest extends editor_Test_ImportTest
      */
     public function testUsers()
     {
+        // the customer-ids to test with
         $mainClientId = static::getTestCustomerId();
         $firstClientPmClientId = static::getTestCustomerId(1);
         $secondClientPmClientId = static::getTestCustomerId(2);
+        
         // add a User to work with, bound to the main customer
         static::api()->login('testmanager');
         $newUser = static::api()->postJson('editor/user/', [
@@ -109,7 +94,6 @@ class ClientPmTest extends editor_Test_ImportTest
             "customers" => $mainClientId . ',' . $firstClientPmClientId,
             "locale" => "en",
         ]);
-
         static::assertIsObject($newUser); // user exists
         static::$newUserId = $newUser->id; // deletes the user in the test-teardown
         // check if customers were really assigned
@@ -123,18 +107,17 @@ class ClientPmTest extends editor_Test_ImportTest
         $result = static::api()->putJson('editor/user/' . static::$newUserId, [
             'customers' => $firstClientPmClientId . ',' . $secondClientPmClientId // mimicing the frontend, we just send the two customers the clientpm can access !
         ]);
-        // this MUST lead to the "main customer" is still assigned
         static::assertEquals(
-            $this->normalizeCustomers([$mainClientId, $firstClientPmClientId, $secondClientPmClientId]),
+            $this->normalizeCustomers([$mainClientId, $firstClientPmClientId, $secondClientPmClientId]),  // this MUST lead to the "main customer" is still assigned
             $this->normalizeCustomers($result->customers)
         );
+
         // test again, now remove the first clientPm customer
         $result = static::api()->putJson('editor/user/' . static::$newUserId, [
             'customers' => $secondClientPmClientId // mimicing the frontend, we just send the customer accessible for the client-pm
         ]);
-        // this MUST lead to the "main customer" is still assigned
         static::assertEquals(
-            $this->normalizeCustomers([$mainClientId, $secondClientPmClientId]),
+            $this->normalizeCustomers([$mainClientId, $secondClientPmClientId]), // this MUST lead to the "main customer" is still assigned
             $this->normalizeCustomers($result->customers)
         );
 
@@ -151,7 +134,6 @@ class ClientPmTest extends editor_Test_ImportTest
         $result = static::api()->putJson('editor/user/' . static::$newUserId, [
             'customers' => $mainClientId
         ]);
-        // this MUST lead to the "main customer" is still assigned
         static::assertEquals(
             $this->normalizeCustomers([$mainClientId]),
             $this->normalizeCustomers($result->customers)
@@ -169,18 +151,72 @@ class ClientPmTest extends editor_Test_ImportTest
      */
     public function testLanguageResources()
     {
-        /*
+        // import the two language-resources to test (assigned to different customers)
         static::api()->login('testmanager');
-        $resources = static::api()->getJson('editor/languageresource');
-        static::assertCount(2, $resources);
+        $config = static::getConfig();
+        $dummyMt0 = $config->addLanguageResource(
+            LanguageResource::DUMMY_TM,
+            null,
+            static::getTestCustomerId(),
+            'en',
+            'de'
+        );
+        $config->import($dummyMt0);
+        $dummyMt1 = $config->addLanguageResource(
+            LanguageResource::DUMMY_TM,
+            null,
+            static::getTestCustomerId(1),
+            'en',
+            'de'
+        );
+        $config->import($dummyMt1);
 
+        // make sure, the clientpm can only see the single resource he is entitled for
         static::api()->login('testclientpm');
-        $resources = static::api()->getJson('editor/languageresource');
-        static::assertCount(2, $resources);
-        */
-        static::assertTrue(true);
+        $resources = static::api()->getJson('editor/languageresourceinstance');
+        static::assertCount(1, $resources);
+        static::assertEquals($dummyMt1->getId(), $resources[0]->id);
 
-        // echo "\nRESULT:\n\n".json_encode($result, JSON_PRETTY_PRINT|JSON_UNESCAPED_UNICODE)."\n\n";
+        // check, the clientpm can see the "his" resource via getAction
+        $result = static::api()->getJson('editor/languageresourceinstance/' . $dummyMt1->getId());
+        static::assertIsObject($result);
+        static::assertEquals($dummyMt1->getId(), $result->id);
+
+        // check, the clientpm not see the other one via getAction
+        $result = static::api()->getJson('editor/languageresourceinstance/' . $dummyMt0->getId(), [], null, true);
+        static::assertEquals(403, $result->status);
+        static::assertStringContainsString('not accessible due to the users client-restriction', $result->error);
+
+        $mainClientId = static::getTestCustomerId();
+        $firstClientPmClientId = static::getTestCustomerId(1);
+        $secondClientPmClientId = static::getTestCustomerId(2);
+
+        // add customer to TM 2
+        static::api()->login('testmanager');
+        $result = static::api()->putJson('editor/languageresourceinstance/' . $dummyMt0->getId(), [
+            'customerIds' => [$mainClientId, $firstClientPmClientId]
+        ]);
+        static::assertEquals(
+            $this->normalizeCustomers([$mainClientId, $firstClientPmClientId]),
+            $this->normalizeCustomers($result->customerIds)
+        );
+
+        // the clientpm now should have access
+        static::api()->login('testclientpm');
+        $result = static::api()->getJson('editor/languageresourceinstance/' . $dummyMt0->getId());
+        static::assertEquals(
+            $this->normalizeCustomers([$mainClientId, $firstClientPmClientId]),
+            $this->normalizeCustomers($result->customerIds)
+        );
+
+        // now add other client-pm customer as clientpm ... and ensure, the base-cusomer is still present
+        $result = static::api()->putJson('editor/languageresourceinstance/' . $dummyMt0->getId(), [
+            'customerIds' => [$firstClientPmClientId, $secondClientPmClientId]
+        ]);
+        static::assertEquals(
+            $this->normalizeCustomers([$mainClientId, $firstClientPmClientId, $secondClientPmClientId]), // $mainClientId must be present !
+            $this->normalizeCustomers($result->customerIds)
+        );
     }
 
     /**
@@ -196,8 +232,6 @@ class ClientPmTest extends editor_Test_ImportTest
         sort($customers, SORT_NUMERIC);
         return $customers;
     }
-
-    // echo "\nRESULT:\n\n".json_encode($result, JSON_PRETTY_PRINT|JSON_UNESCAPED_UNICODE)."\n\n";
 
     /**
      * Cleans up the added entities during the tests
