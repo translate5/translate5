@@ -52,6 +52,8 @@ final class Task extends Resource
     public int $wordCount = 666;
     public int $autoStartImport = 1;
     public string $orderdate;
+    public string $foreignId;
+    public string $foreignName;
     private ?string $_uploadFolder = null;
     private ?array $_uploadFiles = null;
     private ?array $_uploadData = null;
