@@ -183,11 +183,12 @@ final class Task extends Resource
 
     /**
      * Sets the owner of the task - the user that imports it (default: "testmanager")
-     * @return string
+     * @return $this
      */
-    public function setOwner(string $login): void
+    public function setOwner(string $login): Task
     {
         $this->_owner = $login;
+        return $this;
     }
 
     /**
