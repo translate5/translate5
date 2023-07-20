@@ -69,7 +69,6 @@ class Collection extends Base
         $assocs = $assoc->loadAssocByServiceName($this->task->getTaskGuid(),$service->getName());
 
         $export = ZfExtended_Factory::get(editor_Models_Export_Terminology_Tbx::class);
-        $export->setExportAsFile(true);
 
         foreach ($assocs as $item) {
             $filePath = $this->getFolderPath().DIRECTORY_SEPARATOR.$item['languageResourceId'].'.tbx';

@@ -6494,9 +6494,17 @@ The following task was imported with errors / warnings / notices. Please take ca
                 <source>Nur TBX Basic Standardattribute + processStatus exportieren</source>
                 <target>Export only TBX Basic standard attributes + processStatus</target>
             </trans-unit>
-            <trans-unit id='QmlsZGVyIGltIEhleC1Gb3JtYXQgZXhwb3J0aWVyZW4sIGVpbmdlYmV0dGV0IGluIFRCWA=='>
-                <source>Bilder im Hex-Format exportieren, eingebettet in TBX</source>
-                <target>Export images in hex format, embedded in TBX</target>
+            <trans-unit id='QmlsZGVyIGV4cG9ydGllcmVu'>
+                <source>Bilder exportieren</source>
+                <target>Export images</target>
+            </trans-unit>
+            <trans-unit id='SW0gSGV4LUZvcm1hdCwgZWluZ2ViZXR0ZXQgaW4gVEJY'>
+                <source>Im Hex-Format, eingebettet in TBX</source>
+                <target>In hex format, embedded in TBX</target>
+            </trans-unit>
+            <trans-unit id='SW4gbWVkaWEvIE9yZG5lciBpbSBaSVAtQXJjaGl2'>
+                <source>In media/ Ordner im ZIP-Archiv</source>
+                <target>In media/ folder inside ZIP-archive</target>
             </trans-unit>
             <trans-unit id='QWxzIFRCWCBleHBvcnRpZXJlbg=='>
                 <source>Als TBX exportieren</source>
