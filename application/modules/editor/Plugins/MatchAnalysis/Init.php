@@ -183,7 +183,7 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract
         }
 
         // If current user is PM - apply additional confitions
-        if (ZfExtended_Authentication::getInstance()->getUser()->hasRole('pm')) {
+        if (ZfExtended_Authentication::getInstance()->hasUserRole('pm')) {
 
             // If current request has no filter-param - return
             if (!$filter = $controller->getParam('filter')) {
