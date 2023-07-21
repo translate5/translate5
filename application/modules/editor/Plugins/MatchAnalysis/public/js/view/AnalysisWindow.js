@@ -59,6 +59,11 @@ Ext.define('Editor.plugins.MatchAnalysis.view.AnalysisWindow', {
         var me = this,
             grid = me.down('matchAnalysisGrid');
 
-        grid & grid.setTask(task);
+        if (grid) {
+            grid.down('#unitType').suspendEvent('change');
+            grid.down('#unitType').setValue(task.get('presetUnitType'));
+            grid.down('#unitType').resumeEvent('change');
+            grid.setTask(task);
+        }
     }
 });

@@ -167,7 +167,7 @@ class editor_Models_Import_SegmentProcessor_Review extends editor_Models_Import_
         }
         else {
             //transunitHash must not be null, so if no info given we use segmentNr to assume that just the single segment is in a transunit
-            $meta->setTransunitHash($seg->getSegmentNrInTask());
+            $meta->setTransunitHash((string) $seg->getSegmentNrInTask());
         }
 
         if(!empty($attributes->transunitId)) {

@@ -651,7 +651,7 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
     /**
      * parses the TransUnit attributes
      * @param array $attributes transUnit attributes
-     * @param int $mid MRK tag mid or 0 if no mrk mtype seg used
+     * @param string $mid MRK tag mid or 0 if no mrk mtype seg used
      * @param array|null $currentSource
      * @param array|null $currentTarget
      * @return editor_Models_Import_FileParser_SegmentAttributes
@@ -659,8 +659,8 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
      * @throws editor_Models_Import_MetaData_Exception
      */
     protected function parseSegmentAttributes(
-        $attributes,
-        $mid,
+        array $attributes,
+        string $mid,
         array $currentSource = null,
         array $currentTarget = null): editor_Models_Import_FileParser_SegmentAttributes {
 
@@ -673,7 +673,7 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
         // increase the segment count
         ++$this->segmentCount;
 
-        if (str_starts_with($mid, self::PREFIX_SUB)){
+        if (str_starts_with((string) $mid, self::PREFIX_SUB)){
             // Add the $mid to the transunit hash calculation, so we can differ the sub-segment from the other segments
             // in this trans unit
             $transunitHash = $this->transunitHash->createForSub($this->sourceFileId, $transunitId, $mid);

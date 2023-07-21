@@ -77,6 +77,11 @@ class editor_Plugins_ZDemoMT_Connector extends editor_Services_Connector_Abstrac
      * @see editor_Services_Connector_Abstract::translate()
      */
     public function translate(string $searchString){
+//        throw new editor_Services_Connector_Exception('E1334', [
+//            'service' => $this->getResource()->getName(),
+//            'languageResource' => $this->languageResource ?? '',
+//            'message'=>'502 Bad Gateway'
+//        ]);
         if(empty($searchString)) {
             return $this->resultList;
         }

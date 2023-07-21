@@ -490,6 +490,7 @@ class editor_Models_TaskUserAssoc extends ZfExtended_Models_Entity_Abstract {
             $where['taskGuid = ?'] = $taskGuid;
         }
 
+
         $s = $this->db->select()->from($this->db, ['taskGuid', 'userGuid']);
         foreach($where as $condition => $valToQuote) {
             $s->where($condition, $valToQuote);

@@ -26,33 +26,27 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-/**#@+
- * @author Marc Mittag
- * @package editor
- * @version 1.0
- *
- */
 /**
  * Foldertree Object Instanz wie in der Applikation benötigt
  *
- * @method void setId() setId(int $id)
- * @method void setTaskGuid() setTaskGuid(string $guid)
- * @method void setFileName() setFileName(string $name)
- * @method void setFileParser() setFileParser(string $parser)
- * @method void setSourceLang() setSourceLang(int $source)
- * @method void setTargetLang() setTargetLang(int $target)
- * @method void setRelaisLang() setRelaisLang(int $target)
- * @method void setFileOrder() setFileOrder(int $order)
- * @method void setIsReimportable() setIsReimportable(int $isReimportable)
- * @method integer getId() getId()
- * @method string getTaskGuid() getTaskGuid()
- * @method string getFileName() getFileName()
- * @method string getFileParser() getFileParser()
- * @method integer getSourceLang() getSourceLang()
- * @method integer getTargetLang() getTargetLang()
- * @method integer getRelaisLang() getRelaisLang()
- * @method integer getFileOrder() getFileOrder()
- * @method integer getIsReimportable() getIsReimportable()
+ * @method void setId(int $id)
+ * @method void setTaskGuid(string $guid)
+ * @method void setFileName(string $name)
+ * @method void setFileParser(string $parser)
+ * @method void setSourceLang(int $source)
+ * @method void setTargetLang(int $target)
+ * @method void setRelaisLang(int $target)
+ * @method void setFileOrder(int $order)
+ * @method void setIsReimportable(int $isReimportable)
+ * @method integer getId()
+ * @method string getTaskGuid()
+ * @method string getFileName()
+ * @method string getFileParser()
+ * @method integer getSourceLang()
+ * @method integer getTargetLang()
+ * @method integer getRelaisLang()
+ * @method integer getFileOrder()
+ * @method integer getIsReimportable()
  */
 class editor_Models_File extends ZfExtended_Models_Entity_Abstract {
     const SKELETON_DIR_NAME = 'skeletonfiles';

@@ -28,4 +28,6 @@ RewriteRule ^(.*)$ $1 [E=preflight:1,L,R=204]
 # Add trailing slash on editor
 RewriteRule ^((.*/)?editor)$ /$1/ [L,R]
 
+# integrate as sysadmin page - dangereous on multi hosting envs!
+RewriteCond %{REQUEST_URI} !=/server-status
 RewriteRule ^.*$ index.php [NC,L]

@@ -479,7 +479,8 @@ the format is:
             '     <info>domain:</> '.OutputFormatter::escape((string) $row['domain']),
             '    <info>message:</> '.OutputFormatter::escape((string) $row['message']),
             ' <info>appVersion:</> '.OutputFormatter::escape((string) $row['appVersion']),
-            '<info>file (line):</> '.OutputFormatter::escape((string) $row['file'].' ('.$row['line'].')'),
+            '<info>file (line):</> '.$this->linkIDE(OutputFormatter::escape((string) $row['file'].' ('.$row['line'].')'), $row['file'], $row['line']),
+            '                      '.$this->linkIDE(OutputFormatter::escape((string) $row['file'].' ('.$row['line'].')'), $row['file'], $row['line']),
         ];
 
         if($row['duplicates'] == 0) {
@@ -525,5 +526,16 @@ the format is:
         
         $extra = json_encode($extra, JSON_PRETTY_PRINT);
         return OutputFormatter::escape((string) $extra);
+    }
+
+    protected function linkIDE(string $text, string $file, int $line): string
+    {
+//        if (!\ZfExtended_Utils::isDevelopment() || !str_starts_with($file, APPLICATION_ROOT)) {
+//            return $text;
+//        }
+        $file = urlencode(str_replace(APPLICATION_ROOT, '', $file));
+        $url = OutputFormatter::escape((string) 'phpstorm://open?file='.$file.'&line='.$line);
+        $url = '"https://www.google.de"';
+        return '<href='.$url.'> xxx </>';
     }
 }

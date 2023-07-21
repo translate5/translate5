@@ -8324,9 +8324,17 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
                 <source>Nur TBX Basic Standardattribute + processStatus exportieren</source>
                 <target>Nur TBX Basic Standardattribute + processStatus exportieren</target>
             </trans-unit>
-            <trans-unit id='QmlsZGVyIGltIEhleC1Gb3JtYXQgZXhwb3J0aWVyZW4sIGVpbmdlYmV0dGV0IGluIFRCWA=='>
-                <source>Bilder im Hex-Format exportieren, eingebettet in TBX</source>
-                <target>Bilder im Hex-Format exportieren, eingebettet in TBX</target>
+            <trans-unit id='QmlsZGVyIGV4cG9ydGllcmVu'>
+                <source>Bilder exportieren</source>
+                <target>Bilder exportieren</target>
+            </trans-unit>
+            <trans-unit id='SW0gSGV4LUZvcm1hdCwgZWluZ2ViZXR0ZXQgaW4gVEJY'>
+                <source>Im Hex-Format, eingebettet in TBX</source>
+                <target>Im Hex-Format, eingebettet in TBX</target>
+            </trans-unit>
+            <trans-unit id='SW4gbWVkaWEvIE9yZG5lciBpbSBaSVAtQXJjaGl2'>
+                <source>In media/ Ordner im ZIP-Archiv</source>
+                <target>In media/ Ordner im ZIP-Archiv</target>
             </trans-unit>
             <trans-unit id='QWxzIFRCWCBleHBvcnRpZXJlbg=='>
                 <source>Als TBX exportieren</source>

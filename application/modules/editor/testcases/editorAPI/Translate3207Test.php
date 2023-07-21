@@ -27,19 +27,18 @@ END LICENSE AND COPYRIGHT
 */
 
 /**
- * Testcase for TRANSLATE-2763 - the problem was that the re-import of TBX was deleting all old terms,
- *  also the terms which are again in the re-imported TBX.
- *  This is tested by importing a TBX with Term A B C D - the export should contain all four terms
- *  In a second import a similar TBX is imported into the previous one, with terms A B C Y.
- *  Then the export should contain exactly this terms, not the term D but also the not changed terms A B C.
+ * Testcase for TRANSLATE-3207
  *
  * For details see the issue.
  */
 use MittagQI\Translate5\Test\Import\Config;
 use MittagQI\Translate5\Test\Import\LanguageResource;
 
-class Translate2763Test extends editor_Test_JsonTest {
+class Translate3207Test extends editor_Test_JsonTest {
 
+    /**
+     * @var LanguageResource|null
+     */
     protected static ?LanguageResource $tc = null;
 
     /**
@@ -50,47 +49,51 @@ class Translate2763Test extends editor_Test_JsonTest {
     {
         static::$tc = $config->addLanguageResource(
             'termcollection',
-            'testfiles/term-import-1.tbx',
+            'testfiles/tbx-with-images-dir.zip',
             static::getTestCustomerId()
-        )->setProperty('name', 'TC test');
+        )->setProperty('name', 'tbx-with-images-dir');
     }
 
     /**
      */
-    public function test10_InitialTbxImport() {
+    public function test10_import() {
 
+        // Do export as tbx
         $data = static::api()->get('/editor/languageresourceinstance/tbxexport', [
             'collectionId' => static::$tc->getId(),
-            'tbxBasicOnly' => '1',
-            'exportImages' => '0',
+            'tbxBasicOnly' => '0',
+            'exportImages' => 'tbx',
         ]);
 
-        $this->assertFileContents('term-export-1.tbx', $this->sanitizeURL($data->getBody()), 'The exported TBX does not match the content of term-export-1.tbx', static::api()->isCapturing());
-    }
+        // Compare exported to expected
+        $this->assertFileContents(
+            $file = 'exported-in-tbx.tbx',
+            $this->sanitizeURL($data->getBody()),
+            "The exported TBX does not match the content of $file",
+            static::api()->isCapturing()
+        );
 
-    /**
-     * Merge in the TBX with one additional term, set deleteTermsOlderThanCurrentImport
-     * @depends test10_InitialTbxImport
-     */
-    public function test20_MergeImport() {
-
-        // Reimport tbx into existing term collection
-        static::api()->reimportResource(static::$tc->getId(), 'testfiles/term-import-2.tbx', [
-            'deleteTermsOlderThanCurrentImport' => 'on',
-            'deleteProposalsLastTouchedOlderThan' => null,
-        ]);
-
-        sleep(30);
-
-        // Do tbx-export
+        // Do export as zip
         $data = static::api()->get('/editor/languageresourceinstance/tbxexport', [
             'collectionId' => static::$tc->getId(),
-            'tbxBasicOnly' => '1',
-            'exportImages' => '0',
+            'tbxBasicOnly' => '0',
+            'exportImages' => 'zip',
         ]);
 
-        // Make sure tbx-exported content are as expected
-        $this->assertFileContents('term-export-2.tbx', $this->sanitizeURL($data->getBody()), 'The exported TBX does not match the content of term-export-1.tbx', static::api()->isCapturing());
+        // Create zip file
+        $zipFile = APPLICATION_DATA . '/' . ZfExtended_Test_ApiHelper::TEST_ZIP_FILENAME;
+        file_put_contents($zipFile, $data->getRawBody());
+
+        // Compare exported to expected
+        $this->assertFileContents(
+            $file = 'exported-in-zip.tbx',
+            $this->sanitizeURL(static::api()->getFileContentFromZipPath($zipFile, 'exported.tbx')),
+            "The exported ZIP's tbx-file does not match the content of $file",
+            static::api()->isCapturing()
+        );
+
+        // Delete tmp file
+        unlink($zipFile);
     }
 
     /**

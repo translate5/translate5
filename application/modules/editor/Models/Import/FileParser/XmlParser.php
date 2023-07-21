@@ -161,6 +161,7 @@ class editor_Models_Import_FileParser_XmlParser {
     }
 
     /**
+     * //FIXME nonXmlBlocks are not applied here!
      * walks through the given XML chunk array and fires the registered callbacks for each found node
      * @param array $chunks
      * @param bool $preserveWhitespaceRoot see method parse
@@ -628,6 +629,11 @@ class editor_Models_Import_FileParser_XmlParser {
         $preserve = empty($previousNode) ? $this->preserveWhitespace : $previousNode['preserveWhitespace'];
         //get the XML attribute of the current node, which could not exist at all
         $preserve = $this->getAttribute($attributes, 'xml:space', $preserve ? 'preserve' : 'default');
+
+        //FIXME HERE das preserve aus dem file tag hier wird nicht mehr ausgewertet. Warum?
+        // <file original="simple-en-de.sdlxliff" source-language="en" target-language="de" xml:space="preserve" datatype="x-translate5">
+        // aus segmentlinespixellength-en-de.xlf
+
         $this->xmlStack[] = [
             'openerKey' => $key,
             'tag' => $tag,

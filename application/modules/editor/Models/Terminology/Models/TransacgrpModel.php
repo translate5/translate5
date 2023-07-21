@@ -273,7 +273,7 @@ class editor_Models_Terminology_Models_TransacgrpModel extends editor_Models_Ter
     /**
      * Get data for tbx-export
      *
-     * @param $termEntryIds Comma-separated list of ids
+     * @param string $termEntryIds Comma-separated list of ids
      * @return array
      * @throws Zend_Db_Statement_Exception
      */

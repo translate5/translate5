@@ -109,7 +109,9 @@ final class Service extends DockerServiceAbstract
 
             // the normal way: evaluating
             $scheme = ($isHttps) ? 'wss' : 'ws';
-            $host = $this->config->runtimeOptions->server->name; // TODO FIXME add getenv for especially set different server, like our messagebus.translate5.net
+// TODO FIXME add getenv for especially set different server, like our messagebus.translate5.net
+            // in our cloud: messagebus-cloud.translate5.net
+            $host = $this->config->runtimeOptions->server->name;
             $port = ($isHttps) ? '443' : '80';
             $path = ($isHttps) ? '/wss/translate5' : '/ws/translate5';
 

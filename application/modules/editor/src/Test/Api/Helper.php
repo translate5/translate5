@@ -663,15 +663,6 @@ final class Helper extends \ZfExtended_Test_ApiHelper
     /**
      * Saves a segment / sends segment put
      * @param int $segmentId
-     * @param string $editedTarget
-     * @param string|null $editedSource
-     * @param string|null $jsonFileName
-     * @param array $additionalPutData :
-     * @param int $duration
-     * @return bool|\stdClass
-     */
-    /***
-     * @param int $segmentId
      * @param string|null $editedTarget
      * @param string|null $editedSource
      * @param string|null $jsonFileName
