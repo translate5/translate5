@@ -1207,3 +1207,7 @@ dl {
     background: none;
     box-shadow: none;
 }
+.x-form-item-default.x-item-disabled {
+    -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=70)";
+    opacity: 0.7;
+}

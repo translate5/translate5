@@ -1705,16 +1705,6 @@ Ext.define('Editor.controller.Localizer', {
             title: '<?php echo $this->translate->_('Vorschläge exportieren');?>'
         }
     });
-    Ext.define("Editor.locale.view.LanguageResources.TbxExport", {
-        override: "Editor.view.LanguageResources.TbxExport",
-        strings: {
-            tbxBasicOnlyLabel: '<?php echo $this->translate->_('Nur TBX Basic Standardattribute + processStatus exportieren');?>',
-            exportImagesLabel: '<?php echo $this->translate->_('Bilder im Hex-Format exportieren, eingebettet in TBX');?>',
-            exportButtonText: '<?php echo $this->translate->_('Exportieren');?>',
-            cancelButtonText: '<?php echo $this->translate->_('Abbrechen');?>',
-            title: '<?php echo $this->translate->_('Als TBX exportieren');?>'
-        }
-    });
     Ext.define("Editor.locale.controller.TaskAssoc", {
         override: "Editor.controller.LanguageResourcesTaskassoc",
         strings: {
@@ -2097,7 +2087,7 @@ Editor.data.l10n = {
         metaStates_tooltip_nokey: '<?php echo $this->translate->_('Segment auf den ausgewählten Status setzen');?>'
     },
     falsePositives: {
-        hover: '<?php echo $this->translate->_('Rechts klicken um als \'falsch erkannt\' zu markieren')?>',
+        hover: "<?php echo $this->translate->_('Rechts klicken um als \'falsch erkannt\' zu markieren')?>",
         legend: {
             fixed: '<?php echo $this->translate->_('Falsch erkannte Fehler?')?>',
             float: '<?php echo $this->translate->_('Ein falsch erkannter Fehler?')?>'
@@ -2157,6 +2147,15 @@ Editor.data.l10n = {
     languageResources:{
         editLanguageResource:{
             conflictErrorTitle:'<?php echo $this->translate->_('Konflikt hinsichtlich zugewiesener Aufgaben');?>'
+        },
+        tbxExport: {
+            tbxBasicOnlyLabel: '<?php echo $this->translate->_('Nur TBX Basic Standardattribute + processStatus exportieren');?>',
+            exportImagesLabel: '<?php echo $this->translate->_('Bilder exportieren');?>',
+            exportImagesTbx: '<?php echo $this->translate->_('Im Hex-Format, eingebettet in TBX');?>',
+            exportImagesZip: '<?php echo $this->translate->_('In media/ Ordner im ZIP-Archiv');?>',
+            exportButtonText: '<?php echo $this->translate->_('Exportieren');?>',
+            cancelButtonText: '<?php echo $this->translate->_('Abbrechen');?>',
+            title: '<?php echo $this->translate->_('Als TBX exportieren');?>'
         }
     },
     configuration: {

@@ -808,9 +808,13 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
                 'rex' => 'int11',
                 'key' => 'LEK_languageresources'
             ],
-            'tbxBasicOnly,exportImages' => [
+            'tbxBasicOnly' => [
                 'req' => true,
-                'rex' => '~(0|1)~'
+                'fis' => '0,1'
+            ],
+            'exportImages' => [
+                'req' => true,
+                'fis' => '0,tbx,zip'
             ]
         ], $params);
 
@@ -818,7 +822,7 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         ignore_user_abort(1); set_time_limit(0);
 
         // Export collection
-        ZfExtended_Factory::get('editor_Models_Export_Terminology_Tbx')->exportCollectionById(
+        ZfExtended_Factory::get(editor_Models_Export_Terminology_Tbx::class)->exportCollectionById(
             $params['collectionId'],
             (new Zend_Session_Namespace('user'))->data->userName,
             $params['tbxBasicOnly'],

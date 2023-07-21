@@ -1,0 +1,124 @@
+<?xml version='1.0'?><!DOCTYPE martif SYSTEM "TBXBasiccoreStructV02.dtd">
+<martif>
+    <martifHeader>
+        <fileDesc>
+            <titleStmt>
+                <title>Export of translate5 termCollection tbx-with-images-dir</title>
+                <note>Contains the languages: en</note>
+            </titleStmt>
+            <sourceDesc>
+                <p>File is exported from translate5 instance at HTTP_URL by the user manager test</p>
+            </sourceDesc>
+        </fileDesc>
+        <encodingDesc>
+            <p type="XCSURI">http://www.lisa.org/fileadmin/standards/tbx_basic/TBXBasicXCSV02.xcs</p>
+        </encodingDesc>
+    </martifHeader>
+    <text>
+        <body>
+            <termEntry id="id839bccf7-5493-4fb5-9d08-73c8084a4079">
+                <descrip type="figure" target="uploaded-via-gui">Image</descrip>
+                <descrip type="figure" target="zip-root-image">Image</descrip>
+                <descrip type="figure" target="zip-dir1-image">Image</descrip>
+                <descrip type="figure" target="zip-dir1-dir2-image">Image</descrip>
+                <descrip type="figure" target="base64encoded">Image</descrip>
+                <descrip type="figure" target="target-not-exists">Image</descrip>
+                <descrip type="figure" target="media/path-exists.jpg">cricket bat</descrip>
+                <descrip type="figure" target="media/path-not-exists.jpg">cricket bat</descrip>
+                <xref type="xGraphic" target="some non-path target">cricket bat</xref>
+                <xref type="xGraphic" target="http://some-url.com">cricket bat</xref>
+                <transacGrp>
+                    <transac type="transactionType">origination</transac>
+                    <transacNote type="responsibility" target="{e6828cdf-2ee0-4a25-af0a-92e6f060e9eb}">Pavel Perminov</transacNote>
+                    <date>2023-06-26</date>
+                </transacGrp>
+                <transacGrp>
+                    <transac type="transactionType">modification</transac>
+                    <transacNote type="responsibility" target="{e6828cdf-2ee0-4a25-af0a-92e6f060e9eb}">Pavel Perminov</transacNote>
+                    <date>2023-06-26</date>
+                </transacGrp>
+                <langSet xml:lang="en">
+                    <tig>
+                        <term id="id960be468-4900-406d-9c33-630a151aae5c">term with image</term>
+                        <termNote type="processStatus">finalized</termNote>
+                        <termNote type="administrativeStatus">admittedTerm-admn-sts</termNote>
+                        <transacGrp>
+                            <transac type="transactionType">origination</transac>
+                            <transacNote type="responsibility" target="{e6828cdf-2ee0-4a25-af0a-92e6f060e9eb}">Pavel Perminov</transacNote>
+                            <date>2023-06-26</date>
+                        </transacGrp>
+                        <transacGrp>
+                            <transac type="transactionType">modification</transac>
+                            <transacNote type="responsibility" target="{e6828cdf-2ee0-4a25-af0a-92e6f060e9eb}">Pavel Perminov</transacNote>
+                            <date>2023-06-26</date>
+                        </transacGrp>
+                    </tig>
+                </langSet>
+            </termEntry>
+        </body>
+        <back>
+            <refObjectList type="respPerson">
+                <refObject id="{e6828cdf-2ee0-4a25-af0a-92e6f060e9eb}">
+                    <item type="fn">Pavel Perminov</item>
+                    <item type="email">noreply@translate5.net</item>
+                    <item type="role">systemadmin,admin,pm,editor,termCustomerSearch,termProposer,termFinalizer,termPM,termPM_allClients,termReviewer</item>
+                </refObject>
+                <refObject id="{e6828cdf-2ee0-4a25-af0a-92e6f060e9eb}">
+                    <item type="fn">Project Manager</item>
+                    <item type="email">noreply@translate5.net</item>
+                    <item type="role">systemadmin,admin,pm,editor,termCustomerSearch,termProposer,termFinalizer,termPM,termPM_allClients,termReviewer</item>
+                </refObject>
+            </refObjectList>
+            <refObjectList type="binaryData">
+                <refObject id="uploaded-via-gui">
+                    <itemSet>
+                        <itemGrp>
+                            <item>uploaded-via-gui.jpg</item>
+                            <xref target="media/uploaded-via-gui.jpg"/>
+                        </itemGrp>
+                    </itemSet>
+                </refObject>
+                <refObject id="zip-root-image">
+                    <itemSet>
+                        <itemGrp>
+                            <item>zip-root-image-ユชื่üñА用.jpg</item>
+                            <xref target="media/zip-root-image-ユชื่üñА用.jpg"/>
+                        </itemGrp>
+                    </itemSet>
+                </refObject>
+                <refObject id="zip-dir1-image">
+                    <itemSet>
+                        <itemGrp>
+                            <item>image.jpg</item>
+                            <xref target="media/image.jpg"/>
+                        </itemGrp>
+                    </itemSet>
+                </refObject>
+                <refObject id="zip-dir1-dir2-image">
+                    <itemSet>
+                        <itemGrp>
+                            <item>image.jpg</item>
+                            <xref target="media/image-1.jpg"/>
+                        </itemGrp>
+                    </itemSet>
+                </refObject>
+                <refObject id="base64encoded">
+                    <itemSet>
+                        <itemGrp>
+                            <item>base64encoded.jpg</item>
+                            <xref target="media/base64encoded.jpg"/>
+                        </itemGrp>
+                    </itemSet>
+                </refObject>
+                <refObject id="media/path-exists.jpg">
+                    <itemSet>
+                        <itemGrp>
+                            <item>path-exists.jpg</item>
+                            <xref target="media/path-exists.jpg"/>
+                        </itemGrp>
+                    </itemSet>
+                </refObject>
+            </refObjectList>
+        </back>
+    </text>
+</martif>

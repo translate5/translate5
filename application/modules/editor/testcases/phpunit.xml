@@ -51,6 +51,7 @@
       <file>editorAPI/Translate2491Test.php</file>
       <file>editorAPI/Translate3013Test.php</file>
       <file>editorAPI/TbxSpecialcharsTest.php</file>
+      <file>editorAPI/Translate3207Test.php</file>
     </testsuite>
     <testsuite name="auth">
       <file>editorAPI/Translate3108Test.php</file>

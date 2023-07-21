@@ -112,7 +112,7 @@ class TbxSpecialcharsTest extends \editor_Test_ApiTest {
         $result = static::api()->getRaw('editor/languageresourceinstance/tbxexport', [
             'collectionId' => $collectionId,
             'tbxBasicOnly' => 0,
-            'exportImages' => 1
+            'exportImages' => 'tbx'
         ]);
         $this->assertFalse(static::api()->isJsonResultError($result), 'TBX export could not be requested');
         $exported = preg_match_all('~&lt;~', $result->data);
