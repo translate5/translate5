@@ -48,6 +48,7 @@ use Translate5\MaintenanceCli\Command\{AuthTokenCommand,
     DevelopmentGithookCommand,
     DevelopmentNewModelCommand,
     DevelopmentNewdbchangeCommand,
+    DevelopmentSymlinksCommand,
     DevelopmentTriggerworkflowCommand,
     DevelopmentOkapiBconfNextVersionCommand,
     L10nAddCommand,
@@ -178,6 +179,7 @@ if (file_exists('.git')) {
     $commands[] = new \Translate5\MaintenanceCli\Command\TmxFixOpenTM2Command();
     $commands[] = new DevelopmentOkapiBconfNextVersionCommand();
     $commands[] = new DevelopmentLocalServicesCommand();
+    $commands[] = new DevelopmentSymlinksCommand();
 }
 $app->addCommands($commands);
 $app->run();
