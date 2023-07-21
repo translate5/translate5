@@ -65,7 +65,6 @@ final class Task extends Resource
     private bool $_setToEditAfterImport = false;
     private bool $_waitForImported = true;
     private bool $_failOnError = true;
-    private string $_owner = 'testmanager';
     /**
      * Defines the default-configs that will be applied for all task-imports
      * @var array
@@ -182,16 +181,6 @@ final class Task extends Resource
     }
 
     /**
-     * Sets the owner of the task - the user that imports it (default: "testmanager")
-     * @return $this
-     */
-    public function setOwner(string $login): Task
-    {
-        $this->_owner = $login;
-        return $this;
-    }
-
-    /**
      * Sets the task-usage mode during import
      * @param string $usageMode
      * @return $this
@@ -274,15 +263,6 @@ final class Task extends Resource
     }
 
     /**
-     * Retrieves the owner of the task, the user that imports it (usually testmanager)
-     * @return string
-     */
-    public function getOwner(): string
-    {
-        return $this->_owner;
-    }
-
-    /**
      * @return string
      * @throws Exception
      */
@@ -333,8 +313,8 @@ final class Task extends Resource
         if ($this->_requested) {
             throw new Exception('You cannot import a Task twice.');
         }
-        // tasks will usually be uploaded as testmanager (if not defined otherwise)
-        $api->login($this->_owner);
+        // tasks will be uploaded as testmanager
+        $api->login('testmanager');
 
         // has to be evaluated before the data is re-set by request
         $isMultiLanguage = (is_array($this->targetLang) && count($this->targetLang) > 1);
@@ -346,12 +326,10 @@ final class Task extends Resource
 
             // the simple case: task without resources & pretranslation
             if (!$this->doImport($api, $this->_failOnError, $this->_waitForImported)) {
-                $api->login('testmanager'); // IMPORTANT: reset the login for other resources
                 return;
             }
             // if we shall not wait, we have to skip user-assignments & task-state-setting
             if (!$this->_waitForImported) {
-                $api->login('testmanager'); // IMPORTANT: reset the login for other resources
                 return;
             }
 
@@ -359,7 +337,6 @@ final class Task extends Resource
 
             // TODO FIXME: check, if $this->_failOnError can not be used here, seems to be just a miscoding overtaken over the years ...
             if (!$this->doImport($api, false, false)) {
-                $api->login('testmanager'); // IMPORTANT: reset the login for other resources
                 return;
             }
             // associate resources
@@ -379,7 +356,6 @@ final class Task extends Resource
             }
             // some tests want to hook in after the task-adding but before import starts
             if (!$this->_waitForImported) {
-                $api->login('testmanager'); // IMPORTANT: reset the login for other resources
                 return;
             }
             // start the import
@@ -419,7 +395,6 @@ final class Task extends Resource
         if ($this->_setToEditAfterImport) {
             $api->setTaskToEdit($this->getId());
         }
-        $api->login('testmanager'); // IMPORTANT: reset the login for other resources
     }
 
     /**
@@ -460,9 +435,9 @@ final class Task extends Resource
      */
     public function cleanup(Helper $api, Config $config): void
     {
-        $api->login($this->_owner);
+        $api->login('testmanager');
         // TODO FIXME: this is just neccessary because of quirks in the helper API ... see class comment
-        if ($this->_failOnError) {
+        if($this->_failOnError){
             $this->reload($api);
         }
         // remove on server
@@ -472,11 +447,11 @@ final class Task extends Resource
             // project tasks or tasks in error/import state can not be opened
             // Note that it can not be guaranteed here, that the state of the task is persistent as there is a task-cache in the API still
             if (!$this->isProjectTask() && $taskState !== 'error' && $taskState !== 'import') {
-                $login = ($config->hasTestlectorLogin()) ? 'testlector' : $this->_owner;
+                $login = ($config->hasTestlectorLogin()) ? 'testlector' : 'testmanager';
                 $api->login($login);
                 $api->setTaskToOpen($taskId);
             }
-            $api->login($this->_owner);
+            $api->login('testmanager');
             $api->delete('editor/task/' . $taskId);
         }
         // remnove zipped file when imported by folder
@@ -484,7 +459,6 @@ final class Task extends Resource
             @unlink($this->_cleanupZip);
             $this->_cleanupZip = null;
         }
-        $api->login('testmanager'); // IMPORTANT: reset the login for other resources
     }
 
     /**
@@ -556,7 +530,7 @@ final class Task extends Resource
         if ($this->_uploadFolder !== null) {
             $this->_cleanupZip = $api->zipTestFiles($this->_uploadFolder);
             // add/change a task-config.ini if we have configs
-            if (count($this->_importConfigs) > 0) {
+            if (count($this->_importConfigs) > 0){
                 $this->setTaskConfigsInZip($this->_cleanupZip);
             }
             $api->addImportFile($this->_cleanupZip);
@@ -566,14 +540,14 @@ final class Task extends Resource
                 $mime = $this->evaluateMime($this->_uploadFiles[0]);
                 $file = $api->getFile($this->_uploadFiles[0]);
                 // add/change a task-config.ini if we have configs. We must use a temporary zip then to not overwrite the original ZIP
-                if ($mime === 'application/zip' && count($this->_importConfigs) > 0) {
+                if ($mime === 'application/zip' && count($this->_importConfigs) > 0){
                     $this->_cleanupZip = APPLICATION_DATA . '/tmp-' . basename($file);
                     copy($file, $this->_cleanupZip);
                     $this->setTaskConfigsInZip($this->_cleanupZip);
                     $file = $this->_cleanupZip;
                 }
                 $api->addImportFile($file, $mime);
-                if ($mime === 'application/zip') {
+                if($mime === 'application/zip'){
                     return; // zip is a highlander-format ...
                 }
             } else {
@@ -604,9 +578,8 @@ final class Task extends Resource
      * @param string $file
      * @return string
      */
-    private function evaluateMime(string $file): string
-    {
-        switch (pathinfo($file, PATHINFO_EXTENSION)) {
+    private function evaluateMime(string $file): string {
+        switch(pathinfo($file, PATHINFO_EXTENSION)){
             case 'zip':
                 return 'application/zip';
             case 'csv':
@@ -615,7 +588,7 @@ final class Task extends Resource
             case 'xliff':
             case 'xlf':
             case 'xml':
-                return 'application/xml';
+                 return 'application/xml';
             default:
                 return 'text/plain';
         }
@@ -626,16 +599,15 @@ final class Task extends Resource
      * @param string $zipPath
      * @throws Exception
      */
-    private function setTaskConfigsInZip(string $zipPath)
-    {
+    private function setTaskConfigsInZip(string $zipPath){
         $zip = new \ZipArchive();
-        if ($zip->open($zipPath) === true) {
+        if ($zip->open($zipPath) === true){
             // QUIRK: It seems normally a file in the top-level is found with /filename.extension but it seems it sometimes is found only without leading slash ?
-            $taskConfigContent = $zip->getFromName('/' . self::TASK_CONFIG_INI);
-            if ($taskConfigContent === false) {
+            $taskConfigContent = $zip->getFromName('/'.self::TASK_CONFIG_INI);
+            if($taskConfigContent === false){
                 $taskConfigContent = $zip->getFromName(self::TASK_CONFIG_INI);
             }
-            if ($taskConfigContent !== false) {
+            if($taskConfigContent !== false){
                 // there is already a task-config we have to overwrite
                 $taskConfig = new TaskConfigIni($taskConfigContent, $this->_importConfigs);
                 $zip->addFromString(self::TASK_CONFIG_INI, $taskConfig->getContents(), \ZipArchive::FL_OVERWRITE);
@@ -645,7 +617,7 @@ final class Task extends Resource
             }
             $zip->close();
         } else {
-            throw new Exception('Could not open zip \'' . $zipPath . '\'');
+            throw new Exception('Could not open zip \''.$zipPath.'\'');
         }
     }
 

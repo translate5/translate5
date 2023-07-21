@@ -50,8 +50,7 @@ class ClientPmTest extends editor_Test_ImportTest
         $config->import($task0);
         // import one task with the testclientpm as owner and customer 1
         $task1 = $config->addTask('en', 'de', static::getTestCustomerId(1), '3-segments-en-de.zip')
-            ->setProperty('foreignId', '2')
-            ->setOwner('testclientpm');
+            ->setProperty('foreignId', '2');
         $config->import($task1);
 
         // the pm should see both tasks
