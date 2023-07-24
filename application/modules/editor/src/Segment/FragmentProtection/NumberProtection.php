@@ -50,12 +50,35 @@ END LICENSE AND COPYRIGHT
 */
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\Segment\FragmentProtection\Number;
+namespace MittagQI\Translate5\Segment\FragmentProtection;
 
-use Traversable;
+use MittagQI\Translate5\Segment\FragmentProtection\Number\NumberProtectionInterface;
 
-interface NumberProtectionInterface
+class NumberProtection
 {
-    public function protect(iterable $textNodes, ?int $sourceLang, ?int $targetLang): Traversable;
+    public const DATE_TYPE = 'date';
 
+    /**
+     * @var array<NumberProtectionInterface & RatingInterface>
+     */
+    private array $protectors = [];
+
+    public function __construct()
+    {
+    }
+
+    public function protect(iterable $textNodes, ?int $sourceLang, ?int $targetLang,): iterable
+    {
+        foreach ($this->protectors() as $protector) {
+
+        }
+    }
+
+    /**
+     * @return iterable<NumberProtectionInterface & RatingInterface>
+     */
+    private function protectors(): iterable
+    {
+
+    }
 }

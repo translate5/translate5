@@ -50,23 +50,19 @@ END LICENSE AND COPYRIGHT
 */
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\Segment\FragmentProtection;
-
-use editor_Models_Segment_Utility as SegmentUtility;
-
-class Number implements TagProtectionInterface
+/**
+ * @method string getLanguageId()
+ * @method void setLanguageId(int $id)
+ * @method string getType()
+ * @method void setType(string $type)
+ * @method string getName()
+ * @method void setName(string $name)
+ * @method string getRegex()
+ * @method void setRegex(string $regex)
+ * @method string getFormat()
+ * @method void setFormat(string $format)
+ */
+class editor_Models_LanguageDateFormat extends ZfExtended_Models_Entity_Abstract
 {
-    public const DATE_TYPE = 'date';
 
-    public function __construct()
-    {
-
-    }
-
-    public function protect(string $textNode, string $entityHandling = self::ENTITY_MODE_RESTORE): string
-    {
-        if ($entityHandling !== self::ENTITY_MODE_OFF) {
-            $textNode = SegmentUtility::entityCleanup($textNode, $entityHandling == self::ENTITY_MODE_RESTORE);
-        }
-    }
 }

@@ -50,12 +50,9 @@ END LICENSE AND COPYRIGHT
 */
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\Segment\FragmentProtection\Number;
+namespace MittagQI\Translate5\Segment\FragmentProtection;
 
-use Traversable;
-
-interface NumberProtectionInterface
+interface RatingInterface
 {
-    public function protect(iterable $textNodes, ?int $sourceLang, ?int $targetLang): Traversable;
-
+    public function rating(): int;
 }

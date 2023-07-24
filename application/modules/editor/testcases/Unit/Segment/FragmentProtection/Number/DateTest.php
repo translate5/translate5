@@ -1,8 +1,8 @@
 <?php
 /*
 START LICENSE AND COPYRIGHT
- Copyright (c) 2013 - 2022 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
- Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
+ Copyright (c) 2013 - 2022 Marc Mittag; MittagQI - Quality Informatics; All rights reserved.
+ Contact: http://www.MittagQI.com/ / service (ATT) MittagQI.com
 
  This file is part of a paid plug-in for translate5.
 
@@ -41,11 +41,11 @@ START LICENSE AND COPYRIGHT
  root folder of translate5. This plug-in exception allows using GPLv3 for translate5 plug-ins,
  although translate5 core is licensed under AGPLv3.
 
- @copyright  Marc Mittag, MittagQI - Quality Informatics
- @author     MittagQI - Quality Informatics
- @license    GNU GENERAL PUBLIC LICENSE version 3 with plugin-execption
-             http://www.gnu.org/licenses/gpl.html
-             http://www.translate5.net/plugin-exception.txt
+ @copyright Marc Mittag, MittagQI - Quality Informatics
+ @author   MittagQI - Quality Informatics
+ @license  GNU GENERAL PUBLIC LICENSE version 3 with plugin-execption
+       http://www.gnu.org/licenses/gpl.html
+       http://www.translate5.net/plugin-exception.txt
 END LICENSE AND COPYRIGHT
 */
 declare(strict_types=1);
@@ -227,37 +227,260 @@ class DateTest extends editor_Test_UnitTest
     /**
      * @dataProvider defaultDataToProtect
      */
-    public function testProtectWithNoSourceAndTargetLang(string $textNode, string $expected): void
+    public function testProtectWithNoSourceAndTargetLang(array $textNodes, array $expected): void
     {
         $repo = $this->createConfiguredMock(LanguageNumberFormatRepository::class, []);
-        self::assertSame($expected, (new DateProtection($repo))->protect($textNode, null, null));
+        self::assertSame($expected, iterator_to_array((new DateProtection($repo))->protect($textNodes, null, null)));
     }
 
     public function defaultDataToProtect(): iterable
     {
         yield 'date in the middle of text' => [
-            'textNode' => 'some text with date in it: 2023-07-18. in the middle',
-            'expected' => 'some text with date in it: <number type="date" name="default" source="2023-07-18" iso="2023-07-18" target="" />. in the middle'
+            'textNodes' => [
+                [
+                    'text' => 'some text with date in it: 2023-07-18. in the middle',
+                    'protected' => false,
+                ],
+            ],
+            'expected' => [
+                [
+                    'text' => 'some text with date in it: ',
+                    'protected' => false,
+                ],
+                [
+                    'text' => '<number type="date" name="default" source="2023-07-18" iso="2023-07-18" target="" />',
+                    'protected' => true,
+                ],
+                [
+                    'text' => '. in the middle',
+                    'protected' => false,
+                ],
+            ]
         ];
 
         yield 'date at the end of text' => [
-            'textNode' => 'some text with date in it: 18-07-2023',
-            'expected' => 'some text with date in it: <number type="date" name="default" source="18-07-2023" iso="2023-07-18" target="" />'
+            'textNodes' => [
+                [
+                    'text' => 'some text with date in it: 18-07-2023',
+                    'protected' => false,
+                ]
+            ],
+            'expected' => [
+                [
+                    'text' => 'some text with date in it: ',
+                    'protected' => false,
+                ],
+                [
+                    'text' => '<number type="date" name="default" source="18-07-2023" iso="2023-07-18" target="" />',
+                    'protected' => true,
+                ],
+            ]
         ];
 
         yield 'date at the beginning of text' => [
-            'textNode' => '07-18-2023 some text with date in it',
-            'expected' => '<number type="date" name="default" source="07-18-2023" iso="2023-07-18" target="" /> some text with date in it'
+            'textNodes' => [
+                [
+                    'text' => '07-18-2023 some text with date in it',
+                    'protected' => false,
+                ]
+            ],
+            'expected' => [
+                [
+                    'text' => '<number type="date" name="default" source="07-18-2023" iso="2023-07-18" target="" />',
+                    'protected' => true,
+                ],
+                [
+                    'text' => ' some text with date in it',
+                    'protected' => false,
+                ],
+            ]
         ];
 
         yield 'date at the beginning and end of text' => [
-            'textNode' => '07.18.23 some text with date in it 18/07/2023',
-            'expected' => '<number type="date" name="default" source="07.18.23" iso="2023-07-18" target="" /> some text with date in it <number type="date" name="default" source="18/07/2023" iso="2023-07-18" target="" />'
+            'textNodes' => [
+                [
+                    'text' => '07.18.23 some text with date in it 18/07/2023',
+                    'protected' => false,
+                ]
+            ],
+            'expected' => [
+                [
+                    'text' => '<number type="date" name="default" source="07.18.23" iso="2023-07-18" target="" />',
+                    'protected' => true,
+                ],
+                [
+                    'text' => ' some text with date in it ',
+                    'protected' => false,
+                ],
+                [
+                    'text' => '<number type="date" name="default" source="18/07/2023" iso="2023-07-18" target="" />',
+                    'protected' => true,
+                ],
+            ]
         ];
 
         yield 'a lot of different dates inside text' => [
-            'textNode' => '07/18/23 some text with date in it: 2023-07-18. in the middle 07.18.2023 and some more text 07 18 2023 and more 20231231',
-            'expected' => '<number type="date" name="default" source="07/18/23" iso="2023-07-18" target="" /> some text with date in it: <number type="date" name="default" source="2023-07-18" iso="2023-07-18" target="" />. in the middle <number type="date" name="default" source="07.18.2023" iso="2023-07-18" target="" /> and some more text <number type="date" name="default" source="07 18 2023" iso="2023-07-18" target="" /> and more <number type="date" name="default" source="20231231" iso="2023-12-31" target="" />'
+            'textNodes' => [
+                [
+                    'text' => '07/18/23 some text with date in it: 2023-07-18. in the middle 07.18.2023 and some more text 07 18 2023 and more 20231231',
+                    'protected' => false,
+                ]
+            ],
+            'expected' => [
+                [
+                    'text' => '<number type="date" name="default" source="07/18/23" iso="2023-07-18" target="" />',
+                    'protected' => true,
+                ],
+                [
+                    'text' => ' some text with date in it: ',
+                    'protected' => false,
+                ],
+                [
+                    'text' => '<number type="date" name="default" source="2023-07-18" iso="2023-07-18" target="" />',
+                    'protected' => true,
+                ],
+                [
+                    'text' => '. in the middle ',
+                    'protected' => false,
+                ],
+                [
+                    'text' => '<number type="date" name="default" source="07.18.2023" iso="2023-07-18" target="" />',
+                    'protected' => true,
+                ],
+                [
+                    'text' => ' and some more text ',
+                    'protected' => false,
+                ],
+                [
+                    'text' => '<number type="date" name="default" source="07 18 2023" iso="2023-07-18" target="" />',
+                    'protected' => true,
+                ],
+                [
+                    'text' => ' and more ',
+                    'protected' => false,
+                ],
+                [
+                    'text' => '<number type="date" name="default" source="20231231" iso="2023-12-31" target="" />',
+                    'protected' => true,
+                ],
+            ]
+        ];
+
+        yield '2 test nodes. date in the middle of second text' => [
+            'textNodes' => [
+                [
+                    'text' => 'some text',
+                    'protected' => false,
+                ],
+                [
+                    'text' => 'some text with date in it: 2023-07-18. in the middle',
+                    'protected' => false,
+                ]
+            ],
+            'expected' => [
+                [
+                    'text' => 'some text',
+                    'protected' => false,
+                ],
+                [
+                    'text' => 'some text with date in it: ',
+                    'protected' => false,
+                ],
+                [
+                    'text' => '<number type="date" name="default" source="2023-07-18" iso="2023-07-18" target="" />',
+                    'protected' => true,
+                ],
+                [
+                    'text' => '. in the middle',
+                    'protected' => false,
+                ],
+            ]
+        ];
+
+        yield '3 test nodes. second marked as protected. date in the middle of third text' => [
+            'textNodes' => [
+                [
+                    'text' => 'some text',
+                    'protected' => false,
+                ],
+                [
+                    'text' => '2023-07-18',
+                    'protected' => true,
+                ],
+                [
+                    'text' => 'some text with date in it: 2023-07-18. in the middle',
+                    'protected' => false,
+                ]
+            ],
+            'expected' => [
+                [
+                    'text' => 'some text',
+                    'protected' => false,
+                ],
+                [
+                    'text' => '2023-07-18',
+                    'protected' => true,
+                ],
+                [
+                    'text' => 'some text with date in it: ',
+                    'protected' => false,
+                ],
+                [
+                    'text' => '<number type="date" name="default" source="2023-07-18" iso="2023-07-18" target="" />',
+                    'protected' => true,
+                ],
+                [
+                    'text' => '. in the middle',
+                    'protected' => false,
+                ],
+            ]
+        ];
+
+        yield '4 test nodes. second marked as protected. date in the middle of third text' => [
+            'textNodes' => [
+                [
+                    'text' => 'some text',
+                    'protected' => false,
+                ],
+                [
+                    'text' => '2023-07-18',
+                    'protected' => true,
+                ],
+                [
+                    'text' => 'some text with date in it: 2023-07-18. in the middle',
+                    'protected' => false,
+                ],
+                [
+                    'text' => 'some additional text',
+                    'protected' => false,
+                ]
+            ],
+            'expected' => [
+                [
+                    'text' => 'some text',
+                    'protected' => false,
+                ],
+                [
+                    'text' => '2023-07-18',
+                    'protected' => true,
+                ],
+                [
+                    'text' => 'some text with date in it: ',
+                    'protected' => false,
+                ],
+                [
+                    'text' => '<number type="date" name="default" source="2023-07-18" iso="2023-07-18" target="" />',
+                    'protected' => true,
+                ],
+                [
+                    'text' => '. in the middle',
+                    'protected' => false,
+                ],
+                [
+                    'text' => 'some additional text',
+                    'protected' => false,
+                ],
+            ]
         ];
     }
 }

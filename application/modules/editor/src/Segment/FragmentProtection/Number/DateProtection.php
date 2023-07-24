@@ -54,9 +54,11 @@ namespace MittagQI\Translate5\Segment\FragmentProtection\Number;
 
 use DateTime;
 use MittagQI\Translate5\Repository\LanguageNumberFormatRepository;
-use MittagQI\Translate5\Segment\FragmentProtection\Number;
+use MittagQI\Translate5\Segment\FragmentProtection\NumberProtection;
+use MittagQI\Translate5\Segment\FragmentProtection\RatingInterface;
+use Traversable;
 
-class DateProtection implements NumberProtectionInterface
+class DateProtection implements NumberProtectionInterface, RatingInterface
 {
     private array $dateFormats = [
         [
@@ -173,39 +175,66 @@ class DateProtection implements NumberProtectionInterface
         return (bool) preg_match($this->getDateRegex($sourceLang), $textNode);
     }
 
-    public function protect(iterable $textNodes, ?int $sourceLang, ?int $targetLang): iterable
+    public function rating(): int
+    {
+        return 500;
+    }
+
+    public function protect(iterable $textNodes, ?int $sourceLang, ?int $targetLang): Traversable
+    {
+        $regex = $this->getDateRegex($sourceLang);
+
+        foreach ($textNodes as $textNode) {
+            if ($textNode['protected']) {
+                yield $textNode;
+
+                continue;
+            }
+
+            preg_match_all($regex, $textNode['text'], $matches, PREG_PATTERN_ORDER);
+            $splitText = preg_split($regex, $textNode['text']);
+            $dates = $matches[1];
+
+            // put protected dates on the places where they belong
+            foreach ($this->processSplitNode($splitText, $dates, $sourceLang, $targetLang) as $text => $protected) {
+                if (!empty($text)) {
+                    yield ['text' => $text, 'protected' => $protected];
+                }
+            }
+        }
+    }
+
+    private function processSplitNode(
+        array $splitText,
+        array $datesToProtect,
+        ?int $sourceLang,
+        ?int $targetLang
+    ): iterable {
+        $matchCount = count($datesToProtect);
+        for ($i = 0; $i <= $matchCount; $i++) {
+            // yield not date part of text node
+            yield $splitText[$i] => false;
+
+            if (!isset($datesToProtect[$i])) {
+                continue;
+            }
+
+            yield $this->protectDate($datesToProtect[$i], $sourceLang, $targetLang) => true;
+        }
+    }
+
+    private function protectDate(string $dateToProtect, ?int $sourceLang, ?int $targetLang): string
     {
         $targetFormat = null;
 
-        $regex = $this->getDateRegex($sourceLang);
-
-        $matchCount = preg_match_all($regex, $textNode, $matches, PREG_PATTERN_ORDER);
-        $splitText = preg_split($regex, $textNode);
-
-        $datesToProtect = $matches[1];
-
-        // put protected dates on the places where they belong
-        for ($i = 0; $i <= $matchCount; $i++) {
-            yield $splitText[$i] => false;
-
-            if (isset($datesToProtect[$i])) {
-                $composedTextArray[] = $protectedDates[$i];
-            }
-        }
-
-
-
-
-        $protectedDates = [];
-
+        // if source lang provided we'll firstly try to check existing user provided formats
         if (null !== $sourceLang) {
-            $this->applyCustomFormatsProcessing(
-                $textNode,
-                $sourceLang,
-                $targetLang,
-                $datesToProtect,
-                $protectedDates
-            );
+            $protectedDate = $this->protectDateOfCustomFormats($dateToProtect, $sourceLang, $targetLang);
+
+            if (null !== $protectedDate) {
+                // yield protected date of format provided by user and continue with next text part
+                return $protectedDate;
+            }
         }
 
         if ($targetLang) {
@@ -213,24 +242,24 @@ class DateProtection implements NumberProtectionInterface
         }
 
         foreach ($this->dateFormats as $sourceFormat) {
-            $this->protectDates($sourceFormat, $targetFormat, $datesToProtect, $protectedDates);
-        }
-
-        $composedTextArray = [];
-        // put protected dates on the places where they belong
-        for ($i = 0; $i <= $matchCount; $i++) {
-            $composedTextArray[] = $splitText[$i];
-
-            if (isset($protectedDates[$i])) {
-                $composedTextArray[] = $protectedDates[$i];
+            if (!$this->dateMatchesRegex($sourceFormat['regex'], $dateToProtect)) {
+                continue;
             }
+
+            return $this->composeNumberDateTag($dateToProtect, 'default', $sourceFormat['format'], $targetFormat);
         }
 
-        return implode('', $composedTextArray);
+        throw new \LogicException(
+            sprintf('None of regex matches current date "%s" that should not be possible', $dateToProtect)
+        );
     }
 
-    private function protectDate(string $date, string $name, ?string $sourceFormat, ?string $targetFormat): string
-    {
+    private function composeNumberDateTag(
+        string $date,
+        string $name,
+        ?string $sourceFormat,
+        ?string $targetFormat
+    ): string {
         $datetime = null;
 
         if (null !== $sourceFormat) {
@@ -239,7 +268,7 @@ class DateProtection implements NumberProtectionInterface
 
         return sprintf(
             '<number type="%s" name="%s" source="%s" iso="%s" target="%s" />',
-            Number::DATE_TYPE,
+            NumberProtection::DATE_TYPE,
             $name,
             $date,
             $datetime ? $datetime->format('Y-m-d') : '',
@@ -247,7 +276,7 @@ class DateProtection implements NumberProtectionInterface
         );
     }
 
-    private function composeDateRegex(array $parts): string
+    private function composeDateRegex(string ...$parts): string
     {
         return sprintf('/\b(%s)\b/', implode('|', $parts));
     }
@@ -255,7 +284,7 @@ class DateProtection implements NumberProtectionInterface
     private function getDateRegex(?int $sourceLang): string
     {
         return $this->composeDateRegex(
-            array_merge(
+            ...array_merge(
                 array_column($this->dateFormats, 'regex'),
                 array_column($this->getFormatsByLangId($sourceLang), 'regex')
             )
@@ -266,20 +295,18 @@ class DateProtection implements NumberProtectionInterface
     {
         return null === $sourceLang
             ? []
-            : $this->formatRepository->findByLanguageIdAndType($sourceLang, Number::DATE_TYPE);
+            : $this->formatRepository->findByLanguageIdAndType($sourceLang, NumberProtection::DATE_TYPE);
     }
 
-    public function applyCustomFormatsProcessing(
-        string $textNode,
+    private function protectDateOfCustomFormats(
+        string $dateToProtect,
         int $sourceLang,
         ?int $targetLang,
-        array &$datesToProtect,
-        array &$protectedDates
-    ): void {
+    ): ?string {
         $formats = $this->getFormatsByLangId($sourceLang);
 
-        if (!preg_match($this->composeDateRegex(array_column($formats, 'regex')), $textNode)) {
-            return;
+        if (!preg_match($this->composeDateRegex(...array_column($formats, 'regex')), $dateToProtect)) {
+            return null;
         }
 
         $targetFormat = null;
@@ -291,35 +318,23 @@ class DateProtection implements NumberProtectionInterface
                     ?->getFormat();
             }
 
-            $this->protectDates($sourceFormat, $targetFormat, $datesToProtect, $protectedDates);
-        }
-    }
-
-    public function protectDates(
-        array $sourceFormat,
-        ?string $targetFormat,
-        array &$datesToProtect,
-        array &$protectedDates
-    ): void {
-        foreach ($datesToProtect as $key => $date) {
-            $regex = $this->composeDateRegex([$sourceFormat['regex']]);
-
-            if (!preg_match($regex, $date)) {
+            if (!$this->dateMatchesRegex($sourceFormat['regex'], $dateToProtect)) {
                 continue;
             }
 
-            $protectedDates[$key] = preg_replace_callback(
-                $regex,
-                fn($matches) => $this->protectDate(
-                    $matches[1],
-                    $sourceFormat['name'] ?? 'default',
-                    $sourceFormat['format'] ?? null,
-                    $targetFormat
-                ),
-                $date
+            return $this->composeNumberDateTag(
+                $dateToProtect,
+                $sourceFormat['name'] ?? 'default',
+                $sourceFormat['format'] ?? null,
+                $targetFormat
             );
-
-            unset($datesToProtect[$key]);
         }
+
+        return null;
+    }
+
+    private function dateMatchesRegex(string $regex, string $dateToProtect): bool
+    {
+        return (bool) preg_match($this->composeDateRegex($regex), $dateToProtect);
     }
 }
