@@ -539,14 +539,6 @@ class editor_Models_TaskUserAssoc extends ZfExtended_Models_Entity_Abstract {
         foreach($taskUserAssoc as $job) {
             $task->unlockForUser($job['userGuid'], $job['taskGuid']);
         }
-
-        // TODO: REMOVE ME LATER WHEN WE HAVE INFO ABOUT THE NOACCESS ERROR. THIS IS ONLY TEMP DEBUG CODE TO COLLECT
-        // MORE INFO ABOUT THE BUG
-        $session = new Zend_Session_Namespace();
-        $internalSessionUniqId = $session->internalSessionUniqId;
-        $customFileLogger->log('My current internalSessionUniqId : '.$internalSessionUniqId);
-        $customFileLogger->log('My current sessionId : '.Zend_Session::getId());
-        $customFileLogger->write();
     }
 
     /**
