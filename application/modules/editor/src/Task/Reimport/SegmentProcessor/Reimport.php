@@ -56,7 +56,7 @@ class Reimport extends editor_Models_Import_SegmentProcessor
      * Translate5 version for alignment switch. Everything before ALIGNMENT_SWITCH_VERSION
      * will use Source as alignment.
      */
-    public const ALIGNMENT_SWITCH_VERSION = 621;
+    public const ALIGNMENT_SWITCH_VERSION = 650;
 
     /**
      * @var editor_Models_Segment_InternalTag
@@ -245,8 +245,8 @@ class Reimport extends editor_Models_Import_SegmentProcessor
             return ZfExtended_Factory::get(Mid::class);
         }
         $version = (int)str_replace('.', '', $version);
-        // For versions > 6.2.1 use always the new MID alignment
-        return ZfExtended_Factory::get(($version > self::ALIGNMENT_SWITCH_VERSION) ? Mid::class : Source::class);
+        // For versions => 6.5.0 use always the new MID alignment
+        return ZfExtended_Factory::get(($version >= self::ALIGNMENT_SWITCH_VERSION) ? Mid::class : Source::class);
     }
 
 }
