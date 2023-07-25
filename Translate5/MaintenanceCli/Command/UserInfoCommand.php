@@ -33,6 +33,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Translate5\MaintenanceCli\WebAppBridge\Application;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
+use ZfExtended_Models_Db_Session;
 
 
 class UserInfoCommand extends UserAbstractCommand
@@ -132,8 +133,7 @@ class UserInfoCommand extends UserAbstractCommand
     }
 
     protected function printSessions(int $userId) {
-        $sessionDb = \ZfExtended_Factory::get('ZfExtended_Models_Db_Session');
-        /* @var $sessionDb \ZfExtended_Models_Db_Session */
+        $sessionDb = new ZfExtended_Models_Db_Session();
         $sessions = $sessionDb->fetchAll($sessionDb->select()
             ->where('userId = ?', $userId)
         )->toArray();
