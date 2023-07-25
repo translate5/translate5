@@ -50,9 +50,12 @@ END LICENSE AND COPYRIGHT
 */
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\Segment\FragmentProtection;
+namespace MittagQI\Translate5\Segment\ChunkProtection;
 
-interface TagProtectionInterface
+use editor_Models_Segment_Utility as SegmentUtility;
+use editor_Models_Segment_Whitespace as Whitespace;
+
+class ChunkProtection
 {
     /**
      * All entities are restored to their applicable characters (&_szlig; => ß),
@@ -71,5 +74,23 @@ interface TagProtectionInterface
      */
     public const ENTITY_MODE_OFF = 'off';
 
-    public function protect(string $textNode, string $entityHandling = self::ENTITY_MODE_RESTORE): string;
+    public function __construct(private NumberProtection $number, private Whitespace $whitespace)
+    {
+    }
+
+    public function protect(
+        string $textNode,
+        ?int $sourceLang,
+        ?int $targetLang,
+        string $entityHandling = self::ENTITY_MODE_RESTORE
+    ): string {
+        if ($entityHandling !== self::ENTITY_MODE_OFF) {
+            $textNode = SegmentUtility::entityCleanup($textNode, $entityHandling === self::ENTITY_MODE_RESTORE);
+        }
+
+        $textNode = $this->number->protect($textNode, $sourceLang, $targetLang);
+        $textNode = $this->whitespace->protectWhitespace($textNode, self::ENTITY_MODE_OFF);
+
+        return $textNode;
+    }
 }

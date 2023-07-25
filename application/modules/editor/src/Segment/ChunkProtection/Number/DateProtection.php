@@ -50,12 +50,13 @@ END LICENSE AND COPYRIGHT
 */
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\Segment\FragmentProtection\Number;
+namespace MittagQI\Translate5\Segment\ChunkProtection\Number;
 
 use DateTime;
 use MittagQI\Translate5\Repository\LanguageNumberFormatRepository;
-use MittagQI\Translate5\Segment\FragmentProtection\NumberProtection;
-use MittagQI\Translate5\Segment\FragmentProtection\RatingInterface;
+use MittagQI\Translate5\Segment\ChunkProtection\ChunkDto;
+use MittagQI\Translate5\Segment\ChunkProtection\NumberProtection;
+use MittagQI\Translate5\Segment\ChunkProtection\RatingInterface;
 use Traversable;
 
 class DateProtection implements NumberProtectionInterface, RatingInterface
@@ -180,27 +181,25 @@ class DateProtection implements NumberProtectionInterface, RatingInterface
         return 500;
     }
 
-    public function protect(iterable $textNodes, ?int $sourceLang, ?int $targetLang): Traversable
+    /**
+     * {@inheritDoc}
+     */
+    public function protect(iterable $chunks, ?int $sourceLang, ?int $targetLang): iterable
     {
         $regex = $this->getDateRegex($sourceLang);
 
-        foreach ($textNodes as $textNode) {
-            if ($textNode['protected']) {
-                yield $textNode;
+        foreach ($chunks as $chunk) {
+            if ($chunk->protected) {
+                yield $chunk;
 
                 continue;
             }
 
-            preg_match_all($regex, $textNode['text'], $matches, PREG_PATTERN_ORDER);
-            $splitText = preg_split($regex, $textNode['text']);
+            preg_match_all($regex, $chunk->text, $matches, PREG_PATTERN_ORDER);
+            $splitText = preg_split($regex, $chunk->text);
             $dates = $matches[1];
 
-            // put protected dates on the places where they belong
-            foreach ($this->processSplitNode($splitText, $dates, $sourceLang, $targetLang) as $text => $protected) {
-                if (!empty($text)) {
-                    yield ['text' => $text, 'protected' => $protected];
-                }
-            }
+            yield from $this->processSplitNode($splitText, $dates, $sourceLang, $targetLang);
         }
     }
 
@@ -212,14 +211,16 @@ class DateProtection implements NumberProtectionInterface, RatingInterface
     ): iterable {
         $matchCount = count($datesToProtect);
         for ($i = 0; $i <= $matchCount; $i++) {
-            // yield not date part of text node
-            yield $splitText[$i] => false;
+            if (!empty($splitText[$i])) {
+                // yield not date part of text node
+                yield new ChunkDto($splitText[$i]);
+            }
 
             if (!isset($datesToProtect[$i])) {
                 continue;
             }
 
-            yield $this->protectDate($datesToProtect[$i], $sourceLang, $targetLang) => true;
+            yield new ChunkDto($this->protectDate($datesToProtect[$i], $sourceLang, $targetLang), true);
         }
     }
 

@@ -50,9 +50,15 @@ END LICENSE AND COPYRIGHT
 */
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\Segment\FragmentProtection;
+namespace MittagQI\Translate5\Segment\ChunkProtection;
 
-interface RatingInterface
+/**
+ * @property-read string $text
+ * @property-read bool $protected
+ */
+class ChunkDto
 {
-    public function rating(): int;
+    public function __construct(public string $text, public bool $protected = false)
+    {
+    }
 }

@@ -50,12 +50,32 @@ END LICENSE AND COPYRIGHT
 */
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\Segment\FragmentProtection\Number;
+namespace MittagQI\Translate5\Test\Unit\Segment\ChunkProtection;
 
-use Traversable;
+use editor_Test_UnitTest;
+use MittagQI\Translate5\Segment\ChunkProtection\ChunkDto;
+use MittagQI\Translate5\Segment\ChunkProtection\Number\NumberProtectionInterface;
+use MittagQI\Translate5\Segment\ChunkProtection\NumberProtection;
 
-interface NumberProtectionInterface
+class NumberProtectionTest extends editor_Test_UnitTest
 {
-    public function protect(iterable $textNodes, ?int $sourceLang, ?int $targetLang): Traversable;
+    public function test(): void
+    {
+        $protector = new NumberProtection([new TestProtection()]);
+        $testString = 'some text with date in it: 2023-07-18. in the middle';
 
+        self::assertSame($testString, $protector->protect($testString, null, null));
+    }
+}
+
+class TestProtection implements NumberProtectionInterface
+{
+    public function protect(iterable $chunks, ?int $sourceLang, ?int $targetLang): iterable
+    {
+        foreach ($chunks as $chunk) {
+            foreach (preg_split('/\b/', $chunk->text) as $part) {
+                yield new ChunkDto($part);
+            }
+        }
+    }
 }

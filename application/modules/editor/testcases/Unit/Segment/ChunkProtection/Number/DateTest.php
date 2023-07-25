@@ -50,18 +50,19 @@ END LICENSE AND COPYRIGHT
 */
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\Test\Unit\Segment\FragmentProtection\Number;
+namespace MittagQI\Translate5\Test\Unit\Segment\ChunkProtection\Number;
 
 use editor_Test_UnitTest;
 use MittagQI\Translate5\Repository\LanguageNumberFormatRepository;
-use MittagQI\Translate5\Segment\FragmentProtection\Number\DateProtection;
+use MittagQI\Translate5\Segment\ChunkProtection\ChunkDto;
+use MittagQI\Translate5\Segment\ChunkProtection\Number\DateProtection;
 
 class DateTest extends editor_Test_UnitTest
 {
     /**
      * @dataProvider datesProvider
      */
-    public function estHasEntityToProtectWithNoSourceLang(string $date, bool $valid): void
+    public function testHasEntityToProtectWithNoSourceLang(string $date, bool $valid): void
     {
         $repo = $this->createConfiguredMock(
             LanguageNumberFormatRepository::class,
@@ -230,256 +231,117 @@ class DateTest extends editor_Test_UnitTest
     public function testProtectWithNoSourceAndTargetLang(array $textNodes, array $expected): void
     {
         $repo = $this->createConfiguredMock(LanguageNumberFormatRepository::class, []);
-        self::assertSame($expected, iterator_to_array((new DateProtection($repo))->protect($textNodes, null, null)));
+        $protected = (new DateProtection($repo))->protect($textNodes, null, null);
+
+        $result = [];
+        foreach ($protected as $p) {
+            $result[] = $p;
+        }
+
+        self::assertEquals($expected, $result);
     }
 
     public function defaultDataToProtect(): iterable
     {
         yield 'date in the middle of text' => [
-            'textNodes' => [
-                [
-                    'text' => 'some text with date in it: 2023-07-18. in the middle',
-                    'protected' => false,
-                ],
-            ],
+            'textNodes' => [new ChunkDto('some text with date in it: 2023-07-18. in the middle', false)],
             'expected' => [
-                [
-                    'text' => 'some text with date in it: ',
-                    'protected' => false,
-                ],
-                [
-                    'text' => '<number type="date" name="default" source="2023-07-18" iso="2023-07-18" target="" />',
-                    'protected' => true,
-                ],
-                [
-                    'text' => '. in the middle',
-                    'protected' => false,
-                ],
+                new ChunkDto('some text with date in it: ', false),
+                new ChunkDto('<number type="date" name="default" source="2023-07-18" iso="2023-07-18" target="" />', true),
+                new ChunkDto('. in the middle', false),
             ]
         ];
 
         yield 'date at the end of text' => [
             'textNodes' => [
-                [
-                    'text' => 'some text with date in it: 18-07-2023',
-                    'protected' => false,
-                ]
+                new ChunkDto('some text with date in it: 18-07-2023', false)
             ],
             'expected' => [
-                [
-                    'text' => 'some text with date in it: ',
-                    'protected' => false,
-                ],
-                [
-                    'text' => '<number type="date" name="default" source="18-07-2023" iso="2023-07-18" target="" />',
-                    'protected' => true,
-                ],
+                new ChunkDto('some text with date in it: ', false),
+                new ChunkDto('<number type="date" name="default" source="18-07-2023" iso="2023-07-18" target="" />', true),
             ]
         ];
 
         yield 'date at the beginning of text' => [
             'textNodes' => [
-                [
-                    'text' => '07-18-2023 some text with date in it',
-                    'protected' => false,
-                ]
+                new ChunkDto('07-18-2023 some text with date in it', false)
             ],
             'expected' => [
-                [
-                    'text' => '<number type="date" name="default" source="07-18-2023" iso="2023-07-18" target="" />',
-                    'protected' => true,
-                ],
-                [
-                    'text' => ' some text with date in it',
-                    'protected' => false,
-                ],
+                new ChunkDto('<number type="date" name="default" source="07-18-2023" iso="2023-07-18" target="" />', true),
+                new ChunkDto(' some text with date in it', false),
             ]
         ];
 
         yield 'date at the beginning and end of text' => [
             'textNodes' => [
-                [
-                    'text' => '07.18.23 some text with date in it 18/07/2023',
-                    'protected' => false,
-                ]
+                new ChunkDto('07.18.23 some text with date in it 18/07/2023', false)
             ],
             'expected' => [
-                [
-                    'text' => '<number type="date" name="default" source="07.18.23" iso="2023-07-18" target="" />',
-                    'protected' => true,
-                ],
-                [
-                    'text' => ' some text with date in it ',
-                    'protected' => false,
-                ],
-                [
-                    'text' => '<number type="date" name="default" source="18/07/2023" iso="2023-07-18" target="" />',
-                    'protected' => true,
-                ],
+                new ChunkDto('<number type="date" name="default" source="07.18.23" iso="2023-07-18" target="" />', true),
+                new ChunkDto(' some text with date in it ', false),
+                new ChunkDto('<number type="date" name="default" source="18/07/2023" iso="2023-07-18" target="" />', true),
             ]
         ];
 
         yield 'a lot of different dates inside text' => [
             'textNodes' => [
-                [
-                    'text' => '07/18/23 some text with date in it: 2023-07-18. in the middle 07.18.2023 and some more text 07 18 2023 and more 20231231',
-                    'protected' => false,
-                ]
+                new ChunkDto('07/18/23 some text with date in it: 2023-07-18. in the middle 07.18.2023 and some more text 07 18 2023 and more 20231231', false)
             ],
             'expected' => [
-                [
-                    'text' => '<number type="date" name="default" source="07/18/23" iso="2023-07-18" target="" />',
-                    'protected' => true,
-                ],
-                [
-                    'text' => ' some text with date in it: ',
-                    'protected' => false,
-                ],
-                [
-                    'text' => '<number type="date" name="default" source="2023-07-18" iso="2023-07-18" target="" />',
-                    'protected' => true,
-                ],
-                [
-                    'text' => '. in the middle ',
-                    'protected' => false,
-                ],
-                [
-                    'text' => '<number type="date" name="default" source="07.18.2023" iso="2023-07-18" target="" />',
-                    'protected' => true,
-                ],
-                [
-                    'text' => ' and some more text ',
-                    'protected' => false,
-                ],
-                [
-                    'text' => '<number type="date" name="default" source="07 18 2023" iso="2023-07-18" target="" />',
-                    'protected' => true,
-                ],
-                [
-                    'text' => ' and more ',
-                    'protected' => false,
-                ],
-                [
-                    'text' => '<number type="date" name="default" source="20231231" iso="2023-12-31" target="" />',
-                    'protected' => true,
-                ],
+                new ChunkDto('<number type="date" name="default" source="07/18/23" iso="2023-07-18" target="" />', true),
+                new ChunkDto(' some text with date in it: ', false),
+                new ChunkDto('<number type="date" name="default" source="2023-07-18" iso="2023-07-18" target="" />', true),
+                new ChunkDto('. in the middle ', false),
+                new ChunkDto('<number type="date" name="default" source="07.18.2023" iso="2023-07-18" target="" />', true),
+                new ChunkDto(' and some more text ', false),
+                new ChunkDto('<number type="date" name="default" source="07 18 2023" iso="2023-07-18" target="" />', true),
+                new ChunkDto(' and more ', false),
+                new ChunkDto('<number type="date" name="default" source="20231231" iso="2023-12-31" target="" />', true),
             ]
         ];
 
         yield '2 test nodes. date in the middle of second text' => [
             'textNodes' => [
-                [
-                    'text' => 'some text',
-                    'protected' => false,
-                ],
-                [
-                    'text' => 'some text with date in it: 2023-07-18. in the middle',
-                    'protected' => false,
-                ]
+                new ChunkDto('some text', false),
+                new ChunkDto('some text with date in it: 2023-07-18. in the middle', false)
             ],
             'expected' => [
-                [
-                    'text' => 'some text',
-                    'protected' => false,
-                ],
-                [
-                    'text' => 'some text with date in it: ',
-                    'protected' => false,
-                ],
-                [
-                    'text' => '<number type="date" name="default" source="2023-07-18" iso="2023-07-18" target="" />',
-                    'protected' => true,
-                ],
-                [
-                    'text' => '. in the middle',
-                    'protected' => false,
-                ],
+                new ChunkDto('some text', false),
+                new ChunkDto('some text with date in it: ', false),
+                new ChunkDto('<number type="date" name="default" source="2023-07-18" iso="2023-07-18" target="" />', true),
+                new ChunkDto('. in the middle', false),
             ]
         ];
 
         yield '3 test nodes. second marked as protected. date in the middle of third text' => [
             'textNodes' => [
-                [
-                    'text' => 'some text',
-                    'protected' => false,
-                ],
-                [
-                    'text' => '2023-07-18',
-                    'protected' => true,
-                ],
-                [
-                    'text' => 'some text with date in it: 2023-07-18. in the middle',
-                    'protected' => false,
-                ]
+                new ChunkDto('some text', false),
+                new ChunkDto('2023-07-18', true),
+                new ChunkDto('some text with date in it: 2023-07-18. in the middle', false)
             ],
             'expected' => [
-                [
-                    'text' => 'some text',
-                    'protected' => false,
-                ],
-                [
-                    'text' => '2023-07-18',
-                    'protected' => true,
-                ],
-                [
-                    'text' => 'some text with date in it: ',
-                    'protected' => false,
-                ],
-                [
-                    'text' => '<number type="date" name="default" source="2023-07-18" iso="2023-07-18" target="" />',
-                    'protected' => true,
-                ],
-                [
-                    'text' => '. in the middle',
-                    'protected' => false,
-                ],
+                new ChunkDto('some text', false),
+                new ChunkDto('2023-07-18', true),
+                new ChunkDto('some text with date in it: ', false),
+                new ChunkDto('<number type="date" name="default" source="2023-07-18" iso="2023-07-18" target="" />', true),
+                new ChunkDto('. in the middle', false),
             ]
         ];
 
         yield '4 test nodes. second marked as protected. date in the middle of third text' => [
             'textNodes' => [
-                [
-                    'text' => 'some text',
-                    'protected' => false,
-                ],
-                [
-                    'text' => '2023-07-18',
-                    'protected' => true,
-                ],
-                [
-                    'text' => 'some text with date in it: 2023-07-18. in the middle',
-                    'protected' => false,
-                ],
-                [
-                    'text' => 'some additional text',
-                    'protected' => false,
-                ]
+                new ChunkDto('some text', false),
+                new ChunkDto('2023-07-18', true),
+                new ChunkDto('some text with date in it: 2023-07-18. in the middle', false),
+                new ChunkDto('some additional text', false)
             ],
             'expected' => [
-                [
-                    'text' => 'some text',
-                    'protected' => false,
-                ],
-                [
-                    'text' => '2023-07-18',
-                    'protected' => true,
-                ],
-                [
-                    'text' => 'some text with date in it: ',
-                    'protected' => false,
-                ],
-                [
-                    'text' => '<number type="date" name="default" source="2023-07-18" iso="2023-07-18" target="" />',
-                    'protected' => true,
-                ],
-                [
-                    'text' => '. in the middle',
-                    'protected' => false,
-                ],
-                [
-                    'text' => 'some additional text',
-                    'protected' => false,
-                ],
+                new ChunkDto('some text', false),
+                new ChunkDto('2023-07-18', true),
+                new ChunkDto('some text with date in it: ', false),
+                new ChunkDto('<number type="date" name="default" source="2023-07-18" iso="2023-07-18" target="" />', true),
+                new ChunkDto('. in the middle', false),
+                new ChunkDto('some additional text', false),
             ]
         ];
     }
