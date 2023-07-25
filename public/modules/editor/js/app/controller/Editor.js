@@ -1531,7 +1531,15 @@ Ext.define('Editor.controller.Editor', {
         e.preventDefault();
         var me = this,
             plug = me.getEditPlugin(),
-            segmentId = plug.context.record.get('id'),
+            record = plug.context ? plug.context.record : null;
+
+        // if the user is fast enough to close the window and after this use ctr + v to paste the content, the event
+        // will be fired but the row editor will not exist anymore
+        if(!record){
+            return;
+        }
+
+        var segmentId = record.get('id'),
             internalClip = me.copiedSelectionWithTagHandling || {},
             clipboard = (e.browserEvent.clipboardData || window.clipboardData),
             clipboardText = clipboard.getData('Text'),
