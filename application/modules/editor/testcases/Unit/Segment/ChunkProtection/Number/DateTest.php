@@ -66,7 +66,7 @@ class DateTest extends editor_Test_UnitTest
     {
         $repo = $this->createConfiguredMock(
             LanguageNumberFormatRepository::class,
-            ['getByLanguageIdAndType' => []]
+            ['findByLanguageIdAndType' => []]
         );
         self::assertSame($valid, (new DateProtection($repo))->hasEntityToProtect($date, null));
     }
@@ -223,6 +223,7 @@ class DateTest extends editor_Test_UnitTest
         yield ['date' => 'string 23 15 30 string', 'valid' => false];
         yield ['date' => 'string 23 30 13 string', 'valid' => false];
         yield ['date' => 'string 23 32 3 string', 'valid' => false];
+        yield ['date' => '149 597 870 700', 'valid' => false];
     }
 
     /**
