@@ -485,6 +485,7 @@ class editor_Models_TaskUserAssoc extends ZfExtended_Models_Entity_Abstract {
         // TODO: REMOVE ME LATER WHEN WE HAVE INFO ABOUT THE NOACCESS ERROR. THIS IS ONLY TEMP DEBUG CODE TO COLLECT
         // MORE INFO ABOUT THE BUG
         $customFileLogger = ZfExtended_Factory::get(CustomFileLogger::class);
+        $customFileLogger->log('Request url: '.$_SERVER['REQUEST_URI']);
         $customFileLogger->log('Found validSessionIds sql : '.$validSessionIds);
 
         //load all used jobs where the usage is not valid anymore
@@ -539,6 +540,19 @@ class editor_Models_TaskUserAssoc extends ZfExtended_Models_Entity_Abstract {
         foreach($taskUserAssoc as $job) {
             $task->unlockForUser($job['userGuid'], $job['taskGuid']);
         }
+
+        // TODO: REMOVE ME LATER WHEN WE HAVE INFO ABOUT THE NOACCESS ERROR. THIS IS ONLY TEMP DEBUG CODE TO COLLECT
+        // MORE INFO ABOUT THE BUG
+        $currentUser = ZfExtended_Authentication::getInstance()->getUser();
+        $internalSessionUniqId = null;
+        if($currentUser){
+            $session = new Zend_Session_Namespace();
+            $internalSessionUniqId = $session->internalSessionUniqId;
+        }
+
+        $customFileLogger->log('My current internalSessionUniqId : '.$internalSessionUniqId);
+        $customFileLogger->log('My current sessionId : '.Zend_Session::getId());
+        $customFileLogger->write();
     }
 
     /**
