@@ -14,6 +14,12 @@ class TagCheck {
         for (let node of nodeList) {
             let id = node.id.replace(new RegExp('^' + this.idPrefix), '');
 
+            let isQaTag = /qmflag/.test(node.className);
+
+            if (isQaTag) {
+                continue;
+            }
+
             let isWhitespaceTag = /whitespace/.test(node.className);
 
             //ignore whitespace and nodes without ids

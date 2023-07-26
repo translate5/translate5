@@ -32,6 +32,9 @@ END LICENSE AND COPYRIGHT
  * @version 1.0
  *
  */
+
+use MittagQI\ZfExtended\Logger\CustomFileLogger;
+
 /**
  * TaskUserAssoc Object Instance as needed in the application
  * @method integer getId() getId()
@@ -75,7 +78,6 @@ END LICENSE AND COPYRIGHT
 class editor_Models_TaskUserAssoc extends ZfExtended_Models_Entity_Abstract {
     protected $dbInstanceClass = 'editor_Models_Db_TaskUserAssoc';
     protected $validatorInstanceClass = 'editor_Models_Validator_TaskUserAssoc';
-
 
     /***
      * @param string $taskGuid
@@ -480,6 +482,12 @@ class editor_Models_TaskUserAssoc extends ZfExtended_Models_Entity_Abstract {
         $sessions = new ZfExtended_Models_Db_Session();
         $validSessionIds = $sessions->getValidSessionsSql();
 
+        // TODO: REMOVE ME LATER WHEN WE HAVE INFO ABOUT THE NOACCESS ERROR. THIS IS ONLY TEMP DEBUG CODE TO COLLECT
+        // MORE INFO ABOUT THE BUG
+        $customFileLogger = ZfExtended_Factory::get(CustomFileLogger::class);
+        $customFileLogger->log('Request url: '.$_SERVER['REQUEST_URI']);
+        $customFileLogger->log('Found validSessionIds sql : '.$validSessionIds);
+
         //load all used jobs where the usage is not valid anymore
         $where = array('not usedState is null and (usedInternalSessionUniqId not in ('.$validSessionIds.') or usedInternalSessionUniqId is null)' => null);
         if(!empty($taskGuid)) {
@@ -496,6 +504,11 @@ class editor_Models_TaskUserAssoc extends ZfExtended_Models_Entity_Abstract {
             $s->where($condition, $valToQuote);
         }
         $taskUserAssoc = $this->db->fetchAll($s)->toArray();
+
+        // TODO: REMOVE ME LATER WHEN WE HAVE INFO ABOUT THE NOACCESS ERROR. THIS IS ONLY TEMP DEBUG CODE TO COLLECT
+        // MORE INFO ABOUT THE BUG
+        $customFileLogger->log('TaskUserAssocs query: '.$s->assemble());
+        $customFileLogger->log('TaskUserAssocs query results : '.print_r($taskUserAssoc,true));
 
         //reopen each found job, keeping workflow transition check
         $taskGuids = array_unique(array_column($taskUserAssoc, 'taskGuid'));
@@ -527,6 +540,17 @@ class editor_Models_TaskUserAssoc extends ZfExtended_Models_Entity_Abstract {
         foreach($taskUserAssoc as $job) {
             $task->unlockForUser($job['userGuid'], $job['taskGuid']);
         }
+
+        // TODO: REMOVE ME LATER WHEN WE HAVE INFO ABOUT THE NOACCESS ERROR. THIS IS ONLY TEMP DEBUG CODE TO COLLECT
+        // MORE INFO ABOUT THE BUG
+        if(Zend_Session::isStarted() && !Zend_Session::isDestroyed()){
+            $session = new Zend_Session_Namespace();
+            $internalSessionUniqId = $session->internalSessionUniqId;
+            $customFileLogger->log('My current internalSessionUniqId : '.$internalSessionUniqId);
+            $customFileLogger->log('My current sessionId : '.Zend_Session::getId());
+        }
+
+        $customFileLogger->write();
     }
 
     /**

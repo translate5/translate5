@@ -1402,15 +1402,24 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract
     }
 
     /**
-     * Loads segments by a specific workflowStep, fetch only specific fields.
+     * Get all changed segments of a task workflow for given workflow step.
+     * TODO: this is very workflow specific function and should be moved from here.
+     *
      * @param editor_Models_Task $task
      * @param string $workflowStep
      * @param int $workflowStepNr
+     * @return array
+     * @throws ReflectionException
+     * @throws editor_Models_ConfigException
      */
-    public function loadByWorkflowStep(editor_Models_Task $task, string $workflowStep, $workflowStepNr)
+    public function getWorkflowStepSegments(editor_Models_Task $task, string $workflowStep, int $workflowStepNr): array
     {
         $this->setConfig($task->getConfig());
+
         $pmChanges = $this->config->runtimeOptions->editor->notification->pmChanges;
+        // This should be task specific config. If changed above, this must be adjusted to
+        $showCommentedSegments = (bool) $this->config->runtimeOptions->editor->notification->showCommentedSegments;
+
         $this->segmentFieldManager->initFields($task->getTaskGuid());
         $this->reInitDb($task->getTaskGuid());
 
@@ -1419,7 +1428,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract
 
         $this->initDefaultSort();
         $s = $this->db->select(false);
-        $db = $this->db;
+
         $s->from($this->db, $fields);
         $s = $this->addWatchlistJoin($s);
         $s = $this->addWhereTaskGuid($s, $task->getTaskGuid());
@@ -1445,6 +1454,11 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract
                 $s->where($this->tableName . '.workflowStep = ?', $workflowStep);
                 break;
         }
+
+        if($showCommentedSegments){
+            $s->orWhere('comments IS NOT NULL');
+        }
+
         $list = parent::loadFilterdCustom($s);
         
         // add the Segment's Qualities (which are stored in the qualities table) as names

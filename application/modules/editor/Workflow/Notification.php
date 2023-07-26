@@ -83,7 +83,7 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
         $stepNr = $task->getWorkflowStep();
         $segment = ZfExtended_Factory::get('editor_Models_Segment');
         /* @var $segment editor_Models_Segment */
-        return $segment->loadByWorkflowStep($task, $step, $stepNr);
+        return $segment->getWorkflowStepSegments($task, $step, $stepNr);
     }
 
     /**
