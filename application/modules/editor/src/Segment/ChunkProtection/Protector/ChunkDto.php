@@ -50,63 +50,15 @@ END LICENSE AND COPYRIGHT
 */
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\Segment\ChunkProtection;
+namespace MittagQI\Translate5\Segment\ChunkProtection\Protector;
 
-use editor_Models_Segment_Utility as SegmentUtility;
-use MittagQI\Translate5\Segment\ChunkProtection\Protector\ChunkDto;
-use MittagQI\Translate5\Segment\ChunkProtection\Protector\NumberProtector;
-use MittagQI\Translate5\Segment\ChunkProtection\Protector\ProtectorInterface;
-use MittagQI\Translate5\Segment\ChunkProtection\Protector\WhitespaceProtector;
-
-class ChunkProtection
+/**
+ * @property-read string $text
+ * @property-read bool $protected
+ */
+class ChunkDto
 {
-    /**
-     * All entities are restored to their applicable characters (&_szlig; => ß),
-     * only the XML relevant &<> are encoded (ready for GUI)
-     */
-    public const ENTITY_MODE_RESTORE = 'restore';
-
-    /**
-     * Nothing is restored, but encoded (&_szlig; => &_amp;szlig;),
-     * only the XML relevant &<> are encoded (ready for GUI)
-     */
-    public const ENTITY_MODE_KEEP = 'keep';
-
-    /**
-     * Entity handling is disabled, entities must be handled elsewhere!
-     */
-    public const ENTITY_MODE_OFF = 'off';
-
-    /**
-     * @var ProtectorInterface[]
-     */
-    private array $protectors;
-
-    public function __construct(NumberProtector $number, WhitespaceProtector $whitespace)
+    public function __construct(public string $text, public bool $protected = false)
     {
-        $this->protectors = [$number, $whitespace];
-    }
-
-    public function protect(
-        string $textNode,
-        ?int $sourceLang,
-        ?int $targetLang,
-        string $entityHandling = self::ENTITY_MODE_RESTORE
-    ): string {
-        if ($entityHandling !== self::ENTITY_MODE_OFF) {
-            $textNode = SegmentUtility::entityCleanup($textNode, $entityHandling === self::ENTITY_MODE_RESTORE);
-        }
-
-        $chunks = [new ChunkDto($textNode)];
-        foreach ($this->protectors as $protector) {
-            $chunks = $protector->protect($chunks, $sourceLang, $targetLang);
-        }
-
-        $result = '';
-        foreach ($chunks as $chunk) {
-            $result .= $chunk->text;
-        }
-
-        return $result;
     }
 }

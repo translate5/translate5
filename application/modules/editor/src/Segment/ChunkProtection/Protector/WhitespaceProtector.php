@@ -50,9 +50,26 @@ END LICENSE AND COPYRIGHT
 */
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\Segment\ChunkProtection;
+namespace MittagQI\Translate5\Segment\ChunkProtection\Protector;
 
-interface RatingInterface
+use editor_Models_Segment_Whitespace;
+
+class WhitespaceProtector implements ProtectorInterface
 {
-    public function rating(): int;
+    private editor_Models_Segment_Whitespace $whitespace;
+
+    public function __construct()
+    {
+        $this->whitespace = new editor_Models_Segment_Whitespace();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function protect(iterable $chunks, ?int $sourceLang, ?int $targetLang): iterable
+    {
+        foreach ($chunks as $chunk) {
+            yield $chunk->protected ? $chunk : new ChunkDto($this->whitespace->protectWhitespace($chunk->text), true);
+        }
+    }
 }

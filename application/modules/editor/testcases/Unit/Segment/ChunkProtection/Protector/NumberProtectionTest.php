@@ -50,17 +50,67 @@ END LICENSE AND COPYRIGHT
 */
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\Segment\ChunkProtection\Number;
+namespace MittagQI\Translate5\Test\Unit\Segment\ChunkProtection\Protector;
 
-use MittagQI\Translate5\Segment\ChunkProtection\ChunkDto;
-use Traversable;
+use editor_Test_UnitTest;
+use MittagQI\Translate5\Segment\ChunkProtection\Protector\ChunkDto;
+use MittagQI\Translate5\Segment\ChunkProtection\Protector\Number\NumberProtectorInterface;
+use MittagQI\Translate5\Segment\ChunkProtection\Protector\NumberProtector;
+use MittagQI\Translate5\Segment\ChunkProtection\Protector\RatingInterface;
 
-interface NumberProtectionInterface
+class NumberProtectionTest extends editor_Test_UnitTest
 {
-    /**
-     * @param iterable<ChunkDto> $chunks
-     * @return iterable<ChunkDto>
-     */
-    public function protect(iterable $chunks, ?int $sourceLang, ?int $targetLang): iterable;
+    public function test(): void
+    {
+        $processor = new class implements NumberProtectorInterface, RatingInterface
+        {
+            public function protect(iterable $chunks, ?int $sourceLang, ?int $targetLang): iterable
+            {
+                foreach ($chunks as $chunk) {
+                    foreach (explode(' ', $chunk->text) as $part) {
+                        yield new ChunkDto($part);
+                    }
+                }
+            }
 
+            public function rating(): int
+            {
+                return 2;
+            }
+        };
+
+        $processor1 = new class implements NumberProtectorInterface, RatingInterface
+        {
+            public function protect(iterable $chunks, ?int $sourceLang, ?int $targetLang): iterable
+            {
+                foreach ($chunks as $chunk) {
+                    yield new ChunkDto(sprintf('<ph>%s</ph>', $chunk->text), true);
+                }
+            }
+
+            public function rating(): int
+            {
+                return 1;
+            }
+        };
+
+
+        $protector = new NumberProtector([$processor1, $processor]);
+        $testString = 'some text';
+
+        $protected = $protector->protect([new ChunkDto($testString)], null, null);
+
+        $result = [];
+        foreach ($protected as $p) {
+            $result[] = $p;
+        }
+
+        self::assertEquals(
+            [
+                new ChunkDto('<ph>some</ph>', true),
+                new ChunkDto('<ph>text</ph>', true),
+            ],
+            $result
+        );
+    }
 }

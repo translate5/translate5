@@ -50,12 +50,12 @@ END LICENSE AND COPYRIGHT
 */
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\Test\Unit\Segment\ChunkProtection\Number;
+namespace MittagQI\Translate5\Test\Unit\Segment\ChunkProtection\Protector\Number;
 
 use editor_Test_UnitTest;
 use MittagQI\Translate5\Repository\LanguageNumberFormatRepository;
-use MittagQI\Translate5\Segment\ChunkProtection\ChunkDto;
-use MittagQI\Translate5\Segment\ChunkProtection\Number\DateProtection;
+use MittagQI\Translate5\Segment\ChunkProtection\Protector\ChunkDto;
+use MittagQI\Translate5\Segment\ChunkProtection\Protector\Number\DateProtector;
 
 class DateTest extends editor_Test_UnitTest
 {
@@ -68,7 +68,7 @@ class DateTest extends editor_Test_UnitTest
             LanguageNumberFormatRepository::class,
             ['findByLanguageIdAndType' => []]
         );
-        self::assertSame($valid, (new DateProtection($repo))->hasEntityToProtect($date, null));
+        self::assertSame($valid, (new DateProtector($repo))->hasEntityToProtect($date, null));
     }
 
     public function datesProvider(): iterable
@@ -224,6 +224,12 @@ class DateTest extends editor_Test_UnitTest
         yield ['date' => 'string 23 30 13 string', 'valid' => false];
         yield ['date' => 'string 23 32 3 string', 'valid' => false];
         yield ['date' => '149 597 870 700', 'valid' => false];
+
+        yield ['date' => 'string 05/07 2023 string', 'valid' => true];
+        yield ['date' => 'string 31/12 2023 string', 'valid' => true];
+        yield ['date' => 'string 12/31 2023 string', 'valid' => false];
+        yield ['date' => 'string 2023 12/31 string', 'valid' => false];
+        yield ['date' => 'string 2023 31/12 string', 'valid' => false];
     }
 
     /**
@@ -232,7 +238,7 @@ class DateTest extends editor_Test_UnitTest
     public function testProtectWithNoSourceAndTargetLang(array $textNodes, array $expected): void
     {
         $repo = $this->createConfiguredMock(LanguageNumberFormatRepository::class, []);
-        $protected = (new DateProtection($repo))->protect($textNodes, null, null);
+        $protected = (new DateProtector($repo))->protect($textNodes, null, null);
 
         $result = [];
         foreach ($protected as $p) {

@@ -50,16 +50,15 @@ END LICENSE AND COPYRIGHT
 */
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\Segment\ChunkProtection\Number;
+namespace MittagQI\Translate5\Segment\ChunkProtection\Protector\Number;
 
 use DateTime;
 use MittagQI\Translate5\Repository\LanguageNumberFormatRepository;
-use MittagQI\Translate5\Segment\ChunkProtection\ChunkDto;
-use MittagQI\Translate5\Segment\ChunkProtection\NumberProtection;
-use MittagQI\Translate5\Segment\ChunkProtection\RatingInterface;
-use Traversable;
+use MittagQI\Translate5\Segment\ChunkProtection\Protector\ChunkDto;
+use MittagQI\Translate5\Segment\ChunkProtection\Protector\NumberProtector;
+use MittagQI\Translate5\Segment\ChunkProtection\Protector\RatingInterface;
 
-class DateProtection implements NumberProtectionInterface, RatingInterface
+class DateProtector implements NumberProtectorInterface, RatingInterface
 {
     private array $dateFormats = [
         [
@@ -165,6 +164,11 @@ class DateProtection implements NumberProtectionInterface, RatingInterface
             'regex' => '\d\d\d\d(0[1-9]|1[0-2])(0[1-9]|[1-2][0-9]|3[0-1])',
             'format' => 'Ymd'
         ],
+
+        [
+            'regex' => '(0[1-9]|[1-2][0-9]|3[0-1]|[1-9])\/(0[1-9]|1[0-2]|[1-9]) \d\d\d\d',
+            'format' => 'd/m Y'
+        ],
     ];
 
     public function __construct(private LanguageNumberFormatRepository $formatRepository)
@@ -197,7 +201,7 @@ class DateProtection implements NumberProtectionInterface, RatingInterface
 
             preg_match_all($regex, $chunk->text, $matches, PREG_PATTERN_ORDER);
             $splitText = preg_split($regex, $chunk->text);
-            $dates = $matches[1];
+            $dates = $matches[0];
 
             yield from $this->processSplitNode($splitText, $dates, $sourceLang, $targetLang);
         }
@@ -269,7 +273,7 @@ class DateProtection implements NumberProtectionInterface, RatingInterface
 
         return sprintf(
             '<number type="%s" name="%s" source="%s" iso="%s" target="%s" />',
-            NumberProtection::DATE_TYPE,
+            NumberProtector::DATE_TYPE,
             $name,
             $date,
             $datetime ? $datetime->format('Y-m-d') : '',
@@ -296,7 +300,7 @@ class DateProtection implements NumberProtectionInterface, RatingInterface
     {
         return null === $sourceLang
             ? []
-            : $this->formatRepository->findByLanguageIdAndType($sourceLang, NumberProtection::DATE_TYPE);
+            : $this->formatRepository->findByLanguageIdAndType($sourceLang, NumberProtector::DATE_TYPE);
     }
 
     private function protectDateOfCustomFormats(

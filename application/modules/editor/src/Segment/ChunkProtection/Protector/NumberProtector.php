@@ -50,34 +50,28 @@ END LICENSE AND COPYRIGHT
 */
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\Segment\ChunkProtection;
+namespace MittagQI\Translate5\Segment\ChunkProtection\Protector;
 
-use MittagQI\Translate5\Segment\ChunkProtection\Number\NumberProtectionInterface;
+use MittagQI\Translate5\Segment\ChunkProtection\Protector\Number\NumberProtectorInterface;
 
-class NumberProtection
+class NumberProtector implements ProtectorInterface
 {
     public const DATE_TYPE = 'date';
 
     /**
-     * @param array<NumberProtectionInterface & RatingInterface> $protectors
+     * @param array<NumberProtectorInterface & RatingInterface> $protectors
      */
     public function __construct(private array $protectors)
     {
         usort($this->protectors, fn (RatingInterface $p1, RatingInterface $p2) => $p2->rating() <=> $p1->rating());
     }
 
-    public function protect(string $textNode, ?int $sourceLang, ?int $targetLang): string
+    public function protect(iterable $chunks, ?int $sourceLang, ?int $targetLang): iterable
     {
-        $textNodes = [new ChunkDto($textNode)];
         foreach ($this->protectors as $protector) {
-            $textNodes = $protector->protect($textNodes, $sourceLang, $targetLang);
+            $chunks = $protector->protect($chunks, $sourceLang, $targetLang);
         }
 
-        $result = '';
-        foreach ($textNodes as $node) {
-            $result .= $node->text;
-        }
-
-        return $result;
+        return $chunks;
     }
 }
