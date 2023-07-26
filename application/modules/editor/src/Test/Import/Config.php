@@ -28,7 +28,6 @@ END LICENSE AND COPYRIGHT
 
 namespace MittagQI\Translate5\Test\Import;
 
-use MittagQI\Translate5\Plugins\TildeMT\Test\Import\TildeMt;
 use MittagQI\Translate5\Test\Api\Helper;
 
 /**
@@ -393,7 +392,7 @@ final class Config
                 return new MicrosoftTranslator($this->testClass, $nextIndex);
 
             case LanguageResource::TILDE_MT:
-                return new TildeMt($this->testClass, $nextIndex);
+                return new \MittagQI\Translate5\Plugins\TildeMT\Test\Import\TildeMt($this->testClass, $nextIndex);
 
             default:
                 throw new Exception('Unknown language-resource type "' . $type . '"');
