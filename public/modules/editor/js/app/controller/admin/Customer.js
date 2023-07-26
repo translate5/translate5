@@ -86,9 +86,9 @@ Ext.define('Editor.controller.admin.Customer', {
     },
 
     strings:{
-        customerLabelText:'#UT#Kunden InstantTranslate &amp; TermPortal',
-        customerInfoIconTooltip:'#UT#Der Benutzer hat das Recht, die Sprachressourcen in InstantTranslate &amp; TermPortal zu nutzen, die denselben Kunden zugeordnet sind, denen der Benutzer hier zugeordnet ist.',
-        allCustomers:'#UT#Alle Kunden'
+        customerLabelText: '#UT#Zugewiesene Kunden (Betrifft Rollen PM, InstantTranslate und TermPortal)',
+        customerInfoIconTooltip: '#UT#Der Benutzer hat das Recht, die Sprachressourcen in InstantTranslate &amp; TermPortal zu nutzen, die denselben Kunden zugeordnet sind, denen der Benutzer hier zugeordnet ist.',
+        allCustomers: '#UT#Alle Kunden'
     },
     
     // Multitenancy
@@ -121,12 +121,12 @@ Ext.define('Editor.controller.admin.Customer', {
         if(!this.isCustomerOverviewAllowed()){
             return;
         }
-        var me=this,
-            loginFieldset=adminWindow.down('#loginDetailsFieldset');
+        var me = this,
+            loginFieldset = adminWindow.down('#loginDetailsFieldset');
 
         loginFieldset.add({
-            xtype:'customers',
-            fieldLabel:me.strings.customerLabelText
+            xtype: 'customers',
+            fieldLabel: me.strings.customerLabelText
         });
     },
 

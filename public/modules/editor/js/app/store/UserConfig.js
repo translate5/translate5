@@ -1,4 +1,3 @@
-
 /*
 START LICENSE AND COPYRIGHT
 
@@ -27,8 +26,31 @@ END LICENSE AND COPYRIGHT
 */
 
 Ext.define('Editor.store.UserConfig', {
-  extend : 'Ext.data.Store',
-  model: 'Editor.model.UserConfig',
-  storeId: 'UserConfig',
-  pageSize: -1
+    extend: 'Ext.data.Store',
+    model: 'Editor.model.UserConfig',
+    storeId: 'UserConfig',
+    pageSize: -1,
+
+    /**
+     * Load task data for given task guid
+     */
+    loadByTaskGuid: function (curentTaskGuid, callback) {
+        if (!curentTaskGuid) {
+            return;
+        }
+        var me = this,
+            proxy = me.getProxy(),
+            existing = proxy.getExtraParams(),
+            // spread operation used for cloning
+            merged = Ext.Object.merge({...existing}, {taskGuid: curentTaskGuid});
+
+        // For IN task context we need reload user config with task config context
+        proxy.setExtraParams(merged);
+        me.load(function (records, operation, success) {
+            callback(records, operation, success);
+            // rollback for when we leave task and reload store.
+            // This way once we enter project list User config will be stripped of task config context
+            proxy.setExtraParams(existing);
+        });
+    }
 });

@@ -1,7 +1,6 @@
 [
     {
         "segmentNrInTask": "1",
-        "mid": "56_1",
         "userGuid": "{00000000-0000-0000-C100-CCDDEE000001}",
         "editable": "1",
         "pretrans": "0",
@@ -18,7 +17,6 @@
     },
     {
         "segmentNrInTask": "2",
-        "mid": "59_2",
         "userGuid": "{00000000-0000-0000-C100-CCDDEE000001}",
         "editable": "1",
         "pretrans": "0",
@@ -35,7 +33,6 @@
     },
     {
         "segmentNrInTask": "3",
-        "mid": "60_3",
         "userGuid": "{00000000-0000-0000-C100-CCDDEE000001}",
         "editable": "1",
         "pretrans": "0",
@@ -52,7 +49,6 @@
     },
     {
         "segmentNrInTask": "4",
-        "mid": "61_4",
         "userGuid": "{00000000-0000-0000-C100-CCDDEE000001}",
         "editable": "1",
         "pretrans": "0",
@@ -69,7 +65,6 @@
     },
     {
         "segmentNrInTask": "5",
-        "mid": "62_5",
         "userGuid": "{00000000-0000-0000-C100-CCDDEE000001}",
         "editable": "1",
         "pretrans": "0",
@@ -86,7 +81,6 @@
     },
     {
         "segmentNrInTask": "6",
-        "mid": "65_6",
         "userGuid": "{00000000-0000-0000-C100-CCDDEE000001}",
         "editable": "1",
         "pretrans": "0",
@@ -103,7 +97,6 @@
     },
     {
         "segmentNrInTask": "7",
-        "mid": "66_7",
         "userGuid": "{00000000-0000-0000-C100-CCDDEE000001}",
         "editable": "1",
         "pretrans": "0",
@@ -120,7 +113,6 @@
     },
     {
         "segmentNrInTask": "8",
-        "mid": "67_8",
         "userGuid": "{00000000-0000-0000-C100-CCDDEE000001}",
         "editable": "1",
         "pretrans": "0",
@@ -137,7 +129,6 @@
     },
     {
         "segmentNrInTask": "9",
-        "mid": "70_9",
         "userGuid": "{00000000-0000-0000-C100-CCDDEE000001}",
         "editable": "1",
         "pretrans": "0",
@@ -154,7 +145,6 @@
     },
     {
         "segmentNrInTask": "10",
-        "mid": "71_10",
         "userGuid": "{00000000-0000-0000-C100-CCDDEE000001}",
         "editable": "1",
         "pretrans": "0",
@@ -171,7 +161,6 @@
     },
     {
         "segmentNrInTask": "11",
-        "mid": "72_11",
         "userGuid": "{00000000-0000-0000-C100-CCDDEE000001}",
         "editable": "1",
         "pretrans": "0",
@@ -188,7 +177,6 @@
     },
     {
         "segmentNrInTask": "12",
-        "mid": "73_12",
         "userGuid": "{00000000-0000-0000-C100-CCDDEE000001}",
         "editable": "1",
         "pretrans": "0",
@@ -205,7 +193,6 @@
     },
     {
         "segmentNrInTask": "13",
-        "mid": "77_13",
         "userGuid": "{00000000-0000-0000-C100-CCDDEE000001}",
         "editable": "1",
         "pretrans": "0",

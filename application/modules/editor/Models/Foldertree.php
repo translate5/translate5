@@ -112,11 +112,18 @@ class editor_Models_Foldertree extends ZfExtended_Models_Entity_Abstract
      * Adopt the file tree, so it can be easily used for file store on the frontend
      * @param stdClass $object
      * @return stdClass|void
+     * @throws ZfExtended_Models_Entity_NotFoundException
      */
     public function normalizeStoreTree(stdClass $object){
-        $object->extension = pathinfo($object->filename, PATHINFO_EXTENSION);;
+        $object->extension = pathinfo($object->filename, PATHINFO_EXTENSION);
         $object->leaf = $object->isFile ?? false;
-        if( empty($object->children)){
+        // in case the isReimportable flag is not set, set it by loading the file model from the database
+        if (!isset($object->isReimportable) && isset($object->id) && $object->leaf) {
+            $fileModel = ZfExtended_Factory::get(editor_Models_File::class);
+            $fileModel->load($object->id);
+            $object->isReimportable = (bool) $fileModel->getIsReimportable();
+        }
+        if ( empty($object->children)){
             return $object;
         }
 

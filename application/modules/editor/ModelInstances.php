@@ -56,10 +56,11 @@ class editor_ModelInstances {
      * returns (and loads if needed) the task by taskGuid
      * @param string $taskGuid
      * @return editor_Models_Task
+     * @throws ZfExtended_Models_Entity_NotFoundException
      */
     public static function taskByGuid(string $taskGuid): editor_Models_Task {
         /* @var $instance editor_Models_Task */
-        $instance = self::getMapped('editor_Models_Task', 'getTaskGuid', $taskGuid, function() use ($taskGuid) {
+        $instance = self::getMapped('editor_Models_Task', 'getTaskGuid', $taskGuid, function () use ($taskGuid) {
             /* @var $instance editor_Models_Task */
             $instance = self::entityInstance('editor_Models_Task');
             $instance->loadByTaskGuid($taskGuid);

@@ -1379,7 +1379,9 @@ Ext.define('Editor.controller.Localizer', {
             confirmDeleteTitle: '<?php echo $this->translate->_('Benutzer endgültig löschen?');?>',
             confirmDeleteMsg: '<?php echo $this->translate->_('Soll der gewählte Benutzer "{0}" wirklich endgültig gelöscht werden?');?>',
             confirmResetPwTitle: '<?php echo $this->translate->_('Passwort zurücksetzen?');?>',
-            confirmResetPwMsg: '<?php echo $this->translate->_('Soll das Passwort des Benutzers "{0}" wirklick zurückgesetzt werden?<br /> Der Benutzer wird per E-Mail benachrichtigt, dass er ein neues Passwort anfordern muss.');?>'
+            confirmResetPwMsg: '<?php echo $this->translate->_('Soll das Passwort des Benutzers "{0}" wirklick zurückgesetzt werden?<br /> Der Benutzer wird per E-Mail benachrichtigt, dass er ein neues Passwort anfordern muss.');?>',
+            deletionForbidden: '<?php echo $this->translate->_('Sie sind nicht berechtigt, diesen Benutzer zu entfernen.');?>',
+            error: '<?php echo $this->translate->_('Fehler');?>'
         }
     });
 
@@ -1458,7 +1460,8 @@ Ext.define('Editor.controller.Localizer', {
             languageInfo: '<?php echo $this->translate->_('Beim Import von Aufgaben werden "Editor" Benutzer mit den passenden Sprachen <a href="http://confluence.translate5.net/pages/viewpage.action?pageId=557164" target="_blank" title="mehr Info">automatisch der Aufgabe zugewiesen</a>.');?>',
             localeLabel: '<?php echo $this->translate->_('Benutzersprache');?>',
             parentUserLabel: '<?php echo $this->translate->_('Übergeordneter Benutzer');?>',
-            bottomOpenIdNoEditInfo: '<?php echo $this->translate->_(' ⁴ Der Benutzer kann nicht bearbeitet werden. Dieser Benutzer wird von translate5 nach der OpenID-Authentifizierung automatisch erstellt.');?>'
+            bottomOpenIdNoEditInfo: '<?php echo $this->translate->_(' ⁴ Der Benutzer kann nicht bearbeitet werden. Dieser Benutzer wird von translate5 nach der OpenID-Authentifizierung automatisch erstellt.');?>',
+            clientPmSubRoles: '<?php echo $this->translate->_("Zugängliche Managementübersichten für Rolle PM");?>'
         }
     });
     Editor.view.admin.task.UserPrefsGrid.prototype.strings = {
@@ -1511,7 +1514,7 @@ Ext.define('Editor.controller.Localizer', {
     };
 
     Editor.controller.admin.Customer.prototype.strings = {
-        customerLabelText:'<?php echo $this->translate->_("Kunden InstantTranslate &amp; TermPortal");?>',
+        customerLabelText:'<?php echo $this->translate->_("Zugewiesene Kunden (Betrifft Rollen PM, InstantTranslate und TermPortal)");?>',
         customerInfoIconTooltip:'<?php echo $this->translate->_("Der Benutzer hat das Recht, die Sprachressourcen in InstantTranslate &amp; TermPortal zu nutzen, die denselben Kunden zugeordnet sind, denen der Benutzer hier zugeordnet ist.");?>',
         allCustomers:'<?php echo $this->translate->_("Alle Kunden");?>'
     };
@@ -1705,16 +1708,6 @@ Ext.define('Editor.controller.Localizer', {
             title: '<?php echo $this->translate->_('Vorschläge exportieren');?>'
         }
     });
-    Ext.define("Editor.locale.view.LanguageResources.TbxExport", {
-        override: "Editor.view.LanguageResources.TbxExport",
-        strings: {
-            tbxBasicOnlyLabel: '<?php echo $this->translate->_('Nur TBX Basic Standardattribute + processStatus exportieren');?>',
-            exportImagesLabel: '<?php echo $this->translate->_('Bilder im Hex-Format exportieren, eingebettet in TBX');?>',
-            exportButtonText: '<?php echo $this->translate->_('Exportieren');?>',
-            cancelButtonText: '<?php echo $this->translate->_('Abbrechen');?>',
-            title: '<?php echo $this->translate->_('Als TBX exportieren');?>'
-        }
-    });
     Ext.define("Editor.locale.controller.TaskAssoc", {
         override: "Editor.controller.LanguageResourcesTaskassoc",
         strings: {
@@ -1757,7 +1750,9 @@ Ext.define('Editor.controller.Localizer', {
             exportZippedTmx: '<?php echo $this->translate->_('als gezippte TMX Datei exportieren');?>',
             mergeTermsWarnTitle: '<?php echo $this->translate->_('Nicht empfohlen!');?>',
             mergeTermsWarnMessage: '<?php echo $this->translate->_('Begriffe in der TBX werden immer zuerst nach ID mit bestehenden Einträgen in der TermCollection zusammengeführt. Wenn Terme zusammenführen angekreuzt ist und die ID in der TBX nicht in der TermCollection gefunden wird, wird gesucht, ob derselbe Begriff bereits in derselben Sprache existiert. Wenn ja, werden die gesamten Termeinträge zusammengeführt. Insbesondere bei einer TermCollection mit vielen Sprachen kann dies zu unerwünschten Ergebnissen führen.');?>',
-            importing: '<?php echo $this->translate->_('Die Sprachressource {0} wird gerade importiert. Bitte warten Sie, bis der Import abgeschlossen ist.');?>'
+            importing: '<?php echo $this->translate->_('Die Sprachressource {0} wird gerade importiert. Bitte warten Sie, bis der Import abgeschlossen ist.');?>',
+            deletionForbidden: '<?php echo $this->translate->_('Sie sind nicht berechtigt, diese Sprachressource zu entfernen.');?>',
+            error: '<?php echo $this->translate->_('Fehler');?>'
         }
     });
 
@@ -2097,7 +2092,7 @@ Editor.data.l10n = {
         metaStates_tooltip_nokey: '<?php echo $this->translate->_('Segment auf den ausgewählten Status setzen');?>'
     },
     falsePositives: {
-        hover: '<?php echo $this->translate->_('Rechts klicken um als \'falsch erkannt\' zu markieren')?>',
+        hover: "<?php echo $this->translate->_('Rechts klicken um als \'falsch erkannt\' zu markieren')?>",
         legend: {
             fixed: '<?php echo $this->translate->_('Falsch erkannte Fehler?')?>',
             float: '<?php echo $this->translate->_('Ein falsch erkannter Fehler?')?>'
@@ -2157,6 +2152,15 @@ Editor.data.l10n = {
     languageResources:{
         editLanguageResource:{
             conflictErrorTitle:'<?php echo $this->translate->_('Konflikt hinsichtlich zugewiesener Aufgaben');?>'
+        },
+        tbxExport: {
+            tbxBasicOnlyLabel: '<?php echo $this->translate->_('Nur TBX Basic Standardattribute + processStatus exportieren');?>',
+            exportImagesLabel: '<?php echo $this->translate->_('Bilder exportieren');?>',
+            exportImagesTbx: '<?php echo $this->translate->_('Im Hex-Format, eingebettet in TBX');?>',
+            exportImagesZip: '<?php echo $this->translate->_('In media/ Ordner im ZIP-Archiv');?>',
+            exportButtonText: '<?php echo $this->translate->_('Exportieren');?>',
+            cancelButtonText: '<?php echo $this->translate->_('Abbrechen');?>',
+            title: '<?php echo $this->translate->_('Als TBX exportieren');?>'
         }
     },
     configuration: {
@@ -2167,13 +2171,29 @@ Editor.data.l10n = {
         remove:'<?php echo $this->translate->_('Entfernen');?>',
         save:'<?php echo $this->translate->_('Speichern');?>',
         cancel:'<?php echo $this->translate->_('Abbrechen');?>',
+        reload: '<?php echo $this->translate->_('Neu laden');?>',
     },
     user:{
         addEditWindow:{
             notValidPasswordDefaultMessage:'<?php echo $this->translate->_('Mindestlänge: 12 Zeichen. Mindestens enthalten: Ein Großbuchstabe, ein Kleinbuchstabe und eine Zahl.');?>'
-        }
+        },
+        user: '<?= $this->translate->_('Benutzername') ?>'
     },
-    editableCellHint: 'Double-click to edit'
+    editableCellHint: '<?= $this->translate->_('Doppelklick zum bearbeiten') ?>',
+    token: {
+        title: '<?= $this->translate->_('APP Tokens') ?>',
+        expiration_date: '<?= $this->translate->_('Verfallsdatum') ?>',
+        confirm_deletion_title: '<?= $this->translate->_('Löschen des Tokens bestätigen') ?>',
+        confirm_deletion_message: '<?= $this->translate->_('Sind Sie sicher, dass Sie das Token löschen möchten?') ?>',
+        token_created_message: '<?= $this->translate->_('Der Zugriffstoken wird nur einmal angezeigt. Sie werden nicht gespeichert und können nicht abgerufen werden. Stellen Sie sicher, dass Sie es an einem sicheren Ort aufbewahren.<br/><br/><b>{0}</b>') ?>'
+    },
+    general: {
+        useForSearch: '<?= $this->translate->_('Bei der Suche verwenden');?>',
+        description: '<?= $this->translate->_('Beschreibung') ?>',
+        creation_date: '<?= $this->translate->_('Erstellungsdatum') ?>',
+        create_title: '<?= $this->translate->_('Token erstellen') ?>',
+        copy_and_close_btn: '<?= $this->translate->_('App-Token kopieren') ?>'
+    }
 };
 
 <?php

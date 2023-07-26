@@ -65,6 +65,11 @@ abstract class Translate5AbstractCommand extends Command
      */
     protected bool $isPorcelain = false;
 
+    public static function create(): static
+    {
+        return new static();
+    }
+
     public function __construct($name = null)
     {
         parent::__construct($name);

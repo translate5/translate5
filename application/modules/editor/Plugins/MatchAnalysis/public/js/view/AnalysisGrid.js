@@ -109,6 +109,7 @@ Ext.define('Editor.plugins.MatchAnalysis.view.AnalysisGrid', {
                         xtype: 'combo',
                         name:'unitType',
                         itemId:'unitType',
+                        disabled: !Editor.app.authenticatedUser.isAllowed('pluginMatchAnalysisPricingPreset'),
                         editable : true,
                         typeAhead : true,
                         forceSelection : true,

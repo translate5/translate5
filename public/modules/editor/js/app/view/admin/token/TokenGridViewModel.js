@@ -1,4 +1,4 @@
-<?php
+
 /*
 START LICENSE AND COPYRIGHT
 
@@ -26,22 +26,11 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-/**
- * XLF File-parser Add On to parse Zend XLF specific dialect
- */
-class editor_Models_Import_FileParser_Xlf_Namespaces_ZendXlf extends editor_Models_Import_FileParser_Xlf_Namespaces_Abstract{
+Ext.define('Editor.view.admin.token.TokenGridViewModel', {
+    extend: 'Ext.app.ViewModel',
+    alias: 'viewmodel.TokenGrid',
 
-    protected static function isApplicable(string $xliff): bool
-    {
-        return false; // this namespace is added explicitly on usage with addNamespace
+    data:{
+        hasReadOnly:true
     }
-
-    /**
-     * {@inheritDoc}
-     * @see editor_Models_Import_FileParser_Xlf_Namespaces_Abstract::useTagContentOnly()
-     */
-    public function useTagContentOnly(): ?bool
-    {
-        return true;
-    }
-}
+});

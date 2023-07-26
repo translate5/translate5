@@ -32,6 +32,8 @@ END LICENSE AND COPYRIGHT
  * @version 1.0
  */
 
+use MittagQI\Translate5\Segment\TransUnitHash;
+
 /**
  * Enthält Methoden zum Fileparsing für den Export
  */
@@ -138,7 +140,9 @@ abstract class editor_Models_Export_FileParser {
      * @var editor_Models_SegmentFieldManager
      */
     protected $segmentFieldManager;
-    
+
+    protected TransUnitHash $transunitHash;
+
     /**
      * @param editor_Models_Task $task
      * @param int $fileId
@@ -159,6 +163,7 @@ abstract class editor_Models_Export_FileParser {
         $this->_taskGuid = $task->getTaskGuid();
         $this->path = $path;
         $this->config = $task->getConfig();
+        $this->transunitHash = ZfExtended_Factory::get(TransUnitHash::class, [$this->config, $fileId]);
         $this->log = Zend_Registry::get('logger')->cloneMe('editor.export.fileparser');
         $this->translate = ZfExtended_Zendoverwrites_Translate::getInstance();
         

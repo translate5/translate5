@@ -70,7 +70,7 @@ class editor_Services_TermCollection_Connector extends editor_Services_Connector
 
         $import->mergeTerms = isset($params['mergeTerms']) ? filter_var($params['mergeTerms'], FILTER_VALIDATE_BOOLEAN) : false;
 
-        $userGuid = $params['userGuid'] ?? editor_User::instance()->getGuid();
+        $userGuid = $params['userGuid'] ?? ZfExtended_Authentication::getInstance()->getUserGuid();
         $import->loadUser($userGuid);
 
         //import the term collection

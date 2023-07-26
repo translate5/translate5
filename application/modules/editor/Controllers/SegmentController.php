@@ -203,8 +203,10 @@ class Editor_SegmentController extends ZfExtended_RestController
      */
     protected function getUsersAutoStateIds(){
         if($this->cachedAutostates == NULL){
-            $sessionUser = new Zend_Session_Namespace('user');
-            $taskUserAssoc = editor_Models_Loaders_Taskuserassoc::loadByTaskGuid($sessionUser->data->userGuid, $this->getCurrentTask()->getTaskGuid());
+            $taskUserAssoc = editor_Models_Loaders_Taskuserassoc::loadByTaskGuid(
+                ZfExtended_Authentication::getInstance()->getUserGuid(),
+                $this->getCurrentTask()->getTaskGuid()
+            );
             if ($taskUserAssoc->getIsPmOverride()) {
                 $userRole = 'pm';
             } else {
@@ -287,8 +289,7 @@ class Editor_SegmentController extends ZfExtended_RestController
         $assoc = ZfExtended_Factory::get('editor_Models_SegmentUserAssoc');
         /* @var $assoc editor_Models_SegmentUserAssoc */
 
-        $sessionUser = new Zend_Session_Namespace('user');
-        $watched = $assoc->loadIsWatched($ids, $sessionUser->data->userGuid);
+        $watched = $assoc->loadIsWatched($ids, ZfExtended_Authentication::getInstance()->getUserGuid());
         $watchedById = array();
         array_map(function ($assoc) use (&$watchedById) {
             $watchedById[$assoc['segmentId']] = $assoc['id'];
@@ -304,7 +305,7 @@ class Editor_SegmentController extends ZfExtended_RestController
 
     public function putAction()
     {
-        $sessionUser = ZfExtended_Authentication::getInstance()->getUser();
+        $auth = ZfExtended_Authentication::getInstance();
         $this->entity->load((int)$this->_getParam('id'));
 
         //check if update is allowed
@@ -313,12 +314,12 @@ class Editor_SegmentController extends ZfExtended_RestController
         /* @var $task editor_Models_Task */
         $wfh = $this->_helper->workflow;
         /* @var $wfh Editor_Controller_Helper_Workflow */
-        $wfh->checkWorkflowWriteable($this->entity->getTaskGuid(), $sessionUser->getUserGuid());
+        $wfh->checkWorkflowWriteable($this->entity->getTaskGuid(), $auth->getUserGuid());
 
         //the history entry must be created before the original entity is modified
         $history = $this->entity->getNewHistoryEntity();
         //update the segment
-        $updater = ZfExtended_Factory::get('editor_Models_Segment_Updater', [$task,$sessionUser->getUserGuid()]);
+        $updater = ZfExtended_Factory::get('editor_Models_Segment_Updater', [$task, $auth->getUserGuid()]);
 
         $allowedAlternatesToChange = $this->entity->getEditableDataIndexList(true);
 
@@ -340,8 +341,8 @@ class Editor_SegmentController extends ZfExtended_RestController
         $this->sanitizeEditedContent($updater, $allowedAlternatesToChange);
 
         $this->setDataInEntity(array_merge($allowedToChange, $allowedAlternatesToChange), self::SET_DATA_WHITELIST);
-        $this->entity->setUserGuid($sessionUser->getUserGuid());
-        $this->entity->setUserName($sessionUser->getUserName());
+        $this->entity->setUserGuid($auth->getUser()->getUserGuid());
+        $this->entity->setUserName($auth->getUser()->getUserName());
 
         /* @var $updater editor_Models_Segment_Updater */
         $updater->update($this->entity, $history);
@@ -620,12 +621,11 @@ class Editor_SegmentController extends ZfExtended_RestController
 
         if ($isTaskGuidAndEditable && $editable) {
             // if the user can edit only segmentranges, we must also check if s/he is allowed to edit and save this segment
-            $sessionUser = new Zend_Session_Namespace('user');
-            $sessionUserGuid = $sessionUser->data->userGuid;
-            $tua = editor_Models_Loaders_Taskuserassoc::loadByTask($sessionUserGuid, $task);
+            $authUserGuid = ZfExtended_Authentication::getInstance()->getUserGuid();
+            $tua = editor_Models_Loaders_Taskuserassoc::loadByTask($authUserGuid, $task);
             $step = $tua->getWorkflowStepName();
             if ($tua->isSegmentrangedTaskForStep($task, $step)) {
-                $assignedSegments = $tua->getAllAssignedSegmentsByUserAndStep($task->getTaskGuid(), $sessionUserGuid, $step);
+                $assignedSegments = $tua->getAllAssignedSegmentsByUserAndStep($task->getTaskGuid(), $authUserGuid, $step);
                 if (!in_array($this->entity->getSegmentNrInTask(), $assignedSegments)) {
                     $isTaskGuidAndEditable = false;
                 }
@@ -928,16 +928,15 @@ class Editor_SegmentController extends ZfExtended_RestController
         if ($task->getUsageMode() !== $task::USAGE_MODE_SIMULTANEOUS) {
             return false;
         }
-        $sessionUser = new Zend_Session_Namespace('user');
-        $sessionUserGuid = $sessionUser->data->userGuid;
-        $tua = editor_Models_Loaders_Taskuserassoc::loadByTask($sessionUserGuid, $task);
+        $authUserGuid = ZfExtended_Authentication::getInstance()->getUserGuid();
+        $tua = editor_Models_Loaders_Taskuserassoc::loadByTask($authUserGuid, $task);
         /* @var $tua editor_Models_TaskUserAssoc */
         $step = $tua->getWorkflowStepName();
         $handleSegmentranges = $tua->isSegmentrangedTaskForStep($task, $step);
         if (!$handleSegmentranges) {
             return false;
         }
-        return $tua->getAllAssignedSegmentsByUserAndStep($task->getTaskGuid(), $sessionUserGuid, $step);
+        return $tua->getAllAssignedSegmentsByUserAndStep($task->getTaskGuid(), $authUserGuid, $step);
     }
 
     /***
@@ -951,8 +950,7 @@ class Editor_SegmentController extends ZfExtended_RestController
      */
     protected function addJumpToSegmentIndex()
     {
-        $sessionUser = new Zend_Session_Namespace('user');
-        $userGuid = $sessionUser->data->userGuid;
+        $authUserGuid = ZfExtended_Authentication::getInstance()->getUserGuid();
         $taskGuid = $this->getCurrentTask()->getTaskGuid();
 
         //needed only on first page and if we have rows
@@ -968,7 +966,7 @@ class Editor_SegmentController extends ZfExtended_RestController
         //we need a clone of the entity, so that the filters are initialized
         $segment = clone $this->entity;
         /* @var $segment editor_Models_Segment */
-        $segmentId = $segment->getLastEditedByUserAndTask($taskGuid, $userGuid);
+        $segmentId = $segment->getLastEditedByUserAndTask($taskGuid, $authUserGuid);
 
         if ($segmentId > 0) {
             //last edited segment found, find and set the segment index
@@ -979,7 +977,7 @@ class Editor_SegmentController extends ZfExtended_RestController
 
         $tua = null;
         try {
-            $tua = editor_Models_Loaders_Taskuserassoc::loadByTaskGuidForceWorkflowRole($userGuid, $taskGuid);
+            $tua = editor_Models_Loaders_Taskuserassoc::loadByTaskGuidForceWorkflowRole($authUserGuid, $taskGuid);
         } catch (ZfExtended_Models_Entity_NotFoundException $e) {
         }
 

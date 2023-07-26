@@ -157,7 +157,7 @@ class editor_FileController extends ZfExtended_RestController
         // init worker and queue it
         if (!$worker->init($task->getTaskGuid(), [
             'files' => $dataProvider->getFiles(),// fileId => FileDto mapping
-            'userGuid' => ZfExtended_Authentication::getInstance()->getUser()->getUserGuid(),
+            'userGuid' => ZfExtended_Authentication::getInstance()->getUserGuid(),
             'segmentTimestamp' => NOW_ISO,
             'dataProviderClass' => $dataProvider::class
         ])) {

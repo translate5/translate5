@@ -87,6 +87,7 @@
 		}		
 	],
 	"require" : {
+		"ext-xml": "*",
 		"ext-simplexml": "*",
 		"ext-libxml": "*",
 		"ext-pdo": "*",
@@ -166,6 +167,7 @@
 	"license" : "AGPL-3.0-only",
 	"require-dev" : {
 		"brainmaestro/composer-git-hooks" : "^2.8",
-		"symfony/var-dumper": "^6.0"
+		"symfony/var-dumper": "^6.0",
+		"phpstan/phpstan": "^1.10"
 	}
 }

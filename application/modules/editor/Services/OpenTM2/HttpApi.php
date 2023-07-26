@@ -383,14 +383,17 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
     /**
      * This method searches the given search string in the proposals contained in a memory (concordance search).
      * The function returns one proposal per request.
-     * The caller has to provide the search position returned by a previous call or an empty search position to start the search at the begin of the memory.
-     * Note: Provide the returned search position NewSearchPosition as SearchPosition on subsequenet calls to do a sequential search of the memory.
+     * The caller has to provide the search position returned by a previous call or an empty search
+     * position to start the search at the begin of the memory.
+     * Note: Provide the returned search position NewSearchPosition as SearchPosition on
+     * subsequenet calls to do a sequential search of the memory.
      */
     public function search($queryString, $field, $searchPosition = null) {
-        if($this->isToLong($queryString)) {
+        if ($this->isToLong($queryString)) {
             $this->result = json_decode('{"results":[]}');
             return true;
         }
+
         $data = new stdClass();
         $data->searchString = $queryString;
         $data->searchType = $field;
@@ -404,7 +407,8 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
 
     /**
      * This method updates (or adds) a memory proposal in the memory.
-     * Note: This method updates an existing proposal when a proposal with the same key information (source text, language, segment number, and document name) exists.
+     * Note: This method updates an existing proposal when a proposal with the same key information
+     * (source text, language, segment number, and document name) exists.
      *
      * @param string $source
      * @param string $target
@@ -415,9 +419,12 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
      */
     public function update(string $source, string $target, editor_Models_Segment $segment, $filename): bool
     {
+        $this->error = null;
+
         $http = $this->getHttpWithMemory('POST', 'entry');
-        $json = $this->getUpdateJson(__FUNCTION__,$source,$target);
-        if(!is_null($this->error)){
+        $json = $this->getUpdateJson(__FUNCTION__, $source, $target);
+
+        if (null !== $this->error) {
             return false;
         }
 
@@ -439,16 +446,17 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
      */
     public function updateText(string $source, string $target): bool
     {
+        $this->error = null;
 
         $http = $this->getHttpWithMemory('POST', 'entry');
-        $json = $this->getUpdateJson(__FUNCTION__,$source,$target);
-        if(!is_null($this->error)){
+        $json = $this->getUpdateJson(__FUNCTION__, $source, $target);
+
+        if (null !== $this->error) {
             return false;
         }
 
         $json->documentName = 'source';
-        $userData = editor_User::instance()->getData();
-        $json->author = $userData->firstName . ' '. $userData->surName;
+        $json->author = ZfExtended_Authentication::getInstance()->getUser()->getUserName();
         $json->context = '';
         $json->addInfo = $json->documentName;
 

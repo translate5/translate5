@@ -66,7 +66,7 @@ class TaskAssociation extends AssociationAbstract {
                 ->where('languageResourceId = ?', $languageResourceId)
                 ->where('taskGuid = ?', $taskGuid);
             $row = $this->db->fetchRow($s);
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             $this->notFound('NotFound after other Error', $e);
         }
         if (!$row) {

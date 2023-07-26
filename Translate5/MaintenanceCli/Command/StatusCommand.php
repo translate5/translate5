@@ -87,7 +87,7 @@ class StatusCommand extends Translate5AbstractCommand
         $this->writeTitle('Translate5 status overview');
 
         $this->writeSystemCheck();
-        $this->writeVersion();
+        $this->writeVersion(); //FIXME add maintenance status!
         $this->writeWorkerSummary();
         $this->writeSection('Connected Sessions', $this->messageBus());
         $this->writeTaskAndJobs();

@@ -27,7 +27,7 @@ END LICENSE AND COPYRIGHT
 */
 
 /**
- * All available customers for the curend loged in user
+ * All available customers for the currently loged in user
  * 
  * @class Editor.store.admin.UserCustomers
  * @extends Ext.data.Store
@@ -50,11 +50,8 @@ Ext.define('Editor.store.admin.UserCustomers', {
                 Editor.app.getController('ServerException').handleCallback(record, operation, false);
             },
             success: function(record) {
-                var userCustomers = record.get('customers').split(','); // get the user customers as array
-                    userCustomers = userCustomers.filter(function(v){
-                        return v != '';
-                    }); // remove the empty array fields
-    
+                /** @var record {Editor.model.admin.User} */
+                var userCustomers = record.getCustomerIds(); // get the user customers as int array
                 //if no customers to the user are assigned, set empty store
                 if(userCustomers.length < 1){
                     return;

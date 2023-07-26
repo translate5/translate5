@@ -1,4 +1,9 @@
 <?php
+
+/**
+ * @deprecated Must be removed!
+ */
+
 /**
  * Performance detection. 'mt' mean 'microtime'
  * Returns the time between the previous and current calls of this function

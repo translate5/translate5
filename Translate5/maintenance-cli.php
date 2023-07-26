@@ -33,8 +33,9 @@ require_once 'vendor/autoload.php';
 const TRANSLATE5_CLI = true;
 
 use Symfony\Component\Console\Application;
-use Translate5\MaintenanceCli\Command\{
-    AuthTokenCommand,
+use Translate5\MaintenanceCli\Command\{AuthTokenCommand,
+    AuthTokenDeleteCommand,
+    AuthTokenListCommand,
     CachePurgeCommand,
     ChangelogCommand,
     ConfigCommand,
@@ -70,12 +71,14 @@ use Translate5\MaintenanceCli\Command\{
     ReleaseNotesCommand,
     ServiceAutodiscoveryCommand,
     ServiceCheckCommand,
+    ServicePingCommand,
     DevelopmentLocalServicesCommand,
     SessionImpersonateCommand,
     StatusCommand,
     SystemCheckCommand,
     SystemMailtestCommand,
     TaskCleanCommand,
+    TaskImportCommand,
     TaskInfoCommand,
     TaskSkeletonfileCommand,
     TermportalReindexCommand,
@@ -103,6 +106,8 @@ use Translate5\MaintenanceCli\Command\SegmentHistoryCommand;
 $app = new Application('Translate5 CLI Maintenance', '1.0');
 $commands = [
     new AuthTokenCommand(),
+    new AuthTokenListCommand(),
+    new AuthTokenDeleteCommand(),
     new CachePurgeCommand(),
     new ChangelogCommand(),
     new ConfigCommand(),
@@ -131,12 +136,14 @@ $commands = [
     new SegmentHistoryCommand(),
     new ServiceAutodiscoveryCommand(),
     new ServiceCheckCommand(),
+    new ServicePingCommand(),
     new SessionImpersonateCommand(),
     new StatusCommand(),
     new SystemCheckCommand(),
     new SystemMailtestCommand(),
     new TaskCleanCommand(),
     new TaskInfoCommand(),
+    new TaskImportCommand(),
     new TaskSkeletonfileCommand(),
     new TermportalReindexCommand(),
     new TermportalDatatypecheckCommand(),
@@ -151,7 +158,7 @@ $commands = [
     new WorkerListCommand(),
     new WorkerQueueCommand(),
 ];
-if(file_exists('.git')) {
+if (file_exists('.git')) {
     $commands[] = new DevelopmentGithookCommand();
     $commands[] = new DevelopmentNewdbchangeCommand();
     $commands[] = new DevelopmentCreatetestCommand();

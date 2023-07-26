@@ -32,6 +32,11 @@ END LICENSE AND COPYRIGHT
  * @version 1.0
  */
 
+use MittagQI\Translate5\Task\Import\FileParser\Xlf\Namespaces\Across;
+use MittagQI\Translate5\Task\Import\FileParser\Xlf\Namespaces\Translate5;
+use MittagQI\Translate5\Task\Import\FileParser\Xlf\Namespaces\MemoQ;
+use MittagQI\Translate5\Task\Import\FileParser\Xlf\Namespaces\Tmgr;
+
 
 /**
  * XLF Namespace Handler
@@ -42,16 +47,16 @@ class editor_Models_Export_FileParser_Xlf_Namespaces extends editor_Models_Expor
     public function __construct($xliff) {
         //TODO this code could be improved by moving the following checks into each namespace class and loop through the existing classes
         // instead of hardcoding the checks here
-        if (strpos($xliff, editor_Models_Import_FileParser_Xlf_Namespaces_Tmgr::IBM_XLIFF_NAMESPACE) !== false) {
+        if (strpos($xliff, Tmgr::IBM_XLIFF_NAMESPACE) !== false) {
             $this->namespaces['ibm'] = ZfExtended_Factory::get('editor_Models_Export_FileParser_Xlf_Namespaces_Tmgr');
         }
-        if (strpos($xliff, editor_Models_Import_FileParser_Xlf_Namespaces_Translate5::TRANSLATE5_XLIFF_NAMESPACE) !== false) {
+        if (strpos($xliff, Translate5::TRANSLATE5_XLIFF_NAMESPACE) !== false) {
             $this->namespaces['translate5'] = ZfExtended_Factory::get('editor_Models_Export_FileParser_Xlf_Namespaces_Translate5');
         }
-        if (strpos($xliff, editor_Models_Import_FileParser_Xlf_Namespaces_Across::ACROSS_XLIFF_NAMESPACE) !== false) {
+        if (strpos($xliff, Across::ACROSS_XLIFF_NAMESPACE) !== false) {
             $this->namespaces['across'] = ZfExtended_Factory::get('editor_Models_Export_FileParser_Xlf_Namespaces_Across');
         }
-        if (strpos($xliff, editor_Models_Import_FileParser_Xlf_Namespaces_MemoQ::MEMOQ_XLIFF_NAMESPACE) !== false) {
+        if (strpos($xliff, MemoQ::MEMOQ_XLIFF_NAMESPACE) !== false) {
             $this->namespaces['memoq'] = ZfExtended_Factory::get('editor_Models_Export_FileParser_Xlf_Namespaces_MemoQ');
         }
     }

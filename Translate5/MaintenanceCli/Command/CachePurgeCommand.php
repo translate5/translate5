@@ -63,6 +63,9 @@ class CachePurgeCommand extends Translate5AbstractCommand
         /* @var $cache \Zend_Cache_Core */
         $cache = \Zend_Registry::get('cache');
 
+        //FIXME ebenfalls memcache löschen!
+        // memcache doch in reg legen und alle Nutzungen darauf umbauen, aber erst nach merge von Leons aktueller Glossary Anbindung von 24translate
+
         if($cache->clean()) {
             $this->io->success("Application cache purged!");
         }

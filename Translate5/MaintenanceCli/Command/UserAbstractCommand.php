@@ -35,6 +35,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\ChoiceQuestion;
 use Symfony\Component\Console\Question\Question;
 use Symfony\Component\Console\Input\InputArgument;
+use Zend_Registry;
 use ZfExtended_Authentication;
 use ZfExtended_Models_User;
 use ZfExtended_PasswordCheck;
@@ -193,7 +194,8 @@ abstract class UserAbstractCommand extends Translate5AbstractCommand
 
         $validator = function (string $password): string {
             $errors = [];
-            if (ZfExtended_PasswordCheck::isValid($password, $errors)) {
+            $config = Zend_Registry::get('config');
+            if ($config?->development?->allowInsecurePasswords || ZfExtended_PasswordCheck::isValid($password, $errors)) {
                 return $password;
             }
 

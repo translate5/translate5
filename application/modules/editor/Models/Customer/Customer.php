@@ -76,6 +76,11 @@ END LICENSE AND COPYRIGHT
 class editor_Models_Customer_Customer extends ZfExtended_Models_Entity_Abstract {
     protected $dbInstanceClass = 'editor_Models_Db_Customer';
     protected $validatorInstanceClass   = 'editor_Models_Validator_Customer';
+
+    /**
+     * Customers must be filtered by role-driven restrictions
+     */
+    protected ?array $clientAccessRestriction = ['field' => 'id'];
     
     CONST DEFAULTCUSTOMER_NUMBER = 'default for legacy data';
     /**

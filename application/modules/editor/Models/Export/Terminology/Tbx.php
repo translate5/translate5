@@ -83,6 +83,30 @@ class editor_Models_Export_Terminology_Tbx {
     protected string $file = '';
 
     /**
+     * Array containing absolute paths to be used while exporting to zip
+     *
+     * @var array
+     */
+    protected array $zip = [
+
+        // '.../terms-images-public/tc_<collectionId>/' directory where all
+        // images of current term-collection are stored under their <uniqueName>-names
+        'tc_root' => '',
+
+        // Temporary '<tc_root>/media/' subdirectory where same images are collected but
+        // under their <name>-names to be added to zip-archive for it to be importable
+        'media' => '',
+
+        // Destination zip-archive file
+        'archive' => '',
+
+        // [name.jpg => 123] pairs where 123 is how many times such name was used during zip-export
+        // this is need to inject counter to the filename so that older files having same names are not
+        // overwritten by further ones as names would looks like name.jpg, name-1.jpg, etc
+        'qtyByName' => []
+    ];
+
+    /**
      * Flag, indicating whether definition-attrs should be skipped while exporting tbx contents
      *
      * @var bool
@@ -269,12 +293,37 @@ class editor_Models_Export_Terminology_Tbx {
     }
 
     /**
-     * Export collection as a TBX file
+     * Create term-images-public/tc_<collectionId>/media/ directory and setup
+     * values in $this->zip array under 'tc_root', 'media' and 'archive' keys
+     * to be further used as paths shortcuts
+     *
+     * @param int $collectionId
+     */
+    protected function prepareZipExport(int $collectionId) : void {
+
+        // Setup term collection's images root directory
+        $this->zip['tc_root'] = ZfExtended_Factory
+            ::get(editor_Models_Terminology_Models_ImagesModel::class)
+            ->getImagePath($collectionId);
+
+        // Setup temporary media/ subdirectory
+        mkdir($this->zip['media'] = $this->zip['tc_root']. '/media', 0777, true);
+
+        // Set $this->file
+        $this->setFile($this->zip['tc_root'] . '/exported.tbx');
+
+        // Setup archive file path
+        $this->zip['archive'] = preg_replace('~\.tbx$~', '.zip', $this->getFile());
+    }
+
+    /**
+     * Export collection as a TBX file, or ZIP-file containing that TBX-file
+     * along with media/ folder inside, if $exportImages arg is 'zip'
      *
      * @param int $collectionId
      * @param string $userName
      * @param bool $tbxBasicOnly
-     * @param bool $exportImages
+     * @param string|bool $exportImages
      * @param int $byTermEntryQty How many termEntries should be processed at once
      * @param int $byImageQty How many image binaries should be processed at once
      * @param null $selected Bunch of arguments passed by $this->renderRawForTaskImport(). Should look like below: [
@@ -285,7 +334,7 @@ class editor_Models_Export_Terminology_Tbx {
      * @throws Zend_Db_Statement_Exception
      * @throws ZfExtended_Models_Entity_NotFoundException
      */
-    public function exportCollectionById(int $collectionId, string $userName, $tbxBasicOnly = false, $exportImages = true,
+    public function exportCollectionById(int $collectionId, string $userName, $tbxBasicOnly = false, $exportImages = 'tbx',
                                          $byTermEntryQty = 1000, $byImageQty = 50, $selected = null) {
 
         if( $this->isExportAsFile() && empty($this->getFile())){
@@ -294,19 +343,19 @@ class editor_Models_Export_Terminology_Tbx {
         }
 
         // Models shortcuts
-        $termM = ZfExtended_Factory::get('editor_Models_Terminology_Models_TermModel');
-        $attrM = ZfExtended_Factory::get('editor_Models_Terminology_Models_AttributeModel');
-        $trscM = ZfExtended_Factory::get('editor_Models_Terminology_Models_TransacgrpModel');
+        $termM = ZfExtended_Factory::get(editor_Models_Terminology_Models_TermModel::class);
+        $attrM = ZfExtended_Factory::get(editor_Models_Terminology_Models_AttributeModel::class);
+        $trscM = ZfExtended_Factory::get(editor_Models_Terminology_Models_TransacgrpModel::class);
 
         // Get total qty of entries to be processed
         $qty = $selected
             ? count($selected['termEntryIds'])
             : ZfExtended_Factory
-                ::get('editor_Models_Terminology_Models_TermEntryModel')
+                ::get(editor_Models_Terminology_Models_TermEntryModel::class)
                 ->getQtyByCollectionId($collectionId);
 
         /** @var editor_Models_Terminology_Models_TermEntryModel $m */
-        $m = ZfExtended_Factory::get('editor_Models_Terminology_Models_TermEntryModel');
+        $m = ZfExtended_Factory::get(editor_Models_Terminology_Models_TermEntryModel::class);
 
         // Build WHERE clause
         $where = 'collectionId = ' . $collectionId;
@@ -319,7 +368,7 @@ class editor_Models_Export_Terminology_Tbx {
 
         // If $tbxBasicOnly arg is true, overwrite it with comma-separated dataTypeIds of tbx-basic attributes
         if ($tbxBasicOnly) $tbxBasicOnly = ZfExtended_Factory
-            ::get('editor_Models_Terminology_Models_AttributeDataType')
+            ::get(editor_Models_Terminology_Models_AttributeDataType::class)
             ->getTbxBasicIds();
 
         // Prepare indents
@@ -327,12 +376,17 @@ class editor_Models_Export_Terminology_Tbx {
             $this->tabs[$i] = str_pad('', $i * 4, ' ');
         }
 
+        // Create temporary folder to be further zipped and do other things
+        if ($exportImages === 'zip') {
+            $this->prepareZipExport($collectionId);
+        }
+
         // Prepare xml header
         $line []= '<?xml version=\'1.0\'?><!DOCTYPE martif SYSTEM "TBXBasiccoreStructV02.dtd">';
         $line []= '<martif>';
 
         // Get collection name
-        $collection = ZfExtended_Factory::get('editor_Models_TermCollection_TermCollection');
+        $collection = ZfExtended_Factory::get(editor_Models_TermCollection_TermCollection::class);
         $collection->load($collectionId);
         $collectionName = $collection->getName();
 
@@ -478,14 +532,45 @@ class editor_Models_Export_Terminology_Tbx {
 
                 // Foreach image
                 foreach ($imgA as $imgI) {
+
+                    // Open refObject-node
                     $line []= $this->tabs[4] . '<refObject id="' . $imgI['targetId'] . '">';
-                    $path = $i->getImagePath($collectionId, $imgI['uniqueName']);
-                    $file = file_get_contents($path);
-                    $line []= $this->tabs[5] . '<item type="name">' . $imgI['name'] . '</item>';
-                    $line []= $this->tabs[5] . '<item type="encoding">hex</item>';
-                    $line []= $this->tabs[5] . '<item type="format">' . (preg_match('~/~', $imgI['format']) ? '' : 'image/') . $imgI['format'] . '</item>';
-                    $text = preg_replace('~.{2}~', '$0 ', bin2hex($file));
-                    $line []= $this->tabs[5] . '<item type="data">' . $text . '</item>';
+
+                    // Get full filepath to the image
+                    $storedPath = $i->getImagePath($collectionId, $imgI['uniqueName']);
+
+                    // If images should be exported in hex-encoded format
+                    if ($exportImages === 'tbx') {
+
+                        // Add markup
+                        $file = file_get_contents($storedPath);
+                        $line []= $this->tabs[5] . '<item type="name">' . $imgI['name'] . '</item>';
+                        $line []= $this->tabs[5] . '<item type="encoding">hex</item>';
+                        $line []= $this->tabs[5] . '<item type="format">' . (preg_match('~/~', $imgI['format']) ? '' : 'image/') . $imgI['format'] . '</item>';
+                        $text = preg_replace('~.{2}~', '$0 ', bin2hex($file));
+                        $line []= $this->tabs[5] . '<item type="data">' . $text . '</item>';
+
+                    // Else if images should be exported into media/ directory inside zip-file
+                    } else {
+
+                        // Prepare name
+                        $name = $this->getImageFilename4Export($imgI['name']);
+
+                        // Add itemSet-node
+                        $line []= $this->tabs[5] . '<itemSet>';
+                        $line []=     $this->tabs[6] . '<itemGrp>';
+                        $line []=         $this->tabs[7] . '<item>' . $imgI['name'] .'</item>';
+                        $line []=         $this->tabs[7] . '<xref target="media/' . $name . '"/>';
+                        $line []=     $this->tabs[6] . '</itemGrp>';
+                        $line []= $this->tabs[5] . '</itemSet>';
+
+                        // Copy image to temporary folder
+                        if (is_file($storedPath)) {
+                            copy($storedPath, $this->zip['media'] . '/' . $name);
+                        }
+                    }
+
+                    // Close refObject-node
                     $line []= $this->tabs[4] . '</refObject>';
                 }
 
@@ -506,6 +591,44 @@ class editor_Models_Export_Terminology_Tbx {
         //readfile($this->file);
         if (!$selected && !$this->isExportAsFile()) {
             die();
+        }
+
+        // If images should be exported via zip
+        if ($exportImages === 'zip') {
+
+            // Add tbx file with normal compression and media/ folder with NO compression
+            $zip = new ZipArchive();
+            $zip->open($this->zip['archive'], ZipArchive::CREATE | ZipArchive::OVERWRITE);
+            $zip->addFile($this->getFile(), 'exported.tbx');
+            $zip->addGlob($this->zip['media'] . '/*', null, [
+                'add_path' => 'media/',
+                'remove_all_path' => TRUE,
+                'comp_method' => ZipArchive::CM_STORE
+            ]);
+            $zip->close();
+
+            // Drop tbx-file
+            unlink($this->getFile());
+
+            // Drop temporary media/ directory
+            ZfExtended_Zendoverwrites_Controller_Action_HelperBroker
+                ::getStaticHelper('Recursivedircleaner')
+                ->delete($this->zip['media']);
+
+            // Set up headers to download the zip
+            Header::sendDownload(
+                $collectionName . '.zip',
+                'application/zip',
+                'no-cache',
+                filesize($this->zip['archive']),
+                [ 'X-Accel-Buffering' => 'no' ]
+            );
+
+            // Flush zip binary data
+            readfile($this->zip['archive']);
+
+            // Drop zip-file
+            unlink($this->zip['archive']);
         }
     }
 
@@ -602,16 +725,13 @@ class editor_Models_Export_Terminology_Tbx {
         // Build raw output
         $raw = join("\n", $lines) . "\n";
 
-        if( $this->isExportAsFile()){
+        if ($this->isExportAsFile()){
             // Write lines
             file_put_contents($this->file, $raw, $overwrite ? null : FILE_APPEND);
-        }else{
+        } else {
             // Flush raw output
             echo $raw;
         }
-
-
-
 
         // Clear lines
         $lines = [];
@@ -680,6 +800,11 @@ class editor_Models_Export_Terminology_Tbx {
     public function setFile(string $file): void
     {
         $this->file = $file;
+
+        // Set $this->exportAsFile-flag
+        if ($this->file) {
+            $this->setExportAsFile(true);
+        }
     }
 
     /**
@@ -696,5 +821,30 @@ class editor_Models_Export_Terminology_Tbx {
     public function setExportAsFile(bool $exportAsFile): void
     {
         $this->exportAsFile = $exportAsFile;
+    }
+
+    /**
+     * Check whether we've already had such a $name given, and if so -
+     * append a counter to prevent existing file from being overrwitten
+     *
+     * @param $name
+     * @return string
+     */
+    public function getImageFilename4Export($name) : string {
+
+        // Get file and extension
+        $file = pathinfo($name, PATHINFO_FILENAME);
+        $ext  = pathinfo($name, PATHINFO_EXTENSION);
+
+        // Build result name
+        $result = isset($this->zip['qtyByName'][$name])
+            ? "$file-{$this->zip['qtyByName'][$name]}.$ext"
+            : $name;
+
+        // Increment $name usage counter
+        $this->zip['qtyByName'][$name] = ($this->zip['qtyByName'][$name] ?? 0) + 1;
+
+        // Return name with counter, if need
+        return $result;
     }
 }

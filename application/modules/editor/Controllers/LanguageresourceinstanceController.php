@@ -107,8 +107,8 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         //add custom filters
         $this->handleFilterCustom();
 
-        $this->view->rows =$this->entity->loadAllByServices();
-        $this->view->total =$this->entity->getTotalCount();
+        $this->view->rows = $this->entity->loadAllByServices();
+        $this->view->total = $this->entity->getTotalCount();
 
         $serviceManager = ZfExtended_Factory::get('editor_Services_Manager');
         /* @var $serviceManager editor_Services_Manager */
@@ -733,6 +733,12 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
             // especially tests are not respecting the array format ...
             editor_Utils::ensureFieldsAreArrays($this->data, ['customerIds', 'customerUseAsDefaultIds', 'customerWriteAsDefaultIds', 'customerPivotAsDefaultIds']);
 
+            // UGLY/QUIRK: client-restricted PMs may save languageresources, that contain assocs to customers, the PMs cannot see in the frontend and they have no rights to remove.
+            // we fix that here by re-adding them
+            if(ZfExtended_Authentication::getInstance()->isUserClientRestricted()){
+                $this->transformClientRestrictedCustomerAssocs();
+            }
+
             if ((bool)$this->getParam('forced', false) === true) {
                 $this->checkOrCleanCustomerAssociation(true, $this->getDataField('customerIds') ?? []);
             }
@@ -808,9 +814,13 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
                 'rex' => 'int11',
                 'key' => 'LEK_languageresources'
             ],
-            'tbxBasicOnly,exportImages' => [
+            'tbxBasicOnly' => [
                 'req' => true,
-                'rex' => '~(0|1)~'
+                'fis' => '0,1'
+            ],
+            'exportImages' => [
+                'req' => true,
+                'fis' => '0,tbx,zip'
             ]
         ], $params);
 
@@ -818,7 +828,7 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         ignore_user_abort(1); set_time_limit(0);
 
         // Export collection
-        ZfExtended_Factory::get('editor_Models_Export_Terminology_Tbx')->exportCollectionById(
+        ZfExtended_Factory::get(editor_Models_Export_Terminology_Tbx::class)->exportCollectionById(
             $params['collectionId'],
             (new Zend_Session_Namespace('user'))->data->userName,
             $params['tbxBasicOnly'],
@@ -1156,8 +1166,8 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
             $params['fileinfo'] = [];
         }
 
-        $params['addnew']=$addNew;
-        $params['userGuid']=editor_User::instance()->getGuid();
+        $params['addnew'] = $addNew;
+        $params['userGuid'] = ZfExtended_Authentication::getInstance()->getUserGuid();
 
         if (!$worker->init(null, $params)) {
             $this->uploadErrors[] = 'File import in language resources Error on worker init()';
@@ -1216,9 +1226,16 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
     }
 
     public function deleteAction(){
-        //load the entity abd store a copy for later use.
+
+        //load the entity and store a copy for later use.
         $this->entityLoad();
         $clone = clone $this->entity;
+
+        // Client-restricted users can only delete language-resources, that are associated only to "their" customers
+        // we will throw a no-access exception in case this is attempted
+        if(ZfExtended_Authentication::getInstance()->isUserClientRestricted()){
+            $this->checkClientRestrictedDeletion();
+        }
         
         // detect parameters
         $forced = (bool)$this->getParam('forced',false);
@@ -1520,4 +1537,92 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         return count($importingTasks) > 0;
     }
 
+    // additional API needed to process client-restricted usage of the controller
+
+    /**
+     * Fixes the current customer associations for client-restricted PMs: They may send assocs that do not contain the currently set assocs for customers they cannot see
+     * @return void
+     */
+    private function transformClientRestrictedCustomerAssocs(): void
+    {
+        $resourceId = (int) $this->entity->getId();
+        $allowedCustomerIs = ZfExtended_Authentication::getInstance()->getUser()->getRestrictedClientIds();
+        //get all assocs grouped for our entity
+        $customerAssocModel = ZfExtended_Factory::get(editor_Models_LanguageResources_CustomerAssoc::class);
+        $customerAssocs = $customerAssocModel->loadCustomerIdsGrouped($resourceId);
+        $doDebug = ZfExtended_Debug::hasLevel('core', 'EntityFilter');
+        // now fix the sent data in case unallowed assocs have been removed
+        $this->adjustClientRestrictedCustomerAssoc(
+            'customerIds',
+            $this->getCustassoc($customerAssocs, 'customerId', $resourceId),
+            $allowedCustomerIs,
+            $doDebug
+        );
+        $this->adjustClientRestrictedCustomerAssoc(
+            'customerUseAsDefaultIds',
+            $this->getCustassocByIndex($customerAssocs, 'useAsDefault', $resourceId),
+            $allowedCustomerIs,
+            $doDebug
+        );
+        $this->adjustClientRestrictedCustomerAssoc(
+            'customerWriteAsDefaultIds',
+            $this->getCustassocByIndex($customerAssocs, 'writeAsDefault', $resourceId),
+            $allowedCustomerIs,
+            $doDebug
+        );
+        $this->adjustClientRestrictedCustomerAssoc(
+            'customerPivotAsDefaultIds',
+            $this->getCustassocByIndex($customerAssocs, 'pivotAsDefault', $resourceId),
+            $allowedCustomerIs,
+            $doDebug
+        );
+    }
+
+    /**
+     * Adjusts a single Association that needs to be  potentially fixed if the user is only allowed to remove certain clients
+     * @param string $paramName
+     * @param array $originalValue
+     * @param array $allowedCustomerIs
+     * @param bool $doDebug
+     * @return void
+     */
+    private function adjustClientRestrictedCustomerAssoc(string $paramName, array $originalValue, array $allowedCustomerIs, bool $doDebug): void
+    {
+        // evaluate the ids the client-restricted user is not allowed to change
+        $notAllowedIds = array_values(array_diff($originalValue, $allowedCustomerIs));
+
+        if(!empty($notAllowedIds)){
+            // if there are clients, the user is not allowed to remove, add them to the sent data
+            $sentIds = $this->getDataField($paramName) ?? [];
+            $newIds = array_values(array_unique(array_merge($sentIds, $notAllowedIds)));
+
+            if($doDebug){
+                error_log(
+                    "\n----------\n"
+                    . "FIX ENTITY UPDATE " . get_class($this->entity) . "\n"
+                    . 'user removed client-ids he is not entitled for: ' . implode(', ', $notAllowedIds)
+                    . "\n==========\n"
+                );
+            }
+
+            if($this->decodePutAssociative){
+                $this->data[$paramName] = $newIds;
+            } else {
+                $this->data->$paramName = $newIds;
+            }
+        }
+    }
+
+    /**
+     * Checks the deletion of language-resources for client-restricted users
+     * @return void
+     * @throws ZfExtended_NoAccessException
+     */
+    private function checkClientRestrictedDeletion(): void
+    {
+        $allowedCustomerIs = ZfExtended_Authentication::getInstance()->getUser()->getRestrictedClientIds();
+        if(!empty(array_diff($this->entity->getCustomers(), $allowedCustomerIs))){
+            throw new ZfExtended_NoAccessException('Deletion of LanguageResource is not allowed due to client-restriction');
+        }
+    }
 }

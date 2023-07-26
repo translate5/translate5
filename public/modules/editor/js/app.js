@@ -93,7 +93,7 @@ if(Ext.browser.is.IE) {
 Ext.application({
     name: 'Editor',
     models: ['File', 'Segment', 'admin.User', 'admin.Task', 'segment.Field', 'Config', 'TaskConfig', 'CustomerConfig', 'admin.UserAssocDefault'],
-    stores: ['Files', 'ReferenceFiles', 'Segments', 'AlikeSegments', 'admin.Languages', 'UserConfig', 'admin.Config', 'admin.CustomerConfig', 'admin.task.Config', 'admin.UserAssocDefault','admin.WizardTasks'],
+    stores: ['admin.TokenStore', 'Files', 'ReferenceFiles', 'Segments', 'AlikeSegments', 'admin.Languages', 'UserConfig', 'admin.Config', 'admin.CustomerConfig', 'admin.task.Config', 'admin.UserAssocDefault','admin.WizardTasks'],
     requires: [
         'Editor.view.ViewPort',
         'Editor.view.ViewPortEditor',
@@ -389,6 +389,10 @@ Ext.application({
         if (!Editor.controller.admin || !Editor.controller.admin.TaskOverview) {
             return;
         }
+        if (task) {
+            // reload when we leave the task
+            Ext.state.Manager.getProvider().store.reload();
+        }
         me.removeTaskFromUrl();
         if (me.viewport) {
             me.getController('ViewModes').deactivate();
@@ -633,17 +637,26 @@ Ext.application({
      */
     loadEditorConfigData: function (task, callback) {
         var me = this,
-            store = Ext.StoreManager.get('admin.task.Config');
+            taskStore = Ext.StoreManager.get('admin.task.Config'),
+            userStore = Ext.state.Manager.getProvider().store,
+            counter = 0;
 
-        store.loadByTaskGuid(task.get('taskGuid'), function (records, operation, success) {
-            me.unmask();
+        const onLoadedCallback = (store) => (records, operation, success) => {
+            counter++;
             if (!success) {
                 Editor.app.getController('ServerException').handleCallback(records, operation, false);
                 return;
             }
             store.clearFilter(true);
-            callback();
-        });
+
+            if (2 === counter) {
+                me.unmask();
+                callback();
+            }
+        };
+
+        taskStore.loadByTaskGuid(task.get('taskGuid'), onLoadedCallback(taskStore));
+        userStore.loadByTaskGuid(task.get('taskGuid'), onLoadedCallback(userStore));
     },
 
     /***

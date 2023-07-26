@@ -44,7 +44,7 @@ class editor_Workflow_Default_SegmentHandler {
     public function __construct(editor_Workflow_Default $workflow) {
         $this->workflow = $workflow;
         if(ZfExtended_Authentication::getInstance()->isAuthenticated()) {
-            $this->userGuid = ZfExtended_Authentication::getInstance()->getUser()->getUserGuid();
+            $this->userGuid = ZfExtended_Authentication::getInstance()->getUserGuid();
         }
     }
 

@@ -52,7 +52,7 @@ Ext.define('Ext.overrides.data.proxy.Server', {
  * needed for ext-6.0.0
  * recheck on update
  */
-Ext.define('Ext.overrides.fixed.BufferedStore', {
+Ext.define('Ext.overrides.data.BufferedStore', {
     override: 'Ext.data.BufferedStore',
     contains: function(record) {
         return this.indexOf(record) > -1;
@@ -65,7 +65,7 @@ Ext.define('Ext.overrides.fixed.BufferedStore', {
  * needed for ext-6.0.0
  * should be solved natively with ext-6.0.1
  */
-Ext.define('Ext.overrides.fixed.PageMap', {
+Ext.define('Ext.overrides.data.PageMap', {
     override: 'Ext.data.PageMap',
     getByInternalId: function(internalId) {
         var index = this.indexMap[internalId];
@@ -80,7 +80,7 @@ Ext.define('Ext.overrides.fixed.PageMap', {
  * needed for ext-6.0.0
  * should be solved natively with ext-6.0.1
  */
-Ext.define('Ext.overrides.fixed.ListFilter', {
+Ext.define('Ext.overrides.grid.filters.filter.List', {
     override: 'Ext.grid.filters.filter.List',
     getGridStoreListeners: function() {
         if(this.autoStore) {

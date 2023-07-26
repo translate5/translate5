@@ -27,7 +27,7 @@ END LICENSE AND COPYRIGHT
 */
 
 /**
- * Handler methods for task hookins
+ * different hooks for the different finish cases, is called by JobHandler::onFinish
  * WARNING TODO the handlers are named OfARole but basically they are triggered OfAWorkflowStep
  */
 class editor_Workflow_Default_JobHandler_Finish extends editor_Workflow_Default_AbstractHandler {

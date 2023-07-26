@@ -182,16 +182,6 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract
             return;
         }
 
-        // If current request has no filter-param - return
-        if (!$filter = $controller->getParam('filter')) {
-            return;
-        }
-
-        // If there is no projectId-filter among current request's filter-param - return
-        if (!in_array('projectId', array_column(json_decode($filter), 'property'))) {
-            return;
-        }
-
         // Get task and preset models
         $task = $event->getParam('entity');
         $preset = ZfExtended_Factory::get(Preset::class);

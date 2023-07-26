@@ -138,6 +138,12 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
     protected $validatorInstanceClass = 'editor_Models_Validator_Task';
 
     /**
+     * Tasks must be filtered by role-driven restrictions
+     */
+    protected ?array $clientAccessRestriction = ['field' => 'customerId'];
+
+
+    /**
      * @var editor_Models_Task_Meta
      */
     protected $meta;
@@ -218,8 +224,10 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
     /**
      * loads the task to the given guid
      * @param string $taskGuid
+     * @throws ZfExtended_Models_Entity_NotFoundException
      */
-    public function loadByTaskGuid(string $taskGuid){
+    public function loadByTaskGuid(string $taskGuid): void
+    {
         try {
             $s = $this->db->select()->where('taskGuid = ?', $taskGuid);
             $row = $this->db->fetchRow($s);
@@ -307,7 +315,7 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
         $userModel = ZfExtended_Factory::get('ZfExtended_Models_User');
 
         // here no check for pmGuid, since this is done in task::loadListByUserAssoc
-        $loadAll = editor_User::instance()->isAllowed('backend', 'loadAllTasks');
+        $loadAll = ZfExtended_Authentication::getInstance()->isUserAllowed('backend', 'loadAllTasks');
         $ignoreAnonStuff = $this->rolesAllowReadAnonymizedUsers();
 
         $anonSql = '';
@@ -357,9 +365,7 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
      */
     public function getTotalCountByUserAssoc(string $userGuid, $loadAll = false) {
         $s = $this->getSelectByUserAssocSql($userGuid, array('numrows' => 'count(*)'), $loadAll);
-        if(!empty($this->filter)) {
-            $this->filter->applyToSelect($s, false);
-        }
+        $this->applyFilterToSelect($s);
         return $this->db->fetchRow($s)->numrows;
     }
 
@@ -1171,7 +1177,7 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
      */
     protected function rolesAllowReadAnonymizedUsers(array $rolesToCheck = null) {
         if(empty($rolesToCheck)) {
-            $rolesToCheck = ZfExtended_Authentication::getInstance()->getRoles();
+            $rolesToCheck = ZfExtended_Authentication::getInstance()->getUserRoles();
         }
         $aclInstance = ZfExtended_Acl::getInstance();
         return $aclInstance->isInAllowedRoles($rolesToCheck, "frontend", "readAnonymyzedUsers");

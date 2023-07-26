@@ -65,6 +65,14 @@ class editor_Models_Segment_InternalTag extends editor_Models_Segment_TagAbstrac
      */
     const TYPE_REGEX = 'regex';
 
+    /**
+     * Map long, not numeric rids to a short integer, otherwise some t5memory versions will
+     *  - remove not numeric rids
+     *  - crash if the number is to long
+     * @var array
+     */
+    protected array $ridMap;
+
     public function __construct($replacerTemplate = null)
     {
         $this->replacerRegex = self::REGEX_INTERNAL_TAGS;
@@ -284,6 +292,7 @@ class editor_Models_Segment_InternalTag extends editor_Models_Segment_TagAbstrac
             $replaceMap = [];
         }
 
+        $this->ridMap = [];
         $result = $this->replace($segment, function ($match) use (&$newid, &$replaceMap) {
             //original id coming from import format
             $id = $match[3];
@@ -293,7 +302,8 @@ class editor_Models_Segment_InternalTag extends editor_Models_Segment_TagAbstrac
             // bpt ept → begin and end tag as standalone tags in one segment
             // bx ex → start and end tag of tag pairs where the tags are distributed to different segments
             // g tag → direct representation of a tag pair,
-            //  disadvantage: the closing g tag contains no information about semantic, so for reappling our internal tags a XML parser would be necessary
+            //  disadvantage: the closing g tag contains no information about semantic,
+            //                so for reappling our internal tags a XML parser would be necessary
 
             //as tag id the here generated newid must be used,
             // since the original $id is coming from imported data, it can happen
@@ -302,6 +312,7 @@ class editor_Models_Segment_InternalTag extends editor_Models_Segment_TagAbstrac
             if ($type == 'single') {
                 $result = sprintf('<x id="%s"/>', $newid++);
             } else {
+                $id = $this->sanitizeNonNumericTagIds($id);
                 //for matching bx and ex tags the original $id is fine
                 $result = sprintf('<%s id="%s" rid="%s"/>', $tag[$type], $newid++, $id);
             }
@@ -750,5 +761,19 @@ class editor_Models_Segment_InternalTag extends editor_Models_Segment_TagAbstrac
         }
         $updateField($originalContent, $segmentContent);
         return true;
+    }
+
+    /**
+     * ensure that id is a number by mapping it into an array
+     * older versions of t5memory support only numeric rids and remove not numeric ones which breaks the tag mapping
+     * @param mixed $id
+     * @return int
+     */
+    protected function sanitizeNonNumericTagIds(string $id): int
+    {
+        if (! array_key_exists($id, $this->ridMap)) {
+            $this->ridMap[$id] = count($this->ridMap) + 1;
+        }
+        return $this->ridMap[$id];
     }
 }

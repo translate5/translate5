@@ -415,7 +415,7 @@ class editor_Models_Import_FileParser_Xlf_OtherContent {
             // the length is completely saved in $additionalUnitLength. The length per MRK is not filled anymore,
             // but the related code still remains for legacy tasks having there a value set
             $this->additionalUnitLength += $this->segmentBareInstance->textLengthByImportattributes($collectedContents, $attributes, $this->task->getTaskGuid(), $this->fileId);
-            $this->segmentMetaBareInstance->updateAdditionalUnitLength($this->task->getTaskGuid(), $attributes->transunitId, $this->additionalUnitLength);
+            $this->segmentMetaBareInstance->updateAdditionalUnitLength($this->task->getTaskGuid(), $attributes->transunitHash, $this->additionalUnitLength);
         }
     }
     

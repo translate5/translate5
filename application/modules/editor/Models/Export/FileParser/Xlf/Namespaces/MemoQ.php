@@ -32,6 +32,8 @@ END LICENSE AND COPYRIGHT
  * @version 1.0
  */
 
+use MittagQI\Translate5\Task\Import\FileParser\Xlf\Namespaces\MemoQ;
+
 
 /**
  * XLF Fileparser Add On to parse MemoQ XLF specific stuff
@@ -105,7 +107,7 @@ class editor_Models_Export_FileParser_Xlf_Namespaces_MemoQ extends editor_Models
 
         foreach($this->comments as $comment) {
             //comments already imported from across are ignored
-            if($comment['userGuid'] == editor_Models_Import_FileParser_Xlf_Namespaces_MemoQ::USERGUID) {
+            if($comment['userGuid'] == MemoQ::USERGUID) {
                 continue;
             }
             self::$xmlWriter->startElement('mq:comment');

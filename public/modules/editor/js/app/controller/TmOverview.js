@@ -71,7 +71,9 @@ Ext.define('Editor.controller.TmOverview', {
         exportZippedTmx: '#UT#als gezippte TMX Datei exportieren',
         mergeTermsWarnTitle: '#UT#Nicht empfohlen!',
         mergeTermsWarnMessage: '#UT#Begriffe in der TBX werden immer zuerst nach ID mit bestehenden Einträgen in der TermCollection zusammengeführt. Wenn Terme zusammenführen angekreuzt ist und die ID in der TBX nicht in der TermCollection gefunden wird, wird gesucht, ob derselbe Begriff bereits in derselben Sprache existiert. Wenn ja, werden die gesamten Termeinträge zusammengeführt. Insbesondere bei einer TermCollection mit vielen Sprachen kann dies zu unerwünschten Ergebnissen führen.',
-        importing: '#UT#Die Sprachressource {0} wird gerade importiert. Bitte warten Sie, bis der Import abgeschlossen ist.'
+        importing: '#UT#Die Sprachressource {0} wird gerade importiert. Bitte warten Sie, bis der Import abgeschlossen ist.',
+        deletionForbidden: '#UT#Sie sind nicht berechtigt, diese Sprachressource zu entfernen.',
+        error: '#UT#Fehler'
     },
     refs: [{
         ref: 'tmOverviewPanel',
@@ -519,15 +521,36 @@ Ext.define('Editor.controller.TmOverview', {
         });
         menu.showAt(ev.getXY());
     },
+
+    /**
+     *
+     * @param view
+     * @param {integer} cell
+     * @param {integer} cellIdx
+     * @param {Editor.model.LanguageResources.LanguageResource} rec
+     */
     handleDeleteTm: function (view, cell, cellIdx, rec) {
         var me = this,
             msg = me.strings,
-            store = view.getStore(),
             noConn = rec.get('status') === rec.STATUS_NOCONNECTION,
             info = Ext.String.format(noConn ? msg.deleteConfirmLocalText : msg.deleteConfirmText, rec.get('name')),
             //force local deletion when no connection to resource
             params = noConn ? {deleteLocally: true} : {};
 
+        // allow deletion of language-resources for client-restricted users only,
+        // if the bound clients of the resource are e subset of the customers the client-restricted user is allowed to manage
+        if(Editor.app.authenticatedUser.isClientRestricted()){
+            var unallowedClientIds = Ext.Array.difference(rec.get('customerIds'), Editor.app.authenticatedUser.getRestrictedClientIds());
+            if(unallowedClientIds.length > 0){
+                Ext.Msg.show({
+                    title: this.strings.error,
+                    message: this.strings.deletionForbidden,
+                    buttons: Ext.MessageBox.OK,
+                    icon: Ext.Msg.ERROR
+                });
+                return;
+            }
+        }
 
         Ext.Msg.confirm(noConn ? msg.deleteConfirmLocal : msg.deleteConfirm, info, function (btn) {
             if (btn !== 'yes') {

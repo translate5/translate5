@@ -26,6 +26,7 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\Access\Roles;
 use MittagQI\Translate5\Applet\Dispatcher;
 use MittagQI\Translate5\Task\FileTypeSupport;
 use MittagQI\Translate5\Service\Services;
@@ -120,7 +121,7 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
         $this->view->pathToIMAGES = APPLICATION_RUNDIR . $this->config->runtimeOptions->server->pathToIMAGES;
 
         $userConfig = ZfExtended_Factory::get(editor_Models_Config::class);
-        $userConfig = $userConfig->mergeUserValues(ZfExtended_Authentication::getInstance()->getUser()->getUserGuid());
+        $userConfig = $userConfig->mergeUserValues(ZfExtended_Authentication::getInstance()->getUserGuid());
         $userTheme = $userConfig['runtimeOptions.extJs.theme']['value'];
         $defaultTheme = $this->config->runtimeOptions->extJs->defaultTheme;
         $userTheme = $userTheme == 'default' ? $defaultTheme : $userTheme;
@@ -486,8 +487,6 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
     protected function setJsAppData()
     {
         $userSession = new Zend_Session_Namespace('user');
-        $userSession->data->passwd = '********';
-        $userSession->data->openIdSubject = '';
 
         $ed = $this->config->runtimeOptions->editor;
 
@@ -529,12 +528,8 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
         $php2js->set('app.serverId', ZfExtended_Utils::installationHash('MessageBus'));
         $php2js->set('app.sessionKey', session_name());
 
-        $allRoles = $this->acl->getAllRoles();
-        $roles = array();
-        foreach ($allRoles as $role) {
-            if ($role == 'noRights' || $role == 'basic') {
-                continue;
-            }
+        $roles = [];
+        foreach (Roles::getFrontendRoles() as $role) {
             //set the setable, if the user is able to set/modify this role
             $roles[$role] = [
                 'label' => $this->translate->_(ucfirst($role)),
@@ -543,14 +538,22 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
         }
         $php2js->set('app.roles', $roles);
 
-        $wm = ZfExtended_Factory::get('editor_Workflow_Manager');
-        /* @var $wm editor_Workflow_Manager */
+        $clientPmSubRoles = [];
+        foreach (Roles::getClientPmSubroles() as $role) {
+            $clientPmSubRoles[] = [
+                $role,
+                $this->translate->_($role)
+            ];
+        }
+        $php2js->set('app.clientPmSubRoles', $clientPmSubRoles);
+
+        $wm = ZfExtended_Factory::get(editor_Workflow_Manager::class);
         $php2js->set('app.workflows', $wm->getWorkflowData());
         $php2js->set('app.workflow.CONST', $wm->getWorkflowConstants());
 
         $php2js->set(
             'app.userRights',
-            $this->acl->getFrontendRights(ZfExtended_Authentication::getInstance()->getRoles())
+            $this->acl->getFrontendRights(ZfExtended_Authentication::getInstance()->getUserRoles())
         );
 
         $php2js->set('app.version', $this->view->appVersion);
@@ -609,7 +612,7 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
         // we try to load the first suitable job
         try {
             $job = editor_Models_Loaders_Taskuserassoc::loadByTask(
-                ZfExtended_Authentication::getInstance()->getUser()->getUserGuid(),
+                ZfExtended_Authentication::getInstance()->getUserGuid(),
                 $this->getCurrentTask()
             );
             return $this->getCurrentTask()->getTaskActiveWorkflow()->getInitialUsageState($job);
@@ -922,7 +925,7 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
      */
     private function isAllowed(string $resource, ?string $right = null): string
     {
-        $roles = ZfExtended_Authentication::getInstance()->getRoles();
+        $roles = ZfExtended_Authentication::getInstance()->getUserRoles();
         try {
             return $this->acl->isInAllowedRoles($roles, $resource, $right);
         } catch (Zend_Acl_Exception) {

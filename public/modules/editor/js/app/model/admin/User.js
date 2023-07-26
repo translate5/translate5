@@ -103,6 +103,32 @@ Ext.define('Editor.model.admin.User', {
   getRoles: function() {
       return this.self.getRoles(this);
   },
+    /**
+     * Retrieves the main roles (all but the clientPmSubRoles
+     * @return {Array}
+     */
+    getMainRoles: function() {
+        var roles = [];
+        for (const role of this.self.getRoles(this)) {
+            if(!role.startsWith('clientpm_')){
+                roles.push(role);
+            }
+        }
+        return roles;
+    },
+    /**
+     * Retrieves the clientPM's subroles
+     * @return {Array}
+     */
+    getClientPmSubRoles: function() {
+        var roles = [];
+        for (const role of this.self.getRoles(this)) {
+            if(role.startsWith('clientpm_')){
+                roles.push(role);
+            }
+        }
+        return roles;
+    },
   /**
    * @param role {String}
    * @return {Boolean}
@@ -162,7 +188,7 @@ Ext.define('Editor.model.admin.User', {
               }
               break;
           case 'editorFinishTask':
-              if(!isJobInStepChain || task.hasCriticalErrors() || task.isWaiting() || task.isFinished() || task.isEnded() || task.isUnconfirmed()) {
+              if(!isJobInStepChain || task.isWaiting() || task.isFinished() || task.isEnded() || task.isUnconfirmed()) {
                   return false;
               }
               break;
@@ -190,5 +216,26 @@ Ext.define('Editor.model.admin.User', {
       }
       // @todo should we move the rights into the model?
       return isAllowed;
-  }
+  },
+    /**
+     * retrieves the id's of the customers bound to the user
+     * @returns {int[]}
+     */
+    getCustomerIds: function(){
+        var customers = Editor.util.Util.removeLeadingTrailingCommas(this.get('customers'));
+        return Editor.util.Util.integerizeArray(customers.split(','));
+    },
+    /**
+     * @returns {Boolean}
+     */
+    isClientRestricted: function(){
+        return Editor.data.app.user.isClientRestricted;
+    },
+    /**
+     * This will retrieve the restricted customer-ids in case the current authenticated user is client-restricted
+     * @returns {int[]}
+     */
+    getRestrictedClientIds: function(){
+        return Editor.util.Util.integerizeArray(Editor.data.app.user.restrictedClientIds);
+    }
 });

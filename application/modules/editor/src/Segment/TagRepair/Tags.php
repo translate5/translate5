@@ -28,6 +28,8 @@ END LICENSE AND COPYRIGHT
 
 namespace MittagQI\Translate5\Segment\TagRepair;
 
+use editor_TagSequence;
+
 /**
  * General Extension to use te FieldTags Model for a general Tag-Repair (not specific for internal or xliff tags)
  * The (nested) tags of a text (segment) will be converted to a sequence of simple image-tags representing the opening/closing tags of the original markup
@@ -46,7 +48,7 @@ namespace MittagQI\Translate5\Segment\TagRepair;
  * @method Tag unparseHtml(string $html)
  * @property Tag[] $tags
  */
-class Tags extends \editor_TagSequence {
+class Tags extends editor_TagSequence {
 
     /**
      * @var bool
@@ -148,7 +150,7 @@ class Tags extends \editor_TagSequence {
             }
             return $rendered;
 
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             // reset captured errors
             $this->captureErrors = false;
             if(self::DO_DEBUG && count($this->capturedErrors) > 0) {

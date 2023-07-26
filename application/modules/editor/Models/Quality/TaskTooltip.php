@@ -105,9 +105,7 @@ class editor_Models_Quality_TaskTooltip extends editor_Models_Quality_AbstractVi
                     '<br>'
                     . $this->getStatusSymbol('error')
                     . ' '
-                    . $this->translate->_(
-                        'Alle Fehler der folgenden Gruppe ODER setzen Sie sie auf “falscher Fehler”'
-                    );
+                    . $this->translate->_(editor_Segment_Quality_Provider::CATEGORY_CRITICAL_ERROR_TOOLTIP);
             }
             $html .= '</td></tr>';
         }

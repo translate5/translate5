@@ -165,7 +165,7 @@ class Editor_Controller_Helper_TaskUserInfo extends Zend_Controller_Action_Helpe
                 $userPref->loadByTaskUserAndStep(
                     $taskguid,
                     $this->workflow->getName(),
-                    ZfExtended_Authentication::getInstance()->getUser()->getUserGuid(),
+                    ZfExtended_Authentication::getInstance()->getUserGuid(),
                     $row['userStep']
                 );
 

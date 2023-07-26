@@ -44,6 +44,13 @@ class editor_Models_Config extends ZfExtended_Models_Config {
     const CONFIG_LEVEL_TASKIMPORT = 8; // editable in system & customer & task config, freezed thereafter (not editable anymore after import)
     const CONFIG_LEVEL_TASK = 16; // editable in system & customer & task config, throughout the lifetime of a task
     const CONFIG_LEVEL_USER     = 32; // TODO FIXME: add doc about frontend-visibility
+
+    private const CUSTOMER_CONFIG_LEVELS = [
+        self::CONFIG_LEVEL_CUSTOMER,
+        self::CONFIG_LEVEL_TASK,
+        self::CONFIG_LEVEL_TASKIMPORT,
+        self::CONFIG_LEVEL_USER
+    ];
     
     // system 1 (default), instance 2, customer 4, task 8 , user 16
     protected $configLabel=[
@@ -176,7 +183,8 @@ class editor_Models_Config extends ZfExtended_Models_Config {
      * @param array $dbResults
      * @return array
      */
-    public function mergeTaskValues(string $taskGuid, array $dbResults=[]):array {
+    public function mergeTaskValues(string $taskGuid, array $dbResults=[], bool $excludeMaps = true):array
+    {
         $task = ZfExtended_Factory::get('editor_Models_Task');
         /* @var $task editor_Models_Task */
         $task->loadByTaskGuid($taskGuid);
@@ -189,7 +197,12 @@ class editor_Models_Config extends ZfExtended_Models_Config {
         //on customer level, we can override task specific config. With this, those overrides will be loaded
         //and used as base value in task config window
         //configs with customer level will be marked as readonly on the frontend
-        $customerBase = $this->mergeCustomerValues($task->getCustomerId(), $dbResults);
+        $customerBase = $this->mergeCustomerValues(
+            $task->getCustomerId(),
+            $dbResults,
+            self::CUSTOMER_CONFIG_LEVELS,
+            $excludeMaps
+        );
         array_walk($customerBase, function(&$r) use($taskGuid, $isImportDisabled){
             $r['taskGuid'] = $taskGuid;
             //it is readonly when the config is import config and the task is not in import state
@@ -218,26 +231,30 @@ class editor_Models_Config extends ZfExtended_Models_Config {
      * @return array
      */
     public function mergeCustomerValues(
-            int $customerId,
-            array $dbResults=[],
-            array $level = [self::CONFIG_LEVEL_CUSTOMER,self::CONFIG_LEVEL_TASK,self::CONFIG_LEVEL_TASKIMPORT]
-        ):array {
-        
-        if(empty($dbResults)){
+        int $customerId,
+        array $dbResults=[],
+        array $level = self::CUSTOMER_CONFIG_LEVELS,
+        bool $excludeMaps = true
+    ):array {
+        if (empty($dbResults)) {
             //include task levels so we can set the baase values for task config
             //do not load all map config types (usualy default state) since no config editor for the frontend
             //is available for now
-            $dbResults = $this->loadByLevel($level,[ZfExtended_DbConfig_Type_CoreTypes::TYPE_MAP]);
+            $dbResults = $this->loadByLevel(
+                $level,
+                $excludeMaps ? [ZfExtended_DbConfig_Type_CoreTypes::TYPE_MAP] : []
+            );
         }
-        array_walk($dbResults, function(&$r) use($customerId){
+        array_walk($dbResults, function (&$r) use ($customerId) {
             $r['customerId'] = $customerId;
         });
         $s = $this->db->select()
             ->setIntegrityCheck(false)
             ->from('LEK_customer_config')
-            ->where('customerId = ?',$customerId);
+            ->where('customerId = ?', $customerId);
         $userResults = $this->db->fetchAll($s)->toArray();
-        return $this->mergeConfig($userResults, $dbResults,self::CONFIG_SOURCE_CUSTOMER);
+
+        return $this->mergeConfig($userResults, $dbResults, self::CONFIG_SOURCE_CUSTOMER);
     }
     
     /***
