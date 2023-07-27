@@ -798,7 +798,8 @@ class Editor_SegmentController extends ZfExtended_RestController
         $segment->load((int) $this->_getParam('id'));
 
         // Get desired locale either from request or from session
-        $desiredLocale = $this->getRequest()->getParam('locale') ?: (new Zend_Session_Namespace())->locale;
+        $desiredLocale = $this->getRequest()->getParam('locale')
+            ?: ZfExtended_Authentication::getInstance()->getUser()->getLocale();
 
         // Get locale
         $locale = ZfExtended_Utils::getLocale($desiredLocale);
