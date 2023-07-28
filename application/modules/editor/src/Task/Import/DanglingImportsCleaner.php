@@ -58,7 +58,7 @@ use Zend_Registry;
 use ZfExtended_Factory;
 use ZfExtended_Models_Entity_NotFoundException;
 use ZfExtended_Models_Worker;
-use ZfExtended_Worker_TriggerByHttp;
+use MittagQI\ZfExtended\Worker\Trigger\Factory as WorkerTriggerFactory;
 
 class DanglingImportsCleaner
 {
@@ -100,8 +100,7 @@ class DanglingImportsCleaner
                 $worker->defuncRemainingOfGroup([$finalStepWorker], true, true);
                 $worker->wakeupScheduled();
 
-                $trigger = ZfExtended_Factory::get(ZfExtended_Worker_TriggerByHttp::class);
-                $trigger->triggerWorker($worker->getId(), $worker->getHash());
+                WorkerTriggerFactory::create()->triggerWorker($worker->getId(), $worker->getHash());
             } catch (ZfExtended_Models_Entity_NotFoundException) {
                 //do nothing
             }

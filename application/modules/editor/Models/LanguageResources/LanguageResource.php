@@ -68,6 +68,17 @@ class editor_Models_LanguageResources_LanguageResource extends ZfExtended_Models
     
     protected $dbInstanceClass = 'editor_Models_Db_LanguageResources_LanguageResource';
     protected $validatorInstanceClass = 'editor_Models_Validator_LanguageResources_LanguageResource';
+
+    /**
+     * Language-resources must be filtered by role-driven restrictions, what must be done via our customer-association
+     * This differs from "customerIds" in the controller !
+     */
+    protected ?array $clientAccessRestriction = ['field' => 'customerId', 'type' => 'list', 'assoc' => [
+        'table' => 'LEK_languageresources_customerassoc',
+        'foreignKey' => 'languageResourceId',
+        'localKey' => 'id',
+        'searchField' => 'customerId'
+    ]];
     
     
     /***
@@ -280,7 +291,7 @@ class editor_Models_LanguageResources_LanguageResource extends ZfExtended_Models
      * @return array|array
      */
     public function loadByUserCustomerAssocs($serviceNames=array(),$sourceLang=array(),$targetLang=array()){
-        $customers = ZfExtended_Authentication::getInstance()->getUser()->getCustomersArray();
+        $customers = ZfExtended_Authentication::getInstance()->getUser()?->getCustomersArray();
         if(!empty($customers)){
             
             //each sdlcloud language resource can have only one language combination

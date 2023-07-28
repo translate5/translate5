@@ -87,6 +87,7 @@
 		}		
 	],
 	"require" : {
+		"ext-xml": "*",
 		"ext-simplexml": "*",
 		"ext-libxml": "*",
 		"ext-pdo": "*",

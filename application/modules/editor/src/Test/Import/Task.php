@@ -52,6 +52,8 @@ final class Task extends Resource
     public int $wordCount = 666;
     public int $autoStartImport = 1;
     public string $orderdate;
+    public string $foreignId;
+    public string $foreignName;
     private ?string $_uploadFolder = null;
     private ?array $_uploadFiles = null;
     private ?array $_uploadData = null;
@@ -199,8 +201,8 @@ final class Task extends Resource
      */
     public function addTaskConfig(string $configName, string $configValue): Task
     {
-        if(!str_starts_with($configName, 'runtimeOptions.')){
-            $configName = 'runtimeOptions.'.ltrim($configName, '.');
+        if (!str_starts_with($configName, 'runtimeOptions.')) {
+            $configName = 'runtimeOptions.' . ltrim($configName, '.');
         }
         $this->_importConfigs[$configName] = $configValue;
         return $this;
@@ -224,7 +226,7 @@ final class Task extends Resource
      */
     public function removeTaskConfig(string $configName): Task
     {
-        if(array_key_exists($configName, $this->_importConfigs)){
+        if (array_key_exists($configName, $this->_importConfigs)) {
             unset($this->_importConfigs[$configName]);
         }
         return $this;
@@ -371,8 +373,8 @@ final class Task extends Resource
         $this->applyResult($api->getTask());
 
         // set usage-mode if setup
-        if($this->_usageMode !== null){
-            $api->putJson('editor/task/'.$this->getId(), array('usageMode' => $this->_usageMode));
+        if ($this->_usageMode !== null) {
+            $api->putJson('editor/task/' . $this->getId(), array('usageMode' => $this->_usageMode));
         }
         // if testlector shall be loged in after setup, we add him to the task automatically
         if ($config->getLogin() === 'testlector') {
@@ -621,12 +623,13 @@ final class Task extends Resource
 
     /**
      * @param Helper $api
-     * @return void
+     * @return mixed
      * @throws Exception
      * @throws Zend_Http_Client_Exception
      */
-    public function getAvaliableResources(Helper $api){
-        return $api->getJson('editor/languageresourcetaskassoc',[
+    public function getAvaliableResources(Helper $api): mixed
+    {
+        return $api->getJson('editor/languageresourcetaskassoc', [
             'filter' => '[{"operator":"eq","value":"' . $this->getTaskGuid() . '","property":"taskGuid"}]'
         ]);
     }

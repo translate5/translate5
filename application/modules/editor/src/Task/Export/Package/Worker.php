@@ -105,7 +105,7 @@ class Worker extends editor_Models_Export_Worker
         $parameter = [
             'diff' => $diff,
             self::PARAM_EXPORT_FOLDER => $exportFolder,
-            'userGuid' => ZfExtended_Authentication::getInstance()->getUser()->getUserGuid()
+            'userGuid' => ZfExtended_Authentication::getInstance()->getUserGuid()
         ];
         $this->init($task->getTaskGuid(), $parameter);
         return $exportFolder;

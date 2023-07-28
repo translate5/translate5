@@ -61,6 +61,7 @@ class Cronjobs
      */
     public function periodical(): void
     {
+        //FIXME exception handling here, encaps each "job" and log exception, otherwise it just bubbles to the CLI output
         self::$running = true;
         /* @var $gc ZfExtended_Resource_GarbageCollector */
         $gc = $this->bootstrap->getPluginResource(ZfExtended_Resource_GarbageCollector::class);

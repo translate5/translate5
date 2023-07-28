@@ -172,7 +172,7 @@ Ext.define('Editor.view.admin.user.Grid', {
           dataIndex: 'roles',
           stateId: 'roles',
           renderer: function(v) {
-              if(!v || v==""){
+              if(!v || v === ""){
                   return "";
               }
               return Ext.Array.map(v.split(','), function(item){

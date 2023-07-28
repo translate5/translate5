@@ -384,7 +384,7 @@ The German and the English Comment tag of the string must be imported as comment
         //define the fieldnames where the data should be stored
         $sourceName = $this->segmentFieldManager->getFirstSourceName();
         $targetName = $this->segmentFieldManager->getFirstTargetName();
-        
+
         $textId = $this->xmlparser->getAttribute($opener['attributes'], 'id');
         $lengthId = $this->xmlparser->getAttribute($opener['attributes'], 'len');
 
@@ -423,8 +423,15 @@ The German and the English Comment tag of the string must be imported as comment
      * @return editor_Models_Import_FileParser_SegmentAttributes
      */
     protected function parseSegmentAttributes($textId, $lengthId): editor_Models_Import_FileParser_SegmentAttributes {
-        $segmentAttributes = $this->createSegmentAttributes($textId);
-        $this->setMid($textId);
+
+        $transunitHash = $this->transunitHash->create($this->sourceFileId, $textId);
+
+        $this->setMidWithHash($transunitHash,$textId);
+
+        $segmentAttributes = $this->createSegmentAttributes($this->_mid);
+        $segmentAttributes->transunitHash = $transunitHash;
+        $segmentAttributes->transunitId = $textId;
+        $segmentAttributes->mrkMid = $textId;
         $segmentAttributes->transunitId = $textId;
         $segmentAttributes->locked = $this->currentIsReadOnly;
         $segmentAttributes->editable = !$this->currentIsReadOnly;

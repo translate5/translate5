@@ -76,7 +76,8 @@ Ext.define('Editor.view.admin.user.AddWindow', {
         languageInfo: '#UT#Beim Import von Aufgaben werden "Editor" Benutzer mit den passenden Sprachen <a href="http://confluence.translate5.net/pages/viewpage.action?pageId=557164" target="_blank" title="mehr Info">automatisch der Aufgabe zugewiesen</a>.',
         localeLabel:'#UT#Benutzersprache',
         parentUserLabel: '#UT#Übergeordneter Benutzer',
-        bottomOpenIdNoEditInfo: '#UT# ⁴ Der Benutzer kann nicht bearbeitet werden. Dieser Benutzer wird von translate5 nach der OpenID-Authentifizierung automatisch erstellt.'
+        bottomOpenIdNoEditInfo: '#UT# ⁴ Der Benutzer kann nicht bearbeitet werden. Dieser Benutzer wird von translate5 nach der OpenID-Authentifizierung automatisch erstellt.',
+        clientPmSubRoles: '#UT#Zugängliche Managementübersichten für Rolle PM',
     },
     modal : true,
     layout:'fit',
@@ -112,7 +113,9 @@ Ext.define('Editor.view.admin.user.AddWindow', {
                 boxLabel: value.label,
                 name: 'roles_helper',
                 value: key,
-                handler: me.roleCheckChange
+                handler: function(box, checked){
+                    me.roleCheckChange(box, checked);
+                }
             });
         });
         Ext.Object.each(Editor.data.l10n.translations, function(id,value) {
@@ -227,6 +230,17 @@ Ext.define('Editor.view.admin.user.AddWindow', {
                                 autoEl: {
                                     tag: 'div',
                                     'data-qtip': Ext.String.htmlEncode(me.strings.bottomRoleInfo)
+                                }
+                            },{
+                                xtype: 'tagfield',
+                                itemId: 'clientPmSubRoles',
+                                fieldLabel: me.strings.clientPmSubRoles,
+                                queryMode: 'local',
+                                dataIndex: 'clientPmSubRoles',
+                                store: Editor.data.app.clientPmSubRoles,
+                                hidden: true,
+                                listeners: {
+                                    change: me.clientPmSubRoleChange
                                 }
                             },{
                                 xtype: 'combo',
@@ -364,31 +378,82 @@ Ext.define('Editor.view.admin.user.AddWindow', {
      */
     roleCheckChange: function(box, checked) {
         var roles = [],
+            form = box.up('form'),
             boxes = box.up('#rolesGroup').query('checkbox[checked=true]');
-        Ext.Array.forEach(boxes, function(box){
-            roles.push(box.initialConfig.value);
+        Ext.Array.forEach(boxes, function(item){
+            roles.push(item.initialConfig.value);
         });
-        box.up('form').down('hidden[name="roles"]').setValue(roles.join(','));
+        if(this.isClientPm(roles)){
+            // if the client-pm role is checked, we show the client-pm sub-roles and add their value
+            var tagfield = form.down('#clientPmSubRoles');
+            // if a new user is set the first time to be a clientPm we add all sub-roles for convenience
+            if(!tagfield.isClientPmInited && !Number.isInteger(form.getRecord().get('id'))){
+                var item, allSubRoles = [];
+                for(item of Editor.data.app.clientPmSubRoles){
+                    allSubRoles.push(item[0]);
+                }
+                tagfield.setValue(allSubRoles);
+                // form.getRecord().set('clientPmSubRoles', allSubRoles, { silent: true, commit: false });
+                tagfield.isClientPmInited = true;
+            }
+            roles = roles.concat(tagfield.getValue());
+            tagfield.setHidden(false);
+        } else {
+            form.down('#clientPmSubRoles').setHidden(true);
+        }
+        form.down('hidden[name="roles"]').setValue(roles.join(','));
+    },
+    /**
+     * merge and save the checked roles AND the client-pm sub-roles into the hidden roles field
+     * @param {Ext.form.field.Tag} tagfield
+     * @param {Array} newValue
+     */
+    clientPmSubRoleChange: function(tagfield, newValue) {
+        var roles = [],
+            form = tagfield.up('form'),
+            boxes = form.down('#rolesGroup').query('checkbox[checked=true]');
+        Ext.Array.forEach(boxes, function(item){
+            roles.push(item.initialConfig.value);
+        });
+        roles = roles.concat(newValue);
+        form.down('hidden[name="roles"]').setValue(roles.join(','));
     },
     /**
      * loads the record into the form, does set the role checkboxes according to the roles value
      * @param record
      */
     loadRecord: function(record) {
-        var me=this,
-            form=me.down('form'),
-            roles = record.get('roles').split(',');
+        var me = this,
+            form = me.down('form'),
+            roles = record.getMainRoles();
+        // we set the subroles just for the lifetime of the form as "real" data-values
+        record.set('clientPmSubRoles', record.getClientPmSubRoles(), { silent: true, commit: false });
+
         form.loadRecord(record);
-        Ext.Array.forEach(this.query('#rolesGroup checkbox'), function(item) {
+
+        Ext.Array.forEach(me.query('#rolesGroup checkbox'), function(item) {
             item.setValue(Ext.Array.indexOf(roles, item.initialConfig.value) >= 0);
         });
 
-        if(form.isDisabled() && record.get('openIdIssuer')!=''){
+        if(form.isDisabled() && record.get('openIdIssuer') !== ''){
             form.add({
                 xtype: 'container',
-                html: '<p>'+me.strings.bottomOpenIdNoEditInfo+'</p><p style="margin-top:5px;margin-left:5px;"></p>',
+                html: '<p>'+me.strings.bottomOpenIdNoEditInfo + '</p><p style="margin-top:5px;margin-left:5px;"></p>',
                 dock : 'bottom'
             });
         }
+        // set the subroles-tagfield visible if the user is a clientPm
+        if(me.isClientPm(roles)){
+            me.down('#clientPmSubRoles').setHidden(false);
+        }
+    },
+
+    /**
+     * Checks wether the users roles represent a clientPm
+     * @param {Array} roles
+     * @returns {boolean}
+     */
+    isClientPm: function(roles) {
+        return !roles.includes('pm') && roles.includes('clientpm');
     }
 });

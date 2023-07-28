@@ -276,17 +276,41 @@ Modified values are shown bold in the simple listing.');
             $this->io->text($out);
         }
 
-        if ((int) $configData['level'] >= $config::CONFIG_LEVEL_INSTANCE) {
+        if ((int) $configData['level'] >= $config::CONFIG_LEVEL_CUSTOMER) {
             $db = new \editor_Models_Db_CustomerConfig();
             $customerConfig = $db->fetchAll($sql = $db
                 ->select()->setIntegrityCheck(false)
                 ->from($db, ['value'])
-                ->joinLeft('LEK_customer', 'LEK_customer.id = LEK_customer_config.customerId', ['name', 'number', ''])
+                ->joinLeft('LEK_customer', 'LEK_customer.id = LEK_customer_config.customerId', ['name', 'number'])
                 ->where('LEK_customer_config.name = ?', $name)
             );
             $perCustomer = $customerConfig->toArray();
-            if (!empty($perCustomer)) {
+            if (empty($perCustomer)) {
+                $this->io->info('Configuration NOT overwritten by a Customer.');
+            } else {
                 $this->io->section('Configuration overwritten per Customer: ');
+                $this->writeTable($perCustomer);
+            }
+        }
+
+        if ((int) $configData['level'] >= $config::CONFIG_LEVEL_TASKIMPORT) {
+            $db = new \editor_Models_Db_TaskConfig();
+            $customerConfig = $db->fetchAll($sql = $db
+                ->select()->setIntegrityCheck(false)
+                ->from($db, ['value'])
+                ->joinLeft(
+                    'LEK_task',
+                    'LEK_task.taskGuid = LEK_task_config.taskGuid',
+                    ['id', 'taskName']
+                )
+                ->where('LEK_task_config.name = ?', $name)
+                ->where('LEK_task_config.value != ?', $configData['value'])
+            );
+            $perCustomer = $customerConfig->toArray();
+            if (empty($perCustomer)) {
+                $this->io->info('Configuration identical in all tasks.');
+            } else {
+                $this->io->section('Configuration set different on task: ');
                 $this->writeTable($perCustomer);
             }
         }

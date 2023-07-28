@@ -143,13 +143,12 @@ class editor_SessionController extends ZfExtended_SessionController {
             $taskUserAssoc->save();
         }
         
-        $user = ZfExtended_Factory::get('ZfExtended_Models_User');
+        $user = ZfExtended_Factory::get(ZfExtended_Models_User::class);
         /* @var $user ZfExtended_Models_User */
         $user->loadByGuid($taskUserAssoc->getUserGuid());
         $this->setLocale(new Zend_Session_Namespace(), $user);
 
-        $task = ZfExtended_Factory::get('editor_Models_Task');
-        /* @var $task editor_Models_Task */
+        $task = ZfExtended_Factory::get(editor_Models_Task::class);
         $task->loadByTaskGuid($taskUserAssoc->getTaskGuid());
         
         $auth = ZfExtended_Authentication::getInstance();
@@ -157,12 +156,11 @@ class editor_SessionController extends ZfExtended_SessionController {
 
         $userSession = new Zend_Session_Namespace('user');
 
-        $session = ZfExtended_Factory::get('ZfExtended_Session');
-        /* @var $session ZfExtended_Session */
+        $session = ZfExtended_Factory::get(ZfExtended_Session::class);
         // remove the old session (if exist) for the auth-hash user
         $session->cleanForUser($userSession->data->id);
 
-        ZfExtended_Models_LoginLog::addSuccess($auth, "authhash");
+        ZfExtended_Models_LoginLog::addSuccess($auth, 'authhash');
         
         $mv = ZfExtended_Factory::get('editor_Models_Segment_MaterializedView');
         /* @var $mv editor_Models_Segment_MaterializedView */

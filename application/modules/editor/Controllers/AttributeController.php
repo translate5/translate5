@@ -98,7 +98,7 @@ class editor_AttributeController extends ZfExtended_RestController
         // Else we should apply collectionsIds-restriction everywhere, so get accessible collections
         $this->collectionIds =
             $this->isAllowed('editor_term', 'anyCollection')
-                ?: $termCollection->getAccessibleCollectionIds(editor_User::instance()->getModel());
+                ?: $termCollection->getAccessibleCollectionIds(ZfExtended_Authentication::getInstance()->getUser());
     }
 
     /**

@@ -447,8 +447,33 @@ Ext.define('Editor.util.Util', {
             }
             // is allowed to edit a task
             return Editor.app.authenticatedUser.isAllowed('editorEditTask',task) && task.isNotErrorImportPendingCustom();
+        },
+
+        /**
+         * Helper to guarantee an array of id's are all integers
+         * @param {string[]} values
+         * @returns {int[]}
+         */
+        integerizeArray: function(values){
+            var ints = [];
+            Ext.Array.each(values, function(id){
+                ints.push(parseInt(id));
+            });
+            return ints;
+        },
+
+        /**
+         * @param {string} value
+         * @returns {string}
+         */
+        removeLeadingTrailingCommas: function(value){
+            while(value.substring(0, 1) === ','){
+                value = value.substring(1);
+            }
+            while(value.substring(value.length - 1, value.length) === ','){
+                value = value.substring(0, value.length - 1);
+            }
+            return value;
         }
-
-
     }
 });

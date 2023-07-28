@@ -1280,6 +1280,10 @@
                 <source>Benutzer endgültig löschen?</source>
                 <target>Benutzer endgültig löschen?</target>
             </trans-unit>
+            <trans-unit id='U2llIHNpbmQgbmljaHQgYmVyZWNodGlndCwgZGllc2VuIEJlbnV0emVyIHp1IGVudGZlcm5lbi4='>
+                <source>Sie sind nicht berechtigt, diesen Benutzer zu entfernen.</source>
+                <target>Sie sind nicht berechtigt, diesen Benutzer zu entfernen.</target>
+            </trans-unit>
             <trans-unit id='U29sbCBkZXIgZ2V3w6RobHRlIEJlbnV0emVyICJ7MH0iIHdpcmtsaWNoIGVuZGfDvGx0aWcgZ2Vsw7ZzY2h0IHdlcmRlbj8='>
                 <source>Soll der gewählte Benutzer "{0}" wirklich endgültig gelöscht werden?</source>
                 <target>Soll der gewählte Benutzer "{0}" wirklich endgültig gelöscht werden?</target>
@@ -4370,15 +4374,19 @@
                 <target>Editor</target>
             </trans-unit>
             <trans-unit id='UG0='>
-                <source>PM</source>
-                <target>PM</target>
+                <source>Pm</source>
+                <target>PM (alle Kunden)</target>
+            </trans-unit>
+            <trans-unit id='Q2xpZW50cG0='>
+                <source>Clientpm</source>
+                <target>PM (ausgewählte Kunden)</target>
             </trans-unit>
             <trans-unit id='QWRtaW4='>
                 <source>Admin</source>
                 <target>Admin</target>
             </trans-unit>
             <trans-unit id='QXBp'>
-                <source>API</source>
+                <source>Api</source>
                 <target>API</target>
             </trans-unit>
             <trans-unit id='UmVmZXJlbnpkYXRlaWVuIHZvcmhhbmRlbg=='>
@@ -6105,11 +6113,11 @@ Im Projektportal {portalLink} wurde die Aufgabe
             </trans-unit>
             <trans-unit id='VGVybVNlYXJjaA=='>
                 <source>TermSearch</source>
-                <target>Term-Suche</target>
+                <target>Terme suchen</target>
             </trans-unit>
             <trans-unit id='VGVybUN1c3RvbWVyU2VhcmNo'>
                 <source>TermCustomerSearch</source>
-                <target>Term-Suche</target>
+                <target>Terme suchen</target>
             </trans-unit>
             <trans-unit id='VGVybVByb3Bvc2Vy'>
                 <source>TermProposer</source>
@@ -6125,11 +6133,11 @@ Im Projektportal {portalLink} wurde die Aufgabe
             </trans-unit>
             <trans-unit id='VGVybVBN'>
                 <source>TermPM</source>
-                <target>Term PM</target>
+                <target>Term-PM (ausgewählte Kunden)</target>
             </trans-unit>
             <trans-unit id='VGVybVBNX2FsbENsaWVudHM'>
                 <source>TermPM_allClients</source>
-                <target>Term PM (alle Kunden)</target>
+                <target>Term-PM (alle Kunden)</target>
             </trans-unit>
             <trans-unit id='T3BlbklEIElzc3Vlcg=='>
                 <source>OpenID Issuer</source>
@@ -8192,9 +8200,29 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
                 <source>Der Benutzer hat das Recht, die Sprachressourcen in InstantTranslate &amp; TermPortal zu nutzen, die denselben Kunden zugeordnet sind, denen der Benutzer hier zugeordnet ist.</source>
                 <target>Der Benutzer hat das Recht, die Sprachressourcen in InstantTranslate &amp; TermPortal zu nutzen, die denselben Kunden zugeordnet sind, denen der Benutzer hier zugeordnet ist.</target>
             </trans-unit>
-            <trans-unit id='S3VuZGVuIEluc3RhbnRUcmFuc2xhdGUgJmFtcDsgVGVybVBvcnRhbA=='>
-                <source>Kunden InstantTranslate &amp; TermPortal</source>
-                <target>Kunden InstantTranslate &amp; TermPortal</target>
+            <trans-unit id='WnVnZXdpZXNlbmUgS3VuZGVuIChCZXRyaWZmdCBSb2xsZW4gUE0sIEluc3RhbnRUcmFuc2xhdGUgdW5kIFRlcm1Qb3J0YWwp'>
+                <source>Zugewiesene Kunden (Betrifft Rollen PM, InstantTranslate und TermPortal)</source>
+                <target>Zugewiesene Kunden (Betrifft Rollen PM, InstantTranslate und TermPortal)</target>
+            </trans-unit>
+            <trans-unit id='WnVnw6RuZ2xpY2hlIE1hbmFnZW1lbnTDvGJlcnNpY2h0ZW4gZsO8ciBSb2xsZSBQTQ=='>
+                <source>Zugängliche Managementübersichten für Rolle PM</source>
+                <target>Zugängliche Managementübersichten für Rolle PM</target>
+            </trans-unit>
+            <trans-unit id='Y2xpZW50cG1fcHJvamVjdHM='>
+                <source>clientpm_projects</source>
+                <target>Projekte</target>
+            </trans-unit>
+            <trans-unit id='Y2xpZW50cG1fbGFuZ3Jlc291cmNlcw=='>
+                <source>clientpm_langresources</source>
+                <target>Sprachressourcen</target>
+            </trans-unit>
+            <trans-unit id='Y2xpZW50cG1fY3VzdG9tZXJz'>
+                <source>clientpm_customers</source>
+                <target>Kunden</target>
+            </trans-unit>
+            <trans-unit id='Y2xpZW50cG1fdXNlcnM='>
+                <source>clientpm_users</source>
+                <target>Benutzer</target>
             </trans-unit>
             <trans-unit id='QmVudXR6ZXIgbmFjaCBJbXBvcnQgYmVuYWNocmljaHRpZ2Vu'>
                 <source>Benutzer nach Import benachrichtigen</source>
@@ -8387,6 +8415,10 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
             <trans-unit id='U3ByYWNocmVzc291cmNlICJ7MH0iIGdlbMO2c2NodC4='>
                 <source>Sprachressource "{0}" gelöscht.</source>
                 <target>Sprachressource "{0}" gelöscht.</target>
+            </trans-unit>
+            <trans-unit id='U2llIHNpbmQgbmljaHQgYmVyZWNodGlndCwgZGllc2UgU3ByYWNocmVzc291cmNlIHp1IGVudGZlcm5lbi4='>
+                <source>Sie sind nicht berechtigt, diese Sprachressource zu entfernen.</source>
+                <target>Sie sind nicht berechtigt, diese Sprachressource zu entfernen.</target>
             </trans-unit>
             <trans-unit id='QXVmZ2FiZSAiezB9IiBnZWzDtnNjaHQ='>
                 <source>Aufgabe "{0}" gelöscht</source>
@@ -9013,6 +9045,46 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
             <trans-unit id='PGI+UXVlbGxzcHJhY2hlIGlzdCBkaWUgWmllbHNwcmFjaGU8L2I+PGJyLz5RdWVsbHNwcmFjaGUgZ2xlaWNodCBkZXIgWmllbHNwcmFjaGUsIGRlc3dlZ2VuIGthbm4gZGVyIGVpbmdlZ2ViZW5lIFRleHQgbmljaHQgw7xiZXJzZXR6dCB3ZXJkZW4u'>
                 <source><b>Quellsprache ist die Zielsprache</b><br/>Quellsprache gleicht der Zielsprache, deswegen kann der eingegebene Text nicht übersetzt werden.</source>
                 <target><b>Quellsprache ist die Zielsprache</b><br/>Quellsprache gleicht der Zielsprache, deswegen kann der eingegebene Text nicht übersetzt werden.</target>
+            </trans-unit>
+            <trans-unit id='QmVzY2hyZWlidW5n'>
+                <source>Beschreibung</source>
+                <target>Beschreibung</target>
+            </trans-unit>
+            <trans-unit id='VmVyZmFsbHNkYXR1bQ=='>
+                <source>Verfallsdatum</source>
+                <target>Verfallsdatum</target>
+            </trans-unit>
+            <trans-unit id='VG9rZW4gZXJzdGVsbGVu'>
+                <source>Token erstellen</source>
+                <target>Token erstellen</target>
+            </trans-unit>
+            <trans-unit id="TMO2c2NoZW4gZGVzIFRva2VucyBiZXN0w6R0aWdlbg==">
+                <source>Löschen des Tokens bestätigen</source>
+                <target>Löschen des Tokens bestätigen</target>
+            </trans-unit>
+            <trans-unit id="U2luZCBTaWUgc2ljaGVyLCBkYXNzIFNpZSBkYXMgVG9rZW4gbMO2c2NoZW4gbcO2Y2h0ZW4/">
+                <source>Sind Sie sicher, dass Sie das Token löschen möchten?</source>
+                <target>Sind Sie sicher, dass Sie das Token löschen möchten?</target>
+            </trans-unit>
+            <trans-unit id='RGVyIFp1Z3JpZmZzdG9rZW4gd2lyZCBudXIgZWlubWFsIGFuZ2V6ZWlndC4gU2llIHdlcmRlbiBuaWNodCBnZXNwZWljaGVydCB1bmQga8O2bm5lbiBuaWNodCBhYmdlcnVmZW4gd2VyZGVuLiBTdGVsbGVuIFNpZSBzaWNoZXIsIGRhc3MgU2llIGVzIGFuIGVpbmVtIHNpY2hlcmVuIE9ydCBhdWZiZXdhaHJlbi48YnIvPjxici8+PGI+ezB9PC9iPg=='>
+                <source>Der Zugriffstoken wird nur einmal angezeigt. Stellen Sie sicher, dass Sie es an einem sicheren Ort aufbewahren<br/><b>{0}</b></source>
+                <target>Der Zugriffstoken wird nur einmal angezeigt. Stellen Sie sicher, dass Sie es an einem sicheren Ort aufbewahren<br/><b>{0}</b></target>
+            </trans-unit>
+            <trans-unit id='RGFzIEFibGF1ZmRhdHVtIGRhcmYgbmljaHQga8O8cnplciBzZWluIGFscyBoZXV0ZQ=='>
+                <source>Das Ablaufdatum darf nicht kürzer sein als heute</source>
+                <target>Expiration date can not be less that today</target>
+            </trans-unit>
+            <trans-unit id='RGllIFBhcmFtZXRlciAidXNlcklkIiB1bmQgImRlc2NyaXB0aW9uIiBzaW5kIGVyZm9yZGVybGljaC4='>
+                <source>Die Parameter "userId" und "description" sind erforderlich.</source>
+                <target>Die Parameter "userId" und "description" sind erforderlich.</target>
+            </trans-unit>
+            <trans-unit id='RG9wcGVsa2xpY2sgenVtIGJlYXJiZWl0ZW4='>
+                <source>Doppelklick zum bearbeiten</source>
+                <target>Doppelklick zum bearbeiten</target>
+            </trans-unit>
+            <trans-unit id='QXBwLVRva2VuIGtvcGllcmVu'>
+                <source>App-Token kopieren</source>
+                <target>App-Token kopieren</target>
             </trans-unit>
         </body>
     </file>

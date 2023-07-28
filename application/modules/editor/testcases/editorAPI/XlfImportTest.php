@@ -26,6 +26,7 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\Segment\TransUnitHash;
 use MittagQI\Translate5\Test\Import\Config;
 
 /**
@@ -41,7 +42,8 @@ class XlfImportTest extends editor_Test_JsonTest {
 
     protected static array $requiredRuntimeOptions = [
         'import.xlf.preserveWhitespace' => 0,
-        'import.fileparser.options.protectTags' => 0,
+        'runtimeOptions.import.xlf.includedSubElementInLengthCalculation' => 0,
+        'import.fileparser.options.protectTags' => 0
     ];
 
     protected static string $setupUserLogin = 'testlector';
@@ -53,6 +55,33 @@ class XlfImportTest extends editor_Test_JsonTest {
             ->addUploadFolder('testfiles')
             ->addTaskConfig('runtimeOptions.autoQA.enableSegmentSpellCheck', '0')
             ->setToEditAfterImport();
+    }
+
+    /***
+     * Check if the creation of transunitHash works.
+     * @return void
+     */
+    public function testTransunitHash()
+    {
+
+        $result = static::api()->getSegments(limit: 1,start: 24);
+        self::assertNotEmpty($result);
+
+        $segment =  $result[0];
+
+        $segmentModel = ZfExtended_Factory::get(editor_Models_Segment::class);
+        $segmentModel->load($segment->id);
+
+        $meta = $segmentModel->meta();
+
+        $configMock = $this->createConfiguredMock(Zend_Config::class, []);
+        $transUnitHash = new TransUnitHash($configMock, $segment->fileId);
+        $hash = $transUnitHash->create(
+            $meta->getSourceFileId(),
+            $meta->getTransunitId() . 'sub-ph-a_3'
+        );
+
+        self::assertEquals($hash,$meta->getTransunitHash());
     }
 
     /**
@@ -201,7 +230,7 @@ class XlfImportTest extends editor_Test_JsonTest {
         $this->checkExport($task, 'editor/task/export/id/'.$task->id, '06-Translate2525-de-en.xlf', 'Translate2525-exporttest.xlf');
         $this->checkExport($task, 'editor/task/export/id/'.$task->id, '09-Translate2786-en-de.xlf', 'Translate2786-exporttest.xlf');
     }
-    
+
     /**
      * tests the export results
      * @param stdClass $task

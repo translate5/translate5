@@ -27,11 +27,13 @@
  */
 namespace Translate5\MaintenanceCli\Command;
 
+use DateTime;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use ZfExtended_Auth_Token_Entity;
+use ZfExtended_Auth_Token_Token;
 use ZfExtended_Factory;
 
 class AuthTokenCommand extends Translate5AbstractCommand {
@@ -62,6 +64,12 @@ class AuthTokenCommand extends Translate5AbstractCommand {
             'Description for the generated token'
         );
 
+        $this->addOption(
+            'expires',
+            null,
+            InputOption::VALUE_OPTIONAL,
+            'Expiration time for the generated token',
+        );
     }
     
     /**
@@ -78,15 +86,21 @@ class AuthTokenCommand extends Translate5AbstractCommand {
 
         $login = $input->getArgument('login');
         $desc = $input->getArgument('desc');
+        $expires = $input->getOption('expires');
 
-        $auth = ZfExtended_Factory::get('ZfExtended_Auth_Token_Entity');
-        /** @var ZfExtended_Auth_Token_Entity $auth */
+        $expirationDate = null;
 
-        $token = $auth->create($login, $desc);
+        $auth = ZfExtended_Factory::get(ZfExtended_Auth_Token_Entity::class);
+        if ($expires) {
+            $expirationDate = new DateTime($expires);
+            if ($expirationDate < new DateTime()) {
+                $this->io->error('Expiration date can not be less that today');
 
-        $this->writeAssoc([
-            'Token' => $token
-        ]);
+                return 1;
+            }
+        }
+
+        $this->writeAssoc(['Token' => $auth->create($login, $desc, $expirationDate)]);
 
         return 0;
     }

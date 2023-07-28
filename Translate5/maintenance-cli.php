@@ -33,8 +33,9 @@ require_once 'vendor/autoload.php';
 const TRANSLATE5_CLI = true;
 
 use Symfony\Component\Console\Application;
-use Translate5\MaintenanceCli\Command\{
-    AuthTokenCommand,
+use Translate5\MaintenanceCli\Command\{AuthTokenCommand,
+    AuthTokenDeleteCommand,
+    AuthTokenListCommand,
     CachePurgeCommand,
     ChangelogCommand,
     ConfigCommand,
@@ -47,6 +48,7 @@ use Translate5\MaintenanceCli\Command\{
     DevelopmentGithookCommand,
     DevelopmentNewModelCommand,
     DevelopmentNewdbchangeCommand,
+    DevelopmentSymlinksCommand,
     DevelopmentTriggerworkflowCommand,
     DevelopmentOkapiBconfNextVersionCommand,
     L10nAddCommand,
@@ -77,6 +79,7 @@ use Translate5\MaintenanceCli\Command\{
     SystemCheckCommand,
     SystemMailtestCommand,
     TaskCleanCommand,
+    TaskImportCommand,
     TaskInfoCommand,
     TaskSkeletonfileCommand,
     TermportalReindexCommand,
@@ -104,6 +107,8 @@ use Translate5\MaintenanceCli\Command\SegmentHistoryCommand;
 $app = new Application('Translate5 CLI Maintenance', '1.0');
 $commands = [
     new AuthTokenCommand(),
+    new AuthTokenListCommand(),
+    new AuthTokenDeleteCommand(),
     new CachePurgeCommand(),
     new ChangelogCommand(),
     new ConfigCommand(),
@@ -139,6 +144,7 @@ $commands = [
     new SystemMailtestCommand(),
     new TaskCleanCommand(),
     new TaskInfoCommand(),
+    new TaskImportCommand(),
     new TaskSkeletonfileCommand(),
     new TermportalReindexCommand(),
     new TermportalDatatypecheckCommand(),
@@ -153,7 +159,7 @@ $commands = [
     new WorkerListCommand(),
     new WorkerQueueCommand(),
 ];
-if(file_exists('.git')) {
+if (file_exists('.git')) {
     $commands[] = new DevelopmentGithookCommand();
     $commands[] = new DevelopmentNewdbchangeCommand();
     $commands[] = new DevelopmentCreatetestCommand();
@@ -173,6 +179,7 @@ if(file_exists('.git')) {
     $commands[] = new \Translate5\MaintenanceCli\Command\TmxFixOpenTM2Command();
     $commands[] = new DevelopmentOkapiBconfNextVersionCommand();
     $commands[] = new DevelopmentLocalServicesCommand();
+    $commands[] = new DevelopmentSymlinksCommand();
 }
 $app->addCommands($commands);
 $app->run();

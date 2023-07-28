@@ -1226,7 +1226,6 @@ class editor_Utils {
         $segment = ZfExtended_Factory::get('editor_Models_Segment');
         return ZfExtended_Utils::emptyString($segment->stripTags($segmentText));
     }
-
 }
 
 class ZfExtended_Mismatch extends ZfExtended_ErrorCodeException {

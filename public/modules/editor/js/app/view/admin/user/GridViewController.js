@@ -33,7 +33,9 @@ Ext.define('Editor.view.admin.user.GridViewController', {
         confirmDeleteTitle: '#UT#Benutzer endgültig löschen?',
         confirmDeleteMsg: '#UT#Soll der gewählte Benutzer "{0}" wirklich endgültig gelöscht werden?',
         confirmResetPwTitle: '#UT#Passwort zurücksetzen?',
-        confirmResetPwMsg: '#UT#Soll das Passwort des Benutzers "{0}" wirklick zurückgesetzt werden?<br /> Der Benutzer wird per E-Mail benachrichtigt, dass er ein neues Passwort anfordern muss.'
+        confirmResetPwMsg: '#UT#Soll das Passwort des Benutzers "{0}" wirklick zurückgesetzt werden?<br /> Der Benutzer wird per E-Mail benachrichtigt, dass er ein neues Passwort anfordern muss.',
+        deletionForbidden: '#UT#Sie sind nicht berechtigt, diesen Benutzer zu entfernen.',
+        error: '#UT#Fehler'
     },
     listen: {
         component: {
@@ -120,6 +122,21 @@ Ext.define('Editor.view.admin.user.GridViewController', {
             case 'delete':
                 if(!me.isAllowed('editorDeleteUser')) {
                     return;
+                }
+
+                // allow deletion of other users for client-restricted users only,
+                // if the bound clients of the edited user are e subset of the customers the client-restricted user is allowed to manage
+                if(Editor.app.authenticatedUser.isClientRestricted()){
+                    var unallowedClientIds = Ext.Array.difference(user.getCustomerIds(), Editor.app.authenticatedUser.getRestrictedClientIds());
+                    if(unallowedClientIds.length > 0){
+                        Ext.Msg.show({
+                            title: this.strings.error,
+                            message: this.strings.deletionForbidden,
+                            buttons: Ext.MessageBox.OK,
+                            icon: Ext.Msg.ERROR
+                        });
+                        return;
+                    }
                 }
                 info = Ext.String.format(msg.confirmDeleteMsg,user.get('firstName')+' '+user.get('surName'));
                 Ext.Msg.confirm(msg.confirmDeleteTitle, info, function(btn){

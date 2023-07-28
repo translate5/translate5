@@ -192,7 +192,7 @@ class LoginController extends ZfExtended_Controllers_Login {
                 $auth->authenticateUser($user);
                 ZfExtended_Models_LoginLog::addSuccess($auth, "openid");
 
-                ZfExtended_Session::updateSession(true,true);
+                ZfExtended_Session::updateSession(true, true, intval($user->getId()));
 
                 $this->initDataAndRedirect();
             }

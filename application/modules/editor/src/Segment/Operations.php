@@ -33,8 +33,8 @@ use editor_Models_Segment;
 use editor_Models_Segment_AutoStates;
 use editor_Models_Segment_Exception;
 use editor_Models_SegmentUserAssoc;
-use editor_User;
 use Zend_Db_Statement_Exception;
+use ZfExtended_Authentication;
 use ZfExtended_Factory;
 use ZfExtended_Models_Entity_Exceptions_IntegrityConstraint;
 use ZfExtended_ValidateException;
@@ -131,7 +131,7 @@ class Operations
         $assoc = ZfExtended_Factory::get('editor_Models_SegmentUserAssoc');
 
         $this->iterateOverFilteredList(callback: function(editor_Models_Segment $segment) use ($assoc, $bookmark){
-            $userGuid = editor_User::instance()->getGuid();
+            $userGuid = ZfExtended_Authentication::getInstance()->getUserGuid();
             if($bookmark) {
                 $assoc->createAndSave($segment->getTaskGuid(), $segment->getId(), $userGuid);
             }
