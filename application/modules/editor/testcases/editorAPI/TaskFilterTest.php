@@ -46,7 +46,7 @@ class TaskFilterTest extends editor_Test_ImportTest {
     }
 
     /**
-     * Test if the task user assoc filters are workign
+     * Test if the task user assoc filters are working
      */
     public function testTaskUserAssocFilters() {
         //test the assigment date of the task
