@@ -173,7 +173,7 @@ final class editor_Plugins_Okapi_Bconf_Segmentation_Srx extends editor_Plugins_O
             // Define as empty array
             $rex[$purpose] = [];
 
-            // Foreach [prev => next] regex pair
+            // Foreach [prev, next] regex pair
             foreach ($rules[$purpose] as $rule) {
 
                 // Build regex that will help to insert delimiter between prev and next
