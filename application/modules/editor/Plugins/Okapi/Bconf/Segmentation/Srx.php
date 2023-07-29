@@ -103,7 +103,9 @@ final class editor_Plugins_Okapi_Bconf_Segmentation_Srx extends editor_Plugins_O
         $srx = json_encode($srx);
         $srx = json_decode($srx, true);
 
-        // Find languagerulename for the given $rfc5646
+        // Check whether any rules exist for the given $rfc5646,
+        // and if yes - get the language name, that is used within srx-file
+        // to map with the segmentation rules
         foreach($srx['body']['maprules']['languagemap'] as $languagemap) {
             $attr = $languagemap['@attributes'];
             if (preg_match('~' . $attr['languagepattern'] . '~', $rfc5646)) {
@@ -116,20 +118,20 @@ final class editor_Plugins_Okapi_Bconf_Segmentation_Srx extends editor_Plugins_O
             return false;
         }
 
-        // Rules array, grouped by type (break="yes|no")
+        // Rules array, grouped by purpose e.g insert/delete delimiter, based on break="yes|no"
         $ruleA = [];
         foreach ($srx['body']['languagerules']['languagerule'] as $languagerule) {
 
-            // If it's not languagerulename we need - skip
+            // If those are rules NOT for the language we need - skip
             if ($languagerule['@attributes']['languagerulename'] !== $languagerulename) {
                 continue;
             }
 
-            // Foreach rule
+            // Else foreach rule
             foreach ($languagerule['rule'] as $rule) {
 
                 // If <beforebreak> and/or <afterbreak> is empty - it's represented as empty array,
-                // so convert to string, else trim newlines
+                // so convert to string, else trim newlines/whitespaces
                 foreach (['beforebreak' => 'prev', 'afterbreak' => 'next'] as $node => $side) {
                     $rule[$side] = is_array($rule[$node]) ? '' : trim($rule[$node]);
                     unset ($rule[$node]);
@@ -156,7 +158,7 @@ final class editor_Plugins_Okapi_Bconf_Segmentation_Srx extends editor_Plugins_O
     }
 
     /**
-     * Split given $text to segments based on array of rules given by $ruleA arg
+     * Split given $text to segments based on array of rules given by $rules arg
      *
      * @param string $text
      * @param array $rules
@@ -164,7 +166,7 @@ final class editor_Plugins_Okapi_Bconf_Segmentation_Srx extends editor_Plugins_O
      */
     public function splitTextToSegments(string $text, array $rules): array
     {
-        // Prepare arrays of regexes to be used for separator insertion and deletion
+        // Prepare arrays of regexes to be used for delimiter insertion and deletion
         $rex = [];
         foreach (['insert', 'delete'] as $purpose) {
 
@@ -174,13 +176,13 @@ final class editor_Plugins_Okapi_Bconf_Segmentation_Srx extends editor_Plugins_O
             // Foreach [prev => next] regex pair
             foreach ($rules[$purpose] as $rule) {
 
-                // Build regex that will help to insert separator between prev and next
+                // Build regex that will help to insert delimiter between prev and next
                 if ($purpose === 'insert') {
                     $expr = "~(?<prev>{$rule['prev']})(?<next>{$rule['next']})~u";
 
-                    // Build regex that will help to delete separator, that was previously inserted between prev and next
+                // Build regex that will help to delete delimiter, that was previously inserted between prev and next
                 } else {
-                    $expr = "~(?<prev>{$rule['prev']})<separator/>(?<next>{$rule['next']})~u";
+                    $expr = "~(?<prev>{$rule['prev']})<delimiter/>(?<next>{$rule['next']})~u";
                 }
 
                 // If it's supported by PHP's PCRE2 - append to $rex array
@@ -190,14 +192,14 @@ final class editor_Plugins_Okapi_Bconf_Segmentation_Srx extends editor_Plugins_O
             }
         }
 
-        // Insert <separator/> between segments
-        $text = preg_replace_callback($rex['insert'], fn($m) => "{$m['prev']}<separator/>{$m['next']}", $text);
+        // Insert <delimiter/> between segments
+        $text = preg_replace_callback($rex['insert'], fn($m) => "{$m['prev']}<delimiter/>{$m['next']}", $text);
 
-        // Delete <separator/> between segments, if those are, so to say, false-positives
+        // Delete <delimiter/> between segments, if those are, so to say, false-positives
         $text = preg_replace_callback($rex['delete'], fn($m) => "{$m['prev']}{$m['next']}", $text);
 
         // Use basic splitting
-        return explode('<separator/>', $text);
+        return explode('<delimiter/>', $text);
     }
 
     /**
