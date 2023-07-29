@@ -72,7 +72,7 @@ function i($value, $mode = 'w', $file = 'debug.txt') {
     $abs = $doc . '/' . $file;
 
     // If value is bool
-    if (is_bool($value)) {
+    if (is_bool($value) || is_null($value)) {
 
         // Use var_dump for dumping, as print_r() will give 1 or 0 instead of 'bool(true)' or 'bool(false)'
         ob_start(); var_dump($value); $value = ob_get_clean();

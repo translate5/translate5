@@ -79,4 +79,147 @@ final class editor_Plugins_Okapi_Bconf_Segmentation_Srx extends editor_Plugins_O
     public function setPath(string $path) {
         $this->path = $path;
     }
+
+    /**
+     * Get array of [prev, next] pairs, grouped by purpose
+     * [
+     *     'insert' => [
+     *         ['prev' => 'regex1', 'next' => 'regex2'],
+     *         ['prev' => 'regex3', 'next' => 'regex4'],
+     *     ],
+     *     'delete' => [
+     *         ['prev' => 'regex5', 'next' => 'regex6'],
+     *         ['prev' => 'regex7', 'next' => 'regex8'],
+     *     ]
+     * ]
+     *
+     * @param string $rfc5646
+     * @return array|bool
+     */
+    public function getSegmentationRules(string $rfc5646) : array|bool {
+
+        // Get srx file contents and convert to php-array
+        $srx = simplexml_load_string($this->getContent());
+        $srx = json_encode($srx);
+        $srx = json_decode($srx, true);
+
+        // Find languagerulename for the given $rfc5646
+        foreach($srx['body']['maprules']['languagemap'] as $languagemap) {
+            $attr = $languagemap['@attributes'];
+            if (preg_match('~' . $attr['languagepattern'] . '~', $rfc5646)) {
+                $languagerulename = $attr['languagerulename'];
+            }
+        }
+
+        // If it was not possible to find <languagemap>-node for given $rfc5646 - return false
+        if (!isset($languagerulename)) {
+            return false;
+        }
+
+        // Rules array, grouped by type (break="yes|no")
+        $ruleA = [];
+        foreach ($srx['body']['languagerules']['languagerule'] as $languagerule) {
+
+            // If it's not languagerulename we need - skip
+            if ($languagerule['@attributes']['languagerulename'] !== $languagerulename) {
+                continue;
+            }
+
+            // Foreach rule
+            foreach ($languagerule['rule'] as $rule) {
+
+                // If <beforebreak> and/or <afterbreak> is empty - it's represented as empty array,
+                // so convert to string, else trim newlines
+                foreach (['beforebreak' => 'prev', 'afterbreak' => 'next'] as $node => $side) {
+                    $rule[$side] = is_array($rule[$node]) ? '' : trim($rule[$node]);
+                    unset ($rule[$node]);
+                }
+
+                // Get purpose
+                $purpose = $rule['@attributes']['break'] === 'yes' ? 'insert' : 'delete';
+
+                // Unset @attributes-prop
+                unset ($rule['@attributes']);
+
+                // Skip things we don't need
+                if (preg_match('~T5-IGNORE-(START|END)~', join('', $rule))) {
+                    continue;
+                }
+
+                // Collect rules
+                $ruleA[$purpose] []= $rule;
+            }
+        }
+
+        // Return rules grouped by purpose
+        return $ruleA;
+    }
+
+    /**
+     * Split given $text to segments based on array of rules given by $ruleA arg
+     *
+     * @param string $text
+     * @param array $rules
+     * @return array
+     */
+    public function splitTextToSegments(string $text, array $rules): array
+    {
+        // Prepare arrays of regexes to be used for separator insertion and deletion
+        $rex = [];
+        foreach (['insert', 'delete'] as $purpose) {
+
+            // Define as empty array
+            $rex[$purpose] = [];
+
+            // Foreach [prev => next] regex pair
+            foreach ($rules[$purpose] as $rule) {
+
+                // Build regex that will help to insert separator between prev and next
+                if ($purpose === 'insert') {
+                    $expr = "~(?<prev>{$rule['prev']})(?<next>{$rule['next']})~u";
+
+                    // Build regex that will help to delete separator, that was previously inserted between prev and next
+                } else {
+                    $expr = "~(?<prev>{$rule['prev']})<separator/>(?<next>{$rule['next']})~u";
+                }
+
+                // If it's supported by PHP's PCRE2 - append to $rex array
+                if (@preg_match($expr,'') !== false) {
+                    $rex[$purpose] []= $expr;
+                }
+            }
+        }
+
+        // Insert <separator/> between segments
+        $text = preg_replace_callback($rex['insert'], fn($m) => "{$m['prev']}<separator/>{$m['next']}", $text);
+
+        // Delete <separator/> between segments, if those are, so to say, false-positives
+        $text = preg_replace_callback($rex['delete'], fn($m) => "{$m['prev']}{$m['next']}", $text);
+
+        // Use basic splitting
+        return explode('<separator/>', $text);
+    }
+
+    /**
+     * Convert capturing groups to non-capturing groups, if any in the given $regex
+     *
+     * @param string $regex
+     * @return array|string|string[]|null
+     */
+    function disableCapturingGroups(string $regex) {
+
+        // No slash before
+        $nsb = '(?<!\\\)';
+
+        // Other regex shortcuts
+        $since = preg_quote('(', '~');
+        $until = preg_quote(')', '~');
+        $inner = '.*?';
+
+        // Regex to find capturing groups inside $regex, if any
+        $capturingGroup = "~$nsb($since)($inner)$nsb($until)~";
+
+        // Insert '?:' after group's opening '(', to make that group to be non-capturing
+        return preg_replace($capturingGroup, '$1?:$2$3', $regex);
+    }
 }
