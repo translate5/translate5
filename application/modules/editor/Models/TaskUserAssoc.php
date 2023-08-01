@@ -550,6 +550,9 @@ class editor_Models_TaskUserAssoc extends ZfExtended_Models_Entity_Abstract {
             $customFileLogger->log('My current sessionId : '.Zend_Session::getId());
         }
 
+        $user = ZfExtended_Authentication::getInstance()->getUser();
+        $customFileLogger->log('Current user: '. ($user ?? ' NO USER'));
+
         $customFileLogger->write();
     }
 
