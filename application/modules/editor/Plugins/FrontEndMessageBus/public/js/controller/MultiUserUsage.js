@@ -571,6 +571,14 @@ return; //FIXME prepare that socket server is only triggered for simultaneous us
         }
         //reloads the currently opened task
         if(taskGuid && taskGuid == data.taskGuid) {
+
+            // in case the current task is not a task model, create it as a model and trigger the reload
+            if(!Editor.data.task.load){
+                // when the task is not model, the object contains id and the taskGuid in it
+                // Based on that, we can use it as init object for the new model
+                Editor.data.task = Ext.create('Editor.model.admin.Task', Editor.data.task);
+            }
+
             Editor.data.task.load();
         }
     },

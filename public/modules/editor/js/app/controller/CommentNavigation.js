@@ -55,14 +55,19 @@ Ext.define('Editor.controller.CommentNavigation', {
         messagebus: {
             '#translate5 task': {
                 commentChanged: function handleCommentChange({comment, connectionId, typeOfChange}) {
-                    var remarkRecord = new (this.getCommentList().getStore().getModel())(Ext.clone(comment));
+                    var commentListComponent = this.getCommentList();
+                    // In case the commentListComponent is already destroyed, skip this event processing.
+                    if(!commentListComponent){
+                        return;
+                    }
+                    var remarkRecord = new (commentListComponent.getStore().getModel())(Ext.clone(comment));
                     switch(typeOfChange) {
                         case 'afterPostAction':
                         case 'afterPutAction':
                             this.updateStore(remarkRecord, typeOfChange);
                             break;
                         case 'beforeDeleteAction':
-                            this.getCommentList().getStore().remove(remarkRecord);
+                            commentListComponent.getStore().remove(remarkRecord);
                     }
                 }
             }
