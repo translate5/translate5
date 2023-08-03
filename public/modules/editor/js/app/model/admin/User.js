@@ -226,12 +226,12 @@ Ext.define('Editor.model.admin.User', {
         return Editor.util.Util.integerizeArray(customers.split(','));
     },
     /**
-     * Evaluates, if the user-rights makes it neccessary to load the customer-store
+     * Evaluates, if the user-rights make it neccessary to load the customers-store
      * @returns {Boolean}
      */
     needsCustomersStore: function(){
-        // QUIRK: there might be more rights/functionalities requiring the customers-store. But they are al bound to role "clintpm" or "pm"
-        // instead this evaluation we may better test for those two roles
+        // QUIRK: there might be more rights/functionalities requiring the customers-store. But they are all bound to role "clintpm" or "pm"
+        // instead of this evaluation we may better test for those two roles instead
         return Editor.data.app.userRights.includes('customerAdministration') ||
             Editor.data.app.userRights.includes('editorAddLangresource') ||
             Editor.data.app.userRights.includes('editorAddTask') ||
