@@ -226,6 +226,19 @@ Ext.define('Editor.model.admin.User', {
         return Editor.util.Util.integerizeArray(customers.split(','));
     },
     /**
+     * Evaluates, if the user-rights makes it neccessary to load the customer-store
+     * @returns {Boolean}
+     */
+    needsCustomersStore: function(){
+        // QUIRK: there might be more rights/functionalities requiring the customers-store. But they are al bound to role "clintpm" or "pm"
+        // instead this evaluation we may better test for those two roles
+        return Editor.data.app.userRights.includes('customerAdministration') ||
+            Editor.data.app.userRights.includes('editorAddLangresource') ||
+            Editor.data.app.userRights.includes('editorAddTask') ||
+            Editor.data.app.userRights.includes('editorAddUser') ||
+            Editor.data.app.userRights.includes('editorCustomerSwitch');
+    },
+    /**
      * @returns {Boolean}
      */
     isClientRestricted: function(){

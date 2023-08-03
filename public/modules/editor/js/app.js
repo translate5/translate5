@@ -203,8 +203,8 @@ Ext.application({
 
         me.authenticatedUser = Ext.create('Editor.model.admin.User', Editor.data.app.user);
 
-        // load the customers store if the user is allowed
-        if (me.authenticatedUser.isAllowed('customerAdministration')) {
+        // load the customers store if the user is allowed OR has access to other UIs that need the customer store
+        if (me.authenticatedUser.needsCustomersStore()) {
             Ext.getStore('customersStore').load();
         }
 
