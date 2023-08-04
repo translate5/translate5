@@ -89,9 +89,9 @@ final class Roles extends BaseRoles {
                 $fronendRoles[] = $role;
             }
         }
-        // may someone adds new roles and forgets to put them in the order here
+        // may someone adds new roles and forgets to put them in the order here ... clientpm-roles must not be added !
         foreach($allRoles as $role){
-            if(!in_array($role, $fronendRoles)){
+            if(!str_starts_with($role, 'clientpm_') && !in_array($role, $fronendRoles)){
                 $fronendRoles[] = $role;
             }
         }

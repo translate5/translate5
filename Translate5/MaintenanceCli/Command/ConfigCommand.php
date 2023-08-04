@@ -98,7 +98,7 @@ Modified values are shown bold in the simple listing.');
     {
         $this->initInputOutput($input, $output);
         $this->initTranslate5AppOrTest();
-        $this->writeTitle('Change Translate5 configuration.');
+        $this->isPorcelain || $this->writeTitle('Change Translate5 configuration.');
 
         $config = new \editor_Models_Config();
         $name = $this->input->getArgument('name');
@@ -118,7 +118,7 @@ Modified values are shown bold in the simple listing.');
         $isModifiedOnly = $this->input->getOption('modified');
         $isExact = count($foundConfigs) === 1;
         if($isExact) {
-            $this->io->section('Configuration found:');
+            $this->isPorcelain || $this->io->section('Configuration found:');
             if($isModifiedOnly) {
                 $this->io->note("Option -m|--modified ignored!");
             }
@@ -268,8 +268,13 @@ Modified values are shown bold in the simple listing.');
             $out[1] = '  '.($hasIni ? 'ini':'new').' value: <fg=green;options=bold>'.OutputFormatter::escape($configData['value']).'</>';
             array_splice($out, 2, 0, '  old value: <fg=red>'.OutputFormatter::escape($configData['oldvalue']).'</>');
         }
-        
-        $this->io->text($out);
+
+        if ($this->isPorcelain) {
+            $this->io->text('set config '.OutputFormatter::escape($name).': '.$configData['value']);
+            return self::SUCCESS;
+        } else {
+            $this->io->text($out);
+        }
 
         if ((int) $configData['level'] >= $config::CONFIG_LEVEL_CUSTOMER) {
             $db = new \editor_Models_Db_CustomerConfig();

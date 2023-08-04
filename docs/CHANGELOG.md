@@ -28,6 +28,78 @@ All updates are (downwards) compatible! If not this is listed in the important r
 
 
 
+
+## [6.5.0] - 2023-07-28
+
+### Important Notes:
+ 
+
+
+### Added
+**[TRANSLATE-3207](https://jira.translate5.net/browse/TRANSLATE-3207): LanguageResources, TermPortal - Extend TBX import with images from zip folder** <br>
+Added support for terminology images to be imported/exported in zip-archive
+
+**[TRANSLATE-3164](https://jira.translate5.net/browse/TRANSLATE-3164): VisualReview / VisualTranslation - Pivot language preview in the visual layout** <br>
+Plugin Visual: In the (left) source layout for tasks with available pivot now a toggle button exists, that will switch between source and pivot language. Please note, that the pivot-view will use the reflown Wysiwyg-layout with all known limitations.
+
+**[TRANSLATE-3031](https://jira.translate5.net/browse/TRANSLATE-3031): Client management, LanguageResources, Task Management, User Management - Multitenancy of management interfaces** <br>
+Add role "PM selected clients" which enables to create PMs which are restricted to certain clients (multitenancy)
+
+
+### Changed
+**[TRANSLATE-3432](https://jira.translate5.net/browse/TRANSLATE-3432): Main back-end mechanisms (Worker, Logging, etc.) - Logger to catch more info about no access exception** <br>
+Added special logging improvement for certain backend error.
+
+**[TRANSLATE-3398](https://jira.translate5.net/browse/TRANSLATE-3398): Workflows - Extend translate5 mail on task status change** <br>
+ENHANCEMENT: It can be configured if the changed segments email contains the commented segments and if the "Target text(at time of import)" is shown.
+
+**[TRANSLATE-3396](https://jira.translate5.net/browse/TRANSLATE-3396): VisualReview / VisualTranslation - Visual WYSIWYG: Pages of the visual remain untranslated when database is very slow** <br>
+FIX: When the database is very slow, the visual Wysiwyg may remain untranslated in sections
+
+**[TRANSLATE-3378](https://jira.translate5.net/browse/TRANSLATE-3378): Test framework - Add tests for TildeMT plugin** <br>
+Added API test for TildeMT plugin using a fake-API
+
+**[TRANSLATE-3109](https://jira.translate5.net/browse/TRANSLATE-3109): User Management - UI for appTokens** <br>
+For API users: Implemented a administration for application auth tokens in the UI. Improved according CLI commands to list, delete app tokens and set expires date with CLI.
+
+
+
+### Bugfixes
+**[TRANSLATE-3439](https://jira.translate5.net/browse/TRANSLATE-3439): VisualReview / VisualTranslation - Visual: FIX Image-Import for monochrome or transparent images** <br>
+FIX: When images as review-source in the Visual are completely transparent or  monochrome the color-processing fails with an unhandled exception
+
+**[TRANSLATE-3438](https://jira.translate5.net/browse/TRANSLATE-3438): TermPortal, TermTagger integration - TermPortal: Custom attribute names are not reflected in translate5s editor** <br>
+FIXED: Term-portlet attributes labels problem 
+
+**[TRANSLATE-3437](https://jira.translate5.net/browse/TRANSLATE-3437): Editor general - No way to save segment with MQM tags** <br>
+Fixed bug which caused an error on saving segment with MQM tag
+
+**[TRANSLATE-3435](https://jira.translate5.net/browse/TRANSLATE-3435): Authentication - Sessions are not cleaned up in DB, Logins frequently fail (mayby due to faulty db-session-data)** <br>
+FIX: expired sessions were not cleaned anymore leading to potential problems with the login. Other quirks also could lead to multiple entries for the unique-id
+
+**[TRANSLATE-3433](https://jira.translate5.net/browse/TRANSLATE-3433): VisualReview / VisualTranslation - Segment selection/scrolling may leads to wrong "segment not found" toasts** <br>
+BUG: segment selection/scrolling may leads to wrong "segment not found" toasts
+
+**[TRANSLATE-3431](https://jira.translate5.net/browse/TRANSLATE-3431): Editor general - Pasting content when segments editor is closed** <br>
+FIX: solve potential problem when pasting content in the segment-editor very fast
+
+**[TRANSLATE-3430](https://jira.translate5.net/browse/TRANSLATE-3430): MatchAnalysis & Pretranslation - Match Ranges & Pricing: changing preset should be possible for PM only** <br>
+Pricing preset now can be changed by PM only
+
+**[TRANSLATE-3402](https://jira.translate5.net/browse/TRANSLATE-3402): Okapi integration - Hotfix: delete deepl glossary on deleting termcollection** <br>
+translate - 6.4.3: When deleting a termcollection the corresponding DeepL glossary was not deleted. This is fixed now.
+translate - 6.5.0: Change wrong title in change-log
+
+**[TRANSLATE-3304](https://jira.translate5.net/browse/TRANSLATE-3304): Package Ex and Re-Import - Improve re-import segment alignment** <br>
+Different segment alignment will be used base on the task version. All tasks older then translate5 - 6.5.0 will use different segment alignment.
+
+**[TRANSLATE-3303](https://jira.translate5.net/browse/TRANSLATE-3303): Import/Export - Generated mid is not unique enough** <br>
+The XLF re-import had problems if in a package segments had the same segment ID. Now the generation of the ID is changed to be really unique.
+
+**[TRANSLATE-2831](https://jira.translate5.net/browse/TRANSLATE-2831): Configuration - Repetition editor options do not appear in client overwrites** <br>
+Fix config level of Repetition editor options
+
+
 ## [6.4.3] - 2023-07-13
 
 ### Important Notes:
