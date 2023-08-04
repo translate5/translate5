@@ -56,8 +56,6 @@ use MittagQI\Translate5\Segment\TagProtection\Protector\Number\NumberProtectorIn
 
 class NumberProtector implements ProtectorInterface
 {
-    public const DATE_TYPE = 'date';
-
     /**
      * @param array<NumberProtectorInterface & RatingInterface> $protectors
      */

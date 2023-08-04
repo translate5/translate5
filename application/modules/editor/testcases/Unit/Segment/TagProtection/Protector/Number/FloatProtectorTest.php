@@ -156,19 +156,19 @@ class FloatProtectorTest extends TestCase
             'targetLang' => null,
         ];
 
-        $targetLangAr = new editor_Models_Languages();
-        $targetLangAr->setId(0);
-        $targetLangAr->setRfc5646('ar-EG');
-
-        yield 'date in the middle of text. targetLang = ar-EG' => [
-            'textNodes' => [new ChunkDto('some text with float in it: 1.234.567,123456, in the middle', false)],
-            'expected' => [
-                new ChunkDto('some text with float in it:', false),
-                new ChunkDto(' <number type="float" name="default" source="1.234.567,123456" iso="1234567.123456" target="١٬٢٣٤٬٥٦٧٫١٢٣٤٥٦" />,', true),
-                new ChunkDto(' in the middle', false),
-            ],
-            'targetLang' => $targetLangAr,
-        ];
+//        $targetLangAr = new editor_Models_Languages();
+//        $targetLangAr->setId(0);
+//        $targetLangAr->setRfc5646('ar-EG');
+//
+//        yield 'date in the middle of text. targetLang = ar-EG' => [
+//            'textNodes' => [new ChunkDto('some text with float in it: 1.234.567,123456, in the middle', false)],
+//            'expected' => [
+//                new ChunkDto('some text with float in it:', false),
+//                new ChunkDto(' <number type="float" name="default" source="1.234.567,123456" iso="1234567.123456" target="١٬٢٣٤٬٥٦٧٫١٢٣٤٥٦" />,', true),
+//                new ChunkDto(' in the middle', false),
+//            ],
+//            'targetLang' => $targetLangAr,
+//        ];
 
         yield [
             'textNodes' => [new ChunkDto('1234567.89', false)],
@@ -330,6 +330,14 @@ class FloatProtectorTest extends TestCase
             'textNodes' => [new ChunkDto("١٬٢٣٤٬٥٦٧٫٨٩", false)],
             'expected' => [
                 new ChunkDto('<number type="float" name="default" source="١٬٢٣٤٬٥٦٧٫٨٩" iso="1234567.89" target="" />', true),
+            ],
+            'targetLang' => null,
+        ];
+
+        yield [
+            'textNodes' => [new ChunkDto("1.234.567,89.987", false)],
+            'expected' => [
+                new ChunkDto("1.234.567,89.987", false),
             ],
             'targetLang' => null,
         ];

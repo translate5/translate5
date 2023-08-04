@@ -172,9 +172,13 @@ abstract class AbstractProtector implements NumberProtectorInterface, RatingInte
 
             $parts = explode($node, $nodesToProtect[$i][0]);
 
-            $protected = $this->protectNode($node, $sourceLang, $targetLang);
+            try {
+                $protected = $this->protectNode($node, $sourceLang, $targetLang);
 
-            yield new ChunkDto($parts[0] . $protected . $parts[1], true);
+                yield new ChunkDto($parts[0] . $protected . $parts[1], true);
+            } catch (\LogicException) {
+                yield new ChunkDto($node, false);
+            }
         }
     }
 
