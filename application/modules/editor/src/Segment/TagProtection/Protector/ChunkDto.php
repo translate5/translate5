@@ -50,19 +50,15 @@ END LICENSE AND COPYRIGHT
 */
 declare(strict_types=1);
 
-/**
- * @method string getLanguageId()
- * @method void setLanguageId(int $id)
- * @method string getType()
- * @method void setType(string $type)
- * @method string getName()
- * @method void setName(string $name)
- * @method string getRegex()
- * @method void setRegex(string $regex)
- * @method string getFormat()
- * @method void setFormat(string $format)
- */
-class editor_Models_LanguageDateFormat extends ZfExtended_Models_Entity_Abstract
-{
+namespace MittagQI\Translate5\Segment\TagProtection\Protector;
 
+/**
+ * @property-read string $text
+ * @property-read bool $protected
+ */
+class ChunkDto
+{
+    public function __construct(public string $text, public bool $protected = false)
+    {
+    }
 }

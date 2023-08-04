@@ -50,9 +50,83 @@ END LICENSE AND COPYRIGHT
 */
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\Segment\ChunkProtection\Protector;
+namespace MittagQI\Translate5\Test\Unit\Segment\TagProtection;
 
-interface RatingInterface
+use editor_Models_Languages;
+use editor_Test_UnitTest;
+use MittagQI\Translate5\Segment\TagProtection\TagProtector;
+use MittagQI\Translate5\Segment\TagProtection\Protector\ChunkDto;
+use MittagQI\Translate5\Segment\TagProtection\Protector\Number\NumberProtectorInterface;
+use MittagQI\Translate5\Segment\TagProtection\Protector\NumberProtector;
+use MittagQI\Translate5\Segment\TagProtection\Protector\RatingInterface;
+use MittagQI\Translate5\Segment\TagProtection\Protector\WhitespaceProtector;
+
+class TagProtectorTest extends editor_Test_UnitTest
 {
-    public function rating(): int;
+    public function test(): void
+    {
+        $processor = new class implements NumberProtectorInterface, RatingInterface
+        {
+            public function protect(
+                iterable $chunks,
+                ?editor_Models_Languages $sourceLang,
+                ?editor_Models_Languages $targetLang
+            ): iterable {
+                foreach ($chunks as $chunk) {
+                    foreach (explode(' ', $chunk->text) as $part) {
+                        yield new ChunkDto($part);
+                    }
+                }
+            }
+
+            public function rating(): int
+            {
+                return 2;
+            }
+
+            public function hasEntityToProtect(string $textNode, ?editor_Models_Languages $sourceLang): bool
+            {
+                return true;
+            }
+        };
+
+        $processor1 = new class implements NumberProtectorInterface, RatingInterface
+        {
+            public function protect(
+                iterable $chunks,
+                ?editor_Models_Languages $sourceLang,
+                ?editor_Models_Languages $targetLang
+            ): iterable {
+                foreach ($chunks as $chunk) {
+                    if (str_contains($chunk->text, 'test')) {
+                        yield new ChunkDto(sprintf('<ph>%s</ph>', $chunk->text), true);
+                    } else {
+                        yield $chunk;
+                    }
+                }
+            }
+
+            public function rating(): int
+            {
+                return 1;
+            }
+
+            public function hasEntityToProtect(string $textNode, ?editor_Models_Languages $sourceLang): bool
+            {
+                return true;
+            }
+        };
+
+
+        $number = new NumberProtector([$processor1, $processor]);
+        $whitespace = new WhitespaceProtector();
+
+        $chunkProtector = new TagProtector($number, $whitespace);
+        $testString = 'some test  text  ';
+
+        self::assertEquals(
+            'some<ph>test </ph>text<char ts="c2a0" length="1"/>',
+            $chunkProtector->protect($testString, null, null)
+        );
+    }
 }

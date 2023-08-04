@@ -50,23 +50,39 @@ END LICENSE AND COPYRIGHT
 */
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\Repository;
+namespace MittagQI\Translate5\Segment\TagProtection\Protector;
 
-use editor_Models_Segment_Number_LanguageFormat as LanguageFormat;
+use MittagQI\Translate5\Segment\TagProtection\Protector\Number\NumberProtectorInterface;
 
-class LanguageNumberFormatRepository
+class NumberProtector implements ProtectorInterface
 {
-    public function findByLanguageIdAndType(int $langId, string $type): array
-    {
+    public const DATE_TYPE = 'date';
 
+    /**
+     * @param array<NumberProtectorInterface & RatingInterface> $protectors
+     */
+    public function __construct(private array $protectors)
+    {
+        usort($this->protectors, fn (RatingInterface $p1, RatingInterface $p2) => $p2->rating() <=> $p1->rating());
     }
 
-    public function findFormat(int $langId, string $type, string $name): ?LanguageFormat
+    public function hasEntityToProtect(string $textNode, ?int $sourceLang): bool
     {
+        foreach ($this->protectors as $protector) {
+            if ($protector->hasEntityToProtect($textNode, $sourceLang)) {
+                return true;
+            }
+        }
 
+        return false;
     }
 
-    public function findDateFormat(int $langId, string $name): ?LanguageFormat
+    public function protect(iterable $chunks, ?int $sourceLang, ?int $targetLang): iterable
     {
+        foreach ($this->protectors as $protector) {
+            $chunks = $protector->protect($chunks, $sourceLang, $targetLang);
+        }
+
+        return $chunks;
     }
 }

@@ -50,7 +50,7 @@ END LICENSE AND COPYRIGHT
 */
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\Segment\ChunkProtection\Protector;
+namespace MittagQI\Translate5\Segment\TagProtection\Protector;
 
 use editor_Models_Segment_Whitespace;
 
@@ -71,5 +71,10 @@ class WhitespaceProtector implements ProtectorInterface
         foreach ($chunks as $chunk) {
             yield $chunk->protected ? $chunk : new ChunkDto($this->whitespace->protectWhitespace($chunk->text), true);
         }
+    }
+
+    public function hasEntityToProtect(string $textNode, ?int $sourceLang): bool
+    {
+        return true;
     }
 }

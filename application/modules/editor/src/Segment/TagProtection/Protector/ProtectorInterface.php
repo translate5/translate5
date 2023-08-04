@@ -50,15 +50,17 @@ END LICENSE AND COPYRIGHT
 */
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\Segment\ChunkProtection\Protector;
+namespace MittagQI\Translate5\Segment\TagProtection\Protector;
 
-/**
- * @property-read string $text
- * @property-read bool $protected
- */
-class ChunkDto
+use MittagQI\Translate5\Segment\TagProtection\Protector\ChunkDto;
+
+interface ProtectorInterface
 {
-    public function __construct(public string $text, public bool $protected = false)
-    {
-    }
+    public function hasEntityToProtect(string $textNode, ?int $sourceLang): bool;
+    /**
+     * @param iterable<ChunkDto> $chunks
+     * @return iterable<ChunkDto>
+     */
+    public function protect(iterable $chunks, ?int $sourceLang, ?int $targetLang): iterable;
+
 }

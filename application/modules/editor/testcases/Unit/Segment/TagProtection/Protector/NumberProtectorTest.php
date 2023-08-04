@@ -50,16 +50,84 @@ END LICENSE AND COPYRIGHT
 */
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\Segment\ChunkProtection\Protector;
+namespace MittagQI\Translate5\Test\Unit\Segment\TagProtection\Protector;
 
-use MittagQI\Translate5\Segment\ChunkProtection\Protector\ChunkDto;
+use editor_Models_Languages;
+use MittagQI\Translate5\Segment\TagProtection\Protector\ChunkDto;
+use MittagQI\Translate5\Segment\TagProtection\Protector\Number\NumberProtectorInterface;
+use MittagQI\Translate5\Segment\TagProtection\Protector\NumberProtector;
+use MittagQI\Translate5\Segment\TagProtection\Protector\RatingInterface;
+use PHPUnit\Framework\TestCase;
 
-interface ProtectorInterface
+class NumberProtectorTest extends TestCase
 {
-    /**
-     * @param iterable<ChunkDto> $chunks
-     * @return iterable<ChunkDto>
-     */
-    public function protect(iterable $chunks, ?int $sourceLang, ?int $targetLang): iterable;
+    public function test(): void
+    {
+        $processor = new class implements NumberProtectorInterface, RatingInterface
+        {
+            public function protect(
+                iterable $chunks,
+                ?editor_Models_Languages $sourceLang,
+                ?editor_Models_Languages $targetLang
+            ): iterable {
+                foreach ($chunks as $chunk) {
+                    foreach (explode(' ', $chunk->text) as $part) {
+                        yield new ChunkDto($part);
+                    }
+                }
+            }
 
+            public function rating(): int
+            {
+                return 2;
+            }
+
+            public function hasEntityToProtect(string $textNode, ?editor_Models_Languages $sourceLang): bool
+            {
+                return true;
+            }
+        };
+
+        $processor1 = new class implements NumberProtectorInterface, RatingInterface
+        {
+            public function protect(
+                iterable $chunks,
+                ?editor_Models_Languages $sourceLang,
+                ?editor_Models_Languages $targetLang
+            ): iterable {
+                foreach ($chunks as $chunk) {
+                    yield new ChunkDto(sprintf('<ph>%s</ph>', $chunk->text), true);
+                }
+            }
+
+            public function rating(): int
+            {
+                return 1;
+            }
+
+            public function hasEntityToProtect(string $textNode, ?editor_Models_Languages $sourceLang): bool
+            {
+                return true;
+            }
+        };
+
+
+        $protector = new NumberProtector([$processor1, $processor]);
+        $testString = 'some text';
+
+        $protected = $protector->protect([new ChunkDto($testString)], null, null);
+
+        $result = [];
+        foreach ($protected as $p) {
+            $result[] = $p;
+        }
+
+        self::assertEquals(
+            [
+                new ChunkDto('<ph>some</ph>', true),
+                new ChunkDto('<ph>text</ph>', true),
+            ],
+            $result
+        );
+    }
 }

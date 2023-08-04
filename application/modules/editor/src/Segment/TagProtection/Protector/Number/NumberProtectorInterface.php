@@ -50,16 +50,22 @@ END LICENSE AND COPYRIGHT
 */
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\Segment\ChunkProtection\Protector\Number;
+namespace MittagQI\Translate5\Segment\TagProtection\Protector\Number;
 
-use MittagQI\Translate5\Segment\ChunkProtection\Protector\ChunkDto;
+use editor_Models_Languages;
+use MittagQI\Translate5\Segment\TagProtection\Protector\ChunkDto;
 
 interface NumberProtectorInterface
 {
+    public function hasEntityToProtect(string $textNode, ?editor_Models_Languages $sourceLang): bool;
+
     /**
      * @param iterable<ChunkDto> $chunks
      * @return iterable<ChunkDto>
      */
-    public function protect(iterable $chunks, ?int $sourceLang, ?int $targetLang): iterable;
-
+    public function protect(
+        iterable $chunks,
+        ?editor_Models_Languages $sourceLang,
+        ?editor_Models_Languages $targetLang
+    ): iterable;
 }

@@ -50,28 +50,65 @@ END LICENSE AND COPYRIGHT
 */
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\Segment\ChunkProtection\Protector;
+namespace MittagQI\Translate5\Segment\TagProtection;
 
-use MittagQI\Translate5\Segment\ChunkProtection\Protector\Number\NumberProtectorInterface;
+use editor_Models_Segment_Utility as SegmentUtility;
+use MittagQI\Translate5\Segment\TagProtection\Protector\ChunkDto;
+use MittagQI\Translate5\Segment\TagProtection\Protector\NumberProtector;
+use MittagQI\Translate5\Segment\TagProtection\Protector\ProtectorInterface;
+use MittagQI\Translate5\Segment\TagProtection\Protector\WhitespaceProtector;
 
-class NumberProtector implements ProtectorInterface
+class TagProtector
 {
-    public const DATE_TYPE = 'date';
+    /**
+     * All entities are restored to their applicable characters (&_szlig; => ß),
+     * only the XML relevant &<> are encoded (ready for GUI)
+     */
+    public const ENTITY_MODE_RESTORE = 'restore';
 
     /**
-     * @param array<NumberProtectorInterface & RatingInterface> $protectors
+     * Nothing is restored, but encoded (&_szlig; => &_amp;szlig;),
+     * only the XML relevant &<> are encoded (ready for GUI)
      */
-    public function __construct(private array $protectors)
+    public const ENTITY_MODE_KEEP = 'keep';
+
+    /**
+     * Entity handling is disabled, entities must be handled elsewhere!
+     */
+    public const ENTITY_MODE_OFF = 'off';
+
+    /**
+     * @var ProtectorInterface[]
+     */
+    private array $protectors;
+
+    public function __construct(NumberProtector $number, WhitespaceProtector $whitespace)
     {
-        usort($this->protectors, fn (RatingInterface $p1, RatingInterface $p2) => $p2->rating() <=> $p1->rating());
+        $this->protectors = [$number, $whitespace];
     }
 
-    public function protect(iterable $chunks, ?int $sourceLang, ?int $targetLang): iterable
-    {
-        foreach ($this->protectors as $protector) {
-            $chunks = $protector->protect($chunks, $sourceLang, $targetLang);
+    public function protect(
+        string $textNode,
+        ?int $sourceLang,
+        ?int $targetLang,
+        string $entityHandling = self::ENTITY_MODE_RESTORE
+    ): string {
+        if ($entityHandling !== self::ENTITY_MODE_OFF) {
+            $textNode = SegmentUtility::entityCleanup($textNode, $entityHandling === self::ENTITY_MODE_RESTORE);
         }
 
-        return $chunks;
+        $chunks = [new ChunkDto($textNode)];
+        foreach ($this->protectors as $protector) {
+            if ($protector->hasEntityToProtect($textNode, $sourceLang)) {
+                $chunks = $protector->protect($chunks, $sourceLang, $targetLang);
+            }
+        }
+
+        $result = '';
+        foreach ($chunks as $chunk) {
+            $result .= $chunk->text;
+        }
+
+        return $result;
     }
 }

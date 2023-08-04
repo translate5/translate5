@@ -50,14 +50,15 @@ END LICENSE AND COPYRIGHT
 */
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\Test\Unit\Segment\ChunkProtection\Protector\Number;
+namespace MittagQI\Translate5\Test\Unit\Segment\TagProtection\Protector\Number;
 
-use editor_Test_UnitTest;
+use editor_Models_Languages;
 use MittagQI\Translate5\Repository\LanguageNumberFormatRepository;
-use MittagQI\Translate5\Segment\ChunkProtection\Protector\ChunkDto;
-use MittagQI\Translate5\Segment\ChunkProtection\Protector\Number\DateProtector;
+use MittagQI\Translate5\Segment\TagProtection\Protector\ChunkDto;
+use MittagQI\Translate5\Segment\TagProtection\Protector\Number\DateProtector;
+use PHPUnit\Framework\TestCase;
 
-class DateTest extends editor_Test_UnitTest
+class DateProtectorTest extends TestCase
 {
     /**
      * @dataProvider datesProvider
@@ -235,10 +236,13 @@ class DateTest extends editor_Test_UnitTest
     /**
      * @dataProvider defaultDataToProtect
      */
-    public function testProtectWithNoSourceAndTargetLang(array $textNodes, array $expected): void
-    {
-        $repo = $this->createConfiguredMock(LanguageNumberFormatRepository::class, []);
-        $protected = (new DateProtector($repo))->protect($textNodes, null, null);
+    public function testProtectDefaultFormats(
+        array $textNodes,
+        array $expected,
+        ?editor_Models_Languages $targetLang
+    ): void {
+        $repo = $this->createConfiguredMock(LanguageNumberFormatRepository::class, ['findDateFormat' => null]);
+        $protected = (new DateProtector($repo))->protect($textNodes, null, $targetLang);
 
         $result = [];
         foreach ($protected as $p) {
@@ -256,7 +260,8 @@ class DateTest extends editor_Test_UnitTest
                 new ChunkDto('some text with date in it: ', false),
                 new ChunkDto('<number type="date" name="default" source="2023-07-18" iso="2023-07-18" target="" />', true),
                 new ChunkDto('. in the middle', false),
-            ]
+            ],
+            'targetLang' => null,
         ];
 
         yield 'date at the end of text' => [
@@ -266,7 +271,8 @@ class DateTest extends editor_Test_UnitTest
             'expected' => [
                 new ChunkDto('some text with date in it: ', false),
                 new ChunkDto('<number type="date" name="default" source="18-07-2023" iso="2023-07-18" target="" />', true),
-            ]
+            ],
+            'targetLang' => null,
         ];
 
         yield 'date at the beginning of text' => [
@@ -276,7 +282,8 @@ class DateTest extends editor_Test_UnitTest
             'expected' => [
                 new ChunkDto('<number type="date" name="default" source="07-18-2023" iso="2023-07-18" target="" />', true),
                 new ChunkDto(' some text with date in it', false),
-            ]
+            ],
+            'targetLang' => null,
         ];
 
         yield 'date at the beginning and end of text' => [
@@ -287,7 +294,8 @@ class DateTest extends editor_Test_UnitTest
                 new ChunkDto('<number type="date" name="default" source="07.18.23" iso="2023-07-18" target="" />', true),
                 new ChunkDto(' some text with date in it ', false),
                 new ChunkDto('<number type="date" name="default" source="18/07/2023" iso="2023-07-18" target="" />', true),
-            ]
+            ],
+            'targetLang' => null,
         ];
 
         yield 'a lot of different dates inside text' => [
@@ -304,7 +312,8 @@ class DateTest extends editor_Test_UnitTest
                 new ChunkDto('<number type="date" name="default" source="07 18 2023" iso="2023-07-18" target="" />', true),
                 new ChunkDto(' and more ', false),
                 new ChunkDto('<number type="date" name="default" source="20231231" iso="2023-12-31" target="" />', true),
-            ]
+            ],
+            'targetLang' => null,
         ];
 
         yield '2 test nodes. date in the middle of second text' => [
@@ -317,7 +326,8 @@ class DateTest extends editor_Test_UnitTest
                 new ChunkDto('some text with date in it: ', false),
                 new ChunkDto('<number type="date" name="default" source="2023-07-18" iso="2023-07-18" target="" />', true),
                 new ChunkDto('. in the middle', false),
-            ]
+            ],
+            'targetLang' => null,
         ];
 
         yield '3 test nodes. second marked as protected. date in the middle of third text' => [
@@ -332,7 +342,8 @@ class DateTest extends editor_Test_UnitTest
                 new ChunkDto('some text with date in it: ', false),
                 new ChunkDto('<number type="date" name="default" source="2023-07-18" iso="2023-07-18" target="" />', true),
                 new ChunkDto('. in the middle', false),
-            ]
+            ],
+            'targetLang' => null,
         ];
 
         yield '4 test nodes. second marked as protected. date in the middle of third text' => [
@@ -349,7 +360,38 @@ class DateTest extends editor_Test_UnitTest
                 new ChunkDto('<number type="date" name="default" source="2023-07-18" iso="2023-07-18" target="" />', true),
                 new ChunkDto('. in the middle', false),
                 new ChunkDto('some additional text', false),
-            ]
+            ],
+            'targetLang' => null,
+        ];
+
+        $targetLangEn = new editor_Models_Languages();
+        $targetLangEn->setId(0);
+        $targetLangEn->setRfc5646('en-US');
+
+        yield 'date at the end of text. target en-US' => [
+            'textNodes' => [
+                new ChunkDto('some text with date in it: 18-07-2023', false)
+            ],
+            'expected' => [
+                new ChunkDto('some text with date in it: ', false),
+                new ChunkDto('<number type="date" name="default" source="18-07-2023" iso="2023-07-18" target="7/18/23" />', true),
+            ],
+            'targetLang' => $targetLangEn,
+        ];
+
+        $targetLangDe = new editor_Models_Languages();
+        $targetLangDe->setId(0);
+        $targetLangDe->setRfc5646('de-DE');
+
+        yield 'date at the end of text. target de-DE' => [
+            'textNodes' => [
+                new ChunkDto('some text with date in it: 18-07-2023', false)
+            ],
+            'expected' => [
+                new ChunkDto('some text with date in it: ', false),
+                new ChunkDto('<number type="date" name="default" source="18-07-2023" iso="2023-07-18" target="18.07.23" />', true),
+            ],
+            'targetLang' => $targetLangDe,
         ];
     }
 }
