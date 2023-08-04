@@ -445,6 +445,10 @@ Ext.define('Editor.view.admin.user.AddWindow', {
         // set the subroles-tagfield visible if the user is a clientPm
         if(me.isClientPm(roles)){
             me.down('#clientPmSubRoles').setHidden(false);
+            // when the current user is "only" client-pm, he must not be able to change his own subroles
+            if(me.isClientPm(Editor.data.app.user.roles.split(','))){
+                me.down('#clientPmSubRoles').setDisabled(true);
+            }
         }
     },
 
