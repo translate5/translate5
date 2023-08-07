@@ -128,10 +128,17 @@ Ext.define('Editor.view.LanguageResources.MatchGridViewController', {
     },
     cache: function(){
         var me = this,
-        segments = Ext.data.StoreManager.get('Segments');
+            segments = Ext.data.StoreManager.get('Segments');
+
         for(var i=0;i<me.cacheSegmentIndex.length;i++){
             var segment = segments.getAt(me.cacheSegmentIndex[i]),
-                segId = segment.get('id');
+                segId = segment && segment.get('id');
+
+            // in case no segment is found in store, ignore the below logic
+            if(!segId){
+                continue;
+            }
+
             if(segId == this.editedSegmentId){
                 me.getView().getStore('editorquery').removeAll();
             }

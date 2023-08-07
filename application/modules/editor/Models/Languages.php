@@ -69,4 +69,23 @@ class editor_Models_Languages extends ZfExtended_Languages {
         $languageParameter = $this->getId();
         return $this;
     }
+
+
+    /**
+     * Convert the given langauge ids to rfc 
+     * @param array $languageIds
+     * @return array
+     */
+    public function toRfcArray(array $languageIds): array{
+
+        $langs = $this->loadAllKeyValueCustom('id','rfc5646');
+
+        $converted = [];
+        foreach ($languageIds as $lng){
+            if(isset($langs[$lng])){
+                $converted[] = $langs[$lng];
+            }
+        }
+        return $converted;
+    }
 }

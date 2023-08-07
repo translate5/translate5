@@ -2032,7 +2032,7 @@ Ext.define('Editor.controller.Editor', {
         } else {
             var button = this.getSegmentGrid().down('segmentsToolbar #' + item.itemId);
             if (button.dispatcher) {
-                this.buttonClickDispatcher(item);
+                this.buttonClickDispatcher(item,event);
             } else {
                 button.click();
             }
