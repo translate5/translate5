@@ -25,14 +25,12 @@ START LICENSE AND COPYRIGHT
 
 END LICENSE AND COPYRIGHT
 */
-
-use MittagQI\Translate5\Test\Import\Config;
-use MittagQI\Translate5\Test\Import\LanguageResource;
+use editor_Plugins_Okapi_Bconf_Segmentation_Srx as Srx;
 
 /**
  * Test whether srx-based text segmentation works as expected
  */
-class Translate3408Test extends editor_Test_JsonTest {
+class Translate3408Test extends editor_Test_UnitTest {
 
     /**
      * @var string
@@ -40,46 +38,32 @@ class Translate3408Test extends editor_Test_JsonTest {
     protected static string $sourceLangRfc = 'de';
 
     /**
-     * @var string
+     * @throws ZfExtended_Exception
      */
-    protected static string $targetLangRfc = 'en';
-
-    /**
-     * @var array|string[]
-     */
-    protected static array $requiredPlugins = [
-        'editor_Plugins_InstantTranslate_Init'
-    ];
-
     public function testSegmentation() {
+
+        // Get Srx-class instance
+        $srx = Srx::createSystemTargetSrx();
 
         // Text to be splitted by segments
         $text = 'Herzlich Willkommen zum Verkaufstraining für die barrierefreie Nullschwelle in Verbindung mit dem Schüco AD UP. Nutzen Sie die Abschnitte rechts, um das Produkt kennenzulernen und sich optimal auf die Beratung Ihrer Partner und Kunden vorzubereiten. Am Ende eines Abschnitts werden Sie auf Quizfragen stoßen, die Ihnen helfen, Ihr Wissen zu überprüfen. Beantworten Sie 80% der Fragen richtig für einen erfolgreichen Abschluss. Die Offline-Präsentation wird von David O. McKay und B. H. Roberts durchgeführt. Los geht\'s!';
 
-        // Make request with special mode-param
-        $result = static::api()->getJson('editor/instanttranslateapi/translate', [
-            'text' => $text,
-            'source' => self::$sourceLangRfc,
-            'target' => self::$targetLangRfc,
-            'mode' => 'segmentation'
-        ]);
+        // Get SRX-based splitting-rules
+        $rules = $srx->getSegmentationRules(self::$sourceLangRfc);
+
+        // Use SRX-based splitting
+        $result = $srx->splitTextToSegments($text, $rules);
+
+        // Assert not empty
         $this->assertNotEmpty($result,'No results found for the request');
 
         // File name
-        $file = 'segmented.json';
+        $expected = file_get_contents('editorAPI/' . get_class($this) . '/segmented.json');
 
         // Json-encode actual result
         $actual = json_encode($result, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
 
-        // Recreate the file from the api response, if test is running in capture-mode
-        if (static::api()->isCapturing()) {
-            file_put_contents(static::api()->getFile($file, null, false), $actual);
-        }
-
-        // Get expected result
-        $expected = json_encode(static::api()->getFileContent($file), JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
-
         // Check for differences between the expected and the actual result
-        $this->assertEquals($expected, $actual, "The expected file an the result file does not match.");
+        $this->assertJsonStringEqualsJsonString($expected, $actual, "The expected file an the result file does not match.");
     }
 }
