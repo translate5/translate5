@@ -54,16 +54,13 @@ class Translate3408Test extends editor_Test_UnitTest {
         // Use SRX-based splitting
         $result = $srx->splitTextToSegments($text, $rules);
 
-        // Assert not empty
-        $this->assertNotEmpty($result,'No results found for the request');
-
         // File name
-        $expected = file_get_contents('editorAPI/' . get_class($this) . '/segmented.json');
+        $expected = file_get_contents(__DIR__  . '/' . get_class($this) . '/segmented.json');
 
         // Json-encode actual result
         $actual = json_encode($result, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
 
         // Check for differences between the expected and the actual result
-        $this->assertJsonStringEqualsJsonString($expected, $actual, "The expected file an the result file does not match.");
+        $this->assertJsonStringEqualsJsonString($expected, $actual, "The actual segmentation result does not match expected one.");
     }
 }
