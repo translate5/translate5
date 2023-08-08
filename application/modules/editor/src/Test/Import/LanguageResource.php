@@ -43,6 +43,8 @@ abstract class LanguageResource extends Resource
     public const MICROSOFT_TRANSLATOR = 'microsofttranslator';
     public const TILDE_MT = 'tildemt';
 
+    public const GOOGLE_TRANSLATE = 'googletranslate';
+
     public string $name;
     public array $customerIds = [];
     public array $customerUseAsDefaultIds = [];
