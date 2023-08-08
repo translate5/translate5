@@ -54,7 +54,6 @@ namespace MittagQI\Translate5\Segment\TagProtection\Protector\Number;
 
 use editor_Models_Languages;
 use MittagQI\Translate5\Segment\TagProtection\Protector\Number\Object\FloatObject;
-use NumberFormatter;
 
 class FloatProtector extends AbstractProtector
 {
@@ -76,7 +75,7 @@ class FloatProtector extends AbstractProtector
                 'keepAsIs' => true,
             ],
             [
-                'regex' => '[٠١٢٣٤٥٦٧٨٩]([٬٫]|[٠١٢٣٤٥٦٧٨٩])*[٠١٢٣٤٥٦٧٨٩]',
+                'regex' => "(\d{1,3}٬){0,1}(\d{3}٬)*\d{1,3}٫\d+",
             ],
 
             [
@@ -144,10 +143,9 @@ class FloatProtector extends AbstractProtector
         ?string $targetFormat
     ): string {
         $float = null;
-        $sourceLocale = null;
 
         if (empty($sourceFormat['keepAsIs'])) {
-            $float = FloatObject::parse($number, $sourceLocale);
+            $float = FloatObject::parse($number, $sourceFormat['locale'] ?? null);
         }
 
         return sprintf(
@@ -155,7 +153,7 @@ class FloatProtector extends AbstractProtector
             self::TYPE,
             $sourceFormat['name'] ?? 'default',
             $number,
-            $float ? $float->format(format: '#.#'): '',
+            $float ? $float->format(format: '#.#') : '',
             $this->getTargetFloat($float, $targetFormat, $targetLang)
         );
     }
@@ -179,7 +177,7 @@ class FloatProtector extends AbstractProtector
     protected function getJoinedRegex(): string
     {
         return <<<REGEX
-/(^|\s)((\d*(,|\.)\d+e-?\d+)|(\d([ ,\.·˙'\x{2009}\x{202F}]|\d)*\d)|([٠١٢٣٤٥٦٧٨٩]([٬٫]|[٠١٢٣٤٥٦٧٨٩])*[٠١٢٣٤٥٦٧٨٩]))($|[^٠١٢٣٤٥٦٧٨٩\d])/u
+/(^|\s)((\d*(,|\.)\d+e-?\d+)|(\d([ ,\.·˙'\x{2009}\x{202F}٬٫]|\d)*\d))($|[^\d])/u
 REGEX;
     }
 
