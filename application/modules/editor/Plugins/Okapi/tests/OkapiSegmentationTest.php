@@ -30,7 +30,7 @@ use editor_Plugins_Okapi_Bconf_Segmentation_Srx as Srx;
 /**
  * Test whether srx-based text segmentation works as expected
  */
-class Translate3408Test extends editor_Test_UnitTest {
+class OkapiSegmentationTest extends editor_Test_UnitTest {
 
     /**
      * @var string

@@ -40,6 +40,17 @@ final class editor_Plugins_Okapi_Bconf_Segmentation_Srx extends editor_Plugins_O
      */
     const SYSTEM_TARGET_SRX = '/application/modules/editor/Plugins/Okapi/data/srx/translate5/languages-2.srx';
 
+    /**
+     * Create and return self instance using SYSTEM_TARGET_SRX as path
+     *
+     * @return editor_Plugins_Okapi_Bconf_Segmentation_Srx
+     * @throws ZfExtended_Exception
+     */
+    public static function createSystemTargetSrx() {
+        return new self(APPLICATION_ROOT . self::SYSTEM_TARGET_SRX);
+    }
+
+
     // a SRX is generally a XML variant
     protected string $mime = 'text/xml';
 
@@ -213,7 +224,7 @@ final class editor_Plugins_Okapi_Bconf_Segmentation_Srx extends editor_Plugins_O
      * @param string $regex
      * @return array|string|string[]|null
      */
-    function disableCapturingGroups(string $regex) {
+    private function disableCapturingGroups(string $regex) {
 
         // No slash before
         $nsb = '(?<!\\\)';
@@ -228,15 +239,5 @@ final class editor_Plugins_Okapi_Bconf_Segmentation_Srx extends editor_Plugins_O
 
         // Insert '?:' after group's opening '(', to make that group to be non-capturing
         return preg_replace($capturingGroup, '$1?:$2$3', $regex);
-    }
-
-    /**
-     * Create and return self instance using SYSTEM_TARGET_SRX as path
-     *
-     * @return editor_Plugins_Okapi_Bconf_Segmentation_Srx
-     * @throws ZfExtended_Exception
-     */
-    public static function createSystemTargetSrx() {
-        return new self(APPLICATION_ROOT . self::SYSTEM_TARGET_SRX);
     }
 }
