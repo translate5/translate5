@@ -141,6 +141,8 @@ abstract class AbstractProtector implements NumberProtectorInterface, RatingInte
         ?string $targetFormat
     ): string;
 
+    abstract protected function composeRegex(string ...$parts): string;
+
     /**
      * @param string[] $splitNodes
      * @param string[][] $nodesToProtect
@@ -214,11 +216,6 @@ abstract class AbstractProtector implements NumberProtectorInterface, RatingInte
         throw new \LogicException(
             sprintf('None of regex matches current date "%s" that should not be possible', $node)
         );
-    }
-
-    protected function composeRegex(string ...$parts): string
-    {
-        return sprintf('/\b(%s)\b/', implode('|', $parts));
     }
 
     protected function getJoinedRegex(): string

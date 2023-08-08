@@ -173,7 +173,7 @@ class DateProtector extends AbstractProtector
 
     public function rating(): int
     {
-        return 500;
+        return 600;
     }
 
     protected function getDefaultFormats(): array
@@ -223,5 +223,10 @@ class DateProtector extends AbstractProtector
         }
 
         return '';
+    }
+
+    protected function composeRegex(string ...$parts): string
+    {
+        return sprintf('/\b(%s)\b/', implode('|', $parts));
     }
 }

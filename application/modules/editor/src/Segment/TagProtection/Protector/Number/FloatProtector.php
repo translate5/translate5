@@ -177,7 +177,7 @@ class FloatProtector extends AbstractProtector
     protected function getJoinedRegex(): string
     {
         return <<<REGEX
-/(^|\s)((\d*(,|\.)\d+e-?\d+)|(\d([ ,\.·˙'\x{2009}\x{202F}٬٫]|\d)*\d))($|[^\d])/u
+/(^|\b)((\d*(,|\.)\d+e-?\d+)|(\d([ ,\.·˙'\x{2009}\x{202F}٬٫]|\d)*\d))($|\b)/u
 REGEX;
     }
 

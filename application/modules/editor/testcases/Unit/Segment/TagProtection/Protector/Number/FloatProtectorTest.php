@@ -131,9 +131,9 @@ class FloatProtectorTest extends TestCase
         yield 'date in the middle of text' => [
             'textNodes' => [new ChunkDto('some text with float in it: 1,234,567.89. in the middle', false)],
             'expected' => [
-                new ChunkDto('some text with float in it:', false),
-                new ChunkDto(' <number type="float" name="default" source="1,234,567.89" iso="1234567.89" target="" />.', true),
-                new ChunkDto(' in the middle', false),
+                new ChunkDto('some text with float in it: ', false),
+                new ChunkDto('<number type="float" name="default" source="1,234,567.89" iso="1234567.89" target="" />', true),
+                new ChunkDto('. in the middle', false),
             ],
             'targetLang' => null,
         ];
@@ -141,8 +141,8 @@ class FloatProtectorTest extends TestCase
         yield 'date in the end of text' => [
             'textNodes' => [new ChunkDto('some text with float in it: 1,234,567.89', false)],
             'expected' => [
-                new ChunkDto('some text with float in it:', false),
-                new ChunkDto(' <number type="float" name="default" source="1,234,567.89" iso="1234567.89" target="" />', true),
+                new ChunkDto('some text with float in it: ', false),
+                new ChunkDto('<number type="float" name="default" source="1,234,567.89" iso="1234567.89" target="" />', true),
             ],
             'targetLang' => null,
         ];
@@ -150,8 +150,8 @@ class FloatProtectorTest extends TestCase
         yield 'date in the beginning of text' => [
             'textNodes' => [new ChunkDto('1,234,567.89, some text with float in it', false)],
             'expected' => [
-                new ChunkDto('<number type="float" name="default" source="1,234,567.89" iso="1234567.89" target="" />,', true),
-                new ChunkDto(' some text with float in it', false),
+                new ChunkDto('<number type="float" name="default" source="1,234,567.89" iso="1234567.89" target="" />', true),
+                new ChunkDto(', some text with float in it', false),
             ],
             'targetLang' => null,
         ];
@@ -163,9 +163,9 @@ class FloatProtectorTest extends TestCase
         yield 'date in the middle of text. targetLang = ar-EG' => [
             'textNodes' => [new ChunkDto('some text with float in it: 1.234.567,123456, in the middle', false)],
             'expected' => [
-                new ChunkDto('some text with float in it:', false),
-                new ChunkDto(' <number type="float" name="default" source="1.234.567,123456" iso="1234567.123456" target="١٬٢٣٤٬٥٦٧٫١٢٣٤٥٦" />,', true),
-                new ChunkDto(' in the middle', false),
+                new ChunkDto('some text with float in it: ', false),
+                new ChunkDto('<number type="float" name="default" source="1.234.567,123456" iso="1234567.123456" target="١٬٢٣٤٬٥٦٧٫١٢٣٤٥٦" />', true),
+                new ChunkDto(', in the middle', false),
             ],
             'targetLang' => $targetLangAr,
         ];
