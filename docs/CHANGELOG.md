@@ -29,6 +29,28 @@ All updates are (downwards) compatible! If not this is listed in the important r
 
 
 
+
+## [6.5.1] - 2023-08-04
+
+### Important Notes:
+ 
+
+
+### Bugfixes
+**[TRANSLATE-3442](https://jira.translate5.net/browse/TRANSLATE-3442): Client management - Role Client-PM must have Customer-management enabled to have customers available in other views** <br>
+FIX: Role "PM selected Clients" must have Customer management enabled to have accessible Customers in other management-views
+
+**[TRANSLATE-3441](https://jira.translate5.net/browse/TRANSLATE-3441): Editor general - Translate5 UI errors** <br>
+Multiple fixes for UI errors.
+
+**[TRANSLATE-3433](https://jira.translate5.net/browse/TRANSLATE-3433): VisualReview / VisualTranslation - Segment selection/scrolling may leads to wrong "segment not found" toasts** <br>
+translate5 - 6.5.0: BUG: segment selection/scrolling may leads to wrong "segment not found" toasts
+translate5 - 6.5.1: Additional improvement
+
+**[TRANSLATE-3422](https://jira.translate5.net/browse/TRANSLATE-3422): TBX-Import - Language mapping does not work correctly for TBX, that are imported in a zip** <br>
+Language matching is improved when importing TBX file in import zip package.
+
+
 ## [6.5.0] - 2023-07-28
 
 ### Important Notes:
