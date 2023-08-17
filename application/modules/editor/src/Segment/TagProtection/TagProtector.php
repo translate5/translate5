@@ -71,7 +71,7 @@ class TagProtector
         ?int $targetLang,
         bool $protectTags = false
     ): string {
-        $text = $this->protectTags($protectTags, $text);
+        $text = $this->protectTags($text, $protectTags);
 
         foreach ($this->protectors as $protector) {
             if ($protector->hasEntityToProtect($text, $sourceLang)) {
@@ -80,7 +80,7 @@ class TagProtector
             }
         }
 
-        $text = $this->protectTags($protectTags, $text);
+        $text = $this->protectTags($text, $protectTags);
 
         return $this->utilities->whitespace->protectWhitespace(
             $text,
@@ -88,12 +88,7 @@ class TagProtector
         );
     }
 
-    /**
-     * @param bool $protectTags
-     * @param string $text
-     * @return string|null
-     */
-    public function protectTags(bool $protectTags, string $text): ?string
+    private function protectTags(string $text, bool $protectTags): ?string
     {
         if (!$protectTags) {
             return $text;
