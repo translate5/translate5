@@ -53,345 +53,120 @@ declare(strict_types=1);
 namespace MittagQI\Translate5\Test\Unit\Segment\TagProtection\Protector\Number;
 
 use editor_Models_Languages;
+use editor_Models_Segment_Number_LanguageFormat as LanguageFormat;
 use MittagQI\Translate5\Repository\LanguageNumberFormatRepository;
-use MittagQI\Translate5\Segment\TagProtection\Protector\ChunkDto;
 use MittagQI\Translate5\Segment\TagProtection\Protector\Number\DateProtector;
+use MittagQI\Translate5\Segment\TagProtection\Protector\Number\NumberParsingException;
 use PHPUnit\Framework\TestCase;
 
 class DateProtectorTest extends TestCase
 {
     /**
-     * @dataProvider datesProvider
-     */
-    public function testHasEntityToProtectWithNoSourceLang(string $date, bool $valid): void
-    {
-        $repo = $this->createConfiguredMock(
-            LanguageNumberFormatRepository::class,
-            ['findByLanguageIdAndType' => []]
-        );
-        self::assertSame($valid, (new DateProtector($repo))->hasEntityToProtect($date, null));
-    }
-
-    public function datesProvider(): iterable
-    {
-        yield ['date' => 'string 20231020 string', 'valid' => true];
-        yield ['date' => 'string 20231230 string', 'valid' => true];
-        yield ['date' => 'string 20233108 string', 'valid' => false];
-
-        yield ['date' => 'string 05/07/23 string', 'valid' => true];
-        yield ['date' => 'string 05/27/23 string', 'valid' => true];
-        yield ['date' => 'string 05/17/23 string', 'valid' => true];
-        yield ['date' => 'string 05/30/23 string', 'valid' => true];
-        yield ['date' => 'string 31/07/23 string', 'valid' => true];
-        yield ['date' => 'string 26/07/23 string', 'valid' => true];
-        yield ['date' => 'string 19/07/23 string', 'valid' => true];
-        yield ['date' => 'string 19/7/23 string', 'valid' => true];
-        yield ['date' => 'string 5/7/23 string', 'valid' => true];
-        yield ['date' => 'string 5/27/23 string', 'valid' => true];
-        yield ['date' => 'string 5/17/23 string', 'valid' => true];
-        yield ['date' => 'string 5/30/23 string', 'valid' => true];
-        yield ['date' => 'string 05/07/2023 string', 'valid' => true];
-        yield ['date' => 'string 5/7/2023 string', 'valid' => true];
-        yield ['date' => 'string 2023/05/07 string', 'valid' => true];
-        yield ['date' => 'string 2023/5/7 string', 'valid' => true];
-        yield ['date' => 'string 35/7/23 string', 'valid' => true];
-        yield ['date' => 'string 35/07/23 string', 'valid' => true];
-
-        yield ['date' => 'string 05/07/123 string', 'valid' => false];
-        yield ['date' => 'string 123/05/07 string', 'valid' => false];
-        yield ['date' => 'string 35/7/2023 string', 'valid' => false];
-        yield ['date' => 'string 35/07/2023 string', 'valid' => false];
-        yield ['date' => 'string 30/17/2023 string', 'valid' => false];
-        yield ['date' => 'string 13/31/2023 string', 'valid' => false];
-        yield ['date' => 'string 2023/5/37 string', 'valid' => false];
-        yield ['date' => 'string 2023/15/30 string', 'valid' => false];
-        yield ['date' => 'string 2023/30/13 string', 'valid' => false];
-        yield ['date' => 'string 2023/32/3 string', 'valid' => false];
-        yield ['date' => 'string 30/17/23 string', 'valid' => false];
-        yield ['date' => 'string 13/31/23 string', 'valid' => false];
-        yield ['date' => 'string 33/5/37 string', 'valid' => false];
-        yield ['date' => 'string 23/15/30 string', 'valid' => false];
-        yield ['date' => 'string 23/30/13 string', 'valid' => false];
-        yield ['date' => 'string 23/32/3 string', 'valid' => false];
-
-        yield ['date' => 'string 05-07-23 string', 'valid' => true];
-        yield ['date' => 'string 05-27-23 string', 'valid' => true];
-        yield ['date' => 'string 05-17-23 string', 'valid' => true];
-        yield ['date' => 'string 05-30-23 string', 'valid' => true];
-        yield ['date' => 'string 31-07-23 string', 'valid' => true];
-        yield ['date' => 'string 26-07-23 string', 'valid' => true];
-        yield ['date' => 'string 19-07-23 string', 'valid' => true];
-        yield ['date' => 'string 19-7-23 string', 'valid' => true];
-        yield ['date' => 'string 5-7-23 string', 'valid' => true];
-        yield ['date' => 'string 5-27-23 string', 'valid' => true];
-        yield ['date' => 'string 5-17-23 string', 'valid' => true];
-        yield ['date' => 'string 5-30-23 string', 'valid' => true];
-        yield ['date' => 'string 05-07-2023 string', 'valid' => true];
-        yield ['date' => 'string 5-7-2023 string', 'valid' => true];
-        yield ['date' => 'string 2023-05-07 string', 'valid' => true];
-        yield ['date' => 'string 2023-5-7 string', 'valid' => true];
-        yield ['date' => 'string 05-07-123 string', 'valid' => false];
-        yield ['date' => 'string 123-05-07 string', 'valid' => false];
-        yield ['date' => 'string 35-7-2023 string', 'valid' => false];
-        yield ['date' => 'string 35-07-2023 string', 'valid' => false];
-        yield ['date' => 'string 30-17-2023 string', 'valid' => false];
-        yield ['date' => 'string 13-31-2023 string', 'valid' => false];
-        yield ['date' => 'string 2023-5-37 string', 'valid' => false];
-        yield ['date' => 'string 2023-15-30 string', 'valid' => false];
-        yield ['date' => 'string 2023-30-13 string', 'valid' => false];
-        yield ['date' => 'string 2023-32-3 string', 'valid' => false];
-        yield ['date' => 'string 35-7-23 string', 'valid' => false];
-        yield ['date' => 'string 35-07-23 string', 'valid' => false];
-        yield ['date' => 'string 30-17-23 string', 'valid' => false];
-        yield ['date' => 'string 13-31-23 string', 'valid' => false];
-        yield ['date' => 'string 33-5-37 string', 'valid' => false];
-        yield ['date' => 'string 23-15-30 string', 'valid' => false];
-        yield ['date' => 'string 23-30-13 string', 'valid' => false];
-        yield ['date' => 'string 23-32-3 string', 'valid' => false];
-
-        yield ['date' => 'string 05.07.23 string', 'valid' => true];
-        yield ['date' => 'string 05.27.23 string', 'valid' => true];
-        yield ['date' => 'string 05.17.23 string', 'valid' => true];
-        yield ['date' => 'string 05.30.23 string', 'valid' => true];
-        yield ['date' => 'string 31.07.23 string', 'valid' => true];
-        yield ['date' => 'string 26.07.23 string', 'valid' => true];
-        yield ['date' => 'string 19.07.23 string', 'valid' => true];
-        yield ['date' => 'string 19.7.23 string', 'valid' => true];
-        yield ['date' => 'string 5.7.23 string', 'valid' => true];
-        yield ['date' => 'string 5.27.23 string', 'valid' => true];
-        yield ['date' => 'string 5.17.23 string', 'valid' => true];
-        yield ['date' => 'string 5.30.23 string', 'valid' => true];
-        yield ['date' => 'string 05.07.2023 string', 'valid' => true];
-        yield ['date' => 'string 5.7.2023 string', 'valid' => true];
-        yield ['date' => 'string 2023.05.07 string', 'valid' => true];
-        yield ['date' => 'string 2023.5.7 string', 'valid' => true];
-
-        yield ['date' => 'string 05.07.123 string', 'valid' => false];
-        yield ['date' => 'string 123.05.07 string', 'valid' => false];
-        yield ['date' => 'string 35.7.2023 string', 'valid' => false];
-        yield ['date' => 'string 35.07.2023 string', 'valid' => false];
-        yield ['date' => 'string 30.17.2023 string', 'valid' => false];
-        yield ['date' => 'string 13.31.2023 string', 'valid' => false];
-        yield ['date' => 'string 2023.5.37 string', 'valid' => false];
-        yield ['date' => 'string 2023.15.30 string', 'valid' => false];
-        yield ['date' => 'string 2023.30.13 string', 'valid' => false];
-        yield ['date' => 'string 2023.32.3 string', 'valid' => false];
-        yield ['date' => 'string 35.7.23 string', 'valid' => false];
-        yield ['date' => 'string 35.07.23 string', 'valid' => false];
-        yield ['date' => 'string 30.17.23 string', 'valid' => false];
-        yield ['date' => 'string 13.31.23 string', 'valid' => false];
-        yield ['date' => 'string 33.5.37 string', 'valid' => false];
-        yield ['date' => 'string 23.15.30 string', 'valid' => false];
-        yield ['date' => 'string 23.30.13 string', 'valid' => false];
-        yield ['date' => 'string 23.32.3 string', 'valid' => false];
-
-        yield ['date' => 'string 05 07 2023 string', 'valid' => true];
-        yield ['date' => 'string 5 7 2023 string', 'valid' => true];
-        yield ['date' => 'string 31 11 2023 string', 'valid' => true];
-        yield ['date' => 'string 31 5 2023 string', 'valid' => true];
-        yield ['date' => 'string 2023 05 07 string', 'valid' => true];
-        yield ['date' => 'string 2023 5 7 string', 'valid' => true];
-        yield ['date' => 'string 2023 5 30 string', 'valid' => true];
-        yield ['date' => 'string 2023 12 31 string', 'valid' => true];
-
-        yield ['date' => 'string 05 07 23 string', 'valid' => false];
-        yield ['date' => 'string 05 27 23 string', 'valid' => false];
-        yield ['date' => 'string 05 17 23 string', 'valid' => false];
-        yield ['date' => 'string 05 30 23 string', 'valid' => false];
-        yield ['date' => 'string 31 07 23 string', 'valid' => false];
-        yield ['date' => 'string 26 07 23 string', 'valid' => false];
-        yield ['date' => 'string 19 07 23 string', 'valid' => false];
-        yield ['date' => 'string 19 7 23 string', 'valid' => false];
-        yield ['date' => 'string 5 7 23 string', 'valid' => false];
-        yield ['date' => 'string 5 27 23 string', 'valid' => false];
-        yield ['date' => 'string 5 17 23 string', 'valid' => false];
-        yield ['date' => 'string 5 30 23 string', 'valid' => false];
-        yield ['date' => 'string 05 07 123 string', 'valid' => false];
-        yield ['date' => 'string 123 05 07 string', 'valid' => false];
-        yield ['date' => 'string 35 7 2023 string', 'valid' => false];
-        yield ['date' => 'string 35 07 2023 string', 'valid' => false];
-        yield ['date' => 'string 30 17 2023 string', 'valid' => false];
-        yield ['date' => 'string 13 31 2023 string', 'valid' => false];
-        yield ['date' => 'string 2023 5 37 string', 'valid' => false];
-        yield ['date' => 'string 2023 15 30 string', 'valid' => false];
-        yield ['date' => 'string 2023 30 13 string', 'valid' => false];
-        yield ['date' => 'string 2023 32 3 string', 'valid' => false];
-        yield ['date' => 'string 35 7 23 string', 'valid' => false];
-        yield ['date' => 'string 35 07 23 string', 'valid' => false];
-        yield ['date' => 'string 30 17 23 string', 'valid' => false];
-        yield ['date' => 'string 13 31 23 string', 'valid' => false];
-        yield ['date' => 'string 33 5 37 string', 'valid' => false];
-        yield ['date' => 'string 23 15 30 string', 'valid' => false];
-        yield ['date' => 'string 23 30 13 string', 'valid' => false];
-        yield ['date' => 'string 23 32 3 string', 'valid' => false];
-        yield ['date' => '149 597 870 700', 'valid' => false];
-
-        yield ['date' => 'string 05/07 2023 string', 'valid' => true];
-        yield ['date' => 'string 31/12 2023 string', 'valid' => true];
-        yield ['date' => 'string 12/31 2023 string', 'valid' => false];
-        yield ['date' => 'string 2023 12/31 string', 'valid' => false];
-        yield ['date' => 'string 2023 31/12 string', 'valid' => false];
-    }
-
-    /**
      * @dataProvider defaultDataToProtect
      */
     public function testProtectDefaultFormats(
-        array $textNodes,
-        array $expected,
+        string $number,
+        string $expected,
+        LanguageFormat $sourceFormat,
+        ?LanguageFormat $targetFormat,
         ?editor_Models_Languages $targetLang
     ): void {
-        $repo = $this->createConfiguredMock(LanguageNumberFormatRepository::class, ['findDateFormat' => null]);
-        $protected = (new DateProtector($repo))->protect($textNodes, null, $targetLang);
+        $repo = $this->createConfiguredMock(LanguageNumberFormatRepository::class, ['findBy' => $targetFormat]);
+        $protected = (new DateProtector($repo))->protect($number, $sourceFormat, null, $targetLang);
 
-        $result = [];
-        foreach ($protected as $p) {
-            $result[] = $p;
-        }
-
-        self::assertEquals($expected, $result);
+        self::assertSame($expected, $protected);
     }
 
     public function defaultDataToProtect(): iterable
     {
-        yield 'date in the middle of text' => [
-            'textNodes' => [new ChunkDto('some text with date in it: 2023-07-18. in the middle', false)],
-            'expected' => [
-                new ChunkDto('some text with date in it: ', false),
-                new ChunkDto('<number type="date" name="default" source="2023-07-18" iso="2023-07-18" target="" />', true),
-                new ChunkDto('. in the middle', false),
-            ],
+        $sourceFormat = $this->createConfiguredMock(LanguageFormat::class, []);
+        $sourceFormat
+            ->method('__call')
+            ->willReturnCallback(function($name, $args) {
+                return match ($name) {
+                    'getName' => 'test-default',
+                    'getRegex' => '/\b\d{4}\/(0[1-9]|[1-2][0-9]|3[0-1]|[1-9])\/(0[1-9]|1[0-2]|[1-9])\b/',
+                    'getFormat' => 'Y/d/m',
+                    'getKeepAsIs' => false,
+                    'getType' => 'date',
+                };
+            });
+
+        yield 'date' => [
+            'number' => '2023/18/07',
+            'expected' => '<number type="date" name="test-default" source="2023/18/07" iso="2023-07-18" target="" />',
+            'sourceFormat' => $sourceFormat,
+            'targetFormat' => null,
             'targetLang' => null,
-        ];
-
-        yield 'date at the end of text' => [
-            'textNodes' => [
-                new ChunkDto('some text with date in it: 18-07-2023', false)
-            ],
-            'expected' => [
-                new ChunkDto('some text with date in it: ', false),
-                new ChunkDto('<number type="date" name="default" source="18-07-2023" iso="2023-07-18" target="" />', true),
-            ],
-            'targetLang' => null,
-        ];
-
-        yield 'date at the beginning of text' => [
-            'textNodes' => [
-                new ChunkDto('07-18-2023 some text with date in it', false)
-            ],
-            'expected' => [
-                new ChunkDto('<number type="date" name="default" source="07-18-2023" iso="2023-07-18" target="" />', true),
-                new ChunkDto(' some text with date in it', false),
-            ],
-            'targetLang' => null,
-        ];
-
-        yield 'date at the beginning and end of text' => [
-            'textNodes' => [
-                new ChunkDto('07.18.23 some text with date in it 18/07/2023', false)
-            ],
-            'expected' => [
-                new ChunkDto('<number type="date" name="default" source="07.18.23" iso="2023-07-18" target="" />', true),
-                new ChunkDto(' some text with date in it ', false),
-                new ChunkDto('<number type="date" name="default" source="18/07/2023" iso="2023-07-18" target="" />', true),
-            ],
-            'targetLang' => null,
-        ];
-
-        yield 'a lot of different dates inside text' => [
-            'textNodes' => [
-                new ChunkDto('07/18/23 some text with date in it: 2023-07-18. in the middle 07.18.2023 and some more text 07 18 2023 and more 20231231', false)
-            ],
-            'expected' => [
-                new ChunkDto('<number type="date" name="default" source="07/18/23" iso="2023-07-18" target="" />', true),
-                new ChunkDto(' some text with date in it: ', false),
-                new ChunkDto('<number type="date" name="default" source="2023-07-18" iso="2023-07-18" target="" />', true),
-                new ChunkDto('. in the middle ', false),
-                new ChunkDto('<number type="date" name="default" source="07.18.2023" iso="2023-07-18" target="" />', true),
-                new ChunkDto(' and some more text ', false),
-                new ChunkDto('<number type="date" name="default" source="07 18 2023" iso="2023-07-18" target="" />', true),
-                new ChunkDto(' and more ', false),
-                new ChunkDto('<number type="date" name="default" source="20231231" iso="2023-12-31" target="" />', true),
-            ],
-            'targetLang' => null,
-        ];
-
-        yield '2 test nodes. date in the middle of second text' => [
-            'textNodes' => [
-                new ChunkDto('some text', false),
-                new ChunkDto('some text with date in it: 2023-07-18. in the middle', false)
-            ],
-            'expected' => [
-                new ChunkDto('some text', false),
-                new ChunkDto('some text with date in it: ', false),
-                new ChunkDto('<number type="date" name="default" source="2023-07-18" iso="2023-07-18" target="" />', true),
-                new ChunkDto('. in the middle', false),
-            ],
-            'targetLang' => null,
-        ];
-
-        yield '3 test nodes. second marked as protected. date in the middle of third text' => [
-            'textNodes' => [
-                new ChunkDto('some text', false),
-                new ChunkDto('2023-07-18', true),
-                new ChunkDto('some text with date in it: 2023-07-18. in the middle', false)
-            ],
-            'expected' => [
-                new ChunkDto('some text', false),
-                new ChunkDto('2023-07-18', true),
-                new ChunkDto('some text with date in it: ', false),
-                new ChunkDto('<number type="date" name="default" source="2023-07-18" iso="2023-07-18" target="" />', true),
-                new ChunkDto('. in the middle', false),
-            ],
-            'targetLang' => null,
-        ];
-
-        yield '4 test nodes. second marked as protected. date in the middle of third text' => [
-            'textNodes' => [
-                new ChunkDto('some text', false),
-                new ChunkDto('2023-07-18', true),
-                new ChunkDto('some text with date in it: 2023-07-18. in the middle', false),
-                new ChunkDto('some additional text', false)
-            ],
-            'expected' => [
-                new ChunkDto('some text', false),
-                new ChunkDto('2023-07-18', true),
-                new ChunkDto('some text with date in it: ', false),
-                new ChunkDto('<number type="date" name="default" source="2023-07-18" iso="2023-07-18" target="" />', true),
-                new ChunkDto('. in the middle', false),
-                new ChunkDto('some additional text', false),
-            ],
-            'targetLang' => null,
-        ];
-
-        $targetLangEn = new editor_Models_Languages();
-        $targetLangEn->setId(0);
-        $targetLangEn->setRfc5646('en-US');
-
-        yield 'date at the end of text. target en-US' => [
-            'textNodes' => [
-                new ChunkDto('some text with date in it: 18-07-2023', false)
-            ],
-            'expected' => [
-                new ChunkDto('some text with date in it: ', false),
-                new ChunkDto('<number type="date" name="default" source="18-07-2023" iso="2023-07-18" target="7/18/23" />', true),
-            ],
-            'targetLang' => $targetLangEn,
         ];
 
         $targetLangDe = new editor_Models_Languages();
         $targetLangDe->setId(0);
         $targetLangDe->setRfc5646('de-DE');
 
-        yield 'date at the end of text. target de-DE' => [
-            'textNodes' => [
-                new ChunkDto('some text with date in it: 18-07-2023', false)
-            ],
-            'expected' => [
-                new ChunkDto('some text with date in it: ', false),
-                new ChunkDto('<number type="date" name="default" source="18-07-2023" iso="2023-07-18" target="18.07.23" />', true),
-            ],
+        yield 'target lang de-DE' => [
+            'number' => '2023/18/07',
+            'expected' => '<number type="date" name="test-default" source="2023/18/07" iso="2023-07-18" target="18.07.23" />',
+            'sourceFormat' => $sourceFormat,
+            'targetFormat' => null,
             'targetLang' => $targetLangDe,
         ];
+
+        $targetFormat = $this->createConfiguredMock(LanguageFormat::class, []);
+        $targetFormat
+            ->method('__call')
+            ->willReturnCallback(function($name, $args) {
+                return match ($name) {
+                    'getFormat' => 'Y*m*d',
+                };
+            });
+
+        yield 'date. target format Y*m*d' => [
+            'number' => '2023/18/07',
+            'expected' => '<number type="date" name="test-default" source="2023/18/07" iso="2023-07-18" target="2023*07*18" />',
+            'sourceFormat' => $sourceFormat,
+            'targetFormat' => $targetFormat,
+            'targetLang' => $targetLangDe,
+        ];
+
+        $sourceFormatKeepAsIs = $this->createConfiguredMock(LanguageFormat::class, []);
+        $sourceFormatKeepAsIs
+            ->method('__call')
+            ->willReturnCallback(function($name, $args) {
+                return match ($name) {
+                    'getName' => 'test-default',
+                    'getRegex' => '/\b\d{4}\/(0[1-9]|[1-2][0-9]|3[0-1]|[1-9])\/(0[1-9]|1[0-2]|[1-9])\b/',
+                    'getFormat' => 'Y/d/m',
+                    'getKeepAsIs' => true,
+                    'getType' => 'date',
+                };
+            });
+
+        yield 'date. keep as is' => [
+            'number' => '2023/18/07',
+            'expected' => '<number type="date" name="test-default" source="2023/18/07" iso="" target="" />',
+            'sourceFormat' => $sourceFormatKeepAsIs,
+            'targetFormat' => $targetFormat,
+            'targetLang' => $targetLangDe,
+        ];
+    }
+
+    public function testExceptionOnWrongDate(): void {
+        $sourceFormat = $this->createConfiguredMock(LanguageFormat::class, []);
+        $sourceFormat
+            ->method('__call')
+            ->willReturnCallback(function($name, $args) {
+                return match ($name) {
+                    'getName' => 'test-default',
+                    'getRegex' => '/\b\d{4}\/(0[1-9]|[1-2][0-9]|3[0-1]|[1-9])\/(0[1-9]|1[0-2]|[1-9])\b/',
+                    'getFormat' => 'Y/d/m',
+                    'getKeepAsIs' => false,
+                    'getType' => 'date',
+                };
+            });
+        $repo = $this->createConfiguredMock(LanguageNumberFormatRepository::class, ['findBy' => null]);
+
+        $this->expectException(NumberParsingException::class);
+        (new DateProtector($repo))->protect('2023/18/13', $sourceFormat, null, null);
     }
 }

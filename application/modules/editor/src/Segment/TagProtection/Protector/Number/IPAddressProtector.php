@@ -52,66 +52,10 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\Segment\TagProtection\Protector\Number;
 
-use DateTime;
-use editor_Models_Languages;
-use editor_Models_Segment_Number_LanguageFormat as LanguageFormat;
-use IntlDateFormatter;
-
-class DateProtector extends AbstractProtector
+class IPAddressProtector extends AbstractProtector
 {
     public static function getType(): string
     {
-        return 'date';
-    }
-
-    protected function composeNumberTag(
-        string $number,
-        LanguageFormat $sourceFormat,
-        ?editor_Models_Languages $sourceLang,
-        ?editor_Models_Languages $targetLang,
-        ?string $targetFormat
-    ): string {
-        $date = null;
-
-        if (!empty($sourceFormat->getFormat()) && !$sourceFormat->getKeepAsIs()) {
-            $date = DateTime::createFromFormat($sourceFormat->getFormat(), $number);
-
-            // 31.11.2023 -> 12.01.2023
-            $errArr = DateTime::getLastErrors();
-            if (0 !== $errArr['warning_count'] + $errArr['error_count']) {
-                throw new NumberParsingException();
-            }
-        }
-
-        return sprintf(
-            self::TAG_FORMAT,
-            self::getType(),
-            $sourceFormat->getName(),
-            $number,
-            $date ? $date->format('Y-m-d') : '',
-            $this->getTargetDate($date, $targetFormat, $targetLang)
-        );
-    }
-
-    protected function getTargetDate(
-        ?DateTime $date,
-        ?string $targetFormat,
-        ?editor_Models_Languages $targetLang
-    ): string {
-        if (null === $date) {
-            return '';
-        }
-
-        if (null !== $targetFormat) {
-            return $date->format($targetFormat);
-        }
-
-        if (null !== $targetLang) {
-            $formater = datefmt_create($targetLang->getRfc5646(), IntlDateFormatter::SHORT, IntlDateFormatter::NONE);
-
-            return $formater->format($date);
-        }
-
-        return '';
+        return 'ip-address';
     }
 }

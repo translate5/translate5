@@ -53,15 +53,14 @@ declare(strict_types=1);
 namespace MittagQI\Translate5\Segment\TagProtection\Protector\Number;
 
 use editor_Models_Languages;
+use editor_Models_Segment_Number_LanguageFormat as LanguageFormat;
 use NumberFormatter;
 
 class IntegerProtector extends FloatProtector
 {
-    public const TYPE = 'integer';
-
-    public function rating(): int
+    public static function getType(): string
     {
-        return 300;
+        return 'integer';
     }
 
     protected function getDefaultFormats(): array
@@ -76,28 +75,24 @@ class IntegerProtector extends FloatProtector
         ];
     }
 
-    protected function getNodeToProtect(array $matches): string
-    {
-        return $matches[0];
-    }
-
     protected function composeNumberTag(
         string $number,
-        array $sourceFormat,
+        LanguageFormat $sourceFormat,
+        ?editor_Models_Languages $sourceLang,
         ?editor_Models_Languages $targetLang,
         ?string $targetFormat
     ): string {
         $integer = null;
 
-        if (empty($sourceFormat['keepAsIs'])) {
+        if (!$sourceFormat->getKeepAsIs()) {
             $fmt = NumberFormatter::create('en', NumberFormatter::DECIMAL);
             $integer = $fmt->parse(preg_replace('/[^\d]/u', '', $number), NumberFormatter::TYPE_INT64);
         }
 
         return sprintf(
             self::TAG_FORMAT,
-            self::TYPE,
-            $sourceFormat['name'] ?? 'default',
+            self::getType(),
+            $sourceFormat->getName(),
             $number,
             (string) $integer,
             $this->getTargetInteger($integer, $targetFormat, $targetLang)
@@ -117,18 +112,8 @@ class IntegerProtector extends FloatProtector
             return '';
         }
 
-        $fmt = NumberFormatter::create($targetLang->getRfc5646(), NumberFormatter::DECIMAL, $targetFormat);
+        $fmt = NumberFormatter::create($targetLang->getRfc5646(), NumberFormatter::PATTERN_DECIMAL, $targetFormat);
 
         return $fmt->format($integer);
-    }
-
-    protected function getJoinedRegex(): string
-    {
-        return AbstractProtector::getJoinedRegex();
-    }
-
-    protected function composeRegex(string ...$parts): string
-    {
-        return sprintf('/(^|\b)(%s)($|\b)/u', implode('|', $parts));
     }
 }

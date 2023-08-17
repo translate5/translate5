@@ -52,35 +52,169 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\Segment\TagProtection\Protector;
 
+use DOMCharacterData;
+use DOMDocument;
+use DOMElement;
+use DOMNode;
+use DOMText;
+use editor_Models_Languages;
+use editor_Models_Segment_Number_LanguageFormat as LanguageFormat;
+use MittagQI\Translate5\Repository\LanguageRepository;
+use MittagQI\Translate5\Segment\TagProtection\Protector\Number\NumberParsingException;
 use MittagQI\Translate5\Segment\TagProtection\Protector\Number\NumberProtectorInterface;
+use MittagQI\Translate5\Repository\LanguageNumberFormatRepository;
 
 class NumberProtector implements ProtectorInterface
 {
     /**
-     * @param array<NumberProtectorInterface & RatingInterface> $protectors
+     * @var array<string, NumberProtectorInterface>
      */
-    public function __construct(private array $protectors)
-    {
-        usort($this->protectors, fn (RatingInterface $p1, RatingInterface $p2) => $p2->rating() <=> $p1->rating());
+    private array $protectors;
+
+    private array $protectedNumbers = [];
+
+    private DOMDocument $document;
+
+    /**
+     * @param array<NumberProtectorInterface> $protectors
+     */
+    public function __construct(
+        array $protectors,
+        private LanguageNumberFormatRepository $numberFormatRepository,
+        private LanguageRepository $languageRepository
+    ) {
+        foreach ($protectors as $protector) {
+            $this->protectors[$protector::getType()] = $protector;
+        }
+        $this->document = new DOMDocument();
     }
 
-    public function hasEntityToProtect(string $textNode, ?int $sourceLang): bool
+    public function hasEntityToProtect(string $textNode, ?int $sourceLang = null): bool
     {
-        foreach ($this->protectors as $protector) {
-            if ($protector->hasEntityToProtect($textNode, $sourceLang)) {
-                return true;
+        return (bool) preg_match('/(\d|[[:xdigit:]][-:]+)/u', $textNode);
+    }
+
+    public function protect(string $textNode, ?int $sourceLangId, ?int $targetLangId): string
+    {
+        $sourceLang = $sourceLangId ? $this->languageRepository->find($sourceLangId) : null;
+        $targetLang = $targetLangId ? $this->languageRepository->find($targetLangId) : null;
+
+        $this->loadXML("<node>$textNode</node>");
+
+        foreach ($this->numberFormatRepository->getAll($sourceLang) as $langFormat) {
+            if (!preg_match($langFormat->getRegex(), $this->document->textContent)) {
+                continue;
+            }
+
+            $this->processElement($this->document->documentElement, $langFormat, $sourceLang, $targetLang);
+
+            // reloading document with potential new tags
+            $this->loadXML($this->getCurrentTextNode());
+        }
+
+        preg_match('/<node>(.+)<\/node>/', $this->getCurrentTextNode(), $matches);
+
+        return $matches[1];
+    }
+
+    private function processElement(
+        DOMNode $element,
+        LanguageFormat $langFormat,
+        ?editor_Models_Languages $sourceLang,
+        ?editor_Models_Languages $targetLang
+    ): void {
+        // we can't remove them in protectNumbers() because it will break `$element->childNodes` iterator,
+        // so we remove them after and replace original text node with a couple of generated nodes in protectNumbers()
+        $nodesToRemove = [];
+
+        foreach ($element->childNodes as $child) {
+            if ($child instanceof DOMElement) {
+                $this->processElement($child, $langFormat, $sourceLang, $targetLang);
+
+                continue;
+            }
+
+            if (
+                $child instanceof DOMCharacterData
+                && $this->protectNumbers($child, $langFormat, $sourceLang, $targetLang)
+            ) {
+                $nodesToRemove[] = $child;
             }
         }
 
-        return false;
+        foreach ($nodesToRemove as $node) {
+            $node->remove();
+        }
     }
 
-    public function protect(iterable $chunks, ?int $sourceLang, ?int $targetLang): iterable
-    {
-        foreach ($this->protectors as $protector) {
-            $chunks = $protector->protect($chunks, $sourceLang, $targetLang);
+    private function protectNumbers(
+        DOMCharacterData $text,
+        LanguageFormat $langFormat,
+        ?editor_Models_Languages $sourceLang,
+        ?editor_Models_Languages $targetLang
+    ): bool {
+        if (!preg_match_all($langFormat->getRegex(), $text->textContent, $matches)) {
+            return false;
         }
 
-        return $chunks;
+        $numbers = $matches[0];
+        $parts = preg_split($langFormat->getRegex(), $text->textContent);
+
+        $matchCount = count($numbers);
+
+        /** @var DOMNode $parentNode */
+        $parentNode = $text->parentNode;
+
+        for ($i = 0; $i <= $matchCount; $i++) {
+            if (!empty($parts[$i])) {
+                $parentNode->insertBefore(new DOMText($parts[$i]), $text);
+            }
+
+            if (!isset($numbers[$i])) {
+                continue;
+            }
+
+            $parentNode->insertBefore(
+                $this->protectNumber($numbers[$i], $langFormat, $sourceLang, $targetLang),
+                $text
+            );
+        }
+
+        return true;
+    }
+
+    private function protectNumber(
+        string $number,
+        LanguageFormat $langFormat,
+        ?editor_Models_Languages $sourceLang,
+        ?editor_Models_Languages $targetLang
+    ): DOMNode {
+        if (!isset($this->protectedNumbers[$number])) {
+            try {
+                $protectedNumber = $this
+                    ->protectors[$langFormat->getType()]
+                    ->protect($number, $langFormat, $sourceLang, $targetLang);
+            } catch (NumberParsingException) {
+                return new DOMText($number);
+            }
+
+            $dom = new DOMDocument();
+            $dom->loadXML($protectedNumber);
+            $this->protectedNumbers[$number] = $this->document->importNode($dom->firstChild);
+        }
+
+        return $this->protectedNumbers[$number]->cloneNode();
+    }
+
+    private function loadXML(string $textNode): void
+    {
+        $this->document->loadXML($textNode);
+        // loadXML resets encoding so we setting it here at each iteration
+        $this->document->encoding = 'utf-8';
+    }
+
+    private function getCurrentTextNode(): string
+    {
+        return $this->document->saveXML($this->document->documentElement);
     }
 }

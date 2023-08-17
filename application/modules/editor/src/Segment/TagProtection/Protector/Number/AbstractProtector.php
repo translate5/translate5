@@ -54,13 +54,10 @@ namespace MittagQI\Translate5\Segment\TagProtection\Protector\Number;
 
 use editor_Models_Languages;
 use MittagQI\Translate5\Repository\LanguageNumberFormatRepository;
-use MittagQI\Translate5\Segment\TagProtection\Protector\ChunkDto;
-use MittagQI\Translate5\Segment\TagProtection\Protector\RatingInterface;
+use editor_Models_Segment_Number_LanguageFormat as LanguageFormat;
 
-abstract class AbstractProtector implements NumberProtectorInterface, RatingInterface
+abstract class AbstractProtector implements NumberProtectorInterface
 {
-    public const TYPE = 'invalid';
-
     protected const TAG_FORMAT = '<number type="%s" name="%s" source="%s" iso="%s" target="%s" />';
 
     private array $formatsCache = [];
@@ -69,211 +66,50 @@ abstract class AbstractProtector implements NumberProtectorInterface, RatingInte
     {
     }
 
-    public function hasEntityToProtect(string $textNode, ?editor_Models_Languages $sourceLang): bool
-    {
-        if (preg_match($this->getJoinedRegex(), $textNode)) {
-            return true;
-        }
-
-        foreach (array_column($this->getFormatsByLang($sourceLang), 'regex') as $regex) {
-            if (preg_match($regex, $textNode)) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
     /**
      * {@inheritDoc}
      */
     public function protect(
-        iterable $chunks,
-        ?editor_Models_Languages $sourceLang,
-        ?editor_Models_Languages $targetLang
-    ): iterable
-    {
-        $regexes = $this->getSplitRegexes($sourceLang);
-
-        foreach ($chunks as $chunk) {
-            if ($chunk->protected) {
-                yield $chunk;
-
-                continue;
-            }
-
-            foreach ($regexes as $regex) {
-                preg_match_all($regex, $chunk->text, $matches, PREG_SPLIT_DELIM_CAPTURE);
-
-                yield from $this->processSplitNodes(
-                    preg_split($regex, $chunk->text),
-                    $matches,
-                    $sourceLang,
-                    $targetLang
-                );
-            }
-        }
-    }
-
-    protected function getSplitRegexes(?editor_Models_Languages $sourceLang): array
-    {
-        // try custom regexes and only then default
-        $regexes = array_column($this->getFormatsByLang($sourceLang), 'regex');
-        $regexes[] = $this->getJoinedRegex();
-
-        return $regexes;
-    }
-
-    protected function getNodeToProtect(array $matches): string
-    {
-        return $matches[0];
-    }
-
-    /**
-     * @return array<array{regex: string, format: string}>
-     */
-    abstract protected function getDefaultFormats(): array;
-
-    abstract protected function composeNumberTag(
         string $number,
-        array $sourceFormat,
-        ?editor_Models_Languages $targetLang,
-        ?string $targetFormat
-    ): string;
-
-    abstract protected function composeRegex(string ...$parts): string;
-
-    /**
-     * @param string[] $splitNodes
-     * @param string[][] $nodesToProtect
-     * @return iterable<ChunkDto>
-     */
-    protected function processSplitNodes(
-        array $splitNodes,
-        array $nodesToProtect,
-        ?editor_Models_Languages $sourceLang,
-        ?editor_Models_Languages $targetLang
-    ): iterable {
-        $matchCount = count($nodesToProtect);
-        for ($i = 0; $i <= $matchCount; $i++) {
-            if (!empty($splitNodes[$i])) {
-                // yield not protected part of text node
-                yield new ChunkDto($splitNodes[$i]);
-            }
-
-            if (!isset($nodesToProtect[$i])) {
-                continue;
-            }
-
-            // this node is a part of regex match. so we need to concat trimmed parts in chuck
-            // example:
-            // match: ⎵123,456.789⎵
-            // node: 123,456.789
-            // chunk: ⎵<number type="float" ...>⎵
-            $node = $this->getNodeToProtect($nodesToProtect[$i]);
-
-            $parts = explode($node, $nodesToProtect[$i][0]);
-
-            try {
-                $protected = $this->protectNode($node, $sourceLang, $targetLang);
-
-                yield new ChunkDto($parts[0] . $protected . $parts[1], true);
-            } catch (\LogicException) {
-                yield new ChunkDto($node, false);
-            }
-        }
-    }
-
-    protected function protectNode(
-        string $node,
+        LanguageFormat $languageFormat,
         ?editor_Models_Languages $sourceLang,
         ?editor_Models_Languages $targetLang
     ): string {
-        $targetFormat = null;
+        $targetFormat = $targetLang ? $this->getFormat($targetLang->getId(), $languageFormat) : null;
 
-        // if source lang provided we'll firstly try to check existing user provided formats
-        if (null !== $sourceLang) {
-            $protected = $this->protectNodeOfCustomFormats($node, $sourceLang, $targetLang);
+        return $this->composeNumberTag($number, $languageFormat, $sourceLang, $targetLang, $targetFormat);
+    }
 
-            if (null !== $protected) {
-                // yield protected date of format provided by user and continue with next text part
-                return $protected;
-            }
-        }
-
-        if ($targetLang) {
-            $targetFormat = $this->formatRepository->findDateFormat($targetLang->getId(), 'default')?->getFormat();
-        }
-
-        foreach ($this->getDefaultFormats() as $sourceFormat) {
-            if (!$this->nodeMatchesRegex($node, $sourceFormat['regex'])) {
-                continue;
-            }
-
-            return $this->composeNumberTag($node, $sourceFormat, $targetLang, $targetFormat);
-        }
-
-        throw new \LogicException(
-            sprintf('None of regex matches current date "%s" that should not be possible', $node)
+    /**
+     * @throws NumberParsingException
+     */
+    protected function composeNumberTag(
+        string $number,
+        LanguageFormat $sourceFormat,
+        ?editor_Models_Languages $sourceLang,
+        ?editor_Models_Languages $targetLang,
+        ?string $targetFormat
+    ): string {
+        return sprintf(
+            self::TAG_FORMAT,
+            static::getType(),
+            $sourceFormat->getName(),
+            $number,
+            '',
+            ''
         );
     }
 
-    protected function getJoinedRegex(): string
+    private function getFormat(int $langId, LanguageFormat $languageFormat): ?string
     {
-        return $this->composeRegex(...array_column($this->getDefaultFormats(), 'regex'));
-    }
-
-    protected function getFormatsByLang(?editor_Models_Languages $sourceLang): array
-    {
-        if (null === $sourceLang) {
-            return [];
+        $key = "{$langId}:{$languageFormat->getType()}:{$languageFormat->getName()}";
+        if (!isset($this->formatsCache[$key])) {
+            $this->formatsCache[$key] = $this
+                ->formatRepository
+                ->findBy($langId, $languageFormat->getType(), $languageFormat->getName())
+                ?->getFormat();
         }
 
-        if (!isset($this->formatsCache[$sourceLang->getRfc5646()])) {
-            $this->formatsCache[$sourceLang->getRfc5646()] = $this->formatRepository
-                ->findByLanguageIdAndType($sourceLang->getId(), static::TYPE);
-        }
-
-        return $this->formatsCache[$sourceLang->getRfc5646()];
-    }
-
-    protected function nodeMatchesRegex(string $nodeToProtect, string ...$regex): bool
-    {
-        return (bool) preg_match($this->composeRegex(...$regex), $nodeToProtect);
-    }
-
-    protected function protectNodeOfCustomFormats(
-        string $node,
-        editor_Models_Languages $sourceLang,
-        ?editor_Models_Languages $targetLang,
-    ): ?string {
-        $formats = $this->getFormatsByLang($sourceLang);
-
-        if (!$this->nodeMatchesRegex($node, ...array_column($formats, 'regex'))) {
-            return null;
-        }
-
-        $targetFormat = null;
-
-        foreach ($formats as $sourceFormat) {
-            if ($targetLang) {
-                $targetFormat = $this->formatRepository
-                    ->findDateFormat($targetLang->getId(), $sourceFormat['name'])
-                    ?->getFormat();
-            }
-
-            if (!$this->nodeMatchesRegex($node, $sourceFormat['regex'])) {
-                continue;
-            }
-
-            return $this->composeNumberTag(
-                $node,
-                $sourceFormat,
-                $targetLang,
-                $targetFormat
-            );
-        }
-
-        return null;
+        return $this->formatsCache[$key];
     }
 }

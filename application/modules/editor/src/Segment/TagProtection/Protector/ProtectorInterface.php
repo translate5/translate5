@@ -52,15 +52,8 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\Segment\TagProtection\Protector;
 
-use MittagQI\Translate5\Segment\TagProtection\Protector\ChunkDto;
-
 interface ProtectorInterface
 {
-    public function hasEntityToProtect(string $textNode, ?int $sourceLang): bool;
-    /**
-     * @param iterable<ChunkDto> $chunks
-     * @return iterable<ChunkDto>
-     */
-    public function protect(iterable $chunks, ?int $sourceLang, ?int $targetLang): iterable;
-
+    public function hasEntityToProtect(string $textNode, ?int $sourceLang = null): bool;
+    public function protect(string $textNode, ?int $sourceLangId, ?int $targetLangId): string;
 }

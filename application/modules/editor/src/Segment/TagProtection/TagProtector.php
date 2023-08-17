@@ -52,63 +52,57 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\Segment\TagProtection;
 
-use editor_Models_Segment_Utility as SegmentUtility;
-use MittagQI\Translate5\Segment\TagProtection\Protector\ChunkDto;
-use MittagQI\Translate5\Segment\TagProtection\Protector\NumberProtector;
+use editor_Models_Segment_UtilityBroker;
+use editor_Models_Segment_Whitespace as WhitespaceProtector;
 use MittagQI\Translate5\Segment\TagProtection\Protector\ProtectorInterface;
-use MittagQI\Translate5\Segment\TagProtection\Protector\WhitespaceProtector;
 
 class TagProtector
 {
     /**
-     * All entities are restored to their applicable characters (&_szlig; => ß),
-     * only the XML relevant &<> are encoded (ready for GUI)
+     * @param  ProtectorInterface[] $protectors
      */
-    public const ENTITY_MODE_RESTORE = 'restore';
-
-    /**
-     * Nothing is restored, but encoded (&_szlig; => &_amp;szlig;),
-     * only the XML relevant &<> are encoded (ready for GUI)
-     */
-    public const ENTITY_MODE_KEEP = 'keep';
-
-    /**
-     * Entity handling is disabled, entities must be handled elsewhere!
-     */
-    public const ENTITY_MODE_OFF = 'off';
-
-    /**
-     * @var ProtectorInterface[]
-     */
-    private array $protectors;
-
-    public function __construct(NumberProtector $number, WhitespaceProtector $whitespace)
+    public function __construct(private iterable $protectors, private editor_Models_Segment_UtilityBroker $utilities)
     {
-        $this->protectors = [$number, $whitespace];
     }
 
     public function protect(
-        string $textNode,
+        string $text,
         ?int $sourceLang,
         ?int $targetLang,
-        string $entityHandling = self::ENTITY_MODE_RESTORE
+        bool $protectTags = false
     ): string {
-        if ($entityHandling !== self::ENTITY_MODE_OFF) {
-            $textNode = SegmentUtility::entityCleanup($textNode, $entityHandling === self::ENTITY_MODE_RESTORE);
-        }
+        $text = $this->protectTags($protectTags, $text);
 
-        $chunks = [new ChunkDto($textNode)];
         foreach ($this->protectors as $protector) {
-            if ($protector->hasEntityToProtect($textNode, $sourceLang)) {
-                $chunks = $protector->protect($chunks, $sourceLang, $targetLang);
+            if ($protector->hasEntityToProtect($text, $sourceLang)) {
+                $text = $protector->protect($text, $sourceLang, $targetLang);
+                $protectTags = true;
             }
         }
 
-        $result = '';
-        foreach ($chunks as $chunk) {
-            $result .= $chunk->text;
-        }
+        $text = $this->protectTags($protectTags, $text);
 
-        return $result;
+        return $this->utilities->whitespace->protectWhitespace(
+            $text,
+            $protectTags ? WhitespaceProtector::ENTITY_MODE_OFF : WhitespaceProtector::ENTITY_MODE_RESTORE
+        );
+    }
+
+    /**
+     * @param bool $protectTags
+     * @param string $text
+     * @return string|null
+     */
+    public function protectTags(bool $protectTags, string $text): ?string
+    {
+        if (!$protectTags) {
+            return $text;
+        }
+        //since we are in the XML file format, plain tags in the content are encoded, which we have to undo first
+        //$text is here for example: Dies &lt;strong&gt;ist ein&lt;/strong&gt; Test. &amp;nbsp;
+        $text = html_entity_decode($text);
+        //$text is now: Dies <strong>ist ein</strong> Test. &nbsp;
+
+        return $this->utilities->tagProtection->protectTags($text);
     }
 }

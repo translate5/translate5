@@ -56,24 +56,21 @@ use NumberFormatter;
 
 class FloatObject
 {
-    public function __construct(private int $whole, private int $decimal)
+    public function __construct(private float $number, private int $fractionDigits)
     {
     }
 
     public static function parse(string $float, ?string $sourceLocale = null): self
     {
-        $formater = numfmt_create($sourceLocale ?: 'en', NumberFormatter::PARSE_INT_ONLY);
+        $formater = numfmt_create($sourceLocale ?: 'en', NumberFormatter::DECIMAL);
         $symbols = array_filter(preg_split('/(\d+|[٠١٢٣٤٥٦٧٨٩]+)/u', $float));
         $decimalSeparator = end($symbols);
 
         $regSymbol = '.' === $decimalSeparator ? '\\' . $decimalSeparator : $decimalSeparator;
 
-        $parts = explode($decimalSeparator, preg_replace("/[^\d٠١٢٣٤٥٦٧٨٩$regSymbol]/u", '', $float));
+        $number = str_replace($decimalSeparator, '.', preg_replace("/[^\d$regSymbol]/u", '', $float));
 
-        return new self(
-            $formater->parse($parts[0], NumberFormatter::TYPE_INT64),
-            $formater->parse($parts[1], NumberFormatter::TYPE_INT64)
-        );
+        return new self($formater->parse($number), (int) strpos(strrev($number), '.'));
     }
 
     public function format(string $locale = 'en', ?string $format = null): string
@@ -82,13 +79,8 @@ class FloatObject
         if (!empty($format)) {
             $formater->setPattern($format);
         }
-        $formater->setAttribute(NumberFormatter::MAX_FRACTION_DIGITS, ceil(log10($this->decimal)));
+        $formater->setAttribute(NumberFormatter::MAX_FRACTION_DIGITS, $this->fractionDigits);
 
-        return $formater->format($this->toFloat());
-    }
-
-    public function toFloat(): float
-    {
-        return floatval($this->whole . '.' . $this->decimal);
+        return $formater->format($this->number);
     }
 }

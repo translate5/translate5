@@ -53,19 +53,19 @@ declare(strict_types=1);
 namespace MittagQI\Translate5\Segment\TagProtection\Protector\Number;
 
 use editor_Models_Languages;
-use MittagQI\Translate5\Segment\TagProtection\Protector\ChunkDto;
+use editor_Models_Segment_Number_LanguageFormat as LanguageFormat;
 
 interface NumberProtectorInterface
 {
-    public function hasEntityToProtect(string $textNode, ?editor_Models_Languages $sourceLang): bool;
+    public static function getType(): string;
 
     /**
-     * @param iterable<ChunkDto> $chunks
-     * @return iterable<ChunkDto>
+     * @throws NumberParsingException
      */
     public function protect(
-        iterable $chunks,
+        string $number,
+        LanguageFormat $languageFormat,
         ?editor_Models_Languages $sourceLang,
         ?editor_Models_Languages $targetLang
-    ): iterable;
+    ): string;
 }

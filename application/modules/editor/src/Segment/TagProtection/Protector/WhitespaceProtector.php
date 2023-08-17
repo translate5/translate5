@@ -63,18 +63,16 @@ class WhitespaceProtector implements ProtectorInterface
         $this->whitespace = new editor_Models_Segment_Whitespace();
     }
 
+    public function hasEntityToProtect(string $textNode, ?int $sourceLang = null): bool
+    {
+        return true;
+    }
+
     /**
      * {@inheritDoc}
      */
-    public function protect(iterable $chunks, ?int $sourceLang, ?int $targetLang): iterable
+    public function protect(string $textNode, ?int $sourceLangId, ?int $targetLangId): string
     {
-        foreach ($chunks as $chunk) {
-            yield $chunk->protected ? $chunk : new ChunkDto($this->whitespace->protectWhitespace($chunk->text), true);
-        }
-    }
-
-    public function hasEntityToProtect(string $textNode, ?int $sourceLang): bool
-    {
-        return true;
+        return $this->whitespace->protectWhitespace($textNode);
     }
 }

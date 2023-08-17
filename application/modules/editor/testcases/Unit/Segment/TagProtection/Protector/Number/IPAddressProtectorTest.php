@@ -1,8 +1,8 @@
 <?php
 /*
 START LICENSE AND COPYRIGHT
- Copyright (c) 2013 - 2022 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
- Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
+ Copyright (c) 2013 - 2022 Marc Mittag; MittagQI - Quality Informatics; All rights reserved.
+ Contact: http://www.MittagQI.com/ / service (ATT) MittagQI.com
 
  This file is part of a paid plug-in for translate5.
 
@@ -41,77 +41,38 @@ START LICENSE AND COPYRIGHT
  root folder of translate5. This plug-in exception allows using GPLv3 for translate5 plug-ins,
  although translate5 core is licensed under AGPLv3.
 
- @copyright  Marc Mittag, MittagQI - Quality Informatics
- @author     MittagQI - Quality Informatics
- @license    GNU GENERAL PUBLIC LICENSE version 3 with plugin-execption
-             http://www.gnu.org/licenses/gpl.html
-             http://www.translate5.net/plugin-exception.txt
+ @copyright Marc Mittag, MittagQI - Quality Informatics
+ @author   MittagQI - Quality Informatics
+ @license  GNU GENERAL PUBLIC LICENSE version 3 with plugin-execption
+       http://www.gnu.org/licenses/gpl.html
+       http://www.translate5.net/plugin-exception.txt
 END LICENSE AND COPYRIGHT
 */
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\Segment\TagProtection\Protector\Number;
+namespace MittagQI\Translate5\Test\Unit\Segment\TagProtection\Protector\Number;
 
-use DateTime;
-use editor_Models_Languages;
 use editor_Models_Segment_Number_LanguageFormat as LanguageFormat;
-use IntlDateFormatter;
+use MittagQI\Translate5\Repository\LanguageNumberFormatRepository;
+use MittagQI\Translate5\Segment\TagProtection\Protector\Number\IPAddressProtector;
+use PHPUnit\Framework\TestCase;
 
-class DateProtector extends AbstractProtector
+class IPAddressProtectorTest extends TestCase
 {
-    public static function getType(): string
-    {
-        return 'date';
-    }
+    public function testProtectDefaultFormats(): void {
+        $repo = $this->createConfiguredMock(LanguageNumberFormatRepository::class, ['findBy' => null]);
+        $sourceFormat = $this->createConfiguredMock(LanguageFormat::class, []);
+        $sourceFormat
+            ->method('__call')
+            ->willReturnCallback(function($name, $args) {
+                return match ($name) {
+                    'getName' => 'test-default',
+                };
+            });
 
-    protected function composeNumberTag(
-        string $number,
-        LanguageFormat $sourceFormat,
-        ?editor_Models_Languages $sourceLang,
-        ?editor_Models_Languages $targetLang,
-        ?string $targetFormat
-    ): string {
-        $date = null;
-
-        if (!empty($sourceFormat->getFormat()) && !$sourceFormat->getKeepAsIs()) {
-            $date = DateTime::createFromFormat($sourceFormat->getFormat(), $number);
-
-            // 31.11.2023 -> 12.01.2023
-            $errArr = DateTime::getLastErrors();
-            if (0 !== $errArr['warning_count'] + $errArr['error_count']) {
-                throw new NumberParsingException();
-            }
-        }
-
-        return sprintf(
-            self::TAG_FORMAT,
-            self::getType(),
-            $sourceFormat->getName(),
-            $number,
-            $date ? $date->format('Y-m-d') : '',
-            $this->getTargetDate($date, $targetFormat, $targetLang)
+        self::assertSame(
+            '<number type="ip-address" name="test-default" source="127.0.0.1" iso="" target="" />',
+            (new IPAddressProtector($repo))->protect('127.0.0.1', $sourceFormat, null, null)
         );
-    }
-
-    protected function getTargetDate(
-        ?DateTime $date,
-        ?string $targetFormat,
-        ?editor_Models_Languages $targetLang
-    ): string {
-        if (null === $date) {
-            return '';
-        }
-
-        if (null !== $targetFormat) {
-            return $date->format($targetFormat);
-        }
-
-        if (null !== $targetLang) {
-            $formater = datefmt_create($targetLang->getRfc5646(), IntlDateFormatter::SHORT, IntlDateFormatter::NONE);
-
-            return $formater->format($date);
-        }
-
-        return '';
     }
 }

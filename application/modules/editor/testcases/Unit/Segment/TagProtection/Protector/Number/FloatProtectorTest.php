@@ -53,293 +53,100 @@ declare(strict_types=1);
 namespace MittagQI\Translate5\Test\Unit\Segment\TagProtection\Protector\Number;
 
 use editor_Models_Languages;
+use editor_Models_Segment_Number_LanguageFormat as LanguageFormat;
 use MittagQI\Translate5\Repository\LanguageNumberFormatRepository;
-use MittagQI\Translate5\Segment\TagProtection\Protector\ChunkDto;
 use MittagQI\Translate5\Segment\TagProtection\Protector\Number\FloatProtector;
 use PHPUnit\Framework\TestCase;
 
 class FloatProtectorTest extends TestCase
 {
     /**
-     * @dataProvider floatsProvider
-     */
-    public function testHasEntityToProtectWithNoSourceLang(string $string, bool $valid): void
-    {
-        $repo = $this->createConfiguredMock(
-            LanguageNumberFormatRepository::class,
-            ['findByLanguageIdAndType' => []]
-        );
-        self::assertSame($valid, (new FloatProtector($repo))->hasEntityToProtect($string, null));
-    }
-
-    public function floatsProvider(): iterable
-    {
-        yield ['string' => 'string 123456789.12345 string', 'valid' => true];
-        yield ['string' => 'string 123456789,12345 string', 'valid' => true];
-        yield ['string' => 'string 123456789·12345 string', 'valid' => true];
-
-        yield ['string' => 'string 1,234,567.89 string', 'valid' => true];
-        yield ['string' => 'string 1,234,567·89 string', 'valid' => true];
-        yield ['string' => 'string 12,34,567.89 string', 'valid' => true];
-        yield ['string' => 'string 123,4567.89 string', 'valid' => true];
-
-        yield ['string' => 'string 1 234 567.89 string', 'valid' => true];
-        yield ['string' => 'string 1 234 567,89 string', 'valid' => true];
-
-        yield ['string' => 'string 1 234 567.89 string', 'valid' => true];
-        yield ['string' => 'string 1 234 567,89 string', 'valid' => true];
-
-        yield ['string' => 'string 1 234 567.89 string', 'valid' => true];
-        yield ['string' => 'string 1 234 567,89 string', 'valid' => true];
-
-        yield ['string' => 'string 1˙234˙567.89 string', 'valid' => true];
-        yield ['string' => 'string 1˙234˙567,89 string', 'valid' => true];
-
-        yield ['string' => "string 1'234'567.89 string", 'valid' => true];
-        yield ['string' => "string 1'234'567,89 string", 'valid' => true];
-
-        yield ['string' => 'string 1.234.567,89 string', 'valid' => true];
-        yield ['string' => "string 1.234.567'89 string", 'valid' => true];
-
-        yield ['string' => "string 1.23e12 string", 'valid' => true];
-        yield ['string' => "string 1.13e-15 string", 'valid' => true];
-
-        yield ['string' => "string ١٬٢٣٤٬٥٦٧٫٨٩ string", 'valid' => true];
-    }
-
-    /**
      * @dataProvider defaultDataToProtect
      */
     public function testProtectDefaultFormats(
-        array $textNodes,
-        array $expected,
+        string $number,
+        string $expected,
+        LanguageFormat $sourceFormat,
+        ?LanguageFormat $targetFormat,
         ?editor_Models_Languages $targetLang
     ): void {
-        $repo = $this->createConfiguredMock(LanguageNumberFormatRepository::class, ['findDateFormat' => null]);
-        $protected = (new FloatProtector($repo))->protect($textNodes, null, $targetLang);
+        $repo = $this->createConfiguredMock(LanguageNumberFormatRepository::class, ['findBy' => $targetFormat]);
+        $protected = (new FloatProtector($repo))->protect($number, $sourceFormat, null, $targetLang);
 
-        $result = [];
-        foreach ($protected as $p) {
-            $result[] = $p;
-        }
-
-        self::assertEquals($expected, $result);
+        self::assertSame($expected, $protected);
     }
 
     public function defaultDataToProtect(): iterable
     {
-        yield 'date in the middle of text' => [
-            'textNodes' => [new ChunkDto('some text with float in it: 1,234,567.89. in the middle', false)],
-            'expected' => [
-                new ChunkDto('some text with float in it: ', false),
-                new ChunkDto('<number type="float" name="default" source="1,234,567.89" iso="1234567.89" target="" />', true),
-                new ChunkDto('. in the middle', false),
-            ],
+        $sourceFormat = $this->createConfiguredMock(LanguageFormat::class, []);
+        $sourceFormat
+            ->method('__call')
+            ->willReturnCallback(function($name, $args) {
+                return match ($name) {
+                    'getName' => 'test-default',
+                    'getRegex' => '/\b([1-9]\d{0,2},){1}(\d{3},)*\d{3}\.\d+\b/u',
+                    'getFormat' => null,
+                    'getKeepAsIs' => false,
+                    'getType' => 'float',
+                };
+            });
+
+        yield 'float' => [
+            'number' => '123,456.78',
+            'expected' => '<number type="float" name="test-default" source="123,456.78" iso="123456.78" target="" />',
+            'sourceFormat' => $sourceFormat,
+            'targetFormat' => null,
             'targetLang' => null,
         ];
 
-        yield 'date in the end of text' => [
-            'textNodes' => [new ChunkDto('some text with float in it: 1,234,567.89', false)],
-            'expected' => [
-                new ChunkDto('some text with float in it: ', false),
-                new ChunkDto('<number type="float" name="default" source="1,234,567.89" iso="1234567.89" target="" />', true),
-            ],
-            'targetLang' => null,
+        $targetLangDe = new editor_Models_Languages();
+        $targetLangDe->setId(0);
+        $targetLangDe->setRfc5646('hi_IN');
+
+        yield 'target lang hi_IN' => [
+            'number' => '123,456.78',
+            'expected' => '<number type="float" name="test-default" source="123,456.78" iso="123456.78" target="1,23,456.78" />',
+            'sourceFormat' => $sourceFormat,
+            'targetFormat' => null,
+            'targetLang' => $targetLangDe,
         ];
 
-        yield 'date in the beginning of text' => [
-            'textNodes' => [new ChunkDto('1,234,567.89, some text with float in it', false)],
-            'expected' => [
-                new ChunkDto('<number type="float" name="default" source="1,234,567.89" iso="1234567.89" target="" />', true),
-                new ChunkDto(', some text with float in it', false),
-            ],
-            'targetLang' => null,
+        $targetFormat = $this->createConfiguredMock(LanguageFormat::class, []);
+        $targetFormat
+            ->method('__call')
+            ->willReturnCallback(function($name, $args) {
+                return match ($name) {
+                    'getFormat' => '#,###,####0.###',
+                };
+            });
+
+        yield 'target format #,###,####0.###' => [
+            'number' => '1,212,312,345.78',
+            'expected' => '<number type="float" name="test-default" source="1,212,312,345.78" iso="1212312345.78" target="12,123,12345.78" />',
+            'sourceFormat' => $sourceFormat,
+            'targetFormat' => $targetFormat,
+            'targetLang' => $targetLangDe,
         ];
 
-        $targetLangAr = new editor_Models_Languages();
-        $targetLangAr->setId(0);
-        $targetLangAr->setRfc5646('ar-EG');
+        $sourceFormatKeepAsIs = $this->createConfiguredMock(LanguageFormat::class, []);
+        $sourceFormatKeepAsIs
+            ->method('__call')
+            ->willReturnCallback(function($name, $args) {
+                return match ($name) {
+                    'getName' => 'test-default',
+                    'getRegex' => '/\b\d{4}\/(0[1-9]|[1-2][0-9]|3[0-1]|[1-9])\/(0[1-9]|1[0-2]|[1-9])\b/',
+                    'getFormat' => 'Y/d/m',
+                    'getKeepAsIs' => true,
+                    'getType' => 'date',
+                };
+            });
 
-        yield 'date in the middle of text. targetLang = ar-EG' => [
-            'textNodes' => [new ChunkDto('some text with float in it: 1.234.567,123456, in the middle', false)],
-            'expected' => [
-                new ChunkDto('some text with float in it: ', false),
-                new ChunkDto('<number type="float" name="default" source="1.234.567,123456" iso="1234567.123456" target="١٬٢٣٤٬٥٦٧٫١٢٣٤٥٦" />', true),
-                new ChunkDto(', in the middle', false),
-            ],
-            'targetLang' => $targetLangAr,
-        ];
-
-        yield [
-            'textNodes' => [new ChunkDto('1234567.89', false)],
-            'expected' => [
-                new ChunkDto('<number type="float" name="default" source="1234567.89" iso="1234567.89" target="" />', true),
-            ],
-            'targetLang' => null,
-        ];
-        yield [
-            'textNodes' => [new ChunkDto('1234567,89', false)],
-            'expected' => [
-                new ChunkDto('<number type="float" name="default" source="1234567,89" iso="1234567.89" target="" />', true),
-            ],
-            'targetLang' => null,
-        ];
-        yield [
-            'textNodes' => [new ChunkDto('1234567·89', false)],
-            'expected' => [
-                new ChunkDto('<number type="float" name="default" source="1234567·89" iso="1234567.89" target="" />', true),
-            ],
-            'targetLang' => null,
-        ];
-
-        yield [
-            'textNodes' => [new ChunkDto('1,234,567.89', false)],
-            'expected' => [
-                new ChunkDto('<number type="float" name="default" source="1,234,567.89" iso="1234567.89" target="" />', true),
-            ],
-            'targetLang' => null,
-        ];
-        yield [
-            'textNodes' => [new ChunkDto('1,234,567·89', false)],
-            'expected' => [
-                new ChunkDto('<number type="float" name="default" source="1,234,567·89" iso="1234567.89" target="" />', true),
-            ],
-            'targetLang' => null,
-        ];
-        yield [
-            'textNodes' => [new ChunkDto('12,34,567.89', false)],
-            'expected' => [
-                new ChunkDto('<number type="float" name="default" source="12,34,567.89" iso="1234567.89" target="" />', true),
-            ],
-            'targetLang' => null,
-        ];
-        yield [
-            'textNodes' => [new ChunkDto('123,4567.89', false)],
-            'expected' => [
-                new ChunkDto('<number type="float" name="default" source="123,4567.89" iso="1234567.89" target="" />', true),
-            ],
-            'targetLang' => null,
-        ];
-
-        yield [
-            'textNodes' => [new ChunkDto('1 234 567.89', false)],
-            'expected' => [
-                new ChunkDto('<number type="float" name="default" source="1 234 567.89" iso="1234567.89" target="" />', true),
-            ],
-            'targetLang' => null,
-        ];
-        yield [
-            'textNodes' => [new ChunkDto('1 234 567,89', false)],
-            'expected' => [
-                new ChunkDto('<number type="float" name="default" source="1 234 567,89" iso="1234567.89" target="" />', true),
-            ],
-            'targetLang' => null,
-        ];
-
-        yield [
-            'textNodes' => [new ChunkDto('1 234 567.89', false)],
-            'expected' => [
-                new ChunkDto('<number type="float" name="default" source="1 234 567.89" iso="1234567.89" target="" />', true),
-            ],
-            'targetLang' => null,
-        ];
-        yield [
-            'textNodes' => [new ChunkDto('1 234 567,89', false)],
-            'expected' => [
-                new ChunkDto('<number type="float" name="default" source="1 234 567,89" iso="1234567.89" target="" />', true),
-            ],
-            'targetLang' => null,
-        ];
-
-        yield [
-            'textNodes' => [new ChunkDto('1 234 567.89', false)],
-            'expected' => [
-                new ChunkDto('<number type="float" name="default" source="1 234 567.89" iso="1234567.89" target="" />', true),
-            ],
-            'targetLang' => null,
-        ];
-        yield [
-            'textNodes' => [new ChunkDto('1 234 567,89', false)],
-            'expected' => [
-                new ChunkDto('<number type="float" name="default" source="1 234 567,89" iso="1234567.89" target="" />', true),
-            ],
-            'targetLang' => null,
-        ];
-
-        yield [
-            'textNodes' => [new ChunkDto('1˙234˙567.89', false)],
-            'expected' => [
-                new ChunkDto('<number type="float" name="default" source="1˙234˙567.89" iso="1234567.89" target="" />', true),
-            ],
-            'targetLang' => null,
-        ];
-        yield [
-            'textNodes' => [new ChunkDto('1˙234˙567,89', false)],
-            'expected' => [
-                new ChunkDto('<number type="float" name="default" source="1˙234˙567,89" iso="1234567.89" target="" />', true),
-            ],
-            'targetLang' => null,
-        ];
-
-        yield [
-            'textNodes' => [new ChunkDto("1'234'567.89", false)],
-            'expected' => [
-                new ChunkDto('<number type="float" name="default" source="1\'234\'567.89" iso="1234567.89" target="" />', true),
-            ],
-            'targetLang' => null,
-        ];
-        yield [
-            'textNodes' => [new ChunkDto("1'234'567,89", false)],
-            'expected' => [
-                new ChunkDto('<number type="float" name="default" source="1\'234\'567,89" iso="1234567.89" target="" />', true),
-            ],
-            'targetLang' => null,
-        ];
-
-        yield [
-            'textNodes' => [new ChunkDto('1.234.567,89', false)],
-            'expected' => [
-                new ChunkDto('<number type="float" name="default" source="1.234.567,89" iso="1234567.89" target="" />', true),
-            ],
-            'targetLang' => null,
-        ];
-        yield [
-            'textNodes' => [new ChunkDto("1.234.567'89", false)],
-            'expected' => [
-                new ChunkDto('<number type="float" name="default" source="1.234.567\'89" iso="1234567.89" target="" />', true),
-            ],
-            'targetLang' => null,
-        ];
-
-        yield [
-            'textNodes' => [new ChunkDto("1.23e12", false)],
-            'expected' => [
-                new ChunkDto('<number type="float" name="default" source="1.23e12" iso="" target="" />', true),
-            ],
-            'targetLang' => null,
-        ];
-        yield [
-            'textNodes' => [new ChunkDto("1.13e-15", false)],
-            'expected' => [
-                new ChunkDto('<number type="float" name="default" source="1.13e-15" iso="" target="" />', true),
-            ],
-            'targetLang' => null,
-        ];
-
-        yield [
-            'textNodes' => [new ChunkDto("١٬٢٣٤٬٥٦٧٫٨٩", false)],
-            'expected' => [
-                new ChunkDto('<number type="float" name="default" source="١٬٢٣٤٬٥٦٧٫٨٩" iso="1234567.89" target="" />', true),
-            ],
-            'targetLang' => null,
-        ];
-
-        yield [
-            'textNodes' => [new ChunkDto("1.234.567,89.987", false)],
-            'expected' => [
-                new ChunkDto("1.234.567,89.987", false),
-            ],
-            'targetLang' => null,
+        yield 'date. keep as is' => [
+            'number' => '123,456.78',
+            'expected' => '<number type="float" name="test-default" source="123,456.78" iso="" target="" />',
+            'sourceFormat' => $sourceFormatKeepAsIs,
+            'targetFormat' => $targetFormat,
+            'targetLang' => $targetLangDe,
         ];
     }
 }

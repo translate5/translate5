@@ -54,104 +54,32 @@ namespace MittagQI\Translate5\Segment\TagProtection\Protector\Number;
 
 use editor_Models_Languages;
 use MittagQI\Translate5\Segment\TagProtection\Protector\Number\Object\FloatObject;
+use editor_Models_Segment_Number_LanguageFormat as LanguageFormat;
 
 class FloatProtector extends AbstractProtector
 {
-    public const TYPE = 'float';
-
-    public function rating(): int
+    public static function getType(): string
     {
-        return 400;
-    }
-
-    protected function getDefaultFormats(): array
-    {
-        return [
-            [
-                'regex' => '\d+(\.|,|·)\d+',
-            ],
-            [
-                'regex' => '\d*(,|\.)\d+e-?\d+',
-                'keepAsIs' => true,
-            ],
-            [
-                'regex' => "(\d{1,3}٬){0,1}(\d{3}٬)*\d{1,3}٫\d+",
-            ],
-
-            [
-                'regex' => "(\d{1,3}\.){0,1}(\d{3}\.)*\d{1,3}'\d+",
-            ],
-            [
-                'regex' => "(\d{1,3},){0,1}(\d{3},)*\d{1,3}·\d+",
-            ],
-
-            [
-                'regex' => '(\d{1,3},){0,1}(\d{3},)*\d{3}\.\d+',
-            ],
-            [
-                'regex' => '(\d{1,4},){0,1}(\d{4},)*\d{4}\.\d+',
-            ],
-            [
-                'regex' => '(\d,)?(\d{2},)*(\d{3})\.\d+',
-            ],
-            [
-                'regex' => '(\d{1,3} ){0,1}(\d{3} )*\d{1,3}\.\d+',
-            ],
-            [
-                'regex' => '(\d{1,3}\x{2009}){0,1}(\d{3}\x{2009})*\d{1,3}\.\d+',
-            ],
-            [
-                'regex' => '(\d{1,3}\x{202F}){0,1}(\d{3}\x{202F})*\d{1,3}\.\d+',
-            ],
-            [
-                'regex' => '(\d{1,3}˙){0,1}(\d{3}˙)*\d{1,3}\.\d+',
-            ],
-            [
-                'regex' => "(\d{1,3}'){0,1}(\d{3}')*\d{1,3}\.\d+",
-            ],
-
-            [
-                'regex' => '(\d{1,3}\.){0,1}(\d{3}\.)*\d{1,3},\d+',
-            ],
-            [
-                'regex' => '(\d{1,3} ){0,1}(\d{3} )*\d{1,3},\d+',
-            ],
-            [
-                'regex' => '(\d{1,3}\x{2009}){0,1}(\d{3}\x{2009})*\d{1,3},\d+',
-            ],
-            [
-                'regex' => '(\d{1,3}\x{202F}){0,1}(\d{3}\x{202F})*\d{1,3},\d+',
-            ],
-            [
-                'regex' => '(\d{1,3}˙){0,1}(\d{3}˙)*\d{1,3},\d+',
-            ],
-            [
-                'regex' => "(\d{1,3}'){0,1}(\d{3}')*\d{1,3},\d+",
-            ],
-        ];
-    }
-
-    protected function getNodeToProtect(array $matches): string
-    {
-        return $matches[2];
+        return 'float';
     }
 
     protected function composeNumberTag(
         string $number,
-        array $sourceFormat,
+        LanguageFormat $sourceFormat,
+        ?editor_Models_Languages $sourceLang,
         ?editor_Models_Languages $targetLang,
         ?string $targetFormat
     ): string {
         $float = null;
 
-        if (empty($sourceFormat['keepAsIs'])) {
-            $float = FloatObject::parse($number, $sourceFormat['locale'] ?? null);
+        if (!$sourceFormat->getKeepAsIs()) {
+            $float = FloatObject::parse($number, $sourceLang?->getRfc5646());
         }
 
         return sprintf(
             self::TAG_FORMAT,
-            self::TYPE,
-            $sourceFormat['name'] ?? 'default',
+            self::getType(),
+            $sourceFormat->getName(),
             $number,
             $float ? $float->format(format: '#.#') : '',
             $this->getTargetFloat($float, $targetFormat, $targetLang)
@@ -172,17 +100,5 @@ class FloatProtector extends AbstractProtector
         }
 
         return $float->format($targetLang->getRfc5646(), $targetFormat);
-    }
-
-    protected function getJoinedRegex(): string
-    {
-        return <<<REGEX
-/(^|\b)((\d*(,|\.)\d+e-?\d+)|(\d([ ,\.·˙'\x{2009}\x{202F}٬٫]|\d)*\d))($|\b)/u
-REGEX;
-    }
-
-    protected function composeRegex(string ...$parts): string
-    {
-        return sprintf('/^(%s)$/u', implode('|', $parts));
     }
 }

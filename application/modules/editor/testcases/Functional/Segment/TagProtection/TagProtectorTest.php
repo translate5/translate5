@@ -50,50 +50,29 @@ END LICENSE AND COPYRIGHT
 */
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\Test\Unit\Segment\TagProtection;
+namespace MittagQI\Translate5\Test\Functional\Segment\TagProtection;
 
-use editor_Models_Languages;
-use editor_Models_Segment_Number_LanguageFormat as LanguageFormat;
 use editor_Test_UnitTest;
-use MittagQI\Translate5\Repository\LanguageNumberFormatRepository;
-use MittagQI\Translate5\Repository\LanguageRepository;
 use MittagQI\Translate5\Segment\TagProtection\TagProtector;
-use MittagQI\Translate5\Segment\TagProtection\Protector\ChunkDto;
-use MittagQI\Translate5\Segment\TagProtection\Protector\Number\NumberProtectorInterface;
 use MittagQI\Translate5\Segment\TagProtection\Protector\NumberProtector;
-use MittagQI\Translate5\Segment\TagProtection\Protector\RatingInterface;
-use MittagQI\Translate5\Segment\TagProtection\Protector\WhitespaceProtector;
 
 class TagProtectorTest extends editor_Test_UnitTest
 {
     /**
      * @dataProvider casesProvider
      */
-    public function test(string $node, string $expected): void
+    public function testWhitespaceHandling(string $node, string $expected): void
     {
-        $processor = new class implements NumberProtectorInterface
-        {
-            public static function getType(): string
-            {
-                return 'integer';
-            }
+        $number = $this->createConfiguredMock(
+            NumberProtector::class,
+            [
+                'hasEntityToProtect' => true,
+                'protect' => 'text with <number type="integer" name="default" source="1 234" iso="1234" target=""/> [\r\n] in it',
+            ]
+        );
+        $utilities = \ZfExtended_Factory::get(\editor_Models_Segment_UtilityBroker::class);
 
-            public function protect(
-                string $textNode,
-                LanguageFormat $languageFormat,
-                ?editor_Models_Languages $sourceLang,
-                ?editor_Models_Languages $targetLang
-            ): string {
-                return '<number type="integer" name="default" source="1 234" iso="1234" target=""/>';
-            }
-        };
-        $numberFormatRepository = $this->createConfiguredMock(LanguageNumberFormatRepository::class, []);
-        $languageRepository = $this->createConfiguredMock(LanguageRepository::class, []);
-
-        $number = new NumberProtector([$processor], $numberFormatRepository, $languageRepository);
-        $whitespace = new WhitespaceProtector();
-
-        $tagProtector = new TagProtector($number, $whitespace);
+        $tagProtector = new TagProtector([$number], $utilities);
 
         self::assertEquals($expected, $tagProtector->protect($node, null, null));
     }
@@ -102,7 +81,7 @@ class TagProtectorTest extends editor_Test_UnitTest
     {
         yield 'NNBSP in tag is safe' => [
             'text' => 'text with 1 234 [\r\n] in it',
-            'expected' => 'text with <number type="integer" name="default" source="1 234" iso="1234" target=""/> [<hardReturn/>] in it'
+            'expected' => 'text with <protectedTag data-type="single" data-id="1" data-content="3c6e756d62657220747970653d22696e746567657222206e616d653d2264656661756c742220736f757263653d2231e280af323334222069736f3d223132333422207461726765743d22222f3e"/> [\r\n] in it'
         ];
     }
 }

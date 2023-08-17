@@ -52,9 +52,9 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\Test\Unit\Segment\TagProtection\Protector;
 
-use MittagQI\Translate5\Segment\TagProtection\Protector\ChunkDto;
-use MittagQI\Translate5\Segment\TagProtection\Protector\WhitespaceProtector;
+use editor_Models_Segment_Whitespace;
 use PHPUnit\Framework\TestCase;
+use ZfExtended_Factory;
 
 class WhitespaceProtectorTest extends TestCase
 {
@@ -63,16 +63,9 @@ class WhitespaceProtectorTest extends TestCase
      */
     public function test(string $text, string $expected): void
     {
-        $protector = new WhitespaceProtector();
+        $protector = ZfExtended_Factory::get(editor_Models_Segment_Whitespace::class);
 
-        $protected = $protector->protect([new ChunkDto($text)], null, null);
-
-        $result = [];
-        foreach ($protected as $p) {
-            $result[] = $p;
-        }
-
-        self::assertEquals([new ChunkDto($expected, true),], $result);
+        self::assertEquals($expected, $protector->protectWhitespace($text));
     }
 
     public function caseProvider(): iterable
