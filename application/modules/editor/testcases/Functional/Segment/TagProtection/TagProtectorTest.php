@@ -53,7 +53,10 @@ declare(strict_types=1);
 namespace MittagQI\Translate5\Test\Unit\Segment\TagProtection;
 
 use editor_Models_Languages;
+use editor_Models_Segment_Number_LanguageFormat as LanguageFormat;
 use editor_Test_UnitTest;
+use MittagQI\Translate5\Repository\LanguageNumberFormatRepository;
+use MittagQI\Translate5\Repository\LanguageRepository;
 use MittagQI\Translate5\Segment\TagProtection\TagProtector;
 use MittagQI\Translate5\Segment\TagProtection\Protector\ChunkDto;
 use MittagQI\Translate5\Segment\TagProtection\Protector\Number\NumberProtectorInterface;
@@ -63,70 +66,43 @@ use MittagQI\Translate5\Segment\TagProtection\Protector\WhitespaceProtector;
 
 class TagProtectorTest extends editor_Test_UnitTest
 {
-    public function test(): void
+    /**
+     * @dataProvider casesProvider
+     */
+    public function test(string $node, string $expected): void
     {
-        $processor = new class implements NumberProtectorInterface, RatingInterface
+        $processor = new class implements NumberProtectorInterface
         {
+            public static function getType(): string
+            {
+                return 'integer';
+            }
+
             public function protect(
-                iterable $chunks,
+                string $textNode,
+                LanguageFormat $languageFormat,
                 ?editor_Models_Languages $sourceLang,
                 ?editor_Models_Languages $targetLang
-            ): iterable {
-                foreach ($chunks as $chunk) {
-                    foreach (explode(' ', $chunk->text) as $part) {
-                        yield new ChunkDto($part);
-                    }
-                }
-            }
-
-            public function rating(): int
-            {
-                return 2;
-            }
-
-            public function hasEntityToProtect(string $textNode, ?editor_Models_Languages $sourceLang): bool
-            {
-                return true;
+            ): string {
+                return '<number type="integer" name="default" source="1 234" iso="1234" target=""/>';
             }
         };
+        $numberFormatRepository = $this->createConfiguredMock(LanguageNumberFormatRepository::class, []);
+        $languageRepository = $this->createConfiguredMock(LanguageRepository::class, []);
 
-        $processor1 = new class implements NumberProtectorInterface, RatingInterface
-        {
-            public function protect(
-                iterable $chunks,
-                ?editor_Models_Languages $sourceLang,
-                ?editor_Models_Languages $targetLang
-            ): iterable {
-                foreach ($chunks as $chunk) {
-                    if (str_contains($chunk->text, 'test')) {
-                        yield new ChunkDto(sprintf('<ph>%s</ph>', $chunk->text), true);
-                    } else {
-                        yield $chunk;
-                    }
-                }
-            }
-
-            public function rating(): int
-            {
-                return 1;
-            }
-
-            public function hasEntityToProtect(string $textNode, ?editor_Models_Languages $sourceLang): bool
-            {
-                return true;
-            }
-        };
-
-
-        $number = new NumberProtector([$processor1, $processor]);
+        $number = new NumberProtector([$processor], $numberFormatRepository, $languageRepository);
         $whitespace = new WhitespaceProtector();
 
-        $chunkProtector = new TagProtector($number, $whitespace);
-        $testString = 'some test  text  ';
+        $tagProtector = new TagProtector($number, $whitespace);
 
-        self::assertEquals(
-            'some<ph>test </ph>text<char ts="c2a0" length="1"/>',
-            $chunkProtector->protect($testString, null, null)
-        );
+        self::assertEquals($expected, $tagProtector->protect($node, null, null));
+    }
+
+    public function casesProvider(): iterable
+    {
+        yield 'NNBSP in tag is safe' => [
+            'text' => 'text with 1 234 [\r\n] in it',
+            'expected' => 'text with <number type="integer" name="default" source="1 234" iso="1234" target=""/> [<hardReturn/>] in it'
+        ];
     }
 }
