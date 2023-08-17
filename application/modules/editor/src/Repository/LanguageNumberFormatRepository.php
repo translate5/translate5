@@ -56,17 +56,33 @@ use editor_Models_Segment_Number_LanguageFormat as LanguageFormat;
 
 class LanguageNumberFormatRepository
 {
-    public function findByLanguageIdAndType(int $langId, string $type): array
+    /**
+     * @return iterable<LanguageFormat>
+     */
+    public function getAll(?int $sourceLang): iterable
     {
+        $db = \ZfExtended_Factory::get(LanguageFormat::class)->db;
+        $s = $db->select()->order('priority desc');
 
+        if (null !== $sourceLang) {
+            $s->where('languageId = ?', $sourceLang)->orWhere('(languageId IS NULL and name = ?)', 'default');
+        } else {
+            $s->where('(languageId IS NULL and name = ?)', 'default');
+        }
+
+        $formats = $db->fetchAll($s);
+
+        $format = \ZfExtended_Factory::get(LanguageFormat::class);
+
+        foreach ($formats as $formatData) {
+            $format = clone $format;
+            $format->init($formatData->toArray());
+
+            yield $format;
+        }
     }
 
-    public function findFormat(int $langId, string $type, string $name): ?LanguageFormat
-    {
-
-    }
-
-    public function findDateFormat(int $langId, string $name): ?LanguageFormat
+    public function findBy(int $langId, string $type, string $name): ?LanguageFormat
     {
     }
 }

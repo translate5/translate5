@@ -50,21 +50,7 @@ END LICENSE AND COPYRIGHT
 */
 declare(strict_types=1);
 
-/**
- * @method string getLanguageId()
- * @method void setLanguageId(int $id)
- * @method string getType()
- * @method void setType(string $type)
- * @method string getName()
- * @method void setName(string $name)
- * @method string getRegex()
- * @method void setRegex(string $regex)
- * @method string getFormat()
- * @method void setFormat(string $format)
- * @method bool getKeepAsIs()
- * @method void setKeepAsIs(bool $keepAsIs)
- */
-class editor_Models_Segment_Number_LanguageFormat extends ZfExtended_Models_Entity_Abstract
-{
-    protected $dbInstanceClass = editor_Models_Db_Segment_Number_LanguageFormat::class;
+class editor_Models_Db_Segment_Number_LanguageFormat extends Zend_Db_Table_Abstract {
+    protected $_name = 'LEK_language_number_format';
+    public $_primary = 'id';
 }
