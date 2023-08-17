@@ -713,6 +713,10 @@ class NumberProtectorTest extends TestCase
     public function trickyCasesProvider(): iterable
     {
         yield [
+            'string' => 'string &Alpha;123456789&quot; string',
+            'expected' => 'string &Alpha;<number type="integer" name="default" source="123456789" iso="123456789" target=""/>&quot; string'
+        ];
+        yield [
             'string' => 'string<someTag/>123456789 string',
             'expected' => 'string<someTag/>123456789 string'
         ];

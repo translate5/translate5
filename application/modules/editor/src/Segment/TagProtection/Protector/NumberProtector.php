@@ -208,13 +208,18 @@ class NumberProtector implements ProtectorInterface
 
     private function loadXML(string $textNode): void
     {
-        $this->document->loadXML($textNode);
+        // protect entities
+        $this->document->loadXML(preg_replace('/&(\w{2,8});/', '**\1**', $textNode));
         // loadXML resets encoding so we setting it here at each iteration
         $this->document->encoding = 'utf-8';
     }
 
     private function getCurrentTextNode(): string
     {
-        return $this->document->saveXML($this->document->documentElement);
+        return preg_replace(
+            '/\*\*(\w{2,8})\*\*/',
+            '&\1;',
+            $this->document->saveXML($this->document->documentElement)
+        );
     }
 }
