@@ -355,50 +355,56 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_Me
         return $data;
     }
 
-    /***
+    /**
      * Validate import languages against tbx languages
-     * @return boolean
+     * @return void
      */
-    private function validateTbxLanguages(): bool
+    private function validateTbxLanguages(): void
     {
-        $langs = [];
-        $langs[$this->task->getSourceLang()] = $this->task->getSourceLang();
-        $langs[$this->task->getTargetLang()] = $this->task->getTargetLang();
 
-        $collection = ZfExtended_Factory::get('editor_Models_TermCollection_TermCollection');
-        /* @var $collection editor_Models_TermCollection_TermCollection */
-        $collLangs = $collection->getLanguagesInTermCollections(array($this->termCollection->getId()));
+        $collection = ZfExtended_Factory::get(editor_Models_TermCollection_TermCollection::class);
+
+        $collLangs = $collection->getLanguagesInTermCollections([
+            $this->termCollection->getId()
+        ]);
 
         //disable terminology when no terms for the term collection are available
-        if (empty($collLangs)) {
+        if (empty($collLangs))
+        {
             $this->logger->error('E1028', 'Terminology for task is disabled because no languages are defined in the automatically created and attached term collection', $this->getDefaultLogData());
             $this->task->setTerminologie(0);
-            return false;
+            return;
         }
 
-        $collLangKeys = [];
-        foreach ($collLangs as $lng){
-            $collLangKeys[$lng['id']] = $lng['id'];
-        }
+        $collLangKeys = array_column($collLangs,'id');
 
-        //missing langs
-        $notProcessed = array_diff(
-            array_keys($langs),
-            array_keys($collLangKeys));
+        $fuzzyModel = ZfExtended_Factory::get(editor_Models_Languages::class);
 
-        if (empty($notProcessed)) {
-            return true;
+        // get all task source/target languages including the fuzzy languages
+        $sourceLanguages = array_merge(
+            $fuzzyModel->getFuzzyLanguages($this->task->getSourceLang(),includeMajor: true)
+        );
+        $targetLanguages = array_merge(
+            $fuzzyModel->getFuzzyLanguages($this->task->getTargetLang(),includeMajor: true)
+        );
+
+        $matchSource = array_intersect($sourceLanguages, $collLangKeys);
+        $matchTarget = array_intersect($targetLanguages, $collLangKeys);
+
+        // check if the task source and target language can be found in the collection languages
+        if (!empty($matchSource) && !empty($matchTarget)) {
+            return;
         }
 
         $this->logger->error(
             'E1028',
             'Terminology for task is disabled because the automatically created and attached term collection does not contain suitable languages for the task.',
             $this->getDefaultLogData([
-                'notFoundLanguageIds' => $notProcessed
+                'taskLanguages' => $fuzzyModel->toRfcArray(array_merge($sourceLanguages,$targetLanguages)),
+                'collectionLanguages' => $fuzzyModel->toRfcArray($collLangKeys)
             ])
         );
         $this->task->setTerminologie(0);
-        return false;
     }
 
     /***

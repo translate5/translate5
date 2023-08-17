@@ -185,7 +185,7 @@ final class Config
     /**
      * @param string $type : see LanguageResource::XXX
      * @param string|null $resourceFileName
-     * @param array|null $customerIds
+     * @param int $customerId
      * @param string|null $sourceLanguage
      * @param string|null $targetLanguage
      * @return LanguageResource
@@ -390,6 +390,10 @@ final class Config
             case LanguageResource::MICROSOFT_TRANSLATOR:
             case 'mstranslator':
                 return new MicrosoftTranslator($this->testClass, $nextIndex);
+
+            case LanguageResource::GOOGLE_TRANSLATE:
+                return new GoogleTranslate($this->testClass,$nextIndex);
+
 
             case LanguageResource::TILDE_MT:
                 // TODO FIXME UGLY: Using classes from Private Plugins ... how to solve ?
