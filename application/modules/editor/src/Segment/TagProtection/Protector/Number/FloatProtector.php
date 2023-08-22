@@ -77,7 +77,7 @@ class FloatProtector extends AbstractProtector
         }
 
         return sprintf(
-            self::TAG_FORMAT,
+            $this->tagFormat(),
             self::getType(),
             $sourceFormat->getName(),
             $number,

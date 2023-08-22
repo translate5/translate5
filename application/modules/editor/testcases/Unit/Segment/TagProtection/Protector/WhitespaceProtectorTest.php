@@ -53,8 +53,8 @@ declare(strict_types=1);
 namespace MittagQI\Translate5\Test\Unit\Segment\TagProtection\Protector;
 
 use editor_Models_Segment_Whitespace;
+use MittagQI\Translate5\Segment\TagProtection\Protector\WhitespaceProtector;
 use PHPUnit\Framework\TestCase;
-use ZfExtended_Factory;
 
 class WhitespaceProtectorTest extends TestCase
 {
@@ -63,9 +63,9 @@ class WhitespaceProtectorTest extends TestCase
      */
     public function test(string $text, string $expected): void
     {
-        $protector = ZfExtended_Factory::get(editor_Models_Segment_Whitespace::class);
+        $protector = new WhitespaceProtector(new editor_Models_Segment_Whitespace());
 
-        self::assertEquals($expected, $protector->protectWhitespace($text));
+        self::assertEquals($expected, $protector->protect($text, null, null));
     }
 
     public function caseProvider(): iterable
@@ -188,6 +188,90 @@ class WhitespaceProtectorTest extends TestCase
         yield 'Ideographic Space' => [
             'text' => "text with [　] in it",
             'expected' => 'text with [<char ts="e38080" length="1"/>] in it'
+        ];
+    }
+
+    /**
+     * @dataProvider internalTagsProvider
+     */
+    public function testConvertToInternalTags(string $segment, string $converted, int $finalTagIdent): void
+    {
+        $shortTagIdent = 1;
+        $whitespace = new WhitespaceProtector(new editor_Models_Segment_Whitespace());
+
+        self::assertSame($converted, $whitespace->convertToInternalTags($segment, $shortTagIdent));
+        self::assertSame($finalTagIdent, $shortTagIdent);
+    }
+
+    public function internalTagsProvider(): iterable
+    {
+        $tag1 = '<hardReturn/>';
+        $converted1 = '<div class="single 6861726452657475726e2f newline internal-tag ownttip"><span title="&lt;1/&gt;: Newline" class="short">&lt;1/&gt;</span><span data-originalid="hardReturn" data-length="1" class="full">↵</span></div>';
+
+        yield [
+            'segment' => "string $tag1 string",
+            'converted' => "string $converted1 string",
+            'finalTagIdent' => 2,
+        ];
+
+        $tag2 = '<softReturn/>';
+        $converted2 = '<div class="single 736f667452657475726e2f newline internal-tag ownttip"><span title="&lt;2/&gt;: Newline" class="short">&lt;2/&gt;</span><span data-originalid="softReturn" data-length="1" class="full">↵</span></div>';
+
+        yield [
+            'segment' => "string $tag1 string $tag2 string",
+            'converted' => "string $converted1 string $converted2 string",
+            'finalTagIdent' => 3,
+        ];
+    }
+
+    /**
+     * @dataProvider internalTagsInChunksProvider
+     */
+    public function testConvertToInternalTagsInChunks(string $segment, array $xmlChunks, int $finalTagIdent): void
+    {
+        $whitespace = new WhitespaceProtector(new editor_Models_Segment_Whitespace());
+        $shortTagIdent = 1;
+
+        self::assertEquals($xmlChunks, $whitespace->convertToInternalTagsInChunks($segment, $shortTagIdent));
+        self::assertSame($finalTagIdent, $shortTagIdent);
+    }
+
+    public function internalTagsInChunksProvider(): iterable
+    {
+        $tag1 = '<hardReturn/>';
+        $converted1 = '<div class="single 6861726452657475726e2f newline internal-tag ownttip"><span title="&lt;1/&gt;: Newline" class="short">&lt;1/&gt;</span><span data-originalid="hardReturn" data-length="1" class="full">↵</span></div>';
+
+        $parsedTag1 = new \editor_Models_Import_FileParser_WhitespaceTag();
+        $parsedTag1->originalContent = $tag1;
+        $parsedTag1->rawContent = "\r\n";
+        $parsedTag1->tagNr = 1;
+        $parsedTag1->id = 'hardReturn';
+        $parsedTag1->tag = 'hardReturn';
+        $parsedTag1->text = '↵';
+        $parsedTag1->renderedTag = $converted1;
+
+        yield [
+            'segment' => "string $tag1 string",
+            'xmlChunks' => ['string ', $parsedTag1, ' string'],
+            'finalTagIdent' => 2,
+        ];
+
+        $tag2 = '<softReturn/>';
+        $converted2 = '<div class="single 736f667452657475726e2f newline internal-tag ownttip"><span title="&lt;2/&gt;: Newline" class="short">&lt;2/&gt;</span><span data-originalid="softReturn" data-length="1" class="full">↵</span></div>';
+
+        $parsedTag2 = new \editor_Models_Import_FileParser_WhitespaceTag();
+        $parsedTag2->originalContent = $tag2;
+        $parsedTag2->rawContent = "\n";
+        $parsedTag2->tagNr = 2;
+        $parsedTag2->id = 'softReturn';
+        $parsedTag2->tag = 'softReturn';
+        $parsedTag2->text = '↵';
+        $parsedTag2->renderedTag = $converted2;
+
+        yield [
+            'segment' => "string $tag1 string $tag2 string",
+            'xmlChunks' => ['string ', $parsedTag1, ' string ', $parsedTag2, ' string'],
+            'finalTagIdent' => 3,
         ];
     }
 }

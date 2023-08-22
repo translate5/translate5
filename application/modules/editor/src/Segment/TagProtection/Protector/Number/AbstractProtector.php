@@ -55,15 +55,19 @@ namespace MittagQI\Translate5\Segment\TagProtection\Protector\Number;
 use editor_Models_Languages;
 use MittagQI\Translate5\Repository\LanguageNumberFormatRepository;
 use editor_Models_Segment_Number_LanguageFormat as LanguageFormat;
+use MittagQI\Translate5\Segment\TagProtection\Protector\NumberProtector;
 
 abstract class AbstractProtector implements NumberProtectorInterface
 {
-    protected const TAG_FORMAT = '<number type="%s" name="%s" source="%s" iso="%s" target="%s" />';
-
     private array $formatsCache = [];
 
     public function __construct(protected LanguageNumberFormatRepository $formatRepository)
     {
+    }
+
+    protected function tagFormat(): string
+    {
+        return '<' . NumberProtector::TAG_NAME . ' type="%s" name="%s" source="%s" iso="%s" target="%s" />';
     }
 
     /**
@@ -91,7 +95,7 @@ abstract class AbstractProtector implements NumberProtectorInterface
         ?string $targetFormat
     ): string {
         return sprintf(
-            self::TAG_FORMAT,
+            $this->tagFormat(),
             static::getType(),
             $sourceFormat->getName(),
             $number,

@@ -57,15 +57,24 @@ use DOMDocument;
 use DOMElement;
 use DOMNode;
 use DOMText;
+use editor_Models_Import_FileParser_XmlParser as XmlParser;
 use editor_Models_Languages;
 use editor_Models_Segment_Number_LanguageFormat as LanguageFormat;
 use MittagQI\Translate5\Repository\LanguageRepository;
+use MittagQI\Translate5\Segment\TagProtection\NumberTag;
+use MittagQI\Translate5\Segment\TagProtection\Protector\Number\DateProtector;
+use MittagQI\Translate5\Segment\TagProtection\Protector\Number\FloatProtector;
+use MittagQI\Translate5\Segment\TagProtection\Protector\Number\IntegerProtector;
+use MittagQI\Translate5\Segment\TagProtection\Protector\Number\IPAddressProtector;
+use MittagQI\Translate5\Segment\TagProtection\Protector\Number\MacAddressProtector;
 use MittagQI\Translate5\Segment\TagProtection\Protector\Number\NumberParsingException;
 use MittagQI\Translate5\Segment\TagProtection\Protector\Number\NumberProtectorInterface;
 use MittagQI\Translate5\Repository\LanguageNumberFormatRepository;
+use ZfExtended_Factory;
 
 class NumberProtector implements ProtectorInterface
 {
+    public const TAG_NAME = 'number';
     /**
      * @var array<string, NumberProtectorInterface>
      */
@@ -89,9 +98,92 @@ class NumberProtector implements ProtectorInterface
         $this->document = new DOMDocument();
     }
 
+    public static function create(): self
+    {
+        $numberFormatRepository = new LanguageNumberFormatRepository();
+
+        return new self(
+            [
+                new DateProtector($numberFormatRepository),
+                new FloatProtector($numberFormatRepository),
+                new IntegerProtector($numberFormatRepository),
+                new IPAddressProtector($numberFormatRepository),
+                new MacAddressProtector($numberFormatRepository),
+            ],
+            $numberFormatRepository,
+            new LanguageRepository()
+        );
+    }
+
+    public function priority(): int
+    {
+        return 200;
+    }
+
     public function hasEntityToProtect(string $textNode, ?int $sourceLang = null): bool
     {
         return (bool) preg_match('/(\d|[[:xdigit:]][-:]+)/u', $textNode);
+    }
+
+    public function hasTagsToConvert(string $textNode): bool
+    {
+        return str_contains($textNode, '<' . self::TAG_NAME . ' ');
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function convertToInternalTags(string $segment, int &$shortTagIdent, array &$xmlChunks = []): string
+    {
+        $xml = ZfExtended_Factory::get(XmlParser::class, [['normalizeTags' => false]]);
+
+        $xml->registerElement(
+            self::TAG_NAME,
+            null,
+            function ($tagName, $key, $opener) use ($xml, &$shortTagIdent) {
+                $xml->replaceChunk(
+                    $key,
+                    $this->handleNumberTags($xml, $tagName, $key, $opener, $shortTagIdent)
+                );
+            }
+        );
+
+        $result = $xml->parse($segment, true, [self::TAG_NAME]);
+        $xmlChunks = $xml->getAllChunks();
+
+        return $result;
+    }
+
+    public function convertToInternalTagsInChunks(string $segment, int &$shortTagIdent): array
+    {
+        $xmlChunks = [];
+        $this->convertToInternalTags($segment, $shortTagIdent, $xmlChunks);
+
+        return $xmlChunks;
+    }
+
+    private function handleNumberTags(
+        XmlParser $xml,
+        string $tagName,
+        int $key,
+        array $opener,
+        int &$shortTagIdent
+    ): NumberTag {
+        $source = $xml->getAttribute($opener['attributes'], 'source', null);
+        $target = $xml->getAttribute($opener['attributes'], 'target', null);
+
+        $tagObj = new NumberTag();
+        $tagObj->originalContent = $xml->getChunk($key);
+        $tagObj->tagNr = $shortTagIdent;
+        $tagObj->id = $tagName;
+        $tagObj->tag = $tagName;
+        $tagObj->text = json_encode(['source' => $source, 'target' => $target]);
+        //title: Only translatable with using ExtJS QTips in the frontend, as title attribute not possible
+        $tagObj->renderTag(mb_strlen($source), '&lt;' . $shortTagIdent . '/&gt;: Number', ' ' . self::TAG_NAME);
+
+        $shortTagIdent++;
+
+        return $tagObj;
     }
 
     public function protect(string $textNode, ?int $sourceLangId, ?int $targetLangId): string

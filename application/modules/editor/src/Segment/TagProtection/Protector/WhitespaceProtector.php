@@ -56,11 +56,15 @@ use editor_Models_Segment_Whitespace;
 
 class WhitespaceProtector implements ProtectorInterface
 {
-    private editor_Models_Segment_Whitespace $whitespace;
+    private const TAG_REGEX = '/(<\w+ .+>|<\/\w+>)/u';
 
-    public function __construct()
+    public function __construct(private editor_Models_Segment_Whitespace $whitespace)
     {
-        $this->whitespace = new editor_Models_Segment_Whitespace();
+    }
+
+    public function priority(): int
+    {
+        return 100;
     }
 
     public function hasEntityToProtect(string $textNode, ?int $sourceLang = null): bool
@@ -68,11 +72,57 @@ class WhitespaceProtector implements ProtectorInterface
         return true;
     }
 
+    public function hasTagsToConvert(string $textNode): bool
+    {
+        return (bool) preg_match(sprintf("/<(%s)\s?/", implode('|', $this->whitespace->validTags())), $textNode);
+    }
+
     /**
      * {@inheritDoc}
      */
     public function protect(string $textNode, ?int $sourceLangId, ?int $targetLangId): string
     {
-        return $this->whitespace->protectWhitespace($textNode);
+        if (!preg_match_all(self::TAG_REGEX, $textNode, $matches)) {
+            return $this->whitespace->protectWhitespace($textNode);
+        }
+
+        $tags = $matches[0];
+        $parts = preg_split(self::TAG_REGEX, $textNode);
+        $tagCount = count($tags);
+
+        $protected = '';
+
+        for ($i = 0; $i <= $tagCount; $i++) {
+            if (!empty($parts[$i])) {
+                $protected .= $this->whitespace->protectWhitespace($parts[$i]);
+            }
+
+            if (!isset($tags[$i])) {
+                continue;
+            }
+
+            $protected .= $tags[$i];
+        }
+
+        return $protected;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function convertToInternalTags(string $segment, int &$shortTagIdent): string
+    {
+        return $this->whitespace->convertToInternalTags($segment, $shortTagIdent);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function convertToInternalTagsInChunks(string $segment, int &$shortTagIdent): array
+    {
+        $xmlChunks = [];
+        $this->whitespace->convertToInternalTags($segment, $shortTagIdent, $xmlChunks);
+
+        return $xmlChunks;
     }
 }

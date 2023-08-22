@@ -52,8 +52,10 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\Segment\TagProtection;
 
-use editor_Models_Segment_UtilityBroker;
+use editor_Models_Import_FileParser_Tag;
+use editor_Models_Segment_Utility as SegmentUtility;
 use editor_Models_Segment_Whitespace as WhitespaceProtector;
+use MittagQI\Translate5\Segment\TagProtection\Protector\Number\TagSequence\NumberTagSequence;
 use MittagQI\Translate5\Segment\TagProtection\Protector\ProtectorInterface;
 
 class TagProtector
@@ -61,43 +63,78 @@ class TagProtector
     /**
      * @param  ProtectorInterface[] $protectors
      */
-    public function __construct(private iterable $protectors, private editor_Models_Segment_UtilityBroker $utilities)
+    public function __construct(private array $protectors)
     {
+        usort(
+            $this->protectors,
+            fn (ProtectorInterface $p1, ProtectorInterface $p2) => $p2->priority() <=> $p1->priority()
+        );
     }
 
     public function protect(
         string $text,
         ?int $sourceLang,
         ?int $targetLang,
-        bool $protectTags = false
+        $entityHandling = WhitespaceProtector::ENTITY_MODE_RESTORE
     ): string {
-        $text = $this->protectTags($text, $protectTags);
+        if ($entityHandling !== WhitespaceProtector::ENTITY_MODE_OFF) {
+            $text = SegmentUtility::entityCleanup($text, $entityHandling === WhitespaceProtector::ENTITY_MODE_RESTORE);
+        }
 
         foreach ($this->protectors as $protector) {
             if ($protector->hasEntityToProtect($text, $sourceLang)) {
                 $text = $protector->protect($text, $sourceLang, $targetLang);
-                $protectTags = true;
             }
         }
 
-        $text = $this->protectTags($text, $protectTags);
-
-        return $this->utilities->whitespace->protectWhitespace(
-            $text,
-            $protectTags ? WhitespaceProtector::ENTITY_MODE_OFF : WhitespaceProtector::ENTITY_MODE_RESTORE
-        );
+        return $text;
     }
 
-    private function protectTags(string $text, bool $protectTags): ?string
+    /**
+     * replaces the placeholder tags (<protectedTag> / <hardReturn> / <char> / <number> etc) with an internal tag
+     */
+    public function convertToInternalTags(string $segment, int &$shortTagIdent): string
     {
-        if (!$protectTags) {
-            return $text;
+        foreach ($this->protectors as $protector) {
+            if ($protector->hasTagsToConvert($segment)) {
+                $segment = $protector->convertToInternalTags($segment, $shortTagIdent);
+            }
         }
-        //since we are in the XML file format, plain tags in the content are encoded, which we have to undo first
-        //$text is here for example: Dies &lt;strong&gt;ist ein&lt;/strong&gt; Test. &amp;nbsp;
-        $text = html_entity_decode($text);
-        //$text is now: Dies <strong>ist ein</strong> Test. &nbsp;
 
-        return $this->utilities->tagProtection->protectTags($text);
+        return $segment;
+    }
+
+    public function convertToInternalTagsInChunks(string $segment, int &$shortTagIdent): array
+    {
+        $tagsPattern = '/<.+\/>/U';
+        // we assume that tags that we interested in are all single tags
+        if (!preg_match_all($tagsPattern, $segment, $matches)) {
+            return [$segment];
+        }
+
+        $strings = preg_split($tagsPattern, $segment);
+        $tags = $matches[0];
+
+        $chunkStorage = [];
+
+        $matchCount = count($tags);
+
+        for ($i = 0; $i <= $matchCount; $i++) {
+            if (!empty($strings[$i])) {
+                $chunkStorage[] = [$strings[$i]];
+            }
+
+            if (!isset($tags[$i])) {
+                continue;
+            }
+
+            foreach ($this->protectors as $protector) {
+                if ($protector->hasTagsToConvert($tags[$i])) {
+                    $chunkStorage[] = $protector->convertToInternalTagsInChunks($tags[$i], $shortTagIdent);
+                }
+            }
+        }
+
+        return array_values(array_filter(array_merge(...$chunkStorage)));
     }
 }
