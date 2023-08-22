@@ -87,11 +87,17 @@ abstract class AbstractConnector
      */
     protected string $matchrateConfigKey;
 
-    /**The Name of the Authorization Header field
-     *
+    /**
+     * The Name of the Authorization Header field
      * @var string
      */
     protected string $authorizationHeaderName = 'Authorization';
+
+    /**
+     * If the Auth is a Bearer-Authentication, set this to 'Bearer'
+     * @var string 
+     */
+    protected string $authorizationHeaderBearer = '';
 
     /**
      * @var AbstractAuthenticatedService
@@ -241,6 +247,7 @@ abstract class AbstractConnector
      */
     protected function addAuthorization(JsonClient $client): void
     {
-        $client->setHeaders($this->authorizationHeaderName, $this->getAuthorizationKey());
+        $bearer = empty($this->authorizationHeaderBearer) ? '' : $this->authorizationHeaderBearer . ' ';
+        $client->setHeaders($this->authorizationHeaderName, $bearer . $this->getAuthorizationKey());
     }
 }

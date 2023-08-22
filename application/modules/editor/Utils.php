@@ -324,6 +324,23 @@ class editor_Utils {
     public static function normalizeWhitespace($text, $replacement=' '){
         return preg_replace('/\s+/', $replacement, self::replaceFunnyWhitespace($text, $replacement));
     }
+
+    /**
+     * Turns all "programmers" quotes to typographical ones
+     * @param string $text
+     * @param string|null $languageIso5646
+     * @return string
+     */
+    public static function typographizeQuotes(string $text, string $languageIso5646 = null): string
+    {
+        $text = str_replace("'", '’', stripslashes($text));
+        $pStart = (substr($languageIso5646, 0, 2) === 'de') ? '„' : '“'; // adjustments for german text
+        $text = str_replace('"', $pStart, $text);
+        $text = str_replace($pStart . ' ', '” ', $text);
+        if (str_ends_with($text, $pStart))
+            return substr($text, 0, -1) . '”';
+        return $text;
+    }
     /**
      * Replaces all funny whitespace chars (characters representing whitespace that are no blanks " ") with the replacement (default: single blank)
      * @param string $text
