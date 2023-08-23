@@ -521,7 +521,7 @@ abstract class AbstractRequest
      * @param array $extraData
      * @return ZfExtended_ErrorCodeException
      */
-    final protected function createException(string $ecode, string $errorMessage = null, array $extraData = []): ZfExtended_ErrorCodeException
+    final public function createException(string $ecode, string $errorMessage = null, array $extraData = []): ZfExtended_ErrorCodeException
     {
         return new $this->exceptionClass($ecode, $this->createExtraData($errorMessage, $extraData));
     }
