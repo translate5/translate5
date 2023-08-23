@@ -376,9 +376,14 @@ The German and the English Comment tag of the string must be imported as comment
         $segment = $this->utilities->internalTag->protect($segment);
         
         //since there are no other tags we can just take the string and protect whitespace there (no tag protection needed!)
-        $segment = $this->utilities->whitespace->protectWhitespace($segment, $this->utilities->whitespace::ENTITY_MODE_OFF);
-        $segment = $this->utilities->whitespace->convertToInternalTags($segment, $this->shortTagIdent);
-        
+        $segment = $this->tagProtector->protectAndConvert(
+            $segment,
+            $this->task->getSourceLang(),
+            $this->task->getTargetLang(),
+            $this->shortTagIdent,
+            editor_Models_Segment_Whitespace::ENTITY_MODE_OFF
+        );
+
         $segment = $this->utilities->internalTag->unprotect($segment);
         
         //define the fieldnames where the data should be stored
