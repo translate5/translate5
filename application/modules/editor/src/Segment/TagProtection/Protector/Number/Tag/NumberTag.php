@@ -50,7 +50,7 @@ END LICENSE AND COPYRIGHT
 */
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\Segment\TagProtection;
+namespace MittagQI\Translate5\Segment\TagProtection\Protector\Number\Tag;
 
 use editor_Models_Import_FileParser_Tag;
 

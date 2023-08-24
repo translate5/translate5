@@ -54,10 +54,10 @@ namespace MittagQI\Translate5\Test\Functional\Segment\TagProtection;
 
 use editor_Models_Segment_Whitespace;
 use editor_Test_UnitTest;
-use MittagQI\Translate5\Segment\TagProtection\NumberTag;
+use MittagQI\Translate5\Segment\TagProtection\Protector\Number\Tag\NumberTag;
+use MittagQI\Translate5\Segment\TagProtection\Protector\NumberProtector;
 use MittagQI\Translate5\Segment\TagProtection\Protector\WhitespaceProtector;
 use MittagQI\Translate5\Segment\TagProtection\TagProtector;
-use MittagQI\Translate5\Segment\TagProtection\Protector\NumberProtector;
 
 class TagProtectorTest extends editor_Test_UnitTest
 {
@@ -107,7 +107,7 @@ class TagProtectorTest extends editor_Test_UnitTest
     public function internalTagsProvider(): iterable
     {
         $tag1 = '<number type="date" name="default" source="20231020" iso="2023-10-20" target="2023-10-20"/>';
-        $converted1 = '<div class="single 6e756d62657220747970653d226461746522206e616d653d2264656661756c742220736f757263653d223230323331303230222069736f3d22323032332d31302d323022207461726765743d22323032332d31302d3230222f number internal-tag ownttip"><span title="&lt;1/&gt;: Number" class="short">&lt;1/&gt;</span><span data-originalid="number" data-length="8" data-source="20231020" data-target="2023-10-20" class="full"></span></div>';
+        $converted1 = '<div class="single 6e756d62657220747970653d226461746522206e616d653d2264656661756c742220736f757263653d223230323331303230222069736f3d22323032332d31302d323022207461726765743d22323032332d31302d3230222f number internal-tag ownttip"><span title="&lt;1/&gt;: Number" class="short">&lt;1/&gt;</span><span data-originalid="number" data-length="-1" data-source="20231020" data-target="2023-10-20" class="full"></span></div>';
 
         yield [
             'segment' => "string $tag1 string",
@@ -143,7 +143,7 @@ class TagProtectorTest extends editor_Test_UnitTest
     public function internalTagsInChunksProvider(): iterable
     {
         $tag1 = '<number type="date" name="default" source="20231020" iso="2023-10-20" target="2023-10-20"/>';
-        $converted1 = '<div class="single 6e756d62657220747970653d226461746522206e616d653d2264656661756c742220736f757263653d223230323331303230222069736f3d22323032332d31302d323022207461726765743d22323032332d31302d3230222f number internal-tag ownttip"><span title="&lt;1/&gt;: Number" class="short">&lt;1/&gt;</span><span data-originalid="number" data-length="8" data-source="20231020" data-target="2023-10-20" class="full"></span></div>';
+        $converted1 = '<div class="single 6e756d62657220747970653d226461746522206e616d653d2264656661756c742220736f757263653d223230323331303230222069736f3d22323032332d31302d323022207461726765743d22323032332d31302d3230222f number internal-tag ownttip"><span title="&lt;1/&gt;: Number" class="short">&lt;1/&gt;</span><span data-originalid="number" data-length="-1" data-source="20231020" data-target="2023-10-20" class="full"></span></div>';
 
         $parsedTag1 = new NumberTag();
         $parsedTag1->originalContent = $tag1;

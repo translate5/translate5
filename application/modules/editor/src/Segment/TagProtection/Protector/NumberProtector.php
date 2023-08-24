@@ -60,8 +60,8 @@ use DOMText;
 use editor_Models_Import_FileParser_XmlParser as XmlParser;
 use editor_Models_Languages;
 use editor_Models_Segment_Number_LanguageFormat as LanguageFormat;
+use MittagQI\Translate5\Repository\LanguageNumberFormatRepository;
 use MittagQI\Translate5\Repository\LanguageRepository;
-use MittagQI\Translate5\Segment\TagProtection\NumberTag;
 use MittagQI\Translate5\Segment\TagProtection\Protector\Number\DateProtector;
 use MittagQI\Translate5\Segment\TagProtection\Protector\Number\FloatProtector;
 use MittagQI\Translate5\Segment\TagProtection\Protector\Number\IntegerProtector;
@@ -69,7 +69,7 @@ use MittagQI\Translate5\Segment\TagProtection\Protector\Number\IPAddressProtecto
 use MittagQI\Translate5\Segment\TagProtection\Protector\Number\MacAddressProtector;
 use MittagQI\Translate5\Segment\TagProtection\Protector\Number\NumberParsingException;
 use MittagQI\Translate5\Segment\TagProtection\Protector\Number\NumberProtectorInterface;
-use MittagQI\Translate5\Repository\LanguageNumberFormatRepository;
+use MittagQI\Translate5\Segment\TagProtection\Protector\Number\Tag\NumberTag;
 use ZfExtended_Factory;
 
 class NumberProtector implements ProtectorInterface
@@ -179,7 +179,7 @@ class NumberProtector implements ProtectorInterface
         $tagObj->tag = $tagName;
         $tagObj->text = json_encode(['source' => $source, 'target' => $target]);
         //title: Only translatable with using ExtJS QTips in the frontend, as title attribute not possible
-        $tagObj->renderTag(mb_strlen($source), '&lt;' . $shortTagIdent . '/&gt;: Number', ' ' . self::TAG_NAME);
+        $tagObj->renderTag(title:  '&lt;' . $shortTagIdent . '/&gt;: Number', cls: ' ' . self::TAG_NAME);
 
         $shortTagIdent++;
 
