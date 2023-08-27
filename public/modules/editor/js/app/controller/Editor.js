@@ -524,7 +524,14 @@ Ext.define('Editor.controller.Editor', {
         if(me.editorKeyMap) {
             me.editorKeyMap.destroy();
         }
-        
+        if(me.editorKeyMap_rowpanel) {
+            me.editorKeyMap_rowpanel.destroy();
+        }
+
+        editor.editorKeyMap_rowpanel = me.editorKeyMap_rowpanel = new Editor.view.segments.EditorKeyMap({
+            target: editor.up().el,
+            binding: me.getKeyMapConfig('editor_rowpanel')
+        });
         editor.editorKeyMap = me.editorKeyMap = new Editor.view.segments.EditorKeyMap({
             target: docEl,
             binding: me.getKeyMapConfig('editor', {
@@ -1330,13 +1337,22 @@ Ext.define('Editor.controller.Editor', {
      * F3 editor event handler.
      * This will set the focus in the targetSearch field of concordance search panel
      */
-    handleF3KeyPress: function() {
+    handleF3KeyPress: function(keyCode, event) {
         var me = this,
             searchGrid = me.getLanguageResourceSearchGrid(),
-            field;
+            field,
+            domNode,
+            fieldType;
+
+        if ((domNode = event.getTarget('.type-source'))) {
+            fieldType = 'source';
+        } else {
+            domNode = event.getTarget('.type-target');
+            fieldType = 'target';
+        }
 
         me.searchConcordenceOrSynonym(searchGrid,function (selectedText){
-            field = searchGrid.down('#targetSearch');
+            field = searchGrid.down('#' + fieldType + 'Search');
             if( selectedText === ''){
                 field.focus(false,500);
                 return;
@@ -1345,7 +1361,7 @@ Ext.define('Editor.controller.Editor', {
             field.setValue(selectedText);
             searchGrid.getController().setLastActiveField(field);
             searchGrid.getController().handleSearchAll();
-        });
+        }, domNode);
 
     },
 
@@ -1376,23 +1392,25 @@ Ext.define('Editor.controller.Editor', {
      * @param component
      * @param textCallback
      */
-    searchConcordenceOrSynonym: function (component, textCallback){
+    searchConcordenceOrSynonym: function (component, textCallback, node){
         var me = this,
             editorPanel = me.getLanguageResourceEditorPanel(),
             delay,
             selectedText;
 
-        if(!editorPanel || !component){
+        if(!component){
             return;
         }
-        // expand if collapsed and set the delay to 0.5 sec (delay because of expand animation)
-        if(editorPanel.getCollapsed()){
-            editorPanel.expand();
-            delay = 500;
+        if (editorPanel) {
+            // expand if collapsed and set the delay to 0.5 sec (delay because of expand animation)
+            if(editorPanel.getCollapsed()){
+                editorPanel.expand();
+                delay = 500;
+            }
+            editorPanel.setActiveTab(component);
         }
-        editorPanel.setActiveTab(component);
 
-        selectedText = me.getSelectedTextInEditor();
+        selectedText = me.getSelectedTextInNode(node);
         textCallback(selectedText);
     },
 
@@ -1590,7 +1608,7 @@ Ext.define('Editor.controller.Editor', {
      */
     onEditorSelectionChange: function (){
         var me = this,
-            selectedText = me.getSelectedTextInEditor(),
+            selectedText = me.getSelectedTextInNode(),
             synonymGridExist =  me.getSynonymSearch() !== undefined,
             editorPanelExist = me.getLanguageResourceEditorPanel() !== undefined;
 
@@ -2001,16 +2019,15 @@ Ext.define('Editor.controller.Editor', {
      * Return the current selected text in editor without tags.
      * @returns {string|*}
      */
-    getSelectedTextInEditor: function (){
+    getSelectedTextInNode: function (node){
         var me = this,
-            plug = me.getEditPlugin(),
-            editor = plug.editor.mainEditor,
             selectionInEditor,
-            rangeForSelection,
-            selectedText;
+            rangeForSelection;
 
+        // Use editor body as node by default
+        if (!node) node = me.getEditPlugin().editor.mainEditor.getEditorBody();
 
-        selectionInEditor = rangy.getSelection(editor.getEditorBody());
+        selectionInEditor = rangy.getSelection(node);
         rangeForSelection = selectionInEditor.rangeCount ? selectionInEditor.getRangeAt(0) : null;
         if (rangeForSelection == null || rangeForSelection.collapsed){
             return '';
