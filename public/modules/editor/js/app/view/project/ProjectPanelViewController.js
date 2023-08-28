@@ -67,7 +67,8 @@ Ext.define('Editor.view.project.ProjectPanelViewController', {
         },
         store: {
             '#project.Project':{
-                load:'onProjectStoreLoad'
+                load:'onProjectStoreLoad',
+                filterchange: 'onProjectStoreFilterChange'
             }
         }
     },
@@ -484,5 +485,51 @@ Ext.define('Editor.view.project.ProjectPanelViewController', {
      */
     reset:function(){
         this.resetSelection();
+    },
+
+    /**
+     * Auto-select first record if current selection do not match the filters
+     *
+     * @param store
+     */
+    onProjectStoreFilterChange: function(store) {
+
+        // Put a single-time callback on store's load-event, as we need to
+        // check whether selected row is still in the store after filters are really applied
+        store.on('load', function() {
+
+            // Get selection model
+            var sm = this.lookup('projectGrid').getSelectionModel();
+
+            // If we have selection
+            if (sm.getSelection().length) {
+
+                // Get selected record
+                var record = sm.getSelection()[0];
+
+                // If it's still in the store - do nothing
+                if (~store.findExact('id', record.getId())) {
+
+                // Else if it's not and store is not empty
+                } else if (store.getCount()) {
+
+                    // Select first record
+                    sm.select(store.getAt(0));
+
+                // Else
+                } else {
+
+                    // Clear selection
+                    sm.deselect([record]);
+
+                    // Reset right panel
+                    this.reset();
+                }
+
+            // Else select first record
+            } else {
+                sm.select(store.getAt(0));
+            }
+        }, this, {single: true});
     }
 });
