@@ -655,16 +655,20 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         }
 
         $sourceLangCode = null;
+        $sourceLangName = null;
         $targetLangCode = null;
+        $targetLangName = null;
         //find the language codes for the current resource
         //in each resource separate language code matching should be introduced
         //because some of the resources are supporting different type of language codes
         //rfc as a language code will be used when no custom matching is implemented for the resource
         if(!empty($sourceLangId)){
             $sourceLangCode = $resource->getLanguageCodeSource($sourceLangId);
+            $sourceLangName = $resource->getLanguageNameSource($sourceLangId);
         }
         if(!empty($targetLangId)){
             $targetLangCode = $resource->getLanguageCodeTarget($targetLangId);
+            $targetLangName = $resource->getLanguageNameTarget($targetLangId);
         }
 
         //set the entity resource type from the $resource
@@ -702,8 +706,10 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         /* @var editor_Models_LanguageResources_Languages $resourceLanguages */
         $resourceLanguages->setSourceLang($sourceLangId);
         $resourceLanguages->setSourceLangCode($sourceLangCode);
+        $resourceLanguages->setSourceLangName($sourceLangName);
         $resourceLanguages->setTargetLang($targetLangId);
         $resourceLanguages->setTargetLangCode($targetLangCode);
+        $resourceLanguages->setTargetLangName($targetLangName);
         $resourceLanguages->setLanguageResourceId($this->data['id']);
         if (!empty($sourceLangId) || !empty($targetLangId)) {
             $resourceLanguages->save();

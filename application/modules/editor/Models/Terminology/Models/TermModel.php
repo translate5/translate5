@@ -1227,9 +1227,11 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
 
                     $model->setSourceLang($x['languageId']);
                     $model->setSourceLangCode($x['rfc5646']);
+                    $model->setSourceLangName($x['langName']);
 
                     $model->setTargetLang($y['languageId']);
                     $model->setTargetLangCode($y['rfc5646']);
+                    $model->setTargetLangName($x['langName']);
 
                     $model->setLanguageResourceId($key);
                     $model->save();

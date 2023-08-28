@@ -83,34 +83,46 @@ class editor_Models_LanguageResources_LanguageResource extends ZfExtended_Models
     
     /***
      * Source lang id helper property
+     * TODO REMOVE
      * @var int
      */
     public $sourceLang;
     
     /***
      * Target lang id helper property
+     * TODO REMOVE
      * @var int
      */
     public $targetLang;
     
     /***
      * Source language code value helper property
+     * TODO REMOVE
      * @var String
      */
     public $sourceLangCode;
+
+    // TODO REMOVE
+    public ?string $sourceLangName;
     
     
     /***
      * Target lang code value helper property
+     * TODO REMOVE
      * @var String
      */
     public $targetLangCode;
+
+    // TODO REMOVE
+    public ?string $targetLangName;
 
     /**
      * Caches the customers of a language-resource
      * @var array
      */
     protected array $customers = [];
+
+    private editor_Models_LanguageResources_Languages $languages;
 
     /***
      * Init the language resource instance for given editor_Models_LanguageResources_Resource
@@ -476,32 +488,72 @@ class editor_Models_LanguageResources_LanguageResource extends ZfExtended_Models
     }
     
     /***
+     * TODO REMOVE: Why is here the case represented we have multiple rows ?
      * Load the exsisting langages for the initialized entity.
      * @param string $fieldName : field which will be returned
      * @throws ZfExtended_ValidateException
-     * @return array
+     * @return mixed
      */
-    public function getLanguageByField($fieldName){
+    protected function getLanguageByField($fieldName){
 
         //check if the fieldName is defined
         if(empty($fieldName)){
-            throw new ZfExtended_ValidateException("Missing field name.");
+            throw new ZfExtended_ValidateException('Missing field name.');
         }
         
-        if($this->getId()==null){
-            throw new ZfExtended_ValidateException("Entity id is not set.");
+        if($this->getId() == null){
+            throw new ZfExtended_ValidateException('Entity id is not set.');
         }
         
-        $model=ZfExtended_Factory::get('editor_Models_LanguageResources_Languages');
-        /* @var $model editor_Models_LanguageResources_Languages */
-        
+        $model = ZfExtended_Factory::get(editor_Models_LanguageResources_Languages::class);
+
         //load the existing languages from the languageresource languages table
-        $res=$model->loadByLanguageResourceId($this->getId());
+        $res = $model->loadByLanguageResourceId($this->getId());
         
-        if(count($res)==1){
+        if(count($res) === 1){
             return $res[0][$fieldName];
         }
         return array_column($res, $fieldName);
+    }
+
+    /**
+     * Fetches a cached related languagresource-languages object
+     * TODO FIXME: Is it really neccessary to take a "does not exist" into account or could we assume it must always exist and throw an exception instead ?
+     * @return editor_Models_LanguageResources_Languages|null
+     * @throws ReflectionException
+     * @throws ZfExtended_ValidateException
+     */
+    protected function getCachedLanguages(): ?editor_Models_LanguageResources_Languages {
+
+        if(isset($this->languages) && (int) $this->languages->getLanguageResourceId() === (int) $this->getId()){
+            return $this->languages;
+        }
+
+        if(empty($this->getId())){
+            throw new ZfExtended_BadMethodCallException('Entity id is not set.');
+        }
+        try {
+            $this->languages = ZfExtended_Factory::get(editor_Models_LanguageResources_Languages::class);
+            $this->languages->loadRowByLanguageResourceId((int) $this->getId());
+            return $this->languages;
+        } catch(ZfExtended_Models_Entity_NotFoundException $e){
+            return null;
+        }
+    }
+
+    /***
+     * Get the source lang id values from the languageresource language table.
+     * Note: the enity id need to be valid
+     * @return array|string
+     */
+    public function getSourceLang(){
+        $languages = $this->getCachedLanguages();
+        return empty($languages) ? null : $languages->getSourceLang();
+        // TODO REMOVE
+        if(!$this->sourceLang){
+            $this->sourceLang = $this->getLanguageByField('sourceLang');
+        }
+        return $this->sourceLang;
     }
     
     /***
@@ -510,10 +562,39 @@ class editor_Models_LanguageResources_LanguageResource extends ZfExtended_Models
      * @return array|string
      */
     public function getSourceLangCode(){
+        $languages = $this->getCachedLanguages();
+        return empty($languages) ? null : $languages->getSourceLangCode();
+        // TODO REMOVE
         if(!$this->sourceLangCode){
-            $this->sourceLangCode=$this->getLanguageByField('sourceLangCode');
+            $this->sourceLangCode = $this->getLanguageByField('sourceLangCode');
         }
         return $this->sourceLangCode;
+    }
+
+    /**
+     * Get the source lang name from the languageresource language table
+     * @return string|null
+     * @throws ZfExtended_ValidateException
+     */
+    public function getSourceLangName(): ?string
+    {
+        $languages = $this->getCachedLanguages();
+        return empty($languages) ? null : $languages->getSourceLangName();
+    }
+
+    /***
+     * Get the target lang id values from the languageresource language table.
+     * Note: the enity id need to be valid
+     * @return array|string
+     */
+    public function getTargetLang(){
+        $languages = $this->getCachedLanguages();
+        return empty($languages) ? null : $languages->getTargetLang();
+        // TODO REMOVE
+        if(!$this->targetLang){
+            $this->targetLang = $this->getLanguageByField('targetLang');
+        }
+        return $this->targetLang;
     }
     
     /***
@@ -522,34 +603,24 @@ class editor_Models_LanguageResources_LanguageResource extends ZfExtended_Models
      * @return array|string
      */
     public function getTargetLangCode(){
+        $languages = $this->getCachedLanguages();
+        return empty($languages) ? null : $languages->getTargetLangCode();
+        // TODO REMOVE
         if(!$this->targetLangCode){
-            $this->targetLangCode=$this->getLanguageByField('targetLangCode');
+            $this->targetLangCode = $this->getLanguageByField('targetLangCode');
         }
         return $this->targetLangCode;
     }
-    
-    /***
-     * Get the source lang id values from the languageresource language table.
-     * Note: the enity id need to be valid
-     * @return array|string
+
+    /**
+     * Get the target lang name from the languageresource language table
+     * @return string|null
+     * @throws ZfExtended_ValidateException
      */
-    public function getSourceLang(){
-        if(!$this->sourceLang){
-            $this->sourceLang=$this->getLanguageByField('sourceLang');
-        }
-        return $this->sourceLang;
-    }
-    
-    /***
-     * Get the target lang id values from the languageresource language table.
-     * Note: the enity id need to be valid
-     * @return array|string
-     */
-    public function getTargetLang(){
-        if(!$this->targetLang){
-            $this->targetLang=$this->getLanguageByField('targetLang');
-        }
-        return $this->targetLang;
+    public function getTargetLangName(): ?string
+    {
+        $languages = $this->getCachedLanguages();
+        return empty($languages) ? null : $languages->getTargetLangName();
     }
 
     /***

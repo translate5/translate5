@@ -211,13 +211,11 @@ abstract class editor_Services_Connector_Abstract {
             return;
         }
 
-        /** @var editor_Models_Languages $fuzzy */
-        $fuzzy = ZfExtended_Factory::get('editor_Models_Languages');
-        $sourceFuzzy = $fuzzy->getFuzzyLanguages($sourceLang,includeMajor: true);
-        $targetFuzzy = $fuzzy->getFuzzyLanguages($targetLang,includeMajor: true);
+        $fuzzy = ZfExtended_Factory::get(editor_Models_Languages::class);
+        $sourceFuzzy = $fuzzy->getFuzzyLanguages($sourceLang, includeMajor: true);
+        $targetFuzzy = $fuzzy->getFuzzyLanguages($targetLang, includeMajor: true);
 
-        /** @var editor_Models_LanguageResources_Languages $languages */
-        $languages = ZfExtended_Factory::get('editor_Models_LanguageResources_Languages');
+        $languages = ZfExtended_Factory::get(editor_Models_LanguageResources_Languages::class);
 
         // load only the required languages
         $langaugepair = $languages->loadFilteredPairs($this->languageResource->getId(),$sourceFuzzy,$targetFuzzy);
@@ -436,8 +434,7 @@ abstract class editor_Services_Connector_Abstract {
      * @return string[]
      */
     public function languages(): array {
-        $languages = ZfExtended_Factory::get('editor_Models_Languages');
-        /* @var $languages editor_Models_Languages*/
+        $languages = ZfExtended_Factory::get(editor_Models_Languages::class);
         $ret = $languages->loadAllKeyValueCustom('id','rfc5646');
         return array_values($ret);
     }
@@ -485,8 +482,7 @@ abstract class editor_Services_Connector_Abstract {
         if(!$this->tagHandler->logger->hasQueuedLogs()) {
             return;
         }
-        $task = ZfExtended_Factory::get('editor_Models_Task');
-        /* @var $task editor_Models_Task */
+        $task = ZfExtended_Factory::get(editor_Models_Task::class);
         $task->loadByTaskGuid($segment->getTaskGuid());
         $this->tagHandler->logger->flush([
             'segmentId' => $segment->getId(),
@@ -538,16 +534,26 @@ abstract class editor_Services_Connector_Abstract {
 
     protected function getSourceLanguageCode(): string
     {
-        $langModel = ZfExtended_Factory::get(editor_Models_Languages::class);
-        $langModel->load($this->sourceLang);
+        $langModel = editor_ModelInstances::language($this->sourceLang);
         return $langModel->getRfc5646();
+    }
+
+    protected function getSourceLanguageName(): string
+    {
+        $langModel = editor_ModelInstances::language($this->sourceLang);
+        return $langModel->getLangName();
     }
 
     protected function getTargetLanguageCode(): string
     {
-        $langModel = ZfExtended_Factory::get(editor_Models_Languages::class);
-        $langModel->load($this->targetLang);
+        $langModel = editor_ModelInstances::language($this->targetLang);
         return $langModel->getRfc5646();
+    }
+
+    protected function getTargetLanguageName(): string
+    {
+        $langModel = editor_ModelInstances::language($this->targetLang);
+        return $langModel->getLangName();
     }
 
     protected function getServiceNameDisplayedInLog(): string
