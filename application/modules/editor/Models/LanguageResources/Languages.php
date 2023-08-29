@@ -87,28 +87,12 @@ class editor_Models_LanguageResources_Languages extends ZfExtended_Models_Entity
      * @param int $languageResourceId
      * @return array
      */
-    public function loadByLanguageResourceId($languageResourceId=null){
-        $s=$this->db->select();
+    public function loadByLanguageResourceId($languageResourceId = null){
+        $s = $this->db->select();
         if($languageResourceId){
-            $s->where('languageResourceId=?',$languageResourceId);
+            $s->where('languageResourceId = ?',$languageResourceId);
         }
         return $this->db->fetchAll($s)->toArray();
-    }
-
-    /**
-     * Loads the entity by languageResourceId
-     * @param int $languageResourceId
-     * @return void
-     * @throws ZfExtended_Models_Entity_NotFoundException
-     */
-    public function loadRowByLanguageResourceId(int $languageResourceId): void
-    {
-        $s = $this->db->select()->where('languageResourceId = ?', $languageResourceId);
-        $row = $this->db->fetchRow($s);
-        if (!$row) {
-            $this->notFound(__CLASS__ . '#languageResourceId', $languageResourceId);
-        }
-        $this->row = $row;
     }
 
     /**

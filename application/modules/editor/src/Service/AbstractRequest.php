@@ -274,6 +274,7 @@ abstract class AbstractRequest
         // create client, request data, catch any exception & process it.
         // We also transform some legacy exceptions to proper connector exceptions
         $exception = null;
+        $debug = '';
         try {
             // crate client
             $client = $this->createClient();
@@ -299,7 +300,6 @@ abstract class AbstractRequest
                 if (!empty($this->data)) {
                     $debug .= "\n    data: " . json_encode($this->data, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
                 }
-                error_log($debug);
             }
             // request JSON
             $this->response = $client->requestJson(static::METHOD, $this->data);
@@ -335,6 +335,7 @@ abstract class AbstractRequest
         // No response: unrecoverable service error that can not be intercepted
         if (!isset($this->response)) {
             if ($this->doDebug) {
+                error_log($debug);
                 error_log("\n    FAILED WITHOUT RESPONSE: " . $this->traceException($exception));
                 error_log("\n==========\n");
             }
@@ -367,6 +368,7 @@ abstract class AbstractRequest
             $exception = $this->interceptException($exception);
         }
         if ($this->doDebug) {
+            error_log($debug);
             if ($exception != null) {
                 error_log("\n    FAILED: " . $this->traceException($exception));
             }
