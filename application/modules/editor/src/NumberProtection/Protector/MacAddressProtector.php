@@ -52,7 +52,6 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\NumberProtection\Protector;
 
-
 class MacAddressProtector extends IPAddressProtector
 {
     public static function getType(): string
