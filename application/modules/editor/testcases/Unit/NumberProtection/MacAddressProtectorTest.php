@@ -53,8 +53,13 @@ declare(strict_types=1);
 namespace MittagQI\Translate5\Test\Unit\NumberProtection;
 
 use MittagQI\Translate5\NumberProtection\Model\LanguageNumberFormat as LanguageFormat;
+<<<<<<< HEAD
 use MittagQI\Translate5\NumberProtection\Model\LanguageNumberFormatRepository;
 use MittagQI\Translate5\NumberProtection\Protector\MacAddressProtector;
+=======
+use MittagQI\Translate5\NumberProtection\Protector\MacAddressProtector;
+use MittagQI\Translate5\Repository\LanguageNumberFormatRepository;
+>>>>>>> f2f3ab548 (TRANSLATE-3206 Move classes)
 use PHPUnit\Framework\TestCase;
 
 class MacAddressProtectorTest extends TestCase

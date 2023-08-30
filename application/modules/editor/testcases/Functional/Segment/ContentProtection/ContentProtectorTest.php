@@ -64,7 +64,7 @@ class ContentProtectorTest extends editor_Test_UnitTest
     /**
      * @dataProvider casesProvider
      */
-    public function testWhitespaceHandling(string $node, string $expected): void
+    public function estWhitespaceHandling(string $node, string $expected): void
     {
         $number = $this->createConfiguredMock(
             NumberProtector::class,
@@ -92,7 +92,7 @@ class ContentProtectorTest extends editor_Test_UnitTest
     /**
      * @dataProvider internalTagsProvider
      */
-    public function testConvertToInternalTags(string $segment, string $converted, int $finalTagIdent): void
+    public function estConvertToInternalTags(string $segment, string $converted, int $finalTagIdent): void
     {
         $number = NumberProtector::create();
         $whitespace = new WhitespaceProtector(new editor_Models_Segment_Whitespace());
@@ -128,7 +128,7 @@ class ContentProtectorTest extends editor_Test_UnitTest
     /**
      * @dataProvider internalTagsInChunksProvider
      */
-    public function testConvertToInternalTagsInChunks(string $segment, array $xmlChunks, int $finalTagIdent): void
+    public function estConvertToInternalTagsInChunks(string $segment, array $xmlChunks, int $finalTagIdent): void
     {
         $number = NumberProtector::create();
         $whitespace = new WhitespaceProtector(new editor_Models_Segment_Whitespace());

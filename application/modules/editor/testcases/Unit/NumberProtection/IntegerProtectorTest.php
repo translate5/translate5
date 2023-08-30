@@ -54,8 +54,13 @@ namespace MittagQI\Translate5\Test\Unit\NumberProtection;
 
 use editor_Models_Languages;
 use MittagQI\Translate5\NumberProtection\Model\LanguageNumberFormat as LanguageFormat;
+<<<<<<< HEAD
 use MittagQI\Translate5\NumberProtection\Model\LanguageNumberFormatRepository;
 use MittagQI\Translate5\NumberProtection\Protector\IntegerProtector;
+=======
+use MittagQI\Translate5\NumberProtection\Protector\IntegerProtector;
+use MittagQI\Translate5\Repository\LanguageNumberFormatRepository;
+>>>>>>> f2f3ab548 (TRANSLATE-3206 Move classes)
 use PHPUnit\Framework\TestCase;
 
 class IntegerProtectorTest extends TestCase
