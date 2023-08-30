@@ -55,10 +55,6 @@ namespace MittagQI\Translate5\NumberProtection\Model;
 use Zend_Db_Table_Row_Abstract;
 use ZfExtended_Models_Entity_Abstract;
 
-namespace MittagQI\Translate5\NumberProtection\Model;
-
-use Zend_Validate_Abstract;
-
 /**
  * @method string getLanguageId()
  * @method void setLanguageId(int $id)
