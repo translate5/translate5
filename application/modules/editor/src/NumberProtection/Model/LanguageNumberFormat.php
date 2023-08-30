@@ -50,6 +50,9 @@ END LICENSE AND COPYRIGHT
 */
 declare(strict_types=1);
 
+namespace MittagQI\Translate5\NumberProtection\Model;
+use ZfExtended_Models_Entity_Abstract;
+
 /**
  * @method string getLanguageId()
  * @method void setLanguageId(int $id)
@@ -66,8 +69,8 @@ declare(strict_types=1);
  * @method bool getPriority()
  * @method void setPriority(int $priority)
  */
-class editor_Models_Segment_LanguageNumberFormat extends ZfExtended_Models_Entity_Abstract
+class LanguageNumberFormat extends ZfExtended_Models_Entity_Abstract
 {
-    protected $dbInstanceClass = editor_Models_Db_Segment_Number_LanguageFormat::class;
-    protected $validatorInstanceClass = editor_Models_Validator_LanguageNumberFormat::class;
+    protected $dbInstanceClass = LanguageNumberFormatTable::class;
+    protected $validatorInstanceClass = LanguageNumberFormatValidator::class;
 }

@@ -26,7 +26,15 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+<<<<<<< HEAD
 use \MittagQI\Translate5\Task\Import\FileParser\Xlf\Namespaces\AbstractNamespace as XlfNamespaces;
+=======
+use editor_Models_Segment_Whitespace as Whitespace;
+use MittagQI\Translate5\NumberProtection\NumberProtector;
+use MittagQI\Translate5\Segment\ContentProtection\ContentProtector;
+use MittagQI\Translate5\Segment\ContentProtection\WhitespaceProtector;
+use MittagQI\Translate5\Task\Import\FileParser\Xlf\Namespaces\AbstractNamespace as XlfNamespaces;
+>>>>>>> 1f83ae4a4 (TRANSLATE-3206 Move classes)
 
 /**
  * Converts XLF segment content chunks into translate5 internal segment content string
@@ -90,6 +98,11 @@ class editor_Models_Import_FileParser_Xlf_ContentConverter {
      */
     protected editor_Models_Import_FileParser_Xlf_ShortTagNumbers $shortTagNumbers;
 
+<<<<<<< HEAD
+=======
+    private ContentProtector $tagProtector;
+
+>>>>>>> 1f83ae4a4 (TRANSLATE-3206 Move classes)
     /**
      * @param XlfNamespaces $namespaces
      * @param editor_Models_Task $task for debugging reasons only
@@ -103,6 +116,14 @@ class editor_Models_Import_FileParser_Xlf_ContentConverter {
         $this->utilities = ZfExtended_Factory::get('editor_Models_Segment_UtilityBroker');
         $this->utilities->whitespace->collectTagNumbers = true;
 
+<<<<<<< HEAD
+=======
+        $this->tagProtector = new ContentProtector([
+            NumberProtector::create(),
+            new WhitespaceProtector($this->utilities->whitespace)
+        ]);
+
+>>>>>>> 1f83ae4a4 (TRANSLATE-3206 Move classes)
         $this->shortTagNumbers = ZfExtended_Factory::get('editor_Models_Import_FileParser_Xlf_ShortTagNumbers');
 
         $this->useTagContentOnlyNamespace = $this->namespaces->useTagContentOnly();

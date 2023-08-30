@@ -50,23 +50,37 @@ END LICENSE AND COPYRIGHT
 */
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\NumberProtection\Protector;
+namespace MittagQI\Translate5\NumberProtection\Model;
 
-use editor_Models_Languages;
 use MittagQI\Translate5\NumberProtection\Model\LanguageNumberFormat as LanguageFormat;
-use MittagQI\Translate5\NumberProtection\NumberParsingException;
 
-interface NumberProtectorInterface
+class LanguageNumberFormatRepository
 {
-    public static function getType(): string;
-
     /**
-     * @throws NumberParsingException
+     * @return iterable<LanguageFormat>
      */
-    public function protect(
-        string $number,
-        LanguageFormat $languageFormat,
-        ?editor_Models_Languages $sourceLang,
-        ?editor_Models_Languages $targetLang
-    ): string;
+    public function getAll(?int $sourceLang): iterable
+    {
+        $db = \ZfExtended_Factory::get(LanguageFormat::class)->db;
+        $s = $db->select()->order('priority desc');
+
+        if (null !== $sourceLang) {
+            $s->where('languageId = ?', $sourceLang)->orWhere('(languageId IS NULL and name = ?)', 'default');
+        }
+
+        $formats = $db->fetchAll($s);
+
+        $format = \ZfExtended_Factory::get(LanguageFormat::class);
+
+        foreach ($formats as $formatData) {
+            $format = clone $format;
+            $format->init($formatData->toArray());
+
+            yield $format;
+        }
+    }
+
+    public function findBy(int $langId, string $type, string $name): ?LanguageFormat
+    {
+    }
 }

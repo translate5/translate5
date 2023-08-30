@@ -26,6 +26,9 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\NumberProtection\NumberProtector;
+use MittagQI\Translate5\Segment\ContentProtection\ContentProtector;
+use MittagQI\Translate5\Segment\ContentProtection\WhitespaceProtector;
 use MittagQI\Translate5\Segment\TransUnitHash;
 
 /**#@+
@@ -151,6 +154,8 @@ abstract class editor_Models_Import_FileParser {
 
     protected TransUnitHash $transunitHash;
 
+    protected ContentProtector $tagProtector;
+
     /**
      * returns the file extensions (in lower case) parsable by this fileparser
      * @return array;
@@ -207,6 +212,11 @@ abstract class editor_Models_Import_FileParser {
         $this->updateFile(get_class($this));
         
         $this->utilities = ZfExtended_Factory::get(editor_Models_Segment_UtilityBroker::class);
+
+        $this->tagProtector = new ContentProtector([
+            NumberProtector::create(),
+            new WhitespaceProtector($this->utilities->whitespace)
+        ]);
     }
     
     /**

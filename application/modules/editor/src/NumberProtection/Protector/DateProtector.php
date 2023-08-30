@@ -50,12 +50,13 @@ END LICENSE AND COPYRIGHT
 */
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\Segment\ContentProtection\Number;
+namespace MittagQI\Translate5\NumberProtection\Protector;
 
 use DateTime;
 use editor_Models_Languages;
-use editor_Models_Segment_LanguageNumberFormat as LanguageFormat;
+use MittagQI\Translate5\NumberProtection\Model\LanguageNumberFormat;
 use IntlDateFormatter;
+use MittagQI\Translate5\NumberProtection\NumberParsingException;
 
 class DateProtector extends AbstractProtector
 {
@@ -66,7 +67,7 @@ class DateProtector extends AbstractProtector
 
     protected function composeNumberTag(
         string $number,
-        LanguageFormat $sourceFormat,
+        LanguageNumberFormat $sourceFormat,
         ?editor_Models_Languages $sourceLang,
         ?editor_Models_Languages $targetLang,
         ?string $targetFormat

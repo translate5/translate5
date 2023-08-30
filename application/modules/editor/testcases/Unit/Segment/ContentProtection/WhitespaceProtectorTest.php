@@ -50,7 +50,7 @@ END LICENSE AND COPYRIGHT
 */
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\Test\Unit\Segment\TagProtection\Protector;
+namespace MittagQI\Translate5\Test\Unit\Segment\ContentProtection;
 
 use editor_Models_Segment_Whitespace;
 use MittagQI\Translate5\Segment\ContentProtection\WhitespaceProtector;

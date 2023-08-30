@@ -26,6 +26,10 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\NumberProtection\NumberProtector;
+use MittagQI\Translate5\Segment\ContentProtection\ContentProtector;
+use MittagQI\Translate5\Segment\ContentProtection\WhitespaceProtector;
+
 /**
  * Saving an existing Segment contains a lot of different steps in the business logic, not only just saving the content to the DB
  * Therefore this updater class exists, which provides some functions to update a segment
@@ -58,6 +62,8 @@ class editor_Models_Segment_Updater {
      */
     private string $saveTimestamp;
 
+    protected ContentProtector $tagProtector;
+
     /**
      * @param editor_Models_Task $task
      * @param string $userGuid
@@ -66,6 +72,10 @@ class editor_Models_Segment_Updater {
         $this->task = $task;
         $this->events = ZfExtended_Factory::get('ZfExtended_EventManager', array(get_class($this)));
         $this->utilities = ZfExtended_Factory::get('editor_Models_Segment_UtilityBroker');
+        $this->tagProtector = new ContentProtector([
+            NumberProtector::create(),
+            new WhitespaceProtector($this->utilities->whitespace)
+        ]);
     }
 
     /**

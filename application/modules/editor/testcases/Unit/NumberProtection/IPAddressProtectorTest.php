@@ -50,11 +50,11 @@ END LICENSE AND COPYRIGHT
 */
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\Test\Unit\Segment\TagProtection\Protector\Number;
+namespace MittagQI\Translate5\Test\Unit\NumberProtection;
 
 use MittagQI\Translate5\NumberProtection\Model\LanguageNumberFormat as LanguageFormat;
+use MittagQI\Translate5\NumberProtection\Model\LanguageNumberFormatRepository;
 use MittagQI\Translate5\NumberProtection\Protector\IPAddressProtector;
-use MittagQI\Translate5\Repository\LanguageNumberFormatRepository;
 use PHPUnit\Framework\TestCase;
 
 class IPAddressProtectorTest extends TestCase

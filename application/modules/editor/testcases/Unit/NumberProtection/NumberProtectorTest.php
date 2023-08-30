@@ -50,14 +50,14 @@ END LICENSE AND COPYRIGHT
 */
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\Test\Unit\Segment\TagProtection\Protector;
+namespace MittagQI\Translate5\Test\Unit\NumberProtection;
 
 use editor_Models_Languages;
 use MittagQI\Translate5\NumberProtection\Model\LanguageNumberFormat as LanguageFormat;
+use MittagQI\Translate5\NumberProtection\Model\LanguageNumberFormatRepository;
 use MittagQI\Translate5\NumberProtection\NumberProtector;
 use MittagQI\Translate5\NumberProtection\Protector\NumberProtectorInterface;
 use MittagQI\Translate5\NumberProtection\Tag\NumberTag;
-use MittagQI\Translate5\Repository\LanguageNumberFormatRepository;
 use MittagQI\Translate5\Repository\LanguageRepository;
 use PHPUnit\Framework\TestCase;
 

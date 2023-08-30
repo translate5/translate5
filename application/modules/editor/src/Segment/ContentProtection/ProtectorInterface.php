@@ -50,7 +50,7 @@ END LICENSE AND COPYRIGHT
 */
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\Segment\TagProtection\Protector;
+namespace MittagQI\Translate5\Segment\ContentProtection;
 
 interface ProtectorInterface
 {

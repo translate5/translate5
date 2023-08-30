@@ -50,26 +50,21 @@ END LICENSE AND COPYRIGHT
 */
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\Test\Functional\Segment\TagProtection;
+namespace MittagQI\Translate5\Test\Functional\Segment\ContentProtection;
 
 use editor_Models_Segment_Whitespace;
 use editor_Test_UnitTest;
 use MittagQI\Translate5\NumberProtection\NumberProtector;
 use MittagQI\Translate5\NumberProtection\Tag\NumberTag;
-use MittagQI\Translate5\Repository\LanguageNumberFormatRepository;
 use MittagQI\Translate5\Segment\ContentProtection\ContentProtector;
 use MittagQI\Translate5\Segment\ContentProtection\WhitespaceProtector;
 
-class TagProtectorTest extends editor_Test_UnitTest
+class ContentProtectorTest extends editor_Test_UnitTest
 {
-    public function test(): void
-    {
-        dump((new LanguageNumberFormatRepository())->getAllForFrontend()[0]);
-    }
     /**
      * @dataProvider casesProvider
      */
-    public function estWhitespaceHandling(string $node, string $expected): void
+    public function testWhitespaceHandling(string $node, string $expected): void
     {
         $number = $this->createConfiguredMock(
             NumberProtector::class,
@@ -97,7 +92,7 @@ class TagProtectorTest extends editor_Test_UnitTest
     /**
      * @dataProvider internalTagsProvider
      */
-    public function estConvertToInternalTags(string $segment, string $converted, int $finalTagIdent): void
+    public function testConvertToInternalTags(string $segment, string $converted, int $finalTagIdent): void
     {
         $number = NumberProtector::create();
         $whitespace = new WhitespaceProtector(new editor_Models_Segment_Whitespace());
@@ -133,7 +128,7 @@ class TagProtectorTest extends editor_Test_UnitTest
     /**
      * @dataProvider internalTagsInChunksProvider
      */
-    public function estConvertToInternalTagsInChunks(string $segment, array $xmlChunks, int $finalTagIdent): void
+    public function testConvertToInternalTagsInChunks(string $segment, array $xmlChunks, int $finalTagIdent): void
     {
         $number = NumberProtector::create();
         $whitespace = new WhitespaceProtector(new editor_Models_Segment_Whitespace());

@@ -50,7 +50,11 @@ END LICENSE AND COPYRIGHT
 */
 declare(strict_types=1);
 
-class editor_Models_Db_Segment_Number_LanguageFormat extends Zend_Db_Table_Abstract {
+namespace MittagQI\Translate5\NumberProtection\Model;
+use Zend_Db_Table_Abstract;
+
+class LanguageNumberFormatTable extends Zend_Db_Table_Abstract
+{
     protected $_name = 'LEK_language_number_format';
     public $_primary = 'id';
 }

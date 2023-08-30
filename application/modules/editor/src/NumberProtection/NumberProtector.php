@@ -50,7 +50,7 @@ END LICENSE AND COPYRIGHT
 */
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\Segment\ContentProtection;
+namespace MittagQI\Translate5\NumberProtection;
 
 use DOMCharacterData;
 use DOMDocument;
@@ -59,17 +59,17 @@ use DOMNode;
 use DOMText;
 use editor_Models_Import_FileParser_XmlParser as XmlParser;
 use editor_Models_Languages;
-use editor_Models_Segment_LanguageNumberFormat as LanguageFormat;
-use MittagQI\Translate5\Repository\LanguageNumberFormatRepository;
+use MittagQI\Translate5\NumberProtection\Model\LanguageNumberFormat as LanguageFormat;
+use MittagQI\Translate5\NumberProtection\Model\LanguageNumberFormatRepository;
+use MittagQI\Translate5\NumberProtection\Protector\DateProtector;
+use MittagQI\Translate5\NumberProtection\Protector\FloatProtector;
+use MittagQI\Translate5\NumberProtection\Protector\IntegerProtector;
+use MittagQI\Translate5\NumberProtection\Protector\IPAddressProtector;
+use MittagQI\Translate5\NumberProtection\Protector\MacAddressProtector;
+use MittagQI\Translate5\NumberProtection\Protector\NumberProtectorInterface;
+use MittagQI\Translate5\NumberProtection\Tag\NumberTag;
 use MittagQI\Translate5\Repository\LanguageRepository;
-use MittagQI\Translate5\Segment\ContentProtection\Number\DateProtector;
-use MittagQI\Translate5\Segment\ContentProtection\Number\FloatProtector;
-use MittagQI\Translate5\Segment\ContentProtection\Number\IntegerProtector;
-use MittagQI\Translate5\Segment\ContentProtection\Number\IPAddressProtector;
-use MittagQI\Translate5\Segment\ContentProtection\Number\MacAddressProtector;
-use MittagQI\Translate5\Segment\ContentProtection\Number\NumberParsingException;
-use MittagQI\Translate5\Segment\ContentProtection\Number\NumberProtectorInterface;
-use MittagQI\Translate5\Segment\ContentProtection\Number\Tag\NumberTag;
+use MittagQI\Translate5\Segment\ContentProtection\ProtectorInterface;
 use ZfExtended_Factory;
 
 class NumberProtector implements ProtectorInterface

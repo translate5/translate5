@@ -50,7 +50,7 @@ END LICENSE AND COPYRIGHT
 */
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\Test\Unit\Segment\TagProtection\Protector\Number\Object;
+namespace MittagQI\Translate5\Test\Unit\NumberProtection;
 
 use MittagQI\Translate5\NumberProtection\Object\FloatObject;
 use PHPUnit\Framework\TestCase;

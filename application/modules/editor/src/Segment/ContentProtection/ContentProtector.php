@@ -50,13 +50,12 @@ END LICENSE AND COPYRIGHT
 */
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\Segment\TagProtection;
+namespace MittagQI\Translate5\Segment\ContentProtection;
 
 use editor_Models_Segment_Utility as SegmentUtility;
 use editor_Models_Segment_Whitespace as WhitespaceProtector;
-use MittagQI\Translate5\Segment\TagProtection\Protector\ProtectorInterface;
 
-class TagProtector
+class ContentProtector
 {
     /**
      * @param  ProtectorInterface[] $protectors
@@ -108,8 +107,7 @@ class TagProtector
         ?int $targetLang,
         int &$shortTagIdent,
         string $entityHandling = WhitespaceProtector::ENTITY_MODE_RESTORE
-    ): string
-    {
+    ): string {
         return $this->convertToInternalTags(
             $this->protect($text, $sourceLang, $targetLang, $entityHandling),
             $shortTagIdent

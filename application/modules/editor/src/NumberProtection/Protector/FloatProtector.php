@@ -50,11 +50,11 @@ END LICENSE AND COPYRIGHT
 */
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\Segment\ContentProtection\Number;
+namespace MittagQI\Translate5\NumberProtection\Protector;
 
 use editor_Models_Languages;
-use editor_Models_Segment_LanguageNumberFormat as LanguageFormat;
-use MittagQI\Translate5\Segment\ContentProtection\Number\Object\FloatObject;
+use MittagQI\Translate5\NumberProtection\Model\LanguageNumberFormat as LanguageFormat;
+use MittagQI\Translate5\NumberProtection\Object\FloatObject;
 
 class FloatProtector extends AbstractProtector
 {
