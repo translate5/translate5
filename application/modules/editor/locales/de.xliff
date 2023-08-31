@@ -9098,6 +9098,30 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
                 <source>Gemeldete Fehler</source>
                 <target>Gemeldete Fehler</target>
             </trans-unit>
+            <trans-unit id='TmFtZSAnZGVmYXVsdCcgY2Fubm90IGJlIHNldCBhcyBhIHZhbHVl'>
+                <source>Name 'default' cannot be set as a value</source>
+                <target>Der Name 'default' kann nicht als Wert festgelegt werden</target>
+            </trans-unit>
+            <trans-unit id='UHJpb3JpdMOkdA=='>
+                <source>Priorität</source>
+                <target>Priorität</target>
+            </trans-unit>
+            <trans-unit id='TGFzcyBlcyBzbyB3aWUgZXMgaXN0'>
+                <source>Lass es so wie es ist</source>
+                <target>Lass es so wie es ist</target>
+            </trans-unit>
+            <trans-unit id='U3ByYWNoc3BlemlmaXNjaGUgWmFobGVuZm9ybWF0ZQ=='>
+                <source>Sprachspezifische Zahlenformate</source>
+                <target>Sprachspezifische Zahlenformate</target>
+            </trans-unit>
+            <trans-unit id="TMO2c2NoZW4gZGVzIFphaGxlbmZvcm1hdCBiZXN0w6R0aWdlbg==">
+                <source>Löschen des Zahlenformat bestätigen</source>
+                <target>Löschen des Zahlenformat bestätigen</target>
+            </trans-unit>
+            <trans-unit id="U2luZCBTaWUgc2ljaGVyLCBkYXNzIFNpZSBkYXMgWmFobGVuZm9ybWF0IGzDtnNjaGVuIG3DtmNodGVuPw==">
+                <source>Sind Sie sicher, dass Sie das Zahlenformat löschen möchten?</source>
+                <target>Sind Sie sicher, dass Sie das Zahlenformat löschen möchten?</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

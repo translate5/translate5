@@ -9275,6 +9275,26 @@ E-Mail: service@MittagQI.com</pre>
                 <source>Gemeldete Fehler</source>
                 <target>Reported errors</target>
             </trans-unit>
+            <trans-unit id='UHJpb3JpdMOkdA=='>
+                <source>Priorität</source>
+                <target>Priority</target>
+            </trans-unit>
+            <trans-unit id='TGFzcyBlcyBzbyB3aWUgZXMgaXN0'>
+                <source>Lass es so wie es ist</source>
+                <target>Keep as is</target>
+            </trans-unit>
+            <trans-unit id='U3ByYWNoc3BlemlmaXNjaGUgWmFobGVuZm9ybWF0ZQ=='>
+                <source>Sprachspezifische Zahlenformate</source>
+                <target>Language number formats</target>
+            </trans-unit>
+            <trans-unit id="TMO2c2NoZW4gZGVzIFphaGxlbmZvcm1hdCBiZXN0w6R0aWdlbg==">
+                <source>Löschen des Zahlenformat bestätigen</source>
+                <target>Confirm number format deletion</target>
+            </trans-unit>
+            <trans-unit id="U2luZCBTaWUgc2ljaGVyLCBkYXNzIFNpZSBkYXMgWmFobGVuZm9ybWF0IGzDtnNjaGVuIG3DtmNodGVuPw==">
+                <source>Sind Sie sicher, dass Sie das Zahlenformat löschen möchten?</source>
+                <target>Are you sure you want to delete number format?</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

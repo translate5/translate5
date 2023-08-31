@@ -1,0 +1,81 @@
+<?php
+/*
+START LICENSE AND COPYRIGHT
+
+ This file is part of translate5
+ 
+ Copyright (c) 2013 - 2021 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
+
+ Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
+
+ This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
+ as published by the Free Software Foundation and appearing in the file agpl3-license.txt 
+ included in the packaging of this file.  Please review the following information 
+ to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
+ http://www.gnu.org/licenses/agpl.html
+  
+ There is a plugin exception available for use with this release of translate5 for
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ plugin-exception.txt in the root folder of translate5.
+  
+ @copyright  Marc Mittag, MittagQI - Quality Informatics
+ @author     MittagQI - Quality Informatics
+ @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
+			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+
+END LICENSE AND COPYRIGHT
+*/
+
+namespace MittagQI\Translate5\NumberProtection\Model;
+
+use MittagQI\Translate5\NumberProtection\NumberProtector;
+use Zend_Validate;
+use ZfExtended_Models_Validator_Abstract;
+
+class LanguageNumberFormatValidator extends ZfExtended_Models_Validator_Abstract
+{
+
+    /**
+     * Validators for Customer entity
+     */
+    protected function defineValidators()
+    {
+        //`id` int(11) NOT NULL AUTO_INCREMENT,
+        $this->addValidator('id', 'int');
+
+        $this->addValidator('languageId', 'int', [], true);
+
+        $this->addValidator('type', 'InArray', [NumberProtector::create()->types()]);
+
+        //`name` varchar(255) NOT NULL DEFAULT 'default',
+        $nameValidator = new Zend_Validate();
+        $nameValidator->addValidator($this->validatorFactory('stringLength', ['min' => 3, 'max' => 255]), true);
+        // "default" is reserved name. users should not be able neither create nor modify default records
+        $nameValidator->addValidator(new NameIsNotDefaultValidator(), true);
+
+        $this->addValidatorInstance('name', $nameValidator);
+
+        //`regex` varchar(255) NOT NULL,
+        $regexValidator = new Zend_Validate();
+        $regexValidator->addValidator($this->validatorFactory('stringLength', ['min' => 3, 'max' => 255]), true);
+        $regexValidator->addValidator(new RegexPatternValidator(), true);
+
+        $this->addValidatorInstance('regex', $regexValidator);
+        //`format` varchar(255) NOT NULL,
+        $this->addValidator('format', 'stringLength', ['min' => 0, 'max' => 255]);
+
+        $this->addValidator('keepAsIs', 'boolean');
+
+        $priorityValidator = new Zend_Validate();
+
+        $priorityValidator->addValidator($this->validatorFactory('int'), true);
+        $priorityValidator->addValidator(
+            $this->validatorFactory(
+                'Db_NoRecordExists',
+                ['table' => 'LEK_language_number_format', 'field' => 'priority']
+            )
+        );
+
+        $this->addValidatorInstance('priority', $priorityValidator);
+    }
+}
