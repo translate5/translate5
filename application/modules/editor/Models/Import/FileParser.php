@@ -154,7 +154,7 @@ abstract class editor_Models_Import_FileParser {
 
     protected TransUnitHash $transunitHash;
 
-    protected ContentProtector $tagProtector;
+    protected ContentProtector $contentProtector;
 
     /**
      * returns the file extensions (in lower case) parsable by this fileparser
@@ -213,7 +213,7 @@ abstract class editor_Models_Import_FileParser {
         
         $this->utilities = ZfExtended_Factory::get(editor_Models_Segment_UtilityBroker::class);
 
-        $this->tagProtector = new ContentProtector([
+        $this->contentProtector = new ContentProtector([
             NumberProtector::create(),
             new WhitespaceProtector($this->utilities->whitespace)
         ]);

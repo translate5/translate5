@@ -26,15 +26,11 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-<<<<<<< HEAD
-use \MittagQI\Translate5\Task\Import\FileParser\Xlf\Namespaces\AbstractNamespace as XlfNamespaces;
-=======
 use editor_Models_Segment_Whitespace as Whitespace;
 use MittagQI\Translate5\NumberProtection\NumberProtector;
 use MittagQI\Translate5\Segment\ContentProtection\ContentProtector;
 use MittagQI\Translate5\Segment\ContentProtection\WhitespaceProtector;
 use MittagQI\Translate5\Task\Import\FileParser\Xlf\Namespaces\AbstractNamespace as XlfNamespaces;
->>>>>>> 1f83ae4a4 (TRANSLATE-3206 Move classes)
 
 /**
  * Converts XLF segment content chunks into translate5 internal segment content string
@@ -98,11 +94,8 @@ class editor_Models_Import_FileParser_Xlf_ContentConverter {
      */
     protected editor_Models_Import_FileParser_Xlf_ShortTagNumbers $shortTagNumbers;
 
-<<<<<<< HEAD
-=======
-    private ContentProtector $tagProtector;
+    private ContentProtector $contentProtector;
 
->>>>>>> 1f83ae4a4 (TRANSLATE-3206 Move classes)
     /**
      * @param XlfNamespaces $namespaces
      * @param editor_Models_Task $task for debugging reasons only
@@ -116,14 +109,11 @@ class editor_Models_Import_FileParser_Xlf_ContentConverter {
         $this->utilities = ZfExtended_Factory::get('editor_Models_Segment_UtilityBroker');
         $this->utilities->whitespace->collectTagNumbers = true;
 
-<<<<<<< HEAD
-=======
-        $this->tagProtector = new ContentProtector([
+        $this->contentProtector = new ContentProtector([
             NumberProtector::create(),
             new WhitespaceProtector($this->utilities->whitespace)
         ]);
 
->>>>>>> 1f83ae4a4 (TRANSLATE-3206 Move classes)
         $this->shortTagNumbers = ZfExtended_Factory::get('editor_Models_Import_FileParser_Xlf_ShortTagNumbers');
 
         $this->useTagContentOnlyNamespace = $this->namespaces->useTagContentOnly();
@@ -391,14 +381,22 @@ class editor_Models_Import_FileParser_Xlf_ContentConverter {
             //$text is now: Dies <strong>ist ein</strong> Test. &nbsp;
             
             $text = $this->utilities->tagProtection->protectTags($text);
-            $text = $wh->protectWhitespace($text, $wh::ENTITY_MODE_OFF); //disable entity handling here, since already done in tagProtection
+
+            $text = $this->contentProtector->protect(
+                $text,
+                $this->task->getSourceLang(),
+                $this->task->getTargetLang(),
+                Whitespace::ENTITY_MODE_OFF
+            );
         }
         else {
-            $text = $wh->protectWhitespace($text);
+            $text = $this->contentProtector->protect($text, $this->task->getSourceLang(), $this->task->getTargetLang());
         }
 
-        $xmlChunks = [];
-        $wh->convertToInternalTags($text, $this->shortTagNumbers->shortTagIdent, $xmlChunks);
+        $xmlChunks = $this->contentProtector->convertToInternalTagsInChunks(
+            $text,
+            $this->shortTagNumbers->shortTagIdent
+        );
         //to keep the generated tag objects we have to use the chunklist instead of the returned string
         array_push($this->result, ... $xmlChunks);
     }

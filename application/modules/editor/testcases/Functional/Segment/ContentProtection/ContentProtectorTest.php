@@ -76,9 +76,9 @@ class ContentProtectorTest extends editor_Test_UnitTest
         );
         $whitespace = new WhitespaceProtector(new editor_Models_Segment_Whitespace());
 
-        $tagProtector = new ContentProtector([$number, $whitespace]);
+        $contentProtector = new ContentProtector([$number, $whitespace]);
 
-        self::assertEquals($expected, $tagProtector->protect($node, null, null));
+        self::assertEquals($expected, $contentProtector->protect($node, null, null));
     }
 
     public function casesProvider(): iterable
@@ -98,9 +98,9 @@ class ContentProtectorTest extends editor_Test_UnitTest
         $whitespace = new WhitespaceProtector(new editor_Models_Segment_Whitespace());
         $shortTagIdent = 1;
 
-        $tagProtector = new ContentProtector([$number, $whitespace]);
+        $contentProtector = new ContentProtector([$number, $whitespace]);
 
-        self::assertSame($converted, $tagProtector->convertToInternalTags($segment, $shortTagIdent));
+        self::assertSame($converted, $contentProtector->convertToInternalTags($segment, $shortTagIdent));
         self::assertSame($finalTagIdent, $shortTagIdent);
     }
 
@@ -134,9 +134,9 @@ class ContentProtectorTest extends editor_Test_UnitTest
         $whitespace = new WhitespaceProtector(new editor_Models_Segment_Whitespace());
         $shortTagIdent = 1;
 
-        $tagProtector = new ContentProtector([$number, $whitespace]);
+        $contentProtector = new ContentProtector([$number, $whitespace]);
 
-        self::assertEquals($xmlChunks, $tagProtector->convertToInternalTagsInChunks($segment, $shortTagIdent));
+        self::assertEquals($xmlChunks, $contentProtector->convertToInternalTagsInChunks($segment, $shortTagIdent));
         self::assertSame($finalTagIdent, $shortTagIdent);
     }
 

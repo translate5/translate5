@@ -249,7 +249,15 @@ class editor_Models_Import_FileParser_Transit extends editor_Models_Import_FileP
      */
     protected function parseSegment($segment, $isSource){
         $segment = editor_Models_Segment_Utility::foreachSegmentTextNode($segment, function($text){
+<<<<<<< HEAD
             return $this->utilities->whitespace->protectWhitespace($text);
+=======
+            return $this->contentProtector->protect(
+                $text,
+                $this->task->getSourceLang(),
+                $this->task->getTargetLang()
+            );
+>>>>>>> 631bbbb21 (TRANSLATE-3206 Rename props)
         });
         if (strpos($segment, '<')=== false) {
             return $segment;
@@ -259,7 +267,11 @@ class editor_Models_Import_FileParser_Transit extends editor_Models_Import_FileP
         
         $segment = $this->parseTags($segment);
         
+<<<<<<< HEAD
         $segment = $this->utilities->whitespace->convertToInternalTags($segment, $this->shortTagIdent);
+=======
+        $segment = $this->contentProtector->convertToInternalTags($segment, $this->shortTagIdent);
+>>>>>>> 631bbbb21 (TRANSLATE-3206 Rename props)
         $this->checkForUndefinedTags($segment);
 
         return $segment;

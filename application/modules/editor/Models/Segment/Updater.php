@@ -62,7 +62,7 @@ class editor_Models_Segment_Updater {
      */
     private string $saveTimestamp;
 
-    protected ContentProtector $tagProtector;
+    protected ContentProtector $contentProtector;
 
     /**
      * @param editor_Models_Task $task
@@ -72,7 +72,7 @@ class editor_Models_Segment_Updater {
         $this->task = $task;
         $this->events = ZfExtended_Factory::get('ZfExtended_EventManager', array(get_class($this)));
         $this->utilities = ZfExtended_Factory::get('editor_Models_Segment_UtilityBroker');
-        $this->tagProtector = new ContentProtector([
+        $this->contentProtector = new ContentProtector([
             NumberProtector::create(),
             new WhitespaceProtector($this->utilities->whitespace)
         ]);
@@ -300,8 +300,14 @@ class editor_Models_Segment_Updater {
         //the following call splits the content at tag boundaries, and sanitizes the textNodes only
         // In the textnode additional / new protected characters (whitespace) is converted to internal tags and then removed
         // This is because the user is not allowed to add new internal tags by adding plain special characters directly (only via adding it as tag in the frontend)
-        $content = editor_Models_Segment_Utility::foreachSegmentTextNode($content, function($text){
-            return strip_tags($this->utilities->whitespace->protectWhitespace($text));
+        $content = editor_Models_Segment_Utility::foreachSegmentTextNode($content, function($text) {
+            return strip_tags(
+                $this->contentProtector->protect(
+                    $text,
+                    $this->task->getSourceLang(),
+                    $this->task->getTargetLang()
+                )
+            );
         });
         
         //revoke the internaltag replacement
