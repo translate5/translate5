@@ -56,7 +56,6 @@ use editor_Models_Segment_Whitespace;
 use editor_Test_UnitTest;
 use MittagQI\Translate5\NumberProtection\NumberProtector;
 use MittagQI\Translate5\NumberProtection\Tag\NumberTag;
-use MittagQI\Translate5\Repository\LanguageNumberFormatRepository;
 use MittagQI\Translate5\Segment\ContentProtection\ContentProtector;
 use MittagQI\Translate5\Segment\ContentProtection\WhitespaceProtector;
 
