@@ -52,10 +52,8 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\Segment\TagProtection;
 
-use editor_Models_Import_FileParser_Tag;
 use editor_Models_Segment_Utility as SegmentUtility;
 use editor_Models_Segment_Whitespace as WhitespaceProtector;
-use MittagQI\Translate5\Segment\TagProtection\Protector\Number\TagSequence\NumberTagSequence;
 use MittagQI\Translate5\Segment\TagProtection\Protector\ProtectorInterface;
 
 class TagProtector
@@ -75,7 +73,7 @@ class TagProtector
         string $text,
         ?int $sourceLang,
         ?int $targetLang,
-        $entityHandling = WhitespaceProtector::ENTITY_MODE_RESTORE
+        string $entityHandling = WhitespaceProtector::ENTITY_MODE_RESTORE
     ): string {
         if ($entityHandling !== WhitespaceProtector::ENTITY_MODE_OFF) {
             $text = SegmentUtility::entityCleanup($text, $entityHandling === WhitespaceProtector::ENTITY_MODE_RESTORE);
@@ -104,6 +102,23 @@ class TagProtector
         return $segment;
     }
 
+    public function protectAndConvert(
+        string $text,
+        ?int $sourceLang,
+        ?int $targetLang,
+        int &$shortTagIdent,
+        string $entityHandling = WhitespaceProtector::ENTITY_MODE_RESTORE
+    ): string
+    {
+        return $this->convertToInternalTags(
+            $this->protect($text, $sourceLang, $targetLang, $entityHandling),
+            $shortTagIdent
+        );
+    }
+
+    /**
+     * @return string[]|\editor_Models_Import_FileParser_Tag[]
+     */
     public function convertToInternalTagsInChunks(string $segment, int &$shortTagIdent): array
     {
         $tagsPattern = '/<.+\/>/U';

@@ -26,6 +26,10 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use editor_Models_Segment_Whitespace as Whitespace;
+use MittagQI\Translate5\Segment\TagProtection\Protector\NumberProtector;
+use MittagQI\Translate5\Segment\TagProtection\Protector\WhitespaceProtector;
+use MittagQI\Translate5\Segment\TagProtection\TagProtector;
 use \MittagQI\Translate5\Task\Import\FileParser\Xlf\Namespaces\AbstractNamespace as XlfNamespaces;
 
 /**
@@ -90,6 +94,8 @@ class editor_Models_Import_FileParser_Xlf_ContentConverter {
      */
     protected editor_Models_Import_FileParser_Xlf_ShortTagNumbers $shortTagNumbers;
 
+    private TagProtector $tagProtector;
+
     /**
      * @param XlfNamespaces $namespaces
      * @param editor_Models_Task $task for debugging reasons only
@@ -102,6 +108,11 @@ class editor_Models_Import_FileParser_Xlf_ContentConverter {
 
         $this->utilities = ZfExtended_Factory::get('editor_Models_Segment_UtilityBroker');
         $this->utilities->whitespace->collectTagNumbers = true;
+
+        $this->tagProtector = new TagProtector([
+            NumberProtector::create(),
+            new WhitespaceProtector($this->utilities->whitespace)
+        ]);
 
         $this->shortTagNumbers = ZfExtended_Factory::get('editor_Models_Import_FileParser_Xlf_ShortTagNumbers');
 
@@ -362,7 +373,6 @@ class editor_Models_Import_FileParser_Xlf_ContentConverter {
         // although the whitespace of the content may not be preserved here, if there remain multiple spaces or other space characters,
         // we have to protect them here
         
-        $wh = $this->utilities->whitespace;
         if($this->task->getConfig()->runtimeOptions->import->fileparser->options->protectTags ?? false) {
             //since we are in a XML file format, plain tags in the content are encoded, which we have to undo first
             //$text is here for example: Dies &lt;strong&gt;ist ein&lt;/strong&gt; Test. &amp;nbsp;
@@ -370,14 +380,19 @@ class editor_Models_Import_FileParser_Xlf_ContentConverter {
             //$text is now: Dies <strong>ist ein</strong> Test. &nbsp;
             
             $text = $this->utilities->tagProtection->protectTags($text);
-            $text = $wh->protectWhitespace($text, $wh::ENTITY_MODE_OFF); //disable entity handling here, since already done in tagProtection
+
+            $text = $this->tagProtector->protect(
+                $text,
+                $this->task->getSourceLang(),
+                $this->task->getTargetLang(),
+                Whitespace::ENTITY_MODE_OFF
+            );
         }
         else {
-            $text = $wh->protectWhitespace($text);
+            $text = $this->tagProtector->protect($text, $this->task->getSourceLang(), $this->task->getTargetLang());
         }
 
-        $xmlChunks = [];
-        $wh->convertToInternalTags($text, $this->shortTagNumbers->shortTagIdent, $xmlChunks);
+        $xmlChunks = $this->tagProtector->convertToInternalTagsInChunks($text, $this->shortTagNumbers->shortTagIdent);
         //to keep the generated tag objects we have to use the chunklist instead of the returned string
         array_push($this->result, ... $xmlChunks);
     }

@@ -26,6 +26,10 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\Segment\TagProtection\Protector\NumberProtector;
+use MittagQI\Translate5\Segment\TagProtection\Protector\WhitespaceProtector;
+use MittagQI\Translate5\Segment\TagProtection\TagProtector;
+
 /**
  * Saving an existing Segment contains a lot of different steps in the business logic, not only just saving the content to the DB
  * Therefore this updater class exists, which provides some functions to update a segment
@@ -58,6 +62,8 @@ class editor_Models_Segment_Updater {
      */
     private string $saveTimestamp;
 
+    protected TagProtector $tagProtector;
+
     /**
      * @param editor_Models_Task $task
      * @param string $userGuid
@@ -66,6 +72,10 @@ class editor_Models_Segment_Updater {
         $this->task = $task;
         $this->events = ZfExtended_Factory::get('ZfExtended_EventManager', array(get_class($this)));
         $this->utilities = ZfExtended_Factory::get('editor_Models_Segment_UtilityBroker');
+        $this->tagProtector = new TagProtector([
+            NumberProtector::create(),
+            new WhitespaceProtector($this->utilities->whitespace)
+        ]);
     }
 
     /**
@@ -290,8 +300,14 @@ class editor_Models_Segment_Updater {
         //the following call splits the content at tag boundaries, and sanitizes the textNodes only
         // In the textnode additional / new protected characters (whitespace) is converted to internal tags and then removed
         // This is because the user is not allowed to add new internal tags by adding plain special characters directly (only via adding it as tag in the frontend)
-        $content = editor_Models_Segment_Utility::foreachSegmentTextNode($content, function($text){
-            return strip_tags($this->utilities->whitespace->protectWhitespace($text));
+        $content = editor_Models_Segment_Utility::foreachSegmentTextNode($content, function($text) {
+            return strip_tags(
+                $this->tagProtector->protect(
+                    $text,
+                    $this->task->getSourceLang(),
+                    $this->task->getTargetLang()
+                )
+            );
         });
         
         //revoke the internaltag replacement
