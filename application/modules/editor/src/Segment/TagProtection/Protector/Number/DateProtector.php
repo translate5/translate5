@@ -84,7 +84,7 @@ class DateProtector extends AbstractProtector
         }
 
         return sprintf(
-            self::TAG_FORMAT,
+            $this->tagFormat(),
             self::getType(),
             $sourceFormat->getName(),
             $number,

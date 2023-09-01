@@ -50,21 +50,26 @@ END LICENSE AND COPYRIGHT
 */
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\Segment\TagProtection\Protector;
+namespace MittagQI\Translate5\Segment\TagProtection\Protector\Number\Tag;
 
-interface ProtectorInterface
+use editor_Models_Import_FileParser_Tag;
+
+class NumberTag extends editor_Models_Import_FileParser_Tag
 {
-    public function hasEntityToProtect(string $textNode, ?int $sourceLang = null): bool;
-    public function hasTagsToConvert(string $textNode): bool;
-    public function protect(string $textNode, ?int $sourceLangId, ?int $targetLangId): string;
-    public function priority(): int;
+    public const TYPE_NUMBER = 4;
+
     /**
-     * replaces the placeholder tags (<protectedTag> / <hardReturn> / <char> / <number> etc) with an internal tag
-     * @param string $segment
-     * @param int $shortTagIdent
-     * @param array $xmlChunks
-     * @return string
+     * @var array|\editor_ImageTag[]
      */
-    public function convertToInternalTags(string $segment, int &$shortTagIdent): string;
-    public function convertToInternalTagsInChunks(string $segment, int &$shortTagIdent): array;
+    static array $renderer = [
+        self::TYPE_OPEN => 'editor_ImageTag_Left',
+        self::TYPE_CLOSE => 'editor_ImageTag_Right',
+        self::TYPE_SINGLE => 'editor_ImageTag_Single',
+        self::TYPE_NUMBER => NumberTagRenderer::class,
+    ];
+
+    public function __construct(int $type = self::TYPE_NUMBER, bool $xmlTags = true)
+    {
+        parent::__construct($type, $xmlTags);
+    }
 }

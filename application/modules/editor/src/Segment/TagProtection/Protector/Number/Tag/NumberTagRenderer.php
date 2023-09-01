@@ -50,21 +50,19 @@ END LICENSE AND COPYRIGHT
 */
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\Segment\TagProtection\Protector;
+namespace MittagQI\Translate5\Segment\TagProtection\Protector\Number\Tag;
 
-interface ProtectorInterface
+use editor_ImageTag_Single;
+
+class NumberTagRenderer extends editor_ImageTag_Single
 {
-    public function hasEntityToProtect(string $textNode, ?int $sourceLang = null): bool;
-    public function hasTagsToConvert(string $textNode): bool;
-    public function protect(string $textNode, ?int $sourceLangId, ?int $targetLangId): string;
-    public function priority(): int;
-    /**
-     * replaces the placeholder tags (<protectedTag> / <hardReturn> / <char> / <number> etc) with an internal tag
-     * @param string $segment
-     * @param int $shortTagIdent
-     * @param array $xmlChunks
-     * @return string
-     */
-    public function convertToInternalTags(string $segment, int &$shortTagIdent): string;
-    public function convertToInternalTagsInChunks(string $segment, int &$shortTagIdent): array;
+    protected string $htmlTagTpl = '<div class="{type} {class} internal-tag ownttip"><span title="{title}" class="short">{shortTag}</span><span data-originalid="{id}" data-length="{length}" data-source="{source}" data-target="{target}" class="full"></span></div>';
+
+    public function getHtmlTag(array $parameters) {
+        $st = json_decode($parameters['text'], true);
+        $parameters['source'] = $st['source'];
+        $parameters['target'] = $st['target'];
+
+        return parent::getHtmlTag($parameters);
+    }
 }

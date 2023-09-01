@@ -52,9 +52,12 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\Test\Functional\Segment\TagProtection;
 
+use editor_Models_Segment_Whitespace;
 use editor_Test_UnitTest;
-use MittagQI\Translate5\Segment\TagProtection\TagProtector;
+use MittagQI\Translate5\Segment\TagProtection\Protector\Number\Tag\NumberTag;
 use MittagQI\Translate5\Segment\TagProtection\Protector\NumberProtector;
+use MittagQI\Translate5\Segment\TagProtection\Protector\WhitespaceProtector;
+use MittagQI\Translate5\Segment\TagProtection\TagProtector;
 
 class TagProtectorTest extends editor_Test_UnitTest
 {
@@ -66,13 +69,14 @@ class TagProtectorTest extends editor_Test_UnitTest
         $number = $this->createConfiguredMock(
             NumberProtector::class,
             [
+                'priority' => 200,
                 'hasEntityToProtect' => true,
-                'protect' => 'text with <number type="integer" name="default" source="1 234" iso="1234" target=""/> [\r\n] in it',
+                'protect' => "text with " . '<number type="integer" name="default" source="1 234" iso="1234" target=""/>'. " [\r\n] in it",
             ]
         );
-        $utilities = \ZfExtended_Factory::get(\editor_Models_Segment_UtilityBroker::class);
+        $whitespace = new WhitespaceProtector(new editor_Models_Segment_Whitespace());
 
-        $tagProtector = new TagProtector([$number], $utilities);
+        $tagProtector = new TagProtector([$number, $whitespace]);
 
         self::assertEquals($expected, $tagProtector->protect($node, null, null));
     }
@@ -80,8 +84,97 @@ class TagProtectorTest extends editor_Test_UnitTest
     public function casesProvider(): iterable
     {
         yield 'NNBSP in tag is safe' => [
-            'text' => 'text with 1 234 [\r\n] in it',
-            'expected' => 'text with <protectedTag data-type="single" data-id="1" data-content="3c6e756d62657220747970653d22696e746567657222206e616d653d2264656661756c742220736f757263653d2231e280af323334222069736f3d223132333422207461726765743d22222f3e"/> [\r\n] in it'
+            'text' => "text with 1 234 [\r\n] in it",
+            'expected' => 'text with <number type="integer" name="default" source="1 234" iso="1234" target=""/> [<hardReturn/>] in it'
+        ];
+    }
+
+    /**
+     * @dataProvider internalTagsProvider
+     */
+    public function testConvertToInternalTags(string $segment, string $converted, int $finalTagIdent): void
+    {
+        $number = NumberProtector::create();
+        $whitespace = new WhitespaceProtector(new editor_Models_Segment_Whitespace());
+        $shortTagIdent = 1;
+
+        $tagProtector = new TagProtector([$number, $whitespace]);
+
+        self::assertSame($converted, $tagProtector->convertToInternalTags($segment, $shortTagIdent));
+        self::assertSame($finalTagIdent, $shortTagIdent);
+    }
+
+    public function internalTagsProvider(): iterable
+    {
+        $tag1 = '<number type="date" name="default" source="20231020" iso="2023-10-20" target="2023-10-20"/>';
+        $converted1 = '<div class="single 6e756d62657220747970653d226461746522206e616d653d2264656661756c742220736f757263653d223230323331303230222069736f3d22323032332d31302d323022207461726765743d22323032332d31302d3230222f number internal-tag ownttip"><span title="&lt;1/&gt;: Number" class="short">&lt;1/&gt;</span><span data-originalid="number" data-length="-1" data-source="20231020" data-target="2023-10-20" class="full"></span></div>';
+
+        yield [
+            'segment' => "string $tag1 string",
+            'converted' => "string $converted1 string",
+            'finalTagIdent' => 2,
+        ];
+
+        $tag2 = '<hardReturn/>';
+        $converted2 = '<div class="single 6861726452657475726e2f newline internal-tag ownttip"><span title="&lt;2/&gt;: Newline" class="short">&lt;2/&gt;</span><span data-originalid="hardReturn" data-length="1" class="full">↵</span></div>';
+
+        yield [
+            'segment' => "string $tag1 string $tag2 string",
+            'converted' => "string $converted1 string $converted2 string",
+            'finalTagIdent' => 3,
+        ];
+    }
+
+    /**
+     * @dataProvider internalTagsInChunksProvider
+     */
+    public function testConvertToInternalTagsInChunks(string $segment, array $xmlChunks, int $finalTagIdent): void
+    {
+        $number = NumberProtector::create();
+        $whitespace = new WhitespaceProtector(new editor_Models_Segment_Whitespace());
+        $shortTagIdent = 1;
+
+        $tagProtector = new TagProtector([$number, $whitespace]);
+
+        self::assertEquals($xmlChunks, $tagProtector->convertToInternalTagsInChunks($segment, $shortTagIdent));
+        self::assertSame($finalTagIdent, $shortTagIdent);
+    }
+
+    public function internalTagsInChunksProvider(): iterable
+    {
+        $tag1 = '<number type="date" name="default" source="20231020" iso="2023-10-20" target="2023-10-20"/>';
+        $converted1 = '<div class="single 6e756d62657220747970653d226461746522206e616d653d2264656661756c742220736f757263653d223230323331303230222069736f3d22323032332d31302d323022207461726765743d22323032332d31302d3230222f number internal-tag ownttip"><span title="&lt;1/&gt;: Number" class="short">&lt;1/&gt;</span><span data-originalid="number" data-length="-1" data-source="20231020" data-target="2023-10-20" class="full"></span></div>';
+
+        $parsedTag1 = new NumberTag();
+        $parsedTag1->originalContent = $tag1;
+        $parsedTag1->tagNr = 1;
+        $parsedTag1->id = 'number';
+        $parsedTag1->tag = 'number';
+        $parsedTag1->text = '{"source":"20231020","target":"2023-10-20"}';
+        $parsedTag1->renderedTag = $converted1;
+
+        yield [
+            'segment' => "string $tag1 string",
+            'xmlChunks' => ['string ', $parsedTag1, ' string'],
+            'finalTagIdent' => 2,
+        ];
+
+        $tag2 = '<hardReturn/>';
+        $converted2 = '<div class="single 6861726452657475726e2f newline internal-tag ownttip"><span title="&lt;2/&gt;: Newline" class="short">&lt;2/&gt;</span><span data-originalid="hardReturn" data-length="1" class="full">↵</span></div>';
+
+        $parsedTag2 = new \editor_Models_Import_FileParser_WhitespaceTag();
+        $parsedTag2->originalContent = $tag2;
+        $parsedTag2->rawContent = "\r\n";
+        $parsedTag2->tagNr = 2;
+        $parsedTag2->id = 'hardReturn';
+        $parsedTag2->tag = 'hardReturn';
+        $parsedTag2->text = '↵';
+        $parsedTag2->renderedTag = $converted2;
+
+        yield [
+            'segment' => "string $tag1 string $tag2 string",
+            'xmlChunks' => ['string ', $parsedTag1, ' string ', $parsedTag2, ' string'],
+            'finalTagIdent' => 3,
         ];
     }
 }

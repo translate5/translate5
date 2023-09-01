@@ -52,13 +52,6 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\Test\Functional\Segment\TagProtection\Protector;
 
-use MittagQI\Translate5\Repository\LanguageNumberFormatRepository;
-use MittagQI\Translate5\Repository\LanguageRepository;
-use MittagQI\Translate5\Segment\TagProtection\Protector\Number\DateProtector;
-use MittagQI\Translate5\Segment\TagProtection\Protector\Number\FloatProtector;
-use MittagQI\Translate5\Segment\TagProtection\Protector\Number\IntegerProtector;
-use MittagQI\Translate5\Segment\TagProtection\Protector\Number\IPAddressProtector;
-use MittagQI\Translate5\Segment\TagProtection\Protector\Number\MacAddressProtector;
 use MittagQI\Translate5\Segment\TagProtection\Protector\NumberProtector;
 use PHPUnit\Framework\TestCase;
 
@@ -69,20 +62,7 @@ class NumberProtectorTest extends TestCase
      */
     public function test(string $node, string $expected): void
     {
-        $numberFormatRepository = new LanguageNumberFormatRepository();
-        $protectors = [
-            new DateProtector($numberFormatRepository),
-            new FloatProtector($numberFormatRepository),
-            new IntegerProtector($numberFormatRepository),
-            new IPAddressProtector($numberFormatRepository),
-            new MacAddressProtector($numberFormatRepository),
-        ];
-
-        $protector = new NumberProtector(
-            $protectors,
-            $numberFormatRepository,
-            new LanguageRepository()
-        );
+        $protector = NumberProtector::create();
 
         self::assertTrue($protector->hasEntityToProtect($node));
 

@@ -63,18 +63,6 @@ class IntegerProtector extends FloatProtector
         return 'integer';
     }
 
-    protected function getDefaultFormats(): array
-    {
-        return [
-            [
-                'regex' => "\d{1,4}( |,|\.|·|˙|'|\x{2009}|\x{202F}|٬)?\d{1,4}( |,|\.|·|˙|'|\x{2009}|\x{202F}|٬)*\d{3,4}",
-            ],
-            [
-                'regex' => '\d+',
-            ],
-        ];
-    }
-
     protected function composeNumberTag(
         string $number,
         LanguageFormat $sourceFormat,
@@ -90,7 +78,7 @@ class IntegerProtector extends FloatProtector
         }
 
         return sprintf(
-            self::TAG_FORMAT,
+            $this->tagFormat(),
             self::getType(),
             $sourceFormat->getName(),
             $number,
