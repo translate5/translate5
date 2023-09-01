@@ -53,7 +53,8 @@ declare(strict_types=1);
 namespace MittagQI\Translate5\Segment\ContentProtection;
 
 use editor_Models_Segment_Utility as SegmentUtility;
-use editor_Models_Segment_Whitespace as WhitespaceProtector;
+use editor_Models_Segment_Whitespace as Whitespace;
+use MittagQI\Translate5\NumberProtection\NumberProtector;
 
 class ContentProtector
 {
@@ -68,20 +69,37 @@ class ContentProtector
         );
     }
 
+    public static function create(Whitespace $whitespace): self
+    {
+        return new self([
+            NumberProtector::create(),
+            new WhitespaceProtector($whitespace)
+        ]);
+    }
+
     public function protect(
         string $text,
         ?int $sourceLang,
         ?int $targetLang,
-        string $entityHandling = WhitespaceProtector::ENTITY_MODE_RESTORE
+        string $entityHandling = Whitespace::ENTITY_MODE_RESTORE
     ): string {
-        if ($entityHandling !== WhitespaceProtector::ENTITY_MODE_OFF) {
-            $text = SegmentUtility::entityCleanup($text, $entityHandling === WhitespaceProtector::ENTITY_MODE_RESTORE);
+        if ($entityHandling !== Whitespace::ENTITY_MODE_OFF) {
+            $text = SegmentUtility::entityCleanup($text, $entityHandling === Whitespace::ENTITY_MODE_RESTORE);
         }
 
         foreach ($this->protectors as $protector) {
             if ($protector->hasEntityToProtect($text, $sourceLang)) {
                 $text = $protector->protect($text, $sourceLang, $targetLang);
             }
+        }
+
+        return $text;
+    }
+
+    public function unprotect(string $text): string
+    {
+        foreach ($this->protectors as $protector) {
+            $text = $protector->unprotect($text);
         }
 
         return $text;
@@ -106,7 +124,7 @@ class ContentProtector
         ?int $sourceLang,
         ?int $targetLang,
         int &$shortTagIdent,
-        string $entityHandling = WhitespaceProtector::ENTITY_MODE_RESTORE
+        string $entityHandling = Whitespace::ENTITY_MODE_RESTORE
     ): string {
         return $this->convertToInternalTags(
             $this->protect($text, $sourceLang, $targetLang, $entityHandling),

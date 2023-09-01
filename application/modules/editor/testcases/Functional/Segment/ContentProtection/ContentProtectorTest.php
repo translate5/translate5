@@ -81,6 +81,22 @@ class ContentProtectorTest extends editor_Test_UnitTest
         self::assertEquals($expected, $contentProtector->protect($node, null, null));
     }
 
+    /**
+     * @dataProvider casesProvider
+     */
+    public function testUnprotect(string $expected, string $node, bool $runTest = true): void
+    {
+        $contentProtector = ContentProtector::create(new editor_Models_Segment_Whitespace());
+
+        if (!$runTest) {
+            // Test case designed for `protect` test only
+            self::assertTrue(true);
+
+            return;
+        }
+        self::assertSame($expected, $contentProtector->unprotect($node));
+    }
+
     public function casesProvider(): iterable
     {
         yield 'NNBSP in tag is safe' => [

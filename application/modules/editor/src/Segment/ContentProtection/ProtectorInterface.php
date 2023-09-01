@@ -57,6 +57,7 @@ interface ProtectorInterface
     public function hasEntityToProtect(string $textNode, ?int $sourceLang = null): bool;
     public function hasTagsToConvert(string $textNode): bool;
     public function protect(string $textNode, ?int $sourceLangId, ?int $targetLangId): string;
+    public function unprotect(string $content): string;
     public function priority(): int;
     /**
      * replaces the placeholder tags (<protectedTag> / <hardReturn> / <char> / <number> etc) with an internal tag

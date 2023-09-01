@@ -139,13 +139,29 @@ class NumberProtectorTest extends TestCase
     /**
      * @dataProvider numbersProvider
      */
-    public function test(string $node, string $expected): void
+    public function testProtect(string $node, string $expected): void
     {
         $protector = NumberProtector::create();
 
         self::assertTrue($protector->hasEntityToProtect($node));
 
         self::assertSame($expected, $protector->protect($node, null, null));
+    }
+
+    /**
+     * @dataProvider numbersProvider
+     */
+    public function testUnprotect(string $expected, string $node, bool $runTest = true): void
+    {
+        $protector = NumberProtector::create();
+
+        if (!$runTest) {
+            // Test case designed for `protect` test only
+            self::assertTrue(true);
+
+            return;
+        }
+        self::assertSame($expected, $protector->unprotect($node));
     }
     
     public function numbersProvider(): iterable
@@ -461,7 +477,8 @@ class NumberProtectorTest extends TestCase
         ];
         yield [
             'string' => 'This is <tag1><number type="integer" name="default" source="123" iso="123" target=""/><tag2>malicious 546.5</tag2>2035</tag1> text',
-            'expected' => 'This is <tag1><number type="integer" name="default" source="123" iso="123" target=""/><tag2>malicious <number type="float" name="default" source="546.5" iso="546.5" target=""/></tag2><number type="integer" name="default" source="2035" iso="2035" target=""/></tag1> text'
+            'expected' => 'This is <tag1><number type="integer" name="default" source="123" iso="123" target=""/><tag2>malicious <number type="float" name="default" source="546.5" iso="546.5" target=""/></tag2><number type="integer" name="default" source="2035" iso="2035" target=""/></tag1> text',
+            'useForUnprotectTest' => false,
         ];
         yield [
             'string' => 'string 05.07.123 string',
@@ -826,6 +843,7 @@ class NumberProtectorTest extends TestCase
         yield 'already protected number is safe' => [
             'string' => 'some text with date in it: <number type="date" name="test-default" source="2023/18/07" iso="2023-07-18" target="18.07.23"/>',
             'expected' => 'some text with date in it: <number type="date" name="test-default" source="2023/18/07" iso="2023-07-18" target="18.07.23"/>',
+            'useForUnprotectTest' => false,
         ];
     }
 }

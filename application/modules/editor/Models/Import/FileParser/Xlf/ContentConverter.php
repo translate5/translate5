@@ -27,9 +27,7 @@ END LICENSE AND COPYRIGHT
 */
 
 use editor_Models_Segment_Whitespace as Whitespace;
-use MittagQI\Translate5\NumberProtection\NumberProtector;
 use MittagQI\Translate5\Segment\ContentProtection\ContentProtector;
-use MittagQI\Translate5\Segment\ContentProtection\WhitespaceProtector;
 use MittagQI\Translate5\Task\Import\FileParser\Xlf\Namespaces\AbstractNamespace as XlfNamespaces;
 
 /**
@@ -109,10 +107,7 @@ class editor_Models_Import_FileParser_Xlf_ContentConverter {
         $this->utilities = ZfExtended_Factory::get('editor_Models_Segment_UtilityBroker');
         $this->utilities->whitespace->collectTagNumbers = true;
 
-        $this->contentProtector = new ContentProtector([
-            NumberProtector::create(),
-            new WhitespaceProtector($this->utilities->whitespace)
-        ]);
+        $this->contentProtector = ContentProtector::create($this->utilities->whitespace);
 
         $this->shortTagNumbers = ZfExtended_Factory::get('editor_Models_Import_FileParser_Xlf_ShortTagNumbers');
 

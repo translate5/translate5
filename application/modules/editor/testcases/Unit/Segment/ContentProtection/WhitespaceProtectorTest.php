@@ -61,11 +61,21 @@ class WhitespaceProtectorTest extends TestCase
     /**
      * @dataProvider caseProvider
      */
-    public function test(string $text, string $expected): void
+    public function testProtect(string $text, string $expected): void
     {
         $protector = new WhitespaceProtector(new editor_Models_Segment_Whitespace());
 
         self::assertEquals($expected, $protector->protect($text, null, null));
+    }
+
+    /**
+     * @dataProvider caseProvider
+     */
+    public function testUnprotect(string $expected, string $text): void
+    {
+        $protector = new WhitespaceProtector(new editor_Models_Segment_Whitespace());
+
+        self::assertEquals($expected, $protector->unprotect($text));
     }
 
     public function caseProvider(): iterable

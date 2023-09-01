@@ -107,6 +107,11 @@ class WhitespaceProtector implements ProtectorInterface
         return $protected;
     }
 
+    public function unprotect(string $content): string
+    {
+        return $this->whitespace->unprotectWhitespace($content);
+    }
+
     /**
      * {@inheritDoc}
      */

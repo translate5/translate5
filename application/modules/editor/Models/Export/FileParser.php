@@ -32,6 +32,7 @@ END LICENSE AND COPYRIGHT
  * @version 1.0
  */
 
+use MittagQI\Translate5\Segment\ContentProtection\ContentProtector;
 use MittagQI\Translate5\Segment\TransUnitHash;
 
 /**
@@ -143,6 +144,8 @@ abstract class editor_Models_Export_FileParser {
 
     protected TransUnitHash $transunitHash;
 
+    protected ContentProtector $contentProtector;
+
     /**
      * @param editor_Models_Task $task
      * @param int $fileId
@@ -168,6 +171,7 @@ abstract class editor_Models_Export_FileParser {
         $this->translate = ZfExtended_Zendoverwrites_Translate::getInstance();
         
         $this->utilities = ZfExtended_Factory::get('editor_Models_Segment_UtilityBroker');
+        $this->contentProtector = ContentProtector::create($this->utilities->whitespace);
         
         $this->segmentFieldManager = ZfExtended_Factory::get('editor_Models_SegmentFieldManager');
         $this->segmentFieldManager->initFields($this->_taskGuid);
@@ -447,6 +451,6 @@ abstract class editor_Models_Export_FileParser {
      * @return string
      */
     protected function unprotectContent(string $segment): string {
-        return $this->utilities->whitespace->unprotectWhitespace($segment);
+        return $this->contentProtector->unprotect($segment);
     }
 }

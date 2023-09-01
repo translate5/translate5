@@ -214,6 +214,15 @@ class NumberProtector implements ProtectorInterface
         return $matches[1];
     }
 
+    public function unprotect(string $content): string
+    {
+        return preg_replace_callback(
+            sprintf('/<%s.+source="(.+)".+\/>/U', self::TAG_NAME),
+            fn (array $match): string => $match[1],
+            $content
+        );
+    }
+
     private function processElement(
         DOMNode $element,
         LanguageFormat $langFormat,
