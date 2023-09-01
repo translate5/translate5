@@ -50,39 +50,10 @@ END LICENSE AND COPYRIGHT
 */
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\Repository;
+namespace MittagQI\Translate5\Segment\TagProtection\Protector;
 
-use editor_Models_Segment_Number_LanguageFormat as LanguageFormat;
-
-class LanguageNumberFormatRepository
+interface ProtectorInterface
 {
-    /**
-     * @return iterable<LanguageFormat>
-     */
-    public function getAll(?int $sourceLang): iterable
-    {
-        $db = \ZfExtended_Factory::get(LanguageFormat::class)->db;
-        $s = $db->select()->order('priority desc');
-
-        if (null !== $sourceLang) {
-            $s->where('languageId = ?', $sourceLang)->orWhere('(languageId IS NULL and name = ?)', 'default');
-        } else {
-            $s->where('(languageId IS NULL and name = ?)', 'default');
-        }
-
-        $formats = $db->fetchAll($s);
-
-        $format = \ZfExtended_Factory::get(LanguageFormat::class);
-
-        foreach ($formats as $formatData) {
-            $format = clone $format;
-            $format->init($formatData->toArray());
-
-            yield $format;
-        }
-    }
-
-    public function findBy(int $langId, string $type, string $name): ?LanguageFormat
-    {
-    }
+    public function hasEntityToProtect(string $textNode, ?int $sourceLang = null): bool;
+    public function protect(string $textNode, ?int $sourceLangId, ?int $targetLangId): string;
 }

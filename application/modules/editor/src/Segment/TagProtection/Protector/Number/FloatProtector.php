@@ -50,39 +50,55 @@ END LICENSE AND COPYRIGHT
 */
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\Repository;
+namespace MittagQI\Translate5\Segment\TagProtection\Protector\Number;
 
+use editor_Models_Languages;
+use MittagQI\Translate5\Segment\TagProtection\Protector\Number\Object\FloatObject;
 use editor_Models_Segment_Number_LanguageFormat as LanguageFormat;
 
-class LanguageNumberFormatRepository
+class FloatProtector extends AbstractProtector
 {
-    /**
-     * @return iterable<LanguageFormat>
-     */
-    public function getAll(?int $sourceLang): iterable
+    public static function getType(): string
     {
-        $db = \ZfExtended_Factory::get(LanguageFormat::class)->db;
-        $s = $db->select()->order('priority desc');
-
-        if (null !== $sourceLang) {
-            $s->where('languageId = ?', $sourceLang)->orWhere('(languageId IS NULL and name = ?)', 'default');
-        } else {
-            $s->where('(languageId IS NULL and name = ?)', 'default');
-        }
-
-        $formats = $db->fetchAll($s);
-
-        $format = \ZfExtended_Factory::get(LanguageFormat::class);
-
-        foreach ($formats as $formatData) {
-            $format = clone $format;
-            $format->init($formatData->toArray());
-
-            yield $format;
-        }
+        return 'float';
     }
 
-    public function findBy(int $langId, string $type, string $name): ?LanguageFormat
-    {
+    protected function composeNumberTag(
+        string $number,
+        LanguageFormat $sourceFormat,
+        ?editor_Models_Languages $sourceLang,
+        ?editor_Models_Languages $targetLang,
+        ?string $targetFormat
+    ): string {
+        $float = null;
+
+        if (!$sourceFormat->getKeepAsIs()) {
+            $float = FloatObject::parse($number, $sourceLang?->getRfc5646());
+        }
+
+        return sprintf(
+            self::TAG_FORMAT,
+            self::getType(),
+            $sourceFormat->getName(),
+            $number,
+            $float ? $float->format(format: '#.#') : '',
+            $this->getTargetFloat($float, $targetFormat, $targetLang)
+        );
+    }
+
+    protected function getTargetFloat(
+        ?FloatObject $float,
+        ?string $targetFormat,
+        ?editor_Models_Languages $targetLang
+    ): string {
+        if (null === $float) {
+            return '';
+        }
+
+        if (null === $targetLang) {
+            return '';
+        }
+
+        return $float->format($targetLang->getRfc5646(), $targetFormat);
     }
 }

@@ -50,67 +50,29 @@ END LICENSE AND COPYRIGHT
 */
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\Test\Unit\Segment\ChunkProtection\Protector;
+namespace MittagQI\Translate5\Segment\TagProtection\Protector;
 
-use editor_Test_UnitTest;
-use MittagQI\Translate5\Segment\ChunkProtection\Protector\ChunkDto;
-use MittagQI\Translate5\Segment\ChunkProtection\Protector\Number\NumberProtectorInterface;
-use MittagQI\Translate5\Segment\ChunkProtection\Protector\NumberProtector;
-use MittagQI\Translate5\Segment\ChunkProtection\Protector\RatingInterface;
+use editor_Models_Segment_Whitespace;
 
-class NumberProtectionTest extends editor_Test_UnitTest
+class WhitespaceProtector implements ProtectorInterface
 {
-    public function test(): void
+    private editor_Models_Segment_Whitespace $whitespace;
+
+    public function __construct()
     {
-        $processor = new class implements NumberProtectorInterface, RatingInterface
-        {
-            public function protect(iterable $chunks, ?int $sourceLang, ?int $targetLang): iterable
-            {
-                foreach ($chunks as $chunk) {
-                    foreach (explode(' ', $chunk->text) as $part) {
-                        yield new ChunkDto($part);
-                    }
-                }
-            }
+        $this->whitespace = new editor_Models_Segment_Whitespace();
+    }
 
-            public function rating(): int
-            {
-                return 2;
-            }
-        };
+    public function hasEntityToProtect(string $textNode, ?int $sourceLang = null): bool
+    {
+        return true;
+    }
 
-        $processor1 = new class implements NumberProtectorInterface, RatingInterface
-        {
-            public function protect(iterable $chunks, ?int $sourceLang, ?int $targetLang): iterable
-            {
-                foreach ($chunks as $chunk) {
-                    yield new ChunkDto(sprintf('<ph>%s</ph>', $chunk->text), true);
-                }
-            }
-
-            public function rating(): int
-            {
-                return 1;
-            }
-        };
-
-
-        $protector = new NumberProtector([$processor1, $processor]);
-        $testString = 'some text';
-
-        $protected = $protector->protect([new ChunkDto($testString)], null, null);
-
-        $result = [];
-        foreach ($protected as $p) {
-            $result[] = $p;
-        }
-
-        self::assertEquals(
-            [
-                new ChunkDto('<ph>some</ph>', true),
-                new ChunkDto('<ph>text</ph>', true),
-            ],
-            $result
-        );
+    /**
+     * {@inheritDoc}
+     */
+    public function protect(string $textNode, ?int $sourceLangId, ?int $targetLangId): string
+    {
+        return $this->whitespace->protectWhitespace($textNode);
     }
 }

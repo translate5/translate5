@@ -50,39 +50,69 @@ END LICENSE AND COPYRIGHT
 */
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\Repository;
+namespace MittagQI\Translate5\Test\Unit\Segment\TagProtection\Protector;
 
+use editor_Models_Languages;
 use editor_Models_Segment_Number_LanguageFormat as LanguageFormat;
+use MittagQI\Translate5\Repository\LanguageNumberFormatRepository;
+use MittagQI\Translate5\Repository\LanguageRepository;
+use MittagQI\Translate5\Segment\TagProtection\Protector\Number\NumberProtectorInterface;
+use MittagQI\Translate5\Segment\TagProtection\Protector\NumberProtector;
+use PHPUnit\Framework\TestCase;
 
-class LanguageNumberFormatRepository
+class NumberProtectorTest extends TestCase
 {
-    /**
-     * @return iterable<LanguageFormat>
-     */
-    public function getAll(?int $sourceLang): iterable
+    public function testHasEntityToProtect(): void
     {
-        $db = \ZfExtended_Factory::get(LanguageFormat::class)->db;
-        $s = $db->select()->order('priority desc');
+        $processor = new class implements NumberProtectorInterface {
+            public static function getType(): string
+            {
+                return 'test';
+            }
 
-        if (null !== $sourceLang) {
-            $s->where('languageId = ?', $sourceLang)->orWhere('(languageId IS NULL and name = ?)', 'default');
-        } else {
-            $s->where('(languageId IS NULL and name = ?)', 'default');
-        }
+            public function protect(
+                string $textNode,
+                LanguageFormat $languageFormat,
+                ?editor_Models_Languages $sourceLang,
+                ?editor_Models_Languages $targetLang
+            ): string {
+                return 'test';
+            }
+        };
+        $numberFormatRepository = $this->createConfiguredMock(LanguageNumberFormatRepository::class, []);
+        $languageRepository = $this->createConfiguredMock(LanguageRepository::class, []);
 
-        $formats = $db->fetchAll($s);
+        $protector = new NumberProtector([$processor], $numberFormatRepository, $languageRepository);
 
-        $format = \ZfExtended_Factory::get(LanguageFormat::class);
-
-        foreach ($formats as $formatData) {
-            $format = clone $format;
-            $format->init($formatData->toArray());
-
-            yield $format;
-        }
+        self::assertTrue($protector->hasEntityToProtect('text with number [2] in it'));
+        self::assertTrue($protector->hasEntityToProtect('text with part of mac [aa:] in it'));
+        self::assertTrue($protector->hasEntityToProtect('text with part of mac [aa-] in it'));
     }
 
-    public function findBy(int $langId, string $type, string $name): ?LanguageFormat
+    public function testProtect(): void
     {
+        $processor = new class implements NumberProtectorInterface {
+            public static function getType(): string
+            {
+                return 'test';
+            }
+
+            public function protect(
+                string $textNode,
+                LanguageFormat $languageFormat,
+                ?editor_Models_Languages $sourceLang,
+                ?editor_Models_Languages $targetLang
+            ): string {
+                return $textNode;
+            }
+        };
+        $numberFormatRepository = $this->createConfiguredMock(LanguageNumberFormatRepository::class, []);
+        $languageRepository = $this->createConfiguredMock(LanguageRepository::class, []);
+
+        $protector = new NumberProtector([$processor], $numberFormatRepository, $languageRepository);
+
+        $testNode = 'some sample text';
+
+        self::assertSame($testNode, $protector->protect($testNode, null, null));
     }
 }

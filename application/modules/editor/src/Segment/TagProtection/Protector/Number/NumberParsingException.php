@@ -50,28 +50,10 @@ END LICENSE AND COPYRIGHT
 */
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\Segment\ChunkProtection\Protector;
+namespace MittagQI\Translate5\Segment\TagProtection\Protector\Number;
 
-use MittagQI\Translate5\Segment\ChunkProtection\Protector\Number\NumberProtectorInterface;
+use Exception;
 
-class NumberProtector implements ProtectorInterface
+class NumberParsingException extends Exception
 {
-    public const DATE_TYPE = 'date';
-
-    /**
-     * @param array<NumberProtectorInterface & RatingInterface> $protectors
-     */
-    public function __construct(private array $protectors)
-    {
-        usort($this->protectors, fn (RatingInterface $p1, RatingInterface $p2) => $p2->rating() <=> $p1->rating());
-    }
-
-    public function protect(iterable $chunks, ?int $sourceLang, ?int $targetLang): iterable
-    {
-        foreach ($this->protectors as $protector) {
-            $chunks = $protector->protect($chunks, $sourceLang, $targetLang);
-        }
-
-        return $chunks;
-    }
 }

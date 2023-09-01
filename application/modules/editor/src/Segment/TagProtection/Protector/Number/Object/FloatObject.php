@@ -50,26 +50,37 @@ END LICENSE AND COPYRIGHT
 */
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\Segment\ChunkProtection\Protector;
+namespace MittagQI\Translate5\Segment\TagProtection\Protector\Number\Object;
 
-use editor_Models_Segment_Whitespace;
+use NumberFormatter;
 
-class WhitespaceProtector implements ProtectorInterface
+class FloatObject
 {
-    private editor_Models_Segment_Whitespace $whitespace;
-
-    public function __construct()
+    public function __construct(private float $number, private int $fractionDigits)
     {
-        $this->whitespace = new editor_Models_Segment_Whitespace();
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function protect(iterable $chunks, ?int $sourceLang, ?int $targetLang): iterable
+    public static function parse(string $float, ?string $sourceLocale = null): self
     {
-        foreach ($chunks as $chunk) {
-            yield $chunk->protected ? $chunk : new ChunkDto($this->whitespace->protectWhitespace($chunk->text), true);
+        $formater = numfmt_create($sourceLocale ?: 'en', NumberFormatter::DECIMAL);
+        $symbols = array_filter(preg_split('/(\d+|[٠١٢٣٤٥٦٧٨٩]+)/u', $float));
+        $decimalSeparator = end($symbols);
+
+        $regSymbol = '.' === $decimalSeparator ? '\\' . $decimalSeparator : $decimalSeparator;
+
+        $number = str_replace($decimalSeparator, '.', preg_replace("/[^\d$regSymbol]/u", '', $float));
+
+        return new self($formater->parse($number), (int) strpos(strrev($number), '.'));
+    }
+
+    public function format(string $locale = 'en', ?string $format = null): string
+    {
+        $formater = numfmt_create($locale, NumberFormatter::DECIMAL);
+        if (!empty($format)) {
+            $formater->setPattern($format);
         }
+        $formater->setAttribute(NumberFormatter::MAX_FRACTION_DIGITS, $this->fractionDigits);
+
+        return $formater->format($this->number);
     }
 }

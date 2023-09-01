@@ -1,8 +1,8 @@
 <?php
 /*
 START LICENSE AND COPYRIGHT
- Copyright (c) 2013 - 2022 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
- Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
+ Copyright (c) 2013 - 2022 Marc Mittag; MittagQI - Quality Informatics; All rights reserved.
+ Contact: http://www.MittagQI.com/ / service (ATT) MittagQI.com
 
  This file is part of a paid plug-in for translate5.
 
@@ -41,24 +41,38 @@ START LICENSE AND COPYRIGHT
  root folder of translate5. This plug-in exception allows using GPLv3 for translate5 plug-ins,
  although translate5 core is licensed under AGPLv3.
 
- @copyright  Marc Mittag, MittagQI - Quality Informatics
- @author     MittagQI - Quality Informatics
- @license    GNU GENERAL PUBLIC LICENSE version 3 with plugin-execption
-             http://www.gnu.org/licenses/gpl.html
-             http://www.translate5.net/plugin-exception.txt
+ @copyright Marc Mittag, MittagQI - Quality Informatics
+ @author   MittagQI - Quality Informatics
+ @license  GNU GENERAL PUBLIC LICENSE version 3 with plugin-execption
+       http://www.gnu.org/licenses/gpl.html
+       http://www.translate5.net/plugin-exception.txt
 END LICENSE AND COPYRIGHT
 */
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\Segment\ChunkProtection\Protector;
+namespace MittagQI\Translate5\Test\Unit\Segment\TagProtection\Protector\Number;
 
-/**
- * @property-read string $text
- * @property-read bool $protected
- */
-class ChunkDto
+use editor_Models_Segment_Number_LanguageFormat as LanguageFormat;
+use MittagQI\Translate5\Repository\LanguageNumberFormatRepository;
+use MittagQI\Translate5\Segment\TagProtection\Protector\Number\IPAddressProtector;
+use PHPUnit\Framework\TestCase;
+
+class IPAddressProtectorTest extends TestCase
 {
-    public function __construct(public string $text, public bool $protected = false)
-    {
+    public function testProtectDefaultFormats(): void {
+        $repo = $this->createConfiguredMock(LanguageNumberFormatRepository::class, ['findBy' => null]);
+        $sourceFormat = $this->createConfiguredMock(LanguageFormat::class, []);
+        $sourceFormat
+            ->method('__call')
+            ->willReturnCallback(function($name, $args) {
+                return match ($name) {
+                    'getName' => 'test-default',
+                };
+            });
+
+        self::assertSame(
+            '<number type="ip-address" name="test-default" source="127.0.0.1" iso="" target="" />',
+            (new IPAddressProtector($repo))->protect('127.0.0.1', $sourceFormat, null, null)
+        );
     }
 }

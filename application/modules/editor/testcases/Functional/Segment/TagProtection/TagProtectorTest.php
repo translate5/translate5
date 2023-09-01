@@ -50,39 +50,38 @@ END LICENSE AND COPYRIGHT
 */
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\Repository;
+namespace MittagQI\Translate5\Test\Functional\Segment\TagProtection;
 
-use editor_Models_Segment_Number_LanguageFormat as LanguageFormat;
+use editor_Test_UnitTest;
+use MittagQI\Translate5\Segment\TagProtection\TagProtector;
+use MittagQI\Translate5\Segment\TagProtection\Protector\NumberProtector;
 
-class LanguageNumberFormatRepository
+class TagProtectorTest extends editor_Test_UnitTest
 {
     /**
-     * @return iterable<LanguageFormat>
+     * @dataProvider casesProvider
      */
-    public function getAll(?int $sourceLang): iterable
+    public function testWhitespaceHandling(string $node, string $expected): void
     {
-        $db = \ZfExtended_Factory::get(LanguageFormat::class)->db;
-        $s = $db->select()->order('priority desc');
+        $number = $this->createConfiguredMock(
+            NumberProtector::class,
+            [
+                'hasEntityToProtect' => true,
+                'protect' => 'text with <number type="integer" name="default" source="1 234" iso="1234" target=""/> [\r\n] in it',
+            ]
+        );
+        $utilities = \ZfExtended_Factory::get(\editor_Models_Segment_UtilityBroker::class);
 
-        if (null !== $sourceLang) {
-            $s->where('languageId = ?', $sourceLang)->orWhere('(languageId IS NULL and name = ?)', 'default');
-        } else {
-            $s->where('(languageId IS NULL and name = ?)', 'default');
-        }
+        $tagProtector = new TagProtector([$number], $utilities);
 
-        $formats = $db->fetchAll($s);
-
-        $format = \ZfExtended_Factory::get(LanguageFormat::class);
-
-        foreach ($formats as $formatData) {
-            $format = clone $format;
-            $format->init($formatData->toArray());
-
-            yield $format;
-        }
+        self::assertEquals($expected, $tagProtector->protect($node, null, null));
     }
 
-    public function findBy(int $langId, string $type, string $name): ?LanguageFormat
+    public function casesProvider(): iterable
     {
+        yield 'NNBSP in tag is safe' => [
+            'text' => 'text with 1 234 [\r\n] in it',
+            'expected' => 'text with <protectedTag data-type="single" data-id="1" data-content="3c6e756d62657220747970653d22696e746567657222206e616d653d2264656661756c742220736f757263653d2231e280af323334222069736f3d223132333422207461726765743d22222f3e"/> [\r\n] in it'
+        ];
     }
 }

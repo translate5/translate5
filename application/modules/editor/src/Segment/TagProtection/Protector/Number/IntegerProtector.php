@@ -50,16 +50,70 @@ END LICENSE AND COPYRIGHT
 */
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\Segment\ChunkProtection\Protector;
+namespace MittagQI\Translate5\Segment\TagProtection\Protector\Number;
 
-use MittagQI\Translate5\Segment\ChunkProtection\Protector\ChunkDto;
+use editor_Models_Languages;
+use editor_Models_Segment_Number_LanguageFormat as LanguageFormat;
+use NumberFormatter;
 
-interface ProtectorInterface
+class IntegerProtector extends FloatProtector
 {
-    /**
-     * @param iterable<ChunkDto> $chunks
-     * @return iterable<ChunkDto>
-     */
-    public function protect(iterable $chunks, ?int $sourceLang, ?int $targetLang): iterable;
+    public static function getType(): string
+    {
+        return 'integer';
+    }
 
+    protected function getDefaultFormats(): array
+    {
+        return [
+            [
+                'regex' => "\d{1,4}( |,|\.|·|˙|'|\x{2009}|\x{202F}|٬)?\d{1,4}( |,|\.|·|˙|'|\x{2009}|\x{202F}|٬)*\d{3,4}",
+            ],
+            [
+                'regex' => '\d+',
+            ],
+        ];
+    }
+
+    protected function composeNumberTag(
+        string $number,
+        LanguageFormat $sourceFormat,
+        ?editor_Models_Languages $sourceLang,
+        ?editor_Models_Languages $targetLang,
+        ?string $targetFormat
+    ): string {
+        $integer = null;
+
+        if (!$sourceFormat->getKeepAsIs()) {
+            $fmt = NumberFormatter::create('en', NumberFormatter::DECIMAL);
+            $integer = $fmt->parse(preg_replace('/[^\d]/u', '', $number), NumberFormatter::TYPE_INT64);
+        }
+
+        return sprintf(
+            self::TAG_FORMAT,
+            self::getType(),
+            $sourceFormat->getName(),
+            $number,
+            (string) $integer,
+            $this->getTargetInteger($integer, $targetFormat, $targetLang)
+        );
+    }
+
+    protected function getTargetInteger(
+        ?int $integer,
+        ?string $targetFormat,
+        ?editor_Models_Languages $targetLang
+    ): string {
+        if (null === $integer) {
+            return '';
+        }
+
+        if (null === $targetLang) {
+            return '';
+        }
+
+        $fmt = NumberFormatter::create($targetLang->getRfc5646(), NumberFormatter::PATTERN_DECIMAL, $targetFormat);
+
+        return $fmt->format($integer);
+    }
 }

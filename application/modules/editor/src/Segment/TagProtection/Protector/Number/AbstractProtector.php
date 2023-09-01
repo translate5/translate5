@@ -50,39 +50,66 @@ END LICENSE AND COPYRIGHT
 */
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\Repository;
+namespace MittagQI\Translate5\Segment\TagProtection\Protector\Number;
 
+use editor_Models_Languages;
+use MittagQI\Translate5\Repository\LanguageNumberFormatRepository;
 use editor_Models_Segment_Number_LanguageFormat as LanguageFormat;
 
-class LanguageNumberFormatRepository
+abstract class AbstractProtector implements NumberProtectorInterface
 {
-    /**
-     * @return iterable<LanguageFormat>
-     */
-    public function getAll(?int $sourceLang): iterable
+    protected const TAG_FORMAT = '<number type="%s" name="%s" source="%s" iso="%s" target="%s" />';
+
+    private array $formatsCache = [];
+
+    public function __construct(protected LanguageNumberFormatRepository $formatRepository)
     {
-        $db = \ZfExtended_Factory::get(LanguageFormat::class)->db;
-        $s = $db->select()->order('priority desc');
-
-        if (null !== $sourceLang) {
-            $s->where('languageId = ?', $sourceLang)->orWhere('(languageId IS NULL and name = ?)', 'default');
-        } else {
-            $s->where('(languageId IS NULL and name = ?)', 'default');
-        }
-
-        $formats = $db->fetchAll($s);
-
-        $format = \ZfExtended_Factory::get(LanguageFormat::class);
-
-        foreach ($formats as $formatData) {
-            $format = clone $format;
-            $format->init($formatData->toArray());
-
-            yield $format;
-        }
     }
 
-    public function findBy(int $langId, string $type, string $name): ?LanguageFormat
+    /**
+     * {@inheritDoc}
+     */
+    public function protect(
+        string $number,
+        LanguageFormat $languageFormat,
+        ?editor_Models_Languages $sourceLang,
+        ?editor_Models_Languages $targetLang
+    ): string {
+        $targetFormat = $targetLang ? $this->getFormat($targetLang->getId(), $languageFormat) : null;
+
+        return $this->composeNumberTag($number, $languageFormat, $sourceLang, $targetLang, $targetFormat);
+    }
+
+    /**
+     * @throws NumberParsingException
+     */
+    protected function composeNumberTag(
+        string $number,
+        LanguageFormat $sourceFormat,
+        ?editor_Models_Languages $sourceLang,
+        ?editor_Models_Languages $targetLang,
+        ?string $targetFormat
+    ): string {
+        return sprintf(
+            self::TAG_FORMAT,
+            static::getType(),
+            $sourceFormat->getName(),
+            $number,
+            '',
+            ''
+        );
+    }
+
+    private function getFormat(int $langId, LanguageFormat $languageFormat): ?string
     {
+        $key = "{$langId}:{$languageFormat->getType()}:{$languageFormat->getName()}";
+        if (!isset($this->formatsCache[$key])) {
+            $this->formatsCache[$key] = $this
+                ->formatRepository
+                ->findBy($langId, $languageFormat->getType(), $languageFormat->getName())
+                ?->getFormat();
+        }
+
+        return $this->formatsCache[$key];
     }
 }

@@ -50,39 +50,54 @@ END LICENSE AND COPYRIGHT
 */
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\Repository;
+namespace MittagQI\Translate5\Segment\TagProtection;
 
-use editor_Models_Segment_Number_LanguageFormat as LanguageFormat;
+use editor_Models_Segment_UtilityBroker;
+use editor_Models_Segment_Whitespace as WhitespaceProtector;
+use MittagQI\Translate5\Segment\TagProtection\Protector\ProtectorInterface;
 
-class LanguageNumberFormatRepository
+class TagProtector
 {
     /**
-     * @return iterable<LanguageFormat>
+     * @param  ProtectorInterface[] $protectors
      */
-    public function getAll(?int $sourceLang): iterable
+    public function __construct(private iterable $protectors, private editor_Models_Segment_UtilityBroker $utilities)
     {
-        $db = \ZfExtended_Factory::get(LanguageFormat::class)->db;
-        $s = $db->select()->order('priority desc');
-
-        if (null !== $sourceLang) {
-            $s->where('languageId = ?', $sourceLang)->orWhere('(languageId IS NULL and name = ?)', 'default');
-        } else {
-            $s->where('(languageId IS NULL and name = ?)', 'default');
-        }
-
-        $formats = $db->fetchAll($s);
-
-        $format = \ZfExtended_Factory::get(LanguageFormat::class);
-
-        foreach ($formats as $formatData) {
-            $format = clone $format;
-            $format->init($formatData->toArray());
-
-            yield $format;
-        }
     }
 
-    public function findBy(int $langId, string $type, string $name): ?LanguageFormat
+    public function protect(
+        string $text,
+        ?int $sourceLang,
+        ?int $targetLang,
+        bool $protectTags = false
+    ): string {
+        $text = $this->protectTags($text, $protectTags);
+
+        foreach ($this->protectors as $protector) {
+            if ($protector->hasEntityToProtect($text, $sourceLang)) {
+                $text = $protector->protect($text, $sourceLang, $targetLang);
+                $protectTags = true;
+            }
+        }
+
+        $text = $this->protectTags($text, $protectTags);
+
+        return $this->utilities->whitespace->protectWhitespace(
+            $text,
+            $protectTags ? WhitespaceProtector::ENTITY_MODE_OFF : WhitespaceProtector::ENTITY_MODE_RESTORE
+        );
+    }
+
+    private function protectTags(string $text, bool $protectTags): ?string
     {
+        if (!$protectTags) {
+            return $text;
+        }
+        //since we are in the XML file format, plain tags in the content are encoded, which we have to undo first
+        //$text is here for example: Dies &lt;strong&gt;ist ein&lt;/strong&gt; Test. &amp;nbsp;
+        $text = html_entity_decode($text);
+        //$text is now: Dies <strong>ist ein</strong> Test. &nbsp;
+
+        return $this->utilities->tagProtection->protectTags($text);
     }
 }

@@ -1,8 +1,8 @@
 <?php
 /*
 START LICENSE AND COPYRIGHT
- Copyright (c) 2013 - 2022 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
- Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
+ Copyright (c) 2013 - 2022 Marc Mittag; MittagQI - Quality Informatics; All rights reserved.
+ Contact: http://www.MittagQI.com/ / service (ATT) MittagQI.com
 
  This file is part of a paid plug-in for translate5.
 
@@ -41,28 +41,38 @@ START LICENSE AND COPYRIGHT
  root folder of translate5. This plug-in exception allows using GPLv3 for translate5 plug-ins,
  although translate5 core is licensed under AGPLv3.
 
- @copyright  Marc Mittag, MittagQI - Quality Informatics
- @author     MittagQI - Quality Informatics
- @license    GNU GENERAL PUBLIC LICENSE version 3 with plugin-execption
-             http://www.gnu.org/licenses/gpl.html
-             http://www.translate5.net/plugin-exception.txt
+ @copyright Marc Mittag, MittagQI - Quality Informatics
+ @author   MittagQI - Quality Informatics
+ @license  GNU GENERAL PUBLIC LICENSE version 3 with plugin-execption
+       http://www.gnu.org/licenses/gpl.html
+       http://www.translate5.net/plugin-exception.txt
 END LICENSE AND COPYRIGHT
 */
 declare(strict_types=1);
 
-/**
- * @method string getLanguageId()
- * @method void setLanguageId(int $id)
- * @method string getType()
- * @method void setType(string $type)
- * @method string getName()
- * @method void setName(string $name)
- * @method string getRegex()
- * @method void setRegex(string $regex)
- * @method string getFormat()
- * @method void setFormat(string $format)
- */
-class editor_Models_LanguageDateFormat extends ZfExtended_Models_Entity_Abstract
-{
+namespace MittagQI\Translate5\Test\Unit\Segment\TagProtection\Protector\Number;
 
+use editor_Models_Segment_Number_LanguageFormat as LanguageFormat;
+use MittagQI\Translate5\Repository\LanguageNumberFormatRepository;
+use MittagQI\Translate5\Segment\TagProtection\Protector\Number\MacAddressProtector;
+use PHPUnit\Framework\TestCase;
+
+class MacAddressProtectorTest extends TestCase
+{
+    public function testProtectDefaultFormats(): void {
+        $repo = $this->createConfiguredMock(LanguageNumberFormatRepository::class, ['findBy' => null]);
+        $sourceFormat = $this->createConfiguredMock(LanguageFormat::class, []);
+        $sourceFormat
+            ->method('__call')
+            ->willReturnCallback(function($name, $args) {
+                return match ($name) {
+                    'getName' => 'test-default',
+                };
+            });
+
+        self::assertSame(
+            '<number type="mac-address" name="test-default" source="aa:bb:cc:11:22:33" iso="" target="" />',
+            (new MacAddressProtector($repo))->protect('aa:bb:cc:11:22:33', $sourceFormat, null, null)
+        );
+    }
 }
