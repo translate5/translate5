@@ -71,7 +71,10 @@ class DateProtectorTest extends TestCase
         ?LanguageFormat $targetFormat,
         ?editor_Models_Languages $targetLang
     ): void {
-        $repo = $this->createConfiguredMock(LanguageNumberFormatRepository::class, ['findBy' => $targetFormat]);
+        $repo = $this->createConfiguredMock(
+            LanguageNumberFormatRepository::class,
+            ['findForLangOrMajorBy' => $targetFormat]
+        );
         $protected = (new DateProtector($repo))->protect($number, $sourceFormat, null, $targetLang);
 
         self::assertSame($expected, $protected);
@@ -164,7 +167,10 @@ class DateProtectorTest extends TestCase
                     'getType' => 'date',
                 };
             });
-        $repo = $this->createConfiguredMock(LanguageNumberFormatRepository::class, ['findBy' => null]);
+        $repo = $this->createConfiguredMock(
+            LanguageNumberFormatRepository::class,
+            ['findForLangOrMajorBy' => null]
+        );
 
         $this->expectException(NumberParsingException::class);
         (new DateProtector($repo))->protect('2023/18/13', $sourceFormat, null, null);

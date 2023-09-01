@@ -80,7 +80,7 @@ abstract class AbstractProtector implements NumberProtectorInterface
         ?editor_Models_Languages $sourceLang,
         ?editor_Models_Languages $targetLang
     ): string {
-        $targetFormat = $targetLang ? $this->getFormat($targetLang->getId(), $languageFormat) : null;
+        $targetFormat = $targetLang ? $this->getFormat($targetLang, $languageFormat) : null;
 
         return $this->composeNumberTag($number, $languageFormat, $sourceLang, $targetLang, $targetFormat);
     }
@@ -105,13 +105,13 @@ abstract class AbstractProtector implements NumberProtectorInterface
         );
     }
 
-    private function getFormat(int $langId, LanguageFormat $languageFormat): ?string
+    private function getFormat(editor_Models_Languages $targetLang, LanguageFormat $languageFormat): ?string
     {
-        $key = "{$langId}:{$languageFormat->getType()}:{$languageFormat->getName()}";
+        $key = "{$targetLang->getId()}:{$languageFormat->getType()}:{$languageFormat->getName()}";
         if (!isset($this->formatsCache[$key])) {
             $this->formatsCache[$key] = $this
                 ->formatRepository
-                ->findBy($langId, $languageFormat->getType(), $languageFormat->getName())
+                ->findForLangOrMajorBy($targetLang, $languageFormat->getType(), $languageFormat->getName())
                 ?->getFormat();
         }
 

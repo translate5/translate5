@@ -51,6 +51,8 @@ END LICENSE AND COPYRIGHT
 declare(strict_types=1);
 
 namespace MittagQI\Translate5\NumberProtection\Model;
+
+use Zend_Db_Table_Row_Abstract;
 use ZfExtended_Models_Entity_Abstract;
 
 /**
@@ -73,4 +75,19 @@ class LanguageNumberFormat extends ZfExtended_Models_Entity_Abstract
 {
     protected $dbInstanceClass = LanguageNumberFormatTable::class;
     protected $validatorInstanceClass = LanguageNumberFormatValidator::class;
+
+    public function loadBy(int $langId, string $type, string $name): ?Zend_Db_Table_Row_Abstract
+    {
+        $s = $this->db->select();
+        $s->where('languageId = ?', $langId)
+            ->where('type = ?', $type)
+            ->where('name = ?', $name);
+
+        $this->row = $this->db->fetchRow($s);
+        if (empty($this->row)){
+            $this->notFound("#by languageId, type, name", "$langId, $type, $name");
+        }
+
+        return $this->row;
+    }
 }

@@ -50,13 +50,92 @@ END LICENSE AND COPYRIGHT
 */
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\Test\Functional\Segment\TagProtection\Protector;
+namespace MittagQI\Translate5\Test\Functional\NumberProtection;
 
+use editor_Models_Languages;
+use MittagQI\Translate5\NumberProtection\Model\LanguageNumberFormat;
 use MittagQI\Translate5\NumberProtection\NumberProtector;
+use MittagQI\Translate5\NumberProtection\Protector\IntegerProtector;
 use PHPUnit\Framework\TestCase;
+use ZfExtended_Factory;
 
 class NumberProtectorTest extends TestCase
 {
+    public function testCustomTargetFormatProcessed(): void
+    {
+        $langEn = ZfExtended_Factory::get(editor_Models_Languages::class);
+        $langEn->loadByRfc5646('en');
+
+        $langDe = ZfExtended_Factory::get(editor_Models_Languages::class);
+        $langDe->loadByRfc5646('de');
+
+        $numberFormatSource = ZfExtended_Factory::get(LanguageNumberFormat::class);
+        $numberFormatSource->setLanguageId($langEn->getId());
+        $numberFormatSource->setName('test');
+        $numberFormatSource->setRegex('/^\d+ USD$/');
+        $numberFormatSource->setType(IntegerProtector::getType());
+        $numberFormatSource->setKeepAsIs(false);
+        $numberFormatSource->setPriority(1000);
+        $numberFormatSource->save();
+
+        $numberFormatTarget = ZfExtended_Factory::get(LanguageNumberFormat::class);
+        $numberFormatTarget->setLanguageId($langDe->getId());
+        $numberFormatTarget->setName('test');
+        $numberFormatTarget->setType(IntegerProtector::getType());
+        $numberFormatTarget->setFormat('# EUR');
+        $numberFormatTarget->setPriority(1000);
+        $numberFormatTarget->save();
+
+        $protected = NumberProtector::create()->protect('12345 USD', (int) $langEn->getId(), (int) $langDe->getId());
+
+        $numberFormatSource->delete();
+        $numberFormatTarget->delete();
+
+        self::assertSame(
+            '<number type="integer" name="test" source="12345 USD" iso="12345" target="12345 EUR"/>',
+            $protected
+        );
+    }
+
+    public function testMajorCustomTargetFormatProcessed(): void
+    {
+        $langEn = ZfExtended_Factory::get(editor_Models_Languages::class);
+        $langEn->loadByRfc5646('en');
+
+        $langDe = ZfExtended_Factory::get(editor_Models_Languages::class);
+        $langDe->loadByRfc5646('de');
+
+        $langDeAt = ZfExtended_Factory::get(editor_Models_Languages::class);
+        $langDeAt->loadByRfc5646('de-at');
+
+        $numberFormatSource = ZfExtended_Factory::get(LanguageNumberFormat::class);
+        $numberFormatSource->setLanguageId($langEn->getId());
+        $numberFormatSource->setName('test');
+        $numberFormatSource->setRegex('/^\d+ USD$/');
+        $numberFormatSource->setType(IntegerProtector::getType());
+        $numberFormatSource->setKeepAsIs(false);
+        $numberFormatSource->setPriority(1000);
+        $numberFormatSource->save();
+
+        $numberFormatTarget = ZfExtended_Factory::get(LanguageNumberFormat::class);
+        $numberFormatTarget->setLanguageId($langDe->getId());
+        $numberFormatTarget->setName('test');
+        $numberFormatTarget->setType(IntegerProtector::getType());
+        $numberFormatTarget->setFormat('# EUR');
+        $numberFormatTarget->setPriority(1000);
+        $numberFormatTarget->save();
+
+        $protected = NumberProtector::create()->protect('12345 USD', (int) $langEn->getId(), (int) $langDeAt->getId());
+
+        $numberFormatSource->delete();
+        $numberFormatTarget->delete();
+
+        self::assertSame(
+            '<number type="integer" name="test" source="12345 USD" iso="12345" target="12345 EUR"/>',
+            $protected
+        );
+    }
+
     /**
      * @dataProvider numbersProvider
      */

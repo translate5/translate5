@@ -60,7 +60,10 @@ use PHPUnit\Framework\TestCase;
 class MacAddressProtectorTest extends TestCase
 {
     public function testProtectDefaultFormats(): void {
-        $repo = $this->createConfiguredMock(LanguageNumberFormatRepository::class, ['findBy' => null]);
+        $repo = $this->createConfiguredMock(
+            LanguageNumberFormatRepository::class,
+            ['findForLangOrMajorBy' => null]
+        );
         $sourceFormat = $this->createConfiguredMock(LanguageFormat::class, []);
         $sourceFormat
             ->method('__call')

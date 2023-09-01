@@ -70,7 +70,10 @@ class FloatProtectorTest extends TestCase
         ?LanguageFormat $targetFormat,
         ?editor_Models_Languages $targetLang
     ): void {
-        $repo = $this->createConfiguredMock(LanguageNumberFormatRepository::class, ['findBy' => $targetFormat]);
+        $repo = $this->createConfiguredMock(
+            LanguageNumberFormatRepository::class,
+            ['findForLangOrMajorBy' => $targetFormat]
+        );
         $protected = (new FloatProtector($repo))->protect($number, $sourceFormat, null, $targetLang);
 
         self::assertSame($expected, $protected);

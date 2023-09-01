@@ -52,25 +52,28 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\NumberProtection\Model;
 
-use MittagQI\Translate5\NumberProtection\Model\LanguageNumberFormat as LanguageFormat;
+use editor_Models_Languages;
+use ZfExtended_Factory;
+use ZfExtended_Models_Entity_NotFoundException;
 
 class LanguageNumberFormatRepository
 {
     /**
-     * @return iterable<LanguageFormat>
+     * @return iterable<LanguageNumberFormat>
      */
-    public function getAll(?int $sourceLang): iterable
+    public function getAll(?editor_Models_Languages $sourceLang): iterable
     {
-        $db = \ZfExtended_Factory::get(LanguageFormat::class)->db;
+        $db = ZfExtended_Factory::get(LanguageNumberFormat::class)->db;
         $s = $db->select()->order('priority desc');
 
         if (null !== $sourceLang) {
-            $s->where('languageId = ?', $sourceLang)->orWhere('(languageId IS NULL and name = ?)', 'default');
+            $s->where('languageId = ?', $sourceLang->getId())
+                ->orWhere('(languageId IS NULL and name = ?)', 'default');
         }
 
         $formats = $db->fetchAll($s);
 
-        $format = \ZfExtended_Factory::get(LanguageFormat::class);
+        $format = ZfExtended_Factory::get(LanguageNumberFormat::class);
 
         foreach ($formats as $formatData) {
             $format = clone $format;
@@ -80,7 +83,32 @@ class LanguageNumberFormatRepository
         }
     }
 
-    public function findBy(int $langId, string $type, string $name): ?LanguageFormat
+    public function findForLangOrMajorBy(
+        editor_Models_Languages $targetLang,
+        string $type,
+        string $name
+    ): ?LanguageNumberFormat {
+        $format = $this->findBy((int) $targetLang->getId(), $type, $name);
+
+        if (null === $format) {
+            $major = \ZfExtended_Factory::get(editor_Models_Languages::class);
+            $major->loadByRfc5646($targetLang->getMajorRfc5646());
+
+            $format = $this->findBy((int) $major->getId(), $type, $name);
+        }
+
+        return $format;
+    }
+
+    public function findBy(int $langId, string $type, string $name): ?LanguageNumberFormat
     {
+        $lnf = ZfExtended_Factory::get(LanguageNumberFormat::class);
+        try {
+            $lnf->loadBy($langId, $type, $name);
+
+            return $lnf;
+        } catch (ZfExtended_Models_Entity_NotFoundException) {
+            return null;
+        }
     }
 }
