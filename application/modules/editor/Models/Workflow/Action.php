@@ -73,6 +73,15 @@ class editor_Models_Workflow_Action extends ZfExtended_Models_Entity_Abstract {
         }
         $s->order('position');
         $s->order('id');
-        return $this->db->fetchAll($s)->toArray();   
+        return $this->db->fetchAll($s)->toArray();
+    }
+
+    public function loadByWorkflow(string $workflow): array
+    {
+        $s = $this->db->select();
+        $s->where('`workflow` = ?', $workflow);
+        $s->order('position');
+        $s->order('id');
+        return $this->db->fetchAll($s)->toArray();
     }
 }
