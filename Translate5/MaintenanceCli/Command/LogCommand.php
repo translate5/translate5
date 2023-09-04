@@ -480,7 +480,6 @@ the format is:
             '    <info>message:</> '.OutputFormatter::escape((string) $row['message']),
             ' <info>appVersion:</> '.OutputFormatter::escape((string) $row['appVersion']),
             '<info>file (line):</> '.$this->linkIDE(OutputFormatter::escape((string) $row['file'].' ('.$row['line'].')'), $row['file'], $row['line']),
-            '                      '.$this->linkIDE(OutputFormatter::escape((string) $row['file'].' ('.$row['line'].')'), $row['file'], $row['line']),
         ];
 
         if($row['duplicates'] == 0) {
@@ -501,7 +500,7 @@ the format is:
             $out[] = '     <info>Worker:</> '.OutputFormatter::escape((string) $row['worker']);
         }
         if(!empty($row['trace'])) {
-            $out[] = '      <info>Trace:</> '.preg_replace('/((#[0-9]+) |\([0-9]+\))/', "<options=bold>$0</>", OutputFormatter::escape((string) $row['trace']));
+            $out[] = '      <info>Trace:</> '.preg_replace('/((#[0-9]+) |\([0-9]+\))/', "<options=bold>$0</>", $this->formatTrace((string) $row['trace']));
         }
         if(!empty($row['extra'])) {
             $out[] = '      <info>Extra:</> '.$this->prepareExtra($row['extra']);
@@ -528,6 +527,13 @@ the format is:
         return OutputFormatter::escape((string) $extra);
     }
 
+    protected function formatTrace(string $trace): string {
+        $trace = OutputFormatter::escape($trace);
+        return preg_replace_callback('/#[0-9]+ ([^( ]+)\(([0-9]+)\):/', function($matches) {
+            return $this->linkIDE($matches[0], $matches[1], $matches[2]);
+        }, $trace);
+    }
+
     protected function linkIDE(string $text, string $file, int $line): string
     {
         if (!\ZfExtended_Utils::isDevelopment() || !str_starts_with($file, APPLICATION_ROOT)) {
@@ -535,6 +541,6 @@ the format is:
         }
         $file = urlencode(str_replace(APPLICATION_ROOT, '', $file));
         $url = OutputFormatter::escape((string) 'phpstorm://open?file='.$file.'&line='.$line);
-        return '<href='.$url.'>'.$text.'</>';
+        return '<href='.$url.'>✎</> '.$text;
     }
 }
