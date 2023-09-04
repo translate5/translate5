@@ -51,6 +51,7 @@ use Translate5\MaintenanceCli\Command\{AuthTokenCommand,
     DevelopmentSymlinksCommand,
     DevelopmentTriggerworkflowCommand,
     DevelopmentOkapiBconfNextVersionCommand,
+    DevelopmentWorkertreeCommand,
     L10nAddCommand,
     L10nRemoveCommand,
     LogCommand,
@@ -163,6 +164,7 @@ if (file_exists('.git')) {
     $commands[] = new DevelopmentGithookCommand();
     $commands[] = new DevelopmentNewdbchangeCommand();
     $commands[] = new DevelopmentCreatetestCommand();
+    $commands[] = new DevelopmentWorkertreeCommand();
     $commands[] = new TestApplytestsqlCommand();
     $commands[] = new TestRunAllCommand();
     $commands[] = new TestRunCommand();
