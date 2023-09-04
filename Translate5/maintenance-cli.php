@@ -102,7 +102,10 @@ use Translate5\MaintenanceCli\Command\{AuthTokenCommand,
     VisualImplantReflownWysiwyg,
     WorkerCleanCommand,
     WorkerListCommand,
-    WorkerQueueCommand};
+    WorkerQueueCommand,
+    WorkflowCloneCommand,
+    WorkflowListCommand,
+    WorkflowStepCommand};
 use Translate5\MaintenanceCli\Command\SegmentHistoryCommand;
 
 $app = new Application('Translate5 CLI Maintenance', '1.0');
@@ -159,6 +162,9 @@ $commands = [
     new WorkerCleanCommand(),
     new WorkerListCommand(),
     new WorkerQueueCommand(),
+    new WorkflowCloneCommand(),
+    new WorkflowListCommand(),
+    new WorkflowStepCommand(),
 ];
 if (file_exists('.git')) {
     $commands[] = new DevelopmentGithookCommand();

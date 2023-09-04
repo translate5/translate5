@@ -530,12 +530,11 @@ the format is:
 
     protected function linkIDE(string $text, string $file, int $line): string
     {
-//        if (!\ZfExtended_Utils::isDevelopment() || !str_starts_with($file, APPLICATION_ROOT)) {
-//            return $text;
-//        }
+        if (!\ZfExtended_Utils::isDevelopment() || !str_starts_with($file, APPLICATION_ROOT)) {
+            return $text;
+        }
         $file = urlencode(str_replace(APPLICATION_ROOT, '', $file));
         $url = OutputFormatter::escape((string) 'phpstorm://open?file='.$file.'&line='.$line);
-        $url = '"https://www.google.de"';
-        return '<href='.$url.'> xxx </>';
+        return '<href='.$url.'>'.$text.'</>';
     }
 }
