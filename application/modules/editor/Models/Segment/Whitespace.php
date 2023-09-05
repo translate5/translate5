@@ -186,7 +186,7 @@ class editor_Models_Segment_Whitespace {
      */
     public function protectWhitespace($textNode, $entityHandling = self::ENTITY_MODE_RESTORE) {
         //definition how entities are handled:
-        if ($entityHandling != self::ENTITY_MODE_OFF) {
+        if($entityHandling != self::ENTITY_MODE_OFF) {
             $textNode = editor_Models_Segment_Utility::entityCleanup($textNode, $entityHandling == self::ENTITY_MODE_RESTORE);
         }
         
@@ -393,17 +393,11 @@ class editor_Models_Segment_Whitespace {
             $xml->replaceChunk($key, $this->handleProtectedTags($type, $id, $content));
         });
 
-        $result = $xml->parse($segment, true, $this->validTags());
-        $xmlChunks = $xml->getAllChunks();
-        return $result;
-    }
-
-    public function validTags(): array
-    {
         $validTags = self::WHITESPACE_TAGS;
         $validTags[] = 'protectedTag';
-
-        return $validTags;
+        $result = $xml->parse($segment, true, $validTags);
+        $xmlChunks = $xml->getAllChunks();
+        return $result;
     }
 
     /**
