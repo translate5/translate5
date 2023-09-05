@@ -790,7 +790,7 @@ final class editor_Segment_Quality_Manager
      * @throws editor_Models_ConfigException
      */
     private function isProcessingSkipped(string $processingMode, editor_Models_Task $task, bool $logSkipping = false){
-        if(self::ACTIVE){
+        if(!self::ACTIVE){
             return true;
         }
         if($processingMode === editor_Segment_Processing::IMPORT && (!$task->getTaskType()->isAutoStartAutoQA() || !$task->getConfig()->runtimeOptions->autoQA->autoStartOnImport)){
