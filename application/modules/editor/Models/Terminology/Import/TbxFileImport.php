@@ -527,6 +527,12 @@ $memLog('Loaded terms:        ');
 
         $this->setDiscriptGrp($languageGroup,$newLangSet,'langSet');
 
+        if (isset($languageGroup->transacGrp)) {
+            foreach ($languageGroup->transacGrp as $transacGrp) {
+                $newLangSet->transacGrp = $this->setTransacAttributes($transacGrp, false, 'langSet', $newLangSet);
+            }
+        }
+
         if (isset($languageGroup->note)) {
             $this->setAttributeTypes($languageGroup->note, $newLangSet);
         }

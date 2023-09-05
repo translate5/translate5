@@ -42,12 +42,44 @@ class editor_Services_Manager {
     const CLS_CONNECTOR = '_Connector';
 
     public const SERVICE_OPENTM2 = 'editor_Services_OpenTM2';
+
+    /**
+     * Generates a translated error-msg to report TM-update errors to the frontend
+     * @param array|stdClass|null $errors
+     * @param string|null $errorMsg
+     * @param string $errorType
+     * @param string $origin
+     * @return void
+     * @throws Zend_Exception
+     */
+    public static function reportTMUpdateError(array|stdClass $errors = null, string $errorMsg = null, string $errorType = 'Error', string $origin = 'core'): void
+    {
+        $translate= ZfExtended_Zendoverwrites_Translate::getInstance();
+        $msg =
+            $translate->_('Das Segment konnte nicht ins TM gespeichert werden')
+            . '. '
+            . $translate->_('Bitte kontaktieren Sie Ihren Administrator')
+            . '!<br />'
+            . $translate->_('Gemeldete Fehler')
+            . ':';
+        if(empty($errors)){
+            $data = [
+                'type' => $errorType,
+                'error' => $errorMsg,
+            ];
+        } else {
+            $data = (is_array($errors)) ? $errors : [$errors];
+        }
+        /* @var ZfExtended_Models_Messages $messages */
+        $messages = Zend_Registry::get('rest_messages');
+        $messages->addError($msg, $origin, null, $data);
+    }
     
     /**
      * The registered services are currently hardcoded
      * @var array
      */
-    static protected $registeredServices = array(
+    protected static $registeredServices = [
         self::SERVICE_OPENTM2,
         'editor_Services_Moses',
         'editor_Services_LucyLT',
@@ -56,7 +88,7 @@ class editor_Services_Manager {
         'editor_Services_Google',
         'editor_Services_Microsoft'
         //'editor_Services_DummyFileTm',
-    );
+    ];
 
     public function getAll() {
         return self::$registeredServices;
@@ -295,13 +327,7 @@ class editor_Services_Manager {
                 $connector->update($segment);
             }
         }, function(Exception $e, editor_Models_LanguageResources_LanguageResource $languageResource, ZfExtended_Logger_Event $event) {
-            /** @var ZfExtended_Models_Messages $messages */
-            $messages = Zend_Registry::get('rest_messages');
-            $msg = 'Das Segment konnte nicht ins TM gespeichert werden! Bitte kontaktieren Sie Ihren Administrator! <br />Gemeldete Fehler:';
-            $messages->addError($msg, data: [
-                'type' => $event->eventCode,
-                'error' => $event->message,
-            ]);
+            self::reportTMUpdateError(null, $event->message, $event->eventCode);
         });
     }
 

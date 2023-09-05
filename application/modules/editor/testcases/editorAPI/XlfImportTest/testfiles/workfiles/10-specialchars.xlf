@@ -12,6 +12,12 @@
             <target>&#xE000;03:  08:  09: 	 0b:  0c:  c285:  c2a0:   e19a80:   e1a08e: ᠎ e28080:   e28081:   e28082:   e28083:   e28084:   e28085:   e28086:   e28087:   e28088:   e28089:   e2808a:   e2808b: ​ e280a8:
                 e280a9:   e280af:   e2819f:   e38080: 　 efbbbf: ﻿ </target>
         </trans-unit>
+
+        <trans-unit id="2" datatype="html">
+            <source>Test TRANSLATE-3450<x id="START_TAG_STRONG" ctype="x-strong" equiv-text="&lt;strong&gt;"/><x id="INTERPOLATION" equiv-text="ytes$ | async) || 0 | filesize }}"/><x id="CLOSE_TAG_STRONG" ctype="x-strong" equiv-text="used&lt;/div"/> due <x id="START_TAG_STRONG" ctype="x-strong" equiv-text="&lt;strong&gt;"/><x id="INTERPOLATION_1" equiv-text="Bytes$ | async) || 0 | filesize }}"/><x id="CLOSE_TAG_STRONG" ctype="x-strong" equiv-text="used&lt;/div"/> wrong short tag numbers</source>
+        </trans-unit>
+
+
     </body>
   </file>
 </xliff>

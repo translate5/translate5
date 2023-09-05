@@ -106,6 +106,7 @@ class MaintenanceCommand extends Translate5AbstractCommand {
             }
             $msg[] = '';
             $this->io->text($msg);
+            $this->printNotes();
             return 0;
         }
         $startTimeStamp = strtotime($conf->startDate);
@@ -127,6 +128,9 @@ class MaintenanceCommand extends Translate5AbstractCommand {
             '        <info>receivers:</> '.$conf->announcementMail,
             '',
         ]);
+
+        $this->printNotes();
+
         return 0;
     }
 }

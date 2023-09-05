@@ -83,19 +83,24 @@ final class Roles extends BaseRoles {
     public static function getFrontendRoles(): array
     {
         $allRoles = ZfExtended_Acl::getInstance()->getAllRoles();
-        $fronendRoles = [];
+        $frontendRoles = [];
         foreach(static::$frontendOrder as $role){
             if(in_array($role, $allRoles)){
-                $fronendRoles[] = $role;
+                $frontendRoles[] = $role;
             }
         }
-        // may someone adds new roles and forgets to put them in the order here ... clientpm-roles must not be added !
+        // may someone adds new roles and forgets to put them in the order here
+        // Important: clientpm-roles must not be added also not the internal roles "no-rights" and "basic"
         foreach($allRoles as $role){
-            if(!str_starts_with($role, 'clientpm_') && !in_array($role, $fronendRoles)){
-                $fronendRoles[] = $role;
+            if(!str_starts_with($role, 'clientpm_')
+                && $role != self::BASIC
+                && $role != self::NORIGHTS
+                && !in_array($role, $frontendRoles)){
+
+                $frontendRoles[] = $role;
             }
         }
-        return $fronendRoles;
+        return $frontendRoles;
     }
 
     /**
