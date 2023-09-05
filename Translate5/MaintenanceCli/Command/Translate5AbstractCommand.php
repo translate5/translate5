@@ -256,4 +256,16 @@ END LICENSE AND COPYRIGHT
         }
         return false;
     }
+
+    /**
+     * Prints the instance specific client-specific/instance-notes.md file if any
+     * @return void
+     */
+    protected function printNotes() {
+        $notesFile = APPLICATION_ROOT.'/client-specific/instance-notes.md';
+        if (file_exists($notesFile)) {
+            $this->io->section('Important instance notes (client-specific/instance-notes.md)');
+            $this->io->writeln(file_get_contents($notesFile));
+        }
+    }
 }
