@@ -9086,6 +9086,18 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
                 <source>App-Token kopieren</source>
                 <target>App-Token kopieren</target>
             </trans-unit>
+            <trans-unit id='RGFzIFNlZ21lbnQga29ubnRlIG5pY2h0IGlucyBUTSBnZXNwZWljaGVydCB3ZXJkZW4='>
+                <source>Das Segment konnte nicht ins TM gespeichert werden</source>
+                <target>Das Segment konnte nicht ins TM gespeichert werden</target>
+            </trans-unit>
+            <trans-unit id='Qml0dGUga29udGFrdGllcmVuIFNpZSBJaHJlbiBBZG1pbmlzdHJhdG9y'>
+                <source>Bitte kontaktieren Sie Ihren Administrator</source>
+                <target>Bitte kontaktieren Sie Ihren Administrator</target>
+            </trans-unit>
+            <trans-unit id='R2VtZWxkZXRlIEZlaGxlcg=='>
+                <source>Gemeldete Fehler</source>
+                <target>Gemeldete Fehler</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

@@ -65,7 +65,8 @@ class editor_Models_Export_Exported_TransferWorker extends editor_Models_Export_
         $this->init($taskGuid, [
             'folderToGetTbx' => $parameters['exportFolder'],
             'cookie' => $parameters['cookie'],
-            'url' => $workerServer . APPLICATION_RUNDIR . '/editor/'
+            'url' => $workerServer . APPLICATION_RUNDIR . '/editor/',
+            'userId' => $parameters['userId'],
         ]);
     }
 
@@ -98,6 +99,15 @@ class editor_Models_Export_Exported_TransferWorker extends editor_Models_Export_
         $targetLangId = $task->getTargetLang();
         $targetLangRfc = ZfExtended_Factory::get('editor_Models_Languages')->load($targetLangId)->rfc5646;
 
+        // Prepare params to spoof/amend inside tbx
+        $date = date('Y-10-03 H:i:s');
+        $user = ZfExtended_Factory::get(ZfExtended_Models_User::class);
+        $user->load($parameters['userId']);
+        $userGuid = $user->getUserGuid();
+        $userName = $user->getUserName();
+        $userEmail = $user->getEmail();
+        $userRoles = join(',', $user->getRoles());
+
         // Foreach exported tbx file
         foreach ($tbxA as $idx => $tbx) {
 
@@ -109,8 +119,17 @@ class editor_Models_Export_Exported_TransferWorker extends editor_Models_Export_
             // Get raw tbx contents
             $raw = file_get_contents($tbx);
 
-            // Spoof rfc5646-code of source language with target language one
+            // Update <transacGrp>-nodes with current date and user info who it doing re-import
+            $raw = $this->updateTransacGrp($raw, '<termEntry .*?<langSet ', $date, $userName, $userGuid, 'modification');
+            $raw = $this->updateTransacGrp($raw, '<langSet .*?<tig'       , $date, $userName, $userGuid);
+            $raw = $this->updateTransacGrp($raw, '<tig.*?</tig>'          , $date, $userName, $userGuid);
+
+            // Append <refObject id="$userGuid">-node if need, inside <refObjectList type="respPerson">-node if exists
+            $raw = $this->appendRefObject($raw, $userGuid, $userName, $userEmail, $userRoles);
+
+            // Spoof rfc5646-code of source language with target language's one
             $raw = preg_replace('~(<langSet.+?xml:lang=")([^"]+)(".*?>)~', '$1' . $targetLangRfc . '$3', $raw);
+
 
             // TODO FIXME: this Code should be abstarcted to an ZfExtended API class, see also editor_Plugins_InstantTranslate_Filetranslationhelper
 
@@ -134,4 +153,50 @@ class editor_Models_Export_Exported_TransferWorker extends editor_Models_Export_
             }
         }
     }
+
+    /**
+     * Update transacGrp-nodes found within given $tbx with new date and user info
+     *
+     * @param string $tbx
+     * @param string $wrap
+     * @param string $date
+     * @param string $userName
+     * @param string $userGuid
+     * @param string $type Can be 'origination', 'modification' or empty string (by default)
+     * @return string
+     */
+    public function updateTransacGrp(string $tbx, string $wrap, string $date, string $userName, string $userGuid, string $type = '') : string {
+        $type = $type ? "\s*?<transac type=\"transactionType\">$type</transac>" : '';
+        return preg_replace_callback("~$wrap~s",
+            fn($w) => preg_replace_callback("~<transacGrp>$type.*?</transacGrp>~s",
+                fn($m) => preg_replace('~(target=")[^"]*?("[^>]*?>).*?(</transacNote>.*?<date>).*?(</date>)~s',
+                    '${1}' . $userGuid . '${2}' . $userName . '${3}' . $date . '${4}'
+                    , $m[0]),
+                $w[0])
+            , $tbx);
+    }
+
+    /**
+     * Append <refObject id="$userGuid">-node if need, inside <refObjectList type="respPerson">-node if exists
+     *
+     * @param string $tbx Raw tbx contents
+     * @param string $userGuid
+     * @param string $userName
+     * @param string $userEmail
+     * @param string $userRole
+     * @return string
+     */
+    public function appendRefObject(string $tbx, string $userGuid, string $userName, string $userEmail, string $userRole) : string {
+        return preg_replace_callback('~(<refObjectList type="respPerson">)(.*?)(</refObjectList>)~s', fn($r) =>
+            preg_match('~<refObject id="' . preg_quote($userGuid, '~') .'">~', $r[2])
+                ? $r[0]
+                : $r[1] . $r[2] . "    <refObject id=\"$userGuid\">
+                        <item type=\"fn\">$userName</item>
+                        <item type=\"email\">$userEmail</item>
+                        <item type=\"role\">$userRole</item>
+                    </refObject>
+                " . $r[3]
+        , $tbx);
+    }
+
 }

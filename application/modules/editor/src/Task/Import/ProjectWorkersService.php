@@ -138,7 +138,11 @@ class ProjectWorkersService
 
             $workerModel = ZfExtended_Factory::get(ZfExtended_Models_Worker::class);
             try {
-                $workerModel->loadFirstOf(editor_Models_Import_Worker::class, $model->getTaskGuid());
+                $workerModel->loadFirstOf(
+                    editor_Models_Import_Worker::class,
+                    $model->getTaskGuid(),
+                    [ZfExtended_Models_Worker::STATE_PREPARE]
+                );
                 $worker = ZfExtended_Worker_Abstract::instanceByModel($workerModel);
                 $worker && $worker->schedulePrepared();
 

@@ -82,14 +82,14 @@ class PivotQueuer
         if ($task->isImporting()) {
             //on import, we use the import worker as parentId
             $parentWorkerId = $this->fetchImportWorkerId($task->getTaskGuid());
+            $workerState = null;
         } else {
             // crucial: add a different behaviour for the workers when performing an operation
             $workerParameters['workerBehaviour'] = 'ZfExtended_Worker_Behaviour_Default';
             // this creates the operation start/finish workers
-            $parentWorkerId = editor_Task_Operation::create(
-                editor_Task_Operation::PIVOT_PRE_TRANSLATION,
-                $task
-            );
+            $operation = editor_Task_Operation::create(editor_Task_Operation::PIVOT_PRE_TRANSLATION, $task);
+            $parentWorkerId = $operation->getWorkerId();
+            $workerState = ZfExtended_Models_Worker::STATE_PREPARE;
         }
 
         $user = ZfExtended_Authentication::getInstance()->getUser();
@@ -125,9 +125,13 @@ class PivotQueuer
 
         $worker = ZfExtended_Factory::get(PausePivotWorker::class);
         $worker->init($task->getTaskGuid(), [PauseWorker::PROCESSOR => PausePivotProcessor::class]);
-        $worker->queue($parentWorkerId);
+        $worker->queue($parentWorkerId, $workerState);
 
-        $pivotWorker->queue($parentWorkerId, null, false);
+        $pivotWorker->queue($parentWorkerId, $workerState, false);
+
+        if (!$task->isImporting()) {
+            $operation->start();
+        }
     }
 
     /**

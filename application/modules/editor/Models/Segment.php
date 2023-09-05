@@ -1829,7 +1829,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract
     {
         $result = parent::getModifiedData(); //assoc mit key = dataindex und value = modValue
         $modKeys = array_keys($result);
-        $modFields = array_unique(array_diff($this->modified, $modKeys));
+        $modFields = array_unique(array_diff(array_keys($this->modified), $modKeys));
         foreach ($modFields as $field) {
             if ($this->segmentFieldManager->getDataLocationByKey($field) !== false) {
                 $result[$field] = $this->get($field);
