@@ -49,6 +49,11 @@ Ext.define('Editor.view.admin.customer.ViewController', {
             'button[iconCls="x-toolbar-more-icon"] > menu > menuitem': {
                 click: menuitem => menuitem.masterComponent.fireEvent('click')
             }
+        },
+        store:{
+            'customersStore': {
+                filterchange: 'onCustomerStoreFilterChange'
+            }
         }
     },
 
@@ -310,4 +315,45 @@ Ext.define('Editor.view.admin.customer.ViewController', {
 
         window.open(url);
     },
+
+    /**
+     * Auto-select first record if current selection do not match the filters
+     *
+     * @param store
+     */
+    onCustomerStoreFilterChange: function(store) {
+
+        // Get selection model
+        var sm = this.getView().down('#customerPanelGrid').getSelectionModel();
+
+        // If we have some record selected
+        if (sm.getSelection().length) {
+
+            // Get that record
+            var record = sm.getSelection()[0];
+
+            // If it's still in the store despite the filters - do nothing
+            if (~store.findExact('id', record.getId())) {
+
+            // Else if not, but store is not empty
+            } else if (store.getCount()){
+
+                // Select first record we have
+                sm.select(store.first());
+
+            // Else if store is empty
+            } else {
+
+                // Clear selection
+                sm.deselect([record]);
+
+                // Reset right panel
+                this.cancelEdit();
+            }
+
+        // Ele select first record
+        } else {
+            sm.select(store.first());
+        }
+    }
 });
