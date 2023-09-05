@@ -685,7 +685,7 @@ https://confluence.translate5.net/display/TAD/EventCodes
 #### Plug-In TermPortal
 | EventCode               | Context            | EventMessage                                                                 | Description/Solution                                                                                           |
 |:------------------------|:-------------------|:-----------------------------------------------------------------------------|:---------------------------------------------------------------------------------------------------------------|
-| <a id="E1516"></a>E1516 | Plug-In TermPortal | Default user to be assigned as PM for TermTranslation-projects - was deleted | Change runtimeOptions.plugins.TermPortal.termsTransferDefaultPM to one of existing users in system preferences |
+| <a id="E1516"></a>E1516 | Plug-In TermPortal | Currently, there is no project manager in the system configuration to which term translation projects are automatically assigned. Therefore, no term translation project can be created. Please define such a user in the system configuration or have a user defined if you lack the rights to do so. The corresponding parameter in the system configuration is: runtimeOptions.plugins.TermPortal.termsTransferDefaultPM | Change runtimeOptions.plugins.TermPortal.termsTransferDefaultPM to one of existing users in system preferences |
 
 #### Plug-In Connect Worldserver
 | EventCode               | Context                     | EventMessage                                                                                                                                                                                     | Description/Solution                                                                             |
