@@ -53,7 +53,7 @@ declare(strict_types=1);
 namespace MittagQI\Translate5\NumberProtection\Protector;
 
 use editor_Models_Languages;
-use MittagQI\Translate5\NumberProtection\Model\LanguageNumberFormat as LanguageFormat;
+use MittagQI\Translate5\NumberProtection\Model\NumberFormatDto;
 use MittagQI\Translate5\NumberProtection\Object\FloatObject;
 
 class FloatProtector extends AbstractProtector
@@ -65,21 +65,21 @@ class FloatProtector extends AbstractProtector
 
     protected function composeNumberTag(
         string $number,
-        LanguageFormat $sourceFormat,
+        NumberFormatDto $sourceFormat,
         ?editor_Models_Languages $sourceLang,
         ?editor_Models_Languages $targetLang,
         ?string $targetFormat
     ): string {
         $float = null;
 
-        if (!$sourceFormat->getKeepAsIs()) {
+        if (!$sourceFormat->keepAsIs) {
             $float = FloatObject::parse($number, $sourceLang?->getRfc5646());
         }
 
         return sprintf(
             $this->tagFormat(),
             self::getType(),
-            $sourceFormat->getName(),
+            $sourceFormat->name,
             $number,
             $float ? $float->format(format: '#.#') : '',
             $this->getTargetFloat($float, $targetFormat, $targetLang)

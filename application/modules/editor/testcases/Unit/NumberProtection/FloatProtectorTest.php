@@ -53,8 +53,8 @@ declare(strict_types=1);
 namespace MittagQI\Translate5\Test\Unit\NumberProtection;
 
 use editor_Models_Languages;
-use MittagQI\Translate5\NumberProtection\Model\LanguageNumberFormat as LanguageFormat;
-use MittagQI\Translate5\NumberProtection\Model\LanguageNumberFormatRepository;
+use MittagQI\Translate5\NumberProtection\Model\NumberFormatDto;
+use MittagQI\Translate5\NumberProtection\Model\NumberFormatRepository;
 use MittagQI\Translate5\NumberProtection\Protector\FloatProtector;
 use PHPUnit\Framework\TestCase;
 
@@ -66,14 +66,11 @@ class FloatProtectorTest extends TestCase
     public function testProtectDefaultFormats(
         string $number,
         string $expected,
-        LanguageFormat $sourceFormat,
-        ?LanguageFormat $targetFormat,
+        NumberFormatDto $sourceFormat,
+        ?string $targetFormat,
         ?editor_Models_Languages $targetLang
     ): void {
-        $repo = $this->createConfiguredMock(
-            LanguageNumberFormatRepository::class,
-            ['findForLangOrMajorBy' => $targetFormat]
-        );
+        $repo = $this->createConfiguredMock(NumberFormatRepository::class, ['findOutputFormat' => $targetFormat]);
         $protected = (new FloatProtector($repo))->protect($number, $sourceFormat, null, $targetLang);
 
         self::assertSame($expected, $protected);
@@ -81,18 +78,13 @@ class FloatProtectorTest extends TestCase
 
     public function defaultDataToProtect(): iterable
     {
-        $sourceFormat = $this->createConfiguredMock(LanguageFormat::class, []);
-        $sourceFormat
-            ->method('__call')
-            ->willReturnCallback(function($name, $args) {
-                return match ($name) {
-                    'getName' => 'test-default',
-                    'getRegex' => '/\b([1-9]\d{0,2},){1}(\d{3},)*\d{3}\.\d+\b/u',
-                    'getFormat' => null,
-                    'getKeepAsIs' => false,
-                    'getType' => 'float',
-                };
-            });
+        $sourceFormat = new NumberFormatDto(
+            'float',
+             'test-default',
+            '/\b([1-9]\d{0,2},){1}(\d{3},)*\d{3}\.\d+\b/u',
+            null,
+            false,
+        );
 
         yield 'float' => [
             'number' => '123,456.78',
@@ -114,14 +106,7 @@ class FloatProtectorTest extends TestCase
             'targetLang' => $targetLangDe,
         ];
 
-        $targetFormat = $this->createConfiguredMock(LanguageFormat::class, []);
-        $targetFormat
-            ->method('__call')
-            ->willReturnCallback(function($name, $args) {
-                return match ($name) {
-                    'getFormat' => '#,###,####0.###',
-                };
-            });
+        $targetFormat = '#,###,####0.###';
 
         yield 'target format #,###,####0.###' => [
             'number' => '1,212,312,345.78',
@@ -131,18 +116,13 @@ class FloatProtectorTest extends TestCase
             'targetLang' => $targetLangDe,
         ];
 
-        $sourceFormatKeepAsIs = $this->createConfiguredMock(LanguageFormat::class, []);
-        $sourceFormatKeepAsIs
-            ->method('__call')
-            ->willReturnCallback(function($name, $args) {
-                return match ($name) {
-                    'getName' => 'test-default',
-                    'getRegex' => '/\b\d{4}\/(0[1-9]|[1-2][0-9]|3[0-1]|[1-9])\/(0[1-9]|1[0-2]|[1-9])\b/',
-                    'getFormat' => 'Y/d/m',
-                    'getKeepAsIs' => true,
-                    'getType' => 'date',
-                };
-            });
+        $sourceFormatKeepAsIs = new NumberFormatDto(
+            'float',
+            'test-default',
+            '/\b([1-9]\d{0,2},){1}(\d{3},)*\d{3}\.\d+\b/u',
+            null,
+            true,
+        );
 
         yield 'date. keep as is' => [
             'number' => '123,456.78',

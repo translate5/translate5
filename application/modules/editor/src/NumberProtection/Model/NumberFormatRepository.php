@@ -50,58 +50,76 @@ END LICENSE AND COPYRIGHT
 */
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\NumberProtection\Protector;
+namespace MittagQI\Translate5\NumberProtection\Model;
 
 use editor_Models_Languages;
-use MittagQI\Translate5\NumberProtection\Model\NumberFormatDto;
-use NumberFormatter;
+use ZfExtended_Factory;
+use ZfExtended_Models_Entity_NotFoundException;
 
-class IntegerProtector extends FloatProtector
+class NumberFormatRepository
 {
-    public static function getType(): string
+    /**
+     * @return iterable<NumberFormatDto>
+     */
+    public function getAll(?editor_Models_Languages $sourceLang): iterable
     {
-        return 'integer';
+        $dbMapping = ZfExtended_Factory::get(InputMapping::class)->db;
+        $dbNumberFormat = ZfExtended_Factory::get(LanguageNumberFormat::class)->db;
+        $numberFormatTable = ZfExtended_Factory::get(LanguageNumberFormat::class)->db->info($dbNumberFormat::NAME);
+
+        $selects = [];
+        $selects[] = $dbNumberFormat->select()
+            ->from(['format' => $numberFormatTable], ['format.*'])
+            ->where('isDefault = true');
+
+        if (null !== $sourceLang) {
+            $selects[] = $dbMapping->select()
+                ->setIntegrityCheck(false)
+                ->from(['mapping' => $dbMapping->info($dbMapping::NAME)])
+                ->join(['format' => $numberFormatTable], 'format.id = mapping.numberFormatId', ['format.*'])
+                ->where('mapping.languageId = ?', $sourceLang->getId());
+        }
+
+        $select = $dbNumberFormat->select()->union($selects)->order('priority desc');
+
+        foreach ($dbNumberFormat->fetchAll($select) as $formatData) {
+            yield NumberFormatDto::fromRow($formatData);
+        }
     }
 
-    protected function composeNumberTag(
-        string $number,
-        NumberFormatDto $sourceFormat,
-        ?editor_Models_Languages $sourceLang,
-        ?editor_Models_Languages $targetLang,
-        ?string $targetFormat
-    ): string {
-        $integer = null;
-
-        if (!$sourceFormat->keepAsIs) {
-            $fmt = NumberFormatter::create('en', NumberFormatter::DECIMAL);
-            $integer = $fmt->parse(preg_replace('/[^\d]/u', '', $number), NumberFormatter::TYPE_INT64);
+    public function findOutputFormat(
+        editor_Models_Languages $targetLang,
+        string $type,
+        string $name
+    ): ?string {
+        $lnf = ZfExtended_Factory::get(LanguageNumberFormat::class);
+        try {
+            $lnf->loadBy($type, $name);
+        } catch (ZfExtended_Models_Entity_NotFoundException) {
+            return null;
         }
 
-        return sprintf(
-            $this->tagFormat(),
-            self::getType(),
-            $sourceFormat->name,
-            $number,
-            (string) $integer,
-            $this->getTargetInteger($integer, $targetFormat, $targetLang)
-        );
+        $mapping = $this->findOutputMappingBy((int) $targetLang->getId(), (int) $lnf->getId());
+        // if not found - try to look by major lang
+        if (null === $mapping) {
+            $major = ZfExtended_Factory::get(editor_Models_Languages::class);
+            $major->loadByRfc5646($targetLang->getMajorRfc5646());
+
+            $mapping = $this->findOutputMappingBy((int) $major->getId(), (int) $lnf->getId());
+        }
+
+        return $mapping?->getFormat();
     }
 
-    protected function getTargetInteger(
-        ?int $integer,
-        ?string $targetFormat,
-        ?editor_Models_Languages $targetLang
-    ): string {
-        if (null === $integer) {
-            return '';
+    public function findOutputMappingBy(int $langId, int $numberFormatId): ?OutputMapping
+    {
+        $mapping = ZfExtended_Factory::get(OutputMapping::class);
+        try {
+            $mapping->loadBy($langId, $numberFormatId);
+
+            return $mapping;
+        } catch (ZfExtended_Models_Entity_NotFoundException) {
+            return null;
         }
-
-        if (null === $targetLang) {
-            return '';
-        }
-
-        $fmt = NumberFormatter::create($targetLang->getRfc5646(), NumberFormatter::PATTERN_DECIMAL, $targetFormat);
-
-        return $fmt->format($integer);
     }
 }

@@ -53,8 +53,8 @@ declare(strict_types=1);
 namespace MittagQI\Translate5\Test\Unit\NumberProtection;
 
 use editor_Models_Languages;
-use MittagQI\Translate5\NumberProtection\Model\LanguageNumberFormat as LanguageFormat;
-use MittagQI\Translate5\NumberProtection\Model\LanguageNumberFormatRepository;
+use MittagQI\Translate5\NumberProtection\Model\NumberFormatRepository;
+use MittagQI\Translate5\NumberProtection\Model\NumberFormatDto;
 use MittagQI\Translate5\NumberProtection\NumberProtector;
 use MittagQI\Translate5\NumberProtection\Protector\NumberProtectorInterface;
 use MittagQI\Translate5\NumberProtection\Tag\NumberTag;
@@ -72,15 +72,15 @@ class NumberProtectorTest extends TestCase
             }
 
             public function protect(
-                string $textNode,
-                LanguageFormat $languageFormat,
+                string $number,
+                NumberFormatDto $languageFormat,
                 ?editor_Models_Languages $sourceLang,
                 ?editor_Models_Languages $targetLang
             ): string {
                 return 'test';
             }
         };
-        $numberFormatRepository = $this->createConfiguredMock(LanguageNumberFormatRepository::class, []);
+        $numberFormatRepository = $this->createConfiguredMock(NumberFormatRepository::class, []);
         $languageRepository = $this->createConfiguredMock(LanguageRepository::class, []);
 
         $protector = new NumberProtector([$processor], $numberFormatRepository, $languageRepository);
@@ -99,15 +99,15 @@ class NumberProtectorTest extends TestCase
             }
 
             public function protect(
-                string $textNode,
-                LanguageFormat $languageFormat,
+                string $number,
+                NumberFormatDto $languageFormat,
                 ?editor_Models_Languages $sourceLang,
                 ?editor_Models_Languages $targetLang
             ): string {
-                return $textNode;
+                return $number;
             }
         };
-        $numberFormatRepository = $this->createConfiguredMock(LanguageNumberFormatRepository::class, []);
+        $numberFormatRepository = $this->createConfiguredMock(NumberFormatRepository::class, []);
         $languageRepository = $this->createConfiguredMock(LanguageRepository::class, []);
 
         $protector = new NumberProtector([$processor], $numberFormatRepository, $languageRepository);

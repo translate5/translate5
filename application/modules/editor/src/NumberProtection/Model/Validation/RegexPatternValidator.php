@@ -50,58 +50,28 @@ END LICENSE AND COPYRIGHT
 */
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\NumberProtection\Protector;
+namespace MittagQI\Translate5\NumberProtection\Model\Validation;
 
-use editor_Models_Languages;
-use MittagQI\Translate5\NumberProtection\Model\NumberFormatDto;
-use NumberFormatter;
+use Zend_Validate_Abstract;
 
-class IntegerProtector extends FloatProtector
+class RegexPatternValidator extends Zend_Validate_Abstract
 {
-    public static function getType(): string
+    private const INVALID = 'invalid';
+
+    protected $_messageTemplates = [
+        self::INVALID   => "Ungültiger Regulärer Ausdruck",
+    ];
+
+    public function isValid($value)
     {
-        return 'integer';
-    }
+        $this->_setValue($value);
 
-    protected function composeNumberTag(
-        string $number,
-        NumberFormatDto $sourceFormat,
-        ?editor_Models_Languages $sourceLang,
-        ?editor_Models_Languages $targetLang,
-        ?string $targetFormat
-    ): string {
-        $integer = null;
-
-        if (!$sourceFormat->keepAsIs) {
-            $fmt = NumberFormatter::create('en', NumberFormatter::DECIMAL);
-            $integer = $fmt->parse(preg_replace('/[^\d]/u', '', $number), NumberFormatter::TYPE_INT64);
+        if (false !== @preg_match($value, '')) {
+            return true;
         }
 
-        return sprintf(
-            $this->tagFormat(),
-            self::getType(),
-            $sourceFormat->name,
-            $number,
-            (string) $integer,
-            $this->getTargetInteger($integer, $targetFormat, $targetLang)
-        );
-    }
+        $this->_error(self::INVALID);
 
-    protected function getTargetInteger(
-        ?int $integer,
-        ?string $targetFormat,
-        ?editor_Models_Languages $targetLang
-    ): string {
-        if (null === $integer) {
-            return '';
-        }
-
-        if (null === $targetLang) {
-            return '';
-        }
-
-        $fmt = NumberFormatter::create($targetLang->getRfc5646(), NumberFormatter::PATTERN_DECIMAL, $targetFormat);
-
-        return $fmt->format($integer);
+        return false;
     }
 }

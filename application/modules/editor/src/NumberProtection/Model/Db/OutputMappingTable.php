@@ -50,65 +50,11 @@ END LICENSE AND COPYRIGHT
 */
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\NumberProtection\Model;
+namespace MittagQI\Translate5\NumberProtection\Model\Db;
+use Zend_Db_Table_Abstract;
 
-use editor_Models_Languages;
-use ZfExtended_Factory;
-use ZfExtended_Models_Entity_NotFoundException;
-
-class LanguageNumberFormatRepository
+class OutputMappingTable extends Zend_Db_Table_Abstract
 {
-    /**
-     * @return iterable<LanguageNumberFormat>
-     */
-    public function getAll(?editor_Models_Languages $sourceLang): iterable
-    {
-        $db = ZfExtended_Factory::get(LanguageNumberFormat::class)->db;
-        $s = $db->select()->order('priority desc');
-
-        if (null !== $sourceLang) {
-            $s->where('languageId = ?', $sourceLang->getId())
-                ->orWhere('(languageId IS NULL and name = ?)', 'default');
-        }
-
-        $formats = $db->fetchAll($s);
-
-        $format = ZfExtended_Factory::get(LanguageNumberFormat::class);
-
-        foreach ($formats as $formatData) {
-            $format = clone $format;
-            $format->init($formatData->toArray());
-
-            yield $format;
-        }
-    }
-
-    public function findForLangOrMajorBy(
-        editor_Models_Languages $targetLang,
-        string $type,
-        string $name
-    ): ?LanguageNumberFormat {
-        $format = $this->findBy((int) $targetLang->getId(), $type, $name);
-
-        if (null === $format) {
-            $major = \ZfExtended_Factory::get(editor_Models_Languages::class);
-            $major->loadByRfc5646($targetLang->getMajorRfc5646());
-
-            $format = $this->findBy((int) $major->getId(), $type, $name);
-        }
-
-        return $format;
-    }
-
-    public function findBy(int $langId, string $type, string $name): ?LanguageNumberFormat
-    {
-        $lnf = ZfExtended_Factory::get(LanguageNumberFormat::class);
-        try {
-            $lnf->loadBy($langId, $type, $name);
-
-            return $lnf;
-        } catch (ZfExtended_Models_Entity_NotFoundException) {
-            return null;
-        }
-    }
+    protected $_name = 'LEK_language_number_format_output_mapping';
+    public $_primary = 'id';
 }

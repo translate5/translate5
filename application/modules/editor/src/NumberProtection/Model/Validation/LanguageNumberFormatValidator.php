@@ -26,7 +26,7 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-namespace MittagQI\Translate5\NumberProtection\Model;
+namespace MittagQI\Translate5\NumberProtection\Model\Validation;
 
 use MittagQI\Translate5\NumberProtection\NumberProtector;
 use Zend_Validate;

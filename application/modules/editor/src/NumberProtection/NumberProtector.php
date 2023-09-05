@@ -59,8 +59,8 @@ use DOMNode;
 use DOMText;
 use editor_Models_Import_FileParser_XmlParser as XmlParser;
 use editor_Models_Languages;
-use MittagQI\Translate5\NumberProtection\Model\LanguageNumberFormat as LanguageFormat;
-use MittagQI\Translate5\NumberProtection\Model\LanguageNumberFormatRepository;
+use MittagQI\Translate5\NumberProtection\Model\NumberFormatRepository;
+use MittagQI\Translate5\NumberProtection\Model\NumberFormatDto;
 use MittagQI\Translate5\NumberProtection\Protector\DateProtector;
 use MittagQI\Translate5\NumberProtection\Protector\FloatProtector;
 use MittagQI\Translate5\NumberProtection\Protector\IntegerProtector;
@@ -89,7 +89,7 @@ class NumberProtector implements ProtectorInterface
      */
     public function __construct(
         array $protectors,
-        private LanguageNumberFormatRepository $numberFormatRepository,
+        private NumberFormatRepository $numberFormatRepository,
         private LanguageRepository $languageRepository
     ) {
         foreach ($protectors as $protector) {
@@ -100,7 +100,7 @@ class NumberProtector implements ProtectorInterface
 
     public static function create(): self
     {
-        $numberFormatRepository = new LanguageNumberFormatRepository();
+        $numberFormatRepository = new NumberFormatRepository();
 
         return new self(
             [
@@ -199,12 +199,11 @@ class NumberProtector implements ProtectorInterface
         $this->loadXML("<node>$textNode</node>");
 
         foreach ($this->numberFormatRepository->getAll($sourceLang) as $langFormat) {
-            if (!preg_match($langFormat->getRegex(), $this->document->textContent)) {
+            if (!preg_match($langFormat->regex, $this->document->textContent)) {
                 continue;
             }
 
             $this->processElement($this->document->documentElement, $langFormat, $sourceLang, $targetLang);
-
             // reloading document with potential new tags
             $this->loadXML($this->getCurrentTextNode());
         }
@@ -225,14 +224,13 @@ class NumberProtector implements ProtectorInterface
 
     private function processElement(
         DOMNode $element,
-        LanguageFormat $langFormat,
+        NumberFormatDto $langFormat,
         ?editor_Models_Languages $sourceLang,
         ?editor_Models_Languages $targetLang
     ): void {
         // we can't remove them in protectNumbers() because it will break `$element->childNodes` iterator,
         // so we remove them after and replace original text node with a couple of generated nodes in protectNumbers()
         $nodesToRemove = [];
-
         foreach ($element->childNodes as $child) {
             if ($child instanceof DOMElement) {
                 $this->processElement($child, $langFormat, $sourceLang, $targetLang);
@@ -255,16 +253,16 @@ class NumberProtector implements ProtectorInterface
 
     private function protectNumbers(
         DOMCharacterData $text,
-        LanguageFormat $langFormat,
+        NumberFormatDto $langFormat,
         ?editor_Models_Languages $sourceLang,
         ?editor_Models_Languages $targetLang
     ): bool {
-        if (!preg_match_all($langFormat->getRegex(), $text->textContent, $matches)) {
+        if (!preg_match_all($langFormat->regex, $text->textContent, $matches)) {
             return false;
         }
 
         $numbers = $matches[0];
-        $parts = preg_split($langFormat->getRegex(), $text->textContent);
+        $parts = preg_split($langFormat->regex, $text->textContent);
 
         $matchCount = count($numbers);
 
@@ -291,14 +289,14 @@ class NumberProtector implements ProtectorInterface
 
     private function protectNumber(
         string $number,
-        LanguageFormat $langFormat,
+        NumberFormatDto $langFormat,
         ?editor_Models_Languages $sourceLang,
         ?editor_Models_Languages $targetLang
     ): DOMNode {
         if (!isset($this->protectedNumbers[$number])) {
             try {
                 $protectedNumber = $this
-                    ->protectors[$langFormat->getType()]
+                    ->protectors[$langFormat->type]
                     ->protect($number, $langFormat, $sourceLang, $targetLang);
             } catch (NumberParsingException) {
                 return new DOMText($number);

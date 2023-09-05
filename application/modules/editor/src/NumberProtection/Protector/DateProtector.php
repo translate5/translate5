@@ -54,8 +54,8 @@ namespace MittagQI\Translate5\NumberProtection\Protector;
 
 use DateTime;
 use editor_Models_Languages;
-use MittagQI\Translate5\NumberProtection\Model\LanguageNumberFormat;
 use IntlDateFormatter;
+use MittagQI\Translate5\NumberProtection\Model\NumberFormatDto;
 use MittagQI\Translate5\NumberProtection\NumberParsingException;
 
 class DateProtector extends AbstractProtector
@@ -67,15 +67,15 @@ class DateProtector extends AbstractProtector
 
     protected function composeNumberTag(
         string $number,
-        LanguageNumberFormat $sourceFormat,
+        NumberFormatDto $sourceFormat,
         ?editor_Models_Languages $sourceLang,
         ?editor_Models_Languages $targetLang,
         ?string $targetFormat
     ): string {
         $date = null;
 
-        if (!empty($sourceFormat->getFormat()) && !$sourceFormat->getKeepAsIs()) {
-            $date = DateTime::createFromFormat($sourceFormat->getFormat(), $number);
+        if (!empty($sourceFormat->format) && !$sourceFormat->keepAsIs) {
+            $date = DateTime::createFromFormat($sourceFormat->format, $number);
 
             // 31.11.2023 -> 12.01.2023
             $errArr = DateTime::getLastErrors();
@@ -87,7 +87,7 @@ class DateProtector extends AbstractProtector
         return sprintf(
             $this->tagFormat(),
             self::getType(),
-            $sourceFormat->getName(),
+            $sourceFormat->name,
             $number,
             $date ? $date->format('Y-m-d') : '',
             $this->getTargetDate($date, $targetFormat, $targetLang)

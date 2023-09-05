@@ -53,8 +53,8 @@ declare(strict_types=1);
 namespace MittagQI\Translate5\NumberProtection\Protector;
 
 use editor_Models_Languages;
-use MittagQI\Translate5\NumberProtection\Model\LanguageNumberFormat as LanguageFormat;
-use MittagQI\Translate5\NumberProtection\Model\LanguageNumberFormatRepository;
+use MittagQI\Translate5\NumberProtection\Model\NumberFormatRepository;
+use MittagQI\Translate5\NumberProtection\Model\NumberFormatDto;
 use MittagQI\Translate5\NumberProtection\NumberParsingException;
 use MittagQI\Translate5\NumberProtection\NumberProtector;
 
@@ -62,7 +62,7 @@ abstract class AbstractProtector implements NumberProtectorInterface
 {
     private array $formatsCache = [];
 
-    public function __construct(protected LanguageNumberFormatRepository $formatRepository)
+    public function __construct(protected NumberFormatRepository $formatRepository)
     {
     }
 
@@ -76,7 +76,7 @@ abstract class AbstractProtector implements NumberProtectorInterface
      */
     public function protect(
         string $number,
-        LanguageFormat $languageFormat,
+        NumberFormatDto $languageFormat,
         ?editor_Models_Languages $sourceLang,
         ?editor_Models_Languages $targetLang
     ): string {
@@ -90,7 +90,7 @@ abstract class AbstractProtector implements NumberProtectorInterface
      */
     protected function composeNumberTag(
         string $number,
-        LanguageFormat $sourceFormat,
+        NumberFormatDto $sourceFormat,
         ?editor_Models_Languages $sourceLang,
         ?editor_Models_Languages $targetLang,
         ?string $targetFormat
@@ -98,21 +98,20 @@ abstract class AbstractProtector implements NumberProtectorInterface
         return sprintf(
             $this->tagFormat(),
             static::getType(),
-            $sourceFormat->getName(),
+            $sourceFormat->name,
             $number,
             '',
             ''
         );
     }
 
-    private function getFormat(editor_Models_Languages $targetLang, LanguageFormat $languageFormat): ?string
+    private function getFormat(editor_Models_Languages $targetLang, NumberFormatDto $languageFormat): ?string
     {
-        $key = "{$targetLang->getId()}:{$languageFormat->getType()}:{$languageFormat->getName()}";
+        $key = "{$targetLang->getId()}:{$languageFormat->type}:{$languageFormat->name}";
         if (!isset($this->formatsCache[$key])) {
             $this->formatsCache[$key] = $this
                 ->formatRepository
-                ->findForLangOrMajorBy($targetLang, $languageFormat->getType(), $languageFormat->getName())
-                ?->getFormat();
+                ->findOutputFormat($targetLang, $languageFormat->type, $languageFormat->name);
         }
 
         return $this->formatsCache[$key];

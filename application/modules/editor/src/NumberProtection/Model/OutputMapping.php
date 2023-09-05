@@ -52,26 +52,36 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\NumberProtection\Model;
 
-use Zend_Validate_Abstract;
+use MittagQI\Translate5\NumberProtection\Model\Db\LanguageNumberFormatTable;
+use MittagQI\Translate5\NumberProtection\Model\Db\OutputMappingTable;
+use MittagQI\Translate5\NumberProtection\Model\Validation\LanguageNumberFormatValidator;
+use Zend_Db_Table_Row_Abstract;
+use ZfExtended_Models_Entity_Abstract;
 
-class NameIsNotDefaultValidator extends Zend_Validate_Abstract
+/**
+ * @method string getId()
+ * @method string getLanguageId()
+ * @method void setLanguageId(int $languageId)
+ * @method string getNumberFormatId()
+ * @method void setNumberFormatId(int $numberFormatId)
+ * @method string getFormat()
+ * @method void setFormat(string $format)
+ */
+class OutputMapping extends ZfExtended_Models_Entity_Abstract
 {
-    private const INVALID = 'invalid';
+    protected $dbInstanceClass = OutputMappingTable::class;
+//    protected $validatorInstanceClass = LanguageNumberFormatValidator::class;
 
-    protected $_messageTemplates = [
-        self::INVALID   => "Name 'default' cannot be set as a value",
-    ];
-
-    public function isValid($value)
+    public function loadBy(int $langId, int $numberFormatId): ?Zend_Db_Table_Row_Abstract
     {
-        $this->_setValue($value);
+        $s = $this->db->select();
+        $s->where('languageId = ?', $langId)->where('numberFormatId = ?', $numberFormatId);
 
-        if ('default' !== strtolower($value)) {
-            return true;
+        $this->row = $this->db->fetchRow($s);
+        if (empty($this->row)){
+            $this->notFound("#by languageId, numberFormatId", "$langId, $numberFormatId");
         }
 
-        $this->_error(self::INVALID);
-
-        return false;
+        return $this->row;
     }
 }

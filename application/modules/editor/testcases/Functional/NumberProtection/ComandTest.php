@@ -50,58 +50,25 @@ END LICENSE AND COPYRIGHT
 */
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\NumberProtection\Protector;
+namespace MittagQI\Translate5\Test\Functional\NumberProtection;
 
 use editor_Models_Languages;
-use MittagQI\Translate5\NumberProtection\Model\NumberFormatDto;
-use NumberFormatter;
+use MittagQI\Translate5\NumberProtection\Model\LanguageNumberFormat;
+use MittagQI\Translate5\NumberProtection\Model\NumberFormatRepository;
+use MittagQI\Translate5\NumberProtection\NumberProtector;
+use MittagQI\Translate5\NumberProtection\Protector\IntegerProtector;
+use PHPUnit\Framework\TestCase;
+use ZfExtended_Factory;
 
-class IntegerProtector extends FloatProtector
+class ComandTest extends TestCase
 {
-    public static function getType(): string
+    public function test(): void
     {
-        return 'integer';
-    }
-
-    protected function composeNumberTag(
-        string $number,
-        NumberFormatDto $sourceFormat,
-        ?editor_Models_Languages $sourceLang,
-        ?editor_Models_Languages $targetLang,
-        ?string $targetFormat
-    ): string {
-        $integer = null;
-
-        if (!$sourceFormat->keepAsIs) {
-            $fmt = NumberFormatter::create('en', NumberFormatter::DECIMAL);
-            $integer = $fmt->parse(preg_replace('/[^\d]/u', '', $number), NumberFormatter::TYPE_INT64);
-        }
-
-        return sprintf(
-            $this->tagFormat(),
-            self::getType(),
-            $sourceFormat->name,
-            $number,
-            (string) $integer,
-            $this->getTargetInteger($integer, $targetFormat, $targetLang)
-        );
-    }
-
-    protected function getTargetInteger(
-        ?int $integer,
-        ?string $targetFormat,
-        ?editor_Models_Languages $targetLang
-    ): string {
-        if (null === $integer) {
-            return '';
-        }
-
-        if (null === $targetLang) {
-            return '';
-        }
-
-        $fmt = NumberFormatter::create($targetLang->getRfc5646(), NumberFormatter::PATTERN_DECIMAL, $targetFormat);
-
-        return $fmt->format($integer);
+        dump('tyt');
+        $lang = ZfExtended_Factory::get(editor_Models_Languages::class);
+        $lang->loadByRfc5646('de');
+        $r = new NumberFormatRepository();
+        $r->getAll($lang);
+        dump('tyt');
     }
 }

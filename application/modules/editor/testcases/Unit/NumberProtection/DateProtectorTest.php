@@ -53,8 +53,8 @@ declare(strict_types=1);
 namespace MittagQI\Translate5\Test\Unit\NumberProtection;
 
 use editor_Models_Languages;
-use MittagQI\Translate5\NumberProtection\Model\LanguageNumberFormat as LanguageFormat;
-use MittagQI\Translate5\NumberProtection\Model\LanguageNumberFormatRepository;
+use MittagQI\Translate5\NumberProtection\Model\NumberFormatDto;
+use MittagQI\Translate5\NumberProtection\Model\NumberFormatRepository;
 use MittagQI\Translate5\NumberProtection\NumberParsingException;
 use MittagQI\Translate5\NumberProtection\Protector\DateProtector;
 use PHPUnit\Framework\TestCase;
@@ -67,14 +67,11 @@ class DateProtectorTest extends TestCase
     public function testProtectDefaultFormats(
         string $number,
         string $expected,
-        LanguageFormat $sourceFormat,
-        ?LanguageFormat $targetFormat,
+        NumberFormatDto $sourceFormat,
+        ?string $targetFormat,
         ?editor_Models_Languages $targetLang
     ): void {
-        $repo = $this->createConfiguredMock(
-            LanguageNumberFormatRepository::class,
-            ['findForLangOrMajorBy' => $targetFormat]
-        );
+        $repo = $this->createConfiguredMock(NumberFormatRepository::class, ['findOutputFormat' => $targetFormat]);
         $protected = (new DateProtector($repo))->protect($number, $sourceFormat, null, $targetLang);
 
         self::assertSame($expected, $protected);
@@ -82,18 +79,13 @@ class DateProtectorTest extends TestCase
 
     public function defaultDataToProtect(): iterable
     {
-        $sourceFormat = $this->createConfiguredMock(LanguageFormat::class, []);
-        $sourceFormat
-            ->method('__call')
-            ->willReturnCallback(function($name, $args) {
-                return match ($name) {
-                    'getName' => 'test-default',
-                    'getRegex' => '/\b\d{4}\/(0[1-9]|[1-2][0-9]|3[0-1]|[1-9])\/(0[1-9]|1[0-2]|[1-9])\b/',
-                    'getFormat' => 'Y/d/m',
-                    'getKeepAsIs' => false,
-                    'getType' => 'date',
-                };
-            });
+        $sourceFormat = new NumberFormatDto(
+            'date',
+            'test-default',
+            '/\b\d{4}\/(0[1-9]|[1-2][0-9]|3[0-1]|[1-9])\/(0[1-9]|1[0-2]|[1-9])\b/',
+            'Y/d/m',
+            false,
+        );
 
         yield 'date' => [
             'number' => '2023/18/07',
@@ -115,14 +107,7 @@ class DateProtectorTest extends TestCase
             'targetLang' => $targetLangDe,
         ];
 
-        $targetFormat = $this->createConfiguredMock(LanguageFormat::class, []);
-        $targetFormat
-            ->method('__call')
-            ->willReturnCallback(function($name, $args) {
-                return match ($name) {
-                    'getFormat' => 'Y*m*d',
-                };
-            });
+        $targetFormat = 'Y*m*d';
 
         yield 'date. target format Y*m*d' => [
             'number' => '2023/18/07',
@@ -132,18 +117,13 @@ class DateProtectorTest extends TestCase
             'targetLang' => $targetLangDe,
         ];
 
-        $sourceFormatKeepAsIs = $this->createConfiguredMock(LanguageFormat::class, []);
-        $sourceFormatKeepAsIs
-            ->method('__call')
-            ->willReturnCallback(function($name, $args) {
-                return match ($name) {
-                    'getName' => 'test-default',
-                    'getRegex' => '/\b\d{4}\/(0[1-9]|[1-2][0-9]|3[0-1]|[1-9])\/(0[1-9]|1[0-2]|[1-9])\b/',
-                    'getFormat' => 'Y/d/m',
-                    'getKeepAsIs' => true,
-                    'getType' => 'date',
-                };
-            });
+        $sourceFormatKeepAsIs = new NumberFormatDto(
+            'date',
+            'test-default',
+            '/\b\d{4}\/(0[1-9]|[1-2][0-9]|3[0-1]|[1-9])\/(0[1-9]|1[0-2]|[1-9])\b/',
+            'Y/d/m',
+            true,
+        );
 
         yield 'date. keep as is' => [
             'number' => '2023/18/07',
@@ -155,22 +135,14 @@ class DateProtectorTest extends TestCase
     }
 
     public function testExceptionOnWrongDate(): void {
-        $sourceFormat = $this->createConfiguredMock(LanguageFormat::class, []);
-        $sourceFormat
-            ->method('__call')
-            ->willReturnCallback(function($name, $args) {
-                return match ($name) {
-                    'getName' => 'test-default',
-                    'getRegex' => '/\b\d{4}\/(0[1-9]|[1-2][0-9]|3[0-1]|[1-9])\/(0[1-9]|1[0-2]|[1-9])\b/',
-                    'getFormat' => 'Y/d/m',
-                    'getKeepAsIs' => false,
-                    'getType' => 'date',
-                };
-            });
-        $repo = $this->createConfiguredMock(
-            LanguageNumberFormatRepository::class,
-            ['findForLangOrMajorBy' => null]
+        $sourceFormat = new NumberFormatDto(
+            'date',
+            'test-default',
+            '/\b\d{4}\/(0[1-9]|[1-2][0-9]|3[0-1]|[1-9])\/(0[1-9]|1[0-2]|[1-9])\b/',
+            'Y/d/m',
+            false,
         );
+        $repo = $this->createConfiguredMock(NumberFormatRepository::class, ['findOutputFormat' => null]);
 
         $this->expectException(NumberParsingException::class);
         (new DateProtector($repo))->protect('2023/18/13', $sourceFormat, null, null);

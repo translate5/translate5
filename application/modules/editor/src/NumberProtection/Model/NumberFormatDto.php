@@ -52,26 +52,33 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\NumberProtection\Model;
 
-use Zend_Validate_Abstract;
+use Zend_Db_Table_Row;
 
-class RegexPatternValidator extends Zend_Validate_Abstract
+/**
+ * @property-read string $type
+ * @property-read string $name
+ * @property-read string $regex
+ * @property-read string|null $format
+ * @property-read bool $keepAsIs
+ */
+class NumberFormatDto
 {
-    private const INVALID = 'invalid';
+    public function __construct(
+        public string $type,
+        public string $name,
+        public string $regex,
+        public ?string $format,
+        public bool $keepAsIs,
+    ) {}
 
-    protected $_messageTemplates = [
-        self::INVALID   => "Ungültiger Regulärer Ausdruck",
-    ];
-
-    public function isValid($value)
+    public static function fromRow(Zend_Db_Table_Row $row): self
     {
-        $this->_setValue($value);
-
-        if (false !== @preg_match($value, '')) {
-            return true;
-        }
-
-        $this->_error(self::INVALID);
-
-        return false;
+        return new self(
+            $row['type'],
+            $row['name'],
+            $row['regex'],
+            $row['format'],
+            (bool) $row['keepAsIs'],
+        );
     }
 }

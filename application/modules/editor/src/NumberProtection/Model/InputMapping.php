@@ -50,58 +50,20 @@ END LICENSE AND COPYRIGHT
 */
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\NumberProtection\Protector;
+namespace MittagQI\Translate5\NumberProtection\Model;
 
-use editor_Models_Languages;
-use MittagQI\Translate5\NumberProtection\Model\NumberFormatDto;
-use NumberFormatter;
+use MittagQI\Translate5\NumberProtection\Model\Db\InputMappingTable;
+use ZfExtended_Models_Entity_Abstract;
 
-class IntegerProtector extends FloatProtector
+/**
+ * @method string getId()
+ * @method string getLanguageId()
+ * @method void setLanguageId(int $languageId)
+ * @method string getNumberFormatId()
+ * @method void setNumberFormatId(int $numberFormatId)
+ */
+class InputMapping extends ZfExtended_Models_Entity_Abstract
 {
-    public static function getType(): string
-    {
-        return 'integer';
-    }
-
-    protected function composeNumberTag(
-        string $number,
-        NumberFormatDto $sourceFormat,
-        ?editor_Models_Languages $sourceLang,
-        ?editor_Models_Languages $targetLang,
-        ?string $targetFormat
-    ): string {
-        $integer = null;
-
-        if (!$sourceFormat->keepAsIs) {
-            $fmt = NumberFormatter::create('en', NumberFormatter::DECIMAL);
-            $integer = $fmt->parse(preg_replace('/[^\d]/u', '', $number), NumberFormatter::TYPE_INT64);
-        }
-
-        return sprintf(
-            $this->tagFormat(),
-            self::getType(),
-            $sourceFormat->name,
-            $number,
-            (string) $integer,
-            $this->getTargetInteger($integer, $targetFormat, $targetLang)
-        );
-    }
-
-    protected function getTargetInteger(
-        ?int $integer,
-        ?string $targetFormat,
-        ?editor_Models_Languages $targetLang
-    ): string {
-        if (null === $integer) {
-            return '';
-        }
-
-        if (null === $targetLang) {
-            return '';
-        }
-
-        $fmt = NumberFormatter::create($targetLang->getRfc5646(), NumberFormatter::PATTERN_DECIMAL, $targetFormat);
-
-        return $fmt->format($integer);
-    }
+    protected $dbInstanceClass = InputMappingTable::class;
+//    protected $validatorInstanceClass = LanguageNumberFormatValidator::class;
 }

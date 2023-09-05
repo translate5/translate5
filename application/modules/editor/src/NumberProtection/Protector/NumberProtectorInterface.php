@@ -53,7 +53,7 @@ declare(strict_types=1);
 namespace MittagQI\Translate5\NumberProtection\Protector;
 
 use editor_Models_Languages;
-use MittagQI\Translate5\NumberProtection\Model\LanguageNumberFormat as LanguageFormat;
+use MittagQI\Translate5\NumberProtection\Model\NumberFormatDto;
 use MittagQI\Translate5\NumberProtection\NumberParsingException;
 
 interface NumberProtectorInterface
@@ -65,7 +65,7 @@ interface NumberProtectorInterface
      */
     public function protect(
         string $number,
-        LanguageFormat $languageFormat,
+        NumberFormatDto $languageFormat,
         ?editor_Models_Languages $sourceLang,
         ?editor_Models_Languages $targetLang
     ): string;

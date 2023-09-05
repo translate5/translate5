@@ -52,26 +52,22 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\Test\Unit\NumberProtection;
 
-use MittagQI\Translate5\NumberProtection\Model\LanguageNumberFormat as LanguageFormat;
-use MittagQI\Translate5\NumberProtection\Model\LanguageNumberFormatRepository;
+use MittagQI\Translate5\NumberProtection\Model\NumberFormatDto;
+use MittagQI\Translate5\NumberProtection\Model\NumberFormatRepository;
 use MittagQI\Translate5\NumberProtection\Protector\IPAddressProtector;
 use PHPUnit\Framework\TestCase;
 
 class IPAddressProtectorTest extends TestCase
 {
     public function testProtectDefaultFormats(): void {
-        $repo = $this->createConfiguredMock(
-            LanguageNumberFormatRepository::class,
-            ['findForLangOrMajorBy' => null]
+        $repo = $this->createConfiguredMock(NumberFormatRepository::class, ['findOutputFormat' => null]);
+        $sourceFormat = new NumberFormatDto(
+            'ip-address',
+            'test-default',
+            '',
+            '',
+            true
         );
-        $sourceFormat = $this->createConfiguredMock(LanguageFormat::class, []);
-        $sourceFormat
-            ->method('__call')
-            ->willReturnCallback(function($name, $args) {
-                return match ($name) {
-                    'getName' => 'test-default',
-                };
-            });
 
         self::assertSame(
             '<number type="ip-address" name="test-default" source="127.0.0.1" iso="" target="" />',

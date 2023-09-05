@@ -50,7 +50,7 @@ END LICENSE AND COPYRIGHT
 */
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\NumberProtection\Model;
+namespace MittagQI\Translate5\NumberProtection\Model\Db;
 use Zend_Db_Table_Abstract;
 
 class LanguageNumberFormatTable extends Zend_Db_Table_Abstract
