@@ -34,6 +34,7 @@ use Exception;
 use GuzzleHttp\Psr7\Uri;
 use JsonException;
 use MittagQI\Translate5\LanguageResource\Status as LanguageResourceStatus;
+use MittagQI\Translate5\LanguageResource\TaskAssociation;
 use RuntimeException;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Input\InputArgument;
@@ -42,7 +43,9 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use editor_Services_OpenTM2_Connector as Connector;
 use editor_Services_OpenTM2_Service as Service;
+use editor_Models_LanguageResources_CustomerAssoc as LanguageResourcesCustomerAssoc;
 use editor_Models_LanguageResources_LanguageResource as LanguageResource;
+use editor_Models_LanguageResources_Languages as LanguageResourcesLanguages;
 use Throwable;
 use Zend_Db_Statement_Exception;
 use Zend_Exception;
@@ -59,6 +62,8 @@ class OpenTm2MigrationCommand extends Translate5AbstractCommand
     private const ARGUMENT_SOURCE_URL = 'sourceUrl';
     private const OPTION_DO_NOT_WAIT_IMPORT_FINISHED = 'doNotWaitImportFinish';
     private const OPTION_WAIT_TIMEOUT = 'wait-timeout';
+    private const OPTION_CLONE_LANGUAGE_RESOURCE = 'duplicate-language-resource';
+    private const OPTION_CLONED_NAME_PART = 'cloned_name_part';
     private const DATA_RELATIVE_PATH = '/../data/';
     private const EXPORT_FILE_EXTENSION = '.tmx';
     private const DEFAULT_WAIT_TIME_SECONDS = 600;
@@ -72,11 +77,49 @@ class OpenTm2MigrationCommand extends Translate5AbstractCommand
 
         $this
             ->setDescription('Migrates all existing OpenTM2 language resources to t5memory')
-            ->setHelp('Tool exports OpenTM2 language resources one by one and imports data to the t5memory provided as endpoint argument')
-            ->addArgument(self::ARGUMENT_SOURCE_URL, InputArgument::REQUIRED, 'Endpoint data is exported from (source), e.g. http://t5memory.local/t5memory')
-            ->addArgument(self::ARGUMENT_TARGET_URL, InputArgument::REQUIRED, 't5memory endpoint data to be imported to (target), e.g. http://t5memory.local/t5memory')
-            ->addOption(self::OPTION_DO_NOT_WAIT_IMPORT_FINISHED, 'd', InputOption::VALUE_NEGATABLE, 'Skips waiting for import to finish before processing next language resource', false)
-            ->addOption(self::OPTION_WAIT_TIMEOUT, 't', InputOption::VALUE_OPTIONAL, 'Timeout in seconds for waiting for import to finish', self::DEFAULT_WAIT_TIME_SECONDS);
+            ->setHelp('Tool exports OpenTM2 language resources one by one and '
+                .'imports data to the t5memory provided as endpoint argument')
+            ->addArgument(
+                self::ARGUMENT_SOURCE_URL,
+                InputArgument::REQUIRED,
+                'Endpoint data is exported from (source), e.g. http://t5memory.local/t5memory'
+            )
+            ->addArgument(
+                self::ARGUMENT_TARGET_URL,
+                InputArgument::REQUIRED,
+                't5memory endpoint data to be imported to (target), e.g. http://t5memory.local/t5memory'
+            )
+            ->addOption(
+                self::OPTION_DO_NOT_WAIT_IMPORT_FINISHED,
+                'd',
+                InputOption::VALUE_NEGATABLE,
+                'Skips waiting for import to finish before processing next language resource',
+                false
+            )
+            ->addOption(
+                self::OPTION_WAIT_TIMEOUT,
+                't',
+                InputOption::VALUE_OPTIONAL,
+                'Timeout in seconds for waiting for import to finish',
+                self::DEFAULT_WAIT_TIME_SECONDS
+            )
+            ->addOption(
+                self::OPTION_CLONE_LANGUAGE_RESOURCE,
+                'c',
+                InputOption::VALUE_NEGATABLE,
+                'If provided language resource will be cloned before migration. ' .
+                    'New language resource will be named based on --name option value',
+                false
+            )
+            ->addOption(
+                self::OPTION_CLONED_NAME_PART,
+                'name',
+                InputOption::VALUE_OPTIONAL,
+                'Name part for cloned language resource. ' .
+                    'Name part can contain place where it should be placed e.g prefix: or suffix:.' .
+                    'If not provided default prefix is used',
+                'prefix:DUPLIKAT_TEST_'
+            );
     }
 
     /**
@@ -106,6 +149,8 @@ class OpenTm2MigrationCommand extends Translate5AbstractCommand
 
         $targetResourceId = $this->getTargetResourceId($targetUrl);
 
+        $cloneLanguageResource = $input->getOption(self::OPTION_CLONE_LANGUAGE_RESOURCE);
+
         $processingErrors = [];
         $connector = new Connector();
 
@@ -131,6 +176,7 @@ class OpenTm2MigrationCommand extends Translate5AbstractCommand
                 continue;
             }
 
+            $languageResource = $this->cloneLanguageResourceIfNeeded($languageResource, $cloneLanguageResource);
             $languageResource->setResourceId($targetResourceId);
 
             try {
@@ -145,7 +191,7 @@ class OpenTm2MigrationCommand extends Translate5AbstractCommand
             }
         }
 
-        if (count($processingErrors) === 0) {
+        if (empty($processingErrors) && !$cloneLanguageResource) {
             $this->cleanupConfig($sourceResourceId);
             $targetResourceId = $this->getTargetResourceId($targetUrl);
             $this->updateLanguageResources(array_column($languageResourcesData, 'id'), $targetResourceId);
@@ -279,7 +325,11 @@ class OpenTm2MigrationCommand extends Translate5AbstractCommand
         string $filenameWithPath,
         string $type
     ): void {
-        $connector->connectTo($languageResource, $languageResource->getSourceLang(), $languageResource->getTargetLang());
+        $connector->connectTo(
+            $languageResource,
+            $languageResource->getSourceLang(),
+            $languageResource->getTargetLang()
+        );
 
         file_put_contents($filenameWithPath, $connector->getTm($type));
 
@@ -321,6 +371,16 @@ class OpenTm2MigrationCommand extends Translate5AbstractCommand
      */
     private function revertChanges(LanguageResource $languageResource, array $primaryData): void
     {
+        if ($languageResource->getId() !== $primaryData['id']) {
+            $remover = ZfExtended_Factory::get(
+                \editor_Models_LanguageResources_Remover::class,
+                [$languageResource]
+            );
+            $remover->remove(forced: true);
+
+            return;
+        }
+
         $languageResource->setSpecificData(json_decode($primaryData['specificData'], true, 512, JSON_THROW_ON_ERROR));
         $languageResource->setResourceId($primaryData['resourceId']);
 
@@ -394,5 +454,58 @@ class OpenTm2MigrationCommand extends Translate5AbstractCommand
         $this->io->warning('Import not finished after ' . $maxWaitTime . ' seconds');
 
         throw new RuntimeException('Import not finished after ' . $maxWaitTime . ' seconds');
+    }
+
+    private function cloneLanguageResourceIfNeeded(LanguageResource $languageResource, bool $clone): LanguageResource
+    {
+        if (!$clone) {
+            return $languageResource;
+        }
+
+        $namePart = $this->input->getOption(self::OPTION_CLONED_NAME_PART);
+        $nameParts = explode(':', $namePart);
+
+        if (count($nameParts) === 2) {
+            if ($nameParts[0] === 'prefix') {
+                $name = $nameParts[1] . $languageResource->getName();
+            } else {
+                $name = $languageResource->getName() . $nameParts[1];
+            }
+        } else {
+            $name = $namePart . $languageResource->getName();
+        }
+
+        // TODO we have similar code in PrivatePlugins think about moving this to factory or something like that
+        $newLanguageResource = new LanguageResource();
+        $newLanguageResource->init([
+            'resourceId' => $languageResource->getResourceId(),
+            'resourceType' => $languageResource->getResourceType(),
+            'serviceType' => $languageResource->getServiceType(),
+            'serviceName' => $languageResource->getServiceName(),
+            'color' => $languageResource->getColor(),
+            'name' => $name,
+        ]);
+        $newLanguageResource->createLangResUuid();
+        $newLanguageResource->validate();
+        $newLanguageResource->save();
+
+        $resourceLanguages = ZfExtended_Factory::get(LanguageResourcesLanguages::class);
+        $resourceLanguages->setSourceLang($languageResource->getSourceLang());
+        $resourceLanguages->setSourceLangCode($languageResource->getSourceLangCode());
+        $resourceLanguages->setTargetLang($languageResource->getTargetLang());
+        $resourceLanguages->setTargetLangCode($languageResource->getTargetLangCode());
+        $resourceLanguages->setLanguageResourceId($newLanguageResource->getId());
+        $resourceLanguages->save();
+
+        foreach ($languageResource->getCustomers() as $customerId) {
+            $customerAssoc = ZfExtended_Factory::get(LanguageResourcesCustomerAssoc::class);
+            $customerAssoc->setCustomerId($customerId);
+            $customerAssoc->setLanguageResourceId($newLanguageResource->getId());
+            $customerAssoc->save();
+        }
+
+        $newLanguageResource->refresh();
+
+        return $newLanguageResource;
     }
 }
