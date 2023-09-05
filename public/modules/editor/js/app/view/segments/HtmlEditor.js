@@ -573,6 +573,9 @@ Ext.define('Editor.view.segments.HtmlEditor', {
                         }
 
                         data = tag.data;
+                        // Since tag order can start from something different that 1 and tag order in reference can be
+                        // not by order we need to set the tag number to the one from the reference
+                        openTagNumber = parseInt(data.nr);
 
                         break;
 
@@ -585,6 +588,9 @@ Ext.define('Editor.view.segments.HtmlEditor', {
                         }
 
                         data = tag.data;
+                        // Since tag order can start from something different that 1 and tag order in reference can be
+                        // not by order we need to set the tag number to the one from the reference
+                        closeTagNumber = parseInt(data.nr);
 
                         break;
 
@@ -609,6 +615,9 @@ Ext.define('Editor.view.segments.HtmlEditor', {
                         }
 
                         data = tag.data;
+                        // Since tag order can start from something different that 1 and tag order in reference can be
+                        // not by order we need to set the tag number to the one from the reference
+                        singleTagNumber = parseInt(data.nr);
 
                         break;
                 }

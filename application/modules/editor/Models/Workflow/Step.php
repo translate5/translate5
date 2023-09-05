@@ -29,20 +29,20 @@ END LICENSE AND COPYRIGHT
 /**
  * Workflow Step Entity Objekt
  *
- * @method integer getId() getId()
- * @method void setId() setId(int $id)
- * @method string getWorkflowName() getWorkflowName()
- * @method void setWorkflowName() setWorkflowName(string $workflowName)
- * @method string getName() getName()
- * @method void setName() setName(string $name)
- * @method string getLabel() getLabel()
- * @method void setLabel() setLabel(string $label)
- * @method string getRole() getRole()
- * @method void setRole() setRole(string $role)
- * @method ?integer getPosition() getPosition()
- * @method void setPosition() setPosition(?integer $position)
- * @method bool getFlagInitiallyFiltered() getFlagInitiallyFiltered()
- * @method void setFlagInitiallyFiltered() setFlagInitiallyFiltered(bool $filter)
+ * @method integer getId()
+ * @method void setId(int $id)
+ * @method string getWorkflowName()
+ * @method void setWorkflowName(string $workflowName)
+ * @method string getName()
+ * @method void setName(string $name)
+ * @method string getLabel()
+ * @method void setLabel(string $label)
+ * @method string getRole()
+ * @method void setRole(string $role)
+ * @method integer|null getPosition()
+ * @method void setPosition(?integer $position)
+ * @method bool getFlagInitiallyFiltered()
+ * @method void setFlagInitiallyFiltered(bool $filter)
  */
 class editor_Models_Workflow_Step extends ZfExtended_Models_Entity_Abstract {
     protected $dbInstanceClass          = 'editor_Models_Db_Workflow_Step';

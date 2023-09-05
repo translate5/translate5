@@ -106,9 +106,10 @@ class editor_Models_Import_FileParser_Xlf_ShortTagNumbers {
             if(empty($tagsById['id-'.$tag->id])) {
                 $tagsById['id-'.$tag->id] = $tag;
             }
-            elseif(is_null($partner)) {
+            // we may apply id based matching only if no rid based partner was found
+            // and on open/close tags, since the id of single tags may be duplicated
+            elseif(is_null($partner) && ! $tag->isSingle()) {
                 //if we have found no partner by rid we use the partner by id
-                // TODO possible problem here, may have a <ph> tag and a <ex> tag have the same id? if yes, they would get paired here, although they do not belong together
                 $partner = $tagsById['id-'.$tag->id];
             }
 
@@ -120,9 +121,11 @@ class editor_Models_Import_FileParser_Xlf_ShortTagNumbers {
         }
 
 
-        //second loop: find shorttag numbers, either of the partner (source) or of the shortTagnumbers of the source (target)
+        //second loop: find shorttag numbers, either of the partner (source)
+        // or of the shortTagnumbers of the source (target)
         foreach($this->allTags as $tag) {
             if(empty($tag->partner)) {
+                // if a previous open/close tag has no partner, we render it as single tag...
                 $tag->setSingle();
             }
 

@@ -101,6 +101,8 @@ class editor_Segment_Consistent_Check {
      */
     public function getInconsistentSegmentNrsInTask(editor_Models_Task $task) {
 
+        $result = [];
+
         // Get materialized view
         $mv = ZfExtended_Factory::get('editor_Models_Segment_MaterializedView');
         $mv->setTaskGuid($task->getTaskGuid());

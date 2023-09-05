@@ -303,14 +303,21 @@ abstract class editor_Test_ApiTest extends TestCase
             if (static::$_appState === null) {
                 self::testRunSetup(static::$_api);
             }
-            // make sure the setup always happens as testmanager
-            static::api()->login('testmanager');
 
-            if(static::$skipIfOptionsMissing && !static::api()->checkConfigs(static::$requiredRuntimeOptions)){
+            if(static::$_api->isTestSkipped()){
 
+                // skip test when --skip option demanded to do so
+                static::markTestSkipped('Skipped test "' . static::class . '" as requested.');
+
+            } else if(static::$skipIfOptionsMissing && !static::api()->checkConfigs(static::$requiredRuntimeOptions)){
+
+                // skip test when configs/runtimeOptions are missing
                 static::markTestSkipped('Skipped test "' . static::class . '" because neccessary configs are not set or missing.');
 
             } else {
+
+                // make sure the setup always happens as testmanager
+                static::api()->login('testmanager');
 
                 // checks for the plugin & config dependencies that have been defined for this test
                 static::assertAppState();
