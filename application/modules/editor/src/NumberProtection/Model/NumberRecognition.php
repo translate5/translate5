@@ -52,8 +52,8 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\NumberProtection\Model;
 
-use MittagQI\Translate5\NumberProtection\Model\Db\LanguageNumberFormatTable;
-use MittagQI\Translate5\NumberProtection\Model\Validation\LanguageNumberFormatValidator;
+use MittagQI\Translate5\NumberProtection\Model\Db\NumberRecognitionTable;
+use MittagQI\Translate5\NumberProtection\Model\Validation\NumberRecognitionValidator;
 use Zend_Db_Table_Row_Abstract;
 use ZfExtended_Models_Entity_Abstract;
 
@@ -73,10 +73,10 @@ use ZfExtended_Models_Entity_Abstract;
  * @method void setPriority(int $priority)
  * @method bool getIsDefault()
  */
-class LanguageNumberFormat extends ZfExtended_Models_Entity_Abstract
+class NumberRecognition extends ZfExtended_Models_Entity_Abstract
 {
-    protected $dbInstanceClass = LanguageNumberFormatTable::class;
-    protected $validatorInstanceClass = LanguageNumberFormatValidator::class;
+    protected $dbInstanceClass = NumberRecognitionTable::class;
+    protected $validatorInstanceClass = NumberRecognitionValidator::class;
 
     public function loadBy(string $type, string $name): ?Zend_Db_Table_Row_Abstract
     {

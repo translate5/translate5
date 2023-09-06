@@ -53,8 +53,8 @@ declare(strict_types=1);
 namespace MittagQI\Translate5\NumberProtection\Model\Db;
 use Zend_Db_Table_Abstract;
 
-class LanguageNumberFormatTable extends Zend_Db_Table_Abstract
+class NumberRecognitionTable extends Zend_Db_Table_Abstract
 {
-    protected $_name = 'LEK_language_number_format';
+    protected $_name = 'LEK_number_protection_number_recognition';
     public $_primary = 'id';
 }

@@ -25,7 +25,7 @@
 -- END LICENSE AND COPYRIGHT
 -- */
 
-CREATE TABLE `LEK_language_number_format` (
+CREATE TABLE `LEK_number_protection_number_recognition` (
     `id` int (11) NOT NULL AUTO_INCREMENT,
     `type` varchar(30) NOT NULL,
     `name` varchar(124) DEFAULT 'default' NOT NULL,
@@ -38,30 +38,30 @@ CREATE TABLE `LEK_language_number_format` (
     INDEX (`type`, `name`)
 );
 
-CREATE TABLE `LEK_language_number_format_input_mapping` (
+CREATE TABLE `LEK_number_protection_input_mapping` (
     `id` int (11) NOT NULL AUTO_INCREMENT,
     `languageId` int (11) NOT NULL COMMENT 'Foreign Key to LEK_languages',
-    `numberFormatId` int (11) NOT NULL COMMENT 'Foreign Key to LEK_language_number_format',
+    `numberFormatId` int (11) NOT NULL COMMENT 'Foreign Key to LEK_number_protection_number_recognition',
     PRIMARY KEY (`id`),
     CONSTRAINT FOREIGN KEY (`languageId`) REFERENCES `LEK_languages` (`id`) ON DELETE CASCADE,
-    CONSTRAINT FOREIGN KEY (`numberFormatId`) REFERENCES `LEK_language_number_format` (`id`) ON DELETE CASCADE,
+    CONSTRAINT FOREIGN KEY (`numberFormatId`) REFERENCES `LEK_number_protection_number_recognition` (`id`) ON DELETE CASCADE,
     INDEX (`languageId`),
     INDEX (`numberFormatId`)
 );
 
-CREATE TABLE `LEK_language_number_format_output_mapping` (
+CREATE TABLE `LEK_number_protection_output_mapping` (
     `id` int (11) NOT NULL AUTO_INCREMENT,
     `languageId` int (11) DEFAULT NULL COMMENT 'Foreign Key to LEK_languages',
-    `numberFormatId` int (11) NOT NULL COMMENT 'Foreign Key to LEK_language_number_format',
+    `numberFormatId` int (11) NOT NULL COMMENT 'Foreign Key to LEK_number_protection_number_recognition',
     `format` varchar(124) DEFAULT NULL,
     PRIMARY KEY (`id`),
     CONSTRAINT FOREIGN KEY (`languageId`) REFERENCES `LEK_languages` (`id`) ON DELETE CASCADE,
-    CONSTRAINT FOREIGN KEY (`numberFormatId`) REFERENCES `LEK_language_number_format` (`id`) ON DELETE CASCADE,
+    CONSTRAINT FOREIGN KEY (`numberFormatId`) REFERENCES `LEK_number_protection_number_recognition` (`id`) ON DELETE CASCADE,
     INDEX (`languageId`),
     INDEX (`numberFormatId`)
 );
 
-INSERT INTO `LEK_language_number_format` (`type`, `regex`, `format`, `keepAsIs`, `priority`, `isDefault`) VALUES
+INSERT INTO `LEK_number_protection_number_recognition` (`type`, `regex`, `format`, `keepAsIs`, `priority`, `isDefault`) VALUES
 -- MAC address
 ('mac-address', '/\\b(?:[[:xdigit:]]{2}([-:]))(?:[[:xdigit:]]{2}\\1){4}[[:xdigit:]]{2}\\b/', null, true, 500, true),
 -- IP address

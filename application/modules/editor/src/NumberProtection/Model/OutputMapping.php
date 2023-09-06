@@ -52,9 +52,9 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\NumberProtection\Model;
 
-use MittagQI\Translate5\NumberProtection\Model\Db\LanguageNumberFormatTable;
+use MittagQI\Translate5\NumberProtection\Model\Db\NumberRecognitionTable;
 use MittagQI\Translate5\NumberProtection\Model\Db\OutputMappingTable;
-use MittagQI\Translate5\NumberProtection\Model\Validation\LanguageNumberFormatValidator;
+use MittagQI\Translate5\NumberProtection\Model\Validation\NumberRecognitionValidator;
 use Zend_Db_Table_Row_Abstract;
 use ZfExtended_Models_Entity_Abstract;
 

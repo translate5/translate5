@@ -162,7 +162,7 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
                 'config', 'segmentuserassoc', 'session', 'language','termcollection',
                 'languageresourceresource','languageresourcetaskassoc','languageresourcetaskpivotassoc',
                 'languageresourceinstance','taskusertracking', 'term', 'attribute', 'termattribute', 'category',
-                'quality','userassocdefault', 'log', 'collectionattributedatatype', 'token', 'languageNumberFormat'
+                'quality','userassocdefault', 'log', 'collectionattributedatatype', 'token',
             ],
         ]);
         $this->front->getRouter()->addRoute('editorRestDefault', $restRoute);
@@ -690,6 +690,18 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
                 'controller' => 'term',
                 'action' => 'transfer'
             ]));
+
+        $this->front->getRouter()->addRoute(
+            'numberProtection',
+            new ZfExtended_Controller_RestLikeRoute(
+            'editor/number-protection/number-recognition',
+                [
+                    'module' => 'editor',
+                    'controller' => 'NumberProtectionNumberRecognition',
+                    'action' => ''
+                ]
+            )
+        );
     }
     
     

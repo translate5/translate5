@@ -55,6 +55,6 @@ use Zend_Db_Table_Abstract;
 
 class InputMappingTable extends Zend_Db_Table_Abstract
 {
-    protected $_name = 'LEK_language_number_format_input_mapping';
+    protected $_name = 'LEK_number_protection_input_mapping';
     public $_primary = 'id';
 }

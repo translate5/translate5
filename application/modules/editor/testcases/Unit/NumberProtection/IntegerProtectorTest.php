@@ -53,7 +53,7 @@ declare(strict_types=1);
 namespace MittagQI\Translate5\Test\Unit\NumberProtection;
 
 use editor_Models_Languages;
-use MittagQI\Translate5\NumberProtection\Model\LanguageNumberFormat as LanguageFormat;
+use MittagQI\Translate5\NumberProtection\Model\NumberRecognition as LanguageFormat;
 use MittagQI\Translate5\NumberProtection\Model\NumberFormatDto;
 use MittagQI\Translate5\NumberProtection\Model\NumberFormatRepository;
 use MittagQI\Translate5\NumberProtection\Protector\IntegerProtector;

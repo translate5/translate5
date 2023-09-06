@@ -25,5 +25,7 @@
 -- END LICENSE AND COPYRIGHT
 -- */
 INSERT INTO `Zf_acl_rules` (`module`, `role`, `resource`, `right`) VALUES 
-('editor', 'pm', 'editor_languageNumberFormat', 'all'),
-('editor', 'pm', 'frontend', 'languageNumberFormat');
+('editor', 'pm', 'editor_NumberProtectionNumberRecognition', 'all'),
+('editor', 'pm', 'editor_NumberProtectionInputMapping', 'all'),
+('editor', 'pm', 'editor_NumberProtectionOutputMapping', 'all'),
+('editor', 'pm', 'frontend', 'numberProtection');

@@ -54,7 +54,7 @@ namespace MittagQI\Translate5\Test\Functional\NumberProtection;
 
 use editor_Models_Languages;
 use MittagQI\Translate5\NumberProtection\Model\InputMapping;
-use MittagQI\Translate5\NumberProtection\Model\LanguageNumberFormat;
+use MittagQI\Translate5\NumberProtection\Model\NumberRecognition;
 use MittagQI\Translate5\NumberProtection\Model\OutputMapping;
 use MittagQI\Translate5\NumberProtection\NumberProtector;
 use MittagQI\Translate5\NumberProtection\Protector\IntegerProtector;
@@ -71,7 +71,7 @@ class NumberProtectorTest extends TestCase
         $langDe = ZfExtended_Factory::get(editor_Models_Languages::class);
         $langDe->loadByRfc5646('de');
 
-        $numberFormat = ZfExtended_Factory::get(LanguageNumberFormat::class);
+        $numberFormat = ZfExtended_Factory::get(NumberRecognition::class);
         $numberFormat->setName('test');
         $numberFormat->setRegex('/^\d+ USD$/');
         $numberFormat->setType(IntegerProtector::getType());
@@ -112,7 +112,7 @@ class NumberProtectorTest extends TestCase
         $langDeAt = ZfExtended_Factory::get(editor_Models_Languages::class);
         $langDeAt->loadByRfc5646('de-at');
 
-        $numberFormat = ZfExtended_Factory::get(LanguageNumberFormat::class);
+        $numberFormat = ZfExtended_Factory::get(NumberRecognition::class);
         $numberFormat->setName('test');
         $numberFormat->setRegex('/^\d+ USD$/');
         $numberFormat->setType(IntegerProtector::getType());

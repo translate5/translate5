@@ -32,7 +32,7 @@ use MittagQI\Translate5\NumberProtection\NumberProtector;
 use Zend_Validate;
 use ZfExtended_Models_Validator_Abstract;
 
-class LanguageNumberFormatValidator extends ZfExtended_Models_Validator_Abstract
+class NumberRecognitionValidator extends ZfExtended_Models_Validator_Abstract
 {
 
     /**
@@ -72,7 +72,7 @@ class LanguageNumberFormatValidator extends ZfExtended_Models_Validator_Abstract
         $priorityValidator->addValidator(
             $this->validatorFactory(
                 'Db_NoRecordExists',
-                ['table' => 'LEK_language_number_format', 'field' => 'priority']
+                ['table' => 'LEK_number_protection_number_recognition', 'field' => 'priority']
             )
         );
 

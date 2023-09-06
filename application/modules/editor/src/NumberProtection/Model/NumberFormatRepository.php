@@ -64,25 +64,27 @@ class NumberFormatRepository
     public function getAll(?editor_Models_Languages $sourceLang): iterable
     {
         $dbMapping = ZfExtended_Factory::get(InputMapping::class)->db;
-        $dbNumberFormat = ZfExtended_Factory::get(LanguageNumberFormat::class)->db;
-        $numberFormatTable = ZfExtended_Factory::get(LanguageNumberFormat::class)->db->info($dbNumberFormat::NAME);
+        $dbNumberRecognition = ZfExtended_Factory::get(NumberRecognition::class)->db;
+        $numberRecognitionTable = ZfExtended_Factory::get(NumberRecognition::class)
+            ->db
+            ->info($dbNumberRecognition::NAME);
 
         $selects = [];
-        $selects[] = $dbNumberFormat->select()
-            ->from(['format' => $numberFormatTable], ['format.*'])
+        $selects[] = $dbNumberRecognition->select()
+            ->from(['format' => $numberRecognitionTable], ['format.*'])
             ->where('isDefault = true');
 
         if (null !== $sourceLang) {
             $selects[] = $dbMapping->select()
                 ->setIntegrityCheck(false)
                 ->from(['mapping' => $dbMapping->info($dbMapping::NAME)])
-                ->join(['format' => $numberFormatTable], 'format.id = mapping.numberFormatId', ['format.*'])
+                ->join(['format' => $numberRecognitionTable], 'format.id = mapping.numberFormatId', ['format.*'])
                 ->where('mapping.languageId = ?', $sourceLang->getId());
         }
 
-        $select = $dbNumberFormat->select()->union($selects)->order('priority desc');
+        $select = $dbNumberRecognition->select()->union($selects)->order('priority desc');
 
-        foreach ($dbNumberFormat->fetchAll($select) as $formatData) {
+        foreach ($dbNumberRecognition->fetchAll($select) as $formatData) {
             yield NumberFormatDto::fromRow($formatData);
         }
     }
@@ -92,20 +94,20 @@ class NumberFormatRepository
         string $type,
         string $name
     ): ?string {
-        $lnf = ZfExtended_Factory::get(LanguageNumberFormat::class);
+        $numberRecognition = ZfExtended_Factory::get(NumberRecognition::class);
         try {
-            $lnf->loadBy($type, $name);
+            $numberRecognition->loadBy($type, $name);
         } catch (ZfExtended_Models_Entity_NotFoundException) {
             return null;
         }
 
-        $mapping = $this->findOutputMappingBy((int) $targetLang->getId(), (int) $lnf->getId());
+        $mapping = $this->findOutputMappingBy((int) $targetLang->getId(), (int) $numberRecognition->getId());
         // if not found - try to look by major lang
         if (null === $mapping) {
             $major = ZfExtended_Factory::get(editor_Models_Languages::class);
             $major->loadByRfc5646($targetLang->getMajorRfc5646());
 
-            $mapping = $this->findOutputMappingBy((int) $major->getId(), (int) $lnf->getId());
+            $mapping = $this->findOutputMappingBy((int) $major->getId(), (int) $numberRecognition->getId());
         }
 
         return $mapping?->getFormat();

@@ -55,6 +55,6 @@ use Zend_Db_Table_Abstract;
 
 class OutputMappingTable extends Zend_Db_Table_Abstract
 {
-    protected $_name = 'LEK_language_number_format_output_mapping';
+    protected $_name = 'LEK_number_protection_output_mapping';
     public $_primary = 'id';
 }

@@ -26,16 +26,16 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-use MittagQI\Translate5\NumberProtection\Model\LanguageNumberFormat;
+use MittagQI\Translate5\NumberProtection\Model\NumberRecognition;
 
-class editor_LanguageNumberFormatController extends ZfExtended_RestController
+class editor_NumberProtectionNumberRecognitionController extends ZfExtended_RestController
 {
-    protected $entityClass = LanguageNumberFormat::class;
+    protected $entityClass = NumberRecognition::class;
 
     protected $postBlacklist = ['id'];
 
     /**
-     * @var LanguageNumberFormat
+     * @var NumberRecognition
      */
     protected $entity;
 
