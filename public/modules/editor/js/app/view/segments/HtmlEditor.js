@@ -117,10 +117,6 @@ Ext.define('Editor.view.segments.HtmlEditor', {
             '<span title="{title}" class="short">{shortTag}</span>',
             '<span data-originalid="{id}" data-length="{length}" class="full">{text}</span>'
         ]);
-        me.intNumberSpansTpl = new Ext.Template([
-            '<span title="{title}" class="short">{shortTag}</span>',
-            '<span data-originalid="{id}" data-length="{length}" data-source="{source}" data-target="{target}" class="full"></span>'
-        ]);
         me.termSpanTpl = new Ext.Template([
             '<span class="{className}" title="{title}"">'
         ]);
@@ -152,9 +148,6 @@ Ext.define('Editor.view.segments.HtmlEditor', {
 
             case 'internalspans':
                 return this.intSpansTpl.apply(data);
-
-            case 'numberspans':
-                return this.intNumberSpansTpl.apply(data);
 
             case 'termspan':
                 return (this.hasQIdProp(data) ? this.termSpanTplQid.apply(data) : this.termSpanTpl.apply(data));
@@ -639,17 +632,12 @@ Ext.define('Editor.view.segments.HtmlEditor', {
                     fullWidth: data.fullWidth,
                     shortWidth: data.shortWidth,
                     whitespaceTag: data.whitespaceTag,
-                    numberTag: data.numberTag,
                     html: me.renderInternalTags(item.className, data),
                     data: data
                 };
             }
 
-            if (me.viewModesController.isFullTag() || data.whitespaceTag || data.numberTag) {
-                if (data.numberTag) {
-                    data.text = data.target ? data.target : data.source;
-                }
-                me.measure(data);
+            if (me.viewModesController.isFullTag() || data.whitespaceTag) {
                 data.path = me.getSvg(data.text, data.fullWidth);
             } else {
                 data.path = me.getSvg(data.shortTag, data.shortWidth);
@@ -713,11 +701,6 @@ Ext.define('Editor.view.segments.HtmlEditor', {
         // Fallunterscheidung Tag Typ
         data = me.renderTagTypeInData(item.className, data);
 
-        if (data.numberTag) {
-            data.source = spanFull.getAttribute('data-source');
-            data.target = spanFull.getAttribute('data-target');
-        }
-
         //if it is a whitespace tag we have to precalculate the pixel width of the tag (if possible)
         if (data.whitespaceTag) {
             data.pixellength = Editor.view.segments.PixelMapping.getPixelLengthFromTag(item, me.currentSegment.get('metaCache'), me.currentSegment.get('fileId'));
@@ -742,7 +725,6 @@ Ext.define('Editor.view.segments.HtmlEditor', {
         data.key = data.type + data.nr;
         data.shortTag = '&lt;' + data.shortTag + '&gt;';
         data.whitespaceTag = /nbsp|tab|space|newline|char/.test(className);
-        data.numberTag = /number/.test(className);
 
         if (data.whitespaceTag) {
             data.type += ' whitespace';
@@ -801,8 +783,7 @@ Ext.define('Editor.view.segments.HtmlEditor', {
      */
     renderInternalTags: function (className, data) {
         var me = this;
-        const type = data.numberTag ? 'numberspans' : 'internalspans';
-        return '<div class="' + className + '">' + me.applyTemplate(type, data) + '</div>';
+        return '<div class="' + className + '">' + me.applyTemplate('internalspans', data) + '</div>';
     },
 
     /**

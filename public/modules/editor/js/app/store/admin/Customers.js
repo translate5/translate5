@@ -28,6 +28,7 @@ END LICENSE AND COPYRIGHT
 
 Ext.define('Editor.store.admin.Customers', {
     extend: 'Ext.data.Store',
+    alias: 'store.customersStore',
     pageSize: 0,
     model: 'Editor.model.admin.Customer',
     autoLoad: false,
