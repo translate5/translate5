@@ -733,7 +733,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
      */
     public function initForFuzzyAnalysis($analysisId)
     {
-        $mime = "TM";
+        $mime = 'TM';
         // TODO FIXME: This brings the "Mother-TM" into fuzzy-mode, why is this done ? Maybe a historic artefact due to the ugly "clone" in the base-implementation ??
         $this->isInternalFuzzy = true;
         $validExportTypes = $this->getValidExportTypes();
@@ -750,7 +750,12 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
             $data = $this->getTm($validExportTypes[$mime]);
             $this->api->createMemory($fuzzyFileName, $this->languageResource->getSourceLangCode(), $data);
         } else {
+            // HOTFIX for t5memory problem: After a clone the cloned memory might is corrupt, if the cloned TM has (recent) updates
+            // an export of the cloned memory seems to heal that (either as TM or TMX)
+            $this->getTm($validExportTypes['TM']);
+            sleep(1);
             $this->api->cloneMemory($fuzzyFileName);
+            sleep(1);
         }
 
         $fuzzyLanguageResource = clone $this->languageResource;
