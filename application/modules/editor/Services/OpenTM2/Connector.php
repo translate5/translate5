@@ -752,7 +752,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
         } else {
             // HOTFIX for t5memory problem: After a clone the cloned memory might is corrupt, if the cloned TM has (recent) updates
             // an export of the cloned memory seems to heal that (either as TM or TMX)
-            $this->getTm($validExportTypes['TM']);
+            $this->getTm($validExportTypes[$mime]);
             sleep(1);
             $this->api->cloneMemory($fuzzyFileName);
             sleep(1);
