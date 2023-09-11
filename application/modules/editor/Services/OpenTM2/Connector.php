@@ -927,6 +927,11 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
             $this->languageResource->save();
         }
 
+        // HOTFIX for t5memory BUG: It seems a reorganize may deletes recently updated segments
+        // an export of the cloned memory before seems to heal that
+        $validExportTypes = $this->getValidExportTypes();
+        $this->getTm($validExportTypes['TM']);
+        sleep(1);
         $reorganized = $this->api->reorganizeTm();
 
         if($this->isInternalFuzzy()){
@@ -1012,7 +1017,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
     }
 
     /**
-     * Helper to wait for a internal reorganization
+     * Helper to wait for a internal reorganizationgetValidExportTypes
      * @throws editor_Services_Connector_Exception
      * @throws editor_Services_Exceptions_InvalidResponse
      */
