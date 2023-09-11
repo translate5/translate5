@@ -1028,39 +1028,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
             // if TM is answering, we assume reorganize succeeded
             if($this->api->isRequestable()){
                 $this->fuzzyReorganize = -1;
-                $this->reorganizeParentTM();
                 return;
-            }
-        }
-    }
-
-    /**
-     * Reorganize the parent TM for a cloned fuzzy TM if it needs reorganization
-     * @return void
-     * @throws editor_Services_Connector_Exception
-     */
-    private function reorganizeParentTM()
-    {
-        if(Zend_Registry::get('config')->runtimeOptions->LanguageResources->t5memory?->reorganizeParentTmAlongFuzzy && $this->parentApi != null){
-
-            $successful = $this->parentApi->search('EXAMPLE', 'source');
-            if (!$successful && $this->needsReorganizing($this->parentApi->getError())) {
-
-                $this->parentApi->reorganizeTm();
-                $this->fuzzyReorganize = time();
-                while($this->fuzzyReorganize > 0){
-                    // if reorganize takes too long we end with exception
-                    if((time() - $this->fuzzyReorganize) > T5Memory::REQUEST_TIMEOUT){
-                        throw new editor_Services_Connector_Exception('E1512');
-                    }
-                    // wait 10 sec
-                    sleep(10);
-                    // if TM is answering, we assume reorganize succeeded
-                    if($this->parentApi->isRequestable()){
-                        $this->fuzzyReorganize = -1;
-                        return;
-                    }
-                }
             }
         }
     }
