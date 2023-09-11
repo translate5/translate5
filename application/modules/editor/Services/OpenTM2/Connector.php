@@ -1017,7 +1017,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
     }
 
     /**
-     * Helper to wait for a internal reorganizationgetValidExportTypes
+     * Helper to wait for a internal reorganization
      * @throws editor_Services_Connector_Exception
      * @throws editor_Services_Exceptions_InvalidResponse
      */
