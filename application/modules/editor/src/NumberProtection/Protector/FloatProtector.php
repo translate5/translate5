@@ -79,7 +79,7 @@ class FloatProtector extends AbstractProtector
         return sprintf(
             $this->tagFormat(),
             self::getType(),
-            $sourceFormat->name,
+            base64_encode($sourceFormat->name),
             $number,
             $float ? $float->format(format: '#.#') : '',
             $this->getTargetFloat($float, $targetFormat, $targetLang)

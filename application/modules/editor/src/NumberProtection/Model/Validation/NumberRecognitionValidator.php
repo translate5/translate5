@@ -28,6 +28,7 @@ END LICENSE AND COPYRIGHT
 
 namespace MittagQI\Translate5\NumberProtection\Model\Validation;
 
+use MittagQI\Translate5\NumberProtection\Model\Db\NumberRecognitionTable;
 use MittagQI\Translate5\NumberProtection\NumberProtector;
 use Zend_Validate;
 use ZfExtended_Models_Validator_Abstract;
@@ -40,20 +41,17 @@ class NumberRecognitionValidator extends ZfExtended_Models_Validator_Abstract
      */
     protected function defineValidators()
     {
+        $table = \ZfExtended_Factory::get(NumberRecognitionTable::class)->info(NumberRecognitionTable::NAME);
         //`id` int(11) NOT NULL AUTO_INCREMENT,
-        $this->addValidator('id', 'int');
-
-        $this->addValidator('languageId', 'int', [], true);
+        $idValidator = new Zend_Validate();
+        $idValidator->addValidator($this->validatorFactory('int'), true);
+        // users should not be able neither create nor modify default records
+        $idValidator->addValidator(new RecordIsNotDefaultValidator(['table' => $table, 'field' => 'id']), true);
+        $this->addValidatorInstance('id', $idValidator);
 
         $this->addValidator('type', 'InArray', [NumberProtector::create()->types()]);
-
         //`name` varchar(255) NOT NULL DEFAULT 'default',
-        $nameValidator = new Zend_Validate();
-        $nameValidator->addValidator($this->validatorFactory('stringLength', ['min' => 3, 'max' => 255]), true);
-        // "default" is reserved name. users should not be able neither create nor modify default records
-        $nameValidator->addValidator(new NameIsNotDefaultValidator(), true);
-
-        $this->addValidatorInstance('name', $nameValidator);
+        $this->addValidator('name', 'stringLength', ['min' => 3, 'max' => 255]);
 
         //`regex` varchar(255) NOT NULL,
         $regexValidator = new Zend_Validate();

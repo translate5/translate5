@@ -65,20 +65,22 @@ class NumberFormatRepository
     {
         $dbMapping = ZfExtended_Factory::get(InputMapping::class)->db;
         $dbNumberRecognition = ZfExtended_Factory::get(NumberRecognition::class)->db;
-        $numberRecognitionTable = ZfExtended_Factory::get(NumberRecognition::class)
-            ->db
-            ->info($dbNumberRecognition::NAME);
+        $numberRecognitionTable = $dbNumberRecognition->info($dbNumberRecognition::NAME);
 
         $selects = [];
         $selects[] = $dbNumberRecognition->select()
-            ->from(['format' => $numberRecognitionTable], ['format.*'])
+            ->from(['recognition' => $numberRecognitionTable], ['recognition.*'])
             ->where('isDefault = true');
 
         if (null !== $sourceLang) {
             $selects[] = $dbMapping->select()
                 ->setIntegrityCheck(false)
-                ->from(['mapping' => $dbMapping->info($dbMapping::NAME)])
-                ->join(['format' => $numberRecognitionTable], 'format.id = mapping.numberFormatId', ['format.*'])
+                ->from(['mapping' => $dbMapping->info($dbMapping::NAME)], [])
+                ->join(
+                    ['recognition' => $numberRecognitionTable],
+                    'recognition.id = mapping.numberRecognitionId',
+                    ['recognition.*']
+                )
                 ->where('mapping.languageId = ?', $sourceLang->getId());
         }
 
@@ -113,11 +115,11 @@ class NumberFormatRepository
         return $mapping?->getFormat();
     }
 
-    public function findOutputMappingBy(int $langId, int $numberFormatId): ?OutputMapping
+    public function findOutputMappingBy(int $langId, int $numberRecognitionId): ?OutputMapping
     {
         $mapping = ZfExtended_Factory::get(OutputMapping::class);
         try {
-            $mapping->loadBy($langId, $numberFormatId);
+            $mapping->loadBy($langId, $numberRecognitionId);
 
             return $mapping;
         } catch (ZfExtended_Models_Entity_NotFoundException) {

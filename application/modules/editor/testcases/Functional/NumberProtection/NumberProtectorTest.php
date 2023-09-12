@@ -82,12 +82,12 @@ class NumberProtectorTest extends TestCase
 
         $inputMapping = ZfExtended_Factory::get(InputMapping::class);
         $inputMapping->setLanguageId($langEn->getId());
-        $inputMapping->setNumberFormatId($numberFormat->getId());
+        $inputMapping->setNumberRecognitionId($numberFormat->getId());
         $inputMapping->save();
 
         $outputMapping = ZfExtended_Factory::get(OutputMapping::class);
         $outputMapping->setLanguageId($langDe->getId());
-        $outputMapping->setNumberFormatId($numberFormat->getId());
+        $outputMapping->setNumberRecognitionId($numberFormat->getId());
         $outputMapping->setFormat('# EUR');
         $outputMapping->save();
 
@@ -96,7 +96,7 @@ class NumberProtectorTest extends TestCase
         $numberFormat->delete();
 
         self::assertSame(
-            '<number type="integer" name="test" source="12345 USD" iso="12345" target="12345 EUR"/>',
+            '<number type="integer" name="dGVzdA==" source="12345 USD" iso="12345" target="12345 EUR"/>',
             $protected
         );
     }
@@ -123,12 +123,12 @@ class NumberProtectorTest extends TestCase
 
         $inputMapping = ZfExtended_Factory::get(InputMapping::class);
         $inputMapping->setLanguageId($langEn->getId());
-        $inputMapping->setNumberFormatId($numberFormat->getId());
+        $inputMapping->setNumberRecognitionId($numberFormat->getId());
         $inputMapping->save();
 
         $outputMapping = ZfExtended_Factory::get(OutputMapping::class);
         $outputMapping->setLanguageId($langDe->getId());
-        $outputMapping->setNumberFormatId($numberFormat->getId());
+        $outputMapping->setNumberRecognitionId($numberFormat->getId());
         $outputMapping->setFormat('# EUR');
         $outputMapping->save();
 
@@ -137,7 +137,7 @@ class NumberProtectorTest extends TestCase
         $numberFormat->delete();
 
         self::assertSame(
-            '<number type="integer" name="test" source="12345 USD" iso="12345" target="12345 EUR"/>',
+            '<number type="integer" name="dGVzdA==" source="12345 USD" iso="12345" target="12345 EUR"/>',
             $protected
         );
     }
@@ -189,253 +189,253 @@ class NumberProtectorTest extends TestCase
     {
         yield [
             'string' => 'string 20231020 string',
-            'expected' => 'string <number type="date" name="default" source="20231020" iso="2023-10-20" target=""/> string'
+            'expected' => 'string <number type="date" name="ZGVmYXVsdCBZbWQ=" source="20231020" iso="2023-10-20" target=""/> string'
         ];
         yield [
             'string' => 'string 20231230 string',
-            'expected' => 'string <number type="date" name="default" source="20231230" iso="2023-12-30" target=""/> string'
+            'expected' => 'string <number type="date" name="ZGVmYXVsdCBZbWQ=" source="20231230" iso="2023-12-30" target=""/> string'
         ];
 
         yield [
             'string' => 'string 05/07/23 string',
-            'expected' => 'string <number type="date" name="default" source="05/07/23" iso="2023-05-07" target=""/> string'
+            'expected' => 'string <number type="date" name="ZGVmYXVsdCBtL2QveQ==" source="05/07/23" iso="2023-05-07" target=""/> string'
         ];
         yield [
             'string' => 'string 05/27/23 string',
-            'expected' => 'string <number type="date" name="default" source="05/27/23" iso="2023-05-27" target=""/> string'
+            'expected' => 'string <number type="date" name="ZGVmYXVsdCBtL2QveQ==" source="05/27/23" iso="2023-05-27" target=""/> string'
         ];
         yield [
             'string' => 'string 05/17/23 string',
-            'expected' => 'string <number type="date" name="default" source="05/17/23" iso="2023-05-17" target=""/> string'
+            'expected' => 'string <number type="date" name="ZGVmYXVsdCBtL2QveQ==" source="05/17/23" iso="2023-05-17" target=""/> string'
         ];
         yield [
             'string' => 'string 05/30/23 string',
-            'expected' => 'string <number type="date" name="default" source="05/30/23" iso="2023-05-30" target=""/> string'
+            'expected' => 'string <number type="date" name="ZGVmYXVsdCBtL2QveQ==" source="05/30/23" iso="2023-05-30" target=""/> string'
         ];
         yield [
             'string' => 'string 31/07/23 string',
-            'expected' => 'string <number type="date" name="default" source="31/07/23" iso="2023-07-31" target=""/> string'
+            'expected' => 'string <number type="date" name="ZGVmYXVsdCBkL20veQ==" source="31/07/23" iso="2023-07-31" target=""/> string'
         ];
         yield [
             'string' => 'string 26/07/23 string',
-            'expected' => 'string <number type="date" name="default" source="26/07/23" iso="2023-07-26" target=""/> string'
+            'expected' => 'string <number type="date" name="ZGVmYXVsdCBkL20veQ==" source="26/07/23" iso="2023-07-26" target=""/> string'
         ];
         yield [
             'string' => 'string 19/07/23 string',
-            'expected' => 'string <number type="date" name="default" source="19/07/23" iso="2023-07-19" target=""/> string'
+            'expected' => 'string <number type="date" name="ZGVmYXVsdCBkL20veQ==" source="19/07/23" iso="2023-07-19" target=""/> string'
         ];
         yield [
             'string' => 'string 19/7/23 string',
-            'expected' => 'string <number type="date" name="default" source="19/7/23" iso="2023-07-19" target=""/> string'
+            'expected' => 'string <number type="date" name="ZGVmYXVsdCBkL20veQ==" source="19/7/23" iso="2023-07-19" target=""/> string'
         ];
         yield [
             'string' => 'string 5/7/23 string',
-            'expected' => 'string <number type="date" name="default" source="5/7/23" iso="2023-05-07" target=""/> string'
+            'expected' => 'string <number type="date" name="ZGVmYXVsdCBtL2QveQ==" source="5/7/23" iso="2023-05-07" target=""/> string'
         ];
         yield [
             'string' => 'string 5/27/23 string',
-            'expected' => 'string <number type="date" name="default" source="5/27/23" iso="2023-05-27" target=""/> string'
+            'expected' => 'string <number type="date" name="ZGVmYXVsdCBtL2QveQ==" source="5/27/23" iso="2023-05-27" target=""/> string'
         ];
         yield [
             'string' => 'string 5/17/23 string',
-            'expected' => 'string <number type="date" name="default" source="5/17/23" iso="2023-05-17" target=""/> string'
+            'expected' => 'string <number type="date" name="ZGVmYXVsdCBtL2QveQ==" source="5/17/23" iso="2023-05-17" target=""/> string'
         ];
         yield [
             'string' => 'string 5/30/23 string',
-            'expected' => 'string <number type="date" name="default" source="5/30/23" iso="2023-05-30" target=""/> string'
+            'expected' => 'string <number type="date" name="ZGVmYXVsdCBtL2QveQ==" source="5/30/23" iso="2023-05-30" target=""/> string'
         ];
         yield [
             'string' => 'string 05/07/2023 string',
-            'expected' => 'string <number type="date" name="default" source="05/07/2023" iso="2023-05-07" target=""/> string'
+            'expected' => 'string <number type="date" name="ZGVmYXVsdCBtL2QvWQ==" source="05/07/2023" iso="2023-05-07" target=""/> string'
         ];
         yield [
             'string' => 'string 5/7/2023 string',
-            'expected' => 'string <number type="date" name="default" source="5/7/2023" iso="2023-05-07" target=""/> string'
+            'expected' => 'string <number type="date" name="ZGVmYXVsdCBtL2QvWQ==" source="5/7/2023" iso="2023-05-07" target=""/> string'
         ];
         yield [
             'string' => 'string 2023/05/07 string',
-            'expected' => 'string <number type="date" name="default" source="2023/05/07" iso="2023-05-07" target=""/> string'
+            'expected' => 'string <number type="date" name="ZGVmYXVsdCBZL20vZA==" source="2023/05/07" iso="2023-05-07" target=""/> string'
         ];
         yield [
             'string' => 'string 2023/5/7 string',
-            'expected' => 'string <number type="date" name="default" source="2023/5/7" iso="2023-05-07" target=""/> string'
+            'expected' => 'string <number type="date" name="ZGVmYXVsdCBZL20vZA==" source="2023/5/7" iso="2023-05-07" target=""/> string'
         ];
         yield [
             'string' => 'string 35/7/23 string',
-            'expected' => 'string <number type="date" name="default" source="35/7/23" iso="2035-07-23" target=""/> string'
+            'expected' => 'string <number type="date" name="ZGVmYXVsdCB5L20vZA==" source="35/7/23" iso="2035-07-23" target=""/> string'
         ];
         yield [
             'string' => 'string 35/07/23 string',
-            'expected' => 'string <number type="date" name="default" source="35/07/23" iso="2035-07-23" target=""/> string'
+            'expected' => 'string <number type="date" name="ZGVmYXVsdCB5L20vZA==" source="35/07/23" iso="2035-07-23" target=""/> string'
         ];
 
         yield [
             'string' => 'string 05-07-23 string',
-            'expected' => 'string <number type="date" name="default" source="05-07-23" iso="2023-07-05" target=""/> string'
+            'expected' => 'string <number type="date" name="ZGVmYXVsdCBkLW0teQ==" source="05-07-23" iso="2023-07-05" target=""/> string'
         ];
         yield [
             'string' => 'string 05-27-23 string',
-            'expected' => 'string <number type="date" name="default" source="05-27-23" iso="2023-05-27" target=""/> string'
+            'expected' => 'string <number type="date" name="ZGVmYXVsdCBtLWQteQ==" source="05-27-23" iso="2023-05-27" target=""/> string'
         ];
         yield [
             'string' => 'string 05-17-23 string',
-            'expected' => 'string <number type="date" name="default" source="05-17-23" iso="2023-05-17" target=""/> string'
+            'expected' => 'string <number type="date" name="ZGVmYXVsdCBtLWQteQ==" source="05-17-23" iso="2023-05-17" target=""/> string'
         ];
         yield [
             'string' => 'string 05-30-23 string',
-            'expected' => 'string <number type="date" name="default" source="05-30-23" iso="2023-05-30" target=""/> string'
+            'expected' => 'string <number type="date" name="ZGVmYXVsdCBtLWQteQ==" source="05-30-23" iso="2023-05-30" target=""/> string'
         ];
         yield [
             'string' => 'string 31-07-23 string',
-            'expected' => 'string <number type="date" name="default" source="31-07-23" iso="2023-07-31" target=""/> string'
+            'expected' => 'string <number type="date" name="ZGVmYXVsdCBkLW0teQ==" source="31-07-23" iso="2023-07-31" target=""/> string'
         ];
         yield [
             'string' => 'string 26-07-23 string',
-            'expected' => 'string <number type="date" name="default" source="26-07-23" iso="2023-07-26" target=""/> string'
+            'expected' => 'string <number type="date" name="ZGVmYXVsdCBkLW0teQ==" source="26-07-23" iso="2023-07-26" target=""/> string'
         ];
         yield [
             'string' => 'string 19-07-23 string',
-            'expected' => 'string <number type="date" name="default" source="19-07-23" iso="2023-07-19" target=""/> string'
+            'expected' => 'string <number type="date" name="ZGVmYXVsdCBkLW0teQ==" source="19-07-23" iso="2023-07-19" target=""/> string'
         ];
         yield [
             'string' => 'string 19-7-23 string',
-            'expected' => 'string <number type="date" name="default" source="19-7-23" iso="2023-07-19" target=""/> string'
+            'expected' => 'string <number type="date" name="ZGVmYXVsdCBkLW0teQ==" source="19-7-23" iso="2023-07-19" target=""/> string'
         ];
         yield [
             'string' => 'string 5-7-23 string',
-            'expected' => 'string <number type="date" name="default" source="5-7-23" iso="2023-07-05" target=""/> string'
+            'expected' => 'string <number type="date" name="ZGVmYXVsdCBkLW0teQ==" source="5-7-23" iso="2023-07-05" target=""/> string'
         ];
         yield [
             'string' => 'string 5-27-23 string',
-            'expected' => 'string <number type="date" name="default" source="5-27-23" iso="2023-05-27" target=""/> string'
+            'expected' => 'string <number type="date" name="ZGVmYXVsdCBtLWQteQ==" source="5-27-23" iso="2023-05-27" target=""/> string'
         ];
         yield [
             'string' => 'string 5-17-23 string',
-            'expected' => 'string <number type="date" name="default" source="5-17-23" iso="2023-05-17" target=""/> string'
+            'expected' => 'string <number type="date" name="ZGVmYXVsdCBtLWQteQ==" source="5-17-23" iso="2023-05-17" target=""/> string'
         ];
         yield [
             'string' => 'string 5-30-23 string',
-            'expected' => 'string <number type="date" name="default" source="5-30-23" iso="2023-05-30" target=""/> string'
+            'expected' => 'string <number type="date" name="ZGVmYXVsdCBtLWQteQ==" source="5-30-23" iso="2023-05-30" target=""/> string'
         ];
         yield [
             'string' => 'string 05-07-2023 string',
-            'expected' => 'string <number type="date" name="default" source="05-07-2023" iso="2023-07-05" target=""/> string'
+            'expected' => 'string <number type="date" name="ZGVmYXVsdCBkLW0tWQ==" source="05-07-2023" iso="2023-07-05" target=""/> string'
         ];
         yield [
             'string' => 'string 5-7-2023 string',
-            'expected' => 'string <number type="date" name="default" source="5-7-2023" iso="2023-07-05" target=""/> string'
+            'expected' => 'string <number type="date" name="ZGVmYXVsdCBkLW0tWQ==" source="5-7-2023" iso="2023-07-05" target=""/> string'
         ];
         yield [
             'string' => 'string 2023-05-07 string',
-            'expected' => 'string <number type="date" name="default" source="2023-05-07" iso="2023-05-07" target=""/> string'
+            'expected' => 'string <number type="date" name="ZGVmYXVsdCBZLW0tZA==" source="2023-05-07" iso="2023-05-07" target=""/> string'
         ];
         yield [
             'string' => 'string 2023-5-7 string',
-            'expected' => 'string <number type="date" name="default" source="2023-5-7" iso="2023-05-07" target=""/> string'
+            'expected' => 'string <number type="date" name="ZGVmYXVsdCBZLW0tZA==" source="2023-5-7" iso="2023-05-07" target=""/> string'
         ];
 
         yield [
             'string' => 'string 05.07.23 string',
-            'expected' => 'string <number type="date" name="default" source="05.07.23" iso="2023-07-05" target=""/> string'
+            'expected' => 'string <number type="date" name="ZGVmYXVsdCBkLm0ueQ==" source="05.07.23" iso="2023-07-05" target=""/> string'
         ];
         yield [
             'string' => 'string 05.27.23 string',
-            'expected' => 'string <number type="date" name="default" source="05.27.23" iso="2023-05-27" target=""/> string'
+            'expected' => 'string <number type="date" name="ZGVmYXVsdCBtLmQueQ==" source="05.27.23" iso="2023-05-27" target=""/> string'
         ];
         yield [
             'string' => 'string 05.17.23 string',
-            'expected' => 'string <number type="date" name="default" source="05.17.23" iso="2023-05-17" target=""/> string'
+            'expected' => 'string <number type="date" name="ZGVmYXVsdCBtLmQueQ==" source="05.17.23" iso="2023-05-17" target=""/> string'
         ];
         yield [
             'string' => 'string 05.30.23 string',
-            'expected' => 'string <number type="date" name="default" source="05.30.23" iso="2023-05-30" target=""/> string'
+            'expected' => 'string <number type="date" name="ZGVmYXVsdCBtLmQueQ==" source="05.30.23" iso="2023-05-30" target=""/> string'
         ];
         yield [
             'string' => 'string 31.07.23 string',
-            'expected' => 'string <number type="date" name="default" source="31.07.23" iso="2023-07-31" target=""/> string'
+            'expected' => 'string <number type="date" name="ZGVmYXVsdCBkLm0ueQ==" source="31.07.23" iso="2023-07-31" target=""/> string'
         ];
 
         yield [
             'string' => 'string 26.07.23 string',
-            'expected' => 'string <number type="date" name="default" source="26.07.23" iso="2023-07-26" target=""/> string'
+            'expected' => 'string <number type="date" name="ZGVmYXVsdCBkLm0ueQ==" source="26.07.23" iso="2023-07-26" target=""/> string'
         ];
         yield [
             'string' => 'string 19.07.23 string',
-            'expected' => 'string <number type="date" name="default" source="19.07.23" iso="2023-07-19" target=""/> string'
+            'expected' => 'string <number type="date" name="ZGVmYXVsdCBkLm0ueQ==" source="19.07.23" iso="2023-07-19" target=""/> string'
         ];
         yield [
             'string' => 'string 19.7.23 string',
-            'expected' => 'string <number type="date" name="default" source="19.7.23" iso="2023-07-19" target=""/> string'
+            'expected' => 'string <number type="date" name="ZGVmYXVsdCBkLm0ueQ==" source="19.7.23" iso="2023-07-19" target=""/> string'
         ];
         yield [
             'string' => 'string 5.7.23 string',
-            'expected' => 'string <number type="date" name="default" source="5.7.23" iso="2023-07-05" target=""/> string'
+            'expected' => 'string <number type="date" name="ZGVmYXVsdCBkLm0ueQ==" source="5.7.23" iso="2023-07-05" target=""/> string'
         ];
         yield [
             'string' => 'string 5.27.23 string',
-            'expected' => 'string <number type="date" name="default" source="5.27.23" iso="2023-05-27" target=""/> string'
+            'expected' => 'string <number type="date" name="ZGVmYXVsdCBtLmQueQ==" source="5.27.23" iso="2023-05-27" target=""/> string'
         ];
         yield [
             'string' => 'string 5.17.23 string',
-            'expected' => 'string <number type="date" name="default" source="5.17.23" iso="2023-05-17" target=""/> string'
+            'expected' => 'string <number type="date" name="ZGVmYXVsdCBtLmQueQ==" source="5.17.23" iso="2023-05-17" target=""/> string'
         ];
         yield [
             'string' => 'string 5.30.23 string',
-            'expected' => 'string <number type="date" name="default" source="5.30.23" iso="2023-05-30" target=""/> string'
+            'expected' => 'string <number type="date" name="ZGVmYXVsdCBtLmQueQ==" source="5.30.23" iso="2023-05-30" target=""/> string'
         ];
         yield [
             'string' => 'string 05.07.2023 string',
-            'expected' => 'string <number type="date" name="default" source="05.07.2023" iso="2023-07-05" target=""/> string'
+            'expected' => 'string <number type="date" name="ZGVmYXVsdCBkLm0uWQ==" source="05.07.2023" iso="2023-07-05" target=""/> string'
         ];
         yield [
             'string' => 'string 5.7.2023 string',
-            'expected' => 'string <number type="date" name="default" source="5.7.2023" iso="2023-07-05" target=""/> string'
+            'expected' => 'string <number type="date" name="ZGVmYXVsdCBkLm0uWQ==" source="5.7.2023" iso="2023-07-05" target=""/> string'
         ];
         yield [
             'string' => 'string 2023.05.07 string',
-            'expected' => 'string <number type="date" name="default" source="2023.05.07" iso="2023-05-07" target=""/> string'
+            'expected' => 'string <number type="date" name="ZGVmYXVsdCBZLm0uZA==" source="2023.05.07" iso="2023-05-07" target=""/> string'
         ];
         yield [
             'string' => 'string 2023.5.7 string',
-            'expected' => 'string <number type="date" name="default" source="2023.5.7" iso="2023-05-07" target=""/> string'
+            'expected' => 'string <number type="date" name="ZGVmYXVsdCBZLm0uZA==" source="2023.5.7" iso="2023-05-07" target=""/> string'
         ];
 
         yield [
             'string' => 'string 05 07 2023 string',
-            'expected' => 'string <number type="date" name="default" source="05 07 2023" iso="2023-07-05" target=""/> string'
+            'expected' => 'string <number type="date" name="ZGVmYXVsdCBkIG0gWQ==" source="05 07 2023" iso="2023-07-05" target=""/> string'
         ];
         yield [
             'string' => 'string 5 7 2023 string',
-            'expected' => 'string <number type="date" name="default" source="5 7 2023" iso="2023-07-05" target=""/> string'
+            'expected' => 'string <number type="date" name="ZGVmYXVsdCBkIG0gWQ==" source="5 7 2023" iso="2023-07-05" target=""/> string'
         ];
         yield [
             'string' => 'string 31 5 2023 string',
-            'expected' => 'string <number type="date" name="default" source="31 5 2023" iso="2023-05-31" target=""/> string'
+            'expected' => 'string <number type="date" name="ZGVmYXVsdCBkIG0gWQ==" source="31 5 2023" iso="2023-05-31" target=""/> string'
         ];
         yield [
             'string' => 'string 2023 05 07 string',
-            'expected' => 'string <number type="date" name="default" source="2023 05 07" iso="2023-05-07" target=""/> string'
+            'expected' => 'string <number type="date" name="ZGVmYXVsdCBZIG0gZA==" source="2023 05 07" iso="2023-05-07" target=""/> string'
         ];
         yield [
             'string' => 'string 2023 5 7 string',
-            'expected' => 'string <number type="date" name="default" source="2023 5 7" iso="2023-05-07" target=""/> string'
+            'expected' => 'string <number type="date" name="ZGVmYXVsdCBZIG0gZA==" source="2023 5 7" iso="2023-05-07" target=""/> string'
         ];
         yield [
             'string' => 'string 2023 5 30 string',
-            'expected' => 'string <number type="date" name="default" source="2023 5 30" iso="2023-05-30" target=""/> string'
+            'expected' => 'string <number type="date" name="ZGVmYXVsdCBZIG0gZA==" source="2023 5 30" iso="2023-05-30" target=""/> string'
         ];
         yield [
             'string' => 'string 2023 12 31 string',
-            'expected' => 'string <number type="date" name="default" source="2023 12 31" iso="2023-12-31" target=""/> string'
+            'expected' => 'string <number type="date" name="ZGVmYXVsdCBZIG0gZA==" source="2023 12 31" iso="2023-12-31" target=""/> string'
         ];
 
         yield [
             'string' => 'string 05/07 2023 string',
-            'expected' => 'string <number type="date" name="default" source="05/07 2023" iso="2023-07-05" target=""/> string'
+            'expected' => 'string <number type="date" name="ZGVmYXVsdCBkL20gWQ==" source="05/07 2023" iso="2023-07-05" target=""/> string'
         ];
         yield [
             'string' => 'string 31/12 2023 string',
-            'expected' => 'string <number type="date" name="default" source="31/12 2023" iso="2023-12-31" target=""/> string'
+            'expected' => 'string <number type="date" name="ZGVmYXVsdCBkL20gWQ==" source="31/12 2023" iso="2023-12-31" target=""/> string'
         ];
     }
     
@@ -443,64 +443,64 @@ class NumberProtectorTest extends TestCase
     {
         yield [
             'string' => 'string 31 11 2023 string',
-            'expected' => 'string <number type="integer" name="default" source="31" iso="31" target=""/> <number type="integer" name="default" source="11" iso="11" target=""/> <number type="integer" name="default" source="2023" iso="2023" target=""/> string'
+            'expected' => 'string <number type="integer" name="ZGVmYXVsdCBzaW1wbGU=" source="31" iso="31" target=""/> <number type="integer" name="ZGVmYXVsdCBzaW1wbGU=" source="11" iso="11" target=""/> <number type="integer" name="ZGVmYXVsdCBzaW1wbGU=" source="2023" iso="2023" target=""/> string'
         ];
         yield [
             'string' => 'string 20233108 string',
-            'expected' => 'string <number type="integer" name="default" source="20233108" iso="20233108" target=""/> string'
+            'expected' => 'string <number type="integer" name="ZGVmYXVsdCBzaW1wbGU=" source="20233108" iso="20233108" target=""/> string'
         ];
         yield [
             'string' => 'string 05 07 23 string',
-            'expected' => 'string 05 07 <number type="integer" name="default" source="23" iso="23" target=""/> string'
+            'expected' => 'string 05 07 <number type="integer" name="ZGVmYXVsdCBzaW1wbGU=" source="23" iso="23" target=""/> string'
         ];
         yield [
             'string' => 'string 5 7 23 string',
-            'expected' => 'string <number type="integer" name="default" source="5" iso="5" target=""/> <number type="integer" name="default" source="7" iso="7" target=""/> <number type="integer" name="default" source="23" iso="23" target=""/> string'
+            'expected' => 'string <number type="integer" name="ZGVmYXVsdCBzaW1wbGU=" source="5" iso="5" target=""/> <number type="integer" name="ZGVmYXVsdCBzaW1wbGU=" source="7" iso="7" target=""/> <number type="integer" name="ZGVmYXVsdCBzaW1wbGU=" source="23" iso="23" target=""/> string'
         ];
         yield [
             'string' => 'string 2023 32 3 string',
-            'expected' => 'string <number type="integer" name="default" source="2023" iso="2023" target=""/> <number type="integer" name="default" source="32" iso="32" target=""/> <number type="integer" name="default" source="3" iso="3" target=""/> string'
+            'expected' => 'string <number type="integer" name="ZGVmYXVsdCBzaW1wbGU=" source="2023" iso="2023" target=""/> <number type="integer" name="ZGVmYXVsdCBzaW1wbGU=" source="32" iso="32" target=""/> <number type="integer" name="ZGVmYXVsdCBzaW1wbGU=" source="3" iso="3" target=""/> string'
         ];
         yield [
             'string' => 'string 05/07/123 string',
-            'expected' => 'string 05/07/<number type="integer" name="default" source="123" iso="123" target=""/> string'
+            'expected' => 'string 05/07/<number type="integer" name="ZGVmYXVsdCBzaW1wbGU=" source="123" iso="123" target=""/> string'
         ];
         yield [
             'string' => 'string 123/05/07 string',
-            'expected' => 'string <number type="integer" name="default" source="123" iso="123" target=""/>/05/07 string'
+            'expected' => 'string <number type="integer" name="ZGVmYXVsdCBzaW1wbGU=" source="123" iso="123" target=""/>/05/07 string'
         ];
         yield [
             'string' => 'string 35/7/2023 string',
-            'expected' => 'string <number type="integer" name="default" source="35" iso="35" target=""/>/<number type="integer" name="default" source="7" iso="7" target=""/>/<number type="integer" name="default" source="2023" iso="2023" target=""/> string'
+            'expected' => 'string <number type="integer" name="ZGVmYXVsdCBzaW1wbGU=" source="35" iso="35" target=""/>/<number type="integer" name="ZGVmYXVsdCBzaW1wbGU=" source="7" iso="7" target=""/>/<number type="integer" name="ZGVmYXVsdCBzaW1wbGU=" source="2023" iso="2023" target=""/> string'
         ];
         yield [
             'string' => 'string 35/07/2023 string',
-            'expected' => 'string <number type="integer" name="default" source="35" iso="35" target=""/>/07/<number type="integer" name="default" source="2023" iso="2023" target=""/> string'
+            'expected' => 'string <number type="integer" name="ZGVmYXVsdCBzaW1wbGU=" source="35" iso="35" target=""/>/07/<number type="integer" name="ZGVmYXVsdCBzaW1wbGU=" source="2023" iso="2023" target=""/> string'
         ];
         yield [
             'string' => 'string 2023 12/31 string',
-            'expected' => 'string <number type="integer" name="default" source="2023" iso="2023" target=""/> <number type="integer" name="default" source="12" iso="12" target=""/>/<number type="integer" name="default" source="31" iso="31" target=""/> string'
+            'expected' => 'string <number type="integer" name="ZGVmYXVsdCBzaW1wbGU=" source="2023" iso="2023" target=""/> <number type="integer" name="ZGVmYXVsdCBzaW1wbGU=" source="12" iso="12" target=""/>/<number type="integer" name="ZGVmYXVsdCBzaW1wbGU=" source="31" iso="31" target=""/> string'
         ];
         yield [
-            'string' => 'This is <tag1><number type="integer" name="default" source="123" iso="123" target=""/><tag2>malicious 546.5</tag2>2035</tag1> text',
-            'expected' => 'This is <tag1><number type="integer" name="default" source="123" iso="123" target=""/><tag2>malicious <number type="float" name="default" source="546.5" iso="546.5" target=""/></tag2><number type="integer" name="default" source="2035" iso="2035" target=""/></tag1> text',
+            'string' => 'This is <tag1><number type="integer" name="ZGVmYXVsdCBzaW1wbGU=" source="123" iso="123" target=""/><tag2>malicious 546.5</tag2>2035</tag1> text',
+            'expected' => 'This is <tag1><number type="integer" name="ZGVmYXVsdCBzaW1wbGU=" source="123" iso="123" target=""/><tag2>malicious <number type="float" name="ZGVmYXVsdCBnZW5lcmlj" source="546.5" iso="546.5" target=""/></tag2><number type="integer" name="ZGVmYXVsdCBzaW1wbGU=" source="2035" iso="2035" target=""/></tag1> text',
             'useForUnprotectTest' => false,
         ];
         yield [
             'string' => 'string 05.07.123 string',
-            'expected' => 'string 05.07.<number type="integer" name="default" source="123" iso="123" target=""/> string'
+            'expected' => 'string 05.07.<number type="integer" name="ZGVmYXVsdCBzaW1wbGU=" source="123" iso="123" target=""/> string'
         ];
         yield [
             'string' => 'string 05-07-123 string',
-            'expected' => 'string 05-07-<number type="integer" name="default" source="123" iso="123" target=""/> string'
+            'expected' => 'string 05-07-<number type="integer" name="ZGVmYXVsdCBzaW1wbGU=" source="123" iso="123" target=""/> string'
         ];
         yield [
             'string' => 'string 35-7-2023 string',
-            'expected' => 'string <number type="integer" name="default" source="35" iso="35" target=""/>-<number type="integer" name="default" source="7" iso="7" target=""/>-<number type="integer" name="default" source="2023" iso="2023" target=""/> string'
+            'expected' => 'string <number type="integer" name="ZGVmYXVsdCBzaW1wbGU=" source="35" iso="35" target=""/>-<number type="integer" name="ZGVmYXVsdCBzaW1wbGU=" source="7" iso="7" target=""/>-<number type="integer" name="ZGVmYXVsdCBzaW1wbGU=" source="2023" iso="2023" target=""/> string'
         ];
         yield [
             'string' => 'string 35-07-2023 string',
-            'expected' => 'string <number type="integer" name="default" source="35" iso="35" target=""/>-07-<number type="integer" name="default" source="2023" iso="2023" target=""/> string'
+            'expected' => 'string <number type="integer" name="ZGVmYXVsdCBzaW1wbGU=" source="35" iso="35" target=""/>-07-<number type="integer" name="ZGVmYXVsdCBzaW1wbGU=" source="2023" iso="2023" target=""/> string'
         ];
     }
 
@@ -508,104 +508,104 @@ class NumberProtectorTest extends TestCase
     {
         yield [
             'string' => 'string 9.012345 string',
-            'expected' => 'string <number type="float" name="default" source="9.012345" iso="9.012345" target=""/> string'
+            'expected' => 'string <number type="float" name="ZGVmYXVsdCBnZW5lcmlj" source="9.012345" iso="9.012345" target=""/> string'
         ];
         yield [
             'string' => 'string 123456789.12345 string',
-            'expected' => 'string <number type="float" name="default" source="123456789.12345" iso="123456789.12345" target=""/> string'
+            'expected' => 'string <number type="float" name="ZGVmYXVsdCBnZW5lcmlj" source="123456789.12345" iso="123456789.12345" target=""/> string'
         ];
         yield [
             'string' => 'string 123456789,12345 string',
-            'expected' => 'string <number type="float" name="default" source="123456789,12345" iso="123456789.12345" target=""/> string'
+            'expected' => 'string <number type="float" name="ZGVmYXVsdCBnZW5lcmlj" source="123456789,12345" iso="123456789.12345" target=""/> string'
         ];
         yield [
             'string' => 'string 123456789·12345 string',
-            'expected' => 'string <number type="float" name="default" source="123456789·12345" iso="123456789.12345" target=""/> string'
+            'expected' => 'string <number type="float" name="ZGVmYXVsdCBnZW5lcmlj" source="123456789·12345" iso="123456789.12345" target=""/> string'
         ];
 
         yield [
             'string' => 'string 1,234,567.89 string',
-            'expected' => 'string <number type="float" name="default" source="1,234,567.89" iso="1234567.89" target=""/> string'
+            'expected' => 'string <number type="float" name="ZGVmYXVsdCB3aXRoIGNvbW1hIHRob3VzYW5kIGRlY2ltYWwgZG90" source="1,234,567.89" iso="1234567.89" target=""/> string'
         ];
         yield [
             'string' => 'string 1,234,567·89 string',
-            'expected' => 'string <number type="float" name="default" source="1,234,567·89" iso="1234567.89" target=""/> string'
+            'expected' => 'string <number type="float" name="ZGVmYXVsdCB3aXRoIGNvbW1hIHRob3VzYW5kIGRlY2ltYWwgbWlkZGxlIGRvdA==" source="1,234,567·89" iso="1234567.89" target=""/> string'
         ];
         yield [
             'string' => 'string 12,34,567.89 string',
-            'expected' => 'string <number type="float" name="default" source="12,34,567.89" iso="1234567.89" target=""/> string'
+            'expected' => 'string <number type="float" name="ZGVmYXVsdCBpbmRpYW4=" source="12,34,567.89" iso="1234567.89" target=""/> string'
         ];
         yield [
             'string' => 'string 123,4567.89 string',
-            'expected' => 'string <number type="float" name="default" source="123,4567.89" iso="1234567.89" target=""/> string'
+            'expected' => 'string <number type="float" name="ZGVmYXVsdCBjaGluZXNl" source="123,4567.89" iso="1234567.89" target=""/> string'
         ];
 
         yield [
             'string' => 'string 1 234 567.89 string',
-            'expected' => 'string <number type="float" name="default" source="1 234 567.89" iso="1234567.89" target=""/> string'
+            'expected' => 'string <number type="float" name="ZGVmYXVsdCB3aXRoIHdoaXRlc3BhY2UgdGhvdXNhbmQgZGVjaW1hbCBkb3Q=" source="1 234 567.89" iso="1234567.89" target=""/> string'
         ];
         yield [
             'string' => 'string 1 234 567,89 string',
-            'expected' => 'string <number type="float" name="default" source="1 234 567,89" iso="1234567.89" target=""/> string'
+            'expected' => 'string <number type="float" name="ZGVmYXVsdCB3aXRoIHdoaXRlc3BhY2UgdGhvdXNhbmQgZGVjaW1hbCBjb21tYQ==" source="1 234 567,89" iso="1234567.89" target=""/> string'
         ];
 
         yield [
             'string' => 'string 1 234 567.89 string',
-            'expected' => 'string <number type="float" name="default" source="1 234 567.89" iso="1234567.89" target=""/> string'
+            'expected' => 'string <number type="float" name="ZGVmYXVsdCB3aXRoIFtUSFNQXSB0aG91c2FuZCBkZWNpbWFsIGRvdA==" source="1 234 567.89" iso="1234567.89" target=""/> string'
         ];
         yield [
             'string' => 'string 1 234 567,89 string',
-            'expected' => 'string <number type="float" name="default" source="1 234 567,89" iso="1234567.89" target=""/> string'
+            'expected' => 'string <number type="float" name="ZGVmYXVsdCB3aXRoIFtUSFNQXSB0aG91c2FuZCBkZWNpbWFsIGNvbW1h" source="1 234 567,89" iso="1234567.89" target=""/> string'
         ];
 
         yield [
             'string' => 'string 1 234 567.89 string',
-            'expected' => 'string <number type="float" name="default" source="1 234 567.89" iso="1234567.89" target=""/> string'
+            'expected' => 'string <number type="float" name="ZGVmYXVsdCB3aXRoIFtOTkJTUF0gdGhvdXNhbmQgZGVjaW1hbCBkb3Q=" source="1 234 567.89" iso="1234567.89" target=""/> string'
         ];
         yield [
             'string' => 'string 1 234 567,89 string',
-            'expected' => 'string <number type="float" name="default" source="1 234 567,89" iso="1234567.89" target=""/> string'
+            'expected' => 'string <number type="float" name="ZGVmYXVsdCB3aXRoIFtOTkJTUF0gdGhvdXNhbmQgZGVjaW1hbCBjb21tYQ==" source="1 234 567,89" iso="1234567.89" target=""/> string'
         ];
 
         yield [
             'string' => 'string 1˙234˙567.89 string',
-            'expected' => 'string <number type="float" name="default" source="1˙234˙567.89" iso="1234567.89" target=""/> string'
+            'expected' => 'string <number type="float" name="ZGVmYXVsdCB3aXRoICLLmSIgdGhvdXNhbmQgZGVjaW1hbCBkb3Q=" source="1˙234˙567.89" iso="1234567.89" target=""/> string'
         ];
         yield [
             'string' => 'string 1˙234˙567,89 string',
-            'expected' => 'string <number type="float" name="default" source="1˙234˙567,89" iso="1234567.89" target=""/> string'
+            'expected' => 'string <number type="float" name="ZGVmYXVsdCB3aXRoICLLmSIgdGhvdXNhbmQgZGVjaW1hbCBjb21tYQ==" source="1˙234˙567,89" iso="1234567.89" target=""/> string'
         ];
 
         yield [
             'string' => "string 1'234'567.89 string",
-            'expected' => 'string <number type="float" name="default" source="1\'234\'567.89" iso="1234567.89" target=""/> string'
+            'expected' => 'string <number type="float" name="ZGVmYXVsdCB3aXRoICInIiB0aG91c2FuZCBkZWNpbWFsIGRvdA==" source="1\'234\'567.89" iso="1234567.89" target=""/> string'
         ];
         yield [
             'string' => "string 1'234'567,89 string",
-            'expected' => 'string <number type="float" name="default" source="1\'234\'567,89" iso="1234567.89" target=""/> string'
+            'expected' => 'string <number type="float" name="ZGVmYXVsdCB3aXRoICInIiB0aG91c2FuZCBkZWNpbWFsIGNvbW1h" source="1\'234\'567,89" iso="1234567.89" target=""/> string'
         ];
 
         yield [
             'string' => 'string 1.234.567,89 string',
-            'expected' => 'string <number type="float" name="default" source="1.234.567,89" iso="1234567.89" target=""/> string'
+            'expected' => 'string <number type="float" name="ZGVmYXVsdCB3aXRoIGRvdCB0aG91c2FuZCBkZWNpbWFsIGNvbW1h" source="1.234.567,89" iso="1234567.89" target=""/> string'
         ];
         yield [
             'string' => "string 1.234.567'89 string",
-            'expected' => 'string <number type="float" name="default" source="1.234.567\'89" iso="1234567.89" target=""/> string'
+            'expected' => 'string <number type="float" name="ZGVmYXVsdCB3aXRoICInIiBzZXBhcmF0b3I=" source="1.234.567\'89" iso="1234567.89" target=""/> string'
         ];
 
         yield [
             'string' => "string 1.23e12 string",
-            'expected' => 'string <number type="float" name="default" source="1.23e12" iso="" target=""/> string'
+            'expected' => 'string <number type="float" name="ZGVmYXVsdCBleHBvbmVudA==" source="1.23e12" iso="" target=""/> string'
         ];
         yield [
             'string' => "string 1.13e-15 string",
-            'expected' => 'string <number type="float" name="default" source="1.13e-15" iso="" target=""/> string'
+            'expected' => 'string <number type="float" name="ZGVmYXVsdCBleHBvbmVudA==" source="1.13e-15" iso="" target=""/> string'
         ];
 
         yield [
             'string' => "string ١٬٢٣٤٬٥٦٧٫٨٩ string",
-            'expected' => 'string <number type="float" name="default" source="١٬٢٣٤٬٥٦٧٫٨٩" iso="1234567.89" target=""/> string'
+            'expected' => 'string <number type="float" name="ZGVmYXVsdCBhcmFiaWFu" source="١٬٢٣٤٬٥٦٧٫٨٩" iso="1234567.89" target=""/> string'
         ];
     }
 
@@ -613,11 +613,11 @@ class NumberProtectorTest extends TestCase
     {
         yield [
             'string' => 'string 0567,89 string',
-            'expected' => 'string 0567,<number type="integer" name="default" source="89" iso="89" target=""/> string'
+            'expected' => 'string 0567,<number type="integer" name="ZGVmYXVsdCBzaW1wbGU=" source="89" iso="89" target=""/> string'
         ];
         yield [
             'string' => 'string 5.67,89.45 string',
-            'expected' => 'string <number type="float" name="default" source="5.67" iso="5.67" target=""/>,<number type="float" name="default" source="89.45" iso="89.45" target=""/> string'
+            'expected' => 'string <number type="float" name="ZGVmYXVsdCBnZW5lcmlj" source="5.67" iso="5.67" target=""/>,<number type="float" name="ZGVmYXVsdCBnZW5lcmlj" source="89.45" iso="89.45" target=""/> string'
         ];
     }
 
@@ -625,50 +625,50 @@ class NumberProtectorTest extends TestCase
     {
         yield [
             'string' => 'string 123456789 string',
-            'expected' => 'string <number type="integer" name="default" source="123456789" iso="123456789" target=""/> string'
+            'expected' => 'string <number type="integer" name="ZGVmYXVsdCBzaW1wbGU=" source="123456789" iso="123456789" target=""/> string'
         ];
 
         yield [
             'string' => 'string 1,234,567 string',
-            'expected' => 'string <number type="integer" name="default" source="1,234,567" iso="1234567" target=""/> string'
+            'expected' => 'string <number type="integer" name="ZGVmYXVsdCBnZW5lcmljIHdpdGggc2VwYXJhdG9y" source="1,234,567" iso="1234567" target=""/> string'
         ];
         yield [
             'string' => 'string 12,34,567 string',
-            'expected' => 'string <number type="integer" name="default" source="12,34,567" iso="1234567" target=""/> string'
+            'expected' => 'string <number type="integer" name="ZGVmYXVsdCBpbmRpYW4gd2l0aCBjb21tYSB0aG91c2FuZA==" source="12,34,567" iso="1234567" target=""/> string'
         ];
         yield [
             'string' => 'string 1,1234,4567 string',
-            'expected' => 'string <number type="integer" name="default" source="1,1234,4567" iso="112344567" target=""/> string'
+            'expected' => 'string <number type="integer" name="ZGVmYXVsdCBjaGluZXNlIHdpdGggY29tbWEgdGhvdXNhbmQ=" source="1,1234,4567" iso="112344567" target=""/> string'
         ];
 
         yield [
-            'string' => 'string 1 234 567 string',
-            'expected' => 'string <number type="integer" name="default" source="1 234 567" iso="1234567" target=""/> string'
+            'string' => 'string 11 234 567 string',
+            'expected' => 'string <number type="integer" name="ZGVmYXVsdCBnZW5lcmljIHdpdGggc2VwYXJhdG9y" source="11 234 567" iso="11234567" target=""/> string'
         ];
 
         yield [
             'string' => 'string 1 234 567 string',
-            'expected' => 'string <number type="integer" name="default" source="1 234 567" iso="1234567" target=""/> string'
+            'expected' => 'string <number type="integer" name="ZGVmYXVsdCBnZW5lcmljIHdpdGggc2VwYXJhdG9y" source="1 234 567" iso="1234567" target=""/> string'
         ];
 
         yield [
             'string' => 'string 1˙234˙567 string',
-            'expected' => 'string <number type="integer" name="default" source="1˙234˙567" iso="1234567" target=""/> string'
+            'expected' => 'string <number type="integer" name="ZGVmYXVsdCBnZW5lcmljIHdpdGggc2VwYXJhdG9y" source="1˙234˙567" iso="1234567" target=""/> string'
         ];
 
         yield [
             'string' => "string 1'234'567 string",
-            'expected' => 'string <number type="integer" name="default" source="1\'234\'567" iso="1234567" target=""/> string'
+            'expected' => 'string <number type="integer" name="ZGVmYXVsdCBnZW5lcmljIHdpdGggc2VwYXJhdG9y" source="1\'234\'567" iso="1234567" target=""/> string'
         ];
 
         yield [
             'string' => 'string 1.234.567 string',
-            'expected' => 'string <number type="integer" name="default" source="1.234.567" iso="1234567" target=""/> string'
+            'expected' => 'string <number type="integer" name="ZGVmYXVsdCBnZW5lcmljIHdpdGggc2VwYXJhdG9y" source="1.234.567" iso="1234567" target=""/> string'
         ];
 
         yield [
             'string' => "string ١٬٢٣٤٬٥٦٧ string",
-            'expected' => 'string <number type="integer" name="default" source="١٬٢٣٤٬٥٦٧" iso="1234567" target=""/> string'
+            'expected' => 'string <number type="integer" name="ZGVmYXVsdCBhcmFiaWFuIHdpdGggc2VwYXJhdG9y" source="١٬٢٣٤٬٥٦٧" iso="1234567" target=""/> string'
         ];
     }
 
@@ -680,7 +680,7 @@ class NumberProtectorTest extends TestCase
         ];
         yield [
             'string' => 'string 67 89 45 string',
-            'expected' => 'string <number type="integer" name="default" source="67" iso="67" target=""/> <number type="integer" name="default" source="89" iso="89" target=""/> <number type="integer" name="default" source="45" iso="45" target=""/> string'
+            'expected' => 'string <number type="integer" name="ZGVmYXVsdCBzaW1wbGU=" source="67" iso="67" target=""/> <number type="integer" name="ZGVmYXVsdCBzaW1wbGU=" source="89" iso="89" target=""/> <number type="integer" name="ZGVmYXVsdCBzaW1wbGU=" source="45" iso="45" target=""/> string'
         ];
     }
 
@@ -688,19 +688,19 @@ class NumberProtectorTest extends TestCase
     {
         yield [
             'string' => 'string 127.0.0.1 string',
-            'expected' => 'string <number type="ip-address" name="default" source="127.0.0.1" iso="" target=""/> string'
+            'expected' => 'string <number type="ip-address" name="ZGVmYXVsdA==" source="127.0.0.1" iso="" target=""/> string'
         ];
         yield [
             'string' => 'string 255.255.255.255 string',
-            'expected' => 'string <number type="ip-address" name="default" source="255.255.255.255" iso="" target=""/> string'
+            'expected' => 'string <number type="ip-address" name="ZGVmYXVsdA==" source="255.255.255.255" iso="" target=""/> string'
         ];
         yield [
             'string' => 'string 0.0.0.0 string',
-            'expected' => 'string <number type="ip-address" name="default" source="0.0.0.0" iso="" target=""/> string'
+            'expected' => 'string <number type="ip-address" name="ZGVmYXVsdA==" source="0.0.0.0" iso="" target=""/> string'
         ];
         yield [
             'string' => 'string 1.1.1.1 string',
-            'expected' => 'string <number type="ip-address" name="default" source="1.1.1.1" iso="" target=""/> string'
+            'expected' => 'string <number type="ip-address" name="ZGVmYXVsdA==" source="1.1.1.1" iso="" target=""/> string'
         ];
     }
 
@@ -708,23 +708,23 @@ class NumberProtectorTest extends TestCase
     {
         yield [
             'string' => 'string 1.0.0.1.1 string',
-            'expected' => 'string <number type="ip-address" name="default" source="1.0.0.1" iso="" target=""/>.<number type="integer" name="default" source="1" iso="1" target=""/> string'
+            'expected' => 'string <number type="ip-address" name="ZGVmYXVsdA==" source="1.0.0.1" iso="" target=""/>.<number type="integer" name="ZGVmYXVsdCBzaW1wbGU=" source="1" iso="1" target=""/> string'
         ];
         yield [
             'string' => 'string 1.1.1.256 string',
-            'expected' => 'string <number type="float" name="default" source="1.1" iso="1.1" target=""/>.<number type="float" name="default" source="1.256" iso="1.256" target=""/> string'
+            'expected' => 'string <number type="float" name="ZGVmYXVsdCBnZW5lcmlj" source="1.1" iso="1.1" target=""/>.<number type="float" name="ZGVmYXVsdCBnZW5lcmlj" source="1.256" iso="1.256" target=""/> string'
         ];
         yield [
             'string' => 'string 256.0.0.1 string',
-            'expected' => 'string <number type="float" name="default" source="256.0" iso="256" target=""/>.<number type="integer" name="default" source="0" iso="0" target=""/>.<number type="integer" name="default" source="1" iso="1" target=""/> string'
+            'expected' => 'string <number type="float" name="ZGVmYXVsdCBnZW5lcmlj" source="256.0" iso="256" target=""/>.<number type="integer" name="ZGVmYXVsdCBzaW1wbGU=" source="0" iso="0" target=""/>.<number type="integer" name="ZGVmYXVsdCBzaW1wbGU=" source="1" iso="1" target=""/> string'
         ];
         yield [
             'string' => 'string 1.256.0.0 string',
-            'expected' => 'string <number type="float" name="default" source="1.256" iso="1.256" target=""/>.<number type="integer" name="default" source="0" iso="0" target=""/>.<number type="integer" name="default" source="0" iso="0" target=""/> string'
+            'expected' => 'string <number type="float" name="ZGVmYXVsdCBnZW5lcmlj" source="1.256" iso="1.256" target=""/>.<number type="integer" name="ZGVmYXVsdCBzaW1wbGU=" source="0" iso="0" target=""/>.<number type="integer" name="ZGVmYXVsdCBzaW1wbGU=" source="0" iso="0" target=""/> string'
         ];
         yield [
             'string' => 'string 1.0.256.1 string',
-            'expected' => 'string <number type="float" name="default" source="1.0" iso="1" target=""/>.<number type="float" name="default" source="256.1" iso="256.1" target=""/> string'
+            'expected' => 'string <number type="float" name="ZGVmYXVsdCBnZW5lcmlj" source="1.0" iso="1" target=""/>.<number type="float" name="ZGVmYXVsdCBnZW5lcmlj" source="256.1" iso="256.1" target=""/> string'
         ];
     }
 
@@ -732,23 +732,23 @@ class NumberProtectorTest extends TestCase
     {
         yield [
             'string' => 'string 01:02:03:04:ab:cd string',
-            'expected' => 'string <number type="mac-address" name="default" source="01:02:03:04:ab:cd" iso="" target=""/> string'
+            'expected' => 'string <number type="mac-address" name="ZGVmYXVsdA==" source="01:02:03:04:ab:cd" iso="" target=""/> string'
         ];
         yield [
             'string' => 'string 01-02-03-04-ab-cd string',
-            'expected' => 'string <number type="mac-address" name="default" source="01-02-03-04-ab-cd" iso="" target=""/> string'
+            'expected' => 'string <number type="mac-address" name="ZGVmYXVsdA==" source="01-02-03-04-ab-cd" iso="" target=""/> string'
         ];
         yield [
             'string' => 'string 00:00:00:00:00:00 string',
-            'expected' => 'string <number type="mac-address" name="default" source="00:00:00:00:00:00" iso="" target=""/> string'
+            'expected' => 'string <number type="mac-address" name="ZGVmYXVsdA==" source="00:00:00:00:00:00" iso="" target=""/> string'
         ];
         yield [
             'string' => 'string FF:FF:FF:FF:FF:FF string',
-            'expected' => 'string <number type="mac-address" name="default" source="FF:FF:FF:FF:FF:FF" iso="" target=""/> string'
+            'expected' => 'string <number type="mac-address" name="ZGVmYXVsdA==" source="FF:FF:FF:FF:FF:FF" iso="" target=""/> string'
         ];
         yield [
             'string' => 'string FF-11-FF-33-FF-44 string',
-            'expected' => 'string <number type="mac-address" name="default" source="FF-11-FF-33-FF-44" iso="" target=""/> string'
+            'expected' => 'string <number type="mac-address" name="ZGVmYXVsdA==" source="FF-11-FF-33-FF-44" iso="" target=""/> string'
         ];
     }
 
@@ -756,7 +756,7 @@ class NumberProtectorTest extends TestCase
     {
         yield [
             'string' => 'string 01-02-03-04-ab-cd-11 string',
-            'expected' => 'string <number type="mac-address" name="default" source="01-02-03-04-ab-cd" iso="" target=""/>-<number type="integer" name="default" source="11" iso="11" target=""/> string'
+            'expected' => 'string <number type="mac-address" name="ZGVmYXVsdA==" source="01-02-03-04-ab-cd" iso="" target=""/>-<number type="integer" name="ZGVmYXVsdCBzaW1wbGU=" source="11" iso="11" target=""/> string'
         ];
         yield [
             'string' => 'string FF:FF-FF:FF-FF:FF string',
@@ -780,7 +780,7 @@ class NumberProtectorTest extends TestCase
         ];
         yield [
             'string' => 'string 00:00:00:00:00:00:00 string',
-            'expected' => 'string <number type="mac-address" name="default" source="00:00:00:00:00:00" iso="" target=""/>:00 string'
+            'expected' => 'string <number type="mac-address" name="ZGVmYXVsdA==" source="00:00:00:00:00:00" iso="" target=""/>:00 string'
         ];
         yield [
             'string' => 'string F:FF:FF:FF:FF:FF string',
@@ -796,7 +796,7 @@ class NumberProtectorTest extends TestCase
     {
         yield [
             'string' => 'string &Alpha;123456789&quot; string',
-            'expected' => 'string &Alpha;<number type="integer" name="default" source="123456789" iso="123456789" target=""/>&quot; string'
+            'expected' => 'string &Alpha;<number type="integer" name="ZGVmYXVsdCBzaW1wbGU=" source="123456789" iso="123456789" target=""/>&quot; string'
         ];
         yield [
             'string' => 'string<someTag/>123456789 string',
@@ -820,31 +820,31 @@ class NumberProtectorTest extends TestCase
         ];
         yield [
             'string' => 'string <someTag/>123456789<someTag/> string',
-            'expected' => 'string <someTag/><number type="integer" name="default" source="123456789" iso="123456789" target=""/><someTag/> string'
+            'expected' => 'string <someTag/><number type="integer" name="ZGVmYXVsdCBzaW1wbGU=" source="123456789" iso="123456789" target=""/><someTag/> string'
         ];
         yield [
             'string' => 'string <someTag>123456789</someTag> string',
-            'expected' => 'string <someTag><number type="integer" name="default" source="123456789" iso="123456789" target=""/></someTag> string'
+            'expected' => 'string <someTag><number type="integer" name="ZGVmYXVsdCBzaW1wbGU=" source="123456789" iso="123456789" target=""/></someTag> string'
         ];
         yield [
             'string' => '123456789<someTag/> string',
-            'expected' => '<number type="integer" name="default" source="123456789" iso="123456789" target=""/><someTag/> string'
+            'expected' => '<number type="integer" name="ZGVmYXVsdCBzaW1wbGU=" source="123456789" iso="123456789" target=""/><someTag/> string'
         ];
         yield [
             'string' => '<someTag/>123456789<someTag/> string',
-            'expected' => '<someTag/><number type="integer" name="default" source="123456789" iso="123456789" target=""/><someTag/> string'
+            'expected' => '<someTag/><number type="integer" name="ZGVmYXVsdCBzaW1wbGU=" source="123456789" iso="123456789" target=""/><someTag/> string'
         ];
         yield [
             'string' => 'string <someTag/>123456789',
-            'expected' => 'string <someTag/><number type="integer" name="default" source="123456789" iso="123456789" target=""/>'
+            'expected' => 'string <someTag/><number type="integer" name="ZGVmYXVsdCBzaW1wbGU=" source="123456789" iso="123456789" target=""/>'
         ];
         yield [
             'string' => 'string <someTag/>123456789<someTag/>',
-            'expected' => 'string <someTag/><number type="integer" name="default" source="123456789" iso="123456789" target=""/><someTag/>'
+            'expected' => 'string <someTag/><number type="integer" name="ZGVmYXVsdCBzaW1wbGU=" source="123456789" iso="123456789" target=""/><someTag/>'
         ];
         yield 'date at the beginning and end of text' => [
             'string' => '2023/18/07 some text with date in it 2023/18/07',
-            'expected' => '<number type="date" name="default" source="2023/18/07" iso="2023-07-18" target=""/> some text with date in it <number type="date" name="default" source="2023/18/07" iso="2023-07-18" target=""/>',
+            'expected' => '<number type="date" name="ZGVmYXVsdCBZL2QvbQ==" source="2023/18/07" iso="2023-07-18" target=""/> some text with date in it <number type="date" name="ZGVmYXVsdCBZL2QvbQ==" source="2023/18/07" iso="2023-07-18" target=""/>',
         ];
         yield 'already protected number is safe' => [
             'string' => 'some text with date in it: <number type="date" name="test-default" source="2023/18/07" iso="2023-07-18" target="18.07.23"/>',

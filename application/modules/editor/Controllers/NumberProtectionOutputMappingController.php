@@ -26,18 +26,24 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-use MittagQI\Translate5\NumberProtection\Model\NumberRecognition;
+use MittagQI\Translate5\NumberProtection\Model\OutputMapping;
 
-class editor_NumberProtectionNumberRecognitionController extends ZfExtended_RestController
+class editor_NumberProtectionOutputMappingController extends ZfExtended_RestController
 {
-    protected $entityClass = NumberRecognition::class;
+    protected $entityClass = OutputMapping::class;
 
     protected $postBlacklist = ['id'];
 
     /**
-     * @var NumberRecognition
+     * @var OutputMapping
      */
     protected $entity;
+
+    public function indexAction(): void
+    {
+        $this->view->rows = $this->entity->loadAllForFrontEnd();
+        $this->view->total = $this->entity->getTotalCount();
+    }
 
     public function getAction(): void
     {

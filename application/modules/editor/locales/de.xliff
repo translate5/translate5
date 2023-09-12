@@ -9102,6 +9102,10 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
                 <source>Name 'default' cannot be set as a value</source>
                 <target>Der Name 'default' kann nicht als Wert festgelegt werden</target>
             </trans-unit>
+            <trans-unit id='Q2Fubm90IG1vZGlmeSBkZWZhdWx0IHJlY29yZA=='>
+                <source>Cannot modify default record</source>
+                <target>Der Standarddatensatz kann nicht geändert werden</target>
+            </trans-unit>
             <trans-unit id='UHJpb3JpdMOkdA=='>
                 <source>Priorität</source>
                 <target>Priorität</target>
@@ -9110,17 +9114,41 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
                 <source>Lass es so wie es ist</source>
                 <target>Lass es so wie es ist</target>
             </trans-unit>
-            <trans-unit id='U3ByYWNoc3BlemlmaXNjaGUgWmFobGVuZm9ybWF0ZQ=='>
-                <source>Sprachspezifische Zahlenformate</source>
-                <target>Sprachspezifische Zahlenformate</target>
+            <trans-unit id='TnVtbWVybnNjaHV0eg=='>
+                <source>Nummernschutz</source>
+                <target>Nummernschutz</target>
             </trans-unit>
-            <trans-unit id="TMO2c2NoZW4gZGVzIFphaGxlbmZvcm1hdCBiZXN0w6R0aWdlbg==">
-                <source>Löschen des Zahlenformat bestätigen</source>
-                <target>Löschen des Zahlenformat bestätigen</target>
+            <trans-unit id="TMO2c2NodW5nIGJlc3TDpHRpZ2Vu">
+                <source>Löschung bestätigen</source>
+                <target>Löschung bestätigen</target>
             </trans-unit>
-            <trans-unit id="U2luZCBTaWUgc2ljaGVyLCBkYXNzIFNpZSBkYXMgWmFobGVuZm9ybWF0IGzDtnNjaGVuIG3DtmNodGVuPw==">
-                <source>Sind Sie sicher, dass Sie das Zahlenformat löschen möchten?</source>
-                <target>Sind Sie sicher, dass Sie das Zahlenformat löschen möchten?</target>
+            <trans-unit id="U2luZCBTaWUgc2ljaGVyLCBkYXNzIFNpZSBkaWUgTnVtbWVybmVya2VubnVuZyBsw7ZzY2hlbiBtw7ZjaHRlbj8=">
+                <source>Sind Sie sicher, dass Sie die Nummernerkennung löschen möchten?</source>
+                <target>Sind Sie sicher, dass Sie die Nummernerkennung löschen möchten?</target>
+            </trans-unit>
+            <trans-unit id="U2luZCBTaWUgc2ljaGVyLCBkYXNzIFNpZSBkaWUgWnVvcmRudW5nIGzDtnNjaGVuIG3DtmNodGVuPw==">
+                <source>Sind Sie sicher, dass Sie die Zuordnung löschen möchten?</source>
+                <target>Sind Sie sicher, dass Sie die Zuordnung löschen möchten?</target>
+            </trans-unit>
+            <trans-unit id="TnVtbWVybmVya2VubnVuZw==">
+                <source>Nummernerkennung</source>
+                <target>Nummernerkennung</target>
+            </trans-unit>
+            <trans-unit id="RWluZ2FiZXp1b3JkbnVuZw==">
+                <source>Eingabezuordnung</source>
+                <target>Eingabezuordnung</target>
+            </trans-unit>
+            <trans-unit id="QXVzZ2FiZXp1b3JkbnVuZw==">
+                <source>Ausgabezuordnung</source>
+                <target>Ausgabezuordnung</target>
+            </trans-unit>
+            <trans-unit id="TnVtbWVybmVya2VubnVuZyBlcnN0ZWxsZW4=">
+                <source>Nummernerkennung erstellen</source>
+                <target>Nummernerkennung erstellen</target>
+            </trans-unit>
+            <trans-unit id="WnVvcmRudW5nIGVyc3RlbGxlbg==">
+                <source>Zuordnung erstellen</source>
+                <target>Zuordnung erstellen</target>
             </trans-unit>
         </body>
     </file>

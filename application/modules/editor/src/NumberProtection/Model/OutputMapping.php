@@ -54,34 +54,51 @@ namespace MittagQI\Translate5\NumberProtection\Model;
 
 use MittagQI\Translate5\NumberProtection\Model\Db\NumberRecognitionTable;
 use MittagQI\Translate5\NumberProtection\Model\Db\OutputMappingTable;
-use MittagQI\Translate5\NumberProtection\Model\Validation\NumberRecognitionValidator;
+use MittagQI\Translate5\NumberProtection\Model\Validation\OutputMappingValidator;
 use Zend_Db_Table_Row_Abstract;
+use ZfExtended_Factory;
 use ZfExtended_Models_Entity_Abstract;
 
 /**
  * @method string getId()
  * @method string getLanguageId()
  * @method void setLanguageId(int $languageId)
- * @method string getNumberFormatId()
- * @method void setNumberFormatId(int $numberFormatId)
+ * @method string getNumberRecognitionId()
+ * @method void setNumberRecognitionId(int $numberRecognitionId)
  * @method string getFormat()
  * @method void setFormat(string $format)
  */
 class OutputMapping extends ZfExtended_Models_Entity_Abstract
 {
     protected $dbInstanceClass = OutputMappingTable::class;
-//    protected $validatorInstanceClass = LanguageNumberFormatValidator::class;
+    protected $validatorInstanceClass = OutputMappingValidator::class;
 
-    public function loadBy(int $langId, int $numberFormatId): ?Zend_Db_Table_Row_Abstract
+    public function loadBy(int $langId, int $numberRecognitionId): ?Zend_Db_Table_Row_Abstract
     {
         $s = $this->db->select();
-        $s->where('languageId = ?', $langId)->where('numberFormatId = ?', $numberFormatId);
+        $s->where('languageId = ?', $langId)->where('numberRecognitionId = ?', $numberRecognitionId);
 
         $this->row = $this->db->fetchRow($s);
         if (empty($this->row)){
-            $this->notFound("#by languageId, numberFormatId", "$langId, $numberFormatId");
+            $this->notFound("#by languageId, numberRecognitionId", "$langId, $numberRecognitionId");
         }
 
         return $this->row;
+    }
+
+    public function loadAllForFrontEnd()
+    {
+        $recognitionTable = ZfExtended_Factory::get(NumberRecognitionTable::class)->info(NumberRecognitionTable::NAME);
+        $s = $this->db
+            ->select()
+            ->setIntegrityCheck(false)
+            ->from(['mapping' => $this->db->info($this->db::NAME)], ['mapping.id', 'languageId', 'mapping.format'])
+            ->join(
+                ['recognition' => $recognitionTable],
+                'recognition.id = mapping.numberRecognitionId',
+                ['type', 'name']
+            );
+
+        return $this->loadFilterdCustom($s);
     }
 }

@@ -53,17 +53,36 @@ declare(strict_types=1);
 namespace MittagQI\Translate5\NumberProtection\Model;
 
 use MittagQI\Translate5\NumberProtection\Model\Db\InputMappingTable;
+use MittagQI\Translate5\NumberProtection\Model\Db\NumberRecognitionTable;
+use MittagQI\Translate5\NumberProtection\Model\Validation\InputMappingValidator;
+use ZfExtended_Factory;
 use ZfExtended_Models_Entity_Abstract;
 
 /**
  * @method string getId()
  * @method string getLanguageId()
  * @method void setLanguageId(int $languageId)
- * @method string getNumberFormatId()
- * @method void setNumberFormatId(int $numberFormatId)
+ * @method string getNumberRecognitionId()
+ * @method void setNumberRecognitionId(int $numberRecognitionId)
  */
 class InputMapping extends ZfExtended_Models_Entity_Abstract
 {
     protected $dbInstanceClass = InputMappingTable::class;
-//    protected $validatorInstanceClass = LanguageNumberFormatValidator::class;
+    protected $validatorInstanceClass = InputMappingValidator::class;
+
+    public function loadAllForFrontEnd()
+    {
+        $recognitionTable = ZfExtended_Factory::get(NumberRecognitionTable::class)->info(NumberRecognitionTable::NAME);
+        $s = $this->db
+            ->select()
+            ->setIntegrityCheck(false)
+            ->from(['mapping' => $this->db->info($this->db::NAME)], ['mapping.id', 'languageId'])
+            ->join(
+                ['recognition' => $recognitionTable],
+                'recognition.id = mapping.numberRecognitionId',
+                ['type', 'name']
+            );
+
+        return $this->loadFilterdCustom($s);
+    }
 }

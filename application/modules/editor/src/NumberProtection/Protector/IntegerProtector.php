@@ -77,14 +77,19 @@ class IntegerProtector extends FloatProtector
             $integer = $fmt->parse(preg_replace('/[^\d]/u', '', $number), NumberFormatter::TYPE_INT64);
         }
 
-        return sprintf(
-            $this->tagFormat(),
-            self::getType(),
-            $sourceFormat->name,
-            $number,
-            (string) $integer,
-            $this->getTargetInteger($integer, $targetFormat, $targetLang)
-        );
+        try {
+            return sprintf(
+                $this->tagFormat(),
+                self::getType(),
+                base64_encode($sourceFormat->name),
+                $number,
+                (string)$integer,
+                $this->getTargetInteger($integer, $targetFormat, $targetLang)
+            );
+        } catch (\Throwable) {
+            dump($sourceFormat->name);
+            return '';
+        }
     }
 
     protected function getTargetInteger(

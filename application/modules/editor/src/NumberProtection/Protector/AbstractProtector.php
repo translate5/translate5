@@ -98,7 +98,7 @@ abstract class AbstractProtector implements NumberProtectorInterface
         return sprintf(
             $this->tagFormat(),
             static::getType(),
-            $sourceFormat->name,
+            base64_encode($sourceFormat->name),
             $number,
             '',
             ''

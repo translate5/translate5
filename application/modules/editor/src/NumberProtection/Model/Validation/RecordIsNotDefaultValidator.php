@@ -52,26 +52,39 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\NumberProtection\Model\Validation;
 
-use Zend_Validate_Abstract;
+use Zend_Validate_Db_Abstract;
 
-class NameIsNotDefaultValidator extends Zend_Validate_Abstract
+/**
+ * Checks if record has `true` in `isDefault` field.
+ * Should be used in a combination with PK or unique field
+ */
+class RecordIsNotDefaultValidator extends Zend_Validate_Db_Abstract
 {
     private const INVALID = 'invalid';
 
     protected $_messageTemplates = [
-        self::INVALID   => "Name 'default' cannot be set as a value",
+        self::INVALID => "Cannot modify default record",
     ];
 
     public function isValid($value)
     {
+        $valid = true;
         $this->_setValue($value);
 
-        if ('default' !== strtolower($value)) {
-            return true;
+        $result = $this->_query($value);
+        if ($result) {
+            $valid = false;
+            $this->_error(self::INVALID);
         }
 
-        $this->_error(self::INVALID);
+        return $valid;
+    }
 
-        return false;
+    public function getSelect(): \Zend_Db_Select
+    {
+        $select = parent::getSelect();
+        $select->where('isDefault', true);
+
+        return $select;
     }
 }

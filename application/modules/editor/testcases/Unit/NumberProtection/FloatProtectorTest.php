@@ -88,7 +88,7 @@ class FloatProtectorTest extends TestCase
 
         yield 'float' => [
             'number' => '123,456.78',
-            'expected' => '<number type="float" name="test-default" source="123,456.78" iso="123456.78" target="" />',
+            'expected' => '<number type="float" name="dGVzdC1kZWZhdWx0" source="123,456.78" iso="123456.78" target="" />',
             'sourceFormat' => $sourceFormat,
             'targetFormat' => null,
             'targetLang' => null,
@@ -100,7 +100,7 @@ class FloatProtectorTest extends TestCase
 
         yield 'target lang hi_IN' => [
             'number' => '123,456.78',
-            'expected' => '<number type="float" name="test-default" source="123,456.78" iso="123456.78" target="1,23,456.78" />',
+            'expected' => '<number type="float" name="dGVzdC1kZWZhdWx0" source="123,456.78" iso="123456.78" target="1,23,456.78" />',
             'sourceFormat' => $sourceFormat,
             'targetFormat' => null,
             'targetLang' => $targetLangDe,
@@ -110,7 +110,7 @@ class FloatProtectorTest extends TestCase
 
         yield 'target format #,###,####0.###' => [
             'number' => '1,212,312,345.78',
-            'expected' => '<number type="float" name="test-default" source="1,212,312,345.78" iso="1212312345.78" target="12,123,12345.78" />',
+            'expected' => '<number type="float" name="dGVzdC1kZWZhdWx0" source="1,212,312,345.78" iso="1212312345.78" target="12,123,12345.78" />',
             'sourceFormat' => $sourceFormat,
             'targetFormat' => $targetFormat,
             'targetLang' => $targetLangDe,
@@ -126,7 +126,7 @@ class FloatProtectorTest extends TestCase
 
         yield 'date. keep as is' => [
             'number' => '123,456.78',
-            'expected' => '<number type="float" name="test-default" source="123,456.78" iso="" target="" />',
+            'expected' => '<number type="float" name="dGVzdC1kZWZhdWx0" source="123,456.78" iso="" target="" />',
             'sourceFormat' => $sourceFormatKeepAsIs,
             'targetFormat' => $targetFormat,
             'targetLang' => $targetLangDe,

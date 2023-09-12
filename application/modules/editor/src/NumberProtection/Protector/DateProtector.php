@@ -87,7 +87,7 @@ class DateProtector extends AbstractProtector
         return sprintf(
             $this->tagFormat(),
             self::getType(),
-            $sourceFormat->name,
+            base64_encode($sourceFormat->name),
             $number,
             $date ? $date->format('Y-m-d') : '',
             $this->getTargetDate($date, $targetFormat, $targetLang)

@@ -9283,17 +9283,41 @@ E-Mail: service@MittagQI.com</pre>
                 <source>Lass es so wie es ist</source>
                 <target>Keep as is</target>
             </trans-unit>
-            <trans-unit id='U3ByYWNoc3BlemlmaXNjaGUgWmFobGVuZm9ybWF0ZQ=='>
-                <source>Sprachspezifische Zahlenformate</source>
-                <target>Language number formats</target>
+            <trans-unit id='TnVtbWVybnNjaHV0eg=='>
+                <source>Nummernschutz</source>
+                <target>Number protection</target>
             </trans-unit>
-            <trans-unit id="TMO2c2NoZW4gZGVzIFphaGxlbmZvcm1hdCBiZXN0w6R0aWdlbg==">
-                <source>Löschen des Zahlenformat bestätigen</source>
-                <target>Confirm number format deletion</target>
+            <trans-unit id="TMO2c2NodW5nIGJlc3TDpHRpZ2Vu">
+                <source>Löschung bestätigen</source>
+                <target>Confirm deletion</target>
             </trans-unit>
-            <trans-unit id="U2luZCBTaWUgc2ljaGVyLCBkYXNzIFNpZSBkYXMgWmFobGVuZm9ybWF0IGzDtnNjaGVuIG3DtmNodGVuPw==">
-                <source>Sind Sie sicher, dass Sie das Zahlenformat löschen möchten?</source>
-                <target>Are you sure you want to delete number format?</target>
+            <trans-unit id="U2luZCBTaWUgc2ljaGVyLCBkYXNzIFNpZSBkaWUgTnVtbWVybmVya2VubnVuZyBsw7ZzY2hlbiBtw7ZjaHRlbj8=">
+                <source>Sind Sie sicher, dass Sie die Nummernerkennung löschen möchten?</source>
+                <target>Are you sure you want to delete number recognition?</target>
+            </trans-unit>
+            <trans-unit id="U2luZCBTaWUgc2ljaGVyLCBkYXNzIFNpZSBkaWUgWnVvcmRudW5nIGzDtnNjaGVuIG3DtmNodGVuPw==">
+                <source>Sind Sie sicher, dass Sie die Zuordnung löschen möchten?</source>
+                <target>Are you sure you want to mapping?</target>
+            </trans-unit>
+            <trans-unit id="TnVtbWVybmVya2VubnVuZw==">
+                <source>Nummernerkennung</source>
+                <target>Number recognition</target>
+            </trans-unit>
+            <trans-unit id="RWluZ2FiZXp1b3JkbnVuZw==">
+                <source>Eingabezuordnung</source>
+                <target>Input mapping</target>
+            </trans-unit>
+            <trans-unit id="QXVzZ2FiZXp1b3JkbnVuZw==">
+                <source>Ausgabezuordnung</source>
+                <target>Output mapping</target>
+            </trans-unit>
+            <trans-unit id="TnVtbWVybmVya2VubnVuZyBlcnN0ZWxsZW4=">
+                <source>Nummernerkennung erstellen</source>
+                <target>Create number recognition</target>
+            </trans-unit>
+            <trans-unit id="WnVvcmRudW5nIGVyc3RlbGxlbg==">
+                <source>Zuordnung erstellen</source>
+                <target>Create mapping</target>
             </trans-unit>
         </body>
     </file>
