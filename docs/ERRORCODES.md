@@ -747,8 +747,6 @@ https://confluence.translate5.net/display/TAD/EventCodes
 | <a id="E3043"></a>E3043 | Plug-In TextShuttle  | TextShuttle Plug-In: API response of /split-sentences doesn't validate against schema. | Please contact the support.                                                                                                                                                                                                                                                                                    |
 | <a id="E3060"></a>E3060 | Plug-In TextShuttle  | Incompatible method 'batchSearch' called.                                              | Please contact the support.                                                                                                                                                                                                                                                                                    |
 | <a id="E3061"></a>E3061 | Plug-In TextShuttle  | TextShuttle Plug-In: Too long segments.                                                | Currently, segments that are too long for TextShuttle (> 3000 characters) can't be translated. They would need to be split between sentences but there is currently no strategy defined to put the results back together. Only possible solution for now: Split the segments manually before using the plugin. |
-| <a id="E1554"></a>E1554  | TODO    | SET ME BY USING ME! {TEST} | TODO DESCRIPTION / SOLUTION |
-| <a id="E1555"></a>E1555  | TODO    | SET ME BY USING ME! {TEST} | TODO DESCRIPTION / SOLUTION |
 
 ## EventCode Design rules / decisions
 - Prefixed with &quot;E&quot; so that a search for the error code through the code is more reliable than just searching for a number
