@@ -28,11 +28,11 @@
 /**
  * @extends Ext.data.Store
  */
-Ext.define('Editor.store.admin.LanguageNumberFormatStore', {
+Ext.define('Editor.store.admin.numberProtection.InputMappingStore', {
     extend: 'Ext.data.Store',
-    requires: ['Editor.view.admin.languageNumberFormat.NumberFormatModel'],
-    alias: 'store.NumberFormatModel',
-    model: 'Editor.view.admin.languageNumberFormat.NumberFormatModel',
+    requires: ['Editor.view.admin.numberProtection.inputMapping.Model'],
+    alias: 'store.numberProtection.InputMapping',
+    model: 'Editor.view.admin.numberProtection.inputMapping.Model',
     autoLoad: false,
     autoSync: false,
     remoteFilter: false,

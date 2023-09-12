@@ -26,15 +26,15 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-Ext.define('Editor.view.admin.languageNumberFormat.CreateNumberFormatWindowViewController', {
+Ext.define('Editor.view.admin.numberProtection.outputMapping.CreateWindowViewController', {
     extend: 'Ext.app.ViewController',
-    alias: 'controller.adminCreateNumberFormatWindowViewController',
+    alias: 'controller.adminCreateOutputMappingWindowViewController',
     listen: {
         component: {
-            '#adminCreateNumberFormatWindow #create-btn': {
-                click: 'saveNewNumberFormat'
+            '#adminCreateOutputMappingWindow #create-btn': {
+                click: 'saveNewOutputMapping'
             },
-            '#adminCreateNumberFormatWindow #cancel-btn': {
+            '#adminCreateOutputMappingWindow #cancel-btn': {
                 click: 'handleUserCancel'
             }
         }
@@ -44,12 +44,12 @@ Ext.define('Editor.view.admin.languageNumberFormat.CreateNumberFormatWindowViewC
         win.down('form').getForm().reset();
         win.close();
     },
-    saveNewNumberFormat: function() {
+    saveNewOutputMapping: function() {
         var me = this,
             win = me.getView(),
             form = win.down('form').getForm(),
             record = form.getRecord(),
-            store = Ext.StoreManager.get('admin.LanguageNumberFormatStore');
+            store = Ext.StoreManager.get('admin.numberProtection.OutputMappingStore');
 
         if (!form.isValid()) {
             return;
@@ -60,9 +60,7 @@ Ext.define('Editor.view.admin.languageNumberFormat.CreateNumberFormatWindowViewC
 
         win.setLoading(true);
 
-        if (0 === record.get('languageId')) {
-            record.set('languageId', null);
-        }
+        record.set('numberRecognitionId', form.getValues().numberRecognitionId);
 
         record.save({
             preventDefaultHandler: true,

@@ -27,35 +27,34 @@
 /**
  * Lists and manages the available pricing presets to choose from when creating a task
  */
-Ext.define('Editor.view.admin.languageNumberFormat.NumberFormatGrid', {
+Ext.define('Editor.view.admin.numberProtection.outputMapping.Grid', {
     extend: 'Ext.grid.Panel',
     requires: [
-        'Editor.view.admin.languageNumberFormat.NumberFormatGridController',
-        'Editor.store.admin.LanguageNumberFormatStore',
-        'Editor.view.admin.languageNumberFormat.NumberFormatGridViewModel',
-        'Editor.view.admin.languageNumberFormat.CreateNumberFormatWindow'
+        'Editor.store.admin.numberProtection.OutputMappingStore',
+        'Editor.view.admin.numberProtection.outputMapping.CreateWindow',
+        'Editor.view.admin.numberProtection.outputMapping.GridController',
+        'Editor.view.admin.numberProtection.outputMapping.GridViewModel'
     ],
-    alias: 'widget.NumberFormatGrid',
-    viewModel:{
-        type: 'NumberFormatGrid'
+    alias: 'widget.OutputMappingGrid',
+    viewModel: {
+        type: 'OutputMappingGrid'
     },
     plugins: ['cellediting', 'gridfilters'],
-    itemId: 'numberFormatGrid',
-    reference: 'NumberFormatGrid',
-    controller: 'Editor.view.admin.languageNumberFormat.NumberFormatGridController',
+    itemId: 'OutputMappingGrid',
+    reference: 'OutputMappingGrid',
+    controller: 'Editor.view.admin.numberProtection.outputMapping.GridController',
     stateful: true,
-    stateId: 'adminNumberFormatGrid',
-    store: 'admin.LanguageNumberFormatStore',
+    stateId: 'adminOutputMappingGrid',
+    store: 'admin.numberProtection.OutputMappingStore',
     bind: {
-        title: '{l10n.languageNumberFormat.title}'
+        title: '{l10n.numberProtection.mapping.output_title}'
     },
-    glyph: 'f292@FontAwesome5FreeSolid',
     /** @property {string} routePrefix Used to setup routes on different view instances */
     routePrefix: '',
     listeners: {
         beforeedit: 'onBeforeEdit',
-        edit: 'onNumberFormatEdit',
-        activate:'onGridActivate'
+        edit: 'onOutputMappingEdit',
+        activate: 'onGridActivate'
     },
     viewConfig: {
         enableTextSelection: true
@@ -68,9 +67,8 @@ Ext.define('Editor.view.admin.languageNumberFormat.NumberFormatGrid', {
         var me = this,
             config = {},
             langStore = Ext.getStore('admin.Languages'),
-            langFilter = [],
-            typeFilter = [],
-            rfcs = [];
+            langs = [],
+            langFilter = [];
 
         config.title = me.title;
         config.dockedItems = [{
@@ -86,7 +84,7 @@ Ext.define('Editor.view.admin.languageNumberFormat.NumberFormatGrid', {
                     },
                     ui: 'default-toolbar-small',
                     width: 'auto',
-                    handler: 'createNumberFormat'
+                    handler: 'createOutputMapping'
                 },
                 {
                     xtype: 'button',
@@ -98,7 +96,7 @@ Ext.define('Editor.view.admin.languageNumberFormat.NumberFormatGrid', {
                 },
                 {
                     xtype: 'button',
-                    iconCls: 'x-fa fa-info-circle',
+                    iconCls: 'x-fa fa-question-circle',
                     handler: () => window.open('https://confluence.translate5.net/display/TAD/Application+NumberFormat', '_blank')
                 },
                 {
@@ -120,21 +118,14 @@ Ext.define('Editor.view.admin.languageNumberFormat.NumberFormatGrid', {
                 xtype: 'gridcolumn',
                 dataIndex: 'languageId',
                 flex: 1,
-                renderer: function(v, meta, rec) {
-                    const rfc = langStore.getRfcById(v);
-                    if (rfc && !rfcs.includes(rfc)) {
-                        rfcs.push(rfc);
-                        langFilter.push([v, rfc]);
-
-                        return rfc;
+                renderer: function (v) {
+                    const lang = langStore.getById(v).get('label');
+                    if (!langs.includes(lang)) {
+                        langs.push(lang);
+                        langFilter.push([v, lang]);
                     }
 
-                    if (!rfcs.includes('empty')) {
-                        rfcs.push('empty');
-                        langFilter.push([v, '-']);
-                    }
-
-                    return rfc ? rfc : '-';
+                    return lang;
                 },
                 bind: {
                     text: '{l10n.general.language}'
@@ -149,64 +140,25 @@ Ext.define('Editor.view.admin.languageNumberFormat.NumberFormatGrid', {
                 xtype: 'gridcolumn',
                 dataIndex: 'type',
                 flex: 1,
-                renderer: function(v, meta, rec) {
-                    if (!typeFilter.includes(v)) {
-                        typeFilter.push(v);
-                    }
-
-                    return v;
-                },
                 bind: {
                     text: '{l10n.general.type}'
                 },
                 filter: {
                     type: 'list',
-                    options: typeFilter,
                     phpMode: false
                 }
             },
             {
                 xtype: 'gridcolumn',
-                alias: 'name',
                 dataIndex: 'name',
-                stateId: 'name',
-                editor: {
-                    field: {
-                        xtype: 'textfield',
-                        allowBlank: false,
-                        bind: {
-                            emptyText: '...'
-                        }
-                    }
-                },
-                renderer: 'editableCellRenderer',
-                flex: 3,
+                flex: 2,
                 bind: {
                     text: '{l10n.general.name}'
                 },
                 filter: {
-                    type: 'string'
+                    type: 'string',
+                    phpMode: false
                 }
-            },
-            {
-                xtype: 'gridcolumn',
-                alias: 'regex',
-                dataIndex: 'regex',
-                stateId: 'regex',
-                bind: {
-                    text: '{l10n.general.regex}'
-                },
-                editor: {
-                    field: {
-                        xtype: 'textfield',
-                        allowBlank: false,
-                        bind: {
-                            emptyText: '/d+/u'
-                        }
-                    }
-                },
-                renderer: 'editableCellRenderer',
-                flex: 3
             },
             {
                 xtype: 'gridcolumn',
@@ -226,47 +178,7 @@ Ext.define('Editor.view.admin.languageNumberFormat.NumberFormatGrid', {
                     }
                 },
                 renderer: 'editableCellRenderer',
-                flex: 3
-            },
-            {
-                xtype: 'booleancolumn',
-                alias: 'keepAsIs',
-                dataIndex: 'keepAsIs',
-                stateId: 'keepAsIs',
-                filter: {
-                    type: 'boolean'
-                },
-                editor: {
-                    field: {
-                        xtype: 'checkbox',
-                        allowBlank: true
-                    }
-                },
-                renderer: 'editableCellRenderer',
-                flex: 1,
-                bind: {
-                    text: '{l10n.general.keepAsIs}'
-                }
-            },
-            {
-                xtype: 'gridcolumn',
-                alias: 'priority',
-                dataIndex: 'priority',
-                stateId: 'priority',
-                bind: {
-                    text: '{l10n.general.priority}'
-                },
-                filter: {
-                    type: 'number'
-                },
-                editor: {
-                    field: {
-                        xtype: 'numberfield',
-                        allowBlank: false
-                    }
-                },
-                renderer: 'editableCellRenderer',
-                flex: 1
+                flex: 2
             },
             {
                 xtype: 'actioncolumn',
@@ -279,18 +191,15 @@ Ext.define('Editor.view.admin.languageNumberFormat.NumberFormatGrid', {
                             tooltip: '{l10n.configuration.remove}'
                         },
                         glyph: 'f2ed@FontAwesome5FreeSolid',
-                        isDisabled: function(view, rowIndex, colIndex, item, record) {
-                            // Returns true if 'editable' is false (, null, or undefined)
-                            return 'default' === record.get('name');
-                        },
-                        handler: 'deleteNumberFormat'
+                        handler: 'deleteOutputMapping'
                     }
                 ]
             }
         ];
         if (instanceConfig) {
-            config=me.self.getConfigurator().merge(me, config, instanceConfig);
+            config = me.self.getConfigurator().merge(me, config, instanceConfig);
         }
         return me.callParent([config]);
     }
-});
+})
+;

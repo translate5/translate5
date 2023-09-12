@@ -93,7 +93,23 @@ if(Ext.browser.is.IE) {
 Ext.application({
     name: 'Editor',
     models: ['File', 'Segment', 'admin.User', 'admin.Task', 'segment.Field', 'Config', 'TaskConfig', 'CustomerConfig', 'admin.UserAssocDefault'],
-    stores: ['admin.TokenStore', 'admin.LanguageNumberFormatStore', 'Files', 'ReferenceFiles', 'Segments', 'AlikeSegments', 'admin.Languages', 'UserConfig', 'admin.Config', 'admin.CustomerConfig', 'admin.task.Config', 'admin.UserAssocDefault','admin.WizardTasks'],
+    stores: [
+        'admin.TokenStore',
+        'admin.numberProtection.InputMappingStore',
+        'admin.numberProtection.OutputMappingStore',
+        'admin.numberProtection.NumberRecognitionStore',
+        'Files',
+        'ReferenceFiles',
+        'Segments',
+        'AlikeSegments',
+        'admin.Languages',
+        'UserConfig',
+        'admin.Config',
+        'admin.CustomerConfig',
+        'admin.task.Config',
+        'admin.UserAssocDefault',
+        'admin.WizardTasks'
+    ],
     requires: [
         'Editor.view.ViewPort',
         'Editor.view.ViewPortEditor',

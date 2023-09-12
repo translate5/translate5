@@ -25,45 +25,17 @@
  END LICENSE AND COPYRIGHT
  */
 
-Ext.define('Editor.view.admin.languageNumberFormat.NumberFormatModel', {
-    extend: 'Ext.data.Model',
-    alias: 'model.NumberFormatModel',
-    idProperty: 'id',
-    proxy: {
-        type: 'rest',
-        url: Editor.data.restpath + 'languageNumberFormat',
-        reader: {
-            rootProperty: 'rows',
-            type : 'json'
-        },
-        writer: {
-            encode: true,
-            rootProperty: 'data'
-        }
-    },
-    fields: [{
-        name: 'id',
-        type: 'int'
-    }, {
-        name: 'languageId',
-        type: 'int'
-    }, {
-        name: 'type',
-        type: 'string'
-    },{
-        name: 'name',
-        type: 'string'
-    }, {
-        name: 'regex',
-        type: 'string'
-    }, {
-        name: 'format',
-        type: 'string'
-    }, {
-        name: 'keepAsIs',
-        type: 'bool'
-    }, {
-        name: 'priority',
-        type: 'int'
-    }]
+/**
+ * @extends Ext.data.Store
+ */
+Ext.define('Editor.store.admin.numberProtection.NumberRecognitionStore', {
+    extend: 'Ext.data.Store',
+    requires: ['Editor.view.admin.numberProtection.numberRecognition.Model'],
+    alias: 'store.numberProtection.NumberRecognition',
+    model: 'Editor.view.admin.numberProtection.numberRecognition.Model',
+    autoLoad: false,
+    autoSync: false,
+    remoteFilter: false,
+    remoteSort: false,
+    pageSize: 0
 });

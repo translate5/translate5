@@ -26,9 +26,9 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-Ext.define('Editor.view.admin.languageNumberFormat.NumberFormatGridViewModel', {
+Ext.define('Editor.view.admin.numberProtection.outputMapping.GridViewModel', {
     extend: 'Ext.app.ViewModel',
-    alias: 'viewmodel.NumberFormatGrid',
+    alias: 'viewmodel.OutputMappingGrid',
 
     data:{
         hasReadOnly:true

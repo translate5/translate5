@@ -25,28 +25,26 @@
  END LICENSE AND COPYRIGHT
  */
 
-Ext.define('Editor.view.admin.languageNumberFormat.NumberFormatGridController', {
+Ext.define('Editor.view.admin.numberProtection.outputMapping.GridController', {
     extend: 'Ext.app.ViewController',
-    alias: 'controller.Editor.view.admin.languageNumberFormat.NumberFormatGridController',
+    alias: 'controller.Editor.view.admin.numberProtection.outputMapping.GridController',
 
-    deleteNumberFormat: function(view, rowIdx, colIdx, actionCfg, evt, rec) {
-        const callback = (btn) => btn === 'yes' && Ext.Ajax.request({
-            url: Editor.data.restpath + 'languageNumberFormat',
-            method: 'DELETE',
-            params: {
-                id : rec.get('id')
-            },
-            success: xhr => rec.store.remove(rec)
-        });
-
+    deleteOutputMapping: function(view, rowIdx, colIdx, actionCfg, evt, rec) {
         Ext.MessageBox.confirm(
-            Editor.data.l10n.languageNumberFormat.confirm_deletion_title,
-            Editor.data.l10n.languageNumberFormat.confirm_deletion_message,
-            callback
+            Editor.data.l10n.numberProtection.confirm_deletion_title,
+            Editor.data.l10n.numberProtection.mapping.confirm_deletion_message,
+            btn => btn === 'yes' && Ext.Ajax.request({
+                url: Editor.data.restpath + 'NumberProtectionOutputMapping',
+                method: 'DELETE',
+                params: {
+                    id : rec.get('id')
+                },
+                success: xhr => rec.store.remove(rec)
+            })
         );
     },
 
-    onNumberFormatEdit: function(plugin, context) {
+    onOutputMappingEdit: function(plugin, context) {
         context.record.save({
             preventDefaultHandler: true,
             success: function() {
@@ -66,23 +64,16 @@ Ext.define('Editor.view.admin.languageNumberFormat.NumberFormatGridController', 
         });
     },
     onBeforeEdit: function(cellEditPlugin, cellContext) {
-        var grid = this.getView(),
-            rec = cellContext.record;
+        this.getView().view.select(cellContext.record);
 
-        if ('default' === rec.getData().name) {
-            return false;
-        }
-
-        grid.view.select(rec);
-
-        return cellContext.field !== 'id';
+        return cellContext.field === 'languageId';
     },
 
-    createNumberFormat: function () {
-        var win = Ext.widget('adminCreateNumberFormatWindow');
+    createOutputMapping: function () {
+        var win = Ext.widget('adminCreateOutputMappingWindow');
         win.show();
         const form = win.down('form');
-        const newRecord = Ext.create('Editor.view.admin.languageNumberFormat.NumberFormatModel');
+        const newRecord = Ext.create('Editor.view.admin.numberProtection.outputMapping.Model');
         // newRecord.set('id', null);
         // Clear form
         form.reset();

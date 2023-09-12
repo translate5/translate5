@@ -2189,11 +2189,20 @@ Editor.data.l10n = {
         copy_and_close_btn: '<?= $this->translate->_('App-Token kopieren') ?>',
         token_created_message: '<?= $this->translate->_('Der Zugriffstoken wird nur einmal angezeigt. Sie werden nicht gespeichert und können nicht abgerufen werden. Stellen Sie sicher, dass Sie es an einem sicheren Ort aufbewahren.<br/><br/><b>{0}</b>') ?>'
     },
-    languageNumberFormat: {
-        title: '<?= $this->translate->_('Sprachspezifische Zahlenformate') ?>',
-        create_title: '<?= $this->translate->_('Zahlenformat erstellen') ?>',
-        confirm_deletion_title: '<?= $this->translate->_('Löschen des Zahlenformat bestätigen') ?>',
-        confirm_deletion_message: '<?= $this->translate->_('Sind Sie sicher, dass Sie das Zahlenformat löschen möchten?') ?>'
+    numberProtection: {
+        title: '<?= $this->translate->_('Nummernschutz') ?>',
+        confirm_deletion_title: '<?= $this->translate->_('Löschung bestätigen') ?>',
+        numberRecognition: {
+            title: '<?= $this->translate->_('Nummernerkennung') ?>',
+            create_title: '<?= $this->translate->_('Nummernerkennung erstellen') ?>',
+            confirm_deletion_message: '<?= $this->translate->_('Sind Sie sicher, dass Sie die Nummernerkennung löschen möchten?') ?>'
+        },
+        mapping: {
+            input_title: '<?= $this->translate->_('Eingabezuordnung') ?>',
+            output_title: '<?= $this->translate->_('Ausgabezuordnung') ?>',
+            create_title: '<?= $this->translate->_('Zuordnung erstellen') ?>',
+            confirm_deletion_message: '<?= $this->translate->_('Sind Sie sicher, dass Sie die Zuordnung löschen möchten?') ?>'
+        }
     },
     general: {
         useForSearch: '<?= $this->translate->_('Bei der Suche verwenden');?>',
@@ -2201,7 +2210,7 @@ Editor.data.l10n = {
         creation_date: '<?= $this->translate->_('Erstellungsdatum') ?>',
         language: '<?= $this->translate->_('Sprache') ?>',
         name: '<?= $this->translate->_('Name') ?>',
-        type: '<?php echo $this->translate->_('Typ');?>',
+        type: '<?= $this->translate->_('Typ');?>',
         format: '<?= $this->translate->_('Format') ?>',
         priority: '<?= $this->translate->_('Priorität') ?>',
         keepAsIs: '<?= $this->translate->_('Lass es so wie es ist') ?>',

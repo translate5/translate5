@@ -25,15 +25,15 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-Ext.define('Editor.view.admin.languageNumberFormat.CreateNumberFormatWindow', {
+Ext.define('Editor.view.admin.numberProtection.outputMapping.CreateWindow', {
     extend: 'Ext.window.Window',
-    alias: 'widget.adminCreateNumberFormatWindow',
-    itemId: 'adminCreateNumberFormatWindow',
-    cls: 'adminCreateNumberFormatWindow',
+    alias: 'widget.adminCreateOutputMappingWindow',
+    itemId: 'adminCreateOutputMappingWindow',
+    cls: 'adminCreateOutputMappingWindow',
     requires: [
-        'Editor.view.admin.languageNumberFormat.CreateNumberFormatWindowViewController'
+        'Editor.view.admin.numberProtection.outputMapping.CreateWindowViewController'
     ],
-    controller: 'adminCreateNumberFormatWindowViewController',
+    controller: 'adminCreateOutputMappingWindowViewController',
     modal: true,
     layout: 'fit',
     initComponent: function () {
@@ -41,10 +41,10 @@ Ext.define('Editor.view.admin.languageNumberFormat.CreateNumberFormatWindow', {
     },
     initConfig: function (instanceConfig) {
         var me = this,
-            config = {};
+            config;
 
         config = {
-            title: Editor.data.l10n.languageNumberFormat.create_title,
+            title: Editor.data.l10n.numberProtection.mapping.create_title,
             layout: {
                 type: 'fit'
             },
@@ -63,35 +63,9 @@ Ext.define('Editor.view.admin.languageNumberFormat.CreateNumberFormatWindow', {
                     items: [
                         {
                             xtype: 'combo',
-                            itemId: 'languageId',
-                            name: 'languageId',
-                            allowBlank: true,
-                            emptyText: '---',
-                            typeAhead: true,
-                            anyMatch: true,
-                            forceSelection: false,
-                            displayField: 'label',
-                            valueField: 'id',
-                            defaultValue: null,
-                            store: {
-                                type: 'languagestore',
-                                listeners: {
-                                    load: function(store) {
-                                        store.insert(0, [{
-                                            id: null,
-                                            label: "---"
-                                        }]);
-                                    }
-                                }
-                            },
-                            bind: {
-                                fieldLabel: '{l10n.general.language}'
-                            }
-                        },
-                        {
-                            xtype: 'combo',
-                            itemId: 'type',
+                            itemId: 'typeField',
                             name: 'type',
+                            ref: 'typeField',
                             allowBlank: false,
                             typeAhead: true,
                             anyMatch: true,
@@ -106,29 +80,49 @@ Ext.define('Editor.view.admin.languageNumberFormat.CreateNumberFormatWindow', {
                                     type: 'float'
                                 },{
                                     type: 'integer'
-                                },{
-                                    type: 'ip-address'
-                                },{
-                                    type: 'mac-address'
                                 }]
+                            },
+                            listeners: {
+                                change: (fld, newValue) => fld.up('form').down('#numberRecognitionId').getStore().filter('type', newValue)
                             },
                             bind: {
                                 fieldLabel: '{l10n.general.type}'
                             }
                         },
                         {
-                            xtype: 'textfield',
-                            name: 'name',
+                            xtype: 'combo',
+                            itemId: 'numberRecognitionId',
+                            name: 'numberRecognitionId',
+                            ref: 'numberRecognitionId',
                             allowBlank: false,
+                            typeAhead: true,
+                            anyMatch: true,
+                            forceSelection: true,
+                            displayField: 'name',
+                            valueField: 'id',
                             bind: {
                                 fieldLabel: '{l10n.general.name}'
+                            },
+                            store: {
+                                type: 'numberProtection.NumberRecognition'
                             }
                         },
                         {
-                            xtype: 'textfield',
-                            name: 'regex',
-                            fieldLabel: 'Regex',
-                            allowBlank: false
+                            xtype: 'combo',
+                            itemId: 'languageId',
+                            name: 'languageId',
+                            allowBlank: false,
+                            typeAhead: true,
+                            anyMatch: true,
+                            forceSelection: true,
+                            displayField: 'label',
+                            valueField: 'id',
+                            bind: {
+                                fieldLabel: '{l10n.general.language}'
+                            },
+                            store: {
+                                type: 'languagestore'
+                            }
                         },
                         {
                             xtype: 'textfield',
@@ -136,22 +130,6 @@ Ext.define('Editor.view.admin.languageNumberFormat.CreateNumberFormatWindow', {
                             allowBlank: true,
                             bind: {
                                 fieldLabel: '{l10n.general.format}'
-                            }
-                        },
-                        {
-                            xtype: 'checkbox',
-                            name: 'keepAsIs',
-                            allowBlank: false,
-                            bind: {
-                                fieldLabel: '{l10n.general.keepAsIs}'
-                            }
-                        },
-                        {
-                            xtype: 'numberfield',
-                            name: 'priority',
-                            allowBlank: false,
-                            bind: {
-                                fieldLabel: '{l10n.general.priority}'
                             }
                         }
                     ]
