@@ -30,6 +30,7 @@ CREATE TABLE `LEK_number_protection_number_recognition` (
     `regex` varchar(1024) NOT NULL,
     `format` varchar(124) DEFAULT NULL,
     `keepAsIs` boolean NOT NULL default true,
+    `enabled` boolean NOT NULL default true,
     `isDefault` boolean NOT NULL default false,
     `priority` int(3) NOT NULL,
     PRIMARY KEY (`id`),

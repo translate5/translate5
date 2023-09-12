@@ -138,7 +138,7 @@ Ext.define('Editor.view.admin.numberProtection.numberRecognition.Grid', {
                     }
                 },
                 renderer: 'editableCellRenderer',
-                flex: 3,
+                flex: 2,
                 bind: {
                     text: '{l10n.general.name}'
                 },
@@ -187,23 +187,33 @@ Ext.define('Editor.view.admin.numberProtection.numberRecognition.Grid', {
                 flex: 1
             },
             {
-                xtype: 'booleancolumn',
-                alias: 'keepAsIs',
+                xtype: 'checkcolumn',
                 dataIndex: 'keepAsIs',
                 stateId: 'keepAsIs',
                 filter: {
                     type: 'boolean'
                 },
-                editor: {
-                    field: {
-                        xtype: 'checkbox',
-                        allowBlank: true
-                    }
+                listeners: {
+                    beforecheckchange: 'onBeforeCheckChange'
                 },
-                renderer: 'editableCellRenderer',
                 flex: 1,
                 bind: {
                     text: '{l10n.general.keepAsIs}'
+                }
+            },
+            {
+                xtype: 'checkcolumn',
+                dataIndex: 'rowEnabled',
+                stateId: 'rowEnabled',
+                filter: {
+                    type: 'boolean'
+                },
+                listeners: {
+                    beforecheckchange: 'onBeforeCheckChange'
+                },
+                flex: 1,
+                bind: {
+                    text: '{l10n.general.enabled}'
                 }
             },
             {
@@ -239,6 +249,7 @@ Ext.define('Editor.view.admin.numberProtection.numberRecognition.Grid', {
                         glyph: 'f2ed@FontAwesome5FreeSolid',
                         isDisabled: function(view, rowIndex, colIndex, item, record) {
                             // Returns true if 'editable' is false (, null, or undefined)
+
                             return record.get('isDefault');
                         },
                         handler: 'deleteNumberRecognition'

@@ -70,7 +70,8 @@ class NumberFormatRepository
         $selects = [];
         $selects[] = $dbNumberRecognition->select()
             ->from(['recognition' => $numberRecognitionTable], ['recognition.*'])
-            ->where('isDefault = true');
+            ->where('isDefault = true')
+            ->where('enabled = true');
 
         if (null !== $sourceLang) {
             $selects[] = $dbMapping->select()
@@ -81,7 +82,8 @@ class NumberFormatRepository
                     'recognition.id = mapping.numberRecognitionId',
                     ['recognition.*']
                 )
-                ->where('mapping.languageId = ?', $sourceLang->getId());
+                ->where('mapping.languageId = ?', $sourceLang->getId())
+                ->where('recognition.enabled = true');
         }
 
         $select = $dbNumberRecognition->select()->union($selects)->order('priority desc');

@@ -63,6 +63,7 @@ class NumberRecognitionValidator extends ZfExtended_Models_Validator_Abstract
         $this->addValidator('format', 'stringLength', ['min' => 0, 'max' => 255]);
 
         $this->addValidator('keepAsIs', 'boolean');
+        $this->addValidator('enabled', 'boolean');
 
         $priorityValidator = new Zend_Validate();
 
@@ -75,5 +76,14 @@ class NumberRecognitionValidator extends ZfExtended_Models_Validator_Abstract
         );
 
         $this->addValidatorInstance('priority', $priorityValidator);
+    }
+
+    public function isValid(array $data)
+    {
+        if (2 === count($data) && array_key_exists('enabled', $data)) {
+            return is_bool($data['enabled']);
+        }
+
+        return parent::isValid($data);
     }
 }

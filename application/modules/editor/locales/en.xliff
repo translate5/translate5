@@ -9319,6 +9319,10 @@ E-Mail: service@MittagQI.com</pre>
                 <source>Zuordnung erstellen</source>
                 <target>Create mapping</target>
             </trans-unit>
+            <trans-unit id='RXJtw7ZnbGljaHQ='>
+                <source>Ermöglicht</source>
+                <target>Enabled</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

@@ -78,6 +78,23 @@ Ext.define('Editor.view.admin.numberProtection.numberRecognition.GridController'
         return cellContext.field !== 'id';
     },
 
+    onBeforeCheckChange: function (col, recordIndex, checked, record){
+        // at times extJs fires this event without record what in theory must not happen
+        if(!record){
+            return;
+        }
+
+        if (record.getData().isDefault && col.dataIndex !== 'rowEnabled') {
+            return false;
+        }
+
+        record.set(col.dataIndex, checked);
+        record.save();
+
+        return true;
+    },
+
+
     createNumberRecognition: function () {
         var win = Ext.widget('adminCreateNumberRecognitionWindow');
         win.show();
