@@ -99,6 +99,15 @@ Ext.define('Editor.view.admin.numberProtection.numberRecognition.Grid', {
                 {
                     xtype: 'tbspacer',
                     flex: 1.6
+                },
+                {
+                    xtype: 'button',
+                    iconCls: 'x-fa fa-filter',
+                    bind: {
+                        text: '{l10n.general.hideDefault}'
+                    },
+                    enableToggle: true,
+                    toggleHandler: 'onToggleDefaultFilter'
                 }
             ]
         }];

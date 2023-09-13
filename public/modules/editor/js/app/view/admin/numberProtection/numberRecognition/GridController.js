@@ -116,6 +116,20 @@ Ext.define('Editor.view.admin.numberProtection.numberRecognition.GridController'
     onRefreshClick: function(){
         this.getView().getStore().reload();
     },
+    onToggleDefaultFilter: function (btn, pressed) {
+        if (pressed) {
+            btn.setText(Editor.data.l10n.general.showDefault);
+            this.getView().getStore().addFilter({
+                property: 'isDefault',
+                value: false
+            });
+
+            return;
+        }
+
+        btn.setText(Editor.data.l10n.general.hideDefault);
+        this.getView().getStore().removeFilter('isDefault');
+    },
     /**
      * Event listeners
      */

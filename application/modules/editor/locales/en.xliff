@@ -9323,6 +9323,14 @@ E-Mail: service@MittagQI.com</pre>
                 <source>Ermöglicht</source>
                 <target>Enabled</target>
             </trans-unit>
+            <trans-unit id='RGVmYXVsdHMgYW56ZWlnZW4='>
+                <source>Defaults anzeigen</source>
+                <target>Show defaults</target>
+            </trans-unit>
+            <trans-unit id='RGVmYXVsdHMgYXVzYmxlbmRlbg=='>
+                <source>Defaults ausblenden</source>
+                <target>Hide defaults</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>
