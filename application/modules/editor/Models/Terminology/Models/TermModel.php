@@ -742,7 +742,7 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
             WHERE `collectionId` = $collectionId 
               AND `language` = ?
               AND ? IN (`term`, `proposal`) 
-        ", [$language, $term])->fetchAll(PDO::FETCH_COLUMN);
+        ", [$language, trim($term)])->fetchAll(PDO::FETCH_COLUMN);
     }
 
     public function searchTermByParams(array $params = [], &$total = null) {
