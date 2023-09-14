@@ -185,7 +185,8 @@ class editor_TermController extends ZfExtended_RestController
         // If we checked whether those source and/or target terms already exist for theirs languages inside given collection
         if ($this->getParam('checkExisting')) {
 
-            // Flush success
+            // It means this request came from main translate5-app rather than TermPortal-app,
+            // so in that case we make sure user will get explicitly MsgBox saying 'Done'
             $this->view->assign([
                 'success' => true,
                 'msg' => 'Done'
@@ -254,7 +255,7 @@ class editor_TermController extends ZfExtended_RestController
         // If we should check whether those source and/or target terms already exist for theirs languages inside given collection
         if ($this->getParam('checkExisting')) {
 
-            // Define ternEntryIdA array
+            // Define termEntryIdA array
             $termEntryIdA = ['target' => [], 'source' => []];
 
             // Get array of termEntryIds where target term exists, if any
@@ -279,7 +280,7 @@ class editor_TermController extends ZfExtended_RestController
             if (array_intersect($termEntryIdA['target'], $termEntryIdA['source'])) {
 
                 // Flush failure
-                $this->jflush(false, 'Both terms are already existing within in selected term collection');
+                $this->jflush(false, 'Both terms are already existing within selected term collection');
 
             // Else if at least one termEntryId found for target term
             } else if ($termEntryIdA['target']) {
