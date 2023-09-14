@@ -44,7 +44,7 @@ Ext.define('Editor.view.admin.token.CreateTokenWindow', {
             config = {};
 
         config = {
-            title: Editor.data.l10n.general.create_title,
+            title: Editor.data.l10n.token.create_title,
             layout: {
                 type: 'fit'
             },

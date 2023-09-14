@@ -94,6 +94,7 @@ Ext.define('Editor.view.admin.customer.Panel', {
                     {
                         xtype: 'gridpanel',
                         cls: 'customerPanelGrid',
+                        itemId: 'customerPanelGrid',
                         flex: 0.3,
                         region: 'center',
                         split: true,

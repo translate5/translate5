@@ -106,7 +106,10 @@ class editor_TokenController extends ZfExtended_RestController
             $this->entity->save();
         }
 
-        $this->view->rows = $this->entity->getDataObject();
+        $token = (array) $this->entity->getDataObject();
+        unset($token['token']);
+
+        $this->view->rows = $token;
     }
 
     public function getAction(): void

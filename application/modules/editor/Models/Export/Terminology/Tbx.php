@@ -119,6 +119,11 @@ class editor_Models_Export_Terminology_Tbx {
      */
     private bool $exportAsFile = false;
 
+    /**
+     * @var array|null
+     */
+    protected ?array $selected = [];
+
     public function __construct()
     {
         $tbxImport = ZfExtended_Factory::get('editor_Models_Import_TermListParser_Tbx');
@@ -346,6 +351,9 @@ class editor_Models_Export_Terminology_Tbx {
         $termM = ZfExtended_Factory::get(editor_Models_Terminology_Models_TermModel::class);
         $attrM = ZfExtended_Factory::get(editor_Models_Terminology_Models_AttributeModel::class);
         $trscM = ZfExtended_Factory::get(editor_Models_Terminology_Models_TransacgrpModel::class);
+
+        // Setup $this->selected to accessible in other methods
+        $this->selected = $selected;
 
         // Get total qty of entries to be processed
         $qty = $selected
@@ -668,6 +676,11 @@ class editor_Models_Export_Terminology_Tbx {
                 continue;
             }
 
+            // If we're here due to termtranslation - prevent grammaticalGender from being exported
+            if ($this->selected && $attr['type'] === 'grammaticalGender') {
+                continue;
+            }
+
             // Node attributes
             $_attr = [];
 
@@ -686,11 +699,18 @@ class editor_Models_Export_Terminology_Tbx {
     }
 
     public function transacGrpNodes($level, &$line, $trscA, $termEntryId, $language = '', $termId = '') {
+
+        // Foreach transacGrp-records
         foreach ($trscA[$termEntryId][$language][$termId] ?? [] as $trsc) {
+
+            // If we're here due to termtranslation - export full date, or just Y-m-d otherwise
+            $date = $this->selected ? $trsc['date'] : explode(' ', $trsc['date'])[0];
+
+            // Do export
             $line []= $this->tabs[$level] . '<transacGrp>';
             $line []= $this->tabs[$level + 1] . '<transac type="transactionType">'. $trsc['transac'] . '</transac>';
             $line []= $this->tabs[$level + 1] . '<transacNote type="' . $trsc['transacType'] . '" target="' . $trsc['target'] . '">' . htmlentities($trsc['transacNote'], ENT_XML1) . '</transacNote>';
-            $line []= $this->tabs[$level + 1] . '<date>' . explode(' ', $trsc['date'])[0] . '</date>';
+            $line []= $this->tabs[$level + 1] . "<date>$date</date>";
             $line []= $this->tabs[$level] . '</transacGrp>';
         }
     }

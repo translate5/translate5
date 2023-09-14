@@ -732,12 +732,8 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
      *         wobei die id die ID des Segments in der Tabelle Segments darstellt
      */
     protected function parseSegment($segment,$isSource): string {
-        $segment = editor_Models_Segment_Utility::foreachSegmentTextNode($segment, function($text) {
-            return $this->tagProtector->protect(
-                $text,
-                $this->task->getSourceLang(),
-                $this->task->getTargetLang()
-            );
+        $segment = editor_Models_Segment_Utility::foreachSegmentTextNode($segment, function($text){
+            return $this->utilities->whitespace->protectWhitespace($text);
         });
         if (strpos($segment, '<') === false) {
             return $segment;

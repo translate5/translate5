@@ -116,6 +116,7 @@ class editor_Services_Connector
     
     /**
      * Init connector for fuzzy usage
+     * TODO FIXME: The method is improperly named as it actually clones or creates a fuzzy connector
      * @param integer  $analysisId
      * @return editor_Services_Connector
      */

@@ -139,14 +139,12 @@ div.single + div {
 .short-tag div.internal-tag.tab span.short,
 .short-tag div.internal-tag.space span.short,
 .short-tag div.internal-tag.newline span.short,
-.short-tag div.internal-tag.nbsp span.short,
-.short-tag div.internal-tag.number span.short {display:none;}
+.short-tag div.internal-tag.nbsp span.short {display:none;}
 .short-tag div.internal-tag.char span.full,
 .short-tag div.internal-tag.tab span.full,
 .short-tag div.internal-tag.space span.full,
 .short-tag div.internal-tag.newline span.full,
-.short-tag div.internal-tag.nbsp span.full,
-.short-tag div.internal-tag.number span.full {display:inline;}
+.short-tag div.internal-tag.nbsp span.full {display:inline;}
 
 #segment-grid span.term {
     text-decoration: underline;
@@ -1213,27 +1211,3 @@ dl {
     -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=70)";
     opacity: 0.7;
 }
-
-div.internal-tag.number {
-    width: 0;
-    height: 0;
-    display: inline;
-    border: none;
-    color: transparent;
-    user-select: none;
-    box-sizing: border-box;
-    word-break: break-all;
-}
-div.internal-tag.number span.full::after {
-    content: attr(data-source);
-    color: #000;
-    display: inline;
-    white-space: nowrap;
-    padding-top: 3px;
-}
-
-.type-target div.internal-tag.number .full::after {
-    content: attr(data-target);
-}
-
-.number + .number { margin-left:1px; }

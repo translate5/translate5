@@ -152,6 +152,7 @@ Ext.define('Editor.view.ViewPortEditor', {
                     stateful:true
                 },{
                     xtype: 'commentPanel',
+                    disabled: (task && task.isReadOnly()), // commenting on task in readonly mode should not be possible
                     stateId: 'editor.eastPanelCommentPanel',
                     stateEvents: ['collapse', 'expand'],
                     stateful:true

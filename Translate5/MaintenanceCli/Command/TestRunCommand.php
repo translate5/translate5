@@ -37,6 +37,9 @@ class TestRunCommand extends Translate5AbstractTestCommand
 {
     // the name of the command (the part after "bin/console")
     protected static $defaultName = 'test:run';
+
+    // skipping tests when running a single one makes no sense
+    protected static bool $canSkipTests = false;
     
     protected function configure()
     {
