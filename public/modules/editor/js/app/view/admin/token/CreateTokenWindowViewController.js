@@ -72,7 +72,7 @@ Ext.define('Editor.view.admin.token.CreateTokenWindowViewController', {
                     closable: false,
                     buttons: Ext.MessageBox.OK,
                     buttonText: {
-                        ok: Editor.data.l10n.general.copy_and_close_btn
+                        ok: Editor.data.l10n.token.copy_and_close_btn
                     },
                     fn : function (){
                         if (navigator?.clipboard?.writeText) {

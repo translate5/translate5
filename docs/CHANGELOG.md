@@ -30,6 +30,77 @@ All updates are (downwards) compatible! If not this is listed in the important r
 
 
 
+
+## [6.5.2] - 2023-09-05
+
+### Important Notes:
+#### [TRANSLATE-3451](https://jira.translate5.net/browse/TRANSLATE-3451)
+This fix cleans inconsistent entries in the user default associations - if there are any. The deleted entries are listed in the system log. Please check the log and readd them if necessary. The inconsistency was due invalid workflow and workflowStep combination, which can only happen due manual changes in the DB.
+
+#### [TRANSLATE-3048](https://jira.translate5.net/browse/TRANSLATE-3048)
+This Feature changes the way the T5-API can be accessed: An App-Token MUST be used from now on to request the API
+externally. t5connect must be setup to use App-Tokens !!
+ 
+
+
+### Added
+**[TRANSLATE-3376](https://jira.translate5.net/browse/TRANSLATE-3376): Editor general - Select a term anywhere and hit F3 to search the Concordance** <br>
+Concordance search now works for source/target-columns even if editor is not opened
+
+
+### Changed
+**[TRANSLATE-3470](https://jira.translate5.net/browse/TRANSLATE-3470): Test framework - Add option to skip certain tests to test:runall command** <br>
+ENHANCEMENT: add option to skip certain tests in test-commands
+
+**[TRANSLATE-3467](https://jira.translate5.net/browse/TRANSLATE-3467): Installation & Update - Implement a instance specific notification facility** <br>
+In the optional file client-specific/instance-notes.md specific notes for updating and downtime can be noted. The file is printed on each usage of the maintenance and status command so that admin is remembered to that important notes regarding update and downtime.
+
+
+### Bugfixes
+**[TRANSLATE-3468](https://jira.translate5.net/browse/TRANSLATE-3468): Main back-end mechanisms (Worker, Logging, etc.) - Fix AcrossHotfolder faulty namespaces in the SQL files** <br>
+FIX: Wrong SQL in Across Hotfolder plugin
+
+**[TRANSLATE-3464](https://jira.translate5.net/browse/TRANSLATE-3464): Main back-end mechanisms (Worker, Logging, etc.) - Awkward Code in base Entity-class may leads to memory buildup** <br>
+FIX: inappropriate code in entity-base-class may leads to high memory-consumption
+
+**[TRANSLATE-3457](https://jira.translate5.net/browse/TRANSLATE-3457): User Management - Client-PM / User Manegment: Roles "No rights" & "Basic" appear mistakenly in the user-form** <br>
+FIX: roles "no rights" & "basic" mistakenly appeared in the user-editor form
+
+**[TRANSLATE-3451](https://jira.translate5.net/browse/TRANSLATE-3451): Client management, Workflows - Fix wrong foreign key usage and introduce simple workflow management CLI commands** <br>
+This fix cleans inconsistent entries in the user default associations - if there are any and adds proper foreign keys. The deleted entries are listed in the system log. Please check the log and readd them if necessary. The inconsistency was due invalid workflow and workflowStep combination, which can only happen due manual changes in the DB.
+
+**[TRANSLATE-3450](https://jira.translate5.net/browse/TRANSLATE-3450): Import/Export - XLF x tags with non unique IDs lead to duplicated tags after import** <br>
+XLF with duplicated x tag ids in the same segment were producing wrong tag numbers on import.
+
+**[TRANSLATE-3449](https://jira.translate5.net/browse/TRANSLATE-3449): Editor general - Taking matches with tags ignores the tag numbers** <br>
+Fixed calculating tag numbers when setting TM match to segment editor
+
+**[TRANSLATE-3448](https://jira.translate5.net/browse/TRANSLATE-3448): Main back-end mechanisms (Worker, Logging, etc.) - Missing worker dependencies** <br>
+FIX: Task Operations may unexpectedly terminated before doing anything since the workers have been queued in state "scheduled"
+FIX: Quality Operation queued workers even if completely deactivated
+CARE: checked worker dependencies, added commandline-tool to visualize the dependencies
+
+**[TRANSLATE-3445](https://jira.translate5.net/browse/TRANSLATE-3445): LanguageResources - Google connector: wrong language compare** <br>
+Fix for wrong language compare in google connector.
+
+**[TRANSLATE-3440](https://jira.translate5.net/browse/TRANSLATE-3440): TermPortal - Misunderstandable message, if no Default-PM for term-translations is defined** <br>
+Improved message shown if no Default-PM for term-translations is defined
+
+**[TRANSLATE-3236](https://jira.translate5.net/browse/TRANSLATE-3236): TermPortal - Some attribute values need to change in the term translation workflow** <br>
+Improved import logic for 'Created/Updated At/By' and 'Gender' tbx attributes
+
+**[TRANSLATE-3138](https://jira.translate5.net/browse/TRANSLATE-3138): Client management - Set filter in project and Clients grids does not reselect the row** <br>
+Improved auto-selection logic for Projects/Clients grids when filters are used
+
+**[TRANSLATE-3048](https://jira.translate5.net/browse/TRANSLATE-3048): Editor general - CSRF Protection for translate5** <br>
+translate5 - 6.0.0
+- CSRF (Cross Site Request Forgery) Protection for translate5 with a CSRF-token. Important info for translate5 API users: externally the translate5 - API can only be accessed with an App-Token from now on.
+translate5 - 6.0.2
+- remove CSRF protection for automated cron calls
+translate5 - 6.5.2
+- additional action protected
+
+
 ## [6.5.1] - 2023-08-04
 
 ### Important Notes:

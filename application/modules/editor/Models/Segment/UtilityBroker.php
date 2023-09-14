@@ -46,7 +46,6 @@ class editor_Models_Segment_UtilityBroker {
         'internalTag' => 'editor_Models_Segment_InternalTag',
         'termTag' => 'editor_Models_Segment_TermTag',
         'trackChangeTag' => 'editor_Models_Segment_TrackChangeTag',
-
     ];
     
     /**

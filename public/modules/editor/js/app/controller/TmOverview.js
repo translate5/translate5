@@ -282,6 +282,7 @@ Ext.define('Editor.controller.TmOverview', {
 
         window.setLoading(true);
         form.submit({
+            timeout: 3600, //1h, is seconds here, ensure upload of bigger files
             params: {
                 format: 'jsontext'
             },

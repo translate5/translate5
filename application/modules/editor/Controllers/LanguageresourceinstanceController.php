@@ -73,7 +73,7 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
     /**
      * The download-actions need to be csrf unprotected!
      */
-    protected array $_unprotectedActions = ['download', 'export', 'xlsxexport', 'tbxexport', 'testexport'];
+    protected array $_unprotectedActions = ['import', 'download', 'export', 'xlsxexport', 'tbxexport', 'testexport'];
 
     /**
      * @throws ZfExtended_Models_Entity_NotFoundException

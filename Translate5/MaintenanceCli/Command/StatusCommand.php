@@ -93,6 +93,7 @@ class StatusCommand extends Translate5AbstractCommand
         $this->writeTaskAndJobs();
         $this->io->text('');
         $this->writeLastErrors();
+        $this->printNotes();
 
         return 0;
     }

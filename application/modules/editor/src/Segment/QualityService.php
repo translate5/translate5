@@ -52,6 +52,7 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\Segment;
 
+use editor_ModelInstances;
 use editor_Models_Db_SegmentQuality;
 use editor_Models_Task;
 use editor_Models_TaskUserAssoc;
@@ -96,19 +97,18 @@ class QualityService
         ?editor_Models_TaskUserAssoc $tua,
         bool $includeLabels = false
     ): Generator {
-        $task = ZfExtended_Factory::get(editor_Models_Task::class);
-        $task->loadByTaskGuid($taskGuid);
 
-        $config = $task->getConfig();
+        $task = editor_ModelInstances::taskByGuid($taskGuid);
+        $taskConfig = $task->getConfig();
 
-        if (empty($config->runtimeOptions->autoQA->mustBeZeroErrorsQualities)) {
+        if (empty($taskConfig->runtimeOptions->autoQA->mustBeZeroErrorsQualities)) {
             return [];
         }
 
         $labels = [];
 
         if ($includeLabels) {
-            foreach ($this->manager->getActiveTypeToCategoryMap($task, $task->getConfig()) as $key => $label) {
+            foreach ($this->manager->getActiveTypeToCategoryMap($task, $taskConfig) as $key => $label) {
                 $labels[$key] = $label;
             }
         }

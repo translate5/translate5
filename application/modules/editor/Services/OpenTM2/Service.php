@@ -31,7 +31,9 @@ END LICENSE AND COPYRIGHT
  * @package editor
  * @version 1.0
  *
- * OpenTM2 Service Base Class
+ * T5memory / OpenTM2 Service Base Class
+ *
+ * IMPORTANT: see the doc/comments in MittagQI\Translate5\Service\T5Memory
  */
 class editor_Services_OpenTM2_Service extends editor_Services_ServiceAbstract
 {

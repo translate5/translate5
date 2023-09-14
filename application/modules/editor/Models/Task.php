@@ -198,8 +198,7 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
      * @throws editor_Models_ConfigException
      */
     public function getConfig(bool $disableCache = false) {
-        $taskConfig = ZfExtended_Factory::get('editor_Models_TaskConfig');
-        /* @var $taskConfig editor_Models_TaskConfig */
+        $taskConfig = ZfExtended_Factory::get(editor_Models_TaskConfig::class);
         if($disableCache){
             $taskConfig->cleanConfigCache();
         }

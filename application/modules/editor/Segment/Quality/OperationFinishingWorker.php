@@ -52,8 +52,8 @@ class editor_Segment_Quality_OperationFinishingWorker extends editor_Models_Task
     protected function work(){        
         // write the segments back to the segments model
         editor_Segment_Quality_Manager::instance()->finishOperation($this->processingMode, $this->task);
-        // unlock the task if locked (we lock in the operation worker)
-        if($this->task->isLocked($this->task->getTaskGuid())){
+        // if not importing, unlock the task if locked (we lock in the operation worker)
+        if($this->processingMode != editor_Segment_Processing::IMPORT && $this->task->isLocked($this->task->getTaskGuid())){
             $this->task->unlock();
         }
         return true;

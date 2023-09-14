@@ -1698,7 +1698,8 @@ class editor_TaskController extends ZfExtended_RestController
         // Setup worker. 'cookie' in 2nd arg is important only if $context is 'transfer'
         $inited = $finalExportWorker->setup($this->entity->getTaskGuid(), [
             'exportFolder' => $exportFolder,
-            'cookie' => Zend_Session::getId()
+            'cookie' => Zend_Session::getId(),
+            'userId' => ZfExtended_Authentication::getInstance()->getUserId(),
         ]);
 
         // If $content is not 'filetranslation' or 'transfer' assume init return value is zipFile name
