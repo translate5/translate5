@@ -260,7 +260,7 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
         $result = $fix->convert($tmxData);
         if($fix->getChangeCount() > 0 || $fix->getNewLineCount() > 0) {
             $logger = Zend_Registry::get('logger');
-            $logger->warn('E9999', 'TMX Export: Entities in {changeCount} text parts repaired (see raw php error log), {newLineCount} new line tags restored.', [
+            $logger->warn('E1554', 'TMX Export: Entities in {changeCount} text parts repaired (see raw php error log), {newLineCount} new line tags restored.', [
                 'languageResource' => $this->languageResource,
                 'changeCount' => $fix->getChangeCount(),
                 'newLineCount' => $fix->getNewLineCount(),
@@ -472,8 +472,30 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
     public function reorganizeTm(): bool
     {
         $http = $this->getHttpWithMemory('GET', 'reorganize');
-
-        return $this->processResponse($http->request());
+        if($this->processResponse($http->request())){
+            // since Version 0.4.48 we have the number of invalid segments in the result
+            // {
+            //     "axelloc-ID57-T5Memory 0448 TEST": "reorganized",
+            //     "time": "1 sec",
+            //     "reorganizedSegmentCount": "2277", -> since 0.4.48
+            //     "invalidSegmentCount": "0" -> since 0.4.48
+            // }
+            if(property_exists($this->result, 'invalidSegmentCount')){
+                $invalid = (int) $this->result->invalidSegmentCount;
+                if($invalid > 0){
+                    $overall = (int) $this->result->reorganizedSegmentCount;
+                    $logger = Zend_Registry::get('logger');
+                    $logger->warn('E1555', 'Errors during Translation Memory reorganization: {invalid} of {overall} segments invalid in "{tmname}".', [
+                        'languageResource' => $this->languageResource,
+                        'invalid' => $invalid,
+                        'overall' => $overall,
+                        'tmname' => $this->languageResource->getName(),
+                    ]);
+                }
+            }
+            return true;
+        }
+        return false;
     }
 
     /***
