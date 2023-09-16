@@ -175,11 +175,11 @@ class editor_Models_Import_FileParser_Tag {
      */
     public function renderTag(int $length = -1, string $title = null, string $cls = null): string {
         //lazy loading of the image tag renderers
-        if(is_string(self::$renderer[$this->type])) {
-            self::$renderer[$this->type] = ZfExtended_Factory::get(self::$renderer[$this->type]);
+        if (is_string(static::$renderer[$this->type])) {
+            static::$renderer[$this->type] = ZfExtended_Factory::get(static::$renderer[$this->type]);
         }
 
-        return $this->renderedTag = self::$renderer[$this->type]->getHtmlTag([
+        return $this->renderedTag = static::$renderer[$this->type]->getHtmlTag([
             'class' => $this->parseSegmentGetStorageClass($this->originalContent, $this->xmlTags) . ($cls ?? ''),
             'text' => $this->text ?? htmlentities($this->originalContent, ENT_COMPAT), //PHP 8.1 fix - default changed!
             'shortTag' => $this->tagNr,

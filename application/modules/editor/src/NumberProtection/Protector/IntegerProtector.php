@@ -81,13 +81,12 @@ class IntegerProtector extends FloatProtector
             return sprintf(
                 $this->tagFormat(),
                 self::getType(),
-                base64_encode($sourceFormat->name),
+                htmlspecialchars($sourceFormat->name),
                 $number,
                 (string)$integer,
                 $this->getTargetInteger($integer, $targetFormat, $targetLang)
             );
         } catch (\Throwable) {
-            dump($sourceFormat->name);
             return '';
         }
     }

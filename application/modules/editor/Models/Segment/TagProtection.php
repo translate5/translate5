@@ -77,8 +77,14 @@ class editor_Models_Segment_TagProtection {
         }
             
         try {
-            $tempXml = qp('<?xml version="1.0"?><segment>'.$textNode.'</segment>', NULL, array('format_output' => false));
-            /* @var $tempXml \QueryPath\DOMQuery */
+            $tempXml = qp(
+                '<?xml version="1.0" encoding="utf-8"?><segment>'.$textNode.'</segment>',
+                null,
+                [
+                    'format_output' => false,
+                    'encoding' => 'utf-8'
+                ]
+            );            /* @var $tempXml \QueryPath\DOMQuery */
         }
         catch (Exception $e) {
             return $this->parseSegmentProtectInvalidHtml5($textNode, $entityCleanup);

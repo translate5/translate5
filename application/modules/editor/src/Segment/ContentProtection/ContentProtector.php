@@ -63,15 +63,12 @@ class ContentProtector
      */
     public function __construct(private array $protectors)
     {
-        usort(
-            $this->protectors,
-            fn (ProtectorInterface $p1, ProtectorInterface $p2) => $p2->priority() <=> $p1->priority()
-        );
     }
 
     public static function create(Whitespace $whitespace): self
     {
         return new self([
+            WhitespaceProtector::withoutNumberWhitespaces($whitespace),
             NumberProtector::create(),
             new WhitespaceProtector($whitespace)
         ]);

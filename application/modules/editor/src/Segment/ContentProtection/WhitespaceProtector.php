@@ -62,6 +62,15 @@ class WhitespaceProtector implements ProtectorInterface
     {
     }
 
+    public static function withoutNumberWhitespaces(editor_Models_Segment_Whitespace $whitespace): self
+    {
+        // THSP and NNBSP
+        $ws = clone $whitespace;
+        $ws->setExcludedCharacters('e28089', 'e280af');
+
+        return new self($ws);
+    }
+
     public function priority(): int
     {
         return 100;

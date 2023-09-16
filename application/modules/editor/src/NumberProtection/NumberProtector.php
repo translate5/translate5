@@ -95,7 +95,6 @@ class NumberProtector implements ProtectorInterface
         foreach ($protectors as $protector) {
             $this->protectors[$protector::getType()] = $protector;
         }
-        $this->document = new DOMDocument();
     }
 
     public static function create(): self
@@ -141,7 +140,7 @@ class NumberProtector implements ProtectorInterface
     public function convertToInternalTags(string $segment, int &$shortTagIdent, array &$xmlChunks = []): string
     {
         $xml = ZfExtended_Factory::get(XmlParser::class, [['normalizeTags' => false]]);
-
+        error_log($segment);
         $xml->registerElement(
             self::TAG_NAME,
             null,
@@ -154,6 +153,7 @@ class NumberProtector implements ProtectorInterface
         );
 
         $result = $xml->parse($segment, true, [self::TAG_NAME]);
+        error_log($result);
         $xmlChunks = $xml->getAllChunks();
 
         return $result;
@@ -167,32 +167,10 @@ class NumberProtector implements ProtectorInterface
         return $xmlChunks;
     }
 
-    private function handleNumberTags(
-        XmlParser $xml,
-        string $tagName,
-        int $key,
-        array $opener,
-        int &$shortTagIdent
-    ): NumberTag {
-        $source = $xml->getAttribute($opener['attributes'], 'source', null);
-        $target = $xml->getAttribute($opener['attributes'], 'target', null);
-
-        $tagObj = new NumberTag();
-        $tagObj->originalContent = $xml->getChunk($key);
-        $tagObj->tagNr = $shortTagIdent;
-        $tagObj->id = $tagName;
-        $tagObj->tag = $tagName;
-        $tagObj->text = json_encode(['source' => $source, 'target' => $target]);
-        //title: Only translatable with using ExtJS QTips in the frontend, as title attribute not possible
-        $tagObj->renderTag(title:  '&lt;' . $shortTagIdent . '/&gt;: Number', cls: ' ' . self::TAG_NAME);
-
-        $shortTagIdent++;
-
-        return $tagObj;
-    }
-
     public function protect(string $textNode, ?int $sourceLangId, ?int $targetLangId): string
     {
+        // Reset document else it will be compromised between method calls
+        $this->document = new DOMDocument();
         $sourceLang = $sourceLangId ? $this->languageRepository->find($sourceLangId) : null;
         $targetLang = $targetLangId ? $this->languageRepository->find($targetLangId) : null;
 
@@ -208,7 +186,9 @@ class NumberProtector implements ProtectorInterface
             $this->loadXML($this->getCurrentTextNode());
         }
 
-        preg_match('/<node>(.+)<\/node>/', $this->getCurrentTextNode(), $matches);
+        $text = $this->getCurrentTextNode();
+
+        preg_match('/<node>((.*(\n|\r\n)*.*)+)<\/node>/m', $text, $matches);
 
         return $matches[1];
     }
@@ -220,6 +200,31 @@ class NumberProtector implements ProtectorInterface
             fn (array $match): string => $match[1],
             $content
         );
+    }
+
+    private function handleNumberTags(
+        XmlParser $xml,
+        string $tagName,
+        int $key,
+        array $opener,
+        int &$shortTagIdent
+    ): NumberTag {
+        error_log(print_r($opener, true));
+        $source = $xml->getAttribute($opener['attributes'], 'source', null);
+        $target = $xml->getAttribute($opener['attributes'], 'target', null);
+
+        $tagObj = new NumberTag();
+        $tagObj->originalContent = $xml->getChunk($key);
+        $tagObj->tagNr = $shortTagIdent;
+        $tagObj->id = $tagName;
+        $tagObj->tag = $tagName;
+        $tagObj->text = json_encode(['source' => $source, 'target' => $target]);
+        //title: Only translatable with using ExtJS QTips in the frontend, as title attribute not possible
+        $tagObj->renderTag(title:  '&lt;' . $shortTagIdent . '/&gt;: Number', cls: ' ' . self::TAG_NAME);
+
+        $shortTagIdent++;
+
+        return $tagObj;
     }
 
     private function processElement(
@@ -299,15 +304,15 @@ class NumberProtector implements ProtectorInterface
                     ->protectors[$langFormat->type]
                     ->protect($number, $langFormat, $sourceLang, $targetLang);
             } catch (NumberParsingException) {
-                return new DOMText($number);
+                return $this->document->importNode(new DOMText($number));
             }
 
             $dom = new DOMDocument();
             $dom->loadXML($protectedNumber);
-            $this->protectedNumbers[$number] = $this->document->importNode($dom->firstChild);
+            $this->protectedNumbers[$number] = $dom->firstChild;
         }
 
-        return $this->protectedNumbers[$number]->cloneNode();
+        return $this->document->importNode($this->protectedNumbers[$number]);
     }
 
     private function loadXML(string $textNode): void

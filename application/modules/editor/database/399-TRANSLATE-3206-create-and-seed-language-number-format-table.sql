@@ -124,7 +124,9 @@ INSERT INTO `LEK_number_protection_number_recognition` (`type`, `name`,`regex`, 
 
 -- integer
 ('integer', 'default chinese with comma thousand', "/\\b[1-9]\\d{0,3}(,)?(\\d{4}\\1)+\\d{4}\\b/u", '#,###0', false, 200, true),
-('integer', 'default generic with separator', "/\\b[1-9]\\d{0,2}(,|\\.|·|˙|'|\\x{2009}|\\x{202F}|٬)?(\\d{3}\\1)+\\d{3}\\b/u", null, false, 180, true),
+('integer', 'default generic with not standard separator', "/\\b[1-9]\\d{0,2}(·|˙|'|\\x{2009}|\\x{202F}|٬)(\\d{3}\\1)*\\d{3}\\b/u", null, false, 180, true),
+('integer', 'default generic with separator', "/\\b[1-9]\\d{0,2}(,|\\.)?(\\d{3}\\1)+\\d{3}\\b/", null, false, 175, true),
+
 ('integer', 'default indian with comma thousand', "/\\b[1-9]\\d{0,1}(,)?(\\d{2}\\1)+\\d{3}\\b/u", '#,##,##0', false, 170, true),
 ('integer', 'default arabian with separator',"/\\b[١٢٣٤٥٦٧٨٩]{0,2}٬?([١٢٣٤٥٦٧٨٩]{3}٬)*[١٢٣٤٥٦٧٨٩]{3}\\b/u", null, false, 120, true),
 ('integer', 'default simple', '/\\b(\\d|[1-9]\\d+)\\b/u', '#', false, 100, true)

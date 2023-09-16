@@ -91,7 +91,7 @@ class IntegerProtectorTest extends TestCase
 
         yield 'float' => [
             'number' => '123,456',
-            'expected' => '<number type="integer" name="dGVzdC1kZWZhdWx0" source="123,456" iso="123456" target="" />',
+            'expected' => '<number type="integer" name="test-default" source="123,456" iso="123456" target="" />',
             'sourceFormat' => $sourceFormat,
             'targetFormat' => null,
             'targetLang' => null,
@@ -103,7 +103,7 @@ class IntegerProtectorTest extends TestCase
 
         yield 'target lang hi_IN' => [
             'number' => '123,456',
-            'expected' => '<number type="integer" name="dGVzdC1kZWZhdWx0" source="123,456" iso="123456" target="123456" />',
+            'expected' => '<number type="integer" name="test-default" source="123,456" iso="123456" target="123456" />',
             'sourceFormat' => $sourceFormat,
             'targetFormat' => null,
             'targetLang' => $targetLangDe,
@@ -113,7 +113,7 @@ class IntegerProtectorTest extends TestCase
 
         yield 'target format #,###,####0.###' => [
             'number' => '1,212,312,345',
-            'expected' => '<number type="integer" name="dGVzdC1kZWZhdWx0" source="1,212,312,345" iso="1212312345" target="12,123,12345" />',
+            'expected' => '<number type="integer" name="test-default" source="1,212,312,345" iso="1212312345" target="12,123,12345" />',
             'sourceFormat' => $sourceFormat,
             'targetFormat' => $targetFormat,
             'targetLang' => $targetLangDe,
@@ -129,7 +129,7 @@ class IntegerProtectorTest extends TestCase
 
         yield 'date. keep as is' => [
             'number' => '123,456',
-            'expected' => '<number type="integer" name="dGVzdC1kZWZhdWx0" source="123,456" iso="" target="" />',
+            'expected' => '<number type="integer" name="test-default" source="123,456" iso="" target="" />',
             'sourceFormat' => $sourceFormatKeepAsIs,
             'targetFormat' => $targetFormat,
             'targetLang' => $targetLangDe,

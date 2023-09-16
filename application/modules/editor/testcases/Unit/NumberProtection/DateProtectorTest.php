@@ -89,7 +89,7 @@ class DateProtectorTest extends TestCase
 
         yield 'date' => [
             'number' => '2023/18/07',
-            'expected' => '<number type="date" name="dGVzdC1kZWZhdWx0" source="2023/18/07" iso="2023-07-18" target="" />',
+            'expected' => '<number type="date" name="test-default" source="2023/18/07" iso="2023-07-18" target="" />',
             'sourceFormat' => $sourceFormat,
             'targetFormat' => null,
             'targetLang' => null,
@@ -101,7 +101,7 @@ class DateProtectorTest extends TestCase
 
         yield 'target lang de-DE' => [
             'number' => '2023/18/07',
-            'expected' => '<number type="date" name="dGVzdC1kZWZhdWx0" source="2023/18/07" iso="2023-07-18" target="18.07.23" />',
+            'expected' => '<number type="date" name="test-default" source="2023/18/07" iso="2023-07-18" target="18.07.23" />',
             'sourceFormat' => $sourceFormat,
             'targetFormat' => null,
             'targetLang' => $targetLangDe,
@@ -111,7 +111,7 @@ class DateProtectorTest extends TestCase
 
         yield 'date. target format Y*m*d' => [
             'number' => '2023/18/07',
-            'expected' => '<number type="date" name="dGVzdC1kZWZhdWx0" source="2023/18/07" iso="2023-07-18" target="2023*07*18" />',
+            'expected' => '<number type="date" name="test-default" source="2023/18/07" iso="2023-07-18" target="2023*07*18" />',
             'sourceFormat' => $sourceFormat,
             'targetFormat' => $targetFormat,
             'targetLang' => $targetLangDe,
@@ -127,7 +127,7 @@ class DateProtectorTest extends TestCase
 
         yield 'date. keep as is' => [
             'number' => '2023/18/07',
-            'expected' => '<number type="date" name="dGVzdC1kZWZhdWx0" source="2023/18/07" iso="" target="" />',
+            'expected' => '<number type="date" name="test-default" source="2023/18/07" iso="" target="" />',
             'sourceFormat' => $sourceFormatKeepAsIs,
             'targetFormat' => $targetFormat,
             'targetLang' => $targetLangDe,

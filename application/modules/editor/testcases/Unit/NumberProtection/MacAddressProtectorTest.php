@@ -70,7 +70,7 @@ class MacAddressProtectorTest extends TestCase
         );
 
         self::assertSame(
-            '<number type="mac-address" name="dGVzdC1kZWZhdWx0" source="aa:bb:cc:11:22:33" iso="" target="" />',
+            '<number type="mac-address" name="test-default" source="aa:bb:cc:11:22:33" iso="" target="" />',
             (new MacAddressProtector($repo))->protect('aa:bb:cc:11:22:33', $sourceFormat, null, null)
         );
     }

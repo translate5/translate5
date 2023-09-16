@@ -152,6 +152,8 @@ class editor_Models_Segment_Whitespace {
         '/\x{FEFF}/u' => ['ts' => 'efbbbf', 'text' => '[BOM]', 'title' => 'Zero Width No-Break Space (BOM, ZWNBSP)'],
     ];
 
+    private array $excludedCharacters = [];
+
     /**
      * short tag incrementor, initialized from outside
      * @var int
@@ -178,6 +180,11 @@ class editor_Models_Segment_Whitespace {
         $this->protectedCharLabels = array_combine(array_column($labeledCharacters, 'ts'), $labeledCharacters);
     }
 
+    public function setExcludedCharacters(string ...$charTs): void
+    {
+        $this->excludedCharacters = $charTs;
+    }
+
     /**
      * protects all whitespace and special characters coming from the import formats
      * WARNING: should be called only on plain text fragments without tags!
@@ -186,7 +193,7 @@ class editor_Models_Segment_Whitespace {
      */
     public function protectWhitespace($textNode, $entityHandling = self::ENTITY_MODE_RESTORE) {
         //definition how entities are handled:
-        if($entityHandling != self::ENTITY_MODE_OFF) {
+        if ($entityHandling != self::ENTITY_MODE_OFF) {
             $textNode = editor_Models_Segment_Utility::entityCleanup($textNode, $entityHandling == self::ENTITY_MODE_RESTORE);
         }
         
@@ -221,11 +228,26 @@ class editor_Models_Segment_Whitespace {
             }, $textNode);
         }
 
-        $regexList = array_keys(self::PROTECTED_CHARACTERS);
-        return preg_replace_callback($regexList, function ($match) {
+        return preg_replace_callback($this->getProtectedCharactersRegexes(), function ($match) {
             //always one single character is masked, so length = 1
             return $this->maskSpecialContent('char', $match[0], 1);
         }, $textNode);
+    }
+
+    private function getProtectedCharactersRegexes(): array
+    {
+        if (empty($this->excludedCharacters)) {
+            return array_keys(self::PROTECTED_CHARACTERS);
+        }
+
+        $regexList = [];
+        foreach (self::PROTECTED_CHARACTERS as $regex => $setting) {
+            if (isset($setting['ts']) && !in_array($setting['ts'], $this->excludedCharacters, true)) {
+                $regexList[] = $regex;
+            }
+        }
+
+        return $regexList;
     }
     
     /**
@@ -393,11 +415,18 @@ class editor_Models_Segment_Whitespace {
             $xml->replaceChunk($key, $this->handleProtectedTags($type, $id, $content));
         });
 
+        $result = $xml->parse($segment, true, $this->validTags());
+        $xmlChunks = $xml->getAllChunks();
+
+        return $result;
+    }
+
+    public function validTags(): array
+    {
         $validTags = self::WHITESPACE_TAGS;
         $validTags[] = 'protectedTag';
-        $result = $xml->parse($segment, true, $validTags);
-        $xmlChunks = $xml->getAllChunks();
-        return $result;
+
+        return $validTags;
     }
 
     /**

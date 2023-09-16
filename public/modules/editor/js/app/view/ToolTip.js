@@ -115,11 +115,24 @@ Ext.define('Editor.view.ToolTip', {
         
 
         //Workaround to show the titles of the img tags always in fulltag mode
-        if(fly.hasCls('internal-tag') && (fly.hasCls('tab')||fly.hasCls('space')||fly.hasCls('newline')||fly.hasCls('nbsp')||fly.hasCls('char'))) {
+        if(
+            fly.hasCls('internal-tag')
+            && me.flyHasOneOfCls(fly, ['number', 'tab', 'space', 'newline', 'nbsp', 'char'])
+        ) {
             result = fly.down('span.short').getAttribute('title') + (result ? '<br>'+result : '');
-        };
+        }
         tip.update(result);
         return !!result; //if there is no content for ttip, we return false to prevent the show of the tooltip
+    },
+
+    flyHasOneOfCls: function (fly, classes) {
+        for (let cls of classes) {
+            if (fly.hasCls(cls)) {
+                return true;
+            }
+        }
+
+        return false;
     },
     
     // ------------------------------------------------------------------

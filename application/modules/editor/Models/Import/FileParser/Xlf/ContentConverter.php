@@ -368,7 +368,6 @@ class editor_Models_Import_FileParser_Xlf_ContentConverter {
         // although the whitespace of the content may not be preserved here, if there remain multiple spaces or other space characters,
         // we have to protect them here
         
-        $wh = $this->utilities->whitespace;
         if($this->task->getConfig()->runtimeOptions->import->fileparser->options->protectTags ?? false) {
             //since we are in a XML file format, plain tags in the content are encoded, which we have to undo first
             //$text is here for example: Dies &lt;strong&gt;ist ein&lt;/strong&gt; Test. &amp;nbsp;
