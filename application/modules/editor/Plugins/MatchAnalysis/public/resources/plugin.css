@@ -35,4 +35,5 @@ END LICENSE AND COPYRIGHT
 .matchAnalysisGrid .x-grid-header-ct .info-icon > div {background:url("images/information.png") no-repeat 45px 9px;}
 
 .matchAnalysisInfoBox div > span{display:inline-block; margin-right:30px;}
+.matchAnalysisInfoBox div > span.errors{display:block; font-weight: bold;}
 .matchAnalysisInfoBox div span.label{font-style: italic;}

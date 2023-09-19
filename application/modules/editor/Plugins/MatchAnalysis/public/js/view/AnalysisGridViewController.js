@@ -124,6 +124,7 @@ Ext.define('Editor.plugins.MatchAnalysis.view.AnalysisGridViewController', {
             hasAnalysisData: hasData,
             created: record && record.get('created'),
             internalFuzzy: record && record.get('internalFuzzy'),
+            errorCount: record && record.get('errorCount'),
             editFullMatch: task && task.get('edit100PercentMatch'),
             strings: view.strings
         });
