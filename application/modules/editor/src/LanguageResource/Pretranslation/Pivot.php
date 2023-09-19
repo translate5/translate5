@@ -168,9 +168,9 @@ class Pivot
                     'languageResource' => $languageresource,
                 ], $errors));
                 $this->log->exception($e, [
-                    'task' => $this->task,
                     'level' => $this->log::LEVEL_WARN,
                     'domain' => $this->log->getDomain(),
+                    'extra' => ['task' => $this->task],
                 ]);
                 continue;
             }
@@ -538,7 +538,7 @@ class Pivot
         $this->log->exception($e, [
             'level' => $this->log::LEVEL_WARN,
             'domain' => $this->log->getDomain(),
-            'task' => $this->task,
+            'extra' => ['task' => $this->task],
         ]);
         settype($this->connectorErrorCount[$id], 'integer');
         $this->connectorErrorCount[$id]++;

@@ -320,7 +320,17 @@ final class editor_Segment_Internal_Tag extends editor_Segment_Tag {
         }
         return md5($this->render());
     }
-    
+
+
+    /**
+     * Renders the short-tag as unescaped markup like "<5/>"
+     * @return string
+     */
+    public function getShortTagMarkup(): string
+    {
+        return htmlspecialchars_decode($this->shortTag->getText());
+    }
+
     /* *************************************** Overwritten Tag API *************************************** */
     
     /**

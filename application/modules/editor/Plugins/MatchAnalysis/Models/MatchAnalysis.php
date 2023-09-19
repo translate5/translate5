@@ -346,6 +346,7 @@ class editor_Plugins_MatchAnalysis_Models_MatchAnalysis extends ZfExtended_Model
             $row[$key]['resourceColor'] = $color;
 
             $row[$key]['created'] = $analysisData['created'];
+            $row[$key]['errorCount'] = $analysisData['errorCount'];
             $row[$key]['internalFuzzy'] = $fuzzyString;
             $row[$key]['unitCountTotal'] = 0;
 
