@@ -69,11 +69,11 @@ class editor_Segment_Internal_TagRepair extends editor_Segment_Internal_TagCheck
     /**
      * Checks if the structure of internal tags is correct, every opener has his corresponding closer without overlaps
      */
-    private function fixStructure(){
-
+    private function fixStructure(): void
+    {
         // most simple fix: swap all tags that are in the wrong order
         // But: without it, other fixes may fail as they implicitly expect the opening tag to be before the closing ...
-        $this->fixWrongOrder();
+        $this->fixWrongOrder($this->checkTags);
 
         // first fix overlaps in sequences on the same index
         $this->fixSameIndexSequences();
@@ -85,10 +85,10 @@ class editor_Segment_Internal_TagRepair extends editor_Segment_Internal_TagCheck
             if($tag->isSingle()){
                 // pass through singular tags
                 $this->resultTags[] = $tag;
-            } else if($tag->counterpart == NULL){
+            } else if($tag->counterpart === null){
                 // remove incomplete tags
                 $this->numRemoved++;
-            } else if($tag->isOpening() && !$this->isStructurallyValid($tag)){
+            } else if($tag->isOpening() && !$this->isStructurallyValid($this->checkTags, $i)){
                 // cache broken pairs with incorrect structure
                 $brokenOpeners[] = $tag;
             } else if($tag->isOpening()){
@@ -100,7 +100,7 @@ class editor_Segment_Internal_TagRepair extends editor_Segment_Internal_TagCheck
         if($numBroken > 0){
             $this->findBoundries();
             usort($this->resultTags, array($this->fieldTags, 'compare'));
-            for($i=0; $i < $numBroken; $i++){
+            for($i = 0; $i < $numBroken; $i++){
                 if($this->insertTagsToResult($brokenOpeners[$i], $brokenOpeners[$i]->counterpart)){
                     $this->numFixed += 2;
                 } else {
@@ -109,7 +109,8 @@ class editor_Segment_Internal_TagRepair extends editor_Segment_Internal_TagCheck
             }
         }
         if($this->hadErrors()){
-            // remove the internal tags and merge the remaining tags with the new internal tags. Then we reset the tags and re-add the evaluated
+            // remove the internal tags and merge the remaining tags with the new internal tags.
+            // Then we reset the tags and re-add the evaluated
             // this is needed to ensure the order in the Fieldtags is correct
             $this->fieldTags->removeByType(editor_Segment_Tag::TYPE_INTERNAL);
             $all = array_merge($this->fieldTags->getAll(), $this->resultTags);
@@ -126,7 +127,8 @@ class editor_Segment_Internal_TagRepair extends editor_Segment_Internal_TagCheck
      * @param editor_Segment_Internal_Tag $end
      * @return boolean
      */
-    private function insertTagsToResult(editor_Segment_Internal_Tag $start, editor_Segment_Internal_Tag $end){
+    private function insertTagsToResult(editor_Segment_Internal_Tag $start, editor_Segment_Internal_Tag $end): bool
+    {
         // special case: tags are swapped
         if($start->startIndex > $end->endIndex && $this->hasNoOverlapsBetweenIndices($start->endIndex, $end->startIndex)){
             $startIdx = $start->startIndex;
@@ -138,6 +140,17 @@ class editor_Segment_Internal_TagRepair extends editor_Segment_Internal_TagCheck
             $this->addToResult($end, $start);
             return true;
         }
+        // other special case: tags are in sequence / on the same text-index
+        // then, they will be added immediately behind each other
+        if($start->hasSameTextIndex($end)){
+            // crucial: level the order so they are really rendered behind each other!
+            $end->order = $start->order;
+            $end->parentOrder = $start->parentOrder;
+            $this->addToResult($start, $end);
+            return true;
+        }
+
+        // standard case: look for the next word that matches
         foreach($this->wordEnds as $textIndex){
             if($textIndex > $start->endIndex && $this->hasNoOverlapsBetweenIndices($start->endIndex, $textIndex)){
                 $end->startIndex = $end->endIndex = $textIndex;
@@ -164,10 +177,17 @@ class editor_Segment_Internal_TagRepair extends editor_Segment_Internal_TagCheck
      * @param int $endTextIndex
      * @return bool
      */
-    private function hasNoOverlapsBetweenIndices(int $startTextIndex, int $endTextIndex) : bool {
+    private function hasNoOverlapsBetweenIndices(int $startTextIndex, int $endTextIndex): bool
+    {
         foreach($this->resultTags as $tag){
-            if($tag->startIndex < $endTextIndex && $tag->endIndex > $startTextIndex && ($tag->isOpening() || $tag->isClosing())){
-                if($tag->endIndex > $endTextIndex || $tag->startIndex < $startTextIndex || $tag->counterpart->endIndex > $endTextIndex || $tag->counterpart->startIndex < $startTextIndex){
+            if($tag->startIndex < $endTextIndex
+                && $tag->endIndex > $startTextIndex
+                && ($tag->isOpening() || $tag->isClosing())){
+
+                if($tag->endIndex > $endTextIndex
+                    || $tag->startIndex < $startTextIndex
+                    || $tag->counterpart->endIndex > $endTextIndex
+                    || $tag->counterpart->startIndex < $startTextIndex){
                     return false;
                 }
             }
@@ -219,16 +239,27 @@ class editor_Segment_Internal_TagRepair extends editor_Segment_Internal_TagCheck
                 }
                 foreach($clusters as $cluster){
                     if(count($cluster['tags']) < 2){
-                        throw new ZfExtended_Exception('Algorithmical Error in TagRepair: found cluster with less than 2 elements!');
+                        throw new ZfExtended_Exception(
+                            'Algorithmical Error in TagRepair: found cluster with less than 2 elements!');
                     }
                     $this->fixSameIndexClusterTags($cluster['tags']);
                 }
             }
+
+            // the cluster-repair may lead to a faulty tag-order, repair that first since some APIs expect ordered tags
+            $this->fixWrongOrder($sequence);
+            // order by _idx
+            usort($sequence, 'editor_Segment_Internal_TagCheckBase::compareByIdx');
+
+            // it turns out the "fix clusters" approach produces "nice" fixes but can not catch all faulty tags.
+            // Therefore a second run fixes all still overlapping tags the hard way ...
+            $this->numFixed += $this->fixSameIndexTagsForced($sequence, $this->checkTags);
         }
     }
 
     /**
-     * The passed tags are overlapping with each other, they are ordered by index in the sequence and all ar only the opening tags
+     * The passed tags are overlapping with each other,
+     * they are ordered by index in the sequence and all are only the opening tags
      * @param editor_Segment_Internal_Tag[] $tags
      * @return void
      */
@@ -293,7 +324,7 @@ class editor_Segment_Internal_TagRepair extends editor_Segment_Internal_TagCheck
      * Swaps all tags/counterparts that simply are in the wrong order
      * @return void
      */
-    private function fixWrongOrder(): void
+    private function fixWrongOrder(array &$tags): void
     {
         $swaps = [];
         foreach($this->checkTags as $tag){
@@ -308,15 +339,79 @@ class editor_Segment_Internal_TagRepair extends editor_Segment_Internal_TagCheck
             $counterIdx = $tag->_idx;
             $counterOrder = $tag->order;
 
-            $this->checkTags[$tagIdx] = $tag;
+            $tags[$tagIdx] = $tag;
             $tag->_idx = $tagIdx;
             $tag->order = $tagOrder;
-            $this->checkTags[$counterIdx] = $tag->counterpart;
+            $tags[$counterIdx] = $tag->counterpart;
             $tag->counterpart->_idx = $counterIdx;
             $tag->counterpart->order = $counterOrder;
 
             $this->numFixed += 1;
         }
+    }
+
+    /**
+     * API to force a fix of tags on either a whole structure or only a single-text-index sequence
+     * The repair is achieved by simply put the end-tag directly behind the start-tag
+     * This is by no means a nice fix and only a last ressort for faulty structures that cannot be fixed otherwise
+     * It is expected, that the _idx prop refers to the index in the passed array
+     * Another prequesite is, that all opening tags come before the closing tags
+     * @param editor_Segment_Internal_Tag[] $tags
+     * @param bool $isInSequence: if set, it is exopected, all passed tags are on the same text-index
+     * @param editor_Segment_Internal_Tag[] $referencedTags: the tags the indexes refer to (may be the same as the first param)
+     * @return int: the number of repaired tags
+     */
+    /**
+     * @param editor_Segment_Internal_Tag[] $tags
+     * @param bool $isInSequence
+     *
+     * @return int
+     */
+    private function fixSameIndexTagsForced(array $tags, array &$referencedTags): int
+    {
+        $fixed = 0;
+        // at one point this api may be called multiple times
+        foreach($tags as $tag){
+            if(isset($tag->_sidx)){
+                unset($tag->_sidx);
+            }
+        }
+        $numTags = count($tags);
+        $reordered = [];
+        $isFaulty = false;
+        foreach($tags as $index => $tag){ /* @var editor_Segment_Internal_Tag $tag */
+            if(!isset($tag->_sidx)){
+                $tag->_sidx = $index;
+                $reordered[] = $tag;
+                // if we have a tag tha has overlaps ...
+                if($tag->counterpart != null
+                    && $tag->isOpening()
+                    && $this->isOverlappingInSequence($tag, $index, $tags, $numTags)){
+                    // ... find the closing tag and add it immediately after
+                    for($i = $index + 1; $i < $numTags; $i++){
+                        if($tag->counterpart === $tags[$i]){
+                            $tags[$i]->_sidx = $i;
+                            $reordered[] = $tags[$i];
+                            $isFaulty = true;
+                            $fixed++;
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+        // if there have been faults, apply the ordering of the reorder
+        // (which is virtual and we have to use the original sequence to find the target position)
+        if($isFaulty){
+            foreach($reordered as $index => $tag){
+                $desiredIdx = $tags[$index]->_idx;
+                if($tag->_idx !== $desiredIdx){
+                    $referencedTags[$desiredIdx] = $tag;
+                    $tag->_idx = $desiredIdx;
+                }
+            }
+        }
+        return $fixed;
     }
 
     /**

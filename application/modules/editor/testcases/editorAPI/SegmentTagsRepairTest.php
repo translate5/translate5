@@ -132,8 +132,37 @@ class SegmentTagsRepairTest extends editor_Test_SegmentTagsTest {
      */
     public function testTagRepair10()
     {
-        $fixed = 'Lorem ipsum<1><2><3><5/></3><6/></2><7/></1>  dolor sit amet';
-        $broken = 'Lorem ipsum<1><2><3><5/></1><6/></2><7/></3>  dolor sit amet';
+        $fixed = 'Lorem ipsum<1><2><3><5/></3><6/></2><7/></1> dolor sit amet';
+        $broken = 'Lorem ipsum<1><2><3><5/></1><6/></2><7/></3> dolor sit amet';
+        $this->createRepairTest($fixed, $broken, ['internal_tag_structure_faulty']);
+    }
+
+    /**
+     * Tests sequences of tags with overlaps/interleaves
+     * @return void
+     */
+    public function testTagRepair11()
+    {
+        $fixed = 'Lorem ipsum<1><2><5/></2></1><6/><4><3><7/></3></4> dolor sit amet';
+        $broken = 'Lorem ipsum<1><2><5/></1></2><6/><4><3><7/></4></3> dolor sit amet';
+        $this->createRepairTest($fixed, $broken, ['internal_tag_structure_faulty']);
+    }
+
+    /**
+     * Tests sequences of tags with overlaps/interleaves
+     * @return void
+     */
+    public function testTagRepair12()
+    {
+        $fixed = 'Lorem ipsum<1><2><5/><4><3><6/></3></4><7/></2></1> dolor sit amet';
+        $broken = 'Lorem ipsum<1><2><5/><4></2><6/><3></1><7/></3></4> dolor sit amet';
+        $this->createRepairTest($fixed, $broken, ['internal_tag_structure_faulty']);
+    }
+
+    public function testTagRepair13()
+    {
+        $fixed = 'Lorem ipsum<1><2></2><5/><4> dolor</4><6/><3></3><7/></1> sit amet';
+        $broken = 'Lorem ipsum<1><2><5/><4></2> dolor<6/><3></1><7/></3></4> sit amet';
         $this->createRepairTest($fixed, $broken, ['internal_tag_structure_faulty']);
     }
 

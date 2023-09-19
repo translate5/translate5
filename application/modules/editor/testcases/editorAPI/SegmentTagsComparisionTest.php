@@ -210,7 +210,6 @@ class SegmentTagsComparisionTest extends editor_Test_SegmentTagsTest {
         $this->createStructuralTest($markup, ['internal_tag_structure_faulty']);
     }
 
-
     /**
      * Tests sequences of tags with overlaps/interleaves
      * @return void
@@ -218,6 +217,16 @@ class SegmentTagsComparisionTest extends editor_Test_SegmentTagsTest {
     public function testSequenceComparision5()
     {
         $markup = 'Lorem ipsum<1><2><3><5/></1><6/></2><7/></3>  dolor sit amet';
+        $this->createStructuralTest($markup, ['internal_tag_structure_faulty']);
+    }
+
+    /**
+     * Tests sequences of tags with overlaps/interleaves
+     * @return void
+     */
+    public function testSequenceComparision6()
+    {
+        $markup = 'Lorem ipsum<1><2><5/></1></2><6/><4><3><7/></4></3>  dolor sit amet';
         $this->createStructuralTest($markup, ['internal_tag_structure_faulty']);
     }
 

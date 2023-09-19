@@ -181,7 +181,7 @@ class editor_Segment_Internal_TagComparision extends editor_Segment_Internal_Tag
         // closing tags can be skipped in this test, only orphan closers are obvious faults
         for($i=0; $i < $this->numCheckTags; $i++){
             // check the tags in a loop, where closing tags with counterparts can be excluded to avoid duplicate checks, they are checked with their opening counterpart
-            if((!$this->checkTags[$i]->isSingle() && $this->checkTags[$i]->counterpart == NULL) || ($this->checkTags[$i]->isOpening() && !$this->isStructurallyValid($this->checkTags[$i]))){
+            if((!$this->checkTags[$i]->isSingle() && $this->checkTags[$i]->counterpart == NULL) || ($this->checkTags[$i]->isOpening() && !$this->isStructurallyValid($this->checkTags, $i))){
                 $this->stati[] = self::TAG_STRUCTURE_FAULTY;
                 return;
             }
