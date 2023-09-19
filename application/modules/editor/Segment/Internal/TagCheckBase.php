@@ -155,4 +155,73 @@ class editor_Segment_Internal_TagCheckBase {
         }
         return true;
     }
+
+    /**
+     * Finds all indexes wich have more then one tag with start === end on them
+     * Returns structure like
+     * [
+     *      textIndex => [                  // the textIndex is the start/end index of all tags
+     *          tagIndex => [               // the tagIndex is the original index in checktags so the array usually does not start at 0 or may has gaps
+     *              { ... }                 // the tag
+     *          ]
+     *  ]
+     * ]
+     *
+     * @param editor_Segment_Internal_Tag[] $tags
+     * @return array
+     */
+    protected function findSameIndexSequences(array $tags): array
+    {
+        $sequences = [];
+        // order all singular or multiple tags with identfixSameIndexClusterical start/end by index
+        foreach($tags as $index => $tag){
+            // we ignore singular tags here as they can nut be overlapping/interleaving
+            if(!$tag->isSingle() && $tag->counterpart !== null && $tag->startIndex === $tag->endIndex){
+                if(!array_key_exists($tag->startIndex, $sequences)){
+                    $sequences[$tag->startIndex] = [];
+                }
+                $sequences[$tag->startIndex][] = $tag;
+            }
+        }
+        // remove all sequences that have less than 2 elements
+        $filteredSequences = [];
+        foreach($sequences as $sequence){
+            if(count($sequence) > 1){
+                $filteredSequences[] = $sequence;
+            }
+        }
+        return $filteredSequences;
+    }
+
+    /**
+     * Checks wether a sequence of tags on the same text-index has a proper sequential structure
+     * @param array $tagsOnTextIndex
+     * @return array: an array of indices of opening tags which refer to the passed array $tagsOnTextIndex and do overlap
+     */
+    protected function checkSameIndexSequence(array $tagsOnTextIndex): array
+    {
+        $faultyIndices = [];
+        $numTags = count($tagsOnTextIndex);
+        foreach($tagsOnTextIndex as $index => $tag){ /* @var editor_Segment_Internal_Tag $tag */
+            if($tag->isOpening()){
+                $overlap = false;
+                for($i = 0; $i < $numTags; $i++){
+                    if($i != $index){
+                        $lIdx = $tagsOnTextIndex[$i]->_idx;
+                        $ridx = $tagsOnTextIndex[$i]->counterpart->_idx;
+                        if(($lIdx > $tag->_idx && $lIdx < $tag->counterpart->_idx && $ridx > $tag->counterpart->_idx)
+                            || ($ridx > $tag->_idx && $ridx < $tag->counterpart->_idx) && $lIdx < $tag->_idx){
+                            // add to existing cluster stretching it's boundaries
+                            $overlap = true;
+                            break;
+                        }
+                    }
+                }
+                if($overlap){
+                    $faultyIndices[$index] = 1;
+                }
+            }
+        }
+        return array_keys($faultyIndices);
+    }
 }

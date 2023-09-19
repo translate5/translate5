@@ -159,12 +159,76 @@ class SegmentTagsComparisionTest extends editor_Test_SegmentTagsTest {
         $this->createEditedComparisionTest($source, $targetEdited, ['internal_tags_missing']);
         $this->createEditedComparisionTest($targetOriginal, $targetEdited, ['internal_tags_missing']);
     }
+
+    /**
+     * Tests sequences of tags with overlaps/interleaves
+     * @return void
+     */
+    public function testSequenceComparision0()
+    {
+        $markup = 'Lorem ipsum<1><2><5/></1></2> dolor<3><6/></3> sit amet';
+        $this->createStructuralTest($markup, ['internal_tag_structure_faulty']);
+    }
+
+    /**
+     * Tests sequences of tags with overlaps/interleaves
+     * @return void
+     */
+    public function testSequenceComparision1()
+    {
+        $markup = 'Lorem ipsum<1><2><5/></2></1> dolor<3><6/></3> sit amet';
+        $this->createStructuralTest($markup, []);
+    }
+
+    /**
+     * Tests sequences of tags with overlaps/interleaves
+     * @return void
+     */
+    public function testSequenceComparision2()
+    {
+        $markup = 'Lorem ipsum<1><2><5/></2></1> dolor<6/></3><3> sit amet';
+        $this->createStructuralTest($markup, ['internal_tag_structure_faulty']);
+    }
+
+    /**
+     * Tests sequences of tags with overlaps/interleaves
+     * @return void
+     */
+    public function testSequenceComparision3()
+    {
+        $markup = 'Lorem ipsum<7/><1><2></2><3></3><4></4></1><5/> dolor<3><6/></3> sit amet';
+        $this->createStructuralTest($markup, []);
+    }
+
+    /**
+     * Tests sequences of tags with overlaps/interleaves
+     * @return void
+     */
+    public function testSequenceComparision4()
+    {
+        $markup = 'Lorem ipsum<7/><1><2></2><3><4></3></4></1><5/> dolor<3><6/></3> sit amet';
+        $this->createStructuralTest($markup, ['internal_tag_structure_faulty']);
+    }
+
+
+    /**
+     * Tests sequences of tags with overlaps/interleaves
+     * @return void
+     */
+    public function testSequenceComparision5()
+    {
+        $markup = 'Lorem ipsum<1><2><3><5/></1><6/></2><7/></3>  dolor sit amet';
+        $this->createStructuralTest($markup, ['internal_tag_structure_faulty']);
+    }
+
     /**
      * Creates a test only to check the structure of the given markup
      * @param string $markup
      * @param array|string $expectedState
      */
-    private function createStructuralTest($markup, $expectedState){
+    private function createStructuralTest(string $markup, array|string $expectedState)
+    {
+        $markup = $this->replaceInternalComparisionTags($markup);
         $tags = new editor_Segment_FieldTags($this->getTestTask(), 123456, $markup, 'target', 'targetEdit');
         $tagComparision = new editor_Segment_Internal_TagComparision($tags, null);
         $this->assertEquals($expectedState, $tagComparision->getStati());
