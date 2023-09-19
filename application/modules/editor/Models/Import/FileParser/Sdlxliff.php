@@ -865,20 +865,23 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
      * @param editor_Models_Import_FileParser_Sdlxliff_parseSegmentData $data enthält alle für das Segmentparsen wichtigen Daten
      * @return editor_Models_Import_FileParser_Sdlxliff_parseSegmentData  $data enthält alle für das Segmentparsen wichtigen Daten
      */
-    protected function parseSingleTag($data) {
+    protected function parseSingleTag($data)
+    {
         $tag = &$data->segment[$data->i];
         $tagName = preg_replace('"<([^/ ]*).*>"', '\\1', $tag);
 
-        $whitespaceTags = ['hardReturn' , 'softReturn', 'macReturn', 'space', 'char', 'tab', 'protectedTag'];
-        if (in_array($tagName, $whitespaceTags)) {
-            //tagtrait is working with shortTagIdent internally, so we have to feed it here
+        if ($this->contentProtector->hasTagsToConvert($tag)) {
+            //tag trait is working with shortTagIdent internally, so we have to feed it here
             $this->shortTagIdent = $data->j++;
-            $tag = $this->utilities->whitespace->convertToInternalTags($tag, $this->shortTagIdent);
+            $tag = $this->contentProtector->convertToInternalTags($tag, $this->shortTagIdent);
+
             return $data;
         }
+
         $this->verifyTagName($tagName, $data);
         $tagId = $this->parseSegmentGetTagId($tag, $tagName);
         $shortTagIdent = $data->j;
+
         if (strpos($tagId, 'locked')!== false) {
             $this->setLockedTagContent($tag, $tagId);
             $shortTagIdent = 'locked' . $data->j;
@@ -893,6 +896,7 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
         $tag = $tagObj->renderTag();
 
         $data->j++;
+
         return $data;
     }
 

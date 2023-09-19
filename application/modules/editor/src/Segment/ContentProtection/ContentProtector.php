@@ -102,6 +102,17 @@ class ContentProtector
         return $text;
     }
 
+    public function hasTagsToConvert(string $segment): bool
+    {
+        foreach ($this->protectors as $protector) {
+            if ($protector->hasTagsToConvert($segment)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     /**
      * replaces the placeholder tags (<protectedTag> / <hardReturn> / <char> / <number> etc) with an internal tag
      */
