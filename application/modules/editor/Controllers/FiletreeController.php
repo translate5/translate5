@@ -26,6 +26,7 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\Acl\Rights;
 use MittagQI\Translate5\Task\Current\Exception;
 use MittagQI\Translate5\Task\Current\NoAccessException;
 use MittagQI\Translate5\Task\TaskContextTrait;
@@ -83,7 +84,7 @@ class Editor_FiletreeController extends ZfExtended_RestController
 
         $isPm = $task->getPmGuid() === ZfExtended_Authentication::getInstance()->getUserGuid();
 
-        $mayLoadAllTasks = $this->isAllowed('backend', 'loadAllTasks') || ($isPm);
+        $mayLoadAllTasks = $this->isAllowed(Rights::ID, Rights::LOAD_ALL_TASKS) || ($isPm);
 
         if( $mayLoadAllTasks === false){
             $this->view->rows = [];
