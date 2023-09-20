@@ -343,6 +343,12 @@ class editor_TaskController extends ZfExtended_RestController
     protected function loadAllForTaskOverview(): array
     {
         $rows = $this->loadAll();
+
+        //if we have no paging parameters, we omit all additional data gathering to improve performace!
+        if ($this->getParam('limit', 0) === 0 && !$this->getParam('filter', false)) {
+            return $rows;
+        }
+
         $taskGuids = array_map(fn ($item) => $item['taskGuid'], $rows);
 
         $file = ZfExtended_Factory::get(editor_Models_File::class);

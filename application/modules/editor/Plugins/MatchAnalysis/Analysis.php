@@ -456,7 +456,9 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
         $this->log->exception($e, [
             'level' => $this->log::LEVEL_WARN,
             'domain' => $this->log->getDomain(),
-            'task' => $this->task,
+            'extra' => [
+                'task' => $this->task,
+            ]
         ]);
         settype($this->connectorErrorCount[$id], 'integer');
         $this->connectorErrorCount[$id]++;
@@ -630,9 +632,11 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
                     'languageResource' => $languageresource,
                 ], $errors));
                 $this->log->exception($e, [
-                    'task' => $this->task,
                     'level' => $this->log::LEVEL_WARN,
                     'domain' => $this->log->getDomain(),
+                    'extra' => [
+                        'task' => $this->task,
+                    ]
                 ]);
                 continue;
             }
@@ -695,6 +699,15 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
         //remove fuzzy languageResource from opentm2
         $this->removeFuzzyResources();
         $this->connectors = null;
+    }
+
+    /**
+     * returns the error count sum
+     * @return int
+     */
+    public function getErrorCount(): int
+    {
+        return array_sum($this->connectorErrorCount);
     }
 
     public function setPretranslate($pretranslate)

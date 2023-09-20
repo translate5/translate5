@@ -513,8 +513,10 @@ class Editor_SegmentController extends ZfExtended_RestController
                 $task->loadByTaskGuid($this->entity->getTaskGuid());
                 $this->log->exception($e, [
                     'level' => $this->log::LEVEL_WARN,
-                    'task' => $task,
-                    'loadedSegment' => $this->entity->getDataObject(),
+                    'extra' => [
+                        'task' => $task,
+                        'loadedSegment' => $this->entity->getDataObject(),
+                    ]
                 ]);
             }
 

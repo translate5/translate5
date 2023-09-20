@@ -72,8 +72,12 @@ class editor_Plugins_MatchAnalysis_Models_TaskAssoc extends ZfExtended_Models_En
     /**
      * Sets the finishedAt date to database now
      */
-    public function finishNow() {
+    public function finishNow(int $errorCount): void
+    {
         $id = (int)$this->getId();
-        $this->db->update(['finishedAt' => new Zend_Db_Expr('now()')], 'id = '.$id);
+        $this->db->update([
+            'errorCount' => $errorCount,
+            'finishedAt' => new Zend_Db_Expr('now()'),
+        ], 'id = '.$id);
     }
 }
