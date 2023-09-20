@@ -170,6 +170,8 @@ class ContentProtector
             foreach ($this->protectors as $protector) {
                 if ($protector->hasTagsToConvert($tags[$i])) {
                     $chunkStorage[] = $protector->convertToInternalTagsInChunks($tags[$i], $shortTagIdent);
+
+                    continue 2;
                 }
             }
         }

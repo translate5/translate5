@@ -1235,5 +1235,8 @@ div.internal-tag.number span.full::after {
 .type-target div.internal-tag.number .full::after {
     content: attr(data-target);
 }
+.alike-target-field div.internal-tag.number .full::after {
+    content: attr(data-target);
+}
 
 .number + .number { margin-left:1px; }
