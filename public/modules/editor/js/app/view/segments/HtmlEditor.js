@@ -630,7 +630,7 @@ Ext.define('Editor.view.segments.HtmlEditor', {
                     fullWidth: data.fullWidth,
                     shortWidth: data.shortWidth,
                     whitespaceTag: data.whitespaceTag,
-                    html: me.renderInternalTags(item.className, data),
+                    html: me.renderInternalTags(data.className, data),
                     data: data
                 };
 
@@ -686,6 +686,7 @@ Ext.define('Editor.view.segments.HtmlEditor', {
         data.title = Ext.htmlEncode(spanShort.getAttribute('title'));
         data.length = spanFull.getAttribute('data-length');
         data.originalItem = item;
+        data.className = item.className;
 
         //old way is to use only the id attribute, new way is to use separate data fields
         // both way are currently used!
