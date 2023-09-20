@@ -60,6 +60,13 @@ Ext.define('Editor.view.quality.FilterPanelController', {
      * When the view is expanded we load/reload the store
      */
     onBeforeExpand: function(){
+        this.reloadKeepingFilterVal();
+    },
+
+    /**
+     * Reload filters store but keep checkboxes state
+     */
+    reloadKeepingFilterVal: function(){
         // if a filter was already set this is not the initial opening and we need to keep the persistence of this filter
         if(this.currentFilterVal){
             this.loadFilteredStrore(this.currentFilterVal);
