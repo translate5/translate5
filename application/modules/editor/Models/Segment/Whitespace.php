@@ -179,6 +179,22 @@ class editor_Models_Segment_Whitespace {
     }
 
     /**
+     * returns all tags
+     * @param string $segment
+     * @return array
+     */
+    public function get(string $segment)
+    {
+        $matches = null;
+        preg_match_all(editor_Models_Segment_InternalTag::REGEX_INTERNAL_TAGS, $segment, $matches);
+        $realTags = array_filter($matches[3], function ($value) {
+            return in_array($value, editor_Models_Segment_Whitespace::WHITESPACE_TAGS);
+        });
+        //return the real tags (with cleaned index) from matches[0] by the keys from the found real tags above
+        return array_values(array_intersect_key($matches[0], $realTags));
+    }
+
+    /**
      * protects all whitespace and special characters coming from the import formats
      * WARNING: should be called only on plain text fragments without tags!
      * @param string $textNode should not contain tags, since special characters in the tag content would also be protected then
