@@ -119,17 +119,23 @@ class editor_Segment_Internal_TagComparision extends editor_Segment_Internal_Tag
     }
     /**
      * Here we check if all tags from checkAgainst are present in the check tags
+     * HOTFIX: Due to an tag-numbering problem, it can happen, that whitespace-tags have the same-index
+     * and the hash-based comparision fails, see TS-2856 / TRANSLATE-3495
+     * Therefore we also compare their pure number
      */
     private function checkCompleteness(){
         $states = [];
         $hashesInternalCheck = [];
         $hashesWhitespaceCheck = [];
         $hashesInternalAgainst = [];
-        $hashesWhitespaceAgainst = [];        
+        $hashesWhitespaceAgainst = [];
+        $numWhitespaceCheck = 0;
+        $numWhitespaceAgainst = 0;
         foreach($this->checkTags as $tag){
             /* @var $tag editor_Segment_Internal_Tag */
             if($tag->isWhitespace()){
                 $hashesWhitespaceCheck[] = $tag->getComparisionHash();
+                $numWhitespaceCheck++;
             } else {
                 $hashesInternalCheck[] = $tag->getComparisionHash();
             }
@@ -138,6 +144,7 @@ class editor_Segment_Internal_TagComparision extends editor_Segment_Internal_Tag
             /* @var $tag editor_Segment_Internal_Tag */
             if($tag->isWhitespace()){
                 $hashesWhitespaceAgainst[] = $tag->getComparisionHash();
+                $numWhitespaceAgainst++;
             } else {
                 $hashesInternalAgainst[] = $tag->getComparisionHash();
             }
@@ -148,7 +155,7 @@ class editor_Segment_Internal_TagComparision extends editor_Segment_Internal_Tag
         if(count($diffInternal) > 0){
             $states[self::TAGS_ADDED] = true;
         }
-        if(count($diffWhitespace) > 0){
+        if(count($diffWhitespace) > 0 || $numWhitespaceCheck > $numWhitespaceAgainst){
             $states[self::WHITESPACE_ADDED] = true;
         }
         
@@ -157,7 +164,7 @@ class editor_Segment_Internal_TagComparision extends editor_Segment_Internal_Tag
         if(count($diffInternal) > 0){
             $states[self::TAGS_MISSING] = true;
         }
-        if(count($diffWhitespace) > 0){
+        if(count($diffWhitespace) > 0 || $numWhitespaceCheck < $numWhitespaceAgainst){
             $states[self::WHITESPACE_MISSING] = true;
         }
         if(count($states) > 0){
