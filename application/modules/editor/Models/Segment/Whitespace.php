@@ -183,7 +183,7 @@ class editor_Models_Segment_Whitespace {
      * @param string $segment
      * @return array
      */
-    public function get(string $segment)
+    public function get(string $segment): array
     {
         $matches = null;
         preg_match_all(editor_Models_Segment_InternalTag::REGEX_INTERNAL_TAGS, $segment, $matches);

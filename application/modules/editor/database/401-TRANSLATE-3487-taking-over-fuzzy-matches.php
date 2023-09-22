@@ -110,7 +110,7 @@ foreach ($result as $item) {
     $tagWhitespace = ZfExtended_Factory::get(editor_Models_Segment_Whitespace::class);
     $whiteSpaces = $tagWhitespace->get($item['targetEdited']);
 
-    checkWhitespaces($whiteSpaces,$item['targetEdited']);
+    $whiteSpacesData[] = checkWhitespaces($whiteSpaces,$item['targetEdited']);
 
     $diff = $tag->diffArray($targetTags,$sourceTags);
 
@@ -156,78 +156,6 @@ foreach ($result as $item) {
     }
 }
 
-/**
- * Collect the whitespaces where the css class has different content as expected
- * @param array $tags
- * @param string $target
- * @return void
- */
-function checkWhitespaces(array $tags, string $target): void
-{
-
-    // collected invalid tags from the segment
-    $invalid = [];
-
-    foreach ($tags as $tag){
-        $matches = null;
-        preg_match_all(editor_Models_Segment_InternalTag::REGEX_INTERNAL_TAGS, $tag, $matches);
-
-        if(!empty($matches)){
-            $class = $matches[2][0];
-            $type = $matches[3][0];
-            $decoded= pack('H*', $class);
-
-
-            $typeInClass = explode(' ',$decoded);
-            $typeInClass = $typeInClass[0] ?? '';
-            $typeInClass = str_replace('/','',$typeInClass);
-
-            if($type !== $typeInClass){
-                $invalid[] = [
-                    'regexMatches' => $matches,
-                    'segment' => $target
-                ];
-            }
-        }
-    }
-
-    if(!empty($invalid)){
-        error_log('Wrong whitespace tags found:'.count($invalid));
-    }
-}
-
-/**
- * This function will try to find the correct tag by searching for the tag number of the broken tag in the correctTags
- * @param array $correctTags
- * @param string $brokenTag
- * @return mixed|string
- */
-function findCorrectTag(array $correctTags, string $brokenTag): mixed
-{
-
-    $pattern = '/<span class="short" title="([^"]*)">(.*?)<\/span>/i';
-
-    preg_match($pattern, $brokenTag, $matches);
-
-    if(empty($matches)){
-        return '';
-    }
-
-    $shortTag = $matches[2];
-
-    foreach ($correctTags as $tag){
-
-        // generate the short tag regex for matching
-        // in addition escape the forward slashes because in some cases they can not be correct
-        $pattern = '/<span class="short" title="([^"]*)">'.str_replace('/','\/',$shortTag).'<\/span>/i';
-        if( preg_match($pattern,$tag,$newMatch)){
-            return $tag;
-        }
-    }
-
-    return '';
-}
-
 if(!empty($reviewData)){
     error_log('Broken segments in review tasks where found and those will not be repaired automatically. Check '.APPLICATION_PATH.'/../data/logs/BrokenSegmentsInReviewTask.log file for more info');
     file_put_contents(APPLICATION_PATH.'/../data/logs/BrokenSegmentsInReviewTask.log', print_r($reviewData,true),FILE_APPEND);
@@ -242,10 +170,22 @@ if(file_exists(APPLICATION_PATH.'/../data/logs/BrokenSegmentsInReviewTask.log'))
     $config = \Zend_Registry::get('config');
     /* @var $config \Zend_Config */
 
+    $receiver =
+        $config->resources->ZfExtended_Resource_Logger->writer->mail->receiver
+        ??
+        $this->_config->resources->mail->defaultFrom->email;
+
+    if($receiver instanceof Zend_Config){
+        $receiver = $receiver->toArray();
+    }
+
+    $toEmail = is_array($receiver) ? $receiver[0] : $receiver;
+
     $mail = new \ZfExtended_Mailer('utf-8');
     $mail->setSubject('Translate5 TRANSLATE-3487 E-Mail - from '.$config->runtimeOptions->server->name);
     $mail->setBodyText('This is email for collected errors and debug output from TRANSLATE-3487');
-    $mail->addTo('errors@translate5.net');
+    $mail->addTo($toEmail);
+
     $mail->createAttachment(
         file_get_contents(APPLICATION_PATH.'/../data/logs/BrokenSegmentsInReviewTask.log'),
         'text/plain',
@@ -253,6 +193,7 @@ if(file_exists(APPLICATION_PATH.'/../data/logs/BrokenSegmentsInReviewTask.log'))
         Zend_Mime::ENCODING_BASE64,
         'BrokenSegmentsInReviewTask.log'
     );
+
     $mail->send();
 }
 
@@ -346,4 +287,76 @@ if(!empty($replaceInfo)){
             $view->drop();
         }
     }
+}
+
+
+
+/**
+ * Collect the whitespaces where the css class has different content as expected
+ * @param array $tags
+ * @param string $target
+ * @return array
+ */
+function checkWhitespaces(array $tags, string $target): array
+{
+
+    // collected invalid tags from the segment
+    $invalid = [];
+
+    foreach ($tags as $tag){
+        $matches = null;
+        preg_match_all(editor_Models_Segment_InternalTag::REGEX_INTERNAL_TAGS, $tag, $matches);
+
+        if(!empty($matches)){
+            $class = $matches[2][0];
+            $type = $matches[3][0];
+            $decoded= pack('H*', $class);
+
+
+            $typeInClass = explode(' ',$decoded);
+            $typeInClass = $typeInClass[0] ?? '';
+            $typeInClass = str_replace('/','',$typeInClass);
+
+            if($type !== $typeInClass){
+                $invalid[] = [
+                    'regexMatches' => $matches,
+                    'segment' => $target
+                ];
+            }
+        }
+    }
+
+    return $invalid;
+}
+
+/**
+ * This function will try to find the correct tag by searching for the tag number of the broken tag in the correctTags
+ * @param array $correctTags
+ * @param string $brokenTag
+ * @return mixed|string
+ */
+function findCorrectTag(array $correctTags, string $brokenTag): mixed
+{
+
+    $pattern = '/<span class="short" title="([^"]*)">(.*?)<\/span>/i';
+
+    preg_match($pattern, $brokenTag, $matches);
+
+    if(empty($matches)){
+        return '';
+    }
+
+    $shortTag = $matches[2];
+
+    foreach ($correctTags as $tag){
+
+        // generate the short tag regex for matching
+        // in addition escape the forward slashes because in some cases they can not be correct
+        $pattern = '/<span class="short" title="([^"]*)">'.str_replace('/','\/',$shortTag).'<\/span>/i';
+        if( preg_match($pattern,$tag,$newMatch)){
+            return $tag;
+        }
+    }
+
+    return '';
 }
