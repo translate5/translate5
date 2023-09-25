@@ -106,8 +106,13 @@ Ext.define('Editor.view.quality.FalsePositivesController', {
                     }
                 }
 
-                // Reload left panel's qualities tree
-                Ext.ComponentQuery.query('qualityFilterPanel').pop()?.getController()?.reloadKeepingFilterVal();
+                // Get quality filter panel
+                var qfp = Ext.ComponentQuery.query('qualityFilterPanel').pop();
+
+                // Reload qualities tree
+                if (qfp) {
+                    qfp.getController().reloadKeepingFilterVal();
+                }
             },
             failure: (response) => {
 
