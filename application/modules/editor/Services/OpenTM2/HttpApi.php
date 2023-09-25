@@ -26,6 +26,8 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\Service\T5Memory;
+
 /**
  * OpenTM2 HTTP Connection API
  */
@@ -78,7 +80,7 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
         $data->data = base64_encode($tmData);
         
         $http = $this->getHttp('POST');
-        $http->setConfig(['timeout' => 1200]);
+        $http->setConfig(['timeout' => $this->createTimeout(1200)]);
         $http->setRawData($this->jsonEncode($data), 'application/json; charset=utf-8');
         return $this->processResponse($http->request());
     }
@@ -92,6 +94,7 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
         
         $data = new stdClass();
 
+        // TODO T5MEMORY: remove when OpenTM2 is out of production
         if($this->isOpenTM2()) {
             $tmData = $this->fixLanguages->tmxOnUpload($tmData);
             /* @var $tmxRepairer editor_Services_OpenTM2_FixImportParser */
@@ -101,7 +104,7 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
         $data->tmxData = base64_encode($tmData);
 
         $http = $this->getHttpWithMemory('POST', '/import');
-        $http->setConfig(['timeout' => 1200]);
+        $http->setConfig(['timeout' => $this->createTimeout(1200)]);
         $http->setRawData($this->jsonEncode($data), 'application/json; charset=utf-8');
 
         return $this->processResponse($http->request());
@@ -118,7 +121,7 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
         $data['newName'] = $this->addTmPrefix($targetMemory);
 
         $http = $this->getHttpWithMemory('POST', 'clone');
-        $http->setConfig(['timeout' => 1200]);
+        $http->setConfig(['timeout' => $this->createTimeout(1200)]);
         $http->setRawData($this->jsonEncode($data), 'application/json; charset=utf-8');
 
         return $this->processResponse($http->request());
@@ -163,7 +166,7 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
         $this->httpMethod = $method;
         $this->http->setHeaders('Accept-charset', 'UTF-8');
         $this->http->setHeaders('Accept', 'application/json; charset=utf-8');
-        $this->http->setConfig(['timeout' => 30]);
+        $this->http->setConfig(['timeout' => $this->createTimeout(30)]);
 
         return $this->http;
     }
@@ -224,7 +227,7 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
             $mime = implode(',', $mime);
         }
         $http = $this->getHttpWithMemory('GET');
-        $http->setConfig(['timeout' => 1200]);
+        $http->setConfig(['timeout' => $this->createTimeout(1200)]);
         $http->setHeaders('Accept', $mime);
         $response = $http->request();
         if($response->getStatus() === 200) {
@@ -257,7 +260,7 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
         $result = $fix->convert($tmxData);
         if($fix->getChangeCount() > 0 || $fix->getNewLineCount() > 0) {
             $logger = Zend_Registry::get('logger');
-            $logger->warn('E9999', 'TMX Export: Entities in {changeCount} text parts repaired (see raw php error log), {newLineCount} new line tags restored.', [
+            $logger->warn('E1554', 'TMX Export: Entities in {changeCount} text parts repaired (see raw php error log), {newLineCount} new line tags restored.', [
                 'languageResource' => $this->languageResource,
                 'changeCount' => $fix->getChangeCount(),
                 'newLineCount' => $fix->getNewLineCount(),
@@ -277,7 +280,7 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
         else {
             $this->getHttpWithMemory('GET', '/status');
         }
-        $this->http->setConfig(['timeout' => 3]);
+        $this->http->setConfig(['timeout' => $this->createTimeout(3)]);
         try {
             //OpenTM2 returns invalid JSON on calling "/", so we have to fix this here by catching the invalid JSON Exception.
             // Also this would send a list of all TMs to all error receivers, which must also prevented
@@ -332,6 +335,7 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
         
         $http = $this->getHttpWithMemory('POST', 'fuzzysearch');
 
+        // TODO T5MEMORY: remove when OpenTM2 is out of production
         if($this->isOpenTM2() && strtolower($json->targetLang) === 'en-gb'){
             // TODO REMOVE THIS WHOLE IF AFTER ABOLISHING OPENTM2
             //between 06.2022 v5.7.4 and 9.2022 v5.7.10 all en-GB segments were stored as en-UK into OpenTM2
@@ -468,8 +472,30 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
     public function reorganizeTm(): bool
     {
         $http = $this->getHttpWithMemory('GET', 'reorganize');
-
-        return $this->processResponse($http->request());
+        if($this->processResponse($http->request())){
+            // since Version 0.4.48 we have the number of invalid segments in the result
+            // {
+            //     "axelloc-ID57-T5Memory 0448 TEST": "reorganized",
+            //     "time": "1 sec",
+            //     "reorganizedSegmentCount": "2277", -> since 0.4.48
+            //     "invalidSegmentCount": "0" -> since 0.4.48
+            // }
+            if(property_exists($this->result, 'invalidSegmentCount')){
+                $invalid = (int) $this->result->invalidSegmentCount;
+                if($invalid > 0){
+                    $overall = (int) $this->result->reorganizedSegmentCount;
+                    $logger = Zend_Registry::get('logger');
+                    $logger->warn('E1555', 'Errors during Translation Memory reorganization: {invalid} of {overall} segments invalid in "{tmname}".', [
+                        'languageResource' => $this->languageResource,
+                        'invalid' => $invalid,
+                        'overall' => $overall,
+                        'tmname' => $this->languageResource->getName(),
+                    ]);
+                }
+            }
+            return true;
+        }
+        return false;
     }
 
     /***
@@ -568,6 +594,7 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
     /**
      * returns true if the target system is OpenTM2, false if isT5Memory
      * @deprecated check all usages and remove them if OpenTM2 is replaced with t5memory
+     * TODO T5MEMORY: remove when OpenTM2 is out of production
      * @return bool
      */
     public function isOpenTM2(): bool {
@@ -606,6 +633,7 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
     {
         $flags = JSON_THROW_ON_ERROR;
 
+        // TODO T5MEMORY: remove when OpenTM2 is out of production
         if (!$this->isOpenTM2()) {
             $flags = JSON_THROW_ON_ERROR | JSON_PRETTY_PRINT;
         }
@@ -613,5 +641,35 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
         // Due to error in proxygen library in t5memory json closing brace should follow a new line symbol (should be "\n}" instead of "}"),
         // otherwise such a json won't be parsed correctly
         return json_encode($data, $flags);
+    }
+
+    /**
+     * Generates the Timeouts to use for a request
+     * TODO T5MEMORY: remove when OpenTM2 is out of production
+     * @param int $seconds
+     * @return int
+     */
+    private function createTimeout(int $seconds): int
+    {
+        if($this->isT5Memory){
+            return T5Memory::REQUEST_TIMEOUT + $seconds;
+        } else {
+            return $seconds;
+        }
+    }
+
+    public function isRequestable(): bool
+    {
+        if(empty($this->languageResource)) {
+            $this->getHttp('GET', '/');
+        } else {
+            $this->getHttpWithMemory('GET', '/status');
+        }
+        $this->http->setConfig(['timeout' => 3]);
+        try {
+            return $this->processResponse($this->http->request());
+        } catch(editor_Services_Exceptions_InvalidResponse $e) {
+            return false;
+        }
     }
 }

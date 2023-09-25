@@ -9263,6 +9263,18 @@ E-Mail: service@MittagQI.com</pre>
                 <source>App-Token kopieren</source>
                 <target>Copy application token</target>
             </trans-unit>
+            <trans-unit id='RGFzIFNlZ21lbnQga29ubnRlIG5pY2h0IGlucyBUTSBnZXNwZWljaGVydCB3ZXJkZW4='>
+                <source>Das Segment konnte nicht ins TM gespeichert werden</source>
+                <target>The segment could not be saved to the TM</target>
+            </trans-unit>
+            <trans-unit id='Qml0dGUga29udGFrdGllcmVuIFNpZSBJaHJlbiBBZG1pbmlzdHJhdG9y'>
+                <source>Bitte kontaktieren Sie Ihren Administrator</source>
+                <target>Please contact your administrator</target>
+            </trans-unit>
+            <trans-unit id='R2VtZWxkZXRlIEZlaGxlcg=='>
+                <source>Gemeldete Fehler</source>
+                <target>Reported errors</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

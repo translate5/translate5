@@ -26,6 +26,7 @@
  END LICENSE AND COPYRIGHT
  */
 
+use MittagQI\Translate5\Acl\Rights;
 use MittagQI\Translate5\Cronjob\CronEventTrigger;
 use MittagQI\Translate5\LanguageResource\Pretranslation\BatchResult;
 use MittagQI\Translate5\PauseWorker\PauseWorker;
@@ -47,8 +48,8 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract
      * @var array
      */
     protected $frontendControllers = array(
-        'pluginMatchAnalysisMatchAnalysis' => 'Editor.plugins.MatchAnalysis.controller.MatchAnalysis',
-        'pluginMatchAnalysisPricingPreset' => 'Editor.plugins.MatchAnalysis.controller.admin.PricingPreset'
+        Rights::PLUGIN_MATCH_ANALYSIS_MATCH_ANALYSIS => 'Editor.plugins.MatchAnalysis.controller.MatchAnalysis',
+        Rights::PLUGIN_MATCH_ANALYSIS_PRICING_PRESET => 'Editor.plugins.MatchAnalysis.controller.admin.PricingPreset'
     );
 
     protected $localePath = 'locales';
@@ -466,11 +467,14 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract
         if ($task->isImporting()) {
             //on import we use the import worker as parentId
             $parentWorkerId = $this->fetchImportWorkerId($task->getTaskGuid());
+            $workerState = null;
         } else {
             // crucial: add a different behaviour for the workers when performig an operation
             $workerParameters['workerBehaviour'] = ZfExtended_Worker_Behaviour_Default::class;
             // this creates the operation start/finish workers
-            $parentWorkerId = editor_Task_Operation::create(editor_Task_Operation::MATCHANALYSIS, $task);
+            $operation = editor_Task_Operation::create(editor_Task_Operation::MATCHANALYSIS, $task);
+            $parentWorkerId = $operation->getWorkerId();
+            $workerState = ZfExtended_Models_Worker::STATE_PREPARE;
         }
 
         if (empty($valid)) {
@@ -491,12 +495,12 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract
         $workerParameters['batchQuery'] = (boolean)Zend_Registry::get('config')
             ->runtimeOptions->LanguageResources->Pretranslation->enableBatchQuery;
         if (!empty($this->batchAssocs) && $workerParameters['batchQuery']) {
-            $this->queueBatchWorkers($task, $workerParameters, $parentWorkerId);
+            $this->queueBatchWorkers($task, $workerParameters, $parentWorkerId, $workerState);
         }
 
         $worker = ZfExtended_Factory::get(PauseMatchAnalysisWorker::class);
         $worker->init($task->getTaskGuid(), [PauseWorker::PROCESSOR => PauseMatchAnalysisProcessor::class]);
-        $worker->queue($parentWorkerId);
+        $worker->queue($parentWorkerId, $workerState);
 
         // init worker and queue it
         $worker = ZfExtended_Factory::get(editor_Plugins_MatchAnalysis_Worker::class);
@@ -514,8 +518,11 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract
             editor_Segment_Quality_Manager::instance()->queueOperation(
                 editor_Segment_Processing::ANALYSIS,
                 $task,
-                $parentWorkerId
+                $parentWorkerId,
+                ZfExtended_Models_Worker::STATE_PREPARE
             );
+            // we need to start any operation but the import
+            $operation->start();
         }
 
         return true;
@@ -525,8 +532,16 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract
      * For each batch supported connector queue one batch worker
      * @param editor_Models_Task $task
      * @param array $eventParams
+     * @param int $parentWorkerId
+     * @param string|null $workerState
+     * @return void
+     * @throws ReflectionException
      */
-    protected function queueBatchWorkers(editor_Models_Task $task, array $eventParams, int $parentWorkerId)
+    protected function queueBatchWorkers(
+        editor_Models_Task $task,
+        array              $eventParams,
+        int                $parentWorkerId,
+        string             $workerState = null)
     {
         $isPretranslateMt = (boolean)$eventParams['pretranslateMt'];
         $isPretranslate = (boolean)$eventParams['pretranslate'];
@@ -559,7 +574,7 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract
             }
 
             //we may not trigger the queue here, just add the workers!
-            $workerId = $batchWorker->queue($parentWorkerId, null, false);
+            $workerId = $batchWorker->queue($parentWorkerId, $workerState, false);
 
             $this->queueBatchCleanUpWorker($workerId, $task->getTaskGuid());
         }

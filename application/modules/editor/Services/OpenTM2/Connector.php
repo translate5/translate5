@@ -28,13 +28,17 @@ END LICENSE AND COPYRIGHT
 
 use editor_Models_Task as Task;
 use MittagQI\Translate5\LanguageResource\Status as LanguageResourceStatus;
+use MittagQI\Translate5\Service\T5Memory;
 
 /**
- * OpenTM2 Connector
+ * T5memory / OpenTM2 Connector
+ *
+ * IMPORTANT: see the doc/comments in MittagQI\Translate5\Service\T5Memory
  */
 class editor_Services_OpenTM2_Connector extends editor_Services_Connector_FilebasedAbstract {
 
     /**
+     * Connector
      * @var editor_Services_OpenTM2_HttpApi
      */
     protected $api;
@@ -56,6 +60,18 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
      * @var bool
      */
     protected $internalTagSupport = true;
+
+    /**
+     * Holds the parent API in case of an fuzzy connector
+     * @var editor_Services_OpenTM2_HttpApi|null
+     */
+    private ?editor_Services_OpenTM2_HttpApi $parentApi = null;
+
+    /**
+     * marks an fuzzy connector as reorganizing the TM, holds the beginning timestamp
+     * @var int
+     */
+    private int $fuzzyReorganize = -1;
     
     public function __construct() {
         editor_Services_Connector_Exception::addCodes([
@@ -81,7 +97,8 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
         $this->api = ZfExtended_Factory::get('editor_Services_OpenTM2_HttpApi');
         $this->api->setLanguageResource($languageResource);
 
-        //t5 memory is not needing the OpenTM2 specific Xliff TagHandler, the default XLIFF TagHandler is sufficient
+        // TODO T5MEMORY: remove when OpenTM2 is out of production
+        // t5 memory is not needing the OpenTM2 specific Xliff TagHandler, the default XLIFF TagHandler is sufficient
         if (!$this->api->isOpenTM2()
             && $this->tagHandler instanceof editor_Services_Connector_TagHandler_OpenTM2Xliff) {
             $this->tagHandler = ZfExtended_Factory::get(
@@ -236,17 +253,13 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
         
         $error = $this->api->getError();
 
-        $msg = 'Das Segment konnte nicht ins TM gespeichert werden! Bitte kontaktieren '
-            . 'Sie Ihren Administrator! <br />Gemeldete Fehler:';
+        // send the error to the frontend
+        editor_Services_Manager::reportTMUpdateError($error);
 
-        /* @var $messages ZfExtended_Models_Messages */
-        $messages = Zend_Registry::get('rest_messages');
-        $messages->addError($msg, 'core', null, [$error]);
-        
         $this->logger->error('E1306', 'OpenTM2: could not save segment to TM', [
             'languageResource' => $this->languageResource,
             'segment' => $segment,
-            'apiError' => $error,
+            'apiError' => $error
         ]);
     }
 
@@ -720,7 +733,8 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
      */
     public function initForFuzzyAnalysis($analysisId)
     {
-        $mime = "TM";
+        $mime = 'TM';
+        // TODO FIXME: This brings the "Mother-TM" into fuzzy-mode, why is this done ? Maybe a historic artefact due to the ugly "clone" in the base-implementation ??
         $this->isInternalFuzzy = true;
         $validExportTypes = $this->getValidExportTypes();
 
@@ -731,11 +745,17 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
         $fuzzyFileName = $this->renderFuzzyLanguageResourceName($this->languageResource->getSpecificData('fileName'), $analysisId);
         $this->api->setResource($this->languageResource->getResource());
 
+        // TODO T5MEMORY: remove when OpenTM2 is out of production
         if ($this->api->isOpenTM2()) {
             $data = $this->getTm($validExportTypes[$mime]);
             $this->api->createMemory($fuzzyFileName, $this->languageResource->getSourceLangCode(), $data);
         } else {
+            // HOTFIX for t5memory BUG: After a clone call the clone might is corrupt, if the cloned TM has (recent) updates
+            // an export of the cloned memory before seems to heal that (either as TM or TMX)
+            $this->getTm($validExportTypes[$mime]);
+            sleep(1);
             $this->api->cloneMemory($fuzzyFileName);
+            sleep(1);
         }
 
         $fuzzyLanguageResource = clone $this->languageResource;
@@ -748,13 +768,13 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
         //$fuzzyLanguageResource->setId(null);
 
         $connector = ZfExtended_Factory::get(self::class);
-        /* @var $connector editor_Services_Connector */
         $connector->connectTo($fuzzyLanguageResource, $this->languageResource->getSourceLang(), $this->languageResource->getTargetLang());
         // copy the current config (for task specific config)
         $connector->setConfig($this->getConfig());
         // copy the worker user guid
         $connector->setWorkerUserGuid($this->getWorkerUserGuid());
         $connector->isInternalFuzzy = true;
+        $connector->parentApi = $this->api; // needed by the fuzzy connector to reorganize the parent TM if neccessary
 
         return $connector;
     }
@@ -907,9 +927,21 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
             $this->languageResource->save();
         }
 
+        // HOTFIX for t5memory BUG: It seems a reorganize may deletes recently updated segments
+        // an export of the cloned memory before seems to heal that
+        $validExportTypes = $this->getValidExportTypes();
+        $this->getTm($validExportTypes['TM']);
+        sleep(1);
         $reorganized = $this->api->reorganizeTm();
 
-        if (!$this->isInternalFuzzy()) {
+        if($this->isInternalFuzzy()){
+
+            $this->fuzzyReorganize = time();
+            $this->waitForReorganization();
+            return true;
+
+        } else {
+
             $this->languageResource->setStatus(
                 $reorganized ? LanguageResourceStatus::AVAILABLE : LanguageResourceStatus::REORGANIZE_FAILED
             );
@@ -921,6 +953,9 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
 
     public function isReorganizingAtTheMoment(): bool
     {
+        if($this->fuzzyReorganize > 0){
+            return true;
+        }
         $this->resetReorganizingIfNeeded();
 
         return $this->languageResource->getStatus() === LanguageResourceStatus::REORGANIZE_IN_PROGRESS;
@@ -979,5 +1014,27 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
     public function getApi(): editor_Services_OpenTM2_HttpApi
     {
         return $this->api;
+    }
+
+    /**
+     * Helper to wait for a internal reorganization
+     * @throws editor_Services_Connector_Exception
+     * @throws editor_Services_Exceptions_InvalidResponse
+     */
+    private function waitForReorganization()
+    {
+        while($this->fuzzyReorganize > 0){
+            // if reorganize takes too long we end with exception
+            if((time() - $this->fuzzyReorganize) > T5Memory::REQUEST_TIMEOUT){
+                throw new editor_Services_Connector_Exception('E1512');
+            }
+            // wait 10 sec
+            sleep(10);
+            // if TM is answering, we assume reorganize succeeded
+            if($this->api->isRequestable()){
+                $this->fuzzyReorganize = -1;
+                return;
+            }
+        }
     }
 }

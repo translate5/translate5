@@ -26,8 +26,9 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-use MittagQI\Translate5\Segment\QualityService;
+use MittagQI\Translate5\Acl\Rights;
 use MittagQI\Translate5\Task\TaskService;
+use MittagQI\ZfExtended\Acl\SystemResource;
 
 /**
  * Controller for the User Task Associations
@@ -87,7 +88,7 @@ class Editor_TaskuserassocController extends ZfExtended_RestController {
 
     public function postDispatch()
     {
-        if ($this->isAllowed('readAuthHash')) {
+        if ($this->isAllowed(Rights::ID, Rights::READ_AUTH_HASH)) {
             parent::postDispatch();
             return;
         }
@@ -348,7 +349,7 @@ class Editor_TaskuserassocController extends ZfExtended_RestController {
         $authenticated = $userSession->data;
         
         //if i am allowed to see any user:
-        if($this->isAllowed('backend', 'seeAllUsers')) {
+        if($this->isAllowed(SystemResource::ID, SystemResource::SEE_ALL_USERS)) {
             return;
         }
         
@@ -392,7 +393,7 @@ class Editor_TaskuserassocController extends ZfExtended_RestController {
         $userData=$userSession->data;
         /** @var ZfExtended_Models_User $userModel */
         $userModel = ZfExtended_Factory::get('ZfExtended_Models_User');
-        $seeAllUsersAllowed = $this->isAllowed("backend","seeAllUsers");
+        $seeAllUsersAllowed = $this->isAllowed(SystemResource::ID, SystemResource::SEE_ALL_USERS);
         
         if(is_array($this->view->rows)) {
             foreach ($this->view->rows as &$row){

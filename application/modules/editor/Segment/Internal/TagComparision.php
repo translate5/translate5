@@ -84,12 +84,14 @@ class editor_Segment_Internal_TagComparision extends editor_Segment_Internal_Tag
      */
     private $numAgainstTags = 0;
 
-    public function __construct(editor_Segment_FieldTags $toCheck, editor_Segment_FieldTags $against=NULL){
+    public function __construct(editor_Segment_FieldTags $toCheck, editor_Segment_FieldTags $against = null)
+    {
         parent::__construct($toCheck, $against);
         // the structural check can be done without against tags
         $this->checkStructure();
+        $this->checkSameIndexSequences();
         // there is a against and it is not empty and toCheck also is not empty
-        if($against != NULL && !$against->isEmpty() && !$toCheck->isEmpty()){
+        if($against != null && !$against->isEmpty() && !$toCheck->isEmpty()){
             $against->sort();
             $this->againstTags = $this->extractRelevantTags($against);
             $this->numAgainstTags = count($this->againstTags);
@@ -117,17 +119,23 @@ class editor_Segment_Internal_TagComparision extends editor_Segment_Internal_Tag
     }
     /**
      * Here we check if all tags from checkAgainst are present in the check tags
+     * HOTFIX: Due to an tag-numbering problem, it can happen, that whitespace-tags have the same-index
+     * and the hash-based comparision fails, see TS-2856 / TRANSLATE-3495
+     * Therefore we also compare their pure number
      */
     private function checkCompleteness(){
         $states = [];
         $hashesInternalCheck = [];
         $hashesWhitespaceCheck = [];
         $hashesInternalAgainst = [];
-        $hashesWhitespaceAgainst = [];        
+        $hashesWhitespaceAgainst = [];
+        $numWhitespaceCheck = 0;
+        $numWhitespaceAgainst = 0;
         foreach($this->checkTags as $tag){
             /* @var $tag editor_Segment_Internal_Tag */
             if($tag->isWhitespace()){
                 $hashesWhitespaceCheck[] = $tag->getComparisionHash();
+                $numWhitespaceCheck++;
             } else {
                 $hashesInternalCheck[] = $tag->getComparisionHash();
             }
@@ -136,6 +144,7 @@ class editor_Segment_Internal_TagComparision extends editor_Segment_Internal_Tag
             /* @var $tag editor_Segment_Internal_Tag */
             if($tag->isWhitespace()){
                 $hashesWhitespaceAgainst[] = $tag->getComparisionHash();
+                $numWhitespaceAgainst++;
             } else {
                 $hashesInternalAgainst[] = $tag->getComparisionHash();
             }
@@ -146,7 +155,7 @@ class editor_Segment_Internal_TagComparision extends editor_Segment_Internal_Tag
         if(count($diffInternal) > 0){
             $states[self::TAGS_ADDED] = true;
         }
-        if(count($diffWhitespace) > 0){
+        if(count($diffWhitespace) > 0 || $numWhitespaceCheck > $numWhitespaceAgainst){
             $states[self::WHITESPACE_ADDED] = true;
         }
         
@@ -155,7 +164,7 @@ class editor_Segment_Internal_TagComparision extends editor_Segment_Internal_Tag
         if(count($diffInternal) > 0){
             $states[self::TAGS_MISSING] = true;
         }
-        if(count($diffWhitespace) > 0){
+        if(count($diffWhitespace) > 0 || $numWhitespaceCheck < $numWhitespaceAgainst){
             $states[self::WHITESPACE_MISSING] = true;
         }
         if(count($states) > 0){
@@ -179,12 +188,31 @@ class editor_Segment_Internal_TagComparision extends editor_Segment_Internal_Tag
         // closing tags can be skipped in this test, only orphan closers are obvious faults
         for($i=0; $i < $this->numCheckTags; $i++){
             // check the tags in a loop, where closing tags with counterparts can be excluded to avoid duplicate checks, they are checked with their opening counterpart
-            if((!$this->checkTags[$i]->isSingle() && $this->checkTags[$i]->counterpart == NULL) || ($this->checkTags[$i]->isOpening() && !$this->isStructurallyValid($this->checkTags[$i]))){
+            if((!$this->checkTags[$i]->isSingle() && $this->checkTags[$i]->counterpart == NULL) || ($this->checkTags[$i]->isOpening() && !$this->isStructurallyValid($this->checkTags, $i))){
                 $this->stati[] = self::TAG_STRUCTURE_FAULTY;
                 return;
             }
         }
     }
+
+    /**
+     * Special check for tags on the same text-indices. Overlaps in such constructs can not be found with the general structural check
+     * Example for such errors: "This is a <1><2><3/></1></2>segment."
+     * @return void
+     */
+    private function checkSameIndexSequences(): void
+    {
+        $sameIndexSequences = $this->findSameIndexSequences($this->checkTags);
+        foreach($sameIndexSequences as $sequence){
+            $faultyIndices = $this->checkSameIndexSequence($sequence);
+            if(count($faultyIndices) > 0){
+                $this->stati[] = self::TAG_STRUCTURE_FAULTY;
+                return;
+            }
+        }
+    }
+
+
     /**
      * Retrieves the internal tag states of the field tags to compare
      * @return string[]

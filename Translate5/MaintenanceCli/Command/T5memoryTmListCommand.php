@@ -40,11 +40,11 @@ use Zend_Http_Client;
 use editor_Services_Manager as ServiceManager;
 use ZfExtended_Factory;
 
-final class T5memoryTmListCommand extends Translate5AbstractCommand
+class T5memoryTmListCommand extends Translate5AbstractCommand
 {
-    protected static $defaultName = 't5memory:list';
+    protected static $defaultName = 't5memory:list|memory:list';
 
-    private const ARGUMENT_TM_NAME = 'tmName';
+    protected const ARGUMENT_TM_NAME = 'tmName';
 
     protected function configure(): void
     {
@@ -75,17 +75,24 @@ final class T5memoryTmListCommand extends Translate5AbstractCommand
         return self::SUCCESS;
     }
 
-    private function getLocalTms(): Generator
+    protected function getLocalTms(): Generator
     {
         $languageResource = ZfExtended_Factory::get(LanguageResource::class);
         $languageResourcesData = $languageResource->loadByService(Service::NAME);
         $connector = new Connector();
 
-        $nameFilter = $this->input->getArgument(self::ARGUMENT_TM_NAME);
+        $nameFilter = null;
+        if($this->input->hasArgument(self::ARGUMENT_TM_NAME)){
+            $nameFilter = $this->input->getArgument(self::ARGUMENT_TM_NAME);
+        } else if ($this->input->hasOption(self::ARGUMENT_TM_NAME)){
+            $nameFilter = $this->input->getOption(self::ARGUMENT_TM_NAME);
+        }
+
+        $this->io->note('NAME FILTER: '.$nameFilter);
 
         foreach ($languageResourcesData as $languageResourceData) {
             if ($nameFilter
-                && !str_contains(mb_strtolower($nameFilter), mb_strtolower($languageResourceData['name']))
+                && !str_contains(mb_strtolower($languageResourceData['name']), mb_strtolower($nameFilter))
             ) {
                 continue;
             }
@@ -116,7 +123,7 @@ final class T5memoryTmListCommand extends Translate5AbstractCommand
         }
     }
 
-    private function getRemoteTmsList(): array
+    protected function getRemoteTmsList(): array
     {
         $manager = ZfExtended_Factory::get(ServiceManager::class);
 

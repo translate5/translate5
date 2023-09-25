@@ -370,6 +370,20 @@ class editor_Segment_Tag extends editor_Tag implements JsonSerializable {
         $data->hash = md5($this->content);
         return $data;
     }
+
+    /**
+     * Retrieves if two tags are completely on the same text-index
+     * @param editor_Segment_Internal_Tag $tag
+     * @return bool
+     */
+    public function hasSameTextIndex(editor_Segment_Tag $tag): bool
+    {
+        return
+            $this->startIndex === $this->endIndex
+            && $tag->startIndex === $tag->endIndex
+            && $this->startIndex === $tag->startIndex;
+    }
+
     /**
      * Identifies a tag by a quality entry from the DB
      * This is needed only for the persistance of the falsePositive flag, all other props will be re-evaluated anyway

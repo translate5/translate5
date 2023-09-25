@@ -287,12 +287,10 @@ class editor_Plugins_NecTm_Connector extends editor_Services_Connector_Filebased
         }
         
         $errors = $this->api->getErrors();
-        
-        $messages = Zend_Registry::get('rest_messages');
-        /* @var $messages ZfExtended_Models_Messages */
-        $msg = 'Das Segment konnte nicht ins TM gespeichert werden! Bitte kontaktieren Sie Ihren Administrator! <br />Gemeldete Fehler:';
-        $messages->addError($msg, 'plugin.nectm', null, $errors);
-        
+
+        // send the errors to the frontend
+        editor_Services_Manager::reportTMUpdateError($errors, null, 'Error', 'plugin.nectm');
+
         throw new editor_Plugins_NecTm_Exception('E1183', [
             'LanguageResource' => print_r($this->languageResource->getDataObject(),1),
             'Segment' => print_r($segment->getDataObject(),1),

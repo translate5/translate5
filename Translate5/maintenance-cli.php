@@ -51,6 +51,7 @@ use Translate5\MaintenanceCli\Command\{AuthTokenCommand,
     DevelopmentSymlinksCommand,
     DevelopmentTriggerworkflowCommand,
     DevelopmentOkapiBconfNextVersionCommand,
+    DevelopmentWorkertreeCommand,
     L10nAddCommand,
     L10nRemoveCommand,
     LogCommand,
@@ -70,6 +71,7 @@ use Translate5\MaintenanceCli\Command\{AuthTokenCommand,
     PluginEnableCommand,
     PluginListCommand,
     ReleaseNotesCommand,
+    RoleListCommand,
     ServiceAutodiscoveryCommand,
     ServiceCheckCommand,
     ServicePingCommand,
@@ -101,7 +103,10 @@ use Translate5\MaintenanceCli\Command\{AuthTokenCommand,
     VisualImplantReflownWysiwyg,
     WorkerCleanCommand,
     WorkerListCommand,
-    WorkerQueueCommand};
+    WorkerQueueCommand,
+    WorkflowCloneCommand,
+    WorkflowListCommand,
+    WorkflowStepCommand};
 use Translate5\MaintenanceCli\Command\SegmentHistoryCommand;
 
 $app = new Application('Translate5 CLI Maintenance', '1.0');
@@ -134,6 +139,7 @@ $commands = [
     new PluginDisableCommand(),
     new PluginEnableCommand(),
     new PluginListCommand(),
+    new RoleListCommand(),
     new SegmentHistoryCommand(),
     new ServiceAutodiscoveryCommand(),
     new ServiceCheckCommand(),
@@ -158,11 +164,15 @@ $commands = [
     new WorkerCleanCommand(),
     new WorkerListCommand(),
     new WorkerQueueCommand(),
+    new WorkflowCloneCommand(),
+    new WorkflowListCommand(),
+    new WorkflowStepCommand(),
 ];
 if (file_exists('.git')) {
     $commands[] = new DevelopmentGithookCommand();
     $commands[] = new DevelopmentNewdbchangeCommand();
     $commands[] = new DevelopmentCreatetestCommand();
+    $commands[] = new DevelopmentWorkertreeCommand();
     $commands[] = new TestApplytestsqlCommand();
     $commands[] = new TestRunAllCommand();
     $commands[] = new TestRunCommand();

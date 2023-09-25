@@ -54,12 +54,12 @@ class editor_Task_Operation {
     const PIVOT_PRE_TRANSLATION = 'pivotpretranslation';
 
     /**
-     * 
+     * Creates a Task-Operation which is the wrapper for any operation performed for tasks albeit the Import
      * @param string $operationType: must be a constant of this class
      * @param editor_Models_Task $task
-     * @return int The parent ID to use for all inner workers
      */
-    public static function create(string $operationType, editor_Models_Task $task) : int {
+    public static function create(string $operationType, editor_Models_Task $task): editor_Task_Operation
+    {
         $taskState = $task->getState();
         // Only one operation is allowed to run at a time !
         if(in_array($taskState, self::getAllOperations())){
@@ -69,17 +69,8 @@ class editor_Task_Operation {
         if($taskState === editor_Models_Task::STATE_EXCELEXPORTED){
             throw new editor_Task_Operation_Exception('E1395', ['taskstate' => $taskState, 'operation' => $operationType]);
         }
-        $worker = ZfExtended_Factory::get(editor_Task_Operation_StartingWorker::class);
-        if($worker->init($task->getTaskGuid(), [ 'operationType' => $operationType ])) {
-            $parentId = $worker->queue(0, null, false);
-            // add finishing worker
-            $worker = ZfExtended_Factory::get(editor_Task_Operation_FinishingWorker::class);
-            if($worker->init($task->getTaskGuid(), [ 'operationType' => $operationType, 'taskInitialState' => $taskState ])) {
-                $worker->queue($parentId, null, false);
-                return $parentId;
-            }
-        }
-        return 0;
+
+        return new self($operationType, $task);
     }
 
     /**
@@ -88,5 +79,42 @@ class editor_Task_Operation {
      */
     public static function getAllOperations() : array {
         return [ self::AUTOQA, self::MATCHANALYSIS, self::PIVOT_PRE_TRANSLATION ];
+    }
+
+    private int $workerId;
+
+    private editor_Task_Operation_StartingWorker $worker;
+
+    private function __construct(private string $operationType, editor_Models_Task $task)
+    {
+        $this->worker = ZfExtended_Factory::get(editor_Task_Operation_StartingWorker::class);
+        if($this->worker->init($task->getTaskGuid(), [ 'operationType' => $operationType ])) {
+            $this->workerId = $this->worker->queue(0, ZfExtended_Models_Worker::STATE_PREPARE, false);
+            // add finishing worker
+            $worker = ZfExtended_Factory::get(editor_Task_Operation_FinishingWorker::class);
+            if($worker->init($task->getTaskGuid(), [ 'operationType' => $operationType, 'taskInitialState' => $task->getState() ])) {
+                $worker->queue($this->workerId, ZfExtended_Models_Worker::STATE_PREPARE, false);
+                return;
+            }
+        }
+        throw new ZfExtended_Exception('Operation could not be started, the operation workers could not be initialized.');
+    }
+
+    /**
+     * Retrieves the parent-id to use for all inner workers
+     * @return int
+     */
+    public function getWorkerId(): int
+    {
+        return $this->workerId;
+    }
+
+    /**
+     * Starts / schedules the prepared workers after inner workers are queued
+     * @return void
+     */
+    public function start(): void
+    {
+        $this->worker->schedulePrepared();
     }
 }

@@ -26,6 +26,7 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\Acl\Rights;
 use MittagQI\Translate5\Segment\QualityService;
 use MittagQI\Translate5\Task\Export\Package\Downloader;
 use MittagQI\Translate5\Task\Import\ImportService;
@@ -43,6 +44,7 @@ class editor_TaskController extends ZfExtended_RestController
 
     use TaskContextTrait;
 
+    const BACKEND = 'backend';
     protected $entityClass = 'editor_Models_Task';
 
     /**
@@ -304,7 +306,7 @@ class editor_TaskController extends ZfExtended_RestController
      */
     protected function loadAll(){
         // here no check for pmGuid, since this is done in task::loadListByUserAssoc
-        $isAllowedToLoadAll = $this->isAllowed('backend', 'loadAllTasks');
+        $isAllowedToLoadAll = $this->isAllowed(Rights::ID, Rights::LOAD_ALL_TASKS);
         //set the default table to lek_task
         $this->entity->getFilter()->setDefaultTable('LEK_task');
         if($isAllowedToLoadAll) {
@@ -343,6 +345,12 @@ class editor_TaskController extends ZfExtended_RestController
     protected function loadAllForTaskOverview(): array
     {
         $rows = $this->loadAll();
+
+        //if we have no paging parameters, we omit all additional data gathering to improve performace!
+        if ($this->getParam('limit', 0) === 0 && !$this->getParam('filter', false)) {
+            return $rows;
+        }
+
         $taskGuids = array_map(fn ($item) => $item['taskGuid'], $rows);
 
         $file = ZfExtended_Factory::get(editor_Models_File::class);
@@ -389,7 +397,7 @@ class editor_TaskController extends ZfExtended_RestController
     
             $row['customerName'] = empty($customerData[$row['customerId']]) ? '' : $customerData[$row['customerId']];
 
-            $isEditAll = $this->isAllowed('backend', 'editAllTasks') || $this->isAuthUserTaskPm($row['pmGuid']);
+            $isEditAll = $this->isAllowed(Rights::ID, Rights::EDIT_ALL_TASKS) || $this->isAuthUserTaskPm($row['pmGuid']);
 
             $this->_helper->TaskUserInfo->initForTask($this->workflow, $this->entity, $this->isTaskProvided());
             $this->_helper->TaskUserInfo->addUserInfos($row, $isEditAll);
@@ -540,7 +548,7 @@ class editor_TaskController extends ZfExtended_RestController
         }
         $pm = ZfExtended_Factory::get(ZfExtended_Models_User::class);
         /* @var $pm ZfExtended_Models_User */
-        if (empty($this->data['pmGuid']) || !$this->isAllowed('frontend', 'editorEditTaskPm')) {
+        if (empty($this->data['pmGuid']) || !$this->isAllowed(Rights::ID, 'editorEditTaskPm')) {
             $this->data['pmGuid'] = $this->user->data->userGuid;
             $pm->init((array)$this->user->data);
         } else {
@@ -1058,7 +1066,8 @@ class editor_TaskController extends ZfExtended_RestController
 
         //because we are mixing objects (getDataObject) and arrays (loadAll) as entity container we have to cast here
         $row = (array) $obj;
-        $isEditAll = $this->isAllowed('backend', 'editAllTasks') || $this->isAuthUserTaskPm($row['pmGuid']);
+        $isEditAll =
+            $this->isAllowed(Rights::ID, Rights::EDIT_ALL_TASKS) || $this->isAuthUserTaskPm($row['pmGuid']);
         $this->_helper->TaskUserInfo->initForTask($this->workflow, $this->entity, $this->isTaskProvided());
         $this->_helper->TaskUserInfo->addUserInfos($row, $isEditAll, $this->data->userState ?? null);
         $this->view->rows = (object)$row;
@@ -1080,7 +1089,7 @@ class editor_TaskController extends ZfExtended_RestController
      * @throws ZfExtended_Models_Entity_Conflict
      */
     protected function checkTaskAccess() {
-        $mayLoadAllTasks = $this->isAllowed('backend', 'loadAllTasks') || $this->isAuthUserTaskPm($this->entity->getPmGuid());
+        $mayLoadAllTasks = $this->isAllowed(Rights::ID, Rights::LOAD_ALL_TASKS) || $this->isAuthUserTaskPm($this->entity->getPmGuid());
         
         try {
             $tua = editor_Models_Loaders_Taskuserassoc::loadByTask($this->user->data->userGuid, $this->entity);
@@ -1128,7 +1137,7 @@ class editor_TaskController extends ZfExtended_RestController
                 '$mayLoadAllTasks' => $mayLoadAllTasks,
                 'tua' => $tua ? $tua->getDataObject() : 'no tua',
                 'isPmOver' => $tua && $tua->getIsPmOverride(),
-                'loadAllTasks' => $this->isAllowed('backend', 'loadAllTasks'),
+                'loadAllTasks' => $this->isAllowed(Rights::ID, Rights::LOAD_ALL_TASKS),
                 'isAuthUserTaskPm' => $this->isAuthUserTaskPm($this->entity->getPmGuid()),
                 '$isTaskDisallowEditing' => $isTaskDisallowEditing,
                 '$isTaskDisallowReading' => $isTaskDisallowReading,
@@ -1351,7 +1360,7 @@ class editor_TaskController extends ZfExtended_RestController
             throw new ZfExtended_ValidateException('Given UserState '.$this->data->userState.' does not exist.');
         }
 
-        $isEditAllTasks = $this->isAllowed('backend', 'editAllTasks')
+        $isEditAllTasks = $this->isAllowed(Rights::ID, Rights::EDIT_ALL_TASKS)
             || $this->isAuthUserTaskPm($this->entity->getPmGuid());
         $isOpen = $this->isOpenTaskRequest();
 
@@ -1501,13 +1510,13 @@ class editor_TaskController extends ZfExtended_RestController
         }
         
         //to access a task the user must either have the loadAllTasks right, or must be the tasks PM, or must be associated to the task
-        $isTaskAccessable = $this->isAllowed('backend', 'loadAllTasks') || $isTaskPm || !is_null($tua);
+        $isTaskAccessable = $this->isAllowed(Rights::ID, Rights::LOAD_ALL_TASKS) || $isTaskPm || !is_null($tua);
         if(!$isTaskAccessable) {
             unset($this->view->rows);
             throw new ZfExtended_Models_Entity_NoAccessException();
         }
         
-        $isEditAll = $this->isAllowed('backend', 'editAllTasks') || $isTaskPm;
+        $isEditAll = $this->isAllowed(Rights::ID, Rights::EDIT_ALL_TASKS) || $isTaskPm;
         $this->_helper->TaskUserInfo->initForTask($this->workflow, $this->entity, $this->isTaskProvided());
         $this->_helper->TaskUserInfo->addUserInfos($row, $isEditAll);
         $this->addMissingSegmentrangesToResult($row);
@@ -1531,7 +1540,7 @@ class editor_TaskController extends ZfExtended_RestController
 
     public function deleteAction()
     {
-        $forced = $this->getParam('force', false) && $this->isAllowed('backend', 'taskForceDelete');
+        $forced = $this->getParam('force', false) && $this->isAllowed(Rights::ID, Rights::TASK_FORCE_DELETE);
         $this->entityLoad();
         $this->checkStateDelete($this->entity, $forced);
 
@@ -1618,7 +1627,7 @@ class editor_TaskController extends ZfExtended_RestController
                 return;
 
             case 'excelhistory':
-                if (!$this->isAllowed('frontend', 'editorExportExcelhistory')) {
+                if (!$this->isAllowed(Rights::ID, Rights::EDITOR_EXPORT_EXCELHISTORY)) {
                     throw new ZfExtended_NoAccessException();
                 }
                 // run history excel export
@@ -1698,7 +1707,8 @@ class editor_TaskController extends ZfExtended_RestController
         // Setup worker. 'cookie' in 2nd arg is important only if $context is 'transfer'
         $inited = $finalExportWorker->setup($this->entity->getTaskGuid(), [
             'exportFolder' => $exportFolder,
-            'cookie' => Zend_Session::getId()
+            'cookie' => Zend_Session::getId(),
+            'userId' => ZfExtended_Authentication::getInstance()->getUserId(),
         ]);
 
         // If $content is not 'filetranslation' or 'transfer' assume init return value is zipFile name
@@ -1837,7 +1847,7 @@ class editor_TaskController extends ZfExtended_RestController
      * @throws ZfExtended_NotFoundException
      */
     protected function downloadImportArchive() {
-        if(!$this->isAllowed('frontend','downloadImportArchive')) {
+        if(!$this->isAllowed(Rights::ID, Rights::DOWNLOAD_IMPORT_ARCHIVE)) {
             throw new ZfExtended_NoAccessException("The Archive ZIP can not be accessed");
         }
         $archiveZip = new SplFileInfo($this->entity->getAbsoluteTaskDataPath().'/'.editor_Models_Import_DataProvider_Abstract::TASK_ARCHIV_ZIP_NAME);
@@ -1869,7 +1879,7 @@ class editor_TaskController extends ZfExtended_RestController
         ];
 
         //pre check pm change first
-        if(!empty($this->data->pmGuid) && $this->isAllowed('frontend', 'editorEditTaskPm')){
+        if(!empty($this->data->pmGuid) && $this->isAllowed(Rights::ID, 'editorEditTaskPm')){
             //if the pmGuid is modified, set the pmName
             $userModel = ZfExtended_Factory::get('ZfExtended_Models_User');
             /* @var $userModel  ZfExtended_Models_User*/
@@ -1879,7 +1889,7 @@ class editor_TaskController extends ZfExtended_RestController
 
         //then loop over all allowed fields
         foreach($fieldToRight as $field => $right) {
-            if(!empty($this->data->$field) && !$this->isAllowed('frontend', $right)) {
+            if(!empty($this->data->$field) && !$this->isAllowed(Rights::ID, $right)) {
                 unset($this->data->$field);
                 $this->log->warn('E1011', 'The user is not allowed to modify the tasks field {field}', ['field' => $field]);
             }
@@ -2059,7 +2069,7 @@ class editor_TaskController extends ZfExtended_RestController
     }
 
     protected function handleCancelImport() {
-        $isAllowedToCancel = $this->isAllowed('frontend', 'editorCancelImport') || $this->isAuthUserTaskPm($this->entity->getPmGuid());
+        $isAllowedToCancel = $this->isAllowed(Rights::ID, Rights::EDITOR_CANCEL_IMPORT) || $this->isAuthUserTaskPm($this->entity->getPmGuid());
 
         //if no state is set or user is not allowed to cancel, do nothing
         if(empty($this->data->state)) {

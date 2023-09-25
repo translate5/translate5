@@ -52,7 +52,7 @@ use ZfExtended_Utils;
 
 class StatusCommand extends Translate5AbstractCommand
 {
-    CONST SECTION_LENGTH = 40;
+    const SECTION_LENGTH = 40;
 
     // the name of the command (the part after "bin/console")
     protected static $defaultName = 'status';
@@ -93,6 +93,7 @@ class StatusCommand extends Translate5AbstractCommand
         $this->writeTaskAndJobs();
         $this->io->text('');
         $this->writeLastErrors();
+        $this->printNotes();
 
         return 0;
     }

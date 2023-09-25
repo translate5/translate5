@@ -46,9 +46,9 @@ class editor_Plugins_NecTm_Init extends ZfExtended_Plugin_Abstract {
      * Contains the Plugin Path relativ to APPLICATION_PATH or absolut if not under APPLICATION_PATH
      * @var array
      */
-    protected $frontendControllers = array(
-        'pluginNecTmMain' => 'Editor.plugins.NecTm.controller.Main',
-    );
+    protected $frontendControllers = [
+        'Editor.plugins.NecTm.controller.Main',
+    ];
     
     public function init() {
         if(!$this->validateConfig()) {

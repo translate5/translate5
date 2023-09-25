@@ -34,13 +34,15 @@ use editor_Services_OpenTM2_Connector as Connector;
 use MittagQI\Translate5\Service\T5Memory\Enum\ReorganizeTm;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Question\ChoiceQuestion;
 use Symfony\Component\Console\Question\ConfirmationQuestion;
 use ZfExtended_Factory;
 
-final class T5MemoryReorganizeCommand extends Translate5AbstractCommand
+final class T5MemoryReorganizeCommand extends T5memoryTmListCommand
 {
-    protected static $defaultName = 't5memory:reorganize';
+    protected static $defaultName = 't5memory:reorganize|memory:reorganize';
 
     private const ARGUMENT_UUID = 'uuid';
 
@@ -49,8 +51,14 @@ final class T5MemoryReorganizeCommand extends Translate5AbstractCommand
         $this->setDescription('Reorganizes particular TM');
         $this->addArgument(
             self::ARGUMENT_UUID,
-            InputArgument::REQUIRED,
-            'UUID of the memory to reorganize'
+            InputArgument::OPTIONAL,
+            'UUID of the memory to reorganize, if not given, you can select from a list'
+        );
+        $this->addOption(
+            self::ARGUMENT_TM_NAME,
+            'f',
+            InputOption::VALUE_REQUIRED,
+            'If no UUID was given this will filter the list of all TMs if provided'
         );
     }
 
@@ -59,7 +67,26 @@ final class T5MemoryReorganizeCommand extends Translate5AbstractCommand
         $this->initInputOutput($input, $output);
         $this->initTranslate5();
 
+
         $uuid = $input->getArgument(self::ARGUMENT_UUID);
+
+        if (empty($uuid)) {
+            $uuidList = $this->createLocalTmsUuidList();
+            if (empty($uuidList)) {
+                if ($this->input->hasOption(self::ARGUMENT_TM_NAME)) {
+                    $this->io->warning(
+                        'There are no translation memories that match "'
+                        . $this->input->getOption(self::ARGUMENT_TM_NAME)
+                        . '"');
+                } else {
+                    $this->io->warning('There are no translation memories in t5memory');
+                }
+                return self::FAILURE;
+            }
+            $askMemories = new ChoiceQuestion('Please choose a Memory:', array_values($uuidList), null);
+            $tmName = $this->io->askQuestion($askMemories);
+            $uuid = array_search($tmName, $uuidList);
+        }
 
         $connector = $this->getConnector($uuid);
 
@@ -96,10 +123,24 @@ final class T5MemoryReorganizeCommand extends Translate5AbstractCommand
         }
 
         if ($connector->isReorganizeFailed()) {
-            $this->io->text('There was already an attempt to reorganize this memory, but it was failed.');
+            $this->io->text('There was already an attempt to reorganize this memory, but it failed.');
         }
 
-        return $connector->reorganizeTm();
+        $success = $connector->reorganizeTm();
+        $result = $connector->getApi()->getResult();
+
+        if (property_exists($result, 'invalidSegmentCount')) {
+
+            $invalid = (int) $result->invalidSegmentCount;
+            $overall = (int) $result->reorganizedSegmentCount;
+            $msg = $invalid . ' segments of ' . $overall . ' have been invalid/lost while reorganizing';
+            if ($invalid > 0) {
+                $this->io->warning($msg);
+            } else {
+                $this->io->info($msg);
+            }
+        }
+        return $success;
     }
 
     private function getLanguageResource(string $uuid): editor_Models_LanguageResources_LanguageResource
@@ -135,5 +176,14 @@ final class T5MemoryReorganizeCommand extends Translate5AbstractCommand
         );
 
         return $connector;
+    }
+
+    private function createLocalTmsUuidList(): array
+    {
+        $list = [];
+        foreach ($this->getLocalTms() as $item) {
+            $list[$item['uuid']] = $item['name'];
+        }
+        return $list;
     }
 }
