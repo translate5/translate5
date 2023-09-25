@@ -52,6 +52,7 @@ class TermportletData
     private array $result;
     private array $allUsedLanguageIds;
     private array $sourceLangs;
+    private array $targetLangs;
     private array $collections;
     private TermModel $termModel;
     private array $allUsedLanguages;
@@ -122,12 +123,126 @@ class TermportletData
 
         $termIds = $this->getTermMidsFromTaskSegment($segment);
         $result = $this->getSortedTermGroups($termIds);
-
+        $result = $this->appendHomonyms($result);
         if (empty($result)) {
             return [];
         }
 
         return $this->termModel->sortTerms($result);
+    }
+
+    /**
+     * Append homonym data to termportlet data
+     *
+     * @param array $termportletData
+     * @return array
+     * @throws Zend_Db_Statement_Exception
+     */
+    public function appendHomonyms(array $termportletData): array {
+
+        // Get values of processStatus, that homonyms should have in order to be shown
+        $processStatusA = $this->task->getConfig()->runtimeOptions->terminology->usedTermProcessStatus->toArray();
+
+        // Array to collect terms (currently used inside the segment), that we need to find homonyms for
+        $used = [];
+
+        // Foreach [termEntryTbxId => terms array] pair
+        foreach ($termportletData as $termA) {
+
+            // Foreach stdClass-object representing the term inside terms array
+            foreach ($termA as $termO) {
+
+                // If it's used in segment
+                if ($termO->used) {
+
+                    // Prepare type
+                    $type = $termO->isSource ? 'source' : 'target';
+
+                    // Append [termEntryId => term] pair for used term, grouped by source/target
+                    $used[$type][$termO->termEntryId] = $termO->term;
+                }
+            }
+        }
+
+        // Get [id => color] pairs for term collections assigned to current task
+        $collectionColorA = array_column($this->collections, 'color', 'id');
+
+        // Get comma-separated list of ids of those term collections as well
+        $collectionIds = join(',', array_column($this->collections, 'id'));
+
+        // Shortcut to db adapter
+        $db = \Zend_Db_Table::getDefaultAdapter();
+
+        // Foreach ['source/target' => [[termEntryId => term], ...]] pairs
+        foreach ($used as $type => $termByTermEntryIdA) {
+
+            // Prepare parts of WHERE clause to find termEntries where homonyms are located, if any
+            $where = [
+                'sameTerm' => $db->quoteInto('`term` IN (?)', array_unique($termByTermEntryIdA)),
+                'sameLanguageId' => $db->quoteInto('`languageId` IN (?)', $this->{$type . 'Langs'}),
+                'otherTermEntryId' => $db->quoteInto('`termEntryId` NOT IN (?)', array_keys($termByTermEntryIdA))
+            ];
+
+            // As long as we might already have some of homonyms within the current termportlet data we have to
+            // make sure that now we fetch termEntryId-array only for homonyms other than we might already have, if any,
+            // so those will be the homonyms that are surely unused so far in the current segment
+            $homonymTermEntryIdA = $db->query("
+                SELECT `termEntryId`
+                FROM `terms_term` 
+                WHERE {$where['sameTerm']} 
+                  AND {$where['sameLanguageId']}
+                  AND {$where['otherTermEntryId']}
+                  AND `collectionId` IN ($collectionIds)
+                  AND `processStatus` = 'finalized'
+            ")->fetchAll(\PDO::FETCH_COLUMN);
+
+            // If we have something
+            if ($homonymTermEntryIdA) {
+
+                // Prepare parts of WHERE clause to find homonyms themselves
+                $where = [
+                    'homonymTermEntryId' => $db->quoteInto('`termEntryId` IN (?)', array_unique($homonymTermEntryIdA)),
+                    'allUsedLanguageIds' => $db->quoteInto('`languageId` IN (?)', $this->allUsedLanguageIds),
+                    'processStatus' => $db->quoteInto('`processStatus` IN (?)', $processStatusA),
+                ];
+
+                // Fetch homonyms and along with their translations as stdClass-instances, all grouped by their termEntryId
+                $homonymA = $db->query("
+                    SELECT
+                      `t`.`termEntryTbxId`,
+                      `t`.*
+                    FROM `terms_term` `t`
+                    WHERE {$where['homonymTermEntryId']}
+                      AND {$where['allUsedLanguageIds']}
+                      AND {$where['processStatus']}
+                      AND `collectionId` IN ($collectionIds)
+                ")->fetchAll(\PDO::FETCH_GROUP | \PDO::FETCH_OBJ);
+
+                // Apply auxiliary props required by termportlet renderer
+                foreach ($homonymA as &$termA) {
+                    foreach ($termA as $termO) {
+
+                        // Setup isSource-flag
+                        $termO->isSource = in_array($termO->languageId, $this->sourceLangs);
+
+                        // Setup rtl-flag
+                        $termO->rtl = $this->allUsedLanguages[strtolower($termO->language)]['rtl'] ? 1 : '';
+
+                        // Setup other props to be fed to termportlet client-side renderer
+                        $termO->used = false;
+                        $termO->transFound = false;
+                        $termO->collectionColor = $collectionColorA[$termO->collectionId]
+                            ?? editor_Services_ServiceAbstract::DEFAULT_COLOR;
+                    }
+                }
+
+                // Append source/target homonyms to result
+                $termportletData += $homonymA;
+            }
+        }
+
+        // Return
+        return $termportletData;
     }
 
     /**
@@ -195,6 +310,10 @@ class TermportletData
             $statuses =  [];
         }
 
+        // Prepare comma-separated list, enclosed with single-quotes
+        $sourceIds = $this->termModel->db->getAdapter()->quoteInto('?', join(',', array_reverse($sourceIds)));
+
+        // Fetch terms
         $sql = $this->termModel->db->getAdapter()->select()
             ->from(['t1' =>'terms_term'], ['t2.*'])
             ->distinct()
@@ -207,7 +326,13 @@ class TermportletData
             ->where('t1.collectionId IN(?)', array_column($this->collections, 'id'))
             ->where('t1.termTbxId IN(?)', $allIds)
             ->where('t1.languageId IN (?)', $this->allUsedLanguageIds)
-            ->where('t2.languageId IN (?)', $this->allUsedLanguageIds);
+            ->where('t2.languageId IN (?)', $this->allUsedLanguageIds)
+            ->order(["
+                GREATEST (
+                    FIND_IN_SET(t1.termTbxId, $sourceIds),
+                    FIND_IN_SET(t2.termTbxId, $sourceIds)
+                ) DESC
+            "]);
 
         if (!empty($statuses)) {
             $sql->where('t1.processStatus in (?)', $statuses);
@@ -302,10 +427,10 @@ class TermportletData
     {
         $languages = ZfExtended_Factory::get(editor_Models_Languages::class);
         $this->sourceLangs = $languages->getFuzzyLanguages($this->task->getSourceLang(), includeMajor: true);
-        $targetLangs = $languages->getFuzzyLanguages($this->task->getTargetLang(), includeMajor: true);
+        $this->targetLangs = $languages->getFuzzyLanguages($this->task->getTargetLang(), includeMajor: true);
 
         //combine all used languages from task
-        $this->allUsedLanguageIds = array_unique(array_merge($this->sourceLangs, $targetLangs));
+        $this->allUsedLanguageIds = array_unique(array_merge($this->sourceLangs, $this->targetLangs));
 
         $usedLanguages = $languages->loadByIds($this->allUsedLanguageIds);
         // lower keys, since are also lower in usage in UI
