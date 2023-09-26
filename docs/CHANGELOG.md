@@ -8,35 +8,13 @@ Missing Versions are merged into in the next upper versions, so no extra section
 
 All updates are (downwards) compatible! If not this is listed in the important release notes.
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+## [6.5.4] - 2023-09-26
+### Bugfixes
+**[TRANSLATE-3495](https://jira.translate5.net/browse/TRANSLATE-3495): Editor general - FIX whitespace tag-check to cope with frontend does not correctly number whitespace-tags** <br>
+FIX: Segments with more then 9 tags were producing errors in the UI
 
 ## [6.5.3] - 2023-09-22
-
 ### Important Notes:
- 
-
 
 ### Added
 **[TRANSLATE-3489](https://jira.translate5.net/browse/TRANSLATE-3489): Okapi integration - Enhance figma default xml conversion settings** <br>
