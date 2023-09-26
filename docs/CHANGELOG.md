@@ -10,7 +10,7 @@ All updates are (downwards) compatible! If not this is listed in the important r
 
 ## [6.5.4] - 2023-09-26
 ### Bugfixes
-**[TRANSLATE-3495](https://jira.translate5.net/browse/TRANSLATE-3495): Editor general - FIX whitespace tag-check to cope with frontend does not correctly number whitespace-tags** <br>
+**[TRANSLATE-3487](https://jira.translate5.net/browse/TRANSLATE-3487): Editor general - Taking over fuzzy matches in the UI may lead to corrupted internal tags** <br>
 FIX: Segments with more then 9 tags were producing errors in the UI
 
 ## [6.5.3] - 2023-09-22
