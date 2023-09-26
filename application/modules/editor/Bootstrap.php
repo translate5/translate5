@@ -703,6 +703,24 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
                 'controller' => 'term',
                 'action' => 'transfer'
             ]));
+
+        $this->front->getRouter()->addRoute('editorAttributeHistory', new ZfExtended_Controller_RestLikeRoute(
+            'editor/attribute/:id/history',
+            [
+                'module' => 'editor',
+                'controller' => 'attribute',
+                'action' => 'history'
+            ]
+        ));
+
+        $this->front->getRouter()->addRoute('editorTermHistory', new ZfExtended_Controller_RestLikeRoute(
+            'editor/term/:id/history',
+            [
+                'module' => 'editor',
+                'controller' => 'term',
+                'action' => 'history'
+            ]
+        ));
     }
     
     
