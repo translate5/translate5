@@ -25,7 +25,9 @@ START LICENSE AND COPYRIGHT
 
 END LICENSE AND COPYRIGHT
 */
-
+use editor_Models_Terminology_Models_TermModel as TermModel;
+use editor_Models_Terminology_Models_AttributeModel as AttributeModel;
+use editor_Models_TermCollection_TermCollection as TermCollection;
 /**
  *
  */
@@ -39,10 +41,10 @@ class editor_AttributeController extends ZfExtended_RestController
     /**
      * @var string
      */
-    protected $entityClass = 'editor_Models_Terminology_Models_AttributeModel';
+    protected $entityClass = AttributeModel::class;
 
     /**
-     * @var editor_Models_Terminology_Models_AttributeModel
+     * @var AttributeModel
      */
     protected $entity;
 
@@ -92,7 +94,7 @@ class editor_AttributeController extends ZfExtended_RestController
         // If request contains json-encoded 'data'-param, decode it and append to request params
         $this->handleData();
 
-        $termCollection = ZfExtended_Factory::get(editor_Models_TermCollection_TermCollection::class);
+        $termCollection = ZfExtended_Factory::get(TermCollection::class);
 
         // If current user has 'termPM_allClients' role, it means all collections are accessible
         // Else we should apply collectionsIds-restriction everywhere, so get accessible collections
@@ -142,7 +144,7 @@ class editor_AttributeController extends ZfExtended_RestController
 
             // Fetch ids of ALL terms matching last search, excluding ids given by 'except'-param
             $termIdA = ZfExtended_Factory
-                ::get('editor_Models_Terminology_Models_TermModel')
+                ::get(TermModel::class)
                 ->searchTermByParams(
                     $_SESSION['lastParams'] + ['except' => join(',', $termIdA)],
                     $total
@@ -269,7 +271,7 @@ class editor_AttributeController extends ZfExtended_RestController
             'termId' => [
                 'req' => true,
                 'rex' => 'int11',
-                'key' => 'editor_Models_Terminology_Models_TermModel'
+                'key' => TermModel::class
             ],
         ]);
 
@@ -526,7 +528,7 @@ class editor_AttributeController extends ZfExtended_RestController
 
             // Update collection stats
             ZfExtended_Factory
-                ::get('editor_Models_TermCollection_TermCollection')
+                ::get(TermCollection::class)
                 ->updateStats($this->entity->getCollectionId(), [
                     'termEntry' => 0,
                     'term' => 0,
@@ -794,7 +796,7 @@ class editor_AttributeController extends ZfExtended_RestController
             $refTargetIdA[$target] = [$level, $attrId];
 
             // Call $this->_refTarget() with that args
-            editor_Models_Terminology_Models_AttributeModel::refTarget($refA, $refTargetIdA, $prefLangA, $level);
+            AttributeModel::refTarget($refA, $refTargetIdA, $prefLangA, $level);
 
             // Append refTarget data to the response
             $data += $refA[$level][$attrId];
@@ -858,11 +860,11 @@ class editor_AttributeController extends ZfExtended_RestController
     }
 
     /**
-     * @param editor_Models_Terminology_Models_AttributeModel|null $drop
+     * @param AttributeModel|null $drop
      * @throws ZfExtended_Exception
      * @throws ZfExtended_Mismatch
      */
-    public function attrupdateAction(editor_Models_Terminology_Models_AttributeModel $drop = null) {
+    public function attrupdateAction(AttributeModel $drop = null) {
 
         // Check request params and return an array, containing records
         // fetched from database by dataTypeId-param (and termId-param, if given)
@@ -882,7 +884,7 @@ class editor_AttributeController extends ZfExtended_RestController
 
             // Update collection stats
             ZfExtended_Factory
-                ::get('editor_Models_TermCollection_TermCollection')
+                ::get(TermCollection::class)
                 ->updateStats($drop->getCollectionId(), [
                     'termEntry' => 0,
                     'term' => 0,
@@ -960,12 +962,12 @@ class editor_AttributeController extends ZfExtended_RestController
      * so this method get all term's attributes that may affect term's `status` and recalculate
      * and return the value for `status`
      *
-     * @param editor_Models_Terminology_Models_TermModel $termM
-     * @param editor_Models_Terminology_Models_AttributeModel $attrM
+     * @param TermModel $termM
+     * @param AttributeModel $attrM
      * @return array
      * @throws ZfExtended_Exception
      */
-    protected function _updateTermStatus(editor_Models_Terminology_Models_TermModel $termM, editor_Models_Terminology_Models_AttributeModel $attrM): array {
+    protected function _updateTermStatus(TermModel $termM, AttributeModel $attrM): array {
 
         /* @var $termNoteStatus editor_Models_Terminology_TermStatus */
         $termNoteStatus = ZfExtended_Factory::get('editor_Models_Terminology_TermStatus');
@@ -1020,7 +1022,7 @@ class editor_AttributeController extends ZfExtended_RestController
             ],
             'termId' => [
                 'rex' => 'int11',
-                'key' => 'editor_Models_Terminology_Models_TermModel'
+                'key' => TermModel::class
             ]
         ], $this->entity);
 
@@ -1049,31 +1051,8 @@ class editor_AttributeController extends ZfExtended_RestController
         // Get current value of processStatus attribute, that should be involved in validation
         $current = $_['termId']->getProposal() ? 'unprocessed' : $this->entity->getValue();
 
-        // Define which old values can be changed to which new values
-        $allow = false;
-        $allowByRight = [
-            'review'    => ['unprocessed' => ['provisionallyProcessed' => true, 'rejected' => true]],
-            'finalize'  => ['provisionallyProcessed' => ['finalized' => true, 'rejected' => true]],
-            'propose'   => [],
-            'anyStatus' => true, // any change allowed
-        ];
-
-        // Merge allowed
-        foreach ($allowByRight as $right => $info) {
-            if ($this->isAllowed('editor_term', $right)) {
-                $allow = is_bool($info) || is_bool($allow)
-                    ? $info
-                    : $info + $allow;
-            }
-        }
-
-        // Prepare list of allowed values
-        $allowed = [];
-        foreach(explode(',', $_['dataTypeId']['picklistValues']) as $possible) {
-            if ($allow === true || (is_array($allow[$current] ?? 0) && ($allow[$current][$possible] ?? 0))) {
-                $allowed []= $possible;
-            }
-        }
+        // Get list of allowed process statuses
+        $allowed = TermModel::getAllowedProcessStatuses($current, false);
 
         // Make sure only allowed values can be set as new value of processStatus attribute
         $this->jcheck([
