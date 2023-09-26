@@ -12,7 +12,7 @@ class TagCheck {
         let excessTags = [];
 
         for (let node of nodeList) {
-            const match = node.id.match(new RegExp(this.idPrefix + '(\\w+)(\\d+)'));
+            const match = node.id.match(new RegExp(this.idPrefix + '([a-zA-Z]+)(\\d+)'));
 
             if (!match) {
                 continue;
