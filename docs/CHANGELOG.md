@@ -31,6 +31,72 @@ All updates are (downwards) compatible! If not this is listed in the important r
 
 
 
+
+## [6.5.3] - 2023-09-22
+
+### Important Notes:
+ 
+
+
+### Added
+**[TRANSLATE-3489](https://jira.translate5.net/browse/TRANSLATE-3489): Okapi integration - Enhance figma default xml conversion settings** <br>
+ENHANCEMENT: Fix FIGMA file-format settings regarding whitespace
+
+
+### Changed
+**[TRANSLATE-3474](https://jira.translate5.net/browse/TRANSLATE-3474): TermPortal - Show explaining text, when no filters are set.** <br>
+Added explaining text for active filters field when none are in use
+
+**[TRANSLATE-3473](https://jira.translate5.net/browse/TRANSLATE-3473): TermPortal - Make info about TermCollection and Client bold in Termportal middle column** <br>
+Font for Client and TermCollection names in Siblings-panel is now bolder and bigger
+
+**[TRANSLATE-3472](https://jira.translate5.net/browse/TRANSLATE-3472): Editor general - Show match resource name in match panel of translate5 editor** <br>
+LanguageResource name is now shown in addition to match rate value in 'Match Rate' column within Match panel
+
+**[TRANSLATE-3241](https://jira.translate5.net/browse/TRANSLATE-3241): OpenTM2 integration - T5memory automatic reorganize and via CLI** <br>
+translate - 5.9.4
+Added two new commands: 
+  - t5memory:reorganize for manually triggering translation memory reorganizing
+  - t5memory:list - for listing all translation memories with their statuses
+Add new config for setting up error codes from t5memory that should trigger automatic reorganizing
+Added automatic translation memory reorganizing if appropriate error appears in response from t5memory engine
+
+translate - 6.2.0
+ -  Fix the status check for GroupShare language resources
+
+translate - 6.5.3
+-   CLI improvement
+
+
+### Bugfixes
+**[TRANSLATE-3495](https://jira.translate5.net/browse/TRANSLATE-3495): Editor general - FIX whitespace tag-check to cope with frontend does not correctly number whitespace-tags** <br>
+FIX: Numbering of whitespace-tags may be faulty due to frontend-errors leading to incorrect  tag-errors
+
+**[TRANSLATE-3490](https://jira.translate5.net/browse/TRANSLATE-3490): Auto-QA - AutoQA: Internal Tag-Check does not detect tags with incorrect order on the same index** <br>
+FIX: AutoQA did not detect overlapping/interleaving tags when they are on the same index
+
+**[TRANSLATE-3487](https://jira.translate5.net/browse/TRANSLATE-3487): Editor general - Taking over fuzzy matches in the UI may lead to corrupted internal tags** <br>
+Taking over fuzzy matches in the UI was producing corrupted internal tags. In the Editor the tags were looking correctly, but on database level they did contain the wrong content. 
+
+**[TRANSLATE-3484](https://jira.translate5.net/browse/TRANSLATE-3484): API - Low full task listing on large instances** <br>
+The full listing of tasks via API is reduced to the task data, no additional sub data like quality stats etc per task is added any more to improve loading speed of such a request. 
+
+**[TRANSLATE-3478](https://jira.translate5.net/browse/TRANSLATE-3478): OpenId Connect - Open task for editing with SSO enabled** <br>
+Fix: start task editing from a link with SSO authentication does not work
+
+**[TRANSLATE-3461](https://jira.translate5.net/browse/TRANSLATE-3461): Authentication, Editor general - Use http header fields only lowercase** <br>
+FIX: evaluation of sent request headers is case-insensitive now
+
+**[TRANSLATE-3454](https://jira.translate5.net/browse/TRANSLATE-3454): t5memory - Analysis runs through although t5memories are in state of reorganisation** <br>
+All connection errors are logged now while match analysis, if match analysis is incomplete due such problems an error message is shown on the analysis page.
+
+**[TRANSLATE-3444](https://jira.translate5.net/browse/TRANSLATE-3444): Main back-end mechanisms (Worker, Logging, etc.) - ERROR in core: E9999 - Cannot refresh row as parent is missing** <br>
+Fix for back-end error when authentication an user.
+
+**[TRANSLATE-3292](https://jira.translate5.net/browse/TRANSLATE-3292): Editor general - List all homonyms in right-side TermPortlet of the editor** <br>
+Now the other homonyms are shown in the right-side Terminology-panel as well
+
+
 ## [6.5.2] - 2023-09-05
 
 ### Important Notes:
