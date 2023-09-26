@@ -248,7 +248,7 @@ class editor_TermController extends ZfExtended_RestController
                 'key' => 'LEK_languages.rfc5646'
             ],
             'processStatus,sourceProcessStatus' => [
-                'fis' => join(',', TermModel::allowedProcessStatuses())
+                'fis' => join(',', TermModel::getAllowedProcessStatuses())
             ]
         ]);
 

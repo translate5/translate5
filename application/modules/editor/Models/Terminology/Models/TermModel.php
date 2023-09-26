@@ -2550,7 +2550,7 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
      *                             we need to prepare data for processStatus-combobox store
      * @return array
      */
-    public static function allowedProcessStatuses(
+    public static function getAllowedProcessStatuses(
         string $current = 'unprocessed',
         bool $includeCurrent = true
     ) : array {

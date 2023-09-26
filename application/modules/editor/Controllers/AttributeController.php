@@ -1052,7 +1052,7 @@ class editor_AttributeController extends ZfExtended_RestController
         $current = $_['termId']->getProposal() ? 'unprocessed' : $this->entity->getValue();
 
         // Get list of allowed process statuses
-        $allowed = TermModel::allowedProcessStatuses($current, false);
+        $allowed = TermModel::getAllowedProcessStatuses($current, false);
 
         // Make sure only allowed values can be set as new value of processStatus attribute
         $this->jcheck([
