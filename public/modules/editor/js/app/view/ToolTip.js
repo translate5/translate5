@@ -60,10 +60,21 @@ Ext.define('Editor.view.ToolTip', {
     // Change content dynamically depending on which element triggered the show.
     onBeforeShow: function(tip) {
         var t = tip.triggerElement,
-            fly = Ext.fly(t); 
+            fly = Ext.fly(t), up = fly.up();
+
         if(fly.hasCls('qmflag') || fly.hasCls('trackchanges') || fly.hasCls('internal-tag')) {
-            // Don't show multiple ToolTips that overlap, but collect data into one single ToolTip
-            return this.handleCollectedTooltip(t, tip);
+            if (up.dom.hasAttribute('data-qtip')) {
+                return this.handleCollectedTooltip(t, tip, '<br>' + up.dom.getAttribute('data-qtip'));
+            } else {
+                return this.handleCollectedTooltip(t, tip);
+            }
+        } else if (fly.dom.hasAttribute('data-qtip')) {
+            if (up.hasCls('qmflag') || up.hasCls('trackchanges') || up.hasCls('internal-tag')) {
+                return this.handleCollectedTooltip(t.parentNode, tip, '<br>' + fly.dom.getAttribute('data-qtip'));
+            } else {
+                tip.update(fly.dom.getAttribute('data-qtip'));
+                return true;
+            }
         }
         return false;
     },
@@ -88,7 +99,7 @@ Ext.define('Editor.view.ToolTip', {
      * Collect data for"common" ToolTip.
      * First the node itself is checked, but (if necessary) be careful to check for parent or child-Nodes, too.
      */
-    handleCollectedTooltip: function(node, tip) {
+    handleCollectedTooltip: function(node, tip, appendText) {
         var me = this,
             fly = Ext.fly(node),
             result = '';
@@ -118,6 +129,12 @@ Ext.define('Editor.view.ToolTip', {
         if(fly.hasCls('internal-tag') && (fly.hasCls('tab')||fly.hasCls('space')||fly.hasCls('newline')||fly.hasCls('nbsp')||fly.hasCls('char'))) {
             result = fly.down('span.short').getAttribute('title') + (result ? '<br>'+result : '');
         };
+
+
+        if (appendText) {
+            result += appendText;
+        }
+
         tip.update(result);
         return !!result; //if there is no content for ttip, we return false to prevent the show of the tooltip
     },

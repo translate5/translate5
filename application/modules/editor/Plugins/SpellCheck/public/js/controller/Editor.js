@@ -780,10 +780,10 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
             match = matches ? matches[index] : me.allMatches[index],
             nodeElParams = { tag: me.self.NODE_NAME_MATCH };
         // CSS-class(es)
-        nodeElParams['cls'] = Editor.util.HtmlClasses.CSS_CLASSNAME_SPELLCHECK + ' ' + match.cssClassErrorType;
+        nodeElParams['cls'] = Editor.util.HtmlClasses.CSS_CLASSNAME_SPELLCHECK + ' ' + match.cssClassErrorType + ' ownttip';
         // activeMatchIndex
         nodeElParams[me.self.ATTRIBUTE_ACTIVEMATCHINDEX] = index;
-        nodeElParams[me.self.ATTRIBUTE_TITLE] = 'Press CTRL+R to select proposals. Cursor has to be inside error';
+        nodeElParams['data-qtip'] = Editor.data.l10n.SpellCheck.nodeTitle;
         // create and return node
         return Ext.DomHelper.createDom(nodeElParams);
     },
@@ -911,7 +911,7 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
         // infoURL(s)
         if (infoURLs.length > 0) {
             Ext.Array.each(infoURLs, function(url) {
-                items.push({text: me.spellCheckMessages.moreInformation,
+                items.push({text: Editor.data.l10n.SpellCheck.moreInformation,
                             cls: me.self.CSS_CLASSNAME_TOOLTIP_MOREINFO,
                             href: url,
                             hrefTarget: '_blank'});
