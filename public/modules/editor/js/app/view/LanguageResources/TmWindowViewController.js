@@ -240,9 +240,6 @@ Ext.define('Editor.view.LanguageResources.TmWindowViewController', {
         sourceLang = view.down('combo[name="sourceLang"]').getSelection();
         targetLang = view.down('combo[name="targetLang"]').getSelection();
 
-        console.log('ENGINE SELECTION: ', selectedEngine);
-        // if(selectedEngine && )
-        
         //clean the engine filters
         engineComboStore.clearFilter();
 
