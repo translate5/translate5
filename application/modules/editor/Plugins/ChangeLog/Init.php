@@ -26,6 +26,8 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\Acl\Rights;
+
 class editor_Plugins_ChangeLog_Init extends ZfExtended_Plugin_Abstract {
     protected static string $description = 'Provides change-log information in the GUI';
     protected static bool $enabledByDefault = true;
@@ -36,7 +38,7 @@ class editor_Plugins_ChangeLog_Init extends ZfExtended_Plugin_Abstract {
      * @var array
      */
     protected $frontendControllers = array(
-        'pluginChangeLogChangelog' => 'Editor.plugins.ChangeLog.controller.Changelog',
+        Rights::ACL_RIGHT_PLUGIN_CHANGE_LOG_CHANGELOG => 'Editor.plugins.ChangeLog.controller.Changelog',
     );
     
     protected $localePath = 'locales';

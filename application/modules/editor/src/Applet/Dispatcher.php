@@ -28,6 +28,8 @@ END LICENSE AND COPYRIGHT
 
 namespace MittagQI\Translate5\Applet;
 
+use MittagQI\ZfExtended\Acl\ResourceInterface;
+use MittagQI\ZfExtended\Acl\RightDTO;
 use ZfExtended_Authentication as Auth;
 use JetBrains\PhpStorm\NoReturn;
 use Zend_Registry;
@@ -37,7 +39,11 @@ use ZfExtended_NotAuthenticatedException;
 /**
  * Applet dispatcher for translate5 applets (termportal, instanttranslate, etc)
  */
-class Dispatcher {
+class Dispatcher implements ResourceInterface {
+    /**
+     * ACL Resource ID for containing all initial pages / applets. Used to control where a user is redirected after login.
+     */
+    public const INITIAL_PAGE_RESOURCE = 'initial_page';
 
     /**
      * @var AppletAbstract[]
@@ -100,6 +106,31 @@ class Dispatcher {
             $this->call($meta->getLastUsedApp());
         }
         $this->call(); //fallback if no lastUsedApp configured
+    }
+
+    /**
+     * returns the ACL resource ID for the Applet Dispatcher
+     * @return string
+     */
+    public function getId(): string {
+        return self::INITIAL_PAGE_RESOURCE;
+    }
+
+    /**
+     * returns the ACL rights provided by the Applet Dispatcher as initial page resources
+     * @return RightDTO[]
+     */
+    public function getRights(): array {
+        $result = [];
+        foreach($this->applets as $applet) {
+            $acl = new RightDTO();
+            $acl->resource = $this->getId();
+            $acl->name = $applet->getInitialPage();
+            $acl->id = strtoupper($this->getId().'_'.$acl->name);
+            $acl->description = 'Allows Applet '.$acl->name.' as initial page';
+            $result[] = $acl;
+        }
+        return $result;
     }
 
     /**

@@ -1096,4 +1096,29 @@ class editor_AttributeController extends ZfExtended_RestController
             'isDraft' => $this->batch ? 1 : 0
         ]);
     }
+
+    /**
+     * Get history for an attribute
+     *
+     * @throws ReflectionException
+     * @throws Zend_Db_Statement_Exception
+     * @throws ZfExtended_Mismatch
+     */
+    public function historyAction() {
+
+        // Load entity internally
+        $this->entityLoad();
+
+        // If no or only certain collections are accessible - validate collection accessibility
+        if ($this->collectionIds !== true) $this->jcheck([
+            'collectionId' => [
+                'fis' => $this->collectionIds ?: 'invalid' // FIND_IN_SET
+            ],
+        ], $this->entity);
+
+        // Load history and assign to response
+        $this->view->history = ZfExtended_Factory
+            ::get(editor_Models_Term_AttributeHistory::class)
+            ->getByAttrId($this->entity->getId(), $this->getParam('language'));
+    }
 }

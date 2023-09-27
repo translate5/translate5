@@ -33,10 +33,11 @@ use editor_Models_Task as Task;
 use editor_Models_Task_AbstractWorker;
 use editor_Models_TaskUserAssoc;
 use JsonException;
+use MittagQI\Translate5\Acl\Rights;
 use MittagQI\Translate5\Task\Lock;
 use MittagQI\Translate5\Task\Reimport\DataProvider\AbstractDataProvider;
 use MittagQI\Translate5\Task\Reimport\DataProvider\FileDto;
-use MittagQI\Translate5\Task\Reimport\SegmentProcessor\ReimportSegmentErrors;
+use ReflectionException;
 use Zend_Acl_Exception;
 use Zend_Exception;
 use Zend_Registry;
@@ -138,6 +139,7 @@ class Worker extends editor_Models_Task_AbstractWorker
      * @param ZfExtended_Models_User $user
      * @return editor_Models_TaskUserAssoc
      * @throws Zend_Acl_Exception
+     * @throws ReflectionException
      */
     protected function prepareTaskUserAssociation(Task $task, ZfExtended_Models_User $user): editor_Models_TaskUserAssoc
     {
@@ -148,7 +150,7 @@ class Worker extends editor_Models_Task_AbstractWorker
             $acl = ZfExtended_Acl::getInstance();
 
             $isUserPm = $task->getPmGuid() == $user->getUserGuid();
-            $isEditAllAllowed = $acl->isInAllowedRoles($user->getRoles(), 'backend', 'editAllTasks');
+            $isEditAllAllowed = $acl->isInAllowedRoles($user->getRoles(), Rights::ID, Rights::EDIT_ALL_TASKS);
             $isEditAllTasks = $isEditAllAllowed || $isUserPm;
 
             //if the user is allowed to load all, use the default loader

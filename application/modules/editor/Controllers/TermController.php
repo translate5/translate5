@@ -722,4 +722,29 @@ class editor_TermController extends ZfExtended_RestController
         // Flush responses
         $this->view->assign($steps);  // i(mt(true), 'a');
     }
+
+    /**
+     * Get history for the term
+     *
+     * @throws ReflectionException
+     * @throws Zend_Db_Statement_Exception
+     * @throws ZfExtended_Mismatch
+     */
+    public function historyAction() {
+
+        // Load term internally
+        $this->entityLoad();
+
+        // If no or only certain collections are accessible - validate collection accessibility
+        if ($this->collectionIds !== true) $this->jcheck([
+            'collectionId' => [
+                'fis' => $this->collectionIds ?: 'invalid' // FIND_IN_SET
+            ],
+        ], $this->entity);
+
+        // Load history and assign to response
+        $this->view->history = ZfExtended_Factory
+            ::get(editor_Models_Term_History::class)
+            ->getByTermId($this->entity->getId());
+    }
 }

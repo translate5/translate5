@@ -26,6 +26,8 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\Acl\Rights;
+
 /**
  * Initial Class of Plugin "GlobalesePreTranslation"
  */
@@ -46,7 +48,7 @@ class editor_Plugins_GlobalesePreTranslation_Init extends ZfExtended_Plugin_Abst
      * @var array
      */
     protected $frontendControllers = array(
-            'pluginGlobalesePreTranslationGlobalese' => 'Editor.plugins.GlobalesePreTranslation.controller.Globalese'
+        Rights::PLUGIN_GLOBALESE_PRE_TRANSLATION => 'Editor.plugins.GlobalesePreTranslation.controller.Globalese'
     );
             
     protected $localePath = 'locales';

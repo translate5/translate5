@@ -37,13 +37,36 @@ class editor_Models_Config extends ZfExtended_Models_Config {
     const CONFIG_SOURCE_CUSTOMER = "customer";// the source is customer specific config (loaded from database table)
     const CONFIG_SOURCE_TASK = "task";//the source is task specific config (loaded from database table)
     const CONFIG_SOURCE_USER = "user";//the source is user specific config (loaded from database table)
-    
-    const CONFIG_LEVEL_SYSTEM   = 1; // invisible in the Frontend
-    const CONFIG_LEVEL_INSTANCE = 2; // editable in system config
-    const CONFIG_LEVEL_CUSTOMER = 4; // editable in system & customer config
-    const CONFIG_LEVEL_TASKIMPORT = 8; // editable in system & customer & task config, freezed thereafter (not editable anymore after import)
-    const CONFIG_LEVEL_TASK = 16; // editable in system & customer & task config, throughout the lifetime of a task
-    const CONFIG_LEVEL_USER     = 32; // TODO FIXME: add doc about frontend-visibility
+
+    /**
+     * invisible in the Frontend
+     */
+    const CONFIG_LEVEL_SYSTEM = 1;
+
+    /**
+     * editable in system config
+     */
+    const CONFIG_LEVEL_INSTANCE = 2;
+
+    /**
+     * editable in system & customer config
+     */
+    const CONFIG_LEVEL_CUSTOMER = 4;
+
+    /**
+     * editable in system & customer & task config, freezed thereafter (not editable anymore after import)
+     */
+    const CONFIG_LEVEL_TASKIMPORT = 8;
+
+    /**
+     * editable in system & customer & task config, throughout the lifetime of a task
+     */
+    const CONFIG_LEVEL_TASK = 16;
+
+    /**
+     * editable by the user in the UI, preset-able on the previous levels
+     */
+    const CONFIG_LEVEL_USER = 32;
 
     private const CUSTOMER_CONFIG_LEVELS = [
         self::CONFIG_LEVEL_CUSTOMER,

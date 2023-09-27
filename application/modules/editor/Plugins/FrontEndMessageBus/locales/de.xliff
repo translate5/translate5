@@ -20,9 +20,9 @@
             <source>Ausgewählt von</source>
             <target>Ausgewählt von</target>
         </trans-unit>
-        <trans-unit id='S2VpbmUgVmVyYmluZHVuZyB6dW0gU2VydmVy'>
-            <source>Keine Verbindung zum Server</source>
-            <target>Keine Verbindung zum Server</target>
+        <trans-unit id='U2llIGhhYmVuIFZlcmJpbmR1bmdzcHJvYmxlbWUgenVtIEludGVybmV0LiA8YnIgLz5CaXR0ZSBwcsO8ZmVuIFNpZSBkaWUgU3RhYmlsaXTDpHQgSWhyZXIgSW50ZXJuZXR2ZXJiaW5kdW5nLiA8YnIgLz5Tb2xsdGUgZGllc2UgTWVsZHVuZyBkYXVlcmhhZnQgenUgc2VoZW4gc2Vpbiwga2FubiBlcyBhdWNoIHNlaW4sIDxiciAvPmRhc3MgZGFzIFdlYnNvY2tldC1Qcm90b2tvbGwgd3NzOi8vIGluIElocmVyIEZpcmV3YWxsIGJsb2NraWVydCBpc3Qu'>
+            <source>Sie haben Verbindungsprobleme zum Internet. <br />Bitte prüfen Sie die Stabilität Ihrer Internetverbindung. <br />Sollte diese Meldung dauerhaft zu sehen sein, kann es auch sein, <br />dass das Websocket-Protokoll wss:// in Ihrer Firewall blockiert ist.</source>
+            <target>Sie haben Verbindungsprobleme zum Internet. <br />Bitte prüfen Sie die Stabilität Ihrer Internetverbindung. <br />Sollte diese Meldung dauerhaft zu sehen sein, kann es auch sein, <br />dass das Websocket-Protokoll wss:// in Ihrer Firewall blockiert ist.</target>
         </trans-unit>
         <trans-unit id='U2llIGvDtm5uZW4ga2VpbiBTZWdtZW50IGVkaXRpZXJlbiwgc28gbGFuZ2Uga2VpbmUgVmVyYmluZHVuZyB6dW0gU2VydmVyIGJlc3RlaHQu'>
             <source>Sie können kein Segment editieren, so lange keine Verbindung zum Server besteht.</source>

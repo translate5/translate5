@@ -49,7 +49,11 @@ $config = Zend_Registry::get('config');
     ?>;
     for (const directRedirectsKey in Editor.data.directRedirects) {
         if (location.hash.match(new RegExp('^#'+directRedirectsKey))) {
-            location = Editor.data.directRedirects[directRedirectsKey];
+            var redirect = Editor.data.directRedirects[directRedirectsKey];
+            if (!redirect.match('#') && location.hash) {
+                redirect += location.hash;
+            }
+            location = redirect;
             break;
         }
     }

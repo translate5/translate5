@@ -26,9 +26,9 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-namespace MittagQI\Translate5\Access;
+namespace MittagQI\Translate5\Acl;
 
-use MittagQI\ZfExtended\Access\Roles as BaseRoles;
+use MittagQI\ZfExtended\Acl\Roles as BaseRoles;
 use ZfExtended_Acl;
 
 /**

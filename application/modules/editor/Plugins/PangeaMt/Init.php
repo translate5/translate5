@@ -50,7 +50,7 @@ class editor_Plugins_PangeaMt_Init extends ZfExtended_Plugin_Abstract {
      * @var array
      */
     protected $frontendControllers = [
-        'pluginPangeaMtMain' => 'Editor.plugins.PangeaMt.controller.Main',
+        'Editor.plugins.PangeaMt.controller.Main',
     ];
     
     public function init() {

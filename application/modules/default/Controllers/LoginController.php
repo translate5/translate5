@@ -110,6 +110,55 @@ class LoginController extends ZfExtended_Controllers_Login {
         throw new ZfExtended_NoAccessException("No initial_page resource is found.");
     }
 
+    /**
+     * Init the user session based on OpenId authenticated user and redirect his user to the editor or to the redirectTo
+     * session route.
+     * @param ZfExtended_Models_User $user
+     * @return void
+     * @throws ReflectionException
+     * @throws Zend_Db_Statement_Exception
+     * @throws Zend_Db_Table_Exception
+     * @throws Zend_Exception
+     * @throws ZfExtended_Models_Entity_Exceptions_IntegrityConstraint
+     * @throws ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey
+     * @throws ZfExtended_NoAccessException
+     */
+    private function initDataAndRedirectOpenId(ZfExtended_Models_User $user){
+        //init the user session and redirect to the editor
+        $invalidLoginCounter = ZfExtended_Factory::get(
+            ZfExtended_Models_Invalidlogin::class,
+            [$user->getLogin()]
+        );
+        $invalidLoginCounter->resetCounter(); // reset counter - here we are successfully logged in by openID
+
+        $auth = Auth::getInstance();
+        $auth->authenticateUser($user);
+
+        ZfExtended_Models_LoginLog::addSuccess($auth, ZfExtended_Models_LoginLog::LOGIN_OPENID);
+
+        $accessHelper = $this->getHelper('Access');
+        /* @var ZfExtended_Controller_Helper_Access $accessHelper */
+
+        // prevent the redirecTo session flag in case it exist because the update session can remove it (if there is
+        // already existing session in the database for the user and this session is taken)
+        $redirectTo = $accessHelper->getRedirectTo();
+        $isHash = str_starts_with($redirectTo,'#');
+
+        // prevent redirectTo only if it is hash. Otherwise set it to empty string to use the default route to redirect
+        if (!$isHash){
+            $redirectTo = '';
+        }
+
+        ZfExtended_Session::updateSession(true, true, $user->getId());
+
+        // re-add the redirectTo value from above after the updateSession is called. This must be done because the
+        // update session can remove this value and the user will not be redirected to the "clicked" edit task link/hash
+        $accessHelper->addHashToOrigin($redirectTo);
+
+        // redirect the authenticated user to the needed route
+        $this->initDataAndRedirect();
+    }
+
     /***
      * Check if the current request is valid for the openid. If it is a valid openid request, the user
      * login will be redirected to the openid client server
@@ -182,19 +231,7 @@ class LoginController extends ZfExtended_Controllers_Login {
                 if(!$user){
                     return;
                 }
-                //init the user session and redirect to the editor
-                
-                $invalidLoginCounter = ZfExtended_Factory::get('ZfExtended_Models_Invalidlogin',array($user->getLogin()));
-                /* @var $invalidLoginCounter ZfExtended_Models_Invalidlogin */
-                $invalidLoginCounter->resetCounter(); // bei erfolgreichem login den counter zurücksetzen
-
-                $auth = Auth::getInstance();
-                $auth->authenticateUser($user);
-                ZfExtended_Models_LoginLog::addSuccess($auth, "openid");
-
-                ZfExtended_Session::updateSession(true, true, intval($user->getId()));
-
-                $this->initDataAndRedirect();
+               $this->initDataAndRedirectOpenId($user);
             }
         } catch (OpenIdClientException $e) {
             ZfExtended_Models_LoginLog::addFailed(empty($user) ? 'No User given' : $user->getLogin(), "openid");
