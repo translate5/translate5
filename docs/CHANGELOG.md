@@ -8,6 +8,26 @@ Missing Versions are merged into in the next upper versions, so no extra section
 
 All updates are (downwards) compatible! If not this is listed in the important release notes.
 
+
+## [6.5.5] - 2023-09-27
+
+### Important Notes:
+ 
+
+
+### Bugfixes
+**[TRANSLATE-3499](https://jira.translate5.net/browse/TRANSLATE-3499): VisualReview / VisualTranslation - Set --correct-text-visibility for pdfconverter via GUI** <br>
+Added new config option runtimeOptions.plugins.VisualReview.pdfcorrectTextVisibility which changes text visibility in PDF which contains for example image overlays / watersigns like "draft" or similar things hiding the real text.
+
+**[TRANSLATE-3487](https://jira.translate5.net/browse/TRANSLATE-3487): Editor general - Taking over fuzzy matches in the UI may lead to corrupted internal tags** <br>
+6.5.4: FIX: Segments with more then 9 tags were producing errors in the UI
+6.5.3: Taking over fuzzy matches in the UI was producing corrupted internal tags. In the Editor the tags were looking correctly, but on database level they did contain the wrong content. 
+6.5.5: Fix problem with locked segment tag
+
+**[TRANSLATE-3289](https://jira.translate5.net/browse/TRANSLATE-3289): TermPortal - Login deletes hash of TermPortal URL** <br>
+Addressbar location hash is now preserved on login, if applicable
+
+
 ## [6.5.4] - 2023-09-26
 ### Bugfixes
 **[TRANSLATE-3487](https://jira.translate5.net/browse/TRANSLATE-3487): Editor general - Taking over fuzzy matches in the UI may lead to corrupted internal tags** <br>
