@@ -26,6 +26,8 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\ZfExtended\Acl\ConfigLevelResource;
+
 /**
  */
 class editor_ConfigController extends ZfExtended_RestController {
@@ -249,7 +251,7 @@ class editor_ConfigController extends ZfExtended_RestController {
      */
     protected function checkConfigUpdateAllowed(int $level) {
         $acl = ZfExtended_Acl::getInstance();
-        if(!$acl->isInAllowedRoles(ZfExtended_Authentication::getInstance()->getUserRoles(), ZfExtended_Models_User::APPLICATION_CONFIG_LEVEL, $this->entity->getConfigLevelLabel($level))){
+        if(!$acl->isInAllowedRoles(ZfExtended_Authentication::getInstance()->getUserRoles(), ConfigLevelResource::ID, $this->entity->getConfigLevelLabel($level))){
             throw new editor_Models_ConfigException('E1292', [
                 'level' => $level
             ]);

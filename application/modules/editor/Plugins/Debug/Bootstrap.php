@@ -26,6 +26,7 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\Acl\Rights;
 use MittagQI\Translate5\Task\Import\ImportEventTrigger;
 
 /**
@@ -70,7 +71,7 @@ class editor_Plugins_Debug_Bootstrap extends ZfExtended_Plugin_Abstract
 
         // allow PMs to read the user assoc auth hashes for clicking user associations to log in as that user
         $acl = ZfExtended_Acl::getInstance();
-        $acl->allow('pm', 'readAuthHash');
+        $acl->allow('pm', Rights::ID, Rights::READ_AUTH_HASH);
     }
 
     public function handleAfterIndexAction(Zend_EventManager_Event $event)
