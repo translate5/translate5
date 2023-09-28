@@ -583,8 +583,9 @@ class editor_Utils {
             }
 
             // If prop's value should match certain regular expression, but it does not - flush error
-            if ($rule['rex'] && strlen($value) && !self::rexm($rule['rex'], $value))
+            if ($rule['rex'] && $value !== null && strlen($value) && !self::rexm($rule['rex'], $value)){
                 throw new ZfExtended_Mismatch('E2001', [$value, $label]);
+            }
 
             // If file's extension should match certain regular expression, but it does not - flush error
             if ($rule['ext']) {
@@ -613,7 +614,9 @@ class editor_Utils {
             }
 
             // If value should be a json-encoded expression, and it is - decode
-            if ($rule['rex'] == 'json') $rowA[$prop] = json_decode($value);
+            if ($rule['rex'] == 'json') {
+                $rowA[$prop] = ($value === null) ? null : json_decode($value);
+            }
 
             // If prop's value should be equal to some certain value, but it's not equal - flush error
             if (array_key_exists('eql', $rule)
