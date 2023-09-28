@@ -104,7 +104,7 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
         // CSS-Classes for error-types
         // Attributes for the spellcheck-Node
         ATTRIBUTE_ACTIVEMATCHINDEX: 'data-spellCheck-activeMatchIndex',
-        ATTRIBUTE_TITLE: 'title',
+        ATTRIBUTE_QTIP: 'data-qtip',
         // In ToolTips
         CSS_CLASSNAME_TOOLTIP_HEADER:  'spellcheck-tooltip-header',
         CSS_CLASSNAME_REPLACEMENTLINK:  'spellcheck-replacement',
@@ -783,7 +783,7 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
         nodeElParams['cls'] = Editor.util.HtmlClasses.CSS_CLASSNAME_SPELLCHECK + ' ' + match.cssClassErrorType + ' ownttip';
         // activeMatchIndex
         nodeElParams[me.self.ATTRIBUTE_ACTIVEMATCHINDEX] = index;
-        nodeElParams['data-qtip'] = Editor.data.l10n.SpellCheck.nodeTitle;
+        nodeElParams[me.self.ATTRIBUTE_QTIP] = Editor.data.l10n.SpellCheck.nodeTitle;
         // create and return node
         return Ext.DomHelper.createDom(nodeElParams);
     },
@@ -932,7 +932,7 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
 
         // Auxiliary variables
         var ed = this.editor, selection = ed.getWin().getSelection(),
-            node = selection.baseNode.parentNode;
+            node = selection.focusNode.parentNode;
 
         // Go upper until .t5spellcheck-node is met, if possible
         while (node.classList && !node.classList.contains('t5spellcheck') && node.parentNode) {

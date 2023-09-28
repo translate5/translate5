@@ -10,7 +10,7 @@
     </trans-unit>
     <trans-unit id='RHLDvGNrZW4gU2llIEN0cmwrUiwgdW0gVm9yc2NobMOkZ2UgYXVzenV3w6RobGVuIG9kZXIgcmVjaHRzLWtsaWNrZW4gU2llIGF1ZiBkaWVzZXMgV29ydC4gRGVyIEN1cnNvciBtdXNzIHNpY2ggaW5uZXJoYWxiIGRlcyBGZWhsZXJzIGJlZmluZGVuLg=='>
         <source>Drücken Sie Ctrl+R, um Vorschläge auszuwählen oder rechts-klicken Sie auf dieses Wort. Der Cursor muss sich innerhalb des Fehlers befinden.</source>
-        <target>Press Ctrl+R to select proposals or right-click this word. Cursor has to be inside error.</target>
+        <target><b>Press Ctrl+R</b> to select proposals or right-click this word. Cursor has to be inside error.</target>
     </trans-unit>
   </body>
  </file>

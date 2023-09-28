@@ -59,26 +59,36 @@ Ext.define('Editor.view.ToolTip', {
 
     // Change content dynamically depending on which element triggered the show.
     onBeforeShow: function(tip) {
-        var t = tip.triggerElement,
-            fly = Ext.fly(t), up = fly.up();
+        var me = this, t = tip.triggerElement,
+            fly = Ext.fly(t), up = fly.up(), qtip = me.getQtip(fly) || me.getQtip(up);
 
-        if(fly.hasCls('qmflag') || fly.hasCls('trackchanges') || fly.hasCls('internal-tag')) {
-            if (up.dom.hasAttribute('data-qtip')) {
-                return this.handleCollectedTooltip(t, tip, '<br>' + up.dom.getAttribute('data-qtip'));
+        if (me.hasCustomTip(fly)) {
+            if (qtip) {
+                up.dom.setAttribute('data-qclass', 'hidden');
+                return me.handleCollectedTooltip(t, tip, qtip);
             } else {
-                return this.handleCollectedTooltip(t, tip);
+                return me.handleCollectedTooltip(t, tip);
             }
-        } else if (fly.dom.hasAttribute('data-qtip')) {
-            if (up.hasCls('qmflag') || up.hasCls('trackchanges') || up.hasCls('internal-tag')) {
-                return this.handleCollectedTooltip(t.parentNode, tip, '<br>' + fly.dom.getAttribute('data-qtip'));
+        } else if (qtip) {
+            if (me.hasCustomTip(up)) {
+                fly.dom.setAttribute('data-qclass', 'hidden');
+                return me.handleCollectedTooltip(t.parentNode, tip, qtip);
             } else {
-                tip.update(fly.dom.getAttribute('data-qtip'));
+                tip.update(qtip);
                 return true;
             }
         }
         return false;
     },
-    
+
+    hasCustomTip: function(el) {
+        return el.hasCls('qmflag') || el.hasCls('trackchanges') || el.hasCls('internal-tag');
+    },
+
+    getQtip: function(el) {
+        return el.dom.getAttribute('data-qtip');
+    },
+
     constructor: function() {
         this.renderTo = Ext.getBody();
         this.callParent(arguments);
@@ -130,9 +140,10 @@ Ext.define('Editor.view.ToolTip', {
             result = fly.down('span.short').getAttribute('title') + (result ? '<br>'+result : '');
         };
 
+        result = result.replaceAll('<br>', ' ');
 
         if (appendText) {
-            result += appendText;
+            result += '<br><br>' + appendText;
         }
 
         tip.update(result);
