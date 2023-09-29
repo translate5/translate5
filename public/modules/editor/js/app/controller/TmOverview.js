@@ -646,7 +646,7 @@ Ext.define('Editor.controller.TmOverview', {
         if (engine) {
             form.getForm().findField('specificData').setValue(JSON.stringify({
                 domainCode: engine.get('domainCode'),
-                engineName: engine.get('name')
+                engineName: engine.get('engineName')
             }));
         }
 

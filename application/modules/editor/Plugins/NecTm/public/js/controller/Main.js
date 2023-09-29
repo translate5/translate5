@@ -100,7 +100,7 @@ Ext.define('Editor.plugins.NecTm.controller.Main', {
      * After the Edit-Window for a LanguageResource has been opened,
      * we show the categories-field (no need to add it - it is already in there).
      */
-    onEditTmWindowAfterrender: function(editTmWindow) {
+    onEditTmWindowAfterrender: function(editTmWindow){
         var resourceId = editTmWindow.down('#resourceId').getValue(),
             disableCategories = (resourceId.indexOf('editor_Plugins_NecTm') === -1),
             categoriesField = editTmWindow.down('#categories');

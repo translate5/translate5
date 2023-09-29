@@ -16,5 +16,6 @@ class Status
     public const QUOTA_EXCEEDED = 'quotaexceeded';
     public const REORGANIZE_IN_PROGRESS = 'reorganize_in_progress';
     public const REORGANIZE_FAILED = 'reorganize_failed';
+    public const TUNING_IN_PROGRESS = 'tuning_in_progress';
     public const IMPORT = 'import';
 }
