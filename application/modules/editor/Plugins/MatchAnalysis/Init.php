@@ -26,6 +26,7 @@
  END LICENSE AND COPYRIGHT
  */
 
+use MittagQI\Translate5\Acl\Rights;
 use MittagQI\Translate5\Cronjob\CronEventTrigger;
 use MittagQI\Translate5\LanguageResource\Pretranslation\BatchResult;
 use MittagQI\Translate5\PauseWorker\PauseWorker;
@@ -47,8 +48,8 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract
      * @var array
      */
     protected $frontendControllers = array(
-        'pluginMatchAnalysisMatchAnalysis' => 'Editor.plugins.MatchAnalysis.controller.MatchAnalysis',
-        'pluginMatchAnalysisPricingPreset' => 'Editor.plugins.MatchAnalysis.controller.admin.PricingPreset'
+        Rights::PLUGIN_MATCH_ANALYSIS_MATCH_ANALYSIS => 'Editor.plugins.MatchAnalysis.controller.MatchAnalysis',
+        Rights::PLUGIN_MATCH_ANALYSIS_PRICING_PRESET => 'Editor.plugins.MatchAnalysis.controller.admin.PricingPreset'
     );
 
     protected $localePath = 'locales';

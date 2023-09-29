@@ -26,7 +26,7 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-use MittagQI\Translate5\Segment\FilteredIterator;
+use MittagQI\Translate5\Acl\Rights;
 use MittagQI\Translate5\Segment\Operations;
 use MittagQI\Translate5\Task\Current\NoAccessException;
 use MittagQI\Translate5\Task\TaskContextTrait;
@@ -696,12 +696,12 @@ class Editor_SegmentController extends ZfExtended_RestController
      * @throws editor_Models_Segment_Exception
      */
     public function lockOperation(bool $lock = true) {
-        $acl = $lock ? 'lockSegmentOperation' : 'unlockSegmentOperation';
+        $acl = $lock ? Rights::LOCK_SEGMENT_OPERATION : Rights::UNLOCK_SEGMENT_OPERATION;
 
         //the amount of new ACL rules would be huge to handle that lock/unlock Batch/Operations with
         // ordinary controller right handling since currently role editor has access to all methods here.
         // So its easier to double access to that functions for PM users then
-        $this->checkAccess('frontend', $acl, __CLASS__.'::'.($lock ? __FUNCTION__ : 'unlockOperation'));
+        $this->checkAccess(Rights::ID, $acl, __CLASS__.'::'.($lock ? __FUNCTION__ : 'unlockOperation'));
         $this->getAction();
 
         /* @var Operations $operations */
@@ -736,8 +736,8 @@ class Editor_SegmentController extends ZfExtended_RestController
      * @throws \MittagQI\Translate5\Task\Current\Exception
      */
     public function lockBatch(bool $lock = true) {
-        $acl = $lock ? 'lockSegmentBatch' : 'unlockSegmentBatch';
-        $this->checkAccess('frontend', $acl, __CLASS__.'::'.($lock ? __FUNCTION__ : 'unlockBatch'));
+        $acl = $lock ? Rights::LOCK_SEGMENT_BATCH : Rights::UNLOCK_SEGMENT_BATCH;
+        $this->checkAccess(Rights::ID, $acl, __CLASS__.'::'.($lock ? __FUNCTION__ : 'unlockBatch'));
         $this->applyQualityFilter();
 
         /* @var Operations $operations */

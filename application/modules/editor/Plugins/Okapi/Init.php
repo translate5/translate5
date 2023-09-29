@@ -26,6 +26,7 @@
  END LICENSE AND COPYRIGHT
  */
 
+use MittagQI\Translate5\Acl\Rights;
 use MittagQI\Translate5\Task\FileTypeSupport;
 use MittagQI\Translate5\Plugins\Okapi\ImportFilter;
 use MittagQI\Translate5\Plugins\Okapi\Service;
@@ -244,7 +245,7 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
     protected $localePath = 'locales';
 
     protected $frontendControllers = array(
-        'pluginOkapiBconfPrefs' => 'Editor.plugins.Okapi.controller.BconfPrefs'
+        Rights::PLUGIN_OKAPI_BCONF_PREFS => 'Editor.plugins.Okapi.controller.BconfPrefs'
     );
 
     #region Plugin Init
