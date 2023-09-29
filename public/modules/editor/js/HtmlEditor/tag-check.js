@@ -12,14 +12,15 @@ class TagCheck {
         let excessTags = [];
 
         for (let node of nodeList) {
-            const match = node.id.match(new RegExp(this.idPrefix + '(\\w+)(\\d+)'));
+            // node id can have word locked followed by number, so we need to use negative lookbehind
+            const match = node.id.match(new RegExp(this.idPrefix + '([a-zA-Z]+)(?<!locked)(locked)?(\\d+)'));
 
             if (!match) {
                 continue;
             }
 
             const type = match[1];
-            const number = parseInt(match[2], 10);
+            const number = parseInt(match[3], 10);
             const id = type + number;
 
             let isQaTag = /qmflag/.test(node.className);
@@ -37,7 +38,8 @@ class TagCheck {
                 continue;
             }
 
-            if (!this.referenceTags[type].find(t => parseInt(t.data.nr) === number)) {
+            // data.nr can be prefixed by the word locked, so we need to remove that to get the number of the tag
+            if (!this.referenceTags[type].find(t => parseInt(t.data.nr.replace('locked', '')) === number)) {
                 if (isWhitespaceTag && this.isAllowedAddingWhitespaceTags()) {
                     continue;
                 }
@@ -61,7 +63,8 @@ class TagCheck {
                     continue;
                 }
 
-                if (!foundIds.includes(type + tag.data.nr)) {
+                // Check if tag is deleted keeping in mind that data.nr can be prefixed by the word locked
+                if (!foundIds.includes(type + tag.data.nr.replace('locked', ''))) {
                     missingTags.push(tag);
                 }
             }

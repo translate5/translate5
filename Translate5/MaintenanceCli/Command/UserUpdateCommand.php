@@ -214,7 +214,7 @@ class UserUpdateCommand extends UserAbstractCommand
 
         $passwdreset = ZfExtended_Factory::get(ZfExtended_Models_Passwdreset::class);
 
-        return $passwdreset->reset($userModel->getLogin());
+        return $passwdreset->reset($userModel->getLogin(), 'CLI::userUpdate');
     }
 
     private function addRoles(ZfExtended_Models_User $userModel): void
