@@ -196,7 +196,14 @@ class MatchAnalysisTest extends editor_Test_ImportTest {
     {
         // remove some unneeded columns
         foreach ($data as $a){
-            unset($a->id, $a->taskGuid, $a->analysisId, $a->segmentId, $a->languageResourceid);
+            unset(
+                $a->id,
+                $a->taskGuid,
+                $a->analysisId,
+                $a->segmentId,
+                $a->languageResourceid,
+                $a->errorCount
+            );
         }
         return $data;
     }
