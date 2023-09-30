@@ -9098,6 +9098,18 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
                 <source>Gemeldete Fehler</source>
                 <target>Gemeldete Fehler</target>
             </trans-unit>
+            <trans-unit id='RXJsZWRpZ3Q='>
+                <source>Erledigt</source>
+                <target>Erledigt</target>
+            </trans-unit>
+            <trans-unit id='QmVpZGUgQmVuZW5udW5nZW4gYmVyZWl0cyB2b3JoYW5kZW4gaW4gYXVzZ2V3w6RobHRlciBUZXJtQ29sbGVjdGlvbi4='>
+                <source>Beide Benennungen bereits vorhanden in ausgewählter TermCollection.</source>
+                <target>Beide Benennungen bereits vorhanden in ausgewählter TermCollection.</target>
+            </trans-unit>
+            <trans-unit id='QmVncmlmZiBleGlzdGllcnQgYmVyZWl0cyBpbiBkZXIgYXVzZ2V3w6RobHRlbiBUZXJtQ29sbGVjdGlvbg=='>
+                <source>Begriff existiert bereits in der ausgewählten TermCollection</source>
+                <target>Begriff existiert bereits in der ausgewählten TermCollection</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>
