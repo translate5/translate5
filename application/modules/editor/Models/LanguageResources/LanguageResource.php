@@ -692,7 +692,7 @@ class editor_Models_LanguageResources_LanguageResource extends ZfExtended_Models
      * @return string
      * @throws Zend_Exception
      */
-    public function getAbsoluteDataPath(bool $createDirIfNotExists): string
+    public function getAbsoluteDataPath(bool $createDirIfNotExists = false): string
     {
         if(!isset($this->absoluteDataPath) || !str_ends_with($this->absoluteDataPath, strval($this->getId()))){
             $config = Zend_Registry::get('config');
