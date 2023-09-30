@@ -89,24 +89,24 @@ Ext.define('Editor.model.LanguageResources.LanguageResource', {
         return this.get('resourceType') === Editor.util.LanguageResources.resourceType.TERM_COLLECTION;
     },
 
-    /***
-     *
+    /**
+     * retrieves props of the specificData JSON
+     * TODO FIXME: why is the data suffixed with the languge-resource type here ??
+     * @param string name
+     * @param string resourceType
+     * @returns {*|null}
      */
-    getSpecificDataByType: function (type) {
-        var data = Ext.JSON.decode(this.get('specificData'), true),
-            glossaryId = null;
-
-        if (!data) {
-            return glossaryId;
-        }
-
-        Ext.each(data, function (ob) {
-            if(ob.type === type){
-                return glossaryId = ob.value;
+    getSpecificDataByType: function (name, resourceType) {
+        var specificData = this.get('specificData'),
+            specificItems = specificData ? JSON.parse(specificData) : false;
+        if (specificItems && specificItems.length > 0) {
+            for (const item of specificItems) {
+                if(item.hasOwnProperty('type') && item.type === name + '_' + resourceType){
+                    return item.value;
+                }
             }
-        });
-
-        return glossaryId;
+        }
+        return null;
     },
 
     idProperty: 'id',
