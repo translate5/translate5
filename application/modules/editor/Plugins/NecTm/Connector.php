@@ -130,8 +130,8 @@ class editor_Plugins_NecTm_Connector extends editor_Services_Connector_Filebased
      * @param editor_Models_LanguageResources_LanguageResource $languageResource
      */
     protected function setLanguagesForNecTm($languageResource) {
-        $this->sourceLangForNecTm = $this->getLangCodeForNecTm($languageResource->sourceLangCode);
-        $this->targetLangForNecTm = $this->getLangCodeForNecTm($languageResource->targetLangCode);
+        $this->sourceLangForNecTm = $this->getLangCodeForNecTm($languageResource->getSourceLangCode());
+        $this->targetLangForNecTm = $this->getLangCodeForNecTm($languageResource->getTargetLangCode());
     }
     
     /**

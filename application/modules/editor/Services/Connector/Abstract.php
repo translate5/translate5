@@ -191,10 +191,6 @@ abstract class editor_Services_Connector_Abstract {
         $this->languageResource = $languageResource;
         $this->resultList->setLanguageResource($languageResource);
         $this->setServiceLanguages($sourceLang, $targetLang);
-        if($languageResource->getId() !== null){
-            $this->languageResource->sourceLangCode = $this->languageResource->getSourceLangCode();
-            $this->languageResource->targetLangCode = $this->languageResource->getTargetLangCode();
-        }
         $this->logger = $this->logger->cloneMe('editor.languageresource.'.strtolower($this->resource->getService()).'.connector');
     }
 

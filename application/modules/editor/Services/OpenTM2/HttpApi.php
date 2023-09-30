@@ -233,8 +233,8 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
         if($response->getStatus() === 200) {
             $this->result = $response->getBody();
             if($mime == "application/xml"){
-                $targetLang = $this->languageResource->targetLangCode;
-                $sourceLang = $this->languageResource->sourceLangCode;
+                $targetLang = $this->languageResource->getTargetLangCode();
+                $sourceLang = $this->languageResource->getSourceLangCode();
                 $this->result = $this->fixInvalidOpenTM2XML($this->fixLanguages->tmxOnDownload($sourceLang, $targetLang, $this->result));
             }
             return true;
@@ -311,8 +311,8 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
     public function lookup(editor_Models_Segment $segment, string $queryString, string $filename) {
         $json = new stdClass();
 
-        $json->sourceLang = $this->fixLanguages->key($this->languageResource->sourceLangCode);
-        $json->targetLang = $this->fixLanguages->key($this->languageResource->targetLangCode);
+        $json->sourceLang = $this->fixLanguages->key($this->languageResource->getSourceLangCode());
+        $json->targetLang = $this->fixLanguages->key($this->languageResource->getTargetLangCode());
         
         if($this->isToLong($queryString)) {
             $this->result = json_decode('{"ReturnValue":0,"ErrorMsg":"","NumOfFoundProposals":0}');

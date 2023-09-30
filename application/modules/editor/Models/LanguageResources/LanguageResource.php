@@ -79,40 +79,6 @@ class editor_Models_LanguageResources_LanguageResource extends ZfExtended_Models
         'localKey' => 'id',
         'searchField' => 'customerId'
     ]];
-    
-    
-    /***
-     * Source lang id helper property
-     * @var int|array
-     */
-    public $sourceLang;
-    
-    /***
-     * Target lang id helper property
-     * @var int|array
-     */
-    public $targetLang;
-    
-    /***
-     * Source language code value helper property
-     * TODO REMOVE
-     * @var String
-     */
-    public $sourceLangCode;
-
-    // TODO REMOVE
-    public ?string $sourceLangName;
-    
-    
-    /***
-     * Target lang code value helper property
-     * TODO REMOVE
-     * @var String
-     */
-    public $targetLangCode;
-
-    // TODO REMOVE
-    public ?string $targetLangName;
 
     /**
      * Caches the customers of a language-resource
@@ -121,6 +87,8 @@ class editor_Models_LanguageResources_LanguageResource extends ZfExtended_Models
     protected array $customers = [];
 
     private array $cachedLanguages;
+
+    private string $absoluteDataPath;
 
     /***
      * Init the language resource instance for given editor_Models_LanguageResources_Resource
@@ -486,8 +454,8 @@ class editor_Models_LanguageResources_LanguageResource extends ZfExtended_Models
     }
     
     /***
-     * TODO REMOVE: Why is here the case represented we have multiple rows ?
      * Load the exsisting langages for the initialized entity.
+     * HINT: there may be multiple rows (-> termcollection) !
      * @param string $fieldName : field which will be returned
      * @throws ZfExtended_ValidateException
      * @return mixed
@@ -715,6 +683,36 @@ class editor_Models_LanguageResources_LanguageResource extends ZfExtended_Models
             ZfExtended_Factory
                 ::get(CollectionAttributeDataType::class)
                 ->onTermCollectionInsert($this->getId());
+        }
+    }
+
+    /**
+     * Retrieves a path to store language-resource data
+     * @param bool $createDirIfNotExists: if set, the directory will be created if it does not exists
+     * @return string
+     * @throws Zend_Exception
+     */
+    public function getAbsoluteDataPath(bool $createDirIfNotExists): string
+    {
+        if(!isset($this->absoluteDataPath) || !str_ends_with($this->absoluteDataPath, strval($this->getId()))){
+            $config = Zend_Registry::get('config');
+            $this->absoluteDataPath =
+                $config->runtimeOptions->dir->languageResourceData
+                . DIRECTORY_SEPARATOR . $this->getId();
+        }
+        if($createDirIfNotExists && !is_dir($this->absoluteDataPath)){
+            mkdir($this->absoluteDataPath, 0777, true);
+        }
+        return $this->absoluteDataPath;
+    }
+
+    public function delete()
+    {
+        $dataPath = $this->getAbsoluteDataPath();
+        parent::delete();
+        // we delete the data after the entity to avoid deletion for entities that cannot be deleted
+        if(is_dir($dataPath)){
+            ZfExtended_Utils::recursiveDelete($dataPath);
         }
     }
 
