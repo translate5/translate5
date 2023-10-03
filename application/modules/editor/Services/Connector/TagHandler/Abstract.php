@@ -32,10 +32,14 @@ END LICENSE AND COPYRIGHT
  * @version 1.0
  *
  */
+
+use MittagQI\Translate5\Segment\ContentProtection\ContentProtector;
+
 /**
  * Abstract Tag Handler for internal tags in text to be send to language resources
  */
-abstract class editor_Services_Connector_TagHandler_Abstract {
+abstract class editor_Services_Connector_TagHandler_Abstract
+{
     
     /**
      * This parser is used to restore whitespace tags
@@ -60,8 +64,8 @@ abstract class editor_Services_Connector_TagHandler_Abstract {
      */
     protected $realTagCount = 0;
     
-    protected $highestTagShortCutNumber = 0;
-    protected $tagShortCutSpecialCharMap = [];
+    protected $highestShortcutNumber = 0;
+    protected $shortcutNumberMap = [];
     
     /**
      * @var editor_Models_Segment_UtilityBroker
@@ -84,21 +88,35 @@ abstract class editor_Services_Connector_TagHandler_Abstract {
      * @var ZfExtended_Logger_Queued
      */
     public $logger;
+
+    protected ContentProtector $contentProtector;
+
+    protected int $sourceLang = 0;
+    protected int $targetLang = 0;
     
     public function __construct() {
-        $this->xmlparser = ZfExtended_Factory::get('editor_Models_Import_FileParser_XmlParser');
-        $this->trackChange = ZfExtended_Factory::get('editor_Models_Segment_TrackChangeTag');
-        $this->utilities = ZfExtended_Factory::get('editor_Models_Segment_UtilityBroker');
+        $this->xmlparser = ZfExtended_Factory::get(editor_Models_Import_FileParser_XmlParser::class);
+        $this->trackChange = ZfExtended_Factory::get(editor_Models_Segment_TrackChangeTag::class);
+        $this->utilities = ZfExtended_Factory::get(editor_Models_Segment_UtilityBroker::class);
         
-        $this->logger = ZfExtended_Factory::get('ZfExtended_Logger_Queued');
+        $this->logger = ZfExtended_Factory::get(ZfExtended_Logger_Queued::class);
+
+        $this->contentProtector = ContentProtector::create($this->utilities->whitespace);
         
         //we have to use the XML parser to restore whitespace, otherwise protectWhitespace would destroy the tags
-        $this->xmlparser->registerOther(function($textNode, $key){
-            $textNode = $this->utilities->whitespace->protectWhitespace($textNode);
-            
+        $this->xmlparser->registerOther(function($textNode, $key) {
             //set shortTagIdent of the tagTrait to the next usable number if there are new tags
-            $this->shortTagIdent = $this->highestTagShortCutNumber + 1;
-            $textNode = $this->utilities->whitespace->convertToInternalTagsFromService($textNode, $this->shortTagIdent, $this->tagShortCutSpecialCharMap);
+            $this->shortTagIdent = $this->highestShortcutNumber + 1;
+            $textNode = $this->contentProtector->convertToInternalTagsWithShortcutNumberMap(
+                $this->contentProtector->protect(
+                    $textNode,
+                    $this->sourceLang,
+                    $this->targetLang,
+                    editor_Models_Segment_Whitespace::ENTITY_MODE_KEEP
+                ),
+                $this->shortTagIdent,
+                $this->shortcutNumberMap
+            );
             $this->xmlparser->replaceChunk($key, $textNode);
         });
     }
@@ -108,7 +126,7 @@ abstract class editor_Services_Connector_TagHandler_Abstract {
      * @param string $queryString
      * @return string
      */
-    abstract public function prepareQuery(string $queryString): string;
+    abstract public function prepareQuery(string $queryString, bool $isSource = true): string;
     
     /**
      * protects the internal tags for language resource processing as defined in the class
@@ -124,24 +142,33 @@ abstract class editor_Services_Connector_TagHandler_Abstract {
     public function hasRestoreErrors(): bool {
         return $this->hasRestoreErrors;
     }
-    
-    /**
-     * @param string $text
-     * @return string
-     */
-    protected function importWhitespaceFromTagLessQuery(string $text): string {
-        $wh = $this->utilities->whitespace;
-        $text = $wh->protectWhitespace($text, $wh::ENTITY_MODE_KEEP);
-        return $wh->convertToInternalTagsFromService($text, $this->shortTagIdent, $this->tagShortCutSpecialCharMap);
+
+    public function setLanguages(int $sourceLang, int $targetLang): void
+    {
+        $this->sourceLang = $sourceLang;
+        $this->targetLang = $targetLang;
     }
 
-    protected function restoreWhitespaceForQuery (string $queryString): string {
-        $this->highestTagShortCutNumber = 0;
-        $this->tagShortCutSpecialCharMap = [];
-        $qs = $this->trackChange->removeTrackChanges($queryString);
-        //restore the whitespaces to real characters
-        $qs = $this->utilities->internalTag->restore($qs, true, $this->highestTagShortCutNumber, $this->tagShortCutSpecialCharMap);
-        return $this->utilities->whitespace->unprotectWhitespace($qs);
+    protected function convertQueryContent(string $queryString, bool $isSource = true): string
+    {
+        $this->highestShortcutNumber = 0;
+        $this->shortcutNumberMap = [];
+
+        //restore the whitespaces and numbers to real characters
+        return $this->convertQuery(
+            $this->utilities->internalTag->restore(
+                $this->trackChange->removeTrackChanges($queryString),
+                $this->contentProtector->tagList(),
+                $this->highestShortcutNumber,
+                $this->shortcutNumberMap
+            ),
+            $isSource
+        );
+    }
+
+    protected function convertQuery(string $queryString, bool $isSource): string
+    {
+        return $this->contentProtector->unprotect($queryString);
     }
     
     /**

@@ -68,9 +68,21 @@ class FloatObject
 
         $regSymbol = '.' === $decimalSeparator ? '\\' . $decimalSeparator : $decimalSeparator;
 
-        $number = str_replace($decimalSeparator, '.', preg_replace("/[^\d$regSymbol]/u", '', $float));
+        $number = preg_replace("/[^\d$regSymbol]/u", '', $float);
 
-        return new self($formater->parse($number), (int) strpos(strrev($number), '.'));
+        if (null === $sourceLocale) {
+            $number = str_replace($decimalSeparator, '.', $number);
+        }
+
+        $float = $formater->parse($number);
+
+        if (false === $float) {
+            $formater = numfmt_create('en', NumberFormatter::DECIMAL);
+            $number = str_replace($decimalSeparator, '.', $number);
+            $float = $formater->parse($number);
+        }
+
+        return new self($float, (int) strpos(strrev($number), $sourceLocale ? $decimalSeparator : '.'));
     }
 
     public function format(string $locale = 'en', ?string $format = null): string

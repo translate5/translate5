@@ -60,13 +60,24 @@ class FloatObjectTest extends TestCase
     /**
      * @dataProvider parseProvider
      */
-    public function testParse(string $float, FloatObject $object): void
+    public function testParse(string $float, FloatObject $object, string $locale = null): void
     {
-        self::assertEquals($object, FloatObject::parse($float));
+        self::assertEquals($object, FloatObject::parse($float, $locale));
     }
 
     public function parseProvider(): iterable
     {
+        yield [
+            'float' => '123.456,789',
+            'object' => new FloatObject(123456.789, 3),
+            'locale' => 'de',
+        ];
+        yield [
+            'float' => '123 456.789',
+            'object' => new FloatObject(123456.789, 3),
+            'locale' => 'de',
+        ];
+
         #region #,#.#
         yield [
             'float' => '567.078',

@@ -1232,6 +1232,9 @@ div.internal-tag.number span.full::after {
     padding-top: 3px;
 }
 
+.target div.internal-tag.number .full::after {
+    content: attr(data-target);
+}
 .type-target div.internal-tag.number .full::after {
     content: attr(data-target);
 }

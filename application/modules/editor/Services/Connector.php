@@ -26,6 +26,9 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use editor_Models_Segment_Whitespace as Whitespace;
+use editor_Models_Segment_UtilityBroker as UtilityBroker;
+use MittagQI\Translate5\Segment\ContentProtection\ContentProtector;
 use MittagQI\Translate5\Segment\TagRepair\HtmlProcessor;
 
 /**
@@ -83,6 +86,12 @@ class editor_Services_Connector
      * @var boolean
      */
     protected $batchEnabled = false;
+
+    private ContentProtector $contentProtector;
+    public function __construct()
+    {
+        $this->contentProtector = ContentProtector::create(ZfExtended_Factory::get(Whitespace::class));
+    }
 
     /**
      * @param editor_Models_LanguageResources_LanguageResource $languageResource
@@ -219,33 +228,33 @@ class editor_Services_Connector
         }
         return $serviceResult;
     }
+
     /**
      * Protect markup with whitespace & tags to internal tags
      * this simplifies but still copies the logic of editor_Models_Import_FileParser_Csv::parseSegment
-     * @param string $markup
-     * @param editor_Models_Segment_UtilityBroker $utilities
-     * @return string
      */
-    private function convertMarkupToInternalTags(string $markup, editor_Models_Segment_UtilityBroker $utilities) : string {
+    private function convertMarkupToInternalTags(string $markup, UtilityBroker $utilities) : string
+    {
         $shortTagIdent = 1;
-        $markup = $utilities->tagProtection->protectTags($markup, false);
-        $markup = $utilities->whitespace->convertToInternalTags($markup, $shortTagIdent);
-        $markup = $utilities->whitespace->protectWhitespace($markup, $utilities->whitespace::ENTITY_MODE_OFF);
-        $markup = $utilities->whitespace->convertToInternalTags($markup, $shortTagIdent);
-        return $markup;
+
+        return $this->contentProtector->protectAndConvert(
+            $utilities->tagProtection->protectTags($markup, false),
+            $this->adapter->getSourceLang(),
+            $this->adapter->getTargetLang(),
+            $shortTagIdent,
+            Whitespace::ENTITY_MODE_OFF
+        );
     }
+
     /**
      * Revert markup with whitespace encoded to internal tags to it's original format
      * this simplifies but still copies the logic of editor_Models_Export_FileParser::exportSingleSegmentContent
-     * @param string $textWithTags
-     * @param editor_Models_Segment_UtilityBroker $utilities
-     * @return string
      */
-    private function convertInternalTagsToMarkup(string $textWithTags, editor_Models_Segment_UtilityBroker $utilities) : string {
-        $textWithTags = $utilities->internalTag->restore($textWithTags);
-        $textWithTags =  $utilities->whitespace->unprotectWhitespace($textWithTags);
-        return $textWithTags;
+    private function convertInternalTagsToMarkup(string $textWithTags, UtilityBroker $utilities) : string
+    {
+        return $this->contentProtector->unprotect($utilities->internalTag->restore($textWithTags));
     }
+
     /***
      * This magic method is invoked each time a nonexistent method is called on the object.
      * If the function exist in the adapter it will be called there.

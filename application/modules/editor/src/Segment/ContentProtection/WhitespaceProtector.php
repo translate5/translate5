@@ -52,23 +52,20 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\Segment\ContentProtection;
 
-use editor_Models_Segment_Whitespace;
+use editor_Models_Segment_Whitespace as Whitespace;
 
 class WhitespaceProtector implements ProtectorInterface
 {
-    private const TAG_REGEX = '/(<\w+ .+>|<\/\w+>)/u';
+    private const TAG_REGEX = '/(<\w+ .+>|<\/\w+>|<\w+\s?.+\/>)/Uu';
+    private array $numberWhitespaces = ['e28089', 'e280af']; // THSP and NNBSP
 
-    public function __construct(private editor_Models_Segment_Whitespace $whitespace)
+    public function __construct(private Whitespace $whitespace, private bool $withoutNumberWhitespaces = false)
     {
     }
 
-    public static function withoutNumberWhitespaces(editor_Models_Segment_Whitespace $whitespace): self
+    public static function alias(): string
     {
-        // THSP and NNBSP
-        $ws = clone $whitespace;
-        $ws->setExcludedCharacters('e28089', 'e280af');
-
-        return new self($ws);
+        return 'whitespace';
     }
 
     public function priority(): int
@@ -91,8 +88,9 @@ class WhitespaceProtector implements ProtectorInterface
      */
     public function protect(string $textNode, ?int $sourceLangId, ?int $targetLangId): string
     {
+        $excludedCharacters = $this->withoutNumberWhitespaces ? $this->numberWhitespaces : [];
         if (!preg_match_all(self::TAG_REGEX, $textNode, $matches)) {
-            return $this->whitespace->protectWhitespace($textNode);
+            return $this->whitespace->protectWhitespace($textNode, Whitespace::ENTITY_MODE_OFF, $excludedCharacters);
         }
 
         $tags = $matches[0];
@@ -103,7 +101,11 @@ class WhitespaceProtector implements ProtectorInterface
 
         for ($i = 0; $i <= $tagCount; $i++) {
             if (!empty($parts[$i])) {
-                $protected .= $this->whitespace->protectWhitespace($parts[$i]);
+                $protected .= $this->whitespace->protectWhitespace(
+                    $parts[$i],
+                    Whitespace::ENTITY_MODE_OFF,
+                    $excludedCharacters
+                );
             }
 
             if (!isset($tags[$i])) {
@@ -119,6 +121,11 @@ class WhitespaceProtector implements ProtectorInterface
     public function unprotect(string $content): string
     {
         return $this->whitespace->unprotectWhitespace($content);
+    }
+
+    public function convertForSorting(string $content): string
+    {
+        return $this->whitespace->convertForStripping($content);
     }
 
     /**
@@ -138,5 +145,18 @@ class WhitespaceProtector implements ProtectorInterface
         $this->whitespace->convertToInternalTags($segment, $shortTagIdent, $xmlChunks);
 
         return $xmlChunks;
+    }
+
+    public function convertToInternalTagsWithShortcutNumberMap(
+        string $segment,
+        int &$shortTagIdent,
+        array $shortcutNumberMap
+    ): string {
+        return $this->whitespace->convertToInternalTagsFromService($segment, $shortTagIdent, $shortcutNumberMap);
+    }
+
+    public function tagList(): array
+    {
+        return Whitespace::WHITESPACE_TAGS;
     }
 }

@@ -32,6 +32,8 @@ END LICENSE AND COPYRIGHT
  * @version 1.0
  */
 
+use editor_Models_Segment_InternalTag as InternalTag;
+
 /**
  * Fileparsing for Csv-files
  *
@@ -81,12 +83,6 @@ class editor_Models_Import_FileParser_Csv extends editor_Models_Import_FileParse
      * @var array
      */
     protected $replaceRegularExpressionsAfterTagParsing = array();
-
-    /**
-     *
-     * @var string regex describing the structure of translate5 internal tags
-     */
-    protected string $regexInternalTags = editor_Models_Segment_InternalTag::REGEX_INTERNAL_TAGS;
 
     /**
      * (non-PHPdoc)
@@ -375,8 +371,8 @@ class editor_Models_Import_FileParser_Csv extends editor_Models_Import_FileParse
             $segment = $this->utilities->tagProtection->protectTags($segment, false);
             
             //now we have to protect thw so protected tags with the internal char based replacers
-            $segment = $this->utilities->whitespace->convertToInternalTags($segment, $this->shortTagIdent);
-            $segment = $this->parseSegmentInsertPlaceholders($segment, $this->regexInternalTags);
+            $segment = $this->contentProtector->convertToInternalTags($segment, $this->shortTagIdent);
+            $segment = $this->parseSegmentInsertPlaceholders($segment, InternalTag::REGEX_INTERNAL_TAGS);
         }
         
         // protect regExes after tag parsing
@@ -392,7 +388,7 @@ class editor_Models_Import_FileParser_Csv extends editor_Models_Import_FileParse
             editor_Models_Segment_Whitespace::ENTITY_MODE_KEEP
         );
 
-        $segment = $this->parseSegmentInsertPlaceholders($segment,$this->regexInternalTags);
+        $segment = $this->parseSegmentInsertPlaceholders($segment, InternalTag::REGEX_INTERNAL_TAGS);
         
         return $this->parseSegmentReplacePlaceholders($segment);
     }
@@ -416,15 +412,15 @@ class editor_Models_Import_FileParser_Csv extends editor_Models_Import_FileParse
             }
             $tagObj = new editor_Models_Import_FileParser_Tag(editor_Models_Import_FileParser_Tag::TYPE_SINGLE, false);
             $tagObj->originalContent = $tag;
-            $tagObj->tagNr = $this->shortTagIdent++;;
-            $tagObj->id = editor_Models_Segment_InternalTag::TYPE_REGEX;
+            $tagObj->tagNr = $this->shortTagIdent++;
+            $tagObj->id = InternalTag::TYPE_REGEX;
             $tagObj->text = $this->encodeTagsForDisplay($tag);
             return $tagObj->renderTag();
         };
         foreach ($regexToUse as $regEx) {
             $text = preg_replace_callback($regEx, $mask, $text);
         }
-        return $this->parseSegmentInsertPlaceholders($text,$this->regexInternalTags);
+        return $this->parseSegmentInsertPlaceholders($text, InternalTag::REGEX_INTERNAL_TAGS);
     }
     
     /**

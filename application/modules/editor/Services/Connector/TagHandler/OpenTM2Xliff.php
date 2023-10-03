@@ -32,6 +32,7 @@ END LICENSE AND COPYRIGHT
  * @version 1.0
  *
  */
+
 /**
  * protects the translate5 internal tags as XLIFF for language resource processing,
  * - for OpenTM2 communication we convert line breaks to <ph type="lb"/> tags for better matching
@@ -40,29 +41,37 @@ END LICENSE AND COPYRIGHT
  *   It seems that a <x id="123"/> here does not match an <it type="struct"/> tag in the imported TMX,
  *   a <x mid="123"/> instead does match the it tag (same for bx and ex tags).
  */
-class editor_Services_Connector_TagHandler_OpenTM2Xliff extends editor_Services_Connector_TagHandler_Xliff {
+class editor_Services_Connector_TagHandler_OpenTM2Xliff extends editor_Services_Connector_TagHandler_Xliff
+{
 
     /**
      * {@inheritDoc}
      * @see editor_Services_Connector_TagHandler_Xliff::prepareQuery()
      */
-    public function prepareQuery(string $queryString): string {
+    public function prepareQuery(string $queryString, bool $isSource = true): string
+    {
         $queryString = parent::prepareQuery($queryString);
-        $queryString = str_replace(['<x id="','<ex id="','<bx id="'], ['<x mid="','<ex mid="','<bx mid="'], $queryString);
-        return str_replace(["\r\n","\n","\r"], '<ph type="lb"/>', $queryString);
+        $queryString = str_replace(
+            ['<x id="', '<ex id="', '<bx id="'],
+            ['<x mid="', '<ex mid="', '<bx mid="'],
+            $queryString
+        );
+
+        return str_replace(["\r\n", "\n", "\r"], '<ph type="lb"/>', $queryString);
     }
-    
+
     /**
      * {@inheritDoc}
      * @see editor_Services_Connector_TagHandler_Xliff::restoreInResult()
      */
-    public function restoreInResult(string $resultString): ?string {
+    public function restoreInResult(string $resultString): ?string
+    {
         return parent::restoreInResult(str_replace([
             '<x mid="',
             '<bx mid="',
             '<ex mid="',
             '<ph type="lb"/>',
             '<ph type="lb" />'
-        ], ['<x id="','<bx id="','<ex id="', "\n","\n"], $resultString));
+        ], ['<x id="', '<bx id="', '<ex id="', "\n", "\n"], $resultString));
     }
 }

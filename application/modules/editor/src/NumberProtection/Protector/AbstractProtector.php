@@ -68,7 +68,11 @@ abstract class AbstractProtector implements NumberProtectorInterface
 
     protected function tagFormat(): string
     {
-        return '<' . NumberProtector::TAG_NAME . ' type="%s" name="%s" source="%s" iso="%s" target="%s" />';
+        return str_replace(
+            ':tag',
+            NumberProtector::TAG_NAME,
+            '<:tag type="%s" name="%s" source="%s" iso="%s" target="%s"/>'
+        );
     }
 
     /**

@@ -41,11 +41,11 @@ class editor_Services_Connector_TagHandler_Remover extends editor_Services_Conne
      * @param string $queryString
      * @return string
      */
-    public function prepareQuery(string $queryString): string {
+    public function prepareQuery(string $queryString, bool $isSource = true): string {
         $this->realTagCount = 0;
         
         //1. whitespace preparation
-        $queryString = $this->restoreWhitespaceForQuery($queryString);
+        $queryString = $this->convertQueryContent($queryString);
         
         //2. strip all tags and set real tag count
         return strip_tags($this->utilities->internalTag->replace($queryString, '', -1, $this->realTagCount));
@@ -58,5 +58,22 @@ class editor_Services_Connector_TagHandler_Remover extends editor_Services_Conne
      */
     public function restoreInResult(string $resultString): string {
         return $this->importWhitespaceFromTagLessQuery($resultString);
+    }
+
+    /**
+     * @param string $text
+     * @return string
+     */
+    protected function importWhitespaceFromTagLessQuery(string $text): string {
+        return $this->contentProtector->convertToInternalTagsWithShortcutNumberMap(
+            $this->contentProtector->protect(
+                $text,
+                $this->sourceLang,
+                $this->targetLang,
+                editor_Models_Segment_Whitespace::ENTITY_MODE_KEEP
+            ),
+            $this->shortTagIdent,
+            $this->shortcutNumberMap
+        );
     }
 }

@@ -152,8 +152,6 @@ class editor_Models_Segment_Whitespace {
         '/\x{FEFF}/u' => ['ts' => 'efbbbf', 'text' => '[BOM]', 'title' => 'Zero Width No-Break Space (BOM, ZWNBSP)'],
     ];
 
-    private array $excludedCharacters = [];
-
     /**
      * short tag incrementor, initialized from outside
      * @var int
@@ -180,18 +178,17 @@ class editor_Models_Segment_Whitespace {
         $this->protectedCharLabels = array_combine(array_column($labeledCharacters, 'ts'), $labeledCharacters);
     }
 
-    public function setExcludedCharacters(string ...$charTs): void
-    {
-        $this->excludedCharacters = $charTs;
-    }
-
     /**
      * protects all whitespace and special characters coming from the import formats
      * WARNING: should be called only on plain text fragments without tags!
      * @param string $textNode should not contain tags, since special characters in the tag content would also be protected then
      * @param string $entityHandling defaults to ENTITY_MODE_RESTORE, decides how XML Entities are encoded, see inline comments
      */
-    public function protectWhitespace($textNode, $entityHandling = self::ENTITY_MODE_RESTORE) {
+    public function protectWhitespace(
+        string $textNode,
+        string $entityHandling = self::ENTITY_MODE_RESTORE,
+        array $excludedCharacters = []
+    ): string {
         //definition how entities are handled:
         if ($entityHandling != self::ENTITY_MODE_OFF) {
             $textNode = editor_Models_Segment_Utility::entityCleanup($textNode, $entityHandling == self::ENTITY_MODE_RESTORE);
@@ -228,21 +225,21 @@ class editor_Models_Segment_Whitespace {
             }, $textNode);
         }
 
-        return preg_replace_callback($this->getProtectedCharactersRegexes(), function ($match) {
+        return preg_replace_callback($this->getProtectedCharactersRegexes($excludedCharacters), function ($match) {
             //always one single character is masked, so length = 1
             return $this->maskSpecialContent('char', $match[0], 1);
         }, $textNode);
     }
 
-    private function getProtectedCharactersRegexes(): array
+    private function getProtectedCharactersRegexes(array $excludedCharacters): array
     {
-        if (empty($this->excludedCharacters)) {
+        if (empty($excludedCharacters)) {
             return array_keys(self::PROTECTED_CHARACTERS);
         }
 
         $regexList = [];
         foreach (self::PROTECTED_CHARACTERS as $regex => $setting) {
-            if (isset($setting['ts']) && !in_array($setting['ts'], $this->excludedCharacters, true)) {
+            if (isset($setting['ts']) && !in_array($setting['ts'], $excludedCharacters, true)) {
                 $regexList[] = $regex;
             }
         }

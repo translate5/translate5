@@ -53,12 +53,10 @@ declare(strict_types=1);
 namespace MittagQI\Translate5\Test\Functional\Segment\ContentProtection;
 
 use editor_Models_Import_FileParser_WhitespaceTag;
-use editor_Models_Segment_Whitespace;
+use editor_Models_Segment_Whitespace as Whitespace;
 use editor_Test_UnitTest;
-use MittagQI\Translate5\NumberProtection\NumberProtector;
 use MittagQI\Translate5\NumberProtection\Tag\NumberTag;
 use MittagQI\Translate5\Segment\ContentProtection\ContentProtector;
-use MittagQI\Translate5\Segment\ContentProtection\WhitespaceProtector;
 
 class ContentProtectorTest extends editor_Test_UnitTest
 {
@@ -67,7 +65,7 @@ class ContentProtectorTest extends editor_Test_UnitTest
      */
     public function testProtect(string $node, string $expected): void
     {
-        $contentProtector = ContentProtector::create(new editor_Models_Segment_Whitespace());
+        $contentProtector = ContentProtector::create(new Whitespace());
 
         self::assertEquals($expected, $contentProtector->protect($node, null, null));
     }
@@ -77,7 +75,7 @@ class ContentProtectorTest extends editor_Test_UnitTest
      */
     public function testUnprotect(string $expected, string $node, bool $runTest = true): void
     {
-        $contentProtector = ContentProtector::create(new editor_Models_Segment_Whitespace());
+        $contentProtector = ContentProtector::create(new Whitespace());
 
         if (!$runTest) {
             // Test case designed for `protect` test only
@@ -99,6 +97,11 @@ class ContentProtectorTest extends editor_Test_UnitTest
             'text' => 'string [] 1 234 [] string',
             'expected' => 'string [<char ts="03" length="1"/>] <number type="integer" name="default generic with not standard separator" source="1 234" iso="1234" target=""/> [<char ts="08" length="1"/>] string'
         ];
+
+        yield 'float in the beginning' => [
+            'text' => '123,456.789 Übersetzungsbüro [ ] 24translate 2023-09-15 and 2024-10-19',
+            'expected' => '<number type="float" name="default with comma thousand decimal dot" source="123,456.789" iso="123456.789" target=""/> Übersetzungsbüro [<char ts="c2a0" length="1"/>] 24translate <number type="date" name="default Y-m-d" source="2023-09-15" iso="2023-09-15" target=""/> and <number type="date" name="default Y-m-d" source="2024-10-19" iso="2024-10-19" target=""/>',
+        ];
     }
 
     /**
@@ -107,9 +110,12 @@ class ContentProtectorTest extends editor_Test_UnitTest
     public function testProtectAndConvert(string $segment, string $converted, int $finalTagIdent): void
     {
         $shortTagIdent = 1;
-        $contentProtector = ContentProtector::create(new editor_Models_Segment_Whitespace());
+        $contentProtector = ContentProtector::create(new Whitespace());
 
-        self::assertSame($converted, $contentProtector->protectAndConvert($segment, null, null, $shortTagIdent));
+        self::assertSame(
+            $converted,
+            $contentProtector->protectAndConvert($segment, null, null, $shortTagIdent, Whitespace::ENTITY_MODE_OFF)
+        );
         self::assertSame($finalTagIdent, $shortTagIdent);
     }
 
@@ -132,6 +138,21 @@ class ContentProtectorTest extends editor_Test_UnitTest
             'converted' => "string [$convertedNbsp] string $convertedNumber string",
             'finalTagIdent' => 3,
         ];
+
+        yield [
+            'segment' => "string <some-tag>[$nbsp]</some-tag> string <other-tag>$number</other-tag> string",
+            'converted' => "string <some-tag>[$convertedNbsp]</some-tag> string <other-tag>$convertedNumber</other-tag> string",
+            'finalTagIdent' => 3,
+        ];
+
+        $numberIdentOne = '20231020';
+        $convertedNumberIdentOne = '<div class="single 6e756d62657220747970653d226461746522206e616d653d2264656661756c7420596d642220736f757263653d223230323331303230222069736f3d22323032332d31302d323022207461726765743d22222f number internal-tag ownttip"><span title="&lt;1/&gt;: Number" class="short">&lt;1/&gt;</span><span data-originalid="number" data-length="-1" data-source="20231020" data-target="" class="full"></span></div>';
+
+        yield [
+            'segment' => "$numberIdentOne string $number",
+            'converted' => "$convertedNumberIdentOne string $convertedNumber",
+            'finalTagIdent' => 3,
+        ];
     }
 
     /**
@@ -140,7 +161,7 @@ class ContentProtectorTest extends editor_Test_UnitTest
     public function testConvertToInternalTags(string $segment, string $converted, int $finalTagIdent): void
     {
         $shortTagIdent = 1;
-        $contentProtector = ContentProtector::create(new editor_Models_Segment_Whitespace());
+        $contentProtector = ContentProtector::create(new Whitespace());
 
         self::assertSame($converted, $contentProtector->convertToInternalTags($segment, $shortTagIdent));
         self::assertSame($finalTagIdent, $shortTagIdent);
@@ -148,6 +169,15 @@ class ContentProtectorTest extends editor_Test_UnitTest
 
     public function internalTagsProvider(): iterable
     {
+        $tagN = '<number type="date" name="default" source="20231020" iso="2023-10-20" target="2023-10-20"/>';
+        $convertedN = '<div class="single 6e756d62657220747970653d226461746522206e616d653d2264656661756c742220736f757263653d223230323331303230222069736f3d22323032332d31302d323022207461726765743d22323032332d31302d3230222f number internal-tag ownttip"><span title="&lt;1/&gt;: Number" class="short">&lt;1/&gt;</span><span data-originalid="number" data-length="-1" data-source="20231020" data-target="2023-10-20" class="full"></span></div>';
+
+        yield [
+            'segment' => "$tagN string",
+            'converted' => "$convertedN string",
+            'finalTagIdent' => 2,
+        ];
+
         $tag1 = '<hardReturn/>';
         $converted1 = '<div class="single 6861726452657475726e2f newline internal-tag ownttip"><span title="&lt;1/&gt;: Newline" class="short">&lt;1/&gt;</span><span data-originalid="hardReturn" data-length="1" class="full">↵</span></div>';
 
@@ -182,7 +212,7 @@ class ContentProtectorTest extends editor_Test_UnitTest
     public function testConvertToInternalTagsInChunks(string $segment, array $xmlChunks, int $finalTagIdent): void
     {
         $shortTagIdent = 1;
-        $contentProtector = ContentProtector::create(new editor_Models_Segment_Whitespace());
+        $contentProtector = ContentProtector::create(new Whitespace());
 
         self::assertEquals($xmlChunks, $contentProtector->convertToInternalTagsInChunks($segment, $shortTagIdent));
         self::assertSame($finalTagIdent, $shortTagIdent);
@@ -204,6 +234,12 @@ class ContentProtectorTest extends editor_Test_UnitTest
         yield [
             'segment' => "string $tag1 string",
             'xmlChunks' => ['string ', $parsedTag1, ' string'],
+            'finalTagIdent' => 2,
+        ];
+
+        yield [
+            'segment' => "$tag1 string",
+            'xmlChunks' => [$parsedTag1, ' string'],
             'finalTagIdent' => 2,
         ];
 

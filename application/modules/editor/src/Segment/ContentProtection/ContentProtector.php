@@ -68,7 +68,7 @@ class ContentProtector
     public static function create(Whitespace $whitespace): self
     {
         return new self([
-            WhitespaceProtector::withoutNumberWhitespaces($whitespace),
+            new WhitespaceProtector($whitespace, true),
             NumberProtector::create(),
             new WhitespaceProtector($whitespace)
         ]);
@@ -80,6 +80,10 @@ class ContentProtector
         ?int $targetLang,
         string $entityHandling = Whitespace::ENTITY_MODE_RESTORE
     ): string {
+        if (0 === strpos($text, 'translate5-unique-id')) {
+            return $text;
+        }
+
         if ($entityHandling !== Whitespace::ENTITY_MODE_OFF) {
             $text = SegmentUtility::entityCleanup($text, $entityHandling === Whitespace::ENTITY_MODE_RESTORE);
         }
@@ -93,10 +97,34 @@ class ContentProtector
         return $text;
     }
 
-    public function unprotect(string $text): string
+    public function tagList(): array
+    {
+        $tags = [];
+
+        foreach ($this->protectors as $protector) {
+            $tags[] = $protector->tagList();
+        }
+
+        return array_unique(array_merge(...$tags));
+    }
+
+    public function unprotect(string $text, string ...$exceptProtectors): string
     {
         foreach ($this->protectors as $protector) {
+            if (in_array($protector::alias(), $exceptProtectors, true)) {
+                continue;
+            }
+
             $text = $protector->unprotect($text);
+        }
+
+        return $text;
+    }
+
+    public function convertForSorting(string $text): string
+    {
+        foreach ($this->protectors as $protector) {
+            $text = $protector->convertForSorting($text);
         }
 
         return $text;
@@ -121,6 +149,24 @@ class ContentProtector
         foreach ($this->protectors as $protector) {
             if ($protector->hasTagsToConvert($segment)) {
                 $segment = $protector->convertToInternalTags($segment, $shortTagIdent);
+            }
+        }
+
+        return $segment;
+    }
+
+    public function convertToInternalTagsWithShortcutNumberMap(
+        string $segment,
+        int &$shortTagIdent,
+        array $shortcutNumberMap
+    ): string {
+        foreach ($this->protectors as $protector) {
+            if ($protector->hasTagsToConvert($segment)) {
+                $segment = $protector->convertToInternalTagsWithShortcutNumberMap(
+                    $segment,
+                    $shortTagIdent,
+                    $shortcutNumberMap
+                );
             }
         }
 

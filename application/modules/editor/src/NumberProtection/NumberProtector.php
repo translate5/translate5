@@ -61,6 +61,7 @@ use editor_Models_Import_FileParser_XmlParser as XmlParser;
 use editor_Models_Languages;
 use MittagQI\Translate5\NumberProtection\Model\NumberFormatRepository;
 use MittagQI\Translate5\NumberProtection\Model\NumberFormatDto;
+use MittagQI\Translate5\NumberProtection\Protector\AbstractProtector;
 use MittagQI\Translate5\NumberProtection\Protector\DateProtector;
 use MittagQI\Translate5\NumberProtection\Protector\FloatProtector;
 use MittagQI\Translate5\NumberProtection\Protector\IntegerProtector;
@@ -95,6 +96,19 @@ class NumberProtector implements ProtectorInterface
         foreach ($protectors as $protector) {
             $this->protectors[$protector::getType()] = $protector;
         }
+    }
+
+    public static function alias(): string
+    {
+        return self::TAG_NAME;
+    }
+
+    public static function fullTagRegex(): string
+    {
+        return sprintf(
+            '/<%s type="(.+)" name="(.+)" source="(.+)" iso="(.+)" target="(.+)"\s?\/>/U',
+            self::TAG_NAME
+        );
     }
 
     public static function create(): self
@@ -134,26 +148,33 @@ class NumberProtector implements ProtectorInterface
         return str_contains($textNode, '<' . self::TAG_NAME . ' ');
     }
 
+    public function tagList(): array
+    {
+        return [self::TAG_NAME];
+    }
+
     /**
      * {@inheritDoc}
      */
-    public function convertToInternalTags(string $segment, int &$shortTagIdent, array &$xmlChunks = []): string
-    {
+    public function convertToInternalTags(
+        string $segment,
+        int &$shortTagIdent,
+        array &$xmlChunks = [],
+        array $shortcutNumberMap = []
+    ): string {
         $xml = ZfExtended_Factory::get(XmlParser::class, [['normalizeTags' => false]]);
-        error_log($segment);
         $xml->registerElement(
             self::TAG_NAME,
             null,
-            function ($tagName, $key, $opener) use ($xml, &$shortTagIdent) {
+            function ($tagName, $key, $opener) use ($xml, &$shortTagIdent, $shortcutNumberMap) {
                 $xml->replaceChunk(
                     $key,
-                    $this->handleNumberTags($xml, $tagName, $key, $opener, $shortTagIdent)
+                    $this->handleNumberTags($xml, $key, $opener, $shortTagIdent, $shortcutNumberMap)
                 );
             }
         );
 
         $result = $xml->parse($segment, true, [self::TAG_NAME]);
-        error_log($result);
         $xmlChunks = $xml->getAllChunks();
 
         return $result;
@@ -167,6 +188,14 @@ class NumberProtector implements ProtectorInterface
         return $xmlChunks;
     }
 
+    public function convertToInternalTagsWithShortcutNumberMap(
+        string $segment,
+        int &$shortTagIdent,
+        array $shortcutNumberMap
+    ): string {
+        return $this->convertToInternalTags($segment, $shortTagIdent, shortcutNumberMap: $shortcutNumberMap);
+    }
+
     public function protect(string $textNode, ?int $sourceLangId, ?int $targetLangId): string
     {
         // Reset document else it will be compromised between method calls
@@ -175,6 +204,10 @@ class NumberProtector implements ProtectorInterface
         $targetLang = $targetLangId ? $this->languageRepository->find($targetLangId) : null;
 
         $this->loadXML("<node>$textNode</node>");
+
+        if (!$this->hasEntityToProtect($this->document->textContent)) {
+            return $textNode;
+        }
 
         foreach ($this->numberFormatRepository->getAll($sourceLang) as $langFormat) {
             if (!preg_match($langFormat->regex, $this->document->textContent)) {
@@ -202,27 +235,39 @@ class NumberProtector implements ProtectorInterface
         );
     }
 
+    public function convertForSorting(string $content): string
+    {
+        return $this->unprotect($content);
+    }
+
     private function handleNumberTags(
         XmlParser $xml,
-        string $tagName,
         int $key,
         array $opener,
-        int &$shortTagIdent
+        int &$shortTagIdent,
+        array $shortcutNumberMap = []
     ): NumberTag {
-        error_log(print_r($opener, true));
         $source = $xml->getAttribute($opener['attributes'], 'source', null);
         $target = $xml->getAttribute($opener['attributes'], 'target', null);
 
+        $wholeTag = $xml->getChunk($key);
+        $shortTagNumber = $shortTagIdent;
+
+        //either we get a reusable shortcut number in the map, or we have to increment one
+        if (!empty($shortcutNumberMap) && !empty($shortcutNumberMap[$wholeTag])) {
+            $shortTagNumber = array_shift($shortcutNumberMap[$wholeTag]);
+        } else {
+            $shortTagIdent++;
+        }
+
         $tagObj = new NumberTag();
-        $tagObj->originalContent = $xml->getChunk($key);
-        $tagObj->tagNr = $shortTagIdent;
-        $tagObj->id = $tagName;
-        $tagObj->tag = $tagName;
+        $tagObj->originalContent = $wholeTag;
+        $tagObj->tagNr = $shortTagNumber;
+        $tagObj->id = self::TAG_NAME;
+        $tagObj->tag = self::TAG_NAME;
         $tagObj->text = json_encode(['source' => $source, 'target' => $target]);
         //title: Only translatable with using ExtJS QTips in the frontend, as title attribute not possible
-        $tagObj->renderTag(title:  '&lt;' . $shortTagIdent . '/&gt;: Number', cls: ' ' . self::TAG_NAME);
-
-        $shortTagIdent++;
+        $tagObj->renderTag(title:  '&lt;' . $shortTagNumber . '/&gt;: Number', cls: ' ' . self::TAG_NAME);
 
         return $tagObj;
     }

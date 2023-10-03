@@ -93,6 +93,14 @@ class NumberFormatRepository
         }
     }
 
+    public function getNumberRecognition(string $type, string $name): NumberRecognition
+    {
+        $numberRecognition = ZfExtended_Factory::get(NumberRecognition::class);
+        $numberRecognition->loadBy($type, $name);
+
+        return $numberRecognition;
+    }
+
     public function findOutputFormat(
         editor_Models_Languages $targetLang,
         string $type,

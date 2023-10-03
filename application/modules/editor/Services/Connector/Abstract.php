@@ -179,6 +179,16 @@ abstract class editor_Services_Connector_Abstract {
     protected function log($method, $msg = '') {
         //error_log($method." LanguageResource ".$this->languageResource->getName().' - '.$this->languageResource->getServiceName().$msg);
     }
+
+    public function getSourceLang(): int
+    {
+        return $this->sourceLang;
+    }
+
+    public function getTargetLang(): int
+    {
+        return $this->targetLang;
+    }
     
     /**
      * Link this Connector Instance to the given LanguageResource and its resource, in the given language combination
@@ -195,7 +205,10 @@ abstract class editor_Services_Connector_Abstract {
             $this->languageResource->sourceLangCode = $this->languageResource->getSourceLangCode();
             $this->languageResource->targetLangCode = $this->languageResource->getTargetLangCode();
         }
-        $this->logger = $this->logger->cloneMe('editor.languageresource.'.strtolower($this->resource->getService()).'.connector');
+        $this->tagHandler->setLanguages((int) $sourceLang, (int) $targetLang);
+        $this->logger = $this->logger->cloneMe(
+            'editor.languageresource.'.strtolower($this->resource->getService()).'.connector'
+        );
     }
 
     /**

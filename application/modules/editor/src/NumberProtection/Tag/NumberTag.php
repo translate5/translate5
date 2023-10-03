@@ -72,4 +72,9 @@ class NumberTag extends editor_Models_Import_FileParser_Tag
     {
         parent::__construct($type, $xmlTags);
     }
+
+    public function isSingle(): bool
+    {
+        return true;
+    }
 }

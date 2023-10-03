@@ -26,6 +26,8 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\Segment\ContentProtection\ContentProtector;
+
 /**
  * Count the word in segment text
  */
@@ -78,16 +80,6 @@ class editor_Models_Segment_WordCount {
      */
     protected $rfcLanguage;
     
-       /**
-     * @var editor_Models_Segment_InternalTag
-     */
-    protected $internalTag;
-    
-    /**
-     * @var editor_Models_Segment_Whitespace
-     */
-    protected $whitespaceHelper;
-    
     /***
      * The segment query string
      * @var string
@@ -105,14 +97,20 @@ class editor_Models_Segment_WordCount {
      * @var string
      */
     protected $regexWordBreak;
+
+    protected ContentProtector $contentProtector;
+
+    protected editor_Models_Segment_UtilityBroker $utilityBroker;
     
-    public function __construct($rfcLanguage=""){
+    public function __construct($rfcLanguage="")
+    {
         $this->rfcLanguage=$rfcLanguage;
-        $this->internalTag = ZfExtended_Factory::get('editor_Models_Segment_InternalTag');
-        $this->whitespaceHelper = ZfExtended_Factory::get('editor_Models_Segment_Whitespace');
-        $this->connector= ZfExtended_Factory::get('editor_Services_OpenTM2_Connector');
+        $this->utilityBroker = ZfExtended_Factory::get(editor_Models_Segment_UtilityBroker::class);
+        $this->connector= ZfExtended_Factory::get(editor_Services_OpenTM2_Connector::class);
         $config = Zend_Registry::get('config');
         $this->regexWordBreak = $config->runtimeOptions->editor->export->wordBreakUpRegex;
+        $this->contentProtector = ContentProtector::create($this->utilityBroker->whitespace);
+
     }
     
     /**
@@ -228,13 +226,14 @@ class editor_Models_Segment_WordCount {
      * Get count of the words in source field in the segment
      * All segment tags, and punctuation will be removed before the segment words are counted.
      * For easter asian languages, the grapheme count based on average grapheme per word will be calculated
-     * 
+     *
      * @return number|mixed
      */
-    public function getSourceCount(){
+    public function getSourceCount(): float|int
+    {
         //replace white space tags with real white space, before clean all teh tags
-        $text = $this->internalTag->restore($this->queryString, true);
-        $text = $this->whitespaceHelper->unprotectWhitespace($text);
+        $text = $this->utilityBroker->internalTag->restore($this->queryString, $this->contentProtector->tagList());
+        $text = $this->contentProtector->unprotect($text);
         $text=$this->segment->stripTags($text);
         //average words in East Asian languages by language
         //Chinese (all forms): 2.8
@@ -261,6 +260,5 @@ class editor_Models_Segment_WordCount {
             default:
                 return $this->getWordsCount($text);
         }
-        return 0;
     }
 }
