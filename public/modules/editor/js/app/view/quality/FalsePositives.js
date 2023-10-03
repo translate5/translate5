@@ -96,9 +96,9 @@ Ext.define('Editor.view.quality.FalsePositives', {
                 setUi: function(ui) {this.setUI(ui);},
                 bind: {
                     text: '{record.content ? record.similarQty : "-"}',
-                    disabled: '{record.similarQty == 0 || !record.falsePositiveChanged}',
+                    disabled: '{record.similarQty == 0}',
                     tooltip: '{l10n.falsePositives.grid.similarQty.button}',
-                    ui: '{record.similarQty == 0 || !record.falsePositiveChanged ? "default-toolbar-small" : "default"}'
+                    ui: '{record.similarQty == 0 ? "default-toolbar-small" : "default"}'
                 },
                 handler: 'onFalsePositiveSpread'
             }

@@ -136,7 +136,7 @@ class editor_Models_Db_SegmentQualityRow extends Zend_Db_Table_Row_Abstract {
     }
 
     /**
-     * Get quantity of similar qualities triggered by same content
+     * Get quantity of similar qualities triggered by same content, including the current quality
      *
      * @return int|string
      * @throws Zend_Db_Statement_Exception
@@ -156,7 +156,6 @@ class editor_Models_Db_SegmentQualityRow extends Zend_Db_Table_Row_Abstract {
         // Prepare and return statement
         return $db->query('
             SELECT ' . $select[$mode] . ' FROM `LEK_segment_quality` WHERE `taskGuid` = ?
-              AND `id` != ?
               AND `type` = ?
               AND `category` = ?
               AND `field` = ?
@@ -164,7 +163,6 @@ class editor_Models_Db_SegmentQualityRow extends Zend_Db_Table_Row_Abstract {
               AND JSON_EXTRACT(`additionalData`, "$.content") = ?
         ', [
             $this->taskGuid,
-            $this->id,
             $this->type,
             $this->category,
             $this->field,
