@@ -9098,6 +9098,10 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
                 <source>Gemeldete Fehler</source>
                 <target>Gemeldete Fehler</target>
             </trans-unit>
+            <trans-unit id='SW5pdGlhbCBlaW5tYWwgYXVmICJTdWNoZW4iIGtsaWNrZW4sIGJldm9yICJBbGxlIGVyc2V0emVuIiBhdXN3w6RobGJhciB3aXJkLg=='>
+                <source>Initial einmal auf "Suchen" klicken, bevor "Alle ersetzen" auswählbar wird.</source>
+                <target>Initial einmal auf "Suchen" klicken, bevor "Alle ersetzen" auswählbar wird.</target>
+            </trans-unit>
             <trans-unit id='RXJsZWRpZ3Q='>
                 <source>Erledigt</source>
                 <target>Erledigt</target>

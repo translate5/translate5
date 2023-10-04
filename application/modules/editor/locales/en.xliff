@@ -9275,6 +9275,10 @@ E-Mail: service@MittagQI.com</pre>
                 <source>Gemeldete Fehler</source>
                 <target>Reported errors</target>
             </trans-unit>
+            <trans-unit id='SW5pdGlhbCBlaW5tYWwgYXVmICJTdWNoZW4iIGtsaWNrZW4sIGJldm9yICJBbGxlIGVyc2V0emVuIiBhdXN3w6RobGJhciB3aXJkLg=='>
+                <source>Initial einmal auf "Suchen" klicken, bevor "Alle ersetzen" auswählbar wird.</source>
+                <target>Please click "Search" once to enable "Replace all" operation.</target>
+            </trans-unit>
             <trans-unit id='RXJsZWRpZ3Q='>
                 <source>Erledigt</source>
                 <target>Done</target>
