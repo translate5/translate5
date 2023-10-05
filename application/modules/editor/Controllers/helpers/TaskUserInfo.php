@@ -221,8 +221,8 @@ class Editor_Controller_Helper_TaskUserInfo extends Zend_Controller_Action_Helpe
         else {
             $row['userTracking'] = $this->userTracking->getByTaskGuid($taskGuid);
         }
-        
-        
+
+
         if($this->task->getTaskGuid() != $taskGuid){
             $this->task->init($row);
         }

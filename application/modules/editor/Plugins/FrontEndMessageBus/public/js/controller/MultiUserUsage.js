@@ -44,6 +44,9 @@ Ext.define('Editor.plugins.FrontEndMessageBus.controller.MultiUserUsage', {
     refs: [{
         ref : 'segmentGrid',
         selector : '#segmentgrid'
+    },{
+        ref:'searchReplaceWindow',
+        selector:'#searchreplacetabpanel'
     }],
     strings: {
         noConnection: '#UT#Sie haben Verbindungsprobleme zum Internet. <br />Bitte prüfen Sie die Stabilität Ihrer Internetverbindung. <br />Sollte diese Meldung dauerhaft zu sehen sein, kann es auch sein, <br />dass das Websocket-Protokoll wss:// in Ihrer Firewall blockiert ist.',
@@ -613,10 +616,16 @@ return; //FIXME prepare that socket server is only triggered for simultaneous us
         if(!store || !me.onlineUsers) {
             return;
         }
+        var onlineQty = 0, srw = me.getSearchReplaceWindow();
         Ext.Object.each(me.onlineUsers.onlineInTask, function(key, val){
             var item = store.getById(key);
                 item && item.set('isOnline', val);
+            if (val) onlineQty ++;
         });
+
+        if (srw) {
+            srw.getViewModel().set('isOpenedByMoreThanOneUser', onlineQty > 1);
+        }
         store.commitChanges();
     }
 });
