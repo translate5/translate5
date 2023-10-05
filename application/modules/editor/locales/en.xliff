@@ -9275,6 +9275,7 @@ E-Mail: service@MittagQI.com</pre>
                 <source>Gemeldete Fehler</source>
                 <target>Reported errors</target>
             </trans-unit>
+<<<<<<< HEAD
             <trans-unit id='UHJpb3JpdMOkdA=='>
                 <source>Priorität</source>
                 <target>Priority</target>
@@ -9330,6 +9331,18 @@ E-Mail: service@MittagQI.com</pre>
             <trans-unit id='RGVmYXVsdHMgYXVzYmxlbmRlbg=='>
                 <source>Defaults ausblenden</source>
                 <target>Hide defaults</target>
+            </trans-unit>
+            <trans-unit id='RXJsZWRpZ3Q='>
+                <source>Erledigt</source>
+                <target>Done</target>
+            </trans-unit>
+            <trans-unit id='QmVpZGUgQmVuZW5udW5nZW4gYmVyZWl0cyB2b3JoYW5kZW4gaW4gYXVzZ2V3w6RobHRlciBUZXJtQ29sbGVjdGlvbi4='>
+                <source>Beide Benennungen bereits vorhanden in ausgewählter TermCollection.</source>
+                <target>Both terms are already existing within selected term collection</target>
+            </trans-unit>
+            <trans-unit id='QmVncmlmZiBleGlzdGllcnQgYmVyZWl0cyBpbiBkZXIgYXVzZ2V3w6RobHRlbiBUZXJtQ29sbGVjdGlvbg=='>
+                <source>Begriff existiert bereits in der ausgewählten TermCollection</source>
+                <target>Term already exists in selected TermCollection</target>
             </trans-unit>
         </body>
     </file>

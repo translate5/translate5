@@ -66,4 +66,60 @@ END LICENSE AND COPYRIGHT
  */
 class editor_Models_Term_History extends ZfExtended_Models_Entity_Abstract {
     protected $dbInstanceClass = 'editor_Models_Db_Term_History';
+
+    /**
+     * Get array of history-records for a given term id
+     *
+     * @param int $termId
+     * @return array
+     * @throws Zend_Db_Statement_Exception
+     */
+    public function getByTermId(int $termId): array {
+
+        // Fetch history
+        $history = $this->db->getAdapter()->query('
+            SELECT 
+              `h`.`id`, 
+              `h`.`language`,
+              `h`.`term`,
+              `h`.`proposal`, 
+              `h`.`status`, 
+              IF(LENGTH(`h`.`proposal`), "unprocessed", `h`.`processStatus`) AS `processStatus`, 
+              `h`.`updatedAt`, 
+              CONCAT(`u`.`firstName`, " ", `u`.`surName`) AS `updatedBy`
+            FROM 
+              `terms_term_history` `h`
+              LEFT JOIN `Zf_users` `u` ON `h`.`updatedBy` = `u`.`id`
+            WHERE `h`.`termId` = ?
+            ORDER BY `h`.`updatedAt` DESC
+        ', $termId)->fetchAll();
+
+        // Load term model instance
+        $term = ZfExtended_Factory::get(editor_Models_Terminology_Models_TermModel::class);
+        $term->load($termId);
+
+        // Get user who last updated that attribute
+        try {
+            $user = ZfExtended_Factory::get(ZfExtended_Models_User::class);
+            $user->load($term->getUpdatedBy());
+            $updatedBy = $user->getFirstName() . ' ' . $user->getSurName();
+        } catch (ZfExtended_Models_Entity_NotFoundException $e) {
+            $updatedBy = null;
+        }
+
+        // Prepend current state as a most recent record into the history
+        array_unshift($history, [
+            'id' => 0,
+            'language' => $term->getLanguage(),
+            'term' => $term->getTerm(),
+            'proposal' => $term->getProposal(),
+            'status' => $term->getStatus(),
+            'processStatus' => $term->getProposal() ? 'unprocessed' : $term->getProcessStatus(),
+            'updatedAt' => $term->getUpdatedAt(),
+            'updatedBy' => $updatedBy,
+        ]);
+
+        // Return history including current state
+        return $history;
+    }
 }

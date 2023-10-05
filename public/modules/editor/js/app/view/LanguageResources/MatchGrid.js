@@ -151,17 +151,18 @@ Ext.define('Editor.view.LanguageResources.MatchGrid', {
 	          text: me.strings.target
 	      },{
 	          xtype: 'gridcolumn',
-	          flex: 1,
+	          flex: 3,
 			  hideable: false,
               sortable: false,
 	          dataIndex: 'matchrate',
 	          tdCls: 'matchrate',
 	          renderer: function(matchrate, meta, record) {
-				  var str = me.assocStore.findRecord('languageResourceId',record.get('languageResourceid'),0,false,true,true);
-	              meta.tdAttr += 'data-qtip="'+str.get('name')+' ('+str.get('serviceName')+')'+"<br/>"+ me.getMatchrateTooltip(matchrate)+'"';
+				  var str = me.assocStore.findRecord('languageResourceId',record.get('languageResourceid'),0,false,true,true),
+				  name = str.get('name')+' ('+str.get('serviceName')+')';
+	              meta.tdAttr += 'data-qtip="' + name + "<br/>"+ me.getMatchrateTooltip(matchrate)+'"';
 				  meta.tdCls  = meta.tdCls  + ' info-icon';
 	              meta.tdAttr += 'bgcolor="' + str.get('color') + '"';
-	              return "<b>"+(matchrate > 0 ? matchrate : '&nbsp;')+"</b>";
+	              return "<b style='white-space: pre;'>"+(matchrate > 0 ? matchrate + ' [' + name + ']' : '&nbsp;')+"</b>";
 	          },
 	          text: me.strings.match
 	      }]

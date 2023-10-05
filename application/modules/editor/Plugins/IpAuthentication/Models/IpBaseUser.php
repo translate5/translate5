@@ -26,7 +26,9 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\Acl\Rights;
 use MittagQI\Translate5\Tools\IpMatcher;
+use MittagQI\Translate5\Plugins\IpAuthentication\AclResource;
 
 /***
  * Check if the current client request is configured as ip based in the zf_configuration.
@@ -40,7 +42,7 @@ class editor_Plugins_IpAuthentication_Models_IpBaseUser extends ZfExtended_Model
      * @var string
      */
     const IP_BASED_USER_LOGIN_PREFIX = 'tmp-ip-based-user';
-    
+
     /***
      * Current client ip address
      * @var string
@@ -160,10 +162,11 @@ class editor_Plugins_IpAuthentication_Models_IpBaseUser extends ZfExtended_Model
         //check if the configured ib based use roles are allowed for ip authentication
         foreach ($roles as $role){
             try {
-                if($acl->isAllowed($role,'frontend', 'ipBasedAuthentication')){
-                    $allowedRoles[]=$role;
+                if($acl->isAllowed($role, AclResource::ID, AclResource::IP_BASED_AUTHENTICATION)) {
+                    $allowedRoles[] = $role;
                 }
-            } catch (Exception $e) {
+            } catch (Throwable) {
+                // do nothing
             }
         }
         

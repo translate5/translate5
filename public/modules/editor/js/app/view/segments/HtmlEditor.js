@@ -44,6 +44,7 @@ Ext.define('Editor.view.segments.HtmlEditor', {
     alias: 'widget.segmentsHtmleditor',
     itemId: 'segmentsHtmleditor',
     markupImages: null,
+    tags: null,
     //prefix der img Tag ids im HTML Editor
     idPrefix: 'tag-image-',
     requires: [
@@ -278,14 +279,14 @@ Ext.define('Editor.view.segments.HtmlEditor', {
 
         if (referenceFieldName) {
             this.markupForEditor(segment.get(referenceFieldName));
-            this.tagsCheck = new TagCheck(this.markupImages, this.idPrefix);
+            this.tagsCheck = new TagCheck(this.tags, this.idPrefix);
         }
 
         me.setValue(me.markupForEditor(data.value, tagsFromReferenceFieldOnly) + checkTag);
         me.statusStrip.updateSegment(data.segment, fieldName);
 
         if (!referenceFieldName) {
-            this.tagsCheck = new TagCheck(this.markupImages, this.idPrefix);
+            this.tagsCheck = new TagCheck(this.tags, this.idPrefix);
         }
 
         me.fireEvent('afterSetValueAndMarkup');
@@ -366,6 +367,12 @@ Ext.define('Editor.view.segments.HtmlEditor', {
             result;
         me.contentEdited = false;
         me.markupImages = {};
+        me.tags = {
+            open: [],
+            close: [],
+            single: [],
+            whitespace: [],
+        };
 
         result = me.markup(value, plainContent, false, tagsFromReferenceFieldOnly);
         me.plainContent = plainContent; //stores only the text content and content tags for "original content has changed" comparision
@@ -572,38 +579,32 @@ Ext.define('Editor.view.segments.HtmlEditor', {
             if (tagsFromReferenceFieldOnly) {
                 switch (data.type) {
                     case 'open':
-                        openTagNumber++;
                         tag = me.tagsCheck.getOpeningReferenceTagAtIndexOrNext(openTagNumber);
+                        openTagNumber++;
 
                         if (null === tag) {
                             return;
                         }
 
                         data = tag.data;
-                        // Since tag order can start from something different that 1 and tag order in reference can be
-                        // not by order we need to set the tag number to the one from the reference
-                        openTagNumber = parseInt(data.nr);
 
                         break;
 
                     case 'close':
-                        closeTagNumber++;
                         tag = me.tagsCheck.getClosingReferenceTagAtIndexOrNext(closeTagNumber);
+                        closeTagNumber++;
 
                         if (null === tag) {
                             return;
                         }
 
                         data = tag.data;
-                        // Since tag order can start from something different that 1 and tag order in reference can be
-                        // not by order we need to set the tag number to the one from the reference
-                        closeTagNumber = parseInt(data.nr);
 
                         break;
 
                     case 'whitespace':
-                        whitespaceTagNumber++;
                         tag = me.tagsCheck.getWhitespaceReferenceTagAtIndex(whitespaceTagNumber);
+                        whitespaceTagNumber++;
 
                         if (null === tag) {
                             return;
@@ -614,17 +615,14 @@ Ext.define('Editor.view.segments.HtmlEditor', {
                         break;
 
                     case 'single':
-                        singleTagNumber++;
                         tag = me.tagsCheck.getSingleReferenceTagAtIndexOrNext(singleTagNumber);
+                        singleTagNumber++;
 
                         if (null === tag) {
                             return;
                         }
 
                         data = tag.data;
-                        // Since tag order can start from something different that 1 and tag order in reference can be
-                        // not by order we need to set the tag number to the one from the reference
-                        singleTagNumber = parseInt(data.nr);
 
                         break;
                 }
@@ -640,9 +638,11 @@ Ext.define('Editor.view.segments.HtmlEditor', {
                     shortWidth: data.shortWidth,
                     whitespaceTag: data.whitespaceTag,
                     numberTag: data.numberTag,
-                    html: me.renderInternalTags(item.className, data),
+                    html: me.renderInternalTags(data.className, data),
                     data: data
                 };
+
+                me.tags[data.whitespaceTag ? 'whitespace' : data.type].push({data: data});
             }
 
             if (me.viewModesController.isFullTag() || data.whitespaceTag || data.numberTag) {
@@ -698,6 +698,7 @@ Ext.define('Editor.view.segments.HtmlEditor', {
         data.title = Ext.htmlEncode(spanShort.getAttribute('title'));
         data.length = spanFull.getAttribute('data-length');
         data.originalItem = item;
+        data.className = item.className;
 
         //old way is to use only the id attribute, new way is to use separate data fields
         // both way are currently used!
@@ -1015,10 +1016,11 @@ Ext.define('Editor.view.segments.HtmlEditor', {
                 if (this.tagsCheckResult[todo[i][0]].length > 0) {
                     msg += me.strings[todo[i][1]];
 
-                    Ext.each(me.tagsCheckResult[todo[i][0]], function (tag) {
+                    for(const tagData of me.tagsCheckResult[todo[i][0]]) {
+                        const tag = tagData.data;
                         missingSvg += '<img src="' + me.getSvg(tag.whitespaceTag ? tag.fullTag : tag.shortTag, tag.whitespaceTag ? tag.fullWidth : tag.shortWidth) + '"> ';
                         //msg += '<img src="'+me.getSvg(tag.whitespaceTag ? tag.fullTag : tag.shortTag, tag.whitespaceTag ? tag.fullWidth : tag.shortWidth)+'"> ';
-                    });
+                    }
 
                     msg = Ext.String.format(msg, missingSvg);
                     msg += '<br /><br />';

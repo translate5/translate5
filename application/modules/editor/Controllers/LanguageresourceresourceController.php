@@ -26,6 +26,7 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\Acl\Rights;
 use MittagQI\Translate5\LanguageResource\Adapter\EnginesBasedApiAdapterInterface;
 
 /**#@+
@@ -33,7 +34,7 @@ use MittagQI\Translate5\LanguageResource\Adapter\EnginesBasedApiAdapterInterface
  * One Resource is one available configured connector, Languages and Title can be customized in the TM Overview List
  */
 class editor_LanguageresourceresourceController extends ZfExtended_RestController  {
-    
+
     /**
      * (non-PHPdoc)
      * @see ZfExtended_RestController::init()
@@ -43,7 +44,11 @@ class editor_LanguageresourceresourceController extends ZfExtended_RestControlle
     public function init() {
         $this->initRestControllerSpecific();
     }
-    
+
+    /**
+     * @throws ReflectionException
+     * @throws Zend_Acl_Exception
+     */
     public function indexAction() {
         $serviceManager = ZfExtended_Factory::get('editor_Services_Manager');
         /* @var $serviceManager editor_Services_Manager */
@@ -51,8 +56,18 @@ class editor_LanguageresourceresourceController extends ZfExtended_RestControlle
         
         $acl = ZfExtended_Acl::getInstance();
         $userRoles = ZfExtended_Authentication::getInstance()->getUserRoles();
-        $isAllowedFilebased = $acl->isInAllowedRoles($userRoles, 'frontend', 'languageResourcesAddFilebased');
-        $isAllowedNonFilebased = $acl->isInAllowedRoles($userRoles, 'frontend', 'languageResourcesAddNonFilebased');
+
+        $isAllowedFilebased = $acl->isInAllowedRoles(
+            $userRoles,
+            Rights::ID,
+            Rights::LANGUAGE_RESOURCES_ADD_FILEBASED
+        );
+
+        $isAllowedNonFilebased = $acl->isInAllowedRoles(
+            $userRoles,
+            Rights::ID,
+            Rights::LANGUAGE_RESOURCES_ADD_NON_FILEBASED
+        );
         
         // (1) the resources of the configured services
         $resources = $serviceManager->getAllResources();

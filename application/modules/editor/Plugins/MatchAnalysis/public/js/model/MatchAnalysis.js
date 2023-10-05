@@ -44,6 +44,7 @@ Ext.define('Editor.plugins.MatchAnalysis.model.MatchAnalysis', {
       // they are set automatically via metaData from the request,
       // since the setup is fluent and depends on the underlying configuration!
     {name: 'noMatch'},
+    {name: 'errorCount', type: 'integer'},
     {name: 'unitCountTotal', type: 'number'}
   ],
   idProperty: 'id',

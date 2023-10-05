@@ -26,6 +26,8 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\ZfExtended\Acl\SystemResource;
+
 /***
  * Enable deletion of user associations not in the user hierarchy.
  * @author aleksandar
@@ -68,17 +70,19 @@ class editor_Plugins_DeleteUserAssociations_Init extends ZfExtended_Plugin_Abstr
         }
     }
 
-    /***
+    /**
      * Before user assoc delete action handler
      * @param Zend_EventManager_Event $event
+     * @throws ZfExtended_Models_Entity_NotFoundException
      */
-    public function handleTaskUserAssocBeforeDelete(Zend_EventManager_Event $event){
+    public function handleTaskUserAssocBeforeDelete(Zend_EventManager_Event $event): void
+    {
         $params = $event->getParam('params');
         if(empty($params['id'])) {
             return;//bound to wrong action? id should exist
         }
         $tua = $event->getParam('entity');
-        /* @var $tua editor_Models_TaskUserAssoc */
+        /** @var editor_Models_TaskUserAssoc $tua */
         $tua->load($params['id']);
         if($tua->getRole() != editor_Workflow_Default::ROLE_TRANSLATORCHECK) {
             return;
@@ -87,6 +91,6 @@ class editor_Plugins_DeleteUserAssociations_Init extends ZfExtended_Plugin_Abstr
         $userSession = new Zend_Session_Namespace('user');
         $userData = $userSession->data;
         $acl = ZfExtended_Acl::getInstance();
-        $acl->allow($userData->roles, 'backend', 'seeAllUsers');
+        $acl->allow($userData->roles, SystemResource::ID, SystemResource::SEE_ALL_USERS);
     }
 }

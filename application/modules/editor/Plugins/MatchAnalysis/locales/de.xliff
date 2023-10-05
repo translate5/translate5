@@ -318,6 +318,10 @@
 		    <source>Preisvorlage</source>
 		    <target>Preisvorlage</target>
 		</trans-unit>
+        <trans-unit id='QmVpIGRlciBBbmFseXNlIHNpbmQgezB9IEZlaGxlciBpbiBkZXIgS29tbXVuaWthdGlvbiBtaXQgZGVuIFNwcmFjaHJlc3NvdXJjZW4gYXVmZ2V0cmV0ZW4uIDxiciAvPkRpZSBBbmFseXNlIGthbm4gZGFoZXIgdW52b2xsc3TDpG5kaWcgc2Vpbi4gQml0dGUgcHLDvGZlbiBTaWUgZGllIEVyZWlnbmlzc2UgZGVyIEF1ZmdhYmUgdW5kIGRhcyBTeXN0ZW0gTG9nIHVuZCBlcnN0ZWxsZW4gZ2dmLiBkaWUgQW5hbHlzZSBlcm5ldXQu'>
+            <source>Bei der Analyse sind {0} Fehler in der Kommunikation mit den Sprachressourcen aufgetreten. <br />Die Analyse kann daher unvollständig sein. Bitte prüfen Sie die Ereignisse der Aufgabe und das System Log und erstellen ggf. die Analyse erneut.</source>
+            <target>Bei der Analyse sind {0} Fehler in der Kommunikation mit den Sprachressourcen aufgetreten. <br />Die Analyse kann daher unvollständig sein. Bitte prüfen Sie die Ereignisse der Aufgabe und das System Log und erstellen ggf. die Analyse erneut.</target>
+        </trans-unit>
     </body>
   </file>
 </xliff>

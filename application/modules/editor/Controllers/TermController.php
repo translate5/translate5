@@ -25,6 +25,7 @@ START LICENSE AND COPYRIGHT
 
 END LICENSE AND COPYRIGHT
 */
+use editor_Models_Terminology_Models_TermModel as TermModel;
 
 /**
  *
@@ -39,12 +40,17 @@ class editor_TermController extends ZfExtended_RestController
     /**
      * @var string
      */
-    protected $entityClass = 'editor_Models_Terminology_Models_TermModel';
+    protected $entityClass = TermModel::class;
 
     /**
-     * @var editor_Models_Terminology_Models_TermModel
+     * @var TermModel
      */
     protected $entity;
+
+    /**
+     * @var ZfExtended_Zendoverwrites_Translate
+     */
+    protected $_translate;
 
     /**
      * Collections, allowed for current user
@@ -65,6 +71,9 @@ class editor_TermController extends ZfExtended_RestController
         $this->handleData();
 
         $termCollection = ZfExtended_Factory::get(editor_Models_TermCollection_TermCollection::class);
+
+        // Setup translator
+        $this->_translate = ZfExtended_Zendoverwrites_Translate::getInstance();
 
         // If current user has 'termPM_allClients' role, it means all collections are accessible
         // Else we should apply collectionsIds-restriction everywhere, so get accessible collections
@@ -128,6 +137,7 @@ class editor_TermController extends ZfExtended_RestController
                 'language' => $_['sourceLang']['rfc5646'],
                 'term' => trim($params['sourceTerm']),
                 'status' => 'preferredTerm', // which status should be set initially ?
+                'processStatus' => $this->getParam('sourceProcessStatus') ?? 'unprocessed',
             ], $te)->insert([
                 'userName' => $this->user()->getUserName(),
                 'userGuid' => $this->user()->getUserGuid()
@@ -147,6 +157,7 @@ class editor_TermController extends ZfExtended_RestController
             'language' => $params['language'],
             'term' => $params['term'],
             'status' => $termNoteStatus->getDefaultTermStatus(),
+            'processStatus' => $this->getParam('processStatus') ?? 'unprocessed',
         ], $te)->insert([
             'note' => trim($params['note'] ?? ''),
             'userName' => $this->user()->getUserName(),
@@ -178,6 +189,17 @@ class editor_TermController extends ZfExtended_RestController
             'termTbxId' => $this->entity->getTermTbxId(),
             'termEntryTbxId' => $this->entity->getTermEntryTbxId(),
         ]);
+
+        // If we checked whether those source and/or target terms already exist for theirs languages inside given collection
+        if ($this->getParam('checkExisting')) {
+
+            // It means this request came from main translate5-app rather than TermPortal-app,
+            // so in that case we make sure user will get explicitly MsgBox saying 'Done'
+            $this->view->assign([
+                'success' => true,
+                'msg' => $this->_translate->_('Erledigt')
+            ]);
+        }
     }
 
     /**
@@ -200,7 +222,7 @@ class editor_TermController extends ZfExtended_RestController
         $params = $this->getRequest()->getParams();
 
         // Validate params
-        return $this->jcheck([
+        $result = $this->jcheck([
             'collectionId' => [
                 'req' => true,                                                      // required
                 'rex' => 'int11',                                                   // regular expression preset key or raw expression
@@ -232,8 +254,82 @@ class editor_TermController extends ZfExtended_RestController
                 'req' => isset($params['sourceTerm']),
                 'rex' => 'rfc5646',
                 'key' => 'LEK_languages.rfc5646'
+            ],
+            'processStatus,sourceProcessStatus' => [
+                'fis' => join(',', TermModel::getAllowedProcessStatuses())
             ]
         ]);
+
+        // If we should check whether those source and/or target terms already exist for theirs languages inside given collection
+        if ($this->getParam('checkExisting')) {
+
+            // Define termEntryIdA array
+            $termEntryIdA = ['target' => [], 'source' => []];
+
+            // Get array of termEntryIds where target term exists, if any
+            $termEntryIdA['target'] = $this->entity->searchTermEntryIdsBy(
+                $this->getParam('collectionId'),
+                $this->getParam('language'),
+                $this->getParam('term'),
+            );
+
+            // If source term is given
+            if ($result['sourceLang'] ?? 0) {
+
+                // Get termEntryId-array where source term exists, if any
+                $termEntryIdA['source'] = $this->entity->searchTermEntryIdsBy(
+                    $this->getParam('collectionId'),
+                    $this->getParam('sourceLang'),
+                    $this->getParam('sourceTerm'),
+                );
+            }
+
+            // If there is at least one termEntry where both source and target terms exists
+            if (array_intersect($termEntryIdA['target'], $termEntryIdA['source'])) {
+
+                // Flush failure
+                $this->jflush(false, $this->_translate->_(
+                    'Beide Benennungen bereits vorhanden in ausgewählter TermCollection.'
+                ));
+
+            // Else if at least one termEntryId found for target term
+            } else if ($termEntryIdA['target']) {
+
+                // If we have source term proposal given - then we spoof the things
+                // so that source term to be attached as a translation for existing target term
+                if ($params['sourceTerm'] ?? 0) {
+
+                    // Spoof target-params with source-params and setup termEntryId-param
+                    $result['language'] = $result['sourceLang'];
+                    $this->setParam('language',      $params['sourceLang']);
+                    $this->setParam('term',          $params['sourceTerm']);
+                    $this->setParam('processStatus', $params['sourceProcessStatus']);
+                    $this->setParam('termEntryId',   $termEntryIdA['target'][0]);
+
+                    // Unset to prevent duplicates
+                    unset ($result['sourceLang']);
+
+                // Else flush failure
+                } else {
+                    $this->jflush(false, $this->_translate->_(
+                        'Begriff existiert bereits in der ausgewählten TermCollection'
+                    ));
+                }
+
+            // Else if at least one termEntryId found for source term
+            } else if ($termEntryIdA['source']) {
+
+                // Setup termEntryId-param so that target term will be
+                // attached as a translation for existing source term
+                $this->setParam('termEntryId', $termEntryIdA['source'][0]);
+
+                // Unset to prevent source term from being duplicated
+                unset ($result['sourceLang']);
+            }
+        }
+
+        // Return
+        return $result;
     }
 
     /**
@@ -285,7 +381,7 @@ class editor_TermController extends ZfExtended_RestController
      *
      * @param array $data
      * @param editor_Models_Terminology_Models_TermEntryModel $te
-     * @return editor_Models_Terminology_Models_TermModel
+     * @return TermModel
      */
     protected function _postTermInit(array $data, editor_Models_Terminology_Models_TermEntryModel $te) {
 
@@ -588,7 +684,7 @@ class editor_TermController extends ZfExtended_RestController
 
             // Fetch ids of ALL terms matching last search, excluding ids given by 'except'-param
             $termIds = ZfExtended_Factory
-                ::get('editor_Models_Terminology_Models_TermModel')
+                ::get(TermModel::class)
                 ->searchTermByParams(
                     $_SESSION['lastParams'] + ['except' => $this->getParam('except')],
                     $total
@@ -625,5 +721,30 @@ class editor_TermController extends ZfExtended_RestController
 
         // Flush responses
         $this->view->assign($steps);  // i(mt(true), 'a');
+    }
+
+    /**
+     * Get history for the term
+     *
+     * @throws ReflectionException
+     * @throws Zend_Db_Statement_Exception
+     * @throws ZfExtended_Mismatch
+     */
+    public function historyAction() {
+
+        // Load term internally
+        $this->entityLoad();
+
+        // If no or only certain collections are accessible - validate collection accessibility
+        if ($this->collectionIds !== true) $this->jcheck([
+            'collectionId' => [
+                'fis' => $this->collectionIds ?: 'invalid' // FIND_IN_SET
+            ],
+        ], $this->entity);
+
+        // Load history and assign to response
+        $this->view->history = ZfExtended_Factory
+            ::get(editor_Models_Term_History::class)
+            ->getByTermId($this->entity->getId());
     }
 }

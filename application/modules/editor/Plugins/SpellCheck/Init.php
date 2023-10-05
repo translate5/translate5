@@ -26,6 +26,7 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\Acl\Rights;
 use MittagQI\Translate5\Plugins\SpellCheck\LanguageTool\Service;
 use MittagQI\Translate5\Plugins\SpellCheck\Segment\Check;
 
@@ -42,8 +43,8 @@ class editor_Plugins_SpellCheck_Init extends ZfExtended_Plugin_Abstract {
      * @var array
      */
     protected $frontendControllers = array(
-        'pluginSpellCheck' => 'Editor.plugins.SpellCheck.controller.Editor',
-        'pluginSpellCheckMain' => 'Editor.plugins.SpellCheck.controller.Main'
+        Rights::PLUGIN_SPELL_CHECK => 'Editor.plugins.SpellCheck.controller.Editor',
+        Rights::PLUGIN_SPELL_CHECK_MAIN => 'Editor.plugins.SpellCheck.controller.Main'
     );
 
     /**
