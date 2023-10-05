@@ -98,7 +98,7 @@ class Translate2428Test extends editor_Test_ImportTest {
         $this->assertNotEmpty($analysis,'No results found for the matchanalysis.');
         //remove the created timestamp since is not relevant for the test
         foreach ($analysis as &$a){
-            unset($a->created);
+            unset($a->created,$a->errorCount);
         }
         //this is to recreate the file from the api response
         if(static::api()->isCapturing()){

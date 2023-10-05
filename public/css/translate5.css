@@ -128,4 +128,11 @@ margin-bottom: 5px;
 div.x-grid-filters-filtered-column{
 	border-style: inset;
 }
-  
+
+.x-form-trigger-default[id$="-trigger-language"] {
+    background-position: center !important;
+    background-repeat: no-repeat;
+}
+.x-form-trigger-default[id$="-trigger-language"]:before {
+    display: none;
+}

@@ -26,14 +26,15 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-use MittagQI\Translate5\Access\Roles;
+use MittagQI\Translate5\Acl\Rights;
+use MittagQI\Translate5\Acl\Roles;
 use MittagQI\Translate5\Applet\Dispatcher;
 use MittagQI\Translate5\Task\FileTypeSupport;
-use MittagQI\Translate5\Service\Services;
 use MittagQI\Translate5\Task\Current\NoAccessException;
 use MittagQI\Translate5\Task\Reimport\FileparserRegistry;
 use MittagQI\Translate5\Task\TaskContextTrait;
 use MittagQI\Translate5\Cronjob\CronIpFactory;
+use MittagQI\ZfExtended\Acl\SetAclRoleResource as BaseRoles;
 use MittagQI\ZfExtended\CsrfProtection;
 
 /**
@@ -42,6 +43,7 @@ use MittagQI\ZfExtended\CsrfProtection;
 class Editor_IndexController extends ZfExtended_Controllers_Action
 {
     use TaskContextTrait;
+
     /**
      * @var ZfExtended_Zendoverwrites_Translate
      */
@@ -74,13 +76,16 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
         'JsLogger'                      => true,
         'editor.CustomPanel'            => true,
         //if value is string[], then controlled by ACL, enabling frontend rights given here
-        'admin.TaskOverview'            => ['taskOverviewFrontendController'],
-        'admin.TaskPreferences'         => ['taskOverviewFrontendController'],
-        'admin.TaskUserAssoc'           => ['taskUserAssocFrontendController'],
-        'admin.Customer'                => ['customerAdministration'],
-        'LanguageResourcesTaskassoc'    => ['languageResourcesTaskassoc'],
-        'LanguageResources'             => ['languageResourcesMatchQuery', 'languageResourcesSearchQuery'],
-        'TmOverview'                    => ['languageResourcesOverview'],
+        'admin.TaskOverview'            => [Rights::TASK_OVERVIEW_FRONTEND_CONTROLLER],
+        'admin.TaskPreferences'         => [Rights::TASK_OVERVIEW_FRONTEND_CONTROLLER],
+        'admin.TaskUserAssoc'           => [Rights::TASK_USER_ASSOC_FRONTEND_CONTROLLER],
+        'admin.Customer'                => [Rights::CUSTOMER_ADMINISTRATION],
+        'LanguageResourcesTaskassoc'    => [Rights::LANGUAGE_RESOURCES_TASKASSOC],
+        'LanguageResources'             => [
+            Rights::LANGUAGE_RESOURCES_MATCH_QUERY,
+            Rights::LANGUAGE_RESOURCES_SEARCH_QUERY
+        ],
+        'TmOverview'                    => [Rights::LANGUAGE_RESOURCES_OVERVIEW],
         'Localizer'                     => true,
         'Quality'                       => true,
         //the check if this controller is active is task specific
@@ -221,7 +226,7 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
             [APPLICATION_ROOT]
         );
 
-        if (! $this->isAllowed('getUpdateNotification')) {
+        if (! $this->isAllowed(Rights::ID, Rights::GET_UPDATE_NOTIFICATION)) {
             return;
         }
         $onlineVersion = $downloader->getAvailableVersion();
@@ -533,7 +538,8 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
             //set the setable, if the user is able to set/modify this role
             $roles[$role] = [
                 'label' => $this->translate->_(ucfirst($role)),
-                'setable' => $this->isAllowed('setaclrole', $role) //role name is used as right in setaclrole
+                //role name is used as right in setaclrole
+                'setable' => $this->isAllowed(BaseRoles::ID, $role)
             ];
         }
         $php2js->set('app.roles', $roles);
@@ -635,7 +641,7 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
         foreach ($this->frontendEndControllers as $controller => $enabled) {
             if (is_array($enabled)) {
                 foreach ($enabled as $neededRightForController) {
-                    if ($this->isAllowed('frontend', $neededRightForController)) {
+                    if ($this->isAllowed(Rights::ID, $neededRightForController)) {
                         $enabled = true;
                         break; //at least only one right is needed out of the list
                     }
@@ -697,7 +703,7 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
         $this->_helper->layout->disableLayout();
 
         $cronIp = CronIpFactory::create();
-        $hasAppStateACL = $this->isAllowed('backend', 'applicationstate');
+        $hasAppStateACL = $this->isAllowed(Rights::ID, Rights::APPLICATIONSTATE);
         //since application state contains sensible information we show that only to the cron TP,
         // or with more details to the API users
         if ($cronIp->isAllowed() || $hasAppStateACL) {
@@ -907,7 +913,7 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
     private function editorOnlyModeConfig(Zend_Config $rop)
     {
         $config = $rop->editor->toolbar;
-        $forceLeaveButton = $this->isAllowed('frontend', 'editorOnlyOverride');
+        $forceLeaveButton = $this->isAllowed(Rights::ID, Rights::EDITOR_ONLY_OVERRIDE);
         $hideClosebutton = $config->hideCloseButton || $forceLeaveButton;
         $hideLeaveButton = $config->hideLeaveTaskButton && !$forceLeaveButton;
         $this->view->Php2JsVars()->setMultiple([
