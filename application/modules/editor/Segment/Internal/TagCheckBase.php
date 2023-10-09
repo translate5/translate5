@@ -37,7 +37,7 @@ class editor_Segment_Internal_TagCheckBase {
      * Helper to order an array of tags by their index in the Fieldtags-Model
      * @param editor_Segment_Internal_Tag $a
      * @param editor_Segment_Internal_Tag $b
-     * @return mixed
+     * @return int
      */
     public static function compareByIdx(editor_Segment_Internal_Tag $a, editor_Segment_Internal_Tag $b): int
     {
@@ -279,7 +279,7 @@ class editor_Segment_Internal_TagCheckBase {
      * @param int $index
      * @param array $tagsOnIndex
      * @param int $numTags
-     * @return array|bool
+     * @return bool
      */
     protected function isOverlappingInSequence(
         editor_Segment_Internal_Tag $opener,

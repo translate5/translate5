@@ -522,7 +522,9 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract
                 ZfExtended_Models_Worker::STATE_PREPARE
             );
             // we need to start any operation but the import
-            $operation->start();
+            if(isset($operation)) {
+                $operation->start();
+            }
         }
 
         return true;

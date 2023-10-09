@@ -469,6 +469,8 @@ the format is:
      * @param array $configData
      */
     protected function showDetail(array $row) {
+            $row['file'] = null;
+            $row['line'] = null;
         $out = [
             '         <info>id:</> '.(string) $row['id'],
             '      <info>level:</> '.(string) self::LEVELS[$row['level']],
@@ -534,9 +536,12 @@ the format is:
         }, $trace);
     }
 
-    protected function linkIDE(string $text, string $file, int $line): string
+    protected function linkIDE(string $text, ?string $file, ?int $line): string
     {
         if (!\ZfExtended_Utils::isDevelopment() || !str_starts_with($file, APPLICATION_ROOT)) {
+            return $text;
+        }
+        if(is_null($file) && is_null($line)) {
             return $text;
         }
         $file = urlencode(str_replace(APPLICATION_ROOT, '', $file));

@@ -357,15 +357,8 @@ class editor_Segment_Internal_TagRepair extends editor_Segment_Internal_TagCheck
      * It is expected, that the _idx prop refers to the index in the passed array
      * Another prequesite is, that all opening tags come before the closing tags
      * @param editor_Segment_Internal_Tag[] $tags
-     * @param bool $isInSequence: if set, it is exopected, all passed tags are on the same text-index
-     * @param editor_Segment_Internal_Tag[] $referencedTags: the tags the indexes refer to (may be the same as the first param)
+     * @param editor_Segment_Internal_Tag[] $referencedTags : the tags the indexes refer to (may be the same as the first param)
      * @return int: the number of repaired tags
-     */
-    /**
-     * @param editor_Segment_Internal_Tag[] $tags
-     * @param bool $isInSequence
-     *
-     * @return int
      */
     private function fixSameIndexTagsForced(array $tags, array &$referencedTags): int
     {
