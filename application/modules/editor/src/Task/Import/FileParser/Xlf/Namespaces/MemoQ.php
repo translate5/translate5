@@ -30,7 +30,9 @@ namespace MittagQI\Translate5\Task\Import\FileParser\Xlf\Namespaces;
 
 use editor_Models_Comment;
 use editor_Models_Import_FileParser_XmlParser;
+use editor_Models_Segment_MatchRateType;
 use ZfExtended_Factory;
+use editor_Models_Import_FileParser_SegmentAttributes as SegmentAttributes;
 
 /**
  * XLF Fileparser Add On to parse MemoQ XLF specific stuff
@@ -95,12 +97,56 @@ class MemoQ extends AbstractNamespace
     }
 
     /**
+     * {@inheritDoc}
+     * @see editor_Models_Import_FileParser_Xlf_Namespaces_Abstract::transunitAttributes()
+     *
+     * This method was implemented, but finally never approved by the client: TS-1292
+     * - therefore its prefixed with DISABLED since it would in use by just naming it transunitAttributes
+     */
+    public function DISABLEDtransunitAttributes(array $attributes, SegmentAttributes $segmentAttributes): void
+    {
+        $status = strtolower($attributes['mq:status'] ?? '');
+        switch ($status) {
+            case 'notstarted':
+                $segmentAttributes->matchRateType = editor_Models_Segment_MatchRateType::TYPE_EMPTY;
+                break;
+            case 'partiallyedited':
+                $segmentAttributes->matchRateType = editor_Models_Segment_MatchRateType::TYPE_INTERACTIVE;
+                break;
+            case 'manuallyconfirmed':
+                $segmentAttributes->matchRateType = editor_Models_Segment_MatchRateType::TYPE_INTERACTIVE;
+                break;
+            case 'pretranslated':
+                $segmentAttributes->isPreTranslated = true;
+                $segmentAttributes->matchRateType = editor_Models_Segment_MatchRateType::TYPE_TM;
+                break;
+            case 'machinetranslated':
+                $segmentAttributes->isPreTranslated = true;
+                $segmentAttributes->matchRateType = editor_Models_Segment_MatchRateType::TYPE_MT;
+                if(!empty($attributes['mq:translatorcommitmatchrate'])) {
+                    $segmentAttributes->matchRate = $attributes['mq:translatorcommitmatchrate'];
+                }
+                break;
+            default:
+                break;
+        }
+        if(!empty($attributes['mq:percent'])) {
+            $segmentAttributes->matchRate = $attributes['mq:percent'];
+        }
+        if(!empty($attributes['mq:locked'])) {
+            $segmentAttributes->locked = true;
+        }
+    }
+
+    /**
      * Translate5 uses x,g and bx ex tags only. So the whole content of the tags incl. the tags must be used.
      * {@inheritDoc}
      * @see AbstractNamespace::useTagContentOnly()
      */
     public function useTagContentOnly(): ?bool
     {
+        //FIXME should be calculated for memoQ. If content will result in {} only or was a single tag,
+        // then it should be true, otherwise false. Also for across XLF
         return false;
     }
 

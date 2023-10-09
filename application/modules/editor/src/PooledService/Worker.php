@@ -35,6 +35,8 @@ use ZfExtended_Exception;
 use ZfExtended_Factory;
 use editor_Models_Task_AbstractWorker;
 use MittagQI\Translate5\Service\DockerServiceAbstract;
+use MittagQI\ZfExtended\Service\ServiceAbstract as BaseServiceAbstract;
+use MittagQI\Translate5\Service\AbstractExternalService;
 
 /**
  * Extends the import worker to work with pooled services tailored for processing segments
@@ -96,7 +98,7 @@ abstract class Worker extends editor_Models_Task_AbstractWorker
     /**
      * @var DockerServiceAbstract|ServiceAbstract
      */
-    protected DockerServiceAbstract|ServiceAbstract $service;
+    protected DockerServiceAbstract|ServiceAbstract|BaseServiceAbstract $service;
 
     /**
      * @var bool
@@ -118,7 +120,8 @@ abstract class Worker extends editor_Models_Task_AbstractWorker
      * This function is also used in a static context and must not use internal dependencis
      * @return DockerServiceAbstract|ServiceAbstract
      */
-    abstract protected function createService(): DockerServiceAbstract|ServiceAbstract;
+    abstract protected function createService():
+        DockerServiceAbstract|ServiceAbstract|BaseServiceAbstract|AbstractExternalService;
 
     /**
      * Must be implemented to create the no services available exception
