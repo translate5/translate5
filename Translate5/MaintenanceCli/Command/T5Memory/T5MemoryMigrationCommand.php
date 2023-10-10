@@ -27,26 +27,29 @@
  */
 declare(strict_types=1);
 
-namespace Translate5\MaintenanceCli\Command;
+namespace Translate5\MaintenanceCli\Command\T5Memory;
 
 use editor_Models_Config;
+use editor_Models_LanguageResources_CustomerAssoc as LanguageResourcesCustomerAssoc;
+use editor_Models_LanguageResources_LanguageResource as LanguageResource;
+use editor_Models_LanguageResources_Languages as LanguageResourcesLanguages;
+use editor_Services_OpenTM2_Connector as Connector;
+use editor_Services_OpenTM2_Service as Service;
 use Exception;
 use GuzzleHttp\Psr7\Uri;
 use JsonException;
 use MittagQI\Translate5\LanguageResource\Status as LanguageResourceStatus;
-use MittagQI\Translate5\LanguageResource\TaskAssociation;
 use RuntimeException;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use editor_Services_OpenTM2_Connector as Connector;
-use editor_Services_OpenTM2_Service as Service;
-use editor_Models_LanguageResources_CustomerAssoc as LanguageResourcesCustomerAssoc;
-use editor_Models_LanguageResources_LanguageResource as LanguageResource;
-use editor_Models_LanguageResources_Languages as LanguageResourcesLanguages;
+use Symfony\Component\Console\Question\ChoiceQuestion;
+use Symfony\Component\Console\Question\ConfirmationQuestion;
 use Throwable;
+use Translate5\MaintenanceCli\Command\T5Memory\Traits\FilteringByNameTrait;
+use Translate5\MaintenanceCli\Command\Translate5AbstractCommand;
 use Zend_Db_Statement_Exception;
 use Zend_Exception;
 use Zend_Registry;
@@ -56,20 +59,23 @@ use ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey;
 use ZfExtended_Models_Entity_NotFoundException;
 use ZfExtended_Resource_DbConfig as DbConfig;
 
-class OpenTm2MigrationCommand extends Translate5AbstractCommand
+class T5MemoryMigrationCommand extends Translate5AbstractCommand
 {
+    use FilteringByNameTrait;
+
     private const ARGUMENT_TARGET_URL = 'targetUrl';
     private const ARGUMENT_SOURCE_URL = 'sourceUrl';
     private const OPTION_DO_NOT_WAIT_IMPORT_FINISHED = 'doNotWaitImportFinish';
     private const OPTION_WAIT_TIMEOUT = 'wait-timeout';
     private const OPTION_CLONE_LANGUAGE_RESOURCE = 'duplicate-language-resource';
     private const OPTION_CLONED_NAME_PART = 'cloned_name_part';
+    private const OPTION_TM_NAME = 'tmName';
     private const DATA_RELATIVE_PATH = '/../data/';
     private const EXPORT_FILE_EXTENSION = '.tmx';
     private const DEFAULT_WAIT_TIME_SECONDS = 600;
     private const DEFAULT_WAIT_TICK_TIME_SECONDS = 5;
 
-    protected static $defaultName = 't5memory:migrate';
+    protected static $defaultName = 't5memory:migrate|memory:migrate';
 
     protected function configure(): void
     {
@@ -119,6 +125,12 @@ class OpenTm2MigrationCommand extends Translate5AbstractCommand
                     'Name part can contain place where it should be placed e.g prefix: or suffix:.' .
                     'If not provided default prefix is used',
                 'prefix:DUPLIKAT_TEST_'
+            )
+            ->addOption(
+                self::OPTION_TM_NAME,
+                'f',
+                InputOption::VALUE_REQUIRED,
+                'If no UUID was given this will filter the list of all TMs if provided'
             );
     }
 
@@ -134,10 +146,8 @@ class OpenTm2MigrationCommand extends Translate5AbstractCommand
 
         $service = new Service();
 
-        $targetUrl = $this->getTargetUrl($input, $service);
         $sourceResourceId = $this->getSourceResourceId($input, $service);
-
-        $languageResourcesData = ZfExtended_Factory::get(LanguageResource::class)->getByResourceId($sourceResourceId);
+        $languageResourcesData = $this->getLanguageResourcesData($input, $sourceResourceId);
 
         if (count($languageResourcesData) === 0) {
             $this->io->warning('Nothing to process. Exit.');
@@ -145,7 +155,19 @@ class OpenTm2MigrationCommand extends Translate5AbstractCommand
             return self::SUCCESS;
         }
 
-        $this->addUrlToConfig($targetUrl);
+        $targetUrl = $this->getTargetUrl($input, $service);
+
+        if (!$this->isFilteringByName()) {
+            $questionText = 'All memories will be migrated from ' . $input->getArgument(self::ARGUMENT_SOURCE_URL)
+                .  ' to ' . $input->getArgument(self::ARGUMENT_TARGET_URL);
+            $this->io->warning($questionText);
+            $helper = $this->getHelper('question');
+            $question = new ConfirmationQuestion('Do you really want to proceed? (Y/N)', false);
+
+            if (!$helper->ask($this->input, $this->output, $question)) {
+                return self::SUCCESS;
+            }
+        }
 
         $targetResourceId = $this->getTargetResourceId($targetUrl);
 
@@ -183,7 +205,7 @@ class OpenTm2MigrationCommand extends Translate5AbstractCommand
                 $this->import($connector, $languageResource, $filenameWithPath, $type);
             } catch (Throwable $e) {
                 $processingErrors[] = [
-                    'language resource id' => $languageResourceData['id'],
+                    'language resource: ' => $languageResourceData['id'] . ' (' . $languageResource->getName() . ')',
                     'message' => $e->getMessage()
                 ];
 
@@ -191,7 +213,11 @@ class OpenTm2MigrationCommand extends Translate5AbstractCommand
             }
         }
 
-        if (empty($processingErrors) && !$cloneLanguageResource) {
+        if (
+            empty($processingErrors) // No errors occurred
+            && !$cloneLanguageResource // We are not cloning language resources
+            && !$input->hasOption(self::OPTION_TM_NAME) // We are not filtering by name, but processing all resources
+        ) {
             $this->cleanupConfig($sourceResourceId);
             $targetResourceId = $this->getTargetResourceId($targetUrl);
             $this->updateLanguageResources(array_column($languageResourcesData, 'id'), $targetResourceId);
@@ -209,11 +235,22 @@ class OpenTm2MigrationCommand extends Translate5AbstractCommand
     private function getTargetUrl(InputInterface $input, Service $service): Uri
     {
         $url = new Uri($input->getArgument(self::ARGUMENT_TARGET_URL));
+        $urlFound = false;
 
         foreach ($service->getResources() as $resource) {
             if ($resource->getUrl() === (string)$url) {
-                throw new RuntimeException('Endpoint already exists');
+                $urlFound = true;
             }
+        }
+
+        if (!$urlFound) {
+            $this->addUrlToConfig($url);
+        }
+
+        if ($urlFound && !$input->hasOption(self::OPTION_TM_NAME)) {
+            // Command can be run several times only when filtering by name,
+            // if URL is already in config - command was already run in batch mode
+            throw new RuntimeException('Endpoint already exists');
         }
 
         return $url;
@@ -279,7 +316,7 @@ class OpenTm2MigrationCommand extends Translate5AbstractCommand
         }
 
         if (!isset($url)) {
-            throw new \RuntimeException('Something went wrong, OpenTM2 url not found, can not cleanup');
+            throw new RuntimeException('Something went wrong, OpenTM2 url not found, can not cleanup');
         }
 
         $config = ZfExtended_Factory::get(editor_Models_Config::class);
@@ -507,5 +544,40 @@ class OpenTm2MigrationCommand extends Translate5AbstractCommand
         $newLanguageResource->refresh();
 
         return $newLanguageResource;
+    }
+
+    private function getLanguageResourcesData(InputInterface $input, string $sourceResourceId): array
+    {
+        $languageResource = ZfExtended_Factory::get(LanguageResource::class);
+
+        if (!$this->isFilteringByName()) {
+            // Return all language resources for given source resource id in case there is no filter by name
+            return $languageResource->getByResourceId($sourceResourceId);
+        }
+
+        $languageResourcesData = $languageResource->getByResourceIdFilteredByNamePart(
+            $sourceResourceId,
+            $input->getOption(self::OPTION_TM_NAME)
+        );
+
+        if (count($languageResourcesData) > 1) {
+            $askMemories = new ChoiceQuestion(
+                'Please choose a Memory:',
+                array_values(array_map(static fn($data) => $data['name'], $languageResourcesData)),
+                null
+            );
+            $id = $this->io->askQuestion($askMemories);
+
+            $languageResourcesData = [
+                $languageResourcesData[array_search($id, array_column($languageResourcesData, 'name'), true)]
+            ];
+        }
+
+        return $languageResourcesData;
+    }
+
+    protected function getInput(): InputInterface
+    {
+        return $this->input;
     }
 }

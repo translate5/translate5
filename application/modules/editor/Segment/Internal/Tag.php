@@ -99,6 +99,8 @@ final class editor_Segment_Internal_Tag extends editor_Segment_Tag {
     protected static $nodeName = 'div';
     
     protected static $identificationClass = self::CSS_CLASS;
+    public $_idx;
+    public $_sidx;
 
     /**
      * Replaces all Internal Tags in a segment-text
