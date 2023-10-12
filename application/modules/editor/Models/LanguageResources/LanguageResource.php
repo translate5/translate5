@@ -179,6 +179,74 @@ class editor_Models_LanguageResources_LanguageResource extends ZfExtended_Models
         return $this->db->fetchAll($s)->toArray();
     }
 
+    /**
+     * Fetches language-resources of the specified types that have the given language-codes
+     * The language-codes either must be identical (default) or are searched by similarity (primary language equals)
+     * @param array $types
+     * @param string $sourceLangCode
+     * @param string $targetLangCode
+     * @param bool $findSimilarLanguages
+     * @return array
+     */
+    public function getByTypesAndLanguages(
+        array  $types,
+        string $sourceLangCode,
+        string $targetLangCode,
+        bool   $findSimilarLanguages = false): array
+    {
+        // the current user may is client-restricted and we have to respect that restriction
+        $restrictedClientIds = null;
+        if (ZfExtended_Authentication::getInstance()->isUserClientRestricted()) {
+            $restrictedClientIds = ZfExtended_Authentication::getInstance()->getUser()->getRestrictedClientIds();
+        }
+        $select = $this->db
+            ->select()
+            ->from(
+                ['lr' => 'LEK_languageresources'],
+                ['lr.id', 'lr.name', 'lr.serviceName', 'lr.resourceType', 'lr.specificData']
+            )
+            ->setIntegrityCheck(false)
+            ->joinLeft(
+                ['lla' => 'LEK_languageresources_languages'],
+                'lr.id = lla.languageResourceId',
+                ['sourceLangCode', 'targetLangCode']
+            );
+        if (count($types) > 1) {
+            $select->where('lr.resourceType IN (?)', $types);
+        } else if (count($types) === 1) {
+            $select->where('lr.resourceType = ?', $types[0]);
+        } else {
+            $select->where('1 = 0');
+        }
+
+        if ($findSimilarLanguages) {
+            $select
+                ->where(
+                    'lla.sourceLangCode LIKE ?',
+                    ZfExtended_Languages::primaryCodeByRfc5646($sourceLangCode) . '%'
+                )
+                ->where(
+                    'lla.targetLangCode LIKE ?',
+                    ZfExtended_Languages::primaryCodeByRfc5646($targetLangCode) . '%'
+                );
+        } else {
+            $select
+                ->where('lla.sourceLangCode = ?', $sourceLangCode)
+                ->where('lla.targetLangCode = ?', $targetLangCode);
+        }
+
+        if (!empty($restrictedClientIds)) {
+            $select
+                ->joinLeft(
+                    ['lca' => 'LEK_languageresources_customerassoc'],
+                    'lr.id = lca.languageResourceId',
+                    ['customerId']
+                )
+                ->where('lca.customerId IN (?)', $restrictedClientIds);
+        }
+        return $this->db->fetchAll($select)->toArray();
+    }
+
     public function getByResourceId(string $resourceId): array
     {
         $s = $this->db
@@ -201,7 +269,7 @@ class editor_Models_LanguageResources_LanguageResource extends ZfExtended_Models
     }
 
     /***
-     * Get all available language resources for customers of loged user
+     * Get all available language resources for customers of current user
      * The result data will in custom format(used in instanttranslate frontend)
      *
      * @param bool $addArrayId : if true(default true), the array key will be the language resource id
