@@ -317,8 +317,8 @@ Ext.define('Editor.view.segments.RowEditorColumnParts', {
 
         me.setColumnToEdit(me.context.column);
 
-        // TODO move to somewhere to avoid duplicates
-        let referenceField = Editor.data.task.get('emptyTargets') ? 'source' : 'target';
+        let referenceField = me.mainEditor.getReferenceField();
+
         me.mainEditor.setValueAndMarkup(record.get(me.columnToEdit), record, me.columnToEdit, referenceField);
     },
     

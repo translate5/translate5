@@ -2936,8 +2936,36 @@
                     <br/>Verwenden Sie alternativ die Hilfeschaltfläche, und suchen Sie nach Tastenkombinationen, um die fehlenden Tags aus der Quelle einzugeben.
                 </target>
             </trans-unit>
-            <trans-unit id='RGllIGZvbGdlbmRlbiBUYWdzIGV4aXN0aWVyZW4gbmljaHQgaW4gZGVyIFF1ZWxsc3ByYWNoZTo8YnIvPjx1bD48bGk+ezB9PC9saT48L3VsPlNvIGVudGZlcm5lbiBTaWUgZGVuIEZlaGxlcjo8YnIvPjx1bD48bGk+S2xpY2tlbiBTaWUgYXVmIE9LLCB1bSBkaWVzZSBOYWNocmljaHQgenUgZW50ZmVybmVuPC9saT48bGk+RHLDvGNrZW4gU2llIEVTQywgdW0gZGFzIFNlZ21lbnQgb2huZSBTcGVpY2hlcm4genUgdmVybGFzc2VuPC9saT48bGk+w5ZmZm5lbiBTaWUgZGFzIFNlZ21lbnQgZXJuZXV0PC9saT48L3VsPldpZWRlcmhvbGVuIFNpZSBqZXR6dCBJaHJlIMOEbmRlcnVuZ2VuLg=='>
-                <source>Die folgenden Tags existieren nicht in der Quellsprache:
+            <trans-unit id='Rm9sZ2VuZGUgVGFncyBmZWhsZW4gaW0gWmllbHRleHQgKHp1ciBJbXBvcnR6ZWl0L1ZvcsO8YmVyc2V0enVuZyk6PGJyLz48dWw+PGxpPnswfTwvbGk+PC91bD5TbyBlbnRmZXJuZW4gU2llIGRlbiBGZWhsZXI6PGJyLz48dWw+IDxsaT5LbGlja2VuIFNpZSBhdWYgT0ssIHVtIGRpZXNlIE5hY2hyaWNodCB6dSBlbnRmZXJuZW48L2xpPjxsaT5EcsO8Y2tlbiBTaWUgRVNDLCB1bSBkYXMgU2VnbWVudCBvaG5lIFNwZWljaGVybiB6dSB2ZXJsYXNzZW48L2xpPjxsaT7DlmZmbmVuIFNpZSBkYXMgU2VnbWVudCBlcm5ldXQ8L2xpPjwvdWw+V2llZGVyaG9sZW4gU2llIGpldHp0IElocmUgw4RuZGVydW5nZW4uPGJyLz5WZXJ3ZW5kZW4gU2llIGFsdGVybmF0aXYgZGllIEhpbGZlc2NoYWx0ZmzDpGNoZSwgdW5kIHN1Y2hlbiBTaWUgbmFjaCBUYXN0ZW5rb21iaW5hdGlvbmVuLCB1bSBkaWUgZmVobGVuZGVuIFRhZ3MgYXVzIGRlciBRdWVsbGUgZWluenVnZWJlbi4='>
+                <source>Folgende Tags fehlen im Zieltext (zur Importzeit/Vorübersetzung):
+                    <br/>
+                    <ul>
+                        <li>{0}</li>
+                    </ul>So entfernen Sie den Fehler:
+                    <br/>
+                    <ul>
+                        <li>Klicken Sie auf OK, um diese Nachricht zu entfernen</li>
+                        <li>Drücken Sie ESC, um das Segment ohne Speichern zu verlassen</li>
+                        <li>Öffnen Sie das Segment erneut</li>
+                    </ul>Wiederholen Sie jetzt Ihre Änderungen.
+                    <br/>Verwenden Sie alternativ die Hilfeschaltfläche, und suchen Sie nach Tastenkombinationen, um die fehlenden Tags aus der Quelle einzugeben.
+                </source>
+                <target>Folgende Tags fehlen:
+                    <br/>
+                    <ul>
+                        <li>{0}</li>
+                    </ul>So entfernen Sie den Fehler:
+                    <br/>
+                    <ul>
+                        <li>Klicken Sie auf OK, um diese Nachricht zu entfernen</li>
+                        <li>Drücken Sie ESC, um das Segment ohne Speichern zu verlassen</li>
+                        <li>Öffnen Sie das Segment erneut</li>
+                    </ul>Wiederholen Sie jetzt Ihre Änderungen.
+                    <br/>Verwenden Sie alternativ die Hilfeschaltfläche, und suchen Sie nach Tastenkombinationen, um die fehlenden Tags aus der Quelle einzugeben.
+                </target>
+            </trans-unit>
+            <trans-unit id='RGllIGZvbGdlbmRlbiBUYWdzIGV4aXN0aWVyZW4gbmljaHQgaW4gZGVyIEF1c2dhbmd0ZXh0Ojxici8+PHVsPjxsaT57MH08L2xpPjwvdWw+U28gZW50ZmVybmVuIFNpZSBkZW4gRmVobGVyOjxici8+PHVsPjxsaT5LbGlja2VuIFNpZSBhdWYgT0ssIHVtIGRpZXNlIE5hY2hyaWNodCB6dSBlbnRmZXJuZW48L2xpPjxsaT5EcsO8Y2tlbiBTaWUgRVNDLCB1bSBkYXMgU2VnbWVudCBvaG5lIFNwZWljaGVybiB6dSB2ZXJsYXNzZW48L2xpPjxsaT7DlmZmbmVuIFNpZSBkYXMgU2VnbWVudCBlcm5ldXQ8L2xpPjwvdWw+V2llZGVyaG9sZW4gU2llIGpldHp0IElocmUgw4RuZGVydW5nZW4u'>
+                <source>Die folgenden Tags existieren nicht in der Ausgangtext:
                     <br/>
                     <ul>
                         <li>{0}</li>
@@ -2949,7 +2977,33 @@
                         <li>Öffnen Sie das Segment erneut</li>
                     </ul>Wiederholen Sie jetzt Ihre Änderungen.
                 </source>
-                <target>Die folgenden Tags existieren nicht in der Quellsprache:
+                <target>Die folgenden Tags existieren nicht in der Ausgangtext:
+                    <br/>
+                    <ul>
+                        <li>{0}</li>
+                    </ul>So entfernen Sie den Fehler:
+                    <br/>
+                    <ul>
+                        <li>Klicken Sie auf OK, um diese Nachricht zu entfernen</li>
+                        <li>Drücken Sie ESC, um das Segment ohne Speichern zu verlassen</li>
+                        <li>Öffnen Sie das Segment erneut</li>
+                    </ul>Wiederholen Sie jetzt Ihre Änderungen.
+                </target>
+            </trans-unit>
+            <trans-unit id='RGllIGZvbGdlbmRlbiBUYWdzIGV4aXN0aWVyZW4gbmljaHQgaW4gZGVyIFppZWx0ZXh0ICh6dXIgSW1wb3J0emVpdC9Wb3LDvGJlcnNldHp1bmcpOjxici8+PHVsPjxsaT57MH08L2xpPjwvdWw+U28gZW50ZmVybmVuIFNpZSBkZW4gRmVobGVyOjxici8+PHVsPjxsaT5LbGlja2VuIFNpZSBhdWYgT0ssIHVtIGRpZXNlIE5hY2hyaWNodCB6dSBlbnRmZXJuZW48L2xpPjxsaT5EcsO8Y2tlbiBTaWUgRVNDLCB1bSBkYXMgU2VnbWVudCBvaG5lIFNwZWljaGVybiB6dSB2ZXJsYXNzZW48L2xpPjxsaT7DlmZmbmVuIFNpZSBkYXMgU2VnbWVudCBlcm5ldXQ8L2xpPjwvdWw+V2llZGVyaG9sZW4gU2llIGpldHp0IElocmUgw4RuZGVydW5nZW4u'>
+                <source>Die folgenden Tags existieren nicht in der Zieltext (zur Importzeit/Vorübersetzung):
+                    <br/>
+                    <ul>
+                        <li>{0}</li>
+                    </ul>So entfernen Sie den Fehler:
+                    <br/>
+                    <ul>
+                        <li>Klicken Sie auf OK, um diese Nachricht zu entfernen</li>
+                        <li>Drücken Sie ESC, um das Segment ohne Speichern zu verlassen</li>
+                        <li>Öffnen Sie das Segment erneut</li>
+                    </ul>Wiederholen Sie jetzt Ihre Änderungen.
+                </source>
+                <target>Die folgenden Tags existieren nicht in der Zieltext (zur Importzeit/Vorübersetzung):
                     <br/>
                     <ul>
                         <li>{0}</li>
