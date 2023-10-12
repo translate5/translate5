@@ -9168,6 +9168,10 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
                 <source>Begriff existiert bereits in der ausgewählten TermCollection</source>
                 <target>Begriff existiert bereits in der ausgewählten TermCollection</target>
             </trans-unit>
+            <trans-unit id='RGFzIFNlZ21lbnQga29ubnRlIG51ciBpbiBkZXIgQXVmZ2FiZSwgbmljaHQgYWJlciBpbnMgVE0gZ2VzcGVpY2hlcnQgd2VyZGVuLiBTZWdtZW50ZSBsw6RuZ2VyIGFscyAyMDQ4IEJ5dGVzIHNpbmQgbmljaHQgaW0gVE0gc3BlaWNoZXJiYXIu'>
+                <source>Das Segment konnte nur in der Aufgabe, nicht aber ins TM gespeichert werden. Segmente länger als 2048 Bytes sind nicht im TM speicherbar.</source>
+                <target>Das Segment konnte nur in der Aufgabe, nicht aber ins TM gespeichert werden. Segmente länger als 2048 Bytes sind nicht im TM speicherbar.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

@@ -9345,6 +9345,10 @@ E-Mail: service@MittagQI.com</pre>
                 <source>Begriff existiert bereits in der ausgewählten TermCollection</source>
                 <target>Term already exists in selected TermCollection</target>
             </trans-unit>
+            <trans-unit id='RGFzIFNlZ21lbnQga29ubnRlIG51ciBpbiBkZXIgQXVmZ2FiZSwgbmljaHQgYWJlciBpbnMgVE0gZ2VzcGVpY2hlcnQgd2VyZGVuLiBTZWdtZW50ZSBsw6RuZ2VyIGFscyAyMDQ4IEJ5dGVzIHNpbmQgbmljaHQgaW0gVE0gc3BlaWNoZXJiYXIu'>
+                <source>Das Segment konnte nur in der Aufgabe, nicht aber ins TM gespeichert werden. Segmente länger als 2048 Bytes sind nicht im TM speicherbar.</source>
+                <target>The segment could only be saved to the task, but not to the TM. Segments longer than 2048 bytes cannot be saved to the TM.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>
