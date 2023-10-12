@@ -65,8 +65,8 @@ class editor_Models_Import_FileParser_Testcase extends editor_Models_Import_File
      * @see editor_Models_Import_FileParser::parse()
      */
     protected function parse() {
-        $this->_skeletonFile = $this->_origFile;
-        $this->qp = qp($this->_skeletonFile, ':root',array('format_output'=> false, 'encoding'=>'UTF-8','use_parser'=>'xml'));
+        $this->skeletonFile = $this->_origFile;
+        $this->qp = qp($this->skeletonFile, ':root',array('format_output'=> false, 'encoding'=>'UTF-8','use_parser'=>'xml'));
         
         $id = $this->segmentCount++;
         //just create a segment attributes object with default values
@@ -74,7 +74,7 @@ class editor_Models_Import_FileParser_Testcase extends editor_Models_Import_File
         $this->setMid($id);
         
         $this->extractSegment('fake - not needed, except for declaration');
-        $this->_skeletonFile = $this->qp->xml();
+        $this->skeletonFile = $this->qp->xml();
     }
 
     /**
