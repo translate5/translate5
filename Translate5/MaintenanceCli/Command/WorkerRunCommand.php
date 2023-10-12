@@ -30,6 +30,7 @@ namespace Translate5\MaintenanceCli\Command;
 
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Throwable;
 use Zend_Exception;
@@ -49,7 +50,7 @@ class WorkerRunCommand extends Translate5AbstractCommand
     {
         $this
             // the short description shown while running "php bin/console list"
-            ->setDescription('Triggers the worker queue - '.
+            ->setDescription('Triggers the worker queue - ' .
                 'may be necessary after an apache restart or maintenance mode.')
 
             // the full command description shown when running the command with
@@ -60,6 +61,12 @@ class WorkerRunCommand extends Translate5AbstractCommand
             'id',
             InputArgument::REQUIRED,
             'The worker ID to be started.'
+        );
+
+        $this->addOption(
+            'debug',
+            mode: InputOption::VALUE_REQUIRED,
+            description: 'Just an option to pass worker and taskGuid into the real process list to be shown with top'
         );
     }
 
