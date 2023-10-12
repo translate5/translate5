@@ -399,6 +399,24 @@ class Editor_SegmentController extends ZfExtended_RestController
         $this->view->rows = $result;
         $this->view->total = count($result);
         $this->view->hasMqm = $this->isMqmTask($parameters['taskGuid']);
+        $this->view->isOpenedByMoreThanOneUser = $this->isOpenedByMoreThanOneUser($parameters['taskGuid']);
+    }
+
+    /**
+     * Check whether task is opened by more than one user
+     *
+     * @param string $taskGuid
+     * @return bool
+     * @throws ReflectionException
+     * @throws Zend_Db_Statement_Exception
+     */
+    public function isOpenedByMoreThanOneUser(string $taskGuid) : bool {
+
+        // Get usage records
+        $usedBy = ZfExtended_Factory::get(editor_Models_TaskUserAssoc::class)->loadUsed($taskGuid);
+
+        // Return flag indicating whether there are more than one such a record
+        return count($usedBy) > 1;
     }
 
     /***
@@ -419,7 +437,7 @@ class Editor_SegmentController extends ZfExtended_RestController
         $task->loadByTaskGuid($parameters['taskGuid']);
         $t = ZfExtended_Zendoverwrites_Translate::getInstance();
         /* @var $t ZfExtended_Zendoverwrites_Translate */
-        if ($task->getUsageMode() == $task::USAGE_MODE_SIMULTANEOUS) {
+        if ($task->getUsageMode() == $task::USAGE_MODE_SIMULTANEOUS && $this->isOpenedByMoreThanOneUser($parameters['taskGuid'])) {
             throw new editor_Models_SearchAndReplace_Exception('E1192', ['task' => $task]);
         }
 

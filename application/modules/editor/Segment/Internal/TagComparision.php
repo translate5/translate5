@@ -69,8 +69,7 @@ class editor_Segment_Internal_TagComparision extends editor_Segment_Internal_Tag
      */
     const TAG_STRUCTURE_FAULTY_NONEDITABLE = 'internal_tag_structure_faulty_noneditable'; 
     /**
-     * 
-     * @var string;
+     * @var array;
      */
     private $stati = [];
     /**
