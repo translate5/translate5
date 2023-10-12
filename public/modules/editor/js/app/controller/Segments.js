@@ -136,7 +136,9 @@ Ext.define('Editor.controller.Segments', {
                 afterrender: 'gridAfterRender',
                 columnhide: 'handleColumnVisibility',
                 columnshow: 'handleColumnVisibility',
-                canceledit: 'handleCancelEdit'
+                canceledit: 'handleCancelEdit',
+                select:'onSegmentGridSelect'
+
             },
             '#fileorderTree': {
                 itemclick: 'handleFileClick'
@@ -203,7 +205,7 @@ Ext.define('Editor.controller.Segments', {
      * @param {Integer} new segment count to be displayed
      */
     updateFilteredCountDisplay: function (newTotal) {
-        var me = this;
+        var me = this,
             resetFilterBtn = me.getResetFilterBtn();
 
         if (!resetFilterBtn){
@@ -771,6 +773,16 @@ Ext.define('Editor.controller.Segments', {
     handleCancelEdit() {
         this.fireEvent('segmentEditCanceled', this);
     },
+
+    /**
+     * @param {Ext.selection.RowModel} rowmodel
+     * @param {Editor.model.Segment} segment
+     */
+    onSegmentGridSelect: function(rowmodel, segment) {
+        var viewPort = this.getViewport();
+        viewPort.getViewModel().set('selectedSegment', segment);
+    },
+
     /**
      * Listens to the filter panel controller and delegates it to our store and changes the view if the stored filter changed
      */

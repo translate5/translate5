@@ -26,27 +26,23 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-/**
- * @class Editor.view.segments.GridViewModel
- * @extends Ext.app.ViewModel
- */
-Ext.define('Editor.view.ViewPortEditorViewModel', {
+Ext.define('Editor.view.comments.PanelViewModel', {
     extend: 'Ext.app.ViewModel',
-    alias: 'viewmodel.viewportEditor',
-    data: {
-        l10n: Editor.data.l10n,
-        taskIsReadonly: false,   // indicates if the task is readonly (can not be changed by the user in the editor)
-        editorIsReadonly: false, // indicates if the task is readonly, triggered by the user and changeable by the user
-        taskHasDefaultLayout: true, //indicates if the tasks segments have the default layout or not (no multiple targets)
-        editorViewmode: null,
-        selectedSegment:null
-    },
+    alias: 'viewmodel.commentPanel',
     formulas: {
-        viewmodeIsErgonomic: function(get){
-            return get('editorViewmode') == Editor.controller.ViewModes.MODE_ERGONOMIC;
-        },
-        viewmodeIsEdit: function(get){
-            return get('editorViewmode') == Editor.controller.ViewModes.MODE_EDIT;
+        commentPanelIsDisabled: {
+            bind: {
+                bindTo: '{selectedSegment}',
+                deep: true
+            },
+            get: function(seg) {
+                if (seg && seg.get('editable'))
+                {
+                    return false;
+                }
+                return !Editor.app.authenticatedUser.isAllowed('editorCommentsForLockedSegments');
+            }
         }
     }
+
 });
