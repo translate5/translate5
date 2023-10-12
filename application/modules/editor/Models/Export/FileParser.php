@@ -33,6 +33,7 @@ END LICENSE AND COPYRIGHT
  */
 
 use MittagQI\Translate5\Segment\TransUnitHash;
+use MittagQI\Translate5\Task\Import\SkeletonFile;
 
 /**
  * Enthält Methoden zum Fileparsing für den Export
@@ -47,7 +48,7 @@ abstract class editor_Models_Export_FileParser {
     /**
      * @var string
      */
-    protected $_skeletonFile = NULL;
+    protected string $skeletonFile = '';
     /**
      * @var integer
      */
@@ -142,12 +143,17 @@ abstract class editor_Models_Export_FileParser {
     protected $segmentFieldManager;
 
     protected TransUnitHash $transunitHash;
+    protected SkeletonFile $skeletonFileInstance;
 
     /**
      * @param editor_Models_Task $task
      * @param int $fileId
      * @param string $path The absolute path to the file where the content is written to
      * @param array $options see $this->options for available options
+     * @throws ReflectionException
+     * @throws Zend_Exception
+     * @throws editor_Models_ConfigException
+     * @throws editor_Models_Export_FileParser_Exception
      */
     public function __construct(editor_Models_Task $task, int $fileId, string $path, array $options = []) {
         if(is_null($this->_classNameDifftagger)){
@@ -173,6 +179,8 @@ abstract class editor_Models_Export_FileParser {
         $this->segmentFieldManager->initFields($this->_taskGuid);
 
         $this->events = ZfExtended_Factory::get('ZfExtended_EventManager', array(get_class($this)));
+
+        $this->skeletonFileInstance = ZfExtended_Factory::get(SkeletonFile::class, [$task]);
     }
 
     /**
@@ -185,7 +193,7 @@ abstract class editor_Models_Export_FileParser {
         /* @var $file editor_Models_File */
         $file->load($this->_fileId);
         
-        $this->getSkeleton($file);
+        $this->loadSkeleton($file);
         $this->parse();
         return $this->_exportFile = $this->convertEncoding($file, $this->_exportFile);
     }
@@ -210,7 +218,7 @@ abstract class editor_Models_Export_FileParser {
      * - befüllt $this->_exportFile
      */
     protected function parse() {
-        $file = preg_split('#<lekTargetSeg([^>]+)/>#', $this->_skeletonFile, flags: PREG_SPLIT_DELIM_CAPTURE);
+        $file = preg_split('#<lekTargetSeg([^>]+)/>#', $this->skeletonFile, flags: PREG_SPLIT_DELIM_CAPTURE);
 
         $count = count($file) - 1;
         for ($i = 1; $i < $count;) {
@@ -399,9 +407,11 @@ abstract class editor_Models_Export_FileParser {
     /**
      * Loads the skeleton file from the disk and stores it internally
      * @param editor_Models_File $file
+     * @throws ZfExtended_Exception
      */
-    protected function getSkeleton(editor_Models_File $file) {
-        $this->_skeletonFile = $file->loadSkeletonFromDisk($this->_task);
+    protected function loadSkeleton(editor_Models_File $file) {
+        //since its not called in a loop, we just instance the SkeletonFile here
+        $this->skeletonFile = $this->skeletonFileInstance->loadFromDisk($file);
     }
 
     /**

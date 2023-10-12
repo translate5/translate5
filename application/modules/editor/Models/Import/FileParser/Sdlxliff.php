@@ -331,8 +331,8 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
                 'filename' => $this->_fileName,
             ]);
         }
-        $this->_skeletonFile = implode('<group', $groups);
-        $this->_skeletonFile = str_replace(array('<group bin-unit ', '/bin-unit</group>'), array('<bin-unit', '</bin-unit>'), $this->_skeletonFile);
+        $this->skeletonFile = implode('<group', $groups);
+        $this->skeletonFile = str_replace(array('<group bin-unit ', '/bin-unit</group>'), array('<bin-unit', '</bin-unit>'), $this->skeletonFile);
     }
 
     /**
