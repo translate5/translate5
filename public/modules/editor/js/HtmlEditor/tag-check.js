@@ -13,14 +13,19 @@ class TagCheck {
 
         for (let node of nodeList) {
             // node id can have word locked followed by number, so we need to use negative lookbehind
-            const match = node.id.match(new RegExp(this.idPrefix + '([a-zA-Z]+)(?<!locked)(locked)?(\\d+)'));
+            const match = node.id.match(new RegExp(this.idPrefix + '([a-zA-Z]+)(\\d+)'));
 
             if (!match) {
                 continue;
             }
 
-            const type = match[1];
-            const number = parseInt(match[3], 10);
+            let type = match[1];
+
+            if (type.includes('locked')) {
+                type = type.replace('locked', '');
+            }
+
+            const number = parseInt(match[2], 10);
             const id = type + number;
 
             let isQaTag = /qmflag/.test(node.className);

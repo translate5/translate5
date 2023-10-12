@@ -129,7 +129,7 @@ class PivotQueuer
 
         $pivotWorker->queue($parentWorkerId, $workerState, false);
 
-        if (!$task->isImporting()) {
+        if (isset($operation) && !$task->isImporting()) {
             $operation->start();
         }
     }

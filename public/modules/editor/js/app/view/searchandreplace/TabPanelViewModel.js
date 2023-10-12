@@ -38,29 +38,33 @@ Ext.define('Editor.view.searchandreplace.TabPanelViewModel', {
         searchView:true,
         searchResultsFound:false,
         disableSearchButton:true,
-        hasMqm:false
+        hasMqm:false,
+        isOpenedByMoreThanOneUser: false
     },
     
     formulas:{
-    	isReplaceAllTooltip:function(get){
-            if(get('hasMqm')){
+    	isReplaceAllTooltip: function(get) {
+            if (get('hasMqm')) {
             	return this.getView().strings.mqmNotSupporterTooltip;
             }
-            if(Editor.data.task.get('usageMode')===Editor.model.admin.Task.USAGE_MODE_SIMULTANEOUS){
-            	return this.getView().strings.multiUsersTooltip;
+            if (!get('searchResultsFound')) {
+            	return this.getView().getViewModel().get('l10n.segmentGrid.searchReplace.replaceAll.disabled.reason1');
+            }
+            if (get('isOpenedByMoreThanOneUser')) {
+            	return this.getView().getViewModel().get('l10n.segmentGrid.searchReplace.replaceAll.disabled.reason2');
             }
             return null;
         },
-        isSearchView:function(get){
+        isSearchView: function(get) {
             return get('searchView');
         },
-        isSearchResultsFound:function(get){
+        isSearchResultsFound: function(get) {
             return get('searchResultsFound');
         },
-        isDisableReplaceAllButton:function(get){
-            return !get('searchResultsFound') || get('hasMqm') || Editor.data.task.get('usageMode')===Editor.model.admin.Task.USAGE_MODE_SIMULTANEOUS;
+        isDisableReplaceAllButton: function(get) {
+            return !get('searchResultsFound') || get('hasMqm') || get('isOpenedByMoreThanOneUser');
         },
-        isDisableSearchButton:function(get){
+        isDisableSearchButton: function(get) {
             return get('disableSearchButton');
         }
     }

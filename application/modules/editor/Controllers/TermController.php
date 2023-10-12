@@ -48,6 +48,11 @@ class editor_TermController extends ZfExtended_RestController
     protected $entity;
 
     /**
+     * @var ZfExtended_Zendoverwrites_Translate
+     */
+    protected $_translate;
+
+    /**
      * Collections, allowed for current user
      *
      * @var
@@ -66,6 +71,9 @@ class editor_TermController extends ZfExtended_RestController
         $this->handleData();
 
         $termCollection = ZfExtended_Factory::get(editor_Models_TermCollection_TermCollection::class);
+
+        // Setup translator
+        $this->_translate = ZfExtended_Zendoverwrites_Translate::getInstance();
 
         // If current user has 'termPM_allClients' role, it means all collections are accessible
         // Else we should apply collectionsIds-restriction everywhere, so get accessible collections
@@ -189,7 +197,7 @@ class editor_TermController extends ZfExtended_RestController
             // so in that case we make sure user will get explicitly MsgBox saying 'Done'
             $this->view->assign([
                 'success' => true,
-                'msg' => 'Done'
+                'msg' => $this->_translate->_('Erledigt')
             ]);
         }
     }
@@ -280,7 +288,9 @@ class editor_TermController extends ZfExtended_RestController
             if (array_intersect($termEntryIdA['target'], $termEntryIdA['source'])) {
 
                 // Flush failure
-                $this->jflush(false, 'Both terms are already existing within selected term collection');
+                $this->jflush(false, $this->_translate->_(
+                    'Beide Benennungen bereits vorhanden in ausgewählter TermCollection.'
+                ));
 
             // Else if at least one termEntryId found for target term
             } else if ($termEntryIdA['target']) {
@@ -301,7 +311,9 @@ class editor_TermController extends ZfExtended_RestController
 
                 // Else flush failure
                 } else {
-                    $this->jflush(false, 'Term already exists in selected term collection');
+                    $this->jflush(false, $this->_translate->_(
+                        'Begriff existiert bereits in der ausgewählten TermCollection'
+                    ));
                 }
 
             // Else if at least one termEntryId found for source term

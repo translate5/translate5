@@ -9,6 +9,68 @@ Missing Versions are merged into in the next upper versions, so no extra section
 All updates are (downwards) compatible! If not this is listed in the important release notes.
 
 
+
+
+## [6.6.1] - 2023-10-04
+
+### Important Notes:
+ 
+
+
+### Added
+**[TRANSLATE-3504](https://jira.translate5.net/browse/TRANSLATE-3504): VisualReview / VisualTranslation - Improve t5memory cli management** <br>
+Added a new command for deleting t5memory language resource
+
+**[TRANSLATE-1436](https://jira.translate5.net/browse/TRANSLATE-1436): TermPortal - Add or propose terminology directly from translate5 task** <br>
+translate5 - 6.6.0: Added ability to propose terminology right from the opened segment in the editor
+translate5 - 6.6.1: Additional UI improvements
+
+
+### Bugfixes
+**[TRANSLATE-3510](https://jira.translate5.net/browse/TRANSLATE-3510): Main back-end mechanisms (Worker, Logging, etc.) - Remove error log summary mail** <br>
+The error log summary e-mail is removed in favour of the error log available in the UI.
+
+**[TRANSLATE-3497](https://jira.translate5.net/browse/TRANSLATE-3497): Editor general, Search & Replace (editor) - "replace all" disabled** <br>
+'Replace all' button is now disabled if task is really opened by more than one user
+
+**[TRANSLATE-3487](https://jira.translate5.net/browse/TRANSLATE-3487): Editor general - Taking over fuzzy matches in the UI may lead to corrupted internal tags** <br>
+6.5.4: FIX: Segments with more then 9 tags were producing errors in the UI
+6.5.3: Taking over fuzzy matches in the UI was producing corrupted internal tags. In the Editor the tags were looking correctly, but on database level they did contain the wrong content. 
+6.5.5: Fix problem with locked segment tag
+6.6.1: Fix problem in old safari browsers
+
+
+## [6.6.0] - 2023-09-29
+
+### Important Notes:
+ 
+
+
+### Added
+**[TRANSLATE-3403](https://jira.translate5.net/browse/TRANSLATE-3403): TermPortal - Show history of term or attribute in TermPortal** <br>
+Added ability to show editing history for terms and attributes
+
+**[TRANSLATE-1436](https://jira.translate5.net/browse/TRANSLATE-1436): TermPortal - Add or propose terminology directly from translate5 task** <br>
+Added ability to propose terminology right from the opened segment in the editor
+
+
+### Changed
+**[TRANSLATE-3500](https://jira.translate5.net/browse/TRANSLATE-3500): ConnectWorldserver - Plugin ConnectWorldserver: finished task will (sometimes) not be transfered back to Worldserver** <br>
+If connection to Worldserver does not exist, transfer back to Worldserver does not happen, but the task in Translate5 was finished nevertheless.
+Now there is a check so its not possible to finish the task any more and a "connection-error" is shown to the user.
+
+**[TRANSLATE-3408](https://jira.translate5.net/browse/TRANSLATE-3408): InstantTranslate - Implement proper segmentation for InstantTranslate** <br>
+Improved segmentation for InstantTranslate to work like the  target segmentation of Okapi
+
+
+### Bugfixes
+**[TRANSLATE-3503](https://jira.translate5.net/browse/TRANSLATE-3503): VisualReview / VisualTranslation - If pdf file contains brackets import fails** <br>
+Fixed bug which caused task containing PDF files with square brackets in name fail to import
+
+**[TRANSLATE-3477](https://jira.translate5.net/browse/TRANSLATE-3477): User Management - Add missing ACL right and role documentation** <br>
+Added ACL rights and role documentation.
+
+
 ## [6.5.5] - 2023-09-27
 
 ### Important Notes:
