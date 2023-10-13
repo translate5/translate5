@@ -31,6 +31,7 @@ namespace MittagQI\Translate5\NumberProtection\Model\Validation;
 use MittagQI\Translate5\NumberProtection\Model\Db\NumberRecognitionTable;
 use MittagQI\Translate5\NumberProtection\NumberProtector;
 use Zend_Validate;
+use ZfExtended_Factory;
 use ZfExtended_Models_Validator_Abstract;
 
 class NumberRecognitionValidator extends ZfExtended_Models_Validator_Abstract
@@ -41,7 +42,7 @@ class NumberRecognitionValidator extends ZfExtended_Models_Validator_Abstract
      */
     protected function defineValidators()
     {
-        $table = \ZfExtended_Factory::get(NumberRecognitionTable::class)->info(NumberRecognitionTable::NAME);
+        $table = ZfExtended_Factory::get(NumberRecognitionTable::class)->info(NumberRecognitionTable::NAME);
         //`id` int(11) NOT NULL AUTO_INCREMENT,
         $idValidator = new Zend_Validate();
         $idValidator->addValidator($this->validatorFactory('int'), true);
@@ -50,8 +51,11 @@ class NumberRecognitionValidator extends ZfExtended_Models_Validator_Abstract
         $this->addValidatorInstance('id', $idValidator);
 
         $this->addValidator('type', 'InArray', [NumberProtector::create()->types()]);
-        //`name` varchar(255) NOT NULL DEFAULT 'default',
+        //`name` varchar(255) NOT NULL,
         $this->addValidator('name', 'stringLength', ['min' => 3, 'max' => 255]);
+
+        //`description` varchar(1024),
+        $this->addValidator('description', 'stringLength', ['min' => 3, 'max' => 1024]);
 
         //`regex` varchar(255) NOT NULL,
         $regexValidator = new Zend_Validate();
@@ -59,6 +63,9 @@ class NumberRecognitionValidator extends ZfExtended_Models_Validator_Abstract
         $regexValidator->addValidator(new RegexPatternValidator(), true);
 
         $this->addValidatorInstance('regex', $regexValidator);
+
+        $this->addValidator('matchId', 'int');
+
         //`format` varchar(255) NOT NULL,
         $this->addValidator('format', 'stringLength', ['min' => 0, 'max' => 255]);
 

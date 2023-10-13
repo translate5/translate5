@@ -85,6 +85,23 @@ Ext.define('Editor.view.admin.numberProtection.numberRecognition.CreateWindow', 
                                     type: 'mac-address'
                                 }]
                             },
+                            listeners: {
+                                change: (fld, newValue) => {
+                                    const formatFld = fld.up('form').down('#formatFld');
+                                    const keepAsIsFld = fld.up('form').down('#keepAsIsFld');
+
+                                    formatFld.hide();
+                                    keepAsIsFld.hide();
+
+                                    if (['date', 'float', 'integer'].includes(newValue)) {
+                                        formatFld.show();
+                                    }
+
+                                    if (!['ip-address', 'mac-address'].includes(newValue)) {
+                                        keepAsIsFld.show();
+                                    }
+                                }
+                            },
                             bind: {
                                 fieldLabel: '{l10n.general.type}'
                             }
@@ -99,12 +116,33 @@ Ext.define('Editor.view.admin.numberProtection.numberRecognition.CreateWindow', 
                         },
                         {
                             xtype: 'textfield',
+                            name: 'description',
+                            allowBlank: true,
+                            bind: {
+                                fieldLabel: '{l10n.general.description}'
+                            }
+                        },
+                        {
+                            xtype: 'textfield',
                             name: 'regex',
                             fieldLabel: 'Regex',
                             allowBlank: false
                         },
                         {
+                            xtype: 'numberfield',
+                            name: 'matchId',
+                            allowBlank: true,
+                            bind: {
+                                fieldLabel: '{l10n.numberProtection.numberRecognition.matchId} &#8505;'
+                            },
+                            autoEl: {
+                                tag: 'div',
+                                'data-qtip': Editor.data.l10n.numberProtection.numberRecognition.matchIdQTip
+                            }
+                        },
+                        {
                             xtype: 'textfield',
+                            itemId: 'formatFld',
                             name: 'format',
                             allowBlank: true,
                             bind: {
@@ -113,6 +151,7 @@ Ext.define('Editor.view.admin.numberProtection.numberRecognition.CreateWindow', 
                         },
                         {
                             xtype: 'checkbox',
+                            itemId: 'keepAsIsFld',
                             name: 'keepAsIs',
                             allowBlank: false,
                             bind: {

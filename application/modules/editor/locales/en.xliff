@@ -9275,7 +9275,6 @@ E-Mail: service@MittagQI.com</pre>
                 <source>Gemeldete Fehler</source>
                 <target>Reported errors</target>
             </trans-unit>
-<<<<<<< HEAD
             <trans-unit id='UHJpb3JpdMOkdA=='>
                 <source>Priorität</source>
                 <target>Priority</target>
@@ -9343,6 +9342,14 @@ E-Mail: service@MittagQI.com</pre>
             <trans-unit id='QmVncmlmZiBleGlzdGllcnQgYmVyZWl0cyBpbiBkZXIgYXVzZ2V3w6RobHRlbiBUZXJtQ29sbGVjdGlvbg=='>
                 <source>Begriff existiert bereits in der ausgewählten TermCollection</source>
                 <target>Term already exists in selected TermCollection</target>
+            </trans-unit>
+            <trans-unit id="R2VzY2jDvHR6dGUgUmVnZXgtR3J1cHBl">
+                <source>Geschützte Regex-Gruppe</source>
+                <target>Protected regex group</target>
+            </trans-unit>
+            <trans-unit id="UHJvdGVjdGVkIHJlZ2V4IGdyb3VwIHF0aXA=">
+                <source>Protected regex group qtip</source>
+                <target>Regexes can contain groupings defined with (). The selected number is the number of the protected grouping, counted from the start of the regex. If no grouping is defined, everything matched by the regex will be protected.</target>
             </trans-unit>
         </body>
     </file>

@@ -53,9 +53,15 @@ Ext.define('Editor.view.admin.numberProtection.numberRecognition.Model', {
     },{
         name: 'name',
         type: 'string'
+    },{
+        name: 'description',
+        type: 'string'
     }, {
         name: 'regex',
         type: 'string'
+    }, {
+        name: 'matchId',
+        type: 'int'
     }, {
         name: 'format',
         type: 'string'

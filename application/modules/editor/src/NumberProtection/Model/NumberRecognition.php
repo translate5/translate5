@@ -63,6 +63,8 @@ use ZfExtended_Models_Entity_Abstract;
  * @method void setType(string $type)
  * @method string getName()
  * @method void setName(string $name)
+ * @method string getDescription()
+ * @method void setDescription(string $description)
  * @method string getRegex()
  * @method void setRegex(string $regex)
  * @method string getFormat()

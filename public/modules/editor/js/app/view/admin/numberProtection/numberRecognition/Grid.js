@@ -157,6 +157,26 @@ Ext.define('Editor.view.admin.numberProtection.numberRecognition.Grid', {
             },
             {
                 xtype: 'gridcolumn',
+                alias: 'description',
+                dataIndex: 'description',
+                stateId: 'description',
+                editor: {
+                    field: {
+                        xtype: 'textfield',
+                        allowBlank: true,
+                        bind: {
+                            emptyText: '...'
+                        }
+                    }
+                },
+                renderer: 'editableCellRenderer',
+                flex: 2,
+                bind: {
+                    text: '{l10n.general.description}'
+                }
+            },
+            {
+                xtype: 'gridcolumn',
                 alias: 'regex',
                 dataIndex: 'regex',
                 stateId: 'regex',

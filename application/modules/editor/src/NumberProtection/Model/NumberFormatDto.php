@@ -58,6 +58,7 @@ use Zend_Db_Table_Row;
  * @property-read string $type
  * @property-read string $name
  * @property-read string $regex
+ * @property-read int $matchId
  * @property-read string|null $format
  * @property-read bool $keepAsIs
  */
@@ -67,6 +68,7 @@ class NumberFormatDto
         public string $type,
         public string $name,
         public string $regex,
+        public int $matchId,
         public ?string $format,
         public bool $keepAsIs,
     ) {}
@@ -77,6 +79,7 @@ class NumberFormatDto
             $row['type'],
             $row['name'],
             $row['regex'],
+            (int) $row['matchId'],
             $row['format'],
             (bool) $row['keepAsIs'],
         );

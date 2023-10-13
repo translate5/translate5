@@ -9098,7 +9098,6 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
                 <source>Gemeldete Fehler</source>
                 <target>Gemeldete Fehler</target>
             </trans-unit>
-<<<<<<< HEAD
             <trans-unit id='Q2Fubm90IG1vZGlmeSBkZWZhdWx0IHJlY29yZA=='>
                 <source>Cannot modify default record</source>
                 <target>Der Standarddatensatz kann nicht geändert werden</target>
@@ -9170,6 +9169,14 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
             <trans-unit id='QmVncmlmZiBleGlzdGllcnQgYmVyZWl0cyBpbiBkZXIgYXVzZ2V3w6RobHRlbiBUZXJtQ29sbGVjdGlvbg=='>
                 <source>Begriff existiert bereits in der ausgewählten TermCollection</source>
                 <target>Begriff existiert bereits in der ausgewählten TermCollection</target>
+            </trans-unit>
+            <trans-unit id="R2VzY2jDvHR6dGUgUmVnZXgtR3J1cHBl">
+                <source>Geschützte Regex-Gruppe</source>
+                <target>Geschützte Regex-Gruppe</target>
+            </trans-unit>
+            <trans-unit id="UHJvdGVjdGVkIHJlZ2V4IGdyb3VwIHF0aXA=">
+                <source>Protected regex group qtip</source>
+                <target>Regexe können Gruppierungen enthalten, die mit () definiert sind. Die gewählte Zahl ist die Nummer der geschützten Gruppierung, gezählt ab dem Beginn der Regex. Wenn keine Gruppierung definiert ist, wird alles, was mit der Regex übereinstimmt, geschützt.</target>
             </trans-unit>
         </body>
     </file>
