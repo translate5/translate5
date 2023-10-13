@@ -478,23 +478,23 @@ class NumberProtectorTest extends TestCase
         ];
         yield [
             'string' => 'string 05/07/123 string',
-            'expected' => 'string 05/07/<number type="integer" name="default simple" source="123" iso="123" target=""/> string'
+            'expected' => 'string 05/07/123 string'
         ];
         yield [
             'string' => 'string 123/05/07 string',
-            'expected' => 'string <number type="integer" name="default simple" source="123" iso="123" target=""/>/05/07 string'
+            'expected' => 'string 123/05/07 string'
         ];
         yield [
             'string' => 'string 35/7/2023 string',
-            'expected' => 'string <number type="integer" name="default simple" source="35" iso="35" target=""/>/<number type="integer" name="default simple" source="7" iso="7" target=""/>/<number type="integer" name="default simple" source="2023" iso="2023" target=""/> string'
+            'expected' => 'string 35/7/2023 string'
         ];
         yield [
             'string' => 'string 35/07/2023 string',
-            'expected' => 'string <number type="integer" name="default simple" source="35" iso="35" target=""/>/07/<number type="integer" name="default simple" source="2023" iso="2023" target=""/> string'
+            'expected' => 'string 35/07/2023 string'
         ];
         yield [
             'string' => 'string 2023 12/31 string',
-            'expected' => 'string <number type="integer" name="default simple" source="2023" iso="2023" target=""/> <number type="integer" name="default simple" source="12" iso="12" target=""/>/<number type="integer" name="default simple" source="31" iso="31" target=""/> string'
+            'expected' => 'string <number type="integer" name="default simple" source="2023" iso="2023" target=""/> 12/31 string'
         ];
         yield [
             'string' => 'This is <tag1><number type="integer" name="default simple" source="123" iso="123" target=""/><tag2>malicious 546.5</tag2>2035</tag1> text',
@@ -503,19 +503,19 @@ class NumberProtectorTest extends TestCase
         ];
         yield [
             'string' => 'string 05.07.123 string',
-            'expected' => 'string 05.07.<number type="integer" name="default simple" source="123" iso="123" target=""/> string'
+            'expected' => 'string 05.07.123 string'
         ];
         yield [
             'string' => 'string 05-07-123 string',
-            'expected' => 'string 05-07-<number type="integer" name="default simple" source="123" iso="123" target=""/> string'
+            'expected' => 'string 05-07-123 string'
         ];
         yield [
             'string' => 'string 35-7-2023 string',
-            'expected' => 'string <number type="integer" name="default simple" source="35" iso="35" target=""/>-<number type="integer" name="default simple" source="7" iso="7" target=""/>-<number type="integer" name="default simple" source="2023" iso="2023" target=""/> string'
+            'expected' => 'string 35-7-2023 string'
         ];
         yield [
             'string' => 'string 35-07-2023 string',
-            'expected' => 'string <number type="integer" name="default simple" source="35" iso="35" target=""/>-07-<number type="integer" name="default simple" source="2023" iso="2023" target=""/> string'
+            'expected' => 'string 35-07-2023 string'
         ];
     }
 
@@ -628,11 +628,11 @@ class NumberProtectorTest extends TestCase
     {
         yield [
             'string' => 'string 0567,89 string',
-            'expected' => 'string 0567,<number type="integer" name="default simple" source="89" iso="89" target=""/> string'
+            'expected' => 'string 0567,89 string'
         ];
         yield [
             'string' => 'string 5.67,89.45 string',
-            'expected' => 'string <number type="float" name="default generic" source="5.67" iso="5.67" target=""/>,<number type="float" name="default generic" source="89.45" iso="89.45" target=""/> string'
+            'expected' => 'string 5.67,89.45 string'
         ];
     }
 
@@ -703,19 +703,19 @@ class NumberProtectorTest extends TestCase
     {
         yield [
             'string' => 'string 127.0.0.1 string',
-            'expected' => 'string <number type="ip-address" name="default" source="127.0.0.1" iso="" target=""/> string'
+            'expected' => 'string <number type="ip-address" name="default" source="127.0.0.1" iso="127.0.0.1" target=""/> string'
         ];
         yield [
             'string' => 'string 255.255.255.255 string',
-            'expected' => 'string <number type="ip-address" name="default" source="255.255.255.255" iso="" target=""/> string'
+            'expected' => 'string <number type="ip-address" name="default" source="255.255.255.255" iso="255.255.255.255" target=""/> string'
         ];
         yield [
             'string' => 'string 0.0.0.0 string',
-            'expected' => 'string <number type="ip-address" name="default" source="0.0.0.0" iso="" target=""/> string'
+            'expected' => 'string <number type="ip-address" name="default" source="0.0.0.0" iso="0.0.0.0" target=""/> string'
         ];
         yield [
             'string' => 'string 1.1.1.1 string',
-            'expected' => 'string <number type="ip-address" name="default" source="1.1.1.1" iso="" target=""/> string'
+            'expected' => 'string <number type="ip-address" name="default" source="1.1.1.1" iso="1.1.1.1" target=""/> string'
         ];
     }
 
@@ -723,23 +723,23 @@ class NumberProtectorTest extends TestCase
     {
         yield [
             'string' => 'string 1.0.0.1.1 string',
-            'expected' => 'string <number type="ip-address" name="default" source="1.0.0.1" iso="" target=""/>.<number type="integer" name="default simple" source="1" iso="1" target=""/> string'
+            'expected' => 'string 1.0.0.1.1 string'
         ];
         yield [
             'string' => 'string 1.1.1.256 string',
-            'expected' => 'string <number type="float" name="default generic" source="1.1" iso="1.1" target=""/>.<number type="float" name="default generic" source="1.256" iso="1.256" target=""/> string'
+            'expected' => 'string 1.1.1.256 string'
         ];
         yield [
             'string' => 'string 256.0.0.1 string',
-            'expected' => 'string <number type="float" name="default generic" source="256.0" iso="256" target=""/>.<number type="integer" name="default simple" source="0" iso="0" target=""/>.<number type="integer" name="default simple" source="1" iso="1" target=""/> string'
+            'expected' => 'string 256.0.0.1 string'
         ];
         yield [
             'string' => 'string 1.256.0.0 string',
-            'expected' => 'string <number type="float" name="default generic" source="1.256" iso="1.256" target=""/>.<number type="integer" name="default simple" source="0" iso="0" target=""/>.<number type="integer" name="default simple" source="0" iso="0" target=""/> string'
+            'expected' => 'string 1.256.0.0 string'
         ];
         yield [
             'string' => 'string 1.0.256.1 string',
-            'expected' => 'string <number type="float" name="default generic" source="1.0" iso="1" target=""/>.<number type="float" name="default generic" source="256.1" iso="256.1" target=""/> string'
+            'expected' => 'string 1.0.256.1 string'
         ];
     }
 
@@ -747,23 +747,23 @@ class NumberProtectorTest extends TestCase
     {
         yield [
             'string' => 'string 01:02:03:04:ab:cd string',
-            'expected' => 'string <number type="mac-address" name="default" source="01:02:03:04:ab:cd" iso="" target=""/> string'
+            'expected' => 'string <number type="mac-address" name="default" source="01:02:03:04:ab:cd" iso="01:02:03:04:ab:cd" target=""/> string'
         ];
         yield [
             'string' => 'string 01-02-03-04-ab-cd string',
-            'expected' => 'string <number type="mac-address" name="default" source="01-02-03-04-ab-cd" iso="" target=""/> string'
+            'expected' => 'string <number type="mac-address" name="default" source="01-02-03-04-ab-cd" iso="01-02-03-04-ab-cd" target=""/> string'
         ];
         yield [
             'string' => 'string 00:00:00:00:00:00 string',
-            'expected' => 'string <number type="mac-address" name="default" source="00:00:00:00:00:00" iso="" target=""/> string'
+            'expected' => 'string <number type="mac-address" name="default" source="00:00:00:00:00:00" iso="00:00:00:00:00:00" target=""/> string'
         ];
         yield [
             'string' => 'string FF:FF:FF:FF:FF:FF string',
-            'expected' => 'string <number type="mac-address" name="default" source="FF:FF:FF:FF:FF:FF" iso="" target=""/> string'
+            'expected' => 'string <number type="mac-address" name="default" source="FF:FF:FF:FF:FF:FF" iso="FF:FF:FF:FF:FF:FF" target=""/> string'
         ];
         yield [
             'string' => 'string FF-11-FF-33-FF-44 string',
-            'expected' => 'string <number type="mac-address" name="default" source="FF-11-FF-33-FF-44" iso="" target=""/> string'
+            'expected' => 'string <number type="mac-address" name="default" source="FF-11-FF-33-FF-44" iso="FF-11-FF-33-FF-44" target=""/> string'
         ];
     }
 
@@ -771,7 +771,7 @@ class NumberProtectorTest extends TestCase
     {
         yield [
             'string' => 'string 01-02-03-04-ab-cd-11 string',
-            'expected' => 'string <number type="mac-address" name="default" source="01-02-03-04-ab-cd" iso="" target=""/>-<number type="integer" name="default simple" source="11" iso="11" target=""/> string'
+            'expected' => 'string 01-02-03-04-ab-cd-11 string'
         ];
         yield [
             'string' => 'string FF:FF-FF:FF-FF:FF string',
@@ -795,7 +795,7 @@ class NumberProtectorTest extends TestCase
         ];
         yield [
             'string' => 'string 00:00:00:00:00:00:00 string',
-            'expected' => 'string <number type="mac-address" name="default" source="00:00:00:00:00:00" iso="" target=""/>:00 string'
+            'expected' => 'string 00:00:00:00:00:00:00 string'
         ];
         yield [
             'string' => 'string F:FF:FF:FF:FF:FF string',
@@ -811,7 +811,7 @@ class NumberProtectorTest extends TestCase
     {
         yield [
             'string' => 'string &Alpha;123456789&quot; string',
-            'expected' => 'string &Alpha;<number type="integer" name="default simple" source="123456789" iso="123456789" target=""/>&quot; string'
+            'expected' => 'string &Alpha;123456789&quot; string'
         ];
         yield [
             'string' => 'string<someTag/>123456789 string',

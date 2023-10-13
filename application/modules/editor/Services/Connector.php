@@ -242,7 +242,7 @@ class editor_Services_Connector
             $this->adapter->getSourceLang(),
             $this->adapter->getTargetLang(),
             $shortTagIdent,
-            Whitespace::ENTITY_MODE_OFF
+            ContentProtector::ENTITY_MODE_OFF
         );
     }
 

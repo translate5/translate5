@@ -130,7 +130,7 @@ class NumberProtectorTest extends TestCase
         $shortTagIdent = 1;
         $xmlChunks = [];
 
-        self::assertSame($converted, $protector->convertToInternalTags($segment, $shortTagIdent, $xmlChunks));
+        self::assertSame($converted, $protector->convertToInternalTags($segment, $shortTagIdent, xmlChunks: $xmlChunks));
         self::assertSame($finalTagIdent, $shortTagIdent);
         self::assertCount($xmlChunksCount, $xmlChunks);
     }

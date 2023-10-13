@@ -85,6 +85,7 @@ class IntegerProtectorTest extends TestCase
             'integer',
             'test-default',
             '/\b[1-9]\d{0,3}(,)?(\d{4}\1)+\d{4}\b/u',
+            0,
             null,
             false,
         );
@@ -123,6 +124,7 @@ class IntegerProtectorTest extends TestCase
             'integer',
             'test-default',
             '/\b[1-9]\d{0,3}(,)?(\d{4}\1)+\d{4}\b/u',
+            0,
             null,
             true,
         );

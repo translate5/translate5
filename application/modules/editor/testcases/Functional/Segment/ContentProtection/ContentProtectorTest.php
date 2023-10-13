@@ -76,26 +76,14 @@ class ContentProtectorTest extends editor_Test_UnitTest
     public function testUnprotect(string $expected, string $node, bool $runTest = true): void
     {
         $contentProtector = ContentProtector::create(new Whitespace());
-
-        if (!$runTest) {
-            // Test case designed for `protect` test only
-            self::assertTrue(true);
-
-            return;
-        }
         self::assertSame($expected, $contentProtector->unprotect($node));
     }
 
     public function casesProvider(): iterable
     {
-        yield 'NNBSP in tag is safe' => [
-            'text' => "text with 1 234 [\r\n] in it",
-            'expected' => 'text with <number type="integer" name="default generic with not standard separator" source="1 234" iso="1234" target=""/> [<hardReturn/>] in it'
-        ];
-
-        yield 'non DOM whitespaces' => [
-            'text' => 'string [] 1 234 [] string',
-            'expected' => 'string [<char ts="03" length="1"/>] <number type="integer" name="default generic with not standard separator" source="1 234" iso="1234" target=""/> [<char ts="08" length="1"/>] string'
+        yield '&#128; is protected as char' => [
+            'text' => 'Test &amp;para; entities ¶ and umlauts öäü¶ and [&#128;] TRANSLATE',
+            'expected' => 'Test &amp;para; entities ¶ and umlauts öäü¶ and [<char ts="26233132383b" length="1"/>] TRANSLATE',
         ];
 
         yield 'float in the beginning' => [
@@ -114,7 +102,7 @@ class ContentProtectorTest extends editor_Test_UnitTest
 
         self::assertSame(
             $converted,
-            $contentProtector->protectAndConvert($segment, null, null, $shortTagIdent, Whitespace::ENTITY_MODE_OFF)
+            $contentProtector->protectAndConvert($segment, null, null, $shortTagIdent, ContentProtector::ENTITY_MODE_OFF)
         );
         self::assertSame($finalTagIdent, $shortTagIdent);
     }

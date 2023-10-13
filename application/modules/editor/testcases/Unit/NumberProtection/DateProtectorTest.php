@@ -83,6 +83,7 @@ class DateProtectorTest extends TestCase
             'date',
             'test-default',
             '/\b\d{4}\/(0[1-9]|[1-2][0-9]|3[0-1]|[1-9])\/(0[1-9]|1[0-2]|[1-9])\b/',
+            0,
             'Y/d/m',
             false,
         );
@@ -121,6 +122,7 @@ class DateProtectorTest extends TestCase
             'date',
             'test-default',
             '/\b\d{4}\/(0[1-9]|[1-2][0-9]|3[0-1]|[1-9])\/(0[1-9]|1[0-2]|[1-9])\b/',
+            0,
             'Y/d/m',
             true,
         );
@@ -139,6 +141,7 @@ class DateProtectorTest extends TestCase
             'date',
             'test-default',
             '/\b\d{4}\/(0[1-9]|[1-2][0-9]|3[0-1]|[1-9])\/(0[1-9]|1[0-2]|[1-9])\b/',
+            0,
             'Y/d/m',
             false,
         );

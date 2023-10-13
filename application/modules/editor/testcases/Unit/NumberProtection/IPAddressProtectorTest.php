@@ -65,12 +65,13 @@ class IPAddressProtectorTest extends TestCase
             'ip-address',
             'test-default',
             '',
+            0,
             '',
             true
         );
 
         self::assertSame(
-            '<number type="ip-address" name="test-default" source="127.0.0.1" iso="" target=""/>',
+            '<number type="ip-address" name="test-default" source="127.0.0.1" iso="127.0.0.1" target=""/>',
             (new IPAddressProtector($repo))->protect('127.0.0.1', $sourceFormat, null, null)
         );
     }

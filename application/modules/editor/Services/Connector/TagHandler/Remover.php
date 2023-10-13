@@ -32,6 +32,9 @@ END LICENSE AND COPYRIGHT
  * @version 1.0
  *
  */
+
+use MittagQI\Translate5\Segment\ContentProtection\ContentProtector;
+
 /**
  * protects the translate5 internal tags by removing for language resource processing
  */
@@ -70,7 +73,7 @@ class editor_Services_Connector_TagHandler_Remover extends editor_Services_Conne
                 $text,
                 $this->sourceLang,
                 $this->targetLang,
-                editor_Models_Segment_Whitespace::ENTITY_MODE_KEEP
+                ContentProtector::ENTITY_MODE_KEEP
             ),
             $this->shortTagIdent,
             $this->shortcutNumberMap

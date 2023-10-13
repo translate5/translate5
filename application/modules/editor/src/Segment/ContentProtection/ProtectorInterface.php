@@ -64,8 +64,18 @@ interface ProtectorInterface
     /**
      * replaces the placeholder tags (<protectedTag> / <hardReturn> / <char> / <number> etc) with an internal tag
      */
-    public function convertToInternalTags(string $segment, int &$shortTagIdent): string;
-    public function convertToInternalTagsInChunks(string $segment, int &$shortTagIdent): array;
+    public function convertToInternalTags(
+        string $segment,
+        int &$shortTagIdent,
+        bool $collectTagNumbers = false,
+        array &$shortcutNumberMap = []
+    ): string;
+    public function convertToInternalTagsInChunks(
+        string $segment,
+        int &$shortTagIdent,
+        bool $collectTagNumbers = false,
+        array &$shortcutNumberMap = []
+    ): array;
     public function convertToInternalTagsWithShortcutNumberMap(
         string $segment,
         int &$shortTagIdent,

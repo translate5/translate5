@@ -65,12 +65,13 @@ class MacAddressProtectorTest extends TestCase
             'mac-address',
             'test-default',
             '',
+            0,
             '',
             true
         );
 
         self::assertSame(
-            '<number type="mac-address" name="test-default" source="aa:bb:cc:11:22:33" iso="" target=""/>',
+            '<number type="mac-address" name="test-default" source="aa:bb:cc:11:22:33" iso="aa:bb:cc:11:22:33" target=""/>',
             (new MacAddressProtector($repo))->protect('aa:bb:cc:11:22:33', $sourceFormat, null, null)
         );
     }

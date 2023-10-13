@@ -90,7 +90,7 @@ class WhitespaceProtector implements ProtectorInterface
     {
         $excludedCharacters = $this->withoutNumberWhitespaces ? $this->numberWhitespaces : [];
         if (!preg_match_all(self::TAG_REGEX, $textNode, $matches)) {
-            return $this->whitespace->protectWhitespace($textNode, Whitespace::ENTITY_MODE_OFF, $excludedCharacters);
+            return $this->whitespace->protectWhitespace($textNode, $excludedCharacters);
         }
 
         $tags = $matches[0];
@@ -103,7 +103,6 @@ class WhitespaceProtector implements ProtectorInterface
             if (!empty($parts[$i])) {
                 $protected .= $this->whitespace->protectWhitespace(
                     $parts[$i],
-                    Whitespace::ENTITY_MODE_OFF,
                     $excludedCharacters
                 );
             }
@@ -131,18 +130,29 @@ class WhitespaceProtector implements ProtectorInterface
     /**
      * {@inheritDoc}
      */
-    public function convertToInternalTags(string $segment, int &$shortTagIdent): string
-    {
-        return $this->whitespace->convertToInternalTags($segment, $shortTagIdent);
+    public function convertToInternalTags(
+        string $segment,
+        int &$shortTagIdent,
+        bool $collectTagNumbers = false,
+        array &$shortcutNumberMap = []
+    ): string {
+        $this->whitespace->collectTagNumbers = $collectTagNumbers;
+
+        return $this->whitespace->convertToInternalTags($segment, $shortTagIdent, $shortcutNumberMap);
     }
 
     /**
      * {@inheritDoc}
      */
-    public function convertToInternalTagsInChunks(string $segment, int &$shortTagIdent): array
-    {
+    public function convertToInternalTagsInChunks(
+        string $segment,
+        int &$shortTagIdent,
+        bool $collectTagNumbers = false,
+        array &$shortcutNumberMap = []
+    ): array {
         $xmlChunks = [];
-        $this->whitespace->convertToInternalTags($segment, $shortTagIdent, $xmlChunks);
+        $this->whitespace->collectTagNumbers = $collectTagNumbers;
+        $this->whitespace->convertToInternalTags($segment, $shortTagIdent, $shortcutNumberMap, $xmlChunks);
 
         return $xmlChunks;
     }

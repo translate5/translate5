@@ -82,6 +82,7 @@ class FloatProtectorTest extends TestCase
             'float',
              'test-default',
             '/\b([1-9]\d{0,2},){1}(\d{3},)*\d{3}\.\d+\b/u',
+            0,
             null,
             false,
         );
@@ -120,6 +121,7 @@ class FloatProtectorTest extends TestCase
             'float',
             'test-default',
             '/\b([1-9]\d{0,2},){1}(\d{3},)*\d{3}\.\d+\b/u',
+            0,
             null,
             true,
         );

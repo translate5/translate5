@@ -60,10 +60,12 @@ class editor_Services_Connector_TagHandler_T5MemoryXliff extends editor_Services
         if (preg_match_all($t5nTagRegex, $resultString, $matches, PREG_SET_ORDER)) {
             $numberTags = [];
             foreach ($matches as $match) {
+                // $numberTags[*r*][*id*] = ['number' => *n*, 'tag' => *wholeTag*];
                 $numberTags[$match[3]][$match[1]] = ['number' => $match[2], 'tag' => $match[0]];
             }
 
             foreach ($numberTags as $regex => $tags) {
+                // sort tags by their ids
                 ksort($tags);
 
                 if (isset($this->numberTagMap[$regex])) {
@@ -72,7 +74,7 @@ class editor_Services_Connector_TagHandler_T5MemoryXliff extends editor_Services
                     continue;
                 }
 
-                foreach ($tags as $number => $tag) {
+                foreach ($tags as ['number' => $number, 'tag' => $tag]) {
                     $resultString = str_replace($tag, $number, $resultString);
                 }
             }

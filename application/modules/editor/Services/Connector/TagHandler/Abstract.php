@@ -65,7 +65,7 @@ abstract class editor_Services_Connector_TagHandler_Abstract
     protected $realTagCount = 0;
     
     protected $highestShortcutNumber = 0;
-    protected $shortcutNumberMap = [];
+    protected array $shortcutNumberMap;
     
     /**
      * @var editor_Models_Segment_UtilityBroker
@@ -102,7 +102,7 @@ abstract class editor_Services_Connector_TagHandler_Abstract
         $this->logger = ZfExtended_Factory::get(ZfExtended_Logger_Queued::class);
 
         $this->contentProtector = ContentProtector::create($this->utilities->whitespace);
-        
+
         //we have to use the XML parser to restore whitespace, otherwise protectWhitespace would destroy the tags
         $this->xmlparser->registerOther(function($textNode, $key) {
             //set shortTagIdent of the tagTrait to the next usable number if there are new tags
@@ -112,7 +112,7 @@ abstract class editor_Services_Connector_TagHandler_Abstract
                     $textNode,
                     $this->sourceLang,
                     $this->targetLang,
-                    editor_Models_Segment_Whitespace::ENTITY_MODE_KEEP
+                    ContentProtector::ENTITY_MODE_KEEP
                 ),
                 $this->shortTagIdent,
                 $this->shortcutNumberMap

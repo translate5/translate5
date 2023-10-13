@@ -128,6 +128,18 @@ class NumberProtector implements ProtectorInterface
         );
     }
 
+    public static function isNumberTag(string $tag): bool
+    {
+        return (bool) preg_match(self::fullTagRegex(), $tag);
+    }
+
+    public static function getIsoFromTag(string $tag): string
+    {
+        preg_match('/iso="(.+)"/U', $tag, $matches);
+
+        return $matches[1];
+    }
+
     public function types(): array
     {
         return array_keys($this->protectors);
@@ -159,17 +171,18 @@ class NumberProtector implements ProtectorInterface
     public function convertToInternalTags(
         string $segment,
         int &$shortTagIdent,
-        array &$xmlChunks = [],
-        array $shortcutNumberMap = []
+        bool $collectTagNumbers = false,
+        array &$shortcutNumberMap = [],
+        array &$xmlChunks = []
     ): string {
         $xml = ZfExtended_Factory::get(XmlParser::class, [['normalizeTags' => false]]);
         $xml->registerElement(
             self::TAG_NAME,
             null,
-            function ($tagName, $key, $opener) use ($xml, &$shortTagIdent, $shortcutNumberMap) {
+            function ($tagName, $key, $opener) use ($xml, $collectTagNumbers, &$shortTagIdent, &$shortcutNumberMap) {
                 $xml->replaceChunk(
                     $key,
-                    $this->handleNumberTags($xml, $key, $opener, $shortTagIdent, $shortcutNumberMap)
+                    $this->handleNumberTags($xml, $key, $opener, $collectTagNumbers, $shortTagIdent, $shortcutNumberMap)
                 );
             }
         );
@@ -180,10 +193,15 @@ class NumberProtector implements ProtectorInterface
         return $result;
     }
 
-    public function convertToInternalTagsInChunks(string $segment, int &$shortTagIdent): array
+    public function convertToInternalTagsInChunks(
+        string $segment,
+        int &$shortTagIdent,
+        bool $collectTagNumbers = false,
+        array &$shortcutNumberMap = []
+    ): array
     {
         $xmlChunks = [];
-        $this->convertToInternalTags($segment, $shortTagIdent, $xmlChunks);
+        $this->convertToInternalTags($segment, $shortTagIdent, $collectTagNumbers, $shortcutNumberMap, $xmlChunks);
 
         return $xmlChunks;
     }
@@ -209,14 +227,19 @@ class NumberProtector implements ProtectorInterface
             return $textNode;
         }
 
+        $tries = 0;
         foreach ($this->numberFormatRepository->getAll($sourceLang) as $langFormat) {
-            if (!preg_match($langFormat->regex, $this->document->textContent)) {
-                continue;
-            }
+            while ($tries++ < 2) {
+                if (!preg_match($langFormat->regex, $this->document->textContent)) {
+                    continue;
+                }
 
-            $this->processElement($this->document->documentElement, $langFormat, $sourceLang, $targetLang);
-            // reloading document with potential new tags
-            $this->loadXML($this->getCurrentTextNode());
+                $this->processElement($this->document->documentElement, $langFormat, $sourceLang, $targetLang);
+
+                // reloading document with potential new tags
+                $this->loadXML($this->getCurrentTextNode());
+            }
+            $tries = 0;
         }
 
         $text = $this->getCurrentTextNode();
@@ -244,8 +267,9 @@ class NumberProtector implements ProtectorInterface
         XmlParser $xml,
         int $key,
         array $opener,
+        bool $collectTagNumbers,
         int &$shortTagIdent,
-        array $shortcutNumberMap = []
+        array &$shortcutNumberMap = []
     ): NumberTag {
         $source = $xml->getAttribute($opener['attributes'], 'source', null);
         $target = $xml->getAttribute($opener['attributes'], 'target', null);
@@ -253,9 +277,15 @@ class NumberProtector implements ProtectorInterface
         $wholeTag = $xml->getChunk($key);
         $shortTagNumber = $shortTagIdent;
 
+        $iso = self::getIsoFromTag($wholeTag);
+
+        if($collectTagNumbers) {
+            $shortcutNumberMap[$iso][] = $shortTagNumber;
+            $shortTagIdent++;
+        }
         //either we get a reusable shortcut number in the map, or we have to increment one
-        if (!empty($shortcutNumberMap) && !empty($shortcutNumberMap[$wholeTag])) {
-            $shortTagNumber = array_shift($shortcutNumberMap[$wholeTag]);
+        elseif (!empty($shortcutNumberMap) && !empty($shortcutNumberMap[$iso])) {
+            $shortTagNumber = array_shift($shortcutNumberMap[$iso]);
         } else {
             $shortTagIdent++;
         }
@@ -311,7 +341,8 @@ class NumberProtector implements ProtectorInterface
             return false;
         }
 
-        $numbers = $matches[0];
+        $wholeMatches = $matches[0];
+        $numbers = $matches[$langFormat->matchId];
         $parts = preg_split($langFormat->regex, $text->textContent);
 
         $matchCount = count($numbers);
@@ -328,10 +359,9 @@ class NumberProtector implements ProtectorInterface
                 continue;
             }
 
-            $parentNode->insertBefore(
-                $this->protectNumber($numbers[$i], $langFormat, $sourceLang, $targetLang),
-                $text
-            );
+            foreach ($this->protectNumber($numbers[$i], $wholeMatches[$i], $langFormat, $sourceLang, $targetLang) as $value) {
+                $parentNode->insertBefore($value, $text);
+            }
         }
 
         return true;
@@ -339,17 +369,19 @@ class NumberProtector implements ProtectorInterface
 
     private function protectNumber(
         string $number,
+        string $wholeMatch,
         NumberFormatDto $langFormat,
         ?editor_Models_Languages $sourceLang,
         ?editor_Models_Languages $targetLang
-    ): DOMNode {
+    ): iterable {
         if (!isset($this->protectedNumbers[$number])) {
             try {
                 $protectedNumber = $this
                     ->protectors[$langFormat->type]
                     ->protect($number, $langFormat, $sourceLang, $targetLang);
             } catch (NumberParsingException) {
-                return $this->document->importNode(new DOMText($number));
+                // if match was not actually a number - return it as is
+                return yield $this->document->importNode(new DOMText($wholeMatch));
             }
 
             $dom = new DOMDocument();
@@ -357,7 +389,17 @@ class NumberProtector implements ProtectorInterface
             $this->protectedNumbers[$number] = $dom->firstChild;
         }
 
-        return $this->document->importNode($this->protectedNumbers[$number]);
+        $parts = explode($number, $wholeMatch);
+
+        if (!empty($parts[0])) {
+            yield $this->document->importNode(new DOMText($parts[0]));
+        }
+
+        yield $this->document->importNode($this->protectedNumbers[$number]);
+
+        if (!empty($parts[1])) {
+            yield $this->document->importNode(new DOMText($parts[1]));
+        }
     }
 
     private function loadXML(string $textNode): void

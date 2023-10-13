@@ -104,7 +104,7 @@ abstract class AbstractProtector implements NumberProtectorInterface
             static::getType(),
             htmlspecialchars($sourceFormat->name),
             $number,
-            '',
+            $number,
             ''
         );
     }
