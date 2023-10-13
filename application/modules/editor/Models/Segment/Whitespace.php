@@ -31,24 +31,6 @@ END LICENSE AND COPYRIGHT
  */
 class editor_Models_Segment_Whitespace {
     /**
-     * All entities are restored to their applicable characters (&_szlig; => ß), only the XML relevant &<> are encoded (ready for GUI)
-     * @var string
-     */
-    const ENTITY_MODE_RESTORE = 'restore';
-    
-    /**
-     * Nothing is restored, but encoded (&_szlig; => &_amp;szlig;), only the XML relevant &<> are encoded (ready for GUI)
-     * @var string
-     */
-    const ENTITY_MODE_KEEP = 'keep';
-    
-    /**
-     * Entity handling is disabled, entities must be handled elsewhere!
-     * @var string
-     */
-    const ENTITY_MODE_OFF = 'off';
-    
-    /**
      * @var array
      */
     const WHITESPACE_TAGS = [
@@ -158,12 +140,6 @@ class editor_Models_Segment_Whitespace {
      */
     private int $currentShortTagNumber;
 
-    /**
-     * tag map for usage in language resources
-     * @var array
-     */
-    private array $tagShortcutNumberMap = [];
-
     private array $protectedCharLabels = [];
 
     /**
@@ -202,14 +178,8 @@ class editor_Models_Segment_Whitespace {
      */
     public function protectWhitespace(
         string $textNode,
-        string $entityHandling = self::ENTITY_MODE_RESTORE,
         array $excludedCharacters = []
     ): string {
-        //definition how entities are handled:
-        if ($entityHandling != self::ENTITY_MODE_OFF) {
-            $textNode = editor_Models_Segment_Utility::entityCleanup($textNode, $entityHandling == self::ENTITY_MODE_RESTORE);
-        }
-        
         //replace only on real text
         $textNode = str_replace($this->protectedWhitespaceMap['search'], $this->protectedWhitespaceMap['replace'], $textNode);
         
@@ -228,18 +198,16 @@ class editor_Models_Segment_Whitespace {
         }, $textNode);
             
         //in XML based import formats we have to extend the list about some HTML entities representing some none printable characters in UTF8
-        if($entityHandling == self::ENTITY_MODE_RESTORE) {
-            //see https://stackoverflow.com/questions/9587751/decoding-numeric-html-entities-via-php
-            // and https://caves.org.uk/charset_test.html  Section: Another Problem with PHP's htmlentities()
-            //since entityCleanup was called aready, we have to begin the regex with &amp; instead &
-            // 2022 additional Info - the here escaped characters 128 - 159 are non printable
-            // control characters (C1 Controls) - therefore we escape them.
-            // Attention caveat: copying the character &#128; into the browser vonverts it to € - assuming that not UTF8 but wincp was used!
-            $textNode = preg_replace_callback('/&amp;#(128|129|1[3-5][0-9]);/', function ($match) {
-                //always one single character is masked, so length = 1
-                return $this->maskSpecialContent('char', '&#'.$match[1].';', 1);
-            }, $textNode);
-        }
+        //see https://stackoverflow.com/questions/9587751/decoding-numeric-html-entities-via-php
+        // and https://caves.org.uk/charset_test.html  Section: Another Problem with PHP's htmlentities()
+        //since entityCleanup was called aready, we have to begin the regex with &amp; instead &
+        // 2022 additional Info - the here escaped characters 128 - 159 are non printable
+        // control characters (C1 Controls) - therefore we escape them.
+        // Attention caveat: copying the character &#128; into the browser vonverts it to € - assuming that not UTF8 but wincp was used!
+        $textNode = preg_replace_callback('/&amp;#(128|129|1[3-5][0-9]);/', function ($match) {
+            //always one single character is masked, so length = 1
+            return $this->maskSpecialContent('char', '&#'.$match[1].';', 1);
+        }, $textNode);
 
         return preg_replace_callback($this->getProtectedCharactersRegexes($excludedCharacters), function ($match) {
             //always one single character is masked, so length = 1
@@ -357,7 +325,12 @@ class editor_Models_Segment_Whitespace {
      * @param string $content
      * @return editor_Models_Import_FileParser_Tag
      */
-    protected function handleProtectedTags(string $type, string $id, string $content): editor_Models_Import_FileParser_Tag {
+    protected function handleProtectedTags(
+        string $type,
+        string $id,
+        string $content,
+        array &$shortcutNumberMap
+    ): editor_Models_Import_FileParser_Tag {
         $content = pack('H*', $content);
 
         //generate the html tag for the editor
@@ -365,12 +338,12 @@ class editor_Models_Segment_Whitespace {
             case 'open':
                 $type = editor_Models_Import_FileParser_Tag::TYPE_OPEN;
                 $shortTag = $this->currentShortTagNumber++;
-                $this->tagShortcutNumberMap[$id] = $shortTag;
+                $shortcutNumberMap[$id] = $shortTag;
                 break;
             case 'close':
                 //on tag protection it is ensured that tag pairs are wellformed, so on close we can rely that open nr exists:
                 $type = editor_Models_Import_FileParser_Tag::TYPE_CLOSE;
-                $shortTag = $this->tagShortcutNumberMap[$id];
+                $shortTag = $shortcutNumberMap[$id];
                 break;
             case 'single':
             default:
@@ -378,6 +351,7 @@ class editor_Models_Segment_Whitespace {
                 $shortTag = $this->currentShortTagNumber++;
                 break;
         }
+
         $tag = new editor_Models_Import_FileParser_Tag($type);
         $tag->originalContent = $content;
         $tag->tagNr = $shortTag;
@@ -393,14 +367,17 @@ class editor_Models_Segment_Whitespace {
      * replaces the placeholder tags (<protectedTag> / <hardReturn> / <char> / <space> etc) with an internal tag
      * @param string $segment
      * @param int $shortTagIdent
-     * @param array $tagShortcutNumberMap shorttag numbers can be provided from outside (needed for language resource usage)
+     * @param array $shortcutNumberMap shorttag numbers can be provided from outside (needed for language resource usage)
      * @return string
      */
-    public function convertToInternalTagsFromService(string $segment, int &$shortTagIdent, array $tagShortcutNumberMap = []): string {
-        //$tagShortcutNumberMap must be given explicitly here as non referenced variable from outside,
+    public function convertToInternalTagsFromService(
+        string $segment,
+        int &$shortTagIdent,
+        array &$shortcutNumberMap = []
+    ): string {
+        // $tagShortcutNumberMap must be given explicitly here as non referenced variable from outside,
         // so that each call of the whitespaceTagReplacer function has its fresh list of tag numbers
-        $this->tagShortcutNumberMap = $tagShortcutNumberMap;
-        return $this->convertToInternalTags($segment,$shortTagIdent);
+        return $this->convertToInternalTags($segment,$shortTagIdent, $shortcutNumberMap);
     }
 
     /**
@@ -410,23 +387,39 @@ class editor_Models_Segment_Whitespace {
      * @param array $xmlChunks
      * @return string
      */
-    public function convertToInternalTags(string $segment, int &$shortTagIdent, array &$xmlChunks = []): string {
+    public function convertToInternalTags(
+        string $segment,
+        int &$shortTagIdent,
+        array &$shortcutNumberMap,
+        array &$xmlChunks = []
+    ): string {
         $this->currentShortTagNumber = &$shortTagIdent;
 
         $xml = ZfExtended_Factory::get('editor_Models_Import_FileParser_XmlParser', [['normalizeTags' => false]]);
 
-        $xml->registerElement(join(', ', self::WHITESPACE_TAGS), null, function ($tagName, $key, $opener) use ($xml){
-            //if there is no length attribute, use length = 1
-            $length = $xml->getAttribute($opener['attributes'], 'length', 1);
-            $xml->replaceChunk($key, $this->handleWhitespaceTags($xml->getChunk($key), $tagName, $length));
-        });
+        $xml->registerElement(
+            join(', ', self::WHITESPACE_TAGS),
+            null,
+            function ($tagName, $key, $opener) use ($xml, &$shortcutNumberMap) {
+                //if there is no length attribute, use length = 1
+                $length = $xml->getAttribute($opener['attributes'], 'length', 1);
+                $xml->replaceChunk(
+                    $key,
+                    $this->handleWhitespaceTags($xml->getChunk($key), $tagName, $length, $shortcutNumberMap)
+                );
+            }
+        );
 
-        $xml->registerElement('protectedTag', null, function ($tag, $key, $opener) use ($xml){
-            $type = $xml->getAttribute($opener['attributes'], 'data-type');
-            $id = $xml->getAttribute($opener['attributes'], 'data-id');
-            $content = $xml->getAttribute($opener['attributes'], 'data-content');
-            $xml->replaceChunk($key, $this->handleProtectedTags($type, $id, $content));
-        });
+        $xml->registerElement(
+            'protectedTag',
+            null,
+            function ($tag, $key, $opener) use ($xml, &$shortcutNumberMap) {
+                $type = $xml->getAttribute($opener['attributes'], 'data-type');
+                $id = $xml->getAttribute($opener['attributes'], 'data-id');
+                $content = $xml->getAttribute($opener['attributes'], 'data-content');
+                $xml->replaceChunk($key, $this->handleProtectedTags($type, $id, $content, $shortcutNumberMap));
+            }
+        );
 
         $result = $xml->parse($segment, true, $this->validTags());
         $xmlChunks = $xml->getAllChunks();
@@ -449,21 +442,27 @@ class editor_Models_Segment_Whitespace {
      * @param string $length
      * @return editor_Models_Import_FileParser_Tag
      */
-    private function handleWhitespaceTags(string $wholeTag, string $tagName, string $length): editor_Models_Import_FileParser_Tag {
+    private function handleWhitespaceTags(
+        string $wholeTag,
+        string $tagName,
+        string $length,
+        array &$shortcutNumberMap
+    ): editor_Models_Import_FileParser_Tag {
         //if collecting, we just collect and do not check the map
         if($this->collectTagNumbers) {
-            $this->tagShortcutNumberMap[$wholeTag][] = $shortTagNumber = $this->currentShortTagNumber++;
+            $shortcutNumberMap[$wholeTag][] = $shortTagNumber = $this->currentShortTagNumber++;
         }
         //tag numbers are not collected, we just look into the map
         else {
             //either we get a reusable shortcut number in the map, or we have to increment one
-            if(empty($this->tagShortcutNumberMap) || empty($this->tagShortcutNumberMap[$wholeTag])) {
+            if(empty($shortcutNumberMap) || empty($shortcutNumberMap[$wholeTag])) {
                 $shortTagNumber = $this->currentShortTagNumber++;
             }
             else {
-                $shortTagNumber = array_shift($this->tagShortcutNumberMap[$wholeTag]);
+                $shortTagNumber = array_shift($shortcutNumberMap[$wholeTag]);
             }
         }
+
         $title = '&lt;'.$shortTagNumber.'/&gt;: ';
         $renderData = $this->getTagRenderData($tagName, $length, $wholeTag);
         $title .= $renderData['title'];
@@ -478,14 +477,6 @@ class editor_Models_Segment_Whitespace {
         //title: Only translatable with using ExtJS QTips in the frontend, as title attribute not possible
         $tagObj->renderTag($length, $title, $renderData['cls']);
         return $tagObj;
-    }
-
-    /**
-     * resets the internal tag number map
-     */
-    public function resetTagNumberMap()
-    {
-        $this->tagShortcutNumberMap = [];
     }
 
     /**

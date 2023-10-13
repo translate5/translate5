@@ -59,6 +59,29 @@ use MittagQI\Translate5\NumberProtection\NumberProtector;
 class ContentProtector
 {
     /**
+     * All entities are restored to their applicable characters (&_szlig; => ß),
+     * only the XML relevant &<> are encoded (ready for GUI)
+     * @var string
+     */
+    public const ENTITY_MODE_RESTORE = 'restore';
+
+    /**
+     * Nothing is restored, but encoded (&_szlig; => &_amp;szlig;),
+     * only the XML relevant &<> are encoded (ready for GUI)
+     * @var string
+     */
+    public const ENTITY_MODE_KEEP = 'keep';
+
+    /**
+     * Entity handling is disabled, entities must be handled elsewhere!
+     * @var string
+     */
+    public const ENTITY_MODE_OFF = 'off';
+
+    private array $shortcutNumberMap = [];
+    private bool $collectShortcutMap = false;
+
+    /**
      * @param  ProtectorInterface[] $protectors
      */
     public function __construct(private array $protectors)
@@ -74,18 +97,28 @@ class ContentProtector
         ]);
     }
 
+    public function resetShortcutMap(): void
+    {
+        $this->shortcutNumberMap = [];
+    }
+
+    public function switchShortcutMapCollection(bool $collect): void
+    {
+        $this->collectShortcutMap = $collect;
+    }
+
     public function protect(
         string $text,
         ?int $sourceLang,
         ?int $targetLang,
-        string $entityHandling = Whitespace::ENTITY_MODE_RESTORE
+        string $entityHandling = self::ENTITY_MODE_RESTORE
     ): string {
         if (0 === strpos($text, 'translate5-unique-id')) {
             return $text;
         }
 
-        if ($entityHandling !== Whitespace::ENTITY_MODE_OFF) {
-            $text = SegmentUtility::entityCleanup($text, $entityHandling === Whitespace::ENTITY_MODE_RESTORE);
+        if ($entityHandling !== self::ENTITY_MODE_OFF) {
+            $text = SegmentUtility::entityCleanup($text, $entityHandling === self::ENTITY_MODE_RESTORE);
         }
 
         foreach ($this->protectors as $protector) {
@@ -178,7 +211,7 @@ class ContentProtector
         ?int $sourceLang,
         ?int $targetLang,
         int &$shortTagIdent,
-        string $entityHandling = Whitespace::ENTITY_MODE_RESTORE
+        string $entityHandling = self::ENTITY_MODE_RESTORE
     ): string {
         return $this->convertToInternalTags(
             $this->protect($text, $sourceLang, $targetLang, $entityHandling),

@@ -26,6 +26,8 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\NumberProtection\NumberProtector;
+
 /**
  * Segment Internal Tag Helper Class
  * This class contains the regex definition and related helper methods to internal tags of translate5
@@ -265,10 +267,17 @@ class editor_Models_Segment_InternalTag extends editor_Models_Segment_TagAbstrac
 
             //the original data is without <>
             $result = '<' . $result . '>';
-            if (!array_key_exists($result, $shortcutNumberMap)) {
-                $shortcutNumberMap[$result] = [];
+
+            $shortcutNumberMapKey = $result;
+
+            if (NumberProtector::isNumberTag($result)) {
+                $shortcutNumberMapKey = NumberProtector::getIsoFromTag($result);
             }
-            $shortcutNumberMap[$result][] = $tagNr;
+
+            if (!array_key_exists($shortcutNumberMapKey, $shortcutNumberMap)) {
+                $shortcutNumberMap[$shortcutNumberMapKey] = [];
+            }
+            $shortcutNumberMap[$shortcutNumberMapKey][] = $tagNr;
 
             return $result;
         });

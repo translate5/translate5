@@ -33,6 +33,7 @@ END LICENSE AND COPYRIGHT
  */
 
 use editor_Models_Segment_InternalTag as InternalTag;
+use MittagQI\Translate5\Segment\ContentProtection\ContentProtector;
 
 /**
  * Fileparsing for Csv-files
@@ -385,7 +386,7 @@ class editor_Models_Import_FileParser_Csv extends editor_Models_Import_FileParse
             $this->task->getSourceLang(),
             $this->task->getTargetLang(),
             $this->shortTagIdent,
-            editor_Models_Segment_Whitespace::ENTITY_MODE_KEEP
+            ContentProtector::ENTITY_MODE_KEEP
         );
 
         $segment = $this->parseSegmentInsertPlaceholders($segment, InternalTag::REGEX_INTERNAL_TAGS);
