@@ -181,7 +181,12 @@ class ContentProtector
     {
         foreach ($this->protectors as $protector) {
             if ($protector->hasTagsToConvert($segment)) {
-                $segment = $protector->convertToInternalTags($segment, $shortTagIdent);
+                $segment = $protector->convertToInternalTags(
+                    $segment,
+                    $shortTagIdent,
+                    $this->collectShortcutMap,
+                    $this->shortcutNumberMap
+                );
             }
         }
 
@@ -248,7 +253,12 @@ class ContentProtector
 
             foreach ($this->protectors as $protector) {
                 if ($protector->hasTagsToConvert($tags[$i])) {
-                    $chunkStorage[] = $protector->convertToInternalTagsInChunks($tags[$i], $shortTagIdent);
+                    $chunkStorage[] = $protector->convertToInternalTagsInChunks(
+                        $tags[$i],
+                        $shortTagIdent,
+                        $this->collectShortcutMap,
+                        $this->shortcutNumberMap
+                    );
 
                     continue 2;
                 }
