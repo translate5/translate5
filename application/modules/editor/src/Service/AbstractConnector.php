@@ -61,7 +61,7 @@ abstract class AbstractConnector
 
     /**
      * The base Endpint of the API
-     * This can be used to adda general path prefixed for all requests
+     * This can be used to add a general path prefixed for all requests
      * IMPORTANT: This path-fragment must be terminated by '/' on both sites
      */
     const BASE_ENDPOINT = '/';
@@ -149,11 +149,21 @@ abstract class AbstractConnector
     }
 
     /**
+     * The base URL of the service
      * @return string
      */
     public function getUrl(): string
     {
         return $this->url;
+    }
+
+    /**
+     * The base URL for all API-calls
+     * @return string
+     */
+    public function getApiUrl(): string
+    {
+        return rtrim($this->url . static::BASE_ENDPOINT, '/');
     }
 
     /**

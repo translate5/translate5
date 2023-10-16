@@ -209,7 +209,7 @@ class editor_Services_Google_Connector extends editor_Services_Connector_Abstrac
             $ecode = 'E1311'; //server not reachable
         }
         else {
-            $ecode = 'E1313'; //'The queried {service} returns an error.'
+            $ecode = 'E1313'; //'The queried {service} returns an error: {error}'
         }
         $data = [
             'service' => $this->getResource()->getName(),
