@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "20b4ec046a69b167f5f118a84dc97578",
+    "content-hash": "dec02b966556ca1ccbb0892a97037bb1",
     "packages": [
         {
             "name": "alchemy/binary-driver",
@@ -635,16 +635,16 @@
         },
         {
             "name": "google/cloud-core",
-            "version": "v1.52.6",
+            "version": "v1.52.7",
             "source": {
                 "type": "git",
                 "url": "https://github.com/googleapis/google-cloud-php-core.git",
-                "reference": "71f092f4dab880515917da64423656ed3d6aefc2"
+                "reference": "f79480d1e2b31a695ae98b42ca10b67b41da9fb1"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/googleapis/google-cloud-php-core/zipball/71f092f4dab880515917da64423656ed3d6aefc2",
-                "reference": "71f092f4dab880515917da64423656ed3d6aefc2",
+                "url": "https://api.github.com/repos/googleapis/google-cloud-php-core/zipball/f79480d1e2b31a695ae98b42ca10b67b41da9fb1",
+                "reference": "f79480d1e2b31a695ae98b42ca10b67b41da9fb1",
                 "shasum": ""
             },
             "require": {
@@ -660,7 +660,7 @@
             "require-dev": {
                 "erusev/parsedown": "^1.6",
                 "google/cloud-common-protos": "^0.4",
-                "google/gax": "^1.19.1",
+                "google/gax": "^1.24.0",
                 "opis/closure": "^3",
                 "phpdocumentor/reflection": "^5.0",
                 "phpspec/prophecy-phpunit": "^2.0",
@@ -694,9 +694,9 @@
             ],
             "description": "Google Cloud PHP shared dependency, providing functionality useful to all components.",
             "support": {
-                "source": "https://github.com/googleapis/google-cloud-php-core/tree/v1.52.6"
+                "source": "https://github.com/googleapis/google-cloud-php-core/tree/v1.52.7"
             },
-            "time": "2023-10-06T21:49:26+00:00"
+            "time": "2023-10-16T22:54:31+00:00"
         },
         {
             "name": "google/cloud-translate",
