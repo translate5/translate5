@@ -9098,6 +9098,7 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
                 <source>Gemeldete Fehler</source>
                 <target>Gemeldete Fehler</target>
             </trans-unit>
+<<<<<<< HEAD
             <trans-unit id='Q2Fubm90IG1vZGlmeSBkZWZhdWx0IHJlY29yZA=='>
                 <source>Cannot modify default record</source>
                 <target>Der Standarddatensatz kann nicht geändert werden</target>
@@ -9157,6 +9158,10 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
             <trans-unit id='RGVmYXVsdHMgYXVzYmxlbmRlbg=='>
                 <source>Defaults ausblenden</source>
                 <target>Defaults ausblenden</target>
+            </trans-unit>
+            <trans-unit id='SW5pdGlhbCBlaW5tYWwgYXVmICJTdWNoZW4iIGtsaWNrZW4sIGJldm9yICJBbGxlIGVyc2V0emVuIiBhdXN3w6RobGJhciB3aXJkLg=='>
+                <source>Initial einmal auf "Suchen" klicken, bevor "Alle ersetzen" auswählbar wird.</source>
+                <target>Initial einmal auf "Suchen" klicken, bevor "Alle ersetzen" auswählbar wird.</target>
             </trans-unit>
             <trans-unit id='RXJsZWRpZ3Q='>
                 <source>Erledigt</source>
