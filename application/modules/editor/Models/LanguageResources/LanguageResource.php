@@ -185,19 +185,32 @@ class editor_Models_LanguageResources_LanguageResource extends ZfExtended_Models
      * @param array $types
      * @param string $sourceLangCode
      * @param string $targetLangCode
-     * @param bool $findSimilarLanguages
+     * @param bool $respectCustomerRestriction: if set, the fetched resources must not have customers of this resource
      * @return array
      */
     public function getByTypesAndLanguages(
-        array  $types,
-        string $sourceLangCode,
-        string $targetLangCode,
-        bool   $findSimilarLanguages = false): array
+        array $types,
+        int   $sourceLangId,
+        int   $targetLangId,
+        bool  $respectCustomerRestriction = true): array
     {
-        // the current user may is client-restricted and we have to respect that restriction
-        $restrictedClientIds = null;
+        // first, evaluate the fuzzy languages
+        $languages = ZfExtended_Factory::get(editor_Models_Languages::class);
+        $sourceLanguageIds = $languages->getFuzzyLanguages($sourceLangId, 'id', true);
+        $targetLanguageIds = $languages->getFuzzyLanguages($targetLangId, 'id', true);
+
+         // evaluate Clients/Customers
+        $clientIds = ($respectCustomerRestriction) ? $this->getCustomers() : null;
+        // the current user may is client-restricted and we have to respect that restriction in any case
         if (ZfExtended_Authentication::getInstance()->isUserClientRestricted()) {
             $restrictedClientIds = ZfExtended_Authentication::getInstance()->getUser()->getRestrictedClientIds();
+            $clientIds = empty($clientIds) ?
+                $restrictedClientIds
+                : array_values(array_intersect($clientIds, $restrictedClientIds));
+            // shortcut: no clients, no resources ...
+            if (empty($clientIds)) {
+                return [];
+            }
         }
         $select = $this->db
             ->select()
@@ -211,38 +224,22 @@ class editor_Models_LanguageResources_LanguageResource extends ZfExtended_Models
                 'lr.id = lla.languageResourceId',
                 ['sourceLangCode', 'targetLangCode']
             );
-        if (count($types) > 1) {
-            $select->where('lr.resourceType IN (?)', $types);
-        } else if (count($types) === 1) {
-            $select->where('lr.resourceType = ?', $types[0]);
-        } else {
-            $select->where('1 = 0');
-        }
+        // type restriction
+        ZfExtended_Utils::addArrayCondition($select, $types, 'lr.resourceType');
 
-        if ($findSimilarLanguages) {
-            $select
-                ->where(
-                    'lla.sourceLangCode LIKE ?',
-                    ZfExtended_Languages::primaryCodeByRfc5646($sourceLangCode) . '%'
-                )
-                ->where(
-                    'lla.targetLangCode LIKE ?',
-                    ZfExtended_Languages::primaryCodeByRfc5646($targetLangCode) . '%'
-                );
-        } else {
-            $select
-                ->where('lla.sourceLangCode = ?', $sourceLangCode)
-                ->where('lla.targetLangCode = ?', $targetLangCode);
-        }
+        // language restriction
+        ZfExtended_Utils::addArrayCondition($select, $sourceLanguageIds, 'lla.sourceLang');
+        ZfExtended_Utils::addArrayCondition($select, $targetLanguageIds, 'lla.targetLang');
 
-        if (!empty($restrictedClientIds)) {
+        // client restriction - if we have one
+        if ($clientIds !== null) {
             $select
                 ->joinLeft(
                     ['lca' => 'LEK_languageresources_customerassoc'],
                     'lr.id = lca.languageResourceId',
                     ['customerId']
-                )
-                ->where('lca.customerId IN (?)', $restrictedClientIds);
+                );
+            ZfExtended_Utils::addArrayCondition($select, $clientIds, 'lca.customerId');
         }
         return $this->db->fetchAll($select)->toArray();
     }
