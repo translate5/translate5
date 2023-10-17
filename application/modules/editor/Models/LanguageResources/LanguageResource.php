@@ -210,7 +210,18 @@ class editor_Models_LanguageResources_LanguageResource extends ZfExtended_Models
 
         return $this->db->fetchAll($s)->toArray();
     }
-    
+
+    public function getByResourceIdFilteredByNamePart(string $resourceId, string $namePart): array
+    {
+        $s = $this->db
+            ->select()
+            ->from(['lr' => 'LEK_languageresources'], ['lr.*'])
+            ->where('lr.resourceId = ?', $resourceId)
+            ->where('lr.name LIKE ?', '%' . $namePart . '%');
+
+        return $this->db->fetchAll($s)->toArray();
+    }
+
     /***
      * Get all available language resources for customers of loged user
      * The result data will in custom format(used in instanttranslate frontend)
