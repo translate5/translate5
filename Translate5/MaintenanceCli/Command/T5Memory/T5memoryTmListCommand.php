@@ -27,30 +27,34 @@
  */
 declare(strict_types=1);
 
-namespace Translate5\MaintenanceCli\Command;
+namespace Translate5\MaintenanceCli\Command\T5Memory;
 
-use editor_Models_LanguageResources_LanguageResource as LanguageResource;
+use editor_Services_Manager as ServiceManager;
 use editor_Services_OpenTM2_Service as Service;
-use editor_Services_OpenTM2_Connector as Connector;
-use Generator;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Translate5\MaintenanceCli\Command\T5Memory\Traits\FilteringByNameTrait;
+use Translate5\MaintenanceCli\Command\T5Memory\Traits\T5MemoryLocalTmsTrait;
+use Translate5\MaintenanceCli\Command\Translate5AbstractCommand;
 use Zend_Http_Client;
-use editor_Services_Manager as ServiceManager;
 use ZfExtended_Factory;
 
 class T5memoryTmListCommand extends Translate5AbstractCommand
 {
+    use T5MemoryLocalTmsTrait;
+    use FilteringByNameTrait;
+
     protected static $defaultName = 't5memory:list|memory:list';
 
-    protected const ARGUMENT_TM_NAME = 'tmName';
+    private const OPTION_TM_NAME = 'tmName';
 
     protected function configure(): void
     {
         $this->setDescription('Lists all translation memories in t5memory with statuses');
-        $this->addArgument(
-            self::ARGUMENT_TM_NAME,
+        $this->addOption(
+            self::OPTION_TM_NAME,
+            'f',
             InputArgument::OPTIONAL,
             'Filter tms by name (case insensitive, partial match)'
         );
@@ -65,9 +69,18 @@ class T5memoryTmListCommand extends Translate5AbstractCommand
 
         $table = $this->io->createTable();
         $table->setHeaders(['Tm name', 'Tm UUID', 'Status']);
-        foreach ($this->getLocalTms() as $item) {
+
+        $nameFilter = null;
+
+        if ($this->isFilteringByName()) {
+            $nameFilter = $this->input->getOption(self::OPTION_TM_NAME);
+            $this->io->note('NAME FILTER: ' . $nameFilter);
+        }
+
+        foreach ($this->getLocalTms($nameFilter) as $item) {
             $table->addRow([$item['name'], $item['uuid'], $item['status']]);
         }
+
         $table->render();
 
         // TODO add remote tms that do not exist locally after tm list query is fixed on t5memory side
@@ -75,55 +88,7 @@ class T5memoryTmListCommand extends Translate5AbstractCommand
         return self::SUCCESS;
     }
 
-    protected function getLocalTms(): Generator
-    {
-        $languageResource = ZfExtended_Factory::get(LanguageResource::class);
-        $languageResourcesData = $languageResource->loadByService(Service::NAME);
-        $connector = new Connector();
-
-        $nameFilter = null;
-        if($this->input->hasArgument(self::ARGUMENT_TM_NAME)){
-            $nameFilter = $this->input->getArgument(self::ARGUMENT_TM_NAME);
-        } else if ($this->input->hasOption(self::ARGUMENT_TM_NAME)){
-            $nameFilter = $this->input->getOption(self::ARGUMENT_TM_NAME);
-        }
-
-        $this->io->note('NAME FILTER: '.$nameFilter);
-
-        foreach ($languageResourcesData as $languageResourceData) {
-            if ($nameFilter
-                && !str_contains(mb_strtolower($languageResourceData['name']), mb_strtolower($nameFilter))
-            ) {
-                continue;
-            }
-
-            $languageResource->load($languageResourceData['id']);
-
-            try {
-                $connector->connectTo(
-                    $languageResource,
-                    $languageResource->getSourceLang(),
-                    $languageResource->getTargetLang()
-                );
-
-                $status = $connector->getStatus($languageResource->getResource());
-            } catch (\Throwable) {
-                $status = 'Language resource service is not available';
-            }
-
-            $tmName = $connector->getApi()->getTmName();
-            $url = rtrim($languageResource->getResource()->getUrl(), '/') . '/';
-
-            yield $url . ' - ' . $tmName => [
-                'name' => $tmName,
-                'uuid' => $languageResource->getLangResUuid(),
-                'url' => $url,
-                'status' => $status,
-            ];
-        }
-    }
-
-    protected function getRemoteTmsList(): array
+    private function getRemoteTmsList(): array
     {
         $manager = ZfExtended_Factory::get(ServiceManager::class);
 
@@ -144,5 +109,10 @@ class T5memoryTmListCommand extends Translate5AbstractCommand
         }
 
         return $result;
+    }
+
+    protected function getInput(): InputInterface
+    {
+        return $this->input;
     }
 }

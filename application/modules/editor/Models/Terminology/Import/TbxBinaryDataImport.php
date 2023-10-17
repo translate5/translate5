@@ -102,7 +102,7 @@ class editor_Models_Terminology_Import_TbxBinaryDataImport
     ];
 
     /**
-     * @var editor_Models_Terminology_Models_ImagesModel|object
+     * @var editor_Models_Terminology_Models_ImagesModel
      */
     protected editor_Models_Terminology_Models_ImagesModel $imagesModel;
 
