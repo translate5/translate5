@@ -34,7 +34,7 @@ Ext.define('Editor.view.admin.numberProtection.outputMapping.GridController', {
             Editor.data.l10n.numberProtection.confirm_deletion_title,
             Editor.data.l10n.numberProtection.mapping.confirm_deletion_message,
             btn => btn === 'yes' && Ext.Ajax.request({
-                url: Editor.data.restpath + 'NumberProtectionOutputMapping',
+                url: Editor.data.restpath + 'numberprotectionoutputmapping',
                 method: 'DELETE',
                 params: {
                     id : rec.get('id')

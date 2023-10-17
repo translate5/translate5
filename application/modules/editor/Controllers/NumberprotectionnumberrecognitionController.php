@@ -26,24 +26,57 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-use MittagQI\Translate5\NumberProtection\Model\InputMapping;
+use MittagQI\Translate5\NumberProtection\Model\NumberRecognition;
 
-class editor_NumberProtectionInputMappingController extends ZfExtended_RestController
+class editor_NumberprotectionnumberrecognitionController extends ZfExtended_RestController
 {
-    protected $entityClass = InputMapping::class;
+    protected $entityClass = NumberRecognition::class;
 
     protected $postBlacklist = ['id'];
 
-    /**
-     * @var InputMapping
-     */
-    protected $entity;
-
-    public function indexAction(): void
+    public function indexAction()
     {
-        $this->view->rows = $this->entity->loadAllForFrontEnd();
+        foreach ($this->entity->loadAll() as $row) {
+            $this->fixRowTypes($row);
+            $data[] = $row;
+        }
+
+        $this->view->rows = $data;
         $this->view->total = $this->entity->getTotalCount();
     }
+
+    public function putAction()
+    {
+        parent::putAction();
+
+        if (!empty($this->view->rows)) {
+            $this->fixRowTypes($this->view->rows);
+        }
+    }
+
+    private function fixRowTypes(object|array &$row): void
+    {
+        $row = (array) $row;
+        $row['keepAsIs'] = boolval($row['keepAsIs']);
+        $row['rowEnabled'] = boolval($row['enabled']);
+        unset($row['enabled']);
+        $row['isDefault'] = boolval($row['isDefault']);
+    }
+
+    protected function decodePutData()
+    {
+        parent::decodePutData();
+        $this->data = (array) $this->data;
+        if (array_key_exists('rowEnabled', $this->data)) {
+            $this->data['enabled'] = $this->data['rowEnabled'];
+            unset($this->data['rowEnabled']);
+        }
+    }
+
+    /**
+     * @var NumberRecognition
+     */
+    protected $entity;
 
     public function getAction(): void
     {

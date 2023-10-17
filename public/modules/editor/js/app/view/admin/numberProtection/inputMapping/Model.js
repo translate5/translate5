@@ -31,7 +31,7 @@ Ext.define('Editor.view.admin.numberProtection.inputMapping.Model', {
     idProperty: 'id',
     proxy: {
         type: 'rest',
-        url: Editor.data.restpath + 'NumberProtectionInputMapping',
+        url: Editor.data.restpath + 'numberprotectioninputmapping',
         reader: {
             rootProperty: 'rows',
             type : 'json'

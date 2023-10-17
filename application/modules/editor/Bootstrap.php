@@ -176,7 +176,7 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
                 'languageresourceresource','languageresourcetaskassoc','languageresourcetaskpivotassoc',
                 'languageresourceinstance','taskusertracking', 'term', 'attribute', 'termattribute', 'category',
                 'quality','userassocdefault', 'log', 'collectionattributedatatype', 'token',
-                'NumberProtectionNumberRecognition', 'NumberProtectionInputMapping', 'NumberProtectionOutputMapping',
+                'numberprotectionnumberrecognition', 'numberprotectioninputmapping', 'numberprotectionoutputmapping',
             ],
         ]);
         $this->front->getRouter()->addRoute('editorRestDefault', $restRoute);

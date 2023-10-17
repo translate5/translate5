@@ -31,7 +31,7 @@ Ext.define('Editor.view.admin.numberProtection.numberRecognition.GridController'
 
     deleteNumberRecognition: function(view, rowIdx, colIdx, actionCfg, evt, rec) {
         const callback = (btn) => btn === 'yes' && Ext.Ajax.request({
-            url: Editor.data.restpath + 'NumberProtectionNumberRecognition',
+            url: Editor.data.restpath + 'numberprotectionnumberrecognition',
             method: 'DELETE',
             params: {
                 id : rec.get('id')

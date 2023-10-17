@@ -31,7 +31,7 @@ Ext.define('Editor.view.admin.numberProtection.numberRecognition.Model', {
     idProperty: 'id',
     proxy: {
         type: 'rest',
-        url: Editor.data.restpath + 'NumberProtectionNumberRecognition',
+        url: Editor.data.restpath + 'numberprotectionnumberrecognition',
         reader: {
             rootProperty: 'rows',
             type : 'json'

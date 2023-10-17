@@ -28,7 +28,7 @@ END LICENSE AND COPYRIGHT
 
 use MittagQI\Translate5\NumberProtection\Model\OutputMapping;
 
-class editor_NumberProtectionOutputMappingController extends ZfExtended_RestController
+class editor_NumberprotectionoutputmappingController extends ZfExtended_RestController
 {
     protected $entityClass = OutputMapping::class;
 
