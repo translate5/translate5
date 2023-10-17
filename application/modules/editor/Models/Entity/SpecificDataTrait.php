@@ -34,7 +34,7 @@ trait editor_Models_Entity_SpecificDataTrait {
     
     /***
      * Set the specificData field. The given value will be json encoded.
-     * @param string $value
+     * @param array|stdClass $value
      */
     public function setSpecificData($value){
         $this->__call('setSpecificData', array(
