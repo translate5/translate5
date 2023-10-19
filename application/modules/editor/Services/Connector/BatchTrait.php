@@ -71,12 +71,23 @@ trait editor_Services_Connector_BatchTrait {
     {
         return $this->batchExceptions;
     }
+
+    /**
+     * Init function to be used before batch query is called
+     * @return void
+     */
+    public function initBatchQuery(){
+
+    }
     
     /***
      * Query the resource with multiple segments at once, and save the results in the database.
      * @param string $taskGuid
      */
     public function batchQuery(string $taskGuid, Closure $progressCallback = null){
+
+        $this->initBatchQuery();
+
         $segments = ZfExtended_Factory::get('editor_Models_Segment_Iterator', [$taskGuid]);
         /* @var $segments editor_Models_Segment_Iterator */
         
@@ -89,7 +100,7 @@ trait editor_Services_Connector_BatchTrait {
         //holds the query strings for batch request
         $batchQuery = [];
         $this->batchExceptions = [];
-        
+
         $segmentCounter = 0;
         $progress = 0;
         $bufferSize = 0;
