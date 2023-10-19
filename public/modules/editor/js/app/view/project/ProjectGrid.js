@@ -92,8 +92,17 @@ Ext.define('Editor.view.project.ProjectGrid', {
         			width: 60,
         			dataIndex: 'id',
 	                filter: {
-	                    type: 'numeric'
-	                },
+	                    type: 'numeric',
+                        updateBuffer: 2000
+                        //createMenu: function () {
+                        //    this.menu = Ext.widget(this.getMenuConfig());
+	                    //    console.log(this.menu, this, this.superclass, this.superclass.superclass);
+	                        //console.log(this.superclass, arguments);
+	                        //this.callOverridden();
+	                        //this.superclass.createMenu.call(this);
+                            //Ext.grid.filters.filter.prototype.createMenu.call(this);
+                        //}
+                    },
 	                text: me.text_cols.id
         		},{
                     text: me.text_cols.taskActions,
