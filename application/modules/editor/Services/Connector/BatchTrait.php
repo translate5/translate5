@@ -73,14 +73,20 @@ trait editor_Services_Connector_BatchTrait {
     }
 
     /**
-     * Init function to be used before batch query is called
+     * Init function to be used before batch query is called for extending classes
      * @return void
      */
-    public function initBatchQuery(){
+    public function initBatchQuery(): void { }
 
-    }
-    
-    /***
+    /**
+     * Notification function when batch-items are dismissed for extending classes
+     * @param string $querySegment: queried segment-text
+     * @param int $batchIndex: index as in the queue
+     * @return void
+     */
+    public function removeLastQuery(string $querySegment, int $batchIndex): void { }
+
+    /**
      * Query the resource with multiple segments at once, and save the results in the database.
      * @param string $taskGuid
      */
@@ -135,7 +141,7 @@ trait editor_Services_Connector_BatchTrait {
             ];
 
             // collect the segment size in bytes in temporary variable
-            $bufferSize += $this->getQuerySegmentSize($querySegment);
+            $bufferSize += $this->getQuerySegmentSize($querySegment, count($batchQuery) - 1);
             // is the collected buffer size above the allowed limit (if the buffer size limit is not allowed for the resource, this will return true)
             $allowByContent = $this->isAllowedByContentSize($bufferSize);
 
@@ -145,10 +151,15 @@ trait editor_Services_Connector_BatchTrait {
 
             // if the content is above the allowed buffer, remove the last segment from the batchQuery, and save it for the next loop
             if($allowByContent === false){
+
                 // get the last query segment
-                $resetBuffer = $batchQuery[count($batchQuery)-1];
+                $resetBufferIdx = count($batchQuery) - 1;
+                $resetBuffer = $batchQuery[$resetBufferIdx];
+
                 // remove the last query segment from the array (since the size is over the allowed limit)
                 array_pop($batchQuery);
+                $this->removeLastQuery($resetBuffer['query'], $resetBufferIdx);
+
                 //send batch query request, and save the results to the batch cache
                 $this->handleBatchQuerys($batchQuery);
                 $progressCallback && $progressCallback($progress);
@@ -156,8 +167,10 @@ trait editor_Services_Connector_BatchTrait {
                 $batchQuery[] = $resetBuffer;
 
                 // set the current buffer size to the last segment size
-                $bufferSize = $this->getQuerySegmentSize($querySegment);
-            }else{
+                $bufferSize = $this->getQuerySegmentSize($querySegment, count($batchQuery) - 1);
+
+            } else {
+
                 //send batch query request, and save the results to the batch cache
                 $this->handleBatchQuerys($batchQuery);
 
@@ -190,11 +203,12 @@ trait editor_Services_Connector_BatchTrait {
     }
 
     /***
-     * Return the queried segment size in KB
+     * Return the queried segment size in KB (or any other unit matching the max buffer size)
      * @param string $querySegment
+     * @param int $batchIndex: the index of the query-segment in the batch
      * @return float|bool|int
      */
-    protected function getQuerySegmentSize(string $querySegment): float|bool|int
+    protected function getQuerySegmentSize(string $querySegment, int $batchIndex): float|bool|int
     {
         if(is_numeric($this->batchQueryBufferSize) === false){
             return 0;
