@@ -54,9 +54,9 @@ class editor_CollectionattributedatatypeController extends ZfExtended_RestContro
     protected $collectionIds = false;
 
     /**
-     * @throws Zend_Session_Exception
-     * @throws ZfExtended_Mismatch
+     * @throws ReflectionException
      * @throws Zend_Db_Statement_Exception
+     * @throws ZfExtended_Mismatch
      */
     public function init() {
 
@@ -65,9 +65,6 @@ class editor_CollectionattributedatatypeController extends ZfExtended_RestContro
 
         // If request contains json-encoded 'data'-param, decode it and append to request params
         $this->handleData();
-
-        // Pick session
-        $this->_session = (new Zend_Session_Namespace('user'))->data;
 
         // If current user has 'anyCollection'-right on 'editor_term'-resource, it means all collections are accessible
         // Else we should apply collectionsIds-restriction everywhere, so get accessible collections

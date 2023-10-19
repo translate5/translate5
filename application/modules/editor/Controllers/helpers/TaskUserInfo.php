@@ -256,10 +256,8 @@ class Editor_Controller_Helper_TaskUserInfo extends Zend_Controller_Action_Helpe
         $taskGuids = array_column($taskRawObjects, 'taskGuid');
         $currentWorkflowSteps = array_column($taskRawObjects, 'workflowStepName', 'taskGuid');
         $this->userAssocInfos = []; //collects the assoc infos to the current user
-        $userAssoc = ZfExtended_Factory::get('editor_Models_TaskUserAssoc');
-        /* @var $userAssoc editor_Models_TaskUserAssoc */
-        $user = new Zend_Session_Namespace('user');
-        $userGuid = $user->data->userGuid;
+        $userAssoc = ZfExtended_Factory::get(editor_Models_TaskUserAssoc::class);
+        $userGuid = ZfExtended_Authentication::getInstance()->getUserGuid();
         $assocs = $userAssoc->loadByTaskGuidList($taskGuids);
         $this->allAssocInfos = [];
         

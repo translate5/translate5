@@ -131,9 +131,9 @@ class editor_Plugins_FrontEndMessageBus_Init extends ZfExtended_Plugin_Abstract 
      * @return boolean true if we have an authenticated user, false if not
      */
     public function handleStartSession(Zend_EventManager_Event $event) {
-        $user = new Zend_Session_Namespace('user');
-        if(!empty($user->data->userGuid)) {
-            $this->bus->startSession(Zend_Session::getId(), $user->data);
+        $auth = ZfExtended_Authentication::getInstance();
+        if($auth->isAuthenticated()) {
+            $this->bus->startSession(Zend_Session::getId(), $auth->getUserData());
             return true;
         }
         return false;

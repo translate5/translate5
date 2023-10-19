@@ -91,8 +91,7 @@ class editor_Models_Config extends ZfExtended_Models_Config {
      */
     public static function checkUserGuid(string $userGuid): void
     {
-        $userSession = new Zend_Session_Namespace('user');
-        if ($userSession->data->userGuid != $userGuid) {
+        if (ZfExtended_Authentication::getInstance()->getUserGuid() != $userGuid) {
             throw new editor_Models_ConfigException('E1299');
         }
     }
@@ -290,10 +289,9 @@ class editor_Models_Config extends ZfExtended_Models_Config {
     public function mergeInstanceValue(array $dbResults = []): array
     {
         if (empty($dbResults)) {
-            $userSession = new Zend_Session_Namespace('user');
             $user = ZfExtended_Factory::get('ZfExtended_Models_User');
             /* @var $user ZfExtended_Models_User */
-            $user->load($userSession->data->id);
+            $user->load(ZfExtended_Authentication::getInstance()->getUserId());
             //get all application config level for the user
             $levels = [];
             // important: the frontend shall just see levels above system level no matter what ACLs might exist
