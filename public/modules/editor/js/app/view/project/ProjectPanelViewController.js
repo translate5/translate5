@@ -129,7 +129,7 @@ Ext.define('Editor.view.project.ProjectPanelViewController', {
 
 
     /***
-     * On Project Focus rute
+     * On Project Focus route
      */
     onProjectFocusRoute:function(id){
         var me=this;
@@ -137,7 +137,7 @@ Ext.define('Editor.view.project.ProjectPanelViewController', {
     },
 
     /***
-     * On ProjectTask rute
+     * On ProjectTask route
      */
     onProjectTaskFocusRoute:function(id,taskId){
         var me=this;
@@ -151,14 +151,13 @@ Ext.define('Editor.view.project.ProjectPanelViewController', {
      */
     focusProjectTask:function(store){
         var me=this,
-            rute=window.location.hash,
-            rute=rute.split('/'),
-            isFocus=(rute.length==4 && rute[3]=='focus'),
+            route = window.location.hash.split('/'),
+            isFocus=(route.length===4 && route[3]==='focus'),
             id=null,
             record=null;
 
         if(isFocus){
-            id=parseInt(rute[2]);
+            id=parseInt(route[2]);
             record=store.getById(parseInt(id));
         }
         if(!record){
@@ -299,6 +298,7 @@ Ext.define('Editor.view.project.ProjectPanelViewController', {
             if(store.getTotalCount() === 0){
                 if(!store.hasPendingLoad()) {
                     Editor.MessageBox.addInfo(me.strings.noProjectInFilter);
+                    me.reset();
                 }
                 return;
             }
@@ -396,7 +396,7 @@ Ext.define('Editor.view.project.ProjectPanelViewController', {
             params = {};
         //the record exist in the grid view
         if(index!=null){
-            return new Ext.Promise(function (resolve, reject) {
+            return new Ext.Promise(function (resolve) {
                 resolve(index);
             });
         }
@@ -470,8 +470,7 @@ Ext.define('Editor.view.project.ProjectPanelViewController', {
      */
     resetSelection:function(){
         var me=this,
-            projectTaskGrid = me.lookup('projectTaskGrid'),
-            projectGrid = me.lookup('projectGrid');
+            projectTaskGrid = me.lookup('projectTaskGrid');
 
         projectTaskGrid.getStore().removeAll(true);
         projectTaskGrid.view.refresh();
@@ -488,48 +487,14 @@ Ext.define('Editor.view.project.ProjectPanelViewController', {
     },
 
     /**
-     * Auto-select first record if current selection do not match the filters
-     *
+     * Project store filter change event handler
      * @param store
      */
     onProjectStoreFilterChange: function(store) {
 
-        // Put a single-time callback on store's load-event, as we need to
-        // check whether selected row is still in the store after filters are really applied
-        store.on('load', function() {
-
-            // Get selection model
-            var sm = this.lookup('projectGrid').getSelectionModel();
-
-            // If we have selection
-            if (sm.getSelection().length) {
-
-                // Get selected record
-                var record = sm.getSelection()[0];
-
-                // If it's still in the store - do nothing
-                if (~store.findExact('id', record.getId())) {
-
-                // Else if it's not and store is not empty
-                } else if (store.getCount()) {
-
-                    // Select first record
-                    sm.select(store.getAt(0));
-
-                // Else
-                } else {
-
-                    // Clear selection
-                    sm.deselect([record]);
-
-                    // Reset right panel
-                    this.reset();
-                }
-
-            // Else select first record
-            } else {
-                sm.select(store.getAt(0));
-            }
-        }, this, {single: true});
+        if(store && store.getTotalCount() > 0){
+            // focus the correct project/task after the project filter is changed
+            this.focusProjectTask(store);
+        }
     }
 });
