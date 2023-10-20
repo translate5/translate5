@@ -46,6 +46,7 @@ Ext.define('Editor.model.LanguageResources.LanguageResource', {
     STATUS_IMPORT: 'import',
     STATUS_NOTLOADED: 'notloaded',
     STATUS_NOVALIDLICENSE: 'novalidlicense',
+    STATUS_TUNINGINPROGRESS: 'tuninginprogress',
     fields: [
         {name: 'id', type: 'int'},
         {name: 'entityVersion', type: 'integer', critical: true},
