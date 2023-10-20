@@ -325,17 +325,17 @@ class editor_Models_LanguageResources_Resource {
     }
 
     /**
-     * returns the initial status for that resource type for the overview list
-     *
-     * @param $statusInfo
-     *
-     * @return string
+     * @param array|null $specificData
+     * @param ZfExtended_Zendoverwrites_Translate $translate
+     * @return array{status:string,statusInfo:string}
+     * @throws Zend_Exception
      */
-    public function getInitialStatus(&$statusInfo): string
+    public function getInitialStatus(?array $specificData, ZfExtended_Zendoverwrites_Translate $translate): array
     {
-        $statusInfo = 'Wählen Sie die Ressource aus um weitere Infos zu bekommen.';
-
-        return LanguageResourceStatus::NOTCHECKED;
+        return [
+            'status' => LanguageResourceStatus::NOTCHECKED,
+            'statusInfo' => $translate->_('Wählen Sie die Ressource aus um weitere Infos zu bekommen.')
+        ];
     }
 
     /**

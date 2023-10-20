@@ -103,95 +103,85 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
      * @see ZfExtended_RestController::indexAction()
      * Adds the readonly "filebased" field to the results
      */
-    public function indexAction(){
+    public function indexAction()
+    {
         //add custom filters
         $this->handleFilterCustom();
 
         $this->view->rows = $this->entity->loadAllByServices();
         $this->view->total = $this->entity->getTotalCount();
 
-        $serviceManager = ZfExtended_Factory::get('editor_Services_Manager');
-        /* @var $serviceManager editor_Services_Manager */
-
+        $serviceManager = ZfExtended_Factory::get(editor_Services_Manager::class);
         $resources = [];
 
-        $getResource = function(string $serviceType, string $id) use ($resources, $serviceManager) {
+        $getResource = function (string $serviceType, string $id) use ($resources, $serviceManager) {
             if (!empty($resources[$id])) {
                 return $resources[$id];
             }
-            return $resources[$id] = $serviceManager->getResourceById($serviceType, $id);
+            $resources[$id] = $serviceManager->getResourceById($serviceType, $id);
+            return $resources[$id];
         };
 
-        $languageResourcesId=array_column($this->view->rows, 'id');
+        $languageResourcesId = array_column($this->view->rows, 'id');
         $this->prepareTaskInfo($languageResourcesId);
 
-        $eventLogger=ZfExtended_Factory::get('editor_Models_Logger_LanguageResources');
-        /* @var $eventLogger editor_Models_Logger_LanguageResources */
-        $eventLoggerGroupped=$eventLogger->getLatesEventsCount($languageResourcesId);
+        $eventLogger = ZfExtended_Factory::get(editor_Models_Logger_LanguageResources::class);
+        $eventLoggerGroupped = $eventLogger->getLatesEventsCount($languageResourcesId);
 
         //get all assocs grouped by language resource id
-        $customerAssocModel=ZfExtended_Factory::get('editor_Models_LanguageResources_CustomerAssoc');
-        /* @var $customerAssocModel editor_Models_LanguageResources_CustomerAssoc */
-        $custAssoc=$customerAssocModel->loadCustomerIdsGrouped();
+        $customerAssocModel = ZfExtended_Factory::get(editor_Models_LanguageResources_CustomerAssoc::class);
+        $custAssoc = $customerAssocModel->loadCustomerIdsGrouped();
 
         // for assigned categories
-        $categoryAssocModel = ZfExtended_Factory::get('editor_Models_LanguageResources_CategoryAssoc');
-        /* @var $categoryAssocModel editor_Models_LanguageResources_CategoryAssoc */
+        $categoryAssocModel = ZfExtended_Factory::get(editor_Models_LanguageResources_CategoryAssoc::class);
         $categoryAssocs = $categoryAssocModel->loadCategoryIdsGrouped();
 
-        $languages=ZfExtended_Factory::get('editor_Models_LanguageResources_Languages');
-        /* @var $languages editor_Models_LanguageResources_Languages */
-        $languages=$languages->loadResourceIdsGrouped();
+        $languages = ZfExtended_Factory::get(editor_Models_LanguageResources_Languages::class);
+        $languages = $languages->loadResourceIdsGrouped();
+        $translate = ZfExtended_Zendoverwrites_Translate::getInstance();
 
-        $t = ZfExtended_Zendoverwrites_Translate::getInstance();
-        /* @var $t ZfExtended_Zendoverwrites_Translate */
+        foreach ($this->view->rows as &$lrData) {
 
-        foreach($this->view->rows as &$languageresource) {
-            $resource = $getResource($languageresource['serviceType'], $languageresource['resourceId']);
-            /* @var $resource editor_Models_LanguageResources_Resource */
-            if(!empty($resource)) {
-                $languageresource = array_merge($languageresource, $resource->getMetaData());
+            $resource = $getResource($lrData['serviceType'], $lrData['resourceId']);
+            /* @var editor_Models_LanguageResources_Resource $resource */
+            if (!empty($resource)) {
+                $lrData = array_merge($lrData, $resource->getMetaData());
+            }
+            // translate the "specificDta" field for the frontend and store the unserialized data
+            $specificData = $this->translateSpecificData($lrData, true);
+            $languageResourceInstance = ZfExtended_Factory::get(editor_Models_LanguageResources_LanguageResource::class);
+            $languageResourceInstance->init($lrData);
+
+            $lrData['taskList'] = $this->getTaskInfos($lrData['id']);
+
+            if (empty($resource)) {
+                $lrData['status'] = LanguageResourceStatus::ERROR;
+                $lrData['statusInfo'] = $translate->_('Die verwendete Resource wurde aus der Konfiguration entfernt.');
+            } else {
+                // retrieves an assoc with 'status' and 'statusInfo' keys
+                foreach($resource->getInitialStatus($specificData, $translate) as $key => $value){
+                    $lrData[$key] = $value;
+                }
             }
 
-            $languageResourceInstance = ZfExtended_Factory::get('editor_Models_LanguageResources_LanguageResource');
-            /* @var $languageResourceInstance editor_Models_LanguageResources_LanguageResource */
-            $languageResourceInstance->init($languageresource);
-
-            $languageresource['taskList'] = $this->getTaskInfos($languageresource['id']);
-
-            if(empty($resource)) {
-                $languageresource['status'] = LanguageResourceStatus::ERROR;
-                $languageresource['statusInfo'] = $t->_('Die verwendete Resource wurde aus der Konfiguration entfernt.');
-            }
-            else {
-                $moreInfo = '';
-                $languageresource['status'] = $resource->getInitialStatus($moreInfo);
-                $languageresource['statusInfo'] = $t->_($moreInfo);
-            }
-
-            $id = $languageresource['id'];
+            $id = $lrData['id'];
 
             //add customer assocs
-            $languageresource['customerIds'] = $this->getCustassoc($custAssoc, 'customerId', $id);
-            $languageresource['customerUseAsDefaultIds'] = $this->getCustassocByIndex($custAssoc, 'useAsDefault', $id);
-            $languageresource['customerWriteAsDefaultIds'] = $this->getCustassocByIndex($custAssoc, 'writeAsDefault', $id);
-            $languageresource['customerPivotAsDefaultIds'] = $this->getCustassocByIndex($custAssoc, 'pivotAsDefault', $id);
-            
-            $languageresource['sourceLang'] = $this->getLanguage($languages, 'sourceLang', $id);
-            $languageresource['targetLang'] = $this->getLanguage($languages, 'targetLang', $id);
+            $lrData['customerIds'] = $this->getCustassoc($custAssoc, 'customerId', $id);
+            $lrData['customerUseAsDefaultIds'] = $this->getCustassocByIndex($custAssoc, 'useAsDefault', $id);
+            $lrData['customerWriteAsDefaultIds'] = $this->getCustassocByIndex($custAssoc, 'writeAsDefault', $id);
+            $lrData['customerPivotAsDefaultIds'] = $this->getCustassocByIndex($custAssoc, 'pivotAsDefault', $id);
+
+            $lrData['sourceLang'] = $this->getLanguage($languages, 'sourceLang', $id);
+            $lrData['targetLang'] = $this->getLanguage($languages, 'targetLang', $id);
 
             // categories (for the moment: just display labels for info, no editing)
             $categoryLabels = [];
             foreach ($this->getCategoryassoc($categoryAssocs, 'categoryId', $id) as $categoryId) {
                 $categoryLabels[] = $this->renderCategoryCustomLabel($categoryId);
             }
-            $languageresource['categories'] = $categoryLabels;
-
-            $languageresource['eventsCount'] = isset($eventLoggerGroupped[$id]) ? (integer)$eventLoggerGroupped[$id] : 0;
-
-            if(isset($languageresource['specificData']) && !empty($languageresource['specificData'])){
-                $languageresource['specificData'] = $this->translateSpecificData($languageresource['specificData'],$languageresource['serviceName']);
-            }
+            $lrData['categories'] = $categoryLabels;
+            $lrData['eventsCount'] = isset($eventLoggerGroupped[$id]) ? (integer)$eventLoggerGroupped[$id] : 0;
         }
     }
 
@@ -315,9 +305,7 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         $this->view->rows->sourceLang = $this->getLanguage($languages, 'sourceLang', $this->entity->getId());
         $this->view->rows->targetLang = $this->getLanguage($languages, 'targetLang', $this->entity->getId());
 
-        if(property_exists($this->view->rows,'specificData') && strlen($this->view->rows->specificData) > 0){
-            $this->view->rows->specificData = $this->translateSpecificData($this->view->rows->specificData,$this->view->rows->serviceName);
-        }
+        $this->translateSpecificData($this->view->rows, false);
     }
 
     /**
@@ -1473,25 +1461,47 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         return str_replace(array_keys($tags), array_values($tags), $segment);
     }
 
-    /***
+    /**
+     * Transforms the specificData for the frontend, "translates" it, sets the new value in $resourceData
+     * and returns the deserialized specificData
      * @param string $specificData
      * @param string $serviceName
      * @return string
      * @throws Zend_Exception
      * @throws Zend_Json_Exception
      */
-    protected function translateSpecificData(string $specificData, string $serviceName): string
+    protected function translateSpecificData(mixed &$resourceData, bool $isArray): array
     {
-        $translate = ZfExtended_Zendoverwrites_Translate::getInstance();
-        /* @var $translate ZfExtended_Zendoverwrites_Translate */;
+        // TODO FIXME: Why are the values suffixed with the service-name here ?? what is this for ?
 
-        $data = Zend_Json::decode($specificData);
-        $return = [];
+        if(($isArray && !array_key_exists('specificData', $resourceData))
+            || (!$isArray && !property_exists($resourceData, 'specificData'))){
+            return [];
+        }
+        $specificData = $isArray ? $resourceData['specificData'] : $resourceData->specificData;
+        $specificData = empty($specificData) ? null : Zend_Json::decode($specificData);
+
+        $setValue = function (mixed &$data, mixed $value, bool $isArray){
+            if($isArray){
+                $data['specificData'] = $value;
+            } else {
+                $data->specificData = $value;
+            }
+        };
+
+        if(empty($specificData)){
+            $setValue($resourceData, null, $isArray);
+            return [];
+        }
+
+        $translate = ZfExtended_Zendoverwrites_Translate::getInstance();
+        $serviceName = $isArray ? $resourceData['serviceName'] : $resourceData->serviceName;
+        $result = [];
 
         $keysToIgnore = ['status'];
 
-        foreach ($data as $key=>$value) {
-            if(in_array($key,$keysToIgnore)){
+        foreach ($specificData as $key => $value) {
+            if(in_array($key, $keysToIgnore)){
                 continue;
             }
             $toAdd = [
@@ -1501,13 +1511,16 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
             ];
             // fileName should always appear as first element
             if($key === 'fileName'){
-                array_unshift($return,$toAdd);
-            }else {
-                array_push($return, $toAdd);
+                array_unshift($result, $toAdd);
+            } else {
+                array_push($result, $toAdd);
             }
         }
 
-        return empty($return) ? '' : Zend_Json::encode($return);
+        $value = empty($result) ? null : Zend_Json::encode($result);
+        $setValue($resourceData, $value, $isArray);
+
+        return $result;
     }
 
     /**
