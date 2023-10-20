@@ -5347,6 +5347,18 @@ Im Projektportal {portalLink} wurde die Aufgabe
                 <source>Keine gültige Lizenz.</source>
                 <target>Keine gültige Lizenz.</target>
             </trans-unit>
+            <trans-unit id='V2lyZCB0cmFpbmllcnQ='>
+                <source>Wird trainiert</source>
+                <target>Wird trainiert</target>
+            </trans-unit>
+            <trans-unit id='V2lyZCByZW9yZ2FuaXNpZXJ0'>
+                <source>Wird reorganisiert</source>
+                <target>Wird reorganisiert</target>
+            </trans-unit>
+            <trans-unit id='UmVvcmdhbmlzYXRpb24gZ2VzY2hlaXRlcnQ='>
+                <source>Reorganisation gescheitert</source>
+                <target>Reorganisation gescheitert</target>
+            </trans-unit>
             <trans-unit id='aW1wb3J0aWVydA=='>
                 <source>importiert</source>
                 <target>importiert</target>

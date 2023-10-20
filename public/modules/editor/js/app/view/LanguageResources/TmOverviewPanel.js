@@ -71,7 +71,10 @@ Ext.define('Editor.view.LanguageResources.TmOverviewPanel', {
             import: '#UT#Import läuft',
             notloaded: '#UT#verfügbar',
             notchecked:'#UT#Nicht geprüft',
-            novalidlicense: '#UT#Keine gültige Lizenz.'
+            novalidlicense: '#UT#Keine gültige Lizenz.',
+            tuninginprogress: '#UT#Wird trainiert',
+            reorganize_in_progress: '#UT#Wird reorganisiert',
+            reorganize_failed: '#UT#Reorganisation gescheitert'
         },
         customers:'#UT#Kunden',
         useAsDefault:'#UT#Leserechte standardmäßig',
