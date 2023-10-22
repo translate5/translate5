@@ -1520,7 +1520,7 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         $value = empty($result) ? null : Zend_Json::encode($result);
         $setValue($resourceData, $value, $isArray);
 
-        return $result;
+        return $specificData;
     }
 
     /**
