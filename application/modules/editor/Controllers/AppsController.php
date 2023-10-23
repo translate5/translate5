@@ -44,11 +44,13 @@ class Editor_AppsController extends ZfExtended_Controllers_Action {
         //either we are redirected, or if no redirect target found, we trigger a notfound:
         throw new ZfExtended_NotFoundException;
     }
-    
-    /***
+
+    /**
      * Update the last used app for the current user
+     * @throws ReflectionException
      */
-    public function lastusedappAction() {
+    public function lastusedappAction(): void
+    {
         $this->_helper->viewRenderer->setNoRender(true);
         $this->_helper->layout->disableLayout();
         $appName=$this->getRequest()->getParam('appName');
@@ -61,9 +63,7 @@ class Editor_AppsController extends ZfExtended_Controllers_Action {
             return;
         }
         
-        $userId = (new Zend_Session_Namespace('user'))->data->id;
-        $meta=ZfExtended_Factory::get('editor_Models_UserMeta');
-        /* @var $meta editor_Models_UserMeta */
-        $meta->saveLastUsedApp($userId, $appName);
+        $meta = ZfExtended_Factory::get(editor_Models_UserMeta::class);
+        $meta->saveLastUsedApp(ZfExtended_Authentication::getInstance()->getUserId(), $appName);
     }
 }
