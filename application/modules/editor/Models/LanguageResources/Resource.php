@@ -326,11 +326,16 @@ class editor_Models_LanguageResources_Resource {
 
     /**
      * @param array|null $specificData
+     * @param int $languageResourceId
      * @param ZfExtended_Zendoverwrites_Translate $translate
      * @return array{status:string,statusInfo:string}
      * @throws Zend_Exception
      */
-    public function getInitialStatus(?array $specificData, ZfExtended_Zendoverwrites_Translate $translate): array
+    public function getInitialStatus(
+        ?array                              $specificData,
+        int                                 $languageResourceId,
+        ZfExtended_Zendoverwrites_Translate $translate
+    ): array
     {
         return [
             'status' => LanguageResourceStatus::NOTCHECKED,

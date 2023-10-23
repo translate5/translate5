@@ -5359,6 +5359,10 @@ Im Projektportal {portalLink} wurde die Aufgabe
                 <source>Reorganisation gescheitert</source>
                 <target>Reorganisation gescheitert</target>
             </trans-unit>
+            <trans-unit id='S29udGluZ2VudCDDvGJlcnNjaHJpdHRlbg=='>
+                <source>Kontingent überschritten</source>
+                <target>Kontingent überschritten</target>
+            </trans-unit>
             <trans-unit id='aW1wb3J0aWVydA=='>
                 <source>importiert</source>
                 <target>importiert</target>

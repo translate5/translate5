@@ -3896,6 +3896,10 @@ A task was associated to you in the task-portal {portalLink}.
                 <source>Reorganisation gescheitert</source>
                 <target>Reorganization failed</target>
             </trans-unit>
+            <trans-unit id='S29udGluZ2VudCDDvGJlcnNjaHJpdHRlbg=='>
+                <source>Kontingent überschritten</source>
+                <target>Quota exceeded</target>
+            </trans-unit>
             <trans-unit id='aW1wb3J0aWVydA=='>
                 <source>importiert</source>
                 <target>importing</target>

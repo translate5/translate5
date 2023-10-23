@@ -122,11 +122,11 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
             return $resources[$id];
         };
 
-        $languageResourcesId = array_column($this->view->rows, 'id');
-        $this->prepareTaskInfo($languageResourcesId);
+        $languageResourcesIds = array_column($this->view->rows, 'id');
+        $this->prepareTaskInfo($languageResourcesIds);
 
         $eventLogger = ZfExtended_Factory::get(editor_Models_Logger_LanguageResources::class);
-        $eventLoggerGroupped = $eventLogger->getLatesEventsCount($languageResourcesId);
+        $eventLoggerGroupped = $eventLogger->getLatesEventsCount($languageResourcesIds);
 
         //get all assocs grouped by language resource id
         $customerAssocModel = ZfExtended_Factory::get(editor_Models_LanguageResources_CustomerAssoc::class);
@@ -159,7 +159,7 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
                 $lrData['statusInfo'] = $translate->_('Die verwendete Resource wurde aus der Konfiguration entfernt.');
             } else {
                 // retrieves an assoc with 'status' and 'statusInfo' keys
-                foreach($resource->getInitialStatus($specificData, $translate) as $key => $value){
+                foreach($resource->getInitialStatus($specificData, (int)$lrData['id'], $translate) as $key => $value){
                     $lrData[$key] = $value;
                 }
             }
