@@ -200,8 +200,16 @@ class editor_Services_TermCollection_Connector extends editor_Services_Connector
      * {@inheritDoc}
      * @see editor_Services_Connector_Abstract::getStatus()
      */
-    public function getStatus(editor_Models_LanguageResources_Resource $resource)
+    public function getStatus(
+        editor_Models_LanguageResources_Resource $resource,
+        editor_Models_LanguageResources_LanguageResource $languageResource = null
+    ): string
     {
+        // is may injected with the call
+        if(!empty($languageResource)){
+            $this->languageResource = $languageResource;
+        }
+
         if (!isset($this->languageResource)) {
             //this should come from the resource status check in the resources api request
             return self::STATUS_AVAILABLE;

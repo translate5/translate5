@@ -362,10 +362,14 @@ abstract class editor_Services_Connector_Abstract {
     /**
      * Check the status of the language resource. If using the HttpClient,
      *  the handling of general service down and timeout as no connection, is done in the connector wrapper.
-     * @param editor_Models_LanguageResources_Resource $resource the resource which should be used for connection
-     * @return string the status of the connected resource and additional information if there is some
+     * @param editor_Models_LanguageResources_Resource $resource
+     * @param editor_Models_LanguageResources_LanguageResource|null $languageResource: May not be given in some cases
+     * @return string
      */
-    abstract public function getStatus(editor_Models_LanguageResources_Resource $resource);
+    abstract public function getStatus(
+        editor_Models_LanguageResources_Resource $resource,
+        editor_Models_LanguageResources_LanguageResource $languageResource = null
+    ): string;
     
     /**
      * returns the last stored additional info string from the last getStatus call

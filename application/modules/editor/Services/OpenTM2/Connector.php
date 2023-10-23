@@ -534,13 +534,22 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
      * {@inheritDoc}
      * @throws editor_Services_Exceptions_InvalidResponse
      */
-    public function getStatus(editor_Models_LanguageResources_Resource $resource): string
+    public function getStatus(
+        editor_Models_LanguageResources_Resource $resource,
+        editor_Models_LanguageResources_LanguageResource $languageResource = null
+    ): string
     {
         $this->lastStatusInfo = '';
 
-        if (empty($this->languageResource)) {
+        // is may injected with the call
+        if(!empty($languageResource)){
+            $this->languageResource = $languageResource;
+        }
+
+        // for the rare cases where no language-resource is present
+        if (!isset($this->languageResource)) {
             //ping call
-            $this->api = ZfExtended_Factory::get('editor_Services_OpenTM2_HttpApi');
+            $this->api = ZfExtended_Factory::get(editor_Services_OpenTM2_HttpApi::class);
             $this->api->setResource($resource);
 
             return $this->api->status() ? LanguageResourceStatus::AVAILABLE : LanguageResourceStatus::ERROR;

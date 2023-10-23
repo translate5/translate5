@@ -60,7 +60,7 @@ trait T5MemoryLocalTmsTrait
                     $languageResource->getTargetLang()
                 );
 
-                $status = $connector->getStatus($languageResource->getResource());
+                $status = $connector->getStatus($languageResource->getResource(), $languageResource);
             } catch (\Throwable) {
                 $status = 'Language resource service is not available';
             }
