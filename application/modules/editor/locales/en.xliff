@@ -6070,9 +6070,17 @@ The following task was imported with errors / warnings / notices. Please take ca
                 <source>Die Qualität wurde entfernt</source>
                 <target>The quality has been removed</target>
             </trans-unit>
-            <trans-unit id='RWluIEtsaWNrIGF1ZiBkaWUgQ2hlY2stQm94IG1hcmtpZXJ0IGRlbiBha3R1ZWxsZW4gRmVobGVyIGFscyAiZmFsc2NoZW4gRmVobGVyIi4gPGJyLz5FaW4gS2xpY2sgYXVmIGRpZSBaYWhsIHJlY2h0cyBtYXJraWVydCBhbGxlIGlkZW50aXNjaGVuIEZlaGxlciBhbHMgImZhbHNjaGUgRmVobGVyIg=='>
-                <source>Ein Klick auf die Check-Box markiert den aktuellen Fehler als "falschen Fehler". <br/>Ein Klick auf die Zahl rechts markiert alle identischen Fehler als "falsche Fehler"</source>
-                <target>A click on the check box marks the current error as "false error". <br/>A click on the number on the right marks all identical errors as "false errors".</target>
+            <trans-unit id='RWluIEtsaWNrIGF1ZiBkaWUgQ2hlY2stQm94IG1hcmtpZXJ0IGRlbiBha3R1ZWxsZW4gRmVobGVyIGFscyAiZmFsc2NoZW4gRmVobGVyIg=='>
+                <source>Ein Klick auf die Check-Box markiert den aktuellen Fehler als "falschen Fehler"</source>
+                <target>A click on the check box marks the current error as "false error"</target>
+            </trans-unit>
+            <trans-unit id='RWluIEtsaWNrIGF1ZiBkaWUgWmFobCByZWNodHMgbWFya2llcnQgYWxsZSBpZGVudGlzY2hlbiBGZWhsZXIgYWxzICJmYWxzY2hlIEZlaGxlciI='>
+                <source>Ein Klick auf die Zahl rechts markiert alle identischen Fehler als "falsche Fehler"</source>
+                <target>A click on the number on the right marks all identical errors as "false errors"</target>
+            </trans-unit>
+            <trans-unit id='VGFzdGF0dXItU2hvcnRjdXQgc2llaGUgVG9vbHRpcCByZWNodGUgU3BhbHRlICJRdWFsaXTDpHRzc2ljaGVydW5nIg=='>
+                <source>Tastatur-Shortcut siehe Tooltip rechte Spalte "Qualitätssicherung"</source>
+                <target>Keyboard shortcut see tooltip right column "Quality Assurance"</target>
             </trans-unit>
             <trans-unit id='RGllc2VuIFN0YXR1cyBmw7xyIGFsbGUgRXJlaWduaXNzZSBpbm5lcmhhbGIgZGllc2VyIEF1ZmdhYmUgdmVydGVpbHQ='>
                 <source>Diesen Status für alle Ereignisse innerhalb dieser Aufgabe verteilt</source>

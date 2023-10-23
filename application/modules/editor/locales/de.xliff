@@ -7804,9 +7804,17 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
                 <source>Die Qualität wurde entfernt</source>
                 <target>Die Qualität wurde entfernt</target>
             </trans-unit>
-            <trans-unit id='RWluIEtsaWNrIGF1ZiBkaWUgQ2hlY2stQm94IG1hcmtpZXJ0IGRlbiBha3R1ZWxsZW4gRmVobGVyIGFscyAiZmFsc2NoZW4gRmVobGVyIi4gPGJyLz5FaW4gS2xpY2sgYXVmIGRpZSBaYWhsIHJlY2h0cyBtYXJraWVydCBhbGxlIGlkZW50aXNjaGVuIEZlaGxlciBhbHMgImZhbHNjaGUgRmVobGVyIg=='>
-                <source>Ein Klick auf die Check-Box markiert den aktuellen Fehler als "falschen Fehler". <br/>Ein Klick auf die Zahl rechts markiert alle identischen Fehler als "falsche Fehler"</source>
-                <target>Ein Klick auf die Check-Box markiert den aktuellen Fehler als "falschen Fehler". <br/>Ein Klick auf die Zahl rechts markiert alle identischen Fehler als "falsche Fehler"</target>
+            <trans-unit id='RWluIEtsaWNrIGF1ZiBkaWUgQ2hlY2stQm94IG1hcmtpZXJ0IGRlbiBha3R1ZWxsZW4gRmVobGVyIGFscyAiZmFsc2NoZW4gRmVobGVyIg=='>
+                <source>Ein Klick auf die Check-Box markiert den aktuellen Fehler als "falschen Fehler"</source>
+                <target>Ein Klick auf die Check-Box markiert den aktuellen Fehler als "falschen Fehler"</target>
+            </trans-unit>
+            <trans-unit id='RWluIEtsaWNrIGF1ZiBkaWUgWmFobCByZWNodHMgbWFya2llcnQgYWxsZSBpZGVudGlzY2hlbiBGZWhsZXIgYWxzICJmYWxzY2hlIEZlaGxlciI='>
+                <source>Ein Klick auf die Zahl rechts markiert alle identischen Fehler als "falsche Fehler"</source>
+                <target>Ein Klick auf die Zahl rechts markiert alle identischen Fehler als "falsche Fehler"</target>
+            </trans-unit>
+            <trans-unit id='VGFzdGF0dXItU2hvcnRjdXQgc2llaGUgVG9vbHRpcCByZWNodGUgU3BhbHRlICJRdWFsaXTDpHRzc2ljaGVydW5nIg=='>
+                <source>Tastatur-Shortcut siehe Tooltip rechte Spalte "Qualitätssicherung"</source>
+                <target>Tastatur-Shortcut siehe Tooltip rechte Spalte "Qualitätssicherung"</target>
             </trans-unit>
             <trans-unit id='RGllc2VuIFN0YXR1cyBmw7xyIGFsbGUgRXJlaWduaXNzZSBpbm5lcmhhbGIgZGllc2VyIEF1ZmdhYmUgdmVydGVpbHQ='>
                 <source>Diesen Status für alle Ereignisse innerhalb dieser Aufgabe verteilt</source>
