@@ -217,6 +217,6 @@ Ext.define('Editor.MessageBox',{
 }, function(){
     Ext.getDoc().on('mousedown', function(){
         var msg = document.querySelector('.app-msg');
-        if (msg) msg.remove();
+        if (msg) Ext.get(msg).ghost("t", {remove:true});
     });
 });
