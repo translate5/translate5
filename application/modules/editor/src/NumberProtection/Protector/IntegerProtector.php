@@ -55,6 +55,7 @@ namespace MittagQI\Translate5\NumberProtection\Protector;
 use editor_Models_Languages;
 use MittagQI\Translate5\NumberProtection\Model\NumberFormatDto;
 use NumberFormatter;
+use Throwable;
 
 class IntegerProtector extends FloatProtector
 {
@@ -66,8 +67,7 @@ class IntegerProtector extends FloatProtector
     protected function composeNumberTag(
         string $number,
         NumberFormatDto $sourceFormat,
-        ?editor_Models_Languages $sourceLang,
-        ?editor_Models_Languages $targetLang,
+        editor_Models_Languages $targetLang,
         ?string $targetFormat
     ): string {
         $integer = null;
@@ -83,10 +83,10 @@ class IntegerProtector extends FloatProtector
                 self::getType(),
                 htmlspecialchars($sourceFormat->name),
                 $number,
-                (string)$integer,
+                $sourceFormat->keepAsIs ? $number : (string) $integer,
                 $this->getTargetInteger($integer, $targetFormat, $targetLang)
             );
-        } catch (\Throwable) {
+        } catch (Throwable) {
             return '';
         }
     }
@@ -94,18 +94,36 @@ class IntegerProtector extends FloatProtector
     protected function getTargetInteger(
         ?int $integer,
         ?string $targetFormat,
-        ?editor_Models_Languages $targetLang
+        editor_Models_Languages $targetLang
     ): string {
         if (null === $integer) {
             return '';
         }
 
-        if (null === $targetLang) {
-            return '';
+        $fmt = NumberFormatter::create($targetLang->getRfc5646(), NumberFormatter::PATTERN_DECIMAL, $targetFormat);
+        if ($targetFormat) {
+            $this->setFormat($targetFormat, $fmt);
         }
 
-        $fmt = NumberFormatter::create($targetLang->getRfc5646(), NumberFormatter::PATTERN_DECIMAL, $targetFormat);
-
         return $fmt->format($integer);
+    }
+
+    public function setFormat(string $format, NumberFormatter $formater): void
+    {
+        $formater->setPattern($format);
+        preg_match('/#+0*([^#0])((#+\1)*#*0*([^#0]))?#*0*/u', $format, $symbols);
+
+        if (empty($symbols)) {
+            return;
+        }
+
+        // Symbols are predefined by locale, so we have to enforce our desired ones
+        $formater->setSymbol(NumberFormatter::GROUPING_SEPARATOR_SYMBOL, $symbols[1]);
+
+        if (isset($symbols[4])) {
+            $formater->setSymbol(NumberFormatter::DECIMAL_SEPARATOR_SYMBOL, $symbols[4]);
+            // replace non-standard symbols in patter with standard
+            $formater->setPattern(str_replace([$symbols[1], $symbols[4]], [',', '.'], $format));
+        }
     }
 }

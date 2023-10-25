@@ -60,39 +60,49 @@ class FloatObject
     {
     }
 
-    public static function parse(string $float, ?string $sourceLocale = null): self
+    public static function parse(string $float): self
     {
-        $formater = numfmt_create($sourceLocale ?: 'en', NumberFormatter::DECIMAL);
+        $formater = numfmt_create( 'en', NumberFormatter::DECIMAL);
         $symbols = array_filter(preg_split('/(\d+|[٠١٢٣٤٥٦٧٨٩]+)/u', $float));
         $decimalSeparator = end($symbols);
 
         $regSymbol = '.' === $decimalSeparator ? '\\' . $decimalSeparator : $decimalSeparator;
-
         $number = preg_replace("/[^\d$regSymbol]/u", '', $float);
+        $number = str_replace($decimalSeparator, '.', $number);
 
-        if (null === $sourceLocale) {
-            $number = str_replace($decimalSeparator, '.', $number);
-        }
-
-        $float = $formater->parse($number);
-
-        if (false === $float) {
-            $formater = numfmt_create('en', NumberFormatter::DECIMAL);
-            $number = str_replace($decimalSeparator, '.', $number);
-            $float = $formater->parse($number);
-        }
-
-        return new self($float, (int) strpos(strrev($number), $sourceLocale ? $decimalSeparator : '.'));
+        return new self($formater->parse($number), mb_strlen(explode('.', $number)[1]));
     }
 
     public function format(string $locale = 'en', ?string $format = null): string
     {
         $formater = numfmt_create($locale, NumberFormatter::DECIMAL);
         if (!empty($format)) {
-            $formater->setPattern($format);
+            $this->setFormat($format, $formater);
         }
         $formater->setAttribute(NumberFormatter::MAX_FRACTION_DIGITS, $this->fractionDigits);
 
+        error_log('fractionDigits: '  .$this->fractionDigits);
+        error_log((string)$this->number . ' ?=? ' . $formater->format($this->number));
+
         return $formater->format($this->number);
+    }
+
+    public function setFormat(string $format, NumberFormatter $formater): void
+    {
+        $formater->setPattern($format);
+        preg_match('/#+0*([^#0])((#+\1)*#*0*([^#0]))?#*0*/u', $format, $symbols);
+
+        if (empty($symbols)) {
+            return;
+        }
+
+        // Symbols are predefined by locale, so we have to enforce our desired ones
+        $formater->setSymbol(NumberFormatter::DECIMAL_SEPARATOR_SYMBOL, $symbols[4] ?? $symbols[1]);
+
+        if (isset($symbols[4])) {
+            // replace non-standard symbols in patter with standard
+            $formater->setPattern(str_replace([$symbols[1], $symbols[4]], [',', '.'], $format));
+            $formater->setSymbol(NumberFormatter::GROUPING_SEPARATOR_SYMBOL, $symbols[1]);
+        }
     }
 }

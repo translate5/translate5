@@ -111,9 +111,9 @@ class NumberProtector implements ProtectorInterface
         );
     }
 
-    public static function create(): self
+    public static function create(?NumberFormatRepository $numberFormatRepository = null): self
     {
-        $numberFormatRepository = new NumberFormatRepository();
+        $numberFormatRepository = $numberFormatRepository ?: new NumberFormatRepository();
 
         return new self(
             [
@@ -150,7 +150,7 @@ class NumberProtector implements ProtectorInterface
         return 200;
     }
 
-    public function hasEntityToProtect(string $textNode, ?int $sourceLang = null): bool
+    public function hasEntityToProtect(string $textNode, int $sourceLang = null): bool
     {
         return (bool) preg_match('/(\d|[[:xdigit:]][-:]+)/u', $textNode);
     }
@@ -214,7 +214,7 @@ class NumberProtector implements ProtectorInterface
         return $this->convertToInternalTags($segment, $shortTagIdent, shortcutNumberMap: $shortcutNumberMap);
     }
 
-    public function protect(string $textNode, ?int $sourceLangId, ?int $targetLangId): string
+    public function protect(string $textNode, int $sourceLangId, int $targetLangId): string
     {
         // Reset document else it will be compromised between method calls
         $this->document = new DOMDocument();
@@ -279,7 +279,7 @@ class NumberProtector implements ProtectorInterface
 
         $iso = self::getIsoFromTag($wholeTag);
 
-        if($collectTagNumbers) {
+        if ($collectTagNumbers) {
             $shortcutNumberMap[$iso][] = $shortTagNumber;
             $shortTagIdent++;
         }

@@ -71,10 +71,13 @@ class IntegerProtectorTest extends TestCase
         ?string $targetFormat,
         ?editor_Models_Languages $targetLang
     ): void {
+        $sourceLang = new editor_Models_Languages();
+        $sourceLang->setId(5);
+        $sourceLang->setRfc5646('en');
         $repo = $this->createConfiguredMock(NumberFormatRepository::class,
             ['findOutputFormat' => $targetFormat]
         );
-        $protected = (new IntegerProtector($repo))->protect($number, $sourceFormat, null, $targetLang);
+        $protected = (new IntegerProtector($repo))->protect($number, $sourceFormat, $sourceLang, $targetLang);
 
         self::assertSame($expected, $protected);
     }
@@ -89,25 +92,28 @@ class IntegerProtectorTest extends TestCase
             null,
             false,
         );
+        $targetLangDe = new editor_Models_Languages();
+        $targetLangDe->setId(0);
+        $targetLangDe->setRfc5646('de');
 
         yield 'float' => [
             'number' => '123,456',
-            'expected' => '<number type="integer" name="test-default" source="123,456" iso="123456" target=""/>',
+            'expected' => '<number type="integer" name="test-default" source="123,456" iso="123456" target="123456"/>',
             'sourceFormat' => $sourceFormat,
             'targetFormat' => null,
-            'targetLang' => null,
+            'targetLang' => $targetLangDe,
         ];
 
-        $targetLangDe = new editor_Models_Languages();
-        $targetLangDe->setId(0);
-        $targetLangDe->setRfc5646('hi_IN');
+        $targetLangHi = new editor_Models_Languages();
+        $targetLangHi->setId(0);
+        $targetLangHi->setRfc5646('hi_IN');
 
         yield 'target lang hi_IN' => [
             'number' => '123,456',
             'expected' => '<number type="integer" name="test-default" source="123,456" iso="123456" target="123456"/>',
             'sourceFormat' => $sourceFormat,
             'targetFormat' => null,
-            'targetLang' => $targetLangDe,
+            'targetLang' => $targetLangHi,
         ];
 
         $targetFormat = '#,###,####0.###';
@@ -129,9 +135,9 @@ class IntegerProtectorTest extends TestCase
             true,
         );
 
-        yield 'date. keep as is' => [
+        yield 'keep as is' => [
             'number' => '123,456',
-            'expected' => '<number type="integer" name="test-default" source="123,456" iso="" target=""/>',
+            'expected' => '<number type="integer" name="test-default" source="123,456" iso="123,456" target=""/>',
             'sourceFormat' => $sourceFormatKeepAsIs,
             'targetFormat' => $targetFormat,
             'targetLang' => $targetLangDe,

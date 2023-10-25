@@ -55,9 +55,9 @@ namespace MittagQI\Translate5\Segment\ContentProtection;
 interface ProtectorInterface
 {
     public static function alias(): string;
-    public function hasEntityToProtect(string $textNode, ?int $sourceLang = null): bool;
+    public function hasEntityToProtect(string $textNode, int $sourceLang = null): bool;
     public function hasTagsToConvert(string $textNode): bool;
-    public function protect(string $textNode, ?int $sourceLangId, ?int $targetLangId): string;
+    public function protect(string $textNode, int $sourceLangId, int $targetLangId): string;
     public function unprotect(string $content): string;
     public function convertForSorting(string $content): string;
     public function priority(): int;

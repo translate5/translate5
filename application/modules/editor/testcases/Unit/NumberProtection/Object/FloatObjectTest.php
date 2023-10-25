@@ -60,9 +60,9 @@ class FloatObjectTest extends TestCase
     /**
      * @dataProvider parseProvider
      */
-    public function testParse(string $float, FloatObject $object, string $locale = null): void
+    public function testParse(string $float, FloatObject $object): void
     {
-        self::assertEquals($object, FloatObject::parse($float, $locale));
+        self::assertEquals($object, FloatObject::parse($float));
     }
 
     public function parseProvider(): iterable
@@ -70,12 +70,10 @@ class FloatObjectTest extends TestCase
         yield [
             'float' => '123.456,789',
             'object' => new FloatObject(123456.789, 3),
-            'locale' => 'de',
         ];
         yield [
             'float' => '123 456.789',
             'object' => new FloatObject(123456.789, 3),
-            'locale' => 'de',
         ];
 
         #region #,#.#
@@ -453,13 +451,25 @@ class FloatObjectTest extends TestCase
             'float' => 1234567.123456,
             'locale' => 'ar_EG',
             'format' => '#,##,##0.#',
-            'expected' => '١٢٬٣٤٬٥٦٧٫١٢٣٤٥٦'
+            'expected' => '١٢,٣٤,٥٦٧.١٢٣٤٥٦'
         ];
         yield [
             'float' => 1234567.123456,
             'locale' => 'en',
             'format' => '#,###0.#',
             'expected' => '123,4567.123456'
+        ];
+        yield [
+            'float' => 1234567.123456,
+            'locale' => 'hi-IN',
+            'format' => '#+###0*# MONEY',
+            'expected' => '123+4567*123456 MONEY'
+        ];
+        yield [
+            'float' => 1234567.123456,
+            'locale' => 'en',
+            'format' => '#.#',
+            'expected' => '1234567.123456'
         ];
     }
 }

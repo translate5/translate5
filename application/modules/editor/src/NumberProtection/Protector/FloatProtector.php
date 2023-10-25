@@ -66,14 +66,13 @@ class FloatProtector extends AbstractProtector
     protected function composeNumberTag(
         string $number,
         NumberFormatDto $sourceFormat,
-        ?editor_Models_Languages $sourceLang,
-        ?editor_Models_Languages $targetLang,
+        editor_Models_Languages $targetLang,
         ?string $targetFormat
     ): string {
         $float = null;
 
         if (!$sourceFormat->keepAsIs) {
-            $float = FloatObject::parse($number, $sourceLang?->getRfc5646());
+            $float = FloatObject::parse($number);
         }
 
         return sprintf(
@@ -81,7 +80,7 @@ class FloatProtector extends AbstractProtector
             self::getType(),
             htmlspecialchars($sourceFormat->name),
             $number,
-            $float ? $float->format(format: '#.#') : '',
+            $sourceFormat->keepAsIs ? $number : $float->format(format: '#.#'),
             $this->getTargetFloat($float, $targetFormat, $targetLang)
         );
     }
@@ -89,16 +88,16 @@ class FloatProtector extends AbstractProtector
     protected function getTargetFloat(
         ?FloatObject $float,
         ?string $targetFormat,
-        ?editor_Models_Languages $targetLang
+        editor_Models_Languages $targetLang
     ): string {
         if (null === $float) {
             return '';
         }
 
-        if (null === $targetLang) {
-            return '';
+        if (null !== $targetFormat) {
+            return $float->format('', format: $targetFormat);
         }
 
-        return $float->format($targetLang->getRfc5646(), $targetFormat);
+        return $float->format($targetLang->getRfc5646());
     }
 }

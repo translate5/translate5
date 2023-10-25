@@ -9098,7 +9098,6 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
                 <source>Gemeldete Fehler</source>
                 <target>Gemeldete Fehler</target>
             </trans-unit>
-<<<<<<< HEAD
             <trans-unit id='Q2Fubm90IG1vZGlmeSBkZWZhdWx0IHJlY29yZA=='>
                 <source>Cannot modify default record</source>
                 <target>Der Standarddatensatz kann nicht geändert werden</target>

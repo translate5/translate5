@@ -69,10 +69,13 @@ class DateProtectorTest extends TestCase
         string $expected,
         NumberFormatDto $sourceFormat,
         ?string $targetFormat,
-        ?editor_Models_Languages $targetLang
+        editor_Models_Languages $targetLang
     ): void {
+        $sourceLang = new editor_Models_Languages();
+        $sourceLang->setId(5);
+        $sourceLang->setRfc5646('en');
         $repo = $this->createConfiguredMock(NumberFormatRepository::class, ['findOutputFormat' => $targetFormat]);
-        $protected = (new DateProtector($repo))->protect($number, $sourceFormat, null, $targetLang);
+        $protected = (new DateProtector($repo))->protect($number, $sourceFormat, $sourceLang, $targetLang);
 
         self::assertSame($expected, $protected);
     }
@@ -88,17 +91,17 @@ class DateProtectorTest extends TestCase
             false,
         );
 
-        yield 'date' => [
-            'number' => '2023/18/07',
-            'expected' => '<number type="date" name="test-default" source="2023/18/07" iso="2023-07-18" target=""/>',
-            'sourceFormat' => $sourceFormat,
-            'targetFormat' => null,
-            'targetLang' => null,
-        ];
-
         $targetLangDe = new editor_Models_Languages();
         $targetLangDe->setId(0);
         $targetLangDe->setRfc5646('de-DE');
+
+        yield 'date' => [
+            'number' => '2023/18/07',
+            'expected' => '<number type="date" name="test-default" source="2023/18/07" iso="2023-07-18" target="18.07.23"/>',
+            'sourceFormat' => $sourceFormat,
+            'targetFormat' => null,
+            'targetLang' => $targetLangDe,
+        ];
 
         yield 'target lang de-DE' => [
             'number' => '2023/18/07',
@@ -129,7 +132,7 @@ class DateProtectorTest extends TestCase
 
         yield 'date. keep as is' => [
             'number' => '2023/18/07',
-            'expected' => '<number type="date" name="test-default" source="2023/18/07" iso="" target=""/>',
+            'expected' => '<number type="date" name="test-default" source="2023/18/07" iso="2023/18/07" target=""/>',
             'sourceFormat' => $sourceFormatKeepAsIs,
             'targetFormat' => $targetFormat,
             'targetLang' => $targetLangDe,
@@ -137,6 +140,14 @@ class DateProtectorTest extends TestCase
     }
 
     public function testExceptionOnWrongDate(): void {
+        $sourceLang = new editor_Models_Languages();
+        $sourceLang->setId(5);
+        $sourceLang->setRfc5646('en');
+
+        $targetLangDe = new editor_Models_Languages();
+        $targetLangDe->setId(0);
+        $targetLangDe->setRfc5646('de-DE');
+
         $sourceFormat = new NumberFormatDto(
             'date',
             'test-default',
@@ -148,6 +159,6 @@ class DateProtectorTest extends TestCase
         $repo = $this->createConfiguredMock(NumberFormatRepository::class, ['findOutputFormat' => null]);
 
         $this->expectException(NumberParsingException::class);
-        (new DateProtector($repo))->protect('2023/18/13', $sourceFormat, null, null);
+        (new DateProtector($repo))->protect('2023/18/13', $sourceFormat, $sourceLang, $targetLangDe);
     }
 }

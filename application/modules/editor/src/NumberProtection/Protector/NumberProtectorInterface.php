@@ -66,7 +66,7 @@ interface NumberProtectorInterface
     public function protect(
         string $number,
         NumberFormatDto $languageFormat,
-        ?editor_Models_Languages $sourceLang,
-        ?editor_Models_Languages $targetLang
+        editor_Models_Languages $sourceLang,
+        editor_Models_Languages $targetLang
     ): string;
 }

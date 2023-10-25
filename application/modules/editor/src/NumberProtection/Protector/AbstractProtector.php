@@ -81,12 +81,12 @@ abstract class AbstractProtector implements NumberProtectorInterface
     public function protect(
         string $number,
         NumberFormatDto $languageFormat,
-        ?editor_Models_Languages $sourceLang,
-        ?editor_Models_Languages $targetLang
+        editor_Models_Languages $sourceLang,
+        editor_Models_Languages $targetLang
     ): string {
-        $targetFormat = $targetLang ? $this->getFormat($targetLang, $languageFormat) : null;
+        $targetFormat = $this->getFormat($targetLang, $languageFormat);
 
-        return $this->composeNumberTag($number, $languageFormat, $sourceLang, $targetLang, $targetFormat);
+        return $this->composeNumberTag($number, $languageFormat, $targetLang, $targetFormat);
     }
 
     /**
@@ -95,8 +95,7 @@ abstract class AbstractProtector implements NumberProtectorInterface
     protected function composeNumberTag(
         string $number,
         NumberFormatDto $sourceFormat,
-        ?editor_Models_Languages $sourceLang,
-        ?editor_Models_Languages $targetLang,
+        editor_Models_Languages $targetLang,
         ?string $targetFormat
     ): string {
         return sprintf(

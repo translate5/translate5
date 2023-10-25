@@ -55,11 +55,42 @@ namespace MittagQI\Translate5\Test\Functional\Segment\ContentProtection;
 use editor_Models_Import_FileParser_WhitespaceTag;
 use editor_Models_Segment_Whitespace as Whitespace;
 use editor_Test_UnitTest;
+use MittagQI\Translate5\NumberProtection\Model\InputMapping;
+use MittagQI\Translate5\NumberProtection\Model\NumberRecognition;
+use MittagQI\Translate5\NumberProtection\Protector\DateProtector;
+use MittagQI\Translate5\NumberProtection\Protector\FloatProtector;
 use MittagQI\Translate5\NumberProtection\Tag\NumberTag;
 use MittagQI\Translate5\Segment\ContentProtection\ContentProtector;
+use ZfExtended_Factory;
 
 class ContentProtectorTest extends editor_Test_UnitTest
 {
+    protected function setUp(): void
+    {
+        $numberRecognition = ZfExtended_Factory::get(NumberRecognition::class);
+        $numberRecognition->loadBy(DateProtector::getType(), 'default Y-m-d');
+
+        $inputMapping = ZfExtended_Factory::get(InputMapping::class);
+        $inputMapping->setLanguageId(5);
+        $inputMapping->setNumberRecognitionId($numberRecognition->getId());
+        $inputMapping->save();
+
+        $numberRecognition->loadBy(FloatProtector::getType(), 'default with comma thousand decimal dot');
+        $inputMapping = ZfExtended_Factory::get(InputMapping::class);
+        $inputMapping->setLanguageId(5);
+        $inputMapping->setNumberRecognitionId($numberRecognition->getId());
+        $inputMapping->save();
+    }
+
+    protected function tearDown(): void
+    {
+        $inputMapping = ZfExtended_Factory::get(InputMapping::class);
+        foreach ($inputMapping->loadAll() as $item) {
+            $inputMapping->load($item['id']);
+            $inputMapping->delete();
+        }
+    }
+
     /**
      * @dataProvider casesProvider
      */
@@ -67,13 +98,13 @@ class ContentProtectorTest extends editor_Test_UnitTest
     {
         $contentProtector = ContentProtector::create(new Whitespace());
 
-        self::assertEquals($expected, $contentProtector->protect($node, null, null));
+        self::assertEquals($expected, $contentProtector->protect($node, 5, 6));
     }
 
     /**
      * @dataProvider casesProvider
      */
-    public function testUnprotect(string $expected, string $node, bool $runTest = true): void
+    public function testUnprotect(string $expected, string $node): void
     {
         $contentProtector = ContentProtector::create(new Whitespace());
         self::assertSame($expected, $contentProtector->unprotect($node));
@@ -88,7 +119,7 @@ class ContentProtectorTest extends editor_Test_UnitTest
 
         yield 'float in the beginning' => [
             'text' => '123,456.789 Übersetzungsbüro [ ] 24translate 2023-09-15 and 2024-10-19',
-            'expected' => '<number type="float" name="default with comma thousand decimal dot" source="123,456.789" iso="123456.789" target=""/> Übersetzungsbüro [<char ts="c2a0" length="1"/>] 24translate <number type="date" name="default Y-m-d" source="2023-09-15" iso="2023-09-15" target=""/> and <number type="date" name="default Y-m-d" source="2024-10-19" iso="2024-10-19" target=""/>',
+            'expected' => '<number type="float" name="default with comma thousand decimal dot" source="123,456.789" iso="123456.789" target="123.456,789"/> Übersetzungsbüro [<char ts="c2a0" length="1"/>] 24translate <number type="date" name="default Y-m-d" source="2023-09-15" iso="2023-09-15" target="15/9/23"/> and <number type="date" name="default Y-m-d" source="2024-10-19" iso="2024-10-19" target="19/10/24"/>',
         ];
     }
 
@@ -102,7 +133,7 @@ class ContentProtectorTest extends editor_Test_UnitTest
 
         self::assertSame(
             $converted,
-            $contentProtector->protectAndConvert($segment, null, null, $shortTagIdent, ContentProtector::ENTITY_MODE_OFF)
+            $contentProtector->protectAndConvert($segment, 5, 6, $shortTagIdent, ContentProtector::ENTITY_MODE_OFF)
         );
         self::assertSame($finalTagIdent, $shortTagIdent);
     }
@@ -118,8 +149,8 @@ class ContentProtectorTest extends editor_Test_UnitTest
             'finalTagIdent' => 2,
         ];
 
-        $number = '20231020';
-        $convertedNumber = '<div class="single 6e756d62657220747970653d226461746522206e616d653d2264656661756c7420596d642220736f757263653d223230323331303230222069736f3d22323032332d31302d323022207461726765743d22222f number internal-tag ownttip"><span title="&lt;2/&gt;: Number" class="short">&lt;2/&gt;</span><span data-originalid="number" data-length="-1" data-source="20231020" data-target="" class="full"></span></div>';
+        $number = '2023-10-20';
+        $convertedNumber = '<div class="single 6e756d62657220747970653d226461746522206e616d653d2264656661756c7420592d6d2d642220736f757263653d22323032332d31302d3230222069736f3d22323032332d31302d323022207461726765743d2232302f31302f3233222f number internal-tag ownttip"><span title="&lt;2/&gt;: Number" class="short">&lt;2/&gt;</span><span data-originalid="number" data-length="8" data-source="2023-10-20" data-target="20/10/23" class="full"></span></div>';
 
         yield [
             'segment' => "string [$nbsp] string $number string",
@@ -133,8 +164,8 @@ class ContentProtectorTest extends editor_Test_UnitTest
             'finalTagIdent' => 3,
         ];
 
-        $numberIdentOne = '20231020';
-        $convertedNumberIdentOne = '<div class="single 6e756d62657220747970653d226461746522206e616d653d2264656661756c7420596d642220736f757263653d223230323331303230222069736f3d22323032332d31302d323022207461726765743d22222f number internal-tag ownttip"><span title="&lt;1/&gt;: Number" class="short">&lt;1/&gt;</span><span data-originalid="number" data-length="-1" data-source="20231020" data-target="" class="full"></span></div>';
+        $numberIdentOne = '2023-10-20';
+        $convertedNumberIdentOne = '<div class="single 6e756d62657220747970653d226461746522206e616d653d2264656661756c7420592d6d2d642220736f757263653d22323032332d31302d3230222069736f3d22323032332d31302d323022207461726765743d2232302f31302f3233222f number internal-tag ownttip"><span title="&lt;1/&gt;: Number" class="short">&lt;1/&gt;</span><span data-originalid="number" data-length="8" data-source="2023-10-20" data-target="20/10/23" class="full"></span></div>';
 
         yield [
             'segment' => "$numberIdentOne string $number",
@@ -158,7 +189,7 @@ class ContentProtectorTest extends editor_Test_UnitTest
     public function internalTagsProvider(): iterable
     {
         $tagN = '<number type="date" name="default" source="20231020" iso="2023-10-20" target="2023-10-20"/>';
-        $convertedN = '<div class="single 6e756d62657220747970653d226461746522206e616d653d2264656661756c742220736f757263653d223230323331303230222069736f3d22323032332d31302d323022207461726765743d22323032332d31302d3230222f number internal-tag ownttip"><span title="&lt;1/&gt;: Number" class="short">&lt;1/&gt;</span><span data-originalid="number" data-length="-1" data-source="20231020" data-target="2023-10-20" class="full"></span></div>';
+        $convertedN = '<div class="single 6e756d62657220747970653d226461746522206e616d653d2264656661756c742220736f757263653d223230323331303230222069736f3d22323032332d31302d323022207461726765743d22323032332d31302d3230222f number internal-tag ownttip"><span title="&lt;1/&gt;: Number" class="short">&lt;1/&gt;</span><span data-originalid="number" data-length="10" data-source="20231020" data-target="2023-10-20" class="full"></span></div>';
 
         yield [
             'segment' => "$tagN string",
@@ -176,7 +207,7 @@ class ContentProtectorTest extends editor_Test_UnitTest
         ];
 
         $tag2 = '<number type="date" name="default" source="20231020" iso="2023-10-20" target="2023-10-20"/>';
-        $converted2 = '<div class="single 6e756d62657220747970653d226461746522206e616d653d2264656661756c742220736f757263653d223230323331303230222069736f3d22323032332d31302d323022207461726765743d22323032332d31302d3230222f number internal-tag ownttip"><span title="&lt;2/&gt;: Number" class="short">&lt;2/&gt;</span><span data-originalid="number" data-length="-1" data-source="20231020" data-target="2023-10-20" class="full"></span></div>';
+        $converted2 = '<div class="single 6e756d62657220747970653d226461746522206e616d653d2264656661756c742220736f757263653d223230323331303230222069736f3d22323032332d31302d323022207461726765743d22323032332d31302d3230222f number internal-tag ownttip"><span title="&lt;2/&gt;: Number" class="short">&lt;2/&gt;</span><span data-originalid="number" data-length="10" data-source="20231020" data-target="2023-10-20" class="full"></span></div>';
 
         yield [
             'segment' => "string $tag1 string $tag2 string",
@@ -209,7 +240,7 @@ class ContentProtectorTest extends editor_Test_UnitTest
     public function internalTagsInChunksProvider(): iterable
     {
         $tag1 = '<number type="date" name="default" source="20231020" iso="2023-10-20" target="2023-10-20"/>';
-        $converted1 = '<div class="single 6e756d62657220747970653d226461746522206e616d653d2264656661756c742220736f757263653d223230323331303230222069736f3d22323032332d31302d323022207461726765743d22323032332d31302d3230222f number internal-tag ownttip"><span title="&lt;1/&gt;: Number" class="short">&lt;1/&gt;</span><span data-originalid="number" data-length="-1" data-source="20231020" data-target="2023-10-20" class="full"></span></div>';
+        $converted1 = '<div class="single 6e756d62657220747970653d226461746522206e616d653d2264656661756c742220736f757263653d223230323331303230222069736f3d22323032332d31302d323022207461726765743d22323032332d31302d3230222f number internal-tag ownttip"><span title="&lt;1/&gt;: Number" class="short">&lt;1/&gt;</span><span data-originalid="number" data-length="10" data-source="20231020" data-target="2023-10-20" class="full"></span></div>';
 
         $parsedTag1 = new NumberTag();
         $parsedTag1->originalContent = $tag1;

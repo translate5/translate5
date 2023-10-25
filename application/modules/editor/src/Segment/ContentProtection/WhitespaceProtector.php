@@ -73,7 +73,7 @@ class WhitespaceProtector implements ProtectorInterface
         return 100;
     }
 
-    public function hasEntityToProtect(string $textNode, ?int $sourceLang = null): bool
+    public function hasEntityToProtect(string $textNode, int $sourceLang = null): bool
     {
         return true;
     }
@@ -86,7 +86,7 @@ class WhitespaceProtector implements ProtectorInterface
     /**
      * {@inheritDoc}
      */
-    public function protect(string $textNode, ?int $sourceLangId, ?int $targetLangId): string
+    public function protect(string $textNode, int $sourceLangId, int $targetLangId): string
     {
         $excludedCharacters = $this->withoutNumberWhitespaces ? $this->numberWhitespaces : [];
         if (!preg_match_all(self::TAG_REGEX, $textNode, $matches)) {

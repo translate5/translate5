@@ -62,6 +62,7 @@ class NumberTagRenderer extends editor_ImageTag_Single
         $st = json_decode($parameters['text'], true);
         $parameters['source'] = $st['source'];
         $parameters['target'] = $st['target'];
+        $parameters['length'] = mb_strlen(!empty($st['target']) ? $st['target'] : $st['source']);
 
         return parent::getHtmlTag($parameters);
     }

@@ -59,7 +59,14 @@ use PHPUnit\Framework\TestCase;
 
 class MacAddressProtectorTest extends TestCase
 {
-    public function testProtectDefaultFormats(): void {
+    public function testProtectDefaultFormats(): void
+    {
+        $sourceLang = new \editor_Models_Languages();
+        $sourceLang->setId(5);
+        $sourceLang->setRfc5646('en');
+        $targetLang = new \editor_Models_Languages();
+        $targetLang->setId(5);
+        $targetLang->setRfc5646('de');
         $repo = $this->createConfiguredMock(NumberFormatRepository::class, ['findOutputFormat' => null]);
         $sourceFormat = new NumberFormatDto(
             'mac-address',
@@ -72,7 +79,7 @@ class MacAddressProtectorTest extends TestCase
 
         self::assertSame(
             '<number type="mac-address" name="test-default" source="aa:bb:cc:11:22:33" iso="aa:bb:cc:11:22:33" target=""/>',
-            (new MacAddressProtector($repo))->protect('aa:bb:cc:11:22:33', $sourceFormat, null, null)
+            (new MacAddressProtector($repo))->protect('aa:bb:cc:11:22:33', $sourceFormat, $sourceLang, $targetLang)
         );
     }
 }

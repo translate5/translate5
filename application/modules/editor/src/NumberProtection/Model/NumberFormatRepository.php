@@ -61,34 +61,35 @@ class NumberFormatRepository
     /**
      * @return iterable<NumberFormatDto>
      */
-    public function getAll(?editor_Models_Languages $sourceLang): iterable
+    public function getAll(editor_Models_Languages $sourceLang): iterable
     {
         $dbMapping = ZfExtended_Factory::get(InputMapping::class)->db;
         $dbNumberRecognition = ZfExtended_Factory::get(NumberRecognition::class)->db;
         $numberRecognitionTable = $dbNumberRecognition->info($dbNumberRecognition::NAME);
 
-        $selects = [];
-        $selects[] = $dbNumberRecognition->select()
-            ->from(['recognition' => $numberRecognitionTable], ['recognition.*'])
-            ->where('isDefault = true')
-            ->where('enabled = true');
+        $ids = [$sourceLang->getId()];
 
-        if (null !== $sourceLang) {
-            $selects[] = $dbMapping->select()
-                ->setIntegrityCheck(false)
-                ->from(['mapping' => $dbMapping->info($dbMapping::NAME)], [])
-                ->join(
-                    ['recognition' => $numberRecognitionTable],
-                    'recognition.id = mapping.numberRecognitionId',
-                    ['recognition.*']
-                )
-                ->where('mapping.languageId = ?', $sourceLang->getId())
-                ->where('recognition.enabled = true');
+        if ($sourceLang->getMajorRfc5646() !== $sourceLang->getRfc5646()) {
+            $major = ZfExtended_Factory::get(editor_Models_Languages::class);
+            $major->loadByRfc5646($sourceLang->getMajorRfc5646());
+
+            $ids[] = $major->getId();
         }
 
-        $select = $dbNumberRecognition->select()->union($selects)->order('priority desc');
+        $select = $dbMapping->select()
+            ->setIntegrityCheck(false)
+            ->from(['mapping' => $dbMapping->info($dbMapping::NAME)], [])
+            ->join(
+                ['recognition' => $numberRecognitionTable],
+                'recognition.id = mapping.numberRecognitionId',
+                ['recognition.*']
+            )
+            ->where('mapping.languageId IN (?)', $ids)
+            ->where('recognition.enabled = true')
+            ->order('priority desc')
+        ;
 
-        foreach ($dbNumberRecognition->fetchAll($select) as $formatData) {
+        foreach ($dbMapping->fetchAll($select) as $formatData) {
             yield NumberFormatDto::fromRow($formatData);
         }
     }

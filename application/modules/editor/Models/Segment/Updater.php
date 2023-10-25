@@ -26,6 +26,7 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\NumberProtection\NumberProtector;
 use MittagQI\Translate5\Segment\ContentProtection\ContentProtector;
 
 /**
@@ -278,7 +279,8 @@ class editor_Models_Segment_Updater {
      * @param string $content the content to be sanitized, the value is modified directly via reference!
      * @return bool
      */
-    public function sanitizeEditedContent(string &$content): bool {
+    public function sanitizeEditedContent(string &$content, bool $isEditingTargetInFront = false): bool
+    {
         $nbsp = json_decode('"\u00a0"');
 
         //some browsers create nbsp instead of normal whitespaces, since nbsp are removed by the protectWhitespace code below
@@ -295,15 +297,20 @@ class editor_Models_Segment_Updater {
         //the following call splits the content at tag boundaries, and sanitizes the textNodes only
         // In the textnode additional / new protected characters (whitespace) is converted to internal tags and then removed
         // This is because the user is not allowed to add new internal tags by adding plain special characters directly (only via adding it as tag in the frontend)
-        $content = editor_Models_Segment_Utility::foreachSegmentTextNode($content, function($text) {
-            return strip_tags(
-                $this->contentProtector->protect(
-                    $text,
-                    $this->task->getSourceLang(),
-                    $this->task->getTargetLang()
-                )
-            );
-        });
+        $content = editor_Models_Segment_Utility::foreachSegmentTextNode(
+            $content,
+            function($text) use ($isEditingTargetInFront) {
+                return strip_tags(
+                    $this->contentProtector->protect(
+                        $text,
+                        $this->task->getSourceLang(),
+                        $this->task->getTargetLang(),
+                        ContentProtector::ENTITY_MODE_RESTORE,
+                        $isEditingTargetInFront ? NumberProtector::alias() : ''
+                    )
+                );
+            }
+        );
         
         //revoke the internaltag replacement
         $content = $this->utilities->internalTag->unprotect($content);

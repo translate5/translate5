@@ -59,7 +59,14 @@ use PHPUnit\Framework\TestCase;
 
 class IPAddressProtectorTest extends TestCase
 {
-    public function testProtectDefaultFormats(): void {
+    public function testProtectDefaultFormats(): void
+    {
+        $sourceLang = new \editor_Models_Languages();
+        $sourceLang->setId(5);
+        $sourceLang->setRfc5646('en');
+        $targetLang = new \editor_Models_Languages();
+        $targetLang->setId(6);
+        $targetLang->setRfc5646('de');
         $repo = $this->createConfiguredMock(NumberFormatRepository::class, ['findOutputFormat' => null]);
         $sourceFormat = new NumberFormatDto(
             'ip-address',
@@ -72,7 +79,7 @@ class IPAddressProtectorTest extends TestCase
 
         self::assertSame(
             '<number type="ip-address" name="test-default" source="127.0.0.1" iso="127.0.0.1" target=""/>',
-            (new IPAddressProtector($repo))->protect('127.0.0.1', $sourceFormat, null, null)
+            (new IPAddressProtector($repo))->protect('127.0.0.1', $sourceFormat, $sourceLang, $targetLang)
         );
     }
 }

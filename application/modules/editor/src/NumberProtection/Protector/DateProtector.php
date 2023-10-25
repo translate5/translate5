@@ -68,8 +68,7 @@ class DateProtector extends AbstractProtector
     protected function composeNumberTag(
         string $number,
         NumberFormatDto $sourceFormat,
-        ?editor_Models_Languages $sourceLang,
-        ?editor_Models_Languages $targetLang,
+        editor_Models_Languages $targetLang,
         ?string $targetFormat
     ): string {
         $date = null;
@@ -84,20 +83,22 @@ class DateProtector extends AbstractProtector
             }
         }
 
+        $iso = $date ? $date->format('Y-m-d') : $number;
+
         return sprintf(
             $this->tagFormat(),
             self::getType(),
             htmlspecialchars($sourceFormat->name),
             $number,
-            $date ? $date->format('Y-m-d') : '',
-            $this->getTargetDate($date, $targetFormat, $targetLang)
+            $sourceFormat->keepAsIs ? $number : $iso,
+            $sourceFormat->keepAsIs ? '' : $this->getTargetDate($date, $targetFormat, $targetLang)
         );
     }
 
     protected function getTargetDate(
         ?DateTime $date,
         ?string $targetFormat,
-        ?editor_Models_Languages $targetLang
+        editor_Models_Languages $targetLang
     ): string {
         if (null === $date) {
             return '';
@@ -107,12 +108,8 @@ class DateProtector extends AbstractProtector
             return $date->format($targetFormat);
         }
 
-        if (null !== $targetLang) {
-            $formater = datefmt_create($targetLang->getRfc5646(), IntlDateFormatter::SHORT, IntlDateFormatter::NONE);
+        $formater = datefmt_create($targetLang->getRfc5646(), IntlDateFormatter::SHORT, IntlDateFormatter::NONE);
 
-            return $formater->format($date);
-        }
-
-        return '';
+        return $formater->format($date);
     }
 }

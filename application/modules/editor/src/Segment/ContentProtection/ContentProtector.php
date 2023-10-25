@@ -109,9 +109,10 @@ class ContentProtector
 
     public function protect(
         string $text,
-        ?int $sourceLang,
-        ?int $targetLang,
-        string $entityHandling = self::ENTITY_MODE_RESTORE
+        int $sourceLang,
+        int $targetLang,
+        string $entityHandling = self::ENTITY_MODE_RESTORE,
+        string ...$exceptProtectors
     ): string {
         if (0 === strpos($text, 'translate5-unique-id')) {
             return $text;
@@ -122,6 +123,10 @@ class ContentProtector
         }
 
         foreach ($this->protectors as $protector) {
+            if (in_array($protector::alias(), $exceptProtectors, true)) {
+                continue;
+            }
+
             if ($protector->hasEntityToProtect($text, $sourceLang)) {
                 $text = $protector->protect($text, $sourceLang, $targetLang);
             }
@@ -213,8 +218,8 @@ class ContentProtector
 
     public function protectAndConvert(
         string $text,
-        ?int $sourceLang,
-        ?int $targetLang,
+        int $sourceLang,
+        int $targetLang,
         int &$shortTagIdent,
         string $entityHandling = self::ENTITY_MODE_RESTORE
     ): string {
