@@ -156,26 +156,28 @@ final class Helper extends \ZfExtended_Test_ApiHelper
      */
     public function waitForCurrentTaskStateOpen(bool $failOnError = true): bool
     {
-        return $this->waitForTaskStateOpen((int)$this->task->id, $this->task->state, $failOnError);
+        return $this->waitForTaskState((int)$this->task->id, $this->task->state, 'open', $failOnError);
     }
 
     /**
      * Check the task state. The test will fail when $failOnError = true and if the task is in state error or after RELOAD_TASK_LIMIT task state checks
      * @param int $taskId
+     * @param string $currentState
+     * @param string $stateToWaitFor
      * @param bool $failOnError
-     * @param string $state
+     *
      * @return bool
      * @throws Zend_Http_Client_Exception
      */
-    public function waitForTaskStateOpen(int $taskId, string $state, bool $failOnError = true): bool
+    public function waitForTaskState(int $taskId, string $currentState, string $stateToWaitFor = 'open', bool $failOnError = true): bool
     {
         $counter = 0;
         while (true) {
 
-            error_log('Task state check ' . $counter . '/' . self::RELOAD_TASK_LIMIT . ' state: ' . $state . ' [' . $this->testClass . ']');
+            error_log('Task state check ' . $counter . '/' . self::RELOAD_TASK_LIMIT . ' state: ' . $currentState . ' [' . $this->testClass . ']');
 
             $taskResult = $this->getJson('editor/task/' . $taskId);
-            if ($taskResult->state == 'open') {
+            if ($taskResult->state == $stateToWaitFor) {
                 if(isset($this->task) && is_object($this->task) && (int)$this->task->id === $taskId){
                     $this->task = $taskResult;
                 }
