@@ -25,13 +25,13 @@
  END LICENSE AND COPYRIGHT
  */
 
-Ext.define('Editor.view.admin.numberProtection.numberRecognition.Model', {
+Ext.define('Editor.view.admin.numberProtection.outputMapping.NumberRecognitionComboModel', {
     extend: 'Ext.data.Model',
-    alias: 'model.NumberRecognitionModel',
+    alias: 'model.outputMapping.NumberRecognitionComboModel',
     idProperty: 'id',
     proxy: {
         type: 'rest',
-        url: Editor.data.restpath + 'numberprotectionnumberrecognition',
+        url: Editor.data.restpath + 'numberprotection/outputmapping/namecombo',
         reader: {
             rootProperty: 'rows',
             type : 'json'
@@ -50,23 +50,5 @@ Ext.define('Editor.view.admin.numberProtection.numberRecognition.Model', {
     },{
         name: 'name',
         type: 'string'
-    },{
-        name: 'description',
-        type: 'string'
-    }, {
-        name: 'regex',
-        type: 'string'
-    }, {
-        name: 'matchId',
-        type: 'int'
-    }, {
-        name: 'format',
-        type: 'string'
-    }, {
-        name: 'keepAsIs',
-        type: 'bool'
-    }, {
-        name: 'priority',
-        type: 'int'
     }]
 });

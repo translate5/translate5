@@ -81,9 +81,6 @@ class FloatObject
         }
         $formater->setAttribute(NumberFormatter::MAX_FRACTION_DIGITS, $this->fractionDigits);
 
-        error_log('fractionDigits: '  .$this->fractionDigits);
-        error_log((string)$this->number . ' ?=? ' . $formater->format($this->number));
-
         return $formater->format($this->number);
     }
 

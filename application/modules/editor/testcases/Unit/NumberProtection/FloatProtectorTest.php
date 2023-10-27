@@ -54,7 +54,7 @@ namespace MittagQI\Translate5\Test\Unit\NumberProtection;
 
 use editor_Models_Languages;
 use MittagQI\Translate5\NumberProtection\Model\NumberFormatDto;
-use MittagQI\Translate5\NumberProtection\Model\NumberFormatRepository;
+use MittagQI\Translate5\NumberProtection\Model\NumberRepository;
 use MittagQI\Translate5\NumberProtection\Protector\FloatProtector;
 use PHPUnit\Framework\TestCase;
 
@@ -73,7 +73,7 @@ class FloatProtectorTest extends TestCase
         $sourceLang = new editor_Models_Languages();
         $sourceLang->setId(5);
         $sourceLang->setRfc5646('en');
-        $repo = $this->createConfiguredMock(NumberFormatRepository::class, ['findOutputFormat' => $targetFormat]);
+        $repo = $this->createConfiguredMock(NumberRepository::class, ['findOutputFormat' => $targetFormat]);
         $protected = (new FloatProtector($repo))->protect($number, $sourceFormat, $sourceLang, $targetLang);
 
         self::assertSame($expected, $protected);

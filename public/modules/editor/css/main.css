@@ -1243,3 +1243,22 @@ div.internal-tag.number span.full::after {
 }
 
 .number + .number { margin-left:1px; }
+
+.infobox-panel {
+    padding: 20px;
+    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.05);
+}
+
+.infobox-panel p {
+    margin: 0;
+}
+
+.infobox-panel h2 {
+    margin: 0.3em 0 0.3em;
+}
+
+.infobox-panel .x-panel-body-default {
+    background-color: rgb(95 162 221 / 20%);
+    border-radius: 4px;
+    padding: 6px;
+}

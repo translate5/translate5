@@ -59,6 +59,9 @@ Ext.define('Editor.view.admin.numberProtection.Panel', {
         var me = this,
             config = {};
 
+        // hack to achieve filled values in OutputMapping::name combobox
+        Ext.getStore('admin.numberProtection.InputMappingStore').load();
+
         config.title = me.title;
         config.items = [
             {

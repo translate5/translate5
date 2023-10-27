@@ -88,6 +88,10 @@ Ext.define('Editor.view.admin.numberProtection.numberRecognition.GridController'
             return false;
         }
 
+        if ('keepAsIs' === col.dataIndex && ['mac-address', 'ip-address'].includes(record.get('type'))) {
+            return false;
+        }
+
         record.set(col.dataIndex, checked);
         record.save();
 

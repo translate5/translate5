@@ -26,21 +26,21 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-use MittagQI\Translate5\NumberProtection\Model\NumberFormatRepository;
+use MittagQI\Translate5\NumberProtection\Model\NumberRepository;
 use MittagQI\Translate5\NumberProtection\NumberProtector;
 
 class editor_Services_Connector_TagHandler_T5MemoryXliff extends editor_Services_Connector_TagHandler_Xliff
 {
     private const T5MEMORY_NUMBER_TAG = 't5:n';
     protected const ALLOWED_TAGS = '<x><x/><bx><bx/><ex><ex/><g><number>';
-    private NumberFormatRepository $numberFormatRepository;
+    private NumberRepository $numberRepository;
     private NumberProtector $numberProtector;
     private array $numberTagMap = [];
 
     public function __construct(array $options = [])
     {
         parent::__construct($options);
-        $this->numberFormatRepository = new NumberFormatRepository();
+        $this->numberRepository = new NumberRepository();
         $this->numberProtector = NumberProtector::create();
         $this->xmlparser->registerElement(NumberProtector::TAG_NAME, null, function ($tagName, $key, $opener) {
             $this->xmlparser->replaceChunk($key, function () use ($key) {
@@ -97,7 +97,7 @@ class editor_Services_Connector_TagHandler_T5MemoryXliff extends editor_Services
             $tag = array_shift($tagProps);
             $tagProps = array_combine(['type', 'name', 'source', 'iso', 'target'], $tagProps);
 
-            $numberRecognition = $this->numberFormatRepository->getNumberRecognition(
+            $numberRecognition = $this->numberRepository->getNumberRecognition(
                 $tagProps['type'],
                 $tagProps['name']
             );

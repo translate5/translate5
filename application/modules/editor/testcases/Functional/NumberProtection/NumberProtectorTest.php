@@ -55,7 +55,7 @@ namespace MittagQI\Translate5\Test\Functional\NumberProtection;
 use editor_Models_Languages;
 use MittagQI\Translate5\NumberProtection\Model\InputMapping;
 use MittagQI\Translate5\NumberProtection\Model\NumberFormatDto;
-use MittagQI\Translate5\NumberProtection\Model\NumberFormatRepository;
+use MittagQI\Translate5\NumberProtection\Model\NumberRepository;
 use MittagQI\Translate5\NumberProtection\Model\NumberRecognition;
 use MittagQI\Translate5\NumberProtection\Model\OutputMapping;
 use MittagQI\Translate5\NumberProtection\NumberProtector;
@@ -654,7 +654,7 @@ class NumberProtectorTest extends TestCase
         ];
     }
 
-    private function getNumberFormatRepository(): NumberFormatRepository
+    private function getNumberFormatRepository(): NumberRepository
     {
         $dbNumberRecognition = ZfExtended_Factory::get(NumberRecognition::class)->db;
         $numberRecognitionTable = $dbNumberRecognition->info($dbNumberRecognition::NAME);
@@ -680,14 +680,14 @@ class NumberProtectorTest extends TestCase
             };
         };
 
-        $numberFormatRepository = $this->createConfiguredMock(
-            NumberFormatRepository::class,
+        $numberRepository = $this->createConfiguredMock(
+            NumberRepository::class,
             [
                 'getAll' => $getAll($select),
             ]
         );
-        $numberFormatRepository->method('findOutputFormat')->will($this->returnCallback($findOutputFormat));
+        $numberRepository->method('findOutputFormat')->will($this->returnCallback($findOutputFormat));
 
-        return $numberFormatRepository;
+        return $numberRepository;
     }
 }

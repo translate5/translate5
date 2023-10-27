@@ -59,7 +59,7 @@ use DOMNode;
 use DOMText;
 use editor_Models_Import_FileParser_XmlParser as XmlParser;
 use editor_Models_Languages;
-use MittagQI\Translate5\NumberProtection\Model\NumberFormatRepository;
+use MittagQI\Translate5\NumberProtection\Model\NumberRepository;
 use MittagQI\Translate5\NumberProtection\Model\NumberFormatDto;
 use MittagQI\Translate5\NumberProtection\Protector\AbstractProtector;
 use MittagQI\Translate5\NumberProtection\Protector\DateProtector;
@@ -89,8 +89,8 @@ class NumberProtector implements ProtectorInterface
      * @param array<NumberProtectorInterface> $protectors
      */
     public function __construct(
-        array $protectors,
-        private NumberFormatRepository $numberFormatRepository,
+        array                      $protectors,
+        private NumberRepository   $numberRepository,
         private LanguageRepository $languageRepository
     ) {
         foreach ($protectors as $protector) {
@@ -111,19 +111,19 @@ class NumberProtector implements ProtectorInterface
         );
     }
 
-    public static function create(?NumberFormatRepository $numberFormatRepository = null): self
+    public static function create(?NumberRepository $numberRepository = null): self
     {
-        $numberFormatRepository = $numberFormatRepository ?: new NumberFormatRepository();
+        $numberRepository = $numberRepository ?: new NumberRepository();
 
         return new self(
             [
-                new DateProtector($numberFormatRepository),
-                new FloatProtector($numberFormatRepository),
-                new IntegerProtector($numberFormatRepository),
-                new IPAddressProtector($numberFormatRepository),
-                new MacAddressProtector($numberFormatRepository),
+                new DateProtector($numberRepository),
+                new FloatProtector($numberRepository),
+                new IntegerProtector($numberRepository),
+                new IPAddressProtector($numberRepository),
+                new MacAddressProtector($numberRepository),
             ],
-            $numberFormatRepository,
+            $numberRepository,
             new LanguageRepository()
         );
     }
@@ -228,7 +228,7 @@ class NumberProtector implements ProtectorInterface
         }
 
         $tries = 0;
-        foreach ($this->numberFormatRepository->getAll($sourceLang) as $langFormat) {
+        foreach ($this->numberRepository->getAll($sourceLang) as $langFormat) {
             while ($tries++ < 2) {
                 if (!preg_match($langFormat->regex, $this->document->textContent)) {
                     continue;

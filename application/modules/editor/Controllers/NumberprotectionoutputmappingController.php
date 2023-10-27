@@ -26,6 +26,7 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\NumberProtection\Model\NumberRepository;
 use MittagQI\Translate5\NumberProtection\Model\OutputMapping;
 
 class editor_NumberprotectionoutputmappingController extends ZfExtended_RestController
@@ -48,5 +49,11 @@ class editor_NumberprotectionoutputmappingController extends ZfExtended_RestCont
     public function getAction(): void
     {
         throw new ZfExtended_Models_Entity_NotFoundException();
+    }
+
+    public function namecomboAction(): void
+    {
+        $this->view->rows = (new NumberRepository())->getNumberRecognitionForOutputMappingForm();
+        $this->view->total = count($this->view->rows);
     }
 }

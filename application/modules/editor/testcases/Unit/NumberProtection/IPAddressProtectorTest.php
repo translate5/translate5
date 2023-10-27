@@ -53,7 +53,7 @@ declare(strict_types=1);
 namespace MittagQI\Translate5\Test\Unit\NumberProtection;
 
 use MittagQI\Translate5\NumberProtection\Model\NumberFormatDto;
-use MittagQI\Translate5\NumberProtection\Model\NumberFormatRepository;
+use MittagQI\Translate5\NumberProtection\Model\NumberRepository;
 use MittagQI\Translate5\NumberProtection\Protector\IPAddressProtector;
 use PHPUnit\Framework\TestCase;
 
@@ -67,14 +67,14 @@ class IPAddressProtectorTest extends TestCase
         $targetLang = new \editor_Models_Languages();
         $targetLang->setId(6);
         $targetLang->setRfc5646('de');
-        $repo = $this->createConfiguredMock(NumberFormatRepository::class, ['findOutputFormat' => null]);
+        $repo = $this->createConfiguredMock(NumberRepository::class, ['findOutputFormat' => null]);
         $sourceFormat = new NumberFormatDto(
             'ip-address',
             'test-default',
             '',
             0,
             '',
-            true
+            false
         );
 
         self::assertSame(

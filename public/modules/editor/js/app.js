@@ -98,6 +98,7 @@ Ext.application({
         'admin.numberProtection.InputMappingStore',
         'admin.numberProtection.OutputMappingStore',
         'admin.numberProtection.NumberRecognitionStore',
+        'admin.numberProtection.outputMapping.NumberRecognitionComboStore',
         'Files',
         'ReferenceFiles',
         'Segments',

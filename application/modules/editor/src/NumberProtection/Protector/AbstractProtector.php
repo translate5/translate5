@@ -53,7 +53,7 @@ declare(strict_types=1);
 namespace MittagQI\Translate5\NumberProtection\Protector;
 
 use editor_Models_Languages;
-use MittagQI\Translate5\NumberProtection\Model\NumberFormatRepository;
+use MittagQI\Translate5\NumberProtection\Model\NumberRepository;
 use MittagQI\Translate5\NumberProtection\Model\NumberFormatDto;
 use MittagQI\Translate5\NumberProtection\NumberParsingException;
 use MittagQI\Translate5\NumberProtection\NumberProtector;
@@ -62,7 +62,7 @@ abstract class AbstractProtector implements NumberProtectorInterface
 {
     private array $formatsCache = [];
 
-    public function __construct(protected NumberFormatRepository $formatRepository)
+    public function __construct(protected NumberRepository $formatRepository)
     {
     }
 

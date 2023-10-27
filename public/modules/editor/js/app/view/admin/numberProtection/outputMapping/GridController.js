@@ -63,11 +63,6 @@ Ext.define('Editor.view.admin.numberProtection.outputMapping.GridController', {
             }
         });
     },
-    onBeforeEdit: function(cellEditPlugin, cellContext) {
-        this.getView().view.select(cellContext.record);
-
-        return cellContext.field === 'languageId';
-    },
 
     createOutputMapping: function () {
         var win = Ext.widget('adminCreateOutputMappingWindow');

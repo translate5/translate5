@@ -25,48 +25,17 @@
  END LICENSE AND COPYRIGHT
  */
 
-Ext.define('Editor.view.admin.numberProtection.numberRecognition.Model', {
-    extend: 'Ext.data.Model',
-    alias: 'model.NumberRecognitionModel',
-    idProperty: 'id',
-    proxy: {
-        type: 'rest',
-        url: Editor.data.restpath + 'numberprotectionnumberrecognition',
-        reader: {
-            rootProperty: 'rows',
-            type : 'json'
-        },
-        writer: {
-            encode: true,
-            rootProperty: 'data'
-        }
-    },
-    fields: [{
-        name: 'id',
-        type: 'int'
-    }, {
-        name: 'type',
-        type: 'string'
-    },{
-        name: 'name',
-        type: 'string'
-    },{
-        name: 'description',
-        type: 'string'
-    }, {
-        name: 'regex',
-        type: 'string'
-    }, {
-        name: 'matchId',
-        type: 'int'
-    }, {
-        name: 'format',
-        type: 'string'
-    }, {
-        name: 'keepAsIs',
-        type: 'bool'
-    }, {
-        name: 'priority',
-        type: 'int'
-    }]
+/**
+ * @extends Ext.data.Store
+ */
+Ext.define('Editor.store.admin.numberProtection.outputMapping.NumberRecognitionComboStore', {
+    extend: 'Ext.data.Store',
+    requires: ['Editor.view.admin.numberProtection.outputMapping.NumberRecognitionComboModel'],
+    alias: 'store.numberProtection.outputMapping.NumberRecognitionComboMapping',
+    model: 'Editor.view.admin.numberProtection.outputMapping.NumberRecognitionComboModel',
+    autoLoad: false,
+    autoSync: false,
+    remoteFilter: false,
+    remoteSort: false,
+    pageSize: 0
 });

@@ -53,9 +53,10 @@ declare(strict_types=1);
 namespace MittagQI\Translate5\Test\Unit\NumberProtection;
 
 use editor_Models_Languages;
-use MittagQI\Translate5\NumberProtection\Model\NumberFormatRepository;
+use MittagQI\Translate5\NumberProtection\Model\NumberRepository;
 use MittagQI\Translate5\NumberProtection\Model\NumberFormatDto;
 use MittagQI\Translate5\NumberProtection\NumberProtector;
+use MittagQI\Translate5\NumberProtection\Protector\IPAddressProtector;
 use MittagQI\Translate5\NumberProtection\Protector\NumberProtectorInterface;
 use MittagQI\Translate5\NumberProtection\Tag\NumberTag;
 use MittagQI\Translate5\Repository\LanguageRepository;
@@ -80,10 +81,10 @@ class NumberProtectorTest extends TestCase
                 return 'test';
             }
         };
-        $numberFormatRepository = $this->createConfiguredMock(NumberFormatRepository::class, []);
+        $numberRepository = $this->createConfiguredMock(NumberRepository::class, []);
         $languageRepository = $this->createConfiguredMock(LanguageRepository::class, []);
 
-        $protector = new NumberProtector([$processor], $numberFormatRepository, $languageRepository);
+        $protector = new NumberProtector([$processor], $numberRepository, $languageRepository);
 
         self::assertTrue($protector->hasEntityToProtect('text with number [2] in it'));
         self::assertTrue($protector->hasEntityToProtect('text with part of mac [aa:] in it'));
@@ -107,14 +108,48 @@ class NumberProtectorTest extends TestCase
                 return $number;
             }
         };
-        $numberFormatRepository = $this->createConfiguredMock(NumberFormatRepository::class, []);
+        $numberRepository = $this->createConfiguredMock(NumberRepository::class, []);
         $languageRepository = $this->createConfiguredMock(LanguageRepository::class, []);
 
-        $protector = new NumberProtector([$processor], $numberFormatRepository, $languageRepository);
+        $protector = new NumberProtector([$processor], $numberRepository, $languageRepository);
 
         $testNode = 'some sample text';
 
         self::assertSame($testNode, $protector->protect($testNode, 0, 0));
+    }
+
+    public function testCheatTypeUsage(): void
+    {
+        $sourceLang = new editor_Models_Languages();
+        $sourceLang->setId(5);
+        $sourceLang->setRfc5646('en');
+
+        $getAll = function () {
+            yield new NumberFormatDto(
+                'ip-address',
+                'test-cheat',
+                '/some text/',
+                0,
+                '',
+                false
+            );
+        };
+
+        $numberRepository = $this->createConfiguredMock(
+            NumberRepository::class,
+            [
+                'findOutputFormat' => null,
+                'getAll' => $getAll()
+            ]
+        );
+        $languageRepository = $this->createConfiguredMock(LanguageRepository::class, ['find' => $sourceLang]);
+
+        $protector = new NumberProtector([new IPAddressProtector($numberRepository)], $numberRepository, $languageRepository);
+
+        self::assertSame(
+            '1. Here we have <number type="ip-address" name="test-cheat" source="some text" iso="some text" target=""/> case',
+            $protector->protect('1. Here we have some text case', 5, 6)
+        );
     }
 
     /**

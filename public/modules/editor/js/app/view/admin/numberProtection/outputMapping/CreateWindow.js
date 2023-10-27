@@ -25,6 +25,7 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+var numberRecognitionClone;
 Ext.define('Editor.view.admin.numberProtection.outputMapping.CreateWindow', {
     extend: 'Ext.window.Window',
     alias: 'widget.adminCreateOutputMappingWindow',
@@ -36,12 +37,40 @@ Ext.define('Editor.view.admin.numberProtection.outputMapping.CreateWindow', {
     controller: 'adminCreateOutputMappingWindowViewController',
     modal: true,
     layout: 'fit',
+    firstInit: true,
     initComponent: function () {
         this.callParent(arguments);
+        if (this.firstInit) {
+            this.firstInit = false;
+            this.initConfig();
+        }
     },
     initConfig: function (instanceConfig) {
         var me = this,
             config;
+        //     numberRecognition = Ext.getStore('admin.numberProtection.NumberRecognitionStore'),
+        //     inputMapping = Ext.getStore('admin.numberProtection.InputMappingStore'),
+        //     // Define a Set to store unique values
+        //     namesInMapping = new Set();
+        //     numberRecognitionClone = Ext.create('Ext.data.Store', {
+        //         storeId: 'namesStoreId',
+        //         model: numberRecognition.getModel(),
+        //         data: numberRecognition.getRange()
+        //     });
+        //
+        // inputMapping.each(function (record) {
+        //     console.log(record.get('name'))
+        //     namesInMapping.add(record.get('name'));
+        // });
+        //
+        // console.log(namesInMapping.size)
+        //
+        // numberRecognitionClone.filter({
+        //     id: 'nameIsInInputMapping',
+        //     filterFn: recognition => namesInMapping.has(recognition.get('name'))
+        // });
+        //
+        // numberRecognitionClone.each(r => console.log(r.get('name')))
 
         config = {
             title: Editor.data.l10n.numberProtection.mapping.create_title,
@@ -104,7 +133,7 @@ Ext.define('Editor.view.admin.numberProtection.outputMapping.CreateWindow', {
                                 fieldLabel: '{l10n.general.name}'
                             },
                             store: {
-                                type: 'numberProtection.NumberRecognition'
+                                type: 'numberProtection.outputMapping.NumberRecognitionComboMapping'
                             }
                         },
                         {

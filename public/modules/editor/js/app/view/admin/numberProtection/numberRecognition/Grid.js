@@ -66,51 +66,58 @@ Ext.define('Editor.view.admin.numberProtection.numberRecognition.Grid', {
     initConfig: function (instanceConfig) {
         var me = this,
             config = {};
+        var infoPanel = Ext.create('Ext.panel.Panel', {
+            html: 'List of predefined regular expressions that can be used to protect content. Or define your own rules.',
+            cls: 'infobox-panel'
+        });
 
         config.title = me.title;
-        config.dockedItems = [{
-            xtype: 'toolbar',
-            dock: 'top',
-            enableOverflow: true,
-            items: [
-                {
-                    xtype: 'button',
-                    glyph: 'f067@FontAwesome5FreeSolid',
-                    bind: {
-                        text: '{l10n.configuration.add}'
+        config.dockedItems = [
+            infoPanel,
+            {
+                xtype: 'toolbar',
+                dock: 'top',
+                enableOverflow: true,
+                items: [
+                    {
+                        xtype: 'button',
+                        glyph: 'f067@FontAwesome5FreeSolid',
+                        bind: {
+                            text: '{l10n.configuration.add}'
+                        },
+                        ui: 'default-toolbar-small',
+                        width: 'auto',
+                        handler: 'createNumberRecognition'
                     },
-                    ui: 'default-toolbar-small',
-                    width: 'auto',
-                    handler: 'createNumberRecognition'
-                },
-                {
-                    xtype: 'button',
-                    iconCls: 'x-fa fa-undo',
-                    bind: {
-                        text: '{l10n.configuration.reload}'
+                    {
+                        xtype: 'button',
+                        iconCls: 'x-fa fa-undo',
+                        bind: {
+                            text: '{l10n.configuration.reload}'
+                        },
+                        handler: 'onRefreshClick'
                     },
-                    handler: 'onRefreshClick'
-                },
-                {
-                    xtype: 'button',
-                    iconCls: 'x-fa fa-question-circle',
-                    handler: () => window.open('https://confluence.translate5.net/display/TAD/Application+NumberFormat', '_blank')
-                },
-                {
-                    xtype: 'tbspacer',
-                    flex: 1.6
-                },
-                {
-                    xtype: 'button',
-                    iconCls: 'x-fa fa-filter',
-                    bind: {
-                        text: '{l10n.general.hideDefault}'
+                    {
+                        xtype: 'button',
+                        iconCls: 'x-fa fa-question-circle',
+                        handler: () => window.open('https://confluence.translate5.net/display/TAD/Application+NumberFormat', '_blank')
                     },
-                    enableToggle: true,
-                    toggleHandler: 'onToggleDefaultFilter'
-                }
-            ]
-        }];
+                    {
+                        xtype: 'tbspacer',
+                        flex: 1.6
+                    },
+                    {
+                        xtype: 'button',
+                        iconCls: 'x-fa fa-filter',
+                        bind: {
+                            text: '{l10n.general.hideDefault}'
+                        },
+                        enableToggle: true,
+                        toggleHandler: 'onToggleDefaultFilter'
+                    }
+                ]
+            }
+        ];
         config.columns = [
             {
                 xtype: 'gridcolumn',

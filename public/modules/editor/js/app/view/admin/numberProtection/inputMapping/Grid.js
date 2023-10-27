@@ -70,41 +70,53 @@ Ext.define('Editor.view.admin.numberProtection.inputMapping.Grid', {
             langs = [],
             langFilter = [];
 
+        var infoPanel = Ext.create('Ext.panel.Panel', {
+            html: '<h2>List of active input rules</h2>' +
+                'To activate a rule it has to be mapped to a source language.' +
+                '<br/>Once the content is found for that language, it will be protected as internal tag.' +
+                '<br/>Dates, float and integer numbers will be automatically transformed to any target language locale format using presets from <a href="https://icu4c-demos.unicode.org/icu-bin/locexp?d_=ru#region" target="_blank" rel="noopener noreferrer">ICU</a> (for dates SHORT format will be used).' +
+                '<br/>To override default formats please use tab "Active Output Rules". IP- and MAC-address will be kept as is.',
+            cls: 'infobox-panel'
+        });
+
         config.title = me.title;
-        config.dockedItems = [{
-            xtype: 'toolbar',
-            dock: 'top',
-            enableOverflow: true,
-            items: [
-                {
-                    xtype: 'button',
-                    glyph: 'f067@FontAwesome5FreeSolid',
-                    bind: {
-                        text: '{l10n.configuration.add}'
+        config.dockedItems = [
+            infoPanel,
+            {
+                xtype: 'toolbar',
+                dock: 'top',
+                enableOverflow: true,
+                items: [
+                    {
+                        xtype: 'button',
+                        glyph: 'f067@FontAwesome5FreeSolid',
+                        bind: {
+                            text: '{l10n.configuration.add}'
+                        },
+                        ui: 'default-toolbar-small',
+                        width: 'auto',
+                        handler: 'createInputMapping'
                     },
-                    ui: 'default-toolbar-small',
-                    width: 'auto',
-                    handler: 'createInputMapping'
-                },
-                {
-                    xtype: 'button',
-                    iconCls: 'x-fa fa-undo',
-                    bind: {
-                        text: '{l10n.configuration.reload}'
+                    {
+                        xtype: 'button',
+                        iconCls: 'x-fa fa-undo',
+                        bind: {
+                            text: '{l10n.configuration.reload}'
+                        },
+                        handler: 'onRefreshClick'
                     },
-                    handler: 'onRefreshClick'
-                },
-                {
-                    xtype: 'button',
-                    iconCls: 'x-fa fa-question-circle',
-                    handler: () => window.open('https://confluence.translate5.net/display/TAD/Application+NumberFormat', '_blank')
-                },
-                {
-                    xtype: 'tbspacer',
-                    flex: 1.6
-                }
-            ]
-        }];
+                    {
+                        xtype: 'button',
+                        iconCls: 'x-fa fa-question-circle',
+                        handler: () => window.open('https://confluence.translate5.net/display/TAD/Application+NumberFormat', '_blank')
+                    },
+                    {
+                        xtype: 'tbspacer',
+                        flex: 1.6
+                    }
+                ]
+            }
+        ];
         config.columns = [
             {
                 xtype: 'gridcolumn',

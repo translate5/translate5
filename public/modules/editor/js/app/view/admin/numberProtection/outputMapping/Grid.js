@@ -52,7 +52,6 @@ Ext.define('Editor.view.admin.numberProtection.outputMapping.Grid', {
     /** @property {string} routePrefix Used to setup routes on different view instances */
     routePrefix: '',
     listeners: {
-        beforeedit: 'onBeforeEdit',
         edit: 'onOutputMappingEdit',
         activate: 'onGridActivate'
     },
@@ -70,12 +69,26 @@ Ext.define('Editor.view.admin.numberProtection.outputMapping.Grid', {
             langs = [],
             langFilter = [];
 
+        var infoPanel = Ext.create('Ext.panel.Panel', {
+            html: '<h2>List of active output rules</h2>' +
+                'Add rules here per target language to override default output formats for your active input rules.' +
+                '<br/>You can provide your own formats for desired <b>type-ruleName-targetLang</b> combination here.' +
+                '<br/>To find format string rules you can look at:' +
+                '<br/><a href="https://icu4c-demos.unicode.org/icu-bin/locexp?d_=ru#region" target="_blank" rel="noopener noreferrer">1. Locale related format presets</a>' +
+                '<br/><a href="https://unicode-org.github.io/icu/userguide/format_parse/datetime/#datetime-format-syntax" target="_blank" rel="noopener noreferrer">2. Dates syntax</a>' +
+                '<br/><a href="https://unicode-org.github.io/icu-docs/apidoc/released/icu4j/com/ibm/icu/text/DecimalFormat.html" target="_blank" rel="noopener noreferrer">3. Number syntax</a>' +
+                '<br/><a href="icu4c-demos.unicode.org" target="_blank" rel="noopener noreferrer">4. ICU Demonstration</a>',
+            cls: 'infobox-panel'
+        });
+
         config.title = me.title;
-        config.dockedItems = [{
-            xtype: 'toolbar',
-            dock: 'top',
-            enableOverflow: true,
-            items: [
+        config.dockedItems = [
+            infoPanel,
+            {
+                xtype: 'toolbar',
+                dock: 'top',
+                enableOverflow: true,
+                items: [
                 {
                     xtype: 'button',
                     glyph: 'f067@FontAwesome5FreeSolid',
@@ -104,7 +117,8 @@ Ext.define('Editor.view.admin.numberProtection.outputMapping.Grid', {
                     flex: 1.6
                 }
             ]
-        }];
+            }
+        ];
         config.columns = [
             {
                 xtype: 'gridcolumn',

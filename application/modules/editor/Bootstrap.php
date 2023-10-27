@@ -722,6 +722,19 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
                 'action' => 'history'
             ]
         ));
+
+        $this->front->getRouter()->addRoute(
+            'numberprotection.outputMapping.nameCombo',
+            new ZfExtended_Controller_RestLikeRoute(
+                'editor/numberprotection/outputmapping/namecombo',
+                [
+                    'module' => 'editor',
+                    'controller' => 'numberprotectionoutputmapping',
+                    /** @see \editor_NumberprotectionoutputmappingController::namecomboAction */
+                    'action' => 'namecombo'
+                ]
+            )
+        );
     }
     
     

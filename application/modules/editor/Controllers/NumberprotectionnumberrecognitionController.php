@@ -27,6 +27,8 @@ END LICENSE AND COPYRIGHT
 */
 
 use MittagQI\Translate5\NumberProtection\Model\NumberRecognition;
+use MittagQI\Translate5\NumberProtection\Protector\IPAddressProtector;
+use MittagQI\Translate5\NumberProtection\Protector\MacAddressProtector;
 
 class editor_NumberprotectionnumberrecognitionController extends ZfExtended_RestController
 {
@@ -58,6 +60,9 @@ class editor_NumberprotectionnumberrecognitionController extends ZfExtended_Rest
     {
         $row = (array) $row;
         $row['keepAsIs'] = boolval($row['keepAsIs']);
+        if (in_array($row['type'], [MacAddressProtector::getType(), IPAddressProtector::getType()])) {
+            $row['keepAsIs'] = true;
+        }
         $row['rowEnabled'] = boolval($row['enabled']);
         unset($row['enabled']);
         $row['isDefault'] = boolval($row['isDefault']);
@@ -69,6 +74,9 @@ class editor_NumberprotectionnumberrecognitionController extends ZfExtended_Rest
         $this->data = (array) $this->data;
         if (array_key_exists('rowEnabled', $this->data)) {
             $this->data['enabled'] = $this->data['rowEnabled'];
+            if (in_array($this->data['type'], [MacAddressProtector::getType(), IPAddressProtector::getType()])) {
+                $this->data['keepAsIs'] = true;
+            }
             unset($this->data['rowEnabled']);
         }
     }

@@ -56,7 +56,7 @@ use editor_Models_Languages;
 use ZfExtended_Factory;
 use ZfExtended_Models_Entity_NotFoundException;
 
-class NumberFormatRepository
+class NumberRepository
 {
     /**
      * @return iterable<NumberFormatDto>
@@ -92,6 +92,26 @@ class NumberFormatRepository
         foreach ($dbMapping->fetchAll($select) as $formatData) {
             yield NumberFormatDto::fromRow($formatData);
         }
+    }
+
+    public function getNumberRecognitionForOutputMappingForm(): array
+    {
+        $dbMapping = ZfExtended_Factory::get(InputMapping::class)->db;
+        $dbNumberRecognition = ZfExtended_Factory::get(NumberRecognition::class)->db;
+        $numberRecognitionTable = $dbNumberRecognition->info($dbNumberRecognition::NAME);
+
+        $select = $dbMapping->select()
+            ->setIntegrityCheck(false)
+            ->from(['mapping' => $dbMapping->info($dbMapping::NAME)], [])
+            ->join(
+                ['recognition' => $numberRecognitionTable],
+                'recognition.id = mapping.numberRecognitionId',
+                ['recognition.id', 'recognition.type', 'recognition.name']
+            )
+            ->order('type asc')
+        ;
+
+        return $dbMapping->fetchAll($select)->toArray();
     }
 
     public function getNumberRecognition(string $type, string $name): NumberRecognition
