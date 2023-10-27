@@ -112,20 +112,10 @@ Ext.define('Editor.view.admin.numberProtection.inputMapping.CreateWindow', {
                             }
                         },
                         {
-                            xtype: 'combo',
-                            itemId: 'languageId',
+                            xtype: 'languagecombo',
                             name: 'languageId',
-                            allowBlank: false,
-                            typeAhead: true,
-                            anyMatch: true,
-                            forceSelection: true,
-                            displayField: 'label',
-                            valueField: 'id',
                             bind: {
                                 fieldLabel: '{l10n.general.language}'
-                            },
-                            store: {
-                                type: 'languagestore'
                             }
                         }
                     ]
