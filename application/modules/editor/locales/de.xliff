@@ -8052,9 +8052,17 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
                 <source>Bosnisch (Latein Bosnien und Herzegowina)</source>
                 <target>Bosnisch (Latein Bosnien und Herzegowina)</target>
             </trans-unit>
-            <trans-unit id='TnVyIFNlZ21lbnRlIG1pdCBXaWVkZXJob2x1bmdlbiBhbnplaWdlbg=='>
-                <source>Nur Segmente mit Wiederholungen anzeigen</source>
-                <target>Nur Segmente mit Wiederholungen anzeigen</target>
+            <trans-unit id='TnVyIFNlZ21lbnRlIG1pdCBXaWVkZXJob2x1bmdlbiBhbnplaWdlbiwgZWluc2NobGllw59saWNoIGRlciBlcnN0ZW4gU2VnbWVudGU='>
+                <source>Nur Segmente mit Wiederholungen anzeigen, einschließlich der ersten Segmente</source>
+                <target>Nur Segmente mit Wiederholungen anzeigen, einschließlich der ersten Segmente</target>
+            </trans-unit>
+            <trans-unit id='TnVyIFNlZ21lbnRlIG1pdCBXaWVkZXJob2x1bmdlbiBhbnplaWdlbiwgYXVzZ2Vub21tZW4gZGllIGVyc3RlbiBTZWdtZW50ZQ=='>
+                <source>Nur Segmente mit Wiederholungen anzeigen, ausgenommen die ersten Segmente</source>
+                <target>Nur Segmente mit Wiederholungen anzeigen, ausgenommen die ersten Segmente</target>
+            </trans-unit>
+            <trans-unit id='RsO8Z2VuIFNpZSB6dWVyc3QgZGVuIEFic2Nobml0dCBlaW4sIGRlciBpbSBGb2xnZW5kZW4gd2llZGVyaG9sdCB3aXJk'>
+                <source>Fügen Sie zuerst den Abschnitt ein, der im Folgenden wiederholt wird</source>
+                <target>Fügen Sie zuerst den Abschnitt ein, der im Folgenden wiederholt wird</target>
             </trans-unit>
             <trans-unit id="U2VnbWVudCBzcGVycmVuIGJ6dy4gZW50c3BlcnJlbiAoU1RSRyArIEwp">
                 <source>Segment sperren bzw. entsperren (STRG + L)</source>

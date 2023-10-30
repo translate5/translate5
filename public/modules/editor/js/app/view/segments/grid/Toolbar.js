@@ -244,15 +244,27 @@ Ext.define('Editor.view.segments.grid.Toolbar', {
                 },{
                     xtype: 'button',
                     glyph: 'f0c5@FontAwesome5FreeSolid',
-                    itemId: 'filterBtnRepeated',
+                    itemId: 'filterBtnRepeatedIncludeFirst',
                     bind: {
                         hidden: '{!taskHasDefaultLayout}',
                         tooltip: {
-                            text: '{l10n.segmentGrid.toolbar.showRepeatedSegments}',
+                            text: '{l10n.segmentGrid.toolbar.showRepeatedSegmentsIncludeFirst}',
                             showDelay: 0
                         }
                     },
-                    enableToggle: true,
+                    toggleGroup: 'repetitions'
+                },{
+                    xtype: 'button',
+                    glyph: 'f0c5@FontAwesome5FreeSolid',
+                    itemId: 'filterBtnRepeatedExcludeFirst',
+                    bind: {
+                        hidden: '{!taskHasDefaultLayout}',
+                        tooltip: {
+                            text: '{l10n.segmentGrid.toolbar.showRepeatedSegmentsExcludeFirst}',
+                            showDelay: 0
+                        }
+                    },
+                    toggleGroup: 'repetitions'
                 }, {
                     xtype: 'tbseparator',
                 }, {
