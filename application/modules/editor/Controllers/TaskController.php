@@ -333,10 +333,20 @@ class editor_TaskController extends ZfExtended_RestController
         $file = ZfExtended_Factory::get('editor_Models_File');
         /* @var $file editor_Models_File */
         $isTransfer = $file->getTransfersPerTasks(array_column($rows, 'taskGuid'));
+
+        // If the config for mailto link in project grid pm user column is configured
+        $isMailTo = $this->config->runtimeOptions->frontend->tasklist->pmMailTo;
+        if ($isMailTo) {
+            $userData = $this->getUsersForRendering($rows);
+        }
+
         foreach ($rows as &$row) {
             unset($row['qmSubsegmentFlags']); // unneccessary in the project overview
             $row['customerName'] = empty($customerData[$row['customerId']]) ? '' : $customerData[$row['customerId']];
             $row['isTransfer'] = isset($isTransfer[$row['taskGuid']]);
+            if ($isMailTo) {
+                $row['pmMail'] = empty($userData[$row['pmGuid']]) ? '' : $userData[$row['pmGuid']];
+            }
         }
         return $rows;
     }

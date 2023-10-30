@@ -53,6 +53,7 @@ declare(strict_types=1);
 namespace MittagQI\Translate5\Task\Import;
 
 use editor_Models_Task;
+use ReflectionException;
 use Zend_Exception;
 use Zend_Registry;
 use ZfExtended_Factory;
@@ -66,6 +67,7 @@ class DanglingImportsCleaner
      * Sets importing tasks to status error if the import was started more than 48
      * (default; configurable runtimeOptions.import.timeout) hours ago
      * @throws Zend_Exception
+     * @throws ReflectionException
      */
     public function cleanup(): void
     {
@@ -74,7 +76,7 @@ class DanglingImportsCleaner
         $worker = ZfExtended_Factory::get(ZfExtended_Models_Worker::class);
 
         $config = Zend_Registry::get('config');
-        $hours = (int) ($config->runtimeOptions->import->timeout ?? 48);
+        $hours = (int)($config->runtimeOptions->import->timeout ?? 48);
         $s = $task->db->select()
             ->where('state = ?', $task::STATE_IMPORT)
             ->where('created < DATE_SUB(NOW(), INTERVAL ? HOUR)', $hours);
@@ -86,7 +88,7 @@ class DanglingImportsCleaner
             $task->init($data->toArray());
 
             //log the dangling task
-            $task->logger()->error('E1379', 'The task import was cancelled after {hours} hours.',[
+            $task->logger()->error('E1379', 'The task import was cancelled after {hours} hours.', [
                 'task' => $task,
                 'hours' => $hours,
             ]);
@@ -100,7 +102,12 @@ class DanglingImportsCleaner
                 $worker->defuncRemainingOfGroup([$finalStepWorker], true, true);
                 $worker->wakeupScheduled();
 
-                WorkerTriggerFactory::create()->triggerWorker($worker->getId(), $worker->getHash());
+                WorkerTriggerFactory::create()->triggerWorker(
+                    (string)$worker->getId(),
+                    $worker->getHash(),
+                    $worker->getWorker(),
+                    $task->getTaskGuid()
+                );
             } catch (ZfExtended_Models_Entity_NotFoundException) {
                 //do nothing
             }

@@ -1761,9 +1761,5 @@ Ext.define('Ext.overrides.grid.filters.filter.Base', {
 
 Ext.define('Ext.overrides.grid.filters.filter.Number', {
     override: 'Ext.grid.filters.filter.Number',
-    createMenu: function () {
-        var me = this;
-        me.callParent();
-        me.setUpdateBuffer(0);
-    }
+    updateBuffer: 0
 });

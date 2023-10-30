@@ -130,7 +130,12 @@ class ReimportOverwrite extends editor_Models_Import_SegmentProcessor
         if (empty($content)) {
             error_log("No content found for parsed file:" . $file->getId());
         } else {
-            $file->saveSkeletonToDisk($content, $this->task);
+            if (method_exists($file, 'saveSkeletonToDisk')) {
+                $file->saveSkeletonToDisk($content, $this->task);
+            } else {
+                $skeletonFile = new \MittagQI\Translate5\Task\Import\SkeletonFile($this->task);
+                $skeletonFile->saveToDisk($file, $content);
+            }
         }
     }
 
@@ -193,7 +198,13 @@ foreach ($tasks as $task) {
     foreach ($allTaskFiles as $taskFile) {
         $file = ZfExtended_Factory::get(editor_Models_File::class);
         $file->load($taskFile['id']);
-        $skeleton = $file->loadSkeletonFromDisk($model);
+
+        if (method_exists($file, 'loadSkeletonFromDisk')) {
+            $skeleton = $file->loadSkeletonFromDisk($model);
+        } else {
+            $skeletonFile = new \MittagQI\Translate5\Task\Import\SkeletonFile($model);
+            $skeleton = $skeletonFile->loadFromDisk($file);
+        }
 
         // check if the skeleton file contains corrupted empty
         if (isCorruptSkeletonFileForFix($skeleton)) {

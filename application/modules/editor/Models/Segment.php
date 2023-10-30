@@ -319,6 +319,10 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract
             }
             return 'CAST('.$adapter->quoteIdentifier($searchInField) . ' AS BINARY) REGEXP BINARY ' . $adapter->quote($queryString);
         }
+
+        // Escape mysql-wildcards
+        $queryString = preg_replace('~[%_]~', '\\\$0', $queryString);
+
         //search type regular wildcard
         if ($parameters['searchType'] === 'wildcardsSearch') {
             $queryString = str_replace("*", "%", $queryString);

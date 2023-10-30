@@ -89,11 +89,11 @@ class editor_Models_Export_FileParser_Transit extends editor_Models_Export_FileP
     
     /**
      * {@inheritDoc}
-     * @see editor_Models_Export_FileParser::getSkeleton()
+     * @see editor_Models_Export_FileParser::loadSkeleton()
      * Does additional transit specific handling of the skel file
      */
-    protected function getSkeleton(editor_Models_File $file) {
-        parent::getSkeleton($file);
+    protected function loadSkeleton(editor_Models_File $file) {
+        parent::loadSkeleton($file);
         $extractDir = $this->extractSkeletonZip();
         $this->setSkeletonFiles($extractDir);
         $recursivedircleaner = ZfExtended_Zendoverwrites_Controller_Action_HelperBroker::getStaticHelper('Recursivedircleaner');
@@ -122,9 +122,9 @@ class editor_Models_Export_FileParser_Transit extends editor_Models_Export_FileP
         $this->sourceDOM = ZfExtended_Factory::get('editor_Plugins_Transit_File');
         $this->sourceDOM->open($sourceFile,  $this->sourcePath);
         
-        $this->_skeletonFile = file_get_contents($extractDir.DIRECTORY_SEPARATOR.$this->targetFileName);
+        $this->skeletonFile = file_get_contents($extractDir.DIRECTORY_SEPARATOR.$this->targetFileName);
         $this->targetDOM = ZfExtended_Factory::get('editor_Plugins_Transit_File');
-        $this->targetDOM->open($this->_skeletonFile,  $this->path);
+        $this->targetDOM->open($this->skeletonFile,  $this->path);
     }
     /**
      * complete override of parent::parse, because we do not use placeholders with transit-files
@@ -210,7 +210,7 @@ class editor_Models_Export_FileParser_Transit extends editor_Models_Export_FileP
         if(!mkdir($extractDir)){
             throw new Zend_Exception('The tmp-folder transitExportZip could not be created.');
         }
-        if(!file_put_contents($exportZip, $this->_skeletonFile)){
+        if(!file_put_contents($exportZip, $this->skeletonFile)){
             throw new Zend_Exception('The export.zip could not be written to tmp dir.');
         }
         $zip = ZfExtended_Factory::get('ZipArchive');
