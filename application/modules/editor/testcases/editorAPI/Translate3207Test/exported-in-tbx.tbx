@@ -38,6 +38,16 @@
                     <date>2023-06-26</date>
                 </transacGrp>
                 <langSet xml:lang="en">
+                    <transacGrp>
+                        <transac type="transactionType">origination</transac>
+                        <transacNote type="responsibility" target="{e6828cdf-2ee0-4a25-af0a-92e6f060e9eb}">Pavel Perminov</transacNote>
+                        <date>2023-06-26</date>
+                    </transacGrp>
+                    <transacGrp>
+                        <transac type="transactionType">modification</transac>
+                        <transacNote type="responsibility" target="{e6828cdf-2ee0-4a25-af0a-92e6f060e9eb}">Pavel Perminov</transacNote>
+                        <date>2023-06-26</date>
+                    </transacGrp>
                     <tig>
                         <term id="id960be468-4900-406d-9c33-630a151aae5c">term with image</term>
                         <termNote type="processStatus">finalized</termNote>
