@@ -1113,6 +1113,19 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract
     }
 
     /**
+     * If the given exception was thrown because of a missing view do nothing.
+     * If it was another Db Exception throw it!
+     * @param Zend_Db_Statement_Exception $e
+     */
+    protected function catchMissingView(Zend_Db_Statement_Exception $e)
+    {
+        $m = $e->getMessage();
+        if (strpos($m, 'SQLSTATE') !== 0 || strpos($m, 'Base table or view not found') === false) {
+            throw $e;
+        }
+    }
+
+    /**
      * Loads segments by task-guid and file-id. Returns just a simple array of id and sgmentNrInTask ordered by sgmentNrInTask
      * @param string $taskGuid
      * @param int $fileId
@@ -1424,7 +1437,9 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract
             ")->fetchAll(PDO::FETCH_COLUMN);
 
         // Exclude
-        $s->where('`id` NOT IN (?)', $this->firstSegmentsOfEachRepetitionsGroup);
+        if ($this->firstSegmentsOfEachRepetitionsGroup) {
+            $s->where('`id` NOT IN (?)', $this->firstSegmentsOfEachRepetitionsGroup);
+        }
     }
 
     /**
