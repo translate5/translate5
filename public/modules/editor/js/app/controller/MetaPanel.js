@@ -217,6 +217,11 @@ Ext.define('Editor.controller.MetaPanel', {
             bind: {
                 title: '{l10n.falsePositives.legend.float} <span class="x-fa fa-circle-xmark" title="{l10n.falsePositives.close}"></span>'
             },
+            listeners: {
+                boxready: function(cmp) {
+                    cmp.el.dom.setAttribute('data-qtip', Editor.data.l10n.falsePositives.window.tooltip);
+                }
+            },
             hide: function() {
                 delete me.segmentRightClickGrid;
                 this.destroy();

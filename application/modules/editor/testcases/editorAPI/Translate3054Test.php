@@ -82,17 +82,17 @@ class Translate3054Test extends \editor_Test_JsonTest {
         static::$segments = static::api()->getSegments();
         static::assertEquals(2, count(static::$segments), 'Unexpected segments qty in the imported task');
 
-        // Make sure initial value of segment #1 termtagger-quality's falsePositive flag is 0 and similarQty is 1
+        // Make sure initial value of segment #1 termtagger-quality's falsePositive flag is 0 and similarQty is 2
         $s1q = static::api()->getJson('/editor/quality/segment?segmentId=' . static::$segments[0]->id);
         foreach ($s1q as $idx => $q) if ($q->type == 'term') break;
         static::assertEquals(0, $s1q[$idx]->falsePositive, 'quality.falsepositive have unexpected value');
-        static::assertEquals(1, $s1q[$idx]->similarQty, 'quality.similarQty have unexpected value');
+        static::assertEquals(2, $s1q[$idx]->similarQty, 'quality.similarQty have unexpected value');
 
-        // Make sure initial value of segment #2 termtagger-quality's falsePositive flag is 0 and similarQty is 1 as well
+        // Make sure initial value of segment #2 termtagger-quality's falsePositive flag is 0 and similarQty is 2 as well
         $s2q = static::api()->getJson('/editor/quality/segment?segmentId=' . static::$segments[1]->id);
         foreach ($s2q as $idx => $q) if ($q->type == 'term') break;
         static::assertEquals(0, $s2q[$idx]->falsePositive, 'quality.falsepositive have unexpected value');
-        static::assertEquals(1, $s2q[$idx]->similarQty, 'quality.similarQty have unexpected value');
+        static::assertEquals(2, $s2q[$idx]->similarQty, 'quality.similarQty have unexpected value');
 
         // Set falsePositive-flag to 1
         $taskId = static::$task->getId(); $qId = $s2q[$idx]->id;
