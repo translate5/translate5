@@ -222,7 +222,13 @@ $languageSelector[] = '</form>';
             <input
                 id="translationSubmit"
                 name="translationSubmit"
-                value="<?= $this->translations["translate"] ?>"
+                value="<?php
+                $buttonText = $this->translations["translate"];
+                if(!Zend_Registry::get('config')->runtimeOptions->InstantTranslate->instantTranslationIsActive){
+                    $buttonText.= ' (ALT + ENTER)';
+                }
+                echo $buttonText;
+                ?>"
                 type="submit"
                 class="translationSubmit marginTop click-starts-translation ui-corner-all ui-button ui-widget"
             />

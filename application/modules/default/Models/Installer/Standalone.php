@@ -443,6 +443,10 @@ class Models_Installer_Standalone {
      */
     protected function postInstallation(): void
     {
+        //we clean here the memcache and the sessions
+        $cache = Zend_Cache::factory('Core', new ZfExtended_Cache_MySQLMemoryBackend());
+        $cache->clean();
+
         if(!$this->isInstallation){
             return;
         }

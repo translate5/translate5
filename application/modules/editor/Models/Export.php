@@ -186,8 +186,8 @@ class editor_Models_Export {
         $file->load($fileId);
 
 
+        /* @var editor_Models_Import_FileParser $importFileParser */
         $importFileParser = $file->getFileParser();
-        /* @uses editor_Models_Import_FileParser::getExportClass() */
         $exportParser = $importFileParser::getExportClass();
 
         if (empty($exportParser) || !class_exists($exportParser)) {

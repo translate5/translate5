@@ -487,9 +487,8 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract
             return false;
         }
 
-        $user = new Zend_Session_Namespace('user');
-        $workerParameters['userGuid'] = $user->data->userGuid;
-        $workerParameters['userName'] = $user->data->userName;
+        $workerParameters['userGuid'] = ZfExtended_Authentication::getInstance()->getUserGuid();
+        $workerParameters['userName'] = ZfExtended_Authentication::getInstance()->getUser()->getUserName();
 
         //enable batch query via config
         $workerParameters['batchQuery'] = (boolean)Zend_Registry::get('config')

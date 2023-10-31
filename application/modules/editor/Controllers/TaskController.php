@@ -55,9 +55,9 @@ class editor_TaskController extends ZfExtended_RestController
 
     /**
      * logged in user
-     * @var Zend_Session_Namespace
+     * @var ZfExtended_Models_User|null
      */
-    protected $user;
+    protected ?ZfExtended_Models_User $authenticatedUser;
 
     /**
      * @var editor_Models_Task
@@ -160,7 +160,7 @@ class editor_TaskController extends ZfExtended_RestController
 
         parent::init();
         $this->now = date('Y-m-d H:i:s', $_SERVER['REQUEST_TIME']);
-        $this->user = new Zend_Session_Namespace('user');
+        $this->authenticatedUser = ZfExtended_Authentication::getInstance()->getUser();
         $this->workflowManager = ZfExtended_Factory::get(editor_Workflow_Manager::class);
         $this->translate = ZfExtended_Zendoverwrites_Translate::getInstance();
         $this->config = Zend_Registry::get('config');
@@ -297,7 +297,7 @@ class editor_TaskController extends ZfExtended_RestController
         $this->addDefaultSort();
         //set the default table to lek_task
         $this->entity->getFilter()->setDefaultTable('LEK_task');
-        $this->view->rows=$this->entity->loadUserList($this->user->data->userGuid);
+        $this->view->rows=$this->entity->loadUserList($this->authenticatedUser->getUserGuid());
     }
 
     /**
@@ -314,8 +314,11 @@ class editor_TaskController extends ZfExtended_RestController
             $rows = $this->entity->loadAll();
         }
         else {
-            $this->totalCount = $this->entity->getTotalCountByUserAssoc($this->user->data->userGuid, $isAllowedToLoadAll);
-            $rows = $this->entity->loadListByUserAssoc($this->user->data->userGuid, $isAllowedToLoadAll);
+            $this->totalCount = $this->entity->getTotalCountByUserAssoc(
+                $this->authenticatedUser->getUserGuid(),
+                $isAllowedToLoadAll
+            );
+            $rows = $this->entity->loadListByUserAssoc($this->authenticatedUser->getUserGuid(), $isAllowedToLoadAll);
         }
         return $rows;
     }
@@ -330,10 +333,20 @@ class editor_TaskController extends ZfExtended_RestController
         $file = ZfExtended_Factory::get('editor_Models_File');
         /* @var $file editor_Models_File */
         $isTransfer = $file->getTransfersPerTasks(array_column($rows, 'taskGuid'));
+
+        // If the config for mailto link in project grid pm user column is configured
+        $isMailTo = $this->config->runtimeOptions->frontend->tasklist->pmMailTo;
+        if ($isMailTo) {
+            $userData = $this->getUsersForRendering($rows);
+        }
+
         foreach ($rows as &$row) {
             unset($row['qmSubsegmentFlags']); // unneccessary in the project overview
             $row['customerName'] = empty($customerData[$row['customerId']]) ? '' : $customerData[$row['customerId']];
             $row['isTransfer'] = isset($isTransfer[$row['taskGuid']]);
+            if ($isMailTo) {
+                $row['pmMail'] = empty($userData[$row['pmGuid']]) ? '' : $userData[$row['pmGuid']];
+            }
         }
         return $rows;
     }
@@ -546,20 +559,19 @@ class editor_TaskController extends ZfExtended_RestController
             //if not explicitly disabled the import starts always automatically to be compatible with legacy API users
             $this->data['autoStartImport'] = true;
         }
-        $pm = ZfExtended_Factory::get(ZfExtended_Models_User::class);
-        /* @var $pm ZfExtended_Models_User */
         if (empty($this->data['pmGuid']) || !$this->isAllowed(Rights::ID, 'editorEditTaskPm')) {
-            $this->data['pmGuid'] = $this->user->data->userGuid;
-            $pm->init((array)$this->user->data);
+            $this->data['pmGuid'] = $this->authenticatedUser->getUserGuid();
+            $this->data['pmName'] = $this->authenticatedUser->getUsernameLong();
         } else {
+            $pm = ZfExtended_Factory::get(ZfExtended_Models_User::class);
             $pm->loadByGuid($this->data['pmGuid']);
+            $this->data['pmName'] = $pm->getUsernameLong();
         }
 
         if (empty($this->data['taskType'])) {
             $this->data['taskType'] = editor_Task_Type_Default::ID;
         }
 
-        $this->data['pmName'] = $pm->getUsernameLong();
         $this->processClientReferenceVersion();
 
         $this->setDataInEntity();
@@ -824,13 +836,11 @@ class editor_TaskController extends ZfExtended_RestController
                 [
                     $this->entity,
                     $tempFilename,
-                    $this->user->data->userGuid
+                    $this->authenticatedUser->getUserGuid()
                 ]
             );
-            $user = ZfExtended_Factory::get(ZfExtended_Models_User::class);
-            $user->init((array) $this->user->data);
             // on error an editor_Models_Excel_ExImportException is thrown
-            $excelReimport->reimport($this->translate, $this->restMessages, $user);
+            $excelReimport->reimport($this->translate, $this->restMessages, $this->authenticatedUser);
             $this->log->info('E1011', 'Task re-imported from excel file and unlocked for further processing.');
 
         } catch(editor_Models_Excel_ExImportException $e) {
@@ -1040,7 +1050,7 @@ class editor_TaskController extends ZfExtended_RestController
         }
 
         //updateUserState does also call workflow "do" methods!
-        $this->updateUserState($this->user->data->userGuid);
+        $this->updateUserState($this->authenticatedUser->getUserGuid());
 
         //closing a task must be done after all workflow "do" calls which triggers some events
         $this->closeAndUnlock();
@@ -1089,10 +1099,14 @@ class editor_TaskController extends ZfExtended_RestController
      * @throws ZfExtended_Models_Entity_Conflict
      */
     protected function checkTaskAccess() {
-        $mayLoadAllTasks = $this->isAllowed(Rights::ID, Rights::LOAD_ALL_TASKS) || $this->isAuthUserTaskPm($this->entity->getPmGuid());
+        $mayLoadAllTasks = $this->isAllowed(Rights::ID, Rights::LOAD_ALL_TASKS)
+            || $this->isAuthUserTaskPm($this->entity->getPmGuid());
         
         try {
-            $tua = editor_Models_Loaders_Taskuserassoc::loadByTask($this->user->data->userGuid, $this->entity);
+            $tua = editor_Models_Loaders_Taskuserassoc::loadByTask(
+                $this->authenticatedUser->getUserGuid(),
+                $this->entity
+            );
         }
         catch(ZfExtended_Models_Entity_NotFoundException $e) {
             $tua = null;
@@ -1272,7 +1286,7 @@ class editor_TaskController extends ZfExtended_RestController
         }
         $taskUserTracking = ZfExtended_Factory::get('editor_Models_TaskUserTracking');
         /* @var $taskUserTracking editor_Models_TaskUserTracking */
-        $taskUserTracking->insertTaskUserTrackingEntry($taskguid, $this->user->data->userGuid, $role);
+        $taskUserTracking->insertTaskUserTrackingEntry($taskguid, $this->authenticatedUser->getUserGuid(), $role);
     }
 
     /**
@@ -1321,11 +1335,11 @@ class editor_TaskController extends ZfExtended_RestController
         if(!$isEnding && (!$this->isLeavingTaskRequest())){
             return;
         }
-        $this->entity->unlockForUser($this->user->data->userGuid);
+        $this->entity->unlockForUser($this->authenticatedUser->getUserGuid());
         $this->unregisterTask();
 
         if($resetToOpen) {
-            $this->updateUserState($this->user->data->userGuid, true);
+            $this->updateUserState($this->authenticatedUser->getUserGuid(), true);
         }
         $this->events->trigger("afterTaskClose", $this, array(
             'task' => $task,
@@ -1471,11 +1485,17 @@ class editor_TaskController extends ZfExtended_RestController
     /**
      * Validate the taskType: check if given tasktype is allowed according to role
      * @throws ZfExtended_UnprocessableEntity
+     * @throws Zend_Acl_Exception
      */
     protected function validateTaskType() {
         $acl = ZfExtended_Acl::getInstance();
-        /* @var $acl ZfExtended_Acl */
-        $isTaskTypeAllowed = $acl->isInAllowedRoles($this->user->data->roles, 'initial_tasktype', $this->entity->getTaskType()->id());
+
+        $isTaskTypeAllowed = $acl->isInAllowedRoles(
+            ZfExtended_Authentication::getInstance()->getUserRoles(),
+            \editor_Task_Type::ID,
+            $this->entity->getTaskType()->id()
+        );
+
         if (!$isTaskTypeAllowed) {
             ZfExtended_UnprocessableEntity::addCodes([
                 'E1217' => 'TaskType not allowed.'
@@ -1503,7 +1523,10 @@ class editor_TaskController extends ZfExtended_RestController
         $isTaskPm = $this->isAuthUserTaskPm($this->entity->getPmGuid());
         $tua = null;
         try {
-            $tua = editor_Models_Loaders_Taskuserassoc::loadByTask($this->user->data->userGuid, $this->entity);
+            $tua = editor_Models_Loaders_Taskuserassoc::loadByTask(
+                $this->authenticatedUser->getUserGuid(),
+                $this->entity
+            );
         }
         catch(ZfExtended_Models_Entity_NotFoundException $e) {
             //do nothing here
@@ -1857,14 +1880,15 @@ class editor_TaskController extends ZfExtended_RestController
         $this->provideZipDownload($archiveZip, ' - ImportArchive.zip');
     }
 
-    /***
+    /**
      * Check if the given pmGuid(userGuid) is the same with the current logged user userGuid
      *
-     * @param string $pmGuid
+     * @param $taskPmGuid
      * @return boolean
      */
-    protected function isAuthUserTaskPm($taskPmGuid){
-        return $this->user->data->userGuid===$taskPmGuid;
+    protected function isAuthUserTaskPm($taskPmGuid): bool
+    {
+        return $this->authenticatedUser->getUserGuid() === $taskPmGuid;
     }
 
     /**

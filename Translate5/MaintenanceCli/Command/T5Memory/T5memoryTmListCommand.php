@@ -68,7 +68,7 @@ class T5memoryTmListCommand extends Translate5AbstractCommand
         $this->io->title('List of all translation memories in t5memory with statuses');
 
         $table = $this->io->createTable();
-        $table->setHeaders(['Tm name', 'Tm UUID', 'Status']);
+        $table->setHeaders(['Tm name', 'Tm UUID', 'Status', 'Server URL']);
 
         $nameFilter = null;
 
@@ -78,7 +78,7 @@ class T5memoryTmListCommand extends Translate5AbstractCommand
         }
 
         foreach ($this->getLocalTms($nameFilter) as $item) {
-            $table->addRow([$item['name'], $item['uuid'], $item['status']]);
+            $table->addRow([$item['name'], $item['uuid'], $item['status'], $item['url']]);
         }
 
         $table->render();
