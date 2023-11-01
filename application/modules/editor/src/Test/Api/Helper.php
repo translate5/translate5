@@ -31,6 +31,7 @@ namespace MittagQI\Translate5\Test\Api;
 use editor_Models_Config;
 use editor_Models_TaskConfig;
 use Zend_Db_Statement_Exception;
+use Zend_Http_Client_Exception;
 use ZfExtended_Factory;
 
 /**
@@ -148,19 +149,38 @@ final class Helper extends \ZfExtended_Test_ApiHelper
     }
 
     /**
-     * DO NOT USE IN CONCRETE API TESTS
-     * Check the task state. The test will fail when $failOnError = true and if the task is in state error or after RELOAD_TASK_LIMIT task state checks
+     * DO NOT USE IN CONCRETE API TESTS. The test will fail when $failOnError = true and if the task is in state error or after RELOAD_TASK_LIMIT task state checks
+     * Check the task state when importing
      * @param bool $failOnError
      * @return boolean
      */
-    public function checkTaskStateLoop(bool $failOnError = true): bool
+    public function waitForCurrentTaskStateOpen(bool $failOnError = true): bool
+    {
+        return $this->waitForTaskState((int)$this->task->id, $this->task->state, 'open', $failOnError);
+    }
+
+    /**
+     * Check the task state. The test will fail when $failOnError = true and if the task is in state error or after RELOAD_TASK_LIMIT task state checks
+     * @param int $taskId
+     * @param string $currentState
+     * @param string $stateToWaitFor
+     * @param bool $failOnError
+     *
+     * @return bool
+     * @throws Zend_Http_Client_Exception
+     */
+    public function waitForTaskState(int $taskId, string $currentState, string $stateToWaitFor = 'open', bool $failOnError = true): bool
     {
         $counter = 0;
         while (true) {
-            error_log('Task state check ' . $counter . '/' . self::RELOAD_TASK_LIMIT . ' state: ' . $this->task->state . ' [' . $this->testClass . ']');
-            $taskResult = $this->getJson('editor/task/' . $this->task->id);
-            if ($taskResult->state == 'open') {
-                $this->task = $taskResult;
+
+            error_log('Task state check ' . $counter . '/' . self::RELOAD_TASK_LIMIT . ' state: ' . $currentState . ' [' . $this->testClass . ']');
+
+            $taskResult = $this->getJson('editor/task/' . $taskId);
+            if ($taskResult->state == $stateToWaitFor) {
+                if(isset($this->task) && is_object($this->task) && (int)$this->task->id === $taskId){
+                    $this->task = $taskResult;
+                }
                 return true;
             }
             if ($taskResult->state == 'unconfirmed') {
@@ -194,7 +214,7 @@ final class Helper extends \ZfExtended_Test_ApiHelper
      * @return bool
      * @throws Exception
      */
-    public function checkProjectTasksStateLoop(bool $failOnError = true): bool
+    public function waitForCurrentProjectStateOpen(bool $failOnError = true): bool
     {
         $counter = 0;
         while (true) {
@@ -253,7 +273,7 @@ final class Helper extends \ZfExtended_Test_ApiHelper
      * @param bool $waitForImport
      * @return array|\stdClass
      * @throws Exception
-     * @throws \Zend_Http_Client_Exception
+     * @throws Zend_Http_Client_Exception
      */
     public function importTask(array $task, bool $failOnError = true, bool $waitForImport = true)
     {
@@ -267,9 +287,9 @@ final class Helper extends \ZfExtended_Test_ApiHelper
             return $this->task;
         }
         if ($this->task->taskType == self::INITIAL_TASKTYPE_PROJECT) {
-            $this->checkProjectTasksStateLoop($failOnError);
+            $this->waitForCurrentProjectStateOpen($failOnError);
         } else {
-            $this->checkTaskStateLoop($failOnError);
+            $this->waitForCurrentTaskStateOpen($failOnError);
         }
         if($projectTasks !== null){
             $this->task->projectTasks = is_array($projectTasks) ? $projectTasks : [ $projectTasks ];
@@ -286,9 +306,9 @@ final class Helper extends \ZfExtended_Test_ApiHelper
     {
         $this->task = $task;
         if ($task->taskType == self::INITIAL_TASKTYPE_PROJECT) {
-            $this->checkProjectTasksStateLoop();
+            $this->waitForCurrentProjectStateOpen();
         } else {
-            $this->checkTaskStateLoop();
+            $this->waitForCurrentTaskStateOpen();
         }
     }
 
@@ -314,7 +334,7 @@ final class Helper extends \ZfExtended_Test_ApiHelper
      * reloads the given or internally stored task
      * @param int|null $taskId
      * @return array|\stdClass
-     * @throws \Zend_Http_Client_Exception
+     * @throws Zend_Http_Client_Exception
      */
     public function reloadTask(int $taskId = null)
     {
@@ -401,7 +421,7 @@ final class Helper extends \ZfExtended_Test_ApiHelper
      * @param int $resourceId
      * @param string $taskGuid
      * @return array|\stdClass
-     * @throws \Zend_Http_Client_Exception
+     * @throws Zend_Http_Client_Exception
      */
     public function addResourceTaskAssoc(int $resourceId, string $resourceName, string $taskGuid)
     {
@@ -497,7 +517,7 @@ final class Helper extends \ZfExtended_Test_ApiHelper
      * @param array $params
      *
      * @return array|\stdClass
-     * @throws \Zend_Http_Client_Exception
+     * @throws Zend_Http_Client_Exception
      */
     public function addUserToTask(string $taskGuid, string $username, string $state = 'open', string $step = 'reviewing', array $params = [])
     {
@@ -673,7 +693,7 @@ final class Helper extends \ZfExtended_Test_ApiHelper
      *                                 With the new mid-implementation, the mid is also generated out of segment fileId,
      *                                 and it is always different for each test run.
      * @return array|\stdClass
-     * @throws \Zend_Http_Client_Exception
+     * @throws Zend_Http_Client_Exception
      */
     public function saveSegment(
         int $segmentId,
@@ -726,7 +746,7 @@ final class Helper extends \ZfExtended_Test_ApiHelper
      * @param bool $waitForImport
      * @param string $testDir
      * @return array|\stdClass
-     * @throws \Zend_Http_Client_Exception
+     * @throws Zend_Http_Client_Exception
      */
     public function addResource(array $params, string $fileName = null, bool $waitForImport = false, string $testDir = '')
     {
@@ -781,7 +801,7 @@ final class Helper extends \ZfExtended_Test_ApiHelper
      * @param bool $waitForImport
      * @param string $testDir
      * @return array|\stdClass
-     * @throws \Zend_Http_Client_Exception
+     * @throws Zend_Http_Client_Exception
      * @throws Exception
      */
     public function reimportResource(int $resourceId, string $fileName, array $params, bool $waitForImport = true, string $testDir = '')
@@ -914,7 +934,7 @@ final class Helper extends \ZfExtended_Test_ApiHelper
      * Get instance level config fro given config name. This function will not perform any asserts
      * @param string $configName
      * @return mixed|null
-     * @throws \Zend_Http_Client_Exception
+     * @throws Zend_Http_Client_Exception
      */
     public function getConfig(string $configName){
         $config = $this->getJson('editor/config');
@@ -933,7 +953,7 @@ final class Helper extends \ZfExtended_Test_ApiHelper
      * Checks, if the passed configs are set
      * @param string[] $configNames
      * @return bool
-     * @throws \Zend_Http_Client_Exception
+     * @throws Zend_Http_Client_Exception
      */
     public function checkConfigsToBeSet(array $configNames): bool
     {
@@ -956,7 +976,7 @@ final class Helper extends \ZfExtended_Test_ApiHelper
 
     /**
      * @return mixed|\stdClass
-     * @throws \Zend_Http_Client_Exception
+     * @throws Zend_Http_Client_Exception
      */
     public function getLanguages()
     {

@@ -81,9 +81,6 @@ Ext.define('Editor.view.quality.FalsePositivesController', {
             },
             success: () => {
 
-                // Set falsePositiveChanged-flag so that spread-button-widget will be enabled in the last grid column
-                record.set('falsePositiveChanged', 1);
-
                 // Commit changes
                 record.commit();
 
@@ -98,10 +95,7 @@ Ext.define('Editor.view.quality.FalsePositivesController', {
 
                     // Replicate change of falsePositive-prop to the corresponding quality-record
                     if (otherRec = other.down('grid').getStore().getById(record.get('id'))) {
-                        otherRec.set({
-                            falsePositive: falsePositive,
-                            falsePositiveChanged: 1
-                        });
+                        otherRec.set('falsePositive', falsePositive);
                         otherRec.commit();
                     }
                 }
@@ -113,6 +107,9 @@ Ext.define('Editor.view.quality.FalsePositivesController', {
                 if (qfp) {
                     qfp.getController().reloadKeepingFilterVal();
                 }
+
+                // Hide floating panel if click came from there
+                column.up('fieldset[floating]')?.hide();
             },
             failure: (response) => {
 
@@ -175,6 +172,9 @@ Ext.define('Editor.view.quality.FalsePositivesController', {
     onFalsePositiveSpread: function(button) {
         var me = this, vm = this.getViewModel(), record = button.getWidgetRecord(), other, otherRec;
 
+        // Change the value in the checkbox-column
+        record.set('falsePositive', record.get('falsePositive') ? 0 : 1);
+
         // Make request to spread
         Ext.Ajax.request({
             url: Editor.data.restpath + 'quality/falsepositivespread',
@@ -185,25 +185,11 @@ Ext.define('Editor.view.quality.FalsePositivesController', {
             success: (xhr) => {
                 var json;
 
-                // Set falsePositiveChanged-flag so that spread-button-widget will be disabled
-                // in the last grid column until the next time value changed in first column
-                record.set('falsePositiveChanged', 0);
-
                 // Commit changes
                 record.commit();
 
                 // Prepare component query selector for other instance of falsePositive-panel
                 other = 'falsePositives[floating=' + (!button.up('fieldset').floating).toString() + ']';
-
-                // If other instance of falsePositive-panel exists
-                if (other = Ext.ComponentQuery.query(other).pop()) {
-
-                    // Replicate change of falsePositiveChanged-prop to the corresponding quality-record
-                    if (otherRec = other.down('grid').getStore().getById(record.get('id'))) {
-                        otherRec.set('falsePositiveChanged', 0);
-                        otherRec.commit();
-                    }
-                }
 
                 // Show tast message
                 Editor.MessageBox.addSuccess(vm.get('l10n.falsePositives.spreaded'));
@@ -214,8 +200,16 @@ Ext.define('Editor.view.quality.FalsePositivesController', {
                     // Update data-t5qfp="true/false" attribute for the similar qualities tags/nodes
                     json.ids.forEach((id) => me.applyFalsePositiveStyle(id, record.get('falsePositive')));
                 }
+
+                // Hide floating panel if click came from there
+                button.up('fieldset[floating]')?.hide();
             },
-            failure: (response) => {
+            failure: response => {
+
+                // Reject changes
+                record.reject();
+
+                // Handle exception
                 Editor.app.getController('ServerException').handleException(response);
             }
         });

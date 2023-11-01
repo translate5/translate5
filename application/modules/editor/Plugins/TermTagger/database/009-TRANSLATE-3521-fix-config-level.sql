@@ -1,0 +1,43 @@
+-- /*
+-- START LICENSE AND COPYRIGHT
+--
+--  This file is part of translate5
+--
+--  Copyright (c) 2013 - '.(date('Y')).' Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
+--
+--  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
+--
+--  This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
+--  as published by the Free Software Foundation and appearing in the file agpl3-license.txt
+--  included in the packaging of this file.  Please review the following information2
+--  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
+--  http://www.gnu.org/licenses/agpl.html
+--
+--  There is a plugin exception available for use with this release of translate5 for
+--  translate5: Please see http://www.translate5.net/plugin-exception.txt or
+--  plugin-exception.txt in the root folder of translate5.
+--
+--  @copyright  Marc Mittag, MittagQI - Quality Informatics
+--  @author     MittagQI - Quality Informatics
+--  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
+-- 			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+--
+-- END LICENSE AND COPYRIGHT
+-- */
+
+UPDATE Zf_configuration set level = 1 WHERE name = "runtimeOptions.termTagger.debug";
+UPDATE Zf_configuration set level = 8 WHERE name = "runtimeOptions.termTagger.enableAutoQA";
+UPDATE Zf_configuration set level = 1 WHERE name = "runtimeOptions.termTagger.fuzzy";
+UPDATE Zf_configuration set level = 1 WHERE name = "runtimeOptions.termTagger.fuzzyPercent";
+UPDATE Zf_configuration set level = 1 WHERE name = "runtimeOptions.termTagger.maxSegmentWordCount";
+UPDATE Zf_configuration set level = 1 WHERE name = "runtimeOptions.termTagger.maxWordLengthSearch";
+UPDATE Zf_configuration set level = 1 WHERE name = "runtimeOptions.termTagger.minFuzzyStartLength";
+UPDATE Zf_configuration set level = 1 WHERE name = "runtimeOptions.termTagger.minFuzzyStringLength";
+UPDATE Zf_configuration set level = 1 WHERE name = "runtimeOptions.termTagger.stemmed";
+UPDATE Zf_configuration set level = 1 WHERE name = "runtimeOptions.termTagger.switchOn.GUI";
+UPDATE Zf_configuration set level = 1 WHERE name = "runtimeOptions.termTagger.switchOn.import";
+UPDATE Zf_configuration set level = 8 WHERE name = "runtimeOptions.termTagger.tagReadonlySegments";
+UPDATE Zf_configuration set level = 4 WHERE name = "runtimeOptions.termTagger.targetStringMatch";
+UPDATE Zf_configuration set level = 1 WHERE name = "runtimeOptions.termTagger.url.default";
+UPDATE Zf_configuration set level = 2 WHERE name = "runtimeOptions.termTagger.url.gui";
+UPDATE Zf_configuration set level = 2 WHERE name = "runtimeOptions.termTagger.url.import";

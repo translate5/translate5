@@ -363,9 +363,9 @@ final class Task extends Resource
 
             // wait for the import to finish. TODO FIXME: is the manual evaluation of multilang-tasks neccessary ?
             if ($this->isProjectTask() || $isMultiLanguage) {
-                $api->checkProjectTasksStateLoop();
+                $api->waitForCurrentProjectStateOpen();
             } else {
-                $api->checkTaskStateLoop();
+                $api->waitForCurrentTaskStateOpen();
             }
         }
 
@@ -420,9 +420,9 @@ final class Task extends Resource
     public function waitForImport(Helper $api)
     {
         if ($this->isProjectTask()) {
-            $api->checkProjectTasksStateLoop();
+            $api->waitForCurrentProjectStateOpen();
         } else {
-            $api->checkTaskStateLoop();
+            $api->waitForCurrentTaskStateOpen();
         }
         // TODO: we should rework the API not to cache the task-data but to return them
         $this->applyResult($api->getTask());

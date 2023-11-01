@@ -104,6 +104,13 @@ Ext.define('Editor.view.admin.ExportMenu', {
                 if (task.get('qualityHasFaults')) {
                     me.createFaultyExportAlert();
                 }
+                // since we don't have any control about the triggered export call (feedback if done),
+                // we just re-load the task after a second to get the latest version from server
+                let taskReload = new Ext.util.DelayedTask(function(){
+                    task.load();
+                });
+                taskReload.delay(1000);
+
             }
         });
 

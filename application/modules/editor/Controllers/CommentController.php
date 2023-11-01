@@ -154,8 +154,7 @@ class Editor_CommentController extends ZfExtended_RestController {
      */
     public function postAction() {
         $taskGuid = $this->getCurrentTask()->getTaskGuid();
-        $sessionUser = new Zend_Session_Namespace('user');
-        $userGuid = $sessionUser->data->userGuid;
+        $userGuid = ZfExtended_Authentication::getInstance()->getUserGuid();
         $wfh = $this->_helper->workflow;
         /* @var $wfh Editor_Controller_Helper_Workflow */
         $wfh->checkWorkflowWriteable($taskGuid, $userGuid);
@@ -165,7 +164,7 @@ class Editor_CommentController extends ZfExtended_RestController {
         $this->entity->setCreated($now);
         $this->entity->setTaskGuid($taskGuid);
         $this->entity->setUserGuid($userGuid);
-        $this->entity->setUserName($sessionUser->data->userName);
+        $this->entity->setUserName(ZfExtended_Authentication::getInstance()->getUser()->getUserName());
         $this->decodePutData();
         $this->checkSegmentTaskGuid($this->data->segmentId);
         $this->entity->setSegmentId($this->data->segmentId);
@@ -223,8 +222,7 @@ class Editor_CommentController extends ZfExtended_RestController {
      * @throws ZfExtended_Models_Entity_NoAccessException
      */
     protected function checkUserGuid() {
-        $sessionUser = new Zend_Session_Namespace('user');
-        if ($sessionUser->data->userGuid !== $this->entity->getUserGuid()) {
+        if (ZfExtended_Authentication::getInstance()->getUserGuid() !== $this->entity->getUserGuid()) {
             throw new ZfExtended_Models_Entity_NoAccessException();
         }
     }

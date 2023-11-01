@@ -740,9 +740,8 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
      * @return boolean
      */
     public function lockForSessionUser(string $datetime): bool {
-        $user = new Zend_Session_Namespace('user');
         $session = new Zend_Session_Namespace();
-        return $this->_lock($datetime, $user->data->userGuid, $session->internalSessionUniqId);
+        return $this->_lock($datetime, ZfExtended_Authentication::getInstance()->getUserGuid(), $session->internalSessionUniqId);
     }
 
 

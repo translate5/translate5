@@ -118,7 +118,7 @@ class Editor_AlikesegmentController extends ZfExtended_RestController {
         $states = ZfExtended_Factory::get('editor_Models_Segment_AutoStates');
         /* @var $states editor_Models_Segment_AutoStates */
         
-        $userGuid = (new Zend_Session_Namespace('user'))->data->userGuid;
+        $userGuid = ZfExtended_Authentication::getInstance()->getUserGuid();
         
         $tua = editor_Models_Loaders_Taskuserassoc::loadByTask($userGuid, $task);
         

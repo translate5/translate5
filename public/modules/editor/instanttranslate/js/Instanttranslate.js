@@ -328,6 +328,16 @@ function initGui(characterLimit, pretranslatedFiles, dateAsOf, disableInstantTra
         getDownloads();
         return false;
     });
+
+    // If the instant translation is not active, add alt + enter shortcut to run translation
+    if(instantTranslationIsActive === false){
+        $(document).bind('keydown', 'alt+enter', function(e) {
+            if (e.keyCode === 13 && e.altKey) {
+                $('#translationSubmit').click();
+            }
+        });
+    }
+
     // initially, we appear as text translation
     showSourceIsText();
     setAllowedFileTypes();

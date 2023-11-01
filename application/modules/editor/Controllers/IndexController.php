@@ -195,14 +195,14 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
         settype($_POST['maxHeight'], 'integer');
         settype($_POST['usedWidth'], 'integer');
         settype($_POST['usedHeight'], 'integer');
-        $userSession = new Zend_Session_Namespace('user');
+        $auth = ZfExtended_Authentication::getInstance();
 
         $log = ZfExtended_Factory::get('editor_Models_BrowserLog');
         /* @var $log editor_Models_BrowserLog */
 
         $log->setDatetime(NOW_ISO);
-        $log->setLogin($userSession->data->login);
-        $log->setUserGuid($userSession->data->userGuid);
+        $log->setLogin($auth->getLogin());
+        $log->setUserGuid($auth->getUserGuid());
         $log->setAppVersion($_POST['appVersion']);
         $log->setUserAgent($_POST['userAgent']);
         $log->setBrowserName($_POST['browserName']);
@@ -492,8 +492,6 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
      */
     protected function setJsAppData()
     {
-        $userSession = new Zend_Session_Namespace('user');
-
         $ed = $this->config->runtimeOptions->editor;
 
         $php2js = $this->view->Php2JsVars();
@@ -516,7 +514,7 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
         $php2js->set('app.branding', (string)$this->translate->_($ed->branding));
         $php2js->set('app.company', $this->config->runtimeOptions->companyName);
         $php2js->set('app.name', $this->config->runtimeOptions->appName);
-        $userData = (array) $userSession->data;
+        $userData = (array) ZfExtended_Authentication::getInstance()->getUserData();
 
         // Trim TermPortal-roles if TermPortal plugin is disabled
         if (! $this->pluginManager->isActive('TermPortal')) {
@@ -930,7 +928,7 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
     /**
      * convenient shortcut to ACLs
      */
-    private function isAllowed(string $resource, ?string $right = null): string
+    private function isAllowed(string $resource, ?string $right = null): bool
     {
         $roles = ZfExtended_Authentication::getInstance()->getUserRoles();
         try {

@@ -88,9 +88,11 @@ class editor_Plugins_DeleteUserAssociations_Init extends ZfExtended_Plugin_Abstr
             return;
         }
         //add the backend right seeAllUsers to the current logged user, so the user is able to delete any assoc users
-        $userSession = new Zend_Session_Namespace('user');
-        $userData = $userSession->data;
         $acl = ZfExtended_Acl::getInstance();
-        $acl->allow($userData->roles, SystemResource::ID, SystemResource::SEE_ALL_USERS);
+        $acl->allow(
+            ZfExtended_Authentication::getInstance()->getUserRoles(),
+            SystemResource::ID,
+            SystemResource::SEE_ALL_USERS
+        );
     }
 }
