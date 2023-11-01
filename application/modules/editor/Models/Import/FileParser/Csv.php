@@ -289,7 +289,7 @@ class editor_Models_Import_FileParser_Csv extends editor_Models_Import_FileParse
             $extracted = $this->extractSegment($line);
             $skel[] = $this->str_putcsv($extracted, $this->_delimiter, $this->_enclosure, $this->break);
         }
-        $this->_skeletonFile = join('', $skel);
+        $this->skeletonFile = join('', $skel);
     }
     
     /**

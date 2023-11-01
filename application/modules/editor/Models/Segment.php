@@ -186,6 +186,13 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract
     protected array $contextData = [];
 
     /**
+     * Array of ids of all segments that are the first occurrences in their repetition groups
+     *
+     * @var array|null
+     */
+    protected ?array $firstSegmentsOfEachRepetitionsGroup = null;
+
+    /**
      * init the internal segment field and the DB object
      */
     public function __construct()
@@ -290,6 +297,10 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract
             }
             return 'CAST('.$adapter->quoteIdentifier($searchInField) . ' AS BINARY) REGEXP BINARY ' . $adapter->quote($queryString);
         }
+
+        // Escape mysql-wildcards
+        $queryString = preg_replace('~[%_]~', '\\\$0', $queryString);
+
         //search type regular wildcard
         if ($parameters['searchType'] === 'wildcardsSearch') {
             $queryString = str_replace("*", "%", $queryString);
@@ -1085,6 +1096,19 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract
     }
 
     /**
+     * If the given exception was thrown because of a missing view do nothing.
+     * If it was another Db Exception throw it!
+     * @param Zend_Db_Statement_Exception $e
+     */
+    protected function catchMissingView(Zend_Db_Statement_Exception $e)
+    {
+        $m = $e->getMessage();
+        if (strpos($m, 'SQLSTATE') !== 0 || strpos($m, 'Base table or view not found') === false) {
+            throw $e;
+        }
+    }
+
+    /**
      * Loads segments by task-guid and file-id. Returns just a simple array of id and sgmentNrInTask ordered by sgmentNrInTask
      * @param string $taskGuid
      * @param int $fileId
@@ -1264,6 +1288,11 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract
         $this->applyFilterAndSort($s); //respecting filters if set any
         $s = $this->addWatchlistJoin($s, $this->tableName);
         $s = $this->addWhereTaskGuid($s, $taskGuid);
+
+        // If only repetitions need to be fetched, make sure first occurrences
+        // are excluded unless it's explicitly specified they should be kept
+        $this->excludeFirstRepetitionOccurrencesIfNeed($s);
+
         $s->where($this->tableName . '.id > ?', $id)
             ->order($this->tableName . '.id ASC')
             ->limit(1);
@@ -1337,7 +1366,63 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract
             $callback($s, $this->tableName);
         }
 
-        return parent::loadFilterdCustom($s);
+        // Apply filter and sort to Select-object
+        $this->applyFilterAndSort($s);
+
+        // If only repetitions need to be fetched, make sure first occurrences
+        // are excluded unless it's explicitly specified they should be kept
+        $this->excludeFirstRepetitionOccurrencesIfNeed($s);
+
+        // Fetch Result
+        $result = $this->db->fetchAll($s)->toArray();
+
+        // Return
+        return $result;
+    }
+
+    /**
+     * @param Zend_Db_Select $s
+     * @throws Zend_Db_Select_Exception
+     * @throws Zend_Db_Statement_Exception
+     */
+    public function excludeFirstRepetitionOccurrencesIfNeed(Zend_Db_Select &$s) {
+
+        // Get current WHERE-clause
+        $where = implode(' ', $s->getPart(Zend_Db_Select::WHERE));
+
+        // If isRepeated-column is NOT mentioned within WHERE-clause - return
+        if (!preg_match('~isRepeated in \(([0-4, ]+)\)~', $where, $m)) {
+            return;
+        }
+
+        // Get values of isRepeated-filter
+        $isRepeated = array_flip(explode(', ', $m[1]));
+
+        // If repetitions (source/target/both) are NOT being explicitly searched - return
+        if (!isset($isRepeated[1]) && !isset($isRepeated[2]) && !isset($isRepeated[3])) {
+            return;
+        }
+
+        // If first repetition occurrences should be kept - return
+        if (isset($isRepeated[4])) {
+            return;
+        }
+
+        // Get array of ids of first repetition occurrences, if we haven't fetched it previously
+        $this->firstSegmentsOfEachRepetitionsGroup = $this->firstSegmentsOfEachRepetitionsGroup
+            ?? $this->db->getAdapter()->query("
+                SELECT SUBSTRING_INDEX(GROUP_CONCAT(`id`), ',', 1) AS `first`
+                FROM `$this->tableName`
+                WHERE $where
+                GROUP BY IF(`isRepeated` = 1, `sourceMd5`,IF(`isRepeated` = 2, `targetMd5`, CONCAT(`sourceMd5`, '-', `targetMd5`)))
+                HAVING COUNT(`id`) > 1
+                ORDER BY `fileOrder`, `id`
+            ")->fetchAll(PDO::FETCH_COLUMN);
+
+        // Exclude
+        if ($this->firstSegmentsOfEachRepetitionsGroup) {
+            $s->where('`id` NOT IN (?)', $this->firstSegmentsOfEachRepetitionsGroup);
+        }
     }
 
     /**
@@ -1361,6 +1446,10 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract
         // but this is only possible AFTER the from() call so far!
         $s = $this->addWhereTaskGuid($s, $taskGuid);
         $s = $this->addWatchlistJoin($s);
+
+        // If only repetitions need to be fetched, make sure first occurrences
+        // are excluded unless it's explicitly specified they should be kept
+        $this->excludeFirstRepetitionOccurrencesIfNeed($s);
 
         $totalCount = $this->db->fetchRow($s)->numrows;
         $s->reset($s::COLUMNS);

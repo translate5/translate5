@@ -509,11 +509,14 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
     {
 
         if($this->isToLong($source) || $this->isToLong($target)) {
+            $translate= ZfExtended_Zendoverwrites_Translate::getInstance();
             $this->error = new stdClass();
             $this->error->method = $this->httpMethod;
             $this->error->url = $this->http->getUri(true);
-            $this->error->type = 'TO_LONG';
-            $this->error->error = 'The given segment data is to long and would crash OpenTM2 on saving it.';
+            $this->error->error =
+                $translate->_(
+                    'Das Segment konnte nur in der Aufgabe, nicht aber ins TM gespeichert werden. Segmente länger als 2048 Bytes sind nicht im TM speicherbar.'
+                );
             return new stdClass();
         }
 

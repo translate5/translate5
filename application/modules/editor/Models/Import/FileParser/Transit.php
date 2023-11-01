@@ -156,7 +156,7 @@ class editor_Models_Import_FileParser_Transit extends editor_Models_Import_FileP
             trigger_error('Could not add targetPath to zip: '.$this->_path.' - reported problem had been: '.$res);
         }
         $zip->close();
-        $this->_skeletonFile = file_get_contents($zipFilePath);
+        $this->skeletonFile = file_get_contents($zipFilePath);
         unlink($zipFilePath);
     }
     

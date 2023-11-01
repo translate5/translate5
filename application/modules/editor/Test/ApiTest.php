@@ -452,6 +452,9 @@ abstract class editor_Test_ApiTest extends TestCase
         }
         if (!$state->database->isUptodate) {
             $errors[] = 'Database is not up to date! ' . $state->database->newCount . ' new / ' . $state->database->modCount . ' modified.';
+            if ($state->database->newCount > 0) {
+                $errors[]= "New files: \n" . print_r($state->database->newFiles, true);
+            }
         }
         if (count($errors) > 0) {
             // UGLY: no Exception can terminate the suite with a single "Explanation", so to avoid all tests failing we simply die ...

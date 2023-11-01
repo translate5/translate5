@@ -64,19 +64,18 @@ class editor_Plugins_ChangeLog_ChangelogController extends ZfExtended_RestContro
         //default sorting by date
         $f->hasSort() || $f->addSort('dateOfChange', true);
         
-        $user = new Zend_Session_Namespace('user');
+        $authenticatedUser = ZfExtended_Authentication::getInstance()->getUser();
         //user group bit map of the authenticated user
-        $userGroup = $this->entity->getUsergroup($user->data);
+        $userGroup = $this->entity->getUsergroup();
         
         $results = $this->entity->loadAllForUser($userGroup);
         $totalcount =$this->entity->getTotalCount($userGroup);
         
         //when there are results and the id filter was set, the load was triggered automatically
         if(!empty($results) && $this->entity->getFilter()->hasFilter('id')){
-            $userId = $user->data->id;
             //update always the last seen changelog id, since when this page is called,
             // the user has seen the changelogs, so no calculation of the id or so is needed 
-            $lastSeen = $this->entity->updateChangelogUserInfo($user->data);
+            $lastSeen = $this->entity->updateChangelogUserInfo($authenticatedUser);
             
             //since we dont use metaData otherwise, we can overwrite it completly:
             $this->view->metaData = new stdClass();

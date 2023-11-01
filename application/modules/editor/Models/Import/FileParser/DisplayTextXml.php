@@ -140,7 +140,7 @@ class editor_Models_Import_FileParser_DisplayTextXml extends editor_Models_Impor
         $this->registerContent();
         
         try {
-            $this->_skeletonFile = $parser->parse($this->_origFile, false);
+            $this->skeletonFile = $parser->parse($this->_origFile, false);
         }
         catch(editor_Models_Import_FileParser_InvalidXMLException $e) {
             $logger = Zend_Registry::get('logger')->cloneMe('editor.import.fileparser.displayTextXml');

@@ -79,10 +79,14 @@ Ext.define('Editor.view.segments.HtmlEditor', {
     tagsFromReferenceFieldOnly: false,
 
     strings: {
-        tagOrderErrorText: '#UT# Einige der im Segment verwendeten Tags sind in der falschen Reihenfolgen (schließender vor öffnendem Tag).',
-        tagMissingText: '#UT#Folgende Tags fehlen:<br/><ul><li>{0}</li></ul>So entfernen Sie den Fehler:<br/><ul><li>Klicken Sie auf OK, um diese Nachricht zu entfernen</li><li>Drücken Sie ESC, um das Segment ohne Speichern zu verlassen</li><li>Öffnen Sie das Segment erneut</li></ul>Wiederholen Sie jetzt Ihre Änderungen.<br/>Verwenden Sie alternativ die Hilfeschaltfläche, und suchen Sie nach Tastenkombinationen, um die fehlenden Tags aus der Quelle einzugeben.',
+        source: '#UT#Quelltext',
+        targetAtImportTime: '#UT#Zieltext zur Importzeit',
+        tagOrderErrorText: '#UT#Einige der im Segment verwendeten Tags sind in der falschen Reihenfolgen (schließender vor öffnendem Tag).',
+        tagMissingTextSource: '#UT#Folgende Tags fehlen:<br/><ul><li>{0}</li></ul>So entfernen Sie den Fehler:<br/><ul><li>Klicken Sie auf OK, um diese Nachricht zu entfernen</li><li>Drücken Sie ESC, um das Segment ohne Speichern zu verlassen</li><li>Öffnen Sie das Segment erneut</li></ul>Wiederholen Sie jetzt Ihre Änderungen.<br/>Verwenden Sie alternativ die Hilfeschaltfläche, und suchen Sie nach Tastenkombinationen, um die fehlenden Tags aus der Quelle einzugeben.',
+        tagMissingTextTarget: '#UT#Folgende Tags fehlen im Zieltext (zur Importzeit/Vorübersetzung):<br/><ul><li>{0}</li></ul>So entfernen Sie den Fehler:<br/><ul><li>Klicken Sie auf OK, um diese Nachricht zu entfernen</li><li>Drücken Sie ESC, um das Segment ohne Speichern zu verlassen</li><li>Öffnen Sie das Segment erneut</li></ul>Wiederholen Sie jetzt Ihre Änderungen.<br/>Verwenden Sie alternativ die Hilfeschaltfläche, und suchen Sie nach Tastenkombinationen, um die fehlenden Tags aus der Quelle einzugeben.',
         tagDuplicatedText: '#UT#Die nachfolgenden Tags wurden beim Editieren dupliziert, das Segment kann nicht gespeichert werden. Löschen Sie die duplizierten Tags. <br />Duplizierte Tags:{0}',
-        tagExcessText: '#UT#Die folgenden Tags existieren nicht in der Quellsprache:<br/><ul><li>{0}</li></ul>So entfernen Sie den Fehler:<br/><ul><li>Klicken Sie auf OK, um diese Nachricht zu entfernen</li><li>Drücken Sie ESC, um das Segment ohne Speichern zu verlassen</li><li>Öffnen Sie das Segment erneut</li></ul>Wiederholen Sie jetzt Ihre Änderungen.',
+        tagExcessTextSource: '#UT#Die folgenden Tags existieren nicht in der Ausgangtext:<br/><ul><li>{0}</li></ul>So entfernen Sie den Fehler:<br/><ul><li>Klicken Sie auf OK, um diese Nachricht zu entfernen</li><li>Drücken Sie ESC, um das Segment ohne Speichern zu verlassen</li><li>Öffnen Sie das Segment erneut</li></ul>Wiederholen Sie jetzt Ihre Änderungen.',
+        tagExcessTextTarget: '#UT#Folgende Tags fehlen im Zieltext (zur Importzeit/Vorübersetzung):<br/><ul><li>{0}</li></ul>So entfernen Sie den Fehler:<br/><ul><li>Klicken Sie auf OK, um diese Nachricht zu entfernen</li><li>Drücken Sie ESC, um das Segment ohne Speichern zu verlassen</li><li>Öffnen Sie das Segment erneut</li></ul>Wiederholen Sie jetzt Ihre Änderungen.<br/>Verwenden Sie alternativ die Hilfeschaltfläche, und suchen Sie nach Tastenkombinationen, um die fehlenden Tags aus der Quelle einzugeben.',
         tagRemovedText: '#UT# Es wurden Tags mit fehlendem Partner entfernt!',
         cantEditContents: '#UT#Es ist Ihnen nicht erlaubt, den Segmentinhalt zu bearbeiten. Bitte verwenden Sie STRG+Z um Ihre Änderungen zurückzusetzen oder brechen Sie das Bearbeiten des Segments ab.',
     },
@@ -1005,24 +1009,24 @@ Ext.define('Editor.view.segments.HtmlEditor', {
         if (!this.tagsCheckResult.isSuccessful()) {
             //first item the field to check, second item: the error text:
             let todo = [
-                    ['missingTags', 'tagMissingText'],
+                    ['missingTags', this.getReferenceField() === 'source' ? 'tagMissingTextSource' : 'tagMissingTextTarget'],
                     ['duplicatedTags', 'tagDuplicatedText'],
-                    ['excessTags', 'tagExcessText']
+                    ['excessTags', this.getReferenceField() === 'source' ? 'tagExcessTextSource' : 'tagExcessTextTarget']
                 ];
 
             for (let i = 0; i < todo.length; i++) {
-                let missingSvg = '';
+                let affectedTags = '';
 
                 if (this.tagsCheckResult[todo[i][0]].length > 0) {
                     msg += me.strings[todo[i][1]];
 
                     for(const tagData of me.tagsCheckResult[todo[i][0]]) {
                         const tag = tagData.data;
-                        missingSvg += '<img src="' + me.getSvg(tag.whitespaceTag ? tag.fullTag : tag.shortTag, tag.whitespaceTag ? tag.fullWidth : tag.shortWidth) + '"> ';
+                        affectedTags += '<img src="' + me.getSvg(tag.whitespaceTag ? tag.fullTag : tag.shortTag, tag.whitespaceTag ? tag.fullWidth : tag.shortWidth) + '"> ';
                         //msg += '<img src="'+me.getSvg(tag.whitespaceTag ? tag.fullTag : tag.shortTag, tag.whitespaceTag ? tag.fullWidth : tag.shortWidth)+'"> ';
                     }
 
-                    msg = Ext.String.format(msg, missingSvg);
+                    msg = Ext.String.format(msg, affectedTags);
                     msg += '<br /><br />';
                 }
             }
@@ -1441,5 +1445,15 @@ Ext.define('Editor.view.segments.HtmlEditor', {
         data.fullWidth = Math.ceil(this.ruler.getBoundingClientRect().width);
         this.ruler.innerHTML = data.shortTag;
         data.shortWidth = Math.ceil(this.ruler.getBoundingClientRect().width);
+    },
+
+    getReferenceField: function () {
+        const useSourceAsReference = Editor.app.getTaskConfig('editor.frontend.reviewTask.useSourceForReference');
+
+        if (Editor.data.task.get('emptyTargets') || useSourceAsReference) {
+            return 'source';
+        }
+
+        return 'target';
     }
 });

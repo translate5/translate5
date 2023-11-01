@@ -63,9 +63,15 @@ class editor_Models_Import_FileParser_Tag {
     public string $tag;
 
     /**
+     * TODO change this to private and add accessor and mutator methods
      * @var string mandatory, the id to identity the same tag in source and target
      */
     public string $id;
+
+    /**
+     * @var string|null optional, the original id of the tag, if id is owerwritten
+     */
+    private ?string $originalId = null;
 
     /**
      * @var string|null optional, the rid to match opening and closing tag, if given
@@ -187,6 +193,32 @@ class editor_Models_Import_FileParser_Tag {
             'length' => $length,
             'title' => $title,
         ]);
+    }
+
+    public function getId(): string
+    {
+        return $this->id;
+    }
+
+    /**
+     * Return the identifier of the tag, which is the tag, the type and the original id (if set)
+     * concatenated with a dash
+     * Used to identify tag duplicates
+     *
+     * @return string
+     */
+    public function getIdentifier(): string
+    {
+        return sprintf('%s-%s-%s', $this->tag, $this->type, $this->originalId ?? $this->id);
+    }
+
+    public function changeId(string $newId): void
+    {
+        if (null === $this->originalId) {
+            $this->originalId = $this->id;
+        }
+
+        $this->id = $newId;
     }
 
     /**

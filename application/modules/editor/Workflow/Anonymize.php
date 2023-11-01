@@ -78,8 +78,7 @@ class editor_Workflow_Anonymize {
      */
     public function __construct(){
         $this->commentHelper = ZfExtended_Factory::get('editor_Models_Comment');
-        $sessionUser = new Zend_Session_Namespace('user');
-        $this->sessionUserGuid = $sessionUser->data->userGuid;
+        $this->sessionUserGuid = ZfExtended_Authentication::getInstance()->getUserGuid();
         $this->taskUserTracking = ZfExtended_Factory::get('editor_Models_TaskUserTracking');
         $this->trackChangeTagHelper = ZfExtended_Factory::get('editor_Models_Segment_TrackChangeTag');
         $this->translate = ZfExtended_Zendoverwrites_Translate::getInstance();

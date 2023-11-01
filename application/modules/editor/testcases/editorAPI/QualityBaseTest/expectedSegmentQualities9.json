@@ -13,7 +13,6 @@
         "falsifiable": true,
         "content": "Fahrtensysteme",
         "similarQty": 0,
-        "falsePositiveChanged": 0,
         "hasTag": true,
         "tagName": "img",
         "cssClass": "qmflag"

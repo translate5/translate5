@@ -46,10 +46,12 @@ abstract class editor_Models_Import_FileParser {
      * @var string
      */
     protected $_origFile = NULL;
+
     /**
      * @var string
      */
-    protected $_skeletonFile = NULL;
+    protected string $skeletonFile = '';
+
     /**
      * @var string
      */
@@ -171,7 +173,7 @@ abstract class editor_Models_Import_FileParser {
     {
         return str_replace('_Import_', '_Export_', static::class);
     }
-    
+
     /**
      * Basically we assume that each Parser is able to parse its exceptions, so this functions defaults to return true.
      * If this not the case forexample due multi purpose extensions like XML, the isParsable must be calculated in the
@@ -267,8 +269,9 @@ abstract class editor_Models_Import_FileParser {
      * Gibt den Inhalt das erzeugte Skeleton File zurück
      * @return string
      */
-    public function getSkeletonFile() {
-        return $this->_skeletonFile;
+    public function getSkeletonFile(): string
+    {
+        return $this->skeletonFile;
     }
     
     /**
