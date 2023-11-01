@@ -98,9 +98,7 @@ class editor_Models_Import_FileParser_Xlf_SurroundingTagRemover_All extends edit
             }
             $counter++;
         }
-        if ($counter > 0) {
-            error_log('$trimmedContent: ' . print_r($trimmedContent, true));
-        }
+
         return $counter;
     }
 

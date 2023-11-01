@@ -28,6 +28,10 @@ END LICENSE AND COPYRIGHT
 
 use MittagQI\Translate5\NumberProtection\Model\InputMapping;
 
+/**
+ * Part of Content protection feature. Number protection part
+ * Input mapping stands for connection between regex and source language
+ */
 class editor_NumberprotectioninputmappingController extends ZfExtended_RestController
 {
     protected $entityClass = InputMapping::class;
@@ -41,6 +45,7 @@ class editor_NumberprotectioninputmappingController extends ZfExtended_RestContr
 
     public function indexAction(): void
     {
+        /** @var array{id: int, languageId: int, type: string, name: string}[] rows */
         $this->view->rows = $this->entity->loadAllForFrontEnd();
         $this->view->total = $this->entity->getTotalCount();
     }

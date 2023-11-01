@@ -29,6 +29,11 @@ END LICENSE AND COPYRIGHT
 use MittagQI\Translate5\NumberProtection\Model\NumberRepository;
 use MittagQI\Translate5\NumberProtection\Model\OutputMapping;
 
+/**
+ * Part of Content protection feature. Number protection part
+ * Output mapping stands for connection between regex and target language.
+ * In case user wants to provide custom output format for found entry he will use this model to do so
+ */
 class editor_NumberprotectionoutputmappingController extends ZfExtended_RestController
 {
     protected $entityClass = OutputMapping::class;
@@ -42,6 +47,7 @@ class editor_NumberprotectionoutputmappingController extends ZfExtended_RestCont
 
     public function indexAction(): void
     {
+        /** @var array{id: int, languageId: int, type: string, name: string, format: string}[] rows */
         $this->view->rows = $this->entity->loadAllForFrontEnd();
         $this->view->total = $this->entity->getTotalCount();
     }

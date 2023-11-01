@@ -30,6 +30,11 @@ use MittagQI\Translate5\NumberProtection\Model\NumberRecognition;
 use MittagQI\Translate5\NumberProtection\Protector\IPAddressProtector;
 use MittagQI\Translate5\NumberProtection\Protector\MacAddressProtector;
 
+/**
+ * Part of Content protection feature. Number protection part
+ * In Number Recognition controller we have list of regexes of corresponding types
+ * Regexes are used to find content for protection in text
+ */
 class editor_NumberprotectionnumberrecognitionController extends ZfExtended_RestController
 {
     protected $entityClass = NumberRecognition::class;
@@ -43,6 +48,20 @@ class editor_NumberprotectionnumberrecognitionController extends ZfExtended_Rest
             $data[] = $row;
         }
 
+        /** @var array{
+         *     id: int,
+         *     type: string,
+         *     name: string,
+         *     description: string,
+         *     regex: string,
+         *     matchId: int,
+         *     format: string,
+         *     isDefault: bool,
+         *     keepAsIs: bool,
+         *     priority: int,
+         *     rowEnabled: bool
+         * } rows
+         */
         $this->view->rows = $data;
         $this->view->total = $this->entity->getTotalCount();
     }

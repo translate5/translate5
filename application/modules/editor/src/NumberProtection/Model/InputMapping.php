@@ -70,7 +70,10 @@ class InputMapping extends ZfExtended_Models_Entity_Abstract
     protected $dbInstanceClass = InputMappingTable::class;
     protected $validatorInstanceClass = InputMappingValidator::class;
 
-    public function loadAllForFrontEnd()
+    /**
+     * @return array{id: int, languageId: int, type: string, name: string}
+     */
+    public function loadAllForFrontEnd(): array
     {
         $recognitionTable = ZfExtended_Factory::get(NumberRecognitionTable::class)->info(NumberRecognitionTable::NAME);
         $s = $this->db
