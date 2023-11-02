@@ -182,7 +182,10 @@ Ext.define('Editor.MessageBox',{
       return [
           '<div class="app-msg">',
           '<div class="x-box-tl"><div class="x-box-tr"><div class="x-box-tc"></div></div></div>',
-          '<div class="x-box-ml"><div class="x-box-mr"><div class="x-box-mc"><h3 class="x-icon-text icon-status-' + status + '">', title, '</h3>', msg, '</div></div></div>',
+          '<div class="x-box-ml"><div class="x-box-mr"><div class="x-box-mc">',
+                '<span class="x-fa fa-close"></span>',
+                '<h3 class="x-icon-text icon-status-' + status + '">', title, '</h3>', msg, '</div>',
+          '</div></div>',
           '<div class="x-box-bl"><div class="x-box-br"><div class="x-box-bc"></div></div></div>',
           '</div>'
       ].join('');
