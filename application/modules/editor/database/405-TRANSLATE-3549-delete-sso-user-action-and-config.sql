@@ -37,7 +37,7 @@ VALUES
         1,
         'default',
         'openid',
-        (SELECT id FROM Zf_users WHERE roles LIKE '%pm%' LIMIT 1),
+        '',
         '',
         '',
         'string',
