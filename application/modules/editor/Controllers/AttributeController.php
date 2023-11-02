@@ -174,7 +174,7 @@ class editor_AttributeController extends ZfExtended_RestController
         // Validate termId-param and also validate dataType-param and load it's model instance
         $_ = $this->jcheck([
             'termId' => [
-                'req' => true,
+                'req' => !$this->getParam('batch'),
                 'rex' => $this->getParam('batch') ? 'int11list' : 'int11'
             ],
             'level' => [

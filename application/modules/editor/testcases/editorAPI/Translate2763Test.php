@@ -82,6 +82,9 @@ class Translate2763Test extends editor_Test_JsonTest {
 
         sleep(30);
 
+        //
+        echo "some output printed, as this may be some magic reason of this test to succeed";
+
         // Do tbx-export
         $data = static::api()->get('/editor/languageresourceinstance/tbxexport', [
             'collectionId' => static::$tc->getId(),

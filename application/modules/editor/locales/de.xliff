@@ -2936,7 +2936,7 @@
                     <br/>Verwenden Sie alternativ die Hilfeschaltfläche, und suchen Sie nach Tastenkombinationen, um die fehlenden Tags aus der Quelle einzugeben.
                 </target>
             </trans-unit>
-            <trans-unit id='Rm9sZ2VuZGUgVGFncyBmZWhsZW4gaW0gWmllbHRleHQgKHp1ciBJbXBvcnR6ZWl0L1ZvcsO8YmVyc2V0enVuZyk6PGJyLz48dWw+PGxpPnswfTwvbGk+PC91bD5TbyBlbnRmZXJuZW4gU2llIGRlbiBGZWhsZXI6PGJyLz48dWw+IDxsaT5LbGlja2VuIFNpZSBhdWYgT0ssIHVtIGRpZXNlIE5hY2hyaWNodCB6dSBlbnRmZXJuZW48L2xpPjxsaT5EcsO8Y2tlbiBTaWUgRVNDLCB1bSBkYXMgU2VnbWVudCBvaG5lIFNwZWljaGVybiB6dSB2ZXJsYXNzZW48L2xpPjxsaT7DlmZmbmVuIFNpZSBkYXMgU2VnbWVudCBlcm5ldXQ8L2xpPjwvdWw+V2llZGVyaG9sZW4gU2llIGpldHp0IElocmUgw4RuZGVydW5nZW4uPGJyLz5WZXJ3ZW5kZW4gU2llIGFsdGVybmF0aXYgZGllIEhpbGZlc2NoYWx0ZmzDpGNoZSwgdW5kIHN1Y2hlbiBTaWUgbmFjaCBUYXN0ZW5rb21iaW5hdGlvbmVuLCB1bSBkaWUgZmVobGVuZGVuIFRhZ3MgYXVzIGRlciBRdWVsbGUgZWluenVnZWJlbi4='>
+            <trans-unit id='Rm9sZ2VuZGUgVGFncyBmZWhsZW4gaW0gWmllbHRleHQgKHp1ciBJbXBvcnR6ZWl0L1ZvcsO8YmVyc2V0enVuZyk6PGJyLz48dWw+PGxpPnswfTwvbGk+PC91bD5TbyBlbnRmZXJuZW4gU2llIGRlbiBGZWhsZXI6PGJyLz48dWw+PGxpPktsaWNrZW4gU2llIGF1ZiBPSywgdW0gZGllc2UgTmFjaHJpY2h0IHp1IGVudGZlcm5lbjwvbGk+PGxpPkRyw7xja2VuIFNpZSBFU0MsIHVtIGRhcyBTZWdtZW50IG9obmUgU3BlaWNoZXJuIHp1IHZlcmxhc3NlbjwvbGk+PGxpPsOWZmZuZW4gU2llIGRhcyBTZWdtZW50IGVybmV1dDwvbGk+PC91bD5XaWVkZXJob2xlbiBTaWUgamV0enQgSWhyZSDDhG5kZXJ1bmdlbi48YnIvPlZlcndlbmRlbiBTaWUgYWx0ZXJuYXRpdiBkaWUgSGlsZmVzY2hhbHRmbMOkY2hlLCB1bmQgc3VjaGVuIFNpZSBuYWNoIFRhc3RlbmtvbWJpbmF0aW9uZW4sIHVtIGRpZSBmZWhsZW5kZW4gVGFncyBhdXMgZGVyIFF1ZWxsZSBlaW56dWdlYmVuLg=='>
                 <source>Folgende Tags fehlen im Zieltext (zur Importzeit/Vorübersetzung):
                     <br/>
                     <ul>
