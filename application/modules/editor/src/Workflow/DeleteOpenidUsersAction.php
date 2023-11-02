@@ -93,7 +93,7 @@ class DeleteOpenidUsersAction extends editor_Workflow_Actions_Abstract
 
             $logins[] = $row->login;
 
-            $userTaskAssocDb->delete(['userGuid = ?', $user->getUserGuid()]);
+            $userTaskAssocDb->delete(['userGuid = ?' => $user->getUserGuid()]);
             $user->delete();
         }
 
