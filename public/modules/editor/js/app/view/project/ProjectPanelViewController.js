@@ -491,10 +491,17 @@ Ext.define('Editor.view.project.ProjectPanelViewController', {
      * @param store
      */
     onProjectStoreFilterChange: function(store) {
+        var me = this,
+            view = me.getView();
+
+
+        if(!view.isVisible()){
+            return;
+        }
 
         if(store && store.getTotalCount() > 0){
             // focus the correct project/task after the project filter is changed
-            this.focusProjectTask(store);
+            me.focusProjectTask(store);
         }
     }
 });
