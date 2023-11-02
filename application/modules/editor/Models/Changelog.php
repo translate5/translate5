@@ -102,18 +102,17 @@ class editor_Models_Changelog extends ZfExtended_Models_Entity_Abstract {
         $result = $this->db->fetchAll($s)->toArray();
         return $result[0]['maxid'];
     }
-    
+
     /***
      * Saves to one user which changelog id he has seen last, the saved id is returned
-     * @param int $userId
-     * @param int $changelogId
+     * @param ZfExtended_Models_User $user
      * @return integer the id on which was updated
      */
-    public function updateChangelogUserInfo(stdClass $userData){
-        $changelogId = $this->maxChangeLogId($this->getUsergroup($userData));
+    public function updateChangelogUserInfo(ZfExtended_Models_User $user){
+        $changelogId = $this->maxChangeLogId($this->getUsergroup());
         $db = $this->db->getAdapter();
         $sql = 'REPLACE INTO LEK_user_changelog_info (userId,changelogId) VALUES(?,?)';
-        $db->query($sql, [$userData->id, $changelogId]);
+        $db->query($sql, [$user->getId(), $changelogId]);
         return $changelogId;
     }
     
@@ -154,15 +153,14 @@ class editor_Models_Changelog extends ZfExtended_Models_Entity_Abstract {
     /**
      * Generates usergroup bit map based on the aclRoles of the user
      * If the user has a role not configured here, this has no influence on the bit map
-     * 
-     * @param stdClass $userData
+     *
      * @return integer
      */
-    public function getUsergroup(stdClass $userData){
+    public function getUsergroup(){
         $this->checkGroups();
-        $user = new Zend_Session_Namespace('user');
+        $roles = ZfExtended_Authentication::getInstance()->getUserRoles();
         $userGroupId=0;
-        foreach($user->data->roles as $role) {
+        foreach($roles as $role) {
             if(isset($this->aclRoleValue[$role])) {
                 $userGroupId+=$this->aclRoleValue[$role];
             }

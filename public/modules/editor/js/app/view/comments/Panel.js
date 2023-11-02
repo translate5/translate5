@@ -38,12 +38,16 @@ Ext.define('Editor.view.comments.Panel', {
     extend: 'Ext.panel.Panel',
     alias: 'widget.commentPanel',
     controller: 'commentPanel',
+    viewModel:{
+        type:'commentPanel'
+    },
 
     cls:'commentPanel',
 
     requires: [
         'Editor.view.comments.Grid',
-        'Editor.view.comments.PanelViewController'
+        'Editor.view.comments.PanelViewController',
+        'Editor.view.comments.PanelViewModel'
     ],
 
     title: '#UT#Kommentare zum aktuellen Segment',
@@ -66,7 +70,7 @@ Ext.define('Editor.view.comments.Panel', {
      */
     isCollapsable: true,
     /**
-     * show a confirm message box before the deletion of a comment
+     * show the confirmation message box before the deletion of a comment
      * @param {Function} callback
      */
     showDeleteConfirm: function (callback) {
@@ -108,7 +112,10 @@ Ext.define('Editor.view.comments.Panel', {
                 items: [{
                     xtype: 'container',
                     itemId: 'commentContainer',
-                    layout: {
+                    bind:{
+                      disabled:'{commentPanelIsDisabled}'
+                    },
+                    lyout: {
                         align: 'stretch',
                         type: 'vbox'
                     },

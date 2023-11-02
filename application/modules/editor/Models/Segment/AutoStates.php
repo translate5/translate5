@@ -525,19 +525,8 @@ class editor_Models_Segment_AutoStates {
      * @param editor_Models_Segment $segment
      */
     public function updateAfterCommented(editor_Models_Segment $segment, editor_Models_TaskUserAssoc $tua) {
-        $workflow = ZfExtended_Factory::get('editor_Workflow_Manager')->getActive($segment->getTaskGuid());
-        if($tua->getRole() == $workflow::ROLE_TRANSLATORCHECK) {
-            $segment->setAutoStateId(self::REVIEWED_TRANSLATOR); //TODO if we have TRANSLATE-1704 then this must be changed too
-            return;
-        }
-        if($tua->getRole() == $workflow::ROLE_REVIEWER) {
-            $segment->setAutoStateId(self::REVIEWED_UNCHANGED);
-            return;
-        }
-        if($this->isEditWithoutAssoc($tua)){
-            $segment->setAutoStateId(self::REVIEWED_PM_UNCHANGED);
-            return;
-        }
+        $calculated = $this->calculateSegmentState($segment,$tua);
+        $segment->setAutoStateId($calculated);
     }
 
     /**

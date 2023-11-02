@@ -59,14 +59,33 @@ class editor_Models_Import_CliImportWorker extends ZfExtended_Worker_Abstract
         $customer = ZfExtended_Factory::get(editor_Models_Customer_Customer::class);
         $customer->loadByNumber($parameters['customerNumber']);
 
+        $language = ZfExtended_Factory::get(\editor_Models_Languages::class);
+        if (!is_numeric($parameters['source'])) {
+            $language->loadByRfc5646($parameters['source']);
+            $parameters['source'] = $language->getId();
+        }
+
+        if (!is_null($parameters['pivotLanguage']) && !is_numeric($parameters['pivotLanguage'])) {
+            $language->loadByRfc5646($parameters['pivotLanguage']);
+            $parameters['pivotLanguage'] = $language->getId();
+        }
+
         $project = $this->createProject(
             $pm,
             $customer,
             $parameters['source'],
             $parameters['taskName'],
             $parameters['workflow'],
-            $parameters['description']
+            $parameters['description'],
+            $parameters['pivotLanguage'] ?? null
         );
+
+        foreach ($parameters['targets'] as $idx => $lang) {
+            if (!is_numeric($lang)) {
+                $language->loadByRfc5646($lang);
+                $parameters['targets'][$idx] = $language->getId();
+            }
+        }
 
         $data = [
             'pmGuid' => $project->getPmGuid(),
@@ -94,13 +113,17 @@ class editor_Models_Import_CliImportWorker extends ZfExtended_Worker_Abstract
         int $sourceLang,
         string $taskName,
         string $workflow,
-        ?string $description
+        ?string $description,
+        ?int $pivotLanguage,
     ): editor_Models_Task {
         $project = ZfExtended_Factory::get(editor_Models_Task::class);
         $project->createTaskGuidIfNeeded();
         $project->setImportAppVersion(ZfExtended_Utils::getAppVersion());
 
         $project->setSourceLang($sourceLang);
+        if (!is_null($pivotLanguage)) {
+            $project->setRelaisLang($pivotLanguage);
+        }
         $project->setTaskName($taskName);
         $project->setPmGuid($pm->getUserGuid());
         $project->setPmName($pm->getUsernameLong());

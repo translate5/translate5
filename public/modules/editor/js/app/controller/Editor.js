@@ -224,8 +224,8 @@ Ext.define('Editor.controller.Editor', {
             'F2':             [Ext.EventObjectImpl.F2,{ctrl: false, alt: false}, me.handleF2KeyPress, true],
             'F3':             [Ext.EventObjectImpl.F3,{ctrl: false, alt: false}, me.handleF3KeyPress, true],
             'alt-F3':         [Ext.EventObjectImpl.F3,{ctrl: false, alt: true}, me.handleAltF3KeyPress, true],
-            'ctrl-insert':    [Ext.EventObjectImpl.INSERT,{ctrl: true, alt: false}, me.copySourceToTarget],
-            'ctrl-dot':       [190,{ctrl: true, alt: false}, me.copySourceToTarget], //Mac Alternative key code,
+            'ctrl-insert':    [Ext.EventObjectImpl.INSERT,{ctrl: true, alt: false}, me.copyReferenceToTarget],
+            'ctrl-dot':       [190,{ctrl: true, alt: false}, me.copyReferenceToTarget], //Mac Alternative key code,
             // DEC_DIGITS:
             // (If you change the setting for a defaultEventAction for DEC_DIGITS,
             // please check if eventIsTranslate5() still works as expected 
@@ -406,12 +406,12 @@ Ext.define('Editor.controller.Editor', {
         //if needed add current edited segment here too
         vm.set('isEditingSegment', true);
         me.prevNextSegment.calculateRows(context); //context.record, context.rowIdx TODO
-        me.getSourceTags(context);
+        me.getReferenceTags(context);
     },
-    getSourceTags: function(context) {
+    getReferenceTags: function(context) {
         var me = this,
             plug = me.getEditPlugin(),
-            source = context.record.get('source'),
+            source = context.record.get(plug.editor.mainEditor.getReferenceField()),
             tempNode, walkNodes;
 
         me.sourceTags = [];
@@ -1652,13 +1652,13 @@ Ext.define('Editor.controller.Editor', {
         me.quickSearchInfoMessage.showMessage();
     },
 
-    copySourceToTarget: function() {
+    copyReferenceToTarget: function() {
         var plug = this.getEditPlugin();
         //do only something when editing targets:
         if(!this.isEditing || !/^target/.test(plug.editor.columnToEdit)){
             return;
         }
-        plug.editor.mainEditor.insertMarkup(plug.context.record.get('source'));
+        plug.editor.mainEditor.insertMarkup(plug.context.record.get(plug.editor.mainEditor.getReferenceField()));
     },
     insertWhitespaceNbsp: function(key,e) {
         this.insertWhitespace(key,e,'nbsp');

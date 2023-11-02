@@ -69,7 +69,8 @@ class T5MemoryMigrationCommand extends Translate5AbstractCommand
     private const OPTION_WAIT_TIMEOUT = 'wait-timeout';
     private const OPTION_CLONE_LANGUAGE_RESOURCE = 'duplicate-language-resource';
     private const OPTION_CLONED_NAME_PART = 'cloned_name_part';
-    private const OPTION_TM_NAME = 'tmName';
+    private const OPTION_TM_NAME = 'tm-name';
+    private const OPTION_CREATE_EMPTY = 'create-empty';
     private const DATA_RELATIVE_PATH = '/../data/';
     private const EXPORT_FILE_EXTENSION = '.tmx';
     private const DEFAULT_WAIT_TIME_SECONDS = 600;
@@ -130,7 +131,14 @@ class T5MemoryMigrationCommand extends Translate5AbstractCommand
                 self::OPTION_TM_NAME,
                 'f',
                 InputOption::VALUE_REQUIRED,
-                'If no UUID was given this will filter the list of all TMs if provided'
+                'This will filter the list of all TMs if provided'
+            )
+            ->addOption(
+                self::OPTION_CREATE_EMPTY,
+                'e',
+                InputOption::VALUE_REQUIRED,
+                'UUID of the TM. If provided empty memory is created in the destination ' .
+                't5memory omitting the export/import process'
             );
     }
 
@@ -145,17 +153,31 @@ class T5MemoryMigrationCommand extends Translate5AbstractCommand
         $this->initTranslate5();
 
         $service = new Service();
+        $sourceUrl = $input->getArgument(self::ARGUMENT_SOURCE_URL);
+        $targetUrl = $this->getTargetUrl($input, $service);
 
-        $sourceResourceId = $this->getSourceResourceId($input, $service);
+        $sourceResourceId = $this->getSourceResourceId($sourceUrl, $service);
         $languageResourcesData = $this->getLanguageResourcesData($input, $sourceResourceId);
 
         if (count($languageResourcesData) === 0) {
-            $this->io->warning('Nothing to process. Exit.');
+            $this->io->warning('No language resources found for the given source URL');
+
+            if (!$this->isFilteringByName() // We are not filtering by name, but processing all resources
+                && !$this->createEmptyRequested() // We are not creating empty resource in target t5memory
+            ) {
+                $helper = $this->getHelper('question');
+                $question = new ConfirmationQuestion(
+                    'Do you want to remove ' . $sourceUrl . ' from config? (Y/N)',
+                    false
+                );
+
+                if ($helper->ask($this->input, $this->output, $question)) {
+                    $this->cleanupConfig($sourceUrl, $targetUrl);
+                }
+            }
 
             return self::SUCCESS;
         }
-
-        $targetUrl = $this->getTargetUrl($input, $service);
 
         if (!$this->isFilteringByName()) {
             $questionText = 'All memories will be migrated from ' . $input->getArgument(self::ARGUMENT_SOURCE_URL)
@@ -188,7 +210,7 @@ class T5MemoryMigrationCommand extends Translate5AbstractCommand
             $filenameWithPath = $this->getFilePath() . $this->generateFilename($languageResource);
 
             try {
-                $this->export($connector, $languageResource, $filenameWithPath, $type);
+                $this->exportIfNeeded($connector, $languageResource, $filenameWithPath, $type);
             } catch (Throwable $e) {
                 $processingErrors[] = [
                     'language resource id' => $languageResourceData['id'],
@@ -202,7 +224,7 @@ class T5MemoryMigrationCommand extends Translate5AbstractCommand
             $languageResource->setResourceId($targetResourceId);
 
             try {
-                $this->import($connector, $languageResource, $filenameWithPath, $type);
+                $this->importOrCreateEmpty($connector, $languageResource, $filenameWithPath, $type);
             } catch (Throwable $e) {
                 $processingErrors[] = [
                     'language resource: ' => $languageResourceData['id'] . ' (' . $languageResource->getName() . ')',
@@ -211,16 +233,6 @@ class T5MemoryMigrationCommand extends Translate5AbstractCommand
 
                 $this->revertChanges($languageResource, $languageResourceData);
             }
-        }
-
-        if (
-            empty($processingErrors) // No errors occurred
-            && !$cloneLanguageResource // We are not cloning language resources
-            && !$input->hasOption(self::OPTION_TM_NAME) // We are not filtering by name, but processing all resources
-        ) {
-            $this->cleanupConfig($sourceResourceId);
-            $targetResourceId = $this->getTargetResourceId($targetUrl);
-            $this->updateLanguageResources(array_column($languageResourcesData, 'id'), $targetResourceId);
         }
 
         $this->writeResult($processingErrors);
@@ -232,7 +244,7 @@ class T5MemoryMigrationCommand extends Translate5AbstractCommand
         return self::SUCCESS;
     }
 
-    private function getTargetUrl(InputInterface $input, Service $service): Uri
+    private function getTargetUrl(InputInterface $input, Service $service): string
     {
         $url = new Uri($input->getArgument(self::ARGUMENT_TARGET_URL));
         $urlFound = false;
@@ -247,19 +259,11 @@ class T5MemoryMigrationCommand extends Translate5AbstractCommand
             $this->addUrlToConfig($url);
         }
 
-        if ($urlFound && !$input->hasOption(self::OPTION_TM_NAME)) {
-            // Command can be run several times only when filtering by name,
-            // if URL is already in config - command was already run in batch mode
-            throw new RuntimeException('Endpoint already exists');
-        }
-
-        return $url;
+        return (string)$url;
     }
 
-    private function getSourceResourceId(InputInterface $input, Service $service): ?string
+    private function getSourceResourceId(string $sourceUrl, Service $service): ?string
     {
-        $sourceUrl = $input->getArgument(self::ARGUMENT_SOURCE_URL);
-
         $resourceId = null;
         foreach ($service->getResources() as $resource) {
             if ($sourceUrl && $resource->getUrl() === $sourceUrl) {
@@ -304,41 +308,40 @@ class T5MemoryMigrationCommand extends Translate5AbstractCommand
      * @throws ZfExtended_Models_Entity_Exceptions_IntegrityConstraint
      * @throws JsonException
      */
-    private function cleanupConfig(string $otmResourceId): void
+    private function cleanupConfig(string $sourceUrl): void
     {
         $service = new Service();
-
-        foreach ($service->getResources() as $resource) {
-            if ($resource->getId() === $otmResourceId) {
-                $url = $resource->getUrl();
-                break;
-            }
-        }
-
-        if (!isset($url)) {
-            throw new RuntimeException('Something went wrong, OpenTM2 url not found, can not cleanup');
-        }
+        $namespace = $service->getServiceNamespace();
 
         $config = ZfExtended_Factory::get(editor_Models_Config::class);
         $config->loadByName('runtimeOptions.LanguageResources.opentm2.server');
         $value = json_decode($config->getValue(), true, 512, JSON_THROW_ON_ERROR);
 
-        array_splice($value, array_search($url, $value, true), 1);
+        array_splice($value, array_search($sourceUrl, $value, true), 1);
+
+        $newIndexes = [];
+        foreach ($service->getResources() as $resource) {
+            $newIndexes[$resource->getId()] = array_search($resource->getUrl(), $value, true);
+        }
 
         $config->setValue(json_encode($value, JSON_THROW_ON_ERROR));
         $config->save();
 
-        $dbConfig = ZfExtended_Factory::get(DbConfig::class);
-        $dbConfig->setBootstrap(Zend_Registry::get('bootstrap'));
-        $dbConfig->init();
+        foreach ($newIndexes as $resourceId => $newIndex) {
+            if ($newIndex === false) {
+                continue;
+            }
+
+            $this->updateLanguageResources($resourceId, $namespace . '_' . ++$newIndex);
+        }
     }
 
-    private function getTargetResourceId(Uri $url): string
+    private function getTargetResourceId(string $url): string
     {
         $service = new Service();
 
         foreach ($service->getResources() as $resource) {
-            if ($resource->getUrl() === (string)$url) {
+            if ($resource->getUrl() === $url) {
                 return $resource->getId();
             }
         }
@@ -356,12 +359,16 @@ class T5MemoryMigrationCommand extends Translate5AbstractCommand
         return APPLICATION_PATH . self::DATA_RELATIVE_PATH;
     }
 
-    private function export(
+    private function exportIfNeeded(
         Connector $connector,
         LanguageResource $languageResource,
         string $filenameWithPath,
         string $type
     ): void {
+        if ($this->createEmptyRequested()) {
+            return;
+        }
+
         $connector->connectTo(
             $languageResource,
             $languageResource->getSourceLang(),
@@ -378,17 +385,21 @@ class T5MemoryMigrationCommand extends Translate5AbstractCommand
     /**
      * @throws Zend_Exception
      */
-    private function import(
+    private function importOrCreateEmpty(
         Connector $connector,
         LanguageResource $languageResource,
         string $filenameWithPath,
         string $type
     ): void {
-        $fileInfo = [
-            'tmp_name' => $filenameWithPath,
-            'type' => $type,
-            'name' => basename($filenameWithPath),
-        ];
+        if (!$this->createEmptyRequested()) {
+            $fileInfo = [
+                'tmp_name' => $filenameWithPath,
+                'type' => $type,
+                'name' => basename($filenameWithPath),
+            ];
+        } else {
+            $fileInfo = [];
+        }
 
         $connector->connectTo($languageResource, $languageResource->getSourceLang(), $languageResource->getTargetLang());
         $successful = $connector->addTm($fileInfo);
@@ -437,11 +448,11 @@ class T5MemoryMigrationCommand extends Translate5AbstractCommand
         $this->io->table($headers, $processingErrors);
     }
 
-    private function updateLanguageResources(array $languageResourcesIds, string $t5MemoryResourceId)
+    private function updateLanguageResources(string $sourceResourceId, string $targetResourceId): void
     {
         $sql = "UPDATE `LEK_languageresources` 
-                SET `resourceId` = '{$t5MemoryResourceId}'
-                WHERE `id` IN (" . implode(', ', $languageResourcesIds) . ")";
+                SET `resourceId` = '{$targetResourceId}'
+                WHERE `resourceId` = '{$sourceResourceId}'";
 
         $languageResource = ZfExtended_Factory::get(LanguageResource::class);
         $languageResource->db->getAdapter()->query($sql);
@@ -550,6 +561,25 @@ class T5MemoryMigrationCommand extends Translate5AbstractCommand
     {
         $languageResource = ZfExtended_Factory::get(LanguageResource::class);
 
+        $createEmptyUUID = $input->getOption(self::OPTION_CREATE_EMPTY);
+        if ($createEmptyUUID !== null) {
+            try {
+                $data = $languageResource->loadByUuid($createEmptyUUID);
+            } catch (ZfExtended_Models_Entity_NotFoundException) {
+                $this->io->error('Language resource with UUID "' . $createEmptyUUID . '" not found.');
+
+                return [];
+            }
+
+            if ($data['resourceId'] !== $sourceResourceId) {
+                $this->io->error('Language resource has different resource id.');
+
+                return [];
+            }
+
+            return [$data];
+        }
+
         if (!$this->isFilteringByName()) {
             // Return all language resources for given source resource id in case there is no filter by name
             return $languageResource->getByResourceId($sourceResourceId);
@@ -574,6 +604,11 @@ class T5MemoryMigrationCommand extends Translate5AbstractCommand
         }
 
         return $languageResourcesData;
+    }
+
+    private function createEmptyRequested(): bool
+    {
+        return $this->getInput()->getOption(self::OPTION_CREATE_EMPTY) !== null;
     }
 
     protected function getInput(): InputInterface

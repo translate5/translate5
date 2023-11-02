@@ -122,10 +122,6 @@ Ext.define('Editor.controller.admin.TaskOverview', {
      */
     advancedFilterWindow: null,
 
-    /***
-     * Action menu cache component
-     */
-    menuCache: [],
     /**
      * Container for translated task handler confirmation strings
      * Deletion of an entry means to disable confirmation.
@@ -281,8 +277,6 @@ Ext.define('Editor.controller.admin.TaskOverview', {
     handleInitEditor: function () {
         let me = this;
         me.closeAdvancedFilterWindow();
-        // reset the menu cache after the view port is changed
-        me.menuCache = [];
     },
     clearTasks: function () {
         this.getAdminTasksStore().removeAll();
@@ -1005,13 +999,21 @@ Ext.define('Editor.controller.admin.TaskOverview', {
      */
     showActionMenu: function (selectedTask, event, menuXtype) {
         var me = this,
-            menu = me.menuCache[menuXtype],
-            vm = null;
+            menu,
+            vm;
 
-        if (!menu) {
-            //create fresh menu instance
-            me.menuCache[menuXtype] = menu = Ext.widget(menuXtype, {task: selectedTask});
-        }
+
+        // Clean up all other menu components before creating new one. This must be done manually because autoDestroy
+        // for the menu item does not work correctly. When using autoDestroy, the component is destroyed on hide. The
+        // problem is that the click events are triggered after the hide event, which leads to not registered click events
+        // because the component is already destroyed.
+        // Another reason for not holding instance object as cache is, in the component creation, custom event is triggered
+        // which allows menu items from plugins to be injected. Having cached component will not trigger this.
+        me.cleanUpActionMenu();
+
+        //create fresh menu instance
+        menu = Ext.widget(menuXtype, {task: selectedTask});
+
         vm = menu.getViewModel();
         vm && vm.set('task', selectedTask);
         if(menuXtype === 'projectActionMenu'){
@@ -1348,5 +1350,14 @@ Ext.define('Editor.controller.admin.TaskOverview', {
                 });
             }
         });
+    },
+
+    /**
+     * Remove all existing task action menu components. Each time when the action menu is requested to be opened, we will
+     * create new component.
+     */
+    cleanUpActionMenu: function (){
+        var menus = Ext.ComponentQuery.query('#taskActionMenu');
+        menus.forEach((element) => element.destroy());
     }
 });

@@ -98,12 +98,11 @@ class editor_Models_Filter_TaskSpecific extends ZfExtended_Models_Filter_ExtJs6 
             return;
         }
         //if the user filter is used, apply the current user as additional TaskAssocFilter
-        $user = new Zend_Session_Namespace('user');
         $filter = new stdClass();
         $filter->field = 'userGuid';
         $filter->type = 'string';
         $filter->comparison = 'eq';
-        $filter->value = $user->data->userGuid;
+        $filter->value = ZfExtended_Authentication::getInstance()->getUserGuid();
         $filter->table = $userStateFilter->type->getTable();
         $this->addFilter($filter);
     }

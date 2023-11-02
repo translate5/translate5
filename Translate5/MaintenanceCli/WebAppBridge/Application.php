@@ -83,6 +83,10 @@ class Application {
         $index->addModuleOptions('default');
         $index->addModuleOptions('editor');
 
+        //faking the viewsetup to get the correct view search paths
+        $viewSetup = new \ZfExtended_Controllers_Plugins_ViewSetup();
+        $viewSetup->routeShutdown(new \Zend_Controller_Request_Simple());
+
         //set the hostname to the configured one:
         $config = \Zend_Registry::get('config');
         $this->hostname = $config->runtimeOptions->server->name;

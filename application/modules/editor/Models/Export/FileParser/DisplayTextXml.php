@@ -64,7 +64,7 @@ class editor_Models_Export_FileParser_DisplayTextXml extends editor_Models_Expor
             $xmlparser->replaceChunk($key, $segment);
         });
         
-        $this->_exportFile = $xmlparser->parse($this->_skeletonFile, false);
+        $this->_exportFile = $xmlparser->parse($this->skeletonFile, false);
     }
     
     /**

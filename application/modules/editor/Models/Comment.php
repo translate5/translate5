@@ -116,8 +116,7 @@ class editor_Models_Comment extends ZfExtended_Models_Entity_Abstract {
    * @return array
    */
   public function loadBySegmentId(int $segmentId, string $taskGuid) {
-      $sessionUser = new Zend_Session_Namespace('user');
-      $userGuid = $sessionUser->data->userGuid ?? null;
+      $userGuid = ZfExtended_Authentication::getInstance()->getUserGuid();
       $comments = $this->loadBySegmentAndTaskPlain($segmentId, $taskGuid);
       $editable = true;
       //comment is editable until an other user has edited it. 
@@ -174,13 +173,12 @@ class editor_Models_Comment extends ZfExtended_Models_Entity_Abstract {
    * calculates the isEditable state of the current comment
    */
   public function isEditable() {
-      $sessionUser = new Zend_Session_Namespace('user');
-      //SELECT explained: 
+      //SELECT explained:
       //if there are newer comments (id > ?) to this segment (segId=?) of another user (userGuid=?), the actual user cant edit the comment anymore
       $s = $this->db->select()
           ->where('id > ?', $this->getId())
           ->where('segmentId = ?', $this->getSegmentId())
-          ->where('userGuid != ?', $sessionUser->data->userGuid);
+          ->where('userGuid != ?', ZfExtended_Authentication::getInstance()->getUserGuid());
       $res = $this->db->getAdapter()->fetchAll($s);
       return empty($res);
   }

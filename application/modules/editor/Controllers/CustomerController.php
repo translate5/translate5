@@ -247,9 +247,8 @@ class Editor_CustomerController extends ZfExtended_RestController {
      * @param int $customerId
      */
     protected function setupTextExportResourcesLogData(int $customerId = null) {
-        $user = new Zend_Session_Namespace('user');
         $allowed = ['testmanager','testapiuser'];
-        if(!in_array($user->data->login, $allowed)){
+        if(!in_array(ZfExtended_Authentication::getInstance()->getLogin(), $allowed)){
             throw new ZfExtended_Models_Entity_NoAccessException('The current user is not alowed to use the resources log export data.');
         }
         $export = ZfExtended_Factory::get('editor_Models_LanguageResources_UsageExporter');
