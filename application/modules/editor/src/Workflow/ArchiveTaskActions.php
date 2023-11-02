@@ -50,7 +50,7 @@ class ArchiveTaskActions {
      * The affected tasks (as data array)
      * @var editor_Models_Task[]
      */
-    private array $tasks;
+    private array $tasks = [];
 
     /**
      * @throws Zend_Exception
@@ -60,30 +60,42 @@ class ArchiveTaskActions {
         $this->triggerConfig = $triggerConfig;
         //configurable limit per call, defaulting to 5, to reduce DB load per each call
         $limit = $triggerConfig->parameters->limit ?? 5;
+        $workflowSteps = $triggerConfig->parameters->workflowSteps ?? [];
 
         $config = Zend_Registry::get('config');
-        $taskLifetimeDays= $config->runtimeOptions->taskLifetimeDays;
+        $taskLifetimeDays = $config->runtimeOptions->taskLifetimeDays;
 
         $daysOffset = $taskLifetimeDays ?? 100;
 
-        if(!$daysOffset){
+        if (!$daysOffset){
             throw new ArchiveException('E1399');
         }
 
         /** @var editor_Models_Task $taskEntity */
-        $taskEntity = ZfExtended_Factory::get('editor_Models_Task');
+        $taskEntity = ZfExtended_Factory::get(editor_Models_Task::class);
 
         $daysOffset = (int)$daysOffset; //ensure that it is plain integer
-        $s = $taskEntity->db->select()
-            ->where('`state` = ?', $taskEntity::STATE_END)
+        $select = $taskEntity->db->select();
+
+        if (!empty($workflowSteps)) {
+            $select->where('(`state` = ?', $taskEntity::STATE_END)
+                ->orWhere('`workflowStepName` IN (?))', $workflowSteps);
+        } else {
+            $select->where('`state` = ?', $taskEntity::STATE_END);
+        }
+
+        $select
             ->where('`modified` < (CURRENT_DATE - INTERVAL ? DAY)', $daysOffset)
-            ->limit($limit); // since this action should be normally called periodically, we limit that on a specific amount
-        $this->tasks = $taskEntity->db->getAdapter()->fetchAll($s) ?? [];
-        foreach($this->tasks as $id => $task) {
+            // since this action should be normally called periodically, we limit that on a specific amount
+            ->limit($limit);
+
+        $tasks = $taskEntity->db->getAdapter()->fetchAll($select) ?? [];
+
+        foreach($tasks as $id => $task) {
             $taskEntity->load($task['id']);
             $this->tasks[$id] = $taskEntity;
             //creating a new instance for each loaded task
-            $taskEntity = ZfExtended_Factory::get('editor_Models_Task');
+            $taskEntity = ZfExtended_Factory::get(editor_Models_Task::class);
         }
     }
 
