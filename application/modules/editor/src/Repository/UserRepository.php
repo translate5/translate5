@@ -70,14 +70,11 @@ class UserRepository
      */
     public function getPmList(): iterable
     {
-        $roles = join('|', $this->acl->getRolesWith('editor_task', 'all'));
-
         $userModel = ZfExtended_Factory::get(ZfExtended_Models_User::class);
-        $userModel->db->select()->where("CONCAT(',', `roles`, ',') REGEXP ',(?),'", $roles);
-        $users = $userModel->db->fetchAll();
+        $users = ZfExtended_Factory::get(ZfExtended_Models_User::class)->loadAllByRole([ACL_ROLE_PM]);
 
         foreach ($users as $user) {
-            $userModel->init($user->toArray());
+            $userModel->init($user);
 
             yield clone $userModel;
         }
