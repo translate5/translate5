@@ -62,6 +62,7 @@ Ext.define('Editor.view.admin.task.menu.TaskActionMenu', {
         var me = this,
             task = instanceConfig.task,
             config = {
+                autoDestroy: true,
                 //Info: all items should be hidden by default, with this we reduce the "blinking" component behaviour
                 items: [{
                     text: me.strings.cancelImportText,

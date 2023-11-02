@@ -172,7 +172,8 @@ Ext.define('Editor.controller.Localizer', {
                 none: '<?php echo $this->translate->_('Segmente ohne Wiederholungen');?>',
                 source: '<?php echo $this->translate->_('Segmente mit Wiederholungen nur in der Quellsprache');?>',
                 target: '<?php echo $this->translate->_('Segmente mit Wiederholungen nur in der Zielsprache');?>',
-                both: '<?php echo $this->translate->_('Segmente mit Wiederholungen in der Quell- und Zielsprache');?>'
+                both: '<?php echo $this->translate->_('Segmente mit Wiederholungen in der Quell- und Zielsprache');?>',
+                includeFirst: '<?php echo $this->translate->_('Fügen Sie zuerst den Abschnitt ein, der im Folgenden wiederholt wird');?>'
             },
             col: {
                 none: '<?php echo $this->translate->_('-');?>',
@@ -339,10 +340,15 @@ Ext.define('Editor.controller.Localizer', {
     Ext.define("Editor.locale.de.view.segments.HtmlEditor", {
         override: "Editor.view.segments.HtmlEditor",
         strings: {
+            source: '<?php echo $this->translate->_('Quelltext');?>',
+            targetAtImportTime: '<?php echo $this->translate->_('Zieltext') . ' ' . $this->translate->_('(zur Importzeit)');?>',
             tagOrderErrorText: '<?php echo $this->translate->_('Einige der im Segment verwendeten Tags sind in der falschen Reihenfolgen (schließender vor öffnendem Tag).');?>',
             tagMissingText: '<?php echo $this->translate->_('Folgende Tags fehlen:<br/><ul><li>{0}</li></ul>So entfernen Sie den Fehler:<br/><ul><li>Klicken Sie auf OK, um diese Nachricht zu entfernen</li><li>Drücken Sie ESC, um das Segment ohne Speichern zu verlassen</li><li>Öffnen Sie das Segment erneut</li></ul>Wiederholen Sie jetzt Ihre Änderungen.<br/>Verwenden Sie alternativ die Hilfeschaltfläche, und suchen Sie nach Tastenkombinationen, um die fehlenden Tags aus der Quelle einzugeben.');?>',
+            tagMissingTextSource: '<?php echo $this->translate->_('Folgende Tags fehlen:<br/><ul><li>{0}</li></ul>So entfernen Sie den Fehler:<br/><ul><li>Klicken Sie auf OK, um diese Nachricht zu entfernen</li><li>Drücken Sie ESC, um das Segment ohne Speichern zu verlassen</li><li>Öffnen Sie das Segment erneut</li></ul>Wiederholen Sie jetzt Ihre Änderungen.<br/>Verwenden Sie alternativ die Hilfeschaltfläche, und suchen Sie nach Tastenkombinationen, um die fehlenden Tags aus der Quelle einzugeben.');?>',
+            tagMissingTextTarget: '<?php echo $this->translate->_('Folgende Tags fehlen im Vergleich zum Zieltext (zum Zeitpunkt des Imports/der Vorübersetzung):<br/><ul><li>{0}</li></ul>So entfernen Sie den Fehler:<br/><ul><li>Klicken Sie auf OK, um diese Nachricht zu entfernen</li><li>Drücken Sie ESC, um das Segment ohne Speichern zu verlassen</li><li>Öffnen Sie das Segment erneut</li></ul>Wiederholen Sie jetzt Ihre Änderungen.<br/>Verwenden Sie alternativ die Hilfeschaltfläche, und suchen Sie nach Tastenkombinationen, um die fehlenden Tags aus der Quelle einzugeben.');?>',
             tagDuplicatedText: '<?php echo $this->translate->_('Die nachfolgenden Tags wurden beim Editieren dupliziert, das Segment kann nicht gespeichert werden. Löschen Sie die duplizierten Tags. <br />Duplizierte Tags:{0}');?>',
-            tagExcessText: '<?php echo $this->translate->_('Die folgenden Tags existieren nicht in der Quellsprache:<br/><ul><li>{0}</li></ul>So entfernen Sie den Fehler:<br/><ul><li>Klicken Sie auf OK, um diese Nachricht zu entfernen</li><li>Drücken Sie ESC, um das Segment ohne Speichern zu verlassen</li><li>Öffnen Sie das Segment erneut</li></ul>Wiederholen Sie jetzt Ihre Änderungen.');?>',
+            tagExcessTextSource: '<?php echo $this->translate->_('Die folgenden Tags existieren nicht in der Ausgangtext:<br/><ul><li>{0}</li></ul>So entfernen Sie den Fehler:<br/><ul><li>Klicken Sie auf OK, um diese Nachricht zu entfernen</li><li>Drücken Sie ESC, um das Segment ohne Speichern zu verlassen</li><li>Öffnen Sie das Segment erneut</li></ul>Wiederholen Sie jetzt Ihre Änderungen.');?>',
+            tagExcessTextTarget: '<?php echo $this->translate->_('Die folgenden Tags existieren nicht in der Zieltext (zur Importzeit/Vorübersetzung):<br/><ul><li>{0}</li></ul>So entfernen Sie den Fehler:<br/><ul><li>Klicken Sie auf OK, um diese Nachricht zu entfernen</li><li>Drücken Sie ESC, um das Segment ohne Speichern zu verlassen</li><li>Öffnen Sie das Segment erneut</li></ul>Wiederholen Sie jetzt Ihre Änderungen.');?>',
             tagRemovedText: '<?php echo $this->translate->_('Es wurden Tags mit fehlendem Partner entfernt!');?>',
             cantEditContents: '<?php echo $this->translate->_('Es ist Ihnen nicht erlaubt, den Segmentinhalt zu bearbeiten. Bitte verwenden Sie STRG+Z um Ihre Änderungen zurückzusetzen oder brechen Sie das Bearbeiten des Segments ab.');?>'
         }
@@ -1999,7 +2005,8 @@ Editor.data.l10n = {
             watchListFilterBtn: '<?php echo $this->translate->_('Lesezeichen');?>',
             helpTooltip: '<?php echo $this->translate->_('Tastaturkürzel nachschlagen');?>',
             showBookmarkedSegments: '<?php echo $this->translate->_('Nur Segmente mit Lesezeichen anzeigen');?>',
-            showRepeatedSegments: '<?php echo $this->translate->_('Nur Segmente mit Wiederholungen anzeigen');?>',
+            showRepeatedSegmentsIncludeFirst: '<?php echo $this->translate->_('Nur Segmente mit Wiederholungen anzeigen, einschließlich der ersten Segmente');?>',
+            showRepeatedSegmentsExcludeFirst: '<?php echo $this->translate->_('Nur Segmente mit Wiederholungen anzeigen, ausgenommen die ersten Segmente');?>',
 
             themeMenuConfigText: '<?php echo $this->translate->_('Layout');?>',
             interfaceTranslation: {
@@ -2110,13 +2117,20 @@ Editor.data.l10n = {
             float: '<?php echo $this->translate->_('Ein falsch erkannter Fehler?')?>'
         },
         close: '<?php echo $this->translate->_('Schließen');?>',
-        spreaded: '<?php echo $this->translate->_('Diesen Status für andere Ereignisse innerhalb dieser Aufgabe verteilt');?>',
+        spreaded: '<?php echo $this->translate->_('Diesen Status für alle Ereignisse innerhalb dieser Aufgabe verteilt');?>',
+        window: {
+            tooltip: '<?php echo join('. <br/>', [
+                    $this->translate->_('Ein Klick auf die Check-Box markiert den aktuellen Fehler als "falschen Fehler"'),
+                    $this->translate->_('Ein Klick auf die Zahl rechts markiert alle identischen Fehler als "falsche Fehler"'),
+                    $this->translate->_('Tastatur-Shortcut siehe Tooltip rechte Spalte "Qualitätssicherung"'),
+            ])?>'
+        },
         grid: {
             falsePositive: '<?php echo $this->translate->_('Ja');?>',
             text: '<?php echo $this->translate->_('Qualität');?>',
             emptyText: '<?php echo $this->translate->_('Ladequalität..');?>',
             similarQty: {
-                tooltip: '<?php echo $this->translate->_('Anzahl anderer Vorkommen eines solchen Paares [Qualität - Inhalt], die in dieser Aufgabe gefunden wurden');?>',
+                tooltip: '<?php echo $this->translate->_('Anzahl aller Vorkommen eines solchen Paares [Qualität - Inhalt], die in dieser Aufgabe gefunden wurden');?>',
                 button: '<?php echo $this->translate->_('Alle identischen Fehler ebenfalls als falsche Fehler markieren.');?>'
             }
         }

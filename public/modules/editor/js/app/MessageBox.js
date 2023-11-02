@@ -108,7 +108,7 @@ Ext.define('Editor.MessageBox',{
         var tpl = new Ext.XTemplate([
             '<table class="message-box-data">',
             '<tpl for=".">',
-            '<tr><td class="type">{type}: </td><td class="msg">{error}</td></tr>',
+            '<tr><td class="type"><tpl if="{type}">{type}:</tpl> </td><td class="msg">{error}</td></tr>',
             '</tpl>',
             '</table>'
         ]);
@@ -182,7 +182,10 @@ Ext.define('Editor.MessageBox',{
       return [
           '<div class="app-msg">',
           '<div class="x-box-tl"><div class="x-box-tr"><div class="x-box-tc"></div></div></div>',
-          '<div class="x-box-ml"><div class="x-box-mr"><div class="x-box-mc"><h3 class="x-icon-text icon-status-' + status + '">', title, '</h3>', msg, '</div></div></div>',
+          '<div class="x-box-ml"><div class="x-box-mr"><div class="x-box-mc">',
+                '<span class="x-fa fa-close"></span>',
+                '<h3 class="x-icon-text icon-status-' + status + '">', title, '</h3>', msg, '</div>',
+          '</div></div>',
           '<div class="x-box-bl"><div class="x-box-br"><div class="x-box-bc"></div></div></div>',
           '</div>'
       ].join('');

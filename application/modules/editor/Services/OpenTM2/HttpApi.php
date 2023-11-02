@@ -417,12 +417,19 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
      * @param string $source
      * @param string $target
      * @param editor_Models_Segment $segment
-     * @param $filename
+     * @param string $filename
+     * @param bool $save2disk
      * @return boolean
+     * @throws JsonException
      * @throws Zend_Http_Client_Exception
      */
-    public function update(string $source, string $target, editor_Models_Segment $segment, $filename): bool
-    {
+    public function update(
+        string $source,
+        string $target,
+        editor_Models_Segment $segment,
+        $filename,
+        bool $save2disk = true
+    ): bool {
         $this->error = null;
 
         $http = $this->getHttpWithMemory('POST', 'entry');
@@ -436,6 +443,7 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
         $json->author = $segment->getUserName();
         $json->timeStamp = $this->nowDate();
         $json->context = $segment->getMid(); //INFO: this is segment stuff
+        $json->save2disk = $save2disk;
 
         $http->setRawData($this->jsonEncode($json), 'application/json; charset=utf-8');
         return $this->processResponse($http->request());
@@ -509,11 +517,14 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
     {
 
         if($this->isToLong($source) || $this->isToLong($target)) {
+            $translate= ZfExtended_Zendoverwrites_Translate::getInstance();
             $this->error = new stdClass();
             $this->error->method = $this->httpMethod;
             $this->error->url = $this->http->getUri(true);
-            $this->error->type = 'TO_LONG';
-            $this->error->error = 'The given segment data is to long and would crash OpenTM2 on saving it.';
+            $this->error->error =
+                $translate->_(
+                    'Das Segment konnte nur in der Aufgabe, nicht aber ins TM gespeichert werden. Segmente länger als 2048 Bytes sind nicht im TM speicherbar.'
+                );
             return new stdClass();
         }
 

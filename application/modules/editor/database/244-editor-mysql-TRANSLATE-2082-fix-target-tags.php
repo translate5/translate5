@@ -30,6 +30,9 @@ END LICENSE AND COPYRIGHT
 /**
  * Fix TRANSLATE-2082 by readding the missing tags to the target
  */
+
+use MittagQI\Translate5\Task\Import\SkeletonFile;
+
 set_time_limit(0);
 
 //uncomment the following line, so that the file is not marked as processed:
@@ -58,7 +61,7 @@ class FixXlfTranslate2082 extends editor_Models_Import_FileParser_Xlf {
     protected $foundLekSegmentId;
     
     public function __construct($fileId, $task) {
-        $path = $task->getAbsoluteTaskDataPath().sprintf(editor_Models_File::SKELETON_PATH, $fileId);
+        $path = $task->getAbsoluteTaskDataPath().sprintf(SkeletonFile::SKELETON_PATH, $fileId);
         $backup = $path.'.backup';
         if(!file_exists($backup)) {
             copy($path, $backup);

@@ -34,7 +34,7 @@ Ext.define('Editor.controller.Quality', {
     extend : 'Ext.app.Controller',
     models: ['Editor.model.quality.Filter'],
     stores: ['Editor.store.quality.Filter'],
-    filterPanelMode: 'all', // the initial filter mode of the filter panel. Can be 'all' | 'error' | 'falsepositive'
+    filterPanelMode: 'error', // the initial filter mode of the filter panel. Can be 'all' | 'error' | 'falsepositive'
     listen: {
         component: {
             '#qualityFilterPanel #modeSelector': {

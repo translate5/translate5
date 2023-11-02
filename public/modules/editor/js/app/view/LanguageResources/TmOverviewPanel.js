@@ -125,6 +125,15 @@ Ext.define('Editor.view.LanguageResources.TmOverviewPanel', {
                 }],
                 columns: [{
                     xtype: 'gridcolumn',
+                    width: 50,
+                    text: 'ID',
+                    dataIndex: 'id',
+                    hidden: true,
+                    filter: {
+                        type: 'numeric'
+                    }
+                },{
+                    xtype: 'gridcolumn',
                     width: 170,
                     text: me.strings.resource,
                     dataIndex: 'serviceName',
