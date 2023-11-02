@@ -1250,8 +1250,8 @@
                     <br/>Alternatively use the help button and look for keyboard shortcuts to enter the  missing tags from the source.
                 </target>
             </trans-unit>
-            <trans-unit id='Rm9sZ2VuZGUgVGFncyBmZWhsZW4gaW0gWmllbHRleHQgKHp1ciBJbXBvcnR6ZWl0L1ZvcsO8YmVyc2V0enVuZyk6PGJyLz48dWw+PGxpPnswfTwvbGk+PC91bD5TbyBlbnRmZXJuZW4gU2llIGRlbiBGZWhsZXI6PGJyLz48dWw+PGxpPktsaWNrZW4gU2llIGF1ZiBPSywgdW0gZGllc2UgTmFjaHJpY2h0IHp1IGVudGZlcm5lbjwvbGk+PGxpPkRyw7xja2VuIFNpZSBFU0MsIHVtIGRhcyBTZWdtZW50IG9obmUgU3BlaWNoZXJuIHp1IHZlcmxhc3NlbjwvbGk+PGxpPsOWZmZuZW4gU2llIGRhcyBTZWdtZW50IGVybmV1dDwvbGk+PC91bD5XaWVkZXJob2xlbiBTaWUgamV0enQgSWhyZSDDhG5kZXJ1bmdlbi48YnIvPlZlcndlbmRlbiBTaWUgYWx0ZXJuYXRpdiBkaWUgSGlsZmVzY2hhbHRmbMOkY2hlLCB1bmQgc3VjaGVuIFNpZSBuYWNoIFRhc3RlbmtvbWJpbmF0aW9uZW4sIHVtIGRpZSBmZWhsZW5kZW4gVGFncyBhdXMgZGVyIFF1ZWxsZSBlaW56dWdlYmVuLg=='>
-                <source>Folgende Tags fehlen im Zieltext (zur Importzeit/Vorübersetzung):
+            <trans-unit id='Rm9sZ2VuZGUgVGFncyBmZWhsZW4gaW0gVmVyZ2xlaWNoIHp1bSBaaWVsdGV4dCAoenVtIFplaXRwdW5rdCBkZXMgSW1wb3J0cy9kZXIgVm9yw7xiZXJzZXR6dW5nKTo8YnIvPjx1bD48bGk+ezB9PC9saT48L3VsPlNvIGVudGZlcm5lbiBTaWUgZGVuIEZlaGxlcjo8YnIvPjx1bD48bGk+S2xpY2tlbiBTaWUgYXVmIE9LLCB1bSBkaWVzZSBOYWNocmljaHQgenUgZW50ZmVybmVuPC9saT48bGk+RHLDvGNrZW4gU2llIEVTQywgdW0gZGFzIFNlZ21lbnQgb2huZSBTcGVpY2hlcm4genUgdmVybGFzc2VuPC9saT48bGk+w5ZmZm5lbiBTaWUgZGFzIFNlZ21lbnQgZXJuZXV0PC9saT48L3VsPldpZWRlcmhvbGVuIFNpZSBqZXR6dCBJaHJlIMOEbmRlcnVuZ2VuLjxici8+VmVyd2VuZGVuIFNpZSBhbHRlcm5hdGl2IGRpZSBIaWxmZXNjaGFsdGZsw6RjaGUsIHVuZCBzdWNoZW4gU2llIG5hY2ggVGFzdGVua29tYmluYXRpb25lbiwgdW0gZGllIGZlaGxlbmRlbiBUYWdzIGF1cyBkZXIgUXVlbGxlIGVpbnp1Z2ViZW4u'>
+                <source>Folgende Tags fehlen im Vergleich zum Zieltext (zum Zeitpunkt des Imports/der Vorübersetzung):
                     <br/>
                     <ul>
                         <li>{0}</li>
@@ -1264,7 +1264,7 @@
                     </ul>Wiederholen Sie jetzt Ihre Änderungen.
                     <br/>Verwenden Sie alternativ die Hilfeschaltfläche, und suchen Sie nach Tastenkombinationen, um die fehlenden Tags aus der Quelle einzugeben.
                 </source>
-                <target>The following tags are missing in target text (at time of import/pretranslation):
+                <target>The following tags are missing comparing to target text (at time of import/pretranslation):
                     <br/>
                     <ul>
                         <li>{0}</li>
