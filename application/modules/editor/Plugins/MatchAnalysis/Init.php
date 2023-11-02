@@ -408,12 +408,10 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract
         array $batchResources
     ): void {
         $workerParameters = [];
-        if ($task->isImporting()) {
-            $workerState = ZfExtended_Models_Worker::STATE_PREPARE;
-        } else {
-            $workerState = ZfExtended_Models_Worker::STATE_SCHEDULED;
+        if (! $task->isImporting()) {
             $workerParameters['workerBehaviour'] = ZfExtended_Worker_Behaviour_Default::class;
         }
+        $workerState = ZfExtended_Models_Worker::STATE_SCHEDULED;
 
         /* @var editor_Models_LanguageResources_LanguageResource $languageResource */
         foreach ($batchResources as $languageResource) {
@@ -546,16 +544,18 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract
         if ($task->isImporting()) {
             //on import we use the import worker as parentId
             $parentWorkerId = $this->fetchImportWorkerId($task->getTaskGuid());
+            //on import scheduled is ok
+            $workerState = ZfExtended_Models_Worker::STATE_SCHEDULED;
         } else {
             // crucial: add a different behaviour for the workers when performig an operation
             $workerParameters['workerBehaviour'] = ZfExtended_Worker_Behaviour_Default::class;
             // this creates the operation start/finish workers
             $operation = editor_Task_Operation::create(editor_Task_Operation::MATCHANALYSIS, $task);
             $parentWorkerId = $operation->getWorkerId();
+            //on operations we init with prepare, since the operation schedules the prepared ones
+            $workerState = ZfExtended_Models_Worker::STATE_PREPARE;
         }
 
-        //always prepare in operation and in import context needed
-        $workerState = ZfExtended_Models_Worker::STATE_PREPARE;
 
         if (empty($valid)) {
             $this->addWarn(

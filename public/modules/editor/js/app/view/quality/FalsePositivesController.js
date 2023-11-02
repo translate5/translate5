@@ -221,9 +221,13 @@ Ext.define('Editor.view.quality.FalsePositivesController', {
      * @param text
      * @param meta
      * @param record
+     * @param rowIndex
+     * @param colIndex
+     * @param store
+     * @param view
      * @returns {string}
      */
-    falsepositivesGridTextRenderer: function(text, meta, record) {
+    falsepositivesGridTextRenderer: function(text, meta, record, rowIndex, colIndex, store, view) {
         meta.tdCls += ' quality';
 
         // Build label
@@ -240,6 +244,13 @@ Ext.define('Editor.view.quality.FalsePositivesController', {
 
             // Append img-tag to quality title
             qlty += ' <img class="x-label-symbol qmflag qmflag-{0}" src="' + src + '"> ';
+        }
+
+        // Apply qtip for record if we're NOT inside floating false-positives panel
+        if (!view.up('falsePositives[floating]')) {
+            if (rowIndex < 10) {
+                meta.tdAttr = 'data-qtip="Ctrl + Alt + ' + (rowIndex === 9 ? 0 : rowIndex + 1) + '"'
+            }
         }
 
         // Return
