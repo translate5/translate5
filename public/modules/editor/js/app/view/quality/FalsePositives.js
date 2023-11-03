@@ -63,6 +63,23 @@ Ext.define('Editor.view.quality.FalsePositives', {
             bind: {
                 text: '{l10n.falsePositives.grid.falsePositive}'
             },
+            renderer: function(value, meta, record, rowIndex, colIndex, store, view) {
+                var me = this, cls = me.checkboxCls, tip = '';
+
+                // Append checked style
+                if (value) {
+                    cls += ' ' + me.checkboxCheckedCls;
+                }
+
+                // Append data-qtip attribute
+                if (rowIndex < 10) {
+                    tip = 'data-qtip="Ctrl + Alt + ' + (rowIndex === 9 ? 0 : rowIndex + 1) + '"'
+                }
+
+                return '<span ' + (tip || '') + ' class="' + cls + '" role="' + me.checkboxAriaRole + '"' +
+                    (!me.ariaStaticRoles[me.checkboxAriaRole] ? ' tabIndex="0"' : '') +
+                    '></span>';
+            },
             listeners: {
                 checkchange: 'onFalsePositiveChanged',
             }
@@ -96,9 +113,9 @@ Ext.define('Editor.view.quality.FalsePositives', {
                 setUi: function(ui) {this.setUI(ui);},
                 bind: {
                     text: '{record.content ? record.similarQty : "-"}',
-                    disabled: '{record.similarQty == 0 || !record.falsePositiveChanged}',
+                    disabled: '{record.similarQty == 0}',
                     tooltip: '{l10n.falsePositives.grid.similarQty.button}',
-                    ui: '{record.similarQty == 0 || !record.falsePositiveChanged ? "default-toolbar-small" : "default"}'
+                    ui: '{record.similarQty == 0 ? "default-toolbar-small" : "default"}'
                 },
                 handler: 'onFalsePositiveSpread'
             }

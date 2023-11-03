@@ -100,8 +100,11 @@ Ext.define('Editor.controller.Segments', {
         ref: 'watchListFilterBtn',
         selector: '#watchListFilterBtn'
     }, {
-        ref: 'filterBtnRepeated',
-        selector: '#filterBtnRepeated'
+        ref: 'filterBtnRepeatedIncludeFirst',
+        selector: '#filterBtnRepeatedIncludeFirst'
+    }, {
+        ref: 'filterBtnRepeatedExcludeFirst',
+        selector: '#filterBtnRepeatedExcludeFirst'
     }, {
         ref: 'segmentsToolbar',
         selector: 'segmentsToolbar'
@@ -152,8 +155,11 @@ Ext.define('Editor.controller.Segments', {
             'segmentsToolbar #watchListFilterBtn': {
                 click: 'watchListFilter'
             },
-            'segmentsToolbar #filterBtnRepeated': {
-                click: 'repeatedFilter'
+            'segmentsToolbar #filterBtnRepeatedIncludeFirst': {
+                click: 'repeatedFilterIncludeFirst'
+            },
+            'segmentsToolbar #filterBtnRepeatedExcludeFirst': {
+                click: 'repeatedFilterExcludeFirst'
             }
         },
         store: {
@@ -356,16 +362,38 @@ Ext.define('Editor.controller.Segments', {
         segment.proxy.appendId = appendId;
     },
 
-    repeatedFilter: function (btn) {
+    repeatedFilterIncludeFirst: function (btn) {
         var me = this,
             grid = me.getSegmentGrid(),
-            column = grid.down('[dataIndex=isRepeated]');
+            column = grid.down('[dataIndex=isRepeated]'),
+            tbar = me.getSegmentsToolbar();
 
         if (column && column.filter) {
             if (btn.pressed) {
+                tbar.down('#filterBtnRepeatedExcludeFirst').toggle(false, false);
+                //1,2,3,4 contain in filter source only (1), target only (2), segments repeated in both (3), including first ones
+                column.filter.filter.setValue([1, 2, 3, 4]);
+                column.filter.active = false;
                 column.filter.setActive(true);
-                //1,2,3 contain in filter source only (1), target only (2), and segments repeatead in both (3)
+            } else {
+                column.filter.setActive(false);
+            }
+        }
+    },
+
+    repeatedFilterExcludeFirst: function (btn) {
+        var me = this,
+            grid = me.getSegmentGrid(),
+            column = grid.down('[dataIndex=isRepeated]'),
+            tbar = me.getSegmentsToolbar();
+
+        if (column && column.filter) {
+            if (btn.pressed) {
+                tbar.down('#filterBtnRepeatedIncludeFirst').toggle(false, false);
+                //1,2,3 contain in filter source only (1), target only (2), segments repeated in both (3), except first ones
                 column.filter.filter.setValue([1, 2, 3]);
+                column.filter.active = false;
+                column.filter.setActive(true);
             } else {
                 column.filter.setActive(false);
             }
@@ -407,16 +435,32 @@ Ext.define('Editor.controller.Segments', {
             tbar = me.getSegmentsToolbar(),
             watchListFound = false,
             isRepeatedFound = false,
-            params = {};
+            params = {},
+            isRepeatedValue,
+            includeFirst = false,
+            excludeFirst = false;
 
         filters.each(function (filter, index, len) {
             watchListFound = watchListFound || filter.getProperty() == 'isWatched';
             isRepeatedFound = isRepeatedFound || filter.getProperty() == 'isRepeated';
+            if (filter.getProperty() == 'isRepeated') {
+                isRepeatedValue = filter.getValue();
+            }
         });
 
         tbar.down('#watchListFilterBtn').toggle(watchListFound, false);
-        tbar.down('#filterBtnRepeated').toggle(isRepeatedFound, false);
 
+        // Setup values for includeFirst and includeFirst flags
+        if (isRepeatedFound) {
+            if (~isRepeatedValue.indexOf(1) || ~isRepeatedValue.indexOf(2) || ~isRepeatedValue.indexOf(3)) {
+                includeFirst = !!~isRepeatedValue.indexOf(4);
+                excludeFirst = !includeFirst;
+            }
+        }
+
+        // Toggle repetition-buttons based on those flags
+        tbar.down('#filterBtnRepeatedIncludeFirst').toggle(includeFirst, false);
+        tbar.down('#filterBtnRepeatedExcludeFirst').toggle(excludeFirst, false);
         params[proxy.getFilterParam()] = proxy.encodeFilters(store.getFilters().items);
 
         filters && me.styleResetFilterButton(filters);

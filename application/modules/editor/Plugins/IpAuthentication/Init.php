@@ -69,9 +69,11 @@ class editor_Plugins_IpAuthentication_Init extends ZfExtended_Plugin_Abstract {
     public function onInstantTranslateTermPortalAfterIndexAction(Zend_EventManager_Event $event): void
     {
         $view = $event->getParam('view');
-        $userSession = new Zend_Session_Namespace('user');
         //do not show the logout button if the user is ipbased
-        $view->isIpBasedUser = str_starts_with($userSession->data->login, IpBaseUser::IP_BASED_USER_LOGIN_PREFIX);
+        $view->isIpBasedUser = str_starts_with(
+            ZfExtended_Authentication::getInstance()->getLogin(),
+            IpBaseUser::IP_BASED_USER_LOGIN_PREFIX
+        );
     }
 
     /**
