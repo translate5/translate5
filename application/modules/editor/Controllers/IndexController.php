@@ -173,6 +173,14 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
         $this->_helper->layout->disableLayout();
         $validator = new ZfExtended_Models_SystemRequirement_Validator(false);
         $results = $validator->validate();
+
+        // HACK: DB-Update via frontend
+        // TODO OPENAI: remove
+        $dbuState = $this->temporaryUpdateDatabase();
+        if($dbuState !== null){
+            $results[$dbuState->id] = $dbuState;
+        }
+
         $this->view->hostname = gethostname();
         $this->view->validationResults = $results;
     }
@@ -936,6 +944,40 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
         } catch (Zend_Acl_Exception) {
             return false;
         }
+    }
+
+    /**
+     * TODO OPENAI: remove, this is just a temporary hack ...
+     * @return string
+     */
+    private function temporaryUpdateDatabase(): ?ZfExtended_Models_SystemRequirement_Result
+    {
+
+        $dbupdater = ZfExtended_Factory::get(ZfExtended_Models_Installer_DbUpdater::class, [true]);
+        $dbupdater->calculateChanges();
+        $newFiles = $dbupdater->getNewFiles();
+        $toProcess = [];
+
+        if(!empty($newFiles)){
+
+            foreach($newFiles as $key => $file) {
+                $toProcess[$file['entryHash']] = 1;
+            }
+
+            $result = new ZfExtended_Models_SystemRequirement_Result();
+            $result->id = 'databaseupdate';
+            $result->name = 'Database Update';
+
+            $importedCount = $dbupdater->applyNew($toProcess);
+            $dbupdater->updateModified($toProcess);
+            $result->error = $dbupdater->getErrors();
+            $result->warning = $dbupdater->getWarnings();
+            $result->info = ['Imported '.$importedCount.' files!'];
+
+            return $result;
+        }
+
+        return null;
     }
 }
 
