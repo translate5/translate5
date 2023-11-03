@@ -234,7 +234,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
         $source = $this->tagHandler->prepareQuery($this->getQueryString($segment));
         $target = $this->tagHandler->prepareQuery($segment->getTargetEdit());
 
-        $successful = $this->api->update($source, $target, $segment, $fileName);
+        $successful = $this->api->update($source, $target, $segment, $fileName, save2disk: !$this->isInternalFuzzy);
 
         if ($successful) {
             return;
@@ -244,7 +244,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
             $this->addReorganizeWarning($segment->getTask());
             $this->reorganizeTm();
 
-            $successful = $this->api->update($source, $target, $segment, $fileName);
+            $successful = $this->api->update($source, $target, $segment, $fileName, save2disk: !$this->isInternalFuzzy);
 
             if ($successful) {
                 return;

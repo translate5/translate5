@@ -417,12 +417,19 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
      * @param string $source
      * @param string $target
      * @param editor_Models_Segment $segment
-     * @param $filename
+     * @param string $filename
+     * @param bool $save2disk
      * @return boolean
+     * @throws JsonException
      * @throws Zend_Http_Client_Exception
      */
-    public function update(string $source, string $target, editor_Models_Segment $segment, $filename): bool
-    {
+    public function update(
+        string $source,
+        string $target,
+        editor_Models_Segment $segment,
+        $filename,
+        bool $save2disk = true
+    ): bool {
         $this->error = null;
 
         $http = $this->getHttpWithMemory('POST', 'entry');
@@ -436,6 +443,7 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
         $json->author = $segment->getUserName();
         $json->timeStamp = $this->nowDate();
         $json->context = $segment->getMid(); //INFO: this is segment stuff
+        $json->save2disk = $save2disk;
 
         $http->setRawData($this->jsonEncode($json), 'application/json; charset=utf-8');
         return $this->processResponse($http->request());
