@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "dec02b966556ca1ccbb0892a97037bb1",
+    "content-hash": "d431be30bed3b671a9317b2e1b6ed8a3",
     "packages": [
         {
             "name": "alchemy/binary-driver",
@@ -2828,39 +2828,39 @@
         },
         {
             "name": "openai-php/client",
-            "version": "v0.7.3",
+            "version": "v0.7.5",
             "source": {
                 "type": "git",
                 "url": "https://github.com/openai-php/client.git",
-                "reference": "86ffa2abe167d6192f01d4df90f83a97c8533303"
+                "reference": "db18414d01c09c9a6956e6a47f117e15ae9c9bab"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/openai-php/client/zipball/86ffa2abe167d6192f01d4df90f83a97c8533303",
-                "reference": "86ffa2abe167d6192f01d4df90f83a97c8533303",
+                "url": "https://api.github.com/repos/openai-php/client/zipball/db18414d01c09c9a6956e6a47f117e15ae9c9bab",
+                "reference": "db18414d01c09c9a6956e6a47f117e15ae9c9bab",
                 "shasum": ""
             },
             "require": {
                 "php": "^8.1.0",
-                "php-http/discovery": "^1.19.0",
+                "php-http/discovery": "^1.19.1",
                 "php-http/multipart-stream-builder": "^1.3.0",
-                "psr/http-client": "^1.0.2",
+                "psr/http-client": "^1.0.3",
                 "psr/http-client-implementation": "^1.0.1",
                 "psr/http-factory-implementation": "*",
                 "psr/http-message": "^1.1.0|^2.0.0"
             },
             "require-dev": {
-                "guzzlehttp/guzzle": "^7.7.0",
-                "guzzlehttp/psr7": "^2.5.0",
-                "laravel/pint": "^1.10.3",
-                "nunomaduro/collision": "^7.7.0",
-                "pestphp/pest": "^2.16.0",
-                "pestphp/pest-plugin-arch": "^2.2.1",
+                "guzzlehttp/guzzle": "^7.8.0",
+                "guzzlehttp/psr7": "^2.6.1",
+                "laravel/pint": "^1.13.2",
+                "nunomaduro/collision": "^7.9.0",
+                "pestphp/pest": "^2.19.2",
+                "pestphp/pest-plugin-arch": "^2.3.3",
                 "pestphp/pest-plugin-mock": "^2.0.0",
-                "pestphp/pest-plugin-type-coverage": "^2.0.0",
-                "phpstan/phpstan": "^1.10.25",
+                "pestphp/pest-plugin-type-coverage": "^2.2.0",
+                "phpstan/phpstan": "^1.10.35",
                 "rector/rector": "^0.16.0",
-                "symfony/var-dumper": "^6.3.1"
+                "symfony/var-dumper": "^6.3.4"
             },
             "type": "library",
             "autoload": {
@@ -2900,7 +2900,7 @@
             ],
             "support": {
                 "issues": "https://github.com/openai-php/client/issues",
-                "source": "https://github.com/openai-php/client/tree/v0.7.3"
+                "source": "https://github.com/openai-php/client/tree/v0.7.5"
             },
             "funding": [
                 {
@@ -2916,7 +2916,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2023-09-08T08:48:59+00:00"
+            "time": "2023-11-06T07:39:32+00:00"
         },
         {
             "name": "paquettg/php-html-parser",
@@ -7897,6 +7897,7 @@
         "ext-fileinfo": "*",
         "ext-curl": "*",
         "ext-posix": "*",
+        "ext-zlib": "*",
         "lib-imagick-imagemagick": "*",
         "ext-imagick": "*",
         "ext-bcmath": "*"
