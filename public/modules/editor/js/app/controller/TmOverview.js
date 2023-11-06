@@ -425,15 +425,25 @@ Ext.define('Editor.controller.TmOverview', {
         win.show();
     },
     handleImportTm: function (view, cell, cellIdx, rec) {
-        //find the import window from the service name
-        var importWindow = Editor.util.LanguageResources.getService(rec.get('serviceName')).getImportWindow(),
-            win = Ext.widget(importWindow);
-        win.loadRecord(rec);
 
         if(this.statusBlocksActionWithWindow(rec)){
             return;
         }
+        //find the import window from the service name, load the record & show
+        var importWindow = Editor.util.LanguageResources.getService(rec.get('serviceName')).getImportWindow(),
+            win = Ext.widget(importWindow);
+        win.loadRecord(rec);
+        win.show();
+    },
+    handleEditSpecific: function (view, cell, cellIdx, rec) {
+        // find the edit specific data window from the service name, by default this is empty
+        var configWindow = Editor.util.LanguageResources.getService(rec.get('serviceName')).getEditSpecificWindow();
 
+        if(!configWindow || this.statusBlocksActionWithWindow(rec)){
+            return;
+        }
+        var win = Ext.widget(configWindow);
+        win.loadRecord(rec);
         win.show();
     },
     handleTmGridActionColumnClick: function (view, cell, row, col, ev, record) {
@@ -465,6 +475,9 @@ Ext.define('Editor.controller.TmOverview', {
                     break;
                 case 'log':
                     me.handleLogTm(view, cell, col, newRecord);
+                    break;
+                case 'specific':
+                    me.handleEditSpecific(view, cell, col, newRecord);
                     break;
             }
         });

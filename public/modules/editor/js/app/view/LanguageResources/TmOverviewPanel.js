@@ -46,7 +46,7 @@ Ext.define('Editor.view.LanguageResources.TmOverviewPanel', {
     alias: 'widget.tmOverviewPanel',
     controller: 'tmOverviewPanel',
     itemId: 'tmOverviewPanel',
-    title:'#UT#Sprachressourcen',
+    title: '#UT#Sprachressourcen',
     helpSection: 'languageresource',
     glyph: 'xf1c0@FontAwesome5FreeSolid',
     strings: {
@@ -58,7 +58,7 @@ Ext.define('Editor.view.LanguageResources.TmOverviewPanel', {
         color: '#UT#Farbe',
         refresh: '#UT#Aktualisieren',
         addResource: '#UT#Sprachressource hinzufügen',
-        noTaskAssigned:'#UT#Keine Aufgaben zugewiesen.',
+        noTaskAssigned: '#UT#Keine Aufgaben zugewiesen.',
         sourceLang: '#UT#Quellsprache',
         targetLang: '#UT#Zielsprache',
         languageResourceStatusColumn: '#UT#Status',
@@ -70,21 +70,21 @@ Ext.define('Editor.view.LanguageResources.TmOverviewPanel', {
             noconnection: '#UT#Keine Verbindung!',
             import: '#UT#Import läuft',
             notloaded: '#UT#verfügbar',
-            notchecked:'#UT#Nicht geprüft',
+            notchecked: '#UT#Nicht geprüft',
             novalidlicense: '#UT#Keine gültige Lizenz.',
             tuninginprogress: '#UT#Wird trainiert',
             reorganize_in_progress: '#UT#Wird reorganisiert',
             reorganize_failed: '#UT#Reorganisation gescheitert'
         },
-        customers:'#UT#Kunden',
-        useAsDefault:'#UT#Leserechte standardmäßig',
-        writeAsDefault:'#UT#Schreibrechte standardmäßig',
-        taskassocgridcell:'#UT#Zugewiesene Aufgaben',
+        customers: '#UT#Kunden',
+        useAsDefault: '#UT#Leserechte standardmäßig',
+        writeAsDefault: '#UT#Schreibrechte standardmäßig',
+        taskassocgridcell: '#UT#Zugewiesene Aufgaben',
         groupHeader: '#UT#Ressource: {name}',
-        specificDataText:'#UT#Zusätzliche Infos',
-        pivotAsDefault:'#UT#Standardmäßig als Pivot verwenden'
+        specificDataText: '#UT#Zusätzliche Infos',
+        pivotAsDefault: '#UT#Standardmäßig als Pivot verwenden'
     },
-    cls:'tmOverviewPanel',
+    cls: 'tmOverviewPanel',
     height: '100%',
     layout: {
         type: 'fit'
@@ -101,7 +101,7 @@ Ext.define('Editor.view.LanguageResources.TmOverviewPanel', {
             },
             config = {
                 title: me.title, //see EXT6UPD-9
-                store :'Editor.store.LanguageResources.LanguageResource',
+                store : 'Editor.store.LanguageResources.LanguageResource',
                 plugins: ['gridfilters'],
                 viewConfig: {
                     getRowClass: function(record) {
@@ -119,7 +119,7 @@ Ext.define('Editor.view.LanguageResources.TmOverviewPanel', {
                     }
                 },
                 features: [{
-                    ftype:'grouping',
+                    ftype: 'grouping',
                     hideGroupedHeader: true,
                     enableGroupingMenu: false
                 }],
@@ -185,44 +185,55 @@ Ext.define('Editor.view.LanguageResources.TmOverviewPanel', {
                         iconCls: 'ico-tm-tasks',
                         hidden: true,
                         isDisabled: function( view, rowIndex, colIndex, item, record ) {
-                            item.hidden=!record.get('writable');
+                            item.hidden != record.get('writable');
+                        }
+                    },{
+                        action: 'specific',
+                        getClass: function(v, meta, r) {
+                            return service(r).getEditSpecificIconClass(r);
+                        },
+                        getTip: function(view, metadata, r){
+                            return service(r).getEditSpecificTooltip(r);
+                        },
+                        isDisabled: function(view, rowIndex, colIndex, item, record) {
+                            return service(record).isEditSpecificDisabled(record);
                         }
                     },{
                         action: 'import',
-	                    getClass:function(v,meta,r) {
+	                    getClass: function(v,meta,r) {
                         	return service(r).getImportIconClass(r);
                         },
-	                    getTip:function(view,metadata,r){
+	                    getTip: function(view,metadata,r){
                             return service(r).getAddTooltip(r);
 	                    },
                         isDisabled: function( view, rowIndex, colIndex, item, record ) {
                             return [record.STATUS_IMPORT, record.STATUS_LOADING].includes(record.get('status'));
-                        },
+                        }
                     },{
                         action: 'download',
-                        getClass:function(v,meta,r) {
+                        getClass: function(v,meta,r) {
                         	return service(r).getDownloadIconClass(r);
                         },
-	                    getTip:function(view,metadata,r){
+	                    getTip: function(view,metadata,r){
 	                    	return service(r).getDownloadTooltip(r);
 	                    },
                         isDisabled: function( view, rowIndex, colIndex, item, record ) {
                             return [record.STATUS_IMPORT, record.STATUS_LOADING].includes(record.get('status'));
-                        },
+                        }
                     },{
                         action: 'export',
-                        getClass:function(v,meta,r) {
+                        getClass: function(v,meta,r) {
                         	return service(r).getExportIconClass(r);
                         },
-	                    getTip:function(view,metadata,r){
+	                    getTip: function(view,metadata,r){
 	                    	return service(r).getExportTooltip(r);
 	                    },
                         isDisabled: function( view, rowIndex, colIndex, item, record ) {
                             return [record.STATUS_IMPORT, record.STATUS_LOADING].includes(record.get('status'));
-                        },
+                        }
                     },{
-                        tooltip: me.strings.log,
                         action: 'log',
+                        tooltip: me.strings.log,
                         getTip:function(view,metadata,r){
                         	return service(r).getLogTooltip(r);
 	                    },
@@ -253,59 +264,62 @@ Ext.define('Editor.view.LanguageResources.TmOverviewPanel', {
                 },{
                     xtype: 'gridcolumn',
                     width: 100,
-                    dataIndex:'customerIds',
+                    dataIndex: 'customerIds',
                     filter: {
                         type: 'customer' // [Multitenancy]
                     },
-                    text:me.strings.customers,
-                    renderer:me.resourceCustomersRenderer
+                    text: me.strings.customers,
+                    renderer: me.resourceCustomersRenderer
                 },{
                     xtype: 'gridcolumn',
                     width: 270,
-                    dataIndex:'customerUseAsDefaultIds',
+                    dataIndex: 'customerUseAsDefaultIds',
                     filter: {
                         type: 'string'
                     },
-                    text:me.strings.useAsDefault,
-                    tooltip:me.strings.useAsDefault,
-                    renderer:me.defaultCustomersRenderer
+                    text: me.strings.useAsDefault,
+                    tooltip: me.strings.useAsDefault,
+                    renderer: me.defaultCustomersRenderer
                 },
                 {
                     xtype: 'gridcolumn',
                     width: 270,
-                    dataIndex:'customerWriteAsDefaultIds',
+                    dataIndex: 'customerWriteAsDefaultIds',
                     filter: {
                         type: 'string'
                     },
-                    text:me.strings.writeAsDefault,
-                    tooltip:me.strings.writeAsDefault,
-                    renderer:me.defaultCustomersRenderer
+                    text: me.strings.writeAsDefault,
+                    tooltip: me.strings.writeAsDefault,
+                    renderer: me.defaultCustomersRenderer
                 },
                 {
                     xtype: 'gridcolumn',
                     width: 270,
-                    dataIndex:'customerPivotAsDefaultIds',
+                    dataIndex: 'customerPivotAsDefaultIds',
                     filter: {
                         type: 'string'
                     },
-                    text:me.strings.pivotAsDefault,
-                    tooltip:me.strings.pivotAsDefault,
-                    renderer:me.defaultCustomersRenderer
+                    text: me.strings.pivotAsDefault,
+                    tooltip: me.strings.pivotAsDefault,
+                    renderer: me.defaultCustomersRenderer
                 },
                 {
                     xtype: 'gridcolumn',
                     width: 100,
                     dataIndex: 'color',
                     renderer: function(value, metaData, record) {
-                        return '<div style="float: left; width: 15px; height: 15px;margin-right:5px; border: 1px solid rgba(0, 0, 0, .2);background: #'+record.data.color+';"></div>';
+                        return '<div style="float:left; width:15px; height:15px; margin-right:5px;' +
+                            ' border:1px solid rgba(0,0,0,.2); background:#' +
+                            record.data.color +
+                            ';"></div>';
                     },
                     text: me.strings.color
                 },{
                     xtype: 'gridcolumn',
-                    text:me.strings.specificDataText,
+                    text: me.strings.specificDataText,
                     width: 160,
-                    tdCls:'specificData',
-                    renderer:me.specificDataRenderer,
+                    tdCls: 'specificData',
+                    renderer: me.specificDataRenderer,
                     dataIndex: 'specificData'
                 },{
                     xtype: 'gridcolumn',
@@ -319,7 +333,7 @@ Ext.define('Editor.view.LanguageResources.TmOverviewPanel', {
                         if(value === "loading") { 
                             // show list as soon as possible, so show status on click only due to different latency of the requested TMs
                             meta.tdCls = 'loading';
-                            meta.tdAttr = 'data-qtip="'+str.loading+'"';
+                            meta.tdAttr = 'data-qtip="' + str.loading + '"';
                             return ''; //no string since icon set
                         }
                         if(str[value]){
@@ -339,9 +353,9 @@ Ext.define('Editor.view.LanguageResources.TmOverviewPanel', {
 
                     }
                 },{
-                    xtype:'gridcolumn',
+                    xtype: 'gridcolumn',
                     width: 40,
-                    dataIndex:'taskList',
+                    dataIndex: 'taskList',
                     filter: {
                         type: 'string'
                     },
@@ -392,19 +406,13 @@ Ext.define('Editor.view.LanguageResources.TmOverviewPanel', {
 
     initComponent: function () {
         var me = this;
-        me.statisticTpl = new Ext.XTemplate(
-            '<table>',
-            '<tpl for=".">',
-            '<tr><td>{text}: </td><td>{value}</td></tr>',
-            '</tpl>',
-            '</table>');
         me.callParent(arguments);
         me.view.on('afterrender', function () {
             me.tooltip = me.createToolTip();
             me.tooltip.on({
                 beforeshow:{
-                    scope:me,
-                    fn:me.onSpecificDataTooltipBeforeShow
+                    scope: me,
+                    fn: me.createSpecificDataTooltip
                 }
             });
         });
@@ -424,9 +432,8 @@ Ext.define('Editor.view.LanguageResources.TmOverviewPanel', {
      * @returns {Ext.tip.ToolTip}
      */
     createToolTip: function () {
-        var me = this;
         return Ext.create('Ext.tip.ToolTip', {
-            target: me.view.el,
+            target: this.view.el,
             delegate: 'td.specificData',
             dismissDelay: 0,
             showDelay: 200,
@@ -435,21 +442,32 @@ Ext.define('Editor.view.LanguageResources.TmOverviewPanel', {
         });
     },
 
-    /***
-     * On specificData column before tooltip show event handler
+    /**
+     * Creates the specific-data tooltip contents out of the specific-data
      * @param tip
      * @returns {boolean}
      */
-    onSpecificDataTooltipBeforeShow: function updateTipBody(tip) {
-        var me=this,
+    createSpecificDataTooltip: function updateTipBody(tip) {
+        var me = this,
             tr = Ext.fly(tip.triggerElement).up('tr'),
             record = me.view.getRecord(tr),
-            value = record.get('specificData');
+            specificData = record.getSpecificData();
 
-        if(Ext.isEmpty(value)){
+        if(Ext.Object.isEmpty(specificData)){
             return false;
         }
-        tip.update(me.statisticTpl.apply(Ext.JSON.decode(value)));
+
+        var key, keyName,
+            names = specificData.hasOwnProperty('localizedKeys') ? specificData.localizedKeys : {},
+            rows = '';
+
+        for(key in specificData) {
+            if(key !== 'localizedKeys'){
+                keyName = names.hasOwnProperty(key) ? names[key] : (key.charAt(0).toUpperCase() + key.slice(1));
+                rows += '<tr><td>' + keyName + ': </td><td>' + specificData[key] + '</td></tr>';
+            }
+        }
+        tip.update('<table>' + rows + '</table>');
     },
 
     langRenderer : function(val, md) {
