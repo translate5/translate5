@@ -1250,8 +1250,36 @@
                     <br/>Alternatively use the help button and look for keyboard shortcuts to enter the  missing tags from the source.
                 </target>
             </trans-unit>
-            <trans-unit id='RGllIGZvbGdlbmRlbiBUYWdzIGV4aXN0aWVyZW4gbmljaHQgaW4gZGVyIFF1ZWxsc3ByYWNoZTo8YnIvPjx1bD48bGk+ezB9PC9saT48L3VsPlNvIGVudGZlcm5lbiBTaWUgZGVuIEZlaGxlcjo8YnIvPjx1bD48bGk+S2xpY2tlbiBTaWUgYXVmIE9LLCB1bSBkaWVzZSBOYWNocmljaHQgenUgZW50ZmVybmVuPC9saT48bGk+RHLDvGNrZW4gU2llIEVTQywgdW0gZGFzIFNlZ21lbnQgb2huZSBTcGVpY2hlcm4genUgdmVybGFzc2VuPC9saT48bGk+w5ZmZm5lbiBTaWUgZGFzIFNlZ21lbnQgZXJuZXV0PC9saT48L3VsPldpZWRlcmhvbGVuIFNpZSBqZXR6dCBJaHJlIMOEbmRlcnVuZ2VuLg=='>
-                <source>Die folgenden Tags existieren nicht in der Quellsprache:
+            <trans-unit id='Rm9sZ2VuZGUgVGFncyBmZWhsZW4gaW0gVmVyZ2xlaWNoIHp1bSBaaWVsdGV4dCAoenVtIFplaXRwdW5rdCBkZXMgSW1wb3J0cy9kZXIgVm9yw7xiZXJzZXR6dW5nKTo8YnIvPjx1bD48bGk+ezB9PC9saT48L3VsPlNvIGVudGZlcm5lbiBTaWUgZGVuIEZlaGxlcjo8YnIvPjx1bD48bGk+S2xpY2tlbiBTaWUgYXVmIE9LLCB1bSBkaWVzZSBOYWNocmljaHQgenUgZW50ZmVybmVuPC9saT48bGk+RHLDvGNrZW4gU2llIEVTQywgdW0gZGFzIFNlZ21lbnQgb2huZSBTcGVpY2hlcm4genUgdmVybGFzc2VuPC9saT48bGk+w5ZmZm5lbiBTaWUgZGFzIFNlZ21lbnQgZXJuZXV0PC9saT48L3VsPldpZWRlcmhvbGVuIFNpZSBqZXR6dCBJaHJlIMOEbmRlcnVuZ2VuLjxici8+VmVyd2VuZGVuIFNpZSBhbHRlcm5hdGl2IGRpZSBIaWxmZXNjaGFsdGZsw6RjaGUsIHVuZCBzdWNoZW4gU2llIG5hY2ggVGFzdGVua29tYmluYXRpb25lbiwgdW0gZGllIGZlaGxlbmRlbiBUYWdzIGF1cyBkZXIgUXVlbGxlIGVpbnp1Z2ViZW4u'>
+                <source>Folgende Tags fehlen im Vergleich zum Zieltext (zum Zeitpunkt des Imports/der Vorübersetzung):
+                    <br/>
+                    <ul>
+                        <li>{0}</li>
+                    </ul>So entfernen Sie den Fehler:
+                    <br/>
+                    <ul>
+                        <li>Klicken Sie auf OK, um diese Nachricht zu entfernen</li>
+                        <li>Drücken Sie ESC, um das Segment ohne Speichern zu verlassen</li>
+                        <li>Öffnen Sie das Segment erneut</li>
+                    </ul>Wiederholen Sie jetzt Ihre Änderungen.
+                    <br/>Verwenden Sie alternativ die Hilfeschaltfläche, und suchen Sie nach Tastenkombinationen, um die fehlenden Tags aus der Quelle einzugeben.
+                </source>
+                <target>The following tags are missing comparing to target text (at time of import/pretranslation):
+                    <br/>
+                    <ul>
+                        <li>{0}</li>
+                    </ul>To remove the error:
+                    <br/>
+                    <ul>
+                        <li>Click OK to remove this message</li>
+                        <li>Press ESC to leave the segment without saving</li>
+                        <li>Open the segment again</li>
+                    </ul>Now redo your edits.
+                    <br/>Alternatively use the help button and look for keyboard shortcuts to enter the missing tags from the source.
+                </target>
+            </trans-unit>
+            <trans-unit id='RGllIGZvbGdlbmRlbiBUYWdzIGV4aXN0aWVyZW4gbmljaHQgaW4gZGVyIEF1c2dhbmd0ZXh0Ojxici8+PHVsPjxsaT57MH08L2xpPjwvdWw+U28gZW50ZmVybmVuIFNpZSBkZW4gRmVobGVyOjxici8+PHVsPjxsaT5LbGlja2VuIFNpZSBhdWYgT0ssIHVtIGRpZXNlIE5hY2hyaWNodCB6dSBlbnRmZXJuZW48L2xpPjxsaT5EcsO8Y2tlbiBTaWUgRVNDLCB1bSBkYXMgU2VnbWVudCBvaG5lIFNwZWljaGVybiB6dSB2ZXJsYXNzZW48L2xpPjxsaT7DlmZmbmVuIFNpZSBkYXMgU2VnbWVudCBlcm5ldXQ8L2xpPjwvdWw+V2llZGVyaG9sZW4gU2llIGpldHp0IElocmUgw4RuZGVydW5nZW4u'>
+                <source>Die folgenden Tags existieren nicht in der Ausgangtext:
                     <br/>
                     <ul>
                         <li>{0}</li>
@@ -1263,7 +1291,33 @@
                         <li>Öffnen Sie das Segment erneut</li>
                     </ul>Wiederholen Sie jetzt Ihre Änderungen.
                 </source>
-                <target>The following tags do not exist in source:
+                <target>The following tags do not exist in source text:
+                    <br/>
+                    <ul>
+                        <li>{0}</li>
+                    </ul>To remove the error:
+                    <br/>
+                    <ul>
+                        <li>Click OK to remove this message</li>
+                        <li>Press ESC to leave the segment without saving</li>
+                        <li>Open the segment again</li>
+                    </ul>Now redo your edits.
+                </target>
+            </trans-unit>
+            <trans-unit id='RGllIGZvbGdlbmRlbiBUYWdzIGV4aXN0aWVyZW4gbmljaHQgaW4gZGVyIFppZWx0ZXh0ICh6dXIgSW1wb3J0emVpdC9Wb3LDvGJlcnNldHp1bmcpOjxici8+PHVsPjxsaT57MH08L2xpPjwvdWw+U28gZW50ZmVybmVuIFNpZSBkZW4gRmVobGVyOjxici8+PHVsPjxsaT5LbGlja2VuIFNpZSBhdWYgT0ssIHVtIGRpZXNlIE5hY2hyaWNodCB6dSBlbnRmZXJuZW48L2xpPjxsaT5EcsO8Y2tlbiBTaWUgRVNDLCB1bSBkYXMgU2VnbWVudCBvaG5lIFNwZWljaGVybiB6dSB2ZXJsYXNzZW48L2xpPjxsaT7DlmZmbmVuIFNpZSBkYXMgU2VnbWVudCBlcm5ldXQ8L2xpPjwvdWw+V2llZGVyaG9sZW4gU2llIGpldHp0IElocmUgw4RuZGVydW5nZW4u'>
+                <source>Die folgenden Tags existieren nicht in der Zieltext (zur Importzeit/Vorübersetzung):
+                    <br/>
+                    <ul>
+                        <li>{0}</li>
+                    </ul>So entfernen Sie den Fehler:
+                    <br/>
+                    <ul>
+                        <li>Klicken Sie auf OK, um diese Nachricht zu entfernen</li>
+                        <li>Drücken Sie ESC, um das Segment ohne Speichern zu verlassen</li>
+                        <li>Öffnen Sie das Segment erneut</li>
+                    </ul>Wiederholen Sie jetzt Ihre Änderungen.
+                </source>
+                <target>The following tags do not exist in target text (at time of import/pretranslation):
                     <br/>
                     <ul>
                         <li>{0}</li>
@@ -6070,17 +6124,29 @@ The following task was imported with errors / warnings / notices. Please take ca
                 <source>Die Qualität wurde entfernt</source>
                 <target>The quality has been removed</target>
             </trans-unit>
-            <trans-unit id='RGllc2VuIFN0YXR1cyBmw7xyIGFuZGVyZSBFcmVpZ25pc3NlIGlubmVyaGFsYiBkaWVzZXIgQXVmZ2FiZSB2ZXJ0ZWlsdA=='>
-                <source>Diesen Status für andere Ereignisse innerhalb dieser Aufgabe verteilt</source>
-                <target>Spreaded such status for other occurrences within this task</target>
+            <trans-unit id='RWluIEtsaWNrIGF1ZiBkaWUgQ2hlY2stQm94IG1hcmtpZXJ0IGRlbiBha3R1ZWxsZW4gRmVobGVyIGFscyAiZmFsc2NoZW4gRmVobGVyIg=='>
+                <source>Ein Klick auf die Check-Box markiert den aktuellen Fehler als "falschen Fehler"</source>
+                <target>A click on the check box marks the current error as "false error"</target>
+            </trans-unit>
+            <trans-unit id='RWluIEtsaWNrIGF1ZiBkaWUgWmFobCByZWNodHMgbWFya2llcnQgYWxsZSBpZGVudGlzY2hlbiBGZWhsZXIgYWxzICJmYWxzY2hlIEZlaGxlciI='>
+                <source>Ein Klick auf die Zahl rechts markiert alle identischen Fehler als "falsche Fehler"</source>
+                <target>A click on the number on the right marks all identical errors as "false errors"</target>
+            </trans-unit>
+            <trans-unit id='VGFzdGF0dXItU2hvcnRjdXQgc2llaGUgVG9vbHRpcCByZWNodGUgU3BhbHRlICJRdWFsaXTDpHRzc2ljaGVydW5nIg=='>
+                <source>Tastatur-Shortcut siehe Tooltip rechte Spalte "Qualitätssicherung"</source>
+                <target>Keyboard shortcut see tooltip right column "Quality Assurance"</target>
+            </trans-unit>
+            <trans-unit id='RGllc2VuIFN0YXR1cyBmw7xyIGFsbGUgRXJlaWduaXNzZSBpbm5lcmhhbGIgZGllc2VyIEF1ZmdhYmUgdmVydGVpbHQ='>
+                <source>Diesen Status für alle Ereignisse innerhalb dieser Aufgabe verteilt</source>
+                <target>Spreaded such status for all occurrences within this task</target>
             </trans-unit>
             <trans-unit id='UmVjaHRzIGtsaWNrZW4gdW0gYWxzICdmYWxzY2ggZXJrYW5udCcgenUgbWFya2llcmVu'>
                 <source>Rechts klicken um als 'falsch erkannt' zu markieren</source>
                 <target>Right-click to set as false positive</target>
             </trans-unit>
-            <trans-unit id='QW56YWhsIGFuZGVyZXIgVm9ya29tbWVuIGVpbmVzIHNvbGNoZW4gUGFhcmVzIFtRdWFsaXTDpHQgLSBJbmhhbHRdLCBkaWUgaW4gZGllc2VyIEF1ZmdhYmUgZ2VmdW5kZW4gd3VyZGVu'>
-                <source>Anzahl anderer Vorkommen eines solchen Paares [Qualität - Inhalt], die in dieser Aufgabe gefunden wurden</source>
-                <target>Quantity of other occurrences of such [quality - content] pair found in this task</target>
+            <trans-unit id='QW56YWhsIGFsbGVyIFZvcmtvbW1lbiBlaW5lcyBzb2xjaGVuIFBhYXJlcyBbUXVhbGl0w6R0IC0gSW5oYWx0XSwgZGllIGluIGRpZXNlciBBdWZnYWJlIGdlZnVuZGVuIHd1cmRlbg=='>
+                <source>Anzahl aller Vorkommen eines solchen Paares [Qualität - Inhalt], die in dieser Aufgabe gefunden wurden</source>
+                <target>Quantity of all occurrences of such [quality - content] pair found in this task</target>
             </trans-unit>
             <trans-unit id='QWxsZSBpZGVudGlzY2hlbiBGZWhsZXIgZWJlbmZhbGxzIGFscyBmYWxzY2hlIEZlaGxlciBtYXJraWVyZW4u'>
                 <source>Alle identischen Fehler ebenfalls als falsche Fehler markieren.</source>
@@ -6182,9 +6248,17 @@ The following task was imported with errors / warnings / notices. Please take ca
                 <source>Bosnisch (Latein Bosnien und Herzegowina)</source>
                 <target>Bosnian (Latin Bosnia and Herzegovina)</target>
             </trans-unit>
-            <trans-unit id='TnVyIFNlZ21lbnRlIG1pdCBXaWVkZXJob2x1bmdlbiBhbnplaWdlbg=='>
-                <source>Nur Segmente mit Wiederholungen anzeigen</source>
-                <target>Show only repeated segments</target>
+            <trans-unit id='TnVyIFNlZ21lbnRlIG1pdCBXaWVkZXJob2x1bmdlbiBhbnplaWdlbiwgZWluc2NobGllw59saWNoIGRlciBlcnN0ZW4gU2VnbWVudGU='>
+                <source>Nur Segmente mit Wiederholungen anzeigen, einschließlich der ersten Segmente</source>
+                <target>Show only repeated segments including first ones</target>
+            </trans-unit>
+            <trans-unit id='TnVyIFNlZ21lbnRlIG1pdCBXaWVkZXJob2x1bmdlbiBhbnplaWdlbiwgYXVzZ2Vub21tZW4gZGllIGVyc3RlbiBTZWdtZW50ZQ=='>
+                <source>Nur Segmente mit Wiederholungen anzeigen, ausgenommen die ersten Segmente</source>
+                <target>Show only repeated segments excluding first ones</target>
+            </trans-unit>
+            <trans-unit id='RsO8Z2VuIFNpZSB6dWVyc3QgZGVuIEFic2Nobml0dCBlaW4sIGRlciBpbSBGb2xnZW5kZW4gd2llZGVyaG9sdCB3aXJk'>
+                <source>Fügen Sie zuerst den Abschnitt ein, der im Folgenden wiederholt wird</source>
+                <target>Do include first (actually, the segment that is repeated below)</target>
             </trans-unit>
             <trans-unit id="U2VnbWVudCBzcGVycmVuIGJ6dy4gZW50c3BlcnJlbiAoU1RSRyArIEwp">
                 <source>Segment sperren bzw. entsperren (STRG + L)</source>
@@ -9290,6 +9364,10 @@ E-Mail: service@MittagQI.com</pre>
             <trans-unit id='QmVncmlmZiBleGlzdGllcnQgYmVyZWl0cyBpbiBkZXIgYXVzZ2V3w6RobHRlbiBUZXJtQ29sbGVjdGlvbg=='>
                 <source>Begriff existiert bereits in der ausgewählten TermCollection</source>
                 <target>Term already exists in selected TermCollection</target>
+            </trans-unit>
+            <trans-unit id='RGFzIFNlZ21lbnQga29ubnRlIG51ciBpbiBkZXIgQXVmZ2FiZSwgbmljaHQgYWJlciBpbnMgVE0gZ2VzcGVpY2hlcnQgd2VyZGVuLiBTZWdtZW50ZSBsw6RuZ2VyIGFscyAyMDQ4IEJ5dGVzIHNpbmQgbmljaHQgaW0gVE0gc3BlaWNoZXJiYXIu'>
+                <source>Das Segment konnte nur in der Aufgabe, nicht aber ins TM gespeichert werden. Segmente länger als 2048 Bytes sind nicht im TM speicherbar.</source>
+                <target>The segment could only be saved to the task, but not to the TM. Segments longer than 2048 bytes cannot be saved to the TM.</target>
             </trans-unit>
         </body>
     </file>

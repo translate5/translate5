@@ -26,6 +26,8 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use editor_Models_Import_FileParser_Tag as Tag;
+
 /**
  * handles the generation of the tag shorttagnumbers for internal tags (source / target and tag pairs only,
  *  whitespace numbering is done in the whitespace tag helper
@@ -103,14 +105,14 @@ class editor_Models_Import_FileParser_Xlf_ShortTagNumbers {
                     $partner = $tagsById['rid-'.$tag->rid];
                 }
             }
-            if(empty($tagsById['id-'.$tag->id])) {
-                $tagsById['id-'.$tag->id] = $tag;
+            if(empty($tagsById['id-'.$tag->getId()])) {
+                $tagsById['id-'.$tag->getId()] = $tag;
             }
             // we may apply id based matching only if no rid based partner was found
             // and on open/close tags, since the id of single tags may be duplicated
             elseif(is_null($partner) && ! $tag->isSingle()) {
                 //if we have found no partner by rid we use the partner by id
-                $partner = $tagsById['id-'.$tag->id];
+                $partner = $tagsById['id-'.$tag->getId()];
             }
 
             //if we have a partner: link each other
@@ -136,21 +138,21 @@ class editor_Models_Import_FileParser_Xlf_ShortTagNumbers {
             }
 
             //if we are in source or no shortTagNumber was used for that tag ID yet, create one
-            if($this->source || empty($this->shortTagNumbers[$tag->id])) {
+            if($this->source || empty($this->shortTagNumbers[$tag->getId()])) {
                 $tag->tagNr = $this->shortTagIdent++;
-                $this->shortTagNumbers[$tag->id] = $tag->tagNr;
+                $this->shortTagNumbers[$tag->getId()] = $tag->tagNr;
             }
             else {
                 //only in target and if the same tag was already found in source, then reuse
-                $tag->tagNr = $this->shortTagNumbers[$tag->id];
+                $tag->tagNr = $this->shortTagNumbers[$tag->getId()];
             }
 
             //if the tag has a partner, set the partners number too
             if(!empty($tag->partner)) {
                 $tag->partner->tagNr = $tag->tagNr;
                 //track the shortTagNumber of the partner if not already set
-                if(empty($this->shortTagNumbers[$tag->partner->id])) {
-                    $this->shortTagNumbers[$tag->partner->id] = $tag->partner->tagNr;
+                if(empty($this->shortTagNumbers[$tag->partner->getId()])) {
+                    $this->shortTagNumbers[$tag->partner->getId()] = $tag->partner->tagNr;
                 }
             }
 
@@ -163,6 +165,12 @@ class editor_Models_Import_FileParser_Xlf_ShortTagNumbers {
      * @param editor_Models_Import_FileParser_Tag $tagObj
      */
     public function addTag(editor_Models_Import_FileParser_Tag $tagObj) {
+        $idsFrequency = array_count_values(array_map(static fn(Tag $tag) => $tag->getIdentifier(), $this->allTags));
+
+        if (array_key_exists($tagObj->getIdentifier(), $idsFrequency)) {
+            $tagObj->changeId($tagObj->getId() . '-duplicate-' . $idsFrequency[$tagObj->getIdentifier()]);
+        }
+
         $this->allTags[] = $tagObj;
     }
 }

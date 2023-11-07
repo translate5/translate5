@@ -11,6 +11,145 @@ All updates are (downwards) compatible! If not this is listed in the important r
 
 
 
+
+## [6.7.0] - 2023-11-03
+
+### Important Notes:
+#### [TRANSLATE-3526](https://jira.translate5.net/browse/TRANSLATE-3526)
+Reminder Thomas: remove workaround in elasticcloud after deployment!
+
+#### [TRANSLATE-3521](https://jira.translate5.net/browse/TRANSLATE-3521)
+All config levels are resetted to there desired original value. So customizations as needed for example on demo installations are reset.
+
+#### [TRANSLATE-1068](https://jira.translate5.net/browse/TRANSLATE-1068)
+Update API documentation on release.
+ 
+
+
+### Added
+**[TRANSLATE-3549](https://jira.translate5.net/browse/TRANSLATE-3549): User Management - Delete users from list after set time** <br>
+New feature that allows to automatically delete SSO users that have not logged in for a set period of time
+
+**[TRANSLATE-3544](https://jira.translate5.net/browse/TRANSLATE-3544): InstantTranslate - add keyboard shortcut for "translate" in instant translate** <br>
+If auto-translate is disabled in instant translate, users now can run translations with a keyboard shortcut (alt + enter).
+
+**[TRANSLATE-3407](https://jira.translate5.net/browse/TRANSLATE-3407): Editor general, Repetition editor - Filter only repetitions except first** <br>
+It's now possible to show repetitions excluding first occurrences of each repetition group
+
+
+### Changed
+**[TRANSLATE-3557](https://jira.translate5.net/browse/TRANSLATE-3557): t5memory - Improve fuzzy analysis speed** <br>
+Internal fuzzy speeded up by omitting flushing memory on each segment update in t5memory
+
+**[TRANSLATE-3555](https://jira.translate5.net/browse/TRANSLATE-3555): Task Management - Flexibilize task deletion and archiving trigger** <br>
+Add flexibility to task auto-deletion. Now user can provide workflow statuses at which task will be archived and deleted from task list 
+
+**[TRANSLATE-3531](https://jira.translate5.net/browse/TRANSLATE-3531): t5memory - Improve memory:migrate CLI command** <br>
+For not exportable memories a create-empty option is added to the memory:migrate CLI command
+
+**[TRANSLATE-3530](https://jira.translate5.net/browse/TRANSLATE-3530): ConnectWorldserver - Plugin ConnectWorldserver: add DueDate** <br>
+Added DueDate for tasks created by plugin ConnectWorldserver
+
+**[TRANSLATE-3520](https://jira.translate5.net/browse/TRANSLATE-3520): Translate5 CLI - Improve internal translation package creation** <br>
+Implemented a CLI command to import the internal translations as translate5 task.
+
+**[TRANSLATE-3418](https://jira.translate5.net/browse/TRANSLATE-3418): Main back-end mechanisms (Worker, Logging, etc.) - Make toast messages closeable, when clicking somewhere** <br>
+Toast messages are now closeable
+
+**[TRANSLATE-3364](https://jira.translate5.net/browse/TRANSLATE-3364): Editor general, SpellCheck (LanguageTool integration) - Show and take over correction proposals of spellcheck also by keyboard** <br>
+Added CTRL+R shortcut for showing replacement suggestions when the cursor is inside an spellcheck-highlighted word in an open segment editor
+
+**[TRANSLATE-3363](https://jira.translate5.net/browse/TRANSLATE-3363): Auto-QA, Editor general, SpellCheck (LanguageTool integration) - Keyboard short-cuts to set false positives** <br>
+Added ability to use CTRL + ALT + DIGIT keyboard shortcut to toggle false positive flag on selected segment's qualities
+
+**[TRANSLATE-3315](https://jira.translate5.net/browse/TRANSLATE-3315): Auto-QA - Enhance false positive pop-up, that appears on right-click on error** <br>
+Enhanced the way of how false-positives  flag can be spreaded across similar AutoQA errors
+
+**[TRANSLATE-3314](https://jira.translate5.net/browse/TRANSLATE-3314): Auto-QA - "Only errors" in AutoQA in the editor should be default setting** <br>
+Default option in AutoQA dropdown at the top left is changed from 'Show all' to 'Only errors'
+
+
+### Bugfixes
+**[TRANSLATE-3556](https://jira.translate5.net/browse/TRANSLATE-3556): MatchAnalysis & Pretranslation - Timeout on segment view creation on large imports** <br>
+Fixing a problem with the initializing of matchanalysis workers producing strange materialized view timeouts on larger imports.
+
+**[TRANSLATE-3540](https://jira.translate5.net/browse/TRANSLATE-3540): Export - problems with excel ex and re import** <br>
+Fixed that the task menu is updated directly after exporting a task as excel so that re-import button is shown without reloading the task overview.
+
+**[TRANSLATE-3529](https://jira.translate5.net/browse/TRANSLATE-3529): InstantTranslate - writetm - Call to a member function getId() on null** <br>
+Made the /instanttranslateapi/writetm endpoint more robust against missing or wrong data in request.
+
+**[TRANSLATE-3527](https://jira.translate5.net/browse/TRANSLATE-3527): TermPortal - TermPortal batch edit "select all" leads to error: param "termid" is not given** <br>
+Fixed batch-editing problem popping when all-terms-except-certain selection have no except-certain terms
+
+**[TRANSLATE-3526](https://jira.translate5.net/browse/TRANSLATE-3526): Import/Export, VisualReview / VisualTranslation - Export not possible after server movement** <br>
+Some specific file formats did store an absolute file path which prevents server movements.
+
+**[TRANSLATE-3525](https://jira.translate5.net/browse/TRANSLATE-3525): VisualReview / VisualTranslation - Video-Pathes in visual not ready for use in docker cloud** <br>
+FIX: Pathes of linked videos in Visual contained absolute paths on server, making problems on changing server location
+
+**[TRANSLATE-3523](https://jira.translate5.net/browse/TRANSLATE-3523): Auto-QA - Allow tag error if error already exists in reference** <br>
+Change the way how duplicated tags are parsed during import if they are already duplicated in the imported content.
+
+**[TRANSLATE-3522](https://jira.translate5.net/browse/TRANSLATE-3522): Editor general - Project focus route in URL does not work** <br>
+Fix problem where project or task was not being focused when clicking on a link containing a direct task route.
+
+**[TRANSLATE-3521](https://jira.translate5.net/browse/TRANSLATE-3521): Configuration, Translate5 CLI - Config CLI command was resetting the config level to 1** <br>
+Due a bug on the CLI config command the config level of changed values was reset to system level, so the config was not changeable in the UI anymore.
+
+**[TRANSLATE-3514](https://jira.translate5.net/browse/TRANSLATE-3514): Editor general - Fix several invalid class references** <br>
+Several invalid class references and other coding problems are fixed.
+
+**[TRANSLATE-3513](https://jira.translate5.net/browse/TRANSLATE-3513): Comments - Blocked segments can be commented and then are unblocked** <br>
+Blocked and locked segments no longer can be commented in translate5 if not explicitly allowed by ACL.
+
+**[TRANSLATE-3512](https://jira.translate5.net/browse/TRANSLATE-3512): Auto-QA - Missing tags cannot be inserted in the editor** <br>
+New config useSourceForReference whose purpose is to choose the reference field for review tasks.
+Fixed some error message to make it more obvious which field tags are compared to
+Shortcuts like ctrl+insert, ctrl+comma+digit are now working based on reference field tags, but not source
+
+**[TRANSLATE-3509](https://jira.translate5.net/browse/TRANSLATE-3509): Task Management - project ID filter closes after inserting first character** <br>
+Fixed filter for ID-column in projects view where the filter dialogue was closing to fast.
+
+**[TRANSLATE-3508](https://jira.translate5.net/browse/TRANSLATE-3508): Editor general - changed error message when long segments cannot be saved to TM** <br>
+Improved error message on saving large segments to t5memory TM.
+
+**[TRANSLATE-3496](https://jira.translate5.net/browse/TRANSLATE-3496): Main back-end mechanisms (Worker, Logging, etc.) - session code cleanup and performance improvement** <br>
+Loading performance of session data improved. (Step 1)
+
+**[TRANSLATE-3485](https://jira.translate5.net/browse/TRANSLATE-3485): LanguageResources, OpenTM2 integration - T5memory: add Export-call to clone & reorganize, log invalid segments** <br>
+FIXES t5memory: 
+* add import-call before clone & reorganize calls to fix updated segments missing
+* add logging on reorganize for invalid segments when cloning
+
+**[TRANSLATE-3463](https://jira.translate5.net/browse/TRANSLATE-3463): Auto-QA - Deactivation AutoQA for Import queues the AutoQA-Workers nevertheless** <br>
+FIX: AutoQA-Workers have been queued even when the AutoQA was completely disabled for the Import
+
+**[TRANSLATE-3456](https://jira.translate5.net/browse/TRANSLATE-3456): t5memory - Error-Message that a segment could not be saved back to TM not shown** <br>
+FIX: Error-Message that a segment could not be saved back to TM was not shown in the frontend
+
+**[TRANSLATE-3427](https://jira.translate5.net/browse/TRANSLATE-3427): Import/Export - Reference files from import zip package are not imported** <br>
+Fix problem where reference files where not imported from zip packages.
+
+**[TRANSLATE-3419](https://jira.translate5.net/browse/TRANSLATE-3419): Task Management - Click on PM name in project overview opens mail with undefined address - and logs out user in certain cases** <br>
+FIXED: 'mailto:undefined' links in PM names in Project overview
+
+**[TRANSLATE-3390](https://jira.translate5.net/browse/TRANSLATE-3390): Auto-QA - Filter is reset, if autoqa error is marked as false positive** <br>
+AutoQA filter does now keep selection on False Positive change for qualities
+
+**[TRANSLATE-3316](https://jira.translate5.net/browse/TRANSLATE-3316): Editor general, Search & Replace (editor) - Mysql wildcards not escaped when using search and replace and grid filters** <br>
+Mysql wildcards (% and _  ) are now escaped when searching with search and replace and with the grid filters.
+
+**[TRANSLATE-3300](https://jira.translate5.net/browse/TRANSLATE-3300): TermTagger integration - Terms that contain xml special chars are not tagged** <br>
+Replaced non-breaking spaces with ordinary spaces before feeding tbx-data to TermTagger
+
+**[TRANSLATE-3291](https://jira.translate5.net/browse/TRANSLATE-3291): Editor general - Sort terms in TermPortlet of the editor according to their order in the segment** <br>
+Terms in the right-side Terminology-panel are now sorted in the order they appear in segment source
+
+**[TRANSLATE-1068](https://jira.translate5.net/browse/TRANSLATE-1068): API - Improve REST API on wrong usage** <br>
+API requests (expect file uploading requests) can now understand JSON in raw body, additionally to the encapsulated JSON in a data form field. Also a proper HTTP error code is sent when providing invalid JSON.
+
+
 ## [6.6.1] - 2023-10-04
 
 ### Important Notes:

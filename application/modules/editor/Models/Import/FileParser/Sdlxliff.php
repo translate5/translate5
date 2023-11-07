@@ -59,6 +59,11 @@ END LICENSE AND COPYRIGHT
 class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_FileParser {
     const SOURCE = 'source';
     const TARGET = 'target';
+    /**
+     * Points to comment location/source. In this case it means that the comment is on transunit level, and it is not
+     * segment specific.
+     */
+    const TRANS_UNIT = 'transunit';
     const USERGUID = 'sdlxliff-imported';
 
     /**
@@ -326,8 +331,8 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
                 'filename' => $this->_fileName,
             ]);
         }
-        $this->_skeletonFile = implode('<group', $groups);
-        $this->_skeletonFile = str_replace(array('<group bin-unit ', '/bin-unit</group>'), array('<bin-unit', '</bin-unit>'), $this->_skeletonFile);
+        $this->skeletonFile = implode('<group', $groups);
+        $this->skeletonFile = str_replace(array('<group bin-unit ', '/bin-unit</group>'), array('<bin-unit', '</bin-unit>'), $this->skeletonFile);
     }
 
     /**
@@ -638,10 +643,12 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
      */
     protected function saveComments(int $segmentId, array $comments) {
         foreach($comments as $mrkId => $mrkCommentMarker) {
-            $selectedTextChunks = $mrkCommentMarker['text'];
             if(empty($this->comments[$mrkId])) {
                 continue;
             }
+
+            $selectedTextChunks = $mrkCommentMarker['text'] ?? true;
+
             foreach($this->comments[$mrkId] as $cmtDef) {
                 $comment = ZfExtended_Factory::get('editor_Models_Comment');
                 /* @var $comment editor_Models_Comment */
@@ -903,16 +910,17 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
             return;
         }
 
-        $this->_origFile = substr_replace($this->_origFile, '', $startComments, $endComments - $startComments);
-
-        //if import disabled we log a warning and remove all comments
+        // if comments import is disabled we log a warning
         if(! $this->config->runtimeOptions->import->sdlxliff->importComments) {
-            $this->logger->warn('E1000', 'The file "{filename}" has contained SDL comments, but comment import is disabled: the comments were removed!', [
+            $this->logger->warn('E1000', 'The file "{filename}" has contained SDL comments, but comment import is disabled.', [
                 'task' => $this->task,
                 'filename' => $this->_fileName,
             ]);
             return;
         }
+
+        // remove the cmt-defs block for the file. It will be generated on export again
+        $this->_origFile = substr_replace($this->_origFile, '', $startComments, $endComments - $startComments);
 
         $xmlparser = ZfExtended_Factory::get('editor_Models_Import_FileParser_XmlParser');
         /* @var $xmlparser editor_Models_Import_FileParser_XmlParser */

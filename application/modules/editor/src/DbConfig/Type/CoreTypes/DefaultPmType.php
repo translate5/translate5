@@ -70,6 +70,6 @@ class DefaultPmType extends ZfExtended_DbConfig_Type_CoreTypes
         $defaults = ZfExtended_Factory::get(ZfExtended_Models_User::class)->loadAllByRole([ACL_ROLE_PM]);
 
         // Check value is in those ids
-        return in_array($value, array_column($defaults, 'id'));
+        return empty($value) || in_array($value, array_column($defaults, 'id'));
     }
 }

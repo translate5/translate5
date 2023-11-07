@@ -27,6 +27,7 @@
  */
 namespace Translate5\MaintenanceCli\Command;
 
+use MittagQI\Translate5\Task\Import\SkeletonFile;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -116,12 +117,13 @@ class TaskSkeletonfileCommand extends Translate5AbstractCommand
             return 0;
         }
 
+        $skeletonFile = new SkeletonFile($task);
         if($this->input->getOption('dump-all')) {
             foreach($files as $fileId => $path) {
                 $file = new \editor_Models_File();
                 $file->load($fileId);
                 $this->io->section($fileId.': '.$path);
-                $skel = $file->loadSkeletonFromDisk($task);
+                $skel = $skeletonFile->loadFromDisk($file);
                 $this->io->write($skel);
             }
             return 0;
@@ -138,7 +140,7 @@ class TaskSkeletonfileCommand extends Translate5AbstractCommand
 
         $file = new \editor_Models_File();
         $file->load($fileId);
-        echo $file->loadSkeletonFromDisk($task);
+        echo $skeletonFile->loadFromDisk($file);
         return 0;
     }
 }

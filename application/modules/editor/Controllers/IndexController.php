@@ -928,7 +928,7 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
     /**
      * convenient shortcut to ACLs
      */
-    private function isAllowed(string $resource, ?string $right = null): string
+    private function isAllowed(string $resource, ?string $right = null): bool
     {
         $roles = ZfExtended_Authentication::getInstance()->getUserRoles();
         try {

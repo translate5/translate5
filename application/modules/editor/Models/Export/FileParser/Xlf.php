@@ -198,7 +198,7 @@ class editor_Models_Export_FileParser_Xlf extends editor_Models_Export_FileParse
         });
 
         $preserveWhitespaceDefault = $this->config->runtimeOptions->import->xlf->preserveWhitespace;
-        $this->_exportFile = $xmlparser->parse($this->_skeletonFile, $preserveWhitespaceDefault);
+        $this->_exportFile = $xmlparser->parse($this->skeletonFile, $preserveWhitespaceDefault);
         
         if($this->options['sourcetoemptytarget']) {
             //UGLY: typecast to string here

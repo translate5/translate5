@@ -34,6 +34,9 @@ END LICENSE AND COPYRIGHT
     - a single task processing is also possible, fill the $tasks array below (line 66) with the desired taskGuids!
     - if the LEK_skeletonfiles table is empty at the end, it will be dropped
  */
+
+use MittagQI\Translate5\Task\Import\SkeletonFile;
+
 set_time_limit(0);
 
 //uncomment the following line, so that the file is not marked as processed:
@@ -95,7 +98,7 @@ foreach ($tasks as $taskGuid) {
     $allFilesConverted = true;
     
     while($row = $stmt->fetchObject()) {
-        $skelFilePath = $task->getAbsoluteTaskDataPath().sprintf(editor_Models_File::SKELETON_PATH, $row->fileId);
+        $skelFilePath = $task->getAbsoluteTaskDataPath().sprintf(SkeletonFile::SKELETON_PATH, $row->fileId);
         $skelDir = dirname($skelFilePath);
         if(!file_exists($skelDir)) {
             @mkdir($skelDir, 0777, true);
