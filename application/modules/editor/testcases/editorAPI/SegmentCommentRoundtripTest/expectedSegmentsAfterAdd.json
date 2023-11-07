@@ -158,7 +158,7 @@
         "pretrans": "0",
         "matchRate": "0",
         "stateId": "0",
-        "autoStateId": "6",
+        "autoStateId": "16",
         "fileOrder": "1",
         "workflowStepNr": "1",
         "workflowStep": "reviewing",

@@ -91,6 +91,9 @@ Ext.define('Editor.view.segments.column.IsRepeated', {
                     },{
                         id: 3,
                         label: me.strings.filter.both
+                    },{
+                        id: 4,
+                        label: me.strings.filter.includeFirst
                     }]
                 }
             };

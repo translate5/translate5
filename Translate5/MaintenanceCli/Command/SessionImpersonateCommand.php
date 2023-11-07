@@ -105,9 +105,6 @@ class SessionImpersonateCommand extends Translate5AbstractCommand
             ''
         ]);
         
-        $userSession = new \Zend_Session_Namespace('user');
-        //set a flag to identify that this session was started by API
-        $userSession->loginByApiAuth = true;
         return 0;
     }
 

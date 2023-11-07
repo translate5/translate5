@@ -217,6 +217,11 @@ Ext.define('Editor.controller.MetaPanel', {
             bind: {
                 title: '{l10n.falsePositives.legend.float} <span class="x-fa fa-circle-xmark" title="{l10n.falsePositives.close}"></span>'
             },
+            listeners: {
+                boxready: function(cmp) {
+                    cmp.el.dom.setAttribute('data-qtip', Editor.data.l10n.falsePositives.window.tooltip);
+                }
+            },
             hide: function() {
                 delete me.segmentRightClickGrid;
                 this.destroy();
@@ -294,10 +299,36 @@ Ext.define('Editor.controller.MetaPanel', {
             return;
         }
 
-        metaFalPosPanel.loadFalsifiable(records);
+        // Get all the content-qualities (which can be spellcheck-qualities and termtagger-qualities)
+        // in the order they appear inside the segment
+        var qidm = me.getSegmentGrid().el
+            .down('[data-recordId="' + this.record.internalId + '"]')
+            .getHtml().matchAll(/data-t5qid="(?<id>[0-9]+)"/g), qid, qidA = [],
+            ordered = [];
+
+        // Get array of matches for further use to be more handy
+        while (qid = qidm.next()) {
+            if (qid.value) {
+                qidA.push(parseInt(qid.value.groups.id));
+            } else {
+                break;
+            }
+        }
+
+        // Setup array of qualities, where we have spellcheck and termtagger qualities added
+        // in the order they appear in the current segment, and all other qualities are added afterwards
+        qidA.forEach(qid => records.forEach(record => { record.get('id') === qid && ordered.push(record) }));
+        records.forEach(record => { !~qidA.indexOf(record.get('id')) && ordered.push(record) });
+
+        /*var _1 = [], _2 = [];
+        ordered.forEach(q => _1.push(q.get('id')));
+        records.forEach(r => _2.push(r.get('id')));
+        console.log(qidA, _1, _2);*/
+
+        metaFalPosPanel.loadFalsifiable(ordered);
 
         var segmentId = this.record.get('id');
-        this.getMetaQmPanel().startEditing(records, segmentId, this.hasQmQualities);
+        this.getMetaQmPanel().startEditing(ordered, segmentId, this.hasQmQualities);
     },
     /**
      * opens metapanel for readonly segments

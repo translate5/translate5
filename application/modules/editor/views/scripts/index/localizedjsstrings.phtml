@@ -172,7 +172,8 @@ Ext.define('Editor.controller.Localizer', {
                 none: '<?php echo $this->translate->_('Segmente ohne Wiederholungen');?>',
                 source: '<?php echo $this->translate->_('Segmente mit Wiederholungen nur in der Quellsprache');?>',
                 target: '<?php echo $this->translate->_('Segmente mit Wiederholungen nur in der Zielsprache');?>',
-                both: '<?php echo $this->translate->_('Segmente mit Wiederholungen in der Quell- und Zielsprache');?>'
+                both: '<?php echo $this->translate->_('Segmente mit Wiederholungen in der Quell- und Zielsprache');?>',
+                includeFirst: '<?php echo $this->translate->_('Fügen Sie zuerst den Abschnitt ein, der im Folgenden wiederholt wird');?>'
             },
             col: {
                 none: '<?php echo $this->translate->_('-');?>',
@@ -2000,7 +2001,8 @@ Editor.data.l10n = {
             watchListFilterBtn: '<?php echo $this->translate->_('Lesezeichen');?>',
             helpTooltip: '<?php echo $this->translate->_('Tastaturkürzel nachschlagen');?>',
             showBookmarkedSegments: '<?php echo $this->translate->_('Nur Segmente mit Lesezeichen anzeigen');?>',
-            showRepeatedSegments: '<?php echo $this->translate->_('Nur Segmente mit Wiederholungen anzeigen');?>',
+            showRepeatedSegmentsIncludeFirst: '<?php echo $this->translate->_('Nur Segmente mit Wiederholungen anzeigen, einschließlich der ersten Segmente');?>',
+            showRepeatedSegmentsExcludeFirst: '<?php echo $this->translate->_('Nur Segmente mit Wiederholungen anzeigen, ausgenommen die ersten Segmente');?>',
 
             themeMenuConfigText: '<?php echo $this->translate->_('Layout');?>',
             interfaceTranslation: {
@@ -2111,13 +2113,20 @@ Editor.data.l10n = {
             float: '<?php echo $this->translate->_('Ein falsch erkannter Fehler?')?>'
         },
         close: '<?php echo $this->translate->_('Schließen');?>',
-        spreaded: '<?php echo $this->translate->_('Diesen Status für andere Ereignisse innerhalb dieser Aufgabe verteilt');?>',
+        spreaded: '<?php echo $this->translate->_('Diesen Status für alle Ereignisse innerhalb dieser Aufgabe verteilt');?>',
+        window: {
+            tooltip: '<?php echo join('. <br/>', [
+                    $this->translate->_('Ein Klick auf die Check-Box markiert den aktuellen Fehler als "falschen Fehler"'),
+                    $this->translate->_('Ein Klick auf die Zahl rechts markiert alle identischen Fehler als "falsche Fehler"'),
+                    $this->translate->_('Tastatur-Shortcut siehe Tooltip rechte Spalte "Qualitätssicherung"'),
+            ])?>'
+        },
         grid: {
             falsePositive: '<?php echo $this->translate->_('Ja');?>',
             text: '<?php echo $this->translate->_('Qualität');?>',
             emptyText: '<?php echo $this->translate->_('Ladequalität..');?>',
             similarQty: {
-                tooltip: '<?php echo $this->translate->_('Anzahl anderer Vorkommen eines solchen Paares [Qualität - Inhalt], die in dieser Aufgabe gefunden wurden');?>',
+                tooltip: '<?php echo $this->translate->_('Anzahl aller Vorkommen eines solchen Paares [Qualität - Inhalt], die in dieser Aufgabe gefunden wurden');?>',
                 button: '<?php echo $this->translate->_('Alle identischen Fehler ebenfalls als falsche Fehler markieren.');?>'
             }
         }
