@@ -93,7 +93,6 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
         $sourceLang,
         $targetLang
     ): void {
-        parent::connectTo($languageResource, $sourceLang, $targetLang);
         $this->api = ZfExtended_Factory::get('editor_Services_OpenTM2_HttpApi');
         $this->api->setLanguageResource($languageResource);
 
@@ -106,6 +105,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
                 [['gTagPairing' => false]]
             );
         }
+        parent::connectTo($languageResource, $sourceLang, $targetLang);
     }
 
     /**
