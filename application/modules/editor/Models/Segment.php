@@ -299,7 +299,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract
         }
 
         // Escape mysql-wildcards
-        $queryString = preg_replace('~[%_]~', '\\\$0', $queryString);
+        $queryString = $this->filter->escapeMysqlWildcards($queryString);
 
         //search type regular wildcard
         if ($parameters['searchType'] === 'wildcardsSearch') {

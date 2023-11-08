@@ -255,6 +255,11 @@ Ext.application({
             // There is no other technical need for the defer as showing the logos
             me.initViewportLaunch(initMethod);
         }, showConsortiumLogos);
+
+        Ext.getDoc().on('mousedown', function(){
+            var msg = document.querySelector('.app-msg');
+            if (msg) Ext.get(msg).ghost("t", {remove:true});
+        });
     },
 
     /***

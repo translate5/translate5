@@ -34,6 +34,7 @@ use MittagQI\Translate5\DbConfig\ActionsEventHandler;
 use MittagQI\Translate5\Task\Import\DanglingImportsCleaner;
 use MittagQI\Translate5\Task\Import\ImportEventTrigger;
 use MittagQI\Translate5\Service\SystemCheck;
+use MittagQI\Translate5\Workflow\DeleteOpenidUsersAction;
 use MittagQI\ZfExtended\Acl\AutoSetRoleResource;
 use MittagQI\ZfExtended\Acl\ResourceManager as AclResourceManager;
 use MittagQI\ZfExtended\Acl\SetAclRoleResource;
@@ -111,6 +112,17 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
             editor_ConfigController::class,
             'afterPutAction',
             $handler->addDefaultsForNonZeroQualityErrorsSettingOnPutAction()
+        );
+        $eventHandler = new ActionsEventHandler();
+        $eventManager->attach(
+            editor_ConfigController::class,
+            'afterIndexAction',
+            $eventHandler->addDefaultPMUsersOnIndexAction(DeleteOpenidUsersAction::FALLBACK_PM_CONFIG)
+        );
+        $eventManager->attach(
+            editor_ConfigController::class,
+            'afterPutAction',
+            $eventHandler->addDefaultPMUsersOnPutAction(DeleteOpenidUsersAction::FALLBACK_PM_CONFIG)
         );
     }
     

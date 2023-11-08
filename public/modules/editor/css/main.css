@@ -329,6 +329,7 @@ background-color: #EAF1FB;
 .app-msg .icon-status-warning {background-image: url("../images/error.png");}
 .app-msg .icon-status-notice {background-image: url("../images/information.png");}
 .app-msg .icon-status-ok {background-image: url("../images/tick.png");}
+.app-msg .x-fa.fa-close {position: absolute; right: 7px; top: 3px; color: #606060; cursor: pointer;}
 table.message-box-data .type {vertical-align: top;} 
 table.message-box-data .error {} 
 
