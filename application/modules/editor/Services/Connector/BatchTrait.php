@@ -94,13 +94,11 @@ trait editor_Services_Connector_BatchTrait {
 
         $this->initBatchQuery();
 
-        $segments = ZfExtended_Factory::get('editor_Models_Segment_Iterator', [$taskGuid]);
+        $segments = ZfExtended_Factory::get(editor_Models_Segment_Iterator::class, [$taskGuid]);
         /* @var $segments editor_Models_Segment_Iterator */
         
-        $task = ZfExtended_Factory::get('editor_Models_Task');
-        /* @var $task editor_Models_Task */
-        $task->loadByTaskGuid($taskGuid);
-        
+        $task = editor_ModelInstances::taskByGuid($taskGuid);
+
         //number of temporary cached segments
         $tmpBuffer = 0;
         //holds the query strings for batch request
