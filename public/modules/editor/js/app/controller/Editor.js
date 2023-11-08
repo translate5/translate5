@@ -72,6 +72,9 @@ Ext.define('Editor.controller.Editor', {
         ref:'filepanel',
         selector:'#filepanel'
     },{
+        ref: 'falsePositiveCheckColumn',
+        selector: '#metapanel #falsePositives grid checkcolumn'
+    },{
         ref:'segmentsHtmleditor',
         selector:'#segmentsHtmleditor'
     },{
@@ -227,6 +230,7 @@ Ext.define('Editor.controller.Editor', {
             // (If you change the setting for a defaultEventAction for DEC_DIGITS,
             // please check if eventIsTranslate5() still works as expected 
             // in Editor.util.Event).
+            'ctrl-alt-DIGIT': [me.DEC_DIGITS,{ctrl: true, alt: true}, me.toggleFalsePositive, true],
             'alt-DIGIT':      [me.DEC_DIGITS,{ctrl: false, alt: true}, me.handleAssignMQMTag, true],
             'DIGIT':          [me.DEC_DIGITS,{ctrl: false, alt: false}, me.handleDigit],
             'ctrl-zoomIn':    [[187, Ext.EventObjectImpl.NUM_PLUS],{ctrl: true, alt: false, shift: false}, me.handleZoomIn, true],
@@ -1110,6 +1114,25 @@ Ext.define('Editor.controller.Editor', {
     handleOpenComments: function() {
         Ext.fireEvent('editorOpenComments');
     },
+
+    /**
+     * Toggle false-positive on any of first 10 qualities, identified by numeric keys 1-9, and key '0' for 10th
+     *
+     * @param key
+     */
+    toggleFalsePositive: function(key) {
+        var me = this,
+            column = me.getFalsePositiveCheckColumn(),
+            rowIndex = (Number(key) - 48 || 10) - 1,
+            record = column.up('grid').getStore().getAt(rowIndex);
+
+        // If no record exists at such rowIndex - return
+        if (!record) return;
+
+        // Fire checkchange-event
+        column.fireEvent('checkchange', column, rowIndex, !record.get('falsePositive'), record);
+    },
+
     /**
      * Handles pressing the MQM tag shortcuts, without shift 1-10, with shift 11-20
      */

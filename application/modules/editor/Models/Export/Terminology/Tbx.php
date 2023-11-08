@@ -208,7 +208,8 @@ class editor_Models_Export_Terminology_Tbx {
 
             $tig->addAttribute('id', $tigId);
 
-            $term = $tig->addChild('term', htmlspecialchars($row->term, ENT_XML1));
+            // Replace nbsp-chars with ordinary spaces
+            $term = $tig->addChild('term', htmlspecialchars(str_replace([' '], [' '], $row->term), ENT_XML1));
             $term->addAttribute('id', $row->termTbxId);
 
             $termNote = $tig->addChild('termNote', $row->status);
