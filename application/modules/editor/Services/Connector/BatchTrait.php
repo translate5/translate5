@@ -143,8 +143,6 @@ trait editor_Services_Connector_BatchTrait {
             // is the collected buffer size above the allowed limit (if the buffer size limit is not allowed for the resource, this will return true)
             $allowByContent = $this->isAllowedByContentSize($bufferSize);
 
-            error_log('BATCH TRAIT: BUFFER SIZE: ' . $bufferSize); // TODO REMOVE
-
             if(++$tmpBuffer != $this->batchQueryBuffer && $allowByContent){
                 continue;
             }
