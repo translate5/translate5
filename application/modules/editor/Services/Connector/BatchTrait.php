@@ -207,10 +207,9 @@ trait editor_Services_Connector_BatchTrait {
     /**
      * Return the queried segment size in KB (or any other unit matching the max buffer size)
      * @param string $querySegment
-     * @param int $batchIndex: the index of the query-segment in the batch
      * @return float|int
      */
-    protected function getQuerySegmentSize(string $querySegment, int $batchIndex): float|int
+    protected function getQuerySegmentSize(string $querySegment): float|int
     {
         if(is_numeric($this->batchQueryBufferSize) === false){
             return 0;
@@ -227,7 +226,7 @@ trait editor_Services_Connector_BatchTrait {
      */
     protected function calculateBufferSize(int|float $currentBufferSize, string $querySegment, int $batchIndex): float|int
     {
-        return $currentBufferSize + $this->getQuerySegmentSize($querySegment, $batchIndex);
+        return $currentBufferSize + $this->getQuerySegmentSize($querySegment);
     }
     
     /**
