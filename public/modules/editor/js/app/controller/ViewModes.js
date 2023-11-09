@@ -501,7 +501,12 @@ Ext.define('Editor.controller.ViewModes', {
      * After the reset, new view mode can be applied
      */
     resetCustomLayout: function(){
-        Ext.state.Manager.getProvider().reset('editor');
+        Ext.state.Manager.getProvider().reset('editor', [
+            'eastPanel',
+            'westPanel',
+            'segmentsGrid',
+            'languageResourceEditorPanel',
+        ]);
     },
 
     /**
