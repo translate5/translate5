@@ -35,18 +35,18 @@ END LICENSE AND COPYRIGHT
  */
 trait editor_Services_Connector_BatchTrait {
 
-    /***
+    /**
      * Number of segments which the batch query sends at once
      * @var integer
      */
     protected $batchQueryBuffer = 1;
 
-    /***
+    /**
      * Buffer size in KB or false to disable the size calculation
      * @var bool|integer
      */
     protected $batchQueryBufferSize = false;
-    
+
     /**
      * container for collected exceptions
      * @var array
@@ -73,7 +73,8 @@ trait editor_Services_Connector_BatchTrait {
     }
 
     /**
-     * Init function to be used before batch query is called for extending classes
+     * Init function to be used before a batch query is called/processed
+     * To be implemented in inheriting classes if needed
      * @return void
      */
     public function initBatchQuery(): void { }
@@ -120,8 +121,6 @@ trait editor_Services_Connector_BatchTrait {
             //or analysis, the empty target segments for mt resources should not be send to batch processor
             //TODO: in future, when the matchrate is provided/calculated for mt, this should be changed
 
-
-
             $contentField = $segment->get($this->getContentField());
 
             // check if the contentField already has translations/data
@@ -139,9 +138,12 @@ trait editor_Services_Connector_BatchTrait {
             ];
 
             // collect the segment size in bytes in temporary variable
-            $bufferSize += $this->getQuerySegmentSize($querySegment, count($batchQuery) - 1);
+            $bufferSize = $this->calculateBufferSize($bufferSize, $querySegment, count($batchQuery) - 1);
+
             // is the collected buffer size above the allowed limit (if the buffer size limit is not allowed for the resource, this will return true)
             $allowByContent = $this->isAllowedByContentSize($bufferSize);
+
+            error_log('BATCH TRAIT: BUFFER SIZE: ' . $bufferSize); // TODO REMOVE
 
             if(++$tmpBuffer != $this->batchQueryBuffer && $allowByContent){
                 continue;
@@ -160,22 +162,26 @@ trait editor_Services_Connector_BatchTrait {
 
                 //send batch query request, and save the results to the batch cache
                 $this->handleBatchQuerys($batchQuery);
+                // progresss & buffer size
                 $progressCallback && $progressCallback($progress);
                 $batchQuery = [];
                 $batchQuery[] = $resetBuffer;
+                // prepare next batch
+                $this->initBatchQuery();
 
                 // set the current buffer size to the last segment size
-                $bufferSize = $this->getQuerySegmentSize($querySegment, count($batchQuery) - 1);
+                $bufferSize = $this->calculateBufferSize(0, $querySegment, 0);
 
             } else {
 
                 //send batch query request, and save the results to the batch cache
                 $this->handleBatchQuerys($batchQuery);
-
+                // progresss & buffer size
                 $progressCallback && $progressCallback($progress);
-
                 $batchQuery = [];
                 $bufferSize = 0;
+                // prepare next batch
+                $this->initBatchQuery();
             }
             $tmpBuffer = 0;
         }
@@ -187,7 +193,7 @@ trait editor_Services_Connector_BatchTrait {
         }
     }
 
-    /***
+    /**
      * Check if calculate content size exceeds the allowed limit
      * @param int $totalContentSize
      * @return bool
@@ -200,18 +206,30 @@ trait editor_Services_Connector_BatchTrait {
         return $totalContentSize < $this->batchQueryBufferSize;
     }
 
-    /***
+    /**
      * Return the queried segment size in KB (or any other unit matching the max buffer size)
      * @param string $querySegment
      * @param int $batchIndex: the index of the query-segment in the batch
-     * @return float|bool|int
+     * @return float|int
      */
-    protected function getQuerySegmentSize(string $querySegment, int $batchIndex): float|bool|int
+    protected function getQuerySegmentSize(string $querySegment, int $batchIndex): float|int
     {
         if(is_numeric($this->batchQueryBufferSize) === false){
             return 0;
         }
         return strlen(urlencode($querySegment)) / 1024;
+    }
+
+    /**
+     * Calculates the buffer size of the current batch
+     * @param int|float $currentBufferSize
+     * @param string $querySegment
+     * @param int $batchIndex
+     * @return float|int
+     */
+    protected function calculateBufferSize(int|float $currentBufferSize, string $querySegment, int $batchIndex): float|int
+    {
+        return $currentBufferSize + $this->getQuerySegmentSize($querySegment, $batchIndex);
     }
     
     /**
