@@ -33,7 +33,7 @@ END LICENSE AND COPYRIGHT
  *
  */
 
-use MittagQI\Translate5\Segment\ContentProtection\ContentProtector;
+use MittagQI\Translate5\ContentProtection\ContentProtector;
 
 /**
  * protects the translate5 internal tags by removing for language resource processing

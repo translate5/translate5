@@ -32,7 +32,7 @@ END LICENSE AND COPYRIGHT
  * @version 1.0
  */
 
-use MittagQI\Translate5\Segment\ContentProtection\ContentProtector;
+use MittagQI\Translate5\ContentProtection\ContentProtector;
 use MittagQI\Translate5\Segment\TransUnitHash;
 use MittagQI\Translate5\Task\Import\SkeletonFile;
 

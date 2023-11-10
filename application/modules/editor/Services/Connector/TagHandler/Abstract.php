@@ -33,7 +33,7 @@ END LICENSE AND COPYRIGHT
  *
  */
 
-use MittagQI\Translate5\Segment\ContentProtection\ContentProtector;
+use MittagQI\Translate5\ContentProtection\ContentProtector;
 
 /**
  * Abstract Tag Handler for internal tags in text to be send to language resources

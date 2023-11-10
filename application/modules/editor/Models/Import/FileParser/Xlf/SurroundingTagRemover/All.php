@@ -26,7 +26,7 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-use MittagQI\Translate5\NumberProtection\Tag\NumberTag;
+use MittagQI\Translate5\ContentProtection\NumberProtection\Tag\NumberTag;
 
 /**
  * calculates and removes leading and trailing paired and special single tags

@@ -26,9 +26,9 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-use editor_Models_Segment_Whitespace as Whitespace;
 use editor_Models_Segment_UtilityBroker as UtilityBroker;
-use MittagQI\Translate5\Segment\ContentProtection\ContentProtector;
+use editor_Models_Segment_Whitespace as Whitespace;
+use MittagQI\Translate5\ContentProtection\ContentProtector;
 use MittagQI\Translate5\Segment\TagRepair\HtmlProcessor;
 
 /**

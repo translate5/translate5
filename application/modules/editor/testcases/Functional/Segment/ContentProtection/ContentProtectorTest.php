@@ -55,30 +55,30 @@ namespace MittagQI\Translate5\Test\Functional\Segment\ContentProtection;
 use editor_Models_Import_FileParser_WhitespaceTag;
 use editor_Models_Segment_Whitespace as Whitespace;
 use editor_Test_UnitTest;
-use MittagQI\Translate5\NumberProtection\Model\InputMapping;
-use MittagQI\Translate5\NumberProtection\Model\NumberRecognition;
-use MittagQI\Translate5\NumberProtection\Protector\DateProtector;
-use MittagQI\Translate5\NumberProtection\Protector\FloatProtector;
-use MittagQI\Translate5\NumberProtection\Tag\NumberTag;
-use MittagQI\Translate5\Segment\ContentProtection\ContentProtector;
+use MittagQI\Translate5\ContentProtection\ContentProtector;
+use MittagQI\Translate5\ContentProtection\Model\ContentRecognition;
+use MittagQI\Translate5\ContentProtection\Model\InputMapping;
+use MittagQI\Translate5\ContentProtection\NumberProtection\Protector\DateProtector;
+use MittagQI\Translate5\ContentProtection\NumberProtection\Protector\FloatProtector;
+use MittagQI\Translate5\ContentProtection\NumberProtection\Tag\NumberTag;
 use ZfExtended_Factory;
 
 class ContentProtectorTest extends editor_Test_UnitTest
 {
     protected function setUp(): void
     {
-        $numberRecognition = ZfExtended_Factory::get(NumberRecognition::class);
-        $numberRecognition->loadBy(DateProtector::getType(), 'default Y-m-d');
+        $contentRecognition = ZfExtended_Factory::get(ContentRecognition::class);
+        $contentRecognition->loadBy(DateProtector::getType(), 'default Y-m-d');
 
         $inputMapping = ZfExtended_Factory::get(InputMapping::class);
         $inputMapping->setLanguageId(5);
-        $inputMapping->setNumberRecognitionId($numberRecognition->getId());
+        $inputMapping->setContentRecognitionId($contentRecognition->getId());
         $inputMapping->save();
 
-        $numberRecognition->loadBy(FloatProtector::getType(), 'default with comma thousand decimal dot');
+        $contentRecognition->loadBy(FloatProtector::getType(), 'default with comma thousand decimal dot');
         $inputMapping = ZfExtended_Factory::get(InputMapping::class);
         $inputMapping->setLanguageId(5);
-        $inputMapping->setNumberRecognitionId($numberRecognition->getId());
+        $inputMapping->setContentRecognitionId($contentRecognition->getId());
         $inputMapping->save();
     }
 

@@ -26,21 +26,21 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-use MittagQI\Translate5\NumberProtection\Model\NumberRepository;
-use MittagQI\Translate5\NumberProtection\NumberProtector;
+use MittagQI\Translate5\ContentProtection\Model\ContentProtectionRepository;
+use MittagQI\Translate5\ContentProtection\NumberProtector;
 
 class editor_Services_Connector_TagHandler_T5MemoryXliff extends editor_Services_Connector_TagHandler_Xliff
 {
     private const T5MEMORY_NUMBER_TAG = 't5:n';
     protected const ALLOWED_TAGS = '<x><x/><bx><bx/><ex><ex/><g><number>';
-    private NumberRepository $numberRepository;
+    private ContentProtectionRepository $numberRepository;
     private NumberProtector $numberProtector;
     private array $numberTagMap = [];
 
     public function __construct(array $options = [])
     {
         parent::__construct($options);
-        $this->numberRepository = new NumberRepository();
+        $this->numberRepository = new ContentProtectionRepository();
         $this->numberProtector = NumberProtector::create();
         $this->xmlparser->registerElement(NumberProtector::TAG_NAME, null, function ($tagName, $key, $opener) {
             $this->xmlparser->replaceChunk($key, function () use ($key) {
@@ -97,12 +97,12 @@ class editor_Services_Connector_TagHandler_T5MemoryXliff extends editor_Services
             $tag = array_shift($tagProps);
             $tagProps = array_combine(['type', 'name', 'source', 'iso', 'target'], $tagProps);
 
-            $numberRecognition = $this->numberRepository->getNumberRecognition(
+            $contentRecognition = $this->numberRepository->getContentRecognition(
                 $tagProps['type'],
                 $tagProps['name']
             );
 
-            $encodedRegex = base64_encode(gzdeflate($numberRecognition->getRegex()));
+            $encodedRegex = base64_encode(gzdeflate($contentRecognition->getRegex()));
             $t5nTag = sprintf(
                 '<%s id="%s" n="%s" r="%s"/>',
                 self::T5MEMORY_NUMBER_TAG,

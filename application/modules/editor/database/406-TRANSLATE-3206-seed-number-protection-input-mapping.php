@@ -27,12 +27,7 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-/**
- * Remove all old term collection tbx cache folders from the disc.
- * Only folders for non-existing term-collections in the translate5 will be removed.
- */
-
-use MittagQI\Translate5\NumberProtection\Model\NumberRecognition;
+use MittagQI\Translate5\ContentProtection\Model\ContentRecognition;
 
 set_time_limit(0);
 
@@ -57,78 +52,78 @@ if (APPLICATION_ENV === ZfExtended_BaseIndex::ENVIRONMENT_TEST) {
     $enGbId = $lang->getLangIdByRfc5646('en-GB');
     $frId = $lang->getLangIdByRfc5646('fr');
 
-    $numberRecognition = ZfExtended_Factory::get(NumberRecognition::class);
+    $contentRecognition = ZfExtended_Factory::get(ContentRecognition::class);
 
     $inputMappings = [];
 
 // region Dates
-    $numberRecognition->loadBy('date', 'default m/d/Y');
-    $inputMappings[] = "($enUsId, {$numberRecognition->getId()})";
+    $contentRecognition->loadBy('date', 'default m/d/Y');
+    $inputMappings[] = "($enUsId, {$contentRecognition->getId()})";
 
-    $numberRecognition->loadBy('date', 'default m/d/y');
-    $inputMappings[] = "($enUsId, {$numberRecognition->getId()})";
+    $contentRecognition->loadBy('date', 'default m/d/y');
+    $inputMappings[] = "($enUsId, {$contentRecognition->getId()})";
 
-    $numberRecognition->loadBy('date', 'default d/m/Y');
+    $contentRecognition->loadBy('date', 'default d/m/Y');
 
-    $inputMappings[] = "($frId, {$numberRecognition->getId()})";
-    $inputMappings[] = "($enId, {$numberRecognition->getId()})";
-    $inputMappings[] = "($enGbId, {$numberRecognition->getId()})";
+    $inputMappings[] = "($frId, {$contentRecognition->getId()})";
+    $inputMappings[] = "($enId, {$contentRecognition->getId()})";
+    $inputMappings[] = "($enGbId, {$contentRecognition->getId()})";
 
-    $numberRecognition->loadBy('date', 'default d/m/y');
+    $contentRecognition->loadBy('date', 'default d/m/y');
 
-    $inputMappings[] = "($frId, {$numberRecognition->getId()})";
-    $inputMappings[] = "($enId, {$numberRecognition->getId()})";
-    $inputMappings[] = "($enGbId, {$numberRecognition->getId()})";
+    $inputMappings[] = "($frId, {$contentRecognition->getId()})";
+    $inputMappings[] = "($enId, {$contentRecognition->getId()})";
+    $inputMappings[] = "($enGbId, {$contentRecognition->getId()})";
 
-    $numberRecognition->loadBy('date', 'default Y-m-d');
+    $contentRecognition->loadBy('date', 'default Y-m-d');
 
-    $inputMappings[] = "($frId, {$numberRecognition->getId()})";
-    $inputMappings[] = "($enId, {$numberRecognition->getId()})";
-    $inputMappings[] = "($deId, {$numberRecognition->getId()})";
+    $inputMappings[] = "($frId, {$contentRecognition->getId()})";
+    $inputMappings[] = "($enId, {$contentRecognition->getId()})";
+    $inputMappings[] = "($deId, {$contentRecognition->getId()})";
 
-    $numberRecognition->loadBy('date', 'default d-m-Y');
+    $contentRecognition->loadBy('date', 'default d-m-Y');
 
-    $inputMappings[] = "($frId, {$numberRecognition->getId()})";
-    $inputMappings[] = "($enId, {$numberRecognition->getId()})";
-    $inputMappings[] = "($enGbId, {$numberRecognition->getId()})";
+    $inputMappings[] = "($frId, {$contentRecognition->getId()})";
+    $inputMappings[] = "($enId, {$contentRecognition->getId()})";
+    $inputMappings[] = "($enGbId, {$contentRecognition->getId()})";
 
-    $numberRecognition->loadBy('date', 'default d.m.Y');
+    $contentRecognition->loadBy('date', 'default d.m.Y');
 
-    $inputMappings[] = "($enId, {$numberRecognition->getId()})";
-    $inputMappings[] = "($deId, {$numberRecognition->getId()})";
+    $inputMappings[] = "($enId, {$contentRecognition->getId()})";
+    $inputMappings[] = "($deId, {$contentRecognition->getId()})";
 
-    $numberRecognition->loadBy('date', 'default d.m.y');
+    $contentRecognition->loadBy('date', 'default d.m.y');
 
-    $inputMappings[] = "($deId, {$numberRecognition->getId()})";
+    $inputMappings[] = "($deId, {$contentRecognition->getId()})";
 
-    $numberRecognition->loadBy('date', 'default Y.m.d');
+    $contentRecognition->loadBy('date', 'default Y.m.d');
 
-    $inputMappings[] = "($enId, {$numberRecognition->getId()})";
-    $inputMappings[] = "($enGbId, {$numberRecognition->getId()})";
+    $inputMappings[] = "($enId, {$contentRecognition->getId()})";
+    $inputMappings[] = "($enGbId, {$contentRecognition->getId()})";
 // endregion Dates block
 
 // region Floats
-    $numberRecognition->loadBy('float', 'default with dot thousand decimal comma');
-    $inputMappings[] = "($deId, {$numberRecognition->getId()})";
+    $contentRecognition->loadBy('float', 'default with dot thousand decimal comma');
+    $inputMappings[] = "($deId, {$contentRecognition->getId()})";
 
-    $numberRecognition->loadBy('float', 'default with comma thousand decimal dot');
-    $inputMappings[] = "($enId, {$numberRecognition->getId()})";
+    $contentRecognition->loadBy('float', 'default with comma thousand decimal dot');
+    $inputMappings[] = "($enId, {$contentRecognition->getId()})";
 
-    $numberRecognition->loadBy('float', 'default with whitespace thousand decimal comma');
-    $inputMappings[] = "($frId, {$numberRecognition->getId()})";
+    $contentRecognition->loadBy('float', 'default with whitespace thousand decimal comma');
+    $inputMappings[] = "($frId, {$contentRecognition->getId()})";
 
-    $numberRecognition->loadBy('float', 'default generic');
-    $inputMappings[] = "($enId, {$numberRecognition->getId()})";
-    $inputMappings[] = "($deId, {$numberRecognition->getId()})";
-    $inputMappings[] = "($frId, {$numberRecognition->getId()})";
+    $contentRecognition->loadBy('float', 'default generic');
+    $inputMappings[] = "($enId, {$contentRecognition->getId()})";
+    $inputMappings[] = "($deId, {$contentRecognition->getId()})";
+    $inputMappings[] = "($frId, {$contentRecognition->getId()})";
 // endregion
 
 // region Integers
-    $numberRecognition->loadBy('integer', 'default simple');
-    $inputMappings[] = "($enId, {$numberRecognition->getId()})";
-    $inputMappings[] = "($deId, {$numberRecognition->getId()})";
-    $inputMappings[] = "($frId, {$numberRecognition->getId()})";
+    $contentRecognition->loadBy('integer', 'default simple');
+    $inputMappings[] = "($enId, {$contentRecognition->getId()})";
+    $inputMappings[] = "($deId, {$contentRecognition->getId()})";
+    $inputMappings[] = "($frId, {$contentRecognition->getId()})";
 // endregion
 
-    $db->query('INSERT INTO `LEK_number_protection_input_mapping` (`languageId`, `numberRecognitionId`) VALUES ' . implode(',', $inputMappings));
+    $db->query('INSERT INTO `LEK_number_protection_input_mapping` (`languageId`, `contentRecognitionId`) VALUES ' . implode(',', $inputMappings));
 }

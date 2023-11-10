@@ -33,7 +33,7 @@ Ext.define('Editor.view.admin.preferences.OverviewPanel', {
         'Editor.view.admin.preferences.User',
         'Editor.view.admin.config.Grid',
         'Editor.view.admin.token.TokenGrid',
-        'Editor.view.admin.numberProtection.Panel',
+        'Editor.view.admin.contentProtection.Panel',
         'Editor.view.admin.log.SystemGrid',
         'Editor.view.admin.system.StatusPanel'
     ],
@@ -114,8 +114,8 @@ Ext.define('Editor.view.admin.preferences.OverviewPanel', {
             configSections.push({xtype: 'TokenGrid'});
         }
 
-        if(user.isAllowed('numberProtection')) {
-            configSections.push({xtype: 'NumberRecognitionPanel'});
+        if(user.isAllowed('contentProtection')) {
+            configSections.push({xtype: 'ContentRecognitionPanel'});
         }
 
         /**

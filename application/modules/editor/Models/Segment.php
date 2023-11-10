@@ -33,7 +33,7 @@ END LICENSE AND COPYRIGHT
  *
  */
 
-use MittagQI\Translate5\Segment\ContentProtection\ContentProtector;
+use MittagQI\Translate5\ContentProtection\ContentProtector;
 
 /**
  * Segment Entity Object

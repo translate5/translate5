@@ -188,7 +188,7 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
                 'languageresourceresource','languageresourcetaskassoc','languageresourcetaskpivotassoc',
                 'languageresourceinstance','taskusertracking', 'term', 'attribute', 'termattribute', 'category',
                 'quality','userassocdefault', 'log', 'collectionattributedatatype', 'token',
-                'numberprotectionnumberrecognition', 'numberprotectioninputmapping', 'numberprotectionoutputmapping',
+                'contentprotectioncontentrecognition', 'contentprotectioninputmapping', 'contentprotectionoutputmapping',
             ],
         ]);
         $this->front->getRouter()->addRoute('editorRestDefault', $restRoute);
@@ -736,13 +736,13 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
         ));
 
         $this->front->getRouter()->addRoute(
-            'numberprotection.outputMapping.nameCombo',
+            'contentprotection.outputMapping.nameCombo',
             new ZfExtended_Controller_RestLikeRoute(
-                'editor/numberprotection/outputmapping/namecombo',
+                'editor/contentprotection/outputmapping/namecombo',
                 [
                     'module' => 'editor',
-                    'controller' => 'numberprotectionoutputmapping',
-                    /** @see \editor_NumberprotectionoutputmappingController::namecomboAction */
+                    'controller' => 'contentprotectionoutputmapping',
+                    /** @see \editor_ContentprotectionoutputmappingController::namecomboAction */
                     'action' => 'namecombo'
                 ]
             )

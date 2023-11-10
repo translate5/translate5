@@ -26,7 +26,7 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-use MittagQI\Translate5\NumberProtection\NumberProtector;
+use MittagQI\Translate5\ContentProtection\NumberProtector;
 
 /**
  * Segment Internal Tag Helper Class

@@ -33,7 +33,7 @@ END LICENSE AND COPYRIGHT
  */
 
 use editor_Models_Segment_InternalTag as InternalTag;
-use MittagQI\Translate5\Segment\ContentProtection\ContentProtector;
+use MittagQI\Translate5\ContentProtection\ContentProtector;
 
 /**
  * Fileparsing for Csv-files

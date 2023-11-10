@@ -53,7 +53,7 @@ declare(strict_types=1);
 namespace MittagQI\Translate5\Test\Unit\Segment\ContentProtection;
 
 use editor_Models_Segment_Whitespace;
-use MittagQI\Translate5\Segment\ContentProtection\WhitespaceProtector;
+use MittagQI\Translate5\ContentProtection\WhitespaceProtector;
 use PHPUnit\Framework\TestCase;
 
 class WhitespaceProtectorTest extends TestCase
