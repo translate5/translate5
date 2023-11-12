@@ -31,13 +31,13 @@ namespace MittagQI\Translate5\Tools;
 class Text {
 
     /**
-     * Uncomplete check if a text can be seen as translatable. Note, that numbers are not seen as translatable
+     * Check if a text can be seen as translatable. This is the case, if it contains at least one letter
+     * Note, that purenumbers are not seen as translatable
      * @param string|null $text
      * @return bool
      */
-    public static function seemsNotTranslatable(?string $text): bool
+    public static function seemsTranslatable(?string $text): bool
     {
-        $text = strip_tags($text);
-        return empty($text) || preg_match('/^[0-9\/\-\^\\\\\]\[().:;,_<>|#\'"!°#{}§$%&=?´`*+~]+$/i', $text) === 1;
+        return empty($text) ? false : (@preg_match('/\p{L}+/u', strip_tags($text)) === 1);
     }
 }

@@ -53,6 +53,12 @@ trait editor_Services_Connector_BatchTrait {
      */
     protected $batchExceptions = [];
 
+    /**
+     * Ther task the batch is worked on
+     * @var editor_Models_Task
+     */
+    protected editor_Models_Task $batchTask;
+
     /***
      * Where to check if the segment field has content (only possible target and pivot).
      * This is MT only relevant because for segments where the $contentField contains data (ex: target field has
@@ -98,7 +104,7 @@ trait editor_Services_Connector_BatchTrait {
         $segments = ZfExtended_Factory::get(editor_Models_Segment_Iterator::class, [$taskGuid]);
         /* @var $segments editor_Models_Segment_Iterator */
         
-        $task = editor_ModelInstances::taskByGuid($taskGuid);
+        $this->batchTask = editor_ModelInstances::taskByGuid($taskGuid);
 
         //number of temporary cached segments
         $tmpBuffer = 0;
@@ -114,7 +120,7 @@ trait editor_Services_Connector_BatchTrait {
             $segmentCounter++;
             
             //progress to update
-            $progress = $segmentCounter / $task->getSegmentCount();
+            $progress = $segmentCounter / $this->batchTask->getSegmentCount();
             
             //For pre-translation only those segments should be send to the MT, that have an empty target.-> https://jira.translate5.net/browse/TRANSLATE-2335
             //For analysis, the mt matchrate will always be the same.So it make no difference here if it is pretranslation

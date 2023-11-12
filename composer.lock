@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "c77c06c7d6d613cce9405aa6a8055804",
+    "content-hash": "866dd30132fa4505f26dfebbcaabf11f",
     "packages": [
         {
             "name": "alchemy/binary-driver",
@@ -2828,16 +2828,16 @@
         },
         {
             "name": "openai-php/client",
-            "version": "v0.7.5",
+            "version": "v0.7.8",
             "source": {
                 "type": "git",
                 "url": "https://github.com/openai-php/client.git",
-                "reference": "db18414d01c09c9a6956e6a47f117e15ae9c9bab"
+                "reference": "646fb247c1e4f33e6311f62bbfa4e81100881cb9"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/openai-php/client/zipball/db18414d01c09c9a6956e6a47f117e15ae9c9bab",
-                "reference": "db18414d01c09c9a6956e6a47f117e15ae9c9bab",
+                "url": "https://api.github.com/repos/openai-php/client/zipball/646fb247c1e4f33e6311f62bbfa4e81100881cb9",
+                "reference": "646fb247c1e4f33e6311f62bbfa4e81100881cb9",
                 "shasum": ""
             },
             "require": {
@@ -2900,7 +2900,7 @@
             ],
             "support": {
                 "issues": "https://github.com/openai-php/client/issues",
-                "source": "https://github.com/openai-php/client/tree/v0.7.5"
+                "source": "https://github.com/openai-php/client/tree/v0.7.8"
             },
             "funding": [
                 {
@@ -2916,7 +2916,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2023-11-06T07:39:32+00:00"
+            "time": "2023-11-07T16:13:43+00:00"
         },
         {
             "name": "paquettg/php-html-parser",
