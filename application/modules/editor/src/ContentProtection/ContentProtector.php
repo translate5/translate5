@@ -145,23 +145,23 @@ class ContentProtector
         return array_unique(array_merge(...$tags));
     }
 
-    public function unprotect(string $text, string ...$exceptProtectors): string
+    public function unprotect(string $text, bool $isSource, string ...$exceptProtectors): string
     {
         foreach ($this->protectors as $protector) {
             if (in_array($protector::alias(), $exceptProtectors, true)) {
                 continue;
             }
 
-            $text = $protector->unprotect($text);
+            $text = $protector->unprotect($text, $isSource);
         }
 
         return $text;
     }
 
-    public function convertForSorting(string $text): string
+    public function convertForSorting(string $text, bool $isSource): string
     {
         foreach ($this->protectors as $protector) {
-            $text = $protector->convertForSorting($text);
+            $text = $protector->convertForSorting($text, $isSource);
         }
 
         return $text;

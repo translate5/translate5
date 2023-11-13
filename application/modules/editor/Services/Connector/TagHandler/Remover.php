@@ -48,7 +48,7 @@ class editor_Services_Connector_TagHandler_Remover extends editor_Services_Conne
         $this->realTagCount = 0;
         
         //1. whitespace preparation
-        $queryString = $this->convertQueryContent($queryString);
+        $queryString = $this->convertQueryContent($queryString, $isSource);
         
         //2. strip all tags and set real tag count
         return strip_tags($this->utilities->internalTag->replace($queryString, '', -1, $this->realTagCount));

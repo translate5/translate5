@@ -27,6 +27,7 @@ END LICENSE AND COPYRIGHT
 */
 
 use MittagQI\Translate5\ContentProtection\ContentProtector;
+use MittagQI\Translate5\ContentProtection\NumberProtector;
 
 /**
  * Count the word in segment text
@@ -233,7 +234,7 @@ class editor_Models_Segment_WordCount {
     {
         //replace white space tags with real white space, before clean all teh tags
         $text = $this->utilityBroker->internalTag->restore($this->queryString, $this->contentProtector->tagList());
-        $text = $this->contentProtector->unprotect($text);
+        $text = $this->contentProtector->unprotect($text, true, NumberProtector::alias());
         $text=$this->segment->stripTags($text);
         //average words in East Asian languages by language
         //Chinese (all forms): 2.8

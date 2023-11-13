@@ -117,12 +117,12 @@ class WhitespaceProtector implements ProtectorInterface
         return $protected;
     }
 
-    public function unprotect(string $content): string
+    public function unprotect(string $content, bool $source): string
     {
         return $this->whitespace->unprotectWhitespace($content);
     }
 
-    public function convertForSorting(string $content): string
+    public function convertForSorting(string $content, bool $isSource): string
     {
         return $this->whitespace->convertForStripping($content);
     }

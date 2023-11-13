@@ -248,18 +248,18 @@ class NumberProtector implements ProtectorInterface
         return $matches[1];
     }
 
-    public function unprotect(string $content): string
+    public function unprotect(string $content, bool $isSource): string
     {
         return preg_replace_callback(
-            sprintf('/<%s.+source="(.+)".+\/>/U', self::TAG_NAME),
-            fn (array $match): string => $match[1],
+            sprintf('/<%s.+source="(.+)".+target="(.+)"\/>/U', self::TAG_NAME),
+            fn (array $match): string => $isSource ? $match[1] : ($match[2] ?: $match[1]),
             $content
         );
     }
 
-    public function convertForSorting(string $content): string
+    public function convertForSorting(string $content, bool $isSource): string
     {
-        return $this->unprotect($content);
+        return $this->unprotect($content, $isSource);
     }
 
     private function handleNumberTags(

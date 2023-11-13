@@ -364,7 +364,7 @@ abstract class editor_Models_Export_FileParser {
         $edited = $this->revertNonBreakingSpaces($edited);
         
         if(!$this->options['diff']){
-            return $this->unprotectContent($edited);
+            return $this->unprotectContent($edited, str_contains($field, 'source'));
         }
         $segmentOriginal = $segment->getFieldExport($field, $this->_task, false, false);
         // This removes all segment tags but the ones needed for export
@@ -382,7 +382,7 @@ abstract class editor_Models_Export_FileParser {
             
         }
         // unprotectWhitespace must be done after diffing!
-        return $this->unprotectContent($diffed);
+        return $this->unprotectContent($diffed, str_contains($field, 'source'));
     }
 
     /**
@@ -447,12 +447,13 @@ abstract class editor_Models_Export_FileParser {
      * @param string $segment
      * @return string
      */
-    public function exportSingleSegmentContent($segment) {
+    public function exportSingleSegmentContent($segment, bool $isSource) {
         //processing of term tags is done after using this method!
         $this->disableMqmExport = true;
         $segment = $this->parseSegment($segment);
         $segment = $this->revertNonBreakingSpaces($segment);
-        return $this->unprotectContent($segment);
+
+        return $this->unprotectContent($segment, $isSource);
     }
     
     /**
@@ -460,7 +461,7 @@ abstract class editor_Models_Export_FileParser {
      * @param string $segment
      * @return string
      */
-    protected function unprotectContent(string $segment): string {
-        return $this->contentProtector->unprotect($segment);
+    protected function unprotectContent(string $segment, bool $isSource): string {
+        return $this->contentProtector->unprotect($segment, $isSource);
     }
 }

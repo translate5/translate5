@@ -168,7 +168,7 @@ abstract class editor_Services_Connector_TagHandler_Abstract
 
     protected function convertQuery(string $queryString, bool $isSource): string
     {
-        return $this->contentProtector->unprotect($queryString);
+        return $this->contentProtector->unprotect($queryString, $isSource);
     }
     
     /**

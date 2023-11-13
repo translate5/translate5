@@ -201,7 +201,7 @@ class editor_Services_Connector
                 }
                 $serviceResult->setResults($results);
             }
-        } else if($this->adapter->canTranslateInternalTags()) {
+        } elseif ($this->adapter->canTranslateInternalTags()) {
 
             // when the connector is able to process the internal T5 format for segment text we convert the raw markup and reconvert it after translation
             // we use the utilities broker that is already instantiated in the concrete connector
@@ -214,7 +214,10 @@ class editor_Services_Connector
             $results = $serviceResult->getResult();
             if(count($results) > 0){
                 // revert the internal and whitespace tags to the input format
-                $results[0]->target = $this->convertInternalTagsToMarkup($results[0]->target, $utilities);
+                $results[0]->target = $this->contentProtector->unprotect(
+                    $utilities->internalTag->restore($results[0]->target),
+                    false
+                );
                 $serviceResult->setResults($results);
             }
         } else {
@@ -244,15 +247,6 @@ class editor_Services_Connector
             $shortTagIdent,
             ContentProtector::ENTITY_MODE_OFF
         );
-    }
-
-    /**
-     * Revert markup with whitespace encoded to internal tags to it's original format
-     * this simplifies but still copies the logic of editor_Models_Export_FileParser::exportSingleSegmentContent
-     */
-    private function convertInternalTagsToMarkup(string $textWithTags, UtilityBroker $utilities) : string
-    {
-        return $this->contentProtector->unprotect($utilities->internalTag->restore($textWithTags));
     }
 
     /***

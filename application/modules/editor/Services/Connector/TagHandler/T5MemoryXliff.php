@@ -85,7 +85,7 @@ class editor_Services_Connector_TagHandler_T5MemoryXliff extends editor_Services
 
     protected function convertQuery(string $queryString, bool $isSource): string
     {
-        $queryString = $this->contentProtector->unprotect($queryString, NumberProtector::alias());
+        $queryString = $this->contentProtector->unprotect($queryString, false, NumberProtector::alias());
         $regex = NumberProtector::fullTagRegex();
 
         if (!preg_match_all($regex, $queryString, $tags, PREG_SET_ORDER)) {
