@@ -202,7 +202,7 @@ trait editor_Services_Connector_BatchTrait {
      * @param int $totalContentSize
      * @return bool
      */
-    protected function isAllowedByContentSize(int $totalContentSize): bool
+    protected function isAllowedByContentSize(int|float $totalContentSize): bool
     {
         if(is_numeric($this->batchQueryBufferSize) === false){
             return true;
