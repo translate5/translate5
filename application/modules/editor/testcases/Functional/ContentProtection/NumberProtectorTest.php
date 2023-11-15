@@ -75,29 +75,29 @@ class NumberProtectorTest extends TestCase
         $langDe = ZfExtended_Factory::get(editor_Models_Languages::class);
         $langDe->loadByRfc5646('de');
 
-        $numberFormat = ZfExtended_Factory::get(ContentRecognition::class);
-        $numberFormat->setName('test');
-        $numberFormat->setRegex('/^\d+ USD$/');
-        $numberFormat->setType(IntegerProtector::getType());
-        $numberFormat->setKeepAsIs(false);
-        $numberFormat->setPriority(1000);
-        $numberFormat->save();
-        $numberFormat->refresh();
+        $contentRecognition = ZfExtended_Factory::get(ContentRecognition::class);
+        $contentRecognition->setName('test');
+        $contentRecognition->setRegex('/^\d+ USD$/');
+        $contentRecognition->setType(IntegerProtector::getType());
+        $contentRecognition->setKeepAsIs(false);
+        $contentRecognition->setPriority(1000);
+        $contentRecognition->save();
+        $contentRecognition->refresh();
 
         $inputMapping = ZfExtended_Factory::get(InputMapping::class);
         $inputMapping->setLanguageId($langEn->getId());
-        $inputMapping->setContentRecognitionId($numberFormat->getId());
+        $inputMapping->setContentRecognitionId($contentRecognition->getId());
         $inputMapping->save();
 
         $outputMapping = ZfExtended_Factory::get(OutputMapping::class);
         $outputMapping->setLanguageId($langDe->getId());
-        $outputMapping->setContentRecognitionId($numberFormat->getId());
+        $outputMapping->setContentRecognitionId($contentRecognition->getId());
         $outputMapping->setFormat('# EUR');
         $outputMapping->save();
 
         $protected = NumberProtector::create()->protect('12345 USD', (int)$langEn->getId(), (int)$langDe->getId());
 
-        $numberFormat->delete();
+        $contentRecognition->delete();
 
         self::assertSame(
             '<number type="integer" name="test" source="12345 USD" iso="12345" target="12345 EUR"/>',
@@ -116,29 +116,29 @@ class NumberProtectorTest extends TestCase
         $langDeAt = ZfExtended_Factory::get(editor_Models_Languages::class);
         $langDeAt->loadByRfc5646('de-at');
 
-        $numberFormat = ZfExtended_Factory::get(ContentRecognition::class);
-        $numberFormat->setName('test');
-        $numberFormat->setRegex('/^\d+ USD$/');
-        $numberFormat->setType(IntegerProtector::getType());
-        $numberFormat->setKeepAsIs(false);
-        $numberFormat->setPriority(1000);
-        $numberFormat->save();
-        $numberFormat->refresh();
+        $contentRecognition = ZfExtended_Factory::get(ContentRecognition::class);
+        $contentRecognition->setName('test');
+        $contentRecognition->setRegex('/^\d+ USD$/');
+        $contentRecognition->setType(IntegerProtector::getType());
+        $contentRecognition->setKeepAsIs(false);
+        $contentRecognition->setPriority(1000);
+        $contentRecognition->save();
+        $contentRecognition->refresh();
 
         $inputMapping = ZfExtended_Factory::get(InputMapping::class);
         $inputMapping->setLanguageId($langEn->getId());
-        $inputMapping->setContentRecognitionId($numberFormat->getId());
+        $inputMapping->setContentRecognitionId($contentRecognition->getId());
         $inputMapping->save();
 
         $outputMapping = ZfExtended_Factory::get(OutputMapping::class);
         $outputMapping->setLanguageId($langDe->getId());
-        $outputMapping->setContentRecognitionId($numberFormat->getId());
+        $outputMapping->setContentRecognitionId($contentRecognition->getId());
         $outputMapping->setFormat('# EUR');
         $outputMapping->save();
 
         $protected = NumberProtector::create()->protect('12345 USD', (int) $langEn->getId(), (int) $langDeAt->getId());
 
-        $numberFormat->delete();
+        $contentRecognition->delete();
 
         self::assertSame(
             '<number type="integer" name="test" source="12345 USD" iso="12345" target="12345 EUR"/>',
@@ -181,7 +181,22 @@ class NumberProtectorTest extends TestCase
 
             return;
         }
-        self::assertSame($expected, $protector->unprotect($node));
+        self::assertSame($expected, $protector->unprotect($node, true));
+    }
+
+    public function testUnprotectForTarget(): void
+    {
+        $protector = NumberProtector::create();
+
+        self::assertSame(
+            'string 1.23e12 string',
+            $protector->unprotect('string <number type="float" name="test" source="1.23e12" iso="1.23e12" target=""/> string', false)
+        );
+
+        self::assertSame(
+            'string 1,23 string',
+            $protector->unprotect('string <number type="float" name="test" source="1.23" iso="1.23" target="1,23"/> string', false)
+        );
     }
     
     public function numbersProvider(): iterable
@@ -661,13 +676,11 @@ class NumberProtectorTest extends TestCase
         $select = $dbContentRecognition->select()
             ->from(['recognition' => $contentRecognitionTable], ['recognition.*'])
             ->where('isDefault = true')
-            ->where('enabled = true')
             ->order('priority desc');
 
         $getAll = function ($select) use ($dbContentRecognition) {
             foreach ($dbContentRecognition->fetchAll($select) as $formatData) {
-                $dto = ContentRecognitionDto::fromRow($formatData);
-                yield $dto;
+                yield ContentRecognitionDto::fromRow($formatData);
             }
         };
 

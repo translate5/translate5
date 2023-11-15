@@ -9202,15 +9202,15 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
             </trans-unit>
             <trans-unit id="TnVtbWVybmVya2VubnVuZw==">
                 <source>Nummernerkennung</source>
-                <target>Nummernerkennung</target>
+                <target>Regeln für die Erkennung von Inhalten</target>
             </trans-unit>
             <trans-unit id="RWluZ2FiZXp1b3JkbnVuZw==">
                 <source>Eingabezuordnung</source>
-                <target>Eingabezuordnung</target>
+                <target>Aktive Input-Regeln</target>
             </trans-unit>
             <trans-unit id="QXVzZ2FiZXp1b3JkbnVuZw==">
                 <source>Ausgabezuordnung</source>
-                <target>Ausgabezuordnung</target>
+                <target>Aktive Output-Regeln</target>
             </trans-unit>
             <trans-unit id="TnVtbWVybmVya2VubnVuZyBlcnN0ZWxsZW4=">
                 <source>Nummernerkennung erstellen</source>
@@ -9259,6 +9259,33 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
             <trans-unit id='RGFzIFNlZ21lbnQga29ubnRlIG51ciBpbiBkZXIgQXVmZ2FiZSwgbmljaHQgYWJlciBpbnMgVE0gZ2VzcGVpY2hlcnQgd2VyZGVuLiBTZWdtZW50ZSBsw6RuZ2VyIGFscyAyMDQ4IEJ5dGVzIHNpbmQgbmljaHQgaW0gVE0gc3BlaWNoZXJiYXIu'>
                 <source>Das Segment konnte nur in der Aufgabe, nicht aber ins TM gespeichert werden. Segmente länger als 2048 Bytes sind nicht im TM speicherbar.</source>
                 <target>Das Segment konnte nur in der Aufgabe, nicht aber ins TM gespeichert werden. Segmente länger als 2048 Bytes sind nicht im TM speicherbar.</target>
+            </trans-unit>
+            <trans-unit id="Q29udGVudCBSZWNvZ25pdGlvbiBSdWxlcyB0YWIgaW5mbyBib3g=">
+                <source>Content Recognition Rules tab info box</source>
+                <target>Liste der vordefinierten regulären Ausdrücke, die zum Schutz von Inhalten verwendet werden können. Oder definieren Sie Ihre eigenen Regeln.</target>
+            </trans-unit>
+            <trans-unit id="QWN0aXZlIElucHV0IFJ1bGVzIHRhYiBpbmZvIGJveA==">
+                <source>Active Input Rules tab info box</source>
+                <target>
+                Liste der aktiven Input-Regeln. Um eine Regel zu aktivieren, muss sie einer Ausgangssprache zugewiesen werden.
+                <br/>Sobald der Inhalt für diese Sprache gefunden wird, wird er als internes Tag geschützt.
+                <br/>Datumsangaben, Fließkomma- und Integer-Zahlen werden automatisch in das Format einer beliebigen Zielsprache umgewandelt, wobei die folgenden Voreinstellungen verwendet werden: <a href="https://icu4c-demos.unicode.org/icu-bin/locexp?d_=de#region" target="_blank" rel="noopener noreferrer">ICU</a> (für Datumsangaben wird das SHORT-Format verwendet)
+                <br/>Um die Standardformate zu überschreiben, verwenden Sie bitte die Registerkarte "Aktive Output-Regeln". IP- und MAC-Adressen werden unverändert übernommen.
+                </target>
+            </trans-unit>
+            <trans-unit id="QWN0aXZlIE91dHB1dCBSdWxlcyB0YWIgaW5mbyBib3g=">
+                <source>Active Output Rules tab info box</source>
+                <target>
+                <h2>Liste der aktiven Output-Regeln</h2>
+                Fügen Sie hier Regeln pro Zielsprache hinzu, um die Standardausgabeformate für Ihre aktiven Input-Regeln zu überschreiben.
+                <br/>Sie können hier Ihre eigenen Formate für die gewünschte <b>type-ruleName-targetLang</b> Kombination angeben.
+                <br/>Output-Regeln werden nicht angewendet, wenn in der Ausgangssprache kein Inhalt geschützt ist.
+                <br/>Regeln für Formatstrings finden Sie hier:
+                <br/><a href="https://icu4c-demos.unicode.org/icu-bin/locexp?d_=de#region" target="_blank" rel="noopener noreferrer">1. Gebietsschema-bezogene Formatvorgaben</a>
+                <br/><a href="https://unicode-org.github.io/icu/userguide/format_parse/datetime/#datetime-format-syntax" target="_blank" rel="noopener noreferrer">2. Syntax für Datumsangaben</a>
+                <br/><a href="https://unicode-org.github.io/icu-docs/apidoc/released/icu4j/com/ibm/icu/text/DecimalFormat.html" target="_blank" rel="noopener noreferrer">3. Zahlen-Syntax</a>
+                <br/><a href="icu4c-demos.unicode.org" target="_blank" rel="noopener noreferrer">4. ICU-Demonstration</a>
+                </target>
             </trans-unit>
         </body>
     </file>

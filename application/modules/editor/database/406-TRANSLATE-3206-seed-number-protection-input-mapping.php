@@ -27,8 +27,6 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-use MittagQI\Translate5\ContentProtection\Model\ContentRecognition;
-
 set_time_limit(0);
 
 /* @var ZfExtended_Models_Installer_DbUpdater $this */
@@ -40,7 +38,7 @@ set_time_limit(0);
 // and must not be a constant since in installation the same named constant would we defined multiple times then
 $SCRIPT_IDENTIFIER = '406-TRANSLATE-3206-seed-number-protection-input-mapping.php';
 
-if (APPLICATION_ENV === ZfExtended_BaseIndex::ENVIRONMENT_TEST) {
+if (APPLICATION_ENV !== ZfExtended_BaseIndex::ENVIRONMENT_TEST) {
 
     $db = Zend_Db_Table::getDefaultAdapter();
 
@@ -52,78 +50,96 @@ if (APPLICATION_ENV === ZfExtended_BaseIndex::ENVIRONMENT_TEST) {
     $enGbId = $lang->getLangIdByRfc5646('en-GB');
     $frId = $lang->getLangIdByRfc5646('fr');
 
-    $contentRecognition = ZfExtended_Factory::get(ContentRecognition::class);
-
     $inputMappings = [];
 
 // region Dates
-    $contentRecognition->loadBy('date', 'default m/d/Y');
-    $inputMappings[] = "($enUsId, {$contentRecognition->getId()})";
+    $s = $db->select()->from('LEK_number_protection_number_recognition', 'id')
+        ->where('type = ?', 'date')->where('name = ?', 'default m/d/Y');
 
-    $contentRecognition->loadBy('date', 'default m/d/y');
-    $inputMappings[] = "($enUsId, {$contentRecognition->getId()})";
+    $inputMappings[] = "($enUsId, {$db->query($s)->fetchColumn()})";
 
-    $contentRecognition->loadBy('date', 'default d/m/Y');
+    $s = $db->select()->from('LEK_number_protection_number_recognition', 'id')
+        ->where('type = ?', 'date')->where('name = ?', 'default m/d/y');
 
-    $inputMappings[] = "($frId, {$contentRecognition->getId()})";
-    $inputMappings[] = "($enId, {$contentRecognition->getId()})";
-    $inputMappings[] = "($enGbId, {$contentRecognition->getId()})";
+    $inputMappings[] = "($enUsId, {$db->query($s)->fetchColumn()})";
 
-    $contentRecognition->loadBy('date', 'default d/m/y');
+    $s = $db->select()->from('LEK_number_protection_number_recognition', 'id')
+        ->where('type = ?', 'date')->where('name = ?', 'default d/m/Y');
 
-    $inputMappings[] = "($frId, {$contentRecognition->getId()})";
-    $inputMappings[] = "($enId, {$contentRecognition->getId()})";
-    $inputMappings[] = "($enGbId, {$contentRecognition->getId()})";
+    $inputMappings[] = "($frId, {$db->query($s)->fetchColumn()})";
+    $inputMappings[] = "($enId, {$db->query($s)->fetchColumn()})";
+    $inputMappings[] = "($enGbId, {$db->query($s)->fetchColumn()})";
 
-    $contentRecognition->loadBy('date', 'default Y-m-d');
+    $s = $db->select()->from('LEK_number_protection_number_recognition', 'id')
+        ->where('type = ?', 'date')->where('name = ?', 'default d/m/y');
 
-    $inputMappings[] = "($frId, {$contentRecognition->getId()})";
-    $inputMappings[] = "($enId, {$contentRecognition->getId()})";
-    $inputMappings[] = "($deId, {$contentRecognition->getId()})";
+    $inputMappings[] = "($frId, {$db->query($s)->fetchColumn()})";
+    $inputMappings[] = "($enId, {$db->query($s)->fetchColumn()})";
+    $inputMappings[] = "($enGbId, {$db->query($s)->fetchColumn()})";
 
-    $contentRecognition->loadBy('date', 'default d-m-Y');
+    $s = $db->select()->from('LEK_number_protection_number_recognition', 'id')
+        ->where('type = ?', 'date')->where('name = ?', 'default Y-m-d');
 
-    $inputMappings[] = "($frId, {$contentRecognition->getId()})";
-    $inputMappings[] = "($enId, {$contentRecognition->getId()})";
-    $inputMappings[] = "($enGbId, {$contentRecognition->getId()})";
+    $inputMappings[] = "($frId, {$db->query($s)->fetchColumn()})";
+    $inputMappings[] = "($enId, {$db->query($s)->fetchColumn()})";
+    $inputMappings[] = "($deId, {$db->query($s)->fetchColumn()})";
 
-    $contentRecognition->loadBy('date', 'default d.m.Y');
+    $s = $db->select()->from('LEK_number_protection_number_recognition', 'id')
+        ->where('type = ?', 'date')->where('name = ?', 'default d-m-Y');
 
-    $inputMappings[] = "($enId, {$contentRecognition->getId()})";
-    $inputMappings[] = "($deId, {$contentRecognition->getId()})";
+    $inputMappings[] = "($frId, {$db->query($s)->fetchColumn()})";
+    $inputMappings[] = "($enId, {$db->query($s)->fetchColumn()})";
+    $inputMappings[] = "($enGbId, {$db->query($s)->fetchColumn()})";
 
-    $contentRecognition->loadBy('date', 'default d.m.y');
+    $s = $db->select()->from('LEK_number_protection_number_recognition', 'id')
+        ->where('type = ?', 'date')->where('name = ?', 'default d.m.Y');
 
-    $inputMappings[] = "($deId, {$contentRecognition->getId()})";
+    $inputMappings[] = "($enId, {$db->query($s)->fetchColumn()})";
+    $inputMappings[] = "($deId, {$db->query($s)->fetchColumn()})";
 
-    $contentRecognition->loadBy('date', 'default Y.m.d');
+    $s = $db->select()->from('LEK_number_protection_number_recognition', 'id')
+        ->where('type = ?', 'date')->where('name = ?', 'default d.m.y');
 
-    $inputMappings[] = "($enId, {$contentRecognition->getId()})";
-    $inputMappings[] = "($enGbId, {$contentRecognition->getId()})";
+    $inputMappings[] = "($deId, {$db->query($s)->fetchColumn()})";
+
+    $s = $db->select()->from('LEK_number_protection_number_recognition', 'id')
+        ->where('type = ?', 'date')->where('name = ?', 'default Y.m.d');
+
+    $inputMappings[] = "($enId, {$db->query($s)->fetchColumn()})";
+    $inputMappings[] = "($enGbId, {$db->query($s)->fetchColumn()})";
 // endregion Dates block
 
 // region Floats
-    $contentRecognition->loadBy('float', 'default with dot thousand decimal comma');
-    $inputMappings[] = "($deId, {$contentRecognition->getId()})";
+    $s = $db->select()->from('LEK_number_protection_number_recognition', 'id')
+        ->where('type = ?', 'float')->where('name = ?', 'default with dot thousand decimal comma');
 
-    $contentRecognition->loadBy('float', 'default with comma thousand decimal dot');
-    $inputMappings[] = "($enId, {$contentRecognition->getId()})";
+    $inputMappings[] = "($deId, {$db->query($s)->fetchColumn()})";
 
-    $contentRecognition->loadBy('float', 'default with whitespace thousand decimal comma');
-    $inputMappings[] = "($frId, {$contentRecognition->getId()})";
+    $s = $db->select()->from('LEK_number_protection_number_recognition', 'id')
+        ->where('type = ?', 'float')->where('name = ?', 'default with comma thousand decimal dot');
 
-    $contentRecognition->loadBy('float', 'default generic');
-    $inputMappings[] = "($enId, {$contentRecognition->getId()})";
-    $inputMappings[] = "($deId, {$contentRecognition->getId()})";
-    $inputMappings[] = "($frId, {$contentRecognition->getId()})";
+    $inputMappings[] = "($enId, {$db->query($s)->fetchColumn()})";
+
+    $s = $db->select()->from('LEK_number_protection_number_recognition', 'id')
+        ->where('type = ?', 'float')->where('name = ?', 'default with whitespace thousand decimal comma');
+
+    $inputMappings[] = "($frId, {$db->query($s)->fetchColumn()})";
+
+    $s = $db->select()->from('LEK_number_protection_number_recognition', 'id')
+        ->where('type = ?', 'float')->where('name = ?', 'default generic');
+
+    $inputMappings[] = "($enId, {$db->query($s)->fetchColumn()})";
+    $inputMappings[] = "($deId, {$db->query($s)->fetchColumn()})";
+    $inputMappings[] = "($frId, {$db->query($s)->fetchColumn()})";
 // endregion
 
 // region Integers
-    $contentRecognition->loadBy('integer', 'default simple');
-    $inputMappings[] = "($enId, {$contentRecognition->getId()})";
-    $inputMappings[] = "($deId, {$contentRecognition->getId()})";
-    $inputMappings[] = "($frId, {$contentRecognition->getId()})";
+    $s = $db->select()->from('LEK_number_protection_number_recognition', 'id')
+        ->where('type = ?', 'integer')->where('name = ?', 'default simple');
+    $inputMappings[] = "($enId, {$db->query($s)->fetchColumn()})";
+    $inputMappings[] = "($deId, {$db->query($s)->fetchColumn()})";
+    $inputMappings[] = "($frId, {$db->query($s)->fetchColumn()})";
 // endregion
 
-    $db->query('INSERT INTO `LEK_number_protection_input_mapping` (`languageId`, `contentRecognitionId`) VALUES ' . implode(',', $inputMappings));
+    $db->query('INSERT INTO `LEK_number_protection_input_mapping` (`languageId`, `numberRecognitionId`) VALUES ' . implode(',', $inputMappings));
 }

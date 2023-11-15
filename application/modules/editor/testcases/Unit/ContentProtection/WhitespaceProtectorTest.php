@@ -50,7 +50,7 @@ END LICENSE AND COPYRIGHT
 */
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\Test\Unit\Segment\ContentProtection;
+namespace MittagQI\Translate5\Test\Unit\ContentProtection;
 
 use editor_Models_Segment_Whitespace;
 use MittagQI\Translate5\ContentProtection\WhitespaceProtector;
@@ -75,7 +75,7 @@ class WhitespaceProtectorTest extends TestCase
     {
         $protector = new WhitespaceProtector(new editor_Models_Segment_Whitespace());
 
-        self::assertEquals($expected, $protector->unprotect($text));
+        self::assertEquals($expected, $protector->unprotect($text, true));
     }
 
     public function caseProvider(): iterable

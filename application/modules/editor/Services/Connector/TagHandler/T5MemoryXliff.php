@@ -104,11 +104,11 @@ class editor_Services_Connector_TagHandler_T5MemoryXliff extends editor_Services
 
             $encodedRegex = base64_encode(gzdeflate($contentRecognition->getRegex()));
             $t5nTag = sprintf(
-                '<%s id="%s" n="%s" r="%s"/>',
+                '<%s id="%s" r="%s" n="%s"/>',
                 self::T5MEMORY_NUMBER_TAG,
                 $currentId,
-                $isSource ? $tagProps['source'] : $tagProps['target'],
-                $encodedRegex
+                $encodedRegex,
+                $isSource ? $tagProps['source'] : $tagProps['target']
             );
 
             $this->numberTagMap[$encodedRegex][] = $tag;

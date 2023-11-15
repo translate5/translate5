@@ -104,10 +104,18 @@ class ContentProtectorTest extends editor_Test_UnitTest
     /**
      * @dataProvider casesProvider
      */
-    public function testUnprotect(string $expected, string $node, bool $source): void
+    public function testUnprotect(string $expected, string $node): void
     {
         $contentProtector = ContentProtector::create(new Whitespace());
-        self::assertSame($expected, $contentProtector->unprotect($node, $source));
+        self::assertSame($expected, $contentProtector->unprotect($node, true));
+
+        self::assertSame(
+            '123.456,789 Übersetzungsbüro [ ] 24translate 15/9/23 and 19/10/24',
+            $contentProtector->unprotect(
+                '<number type="float" name="default with comma thousand decimal dot" source="123,456.789" iso="123456.789" target="123.456,789"/> Übersetzungsbüro [<char ts="c2a0" length="1"/>] 24translate <number type="date" name="default Y-m-d" source="2023-09-15" iso="2023-09-15" target="15/9/23"/> and <number type="date" name="default Y-m-d" source="2024-10-19" iso="2024-10-19" target="19/10/24"/>',
+                false
+            )
+        );
     }
 
     public function casesProvider(): iterable
@@ -115,19 +123,11 @@ class ContentProtectorTest extends editor_Test_UnitTest
         yield '&#128; is protected as char' => [
             'text' => 'Test &amp;para; entities ¶ and umlauts öäü¶ and [&#128;] TRANSLATE',
             'expected' => 'Test &amp;para; entities ¶ and umlauts öäü¶ and [<char ts="26233132383b" length="1"/>] TRANSLATE',
-            'source' => true,
         ];
 
         yield 'float in the beginning' => [
             'text' => '123,456.789 Übersetzungsbüro [ ] 24translate 2023-09-15 and 2024-10-19',
             'expected' => '<number type="float" name="default with comma thousand decimal dot" source="123,456.789" iso="123456.789" target="123.456,789"/> Übersetzungsbüro [<char ts="c2a0" length="1"/>] 24translate <number type="date" name="default Y-m-d" source="2023-09-15" iso="2023-09-15" target="15/9/23"/> and <number type="date" name="default Y-m-d" source="2024-10-19" iso="2024-10-19" target="19/10/24"/>',
-            'source' => true,
-        ];
-
-        yield 'float in the beginning - target' => [
-            'text' => '123.456,789 Übersetzungsbüro [ ] 24translate 15/9/23 and 19/10/24',
-            'expected' => '<number type="float" name="default with comma thousand decimal dot" source="123,456.789" iso="123456.789" target="123.456,789"/> Übersetzungsbüro [<char ts="c2a0" length="1"/>] 24translate <number type="date" name="default Y-m-d" source="2023-09-15" iso="2023-09-15" target="15/9/23"/> and <number type="date" name="default Y-m-d" source="2024-10-19" iso="2024-10-19" target="19/10/24"/>',
-            'source' => false,
         ];
     }
 

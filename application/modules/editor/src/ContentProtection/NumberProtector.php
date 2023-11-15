@@ -251,8 +251,8 @@ class NumberProtector implements ProtectorInterface
     public function unprotect(string $content, bool $isSource): string
     {
         return preg_replace_callback(
-            sprintf('/<%s.+source="(.+)".+target="(.+)"\/>/U', self::TAG_NAME),
-            fn (array $match): string => $isSource ? $match[1] : ($match[2] ?: $match[1]),
+            sprintf('/<%s.+source="(.+)".+target="(.+)?"\/>/U', self::TAG_NAME),
+            fn (array $match): string => $isSource ? $match[1] : ($match[2] ?? $match[1]),
             $content
         );
     }

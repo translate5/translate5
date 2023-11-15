@@ -33,13 +33,15 @@ CREATE TABLE `LEK_content_protection_input_mapping` (
     `contentRecognitionId` int (11) NOT NULL COMMENT 'Foreign Key to LEK_content_protection_number_recognition',
     PRIMARY KEY (`id`),
     CONSTRAINT FOREIGN KEY (`languageId`) REFERENCES `LEK_languages` (`id`) ON DELETE CASCADE,
-    CONSTRAINT FOREIGN KEY (`contentRecognitionId`) REFERENCES `LEK_content_protection_number_recognition` (`id`) ON DELETE CASCADE,
+    CONSTRAINT FOREIGN KEY (`contentRecognitionId`) REFERENCES `LEK_content_protection_content_recognition` (`id`) ON DELETE CASCADE,
     UNIQUE (`languageId`, `contentRecognitionId`)
 );
 
-INSERT INTO LEK_content_protection_input_mapping (id, languageId, contentRecognitionId)
-SELECT id, languageId, numberRecognitionId
+INSERT INTO LEK_content_protection_input_mapping (languageId, contentRecognitionId)
+SELECT languageId, numberRecognitionId
 FROM LEK_number_protection_input_mapping;
+
+DROP TABLE LEK_number_protection_input_mapping;
 
 CREATE TABLE `LEK_content_protection_output_mapping` (
     `id` int (11) NOT NULL AUTO_INCREMENT,
@@ -48,10 +50,12 @@ CREATE TABLE `LEK_content_protection_output_mapping` (
     `format` varchar(124) DEFAULT NULL,
     PRIMARY KEY (`id`),
     CONSTRAINT FOREIGN KEY (`languageId`) REFERENCES `LEK_languages` (`id`) ON DELETE CASCADE,
-    CONSTRAINT FOREIGN KEY (`contentRecognitionId`) REFERENCES `LEK_content_protection_number_recognition` (`id`) ON DELETE CASCADE,
+    CONSTRAINT FOREIGN KEY (`contentRecognitionId`) REFERENCES `LEK_content_protection_content_recognition` (`id`) ON DELETE CASCADE,
     UNIQUE (`languageId`, `contentRecognitionId`)
 );
 
-INSERT INTO LEK_content_protection_output_mapping (id, languageId, contentRecognitionId)
-SELECT id, languageId, numberRecognitionId
+INSERT INTO LEK_content_protection_output_mapping (languageId, contentRecognitionId)
+SELECT languageId, numberRecognitionId
 FROM LEK_number_protection_output_mapping;
+
+DROP TABLE LEK_number_protection_output_mapping;
