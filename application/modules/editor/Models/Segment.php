@@ -828,7 +828,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract
             /* @var $row editor_Models_Db_SegmentDataRow */
             $row->name = $name;
             $field = $sfm->getByName($name);
-            $row->originalToSort = $this->stripTags($row->original);
+            $row->originalToSort = $this->stripTags($row->original, 'source' === $name);
             $row->taskGuid = $this->getTaskGuid();
             $row->mid = $this->getMid();
             if (isset($field->editable) && $field->editable) {
