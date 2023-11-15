@@ -83,16 +83,19 @@ class editor_Task_Operation {
 
     private int $workerId;
 
+    private string $taskGuid;
+
     private editor_Task_Operation_StartingWorker $worker;
 
     private function __construct(private string $operationType, editor_Models_Task $task)
     {
+        $this->taskGuid = $task->getTaskGuid();
         $this->worker = ZfExtended_Factory::get(editor_Task_Operation_StartingWorker::class);
-        if($this->worker->init($task->getTaskGuid(), [ 'operationType' => $operationType ])) {
+        if($this->worker->init($this->taskGuid, [ 'operationType' => $operationType ])) {
             $this->workerId = $this->worker->queue(0, ZfExtended_Models_Worker::STATE_PREPARE, false);
             // add finishing worker
             $worker = ZfExtended_Factory::get(editor_Task_Operation_FinishingWorker::class);
-            if($worker->init($task->getTaskGuid(), [ 'operationType' => $operationType, 'taskInitialState' => $task->getState() ])) {
+            if($worker->init($this->taskGuid, [ 'operationType' => $operationType, 'taskInitialState' => $task->getState() ])) {
                 $worker->queue($this->workerId, ZfExtended_Models_Worker::STATE_PREPARE, false);
                 return;
             }
@@ -116,5 +119,14 @@ class editor_Task_Operation {
     public function start(): void
     {
         $this->worker->schedulePrepared();
+    }
+
+    /**
+     * This API must be called when the creation of a task-operation failed to clean the created workers up
+     * @return void
+     */
+    public function onQueueingError(): void
+    {
+        $this->worker->getModel()->cleanForTask($this->taskGuid);
     }
 }

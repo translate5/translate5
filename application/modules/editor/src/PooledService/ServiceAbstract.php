@@ -108,7 +108,10 @@ abstract class ServiceAbstract extends DockerServiceAbstract
      */
     public function getServiceUrls(): array
     {
-        return array_unique(array_merge($this->getDefaultServiceUrls(), $this->getGuiServiceUrls(), $this->getImportServiceUrls()));
+        $sumUrls = array_merge($this->getDefaultServiceUrls(), $this->getGuiServiceUrls(), $this->getImportServiceUrls());
+        // IMPORTANT: array_unique handles duplicate urls,  array_filter handles misconfigured empty urls
+        // and array_values handles irregular indexed output of these
+        return array_values(array_filter(array_unique($sumUrls)));
     }
 
     /**

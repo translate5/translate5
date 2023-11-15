@@ -57,15 +57,24 @@ final class editor_Segment_Quality_Manager
         $task->checkStateAllowsActions();
         // creates the operation wrapper, that sets the needed task-states
         $operation = editor_Task_Operation::create(editor_Task_Operation::AUTOQA, $task);
-        // this triggers a refresh of the task's TBX cache
-        $task->meta()->resetTbxHash([$task->getTaskGuid()]);
-        // queues the operation workers
-        self::instance()->queueOperation(editor_Segment_Processing::RETAG, $task, $operation->getWorkerId(), ZfExtended_Models_Worker::STATE_PREPARE);
-        // start the operation
-        $operation->start();
-        // triggers the worker-queue
-        $workerQueue = ZfExtended_Factory::get(Queue::class);
-        $workerQueue->trigger();
+        try {
+
+            // this triggers a refresh of the task's TBX cache
+            $task->meta()->resetTbxHash([$task->getTaskGuid()]);
+            // queues the operation workers
+            self::instance()->queueOperation(editor_Segment_Processing::RETAG, $task, $operation->getWorkerId(), ZfExtended_Models_Worker::STATE_PREPARE);
+            // start the operation
+            $operation->start();
+            // triggers the worker-queue
+            $workerQueue = ZfExtended_Factory::get(Queue::class);
+            $workerQueue->trigger();
+
+
+        } catch(Throwable $e){
+
+            $operation->onQueueingError();
+            throw $e;
+        }
     }
 
     /**
@@ -83,13 +92,21 @@ final class editor_Segment_Quality_Manager
         $task->checkStateAllowsActions();
         // queue a task operation and the depending quality operation
         $operation = editor_Task_Operation::create(editor_Task_Operation::TAGTERMS, $task);
-        // queues the operation workers
-        self::instance()->queueOperation(editor_Segment_Processing::TAGTERMS, $task, $operation->getWorkerId(), ZfExtended_Models_Worker::STATE_PREPARE);
-        // start the operation
-        $operation->start();
-        // trigger the workers to work
-        $wq = ZfExtended_Factory::get(Queue::class);
-        $wq->trigger();
+        try {
+
+            // queues the operation workers
+            self::instance()->queueOperation(editor_Segment_Processing::TAGTERMS, $task, $operation->getWorkerId(), ZfExtended_Models_Worker::STATE_PREPARE);
+            // start the operation
+            $operation->start();
+            // trigger the workers to work
+            $workerQueue = ZfExtended_Factory::get(Queue::class);
+            $workerQueue->trigger();
+
+        } catch(Throwable $e){
+
+            $operation->onQueueingError();
+            throw $e;
+        }
     }
 
     /**
