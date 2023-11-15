@@ -444,30 +444,66 @@ Ext.define('Editor.view.LanguageResources.TmOverviewPanel', {
 
     /**
      * Creates the specific-data tooltip contents out of the specific-data
-     * @param tip
+     * @param {Ext.tip.ToolTip} tip
      * @returns {boolean}
      */
     createSpecificDataTooltip: function updateTipBody(tip) {
-        var me = this,
-            tr = Ext.fly(tip.triggerElement).up('tr'),
-            record = me.view.getRecord(tr),
-            specificData = record.getSpecificData();
+        var tr = Ext.fly(tip.triggerElement).up('tr'),
+            record = this.view.getRecord(tr),
+            specificData = record.getSpecificData(),
+            serviceName = record.get('serviceName');
 
         if(Ext.Object.isEmpty(specificData)){
             return false;
         }
 
-        var key, keyName,
-            names = specificData.hasOwnProperty('localizedKeys') ? specificData.localizedKeys : {},
-            rows = '';
+        var key, rows = '';
 
+        // fileName shall always come first
+        if(specificData.hasOwnProperty('fileName')){
+            rows += this.createSpecificDataRow('fileName', serviceName, specificData.fileName);
+        }
+        // then the others
         for(key in specificData) {
-            if(key !== 'localizedKeys'){
-                keyName = names.hasOwnProperty(key) ? names[key] : (key.charAt(0).toUpperCase() + key.slice(1));
-                rows += '<tr><td>' + keyName + ': </td><td>' + specificData[key] + '</td></tr>';
+            if(key !== 'fileName' && key !== 'status'){
+                rows += this.createSpecificDataRow(key, serviceName, specificData[key]);
             }
         }
+        // status shall always come last
+        if(specificData.hasOwnProperty('status')){
+            rows += this.createSpecificDataRow('status', serviceName, specificData.status);
+        }
         tip.update('<table>' + rows + '</table>');
+    },
+
+    /**
+     *
+     * @param {string} key
+     * @param {string} serviceName
+     * @param {*} value
+     * @returns {string}
+     */
+    createSpecificDataRow: function(key, serviceName, value){
+        return '<tr><td>' +
+            this.localizeSpecificDataKey(key, serviceName) +
+            ': </td><td>' + value + '</td></tr>';
+    },
+
+    /**
+     * Translates a key of the specific-data using the modern localization via Editor.data.l10n
+     * @param {string} key
+     * @param {string} serviceName
+     * @returns {string}
+     */
+    localizeSpecificDataKey: function(key, serviceName){
+        if(Editor.data.l10n.languageResources.specificData.hasOwnProperty(serviceName) &&
+            Editor.data.l10n.languageResources.specificData[serviceName].hasOwnProperty(key)){
+            return (Editor.data.l10n.languageResources.specificData[serviceName])[key];
+        }
+        if(Editor.data.l10n.languageResources.specificData.all.hasOwnProperty(key)){
+            return Editor.data.l10n.languageResources.specificData.all[key];
+        }
+        return key.charAt(0).toUpperCase() + key.slice(1);
     },
 
     langRenderer : function(val, md) {

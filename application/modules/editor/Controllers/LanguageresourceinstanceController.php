@@ -30,7 +30,6 @@ use MittagQI\Translate5\LanguageResource\CleanupAssociation\Customer;
 use MittagQI\Translate5\LanguageResource\CleanupAssociation\Task;
 use MittagQI\Translate5\LanguageResource\TaskAssociation;
 use MittagQI\Translate5\LanguageResource\TaskPivotAssociation;
-use MittagQI\Translate5\LanguageResource\SpecificData;
 use MittagQI\Translate5\LanguageResource\Status as LanguageResourceStatus;
 use MittagQI\Translate5\Task\Current\NoAccessException;
 use MittagQI\Translate5\Task\TaskContextTrait;
@@ -149,7 +148,7 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
                 $lrData = array_merge($lrData, $resource->getMetaData());
             }
             // translate the "specificDta" field for the frontend and store the unserialized data
-            $specificData = $this->localizeSpecificData($lrData, true);
+            $specificData = $this->prepareSpecificData($lrData, true);
             $languageResourceInstance = ZfExtended_Factory::get(editor_Models_LanguageResources_LanguageResource::class);
             $languageResourceInstance->init($lrData);
 
@@ -306,7 +305,7 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         $this->view->rows->sourceLang = $this->getLanguage($languages, 'sourceLang', $this->entity->getId());
         $this->view->rows->targetLang = $this->getLanguage($languages, 'targetLang', $this->entity->getId());
 
-        $this->localizeSpecificData($this->view->rows, false);
+        $this->prepareSpecificData($this->view->rows, false);
     }
 
     /**
@@ -1463,7 +1462,7 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
     }
 
     /**
-     * Transforms the specificData for the frontend, adds translations for the array-keys,
+     * Transforms the specificData for the frontend
      * updates the value in the passed object or array and returns the deserialized specificData
      * @param array|stdClass $resourceData
      * @param bool $isArray
@@ -1472,7 +1471,7 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
      * @throws Zend_Json_Exception
      * @throws ZfExtended_Exception
      */
-    protected function localizeSpecificData(mixed &$resourceData, bool $isArray): array
+    protected function prepareSpecificData(mixed &$resourceData, bool $isArray): array
     {
         if (($isArray && !array_key_exists('specificData', $resourceData))
             || (!$isArray && !property_exists($resourceData, 'specificData'))) {
@@ -1482,14 +1481,11 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         $specificData = empty($specificData) ? null : Zend_Json::decode($specificData);
 
         if (empty($specificData)) {
-            // no need to localize, return empty array
             $returnData = [];
             $specificData = null;
         } else {
-            // localize in passed model, return unlocalized data
-            $serviceName = $isArray ? $resourceData['serviceName'] : $resourceData->serviceName;
             $returnData = $specificData;
-            $specificData = Zend_Json::encode(SpecificData::localize($specificData, $serviceName));
+            $specificData = Zend_Json::encode($specificData);
         }
 
         if ($isArray) {
