@@ -9453,10 +9453,10 @@ E-Mail: service@MittagQI.com</pre>
                 Add rules here per target language to override default output formats for your active input rules.
                 <br/>You can provide your own formats for desired <b>type-ruleName-targetLang</b> combination here.
                 <br/>To find format string rules you can look at:
-                <br/><a href="https://icu4c-demos.unicode.org/icu-bin/locexp?d_=ru#region" target="_blank" rel="noopener noreferrer">1. Locale related format presets</a>
+                <br/><a href="https://icu4c-demos.unicode.org/icu-bin/locexp?d_=en#region" target="_blank" rel="noopener noreferrer">1. Locale related format presets</a>
                 <br/><a href="https://unicode-org.github.io/icu/userguide/format_parse/datetime/#datetime-format-syntax" target="_blank" rel="noopener noreferrer">2. Dates syntax</a>
                 <br/><a href="https://unicode-org.github.io/icu-docs/apidoc/released/icu4j/com/ibm/icu/text/DecimalFormat.html" target="_blank" rel="noopener noreferrer">3. Number syntax</a>
-                <br/><a href="icu4c-demos.unicode.org" target="_blank" rel="noopener noreferrer">4. ICU Demonstration</a>
+                <br/><a href="https://icu4c-demos.unicode.org" target="_blank" rel="noopener noreferrer">4. ICU Demonstration</a>
                 </target>
             </trans-unit>
         </body>
