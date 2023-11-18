@@ -29,6 +29,7 @@
 namespace Translate5\MaintenanceCli\Command;
 
 use MittagQI\Translate5\Test\TestConfiguration;
+use MittagQI\ZfExtended\Service\ConfigHelper;
 use PDO;
 use Symfony\Component\Console\Input\InputOption;
 use Translate5\MaintenanceCli\WebAppBridge\Application;
@@ -617,10 +618,10 @@ abstract class Translate5AbstractTestCommand extends Translate5AbstractCommand
                 }
 
             // value needs to be complemented with base-url of current installation. This is e.g. needed, when fake-APIs are used
-            } else if(str_contains($value, TestConfiguration::BASE_URL)){
+            } else if(str_contains($value, ConfigHelper::BASE_URL)){
 
                 $baseUrl = $this->getApplicationBaseUrl($pdo);
-                $neededConfigs[$name] = str_replace(TestConfiguration::BASE_URL, $baseUrl, $value);
+                $neededConfigs[$name] = str_replace(ConfigHelper::BASE_URL, $baseUrl, $value);
             }
         }
         return $neededConfigs;

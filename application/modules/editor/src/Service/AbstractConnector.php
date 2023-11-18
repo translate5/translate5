@@ -174,30 +174,12 @@ abstract class AbstractConnector
     }
 
     /**
-     * Retrieves, if the connector and the underlying service are configured
+     * Retrieves, if the connector is configured
      * @return bool
      */
     public function isConfigured(): bool
     {
-        return $this->service->isConfigured() && $this->isConnectorConfigured();
-    }
-
-    /**
-     * Retrieves, if the neccessary configs for the connector are configured, e.g. the authentication
-     * @return bool
-     */
-    public function isConnectorConfigured(): bool
-    {
-        try {
-            foreach ($this->connectorConfig as $configName => $configType) {
-                if(empty($this->service->getConfigValueFromName($configName, $configType))){
-                    return false;
-                }
-            }
-            return true;
-        } catch (Throwable) {
-            return false;
-        }
+        return $this->service->hasConfigurations(array_keys($this->connectorConfig));
     }
 
     /**
@@ -208,7 +190,7 @@ abstract class AbstractConnector
     public function isAvailable(): bool
     {
         try {
-            if($this->isConfigured()){
+            if($this->service->isConfigured() && $this->isConfigured()){
                 $response = $this->createStatusResponse();
                 return !$response->hasError();
             }

@@ -323,7 +323,7 @@ abstract class ServiceAbstract extends DockerServiceAbstract
      */
     private function getDefaultServiceUrls(): array
     {
-        return $this->getConfigValueFromName($this->configurationConfig['name'], $this->configurationConfig['type'], true);
+        return $this->configHelper->getValue($this->configurationConfig['name'], $this->configurationConfig['type'], true);
     }
 
     /**
@@ -333,7 +333,7 @@ abstract class ServiceAbstract extends DockerServiceAbstract
      */
     private function getGuiServiceUrls(): array
     {
-        return $this->getConfigValueFromName($this->guiConfigurationConfig['name'], $this->guiConfigurationConfig['type'], true);
+        return $this->configHelper->getValue($this->guiConfigurationConfig['name'], $this->guiConfigurationConfig['type'], true);
     }
 
     /**
@@ -343,7 +343,7 @@ abstract class ServiceAbstract extends DockerServiceAbstract
      */
     private function getImportServiceUrls(): array
     {
-        return $this->getConfigValueFromName($this->importConfigurationConfig['name'], $this->importConfigurationConfig['type'], true);
+        return $this->configHelper->getValue($this->importConfigurationConfig['name'], $this->importConfigurationConfig['type'], true);
     }
 
     /**

@@ -875,32 +875,34 @@ final class Helper extends \ZfExtended_Test_ApiHelper
 
     /**
      * tests the config names and values in the given associated array against the REST accessible application config
-     * If the given value to the config is null,
-     * the config value is just checked for existence and if the configured value is not empty
+     * If the given value to the config is null, the config value is just checked for existence,
+     * otherwise for equality
      */
     public function testConfigs(array $configsToTest, ?string $taskGuid = null): void
     {
-        $config = ZfExtended_Factory::get(editor_Models_Config::class);
-        $taskConfig = ZfExtended_Factory::get(editor_Models_TaskConfig::class);
+        $origin = 'instance config';
+        $params = ['configs' => array_keys($configsToTest)];
+        if(!empty($taskGuid)){
+            $params['taskGuid'] = $taskGuid;
+            $origin = 'task config';
+        }
+        // retrieves a stdClass of the requested configs
+        $foundConfigs = $this->getJson('editor/config/apitest', $params);
 
         foreach ($configsToTest as $name => $value) {
-            if (!str_starts_with($name, 'runtimeOptions.')) {
-                $name = 'runtimeOptions.' . $name;
-            }
 
-            $configValue = $taskGuid ? $taskConfig->getCurrentValue($taskGuid, $name) : $config->getCurrentValue($name);
-            $configPlace = $taskGuid ? 'task' : 'instance';
+            $configValue = property_exists($foundConfigs, $name) ? $foundConfigs->$name : null;
 
             if (is_null($value)) {
                 $this->test::assertNotEmpty(
                     $configValue,
-                    "Config $name in $configPlace is empty but should be set with a value!"
+                    "Config $name in $origin is empty but should be set with a value!"
                 );
             } else {
                 $this->test::assertEquals(
                     $value,
                     $configValue,
-                    "Config $name in $configPlace config is not as expected: "
+                    "Config $name in $origin config is not as expected!"
                 );
             }
         }
@@ -908,29 +910,47 @@ final class Helper extends \ZfExtended_Test_ApiHelper
 
     /**
      * Checks, if the passed configs are set / set to the wanted value
+     * Hint: if the passed configs ave null as value, they are only checked for existance, otherwise for equality
      * @param array $configsToTest
      * @return bool
      * @throws Zend_Db_Statement_Exception
      */
     public function checkConfigs(array $configsToTest): bool
     {
-        $config = ZfExtended_Factory::get(editor_Models_Config::class);
-
-        foreach ($configsToTest as $name => $value) {
-            if (!str_starts_with($name, 'runtimeOptions.')) {
-                $name = 'runtimeOptions.' . $name;
-            }
-            $configValue = $config->getCurrentValue($name);
-            if (is_null($value) && (empty($configValue) && $configValue !== 0 && $configValue !== '0')) {
+        // retrieves a stdClass of the requested configs
+        $foundConfigs = $this->getJson('editor/config/apitest', ['configs' => array_keys($configsToTest)]);
+        foreach($configsToTest as $name => $value){
+            if(!property_exists($foundConfigs, $name)){
                 return false;
-            } else if(!is_null($value) && $configValue !== $value){
+            }
+            if($value != null && $foundConfigs->$name != $value){
+                error_log('Found config '.$name.' does not match the expected value!');
                 return false;
             }
         }
         return true;
     }
 
-    /***
+    /**
+     * Checks, if the passed configs are set
+     * @param string[] $configNames
+     * @return bool
+     * @throws Zend_Http_Client_Exception
+     */
+    public function checkConfigsToBeSet(array $configNames): bool
+    {
+        // retrieves a stdClass of the requested configs
+        $foundConfigs = $this->getJson('editor/config/apitest', ['configs' => $configNames]);
+        foreach($configNames as $configName){
+            if(!property_exists($foundConfigs, $configName)){
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * Get configs like the frontend normally does
      * Get instance level config fro given config name. This function will not perform any asserts
      * @param string $configName
      * @return mixed|null
@@ -947,29 +967,6 @@ final class Helper extends \ZfExtended_Test_ApiHelper
             }
         }
         return null;
-    }
-
-    /**
-     * Checks, if the passed configs are set
-     * @param string[] $configNames
-     * @return bool
-     * @throws Zend_Http_Client_Exception
-     */
-    public function checkConfigsToBeSet(array $configNames): bool
-    {
-        $allSet = true;
-        foreach ($configNames as $name) {
-            if (!str_starts_with($name, 'runtimeOptions.')) {
-                $name = 'runtimeOptions.' . $name;
-            }
-            $config = $this->getJson('editor/config', [
-                'filter' => '[{"type":"string","value":"' . $name . '","property":"name","operator":"eq"}]',
-            ]);
-            if(count($config) !== 1 || empty($config[0]->value)){
-                $allSet = false;
-            }
-        }
-        return $allSet;
     }
 
     //endregion

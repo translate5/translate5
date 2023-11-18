@@ -46,11 +46,6 @@ final class TestConfiguration {
     const DATA_DIRECTORY = 'testdata';
 
     /**
-     * Represents a config-value that can be present in test-configs that must be replaced with the installations base-url
-     */
-    const BASE_URL = '{BASE_URL}';
-
-    /**
      * The configs that define USERDATA pathes//null checks for no concrete value but if not empty
      */
     const DATA_CONFIGS = [
