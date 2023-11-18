@@ -30,8 +30,10 @@ namespace MittagQI\Translate5\Service;
 
 use MittagQI\ZfExtended\Zendoverwrites\Http\JsonClient;
 use MittagQI\ZfExtended\Zendoverwrites\Http\JsonResponse;
+
 use Throwable;
 use Zend_Http_Client_Exception;
+use ZfExtended_DbConfig_Type_CoreTypes as CoreTypes;
 use ZfExtended_Exception;
 use ZfExtended_Utils;
 use ZfExtended_Zendoverwrites_Http_Exception_InvalidResponse;
@@ -168,7 +170,7 @@ abstract class AbstractConnector
     public function getDefaultMatchrate(): int
     {
         if(isset($this->matchrateConfigKey)){
-            return intval($this->service->getConfigValueFromName($this->matchrateConfigKey, 'integer'));
+            return intval($this->service->getConfigValueFromName($this->matchrateConfigKey, CoreTypes::TYPE_INTEGER));
         }
         return static::DEFAULT_MATCHRATE;
     }

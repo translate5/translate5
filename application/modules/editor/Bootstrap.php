@@ -732,7 +732,7 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
         ));
 
         // special endpoint to provide configs for API-Tests. Must only be added when serving API-tets
-        if(defined('APPLICATION_APITEST') && constant('APPLICATION_APITEST')){
+        if(defined('APPLICATION_APITEST') && APPLICATION_APITEST){
             $this->front->getRouter()->addRoute('editorConfigApiTest', new ZfExtended_Controller_RestLikeRoute(
                 'editor/config/apitest',
                 array(

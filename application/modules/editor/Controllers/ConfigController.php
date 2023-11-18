@@ -84,7 +84,7 @@ class editor_ConfigController extends ZfExtended_RestController {
         // we have to add dynamic sanitization here depending on the config type
         $this->data->value = ZfExtended_Sanitizer::sanitize(
             $this->data->value,
-            ZfExtended_DbConfig_Type_CoreTypes::getSanitizationType($this->entity->getType())
+            ZfExtended_DbConfig_Type_CoreTypes::sanitizationType($this->entity->getType())
         );
         
         $level = null;
