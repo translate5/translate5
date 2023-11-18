@@ -162,7 +162,7 @@ abstract class AbstractHttpService extends ServiceAbstract
      * @return mixed
      * @throws ZfExtended_Exception
      */
-    public function getConfigValueFromName(string $configName, string $configType, bool $asArray = false): mixed
+    public function getConfigValue(string $configName, string $configType, bool $asArray = false): mixed
     {
         return $this->configHelper->getValue($configName, $configType, $asArray);
     }

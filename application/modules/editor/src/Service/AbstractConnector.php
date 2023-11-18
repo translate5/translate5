@@ -159,7 +159,7 @@ abstract class AbstractConnector
      */
     protected function getAuthorizationKey(): mixed
     {
-        return $this->service->getConfigValueFromName($this->authorizationConfigKey, $this->connectorConfig[$this->authorizationConfigKey]);
+        return $this->service->getConfigValue($this->authorizationConfigKey, $this->connectorConfig[$this->authorizationConfigKey]);
     }
 
     /**
@@ -170,7 +170,7 @@ abstract class AbstractConnector
     public function getDefaultMatchrate(): int
     {
         if(isset($this->matchrateConfigKey)){
-            return intval($this->service->getConfigValueFromName($this->matchrateConfigKey, CoreTypes::TYPE_INTEGER));
+            return intval($this->service->getConfigValue($this->matchrateConfigKey, CoreTypes::TYPE_INTEGER));
         }
         return static::DEFAULT_MATCHRATE;
     }
