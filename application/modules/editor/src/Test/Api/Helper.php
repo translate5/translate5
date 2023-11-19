@@ -878,20 +878,14 @@ final class Helper extends \ZfExtended_Test_ApiHelper
      * If the given value to the config is null, the config value is just checked for existence,
      * otherwise for equality
      */
-    public function testConfigs(array $configsToTest, ?string $taskGuid = null): void
+    public function testConfigs(array $configsToTest, string $taskGuid = null): void
     {
-        $origin = 'instance config';
-        $params = ['configs' => array_keys($configsToTest)];
-        if(!empty($taskGuid)){
-            $params['taskGuid'] = $taskGuid;
-            $origin = 'task config';
-        }
-        // retrieves a stdClass of the requested configs
-        $foundConfigs = $this->getJson('editor/config/apitest', $params);
+        $origin = empty($taskGuid) ? 'instance config' : 'task config';
+        $foundConfigs = $this->getTestConfigs(array_keys($configsToTest), $taskGuid);
 
         foreach ($configsToTest as $name => $value) {
 
-            $configValue = property_exists($foundConfigs, $name) ? $foundConfigs->$name : null;
+            $configValue = array_key_exists($name, $foundConfigs) ? $foundConfigs[$name] : null;
 
             if (is_null($value)) {
                 $this->test::assertNotEmpty(
@@ -917,13 +911,12 @@ final class Helper extends \ZfExtended_Test_ApiHelper
      */
     public function checkConfigs(array $configsToTest): bool
     {
-        // retrieves a stdClass of the requested configs
-        $foundConfigs = $this->getJson('editor/config/apitest', ['configs' => array_keys($configsToTest)]);
+        $foundConfigs = $this->getTestConfigs(array_keys($configsToTest));
         foreach($configsToTest as $name => $value){
-            if(!property_exists($foundConfigs, $name)){
+            if(!array_key_exists($name, $foundConfigs)){
                 return false;
             }
-            if($value != null && $foundConfigs->$name != $value){
+            if($value != null && $foundConfigs[$name] != $value){
                 error_log('Found config '.$name.' does not match the expected value!');
                 return false;
             }
@@ -939,14 +932,30 @@ final class Helper extends \ZfExtended_Test_ApiHelper
      */
     public function checkConfigsToBeSet(array $configNames): bool
     {
-        // retrieves a stdClass of the requested configs
-        $foundConfigs = $this->getJson('editor/config/apitest', ['configs' => $configNames]);
+        $foundConfigs = $this->getTestConfigs($configNames);
         foreach($configNames as $configName){
-            if(!property_exists($foundConfigs, $configName)){
+            if(!array_key_exists($configName, $foundConfigs)){
                 return false;
             }
         }
         return true;
+    }
+
+    /**
+     * Retrieves the configs from the special apitest-endpoint of the config-controller
+     * @param array $configNames
+     * @param string|null $taskGuid: if given, the task-config for this task is used
+     * @return array
+     * @throws Zend_Http_Client_Exception
+     */
+    protected function getTestConfigs(array $configNames, string $taskGuid = null): array
+    {
+        $params = ['configs' => $configNames];
+        if(!empty($taskGuid)){
+            $params['taskGuid'] = $taskGuid;
+        }
+        $foundConfigs = $this->getJson('editor/config/apitest', $params);
+        return json_decode(json_encode($foundConfigs), true);
     }
 
     /**
