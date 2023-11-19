@@ -28,16 +28,15 @@ END LICENSE AND COPYRIGHT
 
 namespace MittagQI\Translate5\Test\Api;
 
-use editor_Models_Config;
-use editor_Models_TaskConfig;
+use MittagQI\ZfExtended\Service\ConfigHelper;
 use Zend_Db_Statement_Exception;
 use Zend_Http_Client_Exception;
-use ZfExtended_Factory;
+use ZfExtended_Test_ApiHelper;
 
 /**
  * API Helper the provides general functions to test the translate5 API
  */
-final class Helper extends \ZfExtended_Test_ApiHelper
+final class Helper extends ZfExtended_Test_ApiHelper
 {
     /**
      * How many time the task status will be check while the task is importing.
@@ -896,7 +895,7 @@ final class Helper extends \ZfExtended_Test_ApiHelper
                 $this->test::assertEquals(
                     $value,
                     $configValue,
-                    "Config $name in $origin config is not as expected!"
+                    "Config $name in $origin is not as expected!"
                 );
             }
         }
@@ -916,25 +915,12 @@ final class Helper extends \ZfExtended_Test_ApiHelper
             if(!array_key_exists($name, $foundConfigs)){
                 return false;
             }
-            if($value != null && $foundConfigs[$name] != $value){
-                error_log('Found config '.$name.' does not match the expected value!');
+            if($value === null && ConfigHelper::isValueEmpty($foundConfigs[$name])){
+                error_log('Found config '.$name.' is empty but should have a non-empty value');
                 return false;
             }
-        }
-        return true;
-    }
-
-    /**
-     * Checks, if the passed configs are set
-     * @param string[] $configNames
-     * @return bool
-     * @throws Zend_Http_Client_Exception
-     */
-    public function checkConfigsToBeSet(array $configNames): bool
-    {
-        $foundConfigs = $this->getTestConfigs($configNames);
-        foreach($configNames as $configName){
-            if(!array_key_exists($configName, $foundConfigs)){
+            if($value !== null && $foundConfigs[$name] != $value){
+                error_log('Found config '.$name.' does not match the expected value!');
                 return false;
             }
         }
@@ -948,7 +934,7 @@ final class Helper extends \ZfExtended_Test_ApiHelper
      * @return array
      * @throws Zend_Http_Client_Exception
      */
-    protected function getTestConfigs(array $configNames, string $taskGuid = null): array
+    private function getTestConfigs(array $configNames, string $taskGuid = null): array
     {
         $params = ['configs' => $configNames];
         if(!empty($taskGuid)){
@@ -956,6 +942,20 @@ final class Helper extends \ZfExtended_Test_ApiHelper
         }
         $foundConfigs = $this->getJson('editor/config/apitest', $params);
         return json_decode(json_encode($foundConfigs), true);
+    }
+
+    private function isConfigValueEmpty(mixed $value): bool
+    {
+        if(is_array($value) && empty($value)){
+            return true;
+        }
+        if(is_string($value) && strlen($value) < 1){
+            return true;
+        }
+        if((is_int($value) || is_float($value)) && $value == 0){
+            return true;
+        }
+        return false;
     }
 
     /**

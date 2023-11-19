@@ -251,7 +251,8 @@ class editor_ConfigController extends ZfExtended_RestController {
             foreach ($configs as $configName) {
                 $name = str_starts_with(trim($configName), 'runtimeOptions')
                     ? trim($configName) : 'runtimeOptions.' . trim($configName);
-                if ($configHelper->hasValue($name)) {
+                // some tests test for values like 0 or []
+                if ($configHelper->hasValue($name, true)) {
                     $this->view->rows[$configName] = $configHelper->getValue($name);
                 }
             }
