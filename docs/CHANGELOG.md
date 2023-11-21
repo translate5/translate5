@@ -12,6 +12,28 @@ All updates are (downwards) compatible! If not this is listed in the important r
 
 
 
+
+## [6.7.1] - 2023-11-08
+
+### Important Notes:
+ 
+
+
+### Bugfixes
+**[TRANSLATE-3563](https://jira.translate5.net/browse/TRANSLATE-3563): Editor general - Fix plugin localized strings** <br>
+Fix a problem in the plugin localizations preventing translate5 to be loaded after login.
+
+**[TRANSLATE-3558](https://jira.translate5.net/browse/TRANSLATE-3558): InstantTranslate - InstantTranslate missing white space between 2 sentences in target** <br>
+FIXED: Multiple sentences are now concatenated with whitespaces in-between.
+
+**[TRANSLATE-3546](https://jira.translate5.net/browse/TRANSLATE-3546): Editor general, VisualReview / VisualTranslation - Editor user preferences not persistent, when task left in simple mode** <br>
+FIXED: user preferences persistence on view mode change
+
+**[TRANSLATE-1068](https://jira.translate5.net/browse/TRANSLATE-1068): API - Improve REST API on wrong usage** <br>
+6.7.1: fix for special use case when authenticating against API session endpoint
+6.7.0: API requests (expect file uploading requests) can now understand JSON in raw body, additionally to the encapsulated JSON in a data form field. Also a proper HTTP error code is sent when providing invalid JSON.
+
+
 ## [6.7.0] - 2023-11-03
 
 ### Important Notes:

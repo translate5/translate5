@@ -95,12 +95,43 @@ class SessionApiTest extends editor_Test_ImportTest {
         $this->assertEmpty($json->user);
     }
 
-    public function testSessionTokenWithTask() {
-        $this->testSessionToken(true);
+    public function testSessionTokenWithFormFields() {
+        /**
+         * @throws Zend_Http_Client_Exception
+         */
+        $request = function($loginData) {
+            static::api()->post('editor/session', $loginData);
+            return static::api()->getLastResponseDecodeed();
+        };
+        $this->requestSessionToken($request);
+        $this->requestSessionToken($request, true);
     }
 
-    public function testSessionToken($withTask = false) {
+    public function testSessionTokenWithRawJson() {
+        /**
+         * @throws Zend_Http_Client_Exception
+         */
+        $request = function($loginData) {
+            //raw json body, no data field used
+            return static::api()->postRawData('editor/session', json_encode($loginData), enctype: 'application/json');
+        };
+        $this->requestSessionToken($request);
+        $this->requestSessionToken($request, true);
+    }
 
+    public function testSessionTokenWithDataJson() {
+        /**
+         * @throws Zend_Http_Client_Exception
+         */
+        $request = function($loginData) {
+            return static::api()->postJson('editor/session', $loginData);
+        };
+        $this->requestSessionToken($request);
+        $this->requestSessionToken($request, true);
+    }
+
+    public function requestSessionToken(Closure $request, $withTask = false): void
+    {
         $task = static::api()->getTask();
         $taskGuid = $task->taskGuid;
         static::api()->logout();
@@ -115,8 +146,11 @@ class SessionApiTest extends editor_Test_ImportTest {
             //remove internal task to prevent adding to the URL
             static::api()->setTask(null);
         }
-        
-        $response = static::api()->postJson('editor/session', $loginData);
+
+        //CRUCIAL: Must test different data variants here
+        $response = $request($loginData);
+
+        // see https://confluence.translate5.net/display/TAD/Session
         $plainResponse = static::api()->getLastResponse();
         $sessionId = $response->sessionId;
         $sessionToken = $response->sessionToken;
@@ -157,6 +191,11 @@ class SessionApiTest extends editor_Test_ImportTest {
         // $expected = '{"state":"authenticated","user":{"userGuid":"{00000000-0000-0000-C100-CCDDEE000001}","firstName":"manager","surName":"test","gender":"m","login":"testmanager","email":"noreply@translate5.net","roles":["pm","editor","admin","instantTranslate","api","termCustomerSearch","termProposer","termFinalizer","termPM","termPM_allClients","termReviewer","instantTranslateWriteTm","basic","noRights"],"passwd":"********","editable":0,"locale":"en","parentIds":null,"customers":null,"userName":"manager test"}}';
         $expected = '{"state":"authenticated","user":{"userGuid":"{00000000-0000-0000-C100-CCDDEE000001}","firstName":"manager","surName":"test","gender":"m","login":"testmanager","email":"noreply@translate5.net","roles":["pm","editor","admin","instantTranslate","api","instantTranslateWriteTm","basic","noRights"],"passwd":"********","editable":0,"locale":"en","parentIds":null,"customers":null,"userName":"manager test","isTokenAuth":false,"isClientRestricted":false,"restrictedClientIds":[]}}';
         $this->assertEquals(json_decode($expected), $sessionData, 'User was not properly authenticated via ');
+
+        if (! $withTask) {
+            //re-add task for next similar test
+            static::api()->setTask($task);
+        }
 
         static::api()->logout();
     }
