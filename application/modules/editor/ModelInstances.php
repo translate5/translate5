@@ -78,6 +78,14 @@ class editor_ModelInstances {
         return self::getById('editor_Models_File', $id);
     }
 
+    /**
+     * @param int $id
+     * @return editor_Models_Languages
+     */
+    public static function language(int $id): editor_Models_Languages {
+        return self::getById('editor_Models_Languages', $id);
+    }
+
 
     //TODO consider moving the following code into a ZfExtended abstract
 

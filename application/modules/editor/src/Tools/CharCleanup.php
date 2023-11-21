@@ -1,4 +1,4 @@
-
+<?php
 /*
 START LICENSE AND COPYRIGHT
 
@@ -26,16 +26,29 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-/***
- * All available engines from the sdl language cloud
+namespace MittagQI\Translate5\Tools;
+
+use ZfExtended_Utils;
+
+/**
+ * Helper to centralize regex based cleanup of common T5 objects (tm-matches, terms, ...
  */
-Ext.define('Editor.view.LanguageResources.EngineCombo', {
-    extend: 'Ext.form.field.ComboBox',
-    alias: 'widget.enginecombo',
-    fieldLabel: 'Engine/Model',
-    displayField: 'name',
-    valueField: 'id',
-    store: 'engine',
-    queryMode: 'local',
-    selectOnFocus: true
-});
+class CharCleanup
+{
+    /**
+     * Unwanted characters in terminology to cleanup for use in e.g. glossaries or MTs
+     */
+    const TERM_REGEX = [
+        '/[[:cntrl:]]/', // Matches characters that are often used to control text presentation, including newlines, null characters, tabs and the escape character
+        '/\r|\n/', // tab and new line is not allowed
+        '~\R~u' // all kind of line brakes are not allowed
+    ];
+
+    public static function cleanTermForMT(string $term): string
+    {
+        return ZfExtended_Utils::replaceC0C1ControlCharacters(
+            trim((string)preg_replace(self::TERM_REGEX,'', $term))
+        );
+    }
+
+}

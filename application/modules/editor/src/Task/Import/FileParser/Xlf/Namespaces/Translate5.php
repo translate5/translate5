@@ -62,7 +62,8 @@ class Translate5 extends AbstractNamespace
     {
         //TODO parse:
         //trans-unit id="7" translate5:autostateId="4" translate5:autostateText="not_translated">
-        $segmentAttributes->maxNumberOfLines = (int) $attributes['translate5:maxNumberOfLines'];
+        $segmentAttributes->maxNumberOfLines = array_key_exists('translate5:maxNumberOfLines', $attributes) ?
+            (int)$attributes['translate5:maxNumberOfLines'] : null;
     }
 
     /**

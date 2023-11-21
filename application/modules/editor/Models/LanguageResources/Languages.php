@@ -27,18 +27,22 @@ END LICENSE AND COPYRIGHT
 */
 
 /**
- * @method integer getId() getId()
- * @method void setId() setId(int $id)
- * @method integer getSourceLang() getSourceLang()
- * @method void setSourceLang() setSourceLang(int $id)
- * @method string getSourceLangCode() getSourceLangCode()
- * @method void setSourceLangCode() setSourceLangCode(string $lang)
- * @method integer getTargetLang() getTargetLang()
- * @method void setTargetLang() setTargetLang(int $id)
- * @method string getTargetLangCode() getTargetLangCode()
- * @method void setTargetLangCode() setTargetLangCode(string $lang)
- * @method integer getLanguageResourceId getLanguageResourceId()
- * @method void setLanguageResourceId() setLanguageResourceId(int $languageResourceId)
+ * @method int getId()
+ * @method void setId(int $id)
+ * @method int getSourceLang()
+ * @method void setSourceLang(int $id)
+ * @method string getSourceLangCode()
+ * @method void setSourceLangCode(string $lang)
+ * @method string getSourceLangName()
+ * @method void setSourceLangName(string $langName)
+ * @method int getTargetLang()
+ * @method void setTargetLang(int $id)
+ * @method string getTargetLangCode()
+ * @method void setTargetLangCode(string $lang)
+ * @method string getTargetLangName()
+ * @method void setTargetLangName(string $langName)
+ * @method int getLanguageResourceId()
+ * @method void setLanguageResourceId(int $languageResourceId)
  *
  */
 class editor_Models_LanguageResources_Languages extends ZfExtended_Models_Entity_Abstract {
@@ -52,25 +56,25 @@ class editor_Models_LanguageResources_Languages extends ZfExtended_Models_Entity
      * @param int $target
      * @param int $languageResourceId
      */
-    public function saveLanguagesWithRfcCode($source,$target,$languageResourceId){
+    public function saveLanguagesWithRfcCode($source, $target, $languageResourceId){
 
         if($source){
-            $sourceLang = ZfExtended_Factory::get('editor_Models_Languages');
-            /* @var $sourceLang editor_Models_Languages */
+            $sourceLang = ZfExtended_Factory::get(editor_Models_Languages::class);
             $sourceLang->load($source);
             $this->setSourceLang($sourceLang->getId());
             $this->setSourceLangCode($sourceLang->getRfc5646());
+            $this->setSourceLangName($sourceLang->getLangName());
         }
         
         if($target){
-            $targetLang = ZfExtended_Factory::get('editor_Models_Languages');
-            /* @var $targetLang editor_Models_Languages */
+            $targetLang = ZfExtended_Factory::get(editor_Models_Languages::class);
             $targetLang->load($target);
             $this->setTargetLang($targetLang->getId());
             $this->setTargetLangCode($targetLang->getRfc5646());
+            $this->setTargetLangName($sourceLang->getLangName());
         }
 
-        //when both lanugages are nod defined do not save db entry
+        //when both lanugages are not defined do not save db entry
         if(!$source && !$target){
             return;
         }
@@ -83,10 +87,10 @@ class editor_Models_LanguageResources_Languages extends ZfExtended_Models_Entity
      * @param int $languageResourceId
      * @return array
      */
-    public function loadByLanguageResourceId($languageResourceId=null){
-        $s=$this->db->select();
+    public function loadByLanguageResourceId($languageResourceId = null){
+        $s = $this->db->select();
         if($languageResourceId){
-            $s->where('languageResourceId=?',$languageResourceId);
+            $s->where('languageResourceId = ?',$languageResourceId);
         }
         return $this->db->fetchAll($s)->toArray();
     }

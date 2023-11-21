@@ -240,6 +240,26 @@ class editor_Models_LanguageResources_Resource {
     public function getLanguageCodeTarget(int $targetLanguageId) {
         return $this->getLanguageCode($targetLanguageId);
     }
+
+    /**
+     * Get the target language name for the given source language id.
+     * @param int $sourceLanguageId
+     * @return int
+     */
+    public function getLanguageNameSource(int $sourceLanguageId): string
+    {
+        return editor_ModelInstances::language($sourceLanguageId)->getLangName();
+    }
+
+    /**
+     * Get the target language name for the given target language id.
+     * @param int $targetLanguageId
+     * @return int
+     */
+    public function getLanguageNameTarget(int $targetLanguageId): string
+    {
+        return editor_ModelInstances::language($targetLanguageId)->getLangName();
+    }
     
     /***
      * Get the langauge code for the given langauge id. By default the language code for the langauge is the rfc value.
@@ -248,12 +268,9 @@ class editor_Models_LanguageResources_Resource {
      * @return string
      */
     protected function getLanguageCode(int $languageId) {
-        $language = ZfExtended_Factory::get('editor_Models_Languages');
-        /* @var $language editor_Models_Languages */
-        $language->load($languageId);
-        return $language->getRfc5646();
+        return editor_ModelInstances::language($languageId)->getRfc5646();
     }
-    
+
     /**
      * sets the service type
      * @param string $name
@@ -308,17 +325,22 @@ class editor_Models_LanguageResources_Resource {
     }
 
     /**
-     * returns the initial status for that resource type for the overview list
-     *
-     * @param $statusInfo
-     *
-     * @return string
+     * @param array|null $specificData
+     * @param int $languageResourceId
+     * @param ZfExtended_Zendoverwrites_Translate $translate
+     * @return array{status:string,statusInfo:string}
+     * @throws Zend_Exception
      */
-    public function getInitialStatus(&$statusInfo): string
+    public function getInitialStatus(
+        ?array                              $specificData,
+        int                                 $languageResourceId,
+        ZfExtended_Zendoverwrites_Translate $translate
+    ): array
     {
-        $statusInfo = 'Wählen Sie die Ressource aus um weitere Infos zu bekommen.';
-
-        return LanguageResourceStatus::NOTCHECKED;
+        return [
+            'status' => LanguageResourceStatus::NOTCHECKED,
+            'statusInfo' => $translate->_('Wählen Sie die Ressource aus um weitere Infos zu bekommen.')
+        ];
     }
 
     /**

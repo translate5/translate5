@@ -97,7 +97,7 @@ class editor_Services_SDLLanguageCloud_Connector extends editor_Services_Connect
      * {@inheritDoc}
      * @see editor_Services_Connector_Abstract::getStatus()
      */
-    public function getStatus(editor_Models_LanguageResources_Resource $resource){
+    public function getStatus(editor_Models_LanguageResources_Resource $resource, editor_Models_LanguageResources_LanguageResource $languageResource = null): string {
         $this->lastStatusInfo = '';
         $this->api->getStatus();
         

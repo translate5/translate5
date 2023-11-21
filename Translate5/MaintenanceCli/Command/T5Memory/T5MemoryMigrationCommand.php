@@ -408,7 +408,7 @@ class T5MemoryMigrationCommand extends Translate5AbstractCommand
             throw new RuntimeException('Failed to import file to ' . $filenameWithPath);
         }
 
-        $this->waitUntilImportFinished($connector);
+        $this->waitUntilImportFinished($connector, $languageResource);
     }
 
     /**
@@ -458,7 +458,7 @@ class T5MemoryMigrationCommand extends Translate5AbstractCommand
         $languageResource->db->getAdapter()->query($sql);
     }
 
-    private function waitUntilImportFinished(Connector $connector): void
+    private function waitUntilImportFinished(Connector $connector, LanguageResource $languageResource): void
     {
         if ($this->input->getOption(self::OPTION_DO_NOT_WAIT_IMPORT_FINISHED)) {
             $this->io->text("\nSkip waiting for import finished");
@@ -476,7 +476,7 @@ class T5MemoryMigrationCommand extends Translate5AbstractCommand
         $progressBar->start();
 
         while ($timeElapsed < $maxWaitTime) {
-            $status = $connector->getStatus($connector->getResource());
+            $status = $connector->getStatus($connector->getResource(), $languageResource);
 
             if ($status === LanguageResourceStatus::AVAILABLE) {
                 $this->io->success('Import finished');

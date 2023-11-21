@@ -1,4 +1,4 @@
-
+<?php
 /*
 START LICENSE AND COPYRIGHT
 
@@ -26,16 +26,18 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-/***
- * All available engines from the sdl language cloud
- */
-Ext.define('Editor.view.LanguageResources.EngineCombo', {
-    extend: 'Ext.form.field.ComboBox',
-    alias: 'widget.enginecombo',
-    fieldLabel: 'Engine/Model',
-    displayField: 'name',
-    valueField: 'id',
-    store: 'engine',
-    queryMode: 'local',
-    selectOnFocus: true
-});
+namespace MittagQI\Translate5\Tools;
+
+class Text {
+
+    /**
+     * Check if a text can be seen as translatable. This is the case, if it contains at least one letter
+     * Note, that purenumbers are not seen as translatable
+     * @param string|null $text
+     * @return bool
+     */
+    public static function seemsTranslatable(?string $text): bool
+    {
+        return empty($text) ? false : (@preg_match('/\p{L}+/u', strip_tags($text)) === 1);
+    }
+}
