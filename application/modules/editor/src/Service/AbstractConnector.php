@@ -30,8 +30,10 @@ namespace MittagQI\Translate5\Service;
 
 use MittagQI\ZfExtended\Zendoverwrites\Http\JsonClient;
 use MittagQI\ZfExtended\Zendoverwrites\Http\JsonResponse;
+
 use Throwable;
 use Zend_Http_Client_Exception;
+use ZfExtended_DbConfig_Type_CoreTypes as CoreTypes;
 use ZfExtended_Exception;
 use ZfExtended_Utils;
 use ZfExtended_Zendoverwrites_Http_Exception_InvalidResponse;
@@ -173,7 +175,7 @@ abstract class AbstractConnector
      */
     protected function getAuthorizationKey(): mixed
     {
-        return $this->service->getConfigValueFromName($this->authorizationConfigKey, $this->connectorConfig[$this->authorizationConfigKey]);
+        return $this->service->getConfigValue($this->authorizationConfigKey, $this->connectorConfig[$this->authorizationConfigKey]);
     }
 
     /**
@@ -184,36 +186,18 @@ abstract class AbstractConnector
     public function getDefaultMatchrate(): int
     {
         if(isset($this->matchrateConfigKey)){
-            return intval($this->service->getConfigValueFromName($this->matchrateConfigKey, 'integer'));
+            return intval($this->service->getConfigValue($this->matchrateConfigKey, CoreTypes::TYPE_INTEGER));
         }
         return static::DEFAULT_MATCHRATE;
     }
 
     /**
-     * Retrieves, if the connector and the underlying service are configured
+     * Retrieves, if the connector is configured
      * @return bool
      */
     public function isConfigured(): bool
     {
-        return $this->service->isConfigured() && $this->isConnectorConfigured();
-    }
-
-    /**
-     * Retrieves, if the neccessary configs for the connector are configured, e.g. the authentication
-     * @return bool
-     */
-    public function isConnectorConfigured(): bool
-    {
-        try {
-            foreach ($this->connectorConfig as $configName => $configType) {
-                if(empty($this->service->getConfigValueFromName($configName, $configType))){
-                    return false;
-                }
-            }
-            return true;
-        } catch (Throwable) {
-            return false;
-        }
+        return $this->service->hasConfigurations(array_keys($this->connectorConfig));
     }
 
     /**
@@ -224,7 +208,7 @@ abstract class AbstractConnector
     public function isAvailable(): bool
     {
         try {
-            if($this->isConfigured()){
+            if($this->service->isConfigured() && $this->isConfigured()){
                 $response = $this->createStatusResponse();
                 return !$response->hasError();
             }
