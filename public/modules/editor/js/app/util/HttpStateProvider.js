@@ -217,12 +217,14 @@ Ext.define('Editor.util.HttpStateProvider',{
      * resets all stored user states so that the defaults are used
      
      * @param {String/String[]} subpaths The subpath or name or an array of subpaths with name.
+     * @param {String[]} names [Optional] Names after last dot. E.g. for subpath 'editor' and names ['segmentActionMenu'] it
+     *        would be array having one record with name 'runtimeOptions.frontend.defaultState.editor.segmentActionMenu'
      */
-    reset: function(subpath) {
+    reset: function(subpath, names) {
         var me = this,
             remove;
 
-        remove = me.getConfigRecords(subpath);
+        remove = me.getConfigRecords(subpath, names);
         if(remove.length === 0){
             return;
         }
@@ -236,10 +238,16 @@ Ext.define('Editor.util.HttpStateProvider',{
     /**
      * Get all state records, optionally of a sub path
      * @param {String/String[]} subpaths The subpath or name or an array of subpaths with name.
+     * @param {String[]} names [Optional] Names after last dot. E.g. for subpath 'editor' and names ['segmentActionMenu'] it
+     *        would be array having one record with name 'runtimeOptions.frontend.defaultState.editor.segmentActionMenu'
      * @return Editor.model.UserConfig[]
      */
-    getConfigRecords: function(subpath){
-        return this.store.query('name', this.getCanonicalPath(subpath));
+    getConfigRecords: function(subpath, names){
+        return this.store.query('name', this.getCanonicalPath(subpath))
+            .filterBy(item => !names
+                || !Ext.isArray(names)
+                || !!~names.indexOf(item.get('name').split('.').pop())
+            );
     }, 
     
     /**
