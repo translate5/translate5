@@ -102,7 +102,7 @@ abstract class DockerServiceAbstract extends AbstractHttpService
     {
         $checked = true;
         $healthCheck = array_key_exists('healthcheck', $this->configurationConfig) ? $this->configurationConfig['healthcheck'] : null;
-        $urls = $this->getConfigValueFromName($this->configurationConfig['name'], $this->configurationConfig['type']);
+        $urls = $this->configHelper->getValue($this->configurationConfig['name'], $this->configurationConfig['type']);
 
         if (empty($urls)) {
             $urls = [];
