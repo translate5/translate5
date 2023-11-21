@@ -36,6 +36,8 @@ use MittagQI\Translate5\Test\Import\LanguageResource;
  */
 class Translate3445Test extends editor_Test_JsonTest {
 
+    protected static bool $skipIfOptionsMissing = true;
+
     protected static array $requiredRuntimeOptions = [
         'runtimeOptions.LanguageResources.google.projectId' => null,//null checks for no concrete value but if not empty
         'runtimeOptions.LanguageResources.google.apiKey' => null//null checks for no concrete value but if not empty
