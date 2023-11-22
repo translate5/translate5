@@ -34,10 +34,12 @@ use editor_Models_Task;
 use editor_Task_Operation;
 use MittagQI\Translate5\PauseWorker\PauseWorker;
 use MittagQI\Translate5\LanguageResource\TaskPivotAssociation;
+use ReflectionException;
 use Zend_Exception;
 use Zend_Registry;
 use ZfExtended_Authentication;
 use ZfExtended_EventManager;
+use ZfExtended_Exception;
 use ZfExtended_Factory;
 use ZfExtended_Models_User;
 use ZfExtended_Models_Worker;
@@ -82,21 +84,54 @@ class PivotQueuer
         if ($task->isImporting()) {
             //on import, we use the import worker as parentId
             $parentWorkerId = $this->fetchImportWorkerId($task->getTaskGuid());
-            $workerState = null;
+            // we do not set a worker-state, this is handled by the import-process
+            $this->doQueuePivotWorker($task, $assoc, $parentWorkerId, null);
+
         } else {
-            // crucial: add a different behaviour for the workers when performing an operation
-            $workerParameters['workerBehaviour'] = 'ZfExtended_Worker_Behaviour_Default';
+
             // this creates the operation start/finish workers
             $operation = editor_Task_Operation::create(editor_Task_Operation::PIVOT_PRE_TRANSLATION, $task);
-            $parentWorkerId = $operation->getWorkerId();
-            $workerState = ZfExtended_Models_Worker::STATE_PREPARE;
-        }
+            try {
 
+                $parentWorkerId = $operation->getWorkerId();
+                $workerState = ZfExtended_Models_Worker::STATE_PREPARE;
+                // add a different behaviour for the workers when performing an operation
+                $workerParameters = ['workerBehaviour' => ZfExtended_Worker_Behaviour_Default::class];
+                // queue the worker
+                $this->doQueuePivotWorker($task, $assoc, $parentWorkerId, $workerState, $workerParameters);
+                // start operation
+                $operation->start();
+
+            } catch(Throwable $e){
+
+                $operation->onQueueingError();
+                throw $e;
+            }
+        }
+    }
+
+    /**
+     * Queues the Pivot Worker
+     * @param editor_Models_Task $task
+     * @param array $assoc
+     * @param int $parentWorkerId
+     * @param string $workerState
+     * @return void
+     * @throws Zend_Exception
+     * @throws ReflectionException
+     */
+    private function doQueuePivotWorker(
+        editor_Models_Task $task,
+        array              $assoc,
+        int                $parentWorkerId,
+        ?string            $workerState,
+        array              $workerParameters = []
+    )
+    {
         $user = ZfExtended_Authentication::getInstance()->getUser();
 
         $workerParameters['userGuid'] = $user?->getUserGuid() ?? ZfExtended_Models_User::SYSTEM_GUID;
         $workerParameters['userName'] = $user?->getUserName() ?? ZfExtended_Models_User::SYSTEM_LOGIN;
-
 
         // enable batch query via config
         $workerParameters['batchQuery'] = $this->batchQueryEnabled();
@@ -114,13 +149,10 @@ class PivotQueuer
             );
         }
 
-        /** @var PivotWorker $pivotWorker */
         $pivotWorker = ZfExtended_Factory::get(PivotWorker::class);
 
-        if (!$pivotWorker->init($taskGuid, $workerParameters)) {
-            $this->addWarn($task, 'Pivot pre-translation Error on worker init(). Worker could not be initialized');
-
-            return;
+        if (!$pivotWorker->init($task->getTaskGuid(), $workerParameters)) {
+            throw new ZfExtended_Exception('Pivot pre-translation Error on worker init(). Worker could not be initialized');
         }
 
         $worker = ZfExtended_Factory::get(PausePivotWorker::class);
@@ -128,11 +160,9 @@ class PivotQueuer
         $worker->queue($parentWorkerId, $workerState);
 
         $pivotWorker->queue($parentWorkerId, $workerState, false);
-
-        if (isset($operation) && !$task->isImporting()) {
-            $operation->start();
-        }
     }
+
+
 
     /**
      * @param string $taskGuid

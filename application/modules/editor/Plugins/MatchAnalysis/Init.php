@@ -541,32 +541,67 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract
      */
     private function finishQueueAnalysis(editor_Models_Task $task, array $valid, array $workerParameters): bool
     {
-        if ($task->isImporting()) {
-            //on import we use the import worker as parentId
-            $parentWorkerId = $this->fetchImportWorkerId($task->getTaskGuid());
-            //on import scheduled is ok
-            $workerState = ZfExtended_Models_Worker::STATE_SCHEDULED;
-        } else {
-            // crucial: add a different behaviour for the workers when performig an operation
-            $workerParameters['workerBehaviour'] = ZfExtended_Worker_Behaviour_Default::class;
-            // this creates the operation start/finish workers
-            $operation = editor_Task_Operation::create(editor_Task_Operation::MATCHANALYSIS, $task);
-            $parentWorkerId = $operation->getWorkerId();
-            //on operations we init with prepare, since the operation schedules the prepared ones
-            $workerState = ZfExtended_Models_Worker::STATE_PREPARE;
-        }
-
-
         if (empty($valid)) {
             $this->addWarn(
                 $task,
                 'MatchAnalysis Plug-In: No valid analysable language resources found.',
                 ['invalid' => print_r($this->assocs, 1)]
             );
-
             return false;
         }
 
+        if ($task->isImporting()) {
+
+            //on import we use the import worker as parentId
+            $parentWorkerId = $this->fetchImportWorkerId($task->getTaskGuid());
+            //on import state scheduled is ok
+            $workerState = ZfExtended_Models_Worker::STATE_SCHEDULED;
+
+            $this->doQueueAnalysisWorkers($task, $parentWorkerId, $workerState, $workerParameters);
+
+        } else {
+
+            // this creates the operation start/finish workers
+            $operation = editor_Task_Operation::create(editor_Task_Operation::MATCHANALYSIS, $task);
+            try {
+
+                $parentWorkerId = $operation->getWorkerId();
+                //on operations we init with prepare, since the operation schedules the prepared ones
+                $workerState = ZfExtended_Models_Worker::STATE_PREPARE;
+                // add a different behaviour for the workers when performing an operation
+                $workerParameters['workerBehaviour'] = ZfExtended_Worker_Behaviour_Default::class;
+
+                $this->doQueueAnalysisWorkers($task, $parentWorkerId, $workerState, $workerParameters);
+                // and start operation
+                $operation->start();
+
+            } catch(Throwable $e){
+
+                $operation->onQueueingError();
+                throw $e;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * Queues the Analysis and all other needed workers
+     * @param editor_Models_Task $task
+     * @param int $parentWorkerId
+     * @param string|null $workerState
+     * @param array $workerParameters
+     * @return false|void
+     * @throws ReflectionException
+     * @throws Zend_Exception
+     * @throws ZfExtended_Models_Entity_NotFoundException
+     */
+    private function doQueueAnalysisWorkers(
+        editor_Models_Task $task,
+        int                $parentWorkerId,
+        ?string            $workerState,
+        array              $workerParameters = []
+    )
+    {
         $workerParameters['userGuid'] = ZfExtended_Authentication::getInstance()->getUserGuid();
         $workerParameters['userName'] = ZfExtended_Authentication::getInstance()->getUser()->getUserName();
 
@@ -585,9 +620,7 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract
         $worker = ZfExtended_Factory::get(editor_Plugins_MatchAnalysis_Worker::class);
 
         if (!$worker->init($task->getTaskGuid(), $workerParameters)) {
-            $this->addWarn($task, 'MatchAnalysis-Error on worker init(). Worker could not be initialized');
-
-            return false;
+            throw new ZfExtended_Exception('MatchAnalysis-Error on worker init(). Worker could not be initialized');
         }
 
         $worker->queue($parentWorkerId, $workerState, false);
@@ -600,13 +633,7 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract
                 $parentWorkerId,
                 ZfExtended_Models_Worker::STATE_PREPARE
             );
-            // we need to start any operation but the import
-            if(isset($operation)) {
-                $operation->start();
-            }
         }
-
-        return true;
     }
 
     /**
