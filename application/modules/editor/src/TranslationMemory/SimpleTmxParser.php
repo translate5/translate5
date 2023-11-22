@@ -134,7 +134,6 @@ final class SimpleTmxParser extends editor_Models_Import_FileParser_XmlParser {
      * @param bool $stripXliffTags
      * @param bool $fuzzyTargetMatching
      * @return bool
-     * @throws ZfExtended_Exception
      */
     public function extract(
         string $xmlString,
@@ -158,7 +157,7 @@ final class SimpleTmxParser extends editor_Models_Import_FileParser_XmlParser {
 
         // register the needed parsers
         $this->registerElement('tmx tu', [$this, 'startTransUnit'], [$this, 'endTransUnit']);
-        $this->registerElement('tmx tu > tuv', [$this, 'startTransUnitVariant'], null);
+        $this->registerElement('tmx tu > tuv', [$this, 'startTransUnitVariant']);
         $this->registerElement('tmx tu > tuv > seg', null, [$this, 'endTransUnitVariantSegment']);
 
         // parse the XML
@@ -191,7 +190,8 @@ final class SimpleTmxParser extends editor_Models_Import_FileParser_XmlParser {
      * @param string $tag
      * @param array $attributes
      * @param int $key
-     * @param boolean $isSingle
+     * @param bool $isSingle
+     * @return void
      */
     public function startTransUnit(string $tag, array $attributes, int $key, bool $isSingle): void
     {
@@ -205,6 +205,7 @@ final class SimpleTmxParser extends editor_Models_Import_FileParser_XmlParser {
      * @param string $tag
      * @param int $key
      * @param array $opener
+     * @return void
      */
     public function endTransUnit(string $tag, int $key, array $opener): void
     {
@@ -246,7 +247,8 @@ final class SimpleTmxParser extends editor_Models_Import_FileParser_XmlParser {
      * @param string $tag
      * @param array $attributes
      * @param int $key
-     * @param boolean $isSingle
+     * @param bool $isSingle
+     * @return void
      */
     public function startTransUnitVariant(string $tag, array $attributes, int $key, bool $isSingle): void
     {
