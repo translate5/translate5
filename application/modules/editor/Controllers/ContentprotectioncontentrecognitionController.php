@@ -70,6 +70,10 @@ class editor_ContentprotectioncontentrecognitionController extends ZfExtended_Re
     {
         parent::putAction();
 
+        if (isset($this->data['enabled']) || isset($this->data['rowEnabled'])) {
+
+        }
+
         if (!empty($this->view->rows)) {
             $this->fixRowTypes($this->view->rows);
         }

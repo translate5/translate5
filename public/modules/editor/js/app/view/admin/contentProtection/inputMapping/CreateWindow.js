@@ -108,7 +108,7 @@ Ext.define('Editor.view.admin.contentProtection.inputMapping.CreateWindow', {
                                 fieldLabel: '{l10n.general.name}'
                             },
                             store: {
-                                type: 'contentProtection.ContentRecognition'
+                                type: 'contentProtection.inputMapping.ContentRecognitionComboMapping'
                             }
                         },
                         {

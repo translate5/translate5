@@ -1263,3 +1263,8 @@ div.internal-tag.number span.full::after {
     border-radius: 4px;
     padding: 6px;
 }
+
+.disabled-row {
+    background-color: rgb(210, 210, 210);
+    color: #b6b6b6;
+}

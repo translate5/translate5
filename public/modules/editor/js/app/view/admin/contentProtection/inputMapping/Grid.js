@@ -115,6 +115,19 @@ Ext.define('Editor.view.admin.contentProtection.inputMapping.Grid', {
                 ]
             }
         ];
+
+        config.viewConfig = {
+            getRowClass: function (record, rowIndex, rowParams, store) {
+                // You can put your condition here
+                if (!record.get('ruleEnabled')) {
+                    return 'disabled-row';
+                }
+
+                // Return an empty string if no class should be applied
+                return '';
+            }
+        };
+
         config.columns = [
             {
                 xtype: 'gridcolumn',

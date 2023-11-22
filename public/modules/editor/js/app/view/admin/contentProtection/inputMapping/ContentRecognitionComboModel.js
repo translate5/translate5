@@ -25,13 +25,13 @@
  END LICENSE AND COPYRIGHT
  */
 
-Ext.define('Editor.view.admin.contentProtection.inputMapping.Model', {
+Ext.define('Editor.view.admin.contentProtection.inputMapping.ContentRecognitionComboModel', {
     extend: 'Ext.data.Model',
-    alias: 'model.InputMappingModel',
+    alias: 'model.inputMapping.ContentRecognitionComboModel',
     idProperty: 'id',
     proxy: {
         type: 'rest',
-        url: Editor.data.restpath + 'contentprotectioninputmapping',
+        url: Editor.data.restpath + 'contentprotection/inputmapping/namecombo',
         reader: {
             rootProperty: 'rows',
             type : 'json'
@@ -45,16 +45,10 @@ Ext.define('Editor.view.admin.contentProtection.inputMapping.Model', {
         name: 'id',
         type: 'int'
     }, {
-        name: 'languageId',
-        type: 'int'
-    }, {
         name: 'type',
         type: 'string'
-    }, {
+    },{
         name: 'name',
         type: 'string'
-    }, {
-        name: 'ruleEnabled',
-        type: 'boolean'
     }]
 });

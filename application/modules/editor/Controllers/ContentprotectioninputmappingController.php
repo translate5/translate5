@@ -26,6 +26,7 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\ContentProtection\Model\ContentProtectionRepository;
 use MittagQI\Translate5\ContentProtection\Model\InputMapping;
 
 /**
@@ -43,15 +44,31 @@ class editor_ContentprotectioninputmappingController extends ZfExtended_RestCont
      */
     protected $entity;
 
+    public function putAction()
+    {
+        parent::putAction();
+    }
+
     public function indexAction(): void
     {
         /** @var array{id: int, languageId: int, type: string, name: string}[] rows */
         $this->view->rows = $this->entity->loadAllForFrontEnd();
+
+        foreach ($this->view->rows as &$row) {
+            $row['ruleEnabled'] = boolval($row['enabled']);
+            unset($row['enabled']);
+        }
         $this->view->total = $this->entity->getTotalCount();
     }
 
     public function getAction(): void
     {
         throw new ZfExtended_Models_Entity_NotFoundException();
+    }
+
+    public function namecomboAction(): void
+    {
+        $this->view->rows = (new ContentProtectionRepository())->getContentRecognitionForInputMappingForm();
+        $this->view->total = count($this->view->rows);
     }
 }

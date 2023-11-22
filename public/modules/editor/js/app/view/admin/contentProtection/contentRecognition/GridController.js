@@ -69,6 +69,12 @@ Ext.define('Editor.view.admin.contentProtection.contentRecognition.GridControlle
         var grid = this.getView(),
             rec = cellContext.record;
 
+        if (cellContext.field === 'priority') {
+            grid.view.select(rec);
+
+            return true;
+        }
+
         if (rec.getData().isDefault) {
             return false;
         }

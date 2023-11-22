@@ -99,6 +99,7 @@ Ext.application({
         'admin.contentProtection.OutputMappingStore',
         'admin.contentProtection.ContentRecognitionStore',
         'admin.contentProtection.outputMapping.ContentRecognitionComboStore',
+        'admin.contentProtection.inputMapping.ContentRecognitionComboStore',
         'Files',
         'ReferenceFiles',
         'Segments',

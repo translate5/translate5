@@ -747,6 +747,19 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
                 ]
             )
         );
+
+        $this->front->getRouter()->addRoute(
+            'contentprotection.inputMapping.nameCombo',
+            new ZfExtended_Controller_RestLikeRoute(
+                'editor/contentprotection/inputmapping/namecombo',
+                [
+                    'module' => 'editor',
+                    'controller' => 'contentprotectioninputmapping',
+                    /** @see \editor_ContentprotectioninputmappingController::namecomboAction */
+                    'action' => 'namecombo'
+                ]
+            )
+        );
     }
     
     

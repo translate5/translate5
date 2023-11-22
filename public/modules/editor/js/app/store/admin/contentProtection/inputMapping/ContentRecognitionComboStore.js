@@ -25,36 +25,17 @@
  END LICENSE AND COPYRIGHT
  */
 
-Ext.define('Editor.view.admin.contentProtection.inputMapping.Model', {
-    extend: 'Ext.data.Model',
-    alias: 'model.InputMappingModel',
-    idProperty: 'id',
-    proxy: {
-        type: 'rest',
-        url: Editor.data.restpath + 'contentprotectioninputmapping',
-        reader: {
-            rootProperty: 'rows',
-            type : 'json'
-        },
-        writer: {
-            encode: true,
-            rootProperty: 'data'
-        }
-    },
-    fields: [{
-        name: 'id',
-        type: 'int'
-    }, {
-        name: 'languageId',
-        type: 'int'
-    }, {
-        name: 'type',
-        type: 'string'
-    }, {
-        name: 'name',
-        type: 'string'
-    }, {
-        name: 'ruleEnabled',
-        type: 'boolean'
-    }]
+/**
+ * @extends Ext.data.Store
+ */
+Ext.define('Editor.store.admin.contentProtection.inputMapping.ContentRecognitionComboStore', {
+    extend: 'Ext.data.Store',
+    requires: ['Editor.view.admin.contentProtection.inputMapping.ContentRecognitionComboModel'],
+    alias: 'store.contentProtection.inputMapping.ContentRecognitionComboMapping',
+    model: 'Editor.view.admin.contentProtection.inputMapping.ContentRecognitionComboModel',
+    autoLoad: false,
+    autoSync: false,
+    remoteFilter: false,
+    remoteSort: false,
+    pageSize: 0
 });
