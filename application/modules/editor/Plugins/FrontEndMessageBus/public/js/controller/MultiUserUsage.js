@@ -127,11 +127,9 @@ Ext.define('Editor.plugins.FrontEndMessageBus.controller.MultiUserUsage', {
         var schema = location.protocol.match('https') ? 'wss' : 'ws',
             host = conf.socketServer.httpHost || window.location.hostname,
             port = conf.socketServer.port || (schema === 'wss' ? 443 : 80),
-            path = conf.socketServer.route;
+            path = '/' + schema + conf.socketServer.route;
 
         url.push(schema, '://', host, ':', port, path);
-
-        console.log('MESSAGEBUS: ' + url.join(''));
 
         Ext.Ajax.setDefaultHeaders(Ext.apply({
             'X-Translate5-MessageBus-ConnId': conf.connectionId
