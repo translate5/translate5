@@ -23,6 +23,16 @@ pipelines:
               - develop
               - master
           - name: SPECIFIC_TEST_OR_SUITE
+          - name: PHPSTAN
+            default: enabled
+            allowed-values:
+              - enabled
+              - disabled
+          - name: MASTER_TESTS
+            default: disabled
+            allowed-values:
+              - enabled
+              - disabled
 
       # Clone docker-repo and run all things from there
       - step:

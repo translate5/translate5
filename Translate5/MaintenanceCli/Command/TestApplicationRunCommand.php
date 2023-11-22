@@ -48,7 +48,7 @@ class TestApplicationRunCommand extends Translate5AbstractTestCommand
      * A master
      * @var bool
      */
-    protected static bool $canMimicMasterTest = false;
+    protected static bool $canMimicMasterTest = true;
     
     protected function configure()
     {
