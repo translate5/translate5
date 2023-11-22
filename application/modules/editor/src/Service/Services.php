@@ -179,6 +179,11 @@ final class Services
      */
     public static function findService(Zend_Config $config, string $serviceName, bool $loadPlugins=false): ?ServiceAbstract
     {
+        $services = self::getServices($config);
+        if (array_key_exists($serviceName, $services)) {
+            return $services[$serviceName];
+        }
+
         $pluginManager = Zend_Registry::get('PluginManager');
         if($loadPlugins){
             $pluginManager->bootstrap();

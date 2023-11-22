@@ -34,22 +34,22 @@ END LICENSE AND COPYRIGHT
  */
 /**
  * Comment Entity Object
- * @method integer getId() getId()
- * @method void setId() setId(int $id)
- * @method string getTaskGuid() getTaskGuid()
- * @method void setTaskGuid() setTaskGuid(string $taskGuid)
- * @method integer getSegmentId() getSegmentId()
- * @method void setSegmentId() setSegmentId(int $segmentId)
- * @method string getUserGuid() getUserGuid()
- * @method void setUserGuid() setUserGuid(string $userGuid)
- * @method string getUserName() getUserName()
- * @method void setUserName() setUserName(string $username)
- * @method string getComment() getComment()
- * @method void setComment() setComment(string $comment)
- * @method string getCreated() getCreated()
- * @method void setCreated() setCreated(string $created)
- * @method string getModified() getModified()
- * @method void setModified() setModified(string $modified)
+ * @method integer getId()
+ * @method void setId(int $id)
+ * @method string getTaskGuid()
+ * @method void setTaskGuid(string $taskGuid)
+ * @method integer getSegmentId()
+ * @method void setSegmentId(int $segmentId)
+ * @method string getUserGuid()
+ * @method void setUserGuid(string $userGuid)
+ * @method string getUserName()
+ * @method void setUserName(string $username)
+ * @method string getComment()
+ * @method void setComment(string $comment)
+ * @method string getCreated()
+ * @method void setCreated(string $created)
+ * @method string getModified()
+ * @method void setModified(string $modified)
  */
 class editor_Models_Comment extends ZfExtended_Models_Entity_Abstract {
     
