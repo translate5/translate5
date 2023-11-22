@@ -70,13 +70,21 @@ class editor_Models_Terminology_Models_RefObjectModel extends editor_Models_Term
         ', $collectionId)->fetchAll(PDO::FETCH_GROUP);
 
         // Get respPerson-data logged during termportal usage (after tbx import)
-        $respPerson = $this->db->getAdapter()->query('
+        $userByGuidA = $this->db->getAdapter()->query('
             SELECT 
                `userGuid` AS `key`, 
-               JSON_OBJECT("fn", CONCAT(`firstName`, " ", `surName`), "email", `email`, "role", `roles`) AS `data` 
+               CONCAT(`firstName`, " ", `surName`) AS `fn`,
+               `email`,
+               `roles` AS `role` 
             FROM `Zf_users`
             WHERE `userGuid` IN (' . $targets . ')
-        ')->fetchAll();
+        ')->fetchAll(PDO::FETCH_UNIQUE);
+
+        // Re-structure to make tbx-exportable
+        $respPerson = [];
+        foreach ($userByGuidA as $key => $data) {
+            $respPerson []= ['key' => $key, 'data' => json_encode($data)];
+        }
 
         // Append data to the respPerson-list
         $refObjectListA['respPerson'] = array_merge($refObjectListA['respPerson'] ?? [], $respPerson);

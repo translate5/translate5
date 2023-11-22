@@ -123,11 +123,14 @@ Ext.define('Editor.plugins.FrontEndMessageBus.controller.MultiUserUsage', {
                 version: conf.clientVersion
             };
         }
-        
-        url.push(conf.socketServer.schema, '://');
-        url.push(conf.socketServer.httpHost || window.location.hostname);
-        url.push(':', conf.socketServer.port, conf.socketServer.route);
-        
+
+        var schema = location.protocol.match('https') ? 'wss' : 'ws',
+            host = conf.socketServer.httpHost || window.location.hostname,
+            port = conf.socketServer.port || (schema === 'wss' ? 443 : 80),
+            path = '/' + schema + conf.socketServer.route;
+
+        url.push(schema, '://', host, ':', port, path);
+
         Ext.Ajax.setDefaultHeaders(Ext.apply({
             'X-Translate5-MessageBus-ConnId': conf.connectionId
         }, Ext.Ajax.getDefaultHeaders()));

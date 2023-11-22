@@ -20,5 +20,6 @@
 3.Run command: "translate5.bat config runtimeOptions.plugins.VisualReview.visualConverterUrl http://visualconverter.:8087"
 4.Run command: "translate5.bat config runtimeOptions.worker.server http://php:80"
 5.Run command: "echo 127.0.0.1 translate5.local php db termtagger frontendmessagebus languagetool okapi pdfconverter visualconverter t5memory >> C:\Windows\System32\drivers\etc\hosts"
-6.Start local apache (having PHP version 8.x)
+6.Run SQL query: "DELETE FROM `Zf_memcache` WHERE `id` IN ('helper_paths_editor', 'helper_paths_default');" as paths are prefixed with '/var/www/' there
+7.Start local apache (having PHP version 8.x)
 
