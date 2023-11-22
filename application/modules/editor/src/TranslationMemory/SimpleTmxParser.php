@@ -134,7 +134,6 @@ final class SimpleTmxParser extends editor_Models_Import_FileParser_XmlParser {
      * @param bool $stripXliffTags
      * @param bool $fuzzyTargetMatching
      * @return bool
-     * @throws ZfExtended_Exception
      */
     public function extract(
         string $xmlString,
@@ -158,7 +157,7 @@ final class SimpleTmxParser extends editor_Models_Import_FileParser_XmlParser {
 
         // register the needed parsers
         $this->registerElement('tmx tu', [$this, 'startTransUnit'], [$this, 'endTransUnit']);
-        $this->registerElement('tmx tu > tuv', [$this, 'startTransUnitVariant'], null);
+        $this->registerElement('tmx tu > tuv', [$this, 'startTransUnitVariant']);
         $this->registerElement('tmx tu > tuv > seg', null, [$this, 'endTransUnitVariantSegment']);
 
         // parse the XML
@@ -190,8 +189,9 @@ final class SimpleTmxParser extends editor_Models_Import_FileParser_XmlParser {
      * Handler when trans-unit starts
      * @param string $tag
      * @param array $attributes
-     * @param string $key
-     * @param boolean $isSingle
+     * @param int $key
+     * @param bool $isSingle
+     * @return void
      */
     public function startTransUnit(string $tag, array $attributes, int $key, bool $isSingle): void
     {
@@ -202,8 +202,9 @@ final class SimpleTmxParser extends editor_Models_Import_FileParser_XmlParser {
     /**
      * Handler sets the collected target content to the evaluated target-node (if the target-node was no single node)
      * @param string $tag
-     * @param string $key
+     * @param int $key
      * @param array $opener
+     * @return void
      */
     public function endTransUnit(string $tag, int $key, array $opener): void
     {
@@ -229,7 +230,7 @@ final class SimpleTmxParser extends editor_Models_Import_FileParser_XmlParser {
         }
     }
 
-    private function languageMatches(string $lang, string $isSource): bool
+    private function languageMatches(string $lang, bool $isSource): bool
     {
         $primary = substr($lang, 0,2);
         if($isSource){
@@ -244,8 +245,9 @@ final class SimpleTmxParser extends editor_Models_Import_FileParser_XmlParser {
      * Starts a variant: gets the language from attributes
      * @param string $tag
      * @param array $attributes
-     * @param string $key
-     * @param boolean $isSingle
+     * @param int $key
+     * @param bool $isSingle
+     * @return void
      */
     public function startTransUnitVariant(string $tag, array $attributes, int $key, bool $isSingle): void
     {
