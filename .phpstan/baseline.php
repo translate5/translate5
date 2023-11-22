@@ -112,11 +112,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/../Translate5/MaintenanceCli/Command/SessionImpersonateCommand.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Access to an undefined property Zend_Session_Namespace\\:\\:\\$loginByApiAuth\\.$#',
-	'count' => 1,
-	'path' => __DIR__ . '/../Translate5/MaintenanceCli/Command/SessionImpersonateCommand.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Call to an undefined method editor_Plugins_FrontEndMessageBus_Bus\\:\\:setExceptionHandler\\(\\)\\.$#',
 	'count' => 1,
 	'path' => __DIR__ . '/../Translate5/MaintenanceCli/Command/StatusCommand.php',
@@ -602,11 +597,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/../application/modules/editor/Controllers/AlikesegmentController.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Access to an undefined property Zend_Session_Namespace\\:\\:\\$data\\.$#',
-	'count' => 1,
-	'path' => __DIR__ . '/../application/modules/editor/Controllers/AlikesegmentController.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Access to an undefined property ZfExtended_View\\:\\:\\$segmentFinishCount\\.$#',
 	'count' => 1,
 	'path' => __DIR__ . '/../application/modules/editor/Controllers/AlikesegmentController.php',
@@ -653,11 +643,6 @@ $ignoreErrors[] = [
 ];
 $ignoreErrors[] = [
 	'message' => '#^Access to an undefined property Zend_Controller_Action_HelperBroker\\:\\:\\$viewRenderer\\.$#',
-	'count' => 1,
-	'path' => __DIR__ . '/../application/modules/editor/Controllers/AppsController.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property Zend_Session_Namespace\\:\\:\\$data\\.$#',
 	'count' => 1,
 	'path' => __DIR__ . '/../application/modules/editor/Controllers/AppsController.php',
 ];
@@ -782,16 +767,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/../application/modules/editor/Controllers/AttributedatatypeController.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Access to an undefined property Zend_Session_Namespace\\:\\:\\$data\\.$#',
-	'count' => 1,
-	'path' => __DIR__ . '/../application/modules/editor/Controllers/CollectionattributedatatypeController.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property editor_CollectionattributedatatypeController\\:\\:\\$_session\\.$#',
-	'count' => 1,
-	'path' => __DIR__ . '/../application/modules/editor/Controllers/CollectionattributedatatypeController.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method editor_Models_Terminology_Models_CollectionAttributeDataType\\:\\:setEnabled\\(\\) invoked with 1 parameter, 0 required\\.$#',
 	'count' => 1,
 	'path' => __DIR__ . '/../application/modules/editor/Controllers/CollectionattributedatatypeController.php',
@@ -818,11 +793,6 @@ $ignoreErrors[] = [
 ];
 $ignoreErrors[] = [
 	'message' => '#^Access to an undefined property Zend_Controller_Action_HelperBroker\\:\\:\\$workflow\\.$#',
-	'count' => 3,
-	'path' => __DIR__ . '/../application/modules/editor/Controllers/CommentController.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property Zend_Session_Namespace\\:\\:\\$data\\.$#',
 	'count' => 3,
 	'path' => __DIR__ . '/../application/modules/editor/Controllers/CommentController.php',
 ];
@@ -955,11 +925,6 @@ $ignoreErrors[] = [
 	'message' => '#^Access to an undefined property Zend_Controller_Action_HelperBroker\\:\\:\\$viewRenderer\\.$#',
 	'count' => 2,
 	'path' => __DIR__ . '/../application/modules/editor/Controllers/CronController.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property Zend_Session_Namespace\\:\\:\\$data\\.$#',
-	'count' => 1,
-	'path' => __DIR__ . '/../application/modules/editor/Controllers/CustomerController.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Access to an undefined property ZfExtended_View\\:\\:\\$result\\.$#',
@@ -1099,11 +1064,6 @@ $ignoreErrors[] = [
 $ignoreErrors[] = [
 	'message' => '#^Access to an undefined property Zend_Controller_Action_HelperBroker\\:\\:\\$viewRenderer\\.$#',
 	'count' => 1,
-	'path' => __DIR__ . '/../application/modules/editor/Controllers/IndexController.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property Zend_Session_Namespace\\:\\:\\$data\\.$#',
-	'count' => 3,
 	'path' => __DIR__ . '/../application/modules/editor/Controllers/IndexController.php',
 ];
 $ignoreErrors[] = [
@@ -1279,21 +1239,6 @@ $ignoreErrors[] = [
 $ignoreErrors[] = [
 	'message' => '#^Constant APPLICATION_RUNDIR not found\\.$#',
 	'count' => 9,
-	'path' => __DIR__ . '/../application/modules/editor/Controllers/IndexController.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Editor_IndexController\\:\\:isAllowed\\(\\) should return string but returns bool\\.$#',
-	'count' => 1,
-	'path' => __DIR__ . '/../application/modules/editor/Controllers/IndexController.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Editor_IndexController\\:\\:isAllowed\\(\\) should return string but returns false\\.$#',
-	'count' => 1,
-	'path' => __DIR__ . '/../application/modules/editor/Controllers/IndexController.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Parameter \\#1 \\$includeServices of static method ZfExtended_Debug\\:\\:applicationState\\(\\) expects bool, string given\\.$#',
-	'count' => 1,
 	'path' => __DIR__ . '/../application/modules/editor/Controllers/IndexController.php',
 ];
 $ignoreErrors[] = [
@@ -1887,11 +1832,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/../application/modules/editor/Controllers/SegmentuserassocController.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Access to an undefined property Zend_Session_Namespace\\:\\:\\$data\\.$#',
-	'count' => 1,
-	'path' => __DIR__ . '/../application/modules/editor/Controllers/SessionController.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Access to an undefined property ZfExtended_View\\:\\:\\$taskUrlPath\\.$#',
 	'count' => 1,
 	'path' => __DIR__ . '/../application/modules/editor/Controllers/SessionController.php',
@@ -1923,7 +1863,7 @@ $ignoreErrors[] = [
 ];
 $ignoreErrors[] = [
 	'message' => '#^Access to an undefined property Zend_Config\\:\\:\\$runtimeOptions\\.$#',
-	'count' => 4,
+	'count' => 5,
 	'path' => __DIR__ . '/../application/modules/editor/Controllers/TaskController.php',
 ];
 $ignoreErrors[] = [
@@ -1944,11 +1884,6 @@ $ignoreErrors[] = [
 $ignoreErrors[] = [
 	'message' => '#^Access to an undefined property Zend_Controller_Action_HelperBroker\\:\\:\\$viewRenderer\\.$#',
 	'count' => 2,
-	'path' => __DIR__ . '/../application/modules/editor/Controllers/TaskController.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property Zend_Session_Namespace\\:\\:\\$data\\.$#',
-	'count' => 15,
 	'path' => __DIR__ . '/../application/modules/editor/Controllers/TaskController.php',
 ];
 $ignoreErrors[] = [
@@ -2267,11 +2202,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/../application/modules/editor/Controllers/TaskmetaController.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Access to an undefined property Zend_Session_Namespace\\:\\:\\$data\\.$#',
-	'count' => 2,
-	'path' => __DIR__ . '/../application/modules/editor/Controllers/TaskuserassocController.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Call to an undefined method Zend_Controller_Request_Abstract\\:\\:isPost\\(\\)\\.$#',
 	'count' => 2,
 	'path' => __DIR__ . '/../application/modules/editor/Controllers/TaskuserassocController.php',
@@ -2333,6 +2263,11 @@ $ignoreErrors[] = [
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method ZfExtended_Logger\\:\\:info\\(\\) invoked with 3 parameters, 0 required\\.$#',
+	'count' => 3,
+	'path' => __DIR__ . '/../application/modules/editor/Controllers/TaskuserassocController.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Parameter \\#1 \\$parentId of method ZfExtended_Models_User\\:\\:hasParent\\(\\) expects string, int given\\.$#',
 	'count' => 3,
 	'path' => __DIR__ . '/../application/modules/editor/Controllers/TaskuserassocController.php',
 ];
@@ -2607,11 +2542,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/../application/modules/editor/Controllers/helpers/TaskUserInfo.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Access to an undefined property Zend_Session_Namespace\\:\\:\\$data\\.$#',
-	'count' => 1,
-	'path' => __DIR__ . '/../application/modules/editor/Controllers/helpers/TaskUserInfo.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method editor_Models_Workflow_Userpref\\:\\:setAnonymousCols\\(\\) invoked with 1 parameter, 0 required\\.$#',
 	'count' => 1,
 	'path' => __DIR__ . '/../application/modules/editor/Controllers/helpers/TaskUserInfo.php',
@@ -2782,19 +2712,9 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/../application/modules/editor/Models/Categories.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Access to an undefined property Zend_Session_Namespace\\:\\:\\$data\\.$#',
-	'count' => 1,
-	'path' => __DIR__ . '/../application/modules/editor/Models/Changelog.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^PHPDoc tag @param references unknown parameter\\: \\$userGroupId$#',
 	'count' => 1,
 	'path' => __DIR__ . '/../application/modules/editor/Models/Changelog.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property Zend_Session_Namespace\\:\\:\\$data\\.$#',
-	'count' => 1,
-	'path' => __DIR__ . '/../application/modules/editor/Models/Comment.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Access to an undefined property Zend_View\\:\\:\\$comment\\.$#',
@@ -2810,11 +2730,6 @@ $ignoreErrors[] = [
 	'message' => '#^Property editor_Models_Comment\\:\\:\\$meta \\(editor_Models_Comment_Meta\\) in empty\\(\\) is not falsy\\.$#',
 	'count' => 1,
 	'path' => __DIR__ . '/../application/modules/editor/Models/Comment.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property Zend_Session_Namespace\\:\\:\\$data\\.$#',
-	'count' => 2,
-	'path' => __DIR__ . '/../application/modules/editor/Models/Config.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^PHPDoc tag @param references unknown parameter\\: \\$user$#',
@@ -3260,11 +3175,6 @@ $ignoreErrors[] = [
 	'message' => '#^Property editor_Models_Export_DiffTagger_TrackChanges\\:\\:\\$task \\(editor_Models_Task\\) does not accept default value of type null\\.$#',
 	'count' => 1,
 	'path' => __DIR__ . '/../application/modules/editor/Models/Export/DiffTagger/TrackChanges.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property Zend_Session_Namespace\\:\\:\\$data\\.$#',
-	'count' => 1,
-	'path' => __DIR__ . '/../application/modules/editor/Models/Export/Excel.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method editor_Models_Task_ExcelExport\\:\\:setTaskGuid\\(\\) invoked with 1 parameter, 0 required\\.$#',
@@ -3805,11 +3715,6 @@ $ignoreErrors[] = [
 	'message' => '#^Property editor_Models_Filter_SegmentSpecific\\:\\:\\$qualityState \\(editor_Models_Quality_RequestState\\) does not accept default value of type null\\.$#',
 	'count' => 1,
 	'path' => __DIR__ . '/../application/modules/editor/Models/Filter/SegmentSpecific.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property Zend_Session_Namespace\\:\\:\\$data\\.$#',
-	'count' => 1,
-	'path' => __DIR__ . '/../application/modules/editor/Models/Filter/TaskSpecific.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Access to an undefined property object\\:\\:\\$filename\\.$#',
@@ -5602,11 +5507,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/../application/modules/editor/Models/Segment.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Call to an undefined method editor_Models_Segment\\:\\:catchMissingView\\(\\)\\.$#',
-	'count' => 1,
-	'path' => __DIR__ . '/../application/modules/editor/Models/Segment.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Call to an undefined method editor_Models_Segment\\:\\:getSourceMd5\\(\\)\\.$#',
 	'count' => 3,
 	'path' => __DIR__ . '/../application/modules/editor/Models/Segment.php',
@@ -5653,6 +5553,21 @@ $ignoreErrors[] = [
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method editor_Models_Segment\\:\\:updateIsTargetRepeated\\(\\) should return bool but return statement is missing\\.$#',
+	'count' => 1,
+	'path' => __DIR__ . '/../application/modules/editor/Models/Segment.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Offset 1 on non\\-empty\\-array\\<string, int\\> in isset\\(\\) does not exist\\.$#',
+	'count' => 1,
+	'path' => __DIR__ . '/../application/modules/editor/Models/Segment.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Offset 2 on non\\-empty\\-array\\<string, int\\> in isset\\(\\) does not exist\\.$#',
+	'count' => 1,
+	'path' => __DIR__ . '/../application/modules/editor/Models/Segment.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Offset 3 on non\\-empty\\-array\\<string, int\\> in isset\\(\\) does not exist\\.$#',
 	'count' => 1,
 	'path' => __DIR__ . '/../application/modules/editor/Models/Segment.php',
 ];
@@ -5732,13 +5647,18 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/../application/modules/editor/Models/Segment.php',
 ];
 $ignoreErrors[] = [
+	'message' => '#^Result of && is always true\\.$#',
+	'count' => 2,
+	'path' => __DIR__ . '/../application/modules/editor/Models/Segment.php',
+];
+$ignoreErrors[] = [
 	'message' => '#^Static property editor_Models_Segment\\:\\:\\$pixelLength \\(editor_Models_Segment_PixelLength\\) in isset\\(\\) is not nullable\\.$#',
 	'count' => 1,
 	'path' => __DIR__ . '/../application/modules/editor/Models/Segment.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Unreachable statement \\- code above always terminates\\.$#',
-	'count' => 2,
+	'count' => 3,
 	'path' => __DIR__ . '/../application/modules/editor/Models/Segment.php',
 ];
 $ignoreErrors[] = [
@@ -6174,11 +6094,6 @@ $ignoreErrors[] = [
 $ignoreErrors[] = [
 	'message' => '#^Access to an undefined property Zend_Db_Table_Row_Abstract\\:\\:\\$qmSubsegmentFlags\\.$#',
 	'count' => 3,
-	'path' => __DIR__ . '/../application/modules/editor/Models/Task.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property Zend_Session_Namespace\\:\\:\\$data\\.$#',
-	'count' => 1,
 	'path' => __DIR__ . '/../application/modules/editor/Models/Task.php',
 ];
 $ignoreErrors[] = [
@@ -7182,11 +7097,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/../application/modules/editor/Plugins/ArchiveTaskBeforeDelete/DbTables.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Access to an undefined property Zend_Session_Namespace\\:\\:\\$data\\.$#',
-	'count' => 3,
-	'path' => __DIR__ . '/../application/modules/editor/Plugins/ChangeLog/Controllers/ChangelogController.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Access to an undefined property ZfExtended_View\\:\\:\\$metaData\\.$#',
 	'count' => 1,
 	'path' => __DIR__ . '/../application/modules/editor/Plugins/ChangeLog/Controllers/ChangelogController.php',
@@ -7195,11 +7105,6 @@ $ignoreErrors[] = [
 	'message' => '#^Method editor_Models_Changelog\\:\\:getTotalCount\\(\\) invoked with 1 parameter, 0 required\\.$#',
 	'count' => 1,
 	'path' => __DIR__ . '/../application/modules/editor/Plugins/ChangeLog/Controllers/ChangelogController.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property Zend_Session_Namespace\\:\\:\\$data\\.$#',
-	'count' => 2,
-	'path' => __DIR__ . '/../application/modules/editor/Plugins/ChangeLog/Init.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Parameter \\#3 \\$callback of method Zend_EventManager_SharedEventManager\\:\\:attach\\(\\) expects callback, array\\<int, \\$this\\(editor_Plugins_ChangeLog_Init\\)\\|string\\> given\\.$#',
@@ -7312,11 +7217,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/../application/modules/editor/Plugins/DeepL/tests/DeepLLanguageResourceApiTest.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Access to an undefined property Zend_Session_Namespace\\:\\:\\$data\\.$#',
-	'count' => 1,
-	'path' => __DIR__ . '/../application/modules/editor/Plugins/DeleteUserAssociations/Init.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Parameter \\#3 \\$callback of method Zend_EventManager_SharedEventManager\\:\\:attach\\(\\) expects callback, array\\<int, \\$this\\(editor_Plugins_DeleteUserAssociations_Init\\)\\|string\\> given\\.$#',
 	'count' => 4,
 	'path' => __DIR__ . '/../application/modules/editor/Plugins/DeleteUserAssociations/Init.php',
@@ -7398,16 +7298,6 @@ $ignoreErrors[] = [
 ];
 $ignoreErrors[] = [
 	'message' => '#^Access to an undefined property Zend_Config\\:\\:\\$runtimeOptions\\.$#',
-	'count' => 5,
-	'path' => __DIR__ . '/../application/modules/editor/Plugins/FrontEndMessageBus/Service.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^PHPDoc tag @param references unknown parameter\\: \\$schema$#',
-	'count' => 1,
-	'path' => __DIR__ . '/../application/modules/editor/Plugins/FrontEndMessageBus/Service.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Parameter \\#4 \\$port of method MittagQI\\\\Translate5\\\\Plugins\\\\FrontEndMessageBus\\\\Service\\:\\:updateConfigurationConfigs\\(\\) expects int, string given\\.$#',
 	'count' => 1,
 	'path' => __DIR__ . '/../application/modules/editor/Plugins/FrontEndMessageBus/Service.php',
 ];
@@ -7622,11 +7512,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/../application/modules/editor/Plugins/GroupShare/HttpApiWebAPI.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Access to an undefined property object\\:\\:\\$id\\.$#',
-	'count' => 1,
-	'path' => __DIR__ . '/../application/modules/editor/Plugins/GroupShare/HttpApiWebAPI.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Call to an undefined method ZfExtended_Cache_MySQLMemoryBackend\\:\\:getBackend\\(\\)\\.$#',
 	'count' => 2,
 	'path' => __DIR__ . '/../application/modules/editor/Plugins/GroupShare/HttpApiWebAPI.php',
@@ -7797,11 +7682,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/../application/modules/editor/Plugins/InstantTranslate/Controllers/InstanttranslateController.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Access to an undefined property Zend_Session_Namespace\\:\\:\\$data\\.$#',
-	'count' => 2,
-	'path' => __DIR__ . '/../application/modules/editor/Plugins/InstantTranslate/Controllers/InstanttranslateController.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Access to an undefined property Zend_View_Interface\\:\\:\\$allDbLanguages\\.$#',
 	'count' => 1,
 	'path' => __DIR__ . '/../application/modules/editor/Plugins/InstantTranslate/Controllers/InstanttranslateController.php',
@@ -7957,11 +7837,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/../application/modules/editor/Plugins/InstantTranslate/Controllers/InstanttranslateapiController.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Access to an undefined property Zend_Session_Namespace\\:\\:\\$data\\.$#',
-	'count' => 3,
-	'path' => __DIR__ . '/../application/modules/editor/Plugins/InstantTranslate/Filetranslationhelper.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Call to an undefined method editor_Models_TaskUsageLog\\:\\:setCustomerId\\(\\)\\.$#',
 	'count' => 1,
 	'path' => __DIR__ . '/../application/modules/editor/Plugins/InstantTranslate/Filetranslationhelper.php',
@@ -7998,11 +7873,6 @@ $ignoreErrors[] = [
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method ZfExtended_Logger\\:\\:error\\(\\) invoked with 2 parameters, 0 required\\.$#',
-	'count' => 1,
-	'path' => __DIR__ . '/../application/modules/editor/Plugins/InstantTranslate/Filetranslationhelper.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^PHPDoc tag @return has invalid value \\(\\$taskId or \'\'\\)\\: Unexpected token "\\$taskId", expected type at offset 207$#',
 	'count' => 1,
 	'path' => __DIR__ . '/../application/modules/editor/Plugins/InstantTranslate/Filetranslationhelper.php',
 ];
@@ -8052,11 +7922,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/../application/modules/editor/Plugins/InstantTranslate/Service/TranslationService.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Access to an undefined property Zend_Session_Namespace\\:\\:\\$data\\.$#',
-	'count' => 1,
-	'path' => __DIR__ . '/../application/modules/editor/Plugins/InstantTranslate/Service/TranslationService.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Access to an undefined property Zend_View\\:\\:\\$errors\\.$#',
 	'count' => 1,
 	'path' => __DIR__ . '/../application/modules/editor/Plugins/InstantTranslate/Service/TranslationService.php',
@@ -8065,11 +7930,6 @@ $ignoreErrors[] = [
 	'message' => '#^If condition is always false\\.$#',
 	'count' => 1,
 	'path' => __DIR__ . '/../application/modules/editor/Plugins/InstantTranslate/Service/TranslationService.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property Zend_Session_Namespace\\:\\:\\$data\\.$#',
-	'count' => 1,
-	'path' => __DIR__ . '/../application/modules/editor/Plugins/IpAuthentication/Init.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Parameter \\#3 \\$callback of method Zend_EventManager_SharedEventManager\\:\\:attach\\(\\) expects callback, array\\<int, \\$this\\(editor_Plugins_IpAuthentication_Init\\)\\|string\\> given\\.$#',
@@ -8334,11 +8194,6 @@ $ignoreErrors[] = [
 $ignoreErrors[] = [
 	'message' => '#^Access to an undefined property Zend_Config\\:\\:\\$calculateBasedOn\\.$#',
 	'count' => 1,
-	'path' => __DIR__ . '/../application/modules/editor/Plugins/MatchAnalysis/Init.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property Zend_Session_Namespace\\:\\:\\$data\\.$#',
-	'count' => 2,
 	'path' => __DIR__ . '/../application/modules/editor/Plugins/MatchAnalysis/Init.php',
 ];
 $ignoreErrors[] = [
@@ -9562,6 +9417,41 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/../application/modules/editor/Plugins/TermImport/Services/Import.php',
 ];
 $ignoreErrors[] = [
+	'message' => '#^Call to function is_null\\(\\) with string will always evaluate to false\\.$#',
+	'count' => 1,
+	'path' => __DIR__ . '/../application/modules/editor/Plugins/TermImport/Services/SftpTbxExport.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Negated boolean expression is always false\\.$#',
+	'count' => 1,
+	'path' => __DIR__ . '/../application/modules/editor/Plugins/TermImport/Services/SftpTbxExport.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^PHPDoc tag @param references unknown parameter\\: \\$acrossApiObject$#',
+	'count' => 1,
+	'path' => __DIR__ . '/../application/modules/editor/Plugins/TermImport/Services/SftpTbxExport.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Parameter \\#2 \\$return of function print_r expects bool, int given\\.$#',
+	'count' => 1,
+	'path' => __DIR__ . '/../application/modules/editor/Plugins/TermImport/Services/SftpTbxExport.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Property SftpConnector\\:\\:\\$currentAction \\(string\\) does not accept default value of type null\\.$#',
+	'count' => 1,
+	'path' => __DIR__ . '/../application/modules/editor/Plugins/TermImport/Services/SftpTbxExport.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Property SftpConnector\\:\\:\\$currentAction \\(string\\) does not accept null\\.$#',
+	'count' => 1,
+	'path' => __DIR__ . '/../application/modules/editor/Plugins/TermImport/Services/SftpTbxExport.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Property SftpConnector\\:\\:\\$securityToken \\(string\\) does not accept default value of type null\\.$#',
+	'count' => 1,
+	'path' => __DIR__ . '/../application/modules/editor/Plugins/TermImport/Services/SftpTbxExport.php',
+];
+$ignoreErrors[] = [
 	'message' => '#^Cannot call method _\\(\\) on array\\.$#',
 	'count' => 4,
 	'path' => __DIR__ . '/../application/modules/editor/Plugins/TermPortal/Controllers/DataController.php',
@@ -10168,11 +10058,6 @@ $ignoreErrors[] = [
 ];
 $ignoreErrors[] = [
 	'message' => '#^Access to an undefined property Zend_Config\\:\\:\\$showChangesDefault\\.$#',
-	'count' => 1,
-	'path' => __DIR__ . '/../application/modules/editor/Plugins/TrackChanges/Init.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property Zend_Session_Namespace\\:\\:\\$data\\.$#',
 	'count' => 1,
 	'path' => __DIR__ . '/../application/modules/editor/Plugins/TrackChanges/Init.php',
 ];
@@ -12197,6 +12082,11 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/../application/modules/editor/PrivatePlugins/ConnectWorldserver/Entity/WorldserverTask.php',
 ];
 $ignoreErrors[] = [
+	'message' => '#^Access to undefined constant MittagQI\\\\Translate5\\\\Plugins\\\\ConnectWorldserver\\\\ConnectWorldserver\\:\\:T5_EVENT_CODE_WS_VALIDATION\\.$#',
+	'count' => 1,
+	'path' => __DIR__ . '/../application/modules/editor/PrivatePlugins/ConnectWorldserver/Entity/WorldserverTask.php',
+];
+$ignoreErrors[] = [
 	'message' => '#^PHPDoc tag @return with type static\\(MittagQI\\\\Translate5\\\\Plugins\\\\ConnectWorldserver\\\\Entity\\\\WorldserverTask\\)\\|null is incompatible with native type bool\\.$#',
 	'count' => 1,
 	'path' => __DIR__ . '/../application/modules/editor/PrivatePlugins/ConnectWorldserver/Entity/WorldserverTask.php',
@@ -12637,11 +12527,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/../application/modules/editor/PrivatePlugins/GroupShare/HttpApiWebAPI.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Access to an undefined property object\\:\\:\\$id\\.$#',
-	'count' => 1,
-	'path' => __DIR__ . '/../application/modules/editor/PrivatePlugins/GroupShare/HttpApiWebAPI.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Call to an undefined method ZfExtended_Cache_MySQLMemoryBackend\\:\\:getBackend\\(\\)\\.$#',
 	'count' => 2,
 	'path' => __DIR__ . '/../application/modules/editor/PrivatePlugins/GroupShare/HttpApiWebAPI.php',
@@ -12779,11 +12664,6 @@ $ignoreErrors[] = [
 $ignoreErrors[] = [
 	'message' => '#^Access to an undefined property Zend_Controller_Action_HelperBroker\\:\\:\\$layout\\.$#',
 	'count' => 1,
-	'path' => __DIR__ . '/../application/modules/editor/PrivatePlugins/InstantTranslate/Controllers/InstanttranslateController.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property Zend_Session_Namespace\\:\\:\\$data\\.$#',
-	'count' => 2,
 	'path' => __DIR__ . '/../application/modules/editor/PrivatePlugins/InstantTranslate/Controllers/InstanttranslateController.php',
 ];
 $ignoreErrors[] = [
@@ -12942,11 +12822,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/../application/modules/editor/PrivatePlugins/InstantTranslate/Controllers/InstanttranslateapiController.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Access to an undefined property Zend_Session_Namespace\\:\\:\\$data\\.$#',
-	'count' => 3,
-	'path' => __DIR__ . '/../application/modules/editor/PrivatePlugins/InstantTranslate/Filetranslationhelper.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Call to an undefined method editor_Models_TaskUsageLog\\:\\:setCustomerId\\(\\)\\.$#',
 	'count' => 1,
 	'path' => __DIR__ . '/../application/modules/editor/PrivatePlugins/InstantTranslate/Filetranslationhelper.php',
@@ -12983,11 +12858,6 @@ $ignoreErrors[] = [
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method ZfExtended_Logger\\:\\:error\\(\\) invoked with 2 parameters, 0 required\\.$#',
-	'count' => 1,
-	'path' => __DIR__ . '/../application/modules/editor/PrivatePlugins/InstantTranslate/Filetranslationhelper.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^PHPDoc tag @return has invalid value \\(\\$taskId or \'\'\\)\\: Unexpected token "\\$taskId", expected type at offset 207$#',
 	'count' => 1,
 	'path' => __DIR__ . '/../application/modules/editor/PrivatePlugins/InstantTranslate/Filetranslationhelper.php',
 ];
@@ -13034,11 +12904,6 @@ $ignoreErrors[] = [
 $ignoreErrors[] = [
 	'message' => '#^Access to an undefined property Zend_Config\\:\\:\\$runtimeOptions\\.$#',
 	'count' => 2,
-	'path' => __DIR__ . '/../application/modules/editor/PrivatePlugins/InstantTranslate/Service/TranslationService.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property Zend_Session_Namespace\\:\\:\\$data\\.$#',
-	'count' => 1,
 	'path' => __DIR__ . '/../application/modules/editor/PrivatePlugins/InstantTranslate/Service/TranslationService.php',
 ];
 $ignoreErrors[] = [
@@ -13533,11 +13398,6 @@ $ignoreErrors[] = [
 ];
 $ignoreErrors[] = [
 	'message' => '#^Access to an undefined property Zend_Config\\:\\:\\$showChangesDefault\\.$#',
-	'count' => 1,
-	'path' => __DIR__ . '/../application/modules/editor/PrivatePlugins/TrackChanges/Init.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property Zend_Session_Namespace\\:\\:\\$data\\.$#',
 	'count' => 1,
 	'path' => __DIR__ . '/../application/modules/editor/PrivatePlugins/TrackChanges/Init.php',
 ];
@@ -15987,11 +15847,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/../application/modules/editor/Services/Connector/Abstract.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Access to an undefined property object\\:\\:\\$userGuid\\.$#',
-	'count' => 1,
-	'path' => __DIR__ . '/../application/modules/editor/Services/Connector/Abstract.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method editor_Models_LanguageResources_UsageLogger\\:\\:setLanguageResourceId\\(\\) invoked with 1 parameter, 0 required\\.$#',
 	'count' => 1,
 	'path' => __DIR__ . '/../application/modules/editor/Services/Connector/Abstract.php',
@@ -16477,6 +16332,11 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/../application/modules/editor/Task/Cloner.php',
 ];
 $ignoreErrors[] = [
+	'message' => '#^Call to an undefined method ZfExtended_Models_Worker\\:\\:cleanForTask\\(\\)\\.$#',
+	'count' => 1,
+	'path' => __DIR__ . '/../application/modules/editor/Task/Operation.php',
+];
+$ignoreErrors[] = [
 	'message' => '#^Property editor_Task_Operation\\:\\:\\$operationType is never read, only written\\.$#',
 	'count' => 1,
 	'path' => __DIR__ . '/../application/modules/editor/Task/Operation.php',
@@ -16787,11 +16647,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/../application/modules/editor/Workflow/Actions.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Access to an undefined property Zend_Session_Namespace\\:\\:\\$data\\.$#',
-	'count' => 1,
-	'path' => __DIR__ . '/../application/modules/editor/Workflow/Actions/Abstract.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method ZfExtended_Logger\\:\\:info\\(\\) invoked with 3 parameters, 0 required\\.$#',
 	'count' => 1,
 	'path' => __DIR__ . '/../application/modules/editor/Workflow/Actions/DeadlineHelper.php',
@@ -16800,11 +16655,6 @@ $ignoreErrors[] = [
 	'message' => '#^PHPDoc tag @param references unknown parameter\\: \\$daysOffset$#',
 	'count' => 1,
 	'path' => __DIR__ . '/../application/modules/editor/Workflow/Actions/DeadlineHelper.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property Zend_Session_Namespace\\:\\:\\$data\\.$#',
-	'count' => 1,
-	'path' => __DIR__ . '/../application/modules/editor/Workflow/Anonymize.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method editor_Workflow_Anonymize\\:\\:renderAnonymizedUserGuid\\(\\) should return string but returns int\\.$#',
@@ -17587,7 +17437,22 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/../application/modules/editor/src/LanguageResource/Pretranslation/Pivot.php',
 ];
 $ignoreErrors[] = [
+	'message' => '#^Caught class MittagQI\\\\Translate5\\\\LanguageResource\\\\Pretranslation\\\\Throwable not found\\.$#',
+	'count' => 1,
+	'path' => __DIR__ . '/../application/modules/editor/src/LanguageResource/Pretranslation/PivotQueuer.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Class MittagQI\\\\Translate5\\\\LanguageResource\\\\Pretranslation\\\\ZfExtended_Worker_Behaviour_Default not found\\.$#',
+	'count' => 1,
+	'path' => __DIR__ . '/../application/modules/editor/src/LanguageResource/Pretranslation/PivotQueuer.php',
+];
+$ignoreErrors[] = [
 	'message' => '#^Method MittagQI\\\\Translate5\\\\LanguageResource\\\\Pretranslation\\\\PivotQueuer\\:\\:fetchImportWorkerId\\(\\) never returns null so it can be removed from the return type\\.$#',
+	'count' => 1,
+	'path' => __DIR__ . '/../application/modules/editor/src/LanguageResource/Pretranslation/PivotQueuer.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Throwing object of an unknown class MittagQI\\\\Translate5\\\\LanguageResource\\\\Pretranslation\\\\Throwable\\.$#',
 	'count' => 1,
 	'path' => __DIR__ . '/../application/modules/editor/src/LanguageResource/Pretranslation/PivotQueuer.php',
 ];
@@ -18097,8 +17962,13 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/../application/modules/editor/src/Test/Api/Helper.php',
 ];
 $ignoreErrors[] = [
+	'message' => '#^Property MittagQI\\\\Translate5\\\\Test\\\\Api\\\\Helper\\:\\:\\$task \\(stdClass\\) in isset\\(\\) is not nullable\\.$#',
+	'count' => 1,
+	'path' => __DIR__ . '/../application/modules/editor/src/Test/Api/Helper.php',
+];
+$ignoreErrors[] = [
 	'message' => '#^Right side of && is always true\\.$#',
-	'count' => 2,
+	'count' => 3,
 	'path' => __DIR__ . '/../application/modules/editor/src/Test/Api/Helper.php',
 ];
 $ignoreErrors[] = [
@@ -18175,6 +18045,41 @@ $ignoreErrors[] = [
 	'message' => '#^Parameter \\#3 \\$previous of class MittagQI\\\\Translate5\\\\Workflow\\\\ArchiveException constructor expects Exception\\|null, League\\\\Flysystem\\\\FilesystemException given\\.$#',
 	'count' => 1,
 	'path' => __DIR__ . '/../application/modules/editor/src/Workflow/ArchiveWorker.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Access to an undefined property Zend_Db_Table_Row_Abstract\\:\\:\\$id\\.$#',
+	'count' => 1,
+	'path' => __DIR__ . '/../application/modules/editor/src/Workflow/DeleteOpenidUsersAction.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Access to an undefined property Zend_Db_Table_Row_Abstract\\:\\:\\$login\\.$#',
+	'count' => 1,
+	'path' => __DIR__ . '/../application/modules/editor/src/Workflow/DeleteOpenidUsersAction.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Method ZfExtended_Models_LoginLog\\:\\:setCreated\\(\\) invoked with 1 parameter, 0 required\\.$#',
+	'count' => 2,
+	'path' => __DIR__ . '/../application/modules/editor/testcases/Functional/Workflow/DeleteOpenidUsersActionTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Method ZfExtended_Models_LoginLog\\:\\:setLogin\\(\\) invoked with 1 parameter, 0 required\\.$#',
+	'count' => 2,
+	'path' => __DIR__ . '/../application/modules/editor/testcases/Functional/Workflow/DeleteOpenidUsersActionTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Method ZfExtended_Models_User\\:\\:setLogin\\(\\) invoked with 1 parameter, 0 required\\.$#',
+	'count' => 3,
+	'path' => __DIR__ . '/../application/modules/editor/testcases/Functional/Workflow/DeleteOpenidUsersActionTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Method ZfExtended_Models_User\\:\\:setOpenIdIssuer\\(\\) invoked with 1 parameter, 0 required\\.$#',
+	'count' => 2,
+	'path' => __DIR__ . '/../application/modules/editor/testcases/Functional/Workflow/DeleteOpenidUsersActionTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Method ZfExtended_Models_User\\:\\:setUserGuid\\(\\) invoked with 1 parameter, 0 required\\.$#',
+	'count' => 3,
+	'path' => __DIR__ . '/../application/modules/editor/testcases/Functional/Workflow/DeleteOpenidUsersActionTest.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Access to an undefined property MittagQI\\\\Translate5\\\\Test\\\\Unit\\\\Tools\\\\CronIpTest\\:\\:\\$remoteAddressMock\\.$#',
@@ -19062,11 +18967,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/../library/ZfExtended/Controllers/Plugins/SessionRegenerate.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^PHPDoc tag @param references unknown parameter\\: \\$request$#',
-	'count' => 1,
-	'path' => __DIR__ . '/../library/ZfExtended/Controllers/Plugins/SessionRegenerate.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Access to an undefined property Zend_Controller_Action_Helper_Abstract\\:\\:\\$view\\.$#',
 	'count' => 2,
 	'path' => __DIR__ . '/../library/ZfExtended/Controllers/Plugins/ViewSetup.php',
@@ -19187,11 +19087,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/../library/ZfExtended/Controllers/SessionController.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Access to an undefined property Zend_Session_Namespace\\:\\:\\$loginByApiAuth\\.$#',
-	'count' => 1,
-	'path' => __DIR__ . '/../library/ZfExtended/Controllers/SessionController.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Access to an undefined property ZfExtended_View\\:\\:\\$sessionId\\.$#',
 	'count' => 1,
 	'path' => __DIR__ . '/../library/ZfExtended/Controllers/SessionController.php',
@@ -19209,11 +19104,6 @@ $ignoreErrors[] = [
 $ignoreErrors[] = [
 	'message' => '#^Access to an undefined property ZfExtended_View\\:\\:\\$user\\.$#',
 	'count' => 2,
-	'path' => __DIR__ . '/../library/ZfExtended/Controllers/SessionController.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property object\\:\\:\\$passwd\\.$#',
-	'count' => 1,
 	'path' => __DIR__ . '/../library/ZfExtended/Controllers/SessionController.php',
 ];
 $ignoreErrors[] = [
@@ -19255,11 +19145,6 @@ $ignoreErrors[] = [
 	'message' => '#^Property TranslateController\\:\\:\\$pathToEnXliff \\(int\\) does not accept default value of type string\\.$#',
 	'count' => 1,
 	'path' => __DIR__ . '/../library/ZfExtended/Controllers/TranslateController.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property Zend_Session_Namespace\\:\\:\\$data\\.$#',
-	'count' => 3,
-	'path' => __DIR__ . '/../library/ZfExtended/Controllers/UserController.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Call to an undefined method Zend_Controller_Request_Abstract\\:\\:isGet\\(\\)\\.$#',
@@ -19339,6 +19224,11 @@ $ignoreErrors[] = [
 $ignoreErrors[] = [
 	'message' => '#^Parameter \\#1 \\$object_or_class of function property_exists expects object\\|string, array given\\.$#',
 	'count' => 2,
+	'path' => __DIR__ . '/../library/ZfExtended/Controllers/UserController.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Parameter \\#1 \\$parentId of method ZfExtended_Models_User\\:\\:hasParent\\(\\) expects string, int given\\.$#',
+	'count' => 1,
 	'path' => __DIR__ . '/../library/ZfExtended/Controllers/UserController.php',
 ];
 $ignoreErrors[] = [
@@ -19627,21 +19517,6 @@ $ignoreErrors[] = [
 	'message' => '#^Parameter \\#2 \\$return of function print_r expects bool, int given\\.$#',
 	'count' => 2,
 	'path' => __DIR__ . '/../library/ZfExtended/Log.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property object\\:\\:\\$firstName\\.$#',
-	'count' => 1,
-	'path' => __DIR__ . '/../library/ZfExtended/Logger.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property object\\:\\:\\$login\\.$#',
-	'count' => 1,
-	'path' => __DIR__ . '/../library/ZfExtended/Logger.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property object\\:\\:\\$surName\\.$#',
-	'count' => 1,
-	'path' => __DIR__ . '/../library/ZfExtended/Logger.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Cannot clone array\\.$#',
@@ -20384,11 +20259,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/../library/ZfExtended/Models/SystemRequirement/Validator.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Access to an undefined property Zend_Session_Namespace\\:\\:\\$data\\.$#',
-	'count' => 2,
-	'path' => __DIR__ . '/../library/ZfExtended/Models/User.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Default value of the parameter \\#2 \\$parentIdFilter \\(false\\) of method ZfExtended_Models_User\\:\\:getTotalByRole\\(\\) is incompatible with type int\\.$#',
 	'count' => 1,
 	'path' => __DIR__ . '/../library/ZfExtended/Models/User.php',
@@ -20534,11 +20404,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/../library/ZfExtended/Resource/Session.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Access to an undefined property Zend_Session_Namespace\\:\\:\\$data\\.$#',
-	'count' => 4,
-	'path' => __DIR__ . '/../library/ZfExtended/Resource/Session.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Access to an undefined property Zend_Session_Namespace\\:\\:\\$internalSessionUniqId\\.$#',
 	'count' => 1,
 	'path' => __DIR__ . '/../library/ZfExtended/Resource/Session.php',
@@ -20570,6 +20435,11 @@ $ignoreErrors[] = [
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method ZfExtended_Sanitized_HttpRequest\\:\\:getData\\(\\) should return array\\|stdClass\\|string but returns mixed\\.$#',
+	'count' => 1,
+	'path' => __DIR__ . '/../library/ZfExtended/Sanitized/HttpRequest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Method ZfExtended_Sanitized_HttpRequest\\:\\:getData\\(\\) should return array\\|stdClass\\|string but returns null\\.$#',
 	'count' => 1,
 	'path' => __DIR__ . '/../library/ZfExtended/Sanitized/HttpRequest.php',
 ];
@@ -20707,11 +20577,6 @@ $ignoreErrors[] = [
 ];
 $ignoreErrors[] = [
 	'message' => '#^PHPDoc tag @param references unknown parameter\\: \\$path$#',
-	'count' => 1,
-	'path' => __DIR__ . '/../library/ZfExtended/Test/ApiHelper.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^PHPDoc tag @return with type mixed is not subtype of native type stdClass\\.$#',
 	'count' => 1,
 	'path' => __DIR__ . '/../library/ZfExtended/Test/ApiHelper.php',
 ];
@@ -21246,11 +21111,6 @@ $ignoreErrors[] = [
 	'message' => '#^Parameter \\#2 \\$return of function print_r expects bool, int given\\.$#',
 	'count' => 1,
 	'path' => __DIR__ . '/../library/ZfExtended/views/helpers/GetUrl.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property Zend_Session_Namespace\\:\\:\\$data\\.$#',
-	'count' => 1,
-	'path' => __DIR__ . '/../library/ZfExtended/views/helpers/MailEmployeeSalutation.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Access to an undefined property Zend_View_Interface\\:\\:\\$translate\\.$#',
