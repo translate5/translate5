@@ -49,12 +49,17 @@ class editor_Models_LanguageResources_Languages extends ZfExtended_Models_Entity
     
     protected $dbInstanceClass = 'editor_Models_Db_LanguageResources_Languages';
     protected $validatorInstanceClass = 'editor_Models_Validator_LanguageResources_Languages';
-    
-    /***
+
+    /**
      * Save the languages with Rfc5646 as language code for the resource id
      * @param int $source
      * @param int $target
      * @param int $languageResourceId
+     * @throws ReflectionException
+     * @throws Zend_Db_Statement_Exception
+     * @throws ZfExtended_Models_Entity_Exceptions_IntegrityConstraint
+     * @throws ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey
+     * @throws ZfExtended_Models_Entity_NotFoundException
      */
     public function saveLanguagesWithRfcCode($source, $target, $languageResourceId){
 
@@ -71,7 +76,7 @@ class editor_Models_LanguageResources_Languages extends ZfExtended_Models_Entity
             $targetLang->load($target);
             $this->setTargetLang($targetLang->getId());
             $this->setTargetLangCode($targetLang->getRfc5646());
-            $this->setTargetLangName($sourceLang->getLangName());
+            $this->setTargetLangName($targetLang->getLangName());
         }
 
         //when both lanugages are not defined do not save db entry
@@ -83,7 +88,7 @@ class editor_Models_LanguageResources_Languages extends ZfExtended_Models_Entity
         $this->save();
     }
     
-    /***
+    /**
      * @param int $languageResourceId
      * @return array
      */

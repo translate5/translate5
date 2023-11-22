@@ -199,6 +199,7 @@ final class SimpleTmxParser extends editor_Models_Import_FileParser_XmlParser {
         $this->currentVariants = [];
         $this->currentLang = null;
     }
+
     /**
      * Handler sets the collected target content to the evaluated target-node (if the target-node was no single node)
      * @param string $tag
