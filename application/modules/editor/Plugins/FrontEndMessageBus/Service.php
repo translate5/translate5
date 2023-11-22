@@ -45,7 +45,6 @@ final class Service extends DockerServiceAbstract
         'runtimeOptions.plugins.FrontEndMessageBus.socketServer.route' => null,
         'runtimeOptions.plugins.FrontEndMessageBus.socketServer.port' => null,
         'runtimeOptions.plugins.FrontEndMessageBus.socketServer.httpHost' => null,
-        'runtimeOptions.plugins.FrontEndMessageBus.socketServer.schema' => null,
         'runtimeOptions.plugins.FrontEndMessageBus.messageBusURI' => null
     ];
 
@@ -53,9 +52,6 @@ final class Service extends DockerServiceAbstract
     {
         $checked = true;
         $messageBusUrl = $this->config->runtimeOptions->plugins->FrontEndMessageBus->messageBusURI;
-        $socketServer = $this->config->runtimeOptions->plugins->FrontEndMessageBus->socketServer;
-        $host = empty($socketServer->host) ? $this->config->runtimeOptions->server->name : $socketServer->host;
-        $socketServerUrl = $socketServer->schema . '://' . $host . ':' . $socketServer->port . $socketServer->route;
 
         if (empty($messageBusUrl)) {
             $this->errors[] = 'There is no URL configured.';
@@ -65,14 +61,6 @@ final class Service extends DockerServiceAbstract
             $checked = false;
         }
 
-        if (empty($messageBusUrl)) {
-            $this->errors[] = 'There is no URL configured.';
-            $checked = false;
-        } else if (!$this->checkConfiguredServiceUrl($socketServerUrl)) {
-            $this->warnings[] = 'The configured socket-server URL "' . $socketServerUrl . '" is not reachable';
-            $this->warnings[] = 'Can be ignored if the UI is working properly!';
-            $checked = false;
-        }
         return $checked;
     }
 
@@ -80,7 +68,7 @@ final class Service extends DockerServiceAbstract
     {
         if(array_key_exists('remove', $config) && $config['remove'] === true){
             // reset all configs
-            $this->updateConfigurationConfigs('', '', '', '', '', $doSave, $io);
+            $this->updateConfigurationConfigs('',$doSave, $io);
             return false;
         }
 
@@ -90,34 +78,7 @@ final class Service extends DockerServiceAbstract
         if (!$this->checkPotentialServiceUrl($this->getName(), $url, $io)) {
             return false;
         }
-        // evaluate the socket-server data
-        $isHttps = ($this->config->runtimeOptions->server->protocol === 'https://');
-        // may data is set by config-option
-        if(array_key_exists('socketServer', $config) && !empty($config['socketServer'])){
-
-            $scheme = parse_url($config['socketServer'], PHP_URL_SCHEME);
-            $host = parse_url($config['socketServer'], PHP_URL_HOST);
-            $port = parse_url($config['socketServer'], PHP_URL_PORT);
-            $path = parse_url($config['socketServer'], PHP_URL_PATH) ?? '';
-
-            if($isHttps && $scheme !== 'wss'){
-                $this->output('The socket-server must also be on SSL if the installation runs on SSL/HTTPS', $io, 'warning');
-                return false;
-            }
-
-        } else {
-
-            // the normal way: evaluating
-            $scheme = ($isHttps) ? 'wss' : 'ws';
-// TODO FIXME add getenv for especially set different server, like our messagebus.translate5.net
-            // in our cloud: messagebus-cloud.translate5.net
-            $host = $this->config->runtimeOptions->server->name;
-            $port = ($isHttps) ? '443' : '80';
-            $path = ($isHttps) ? '/wss/translate5' : '/ws/translate5';
-
-        }
-        // save all evaluated configs
-        $this->updateConfigurationConfigs($url, $scheme, $host, $port, $path, $doSave, $io);
+        $this->updateConfigurationConfigs($url, $doSave, $io);
 
         return true;
     }
@@ -125,10 +86,6 @@ final class Service extends DockerServiceAbstract
     /**
      * Helper to save all messagebus related stuff
      * @param string $url
-     * @param string $schema
-     * @param string $host
-     * @param int $port
-     * @param string $route
      * @param bool $doSave
      * @param SymfonyStyle $io
      * @throws \JsonException
@@ -138,12 +95,8 @@ final class Service extends DockerServiceAbstract
      * @throws \ZfExtended_Models_Entity_Exceptions_IntegrityConstraint
      * @throws \ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey
      */
-    private function updateConfigurationConfigs(string $url, string $scheme, string  $host, int $port, string $route, bool $doSave, SymfonyStyle $io)
+    private function updateConfigurationConfigs(string $url, bool $doSave, SymfonyStyle $io)
     {
         $this->updateConfigurationConfig('runtimeOptions.plugins.FrontEndMessageBus.messageBusURI', 'string', $url, $doSave, $io);
-        $this->updateConfigurationConfig('runtimeOptions.plugins.FrontEndMessageBus.socketServer.schema', 'string', $scheme, $doSave, $io);
-        $this->updateConfigurationConfig('runtimeOptions.plugins.FrontEndMessageBus.socketServer.httpHost', 'string', $host, $doSave, $io);
-        $this->updateConfigurationConfig('runtimeOptions.plugins.FrontEndMessageBus.socketServer.port', 'string', $port, $doSave, $io);
-        $this->updateConfigurationConfig('runtimeOptions.plugins.FrontEndMessageBus.socketServer.route', 'string', $route, $doSave, $io);
     }
 }

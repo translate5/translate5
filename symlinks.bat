@@ -13,6 +13,14 @@ for %%i in (
    mklink /D application\modules\editor\Plugins\%%i ..\PrivatePlugins\%%i
 )
 
+:: This symlink is needed to speed up loading of plugins resources, as otherwise
+:: they are loaded via php-proxy in IndexController->pluginpublicAction() which
+:: is slow on Windows, and horrible slow up to unusable in case of docker-compose
+:: setup having '/var/www/translate5' directory of a php-container filesystem
+:: mapped as a bind-volume to some directory within Windows-host filesystem for
+:: development purposes
+mklink /D public\plugins ..\application\modules\editor\Plugins
+
 :: Jquery
 del public\js\jquery-ui
 mklink /D public\js\jquery-ui ..\..\vendor\jquery\jquery-ui
