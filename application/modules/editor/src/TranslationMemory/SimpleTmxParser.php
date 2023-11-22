@@ -190,7 +190,7 @@ final class SimpleTmxParser extends editor_Models_Import_FileParser_XmlParser {
      * Handler when trans-unit starts
      * @param string $tag
      * @param array $attributes
-     * @param string $key
+     * @param int $key
      * @param boolean $isSingle
      */
     public function startTransUnit(string $tag, array $attributes, int $key, bool $isSingle): void
@@ -199,10 +199,11 @@ final class SimpleTmxParser extends editor_Models_Import_FileParser_XmlParser {
         $this->currentVariants = [];
         $this->currentLang = null;
     }
+
     /**
      * Handler sets the collected target content to the evaluated target-node (if the target-node was no single node)
      * @param string $tag
-     * @param string $key
+     * @param int $key
      * @param array $opener
      */
     public function endTransUnit(string $tag, int $key, array $opener): void
@@ -229,7 +230,7 @@ final class SimpleTmxParser extends editor_Models_Import_FileParser_XmlParser {
         }
     }
 
-    private function languageMatches(string $lang, string $isSource): bool
+    private function languageMatches(string $lang, bool $isSource): bool
     {
         $primary = substr($lang, 0,2);
         if($isSource){
@@ -244,7 +245,7 @@ final class SimpleTmxParser extends editor_Models_Import_FileParser_XmlParser {
      * Starts a variant: gets the language from attributes
      * @param string $tag
      * @param array $attributes
-     * @param string $key
+     * @param int $key
      * @param boolean $isSingle
      */
     public function startTransUnitVariant(string $tag, array $attributes, int $key, bool $isSingle): void

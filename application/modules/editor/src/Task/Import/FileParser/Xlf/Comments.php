@@ -75,13 +75,14 @@ class Comments
         if (! $config->runtimeOptions->import->xliff->importComments || empty($this->comments)) {
             return;
         }
+        $comment = null;
         foreach ($this->comments as $comment) {
             $comment->setTaskGuid($this->task->getTaskGuid());
             $comment->setSegmentId($segmentId);
             $comment->save();
         }
         //if there was at least one processed comment, we have to sync the comment contents to the segment
-        if (!empty($comment)) {
+        if (!is_null($comment)) {
             $segment = ZfExtended_Factory::get(editor_Models_Segment::class);
             $segment->load($segmentId);
             $comment->updateSegment($segment, $this->task->getTaskGuid());

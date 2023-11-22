@@ -243,8 +243,6 @@ class editor_Models_LanguageResources_Resource {
 
     /**
      * Get the target language name for the given source language id.
-     * @param int $sourceLanguageId
-     * @return int
      */
     public function getLanguageNameSource(int $sourceLanguageId): string
     {
@@ -253,18 +251,16 @@ class editor_Models_LanguageResources_Resource {
 
     /**
      * Get the target language name for the given target language id.
-     * @param int $targetLanguageId
-     * @return int
      */
     public function getLanguageNameTarget(int $targetLanguageId): string
     {
         return editor_ModelInstances::language($targetLanguageId)->getLangName();
     }
-    
-    /***
+
+    /**
      * Get the langauge code for the given langauge id. By default the language code for the langauge is the rfc value.
      * Override this method in the child resources if differend language code is needed
-     * @param int $langauge
+     * @param int $languageId
      * @return string
      */
     protected function getLanguageCode(int $languageId) {
