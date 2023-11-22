@@ -21,7 +21,7 @@ START LICENSE AND COPYRIGHT
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
@@ -29,92 +29,85 @@ END LICENSE AND COPYRIGHT
 namespace MittagQI\Translate5\Task\Import\FileParser\Xlf\Namespaces;
 
 use editor_Models_Comment;
+use editor_Models_Export_FileParser_Xlf_Namespaces_Across;
 use editor_Models_Import_FileParser_Xlf_ContentConverter as OrigContentConverter;
-use editor_Models_Import_FileParser_XmlParser;
+use editor_Models_Import_FileParser_XmlParser as XmlParser;
 use editor_Models_Task;
+use MittagQI\Translate5\Task\Import\FileParser\Xlf\Comments;
 use ZfExtended_Factory;
 
 
 /**
  * XLF Fileparser Add On to parse Across XLF specific stuff
- *
- * TODO This class is a draft!
  */
 class Across extends AbstractNamespace
 {
     const ACROSS_XLIFF_NAMESPACE = 'xmlns:ax="AcrossXliff"';
     const USERGUID = 'across-imported';
-    /**
-     * @var array
-     */
-    protected array $comments = [];
+    private ?editor_Models_Comment $currentComment;
 
-    protected static function isApplicable(string $xliff): bool
+    public function __construct(XmlParser $xmlparser, protected Comments $comments)
     {
-        return str_contains($xliff, self::ACROSS_XLIFF_NAMESPACE);
+        parent::__construct($xmlparser, $comments);
+        $this->registerParserHandler();
     }
 
-    /**
-     * {@inheritDoc}
-     * @see AbstractNamespace::registerParserHandler()
-     */
-    public function registerParserHandler(editor_Models_Import_FileParser_XmlParser $xmlparser): void
+    protected function registerParserHandler(): void
     {
-        $currentComment = null;
+        $this->currentComment = null;
 
-        $xmlparser->registerElement(
+        $this->xmlparser->registerElement(
             'trans-unit ax:named-property',
-            function ($tag, $attributes) use (&$currentComment) {
+            function ($tag, $attributes) {
                 if ($attributes['name'] == 'Comment') {
-                    $currentComment = ZfExtended_Factory::get('editor_Models_Comment');
+                    $this->currentComment = ZfExtended_Factory::get(editor_Models_Comment::class);
                 }
-                /* @var $currentComment editor_Models_Comment */
             },
-            function ($tag, $key, $opener) use (&$currentComment) {
+            function ($tag, $key, $opener) {
                 if (!$opener['attributes']['name'] == 'Comment') {
                     return;
                 }
                 $title = '';
-                if (!empty($currentComment->across_title)) {
-                    $title .= 'Title: ' . $currentComment->across_title;
+                if (!empty($this->currentComment->across_title)) {
+                    $title .= 'Title: ' . $this->currentComment->across_title;
                 }
                 if (!empty($title)) {
                     $title .= "\n";
                 }
-                $currentComment->setComment($title . $currentComment->getComment());
-                $this->comments[] = $currentComment;
+                $this->currentComment->setComment($title . $this->currentComment->getComment());
+                $this->comments->add($this->currentComment);
             }
         );
 
-        $xmlparser->registerElement(
+        $this->xmlparser->registerElement(
             'trans-unit ax:named-property ax:named-value',
             null,
-            function ($tag, $key, $opener) use (&$currentComment, $xmlparser) {
+            function ($tag, $key, $opener) {
                 $name = strtolower($opener['attributes']['ax:name']);
                 if ($opener['isSingle']) {
                     return; //do nothing here, since the named-value is empty
                 }
                 $startText = $opener['openerKey'] + 1;
                 $length = $key - $startText;
-                $value = join($xmlparser->getChunks($startText, $length));
+                $value = join($this->xmlparser->getChunks($startText, $length));
                 switch ($name) {
                     case 'annotates':
-                        $currentComment->across_annotates = $value;
+                        $this->currentComment->across_annotates = $value;
                         break;
                     case 'author':
-                        $currentComment->setUserName($value);
-                        $currentComment->setUserGuid(self::USERGUID);
+                        $this->currentComment->setUserName($value);
+                        $this->currentComment->setUserGuid(self::USERGUID);
                         break;
                     case 'text':
-                        $currentComment->setComment($value);
+                        $this->currentComment->setComment($value);
                         break;
                     case 'created':
                         $value = date('Y-m-d H:i:s', strtotime($value));
-                        $currentComment->setCreated($value);
-                        $currentComment->setModified($value);
+                        $this->currentComment->setCreated($value);
+                        $this->currentComment->setModified($value);
                         break;
                     case 'title':
-                        $currentComment->across_title = $value;
+                        $this->currentComment->across_title = $value;
                         break;
                     default:
                         //set nothing here
@@ -125,6 +118,20 @@ class Across extends AbstractNamespace
     }
 
     /**
+     * @param string $xliff
+     * @return bool
+     */
+    public static function isApplicable(string $xliff): bool
+    {
+        return str_contains($xliff, self::ACROSS_XLIFF_NAMESPACE);
+    }
+
+    public static function getExportCls(): ?string
+    {
+        return editor_Models_Export_FileParser_Xlf_Namespaces_Across::class;
+    }
+
+    /**
      * In Across the complete tag content must be used
      * {@inheritDoc}
      * @see AbstractNamespace::useTagContentOnly()
@@ -132,19 +139,6 @@ class Across extends AbstractNamespace
     public function useTagContentOnly(): ?bool
     {
         return false;
-    }
-
-    /**
-     * After fetching the comments, the internal comments fetcher is resetted
-     *   (if comments are inside MRKs and not the whole segment)
-     * {@inheritDoc}
-     * @see AbstractNamespace::getComments()
-     */
-    public function getComments(): array
-    {
-        $commentsToReturn = $this->comments;
-        $this->comments = [];
-        return $commentsToReturn;
     }
 
     public function getContentConverter(editor_Models_Task $task, string $filename): OrigContentConverter
