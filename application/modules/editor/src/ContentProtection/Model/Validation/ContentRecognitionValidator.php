@@ -91,6 +91,10 @@ class ContentRecognitionValidator extends ZfExtended_Models_Validator_Abstract
             return is_bool($data['enabled']);
         }
 
+        if (2 === count($data) && array_key_exists('priority', $data)) {
+            return is_int($data['priority']);
+        }
+
         return parent::isValid($data);
     }
 }

@@ -123,7 +123,7 @@ class editor_Services_Connector_TagHandler_T5MemoryXliff extends editor_Services
     protected function processXliffTags(string $queryString): string
     {
         if ($this->gTagPairing) {
-            return $this->utilities->internalTag->toXliffPaired($queryString, replaceMap: $this->map,);
+            return $this->utilities->internalTag->toXliffPaired($queryString, replaceMap: $this->map);
         }
 
         return $this->utilities->internalTag->toXliff(

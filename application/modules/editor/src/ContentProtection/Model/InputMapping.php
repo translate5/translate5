@@ -75,7 +75,8 @@ class InputMapping extends ZfExtended_Models_Entity_Abstract
      */
     public function loadAllForFrontEnd(): array
     {
-        $recognitionTable = ZfExtended_Factory::get(ContentRecognitionTable::class)->info(ContentRecognitionTable::NAME);
+        $recognitionTable = ZfExtended_Factory::get(ContentRecognitionTable::class)
+            ->info(ContentRecognitionTable::NAME);
         $s = $this->db
             ->select()
             ->setIntegrityCheck(false)
@@ -83,8 +84,9 @@ class InputMapping extends ZfExtended_Models_Entity_Abstract
             ->join(
                 ['recognition' => $recognitionTable],
                 'recognition.id = mapping.contentRecognitionId',
-                ['type', 'name']
-            );
+                ['type', 'name', 'enabled']
+            )
+            ->order('id desc');
 
         return $this->loadFilterdCustom($s);
     }

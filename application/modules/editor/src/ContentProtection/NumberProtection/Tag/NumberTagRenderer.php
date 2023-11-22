@@ -56,6 +56,7 @@ use editor_ImageTag_Single;
 
 class NumberTagRenderer extends editor_ImageTag_Single
 {
+    public const INTERNAL_TAG_REGEX = '/<div class="single \w+ number .+ Number.+data-originalid="number".+div>/';
     protected string $htmlTagTpl = '<div class="{type} {class} internal-tag ownttip"><span title="{title}" class="short">{shortTag}</span><span data-originalid="{id}" data-length="{length}" data-source="{source}" data-target="{target}" class="full"></span></div>';
 
     public function getHtmlTag(array $parameters) {
