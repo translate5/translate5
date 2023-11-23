@@ -351,7 +351,10 @@ class T5MemoryMigrationCommand extends Translate5AbstractCommand
 
     private function generateFilename(LanguageResource $languageResource): string
     {
-        return $languageResource->getSpecificData('fileName') . self::EXPORT_FILE_EXTENSION;
+        $fileName = $languageResource->getSpecificData('memories', true)[0]['filename'];
+        $fileName = str_replace('ID' . $languageResource->getId(), '', $fileName);
+
+        return $fileName . self::EXPORT_FILE_EXTENSION;
     }
 
     private function getFilePath(): string
@@ -375,7 +378,8 @@ class T5MemoryMigrationCommand extends Translate5AbstractCommand
             $languageResource->getTargetLang()
         );
 
-        file_put_contents($filenameWithPath, $connector->getTm($type));
+        $filename = $connector->export($type);
+        rename($filename, $filenameWithPath);
 
         if (!file_exists($filenameWithPath)) {
             throw new RuntimeException('Failed to export file to ' . $filenameWithPath);

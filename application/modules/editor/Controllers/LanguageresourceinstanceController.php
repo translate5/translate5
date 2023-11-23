@@ -597,8 +597,8 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
             throw new ZfExtended_Models_Entity_NotFoundException('Requested languageResource is not filebased!');
         }
 
-        $connector = $serviceManager->getConnector($this->entity);
         /* @var $connector editor_Services_Connector */
+        $connector = $serviceManager->getConnector($this->entity);
 
         $validExportTypes = $connector->getValidExportTypes();
 
@@ -606,14 +606,48 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
             throw new ZfExtended_Models_Entity_NotFoundException('Can not download in format '.$type);
         }
 
+        if ($connector->exportsFile()) {
+            $this->sendStreamedFile($connector->export($validExportTypes[$type]));
+
+            return;
+        }
+
         $data = $connector->getTm($validExportTypes[$type]);
 
         Header::sendDownload(
             rawurlencode($this->entity->getName()) . '.' . strtolower($type),
-            $validExportTypes[$type]
+            contentType: $validExportTypes[$type]
         );
+
         echo $data;
         exit;
+    }
+
+    private function sendStreamedFile(string $filePath): void
+    {
+        $fp = fopen($filePath, 'rb');
+
+        if ($fp === false) {
+            throw new ZfExtended_Models_Entity_NotFoundException('Error occurred during creating file for download');
+        }
+
+        ['extension' => $extension] = pathinfo($filePath);
+        Header::sendDownload(
+            rawurlencode($this->entity->getName()) . '.' . strtolower($extension),
+            contentType: 'application/octet-stream',
+            additionalHeaders: ['Content-Length' => filesize($filePath), 'Accept-Ranges' => 'bytes']
+        );
+
+        $bufferSize = 8192;
+
+        while (!feof($fp)) {
+            echo fread($fp, $bufferSize);
+            ob_flush();
+            flush();
+        }
+
+        fclose($fp);
+        unlink($filePath);
     }
 
     public function postAction()
