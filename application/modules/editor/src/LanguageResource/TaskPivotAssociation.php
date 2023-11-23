@@ -27,7 +27,7 @@ class TaskPivotAssociation extends AssociationAbstract {
      * @param string $taskGuid
      * @return array
      */
-    public function loadAllAvailableForTask(string $taskGuid): array
+    public function loadAllAvailableForTask(string $taskGuid, \editor_Services_Manager $manager): array
     {
 
         /** @var \editor_Models_Task $task */
@@ -39,7 +39,7 @@ class TaskPivotAssociation extends AssociationAbstract {
             $projectGuids=array_column($task->loadProjectTasks($task->getProjectId(),true), 'taskGuid');
             $result=[];
             foreach ($projectGuids as $pg){
-                $result=array_merge($result,$this->loadAllAvailableForTask($pg));
+                $result=array_merge($result,$this->loadAllAvailableForTask($pg, $manager));
             }
             return array_filter(array_values($result));
         }
@@ -88,7 +88,14 @@ class TaskPivotAssociation extends AssociationAbstract {
         $s->join(array("cu"=>"LEK_languageresources_customerassoc"), 'languageResource.id=cu.languageResourceId',array('cu.customerId AS customerId'))
             ->where('cu.customerId=?',$task->getCustomerId());
         $s->group('languageResource.id');
-        return $this->loadFilterdCustom($s);
+
+        $result =  $this->loadFilterdCustom($s);
+
+        foreach ($result as &$row) {
+            $row['serviceName'] = $manager->getUiNameByType($row['serviceType']);
+        }
+
+        return $result;
     }
 
 }
