@@ -116,12 +116,8 @@ class ContentProtectionRepository
 
     public function getContentRecognitionForInputMappingForm(): array
     {
-        $dbMapping = ZfExtended_Factory::get(InputMapping::class)->db;
         $dbContentRecognition = ZfExtended_Factory::get(ContentRecognition::class)->db;
         $contentRecognitionTable = $dbContentRecognition->info($dbContentRecognition::NAME);
-
-        $selectUsedRecognitions = $dbMapping->select()
-            ->from(['mapping' => $dbMapping->info($dbMapping::NAME)], ['distinct(contentRecognitionId)']);
 
         $select = $dbContentRecognition->select()
             ->from(
@@ -129,7 +125,6 @@ class ContentProtectionRepository
                 ['recognition.id', 'recognition.type', 'recognition.name']
             )
             ->where('recognition.enabled = true')
-            ->where('recognition.id not in (?)', $dbMapping->fetchAll($selectUsedRecognitions)->toArray())
             ->order('name desc')
         ;
 
