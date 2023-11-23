@@ -270,7 +270,7 @@ class editor_Models_Converter_SegmentsToXliff extends editor_Models_Converter_Se
          */
 
         //$this->result[] = '<segmentNr>'.$segment['segmentNrInTask'].'</segmentNr>';
-        $this->result[] = '<source>'.$this->prepareText($segment[$this->data['firstSource']]).'</source>';
+        $this->result[] = '<source>'.$this->prepareText($segment[$this->data['firstSource']], true).'</source>';
 
         $fields = $this->sfm->getFieldList();
         foreach($fields as $field) {
@@ -301,7 +301,10 @@ class editor_Models_Converter_SegmentsToXliff extends editor_Models_Converter_Se
             return; //handled before
         }
         if($field->type == editor_Models_SegmentField::TYPE_RELAIS && $this->data['relaisLang'] !== false) {
-            $this->result[] = '<alt-trans dx:origin-shorttext="'.$this->escape($field->label).'"><target xml:lang="'.$this->escape($this->data['relaisLang']).'">'.$this->prepareText($segment[$field->name]).'</target></alt-trans>';
+            $this->result[] = '<alt-trans dx:origin-shorttext="'.$this->escape($field->label).'">'
+                . '<target xml:lang="'.$this->escape($this->data['relaisLang']).'">'
+                . $this->prepareText($segment[$field->name], false)
+                . '</target></alt-trans>';
             return;
         }
         if($field->type != editor_Models_SegmentField::TYPE_TARGET) {
@@ -313,7 +316,7 @@ class editor_Models_Converter_SegmentsToXliff extends editor_Models_Converter_Se
         if($this->data['firstTarget'] == $field->name) {
             $altTransName = $field->name;
             $matchRate = number_format($segment['matchRate'], 1, '.', '');
-            $targetEdit = $this->prepareText($segment[$this->sfm->getEditIndex($this->data['firstTarget'])]);
+            $targetEdit = $this->prepareText($segment[$this->sfm->getEditIndex($this->data['firstTarget'])], false);
             if(empty($this->enabledNamespaces['dx'])){
                 $targetPrefix = '<target state="%1$s">';
             }
@@ -330,20 +333,25 @@ class editor_Models_Converter_SegmentsToXliff extends editor_Models_Converter_Se
             //add previous version of target as alt trans
             if($this->options[self::CONFIG_ADD_PREVIOUS_VERSION]) {
                 //add targetOriginal
-                $this->addAltTransToResult($this->prepareText($segment[$field->name]), $lang, $altTransName, 'previous-version');
+                $this->addAltTransToResult(
+                    $this->prepareText($segment[$field->name], false),
+                    $lang,
+                    $altTransName,
+                    'previous-version'
+                );
             }
         }
         else {
             //add alternatives
             $altTransName = $field->label;
-            $targetEdit = $this->prepareText($segment[$this->sfm->getEditIndex($field->name)]);
+            $targetEdit = $this->prepareText($segment[$this->sfm->getEditIndex($field->name)], false);
             if($this->options[self::CONFIG_ADD_ALTERNATIVES]) {
                 $this->addAltTransToResult($targetEdit, $lang, $altTransName);
             }
         }
         if($this->options[self::CONFIG_INCLUDE_DIFF]){
             //compare targetEdit and targetOriginal
-            $this->addDiffToResult($targetEdit, $this->prepareText($segment[$field->name]), $altTransName, $segment);
+            $this->addDiffToResult($targetEdit, $this->prepareText($segment[$field->name], false), $altTransName, $segment);
         }
     }
 
@@ -398,11 +406,13 @@ class editor_Models_Converter_SegmentsToXliff extends editor_Models_Converter_Se
      * @param string $text
      * @return string
      */
-    protected function prepareText($text) {
+    protected function prepareText(string $text, bool $isSource): string
+    {
         $text = $this->taghelperTrackChanges->removeTrackChanges($text);
         if($this->options[self::CONFIG_PLAIN_INTERNAL_TAGS]) {
             $text = $this->handleTerminology($text, true);
-            return $this->exportParser->exportSingleSegmentContent($text);
+
+            return $this->exportParser->exportSingleSegmentContent($text, $isSource);
         }
 
         // if plain internal tags are disabled:
@@ -412,6 +422,7 @@ class editor_Models_Converter_SegmentsToXliff extends editor_Models_Converter_Se
         $text = $this->taghelperInternal->toXliffPaired($text, true, $this->tagMap, $this->tagId);
         $text = $this->handleTerminology($text, false); //internaltag replacment not needed, since already converted
         $text = $this->taghelperMqm->remove($text);
+
         return $text;
     }
 

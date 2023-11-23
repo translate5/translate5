@@ -614,7 +614,8 @@ class Editor_SegmentController extends ZfExtended_RestController
             if (!in_array($key, $fieldnames)) {
                 continue;
             }
-            $sanitized = $updater->sanitizeEditedContent($data) || $sanitized;
+
+            $sanitized = $updater->sanitizeEditedContent($data, 'targetEdit' === $key) || $sanitized;
             $this->data->{$key} = $data;
         }
         if ($sanitized) {

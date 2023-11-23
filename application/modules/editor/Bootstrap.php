@@ -188,6 +188,7 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
                 'languageresourceresource','languageresourcetaskassoc','languageresourcetaskpivotassoc',
                 'languageresourceinstance','taskusertracking', 'term', 'attribute', 'termattribute', 'category',
                 'quality','userassocdefault', 'log', 'collectionattributedatatype', 'token',
+                'contentprotectioncontentrecognition', 'contentprotectioninputmapping', 'contentprotectionoutputmapping',
             ],
         ]);
         $this->front->getRouter()->addRoute('editorRestDefault', $restRoute);
@@ -733,6 +734,32 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
                 'action' => 'history'
             ]
         ));
+
+        $this->front->getRouter()->addRoute(
+            'contentprotection.outputMapping.nameCombo',
+            new ZfExtended_Controller_RestLikeRoute(
+                'editor/contentprotection/outputmapping/namecombo',
+                [
+                    'module' => 'editor',
+                    'controller' => 'contentprotectionoutputmapping',
+                    /** @see \editor_ContentprotectionoutputmappingController::namecomboAction */
+                    'action' => 'namecombo'
+                ]
+            )
+        );
+
+        $this->front->getRouter()->addRoute(
+            'contentprotection.inputMapping.nameCombo',
+            new ZfExtended_Controller_RestLikeRoute(
+                'editor/contentprotection/inputmapping/namecombo',
+                [
+                    'module' => 'editor',
+                    'controller' => 'contentprotectioninputmapping',
+                    /** @see \editor_ContentprotectioninputmappingController::namecomboAction */
+                    'action' => 'namecombo'
+                ]
+            )
+        );
     }
     
     

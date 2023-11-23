@@ -139,12 +139,14 @@ div.single + div {
 .short-tag div.internal-tag.tab span.short,
 .short-tag div.internal-tag.space span.short,
 .short-tag div.internal-tag.newline span.short,
-.short-tag div.internal-tag.nbsp span.short {display:none;}
+.short-tag div.internal-tag.nbsp span.short,
+.short-tag div.internal-tag.number span.short {display:none;}
 .short-tag div.internal-tag.char span.full,
 .short-tag div.internal-tag.tab span.full,
 .short-tag div.internal-tag.space span.full,
 .short-tag div.internal-tag.newline span.full,
-.short-tag div.internal-tag.nbsp span.full {display:inline;}
+.short-tag div.internal-tag.nbsp span.full,
+.short-tag div.internal-tag.number span.full {display:inline;}
 
 #segment-grid span.term {
     text-decoration: underline;
@@ -1211,4 +1213,58 @@ dl {
 .x-form-item-default.x-item-disabled {
     -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=70)";
     opacity: 0.7;
+}
+
+div.internal-tag.number {
+    width: 0;
+    height: 0;
+    display: inline;
+    border: none;
+    color: transparent;
+    user-select: none;
+    box-sizing: border-box;
+    word-break: break-all;
+}
+div.internal-tag.number span.full::after {
+    content: attr(data-source);
+    color: #000;
+    display: inline;
+    white-space: nowrap;
+    padding-top: 3px;
+}
+
+.target div.internal-tag.number .full::after {
+    content: attr(data-target);
+}
+.type-target div.internal-tag.number .full::after {
+    content: attr(data-target);
+}
+.alike-target-field div.internal-tag.number .full::after {
+    content: attr(data-target);
+}
+
+.number + .number { margin-left:1px; }
+
+.infobox-panel {
+    padding: 20px;
+    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.05);
+}
+
+.infobox-panel p {
+    margin: 0;
+}
+
+.infobox-panel h2 {
+    margin: 0.3em 0 0.3em;
+}
+
+.infobox-panel .x-panel-body-default {
+    background-color: rgb(95 162 221 / 20%);
+    border-radius: 4px;
+    padding: 6px;
+}
+
+.disabled-row {
+    background-color: rgb(210, 210, 210);
+    color: #b6b6b6;
 }

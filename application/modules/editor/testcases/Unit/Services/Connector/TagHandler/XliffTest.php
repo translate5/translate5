@@ -45,7 +45,9 @@ class XliffTest extends \editor_Test_UnitTest
     protected function setUp(): void
     {
         $this->xliffUnderTest = new Xliff(['gTagPairing' => false]);
+        $this->xliffUnderTest->setLanguages(5, 6);
         $this->xliffUnderTestPaired = new Xliff();
+        $this->xliffUnderTestPaired->setLanguages(5, 6);
     }
 
     public function provideData(): array

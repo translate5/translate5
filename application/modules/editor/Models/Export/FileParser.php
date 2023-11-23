@@ -32,6 +32,7 @@ END LICENSE AND COPYRIGHT
  * @version 1.0
  */
 
+use MittagQI\Translate5\ContentProtection\ContentProtector;
 use MittagQI\Translate5\Segment\TransUnitHash;
 use MittagQI\Translate5\Task\Import\SkeletonFile;
 
@@ -145,6 +146,8 @@ abstract class editor_Models_Export_FileParser {
     protected TransUnitHash $transunitHash;
     protected SkeletonFile $skeletonFileInstance;
 
+    protected ContentProtector $contentProtector;
+
     /**
      * @param editor_Models_Task $task
      * @param int $fileId
@@ -174,6 +177,7 @@ abstract class editor_Models_Export_FileParser {
         $this->translate = ZfExtended_Zendoverwrites_Translate::getInstance();
         
         $this->utilities = ZfExtended_Factory::get('editor_Models_Segment_UtilityBroker');
+        $this->contentProtector = ContentProtector::create($this->utilities->whitespace);
         
         $this->segmentFieldManager = ZfExtended_Factory::get('editor_Models_SegmentFieldManager');
         $this->segmentFieldManager->initFields($this->_taskGuid);
@@ -360,7 +364,7 @@ abstract class editor_Models_Export_FileParser {
         $edited = $this->revertNonBreakingSpaces($edited);
         
         if(!$this->options['diff']){
-            return $this->unprotectContent($edited);
+            return $this->unprotectContent($edited, str_contains($field, 'source'));
         }
         $segmentOriginal = $segment->getFieldExport($field, $this->_task, false, false);
         // This removes all segment tags but the ones needed for export
@@ -378,7 +382,7 @@ abstract class editor_Models_Export_FileParser {
             
         }
         // unprotectWhitespace must be done after diffing!
-        return $this->unprotectContent($diffed);
+        return $this->unprotectContent($diffed, str_contains($field, 'source'));
     }
 
     /**
@@ -443,12 +447,13 @@ abstract class editor_Models_Export_FileParser {
      * @param string $segment
      * @return string
      */
-    public function exportSingleSegmentContent($segment) {
+    public function exportSingleSegmentContent($segment, bool $isSource) {
         //processing of term tags is done after using this method!
         $this->disableMqmExport = true;
         $segment = $this->parseSegment($segment);
         $segment = $this->revertNonBreakingSpaces($segment);
-        return $this->unprotectContent($segment);
+
+        return $this->unprotectContent($segment, $isSource);
     }
     
     /**
@@ -456,7 +461,7 @@ abstract class editor_Models_Export_FileParser {
      * @param string $segment
      * @return string
      */
-    protected function unprotectContent(string $segment): string {
-        return $this->utilities->whitespace->unprotectWhitespace($segment);
+    protected function unprotectContent(string $segment, bool $isSource): string {
+        return $this->contentProtector->unprotect($segment, $isSource);
     }
 }

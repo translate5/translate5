@@ -26,6 +26,8 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\ContentProtection\NumberProtector;
+
 /**
  * Segment Internal Tag Helper Class
  * This class contains the regex definition and related helper methods to internal tags of translate5
@@ -220,15 +222,18 @@ class editor_Models_Segment_InternalTag extends editor_Models_Segment_TagAbstrac
     /**
      * restores the original escaped tag
      * @param string $segment
-     * @param bool $whitespaceOnly optional, if true restore whitespace tags only
+     * @param array $tagsToRestore optional, if not empty - only provided tags list will be rostored
      * @param int &$highestTagNr if provided, it will be filled with the highest short tag number of all tags in $segment
-     * @param array $whitespaceMap if provided, it will be filled with a 2d map of replaced whitespace/special characters and their used tag numbers
+     * @param array $shortcutNumberMap if provided, it will be filled with a 2d map of replaced entities and their used tag numbers
      * @return mixed
      */
-    public function restore(string $segment, $whitespaceOnly = false, &$highestTagNr = 0, array &$whitespaceMap = [])
-    {
-        //TODO extend $whitespaceOnly filter so that we can filter for one ore more of the CSS classes (nbsp, newline, tab, space)
-        return $this->replace($segment, function ($match) use ($whitespaceOnly, &$highestTagNr, &$whitespaceMap) {
+    public function restore(
+        string $segment,
+        $tagsToRestore = [],
+        &$highestTagNr = 0,
+        array &$shortcutNumberMap = []
+    ): string {
+        return $this->replace($segment, function ($match) use ($tagsToRestore, &$highestTagNr, &$shortcutNumberMap) {
             $id = $match[3];
             $tagNr = $this->getTagNumber($match[0]);
 
@@ -241,7 +246,7 @@ class editor_Models_Segment_InternalTag extends editor_Models_Segment_TagAbstrac
                 return '';
             }
 
-            if ($whitespaceOnly && !in_array($id, editor_Models_Segment_Whitespace::WHITESPACE_TAGS)) {
+            if (!empty($tagsToRestore) && !in_array($id, $tagsToRestore)) {
                 return $match[0];
             }
 
@@ -256,17 +261,24 @@ class editor_Models_Segment_InternalTag extends editor_Models_Segment_TagAbstrac
 
             //the following search and replace is needed for TRANSLATE-464
             //backwards compatibility of already imported tasks
-            $search = array('hardReturn /', 'softReturn /', 'macReturn /');
-            $replace = array('hardReturn/', 'softReturn/', 'macReturn/');
+            $search = ['hardReturn /', 'softReturn /', 'macReturn /'];
+            $replace = ['hardReturn/', 'softReturn/', 'macReturn/'];
             $result = str_replace($search, $replace, $result);
-
 
             //the original data is without <>
             $result = '<' . $result . '>';
-            if (!array_key_exists($result, $whitespaceMap)) {
-                $whitespaceMap[$result] = [];
+
+            $shortcutNumberMapKey = $result;
+
+            if (NumberProtector::isNumberTag($result)) {
+                $shortcutNumberMapKey = NumberProtector::getIsoFromTag($result);
             }
-            $whitespaceMap[$result][] = $tagNr;
+
+            if (!array_key_exists($shortcutNumberMapKey, $shortcutNumberMap)) {
+                $shortcutNumberMap[$shortcutNumberMapKey] = [];
+            }
+            $shortcutNumberMap[$shortcutNumberMapKey][] = $tagNr;
+
             return $result;
         });
     }
@@ -282,8 +294,13 @@ class editor_Models_Segment_InternalTag extends editor_Models_Segment_TagAbstrac
      * @param int &$newid defaults to 1, is given as reference to provide a different startid of the internal tags
      * @return string segment with xliff tags
      */
-    public function toXliff(string $segment, $removeOther = true, &$replaceMap = null, &$newid = 1)
-    {
+    public function toXliff(
+        string $segment,
+        $removeOther = true,
+        &$replaceMap = null,
+        &$newid = 1,
+        array $dontRemoveTags = []
+    ) {
         //xliff 1.2 needs an id for bpt/bx and ept/ex tags.
         // matching of bpt/bx and ept/ex is done by separate rid, which is filled with the original ID
 
@@ -321,7 +338,10 @@ class editor_Models_Segment_InternalTag extends editor_Models_Segment_TagAbstrac
         });
 
         if ($removeOther) {
-            return strip_tags($result, '<x><x/><bpt><bpt/><ept><ept/><bx><bx/><ex><ex/><it><it/>');
+            return strip_tags(
+                $result,
+                '<x><x/><bpt><bpt/><ept><ept/><bx><bx/><ex><ex/><it><it/>' . implode('', $dontRemoveTags)
+            );
         }
         return $result;
     }
@@ -484,9 +504,14 @@ class editor_Models_Segment_InternalTag extends editor_Models_Segment_TagAbstrac
      * @param int &$newid defaults to 1, is given as reference to provide a different startid of the internal tags
      * @return string segment with xliff tags
      */
-    public function toXliffPaired(string $segment, $removeOther = true, &$replaceMap = null, &$newid = 1)
-    {
-        $result = $this->toXliff($segment, $removeOther, $replaceMap, $newid);
+    public function toXliffPaired(
+        string $segment,
+        $removeOther = true,
+        &$replaceMap = null,
+        &$newid = 1,
+        array $dontRemoveTags = []
+    ) {
+        $result = $this->toXliff($segment, $removeOther, $replaceMap, $newid, $dontRemoveTags);
         $xml = ZfExtended_Factory::get('editor_Models_Converter_XmlPairer');
         /* @var $xml editor_Models_Converter_XmlPairer */
 

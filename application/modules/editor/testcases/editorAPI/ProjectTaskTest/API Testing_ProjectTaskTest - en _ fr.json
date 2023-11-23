@@ -29,7 +29,7 @@
         "isFirstofFile": null
     },
     {
-        "source": "<div class=\"term preferredTerm exact transNotDefined\" title=\"\">Apache</div> 2.x on Unix systems - Manual",
+        "source": "<div class=\"term preferredTerm exact transNotDefined\" title=\"\">Apache</div> <div class=\"single 6e756d62657220747970653d22696e746567657222206e616d653d2264656661756c742073696d706c652220736f757263653d2232222069736f3d223222207461726765743d2232222f number internal-tag ownttip\"><span class=\"short\" title=\"&lt;1/&gt;: Number\">&lt;1/&gt;</span><span class=\"full\" data-originalid=\"number\" data-length=\"-1\" data-source=\"2\" data-target=\"2\"></span></div>.x on Unix systems - Manual",
         "sourceEdit": null,
         "target": "Apache 2.0 auf Unixsystemen - Manual",
         "targetEdit": "Apache 2.0 auf Unixsystemen - Manual",
@@ -174,7 +174,7 @@
         "isFirstofFile": null
     },
     {
-        "source": "<div class=\"term preferredTerm exact transNotDefined\" title=\"\">Apache</div> 2.x on Unix systems",
+        "source": "<div class=\"term preferredTerm exact transNotDefined\" title=\"\">Apache</div> <div class=\"single 6e756d62657220747970653d22696e746567657222206e616d653d2264656661756c742073696d706c652220736f757263653d2232222069736f3d223222207461726765743d2232222f number internal-tag ownttip\"><span class=\"short\" title=\"&lt;1/&gt;: Number\">&lt;1/&gt;</span><span class=\"full\" data-originalid=\"number\" data-length=\"-1\" data-source=\"2\" data-target=\"2\"></span></div>.x on Unix systems",
         "sourceEdit": null,
         "target": "",
         "targetEdit": "",
@@ -928,7 +928,7 @@
         "isFirstofFile": null
     },
     {
-        "source": "<div class=\"term preferredTerm exact transNotDefined\" title=\"\">Apache</div> 2.x on Unix systems",
+        "source": "<div class=\"term preferredTerm exact transNotDefined\" title=\"\">Apache</div> <div class=\"single 6e756d62657220747970653d22696e746567657222206e616d653d2264656661756c742073696d706c652220736f757263653d2232222069736f3d223222207461726765743d2232222f number internal-tag ownttip\"><span class=\"short\" title=\"&lt;1/&gt;: Number\">&lt;1/&gt;</span><span class=\"full\" data-originalid=\"number\" data-length=\"-1\" data-source=\"2\" data-target=\"2\"></span></div>.x on Unix systems",
         "sourceEdit": null,
         "target": "",
         "targetEdit": "",
@@ -957,7 +957,7 @@
         "isFirstofFile": null
     },
     {
-        "source": "This section contains notes and hints specific to <div class=\"term preferredTerm exact transNotDefined\" title=\"\">Apache</div> 2.x installs of PHP on Unix systems.",
+        "source": "This section contains notes and hints specific to <div class=\"term preferredTerm exact transNotDefined\" title=\"\">Apache</div> <div class=\"single 6e756d62657220747970653d22696e746567657222206e616d653d2264656661756c742073696d706c652220736f757263653d2232222069736f3d223222207461726765743d2232222f number internal-tag ownttip\"><span class=\"short\" title=\"&lt;1/&gt;: Number\">&lt;1/&gt;</span><span class=\"full\" data-originalid=\"number\" data-length=\"-1\" data-source=\"2\" data-target=\"2\"></span></div>.x installs of PHP on Unix systems.",
         "sourceEdit": null,
         "target": "Dieser Abschnitt enthält Hinweise und Tipps, die sich auf die Installation von PHP speziell für Apache 2.0 auf Unixsystemen beziehen.",
         "targetEdit": "Dieser Abschnitt enthält Hinweise und Tipps, die sich auf die Installation von PHP speziell für Apache 2.0 auf Unixsystemen beziehen.",
@@ -1595,7 +1595,7 @@
         "isFirstofFile": null
     },
     {
-        "source": "Now you have <div class=\"term preferredTerm exact transNotDefined\" title=\"\">Apache</div> 2.x.NN available under /usr/local/apache2, configured with loadable module support and the standard MPM prefork.",
+        "source": "Now you have <div class=\"term preferredTerm exact transNotDefined\" title=\"\">Apache</div> <div class=\"single 6e756d62657220747970653d22696e746567657222206e616d653d2264656661756c742073696d706c652220736f757263653d2232222069736f3d223222207461726765743d2232222f number internal-tag ownttip\"><span class=\"short\" title=\"&lt;1/&gt;: Number\">&lt;1/&gt;</span><span class=\"full\" data-originalid=\"number\" data-length=\"-1\" data-source=\"2\" data-target=\"2\"></span></div>.x.NN available under /usr/local/apache2, configured with loadable module support and the standard MPM prefork.",
         "sourceEdit": null,
         "target": "/usr/local/apache2/bin/apachectl start",
         "targetEdit": "/usr/local/apache2/bin/apachectl start",

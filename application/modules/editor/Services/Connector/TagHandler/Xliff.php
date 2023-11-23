@@ -36,6 +36,7 @@ END LICENSE AND COPYRIGHT
  * protects the translate5 internal tags as XLIFF for language resource processing
  */
 class editor_Services_Connector_TagHandler_Xliff extends editor_Services_Connector_TagHandler_Abstract {
+    protected const ALLOWED_TAGS = '<x><x/><bx><bx/><ex><ex/><g>';
 
     /**
      * @var integer
@@ -97,24 +98,28 @@ class editor_Services_Connector_TagHandler_Xliff extends editor_Services_Connect
      * @param string $queryString
      * @return string
      */
-    public function prepareQuery(string $queryString): string {
+    public function prepareQuery(string $queryString, bool $isSource = true): string {
         $this->realTagCount = 0;
-        $tag = $this->utilities->internalTag;
-        $queryString = $this->restoreWhitespaceForQuery($queryString);
-
         //$map is set by reference
         $this->map = [];
-        $this->realTagCount = $tag->count($queryString);
+        $queryString = $this->convertQueryContent($queryString, $isSource);
 
-        if($this->gTagPairing) {
-            $queryString = $tag->toXliffPaired($queryString, true, $this->map);
-        }
-        else {
-            $queryString = $tag->toXliff($queryString, true, $this->map);
-        }
+        $this->realTagCount = $this->utilities->internalTag->count($queryString);
+
+        $queryString = $this->processXliffTags($queryString);
 
         $this->mapCount = count($this->map);
+
         return $queryString;
+    }
+
+    protected function processXliffTags(string $queryString): string
+    {
+        if ($this->gTagPairing) {
+            return $this->utilities->internalTag->toXliffPaired($queryString, replaceMap: $this->map);
+        }
+
+        return $this->utilities->internalTag->toXliff($queryString, replaceMap: $this->map);
     }
 
     /**
@@ -125,7 +130,7 @@ class editor_Services_Connector_TagHandler_Xliff extends editor_Services_Connect
     public function restoreInResult(string $resultString): ?string {
         $this->hasRestoreErrors = false;
         //strip other then x|ex|bx|g|/g
-        $resultString = strip_tags($this->replaceTagsWithContent($resultString), '<x><x/><bx><bx/><ex><ex/><g>');
+        $resultString = strip_tags($this->replaceTagsWithContent($resultString), static::ALLOWED_TAGS);
         //since protectWhitespace should run on plain text nodes we have to call it before the internal tags are reapplied,
         // since then the text contains xliff tags and the xliff tags should not contain affected whitespace
         // this is triggered here with the parse call
@@ -139,9 +144,12 @@ class editor_Services_Connector_TagHandler_Xliff extends editor_Services_Connect
                 'givenContent' => $resultString,
             ]);
             $this->hasRestoreErrors = true;
+
             return strip_tags($resultString);
         }
+
         $target = $this->utilities->internalTag->reapply2dMap($target, $this->map);
+
         return $this->replaceAdditionalTags($target, $this->mapCount);
     }
     

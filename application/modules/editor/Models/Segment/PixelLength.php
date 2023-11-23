@@ -126,14 +126,14 @@ class editor_Models_Segment_PixelLength {
      * @param int $fileId
      * @return integer
      */
-    public function textLengthByPixel ($segmentContent, $fontFamily, $fontSize, $fileId) {
+    public function textLengthByPixel ($segmentContent, $fontFamily, $fontSize, $fileId, bool $isSource) {
         $pixelLength = 0;
         $fontFamily = strtolower($fontFamily);
         $pixelMappingForFontAndSize = $this->pixelMapping->getPixelMappingForFontAndSize($this->taskGuid, $this->pixelMappingForTask, $fontFamily, $fontSize);
         $charsNotSet = [];
         
         // prepare string for counting
-        $segmentContent = $this->segment->prepareForPixelBasedLengthCount($segmentContent);
+        $segmentContent = $this->segment->prepareForPixelBasedLengthCount($segmentContent, $isSource);
         
         // get length for string by adding each character's length
         $allCharsInSegment = $this->segmentContentAsCharacters($segmentContent);

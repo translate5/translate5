@@ -373,9 +373,15 @@ class editor_Models_Import_FileParser_Xlf_OtherContent {
      */
     public function addIgnoredSegmentLength(array $content, editor_Models_Import_FileParser_SegmentAttributes $attributes) {
         //we have to convert the ignored content to translate5 content, otherwise the length would not be correct (for example content in <ph> tags would be counted then too)
-        $contentLength = $this->segmentBareInstance->textLengthByImportattributes($this->xmlparser->join($content), $attributes, $this->task->getTaskGuid(), $this->fileId);
+        $contentLength = $this->segmentBareInstance->textLengthByImportattributes(
+            $this->xmlparser->join($content),
+            $attributes,
+            $this->task->getTaskGuid(),
+            $this->fileId,
+            $this->useSource
+        );
         $this->additionalUnitLength += $contentLength;
-        
+
         //we add the additional mrk length of the ignored segment to the additionalUnitLength too
         $this->additionalUnitLength += $attributes->additionalMrkLength;
     }
@@ -410,12 +416,22 @@ class editor_Models_Import_FileParser_Xlf_OtherContent {
             $collectedContents[] = $content->content;
         }
         $collectedContents = join('', $collectedContents);
-        if(strlen($collectedContents) > 0){
+        if (strlen($collectedContents) > 0) {
             //with the ability of editing content between MRKs and importing MRKs in a g tag pair,
             // the length is completely saved in $additionalUnitLength. The length per MRK is not filled anymore,
             // but the related code still remains for legacy tasks having there a value set
-            $this->additionalUnitLength += $this->segmentBareInstance->textLengthByImportattributes($collectedContents, $attributes, $this->task->getTaskGuid(), $this->fileId);
-            $this->segmentMetaBareInstance->updateAdditionalUnitLength($this->task->getTaskGuid(), $attributes->transunitHash, $this->additionalUnitLength);
+            $this->additionalUnitLength += $this->segmentBareInstance->textLengthByImportattributes(
+                $collectedContents,
+                $attributes,
+                $this->task->getTaskGuid(),
+                $this->fileId,
+                $this->useSource
+            );
+            $this->segmentMetaBareInstance->updateAdditionalUnitLength(
+                $this->task->getTaskGuid(),
+                $attributes->transunitHash,
+                $this->additionalUnitLength
+            );
         }
     }
     

@@ -33,6 +33,8 @@ END LICENSE AND COPYRIGHT
  *
  */
 
+use MittagQI\Translate5\ContentProtection\ContentProtector;
+
 /**
  * Segment Entity Object
  *
@@ -168,30 +170,9 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract
      */
     protected $watchlistFilterEnabled = false;
 
-    /**
-     * @var editor_Models_Segment_InternalTag
-     */
-    protected $tagHelper;
-
-    /**
-     * @var editor_Models_Segment_TrackChangeTag
-     */
-    protected $trackChangesTagHelper;
-
-    /**
-     * @var editor_Models_Segment_Whitespace
-     */
-    protected $whitespaceHelper;
-
-    /**
-     * @var Zend_Db_Table_Row_Abstract
-     */
-    protected $tagsModel = null;
-    
-    /**
-     * @var editor_Models_Segment_UtilityBroker
-     */
     protected editor_Models_Segment_UtilityBroker $utilityBroker;
+
+    protected ContentProtector $contentProtector;
     
     /**
      * static so that only one instance is used, for performance and logging issues
@@ -216,12 +197,9 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract
      */
     public function __construct()
     {
-        $this->utilityBroker = ZfExtended_Factory::get('editor_Models_Segment_UtilityBroker');
-        //FIXME replace all helpers with UtilityBroker usage if possible
-        $this->segmentFieldManager = ZfExtended_Factory::get('editor_Models_SegmentFieldManager');
-        $this->tagHelper = ZfExtended_Factory::get('editor_Models_Segment_InternalTag');
-        $this->trackChangesTagHelper = ZfExtended_Factory::get('editor_Models_Segment_TrackChangeTag');
-        $this->whitespaceHelper = ZfExtended_Factory::get('editor_Models_Segment_Whitespace');
+        $this->utilityBroker = ZfExtended_Factory::get(editor_Models_Segment_UtilityBroker::class);
+        $this->segmentFieldManager = ZfExtended_Factory::get(editor_Models_SegmentFieldManager::class);
+        $this->contentProtector = ContentProtector::create($this->utilityBroker->whitespace);
         parent::__construct();
     }
 
@@ -346,7 +324,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract
             return;
         }
         $v = $this->__call('get' . ucfirst($name), array());
-        $this->__call('set' . ucfirst($toSort), array($this->stripTags($v)));
+        $this->__call('set' . ucfirst($toSort), array($this->stripTags($v, str_contains($name, 'source'))));
     }
 
     /**
@@ -568,15 +546,14 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract
 
     /**
      * strips all tags including internal tag content and del tag content
-     * @return string $segmentContent
      */
-    public function stripTags($segmentContent)
+    public function stripTags(string $segment, bool $isSource = true): string
     {
-        $segmentContent = $this->trackChangesTagHelper->removeTrackChanges($segmentContent);
-        $segmentContent = $this->tagHelper->restore($segmentContent, true);
-        $segmentContent = $this->whitespaceHelper->convertForStripping($segmentContent);
+        $segment = $this->utilityBroker->trackChangeTag->removeTrackChanges($segment);
+        $segment = $this->utilityBroker->internalTag->restore($segment, $this->contentProtector->tagList());
+        $segment = $this->contentProtector->convertForSorting($segment, $isSource);
 
-        return strip_tags(preg_replace('#<span[^>]*>[^<]*<\/span>#', '', $segmentContent));
+        return strip_tags(preg_replace('#<span[^>]*>[^<]*<\/span>#', '', $segment));
     }
 
     /**
@@ -593,7 +570,13 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract
     {
         $isPixelBased = ($segmentMeta->getSizeUnit() == editor_Models_Segment_PixelLength::SIZE_UNIT_XLF_DEFAULT);
         if ($isPixelBased) {
-            return $this->textLengthByPixel($segmentContent, $segmentMeta->getTaskGuid(), $segmentMeta->getFont(), $segmentMeta->getFontSize(), $segmentFileId);
+            return $this->textLengthByPixel(
+                $segmentContent,
+                $segmentMeta->getTaskGuid(),
+                $segmentMeta->getFont(),
+                $segmentMeta->getFontSize(),
+                $segmentFileId
+            );
         }
         return $this->textLengthByChar($segmentContent);
     }
@@ -607,11 +590,23 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract
      * @param int $fileId
      * @return integer
      */
-    public function textLengthByImportattributes($content, editor_Models_Import_FileParser_SegmentAttributes $attributes, $taskGuid, $fileId)
-    {
+    public function textLengthByImportattributes(
+        string $content,
+        editor_Models_Import_FileParser_SegmentAttributes $attributes,
+        string $taskGuid,
+        $fileId,
+        bool $isSource
+    ) {
         $isPixelBased = ($attributes->sizeUnit == editor_Models_Segment_PixelLength::SIZE_UNIT_XLF_DEFAULT);
         if ($isPixelBased) {
-            return $this->textLengthByPixel($content, $taskGuid, $attributes->font, $attributes->fontSize, $fileId);
+            return $this->textLengthByPixel(
+                $content,
+                $taskGuid,
+                $attributes->font,
+                $attributes->fontSize,
+                $fileId,
+                $isSource
+            );
         }
         return $this->textLengthByChar($content);
     }
@@ -625,10 +620,10 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract
      * @param integer $fileId
      * @return integer
      */
-    public function textLengthByPixel($segmentContent, $taskGuid, $font, $fontSize, $fileId)
+    public function textLengthByPixel($segmentContent, $taskGuid, $font, $fontSize, $fileId, bool $isSource)
     {
         $pixelLength = $this->getPixelLength($taskGuid); // make sure that the pixelLength we use is that for the segment's task!
-        return $pixelLength->textLengthByPixel($segmentContent, $font, intval($fontSize), $fileId);
+        return $pixelLength->textLengthByPixel($segmentContent, $font, intval($fontSize), $fileId, $isSource);
     }
 
 
@@ -669,10 +664,10 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract
      */
     protected function prepareForCount($text, $padTagLength = false)
     {
-        $text = $this->trackChangesTagHelper->removeTrackChanges($text);
-        $text = $this->tagHelper->replace($text, function ($matches) use ($padTagLength) {
+        $text = $this->utilityBroker->trackChangeTag->removeTrackChanges($text);
+        $text = $this->utilityBroker->internalTag->replace($text, function ($matches) use ($padTagLength) {
             if ($padTagLength) {
-                $length = max((int)$this->tagHelper->getLength($matches[0]), 0);
+                $length = max((int)$this->utilityBroker->internalTag->getLength($matches[0]), 0);
                 return str_repeat('x', $length); //create a "x" string as long as the tag stored tag length
             } else {
                 return ''; //just remove the internal tags
@@ -686,25 +681,26 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract
      * @param string $text
      * @return string
      */
-    public function prepareForPixelBasedLengthCount($text)
+    public function prepareForPixelBasedLengthCount($text, bool $isSource)
     {
-        $text = $this->trackChangesTagHelper->removeTrackChanges($text);
-        $text = $this->restoreWhiteSpace($text);
+        $text = $this->utilityBroker->trackChangeTag->removeTrackChanges($text);
+        $text = $this->restoreWhiteSpace($text, $isSource);
+
         return $text;
     }
 
     /**
      * Restore whitespace to original real characters.
-     * @param string $segmentContent
+     * @param string $segment
      * @return string $segmentContent
      */
-    protected function restoreWhiteSpace($segmentContent)
+    protected function restoreWhiteSpace($segment, bool $isSource)
     {
-        $segmentContent = $this->tagHelper->restore($segmentContent, true);
-        $segmentContent = $this->whitespaceHelper->unprotectWhitespace($segmentContent);
-        $segmentContent = $this->tagHelper->protect($segmentContent);
-        $segmentContent = html_entity_decode(strip_tags($segmentContent), ENT_QUOTES | ENT_XHTML);
-        return $segmentContent;
+        $segment = $this->utilityBroker->internalTag->restore($segment, $this->contentProtector->tagList());
+        $segment = $this->contentProtector->unprotect($segment, $isSource);
+        $segment = $this->utilityBroker->internalTag->protect($segment);
+
+        return html_entity_decode(strip_tags($segment), ENT_QUOTES | ENT_XHTML);
     }
 
     /**
@@ -717,12 +713,11 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract
      */
     public function stripTermTagsAndTrackChanges($segmentContent)
     {
-        $tag = $this->tagHelper;
-        $segmentContent = $this->trackChangesTagHelper->removeTrackChanges($segmentContent);
-        $segmentContent = $tag->protect($segmentContent);
+        $segmentContent = $this->utilityBroker->trackChangeTag->removeTrackChanges($segmentContent);
+        $segmentContent = $this->utilityBroker->internalTag->protect($segmentContent);
         //keep internal tags and MQM, remove all other
-        $segmentContent = strip_tags($segmentContent, '<img>' . $tag::PLACEHOLDER_TAG);
-        $segmentContent = $tag->unprotect($segmentContent);
+        $segmentContent = strip_tags($segmentContent, '<img>' . editor_Models_Segment_InternalTag::PLACEHOLDER_TAG);
+        $segmentContent = $this->utilityBroker->internalTag->unprotect($segmentContent);
         //remove the class attribute of the span, since its position is changed by tag object usage
         return preg_replace('/(<span[^>]*)( class="[^"]+")([^>]*>)/', '$1$3', $segmentContent);
     }
@@ -833,7 +828,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract
             /* @var $row editor_Models_Db_SegmentDataRow */
             $row->name = $name;
             $field = $sfm->getByName($name);
-            $row->originalToSort = $this->stripTags($row->original);
+            $row->originalToSort = $this->stripTags($row->original, 'source' === $name);
             $row->taskGuid = $this->getTaskGuid();
             $row->mid = $this->getMid();
             if (isset($field->editable) && $field->editable) {
