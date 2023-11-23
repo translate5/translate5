@@ -65,8 +65,5 @@ Ext.define('Editor.view.admin.contentProtection.contentRecognition.Model', {
     }, {
         name: 'keepAsIs',
         type: 'bool'
-    }, {
-        name: 'priority',
-        type: 'int'
     }]
 });

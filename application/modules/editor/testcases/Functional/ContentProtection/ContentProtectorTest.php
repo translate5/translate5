@@ -50,7 +50,7 @@ END LICENSE AND COPYRIGHT
 */
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\Test\Functional\Segment\ContentProtection;
+namespace MittagQI\Translate5\Test\Functional\ContentProtection;
 
 use editor_Models_Import_FileParser_WhitespaceTag;
 use editor_Models_Segment_Whitespace as Whitespace;
@@ -69,6 +69,8 @@ class ContentProtectorTest extends editor_Test_UnitTest
     {
         $contentRecognition = ZfExtended_Factory::get(ContentRecognition::class);
         $contentRecognition->loadBy(DateProtector::getType(), 'default Y-m-d');
+        $contentRecognition->setEnabled(true);
+        $contentRecognition->save();
 
         $inputMapping = ZfExtended_Factory::get(InputMapping::class);
         $inputMapping->setLanguageId(5);
@@ -76,6 +78,9 @@ class ContentProtectorTest extends editor_Test_UnitTest
         $inputMapping->save();
 
         $contentRecognition->loadBy(FloatProtector::getType(), 'default with comma thousand decimal dot');
+        $contentRecognition->setEnabled(true);
+        $contentRecognition->save();
+
         $inputMapping = ZfExtended_Factory::get(InputMapping::class);
         $inputMapping->setLanguageId(5);
         $inputMapping->setContentRecognitionId($contentRecognition->getId());
@@ -84,6 +89,15 @@ class ContentProtectorTest extends editor_Test_UnitTest
 
     protected function tearDown(): void
     {
+        $contentRecognition = ZfExtended_Factory::get(ContentRecognition::class);
+        $contentRecognition->loadBy(DateProtector::getType(), 'default Y-m-d');
+        $contentRecognition->setEnabled(false);
+        $contentRecognition->save();
+
+        $contentRecognition->loadBy(FloatProtector::getType(), 'default with comma thousand decimal dot');
+        $contentRecognition->setEnabled(false);
+        $contentRecognition->save();
+
         $inputMapping = ZfExtended_Factory::get(InputMapping::class);
         foreach ($inputMapping->loadAll() as $item) {
             $inputMapping->load($item['id']);
@@ -166,14 +180,8 @@ class ContentProtectorTest extends editor_Test_UnitTest
             'finalTagIdent' => 3,
         ];
 
-        yield [
-            'segment' => "string <some-tag>[$nbsp]</some-tag> string <other-tag>$number</other-tag> string",
-            'converted' => "string <some-tag>[$convertedNbsp]</some-tag> string <other-tag>$convertedNumber</other-tag> string",
-            'finalTagIdent' => 3,
-        ];
-
-        $numberIdentOne = '2023-10-20';
-        $convertedNumberIdentOne = '<div class="single 6e756d62657220747970653d226461746522206e616d653d2264656661756c7420592d6d2d642220736f757263653d22323032332d31302d3230222069736f3d22323032332d31302d323022207461726765743d2232302f31302f3233222f number internal-tag ownttip"><span title="&lt;1/&gt;: Number" class="short">&lt;1/&gt;</span><span data-originalid="number" data-length="8" data-source="2023-10-20" data-target="20/10/23" class="full"></span></div>';
+        $numberIdentOne = '2023-10-30';
+        $convertedNumberIdentOne = '<div class="single 6e756d62657220747970653d226461746522206e616d653d2264656661756c7420592d6d2d642220736f757263653d22323032332d31302d3330222069736f3d22323032332d31302d333022207461726765743d2233302f31302f3233222f number internal-tag ownttip"><span title="&lt;1/&gt;: Number" class="short">&lt;1/&gt;</span><span data-originalid="number" data-length="8" data-source="2023-10-30" data-target="30/10/23" class="full"></span></div>';
 
         yield [
             'segment' => "$numberIdentOne string $number",

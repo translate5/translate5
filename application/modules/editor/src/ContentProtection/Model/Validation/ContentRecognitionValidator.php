@@ -71,18 +71,6 @@ class ContentRecognitionValidator extends ZfExtended_Models_Validator_Abstract
 
         $this->addValidator('keepAsIs', 'boolean');
         $this->addValidator('enabled', 'boolean');
-
-        $priorityValidator = new Zend_Validate();
-
-        $priorityValidator->addValidator($this->validatorFactory('int'), true);
-        $priorityValidator->addValidator(
-            $this->validatorFactory(
-                'Db_NoRecordExists',
-                ['table' => 'LEK_content_protection_content_recognition', 'field' => 'priority']
-            )
-        );
-
-        $this->addValidatorInstance('priority', $priorityValidator);
     }
 
     public function isValid(array $data)

@@ -71,8 +71,8 @@ use ZfExtended_Models_Entity_Abstract;
  * @method void setFormat(string $format)
  * @method bool getKeepAsIs()
  * @method void setKeepAsIs(bool $keepAsIs)
- * @method bool getPriority()
- * @method void setPriority(int $priority)
+ * @method bool getEnabled()
+ * @method void setEnabled(bool $enabled)
  * @method bool getIsDefault()
  */
 class ContentRecognition extends ZfExtended_Models_Entity_Abstract

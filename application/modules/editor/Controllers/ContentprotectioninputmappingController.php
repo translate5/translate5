@@ -51,7 +51,7 @@ class editor_ContentprotectioninputmappingController extends ZfExtended_RestCont
 
     public function indexAction(): void
     {
-        /** @var array{id: int, languageId: int, type: string, name: string}[] rows */
+        /** @var array{id: int, languageId: int, type: string, name: string, priority: int}[] rows */
         $this->view->rows = $this->entity->loadAllForFrontEnd();
 
         foreach ($this->view->rows as &$row) {

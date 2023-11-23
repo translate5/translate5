@@ -58,7 +58,6 @@ class editor_ContentprotectioncontentrecognitionController extends ZfExtended_Re
          *     format: string,
          *     isDefault: bool,
          *     keepAsIs: bool,
-         *     priority: int,
          *     rowEnabled: bool
          * } rows
          */
@@ -70,7 +69,7 @@ class editor_ContentprotectioncontentrecognitionController extends ZfExtended_Re
     {
         parent::putAction();
 
-        if (isset($this->data['enabled']) || isset($this->data['rowEnabled'])) {
+        if (isset($this->data['enabled'])) {
 
         }
 

@@ -80,13 +80,13 @@ class NumberProtectorTest extends TestCase
         $contentRecognition->setRegex('/^\d+ USD$/');
         $contentRecognition->setType(IntegerProtector::getType());
         $contentRecognition->setKeepAsIs(false);
-        $contentRecognition->setPriority(1000);
         $contentRecognition->save();
         $contentRecognition->refresh();
 
         $inputMapping = ZfExtended_Factory::get(InputMapping::class);
         $inputMapping->setLanguageId($langEn->getId());
         $inputMapping->setContentRecognitionId($contentRecognition->getId());
+        $inputMapping->setPriority(1000);
         $inputMapping->save();
 
         $outputMapping = ZfExtended_Factory::get(OutputMapping::class);
@@ -121,13 +121,13 @@ class NumberProtectorTest extends TestCase
         $contentRecognition->setRegex('/^\d+ USD$/');
         $contentRecognition->setType(IntegerProtector::getType());
         $contentRecognition->setKeepAsIs(false);
-        $contentRecognition->setPriority(1000);
         $contentRecognition->save();
         $contentRecognition->refresh();
 
         $inputMapping = ZfExtended_Factory::get(InputMapping::class);
         $inputMapping->setLanguageId($langEn->getId());
         $inputMapping->setContentRecognitionId($contentRecognition->getId());
+        $inputMapping->setPriority(1000);
         $inputMapping->save();
 
         $outputMapping = ZfExtended_Factory::get(OutputMapping::class);
@@ -230,11 +230,11 @@ class NumberProtectorTest extends TestCase
         ];
         yield [
             'string' => 'string 2023 05 07 string',
-            'expected' => 'string <number type="date" name="default Y m d" source="2023 05 07" iso="2023-05-07" target="2023-05-07"/> string'
+            'expected' => 'string <number type="date" name="default Y d m" source="2023 05 07" iso="2023-07-05" target="2023-07-05"/> string'
         ];
         yield [
             'string' => 'string 2023 5 7 string',
-            'expected' => 'string <number type="date" name="default Y m d" source="2023 5 7" iso="2023-05-07" target="2023-05-07"/> string'
+            'expected' => 'string <number type="date" name="default Y d m" source="2023 5 7" iso="2023-07-05" target="2023-07-05"/> string'
         ];
         yield [
             'string' => 'string 2023 5 30 string',
@@ -299,7 +299,7 @@ class NumberProtectorTest extends TestCase
         ];
         yield [
             'string' => 'This is <tag1><number type="integer" name="default simple" source="123" iso="123" target="123"/><tag2>malicious 546.5</tag2>2035</tag1> text',
-            'expected' => 'This is <tag1><number type="integer" name="default simple" source="123" iso="123" target="123"/><tag2>malicious <number type="float" name="default generic" source="546.5" iso="546.5" target="546.5"/></tag2><number type="integer" name="default simple" source="2035" iso="2035" target="2035"/></tag1> text',
+            'expected' => 'This is <tag1><number type="integer" name="default simple" source="123" iso="123" target="123"/><tag2>malicious <number type="float" name="default generic with dot" source="546.5" iso="546.5" target="546.5"/></tag2><number type="integer" name="default simple" source="2035" iso="2035" target="2035"/></tag1> text',
             'useForUnprotectTest' => false,
         ];
         yield [
@@ -324,19 +324,19 @@ class NumberProtectorTest extends TestCase
     {
         yield [
             'string' => 'string 9.012345 string',
-            'expected' => 'string <number type="float" name="default generic" source="9.012345" iso="9.012345" target="9.012345"/> string'
+            'expected' => 'string <number type="float" name="default generic with dot" source="9.012345" iso="9.012345" target="9.012345"/> string'
         ];
         yield [
             'string' => 'string 123456789.12345 string',
-            'expected' => 'string <number type="float" name="default generic" source="123456789.12345" iso="123456789.12345" target="123456789.12345"/> string'
+            'expected' => 'string <number type="float" name="default generic with dot" source="123456789.12345" iso="123456789.12345" target="123456789.12345"/> string'
         ];
         yield [
             'string' => 'string 123456789,12345 string',
-            'expected' => 'string <number type="float" name="default generic" source="123456789,12345" iso="123456789.12345" target="123456789.12345"/> string'
+            'expected' => 'string <number type="float" name="default generic with comma" source="123456789,12345" iso="123456789.12345" target="123456789.12345"/> string'
         ];
         yield [
             'string' => 'string 123456789·12345 string',
-            'expected' => 'string <number type="float" name="default generic" source="123456789·12345" iso="123456789.12345" target="123456789.12345"/> string'
+            'expected' => 'string <number type="float" name="default generic with middle dot" source="123456789·12345" iso="123456789.12345" target="123456789.12345"/> string'
         ];
 
         yield [
@@ -446,7 +446,7 @@ class NumberProtectorTest extends TestCase
 
         yield [
             'string' => 'string 1,234,567 string',
-            'expected' => 'string <number type="integer" name="default generic with separator" source="1,234,567" iso="1234567" target="1234567"/> string'
+            'expected' => 'string <number type="integer" name="default generic with comma" source="1,234,567" iso="1234567" target="1234567"/> string'
         ];
         yield [
             'string' => 'string 12,34,567 string',
@@ -479,7 +479,7 @@ class NumberProtectorTest extends TestCase
 
         yield [
             'string' => 'string 1.234.567 string',
-            'expected' => 'string <number type="integer" name="default generic with separator" source="1.234.567" iso="1234567" target="1234567"/> string'
+            'expected' => 'string <number type="integer" name="default generic with dot" source="1.234.567" iso="1234567" target="1234567"/> string'
         ];
 
         yield [
@@ -675,8 +675,7 @@ class NumberProtectorTest extends TestCase
         $contentRecognitionTable = $dbContentRecognition->info($dbContentRecognition::NAME);
         $select = $dbContentRecognition->select()
             ->from(['recognition' => $contentRecognitionTable], ['recognition.*'])
-            ->where('isDefault = true')
-            ->order('priority desc');
+            ->where('isDefault = true');
 
         $getAll = function ($select) use ($dbContentRecognition) {
             foreach ($dbContentRecognition->fetchAll($select) as $formatData) {

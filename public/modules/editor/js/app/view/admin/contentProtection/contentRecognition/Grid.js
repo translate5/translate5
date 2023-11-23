@@ -206,6 +206,23 @@ Ext.define('Editor.view.admin.contentProtection.contentRecognition.Grid', {
             },
             {
                 xtype: 'gridcolumn',
+                alias: 'matchId',
+                dataIndex: 'matchId',
+                stateId: 'matchId',
+                bind: {
+                    text: '{l10n.contentProtection.contentRecognition.matchId}'
+                },
+                editor: {
+                    field: {
+                        xtype: 'numberfield',
+                        allowBlank: false
+                    }
+                },
+                renderer: 'editableCellRenderer',
+                flex: 1
+            },
+            {
+                xtype: 'gridcolumn',
                 alias: 'format',
                 dataIndex: 'format',
                 stateId: 'format',
@@ -253,26 +270,6 @@ Ext.define('Editor.view.admin.contentProtection.contentRecognition.Grid', {
                 bind: {
                     text: '{l10n.general.enabled}'
                 }
-            },
-            {
-                xtype: 'gridcolumn',
-                alias: 'priority',
-                dataIndex: 'priority',
-                stateId: 'priority',
-                bind: {
-                    text: '{l10n.general.priority}'
-                },
-                filter: {
-                    type: 'number'
-                },
-                editor: {
-                    field: {
-                        xtype: 'numberfield',
-                        allowBlank: false
-                    }
-                },
-                renderer: 'editableCellRenderer',
-                flex: 1
             },
             {
                 xtype: 'actioncolumn',

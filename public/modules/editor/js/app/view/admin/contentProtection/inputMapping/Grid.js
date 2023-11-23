@@ -184,6 +184,26 @@ Ext.define('Editor.view.admin.contentProtection.inputMapping.Grid', {
                 }
             },
             {
+                xtype: 'gridcolumn',
+                alias: 'priority',
+                dataIndex: 'priority',
+                stateId: 'priority',
+                bind: {
+                    text: '{l10n.general.priority}'
+                },
+                filter: {
+                    type: 'number'
+                },
+                editor: {
+                    field: {
+                        xtype: 'numberfield',
+                        allowBlank: false
+                    }
+                },
+                renderer: 'editableCellRenderer',
+                flex: 1
+            },
+            {
                 xtype: 'actioncolumn',
                 align: 'center',
                 width: 100,

@@ -64,6 +64,8 @@ use ZfExtended_Models_Entity_Abstract;
  * @method void setLanguageId(int $languageId)
  * @method string getContentRecognitionId()
  * @method void setContentRecognitionId(int $contentRecognitionId)
+ * @method string getPriority()
+ * @method void setPriority(int $priority)
  */
 class InputMapping extends ZfExtended_Models_Entity_Abstract
 {
@@ -80,7 +82,7 @@ class InputMapping extends ZfExtended_Models_Entity_Abstract
         $s = $this->db
             ->select()
             ->setIntegrityCheck(false)
-            ->from(['mapping' => $this->db->info($this->db::NAME)], ['mapping.id', 'languageId'])
+            ->from(['mapping' => $this->db->info($this->db::NAME)], ['mapping.id', 'languageId', 'priority'])
             ->join(
                 ['recognition' => $recognitionTable],
                 'recognition.id = mapping.contentRecognitionId',

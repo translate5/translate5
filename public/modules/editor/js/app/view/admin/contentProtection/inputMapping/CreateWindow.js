@@ -117,6 +117,14 @@ Ext.define('Editor.view.admin.contentProtection.inputMapping.CreateWindow', {
                             bind: {
                                 fieldLabel: '{l10n.general.language}'
                             }
+                        },
+                        {
+                            xtype: 'numberfield',
+                            name: 'priority',
+                            allowBlank: false,
+                            bind: {
+                                fieldLabel: '{l10n.general.priority}'
+                            }
                         }
                     ]
                 }

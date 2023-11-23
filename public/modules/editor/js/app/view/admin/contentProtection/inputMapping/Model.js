@@ -56,5 +56,8 @@ Ext.define('Editor.view.admin.contentProtection.inputMapping.Model', {
     }, {
         name: 'ruleEnabled',
         type: 'boolean'
+    }, {
+        name: 'priority',
+        type: 'int'
     }]
 });

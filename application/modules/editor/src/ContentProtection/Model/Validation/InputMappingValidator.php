@@ -28,6 +28,7 @@ END LICENSE AND COPYRIGHT
 
 namespace MittagQI\Translate5\ContentProtection\Model\Validation;
 
+use Zend_Validate;
 use ZfExtended_Models_Validator_Abstract;
 
 class InputMappingValidator extends ZfExtended_Models_Validator_Abstract
@@ -43,5 +44,17 @@ class InputMappingValidator extends ZfExtended_Models_Validator_Abstract
 
         $this->addValidator('languageId', 'int');
         $this->addValidator('contentRecognitionId', 'int');
+
+        $priorityValidator = new Zend_Validate();
+
+        $priorityValidator->addValidator($this->validatorFactory('int'), true);
+        $priorityValidator->addValidator(
+            $this->validatorFactory(
+                'Db_NoRecordExists',
+                ['table' => 'LEK_content_protection_content_recognition', 'field' => 'priority']
+            )
+        );
+
+        $this->addValidatorInstance('priority', $priorityValidator);
     }
 }

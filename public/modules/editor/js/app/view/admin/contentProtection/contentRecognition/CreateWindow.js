@@ -157,14 +157,6 @@ Ext.define('Editor.view.admin.contentProtection.contentRecognition.CreateWindow'
                             bind: {
                                 fieldLabel: '{l10n.general.keepAsIs}'
                             }
-                        },
-                        {
-                            xtype: 'numberfield',
-                            name: 'priority',
-                            allowBlank: false,
-                            bind: {
-                                fieldLabel: '{l10n.general.priority}'
-                            }
                         }
                     ]
                 }

@@ -66,7 +66,7 @@ Ext.define('Editor.view.admin.contentProtection.inputMapping.GridController', {
     onBeforeEdit: function(cellEditPlugin, cellContext) {
         this.getView().view.select(cellContext.record);
 
-        return cellContext.field === 'languageId';
+        return cellContext.field === 'languageId' || cellContext.field === 'priority';
     },
 
     createInputMapping: function () {
