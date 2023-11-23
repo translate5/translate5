@@ -34,6 +34,7 @@ END LICENSE AND COPYRIGHT
  */
 
 use MittagQI\ZfExtended\Logger\CustomFileLogger;
+use MittagQI\ZfExtended\Session\SessionInternalUniqueId;
 
 /**
  * TaskUserAssoc Object Instance as needed in the application
@@ -544,9 +545,7 @@ class editor_Models_TaskUserAssoc extends ZfExtended_Models_Entity_Abstract {
         // TODO: REMOVE ME LATER WHEN WE HAVE INFO ABOUT THE NOACCESS ERROR. THIS IS ONLY TEMP DEBUG CODE TO COLLECT
         // MORE INFO ABOUT THE BUG
         if(Zend_Session::isStarted() && !Zend_Session::isDestroyed()){
-            $session = new Zend_Session_Namespace();
-            $internalSessionUniqId = $session->internalSessionUniqId;
-            $customFileLogger->log('My current internalSessionUniqId : '.$internalSessionUniqId);
+            $customFileLogger->log('My current internalSessionUniqId : '.SessionInternalUniqueId::getInstance()->get());
             $customFileLogger->log('My current sessionId : '.Zend_Session::getId());
         }
 
@@ -559,7 +558,7 @@ class editor_Models_TaskUserAssoc extends ZfExtended_Models_Entity_Abstract {
      */
     public function isUsed() {
         $validSessionIds = ZfExtended_Models_Db_Session::GET_VALID_SESSIONS_SQL;
-        $validSessionIds .= ' AND internalSessionUniqId = ?';
+        $validSessionIds .= ' AND s.internalSessionUniqId = ?';
         $res = $this->db->getAdapter()->query($validSessionIds, array($this->getUsedInternalSessionUniqId()));
         $validSessions = $res->fetchAll();
         //if usedInternalSessionUniqId not exists in the session table reset it,
