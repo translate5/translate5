@@ -227,7 +227,6 @@ class NumberProtector implements ProtectorInterface
         }
 
         $tries = 0;
-        file_put_contents('/var/www/translate5/data/logs/php.log', print_r($tries, true), FILE_APPEND);
 
         foreach ($this->numberRepository->getAll($sourceLang) as $langFormat) {
             while ($tries++ < 2) {

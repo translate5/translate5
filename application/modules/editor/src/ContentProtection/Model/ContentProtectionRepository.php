@@ -88,7 +88,6 @@ class ContentProtectionRepository
             ->where('recognition.enabled = true')
             ->order('priority desc')
         ;
-        file_put_contents('/var/www/translate5/data/logs/php.log', print_r($dbMapping->fetchAll($select)->toArray(), true), FILE_APPEND);
 
         foreach ($dbMapping->fetchAll($select) as $formatData) {
             yield ContentRecognitionDto::fromRow($formatData);
