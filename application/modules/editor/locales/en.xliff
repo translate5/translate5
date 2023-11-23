@@ -366,9 +366,9 @@
                 <source>Benutzer l&#xF6;schen</source>
                 <target>delete user</target>
             </trans-unit>
-            <trans-unit id="UGFzc3dvcnQgZGVzIEJlbnV0emVycyB6dXLDvGNrc2V0emVu">
-                <source>Passwort des Benutzers zur&#xFC;cksetzen</source>
-                <target>reset password of user</target>
+            <trans-unit id="UGFzc3dvcnQgZGVzIEJlbnV0emVycyB6dXLDvGNrc2V0emVuLCBCZW51dHplciB3aXJkIHBlciBFLU1haWwgYmVuYWNocmljaHRpZ3Q=">
+                <source>Passwort des Benutzers zurücksetzen, Benutzer wird per E-Mail benachrichtigt</source>
+                <target>Reset user password, user is notified by e-mail</target>
             </trans-unit>
             <trans-unit id="RnJhdQ==">
                 <source>Frau</source>
@@ -378,9 +378,125 @@
                 <source>Herr</source>
                 <target>Mr.</target>
             </trans-unit>
-            <trans-unit id="QmVudXR6ZXJsaXN0ZSB2b20gU2VydmVyIGFrdHVhbGlzaWVyZW4u">
-                <source>Benutzerliste vom Server aktualisieren.</source>
-                <target>Reload users from server.</target>
+            <trans-unit id="QmVudXR6ZXJsaXN0ZSB2b20gU2VydmVyIGFrdHVhbGlzaWVyZW4=">
+                <source>Benutzerliste vom Server aktualisieren</source>
+                <target>Reload users from server</target>
+            </trans-unit>
+            <trans-unit id="U3lzdGVtLSB1bmQgS29ycmVzcG9uZGVuenNwcmFjaGU=">
+                <source>System- und Korrespondenzsprache</source>
+                <target>System and correspondence language</target>
+            </trans-unit>
+            <trans-unit id="WnVyIEt1bmRlbmxpc3RlIHdlY2hzZWxu">
+                <source>Zur Kundenliste wechseln</source>
+                <target>Switch to customer list</target>
+            </trans-unit>
+            <trans-unit id="S3VuZGVubGlzdGUgdm9tIFNlcnZlciBha3R1YWxpc2llcmVu">
+                <source>Kundenliste vom Server aktualisieren</source>
+                <target>Update customer list from server</target>
+            </trans-unit>
+            <trans-unit id="RWluZW4gbmV1ZW4gS3VuZGVuIGhpbnp1ZsO8Z2Vu">
+                <source>Einen neuen Kunden hinzufügen</source>
+                <target>Add a new customer</target>
+            </trans-unit>
+            <trans-unit id="RWluZSBFeGNlbC1EYXRlaSBtaXQgZGVuIE51dHp1bmdzemFobGVuIHp1IGFsbGVuIGVpbmdlYnVuZGVuZW4gU3ByYWNocmVzc291cmNlbiBleHBvcnRpZXJlbg==">
+                <source>Eine Excel-Datei mit den Nutzungszahlen zu allen eingebundenen Sprachressourcen exportieren</source>
+                <target>Export an Excel file with the usage figures for all integrated language resources</target>
+            </trans-unit>
+            <trans-unit id="S3VuZGVucHJvZmlsIGtvcGllcmVu">
+                <source>Kundenprofil kopieren</source>
+                <target>Copy customer profile</target>
+            </trans-unit>
+            <trans-unit id="S3VuZGVucHJvZmlsIGzDtnNjaGVu">
+                <source>Kundenprofil löschen</source>
+                <target>Delete customer profile</target>
+            </trans-unit>
+            <trans-unit id="w5ZmZm5ldCBlaW5lIGV4dGVybmUgV2Vic2l0ZSBtaXQgZWluZXIgTGlzdGUgZGVyIHVudGVyc3TDvHR6ZW4gRGF0ZWlmb3JtYXRl">
+                <source>Öffnet eine externe Website mit einer Liste der unterstützen Dateiformate</source>
+                <target>Opens an external website with a list of supported file formats</target>
+            </trans-unit>
+            <trans-unit id="T2thcGktQmF0Y2gtS29uZmlndXJhdGlvbnNkYXRlaSAoYmNvbmYpIGhvY2hsYWRlbg==">
+                <source>Okapi-Batch-Konfigurationsdatei (bconf) hochladen</source>
+                <target>Upload Okapi batch configuration file (bconf)</target>
+            </trans-unit>
+            <trans-unit id="TGlzdGUgYWt0dWFsaXNpZXJlbg==">
+                <source>Liste aktualisieren</source>
+                <target>Update list</target>
+            </trans-unit>
+            <trans-unit id="VHV0b3JpYWwtVmlkZW9zIGF1ZnJ1ZmVu">
+                <source>Tutorial-Videos aufrufen</source>
+                <target>Call up tutorial videos</target>
+            </trans-unit>
+            <trans-unit id="VGFidWxhdG9yIGVpbmbDvGdlbiAoVEFCKQ==">
+                <source>Tabulator einfügen (TAB)</source>
+                <target>Insert tabulator (TAB)</target>
+            </trans-unit>
+            <trans-unit id="V2VpY2hlbiBaZWlsZW51bWJydWNoIGVpbmbDvGdlbiAoU0hJRlQgKyBFTlRFUik=">
+                <source>Weichen Zeilenumbruch einfügen (SHIFT + ENTER)</source>
+                <target>Insert soft line break (SHIFT + ENTER)</target>
+            </trans-unit>
+            <trans-unit id="R2VzY2jDvHR6dGVzIExlZXJ6ZWljaGVuIGVpbmbDvGdlbiAoU1RSRyArIFNISUZUICsgTGVlcnNjaGxhZyk=">
+                <source>Geschütztes Leerzeichen einfügen (STRG + SHIFT + Leerschlag)</source>
+                <target>Insert protected space (CTRL + SHIFT + space)</target>
+            </trans-unit>
+            <trans-unit id="SG9jaHN0ZWxsZW4=">
+                <source>Hochstellen</source>
+                <target>Raise</target>
+            </trans-unit>
+            <trans-unit id="VGllZnN0ZWxsZW4=">
+                <source>Tiefstellen</source>
+                <target>Low points</target>
+            </trans-unit>
+            <trans-unit id="R2VzY2h3dW5nZW5lcyBBcG9zdHJvcGggLyBIb2Noa29tbWEgZWluZsO8Z2Vu">
+                <source>Geschwungenes Apostroph / Hochkomma einfügen</source>
+                <target>Insert curved apostrophe</target>
+            </trans-unit>
+            <trans-unit id="RWluZmFjaGVzIHNjaGxpZcOfZW5kZXMgQW5mw7xocnVuZ3N6ZWljaGVuIGVpbmbDvGdlbg==">
+                <source>Einfaches schließendes Anführungszeichen einfügen</source>
+                <target>Insert single closing quotation mark</target>
+            </trans-unit>
+            <trans-unit id="RG9wcGVsdGVzIHNjaGxpZcOfZW5kZXMgQW5mw7xocnVuZ3N6ZWljaGVuIGVpbmbDvGdlbg==">
+                <source>Doppeltes schließendes Anführungszeichen einfügen</source>
+                <target>Insert double closing quotation mark</target>
+            </trans-unit>
+            <trans-unit id="RG9wcGVsdGVzIGVuZ2xpc2NoZXMgc2NobGllw59lbmRlcyBBbmbDvGhydW5nc3plaWNoZW4gZWluZsO8Z2Vu">
+                <source>Doppeltes englisches schließendes Anführungszeichen einfügen</source>
+                <target>Insert double English closing quotation mark</target>
+            </trans-unit>
+            <trans-unit id="VXJoZWJlcnJlY2h0LVplaWNoZW4gZWluZsO8Z2Vu">
+                <source>Urheberrecht-Zeichen einfügen</source>
+                <target>Insert copyright symbol</target>
+            </trans-unit>
+            <trans-unit id="UmVnaXN0cmllcnQtWmVpY2hlbiBlaW5mw7xnZW4=">
+                <source>Registriert-Zeichen einfügen</source>
+                <target>Insert registered character</target>
+            </trans-unit>
+            <trans-unit id="TWFya2VuLVplaWNoZW4gZWluZsO8Z2Vu">
+                <source>Marken-Zeichen einfügen</source>
+                <target>Insert brand symbol</target>
+            </trans-unit>
+            <trans-unit id="R2VkYW5rZW5zdHJpY2ggKEJyZWl0ZSBuKSBlaW5mw7xnZW4=">
+                <source>Gedankenstrich (Breite n) einfügen</source>
+                <target>Insert dash (width n)</target>
+            </trans-unit>
+            <trans-unit id="R2VkYW5rZW5zdHJpY2ggKEJyZWl0ZSBtKSBlaW5mw7xnZW4=">
+                <source>Gedankenstrich (Breite m) einfügen</source>
+                <target>Insert dash (width m)</target>
+            </trans-unit>
+            <trans-unit id="QW5nZXdpbmtlbHRlcyBBbmbDvGhydW5nc3plaWNoZW4gbGlua3MgZWluZsO8Z2Vu">
+                <source>Angewinkeltes Anführungszeichen links einfügen</source>
+                <target>Insert angled quotation mark on the left</target>
+            </trans-unit>
+            <trans-unit id="QW5nZXdpbmtlbHRlcyBBbmbDvGhydW5nc3plaWNoZW4gcmVjaHRzIGVpbmbDvGdlbg==">
+                <source>Angewinkeltes Anführungszeichen rechts einfügen</source>
+                <target>Insert angled quotation mark on the right</target>
+            </trans-unit>
+            <trans-unit id="WnVtIFp1a2xhcHBlbiBrbGlja2VuLiBTVFJHICsgS2xpY2sga2xhcHB0IGFsbGUgYW5kZXJlbiB6dQ==">
+                <source>Zum Zuklappen klicken. STRG + Klick klappt alle anderen zu</source>
+                <target>Click to collapse. CTRL + click to collapse all others</target>
+            </trans-unit>
+            <trans-unit id="S2xpY2tlbiBTaWUgenVtIEVyd2VpdGVybi4gU1RSRy1UYXN0ZSBrbGFwcHQgYWxsZSBhbmRlcmVuIGF1cw==">
+                <source>Klicken Sie zum Erweitern. STRG-Taste klappt alle anderen aus</source>
+                <target>Click to expand. CTRL key collapses all others</target>
             </trans-unit>
             <trans-unit id="QmVudXR6ZXIgZXJzdGVsbGVu">
                 <source>Benutzer erstellen</source>
@@ -3862,9 +3978,9 @@ A task was associated to you in the task-portal {portalLink}.
                 <source>Weitere TM Daten in Form einer TMX Datei importieren und dem TM hinzufügen</source>
                 <target>Import TMX to TM</target>
             </trans-unit>
-            <trans-unit id='V2VpdGVyZSBUZXJtLUNvbGxlY3Rpb24gRGF0ZW4gaW4gRm9ybSBlaW5lciBUQlggRGF0ZWkgaW1wb3J0aWVyZW4gdW5kIGRlbSBUZXJtLUNvbGxlY3Rpb24gaGluenVmw7xnZW4='>
-                <source>Weitere Term-Collection Daten in Form einer TBX Datei importieren und dem Term-Collection hinzufügen</source>
-                <target>Import TBX to Term-Collection</target>
+            <trans-unit id='V2VpdGVyZSBUZXJtQ29sbGVjdGlvbi1EYXRlbiBpbiBGb3JtIGVpbmVyIFRCWC1EYXRlaSBpbXBvcnRpZXJlbiB1bmQgZGVyIFRlcm1Db2xsZWN0aW9uIGhpbnp1ZsO8Z2Vu'>
+                <source>Weitere TermCollection-Daten in Form einer TBX-Datei importieren und der TermCollection hinzufügen</source>
+                <target>Import additional TermCollection data in the form of a TBX file and add it to the TermCollection</target>
             </trans-unit>
             <trans-unit id='VE1YLURhdGVp'>
                 <source>TMX-Datei</source>
@@ -4474,9 +4590,9 @@ A task was associated to you in the task-portal {portalLink}.
                 <source>Excel hochladen</source>
                 <target>Upload excel</target>
             </trans-unit>
-            <trans-unit id='TG9n'>
-                <source>Log</source>
-                <target>Log</target>
+            <trans-unit id='TG9nIGF1ZnJ1ZmVu'>
+                <source>Log aufrufen</source>
+                <target>Call up log</target>
             </trans-unit>
             <trans-unit id='VHJhbnNsYXRlNSAtIFdhcm51bmcgenUgQXVmZ2FiZQ=='>
                 <source>Translate5 - Warnung zu Aufgabe</source>
@@ -5262,21 +5378,61 @@ The following task was imported with errors / warnings / notices. Please take ca
                 <source>Projekte</source>
                 <target>Projects</target>
             </trans-unit>
-            <trans-unit id='enVtIFByb2pla3Qgc3ByaW5nZW4='>
-                <source>zum Projekt springen</source>
-                <target>jump to project</target>
+            <trans-unit id='WnVtIFByb2pla3Qgc3ByaW5nZW4g4oCTIHdlY2hzZWx0IGluIGRpZSBQcm9qZWt0bGlzdGU='>
+                <source>Zum Projekt springen – wechselt in die Projektliste</source>
+                <target>jump to project - switches to the project list</target>
             </trans-unit>
-            <trans-unit id='UHJvamVrdGxpc3RlIHZvbSBTZXJ2ZXIgYWt0dWFsaXNpZXJlbi4='>
-                <source>Projektliste vom Server aktualisieren.</source>
-                <target>Refresh project list from the server.</target>
+            <trans-unit id='WnVyIFNwcmFjaHJlc3NvdXJjZW4tw5xiZXJzaWNodCB3ZWNoc2Vsbg=='>
+                <source>Zur Sprachressourcen-Übersicht wechseln</source>
+                <target>Switch to the language resources overview</target>
+            </trans-unit>
+            <trans-unit id='UHJvamVrdGxpc3RlIHZvbSBTZXJ2ZXIgYWt0dWFsaXNpZXJlbg=='>
+                <source>Projektliste vom Server aktualisieren</source>
+                <target>Refresh project list from the server</target>
             </trans-unit>
             <trans-unit id='UHJvamVrdCBha3R1YWxpc2llcmVu'>
                 <source>Projekt aktualisieren</source>
                 <target>Refresh project</target>
             </trans-unit>
-            <trans-unit id="QXVmZ2FiZW5saXN0ZSB2b20gU2VydmVyIGFrdHVhbGlzaWVyZW4u">
-                <source>Aufgabenliste vom Server aktualisieren.</source>
-                <target>Refresh task list from the server.</target>
+            <trans-unit id="QXVmZ2FiZW5saXN0ZSB2b20gU2VydmVyIGFrdHVhbGlzaWVyZW4=">
+                <source>Aufgabenliste vom Server aktualisieren</source>
+                <target>Refresh task list from the server</target>
+            </trans-unit>
+            <trans-unit id="U3ByYWNocmVzc291cmNlbmxpc3RlIHZvbSBTZXJ2ZXIgYWt0dWFsaXNpZXJlbg==">
+                <source>Sprachressourcenliste vom Server aktualisieren</source>
+                <target>Update language resources list from server</target>
+            </trans-unit>
+            <trans-unit id="TmV1ZSBTcHJhY2hyZXNzb3VyY2UgZXJzdGVsbGVuIC8gZXh0ZXJuZSBTcHJhY2hyZXNzb3VyY2UgaW1wb3J0aWVyZW4=">
+                <source>Neue Sprachressource erstellen / externe Sprachressource importieren</source>
+                <target>Create new language resource / import external language resource</target>
+            </trans-unit>
+            <trans-unit id="QXVmZ2FiZW4gYW56ZWlnZW4sIGRpZSBkaWVzZSBTcHJhY2hyZXNzb3VyY2UgdmVyd2VuZGVu">
+                <source>Aufgaben anzeigen, die diese Sprachressource verwenden</source>
+                <target>Show tasks that use this language resource</target>
+            </trans-unit>
+            <trans-unit id="QW56YWhsIEt1bmRlbiwgZGllIGRpZXNlIFNwcmFjaHJlc3NvdXJjZSB6dWdld2llc2VuIHZlcndlbmRlbg==">
+                <source>Anzahl Kunden, die diese Sprachressource zugewiesen verwenden</source>
+                <target>Number of customers assigned to use this language resource</target>
+            </trans-unit>
+            <trans-unit id="RGF0ZWliYXNpZXJ0ZSBUZXJtQ29sbGVjdGlvbiBoZXJ1bnRlcmxhZGVuIHVuZCBsb2thbCBzcGVpY2hlcm4=">
+                <source>Dateibasierte TermCollection herunterladen und lokal speichern</source>
+                <target>Download file-based TermCollection and save locally</target>
+            </trans-unit>
+            <trans-unit id="S3VuZGVuIG1pdCBMZXNlcmVjaHRlbiBhdWYgZGllc2VyIFNwcmFjaHJlc3NvdXJjZQ==">
+                <source>Kunden mit Leserechten auf dieser Sprachressource</source>
+                <target>Customers with read rights to this language resource</target>
+            </trans-unit>
+            <trans-unit id="S3VuZGVuIG1pdCBTY2hyZWlicmVjaHRlIGF1ZiBkaWVzZXIgU3ByYWNocmVzc291cmNl">
+                <source>Kunden mit Schreibrechte auf dieser Sprachressource</source>
+                <target>Customers with write access to this language resource</target>
+            </trans-unit>
+            <trans-unit id="S3VuZGVuLCBkaWUgZGllc2UgU3ByYWNocmVzc291cmNlIHN0YW5kYXJkbcOkw59pZyBhbHMgUGl2b3QgdmVyd2VuZGVu">
+                <source>Kunden, die diese Sprachressource standardmäßig als Pivot verwenden</source>
+                <target>Customers who use this language resource as a pivot by default</target>
+            </trans-unit>
+            <trans-unit id="WnVyIEJlbnV0emVydmVyd2FsdHVuZyB3ZWNoc2Vsbg==">
+                <source>Zur Benutzerverwaltung wechseln</source>
+                <target>Switch to user administration</target>
             </trans-unit>
             <trans-unit id="QWxsZSBFcndlaXRlcm4=">
                 <source>Alle Erweitern</source>
@@ -5862,9 +6018,9 @@ The following task was imported with errors / warnings / notices. Please take ca
                 <source>Ressourcen-Nutzung Exportieren</source>
                 <target>Resource usage export</target>
             </trans-unit>
-            <trans-unit id='S3VuZGVuIGJlYXJiZWl0ZW4='>
-                <source>Kunden bearbeiten</source>
-                <target>Edit client</target>
+            <trans-unit id='S3VuZGVucHJvZmlsIGJlYXJiZWl0ZW4='>
+                <source>Kundenprofil bearbeiten</source>
+                <target>Edit customer profile</target>
             </trans-unit>
             <trans-unit id='Tm9jaCBldHdhcyB6dSB0dW4/'>
                 <source>Noch etwas zu tun?</source>
@@ -9368,6 +9524,18 @@ E-Mail: service@MittagQI.com</pre>
             <trans-unit id='RGFzIFNlZ21lbnQga29ubnRlIG51ciBpbiBkZXIgQXVmZ2FiZSwgbmljaHQgYWJlciBpbnMgVE0gZ2VzcGVpY2hlcnQgd2VyZGVuLiBTZWdtZW50ZSBsw6RuZ2VyIGFscyAyMDQ4IEJ5dGVzIHNpbmQgbmljaHQgaW0gVE0gc3BlaWNoZXJiYXIu'>
                 <source>Das Segment konnte nur in der Aufgabe, nicht aber ins TM gespeichert werden. Segmente länger als 2048 Bytes sind nicht im TM speicherbar.</source>
                 <target>The segment could only be saved to the task, but not to the TM. Segments longer than 2048 bytes cannot be saved to the TM.</target>
+            </trans-unit>
+            <trans-unit id='WnVyIFByb2pla3RsaXN0ZSB3ZWNoc2Vsbg=='>
+                <source>Zur Projektliste wechseln</source>
+                <target>Switch to the project list</target>
+            </trans-unit>
+            <trans-unit id='QWJnZXNjaGxvc3NlbiBiZWRldXRldCBoaWVyIGRpZSBBbnphaGwgU2VnbWVudGUsIHdlbGNoZXIgZGVyIEJlbnV0emVyIGltIGFrdHVlbGxlbiBXb3JrZmxvdy1TY2hyaXR0IG5hY2ggZGVyIEJlYXJiZWl0dW5nIGdlc3BlaWNoZXJ0IGhhdA=='>
+                <source>Abgeschlossen bedeutet hier die Anzahl Segmente, welcher der Benutzer im aktuellen Workflow-Schritt nach der Bearbeitung gespeichert hat</source>
+                <target>Completed here means the number of segments that the user has saved in the current workflow step after processing</target>
+            </trans-unit>
+            <trans-unit id='WnVyIEF1ZmdhYmVubGlzdGUgd2VjaHNlbG4='>
+                <source>Zur Aufgabenliste wechseln</source>
+                <target>Switch to the task list</target>
             </trans-unit>
         </body>
     </file>

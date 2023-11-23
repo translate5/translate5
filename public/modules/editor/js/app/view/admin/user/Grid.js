@@ -91,6 +91,7 @@ Ext.define('Editor.view.admin.user.Grid', {
         },
     config = {
       title: me.title, //see EXT6UPD-9
+      tooltip: Editor.data.l10n.user.tooltip,
       columns: [{
           xtype: 'gridcolumn',
           width: 100,

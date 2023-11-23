@@ -41,7 +41,7 @@ Ext.define('Editor.view.LanguageResources.services.TermCollection', {
     extend: 'Editor.view.LanguageResources.services.Default',
     id: 'TermCollection',
 
-    addTooltip: '#UT#Weitere Term-Collection Daten in Form einer TBX Datei importieren und dem Term-Collection hinzufügen',
+    addTooltip: '#UT#Weitere TermCollection-Daten in Form einer TBX-Datei importieren und der TermCollection hinzufügen',
     openTermPortal: '#UT#Term-Collection im TermPortal öffnen',
 
     /**

@@ -71,7 +71,7 @@ Ext.define('Editor.view.admin.customer.Panel', {
         propertiesTabPanelTitle: '#UT#Allgemein',
         configTabTitle:'#UT#Überschreibung der Systemkonfiguration',
         actionColumn:'#UT#Aktionen',
-        customerEditActionIcon:'#UT#Kunden bearbeiten',
+        customerEditActionIcon:'#UT#Kundenprofil bearbeiten',
         openIdTabPanelDisabledTooltip:'#UT#Bitte konfigurieren Sie zunächst das Feld "translate5 Domain" im Tab "Allgemein". Danach können Sie OpenID Connect für diesen Kunden einrichten.'
     },
     shrinkWrap: 0,
@@ -90,6 +90,7 @@ Ext.define('Editor.view.admin.customer.Panel', {
             canNotDeleteCustomer =  ! Editor.app.authenticatedUser.isAllowed('editorDeleteCustomer'),
             config = {
                 title: me.title, //see EXT6UPD-9
+                tooltip: Editor.data.l10n.clients.tooltip,
                 items: [
                     {
                         xtype: 'gridpanel',
@@ -148,13 +149,13 @@ Ext.define('Editor.view.admin.customer.Panel', {
                                     handler:'onTmExportClick'
                                 },{
                                     glyph: 'f0c5@FontAwesome5FreeSolid',
-                                    tooltip: 'Copy',
+                                    tooltip: Editor.data.l10n.clients.copy,
                                     scope:'controller',
                                     handler:'onCopyActionClick',
                                     hidden: canNotAddCustomer,
                                 },{
                                     glyph: 'f2ed@FontAwesome5FreeSolid',
-                                    tooltip:me.strings.remove,
+                                    tooltip:Editor.data.l10n.clients.delete,
                                     scope:'controller',
                                     handler:'remove',
                                     hidden: canNotDeleteCustomer,
@@ -316,6 +317,7 @@ Ext.define('Editor.view.admin.customer.Panel', {
                                 xtype: 'button',
                                 glyph: 'f2f1@FontAwesome5FreeSolid',
                                 text: me.strings.reload,
+                                tooltip: Editor.data.l10n.clients.refresh,
                                 listeners: {
                                     click: {
                                         fn: 'refresh',
@@ -327,6 +329,7 @@ Ext.define('Editor.view.admin.customer.Panel', {
                                 xtype: 'button',
                                 glyph: 'f067@FontAwesome5FreeSolid',
                                 text: me.strings.addCustomerTitle,
+                                tooltip: Editor.data.l10n.clients.create,
                                 hidden: canNotAddCustomer,
                                 listeners: {
                                     click: {
@@ -338,6 +341,7 @@ Ext.define('Editor.view.admin.customer.Panel', {
                                 xtype: 'button',
                                 glyph: 'f1c3@FontAwesome5FreeSolid',
                                 text: me.strings.export,
+                                tooltip: Editor.data.l10n.clients.export,
                                 listeners: {
                                     click: {
                                         fn: 'onTmExportClick',
