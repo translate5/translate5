@@ -9180,13 +9180,13 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
                 <source>Priorität</source>
                 <target>Priorität</target>
             </trans-unit>
-            <trans-unit id='TGFzcyBlcyBzbyB3aWUgZXMgaXN0'>
-                <source>Lass es so wie es ist</source>
-                <target>Lass es so wie es ist</target>
+            <trans-unit id='VW52ZXLDpG5kZXJ0IMO8YmVybmVobWVu'>
+                <source>Unverändert übernehmen</source>
+                <target>Unverändert übernehmen</target>
             </trans-unit>
             <trans-unit id='TnVtbWVybnNjaHV0eg=='>
                 <source>Nummernschutz</source>
-                <target>Nummernschutz</target>
+                <target>Content protection</target>
             </trans-unit>
             <trans-unit id="TMO2c2NodW5nIGJlc3TDpHRpZ2Vu">
                 <source>Löschung bestätigen</source>
@@ -9220,9 +9220,9 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
                 <source>Zuordnung erstellen</source>
                 <target>Zuordnung erstellen</target>
             </trans-unit>
-            <trans-unit id='RXJtw7ZnbGljaHQ='>
-                <source>Ermöglicht</source>
-                <target>Ermöglicht</target>
+            <trans-unit id='QWt0aXZpZXJ0'>
+                <source>Aktiviert</source>
+                <target>Aktiviert</target>
             </trans-unit>
             <trans-unit id='RGVmYXVsdHMgYW56ZWlnZW4='>
                 <source>Defaults anzeigen</source>

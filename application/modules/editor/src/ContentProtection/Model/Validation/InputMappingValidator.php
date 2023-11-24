@@ -51,7 +51,7 @@ class InputMappingValidator extends ZfExtended_Models_Validator_Abstract
         $priorityValidator->addValidator(
             $this->validatorFactory(
                 'Db_NoRecordExists',
-                ['table' => 'LEK_content_protection_content_recognition', 'field' => 'priority']
+                ['table' => 'LEK_content_protection_input_mapping', 'field' => 'priority']
             )
         );
 

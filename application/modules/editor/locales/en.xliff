@@ -9353,8 +9353,8 @@ E-Mail: service@MittagQI.com</pre>
                 <source>Priorität</source>
                 <target>Priority</target>
             </trans-unit>
-            <trans-unit id='TGFzcyBlcyBzbyB3aWUgZXMgaXN0'>
-                <source>Lass es so wie es ist</source>
+            <trans-unit id='VW52ZXLDpG5kZXJ0IMO8YmVybmVobWVu'>
+                <source>Unverändert übernehmen</source>
                 <target>Keep as is</target>
             </trans-unit>
             <trans-unit id='TnVtbWVybnNjaHV0eg=='>
@@ -9393,8 +9393,8 @@ E-Mail: service@MittagQI.com</pre>
                 <source>Zuordnung erstellen</source>
                 <target>Create mapping</target>
             </trans-unit>
-            <trans-unit id='RXJtw7ZnbGljaHQ='>
-                <source>Ermöglicht</source>
+            <trans-unit id='QWt0aXZpZXJ0'>
+                <source>Aktiviert</source>
                 <target>Enabled</target>
             </trans-unit>
             <trans-unit id='RGVmYXVsdHMgYW56ZWlnZW4='>
