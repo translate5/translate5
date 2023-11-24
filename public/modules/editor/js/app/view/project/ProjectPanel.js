@@ -53,7 +53,7 @@ Ext.define('Editor.view.project.ProjectPanel', {
     viewModel:{
         type: 'projectPanel'
     },
-    
+
     strings:{
     	projectTasksTitle:'#UT#Aufgaben für das Projekt: {projectSelection.taskName}'
     },
@@ -64,6 +64,7 @@ Ext.define('Editor.view.project.ProjectPanel', {
         var me = this,
             config={
             title:me.title,
+            tooltip: Editor.data.l10n.projectGrid.tooltip,
             items:[{
                     xtype: 'projectGrid',
                     reference: 'projectGrid',

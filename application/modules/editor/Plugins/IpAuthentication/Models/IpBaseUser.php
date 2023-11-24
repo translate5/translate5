@@ -29,6 +29,7 @@ END LICENSE AND COPYRIGHT
 use MittagQI\Translate5\Acl\Rights;
 use MittagQI\Translate5\Tools\IpMatcher;
 use MittagQI\Translate5\Plugins\IpAuthentication\AclResource;
+use MittagQI\ZfExtended\Session\SessionInternalUniqueId;
 
 /***
  * Check if the current client request is configured as ip based in the zf_configuration.
@@ -73,7 +74,7 @@ class editor_Plugins_IpAuthentication_Models_IpBaseUser extends ZfExtended_Model
      */
     public function findAllExpired(){
         $sql = " SELECT u.* FROM Zf_users u ".
-                " LEFT JOIN sessionMapInternalUniqId s ON u.login = CONCAT('".self::IP_BASED_USER_LOGIN_PREFIX."',s.internalSessionUniqId) ".
+                " LEFT JOIN session s ON u.login = CONCAT('".self::IP_BASED_USER_LOGIN_PREFIX."',s.internalSessionUniqId) ".
                 " WHERE login like '".self::IP_BASED_USER_LOGIN_PREFIX."%' ".
                 " AND s.internalSessionUniqId is null";
         $res = $this->db->getAdapter()->query($sql);
@@ -231,7 +232,7 @@ class editor_Plugins_IpAuthentication_Models_IpBaseUser extends ZfExtended_Model
      * @return string
      */
     public function generateIpBasedLogin(): string{
-        return self::IP_BASED_USER_LOGIN_PREFIX.$this->_session->internalSessionUniqId;
+        return self::IP_BASED_USER_LOGIN_PREFIX.SessionInternalUniqueId::getInstance()->get();
     }
     
     /**

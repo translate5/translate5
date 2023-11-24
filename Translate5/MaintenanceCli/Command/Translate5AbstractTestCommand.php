@@ -29,6 +29,7 @@
 namespace Translate5\MaintenanceCli\Command;
 
 use MittagQI\Translate5\Test\TestConfiguration;
+use PDO;
 use Symfony\Component\Console\Input\InputOption;
 use Translate5\MaintenanceCli\WebAppBridge\Application;
 use Zend_Registry;
@@ -58,6 +59,13 @@ abstract class Translate5AbstractTestCommand extends Translate5AbstractCommand
      * @var bool
      */
     protected static bool $canSkipTests = true;
+
+    /**
+     * Some configs need the base-url
+     * To not fetch multiple times, we cache it
+     * @var string
+     */
+    protected static string $applicationBaseUrl;
 
     /**
      * General Options of all test-commands
@@ -598,20 +606,56 @@ abstract class Translate5AbstractTestCommand extends Translate5AbstractCommand
     private function getApplicationConfiguration(string $applicationDbName, string $host, string $username, string $password): array
     {
         $this->io->note('Copying config-values from database \'' . $applicationDbName . '\'');
-        $pdo = new \PDO('mysql:host=' . $host . ';dbname=' . $applicationDbName, $username, $password);
+        $pdo = new PDO('mysql:host=' . $host . ';dbname=' . $applicationDbName, $username, $password);
         $neededConfigs = TestConfiguration::getTestConfigs();
         foreach ($neededConfigs as $name => $value) {
-            if ($value === null) { // value should be taken from application DB
-                $query = 'SELECT `value` FROM `Zf_configuration` WHERE `name` = ?';
-                $stmt = $pdo->prepare($query);
-                $stmt->execute([$name]);
-                $appVal = $stmt->fetchColumn();
+            // value should be taken from application DB if defined as null
+            if ($value === null) {
+                $appVal = $this->fetchApplicationConfigurationVal($pdo, $name);
                 if ($appVal !== false) {
                     $neededConfigs[$name] = $appVal;
                 }
+
+            // value needs to be complemented with base-url of current installation. This is e.g. needed, when fake-APIs are used
+            } else if(str_contains($value, TestConfiguration::BASE_URL)){
+
+                $baseUrl = $this->getApplicationBaseUrl($pdo);
+                $neededConfigs[$name] = str_replace(TestConfiguration::BASE_URL, $baseUrl, $value);
             }
         }
         return $neededConfigs;
+    }
+
+    /**
+     * Retrieves the base-URL from of the application config DB
+     * @param PDO $pdo
+     * @return string
+     */
+    private function getApplicationBaseUrl(PDO $pdo): string
+    {
+        if(!isset(static::$applicationBaseUrl)){
+            static::$applicationBaseUrl =
+                $this->fetchApplicationConfigurationVal($pdo, 'runtimeOptions.server.protocol')
+                .$this->fetchApplicationConfigurationVal($pdo, 'runtimeOptions.server.name');
+        }
+        return static::$applicationBaseUrl;
+    }
+
+    /**
+     * Retrieves a single config-value out of the application config DB
+     * @param PDO $pdo
+     * @return string
+     */
+    private function fetchApplicationConfigurationVal(PDO $pdo, string $name): ?string
+    {
+        $query = 'SELECT `value` FROM `Zf_configuration` WHERE `name` = ?';
+        $stmt = $pdo->prepare($query);
+        $stmt->execute([$name]);
+        $appVal = $stmt->fetchColumn();
+        if ($appVal !== false && $appVal !== null) {
+            return (string)$appVal;
+        }
+        return null;
     }
 
     /**

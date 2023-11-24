@@ -77,7 +77,10 @@ Ext.define('Editor.view.segments.grid.Header', {
                     hideText: me.strings.hideDesc,
                     text: me.strings.hideDesc
                 },{
-                    xtype: 'helpButton'
+                    xtype: 'helpButton',
+                    bind: {
+                        tooltip: '{l10n.helpButton.tooltip}'
+                    }
                 },{
                     xtype: 'button',
                     itemId:'toolbarInfoButton',

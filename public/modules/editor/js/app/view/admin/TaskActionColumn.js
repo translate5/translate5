@@ -36,7 +36,7 @@ Ext.define('Editor.view.admin.TaskActionColumn', {
   width: 90,
   menuText: null,
   messages: {
-      projectOverview:'#UT#zum Projekt springen',
+      projectOverview:'#UT#Zum Projekt springen – wechselt in die Projektliste',
       taskOverview:'#UT#zur Aufgabe springen',
       taskActionMenu:'#UT#Aufgabenmenü anzeigen',
       projectActionMenu:'#UT#Projektmenü anzeigen',
@@ -64,7 +64,7 @@ Ext.define('Editor.view.admin.TaskActionColumn', {
 	            iconCls: 'ico-task-menu',
 	            sortIndex:1
 	        },{
-                tooltip: me.messages.actionEdit,
+                tooltip: Editor.data.l10n.tasksGrid.actionColumn.actionEdit,
                 isAllowedFor: 'editorEditTask',
                 iconCls: 'ico-task-edit',
                 sortIndex:1,

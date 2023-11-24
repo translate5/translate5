@@ -38,6 +38,7 @@ use MittagQI\Translate5\Segment\TagRepair\HtmlProcessor;
  * @method editor_Services_ServiceResult translate() translate(string $searchString)
  * @method string getStatus() getStatus(editor_Models_LanguageResources_Resource $resource) returns the LanguageResource status
  * @method string getLastStatusInfo() getLastStatusInfo() returns the last store status info from the last getStatus call
+ * @method void update(editor_Models_Segment $segment) editor_Services_Connector_Abstract::update()
  */
 class editor_Services_Connector
 {
