@@ -94,32 +94,38 @@ class editor_Services_Manager {
         return self::$registeredServices;
     }
 
-    public function getAllNames(): array
+    public function getAllUiNames(): array
     {
         $names = [];
 
         foreach ($this->getAll() as $serviceName) {
-            $names[] = ZfExtended_Factory::get($this->getServiceClassName($serviceName))->getName();
+            $names[] = ZfExtended_Factory::get($this->getServiceClassName($serviceName))->getUiName();
         }
 
         return $names;
     }
 
+    public function getUiNameByType(string $serviceType): string
+    {
+        return ZfExtended_Factory::get($this->getServiceClassName($serviceType))->getUiName();
+    }
+
     /**
      * Creates all configured connector resources.
      *
-     * @return array
+     * @return editor_Models_LanguageResources_Resource[]
      */
     public function getAllResources(): array
     {
-        $serviceResources = array();
+        $serviceResources = [];
 
         foreach (self::$registeredServices as $serviceName) {
+            /** @var editor_Services_ServiceAbstract $service */
             $service = ZfExtended_Factory::get($this->getServiceClassName($serviceName));
-            $serviceResources = array_merge($serviceResources, $service->getResources());
+            $serviceResources[] = $service->getResources();
         }
 
-        return $serviceResources;
+        return array_merge(...$serviceResources);
     }
 
     /**
@@ -148,7 +154,7 @@ class editor_Services_Manager {
      *
      * @return array
      */
-    public function getAllUnconfiguredServices(): array
+    public function getAllUnconfiguredServices(bool $forUi = false): array
     {
         $serviceNames = [];
 
@@ -158,7 +164,7 @@ class editor_Services_Manager {
 
             if (!$service->isConfigured() || empty($service->getResources())) {
                 $serviceNames[] = (object)[
-                    'name' => '[' . $service->getName() . ']',
+                    'name' => '[' . ($forUi ? $service->getUiName() : $service->getName()) . ']',
                     'serviceName' => $service->getName(),
                     'helppage' => urldecode($service->getHelppage())
                 ];
@@ -176,7 +182,7 @@ class editor_Services_Manager {
             }
 
             $serviceNames[] = (object)[
-                'name' => '[' . $service->getName() . ']',
+                'name' => '[' . ($forUi ? $service->getUiName() : $service->getName()) . ']',
                 'serviceName' => $service->getName(),
                 'helppage' => urldecode($service->getHelppage())
             ];

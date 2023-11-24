@@ -341,6 +341,9 @@ Ext.define('Editor.plugins.Okapi.view.BconfGrid', {
                     xtype: 'button',
                     glyph: 'f093@FontAwesome5FreeSolid',
                     text: me.strings.uploadBconf,
+                    bind: {
+                        tooltip: '{l10n.clients.bconf.upload}'
+                    },
                     ui: 'default-toolbar-small',
                     width: 'auto',
                     handler: function(btn){
@@ -352,6 +355,9 @@ Ext.define('Editor.plugins.Okapi.view.BconfGrid', {
                     xtype: 'button',
                     iconCls: 'x-fa fa-undo',
                     text: me.strings.refresh,
+                    bind: {
+                        tooltip: '{l10n.clients.bconf.refresh}'
+                    },
                     handler: function(btn){
                         btn.up('grid').getStore().getSource().reload();
                     }
@@ -359,6 +365,9 @@ Ext.define('Editor.plugins.Okapi.view.BconfGrid', {
                 {
                     xtype: 'button',
                     iconCls: 'x-fa fa-link',
+                    bind: {
+                        tooltip: '{l10n.clients.bconf.formats}'
+                    },
                     text: me.strings.supprtedFormats,
                     handler: function(btn){
                         window.open(btn.up('grid').helpLink, '_blank');
