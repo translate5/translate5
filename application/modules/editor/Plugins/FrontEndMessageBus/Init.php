@@ -193,7 +193,7 @@ class editor_Plugins_FrontEndMessageBus_Init extends ZfExtended_Plugin_Abstract 
         }
 
         //3. load the session id to the internal session
-        $sessIntId = new ZfExtended_Models_Db_SessionMapInternalUniqId();
+        $sessIntId = new ZfExtended_Models_Db_Session();
         $row = $sessIntId->fetchRow(['internalSessionUniqId = ?' => $job->getUsedInternalSessionUniqId()]);
         $result = $this->bus->sessionHasConnection($row->session_id);
         $hasConnection = $result->instanceResult ?? true; //in doubt say true so the job is not unlocked!

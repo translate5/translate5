@@ -98,6 +98,7 @@ Ext.define('Editor.view.LanguageResources.TmOverviewPanel', {
             },
             config = {
                 title: me.title, //see EXT6UPD-9
+                tooltip: Editor.data.l10n.languageResources.tooltip,
                 store :'Editor.store.LanguageResources.LanguageResource',
                 plugins: ['gridfilters'],
                 viewConfig: {
@@ -255,6 +256,7 @@ Ext.define('Editor.view.LanguageResources.TmOverviewPanel', {
                         type: 'customer' // [Multitenancy]
                     },
                     text:me.strings.customers,
+                    tooltip: Editor.data.l10n.languageResources.customers.tooltip,
                     renderer:me.resourceCustomersRenderer
                 },{
                     xtype: 'gridcolumn',
@@ -264,7 +266,7 @@ Ext.define('Editor.view.LanguageResources.TmOverviewPanel', {
                         type: 'string'
                     },
                     text:me.strings.useAsDefault,
-                    tooltip:me.strings.useAsDefault,
+                    tooltip: Editor.data.l10n.languageResources.useAsDefault.tooltip,
                     renderer:me.defaultCustomersRenderer
                 },
                 {
@@ -275,7 +277,7 @@ Ext.define('Editor.view.LanguageResources.TmOverviewPanel', {
                         type: 'string'
                     },
                     text:me.strings.writeAsDefault,
-                    tooltip:me.strings.writeAsDefault,
+                    tooltip: Editor.data.l10n.languageResources.writeAsDefault.tooltip,
                     renderer:me.defaultCustomersRenderer
                 },
                 {
@@ -286,7 +288,7 @@ Ext.define('Editor.view.LanguageResources.TmOverviewPanel', {
                         type: 'string'
                     },
                     text:me.strings.pivotAsDefault,
-                    tooltip:me.strings.pivotAsDefault,
+                    tooltip: Editor.data.l10n.languageResources.pivotAsDefault.tooltip,
                     renderer:me.defaultCustomersRenderer
                 },
                 {
@@ -369,13 +371,13 @@ Ext.define('Editor.view.LanguageResources.TmOverviewPanel', {
                         glyph: 'f2f1@FontAwesome5FreeSolid',
                         itemId: 'btnRefresh',
                         text: me.strings.refresh,
-                        tooltip: me.strings.refresh
+                        tooltip: Editor.data.l10n.languageResources.refresh
                     },{
                         xtype: 'button',
                         glyph: 'f067@FontAwesome5FreeSolid',
                         itemId: 'btnAddTm',
                         text: me.strings.addResource,
-                        tooltip: me.strings.addResource,
+                        tooltip: Editor.data.l10n.languageResources.create,
                         hidden: canNotAddLangresource,
                     }]
                 }]
@@ -409,7 +411,7 @@ Ext.define('Editor.view.LanguageResources.TmOverviewPanel', {
     },
 
     onDestroy: function () {
-        if (this.tooltip) {
+        if (this.tooltip && this.tooltip.destroy) {
             this.tooltip.destroy();
         }
         this.callParent(arguments);

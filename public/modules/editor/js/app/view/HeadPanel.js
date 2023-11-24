@@ -75,7 +75,10 @@ Ext.define('Editor.view.HeadPanel', {
                             window.location = '/erp';
                         }
                     },{
-                        xtype: 'helpButton'
+                        xtype: 'helpButton',
+                        bind: {
+                            tooltip: '{l10n.helpButton.tooltip}'
+                        }
                     },{
                         xtype: 'button',
                         itemId: 'logoutSingle',

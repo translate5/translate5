@@ -171,6 +171,7 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
 
             $id = $languageresource['id'];
 
+            $languageresource['serviceName'] = $serviceManager->getUiNameByType($languageresource['serviceType']);
             //add customer assocs
             $languageresource['customerIds'] = $this->getCustassoc($custAssoc, 'customerId', $id);
             $languageresource['customerUseAsDefaultIds'] = $this->getCustassocByIndex($custAssoc, 'useAsDefault', $id);
@@ -298,6 +299,8 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         foreach($meta as $key => $v) {
             $this->view->rows->{$key} = $v;
         }
+
+        $this->view->rows->serviceName = $serviceManager->getUiNameByType($this->view->rows->serviceType);
 
         $eventLogger=ZfExtended_Factory::get('editor_Models_Logger_LanguageResources');
         /* @var $eventLogger editor_Models_Logger_LanguageResources */

@@ -84,6 +84,11 @@ abstract class editor_Services_ServiceAbstract {
      */
     abstract public function getName();
 
+    public function getUiName(): string
+    {
+        return $this->getName();
+    }
+
     /**
      * Ugly little helper to unify already outdated code
      * @param mixed $configValue

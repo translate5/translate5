@@ -49,7 +49,7 @@ Ext.define('Editor.view.admin.task.menu.TaskActionMenu', {
         taskPrefs: '#UT#Aufgabenspezifische Einstellungen',
         exp: '#UT#Export',
         actionExcelReimport: '#UT#Excel Re-Importieren',
-        projectOverview: '#UT#zum Projekt springen',
+        projectOverview: '#UT#Zum Projekt springen – wechselt in die Projektliste',
         taskOverview: '#UT#zur Aufgabe springen',
         actionDeleteProject: '#UT#Projekt komplett löschen'
     },

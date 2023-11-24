@@ -37,6 +37,7 @@ use MittagQI\Translate5\Task\Lock;
 use MittagQI\Translate5\Task\TaskContextTrait;
 use MittagQI\Translate5\Task\TaskService;
 use MittagQI\ZfExtended\Controller\Response\Header;
+use MittagQI\ZfExtended\Session\SessionInternalUniqueId;
 use PhpOffice\PhpSpreadsheet\Writer\Exception;
 
 class editor_TaskController extends ZfExtended_RestController
@@ -1414,8 +1415,9 @@ class editor_TaskController extends ZfExtended_RestController
         $oldUserTaskAssoc = clone $userTaskAssoc;
 
         if ($isOpen) {
-            $session = new Zend_Session_Namespace();
-            $userTaskAssoc->setUsedInternalSessionUniqId($session->internalSessionUniqId);
+            $userTaskAssoc->setUsedInternalSessionUniqId(
+                SessionInternalUniqueId::getInstance()->get()
+            );
             $userTaskAssoc->setUsedState($this->data->userState);
         } else {
             if ($isPmOverride && $isEditAllTasks) {

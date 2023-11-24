@@ -483,7 +483,7 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
 
         $serviceManager = ZfExtended_Factory::get(editor_Services_Manager::class);
 
-        $this->view->Php2JsVars()->set('LanguageResources.serviceNames', $serviceManager->getAllNames());
+        $this->view->Php2JsVars()->set('LanguageResources.serviceNames', $serviceManager->getAllUiNames());
     }
 
     /**

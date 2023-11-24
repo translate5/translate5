@@ -229,6 +229,7 @@ class TaskAssociation extends AssociationAbstract {
             $resource = $getResource($languageresource['serviceType'], $languageresource['resourceId']);
             if (!empty($resource)) {
                 $languageresource = array_merge($languageresource, $resource->getMetaData());
+                $languageresource['serviceName'] = $serviceManager->getUiNameByType($languageresource['serviceType']);
                 $available[] = $languageresource;
             }
         }
