@@ -165,8 +165,7 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
             }
 
             $id = $lrData['id'];
-
-            $languageresource['serviceName'] = $serviceManager->getUiNameByType($languageresource['serviceType']);
+            $lrData['serviceName'] = $serviceManager->getUiNameByType($lrData['serviceType']);
             //add customer assocs
             $lrData['customerIds'] = $this->getCustassoc($custAssoc, 'customerId', $id);
             $lrData['customerUseAsDefaultIds'] = $this->getCustassocByIndex($custAssoc, 'useAsDefault', $id);
