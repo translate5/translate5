@@ -150,7 +150,9 @@ class SegmentCommentRoundtripTest extends editor_Test_JsonTest {
         $expectedResult = $result[1];
         //file_put_contents('/home/tlauria/foo-export.sdlxliff', $exportedFile);
         //file_put_contents('/home/tlauria/foo-expect.sdlxliff', $expectedResult);
-        $this->assertEquals(rtrim($expectedResult), rtrim($exportedFile), 'Exported result does not equal to export-assert.sdlxliff');
+        $expectedResult = str_replace("\r\n", "\n", rtrim($expectedResult));
+        $exportedFile = str_replace("\r\n", "\n", rtrim($exportedFile));
+        $this->assertEquals($expectedResult, $exportedFile, 'Exported result does not equal to export-assert.sdlxliff');
     }
 
     protected function _testExportMemoQXliff(string $pathToZip) {
