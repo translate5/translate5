@@ -94,6 +94,7 @@
 		"ext-dom": "*",
 		"ext-mysqli": "*",
 		"ext-xmlreader": "*",
+		"ext-xmlwriter": "*",
 		"ext-sockets" : "*",
 		"ext-iconv" : "*",
       	"ext-zip": "*",
@@ -126,7 +127,8 @@
 		"symfony/yaml": "^6.0",
 		"symfony/lock": "^6.0",
 		"cesargb/php-log-rotation": "^2.7",
-		"ifsnop/mysqldump-php": "^v2.9"
+		"ifsnop/mysqldump-php": "^v2.9",
+		"google/gax": "v1.17.0"
     },
 	"extra" : {
 		"merge-plugin" : {
