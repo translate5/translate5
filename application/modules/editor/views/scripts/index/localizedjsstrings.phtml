@@ -2288,6 +2288,7 @@ Editor.data.l10n = {
 $paths = $this->pluginLocale()->getLocalePaths();
 foreach($paths as $path) {
     require $path;
+    echo "\n";
 }
 
 exit;
