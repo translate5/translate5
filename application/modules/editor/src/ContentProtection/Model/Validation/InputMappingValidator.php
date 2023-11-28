@@ -44,17 +44,6 @@ class InputMappingValidator extends ZfExtended_Models_Validator_Abstract
 
         $this->addValidator('languageId', 'int');
         $this->addValidator('contentRecognitionId', 'int');
-
-        $priorityValidator = new Zend_Validate();
-
-        $priorityValidator->addValidator($this->validatorFactory('int'), true);
-        $priorityValidator->addValidator(
-            $this->validatorFactory(
-                'Db_NoRecordExists',
-                ['table' => 'LEK_content_protection_input_mapping', 'field' => 'priority']
-            )
-        );
-
-        $this->addValidatorInstance('priority', $priorityValidator);
+        $this->addValidator('priority', 'int');
     }
 }
