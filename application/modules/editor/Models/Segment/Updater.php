@@ -26,6 +26,7 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\Task\TaskEventTrigger;
 use MittagQI\Translate5\ContentProtection\ContentProtector;
 use MittagQI\Translate5\ContentProtection\NumberProtector;
 
@@ -136,8 +137,19 @@ class editor_Models_Segment_Updater {
     {
         $this->segment->updateIsTargetRepeated($this->segment->getTargetMd5(), $oldSegmentHash);
 
-        //call after segment put handler
-        $this->updateLanguageResources();
+        if (Zend_Registry::get('config')->runtimeOptions->LanguageResources?->tmQueuedUpdate) {
+            //call after segment put handler
+            (new TaskEventTrigger())->triggerAfterSegmentUpdate($this->task, $this->segment);
+        }
+        // TODO TRANSLATE-3579 Delete this branch of logic and config above
+        else {
+            /* @var $segment editor_Models_Segment */
+            $manager = ZfExtended_Factory::get('editor_Services_Manager');
+            /* @var $manager editor_Services_Manager */
+            if (editor_Models_Segment_MatchRateType::isUpdateable($this->segment->getMatchRateType())) {
+                $manager->updateSegment($this->segment);
+            }
+        }
 
         //update the segment finish count for the current workflow step
         $this->task->changeSegmentFinishCount($this->task, $this->segment->getAutoStateId(), $history->getAutoStateId());
@@ -259,18 +271,6 @@ class editor_Models_Segment_Updater {
         //if it is tm or term collection and the matchrate is >=100, log the usage
         if(($languageresource->isTm() || $languageresource->isTc()) && $segment->getMatchRate() >= editor_Services_Connector_FilebasedAbstract::EXACT_MATCH_VALUE){
             $this->logAdapterUsageOnSegmentEdit($languageresource);
-        }
-    }
-    
-    /**
-     * After a segment is changed we inform the language resource services about that. What they do with this information is the service's problem.
-     */
-    protected function updateLanguageResources(): void {
-        /* @var $segment editor_Models_Segment */
-        $manager = ZfExtended_Factory::get('editor_Services_Manager');
-        /* @var $manager editor_Services_Manager */
-        if(editor_Models_Segment_MatchRateType::isUpdateable($this->segment->getMatchRateType())) {
-            $manager->updateSegment($this->segment);
         }
     }
 

@@ -64,7 +64,10 @@ Ext.define('Editor.controller.Termportal', {
             itemId: 'btnTermPortal',
             name: 'btnTermPortal',
             glyph: 'xf002@FontAwesome5FreeSolid',
-            text:me.strings.termPortal
+            text:me.strings.termPortal,
+            bind: {
+                tooltip: '{l10n.TermPortal.tab.tooltip}'
+            }
         });
     },
 

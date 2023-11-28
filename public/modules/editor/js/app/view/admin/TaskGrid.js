@@ -355,6 +355,7 @@ Ext.define('Editor.view.admin.TaskGrid', {
 
         config = {
             title: me.title, //see EXT6UPD-9
+            tooltip: Editor.data.l10n.tasksGrid.tooltip,
             languageStore: Ext.StoreMgr.get('admin.Languages'),
             customerStore: Ext.StoreManager.get('customersStore'),
             columns: {
@@ -545,7 +546,13 @@ Ext.define('Editor.view.admin.TaskGrid', {
                             type: 'string'
                         },
                         tdCls: 'taskNr',
-                        text: me.text_cols.taskNr
+                        text: me.text_cols.taskNr,
+                        renderer: function(value, meta) {
+                            if (value) {
+                                meta.tdAttr = 'data-qtip="' + Editor.data.l10n.tasksGrid.actionColumn.actionEdit + '"';
+                            }
+                            return value;
+                        }
                     }, {
                         xtype: 'numbercolumn',
                         width: 70,
@@ -875,7 +882,7 @@ Ext.define('Editor.view.admin.TaskGrid', {
         });
     },
     onDestroy: function () {
-        if (this.tooltip) {
+        if (this.tooltip && this.tooltip.destroy) {
             this.tooltip.destroy();
         }
         this.callParent(arguments);
