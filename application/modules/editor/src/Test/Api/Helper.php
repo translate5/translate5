@@ -919,7 +919,6 @@ final class Helper extends ZfExtended_Test_ApiHelper
                 return false;
             }
             if($value !== null && !ConfigHelper::isValueEqual($foundConfigs[$name], $value)){
-                error_log("COMPARE: " . print_r($foundConfigs[$name], true) . ' | ' . print_r($value, true));
                 error_log('Found config '.$name.' does not match the expected value!');
                 return false;
             }
