@@ -94,6 +94,7 @@
 		"ext-dom": "*",
 		"ext-mysqli": "*",
 		"ext-xmlreader": "*",
+		"ext-xmlwriter": "*",
 		"ext-sockets" : "*",
 		"ext-iconv" : "*",
       	"ext-zip": "*",
