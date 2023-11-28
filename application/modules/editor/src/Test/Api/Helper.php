@@ -892,9 +892,8 @@ final class Helper extends ZfExtended_Test_ApiHelper
                     "Config $name in $origin is empty but should be set with a value!"
                 );
             } else {
-                $this->test::assertEquals(
-                    $value,
-                    $configValue,
+                $this->test::assertTrue(
+                    ConfigHelper::isValueEqual($configValue, $value),
                     "Config $name in $origin is not as expected!"
                 );
             }
@@ -919,7 +918,8 @@ final class Helper extends ZfExtended_Test_ApiHelper
                 error_log('Found config '.$name.' is empty but should have a non-empty value');
                 return false;
             }
-            if($value !== null && $foundConfigs[$name] != $value){
+            if($value !== null && !ConfigHelper::isValueEqual($foundConfigs[$name], $value)){
+                error_log("COMPARE: " . print_r($foundConfigs[$name], true) . ' | ' . print_r($value, true));
                 error_log('Found config '.$name.' does not match the expected value!');
                 return false;
             }

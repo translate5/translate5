@@ -40,7 +40,9 @@ class SegmentWorkflowTest extends editor_Test_ImportTest {
         'editor_Plugins_ManualStatusCheck_Bootstrap'
     ];
 
-    protected static array $requiredRuntimeOptions = ['editor.notification.saveXmlToFile' => 1];
+    protected static array $requiredRuntimeOptions = [
+        'editor.notification.saveXmlToFile' => 1
+    ];
 
     protected static function setupImport(Config $config): void
     {
