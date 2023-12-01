@@ -47,7 +47,7 @@ class editor_ContentprotectionoutputmappingController extends ZfExtended_RestCon
 
     public function indexAction(): void
     {
-        /** @var array{id: int, languageId: int, type: string, name: string, format: string}[] rows */
+        /** @var array{id: int, languageId: int, type: string, name: string, description: string, format: string}[] */
         $this->view->rows = $this->entity->loadAllForFrontEnd();
         $this->view->total = $this->entity->getTotalCount();
     }

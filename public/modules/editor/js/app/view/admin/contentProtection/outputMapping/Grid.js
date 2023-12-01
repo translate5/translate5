@@ -162,7 +162,19 @@ Ext.define('Editor.view.admin.contentProtection.outputMapping.Grid', {
                 dataIndex: 'name',
                 flex: 2,
                 bind: {
-                    text: '{l10n.general.name}'
+                    text: '{l10n.contentProtection.mapping.rule_name}'
+                },
+                filter: {
+                    type: 'string',
+                    phpMode: false
+                }
+            },
+            {
+                xtype: 'gridcolumn',
+                dataIndex: 'description',
+                flex: 3,
+                bind: {
+                    text: '{l10n.contentProtection.mapping.rule_description}'
                 },
                 filter: {
                     type: 'string',
@@ -175,7 +187,7 @@ Ext.define('Editor.view.admin.contentProtection.outputMapping.Grid', {
                 dataIndex: 'format',
                 stateId: 'format',
                 bind: {
-                    text: '{l10n.general.format}'
+                    text: '{l10n.contentProtection.mapping.output_format}'
                 },
                 editor: {
                     field: {

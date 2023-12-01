@@ -9627,6 +9627,18 @@ E-Mail: service@MittagQI.com</pre>
                 <br/><a href="https://icu4c-demos.unicode.org" target="_blank" rel="noopener noreferrer">4. ICU Demonstration</a>
                 </target>
             </trans-unit>
+            <trans-unit id="UmVnZWxiZXNjaHJlaWJ1bmc=">
+                <source>Regelbeschreibung</source>
+                <target>Rule description</target>
+            </trans-unit>
+            <trans-unit id="UmVnZWxuYW1l">
+                <source>Regelname</source>
+                <target>Rule name</target>
+            </trans-unit>
+            <trans-unit id="QXVzZ2FiZWZvcm1hdA==">
+                <source>Ausgabeformat</source>
+                <target>Output format</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

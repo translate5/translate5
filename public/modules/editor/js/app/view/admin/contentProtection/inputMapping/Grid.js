@@ -176,7 +176,19 @@ Ext.define('Editor.view.admin.contentProtection.inputMapping.Grid', {
                 dataIndex: 'name',
                 flex: 3,
                 bind: {
-                    text: '{l10n.general.name}'
+                    text: '{l10n.contentProtection.mapping.rule_name}'
+                },
+                filter: {
+                    type: 'string',
+                    phpMode: false
+                }
+            },
+            {
+                xtype: 'gridcolumn',
+                dataIndex: 'description',
+                flex: 3,
+                bind: {
+                    text: '{l10n.contentProtection.mapping.rule_description}'
                 },
                 filter: {
                     type: 'string',

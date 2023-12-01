@@ -96,7 +96,7 @@ class OutputMapping extends ZfExtended_Models_Entity_Abstract
             ->join(
                 ['recognition' => $recognitionTable],
                 'recognition.id = mapping.contentRecognitionId',
-                ['type', 'name']
+                ['type', 'name', 'description']
             );
 
         return $this->loadFilterdCustom($s);

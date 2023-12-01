@@ -86,7 +86,7 @@ class InputMapping extends ZfExtended_Models_Entity_Abstract
             ->join(
                 ['recognition' => $recognitionTable],
                 'recognition.id = mapping.contentRecognitionId',
-                ['type', 'name', 'enabled']
+                ['type', 'name', 'enabled', 'description']
             )
             ->order('id desc');
 

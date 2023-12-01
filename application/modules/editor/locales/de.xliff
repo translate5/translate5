@@ -9455,6 +9455,18 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
                 <br/><a href="https://icu4c-demos.unicode.org" target="_blank" rel="noopener noreferrer">4. ICU-Demonstration</a>
                 </target>
             </trans-unit>
+            <trans-unit id="UmVnZWxiZXNjaHJlaWJ1bmc=">
+                <source>Regelbeschreibung</source>
+                <target>Regelbeschreibung</target>
+            </trans-unit>
+            <trans-unit id="UmVnZWxuYW1l">
+                <source>Regelname</source>
+                <target>Regelname</target>
+            </trans-unit>
+            <trans-unit id="QXVzZ2FiZWZvcm1hdA==">
+                <source>Ausgabeformat</source>
+                <target>Ausgabeformat</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

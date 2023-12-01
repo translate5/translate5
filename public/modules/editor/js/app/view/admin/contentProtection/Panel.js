@@ -48,7 +48,7 @@ Ext.define('Editor.view.admin.contentProtection.Panel', {
     bind: {
         title: '{l10n.contentProtection.title}'
     },
-    glyph: 'f292@FontAwesome5FreeSolid',
+    glyph: 'f023@FontAwesome5FreeSolid',
     /** @property {string} routePrefix Used to setup routes on different view instances */
     routePrefix: '',
     layout: {
