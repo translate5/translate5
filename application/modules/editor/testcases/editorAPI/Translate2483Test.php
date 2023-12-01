@@ -151,6 +151,9 @@ class Translate2483Test extends editor_Test_JsonTest {
 
         // Does the result match our expectations?
         foreach ($allTranslations['OpenTM2'] as $translation){
+
+            self::assertNotEmpty($translation,"InstantTranslate: no translation where saved to the TM");
+
             $translation = htmlspecialchars_decode($translation[0]->target);
             $this->assertEquals(self::$targetText, $translation, 'Result of translation is not as expected! Text was:'."\n".self::$sourceText);
         }
