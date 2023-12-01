@@ -9,19 +9,19 @@ START LICENSE AND COPYRIGHT
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
  This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
- as published by the Free Software Foundation and appearing in the file agpl3-license.txt 
- included in the packaging of this file.  Please review the following information 
+ as published by the Free Software Foundation and appearing in the file agpl3-license.txt
+ included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or
  plugin-exception.txt in the root folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
@@ -30,7 +30,7 @@ use MittagQI\Translate5\Test\Import\Config;
 use MittagQI\Translate5\Test\Import\LanguageResource;
 
 /**
- * Test microsoft translator api for dictonary,normal and segmentation search
+ * Test microsoft translator api for dictionary,normal and segmentation search
  */
 class MicrosoftTranslatorTest extends editor_Test_ImportTest {
 
@@ -51,62 +51,86 @@ class MicrosoftTranslatorTest extends editor_Test_ImportTest {
 
     protected static bool $skipIfOptionsMissing = true; // we skip the tests if the neccessary configs are not there ...
 
+    /**
+     * @throws \MittagQI\Translate5\Test\Import\Exception
+     * @throws ZfExtended_Exception
+     */
     protected static function setupImport(Config $config): void
     {
         if (!self::isMasterTest()) {
             self::markTestSkipped('Test runs only in master test to reduce usage/costs.');
         } else {
             static::$microsoftTranslator = $config
-                ->addLanguageResource('microsofttranslator', null, static::getTestCustomerId(), static::$sourceLangRfc, static::$targetLangRfc)
-                ->setProperty('name', static::NAME_PREFIX . static::class);
+                ->addLanguageResource(
+                    'microsofttranslator',
+                    null,
+                    static::getTestCustomerId(),
+                    static::$sourceLangRfc,
+                    static::$targetLangRfc
+                )->setProperty('name', static::NAME_PREFIX . static::class);
         }
     }
 
+    /**
+     * @throws \MittagQI\Translate5\Test\Import\Exception
+     * @throws Zend_Http_Client_Exception
+     */
     public function testResource(){
         $response = static::api()->getJson('editor/languageresourceinstance/'.static::$microsoftTranslator->getId());
         static::assertEquals('available', $response->status, 'Tm import stoped. Tm state is:'.$response->status);
     }
-    
+
+    /**
+     * @throws Zend_Http_Client_Exception
+     * @throws \MittagQI\Translate5\Test\Import\Exception
+     */
     public function testSearch(){
         $this->simpleTextTranslation();
-        $this->translateText('wagen','dictonary.txt');
     }
 
-    /***
+    /**
+     * @throws Zend_Http_Client_Exception
+     * @throws \MittagQI\Translate5\Test\Import\Exception
+     */
+    public function testDictionary(){
+        $this->simpleDictionaryTranslation();
+    }
+
+    /**
      * This will search for single text just to test if the translator returns any translation data. This will not
      * check if the translated data is correct since this can be different from time to time
      * @return void
      * @throws Zend_Http_Client_Exception
+     * @throws \MittagQI\Translate5\Test\Import\Exception
      */
-    private function simpleTextTranslation(){
+    private function simpleTextTranslation(): void
+    {
         $filtered = $this->translateRequest('Tür');
 
         $this->assertNotEmpty($filtered->target,'Empty translation.');
     }
 
-    /***
-     * Translate text and test the results
-     * @param string $text
-     * @param string $fileName
+    /**
+     * This will search for text with dictionary search just to test if the translator returns any translation data.
+     * This will not validate the content of the result because this can be different from time to time
+     * @throws Zend_Http_Client_Exception
+     * @throws \MittagQI\Translate5\Test\Import\Exception
      */
-    private function translateText(string $text, string $fileName){
-        //filter only the microsoft results
-        $filtered = $this->translateRequest($text);
-        
-        //this is to recreate the file from the api response
-        if(static::api()->isCapturing()){
-            file_put_contents(static::api()->getFile($fileName, null, false), json_encode($filtered, JSON_PRETTY_PRINT));
-        }
-        $expected = static::api()->getFileContent($fileName);
-        $actual = json_encode($filtered, JSON_PRETTY_PRINT);
-        //check for differences between the expected and the actual content
-        $this->assertEquals($expected, $actual, "The expected file an the result file does not match.");
+    private function simpleDictionaryTranslation(): void
+    {
+        $filtered = $this->translateRequest('wagen');
+        $this->assertNotEmpty($filtered->target,'Empty dictionary translation.');
+        $this->assertNotEmpty($filtered->metaData,'Empty dictionary metaData translation.');
+        $this->assertNotEmpty(
+            $filtered->metaData->alternativeTranslations,
+            'Empty dictionary metaData->alternativeTranslations translation.'
+        );
     }
 
     /**
      * @param string $text
      * @return stdClass
-     * @throws Zend_Http_Client_Exception
+     * @throws Zend_Http_Client_Exception|\MittagQI\Translate5\Test\Import\Exception
      */
     private function translateRequest(string $text): stdClass
     {
@@ -121,11 +145,14 @@ class MicrosoftTranslatorTest extends editor_Test_ImportTest {
         return $this->filterResult($result);
     }
 
-    /***
+    /**
      * Filter only the required fields for the test
      * @param mixed $result
+     * @return array|mixed
+     * @throws \MittagQI\Translate5\Test\Import\Exception
      */
-    private function filterResult($result){
+    private function filterResult(mixed $result): mixed
+    {
         //filter only microsoft service results
         $serviceName = static::$microsoftTranslator->getServiceName();
         $resourceName = static::$microsoftTranslator->getName();

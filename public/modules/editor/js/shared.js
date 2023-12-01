@@ -56,26 +56,11 @@ function logoutOnWindowClose() {
         if (!Editor.data.logoutOnWindowClose) {
             return;
         }
-
-        // Get regexp to pick zfExtended-cookie
-        var rex = /(?:^|; )zfExtended=([^;]*)(?:; |$)/,
-            m = document.cookie.match(rex),
-            zfExtended = m ? m[1] : false;
-
-        // Prepare FormData object to be submitted via sendBeacon()
-        var fd = new FormData();
-        if (zfExtended) {
-            fd.append('zfExtended', zfExtended);
-        }
-        fd.append('noredirect', 1);
-
-        // Destroy the user session and prevent redirect
-        navigator.sendBeacon(Editor.data.pathToRunDir + '/login/logout?beacon=true', fd);
-
-        // Remove now invalid session cookie
+        // Destroy the user session and prevent redirect. The sendBacon uses HTTP POST requests to send data, and
+        // cookies are automatically included in the request.
+        navigator.sendBeacon(Editor.data.pathToRunDir + '/login/logout?noredirect=1&beacon=true');
         document.cookie = "zfExtended=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-        //document.cookie = document.cookie.replace(rex, '; ').replace(/^; |; $/, '');
-    }
+    };
 }
 
 /**
