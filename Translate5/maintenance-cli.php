@@ -39,6 +39,7 @@ use Translate5\MaintenanceCli\Command\{AuthTokenCommand,
     CachePurgeCommand,
     ChangelogCommand,
     ConfigCommand,
+    ContentProtectionLanguageRulesHashesRefreshCommand,
     CronCommand,
     DatabaseBackupCommand,
     DatabaseStatCommand,
@@ -175,6 +176,7 @@ $commands = [
     new WorkflowCloneCommand(),
     new WorkflowListCommand(),
     new WorkflowStepCommand(),
+    new ContentProtectionLanguageRulesHashesRefreshCommand(),
 ];
 if (file_exists('.git')) {
     $commands[] = new DevelopmentGithookCommand();

@@ -61,7 +61,7 @@ class ContentProtectionRepository
     /**
      * @return iterable<ContentRecognitionDto>
      */
-    public function getAll(editor_Models_Languages $sourceLang): iterable
+    public function getAll(editor_Models_Languages $sourceLang, ?array $orderBy = null): iterable
     {
         $dbMapping = ZfExtended_Factory::get(InputMapping::class)->db;
         $dbContentRecognition = ZfExtended_Factory::get(ContentRecognition::class)->db;
@@ -78,7 +78,7 @@ class ContentProtectionRepository
 
         $select = $dbMapping->select()
             ->setIntegrityCheck(false)
-            ->from(['mapping' => $dbMapping->info($dbMapping::NAME)], [])
+            ->from(['mapping' => $dbMapping->info($dbMapping::NAME)], ['mapping.priority'])
             ->join(
                 ['recognition' => $contentRecognitionTable],
                 'recognition.id = mapping.contentRecognitionId',
@@ -86,7 +86,7 @@ class ContentProtectionRepository
             )
             ->where('mapping.languageId IN (?)', $ids)
             ->where('recognition.enabled = true')
-            ->order('priority desc')
+            ->order($orderBy ?: 'priority desc')
         ;
 
         foreach ($dbMapping->fetchAll($select) as $formatData) {
@@ -173,5 +173,40 @@ class ContentProtectionRepository
         } catch (ZfExtended_Models_Entity_NotFoundException) {
             return null;
         }
+    }
+
+    public function getRulesHashBy(editor_Models_Languages $language): string
+    {
+        $rules = $this->getAll($language, ['regex', 'matchId', 'keepAsIs', 'format', 'priority']);
+
+        $lines = [];
+        foreach ($rules as $rule) {
+            $lines[] = sprintf(
+                '%s:%s:%s:%s:%s',
+                $rule->regex,
+                $rule->matchId,
+                $rule->keepAsIs,
+                $rule->format
+                , $rule->priority
+            );
+        }
+
+        return md5(implode('|', $lines));
+    }
+
+    public function getLanguageRulesHashMap(): array
+    {
+        $db = ZfExtended_Factory::get(LanguageRulesHash::class)->db;
+        $select = $db->select()->from(['hashes' => $db->info($db::NAME)], ['languageId', 'hash']);
+
+        return array_column($db->fetchAll($select)->toArray(), 'hash', 'languageId');
+    }
+
+    public function getLanguageResourceRulesHashMap(): array
+    {
+        $db = ZfExtended_Factory::get(LanguageResourceRulesHash::class)->db;
+        $select = $db->select()->from(['hashes' => $db->info($db::NAME)], ['languageResourceId', 'hash']);
+
+        return array_column($db->fetchAll($select)->toArray(), null, 'languageResourceId');
     }
 }

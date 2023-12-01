@@ -9467,6 +9467,22 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
                 <source>Ausgabeformat</source>
                 <target>Ausgabeformat</target>
             </trans-unit>
+            <trans-unit id="RGllIFJlZ2VsbiBmw7xyIGRpZSBFcmtlbm51bmcgdm9uIEluaGFsdGVuIGhhYmVuIHNpY2ggZsO8ciBkaWVzZSBTcHJhY2hyZXNzb3VyY2UgZ2XDpG5kZXJ0LCBzaWUgc29sbHRlIGtvbnZlcnRpZXJ0IHdlcmRlbi4gR2VoZW4gU2llIGRhenUgYXVmIGRpZSBLb25maWd1cmF0aW9uc3NlaXRlIGRlciBFcmtlbm51bmdzcmVnZWxuIG9kZXIgRnJhZ2VuIFNpZSBJaHJlbiBQcm9qZWt0bWFuYWdlciAoYWxsZSBLdW5kZW4pLg==">
+                <source>Die Regeln für die Erkennung von Inhalten haben sich für diese Sprachressource geändert, sie sollte konvertiert werden. Gehen Sie dazu auf die Konfigurationsseite der Erkennungsregeln oder Fragen Sie Ihren Projektmanager (alle Kunden).</source>
+                <target>Die Regeln für die Erkennung von Inhalten haben sich für diese Sprachressource geändert, sie sollte konvertiert werden. Gehen Sie dazu auf die Konfigurationsseite der Erkennungsregeln oder Fragen Sie Ihren Projektmanager (alle Kunden).</target>
+            </trans-unit>
+            <trans-unit id='S29udmVydGllcnVuZyBnZXN0YXJ0ZWQ='>
+                <source>Konvertierung gestarted</source>
+                <target>Konvertierung gestarted</target>
+            </trans-unit>
+            <trans-unit id='S29udmVydGllcnVuZyBzdGFydGVu'>
+                <source>Konvertierung starten</source>
+                <target>Konvertierung starten</target>
+            </trans-unit>
+            <trans-unit id='QWNodHVuZzogRGllIEtvbnZlcnRpZXJ1bmcga2FubiBuaWNodCBvaG5lIGRlbiBWZXJsdXN0IHZvbiBUTS1NYXRjaGVzIHLDvGNrZ8OkbmdpZyBnZW1hY2h0IHdlcmRlbi4gQml0dGUgbWFjaGVuIFNpZSB2b3JoZXIgZWluIEJhY2t1cCBkZXIgU3ByYWNocmVzc291cmNlKG4pLiBEaWUgS29udmVydGllcnVuZyBiZWVpbmZsdXNzdCBkaWUgTWF0Y2hlcyB2b24gbGF1ZmVuZGVuIEF1ZmdhYmVuLiBBdWYgZGVyIGZvbGdlbmRlbiBDb25mbHVlbmNlLVNlaXRlIHdpcmQgYmVzY2hyaWViZW4sIHdpZSBTaWUgZGllcyB1bWdlaGVuIGvDtm5uZW4u'>
+                <source>Achtung: Die Konvertierung kann nicht ohne den Verlust von TM-Matches rückgängig gemacht werden. Bitte machen Sie vorher ein Backup der Sprachressource(n). Die Konvertierung beeinflusst die Matches von laufenden Aufgaben. Auf der folgenden Confluence-Seite wird beschrieben, wie Sie dies umgehen können.</source>
+                <target>Achtung: Die Konvertierung kann nicht ohne den Verlust von TM-Matches rückgängig gemacht werden. Bitte machen Sie vorher ein Backup der Sprachressource(n). Die Konvertierung beeinflusst die Matches von laufenden Aufgaben. Auf der folgenden Confluence-Seite wird beschrieben, wie Sie dies umgehen können.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

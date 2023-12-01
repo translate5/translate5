@@ -28,6 +28,7 @@ END LICENSE AND COPYRIGHT
 
 use MittagQI\Translate5\ContentProtection\Model\ContentProtectionRepository;
 use MittagQI\Translate5\ContentProtection\Model\InputMapping;
+use MittagQI\Translate5\ContentProtection\T5memory\RecalculateRulesHashWorker;
 
 /**
  * Part of Content protection feature. Number protection part
@@ -44,9 +45,24 @@ class editor_ContentprotectioninputmappingController extends ZfExtended_RestCont
      */
     protected $entity;
 
+    public function postAction()
+    {
+        parent::postAction();
+
+        $worker = ZfExtended_Factory::get(RecalculateRulesHashWorker::class);
+        $worker->init(parameters: ['languageId' => $this->entity->getLanguageId()]);
+        $worker->queue();
+    }
+
     public function putAction()
     {
         parent::putAction();
+
+        if (array_key_exists('priority', (array)$this->data)) {
+            $worker = ZfExtended_Factory::get(RecalculateRulesHashWorker::class);
+            $worker->init(parameters: ['languageId' => $this->entity->getLanguageId()]);
+            $worker->queue();
+        }
     }
 
     public function indexAction(): void

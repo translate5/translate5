@@ -29,6 +29,7 @@ END LICENSE AND COPYRIGHT
 use MittagQI\Translate5\ContentProtection\Model\ContentRecognition;
 use MittagQI\Translate5\ContentProtection\NumberProtection\Protector\IPAddressProtector;
 use MittagQI\Translate5\ContentProtection\NumberProtection\Protector\MacAddressProtector;
+use MittagQI\Translate5\ContentProtection\T5memory\RecalculateRulesHashWorker;
 
 /**
  * Part of Content protection feature. Number protection part
@@ -59,7 +60,7 @@ class editor_ContentprotectioncontentrecognitionController extends ZfExtended_Re
          *     isDefault: bool,
          *     keepAsIs: bool,
          *     rowEnabled: bool
-         * } rows
+         * } $rows
          */
         $this->view->rows = $data;
         $this->view->total = $this->entity->getTotalCount();
@@ -69,8 +70,13 @@ class editor_ContentprotectioncontentrecognitionController extends ZfExtended_Re
     {
         parent::putAction();
 
-        if (isset($this->data['enabled'])) {
+        $updatedFields = array_keys($this->data);
+        $importantKeys = ['enabled', 'regex', 'matchId', 'keepAsIs', 'format'];
 
+        if (!empty(array_intersect($importantKeys, $updatedFields))) {
+            $worker = ZfExtended_Factory::get(RecalculateRulesHashWorker::class);
+            $worker->init(parameters: ['recognitionId' => $this->data['id']]);
+            $worker->queue();
         }
 
         if (!empty($this->view->rows)) {
@@ -102,11 +108,6 @@ class editor_ContentprotectioncontentrecognitionController extends ZfExtended_Re
             unset($this->data['rowEnabled']);
         }
     }
-
-    /**
-     * @var ContentRecognition
-     */
-    protected $entity;
 
     public function getAction(): void
     {
