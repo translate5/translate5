@@ -61,6 +61,7 @@ use Zend_Db_Table_Row;
  * @property-read int $matchId
  * @property-read string|null $format
  * @property-read bool $keepAsIs
+ * @property-read int $priority
  */
 class ContentRecognitionDto
 {
@@ -71,6 +72,7 @@ class ContentRecognitionDto
         public int $matchId,
         public ?string $format,
         public bool $keepAsIs,
+        public int $priority,
     ) {}
 
     public static function fromRow(Zend_Db_Table_Row $row): self
@@ -82,6 +84,7 @@ class ContentRecognitionDto
             (int) $row['matchId'],
             $row['format'],
             (bool) $row['keepAsIs'],
+            (int) $row['priority'],
         );
     }
 }

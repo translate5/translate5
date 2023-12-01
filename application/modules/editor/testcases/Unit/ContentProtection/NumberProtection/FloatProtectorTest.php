@@ -88,6 +88,7 @@ class FloatProtectorTest extends TestCase
             0,
             null,
             false,
+            1
         );
         $targetLangDe = new editor_Models_Languages();
         $targetLangDe->setId(0);
@@ -130,6 +131,7 @@ class FloatProtectorTest extends TestCase
             0,
             null,
             true,
+            1
         );
 
         yield 'date. keep as is' => [

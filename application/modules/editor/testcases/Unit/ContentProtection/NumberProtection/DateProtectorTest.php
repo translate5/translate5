@@ -89,6 +89,7 @@ class DateProtectorTest extends TestCase
             0,
             'Y/d/m',
             false,
+            1
         );
 
         $targetLangDe = new editor_Models_Languages();
@@ -128,6 +129,7 @@ class DateProtectorTest extends TestCase
             0,
             'Y/d/m',
             true,
+            1
         );
 
         yield 'date. keep as is' => [
@@ -155,6 +157,7 @@ class DateProtectorTest extends TestCase
             0,
             'Y/d/m',
             false,
+            1
         );
         $repo = $this->createConfiguredMock(ContentProtectionRepository::class, ['findOutputFormat' => null]);
 

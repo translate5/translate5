@@ -90,6 +90,7 @@ class IntegerProtectorTest extends TestCase
             0,
             null,
             false,
+            1
         );
         $targetLangDe = new editor_Models_Languages();
         $targetLangDe->setId(0);
@@ -132,12 +133,23 @@ class IntegerProtectorTest extends TestCase
             0,
             null,
             true,
+            1
         );
 
         yield 'keep as is' => [
             'number' => '123,456',
             'expected' => '<number type="integer" name="test-default" source="123,456" iso="123,456" target=""/>',
             'sourceFormat' => $sourceFormatKeepAsIs,
+            'targetFormat' => $targetFormat,
+            'targetLang' => $targetLangDe,
+        ];
+
+        $targetFormat = '100';
+
+        yield 'target format +!' => [
+            'number' => '1,212,312,345',
+            'expected' => '<number type="integer" name="test-default" source="1,212,312,345" iso="1212312345" target="12,123,12345"/>',
+            'sourceFormat' => $sourceFormat,
             'targetFormat' => $targetFormat,
             'targetLang' => $targetLangDe,
         ];
