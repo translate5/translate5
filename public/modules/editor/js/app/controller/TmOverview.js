@@ -74,7 +74,10 @@ Ext.define('Editor.controller.TmOverview', {
         importing: '#UT#Die Sprachressource {0} wird gerade importiert. Bitte warten Sie, bis der Import abgeschlossen ist.',
         beingTrained: '#UT#Die Sprachressource {0} wird gerade trainiert. Bitte warten Sie, bis das Training abgeschlossen ist.',
         deletionForbidden: '#UT#Sie sind nicht berechtigt, diese Sprachressource zu entfernen.',
-        error: '#UT#Fehler'
+        error: '#UT#Fehler',
+        conversionStarted: '#UT#Konvertierung gestarted',
+        conversionConfirm: '#UT#Konvertierung starten',
+        conversionConfirmText: '#UT#Soll die gewählte Sprachressource "{0}" wirklich endgültig gelöscht werden?',
     },
     refs: [{
         ref: 'tmOverviewPanel',
@@ -479,9 +482,35 @@ Ext.define('Editor.controller.TmOverview', {
                 case 'specific':
                     me.handleEditSpecific(view, cell, col, newRecord);
                     break;
+                case 'converseTm':
+                    me.handleTmConversion(view, cell, col, newRecord);
+                    break;
             }
         });
     },
+
+    handleTmConversion: function (view, cell, cellIdx, rec) {
+        const me = this;
+        Ext.Msg.confirm(
+            this.strings.conversionConfirm,
+            this.strings.conversionConfirmText,
+            function (btn) {
+                if (btn !== 'yes') {
+                    return;
+                }
+                Ext.Ajax.request({
+                    url: Editor.data.restpath + 'languageresourceinstance/' + rec.get('id') + '/synchronizetm/',
+                    params: {
+                        languageId: rec.get('sourceLang')[0]
+                    },
+                    method: 'POST',
+                    failure: (records, op) => Editor.app.getController('ServerException').handleException(op.error.response),
+                    success: () => Editor.MessageBox.addSuccess(me.strings.conversionStarted)
+                });
+            }
+        );
+    },
+
     handleDownloadTm: function (view, cell, cellIdx, rec, ev) {
         var me = this,
             proxy = rec.proxy,

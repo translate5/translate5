@@ -767,6 +767,7 @@ a.x-btn span.task-confirmation {
 .ico-tm-magnifier {background-image: url(../images/magnifier.png) !important;background-repeat:no-repeat;background-position:center;}
 .ico-tm-log {background-image: url(../images/information.png);background-repeat:no-repeat;background-position:center;}
 .ico-tm-specific {background-image: url(../images/processing.png); background-repeat:no-repeat; background-position:50% 50%;}
+.ico-tm-converseTm {background-image: url(../images/exclamation.png);background-repeat:no-repeat;background-position:center;}
 /*
 .matchGrid .x-grid-item-selected .x-grid-item-over > div {background-image:url(../images/information.png); background-repeat:no-repeat; background-position:18px center;}
 */

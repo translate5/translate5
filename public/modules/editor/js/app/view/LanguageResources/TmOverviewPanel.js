@@ -82,7 +82,8 @@ Ext.define('Editor.view.LanguageResources.TmOverviewPanel', {
         taskassocgridcell: '#UT#Zugewiesene Aufgaben',
         groupHeader: '#UT#Ressource: {name}',
         specificDataText: '#UT#Zusätzliche Infos',
-        pivotAsDefault: '#UT#Standardmäßig als Pivot verwenden'
+        pivotAsDefault: '#UT#Standardmäßig als Pivot verwenden',
+        tmNotConverted: '#UT#TM Not Converted'
     },
     cls: 'tmOverviewPanel',
     height: '100%',
@@ -166,6 +167,13 @@ Ext.define('Editor.view.LanguageResources.TmOverviewPanel', {
                     xtype: 'actioncolumn',
                     width: 120,
                     items: [{
+                        tooltip: me.strings.tmNotConverted,
+                        iconCls: 'ico-tm-converseTm',
+                        hidden: true,
+                        isDisabled: function( view, rowIndex, colIndex, item, record ) {
+                            item.hidden = null === record.get('tmConverted') || record.get('tmConverted');
+                        }
+                    },{
                         tooltip: me.strings.edit,
                         action: 'edit',
                         iconCls: 'ico-tm-edit',
@@ -617,7 +625,7 @@ Ext.define('Editor.view.LanguageResources.TmOverviewPanel', {
      * @param record
      * @returns {string}
      */
-    specificDataRenderer: function(value, meta) {
+    specificDataRenderer: function(value, meta, record) {
         if(!Ext.isEmpty(value)){
             meta.tdCls = 'gridColumnInfoIconTooltipCenter';
         }

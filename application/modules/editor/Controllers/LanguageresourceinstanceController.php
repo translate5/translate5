@@ -26,11 +26,13 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\ContentProtection\Model\ContentProtectionRepository;
 use MittagQI\Translate5\LanguageResource\CleanupAssociation\Customer;
 use MittagQI\Translate5\LanguageResource\CleanupAssociation\Task;
 use MittagQI\Translate5\LanguageResource\TaskAssociation;
 use MittagQI\Translate5\LanguageResource\TaskPivotAssociation;
 use MittagQI\Translate5\LanguageResource\Status as LanguageResourceStatus;
+use MittagQI\Translate5\LanguageResource\TmConversionService;
 use MittagQI\Translate5\Task\Current\NoAccessException;
 use MittagQI\Translate5\Task\TaskContextTrait;
 use MittagQI\ZfExtended\Controller\Response\Header;
@@ -140,6 +142,8 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         $languages = $languages->loadResourceIdsGrouped();
         $translate = ZfExtended_Zendoverwrites_Translate::getInstance();
 
+        $tmConversionService = new TmConversionService(new ContentProtectionRepository());
+
         foreach ($this->view->rows as &$lrData) {
 
             $resource = $getResource($lrData['serviceType'], $lrData['resourceId']);
@@ -175,6 +179,12 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
             $lrData['sourceLang'] = $this->getLanguage($languages, 'sourceLang', $id);
             $lrData['targetLang'] = $this->getLanguage($languages, 'targetLang', $id);
 
+            $languageresource['tmConverted'] = null;
+
+            if (editor_Services_Manager::SERVICE_OPENTM2 === $languageresource['serviceType']) {
+                $languageresource['tmConverted'] = $tmConversionService->isTmConverted($id);
+            }
+
             // categories (for the moment: just display labels for info, no editing)
             $categoryLabels = [];
             foreach ($this->getCategoryassoc($categoryAssocs, 'categoryId', $id) as $categoryId) {
@@ -183,6 +193,20 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
             $lrData['categories'] = $categoryLabels;
             $lrData['eventsCount'] = isset($eventLoggerGroupped[$id]) ? (integer)$eventLoggerGroupped[$id] : 0;
         }
+    }
+
+    public function synchronizetmAction(): void
+    {
+        $postData = $this->getAllParams();
+        $tmConversionService = new TmConversionService(new ContentProtectionRepository());
+
+        $this->view->success = true;
+
+        if ($tmConversionService->isTmConverted($postData['id'])) {
+            return;
+        }
+
+        $tmConversionService->startConversion($postData['id'], $postData['languageId']);
     }
 
     /**

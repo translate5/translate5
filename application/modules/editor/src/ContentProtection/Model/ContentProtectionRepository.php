@@ -162,6 +162,7 @@ class ContentProtectionRepository
                 ['inputRecognition.format as outputFormat']
             )
             ->where('outputMapping.languageId IN (?)', $targetIds)
+            ->orWhere('recognition.keepAsIs = true')
             ->where('recognition.enabled = true')
             ->order('priority desc')
         ;
@@ -214,5 +215,40 @@ class ContentProtectionRepository
         $contentRecognition->loadBy($type, $name);
 
         return $contentRecognition;
+    }
+
+    public function getRulesHashBy(editor_Models_Languages $language): string
+    {
+        $rules = $this->getAll($language, ['regex', 'matchId', 'keepAsIs', 'format', 'priority']);
+
+        $lines = [];
+        foreach ($rules as $rule) {
+            $lines[] = sprintf(
+                '%s:%s:%s:%s:%s',
+                $rule->regex,
+                $rule->matchId,
+                $rule->keepAsIs,
+                $rule->format
+                , $rule->priority
+            );
+        }
+
+        return md5(implode('|', $lines));
+    }
+
+    public function getLanguageRulesHashMap(): array
+    {
+        $db = ZfExtended_Factory::get(LanguageRulesHash::class)->db;
+        $select = $db->select()->from(['hashes' => $db->info($db::NAME)], ['languageId', 'hash']);
+
+        return array_column($db->fetchAll($select)->toArray(), 'hash', 'languageId');
+    }
+
+    public function getLanguageResourceRulesHashMap(): array
+    {
+        $db = ZfExtended_Factory::get(LanguageResourceRulesHash::class)->db;
+        $select = $db->select()->from(['hashes' => $db->info($db::NAME)], ['languageResourceId', 'hash']);
+
+        return array_column($db->fetchAll($select)->toArray(), null, 'languageResourceId');
     }
 }

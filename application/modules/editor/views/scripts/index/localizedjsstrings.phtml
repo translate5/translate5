@@ -1766,7 +1766,10 @@ Ext.define('Editor.controller.Localizer', {
             importing: '<?php echo $this->translate->_('Die Sprachressource {0} wird gerade importiert. Bitte warten Sie, bis der Import abgeschlossen ist.');?>',
             beingTrained: '<?php echo $this->translate->_('Die Sprachressource {0} wird gerade trainiert. Bitte warten Sie, bis das Training abgeschlossen ist.');?>',
             deletionForbidden: '<?php echo $this->translate->_('Sie sind nicht berechtigt, diese Sprachressource zu entfernen.');?>',
-            error: '<?php echo $this->translate->_('Fehler');?>'
+            error: '<?php echo $this->translate->_('Fehler');?>',
+            conversionStarted: '<?= $this->translate->_('Konvertierung gestarted'); ?>',
+            conversionConfirm: '<?= $this->translate->_('Konvertierung starten'); ?>',
+            conversionConfirmText: '<?= $this->translate->_('Achtung: Die Konvertierung kann nicht ohne den Verlust von TM-Matches rückgängig gemacht werden. Bitte machen Sie vorher ein Backup der Sprachressource(n). Die Konvertierung beeinflusst die Matches von laufenden Aufgaben. Auf der folgenden Confluence-Seite wird beschrieben, wie Sie dies umgehen können.'); ?>',
         }
     });
 
@@ -1870,7 +1873,8 @@ Ext.define('Editor.controller.Localizer', {
             groupHeader: '<?php echo $this->translate->_('Ressource: {name}');?>',
             groupHeader: '<?php echo $this->translate->_('Ressource: {name}');?>',
             specificDataText: '<?php echo $this->translate->_('Zusätzliche Infos');?>',
-            pivotAsDefault: '<?php echo $this->translate->_('Standardmäßig als Pivot verwenden');?>'
+            pivotAsDefault: '<?php echo $this->translate->_('Standardmäßig als Pivot verwenden');?>',
+            tmNotConverted: '<?php echo $this->translate->_('Die Regeln für die Erkennung von Inhalten haben sich für diese Sprachressource geändert, sie sollte konvertiert werden. Gehen Sie dazu auf die Konfigurationsseite der Erkennungsregeln oder Fragen Sie Ihren Projektmanager (alle Kunden).');?>'
         }
     });
 
