@@ -307,7 +307,7 @@ class editor_Plugins_MatchAnalysis_Export_Xml
             if(empty($subNodeList)) {
                 $node = $analyseNode->addChild($nodeTag);
                 foreach(self::ATTRIBUTES as $attribute) {
-                    $node->addAttribute($attribute, 0);
+                    $node->addAttribute($attribute, '0');
                 }
             }
             else {

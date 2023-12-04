@@ -31,9 +31,11 @@ use MittagQI\Translate5\Acl\Roles;
 use MittagQI\Translate5\Applet\AppletAbstract;
 use MittagQI\Translate5\Applet\Dispatcher;
 use MittagQI\Translate5\DbConfig\ActionsEventHandler;
+use MittagQI\Translate5\Segment\UpdateLanguageResourcesWorker;
 use MittagQI\Translate5\Task\Import\DanglingImportsCleaner;
 use MittagQI\Translate5\Task\Import\ImportEventTrigger;
 use MittagQI\Translate5\Service\SystemCheck;
+use MittagQI\Translate5\Task\TaskEventTrigger;
 use MittagQI\Translate5\Workflow\DeleteOpenidUsersAction;
 use MittagQI\ZfExtended\Acl\AutoSetRoleResource;
 use MittagQI\ZfExtended\Acl\ResourceManager as AclResourceManager;
@@ -101,19 +103,29 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
             }
         );
 
-        $handler = new ActionsEventHandler();
+        $eventHandler = new ActionsEventHandler();
 
         $eventManager->attach(
             editor_ConfigController::class,
             'afterIndexAction',
-            $handler->addDefaultsForNonZeroQualityErrorsSettingOnIndexAction()
+            $eventHandler->addDefaultsForNonZeroQualityErrorsSettingOnIndexAction()
         );
         $eventManager->attach(
             editor_ConfigController::class,
             'afterPutAction',
-            $handler->addDefaultsForNonZeroQualityErrorsSettingOnPutAction()
+            $eventHandler->addDefaultsForNonZeroQualityErrorsSettingOnPutAction()
         );
-        $eventHandler = new ActionsEventHandler();
+
+        $eventManager->attach(
+            TaskEventTrigger::class,
+            TaskEventTrigger::AFTER_SEGMENT_UPDATE,
+            function (Zend_EventManager_Event $event) {
+                $worker = ZfExtended_Factory::get(UpdateLanguageResourcesWorker::class);
+                $worker->init(parameters: ['segmentId' => $event->getParam('segment')->getId()]);
+                $worker->queue();
+            }
+        );
+
         $eventManager->attach(
             editor_ConfigController::class,
             'afterIndexAction',

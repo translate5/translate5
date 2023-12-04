@@ -183,10 +183,12 @@ class editor_Models_LanguageResources_LanguageResource extends ZfExtended_Models
      * Fetches language-resources of the specified types that have the given language-codes
      * The language-codes either must be identical (default) or are searched by similarity (primary language equals)
      * @param array $types
-     * @param string $sourceLangCode
-     * @param string $targetLangCode
-     * @param bool $respectCustomerRestriction: if set, the fetched resources must not have customers of this resource
+     * @param int $sourceLangId
+     * @param int $targetLangId
+     * @param bool $respectCustomerRestriction : if set, the fetched resources must not have customers of this resource
      * @return array
+     * @throws ReflectionException
+     * @throws Zend_Cache_Exception
      */
     public function getByTypesAndLanguages(
         array $types,
@@ -483,6 +485,8 @@ class editor_Models_LanguageResources_LanguageResource extends ZfExtended_Models
     /**
      * returns the resource used by this languageResource instance
      * @return editor_Models_LanguageResources_Resource
+     * @throws ReflectionException
+     * @throws editor_Services_Exceptions_NoService
      */
     public function getResource() {
         $manager = ZfExtended_Factory::get('editor_Services_Manager');
@@ -580,7 +584,7 @@ class editor_Models_LanguageResources_LanguageResource extends ZfExtended_Models
 
     /**
      * Get the source lang name from the languageresource language table
-     * @return string|null
+     * @return string|array
      * @throws ZfExtended_ValidateException
      */
     public function getSourceLangName(): string|array
@@ -610,7 +614,7 @@ class editor_Models_LanguageResources_LanguageResource extends ZfExtended_Models
 
     /**
      * Get the target lang name from the languageresource language table
-     * @return string|null
+     * @return string|array
      * @throws ZfExtended_ValidateException
      */
     public function getTargetLangName(): string|array

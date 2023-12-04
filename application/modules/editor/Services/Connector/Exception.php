@@ -51,6 +51,8 @@ class editor_Services_Connector_Exception extends ZfExtended_BadGatewayErrorCode
         'E1512' => 'The TM is being reorganized at the moment. Please try again later.',
         'E1536' => 'Request to service {service}: Parameter {paramname} missing.',
         'E1537' => 'Request to service {service}: Invalid response.',
+        'E1564' => 't5memory: Language Resource [{name}] has no writable memory in list',
+        'E1565' => 'Invalid offset provided. Should be: tmId:offset'
     ];
     
     protected function setDuplication() {

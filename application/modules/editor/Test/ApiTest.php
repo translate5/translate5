@@ -294,6 +294,9 @@ abstract class editor_Test_ApiTest extends TestCase
     final public static function setUpBeforeClass(): void
     {
         try {
+
+            self::logTestStart();
+
             static::testSpecificInit();
 
             // each test gets an own api-object, the instance of the current test is for code-completion and does not hurt, since the constructor does nothing
@@ -346,6 +349,8 @@ abstract class editor_Test_ApiTest extends TestCase
 
     final public static function tearDownAfterClass(): void
     {
+        self::logTestEnd();
+
         // ensure the teardown happens as testmanager
         static::api()->login('testmanager');
         // everything is wrapped in try-catch to make sure, all cleanups are executed. Anyone knows a better way to collect exceptions ?
@@ -548,5 +553,23 @@ abstract class editor_Test_ApiTest extends TestCase
             static::assertEquals(200, $response->getStatus(), 'Load test customer request does not respond HTTP 200! Body was: ' . $response->getBody());
             static::$_testCustomers[$index] = $customer->id;
         }
+    }
+
+    /**
+     * Logs the start of a test
+     * @return void
+     */
+    private static function logTestStart(): void
+    {
+        error_log('Starting test: ' . static::class. ' | ' . NOW_ISO );
+    }
+
+    /**
+     * Logs the end of a test
+     * @return void
+     */
+    private static function logTestEnd(): void
+    {
+        error_log('Finished test: ' . static::class . ' | ' . NOW_ISO );
     }
 }

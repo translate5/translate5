@@ -36,8 +36,12 @@ use MittagQI\Translate5\Segment\TagRepair\HtmlProcessor;
  * @method editor_Services_ServiceResult query() query(editor_Models_Segment $segment)
  * @method editor_Services_ServiceResult search() search(string $searchString, $field = 'source', $offset = null)
  * @method editor_Services_ServiceResult translate() translate(string $searchString)
+ * @method void update(editor_Models_Segment $segment) editor_Services_Connector_Abstract::update()
  * @method string getStatus() getStatus(editor_Models_LanguageResources_Resource $resource, editor_Models_LanguageResources_LanguageResource $languageResource = null) returns the LanguageResource status
  * @method string getLastStatusInfo() getLastStatusInfo() returns the last store status info from the last getStatus call
+ * @method string getTm($mime, string $tmName = '') editor_Services_Connector_FilebasedAbstract::getTm()
+ * @method boolean addTm(array $fileInfo = null,array $params=null) editor_Services_Connector_Abstract::addTm()
+ * @method boolean addAdditionalTm(array $fileinfo = null, array $params = null) editor_Services_Connector_Abstract::addAdditionalTm()
  */
 class editor_Services_Connector
 {
@@ -392,5 +396,19 @@ class editor_Services_Connector
         // for batch query supported resources, set the content field to relais. For pre-translation based on the content field,
         // we check if the field is empty. Pretranslation is posible only for empty content fields
         $this->adapter->setContentField($contentField);
+    }
+
+    /**
+     * Shows if connector can export tm as a file, not a string
+     *
+     * @return bool
+     */
+    public function exportsFile(): bool
+    {
+        if (method_exists($this->adapter, 'exportsFile')) {
+            return $this->adapter->exportsFile();
+        }
+
+        return false;
     }
 }

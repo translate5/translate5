@@ -90,7 +90,7 @@ class editor_LanguageresourceresourceController extends ZfExtended_RestControlle
         }
         
         // (2)  the unconfigured services
-        $allUnconfiguredServices = $serviceManager->getAllUnconfiguredServices();
+        $allUnconfiguredServices = $serviceManager->getAllUnconfiguredServices(true);
         foreach ($allUnconfiguredServices as $unconfiguredService) {
             //filter out all configured but not reachable services(the api status request returns different status from available)
             if(isset($unconfiguredService->id) && isset($result[$unconfiguredService->id])){

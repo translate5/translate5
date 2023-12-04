@@ -68,6 +68,10 @@ class Translate2483Test extends editor_Test_JsonTest {
         'editor_Plugins_InstantTranslate_Init'
     ];
 
+    /**
+     * @throws ZfExtended_Exception
+     * @throws Exception
+     */
     public static function beforeTests(): void {
 
         $json = self::assertLogin('testmanager');
@@ -79,17 +83,32 @@ class Translate2483Test extends editor_Test_JsonTest {
                 $userIds[] = intval($userId);
             }
         }
-        self::assertContains(static::getTestCustomerId(), $userIds, 'The test customer is not assigned to the testmanager');
+        self::assertContains(
+            static::getTestCustomerId(),
+            $userIds,
+            'The test customer is not assigned to the testmanager'
+        );
         self::$sourceText = bin2hex(random_bytes(10));
         self::$targetText = bin2hex(random_bytes(10));
     }
 
 
-    /***
-     * Create and write into instant-translate memory
+    /**
      * @return void
+     * @throws Zend_Http_Client_Exception
      */
     public function testCreateAndWrite() {
+        $this->createAndWrite();
+        $this->translate();
+    }
+
+    /**
+     *  Create and write into instant-translate memory
+     * @return void
+     * @throws Zend_Http_Client_Exception
+     */
+    private function createAndWrite(): void
+    {
         self::assertLogin('testmanager');
         $response = static::api()->postJson('editor/instanttranslateapi/writetm',
             [
@@ -108,16 +127,18 @@ class Translate2483Test extends editor_Test_JsonTest {
      * InstantTranslate:
      * Run a translation with our OpenTM2-LanguageResource
      * and check if the result is as expected.
-     * IMPORTANT: the translate function will return only the results for the customers of the current user. And memories
-     * will be created for all user customers where the user has instantTranslate role
+     * IMPORTANT:The "translate" API call, will return only the results for the customers of the current user.
+     * Memories will be created for all user customers where the user has instantTranslate role
      */
-    public function testTranslation() {
+    private function translate(): void
+    {
         $params = [];
         $params['source']  = self::$sourceLang;
         $params['target'] = self::$targetLang;
         $params['text'] = self::$sourceText;
 
-        static::api()->getJson('editor/instanttranslateapi/translate', $params); // (according to Confluence: GET / according to InstantTranslate in Browser: POST)
+        // (according to Confluence: GET / according to InstantTranslate in Browser: POST)
+        static::api()->getJson('editor/instanttranslateapi/translate', $params);
         $responseBody = json_decode(static::api()->getLastResponse()->getBody());
         // Is anything returned for Deep at all?
         $this->assertIsObject($responseBody, 'InstantTranslate: Response for translation does not return an object, check error log.');
@@ -130,10 +151,14 @@ class Translate2483Test extends editor_Test_JsonTest {
 
         // Does the result match our expectations?
         foreach ($allTranslations['OpenTM2'] as $translation){
+
+            self::assertNotEmpty($translation,"InstantTranslate: no translation where saved to the TM");
+
             $translation = htmlspecialchars_decode($translation[0]->target);
             $this->assertEquals(self::$targetText, $translation, 'Result of translation is not as expected! Text was:'."\n".self::$sourceText);
         }
     }
+
 
     public static function afterTests(): void {
         foreach (self::$createdResources as $createdResource) {

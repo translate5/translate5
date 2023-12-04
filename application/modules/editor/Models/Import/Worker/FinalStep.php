@@ -9,19 +9,19 @@ START LICENSE AND COPYRIGHT
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
  This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
- as published by the Free Software Foundation and appearing in the file agpl3-license.txt 
- included in the packaging of this file.  Please review the following information 
+ as published by the Free Software Foundation and appearing in the file agpl3-license.txt
+ included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or
  plugin-exception.txt in the root folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
@@ -84,13 +84,17 @@ class editor_Models_Import_Worker_FinalStep extends ZfExtended_Worker_Abstract {
 
     /**
      * Calls the import callback - if configured!
+     * @param editor_Models_Task $task
+     * @throws ReflectionException
+     * @throws Zend_Exception
      * @throws Zend_Http_Client_Exception
      * @throws editor_Models_ConfigException
      */
-    private function callback(editor_Models_Task $task) {
+    private function callback(editor_Models_Task $task): void
+    {
         $config = $task->getConfig();
         $url = $config->runtimeOptions->import->callbackUrl ?? null;
-        if(empty($url)) {
+        if (empty($url)) {
             return;
         }
         /** @var Zend_Http_Client $http */
@@ -99,6 +103,7 @@ class editor_Models_Import_Worker_FinalStep extends ZfExtended_Worker_Abstract {
         $http->setMethod($http::POST);
         $http->setHeaders('Accept-charset', 'UTF-8');
         $http->setHeaders('Accept', 'application/json; charset=utf-8');
+        $http->setHeaders('Content-Type', 'application/json; charset=utf-8');
         $data = $task->getDataObject();
         unset($data->lockedInternalSessionUniqId);
         unset($data->qmSubsegmentFlags);
@@ -106,8 +111,10 @@ class editor_Models_Import_Worker_FinalStep extends ZfExtended_Worker_Abstract {
         $response = $http->request();
         //we consider all non 200 and 204 status values as invalid and log that!
         $validStats = [200, 204];
-        if(!in_array($response->getStatus(), $validStats, true)) {
-            $task->logger('editor.task.import')->warn('E1378', 'The task import callback HTTP status code is {code} instead 200.', [
+        if (!in_array($response->getStatus(), $validStats, true)) {
+            $task->logger('editor.task.import')->warn(
+                'E1378',
+                'The task import callback HTTP status code is {code} instead 200.', [
                 'code' => $response->getStatus(),
                 'result' => $response->getBody(),
             ]);

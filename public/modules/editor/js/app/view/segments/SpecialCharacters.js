@@ -58,7 +58,9 @@ Ext.define('Editor.view.segments.SpecialCharacters', {
                     padding:0,
                     text: '→',
                     itemId: 'btnInsertWhitespaceTab',
-                    tooltip: 'TAB'
+                    bind: {
+                        tooltip: '{l10n.segmentGrid.toolbar.chars.tab}'
+                    }
                 },{
                     xtype: 'button',
                     border: 1,
@@ -71,7 +73,9 @@ Ext.define('Editor.view.segments.SpecialCharacters', {
                     padding:0,
                     text: '↵',
                     itemId: 'btnInsertWhitespaceNewline',
-                    tooltip: 'SHIFT+ENTER'
+                    bind: {
+                        tooltip: '{l10n.segmentGrid.toolbar.chars.shiftEnter}'
+                    }
                 },{
                     xtype: 'button',
                     border: 1,
@@ -84,7 +88,10 @@ Ext.define('Editor.view.segments.SpecialCharacters', {
                     padding:0,
                     text: '⎵',
                     itemId: 'btnInsertWhitespaceNbsp',
-                    tooltip: 'CTRL+SHIFT+Space'
+                    tooltip: 'CTRL+SHIFT+Space',
+                    bind: {
+                        tooltip: '{l10n.segmentGrid.toolbar.chars.ctrlShiftSpace}'
+                    }
                 }]
             };
 
@@ -119,7 +126,8 @@ Ext.define('Editor.view.segments.SpecialCharacters', {
                     items.push({
                         xtype:'specialCharactersButton',
                         text: r.visualized,
-                        value: Editor.util.Util.toUnicodeCodePointEscape(r.unicode)
+                        value: Editor.util.Util.toUnicodeCodePointEscape(r.unicode),
+                        tooltip: Editor.data.l10n.segmentGrid.toolbar.chars[r.unicode]
                     });
                 });
             }

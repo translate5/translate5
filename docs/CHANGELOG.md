@@ -13,6 +13,53 @@ All updates are (downwards) compatible! If not this is listed in the important r
 
 
 
+
+## [6.7.2] - 2023-11-28
+
+### Important Notes:
+#### [TRANSLATE-3571](https://jira.translate5.net/browse/TRANSLATE-3571)
+The import and task finish callbacks are now sending the proper content-type application/json; charset=utf-8 - what must be supported by your endpoint if using that feature.
+ 
+
+
+### Changed
+**[TRANSLATE-3562](https://jira.translate5.net/browse/TRANSLATE-3562): LanguageResources - Make name of TildeMT configurable in system configuration** <br>
+TildeMT service name now can be configured
+
+**[TRANSLATE-3547](https://jira.translate5.net/browse/TRANSLATE-3547): LanguageResources, t5memory - Change direct saving to tm to queue** <br>
+If enabled segments in TMs will be updated asynchronously via queued worker (runtimeOptions.LanguageResources.tmQueuedUpdate)
+
+**[TRANSLATE-3542](https://jira.translate5.net/browse/TRANSLATE-3542): Editor general - Enhance translate5 with more tooltips for better usability** <br>
+Enhanced Translate5 and TermPortal tooltips
+
+**[TRANSLATE-3421](https://jira.translate5.net/browse/TRANSLATE-3421): Main back-end mechanisms (Worker, Logging, etc.) - Organize test output and php errors from live instances based on Indi Engine** <br>
+Internal improvements for automatic testing in development cycle
+
+
+### Bugfixes
+**[TRANSLATE-3583](https://jira.translate5.net/browse/TRANSLATE-3583): VisualReview / VisualTranslation - FIX Visual Image Test** <br>
+Update Google libraries to solve API-test problems
+
+**[TRANSLATE-3577](https://jira.translate5.net/browse/TRANSLATE-3577): Auto-QA - Missing DB indizes are leading to long running analysis** <br>
+Due a missing DB index the analysis and pre-translation was taking to much time.
+
+**[TRANSLATE-3573](https://jira.translate5.net/browse/TRANSLATE-3573): Main back-end mechanisms (Worker, Logging, etc.) - Fix start of task operations in case of exceptions** <br>
+FIX: QA operation workers stay in database if start of task operation failed
+
+**[TRANSLATE-3571](https://jira.translate5.net/browse/TRANSLATE-3571): API - Add missing content-type header in task import callback** <br>
+The import callback was not sending a content-type, some callback implementations were not able to handle that.
+
+**[TRANSLATE-3559](https://jira.translate5.net/browse/TRANSLATE-3559): Configuration, Test framework - Remove method \ZfExtended_Models_Config::loadListByNamePart** <br>
+Remove a internal function using the system configuration in an incomplete way.
+
+**[TRANSLATE-3496](https://jira.translate5.net/browse/TRANSLATE-3496): Main back-end mechanisms (Worker, Logging, etc.) - session code cleanup and performance improvement** <br>
+translate5 - 6.7.0 
+ * Loading performance of session data improved. (Step 1)
+translate5 - 6.7.2
+ * Storing session improved. (Step 2)
+
+
+
 ## [6.7.1] - 2023-11-08
 
 ### Important Notes:

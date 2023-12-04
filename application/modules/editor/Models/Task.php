@@ -28,6 +28,7 @@ END LICENSE AND COPYRIGHT
 
 use MittagQI\Translate5\Acl\Rights;
 use MittagQI\Translate5\Task\FileTypeSupport;
+use MittagQI\ZfExtended\Session\SessionInternalUniqueId;
 
 /**
  * Task Object Instance as needed in the application
@@ -740,8 +741,11 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
      * @return boolean
      */
     public function lockForSessionUser(string $datetime): bool {
-        $session = new Zend_Session_Namespace();
-        return $this->_lock($datetime, ZfExtended_Authentication::getInstance()->getUserGuid(), $session->internalSessionUniqId);
+        return $this->_lock(
+            $datetime,
+            ZfExtended_Authentication::getInstance()->getUserGuid(),
+            SessionInternalUniqueId::getInstance()->get()
+        );
     }
 
 
