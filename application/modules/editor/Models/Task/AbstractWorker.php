@@ -39,7 +39,8 @@ abstract class editor_Models_Task_AbstractWorker extends ZfExtended_Worker_Abstr
     protected $task;
     
     /**
-     * By default we use the import worker behaviour here (all actions to handle worker in task import context are triggered)
+     * By default we use the import worker behaviour here
+     * → all actions to handle worker in task import context are triggered
      * @var string
      */
     protected $behaviourClass = 'editor_Models_Import_Worker_Behaviour';
@@ -48,8 +49,15 @@ abstract class editor_Models_Task_AbstractWorker extends ZfExtended_Worker_Abstr
      * @var editor_Models_Import_Worker_Behaviour
      */
     protected $behaviour;
-    
-    public function init($taskGuid = NULL, $parameters = []) {
+
+    /**
+     * @throws ZfExtended_Models_Entity_NotFoundException
+     * @throws ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey
+     * @throws Zend_Db_Statement_Exception
+     * @throws ZfExtended_Models_Entity_Exceptions_IntegrityConstraint
+     * @throws ReflectionException
+     */
+    public function init($taskGuid = null, $parameters = []) {
         $this->task = ZfExtended_Factory::get(editor_Models_Task::class);
         $this->task->loadByTaskGuid($taskGuid);
         $this->initBehaviour($parameters['workerBehaviour'] ?? null);
@@ -114,6 +122,7 @@ abstract class editor_Models_Task_AbstractWorker extends ZfExtended_Worker_Abstr
                 'tasklog' => Zend_Registry::get('config')->resources->ZfExtended_Resource_Logger->writer->tasklog
             ]
         ]]);
+        $logger = Zend_Registry::get('logger');
         /* @var $logger ZfExtended_Logger */
         $logger->exception($workException, [
             'extra' => [

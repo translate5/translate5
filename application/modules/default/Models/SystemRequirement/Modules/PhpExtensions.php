@@ -65,7 +65,9 @@ class Models_SystemRequirement_Modules_PhpExtensions extends ZfExtended_Models_S
             'pdo_mysql',
             'zip',
             'sockets',
-            'curl'
+            'curl',
+            'xsl',
+            'xmlwriter',
         ];
         $missing = array_diff($needed, $loaded);
         if(empty($missing)) {

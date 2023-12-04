@@ -45,12 +45,12 @@ abstract class AbstractAuthenticatedService extends AbstractExternalService
     abstract public function getConnector(string $url = null) : AbstractConnector;
 
     /**
-     * the connector must be taken into account here
+     * Our Connector must be configured as well
      * @return bool
      */
-    public function isCheckSkipped(): bool
+    public function isProperlySetup(): bool
     {
-        return (!$this->mandatory && !($this->isConfigured() && $this->getConnector()->isConnectorConfigured()));
+        return $this->isConfigured() && $this->getConnector()->isConfigured();
     }
 
     /**
@@ -61,8 +61,8 @@ abstract class AbstractAuthenticatedService extends AbstractExternalService
     public function check(): bool
     {
         $checked = true;
-        $connectorConfigured = $this->getConnector()->isConnectorConfigured();
-        $urls = $this->getConfigValueFromName($this->configurationConfig['name'], $this->configurationConfig['type'], true);
+        $connectorConfigured = $this->getConnector()->isConfigured();
+        $urls = $this->configHelper->getValue($this->configurationConfig['name'], $this->configurationConfig['type'], true);
         if (count($urls) === 0) {
             $this->errors[] = 'There is no URL configured.';
             $checked = false;

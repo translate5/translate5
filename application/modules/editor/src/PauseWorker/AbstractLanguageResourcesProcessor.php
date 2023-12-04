@@ -71,7 +71,7 @@ abstract class AbstractLanguageResourcesProcessor
                     $task->getConfig()
                 );
 
-                if (LanguageResourceStatus::IMPORT === $connector->getStatus($resource)) {
+                if (LanguageResourceStatus::IMPORT === $connector->getStatus($resource, $languageResource)) {
                     return true;
                 }
 

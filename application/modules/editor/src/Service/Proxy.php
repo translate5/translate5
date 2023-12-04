@@ -29,7 +29,8 @@ END LICENSE AND COPYRIGHT
 namespace MittagQI\Translate5\Service;
 
 /**
- * Represents the Proxy-Service for a dockerized T5
+ * Represents the Proxy-Config for a dockerized T5
+ * if configured must be just a hostname or a list of hostnames, not an URL
  */
 final class Proxy extends DockerServiceAbstract {
 
@@ -42,6 +43,10 @@ final class Proxy extends DockerServiceAbstract {
     protected array $configurationConfig = [
         'name' => 'runtimeOptions.authentication.ipbased.useLocalProxy',
         'type' => 'list',
-        'url' => 'http://proxy.:80/'
     ];
+
+    public function checkUrl(string $url, ?string $healthCheck): bool
+    {
+        return !empty(gethostbynamel($url));
+    }
 }

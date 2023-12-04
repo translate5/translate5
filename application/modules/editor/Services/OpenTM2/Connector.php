@@ -35,20 +35,21 @@ use MittagQI\Translate5\Service\T5Memory;
  *
  * IMPORTANT: see the doc/comments in MittagQI\Translate5\Service\T5Memory
  */
-class editor_Services_OpenTM2_Connector extends editor_Services_Connector_FilebasedAbstract {
-
+class editor_Services_OpenTM2_Connector extends editor_Services_Connector_FilebasedAbstract
+{
+    private const CONCORDANCE_SEARCH_NUM_RESULTS = 20;
     /**
      * Connector
      * @var editor_Services_OpenTM2_HttpApi
      */
     protected $api;
-    
+
     /**
      * Using Xliff based tag handler here
      * @var string
      */
     protected $tagHandlerClass = 'editor_Services_Connector_TagHandler_OpenTM2Xliff';
-    
+
     /**
      * Just overwrite the class var hint here
      * @var editor_Services_Connector_TagHandler_Xliff
@@ -72,19 +73,20 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
      * @var int
      */
     private int $fuzzyReorganize = -1;
-    
-    public function __construct() {
+
+    public function __construct()
+    {
         editor_Services_Connector_Exception::addCodes([
             'E1314' => 'The queried OpenTM2 TM "{tm}" is corrupt and must be reorganized before usage!',
             'E1333' => 'The queried OpenTM2 server has to many open TMs!',
         ]);
-        
+
         //ZfExtended_Logger::addDuplicatesByMessage('E1314');
         ZfExtended_Logger::addDuplicatesByEcode('E1333', 'E1306', 'E1314');
-        
+
         parent::__construct();
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -113,111 +115,134 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
      * @throws Zend_Exception
      * @see editor_Services_Connector_FilebasedAbstract::addTm()
      */
-    public function addTm(array $fileinfo = null,array $params=null) {
+    public function addTm(array $fileinfo = null, array $params = null): bool
+    {
         $sourceLang = $this->languageResource->getSourceLangCode();
 
         //to ensure that we get unique TMs Names although of the above stripped content,
         // we add the LanguageResource ID and a prefix which can be configured per each translate5 instance
-        $name = 'ID'.$this->languageResource->getId().'-'.$this->filterName($this->languageResource->getName());
-        
-        $this->languageResource->addSpecificData('fileName',$name);
-        $this->languageResource->save();
-        
+        $name = 'ID' . $this->languageResource->getId() . '-' . $this->filterName($this->languageResource->getName());
+
         // If we are adding a TMX file as LanguageResource, we must create an empty memory first.
         $validFileTypes = $this->getValidFiletypes();
-        if(empty($validFileTypes['TMX'])){
+        if (empty($validFileTypes['TMX'])) {
             throw new ZfExtended_NotFoundException('OpenTM2: Cannot addTm for TMX-file; valid file types are missing.');
         }
+
         $noFile = empty($fileinfo);
-        $tmxUpload = !$noFile && in_array($fileinfo['type'], $validFileTypes['TMX']) && preg_match('/\.tmx$/', $fileinfo['name']);
-        if($noFile || $tmxUpload) {
-            if($this->api->createEmptyMemory($name, $sourceLang)){
-                $this->api->updateFilenameFromResult();
+        $tmxUpload = !$noFile
+            && in_array($fileinfo['type'], $validFileTypes['TMX'])
+            && preg_match('/\.tmx$/', $fileinfo['name']);
+
+        if ($noFile || $tmxUpload) {
+            $tmName = $this->api->createEmptyMemory($name, $sourceLang);
+
+            if (null !== $tmName) {
+                $this->addMemoryToLanguageResource($tmName);
+
                 //if initial upload is a TMX file, we have to import it.
-                if($tmxUpload) {
-                    return $this->addAdditionalTm($fileinfo);
+                if ($tmxUpload) {
+                    return $this->addAdditionalTm($fileinfo, ['tmName' => $tmName]);
                 }
+
                 return true;
             }
+
             $this->logger->error('E1305', 'OpenTM2: could not create TM', [
                 'languageResource' => $this->languageResource,
                 'apiError' => $this->api->getError(),
             ]);
+
             return false;
         }
-        
+
         //initial upload is a TM file
-        if($this->api->createMemory($name, $sourceLang, file_get_contents($fileinfo['tmp_name']))){
-            $this->api->updateFilenameFromResult();
+        $tmName = $this->api->createMemory($name, $sourceLang, file_get_contents($fileinfo['tmp_name']));
+        if ($tmName) {
+            $this->addMemoryToLanguageResource($tmName);
+
             return true;
         }
+
         $this->logger->error('E1304', 'OpenTM2: could not create prefilled TM', [
             'languageResource' => $this->languageResource,
             'apiError' => $this->api->getError(),
         ]);
+
         return false;
-        
     }
-    
+
+    /**
+     * Updates the filename of the language resource instance with the filename coming from the TM system
+     * @throws Zend_Exception
+     */
+    private function addMemoryToLanguageResource(string $tmName): void
+    {
+        $prefix = Zend_Registry::get('config')->runtimeOptions->LanguageResources->opentm2->tmprefix;
+        if (!empty($prefix)) {
+            //remove the prefix from being stored into the TM
+            $tmName = str_replace('^' . $prefix . '-', '', '^' . $tmName);
+        }
+
+        $memories = $this->languageResource->getSpecificData('memories', parseAsArray: true) ?? [];
+
+        foreach ($memories as &$memory) {
+            $memory['readonly'] = true;
+        }
+
+        $memories[] = ['id' => count($memories) + 1, 'filename' => $tmName, 'readonly' => false];
+
+        $this->languageResource->addSpecificData('memories', $memories);
+        //saving it here makes the TM available even when the TMX import was crashed
+        $this->languageResource->save();
+    }
+
     /**
      * {@inheritDoc}
      */
     public function addAdditionalTm(array $fileinfo = null, array $params = null): bool
     {
-        try {
-            $successful = $this->api->importMemory(file_get_contents($fileinfo['tmp_name']));
-
-            if (!$successful && $this->needsReorganizing($this->api->getError())) {
-                $this->addReorganizeWarning();
-                $this->reorganizeTm();
-            }
-
-            return $successful;
-        } catch (editor_Models_Import_FileParser_InvalidXMLException $e) {
-            $e->addExtraData([
-                'languageResource' => $this->languageResource,
-            ]);
-            $this->logger->exception($e);
-        }
-
-        $this->logger->error('E1303', 'OpenTM2: could not add TMX data to TM', [
-            'languageResource' => $this->languageResource,
-            'apiError' => $this->api->getError(),
-        ]);
-
-        return false;
+        return $this->importTmxIntoMemory(
+            file_get_contents($fileinfo['tmp_name']),
+            $params['tmName'] ?? $this->getWritableMemory()
+        );
     }
-    
+
     /**
      * {@inheritDoc}
-     * @see editor_Services_Connector_FilebasedAbstract::getValidFiletypes()
      */
-    public function getValidFiletypes() {
+    public function getValidFiletypes(): array
+    {
         return [
             'TM' => ['application/zip'],
-            'TMX' => ['application/xml','text/xml'],
+            'TMX' => ['application/xml', 'text/xml'],
         ];
     }
-    
+
     /**
      * {@inheritDoc}
-     * @see editor_Services_Connector_FilebasedAbstract::getValidFiletypeForExport()
      */
-    public function getValidExportTypes() {
+    public function getValidExportTypes(): array
+    {
         return [
             'TM' => 'application/zip',
             'TMX' => 'application/xml',
         ];
     }
-    
+
     /**
-     * (non-PHPdoc)
-     * @see editor_Services_Connector_FilebasedAbstract::getTm()
+     * {@inheritDoc}
      */
-    public function getTm($mime) {
-        if($this->api->get($mime)) {
+    public function getTm($mime, string $tmName = '')
+    {
+        if (empty($tmName)) {
+            $tmName = $this->getWritableMemory();
+        }
+
+        if ($this->api->get($mime, $tmName)) {
             return $this->api->getResult();
         }
+
         $this->throwBadGateway();
     }
 
@@ -234,7 +259,9 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
         $source = $this->tagHandler->prepareQuery($this->getQueryString($segment));
         $target = $this->tagHandler->prepareQuery($segment->getTargetEdit());
 
-        $successful = $this->api->update($source, $target, $segment, $fileName, save2disk: !$this->isInternalFuzzy);
+        $tmName = $this->getWritableMemory();
+
+        $successful = $this->api->update($source, $target, $segment, $fileName, $tmName, !$this->isInternalFuzzy);
 
         if ($successful) {
             return;
@@ -242,15 +269,25 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
 
         if ($this->needsReorganizing($this->api->getError())) {
             $this->addReorganizeWarning($segment->getTask());
-            $this->reorganizeTm();
+            $this->reorganizeTm($tmName);
 
-            $successful = $this->api->update($source, $target, $segment, $fileName, save2disk: !$this->isInternalFuzzy);
+            $successful = $this->api->update($source, $target, $segment, $fileName, $tmName, !$this->isInternalFuzzy);
+
+            if ($successful) {
+                return;
+            }
+        } elseif ($this->isMemoryOverflown($this->api->getError())) {
+            $newName = $this->generateNextMemoryName($this->languageResource);
+            $newName = $this->api->createEmptyMemory($newName, $this->languageResource->getSourceLangCode());
+            $this->addMemoryToLanguageResource($newName);
+
+            $successful = $this->api->update($source, $target, $segment, $fileName, $tmName, !$this->isInternalFuzzy);
 
             if ($successful) {
                 return;
             }
         }
-        
+
         $error = $this->api->getError();
 
         // send the error to the frontend
@@ -263,10 +300,11 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
         ]);
     }
 
-    public function updateTranslation(string $source, string $target){
-        $this->api->updateText($source,$target);
+    public function updateTranslation(string $source, string $target, string $tmName = '')
+    {
+        $this->api->updateText($source, $target, $tmName);
     }
-    
+
     /**
      * Fuzzy search
      *
@@ -276,57 +314,13 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
     {
         $fileName = $this->getFileName($segment);
         $queryString = $this->getQueryString($segment);
-        
-        //if source is empty, OpenTM2 will return an error, therefore we just return an empty list
-        if (empty($queryString) && $queryString !== '0') {
-            return $this->resultList;
-        }
-        
-        //Although we take the source fields from the OpenTM2 answer below
-        // we have to set the default source here to fill the be added internal tags
-        $this->resultList->setDefaultSource($queryString);
-        $query = $this->tagHandler->prepareQuery($queryString);
-        $successful = $this->api->lookup($segment, $query, $fileName);
+        $resultList = $this->queryTm($queryString, $segment, $fileName);
 
-        if (!$successful && $this->needsReorganizing($this->api->getError())) {
-            $this->addReorganizeWarning($segment->getTask());
-            $this->reorganizeTm();
-            $successful = $this->api->lookup($segment, $query, $fileName);
+        if (empty($resultList->getResult())) {
+            return $resultList;
         }
 
-        if (!$successful) {
-            $this->throwBadGateway();
-        }
-
-        $result = $this->api->getResult();
-
-        if ((int)$result->NumOfFoundProposals === 0) {
-            return $this->resultList;
-        }
-
-        foreach ($result->results as $found) {
-            $target = $this->tagHandler->restoreInResult($found->target);
-            $hasTargetErrors = $this->tagHandler->hasRestoreErrors();
-
-            $source = $this->tagHandler->restoreInResult($found->source);
-            $hasSourceErrors = $this->tagHandler->hasRestoreErrors();
-
-            if ($hasTargetErrors || $hasSourceErrors) {
-                //the source has invalid xml -> remove all tags from the result, and reduce the matchrate by 2%
-                $found->matchRate = $this->reduceMatchrate($found->matchRate, 2);
-            }
-
-            $matchrate = $this->calculateMatchRate(
-                $found->matchRate,
-                $this->getMetaData($found),
-                $segment,
-                $fileName
-            );
-            $this->resultList->addResult($target, $matchrate, $this->getMetaData($found));
-            $this->resultList->setSource($source);
-        }
-
-        return $this->getResultListGrouped();
+        return $this->getResultListGrouped($resultList);
     }
 
     /**
@@ -334,17 +328,18 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
      * @param editor_Models_Segment $segment
      * @return string
      */
-    protected function getFileName(editor_Models_Segment $segment): string {
-        $file = editor_ModelInstances::file($segment->getFileId());
-        return $file->getFileName();
+    protected function getFileName(editor_Models_Segment $segment): string
+    {
+        return editor_ModelInstances::file($segment->getFileId())->getFileName();
     }
-    
+
     /**
      * Helper function to get the metadata which should be shown in the GUI out of a single result
-     * @param stdClass $found
-     * @return stdClass
+     *
+     * @return object[]
      */
-    protected function getMetaData($found) {
+    private function getMetaData(object $found): array
+    {
         $nameToShow = [
             "documentName",
             "matchType",
@@ -354,20 +349,22 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
             "additionalInfo",
         ];
         $result = [];
-        foreach($nameToShow as $name) {
-            if(property_exists($found, $name)) {
+
+        foreach ($nameToShow as $name) {
+            if (property_exists($found, $name)) {
                 $item = new stdClass();
                 $item->name = $name;
                 $item->value = $found->{$name};
-                if($name == 'timestamp') {
+                if ($name == 'timestamp') {
                     $item->value = date('Y-m-d H:i:s T', strtotime($item->value));
                 }
                 $result[] = $item;
             }
         }
+
         return $result;
     }
-    
+
     /**
      * Concordance search
      *
@@ -375,47 +372,91 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
      */
     public function search(string $searchString, $field = 'source', $offset = null): editor_Services_ServiceResult
     {
-        $successful = $this->api->search($searchString, $field, $offset);
+        $offsetTmId = null;
+        $tmOffset = null;
 
-        if (!$successful && $this->needsReorganizing($this->api->getError())) {
-            $this->addReorganizeWarning();
-            $this->reorganizeTm();
-            $successful = $this->api->search($searchString, $field, $offset);
+        if (null !== $offset) {
+            @[$offsetTmId, $tmOffset] = explode(':', (string) $offset);
         }
 
-        if (!$successful) {
-            $this->throwBadGateway();
+        if (null === $tmOffset) {
+            throw new editor_Services_Connector_Exception('E1565', compact('offset'));
         }
 
-        $result = $this->api->getResult();
+        $resultList = new editor_Services_ServiceResult();
+        $resultList->setLanguageResource($this->languageResource);
 
-        if (empty($result) || empty($result->results)) {
-            $this->resultList->setNextOffset(null);
+        $results = [];
+        $resultsCount = 0;
 
-            return $this->resultList;
+        $memories = $this->languageResource->getSpecificData('memories', parseAsArray: true);
+
+        usort($memories, fn ($m1, $m2) => $m1['id'] <=> $m2['id']);
+
+        foreach ($memories as ['filename' => $tmName, 'id' => $id]) {
+            // check if current memory was searched through in prev request
+            if (null !== $offsetTmId && $id < $offsetTmId) {
+                continue;
+            }
+
+            $numResults = self::CONCORDANCE_SEARCH_NUM_RESULTS - $resultsCount;
+
+            $successful = $this->api->search($searchString, $tmName, $field, $tmOffset, $numResults);
+
+            if (!$successful && $this->needsReorganizing($this->api->getError())) {
+                $this->addReorganizeWarning();
+                $this->reorganizeTm($tmName);
+                $successful = $this->api->search($searchString, $tmName, $field, $tmOffset, $numResults);
+            }
+
+            if (!$successful) {
+                $this->logger->exception($this->getBadGatewayException($tmName));
+
+                continue;
+            }
+
+            $result = $this->api->getResult();
+
+            if (empty($result) || empty($result->results)) {
+                continue;
+            }
+
+            $results[] = $result->results;
+            $resultsCount += count($result->results);
+            $resultList->setNextOffset($id . ':' . $result->NewSearchPosition);
+
+            // if we get enough results then response them
+            if (self::CONCORDANCE_SEARCH_NUM_RESULTS <= $resultsCount) {
+                break;
+            }
         }
 
-        $this->resultList->setNextOffset($result->NewSearchPosition);
-        $results = $result->results;
+        $results = array_merge(...$results);
+
+        if (empty($results)) {
+            $resultList->setNextOffset(null);
+
+            return $resultList;
+        }
 
         //$found->{$field}
         //[NextSearchPosition] =>
         foreach ($results as $result) {
-            $this->resultList->addResult($this->highlight(
+            $resultList->addResult($this->highlight(
                 $searchString,
                 $this->tagHandler->restoreInResult($result->target),
                 $field === 'target'
             ));
-            $this->resultList->setSource($this->highlight(
+            $resultList->setSource($this->highlight(
                 $searchString,
                 $this->tagHandler->restoreInResult($result->source),
                 $field === 'source')
             );
         }
 
-        return $this->resultList;
+        return $resultList;
     }
-    
+
     /***
      * Search the resource for available translation. Where the source text is in
      * resource source language and the received results are in the resource target language
@@ -424,104 +465,81 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
      */
     public function translate(string $searchString)
     {
-        //return empty result when no search string
-        if (empty($searchString) && $searchString !== "0") {
-            return $this->resultList;
-        }
-
-        $this->resultList->setDefaultSource($searchString);
-
         //create dummy segment so we can use the lookup
         $dummySegment = ZfExtended_Factory::get('editor_Models_Segment');
         /* @var $dummySegment editor_Models_Segment */
         $dummySegment->init();
 
-        $query = $this->tagHandler->prepareQuery($searchString);
-
-        $successful = $this->api->lookup($dummySegment, $query, 'source');
-
-        if (!$successful && $this->needsReorganizing($this->api->getError())) {
-            $this->addReorganizeWarning();
-            $this->reorganizeTm();
-            $successful = $this->api->lookup($dummySegment, $query, 'source');
-        }
-
-        if ($successful) {
-            $result = $this->api->getResult();
-
-            if ((int)$result->NumOfFoundProposals === 0) {
-                return $this->resultList;
-            }
-
-            foreach ($result->results as $found) {
-                $found->target = $this->tagHandler->restoreInResult($found->target);
-                $hasTargetErrors = $this->tagHandler->hasRestoreErrors();
-                $found->source = $this->tagHandler->restoreInResult($found->source);
-                $hasSourceErrors = $this->tagHandler->hasRestoreErrors();
-
-                if ($hasTargetErrors || $hasSourceErrors) {
-                    //the source has invalid xml -> remove all tags from the result, and reduce the matchrate by 2%
-                    $found->matchRate = $this->reduceMatchrate($found->matchRate, 2);
-                }
-
-                $calcMatchRate = $this->calculateMatchRate($found->matchRate, $this->getMetaData($found), $dummySegment, 'InstantTranslate');
-
-                $this->resultList->addResult($found->target, $calcMatchRate, $this->getMetaData($found));
-                $this->resultList->setSource($found->source);
-            }
-
-            return $this->resultList;
-        }
-
-        $this->throwBadGateway();
+        return $this->queryTm($searchString, $dummySegment, 'source');
     }
-    
+
     /**
      * (non-PHPdoc)
      * @see editor_Services_Connector_FilebasedAbstract::delete()
      */
-    public function delete() {
-        if(!$this->api->delete()) {
-            $resp = $this->api->getResponse();
-            if($resp->getStatus() == 404) {
-                // if the result was a 404, then there is nothing to delete,
-                // so throw no error then and delete just locally
-                return;
+    public function delete(): void
+    {
+        $successfullyDeleted = true;
+
+        foreach ($this->languageResource->getSpecificData('memories', parseAsArray: true) as $memory) {
+            $deleted = $this->api->delete($memory['filename']);
+
+            if (!$deleted) {
+                $resp = $this->api->getResponse();
+
+                if ($resp->getStatus() == 404) {
+                    // if the result was a 404, then there is nothing to delete,
+                    // so throw no error then and delete just locally
+                    continue;
+                }
+
+                $successfullyDeleted = false;
             }
+        }
+
+        if (!$successfullyDeleted) {
             $this->throwBadGateway();
         }
     }
-    
+
     /**
      * Throws a service connector exception
      * @throws editor_Services_Connector_Exception
      */
-    protected function throwBadGateway() {
+    private function throwBadGateway(): void
+    {
+        throw $this->getBadGatewayException();
+    }
+
+    private function getBadGatewayException(string $tmName = ''): editor_Services_Connector_Exception
+    {
         $ecode = 'E1313';
         $error = $this->api->getError();
         $data = [
             'service' => $this->getResource()->getName(),
             'languageResource' => $this->languageResource ?? '',
+            'tmName' => $tmName,
             'error' => $error,
         ];
-        if(strpos($error->error ?? '', 'needs to be organized') !== false) {
+        if (strpos($error->error ?? '', 'needs to be organized') !== false) {
             $ecode = 'E1314';
             $data['tm'] = $this->languageResource->getName();
         }
-        
-        if(strpos($error->error ?? '', 'too many open translation memory databases') !== false) {
+
+        if (strpos($error->error ?? '', 'too many open translation memory databases') !== false) {
             $ecode = 'E1333';
         }
-        
-        throw new editor_Services_Connector_Exception($ecode, $data);
+
+        return new editor_Services_Connector_Exception($ecode, $data);
     }
-    
+
     /**
      * Replaces not allowed characters with "_" in memory names
      * @param string $name
      * @return string
      */
-    protected function filterName($name){
+    private function filterName($name)
+    {
         //since we are getting Problems on the OpenTM2 side with non ascii characters in the filenames,
         // we strip them all. See also OPENTM2-13.
         $name = iconv('UTF-8', 'ASCII//TRANSLIT', $name);
@@ -534,19 +552,29 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
      * {@inheritDoc}
      * @throws editor_Services_Exceptions_InvalidResponse
      */
-    public function getStatus(editor_Models_LanguageResources_Resource $resource): string
+    public function getStatus(
+        editor_Models_LanguageResources_Resource $resource,
+        editor_Models_LanguageResources_LanguageResource $languageResource = null,
+        ?string $tmName = null
+    ): string
     {
         $this->lastStatusInfo = '';
 
-        if (empty($this->languageResource)) {
+        // is may injected with the call
+        if(!empty($languageResource)){
+            $this->languageResource = $languageResource;
+        }
+
+        // for the rare cases where no language-resource is present
+        if (!isset($this->languageResource)) {
             //ping call
-            $this->api = ZfExtended_Factory::get('editor_Services_OpenTM2_HttpApi');
+            $this->api = ZfExtended_Factory::get(editor_Services_OpenTM2_HttpApi::class);
             $this->api->setResource($resource);
 
-            return $this->api->status() ? LanguageResourceStatus::AVAILABLE : LanguageResourceStatus::ERROR;
+            return $this->api->status(null) ? LanguageResourceStatus::AVAILABLE : LanguageResourceStatus::ERROR;
         }
-        
-        $name = $this->languageResource->getSpecificData('fileName');
+
+        $name = $tmName ?: $this->getWritableMemory();
 
         if (empty($name)) {
             $this->lastStatusInfo = 'The internal stored filename is invalid';
@@ -557,20 +585,13 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
         // let's check the internal state before calling API for status as import worker may be running
         $status = $this->languageResource->getStatus();
 
-        if ($status === LanguageResourceStatus::IMPORT) {
-            $this->lastStatusInfo = 'TM wird noch importiert und ist daher auch noch nicht nutzbar.';
-            // FIXME thats not 100% correct here, since when it was crashed while the import it may stay on status import
-            // need to add status reset if it hanged up
-            return LanguageResourceStatus::IMPORT;
-        }
-
         // TODO remove after reorganize status is implemented in status query on t5memory side
         if ($this->isReorganizingAtTheMoment()) {
             // Status import to prevent any other queries to TM to be performed
             return LanguageResourceStatus::IMPORT;
         }
 
-        if ($this->api->status()) {
+        if ($this->api->status($name)) {
             $result = $this->api->getResult();
 
             return $this->processImportStatus(is_object($result) ? $result : null);
@@ -595,7 +616,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
             // This will be not needed after migration to t5memory completed
             return LanguageResourceStatus::NOT_LOADED;
         }
-        
+
         $error = $this->api->getError();
 
         if (empty($error->type)) {
@@ -681,8 +702,8 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
 
         return $result;
     }
-    
-    /***
+
+    /**
      * Calculate the new matchrate value.
      * Check if the current match is of type context-match or exact-exact match
      *
@@ -693,43 +714,44 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
      *
      * @return integer
      */
-    protected function calculateMatchRate($matchRate,$metaData,$segment,$filename){
-        
-        if($matchRate<100){
+    private function calculateMatchRate($matchRate, $metaData, $segment, $filename)
+    {
+
+        if ($matchRate < 100) {
             return $matchRate;
         }
-        
-        $isExacExac=false;
-        $isContext=false;
-        foreach ($metaData as $data){
-            
+
+        $isExacExac = false;
+        $isContext = false;
+        foreach ($metaData as $data) {
+
             //exact-exact match
-            if($data->name=="documentName" && $data->value==$filename){
-                $isExacExac=true;
+            if ($data->name == "documentName" && $data->value == $filename) {
+                $isExacExac = true;
             }
 
             //context metch
-            if($data->name=="context" && $data->value==$segment->getMid()){
-                $isContext=true;
+            if ($data->name == "context" && $data->value == $segment->getMid()) {
+                $isContext = true;
             }
         }
-        
-        if($isExacExac && $isContext){
+
+        if ($isExacExac && $isContext) {
             return self::CONTEXT_MATCH_VALUE;
         }
-        
-        if($isExacExac){
+
+        if ($isExacExac) {
             return self::EXACT_EXACT_MATCH_VALUE;
         }
-        
+
         return $matchRate;
     }
-    
+
     /***
      * Download and save the existing tm with "fuzzy" name. The new fuzzy connector will be returned.
      * @param int $analysisId
-     * @throws ZfExtended_NotFoundException
      * @return editor_Services_Connector_Abstract
+     * @throws ZfExtended_NotFoundException
      */
     public function initForFuzzyAnalysis($analysisId)
     {
@@ -742,90 +764,122 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
             throw new ZfExtended_NotFoundException('Can not download in format ' . $mime);
         }
 
-        $fuzzyFileName = $this->renderFuzzyLanguageResourceName($this->languageResource->getSpecificData('fileName'), $analysisId);
-        $this->api->setResource($this->languageResource->getResource());
+        $memories = $this->languageResource->getSpecificData('memories', parseAsArray: true);
+        $fuzzyMemories = [];
 
-        // TODO T5MEMORY: remove when OpenTM2 is out of production
-        if ($this->api->isOpenTM2()) {
-            $data = $this->getTm($validExportTypes[$mime]);
-            $this->api->createMemory($fuzzyFileName, $this->languageResource->getSourceLangCode(), $data);
-        } else {
-            // HOTFIX for t5memory BUG: After a clone call the clone might is corrupt, if the cloned TM has (recent) updates
-            // an export of the cloned memory before seems to heal that (either as TM or TMX)
-            $this->getTm($validExportTypes[$mime]);
-            sleep(1);
-            $this->api->cloneMemory($fuzzyFileName);
-            sleep(1);
+        foreach ($memories as ['filename' => $memory, 'readonly' => $readonly]) {
+            $fuzzyFileName = $this->renderFuzzyLanguageResourceName($memory, $analysisId);
+            $this->api->setResource($this->languageResource->getResource());
+
+            // TODO T5MEMORY: remove when OpenTM2 is out of production
+            if ($this->api->isOpenTM2()) {
+                $data = $this->getTm($validExportTypes[$mime], $memory);
+                $this->api->createMemory($fuzzyFileName, $this->languageResource->getSourceLangCode(), $data);
+            } else {
+                // HOTFIX for t5memory BUG:
+                // After a clone call the clone might is corrupt, if the cloned TM has (recent) updates
+                // an export of the cloned memory before seems to heal that (either as TM or TMX)
+                $this->getTm($validExportTypes[$mime], $memory);
+                sleep(1);
+                $this->api->cloneMemory($fuzzyFileName, $memory);
+                sleep(1);
+            }
+
+            $fuzzyMemories[] = ['filename' => $fuzzyFileName, 'readonly' => $readonly];
         }
 
         $fuzzyLanguageResource = clone $this->languageResource;
 
         //visualized name:
-        $fuzzyLanguageResourceName = $this->renderFuzzyLanguageResourceName($this->languageResource->getName(), $analysisId);
+        $fuzzyLanguageResourceName = $this->renderFuzzyLanguageResourceName(
+            $this->languageResource->getName(),
+            $analysisId
+        );
         $fuzzyLanguageResource->setName($fuzzyLanguageResourceName);
-        $fuzzyLanguageResource->addSpecificData('fileName', $fuzzyFileName);
+        $fuzzyLanguageResource->addSpecificData('memories', $fuzzyMemories);
         //INFO: The resources logging requires resource with valid id.
         //$fuzzyLanguageResource->setId(null);
 
         $connector = ZfExtended_Factory::get(self::class);
-        $connector->connectTo($fuzzyLanguageResource, $this->languageResource->getSourceLang(), $this->languageResource->getTargetLang());
+        $connector->connectTo(
+            $fuzzyLanguageResource,
+            $this->languageResource->getSourceLang(),
+            $this->languageResource->getTargetLang()
+        );
         // copy the current config (for task specific config)
         $connector->setConfig($this->getConfig());
         // copy the worker user guid
         $connector->setWorkerUserGuid($this->getWorkerUserGuid());
         $connector->isInternalFuzzy = true;
-        $connector->parentApi = $this->api; // needed by the fuzzy connector to reorganize the parent TM if neccessary
+        // needed by the fuzzy connector to reorganize the parent TM if neccessary
+        $connector->parentApi = $this->api;
 
         return $connector;
     }
-    
+
     /***
      * Get the result list where the >=100 matches with the same target are grouped as 1 match.
      * @return editor_Services_ServiceResult|number
      */
-    public function getResultListGrouped() {
-        $allResults=$this->resultList->getResult();
-        if(empty($allResults)){
-            return $this->resultList;
+    private function getResultListGrouped(editor_Services_ServiceResult $resultList)
+    {
+        $allResults = $resultList->getResult();
+        if (empty($allResults)) {
+            return $resultList;
         }
-        
-        $showMultiple100PercentMatches = $this->config->runtimeOptions->LanguageResources->opentm2->showMultiple100PercentMatches;
-        
-        $other=array();
-        $differentTargetResult=array();
-        $document=array();
-        $target=null;
-        $resultlist=$this->resultList;
+
+        $showMultiple100PercentMatches = $this->config
+            ->runtimeOptions
+            ->LanguageResources
+            ->opentm2
+            ->showMultiple100PercentMatches;
+
+        $other = [];
+        $differentTargetResult = [];
+        $document = [];
+        $target = null;
         //filter and collect the results
         //all 100>= matches with same target will be collected
         //all <100 mathes will be collected
         //all documentName and documentShortName will be collected from matches >=100
-        $filterArray = array_filter($allResults, function ($var) use(&$other,&$document,&$target,&$differentTargetResult,$resultlist,$showMultiple100PercentMatches) {
-            //collect lower then 100 matches to separate array
-            if($var->matchrate<100){
-                $other[]=$var;
+        $filterArray = array_filter(
+            $allResults,
+            function ($result) use (
+                &$other,
+                &$document,
+                &$target,
+                &$differentTargetResult,
+                $resultList,
+                $showMultiple100PercentMatches
+            ) {
+                //collect lower than 100 matches to separate array
+                if ($result->matchrate < 100) {
+                    $other[] = $result;
+
+                    return false;
+                }
+                //set the compare target
+                if (!isset($target)) {
+                    $target = $result->target;
+                }
+
+                //is with same target or show multiple id disabled collect >=100 match for later sorting
+                if ($result->target == $target || !$showMultiple100PercentMatches) {
+                    $document[] = array(
+                        'documentName' => $resultList->getMetaValue($result->metaData, 'documentName'),
+                        'documentShortName' => $resultList->getMetaValue($result->metaData, 'documentShortName'),
+                    );
+                    return true;
+                }
+                //collect different target result
+                $differentTargetResult[] = $result;
+
                 return false;
             }
-            //set the compare target
-            if(!isset($target)){
-                $target=$var->target;
-            }
-            
-            //is with same target or show multiple id disabled collect >=100 match for later sorting
-            if($var->target==$target || !$showMultiple100PercentMatches){
-                $document[]=array(
-                    'documentName'=>$resultlist->getMetaValue($var->metaData, 'documentName'),
-                    'documentShortName'=>$resultlist->getMetaValue($var->metaData, 'documentShortName'),
-                );
-                return true;
-            }
-            //collect different target result
-            $differentTargetResult[]=$var;
-            return false;
-        });
-        
-        //sort by highes matchrate from the >=100 match results, when same matchrate sort by timestamp
-        usort($filterArray,function($item1,$item2) use($resultlist){
+        );
+
+        //sort by highest match-rate from the >=100 match results, when same match-rate sort by timestamp
+        usort($filterArray, function ($item1, $item2) use ($resultList) {
             //FIXME UGLY UGLY
             // the whole existing code of reducing double 100% matches (getResultListGrouped) must be moved to the processing of the search results for the UI usage of matches
             // this is nothing which should be handled so deep inside of the connector
@@ -833,45 +887,53 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
             // if this is moved, there is no need to contain the isFuzzy check anymore since there is then no fuzzy usage anymore.
             $item1IsFuzzy = preg_match('#^translate5-unique-id\[[^\]]+\]$#', $item1->target);
             $item2IsFuzzy = preg_match('#^translate5-unique-id\[[^\]]+\]$#', $item2->target);
-            if($item1IsFuzzy && !$item2IsFuzzy) {
+
+            if ($item1IsFuzzy && !$item2IsFuzzy) {
                 return 1;
             }
-            if(!$item1IsFuzzy && $item2IsFuzzy) {
+
+            if (!$item1IsFuzzy && $item2IsFuzzy) {
                 return -1;
             }
-            if ($item1->matchrate == $item2->matchrate){
-                return date($resultlist->getMetaValue($item1->metaData, 'timestamp'))<date($resultlist->getMetaValue($item2->metaData, 'timestamp')) ? 1 : -1;
+
+            if ($item1->matchrate == $item2->matchrate) {
+                $date1 = date($resultList->getMetaValue($item1->metaData, 'timestamp'));
+                $date2 = date($resultList->getMetaValue($item2->metaData, 'timestamp'));
+
+                return  $date1 < $date2 ? 1 : -1;
             }
+
             return ($item1->matchrate < $item2->matchrate) ? 1 : -1;
         });
-        
-        if(!empty($filterArray)){
+
+        if (!empty($filterArray)) {
             //get the highest >=100 match, and apply the documentName and documentShrotName from all >=100 matches
-            $filterArray=$filterArray[0];
+            $filterArray = $filterArray[0];
             foreach ($filterArray->metaData as $md) {
-                if($md->name=='documentName'){
-                    $md->value=implode(';',array_column($document, 'documentName'));
+                if ($md->name == 'documentName') {
+                    $md->value = implode(';', array_column($document, 'documentName'));
                 }
-                if($md->name=='documentShortName'){
-                    $md->value=implode(';',array_column($document, 'documentShortName'));
+                if ($md->name == 'documentShortName') {
+                    $md->value = implode(';', array_column($document, 'documentShortName'));
                 }
             }
         }
 
         //if it is single result, init it as array
-        if(!is_array($filterArray)){
-            $filterArray=[$filterArray];
+        if (!is_array($filterArray)) {
+            $filterArray = [$filterArray];
         }
-        
+
         //merge all available results
-        $result=array_merge($filterArray,$differentTargetResult);
-        $result=array_merge($result,$other);
-        
-        $this->resultList->resetResult();
-        $this->resultList->setResults($result);
-        return $this->resultList;
+        $result = array_merge($filterArray, $differentTargetResult);
+        $result = array_merge($result, $other);
+
+        $resultList->resetResult();
+        $resultList->setResults($result);
+
+        return $resultList;
     }
-    
+
     /***
      * Reduce the given matchrate to given percent.
      * It is used when unsupported tags are found in the response result, and those tags are removed.
@@ -879,7 +941,8 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
      * @param integer $reducePercent
      * @return number
      */
-    protected function reduceMatchrate($matchrate,$reducePercent) {
+    protected function reduceMatchrate($matchrate, $reducePercent)
+    {
         //reset higher matches than 100% to 100% match
         //if the matchrate is higher than 0, reduce it by $reducePercent %
         return max(0, min($matchrate, 100) - $reducePercent);
@@ -912,7 +975,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
             && !$this->isReorganizeFailed();
     }
 
-    public function reorganizeTm(): bool
+    public function reorganizeTm(string $tmName): bool
     {
         if (!$this->isInternalFuzzy()) {
             // TODO In editor_Services_Manager::visitAllAssociatedTms language resource is initialized
@@ -930,18 +993,16 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
         // HOTFIX for t5memory BUG: It seems a reorganize may deletes recently updated segments
         // an export of the cloned memory before seems to heal that
         $validExportTypes = $this->getValidExportTypes();
-        $this->getTm($validExportTypes['TM']);
+        $this->getTm($validExportTypes['TM'], $tmName);
         sleep(1);
-        $reorganized = $this->api->reorganizeTm();
+        $reorganized = $this->api->reorganizeTm($tmName);
 
-        if($this->isInternalFuzzy()){
-
+        if ($this->isInternalFuzzy()) {
             $this->fuzzyReorganize = time();
-            $this->waitForReorganization();
+            $this->waitForReorganization($tmName);
+
             return true;
-
         } else {
-
             $this->languageResource->setStatus(
                 $reorganized ? LanguageResourceStatus::AVAILABLE : LanguageResourceStatus::REORGANIZE_FAILED
             );
@@ -953,7 +1014,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
 
     public function isReorganizingAtTheMoment(): bool
     {
-        if($this->fuzzyReorganize > 0){
+        if ($this->fuzzyReorganize > 0) {
             return true;
         }
         $this->resetReorganizingIfNeeded();
@@ -991,8 +1052,9 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
             return;
         }
 
-        if ((new DateTimeImmutable($reorganizeStartedAt))
-                ->modify(sprintf('+%d minutes', self::MAX_REORGANIZE_TIME_MINUTES)) < new DateTimeImmutable()
+        if ((new DateTimeImmutable($reorganizeStartedAt))->modify(
+                sprintf('+%d minutes', self::MAX_REORGANIZE_TIME_MINUTES)
+            ) < new DateTimeImmutable()
         ) {
             // TODO In editor_Services_Manager::visitAllAssociatedTms language resource is initialized
             // without refreshing from DB, which leads th that here it is tried to be inserted as new one
@@ -1001,6 +1063,32 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
             $this->languageResource->removeSpecificData(self::REORGANIZE_STARTED_AT);
             $this->languageResource->setStatus(LanguageResourceStatus::AVAILABLE);
             $this->languageResource->save();
+        }
+    }
+
+    /**
+     * Helper to wait for a internal reorganization
+     *
+     * @param string $tmName
+     * @throws editor_Services_Connector_Exception
+     * @throws editor_Services_Exceptions_InvalidResponse
+     */
+    private function waitForReorganization(string $tmName): void
+    {
+        while ($this->fuzzyReorganize > 0) {
+            // if reorganize takes too long we end with exception
+            if ((time() - $this->fuzzyReorganize) > T5Memory::REQUEST_TIMEOUT) {
+                throw new editor_Services_Connector_Exception('E1512');
+            }
+
+            // wait 10 sec
+            sleep(10);
+
+            // if TM is answering, we assume reorganize succeeded
+            if ($this->api->isRequestable($tmName)) {
+                $this->fuzzyReorganize = -1;
+                return;
+            }
         }
     }
     #endregion Reorganize TM
@@ -1016,25 +1104,356 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
         return $this->api;
     }
 
-    /**
-     * Helper to wait for a internal reorganization
-     * @throws editor_Services_Connector_Exception
-     * @throws editor_Services_Exceptions_InvalidResponse
-     */
-    private function waitForReorganization()
-    {
-        while($this->fuzzyReorganize > 0){
-            // if reorganize takes too long we end with exception
-            if((time() - $this->fuzzyReorganize) > T5Memory::REQUEST_TIMEOUT){
-                throw new editor_Services_Connector_Exception('E1512');
+    private function queryTm(
+        string $queryString,
+        editor_Models_Segment $segment,
+        string $fileName
+    ): editor_Services_ServiceResult {
+        $resultList = new editor_Services_ServiceResult();
+        $resultList->setLanguageResource($this->languageResource);
+
+        //if source is empty, OpenTM2 will return an error, therefore we just return an empty list
+        if (empty($queryString) && $queryString !== '0') {
+            return $resultList;
+        }
+
+        //Although we take the source fields from the OpenTM2 answer below
+        // we have to set the default source here to fill the be added internal tags
+        $resultList->setDefaultSource($queryString);
+        $query = $this->tagHandler->prepareQuery($queryString);
+        $results = [];
+
+        foreach ($this->languageResource->getSpecificData('memories', parseAsArray: true) as $memory) {
+            $successful = $this->api->lookup($segment, $query, $fileName, $memory['filename']);
+
+            if (!$successful && $this->needsReorganizing($this->api->getError())) {
+                $this->addReorganizeWarning($segment->getTask());
+                $this->reorganizeTm($memory->name);
+                $successful = $this->api->lookup($segment, $query, $fileName, $memory['filename']);
             }
-            // wait 10 sec
-            sleep(10);
-            // if TM is answering, we assume reorganize succeeded
-            if($this->api->isRequestable()){
-                $this->fuzzyReorganize = -1;
-                return;
+
+            if (!$successful) {
+                $this->logger->exception($this->getBadGatewayException($memory['filename']));
+
+                continue;
+            }
+
+            $result = $this->api->getResult();
+
+            if ((int)$result->NumOfFoundProposals === 0) {
+                continue;
+            }
+
+            $results[] = $result->results;
+        }
+
+        if (empty($results)) {
+            return $resultList;
+        }
+
+        $results = array_merge(...$results);
+
+        foreach ($results as $found) {
+            $target = $this->tagHandler->restoreInResult($found->target);
+            $hasTargetErrors = $this->tagHandler->hasRestoreErrors();
+
+            $source = $this->tagHandler->restoreInResult($found->source);
+            $hasSourceErrors = $this->tagHandler->hasRestoreErrors();
+
+            if ($hasTargetErrors || $hasSourceErrors) {
+                //the source has invalid xml -> remove all tags from the result, and reduce the matchrate by 2%
+                $found->matchRate = $this->reduceMatchrate($found->matchRate, 2);
+            }
+
+            $matchrate = $this->calculateMatchRate(
+                $found->matchRate,
+                $this->getMetaData($found),
+                $segment,
+                $fileName
+            );
+            $resultList->addResult($target, $matchrate, $this->getMetaData($found));
+            $resultList->setSource($source);
+        }
+
+        return $resultList;
+    }
+
+    private function getWritableMemory(): string
+    {
+        foreach ($this->languageResource->getSpecificData('memories', parseAsArray: true) as $memory) {
+            if (!$memory['readonly']) {
+                return $memory['filename'];
             }
         }
+
+        throw new editor_Services_Connector_Exception('E1564', [
+            'name' => $this->languageResource->getName(),
+        ]);
     }
+
+    private function isMemoryOverflown(object $error): bool
+    {
+        $errorCodes = explode(
+            ',',
+            $this->config->runtimeOptions->LanguageResources->t5memory->memoryOverflowErrorCodes
+        );
+        $errorCodes = array_map(fn($code) => 'rc = ' . $code, $errorCodes);
+
+        return isset($error->error)
+            && str_replace($errorCodes, '', $error->error) !== $error->error;
+    }
+
+    private function importTmxIntoMemory(string $fileContent, string $tmName): bool
+    {
+        $successful = false;
+
+        try {
+            $successful = $this->api->importMemory($fileContent, $tmName);
+
+            if (!$successful) {
+                $this->logger->error('E1303', 'OpenTM2: could not add TMX data to TM', [
+                    'languageResource' => $this->languageResource,
+                    'apiError' => $this->api->getError(),
+                ]);
+            }
+
+            if (!$successful && $this->needsReorganizing($this->api->getError())) {
+                $this->addReorganizeWarning();
+                $this->reorganizeTm($tmName);
+            }
+        } catch (editor_Models_Import_FileParser_InvalidXMLException $e) {
+            $e->addExtraData([
+                'languageResource' => $this->languageResource,
+            ]);
+            $this->logger->exception($e);
+        }
+
+        $this->waitForImportFinish($tmName);
+        $status = $this->getStatus($this->languageResource->getResource(), $this->languageResource, $tmName);
+
+        $error = $this->api->getError();
+        // In case we've got memory overflow error we need to create another memory and import further
+        if ($status === LanguageResourceStatus::ERROR && $this->isMemoryOverflown($error)) {
+            $newName = $this->generateNextMemoryName($this->languageResource);
+            $newName = $this->api->createEmptyMemory($newName, $this->languageResource->getSourceLangCode());
+            $this->addMemoryToLanguageResource($newName);
+
+            // Filter TMX data from already imported segments
+            $fileContent = $this->cutOffTmx(
+                $fileContent,
+                $this->getOverflowSegmentNumber($error->error)
+            );
+
+            // Import further
+            return $this->importTmxIntoMemory($fileContent, $newName);
+        }
+
+        return $successful;
+    }
+
+    private function cutOffTmx(string $tmxData, int $segmentToStartFrom): string
+    {
+        $doc = new DOMDocument();
+        $doc->loadXML($tmxData);
+
+        if (!$doc->hasChildNodes()) {
+            $error = libxml_get_last_error();
+
+            // TODO vice-versa?
+            if (str_contains($error->message, 'labelled UTF-16 but has UTF-8') !== false) {
+                $tmxData = preg_replace('/encoding="UTF-16"/', 'encoding="UTF-8"', $tmxData, 1);
+                $doc->loadXML($tmxData);
+            }
+        }
+
+        unset($tmxData);
+
+        // Create an XPath to query the document
+        $xpath = new DOMXPath($doc);
+
+        // Find all 'tu' elements
+        $tuNodes = $xpath->query('/tmx/body/tu');
+
+        // Remove 'tu' elements before the segment index
+        for ($i = 0; $i < $segmentToStartFrom; $i++) {
+            $tuNodes->item($i)->parentNode->removeChild($tuNodes->item($i));
+        }
+        unset($tuNodes);
+
+        // Save the modified TMX data to a new variable
+        return $doc->saveXML();
+    }
+
+    private function getOverflowSegmentNumber(string $error): int
+    {
+        preg_match('/rc = \d+; segment #(\d+) wasn\'t imported/', $error, $matches);
+
+        if (!isset($matches[1])) {
+            $this->logger->error(
+                'E1313',
+                't5memory responded with memory overflow error, ' .
+                'but we were unable to distinguish the segment number for reimport', [
+                    'languageResource' => $this->languageResource,
+                    'apiError' => $error,
+                ]
+            );
+            throw new editor_Services_Connector_Exception('E1313', ['error' => $error]);
+        }
+
+        return (int)($matches[1]);
+    }
+
+    private function waitForImportFinish(string $tmName): void
+    {
+        while (true) {
+            $status = $this->getStatus($this->languageResource->getResource(), $this->languageResource, $tmName);
+
+            if ($status !== LanguageResourceStatus::IMPORT) {
+                break;
+            }
+
+            sleep(2);
+        }
+    }
+
+    private function generateNextMemoryName(editor_Models_LanguageResources_LanguageResource $languageResource): string
+    {
+        $memories = $languageResource->getSpecificData('memories', parseAsArray: true);
+
+        return $memories[0]['filename'] . '_' . count($memories);
+    }
+
+    // region export TM
+    // TODO change to interface method
+    public function exportsFile(): bool
+    {
+        $memories = $this->languageResource->getSpecificData('memories', parseAsArray: true);
+
+        return count($memories) > 1;
+    }
+
+    // TODO Move to a separate class(es) during refactoring
+    public function export(string $mime): string
+    {
+        $memories = $this->languageResource->getSpecificData('memories', parseAsArray: true);
+
+        usort($memories, fn ($m1, $m2) => $m1['id'] <=> $m2['id']);
+
+        if ($mime === $this->getValidExportTypes()['TMX']) {
+            return $this->exportAllAsOneTmx($memories, $mime);
+        }
+
+        return $this->exportAllAsArchive($memories, $mime);
+    }
+
+    private function exportAllAsOneTmx(array $memories, string $mime): string
+    {
+        $exportDir = APPLICATION_PATH . '/../data/TMExport/';
+        @mkdir($exportDir, recursive: true);
+        $resultFilename = $exportDir . $this->languageResource->getId() . '_' . uniqid() . '.tmx';
+        $writer = new XMLWriter();
+        $writer->openURI($resultFilename);
+        $writer->startDocument('1.0', 'UTF-8');
+        $writer->setIndent(true);
+
+        foreach ($memories as $memoryNumber => $memory) {
+            $filename = $exportDir . $memory['filename'] . '_' . uniqid() . '.tmx';
+            file_put_contents(
+                $filename,
+                $this->getTm($mime, $memory['filename'])
+            );
+
+            $reader = new XMLReader();
+            $reader->open($filename);
+
+            while ($reader->read()) {
+                if ($reader->nodeType == XMLReader::ELEMENT && $reader->name == 'tu') {
+                    $writer->writeRaw($reader->readOuterXML());
+                }
+
+                // Further code is only applicable for the first file
+                if ($memoryNumber > 0) {
+                    continue;
+                }
+
+                if ($reader->nodeType == XMLReader::ELEMENT && $reader->name == 'header') {
+                    $writer->writeRaw($reader->readOuterXML());
+                }
+
+                if (!in_array($reader->name, ['tmx', 'body'])) {
+                    continue;
+                }
+
+                if ($reader->nodeType == XMLReader::ELEMENT) {
+                    $writer->startElement($reader->name);
+
+                    if ($reader->hasAttributes) {
+                        while ($reader->moveToNextAttribute()) {
+                            $writer->writeAttribute($reader->name, $reader->value);
+                        }
+                    }
+
+                    if ($reader->isEmptyElement) {
+                        $writer->endElement();
+                    }
+                }
+            }
+
+            $reader->close();
+
+            unlink($filename);
+
+            if ($memoryNumber < count($memories) - 1) {
+                $writer->writeComment('Next file');
+            }
+        }
+
+        $writer->flush();
+
+        // Finalizing document with $writer->endDocument() adds closing tags for all bpt-ept tags
+        // so add body and tmx closing tags manually
+        file_put_contents($resultFilename, PHP_EOL . '</body>' . PHP_EOL . '</tmx>', FILE_APPEND);
+
+        return $resultFilename;
+    }
+
+    private function exportAllAsArchive(array $memories, string $mime): string
+    {
+        $exportDir = APPLICATION_PATH . '/../data/TMExport/';
+        $tmpDir = $exportDir . $this->languageResource->getId() . '_' . uniqid() . '/';
+        @mkdir($tmpDir, recursive: true);
+
+        foreach ($memories as $index => $memory) {
+            file_put_contents($tmpDir . ($index + 1) . '.tm', $this->getTm($mime, $memory['filename']));
+        }
+
+        $zipFileName = $exportDir . $this->languageResource->getId() . '_' . uniqid() . '.zip';
+        $zip = new ZipArchive();
+        $zip->open($zipFileName, ZipArchive::CREATE | ZipArchive::OVERWRITE);
+        $files = new RecursiveIteratorIterator(
+            new RecursiveDirectoryIterator($tmpDir),
+            RecursiveIteratorIterator::LEAVES_ONLY
+        );
+
+        foreach ($files as $file) {
+            if (!$file->isDir()) {
+                $filePath = $file->getRealPath();
+                $relativePath = basename($filePath);
+
+                $zip->addFile($filePath, $relativePath);
+            }
+        }
+
+        $zip->close();
+
+        foreach ($files as $file) {
+            if (!$file->isDir() && is_file($file->getRealPath())) {
+                unlink($file->getRealPath());
+            }
+        }
+        rmdir($tmpDir);
+
+        return $zipFileName;
+    }
+    // endregion export TM
 }
