@@ -23,5 +23,6 @@
 --
 -- END LICENSE AND COPYRIGHT
 
+UPDATE `LEK_content_protection_input_mapping` SET `priority` = `id`;
 alter table `LEK_content_protection_input_mapping` add UNIQUE (`languageId`, `priority`);
 
