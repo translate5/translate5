@@ -78,11 +78,26 @@ class editor_ModelInstances {
         return self::getById('editor_Models_File', $id);
     }
 
+    /**
+     * @param int $id
+     * @return editor_Models_Languages
+     */
+    public static function language(int $id): editor_Models_Languages {
+        return self::getById('editor_Models_Languages', $id);
+    }
+
 
     //TODO consider moving the following code into a ZfExtended abstract
 
+    /**
+     * @template T of ZfExtended_Models_Entity_Abstract
+     * @param class-string<T> $class
+     * @param int $id
+     * @return T
+     * @throws ZfExtended_Models_Entity_NotFoundException
+     */
     protected static function getById(string $class, int $id): ZfExtended_Models_Entity_Abstract {
-        /* @var $instance ZfExtended_Models_Entity_Abstract */
+        /* @var ZfExtended_Models_Entity_Abstract $instance */
         $instance = self::$instances[$class][$id] ?? null;
         if(! is_null($instance)) {
             return $instance;

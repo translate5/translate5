@@ -34,16 +34,9 @@ use MittagQI\Translate5\Test\Import\Config;
  */
 class Translate3186Test extends editor_Test_JsonTest {
 
-    protected static array $forbiddenPlugins = [
-    ];
-
     protected static array $requiredPlugins = [
         'editor_Plugins_Okapi_Init'
     ];
-
-    protected static array $requiredRuntimeOptions = [
-    ];
- 
 
     protected static function setupImport(Config $config): void
     {

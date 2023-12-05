@@ -34,22 +34,15 @@ use MittagQI\Translate5\Test\Import\LanguageResource;
  */
 class Translate3052Test extends editor_Test_JsonTest {
 
-    protected static array $forbiddenPlugins = [
-    ];
-
     protected static array $requiredPlugins = [
         'editor_Plugins_ZDemoMT_Init',
         'editor_Plugins_MatchAnalysis_Init',
     ];
 
-    protected static array $requiredRuntimeOptions = [
-    ];
- 
     protected static bool $setupOwnCustomer = true;
-    
-    protected static string $setupUserLogin = 'testmanager';
 
     private static LanguageResource $dummyMt;
+
     protected static function setupImport(Config $config): void
     {
         $sourceLangRfc = 'de';

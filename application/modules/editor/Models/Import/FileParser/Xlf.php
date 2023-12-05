@@ -29,6 +29,9 @@ END LICENSE AND COPYRIGHT
 use editor_Models_Import_FileParser_Xlf_LengthRestriction as XlfLengthRestriction;
 use editor_Models_Import_FileParser_Xlf_SurroundingTagRemover_Abstract as AbstractSurroundingTagRemover;
 use editor_Models_Import_FileParser_XmlParser as XmlParser;
+use MittagQI\Translate5\Task\Import\FileParser\Xlf\Comments;
+use MittagQI\Translate5\Task\Import\FileParser\Xlf\NamespaceRegistry;
+use MittagQI\Translate5\Task\Import\FileParser\Xlf\Namespaces\Namespaces;
 
 /**
  * Fileparsing for import of XLIFF 1.1 and 1.2 files
@@ -60,9 +63,8 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
     
     /**
      * Helper to call namespace specfic parsing stuff
-     * @var editor_Models_Import_FileParser_Xlf_Namespaces
      */
-    protected $namespaces;
+    protected Namespaces $namespaces;
     
     /**
      * Stack of the group translate information
@@ -171,7 +173,8 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
      * @var AbstractSurroundingTagRemover
      */
     protected AbstractSurroundingTagRemover $surroundingTags;
-    
+    private Comments $comments;
+
     /**
      * (non-PHPdoc)
      * @see editor_Models_Import_FileParser::getFileExtensions()
@@ -187,7 +190,13 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
     public function __construct(string $path, string $fileName, int $fileId, editor_Models_Task $task)
     {
         parent::__construct($path, $fileName, $fileId, $task);
-        $this->initNamespaces();
+
+        $this->xmlparser = ZfExtended_Factory::get(XmlParser::class, [[
+            'preparsexml' => $this->config->runtimeOptions->import->xlf->preparse
+        ]]);
+        $this->comments = ZfExtended_Factory::get(Comments::class, [$this->task]);
+        $this->namespaces = NamespaceRegistry::getImportNamespace($this->_origFile, $this->xmlparser, $this->comments);
+
         $this->contentConverter = $this->namespaces->getContentConverter($this->task, $fileName);
         $this->internalTag = ZfExtended_Factory::get(editor_Models_Segment_InternalTag::class);
         $this->segmentBareInstance = ZfExtended_Factory::get(editor_Models_Segment::class);
@@ -211,25 +220,24 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
     {
         return $this->wordCount;
     }
-    
+
     /**
      * (non-PHPdoc)
+     * @throws ReflectionException
+     * @throws Zend_Exception
+     * @throws editor_Models_Import_FileParser_Xlf_Exception
      * @see editor_Models_Import_FileParser::parse()
      */
     protected function parse() {
         $this->segmentCount = 0;
 
-        $options = [
-            'preparsexml' => $this->config->runtimeOptions->import->xlf->preparse
-        ];
-
-        $this->xmlparser = $parser = ZfExtended_Factory::get(XmlParser::class, [$options]);
+        $parser = $this->xmlparser;
 
         $this->registerStructural();
         $this->registerMeta();
         $this->registerContent();
-        $this->namespaces->registerParserHandler($this->xmlparser);
-        
+        $this->registerNoteComments();
+
         $preserveWhitespaceDefault = $this->config->runtimeOptions->import->xlf->preserveWhitespace;
         
         try {
@@ -355,6 +363,32 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
                 $this->matchRate[$mid] = (int) trim($matchRate,'% '); //removing the percent sign
             }
         });
+    }
+
+    protected function registerNoteComments(): void
+    {
+        //handling sub segment mrks and sub tags
+        $this->xmlparser->registerElement(
+            'trans-unit > note',
+            null,
+            function ($tag, $key, $opener) {
+                $attributes = [
+                    'lang' => null,
+                    'from' => null,
+                    'priority' => null,
+                    'annotates' => 'general',
+                ];
+                foreach($attributes as $attribute => $default) {
+                    $attributes[$attribute] = $this->xmlparser->getAttribute(
+                        $opener['attributes'],
+                        $attribute,
+                        $default
+                    );
+                }
+                $content = $this->xmlparser->getRange($opener['openerKey'] + 1, $key - 1, true);
+                $this->comments->addByNote($content, $attributes);
+            }
+        );
     }
     
     
@@ -630,10 +664,6 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
         }
     }
     
-    protected function initNamespaces() {
-        $this->namespaces = ZfExtended_Factory::get("editor_Models_Import_FileParser_Xlf_Namespaces",[$this->_origFile]);
-    }
-    
     /**
      * Handles a group tag
      * @param array $attributes
@@ -758,7 +788,11 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
      *
      * @param array $transUnit In this class this are the trans-unit attributes only
      * @return array array of segmentIds created from that trans unit
+     * @throws ReflectionException
+     * @throws Zend_Db_Statement_Exception
      * @throws ZfExtended_Exception
+     * @throws ZfExtended_Models_Entity_Exceptions_IntegrityConstraint
+     * @throws ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey
      * @throws editor_Models_Import_FileParser_Exception
      * @throws editor_Models_Import_MetaData_Exception
      */
@@ -939,7 +973,7 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
             $createdSegmentIds[] = $segmentId = $this->setAndSaveSegmentValues();
             //only with a segmentId (in case of ProofProcessor) we can save comments
             if($segmentId !== false && is_numeric($segmentId)) {
-                $this->importComments((int) $segmentId);
+                $this->comments->importComments((int) $segmentId);
             }
             if($currentTarget !== self::MISSING_MRK) {
                 //we add a placeholder if it is a real segment, not just a placeholder for a missing mrk
@@ -1053,30 +1087,6 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
      */
     protected function hasText($segmentContent) {
         return $this->internalTag->hasText($segmentContent);
-    }
-    
-    /**
-     * Imports the comments of last processed segment
-     * @param int $segmentId
-     */
-    protected function importComments($segmentId) {
-        $comments = $this->namespaces->getComments();
-        if(empty($comments)) {
-            return;
-        }
-        foreach($comments as $comment) {
-            /* @var $comment editor_Models_Comment */
-            $comment->setTaskGuid($this->task->getTaskGuid());
-            $comment->setSegmentId($segmentId);
-            $comment->save();
-        }
-        //if there was at least one processed comment, we have to sync the comment contents to the segment
-        if(!empty($comment)){
-            $segment = ZfExtended_Factory::get('editor_Models_Segment');
-            /* @var $segment editor_Models_Segment */
-            $segment->load($segmentId);
-            $comment->updateSegment($segment, $this->task->getTaskGuid());
-        }
     }
     
     /**

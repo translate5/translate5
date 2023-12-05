@@ -95,7 +95,7 @@ abstract class AbstractExternalService extends AbstractHttpService
     public function check(): bool
     {
         $checked = true;
-        $urls = $this->getConfigValueFromName($this->configurationConfig['name'], $this->configurationConfig['type'], true);
+        $urls = $this->configHelper->getValue($this->configurationConfig['name'], $this->configurationConfig['type'], true);
         if (count($urls) === 0) {
             $this->errors[] = 'There is no URL configured.';
             $checked = false;

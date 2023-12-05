@@ -394,9 +394,12 @@ final class Config
             case LanguageResource::GOOGLE_TRANSLATE:
                 return new GoogleTranslate($this->testClass,$nextIndex);
 
+            case LanguageResource::OPEN_AI:
+                // TODO FIXME / UGLY: Using classes from Private Plugins ... how to solve ?
+                return new \MittagQI\Translate5\Plugins\OpenAI\Test\Import\OpenAI($this->testClass, $nextIndex);
 
             case LanguageResource::TILDE_MT:
-                // TODO FIXME UGLY: Using classes from Private Plugins ... how to solve ?
+                // TODO FIXME / UGLY: Using classes from Private Plugins ... how to solve ?
                 return new \MittagQI\Translate5\Plugins\TildeMT\Test\Import\TildeMt($this->testClass, $nextIndex);
 
             default:

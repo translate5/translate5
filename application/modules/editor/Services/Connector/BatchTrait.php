@@ -35,23 +35,29 @@ END LICENSE AND COPYRIGHT
  */
 trait editor_Services_Connector_BatchTrait {
 
-    /***
+    /**
      * Number of segments which the batch query sends at once
      * @var integer
      */
     protected $batchQueryBuffer = 1;
 
-    /***
+    /**
      * Buffer size in KB or false to disable the size calculation
      * @var bool|integer
      */
     protected $batchQueryBufferSize = false;
-    
+
     /**
      * container for collected exceptions
      * @var array
      */
     protected $batchExceptions = [];
+
+    /**
+     * Ther task the batch is worked on
+     * @var editor_Models_Task
+     */
+    protected editor_Models_Task $batchTask;
 
     /***
      * Where to check if the segment field has content (only possible target and pivot).
@@ -71,25 +77,41 @@ trait editor_Services_Connector_BatchTrait {
     {
         return $this->batchExceptions;
     }
-    
-    /***
+
+    /**
+     * Init function to be used before a batch query is called/processed
+     * To be implemented in inheriting classes if needed
+     * @return void
+     */
+    public function initBatchQuery(): void { }
+
+    /**
+     * Notification function when batch-items are dismissed for extending classes
+     * @param string $querySegment: queried segment-text
+     * @param int $batchIndex: index as in the queue
+     * @return void
+     */
+    public function removeLastQuery(string $querySegment, int $batchIndex): void { }
+
+    /**
      * Query the resource with multiple segments at once, and save the results in the database.
      * @param string $taskGuid
      */
     public function batchQuery(string $taskGuid, Closure $progressCallback = null){
-        $segments = ZfExtended_Factory::get('editor_Models_Segment_Iterator', [$taskGuid]);
+
+        $this->initBatchQuery();
+
+        $segments = ZfExtended_Factory::get(editor_Models_Segment_Iterator::class, [$taskGuid]);
         /* @var $segments editor_Models_Segment_Iterator */
         
-        $task = ZfExtended_Factory::get('editor_Models_Task');
-        /* @var $task editor_Models_Task */
-        $task->loadByTaskGuid($taskGuid);
-        
+        $this->batchTask = editor_ModelInstances::taskByGuid($taskGuid);
+
         //number of temporary cached segments
         $tmpBuffer = 0;
         //holds the query strings for batch request
         $batchQuery = [];
         $this->batchExceptions = [];
-        
+
         $segmentCounter = 0;
         $progress = 0;
         $bufferSize = 0;
@@ -98,14 +120,12 @@ trait editor_Services_Connector_BatchTrait {
             $segmentCounter++;
             
             //progress to update
-            $progress = $segmentCounter / $task->getSegmentCount();
+            $progress = $segmentCounter / $this->batchTask->getSegmentCount();
             
             //For pre-translation only those segments should be send to the MT, that have an empty target.-> https://jira.translate5.net/browse/TRANSLATE-2335
             //For analysis, the mt matchrate will always be the same.So it make no difference here if it is pretranslation
             //or analysis, the empty target segments for mt resources should not be send to batch processor
             //TODO: in future, when the matchrate is provided/calculated for mt, this should be changed
-
-
 
             $contentField = $segment->get($this->getContentField());
 
@@ -124,7 +144,8 @@ trait editor_Services_Connector_BatchTrait {
             ];
 
             // collect the segment size in bytes in temporary variable
-            $bufferSize += $this->getQuerySegmentSize($querySegment);
+            $bufferSize = $this->calculateBufferSize($bufferSize, $querySegment, count($batchQuery) - 1);
+
             // is the collected buffer size above the allowed limit (if the buffer size limit is not allowed for the resource, this will return true)
             $allowByContent = $this->isAllowedByContentSize($bufferSize);
 
@@ -134,26 +155,37 @@ trait editor_Services_Connector_BatchTrait {
 
             // if the content is above the allowed buffer, remove the last segment from the batchQuery, and save it for the next loop
             if($allowByContent === false){
+
                 // get the last query segment
-                $resetBuffer = $batchQuery[count($batchQuery)-1];
+                $resetBufferIdx = count($batchQuery) - 1;
+                $resetBuffer = $batchQuery[$resetBufferIdx];
+
                 // remove the last query segment from the array (since the size is over the allowed limit)
                 array_pop($batchQuery);
+                $this->removeLastQuery($resetBuffer['query'], $resetBufferIdx);
+
                 //send batch query request, and save the results to the batch cache
                 $this->handleBatchQuerys($batchQuery);
+                // progresss & buffer size
                 $progressCallback && $progressCallback($progress);
                 $batchQuery = [];
                 $batchQuery[] = $resetBuffer;
+                // prepare next batch
+                $this->initBatchQuery();
 
                 // set the current buffer size to the last segment size
-                $bufferSize = $this->getQuerySegmentSize($querySegment);
-            }else{
+                $bufferSize = $this->calculateBufferSize(0, $querySegment, 0);
+
+            } else {
+
                 //send batch query request, and save the results to the batch cache
                 $this->handleBatchQuerys($batchQuery);
-
+                // progresss & buffer size
                 $progressCallback && $progressCallback($progress);
-
                 $batchQuery = [];
                 $bufferSize = 0;
+                // prepare next batch
+                $this->initBatchQuery();
             }
             $tmpBuffer = 0;
         }
@@ -165,12 +197,12 @@ trait editor_Services_Connector_BatchTrait {
         }
     }
 
-    /***
+    /**
      * Check if calculate content size exceeds the allowed limit
      * @param int $totalContentSize
      * @return bool
      */
-    protected function isAllowedByContentSize(int $totalContentSize): bool
+    protected function isAllowedByContentSize(int|float $totalContentSize): bool
     {
         if(is_numeric($this->batchQueryBufferSize) === false){
             return true;
@@ -178,17 +210,29 @@ trait editor_Services_Connector_BatchTrait {
         return $totalContentSize < $this->batchQueryBufferSize;
     }
 
-    /***
-     * Return the queried segment size in KB
+    /**
+     * Return the queried segment size in KB (or any other unit matching the max buffer size)
      * @param string $querySegment
-     * @return float|bool|int
+     * @return float|int
      */
-    protected function getQuerySegmentSize(string $querySegment): float|bool|int
+    protected function getQuerySegmentSize(string $querySegment): float|int
     {
         if(is_numeric($this->batchQueryBufferSize) === false){
             return 0;
         }
         return strlen(urlencode($querySegment)) / 1024;
+    }
+
+    /**
+     * Calculates the buffer size of the current batch
+     * @param int|float $currentBufferSize
+     * @param string $querySegment
+     * @param int $batchIndex
+     * @return float|int
+     */
+    protected function calculateBufferSize(int|float $currentBufferSize, string $querySegment, int $batchIndex): float|int
+    {
+        return $currentBufferSize + $this->getQuerySegmentSize($querySegment);
     }
     
     /**

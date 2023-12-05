@@ -64,7 +64,8 @@ trait FilteringByNameTrait
                 $this->io->warning(
                     'There are no translation memories that match "'
                     . $this->input->getOption(self::OPTION_TM_NAME)
-                    . '"');
+                    . '"'
+                );
             } else {
                 $this->io->warning('There are no translation memories in t5memory');
             }

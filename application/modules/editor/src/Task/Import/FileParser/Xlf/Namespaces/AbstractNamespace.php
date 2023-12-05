@@ -21,7 +21,7 @@ START LICENSE AND COPYRIGHT
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
@@ -30,8 +30,10 @@ namespace MittagQI\Translate5\Task\Import\FileParser\Xlf\Namespaces;
 
 use editor_Models_Import_FileParser_SegmentAttributes as SegmentAttributes;
 use editor_Models_Import_FileParser_Xlf_ContentConverter as ContentConverter;
-use editor_Models_Import_FileParser_XmlParser;
+use editor_Models_Import_FileParser_XmlParser as XmlParser;
 use editor_Models_Task;
+use MittagQI\Translate5\Task\Import\FileParser\Xlf\Comments;
+use ReflectionException;
 use ZfExtended_Factory;
 
 /**
@@ -40,20 +42,18 @@ use ZfExtended_Factory;
 abstract class AbstractNamespace
 {
 
+    public function __construct(protected XmlParser $xmlparser, protected Comments $comments)
+    {
+    }
+
     /**
      * returns true if the current Namespace class is applicable for the given XLF string
      * @param string $xliff
      * @return bool
      */
-    abstract protected static function isApplicable(string $xliff): bool;
+    abstract public static function isApplicable(string $xliff): bool;
 
-    /**
-     * Gives the Namespace class the ability to add custom handlers to the xmlparser
-     */
-    public function registerParserHandler(editor_Models_Import_FileParser_XmlParser $xmlparser): void
-    {
-        //method stub
-    }
+    abstract public static function getExportCls(): ?string;
 
     /**
      * Provides an invocation for parsing custom trans-unit attributes
@@ -91,15 +91,8 @@ abstract class AbstractNamespace
     abstract public function useTagContentOnly(): ?bool;
 
     /**
-     * Returns found comments, to be implemented in the subclasses!
-     * @return array
+     * @throws ReflectionException
      */
-    public function getComments(): array
-    {
-        //method stub
-        return [];
-    }
-
     public function getContentConverter(editor_Models_Task $task, string $filename): ContentConverter
     {
         return ZfExtended_Factory::get(ContentConverter::class, [

@@ -36,6 +36,7 @@ Ext.define('Editor.store.LanguageResources.Engine', {
     {name: 'target', type: 'string'},
     {name: 'targetIso', type: 'string'},
     {name: 'domainCode', type: 'string'},
+    {name: 'engineName', type: 'string'},
   ],
   storeId:'engine'
 });

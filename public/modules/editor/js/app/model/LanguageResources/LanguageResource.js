@@ -37,6 +37,7 @@ END LICENSE AND COPYRIGHT
  */
 Ext.define('Editor.model.LanguageResources.LanguageResource', {
     extend: 'Ext.data.Model',
+
     STATUS_LOADING: 'loading',
     STATUS_NOTCHECKED: 'notchecked',
     STATUS_ERROR: 'error',
@@ -46,6 +47,8 @@ Ext.define('Editor.model.LanguageResources.LanguageResource', {
     STATUS_IMPORT: 'import',
     STATUS_NOTLOADED: 'notloaded',
     STATUS_NOVALIDLICENSE: 'novalidlicense',
+    STATUS_TUNINGINPROGRESS: 'tuninginprogress',
+
     fields: [
         {name: 'id', type: 'int'},
         {name: 'entityVersion', type: 'integer', critical: true},
@@ -64,6 +67,7 @@ Ext.define('Editor.model.LanguageResources.LanguageResource', {
         {name: 'writeSource', type: 'boolean'},
         {name: 'useAsGlossarySource', critical: true}
     ],
+    idProperty: 'id',
 
     /***
      * Is the current record Tm
@@ -89,29 +93,29 @@ Ext.define('Editor.model.LanguageResources.LanguageResource', {
         return this.get('resourceType') === Editor.util.LanguageResources.resourceType.TERM_COLLECTION;
     },
 
-    /***
-     *
+    /**
+     * Retrieves the specific data as Object
+     * @returns {Object}
      */
-    getSpecificDataByType: function (type) {
-        var data = Ext.JSON.decode(this.get('specificData'), true),
-            glossaryId = null;
-
-        if (!data) {
-            return glossaryId;
-        }
-
-        Ext.each(data, function (ob) {
-            if(ob.type === type){
-                return glossaryId = ob.value;
-            }
-        });
-
-        return glossaryId;
+    getSpecificData: function () {
+        var specificData = this.get('specificData');
+        specificData = (specificData) ? JSON.parse(specificData) : null;
+        // typeof null is "object" !!
+        return (specificData !== null && typeof specificData === 'object') ? specificData : {};
     },
 
-    idProperty: 'id',
+    /**
+     * Retrieves a property of the specific-data
+     * @param {string} key
+     * @returns {*|null}
+     */
+    getSpecificDataProp: function (key) {
+        var specificData = this.getSpecificData();
+        return (specificData.hasOwnProperty(key)) ? specificData[key] : null;
+    },
+
     proxy: {
-        type: 'rest',//POST for create, GET to get a entity, DELETE to delete an entity, PUT call to edit an entity
+        type: 'rest', //POST for create, GET to get a entity, DELETE to delete an entity, PUT call to edit an entity
         url: Editor.data.restpath + 'languageresourceinstance', //same as PHP controller name
         reader: {
             rootProperty: 'rows',
