@@ -14,6 +14,23 @@ All updates are (downwards) compatible! If not this is listed in the important r
 
 
 
+
+## [6.7.3] - 2023-12-01
+
+### Important Notes:
+ 
+
+
+### Added
+**[TRANSLATE-3548](https://jira.translate5.net/browse/TRANSLATE-3548): Okapi integration - Show xml-tags configured as 'translate="no"' in format conversion as protected segments in translate5** <br>
+Main bulk of this feature is Okapi development and to use it Okapi 1.46 is needed. It allows to configure xml tags in Okapi as 'translate="no"', but still show them as locked segments in translate5.
+
+
+### Bugfixes
+**[TRANSLATE-3588](https://jira.translate5.net/browse/TRANSLATE-3588): Editor general, VisualReview / VisualTranslation - Cleaning up the visual public symlinks does not work** <br>
+FIX: cleanup for visual public URL symbolic links
+
+
 ## [6.7.2] - 2023-11-28
 
 ### Important Notes:
