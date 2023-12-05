@@ -9457,6 +9457,7 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
                 <target>
                 Liste der aktiven Input-Regeln. Um eine Regel zu aktivieren, muss sie einer Ausgangssprache zugewiesen werden.
                 <br/>Sobald der Inhalt für diese Sprache gefunden wird, wird er als internes Tag geschützt.
+                <br/><b>Höhere Priorität wird zuerst gemappt</b>
                 <br/>Datumsangaben, Fließkomma- und Integer-Zahlen werden automatisch in das Format einer beliebigen Zielsprache umgewandelt, wobei die folgenden Voreinstellungen verwendet werden: <a href="https://icu4c-demos.unicode.org/icu-bin/locexp?d_=de#region" target="_blank" rel="noopener noreferrer">ICU</a> (für Datumsangaben wird das SHORT-Format verwendet)
                 <br/>Um die Standardformate zu überschreiben, verwenden Sie bitte die Registerkarte "Aktive Output-Regeln". IP- und MAC-Adressen werden unverändert übernommen.
                 </target>
