@@ -65,7 +65,7 @@ abstract class editor_Services_Connector_TagHandler_Abstract
     protected $realTagCount = 0;
     
     protected $highestShortcutNumber = 0;
-    protected array $shortcutNumberMap;
+    protected array $shortcutNumberMap = [];
     
     /**
      * @var editor_Models_Segment_UtilityBroker
