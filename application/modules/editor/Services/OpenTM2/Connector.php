@@ -384,6 +384,10 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
             throw new editor_Services_Connector_Exception('E1565', compact('offset'));
         }
 
+        if (null !== $tmOffset) {
+            $tmOffset = (int) $tmOffset;
+        }
+
         $resultList = new editor_Services_ServiceResult();
         $resultList->setLanguageResource($this->languageResource);
 
