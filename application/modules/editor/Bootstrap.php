@@ -552,7 +552,6 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
             ));
         $this->front->getRouter()->addRoute('languageresources_languageresourceinstance_search', $queryRoute);
 
-
         $translateRoute = new ZfExtended_Controller_RestLikeRoute(
             'editor/languageresourceinstance/:languageResourceId/translate',
             array(
@@ -561,7 +560,6 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
                 'action' => 'translate'
             ));
         $this->front->getRouter()->addRoute('languageresources_languageresourceinstance_translate', $translateRoute);
-
 
         $queryRoute = new ZfExtended_Controller_RestLikeRoute(
             'editor/languageresourceinstance/:id/import',
@@ -589,7 +587,6 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
                 'action' => 'engines'
             ));
         $this->front->getRouter()->addRoute('languageresources_languageresourceresource_esngines', $queryRoute);
-
 
         $this->front->getRouter()->addRoute('editorLanguageResourcesEvents', new ZfExtended_Controller_RestLikeRoute(
             'editor/languageresourceinstance/:id/events',
@@ -772,6 +769,18 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
                 ]
             )
         );
+
+        // special endpoint to provide configs for API-Tests. Must only be added when serving API-tests
+        if(defined('APPLICATION_APITEST') && APPLICATION_APITEST){
+            $this->front->getRouter()->addRoute('editorConfigApiTest', new ZfExtended_Controller_RestLikeRoute(
+                'editor/config/apitest',
+                array(
+                    'module' => 'editor',
+                    'controller' => 'config',
+                    'action' => 'apitest'
+                )
+            ));
+        }
     }
     
     

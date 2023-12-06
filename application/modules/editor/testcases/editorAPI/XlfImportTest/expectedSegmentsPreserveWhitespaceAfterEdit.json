@@ -1294,7 +1294,7 @@
         "sourceEdit": null,
         "target": "without match",
         "targetEdit": "without match",
-        "comments": "<div class=\"comment\">\n    <span class=\"content\">Title: Imported Comment Title<br />\nImported Comment Text</span>\n    <span class=\"author\">tester</span>\n    <span class=\"modified\">NOT_TESTABLE</span>\n</div>",
+        "comments": null,
         "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"maxNumberOfLines\":null,\"sizeUnit\":\"\",\"font\":\"\",\"fontSize\":0,\"additionalUnitLength\":0,\"additionalMrkLength\":0,\"siblingData\":{\"fakeSegId_91\":{\"nr\":\"91\",\"length\":{\"targetEdit\":13}}}}",
         "segmentNrInTask": "91",
         "mid": null,

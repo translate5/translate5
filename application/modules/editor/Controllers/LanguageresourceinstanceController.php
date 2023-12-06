@@ -103,96 +103,85 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
      * @see ZfExtended_RestController::indexAction()
      * Adds the readonly "filebased" field to the results
      */
-    public function indexAction(){
+    public function indexAction()
+    {
         //add custom filters
         $this->handleFilterCustom();
 
         $this->view->rows = $this->entity->loadAllByServices();
         $this->view->total = $this->entity->getTotalCount();
 
-        $serviceManager = ZfExtended_Factory::get('editor_Services_Manager');
-        /* @var $serviceManager editor_Services_Manager */
-
+        $serviceManager = ZfExtended_Factory::get(editor_Services_Manager::class);
         $resources = [];
 
-        $getResource = function(string $serviceType, string $id) use ($resources, $serviceManager) {
+        $getResource = function (string $serviceType, string $id) use ($resources, $serviceManager) {
             if (!empty($resources[$id])) {
                 return $resources[$id];
             }
-            return $resources[$id] = $serviceManager->getResourceById($serviceType, $id);
+            $resources[$id] = $serviceManager->getResourceById($serviceType, $id);
+            return $resources[$id];
         };
 
-        $languageResourcesId=array_column($this->view->rows, 'id');
-        $this->prepareTaskInfo($languageResourcesId);
+        $languageResourcesIds = array_column($this->view->rows, 'id');
+        $this->prepareTaskInfo($languageResourcesIds);
 
-        $eventLogger=ZfExtended_Factory::get('editor_Models_Logger_LanguageResources');
-        /* @var $eventLogger editor_Models_Logger_LanguageResources */
-        $eventLoggerGroupped=$eventLogger->getLatesEventsCount($languageResourcesId);
+        $eventLogger = ZfExtended_Factory::get(editor_Models_Logger_LanguageResources::class);
+        $eventLoggerGroupped = $eventLogger->getLatesEventsCount($languageResourcesIds);
 
         //get all assocs grouped by language resource id
-        $customerAssocModel=ZfExtended_Factory::get('editor_Models_LanguageResources_CustomerAssoc');
-        /* @var $customerAssocModel editor_Models_LanguageResources_CustomerAssoc */
-        $custAssoc=$customerAssocModel->loadCustomerIdsGrouped();
+        $customerAssocModel = ZfExtended_Factory::get(editor_Models_LanguageResources_CustomerAssoc::class);
+        $custAssoc = $customerAssocModel->loadCustomerIdsGrouped();
 
         // for assigned categories
-        $categoryAssocModel = ZfExtended_Factory::get('editor_Models_LanguageResources_CategoryAssoc');
-        /* @var $categoryAssocModel editor_Models_LanguageResources_CategoryAssoc */
+        $categoryAssocModel = ZfExtended_Factory::get(editor_Models_LanguageResources_CategoryAssoc::class);
         $categoryAssocs = $categoryAssocModel->loadCategoryIdsGrouped();
 
-        $languages=ZfExtended_Factory::get('editor_Models_LanguageResources_Languages');
-        /* @var $languages editor_Models_LanguageResources_Languages */
-        $languages=$languages->loadResourceIdsGrouped();
+        $languages = ZfExtended_Factory::get(editor_Models_LanguageResources_Languages::class);
+        $languages = $languages->loadResourceIdsGrouped();
+        $translate = ZfExtended_Zendoverwrites_Translate::getInstance();
 
-        $t = ZfExtended_Zendoverwrites_Translate::getInstance();
-        /* @var $t ZfExtended_Zendoverwrites_Translate */
+        foreach ($this->view->rows as &$lrData) {
 
-        foreach($this->view->rows as &$languageresource) {
-            $resource = $getResource($languageresource['serviceType'], $languageresource['resourceId']);
-            /* @var $resource editor_Models_LanguageResources_Resource */
-            if(!empty($resource)) {
-                $languageresource = array_merge($languageresource, $resource->getMetaData());
+            $resource = $getResource($lrData['serviceType'], $lrData['resourceId']);
+            /* @var editor_Models_LanguageResources_Resource $resource */
+            if (!empty($resource)) {
+                $lrData = array_merge($lrData, $resource->getMetaData());
+            }
+            // translate the "specificDta" field for the frontend and store the unserialized data
+            $specificData = $this->prepareSpecificData($lrData, true);
+            $languageResourceInstance = ZfExtended_Factory::get(editor_Models_LanguageResources_LanguageResource::class);
+            $languageResourceInstance->init($lrData);
+
+            $lrData['taskList'] = $this->getTaskInfos($lrData['id']);
+
+            if (empty($resource)) {
+                $lrData['status'] = LanguageResourceStatus::ERROR;
+                $lrData['statusInfo'] = $translate->_('Die verwendete Resource wurde aus der Konfiguration entfernt.');
+            } else {
+                // retrieves an assoc with 'status' and 'statusInfo' keys
+                foreach($resource->getInitialStatus($specificData, (int)$lrData['id'], $translate) as $key => $value){
+                    $lrData[$key] = $value;
+                }
             }
 
-            $languageResourceInstance = ZfExtended_Factory::get('editor_Models_LanguageResources_LanguageResource');
-            /* @var $languageResourceInstance editor_Models_LanguageResources_LanguageResource */
-            $languageResourceInstance->init($languageresource);
-
-            $languageresource['taskList'] = $this->getTaskInfos($languageresource['id']);
-
-            if(empty($resource)) {
-                $languageresource['status'] = LanguageResourceStatus::ERROR;
-                $languageresource['statusInfo'] = $t->_('Die verwendete Resource wurde aus der Konfiguration entfernt.');
-            }
-            else {
-                $moreInfo = '';
-                $languageresource['status'] = $resource->getInitialStatus($moreInfo);
-                $languageresource['statusInfo'] = $t->_($moreInfo);
-            }
-
-            $id = $languageresource['id'];
-
-            $languageresource['serviceName'] = $serviceManager->getUiNameByType($languageresource['serviceType']);
+            $id = $lrData['id'];
+            $lrData['serviceName'] = $serviceManager->getUiNameByType($lrData['serviceType']);
             //add customer assocs
-            $languageresource['customerIds'] = $this->getCustassoc($custAssoc, 'customerId', $id);
-            $languageresource['customerUseAsDefaultIds'] = $this->getCustassocByIndex($custAssoc, 'useAsDefault', $id);
-            $languageresource['customerWriteAsDefaultIds'] = $this->getCustassocByIndex($custAssoc, 'writeAsDefault', $id);
-            $languageresource['customerPivotAsDefaultIds'] = $this->getCustassocByIndex($custAssoc, 'pivotAsDefault', $id);
-            
-            $languageresource['sourceLang'] = $this->getLanguage($languages, 'sourceLang', $id);
-            $languageresource['targetLang'] = $this->getLanguage($languages, 'targetLang', $id);
+            $lrData['customerIds'] = $this->getCustassoc($custAssoc, 'customerId', $id);
+            $lrData['customerUseAsDefaultIds'] = $this->getCustassocByIndex($custAssoc, 'useAsDefault', $id);
+            $lrData['customerWriteAsDefaultIds'] = $this->getCustassocByIndex($custAssoc, 'writeAsDefault', $id);
+            $lrData['customerPivotAsDefaultIds'] = $this->getCustassocByIndex($custAssoc, 'pivotAsDefault', $id);
+
+            $lrData['sourceLang'] = $this->getLanguage($languages, 'sourceLang', $id);
+            $lrData['targetLang'] = $this->getLanguage($languages, 'targetLang', $id);
 
             // categories (for the moment: just display labels for info, no editing)
             $categoryLabels = [];
             foreach ($this->getCategoryassoc($categoryAssocs, 'categoryId', $id) as $categoryId) {
                 $categoryLabels[] = $this->renderCategoryCustomLabel($categoryId);
             }
-            $languageresource['categories'] = $categoryLabels;
-
-            $languageresource['eventsCount'] = isset($eventLoggerGroupped[$id]) ? (integer)$eventLoggerGroupped[$id] : 0;
-
-            if(isset($languageresource['specificData']) && !empty($languageresource['specificData'])){
-                $languageresource['specificData'] = $this->translateSpecificData($languageresource['specificData'],$languageresource['serviceName']);
-            }
+            $lrData['categories'] = $categoryLabels;
+            $lrData['eventsCount'] = isset($eventLoggerGroupped[$id]) ? (integer)$eventLoggerGroupped[$id] : 0;
         }
     }
 
@@ -308,7 +297,7 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         $this->view->rows->eventsCount = isset($eventLoggerGroupped[$this->entity->getId()]) ? (integer)$eventLoggerGroupped[$this->entity->getId()] : 0;
 
         $connector = $serviceManager->getConnector($this->entity);
-        $this->view->rows->status = $connector->getStatus($this->entity->getResource());
+        $this->view->rows->status = $connector->getStatus($this->entity->getResource(), $this->entity);
         $this->view->rows->statusInfo = $t->_($connector->getLastStatusInfo());
 
         $languages=ZfExtended_Factory::get('editor_Models_LanguageResources_Languages');
@@ -318,9 +307,7 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         $this->view->rows->sourceLang = $this->getLanguage($languages, 'sourceLang', $this->entity->getId());
         $this->view->rows->targetLang = $this->getLanguage($languages, 'targetLang', $this->entity->getId());
 
-        if(property_exists($this->view->rows,'specificData') && strlen($this->view->rows->specificData) > 0){
-            $this->view->rows->specificData = $this->translateSpecificData($this->view->rows->specificData,$this->view->rows->serviceName);
-        }
+        $this->prepareSpecificData($this->view->rows, false);
     }
 
     /**
@@ -612,8 +599,8 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
             throw new ZfExtended_Models_Entity_NotFoundException('Requested languageResource is not filebased!');
         }
 
-        $connector = $serviceManager->getConnector($this->entity);
         /* @var $connector editor_Services_Connector */
+        $connector = $serviceManager->getConnector($this->entity);
 
         $validExportTypes = $connector->getValidExportTypes();
 
@@ -621,14 +608,48 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
             throw new ZfExtended_Models_Entity_NotFoundException('Can not download in format '.$type);
         }
 
+        if ($connector->exportsFile()) {
+            $this->sendStreamedFile($connector->export($validExportTypes[$type]));
+
+            return;
+        }
+
         $data = $connector->getTm($validExportTypes[$type]);
 
         Header::sendDownload(
             rawurlencode($this->entity->getName()) . '.' . strtolower($type),
-            $validExportTypes[$type]
+            contentType: $validExportTypes[$type]
         );
+
         echo $data;
         exit;
+    }
+
+    private function sendStreamedFile(string $filePath): void
+    {
+        $fp = fopen($filePath, 'rb');
+
+        if ($fp === false) {
+            throw new ZfExtended_Models_Entity_NotFoundException('Error occurred during creating file for download');
+        }
+
+        ['extension' => $extension] = pathinfo($filePath);
+        Header::sendDownload(
+            rawurlencode($this->entity->getName()) . '.' . strtolower($extension),
+            contentType: 'application/octet-stream',
+            additionalHeaders: ['Content-Length' => filesize($filePath), 'Accept-Ranges' => 'bytes']
+        );
+
+        $bufferSize = 8192;
+
+        while (!feof($fp)) {
+            echo fread($fp, $bufferSize);
+            ob_flush();
+            flush();
+        }
+
+        fclose($fp);
+        unlink($filePath);
     }
 
     public function postAction()
@@ -658,16 +679,20 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         }
 
         $sourceLangCode = null;
+        $sourceLangName = null;
         $targetLangCode = null;
+        $targetLangName = null;
         //find the language codes for the current resource
         //in each resource separate language code matching should be introduced
         //because some of the resources are supporting different type of language codes
         //rfc as a language code will be used when no custom matching is implemented for the resource
         if(!empty($sourceLangId)){
             $sourceLangCode = $resource->getLanguageCodeSource($sourceLangId);
+            $sourceLangName = $resource->getLanguageNameSource($sourceLangId);
         }
         if(!empty($targetLangId)){
             $targetLangCode = $resource->getLanguageCodeTarget($targetLangId);
+            $targetLangName = $resource->getLanguageNameTarget($targetLangId);
         }
 
         //set the entity resource type from the $resource
@@ -705,8 +730,10 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         /* @var editor_Models_LanguageResources_Languages $resourceLanguages */
         $resourceLanguages->setSourceLang($sourceLangId);
         $resourceLanguages->setSourceLangCode($sourceLangCode);
+        $resourceLanguages->setSourceLangName($sourceLangName);
         $resourceLanguages->setTargetLang($targetLangId);
         $resourceLanguages->setTargetLangCode($targetLangCode);
+        $resourceLanguages->setTargetLangName($targetLangName);
         $resourceLanguages->setLanguageResourceId($this->data['id']);
         if (!empty($sourceLangId) || !empty($targetLangId)) {
             $resourceLanguages->save();
@@ -1399,7 +1426,7 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
 
         //convert the html special chars
         $decodeHtmlSpecial=function($string){
-            return htmlspecialchars_decode($string);;
+            return htmlspecialchars_decode($string);
         };
 
         $queryString=$decodeHtmlSpecial($queryString);
@@ -1470,41 +1497,40 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         return str_replace(array_keys($tags), array_values($tags), $segment);
     }
 
-    /***
-     * @param string $specificData
-     * @param string $serviceName
-     * @return string
+    /**
+     * Transforms the specificData for the frontend
+     * updates the value in the passed object or array and returns the deserialized specificData
+     * @param array|stdClass $resourceData
+     * @param bool $isArray
+     * @return array
      * @throws Zend_Exception
      * @throws Zend_Json_Exception
+     * @throws ZfExtended_Exception
      */
-    protected function translateSpecificData(string $specificData, string $serviceName): string
+    protected function prepareSpecificData(mixed &$resourceData, bool $isArray): array
     {
-        $translate = ZfExtended_Zendoverwrites_Translate::getInstance();
-        /* @var $translate ZfExtended_Zendoverwrites_Translate */;
+        if (($isArray && !array_key_exists('specificData', $resourceData))
+            || (!$isArray && !property_exists($resourceData, 'specificData'))) {
+            return [];
+        }
+        $specificData = $isArray ? $resourceData['specificData'] : $resourceData->specificData;
+        $specificData = empty($specificData) ? null : Zend_Json::decode($specificData);
 
-        $data = Zend_Json::decode($specificData);
-        $return = [];
-
-        $keysToIgnore = ['status'];
-
-        foreach ($data as $key=>$value) {
-            if(in_array($key,$keysToIgnore)){
-                continue;
-            }
-            $toAdd = [
-                'type' => $key.'_'.$serviceName,
-                'text' => $translate->_($key.'_'.$serviceName),
-                'value' => $value
-            ];
-            // fileName should always appear as first element
-            if($key === 'fileName'){
-                array_unshift($return,$toAdd);
-            }else {
-                array_push($return, $toAdd);
-            }
+        if (empty($specificData)) {
+            $returnData = [];
+            $specificData = null;
+        } else {
+            $returnData = $specificData;
+            $specificData = Zend_Json::encode($specificData);
         }
 
-        return empty($return) ? '' : Zend_Json::encode($return);
+        if ($isArray) {
+            $resourceData['specificData'] = $specificData;
+        } else {
+            $resourceData->specificData = $specificData;
+        }
+
+        return $returnData;
     }
 
     /**

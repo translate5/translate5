@@ -32,10 +32,10 @@ END LICENSE AND COPYRIGHT
 Ext.define('Editor.view.LanguageResources.EngineCombo', {
     extend: 'Ext.form.field.ComboBox',
     alias: 'widget.enginecombo',
-    fieldLabel:'Engine',
+    fieldLabel: 'Engine/Model',
     displayField: 'name',
     valueField: 'id',
-    store:'engine',
+    store: 'engine',
     queryMode: 'local',
-    selectOnFocus:true
+    selectOnFocus: true
 });

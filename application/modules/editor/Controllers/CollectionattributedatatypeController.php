@@ -26,6 +26,8 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\ZfExtended\MismatchException;
+
 /**
  *
  */
@@ -56,7 +58,7 @@ class editor_CollectionattributedatatypeController extends ZfExtended_RestContro
     /**
      * @throws ReflectionException
      * @throws Zend_Db_Statement_Exception
-     * @throws ZfExtended_Mismatch
+     * @throws MismatchException
      */
     public function init() {
 
@@ -77,7 +79,7 @@ class editor_CollectionattributedatatypeController extends ZfExtended_RestContro
     /**
      *
      * @throws Zend_Db_Statement_Exception
-     * @throws ZfExtended_Mismatch
+     * @throws MismatchException
      */
     public function indexAction()
     {
@@ -130,7 +132,7 @@ class editor_CollectionattributedatatypeController extends ZfExtended_RestContro
      * Change mapping record
      *
      * @throws Zend_Db_Statement_Exception
-     * @throws ZfExtended_Mismatch
+     * @throws MismatchException
      * @throws ZfExtended_Models_Entity_Exceptions_IntegrityConstraint
      * @throws ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey
      * @throws ZfExtended_Models_Entity_NotFoundException

@@ -69,18 +69,21 @@ class editor_Models_Segment_Utility {
      * @return string $segment
      */
     public static function foreachSegmentTextNode($segment, callable $textNodeCallback) {
-        $split = preg_split('#(<[^\s][^>]*>)#', $segment, flags: PREG_SPLIT_DELIM_CAPTURE);
-        
-        $i = 0;
-        foreach($split as $idx => $chunk) {
-            if($i++ % 2 === 1 || strlen($chunk) == 0) {
-                //ignore found tags in the content or empty chunks
-                continue;
+        if(!empty($segment)){
+            $split = preg_split('#(<[^\s][^>]*>)#', $segment, flags: PREG_SPLIT_DELIM_CAPTURE);
+
+            $i = 0;
+            foreach($split as $idx => $chunk) {
+                if($i++ % 2 === 1 || strlen($chunk) == 0) {
+                    //ignore found tags in the content or empty chunks
+                    continue;
+                }
+
+                $split[$idx] = $textNodeCallback($chunk);
             }
-            
-            $split[$idx] = $textNodeCallback($chunk);
+            return join($split);
         }
-        return join($split);
+        return (string)$segment;
     }
     
     public function __construct() {

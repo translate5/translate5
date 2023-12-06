@@ -21,7 +21,7 @@ START LICENSE AND COPYRIGHT
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
@@ -31,6 +31,9 @@ END LICENSE AND COPYRIGHT
  * @package editor
  * @version 1.0
  */
+
+use MittagQI\Translate5\Task\Export\FileParser\Xlf\Comments;
+use MittagQI\Translate5\Task\Import\FileParser\Xlf\NamespaceRegistry;
 
 /**
  *
@@ -46,9 +49,8 @@ class editor_Models_Export_FileParser_Xlf extends editor_Models_Export_FileParse
     
     /**
      * Helper to call namespace specfic parsing stuff
-     * @var editor_Models_Export_FileParser_Xlf_Namespaces
      */
-    protected $namespaces;
+    protected editor_Models_Export_FileParser_Xlf_Namespaces $namespace;
     
     /**
      * @var array
@@ -85,14 +87,40 @@ class editor_Models_Export_FileParser_Xlf extends editor_Models_Export_FileParse
      * - befüllt $this->_exportFile
      */
     protected function parse() {
-        $xmlparser = ZfExtended_Factory::get('editor_Models_Import_FileParser_XmlParser');
-        /* @var $xmlparser editor_Models_Import_FileParser_XmlParser */
-        
+        $xmlparser = ZfExtended_Factory::get(editor_Models_Import_FileParser_XmlParser::class);
+
+        $config = $this->_task->getConfig();
+        $comments = ZfExtended_Factory::get(Comments::class, [
+            (bool) $config->runtimeOptions->editor->export->exportComments,
+            (bool) $config->runtimeOptions->export->xliff->commentAddTranslate5Namespace
+        ]);
+
         //namespaces are not available until the xliff start tag was parsed!
-        $xmlparser->registerElement('xliff', function($tag, $attributes, $key) use ($xmlparser){
-            $this->namespaces = ZfExtended_Factory::get("editor_Models_Export_FileParser_Xlf_Namespaces",[$xmlparser->getChunk($key)]);
-            $this->namespaces->registerParserHandler($xmlparser, $this->_task);
-        });
+        $xmlparser->registerElement(
+            'xliff',
+            function ($tag, $attributes, $key) use ($xmlparser, $comments) {
+                $this->namespace = NamespaceRegistry::getExportNamespace(
+                    $xmlparser->getChunk($key),
+                    $xmlparser,
+                    $comments
+                );
+            },
+            function ($tag, $key, $opener) use ($comments, $xmlparser) {
+                $namespaceAdded = $xmlparser->getAttribute($opener['attributes'], 'xmlns:translate5');
+
+                //add translate5 namespace definition to the xliff header if needed
+                if ($comments->getTranslate5CommentCount() > 0 && !$namespaceAdded) {
+                    $xmlparser->replaceChunk(
+                        $opener['openerKey'],
+                        str_replace(
+                            '>',
+                            ' xmlns:translate5="http://www.translate5.net/">',
+                            $xmlparser->getChunk($opener['openerKey'])
+                        )
+                    );
+                }
+            }
+        );
         
         $xmlparser->registerElement('lekTargetSeg', null, function($tag, $key, $opener) use ($xmlparser){
             $attributes = $opener['attributes'];
@@ -132,7 +160,7 @@ class editor_Models_Export_FileParser_Xlf extends editor_Models_Export_FileParse
 
         $xmlparser->registerElement('trans-unit', function(){
             $this->transUnitLength = 0;
-        }, function($tag, $key, $opener) use ($xmlparser){
+        }, function($tag, $key, $opener) use ($xmlparser, $comments){
             $segments = [];
             foreach($this->segmentIdsPerUnit as $segmentId) {
                 $segments[] = $this->getSegment($segmentId);
@@ -190,10 +218,15 @@ class editor_Models_Export_FileParser_Xlf extends editor_Models_Export_FileParse
                     $this->logSegment($originalAttributes, 'segment to long');
                 }
             }
+
+            //does return empty comments if already processed by a namespace
+            $xmlparser->replaceChunk($key, $comments->getCommentXml().$xmlparser->getChunk($key));
         });
 
-        //the unit segment id container must be removed on export, they are mainly needed for namespace related features, which are executed before
-        $xmlparser->registerElement('t5:unitSegIds', null, function($tag, $key) use ($xmlparser){
+        //the unit segment id container must be removed on export,
+        // they are mainly needed for namespace related features, which are executed before
+        $xmlparser->registerElement('t5:unitSegIds', null, function($tag, $key, $opener) use ($xmlparser, $comments) {
+            $comments->loadComments($opener['attributes'], $this->_task);
             $xmlparser->replaceChunk($key, '');
         });
 

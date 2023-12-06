@@ -227,13 +227,11 @@ abstract class editor_Services_Connector_Abstract {
             return;
         }
 
-        /** @var editor_Models_Languages $fuzzy */
-        $fuzzy = ZfExtended_Factory::get('editor_Models_Languages');
-        $sourceFuzzy = $fuzzy->getFuzzyLanguages($sourceLang,includeMajor: true);
-        $targetFuzzy = $fuzzy->getFuzzyLanguages($targetLang,includeMajor: true);
+        $fuzzy = ZfExtended_Factory::get(editor_Models_Languages::class);
+        $sourceFuzzy = $fuzzy->getFuzzyLanguages($sourceLang, includeMajor: true);
+        $targetFuzzy = $fuzzy->getFuzzyLanguages($targetLang, includeMajor: true);
 
-        /** @var editor_Models_LanguageResources_Languages $languages */
-        $languages = ZfExtended_Factory::get('editor_Models_LanguageResources_Languages');
+        $languages = ZfExtended_Factory::get(editor_Models_LanguageResources_Languages::class);
 
         // load only the required languages
         $langaugepair = $languages->loadFilteredPairs($this->languageResource->getId(),$sourceFuzzy,$targetFuzzy);
@@ -384,10 +382,14 @@ abstract class editor_Services_Connector_Abstract {
     /**
      * Check the status of the language resource. If using the HttpClient,
      *  the handling of general service down and timeout as no connection, is done in the connector wrapper.
-     * @param editor_Models_LanguageResources_Resource $resource the resource which should be used for connection
-     * @return string the status of the connected resource and additional information if there is some
+     * @param editor_Models_LanguageResources_Resource $resource
+     * @param editor_Models_LanguageResources_LanguageResource|null $languageResource: May not be given in some cases
+     * @return string
      */
-    abstract public function getStatus(editor_Models_LanguageResources_Resource $resource);
+    abstract public function getStatus(
+        editor_Models_LanguageResources_Resource $resource,
+        editor_Models_LanguageResources_LanguageResource $languageResource = null
+    ): string;
     
     /**
      * returns the last stored additional info string from the last getStatus call
@@ -452,8 +454,7 @@ abstract class editor_Services_Connector_Abstract {
      * @return string[]
      */
     public function languages(): array {
-        $languages = ZfExtended_Factory::get('editor_Models_Languages');
-        /* @var $languages editor_Models_Languages*/
+        $languages = ZfExtended_Factory::get(editor_Models_Languages::class);
         $ret = $languages->loadAllKeyValueCustom('id','rfc5646');
         return array_values($ret);
     }
@@ -501,8 +502,7 @@ abstract class editor_Services_Connector_Abstract {
         if(!$this->tagHandler->logger->hasQueuedLogs()) {
             return;
         }
-        $task = ZfExtended_Factory::get('editor_Models_Task');
-        /* @var $task editor_Models_Task */
+        $task = ZfExtended_Factory::get(editor_Models_Task::class);
         $task->loadByTaskGuid($segment->getTaskGuid());
         $this->tagHandler->logger->flush([
             'segmentId' => $segment->getId(),
@@ -554,16 +554,26 @@ abstract class editor_Services_Connector_Abstract {
 
     protected function getSourceLanguageCode(): string
     {
-        $langModel = ZfExtended_Factory::get(editor_Models_Languages::class);
-        $langModel->load($this->sourceLang);
+        $langModel = editor_ModelInstances::language($this->sourceLang);
         return $langModel->getRfc5646();
+    }
+
+    protected function getSourceLanguageName(): string
+    {
+        $langModel = editor_ModelInstances::language($this->sourceLang);
+        return $langModel->getLangName();
     }
 
     protected function getTargetLanguageCode(): string
     {
-        $langModel = ZfExtended_Factory::get(editor_Models_Languages::class);
-        $langModel->load($this->targetLang);
+        $langModel = editor_ModelInstances::language($this->targetLang);
         return $langModel->getRfc5646();
+    }
+
+    protected function getTargetLanguageName(): string
+    {
+        $langModel = editor_ModelInstances::language($this->targetLang);
+        return $langModel->getLangName();
     }
 
     protected function getServiceNameDisplayedInLog(): string

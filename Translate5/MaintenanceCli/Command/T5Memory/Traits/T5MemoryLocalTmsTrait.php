@@ -52,28 +52,31 @@ trait T5MemoryLocalTmsTrait
             }
 
             $languageResource->load($languageResourceData['id']);
+            $memories = $languageResource->getSpecificData('memories', true);
 
-            try {
-                $connector->connectTo(
-                    $languageResource,
-                    $languageResource->getSourceLang(),
-                    $languageResource->getTargetLang()
-                );
+            foreach ($memories as ['filename' => $tmName, 'readonly' => $readonly]) {
+                try {
+                    $connector->connectTo(
+                        $languageResource,
+                        $languageResource->getSourceLang(),
+                        $languageResource->getTargetLang()
+                    );
 
-                $status = $connector->getStatus($languageResource->getResource());
-            } catch (\Throwable) {
-                $status = 'Language resource service is not available';
+                    $status = $connector->getStatus($languageResource->getResource(), $languageResource, $tmName);
+                } catch (\Throwable) {
+                    $status = 'Language resource service is not available';
+                }
+
+                $url = rtrim($languageResource->getResource()->getUrl(), '/') . '/';
+
+                yield $url . ' - ' . $tmName => [
+                    'name' => $tmName,
+                    'readonly' => $readonly,
+                    'uuid' => $languageResource->getLangResUuid(),
+                    'url' => $url,
+                    'status' => $status,
+                ];
             }
-
-            $tmName = $connector->getApi()->getTmName();
-            $url = rtrim($languageResource->getResource()->getUrl(), '/') . '/';
-
-            yield $url . ' - ' . $tmName => [
-                'name' => $tmName,
-                'uuid' => $languageResource->getLangResUuid(),
-                'url' => $url,
-                'status' => $status,
-            ];
         }
     }
 

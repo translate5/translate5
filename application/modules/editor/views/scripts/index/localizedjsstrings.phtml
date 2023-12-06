@@ -1764,6 +1764,7 @@ Ext.define('Editor.controller.Localizer', {
             mergeTermsWarnTitle: '<?php echo $this->translate->_('Nicht empfohlen!');?>',
             mergeTermsWarnMessage: '<?php echo $this->translate->_('Begriffe in der TBX werden immer zuerst nach ID mit bestehenden Einträgen in der TermCollection zusammengeführt. Wenn Terme zusammenführen angekreuzt ist und die ID in der TBX nicht in der TermCollection gefunden wird, wird gesucht, ob derselbe Begriff bereits in derselben Sprache existiert. Wenn ja, werden die gesamten Termeinträge zusammengeführt. Insbesondere bei einer TermCollection mit vielen Sprachen kann dies zu unerwünschten Ergebnissen führen.');?>',
             importing: '<?php echo $this->translate->_('Die Sprachressource {0} wird gerade importiert. Bitte warten Sie, bis der Import abgeschlossen ist.');?>',
+            beingTrained: '<?php echo $this->translate->_('Die Sprachressource {0} wird gerade trainiert. Bitte warten Sie, bis das Training abgeschlossen ist.');?>',
             deletionForbidden: '<?php echo $this->translate->_('Sie sind nicht berechtigt, diese Sprachressource zu entfernen.');?>',
             error: '<?php echo $this->translate->_('Fehler');?>'
         }
@@ -1855,8 +1856,11 @@ Ext.define('Editor.controller.Localizer', {
                 noconnection: '<?php echo $this->translate->_('Keine Verbindung!');?>',
                 import: '<?php echo $this->translate->_('Import läuft');?>',
                 notloaded: '<?php echo $this->translate->_('verfügbar');?>',
-                novalidlicense: '<?php echo $this->translate->_('Keine gültige Lizenz.');?>',
                 notchecked: '<?php echo $this->translate->_('Nicht geprüft');?>',
+                novalidlicense: '<?php echo $this->translate->_('Keine gültige Lizenz.');?>',
+                tuninginprogress: '<?php echo $this->translate->_('Wird trainiert');?>',
+                reorganize_in_progress: '<?php echo $this->translate->_('Wird reorganisiert');?>',
+                reorganize_failed: '<?php echo $this->translate->_('Reorganisation gescheitert');?>'
             },
             taskassocgridcell: '<?php echo $this->translate->_('Aufgaben anzeigen, die diese Sprachressource verwenden');?>',
             customers: '<?php echo $this->translate->_('Kunden');?>',
@@ -2231,6 +2235,30 @@ Editor.data.l10n = {
             exportButtonText: '<?php echo $this->translate->_('Exportieren');?>',
             cancelButtonText: '<?php echo $this->translate->_('Abbrechen');?>',
             title: '<?php echo $this->translate->_('Als TBX exportieren');?>'
+        },
+        specificData: {
+            all: {
+                domainCode: 'Domain code',
+                engineName: 'Engine name',
+                fileName: 'File name',
+                status: 'Status'
+            },
+            GroupShare: {
+                tmId: '<?php echo $this->translate->_('tmId_GroupShare');?>'
+            },
+            OpenTM2: {
+                fileName: '<?php echo $this->translate->_('fileName_OpenTM2');?>'
+            },
+            SDLLanguageCloud: {
+                domainCode: '<?php echo $this->translate->_('domainCode_SDLLanguageCloud');?>',
+                engineName: '<?php echo $this->translate->_('engineName_SDLLanguageCloud');?>'
+            },
+            TermCollection: {
+                fileName: '<?php echo $this->translate->_('fileName_TermCollection');?>',
+                term: '<?php echo $this->translate->_('term_TermCollection');?>',
+                termEntry: '<?php echo $this->translate->_('termEntry_TermCollection');?>',
+                attribute: '<?php echo $this->translate->_('attribute_TermCollection');?>'
+            }
         }
     },
     configuration: {
@@ -2321,6 +2349,7 @@ Editor.data.l10n = {
 $paths = $this->pluginLocale()->getLocalePaths();
 foreach($paths as $path) {
     require $path;
+    echo "\n";
 }
 
 exit;

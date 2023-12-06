@@ -267,6 +267,7 @@ class editor_Workflow_Actions extends editor_Workflow_Actions_Abstract {
         $http->setMethod($http::POST);
         $http->setHeaders('Accept-charset', 'UTF-8');
         $http->setHeaders('Accept', 'application/json; charset=utf-8');
+        $http->setHeaders('Content-Type', 'application/json; charset=utf-8');
 
         if( !empty($task)){
             $data->task = $task->getDataObject();
