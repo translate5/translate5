@@ -611,7 +611,7 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         if ($connector->exportsFile()) {
             $this->sendStreamedFile($connector->export($validExportTypes[$type]));
 
-            return;
+            exit;
         }
 
         $data = $connector->getTm($validExportTypes[$type]);

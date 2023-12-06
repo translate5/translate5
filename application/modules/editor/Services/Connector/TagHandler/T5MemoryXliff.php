@@ -53,9 +53,14 @@ class editor_Services_Connector_TagHandler_T5MemoryXliff extends editor_Services
         });
     }
 
+    public static function fullTagRegex(): string
+    {
+        return sprintf('/<%s id="(\d+)" r="(.+)" n="(.+)"\s?\/>/Uu', self::T5MEMORY_NUMBER_TAG);
+    }
+
     public function restoreInResult(string $resultString): ?string
     {
-        $t5nTagRegex = sprintf('/<%s id="(\d+)" r="(.+)" n="(.+)"\s?\/>/Uu', self::T5MEMORY_NUMBER_TAG);
+        $t5nTagRegex = self::fullTagRegex();
 
         if (preg_match_all($t5nTagRegex, $resultString, $matches, PREG_SET_ORDER)) {
             $numberTags = [];

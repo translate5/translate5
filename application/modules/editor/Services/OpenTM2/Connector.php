@@ -27,6 +27,8 @@ END LICENSE AND COPYRIGHT
 */
 
 use editor_Models_Task as Task;
+use editor_Services_Connector_TagHandler_T5MemoryXliff as T5MemoryXliff;
+use MittagQI\Translate5\ContentProtection\T5memory\T5NTagSchemaFixFilter;
 use MittagQI\Translate5\LanguageResource\Status as LanguageResourceStatus;
 use MittagQI\Translate5\Service\T5Memory;
 
@@ -1333,7 +1335,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
     {
         $memories = $this->languageResource->getSpecificData('memories', parseAsArray: true);
 
-        return count($memories) > 1;
+        return count($memories) >= 1;
     }
 
     // TODO Move to a separate class(es) during refactoring
@@ -1360,6 +1362,8 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
         $writer->startDocument('1.0', 'UTF-8');
         $writer->setIndent(true);
 
+        stream_filter_register('fix-t5n-tag', T5NTagSchemaFixFilter::class);
+
         foreach ($memories as $memoryNumber => $memory) {
             $filename = $exportDir . $memory['filename'] . '_' . uniqid() . '.tmx';
             file_put_contents(
@@ -1367,12 +1371,13 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
                 $this->getTm($mime, $memory['filename'])
             );
 
+            $stream = "php://filter/read=fix-t5n-tag/resource=$filename";
             $reader = new XMLReader();
-            $reader->open($filename);
+            $reader->open($stream);
 
             while ($reader->read()) {
                 if ($reader->nodeType == XMLReader::ELEMENT && $reader->name == 'tu') {
-                    $writer->writeRaw($reader->readOuterXML());
+                    $writer->writeRaw(preg_replace(T5MemoryXliff::fullTagRegex(), '\3', $reader->readOuterXML()));
                 }
 
                 // Further code is only applicable for the first file
