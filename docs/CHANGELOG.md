@@ -14,6 +14,45 @@ All updates are (downwards) compatible! If not this is listed in the important r
 
 
 
+
+
+## [6.8.0] - 2023-12-05
+
+### Important Notes:
+#### [TRANSLATE-3561](https://jira.translate5.net/browse/TRANSLATE-3561)
+These changes will work properly only with t5memory after version 0.4.1056
+ 
+
+
+### Changed
+**[TRANSLATE-3561](https://jira.translate5.net/browse/TRANSLATE-3561): t5memory - Enable t5memory connector to load balance big TMs** <br>
+Fix overflow error when importing very big files into t5memory by splitting the TM internally.
+
+**[TRANSLATE-3537](https://jira.translate5.net/browse/TRANSLATE-3537): Import/Export - Process comments from xliff 1.2 files** <br>
+XLF comments placed in note tags are now also imported and exported as task comments. The behavior is configurable.
+
+
+### Bugfixes
+**[TRANSLATE-3601](https://jira.translate5.net/browse/TRANSLATE-3601): VisualReview / VisualTranslation - Change default for processing of invisible texts in PDF converter in Visual** <br>
+Changed default for processing of invisible text in the visual (Text visibility correction) to fix only fully occluded text
+
+
+## [6.7.3] - 2023-12-01
+
+### Important Notes:
+ 
+
+
+### Added
+**[TRANSLATE-3548](https://jira.translate5.net/browse/TRANSLATE-3548): Okapi integration - Show xml-tags configured as 'translate="no"' in format conversion as protected segments in translate5** <br>
+Main bulk of this feature is Okapi development and to use it Okapi 1.46 is needed. It allows to configure xml tags in Okapi as 'translate="no"', but still show them as locked segments in translate5.
+
+
+### Bugfixes
+**[TRANSLATE-3588](https://jira.translate5.net/browse/TRANSLATE-3588): Editor general, VisualReview / VisualTranslation - Cleaning up the visual public symlinks does not work** <br>
+FIX: cleanup for visual public URL symbolic links
+
+
 ## [6.7.2] - 2023-11-28
 
 ### Important Notes:

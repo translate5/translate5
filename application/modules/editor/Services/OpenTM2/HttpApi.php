@@ -385,7 +385,7 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
         $data->searchString = $queryString;
         $data->searchType = $field;
         $data->searchPosition = $searchPosition;
-        $data->numResults = 20;
+        $data->numResults = $numResults;
         $data->msSearchAfterNumResults = 250;
         $http = $this->getHttpWithMemory('POST', $tmName, 'concordancesearch');
         $http->setRawData($this->jsonEncode($data), 'application/json; charset=utf-8');
