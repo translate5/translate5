@@ -16,6 +16,29 @@ All updates are (downwards) compatible! If not this is listed in the important r
 
 
 
+
+## [6.8.1] - 2023-12-07
+
+### Important Notes:
+ 
+
+
+### Changed
+**[TRANSLATE-3608](https://jira.translate5.net/browse/TRANSLATE-3608): Configuration - Improve edit 100% matches config desciption** <br>
+Improvement in 100% matches config (runtimeOptions.frontend.importTask.edit100PercentMatch) description.
+
+
+### Bugfixes
+**[TRANSLATE-3610](https://jira.translate5.net/browse/TRANSLATE-3610): Main back-end mechanisms (Worker, Logging, etc.) - FIX bug in Sanitization with empty params** <br>
+FIX: Possible unneccessary exception when sanitizing params
+
+**[TRANSLATE-3606](https://jira.translate5.net/browse/TRANSLATE-3606): Main back-end mechanisms (Worker, Logging, etc.), User Management - Session API authentication combined with apptokens leads to beeing the wrong user** <br>
+FIX authentication via POST on the session-controller, where elevated credentials were delivered when called with an App-Token
+
+**[TRANSLATE-3605](https://jira.translate5.net/browse/TRANSLATE-3605): LanguageResources - TM button for associated tasks missing** <br>
+Fix problem where the TM button for associated tasks was not visible in resources overview.
+
+
 ## [6.8.0] - 2023-12-05
 
 ### Important Notes:
