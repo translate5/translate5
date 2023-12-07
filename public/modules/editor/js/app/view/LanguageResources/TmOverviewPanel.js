@@ -186,7 +186,9 @@ Ext.define('Editor.view.LanguageResources.TmOverviewPanel', {
                         iconCls: 'ico-tm-tasks',
                         hidden: true,
                         isDisabled: function( view, rowIndex, colIndex, item, record ) {
-                            item.hidden != record.get('writable');
+                            // this icon is hidden for resources which are NOT writable
+                            // and visible for all writable resources like (TM - t5memory for example)
+                            item.hidden = !record.get('writable');
                         }
                     },{
                         action: 'specific',
