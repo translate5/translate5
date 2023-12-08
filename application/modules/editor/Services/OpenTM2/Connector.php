@@ -26,9 +26,13 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use editor_Models_Segment_Whitespace as Whitespace;
 use editor_Models_Task as Task;
-use editor_Services_Connector_TagHandler_T5MemoryXliff as T5MemoryXliff;
+use MittagQI\Translate5\ContentProtection\ContentProtector;
+use MittagQI\Translate5\ContentProtection\Model\ContentProtectionRepository;
 use MittagQI\Translate5\ContentProtection\T5memory\T5NTagSchemaFixFilter;
+use MittagQI\Translate5\ContentProtection\T5memory\TmConversionService;
+use MittagQI\Translate5\ContentProtection\WhitespaceProtector;
 use MittagQI\Translate5\LanguageResource\Status as LanguageResourceStatus;
 use MittagQI\Translate5\Service\T5Memory;
 
@@ -76,6 +80,9 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
      */
     private int $fuzzyReorganize = -1;
 
+    private TmConversionService $conversionService;
+    private ContentProtector $contentProtector;
+
     public function __construct()
     {
         editor_Services_Connector_Exception::addCodes([
@@ -85,6 +92,9 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
 
         //ZfExtended_Logger::addDuplicatesByMessage('E1314');
         ZfExtended_Logger::addDuplicatesByEcode('E1333', 'E1306', 'E1314');
+
+        $this->contentProtector = ContentProtector::create(ZfExtended_Factory::get(Whitespace::class));
+        $this->conversionService = new TmConversionService(new ContentProtectionRepository(), $this->contentProtector);
 
         parent::__construct();
     }
@@ -389,6 +399,16 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
             $tmOffset = (int) $tmOffset;
         }
 
+        $searchString = $this->tagHandler->prepareQuery(
+            $this->contentProtector->protect(
+                $searchString,
+                (int) $this->languageResource->getSourceLang(),
+                (int) $this->languageResource->getSourceLang(),
+                ContentProtector::ENTITY_MODE_RESTORE,
+                WhitespaceProtector::alias()
+            )
+        );
+
         $resultList = new editor_Services_ServiceResult();
         $resultList->setLanguageResource($this->languageResource);
 
@@ -448,18 +468,20 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
         //$found->{$field}
         //[NextSearchPosition] =>
         foreach ($results as $result) {
+            $isSource = $field === 'source';
+            $searchString = $this->conversionService->convertT5MemoryTagToNumber($searchString);
             $resultList->addResult($this->highlight(
                 $searchString,
-                $this->tagHandler->restoreInResult($result->target),
+                $this->tagHandler->restoreInResult($result->target, $isSource, true),
                 $field === 'target'
             ));
             $resultList->setSource($this->highlight(
                 $searchString,
-                $this->tagHandler->restoreInResult($result->source),
-                $field === 'source')
+                $this->tagHandler->restoreInResult($result->source, $isSource, true),
+                $isSource)
             );
         }
-
+        error_log(print_r($resultList->getResult(), true));
         return $resultList;
     }
 
@@ -1377,7 +1399,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
 
             while ($reader->read()) {
                 if ($reader->nodeType == XMLReader::ELEMENT && $reader->name == 'tu') {
-                    $writer->writeRaw(preg_replace(T5MemoryXliff::fullTagRegex(), '\3', $reader->readOuterXML()));
+                    $writer->writeRaw($this->conversionService->convertT5MemoryTagToNumber($reader->readOuterXML()));
                 }
 
                 // Further code is only applicable for the first file

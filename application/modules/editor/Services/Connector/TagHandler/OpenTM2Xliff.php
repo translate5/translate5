@@ -64,8 +64,11 @@ class editor_Services_Connector_TagHandler_OpenTM2Xliff extends editor_Services_
      * {@inheritDoc}
      * @see editor_Services_Connector_TagHandler_Xliff::restoreInResult()
      */
-    public function restoreInResult(string $resultString): ?string
-    {
+    public function restoreInResult(
+        string $resultString,
+        bool $isSource = true,
+        bool $unprotectContent = false
+    ): ?string {
         return parent::restoreInResult(str_replace([
             '<x mid="',
             '<bx mid="',
