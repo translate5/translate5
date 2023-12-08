@@ -34,6 +34,7 @@ END LICENSE AND COPYRIGHT
  */
 
 use MittagQI\Translate5\ContentProtection\ContentProtector;
+use MittagQI\Translate5\ContentProtection\NumberProtector;
 
 /**
  * Abstract Tag Handler for internal tags in text to be send to language resources
@@ -93,6 +94,8 @@ abstract class editor_Services_Connector_TagHandler_Abstract
 
     protected int $sourceLang = 0;
     protected int $targetLang = 0;
+
+    protected bool $protectNonWhitespaceContentOnXmlParsing = true;
     
     public function __construct() {
         $this->xmlparser = ZfExtended_Factory::get(editor_Models_Import_FileParser_XmlParser::class);
@@ -112,7 +115,8 @@ abstract class editor_Services_Connector_TagHandler_Abstract
                     $textNode,
                     $this->sourceLang,
                     $this->targetLang,
-                    ContentProtector::ENTITY_MODE_KEEP
+                    ContentProtector::ENTITY_MODE_KEEP,
+                    $this->protectNonWhitespaceContentOnXmlParsing ? '' : NumberProtector::alias()
                 ),
                 $this->shortTagIdent,
                 $this->shortcutNumberMap

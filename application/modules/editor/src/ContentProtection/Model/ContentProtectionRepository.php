@@ -78,7 +78,7 @@ class ContentProtectionRepository
 
         $select = $dbMapping->select()
             ->setIntegrityCheck(false)
-            ->from(['mapping' => $dbMapping->info($dbMapping::NAME)], [])
+            ->from(['mapping' => $dbMapping->info($dbMapping::NAME)], ['mapping.priority'])
             ->join(
                 ['recognition' => $contentRecognitionTable],
                 'recognition.id = mapping.contentRecognitionId',

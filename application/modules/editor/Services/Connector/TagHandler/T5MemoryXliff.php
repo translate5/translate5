@@ -28,19 +28,23 @@ END LICENSE AND COPYRIGHT
 
 use MittagQI\Translate5\ContentProtection\Model\ContentProtectionRepository;
 use MittagQI\Translate5\ContentProtection\NumberProtector;
+use MittagQI\Translate5\ContentProtection\T5memory\TmConversionService;
+use MittagQI\Translate5\ContentProtection\WhitespaceProtector;
 
 class editor_Services_Connector_TagHandler_T5MemoryXliff extends editor_Services_Connector_TagHandler_Xliff
 {
     private const T5MEMORY_NUMBER_TAG = 't5:n';
     protected const ALLOWED_TAGS = '<x><x/><bx><bx/><ex><ex/><g><number>';
-    private ContentProtectionRepository $numberRepository;
+    private ContentProtectionRepository $contentProtectionRepository;
     private NumberProtector $numberProtector;
+    private TmConversionService $conversionService;
     private array $numberTagMap = [];
 
     public function __construct(array $options = [])
     {
         parent::__construct($options);
-        $this->numberRepository = new ContentProtectionRepository();
+        $this->contentProtectionRepository = new ContentProtectionRepository();
+        $this->conversionService = new TmConversionService($this->contentProtectionRepository, $this->contentProtector);
         $this->numberProtector = NumberProtector::create();
         $this->xmlparser->registerElement(NumberProtector::TAG_NAME, null, function ($tagName, $key, $opener) {
             $this->xmlparser->replaceChunk($key, function () use ($key) {
@@ -53,14 +57,12 @@ class editor_Services_Connector_TagHandler_T5MemoryXliff extends editor_Services
         });
     }
 
-    public static function fullTagRegex(): string
-    {
-        return sprintf('/<%s id="(\d+)" r="(.+)" n="(.+)"\s?\/>/Uu', self::T5MEMORY_NUMBER_TAG);
-    }
-
-    public function restoreInResult(string $resultString): ?string
-    {
-        $t5nTagRegex = self::fullTagRegex();
+    public function restoreInResult(
+        string $resultString,
+        bool $isSource = true,
+        bool $unprotectContent = false
+    ): ?string {
+        $t5nTagRegex = TmConversionService::fullTagRegex();
 
         if (preg_match_all($t5nTagRegex, $resultString, $matches, PREG_SET_ORDER)) {
             $numberTags = [];
@@ -85,45 +87,19 @@ class editor_Services_Connector_TagHandler_T5MemoryXliff extends editor_Services
             }
         }
 
+        if ($unprotectContent) {
+            $this->protectNonWhitespaceContentOnXmlParsing = false;
+            $resultString = $this->contentProtector->unprotect($resultString, $isSource, WhitespaceProtector::alias());
+        }
+
         return parent::restoreInResult($resultString);
     }
 
     protected function convertQuery(string $queryString, bool $isSource): string
     {
         $this->numberTagMap = [];
-        $queryString = $this->contentProtector->unprotect($queryString, false, NumberProtector::alias());
-        $regex = NumberProtector::fullTagRegex();
 
-        if (!preg_match_all($regex, $queryString, $tags, PREG_SET_ORDER)) {
-            return $queryString;
-        }
-
-        $currentId = 1;
-        foreach ($tags as $tagProps) {
-            $tag = array_shift($tagProps);
-            $tagProps = array_combine(['type', 'name', 'source', 'iso', 'target'], $tagProps);
-
-            $contentRecognition = $this->numberRepository->getContentRecognition(
-                $tagProps['type'],
-                $tagProps['name']
-            );
-
-            $encodedRegex = base64_encode(gzdeflate($contentRecognition->getRegex()));
-            $t5nTag = sprintf(
-                '<%s id="%s" r="%s" n="%s"/>',
-                self::T5MEMORY_NUMBER_TAG,
-                $currentId,
-                $encodedRegex,
-                $isSource ? $tagProps['source'] : $tagProps['target']
-            );
-
-            $this->numberTagMap[$encodedRegex][] = $tag;
-
-            $queryString = str_replace($tag, $t5nTag, $queryString);
-            $currentId++;
-        }
-
-        return $queryString;
+        return $this->conversionService->convertContentTagToT5MemoryTag($queryString, $isSource, $this->numberTagMap);
     }
 
     protected function processXliffTags(string $queryString): string
