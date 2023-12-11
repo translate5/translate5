@@ -547,8 +547,8 @@ Ext.define('Editor.view.admin.TaskGrid', {
                         },
                         tdCls: 'taskNr',
                         text: me.text_cols.taskNr,
-                        renderer: function(value, meta) {
-                            if (value) {
+                        renderer: function(value, meta, rec) {
+                            if (!(rec.isErroneous() || rec.isImporting() || !rec.isOpenable() || rec.isCustomState())) {
                                 meta.tdAttr = 'data-qtip="' + Editor.data.l10n.tasksGrid.actionColumn.actionEdit + '"';
                             }
                             return value;
