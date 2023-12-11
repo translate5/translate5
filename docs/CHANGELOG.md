@@ -17,6 +17,18 @@ All updates are (downwards) compatible! If not this is listed in the important r
 
 
 
+
+## [6.9.0b] - 2023-12-11
+
+### Important Notes:
+ 
+
+
+### Added
+**[TRANSLATE-3206](https://jira.translate5.net/browse/TRANSLATE-3206): Configuration, Import/Export - Protect and auto-convert numbers and general patterns during translation** <br>
+Numbers are protected with tags for all translations jobs. Custom patterns for number protections can be defined in separate UI.
+
+
 ## [6.8.1] - 2023-12-07
 
 ### Important Notes:
