@@ -75,6 +75,7 @@ class ContentProtectorTest extends editor_Test_UnitTest
         $inputMapping = ZfExtended_Factory::get(InputMapping::class);
         $inputMapping->setLanguageId(5);
         $inputMapping->setContentRecognitionId($contentRecognition->getId());
+        $inputMapping->setPriority(2);
         $inputMapping->save();
 
         $contentRecognition->loadBy(FloatProtector::getType(), 'default with comma thousand decimal dot');
@@ -84,6 +85,7 @@ class ContentProtectorTest extends editor_Test_UnitTest
         $inputMapping = ZfExtended_Factory::get(InputMapping::class);
         $inputMapping->setLanguageId(5);
         $inputMapping->setContentRecognitionId($contentRecognition->getId());
+        $inputMapping->setPriority(1);
         $inputMapping->save();
     }
 

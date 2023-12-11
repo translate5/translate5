@@ -72,7 +72,6 @@ class ContentRecognitionDto
         public int $matchId,
         public ?string $format,
         public bool $keepAsIs,
-        public int $priority,
     ) {}
 
     public static function fromRow(Zend_Db_Table_Row $row): self
@@ -84,7 +83,6 @@ class ContentRecognitionDto
             (int) $row['matchId'],
             $row['format'],
             (bool) $row['keepAsIs'],
-            (int) $row['priority'],
         );
     }
 }
