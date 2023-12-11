@@ -112,7 +112,7 @@ class BasicSegmentEditingTest extends editor_Test_JsonTest {
         
         $tenthSegment = $segments[9];
         
-        $this->assertFieldTextEquals('<div title="" class="term preferredTerm exact transNotDefined">Apache</div> <div class="single 6e756d62657220747970653d22696e746567657222206e616d653d2264656661756c742073696d706c652220736f757263653d2232222069736f3d223222207461726765743d2232222f number internal-tag ownttip"><span class="short" title="&lt;1/&gt;: Number">&lt;1/&gt;</span><span class="full" data-originalid="number" data-length="-1" data-source="2" data-target="2"></span></div>.x on Unix systems.', $tenthSegment->source);
+        $this->assertFieldTextEquals('<div title="" class="term preferredTerm exact transNotDefined">Apache</div> 2.x on Unix systems.', $tenthSegment->source);
         $this->assertEquals('3471de7d2538cd261d744f828d9231c5', $tenthSegment->sourceMd5);
         $this->assertEquals('Apache 2.x on Unix systems.', $tenthSegment->sourceToSort);
         $this->assertEmpty($tenthSegment->target);

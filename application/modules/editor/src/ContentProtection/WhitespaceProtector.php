@@ -100,7 +100,7 @@ class WhitespaceProtector implements ProtectorInterface
         $protected = '';
 
         for ($i = 0; $i <= $tagCount; $i++) {
-            if (!empty($parts[$i])) {
+            if (isset($parts[$i]) && '' !== $parts[$i]) {
                 $protected .= $this->whitespace->protectWhitespace(
                     $parts[$i],
                     $excludedCharacters

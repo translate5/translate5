@@ -146,7 +146,9 @@ class editor_Segment_Length_Check {
                     $length += (int) $this->segment->textLengthByMeta(
                         $this->fieldTags->getFieldText(true, true),
                         $this->segmentMeta,
-                        $this->segment->getFileId());
+                        $this->segment->getFileId(),
+                        str_contains($this->fieldTags->getDataField(), editor_Models_SegmentField::TYPE_SOURCE)
+                    );
                     //normally, the length of one segment contains also the additionalMrkLength,
                     //for the current segment this is added below, the siblings in the next line contain their additionalMrk data already
                 } else {
@@ -180,7 +182,12 @@ class editor_Segment_Length_Check {
         if($restriction->isLengthRestricted()){
             $lengthOverall = 0;
             foreach ($lines as $line) {
-                $length = (int) $this->segment->textLengthByMeta($line, $this->segmentMeta, $this->segment->getFileId());
+                $length = (int) $this->segment->textLengthByMeta(
+                    $line,
+                    $this->segmentMeta,
+                    $this->segment->getFileId(),
+                    str_contains($field, editor_Models_SegmentField::TYPE_SOURCE)
+                );
                 $lengthOverall += $length;
                 if($restriction->maxLength > 0 && $length > $restriction->maxLength && !in_array(self::TOO_LONG, $this->states)){
                     $this->states[] = self::TOO_LONG;

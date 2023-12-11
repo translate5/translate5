@@ -247,7 +247,7 @@ class ContentProtector
         $matchCount = count($tags);
 
         for ($i = 0; $i <= $matchCount; $i++) {
-            if (!empty($strings[$i])) {
+            if (isset($strings[$i]) && '' !== $strings[$i]) {
                 $chunkStorage[] = [$strings[$i]];
             }
 
@@ -269,6 +269,6 @@ class ContentProtector
             }
         }
 
-        return array_values(array_filter(array_merge(...$chunkStorage)));
+        return array_values(array_filter(array_merge(...$chunkStorage), fn ($v) => '' !== $v));
     }
 }

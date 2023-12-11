@@ -351,7 +351,7 @@ class NumberProtector implements ProtectorInterface
         $parentNode = $text->parentNode;
 
         for ($i = 0; $i <= $matchCount; $i++) {
-            if (!empty($parts[$i])) {
+            if (isset($parts[$i]) && '' !== $parts[$i]) {
                 $parentNode->insertBefore(new DOMText($parts[$i]), $text);
             }
 

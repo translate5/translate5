@@ -99,7 +99,12 @@ class editor_Models_Segment_Meta extends ZfExtended_Models_Entity_MetaAbstract {
             //the additional mrk length is added here to each field,
             // so that it is available in the frontend out of the cached siblings without providing an additional data field
             // (the additional unit length is added once to the calculation in the frontend!
-            $data->length[$field] = (int)$segment->textLengthByMeta($value, $this, $segment->getFileId()) + (int)$this->getAdditionalMrkLength();
+            $data->length[$field] = (int) $segment->textLengthByMeta(
+                $value,
+                $this,
+                $segment->getFileId(),
+                str_contains($field, editor_Models_SegmentField::TYPE_SOURCE)
+            ) + (int)$this->getAdditionalMrkLength();
         }
         $this->__call(__FUNCTION__, [json_encode($data)]);
     }

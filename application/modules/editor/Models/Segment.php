@@ -566,8 +566,12 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract
      * @param integer $segmentFileId
      * @return integer
      */
-    public function textLengthByMeta($segmentContent, editor_Models_Segment_Meta $segmentMeta, $segmentFileId)
-    {
+    public function textLengthByMeta(
+        $segmentContent,
+        editor_Models_Segment_Meta $segmentMeta,
+        $segmentFileId,
+        bool $isSource
+    ) {
         $isPixelBased = ($segmentMeta->getSizeUnit() == editor_Models_Segment_PixelLength::SIZE_UNIT_XLF_DEFAULT);
         if ($isPixelBased) {
             return $this->textLengthByPixel(
@@ -575,7 +579,8 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract
                 $segmentMeta->getTaskGuid(),
                 $segmentMeta->getFont(),
                 $segmentMeta->getFontSize(),
-                $segmentFileId
+                $segmentFileId,
+                $isSource
             );
         }
         return $this->textLengthByChar($segmentContent);

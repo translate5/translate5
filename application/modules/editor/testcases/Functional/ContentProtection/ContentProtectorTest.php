@@ -52,6 +52,7 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\Test\Functional\ContentProtection;
 
+use editor_Models_Import_FileParser_Tag as Tag;
 use editor_Models_Import_FileParser_WhitespaceTag;
 use editor_Models_Segment_Whitespace as Whitespace;
 use editor_Test_UnitTest;
@@ -110,11 +111,11 @@ class ContentProtectorTest extends editor_Test_UnitTest
     /**
      * @dataProvider casesProvider
      */
-    public function testProtect(string $node, string $expected): void
+    public function testProtect(string $node, string $expected, string $entityHandling): void
     {
         $contentProtector = ContentProtector::create(new Whitespace());
 
-        self::assertEquals($expected, $contentProtector->protect($node, 5, 6));
+        self::assertEquals($expected, $contentProtector->protect($node, 5, 6, $entityHandling));
     }
 
     /**
@@ -139,11 +140,19 @@ class ContentProtectorTest extends editor_Test_UnitTest
         yield '&#128; is protected as char' => [
             'text' => 'Test &amp;para; entities ¶ and umlauts öäü¶ and [&#128;] TRANSLATE',
             'expected' => 'Test &amp;para; entities ¶ and umlauts öäü¶ and [<char ts="26233132383b" length="1"/>] TRANSLATE',
+            'entityHandling' => ContentProtector::ENTITY_MODE_RESTORE,
         ];
 
         yield 'float in the beginning' => [
             'text' => '123,456.789 Übersetzungsbüro [ ] 24translate 2023-09-15 and 2024-10-19',
             'expected' => '<number type="float" name="default with comma thousand decimal dot" source="123,456.789" iso="123456.789" target="123.456,789"/> Übersetzungsbüro [<char ts="c2a0" length="1"/>] 24translate <number type="date" name="default Y-m-d" source="2023-09-15" iso="2023-09-15" target="15/9/23"/> and <number type="date" name="default Y-m-d" source="2024-10-19" iso="2024-10-19" target="19/10/24"/>',
+            'entityHandling' => ContentProtector::ENTITY_MODE_RESTORE,
+        ];
+
+        yield 'zero between tags' => [
+            'text' => 'Text mit <protectedTag data-type="open" data-id="1" data-content="3c623e"/>0<protectedTag data-type="close" data-id="1" data-content="3c2f623e"/> in tags gab Probleme.',
+            'expected' => 'Text mit <protectedTag data-type="open" data-id="1" data-content="3c623e"/>0<protectedTag data-type="close" data-id="1" data-content="3c2f623e"/> in tags gab Probleme.',
+            'entityHandling' => ContentProtector::ENTITY_MODE_OFF,
         ];
     }
 
@@ -314,6 +323,30 @@ class ContentProtectorTest extends editor_Test_UnitTest
             'segment' => "string $tag1 string [$tagNBSP] string",
             'xmlChunks' => ['string ', $parsedTag1, ' string [', $parsedNBSP, '] string'],
             'finalTagIdent' => 3,
+        ];
+
+        $bTag = new Tag(Tag::TYPE_OPEN);
+        $bTag->originalContent = '<b>';
+        $bTag->rid = '1';
+        $bTag->tagNr = 1;
+        $bTag->id = '1';
+        $bTag->tag = 'protectedTag';
+        $bTag->text = '&lt;b&gt;';
+        $bTag->renderedTag = '<div class="open 62 internal-tag ownttip"><span title="&lt;b&gt;" class="short">&lt;1&gt;</span><span data-originalid="1" data-length="-1" class="full">&lt;b&gt;</span></div>';
+
+        $bCloseTag = new Tag(Tag::TYPE_CLOSE);
+        $bCloseTag->originalContent = '</b>';
+        $bCloseTag->rid = '1';
+        $bCloseTag->tagNr = 1;
+        $bCloseTag->id = '1';
+        $bCloseTag->tag = 'protectedTag';
+        $bCloseTag->text = '&lt;/b&gt;';
+        $bCloseTag->renderedTag = '<div class="close 2f62 internal-tag ownttip"><span title="&lt;/b&gt;" class="short">&lt;/1&gt;</span><span data-originalid="1" data-length="-1" class="full">&lt;/b&gt;</span></div>';
+
+        yield 'zero between tags' => [
+            'segment' => 'Text mit <protectedTag data-type="open" data-id="1" data-content="3c623e"/>0<protectedTag data-type="close" data-id="1" data-content="3c2f623e"/> in tags gab Probleme.',
+            'xmlChunks' => ['Text mit ', $bTag, '0', $bCloseTag, ' in tags gab Probleme.'],
+            'finalTagIdent' => 2,
         ];
     }
 }
