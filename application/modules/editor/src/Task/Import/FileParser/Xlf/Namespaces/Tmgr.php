@@ -55,7 +55,7 @@ class Tmgr extends AbstractNamespace
     public function transunitAttributes(array $attributes, SegmentAttributes $segmentAttributes): void
     {
         //FIXME add match rate infos into our matchRateType field!
-        $segmentAttributes->matchRate = (int) $attributes['tmgr:matchratio'];
+        $segmentAttributes->matchRate = (int) ($attributes['tmgr:matchratio'] ?? 0);
     }
 
     /**
