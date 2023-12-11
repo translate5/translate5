@@ -1639,7 +1639,7 @@ class editor_TaskController extends ZfExtended_RestController
         // exports, the user will get error message. This is checked by checkExportAllowed and this function must be
         // used if other export types are implemented in future
 
-        $context = $this->_helper->getHelper('contextSwitch')->getCurrentContext();
+        $context = $this->_helper->getHelper('contextSwitch')->getCurrentContext() ?? '';
 
         $this->getAction();
 

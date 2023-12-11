@@ -48,10 +48,11 @@ class editor_Models_Export_Exported_Worker extends ZfExtended_Worker_Abstract {
     /**
      * Get context-specific exported worker class instance if exists, or instance of self-class instance
      *
-     * @param $context
+     * @param string $context
      * @return mixed
+     * @throws ReflectionException
      */
-    public static function factory($context) {
+    public static function factory(string $context) {
 
         // Get context-specific class name
         $className = preg_replace('~_(Worker)$~', '_' . ucfirst($context) . '$1', __CLASS__);

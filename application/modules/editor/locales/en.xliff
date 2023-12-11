@@ -5438,8 +5438,8 @@ The following task was imported with errors / warnings / notices. Please take ca
                 <source>Kunden mit Leserechten auf dieser Sprachressource</source>
                 <target>Customers with read rights to this language resource</target>
             </trans-unit>
-            <trans-unit id="S3VuZGVuIG1pdCBTY2hyZWlicmVjaHRlIGF1ZiBkaWVzZXIgU3ByYWNocmVzc291cmNl">
-                <source>Kunden mit Schreibrechte auf dieser Sprachressource</source>
+            <trans-unit id="S3VuZGVuIG1pdCBTY2hyZWlicmVjaHRlbiBhdWYgZGllc2VyIFNwcmFjaHJlc3NvdXJjZQ==">
+                <source>Kunden mit Schreibrechten auf dieser Sprachressource</source>
                 <target>Customers with write access to this language resource</target>
             </trans-unit>
             <trans-unit id="S3VuZGVuLCBkaWUgZGllc2UgU3ByYWNocmVzc291cmNlIHN0YW5kYXJkbcOkw59pZyBhbHMgUGl2b3QgdmVyd2VuZGVu">
