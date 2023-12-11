@@ -74,7 +74,8 @@ class IPAddressProtectorTest extends TestCase
             '',
             0,
             '',
-            false
+            false,
+            0
         );
 
         self::assertSame(

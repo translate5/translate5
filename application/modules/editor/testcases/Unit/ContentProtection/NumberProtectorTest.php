@@ -131,7 +131,8 @@ class NumberProtectorTest extends TestCase
                 '/some text/',
                 0,
                 '',
-                false
+                false,
+                0
             );
         };
 

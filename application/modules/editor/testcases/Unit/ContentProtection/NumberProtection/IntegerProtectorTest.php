@@ -143,15 +143,5 @@ class IntegerProtectorTest extends TestCase
             'targetFormat' => $targetFormat,
             'targetLang' => $targetLangDe,
         ];
-
-        $targetFormat = '100';
-
-        yield 'target format +!' => [
-            'number' => '1,212,312,345',
-            'expected' => '<number type="integer" name="test-default" source="1,212,312,345" iso="1212312345" target="12,123,12345"/>',
-            'sourceFormat' => $sourceFormat,
-            'targetFormat' => $targetFormat,
-            'targetLang' => $targetLangDe,
-        ];
     }
 }

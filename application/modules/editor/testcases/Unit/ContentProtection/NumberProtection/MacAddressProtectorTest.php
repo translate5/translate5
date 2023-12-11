@@ -74,7 +74,8 @@ class MacAddressProtectorTest extends TestCase
             '',
             0,
             '',
-            true
+            true,
+            0
         );
 
         self::assertSame(
