@@ -62,7 +62,7 @@ class editor_Models_Terminology_TbxObjects_DataType {
         // As long as we rely on that `type` is unique for each record across whole datatypes-table,
         // here we set up additional `type`-indexed array of datatype-records to quicker check possibility
         foreach ($this->data as $item) {
-            $this->byType[ strtolower($item['type']) ] = $item;
+            $this->byType[ strtolower($item['type'] ?? '') ] = $item;
         }
     }
 
