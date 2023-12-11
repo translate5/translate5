@@ -609,7 +609,7 @@ class editor_Models_Export_Terminology_Tbx {
             $zip = new ZipArchive();
             $zip->open($this->zip['archive'], ZipArchive::CREATE | ZipArchive::OVERWRITE);
             $zip->addFile($this->getFile(), 'exported.tbx');
-            $zip->addGlob($this->zip['media'] . '/*', null, [
+            $zip->addGlob($this->zip['media'] . '/*', 0, [
                 'add_path' => 'media/',
                 'remove_all_path' => TRUE,
                 'comp_method' => ZipArchive::CM_STORE
