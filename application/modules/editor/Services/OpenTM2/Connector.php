@@ -380,8 +380,12 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
             @[$offsetTmId, $tmOffset] = explode(':', (string) $offset);
         }
 
-        if (null === $tmOffset) {
+        if ('' !== $offsetTmId && null === $tmOffset) {
             throw new editor_Services_Connector_Exception('E1565', compact('offset'));
+        }
+
+        if (null !== $tmOffset) {
+            $tmOffset = (int) $tmOffset;
         }
 
         $resultList = new editor_Services_ServiceResult();
@@ -396,7 +400,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
 
         foreach ($memories as ['filename' => $tmName, 'id' => $id]) {
             // check if current memory was searched through in prev request
-            if (null !== $offsetTmId && $id < $offsetTmId) {
+            if ('' !== $offsetTmId && $id < $offsetTmId) {
                 continue;
             }
 

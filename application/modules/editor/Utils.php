@@ -26,6 +26,7 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\ZfExtended\MismatchException;
 /* 
  */
 class editor_Utils {
@@ -471,7 +472,7 @@ class editor_Utils {
      *    ]);
      *
      * In most cases this method does not return any value, unless there are 'key', 'ext' or 'rex' == 'json' rules used for any of props.
-     * If any validation failed, the ZfExtended_Mismatch exception is thrown immediately.
+     * If any validation failed, an MismatchException exception is thrown immediately.
      * Currently supported rule names and their possible values are:
      *  'req' - Required. If rule value is truly - then prop value is required, e.g. should have non-zero length.
      *  'rex' - Regular expression. Prop value should match regular expression. Rule value can be raw expression
@@ -523,8 +524,9 @@ class editor_Utils {
      * @param $ruleA
      * @param array|stdClass|ZfExtended_Models_Entity_Abstract $data Data to checked
      * @return array
+     * @throws MismatchException
+     * @throws ReflectionException
      * @throws Zend_Db_Statement_Exception
-     * @throws ZfExtended_Mismatch
      */
     public static function jcheck($ruleA, $data) {
 
@@ -579,12 +581,12 @@ class editor_Utils {
                 $args['custom'] = $msg['req'] ?? false;
 
                 // Throw mismatch-exception
-                throw new ZfExtended_Mismatch('E2000', $args);
+                throw new MismatchException('E2000', $args);
             }
 
             // If prop's value should match certain regular expression, but it does not - flush error
             if ($rule['rex'] && $value !== null && strlen($value) && !self::rexm($rule['rex'], $value)){
-                throw new ZfExtended_Mismatch('E2001', [$value, $label]);
+                throw new MismatchException('E2001', [$value, $label]);
             }
 
             // If file's extension should match certain regular expression, but it does not - flush error
@@ -610,7 +612,7 @@ class editor_Utils {
                 }
 
                 // Else throw an exception
-                else throw new ZfExtended_Mismatch('E2007', [$ext, $label]);
+                else throw new MismatchException('E2007', [$ext, $label]);
             }
 
             // If value should be a json-encoded expression, and it is - decode
@@ -621,7 +623,7 @@ class editor_Utils {
             // If prop's value should be equal to some certain value, but it's not equal - flush error
             if (array_key_exists('eql', $rule)
                 && $value != $rule['eql'])
-                throw new ZfExtended_Mismatch('E2003', [$rule['eql'], $value]);
+                throw new MismatchException('E2003', [$rule['eql'], $value]);
 
             // If value should be in the list of allowed values, but it's not  - flush error
             if ($rule['fis'] && $value) {
@@ -636,7 +638,7 @@ class editor_Utils {
                 // it means that result contains those of input values that were not in array of allowed,
                 // so flush error
                 if ($restricted = array_diff($input, $allowed))
-                    throw new ZfExtended_Mismatch('E2004', [
+                    throw new MismatchException('E2004', [
                         $restricted ? implode(',', $restricted) : $value,
                         $label
                     ]);
@@ -652,7 +654,7 @@ class editor_Utils {
                 $args['custom'] = $msg['dis'] ?? false;
 
                 // Throw mismatch-exception
-                throw new ZfExtended_Mismatch('E2005', $args);
+                throw new MismatchException('E2005', $args);
             }
 
             // If prop's value should be an identifier of an existing database record
@@ -768,7 +770,7 @@ class editor_Utils {
                     if ($rowA[$prop]) {
 
                         // Throw mismatch-exception
-                        throw new ZfExtended_Mismatch('E2008', $args);
+                        throw new MismatchException('E2008', $args);
                     }
 
                 // Else
@@ -778,7 +780,7 @@ class editor_Utils {
                     if (!$rowA[$prop] && !$allowNotFound) {
 
                         // Throw mismatch-exception
-                        throw new ZfExtended_Mismatch('E2002', $args);
+                        throw new MismatchException('E2002', $args);
                     }
                 }
             }
@@ -787,21 +789,21 @@ class editor_Utils {
             if (is_numeric($rule['min']) && $value < $rule['min']) {
 
                 // Throw exception
-                throw new ZfExtended_Mismatch('E2009', [$value, $label, $rule['min']]);
+                throw new MismatchException('E2009', [$value, $label, $rule['min']]);
             }
 
             // If max-rule is given, but value is greater than it should bee
             if (is_numeric($rule['max']) && $value > $rule['max']) {
 
                 // Throw exception
-                throw new ZfExtended_Mismatch('E2010', [$value, $label, $rule['max']]);
+                throw new MismatchException('E2010', [$value, $label, $rule['max']]);
             }
 
             // If prop's value should be unique within the whole database table, but it's not - flush error
             /*if ($rule['unq']
                 && count($_ = explode('.', $rule['unq'])) == 2
                 && ZfExtended_Factory::get($_[0])->fetchRow(['`' . $_[1] . '` = "' . $value . '"']))
-                throw new ZfExtended_Mismatch('E2006', [$value, $label]);*/
+                throw new MismatchException('E2006', [$value, $label]);*/
         }
 
         // Return *_Row objects, collected for props, that have 'key' rule
@@ -1245,74 +1247,6 @@ class editor_Utils {
         /** @var editor_Models_Segment $segment */
         $segment = ZfExtended_Factory::get('editor_Models_Segment');
         return ZfExtended_Utils::emptyString($segment->stripTags($segmentText));
-    }
-}
-
-class ZfExtended_Mismatch extends ZfExtended_ErrorCodeException {
-    use ZfExtended_ResponseExceptionTrait;
-
-    /**
-     * @var integer
-     */
-    protected $httpReturnCode = 400;
-
-    /**
-     * By default we log that as INFO, if created as response then the level is set to DEBUG
-     *
-     * @var integer
-     */
-    protected $level = ZfExtended_Logger::LEVEL_INFO;
-
-    /**
-     * @var array
-     */
-    protected static $localErrorCodes = [
-        'E2000' => 'Param "{0}" - is not given',                                           // REQ
-        'E2001' => 'Value "{0}" of param "{1}" - is in invalid format',                    // REX
-        'E2002' => 'No object of type "{0}" was found by key "{1}"',                       // KEY
-        'E2003' => 'Wrong value',                                                          // EQL
-        'E2004' => 'Value "{0}" of param "{1}" - is not in the list of allowed values',    // FIS
-        'E2005' => 'Value "{0}" of param "{1}" - is in the list of disabled values',       // DIS
-        'E2006' => 'Value "{0}" of param "{1}" - is not unique. It should be unique.',     // UNQ
-        'E2007' => 'Extension "{0}" of file "{1}" - is not in the list of allowed values', // EXT
-        'E2008' => 'Object of type "{0}" already exists having key "{1}"',                 // KEY (negation)
-        'E2009' => 'Value "{0}" of param "{1}" should be minimum "{2}"',                   // MIN
-        'E2010' => 'Value "{0}" of param "{1}" should be maximum "{2}"',                   // MAX
-    ];
-
-    /**
-     * Overridden to use custom message if given
-     *
-     * ZfExtended_Mismatch constructor.
-     * @param $errorCode
-     * @param array $extra
-     * @param Exception|null $previous
-     */
-    public function __construct($errorCode, array $extra = [], Exception $previous = null) {
-
-        // Call parent
-        parent::__construct($errorCode, $extra, $previous);
-
-        // If custom message is given
-        if ($extra['custom'] ?? 0) {
-
-            // Get that
-            $msg = $extra['custom'];
-
-        // Else get default one
-        } else {
-            $msg = $this->getMessage();
-        }
-
-        // If message have placeholders like {0}, {1}, {2} etc
-        if (preg_match('~{([0-9])}~', $msg)) {
-
-            // Replace those with values from $extra arg
-            $msg = preg_replace_callback('~{([0-9])}~', fn($m) => $extra[$m[1]] ?? $m[1], $msg);
-        }
-
-        // Spoof msg
-        $this->setMessage($msg);
     }
 }
 
