@@ -50,11 +50,11 @@ class Memory extends Base
      */
     public function export(?ZfExtended_Models_Worker $workerModel): void
     {
-        $service=ZfExtended_Factory::get(editor_Services_OpenTM2_Service::class);
+        $service = ZfExtended_Factory::get(editor_Services_OpenTM2_Service::class);
         /** @var TaskAssociation $assoc */
         $assoc = ZfExtended_Factory::get(TaskAssociation::class);
 
-        $assocs = $assoc->loadAssocByServiceName($this->task->getTaskGuid(),$service->getName());
+        $assocs = $assoc->loadAssocByServiceName($this->task->getTaskGuid(), $service->getName());
 
         $serviceManager = ZfExtended_Factory::get(editor_Services_Manager::class);
 
@@ -63,10 +63,17 @@ class Memory extends Base
             $languageResource->load($assoc['languageResourceId']);
 
             $connector = $serviceManager->getConnector($languageResource);
-            $file = $connector->getTm($connector->getValidExportTypes()['TMX']);
 
-            $fullPath = $this->getFolderPath().DIRECTORY_SEPARATOR.$languageResource->getName().'.tmx';
-            file_put_contents($fullPath,$file);
+            if ($connector->exportsFile()) {
+                $file = $connector->export($connector->getValidExportTypes()['TMX']);
+                ['extension' => $extension] = pathinfo($file);
+                $fullPath = $this->getFolderPath() . DIRECTORY_SEPARATOR . $languageResource->getName() . $extension;
+                rename($file, $fullPath);
+            } else {
+                $file = $connector->getTm($connector->getValidExportTypes()['TMX']);
+                $fullPath = $this->getFolderPath() . DIRECTORY_SEPARATOR . $languageResource->getName() . '.tmx';
+                file_put_contents($fullPath, $file);
+            }
         }
     }
 }

@@ -36,6 +36,7 @@ class Comment extends AbstractModel
     //FIXME make a black list instead a whitelist here!!!
     protected array $whitelist = [
         'userName',
+        'userGuid',
         'comment',
         'created',
         'modified',

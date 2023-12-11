@@ -278,7 +278,7 @@ class editor_Services_DummyFileTm_Connector extends editor_Services_Connector_Fi
         ];
     }
 
-    public function getStatus(editor_Models_LanguageResources_Resource $resource) {
+    public function getStatus(editor_Models_LanguageResources_Resource $resource, editor_Models_LanguageResources_LanguageResource $languageResource = null): string {
         return editor_Services_Connector_Abstract::STATUS_AVAILABLE;
     }
 

@@ -43,7 +43,7 @@ class XlfImportTest extends editor_Test_JsonTest {
     protected static array $requiredRuntimeOptions = [
         'import.xlf.preserveWhitespace' => 0,
         'runtimeOptions.import.xlf.includedSubElementInLengthCalculation' => 0,
-        'import.fileparser.options.protectTags' => 0
+        'import.fileparser.options.protectTags' => 0,
     ];
 
     protected static string $setupUserLogin = 'testlector';
@@ -54,6 +54,8 @@ class XlfImportTest extends editor_Test_JsonTest {
             ->addTask('en', 'de')
             ->addUploadFolder('testfiles')
             ->addTaskConfig('runtimeOptions.autoQA.enableSegmentSpellCheck', '0')
+            // is tested by separate test, so here we test implicitly the deactivation of the comment import
+            ->addTaskConfig('runtimeOptions.import.xliff.importComments', '0')
             ->setToEditAfterImport();
     }
 

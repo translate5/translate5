@@ -26,15 +26,19 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-/**#@++
- * @author Marc Mittag
- * @package editor
- * @version 1.0
- *
- */
+
 /**
  * @class Editor.plugins.pluginFeasibilityTest.view.EditorPanel
  * @extends Ext.panel.Panel
+ *
+ * Currently default for the following types:
+ * 'editor_Services_OpenTM2',
+ * 'editor_Services_Moses',
+ * 'editor_Services_LucyLT',
+ * 'editor_Services_SDLLanguageCloud',
+ * 'editor_Services_Google',
+ * 'editor_Plugins_GroupShare',
+ * 'editor_Plugins_DeepL',
  */
 Ext.define('Editor.view.LanguageResources.services.Default', {
     id: 'Default',
@@ -57,81 +61,111 @@ Ext.define('Editor.view.LanguageResources.services.Default', {
         return result;
     },
 
-    /***
+    /**
      * Add/import new resoucres button default tooltip. This is rendered in the language resources grid.
      */
-    getAddTooltip:function(){
+    getAddTooltip: function(){
         return false;
     },
     
-    /***
+    /**
      * Export button default tooltip
      */
-    getExportTooltip:function(){
+    getExportTooltip: function(){
     	return this.exportTooltip;
     },
     
-    /***
-     * Get export language reources action icon class
+    /**
+     * Get export language resources action icon class
      */
-    getExportIconClass:function(){
+    getExportIconClass: function(){
     	return 'x-hidden-display';
     },
     
-    /***
-     * Get import language reources action icon class
+    /**
+     * Get import language resources action icon class
      */
-    getImportIconClass:function(){
+    getImportIconClass: function(){
+    	return 'x-hidden-display';
+    },
+
+    /**
+     * Get the import window for handleImportTm()
+     */
+    getImportWindow: function(){
+        return 'importTmWindow';
+    },
+    
+    /**
+     * Get download language resources action icon class
+     */
+    getDownloadIconClass: function(){
     	return 'x-hidden-display';
     },
     
-    /***
-     * Get download language reources action icon class
+    /**
+     * Get download language resources action icon tooltip
      */
-    getDownloadIconClass:function(){
-    	return 'x-hidden-display';
-    },
-    
-    /***
-     * Get download language reources action icon tooltip
-     */
-    getDownloadTooltip:function(){
+    getDownloadTooltip: function(){
         return false;
     },
     
-    /***
-     * Get log language reources action icon class
+    /**
+     * Get log language resources action icon class
      */
-    getLogIconClass:function(record){
+    getLogIconClass: function(record){
         if(record.get('eventsCount') > 0){
             return 'ico-tm-log';
         }
         return 'x-hidden-display';
     },
     
-    /***
-     * Get log language reources action icon tooltip
+    /**
+     * Get log language resources action icon tooltip
      */
-    getLogTooltip:function(record){
+    getLogTooltip: function(record){
         if(record.get('eventsCount') > 0){
             return this.log;
         }
         return false;
     },
+
+    /**
+     * Get edit specific data action icon class
+     */
+    getEditSpecificIconClass: function(){
+        return 'x-hidden-display';
+    },
+
+    /**
+     * Get edit specific data action icon tooltip
+     */
+    getEditSpecificTooltip: function(){
+        return false;
+    },
+
+    /**
+     * Retrieves the window to edit the specific data of a language resource.
+     * Generally must be implemented in concrete implementations
+     * @returns {string}
+     */
+    getEditSpecificWindow: function(){
+        return '';
+    },
+
+    /**
+     * If edit specific data action disabled
+     */
+    isEditSpecificDisabled: function(){
+        return true;
+    },
     
-    /***
+    /**
      * Get valid file-types for download.
      * @return array
      */
-    getValidFiletypes:function(){
+    getValidFiletypes: function(){
         return ['tm','tmx'];
-    },
-    
-    /***
-     * Get the import window for handleImportTm()
-     */
-    getImportWindow:function(){
-        return 'importTmWindow';
     },
 
     /**
@@ -141,18 +175,6 @@ Ext.define('Editor.view.LanguageResources.services.Default', {
     getNameRenderer: function() {
         return function(v, meta, rec) {
             return v;
-        }
+        };
     }
-
-
-/*    
- Currently default for the following types: 
-    'editor_Services_OpenTM2',
-    'editor_Services_Moses',
-    'editor_Services_LucyLT',
-    'editor_Services_SDLLanguageCloud',
-    'editor_Services_Google',
-    'editor_Plugins_GroupShare',
-    'editor_Plugins_DeepL',
-    */
 });

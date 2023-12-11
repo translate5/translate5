@@ -15,6 +15,51 @@ All updates are (downwards) compatible! If not this is listed in the important r
 
 
 
+
+
+## [6.8.1] - 2023-12-07
+
+### Important Notes:
+ 
+
+
+### Changed
+**[TRANSLATE-3608](https://jira.translate5.net/browse/TRANSLATE-3608): Configuration - Improve edit 100% matches config desciption** <br>
+Improvement in 100% matches config (runtimeOptions.frontend.importTask.edit100PercentMatch) description.
+
+
+### Bugfixes
+**[TRANSLATE-3610](https://jira.translate5.net/browse/TRANSLATE-3610): Main back-end mechanisms (Worker, Logging, etc.) - FIX bug in Sanitization with empty params** <br>
+FIX: Possible unneccessary exception when sanitizing params
+
+**[TRANSLATE-3606](https://jira.translate5.net/browse/TRANSLATE-3606): Main back-end mechanisms (Worker, Logging, etc.), User Management - Session API authentication combined with apptokens leads to beeing the wrong user** <br>
+FIX authentication via POST on the session-controller, where elevated credentials were delivered when called with an App-Token
+
+**[TRANSLATE-3605](https://jira.translate5.net/browse/TRANSLATE-3605): LanguageResources - TM button for associated tasks missing** <br>
+Fix problem where the TM button for associated tasks was not visible in resources overview.
+
+
+## [6.8.0] - 2023-12-05
+
+### Important Notes:
+#### [TRANSLATE-3561](https://jira.translate5.net/browse/TRANSLATE-3561)
+These changes will work properly only with t5memory after version 0.4.1056
+ 
+
+
+### Changed
+**[TRANSLATE-3561](https://jira.translate5.net/browse/TRANSLATE-3561): t5memory - Enable t5memory connector to load balance big TMs** <br>
+Fix overflow error when importing very big files into t5memory by splitting the TM internally.
+
+**[TRANSLATE-3537](https://jira.translate5.net/browse/TRANSLATE-3537): Import/Export - Process comments from xliff 1.2 files** <br>
+XLF comments placed in note tags are now also imported and exported as task comments. The behavior is configurable.
+
+
+### Bugfixes
+**[TRANSLATE-3601](https://jira.translate5.net/browse/TRANSLATE-3601): VisualReview / VisualTranslation - Change default for processing of invisible texts in PDF converter in Visual** <br>
+Changed default for processing of invisible text in the visual (Text visibility correction) to fix only fully occluded text
+
+
 ## [6.7.3] - 2023-12-01
 
 ### Important Notes:
