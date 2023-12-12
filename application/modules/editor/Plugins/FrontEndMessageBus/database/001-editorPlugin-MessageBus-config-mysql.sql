@@ -37,7 +37,7 @@ INSERT INTO Zf_configuration (`name`, `confirmed`, `module`, `category`, `value`
  if empty the current host of the application in the frontend is used. Can be configured to a fixed value here. Example: www.translate5.net');
  
 INSERT INTO Zf_configuration (`name`, `confirmed`, `module`, `category`, `value`, `default`, `defaults`, `type`, `description`) VALUES
-('runtimeOptions.plugins.FrontEndMessageBus.socketServer.port', 1, 'editor', 'plugins', '9056', '9056', '', 'string', 'WebSocket Server default port, socketServer port in the FrontEndMessageBus backend config.php');
+('runtimeOptions.plugins.FrontEndMessageBus.socketServer.port', 1, 'editor', 'plugins', '', '', '', 'string', 'WebSocket Server default port, socketServer port in the FrontEndMessageBus backend config.php');
 
 INSERT INTO Zf_configuration (`name`, `confirmed`, `module`, `category`, `value`, `default`, `defaults`, `type`, `description`) VALUES
 ('runtimeOptions.plugins.FrontEndMessageBus.socketServer.route', 1, 'editor', 'plugins', '/translate5', '/translate5', '', 'string', 'WebSocket Server default route, defaults to "/translate5" and should normally not be changed. If using SSL (wss) with a ProxyPass statement, prepend the alias here. Example: "/tobedefinedbyyou/translate5" Attention: this config has nothing to do with the APPLICATION_RUNDIR in translate5!');

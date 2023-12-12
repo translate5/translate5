@@ -137,6 +137,20 @@ abstract class AbstractHttpService extends ServiceAbstract
     }
 
     /**
+     * Returns the number of IP adresses behind an URL
+     * This can be used to detect the available services behind a horizontally scaled URL
+     * @param string $serviceUrl
+     * @return int
+     */
+    public function getNumIpsForUrl(string $serviceUrl): int
+    {
+        $host = rtrim(parse_url($serviceUrl, PHP_URL_HOST), '.') . '.';
+        $hosts = gethostbynamel($host);
+        // QUIRK: for now, we return 1 if gethostbynamel() does not detect anything ... TODO FIXME: Throw Exception ?
+        return (empty($hosts)) ? 1 : count($hosts);
+    }
+
+    /**
      * Disables the given service URL via the Services memcache
      * Returns true, if all Services are down, otherwise false
      * @param string $serviceUrl

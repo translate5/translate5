@@ -1382,7 +1382,7 @@
             </trans-unit>
             <trans-unit id="RWluZW4gbmV1ZW4gS3VuZGVuIGhpbnp1ZsO8Z2Vu">
                 <source>Einen neuen Kunden hinzufügen</source>
-                <target>Add a new customer</target>
+                <target>Einen neuen Kunden hinzufügen</target>
             </trans-unit>
             <trans-unit id="RWluZSBFeGNlbC1EYXRlaSBtaXQgZGVuIE51dHp1bmdzemFobGVuIHp1IGFsbGVuIGVpbmdlYnVuZGVuZW4gU3ByYWNocmVzc291cmNlbiBleHBvcnRpZXJlbg==">
                 <source>Eine Excel-Datei mit den Nutzungszahlen zu allen eingebundenen Sprachressourcen exportieren</source>
@@ -7200,9 +7200,9 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
                 <source>Kunden mit Leserechten auf dieser Sprachressource</source>
                 <target>Kunden mit Leserechten auf dieser Sprachressource</target>
             </trans-unit>
-            <trans-unit id="S3VuZGVuIG1pdCBTY2hyZWlicmVjaHRlIGF1ZiBkaWVzZXIgU3ByYWNocmVzc291cmNl">
-                <source>Kunden mit Schreibrechte auf dieser Sprachressource</source>
-                <target>Kunden mit Schreibrechte auf dieser Sprachressource</target>
+            <trans-unit id="S3VuZGVuIG1pdCBTY2hyZWlicmVjaHRlbiBhdWYgZGllc2VyIFNwcmFjaHJlc3NvdXJjZQ==">
+                <source>Kunden mit Schreibrechten auf dieser Sprachressource</source>
+                <target>Kunden mit Schreibrechten auf dieser Sprachressource</target>
             </trans-unit>
             <trans-unit id="S3VuZGVuLCBkaWUgZGllc2UgU3ByYWNocmVzc291cmNlIHN0YW5kYXJkbcOkw59pZyBhbHMgUGl2b3QgdmVyd2VuZGVu">
                 <source>Kunden, die diese Sprachressource standardmäßig als Pivot verwenden</source>

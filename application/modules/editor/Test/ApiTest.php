@@ -561,7 +561,7 @@ abstract class editor_Test_ApiTest extends TestCase
      */
     private static function logTestStart(): void
     {
-        error_log('Starting test: ' . static::class. ' | ' . NOW_ISO );
+        error_log('Starting test: ' . static::class. ' | ' . date("Y-m-d H:i:s") );
     }
 
     /**
@@ -570,6 +570,6 @@ abstract class editor_Test_ApiTest extends TestCase
      */
     private static function logTestEnd(): void
     {
-        error_log('Finished test: ' . static::class . ' | ' . NOW_ISO );
+        error_log('Finished test: ' . static::class . ' | ' . date("Y-m-d H:i:s") );
     }
 }

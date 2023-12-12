@@ -121,7 +121,7 @@ class editor_Models_Export_FileParser_Sdlxliff extends editor_Models_Export_File
             'user' => htmlspecialchars($comment['userName']),
             'date' => $modifiedObj->format($modifiedObj::ATOM),
             'version' => '1.0',
-            'comment' => htmlspecialchars($comment['comment']),
+            'comment' => htmlspecialchars($comment['comment'], ENT_XML1, 'UTF-8'),
         ];
         if($comment['userGuid'] !== editor_Models_Import_FileParser_Sdlxliff::USERGUID) {
             return '';
@@ -219,6 +219,8 @@ class editor_Models_Export_FileParser_Sdlxliff extends editor_Models_Export_File
             $commentsAsString = implode('', $this->comments);
             if (strpos($this->_exportFile, '</cmt-defs>')!== false) {
                 $this->_exportFile = str_replace('</cmt-defs>', $commentsAsString . '</cmt-defs>', $this->_exportFile);
+            }elseif (strpos($this->_exportFile, '<cmt-meta-defs>')!== false) {
+                $this->_exportFile = str_replace('<cmt-meta-defs>', '<cmt-defs>' . $commentsAsString . '</cmt-defs><cmt-meta-defs>', $this->_exportFile);
             } elseif (strpos($this->_exportFile, '</doc-info>')!== false) {
                 $this->_exportFile = str_replace('</doc-info>', '<cmt-defs>' . $commentsAsString . '</cmt-defs></doc-info>', $this->_exportFile);
             }

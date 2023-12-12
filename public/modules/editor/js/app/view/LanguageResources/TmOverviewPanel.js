@@ -467,16 +467,19 @@ Ext.define('Editor.view.LanguageResources.TmOverviewPanel', {
         if(specificData.hasOwnProperty('fileName')){
             rows += this.createSpecificDataRow('fileName', serviceName, specificData.fileName);
         }
+
         // then the others
-        for(key in specificData) {
-            if(key !== 'fileName' && key !== 'status'){
+        for (key in specificData) {
+            if (key !== 'fileName' && key !== 'status' && key !== 'memories') {
                 rows += this.createSpecificDataRow(key, serviceName, specificData[key]);
             }
         }
+
         // status shall always come last
         if(specificData.hasOwnProperty('status')){
             rows += this.createSpecificDataRow('status', serviceName, specificData.status);
         }
+
         tip.update('<table>' + rows + '</table>');
     },
 

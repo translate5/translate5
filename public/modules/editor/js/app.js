@@ -340,7 +340,7 @@ Ext.application({
             preventDefaultHandler: true,
             scope: me,
             success: function (task) {
-                task.set('userState', Editor.data.app.initState);
+                task.set('userState', task.getInitUserState());
                 task.save({
                     scope: me,
                     preventDefaultHandler: true,

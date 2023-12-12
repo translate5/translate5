@@ -28,15 +28,13 @@ END LICENSE AND COPYRIGHT
 
 namespace MittagQI\Translate5\PooledService;
 
+use editor_Models_Task_AbstractWorker;
+use MittagQI\Translate5\Service\AbstractHttpService;
 use Zend_Exception;
 use Zend_Registry;
 use ZfExtended_Debug;
 use ZfExtended_Exception;
 use ZfExtended_Factory;
-use editor_Models_Task_AbstractWorker;
-use MittagQI\Translate5\Service\DockerServiceAbstract;
-use MittagQI\ZfExtended\Service\ServiceAbstract as BaseServiceAbstract;
-use MittagQI\Translate5\Service\AbstractExternalService;
 
 /**
  * Extends the import worker to work with pooled services tailored for processing segments
@@ -63,7 +61,7 @@ abstract class Worker extends editor_Models_Task_AbstractWorker
      * Temporary flag for queueing phase to prevent queueing multiple workers
      * @var bool
      */
-    protected $isSingleThreaded = false;
+    protected bool $isSingleThreaded = false;
 
     /**
      * @var int
@@ -81,7 +79,7 @@ abstract class Worker extends editor_Models_Task_AbstractWorker
     protected bool $isPooled;
 
     /**
-     * @var bool
+     * @var int
      */
     protected int $workerIndex = 0;
 
@@ -96,9 +94,9 @@ abstract class Worker extends editor_Models_Task_AbstractWorker
     protected array $calculatedSlot;
 
     /**
-     * @var DockerServiceAbstract|ServiceAbstract
+     * @var ServiceAbstract|AbstractHttpService
      */
-    protected DockerServiceAbstract|ServiceAbstract|BaseServiceAbstract $service;
+    protected ServiceAbstract|AbstractHttpService $service;
 
     /**
      * @var bool
@@ -118,10 +116,9 @@ abstract class Worker extends editor_Models_Task_AbstractWorker
     /**
      * Must be implemented to create the service
      * This function is also used in a static context and must not use internal dependencis
-     * @return DockerServiceAbstract|ServiceAbstract
+     * @return ServiceAbstract|AbstractHttpService
      */
-    abstract protected function createService():
-        DockerServiceAbstract|ServiceAbstract|BaseServiceAbstract|AbstractExternalService;
+    abstract protected function createService(): ServiceAbstract|AbstractHttpService;
 
     /**
      * Must be implemented to create the no services available exception
@@ -158,6 +155,8 @@ abstract class Worker extends editor_Models_Task_AbstractWorker
 
     /**
      * @return int
+     * @throws Zend_Exception
+     * @throws ZfExtended_Exception
      */
     protected function getMaxParallelProcesses(): int
     {
@@ -174,7 +173,8 @@ abstract class Worker extends editor_Models_Task_AbstractWorker
         if ($this->maxParallel < 0) {
             $serviceId = $this->service->getServiceId();
             $serviceUrls = [];
-            // pooled workers will be limited by the pool-size ... if onlyOncePerTask is set to true we obviously can not run in parallel
+            // pooled workers will be limited by the pool-size
+            // ... if onlyOncePerTask is set to true we obviously can not run in parallel
             if ($this->isPooled && !$this->onlyOncePerTask && !$this->isSingleThreaded) {
                 $serviceUrls = $this->service->getPooledServiceUrls($this->resourcePool);
                 if (empty($serviceUrls) && $this->resourcePool != 'default') {
@@ -182,7 +182,18 @@ abstract class Worker extends editor_Models_Task_AbstractWorker
                     $this->resourcePool = 'default';
                 }
                 $this->maxParallel = count($serviceUrls);
+
+                // SPECIAL: Pooled service with pools having only one URL
+                // are expected to inbuilt load-balancing / horizontal scaling behind that URL
+                if($this->maxParallel === 1
+                    && method_exists($this->service, 'hasLoadBalancingBehindSingularPool')
+                    && $this->service->hasLoadBalancingBehindSingularPool($this->resourcePool)){
+
+                    $this->maxParallel = $this->service->getNumIpsForUrl($serviceUrls[0]);
+                }
+
             } else {
+
                 $serviceUrl = $this->service->getServiceUrl();
                 if ($serviceUrl === null) {
                     // no service url available: no workers will be queued
@@ -192,10 +203,10 @@ abstract class Worker extends editor_Models_Task_AbstractWorker
                     $serviceUrls = [ $serviceUrl ];
                     $this->maxParallel = 1;
                 } else {
-                    // non-pooled services are expected to have inbuilt load-balancing and we evaluate the number of instances by the IP's that exist behind the configured URL
-                    $host = rtrim(parse_url($serviceUrl, PHP_URL_HOST), '.') . '.';
-                    $hosts = gethostbynamel($host);
-                    $this->maxParallel = (empty($hosts)) ? 1 : count($hosts); // QUIRK: for now, we set maxParallel to 1 if gethostbynamel() does not detect anything ... TODO FIXME: Throw Exception ?
+                    // SPECIAL: non-pooled services (= services with only a single URL overall)
+                    // are expected to have inbuilt load-balancing / horizontal scaling
+                    // we evaluate the number of instances by the IP's that exist behind the configured URL
+                    $this->maxParallel = $this->service->getNumIpsForUrl($serviceUrl);
                     $serviceUrls = ($this->maxParallel < 1) ? [] : [$serviceUrl];
                 }
             }

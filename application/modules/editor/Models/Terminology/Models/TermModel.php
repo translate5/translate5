@@ -1693,8 +1693,8 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
                 $tmpTerm['attribute'] = $changeMyCollorTag.$row['attribute-value'];
                 $tmpTerm['lastEditor'] = $changeMyCollorTag.$row['attribute-lastEditor'];
                 $tmpTerm['lastEditedDate'] = $changeMyCollorTag.$row['attribute-lastEditedDate'];
-                $tmpTerm['term'] = str_replace($changeMyCollorTag,'',$row['term-term']);
-                $tmpTerm['termProposal'] = str_replace($changeMyCollorTag,'',$row['termproposal-term']);
+                $tmpTerm['term'] = str_replace($changeMyCollorTag,'',$row['term-term'] ?? '');
+                $tmpTerm['termProposal'] = str_replace($changeMyCollorTag,'',$row['termproposal-term'] ?? '');
             }
 
             //if the attribute proposal is set, set the change color and last editor for the attribute proposal
