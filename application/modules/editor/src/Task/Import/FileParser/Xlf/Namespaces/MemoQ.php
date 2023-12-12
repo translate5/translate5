@@ -21,7 +21,7 @@ START LICENSE AND COPYRIGHT
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
@@ -29,8 +29,10 @@ END LICENSE AND COPYRIGHT
 namespace MittagQI\Translate5\Task\Import\FileParser\Xlf\Namespaces;
 
 use editor_Models_Comment;
-use editor_Models_Import_FileParser_XmlParser;
+use editor_Models_Export_FileParser_Xlf_Namespaces_MemoQ;
+use editor_Models_Import_FileParser_XmlParser as XmlParser;
 use editor_Models_Segment_MatchRateType;
+use MittagQI\Translate5\Task\Import\FileParser\Xlf\Comments;
 use ZfExtended_Factory;
 use editor_Models_Import_FileParser_SegmentAttributes as SegmentAttributes;
 
@@ -41,35 +43,28 @@ class MemoQ extends AbstractNamespace
 {
     const MEMOQ_XLIFF_NAMESPACE = 'xmlns:mq="MQXliff"';
     const USERGUID = 'memoq-imported';
-    /**
-     * @var array
-     */
-    protected array $comments = [];
 
-    protected static function isApplicable(string $xliff): bool
+    public function __construct(protected XmlParser $xmlparser, protected Comments $comments)
     {
-        return str_contains($xliff, self::MEMOQ_XLIFF_NAMESPACE);
+        parent::__construct($xmlparser, $comments);
+        $this->registerParserHandler();
     }
 
-    /**
-     * {@inheritDoc}
-     * @see AbstractNamespace::registerParserHandler()
-     */
-    public function registerParserHandler(editor_Models_Import_FileParser_XmlParser $xmlparser): void
+    protected function registerParserHandler(): void
     {
         $memoqMqmTag = 'trans-unit > target > mrk[mtype=x-mq-range], ';
         $memoqMqmTag .= 'trans-unit > source > mrk[mtype=x-mq-range], ';
         $memoqMqmTag .= 'trans-unit > seg-source > mrk[mtype=x-mq-range]';
-        $xmlparser->registerElement($memoqMqmTag, function ($tag, $attributes, $key) use ($xmlparser) {
-            $xmlparser->replaceChunk($key, '');
-        }, function ($tag, $key, $opener) use ($xmlparser) {
-            $xmlparser->replaceChunk($key, '');
+        $this->xmlparser->registerElement($memoqMqmTag, function ($tag, $attributes, $key) {
+            $this->xmlparser->replaceChunk($key, '');
+        }, function ($tag, $key, $opener) {
+            $this->xmlparser->replaceChunk($key, '');
         });
 
-        $xmlparser->registerElement(
+        $this->xmlparser->registerElement(
             'trans-unit mq:comments mq:comment',
             null,
-            function ($tag, $key, $opener) use ($xmlparser) {
+            function ($tag, $key, $opener) {
                 $attr = $opener['attributes'];
 
                 //if the comment is marked as deleted or is empty (a single attribute), we just do not import it
@@ -81,7 +76,7 @@ class MemoQ extends AbstractNamespace
 
                 $startText = $opener['openerKey'] + 1;
                 $length = $key - $startText;
-                $commentText = join($xmlparser->getChunks($startText, $length));
+                $commentText = join($this->xmlparser->getChunks($startText, $length));
 
                 $comment->setComment($commentText);
 
@@ -91,15 +86,22 @@ class MemoQ extends AbstractNamespace
                 $date = date('Y-m-d H:i:s', strtotime($attr['time'] ?? 'now'));
                 $comment->setCreated($date);
                 $comment->setModified($date);
-                $this->comments[] = $comment;
+                $this->comments->add($comment);
             }
         );
     }
 
+    public static function isApplicable(string $xliff): bool
+    {
+        return str_contains($xliff, self::MEMOQ_XLIFF_NAMESPACE);
+    }
+
+    public static function getExportCls(): ?string
+    {
+        return editor_Models_Export_FileParser_Xlf_Namespaces_MemoQ::class;
+    }
+
     /**
-     * {@inheritDoc}
-     * @see editor_Models_Import_FileParser_Xlf_Namespaces_Abstract::transunitAttributes()
-     *
      * This method was implemented, but finally never approved by the client: TS-1292
      * - therefore its prefixed with DISABLED since it would in use by just naming it transunitAttributes
      */
@@ -110,10 +112,8 @@ class MemoQ extends AbstractNamespace
             case 'notstarted':
                 $segmentAttributes->matchRateType = editor_Models_Segment_MatchRateType::TYPE_EMPTY;
                 break;
-            case 'partiallyedited':
-                $segmentAttributes->matchRateType = editor_Models_Segment_MatchRateType::TYPE_INTERACTIVE;
-                break;
             case 'manuallyconfirmed':
+            case 'partiallyedited':
                 $segmentAttributes->matchRateType = editor_Models_Segment_MatchRateType::TYPE_INTERACTIVE;
                 break;
             case 'pretranslated':
@@ -123,17 +123,17 @@ class MemoQ extends AbstractNamespace
             case 'machinetranslated':
                 $segmentAttributes->isPreTranslated = true;
                 $segmentAttributes->matchRateType = editor_Models_Segment_MatchRateType::TYPE_MT;
-                if(!empty($attributes['mq:translatorcommitmatchrate'])) {
+                if (!empty($attributes['mq:translatorcommitmatchrate'])) {
                     $segmentAttributes->matchRate = $attributes['mq:translatorcommitmatchrate'];
                 }
                 break;
             default:
                 break;
         }
-        if(!empty($attributes['mq:percent'])) {
+        if (!empty($attributes['mq:percent'])) {
             $segmentAttributes->matchRate = $attributes['mq:percent'];
         }
-        if(!empty($attributes['mq:locked'])) {
+        if (!empty($attributes['mq:locked'])) {
             $segmentAttributes->locked = true;
         }
     }
@@ -148,18 +148,5 @@ class MemoQ extends AbstractNamespace
         //FIXME should be calculated for memoQ. If content will result in {} only or was a single tag,
         // then it should be true, otherwise false. Also for across XLF
         return false;
-    }
-
-    /**
-     * After fetching the comments, the internal comments fetcher is resetted
-     *   (if comments are inside MRKs and not the whole segment)
-     * {@inheritDoc}
-     * @see AbstractNamespace::getComments()
-     */
-    public function getComments(): array
-    {
-        $commentsToGet = $this->comments;
-        $this->comments = [];
-        return $commentsToGet;
     }
 }

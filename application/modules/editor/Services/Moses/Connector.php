@@ -135,7 +135,7 @@ class editor_Services_Moses_Connector extends editor_Services_Connector_Abstract
      * {@inheritDoc}
      * @see editor_Services_Connector_Abstract::getStatus()
      */
-    public function getStatus(editor_Models_LanguageResources_Resource $resource){
+    public function getStatus(editor_Models_LanguageResources_Resource $resource, editor_Models_LanguageResources_LanguageResource $languageResource = null): string {
         $this->lastStatusInfo = '';
         $http = ZfExtended_Factory::get('Zend_Http_Client');
         $http->setConfig(['timeout' => 3]);

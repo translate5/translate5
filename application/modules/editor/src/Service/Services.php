@@ -156,6 +156,19 @@ final class Services
     }
 
     /**
+     * Retrieve the mocked service configs from all base services
+     * @return array
+     */
+    public static function getMockConfigs(): array
+    {
+        $mockConfigs = [];
+        foreach(self::getServices(Zend_Registry::get('config')) as $service){
+            $mockConfigs[] = $service->getMockConfigs();
+        }
+        return array_merge(...$mockConfigs);
+    }
+
+    /**
      * Retrieves the global service with the given name or null if it does not exist FOR THE CURRENTLY CONFIGURED PLUGINS
      * @param Zend_Config $config
      * @param string $serviceName
@@ -166,6 +179,11 @@ final class Services
      */
     public static function findService(Zend_Config $config, string $serviceName, bool $loadPlugins=false): ?ServiceAbstract
     {
+        $services = self::getServices($config);
+        if (array_key_exists($serviceName, $services)) {
+            return $services[$serviceName];
+        }
+
         $pluginManager = Zend_Registry::get('PluginManager');
         if($loadPlugins){
             $pluginManager->bootstrap();

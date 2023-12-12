@@ -36,15 +36,23 @@ class editor_Services_TermCollection_Resource extends editor_Models_LanguageReso
         $this->writable = false; //single terms can not be updated 
         $this->type = editor_Models_Segment_MatchRateType::TYPE_TERM_COLLECTION;
     }
-    
-    /**
-     * {@inheritDoc}
-     */
-    public function getInitialStatus(&$statusInfo): string
-    {
-        //no addtional info here
-        $statusInfo = '';
 
-        return LanguageResourceStatus::NOTCHECKED;
+    /**
+     * @param array|null $specificData
+     * @param int $languageResourceId
+     * @param ZfExtended_Zendoverwrites_Translate $translate
+     * @return array{status:string,statusInfo:string}
+     * @throws Zend_Exception
+     */
+    public function getInitialStatus(
+        ?array                              $specificData,
+        int                                 $languageResourceId,
+        ZfExtended_Zendoverwrites_Translate $translate
+    ): array
+    {
+        return [
+            'status' => LanguageResourceStatus::NOTCHECKED,
+            'statusInfo' => '' // no addtional info here
+        ];
     }
 }

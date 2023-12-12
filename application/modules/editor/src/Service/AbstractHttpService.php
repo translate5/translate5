@@ -82,7 +82,7 @@ abstract class AbstractHttpService extends ServiceAbstract
     public function isConfigured(): bool
     {
         try {
-            return !empty($this->getConfigValueFromName($this->configurationConfig['name'], $this->configurationConfig['type']));
+            return !empty($this->configHelper->getValue($this->configurationConfig['name'], $this->configurationConfig['type']));
         } catch (Throwable) {
             return false;
         }
@@ -95,7 +95,16 @@ abstract class AbstractHttpService extends ServiceAbstract
      */
     public function isCheckSkipped(): bool
     {
-        return !$this->mandatory && !$this->isConfigured();
+        return !$this->mandatory && !$this->isProperlySetup();
+    }
+
+    /**
+     * In case of simple HTTP services this is the same as isConfigured()
+     * @return bool
+     */
+    public function isProperlySetup(): bool
+    {
+        return $this->isConfigured();
     }
 
     /**
@@ -105,7 +114,7 @@ abstract class AbstractHttpService extends ServiceAbstract
      */
     public function getServiceUrls(): array
     {
-        return $this->getConfigValueFromName($this->configurationConfig['name'], $this->configurationConfig['type'], true);
+        return $this->configHelper->getValue($this->configurationConfig['name'], $this->configurationConfig['type'], true);
     }
 
     /**
@@ -125,6 +134,20 @@ abstract class AbstractHttpService extends ServiceAbstract
             return $urls[random_int(0, $max)];
         }
         return null;
+    }
+
+    /**
+     * Returns the number of IP adresses behind an URL
+     * This can be used to detect the available services behind a horizontally scaled URL
+     * @param string $serviceUrl
+     * @return int
+     */
+    public function getNumIpsForUrl(string $serviceUrl): int
+    {
+        $host = rtrim(parse_url($serviceUrl, PHP_URL_HOST), '.') . '.';
+        $hosts = gethostbynamel($host);
+        // QUIRK: for now, we return 1 if gethostbynamel() does not detect anything ... TODO FIXME: Throw Exception ?
+        return (empty($hosts)) ? 1 : count($hosts);
     }
 
     /**
@@ -153,23 +176,9 @@ abstract class AbstractHttpService extends ServiceAbstract
      * @return mixed
      * @throws ZfExtended_Exception
      */
-    public function getConfigValueFromName(string $configName, string $configType, bool $asArray = false): mixed
+    public function getConfigValue(string $configName, string $configType, bool $asArray = false): mixed
     {
-        $value = $this->config;
-        try {
-            foreach (explode('.', $configName) as $section) {
-                $value = $value->$section;
-            }
-        } catch (Throwable) {
-            throw new ZfExtended_Exception('Global Config did not contain "' . $configName . '"');
-        }
-        if ($configType === ZfExtended_DbConfig_Type_CoreTypes::TYPE_LIST) {
-            return $value->toArray();
-        }
-        if ($asArray) {
-            return $this->convertValueToArray($value);
-        }
-        return $value;
+        return $this->configHelper->getValue($configName, $configType, $asArray);
     }
 
     /**

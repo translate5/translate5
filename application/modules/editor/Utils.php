@@ -324,6 +324,23 @@ class editor_Utils {
     public static function normalizeWhitespace($text, $replacement=' '){
         return preg_replace('/\s+/', $replacement, self::replaceFunnyWhitespace($text, $replacement));
     }
+
+    /**
+     * Turns all "programmers" quotes to typographical ones
+     * @param string $text
+     * @param string|null $languageIso5646
+     * @return string
+     */
+    public static function typographizeQuotes(string $text, string $languageIso5646 = null): string
+    {
+        $text = str_replace("'", '’', stripslashes($text));
+        $pStart = (substr($languageIso5646, 0, 2) === 'de') ? '„' : '“'; // adjustments for german text
+        $text = str_replace('"', $pStart, $text);
+        $text = str_replace($pStart . ' ', '” ', $text);
+        if (str_ends_with($text, $pStart))
+            return substr($text, 0, -1) . '”';
+        return $text;
+    }
     /**
      * Replaces all funny whitespace chars (characters representing whitespace that are no blanks " ") with the replacement (default: single blank)
      * @param string $text
@@ -566,8 +583,9 @@ class editor_Utils {
             }
 
             // If prop's value should match certain regular expression, but it does not - flush error
-            if ($rule['rex'] && strlen($value) && !self::rexm($rule['rex'], $value))
+            if ($rule['rex'] && $value !== null && strlen($value) && !self::rexm($rule['rex'], $value)){
                 throw new ZfExtended_Mismatch('E2001', [$value, $label]);
+            }
 
             // If file's extension should match certain regular expression, but it does not - flush error
             if ($rule['ext']) {
@@ -596,7 +614,9 @@ class editor_Utils {
             }
 
             // If value should be a json-encoded expression, and it is - decode
-            if ($rule['rex'] == 'json') $rowA[$prop] = json_decode($value);
+            if ($rule['rex'] == 'json') {
+                $rowA[$prop] = ($value === null) ? null : json_decode($value);
+            }
 
             // If prop's value should be equal to some certain value, but it's not equal - flush error
             if (array_key_exists('eql', $rule)
@@ -636,7 +656,7 @@ class editor_Utils {
             }
 
             // If prop's value should be an identifier of an existing database record
-            if ($rule['key'] && strlen($value) && $value != '0') {
+            if ($rule['key'] && strlen($value ?? '') && $value != '0') {
 
                 // Setup invert flag, indicating that key-rule-check should be in inverted/negation mode
                 $invert = false;
@@ -973,7 +993,7 @@ class editor_Utils {
 
         // Split given $text by urls
         while (preg_match("~$rexProtocol$rexDomain$rexPort$rexPath$rexQuery$rexFragment(?=[?.!,;:\"]?(\s|$))~u",
-            $text, $match, PREG_OFFSET_CAPTURE, $position)) {
+            $text ?? '', $match, PREG_OFFSET_CAPTURE, $position)) {
 
             // Extract $url and $urlPosition from match
             [$url, $urlPosition] = $match[0];
@@ -1006,7 +1026,7 @@ class editor_Utils {
         }
 
         // Print the remainder of the text.
-        print(htmlspecialchars(substr($text, $position)));
+        print(htmlspecialchars(substr($text ?? '', $position)));
 
         // Return
         return ob_get_clean();

@@ -9,19 +9,19 @@ START LICENSE AND COPYRIGHT
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
  This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
- as published by the Free Software Foundation and appearing in the file agpl3-license.txt 
- included in the packaging of this file.  Please review the following information 
+ as published by the Free Software Foundation and appearing in the file agpl3-license.txt
+ included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or
  plugin-exception.txt in the root folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
@@ -32,13 +32,15 @@ END LICENSE AND COPYRIGHT
  * @version 1.0
  */
 
+use \MittagQI\Translate5\Task\Import\FileParser\Xlf\NamespaceRegistry;
 use MittagQI\Translate5\Task\Import\FileParser\Xlf\Namespaces\ZendXlf;
 
 
 /**
  * Fileparsing for the Zend XLIFF files used for internal translation of translate5
  *
- * The name is just ZendXliff/ZendXlf to distinguish it between regular Xliff and the xliff used in our Zend based application.
+ * The name is just ZendXliff/ZendXlf to distinguish it between regular Xliff
+ *  and the xliff used in our Zend based application.
  * This name should not provide any connection between Zend and Xliff in general, only in the context of translate5!
  */
 class editor_Models_Import_FileParser_XlfZend extends editor_Models_Import_FileParser_Xlf {
@@ -50,12 +52,13 @@ class editor_Models_Import_FileParser_XlfZend extends editor_Models_Import_FileP
      * @var array
      */
     protected $originalSourceChunks = [];
-    
-    protected function initNamespaces() {
-        parent::initNamespaces();
-        $this->namespaces->addNamespace('zxliff', new ZendXlf());
+
+    public function __construct(string $path, string $fileName, int $fileId, editor_Models_Task $task)
+    {
+        NamespaceRegistry::registerNamespace('zxliff', ZendXlf::class);
+        parent::__construct($path, $fileName, $fileId, $task);
     }
-    
+
     /**
      * (non-PHPdoc)
      * @see editor_Models_Import_FileParser::getFileExtensions()
@@ -185,5 +188,4 @@ class editor_Models_Import_FileParser_XlfZend extends editor_Models_Import_FileP
      */
     protected function checkXliffVersion($attributes, $key) {
     }
-    
 }

@@ -72,6 +72,7 @@ Ext.define('Editor.controller.TmOverview', {
         mergeTermsWarnTitle: '#UT#Nicht empfohlen!',
         mergeTermsWarnMessage: '#UT#Begriffe in der TBX werden immer zuerst nach ID mit bestehenden Einträgen in der TermCollection zusammengeführt. Wenn Terme zusammenführen angekreuzt ist und die ID in der TBX nicht in der TermCollection gefunden wird, wird gesucht, ob derselbe Begriff bereits in derselben Sprache existiert. Wenn ja, werden die gesamten Termeinträge zusammengeführt. Insbesondere bei einer TermCollection mit vielen Sprachen kann dies zu unerwünschten Ergebnissen führen.',
         importing: '#UT#Die Sprachressource {0} wird gerade importiert. Bitte warten Sie, bis der Import abgeschlossen ist.',
+        beingTrained: '#UT#Die Sprachressource {0} wird gerade trainiert. Bitte warten Sie, bis das Training abgeschlossen ist.',
         deletionForbidden: '#UT#Sie sind nicht berechtigt, diese Sprachressource zu entfernen.',
         error: '#UT#Fehler'
     },
@@ -424,17 +425,25 @@ Ext.define('Editor.controller.TmOverview', {
         win.show();
     },
     handleImportTm: function (view, cell, cellIdx, rec) {
-        //find the import window from the service name
+
+        if(this.statusBlocksActionWithWindow(rec)){
+            return;
+        }
+        //find the import window from the service name, load the record & show
         var importWindow = Editor.util.LanguageResources.getService(rec.get('serviceName')).getImportWindow(),
             win = Ext.widget(importWindow);
         win.loadRecord(rec);
+        win.show();
+    },
+    handleEditSpecific: function (view, cell, cellIdx, rec) {
+        // find the edit specific data window from the service name, by default this is empty
+        var configWindow = Editor.util.LanguageResources.getService(rec.get('serviceName')).getEditSpecificWindow();
 
-        if (rec.data.status === rec.STATUS_IMPORT) {
-            this.showCurrentlyImportingMessage(rec);
-
+        if(!configWindow || this.statusBlocksActionWithWindow(rec)){
             return;
         }
-
+        var win = Ext.widget(configWindow);
+        win.loadRecord(rec);
         win.show();
     },
     handleTmGridActionColumnClick: function (view, cell, row, col, ev, record) {
@@ -466,6 +475,9 @@ Ext.define('Editor.controller.TmOverview', {
                     break;
                 case 'log':
                     me.handleLogTm(view, cell, col, newRecord);
+                    break;
+                case 'specific':
+                    me.handleEditSpecific(view, cell, col, newRecord);
                     break;
             }
         });
@@ -506,9 +518,7 @@ Ext.define('Editor.controller.TmOverview', {
                 return items;
             };
 
-        if (rec.data.status === rec.STATUS_IMPORT) {
-            this.showCurrentlyImportingMessage(rec);
-
+        if(this.statusBlocksActionWithWindow(rec)){
             return;
         }
 
@@ -646,7 +656,7 @@ Ext.define('Editor.controller.TmOverview', {
         if (engine) {
             form.getForm().findField('specificData').setValue(JSON.stringify({
                 domainCode: engine.get('domainCode'),
-                engineName: engine.get('name')
+                engineName: engine.get('engineName')
             }));
         }
 
@@ -686,9 +696,7 @@ Ext.define('Editor.controller.TmOverview', {
         }
         menu.record = newRecord;
 
-        if (newRecord.data.status === newRecord.STATUS_IMPORT) {
-            this.showCurrentlyImportingMessage(newRecord);
-
+        if(this.statusBlocksActionWithWindow(newRecord)){
             return;
         }
 
@@ -825,12 +833,23 @@ Ext.define('Editor.controller.TmOverview', {
         return false;
     },
 
-    showCurrentlyImportingMessage: function (record) {
-        Ext.MessageBox.show({
-            title: '',
-            msg: Ext.String.format(this.strings.importing, record.data.name),
-            buttons: Ext.MessageBox.OK,
-            icon: Ext.MessageBox.WARNING
-        });
+    /**
+     *
+     * @param {Editor.model.LanguageResources.LanguageResource} record
+     * @returns {boolean}
+     */
+    statusBlocksActionWithWindow: function (record) {
+        if(record.data.status === record.STATUS_IMPORT || record.data.status === record.STATUS_TUNINGINPROGRESS){
+            var message = (record.data.status === record.STATUS_IMPORT) ?
+                this.strings.importing : this.strings.beingTrained;
+            Ext.MessageBox.show({
+                title: '',
+                msg: Ext.String.format(message, record.data.name),
+                buttons: Ext.MessageBox.OK,
+                icon: Ext.MessageBox.WARNING
+            });
+            return true;
+        }
+        return false;
     }
 });

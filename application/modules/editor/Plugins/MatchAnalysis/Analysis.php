@@ -598,7 +598,7 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
                 $connector->setWorkerUserGuid($this->userGuid);
 
                 //throw a warning if the language resource is not available
-                $status = $connector->getStatus($resource);
+                $status = $connector->getStatus($resource, $languageresource);
                 if (!in_array($status, $availableConnectorStatus)) {
                     $this->log->warn('E1239', 'MatchAnalysis Plug-In: Language resource "{name}" has status "{status}" and is not available for match analysis and pre-translations.', [
                         'task' => $this->task,

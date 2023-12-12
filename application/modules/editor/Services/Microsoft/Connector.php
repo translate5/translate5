@@ -239,7 +239,7 @@ class editor_Services_Microsoft_Connector extends editor_Services_Connector_Abst
      * {@inheritDoc}
      * @see editor_Services_Connector_Abstract::getStatus()
      */
-    public function getStatus(editor_Models_LanguageResources_Resource $resource){
+    public function getStatus(editor_Models_LanguageResources_Resource $resource, editor_Models_LanguageResources_LanguageResource $languageResource = null): string {
         $this->lastStatusInfo = '';
         $this->api = ZfExtended_Factory::get('editor_Services_Microsoft_HttpApi',[$resource]);
         

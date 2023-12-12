@@ -21,13 +21,14 @@ START LICENSE AND COPYRIGHT
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
 
 namespace MittagQI\Translate5\Task\Import\FileParser\Xlf\Namespaces;
 
+use editor_Models_Export_FileParser_Xlf_Namespaces_Tmgr;
 use editor_Models_Import_FileParser_SegmentAttributes as SegmentAttributes;
 
 
@@ -38,9 +39,13 @@ class Tmgr extends AbstractNamespace
 {
     const IBM_XLIFF_NAMESPACE = 'xmlns:tmgr="http://www.ibm.com"';
 
-    protected static function isApplicable(string $xliff): bool
+    public static function isApplicable(string $xliff): bool
     {
         return str_contains($xliff, self::IBM_XLIFF_NAMESPACE);
+    }
+
+    public static function getExportCls(): ?string {
+        return editor_Models_Export_FileParser_Xlf_Namespaces_Tmgr::class;
     }
 
     /**
@@ -50,7 +55,7 @@ class Tmgr extends AbstractNamespace
     public function transunitAttributes(array $attributes, SegmentAttributes $segmentAttributes): void
     {
         //FIXME add match rate infos into our matchRateType field!
-        $segmentAttributes->matchRate = (int) $attributes['tmgr:matchratio'];
+        $segmentAttributes->matchRate = (int) ($attributes['tmgr:matchratio'] ?? 0);
     }
 
     /**

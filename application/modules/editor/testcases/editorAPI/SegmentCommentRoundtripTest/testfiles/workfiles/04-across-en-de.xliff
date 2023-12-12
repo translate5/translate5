@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2" xmlns:ax="AcrossXliff" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="urn:oasis:names:tc:xliff:document:1.2 xliff-core-1.2-transitional.xsd" ax:time-stamp="06/27/2017 17:23:18">
+  <file source-language="de-DE" ax:src-lang="959c4834-a4db-44c7-8d09-011abaa866a3" target-language="en-EN" ax:trg-lang="7ea90d97-dcfc-4341-a1ca-2d55c1d593eb" original="test.docx" datatype="x-across-translation" category="General" ax:start-date="07/07/2017 19:00:00" ax:due-date="07/17/2017 19:00:00">
+    <header>
+      <tool tool-id="Across.XLIFF" tool-name="Across.XLIFF" tool-version="1.1" tool-company="Across Systems GmbH" />
+      <ax:project>
+        <ax:name>Across Comment Import Test</ax:name>
+      </ax:project>
+      <ax:properties>
+        <ax:property name="subjects">
+          <ax:value>General</ax:value>
+        </ax:property>
+      </ax:properties>
+    </header>
+    <body>
+      <trans-unit id="92" translate="yes" ax:state-name="KeepSource" ax:state-id="1" ax:state-flags="1024">
+        <source>ohne match</source>
+        <target>without match</target>
+        <ax:named-properties>
+          <ax:named-property name="Comment">
+            <ax:named-value ax:name="Annotates">Target</ax:named-value>
+            <ax:named-value ax:name="Author">tester</ax:named-value>
+            <ax:named-value ax:name="Text">Imported Comment Text</ax:named-value>
+            <ax:named-value ax:name="Created">02/20/2019 12:55:20</ax:named-value>
+            <ax:named-value ax:name="Title">Imported Comment Title</ax:named-value>
+          </ax:named-property>
+        </ax:named-properties>
+      </trans-unit>
+    </body>
+  </file>
+</xliff>

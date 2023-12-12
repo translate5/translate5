@@ -1382,7 +1382,7 @@
             </trans-unit>
             <trans-unit id="RWluZW4gbmV1ZW4gS3VuZGVuIGhpbnp1ZsO8Z2Vu">
                 <source>Einen neuen Kunden hinzufügen</source>
-                <target>Add a new customer</target>
+                <target>Einen neuen Kunden hinzufügen</target>
             </trans-unit>
             <trans-unit id="RWluZSBFeGNlbC1EYXRlaSBtaXQgZGVuIE51dHp1bmdzemFobGVuIHp1IGFsbGVuIGVpbmdlYnVuZGVuZW4gU3ByYWNocmVzc291cmNlbiBleHBvcnRpZXJlbg==">
                 <source>Eine Excel-Datei mit den Nutzungszahlen zu allen eingebundenen Sprachressourcen exportieren</source>
@@ -5537,6 +5537,22 @@ Im Projektportal {portalLink} wurde die Aufgabe
                 <source>Keine gültige Lizenz.</source>
                 <target>Keine gültige Lizenz.</target>
             </trans-unit>
+            <trans-unit id='V2lyZCB0cmFpbmllcnQ='>
+                <source>Wird trainiert</source>
+                <target>Wird trainiert</target>
+            </trans-unit>
+            <trans-unit id='V2lyZCByZW9yZ2FuaXNpZXJ0'>
+                <source>Wird reorganisiert</source>
+                <target>Wird reorganisiert</target>
+            </trans-unit>
+            <trans-unit id='UmVvcmdhbmlzYXRpb24gZ2VzY2hlaXRlcnQ='>
+                <source>Reorganisation gescheitert</source>
+                <target>Reorganisation gescheitert</target>
+            </trans-unit>
+            <trans-unit id='S29udGluZ2VudCDDvGJlcnNjaHJpdHRlbg=='>
+                <source>Kontingent überschritten</source>
+                <target>Kontingent überschritten</target>
+            </trans-unit>
             <trans-unit id='aW1wb3J0aWVydA=='>
                 <source>importiert</source>
                 <target>importiert</target>
@@ -7184,9 +7200,9 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
                 <source>Kunden mit Leserechten auf dieser Sprachressource</source>
                 <target>Kunden mit Leserechten auf dieser Sprachressource</target>
             </trans-unit>
-            <trans-unit id="S3VuZGVuIG1pdCBTY2hyZWlicmVjaHRlIGF1ZiBkaWVzZXIgU3ByYWNocmVzc291cmNl">
-                <source>Kunden mit Schreibrechte auf dieser Sprachressource</source>
-                <target>Kunden mit Schreibrechte auf dieser Sprachressource</target>
+            <trans-unit id="S3VuZGVuIG1pdCBTY2hyZWlicmVjaHRlbiBhdWYgZGllc2VyIFNwcmFjaHJlc3NvdXJjZQ==">
+                <source>Kunden mit Schreibrechten auf dieser Sprachressource</source>
+                <target>Kunden mit Schreibrechten auf dieser Sprachressource</target>
             </trans-unit>
             <trans-unit id="S3VuZGVuLCBkaWUgZGllc2UgU3ByYWNocmVzc291cmNlIHN0YW5kYXJkbcOkw59pZyBhbHMgUGl2b3QgdmVyd2VuZGVu">
                 <source>Kunden, die diese Sprachressource standardmäßig als Pivot verwenden</source>
@@ -8657,6 +8673,10 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
             <trans-unit id='RGllIFNwcmFjaHJlc3NvdXJjZSB7MH0gd2lyZCBnZXJhZGUgaW1wb3J0aWVydC4gQml0dGUgd2FydGVuIFNpZSwgYmlzIGRlciBJbXBvcnQgYWJnZXNjaGxvc3NlbiBpc3Qu'>
                 <source>Die Sprachressource {0} wird gerade importiert. Bitte warten Sie, bis der Import abgeschlossen ist.</source>
                 <target>Die Sprachressource {0} wird gerade importiert. Bitte warten Sie, bis der Import abgeschlossen ist.</target>
+            </trans-unit>
+            <trans-unit id='RGllIFNwcmFjaHJlc3NvdXJjZSB7MH0gd2lyZCBnZXJhZGUgdHJhaW5pZXJ0LiBCaXR0ZSB3YXJ0ZW4gU2llLCBiaXMgZGFzIFRyYWluaW5nIGFiZ2VzY2hsb3NzZW4gaXN0Lg=='>
+                <source>Die Sprachressource {0} wird gerade trainiert. Bitte warten Sie, bis das Training abgeschlossen ist.</source>
+                <target>Die Sprachressource {0} wird gerade trainiert. Bitte warten Sie, bis das Training abgeschlossen ist.</target>
             </trans-unit>
             <trans-unit id='QmVncmlmZmUgaW4gZGVyIFRCWCB3ZXJkZW4gaW1tZXIgenVlcnN0IG5hY2ggSUQgbWl0IGJlc3RlaGVuZGVuIEVpbnRyw6RnZW4gaW4gZGVyIFRlcm1Db2xsZWN0aW9uIHp1c2FtbWVuZ2Vmw7xocnQuIFdlbm4gVGVybWUgenVzYW1tZW5mw7xocmVuIGFuZ2VrcmV1enQgaXN0IHVuZCBkaWUgSUQgaW4gZGVyIFRCWCBuaWNodCBpbiBkZXIgVGVybUNvbGxlY3Rpb24gZ2VmdW5kZW4gd2lyZCwgd2lyZCBnZXN1Y2h0LCBvYiBkZXJzZWxiZSBCZWdyaWZmIGJlcmVpdHMgaW4gZGVyc2VsYmVuIFNwcmFjaGUgZXhpc3RpZXJ0LiBXZW5uIGphLCB3ZXJkZW4gZGllIGdlc2FtdGVuIFRlcm1laW50csOkZ2UgenVzYW1tZW5nZWbDvGhydC4gSW5zYmVzb25kZXJlIGJlaSBlaW5lciBUZXJtQ29sbGVjdGlvbiBtaXQgdmllbGVuIFNwcmFjaGVuIGthbm4gZGllcyB6dSB1bmVyd8O8bnNjaHRlbiBFcmdlYm5pc3NlbiBmw7xocmVuLg=='>
                 <source>Begriffe in der TBX werden immer zuerst nach ID mit bestehenden Einträgen in der TermCollection zusammengeführt. Wenn Terme zusammenführen angekreuzt ist und die ID in der TBX nicht in der TermCollection gefunden wird, wird gesucht, ob derselbe Begriff bereits in derselben Sprache existiert. Wenn ja, werden die gesamten Termeinträge zusammengeführt. Insbesondere bei einer TermCollection mit vielen Sprachen kann dies zu unerwünschten Ergebnissen führen.</source>

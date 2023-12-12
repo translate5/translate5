@@ -13,6 +13,115 @@ All updates are (downwards) compatible! If not this is listed in the important r
 
 
 
+
+
+
+
+## [6.8.1] - 2023-12-07
+
+### Important Notes:
+ 
+
+
+### Changed
+**[TRANSLATE-3608](https://jira.translate5.net/browse/TRANSLATE-3608): Configuration - Improve edit 100% matches config desciption** <br>
+Improvement in 100% matches config (runtimeOptions.frontend.importTask.edit100PercentMatch) description.
+
+
+### Bugfixes
+**[TRANSLATE-3610](https://jira.translate5.net/browse/TRANSLATE-3610): Main back-end mechanisms (Worker, Logging, etc.) - FIX bug in Sanitization with empty params** <br>
+FIX: Possible unneccessary exception when sanitizing params
+
+**[TRANSLATE-3606](https://jira.translate5.net/browse/TRANSLATE-3606): Main back-end mechanisms (Worker, Logging, etc.), User Management - Session API authentication combined with apptokens leads to beeing the wrong user** <br>
+FIX authentication via POST on the session-controller, where elevated credentials were delivered when called with an App-Token
+
+**[TRANSLATE-3605](https://jira.translate5.net/browse/TRANSLATE-3605): LanguageResources - TM button for associated tasks missing** <br>
+Fix problem where the TM button for associated tasks was not visible in resources overview.
+
+
+## [6.8.0] - 2023-12-05
+
+### Important Notes:
+#### [TRANSLATE-3561](https://jira.translate5.net/browse/TRANSLATE-3561)
+These changes will work properly only with t5memory after version 0.4.1056
+ 
+
+
+### Changed
+**[TRANSLATE-3561](https://jira.translate5.net/browse/TRANSLATE-3561): t5memory - Enable t5memory connector to load balance big TMs** <br>
+Fix overflow error when importing very big files into t5memory by splitting the TM internally.
+
+**[TRANSLATE-3537](https://jira.translate5.net/browse/TRANSLATE-3537): Import/Export - Process comments from xliff 1.2 files** <br>
+XLF comments placed in note tags are now also imported and exported as task comments. The behavior is configurable.
+
+
+### Bugfixes
+**[TRANSLATE-3601](https://jira.translate5.net/browse/TRANSLATE-3601): VisualReview / VisualTranslation - Change default for processing of invisible texts in PDF converter in Visual** <br>
+Changed default for processing of invisible text in the visual (Text visibility correction) to fix only fully occluded text
+
+
+## [6.7.3] - 2023-12-01
+
+### Important Notes:
+ 
+
+
+### Added
+**[TRANSLATE-3548](https://jira.translate5.net/browse/TRANSLATE-3548): Okapi integration - Show xml-tags configured as 'translate="no"' in format conversion as protected segments in translate5** <br>
+Main bulk of this feature is Okapi development and to use it Okapi 1.46 is needed. It allows to configure xml tags in Okapi as 'translate="no"', but still show them as locked segments in translate5.
+
+
+### Bugfixes
+**[TRANSLATE-3588](https://jira.translate5.net/browse/TRANSLATE-3588): Editor general, VisualReview / VisualTranslation - Cleaning up the visual public symlinks does not work** <br>
+FIX: cleanup for visual public URL symbolic links
+
+
+## [6.7.2] - 2023-11-28
+
+### Important Notes:
+#### [TRANSLATE-3571](https://jira.translate5.net/browse/TRANSLATE-3571)
+The import and task finish callbacks are now sending the proper content-type application/json; charset=utf-8 - what must be supported by your endpoint if using that feature.
+ 
+
+
+### Changed
+**[TRANSLATE-3562](https://jira.translate5.net/browse/TRANSLATE-3562): LanguageResources - Make name of TildeMT configurable in system configuration** <br>
+TildeMT service name now can be configured
+
+**[TRANSLATE-3547](https://jira.translate5.net/browse/TRANSLATE-3547): LanguageResources, t5memory - Change direct saving to tm to queue** <br>
+If enabled segments in TMs will be updated asynchronously via queued worker (runtimeOptions.LanguageResources.tmQueuedUpdate)
+
+**[TRANSLATE-3542](https://jira.translate5.net/browse/TRANSLATE-3542): Editor general - Enhance translate5 with more tooltips for better usability** <br>
+Enhanced Translate5 and TermPortal tooltips
+
+**[TRANSLATE-3421](https://jira.translate5.net/browse/TRANSLATE-3421): Main back-end mechanisms (Worker, Logging, etc.) - Organize test output and php errors from live instances based on Indi Engine** <br>
+Internal improvements for automatic testing in development cycle
+
+
+### Bugfixes
+**[TRANSLATE-3583](https://jira.translate5.net/browse/TRANSLATE-3583): VisualReview / VisualTranslation - FIX Visual Image Test** <br>
+Update Google libraries to solve API-test problems
+
+**[TRANSLATE-3577](https://jira.translate5.net/browse/TRANSLATE-3577): Auto-QA - Missing DB indizes are leading to long running analysis** <br>
+Due a missing DB index the analysis and pre-translation was taking to much time.
+
+**[TRANSLATE-3573](https://jira.translate5.net/browse/TRANSLATE-3573): Main back-end mechanisms (Worker, Logging, etc.) - Fix start of task operations in case of exceptions** <br>
+FIX: QA operation workers stay in database if start of task operation failed
+
+**[TRANSLATE-3571](https://jira.translate5.net/browse/TRANSLATE-3571): API - Add missing content-type header in task import callback** <br>
+The import callback was not sending a content-type, some callback implementations were not able to handle that.
+
+**[TRANSLATE-3559](https://jira.translate5.net/browse/TRANSLATE-3559): Configuration, Test framework - Remove method \ZfExtended_Models_Config::loadListByNamePart** <br>
+Remove a internal function using the system configuration in an incomplete way.
+
+**[TRANSLATE-3496](https://jira.translate5.net/browse/TRANSLATE-3496): Main back-end mechanisms (Worker, Logging, etc.) - session code cleanup and performance improvement** <br>
+translate5 - 6.7.0 
+ * Loading performance of session data improved. (Step 1)
+translate5 - 6.7.2
+ * Storing session improved. (Step 2)
+
+
+
 ## [6.7.1] - 2023-11-08
 
 ### Important Notes:

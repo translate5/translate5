@@ -42,6 +42,7 @@ abstract class LanguageResource extends Resource
     public const ZDemo_MT = 'zdemomt';
     public const MICROSOFT_TRANSLATOR = 'microsofttranslator';
     public const TILDE_MT = 'tildemt';
+    public const OPEN_AI = 'openai';
 
     public const GOOGLE_TRANSLATE = 'googletranslate';
 

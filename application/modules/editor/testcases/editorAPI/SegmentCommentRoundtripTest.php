@@ -21,7 +21,7 @@ START LICENSE AND COPYRIGHT
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
@@ -54,8 +54,10 @@ class SegmentCommentRoundtripTest extends editor_Test_JsonTest {
     {
         $requiredTaskConfigs = [
             'editor.export.exportComments' => 1,
+            'import.xliff.importComments' => 1,
             'import.sdlxliff.applyChangeMarks' => 1,
             'import.sdlxliff.importComments' => 1,
+            'runtimeOptions.export.xliff.commentAddTranslate5Namespace' => 1,
             'customers.anonymizeUsers' => 0,
         ];
         static::assertTaskConfigs(static::getTask()->getTaskGuid(), $requiredTaskConfigs);
@@ -70,7 +72,21 @@ class SegmentCommentRoundtripTest extends editor_Test_JsonTest {
         $this->assertSegmentsEqualsJsonFile($jsonFileName, $segments, 'Imported segments are not as expected!');
         $segmentIds = array_column($segments, 'id');
         $comments = $this->getCommentsForTest($segmentIds);
-        $this->assertCommentsEqualsJsonFile('expectedComments.json', $comments, 'Imported comments are not as expected!');
+
+        foreach($comments as $idx1 => $innerComments) {
+            foreach($innerComments as $idx2 => $comment) {
+                if ($comment->userGuid === \MittagQI\Translate5\Task\Import\FileParser\Xlf\Comments::NOTE_USERGUID) {
+                    $comment->created = $comment->modified = 'FAKED_NOT_POSSIBLE_ON_XLF_NOTEs';
+                    $comments[$idx1][$idx2] = $comment;
+                }
+            }
+        }
+
+        $this->assertCommentsEqualsJsonFile(
+            'expectedComments.json',
+            $comments,
+            'Imported comments are not as expected!'
+        );
     }
 
     /**
@@ -107,7 +123,12 @@ class SegmentCommentRoundtripTest extends editor_Test_JsonTest {
         $this->assertSegmentsEqualsJsonFile($jsonFileName, $segments, 'Imported segments are not as expected!');
         $segmentIds = array_column($segments, 'id');
         $comments = $this->getCommentsForTest($segmentIds);
-        $this->assertCommentsEqualsJsonFile('expectedCommentsAfterAdd.json', $comments, 'Imported comments are not as expected!', true);
+        $this->assertCommentsEqualsJsonFile(
+            'expectedCommentsAfterAdd.json',
+            $comments,
+            'Imported comments are not as expected!',
+            true
+        );
     }
 
     /**
@@ -129,6 +150,8 @@ class SegmentCommentRoundtripTest extends editor_Test_JsonTest {
 
         $this->_testExportSdlXliff($pathToZip);
         $this->_testExportMemoQXliff($pathToZip);
+        $this->_testExportXliff($pathToZip);
+        $this->_testAcrossXliff($pathToZip);
     }
 
     protected function _testExportSdlXliff(string $pathToZip) {
@@ -150,7 +173,9 @@ class SegmentCommentRoundtripTest extends editor_Test_JsonTest {
         $expectedResult = $result[1];
         //file_put_contents('/home/tlauria/foo-export.sdlxliff', $exportedFile);
         //file_put_contents('/home/tlauria/foo-expect.sdlxliff', $expectedResult);
-        $this->assertEquals(rtrim($expectedResult), rtrim($exportedFile), 'Exported result does not equal to export-assert.sdlxliff');
+        $expectedResult = str_replace("\r\n", "\n", rtrim($expectedResult));
+        $exportedFile = str_replace("\r\n", "\n", rtrim($exportedFile));
+        $this->assertEquals($expectedResult, $exportedFile, 'Exported result does not equal to export-assert.sdlxliff');
     }
 
     protected function _testExportMemoQXliff(string $pathToZip) {
@@ -169,5 +194,52 @@ class SegmentCommentRoundtripTest extends editor_Test_JsonTest {
         //file_put_contents('/home/tlauria/foo-export.mqxliff', $exportedFile);
         //file_put_contents('/home/tlauria/foo-expect.mqxliff', $expectedResult);
         $this->assertEquals(rtrim($expectedResult), rtrim($exportedFile), 'Exported result does not equal to export-assert.mqxliff');
+    }
+
+    protected function _testExportXliff(string $pathToZip)
+    {
+        $exportedFile = static::api()->getFileContentFromZipPath($pathToZip, '/03-xlf-en-de.xliff');
+        //file_put_contents(static::api()->getFile('export-assert.xlf.xliff', assert: false), $exportedFile);
+        $expectedResult = static::api()->getFileContent('export-assert.xlf.xliff', $exportedFile);
+        //file_put_contents(static::api()->getFile('export-assert.xlf.xliff', assert: false), $expectedResult);
+        $result = preg_replace([
+            '/translate5:time="[0-9-]+T[0-9:]+Z"/'
+        ], [
+            'translate5:time="NOTTESTABLEZ"'
+        ], [
+            $exportedFile,
+            $expectedResult
+        ]);
+        $exportedFile = $result[0];
+        $expectedResult = $result[1];
+        $this->assertEquals(
+            rtrim($expectedResult),
+            rtrim($exportedFile),
+            'Exported result does not equal to export-assert.xlf.xliff'
+        );
+    }
+
+    /**
+     * @param string $pathToZip
+     * @return void
+     * @throws Exception
+     */
+    protected function _testAcrossXliff(string $pathToZip) {
+        $exportedFile = static::api()->getFileContentFromZipPath($pathToZip, '/04-across-en-de.xliff');
+        //file_put_contents(static::api()->getFile('export-assert.across.xliff', assert: false), $exportedFile);
+        $expectedResult = static::api()->getFileContent('export-assert.across.xliff', $exportedFile);
+
+        $s = [
+            '~Comment from lector test \([0-9.: /]+\) in translate5~'
+        ];
+        $r = [
+            'Comment from lector test (NOT TESTABLE) in translate5'
+        ];
+        $result = preg_replace($s, $r, [$exportedFile, $expectedResult]);
+        $exportedFile = $result[0];
+        $expectedResult = $result[1];
+
+        //file_put_contents(static::api()->getFile('export-assert.across.xliff', assert: false), $expectedResult);
+        $this->assertEquals(rtrim($expectedResult), rtrim($exportedFile), 'Exported result does not equal to export-assert.across.xliff');
     }
 }

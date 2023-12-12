@@ -21,19 +21,20 @@ START LICENSE AND COPYRIGHT
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
 
 namespace MittagQI\Translate5\Task\Import\FileParser\Xlf\Namespaces;
 
+use editor_Models_Export_FileParser_Xlf_Namespaces_Translate5;
 use editor_Models_Import_FileParser_SegmentAttributes as SegmentAttributes;
 use editor_Models_Import_FileParser_Xlf_ContentConverter as OrigContentConverter;
-use editor_Models_Import_FileParser_XmlParser;
+use editor_Models_Import_FileParser_XmlParser as XmlParser;
 use editor_Models_Task;
+use MittagQI\Translate5\Task\Import\FileParser\Xlf\Comments;
 use ZfExtended_Factory;
-
 
 /**
  * XLF Fileparser Add On to parse Translate5 XLF specific stuff
@@ -43,9 +44,18 @@ class Translate5 extends AbstractNamespace
     const TRANSLATE5_XLIFF_NAMESPACE = 'xmlns:translate5="http://www.translate5.net/"';
     private Translate5\ContentConverter $contentConverter;
 
-    protected static function isApplicable(string $xliff): bool
+    public function __construct(XmlParser $xmlparser, Comments $comments) {
+        parent::__construct($xmlparser, $comments);
+        $this->registerParserHandler($xmlparser);
+    }
+
+    public static function isApplicable(string $xliff): bool
     {
         return str_contains($xliff, self::TRANSLATE5_XLIFF_NAMESPACE);
+    }
+
+    public static function getExportCls(): ?string {
+        return editor_Models_Export_FileParser_Xlf_Namespaces_Translate5::class;
     }
 
     /**
@@ -62,16 +72,18 @@ class Translate5 extends AbstractNamespace
     {
         //TODO parse:
         //trans-unit id="7" translate5:autostateId="4" translate5:autostateText="not_translated">
-        $segmentAttributes->maxNumberOfLines = (int) $attributes['translate5:maxNumberOfLines'];
+        if (array_key_exists('translate5:maxNumberOfLines', $attributes)) {
+            $segmentAttributes->maxNumberOfLines = (int) $attributes['translate5:maxNumberOfLines'];
+        } else {
+            $segmentAttributes->maxNumberOfLines = null;
+        }
     }
 
-    /**
-     * {@inheritDoc}
-     * @see AbstractNamespace::registerParserHandler()
-     */
-    public function registerParserHandler(editor_Models_Import_FileParser_XmlParser $xmlparser): void
+    protected function registerParserHandler(XmlParser $xmlparser): void
     {
-        $this->contentConverter->resetTagMap();
+        //FIXME translate5 comment attributes are currently omitted, since if really import the user with its guid
+        // then the comment is exported additionally, since user guid does not contain xlf-note-imported anymore.
+
         $xmlparser->registerElement('translate5:tagmap', null, function ($tag, $key, $opener) use ($xmlparser) {
             //get the content between the tagmap tags:
             $storedTags = $xmlparser->getRange($opener['openerKey'] + 1, $key - 1, true);
@@ -105,10 +117,12 @@ class Translate5 extends AbstractNamespace
 
     public function getContentConverter(editor_Models_Task $task, string $filename): OrigContentConverter
     {
-        return $this->contentConverter = ZfExtended_Factory::get(Translate5\ContentConverter::class, [
+        $this->contentConverter = ZfExtended_Factory::get(Translate5\ContentConverter::class, [
             $this,
             $task,
             $filename
         ]);
+        $this->contentConverter->resetTagMap();
+        return $this->contentConverter;
     }
 }
