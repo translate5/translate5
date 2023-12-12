@@ -9,7 +9,7 @@
 --
 --  This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
 --  as published by the Free Software Foundation and appearing in the file agpl3-license.txt
---  included in the packaging of this file.  Please review the following information2
+--  included in the packaging of this file.  Please review the following information
 --  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
 --  http://www.gnu.org/licenses/agpl.html
 --
@@ -25,7 +25,18 @@
 -- END LICENSE AND COPYRIGHT
 -- */
 
-UPDATE Zf_configuration set level = 2 WHERE name = "runtimeOptions.plugins.NecTm.credentials";
-UPDATE Zf_configuration set level = 2 WHERE name = "runtimeOptions.plugins.NecTm.server";
-UPDATE Zf_configuration set level = 2 WHERE name = "runtimeOptions.plugins.NecTm.topLevelCategoriesIds";
-UPDATE Zf_configuration set level = 1 WHERE name = "runtimeOptions.worker.editor_Plugins_NecTm_Worker.maxParallelWorkers";
+DELETE FROM `Zf_configuration` WHERE `name` = 'runtimeOptions.worker.editor_Plugins_NecTm_Worker.maxParallelWorkers';
+DELETE FROM `Zf_configuration` WHERE `name` LIKE 'runtimeOptions.plugins.NecTm.%';
+DELETE FROM `Zf_acl_rules` WHERE `right` = 'pluginNecTm';
+
+UPDATE  `Zf_configuration`
+SET  `value` = REPLACE(`value`, ',"editor_Plugins_NecTm_Init"',"")
+WHERE  `Zf_configuration`.`name` ="runtimeOptions.plugins.active" and `Zf_configuration`.`value` like '%editor_Plugins_NecTm_Init%';
+
+UPDATE  `Zf_configuration`
+SET  `value` = REPLACE(`value`, '"editor_Plugins_NecTm_Init",',"")
+WHERE  `Zf_configuration`.`name` ="runtimeOptions.plugins.active" and `Zf_configuration`.`value` like '%editor_Plugins_NecTm_Init%';
+
+UPDATE  `Zf_configuration`
+SET  `value` = REPLACE(`value`, '"editor_Plugins_NecTm_Init"',"")
+WHERE  `Zf_configuration`.`name` ="runtimeOptions.plugins.active" and `Zf_configuration`.`value` like '%editor_Plugins_NecTm_Init%';
