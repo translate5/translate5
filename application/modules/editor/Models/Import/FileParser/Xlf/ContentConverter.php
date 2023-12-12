@@ -329,8 +329,12 @@ class editor_Models_Import_FileParser_Xlf_ContentConverter {
         
         if(!empty($this->result) && !$this->preserveWhitespace) {
             $lastIdx = count($this->result) - 1;
-            $this->result[0] = ltrim($this->result[0]);
-            $this->result[$lastIdx] = rtrim($this->result[$lastIdx]);
+            if (is_string($this->result[0])) {
+                $this->result[0] = ltrim($this->result[0]);
+            }
+            if (is_string($this->result[$lastIdx])) {
+                $this->result[$lastIdx] = rtrim($this->result[$lastIdx]);
+            }
         }
 
         $this->shortTagNumbers->calculatePartnerAndType();
