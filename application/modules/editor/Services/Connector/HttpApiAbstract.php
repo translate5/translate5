@@ -163,6 +163,15 @@ abstract class editor_Services_Connector_HttpApiAbstract {
                 //get json error to proceed as usual
                 $lastJsonError = json_last_error();
             }
+
+            if ($lastJsonError === JSON_ERROR_UTF8) {
+                $responseBody = mb_convert_encoding($responseBody, 'UTF-8', 'UTF-8');
+
+                $this->result = json_decode($responseBody);
+
+                //get json error to proceed as usual
+                $lastJsonError = json_last_error();
+            }
             
             //check for JSON errors
             if($lastJsonError != JSON_ERROR_NONE){
