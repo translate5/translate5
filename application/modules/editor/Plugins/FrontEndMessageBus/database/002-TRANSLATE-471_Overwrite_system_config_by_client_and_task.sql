@@ -44,7 +44,7 @@ UPDATE Zf_configuration SET
                 `comment` = ""
                 WHERE `name` = "runtimeOptions.plugins.FrontEndMessageBus.socketServer.httpHost";
 UPDATE Zf_configuration SET
-                `default` = "9056",
+                `default` = "",
                 `defaults` = "",
                 `guiName` = "Websockets server port",
                 `guiGroup` = "System setup: General",
