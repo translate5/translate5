@@ -228,9 +228,12 @@ class editor_Models_Segment_MatchRateType {
     }
     
     /**
-     * Returns true if the given type may be updated (either in the segment itself, or the whole segment into another TM)
+     * Returns true if the given type may be updated
+     * (either in the segment itself, or the whole segment into another TM)
+     * @param $type
+     * @return bool
      */
-    static public function isUpdateable($type) {
+    public static function isUpdatable($type) : bool {
         if(!empty($type)){
             $type = explode(';', $type);
             if(in_array(self::TYPE_MISSING_SOURCE_MRK, $type)){
