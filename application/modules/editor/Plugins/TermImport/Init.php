@@ -25,6 +25,10 @@ START LICENSE AND COPYRIGHT
 
 END LICENSE AND COPYRIGHT
 */
+use MittagQI\Translate5\Cronjob\CronEventTrigger;
+use MittagQI\Translate5\Plugins\TermImport\TermImport;
+use MittagQI\Translate5\Plugins\TermImport\Service\Filesystem\FilesystemFactory;
+use MittagQI\Translate5\Plugins\TermImport\Service\LoggerService;
 
 /***
  * This plug-in is used for automatically exports TBX files from the filesystem and Across and imports them to translate5.
@@ -39,13 +43,17 @@ class editor_Plugins_TermImport_Init extends ZfExtended_Plugin_Abstract {
     /**
      * @var array
      */
-    protected $frontendControllers = array(
-    );
+    protected $frontendControllers = [];
     
     
     public function init() {
         $this->addController('TermImportController');
         $this->initRoutes();
+        $this->eventManager->attach(
+            CronEventTrigger::class,
+            CronEventTrigger::PERIODICAL,
+            [$this, 'checkFilesystemsForUpdates']
+        );
     }
     
     /**
@@ -83,5 +91,21 @@ class editor_Plugins_TermImport_Init extends ZfExtended_Plugin_Abstract {
                         'action' => 'crossapi'
                 ));
         $r->addRoute('plugins_termimport_crossapi', $crossapiRoute);
+
+        $r->addRoute('plugins_termimport_force',
+            new ZfExtended_Controller_RestFakeRoute('editor/termimport/force-check', [
+                'module' => 'editor',
+                'controller' => 'plugins_termimport_termimport',
+                'action' => 'force',
+            ])
+        );
+    }
+
+    /**
+     * @throws MittagQI\Translate5\Plugins\TermImport\Exception\TermImportException
+     */
+    public function checkFilesystemsForUpdates(): void
+    {
+        (new TermImport(new FilesystemFactory(new LoggerService())))->checkFilesystems();
     }
 }

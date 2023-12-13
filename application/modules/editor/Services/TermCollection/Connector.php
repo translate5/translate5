@@ -75,7 +75,7 @@ class editor_Services_TermCollection_Connector extends editor_Services_Connector
 
         //import the term collection
         if (!$import->parseTbxFile($fileinfo, $this->languageResource->getId())) {
-            $this->logger->error('E1321', 'Term Collection Import: Errors on parsing the TBX, the file could not be imported.');
+            $this->logger->error('E1321', 'Term Collection Import: Errors on parsing the TBX, the file could not be imported or contains no term entries.');
             return false;
         }
 
