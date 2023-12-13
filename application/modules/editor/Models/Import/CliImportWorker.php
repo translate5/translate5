@@ -42,9 +42,12 @@ class editor_Models_Import_CliImportWorker extends ZfExtended_Worker_Abstract
     {
         return true;
     }
-    
+
     /**
      * (non-PHPdoc)
+     * @return bool
+     * @throws ReflectionException
+     * @throws ZfExtended_Models_Entity_NotFoundException
      * @see ZfExtended_Worker_Abstract::work()
      */
     public function work(): bool
@@ -59,7 +62,7 @@ class editor_Models_Import_CliImportWorker extends ZfExtended_Worker_Abstract
         $customer = ZfExtended_Factory::get(editor_Models_Customer_Customer::class);
         $customer->loadByNumber($parameters['customerNumber']);
 
-        $language = ZfExtended_Factory::get(\editor_Models_Languages::class);
+        $language = ZfExtended_Factory::get(editor_Models_Languages::class);
         if (!is_numeric($parameters['source'])) {
             $language->loadByRfc5646($parameters['source']);
             $parameters['source'] = $language->getId();
@@ -99,14 +102,16 @@ class editor_Models_Import_CliImportWorker extends ZfExtended_Worker_Abstract
             editor_Task_Type_ProjectTask::ID
         );
 
-        $dataProvider = ZfExtended_Factory::get(editor_Models_Import_DataProvider_Zip::class, [$parameters['path']]);
-
-        $importService->import($project, $dataProvider, $data, $pm);
+        $dataprovider = ZfExtended_Factory::get(editor_Models_Import_DataProvider_Factory::class);
+        $importService->import($project, $dataprovider->createFromPath($parameters['path']), $data, $pm);
         $importService->startWorkers($project);
 
         return true;
     }
 
+    /**
+     * @throws ReflectionException
+     */
     private function createProject(
         ZfExtended_Models_User $pm,
         editor_Models_Customer_Customer $customer,
