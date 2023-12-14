@@ -37,7 +37,7 @@ END LICENSE AND COPYRIGHT
  * base class for the creation of internal tags
  */
 abstract class editor_ImageTag {
-    protected string $htmlTagTpl = '<div class="{type} {class} internal-tag ownttip"><span title="{title}" class="short">{shortTag}</span><span data-originalid="{id}" data-length="{length}" class="full">{text}</span></div>';
+    protected string $htmlTagTpl = '<div class="{type} {class} internal-tag ownttip"{dataAttribs}><span title="{title}" class="short">{shortTag}</span><span data-originalid="{id}" data-length="{length}" class="full">{text}</span></div>';
     
     /**
      * returns the Html Tag used in the editor for this tag type.
@@ -49,18 +49,25 @@ abstract class editor_ImageTag {
     public function getHtmlTag(array $parameters) {
         // CRUCIAL: Newlines in internal tags will break frontend-functionality. Therefore we turn all newlines in the content & title to "↵"
         // the export/back-conversion will be done with the base64-encoded data thus this replacing otherwise will do no harm
-        if(isset($parameters['text'])){
+        if(array_key_exists('text', $parameters)){
             $parameters['text'] = editor_Utils::visualizeNewlines($parameters['text']);
+        } else {
+            $parameters['text'] = '';
         }
-        if(isset($parameters['title'])){
+        if(array_key_exists('title', $parameters) && $parameters['title'] !== null){
             $parameters['title'] = editor_Utils::visualizeNewlines($parameters['title']);
-        }
-        if(! isset($parameters['length'])) {
-            $parameters['length'] = -1;
-        }
-        if(! isset($parameters['title']) || is_null($parameters['title'])) {
+        } else {
             $parameters['title'] = htmlspecialchars($parameters['text'], ENT_COMPAT, null, false);
         }
+        if(!array_key_exists('length', $parameters)) {
+            $parameters['length'] = -1;
+        }
+        if(array_key_exists('dataAttribs', $parameters) && !empty($parameters['dataAttribs'])) {
+            $parameters['dataAttribs'] = ' ' . trim($parameters['dataAttribs']);
+        } else {
+            $parameters['dataAttribs'] = '';
+        }
+
         $keys = array_map(function($k){
             return '{'.$k.'}';
         }, array_keys($parameters));
