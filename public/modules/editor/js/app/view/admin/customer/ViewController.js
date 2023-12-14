@@ -36,6 +36,11 @@ Ext.define('Editor.view.admin.customer.ViewController', {
 
 
     listen:{
+        controller: {
+            '#Editor.$application': {
+                adminSectionChanged: 'onApplicationSectionChanged'
+            }
+        },
         component:{
             '#saveOpenIdButton':{
                 click:'save'
@@ -54,6 +59,28 @@ Ext.define('Editor.view.admin.customer.ViewController', {
             'customersStore': {
                 filterchange: 'onCustomerStoreFilterChange'
             }
+        }
+    },
+
+    /**
+     * Will hide the domain tooltip when the application section is changed.
+     * The domain tooltip is only visible in the customer section, and it has the closable
+     * flag set because of the inner tooltip link.
+     * @param openedView
+     */
+    onApplicationSectionChanged: function (openedView){
+        var me = this,
+            view = me.getView();
+
+        if(!view || !openedView){
+            return;
+        }
+        if(view.getXType() === openedView.getXType()){
+            return;
+        }
+
+        if(view.domainLabelInfoTooltip && view.domainLabelInfoTooltip.isVisible()){
+            view.domainLabelInfoTooltip.hide();
         }
     },
 
