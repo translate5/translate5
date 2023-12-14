@@ -238,7 +238,7 @@ class editor_Models_Import_FileParser_Xlf_ContentConverter {
 
         // find placeables in the original content
         if($this->findPlaceables){
-            Placeable::detect($originalContent, $tagObj, $this->placeablesXpathes);
+            Placeable::detect($originalContent, $this->placeablesXpathes, $tagObj);
         }
 
         $this->shortTagNumbers->addTag($tagObj);
