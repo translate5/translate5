@@ -145,7 +145,7 @@ class FilesystemService
 
         $temp_ini_path = tempnam(APPLICATION_DATA . '/tmp', 'termimport');
         file_put_contents($temp_ini_path, $this->mountManager->read($item->path()));
-        $instructions = parse_ini_file($temp_ini_path,true);
+        $instructions = parse_ini_file($temp_ini_path,true, INI_SCANNER_TYPED);
 
         if (false === $instructions) {
             $this->logger->invalidInstructions($item->path(), ['Invalid INI file']);
