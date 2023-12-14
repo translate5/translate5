@@ -111,7 +111,7 @@ class FlysystemFactory {
     public static function createLocal(object $options): Filesystem
     {
         return new Filesystem(new LocalFilesystemAdapter(
-            $options->location ?? DIRECTORY_SEPARATOR, //Whats the Windows Root???
+            $options->location ?? '/', // DIRECTORY_SEPARATOR does not work on Windows
             $options->visibility ?? null,
             $options->writeFlags ?? LOCK_EX,
             $options->linkHandling ?? LocalFilesystemAdapter::DISALLOW_LINKS,

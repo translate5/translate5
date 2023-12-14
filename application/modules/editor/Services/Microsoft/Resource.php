@@ -29,12 +29,29 @@ END LICENSE AND COPYRIGHT
 class editor_Services_Microsoft_Resource extends editor_Models_LanguageResources_Resource {
 
     /**
-     * Microsoft Azure location configuration (for example northeurope etc.pp.)
+     * Microsoft Azure location configuration (for example north europe etc.pp.)
      * @var string
      */
     protected $location;
     
     protected $validLanguages = null;
+
+    /**
+     * The languages defined in the key will be mapped to the value when requesting api translations
+     * @var array
+     */
+    private array $internalLangaugeMap = [
+        'sr' => 'sr-latn',
+        'sr-Cyrl' => 'sr-cyrl',
+        'sr-BA' => 'sr-latn',
+        'sr-Cyrl-BA' => 'sr-cyrl',
+        'sr-SP' => 'sr-latn',
+        'sr-Cyrl-SP' => 'sr-cyrl',
+        'sr-Cyrl-RS' => 'sr-cyrl',
+        'sr-RS' => 'sr-latn',
+        'sr-Latn-RS' => 'sr-latn',
+        'sr-Latn-ME' => 'sr-latn'
+    ];
     
     public function __construct(string $id, string $name) {
         $this->id = $id;
@@ -58,29 +75,63 @@ class editor_Services_Microsoft_Resource extends editor_Models_LanguageResources
     public function getLocation(): string {
         return (string) $this->location;
     }
-    
+
+    /**
+     * Check and return the correct language code for the given rfc5646 code
+     * @param string $rfc5646
+     * @return string
+     */
+    public function getMircosoftCode(string $rfc5646): string {
+        $rfc5646 = strtolower($rfc5646);
+        if(isset($this->internalLangaugeMap[$rfc5646])){
+            return $this->internalLangaugeMap[$rfc5646];
+        }
+        return $rfc5646;
+    }
+
+    /***
+     * Get the langauge code for the given langauge id. By default, the language code for the langauge is the rfc value.
+     * Override this method in the child resources if different language code is needed
+     * @param int $languageId
+     * @return string
+     * @throws ReflectionException
+     * @throws ZfExtended_Models_Entity_NotFoundException
+     */
+    protected function getLanguageCode(int $languageId): string
+    {
+        $language = ZfExtended_Factory::get(editor_Models_Languages::class);
+        $language->load($languageId);
+        return $this->getMircosoftCode($language->getRfc5646());
+    }
+
     /**
      * Check if the valid resource language is valid for the api.
      * {@inheritDoc}
+     * @throws ReflectionException
      * @see editor_Models_LanguageResources_Resource::hasSourceLang()
      */
-    public function hasSourceLang(editor_Models_Languages $sourceLang) {
+    public function hasSourceLang(editor_Models_Languages $sourceLang): bool
+    {
         return $this->isValidLanguage($sourceLang->getRfc5646());
     }
-    
+
+
     /**
      * Check if the valid resource language is valid for the api
      * {@inheritDoc}
+     * @throws ReflectionException
      * @see editor_Models_LanguageResources_Resource::hasTargetLang()
      */
-    public function hasTargetLang(editor_Models_Languages $targetLang) {
+    public function hasTargetLang(editor_Models_Languages $targetLang): bool
+    {
         return $this->isValidLanguage($targetLang->getRfc5646());
     }
-    
+
     /**
      * checks if the given language RFC5646 value is valid for this resource
      * @param string $rfc5646
      * @return boolean
+     * @throws ReflectionException
      */
     protected function isValidLanguage(string $rfc5646): bool {
         if(is_null($this->validLanguages)) {
@@ -88,6 +139,9 @@ class editor_Services_Microsoft_Resource extends editor_Models_LanguageResources
             /* @var $api editor_Services_Microsoft_HttpApi */
             $this->validLanguages = array_map('strtolower', $api->getLanguages() ?? []);
         }
-        return in_array(strtolower($rfc5646), $this->validLanguages);
+        return in_array(
+            $this->getMircosoftCode($rfc5646),
+            $this->validLanguages
+        );
     }
 }

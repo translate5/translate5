@@ -27,6 +27,9 @@ END LICENSE AND COPYRIGHT
 */
 
 use MittagQI\Translate5\Cronjob\CronIpFactory;
+use MittagQI\Translate5\Plugins\TermImport\TermImport;
+use MittagQI\Translate5\Plugins\TermImport\Service\Filesystem\FilesystemFactory;
+use MittagQI\Translate5\Plugins\TermImport\Service\LoggerService;
 
 /**
  */
@@ -36,7 +39,8 @@ class editor_Plugins_TermImport_TermImportController extends ZfExtended_RestCont
 
     protected array $_unprotectedActions = [
         'filesystem',
-        'crossapi'
+        'crossapi',
+        'force',
     ];
 
     /**
@@ -83,5 +87,47 @@ class editor_Plugins_TermImport_TermImportController extends ZfExtended_RestCont
         $import = ZfExtended_Factory::get(editor_Plugins_TermImport_Services_Import::class);
         $message = $import->handleAccrossApiImport();
         $this->view->messages = $message;
+    }
+
+    /**
+     * @throws ReflectionException
+     * @throws \MittagQI\Translate5\Plugins\TermImport\Exception\TermImportException
+     */
+    public function forceAction(): void
+    {
+
+        $request = $this->getRequest();
+        $import = new TermImport(new FilesystemFactory(new LoggerService()));
+
+        if ($request->getParam('defaultOnly', false)) {
+            $import->queueFilesystem(FilesystemFactory::DEFAULT_HOST_LABEL);
+
+            echo 'Success!';
+            return;
+        }
+
+
+        if ($clientIds = $request->getParam('clientIds', false)) {
+            $ids = explode(',', $clientIds);
+
+            $customer = ZfExtended_Factory::get(editor_Models_Customer_Customer::class);
+
+            foreach ($ids as $id) {
+                $id = (int) trim($id);
+                try {
+                    $customer->load($id);
+                    $import->queueFilesystem(TermImport::computeFilesystemKey($id));
+                } catch (ZfExtended_Models_Entity_NotFoundException) {
+                    echo "</br>Customer::[$id] was not found";
+                }
+            }
+
+            echo '</br>Success!';
+            return;
+        }
+
+        $import->checkFilesystems();
+
+        echo 'Success!';
     }
 }

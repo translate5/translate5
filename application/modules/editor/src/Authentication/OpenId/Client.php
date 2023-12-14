@@ -28,15 +28,20 @@ use Bootstrap;
 use editor_Models_Customer_Customer;
 use Jumbojett\OpenIDConnectClient;
 use Jumbojett\OpenIDConnectClientException;
+use ReflectionException;
 use stdClass;
 use Zend_Application_Bootstrap_Exception;
 use Zend_Controller_Front;
 use Zend_Controller_Request_Abstract;
 use Zend_Controller_Request_Http;
+use Zend_Db_Statement_Exception;
+use Zend_Exception;
 use Zend_Registry;
 use ZfExtended_Acl;
 use ZfExtended_Factory;
 use ZfExtended_Logger;
+use ZfExtended_Models_Entity_Exceptions_IntegrityConstraint;
+use ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey;
 use ZfExtended_Models_Entity_NotFoundException;
 use ZfExtended_Models_User;
 use ZfExtended_Resource_Session;
@@ -214,9 +219,10 @@ class Client {
         }
         $user->setLocale($claimLocale);
 
-        $user->setCustomers(','.$this->customer->getId().',');
+        $customerId = $this->handleCustomer();
+        $user->setCustomers(','.$customerId.',');
 
-        //find and set the roles, depending of the openid server config, this can be defined as roles or role
+        //find and set the roles depending on the openid server config, this can be defined as roles or role
         //and it can exist either in the verified claims or in the user info
         $roles=$this->getOpenIdUserData('roles',false);
         if(empty($roles)){
@@ -389,6 +395,34 @@ class Client {
         Zend_Registry::set('module','default');
         ZfExtended_Acl::getInstance()::reset();
         return $roles;
+    }
+
+
+    /**
+     * Handle the customer from the claims, if the customer does not exist, create it but only if claimsCustomer is
+     * provided. Otherwise, the current customer will be returned.
+     * @return int
+     * @throws ReflectionException
+     * @throws Zend_Db_Statement_Exception
+     * @throws Zend_Exception
+     * @throws ZfExtended_Models_Entity_Exceptions_IntegrityConstraint
+     * @throws ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey
+     */
+    protected function handleCustomer(): int
+    {
+        $claimsCustomerConfig = $this->config->runtimeOptions->customers->openid->claimsFieldName ?? '';
+
+        if(empty($claimsCustomerConfig)){
+            return $this->customer->getId();
+        }
+
+        $claimsCustomer = $this->getOpenIdUserData($claimsCustomerConfig,false);
+
+        if(empty($claimsCustomer)){
+            return $this->customer->getId();
+        }
+        $customerHandler = new CustomerHandler($claimsCustomer);
+        return $customerHandler->handleCustomer();
     }
 
     /**

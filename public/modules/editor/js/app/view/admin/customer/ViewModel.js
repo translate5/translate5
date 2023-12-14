@@ -36,12 +36,6 @@ Ext.define('Editor.view.admin.customer.ViewModel', {
     },
 
     formulas: {
-        isOpenIdHidden:{
-            get: function (get) {
-                return get('record') &&
-                    (get('record').get('isDefaultCustomer') && !Editor.data.customers.openid.showOpenIdDefaultCustomerData);
-            }
-        },
         isNewRecord:{
             get: function (get) {
                 return get('record') && !Ext.isNumber(get('record').get('id'));
