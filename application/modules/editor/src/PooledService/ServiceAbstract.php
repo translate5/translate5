@@ -101,6 +101,17 @@ abstract class ServiceAbstract extends DockerServiceAbstract
     }
 
     /**
+     * Special API for pooled services with a single URL for one pool:
+     * This also is expected to represent a load-balancing and for a single URL maybe multiple workers are queued
+     * @param string $serviceUrl
+     * @return int
+     */
+    public function hasLoadBalancingBehindSingularPool(string $pool): bool
+    {
+        return true;
+    }
+
+    /**
      * Compat with non-pooled services
      * Retrieves the unique sum of all our configured URLs
      * @return array
@@ -150,6 +161,7 @@ abstract class ServiceAbstract extends DockerServiceAbstract
      * To enable a transition from pooled services (providing an t5-based load-balancing) to docker services which include load-balancing,
      * a pooled-service with just one default-url configured will count as non-pooled service.
      * This will lead to parallel workers up to IPs behind the single URL
+     * Note: also pooled services can have this kind of load-balancing when only a single URL is defined for a pool
      * @return bool
      */
     public function isPooled(): bool

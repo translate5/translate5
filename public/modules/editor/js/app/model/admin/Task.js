@@ -348,6 +348,20 @@ Ext.define('Editor.model.admin.Task', {
         }
         return !me.isEditable() || me.isFinished() || me.isWaiting() || me.isEnded() || isUnconfirmed;
     },
+
+    /**
+     * Get initial task user state
+     *
+     * @returns {string}
+     */
+    getInitUserState: function() {
+        var me = this;
+        if (me.isUnconfirmed() || me.isWaiting() || me.isFinished()) {
+            return me.USER_STATE_VIEW;
+        }
+        return me.USER_STATE_EDIT;
+    },
+
     /**
      * returns if task is ended
      * @returns {Boolean}

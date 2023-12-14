@@ -1164,7 +1164,7 @@ $memLog('Loaded terms:        ');
 
         // If $target contains any characters that are not in list - return false
         //if (preg_match('~[^a-z0-9_\-/.äöüß ]~i', $target)) {
-        if (preg_match('~[^\p{L}\p{N}\s\p{Pd}_./~!@#$%^&(),+\[\]{};\'`]~iu', $target)) {
+        if (preg_match('~[^\p{L}\p{N}\s\p{Pd}_./\~!@#$%^&(),+\[\]{};\'`]~iu', $target)) {
             return false;
         }
 

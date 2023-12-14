@@ -27,54 +27,32 @@
  */
 namespace Translate5\MaintenanceCli\Command;
 
-use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Input\InputOption;
-use Symfony\Component\Console\Style\SymfonyStyle;
 
-class CachePurgeCommand extends Translate5AbstractCommand
+class DevelopmentDevCommand extends Translate5AbstractCommand
 {
     // the name of the command (the part after "bin/console")
-    protected static $defaultName = 'cache:purge';
-    
+    protected static $defaultName = 'dev';
+
     protected function configure()
     {
         $this
-        // the short description shown while running "php bin/console list"
-        ->setDescription('Cleans the application cache.')
+            // the short description shown while running "php bin/console list"
+            ->setDescription('Development: Empty Command to develop code')
 
-        // the full command description shown when running the command with
-        // the "--help" option
-        ->setHelp('Cleans the application cache by deleting all cache files.');
+            // the full command description shown when running the command with
+            // the "--help" option
+            ->setHelp('Development: Empty Command to develop code');
     }
 
-    /**
-     * Execute the command
-     * {@inheritDoc}
-     * @see \Symfony\Component\Console\Command\Command::execute()
-     */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $this->initInputOutput($input, $output);
         $this->initTranslate5();
 
-        $this->writeTitle('Purging application cache');
-        /* @var $cache \Zend_Cache_Core */
-        $cache = \Zend_Registry::get('cache');
+        $this->io->comment('Test code in "Translate5\MaintenanceCli\Command\DevelopmentDevCommand" but never commit ...');
 
-        if($cache->clean()) {
-            $this->io->success("Application cache purged!");
-        }
-        else {
-            $this->io->error("Errors on purging application cache!");
-        }
-
-        //FIXME ebenfalls memcache löschen!
-        // memcache doch in reg legen und alle Nutzungen darauf umbauen, aber erst nach merge von Leons aktueller Glossary Anbindung von 24translate
-        $cache = \Zend_Cache::factory('Core', new \ZfExtended_Cache_MySQLMemoryBackend());
-        $cache->clean();
-
-        return 0;
+        return self::SUCCESS;
     }
 }

@@ -658,7 +658,7 @@ class editor_Utils {
             }
 
             // If prop's value should be an identifier of an existing database record
-            if ($rule['key'] && strlen($value) && $value != '0') {
+            if ($rule['key'] && strlen($value ?? '') && $value != '0') {
 
                 // Setup invert flag, indicating that key-rule-check should be in inverted/negation mode
                 $invert = false;
@@ -995,7 +995,7 @@ class editor_Utils {
 
         // Split given $text by urls
         while (preg_match("~$rexProtocol$rexDomain$rexPort$rexPath$rexQuery$rexFragment(?=[?.!,;:\"]?(\s|$))~u",
-            $text, $match, PREG_OFFSET_CAPTURE, $position)) {
+            $text ?? '', $match, PREG_OFFSET_CAPTURE, $position)) {
 
             // Extract $url and $urlPosition from match
             [$url, $urlPosition] = $match[0];
@@ -1028,7 +1028,7 @@ class editor_Utils {
         }
 
         // Print the remainder of the text.
-        print(htmlspecialchars(substr($text, $position)));
+        print(htmlspecialchars(substr($text ?? '', $position)));
 
         // Return
         return ob_get_clean();
@@ -1162,36 +1162,6 @@ class editor_Utils {
      */
     public static function cleanUrl(string $url) : string {
         return(self::removeQueryString(self::removeFragment($url)));
-    }
-    /**
-     * 
-     * @param string $url
-     * @return bool
-     */
-    public static function urlIsAccessible(string $url) : bool {
-        if(!empty($url)){
-            $opts = array(
-                'http' => array(
-                    'method' => 'HEAD'
-                )
-            );
-            $context = stream_context_create($opts);
-            $headers = get_headers($url, 0, $context);
-            $code = -1;
-            $matches = [];
-            if ($headers != false && count($headers) > 0) {
-                foreach($headers as $header){
-                    // grabs the last $header $code, in case of redirect(s):
-                    if(preg_match("/^HTTP.+\s(\d\d\d)\s/", $header, $matches)){
-                        $code = $matches[1];
-                    }
-                }
-            }
-            if($code >= 200 && $code <= 300){
-                return true;
-            }
-        }
-        return false;
     }
 
     /**
