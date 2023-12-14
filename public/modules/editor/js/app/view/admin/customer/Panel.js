@@ -272,9 +272,6 @@ Ext.define('Editor.view.admin.customer.Panel', {
                                     name:'domain',
                                     reference:'customerDomain',
                                     publishes:'value',
-                                    bind:{
-                                        visible: '{!isOpenIdHidden}'
-                                    },
                                     itemId:'openIdDomain'
                                 }]
                         },{
