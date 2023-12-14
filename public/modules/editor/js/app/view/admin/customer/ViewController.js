@@ -53,6 +53,9 @@ Ext.define('Editor.view.admin.customer.ViewController', {
             // so that click event is triggered on toolbar's corresponding item
             'button[iconCls="x-toolbar-more-icon"] > menu > menuitem': {
                 click: menuitem => menuitem.masterComponent.fireEvent('click')
+            },
+            '#displayTabPanel': {
+                tabchange: 'onDisplayTabPanelTabChanged'
             }
         },
         store:{
@@ -381,6 +384,20 @@ Ext.define('Editor.view.admin.customer.ViewController', {
         // Ele select first record
         } else {
             sm.select(store.first());
+        }
+    },
+
+    /**
+     * Check and hide the domain tooltip when the tab is changed and the active tab is not
+     * the customer form.
+     * @param tabPanel
+     */
+    onDisplayTabPanelTabChanged: function(tabPanel) {
+        if(tabPanel.getActiveTab().getItemId() === 'customersForm'){
+            return;
+        }
+        if(this.getView().domainLabelInfoTooltip && this.getView().domainLabelInfoTooltip.isVisible()){
+            this.getView().domainLabelInfoTooltip.hide();
         }
     }
 });
