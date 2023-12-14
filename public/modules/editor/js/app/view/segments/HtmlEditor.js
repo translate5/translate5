@@ -988,12 +988,14 @@ Ext.define('Editor.view.segments.HtmlEditor', {
         }
 
         if (!this.tagsCheckResult.isSuccessful()) {
+            const referenceField = this.getReferenceField(me.currentSegment.get('target'));
+
             //first item the field to check, second item: the error text:
             let todo = [
-                    ['missingTags', this.getReferenceField() === 'source' ? 'tagMissingTextSource' : 'tagMissingTextTarget'],
-                    ['duplicatedTags', 'tagDuplicatedText'],
-                    ['excessTags', this.getReferenceField() === 'source' ? 'tagExcessTextSource' : 'tagExcessTextTarget']
-                ];
+                ['missingTags', referenceField === 'source' ? 'tagMissingTextSource' : 'tagMissingTextTarget'],
+                ['duplicatedTags', 'tagDuplicatedText'],
+                ['excessTags', referenceField === 'source' ? 'tagExcessTextSource' : 'tagExcessTextTarget']
+            ];
 
             for (let i = 0; i < todo.length; i++) {
                 let affectedTags = '';
@@ -1428,10 +1430,20 @@ Ext.define('Editor.view.segments.HtmlEditor', {
         data.shortWidth = Math.ceil(this.ruler.getBoundingClientRect().width);
     },
 
-    getReferenceField: function () {
+    /**
+     * Distinguish which field should be used for reference tags
+     *
+     * @param {String} targetContent
+     * @returns {string}
+     */
+    getReferenceField: function (targetContent) {
         const useSourceAsReference = Editor.app.getTaskConfig('editor.frontend.reviewTask.useSourceForReference');
 
-        if (Editor.data.task.get('emptyTargets') || useSourceAsReference) {
+        if (useSourceAsReference) {
+            return 'source';
+        }
+
+        if (targetContent.trim() === '') {
             return 'source';
         }
 

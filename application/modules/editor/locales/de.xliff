@@ -3889,7 +3889,7 @@
             </trans-unit>
             <trans-unit id='U2VyYmlzY2ggKExhdGVpbik='>
                 <source>Serbisch (Latein)</source>
-                <target>Serbisch (Latein)</target>
+                <target>Serbisch</target>
             </trans-unit>
             <trans-unit id='VXNiZWtpc2NoIChMYXRlaW4p'>
                 <source>Usbekisch (Latein)</source>
@@ -9380,6 +9380,11 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
                 <source>Zur Aufgabenliste wechseln</source>
                 <target>Zur Aufgabenliste wechseln</target>
             </trans-unit>
+            <trans-unit id='RGllIE9wZW5JRC1Db25uZWN0LUltcGxlbWVudGllcnVuZyB2b24gdHJhbnNsYXRlNSBlcm3DtmdsaWNodCBlcywgZWluZW4gQ2xpZW50IGF1ZiBkZXIgSURQLVNlaXRlIGVpbmVtIENsaWVudCBpbiB0cmFuc2xhdGU1IHp1enVvcmRuZW4uIERpZSBadW9yZG51bmcgZXJmb2xndCDDvGJlciBkaWUgS3VuZGVubnVtbWVyLiBXZWl0ZXJlIEluZm9ybWF0aW9uZW4gZmluZGVuIFNpZSBpbiBkZXIgPGEgaHJlZj0iaHR0cHM6Ly9jb25mbHVlbmNlLnRyYW5zbGF0ZTUubmV0L3gvQmdEZ0F3IiB0YXJnZXQ9Il9ibGFuayI+RG9rdW1lbnRhdGlvbjwvYT4gdm9uIHRyYW5zbGF0ZTUu'>
+                <source>Die OpenID-Connect-Implementierung von translate5 ermöglicht es, einen Client auf der IDP-Seite einem Client in translate5 zuzuordnen. Die Zuordnung erfolgt über die Kundennummer. Weitere Informationen finden Sie in der <a href="https://confluence.translate5.net/x/BgDgAw" target="_blank">Dokumentation</a> von translate5.</source>
+                <target>Die OpenID-Connect-Implementierung von translate5 ermöglicht es, einen Client auf der IDP-Seite einem Client in translate5 zuzuordnen. Die Zuordnung erfolgt über die Kundennummer. Weitere Informationen finden Sie in der <a href="https://confluence.translate5.net/x/BgDgAw" target="_blank">Dokumentation</a> von translate5.</target>
+            </trans-unit>
+
         </body>
     </file>
 </xliff>

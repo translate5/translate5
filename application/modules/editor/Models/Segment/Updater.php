@@ -141,7 +141,7 @@ class editor_Models_Segment_Updater {
             /* @var $segment editor_Models_Segment */
             $manager = ZfExtended_Factory::get('editor_Services_Manager');
             /* @var $manager editor_Services_Manager */
-            if (editor_Models_Segment_MatchRateType::isUpdateable($this->segment->getMatchRateType())) {
+            if (editor_Models_Segment_MatchRateType::isUpdatable($this->segment->getMatchRateType())) {
                 $manager->updateSegment($this->segment);
             }
         }

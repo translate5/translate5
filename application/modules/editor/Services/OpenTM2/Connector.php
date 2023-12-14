@@ -980,8 +980,12 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
             && !$this->isReorganizeFailed();
     }
 
-    public function reorganizeTm(string $tmName): bool
+    public function reorganizeTm(?string $tmName = null): bool
     {
+        if (null === $tmName) {
+            $tmName = $this->getWritableMemory();
+        }
+
         if (!$this->isInternalFuzzy()) {
             // TODO In editor_Services_Manager::visitAllAssociatedTms language resource is initialized
             // without refreshing from DB, which leads th that here it is tried to be inserted as new one
@@ -1133,7 +1137,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
 
             if (!$successful && $this->needsReorganizing($this->api->getError())) {
                 $this->addReorganizeWarning($segment->getTask());
-                $this->reorganizeTm($memory->name);
+                $this->reorganizeTm($memory['filename']);
                 $successful = $this->api->lookup($segment, $query, $fileName, $memory['filename']);
             }
 

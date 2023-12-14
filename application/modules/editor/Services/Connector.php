@@ -165,12 +165,12 @@ class editor_Services_Connector
      * @return editor_Services_ServiceResult
      */
     protected function _search(string $searchString, $field = 'source', $offset = null) {
-        //searches are always with out tags
+        //searches are always without tags
         return $this->adapter->search(strip_tags($searchString), $field, $offset);
     }
     
     /***
-     * Invoke the translate resource action so the MT logger can be used
+     * Invoke translate resource action so the MT logger can be used
      * This is the main entry point for InstantTranslate
      * @param string $searchString
      * @return editor_Services_ServiceResult

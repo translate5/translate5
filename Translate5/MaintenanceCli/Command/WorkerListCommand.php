@@ -92,6 +92,7 @@ class WorkerListCommand extends Translate5AbstractCommand
             'pid'       => 'Process id:',
             'starttime' => 'Starttime:',
             'endtime'   => 'Endtime:',
+            'duration'  => 'Duration:',
             'taskGuid'  => 'TaskGuid:',
             'worker'    => 'Worker:',
             'progress'  => 'Progress:',
@@ -104,31 +105,41 @@ class WorkerListCommand extends Translate5AbstractCommand
         else {
             $statesToIgnore = [$worker::STATE_DEFUNCT, $worker::STATE_DONE];
         }
-        
-        $rows = [];
-        foreach($allWorker as $worker) {
-            if(in_array($worker['state'], $statesToIgnore)){
-                settype($resultNotListed[$worker['state']], 'integer');
-                $resultNotListed[$worker['state']]++;
+
+        $table = $this->io->createTable();
+        $table->setHeaders($headlines);
+        foreach($allWorker as $workerRow) {
+            if(in_array($workerRow['state'], $statesToIgnore)){
+                settype($resultNotListed[$workerRow['state']], 'integer');
+                $resultNotListed[$workerRow['state']]++;
                 continue;
             }
+
+            //resort fields by headline order
             $row = [];
             foreach($headlines as $key => $title) {
-                if($key == 'progress') {
-                    $row[] = round($worker[$key] * 100).'%';
-                }else {
-                    $row[] = $worker[$key];
+                if($key === 'progress') {
+                    $row[] = round($workerRow[$key] * 100).'%';
+                } elseif ($key === 'duration') {
+                    if (empty($workerRow['starttime'])) {
+                        $row[] = '';
+                    } else {
+                        $endtime = empty($workerRow['endtime']) ? time() : strtotime($workerRow['endtime']);
+                        $row[] = $this->printDuration($endtime - strtotime($workerRow['starttime']));
+                    }
+                } else {
+                    $row[] = $workerRow[$key];
                 }
             }
-            $rows[] = $row;
+            $table->addRow($row);
         }
-        
-        $this->io->table($headlines, $rows);
+
+        $table->render();
         
         if(!empty($resultNotListed)) {
             $this->io->section('Not listed workers:');
-            foreach($resultNotListed as $worker => $count) {
-                $this->io->text($worker.' count '.$count);
+            foreach($resultNotListed as $workerRow => $count) {
+                $this->io->text($workerRow.' count '.$count);
             }
         }
         return 0;

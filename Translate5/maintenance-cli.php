@@ -33,7 +33,8 @@ require_once 'vendor/autoload.php';
 const TRANSLATE5_CLI = true;
 
 use Symfony\Component\Console\Application;
-use Translate5\MaintenanceCli\Command\{AuthTokenCommand,
+use Translate5\MaintenanceCli\Command\{
+    AuthTokenCommand,
     AuthTokenDeleteCommand,
     AuthTokenListCommand,
     CachePurgeCommand,
@@ -44,6 +45,7 @@ use Translate5\MaintenanceCli\Command\{AuthTokenCommand,
     DatabaseStatCommand,
     DatabaseUpdateCommand,
     DevelopmentCreatetestCommand,
+    DevelopmentDevCommand,
     DevelopmentEcodeCommand,
     DevelopmentGithookCommand,
     DevelopmentLocalServicesCommand,
@@ -215,6 +217,7 @@ if (file_exists('.git')) {
     $commands[] = new DevelopmentOkapiBconfNextVersionCommand();
     $commands[] = new DevelopmentLocalServicesCommand();
     $commands[] = new DevelopmentSymlinksCommand();
+    $commands[] = new DevelopmentDevCommand();
 }
 $app->addCommands($commands);
 $app->run();

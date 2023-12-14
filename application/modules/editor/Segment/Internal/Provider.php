@@ -21,7 +21,7 @@ START LICENSE AND COPYRIGHT
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
@@ -42,25 +42,34 @@ class editor_Segment_Internal_Provider extends editor_Segment_Quality_Provider {
         return ($qualityConfig->enableInternalTagCheck == 1);
     }
 
-    public function processSegment(editor_Models_Task $task, Zend_Config $qualityConfig, editor_Segment_Tags $tags, string $processingMode) : editor_Segment_Tags {
-        
-        if(!$qualityConfig->enableInternalTagCheck){
+    public function processSegment(
+        editor_Models_Task $task,
+        Zend_Config $qualityConfig,
+        editor_Segment_Tags $tags,
+        string $processingMode
+    ): editor_Segment_Tags {
+        if (!$qualityConfig->enableInternalTagCheck) {
             return $tags;
         }
-        // 1) Tag check: Bei Translation: Internal Tags gegen Source prüfen, bei Review: gegen original Target (insofern gesetzt)          
+
+        // Tag check: For translation: check internal tags against reference field
+        // (source or target at import time depending on config and if target at import time is empty)
         $against = $tags->getOriginalOrNormalSource();
-        if(!$task->isTranslation()){
-            $originalTarget = $tags->getOriginalTarget();
-            if(!$originalTarget->isEmpty()){
-                $against = $originalTarget;
-            }
+        $originalTarget = $tags->getOriginalTarget();
+        $useSourceForReference = $task->getConfig()->runtimeOptions->editor
+            ->frontend->reviewTask->useSourceForReference;
+
+        if (!$useSourceForReference && $originalTarget && !$originalTarget->isEmpty()) {
+            $against = $originalTarget;
         }
-        foreach($tags->getTargets() as $toCheck){ /* @var $toCheck editor_Segment_Fieldtags */
-            $comparision = new editor_Segment_Internal_TagComparision($toCheck, $against);
-            foreach($comparision->getStati() as $status){
+
+        foreach ($tags->getTargets() as $toCheck) {
+            $comparison = new editor_Segment_Internal_TagComparision($toCheck, $against);
+            foreach ($comparison->getStati() as $status) {
                 $tags->addQuality($toCheck->getField(), editor_Segment_Tag::TYPE_INTERNAL, $status);
             }
         }
+
         return $tags;
     }
     
