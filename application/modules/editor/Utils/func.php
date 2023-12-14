@@ -66,7 +66,7 @@ function d($value) {
 function i($value, $mode = 'w', $file = 'debug.txt') {
 
     // Get the document root, with trimmed right trailing slash
-    $doc = rtrim($_SERVER['DOCUMENT_ROOT'], '\\/');
+    $doc = APPLICATION_ROOT . '/public';
 
     // Get the absolute path of a file, that will be used for writing data to
     $abs = $doc . '/' . $file;

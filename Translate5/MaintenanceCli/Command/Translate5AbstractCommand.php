@@ -268,4 +268,9 @@ END LICENSE AND COPYRIGHT
             $this->io->writeln(file_get_contents($notesFile));
         }
     }
+
+    protected function printDuration($start, $end): string {
+        $s = (int)strtotime($end) - strtotime($start);
+        return sprintf(' %02d:%02d:%02d', $s/3600, $s/60%60, $s%60) . ' ('.$s.')';
+    }
 }

@@ -59,7 +59,7 @@ class UpdateLanguageResourcesWorker extends ZfExtended_Worker_Abstract
 
     protected function work()
     {
-        if (editor_Models_Segment_MatchRateType::isUpdateable($this->segment->getMatchRateType())) {
+        if (editor_Models_Segment_MatchRateType::isUpdatable($this->segment->getMatchRateType())) {
             ZfExtended_Factory::get(editor_Services_Manager::class)->updateSegment($this->segment);
         }
     }

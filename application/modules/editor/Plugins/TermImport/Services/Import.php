@@ -25,6 +25,13 @@ START LICENSE AND COPYRIGHT
 
 END LICENSE AND COPYRIGHT
 */
+use MittagQI\Translate5\Plugins\TermImport\DTO\InstructionsDTO;
+use editor_Models_Customer_Customer as Customer;
+use editor_Models_TermCollection_TermCollection as TermCollection;
+use editor_Models_LanguageResources_CustomerAssoc as CustomerAssoc;
+use MittagQI\Translate5\Plugins\TermImport\Exception\TermImportException;
+use MittagQI\Translate5\Plugins\TermImport\Service\LoggerService;
+use editor_Models_Terminology_Models_TermModel as Term;
 
 /**
  */
@@ -54,7 +61,6 @@ class editor_Plugins_TermImport_Services_Import {
      * @var string
      */
     const IMPORT_ACOSS_API_URL="crossAPIurl";
-
 
     /***
      * Key for the merge terms flag used by the tbx import parser
@@ -427,6 +433,175 @@ class editor_Plugins_TermImport_Services_Import {
         return ['collectionId'=>$collection->getId(),'customerIds'=>[$customerId],'mergeTerms'=>true,'collectionName'=>$collectionName];
     }
 
+    /**
+     * Prepare temporary directory to be download-destination for tbx-files
+     *
+     * @param string $filesystemKeyDecoded
+     * @return string
+     * @throws \MittagQI\Translate5\Plugins\TermImport\Exception\TermImportException
+     */
+    public function prepareTbxDownloadTempDir(string $filesystemKeyDecoded) : string {
+
+        // Destination folder to download tbx-files from certain filesystem
+        $dir = str_replace(DIRECTORY_SEPARATOR, '/', APPLICATION_DATA)
+            . "/tbx-import/filesystem/$filesystemKeyDecoded";
+
+        // If no dir exists so far - try to create it
+        if (!file_exists($dir) && !@mkdir($dir, 0777, true)) {
+            throw new TermImportException('E1576', compact('dir'));
+        }
+
+        // Return download destination folder
+        return $dir;
+    }
+
+    /**
+     * @throws ReflectionException
+     */
+    public function import(InstructionsDTO $instructions, string $tbxDir, string $importSource, LoggerService $logger) {
+
+        // Get term collection model
+        $termCollectionM = ZfExtended_Factory::get(TermCollection::class);
+
+        // Array of collections affected by the import
+        $affectedCollections = [];
+
+        // Array of names of successfully imported tbx files
+        $importedTbxFiles = [];
+
+        // Prepare shared params for the import
+        $sharedParams = [
+            'mergeTerms'   => $instructions->mergeTerms,
+            'importSource' => $importSource,
+        ];
+
+        // Foreach [$tbxFileName => $termCollectionName] pair left/kept in $instructions->FileMapping
+        foreach ($instructions->FileMapping as $tbxFileName => $termCollectionName) {
+
+            // Prepare import params by merging shared params with params specific to tbxFile's TermCollection
+            $params = $sharedParams + $this->prepareCustomerAssocParams(
+                $termCollectionName,
+                $instructions->CollectionMapping[$termCollectionName] // Customer number
+            );
+
+            // Prepare absolute path to the current downloaded tbx file
+            $tbxFilePath = "$tbxDir/$tbxFileName";
+
+            // Append collectionId to the array of affected
+            // todo: Decide whether it is this the right point to add collection to array of affected? looks like
+            //       it's not, but it's done that way both in handleFilesystemImport() and handleAccrossApiImport()
+            $affectedCollections []= $params['collectionId'];
+
+            //
+            if ($termCollectionM->importTbx([$tbxFilePath], $params)) {
+                $logger->fileImportSuccess($tbxFileName);
+                $importedTbxFiles[$tbxFileName] = true;
+            } else {
+                $logger->fileImportFailure($tbxFileName);
+            }
+
+            // Remove old term entries and terms
+            if ($instructions->deleteTermsOlderThanCurrentImport) {
+                $this->deleteTermsOlderThanCurrentImport($params['collectionId']);
+            }
+
+            // Remove term proposals
+            if ($olderThan = $instructions->deleteProposalsLastTouchedOlderThan) {
+                $this->removeOldProposals([$params['collectionId']], $olderThan);
+            }
+
+            // Remove the tmp file
+            if (file_exists($tbxFilePath)) {
+                unlink($tbxFilePath);
+            }
+        }
+
+        // If no files were imported - log that
+        if (empty($importedTbxFiles)) {
+            $logger->zeroImportedFiles($tbxDir);
+        }
+
+        // If we have affected collections
+        if ($affectedCollections) {
+
+            // Remove old terms, if need
+            if ($olderThan = $instructions->deleteTermsLastTouchedOlderThan) {
+                ZfExtended_Factory::get(Term::class)->removeOldTerms($affectedCollections, $olderThan);
+                $this->removeCollectionTbxFromDisc($affectedCollections, strtotime($olderThan));
+            }
+
+            // Remove proposals older than current import
+            if ($instructions->deleteProposalsOlderThanCurrentImport) {
+                $this->removeOldProposals($affectedCollections, NOW_ISO);
+            }
+
+            // Clean the empty term entries
+            $this->removeEmptyTermEntries($affectedCollections);
+        }
+
+        // Return array of tbx files that were successfully imported
+        return $importedTbxFiles;
+    }
+
+    /**
+     *
+     *
+     * @param string $termCollectionName
+     * @param string $customerNumber
+     * @return array
+     * @throws ReflectionException
+     */
+    private function prepareCustomerAssocParams(string $termCollectionName, string $customerNumber) : array {
+
+        /* @var $customer Customer */
+        $customer = ZfExtended_Factory::get(Customer::class);
+        $customer->loadByNumber($customerNumber);
+        $customerId = $customer->getId();
+
+        /* @var $termCollection TermCollection */
+        $termCollection = ZfExtended_Factory::get(TermCollection::class);
+        $termCollectionI = $termCollection->loadByName($termCollectionName);
+
+        // If the term collection exists
+        if ($termCollectionI) {
+
+            /* @var $customerAssoc CustomerAssoc */
+            $customerAssoc = ZfExtended_Factory::get(CustomerAssoc::class);
+            $customers = $customerAssoc->loadByLanguageResourceId($termCollectionI['id']);
+            $customers = array_column($customers, 'customerId');
+
+            // Add [termCollection <=> customer] assoc, if need
+            if (!in_array($customerId, $customers)){
+                $customers []= $customerId;
+                $customerAssoc->addAssocs($termCollectionI['id'], [$customerId]);
+            }
+
+        // Else
+        } else {
+
+            // Create new term collection/language resource
+            $termCollectionI = $termCollection
+                ->create($termCollectionName, $customers = [$customerId])
+                ->toArray();
+        }
+
+        // Return param for tbx import
+        return [
+            'collectionId' => $termCollectionI['id'],
+            'customerIds' => $customers,
+        ];
+    }
+
+    private function deleteTermsOlderThanCurrentImport($collectionId) {
+
+        /* @var $termModel editor_Models_Terminology_Models_TermModel */
+        $termModel=ZfExtended_Factory::get('editor_Models_Terminology_Models_TermModel');
+        $termModel->removeOldTerms([$collectionId], NOW_ISO);
+
+        // Clean the old tbx files from the disc
+        $this->removeCollectionTbxFromDisc([$collectionId], strtotime(NOW_ISO));
+    }
+
     private function loadConfig($configName){
         $path=$this->getPluginConfigFolderPath();
         $this->initConfigFile($path.$configName);
@@ -514,7 +689,7 @@ class editor_Plugins_TermImport_Services_Import {
      */
     private function removeProposalsOlderThenImport(array $collectionIds){
         //check if delete old terms is configured in the config file
-        if(empty($this->configMap[self::DELETE_TERMS_OLDER_THAN_IMPORT_KEY])){
+        if(empty($this->configMap[self::DELETE_PROPOSALS_OLDER_THAN_IMPORT_KEY])){
             return;
         }
         $this->removeOldProposals($collectionIds, NOW_ISO);

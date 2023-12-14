@@ -62,12 +62,12 @@ class View_Helper_WorkflowNotifyHtmlMailSegmentList extends Zend_View_Helper_Abs
      * @param string $comments
      * @return string
      */
-    protected function prepareComments($comments) {
-        $search = array('<span class="author">', '<span class="modified">', '</div>');
-        $replace = array("~#br#~", ' (', ") ~#br#~~#br#~");
+    protected function prepareComments(string $comments): string
+    {
+        $search = ['<span class="author">', '<span class="modified">', '</div>'];
+        $replace = ["~#br#~", ' (', ") ~#br#~~#br#~"];
         $comments = str_replace($search, $replace, $comments);
-        $comments = str_replace('~#br#~', '<br />', strip_tags($comments));
-        return $comments;
+        return str_replace('~#br#~', '<br />', strip_tags($comments));
     }
     
     /**
@@ -229,7 +229,7 @@ class View_Helper_WorkflowNotifyHtmlMailSegmentList extends Zend_View_Helper_Abs
             $result[] = '<td valign="top" nowrap="nowrap">'.$joinedQualities.'</td>';
             $result[] = '<td valign="top">'.$t->_($state).'</td>';
             $result[] = '<td valign="top">'.$segment['matchRate'].'%</td>';
-            $result[] = '<td valign="top">'.$this->prepareComments($segment['comments']).'</td>';
+            $result[] = '<td valign="top">'.$this->prepareComments($segment['comments'] ?? '').'</td>';
             $result[] = '</tr>';
         }
         $result[] = '</table>';
