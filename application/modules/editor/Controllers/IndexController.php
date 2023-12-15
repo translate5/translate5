@@ -378,12 +378,6 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
         // to identify the default customer in the frontend
         $this->view->Php2JsVars()->set('customers.defaultCustomerName', 'defaultcustomer');
 
-        //is the openid data visible for the default customer
-        $this->view->Php2JsVars()->set(
-            'customers.openid.showOpenIdDefaultCustomerData',
-            (boolean)$rop->customers->openid->showOpenIdDefaultCustomerData
-        );
-
         $this->editorOnlyModeConfig($rop);
 
         $this->view->Php2JsVars()->set(

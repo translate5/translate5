@@ -392,7 +392,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract
     public function setMatchRateType($type)
     {
         $oldValue = $this->getMatchRateType();
-        if (editor_Models_Segment_MatchRateType::isUpdateable($oldValue)) {
+        if (editor_Models_Segment_MatchRateType::isUpdatable($oldValue)) {
             return $this->__call(__FUNCTION__, [$type]);
         }
         return $oldValue;

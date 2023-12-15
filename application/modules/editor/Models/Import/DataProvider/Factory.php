@@ -59,6 +59,24 @@ class editor_Models_Import_DataProvider_Factory {
     }
 
     /**
+     * @param string $path
+     * @return editor_Models_Import_DataProvider_Abstract
+     * @throws ReflectionException
+     */
+    public function createFromPath(string $path): editor_Models_Import_DataProvider_Abstract {
+        if (is_dir($path)) {
+            return ZfExtended_Factory::get(editor_Models_Import_DataProvider_Directory::class, [$path]);
+        }
+        if (str_ends_with(strtolower($path), '.zip')) {
+            if (preg_match('#^(http|https)#', $path)) {
+                return ZfExtended_Factory::get(editor_Models_Import_DataProvider_ZippedUrl::class, [$path]);
+            }
+            return ZfExtended_Factory::get(editor_Models_Import_DataProvider_Zip::class, [$path]);
+        }
+        return ZfExtended_Factory::get(editor_Models_Import_DataProvider_SingleFile::class, [$path]);
+    }
+
+    /**
      * Determines which UploadProcessor should be used for uploaded data, creates and returns it
      * @param editor_Models_Import_UploadProcessor $upload
      * @param array $data post request data
@@ -70,18 +88,18 @@ class editor_Models_Import_DataProvider_Factory {
         $files = $mainUpload->getFiles();
 
         if($this->isZipUpload($upload)) {
-            $dp = 'editor_Models_Import_DataProvider_Zip';
+            $dp = editor_Models_Import_DataProvider_Zip::class;
             $tmpfiles = array_keys($files);
             $args = [reset($tmpfiles)]; //first uploaded review file is used as ZIP file
         }else if($this->isProjectUpload($data)){
-            $dp = 'editor_Models_Import_DataProvider_Project';
+            $dp = editor_Models_Import_DataProvider_Project::class;
             $args = [
                 $upload->getFiles(),
                 $this->handleProjectLanguages($data[editor_Models_Import_DataProvider_Abstract::IMPORT_UPLOAD_LANGUAGES_NAME]),
                 $data[editor_Models_Import_DataProvider_Abstract::IMPORT_UPLOAD_TYPE_NAME]
             ];
         } else {
-            $dp = 'editor_Models_Import_DataProvider_SingleUploads';
+            $dp = editor_Models_Import_DataProvider_SingleUploads::class;
             $args = [
                 $upload->getFiles(),
                 $upload->getTargetDirectories(),

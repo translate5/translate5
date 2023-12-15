@@ -335,7 +335,7 @@ class TaskInfoCommand extends Translate5AbstractCommand
                 $task['state'],
                 $startImport,
                 $endImport,
-                $this->duration($startImport, $endImport),
+                $this->printDuration($startImport, $endImport),
             ]);
 
             $projectStart = min($projectStart, $startImport);
@@ -351,14 +351,9 @@ class TaskInfoCommand extends Translate5AbstractCommand
             $project->getState(),
             $projectStart,
             $projectEnd,
-            $this->duration($projectStart, $projectEnd),
+            $this->printDuration($projectStart, $projectEnd),
         ]);
 
         $table->render();
-    }
-
-    private function duration($start, $end) {
-        $s = (int)strtotime($end) - strtotime($start);
-        return sprintf(' %02d:%02d:%02d', $s/3600, $s/60%60, $s%60) . ' ('.$s.')';
     }
 }
