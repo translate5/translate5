@@ -670,8 +670,10 @@ Ext.define('Editor.view.segments.HtmlEditor', {
         //svg += '<?xml version="1.0" encoding="UTF-8" standalone="no"?>';
         svg += '<svg xmlns="http://www.w3.org/2000/svg" height="' + lineHeight + '" width="' + (width + 2) + '">';
         svg += '<rect width="100%" height="100%" fill="' + fill + '" rx="3" ry="3"/>';
-        svg += '<text x="1" y="' + (lineHeight - 5) + '" font-size="' + styles['font-size'] + '" font-weight="' + styles['font-weight'] + '" font-family="' + styles['font-family'].replace(/"/g, "'") + '">'
-        svg += Ext.String.htmlEncode(text) + '</text></svg>';
+        svg += '<text x="1" y="' + (lineHeight - 5) + '" font-size="' + styles['font-size'] + '" font-weight="' + styles['font-weight'] + '" font-family="' + styles['font-family'].replace(/"/g, "'") + '">';
+        // QUIRK: since &nbsp; can not be decoded it will end up as double-encoded. This corrupts a SVG, therefore we manually remove double-encoded nbsp's
+        svg += Ext.String.htmlEncode(text).split('&amp;nbsp;').join('&nbsp;') + '</text></svg>';
+        
         return prefix + encodeURI(svg);
     },
 
