@@ -17,6 +17,70 @@ All updates are (downwards) compatible! If not this is listed in the important r
 
 
 
+
+## [6.9.0] - 2023-12-14
+
+### Important Notes:
+#### [TRANSLATE-3561](https://jira.translate5.net/browse/TRANSLATE-3561)
+These changes will work properly only with t5memory after version 0.4.1056
+ 
+
+
+### Added
+**[TRANSLATE-3553](https://jira.translate5.net/browse/TRANSLATE-3553): TermPortal - Extend folder-based term import to work via sftp** <br>
+Added support for terminology import from remote SFTP directory
+
+**[TRANSLATE-3550](https://jira.translate5.net/browse/TRANSLATE-3550): sso - Add client field for IdP and SSO** <br>
+Added new config to define customer number field in SSO claims.
+
+
+### Changed
+**[TRANSLATE-3582](https://jira.translate5.net/browse/TRANSLATE-3582): Editor general - Change behavior of reference field in editor** <br>
+Reference field for tags validation is now considered to be "target at import time" not only if task is a review task, but also if "target at import time" contains some data.
+
+**[TRANSLATE-3580](https://jira.translate5.net/browse/TRANSLATE-3580): LanguageResources - Remove NecTm plugin** <br>
+NecTm plugin removed as deprecated
+
+**[TRANSLATE-3561](https://jira.translate5.net/browse/TRANSLATE-3561): t5memory - Enable t5memory connector to load balance big TMs** <br>
+translate5 - 6.8.0: Fix overflow error when importing very big files into t5memory by splitting the TM internally.
+translate5 - 6.8.2: Fix for data tooltip
+
+
+### Bugfixes
+**[TRANSLATE-3612](https://jira.translate5.net/browse/TRANSLATE-3612): Main back-end mechanisms (Worker, Logging, etc.) - Password reset does not work** <br>
+Fix for password reset
+
+**[TRANSLATE-3609](https://jira.translate5.net/browse/TRANSLATE-3609): SpellCheck (LanguageTool integration), TermTagger integration - Detect horizonal scaling also behind single pool URL for a pooled service** <br>
+Ebnable better horizonlal scaling for singular pool URLs for TermTagger & LanguageTool
+
+**[TRANSLATE-3607](https://jira.translate5.net/browse/TRANSLATE-3607): t5memory - Non ASCII characters in document name leads to an error in t5memory** <br>
+Fix for problem when segments are updated in t5memory and the response did contains non ASCII characters.
+
+**[TRANSLATE-3598](https://jira.translate5.net/browse/TRANSLATE-3598): Editor general - Fix PHP 8.1 warnings** <br>
+Fix several PHP 8.1 warnings
+
+**[TRANSLATE-3597](https://jira.translate5.net/browse/TRANSLATE-3597): Editor general - Fix PHP 8.1 warnings** <br>
+Fix several PHP 8.1 warnings
+
+**[TRANSLATE-3596](https://jira.translate5.net/browse/TRANSLATE-3596): Editor general - Fix PHP 8.1 warnings** <br>
+Fix several PHP 8.1 warnings
+
+**[TRANSLATE-3595](https://jira.translate5.net/browse/TRANSLATE-3595): User Management - client PM can change password for admin users** <br>
+FIX: client restricted PMs could edit user's with elevated roles
+
+**[TRANSLATE-3584](https://jira.translate5.net/browse/TRANSLATE-3584): Configuration - Implement a outbound proxy config** <br>
+In hosted environments it might be necessary to route the outgoing traffic (visual downloads or similar) over a configurable proxy.
+
+**[TRANSLATE-3576](https://jira.translate5.net/browse/TRANSLATE-3576): LanguageResources - Microsoft and google language mapper problem** <br>
+Fix for a problem with wrong language codes in google and microsoft resource.
+
+**[TRANSLATE-3414](https://jira.translate5.net/browse/TRANSLATE-3414): Import/Export - sdlxliff comments produce several problems** <br>
+Fix problem where sdlxliff comment are not correctly processed on import and export.
+
+**[TRANSLATE-3284](https://jira.translate5.net/browse/TRANSLATE-3284): Task Management - Tasks in "competetive mode" get accepted automatically** <br>
+FIXED: tasks are now not being auto-accepted when auto-opened after login
+
+
 ## [6.8.1] - 2023-12-07
 
 ### Important Notes:

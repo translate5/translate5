@@ -84,6 +84,8 @@ Ext.define('Editor.view.admin.customer.Panel', {
     defaultButton: 'saveButton',
     referenceHolder: true,
 
+    domainLabelInfoTooltip: null,
+
     initConfig: function(instanceConfig) {
         var me = this,
             canNotAddCustomer =  ! Editor.app.authenticatedUser.isAllowed('editorAddCustomer'),
@@ -152,13 +154,13 @@ Ext.define('Editor.view.admin.customer.Panel', {
                                     tooltip: Editor.data.l10n.clients.copy,
                                     scope:'controller',
                                     handler:'onCopyActionClick',
-                                    hidden: canNotAddCustomer,
+                                    hidden: canNotAddCustomer
                                 },{
                                     glyph: 'f2ed@FontAwesome5FreeSolid',
                                     tooltip:Editor.data.l10n.clients.delete,
                                     scope:'controller',
                                     handler:'remove',
-                                    hidden: canNotDeleteCustomer,
+                                    hidden: canNotDeleteCustomer
                                 }]
                             },{
                                 xtype: 'gridcolumn',
@@ -268,10 +270,28 @@ Ext.define('Editor.view.admin.customer.Panel', {
                                     maxLength: 255
                                 },{
                                     xtype:'textfield',
+                                    listeners: {
+                                        afterrender: function (cmp){
+                                            // Gets the fiel label and registers tooltip for it
+                                            var label = cmp && cmp.labelEl;
+                                            if(!label){
+                                                return;
+                                            }
+                                            me.domainLabelInfoTooltip = Ext.create('Ext.tip.ToolTip', {
+                                                target: label,
+                                                title: '',
+                                                autoHide: false,
+                                                closable: true,
+                                                html: Editor.data.l10n.clients.domainInfoTooltip
+                                            });
+
+                                        }
+                                    },
                                     fieldLabel:me.strings.domain,
                                     name:'domain',
                                     reference:'customerDomain',
                                     publishes:'value',
+                                    labelClsExtra: 'lableInfoIcon',
                                     itemId:'openIdDomain'
                                 }]
                         },{
@@ -355,5 +375,12 @@ Ext.define('Editor.view.admin.customer.Panel', {
         }
         return me.callParent([config]);
     },
+
+    onDestroy: function () {
+        if (this.domainLabelInfoTooltip && this.domainLabelInfoTooltip.destroy) {
+            this.domainLabelInfoTooltip.destroy();
+        }
+        this.callParent(arguments);
+    }
 
 });
