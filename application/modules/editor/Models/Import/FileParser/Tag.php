@@ -194,10 +194,14 @@ class editor_Models_Import_FileParser_Tag {
         if($cls !== null){
             $classes[] = trim($cls);
         }
+        // special processing of a placeable
         if(isset($this->placeable)){
             $classes[] = $this->placeable->getCssClass();
+            // title will reflect the original tag/content
             $title = htmlspecialchars($text, ENT_COMPAT, null, false);
+            // while content/content-length is only the referenced content by the xpath
             $text = $this->placeable->getContent();
+            $length = $this->placeable->getContentLength();
         }
 
         return $this->renderedTag = self::$renderer[$this->type]->getHtmlTag([

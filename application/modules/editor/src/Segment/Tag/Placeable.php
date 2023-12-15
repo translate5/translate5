@@ -179,6 +179,15 @@ final class Placeable
     }
 
     /**
+     * Retrieves the content-length of a placeable
+     * @return int
+     */
+    public function getContentLength(): int
+    {
+        return strlen(strip_tags($this->content));
+    }
+
+    /**
      * Retrieves the CSS-class to identify a placeable
      * @return string
      */

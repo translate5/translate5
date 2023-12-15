@@ -26,7 +26,7 @@
 -- */
 ALTER TABLE `Zf_configuration` CHANGE `type` `type` ENUM('string','integer','float','boolean','list','map','absolutepath','markup','json','regex','regexlist','xpath','xpathlist') NOT NULL DEFAULT 'string' COMMENT 'the type of the config value is needed also for GUI';
 INSERT INTO `Zf_configuration` (`name`, `confirmed`, `module`, `category`, `value`, `default`, `defaults`, `type`, `description`, `level`, `guiName`, `guiGroup`, `comment`)
-VALUES ('runtimeOptions.import.xlf.placeablesXpathes', '1', 'editor', 'import', '[]', '[]', '', 'xpathlist', 'A list of XPathes that will search regular internal tags if they contain placeables. Placeables will always be shown with their text-content and not as traditional internal tags.', 8, 'XLIFF import placebles: Detection XPathes', 'File parser options', '');
+VALUES ('runtimeOptions.import.xlf.placeablesXpathes', '1', 'editor', 'import', '[]', '[]', '', 'xpathlist', 'A list of XPathes that will search regular internal tags if they contain placeables. Placeables will always be shown with their text-content and not as traditional internal tags.', 8, 'XLF Import placebles: Detection XPathes', 'File parser options', '');
 
 -- bundle existing parser options
 UPDATE `Zf_configuration` SET `guiGroup` = 'File parser options' WHERE `name` = 'runtimeOptions.import.fileparser.csv.options.regexes.afterTagParsing.regex';
