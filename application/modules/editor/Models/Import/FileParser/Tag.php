@@ -190,23 +190,23 @@ class editor_Models_Import_FileParser_Tag {
         }
 
         $classes = [ $this->parseSegmentGetStorageClass($this->originalContent, $this->xmlTags) ];
-        $dataAttribs = '';
+        $text = $this->text ?? htmlentities($this->originalContent, ENT_COMPAT); //PHP 8.1 fix - default changed!
         if($cls !== null){
             $classes[] = trim($cls);
         }
         if(isset($this->placeable)){
             $classes[] = $this->placeable->getCssClass();
-            $dataAttribs = $this->placeable->getDataAttribute();
+            $title = htmlspecialchars($text, ENT_COMPAT, null, false);
+            $text = $this->placeable->getContent();
         }
 
         return $this->renderedTag = self::$renderer[$this->type]->getHtmlTag([
             'class' => implode(' ', $classes),
-            'text' => $this->text ?? htmlentities($this->originalContent, ENT_COMPAT), //PHP 8.1 fix - default changed!
+            'text' => $text,
             'shortTag' => $this->tagNr,
             'id' => $this->id, //mostly original tag id
             'length' => $length,
-            'title' => $title,
-            'dataAttribs' => $dataAttribs
+            'title' => $title
         ]);
     }
 

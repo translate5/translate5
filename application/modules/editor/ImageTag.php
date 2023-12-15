@@ -37,7 +37,7 @@ END LICENSE AND COPYRIGHT
  * base class for the creation of internal tags
  */
 abstract class editor_ImageTag {
-    protected string $htmlTagTpl = '<div class="{type} {class} internal-tag ownttip"{dataAttribs}><span title="{title}" class="short">{shortTag}</span><span data-originalid="{id}" data-length="{length}" class="full">{text}</span></div>';
+    protected string $htmlTagTpl = '<div class="{type} {class} internal-tag ownttip"><span title="{title}" class="short">{shortTag}</span><span data-originalid="{id}" data-length="{length}" class="full">{text}</span></div>';
     
     /**
      * returns the Html Tag used in the editor for this tag type.
@@ -62,12 +62,6 @@ abstract class editor_ImageTag {
         if(!array_key_exists('length', $parameters)) {
             $parameters['length'] = -1;
         }
-        if(array_key_exists('dataAttribs', $parameters) && !empty($parameters['dataAttribs'])) {
-            $parameters['dataAttribs'] = ' ' . trim($parameters['dataAttribs']);
-        } else {
-            $parameters['dataAttribs'] = '';
-        }
-
         $keys = array_map(function($k){
             return '{'.$k.'}';
         }, array_keys($parameters));

@@ -45,6 +45,8 @@ final class Placeable
 
     const DOCTYPE = '<?xml version="1.0" encoding="UTF-8"?>';
 
+    const ALLOWED_TAGS = ['<b>', '<i>', '<u>', '<strong>', '<sup>', '<sub>'];
+
     /**
      * Detects Placeables in the given internal-tag markup for the given xpathes
      * @param string $markup
@@ -161,7 +163,7 @@ final class Placeable
     public function clean(string $markup)
     {
         if(strip_tags($markup) !== $markup){
-            $markup = strip_tags($markup, ['<b>','<i>','<u>','<strong>','<sup>','<sub>']);
+            $markup = strip_tags($markup, self::ALLOWED_TAGS);
             $markup = preg_replace('/<([a-z][a-z0-9]*)[^<|>]*?(\/?)>/si','<\1\2>', $markup);
         }
         return $markup;
