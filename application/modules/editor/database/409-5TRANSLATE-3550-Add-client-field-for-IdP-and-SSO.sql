@@ -26,13 +26,13 @@
 -- */
 
 
-INSERT INTO `Zf_configuration` (`name`, `confirmed`, `module`, `category`, `value`, `default`, `defaults`, `type`,
+INSERT IGNORE INTO `Zf_configuration` (`name`, `confirmed`, `module`, `category`, `value`, `default`, `defaults`, `type`,
                                 `typeClass`, `description`, `level`, `guiName`, `guiGroup`, `comment`)
 VALUES ('runtimeOptions.customers.openid.claimsFieldName', '1', 'editor', 'system', '', '', '', 'string', NULL,
         'If this field is defined, translate5 will look for this attribute in the verified claims and in the user info. If there is value defined behind this key there, this value will be used to find or create customer in transalte5 and assign this customer to the authenticated user',
         '2', 'OpenID Connect: customer claim name', 'System setup: Authentication', '');
 
-UPDATE LEK_customer
+UPDATE IGNORE LEK_customer
 SET domain = CONCAT( (
 SELECT value FROM Zf_configuration WHERE name = 'runtimeOptions.server.name'
 ),'/') WHERE number = 'default for legacy data';
