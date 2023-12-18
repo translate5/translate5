@@ -38,11 +38,10 @@ pipelines:
       - step:
           size: 2x
           script:
-            #- mkdir -m 777 translate5
             - git clone https://$GIT_USER:$GIT_TOKEN@bitbucket.org/mittagqi/docker.git
             - cd docker && ./bitbucket/test-script.sh
           artifacts:
-            - translate5/data/logs/php.log
+            - translate5/data/**
           after-script:
             - cd docker && ./bitbucket/test-after-script.sh
 
