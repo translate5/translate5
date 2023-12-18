@@ -76,6 +76,10 @@ class FilesystemFactory
         $filesystemConfig = $config->runtimeOptions->plugins?->TermImport?->filesystemConfig;
         $filesystemConfig = $filesystemConfig ? (object) $filesystemConfig->toArray() : null;
 
+        if (!$filesystemConfig || ! (array) $filesystemConfig) {
+            return;
+        }
+
         if (!self::isValidFilesystemConfig($filesystemConfig)) {
             throw new TermImportException('E1568');
         }
