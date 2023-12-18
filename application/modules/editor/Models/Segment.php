@@ -1425,20 +1425,26 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract
             return;
         }
 
+        // Get FROM expression (including LEFT JOIN, if any)
+        $from = preg_match('~FROM (.*?)\s*(?:WHERE|ORDER|LIMIT|$)~s', $s->assemble(), $m) ? $m[1] : '';
+
+        // Shortcut to table name
+        $t = "`$this->tableName`";
+
         // Get array of ids of first repetition occurrences, if we haven't fetched it previously
         $this->firstSegmentsOfEachRepetitionsGroup = $this->firstSegmentsOfEachRepetitionsGroup
             ?? $this->db->getAdapter()->query("
-                SELECT SUBSTRING_INDEX(GROUP_CONCAT(`id`), ',', 1) AS `first`
-                FROM `$this->tableName`
+                SELECT SUBSTRING_INDEX(GROUP_CONCAT($t.`id`), ',', 1) AS `first`
+                FROM $from
                 WHERE $where
-                GROUP BY IF(`isRepeated` = 1, `sourceMd5`,IF(`isRepeated` = 2, `targetMd5`, CONCAT(`sourceMd5`, '-', `targetMd5`)))
-                HAVING COUNT(`id`) > 1
-                ORDER BY `fileOrder`, `id`
+                GROUP BY IF($t.`isRepeated` = 1, $t.`sourceMd5`, IF($t.`isRepeated` = 2, $t.`targetMd5`, CONCAT($t.`sourceMd5`, '-', $t.`targetMd5`)))
+                HAVING COUNT($t.`id`) > 1
+                ORDER BY $t.`fileOrder`, $t.`id`
             ")->fetchAll(PDO::FETCH_COLUMN);
 
         // Exclude
         if ($this->firstSegmentsOfEachRepetitionsGroup) {
-            $s->where('`id` NOT IN (?)', $this->firstSegmentsOfEachRepetitionsGroup);
+            $s->where("$t.`id` NOT IN (?)", $this->firstSegmentsOfEachRepetitionsGroup);
         }
     }
 
