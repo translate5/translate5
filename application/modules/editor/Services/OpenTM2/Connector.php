@@ -314,6 +314,9 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
 
     public function updateTranslation(string $source, string $target, string $tmName = '')
     {
+        if (empty($tmName)) {
+            $tmName = $this->getWritableMemory();
+        }
         $this->api->updateText($source, $target, $tmName);
     }
 
