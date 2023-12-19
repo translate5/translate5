@@ -41,8 +41,6 @@ final class Placeable
 {
     const MARKER_CLASS = 't5placeable';
 
-    const DATA_NAME = 't5plcnt';
-
     const DOCTYPE = '<?xml version="1.0" encoding="UTF-8"?>';
 
     const ALLOWED_TAGS = ['<b>', '<i>', '<u>', '<strong>', '<sup>', '<sub>'];
@@ -56,11 +54,44 @@ final class Placeable
      */
     public static function detect(string $markup, array $xpathes, FileParserTag $tag): void
     {
-        $content = self::searchXpath($markup, $xpathes);
+        $content = self::xpathSearch($markup, $xpathes);
         if($content !== null){
             $tag->placeable = new Placeable($content);
         }
     }
+
+    /**
+     * Evaluates, if the given markup contains a placeable
+     * @param string $segment
+     * @return bool
+     */
+    public static function contains(string $segment): bool
+    {
+        return preg_match('~<div\s*class="[^"]*internal-tag[^"]*'
+                . self::MARKER_CLASS . '[^"]*"[^>]*>.+?</div>~s', $segment) === 1;
+    }
+
+    /**
+     * Replaces als Placeables in the given markup with the placeables content
+     * @param string $segment
+     * @return string
+     */
+    public static function replace(string $segment){
+        return preg_replace_callback(
+            '~<div[^>]+t5placeable[^>]+internal-tag[^>]+>.+?</div>~i',
+            function($matches) {
+                if(count($matches) === 0){
+                    $inner = [];
+                    if(preg_match('~<span[^>]+full[^>]+>(.+)</span>~i', $matches[0], $inner) === 1){
+                        if(count($inner) === 2){
+                            return strip_tags($inner[1]);
+                        }
+                    }
+                }
+                return '';
+            }, $segment
+        ) ?? $segment;
+	}
 
     /**
      * Searches for the passed xpathes in the passed markup and returns the first match
@@ -68,7 +99,7 @@ final class Placeable
      * @param array $xpathes
      * @return string|null
      */
-    private static function searchXpath(string $content, array $xpathes): ?string
+    private static function xpathSearch(string $content, array $xpathes): ?string
     {
         try {
             // generate DOM documentt with proper XML doctype avoiding UTF-8 quirks
@@ -194,15 +225,5 @@ final class Placeable
     public function getCssClass(): string
     {
         return self::MARKER_CLASS;
-    }
-
-    /**
-     * Retrieves the data-attribute for a Placeable
-     * @return string
-     */
-    public function getDataAttribute(): string
-    {
-        $content = htmlspecialchars($this->content, ENT_XML1 | ENT_COMPAT, 'UTF-8', false);
-        return 'data-' . self::DATA_NAME . '="' . $content . '"';
     }
 }
