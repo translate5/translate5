@@ -44,11 +44,23 @@ if (APPLICATION_ENV !== ZfExtended_BaseIndex::ENVIRONMENT_TEST) {
 
     $lang = ZfExtended_Factory::get(editor_Models_Languages::class);
 
-    $deId = $lang->getLangIdByRfc5646('de');
-    $enId = $lang->getLangIdByRfc5646('en');
-    $enUsId = $lang->getLangIdByRfc5646('en-US');
-    $enGbId = $lang->getLangIdByRfc5646('en-GB');
-    $frId = $lang->getLangIdByRfc5646('fr');
+    $deId = $enId = $enUsId = $enGbId = $frId = null;
+
+    try {
+        $deId = $lang->getLangIdByRfc5646('de');
+    } catch (\ZfExtended_Models_Entity_NotFoundException) {}
+    try {
+        $enId = $lang->getLangIdByRfc5646('en');
+    } catch (\ZfExtended_Models_Entity_NotFoundException) {}
+    try {
+        $enUsId = $lang->getLangIdByRfc5646('en-US');
+    } catch (\ZfExtended_Models_Entity_NotFoundException) {}
+    try {
+        $enGbId = $lang->getLangIdByRfc5646('en-GB');
+    } catch (\ZfExtended_Models_Entity_NotFoundException) {}
+    try {
+        $frId = $lang->getLangIdByRfc5646('fr');
+    } catch (\ZfExtended_Models_Entity_NotFoundException) {}
 
     $inputMappings = [];
 
@@ -56,89 +68,145 @@ if (APPLICATION_ENV !== ZfExtended_BaseIndex::ENVIRONMENT_TEST) {
     $s = $db->select()->from('LEK_number_protection_number_recognition', 'id')
         ->where('type = ?', 'date')->where('name = ?', 'default m/d/Y');
 
-    $inputMappings[] = "($enUsId, {$db->query($s)->fetchColumn()})";
+    if ($enUsId) {
+        $inputMappings[] = "($enUsId, {$db->query($s)->fetchColumn()})";
+    }
 
     $s = $db->select()->from('LEK_number_protection_number_recognition', 'id')
         ->where('type = ?', 'date')->where('name = ?', 'default m/d/y');
 
-    $inputMappings[] = "($enUsId, {$db->query($s)->fetchColumn()})";
-
+    if ($enUsId) {
+        $inputMappings[] = "($enUsId, {$db->query($s)->fetchColumn()})";
+    }
     $s = $db->select()->from('LEK_number_protection_number_recognition', 'id')
         ->where('type = ?', 'date')->where('name = ?', 'default d/m/Y');
 
-    $inputMappings[] = "($frId, {$db->query($s)->fetchColumn()})";
-    $inputMappings[] = "($enId, {$db->query($s)->fetchColumn()})";
-    $inputMappings[] = "($enGbId, {$db->query($s)->fetchColumn()})";
+    if ($frId) {
+        $inputMappings[] = "($frId, {$db->query($s)->fetchColumn()})";
+    }
+    if ($enId) {
+        $inputMappings[] = "($enId, {$db->query($s)->fetchColumn()})";
+    }
+    if ($enGbId) {
+        $inputMappings[] = "($enGbId, {$db->query($s)->fetchColumn()})";
+    }
 
     $s = $db->select()->from('LEK_number_protection_number_recognition', 'id')
         ->where('type = ?', 'date')->where('name = ?', 'default d/m/y');
 
-    $inputMappings[] = "($frId, {$db->query($s)->fetchColumn()})";
-    $inputMappings[] = "($enId, {$db->query($s)->fetchColumn()})";
-    $inputMappings[] = "($enGbId, {$db->query($s)->fetchColumn()})";
+    if ($frId) {
+        $inputMappings[] = "($frId, {$db->query($s)->fetchColumn()})";
+    }
+    if ($enId) {
+        $inputMappings[] = "($enId, {$db->query($s)->fetchColumn()})";
+    }
+    if ($enGbId) {
+        $inputMappings[] = "($enGbId, {$db->query($s)->fetchColumn()})";
+    }
 
     $s = $db->select()->from('LEK_number_protection_number_recognition', 'id')
         ->where('type = ?', 'date')->where('name = ?', 'default Y-m-d');
 
-    $inputMappings[] = "($frId, {$db->query($s)->fetchColumn()})";
-    $inputMappings[] = "($enId, {$db->query($s)->fetchColumn()})";
-    $inputMappings[] = "($deId, {$db->query($s)->fetchColumn()})";
+    if ($frId) {
+        $inputMappings[] = "($frId, {$db->query($s)->fetchColumn()})";
+    }
+    if ($enId) {
+        $inputMappings[] = "($enId, {$db->query($s)->fetchColumn()})";
+    }
+    if ($enGbId) {
+        $inputMappings[] = "($enGbId, {$db->query($s)->fetchColumn()})";
+    }
 
     $s = $db->select()->from('LEK_number_protection_number_recognition', 'id')
         ->where('type = ?', 'date')->where('name = ?', 'default d-m-Y');
 
-    $inputMappings[] = "($frId, {$db->query($s)->fetchColumn()})";
-    $inputMappings[] = "($enId, {$db->query($s)->fetchColumn()})";
-    $inputMappings[] = "($enGbId, {$db->query($s)->fetchColumn()})";
+    if ($frId) {
+        $inputMappings[] = "($frId, {$db->query($s)->fetchColumn()})";
+    }
+    if ($enId) {
+        $inputMappings[] = "($enId, {$db->query($s)->fetchColumn()})";
+    }
+    if ($enGbId) {
+        $inputMappings[] = "($enGbId, {$db->query($s)->fetchColumn()})";
+    }
 
     $s = $db->select()->from('LEK_number_protection_number_recognition', 'id')
         ->where('type = ?', 'date')->where('name = ?', 'default d.m.Y');
 
-    $inputMappings[] = "($enId, {$db->query($s)->fetchColumn()})";
-    $inputMappings[] = "($deId, {$db->query($s)->fetchColumn()})";
+    if ($enId) {
+        $inputMappings[] = "($enId, {$db->query($s)->fetchColumn()})";
+    }
+    if ($deId) {
+        $inputMappings[] = "($deId, {$db->query($s)->fetchColumn()})";
+    }
 
     $s = $db->select()->from('LEK_number_protection_number_recognition', 'id')
         ->where('type = ?', 'date')->where('name = ?', 'default d.m.y');
 
-    $inputMappings[] = "($deId, {$db->query($s)->fetchColumn()})";
+    if ($deId) {
+        $inputMappings[] = "($deId, {$db->query($s)->fetchColumn()})";
+    }
 
     $s = $db->select()->from('LEK_number_protection_number_recognition', 'id')
         ->where('type = ?', 'date')->where('name = ?', 'default Y.m.d');
 
-    $inputMappings[] = "($enId, {$db->query($s)->fetchColumn()})";
-    $inputMappings[] = "($enGbId, {$db->query($s)->fetchColumn()})";
+    if ($enId) {
+        $inputMappings[] = "($enId, {$db->query($s)->fetchColumn()})";
+    }
+    if ($enGbId) {
+        $inputMappings[] = "($enGbId, {$db->query($s)->fetchColumn()})";
+    }
 // endregion Dates block
 
 // region Floats
     $s = $db->select()->from('LEK_number_protection_number_recognition', 'id')
         ->where('type = ?', 'float')->where('name = ?', 'default with dot thousand decimal comma');
 
-    $inputMappings[] = "($deId, {$db->query($s)->fetchColumn()})";
+    if ($deId) {
+        $inputMappings[] = "($deId, {$db->query($s)->fetchColumn()})";
+    }
 
     $s = $db->select()->from('LEK_number_protection_number_recognition', 'id')
         ->where('type = ?', 'float')->where('name = ?', 'default with comma thousand decimal dot');
 
-    $inputMappings[] = "($enId, {$db->query($s)->fetchColumn()})";
+    if ($enId) {
+        $inputMappings[] = "($enId, {$db->query($s)->fetchColumn()})";
+    }
 
     $s = $db->select()->from('LEK_number_protection_number_recognition', 'id')
         ->where('type = ?', 'float')->where('name = ?', 'default with whitespace thousand decimal comma');
 
-    $inputMappings[] = "($frId, {$db->query($s)->fetchColumn()})";
+    if ($frId) {
+        $inputMappings[] = "($frId, {$db->query($s)->fetchColumn()})";
+    }
 
     $s = $db->select()->from('LEK_number_protection_number_recognition', 'id')
         ->where('type = ?', 'float')->where('name = ?', 'default generic');
 
-    $inputMappings[] = "($enId, {$db->query($s)->fetchColumn()})";
-    $inputMappings[] = "($deId, {$db->query($s)->fetchColumn()})";
-    $inputMappings[] = "($frId, {$db->query($s)->fetchColumn()})";
+    if ($enId) {
+        $inputMappings[] = "($enId, {$db->query($s)->fetchColumn()})";
+    }
+    if ($deId) {
+        $inputMappings[] = "($deId, {$db->query($s)->fetchColumn()})";
+    }
+    if ($frId) {
+        $inputMappings[] = "($frId, {$db->query($s)->fetchColumn()})";
+    }
 // endregion
 
 // region Integers
     $s = $db->select()->from('LEK_number_protection_number_recognition', 'id')
         ->where('type = ?', 'integer')->where('name = ?', 'default simple');
-    $inputMappings[] = "($enId, {$db->query($s)->fetchColumn()})";
-    $inputMappings[] = "($deId, {$db->query($s)->fetchColumn()})";
-    $inputMappings[] = "($frId, {$db->query($s)->fetchColumn()})";
+
+    if ($enId) {
+        $inputMappings[] = "($enId, {$db->query($s)->fetchColumn()})";
+    }
+    if ($deId) {
+        $inputMappings[] = "($deId, {$db->query($s)->fetchColumn()})";
+    }
+    if ($frId) {
+        $inputMappings[] = "($frId, {$db->query($s)->fetchColumn()})";
+    }
 // endregion
 
     $db->query('INSERT INTO `LEK_number_protection_input_mapping` (`languageId`, `numberRecognitionId`) VALUES ' . implode(',', $inputMappings));
