@@ -64,9 +64,9 @@ Ext.define('Editor.view.admin.contentProtection.outputMapping.CreateWindow', {
                     items: [
                         {
                             xtype: 'combo',
-                            itemId: 'typeField',
+                            itemId: 'type',
                             name: 'type',
-                            ref: 'typeField',
+                            ref: 'type',
                             allowBlank: false,
                             typeAhead: true,
                             anyMatch: true,
@@ -84,7 +84,10 @@ Ext.define('Editor.view.admin.contentProtection.outputMapping.CreateWindow', {
                                 }]
                             },
                             listeners: {
-                                change: (fld, newValue) => fld.up('form').down('#contentRecognitionId').getStore().filter('type', newValue)
+                                change: (fld, newValue) => {
+                                    fld.up('form').down('#inputContentRecognitionId').getStore().filter('type', newValue);
+                                    fld.up('form').down('#outputContentRecognitionId').getStore().filter('type', newValue);
+                                }
                             },
                             bind: {
                                 fieldLabel: '{l10n.general.type}'
@@ -92,9 +95,9 @@ Ext.define('Editor.view.admin.contentProtection.outputMapping.CreateWindow', {
                         },
                         {
                             xtype: 'combo',
-                            itemId: 'contentRecognitionId',
-                            name: 'contentRecognitionId',
-                            ref: 'contentRecognitionId',
+                            itemId: 'inputContentRecognitionId',
+                            name: 'inputContentRecognitionId',
+                            ref: 'inputContentRecognitionId',
                             allowBlank: false,
                             typeAhead: true,
                             anyMatch: true,
@@ -102,7 +105,7 @@ Ext.define('Editor.view.admin.contentProtection.outputMapping.CreateWindow', {
                             displayField: 'name',
                             valueField: 'id',
                             bind: {
-                                fieldLabel: '{l10n.general.name}'
+                                fieldLabel: '{l10n.contentProtection.mapping.input_rule_name}'
                             },
                             store: {
                                 type: 'contentProtection.outputMapping.ContentRecognitionComboMapping'
@@ -116,13 +119,29 @@ Ext.define('Editor.view.admin.contentProtection.outputMapping.CreateWindow', {
                             }
                         },
                         {
-                            xtype: 'textfield',
-                            name: 'format',
-                            allowBlank: true,
+                            xtype: 'combo',
+                            itemId: 'outputContentRecognitionId',
+                            name: 'outputContentRecognitionId',
+                            ref: 'outputContentRecognitionId',
+                            allowBlank: false,
+                            typeAhead: true,
+                            anyMatch: true,
+                            forceSelection: true,
+                            displayField: 'name',
+                            valueField: 'id',
                             bind: {
-                                fieldLabel: '{l10n.general.format}'
+                                fieldLabel: '{l10n.contentProtection.mapping.output_rule_name}'
+                            },
+                            store: {
+                                type: 'contentProtection.ContentRecognition',
+                                filters: [
+                                    {
+                                        property: 'rowEnabled',
+                                        value: true
+                                    }
+                                ]
                             }
-                        }
+                        },
                     ]
                 }
             ],

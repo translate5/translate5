@@ -78,7 +78,7 @@ class ContentProtectionRepository
 
         $select = $dbMapping->select()
             ->setIntegrityCheck(false)
-            ->from(['mapping' => $dbMapping->info($dbMapping::NAME)], ['mapping.priority'])
+            ->from(['mapping' => $dbMapping->info($dbMapping::NAME)], [])
             ->join(
                 ['recognition' => $contentRecognitionTable],
                 'recognition.id = mapping.contentRecognitionId',
@@ -160,7 +160,13 @@ class ContentProtectionRepository
             $mapping = $this->findOutputMappingBy((int) $major->getId(), (int) $contentRecognition->getId());
         }
 
-        return $mapping?->getFormat();
+        if (null === $mapping || empty($mapping->getOutputContentRecognitionId())) {
+            return null;
+        }
+
+        $contentRecognition->load($mapping->getOutputContentRecognitionId());
+
+        return $contentRecognition->getFormat();
     }
 
     public function findOutputMappingBy(int $langId, int $contentRecognitionId): ?OutputMapping

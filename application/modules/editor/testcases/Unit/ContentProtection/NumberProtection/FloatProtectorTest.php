@@ -86,7 +86,7 @@ class FloatProtectorTest extends TestCase
              'test-default',
             '/\b([1-9]\d{0,2},){1}(\d{3},)*\d{3}\.\d+\b/u',
             0,
-            null,
+            '#.##0,###',
             false,
             1
         );
@@ -98,7 +98,31 @@ class FloatProtectorTest extends TestCase
             'number' => '123,456.78',
             'expected' => '<number type="float" name="test-default" source="123,456.78" iso="123456.78" target="123.456,78"/>',
             'sourceFormat' => $sourceFormat,
-            'targetFormat' => null,
+            'targetFormat' => '#.##0,###',
+            'targetLang' => $targetLangDe,
+        ];
+
+        yield 'float with custom format' => [
+            'number' => '123,456.78',
+            'expected' => '<number type="float" name="test-default" source="123,456.78" iso="123456.78" target="12*34*56&78"/>',
+            'sourceFormat' => $sourceFormat,
+            'targetFormat' => '#*##*#0&###',
+            'targetLang' => $targetLangDe,
+        ];
+
+        yield 'float with generic dot' => [
+            'number' => '123,456.78',
+            'expected' => '<number type="float" name="test-default" source="123,456.78" iso="123456.78" target="123456.78"/>',
+            'sourceFormat' => $sourceFormat,
+            'targetFormat' => '#.#',
+            'targetLang' => $targetLangDe,
+        ];
+
+        yield 'float with generic middle dot' => [
+            'number' => '123,456.78',
+            'expected' => '<number type="float" name="test-default" source="123,456.78" iso="123456.78" target="123456·78"/>',
+            'sourceFormat' => $sourceFormat,
+            'targetFormat' => '#·#',
             'targetLang' => $targetLangDe,
         ];
 
@@ -110,15 +134,15 @@ class FloatProtectorTest extends TestCase
             'number' => '123,456.78',
             'expected' => '<number type="float" name="test-default" source="123,456.78" iso="123456.78" target="1,23,456.78"/>',
             'sourceFormat' => $sourceFormat,
-            'targetFormat' => null,
+            'targetFormat' => '#,##,##0.###',
             'targetLang' => $targetLangHi,
         ];
 
-        $targetFormat = '#,###,####0.###';
+        $targetFormat = '#.###.####0,###';
 
-        yield 'target format #,###,####0.###' => [
+        yield 'target format #.###.####0,###' => [
             'number' => '1,212,312,345.78',
-            'expected' => '<number type="float" name="test-default" source="1,212,312,345.78" iso="1212312345.78" target="12,123,12345.78"/>',
+            'expected' => '<number type="float" name="test-default" source="1,212,312,345.78" iso="1212312345.78" target="12.123.12345,78"/>',
             'sourceFormat' => $sourceFormat,
             'targetFormat' => $targetFormat,
             'targetLang' => $targetLangDe,
@@ -136,7 +160,7 @@ class FloatProtectorTest extends TestCase
 
         yield 'date. keep as is' => [
             'number' => '123,456.78',
-            'expected' => '<number type="float" name="test-default" source="123,456.78" iso="123,456.78" target=""/>',
+            'expected' => '<number type="float" name="test-default" source="123,456.78" iso="123,456.78" target="123,456.78"/>',
             'sourceFormat' => $sourceFormatKeepAsIs,
             'targetFormat' => $targetFormat,
             'targetLang' => $targetLangDe,

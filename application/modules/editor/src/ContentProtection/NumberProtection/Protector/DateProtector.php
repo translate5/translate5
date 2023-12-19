@@ -65,51 +65,45 @@ class DateProtector extends AbstractProtector
         return 'date';
     }
 
+    public function validateFormat(string $format): bool
+    {
+        $now = new Datetime();
+        $test = DateTime::createFromFormat($format, $now->format($format));
+
+        return $test && $test->getTimestamp() === $now->getTimestamp();
+    }
+
+    public function getFormatedExample(string $format): string
+    {
+        error_log($format);
+        return (new DateTime())->format($format);
+    }
+
     protected function composeNumberTag(
-        string                  $number,
-        ContentRecognitionDto   $sourceFormat,
+        string $number,
+        ContentRecognitionDto $sourceFormat,
         editor_Models_Languages $targetLang,
-        ?string                 $targetFormat
+        string $targetFormat
     ): string {
-        $date = null;
-
-        if (!empty($sourceFormat->format) && !$sourceFormat->keepAsIs) {
-            $date = DateTime::createFromFormat($sourceFormat->format, $number);
-
-            // 31.11.2023 -> 12.01.2023
-            $errArr = DateTime::getLastErrors();
-            if (0 !== $errArr['warning_count'] + $errArr['error_count']) {
-                throw new NumberParsingException();
-            }
+        if ($sourceFormat->keepAsIs) {
+            return parent::composeNumberTag($number, $sourceFormat, $targetLang, $targetFormat);
         }
 
-        $iso = $date ? $date->format('Y-m-d') : $number;
+        $date = DateTime::createFromFormat($sourceFormat->format, $number);
+
+        // 31.11.2023 -> 12.01.2023
+        $errArr = DateTime::getLastErrors();
+        if (0 !== $errArr['warning_count'] + $errArr['error_count']) {
+            throw new NumberParsingException();
+        }
 
         return sprintf(
             $this->tagFormat(),
             self::getType(),
             htmlspecialchars($sourceFormat->name),
             $number,
-            $sourceFormat->keepAsIs ? $number : $iso,
-            $sourceFormat->keepAsIs ? '' : $this->getTargetDate($date, $targetFormat, $targetLang)
+            $date->format('Y-m-d'),
+            $date->format($targetFormat)
         );
-    }
-
-    protected function getTargetDate(
-        ?DateTime $date,
-        ?string $targetFormat,
-        editor_Models_Languages $targetLang
-    ): string {
-        if (null === $date) {
-            return '';
-        }
-
-        if (null !== $targetFormat) {
-            return $date->format($targetFormat);
-        }
-
-        $formater = datefmt_create($targetLang->getRfc5646(), IntlDateFormatter::SHORT, IntlDateFormatter::NONE);
-
-        return $formater->format($date);
     }
 }

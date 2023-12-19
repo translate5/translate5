@@ -55,7 +55,6 @@ namespace MittagQI\Translate5\ContentProtection\NumberProtection\Protector;
 use editor_Models_Languages;
 use MittagQI\Translate5\ContentProtection\Model\ContentRecognitionDto;
 use NumberFormatter;
-use Throwable;
 
 class IntegerProtector extends FloatProtector
 {
@@ -64,51 +63,57 @@ class IntegerProtector extends FloatProtector
         return 'integer';
     }
 
-    protected function composeNumberTag(
-        string                  $number,
-        ContentRecognitionDto   $sourceFormat,
-        editor_Models_Languages $targetLang,
-        ?string                 $targetFormat
-    ): string {
-        $integer = null;
+    public function validateFormat(string $format): bool
+    {
+        $int = 1123456789;
 
-        if (!$sourceFormat->keepAsIs) {
-            $fmt = NumberFormatter::create('en', NumberFormatter::DECIMAL);
-            $integer = $fmt->parse(preg_replace('/[^\d]/u', '', $number), NumberFormatter::TYPE_INT64);
-        }
-
-        try {
-            return sprintf(
-                $this->tagFormat(),
-                self::getType(),
-                htmlspecialchars($sourceFormat->name),
-                $number,
-                $sourceFormat->keepAsIs ? $number : (string) $integer,
-                $this->getTargetInteger($integer, $targetFormat, $targetLang)
-            );
-        } catch (Throwable) {
-            return '';
-        }
+        return $int === $this->parse($this->getTargetInteger($int, $format));
     }
 
-    protected function getTargetInteger(
-        ?int $integer,
-        ?string $targetFormat,
-        editor_Models_Languages $targetLang
+    public function getFormatedExample(string $format): string
+    {
+        return $this->getTargetInteger(1123456789, $format);
+    }
+
+    protected function composeNumberTag(
+        string $number,
+        ContentRecognitionDto $sourceFormat,
+        editor_Models_Languages $targetLang,
+        string $targetFormat
     ): string {
-        if (null === $integer) {
-            return '';
+        if ($sourceFormat->keepAsIs) {
+            return parent::composeNumberTag($number, $sourceFormat, $targetLang, $targetFormat);
         }
 
-        $fmt = NumberFormatter::create($targetLang->getRfc5646(), NumberFormatter::PATTERN_DECIMAL, $targetFormat);
-        if ($targetFormat) {
-            $this->setFormat($targetFormat, $fmt);
-        }
+        $integer = $this->parse($number);
+
+        return sprintf(
+            $this->tagFormat(),
+            self::getType(),
+            htmlspecialchars($sourceFormat->name),
+            $number,
+            (string) $integer,
+            $this->getTargetInteger($integer, $targetFormat)
+        );
+    }
+
+    private function parse(string $number): int
+    {
+        $fmt = NumberFormatter::create('en', NumberFormatter::DECIMAL);
+        return $fmt->parse(preg_replace('/[^\d]/u', '', $number), NumberFormatter::TYPE_INT64);
+    }
+
+    private function getTargetInteger(
+        int $integer,
+        string $targetFormat
+    ): string {
+        $fmt = NumberFormatter::create('en', NumberFormatter::PATTERN_DECIMAL, $targetFormat);
+        $this->setFormat($targetFormat, $fmt);
 
         return $fmt->format($integer);
     }
 
-    public function setFormat(string $format, NumberFormatter $formater): void
+    private function setFormat(string $format, NumberFormatter $formater): void
     {
         $formater->setPattern($format);
         preg_match('/#+0*([^#0])((#+\1)*#*0*([^#0]))?#*0*/u', $format, $symbols);
@@ -123,7 +128,8 @@ class IntegerProtector extends FloatProtector
         if (isset($symbols[4])) {
             $formater->setSymbol(NumberFormatter::DECIMAL_SEPARATOR_SYMBOL, $symbols[4]);
             // replace non-standard symbols in patter with standard
-            $formater->setPattern(str_replace([$symbols[1], $symbols[4]], [',', '.'], $format));
+            $format = str_replace([$symbols[1], $symbols[4]], ['COMMA', 'DOT'], $format);
+            $formater->setPattern(str_replace(['COMMA', 'DOT'], [',', '.'], $format));
         }
     }
 }

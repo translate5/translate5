@@ -58,4 +58,14 @@ class MacAddressProtector extends IPAddressProtector
     {
         return 'mac-address';
     }
+
+    public function validateFormat(string $format): bool
+    {
+        return true;
+    }
+
+    public function getFormatedExample(string $format): string
+    {
+        return 'AA:BB:CC:11:22:33';
+    }
 }

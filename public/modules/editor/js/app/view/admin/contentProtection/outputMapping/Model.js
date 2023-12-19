@@ -41,20 +41,22 @@ Ext.define('Editor.view.admin.contentProtection.outputMapping.Model', {
             rootProperty: 'data'
         }
     },
-    fields: [{
-        name: 'id',
-        type: 'int'
-    }, {
-        name: 'languageId',
-        type: 'int'
-    }, {
-        name: 'type',
-        type: 'string'
-    }, {
-        name: 'name',
-        type: 'string'
-    }, {
-        name: 'format',
-        type: 'string'
-    }]
+    fields: [
+        {
+            name: 'id',
+            type: 'int'
+        },
+        {
+            name: 'languageId',
+            type: 'int'
+        },
+        {
+            name: 'inputContentRecognitionId',
+            type: 'int'
+        },
+        {
+            name: 'outputContentRecognitionId',
+            type: 'int'
+        }
+    ]
 });

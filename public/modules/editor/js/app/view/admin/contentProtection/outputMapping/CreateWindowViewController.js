@@ -60,7 +60,8 @@ Ext.define('Editor.view.admin.contentProtection.outputMapping.CreateWindowViewCo
 
         win.setLoading(true);
 
-        record.set('contentRecognitionId', form.getValues().contentRecognitionId);
+        record.set('inputContentRecognitionId', form.getValues().inputContentRecognitionId);
+        record.set('outputContentRecognitionId', form.getValues().outputContentRecognitionId);
 
         record.save({
             preventDefaultHandler: true,

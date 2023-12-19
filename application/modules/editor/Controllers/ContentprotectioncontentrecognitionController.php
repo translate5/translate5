@@ -26,6 +26,8 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use editor_Models_Segment_Whitespace as Whitespace;
+use MittagQI\Translate5\ContentProtection\ContentProtector;
 use MittagQI\Translate5\ContentProtection\Model\ContentRecognition;
 use MittagQI\Translate5\ContentProtection\NumberProtection\Protector\IPAddressProtector;
 use MittagQI\Translate5\ContentProtection\NumberProtection\Protector\MacAddressProtector;
@@ -111,5 +113,21 @@ class editor_ContentprotectioncontentrecognitionController extends ZfExtended_Re
     public function getAction(): void
     {
         throw new ZfExtended_Models_Entity_NotFoundException();
+    }
+
+    public function testformatAction(): void
+    {
+        $request = $this->getRequest();
+        $protector = ContentProtector::create(ZfExtended_Factory::get(Whitespace::class));
+
+        if (empty($request->get('type')) || empty($request->getParam('ruleFormat'))) {
+            $this->view->rows = ['example' => ''];
+
+            return;
+        }
+
+        $this->view->rows = [
+            'example' => $protector->getFormatedExample($request->get('type'), $request->getParam('ruleFormat'))
+        ];
     }
 }

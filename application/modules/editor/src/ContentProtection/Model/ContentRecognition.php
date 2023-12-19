@@ -92,4 +92,21 @@ class ContentRecognition extends ZfExtended_Models_Entity_Abstract
 
         return $this->row;
     }
+
+    public function validate(){
+        $this->validatorLazyInstatiation();
+        $data = $this->row->toArray();
+        unset($data['id'], $data['isDefault']);
+        if(!$this->validator->isValid($data)) {
+            //TODO the here thrown exception is the legacy fallback.
+            // Each Validator should implement an own isValid which throws a UnprocessableEntity Exception it self.
+            // See Segment Validator for an example
+            $errors = $this->validator->getMessages();
+            $error = print_r($errors, true);
+            $e = new \ZfExtended_ValidateException($error);
+            $e->setErrors($errors);
+
+            throw $e;
+        }
+    }
 }

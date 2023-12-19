@@ -63,41 +63,39 @@ class FloatProtector extends AbstractProtector
         return 'float';
     }
 
-    protected function composeNumberTag(
-        string                  $number,
-        ContentRecognitionDto   $sourceFormat,
-        editor_Models_Languages $targetLang,
-        ?string                 $targetFormat
-    ): string {
-        $float = null;
+    public function validateFormat(string $format): bool
+    {
+        $float = FloatObject::parse('123456789.123');
 
-        if (!$sourceFormat->keepAsIs) {
-            $float = FloatObject::parse($number);
+        $test = $float->format($format);
+
+        return $test === FloatObject::parse($test)->format($format);
+    }
+
+    public function getFormatedExample(string $format): string
+    {
+        return FloatObject::parse('123456789.123')->format($format);
+    }
+
+    protected function composeNumberTag(
+        string $number,
+        ContentRecognitionDto $sourceFormat,
+        editor_Models_Languages $targetLang,
+        string $targetFormat
+    ): string {
+        if ($sourceFormat->keepAsIs) {
+            return parent::composeNumberTag($number, $sourceFormat, $targetLang, $targetFormat);
         }
+
+        $float = FloatObject::parse($number);
 
         return sprintf(
             $this->tagFormat(),
             self::getType(),
             htmlspecialchars($sourceFormat->name),
             $number,
-            $sourceFormat->keepAsIs ? $number : $float->format(format: '#.#'),
-            $this->getTargetFloat($float, $targetFormat, $targetLang)
+            $float->format('#.#'),
+            $float->format($targetFormat)
         );
-    }
-
-    protected function getTargetFloat(
-        ?FloatObject $float,
-        ?string $targetFormat,
-        editor_Models_Languages $targetLang
-    ): string {
-        if (null === $float) {
-            return '';
-        }
-
-        if (null !== $targetFormat) {
-            return $float->format('', format: $targetFormat);
-        }
-
-        return $float->format($targetLang->getRfc5646());
     }
 }

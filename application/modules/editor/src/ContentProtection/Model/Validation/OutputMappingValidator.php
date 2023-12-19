@@ -28,10 +28,23 @@ END LICENSE AND COPYRIGHT
 
 namespace MittagQI\Translate5\ContentProtection\Model\Validation;
 
-use ZfExtended_Models_Validator_Abstract;
+use Zend_Validate_Abstract;
+use ZfExtended_Models_Entity_Abstract;
 
-class OutputMappingValidator extends ZfExtended_Models_Validator_Abstract
+class OutputMappingValidator extends ValidatorWithContext
 {
+    /**
+     * @var array<string, Zend_Validate_Abstract[]>
+     */
+    protected array $customFieldFilterInstances;
+
+    public function __construct(ZfExtended_Models_Entity_Abstract $entity)
+    {
+        $this->customFieldFilterInstances = [
+            'outputContentRecognitionId' => [new OutputRecognitionShouldBeOfSameTypeValidator()],
+        ];
+        parent::__construct($entity);
+    }
 
     /**
      * Validators for Customer entity
@@ -42,7 +55,7 @@ class OutputMappingValidator extends ZfExtended_Models_Validator_Abstract
         $this->addValidator('id', 'int');
 
         $this->addValidator('languageId', 'int');
-        $this->addValidator('contentRecognitionId', 'int');
-        $this->addValidator('format', 'stringLength', ['min' => 0, 'max' => 255]);
+        $this->addValidator('inputContentRecognitionId', 'int');
+        $this->addValidator('outputContentRecognitionId', 'int');
     }
 }

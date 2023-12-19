@@ -58,4 +58,14 @@ class IPAddressProtector extends AbstractProtector
     {
         return 'ip-address';
     }
+
+    public function validateFormat(string $format): bool
+    {
+        return true;
+    }
+
+    public function getFormatedExample(string $format): string
+    {
+        return '127.0.0.1';
+    }
 }

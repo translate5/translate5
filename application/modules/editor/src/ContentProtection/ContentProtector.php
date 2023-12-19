@@ -79,12 +79,29 @@ class ContentProtector
 
     private array $shortcutNumberMap = [];
     private bool $collectShortcutMap = false;
+    /**
+     * @var array<string, ProtectorInterface>
+     */
+    private array $protectors;
 
     /**
      * @param  ProtectorInterface[] $protectors
      */
-    public function __construct(private array $protectors)
+    public function __construct(array $protectors)
     {
+        foreach ($protectors as $protector) {
+            $this->protectors[$protector::alias()] = $protector;
+        }
+    }
+
+    public function validateFormat(string $type, string $format): bool
+    {
+        return $this->protectors[NumberProtector::alias()]->validateFormat($type, $format);
+    }
+
+    public function getFormatedExample(string $type, string $format): string
+    {
+        return $this->protectors[NumberProtector::alias()]->getFormatedExample($type, $format);
     }
 
     public static function create(Whitespace $whitespace): self

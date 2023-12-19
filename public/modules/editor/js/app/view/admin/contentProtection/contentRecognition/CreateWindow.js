@@ -36,6 +36,7 @@ Ext.define('Editor.view.admin.contentProtection.contentRecognition.CreateWindow'
     controller: 'adminCreateContentRecognitionWindowViewController',
     modal: true,
     layout: 'fit',
+    abortController: null,
     initComponent: function () {
         this.callParent(arguments);
     },
@@ -147,7 +148,43 @@ Ext.define('Editor.view.admin.contentProtection.contentRecognition.CreateWindow'
                             allowBlank: true,
                             bind: {
                                 fieldLabel: '{l10n.general.format}'
+                            },
+                            listeners: {
+                                keyup: {
+                                    element: 'el',
+                                    fn: 'onFormatFieldKeyUp',
+                                    buffer: 1000
+                                }
                             }
+                        },
+                        {
+                            xtype: 'container',
+                            itemId: 'resultContainer',
+                            layout: {
+                                type: 'hbox',
+                                align: 'middle'
+                            },
+                            items: [
+                                {
+                                    xtype: 'label',
+                                    bind: {
+                                        text: '{l10n.contentProtection.contentRecognition.formatExampleRender}:',
+                                    },
+                                    style: {
+                                        flex: 3,
+                                        marginRight: '5px'
+                                    }
+                                },
+                                {
+                                    xtype: 'component',
+                                    itemId: 'formatRenderExample',
+                                    flex: 7, // Adjust flex as needed
+                                    style: {
+                                        padding: '5px 5px 5px 20px',
+                                        margin: '0 0 '
+                                    }
+                                }
+                            ]
                         },
                         {
                             xtype: 'checkbox',

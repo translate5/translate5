@@ -62,6 +62,7 @@ use editor_Models_Languages;
 use MittagQI\Translate5\ContentProtection\Model\ContentProtectionRepository;
 use MittagQI\Translate5\ContentProtection\Model\ContentRecognitionDto;
 use MittagQI\Translate5\ContentProtection\NumberProtection\NumberParsingException;
+use MittagQI\Translate5\ContentProtection\NumberProtection\Protector\AbstractProtector;
 use MittagQI\Translate5\ContentProtection\NumberProtection\Protector\DateProtector;
 use MittagQI\Translate5\ContentProtection\NumberProtection\Protector\FloatProtector;
 use MittagQI\Translate5\ContentProtection\NumberProtection\Protector\IntegerProtector;
@@ -76,7 +77,7 @@ class NumberProtector implements ProtectorInterface
 {
     public const TAG_NAME = 'number';
     /**
-     * @var array<string, NumberProtectorInterface>
+     * @var array<string, AbstractProtector>
      */
     private array $protectors;
 
@@ -85,16 +86,26 @@ class NumberProtector implements ProtectorInterface
     private DOMDocument $document;
 
     /**
-     * @param array<NumberProtectorInterface> $protectors
+     * @param array<AbstractProtector> $protectors
      */
     public function __construct(
-        array                               $protectors,
+        array $protectors,
         private ContentProtectionRepository $numberRepository,
-        private LanguageRepository          $languageRepository
+        private LanguageRepository $languageRepository
     ) {
         foreach ($protectors as $protector) {
             $this->protectors[$protector::getType()] = $protector;
         }
+    }
+
+    public function validateFormat(string $type, string $format): bool
+    {
+        return $this->protectors[$type]->validateFormat($format);
+    }
+
+    public function getFormatedExample(string $type, string $format): string
+    {
+        return $this->protectors[$type]->getFormatedExample($format);
     }
 
     public static function alias(): string

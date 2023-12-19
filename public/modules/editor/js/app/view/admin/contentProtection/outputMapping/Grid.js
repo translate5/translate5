@@ -159,10 +159,10 @@ Ext.define('Editor.view.admin.contentProtection.outputMapping.Grid', {
             },
             {
                 xtype: 'gridcolumn',
-                dataIndex: 'name',
+                dataIndex: 'inputName',
                 flex: 2,
                 bind: {
-                    text: '{l10n.contentProtection.mapping.rule_name}'
+                    text: '{l10n.contentProtection.mapping.input_rule_name}'
                 },
                 filter: {
                     type: 'string',
@@ -171,10 +171,10 @@ Ext.define('Editor.view.admin.contentProtection.outputMapping.Grid', {
             },
             {
                 xtype: 'gridcolumn',
-                dataIndex: 'description',
+                dataIndex: 'inputDescription',
                 flex: 3,
                 bind: {
-                    text: '{l10n.contentProtection.mapping.rule_description}'
+                    text: '{l10n.contentProtection.mapping.input_rule_description}'
                 },
                 filter: {
                     type: 'string',
@@ -183,23 +183,27 @@ Ext.define('Editor.view.admin.contentProtection.outputMapping.Grid', {
             },
             {
                 xtype: 'gridcolumn',
-                alias: 'format',
-                dataIndex: 'format',
-                stateId: 'format',
+                dataIndex: 'outputName',
+                flex: 2,
                 bind: {
-                    text: '{l10n.contentProtection.mapping.output_format}'
+                    text: '{l10n.contentProtection.mapping.output_rule_name}'
                 },
-                editor: {
-                    field: {
-                        xtype: 'textfield',
-                        allowBlank: false,
-                        bind: {
-                            emptyText: 'Y-m-d|#.##0.###'
-                        }
-                    }
+                filter: {
+                    type: 'string',
+                    phpMode: false
+                }
+            },
+            {
+                xtype: 'gridcolumn',
+                dataIndex: 'outputDescription',
+                flex: 3,
+                bind: {
+                    text: '{l10n.contentProtection.mapping.output_rule_description}'
                 },
-                renderer: 'editableCellRenderer',
-                flex: 2
+                filter: {
+                    type: 'string',
+                    phpMode: false
+                }
             },
             {
                 xtype: 'actioncolumn',

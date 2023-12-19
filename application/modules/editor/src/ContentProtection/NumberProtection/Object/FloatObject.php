@@ -66,6 +66,13 @@ class FloatObject
         $symbols = array_filter(preg_split('/(\d+|[٠١٢٣٤٥٦٧٨٩]+)/u', $float));
         $decimalSeparator = end($symbols);
 
+        $decimalPart = explode($decimalSeparator, $float)[1];
+        // if format at the end has currency for example
+        if (!preg_match('/(\d+|[٠١٢٣٤٥٦٧٨٩]+)/u', $decimalPart)) {
+            array_pop($symbols);
+            $decimalSeparator = end($symbols);
+        }
+
         $regSymbol = '.' === $decimalSeparator ? '\\' . $decimalSeparator : $decimalSeparator;
         $number = preg_replace("/[^\d$regSymbol]/u", '', $float);
         $number = str_replace($decimalSeparator, '.', $number);
@@ -73,9 +80,9 @@ class FloatObject
         return new self($formater->parse($number), mb_strlen(explode('.', $number)[1]));
     }
 
-    public function format(string $locale = 'en', ?string $format = null): string
+    public function format(string $format): string
     {
-        $formater = numfmt_create($locale, NumberFormatter::DECIMAL);
+        $formater = numfmt_create('en', NumberFormatter::DECIMAL);
         if (!empty($format)) {
             $this->setFormat($format, $formater);
         }
@@ -84,7 +91,7 @@ class FloatObject
         return $formater->format($this->number);
     }
 
-    public function setFormat(string $format, NumberFormatter $formater): void
+    private function setFormat(string $format, NumberFormatter $formater): void
     {
         $formater->setPattern($format);
         preg_match('/#+0*([^#0])((#+\1)*#*0*([^#0]))?#*0*/u', $format, $symbols);
@@ -96,10 +103,15 @@ class FloatObject
         // Symbols are predefined by locale, so we have to enforce our desired ones
         $formater->setSymbol(NumberFormatter::DECIMAL_SEPARATOR_SYMBOL, $symbols[4] ?? $symbols[1]);
 
-        if (isset($symbols[4])) {
-            // replace non-standard symbols in patter with standard
-            $formater->setPattern(str_replace([$symbols[1], $symbols[4]], [',', '.'], $format));
-            $formater->setSymbol(NumberFormatter::GROUPING_SEPARATOR_SYMBOL, $symbols[1]);
+        if (!isset($symbols[4])) {
+            $formater->setSymbol(NumberFormatter::GROUPING_SEPARATOR_SYMBOL, '');
+
+            return;
         }
+
+        // replace non-standard symbols in patter with standard
+        $format = str_replace([$symbols[1], $symbols[4]], ['COMMA', 'DOT'], $format);
+        $formater->setPattern(str_replace(['COMMA', 'DOT'], [',', '.'], $format));
+        $formater->setSymbol(NumberFormatter::GROUPING_SEPARATOR_SYMBOL, $symbols[1]);
     }
 }

@@ -63,24 +63,24 @@ use ZfExtended_Models_Entity_Abstract;
  * @method string getId()
  * @method string getLanguageId()
  * @method void setLanguageId(int $languageId)
- * @method string getContentRecognitionId()
- * @method void setContentRecognitionId(int $contentRecognitionId)
- * @method string getFormat()
- * @method void setFormat(string $format)
+ * @method string getInputContentRecognitionId()
+ * @method void setInputContentRecognitionId(int $contentRecognitionId)
+ * @method string getOutputContentRecognitionId()
+ * @method void setOutputContentRecognitionId(int $contentRecognitionId)
  */
 class OutputMapping extends ZfExtended_Models_Entity_Abstract
 {
     protected $dbInstanceClass = OutputMappingTable::class;
     protected $validatorInstanceClass = OutputMappingValidator::class;
 
-    public function loadBy(int $langId, int $contentRecognitionId): ?Zend_Db_Table_Row_Abstract
+    public function loadBy(int $langId, int $inputContentRecognitionId): ?Zend_Db_Table_Row_Abstract
     {
         $s = $this->db->select();
-        $s->where('languageId = ?', $langId)->where('contentRecognitionId = ?', $contentRecognitionId);
+        $s->where('languageId = ?', $langId)->where('inputContentRecognitionId = ?', $inputContentRecognitionId);
 
         $this->row = $this->db->fetchRow($s);
         if (empty($this->row)){
-            $this->notFound("#by languageId, contentRecognitionId", "$langId, $contentRecognitionId");
+            $this->notFound("#by languageId, inputContentRecognitionId", "$langId, $inputContentRecognitionId");
         }
 
         return $this->row;
@@ -92,13 +92,35 @@ class OutputMapping extends ZfExtended_Models_Entity_Abstract
         $s = $this->db
             ->select()
             ->setIntegrityCheck(false)
-            ->from(['mapping' => $this->db->info($this->db::NAME)], ['mapping.id', 'languageId', 'mapping.format'])
+            ->from(['mapping' => $this->db->info($this->db::NAME)], ['mapping.id', 'languageId'])
             ->join(
-                ['recognition' => $recognitionTable],
-                'recognition.id = mapping.contentRecognitionId',
-                ['type', 'name', 'description']
+                ['inputRecognition' => $recognitionTable],
+                'inputRecognition.id = mapping.inputContentRecognitionId',
+                ['type', 'name as inputName', 'description as inputDescription']
+            )
+            ->joinLeft(
+                ['outputRecognition' => $recognitionTable],
+                'outputRecognition.id = mapping.outputContentRecognitionId',
+                ['name as outputName', 'description as outputDescription']
             );
 
         return $this->loadFilterdCustom($s);
+    }
+
+    public function validate(){
+        $this->validatorLazyInstatiation();
+        $data = $this->row->toArray();
+        unset($data['id']);
+        if(!$this->validator->isValid($data)) {
+            //TODO the here thrown exception is the legacy fallback.
+            // Each Validator should implement an own isValid which throws a UnprocessableEntity Exception it self.
+            // See Segment Validator for an example
+            $errors = $this->validator->getMessages();
+            $error = print_r($errors, true);
+            $e = new \ZfExtended_ValidateException($error);
+            $e->setErrors($errors);
+
+            throw $e;
+        }
     }
 }

@@ -9656,6 +9656,30 @@ E-Mail: service@MittagQI.com</pre>
                 <source>Regelname</source>
                 <target>Rule name</target>
             </trans-unit>
+            <trans-unit id="TmFtZSBkZXIgRWluZ2FiZXJlZ2Vs">
+                <source>Name der Eingaberegel</source>
+                <target>Input Rule name</target>
+            </trans-unit>
+            <trans-unit id="TmFtZSBkZXIgQXVzZ2FiZXJlZ2Vs">
+                <source>Name der Ausgaberegel</source>
+                <target>Output Rule name</target>
+            </trans-unit>
+            <trans-unit id="QmVzY2hyZWlidW5nIGRlciBFaW5nYWJlcmVnZWw=">
+                <source>Beschreibung der Eingaberegel</source>
+                <target>Input Rule description</target>
+            </trans-unit>
+            <trans-unit id="QmVzY2hyZWlidW5nIGRlciBBdXNnYWJlcmVnZWw=">
+                <source>Beschreibung der Ausgaberegel</source>
+                <target>Output Rule description</target>
+            </trans-unit>
+            <trans-unit id="VW5nw7xsdGlnZXMgRm9ybWF0IGFuZ2VnZWJlbg==">
+                <source>Ungültiges Format angegeben</source>
+                <target>Invalid format provided</target>
+            </trans-unit>
+            <trans-unit id="Rm9ybWF0LVJlbmRlcmluZy1CZWlzcGllbA==">
+                <source>Format-Rendering-Beispiel</source>
+                <target>Format render example</target>
+            </trans-unit>
             <trans-unit id="QXVzZ2FiZWZvcm1hdA==">
                 <source>Ausgabeformat</source>
                 <target>Output format</target>
@@ -9663,6 +9687,26 @@ E-Mail: service@MittagQI.com</pre>
             <trans-unit id='RGllIE9wZW5JRC1Db25uZWN0LUltcGxlbWVudGllcnVuZyB2b24gdHJhbnNsYXRlNSBlcm3DtmdsaWNodCBlcywgZWluZW4gQ2xpZW50IGF1ZiBkZXIgSURQLVNlaXRlIGVpbmVtIENsaWVudCBpbiB0cmFuc2xhdGU1IHp1enVvcmRuZW4uIERpZSBadW9yZG51bmcgZXJmb2xndCDDvGJlciBkaWUgS3VuZGVubnVtbWVyLiBXZWl0ZXJlIEluZm9ybWF0aW9uZW4gZmluZGVuIFNpZSBpbiBkZXIgPGEgaHJlZj0iaHR0cHM6Ly9jb25mbHVlbmNlLnRyYW5zbGF0ZTUubmV0L3gvQmdEZ0F3IiB0YXJnZXQ9Il9ibGFuayI+RG9rdW1lbnRhdGlvbjwvYT4gdm9uIHRyYW5zbGF0ZTUu'>
                 <source>Die OpenID-Connect-Implementierung von translate5 ermöglicht es, einen Client auf der IDP-Seite einem Client in translate5 zuzuordnen. Die Zuordnung erfolgt über die Kundennummer. Weitere Informationen finden Sie in der <a href="https://confluence.translate5.net/x/BgDgAw" target="_blank">Dokumentation</a> von translate5.</source>
                 <target>The OpenID Connect implementation of translate5 makes it possible to assign a client on the IDP side to a client in translate5. The assignment is made via the client number. Further information can be found in the translate5 <a href="https://confluence.translate5.net/x/BgDgAw" target="_blank">documentation.</a></target>
+            </trans-unit>
+            <trans-unit id="RGllIFJlZ2VsbiBmw7xyIGRpZSBFcmtlbm51bmcgdm9uIEluaGFsdGVuIGhhYmVuIHNpY2ggZsO8ciBkaWVzZSBTcHJhY2hyZXNzb3VyY2UgZ2XDpG5kZXJ0LCBzaWUgc29sbHRlIGtvbnZlcnRpZXJ0IHdlcmRlbi4gR2VoZW4gU2llIGRhenUgYXVmIGRpZSBLb25maWd1cmF0aW9uc3NlaXRlIGRlciBFcmtlbm51bmdzcmVnZWxuIG9kZXIgRnJhZ2VuIFNpZSBJaHJlbiBQcm9qZWt0bWFuYWdlciAoYWxsZSBLdW5kZW4pLg==">
+                <source>Die Regeln für die Erkennung von Inhalten haben sich für diese Sprachressource geändert, sie sollte konvertiert werden. Gehen Sie dazu auf die Konfigurationsseite der Erkennungsregeln oder Fragen Sie Ihren Projektmanager (alle Kunden).</source>
+                <target>Content protection rules for this resource have changed, it needs conversion. Please go to the content protection configuration page or ask your project manager (all clients).</target>
+            </trans-unit>
+            <trans-unit id='S29udmVydGllcnVuZyBnZXN0YXJ0ZWQ='>
+                <source>Konvertierung gestarted</source>
+                <target>Conversion started</target>
+            </trans-unit>
+            <trans-unit id='S29udmVydGllcnVuZyBzdGFydGVu'>
+                <source>Konvertierung starten</source>
+                <target>Start conversion</target>
+            </trans-unit>
+            <trans-unit id='QWNodHVuZzogRGllIEtvbnZlcnRpZXJ1bmcga2FubiBuaWNodCBvaG5lIGRlbiBWZXJsdXN0IHZvbiBUTS1NYXRjaGVzIHLDvGNrZ8OkbmdpZyBnZW1hY2h0IHdlcmRlbi4gQml0dGUgbWFjaGVuIFNpZSB2b3JoZXIgZWluIEJhY2t1cCBkZXIgU3ByYWNocmVzc291cmNlKG4pLiBEaWUgS29udmVydGllcnVuZyBiZWVpbmZsdXNzdCBkaWUgTWF0Y2hlcyB2b24gbGF1ZmVuZGVuIEF1ZmdhYmVuLiBBdWYgZGVyIGZvbGdlbmRlbiBDb25mbHVlbmNlLVNlaXRlIHdpcmQgYmVzY2hyaWViZW4sIHdpZSBTaWUgZGllcyB1bWdlaGVuIGvDtm5uZW4u'>
+                <source>Achtung: Die Konvertierung kann nicht ohne den Verlust von TM-Matches rückgängig gemacht werden. Bitte machen Sie vorher ein Backup der Sprachressource(n). Die Konvertierung beeinflusst die Matches von laufenden Aufgaben. Auf der folgenden Confluence-Seite wird beschrieben, wie Sie dies umgehen können.</source>
+                <target>Warning: Conversion cannot be undone without the loss of TM matches. Please backup your resources before conversion. Conversion may affect matches in open tasks, please read how to avoid this on the following confluence page.</target>
+            </trans-unit>
+            <trans-unit id="RGllIEF1c2dhYmVyZWdlbCBzb2xsdGUgdm9tIGdsZWljaGVuIFR5cCBzZWluIHdpZSBkaWUgRWluZ2FiZXJlZ2Vs">
+                <source>Die Ausgaberegel sollte vom gleichen Typ sein wie die Eingaberegel</source>
+                <target>Output rule should be of the same type as Input one</target>
             </trans-unit>
         </body>
     </file>

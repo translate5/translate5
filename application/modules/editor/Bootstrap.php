@@ -758,6 +758,19 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
         );
 
         $this->front->getRouter()->addRoute(
+            'contentprotection.contentrecognition.testformat',
+            new ZfExtended_Controller_RestLikeRoute(
+                'editor/contentprotection/contentrecognition/testformat',
+                [
+                    'module' => 'editor',
+                    'controller' => 'contentprotectioncontentrecognition',
+                    /** @see \editor_ContentprotectioncontentrecognitionController::testformatAction */
+                    'action' => 'testformat'
+                ]
+            )
+        );
+
+        $this->front->getRouter()->addRoute(
             'contentprotection.inputMapping.nameCombo',
             new ZfExtended_Controller_RestLikeRoute(
                 'editor/contentprotection/inputmapping/namecombo',

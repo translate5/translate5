@@ -77,5 +77,44 @@ Ext.define('Editor.view.admin.contentProtection.contentRecognition.CreateWindowV
                 Editor.app.getController('ServerException').handleFormFailure(form, rec, op);
             }
         });
+    },
+    onFormatFieldKeyUp: function (event, el) {
+        var value = el.value,
+            form = this.getView().down('form'),
+            resultContainer = form.down('#formatRenderExample');
+
+        if (this.abortController) {
+            this.abortController.abort();
+        }
+
+        if ('' === value.trim() || !form.down('#type').value) {
+            resultContainer.update('');
+
+            return;
+        }
+
+        // Create a new AbortController for the current request
+        this.abortController = new AbortController();
+
+        Ext.Ajax.request({
+            method: 'get',
+            url: Editor.data.restpath + 'contentprotection/contentrecognition/testformat',
+            params: {
+                type: form.down('#type').value,
+                ruleFormat: value
+            },
+            success: function (response) {
+                var responseData = Ext.decode(response.responseText);
+
+                resultContainer.update(responseData.rows.example);
+            },
+            failure: function (response) {
+                if (response.statusText !== 'AbortError') {
+                    console.error('Request failed: ', response.statusText);
+                }
+            },
+            // Attach the AbortSignal to the request
+            signal: this.abortController.signal
+        });
     }
 });

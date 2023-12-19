@@ -50,76 +50,42 @@ END LICENSE AND COPYRIGHT
 */
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\ContentProtection\NumberProtection\Protector;
+namespace MittagQI\Translate5\ContentProtection\Model\Validation;
 
-use editor_Models_Languages;
-use MittagQI\Translate5\ContentProtection\Model\ContentProtectionRepository;
-use MittagQI\Translate5\ContentProtection\Model\ContentRecognitionDto;
-use MittagQI\Translate5\ContentProtection\NumberProtection\NumberParsingException;
-use MittagQI\Translate5\ContentProtection\NumberProtector;
+use editor_Models_Segment_Whitespace as Whitespace;
+use MittagQI\Translate5\ContentProtection\ContentProtector;
+use Zend_Validate_Abstract;
+use ZfExtended_Factory;
 
-abstract class AbstractProtector implements NumberProtectorInterface
+class FormatValidator extends Zend_Validate_Abstract
 {
-    private array $formatsCache = [];
+    private const INVALID = 'invalid';
 
-    public function __construct(protected ContentProtectionRepository $formatRepository)
+    protected $_messageTemplates = [
+        self::INVALID => "Ungültiges Format angegeben",
+    ];
+
+    private ContentProtector $contentProtector;
+
+    public function __construct()
     {
+        $this->contentProtector = ContentProtector::create(ZfExtended_Factory::get(Whitespace::class));
     }
 
-    abstract public function validateFormat(string $format): bool;
-    abstract public function getFormatedExample(string $format): string;
-
-    protected function tagFormat(): string
+    public function isValid($value, array $context = [])
     {
-        return str_replace(
-            ':tag',
-            NumberProtector::TAG_NAME,
-            '<:tag type="%s" name="%s" source="%s" iso="%s" target="%s"/>'
-        );
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function protect(
-        string $number,
-        ContentRecognitionDto $languageFormat,
-        editor_Models_Languages $sourceLang,
-        editor_Models_Languages $targetLang
-    ): string {
-        $targetFormat = $this->getFormat($targetLang, $languageFormat);
-
-        return $this->composeNumberTag($number, $languageFormat, $targetLang, $targetFormat);
-    }
-
-    /**
-     * @throws NumberParsingException
-     */
-    protected function composeNumberTag(
-        string $number,
-        ContentRecognitionDto $sourceFormat,
-        editor_Models_Languages $targetLang,
-        string $targetFormat
-    ): string {
-        return sprintf(
-            $this->tagFormat(),
-            static::getType(),
-            htmlspecialchars($sourceFormat->name),
-            $number,
-            $number,
-            $number
-        );
-    }
-
-    private function getFormat(editor_Models_Languages $targetLang, ContentRecognitionDto $languageFormat): ?string
-    {
-        $key = "{$targetLang->getId()}:{$languageFormat->type}:{$languageFormat->name}";
-        if (!isset($this->formatsCache[$key])) {
-            $this->formatsCache[$key] = $this
-                ->formatRepository
-                ->findOutputFormat($targetLang, $languageFormat->type, $languageFormat->name);
+        if ($context['keepAsIs'] && empty($value)) {
+            return true;
         }
 
-        return $this->formatsCache[$key];
+        $this->_setValue($value);
+
+        if (!$this->contentProtector->validateFormat($context['type'], $value)) {
+            $this->_error(self::INVALID);
+
+            return false;
+        }
+
+        return true;
     }
 }

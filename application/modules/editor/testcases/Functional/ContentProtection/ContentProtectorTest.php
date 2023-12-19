@@ -59,6 +59,7 @@ use editor_Test_UnitTest;
 use MittagQI\Translate5\ContentProtection\ContentProtector;
 use MittagQI\Translate5\ContentProtection\Model\ContentRecognition;
 use MittagQI\Translate5\ContentProtection\Model\InputMapping;
+use MittagQI\Translate5\ContentProtection\Model\OutputMapping;
 use MittagQI\Translate5\ContentProtection\NumberProtection\Protector\DateProtector;
 use MittagQI\Translate5\ContentProtection\NumberProtection\Protector\FloatProtector;
 use MittagQI\Translate5\ContentProtection\NumberProtection\Tag\NumberTag;
@@ -68,25 +69,48 @@ class ContentProtectorTest extends editor_Test_UnitTest
 {
     protected function setUp(): void
     {
-        $contentRecognition = ZfExtended_Factory::get(ContentRecognition::class);
-        $contentRecognition->loadBy(DateProtector::getType(), 'default Y-m-d');
-        $contentRecognition->setEnabled(true);
-        $contentRecognition->save();
+        $crDate1 = ZfExtended_Factory::get(ContentRecognition::class);
+        $crDate1->loadBy(DateProtector::getType(), 'default Y-m-d');
+        $crDate1->setEnabled(true);
+        $crDate1->save();
+
+        $crDate2 = ZfExtended_Factory::get(ContentRecognition::class);
+        $crDate2->loadBy(DateProtector::getType(), 'default d/m/y');
+        $crDate2->setEnabled(true);
+        $crDate2->save();
 
         $inputMapping = ZfExtended_Factory::get(InputMapping::class);
         $inputMapping->setLanguageId(5);
-        $inputMapping->setContentRecognitionId($contentRecognition->getId());
+        $inputMapping->setContentRecognitionId($crDate1->getId());
         $inputMapping->setPriority(2);
         $inputMapping->save();
 
-        $contentRecognition->loadBy(FloatProtector::getType(), 'default with comma thousand decimal dot');
-        $contentRecognition->setEnabled(true);
-        $contentRecognition->save();
+        $crFloat1 = ZfExtended_Factory::get(ContentRecognition::class);
+        $crFloat1->loadBy(FloatProtector::getType(), 'default with comma thousand decimal dot');
+        $crFloat1->setEnabled(true);
+        $crFloat1->save();
+
+        $crFloat2 = ZfExtended_Factory::get(ContentRecognition::class);
+        $crFloat2->loadBy(FloatProtector::getType(), 'default with dot thousand decimal comma');
+        $crFloat2->setEnabled(true);
+        $crFloat2->save();
 
         $inputMapping = ZfExtended_Factory::get(InputMapping::class);
         $inputMapping->setLanguageId(5);
-        $inputMapping->setContentRecognitionId($contentRecognition->getId());
+        $inputMapping->setContentRecognitionId($crFloat1->getId());
         $inputMapping->setPriority(1);
+        $inputMapping->save();
+
+        $outputMapping = ZfExtended_Factory::get(OutputMapping::class);
+        $outputMapping->setLanguageId(6);
+        $outputMapping->setInputContentRecognitionId($crDate1->getId());
+        $outputMapping->setOutputContentRecognitionId($crDate2->getId());
+        $outputMapping->save();
+
+        $outputMapping = ZfExtended_Factory::get(OutputMapping::class);
+        $outputMapping->setLanguageId(6);
+        $outputMapping->setInputContentRecognitionId($crFloat1->getId());
+        $outputMapping->setOutputContentRecognitionId($crFloat2->getId());
         $inputMapping->save();
     }
 
@@ -97,7 +121,15 @@ class ContentProtectorTest extends editor_Test_UnitTest
         $contentRecognition->setEnabled(false);
         $contentRecognition->save();
 
+        $contentRecognition->loadBy(DateProtector::getType(), 'default d/m/y');
+        $contentRecognition->setEnabled(false);
+        $contentRecognition->save();
+
         $contentRecognition->loadBy(FloatProtector::getType(), 'default with comma thousand decimal dot');
+        $contentRecognition->setEnabled(false);
+        $contentRecognition->save();
+
+        $contentRecognition->loadBy(FloatProtector::getType(), 'default with dot thousand decimal comma');
         $contentRecognition->setEnabled(false);
         $contentRecognition->save();
 
@@ -105,6 +137,12 @@ class ContentProtectorTest extends editor_Test_UnitTest
         foreach ($inputMapping->loadAll() as $item) {
             $inputMapping->load($item['id']);
             $inputMapping->delete();
+        }
+
+        $outputMapping = ZfExtended_Factory::get(OutputMapping::class);
+        foreach ($outputMapping->loadAll() as $item) {
+            $outputMapping->load($item['id']);
+            $outputMapping->delete();
         }
     }
 
