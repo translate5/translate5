@@ -192,6 +192,8 @@ final class Placeable
      */
     public function clean(string $markup)
     {
+        $markup = htmlspecialchars_decode($markup, ENT_QUOTES);
+        $markup = str_replace('&nbsp;', ' ', $markup);
         if(strip_tags($markup) !== $markup){
             $markup = strip_tags($markup, self::ALLOWED_TAGS);
             $markup = preg_replace('/<([a-z][a-z0-9]*)[^<|>]*?(\/?)>/si','<\1\2>', $markup);
