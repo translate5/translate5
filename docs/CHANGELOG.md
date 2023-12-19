@@ -18,6 +18,31 @@ All updates are (downwards) compatible! If not this is listed in the important r
 
 
 
+
+## [6.9.1] - 2023-12-18
+
+### Important Notes:
+ 
+
+
+### Added
+**[TRANSLATE-3553](https://jira.translate5.net/browse/TRANSLATE-3553): TermPortal - Extend folder-based term import to work via sftp** <br>
+translate5 - 6.9.0: Added support for terminology import from remote SFTP directory
+translate5 - 6.9.1: Added additional config value check
+
+
+### Bugfixes
+**[TRANSLATE-3626](https://jira.translate5.net/browse/TRANSLATE-3626): t5memory - Write to instant translate t5memory memory** <br>
+Fix for writing to instant-translate memory.
+
+**[TRANSLATE-3619](https://jira.translate5.net/browse/TRANSLATE-3619): Editor general - SQL error when filtering repetitions with bookmarks** <br>
+FIXED: sql-error when both bookbarks and repetiions filters are used
+
+**[TRANSLATE-3419](https://jira.translate5.net/browse/TRANSLATE-3419): Task Management - Click on PM name in project overview opens mail with undefined address - and logs out user in certain cases** <br>
+translate5 - 6.7.0: FIXED: 'mailto:undefined' links in PM names in Project overview
+translate5 - 6.9.1: project task grid fix
+
+
 ## [6.9.0] - 2023-12-14
 
 ### Important Notes:
