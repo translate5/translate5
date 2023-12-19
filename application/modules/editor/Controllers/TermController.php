@@ -26,6 +26,7 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 use editor_Models_Terminology_Models_TermModel as TermModel;
+use MittagQI\ZfExtended\MismatchException;
 
 /**
  *
@@ -207,7 +208,7 @@ class editor_TermController extends ZfExtended_RestController
      *
      * @return array
      * @throws Zend_Exception
-     * @throws ZfExtended_Mismatch
+     * @throws MismatchException
      */
     protected function _postCheckParams() {
 
@@ -407,7 +408,7 @@ class editor_TermController extends ZfExtended_RestController
     /**
      * Update term (update `terms_term`.`proposal`)
      *
-     * @throws ZfExtended_Mismatch
+     * @throws MismatchException
      */
     public function putAction() {
 
@@ -476,7 +477,7 @@ class editor_TermController extends ZfExtended_RestController
     /**
      * Delete term
      *
-     * @throws ZfExtended_Mismatch
+     * @throws MismatchException
      */
     public function deleteAction() {
 
@@ -570,7 +571,7 @@ class editor_TermController extends ZfExtended_RestController
      * Transfer terms for translation as task of type 'termtranslation'
      *
      * @throws Zend_Db_Statement_Exception
-     * @throws ZfExtended_Mismatch
+     * @throws MismatchException
      */
     public function transferAction() {
 
@@ -728,7 +729,7 @@ class editor_TermController extends ZfExtended_RestController
      *
      * @throws ReflectionException
      * @throws Zend_Db_Statement_Exception
-     * @throws ZfExtended_Mismatch
+     * @throws MismatchException
      */
     public function historyAction() {
 

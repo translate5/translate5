@@ -28,6 +28,8 @@
 
 use MittagQI\Translate5\Plugins\MatchAnalysis\Models\Pricing\Preset;
 use MittagQI\Translate5\Plugins\MatchAnalysis\Models\Pricing\PresetPrices;
+use MittagQI\ZfExtended\MismatchException;
+
 /**
  *
  */
@@ -57,7 +59,7 @@ class editor_Plugins_MatchAnalysis_PricingpresetpricesController extends ZfExten
 
     /**
      * @throws Zend_Db_Statement_Exception
-     * @throws ZfExtended_Mismatch
+     * @throws MismatchException
      */
     public function init() {
 
@@ -70,7 +72,7 @@ class editor_Plugins_MatchAnalysis_PricingpresetpricesController extends ZfExten
 
     /**
      * @throws Zend_Db_Statement_Exception
-     * @throws ZfExtended_Mismatch
+     * @throws MismatchException
      */
     public function indexAction() {
 
@@ -120,7 +122,7 @@ class editor_Plugins_MatchAnalysis_PricingpresetpricesController extends ZfExten
             $validPairs = $this->_validPairs($this->entity->getPresetId());
 
         // Catch mismatch-exception
-        } catch (ZfExtended_Mismatch $e) {
+        } catch (MismatchException $e) {
 
             // Flush msg
             $this->jflush(false, $e->getMessage());
@@ -142,7 +144,7 @@ class editor_Plugins_MatchAnalysis_PricingpresetpricesController extends ZfExten
      * @param $presetId
      * @return array
      * @throws Zend_Db_Statement_Exception
-     * @throws ZfExtended_Mismatch
+     * @throws MismatchException
      */
     private function _validPairs($presetId) {
 
@@ -221,7 +223,7 @@ class editor_Plugins_MatchAnalysis_PricingpresetpricesController extends ZfExten
             $validPairs = $this->_validPairs($presetId = $_['presetId']->getId());
 
         // Catch mismatch-exception
-        } catch (ZfExtended_Mismatch $e) {
+        } catch (MismatchException $e) {
 
             // Flush msg
             $this->jflush(false, $e->getMessage());
@@ -249,7 +251,7 @@ class editor_Plugins_MatchAnalysis_PricingpresetpricesController extends ZfExten
      * Delete prices for certain language
      *
      * @throws Zend_Db_Statement_Exception
-     * @throws ZfExtended_Mismatch
+     * @throws MismatchException
      */
     public function deleteAction() {
 
@@ -339,7 +341,7 @@ class editor_Plugins_MatchAnalysis_PricingpresetpricesController extends ZfExten
             }
 
         // Catch mismatch-exception
-        } catch (ZfExtended_Mismatch $e) {
+        } catch (MismatchException $e) {
 
             // Flush msg
             $this->jflush(false, $e->getMessage());

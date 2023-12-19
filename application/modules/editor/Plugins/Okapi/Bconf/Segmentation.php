@@ -26,6 +26,8 @@
  END LICENSE AND COPYRIGHT
  */
 
+use MittagQI\ZfExtended\MismatchException;
+
 /**
  * Class processing SRX files on import and repacking outdated bconfs, also the upload/processing of SRX files is covered here
  *
@@ -109,7 +111,7 @@ final class editor_Plugins_Okapi_Bconf_Segmentation {
      */
     public function processUpload(editor_Plugins_Okapi_Bconf_Entity $bconf, string $field, string $uploadPath, string $uploadName) {
         if($field !== 'source' && $field !== 'target'){
-            throw new ZfExtended_Mismatch('E2004', [ $field, 'field' ]);
+            throw new MismatchException('E2004', [ $field, 'field' ]);
         }
         // evaluate what's the other field
         $otherField = ($field == 'source') ? 'target' : 'source';
