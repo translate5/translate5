@@ -41,6 +41,8 @@ final class Placeable
 {
     const MARKER_CLASS = 't5placeable';
 
+    const DETECTION_REGEX = '~<div\s*class="[^"]*t5placeable[^"]*internal-tag[^"]*"[^>]*>.+?</div>~i';
+
     const DOCTYPE = '<?xml version="1.0" encoding="UTF-8"?>';
 
     const ALLOWED_TAGS = ['<b>', '<i>', '<u>', '<strong>', '<sup>', '<sub>'];
@@ -67,8 +69,7 @@ final class Placeable
      */
     public static function contains(string $segment): bool
     {
-        return preg_match('~<div\s*class="[^"]*internal-tag[^"]*'
-                . self::MARKER_CLASS . '[^"]*"[^>]*>.+?</div>~s', $segment) === 1;
+        return preg_match(self::DETECTION_REGEX, $segment) === 1;
     }
 
     /**
@@ -77,19 +78,17 @@ final class Placeable
      * @return string
      */
     public static function replace(string $segment){
-        return preg_replace_callback(
-            '~<div[^>]+t5placeable[^>]+internal-tag[^>]+>.+?</div>~i',
-            function($matches) {
-                if(count($matches) === 0){
-                    $inner = [];
-                    if(preg_match('~<span[^>]+full[^>]+>(.+)</span>~i', $matches[0], $inner) === 1){
-                        if(count($inner) === 2){
-                            return strip_tags($inner[1]);
-                        }
+        return preg_replace_callback(self::DETECTION_REGEX, function($matches) {
+            if(count($matches) === 1){
+                $inner = [];
+                if(preg_match('~<span[^>]+full[^>]+>(.+)</span>~i', $matches[0], $inner) === 1){
+                    if(count($inner) === 2){
+                        return strip_tags($inner[1]);
                     }
                 }
-                return '';
-            }, $segment
+            }
+            return '';
+        }, $segment
         ) ?? $segment;
 	}
 
