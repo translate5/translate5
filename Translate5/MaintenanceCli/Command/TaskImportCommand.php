@@ -86,10 +86,11 @@ class TaskImportCommand extends Translate5AbstractCommand
             'Workflow name. If none provided - default will be used',
         );
     }
-    
+
     /**
      * Execute the command
      * {@inheritDoc}
+     * @throws \Zend_Validate_Exception
      * @see \Symfony\Component\Console\Command\Command::execute()
      */
     protected function execute(InputInterface $input, OutputInterface $output)
@@ -107,7 +108,7 @@ class TaskImportCommand extends Translate5AbstractCommand
             return 1;
         }
 
-        $path = APPLICATION_ROOT . DIRECTORY_SEPARATOR . $input->getArgument('path');
+        $path = $input->getArgument('path');
 
         if (!file_exists($path)) {
             $this->io->error(sprintf('File "%s" does not exists', $path));
@@ -115,17 +116,24 @@ class TaskImportCommand extends Translate5AbstractCommand
             return 1;
         }
 
-        $pmGuid = trim($input->getOption('pm'));
+        $pmId = trim($input->getOption('pm'));
 
-        if (!$pmGuid) {
-            $this->io->error('Please provide valid PM GUID');
+        if (!$pmId) {
+            $this->io->error('Please provide valid PM GUID / login / id');
 
             return 1;
         }
 
         try {
             $pm = ZfExtended_Factory::get(ZfExtended_Models_User::class);
-            $pm->loadByGuid($pmGuid);
+            if (is_numeric($pmId)) {
+                $pm->load($pmId);
+            } elseif ((new \ZfExtended_Validate_Guid)->isValid($pmId)) {
+                $pm->loadByGuid($pmId);
+            } else {
+                $pm->loadByLogin($pmId);
+            }
+            $pmGuid = $pm->getUserGuid();
         } catch (ZfExtended_Models_Entity_NotFoundException) {
             $this->io->error('Provided PM does not exists');
 

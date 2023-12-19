@@ -83,20 +83,25 @@ class WorkerRunCommand extends Translate5AbstractCommand
         //$this->initTranslate5AppOrTest();
         $this->initTranslate5(); //woher wissen die worker ob sie als test laufen?
 
-        $workerModel = ZfExtended_Factory::get(ZfExtended_Models_Worker::class);
-        $workerModel->load($input->getArgument('id'));
-
         //if maintenance is near, we disallow starting workers
         if (ZfExtended_Models_Installer_Maintenance::isLoginLock()) {
             throw new ZfExtended_Models_MaintenanceException();
         }
 
-        if ($workerModel->getState() == $workerModel::STATE_WAITING) {
+        try {
+            $workerModel = ZfExtended_Factory::get(ZfExtended_Models_Worker::class);
+            $workerModel->load($input->getArgument('id'));
 
-            $worker = ZfExtended_Worker_Abstract::instanceByModel($workerModel);
-            if (!$worker || !$worker->runQueued()) {
-                return self::FAILURE;
+            if ($workerModel->getState() == $workerModel::STATE_WAITING) {
+
+                $worker = ZfExtended_Worker_Abstract::instanceByModel($workerModel);
+                if (!$worker || !$worker->runQueued()) {
+                    return self::FAILURE;
+                }
             }
+        } catch (Throwable $e) {
+            \Zend_Registry::get('logger')->exception($e);
+            return self::FAILURE;
         }
 
         return self::SUCCESS;

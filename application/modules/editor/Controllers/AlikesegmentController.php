@@ -21,7 +21,7 @@ START LICENSE AND COPYRIGHT
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
@@ -175,7 +175,13 @@ class Editor_AlikesegmentController extends ZfExtended_RestController {
                 // desired tags (all tags from source on translation or targetOriginal on review)
                 // into the targetEdit of the master segment and take the result then.
                 // if that fails, the segment can not be processed automatically and must remain for a manual review by the user
-                if(!$sourceSuccess || !$repetitionUpdater->updateTarget($task->isTranslation())) {
+                $useSourceForReference = $task->getConfig()->runtimeOptions->editor
+                    ->frontend->reviewTask->useSourceForReference;
+
+                $useSourceTags = $useSourceForReference ||
+                    empty($this->entity->getTarget());
+
+                if(!$sourceSuccess || !$repetitionUpdater->updateTarget($useSourceTags)) {
                     //the segment has to be ignored!
                     continue;
                 }

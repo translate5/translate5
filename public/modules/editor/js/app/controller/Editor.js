@@ -411,7 +411,7 @@ Ext.define('Editor.controller.Editor', {
     getReferenceTags: function(context) {
         var me = this,
             plug = me.getEditPlugin(),
-            source = context.record.get(plug.editor.mainEditor.getReferenceField()),
+            source = context.record.get(plug.editor.mainEditor.getReferenceField(context.record.get('target'))),
             tempNode, walkNodes;
 
         me.sourceTags = [];
@@ -1658,7 +1658,8 @@ Ext.define('Editor.controller.Editor', {
         if(!this.isEditing || !/^target/.test(plug.editor.columnToEdit)){
             return;
         }
-        plug.editor.mainEditor.insertMarkup(plug.context.record.get(plug.editor.mainEditor.getReferenceField()));
+        const referenceField = plug.editor.mainEditor.getReferenceField(plug.context.record.get('target'));
+        plug.editor.mainEditor.insertMarkup(plug.context.record.get(referenceField));
     },
     insertWhitespaceNbsp: function(key,e) {
         this.insertWhitespace(key,e,'nbsp');

@@ -46,7 +46,7 @@ $data = [
 
 $data['messages'] = join("</tr><tr>", array_map(function($item) {
     $item = (object) $item;
-    $url = str_replace('{0}', $this->eventCode, $this->config->runtimeOptions->errorCodesUrl);
+    $url = str_replace('{0}', $this->eventCode ?? '', $this->config->runtimeOptions->errorCodesUrl);
     $html = '<tr>';
     $html .= '<td style="white-space:nowrap;padding-right:10px;">'.$item->created.'</td>';
     $html .= '<td>'.ZfExtended_Logger_Summary::getLevel($item->level).'</td>';

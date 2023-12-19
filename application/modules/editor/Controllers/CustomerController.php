@@ -60,7 +60,6 @@ class Editor_CustomerController extends ZfExtended_RestController {
             $this->entity->getFilter()->addSort('name');
         }
         parent::indexAction();
-        $this->cleanUpOpenIdForDefault();
     }
     
     public function postAction() {
@@ -133,17 +132,21 @@ class Editor_CustomerController extends ZfExtended_RestController {
             $copy->copyConfig($source,$this->entity->getId());
         }
     }
-    
+
+    /**
+     * @throws Zend_Exception
+     */
     protected function decodePutData(){
         parent::decodePutData();
         $this->handleDomainField();
         $this->handleDefaultOpenIdLableText();
     }
     
-    /***
+    /**
      * Handle the domain field from the post/put request data.
      */
-    protected function handleDomainField(){
+    protected function handleDomainField(): void
+    {
         if(!isset($this->data->domain)){
             return;
         }
@@ -153,22 +156,23 @@ class Editor_CustomerController extends ZfExtended_RestController {
             return;
         }
         //add always / at the end of the url
-        if(substr($this->data->domain,-1)!=='/'){
+        if(!str_ends_with($this->data->domain, '/')){
             $this->data->domain.='/';
         }
         
         //remove always the protocol if it is provided by the api or frontend
         $disallowed = array('http://', 'https://');
         foreach($disallowed as $d) {
-            if(strpos($this->data->domain, $d) === 0) {
+            if(str_starts_with($this->data->domain, $d)) {
                 $this->data->domain=str_replace($d, '', $this->data->domain);
             }
         }
     }
 
-    /***
+    /**
      * Set default text for the "login with SSO" button
      * @return void
+     * @throws Zend_Exception
      */
     protected function handleDefaultOpenIdLableText(): void
     {
@@ -181,41 +185,17 @@ class Editor_CustomerController extends ZfExtended_RestController {
             $this->data->openIdRedirectLabel = $t->_('Single Sign-on');
         }
     }
-    /***
-     * Remove the openid data for the default customer if it is configured so
-     */
-    protected function cleanUpOpenIdForDefault(){
-        $config = Zend_Registry::get('config');
-        $showOpenIdForDefault=(boolean)$config->runtimeOptions->customers->openid->showOpenIdDefaultCustomerData;
-        if($showOpenIdForDefault){
-            return;
-        }
-        
-        foreach ($this->view->rows as &$row){
-            if($row['number']!=editor_Models_Customer_Customer::DEFAULTCUSTOMER_NUMBER){
-                continue;
-            }
-            $row['domain']=null;
-            $row['openIdServer']=null;
-            $row['openIdIssuer']=null;
-            $row['openIdAuth2Url']=null;
-            $row['openIdServerRoles']=null;
-            $row['openIdDefaultServerRoles']=null;
-            $row['openIdClientId']=null;
-            $row['openIdClientSecret']=null;
-            $row['openIdRedirectLabel']=null;
-            $row['openIdRedirectCheckbox']=null;
-        }
-    }
-    
+
     /**
      * Protect the default customer from being edited or deleted.
+     * @throws Zend_Exception
      */
-    protected function entityLoad() {
+    protected function entityLoad(): void
+    {
         parent::entityLoad();
-        $isModification = $this->_request->isPut() || $this->_request->isDelete();
-        if($isModification && $this->entity->isDefaultCustomer()) {
-            throw new ZfExtended_Models_Entity_NoAccessException('The default client must not be edited or deleted.');
+        if($this->isModificationRequest() && $this->entity->isDefaultCustomer()) {
+            $this->decodePutData();
+            $this->preventDefaultCustomerModification();
         }
     }
     
@@ -259,5 +239,35 @@ class Editor_CustomerController extends ZfExtended_RestController {
             $export->setDocumentTaskType($taskType);
         }
         $this->view->rows = $export->getExportRawDataTests($customerId);
+    }
+
+    /**
+     * It is modification request if it is PUT or DELETE request
+     * @return bool
+     */
+    protected function isModificationRequest(): bool {
+        return $this->_request->isPut() || $this->_request->isDelete();
+    }
+
+    /**
+     * Check if field modification is allowed for the default customer
+     *
+     * @return void
+     * @throws ZfExtended_Models_Entity_NoAccessException
+     */
+    protected function preventDefaultCustomerModification(): void
+    {
+        $blacklistedPutDefaultCustomerFields = [
+            'number',
+            'name'
+        ];
+
+        foreach ($blacklistedPutDefaultCustomerFields as $field){
+            if(isset($this->data->$field)){
+                throw new ZfExtended_Models_Entity_NoAccessException(
+                    'The '.$field.' of the default client can not be edited.'
+                );
+            }
+        }
     }
 }
