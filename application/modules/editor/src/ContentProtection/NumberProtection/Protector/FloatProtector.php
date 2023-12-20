@@ -53,7 +53,7 @@ declare(strict_types=1);
 namespace MittagQI\Translate5\ContentProtection\NumberProtection\Protector;
 
 use editor_Models_Languages;
-use MittagQI\Translate5\ContentProtection\Model\ContentRecognitionDto;
+use MittagQI\Translate5\ContentProtection\Model\ContentProtectionDto;
 use MittagQI\Translate5\ContentProtection\NumberProtection\Object\FloatObject;
 
 class FloatProtector extends AbstractProtector
@@ -79,12 +79,11 @@ class FloatProtector extends AbstractProtector
 
     protected function composeNumberTag(
         string $number,
-        ContentRecognitionDto $sourceFormat,
+        ContentProtectionDto $protectionDto,
         editor_Models_Languages $targetLang,
-        string $targetFormat
     ): string {
-        if ($sourceFormat->keepAsIs) {
-            return parent::composeNumberTag($number, $sourceFormat, $targetLang, $targetFormat);
+        if ($protectionDto->keepAsIs) {
+            return parent::composeNumberTag($number, $protectionDto, $targetLang);
         }
 
         $float = FloatObject::parse($number);
@@ -92,10 +91,10 @@ class FloatProtector extends AbstractProtector
         return sprintf(
             $this->tagFormat(),
             self::getType(),
-            htmlspecialchars($sourceFormat->name),
+            htmlspecialchars($protectionDto->name),
             $number,
-            $float->format('#.#'),
-            $float->format($targetFormat)
+            $float->format('#.#', $targetLang->getRfc5646()),
+            $float->format($protectionDto->outputFormat, $targetLang->getRfc5646())
         );
     }
 }

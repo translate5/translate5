@@ -41,7 +41,7 @@ class OutputMappingValidator extends ValidatorWithContext
     public function __construct(ZfExtended_Models_Entity_Abstract $entity)
     {
         $this->customFieldFilterInstances = [
-            'outputContentRecognitionId' => [new OutputRecognitionShouldBeOfSameTypeValidator()],
+            'outputContentRecognitionId' => [new OutputRecognitionValidator()],
         ];
         parent::__construct($entity);
     }

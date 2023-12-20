@@ -79,12 +79,6 @@ class ContentProtectorTest extends editor_Test_UnitTest
         $crDate2->setEnabled(true);
         $crDate2->save();
 
-        $inputMapping = ZfExtended_Factory::get(InputMapping::class);
-        $inputMapping->setLanguageId(5);
-        $inputMapping->setContentRecognitionId($crDate1->getId());
-        $inputMapping->setPriority(2);
-        $inputMapping->save();
-
         $crFloat1 = ZfExtended_Factory::get(ContentRecognition::class);
         $crFloat1->loadBy(FloatProtector::getType(), 'default with comma thousand decimal dot');
         $crFloat1->setEnabled(true);
@@ -94,6 +88,12 @@ class ContentProtectorTest extends editor_Test_UnitTest
         $crFloat2->loadBy(FloatProtector::getType(), 'default with dot thousand decimal comma');
         $crFloat2->setEnabled(true);
         $crFloat2->save();
+
+        $inputMapping = ZfExtended_Factory::get(InputMapping::class);
+        $inputMapping->setLanguageId(5);
+        $inputMapping->setContentRecognitionId($crDate1->getId());
+        $inputMapping->setPriority(2);
+        $inputMapping->save();
 
         $inputMapping = ZfExtended_Factory::get(InputMapping::class);
         $inputMapping->setLanguageId(5);
@@ -111,7 +111,7 @@ class ContentProtectorTest extends editor_Test_UnitTest
         $outputMapping->setLanguageId(6);
         $outputMapping->setInputContentRecognitionId($crFloat1->getId());
         $outputMapping->setOutputContentRecognitionId($crFloat2->getId());
-        $inputMapping->save();
+        $outputMapping->save();
     }
 
     protected function tearDown(): void
@@ -165,9 +165,9 @@ class ContentProtectorTest extends editor_Test_UnitTest
         self::assertSame($expected, $contentProtector->unprotect($node, true));
 
         self::assertSame(
-            '123.456,789 Übersetzungsbüro [ ] 24translate 15/9/23 and 19/10/24',
+            '123.456,789 Übersetzungsbüro [ ] 24translate 15/09/23 and 19/10/24',
             $contentProtector->unprotect(
-                '<number type="float" name="default with comma thousand decimal dot" source="123,456.789" iso="123456.789" target="123.456,789"/> Übersetzungsbüro [<char ts="c2a0" length="1"/>] 24translate <number type="date" name="default Y-m-d" source="2023-09-15" iso="2023-09-15" target="15/9/23"/> and <number type="date" name="default Y-m-d" source="2024-10-19" iso="2024-10-19" target="19/10/24"/>',
+                '<number type="float" name="default with comma thousand decimal dot" source="123,456.789" iso="123456.789" target="123.456,789"/> Übersetzungsbüro [<char ts="c2a0" length="1"/>] 24translate <number type="date" name="default Y-m-d" source="2023-09-15" iso="2023-09-15" target="15/09/23"/> and <number type="date" name="default Y-m-d" source="2024-10-19" iso="2024-10-19" target="19/10/24"/>',
                 false
             )
         );
@@ -183,7 +183,7 @@ class ContentProtectorTest extends editor_Test_UnitTest
 
         yield 'float in the beginning' => [
             'text' => '123,456.789 Übersetzungsbüro [ ] 24translate 2023-09-15 and 2024-10-19',
-            'expected' => '<number type="float" name="default with comma thousand decimal dot" source="123,456.789" iso="123456.789" target="123.456,789"/> Übersetzungsbüro [<char ts="c2a0" length="1"/>] 24translate <number type="date" name="default Y-m-d" source="2023-09-15" iso="2023-09-15" target="15/9/23"/> and <number type="date" name="default Y-m-d" source="2024-10-19" iso="2024-10-19" target="19/10/24"/>',
+            'expected' => '<number type="float" name="default with comma thousand decimal dot" source="123,456.789" iso="123456.789" target="123.456,789"/> Übersetzungsbüro [<char ts="c2a0" length="1"/>] 24translate <number type="date" name="default Y-m-d" source="2023-09-15" iso="2023-09-15" target="15/09/23"/> and <number type="date" name="default Y-m-d" source="2024-10-19" iso="2024-10-19" target="19/10/24"/>',
             'entityHandling' => ContentProtector::ENTITY_MODE_RESTORE,
         ];
 

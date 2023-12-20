@@ -50,39 +50,45 @@ END LICENSE AND COPYRIGHT
 */
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\ContentProtection\Model;
+namespace MittagQI\Translate5\ContentProtection\Model\Validation;
 
-use Zend_Db_Table_Row;
+use MittagQI\Translate5\ContentProtection\Model\ContentRecognition;
+use Zend_Validate_Abstract;
+use ZfExtended_Factory;
 
-/**
- * @property-read string $type
- * @property-read string $name
- * @property-read string $regex
- * @property-read int $matchId
- * @property-read string|null $format
- * @property-read bool $keepAsIs
- * @property-read int $priority
- */
-class ContentRecognitionDto
+class OutputRecognitionValidator extends Zend_Validate_Abstract
 {
-    public function __construct(
-        public string $type,
-        public string $name,
-        public string $regex,
-        public int $matchId,
-        public ?string $format,
-        public bool $keepAsIs,
-    ) {}
+    private const WRONG_TYPE = 'type';
+    private const KEEP_AS_IS = 'keepAsIs';
 
-    public static function fromRow(Zend_Db_Table_Row $row): self
+    protected $_messageTemplates = [
+        self::WRONG_TYPE => 'Die Ausgaberegel sollte vom gleichen Typ sein wie die Eingaberegel',
+        self::KEEP_AS_IS => 'Die Regel "Unverändert übernehmen" kann nicht als Ausgaberegel verwendet werden',
+    ];
+
+    public function isValid($value, array $context = [])
     {
-        return new self(
-            $row['type'],
-            $row['name'],
-            $row['regex'],
-            (int) $row['matchId'],
-            $row['format'],
-            (bool) $row['keepAsIs'],
-        );
+        $valid = true;
+        $this->_setValue($value);
+
+        $contentRecognition = ZfExtended_Factory::get(ContentRecognition::class);
+
+        $contentRecognition->load($context['inputContentRecognitionId']);
+        $inputType = $contentRecognition->getType();
+
+        $contentRecognition->load($context['outputContentRecognitionId']);
+        $outputType = $contentRecognition->getType();
+
+        if ($contentRecognition->getKeepAsIs()) {
+            $valid = false;
+            $this->_error(self::KEEP_AS_IS);
+        }
+
+        if ($inputType !== $outputType) {
+            $valid = false;
+            $this->_error(self::WRONG_TYPE);
+        }
+
+        return $valid;
     }
 }

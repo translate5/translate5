@@ -53,7 +53,7 @@ declare(strict_types=1);
 namespace MittagQI\Translate5\ContentProtection\NumberProtection\Protector;
 
 use editor_Models_Languages;
-use MittagQI\Translate5\ContentProtection\Model\ContentRecognitionDto;
+use MittagQI\Translate5\ContentProtection\Model\ContentProtectionDto;
 use NumberFormatter;
 
 class IntegerProtector extends FloatProtector
@@ -77,12 +77,11 @@ class IntegerProtector extends FloatProtector
 
     protected function composeNumberTag(
         string $number,
-        ContentRecognitionDto $sourceFormat,
+        ContentProtectionDto $protectionDto,
         editor_Models_Languages $targetLang,
-        string $targetFormat
     ): string {
-        if ($sourceFormat->keepAsIs) {
-            return parent::composeNumberTag($number, $sourceFormat, $targetLang, $targetFormat);
+        if ($protectionDto->keepAsIs) {
+            return parent::composeNumberTag($number, $protectionDto, $targetLang);
         }
 
         $integer = $this->parse($number);
@@ -90,10 +89,10 @@ class IntegerProtector extends FloatProtector
         return sprintf(
             $this->tagFormat(),
             self::getType(),
-            htmlspecialchars($sourceFormat->name),
+            htmlspecialchars($protectionDto->name),
             $number,
             (string) $integer,
-            $this->getTargetInteger($integer, $targetFormat)
+            $this->getTargetInteger($integer, $protectionDto->outputFormat)
         );
     }
 
@@ -103,11 +102,9 @@ class IntegerProtector extends FloatProtector
         return $fmt->parse(preg_replace('/[^\d]/u', '', $number), NumberFormatter::TYPE_INT64);
     }
 
-    private function getTargetInteger(
-        int $integer,
-        string $targetFormat
-    ): string {
-        $fmt = NumberFormatter::create('en', NumberFormatter::PATTERN_DECIMAL, $targetFormat);
+    private function getTargetInteger(int $integer, string $targetFormat): string
+    {
+        $fmt = NumberFormatter::create('en', NumberFormatter::PATTERN_DECIMAL);
         $this->setFormat($targetFormat, $fmt);
 
         return $fmt->format($integer);

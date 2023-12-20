@@ -53,7 +53,8 @@ declare(strict_types=1);
 namespace MittagQI\Translate5\Test\Unit\ContentProtection\NumberProtection;
 
 use editor_Models_Languages;
-use MittagQI\Translate5\ContentProtection\Model\ContentRecognitionDto;
+use LogicException;
+use MittagQI\Translate5\ContentProtection\Model\ContentProtectionDto;
 use MittagQI\Translate5\ContentProtection\Model\ContentProtectionRepository;
 use MittagQI\Translate5\ContentProtection\NumberProtection\Protector\FloatProtector;
 use PHPUnit\Framework\TestCase;
@@ -64,31 +65,30 @@ class FloatProtectorTest extends TestCase
      * @dataProvider defaultDataToProtect
      */
     public function testProtectDefaultFormats(
-        string                   $number,
-        string                   $expected,
-        ContentRecognitionDto    $sourceFormat,
-        ?string                  $targetFormat,
+        string $number,
+        string $expected,
+        ContentProtectionDto $protectionDto,
         ?editor_Models_Languages $targetLang
     ): void {
         $sourceLang = new editor_Models_Languages();
         $sourceLang->setId(5);
         $sourceLang->setRfc5646('en');
-        $repo = $this->createConfiguredMock(ContentProtectionRepository::class, ['findOutputFormat' => $targetFormat]);
-        $protected = (new FloatProtector($repo))->protect($number, $sourceFormat, $sourceLang, $targetLang);
+        $repo = $this->createConfiguredMock(ContentProtectionRepository::class, []);
+        $protected = (new FloatProtector($repo))->protect($number, $protectionDto, $sourceLang, $targetLang);
 
         self::assertSame($expected, $protected);
     }
 
     public function defaultDataToProtect(): iterable
     {
-        $sourceFormat = new ContentRecognitionDto(
+        $protectionDto = new ContentProtectionDto(
             'float',
              'test-default',
             '/\b([1-9]\d{0,2},){1}(\d{3},)*\d{3}\.\d+\b/u',
             0,
-            '#.##0,###',
+            '#,##0.###',
             false,
-            1
+            '#.##0,###'
         );
         $targetLangDe = new editor_Models_Languages();
         $targetLangDe->setId(0);
@@ -97,32 +97,58 @@ class FloatProtectorTest extends TestCase
         yield 'float' => [
             'number' => '123,456.78',
             'expected' => '<number type="float" name="test-default" source="123,456.78" iso="123456.78" target="123.456,78"/>',
-            'sourceFormat' => $sourceFormat,
-            'targetFormat' => '#.##0,###',
+            'protectionDto' => $protectionDto,
             'targetLang' => $targetLangDe,
         ];
+
+        $protectionDto2 = new ContentProtectionDto(
+            'float',
+            'test-default',
+            '/\b([1-9]\d{0,2},){1}(\d{3},)*\d{3}\.\d+\b/u',
+            0,
+            '#,##0.###',
+            false,
+            '#*##*#0&###'
+        );
 
         yield 'float with custom format' => [
             'number' => '123,456.78',
             'expected' => '<number type="float" name="test-default" source="123,456.78" iso="123456.78" target="12*34*56&78"/>',
-            'sourceFormat' => $sourceFormat,
-            'targetFormat' => '#*##*#0&###',
+            'protectionDto' => $protectionDto2,
             'targetLang' => $targetLangDe,
         ];
+
+        $protectionDto3 = new ContentProtectionDto(
+            'float',
+            'test-default',
+            '/\b([1-9]\d{0,2},){1}(\d{3},)*\d{3}\.\d+\b/u',
+            0,
+            '#,##0.###',
+            false,
+            '#.#'
+        );
 
         yield 'float with generic dot' => [
             'number' => '123,456.78',
             'expected' => '<number type="float" name="test-default" source="123,456.78" iso="123456.78" target="123456.78"/>',
-            'sourceFormat' => $sourceFormat,
-            'targetFormat' => '#.#',
+            'protectionDto' => $protectionDto3,
             'targetLang' => $targetLangDe,
         ];
+
+        $protectionDto4 = new ContentProtectionDto(
+            'float',
+            'test-default',
+            '/\b([1-9]\d{0,2},){1}(\d{3},)*\d{3}\.\d+\b/u',
+            0,
+            '#,##0.###',
+            false,
+            '#·#'
+        );
 
         yield 'float with generic middle dot' => [
             'number' => '123,456.78',
             'expected' => '<number type="float" name="test-default" source="123,456.78" iso="123456.78" target="123456·78"/>',
-            'sourceFormat' => $sourceFormat,
-            'targetFormat' => '#·#',
+            'protectionDto' => $protectionDto4,
             'targetLang' => $targetLangDe,
         ];
 
@@ -130,40 +156,79 @@ class FloatProtectorTest extends TestCase
         $targetLangHi->setId(0);
         $targetLangHi->setRfc5646('hi_IN');
 
+        $protectionDto5 = new ContentProtectionDto(
+            'float',
+            'test-default',
+            '/\b([1-9]\d{0,2},){1}(\d{3},)*\d{3}\.\d+\b/u',
+            0,
+            '#,##0.###',
+            false,
+            '#,##,##0.###'
+        );
+
         yield 'target lang hi_IN' => [
             'number' => '123,456.78',
             'expected' => '<number type="float" name="test-default" source="123,456.78" iso="123456.78" target="1,23,456.78"/>',
-            'sourceFormat' => $sourceFormat,
-            'targetFormat' => '#,##,##0.###',
+            'protectionDto' => $protectionDto5,
             'targetLang' => $targetLangHi,
         ];
 
-        $targetFormat = '#.###.####0,###';
+        $protectionDto6 = new ContentProtectionDto(
+            'float',
+            'test-default',
+            '/\b([1-9]\d{0,2},){1}(\d{3},)*\d{3}\.\d+\b/u',
+            0,
+            '#,##0.###',
+            false,
+            '#.###.####0,###'
+        );
 
         yield 'target format #.###.####0,###' => [
             'number' => '1,212,312,345.78',
             'expected' => '<number type="float" name="test-default" source="1,212,312,345.78" iso="1212312345.78" target="12.123.12345,78"/>',
-            'sourceFormat' => $sourceFormat,
-            'targetFormat' => $targetFormat,
+            'protectionDto' => $protectionDto6,
             'targetLang' => $targetLangDe,
         ];
 
-        $sourceFormatKeepAsIs = new ContentRecognitionDto(
+        $protectionDtoKeepAsIs = new ContentProtectionDto(
             'float',
             'test-default',
             '/\b([1-9]\d{0,2},){1}(\d{3},)*\d{3}\.\d+\b/u',
             0,
             null,
             true,
-            1
+            null
         );
 
         yield 'date. keep as is' => [
             'number' => '123,456.78',
             'expected' => '<number type="float" name="test-default" source="123,456.78" iso="123,456.78" target="123,456.78"/>',
-            'sourceFormat' => $sourceFormatKeepAsIs,
-            'targetFormat' => $targetFormat,
+            'protectionDto' => $protectionDtoKeepAsIs,
             'targetLang' => $targetLangDe,
         ];
+    }
+
+    public function testExceptionOnEmptyFormat(): void {
+        $sourceLang = new editor_Models_Languages();
+        $sourceLang->setId(5);
+        $sourceLang->setRfc5646('en');
+
+        $targetLangDe = new editor_Models_Languages();
+        $targetLangDe->setId(0);
+        $targetLangDe->setRfc5646('de-DE');
+
+        $protectionDto = new ContentProtectionDto(
+            'float',
+            'test-default',
+            '/\b([1-9]\d{0,2},){1}(\d{3},)*\d{3}\.\d+\b/u',
+            0,
+            '#,##0.###',
+            false,
+            null
+        );
+        $repo = $this->createConfiguredMock(ContentProtectionRepository::class, []);
+
+        $this->expectException(LogicException::class);
+        (new FloatProtector($repo))->protect('1,234.01', $protectionDto, $sourceLang, $targetLangDe);
     }
 }

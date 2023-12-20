@@ -138,6 +138,10 @@ Ext.define('Editor.view.admin.contentProtection.outputMapping.CreateWindow', {
                                     {
                                         property: 'rowEnabled',
                                         value: true
+                                    },
+                                    {
+                                        property: 'kepAsIs',
+                                        value: false
                                     }
                                 ]
                             }

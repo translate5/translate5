@@ -60,7 +60,7 @@ use DOMText;
 use editor_Models_Import_FileParser_XmlParser as XmlParser;
 use editor_Models_Languages;
 use MittagQI\Translate5\ContentProtection\Model\ContentProtectionRepository;
-use MittagQI\Translate5\ContentProtection\Model\ContentRecognitionDto;
+use MittagQI\Translate5\ContentProtection\Model\ContentProtectionDto;
 use MittagQI\Translate5\ContentProtection\NumberProtection\NumberParsingException;
 use MittagQI\Translate5\ContentProtection\NumberProtection\Protector\AbstractProtector;
 use MittagQI\Translate5\ContentProtection\NumberProtection\Protector\DateProtector;
@@ -71,7 +71,9 @@ use MittagQI\Translate5\ContentProtection\NumberProtection\Protector\MacAddressP
 use MittagQI\Translate5\ContentProtection\NumberProtection\Protector\NumberProtectorInterface;
 use MittagQI\Translate5\ContentProtection\NumberProtection\Tag\NumberTag;
 use MittagQI\Translate5\Repository\LanguageRepository;
+use Zend_Registry;
 use ZfExtended_Factory;
+use ZfExtended_Logger;
 
 class NumberProtector implements ProtectorInterface
 {
@@ -86,12 +88,18 @@ class NumberProtector implements ProtectorInterface
     private DOMDocument $document;
 
     /**
+     * @var array<string, true>
+     */
+    private array $invalidRules = [];
+
+    /**
      * @param array<AbstractProtector> $protectors
      */
     public function __construct(
         array $protectors,
         private ContentProtectionRepository $numberRepository,
-        private LanguageRepository $languageRepository
+        private LanguageRepository $languageRepository,
+        private ZfExtended_Logger $logger
     ) {
         foreach ($protectors as $protector) {
             $this->protectors[$protector::getType()] = $protector;
@@ -121,9 +129,12 @@ class NumberProtector implements ProtectorInterface
         );
     }
 
-    public static function create(?ContentProtectionRepository $numberRepository = null): self
-    {
+    public static function create(
+        ?ContentProtectionRepository $numberRepository = null,
+        ?ZfExtended_Logger $logger = null
+    ): self {
         $numberRepository = $numberRepository ?: new ContentProtectionRepository();
+        $logger = $logger ?: Zend_Registry::get('logger')->cloneMe('translate5.content_protection');
 
         return new self(
             [
@@ -134,7 +145,8 @@ class NumberProtector implements ProtectorInterface
                 new MacAddressProtector($numberRepository),
             ],
             $numberRepository,
-            new LanguageRepository()
+            new LanguageRepository(),
+            $logger
         );
     }
 
@@ -239,13 +251,39 @@ class NumberProtector implements ProtectorInterface
 
         $tries = 0;
 
-        foreach ($this->numberRepository->getAll($sourceLang) as $langFormat) {
+        foreach ($this->numberRepository->getAll($sourceLang, $targetLang) as $protectionDto) {
+            // if we'll try to protect for example integers in a row like "string 12 45 67 string"
+            // then we'll need to do that in a couple of tries because in current case will get result as:
+            // string <number ... source="12" ... /> 145 <number ... source="67" ... /> string
             while ($tries++ < 2) {
-                if (!preg_match($langFormat->regex, $this->document->textContent)) {
+                if (!preg_match_all($protectionDto->regex, $this->document->textContent, $matches)) {
+                    $tries = 0;
+
+                    continue 2;
+                }
+
+                if (!$protectionDto->keepAsIs && empty($protectionDto->outputFormat)) {
+                    $this->loadXML(
+                        preg_replace(
+                            $protectionDto->regex,
+                            sprintf('<skip content="$%s"/>', $protectionDto->matchId),
+                            $this->getCurrentTextNode()
+                        )
+                    );
+
+                    if (!isset($this->invalidRules[$protectionDto->regex])) {
+                        $this->invalidRules[$protectionDto->regex] = true;
+                        $this->logger->warn(
+                            'E1585',
+                            'Input rule of type "{type}" and name "{name}" does not have appropriate output rule',
+                            ['type' => $protectionDto->type, 'name' => $protectionDto->name]
+                        );
+                    }
+
                     continue;
                 }
 
-                $this->processElement($this->document->documentElement, $langFormat, $sourceLang, $targetLang);
+                $this->processElement($this->document->documentElement, $protectionDto, $sourceLang, $targetLang);
 
                 // reloading document with potential new tags
                 $this->loadXML($this->getCurrentTextNode());
@@ -257,7 +295,7 @@ class NumberProtector implements ProtectorInterface
 
         preg_match('/<node>((.*(\n|\r\n)*.*)+)<\/node>/m', $text, $matches);
 
-        return $matches[1];
+        return preg_replace('/<skip content="(.+)"\/>/U', '$1', $matches[1]);
     }
 
     public function unprotect(string $content, bool $isSource): string
@@ -314,8 +352,8 @@ class NumberProtector implements ProtectorInterface
     }
 
     private function processElement(
-        DOMNode                  $element,
-        ContentRecognitionDto    $langFormat,
+        DOMNode $element,
+        ContentProtectionDto $langFormat,
         ?editor_Models_Languages $sourceLang,
         ?editor_Models_Languages $targetLang
     ): void {
@@ -343,8 +381,8 @@ class NumberProtector implements ProtectorInterface
     }
 
     private function protectNumbers(
-        DOMCharacterData         $text,
-        ContentRecognitionDto    $langFormat,
+        DOMCharacterData $text,
+        ContentProtectionDto $langFormat,
         ?editor_Models_Languages $sourceLang,
         ?editor_Models_Languages $targetLang
     ): bool {
@@ -379,9 +417,9 @@ class NumberProtector implements ProtectorInterface
     }
 
     private function protectNumber(
-        string                   $number,
-        string                   $wholeMatch,
-        ContentRecognitionDto    $langFormat,
+        string $number,
+        string $wholeMatch,
+        ContentProtectionDto $langFormat,
         ?editor_Models_Languages $sourceLang,
         ?editor_Models_Languages $targetLang
     ): iterable {

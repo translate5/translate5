@@ -133,11 +133,9 @@ class editor_Services_Connector_TagHandler_Xliff extends editor_Services_Connect
         bool $unprotectContent = false
     ): ?string {
         $this->hasRestoreErrors = false;
-        error_log(__METHOD__ . ': 1: ' . $resultString);
         //strip other then x|ex|bx|g|/g
         $resultString = strip_tags($this->replaceTagsWithContent($resultString), static::ALLOWED_TAGS);
 
-        error_log(__METHOD__ . ': 2: ' . $resultString);
         //since protectWhitespace should run on plain text nodes we have to call it before the internal tags are reapplied,
         // since then the text contains xliff tags and the xliff tags should not contain affected whitespace
         // this is triggered here with the parse call
@@ -154,11 +152,8 @@ class editor_Services_Connector_TagHandler_Xliff extends editor_Services_Connect
 
             return strip_tags($resultString);
         }
-        error_log(__METHOD__ . ': 3: ' . $target);
 
         $target = $this->utilities->internalTag->reapply2dMap($target, $this->map);
-
-        error_log(__METHOD__ . ': 4: ' . $target);
 
         return $this->replaceAdditionalTags($target, $this->mapCount);
     }
@@ -193,8 +188,6 @@ class editor_Services_Connector_TagHandler_Xliff extends editor_Services_Connect
         $addedTags = false;
         $shortTagNr = $mapCount;
 
-        error_log('replaceAdditionalTags: 1: ' . $segment);
-        
         $result = preg_replace_callback('#<(x|ex|bx|g|/g)[^>]*>#', function() use (&$shortTagNr, &$addedTags) {
             $addedTags = true;
             return $this->utilities->internalTag->makeAdditionalHtmlTag(++$shortTagNr);
@@ -209,7 +202,6 @@ class editor_Services_Connector_TagHandler_Xliff extends editor_Services_Connect
             // ]);
         }
 
-        error_log('replaceAdditionalTags: 2: ' . $result);
         return $result;
     }
 }

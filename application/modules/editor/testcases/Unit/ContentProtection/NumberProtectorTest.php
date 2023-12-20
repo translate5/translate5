@@ -54,13 +54,15 @@ namespace MittagQI\Translate5\Test\Unit\ContentProtection;
 
 use editor_Models_Languages;
 use MittagQI\Translate5\ContentProtection\Model\ContentProtectionRepository;
-use MittagQI\Translate5\ContentProtection\Model\ContentRecognitionDto;
+use MittagQI\Translate5\ContentProtection\Model\ContentProtectionDto;
+use MittagQI\Translate5\ContentProtection\NumberProtection\Protector\AbstractProtector;
 use MittagQI\Translate5\ContentProtection\NumberProtection\Protector\IPAddressProtector;
 use MittagQI\Translate5\ContentProtection\NumberProtection\Protector\NumberProtectorInterface;
 use MittagQI\Translate5\ContentProtection\NumberProtection\Tag\NumberTag;
 use MittagQI\Translate5\ContentProtection\NumberProtector;
 use MittagQI\Translate5\Repository\LanguageRepository;
 use PHPUnit\Framework\TestCase;
+use ZfExtended_Logger;
 
 class NumberProtectorTest extends TestCase
 {
@@ -73,8 +75,8 @@ class NumberProtectorTest extends TestCase
             }
 
             public function protect(
-                string                   $number,
-                ContentRecognitionDto    $languageFormat,
+                string $number,
+                ContentProtectionDto $protectionDto,
                 ?editor_Models_Languages $sourceLang,
                 ?editor_Models_Languages $targetLang
             ): string {
@@ -83,8 +85,9 @@ class NumberProtectorTest extends TestCase
         };
         $numberRepository = $this->createConfiguredMock(ContentProtectionRepository::class, []);
         $languageRepository = $this->createConfiguredMock(LanguageRepository::class, []);
+        $logger = $this->createConfiguredMock(ZfExtended_Logger::class, []);
 
-        $protector = new NumberProtector([$processor], $numberRepository, $languageRepository);
+        $protector = new NumberProtector([$processor], $numberRepository, $languageRepository, $logger);
 
         self::assertTrue($protector->hasEntityToProtect('text with number [2] in it'));
         self::assertTrue($protector->hasEntityToProtect('text with part of mac [aa:] in it'));
@@ -100,8 +103,8 @@ class NumberProtectorTest extends TestCase
             }
 
             public function protect(
-                string                   $number,
-                ContentRecognitionDto    $languageFormat,
+                string $number,
+                ContentProtectionDto $protectionDto,
                 ?editor_Models_Languages $sourceLang,
                 ?editor_Models_Languages $targetLang
             ): string {
@@ -110,8 +113,9 @@ class NumberProtectorTest extends TestCase
         };
         $numberRepository = $this->createConfiguredMock(ContentProtectionRepository::class, []);
         $languageRepository = $this->createConfiguredMock(LanguageRepository::class, []);
+        $logger = $this->createConfiguredMock(ZfExtended_Logger::class, []);
 
-        $protector = new NumberProtector([$processor], $numberRepository, $languageRepository);
+        $protector = new NumberProtector([$processor], $numberRepository, $languageRepository, $logger);
 
         $testNode = 'some sample text';
 
@@ -125,31 +129,77 @@ class NumberProtectorTest extends TestCase
         $sourceLang->setRfc5646('en');
 
         $getAll = function () {
-            yield new ContentRecognitionDto(
+            yield new ContentProtectionDto(
                 'ip-address',
                 'test-cheat',
                 '/some text/',
                 0,
                 '',
-                false,
-                0
+                true,
+                null
             );
         };
 
         $numberRepository = $this->createConfiguredMock(
             ContentProtectionRepository::class,
             [
-                'findOutputFormat' => null,
                 'getAll' => $getAll()
             ]
         );
         $languageRepository = $this->createConfiguredMock(LanguageRepository::class, ['find' => $sourceLang]);
+        $logger = $this->createConfiguredMock(ZfExtended_Logger::class, []);
 
-        $protector = new NumberProtector([new IPAddressProtector($numberRepository)], $numberRepository, $languageRepository);
+        $protector = new NumberProtector(
+            [new IPAddressProtector($numberRepository)],
+            $numberRepository,
+            $languageRepository,
+            $logger
+        );
 
         self::assertSame(
-            '1. Here we have <number type="ip-address" name="test-cheat" source="some text" iso="some text" target=""/> case',
+            '1. Here we have <number type="ip-address" name="test-cheat" source="some text" iso="some text" target="some text"/> case',
             $protector->protect('1. Here we have some text case', 5, 6)
+        );
+    }
+
+    public function testRuleWithoutOutputFormatHandling(): void
+    {
+        $sourceLang = new editor_Models_Languages();
+        $sourceLang->setId(5);
+        $sourceLang->setRfc5646('en');
+
+        $getAll = function () {
+            yield new ContentProtectionDto(
+                'date',
+                'test-no-output',
+                '/some text/',
+                0,
+                '',
+                false,
+                null
+            );
+        };
+
+        $numberRepository = $this->createConfiguredMock(
+            ContentProtectionRepository::class,
+            [
+                'getAll' => $getAll()
+            ]
+        );
+        $languageRepository = $this->createConfiguredMock(LanguageRepository::class, ['find' => $sourceLang]);
+        $logger = $this->createConfiguredMock(ZfExtended_Logger::class, []);
+        $logger->expects($this->once())->method('__call')->with('warn');
+
+        $protector = new NumberProtector(
+            [new IPAddressProtector($numberRepository)],
+            $numberRepository,
+            $languageRepository,
+            $logger
+        );
+
+        self::assertSame(
+            '1. Here we have some text some text some text case',
+            $protector->protect('1. Here we have some text some text some text case', 5, 6)
         );
     }
 

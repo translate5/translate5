@@ -80,9 +80,9 @@ class FloatObject
         return new self($formater->parse($number), mb_strlen(explode('.', $number)[1]));
     }
 
-    public function format(string $format): string
+    public function format(string $format, ?string $locale = null): string
     {
-        $formater = numfmt_create('en', NumberFormatter::DECIMAL);
+        $formater = numfmt_create($locale ?: 'en', NumberFormatter::DECIMAL);
         if (!empty($format)) {
             $this->setFormat($format, $formater);
         }

@@ -55,7 +55,7 @@ namespace MittagQI\Translate5\Test\Functional\ContentProtection;
 use editor_Models_Languages;
 use MittagQI\Translate5\ContentProtection\Model\ContentProtectionRepository;
 use MittagQI\Translate5\ContentProtection\Model\ContentRecognition;
-use MittagQI\Translate5\ContentProtection\Model\ContentRecognitionDto;
+use MittagQI\Translate5\ContentProtection\Model\ContentProtectionDto;
 use MittagQI\Translate5\ContentProtection\Model\InputMapping;
 use MittagQI\Translate5\ContentProtection\Model\OutputMapping;
 use MittagQI\Translate5\ContentProtection\NumberProtection\Protector\DateProtector;
@@ -75,32 +75,42 @@ class NumberProtectorTest extends TestCase
         $langDe = ZfExtended_Factory::get(editor_Models_Languages::class);
         $langDe->loadByRfc5646('de');
 
-        $contentRecognition = ZfExtended_Factory::get(ContentRecognition::class);
-        $contentRecognition->setName('test');
-        $contentRecognition->setRegex('/^\d+ USD$/');
-        $contentRecognition->setType(IntegerProtector::getType());
-        $contentRecognition->setKeepAsIs(false);
-        $contentRecognition->save();
-        $contentRecognition->refresh();
+        $contentRecognition1 = ZfExtended_Factory::get(ContentRecognition::class);
+        $contentRecognition1->setName('test usd');
+        $contentRecognition1->setRegex('/^\d+ USD$/');
+        $contentRecognition1->setType(IntegerProtector::getType());
+        $contentRecognition1->setEnabled(true);
+        $contentRecognition1->setKeepAsIs(false);
+        $contentRecognition1->save();
+
+        $contentRecognition2 = ZfExtended_Factory::get(ContentRecognition::class);
+        $contentRecognition2->setName('test eur');
+        $contentRecognition2->setRegex('/^\d+ EUR/');
+        $contentRecognition2->setType(IntegerProtector::getType());
+        $contentRecognition2->setEnabled(true);
+        $contentRecognition2->setKeepAsIs(false);
+        $contentRecognition2->setFormat('# EUR');
+        $contentRecognition2->save();
 
         $inputMapping = ZfExtended_Factory::get(InputMapping::class);
         $inputMapping->setLanguageId($langEn->getId());
-        $inputMapping->setContentRecognitionId($contentRecognition->getId());
+        $inputMapping->setContentRecognitionId($contentRecognition1->getId());
         $inputMapping->setPriority(1000);
         $inputMapping->save();
 
         $outputMapping = ZfExtended_Factory::get(OutputMapping::class);
         $outputMapping->setLanguageId($langDe->getId());
-        $outputMapping->setContentRecognitionId($contentRecognition->getId());
-        $outputMapping->setFormat('# EUR');
+        $outputMapping->setInputContentRecognitionId($contentRecognition1->getId());
+        $outputMapping->setOutputContentRecognitionId($contentRecognition2->getId());
         $outputMapping->save();
 
         $protected = NumberProtector::create()->protect('12345 USD', (int)$langEn->getId(), (int)$langDe->getId());
 
-        $contentRecognition->delete();
+        $contentRecognition1->delete();
+        $contentRecognition2->delete();
 
         self::assertSame(
-            '<number type="integer" name="test" source="12345 USD" iso="12345" target="12345 EUR"/>',
+            '<number type="integer" name="test usd" source="12345 USD" iso="12345" target="12345 EUR"/>',
             $protected
         );
     }
@@ -116,32 +126,42 @@ class NumberProtectorTest extends TestCase
         $langDeAt = ZfExtended_Factory::get(editor_Models_Languages::class);
         $langDeAt->loadByRfc5646('de-at');
 
-        $contentRecognition = ZfExtended_Factory::get(ContentRecognition::class);
-        $contentRecognition->setName('test');
-        $contentRecognition->setRegex('/^\d+ USD$/');
-        $contentRecognition->setType(IntegerProtector::getType());
-        $contentRecognition->setKeepAsIs(false);
-        $contentRecognition->save();
-        $contentRecognition->refresh();
+        $contentRecognition1 = ZfExtended_Factory::get(ContentRecognition::class);
+        $contentRecognition1->setName('test usd');
+        $contentRecognition1->setRegex('/^\d+ USD$/');
+        $contentRecognition1->setType(IntegerProtector::getType());
+        $contentRecognition1->setEnabled(true);
+        $contentRecognition1->setKeepAsIs(false);
+        $contentRecognition1->save();
+
+        $contentRecognition2 = ZfExtended_Factory::get(ContentRecognition::class);
+        $contentRecognition2->setName('test eur');
+        $contentRecognition2->setRegex('/^\d+ EUR/');
+        $contentRecognition2->setType(IntegerProtector::getType());
+        $contentRecognition2->setEnabled(true);
+        $contentRecognition2->setKeepAsIs(false);
+        $contentRecognition2->setFormat('# EUR');
+        $contentRecognition2->save();
 
         $inputMapping = ZfExtended_Factory::get(InputMapping::class);
         $inputMapping->setLanguageId($langEn->getId());
-        $inputMapping->setContentRecognitionId($contentRecognition->getId());
+        $inputMapping->setContentRecognitionId($contentRecognition1->getId());
         $inputMapping->setPriority(1000);
         $inputMapping->save();
 
         $outputMapping = ZfExtended_Factory::get(OutputMapping::class);
         $outputMapping->setLanguageId($langDe->getId());
-        $outputMapping->setContentRecognitionId($contentRecognition->getId());
-        $outputMapping->setFormat('# EUR');
+        $outputMapping->setInputContentRecognitionId($contentRecognition1->getId());
+        $outputMapping->setOutputContentRecognitionId($contentRecognition2->getId());
         $outputMapping->save();
 
         $protected = NumberProtector::create()->protect('12345 USD', (int) $langEn->getId(), (int) $langDeAt->getId());
 
-        $contentRecognition->delete();
+        $contentRecognition1->delete();
+        $contentRecognition2->delete();
 
         self::assertSame(
-            '<number type="integer" name="test" source="12345 USD" iso="12345" target="12345 EUR"/>',
+            '<number type="integer" name="test usd" source="12345 USD" iso="12345" target="12345 EUR"/>',
             $protected
         );
     }
@@ -190,7 +210,7 @@ class NumberProtectorTest extends TestCase
 
         self::assertSame(
             'string 1.23e12 string',
-            $protector->unprotect('string <number type="float" name="test" source="1.23e12" iso="1.23e12" target=""/> string', false)
+            $protector->unprotect('string <number type="float" name="test" source="1.23e12" iso="1.23e12" target="1.23e12"/> string', false)
         );
 
         self::assertSame(
@@ -412,11 +432,11 @@ class NumberProtectorTest extends TestCase
 
         yield [
             'string' => "string 1.23e12 string",
-            'expected' => 'string <number type="float" name="default exponent" source="1.23e12" iso="1.23e12" target=""/> string'
+            'expected' => 'string <number type="float" name="default exponent" source="1.23e12" iso="1.23e12" target="1.23e12"/> string'
         ];
         yield [
             'string' => "string 1.13e-15 string",
-            'expected' => 'string <number type="float" name="default exponent" source="1.13e-15" iso="1.13e-15" target=""/> string'
+            'expected' => 'string <number type="float" name="default exponent" source="1.13e-15" iso="1.13e-15" target="1.13e-15"/> string'
         ];
 
         yield [
@@ -458,23 +478,13 @@ class NumberProtectorTest extends TestCase
         ];
 
         yield [
-            'string' => 'string 11 234 567 string',
-            'expected' => 'string <number type="integer" name="default generic with not standard separator" source="11 234 567" iso="11234567" target="11234567"/> string'
-        ];
-
-        yield [
-            'string' => 'string 1 234 567 string',
-            'expected' => 'string <number type="integer" name="default generic with not standard separator" source="1 234 567" iso="1234567" target="1234567"/> string'
-        ];
-
-        yield [
             'string' => 'string 1˙234˙567 string',
-            'expected' => 'string <number type="integer" name="default generic with not standard separator" source="1˙234˙567" iso="1234567" target="1234567"/> string'
+            'expected' => 'string <number type="integer" name="default generic with dot above separator" source="1˙234˙567" iso="1234567" target="1234567"/> string'
         ];
 
         yield [
             'string' => "string 1'234'567 string",
-            'expected' => 'string <number type="integer" name="default generic with not standard separator" source="1\'234\'567" iso="1234567" target="1234567"/> string'
+            'expected' => 'string <number type="integer" name="default generic with apostrophe separator" source="1\'234\'567" iso="1234567" target="1234567"/> string'
         ];
 
         yield [
@@ -504,19 +514,19 @@ class NumberProtectorTest extends TestCase
     {
         yield [
             'string' => 'string 127.0.0.1 string',
-            'expected' => 'string <number type="ip-address" name="default" source="127.0.0.1" iso="127.0.0.1" target=""/> string'
+            'expected' => 'string <number type="ip-address" name="default" source="127.0.0.1" iso="127.0.0.1" target="127.0.0.1"/> string'
         ];
         yield [
             'string' => 'string 255.255.255.255 string',
-            'expected' => 'string <number type="ip-address" name="default" source="255.255.255.255" iso="255.255.255.255" target=""/> string'
+            'expected' => 'string <number type="ip-address" name="default" source="255.255.255.255" iso="255.255.255.255" target="255.255.255.255"/> string'
         ];
         yield [
             'string' => 'string 0.0.0.0 string',
-            'expected' => 'string <number type="ip-address" name="default" source="0.0.0.0" iso="0.0.0.0" target=""/> string'
+            'expected' => 'string <number type="ip-address" name="default" source="0.0.0.0" iso="0.0.0.0" target="0.0.0.0"/> string'
         ];
         yield [
             'string' => 'string 1.1.1.1 string',
-            'expected' => 'string <number type="ip-address" name="default" source="1.1.1.1" iso="1.1.1.1" target=""/> string'
+            'expected' => 'string <number type="ip-address" name="default" source="1.1.1.1" iso="1.1.1.1" target="1.1.1.1"/> string'
         ];
     }
 
@@ -548,23 +558,23 @@ class NumberProtectorTest extends TestCase
     {
         yield [
             'string' => 'string 01:02:03:04:ab:cd string',
-            'expected' => 'string <number type="mac-address" name="default" source="01:02:03:04:ab:cd" iso="01:02:03:04:ab:cd" target=""/> string'
+            'expected' => 'string <number type="mac-address" name="default" source="01:02:03:04:ab:cd" iso="01:02:03:04:ab:cd" target="01:02:03:04:ab:cd"/> string'
         ];
         yield [
             'string' => 'string 01-02-03-04-ab-cd string',
-            'expected' => 'string <number type="mac-address" name="default" source="01-02-03-04-ab-cd" iso="01-02-03-04-ab-cd" target=""/> string'
+            'expected' => 'string <number type="mac-address" name="default" source="01-02-03-04-ab-cd" iso="01-02-03-04-ab-cd" target="01-02-03-04-ab-cd"/> string'
         ];
         yield [
             'string' => 'string 00:00:00:00:00:00 string',
-            'expected' => 'string <number type="mac-address" name="default" source="00:00:00:00:00:00" iso="00:00:00:00:00:00" target=""/> string'
+            'expected' => 'string <number type="mac-address" name="default" source="00:00:00:00:00:00" iso="00:00:00:00:00:00" target="00:00:00:00:00:00"/> string'
         ];
         yield [
             'string' => 'string FF:FF:FF:FF:FF:FF string',
-            'expected' => 'string <number type="mac-address" name="default" source="FF:FF:FF:FF:FF:FF" iso="FF:FF:FF:FF:FF:FF" target=""/> string'
+            'expected' => 'string <number type="mac-address" name="default" source="FF:FF:FF:FF:FF:FF" iso="FF:FF:FF:FF:FF:FF" target="FF:FF:FF:FF:FF:FF"/> string'
         ];
         yield [
             'string' => 'string FF-11-FF-33-FF-44 string',
-            'expected' => 'string <number type="mac-address" name="default" source="FF-11-FF-33-FF-44" iso="FF-11-FF-33-FF-44" target=""/> string'
+            'expected' => 'string <number type="mac-address" name="default" source="FF-11-FF-33-FF-44" iso="FF-11-FF-33-FF-44" target="FF-11-FF-33-FF-44"/> string'
         ];
     }
 
@@ -679,17 +689,16 @@ class NumberProtectorTest extends TestCase
 
         $getAll = function ($select) use ($dbContentRecognition) {
             foreach ($dbContentRecognition->fetchAll($select) as $formatData) {
-                yield ContentRecognitionDto::fromRow($formatData);
-            }
-        };
+                $formatData = $formatData->toArray();
+                $formatData['outputFormat'] = match ($formatData['type']) {
+                    DateProtector::getType() => 'Y-m-d',
+                    FloatProtector::getType() => '#.#',
+                    IntegerProtector::getType() => '#',
+                    default => null
+                };
 
-        $findOutputFormat = function () {
-            return match (func_get_args()[1]) {
-                DateProtector::getType() => 'Y-m-d',
-                FloatProtector::getType() => '#.#',
-                IntegerProtector::getType() => '#',
-                default => null
-            };
+                yield ContentProtectionDto::fromRow($formatData);
+            }
         };
 
         $numberRepository = $this->createConfiguredMock(
@@ -698,7 +707,6 @@ class NumberProtectorTest extends TestCase
                 'getAll' => $getAll($select),
             ]
         );
-        $numberRepository->method('findOutputFormat')->will($this->returnCallback($findOutputFormat));
 
         return $numberRepository;
     }

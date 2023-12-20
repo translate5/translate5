@@ -53,7 +53,8 @@ declare(strict_types=1);
 namespace MittagQI\Translate5\Test\Unit\ContentProtection\NumberProtection;
 
 use editor_Models_Languages;
-use MittagQI\Translate5\ContentProtection\Model\ContentRecognitionDto;
+use LogicException;
+use MittagQI\Translate5\ContentProtection\Model\ContentProtectionDto;
 use MittagQI\Translate5\ContentProtection\Model\ContentProtectionRepository;
 use MittagQI\Translate5\ContentProtection\NumberProtection\NumberParsingException;
 use MittagQI\Translate5\ContentProtection\NumberProtection\Protector\DateProtector;
@@ -65,31 +66,30 @@ class DateProtectorTest extends TestCase
      * @dataProvider defaultDataToProtect
      */
     public function testProtectDefaultFormats(
-        string                  $number,
-        string                  $expected,
-        ContentRecognitionDto   $sourceFormat,
-        ?string                 $targetFormat,
+        string $number,
+        string $expected,
+        ContentProtectionDto $protectionDto,
         editor_Models_Languages $targetLang
     ): void {
         $sourceLang = new editor_Models_Languages();
         $sourceLang->setId(5);
         $sourceLang->setRfc5646('en');
-        $repo = $this->createConfiguredMock(ContentProtectionRepository::class, ['findOutputFormat' => $targetFormat]);
-        $protected = (new DateProtector($repo))->protect($number, $sourceFormat, $sourceLang, $targetLang);
+        $repo = $this->createConfiguredMock(ContentProtectionRepository::class, []);
+        $protected = (new DateProtector($repo))->protect($number, $protectionDto, $sourceLang, $targetLang);
 
         self::assertSame($expected, $protected);
     }
 
     public function defaultDataToProtect(): iterable
     {
-        $sourceFormat = new ContentRecognitionDto(
+        $protectionDto = new ContentProtectionDto(
             'date',
             'test-default',
             '/\b\d{4}\/(0[1-9]|[1-2][0-9]|3[0-1]|[1-9])\/(0[1-9]|1[0-2]|[1-9])\b/',
             0,
             'Y/d/m',
             false,
-            1
+            'd.m.y'
         );
 
         $targetLangDe = new editor_Models_Languages();
@@ -99,44 +99,48 @@ class DateProtectorTest extends TestCase
         yield 'date' => [
             'number' => '2023/18/07',
             'expected' => '<number type="date" name="test-default" source="2023/18/07" iso="2023-07-18" target="18.07.23"/>',
-            'sourceFormat' => $sourceFormat,
-            'targetFormat' => null,
+            'protectionDto' => $protectionDto,
             'targetLang' => $targetLangDe,
         ];
 
         yield 'target lang de-DE' => [
             'number' => '2023/18/07',
             'expected' => '<number type="date" name="test-default" source="2023/18/07" iso="2023-07-18" target="18.07.23"/>',
-            'sourceFormat' => $sourceFormat,
-            'targetFormat' => null,
+            'protectionDto' => $protectionDto,
             'targetLang' => $targetLangDe,
         ];
 
-        $targetFormat = 'Y*m*d';
+        $protectionDto2 = new ContentProtectionDto(
+            'date',
+            'test-default',
+            '/\b\d{4}\/(0[1-9]|[1-2][0-9]|3[0-1]|[1-9])\/(0[1-9]|1[0-2]|[1-9])\b/',
+            0,
+            'Y/d/m',
+            false,
+            'Y*m*d'
+        );
 
         yield 'date. target format Y*m*d' => [
             'number' => '2023/18/07',
             'expected' => '<number type="date" name="test-default" source="2023/18/07" iso="2023-07-18" target="2023*07*18"/>',
-            'sourceFormat' => $sourceFormat,
-            'targetFormat' => $targetFormat,
+            'protectionDto' => $protectionDto2,
             'targetLang' => $targetLangDe,
         ];
 
-        $sourceFormatKeepAsIs = new ContentRecognitionDto(
+        $protectionDtoKeepAsIs = new ContentProtectionDto(
             'date',
             'test-default',
             '/\b\d{4}\/(0[1-9]|[1-2][0-9]|3[0-1]|[1-9])\/(0[1-9]|1[0-2]|[1-9])\b/',
             0,
             'Y/d/m',
             true,
-            1
+            null
         );
 
         yield 'date. keep as is' => [
             'number' => '2023/18/07',
-            'expected' => '<number type="date" name="test-default" source="2023/18/07" iso="2023/18/07" target=""/>',
-            'sourceFormat' => $sourceFormatKeepAsIs,
-            'targetFormat' => $targetFormat,
+            'expected' => '<number type="date" name="test-default" source="2023/18/07" iso="2023/18/07" target="2023/18/07"/>',
+            'protectionDto' => $protectionDtoKeepAsIs,
             'targetLang' => $targetLangDe,
         ];
     }
@@ -150,18 +154,42 @@ class DateProtectorTest extends TestCase
         $targetLangDe->setId(0);
         $targetLangDe->setRfc5646('de-DE');
 
-        $sourceFormat = new ContentRecognitionDto(
+        $protectionDto = new ContentProtectionDto(
             'date',
             'test-default',
             '/\b\d{4}\/(0[1-9]|[1-2][0-9]|3[0-1]|[1-9])\/(0[1-9]|1[0-2]|[1-9])\b/',
             0,
             'Y/d/m',
             false,
-            1
+            'Y-m-d'
         );
-        $repo = $this->createConfiguredMock(ContentProtectionRepository::class, ['findOutputFormat' => null]);
+        $repo = $this->createConfiguredMock(ContentProtectionRepository::class, []);
 
         $this->expectException(NumberParsingException::class);
-        (new DateProtector($repo))->protect('2023/18/13', $sourceFormat, $sourceLang, $targetLangDe);
+        (new DateProtector($repo))->protect('2023/18/13', $protectionDto, $sourceLang, $targetLangDe);
+    }
+
+    public function testExceptionOnEmptyFormat(): void {
+        $sourceLang = new editor_Models_Languages();
+        $sourceLang->setId(5);
+        $sourceLang->setRfc5646('en');
+
+        $targetLangDe = new editor_Models_Languages();
+        $targetLangDe->setId(0);
+        $targetLangDe->setRfc5646('de-DE');
+
+        $protectionDto = new ContentProtectionDto(
+            'date',
+            'test-default',
+            '/\b\d{4}\/(0[1-9]|[1-2][0-9]|3[0-1]|[1-9])\/(0[1-9]|1[0-2]|[1-9])\b/',
+            0,
+            'Y/d/m',
+            false,
+            null
+        );
+        $repo = $this->createConfiguredMock(ContentProtectionRepository::class, []);
+
+        $this->expectException(LogicException::class);
+        (new DateProtector($repo))->protect('2023/18/01', $protectionDto, $sourceLang, $targetLangDe);
     }
 }

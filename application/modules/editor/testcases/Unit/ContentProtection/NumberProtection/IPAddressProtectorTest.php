@@ -52,7 +52,7 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\Test\Unit\ContentProtection\NumberProtection;
 
-use MittagQI\Translate5\ContentProtection\Model\ContentRecognitionDto;
+use MittagQI\Translate5\ContentProtection\Model\ContentProtectionDto;
 use MittagQI\Translate5\ContentProtection\Model\ContentProtectionRepository;
 use MittagQI\Translate5\ContentProtection\NumberProtection\Protector\IPAddressProtector;
 use PHPUnit\Framework\TestCase;
@@ -67,19 +67,19 @@ class IPAddressProtectorTest extends TestCase
         $targetLang = new \editor_Models_Languages();
         $targetLang->setId(6);
         $targetLang->setRfc5646('de');
-        $repo = $this->createConfiguredMock(ContentProtectionRepository::class, ['findOutputFormat' => null]);
-        $sourceFormat = new ContentRecognitionDto(
+        $repo = $this->createConfiguredMock(ContentProtectionRepository::class, []);
+        $sourceFormat = new ContentProtectionDto(
             'ip-address',
             'test-default',
             '',
             0,
             '',
-            false,
-            0
+            true,
+            null
         );
 
         self::assertSame(
-            '<number type="ip-address" name="test-default" source="127.0.0.1" iso="127.0.0.1" target=""/>',
+            '<number type="ip-address" name="test-default" source="127.0.0.1" iso="127.0.0.1" target="127.0.0.1"/>',
             (new IPAddressProtector($repo))->protect('127.0.0.1', $sourceFormat, $sourceLang, $targetLang)
         );
     }

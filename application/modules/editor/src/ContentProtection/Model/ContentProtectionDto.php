@@ -50,38 +50,41 @@ END LICENSE AND COPYRIGHT
 */
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\ContentProtection\Model\Validation;
+namespace MittagQI\Translate5\ContentProtection\Model;
 
-use MittagQI\Translate5\ContentProtection\Model\ContentRecognition;
-use Zend_Validate_Abstract;
-use ZfExtended_Factory;
+use Zend_Db_Table_Row;
 
-class OutputRecognitionShouldBeOfSameTypeValidator extends Zend_Validate_Abstract
+/**
+ * @property-read string $type
+ * @property-read string $name
+ * @property-read string $regex
+ * @property-read int $matchId
+ * @property-read string|null $format
+ * @property-read bool $keepAsIs
+ * @property-read int $priority
+ */
+class ContentProtectionDto
 {
-    private const INVALID = 'invalid';
+    public function __construct(
+        public string $type,
+        public string $name,
+        public string $regex,
+        public int $matchId,
+        public ?string $format,
+        public bool $keepAsIs,
+        public ?string $outputFormat,
+    ) {}
 
-    protected $_messageTemplates = [
-        self::INVALID => "Die Ausgaberegel sollte vom gleichen Typ sein wie die Eingaberegel",
-    ];
-
-    public function isValid($value, array $context = [])
+    public static function fromRow(array $row): self
     {
-        $valid = true;
-        $this->_setValue($value);
-
-        $contentRecognition = ZfExtended_Factory::get(ContentRecognition::class);
-
-        $contentRecognition->load($context['inputContentRecognitionId']);
-        $inputType = $contentRecognition->getType();
-
-        $contentRecognition->load($context['outputContentRecognitionId']);
-        $outputType = $contentRecognition->getType();
-
-        if ($inputType !== $outputType) {
-            $valid = false;
-            $this->_error(self::INVALID);
-        }
-
-        return $valid;
+        return new self(
+            $row['type'],
+            $row['name'],
+            $row['regex'],
+            (int) $row['matchId'],
+            $row['format'],
+            (bool) $row['keepAsIs'],
+            $row['outputFormat'],
+        );
     }
 }

@@ -417,7 +417,7 @@ class FloatObjectTest extends TestCase
      */
     public function testFormat(float $float, string $locale, ?string $format, string $expected): void
     {
-        self::assertEquals($expected, FloatObject::parse((string)$float)->format($locale, $format));
+        self::assertEquals($expected, FloatObject::parse((string)$float)->format($format, $locale));
     }
 
     public function formatProvider(): iterable
@@ -425,19 +425,19 @@ class FloatObjectTest extends TestCase
         yield [
             'float' => 1234567.123456,
             'locale' => 'en',
-            'format' => null,
+            'format' => '#,##0.#',
             'expected' => '1,234,567.123456'
         ];
         yield [
             'float' => 1234567.123456,
             'locale' => 'ar_EG',
-            'format' => null,
+            'format' => '#٬##0٫#',
             'expected' => '١٬٢٣٤٬٥٦٧٫١٢٣٤٥٦'
         ];
         yield [
             'float' => 1234567.123456,
             'locale' => 'hi-IN',
-            'format' => null,
+            'format' => '#,##,##0.#',
             'expected' => '12,34,567.123456'
         ];
 

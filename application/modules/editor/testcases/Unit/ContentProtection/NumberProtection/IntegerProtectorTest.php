@@ -53,7 +53,7 @@ declare(strict_types=1);
 namespace MittagQI\Translate5\Test\Unit\ContentProtection\NumberProtection;
 
 use editor_Models_Languages;
-use MittagQI\Translate5\ContentProtection\Model\ContentRecognitionDto;
+use MittagQI\Translate5\ContentProtection\Model\ContentProtectionDto;
 use MittagQI\Translate5\ContentProtection\Model\ContentProtectionRepository;
 use MittagQI\Translate5\ContentProtection\NumberProtection\Protector\IntegerProtector;
 use PHPUnit\Framework\TestCase;
@@ -64,43 +64,39 @@ class IntegerProtectorTest extends TestCase
      * @dataProvider defaultDataToProtect
      */
     public function testProtectDefaultFormats(
-        string                   $number,
-        string                   $expected,
-        ContentRecognitionDto    $sourceFormat,
-        ?string                  $targetFormat,
+        string $number,
+        string $expected,
+        ContentProtectionDto $protectionDto,
         ?editor_Models_Languages $targetLang
     ): void {
         $sourceLang = new editor_Models_Languages();
         $sourceLang->setId(5);
         $sourceLang->setRfc5646('en');
-        $repo = $this->createConfiguredMock(ContentProtectionRepository::class,
-            ['findOutputFormat' => $targetFormat]
-        );
-        $protected = (new IntegerProtector($repo))->protect($number, $sourceFormat, $sourceLang, $targetLang);
+        $repo = $this->createConfiguredMock(ContentProtectionRepository::class, []);
+        $protected = (new IntegerProtector($repo))->protect($number, $protectionDto, $sourceLang, $targetLang);
 
         self::assertSame($expected, $protected);
     }
 
     public function defaultDataToProtect(): iterable
     {
-        $sourceFormat = new ContentRecognitionDto(
+        $protectionDto = new ContentProtectionDto(
             'integer',
             'test-default',
             '/\b[1-9]\d{0,3}(,)?(\d{4}\1)+\d{4}\b/u',
             0,
             null,
             false,
-            1
+            '#'
         );
         $targetLangDe = new editor_Models_Languages();
         $targetLangDe->setId(0);
         $targetLangDe->setRfc5646('de');
 
-        yield 'float' => [
+        yield 'integer with comma separator' => [
             'number' => '123,456',
             'expected' => '<number type="integer" name="test-default" source="123,456" iso="123456" target="123456"/>',
-            'sourceFormat' => $sourceFormat,
-            'targetFormat' => null,
+            'protectionDto' => $protectionDto,
             'targetLang' => $targetLangDe,
         ];
 
@@ -108,39 +104,54 @@ class IntegerProtectorTest extends TestCase
         $targetLangHi->setId(0);
         $targetLangHi->setRfc5646('hi_IN');
 
+        $protectionDto1 = new ContentProtectionDto(
+            'integer',
+            'test-default',
+            '/\b[1-9]\d{0,3}(,)?(\d{4}\1)+\d{4}\b/u',
+            0,
+            null,
+            false,
+            '#.##.##0'
+        );
+
         yield 'target lang hi_IN' => [
             'number' => '123,456',
-            'expected' => '<number type="integer" name="test-default" source="123,456" iso="123456" target="123456"/>',
-            'sourceFormat' => $sourceFormat,
-            'targetFormat' => null,
+            'expected' => '<number type="integer" name="test-default" source="123,456" iso="123456" target="1.23.456"/>',
+            'protectionDto' => $protectionDto1,
             'targetLang' => $targetLangHi,
         ];
 
-        $targetFormat = '#,###,####0.###';
+        $protectionDto2 = new ContentProtectionDto(
+            'integer',
+            'test-default',
+            '/\b[1-9]\d{0,3}(,)?(\d{4}\1)+\d{4}\b/u',
+            0,
+            null,
+            false,
+            '#,###,####0.###'
+        );
 
         yield 'target format #,###,####0.###' => [
             'number' => '1,212,312,345',
             'expected' => '<number type="integer" name="test-default" source="1,212,312,345" iso="1212312345" target="12,123,12345"/>',
-            'sourceFormat' => $sourceFormat,
-            'targetFormat' => $targetFormat,
+            'protectionDto' => $protectionDto2,
             'targetLang' => $targetLangDe,
         ];
 
-        $sourceFormatKeepAsIs = new ContentRecognitionDto(
+        $protectionDtoKeepAsIs = new ContentProtectionDto(
             'integer',
             'test-default',
             '/\b[1-9]\d{0,3}(,)?(\d{4}\1)+\d{4}\b/u',
             0,
             null,
             true,
-            1
+            null
         );
 
         yield 'keep as is' => [
             'number' => '123,456',
-            'expected' => '<number type="integer" name="test-default" source="123,456" iso="123,456" target=""/>',
-            'sourceFormat' => $sourceFormatKeepAsIs,
-            'targetFormat' => $targetFormat,
+            'expected' => '<number type="integer" name="test-default" source="123,456" iso="123,456" target="123,456"/>',
+            'protectionDto' => $protectionDtoKeepAsIs,
             'targetLang' => $targetLangDe,
         ];
     }

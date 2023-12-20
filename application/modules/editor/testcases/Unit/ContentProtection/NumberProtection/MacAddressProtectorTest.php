@@ -52,7 +52,7 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\Test\Unit\ContentProtection\NumberProtection;
 
-use MittagQI\Translate5\ContentProtection\Model\ContentRecognitionDto;
+use MittagQI\Translate5\ContentProtection\Model\ContentProtectionDto;
 use MittagQI\Translate5\ContentProtection\Model\ContentProtectionRepository;
 use MittagQI\Translate5\ContentProtection\NumberProtection\Protector\MacAddressProtector;
 use PHPUnit\Framework\TestCase;
@@ -67,19 +67,19 @@ class MacAddressProtectorTest extends TestCase
         $targetLang = new \editor_Models_Languages();
         $targetLang->setId(5);
         $targetLang->setRfc5646('de');
-        $repo = $this->createConfiguredMock(ContentProtectionRepository::class, ['findOutputFormat' => null]);
-        $sourceFormat = new ContentRecognitionDto(
+        $repo = $this->createConfiguredMock(ContentProtectionRepository::class, []);
+        $sourceFormat = new ContentProtectionDto(
             'mac-address',
             'test-default',
             '',
             0,
             '',
             true,
-            0
+            null
         );
 
         self::assertSame(
-            '<number type="mac-address" name="test-default" source="aa:bb:cc:11:22:33" iso="aa:bb:cc:11:22:33" target=""/>',
+            '<number type="mac-address" name="test-default" source="aa:bb:cc:11:22:33" iso="aa:bb:cc:11:22:33" target="aa:bb:cc:11:22:33"/>',
             (new MacAddressProtector($repo))->protect('aa:bb:cc:11:22:33', $sourceFormat, $sourceLang, $targetLang)
         );
     }

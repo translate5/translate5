@@ -53,15 +53,14 @@ declare(strict_types=1);
 namespace MittagQI\Translate5\ContentProtection\NumberProtection\Protector;
 
 use editor_Models_Languages;
+use LogicException;
 use MittagQI\Translate5\ContentProtection\Model\ContentProtectionRepository;
-use MittagQI\Translate5\ContentProtection\Model\ContentRecognitionDto;
+use MittagQI\Translate5\ContentProtection\Model\ContentProtectionDto;
 use MittagQI\Translate5\ContentProtection\NumberProtection\NumberParsingException;
 use MittagQI\Translate5\ContentProtection\NumberProtector;
 
 abstract class AbstractProtector implements NumberProtectorInterface
 {
-    private array $formatsCache = [];
-
     public function __construct(protected ContentProtectionRepository $formatRepository)
     {
     }
@@ -83,13 +82,21 @@ abstract class AbstractProtector implements NumberProtectorInterface
      */
     public function protect(
         string $number,
-        ContentRecognitionDto $languageFormat,
+        ContentProtectionDto $protectionDto,
         editor_Models_Languages $sourceLang,
         editor_Models_Languages $targetLang
     ): string {
-        $targetFormat = $this->getFormat($targetLang, $languageFormat);
+        if (!$protectionDto->keepAsIs && empty($protectionDto->outputFormat)) {
+            throw new LogicException(
+                sprintf(
+                    'Input rule of type "%s" and name "%s" does not have appropriate output rule',
+                    $protectionDto->type,
+                    $protectionDto->name
+                )
+            );
+        }
 
-        return $this->composeNumberTag($number, $languageFormat, $targetLang, $targetFormat);
+        return $this->composeNumberTag($number, $protectionDto, $targetLang);
     }
 
     /**
@@ -97,29 +104,16 @@ abstract class AbstractProtector implements NumberProtectorInterface
      */
     protected function composeNumberTag(
         string $number,
-        ContentRecognitionDto $sourceFormat,
-        editor_Models_Languages $targetLang,
-        string $targetFormat
+        ContentProtectionDto $protectionDto,
+        editor_Models_Languages $targetLang
     ): string {
         return sprintf(
             $this->tagFormat(),
             static::getType(),
-            htmlspecialchars($sourceFormat->name),
+            htmlspecialchars($protectionDto->name),
             $number,
             $number,
             $number
         );
-    }
-
-    private function getFormat(editor_Models_Languages $targetLang, ContentRecognitionDto $languageFormat): ?string
-    {
-        $key = "{$targetLang->getId()}:{$languageFormat->type}:{$languageFormat->name}";
-        if (!isset($this->formatsCache[$key])) {
-            $this->formatsCache[$key] = $this
-                ->formatRepository
-                ->findOutputFormat($targetLang, $languageFormat->type, $languageFormat->name);
-        }
-
-        return $this->formatsCache[$key];
     }
 }
