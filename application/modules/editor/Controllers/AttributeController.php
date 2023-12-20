@@ -28,6 +28,8 @@ END LICENSE AND COPYRIGHT
 use editor_Models_Terminology_Models_TermModel as TermModel;
 use editor_Models_Terminology_Models_AttributeModel as AttributeModel;
 use editor_Models_TermCollection_TermCollection as TermCollection;
+use MittagQI\ZfExtended\MismatchException;
+
 /**
  *
  */
@@ -164,7 +166,7 @@ class editor_AttributeController extends ZfExtended_RestController
      * Create attribute
      *
      * @throws Zend_Db_Statement_Exception
-     * @throws ZfExtended_Mismatch
+     * @throws MismatchException
      */
     public function postAction() {
 
@@ -262,7 +264,7 @@ class editor_AttributeController extends ZfExtended_RestController
      *
      * @param $_
      * @throws Zend_Db_Statement_Exception
-     * @throws ZfExtended_Mismatch
+     * @throws MismatchException
      */
     protected function _postCheck($_) {
 
@@ -301,7 +303,7 @@ class editor_AttributeController extends ZfExtended_RestController
     /**
      * Update attribute
      *
-     * @throws ZfExtended_Mismatch
+     * @throws MismatchException
      */
     public function putAction() {
 
@@ -463,7 +465,7 @@ class editor_AttributeController extends ZfExtended_RestController
     /**
      * Delete attribute
      *
-     * @throws ZfExtended_Mismatch
+     * @throws MismatchException
      */
     public function deleteAction() {
 
@@ -552,7 +554,7 @@ class editor_AttributeController extends ZfExtended_RestController
     /**
      *
      * @throws Zend_Db_Statement_Exception
-     * @throws ZfExtended_Mismatch
+     * @throws MismatchException
      */
     public function xrefcreateAction($_) {
 
@@ -585,7 +587,7 @@ class editor_AttributeController extends ZfExtended_RestController
 
     /**
      * @throws Zend_Db_Statement_Exception
-     * @throws ZfExtended_Mismatch
+     * @throws MismatchException
      */
     public function refcreateAction($_) {
 
@@ -618,7 +620,7 @@ class editor_AttributeController extends ZfExtended_RestController
 
     /**
      * @throws Zend_Db_Statement_Exception
-     * @throws ZfExtended_Mismatch
+     * @throws MismatchException
      */
     public function figurecreateAction($_) {
 
@@ -654,7 +656,7 @@ class editor_AttributeController extends ZfExtended_RestController
     }
 
     /**
-     * @throws ZfExtended_Mismatch
+     * @throws MismatchException
      */
     public function attrcreateAction($_) {
 
@@ -717,7 +719,7 @@ class editor_AttributeController extends ZfExtended_RestController
 
 
     /**
-     * @throws ZfExtended_Mismatch
+     * @throws MismatchException
      */
     public function xrefupdateAction() {
 
@@ -749,7 +751,7 @@ class editor_AttributeController extends ZfExtended_RestController
     }
 
     /**
-     * @throws ZfExtended_Mismatch
+     * @throws MismatchException
      */
     public function refupdateAction() {
 
@@ -807,7 +809,7 @@ class editor_AttributeController extends ZfExtended_RestController
     }
 
     /**
-     * @throws ZfExtended_Mismatch
+     * @throws MismatchException
      */
     public function figureupdateAction() {
 
@@ -862,7 +864,7 @@ class editor_AttributeController extends ZfExtended_RestController
     /**
      * @param AttributeModel|null $drop
      * @throws ZfExtended_Exception
-     * @throws ZfExtended_Mismatch
+     * @throws MismatchException
      */
     public function attrupdateAction(AttributeModel $drop = null) {
 
@@ -1011,7 +1013,7 @@ class editor_AttributeController extends ZfExtended_RestController
      *
      * @param bool $valueRequired
      * @return array
-     * @throws ZfExtended_Mismatch
+     * @throws MismatchException
      */
     protected function _attrupdateCheck($valueRequired = true) {
 
@@ -1044,7 +1046,7 @@ class editor_AttributeController extends ZfExtended_RestController
      * If is not allowed - exception will be thrown
      *
      * @param array $_ data, picked by previous $this->jcheck() call
-     * @throws ZfExtended_Mismatch
+     * @throws MismatchException
      */
     protected function _attrupdateCheckProcessStatusChangeIsAllowed($_) {
 
@@ -1102,7 +1104,7 @@ class editor_AttributeController extends ZfExtended_RestController
      *
      * @throws ReflectionException
      * @throws Zend_Db_Statement_Exception
-     * @throws ZfExtended_Mismatch
+     * @throws MismatchException
      */
     public function historyAction() {
 

@@ -27,11 +27,15 @@
  */
 namespace Translate5\MaintenanceCli\Command;
 
+use ReflectionException;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
+use Zend_Exception;
+use ZfExtended_Factory;
+use ZfExtended_Models_Entity_NotFoundException;
+use ZfExtended_Models_Worker;
 
 class WorkerListCommand extends Translate5AbstractCommand
 {
@@ -64,6 +68,12 @@ class WorkerListCommand extends Translate5AbstractCommand
     /**
      * Execute the command
      * {@inheritDoc}
+     * @param InputInterface $input
+     * @param OutputInterface $output
+     * @return int
+     * @throws ReflectionException
+     * @throws Zend_Exception
+     * @throws ZfExtended_Models_Entity_NotFoundException
      * @see \Symfony\Component\Console\Command\Command::execute()
      */
     protected function execute(InputInterface $input, OutputInterface $output)
@@ -73,8 +83,8 @@ class WorkerListCommand extends Translate5AbstractCommand
         
         $this->writeTitle('worker list');
         
-        $worker = \ZfExtended_Factory::get('ZfExtended_Models_Worker');
-        /* @var $worker \ZfExtended_Models_Worker */
+        $worker = ZfExtended_Factory::get('ZfExtended_Models_Worker');
+        /* @var $worker ZfExtended_Models_Worker */
         
         if($id = $this->input->getArgument('workerId')) {
             $worker->load($id);
@@ -125,7 +135,7 @@ class WorkerListCommand extends Translate5AbstractCommand
                         $row[] = '';
                     } else {
                         $endtime = empty($workerRow['endtime']) ? time() : strtotime($workerRow['endtime']);
-                        $row[] = $this->printDuration($endtime - strtotime($workerRow['starttime']));
+                        $row[] = $this->printDuration(strtotime($workerRow['starttime']), $endtime);
                     }
                 } else {
                     $row[] = $workerRow[$key];

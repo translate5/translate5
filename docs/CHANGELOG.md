@@ -19,6 +19,31 @@ All updates are (downwards) compatible! If not this is listed in the important r
 
 
 
+
+## [7.0.0] - 2023-12-19
+
+### Important Notes:
+#### [TRANSLATE-3436](https://jira.translate5.net/browse/TRANSLATE-3436)
+To update to this version PHP 8.1.23 is required.
+ 
+
+
+### Added
+**[TRANSLATE-3436](https://jira.translate5.net/browse/TRANSLATE-3436): LanguageResources - Integrate GPT-4 with translate5 as translation engine** <br>
+New Private Plugin "OpenAI" to use OpenAI-Models as language-resource and base functionality to fine-tune these models
+
+
+### Bugfixes
+**[TRANSLATE-3627](https://jira.translate5.net/browse/TRANSLATE-3627): Main back-end mechanisms (Worker, Logging, etc.) - HOTFIX: Progress reporting of Looped Segment Processing Workers does not work** <br>
+FIX: progress of termtagger and spellcheck workers was not properly reported to GUI
+
+**[TRANSLATE-3624](https://jira.translate5.net/browse/TRANSLATE-3624): InstantTranslate - Instant Translate will find no en-us terms** <br>
+Fix: list all regional language results from term collections when searching with the main language code 
+
+**[TRANSLATE-3590](https://jira.translate5.net/browse/TRANSLATE-3590): Main back-end mechanisms (Worker, Logging, etc.) - Create Globally usable API-request to replace usage of InstantTranslate in various places** <br>
+Code cleanup: Centralize API-request from InsrtantTranslate as base-code
+
+
 ## [6.9.1] - 2023-12-18
 
 ### Important Notes:

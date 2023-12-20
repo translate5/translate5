@@ -218,8 +218,9 @@ abstract class editor_Services_Connector_Abstract {
      * @param int|null $sourceLang
      * @param int|null $targetLang
      * @return void
+     * @throws Zend_Cache_Exception|ReflectionException
      */
-    private function setServiceLanguages(?int $sourceLang, ?int $targetLang): void
+    protected function setServiceLanguages(?int $sourceLang, ?int $targetLang): void
     {
         if($this->languageResource === null || $sourceLang === null || $targetLang === null ){
             $this->sourceLang = $sourceLang;
