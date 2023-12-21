@@ -79,6 +79,7 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
         'admin.TaskOverview'            => [Rights::TASK_OVERVIEW_FRONTEND_CONTROLLER],
         'admin.TaskPreferences'         => [Rights::TASK_OVERVIEW_FRONTEND_CONTROLLER],
         'admin.TaskUserAssoc'           => [Rights::TASK_USER_ASSOC_FRONTEND_CONTROLLER],
+        'admin.TaskCustomField'         => [Rights::TASK_CUSTOM_FIELD_FRONTEND_CONTROLLER],
         'admin.Customer'                => [Rights::CUSTOMER_ADMINISTRATION],
         'LanguageResourcesTaskassoc'    => [Rights::LANGUAGE_RESOURCES_TASKASSOC],
         'LanguageResources'             => [

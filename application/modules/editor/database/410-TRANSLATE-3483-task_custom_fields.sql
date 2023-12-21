@@ -27,6 +27,7 @@
 
 CREATE TABLE `task_custom_fields` (
   `id` INT (11) NOT NULL AUTO_INCREMENT,
+  # `customerId` INT DEFAULT NULL,
   `label` VARCHAR (255),
   `tooltip` VARCHAR (255),
   `type` ENUM ('text', 'textarea', 'boolean', 'picklist'),
@@ -35,6 +36,14 @@ CREATE TABLE `task_custom_fields` (
   `mode` ENUM ('regular', 'required', 'readonly') NOT NULL DEFAULT 'regular',
   `placesToShow` SET ('projectWizard', 'projectGrid', 'taskGrid'),
   `position` INT (11) NOT NULL DEFAULT 0,
+  # CONSTRAINT FOREIGN KEY (`customerId`) REFERENCES `LEK_customer` (`id`) ON DELETE CASCADE,
   PRIMARY KEY (`id`)
 ) ENGINE = INNODB CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci;
 
+
+-- Add acl-records
+INSERT IGNORE INTO `Zf_acl_rules` (`module`, `role`, `resource`, `right`)
+VALUES ('editor', 'pm', 'frontend', 'taskCustomField');
+
+INSERT IGNORE INTO `Zf_acl_rules` (`module`, `role`, `resource`, `right`)
+VALUES ('editor', 'pm', 'editor_taskcustomfield', 'all');

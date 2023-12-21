@@ -196,7 +196,7 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
             'editor' => [
                 'file','filetree', 'segment', 'alikesegment', 'customer', 'customermeta', 'referencefile', 'comment', 'attributedatatype',
                 'task', 'user', 'taskuserassoc', 'segmentfield', 'workflowuserpref', 'worker','taskmeta',
-                'config', 'segmentuserassoc', 'session', 'language','termcollection',
+                'config', 'segmentuserassoc', 'session', 'language','termcollection', 'taskcustomfield',
                 'languageresourceresource','languageresourcetaskassoc','languageresourcetaskpivotassoc',
                 'languageresourceinstance','taskusertracking', 'term', 'attribute', 'termattribute', 'category',
                 'quality','userassocdefault', 'log', 'collectionattributedatatype', 'token',
