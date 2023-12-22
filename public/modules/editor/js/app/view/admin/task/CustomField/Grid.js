@@ -27,11 +27,11 @@
 /**
  * Lists and manages the available pricing presets to choose from when creating a task
  */
-Ext.define('Editor.view.admin.taskCustomField.Grid', {
+Ext.define('Editor.view.admin.task.CustomField.Grid', {
     extend: 'Ext.grid.Panel',
     requires: [
-        'Editor.view.admin.taskCustomField.GridController',
-        'Editor.store.admin.TaskCustomField',
+        'Editor.view.admin.task.CustomField.GridController',
+        'Editor.store.admin.TaskCustomField'
     ],
     alias: 'widget.taskCustomFieldGrid',
     //plugins: ['cellediting'],

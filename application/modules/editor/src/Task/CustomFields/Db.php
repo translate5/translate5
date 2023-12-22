@@ -25,10 +25,10 @@ START LICENSE AND COPYRIGHT
 
 END LICENSE AND COPYRIGHT
 */
-namespace MittagQI\Translate5\Task\Db;
+namespace MittagQI\Translate5\Task\CustomFields;
 use Zend_Db_Table_Abstract;
 
-class CustomField extends Zend_Db_Table_Abstract {
+class Db extends Zend_Db_Table_Abstract {
     protected $_name = 'task_custom_fields';
     public $_primary = 'id';
 }

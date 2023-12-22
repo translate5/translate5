@@ -25,7 +25,7 @@
  END LICENSE AND COPYRIGHT
  */
 
-Ext.define('Editor.view.admin.taskCustomField.GridController', {
+Ext.define('Editor.view.admin.task.CustomField.GridController', {
     extend: 'Ext.app.ViewController',
     alias: 'controller.taskCustomFieldGridController',
 

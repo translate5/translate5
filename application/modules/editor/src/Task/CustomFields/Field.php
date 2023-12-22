@@ -26,12 +26,11 @@
  END LICENSE AND COPYRIGHT
  */
 
-namespace MittagQI\Translate5\Task;
+namespace MittagQI\Translate5\Task\CustomFields;
 
 use Zend_Db_Statement_Exception;
 use Zend_Db_Table_Row_Exception;
 use ZfExtended_Models_Entity_Abstract;
-use ZfExtended_Factory as Factory;
 use ZfExtended_Models_Entity_Exceptions_IntegrityConstraint;
 use ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey;
 
@@ -56,44 +55,14 @@ use ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey;
  * @method string getPosition()
  * @method void setPosition(string $position)
  */
-class CustomField extends ZfExtended_Models_Entity_Abstract {
+class Field extends ZfExtended_Models_Entity_Abstract {
 
     /**
      * Db instance class
      *
      * @var string
      */
-    protected $dbInstanceClass = \MittagQI\Translate5\Task\Db\CustomField::class;
+    protected $dbInstanceClass = \MittagQI\Translate5\Task\CustomFields\Db::class;
 
-    /**
-     * @throws Zend_Db_Statement_Exception
-     * @throws Zend_Db_Table_Row_Exception
-     * @throws ZfExtended_Models_Entity_Exceptions_IntegrityConstraint
-     * @throws ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey
-     */
-    public function delete(){
-
-        // Do delete
-        try {
-            $this->row->delete();
-        } catch (Zend_Db_Statement_Exception $e) {
-            $this->handleIntegrityConstraintException($e);
-        }
-    }
-
-    /**
-     * Retrieves the list to feed the presets grid view
-     *
-     * @return array
-     */
-    public function getGridRows() : array {
-
-        /* @var CustomField $customField */
-        foreach ($this->loadAllEntities() as $customField){
-            $data []= $customField->toArray();
-        }
-
-        // Return
-        return $data ?? [];
-    }
+    protected string $validatorsClass = \MittagQI\Translate5\Task\CustomFields\Validator::class;
 }

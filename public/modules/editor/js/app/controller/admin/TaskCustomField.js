@@ -34,7 +34,7 @@ Ext.define('Editor.controller.admin.TaskCustomField', {
     extend: 'Ext.app.Controller',
 
     requires: [
-        'Editor.view.admin.taskCustomField.Grid',
+        'Editor.view.admin.task.CustomField.Grid',
         'Editor.store.admin.TaskCustomField',
         //'Editor.model.admin.Customer',
     ],

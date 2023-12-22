@@ -25,10 +25,11 @@
 
  END LICENSE AND COPYRIGHT
  */
-use MittagQI\Translate5\Task\CustomField;
+
+use MittagQI\Translate5\Task\CustomFields\Field;
 
 /**
- * @property CustomField $entity
+ * @property Field $entity
  */
 class editor_TaskcustomfieldController extends ZfExtended_RestController {
 
@@ -47,7 +48,7 @@ class editor_TaskcustomfieldController extends ZfExtended_RestController {
     /**
      * @var string
      */
-    protected $entityClass = CustomField::class;
+    protected $entityClass = Field::class;
 
     /**
      * @throws Zend_Db_Statement_Exception
@@ -103,24 +104,16 @@ class editor_TaskcustomfieldController extends ZfExtended_RestController {
     }
 
     /**
-     * Prepare data to feed grid
-     *
-     * @see ZfExtended_RestController::indexAction()
-     */
-    public function indexAction() {
-        $this->view->rows = $this->entity->getGridRows();
-        $this->view->total = count($this->view->rows);
-    }
-
-    /**
      * Update custom field props
      *
      * @throws Zend_Db_Statement_Exception
      * @throws ZfExtended_Models_Entity_Exceptions_IntegrityConstraint
      * @throws ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey
      */
-    public function putAction() {
+    public function putAction(): void
+    {
 
+        //TODO also not needed and will be auto handled by the parent class!
         try {
 
             // Get validation rules, shared for POST and PUT
@@ -163,6 +156,7 @@ class editor_TaskcustomfieldController extends ZfExtended_RestController {
      */
     public function postAction() {
 
+        // TODO: also not needed and will be auto handled by the parent class!
         try {
 
             // Get validation rules, shared for POST and PUT
