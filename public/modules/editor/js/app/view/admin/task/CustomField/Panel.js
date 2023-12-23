@@ -26,17 +26,137 @@
  */
 
 Ext.define('Editor.view.admin.task.CustomField.Panel', {
-    extend: 'Ext.panel.Panel',
+    extend: 'Ext.form.Panel',
     requires: [
+        'Editor.view.admin.task.CustomField.Grid',
+        'Editor.view.admin.task.CustomField.GridController',
+        'Editor.view.admin.task.CustomField.PanelController'
     ],
     alias: 'widget.adminTaskCustomFieldPanel',
-    items: [
-        {
-            xtype: 'taskCustomFieldGrid',
-            itemId: 'taskCustomFieldGrid',
-            flex: 1
-        },{
-// TODO: form
+    controller: 'adminTaskCustomFieldPanel',
+
+    viewModel: {
+        data: {
+            customField: null
         }
-    ]
+    },
+    width: '100%',
+    height: '100%',
+
+    layout: 'column',
+
+    items: [{
+        xtype: 'taskCustomFieldGrid',
+        itemId: 'taskCustomFieldGrid',
+        columnWidth: 0.65,
+
+        bind: {
+            selection: '{customField}'
+        }
+    }, {
+        xtype: 'fieldset',
+        fieldDefaults: {
+            labelAlign: "left",
+            labelWidth: 90,
+            anchor: '100%',
+            msgTarget: 'side'
+        },
+
+        title: 'Custom field details',
+
+        columnWidth: 0.35,
+        margin: '0 0 0 10',
+        layout: 'anchor',
+        defaultType: 'textfield',
+
+        items: [{
+            fieldLabel: 'Label',
+            bind: '{customField.label}'
+        }, {
+            fieldLabel: 'Tooltip',
+            bind: '{customField.tooltip}'
+        }, {
+            fieldLabel: 'Type',
+            bind: '{customField.type}',
+            xtype: 'combobox',
+            queryMode: 'local',
+            displayField: 'name',
+            valueField: 'value',
+            store: {
+                fields: ['name', 'value'],
+                data: [
+                    {name: 'Text', value: 'text'},
+                    {name: 'Textarea', value: 'textarea'},
+                    {name: 'Boolean', value: 'boolean'},
+                    {name: 'Picklist', value: 'picklist'}
+                ]
+            }
+        }, {
+            xtype: 'textarea',
+            fieldLabel: 'Picklist Data',
+            bind: {
+                value: '{customField.picklistData}',
+                hidden: '{customField.type != "picklist"}'
+            }
+        }, {
+            xtype: 'textarea',
+            fieldLabel: 'Regex',
+            bind: '{customField.regex}'
+        }, {
+            xtype: 'combo',
+            fieldLabel: 'Mode',
+            bind: '{customField.mode}',
+            queryMode: 'local',
+            displayField: 'name',
+            valueField: 'value',
+            store: {
+                fields: ['name', 'value'],
+                data: [
+                    {name: 'Optional', value: 'regular'},
+                    {name: 'Required', value: 'required'},
+                    {name: 'Hidden', value: 'readonly'}
+                ]
+            }
+        }, {
+            xtype: 'tagfield',
+            fieldLabel: 'Places to show',
+            bind: '{customField.placesToShow}',
+            queryMode: 'local',
+            displayField: 'name',
+            valueField: 'value',
+            store: {
+                fields: ['name', 'value'],
+                data: [
+                    {name: 'Project wizard', value: 'projectWizard'},
+                    {name: 'Project grid', value: 'projectGrid'},
+                    {name: 'Task grid', value: 'taskGrid'}
+                ]
+
+            }
+        }, {
+            xtype: 'numberfield',
+            fieldLabel: 'Position',
+            bind: '{customField.position}'
+        },{
+            xtype: 'toolbar',
+            dock: 'bottom',
+            items: [{
+                xtype: 'button',
+                glyph: 'f0c7@FontAwesome5FreeSolid',
+                text: 'Save',
+                handler: 'onSave'
+            },{
+                xtype: 'button',
+                glyph: 'f05e@FontAwesome5FreeSolid',
+                text: 'Cancel',
+                handler: 'onCancel'
+            },{
+                xtype: 'button',
+                glyph: 'f1f8@FontAwesome5FreeSolid',
+                text: 'Delete',
+                handler: 'onDelete'
+            }]
+
+        }]
+    }]
 });

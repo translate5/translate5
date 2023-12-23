@@ -34,14 +34,13 @@ Ext.define('Editor.controller.admin.TaskCustomField', {
     extend: 'Ext.app.Controller',
 
     requires: [
-        'Editor.view.admin.task.CustomField.Grid',
-        'Editor.store.admin.TaskCustomField',
-        //'Editor.model.admin.Customer',
+        'Editor.view.admin.task.CustomField.Panel'
     ],
+
     listen: {
         component: {
             '#preferencesOverviewPanel': {
-                added: 'addToSettingsPanel'
+                render: 'addToSettingsPanel'
             },
             /*'#displayTabPanel': { // customerPanel > tabPanel
                 added: 'addToCustomerPanel',
@@ -74,18 +73,13 @@ Ext.define('Editor.controller.admin.TaskCustomField', {
 
     addToSettingsPanel: function(panel){
         if(Editor.app.authenticatedUser.isAllowed('taskCustomField')){
-            Ext.create('Editor.store.admin.TaskCustomField');
             this.panel = panel.insert(2, {
-                xtype: 'taskCustomFieldGrid',
-                routePrefix: 'preferences/',
-                store: {
-                    type: 'chained',
-                    source: 'taskCustomFieldStore',
-                    storeId: 'taskCustomFieldGlobal'/*,
-                    filters: [function(item){
-                        return !item.data.customerId;
-                    }]*/
+                xtype: 'adminTaskCustomFieldPanel',
+                bind: {
+                    title: '{l10n.taskCustomField.grid.title}'
                 },
+                glyph: 'f1de@FontAwesome5FreeSolid',
+                routePrefix: 'preferences/'
             });
         }
     },

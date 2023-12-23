@@ -29,7 +29,8 @@ namespace MittagQI\Translate5\Task\CustomFields;
 
 use ZfExtended_Models_Validator_Abstract;
 
-class Validator extends ZfExtended_Models_Validator_Abstract {
+class Validator extends ZfExtended_Models_Validator_Abstract
+{
 
     /**
      * @return void
@@ -38,14 +39,29 @@ class Validator extends ZfExtended_Models_Validator_Abstract {
     protected function defineValidators(): void
     {
         // creates validators from the above table definition
-        $this->addValidator('id', 'int');
-        $this->addValidator('label', 'stringLength', ['min' => 0, 'max' => 255]);
-        $this->addValidator('tooltip', 'stringLength', ['min' => 0, 'max' => 255]);
-        $this->addValidator('type', 'inArray', ['text','textarea','boolean','picklist']);
-        $this->addValidator('picklistData', 'stringLength', ['min' => 0, 'max' => 65535]);
-        $this->addValidator('regex', 'stringLength', ['min' => 0, 'max' => 255]);
-        $this->addValidator('mode', 'inArray', ['regular','required','readonly']);
-        $this->addValidator('placesToShow', 'inArray', ['projectWizard','projectGrid','taskGrid']);
-        $this->addValidator('position', 'int');
+        // allowNull is set to true, because the default values are resolved on db level
+        $this->addValidator('id', 'int', allowNull: true);
+        $this->addValidator('label', 'stringLength', ['min' => 0, 'max' => 255], allowNull: true);
+        $this->addValidator('tooltip', 'stringLength', ['min' => 0, 'max' => 255], allowNull: true);
+        $this->addValidator('type', 'inArray', [['text', 'textarea', 'boolean', 'picklist']], allowNull: true);
+        $this->addValidator('picklistData', 'stringLength', ['min' => 0, 'max' => 65535], allowNull: true);
+        $this->addValidator('regex', 'stringLength', ['min' => 0, 'max' => 255], allowNull: true);
+        $this->addValidator('mode', 'inArray', [['regular', 'required', 'readonly']], allowNull: true);
+        $this->addValidatorCustom('placesToShow', function ($value) {
+            if (empty($value)) {
+                return true;
+            }
+            if(is_string($value)) {
+                $value = explode(',', $value);
+            }
+            $places = array_map('trim', $value);
+            foreach ($places as $place) {
+                if (!in_array($place, ['projectWizard', 'projectGrid', 'taskGrid'])) {
+                    return false;
+                }
+            }
+            return true;
+        }, allowNull: true);
+        $this->addValidator('position', 'int', allowNull: true);
     }
 }

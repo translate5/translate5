@@ -40,7 +40,7 @@
  *  "position": "1"
  *  }
  */
-Ext.define('Editor.model.admin.TaskCustomField', {
+Ext.define('Editor.model.admin.task.CustomField', {
     extend: 'Ext.data.Model',
     alias: 'model.taskCustomFieldModel',
     idProperty: 'id',
@@ -53,8 +53,9 @@ Ext.define('Editor.model.admin.TaskCustomField', {
         },
         writer: {
             encode: true,
-            rootProperty: 'data',
-        },
+            writeRecordId: false, // This line prevents sending the id
+            rootProperty: 'data'
+        }
     },
     fields: [{
         name: 'id',
@@ -84,7 +85,7 @@ Ext.define('Editor.model.admin.TaskCustomField', {
         type: 'string'
     }, {
         name: 'placesToShow',
-        type: 'string'
+        type: 'auto'
     }, {
         name: 'position',
         type: 'number'

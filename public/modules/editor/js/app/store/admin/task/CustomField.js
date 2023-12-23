@@ -28,14 +28,11 @@
 /**
  * @extends Ext.data.Store
  */
-Ext.define('Editor.store.admin.TaskCustomField', {
+Ext.define('Editor.store.admin.task.CustomField', {
     extend: 'Ext.data.Store',
-    requires: ['Editor.model.admin.TaskCustomField'],
-    storeId: 'taskCustomFieldStore',
-    model: 'Editor.model.admin.TaskCustomField',
-    autoLoad: true,
-    autoSync: false,
-    pageSize: 0,
+    requires: ['Editor.model.admin.task.CustomField'],
+    model: 'Editor.model.admin.task.CustomField',
+    autoLoad: false,
 
     /**
      * Retrieves all records independently of filtering

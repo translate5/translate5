@@ -29,6 +29,28 @@ Ext.define('Editor.view.admin.task.CustomField.GridController', {
     extend: 'Ext.app.ViewController',
     alias: 'controller.taskCustomFieldGridController',
 
+
+    // register listeners: load store for the grid after the grid is rendered
+    listen: {
+        component: {
+            '#taskCustomFieldGrid': {
+                afterrender: 'onTaskCustomFieldGridAfterRender'
+            }
+        }
+    },
+
+    createCustomField: function(){
+        var grid = this.getView(),
+                store = grid.getStore(),
+                newCustomField = Ext.create('Editor.model.admin.task.CustomField');
+        store.add(newCustomField);
+        grid.setSelection(newCustomField);
+    },
+
+    onTaskCustomFieldGridAfterRender: function(grid){
+        grid.getStore().load();
+    },
+
     /**
      * Delete preset after server-side confirmation
      *

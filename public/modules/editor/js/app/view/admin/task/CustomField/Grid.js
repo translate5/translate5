@@ -31,18 +31,15 @@ Ext.define('Editor.view.admin.task.CustomField.Grid', {
     extend: 'Ext.grid.Panel',
     requires: [
         'Editor.view.admin.task.CustomField.GridController',
-        'Editor.store.admin.TaskCustomField'
+        'Editor.store.admin.task.CustomField'
     ],
     alias: 'widget.taskCustomFieldGrid',
     //plugins: ['cellediting'],
-    itemId: 'customFields',
+    itemId: 'taskCustomFieldGrid',
     controller: 'taskCustomFieldGridController',
-    store: 'taskCustomFieldStore',
+    store: Ext.create('Editor.store.admin.task.CustomField'),
     userCls: 't5actionColumnGrid',
-    bind: {
-        title: '{l10n.taskCustomField.grid.title}'
-    },
-    glyph: 'f1de@FontAwesome5FreeSolid',
+    title: false,
     /** @property {string} routePrefix Used to setup routes on different view instances */
     routePrefix: '',
     /*listeners: {
@@ -64,7 +61,7 @@ Ext.define('Editor.view.admin.task.CustomField.Grid', {
                 triggers: {
                     clear: {
                         cls: Ext.baseCSSPrefix + 'form-clear-trigger',
-                        handler: function(field){
+                        handler: function (field) {
                             field.setValue(null);
                             field.focus();
                         },
@@ -92,8 +89,8 @@ Ext.define('Editor.view.admin.task.CustomField.Grid', {
                 bind: {
                     text: '{l10n.taskCustomField.grid.refresh}'
                 },
-                handler: function(btn){
-                    btn.up('grid').getStore().getSource().reload();
+                handler: function (btn) {
+                    btn.up('grid').getStore().reload();
                 }
             },
             {
@@ -105,17 +102,16 @@ Ext.define('Editor.view.admin.task.CustomField.Grid', {
     viewConfig: {
         enableTextSelection: true,
     },
-    initConfig: function(instanceConfig){
+    initConfig: function (instanceConfig) {
         var me = this,
             config = {};
         config.title = me.title; //see EXT6UPD-9
         config.userCls = 't5actionColumnGrid t5noselectionGrid';
         config.columns = [{
-                xtype: 'gridcolumn',
-                dataIndex: 'id',
-                text: 'Id',
-                hidden: true
-            },
+            xtype: 'gridcolumn',
+            dataIndex: 'id',
+            text: 'Id',
+        },
             {
                 xtype: 'gridcolumn',
                 width: 260,
@@ -187,7 +183,7 @@ Ext.define('Editor.view.admin.task.CustomField.Grid', {
                 bind: {
                     text: '{l10n.taskCustomField.grid.picklistData}'
                 }
-            },{
+            }, {
                 xtype: 'gridcolumn',
                 dataIndex: 'regex',
                 align: 'end',
@@ -195,7 +191,7 @@ Ext.define('Editor.view.admin.task.CustomField.Grid', {
                     text: '{l10n.taskCustomField.grid.regex}',
                 },
                 width: 150
-            },{
+            }, {
                 xtype: 'gridcolumn',
                 dataIndex: 'mode',
                 align: 'end',
@@ -203,7 +199,7 @@ Ext.define('Editor.view.admin.task.CustomField.Grid', {
                     text: '{l10n.taskCustomField.grid.mode}',
                 },
                 width: 150
-            },{
+            }, {
                 xtype: 'gridcolumn',
                 dataIndex: 'placesToShow',
                 align: 'end',
@@ -211,7 +207,7 @@ Ext.define('Editor.view.admin.task.CustomField.Grid', {
                     text: '{l10n.taskCustomField.grid.placesToShow}',
                 },
                 width: 150
-            },{
+            }, {
                 xtype: 'numbercolumn',
                 dataIndex: 'position',
                 align: 'end',
@@ -223,7 +219,7 @@ Ext.define('Editor.view.admin.task.CustomField.Grid', {
                 editor: {
                     xtype: 'numberfield',
                 }
-            },{
+            }, {
                 xtype: 'actioncolumn',
                 stateId: 'actionColumn',
                 align: 'center',

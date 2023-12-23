@@ -64,5 +64,5 @@ class Field extends ZfExtended_Models_Entity_Abstract {
      */
     protected $dbInstanceClass = \MittagQI\Translate5\Task\CustomFields\Db::class;
 
-    protected string $validatorsClass = \MittagQI\Translate5\Task\CustomFields\Validator::class;
+    protected $validatorInstanceClass = \MittagQI\Translate5\Task\CustomFields\Validator::class;
 }

@@ -50,139 +50,31 @@ class editor_TaskcustomfieldController extends ZfExtended_RestController {
      */
     protected $entityClass = Field::class;
 
-    /**
-     * @throws Zend_Db_Statement_Exception
-     * @throws ZfExtended_Mismatch
-     */
-    public function init() {
-
-        // Call parent
-        parent::init();
-
-        // If request contains json-encoded 'data'-param, decode it and append to request params
-        $this->handleData();
-    }
-
-    /**
-     * Get validation rules, shared for POST and PUT
-     *
-     * @return array
-     */
-    private function getSharedRules() {
-        return [
-            'label' => [
-                'req' => true,
-                'rex' => 'json',
-            ],
-            'tooltip' => [
-                'rex' => 'json',
-            ],
-            'type' => [
-                'req' => true,
-                'fis' => 'text,textarea,boolean,picklist',
-            ],
-            'picklistData' => [
-                'req' => $this->getParam('type') === 'picklist',
-                'rex' => 'json',
-            ],
-            'regex' => [
-                'rex' => 'varchar255',
-            ],
-            'mode' => [
-                'req' => true,
-                'fis' => 'regular,required,readonly',
-            ],
-            'placesToShow' => [
-                'req' => true,
-                'set' => 'projectWizard,projectGrid,taskGrid',
-            ],
-            'position' => [
-                'req' => true,
-                'rex' => 'int11',
-            ],
-        ];
-    }
-
-    /**
-     * Update custom field props
-     *
-     * @throws Zend_Db_Statement_Exception
-     * @throws ZfExtended_Models_Entity_Exceptions_IntegrityConstraint
-     * @throws ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey
-     */
-    public function putAction(): void
+    protected function decodePutData(): void
     {
-
-        //TODO also not needed and will be auto handled by the parent class!
-        try {
-
-            // Get validation rules, shared for POST and PUT
-            $ruleA = $this->getSharedRules();
-
-            // Check params
-            $this->jcheck([
-                'customFieldId' => [
-                    'req' => true,
-                    'rex' => 'int11',
-                    'key' => $this->entity,
-                ],
-            ] + $ruleA);
-
-        // Catch mismatch-exception
-        } catch (ZfExtended_Mismatch $e) {
-
-            // Flush msg
-            $this->jflush(false, $e->getMessage());
+        parent::decodePutData();
+        if(isset($this->data['placesToShow']) && is_array($this->data['placesToShow'])) {
+            $this->data['placesToShow'] = implode(',', $this->data['placesToShow']);
         }
-
-        // Assign props
-        foreach (array_intersect_key($this->getAllParams(),
-            array_flip(['label', 'tooltip', 'type', 'picklistData', 'regex', 'mode', 'placesToShow', 'position'])
-        ) as $prop => $value) {
-            $this->entity->{'set' . ucfirst($prop)}($value);
-        }
-
-        // Save assigned
-        $this->entity->save();
-
-        // Flush success
-        $this->jflush(true, ['updated' => $this->entity->toArray()]);
     }
 
-    /**
-     * Create new preset
-     *
-     * @throws Zend_Db_Statement_Exception
-     */
-    public function postAction() {
-
-        // TODO: also not needed and will be auto handled by the parent class!
-        try {
-
-            // Get validation rules, shared for POST and PUT
-            $ruleA = $this->getSharedRules();
-
-            // Check params
-            $this->jcheck($ruleA);
-
-        // Catch mismatch-exception
-        } catch (ZfExtended_Mismatch $e) {
-
-            // Flush msg
-            $this->jflush(false, $e->getMessage());
+    public function postAction()
+    {
+        parent::postAction();
+        $fieldHandler = explode($this->entity->getPlacesToShow(), ',');
+        foreach ($fieldHandler as $handler) {
+            $handler = \MittagQI\Translate5\Task\CustomFields\Handler\Factory::getHandler($handler);
+            $handler->addCustomField($this->entity);
         }
+    }
 
-        // Assign props
-        foreach (array_intersect_key($this->getAllParams(),
-            array_flip(['label', 'tooltip', 'type', 'picklistData', 'regex', 'mode', 'placesToShow', 'position'])
-        ) as $prop => $value) {
-            $this->entity->{'set' . ucfirst($prop)}($value);
+    public function putAction()
+    {
+        parent::putAction();
+        $fieldHandler = explode($this->entity->getPlacesToShow(), ',');
+        foreach ($fieldHandler as $handler) {
+            $handler = \MittagQI\Translate5\Task\CustomFields\Handler\Factory::getHandler($handler);
+            $handler->editCustomField($this->entity, $this->data);
         }
-
-        // Save assigned
-        $this->entity->save();
-
-        // Flush success
-        $this->jflush(true, ['created' => $this->entity->toArray()]);
     }
 }
