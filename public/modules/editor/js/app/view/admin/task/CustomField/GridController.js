@@ -39,6 +39,75 @@ Ext.define('Editor.view.admin.task.CustomField.GridController', {
         }
     },
 
+    /**
+     *
+     * @param value
+     * @returns {*|string}
+     */
+    idRenderer: value => Ext.isNumeric(value) ? value : '*',
+
+    /**
+     * Renderer for localized values. Value for current locale is returned if exists or raw value otherwise
+     *
+     * @param value
+     * @returns {*}
+     */
+    l10nRenderer: value => (Ext.JSON.decode(value, true) || {})[Editor.data.locale] || value,
+
+    /**
+     * Return human-friendly title for a value of type-field
+     *
+     * @param value
+     * @returns {*|string}
+     */
+    typeRenderer: function(value) {
+        return this._enumRenderer(value, 'type');
+    },
+
+    /**
+     * Return human-friendly title for a value of mode-field
+     *
+     * @param value
+     * @returns {string}
+     */
+    modeRenderer: function(value) {
+        return this._enumRenderer(value, 'mode');
+    },
+
+    /**
+     * Convert comma-separated value of placesToShow-field into human-friendly comma-separated title
+     *
+     * @param value
+     * @returns {string}
+     */
+    placesToShowRenderer: function(value) {
+        return this._enumRenderer(value, 'placesToShow');
+    },
+
+    /**
+     * Helper function to comma-separated value given by values-arg
+     * for the field given by prop-arg - into a human-friendly comma-separated title
+     *
+     * @param values
+     * @param prop
+     * @returns {string}
+     * @private
+     */
+    _enumRenderer: function(values, prop) {
+        if (!values) return values;
+        var render = [];
+        values.split(',').forEach(
+            value => render.push(
+                Ext.Array.toValueMap(
+                    Editor.data.l10n.taskCustomField.meta[prop].data, 'value'
+                )[value]['name']
+            )
+        );
+        return render.join(', ');
+    },
+
+
+
     createCustomField: function(){
         var grid = this.getView(),
                 store = grid.getStore(),
@@ -248,7 +317,7 @@ Ext.define('Editor.view.admin.task.CustomField.GridController', {
             store.addFilter({
                 id: 'search',
                 filterFn: ({data}) => rex.exec(
-                    JSON.stringify(data, ['id', 'name', 'unitType', 'description'])
+                    JSON.stringify(data, ['id', 'label', 'tooltip', 'type', 'regex', 'mode', 'placesToShow'])
                 )
             })
 

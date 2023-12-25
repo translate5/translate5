@@ -2094,28 +2094,44 @@ Editor.data.l10n = {
         }
     },
     taskCustomField: {
-        grid: {
-            create: '<?php echo $this->translate->_('Create new custom field');?>',
-            clone: '<?php echo $this->translate->_('Klonen');?>',
-            rename: '<?php echo $this->translate->_('Umbenennen');?>',
-            refresh: '<?php echo $this->translate->_('Aktualisieren');?>',
-            search: '<?php echo $this->translate->_('Suche');?>',
-            title: '<?php echo $this->translate->_('Task custom fields');?>',
+        create: '<?php echo $this->translate->_('Create new custom field');?>',
+        refresh: '<?php echo $this->translate->_('Aktualisieren');?>',
+        search: '<?php echo $this->translate->_('Suche');?>',
+        title: '<?php echo $this->translate->_('Task custom fields');?>',
+        save: '<?php echo $this->translate->_('Save');?>',
+        cancel: '<?php echo $this->translate->_('Cancel');?>',
+        delete: '<?php echo $this->translate->_('Löschen');?>',
+        meta: {
             label: '<?php echo $this->translate->_('Label');?>',
             tooltip: '<?php echo $this->translate->_('Tooltip');?>',
             type: {
-                text: '<?php echo $this->translate->_('Typ');?>',
-                character: '<?php echo $this->translate->_('Zeichenbasiert');?>',
-                word: '<?php echo $this->translate->_('Wortbasiert');?>'
+                name: '<?php echo $this->translate->_('Typ');?>',
+                data: [
+                    {value: 'text',     name: '<?php echo $this->translate->_('Text');?>'},
+                    {value: 'textarea', name: '<?php echo $this->translate->_('Textarea');?>'},
+                    {value: 'boolean',  name: '<?php echo $this->translate->_('Boolean');?>'},
+                    {value: 'picklist', name: '<?php echo $this->translate->_('Picklist');?>'}
+                ]
             },
-            picklistData: 'Picklist data',
+            picklistData: '<?php echo $this->translate->_('Picklist data');?>',
             regex: '<?php echo $this->translate->_('Regex');?>',
-            mode: '<?php echo $this->translate->_('Mode');?>',
-            placesToShow: '<?php echo $this->translate->_('Places to show');?>',
-            actions: {
-                text: '<?php echo $this->translate->_('Aktionen');?>',
-                delete: '<?php echo $this->translate->_('Löschen');?>',
-            }
+            mode: {
+                name: '<?php echo $this->translate->_('Mode');?>',
+                data: [
+                    {value: 'optional', name: '<?php echo $this->translate->_('Optional');?>'},
+                    {value: 'required', name: '<?php echo $this->translate->_('Required');?>'},
+                    {value: 'readonly', name: '<?php echo $this->translate->_('Readonly');?>'}
+                ]
+            },
+            placesToShow: {
+                name: '<?php echo $this->translate->_('Places to show');?>',
+                data: [
+                    {value: 'projectWizard', name: '<?php echo $this->translate->_('Project wizard');?>'},
+                    {value: 'projectGrid',   name: '<?php echo $this->translate->_('Project grid');?>'},
+                    {value: 'taskGrid',      name: '<?php echo $this->translate->_('Task grid');?>'}
+                ]
+            },
+            position: '<?php echo $this->translate->_('Position');?>'
         },
     },
     synonymSearch: {

@@ -33,7 +33,7 @@ CREATE TABLE `task_custom_fields` (
   `type` ENUM ('text', 'textarea', 'boolean', 'picklist'),
   `picklistData` TEXT,
   `regex` VARCHAR (255),
-  `mode` ENUM ('regular', 'required', 'readonly') NOT NULL DEFAULT 'regular',
+  `mode` ENUM ('optional', 'required', 'readonly') NOT NULL DEFAULT 'optional',
   `placesToShow` SET ('projectWizard', 'projectGrid', 'taskGrid'),
   `position` INT (11) NOT NULL DEFAULT 0,
   # CONSTRAINT FOREIGN KEY (`customerId`) REFERENCES `LEK_customer` (`id`) ON DELETE CASCADE,

@@ -34,7 +34,6 @@ Ext.define('Editor.view.admin.task.CustomField.Grid', {
         'Editor.store.admin.task.CustomField'
     ],
     alias: 'widget.taskCustomFieldGrid',
-    //plugins: ['cellediting'],
     itemId: 'taskCustomFieldGrid',
     controller: 'taskCustomFieldGridController',
     store: Ext.create('Editor.store.admin.task.CustomField'),
@@ -42,10 +41,6 @@ Ext.define('Editor.view.admin.task.CustomField.Grid', {
     title: false,
     /** @property {string} routePrefix Used to setup routes on different view instances */
     routePrefix: '',
-    /*listeners: {
-        beforeedit: 'onBeforeEdit',
-        edit: 'onPresetEdit'
-    },*/
     dockedItems: [{
         xtype: 'toolbar',
         dock: 'top',
@@ -56,7 +51,7 @@ Ext.define('Editor.view.admin.task.CustomField.Grid', {
                 width: 300,
                 minWidth: 100,
                 bind: {
-                    emptyText: '{l10n.taskCustomField.grid.search}'
+                    emptyText: '{l10n.taskCustomField.search}'
                 },
                 triggers: {
                     clear: {
@@ -77,7 +72,7 @@ Ext.define('Editor.view.admin.task.CustomField.Grid', {
                 xtype: 'button',
                 glyph: 'f067@FontAwesome5FreeSolid',
                 bind: {
-                    text: '{l10n.taskCustomField.grid.create}'
+                    text: '{l10n.taskCustomField.create}'
                 },
                 ui: 'default-toolbar-small',
                 width: 'auto',
@@ -87,7 +82,7 @@ Ext.define('Editor.view.admin.task.CustomField.Grid', {
                 xtype: 'button',
                 iconCls: 'x-fa fa-undo',
                 bind: {
-                    text: '{l10n.taskCustomField.grid.refresh}'
+                    text: '{l10n.taskCustomField.refresh}'
                 },
                 handler: function (btn) {
                     btn.up('grid').getStore().reload();
@@ -111,57 +106,39 @@ Ext.define('Editor.view.admin.task.CustomField.Grid', {
             xtype: 'gridcolumn',
             dataIndex: 'id',
             text: 'Id',
+            width: 40,
+            renderer: 'idRenderer'
         },
             {
                 xtype: 'gridcolumn',
-                width: 260,
                 dataIndex: 'label',
                 stateId: 'label',
                 flex: 1,
                 editor: 'textfield',
-                //renderer: 'editableCellRenderer',
+                renderer: 'l10nRenderer',
                 bind: {
-                    text: '{l10n.taskCustomField.grid.label}'
+                    text: '{l10n.taskCustomField.meta.label}'
                 }
             },
             {
                 xtype: 'gridcolumn',
-                width: 260,
                 dataIndex: 'tooltip',
                 stateId: 'tooltip',
                 flex: 1,
                 editor: 'textfield',
-                //renderer: 'editableCellRenderer',
+                renderer: 'l10nRenderer',
                 bind: {
-                    text: '{l10n.taskCustomField.grid.tooltip}'
+                    text: '{l10n.taskCustomField.meta.tooltip}'
                 }
             },
             {
                 xtype: 'gridcolumn',
-                width: 360,
+                minWidth: 100,
                 dataIndex: 'type',
                 stateId: 'type',
-                //renderer: 'editableUnitTypeCellRenderer',
-                flex: 1,
-                /*editor: {
-                    field: {
-                        xtype: 'combobox',
-                        queryMode: 'local',
-                        allowBlank: false,
-                        displayField: 'title',
-                        valueField: 'value',
-                        store: {
-                            type: 'json',
-                            fields: ['title', 'value'],
-                            data: [
-                                {title: Editor.data.l10n.taskCustomField.grid.unitType['word']     , value: 'word'},
-                                {title: Editor.data.l10n.taskCustomField.grid.unitType['character'], value: 'character'}
-                            ]
-                        }
-                    }
-                },*/
+                renderer: 'typeRenderer',
                 bind: {
-                    text: '{l10n.taskCustomField.grid.type.text}'
+                    text: '{l10n.taskCustomField.meta.type.name}'
                 }
             },
             {
@@ -169,76 +146,43 @@ Ext.define('Editor.view.admin.task.CustomField.Grid', {
                 alias: 'picklistData',
                 dataIndex: 'picklistData',
                 stateId: 'picklistData',
-                /*editor: {
-                    field: {
-                        xtype: 'textfield',
-                        allowBlank: false,
-                        bind: {
-                            emptyText: '{l10n.taskCustomField.grid.desc}'
-                        }
-                    }
-                },
-                renderer: 'editableCellRenderer',*/
+                hidden: true,
                 flex: 3,
                 bind: {
-                    text: '{l10n.taskCustomField.grid.picklistData}'
+                    text: '{l10n.taskCustomField.meta.picklistData}'
                 }
             }, {
                 xtype: 'gridcolumn',
                 dataIndex: 'regex',
-                align: 'end',
                 bind: {
-                    text: '{l10n.taskCustomField.grid.regex}',
+                    text: '{l10n.taskCustomField.meta.regex}',
                 },
                 width: 150
             }, {
                 xtype: 'gridcolumn',
                 dataIndex: 'mode',
-                align: 'end',
                 bind: {
-                    text: '{l10n.taskCustomField.grid.mode}',
+                    text: '{l10n.taskCustomField.meta.mode.name}',
                 },
-                width: 150
+                renderer: 'modeRenderer',
+                width: 100
             }, {
                 xtype: 'gridcolumn',
                 dataIndex: 'placesToShow',
-                align: 'end',
                 bind: {
-                    text: '{l10n.taskCustomField.grid.placesToShow}',
+                    text: '{l10n.taskCustomField.meta.placesToShow.name}',
                 },
-                width: 150
+                renderer: 'placesToShowRenderer',
+                width: 250,
             }, {
                 xtype: 'numbercolumn',
                 dataIndex: 'position',
                 align: 'end',
                 bind: {
-                    text: '{l10n.taskCustomField.grid.position}',
+                    text: '{l10n.taskCustomField.meta.position}',
                 },
-                width: 150,
-                //renderer: 'editablePriceAdjustmentCellRenderer',
-                editor: {
-                    xtype: 'numberfield',
-                }
-            }, {
-                xtype: 'actioncolumn',
-                stateId: 'actionColumn',
-                align: 'center',
-                width: 100,
-                bind: {
-                    text: '{l10n.taskCustomField.grid.actions.text}'
-                },
-                menuDisabled: true,
-                items: [
-                    {
-                        bind: {
-                            tooltip: '{l10n.taskCustomField.grid.actions.delete}'
-                        },
-                        tooltip: 'delete',
-                        glyph: 'f2ed@FontAwesome5FreeSolid',
-                        isDisabled: 'isDeleteDisabled',
-                        handler: 'deleteCustomField'
-                    }
-                ]
+                format: '0',
+                width: 100
             }
         ];
         return me.callParent([Ext.apply(config, instanceConfig)]);

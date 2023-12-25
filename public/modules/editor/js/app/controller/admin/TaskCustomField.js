@@ -76,7 +76,7 @@ Ext.define('Editor.controller.admin.TaskCustomField', {
             this.panel = panel.insert(2, {
                 xtype: 'adminTaskCustomFieldPanel',
                 bind: {
-                    title: '{l10n.taskCustomField.grid.title}'
+                    title: '{l10n.taskCustomField.title}'
                 },
                 glyph: 'f1de@FontAwesome5FreeSolid',
                 routePrefix: 'preferences/'

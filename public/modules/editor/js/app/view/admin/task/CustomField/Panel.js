@@ -42,121 +42,141 @@ Ext.define('Editor.view.admin.task.CustomField.Panel', {
     },
     width: '100%',
     height: '100%',
-
-    layout: 'column',
-
-    items: [{
+    border: 0,
+    layout: 'fit',
+    items: {
         xtype: 'taskCustomFieldGrid',
         itemId: 'taskCustomFieldGrid',
-        columnWidth: 0.65,
-
+        border: 0,
         bind: {
             selection: '{customField}'
         }
-    }, {
-        xtype: 'fieldset',
+    },
+    dockedItems: {
+        xtype: 'form',
+        dock: 'right',
+        width: 400,
         fieldDefaults: {
             labelAlign: "left",
             labelWidth: 90,
             anchor: '100%',
-            msgTarget: 'side'
+            msgTarget: 'side',
         },
-
-        title: 'Custom field details',
-
-        columnWidth: 0.35,
-        margin: '0 0 0 10',
+        defaults: {
+            bind: {
+                disabled: '{!customField}'
+            },
+        },
+        dockedItems: [{
+            xtype: 'toolbar',
+            dock: 'top',
+            ui: 'default',
+            border: 0,
+            defaults: {
+                width: '33%',
+            },
+            items: [{
+                glyph: 'f0c7@FontAwesome5FreeSolid',
+                bind: {
+                    text: '{l10n.taskCustomField.save}',
+                    disabled: '{!customField}'
+                }
+                //handler: 'onSave'
+            }, {
+                glyph: 'f05e@FontAwesome5FreeSolid',
+                bind: {
+                    text: '{l10n.taskCustomField.cancel}',
+                    disabled: '{!customField}'
+                }
+                //handler: 'onCancel'
+            }, {
+                glyph: 'f2ed@FontAwesome5FreeSolid',
+                bind: {
+                    text: '{l10n.taskCustomField.delete}',
+                    disabled: '{!customField}'
+                },
+                handler: 'onDelete',
+                //isDisabled: 'isDeleteDisabled',
+                //handler: 'deleteCustomField'
+            }]
+        }],
+        bodyPadding: 15,
+        margin: 0,
         layout: 'anchor',
         defaultType: 'textfield',
 
         items: [{
-            fieldLabel: 'Label',
-            bind: '{customField.label}'
-        }, {
-            fieldLabel: 'Tooltip',
-            bind: '{customField.tooltip}'
-        }, {
-            fieldLabel: 'Type',
-            bind: '{customField.type}',
-            xtype: 'combobox',
-            queryMode: 'local',
-            displayField: 'name',
-            valueField: 'value',
-            store: {
-                fields: ['name', 'value'],
-                data: [
-                    {name: 'Text', value: 'text'},
-                    {name: 'Textarea', value: 'textarea'},
-                    {name: 'Boolean', value: 'boolean'},
-                    {name: 'Picklist', value: 'picklist'}
-                ]
+            bind: {
+                fieldLabel: '{l10n.taskCustomField.meta.label}',
+                value: '{customField.label}'
             }
         }, {
-            xtype: 'textarea',
-            fieldLabel: 'Picklist Data',
             bind: {
+                fieldLabel: '{l10n.taskCustomField.meta.tooltip}',
+                value: '{customField.tooltip}'
+            }
+        }, {
+            xtype: 'combobox',
+            forceSelection: true,
+            queryMode: 'local',
+            bind: {
+                fieldLabel: '{l10n.taskCustomField.meta.type.name}',
+                value: '{customField.type}',
+                store: {
+                    fields: ['name', 'value'],
+                    data: '{l10n.taskCustomField.meta.type.data}'
+                }
+            },
+            displayField: 'name',
+            valueField: 'value'
+        }, {
+            xtype: 'textarea',
+            bind: {
+                fieldLabel: '{l10n.taskCustomField.meta.picklistData}',
                 value: '{customField.picklistData}',
                 hidden: '{customField.type != "picklist"}'
             }
         }, {
-            xtype: 'textarea',
-            fieldLabel: 'Regex',
-            bind: '{customField.regex}'
-        }, {
-            xtype: 'combo',
-            fieldLabel: 'Mode',
-            bind: '{customField.mode}',
-            queryMode: 'local',
-            displayField: 'name',
-            valueField: 'value',
-            store: {
-                fields: ['name', 'value'],
-                data: [
-                    {name: 'Optional', value: 'regular'},
-                    {name: 'Required', value: 'required'},
-                    {name: 'Hidden', value: 'readonly'}
-                ]
+            xtype: 'textfield',
+            bind: {
+                fieldLabel: '{l10n.taskCustomField.meta.regex}',
+                value: '{customField.regex}',
+                hidden: '{customField.type == "picklist" || customField.type == "boolean"}'
             }
         }, {
-            xtype: 'tagfield',
-            fieldLabel: 'Places to show',
-            bind: '{customField.placesToShow}',
+            xtype: 'combo',
+            forceSelection: true,
+            bind: {
+                fieldLabel: '{l10n.taskCustomField.meta.mode.name}',
+                value: '{customField.mode}',
+                store: {
+                    fields: ['name', 'value'],
+                    data: '{l10n.taskCustomField.meta.mode.data}'
+                }
+            },
             queryMode: 'local',
             displayField: 'name',
             valueField: 'value',
-            store: {
-                fields: ['name', 'value'],
-                data: [
-                    {name: 'Project wizard', value: 'projectWizard'},
-                    {name: 'Project grid', value: 'projectGrid'},
-                    {name: 'Task grid', value: 'taskGrid'}
-                ]
-
+        }, {
+            xtype: 'tagfield',
+            forceSelection: true,
+            queryMode: 'local',
+            displayField: 'name',
+            valueField: 'value',
+            bind: {
+                fieldLabel: '{l10n.taskCustomField.meta.placesToShow.name}',
+                value: '{customField.placesToShow}',
+                store: {
+                    fields: ['name', 'value'],
+                    data: '{l10n.taskCustomField.meta.placesToShow.data}'
+                }
             }
         }, {
             xtype: 'numberfield',
-            fieldLabel: 'Position',
-            bind: '{customField.position}'
-        },{
-            xtype: 'toolbar',
-            dock: 'bottom',
-            items: [{
-                xtype: 'button',
-                glyph: 'f0c7@FontAwesome5FreeSolid',
-                text: 'Save',
-                handler: 'onSave'
-            },{
-                xtype: 'button',
-                glyph: 'f05e@FontAwesome5FreeSolid',
-                text: 'Cancel',
-                handler: 'onCancel'
-            },{
-                xtype: 'button',
-                glyph: 'f1f8@FontAwesome5FreeSolid',
-                text: 'Delete',
-                handler: 'onDelete'
-            }]
-
+            bind: {
+                fieldLabel: '{l10n.taskCustomField.meta.position}',
+                value: '{customField.position}'
+            }
         }]
-    }]
+    },
 });
