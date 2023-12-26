@@ -28,20 +28,66 @@
 Ext.define('Editor.view.admin.task.CustomField.PanelController', {
     extend: 'Ext.app.ViewController',
     alias: 'controller.adminTaskCustomFieldPanel',
+    listen: {
+        component: {
+            'form': {
+                boxready: 'formBoxReady'
+            }
+        }
+    },
 
+    /**
+     * Apply handlers to fire when json-fields are clicked,
+     * as there is neither triggers supported by ExtJS 6.2 nor click-event directly supported for fields
+     *
+     * @param form
+     */
+    formBoxReady: function(form){
+        var label = form.down('#label'),
+            tooltip = form.down('#tooltip'),
+            picklistData = form.down('#picklistData');
 
+        // Apply handlers
+        label.inputEl.on('click', el => this.jsonFieldClick(label));
+        tooltip.inputEl.on('click', el => this.jsonFieldClick(tooltip));
+        picklistData.inputEl.on('click', el => this.jsonFieldClick(picklistData));
+    },
+
+    /**
+     * make sure SimpleMap-popup is shown when field is clicked so that json-value can be edited via the popup
+     *
+     * @param field
+     */
+    jsonFieldClick: function(field) {
+        Ext.ClassManager.get('Editor.view.admin.config.type.SimpleMap').getJsonFieldEditor(field);
+    },
+
+    /**
+     * Save changes to new or existing custom field
+     */
     onSave:function(){
         var view = this.getView();
-        view.getViewModel().get('customField').save();
-        view.down('#taskCustomFieldGrid').getStore().reload();
+        view.mask(Ext.LoadMask.prototype.msg);
+        view.getViewModel().get('customField').save({
+            callback: () => view.unmask()
+        });
     },
 
+    /**
+     * Cancel changes pending for to new or existing custom field
+     */
     onCancel:function(){
-
+        this.getViewModel().get('customField').reject();
     },
 
+    /**
+     * Delete custom field
+     */
     onDelete:function(){
-        view.getViewModel().get('customField').erase();
-        view.down('#taskCustomFieldGrid').getStore().reload();
+        var view = this.getView(), record = view.getViewModel().get('customField');
+        record.erase();
+        if (!record.phantom) {
+            view.down('#taskCustomFieldGrid').getStore().reload();
+        }
     }
 });

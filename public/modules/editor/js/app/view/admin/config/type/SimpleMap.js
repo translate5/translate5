@@ -39,6 +39,7 @@ Ext.define('Editor.view.admin.config.type.SimpleMap', {
     controller: 'configTypeSimpleMap',
 
     record: null,
+    jsonField: null,
 
     /**
      * This statics must be implemented in classes used as custom config editors
@@ -46,6 +47,13 @@ Ext.define('Editor.view.admin.config.type.SimpleMap', {
     statics: {
         getConfigEditor: function (record) {
             var win = new this({record: record});
+            win.show();
+
+            //prevent cell editing:
+            return null;
+        },
+        getJsonFieldEditor: function (jsonField) {
+            var win = new this({jsonField: jsonField});
             win.show();
 
             //prevent cell editing:
@@ -66,9 +74,12 @@ Ext.define('Editor.view.admin.config.type.SimpleMap', {
     },
     initConfig: function (instanceConfig) {
         var me = this,
-            data = [], config;
+            data = [], config,
+            value = instanceConfig.record
+                ? instanceConfig.record.get('value')
+                : (Ext.JSON.decode(instanceConfig.jsonField.getValue(), true) || {});
 
-        Ext.Object.each(instanceConfig.record.get('value'), function (key, value) {
+        Ext.Object.each(value, function (key, value) {
             data.push([key, value]);
         });
         config = {

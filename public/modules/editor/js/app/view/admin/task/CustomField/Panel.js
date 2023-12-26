@@ -26,7 +26,7 @@
  */
 
 Ext.define('Editor.view.admin.task.CustomField.Panel', {
-    extend: 'Ext.form.Panel',
+    extend: 'Ext.panel.Panel',
     requires: [
         'Editor.view.admin.task.CustomField.Grid',
         'Editor.view.admin.task.CustomField.GridController',
@@ -80,15 +80,15 @@ Ext.define('Editor.view.admin.task.CustomField.Panel', {
                 bind: {
                     text: '{l10n.taskCustomField.save}',
                     disabled: '{!customField}'
-                }
-                //handler: 'onSave'
+                },
+                handler: 'onSave'
             }, {
                 glyph: 'f05e@FontAwesome5FreeSolid',
                 bind: {
                     text: '{l10n.taskCustomField.cancel}',
                     disabled: '{!customField}'
-                }
-                //handler: 'onCancel'
+                },
+                handler: 'onCancel'
             }, {
                 glyph: 'f2ed@FontAwesome5FreeSolid',
                 bind: {
@@ -96,8 +96,6 @@ Ext.define('Editor.view.admin.task.CustomField.Panel', {
                     disabled: '{!customField}'
                 },
                 handler: 'onDelete',
-                //isDisabled: 'isDeleteDisabled',
-                //handler: 'deleteCustomField'
             }]
         }],
         bodyPadding: 15,
@@ -106,11 +104,16 @@ Ext.define('Editor.view.admin.task.CustomField.Panel', {
         defaultType: 'textfield',
 
         items: [{
+            itemId: 'label',
+            allowBlank: false,
+            readOnly: true,
             bind: {
                 fieldLabel: '{l10n.taskCustomField.meta.label}',
                 value: '{customField.label}'
             }
         }, {
+            itemId: 'tooltip',
+            readOnly: true,
             bind: {
                 fieldLabel: '{l10n.taskCustomField.meta.tooltip}',
                 value: '{customField.tooltip}'
@@ -118,7 +121,9 @@ Ext.define('Editor.view.admin.task.CustomField.Panel', {
         }, {
             xtype: 'combobox',
             forceSelection: true,
+            allowBlank: false,
             queryMode: 'local',
+            value: 'text',
             bind: {
                 fieldLabel: '{l10n.taskCustomField.meta.type.name}',
                 value: '{customField.type}',
@@ -131,6 +136,8 @@ Ext.define('Editor.view.admin.task.CustomField.Panel', {
             valueField: 'value'
         }, {
             xtype: 'textarea',
+            itemId: 'picklistData',
+            readOnly: true,
             bind: {
                 fieldLabel: '{l10n.taskCustomField.meta.picklistData}',
                 value: '{customField.picklistData}',
@@ -146,6 +153,8 @@ Ext.define('Editor.view.admin.task.CustomField.Panel', {
         }, {
             xtype: 'combo',
             forceSelection: true,
+            allowBlank: false,
+            value: 'optional',
             bind: {
                 fieldLabel: '{l10n.taskCustomField.meta.mode.name}',
                 value: '{customField.mode}',

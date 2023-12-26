@@ -85,7 +85,7 @@ Ext.define('Editor.model.admin.task.CustomField', {
         type: 'string'
     }, {
         name: 'placesToShow',
-        type: 'auto'
+        type: 'string'
     }, {
         name: 'position',
         type: 'number'

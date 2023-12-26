@@ -35,12 +35,14 @@ Ext.define('Editor.view.admin.config.type.SimpleMapController', {
     alias: 'controller.configTypeSimpleMap',
 
     record: null,
+    jsonField: null,
 
     /**
      * get the record
      */
     init: function () {
         this.record = this.getView().initialConfig.record;
+        this.jsonField = this.getView().initialConfig.jsonField;
     },
 
     /**
@@ -55,24 +57,31 @@ Ext.define('Editor.view.admin.config.type.SimpleMapController', {
         grid.store.each(function (rec) {
             newValue[rec.get('index')] = rec.get('value');
         });
-        confRec.set('value', newValue);
-        win.setLoading('saving...');
-        confRec.save({
-            success: function () {
-                win.setLoading(false);
-                win.close();
-            },
-            failure: function () {
-                win.setLoading(false);
-            }
-        });
+        if (confRec) {
+            confRec.set('value', newValue);
+            win.setLoading('saving...');
+            confRec.save({
+                success: function () {
+                    win.setLoading(false);
+                    win.close();
+                },
+                failure: function () {
+                    win.setLoading(false);
+                }
+            });
+        } else {
+            this.jsonField.setValue(Ext.JSON.encode(newValue));
+            win.close();
+        }
     },
 
     /**
      * on cancel click button
      */
     onCancel: function () {
-        this.record.reject();
+        if (this.record) {
+            this.record.reject();
+        }
         this.getView().close();
     },
 

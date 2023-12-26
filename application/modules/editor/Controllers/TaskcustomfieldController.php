@@ -61,20 +61,20 @@ class editor_TaskcustomfieldController extends ZfExtended_RestController {
     public function postAction()
     {
         parent::postAction();
-        $fieldHandler = explode($this->entity->getPlacesToShow(), ',');
+        /*$fieldHandler = explode($this->entity->getPlacesToShow(), ',');
         foreach ($fieldHandler as $handler) {
             $handler = \MittagQI\Translate5\Task\CustomFields\Handler\Factory::getHandler($handler);
             $handler->addCustomField($this->entity);
-        }
+        }*/
     }
 
     public function putAction()
     {
         parent::putAction();
-        $fieldHandler = explode($this->entity->getPlacesToShow(), ',');
+        /*$fieldHandler = explode(',', $this->entity->getPlacesToShow());
         foreach ($fieldHandler as $handler) {
             $handler = \MittagQI\Translate5\Task\CustomFields\Handler\Factory::getHandler($handler);
             $handler->editCustomField($this->entity, $this->data);
-        }
+        }*/
     }
 }
