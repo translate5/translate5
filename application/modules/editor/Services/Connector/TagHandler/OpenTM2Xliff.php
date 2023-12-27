@@ -50,6 +50,7 @@ class editor_Services_Connector_TagHandler_OpenTM2Xliff extends editor_Services_
      */
     public function prepareQuery(string $queryString, bool $isSource = true): string
     {
+        $this->handleIsInSourceScope = $isSource;
         $queryString = parent::prepareQuery($queryString);
         $queryString = str_replace(
             ['<x id="', '<ex id="', '<bx id="'],

@@ -248,9 +248,10 @@ class editor_Models_Import_FileParser_Transit extends editor_Models_Import_FileP
      *         wobei die id die ID des Segments in der Tabelle Segments darstellt
      */
     protected function parseSegment($segment, $isSource){
-        $segment = editor_Models_Segment_Utility::foreachSegmentTextNode($segment, function($text){
+        $segment = editor_Models_Segment_Utility::foreachSegmentTextNode($segment, function($text) use ($isSource) {
             return $this->contentProtector->protect(
                 $text,
+                $isSource,
                 $this->task->getSourceLang(),
                 $this->task->getTargetLang()
             );

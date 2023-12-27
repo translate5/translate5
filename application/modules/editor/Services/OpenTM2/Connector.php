@@ -402,9 +402,12 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
             $tmOffset = (int) $tmOffset;
         }
 
+        $isSource = $field === 'source';
+
         $searchString = $this->tagHandler->prepareQuery(
             $this->contentProtector->protect(
                 $searchString,
+                $isSource,
                 (int) $this->languageResource->getSourceLang(),
                 (int) $this->languageResource->getSourceLang(),
                 ContentProtector::ENTITY_MODE_RESTORE,
@@ -471,7 +474,6 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
         //$found->{$field}
         //[NextSearchPosition] =>
         foreach ($results as $result) {
-            $isSource = $field === 'source';
             $searchString = $this->conversionService->convertT5MemoryTagToNumber($searchString);
             $resultList->addResult($this->highlight(
                 $searchString,

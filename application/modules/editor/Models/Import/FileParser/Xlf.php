@@ -29,6 +29,7 @@ END LICENSE AND COPYRIGHT
 use editor_Models_Import_FileParser_Xlf_LengthRestriction as XlfLengthRestriction;
 use editor_Models_Import_FileParser_Xlf_SurroundingTagRemover_Abstract as AbstractSurroundingTagRemover;
 use editor_Models_Import_FileParser_XmlParser as XmlParser;
+use MittagQI\Translate5\ContentProtection\NumberProtection\Tag\NumberTag;
 use MittagQI\Translate5\ContentProtection\NumberProtection\Tag\NumberTagRenderer;
 use MittagQI\Translate5\Task\Import\FileParser\Xlf\Comments;
 use MittagQI\Translate5\Task\Import\FileParser\Xlf\NamespaceRegistry;
@@ -880,7 +881,11 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
                     continue;
                 }
 
-                $sourceChunks = $this->contentConverter->convert($sourceChunks, true, $currentSource['openerMeta']['preserveWhitespace']);
+                $sourceChunks = $this->contentConverter->convert(
+                    $sourceChunks,
+                    true,
+                    $currentSource['openerMeta']['preserveWhitespace']
+                );
                 $sourceSegment = $this->xmlparser->join($sourceChunks);
                 
                 //if there is no source content, nothing can be done
@@ -925,10 +930,16 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
                         $targetChunks = $this->xmlparser->join($targetChunks);
                     }
                     //in targetChunks the content is converted (tags, whitespace etc)
-                    $targetChunks = $this->contentConverter->convert($targetChunks, false, $currentTarget['openerMeta']['preserveWhitespace']);
+                    $targetChunks = $this->contentConverter->convert(
+                        $targetChunks,
+                        false,
+                        $currentTarget['openerMeta']['preserveWhitespace']
+                    );
                     unset($this->currentTarget[$mid]);
                 }
             }
+
+            $this->contentProtector->filterTagsInChunks($sourceChunks, $targetChunks);
             
             $this->surroundingTags->calculate($preserveWhitespace, $sourceChunks, $targetChunks, $this->xmlparser);
             

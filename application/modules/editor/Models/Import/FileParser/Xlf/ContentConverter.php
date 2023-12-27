@@ -93,6 +93,8 @@ class editor_Models_Import_FileParser_Xlf_ContentConverter {
 
     private ContentProtector $contentProtector;
 
+    private bool $handleIsInSourceScope = true;
+
     /**
      * @param XlfNamespaces $namespaces
      * @param editor_Models_Task $task for debugging reasons only
@@ -311,6 +313,7 @@ class editor_Models_Import_FileParser_Xlf_ContentConverter {
         $this->result = [];
         $this->removeTags = false;
         $this->shortTagNumbers->init($source);
+        $this->handleIsInSourceScope = $source;
 
         if ($source) {
             $this->contentProtector->resetShortcutMap();
@@ -381,13 +384,19 @@ class editor_Models_Import_FileParser_Xlf_ContentConverter {
 
             $text = $this->contentProtector->protect(
                 $text,
+                $this->handleIsInSourceScope,
                 $this->task->getSourceLang(),
                 $this->task->getTargetLang(),
                 ContentProtector::ENTITY_MODE_OFF
             );
         }
         else {
-            $text = $this->contentProtector->protect($text, $this->task->getSourceLang(), $this->task->getTargetLang());
+            $text = $this->contentProtector->protect(
+                $text,
+                $this->handleIsInSourceScope,
+                $this->task->getSourceLang(),
+                $this->task->getTargetLang()
+            );
         }
 
         $xmlChunks = $this->contentProtector->convertToInternalTagsInChunks(

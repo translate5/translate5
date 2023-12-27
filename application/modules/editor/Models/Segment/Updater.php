@@ -303,6 +303,7 @@ class editor_Models_Segment_Updater {
                 return strip_tags(
                     $this->contentProtector->protect(
                         $text,
+                        !$isEditingTargetInFront,
                         $this->task->getSourceLang(),
                         $this->task->getTargetLang(),
                         ContentProtector::ENTITY_MODE_RESTORE,

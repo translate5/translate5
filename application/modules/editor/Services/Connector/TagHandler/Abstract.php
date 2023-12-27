@@ -96,6 +96,7 @@ abstract class editor_Services_Connector_TagHandler_Abstract
     protected int $targetLang = 0;
 
     protected bool $protectNonWhitespaceContentOnXmlParsing = true;
+    protected bool $handleIsInSourceScope = true;
     
     public function __construct() {
         $this->xmlparser = ZfExtended_Factory::get(editor_Models_Import_FileParser_XmlParser::class);
@@ -113,6 +114,7 @@ abstract class editor_Services_Connector_TagHandler_Abstract
             $textNode = $this->contentProtector->convertToInternalTagsWithShortcutNumberMap(
                 $this->contentProtector->protect(
                     $textNode,
+                    $this->handleIsInSourceScope,
                     $this->sourceLang,
                     $this->targetLang,
                     ContentProtector::ENTITY_MODE_KEEP,

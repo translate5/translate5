@@ -57,6 +57,7 @@ class editor_Services_Connector_TagHandler_HtmlRepaired extends editor_Services_
         if ($this->currentSegment === null) {
             throw new ZfExtended_Exception('editor_Services_Connector_TagHandler_HtmlRepaired::prepareQuery: A currentSegment must be provided per query to use this tag-handler');
         }
+        $this->handleIsInSourceScope = $isSource;
         $key = 'rt'.$this->currentSegment->getId();
         try {
             // this tries to load the segment's

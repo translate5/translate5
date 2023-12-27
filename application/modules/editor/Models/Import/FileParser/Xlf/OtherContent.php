@@ -26,6 +26,8 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\ContentProtection\ContentProtector;
+
 /**
  * Handles OtherContent (recognition and length calculation) on XLIFF import
  * OtherContent is content outside of MRK type seg tags in a segment containing such MRKs
@@ -111,6 +113,8 @@ class editor_Models_Import_FileParser_Xlf_OtherContent {
     private array $midsToBeImported = [];
     private array $orphanedTags = [];
 
+    private ContentProtector $contentProtector;
+
     /**
      * Constructor
      * @param editor_Models_Import_FileParser_Xlf_ContentConverter $converter
@@ -124,6 +128,9 @@ class editor_Models_Import_FileParser_Xlf_OtherContent {
         $this->segmentBareInstance = $segment;
         $this->segmentMetaBareInstance = ZfExtended_Factory::get('editor_Models_Segment_Meta');
         $this->fileId = $fileId;
+        $this->contentProtector = ContentProtector::create(
+            ZfExtended_Factory::get(editor_Models_Segment_Whitespace::class)
+        );
     }
     
     /**
@@ -148,9 +155,30 @@ class editor_Models_Import_FileParser_Xlf_OtherContent {
         $this->useSource = $useSource;
         $this->preserveWhitespace = $preserveWhitespace;
 
+        $sourceChunks = $this->getContentPreserved(true);
+        $targetChunks = $this->getContentPreserved(true);
+
+        $this->contentProtector->filterTagsInChunks($sourceChunks, $targetChunks);
+
         //CRUCIAL - source must be called before target! due tag numbering in contentconverter
-        $this->prepareContentPreserved(true);
-        $this->prepareContentPreserved(false);
+        $this->prepareContentPreserved(true, $sourceChunks);
+        $this->prepareContentPreserved(false, $targetChunks);
+    }
+
+    private function getContentPreserved(bool $source): array
+    {
+        $data = $source ? $this->otherContentSource : $this->otherContentTarget;
+        $containerBoundary = $source ? $this->sourceElementBoundary : $this->targetElementBoundary;
+
+        if(empty($data) || empty($containerBoundary)) {
+            return [];
+        }
+
+        //in source always, and on target only if source empty
+        $resetTagNumbers = $source || empty($this->otherContentSource);
+        $concatContent = $this->xmlparser->join($this->convertBoundaryToContent($containerBoundary, $data));
+
+        return $this->contentConverter->convert($concatContent, $resetTagNumbers, $this->preserveWhitespace);
     }
 
 
@@ -158,7 +186,7 @@ class editor_Models_Import_FileParser_Xlf_OtherContent {
      * Prepare the other contents with preserved whitespace, returning already split the convert content on MRK boundaries
      * @param bool $source
      */
-    private function prepareContentPreserved(bool $source): void
+    private function prepareContentPreserved(bool $source, array $content): void
     {
         $data = $source ? $this->otherContentSource : $this->otherContentTarget;
         $containerBoundary = $source ? $this->sourceElementBoundary : $this->targetElementBoundary;
@@ -167,20 +195,17 @@ class editor_Models_Import_FileParser_Xlf_OtherContent {
             return;
         }
 
-
-        //in source always, and on target only if source empty
-        $resetTagNumbers = $source || empty($this->otherContentSource);
-
-        $concatContent = $this->xmlparser->join($this->convertBoundaryToContent($containerBoundary, $data));
-        $content = $this->contentConverter->convert($concatContent, $resetTagNumbers, $this->preserveWhitespace);
-
         //add the other data container for the first content BEFORE the first MRK:
-        $firstOtherContent = new editor_Models_Import_FileParser_Xlf_OtherContent_Data(0, $containerBoundary[0], reset($data)->startMrkIdx);
-        if($source) {
+        $firstOtherContent = new editor_Models_Import_FileParser_Xlf_OtherContent_Data(
+            0,
+            $containerBoundary[0],
+            reset($data)->startMrkIdx
+        );
+
+        if ($source) {
             array_unshift($this->otherContentSource, $firstOtherContent);
             $data = $this->otherContentSource;
-        }
-        else {
+        } else {
             array_unshift($this->otherContentTarget, $firstOtherContent);
             $data = $this->otherContentTarget;
         }

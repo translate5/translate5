@@ -540,7 +540,7 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
             $attributes->mrkMid = $mid;
 
             $this->segmentData[$sourceName] = ['original' => $this->parseSegment($source,true)];
-            $this->segmentData[$targetName] = ['original' => $this->parseSegment($target,true)];
+            $this->segmentData[$targetName] = ['original' => $this->parseSegment($target,false)];
             $segmentId = $this->setAndSaveSegmentValues();
             $this->saveComments($segmentId, $comments);
             return $this->getFieldPlaceholder($segmentId, $targetName);
@@ -738,10 +738,12 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
      * @return string $segment enthält anstelle der Tags die vom JS benötigten Replacement-Tags
      *         wobei die id die ID des Segments in der Tabelle Segments darstellt
      */
-    protected function parseSegment($segment,$isSource): string {
-        $segment = editor_Models_Segment_Utility::foreachSegmentTextNode($segment, function($text) {
+    protected function parseSegment($segment, $isSource): string
+    {
+        $segment = editor_Models_Segment_Utility::foreachSegmentTextNode($segment, function($text) use ($isSource) {
             return $this->contentProtector->protect(
                 $text,
+                $isSource,
                 $this->task->getSourceLang(),
                 $this->task->getTargetLang()
             );

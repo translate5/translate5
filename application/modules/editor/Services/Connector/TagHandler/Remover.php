@@ -44,7 +44,9 @@ class editor_Services_Connector_TagHandler_Remover extends editor_Services_Conne
      * @param string $queryString
      * @return string
      */
-    public function prepareQuery(string $queryString, bool $isSource = true): string {
+    public function prepareQuery(string $queryString, bool $isSource = true): string
+    {
+        $this->handleIsInSourceScope = $isSource;
         $this->realTagCount = 0;
         
         //1. whitespace preparation
@@ -71,6 +73,7 @@ class editor_Services_Connector_TagHandler_Remover extends editor_Services_Conne
         return $this->contentProtector->convertToInternalTagsWithShortcutNumberMap(
             $this->contentProtector->protect(
                 $text,
+                $this->handleIsInSourceScope,
                 $this->sourceLang,
                 $this->targetLang,
                 ContentProtector::ENTITY_MODE_KEEP

@@ -380,6 +380,7 @@ class editor_Models_Import_FileParser_Csv extends editor_Models_Import_FileParse
         // if there are now internal tags added by the whitespace protection we have to protect them locally too
         $segment = $this->contentProtector->protectAndConvert(
             $segment,
+            $isSource,
             $this->task->getSourceLang(),
             $this->task->getTargetLang(),
             $this->shortTagIdent,

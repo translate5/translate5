@@ -99,6 +99,7 @@ class editor_Services_Connector_TagHandler_Xliff extends editor_Services_Connect
      * @return string
      */
     public function prepareQuery(string $queryString, bool $isSource = true): string {
+        $this->handleIsInSourceScope = $isSource;
         $this->realTagCount = 0;
         //$map is set by reference
         $this->map = [];
