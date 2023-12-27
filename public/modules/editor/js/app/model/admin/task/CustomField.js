@@ -32,8 +32,8 @@
  *  //"customerId": null,                                          // Disabled so far
  *  "label": "Some custom field",
  *  "tooltip": "Some tooltip",
- *  "type": "picklist",                                            // Other possible values here are 'text', 'boolean' and 'textarea'
- *  "picklistData": "{option1: 'Option 1', option2: 'Option 2'}",  // Applicable for 'picklist' type only
+ *  "type": "combobox",                                            // Other possible values here are 'textfield', 'checkbox' and 'textarea'
+ *  "comboboxData": "{option1: 'Option 1', option2: 'Option 2'}",  // Applicable for 'combobox' type only
  *  "regex": "^[a-zA-Z0-9]+$",                                     // Applicable for 'text' and 'textarea' types only
  *  "mode": "regular",                                             // Other possible values are 'required' and 'readonly'
  *  "placesToShow": "projectWizard,projectGrid,taskGrid",
@@ -75,7 +75,7 @@ Ext.define('Editor.model.admin.task.CustomField', {
         name: 'type',
         type: 'string'
     }, {
-        name: 'picklistData',
+        name: 'comboboxData',
         type: 'string'
     }, {
         name: 'regex',

@@ -117,12 +117,69 @@ Ext.define('Editor.view.admin.TaskAddWindow', {
     initConfig: function(instanceConfig) {
         var me = this,
             now = new Date(),
-            config;
-        
+            config,
+            taskCustomFields = [],
+            locale = Editor.data.locale;
+
         //init the card group arrays
         me.groupCards['preimport']=[];
         me.groupCards['import']=[];
         me.groupCards['postimport']=[];
+
+        // Foreach custom field
+        Editor.data.editor.task.customFields.forEach(field => {
+
+            // If field should not be shown in project wizard - skip
+            if (!field.placesToShow.match('projectWizard')) return;
+
+            // Get labels and tooltips
+            var labelL10n = Ext.JSON.decode(field.label, true) || {};
+            var tooltipL10n = Ext.JSON.decode(field.tooltip, true) || {};
+
+            // Start config
+            config = {
+                fieldLabel: locale in labelL10n ? labelL10n[locale] : field.label,
+                tooltip   : locale in tooltipL10n ? tooltipL10n[locale] : field.tooltip,
+                xtype     : field.type,
+                name      : 'customField' + field.id,
+                itemId    : 'customField' + field.id,
+                readOnly  : field.mode === 'readonly',
+                regex     : field.regex ? new RegExp(field.regex) : null,
+                allowBlank: field.type === 'checkbox' || field.mode !== 'required'
+            };
+
+            // If it's a checkbox
+            if (field.type === 'checkbox') {
+
+                // Use '1' instead of 'on'
+                config.inputValue = 1;
+
+            // Else if it's a combobox
+            } else if (field.type === 'combobox') {
+
+                // Decode field's comboboxData, if possible
+                var decoded = Ext.JSON.decode(field.comboboxData, true) || {}, store = [];
+
+                // Re-structure to format supported by extjs
+                Ext.Object.each(decoded, (value, title) => store.push({
+                    value: value,
+                    title: title,
+                }));
+
+                // Apply combobox-specific configs
+                Ext.merge(config, {
+                    valueField: 'value',
+                    displayField: 'title',
+                    store: {
+                        fields: ['value', 'title'],
+                        data: store
+                    }
+                });
+            }
+
+            // Add to configs array
+            taskCustomFields.push(config);
+        });
 
         now.setHours(0,0,0,0);
         config = {
@@ -202,7 +259,7 @@ Ext.define('Editor.view.admin.TaskAddWindow', {
                                     name: 'lockLocked',
                                     checked: true,
                                     fieldLabel: me.strings.lockLockedLabel
-                                }]
+                                }].concat(taskCustomFields)
                             },{
                                 xtype: 'container',
                                 itemId: 'taskSecondCardContainer',

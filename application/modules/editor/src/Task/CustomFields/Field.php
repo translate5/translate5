@@ -44,8 +44,8 @@ use ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey;
  * @method void setTooltip(string $tooltip)
  * @method string getType()
  * @method void setType(string $type)
- * @method string getPicklistData()
- * @method void setPicklistData(string $picklistData)
+ * @method string getComboboxData()
+ * @method void setComboboxData(string $comboboxData)
  * @method string getRegex()
  * @method void setRegex(string $regex)
  * @method string getMode()
@@ -65,4 +65,68 @@ class Field extends ZfExtended_Models_Entity_Abstract {
     protected $dbInstanceClass = \MittagQI\Translate5\Task\CustomFields\Db::class;
 
     protected $validatorInstanceClass = \MittagQI\Translate5\Task\CustomFields\Validator::class;
+
+    /**
+     * Add db column to the tasks table structure
+     */
+    public function onAfterInsert() {
+        $this->alterTasksTable('insert', $this->getId());
+    }
+
+    /**
+     * Drop db column from the tasks table structure
+     */
+    public function delete() {
+
+        // Get id of a newly created custom field
+        $id = $this->getId();
+
+        // Call parent
+        parent::delete();
+
+        // Drop column from tasks table
+        $this->alterTasksTable('delete', $id);
+    }
+
+    /**
+     * Add/drop column into/from the tasks table structure
+     *
+     * @param string $customFieldEvent
+     * @param int $customFieldId
+     * @throws \ReflectionException
+     * @throws \Zend_Db_Table_Exception
+     */
+    public function alterTasksTable(string $customFieldEvent, int $customFieldId) : void {
+
+        // Get db adapter
+        $db = $this->db->getAdapter();
+
+        // Get tasks table name
+        $table = \ZfExtended_Factory
+            ::get(\editor_Models_Db_Task::class)
+            ->info(\Zend_Db_Table_Abstract::NAME);
+
+        // Add column
+        if ($customFieldEvent === 'insert') {
+            $db->query("ALTER TABLE $table ADD COLUMN `customField$customFieldId` VARCHAR(1024) DEFAULT '' NOT NULL");
+
+        // Drop column
+        } else if ($customFieldEvent === 'delete') {
+            $db->query("ALTER TABLE $table DROP COLUMN `customField$customFieldId`");
+        }
+
+        // Clear cache
+        \Zend_Registry::get('cache')->clean();
+    }
+
+    /**
+     * Get all custom fields sorted by `position`
+     *
+     * @return array
+     */
+    public function loadAllSorted() {
+        $s = $this->db->select();
+        $s->order('position');
+        return $this->loadFilterdCustom($s);
+    }
 }

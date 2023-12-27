@@ -61,7 +61,7 @@ Ext.define('Editor.store.admin.task.CustomField', {
                     'label': record.get('label'),
                     'tooltip': record.get('tooltip'),
                     'type': record.get('type'),
-                    'picklistData': record.get('picklistData'),
+                    'comboboxData': record.get('comboboxData'),
                     'regex': record.get('regex'),
                     'mode': record.get('mode'),
                     'cid': (cid === null ? 0 : cid),
@@ -74,7 +74,7 @@ Ext.define('Editor.store.admin.task.CustomField', {
             return true;
         });
         return Ext.create('Ext.data.Store', {
-            fields: ['id', 'label', 'tooltip', 'type', 'picklistData', 'regex', 'mode', 'cid', 'placesToShow', 'position'],
+            fields: ['id', 'label', 'tooltip', 'type', 'comboboxData', 'regex', 'mode', 'cid', 'placesToShow', 'position'],
             sorters: [
                 { 'property': 'cid', 'direction': 'DESC' },
                 { 'property': 'position', 'direction': 'ASC' }

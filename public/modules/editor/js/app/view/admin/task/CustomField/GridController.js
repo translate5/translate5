@@ -65,8 +65,8 @@ Ext.define('Editor.view.admin.task.CustomField.GridController', {
      * @returns {*|string}
      */
     typeRenderer: function(value, meta, record) {
-        if (value === 'picklist') {
-            meta.tdAttr = 'data-qtip="' + Ext.String.htmlEncode(record.get('picklistData')) + '"';
+        if (value === 'combobox') {
+            meta.tdAttr = 'data-qtip="' + Ext.String.htmlEncode(record.get('comboboxData')) + '"';
             meta.tdStyle = 'text-decoration: underline dotted; text-underline-offset: 4px;';
         }
 
@@ -125,7 +125,7 @@ Ext.define('Editor.view.admin.task.CustomField.GridController', {
         newCustomField.set({
             label: '{"en":"","de":""}',
             tooltip: '{"en":"","de":""}',
-            type: 'text',
+            type: 'textfield',
             mode: 'optional',
         });
         store.add(newCustomField);

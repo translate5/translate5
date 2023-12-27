@@ -143,13 +143,13 @@ Ext.define('Editor.view.admin.task.CustomField.Grid', {
             },
             {
                 xtype: 'gridcolumn',
-                alias: 'picklistData',
-                dataIndex: 'picklistData',
-                stateId: 'picklistData',
+                alias: 'comboboxData',
+                dataIndex: 'comboboxData',
+                stateId: 'comboboxData',
                 hidden: true,
                 flex: 3,
                 bind: {
-                    text: '{l10n.taskCustomField.meta.picklistData}'
+                    text: '{l10n.taskCustomField.meta.comboboxData}'
                 }
             }, {
                 xtype: 'gridcolumn',

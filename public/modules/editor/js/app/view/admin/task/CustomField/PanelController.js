@@ -45,12 +45,12 @@ Ext.define('Editor.view.admin.task.CustomField.PanelController', {
     formBoxReady: function(form){
         var label = form.down('#label'),
             tooltip = form.down('#tooltip'),
-            picklistData = form.down('#picklistData');
+            comboboxData = form.down('#comboboxData');
 
         // Apply handlers
         label.inputEl.on('click', el => this.jsonFieldClick(label));
         tooltip.inputEl.on('click', el => this.jsonFieldClick(tooltip));
-        picklistData.inputEl.on('click', el => this.jsonFieldClick(picklistData));
+        comboboxData.inputEl.on('click', el => this.jsonFieldClick(comboboxData));
     },
 
     /**
@@ -85,9 +85,14 @@ Ext.define('Editor.view.admin.task.CustomField.PanelController', {
      */
     onDelete:function(){
         var view = this.getView(), record = view.getViewModel().get('customField');
-        record.erase();
-        if (!record.phantom) {
-            view.down('#taskCustomFieldGrid').getStore().reload();
-        }
+        view.mask(Ext.LoadMask.prototype.msg);
+        record.erase({
+            callback: () => {
+                view.unmask();
+                if (!record.phantom) {
+                    view.down('#taskCustomFieldGrid').getStore().reload();
+                }
+            }
+        });
     }
 });

@@ -43,8 +43,8 @@ class Validator extends ZfExtended_Models_Validator_Abstract
         $this->addValidator('id', 'int', allowNull: true);
         $this->addValidator('label', 'stringLength', ['min' => 0, 'max' => 255], allowNull: true);
         $this->addValidator('tooltip', 'stringLength', ['min' => 0, 'max' => 255], allowNull: true);
-        $this->addValidator('type', 'inArray', [['text', 'textarea', 'boolean', 'picklist']], allowNull: true);
-        $this->addValidator('picklistData', 'stringLength', ['min' => 0, 'max' => 65535], allowNull: true);
+        $this->addValidator('type', 'inArray', [['textfield', 'textarea', 'checkbox', 'combobox']], allowNull: true);
+        $this->addValidator('comboboxData', 'stringLength', ['min' => 0, 'max' => 65535], allowNull: true);
         $this->addValidator('regex', 'stringLength', ['min' => 0, 'max' => 255], allowNull: true);
         $this->addValidator('mode', 'inArray', [['optional', 'required', 'readonly']], allowNull: true);
         $this->addValidatorCustom('placesToShow', function ($value) {

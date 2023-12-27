@@ -136,19 +136,19 @@ Ext.define('Editor.view.admin.task.CustomField.Panel', {
             valueField: 'value'
         }, {
             xtype: 'textarea',
-            itemId: 'picklistData',
+            itemId: 'comboboxData',
             readOnly: true,
             bind: {
-                fieldLabel: '{l10n.taskCustomField.meta.picklistData}',
-                value: '{customField.picklistData}',
-                hidden: '{customField.type != "picklist"}'
+                fieldLabel: '{l10n.taskCustomField.meta.comboboxData}',
+                value: '{customField.comboboxData}',
+                hidden: '{customField.type != "combobox"}'
             }
         }, {
             xtype: 'textfield',
             bind: {
                 fieldLabel: '{l10n.taskCustomField.meta.regex}',
                 value: '{customField.regex}',
-                hidden: '{customField.type == "picklist" || customField.type == "boolean"}'
+                hidden: '{customField.type == "combobox" || customField.type == "checkbox"}'
             }
         }, {
             xtype: 'combo',

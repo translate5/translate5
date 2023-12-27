@@ -36,7 +36,7 @@ use MittagQI\Translate5\Task\TaskContextTrait;
 use MittagQI\Translate5\Cronjob\CronIpFactory;
 use MittagQI\ZfExtended\Acl\SetAclRoleResource as BaseRoles;
 use MittagQI\ZfExtended\CsrfProtection;
-
+use MittagQI\Translate5\Task\CustomFields\Field as TaskCustomField;
 /**
  * Dummy Index Controller
  */
@@ -442,6 +442,10 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
         $this->view->Php2JsVars()->set(
             'editor.task.reimport.supportedExtensions',
             FileparserRegistry::getInstance()->getSupportedFileTypes()
+        );
+        $this->view->Php2JsVars()->set(
+            'editor.task.customFields',
+            ZfExtended_Factory::get(TaskCustomField::class)->loadAllSorted()
         );
         $this->setJsAppData();
         editor_Segment_Quality_Manager::instance()->addAppJsData($this->view->Php2JsVars());
