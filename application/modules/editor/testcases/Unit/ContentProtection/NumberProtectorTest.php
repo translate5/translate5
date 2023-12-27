@@ -55,7 +55,6 @@ namespace MittagQI\Translate5\Test\Unit\ContentProtection;
 use editor_Models_Languages;
 use MittagQI\Translate5\ContentProtection\Model\ContentProtectionRepository;
 use MittagQI\Translate5\ContentProtection\Model\ContentProtectionDto;
-use MittagQI\Translate5\ContentProtection\NumberProtection\Protector\AbstractProtector;
 use MittagQI\Translate5\ContentProtection\NumberProtection\Protector\IPAddressProtector;
 use MittagQI\Translate5\ContentProtection\NumberProtection\Protector\NumberProtectorInterface;
 use MittagQI\Translate5\ContentProtection\NumberProtection\Tag\NumberTag;
@@ -66,6 +65,62 @@ use ZfExtended_Logger;
 
 class NumberProtectorTest extends TestCase
 {
+    /**
+     * @dataProvider filterTagsProvider
+     */
+    public function testFilterTags(string $source, string $target, string $sourceExpected, string $targetExpected): void
+    {
+        NumberProtector::create()->filterTags($source, $target);
+
+        self::assertSame($sourceExpected, $source);
+        self::assertSame($targetExpected, $target);
+    }
+
+    public function filterTagsProvider(): iterable
+    {
+        yield [
+            'source' => 'string <number type="date" name="default Ymd" source="20231020" iso="2023-10-20" target="2023-10-20"/> string <number type="date" name="default Ymd" source="20231020" iso="2023-10-20" target="2023-10-20"/> string',
+            'target' => 'string <number type="date" name="default Ymd" source="20231020" iso="2023-10-20" target="2023-10-20"/> string <number type="date" name="default Ymd" source="20231020" iso="2023-10-20" target="2023-10-20"/> string',
+            'sourceExpected' => 'string <number type="date" name="default Ymd" source="20231020" iso="2023-10-20" target="2023-10-20"/> string <number type="date" name="default Ymd" source="20231020" iso="2023-10-20" target="2023-10-20"/> string',
+            'targetExpected' => 'string <number type="date" name="default Ymd" source="20231020" iso="2023-10-20" target="2023-10-20"/> string <number type="date" name="default Ymd" source="20231020" iso="2023-10-20" target="2023-10-20"/> string',
+        ];
+
+        yield [
+            'source' => 'string <number type="date" name="default Ymd" source="20231020" iso="2023-10-20" target="2023-10-20"/> string <number type="date" name="default Ymd" source="20231020" iso="2023-10-20" target="2023-10-20"/> string',
+            'target' => 'string <number type="date" name="default Y.m.d" source="2023.10.20" iso="2023-10-20" target="2023-10-20"/> string <number type="date" name="default Y*m*d" source="2023*10*20" iso="2023-10-20" target="2023-10-20"/> string',
+            'sourceExpected' => 'string <number type="date" name="default Ymd" source="20231020" iso="2023-10-20" target="2023-10-20"/> string <number type="date" name="default Ymd" source="20231020" iso="2023-10-20" target="2023-10-20"/> string',
+            'targetExpected' => 'string <number type="date" name="default Ymd" source="20231020" iso="2023-10-20" target="2023-10-20"/> string <number type="date" name="default Ymd" source="20231020" iso="2023-10-20" target="2023-10-20"/> string',
+        ];
+
+        yield [
+            'source' => 'string <number type="date" name="default Ymd" source="20231022" iso="2023-10-22" target="2023-10-22"/> string <number type="date" name="default Ymd" source="20231021" iso="2023-10-21" target="2023-10-21"/> string',
+            'target' => 'string <number type="date" name="default Ymd" source="20231020" iso="2023-10-20" target="2023-10-20"/> string <number type="date" name="default Ymd" source="20231021" iso="2023-10-21" target="2023-10-21"/> string',
+            'sourceExpected' => 'string 20231022 string <number type="date" name="default Ymd" source="20231021" iso="2023-10-21" target="2023-10-21"/> string',
+            'targetExpected' => 'string 20231020 string <number type="date" name="default Ymd" source="20231021" iso="2023-10-21" target="2023-10-21"/> string',
+        ];
+
+        yield [
+            'source' => 'string <number type="date" name="default Y*m*d" source="2023*10*21" iso="2023-10-21" target="2023-10-21"/> string',
+            'target' => 'string <number type="date" name="default Ymd" source="20231021" iso="2023-10-21" target="2023-10-21"/> string',
+            'sourceExpected' => 'string <number type="date" name="default Y*m*d" source="2023*10*21" iso="2023-10-21" target="2023-10-21"/> string',
+            'targetExpected' => 'string <number type="date" name="default Y*m*d" source="2023*10*21" iso="2023-10-21" target="2023-10-21"/> string',
+        ];
+
+        yield [
+            'source' => 'string 2023-10-21 string',
+            'target' => 'string <number type="date" name="default Ymd" source="20231021" iso="2023-10-21" target="2023-10-21"/> string',
+            'sourceExpected' => 'string 2023-10-21 string',
+            'targetExpected' => 'string 20231021 string',
+        ];
+
+        yield [
+            'source' => 'string <number type="date" name="default Y-m-d" source="2023-10-21" iso="2023-10-21" target="2023-10-21"/> string',
+            'target' => 'string 20231021 string',
+            'sourceExpected' => 'string 2023-10-21 string',
+            'targetExpected' => 'string 20231021 string',
+        ];
+    }
+
     public function testHasEntityToProtect(): void
     {
         $processor = new class implements NumberProtectorInterface {
@@ -94,41 +149,13 @@ class NumberProtectorTest extends TestCase
         self::assertTrue($protector->hasEntityToProtect('text with part of mac [aa-] in it'));
     }
 
-    public function testProtect(): void
-    {
-        $processor = new class implements NumberProtectorInterface {
-            public static function getType(): string
-            {
-                return 'test';
-            }
-
-            public function protect(
-                string $number,
-                ContentProtectionDto $protectionDto,
-                ?editor_Models_Languages $sourceLang,
-                ?editor_Models_Languages $targetLang
-            ): string {
-                return $number;
-            }
-        };
-        $numberRepository = $this->createConfiguredMock(ContentProtectionRepository::class, []);
-        $languageRepository = $this->createConfiguredMock(LanguageRepository::class, []);
-        $logger = $this->createConfiguredMock(ZfExtended_Logger::class, []);
-
-        $protector = new NumberProtector([$processor], $numberRepository, $languageRepository, $logger);
-
-        $testNode = 'some sample text';
-
-        self::assertSame($testNode, $protector->protect($testNode, 0, 0));
-    }
-
     public function testCheatTypeUsage(): void
     {
         $sourceLang = new editor_Models_Languages();
         $sourceLang->setId(5);
         $sourceLang->setRfc5646('en');
 
-        $getAll = function () {
+        $getAllForSource = function () {
             yield new ContentProtectionDto(
                 'ip-address',
                 'test-cheat',
@@ -143,7 +170,7 @@ class NumberProtectorTest extends TestCase
         $numberRepository = $this->createConfiguredMock(
             ContentProtectionRepository::class,
             [
-                'getAll' => $getAll()
+                'getAllForSource' => $getAllForSource()
             ]
         );
         $languageRepository = $this->createConfiguredMock(LanguageRepository::class, ['find' => $sourceLang]);
@@ -158,7 +185,7 @@ class NumberProtectorTest extends TestCase
 
         self::assertSame(
             '1. Here we have <number type="ip-address" name="test-cheat" source="some text" iso="some text" target="some text"/> case',
-            $protector->protect('1. Here we have some text case', 5, 6)
+            $protector->protect('1. Here we have some text case', true, 5, 6)
         );
     }
 
@@ -168,7 +195,7 @@ class NumberProtectorTest extends TestCase
         $sourceLang->setId(5);
         $sourceLang->setRfc5646('en');
 
-        $getAll = function () {
+        $getAllForSource = function () {
             yield new ContentProtectionDto(
                 'date',
                 'test-no-output',
@@ -183,7 +210,7 @@ class NumberProtectorTest extends TestCase
         $numberRepository = $this->createConfiguredMock(
             ContentProtectionRepository::class,
             [
-                'getAll' => $getAll()
+                'getAllForSource' => $getAllForSource()
             ]
         );
         $languageRepository = $this->createConfiguredMock(LanguageRepository::class, ['find' => $sourceLang]);
@@ -199,7 +226,7 @@ class NumberProtectorTest extends TestCase
 
         self::assertSame(
             '1. Here we have some text some text some text case',
-            $protector->protect('1. Here we have some text some text some text case', 5, 6)
+            $protector->protect('1. Here we have some text some text some text case', true, 5, 6)
         );
     }
 
@@ -267,6 +294,8 @@ class NumberProtectorTest extends TestCase
         $parsedTag1->id = 'number';
         $parsedTag1->tag = 'number';
         $parsedTag1->text = '{"source":"20231020","target":"2023-10-20"}';
+        $parsedTag1->iso = '2023-10-20';
+        $parsedTag1->source = '20231020';
         $parsedTag1->renderedTag = $converted1;
 
         yield [
@@ -284,12 +313,101 @@ class NumberProtectorTest extends TestCase
         $parsedTag2->id = 'number';
         $parsedTag2->tag = 'number';
         $parsedTag2->text = '{"source":"1234","target":""}';
+        $parsedTag2->iso = '1234';
+        $parsedTag2->source = '1234';
         $parsedTag2->renderedTag = $converted2;
 
         yield [
             'segment' => "string $tag1 string $tag2 string",
             'xmlChunks' => ['string ', $parsedTag1, ' string ', $parsedTag2, ' string'],
             'finalTagIdent' => 3,
+        ];
+    }
+
+    /**
+     * @dataProvider filterTagsChunksProvider
+     */
+    public function testFilterTagsInChunks(array $source, array $target, array $sourceExpected, array $targetExpected): void
+    {
+        NumberProtector::create()->filterTagsInChunks($source, $target);
+
+        self::assertEquals($sourceExpected, $source);
+        self::assertEquals($targetExpected, $target);
+    }
+
+    public function filterTagsChunksProvider(): iterable
+    {
+        $tag1 = '<number type="date" name="default" source="20231020" iso="2023-10-20" target="2023-10-20"/>';
+        $converted1 = '<div class="single 6e756d62657220747970653d226461746522206e616d653d2264656661756c742220736f757263653d223230323331303230222069736f3d22323032332d31302d323022207461726765743d22323032332d31302d3230222f number internal-tag ownttip"><span title="&lt;1/&gt;: Number" class="short">&lt;1/&gt;</span><span data-originalid="number" data-length="10" data-source="20231020" data-target="2023-10-20" class="full"></span></div>';
+
+        $parsedTag1 = new NumberTag();
+        $parsedTag1->originalContent = $tag1;
+        $parsedTag1->tagNr = 1;
+        $parsedTag1->id = 'number';
+        $parsedTag1->tag = 'number';
+        $parsedTag1->text = '{"source":"20231020","target":"2023-10-20"}';
+        $parsedTag1->iso = '2023-10-20';
+        $parsedTag1->source = '20231020';
+        $parsedTag1->renderedTag = $converted1;
+
+        $tag2 = '<number type="integer" name="default" source="1234" iso="1234" target=""/>';
+        $converted2 = '<div class="single 6e756d62657220747970653d22696e746567657222206e616d653d2264656661756c742220736f757263653d2231323334222069736f3d223132333422207461726765743d22222f number internal-tag ownttip"><span title="&lt;2/&gt;: Number" class="short">&lt;2/&gt;</span><span data-originalid="number" data-length="4" data-source="1234" data-target="1234" class="full"></span></div>';
+
+        $parsedTag2 = new NumberTag();
+        $parsedTag2->originalContent = $tag2;
+        $parsedTag2->tagNr = 2;
+        $parsedTag2->id = 'number';
+        $parsedTag2->tag = 'number';
+        $parsedTag2->text = '{"source":"1234","target":"1234"}';
+        $parsedTag2->iso = '1234';
+        $parsedTag2->source = '1234';
+        $parsedTag2->renderedTag = $converted2;
+
+        yield [
+            'source' => ['string', $parsedTag1, ' string ', $parsedTag2, 'string'],
+            'target' => ['string', $parsedTag1, ' string ', $parsedTag2, 'string'],
+            'sourceExpected' => ['string', $parsedTag1, ' string ', $parsedTag2, 'string'],
+            'targetExpected' => ['string', $parsedTag1, ' string ', $parsedTag2, 'string'],
+        ];
+
+        $parsedTag3 = clone $parsedTag1;
+        $parsedTag3->iso = '2023-10-20';
+        $parsedTag3->source = '2023.10.20';
+
+        $parsedTag4 = clone $parsedTag2;
+        $parsedTag4->iso = '1234';
+        $parsedTag4->source = '1.234';
+
+        yield [
+            'source' => ['string', $parsedTag1, ' string ', $parsedTag2, 'string'],
+            'target' => ['string', $parsedTag3, ' string ', $parsedTag4, 'string'],
+            'sourceExpected' => ['string', $parsedTag1, ' string ', $parsedTag2, 'string'],
+            'targetExpected' => ['string', $parsedTag1, ' string ', $parsedTag2, 'string'],
+        ];
+
+        $parsedTag5 = clone $parsedTag1;
+        $parsedTag5->iso = '2023-10-22';
+        $parsedTag5->source = '2023.10.22';
+
+        yield [
+            'source' => ['string', $parsedTag1, ' string ', $parsedTag2, 'string'],
+            'target' => ['string', $parsedTag5, ' string ', $parsedTag4, 'string'],
+            'sourceExpected' => ['string', '20231020', ' string ', $parsedTag2, 'string'],
+            'targetExpected' => ['string', '2023.10.22', ' string ', $parsedTag2, 'string'],
+        ];
+
+        yield [
+            'source' => ['string', '20231020', 'string'],
+            'target' => ['string', $parsedTag5, 'string'],
+            'sourceExpected' => ['string', '20231020', 'string'],
+            'targetExpected' => ['string', '2023.10.22', 'string'],
+        ];
+
+        yield [
+            'source' => ['string', $parsedTag5, 'string'],
+            'target' => ['string', '20231020', 'string'],
+            'sourceExpected' => ['string', '2023.10.22', 'string'],
+            'targetExpected' => ['string', '20231020', 'string'],
         ];
     }
 }

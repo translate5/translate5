@@ -153,7 +153,7 @@ class ContentProtectorTest extends editor_Test_UnitTest
     {
         $contentProtector = ContentProtector::create(new Whitespace());
 
-        self::assertEquals($expected, $contentProtector->protect($node, 5, 6, $entityHandling));
+        self::assertEquals($expected, $contentProtector->protect($node, true, 5, 6, $entityHandling));
     }
 
     /**

@@ -83,10 +83,15 @@ class WhitespaceProtector implements ProtectorInterface
         return (bool) preg_match(sprintf("/<(%s)\s?/", implode('|', $this->whitespace->validTags())), $textNode);
     }
 
+    public function filterTagsInChunks(array &$sourceChunks, array &$targetChunks): void
+    {
+        // Nothing to do here
+    }
+
     /**
      * {@inheritDoc}
      */
-    public function protect(string $textNode, int $sourceLangId, int $targetLangId): string
+    public function protect(string $textNode, bool $isSource, int $sourceLangId, int $targetLangId): string
     {
         $excludedCharacters = $this->withoutNumberWhitespaces ? $this->numberWhitespaces : [];
         if (!preg_match_all(self::TAG_REGEX, $textNode, $matches)) {

@@ -236,12 +236,16 @@ class NumberProtector implements ProtectorInterface
         return $this->convertToInternalTags($segment, $shortTagIdent, shortcutNumberMap: $shortcutNumberMap);
     }
 
-    public function protect(string $textNode, int $sourceLangId, int $targetLangId): string
+    public function protect(string $textNode, bool $isSource, int $sourceLangId, int $targetLangId): string
     {
         // Reset document else it will be compromised between method calls
         $this->document = new DOMDocument();
         $sourceLang = $sourceLangId ? $this->languageRepository->find($sourceLangId) : null;
         $targetLang = $targetLangId ? $this->languageRepository->find($targetLangId) : null;
+
+        if (null === $sourceLang || null === $targetLang) {
+            throw new \LogicException("Provided langs are not present in DB: $sourceLangId, $targetLangId");
+        }
 
         $this->loadXML("<node>$textNode</node>");
 
@@ -251,7 +255,11 @@ class NumberProtector implements ProtectorInterface
 
         $tries = 0;
 
-        foreach ($this->numberRepository->getAll($sourceLang, $targetLang) as $protectionDto) {
+        $dtos = $isSource
+            ? $this->numberRepository->getAllForSource($sourceLang, $targetLang)
+            : $this->numberRepository->getAllForTarget($sourceLang, $targetLang);
+
+        foreach ($dtos as $protectionDto) {
             // if we'll try to protect for example integers in a row like "string 12 45 67 string"
             // then we'll need to do that in a couple of tries because in current case will get result as:
             // string <number ... source="12" ... /> 145 <number ... source="67" ... /> string
@@ -345,10 +353,83 @@ class NumberProtector implements ProtectorInterface
         $tagObj->id = self::TAG_NAME;
         $tagObj->tag = self::TAG_NAME;
         $tagObj->text = json_encode(['source' => $source, 'target' => $target]);
+        $tagObj->iso = $iso;
+        $tagObj->source = $source;
         //title: Only translatable with using ExtJS QTips in the frontend, as title attribute not possible
         $tagObj->renderTag(title:  '&lt;' . $shortTagNumber . '/&gt;: Number', cls: ' ' . self::TAG_NAME);
 
         return $tagObj;
+    }
+
+    public function filterTags(string &$source, string &$target): void
+    {
+        if ('' === $target || '' === $source) {
+            return;
+        }
+
+        preg_match_all(self::fullTagRegex(), $source, $sourceMatches, PREG_SET_ORDER);
+        preg_match_all(self::fullTagRegex(), $target, $targetMatches, PREG_SET_ORDER);
+
+        if (!empty($sourceMatches) && empty($targetMatches)) {
+            $source = preg_replace(self::fullTagRegex(), '\3', $source);
+
+            return;
+        }
+
+        foreach ($sourceMatches as $sourceMatch) {
+            foreach ($targetMatches as $key => $targetMatch) {
+                if ($sourceMatch[4] === $targetMatch[4]) {
+                    $target = str_replace($targetMatch[0], $sourceMatch[0], $target);
+                    unset($targetMatches[$key]);
+
+                    continue 2;
+                }
+            }
+
+            $source = str_replace($sourceMatch[0], $sourceMatch[3], $source);
+        }
+
+        foreach ($targetMatches as $targetMatch) {
+            $target = str_replace($targetMatch[0], $targetMatch[3], $target);
+        }
+    }
+
+    public function filterTagsInChunks(array &$sourceChunks, array &$targetChunks): void
+    {
+        if (empty($sourceChunks) || empty($targetChunks)) {
+            return;
+        }
+
+        $sourceTags = $targetTags = [];
+
+        foreach ($sourceChunks as $key => $sourceChunk) {
+            if ($sourceChunk instanceof NumberTag) {
+                $sourceTags[$key] = $sourceChunk;
+            }
+        }
+
+        foreach ($targetChunks as $key => $targetChunk) {
+            if ($targetChunk instanceof NumberTag) {
+                $targetTags[$key] = $targetChunk;
+            }
+        }
+
+        foreach ($sourceTags as $sourceKey => $sourceTag) {
+            foreach ($targetTags as $targetKey => $targetTag) {
+                if ($sourceTag->equals($targetTag)) {
+                    $targetChunks[$targetKey] = clone $sourceTag;
+                    unset($targetTags[$targetKey]);
+
+                    continue 2;
+                }
+            }
+
+            $sourceChunks[$sourceKey] = $sourceTag->source;
+        }
+
+        foreach ($targetTags as $targetKey => $targetTag) {
+            $targetChunks[$targetKey] = $targetTag->source;
+        }
     }
 
     private function processElement(

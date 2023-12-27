@@ -54,6 +54,7 @@ namespace MittagQI\Translate5\ContentProtection;
 
 use editor_Models_Segment_Utility as SegmentUtility;
 use editor_Models_Segment_Whitespace as Whitespace;
+use MittagQI\Translate5\ContentProtection\NumberProtection\Tag\NumberTag;
 
 class ContentProtector
 {
@@ -123,8 +124,50 @@ class ContentProtector
         $this->collectShortcutMap = $collect;
     }
 
+    public function filterTags(string &$source, string &$target): void
+    {
+        if (empty($targetChunks)) {
+            return;
+        }
+
+
+
+        foreach ($this->protectors as $protector) {
+            $protector->filterTagsInChunks($source, $targetChunks);
+            if (is_string($sourceChunk) || !($sourceChunk instanceof NumberTag)) {
+                continue;
+            }
+
+            foreach ($targetChunks as &$targetChunk) {
+                if (is_string($targetChunk) || !($targetChunk instanceof NumberTag)) {
+                    continue;
+                }
+
+                if ($sourceChunk->equals($targetChunk)) {
+                    $targetChunk = clone $sourceChunk;
+
+                    continue 2;
+                }
+            }
+
+            $sourceChunk = $sourceChunk->source;
+        }
+    }
+
+    public function filterTagsInChunks(array &$sourceChunks, array &$targetChunks): void
+    {
+        if (empty($targetChunks)) {
+            return;
+        }
+
+        foreach ($this->protectors as $protector) {
+            $protector->filterTagsInChunks($sourceChunks, $targetChunks);
+        }
+    }
+
     public function protect(
         string $text,
+        bool $isSource,
         int $sourceLang,
         int $targetLang,
         string $entityHandling = self::ENTITY_MODE_RESTORE,
@@ -143,8 +186,8 @@ class ContentProtector
                 continue;
             }
 
-            if ($protector->hasEntityToProtect($text, $sourceLang)) {
-                $text = $protector->protect($text, $sourceLang, $targetLang);
+            if ($protector->hasEntityToProtect($text, $isSource ? $sourceLang : $targetLang)) {
+                $text = $protector->protect($text, $isSource, $sourceLang, $targetLang);
             }
         }
 
@@ -234,13 +277,14 @@ class ContentProtector
 
     public function protectAndConvert(
         string $text,
+        bool $isSource,
         int $sourceLang,
         int $targetLang,
         int &$shortTagIdent,
         string $entityHandling = self::ENTITY_MODE_RESTORE
     ): string {
         return $this->convertToInternalTags(
-            $this->protect($text, $sourceLang, $targetLang, $entityHandling),
+            $this->protect($text, $isSource, $sourceLang, $targetLang, $entityHandling),
             $shortTagIdent
         );
     }

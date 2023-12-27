@@ -60,7 +60,7 @@ class ContentProtectionRepository
     /**
      * @return iterable<ContentProtectionDto>
      */
-    public function getAll(editor_Models_Languages $sourceLang, editor_Models_Languages $targetLang): iterable
+    public function getAllForSource(editor_Models_Languages $sourceLang, editor_Models_Languages $targetLang): iterable
     {
         $dbInputMapping = ZfExtended_Factory::get(InputMapping::class)->db;
         $dbOutputMapping = ZfExtended_Factory::get(OutputMapping::class)->db;
@@ -105,6 +105,63 @@ class ContentProtectionRepository
                 ['outputRecognition.format as outputFormat']
             )
             ->where('inputMapping.languageId IN (?)', $sourceIds)
+            ->where('recognition.enabled = true')
+            ->order('priority desc')
+        ;
+
+        foreach ($dbInputMapping->fetchAll($select) as $formatData) {
+            yield ContentProtectionDto::fromRow($formatData->toArray());
+        }
+    }
+
+    /**
+     * @return iterable<ContentProtectionDto>
+     */
+    public function getAllForTarget(editor_Models_Languages $sourceLang, editor_Models_Languages $targetLang): iterable
+    {
+        $dbInputMapping = ZfExtended_Factory::get(InputMapping::class)->db;
+        $dbOutputMapping = ZfExtended_Factory::get(OutputMapping::class)->db;
+        $dbContentRecognition = ZfExtended_Factory::get(ContentRecognition::class)->db;
+        $contentRecognitionTable = $dbContentRecognition->info($dbContentRecognition::NAME);
+
+        $sourceIds = [$sourceLang->getId()];
+        $targetIds = [$targetLang->getId()];
+
+        if ($sourceLang->getMajorRfc5646() !== $sourceLang->getRfc5646()) {
+            $major = ZfExtended_Factory::get(editor_Models_Languages::class);
+            $major->loadByRfc5646($sourceLang->getMajorRfc5646());
+
+            $sourceIds[] = $major->getId();
+        }
+
+        if ($targetLang->getMajorRfc5646() !== $targetLang->getRfc5646()) {
+            $major = ZfExtended_Factory::get(editor_Models_Languages::class);
+            $major->loadByRfc5646($targetLang->getMajorRfc5646());
+
+            $targetIds[] = $major->getId();
+        }
+
+        $select = $dbOutputMapping->select()
+            ->setIntegrityCheck(false)
+            ->from(['outputMapping' => $dbOutputMapping->info($dbOutputMapping::NAME)], [])
+            ->join(
+                ['recognition' => $contentRecognitionTable],
+                'recognition.id = outputMapping.outputContentRecognitionId',
+                ['recognition.*']
+            )
+            ->joinLeft(
+                ['inputMapping' => $dbInputMapping->info($dbInputMapping::NAME)],
+                'inputMapping.languageId IN (' . implode(',', $sourceIds) . ')
+                AND outputMapping.inputContentRecognitionId = inputMapping.contentRecognitionId',
+                []
+            )
+            ->joinLeft(
+                ['inputRecognition' => $contentRecognitionTable],
+                'inputRecognition.id = outputMapping.inputContentRecognitionId
+                AND inputRecognition.enabled = true',
+                ['inputRecognition.format as outputFormat']
+            )
+            ->where('outputMapping.languageId IN (?)', $targetIds)
             ->where('recognition.enabled = true')
             ->order('priority desc')
         ;

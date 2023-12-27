@@ -195,7 +195,8 @@ class TmConversionService
             }
 
             if ($reader->nodeType == XMLReader::ELEMENT && $reader->name == 'tu') {
-                $writer->writeRaw($this->convertTransUnit($reader->readOuterXML(), $sourceLang, $targetLang));
+                $isSource = true;
+                $writer->writeRaw($this->convertTransUnit($reader->readOuterXML(), $isSource, $sourceLang, $targetLang));
             }
 
             if (!in_array($reader->name, ['tmx', 'body'], true)) {
@@ -228,12 +229,12 @@ class TmConversionService
         return $resultFilename;
     }
 
-    private function convertTransUnit(string $transUnit, int $sourceLang, int $targetLang): string
+    private function convertTransUnit(string $transUnit, bool $isSource, int $sourceLang, int $targetLang): string
     {
         $transUnit = $this->convertT5MemoryTagToNumber($transUnit);
         preg_match_all('/<tuv xml:lang="((\w|-)+)">((\n|\r|\r\n).+)+<\/tuv>/Uum', $transUnit, $matches, PREG_SET_ORDER);
 
-        $transUnit = $this->contentProtector->protect($transUnit, $sourceLang, $targetLang);
+        $transUnit = $this->contentProtector->protect($transUnit, $isSource, $sourceLang, $targetLang);
     }
 
 }

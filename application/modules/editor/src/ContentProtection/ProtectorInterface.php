@@ -57,7 +57,9 @@ interface ProtectorInterface
     public static function alias(): string;
     public function hasEntityToProtect(string $textNode, int $sourceLang = null): bool;
     public function hasTagsToConvert(string $textNode): bool;
-    public function protect(string $textNode, int $sourceLangId, int $targetLangId): string;
+    public function filterTags(string &$source, string &$target): void;
+    public function filterTagsInChunks(array &$sourceChunks, array &$targetChunks): void;
+    public function protect(string $textNode, bool $isSource, int $sourceLangId, int $targetLangId): string;
     public function unprotect(string $content, bool $isSource): string;
     public function convertForSorting(string $content, bool $isSource): string;
     public function priority(): int;

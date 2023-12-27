@@ -58,6 +58,9 @@ class NumberTag extends editor_Models_Import_FileParser_Tag
 {
     public const TYPE_NUMBER = 4;
 
+    public string $iso;
+    public string $source;
+
     /**
      * @var array|\editor_ImageTag[]
      */
@@ -76,5 +79,18 @@ class NumberTag extends editor_Models_Import_FileParser_Tag
     public function isSingle(): bool
     {
         return true;
+    }
+
+    public function equals(self $other): bool
+    {
+        return $this->iso === $other->iso;
+    }
+
+    public function updateSource(string $source): void
+    {
+        $this->source = $source;
+        $text = json_decode($this->text, true);
+        $text['source'] = $source;
+        $this->text = json_encode($text);
     }
 }
