@@ -33,6 +33,77 @@
 Ext.define('Editor.controller.admin.TaskCustomField', {
     extend: 'Ext.app.Controller',
 
+    statics: {
+        getGridColumnsFor: function(gridType) {
+            var locale = Editor.data.locale, column, columns = [];
+
+            // Foreach custom field
+            Editor.data.editor.task.customFields.forEach(field => {
+
+                // If field should not be shown in given gridType - skip
+                if (!field.placesToShow.match(gridType)) return;
+
+                // Get labels and tooltips
+                var labelL10n = Ext.JSON.decode(field.label, true) || {};
+                var tooltipL10n = Ext.JSON.decode(field.tooltip, true) || {};
+
+                // Primary config
+                column = {
+                    text      : locale in labelL10n ? labelL10n[locale] : field.label,
+                    //tooltip   : locale in tooltipL10n ? tooltipL10n[locale] : field.tooltip,
+                    xtype     : 'gridcolumn',
+                    dataIndex : 'customField' + field.id,
+                    stateId   : 'customField' + field.id,
+                    filter    : {
+                        type: 'string'
+                    }
+                };
+
+                // If it's a checkbox or combobox
+                if (!field.type.match('text')) {
+
+                    // Setup list-filter
+                    column.filter = {
+                        type: 'list',
+                        options: [],
+                        phpMode: false,
+                        labelField: 'text'
+                    }
+
+                    // If it's a checkbox
+                    if (field.type === 'checkbox') {
+
+                        // Use '1' instead of 'on'
+                        column.renderer = value => value === '1' ? 'Yes' : 'No';
+
+                        // Setup filter enumerated options
+                        column.filter.options.push(['1', 'Yes'], ['0', 'No']);
+
+                    // Else if it's a combobox
+                    } else if (field.type === 'combobox') {
+
+                        // Decode field's comboboxData, if possible
+                        column.comboboxData = Ext.JSON.decode(field.comboboxData, true) || {};
+
+                        // Convert combobox data into filter options
+                        Ext.Object.each(column.comboboxData, (value, title) =>
+                            column.filter.options.push([value, title]))
+
+                        // Make sure the right title is shown for a value
+                        column.renderer = (value, _1, _2, _3, colIndex, _4, view) =>
+                            view.getHeaderCt().getHeaderAtIndex(colIndex).comboboxData[value];
+                    }
+                }
+
+                // Add to configs array
+                columns.push(column);
+            });
+
+            //
+            return columns;
+        }
+    },
+
     requires: [
         'Editor.view.admin.task.CustomField.Panel'
     ],
