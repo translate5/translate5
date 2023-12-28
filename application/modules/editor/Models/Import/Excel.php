@@ -239,9 +239,10 @@ class editor_Models_Import_Excel extends editor_Models_Excel_AbstractExImport {
         $updater = ZfExtended_Factory::get('editor_Models_Segment_Updater', [$this->task,$this->user->getUserGuid()]);
         /* @var $updater editor_Models_Segment_Updater */
         
-        if($updater->sanitizeEditedContent($newContent)) {
+        if ($updater->sanitizeEditedContent($newContent, true)) {
             $this->addSegmentError($t5Segment->getSegmentNrInTask(), 'Some non representable characters were removed from the segment (multiple white-spaces, tabs, line-breaks etc.)!');
         }
+
         $t5Segment->setTargetEdit($newContent);
         $t5Segment->setUserGuid($this->user->getUserGuid());
         $t5Segment->setUserName($this->user->getUserName());

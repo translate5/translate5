@@ -124,39 +124,30 @@ class ContentProtector
         $this->collectShortcutMap = $collect;
     }
 
-    public function filterTags(string &$source, string &$target): void
+    /**
+     * Checks content protection tags in source and target
+     * Unprotect those that don't have pair
+     */
+    public function filterTags(string $source, string $target): array
     {
-        if (empty($targetChunks)) {
-            return;
+        if ('' === $target || '' === $source) {
+            return [$source, $target];
         }
-
-
 
         foreach ($this->protectors as $protector) {
-            $protector->filterTagsInChunks($source, $targetChunks);
-            if (is_string($sourceChunk) || !($sourceChunk instanceof NumberTag)) {
-                continue;
-            }
-
-            foreach ($targetChunks as &$targetChunk) {
-                if (is_string($targetChunk) || !($targetChunk instanceof NumberTag)) {
-                    continue;
-                }
-
-                if ($sourceChunk->equals($targetChunk)) {
-                    $targetChunk = clone $sourceChunk;
-
-                    continue 2;
-                }
-            }
-
-            $sourceChunk = $sourceChunk->source;
+            $protector->filterTags($source, $target);
         }
+
+        return [$source, $target];
     }
 
+    /**
+     * Checks content protection tags in source and target
+     * Unprotect those that don't have pair
+     */
     public function filterTagsInChunks(array &$sourceChunks, array &$targetChunks): void
     {
-        if (empty($targetChunks)) {
+        if (empty($sourceChunks) || empty($targetChunks)) {
             return;
         }
 

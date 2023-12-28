@@ -303,25 +303,34 @@ class editor_Models_Import_FileParser_Csv extends editor_Models_Import_FileParse
      * @param mixed $transUnit
      * @return array $transUnit
      */
-    protected function extractSegment($lineArr){
-        $this->segmentData = array();
+    protected function extractSegment($lineArr)
+    {
+        $this->segmentData = [];
         foreach($this->colOrder as $name => $idx) {
-            if($name == self::CONFIG_COLUMN_MID) {
+            if ($name == self::CONFIG_COLUMN_MID) {
                 $this->setMid($lineArr[$idx]);
                 continue;
             }
+
             $field = $this->segmentFieldManager->getByName($name);
             $isSource = $field->type == editor_Models_SegmentField::TYPE_SOURCE;
-            if(empty($lineArr[$idx]) && $lineArr[$idx] !== "0") {
+
+            if (empty($lineArr[$idx]) && $lineArr[$idx] !== "0") {
                 $original = '';
-            }
-            else {
+            } else {
                 $original = $lineArr[$idx];
             }
-            $this->segmentData[$name] = array(
-                 'original' => $this->parseSegment($original, $isSource)
-            );
+
+            $this->segmentData[$name] = ['original' => $this->parseSegment($original, $isSource)];
         }
+
+        [$source, $target] = $this->contentProtector->filterTags(
+            $this->segmentData[editor_Models_SegmentField::TYPE_SOURCE],
+            $this->segmentData[editor_Models_SegmentField::TYPE_TARGET]
+        );
+
+        $this->segmentData[editor_Models_SegmentField::TYPE_SOURCE] = $this->convertSegmentToInternalTags($source);
+        $this->segmentData[editor_Models_SegmentField::TYPE_TARGET] = $this->convertSegmentToInternalTags($target);
 
         //just create a segment attributes object with default values
         $this->createSegmentAttributes($this->_mid);
@@ -334,6 +343,15 @@ class editor_Models_Import_FileParser_Csv extends editor_Models_Import_FileParse
             }
         }
         return $lineArr;
+    }
+
+    private function convertSegmentToInternalTags(string $segment): string
+    {
+        $this->shortTagIdent = 1;
+        $segment = $this->contentProtector->convertToInternalTags($segment, $this->shortTagIdent);
+        $segment = $this->parseSegmentInsertPlaceholders($segment, InternalTag::REGEX_INTERNAL_TAGS);
+
+        return $this->parseSegmentReplacePlaceholders($segment);
     }
     
     
@@ -351,8 +369,7 @@ class editor_Models_Import_FileParser_Csv extends editor_Models_Import_FileParse
                 'task' => $this->task,
             ]);
         }
-        $this->shortTagIdent = 1;
-        
+
         //at first protect MQM - they will be converted to MQM-tags later by MqmParser
         //for performance reasons only do this, if escaping MQM is necessary for later protections
         if(strpos($segment, '<mqm:')!==false){
@@ -367,10 +384,6 @@ class editor_Models_Import_FileParser_Csv extends editor_Models_Import_FileParse
         if($this->config->runtimeOptions->import->fileparser->options->protectTags ?? false) {
             // because of the replaceRegularExpressionsAfterTagParsing we can only replace tags here but no whitespace so far!
             $segment = $this->utilities->tagProtection->protectTags($segment, false);
-            
-            //now we have to protect thw so protected tags with the internal char based replacers
-            $segment = $this->contentProtector->convertToInternalTags($segment, $this->shortTagIdent);
-            $segment = $this->parseSegmentInsertPlaceholders($segment, InternalTag::REGEX_INTERNAL_TAGS);
         }
         
         // protect regExes after tag parsing
@@ -378,18 +391,13 @@ class editor_Models_Import_FileParser_Csv extends editor_Models_Import_FileParse
         
         // now all whitespace and remaining entities are encoded
         // if there are now internal tags added by the whitespace protection we have to protect them locally too
-        $segment = $this->contentProtector->protectAndConvert(
+        return $this->contentProtector->protect(
             $segment,
             $isSource,
             $this->task->getSourceLang(),
             $this->task->getTargetLang(),
-            $this->shortTagIdent,
             ContentProtector::ENTITY_MODE_KEEP
         );
-
-        $segment = $this->parseSegmentInsertPlaceholders($segment, InternalTag::REGEX_INTERNAL_TAGS);
-        
-        return $this->parseSegmentReplacePlaceholders($segment);
     }
 
     /**

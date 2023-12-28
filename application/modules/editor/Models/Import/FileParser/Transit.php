@@ -211,18 +211,19 @@ class editor_Models_Import_FileParser_Transit extends editor_Models_Import_FileP
     /**
      * @param array $transUnit array('source' => DOM_DOCUMENT,'target' => DOM_DOCUMENT)
      */
-    protected function extractSegment($transUnit){
-        $this->segmentData = array();
+    protected function extractSegment($transUnit)
+    {
+        $this->segmentData = [];
         $sourceName = $this->segmentFieldManager->getFirstSourceName();
         $targetName = $this->segmentFieldManager->getFirstTargetName();
-        
-        $this->segmentData[$sourceName] = array(
-            'original' => $this->parseSegment($transUnit['source'], true)
+
+        [$parsedSource, $parsedTarget] = $this->contentProtector->filterTags(
+            $this->parseSegment($transUnit['source'],true),
+            $this->parseSegment($transUnit['target'],false)
         );
-        
-        $this->segmentData[$targetName] = array(
-            'original' => $this->parseSegment($transUnit['target'], false)
-        );
+
+        $this->segmentData[$sourceName] = ['original' => $parsedSource];
+        $this->segmentData[$targetName] = ['original' => $parsedTarget];
     }
     /**
      * @param array $transUnit array('source' => DOM_DOCUMENT,'target' => DOM_DOCUMENT)

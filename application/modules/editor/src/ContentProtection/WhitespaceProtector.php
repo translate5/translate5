@@ -88,6 +88,11 @@ class WhitespaceProtector implements ProtectorInterface
         // Nothing to do here
     }
 
+    public function filterTags(string &$source, string &$target): void
+    {
+        // Nothing to do here
+    }
+
     /**
      * {@inheritDoc}
      */

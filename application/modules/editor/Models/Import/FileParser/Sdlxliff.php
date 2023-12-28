@@ -539,10 +539,16 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
             $attributes->transunitId = $this->transunitParser->getTransunitId();
             $attributes->mrkMid = $mid;
 
-            $this->segmentData[$sourceName] = ['original' => $this->parseSegment($source,true)];
-            $this->segmentData[$targetName] = ['original' => $this->parseSegment($target,false)];
+            [$parsedSource, $parsedTarget] = $this->contentProtector->filterTags(
+                $this->parseSegment($source,true),
+                $this->parseSegment($target,false)
+            );
+
+            $this->segmentData[$sourceName] = ['original' => $parsedSource];
+            $this->segmentData[$targetName] = ['original' => $parsedTarget];
             $segmentId = $this->setAndSaveSegmentValues();
             $this->saveComments($segmentId, $comments);
+
             return $this->getFieldPlaceholder($segmentId, $targetName);
         });
 

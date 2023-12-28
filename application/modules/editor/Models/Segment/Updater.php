@@ -307,7 +307,7 @@ class editor_Models_Segment_Updater {
                         $this->task->getSourceLang(),
                         $this->task->getTargetLang(),
                         ContentProtector::ENTITY_MODE_RESTORE,
-                        $isEditingTargetInFront ? NumberProtector::alias() : ''
+                        $isEditingTargetInFront ? NumberProtector::alias() : '',
                     )
                 );
             }

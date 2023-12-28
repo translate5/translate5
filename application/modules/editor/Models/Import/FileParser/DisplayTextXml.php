@@ -380,6 +380,7 @@ The German and the English Comment tag of the string must be imported as comment
         //since there are no other tags we can just take the string and protect whitespace there (no tag protection needed!)
         $segment = $this->contentProtector->protectAndConvert(
             $segment,
+            true,
             $this->task->getSourceLang(),
             $this->task->getTargetLang(),
             $this->shortTagIdent,
