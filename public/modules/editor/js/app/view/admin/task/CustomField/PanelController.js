@@ -32,6 +32,12 @@ Ext.define('Editor.view.admin.task.CustomField.PanelController', {
         component: {
             'form': {
                 boxready: 'formBoxReady'
+            },
+            '#type': {
+                change: 'onTypeChange'
+            },
+            '#taskCustomFieldGrid': {
+                selectionchange: 'onSelectionChange'
             }
         }
     },
@@ -69,7 +75,10 @@ Ext.define('Editor.view.admin.task.CustomField.PanelController', {
         var view = this.getView();
         view.mask(Ext.LoadMask.prototype.msg);
         view.getViewModel().get('customField').save({
-            callback: () => view.unmask()
+            callback: () => {
+                view.unmask();
+                view.down('taskCustomFieldGrid').getStore().refreshGlobalCustomFields()
+            }
         });
     },
 
@@ -90,9 +99,71 @@ Ext.define('Editor.view.admin.task.CustomField.PanelController', {
             callback: () => {
                 view.unmask();
                 if (!record.phantom) {
-                    view.down('#taskCustomFieldGrid').getStore().reload();
+                    view.down('taskCustomFieldGrid').getStore().refreshGlobalCustomFields()
                 }
             }
         });
+    },
+
+    /**
+     * Make sure Readonly-option in Mode-combobox won't be selectable
+     *
+     * @param selModel
+     * @param selected
+     */
+    onSelectionChange: function(selModel, selected) {
+
+        // If nothing selected - skip
+        if (!selected.length) return;
+
+        this.adjustModeChoices();
+        //this.redirectTo(selected[0]);
+    },
+
+    /**
+     *
+     */
+    adjustModeChoices: function() {
+
+        // Get options store for mode-combobox
+        var modeCombo = this.getView().down('form #mode'),
+            modeStore = modeCombo.getStore(),
+            customField = this.getViewModel().get('customField');
+
+        // Clear filter, if any
+        modeStore.clearFilter();
+
+        // If nothing selected in custom fields grid - return
+        if (!customField.id) return;
+
+        // If currently selected customField is readonly
+        if (customField.get('mode') !== 'readonly') {
+
+            // If currently selected customField is checkbox
+            if (customField.get('type') === 'checkbox') {
+
+                // Make sure only Optional is available for choice in Mode-field
+                modeStore.filterBy(mode => mode.get('value') === 'optional');
+
+                // Set optional as the only possible value in this case
+                customField.set('mode', 'optional');
+
+            // Otherwise both Optional and Required should be available there
+            } else {
+                modeStore.filterBy(mode => mode.get('value') !== 'readonly');
+
+                // Set optional as the only possible value in this case
+                customField.set('mode', customField.getModified('mode'));
+            }
+        }
+    },
+
+    /**
+     *
+     * @param combo
+     * @param value
+     */
+    onTypeChange: function(combo, value) {
+        this.adjustModeChoices();
     }
 });

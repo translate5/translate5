@@ -36,6 +36,27 @@ Ext.define('Editor.view.admin.task.CustomField.GridController', {
             '#taskCustomFieldGrid': {
                 afterrender: 'onTaskCustomFieldGridAfterRender'
             }
+        },
+        store: {
+            '#taskCustomFieldStore': {
+                load: 'onLoad'
+            }
+        }
+    },
+
+    /**
+     * Auto-select first row in the grid and refresh global custom fields array
+     *
+     * @param store
+     */
+    onLoad: function(store) {
+        if (store.getCount()) {
+
+            // Auto-select first row in the grid
+            this.getViewModel().set('customField', store.first());
+
+            // Refresh Editor.data.editor.task.customFields array
+            store.refreshGlobalCustomFields();
         }
     },
 

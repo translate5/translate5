@@ -101,6 +101,70 @@ Ext.define('Editor.controller.admin.TaskCustomField', {
 
             //
             return columns;
+        },
+        getFormFieldsFor: function(formType) {
+            var locale = Editor.data.locale, config, fields = [];
+
+            // Foreach custom field
+            Editor.data.editor.task.customFields.forEach(field => {
+
+                // If field should not be shown in project wizard - skip
+                if (!field.placesToShow.match(formType)) return;
+
+                // Get labels and tooltips
+                var labelL10n = Ext.JSON.decode(field.label, true) || {};
+                var tooltipL10n = Ext.JSON.decode(field.tooltip, true) || {};
+
+                // Start config
+                config = {
+                    fieldLabel: locale in labelL10n ? labelL10n[locale] : field.label,
+                    tooltip   : locale in tooltipL10n ? tooltipL10n[locale] : field.tooltip,
+                    xtype     : field.type,
+                    name      : 'customField' + field.id,
+                    itemId    : 'customField' + field.id,
+                    readOnly  : field.mode === 'readonly',
+                    regex     : field.regex ? new RegExp(field.regex) : null,
+                    allowBlank: field.type === 'checkbox' || field.mode !== 'required',
+                    isCustom  : true
+                };
+
+                // If it's a checkbox
+                if (field.type === 'checkbox') {
+
+                    // Use '1' instead of 'on', '0' instead of '' and submit anyway
+                    config.getSubmitValue = function() {
+                        return this.checked ? 1 : 0
+                    };
+
+                // Else if it's a combobox
+                } else if (field.type === 'combobox') {
+
+                    // Decode field's comboboxData, if possible
+                    var decoded = Ext.JSON.decode(field.comboboxData, true) || {}, store = [];
+
+                    // Re-structure to format supported by extjs
+                    Ext.Object.each(decoded, (value, title) => store.push({
+                        value: value,
+                        title: title,
+                    }));
+
+                    // Apply combobox-specific configs
+                    Ext.merge(config, {
+                        valueField: 'value',
+                        displayField: 'title',
+                        store: {
+                            fields: ['value', 'title'],
+                            data: store
+                        }
+                    });
+                }
+
+                // Add to configs array
+                fields.push(config);
+            });
+
+            //
+            return fields;
         }
     },
 
@@ -193,10 +257,8 @@ Ext.define('Editor.controller.admin.TaskCustomField', {
         }
     },*/
     addCustomFieldsToTaskMainCard: function(taskMainCard) {
-        /*taskMainCard.down('#taskMainCardContainer').add({
-            id: 'taskMainCardCustomFieldPropertyGrid',
-            disabled: true,
-            xtype: 'propertygrid?',
-        });*/
+        taskMainCard.down('#taskMainCardContainer').add(
+            Editor.controller.admin.TaskCustomField.getFormFieldsFor('projectWizard')
+        );
     }
 });

@@ -37,7 +37,10 @@ Ext.define('Editor.view.admin.task.CustomField.Panel', {
 
     viewModel: {
         data: {
-            customField: null
+            customField: {
+                id: null,
+                mode: null
+            }
         }
     },
     width: '100%',
@@ -64,7 +67,7 @@ Ext.define('Editor.view.admin.task.CustomField.Panel', {
         },
         defaults: {
             bind: {
-                disabled: '{!customField}'
+                disabled: '{!customField.id || customField.mode == "readonly"}'
             },
         },
         dockedItems: [{
@@ -79,21 +82,21 @@ Ext.define('Editor.view.admin.task.CustomField.Panel', {
                 glyph: 'f0c7@FontAwesome5FreeSolid',
                 bind: {
                     text: '{l10n.taskCustomField.save}',
-                    disabled: '{!customField}'
+                    disabled: '{!customField.id || customField.mode == "readonly"}'
                 },
                 handler: 'onSave'
             }, {
                 glyph: 'f05e@FontAwesome5FreeSolid',
                 bind: {
                     text: '{l10n.taskCustomField.cancel}',
-                    disabled: '{!customField}'
+                    disabled: '{!customField.id || customField.mode == "readonly"}'
                 },
                 handler: 'onCancel'
             }, {
                 glyph: 'f2ed@FontAwesome5FreeSolid',
                 bind: {
                     text: '{l10n.taskCustomField.delete}',
-                    disabled: '{!customField}'
+                    disabled: '{!customField.id || customField.mode == "readonly"}'
                 },
                 handler: 'onDelete',
             }]
@@ -124,6 +127,7 @@ Ext.define('Editor.view.admin.task.CustomField.Panel', {
             allowBlank: false,
             queryMode: 'local',
             value: 'text',
+            itemId: 'type',
             bind: {
                 fieldLabel: '{l10n.taskCustomField.meta.type.name}',
                 value: '{customField.type}',
@@ -155,6 +159,7 @@ Ext.define('Editor.view.admin.task.CustomField.Panel', {
             forceSelection: true,
             allowBlank: false,
             value: 'optional',
+            itemId: 'mode',
             bind: {
                 fieldLabel: '{l10n.taskCustomField.meta.mode.name}',
                 value: '{customField.mode}',

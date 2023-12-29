@@ -115,8 +115,11 @@ class editor_Models_Validator_Task extends ZfExtended_Models_Validator_Abstract
                 // Extract values from [value => title] pairs
                 $values = array_keys(json_decode($customField['comboboxData'], true) ?? []);
 
+                // If field is not mandatory - add empty string to the list of allowed values
+                if ($customField['mode'] !== 'required') $values []= '';
+
                 // Setup the while list
-                $this->addValidator($name, 'inArray', [$values], allowNull: $customField['mode'] !== 'required');
+                $this->addValidator($name, 'inArray', [$values]);
 
             // Else if it's a checkbox
             } else if ($customField['type'] === 'checkbox') {

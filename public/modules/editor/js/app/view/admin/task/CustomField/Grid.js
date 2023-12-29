@@ -37,7 +37,6 @@ Ext.define('Editor.view.admin.task.CustomField.Grid', {
     itemId: 'taskCustomFieldGrid',
     controller: 'taskCustomFieldGridController',
     store: Ext.create('Editor.store.admin.task.CustomField'),
-    userCls: 't5actionColumnGrid',
     title: false,
     /** @property {string} routePrefix Used to setup routes on different view instances */
     routePrefix: '',
@@ -101,7 +100,6 @@ Ext.define('Editor.view.admin.task.CustomField.Grid', {
         var me = this,
             config = {};
         config.title = me.title; //see EXT6UPD-9
-        config.userCls = 't5actionColumnGrid t5noselectionGrid';
         config.columns = [{
             xtype: 'gridcolumn',
             dataIndex: 'id',

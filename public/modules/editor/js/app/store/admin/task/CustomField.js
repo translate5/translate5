@@ -32,7 +32,12 @@ Ext.define('Editor.store.admin.task.CustomField', {
     extend: 'Ext.data.Store',
     requires: ['Editor.model.admin.task.CustomField'],
     model: 'Editor.model.admin.task.CustomField',
+    storeId: 'taskCustomFieldStore',
     autoLoad: false,
+    sorters: [{
+        property: 'position',
+        direction: 'ASC'
+    }],
 
     /**
      * Retrieves all records independently of filtering
@@ -42,6 +47,18 @@ Ext.define('Editor.store.admin.task.CustomField', {
      */
     getUnfilteredData: function(){
         return (this.isFiltered() || this.isSorted()) ? this.getData().getSource() : this.getData();
+    },
+
+    /**
+     * Refresh global customFields array
+     */
+    refreshGlobalCustomFields: function() {
+
+        // Clear
+        Editor.data.editor.task.customFields = [];
+
+        // Re-assemble
+        this.each(rec => Editor.data.editor.task.customFields.push(rec.getData()), this, true);
     },
 
     /**
