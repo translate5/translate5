@@ -36,7 +36,7 @@ use MittagQI\Translate5\Plugins\SpellCheck\Exception\RequestException;
 use MittagQI\Translate5\Plugins\SpellCheck\Exception\TimeOutException;
 use Zend_Http_Client;
 use Zend_Http_Response;
-use ZfExtended_BadGateway;
+use ZfExtended_Debug;
 use ZfExtended_Factory;
 use ZfExtended_Zendoverwrites_Http_Exception_Down;
 use ZfExtended_Zendoverwrites_Http_Exception_NoResponse;
@@ -109,6 +109,8 @@ final class Adapter {
      */
     private $matches;
 
+    private bool $doDebug;
+
     /**
      * Contains the HTTP status of the last request
      *
@@ -121,6 +123,7 @@ final class Adapter {
      */
     public function __construct($serviceUrl) {
         $this->serviceUrl = $serviceUrl;
+        $this->doDebug = ZfExtended_Debug::hasLevel('plugin', 'SpellCheckRequests');
     }
 
     /**
@@ -164,8 +167,20 @@ final class Adapter {
         $http->setHeaders('Accept: application/json');
         
         $response = $http->request(self::METHOD_LANGUAGES);
+        self::$languages['languageTool'] = $this->processResponse($response);
 
-        return self::$languages['languageTool'] = $this->processResponse($response);
+        if($this->doDebug){
+            error_log(
+                "\n----------\n"
+                . 'Spellcheck: ' . self::METHOD_LANGUAGES . ' / ' . self::PATH_LANGUAGES
+                . 'Result: ' . "\n"
+                . json_encode(self::$languages['languageTool'],
+                    JSON_PRETTY_PRINT| JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_UNICODE)
+                . "\n==========\n"
+            );
+        }
+
+        return self::$languages['languageTool'];
     }
 
     /**
@@ -239,19 +254,44 @@ final class Adapter {
         $http->setHeaders('Content-Type: application/json');
         $http->setHeaders('Accept: application/json');
 
+        if($this->doDebug){
+            error_log(
+                "\n----------\n"
+                . 'Spellcheck: ' . self::METHOD_MATCHES . ' / ' . self::PATH_MATCHES
+            );
+        }
+
         // If $text arg is an array, assume we're in the batch-mode
         if (is_array($text)) {
 
             // Prepare a structure described in LanguageTool docs
             $annotation = [];
             foreach ($text as $item) {
-                $annotation []= ['text' => $item];
-                $annotation []= ['markup' => self::BATCH_SEPARATOR, 'interpretAs' => "\n\n"];
+                $annotation[] = ['text' => $item];
+                $annotation[] = ['markup' => self::BATCH_SEPARATOR, 'interpretAs' => "\n\n"];
             }
             $data = json_encode(['annotation' => $annotation]);
             $http->setParameterPost('data', $data);
+
+            if($this->doDebug){
+                error_log(
+                    'Params: ' . "\n"
+                    . json_encode(['annotation' => $annotation],
+                        JSON_PRETTY_PRINT| JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_UNICODE)
+                );
+            }
+
+
         } else {
+
             $http->setParameterPost('text', $text);
+
+            if($this->doDebug){
+                error_log(
+                    'Param text: ' . "\n"
+                     . $text
+                );
+            }
         }
         $http->setParameterPost('language', $language);
 
@@ -273,8 +313,31 @@ final class Adapter {
             // Get status
             $this->lastStatus = $response->getStatus();
 
+            // exception for unsuccessful requests
+            if ($this->lastStatus < 200 || $this->lastStatus > 299) {
+
+                // Throw malfunction exception
+                throw new MalfunctionException('E1477', [
+                    'httpStatus' => $this->getLastStatus(),
+                    'languageToolUrl' => $http->getUri(true),
+                    'plainServerResponse' => print_r($response->getBody(), true),
+                    'requestedData' => compact('text', 'language'),
+                ]);
+            }
+
             // Return processed response
-            return $this->processResponse($response);
+            $result = $this->processResponse($response);
+
+            if($this->doDebug){
+                error_log(
+                    'Result: ' . "\n"
+                    . json_encode($result,
+                        JSON_PRETTY_PRINT| JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_UNICODE)
+                    . "\n==========\n"
+                );
+            }
+
+            return $result;
 
         // Catch timeout
         } catch (ZfExtended_Zendoverwrites_Http_Exception_TimeOut $httpException) {
@@ -291,18 +354,6 @@ final class Adapter {
         // Others
         } catch (Exception $httpException) {
             throw new RequestException('E1479', $extraData, $httpException);
-        }
-
-        // If response http status is not between 200 and 300
-        if (!$this->wasSuccessfull()) {
-
-            // Throw malfunction exception
-            throw new MalfunctionException('E1477', [
-                'httpStatus' => $this->getLastStatus(),
-                'languageToolUrl' => $http->getUri(true),
-                'plainServerResponse' => print_r($response->getBody(), true),
-                'requestedData' => compact('text', 'language'),
-            ]);
         }
     }
 
