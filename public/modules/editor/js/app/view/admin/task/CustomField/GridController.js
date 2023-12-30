@@ -28,13 +28,17 @@
 Ext.define('Editor.view.admin.task.CustomField.GridController', {
     extend: 'Ext.app.ViewController',
     alias: 'controller.taskCustomFieldGridController',
-
-
-    // register listeners: load store for the grid after the grid is rendered
     listen: {
         component: {
-            '#taskCustomFieldGrid': {
-                afterrender: 'onTaskCustomFieldGridAfterRender'
+            '#': {
+                afterrender: 'onAfterRender',
+                selectionchange: 'onSelectionChange'
+            },
+            'form': {
+                boxready: 'formBoxReady'
+            },
+            'form combobox#type': {
+                change: 'onTypeChange'
             }
         },
         store: {
@@ -45,6 +49,13 @@ Ext.define('Editor.view.admin.task.CustomField.GridController', {
     },
 
     /**
+     * Routes
+     */
+    routesToSet: {
+        ':recordId': 'onRecordRoute',
+    },
+
+    /**
      * Auto-select first row in the grid and refresh global custom fields array
      *
      * @param store
@@ -52,8 +63,15 @@ Ext.define('Editor.view.admin.task.CustomField.GridController', {
     onLoad: function(store) {
         if (store.getCount()) {
 
-            // Auto-select first row in the grid
-            this.getViewModel().set('customField', store.first());
+            // Check whether record id is gived in hash
+            var match = Ext.util.History.getToken().match(/(?!\/)[0-9]+$/);
+
+            // Auto-select row in the grid by id from hash, if given, or just first one
+            if (match) {
+                this.onRecordRoute(match[0]);
+            } else {
+                this.getViewModel().set('customField', store.first());
+            }
 
             // Refresh Editor.data.editor.task.customFields array
             store.refreshGlobalCustomFields();
@@ -153,9 +171,12 @@ Ext.define('Editor.view.admin.task.CustomField.GridController', {
         grid.setSelection(newCustomField);
     },
 
-    onTaskCustomFieldGridAfterRender: function(grid){
-        grid.getStore().load();
-    },
+    /**
+     * Load store on grid render
+     *
+     * @param grid
+     */
+    onAfterRender: grid => grid.getStore().load(),
 
     /**
      * Method used for getting the disability of 'delete' action-icon
@@ -217,33 +238,25 @@ Ext.define('Editor.view.admin.task.CustomField.GridController', {
         field.getTrigger('clear').setVisible(trimmed);
     },
 
-    /*routesToSet: {
-        ':presetId': 'onPresetRoute',
-        ':presetId/prices': async function(presetId){
-            presetId = parseInt(presetId, 10);
-            var grid = this.getView();
-            var sel = grid.selection;
-            if(sel?.id !== presetId){
-                Editor.util.Util.parentRoute();
-                sel = await Editor.util.Util.awaitSelection(grid, presetId);
-            }
-            if(sel?.id === presetId){
-                var col = grid.getColumnManager().getHeaderById('presetPrices');
-                var cell = grid.view.getCell(grid.store.getById(presetId), col);
-                cell?.focus().down('.x-action-col-0')?.dom.click(); // triggers showPricesGrid
-            }
-        }
-    },
+    /**
+     * Prepare and set routes
+     *
+     * @param view
+     */
     beforeInit: function(view){
-        var itemId = view.getItemId(),
-            routes = {};
-        /** @link Editor.controller.admin.Customer TODO FIXME: support routing in Customer Controller * /
-        for(const [route, action] of Object.entries(this.routesToSet)){
+        var itemId = view.getItemId(), routes = {};
+
+        // Prepare routes
+        for (const [route, action] of Object.entries(this.routesToSet)) {
             routes[view.routePrefix + itemId + '/' + route] = action;
         }
+
+        // Set routes
         this.setRoutes(routes);
+
+        // Call parent
         this.callParent(arguments);
-    },*/
+    },
     /**
      * Event listeners
      */
@@ -256,20 +269,170 @@ Ext.define('Editor.view.admin.task.CustomField.GridController', {
             }
         }
     },
-    /** The argument depends on the routePrefix of the view */
-    /*onPresetRoute: async function(/* presetId * /){
-        var grid = this.getView(),
-            presetIdArgIndex = (grid.routePrefix.match(/\/:/g) || []).length,
-            presetId = arguments[presetIdArgIndex];
+
+    /**
+     * The argument depends on the routePrefix of the view
+     */
+    onRecordRoute: async function(recordId) {
+        var grid = this.getView(), store = grid.getStore();
+
+        // Close all windows
         Editor.util.Util.closeWindows();
-        await Editor.util.Util.awaitStore(grid.getStore());
-        var selected = grid.getSelectionModel().getSelectionStart(),
-            toSelect = grid.getStore().getById(presetId);
-        if(!toSelect){
-            var correctRoute = Editor.util.Util.trimLastSlash(Ext.util.History.getToken()) + (selected ? '/' + selected.id : '');
-            this.redirectTo(correctRoute);
-        } else if(toSelect !== selected){
+
+        // Wait for store load?
+        await Editor.util.Util.awaitStore(store);
+
+        // Get
+        var selected = grid.getSelectionModel().getSelectionStart(), toSelect = grid.getStore().getById(recordId);
+
+        // If there is no record found by recordId in the store
+        if (!toSelect) {
+
+            // Get recordId to redirect to, if possible
+            if (selected) {
+                recordId = selected.id;
+            } else if (store.getCount()) {
+                recordId = store.first().getId();
+            } else {
+                recordId = '';
+            }
+
+            // Do redirect
+            this.redirectTo(
+                Editor.util.Util.trimLastSlash(Ext.util.History.getToken()) + (recordId ? '/' + recordId : '')
+            );
+
+        // Else move selection to the desired record
+        } else if (toSelect !== selected) {
             grid.setSelection(toSelect);
         }
-    }*/
+    },
+
+    /**
+     * Apply handlers to fire when json-fields are clicked,
+     * as there is neither triggers supported by ExtJS 6.2 nor click-event directly supported for fields
+     *
+     * @param form
+     */
+    formBoxReady: function(form){
+        var label = form.down('#label'),
+            tooltip = form.down('#tooltip'),
+            comboboxData = form.down('#comboboxData');
+
+        // Apply handlers
+        label.inputEl.on('click', el => this.jsonFieldClick(label));
+        tooltip.inputEl.on('click', el => this.jsonFieldClick(tooltip));
+        comboboxData.inputEl.on('click', el => this.jsonFieldClick(comboboxData));
+    },
+
+    /**
+     * make sure SimpleMap-popup is shown when field is clicked so that json-value can be edited via the popup
+     *
+     * @param field
+     */
+    jsonFieldClick: function(field) {
+        Ext.ClassManager.get('Editor.view.admin.config.type.SimpleMap').getJsonFieldEditor(field);
+    },
+
+    /**
+     * Save changes to new or existing custom field
+     */
+    onSave:function(){
+        var view = this.getView();
+        view.mask(Ext.LoadMask.prototype.msg);
+        view.getViewModel().get('customField').save({
+            callback: () => {
+                view.unmask();
+                view.getStore().refreshGlobalCustomFields()
+            }
+        });
+    },
+
+    /**
+     * Cancel changes pending for to new or existing custom field
+     */
+    onCancel:function(){
+        this.getViewModel().get('customField').reject();
+    },
+
+    /**
+     * Delete custom field
+     */
+    onDelete:function(){
+        var view = this.getView(), record = view.getViewModel().get('customField');
+        view.mask(Ext.LoadMask.prototype.msg);
+        record.erase({
+            callback: () => {
+                view.unmask();
+                if (!record.phantom) {
+                    view.getStore().refreshGlobalCustomFields()
+                }
+            }
+        });
+    },
+
+    /**
+     * Make sure Readonly-option in Mode-combobox won't be selectable
+     *
+     * @param selModel
+     * @param selected
+     */
+    onSelectionChange: function(selModel, selected) {
+
+        // If nothing selected - skip
+        if (!selected.length) return;
+
+        // Adjust options available in Mode-combobox based on value in Type-combobox
+        this.adjustModeChoices();
+    },
+
+    /**
+     * Adjust options available in Mode-combobox based on value in Type-combobox
+     */
+    adjustModeChoices: function() {
+
+        // Get options store for mode-combobox
+        var modeCombo = this.getView().down('form #mode'),
+            modeStore = modeCombo.getStore(),
+            customField = this.getViewModel().get('customField');
+
+        // Clear filter, if any
+        modeStore.clearFilter();
+
+        // If nothing selected in custom fields grid - return
+        if (!customField || !customField.id) return;
+
+        // If currently selected customField is readonly
+        if (customField.get('mode') !== 'readonly') {
+
+            // If currently selected customField is checkbox
+            if (customField.get('type') === 'checkbox') {
+
+                // Make sure only Optional is available for choice in Mode-field
+                modeStore.filterBy(mode => mode.get('value') === 'optional');
+
+                // Set optional as the only possible value in this case
+                customField.set('mode', 'optional');
+
+            // Otherwise both Optional and Required should be available there
+            } else {
+                modeStore.filterBy(mode => mode.get('value') !== 'readonly');
+
+                // Set optional as the only possible value in this case
+                if (customField.getModified('mode')) {
+                    customField.set('mode', customField.getModified('mode'));
+                }
+            }
+        }
+    },
+
+    /**
+     * Adjust choices available in Mode-combobox based on current value of Type-combobox
+     *
+     * @param combo
+     * @param value
+     */
+    onTypeChange: function(combo, value) {
+        this.adjustModeChoices();
+    }
 });

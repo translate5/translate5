@@ -108,7 +108,18 @@ class Field extends ZfExtended_Models_Entity_Abstract {
 
         // Add column
         if ($customFieldEvent === 'insert') {
-            $db->query("ALTER TABLE $table ADD COLUMN `customField$customFieldId` VARCHAR(1024) DEFAULT '' NOT NULL");
+
+            // Prepare DEFAULT value based on custom field type
+            if ($this->getType() === 'combobox') {
+                $default = array_keys(json_decode($this->getComboboxData(), true) ?? [])[0];
+            } else if ($this->getType() === 'checkbox') {
+                $default = 0;
+            } else {
+                $default = '';
+            }
+
+            // Do add column
+            $db->query("ALTER TABLE $table ADD COLUMN `customField$customFieldId` VARCHAR(1024) DEFAULT '$default' NOT NULL");
 
         // Drop column
         } else if ($customFieldEvent === 'delete') {

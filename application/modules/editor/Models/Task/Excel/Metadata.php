@@ -73,7 +73,14 @@ class editor_Models_Task_Excel_Metadata extends ZfExtended_Models_Entity_ExcelEx
      * @var array
      */
     protected $taskColumns = [];
-    
+
+    /**
+     * Info about task custom columns
+     *
+     * @var array
+     */
+    protected $taskCustomColumns = [];
+
     /**
      * the number of the row in the metadata-sheet
      * @var integer
@@ -128,7 +135,46 @@ class editor_Models_Task_Excel_Metadata extends ZfExtended_Models_Entity_ExcelEx
                 'size' => '12',
             ],
         ]);
-        
+
+        // Get custom fields
+        $customFields = ZfExtended_Factory
+            ::get(MittagQI\Translate5\Task\CustomFields\Field::class)
+            ->loadAll();
+
+        // Get current locale
+        $locale = ZfExtended_Authentication::getInstance()->getUser()->getLocale();
+
+        // Foreach custom field
+        foreach ($customFields as $customField) {
+
+            // Get label according to current locale
+            $label = json_decode($customField['label'], true)[$locale];
+
+            // Get column dataIndex
+            $index = "customField{$customField['id']}";
+
+            // Add heading
+            $this->taskCustomColumns[$index]['header'] = $label;
+
+            // If custom field type is boolean
+            if ($customField['type'] === 'checkbox') {
+
+                // Get [value => localized title] pairs
+                $this->taskCustomColumns[$index]['value'] = [
+                    0 => 'No',
+                    1 => 'Yes'
+                ];
+
+            // Else if custom field type is picklist
+            } else if ($customField['type'] === 'combobox') {
+
+                // Get [value => localized title] pairs
+                foreach (json_decode($customField['comboboxData'], true) as $value => $l10nTitle) {
+                    $this->taskCustomColumns[$index]['value'][$value] = $l10nTitle;
+                }
+            }
+        }
+
         // write fieldnames in header, set their font to bold, set their width to auto
         $sheetCol = 'A';
         $taskModel = ZfExtended_Factory::get('editor_Models_Task');
@@ -137,6 +183,8 @@ class editor_Models_Task_Excel_Metadata extends ZfExtended_Models_Entity_ExcelEx
         foreach ($this->taskColumns as $key => $colName) {
             if (array_key_exists($colName, $taskGridTextCols)) { // Not all column-names in the taskGrid have a translation.
                 $colHeadline = $this->translate->_($taskGridTextCols[$colName]);
+            } else if (array_key_exists($colName, $this->taskCustomColumns)){
+                $colHeadline = $this->taskCustomColumns[$colName]['header'];
             } else {
                 $colHeadline = $colName;
             }
@@ -238,7 +286,7 @@ class editor_Models_Task_Excel_Metadata extends ZfExtended_Models_Entity_ExcelEx
                     $value = count($allTaskassocs) . ': ' . implode(', ', $values);
                     break;
                 default:
-                    $value = $task[$colName];
+                    $value = $this->taskCustomColumns[$colName]['value'][$task[$colName]] ?? $task[$colName];
                     break;
             }
             $sheet->setCellValue($sheetCol.$this->taskRow, $value);

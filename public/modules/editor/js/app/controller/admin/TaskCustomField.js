@@ -169,7 +169,7 @@ Ext.define('Editor.controller.admin.TaskCustomField', {
     },
 
     requires: [
-        'Editor.view.admin.task.CustomField.Panel'
+        'Editor.view.admin.task.CustomField.Grid'
     ],
 
     listen: {
@@ -209,10 +209,11 @@ Ext.define('Editor.controller.admin.TaskCustomField', {
     addToSettingsPanel: function(panel){
         if(Editor.app.authenticatedUser.isAllowed('taskCustomField')){
             this.panel = panel.insert(2, {
-                xtype: 'adminTaskCustomFieldPanel',
+                xtype: 'taskCustomFieldGrid',
                 bind: {
                     title: '{l10n.taskCustomField.title}'
                 },
+                itemId: 'taskCustomFields',
                 glyph: 'f1de@FontAwesome5FreeSolid',
                 routePrefix: 'preferences/'
             });

@@ -37,12 +37,162 @@ Ext.define('Editor.view.admin.task.CustomField.Grid', {
     itemId: 'taskCustomFieldGrid',
     controller: 'taskCustomFieldGridController',
     store: Ext.create('Editor.store.admin.task.CustomField'),
-    title: false,
+    viewModel: {
+        data: {
+            customField: {
+                id: null,
+                mode: null
+            }
+        }
+    },
+    bind: {
+        selection: '{customField}'
+    },
+
     /** @property {string} routePrefix Used to setup routes on different view instances */
-    routePrefix: '',
+    routePrefix: 'taskCustomFields',
     dockedItems: [{
+        xtype: 'form',
+        dock: 'right',
+        width: 400,
+        fieldDefaults: {
+            labelAlign: "left",
+            labelWidth: 90,
+            anchor: '100%',
+            msgTarget: 'side',
+        },
+        defaults: {
+            bind: {
+                disabled: '{!customField.id || customField.mode == "readonly"}'
+            },
+        },
+        dockedItems: [{
+            xtype: 'toolbar',
+            dock: 'top',
+            ui: 'default',
+            border: 0,
+            defaults: {
+                width: '33%',
+            },
+            items: [{
+                glyph: 'f0c7@FontAwesome5FreeSolid',
+                bind: {
+                    text: '{l10n.taskCustomField.save}',
+                    disabled: '{!customField.id || customField.mode == "readonly"}'
+                },
+                handler: 'onSave'
+            }, {
+                glyph: 'f05e@FontAwesome5FreeSolid',
+                bind: {
+                    text: '{l10n.taskCustomField.cancel}',
+                    disabled: '{!customField.id || customField.mode == "readonly"}'
+                },
+                handler: 'onCancel'
+            }, {
+                glyph: 'f2ed@FontAwesome5FreeSolid',
+                bind: {
+                    text: '{l10n.taskCustomField.delete}',
+                    disabled: '{!customField.id || customField.mode == "readonly"}'
+                },
+                handler: 'onDelete',
+            }]
+        }],
+        bodyPadding: 15,
+        margin: 0,
+        layout: 'anchor',
+        defaultType: 'textfield',
+
+        items: [{
+            itemId: 'label',
+            allowBlank: false,
+            readOnly: true,
+            bind: {
+                fieldLabel: '{l10n.taskCustomField.meta.label}',
+                value: '{customField.label}'
+            }
+        }, {
+            itemId: 'tooltip',
+            readOnly: true,
+            bind: {
+                fieldLabel: '{l10n.taskCustomField.meta.tooltip}',
+                value: '{customField.tooltip}'
+            }
+        }, {
+            xtype: 'combobox',
+            forceSelection: true,
+            allowBlank: false,
+            queryMode: 'local',
+            value: 'text',
+            itemId: 'type',
+            bind: {
+                fieldLabel: '{l10n.taskCustomField.meta.type.name}',
+                value: '{customField.type}',
+                store: {
+                    fields: ['name', 'value'],
+                    data: '{l10n.taskCustomField.meta.type.data}'
+                }
+            },
+            displayField: 'name',
+            valueField: 'value'
+        }, {
+            xtype: 'textarea',
+            itemId: 'comboboxData',
+            readOnly: true,
+            bind: {
+                fieldLabel: '{l10n.taskCustomField.meta.comboboxData}',
+                value: '{customField.comboboxData}',
+                hidden: '{customField.type != "combobox"}'
+            }
+        }, {
+            xtype: 'textfield',
+            bind: {
+                fieldLabel: '{l10n.taskCustomField.meta.regex}',
+                value: '{customField.regex}',
+                hidden: '{customField.type == "combobox" || customField.type == "checkbox"}'
+            }
+        }, {
+            xtype: 'combo',
+            forceSelection: true,
+            allowBlank: false,
+            value: 'optional',
+            itemId: 'mode',
+            bind: {
+                fieldLabel: '{l10n.taskCustomField.meta.mode.name}',
+                value: '{customField.mode}',
+                store: {
+                    fields: ['name', 'value'],
+                    data: '{l10n.taskCustomField.meta.mode.data}'
+                }
+            },
+            queryMode: 'local',
+            displayField: 'name',
+            valueField: 'value',
+        }, {
+            xtype: 'tagfield',
+            forceSelection: true,
+            queryMode: 'local',
+            displayField: 'name',
+            valueField: 'value',
+            bind: {
+                fieldLabel: '{l10n.taskCustomField.meta.placesToShow.name}',
+                value: '{customField.placesToShow}',
+                store: {
+                    fields: ['name', 'value'],
+                    data: '{l10n.taskCustomField.meta.placesToShow.data}'
+                }
+            }
+        }, {
+            xtype: 'numberfield',
+            bind: {
+                fieldLabel: '{l10n.taskCustomField.meta.position}',
+                value: '{customField.position}'
+            }
+        }],
+        weight: 1,
+    }, {
         xtype: 'toolbar',
         dock: 'top',
+        weight: 2,
         enableOverflow: true,
         items: [
             {
