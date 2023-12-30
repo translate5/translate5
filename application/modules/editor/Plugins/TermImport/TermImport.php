@@ -60,6 +60,8 @@ use MittagQI\Translate5\Plugins\TermImport\Service\LoggerService;
 use MittagQI\Translate5\Plugins\TermImport\Worker\CheckHostForUpdates;
 use editor_Plugins_TermImport_Services_Import as ImportService;
 use Throwable;
+use Zend_Registry;
+
 class TermImport
 {
     private LoggerService $logger;
@@ -78,7 +80,13 @@ class TermImport
 
     public function checkFilesystems(): void
     {
-        $this->queueFilesystem(FilesystemFactory::DEFAULT_HOST_LABEL);
+        $config = Zend_Registry::get('config');
+        $filesystemConfig = $config->runtimeOptions->plugins?->TermImport?->filesystemConfig;
+        $filesystemConfig = $filesystemConfig ? (object) $filesystemConfig->toArray() : null;
+
+        if ($filesystemConfig && (array) $filesystemConfig) {
+            $this->queueFilesystem(FilesystemFactory::DEFAULT_HOST_LABEL);
+        }
 
         $db = new \editor_Models_Db_CustomerConfig();
         $customerConfigs = $db->fetchAll($db

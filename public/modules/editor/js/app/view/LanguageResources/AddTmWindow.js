@@ -69,8 +69,8 @@ Ext.define('Editor.view.LanguageResources.AddTmWindow', {
         pivotAsDefault:'#UT#Standardmäßig als Pivot verwenden',
         pivotAsDefaultTooltip:'#UT#Standardmäßig als Pivot verwenden'
     },
-    height: 500,
-    width: 500,
+    height: 600,
+    width: 800,
     modal: true,
     layout: 'fit',
     autoScroll: true,
