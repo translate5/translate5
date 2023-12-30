@@ -9460,6 +9460,14 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
                 <source>Position</source>
                 <target>Position</target>
             </trans-unit>
+            <trans-unit id='V2VydA=='>
+                <source>Wert</source>
+                <target>Wert</target>
+            </trans-unit>
+            <trans-unit id='TG9rYWxpdMOkdGVu'>
+                <source>Lokalitäten</source>
+                <target>Lokalitäten</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

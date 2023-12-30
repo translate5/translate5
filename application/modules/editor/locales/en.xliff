@@ -9637,6 +9637,14 @@ E-Mail: service@MittagQI.com</pre>
                 <source>Position</source>
                 <target>Position</target>
             </trans-unit>
+            <trans-unit id='V2VydA=='>
+                <source>Wert</source>
+                <target>Value</target>
+            </trans-unit>
+            <trans-unit id='TG9rYWxpdMOkdGVu'>
+                <source>Lokalitäten</source>
+                <target>Locales</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

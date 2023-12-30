@@ -37,6 +37,7 @@ Ext.define('Editor.view.admin.task.CustomField.Grid', {
     itemId: 'taskCustomFieldGrid',
     controller: 'taskCustomFieldGridController',
     store: Ext.create('Editor.store.admin.task.CustomField'),
+    border: 0,
     viewModel: {
         data: {
             customField: null
@@ -51,10 +52,10 @@ Ext.define('Editor.view.admin.task.CustomField.Grid', {
     dockedItems: [{
         xtype: 'form',
         dock: 'right',
-        width: 400,
+        width: 450,
         fieldDefaults: {
             labelAlign: "left",
-            labelWidth: 90,
+            labelWidth: 150,
             anchor: '100%',
             msgTarget: 'side',
         },
@@ -124,7 +125,7 @@ Ext.define('Editor.view.admin.task.CustomField.Grid', {
             itemId: 'type',
             bind: {
                 fieldLabel: '{l10n.taskCustomField.meta.type.name}',
-                value: '{customField ? customField.type : "textfield"}',
+                value: '{customField.type}',
                 disabled: '{!customField || customField.id}',
                 store: {
                     fields: ['name', 'value'],
@@ -133,12 +134,68 @@ Ext.define('Editor.view.admin.task.CustomField.Grid', {
             },
             displayField: 'name',
             valueField: 'value'
+        },{
+            xtype: 'grid',
+            height: 200,
+            itemId: 'comboboxDataGrid',
+            selModel: 'cellmodel',
+            plugins: [{
+                ptype: 'cellediting',
+                clicksToEdit: 1
+            }],
+            tbar: [{
+                bind: {
+                    text: '{l10n.configuration.add}',
+                },
+                glyph: 'f067@FontAwesome5FreeSolid',
+                handler: 'onComboboxOptionAdd'
+            }, {
+                bind: {
+                    text: '{l10n.configuration.remove}',
+                },
+                glyph: 'f2ed@FontAwesome5FreeSolid',
+                handler: 'onComboboxOptionRemove'
+            }],
+            columns: [{
+                dataIndex: 'index',
+                editor: true,
+                bind: {
+                    text: '{l10n.taskCustomField.meta.comboboxData.value}',
+                }
+            }, {
+                dataIndex: 'value',
+                flex: 1,
+                bind: {
+                    text: '{l10n.taskCustomField.meta.comboboxData.title}',
+                },
+                renderer: value => Editor.view.admin.config.type.SimpleMap.renderer(value),
+                getEditor: record => Editor.view.admin.config.type.SimpleMap.getConfigEditor({
+                    record: record,
+                    hideTbar: true,
+                    readonlyIndex: true
+                })
+            }],
+            margin: '0 0 10 0',
+            width: '100%',
+            border: 1,
+            bind1: {
+                hidden: '{customField.type != "combobox"}'
+            },
+            store: {
+                type: 'json',
+                fields: ['index', 'value'],
+                data: [{
+                    index: 'option1',
+                    value: {"en":"Option1-en","de":"Option1-de"}
+                }]
+            }
         }, {
             xtype: 'textarea',
             itemId: 'comboboxData',
             readOnly: true,
+            hidden: true,
             bind: {
-                fieldLabel: '{l10n.taskCustomField.meta.comboboxData}',
+                //fieldLabel: '{l10n.taskCustomField.meta.comboboxData}',
                 value: '{customField.comboboxData}',
                 hidden: '{customField.type != "combobox"}'
             }

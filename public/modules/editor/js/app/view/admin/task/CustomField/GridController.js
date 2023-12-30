@@ -457,5 +457,40 @@ Ext.define('Editor.view.admin.task.CustomField.GridController', {
      */
     onTypeChange: function(combo, value) {
         this.adjustModeChoices();
+    },
+
+    /**
+     * Handler for Add button in combobox data grid
+     */
+    onComboboxOptionAdd: function () {
+        var win = this.getView(),
+            grid = win.down('grid#comboboxDataGrid'),
+            rec;
+
+        rec = grid.store.insert(0, {
+            index: '',
+            value: ''
+        })[0];
+        //we set the values after creation, so that the record looks dirty
+        rec.set('index', 'option' + grid.store.getCount());
+        rec.set('value', {en: "", de: ""});
+    },
+
+    /**
+     * Handler for Remove button in combobox data grid
+     */
+    onComboboxOptionRemove: function () {
+        var win = this.getView(),
+            grid = win.down('grid#comboboxDataGrid'),
+            selMod = grid.getSelectionModel();
+
+        if (grid.findPlugin('rowediting'))
+            grid.findPlugin('rowediting').cancelEdit();
+
+        grid.store.remove(selMod.getSelection());
+
+        if (grid.store.getCount() > 0) {
+            selMod.select(0);
+        }
     }
 });

@@ -2113,7 +2113,11 @@ Editor.data.l10n = {
                     {value: 'combobox',  name: '<?php echo $this->translate->_('Auswahlliste');?>'}
                 ]
             },
-            comboboxData: '<?php echo $this->translate->_('Daten der Auswahlliste');?>',
+            comboboxData: {
+                label: '<?php echo $this->translate->_('Daten der Auswahlliste');?>',
+                value: '<?php echo $this->translate->_('Wert');?>',
+                title: '<?php echo $this->translate->_('Lokalitäten');?>'
+            },
             regex: '<?php echo $this->translate->_('Regex für die UI-Validierung');?>',
             mode: {
                 name: '<?php echo $this->translate->_('Mode');?>',

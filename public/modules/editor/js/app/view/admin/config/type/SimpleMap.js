@@ -33,6 +33,7 @@ END LICENSE AND COPYRIGHT
  */
 Ext.define('Editor.view.admin.config.type.SimpleMap', {
     extend: 'Ext.window.Window',
+    alias: 'widget.simplemap',
     requires: [
         'Editor.view.admin.config.type.SimpleMapController'
     ],
@@ -49,7 +50,7 @@ Ext.define('Editor.view.admin.config.type.SimpleMap', {
      */
     statics: {
         getConfigEditor: function (record) {
-            var win = new this({record: record});
+            var win = new this(record.isModel ? {record: record} : record);
             win.show();
 
             //prevent cell editing:
@@ -77,10 +78,15 @@ Ext.define('Editor.view.admin.config.type.SimpleMap', {
     },
     initConfig: function (instanceConfig) {
         var me = this,
-            data = [], config,
-            value = instanceConfig.record
-                ? instanceConfig.record.get('value')
-                : (Ext.JSON.decode(instanceConfig.jsonField.getValue(), true) || {});
+            data = [], config, value;
+
+        if (instanceConfig.record) {
+            value = instanceConfig.record.get('value');
+        } else if (instanceConfig.jsonField) {
+            value = (Ext.JSON.decode(instanceConfig.jsonField.getValue(), true) || {});
+        } else {
+            value = {};
+        }
 
         Ext.Object.each(value, function (key, value) {
             data.push([key, value]);
