@@ -40,6 +40,9 @@ Ext.define('Editor.view.admin.config.type.SimpleMap', {
 
     record: null,
     jsonField: null,
+    hideTbar: false,
+    readonlyIndex: false,
+    valueMaxLength: Number.MAX_VALUE,
 
     /**
      * This statics must be implemented in classes used as custom config editors
@@ -52,8 +55,8 @@ Ext.define('Editor.view.admin.config.type.SimpleMap', {
             //prevent cell editing:
             return null;
         },
-        getJsonFieldEditor: function (jsonField) {
-            var win = new this({jsonField: jsonField});
+        getJsonFieldEditor: function (config) {
+            var win = new this(config);
             win.show();
 
             //prevent cell editing:
@@ -111,30 +114,33 @@ Ext.define('Editor.view.admin.config.type.SimpleMap', {
                     clicksToEdit: 2
                 }],
                 border: false,
-                tbar: [{
-                    type: 'button',
-                    bind: {
-                        text: '{l10n.configuration.add}',
-                    },
-                    glyph: 'f067@FontAwesome5FreeSolid',
-                    handler: 'onAdd'
-                }, {
-                    type: 'button',
-                    bind: {
-                        text: '{l10n.configuration.remove}',
-                    },
-                    glyph: 'f2ed@FontAwesome5FreeSolid',
-                    handler: 'onRemove'
-                }],
+                tbar: {
+                    hidden: instanceConfig.hideTbar,
+                    items: [{
+                        type: 'button',
+                        bind: {
+                            text: '{l10n.configuration.add}',
+                        },
+                        glyph: 'f067@FontAwesome5FreeSolid',
+                        handler: 'onAdd'
+                    }, {
+                        type: 'button',
+                        bind: {
+                            text: '{l10n.configuration.remove}',
+                        },
+                        glyph: 'f2ed@FontAwesome5FreeSolid',
+                        handler: 'onRemove'
+                    }]
+                },
                 columns: [{
                     bind: {
                         text: '{l10n.configuration.index}',
                     },
                     dataIndex: 'index',
-                    editor: {
+                    editor: !(instanceConfig.readonlyIndex || {
                         xtype: 'textfield',
                         itemId: 'index'
-                    }
+                    })
                 }, {
                     bind: {
                         text: '{l10n.configuration.value}',
@@ -142,7 +148,8 @@ Ext.define('Editor.view.admin.config.type.SimpleMap', {
                     dataIndex: 'value',
                     editor: {
                         xtype: 'textfield',
-                        itemId: 'value'
+                        itemId: 'value',
+                        maxLength: instanceConfig.valueMaxLength
                     }
                 }],
                 store: Ext.create('Ext.data.ArrayStore', {

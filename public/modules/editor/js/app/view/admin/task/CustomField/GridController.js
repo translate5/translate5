@@ -162,6 +162,7 @@ Ext.define('Editor.view.admin.task.CustomField.GridController', {
                 store = grid.getStore(),
                 newCustomField = Ext.create('Editor.model.admin.task.CustomField');
         newCustomField.set({
+            id: null,
             label: '{"en":"","de":""}',
             tooltip: '{"en":"","de":""}',
             type: 'textfield',
@@ -320,30 +321,51 @@ Ext.define('Editor.view.admin.task.CustomField.GridController', {
             comboboxData = form.down('#comboboxData');
 
         // Apply handlers
-        label.inputEl.on('click', el => this.jsonFieldClick(label));
-        tooltip.inputEl.on('click', el => this.jsonFieldClick(tooltip));
-        comboboxData.inputEl.on('click', el => this.jsonFieldClick(comboboxData));
+        label.inputEl.on('click', el => this.onJsonFieldClick(label, 40));
+        tooltip.inputEl.on('click', el => this.onJsonFieldClick(tooltip, 119));
+        //comboboxData.inputEl.on('click', el => this.jsonFieldClick(comboboxData));
     },
 
     /**
-     * make sure SimpleMap-popup is shown when field is clicked so that json-value can be edited via the popup
+     * Make sure SimpleMap-popup is shown when field is clicked so that json-value can be edited via the popup
      *
      * @param field
      */
-    jsonFieldClick: function(field) {
-        Ext.ClassManager.get('Editor.view.admin.config.type.SimpleMap').getJsonFieldEditor(field);
+    onJsonFieldClick: function(field, valueMaxLength) {
+        Ext.ClassManager.get('Editor.view.admin.config.type.SimpleMap').getJsonFieldEditor({
+            jsonField: field,
+            hideTbar: true,
+            readonlyIndex: true,
+            valueMaxLength: valueMaxLength
+        });
     },
 
     /**
      * Save changes to new or existing custom field
      */
     onSave:function(){
-        var view = this.getView();
+        var view = this.getView(),
+            record = view.getViewModel().get('customField'),
+            selector = '#' + view.down('tableview').id + '-record-' + record.internalId;
+
+        // Put a mask on the whole view
         view.mask(Ext.LoadMask.prototype.msg);
-        view.getViewModel().get('customField').save({
+
+        // Start saving request
+        record.save({
             callback: () => {
                 view.unmask();
-                view.getStore().refreshGlobalCustomFields()
+
+                // Refresh Editor.data.editor.task.customFields array
+                view.getStore().refreshGlobalCustomFields();
+
+                // Do redirect
+                this.redirectTo(
+                    Editor.util.Util.trimLastSlash(Ext.util.History.getToken()) + (record.get('id') ? '/' + record.get('id') : '')
+                );
+
+                // Put yellow background as it's dissapears somewhy if new record was saved
+                view.el.down(selector).addCls('x-grid-item-selected');
             }
         });
     },
@@ -367,6 +389,7 @@ Ext.define('Editor.view.admin.task.CustomField.GridController', {
                 if (!record.phantom) {
                     view.getStore().refreshGlobalCustomFields()
                 }
+                view.getViewModel().set('customField', null);
             }
         });
     },

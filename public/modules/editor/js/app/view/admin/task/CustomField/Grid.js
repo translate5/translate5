@@ -39,10 +39,7 @@ Ext.define('Editor.view.admin.task.CustomField.Grid', {
     store: Ext.create('Editor.store.admin.task.CustomField'),
     viewModel: {
         data: {
-            customField: {
-                id: null,
-                mode: null
-            }
+            customField: null
         }
     },
     bind: {
@@ -62,8 +59,9 @@ Ext.define('Editor.view.admin.task.CustomField.Grid', {
             msgTarget: 'side',
         },
         defaults: {
+            disabled: true,
             bind: {
-                disabled: '{!customField.id || customField.mode == "readonly"}'
+                disabled: '{!customField || customField.mode == "readonly"}'
             },
         },
         dockedItems: [{
@@ -73,12 +71,13 @@ Ext.define('Editor.view.admin.task.CustomField.Grid', {
             border: 0,
             defaults: {
                 width: '33%',
+                disabled: true
             },
             items: [{
                 glyph: 'f0c7@FontAwesome5FreeSolid',
                 bind: {
                     text: '{l10n.taskCustomField.save}',
-                    disabled: '{!customField.id || customField.mode == "readonly"}'
+                    disabled: '{!customField || customField.mode == "readonly"}'
                 },
                 handler: 'onSave'
             }, {
@@ -92,7 +91,7 @@ Ext.define('Editor.view.admin.task.CustomField.Grid', {
                 glyph: 'f2ed@FontAwesome5FreeSolid',
                 bind: {
                     text: '{l10n.taskCustomField.delete}',
-                    disabled: '{!customField.id || customField.mode == "readonly"}'
+                    disabled: '{!customField || customField.mode == "readonly"}'
                 },
                 handler: 'onDelete',
             }]
@@ -104,7 +103,6 @@ Ext.define('Editor.view.admin.task.CustomField.Grid', {
 
         items: [{
             itemId: 'label',
-            allowBlank: false,
             readOnly: true,
             bind: {
                 fieldLabel: '{l10n.taskCustomField.meta.label}',
@@ -122,11 +120,12 @@ Ext.define('Editor.view.admin.task.CustomField.Grid', {
             forceSelection: true,
             allowBlank: false,
             queryMode: 'local',
-            value: 'text',
+            value: 'textfield',
             itemId: 'type',
             bind: {
                 fieldLabel: '{l10n.taskCustomField.meta.type.name}',
-                value: '{customField.type}',
+                value: '{customField ? customField.type : "textfield"}',
+                disabled: '{!customField || customField.id}',
                 store: {
                     fields: ['name', 'value'],
                     data: '{l10n.taskCustomField.meta.type.data}'
@@ -158,7 +157,7 @@ Ext.define('Editor.view.admin.task.CustomField.Grid', {
             itemId: 'mode',
             bind: {
                 fieldLabel: '{l10n.taskCustomField.meta.mode.name}',
-                value: '{customField.mode}',
+                value: '{customField ? customField.mode : "optional"}',
                 store: {
                     fields: ['name', 'value'],
                     data: '{l10n.taskCustomField.meta.mode.data}'
