@@ -44,6 +44,11 @@ Ext.define('Editor.view.admin.task.CustomField.GridController', {
         store: {
             '#taskCustomFieldStore': {
                 load: 'onLoad'
+            },
+            '#comboboxDataStore': {
+                remove: 'onComboboxStoreUpdated',
+                update: 'onComboboxStoreUpdated',
+                sort: 'onComboboxStoreUpdated'
             }
         }
     },
@@ -277,9 +282,6 @@ Ext.define('Editor.view.admin.task.CustomField.GridController', {
     onRecordRoute: async function(recordId) {
         var grid = this.getView(), store = grid.getStore();
 
-        // Close all windows
-        Editor.util.Util.closeWindows();
-
         // Wait for store load?
         await Editor.util.Util.awaitStore(store);
 
@@ -345,11 +347,16 @@ Ext.define('Editor.view.admin.task.CustomField.GridController', {
      */
     onSave:function(){
         var view = this.getView(),
-            record = view.getViewModel().get('customField'),
+            record = view.getSelection().pop(),
             selector = '#' + view.down('tableview').id + '-record-' + record.internalId;
 
         // Put a mask on the whole view
         view.mask(Ext.LoadMask.prototype.msg);
+
+        //
+        //view.setBind({selection: null});
+        //view.getViewModel().set('customField', Ext.clone(record.getData()));
+        view.getViewModel().set('customField', null);
 
         // Start saving request
         record.save({
@@ -364,8 +371,13 @@ Ext.define('Editor.view.admin.task.CustomField.GridController', {
                     Editor.util.Util.trimLastSlash(Ext.util.History.getToken()) + (record.get('id') ? '/' + record.get('id') : '')
                 );
 
-                // Put yellow background as it's dissapears somewhy if new record was saved
-                view.el.down(selector).addCls('x-grid-item-selected');
+                // Re-apply
+                view.getViewModel().set('customField', record);
+
+                // Commit changes on combobox store records, if need
+                if (record.get('type') === 'combobox') {
+                    view.down('grid#comboboxDataGrid').getStore().commitChanges()
+                }
             }
         });
     },
@@ -402,11 +414,11 @@ Ext.define('Editor.view.admin.task.CustomField.GridController', {
      */
     onSelectionChange: function(selModel, selected) {
 
-        // If nothing selected - skip
-        if (!selected.length) return;
-
         // Adjust options available in Mode-combobox based on value in Type-combobox
-        this.adjustModeChoices();
+        if (selected.length) this.adjustModeChoices();
+
+        // Check whether selected record's type is combobox and load json comboboxData-prop into comboboxDataGrid's store
+        this.setupComboboxData(selected);
     },
 
     /**
@@ -450,6 +462,31 @@ Ext.define('Editor.view.admin.task.CustomField.GridController', {
     },
 
     /**
+     * Check whether selected record's type is combobox and load json comboboxData-prop into comboboxDataGrid's store
+     */
+    setupComboboxData: function(selected) {
+        var me = this, customField = selected.length ? selected[0] : false,
+            store = me.getView().down('grid#comboboxDataGrid').getStore(),
+            decoded, data = [];
+
+        // Clear store
+        store.removeAll();
+
+        // If customField selected in the grid at the moment is of type 'combobox'
+        if (customField && customField.get('type') === 'combobox') {
+
+            // Decode combobox data from json
+            decoded = Ext.JSON.decode(customField.get('comboboxData'), true) || {};
+
+            // Re-structure into format compatible with extjs store
+            Ext.Object.each(decoded, (index, value) => data.push({index: index, value: value}));
+            console.log(customField.get('id'), data, customField.get('comboboxData'));
+            // Add to store
+            store.add(data);
+        }
+    },
+
+    /**
      * Adjust choices available in Mode-combobox based on current value of Type-combobox
      *
      * @param combo
@@ -467,11 +504,8 @@ Ext.define('Editor.view.admin.task.CustomField.GridController', {
             grid = win.down('grid#comboboxDataGrid'),
             rec;
 
-        rec = grid.store.insert(0, {
-            index: '',
-            value: ''
-        })[0];
-        //we set the values after creation, so that the record looks dirty
+        // We set the values after creation, so that the record looks dirty
+        rec = grid.store.add({index: '', value: ''})[0];
         rec.set('index', 'option' + grid.store.getCount());
         rec.set('value', {en: "", de: ""});
     },
@@ -482,15 +516,32 @@ Ext.define('Editor.view.admin.task.CustomField.GridController', {
     onComboboxOptionRemove: function () {
         var win = this.getView(),
             grid = win.down('grid#comboboxDataGrid'),
-            selMod = grid.getSelectionModel();
+            selection = grid.getSelection(),
+            store = grid.getStore();
 
         if (grid.findPlugin('rowediting'))
             grid.findPlugin('rowediting').cancelEdit();
 
-        grid.store.remove(selMod.getSelection());
+        // Remove
+        store.remove(
+            selection.length
+                ? selection
+                : (store.getCount()
+                    ? [store.last()]
+                    : [])
+        );
+    },
 
-        if (grid.store.getCount() > 0) {
-            selMod.select(0);
-        }
+    /**
+     * @param store
+     */
+    onComboboxStoreUpdated: function(store) {
+        var json = {};
+
+        // Prepare json
+        store.each(record => json[record.data.index] = record.data.value);
+
+        // Apply to hidden textarea field
+        this.getView().down('textarea#comboboxData').setValue(Ext.JSON.encode(json));
     }
 });

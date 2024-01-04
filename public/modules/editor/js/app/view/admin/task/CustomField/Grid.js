@@ -134,7 +134,7 @@ Ext.define('Editor.view.admin.task.CustomField.Grid', {
             },
             displayField: 'name',
             valueField: 'value'
-        },{
+        }, {
             xtype: 'grid',
             height: 200,
             itemId: 'comboboxDataGrid',
@@ -159,12 +159,14 @@ Ext.define('Editor.view.admin.task.CustomField.Grid', {
             columns: [{
                 dataIndex: 'index',
                 editor: true,
+                text: '-',
                 bind: {
                     text: '{l10n.taskCustomField.meta.comboboxData.value}',
                 }
             }, {
                 dataIndex: 'value',
                 flex: 1,
+                text: '-',
                 bind: {
                     text: '{l10n.taskCustomField.meta.comboboxData.title}',
                 },
@@ -172,22 +174,22 @@ Ext.define('Editor.view.admin.task.CustomField.Grid', {
                 getEditor: record => Editor.view.admin.config.type.SimpleMap.getConfigEditor({
                     record: record,
                     hideTbar: true,
-                    readonlyIndex: true
+                    readonlyIndex: true,
+                    preventSave: true
                 })
             }],
             margin: '0 0 10 0',
             width: '100%',
             border: 1,
-            bind1: {
-                hidden: '{customField.type != "combobox"}'
+            hidden: true,
+            bind: {
+                hidden: '{!customField || customField.type != "combobox"}'
             },
             store: {
                 type: 'json',
+                storeId: 'comboboxDataStore',
                 fields: ['index', 'value'],
-                data: [{
-                    index: 'option1',
-                    value: {"en":"Option1-en","de":"Option1-de"}
-                }]
+                data: []
             }
         }, {
             xtype: 'textarea',
@@ -195,9 +197,7 @@ Ext.define('Editor.view.admin.task.CustomField.Grid', {
             readOnly: true,
             hidden: true,
             bind: {
-                //fieldLabel: '{l10n.taskCustomField.meta.comboboxData}',
                 value: '{customField.comboboxData}',
-                hidden: '{customField.type != "combobox"}'
             }
         }, {
             xtype: 'textfield',

@@ -44,6 +44,7 @@ Ext.define('Editor.view.admin.config.type.SimpleMap', {
     hideTbar: false,
     readonlyIndex: false,
     valueMaxLength: Number.MAX_VALUE,
+    preventSave: false,
 
     /**
      * This statics must be implemented in classes used as custom config editors

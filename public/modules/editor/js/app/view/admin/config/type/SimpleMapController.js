@@ -36,6 +36,7 @@ Ext.define('Editor.view.admin.config.type.SimpleMapController', {
 
     record: null,
     jsonField: null,
+    preventSave: false,
 
     /**
      * get the record
@@ -43,6 +44,7 @@ Ext.define('Editor.view.admin.config.type.SimpleMapController', {
     init: function () {
         this.record = this.getView().initialConfig.record;
         this.jsonField = this.getView().initialConfig.jsonField;
+        this.preventSave = this.getView().initialConfig.preventSave;
     },
 
     /**
@@ -59,16 +61,20 @@ Ext.define('Editor.view.admin.config.type.SimpleMapController', {
         });
         if (confRec) {
             confRec.set('value', newValue);
-            win.setLoading('saving...');
-            confRec.save({
-                success: function () {
-                    win.setLoading(false);
-                    win.close();
-                },
-                failure: function () {
-                    win.setLoading(false);
-                }
-            });
+            if (this.preventSave) {
+                win.close();
+            } else {
+                win.setLoading('saving...');
+                confRec.save({
+                    success: function () {
+                        win.setLoading(false);
+                        win.close();
+                    },
+                    failure: function () {
+                        win.setLoading(false);
+                    }
+                });
+            }
         } else {
             this.jsonField.setValue(Ext.JSON.encode(newValue));
             win.close();
