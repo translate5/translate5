@@ -660,7 +660,7 @@ Ext.define('Editor.view.segments.HtmlEditor', {
             cell = Ext.fly(this.getEditorBody()),
             styles = cell.getStyle(['font-size', 'font-style', 'font-weight', 'font-family', 'line-height', 'text-transform', 'letter-spacing', 'word-break']),
             lineHeight = styles['line-height'].replace(/px/, ''),
-            fill = isPlaceable ? 'rgb(208,249,237)' : 'rgb(207,207,207)';
+            fill = 'rgb(207,207,207)';
 
         if (!Ext.isNumber(lineHeight)) {
             lineHeight = Math.round(styles['font-size'].replace(/px/, '') * 1.3);

@@ -148,7 +148,7 @@ div.single + div {
 .short-tag div.internal-tag.nbsp span.full,
 .short-tag div.internal-tag.t5placeable span.full { display:inline; }
 /* special styles for placeables */
-.segment-tag-column div.x-grid-cell-inner div.single.t5placeable { color:#000; background:#bbfbe9aa; white-space:nowrap; }
+.segment-tag-column div.x-grid-cell-inner div.single.t5placeable { color:#000; white-space:nowrap; }
 .segment-tag-column div.x-grid-cell-inner div.single.t5placeable span.full { margin:0 2px; }
 
 #segment-grid span.term {

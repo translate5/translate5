@@ -193,33 +193,38 @@ class Check {
         // Foreach match given by LanguageTool API response
         foreach ($data->matches as $index => $match) {
 
+
             // If match's issueType is known to Translate5
             if ($category = self::$map[$match->rule->issueType] ?? 0) {
 
+                // TODO: Filter Whitespace-errors around placeables !
+
                 // Convert into special data structure
-                $this->states[$category] []= (object) [
-                    'content'           => mb_substr(
-                        $match->context->text,
-                        $match->context->offset,
-                        $match->context->length),
-                    'matchIndex'        => $index,                                                       // Integer
-                    'range'             => [                                                             // Rangy bookmark
+                $this->states[$category][]= (object) [
+                    'content'           => mb_substr($match->sentence, $match->offset, $match->length),
+                    'matchIndex'        => $index,                                                              // Integer
+                    'range'             => [                                                                    // Text coordinates
                         'start' => $match->offset,
                         'end'   => $match->offset + $match->context->length
                     ],
-                    'message'           => $match->message,                                              // String
-                    'replacements'      => array_column($match->replacements ?? [], 'value'),            // Array
-                    'infoURLs'          => array_column($match->rule->urls   ?? [], 'value'),            // Array
-                    'cssClassErrorType' => self::$css[$category]                                         // String
+                    'message'           => $match->message,                                                     // String
+                    'replacements'      => array_column($match->replacements ?? [], 'value'),   // Array
+                    'infoURLs'          => array_column($match->rule->urls   ?? [], 'value'),   // Array
+                    'cssClassErrorType' => self::$css[$category]                                                // String
                 ];
 
             // Else log that detected error is of a kind previously unknown to translate5 app
             } else {
-                $segment->getTask()->logger('editor.task.autoqa')->warn('E1418', 'LanguageTool (which stands behind AutoQA Spell Check) detected an error of a kind previously unknown to translate5 app', [
-                    'lang' => $spellCheckLang,
-                    'text' => $target,
-                    'match' => $match
-                ]);
+                $segment->getTask()->logger('editor.task.autoqa')
+                    ->warn(
+                        'E1418',
+                        'LanguageTool (which stands behind AutoQA Spell Check)'
+                        . ' detected an error of a kind previously unknown to translate5 app',
+                        [
+                            'lang' => $spellCheckLang,
+                            'text' => $target,
+                            'match' => $match
+                        ]);
             }
         }
     }
