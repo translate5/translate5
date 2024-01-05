@@ -77,4 +77,13 @@ class editor_TaskcustomfieldController extends ZfExtended_RestController {
             $handler->editCustomField($this->entity, $this->data);
         }*/
     }
+
+    public function indexAction()
+    {
+        parent::indexAction();
+
+        foreach ($this->view->rows as &$row) {
+            $row['roles'] = array_slice(['editor','pm','pmlight'], 0, rand(1, 3));
+        }
+    }
 }

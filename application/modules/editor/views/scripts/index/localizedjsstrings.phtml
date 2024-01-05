@@ -2135,6 +2135,10 @@ Editor.data.l10n = {
                     {value: 'taskGrid',      name: '<?php echo $this->translate->_('Aufgabenraster');?>'}
                 ]
             },
+            roles: {
+                name: '<?php echo $this->translate->_('Systemrollen');?>',
+                tooltip: '<?php echo $this->translate->_(' ² Systemrollen bestimmen darüber, welche Rechte im System ein Nutzer hat. Die Rolle Editor darf auf alle Komponenten des Editors zugreifen, sowie auf die Komponenten der Aufgabenübersicht, die für das Editieren von Aufgaben nötig sind. Die Rolle PM darf Benutzer verwalten und Benutzer Aufgaben im Workflow zuweisen oder entziehen. Achtung: Systemrollen dürfen nicht mit Workflowrollen wie Lektor oder Übersetzer verwechselt werden. Benutzer die im Workflow Aufgaben übernehmen sollen müssen mindestens die Systemrolle Editor erhalten.');?>'
+            },
             position: '<?php echo $this->translate->_('Position');?>'
         },
     },

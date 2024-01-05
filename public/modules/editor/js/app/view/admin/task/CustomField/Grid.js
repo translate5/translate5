@@ -99,6 +99,7 @@ Ext.define('Editor.view.admin.task.CustomField.Grid', {
         }],
         bodyPadding: 15,
         margin: 0,
+        overflowY: 'auto',
         layout: 'anchor',
         defaultType: 'textfield',
 
@@ -237,6 +238,44 @@ Ext.define('Editor.view.admin.task.CustomField.Grid', {
                     data: '{l10n.taskCustomField.meta.placesToShow.data}'
                 }
             }
+        }, {
+            xtype: 'checkboxgroup',
+            itemId: 'roles',
+            cls: 'x-check-group-alt',
+            labelAlign: 'top',
+            name: 'roles',
+            columns: 2,
+            bind: {
+                fieldLabel: '{l10n.taskCustomField.meta.roles.name} &#8505;',
+                value: '{customField.roles}',
+            },
+            autoEl: {
+                tag: 'div',
+                'data-qtip': Ext.String.htmlEncode(Editor.data.l10n.taskCustomField.meta.roles.tooltip)
+            }
+            //inputValuesOnly: true,
+            //name: 'roles',
+            /*bodyPadding: 0,
+            bodyStyle: {
+                'padding-left': 0
+            },
+            afterRender1: function() {},
+            constructor1: function(){
+                this.callParent(arguments);
+            },
+            initComponent1: function() {
+                var me = this;
+                // Init mixins
+                me.initLabelable();
+                me.initFieldAncestor();
+                me.callParent();
+                //me.items = [];
+                //me.initMonitor();
+
+                console.log('zxczxc', this);
+
+                //this.callParent();
+            }*/
         }, {
             xtype: 'numberfield',
             bind: {

@@ -1763,3 +1763,43 @@ Ext.define('Ext.overrides.grid.filters.filter.Number', {
     override: 'Ext.grid.filters.filter.Number',
     updateBuffer: 0
 });
+
+/**
+ *
+ */
+/*Ext.override(Ext.form.CheckboxGroup, {
+    inputValuesOnly: false,
+    getValue: function() {
+        var values = {},
+            boxes  = this.getBoxes(),
+            b,
+            bLen   = boxes.length,
+            box, name, inputValue, bucket;
+
+        if (this.inputValuesOnly) values = [];  // +
+
+        for (b = 0; b < bLen; b++) {
+            box        = boxes[b];
+            name       = box.getName();
+            inputValue = box.inputValue;
+
+            if (box.getValue()) {
+                if (this.inputValuesOnly) {    // +
+                    values.push(inputValue);   // +
+                    continue;                  // +
+                }                              // +
+                if (values.hasOwnProperty(name)) {
+                    bucket = values[name];
+                    if (!Ext.isArray(bucket)) {
+                        bucket = values[name] = [bucket];
+                    }
+                    bucket.push(inputValue);
+                } else {
+                    values[name] = inputValue;
+                }
+            }
+        }
+
+        return values;
+    }
+});*/

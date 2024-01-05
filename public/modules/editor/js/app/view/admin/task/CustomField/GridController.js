@@ -39,6 +39,9 @@ Ext.define('Editor.view.admin.task.CustomField.GridController', {
             },
             'form combobox#type': {
                 change: 'onTypeChange'
+            },
+            'form checkboxgroup#roles': {
+                boxready: 'onRolesBoxReady'
             }
         },
         store: {
@@ -58,6 +61,33 @@ Ext.define('Editor.view.admin.task.CustomField.GridController', {
      */
     routesToSet: {
         ':recordId': 'onRecordRoute',
+    },
+
+    /**
+     * Setup role-checkboxes
+     *
+     * @param cbgroup
+     */
+    onRolesBoxReady: function(cbgroup) {
+        var items = [];
+
+        // For each role
+        Ext.Object.each(Editor.data.app.roles, (key, value) => {
+
+            // Skip unsetable and unapplicable roles
+            if (!value.setable || key.match('term|instantTranslate|editor-only-override')){
+                return;
+            }
+
+            // Add to the array of to be added
+            items.push({
+                boxLabel: value.label,
+                inputValue: key,
+            });
+        });
+
+        // Do add
+        cbgroup.add(items);
     },
 
     /**
@@ -480,7 +510,7 @@ Ext.define('Editor.view.admin.task.CustomField.GridController', {
 
             // Re-structure into format compatible with extjs store
             Ext.Object.each(decoded, (index, value) => data.push({index: index, value: value}));
-            console.log(customField.get('id'), data, customField.get('comboboxData'));
+
             // Add to store
             store.add(data);
         }

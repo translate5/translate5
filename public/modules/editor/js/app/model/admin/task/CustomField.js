@@ -87,6 +87,12 @@ Ext.define('Editor.model.admin.task.CustomField', {
         name: 'placesToShow',
         type: 'string'
     }, {
+        name: 'roles',
+        type: 'string',
+        //mapping: function
+        convert:   v => 'shift' in v ? {roles: v} : v,
+        serialize: v => 'roles' in v ? (v.roles.join ? v.roles.join(',') : v.roles) : ''
+    }, {
         name: 'position',
         type: 'number'
     }],

@@ -54,6 +54,8 @@ use ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey;
  * @method void setPlacesToShow(string $placesToShow)
  * @method string getPosition()
  * @method void setPosition(string $position)
+ * @method string getRoles()
+ * @method void setRoles(string $roles)
  */
 class Field extends ZfExtended_Models_Entity_Abstract {
 
