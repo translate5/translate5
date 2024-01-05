@@ -53,14 +53,15 @@ class editor_TaskcustomfieldController extends ZfExtended_RestController {
     protected function decodePutData(): void
     {
         parent::decodePutData();
-        if(isset($this->data['placesToShow']) && is_array($this->data['placesToShow'])) {
-            $this->data['placesToShow'] = implode(',', $this->data['placesToShow']);
-        }
     }
 
     public function postAction()
     {
         parent::postAction();
+
+        // Set roles
+        $this->entity->setRoles($this->data['roles']);
+
         /*$fieldHandler = explode($this->entity->getPlacesToShow(), ',');
         foreach ($fieldHandler as $handler) {
             $handler = \MittagQI\Translate5\Task\CustomFields\Handler\Factory::getHandler($handler);
@@ -71,6 +72,10 @@ class editor_TaskcustomfieldController extends ZfExtended_RestController {
     public function putAction()
     {
         parent::putAction();
+
+        // Set roles
+        $this->entity->setRoles($this->data['roles']);
+
         /*$fieldHandler = explode(',', $this->entity->getPlacesToShow());
         foreach ($fieldHandler as $handler) {
             $handler = \MittagQI\Translate5\Task\CustomFields\Handler\Factory::getHandler($handler);
@@ -83,7 +88,7 @@ class editor_TaskcustomfieldController extends ZfExtended_RestController {
         parent::indexAction();
 
         foreach ($this->view->rows as &$row) {
-            $row['roles'] = array_slice(['editor','pm','pmlight'], 0, rand(1, 3));
+            $row['roles'] = $this->entity->getRoles($row['id']);
         }
     }
 }

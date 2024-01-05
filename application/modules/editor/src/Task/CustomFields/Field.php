@@ -54,8 +54,6 @@ use ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey;
  * @method void setPlacesToShow(string $placesToShow)
  * @method string getPosition()
  * @method void setPosition(string $position)
- * @method string getRoles()
- * @method void setRoles(string $roles)
  */
 class Field extends ZfExtended_Models_Entity_Abstract {
 
@@ -88,6 +86,11 @@ class Field extends ZfExtended_Models_Entity_Abstract {
 
         // Drop column from tasks table
         $this->alterTasksTable('delete', $id);
+
+        // Get db adapter
+        $this->db->getAdapter()->query(
+            'DELETE FROM `Zf_acl_rules` WHERE `right` = ?', "customField$id"
+        );
     }
 
     /**
@@ -141,5 +144,59 @@ class Field extends ZfExtended_Models_Entity_Abstract {
         $s = $this->db->select();
         $s->order('position');
         return $this->loadFilterdCustom($s);
+    }
+
+    /**
+     *
+     * @param int|null $id
+     * @return string[]
+     * @throws Zend_Db_Statement_Exception
+     */
+    public function getRoles(?int $id = null) {
+
+        // Use own id if not given by 1st arg
+        if (!$id) $id = $this->getId();
+
+        // Get roles from acl table
+        return $this->db->getAdapter()
+            ->query('SELECT `role` FROM `Zf_acl_rules` WHERE `right` = ?',"customField$id")
+            ->fetchAll(\PDO::FETCH_COLUMN);
+    }
+
+    /**
+     * @param ?string $roles
+     * @throws Zend_Db_Statement_Exception
+     */
+    public function setRoles(?string $roles) {
+
+        // Get db adapter
+        $db = $this->db->getAdapter();
+
+        // Shortcuts
+        $right = "customField" . $this->getId();
+        $was = $this->getRoles();
+        $now = strlen($roles) ? explode(',', $roles) : [];
+
+        // Get diffs
+        $ins = array_diff($now, $was);
+        $del = array_diff($was, $now);
+
+        // If some roles were removed - DELETE corresponding acl-records
+        if ($del) $db->query(
+            'DELETE FROM `Zf_acl_rules` WHERE FIND_IN_SET(`role`, ?) AND `right` = ?',
+            [join(',', $del), $right]
+        );
+
+        // If some roles were added - INSERT corresponding acl-records
+        foreach ($ins as $role) {
+            $db->query('
+                INSERT INTO `Zf_acl_rules` SET 
+                  `module` = "editor", 
+                  `role` = ?,
+                  `resource` = "frontend", 
+                  `right` = ? 
+                ', [$role, $right]
+            );
+        }
     }
 }
