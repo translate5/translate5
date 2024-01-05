@@ -553,7 +553,12 @@ Ext.define('Editor.util.dom.Selection', {
         if(tagName in this.ignored){
             for(var item of this.ignored[tagName]){
                 if(this.elementHasClasses(element, item.classes)){
-                    return item.placeholder.length;
+                    if(item.placeholder !== ''){
+                        // QUIRK: do we have whitespace tags with an amount greater 1 ?
+                        var amount = element.dataset.length ? parseInt(element.dataset.length) : 1;
+                        return isNaN(amount) ? item.placeholder.length : item.placeholder.length * amount;
+                    }
+                    return 0;
                 }
             }
         }

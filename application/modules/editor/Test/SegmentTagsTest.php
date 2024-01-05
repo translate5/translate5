@@ -82,8 +82,9 @@ abstract class editor_Test_SegmentTagsTest extends editor_Test_MockedTaskTest {
      * @param int $segmentId
      * @param string $original
      * @param string $markup
+     * @param string $replacedLabeled
      */
-    protected function createOriginalDataTest($segmentId, $original, $markup){
+    protected function createOriginalDataTest($segmentId, $original, $markup, $replacedLabeled = null){
         $originalTags = new editor_Segment_FieldTags($this->getTestTask(), $segmentId, $original, 'target', 'targetEdit');
         $tags = new editor_Segment_FieldTags($this->getTestTask(), $segmentId, $markup, 'target', 'targetEdit');
         // compare unparsed markup
@@ -96,6 +97,12 @@ abstract class editor_Test_SegmentTagsTest extends editor_Test_MockedTaskTest {
         $expectedJSON = $tags->toJson();
         $jsonTags = editor_Segment_FieldTags::fromJson($this->getTestTask(), $expectedJSON);
         $this->assertEquals($expectedJSON, $jsonTags->toJson());
+        // rendering replaced stripped should match the field-text with trackchanges stripped!
+        $this->assertEquals($tags->getFieldText(true), $tags->renderReplaced());
+        // test the replaced rendering with the labeled whitespace placeholders
+        if($replacedLabeled !== null){
+            $this->assertEquals($replacedLabeled, $tags->renderReplaced(editor_TagSequence::MODE_LABELED));
+        }
     }
     /**
      *
