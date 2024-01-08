@@ -279,8 +279,8 @@ class NumberProtector implements ProtectorInterface
                         )
                     );
 
-                    if (!isset($this->invalidRules[$protectionDto->regex])) {
-                        $this->invalidRules[$protectionDto->regex] = true;
+                    if (!isset($this->invalidRules["{$protectionDto->type}:{$protectionDto->name}"])) {
+                        $this->invalidRules["{$protectionDto->type}:{$protectionDto->name}"] = true;
                         $this->logger->warn(
                             'E1585',
                             'Input rule of type "{type}" and name "{name}" does not have appropriate output rule',
@@ -371,10 +371,22 @@ class NumberProtector implements ProtectorInterface
         preg_match_all(self::fullTagRegex(), $target, $targetMatches, PREG_SET_ORDER);
 
         if (!empty($sourceMatches) && empty($targetMatches)) {
-            $source = preg_replace(self::fullTagRegex(), '\3', $source);
+            $source = $this->unprotect($source, true);
 
             return;
         }
+
+        if (empty($sourceMatches) && !empty($targetMatches)) {
+            $target = $this->unprotect($target, false);
+
+            return;
+        }
+
+        if (empty($sourceMatches) && empty($targetMatches)) {
+            return;
+        }
+
+        dump($sourceMatches, $targetMatches);
 
         foreach ($sourceMatches as $sourceMatch) {
             foreach ($targetMatches as $key => $targetMatch) {

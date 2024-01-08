@@ -40,6 +40,10 @@ use MittagQI\Translate5\ContentProtection\T5memory\RecalculateRulesHashWorker;
  */
 class editor_ContentprotectioncontentrecognitionController extends ZfExtended_RestController
 {
+    /**
+     * @var ContentRecognition
+     */
+    protected $entity;
     protected $entityClass = ContentRecognition::class;
 
     protected $postBlacklist = ['id'];
@@ -76,9 +80,7 @@ class editor_ContentprotectioncontentrecognitionController extends ZfExtended_Re
         $importantKeys = ['enabled', 'regex', 'matchId', 'keepAsIs', 'format'];
 
         if (!empty(array_intersect($importantKeys, $updatedFields))) {
-            $worker = ZfExtended_Factory::get(RecalculateRulesHashWorker::class);
-            $worker->init(parameters: ['recognitionId' => $this->data['id']]);
-            $worker->queue();
+            $this->queueRecalculateRulesHashWorker();
         }
 
         if (!empty($this->view->rows)) {
@@ -98,16 +100,28 @@ class editor_ContentprotectioncontentrecognitionController extends ZfExtended_Re
         $row['isDefault'] = boolval($row['isDefault']);
     }
 
+    private function queueRecalculateRulesHashWorker(): void
+    {
+        $worker = ZfExtended_Factory::get(RecalculateRulesHashWorker::class);
+        $worker->init(parameters: ['recognitionId' => $this->entity->getId()]);
+        $worker->queue();
+    }
+
     protected function decodePutData()
     {
         parent::decodePutData();
         $this->data = (array) $this->data;
         if (array_key_exists('rowEnabled', $this->data)) {
             $this->data['enabled'] = $this->data['rowEnabled'];
-            if (in_array($this->data['type'], [MacAddressProtector::getType(), IPAddressProtector::getType()])) {
-                $this->data['keepAsIs'] = true;
-            }
             unset($this->data['rowEnabled']);
+        }
+    }
+
+    protected function setDataInEntity(array $fields = null, $mode = self::SET_DATA_BLACKLIST)
+    {
+        parent::setDataInEntity($fields, $mode);
+        if (in_array($this->entity->getType(), [MacAddressProtector::getType(), IPAddressProtector::getType()])) {
+            $this->entity->setKeepAsIs(true);
         }
     }
 

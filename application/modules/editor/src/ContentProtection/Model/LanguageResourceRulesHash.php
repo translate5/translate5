@@ -64,9 +64,9 @@ use ZfExtended_Models_Entity_Abstract;
  * @method string getLanguageId()
  * @method void setLanguageId(int $languageId)
  * @method string getHash()
- * @method void setHash(int $hash)
+ * @method void setHash(string $hash)
  * @method string getConversionStarted()
- * @method void setConversionStarted(string $datetime)
+ * @method void setConversionStarted(?string $datetime)
  */
 class LanguageResourceRulesHash extends ZfExtended_Models_Entity_Abstract
 {

@@ -45,13 +45,18 @@ class editor_ContentprotectioninputmappingController extends ZfExtended_RestCont
      */
     protected $entity;
 
+    public function deleteAction()
+    {
+        parent::deleteAction();
+
+        $this->queueRecalculateRulesHashWorker();
+    }
+
     public function postAction()
     {
         parent::postAction();
 
-        $worker = ZfExtended_Factory::get(RecalculateRulesHashWorker::class);
-        $worker->init(parameters: ['languageId' => $this->entity->getLanguageId()]);
-        $worker->queue();
+        $this->queueRecalculateRulesHashWorker();
     }
 
     public function putAction()
@@ -59,9 +64,7 @@ class editor_ContentprotectioninputmappingController extends ZfExtended_RestCont
         parent::putAction();
 
         if (array_key_exists('priority', (array)$this->data)) {
-            $worker = ZfExtended_Factory::get(RecalculateRulesHashWorker::class);
-            $worker->init(parameters: ['languageId' => $this->entity->getLanguageId()]);
-            $worker->queue();
+            $this->queueRecalculateRulesHashWorker();
         }
     }
 
@@ -75,6 +78,13 @@ class editor_ContentprotectioninputmappingController extends ZfExtended_RestCont
             unset($row['enabled']);
         }
         $this->view->total = $this->entity->getTotalCount();
+    }
+
+    private function queueRecalculateRulesHashWorker(): void
+    {
+        $worker = ZfExtended_Factory::get(RecalculateRulesHashWorker::class);
+        $worker->init(parameters: ['languageId' => $this->entity->getLanguageId()]);
+        $worker->queue();
     }
 
     public function getAction(): void

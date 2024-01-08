@@ -131,7 +131,27 @@ Ext.define('Editor.view.LanguageResources.TaskAssocPanel', {
                     xtype: 'gridcolumn',
                     text: me.strings.name,
                     renderer: function(value, metaData, record) {
-                        return '<div style="float: left; width: 15px; height: 15px;margin-right:5px; border: 1px solid rgba(0, 0, 0, .2);background: #'+record.get('color')+';"></div>'+value;
+                        const style = 'float: left; width: 15px; height: 15px;margin-right:5px;';
+                        let className = '';
+                        let tooltip = '';
+
+                        if (record.get('tmNeedsConversion')) {
+                            className = 'ico-tm-converseTm';
+                            tooltip = Editor.data.l10n.contentProtection.tm_not_converted;
+                        }
+
+                        if (record.get('tmNeedsConversion') && record.get('tmConversionInProgress')) {
+                            className = 'ico-tm-converseTm-inProgress';
+                            tooltip = Editor.data.l10n.contentProtection.tm_conversion_in_progress;
+                        }
+
+                        return '<div style="' + style + ' border: 1px solid rgba(0, 0, 0, .2);background: #'+record.get('color')+';"></div>'
+                            + (
+                                record.get('tmNeedsConversion')
+                                    ? '<div style="' + style + '" class="' + className + '" data-qtip="'+ tooltip +'"></div>'
+                                    : ''
+                            )
+                            + value;
                     },
                     dataIndex : 'name',
                     sortable : true,

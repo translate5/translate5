@@ -35,9 +35,10 @@ class T5NTagSchemaFixFilter extends \php_user_filter
         return $this->status;
     }
 
-    /* looks for the first (root) element in $this->buffer
-    *  if it doesn't contain a xsi namespace decl inserts it
-    */
+    /**
+     * looks for the first (root) element in $this->buffer
+     * if it doesn't contain a xsi namespace decl inserts it
+     */
     protected function fix()
     {
         $rc = false;

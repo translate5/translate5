@@ -61,7 +61,7 @@ class ContentRecognitionValidator extends ValidatorWithContext
         $this->addValidator('name', 'stringLength', ['min' => 3, 'max' => 255]);
 
         //`description` varchar(1024),
-        $this->addValidator('description', 'stringLength', ['min' => 3, 'max' => 1024]);
+        $this->addValidator('description', 'stringLength', ['min' => 3, 'max' => 1024], true);
 
         //`regex` varchar(255) NOT NULL,
         $regexValidator = new Zend_Validate();

@@ -77,7 +77,7 @@ class RecalculateRulesHashWorker extends ZfExtended_Worker_Abstract
             $dbMapping = ZfExtended_Factory::get(InputMapping::class)->db;
             $select = $dbMapping->select()
                 ->from(['mapping' => $dbMapping->info($dbMapping::NAME)], ['languageId'])
-                ->where('recognitionId = ?', $this->recognitionId)
+                ->where('contentRecognitionId = ?', $this->recognitionId)
             ;
 
             array_push($this->languageIds, ...array_column($dbMapping->fetchAll($select)->toArray(), 'languageId'));

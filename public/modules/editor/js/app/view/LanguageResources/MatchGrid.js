@@ -119,15 +119,39 @@ Ext.define('Editor.view.LanguageResources.MatchGrid', {
                   if(val !== me.SERVER_STATUS.SERVER_STATUS_LOADED){
                   	return "";
                   }
-					meta.tdAttr = 'data-qtip="'+Ext.String.htmlEncode(attrTpl.applyTemplate({
-						title: me.strings.atributeTooltipMsg,
-						metaData: record.get('metaData'),
-						ctrl: me.strings.ctrl,
-						idx: (meta.rowIndex + 1),
-						takeMsg: me.strings.tooltipMsg
-					}))+'"';
-					meta.tdCls  = meta.tdCls  + ' info-icon';
-					return meta.rowIndex + 1;
+
+				  const style = 'float: left; width: 15px; height: 15px;margin-right:5px;';
+				  let className = '';
+				  let tooltip = '';
+
+				  if (record.get('tmNeedsConversion')) {
+					  className = 'ico-tm-converseTm';
+					  tooltip = Editor.data.l10n.contentProtection.tm_not_converted;
+				  }
+
+				  if (record.get('tmNeedsConversion') && record.get('tmConversionInProgress')) {
+					  className = 'ico-tm-converseTm-inProgress';
+					  tooltip = Editor.data.l10n.contentProtection.tm_conversion_in_progress;
+				  }
+
+				  if ('' !== tooltip) {
+					  tooltip = '<div style="' + style + '" class="' + className + '"></div>' + tooltip + '<br/><br/>';
+				  }
+
+				  meta.tdAttr = 'data-qtip="'+Ext.String.htmlEncode(attrTpl.applyTemplate({
+					  title: tooltip + me.strings.atributeTooltipMsg,
+					  metaData: record.get('metaData'),
+					  ctrl: me.strings.ctrl,
+					  idx: (meta.rowIndex + 1),
+					  takeMsg: me.strings.tooltipMsg
+				  }))+'"';
+				  meta.tdCls  = meta.tdCls  + ' info-icon';
+
+				  return meta.rowIndex + 1 + (
+					  record.get('tmNeedsConversion')
+						  ? '<div style="' + style + '" class="' + className + '"></div>'
+						  : ''
+				  );
               },
           },{
 	          xtype: 'gridcolumn',

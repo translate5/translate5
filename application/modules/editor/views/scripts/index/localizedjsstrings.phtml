@@ -1873,8 +1873,7 @@ Ext.define('Editor.controller.Localizer', {
             groupHeader: '<?php echo $this->translate->_('Ressource: {name}');?>',
             groupHeader: '<?php echo $this->translate->_('Ressource: {name}');?>',
             specificDataText: '<?php echo $this->translate->_('Zusätzliche Infos');?>',
-            pivotAsDefault: '<?php echo $this->translate->_('Standardmäßig als Pivot verwenden');?>',
-            tmNotConverted: '<?php echo $this->translate->_('Die Regeln für die Erkennung von Inhalten haben sich für diese Sprachressource geändert, sie sollte konvertiert werden. Gehen Sie dazu auf die Konfigurationsseite der Erkennungsregeln oder Fragen Sie Ihren Projektmanager (alle Kunden).');?>'
+            pivotAsDefault: '<?php echo $this->translate->_('Standardmäßig als Pivot verwenden');?>'
         }
     });
 
@@ -2309,6 +2308,8 @@ Editor.data.l10n = {
     contentProtection: {
         title: '<?= $this->translate->_('Nummernschutz') ?>',
         confirm_deletion_title: '<?= $this->translate->_('Löschung bestätigen') ?>',
+        tm_not_converted: '<?= $this->translate->_('Die Regeln für die Erkennung von Inhalten haben sich für diese Sprachressource geändert, sie sollte konvertiert werden. Gehen Sie dazu auf die Konfigurationsseite der Erkennungsregeln oder Fragen Sie Ihren Projektmanager (alle Kunden).');?>',
+        tm_conversion_in_progress: '<?= $this->translate->_('Konvertierung läuft') ?>',
         contentRecognition: {
             title: '<?= $this->translate->_('Nummernerkennung') ?>',
             infobox: '<?= $this->translate->_('Content Recognition Rules tab info box') ?>',
@@ -2316,7 +2317,9 @@ Editor.data.l10n = {
             confirm_deletion_message: '<?= $this->translate->_('Sind Sie sicher, dass Sie die Nummernerkennung löschen möchten?') ?>',
             matchId: '<?= $this->translate->_('Geschützte Regex-Gruppe') ?>',
             matchIdQTip: '<?= $this->translate->_('Protected regex group qtip') ?>',
-            formatExampleRender: '<?= $this->translate->_('Format-Rendering-Beispiel') ?>'
+            formatExampleRender: '<?= $this->translate->_('Format-Rendering-Beispiel') ?>',
+            confirm_enable_title: '<?= $this->translate->_('Bestätigen Sie die Regelaktivierung') ?>',
+            confirm_enable_message: '<?= $this->translate->_('Das Aktivieren von Input-Regeln kann in neuen Projekten zum Verlust von 100%-Matches führen, wenn Sie die betroffenen Sprachressourcen nicht konvertieren.') ?>'
         },
         mapping: {
             rule_name: '<?= $this->translate->_('Regelname') ?>',

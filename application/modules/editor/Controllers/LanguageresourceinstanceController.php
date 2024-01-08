@@ -26,13 +26,14 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use editor_Models_Segment_Whitespace as Whitespace;
+use MittagQI\Translate5\ContentProtection\ContentProtector;
 use MittagQI\Translate5\ContentProtection\Model\ContentProtectionRepository;
+use MittagQI\Translate5\ContentProtection\T5memory\TmConversionService;
 use MittagQI\Translate5\LanguageResource\CleanupAssociation\Customer;
-use MittagQI\Translate5\LanguageResource\CleanupAssociation\Task;
 use MittagQI\Translate5\LanguageResource\TaskAssociation;
 use MittagQI\Translate5\LanguageResource\TaskPivotAssociation;
 use MittagQI\Translate5\LanguageResource\Status as LanguageResourceStatus;
-use MittagQI\Translate5\LanguageResource\TmConversionService;
 use MittagQI\Translate5\Task\Current\NoAccessException;
 use MittagQI\Translate5\Task\TaskContextTrait;
 use MittagQI\ZfExtended\Controller\Response\Header;
@@ -142,7 +143,10 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         $languages = $languages->loadResourceIdsGrouped();
         $translate = ZfExtended_Zendoverwrites_Translate::getInstance();
 
-        $tmConversionService = new TmConversionService(new ContentProtectionRepository());
+        $tmConversionService = new TmConversionService(
+            new ContentProtectionRepository(),
+            ContentProtector::create(ZfExtended_Factory::get(Whitespace::class))
+        );
 
         foreach ($this->view->rows as &$lrData) {
 
@@ -179,10 +183,11 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
             $lrData['sourceLang'] = $this->getLanguage($languages, 'sourceLang', $id);
             $lrData['targetLang'] = $this->getLanguage($languages, 'targetLang', $id);
 
-            $languageresource['tmConverted'] = null;
+            $lrData['needsConversion'] = false;
 
-            if (editor_Services_Manager::SERVICE_OPENTM2 === $languageresource['serviceType']) {
-                $languageresource['tmConverted'] = $tmConversionService->isTmConverted($id);
+            if (editor_Services_Manager::SERVICE_OPENTM2 === $lrData['serviceType']) {
+                $lrData['tmNeedsConversion'] = !$tmConversionService->isTmConverted($id);
+                $lrData['tmConversionInProgress'] = $tmConversionService->isConversionInProgress($id);
             }
 
             // categories (for the moment: just display labels for info, no editing)
@@ -198,11 +203,17 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
     public function synchronizetmAction(): void
     {
         $postData = $this->getAllParams();
-        $tmConversionService = new TmConversionService(new ContentProtectionRepository());
+        $tmConversionService = new TmConversionService(
+            new ContentProtectionRepository(),
+            ContentProtector::create(ZfExtended_Factory::get(Whitespace::class))
+        );
 
         $this->view->success = true;
 
-        if ($tmConversionService->isTmConverted($postData['id'])) {
+        if (
+            $tmConversionService->isTmConverted($postData['id'])
+            || $tmConversionService->isConversionInProgress($postData['id'])
+        ) {
             return;
         }
 
@@ -1344,10 +1355,24 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
             $result=$this->markDiff($segment, $result,$connector);
         }
 
+        $tmConversionService = new TmConversionService(
+            new ContentProtectionRepository(),
+            ContentProtector::create(ZfExtended_Factory::get(editor_Models_Segment_Whitespace::class))
+        );
+
         $this->view->segmentId = $segment->getId(); //return the segmentId back, just for reference
         $this->view->languageResourceId = $this->entity->getId();
         $this->view->resourceType=$this->entity->getResourceType();
         $this->view->rows = $result->getResult();
+        if (editor_Services_Manager::SERVICE_OPENTM2 === $this->entity->getServiceType()) {
+            $this->view->tmNeedsConversion = !$tmConversionService->isTmConverted($languageResourceId);
+            $this->view->tmConversionInProgress = $tmConversionService->isConversionInProgress($languageResourceId);
+
+            foreach ($this->view->rows as &$row) {
+                $row->tmNeedsConversion = $this->view->tmNeedsConversion;
+                $row->tmConversionInProgress = $this->view->tmConversionInProgress;
+            }
+        }
         $this->view->total = count($this->view->rows);
     }
 

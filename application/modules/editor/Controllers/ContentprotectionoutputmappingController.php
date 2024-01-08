@@ -28,6 +28,7 @@ END LICENSE AND COPYRIGHT
 
 use MittagQI\Translate5\ContentProtection\Model\ContentProtectionRepository;
 use MittagQI\Translate5\ContentProtection\Model\OutputMapping;
+use MittagQI\Translate5\ContentProtection\T5memory\RecalculateRulesHashWorker;
 
 /**
  * Part of Content protection feature. Number protection part
@@ -52,6 +53,20 @@ class editor_ContentprotectionoutputmappingController extends ZfExtended_RestCon
         $this->view->total = $this->entity->getTotalCount();
     }
 
+    public function deleteAction()
+    {
+        parent::deleteAction();
+
+        $this->queueRecalculateRulesHashWorker();
+    }
+
+    public function postAction()
+    {
+        parent::postAction();
+
+        $this->queueRecalculateRulesHashWorker();
+    }
+
     public function getAction(): void
     {
         throw new ZfExtended_Models_Entity_NotFoundException();
@@ -61,5 +76,12 @@ class editor_ContentprotectionoutputmappingController extends ZfExtended_RestCon
     {
         $this->view->rows = (new ContentProtectionRepository())->getContentRecognitionForOutputMappingForm();
         $this->view->total = count($this->view->rows);
+    }
+
+    private function queueRecalculateRulesHashWorker(): void
+    {
+        $worker = ZfExtended_Factory::get(RecalculateRulesHashWorker::class);
+        $worker->init(parameters: ['languageId' => $this->entity->getLanguageId()]);
+        $worker->queue();
     }
 }

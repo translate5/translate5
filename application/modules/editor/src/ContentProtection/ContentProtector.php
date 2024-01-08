@@ -54,7 +54,6 @@ namespace MittagQI\Translate5\ContentProtection;
 
 use editor_Models_Segment_Utility as SegmentUtility;
 use editor_Models_Segment_Whitespace as Whitespace;
-use MittagQI\Translate5\ContentProtection\NumberProtection\Tag\NumberTag;
 
 class ContentProtector
 {

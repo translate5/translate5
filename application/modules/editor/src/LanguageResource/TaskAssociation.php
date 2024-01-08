@@ -28,12 +28,15 @@ END LICENSE AND COPYRIGHT
 
 namespace MittagQI\Translate5\LanguageResource;
 
+use editor_Models_Segment_Whitespace;
+use editor_Services_Manager;
+use MittagQI\Translate5\ContentProtection\ContentProtector;
+use MittagQI\Translate5\ContentProtection\Model\ContentProtectionRepository;
+use MittagQI\Translate5\ContentProtection\T5memory\TmConversionService;
 use Zend_Db_Expr;
-use Zend_Db_Table_Abstract;
 use Zend_Db_Table_Row_Abstract;
 use ZfExtended_Exception;
 use ZfExtended_Factory;
-use ZfExtended_Models_Entity_Abstract;
 
 /**
  * LanguageResource TaskAssoc Entity Object
@@ -204,9 +207,13 @@ class TaskAssociation extends AssociationAbstract {
      * @return array
      * @throws ZfExtended_Exception
      */
-    public function getAssocTasksWithResources($taskGuid){
-        $serviceManager = ZfExtended_Factory::get('editor_Services_Manager');
-        /* @var $serviceManager editor_Services_Manager */
+    public function getAssocTasksWithResources($taskGuid)
+    {
+        $serviceManager = ZfExtended_Factory::get(editor_Services_Manager::class);
+        $tmConversionService = new TmConversionService(
+            new ContentProtectionRepository(),
+            ContentProtector::create(ZfExtended_Factory::get(editor_Models_Segment_Whitespace::class))
+        );
 
         $resources = [];
         
@@ -230,6 +237,16 @@ class TaskAssociation extends AssociationAbstract {
             if (!empty($resource)) {
                 $languageresource = array_merge($languageresource, $resource->getMetaData());
                 $languageresource['serviceName'] = $serviceManager->getUiNameByType($languageresource['serviceType']);
+
+                if (editor_Services_Manager::SERVICE_OPENTM2 === $languageresource['serviceType']) {
+                    $languageresource['tmNeedsConversion'] = !$tmConversionService->isTmConverted(
+                        $languageresource['languageResourceId']
+                    );
+                    $languageresource['tmConversionInProgress'] = $tmConversionService->isConversionInProgress(
+                        $languageresource['languageResourceId']
+                    );
+                }
+
                 $available[] = $languageresource;
             }
         }

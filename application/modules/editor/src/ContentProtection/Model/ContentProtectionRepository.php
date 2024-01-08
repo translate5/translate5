@@ -86,7 +86,7 @@ class ContentProtectionRepository
 
         $select = $dbInputMapping->select()
             ->setIntegrityCheck(false)
-            ->from(['inputMapping' => $dbInputMapping->info($dbInputMapping::NAME)], [])
+            ->from(['inputMapping' => $dbInputMapping->info($dbInputMapping::NAME)], ['priority'])
             ->join(
                 ['recognition' => $contentRecognitionTable],
                 'recognition.id = inputMapping.contentRecognitionId',
@@ -164,7 +164,6 @@ class ContentProtectionRepository
             ->where('outputMapping.languageId IN (?)', $targetIds)
             ->orWhere('recognition.keepAsIs = true')
             ->where('recognition.enabled = true')
-            ->order('priority desc')
         ;
 
         foreach ($dbInputMapping->fetchAll($select) as $formatData) {
@@ -186,7 +185,8 @@ class ContentProtectionRepository
                 'recognition.id = mapping.contentRecognitionId',
                 ['recognition.id', 'recognition.type', 'recognition.name']
             )
-            ->order('type asc')
+            ->where('recognition.enabled = true')
+            ->order('name asc')
         ;
 
         return $dbMapping->fetchAll($select)->toArray();
@@ -219,17 +219,66 @@ class ContentProtectionRepository
 
     public function getRulesHashBy(editor_Models_Languages $language): string
     {
-        $rules = $this->getAll($language, ['regex', 'matchId', 'keepAsIs', 'format', 'priority']);
-
+        $dbInputMapping = ZfExtended_Factory::get(InputMapping::class)->db;
+        $dbOutputMapping = ZfExtended_Factory::get(OutputMapping::class)->db;
+        $dbContentRecognition = ZfExtended_Factory::get(ContentRecognition::class)->db;
+        $contentRecognitionTable = $dbContentRecognition->info($dbContentRecognition::NAME);
         $lines = [];
-        foreach ($rules as $rule) {
+
+        $languageIds = [$language->getId()];
+
+        if ($language->getMajorRfc5646() !== $language->getRfc5646()) {
+            $major = ZfExtended_Factory::get(editor_Models_Languages::class);
+            $major->loadByRfc5646($language->getMajorRfc5646());
+
+            $languageIds[] = $major->getId();
+        }
+
+        $select = $dbInputMapping->select()
+            ->setIntegrityCheck(false)
+            ->from(['inputMapping' => $dbInputMapping->info($dbInputMapping::NAME)], ['priority'])
+            ->join(
+                ['recognition' => $contentRecognitionTable],
+                'recognition.id = inputMapping.contentRecognitionId',
+                ['recognition.*']
+            )
+            ->where('inputMapping.languageId IN (?)', $languageIds)
+            ->where('recognition.enabled = true')
+            ->order(['regex', 'matchId', 'keepAsIs', 'format', 'priority'])
+        ;
+
+        foreach ($dbInputMapping->fetchAll($select) as $rule) {
             $lines[] = sprintf(
                 '%s:%s:%s:%s:%s',
                 $rule->regex,
                 $rule->matchId,
-                $rule->keepAsIs,
-                $rule->format
-                , $rule->priority
+                (int)$rule->keepAsIs,
+                $rule->format,
+                $rule->priority
+            );
+        }
+
+        $select = $dbOutputMapping->select()
+            ->setIntegrityCheck(false)
+            ->from(['outputMapping' => $dbOutputMapping->info($dbOutputMapping::NAME)], [])
+            ->join(
+                ['recognition' => $contentRecognitionTable],
+                'recognition.id = outputMapping.outputContentRecognitionId',
+                ['recognition.*']
+            )
+            ->where('outputMapping.languageId IN (?)', $languageIds)
+            ->orWhere('recognition.keepAsIs = true')
+            ->where('recognition.enabled = true')
+            ->order(['regex', 'matchId', 'keepAsIs', 'format'])
+        ;
+
+        foreach ($dbOutputMapping->fetchAll($select) as $rule) {
+            $lines[] = sprintf(
+                '%s:%s:%s:%s',
+                $rule->regex,
+                $rule->matchId,
+                (int)$rule->keepAsIs,
+                $rule->format,
             );
         }
 
@@ -247,8 +296,18 @@ class ContentProtectionRepository
     public function getLanguageResourceRulesHashMap(): array
     {
         $db = ZfExtended_Factory::get(LanguageResourceRulesHash::class)->db;
-        $select = $db->select()->from(['hashes' => $db->info($db::NAME)], ['languageResourceId', 'hash']);
+        $select = $db->select()->from(['hashes' => $db->info($db::NAME)], ['*']);
 
-        return array_column($db->fetchAll($select)->toArray(), null, 'languageResourceId');
+        $hashes = [];
+
+        foreach ($db->fetchAll($select) as $row) {
+            if (!isset($hashes[$row->languageResourceId])) {
+                $hashes[$row->languageResourceId] = [];
+            }
+
+            $hashes[$row->languageResourceId][] = $row->toArray();
+        }
+
+        return $hashes;
     }
 }

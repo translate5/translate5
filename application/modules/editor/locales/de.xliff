@@ -9540,6 +9540,18 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
                 <source>Die Regel "Unverändert übernehmen" kann nicht als Ausgaberegel verwendet werden</source>
                 <target>Cannot use "Keep As Is" rule as Output rule</target>
             </trans-unit>
+            <trans-unit id='QmVzdMOkdGlnZW4gU2llIGRpZSBSZWdlbGFrdGl2aWVydW5n'>
+                <source>Bestätigen Sie die Regelaktivierung</source>
+                <target>Bestätigen Sie die Regelaktivierung</target>
+            </trans-unit>
+            <trans-unit id='RGFzIEFrdGl2aWVyZW4gdm9uIElucHV0LVJlZ2VsbiBrYW5uIGluIG5ldWVuIFByb2pla3RlbiB6dW0gVmVybHVzdCB2b24gMTAwJS1NYXRjaGVzIGbDvGhyZW4sIHdlbm4gU2llIGRpZSBiZXRyb2ZmZW5lbiBTcHJhY2hyZXNzb3VyY2VuIG5pY2h0IGtvbnZlcnRpZXJlbi4='>
+                <source>Das Aktivieren von Input-Regeln kann in neuen Projekten zum Verlust von 100%-Matches führen, wenn Sie die betroffenen Sprachressourcen nicht konvertieren.</source>
+                <target>Das Aktivieren von Input-Regeln kann in neuen Projekten zum Verlust von 100%-Matches führen, wenn Sie die betroffenen Sprachressourcen nicht konvertieren.</target>
+            </trans-unit>
+            <trans-unit id='S29udmVydGllcnVuZyBsw6R1ZnQ='>
+                <source>Konvertierung läuft</source>
+                <target>Konvertierung läuft</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

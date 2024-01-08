@@ -82,8 +82,7 @@ Ext.define('Editor.view.LanguageResources.TmOverviewPanel', {
         taskassocgridcell: '#UT#Zugewiesene Aufgaben',
         groupHeader: '#UT#Ressource: {name}',
         specificDataText: '#UT#Zusätzliche Infos',
-        pivotAsDefault: '#UT#Standardmäßig als Pivot verwenden',
-        tmNotConverted: '#UT#TM Not Converted'
+        pivotAsDefault: '#UT#Standardmäßig als Pivot verwenden'
     },
     cls: 'tmOverviewPanel',
     height: '100%',
@@ -165,14 +164,13 @@ Ext.define('Editor.view.LanguageResources.TmOverviewPanel', {
                     text: me.strings.name
                 },{
                     xtype: 'actioncolumn',
-                    width: 120,
+                    width: 140,
                     items: [{
-                        tooltip: me.strings.tmNotConverted,
-                        iconCls: 'ico-tm-converseTm',
+                        getTip: (v, meta, rec) => service(rec).getConversionIconTip(rec),
+                        getClass: (v, meta, rec) => service(rec).getConversionIconClass(rec),
                         hidden: true,
-                        isDisabled: function( view, rowIndex, colIndex, item, record ) {
-                            item.hidden = null === record.get('tmConverted') || record.get('tmConverted');
-                        }
+                        isDisabled: (view, rowIndex, colIndex, item, record) =>
+                            item.hidden = !record.get('tmNeedsConversion')
                     },{
                         tooltip: me.strings.edit,
                         action: 'edit',

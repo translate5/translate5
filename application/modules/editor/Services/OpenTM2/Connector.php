@@ -515,24 +515,31 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
         $successfullyDeleted = true;
 
         foreach ($this->languageResource->getSpecificData('memories', parseAsArray: true) as $memory) {
-            $deleted = $this->api->delete($memory['filename']);
-
-            if (!$deleted) {
-                $resp = $this->api->getResponse();
-
-                if ($resp->getStatus() == 404) {
-                    // if the result was a 404, then there is nothing to delete,
-                    // so throw no error then and delete just locally
-                    continue;
-                }
-
-                $successfullyDeleted = false;
-            }
+            $successfullyDeleted = $successfullyDeleted && $this->deleteMemory($memory['filename']);
         }
 
         if (!$successfullyDeleted) {
             $this->throwBadGateway();
         }
+    }
+
+    public function deleteMemory(string $filename): bool
+    {
+        $deleted = $this->api->delete($filename);
+
+        if ($deleted) {
+            return true;
+        }
+
+        $resp = $this->api->getResponse();
+
+        if ($resp->getStatus() == 404) {
+            // if the result was a 404, then there is nothing to delete,
+            // so throw no error then and delete just locally
+            return true;
+        }
+
+        return false;
     }
 
     /**

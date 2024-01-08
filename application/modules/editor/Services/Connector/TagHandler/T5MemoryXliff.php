@@ -33,7 +33,6 @@ use MittagQI\Translate5\ContentProtection\WhitespaceProtector;
 
 class editor_Services_Connector_TagHandler_T5MemoryXliff extends editor_Services_Connector_TagHandler_Xliff
 {
-    private const T5MEMORY_NUMBER_TAG = 't5:n';
     protected const ALLOWED_TAGS = '<x><x/><bx><bx/><ex><ex/><g><number>';
     private ContentProtectionRepository $contentProtectionRepository;
     private NumberProtector $numberProtector;
@@ -111,7 +110,7 @@ class editor_Services_Connector_TagHandler_T5MemoryXliff extends editor_Services
         return $this->utilities->internalTag->toXliff(
             $queryString,
             replaceMap: $this->map,
-            dontRemoveTags: ['<' . self::T5MEMORY_NUMBER_TAG . '>']
+            dontRemoveTags: ['<' . TmConversionService::T5MEMORY_NUMBER_TAG . '>']
         );
     }
 }

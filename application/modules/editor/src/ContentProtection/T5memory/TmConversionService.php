@@ -56,6 +56,7 @@ use MittagQI\Translate5\ContentProtection\ContentProtector;
 use MittagQI\Translate5\ContentProtection\Model\ContentProtectionRepository;
 use MittagQI\Translate5\ContentProtection\Model\LanguageResourceRulesHash;
 use MittagQI\Translate5\ContentProtection\NumberProtector;
+use RuntimeException;
 use XMLReader;
 use XMLWriter;
 use ZfExtended_Factory;
@@ -72,8 +73,8 @@ class TmConversionService
         private ContentProtectionRepository $contentProtectionRepository,
         private ContentProtector $contentProtector
     ) {
-//        $this->languageRulesHashMap = $contentProtectionRepository->getLanguageRulesHashMap();
-//        $this->languageResourceRulesHashMap = $contentProtectionRepository->getLanguageResourceRulesHashMap();
+        $this->languageRulesHashMap = $contentProtectionRepository->getLanguageRulesHashMap();
+        $this->languageResourceRulesHashMap = $contentProtectionRepository->getLanguageResourceRulesHashMap();
     }
 
     public static function fullTagRegex(): string
@@ -83,7 +84,7 @@ class TmConversionService
 
     public function isTmConverted(int $languageResourceId): bool
     {
-        if (!isset($this->languageRulesHashMap[$languageResourceId])) {
+        if (!isset($this->languageResourceRulesHashMap[$languageResourceId])) {
             return false;
         }
 
@@ -98,12 +99,12 @@ class TmConversionService
 
     public function isConversionInProgress(int $languageResourceId): bool
     {
-        if (!isset($this->languageRulesHashMap[$languageResourceId])) {
+        if (!isset($this->languageResourceRulesHashMap[$languageResourceId])) {
             return false;
         }
 
         foreach ($this->languageResourceRulesHashMap[$languageResourceId] as ['conversionStarted' => $started]) {
-            if ($started) {
+            if (!empty($started)) {
                 return true;
             }
         }
@@ -182,7 +183,11 @@ class TmConversionService
         $resultFilename = $exportDir . str_replace('.tmx', '', basename($filenameWithPath)) . '_converted.tmx';
 
         $writer = new XMLWriter();
-        $writer->openURI($resultFilename);
+
+        if (!$writer->openURI($resultFilename)) {
+            throw new RuntimeException('File for TMX conversion was not created. Filename: ' . $resultFilename);
+        }
+
         $writer->startDocument('1.0', 'UTF-8');
         $writer->setIndent(true);
 
@@ -195,8 +200,7 @@ class TmConversionService
             }
 
             if ($reader->nodeType == XMLReader::ELEMENT && $reader->name == 'tu') {
-                $isSource = true;
-                $writer->writeRaw($this->convertTransUnit($reader->readOuterXML(), $isSource, $sourceLang, $targetLang));
+                $writer->writeRaw($this->convertTransUnit($reader->readOuterXML(), $sourceLang, $targetLang));
             }
 
             if (!in_array($reader->name, ['tmx', 'body'], true)) {
@@ -229,12 +233,43 @@ class TmConversionService
         return $resultFilename;
     }
 
-    private function convertTransUnit(string $transUnit, bool $isSource, int $sourceLang, int $targetLang): string
+    private function convertTransUnit(string $transUnit, int $sourceLang, int $targetLang): string
     {
         $transUnit = $this->convertT5MemoryTagToNumber($transUnit);
-        preg_match_all('/<tuv xml:lang="((\w|-)+)">((\n|\r|\r\n).+)+<\/tuv>/Uum', $transUnit, $matches, PREG_SET_ORDER);
+        preg_match_all(
+            '/<tuv xml:lang="((\w|-)+)">((\n|\r|\r\n)?.+)+<\/tuv>/Uum',
+            $transUnit,
+            $matches,
+            PREG_SET_ORDER
+        );
 
-        $transUnit = $this->contentProtector->protect($transUnit, $isSource, $sourceLang, $targetLang);
+        $numberTagMap = [];
+
+        [$source, $target] = $this->contentProtector->filterTags(
+            $this->contentProtector->protect(
+                $matches[0][0],
+                true,
+                $sourceLang,
+                $targetLang,
+                ContentProtector::ENTITY_MODE_OFF
+            ),
+            $this->contentProtector->protect(
+                $matches[1][0],
+                false,
+                $sourceLang,
+                $targetLang,
+                ContentProtector::ENTITY_MODE_OFF
+            )
+        );
+
+        return str_replace(
+            [$matches[0][0], $matches[1][0]],
+            [
+                $this->convertContentTagToT5MemoryTag($source, true, $numberTagMap),
+                $this->convertContentTagToT5MemoryTag($target, false, $numberTagMap),
+            ],
+            $transUnit
+        );
     }
 
 }
