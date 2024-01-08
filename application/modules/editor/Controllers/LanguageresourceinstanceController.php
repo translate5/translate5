@@ -142,7 +142,6 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         $languages = ZfExtended_Factory::get(editor_Models_LanguageResources_Languages::class);
         $languages = $languages->loadResourceIdsGrouped();
         $translate = ZfExtended_Zendoverwrites_Translate::getInstance();
-        $tmConversionService = new TmConversionService(new ContentProtectionRepository());
 
         $tmConversionService = new TmConversionService(
             new ContentProtectionRepository(),
