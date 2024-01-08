@@ -9630,7 +9630,11 @@ E-Mail: service@MittagQI.com</pre>
                 <target>
                 To activate a rule it has to be mapped to a source language.
                 <br/>Once the content is found for that language, it will be protected as internal tag.
+<<<<<<< HEAD
                 <br/>Higher priorities will be mapped first.
+=======
+                <br/><b>Higher priorities will be mapped first</b>
+>>>>>>> 5a214c05d55061eaee5d923c637bdce6df75cd05
                 <br/>Dates, float and integer numbers will be automatically transformed to any target language locale format using presets from <a href="https://icu4c-demos.unicode.org/icu-bin/locexp?d_=en#region" target="_blank" rel="noopener noreferrer">ICU</a> (for dates SHORT format will be used).
                 <br/>To override default formats please use tab "Active Output Rules". IP- and MAC-address will be kept as is.
                 </target>

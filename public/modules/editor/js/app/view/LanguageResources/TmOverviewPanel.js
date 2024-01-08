@@ -81,8 +81,9 @@ Ext.define('Editor.view.LanguageResources.TmOverviewPanel', {
         writeAsDefault: '#UT#Schreibrechte standardmäßig',
         taskassocgridcell: '#UT#Zugewiesene Aufgaben',
         groupHeader: '#UT#Ressource: {name}',
-        specificDataText: '#UT#Zusätzliche Infos',
-        pivotAsDefault: '#UT#Standardmäßig als Pivot verwenden'
+        specificDataText:'#UT#Zusätzliche Infos',
+        pivotAsDefault:'#UT#Standardmäßig als Pivot verwenden',
+        tmNotConverted: '#UT#TM Not Converted',
     },
     cls: 'tmOverviewPanel',
     height: '100%',
