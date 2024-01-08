@@ -569,6 +569,18 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
                 'action' => 'import'
             ));
         $this->front->getRouter()->addRoute('languageresources_languageresourceinstance_import', $queryRoute);
+
+        $this->front->getRouter()->addRoute(
+            'languageresources_languageresourceinstance_defaulttmneedsconversion',
+            new ZfExtended_Controller_RestLikeRoute(
+                'editor/languageresourceinstance/defaulttmneedsconversion',
+                [
+                    'module' => 'editor',
+                    'controller' => 'languageresourceinstance',
+                    'action' => 'defaulttmneedsconversion'
+                ]
+            )
+        );
         
         $queryRoute = new ZfExtended_Controller_RestLikeRoute(
             'editor/languageresourceinstance/:id/tasks',

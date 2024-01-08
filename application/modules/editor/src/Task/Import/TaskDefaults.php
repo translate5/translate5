@@ -128,10 +128,12 @@ class TaskDefaults
 
         $taskGuid = $task->getTaskGuid();
 
-        $this->findMatchingAssocData(
-            (int)$task->getSourceLang(),
-            (int)$task->getTargetLang(),
-            $data,
+        $this->applyAssocData(
+            $this->findMatchingAssocData(
+                (int)$task->getSourceLang(),
+                (int)$task->getTargetLang(),
+                $data
+            ),
             function ($assocRow) use ($taskGuid) {
                 $taskAssoc = ZfExtended_Factory::get(TaskAssociation::class);
                 $taskAssoc->setLanguageResourceId($assocRow['languageResourceId']);
@@ -163,10 +165,12 @@ class TaskDefaults
 
         $taskGuid = $task->getTaskGuid();
 
-        $this->findMatchingAssocData(
-            (int)$task->getSourceLang(),
-            (int)$task->getRelaisLang(),
-            $data,
+        $this->applyAssocData(
+            $this->findMatchingAssocData(
+                (int)$task->getSourceLang(),
+                (int)$task->getRelaisLang(),
+                $data
+            ),
             function ($assocRow) use ($taskGuid) {
                 /** @var TaskPivotAssociation $pivotAssoc */
                 $pivotAssoc = ZfExtended_Factory::get(TaskPivotAssociation::class);
@@ -181,13 +185,14 @@ class TaskDefaults
      * Find matching language resources by task languages and call the callback for saving
      * @throws Zend_Cache_Exception
      */
-    private function findMatchingAssocData(
+    public function findMatchingAssocData(
         int $sourceLang,
         int $targetLang,
-        array $defaultData,
-        callable $saveCallback
-    ): void {
+        array $defaultData
+    ): iterable {
         if (0 === $sourceLang || 0 === $targetLang) {
+            yield from [];
+
             return;
         }
 
@@ -203,8 +208,15 @@ class TaskDefaults
             $targetLangMatch = $languages->isInCollection($targetLanguages, 'targetLang', $languageResourceId);
 
             if ($sourceLangMatch && $targetLangMatch) {
-                $saveCallback($data);
+                yield $data;
             }
+        }
+    }
+
+    private function applyAssocData(iterable $dataIterator, callable $saveCallback): void
+    {
+        foreach ($dataIterator as $data) {
+            $saveCallback($data);
         }
     }
 

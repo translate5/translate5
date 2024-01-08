@@ -9724,6 +9724,10 @@ E-Mail: service@MittagQI.com</pre>
                 <source>Konvertierung läuft</source>
                 <target>Conversion in progress</target>
             </trans-unit>
+            <trans-unit id='QmVzdMOkdGlnZW4gU2llIGRlbiBBdWZnYWJlbmltcG9ydA=='>
+                <source>Bestätigen Sie den Aufgabenimport</source>
+                <target>Confirm task import</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

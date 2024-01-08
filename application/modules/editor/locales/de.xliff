@@ -9552,6 +9552,10 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
                 <source>Konvertierung läuft</source>
                 <target>Konvertierung läuft</target>
             </trans-unit>
+            <trans-unit id='QmVzdMOkdGlnZW4gU2llIGRlbiBBdWZnYWJlbmltcG9ydA=='>
+                <source>Bestätigen Sie den Aufgabenimport</source>
+                <target>Bestätigen Sie den Aufgabenimport</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>
