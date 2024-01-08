@@ -49,20 +49,25 @@ class ConverseMemoryWorker extends ZfExtended_Worker_Abstract
     private const WAIT_TICK_TIME_SECONDS = 5;
     private int $languageResourceId;
     private int $languageId;
-    private ZfExtended_Logger $logger;
     private LanguageResource $languageResource;
-    private array $specificDataBackup;
+    private array $memoriesBackup;
     private LanguageResourceRulesHash $languageResourceRulesHash;
 
     public function __construct()
     {
         parent::__construct();
-        $this->logger = \Zend_Registry::get('logger')
+        $this->log = \Zend_Registry::get('logger')
             ->cloneMe('editor.content-protection.opentm2.conversion');
         $this->tmConversionService = new TmConversionService(
             new ContentProtectionRepository(),
             ContentProtector::create(ZfExtended_Factory::get(Whitespace::class))
         );
+    }
+
+    private function restoreLangResourceMemories(): void
+    {
+        $this->languageResource->addSpecificData('memories', $this->memoriesBackup);
+        $this->languageResource->save();
     }
 
     protected function validateParameters($parameters = [])
@@ -81,7 +86,7 @@ class ConverseMemoryWorker extends ZfExtended_Worker_Abstract
         $this->languageResource = ZfExtended_Factory::get(LanguageResource::class);
         $this->languageResource->load($this->languageResourceId);
 
-        $this->specificDataBackup = $this->languageResource->getSpecificData(parseAsArray: true);
+        $this->memoriesBackup = $this->languageResource->getSpecificData('memories', parseAsArray: true) ?? [];
         
         $this->languageResourceRulesHash = ZfExtended_Factory::get(LanguageResourceRulesHash::class);
         try {
@@ -102,8 +107,7 @@ class ConverseMemoryWorker extends ZfExtended_Worker_Abstract
     protected function handleWorkerException(\Throwable $workException) {
         $this->workerException = $workException;
 
-        $this->languageResource->setSpecificData($this->specificDataBackup);
-        $this->languageResource->save();
+        $this->restoreLangResourceMemories();
         $this->resetConversionStarted();
     }
     
@@ -130,7 +134,7 @@ class ConverseMemoryWorker extends ZfExtended_Worker_Abstract
         $exportFilename = $connector->export($connector->getValidExportTypes()['TMX']);
 
         if (!file_exists($exportFilename)) {
-            $this->logger->error(
+            $this->log->error(
                 'E1587',
                 'Conversion: TM was not exported. TMX file does not exists: {filename}',
                 [
@@ -152,7 +156,7 @@ class ConverseMemoryWorker extends ZfExtended_Worker_Abstract
             );
             unlink($exportFilename);
         } catch (RuntimeException $e) {
-            $this->logger->error(
+            $this->log->error(
                 'E1590',
                 'Conversion: Error in process of TMX file conversion',
                 [
@@ -162,17 +166,14 @@ class ConverseMemoryWorker extends ZfExtended_Worker_Abstract
             );
         }
 
-        $this->languageResource->addSpecificData('memories', []);
-        $this->languageResource->save();
-
         $fileinfo = [
             'tmp_name' => $importFilename,
             'type' => $connector->getValidExportTypes()['TMX'],
             'name' => basename($importFilename),
         ];
 
-        if (!$connector->addTm($fileinfo)) {
-            $this->logger->error(
+        if (!$connector->addTm($fileinfo, ['createNewMemory' => true])) {
+            $this->log->error(
                 'E1588',
                 'Conversion: Failed to import file: {filename}',
                 [
@@ -190,10 +191,9 @@ class ConverseMemoryWorker extends ZfExtended_Worker_Abstract
             $this->waitUntilImportFinished($connector);
             unlink($importFilename);
         } catch (RuntimeException $e) {
-            $this->languageResource->setSpecificData($this->specificDataBackup);
-            $this->languageResource->save();
+            $this->restoreLangResourceMemories();
 
-            $this->logger->error(
+            $this->log->error(
                 'E1588',
                 'Conversion: Failed to import file: {filename}',
                 [
@@ -208,7 +208,7 @@ class ConverseMemoryWorker extends ZfExtended_Worker_Abstract
             return false;
         }
 
-        foreach ($this->specificDataBackup['memories'] as $memory) {
+        foreach ($this->memoriesBackup as $memory) {
             if (!$connector->deleteMemory($memory['filename'])) {
                 $this->log->error(
                     'E1589',

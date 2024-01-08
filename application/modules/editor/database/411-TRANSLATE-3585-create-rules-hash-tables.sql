@@ -37,7 +37,7 @@ CREATE TABLE `LEK_content_protection_language_resource_rules_hash` (
     `languageResourceId` int (11) DEFAULT NULL COMMENT 'Foreign Key to LEK_languageresources',
     `languageId` int (11) NOT NULL COMMENT 'Foreign Key to LEK_languages',
     `hash` varchar(32) NOT NULL,
-    `conversionStarted` datetime DEFAULT current_time,
+    `conversionStarted` datetime DEFAULT NULL,
     PRIMARY KEY (`id`),
     CONSTRAINT FOREIGN KEY (`languageResourceId`) REFERENCES `LEK_languageresources` (`id`) ON DELETE CASCADE,
     CONSTRAINT FOREIGN KEY (`languageId`) REFERENCES `LEK_languages` (`id`) ON DELETE CASCADE,

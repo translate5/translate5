@@ -135,6 +135,10 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
         // we add the LanguageResource ID and a prefix which can be configured per each translate5 instance
         $name = 'ID' . $this->languageResource->getId() . '-' . $this->filterName($this->languageResource->getName());
 
+        if (isset($params['createNewMemory'])) {
+            $name = $this->generateNextMemoryName($this->languageResource);
+        }
+
         // If we are adding a TMX file as LanguageResource, we must create an empty memory first.
         $validFileTypes = $this->getValidFiletypes();
         if (empty($validFileTypes['TMX'])) {
