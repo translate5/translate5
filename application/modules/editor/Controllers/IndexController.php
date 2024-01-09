@@ -443,10 +443,18 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
             'editor.task.reimport.supportedExtensions',
             FileparserRegistry::getInstance()->getSupportedFileTypes()
         );
-        $this->view->Php2JsVars()->set(
-            'editor.task.customFields',
-            ZfExtended_Factory::get(TaskCustomField::class)->loadAllSorted()
-        );
+
+        // Setup allowed custom fields
+        $auth = ZfExtended_Authentication::getInstance();
+        $all = ZfExtended_Factory::get(TaskCustomField::class)->loadAllSorted();
+        $allowed = [];
+        foreach ($all as $field) {
+            if ($auth->isUserAllowed('frontend', "customField{$field['id']}")) {
+                $allowed []= $field;
+            }
+        }
+        $this->view->Php2JsVars()->set('editor.task.customFields', $allowed);
+
         $this->setJsAppData();
         editor_Segment_Quality_Manager::instance()->addAppJsData($this->view->Php2JsVars());
     }

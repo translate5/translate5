@@ -96,6 +96,8 @@ Ext.define('Editor.view.admin.task.CustomField.GridController', {
      * @param store
      */
     onLoad: function(store) {
+
+        // If there is at least 1 record in the store
         if (store.getCount()) {
 
             // Check whether record id is gived in hash
@@ -107,10 +109,10 @@ Ext.define('Editor.view.admin.task.CustomField.GridController', {
             } else {
                 this.getViewModel().set('customField', store.first());
             }
-
-            // Refresh Editor.data.editor.task.customFields array
-            store.refreshGlobalCustomFields();
         }
+
+        // Refresh Editor.data.editor.task.customFields array
+        store.refreshGlobalCustomFields();
     },
 
     /**
@@ -376,9 +378,8 @@ Ext.define('Editor.view.admin.task.CustomField.GridController', {
      * Save changes to new or existing custom field
      */
     onSave:function(){
-        var view = this.getView(),
-            record = view.getSelection().pop(),
-            selector = '#' + view.down('tableview').id + '-record-' + record.internalId;
+        var me = this, view = me.getView(),
+            record = view.getSelection().pop();
 
         // Put a mask on the whole view
         view.mask(Ext.LoadMask.prototype.msg);
@@ -390,7 +391,17 @@ Ext.define('Editor.view.admin.task.CustomField.GridController', {
 
         // Start saving request
         record.save({
-            callback: () => {
+            success: (rec, operation) => {
+
+                // Get response json
+                var json = operation.getResponse().responseJson;
+
+                // If userRights-prop is there - update rights list used by frontend
+                if (json && 'userRights' in json) {
+                    Editor.data.app.userRights = json.userRights;
+                }
+
+                // Hide mask
                 view.unmask();
 
                 // Refresh Editor.data.editor.task.customFields array

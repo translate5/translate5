@@ -57,38 +57,42 @@ class editor_TaskcustomfieldController extends ZfExtended_RestController {
 
     public function postAction()
     {
+        // Call parent
         parent::postAction();
 
-        // Set roles
-        $this->entity->setRoles($this->data['roles']);
-
-        /*$fieldHandler = explode($this->entity->getPlacesToShow(), ',');
-        foreach ($fieldHandler as $handler) {
-            $handler = \MittagQI\Translate5\Task\CustomFields\Handler\Factory::getHandler($handler);
-            $handler->addCustomField($this->entity);
-        }*/
+        // Set roles and refresh rights
+        $this->onAfterSave();
     }
 
     public function putAction()
     {
+        // Call parent
         parent::putAction();
 
-        // Set roles
-        $this->entity->setRoles($this->data['roles']);
-
-        /*$fieldHandler = explode(',', $this->entity->getPlacesToShow());
-        foreach ($fieldHandler as $handler) {
-            $handler = \MittagQI\Translate5\Task\CustomFields\Handler\Factory::getHandler($handler);
-            $handler->editCustomField($this->entity, $this->data);
-        }*/
+        // Set roles and refresh rights
+        $this->onAfterSave();
     }
 
     public function indexAction()
     {
+        // Call parent
         parent::indexAction();
 
+        // Make sure roles are available on frontend for each customField
         foreach ($this->view->rows as &$row) {
             $row['roles'] = $this->entity->getRoles($row['id']);
         }
+    }
+
+    private function onAfterSave() {
+
+        // Set roles
+        $this->entity->setRoles($this->data['roles']);
+
+        // Make it possible to refresh Editor.data.app.userRights
+        ZfExtended_Acl::reset();
+        $this->view->userRights = ZfExtended_Acl::getInstance()->getFrontendRights(
+            ZfExtended_Authentication::getInstance()->getUserRoles()
+        );
     }
 }

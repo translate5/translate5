@@ -53,12 +53,22 @@ Ext.define('Editor.store.admin.task.CustomField', {
      * Refresh global customFields array
      */
     refreshGlobalCustomFields: function() {
+        var me = this, user = Editor.app.authenticatedUser;
 
-        // Clear
+        // Clear custom fields
         Editor.data.editor.task.customFields = [];
 
         // Re-assemble
-        this.each(rec => Editor.data.editor.task.customFields.push(rec.getData()), this, true);
+        me.each(rec => {
+
+            // user.isAllowed() rely on rights list defined in Editor.data.app.userRights
+            // so that each time we create or update customField we have to make sure
+            // fresh list to come with xhr response so we'll be able to update Editor.data.app.userRights
+            // with that list before calling user.isAllowed()
+            if (user.isAllowed('customField' + rec.get('id'))) {
+                Editor.data.editor.task.customFields.push(rec.getData())
+            }
+        }, me, true);
     },
 
     /**
