@@ -36,8 +36,13 @@ use ZfExtended_Logger;
 /**
  * A processing worker processes segments in a loop until no unprocessed segments are available for the task
  */
-abstract class Worker extends PooledServiceWorker
+abstract class Worker extends PooledServiceWorker implements ProgressInterface
 {
+    /**
+     * Defines the number of segments after which the progress is reported
+     */
+    const PROGRESS_INTERVAL = 50;
+
     /**
      * @var ZfExtended_Logger
      */
@@ -63,6 +68,12 @@ abstract class Worker extends PooledServiceWorker
      * @var bool
      */
     protected bool $fromTheTop = true;
+
+    /**
+     * Tracks how often the progress was reported
+     * @var int
+     */
+    protected int $numReports = 0;
 
     /**
      * Must be implemented to create the logger
@@ -124,6 +135,16 @@ abstract class Worker extends PooledServiceWorker
         return false;
     }
 
+    public function reportProcessed(int $numProcessed): void
+    {
+        // when the num of processed segments exceeds our next progress interval
+        // we report the achieved progress to our worker-model
+        if($numProcessed > ($this->numReports + 1) * self::PROGRESS_INTERVAL){
+            $this->updateProgress($this->looper->getProgress());
+            $this->numReports++;
+        }
+    }
+
     protected function work()
     {
         $this->processor = $this->createProcessor();
@@ -135,7 +156,7 @@ abstract class Worker extends PooledServiceWorker
         if($this->processor->prepareWorkload($this->workerIndex)){
             // loop through the segments to process
             $this->logger = $this->createLogger($this->processingMode);
-            $this->looper = new Looper($this->task, $this->processor);
+            $this->looper = new Looper($this, $this->task, $this->processor);
             $this->doLoop();
         } else {
             if ($this->doDebug) {
@@ -183,17 +204,5 @@ abstract class Worker extends PooledServiceWorker
                 }
             }
         }
-    }
-
-    /**
-     * @return float
-     */
-    protected function calculateProgressDone(): float
-    {
-        // when no looper exists there seems no workload processing needed and we can return 100% ...
-        if(isset($this->looper)){
-            return $this->looper->getProgress();
-        }
-        return 1;
     }
 }
