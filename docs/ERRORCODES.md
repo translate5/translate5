@@ -779,6 +779,11 @@ https://confluence.translate5.net/display/TAD/EventCodes
 | <a id="E1551"></a>E1551 | Plug-In IndiEngine | Curl-error occurred on attempt to POST events: {curl_error}              | Please contact the support.                                                                    |
 | <a id="E1552"></a>E1552 | Plug-In IndiEngine | Logger responded with failure code {code}                                | Please contact the support.                                                                    |
 
+#### Content Protection
+| EventCode               | Context              | EventMessage                                                             | Description/Solution                                                                     |
+|:------------------------|:---------------------|:-------------------------------------------------------------------------|:-----------------------------------------------------------------------------------------|
+| <a id="E1591"></a>E1591 | Content Protection   | You already created an {mapping} mapping for this language-rule combination  | User attempted to create Input or Output mapping for already existing Rule-Language pair |
+
 ## EventCode Design rules / decisions
 - Prefixed with &quot;E&quot; so that a search for the error code through the code is more reliable than just searching for a number
 - No structure in the numbering to prevent discussions is it an error E12XX or E45XX

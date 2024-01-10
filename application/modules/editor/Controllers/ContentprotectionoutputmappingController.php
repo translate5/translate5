@@ -62,7 +62,15 @@ class editor_ContentprotectionoutputmappingController extends ZfExtended_RestCon
 
     public function postAction()
     {
-        parent::postAction();
+        try {
+            parent::postAction();
+        } catch (ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey) {
+            ZfExtended_UnprocessableEntity::addCodes([
+                'E1591' => 'You already created an {mapping} mapping for this language-rule combination'
+            ], 'editor.content-protection');
+
+            throw new ZfExtended_UnprocessableEntity('E1591', ['mapping' => 'Output']);
+        }
 
         $this->queueRecalculateRulesHashWorker();
     }
