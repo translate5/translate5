@@ -104,7 +104,7 @@ class NumberProtectorTest extends TestCase
         $outputMapping->setOutputContentRecognitionId($contentRecognition2->getId());
         $outputMapping->save();
 
-        $protected = NumberProtector::create()->protect('12345 USD', (int)$langEn->getId(), (int)$langDe->getId());
+        $protected = NumberProtector::create()->protect('12345 USD', true, (int)$langEn->getId(), (int)$langDe->getId());
 
         $contentRecognition1->delete();
         $contentRecognition2->delete();
@@ -155,7 +155,7 @@ class NumberProtectorTest extends TestCase
         $outputMapping->setOutputContentRecognitionId($contentRecognition2->getId());
         $outputMapping->save();
 
-        $protected = NumberProtector::create()->protect('12345 USD', (int) $langEn->getId(), (int) $langDeAt->getId());
+        $protected = NumberProtector::create()->protect('12345 USD', true, (int) $langEn->getId(), (int) $langDeAt->getId());
 
         $contentRecognition1->delete();
         $contentRecognition2->delete();
@@ -175,7 +175,7 @@ class NumberProtectorTest extends TestCase
 
         self::assertTrue($protector->hasEntityToProtect($node));
 
-        self::assertSame($expected, $protector->protect($node, 5, 6));
+        self::assertSame($expected, $protector->protect($node, true, 5, 6));
     }
 
     public function testProtectRepeatableNumbers(): void
@@ -184,7 +184,7 @@ class NumberProtectorTest extends TestCase
 
         self::assertSame(
             'string <number type="date" name="default Ymd" source="20231020" iso="2023-10-20" target="2023-10-20"/> string <number type="date" name="default Ymd" source="20231020" iso="2023-10-20" target="2023-10-20"/> string',
-            $protector->protect('string 20231020 string 20231020 string', 5, 6)
+            $protector->protect('string 20231020 string 20231020 string', true, 5, 6)
         );
     }
 
@@ -704,7 +704,7 @@ class NumberProtectorTest extends TestCase
         $numberRepository = $this->createConfiguredMock(
             ContentProtectionRepository::class,
             [
-                'getAll' => $getAll($select),
+                'getAllForSource' => $getAll($select),
             ]
         );
 

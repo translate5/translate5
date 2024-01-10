@@ -62,6 +62,7 @@ use MittagQI\Translate5\ContentProtection\Model\InputMapping;
 use MittagQI\Translate5\ContentProtection\Model\OutputMapping;
 use MittagQI\Translate5\ContentProtection\NumberProtection\Protector\DateProtector;
 use MittagQI\Translate5\ContentProtection\NumberProtection\Protector\FloatProtector;
+use MittagQI\Translate5\ContentProtection\NumberProtection\Protector\IntegerProtector;
 use MittagQI\Translate5\ContentProtection\NumberProtection\Tag\NumberTag;
 use ZfExtended_Factory;
 
@@ -89,15 +90,26 @@ class ContentProtectorTest extends editor_Test_UnitTest
         $crFloat2->setEnabled(true);
         $crFloat2->save();
 
+        $crInt1 = ZfExtended_Factory::get(ContentRecognition::class);
+        $crInt1->loadBy(IntegerProtector::getType(), 'default generic with Middle dot separator');
+        $crInt1->setEnabled(true);
+        $crInt1->save();
+
         $inputMapping = ZfExtended_Factory::get(InputMapping::class);
         $inputMapping->setLanguageId(5);
         $inputMapping->setContentRecognitionId($crDate1->getId());
-        $inputMapping->setPriority(2);
+        $inputMapping->setPriority(3);
         $inputMapping->save();
 
         $inputMapping = ZfExtended_Factory::get(InputMapping::class);
         $inputMapping->setLanguageId(5);
         $inputMapping->setContentRecognitionId($crFloat1->getId());
+        $inputMapping->setPriority(2);
+        $inputMapping->save();
+
+        $inputMapping = ZfExtended_Factory::get(InputMapping::class);
+        $inputMapping->setLanguageId(5);
+        $inputMapping->setContentRecognitionId($crInt1->getId());
         $inputMapping->setPriority(1);
         $inputMapping->save();
 
@@ -130,6 +142,10 @@ class ContentProtectorTest extends editor_Test_UnitTest
         $contentRecognition->save();
 
         $contentRecognition->loadBy(FloatProtector::getType(), 'default with dot thousand decimal comma');
+        $contentRecognition->setEnabled(false);
+        $contentRecognition->save();
+
+        $contentRecognition->loadBy(IntegerProtector::getType(), 'default generic with Middle dot separator');
         $contentRecognition->setEnabled(false);
         $contentRecognition->save();
 
@@ -175,6 +191,12 @@ class ContentProtectorTest extends editor_Test_UnitTest
 
     public function casesProvider(): iterable
     {
+        yield 'int without output format' => [
+            'text' => 'Übersetzungsbüro 123·456·789 24translate',
+            'expected' => 'Übersetzungsbüro 123·456·789 24translate',
+            'entityHandling' => ContentProtector::ENTITY_MODE_RESTORE,
+        ];
+
         yield '&#128; is protected as char' => [
             'text' => 'Test &amp;para; entities ¶ and umlauts öäü¶ and [&#128;] TRANSLATE',
             'expected' => 'Test &amp;para; entities ¶ and umlauts öäü¶ and [<char ts="26233132383b" length="1"/>] TRANSLATE',
@@ -204,7 +226,7 @@ class ContentProtectorTest extends editor_Test_UnitTest
 
         self::assertSame(
             $converted,
-            $contentProtector->protectAndConvert($segment, 5, 6, $shortTagIdent, ContentProtector::ENTITY_MODE_OFF)
+            $contentProtector->protectAndConvert($segment, true, 5, 6, $shortTagIdent, ContentProtector::ENTITY_MODE_OFF)
         );
         self::assertSame($finalTagIdent, $shortTagIdent);
     }
@@ -314,6 +336,8 @@ class ContentProtectorTest extends editor_Test_UnitTest
         $parsedTag1->tag = 'number';
         $parsedTag1->text = '{"source":"20231020","target":"2023-10-20"}';
         $parsedTag1->renderedTag = $converted1;
+        $parsedTag1->iso = '2023-10-20';
+        $parsedTag1->source = '20231020';
 
         yield [
             'segment' => "string $tag1 string",

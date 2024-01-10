@@ -65,7 +65,7 @@ class WhitespaceProtectorTest extends TestCase
     {
         $protector = new WhitespaceProtector(new editor_Models_Segment_Whitespace());
 
-        self::assertEquals($expected, $protector->protect($text, 5, 6));
+        self::assertEquals($expected, $protector->protect($text, true, 5, 6));
     }
 
     /**

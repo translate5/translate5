@@ -272,9 +272,13 @@ class NumberProtector implements ProtectorInterface
 
                 if (!$protectionDto->keepAsIs && empty($protectionDto->outputFormat)) {
                     $this->loadXML(
-                        preg_replace(
+                        preg_replace_callback(
                             $protectionDto->regex,
-                            sprintf('<skip content="$%s"/>', $protectionDto->matchId),
+                            fn (array $matches) => str_replace(
+                                $matches[$protectionDto->matchId],
+                                sprintf('<skip content="%s"/>', $matches[$protectionDto->matchId]),
+                                $matches[0]
+                            ),
                             $this->getCurrentTextNode()
                         )
                     );
@@ -377,7 +381,7 @@ class NumberProtector implements ProtectorInterface
         }
 
         if (empty($sourceMatches) && !empty($targetMatches)) {
-            $target = $this->unprotect($target, false);
+            $target = $this->unprotect($target, true);
 
             return;
         }
@@ -385,8 +389,6 @@ class NumberProtector implements ProtectorInterface
         if (empty($sourceMatches) && empty($targetMatches)) {
             return;
         }
-
-        dump($sourceMatches, $targetMatches);
 
         foreach ($sourceMatches as $sourceMatch) {
             foreach ($targetMatches as $key => $targetMatch) {
