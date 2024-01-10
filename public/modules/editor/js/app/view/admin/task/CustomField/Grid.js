@@ -60,9 +60,9 @@ Ext.define('Editor.view.admin.task.CustomField.Grid', {
             msgTarget: 'side',
         },
         defaults: {
-            disabled: true,
+            //disabled: true,
             bind: {
-                disabled: '{!customField || customField.mode == "readonly"}'
+                //disabled: '{!customField || customField.mode == "readonly"}'
             },
         },
         dockedItems: [{
@@ -72,13 +72,13 @@ Ext.define('Editor.view.admin.task.CustomField.Grid', {
             border: 0,
             defaults: {
                 width: '33%',
-                disabled: true
+                //disabled: true
             },
             items: [{
                 glyph: 'f0c7@FontAwesome5FreeSolid',
                 bind: {
                     text: '{l10n.taskCustomField.save}',
-                    disabled: '{!customField || customField.mode == "readonly"}'
+                    //disabled: '{!customField || customField.mode == "readonly"}'
                 },
                 handler: 'onSave'
             }, {
@@ -91,8 +91,8 @@ Ext.define('Editor.view.admin.task.CustomField.Grid', {
             }, {
                 glyph: 'f2ed@FontAwesome5FreeSolid',
                 bind: {
-                    text: '{l10n.taskCustomField.delete}',
-                    disabled: '{!customField || customField.mode == "readonly"}'
+                    text: '{l10n.taskCustomField.delete.button}',
+                    //disabled: '{!customField || customField.mode == "readonly"}'
                 },
                 handler: 'onDelete',
             }]
@@ -159,11 +159,13 @@ Ext.define('Editor.view.admin.task.CustomField.Grid', {
             }],
             columns: [{
                 dataIndex: 'index',
-                editor: true,
                 text: '-',
                 bind: {
                     text: '{l10n.taskCustomField.meta.comboboxData.value}',
-                }
+                },
+                getEditor: record => record.modified && 'index' in record.modified
+                    ? {xtype: 'textfield', maxLength: 10}
+                    : false
             }, {
                 dataIndex: 'value',
                 flex: 1,
@@ -215,7 +217,7 @@ Ext.define('Editor.view.admin.task.CustomField.Grid', {
             itemId: 'mode',
             bind: {
                 fieldLabel: '{l10n.taskCustomField.meta.mode.name}',
-                value: '{customField ? customField.mode : "optional"}',
+                value: '{customField.mode}',
                 store: {
                     fields: ['name', 'value'],
                     data: '{l10n.taskCustomField.meta.mode.data}'
@@ -253,29 +255,6 @@ Ext.define('Editor.view.admin.task.CustomField.Grid', {
                 tag: 'div',
                 'data-qtip': Ext.String.htmlEncode(Editor.data.l10n.taskCustomField.meta.roles.tooltip)
             }
-            //inputValuesOnly: true,
-            //name: 'roles',
-            /*bodyPadding: 0,
-            bodyStyle: {
-                'padding-left': 0
-            },
-            afterRender1: function() {},
-            constructor1: function(){
-                this.callParent(arguments);
-            },
-            initComponent1: function() {
-                var me = this;
-                // Init mixins
-                me.initLabelable();
-                me.initFieldAncestor();
-                me.callParent();
-                //me.items = [];
-                //me.initMonitor();
-
-                console.log('zxczxc', this);
-
-                //this.callParent();
-            }*/
         }, {
             xtype: 'numberfield',
             bind: {

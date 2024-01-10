@@ -197,11 +197,12 @@ Ext.define('Editor.view.admin.task.CustomField.GridController', {
     createCustomField: function(){
         var grid = this.getView(),
                 store = grid.getStore(),
-                newCustomField = Ext.create('Editor.model.admin.task.CustomField');
+                newCustomField = Ext.create('Editor.model.admin.task.CustomField'),
+                titles = JSON.stringify(this.getLocalesJson());
         newCustomField.set({
             id: null,
-            label: '{"en":"","de":""}',
-            tooltip: '{"en":"","de":""}',
+            label: titles,
+            tooltip: titles,
             type: 'textfield',
             mode: 'optional',
         });
@@ -401,9 +402,6 @@ Ext.define('Editor.view.admin.task.CustomField.GridController', {
                     Editor.data.app.userRights = json.userRights;
                 }
 
-                // Hide mask
-                view.unmask();
-
                 // Refresh Editor.data.editor.task.customFields array
                 view.getStore().refreshGlobalCustomFields();
 
@@ -412,13 +410,18 @@ Ext.define('Editor.view.admin.task.CustomField.GridController', {
                     Editor.util.Util.trimLastSlash(Ext.util.History.getToken()) + (record.get('id') ? '/' + record.get('id') : '')
                 );
 
-                // Re-apply
-                view.getViewModel().set('customField', record);
-
                 // Commit changes on combobox store records, if need
                 if (record.get('type') === 'combobox') {
                     view.down('grid#comboboxDataGrid').getStore().commitChanges()
                 }
+            },
+            callback: () => {
+
+                // Unmask UI
+                view.unmask();
+
+                // Re-apply selection
+                view.getViewModel().set('customField', record);
             }
         });
     },
@@ -434,17 +437,24 @@ Ext.define('Editor.view.admin.task.CustomField.GridController', {
      * Delete custom field
      */
     onDelete:function(){
-        var view = this.getView(), record = view.getViewModel().get('customField');
-        view.mask(Ext.LoadMask.prototype.msg);
-        record.erase({
-            callback: () => {
-                view.unmask();
-                if (!record.phantom) {
-                    view.getStore().refreshGlobalCustomFields()
-                }
-                view.getViewModel().set('customField', null);
+        var _delete = Editor.data.l10n.taskCustomField.delete;
+        Ext.Msg.confirm(_delete.button, _delete.confirm.field, answer => {
+            if (answer === 'yes') {
+                var view = this.getView(), record = view.getViewModel().get('customField');
+                view.mask(Ext.LoadMask.prototype.msg);
+                record.erase({
+                    success: () => {
+                        if (!record.phantom) {
+                            view.getStore().refreshGlobalCustomFields()
+                        }
+                        view.getViewModel().set('customField', null);
+                    },
+                    callback: () => {
+                        view.unmask();
+                    }
+                });
             }
-        });
+        })
     },
 
     /**
@@ -538,6 +548,19 @@ Ext.define('Editor.view.admin.task.CustomField.GridController', {
     },
 
     /**
+     * Get json object to be further used for localized titles
+     *
+     * @returns {}
+     */
+    getLocalesJson: function() {
+        var json = {};
+        Object
+            .keys(Editor.data.l10n.translations)
+            .forEach(locale => json[locale] = '');
+        return json;
+    },
+
+    /**
      * Handler for Add button in combobox data grid
      */
     onComboboxOptionAdd: function () {
@@ -548,29 +571,34 @@ Ext.define('Editor.view.admin.task.CustomField.GridController', {
         // We set the values after creation, so that the record looks dirty
         rec = grid.store.add({index: '', value: ''})[0];
         rec.set('index', 'option' + grid.store.getCount());
-        rec.set('value', {en: "", de: ""});
+        rec.set('value', this.getLocalesJson());
     },
 
     /**
      * Handler for Remove button in combobox data grid
      */
     onComboboxOptionRemove: function () {
-        var win = this.getView(),
-            grid = win.down('grid#comboboxDataGrid'),
-            selection = grid.getSelection(),
-            store = grid.getStore();
+        var _delete = Editor.data.l10n.taskCustomField.delete;
+        Ext.Msg.confirm(_delete.button, _delete.confirm.option, answer => {
+            if (answer === 'yes') {
+                var win = this.getView(),
+                    grid = win.down('grid#comboboxDataGrid'),
+                    selection = grid.getSelection(),
+                    store = grid.getStore();
 
-        if (grid.findPlugin('rowediting'))
-            grid.findPlugin('rowediting').cancelEdit();
+                if (grid.findPlugin('rowediting'))
+                    grid.findPlugin('rowediting').cancelEdit();
 
-        // Remove
-        store.remove(
-            selection.length
-                ? selection
-                : (store.getCount()
-                    ? [store.last()]
-                    : [])
-        );
+                // Remove
+                store.remove(
+                    selection.length
+                        ? selection
+                        : (store.getCount()
+                        ? [store.last()]
+                        : [])
+                );
+            }
+        })
     },
 
     /**

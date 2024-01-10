@@ -46,6 +46,18 @@ class editor_TaskcustomfieldController extends ZfExtended_RestController {
     protected bool $decodePutAssociative = true;
 
     /**
+     * @throws Zend_Session_Exception
+     */
+    public function init() {
+
+        // Call parent
+        parent::init();
+
+        // If request contains json-encoded 'data'-param, decode it and append to request params
+        $this->handleData();
+    }
+
+    /**
      * @var string
      */
     protected $entityClass = Field::class;
@@ -57,6 +69,14 @@ class editor_TaskcustomfieldController extends ZfExtended_RestController {
 
     public function postAction()
     {
+        // Make sure
+        $this->jcheck([
+            'mode' => [
+                'req' => true,
+                'dis' => 'readonly'
+            ]
+        ]);
+
         // Call parent
         parent::postAction();
 
@@ -64,8 +84,35 @@ class editor_TaskcustomfieldController extends ZfExtended_RestController {
         $this->onAfterSave();
     }
 
+    public function deleteAction()
+    {
+        // Load entity instance
+        $this->entityLoad();
+
+        // If it's a readonly-field - prevent deletion
+        $this->jcheck(['mode' => ['dis' => 'readonly']], $this->entity);
+
+        // Call parent
+        parent::deleteAction();
+    }
+
     public function putAction()
     {
+        // Load entity instance
+        $this->entityLoad();
+
+        // Make sure it's not a readonly-field, and the PUTted type is the same as field currently have
+        $this->jcheck([
+            'mode' => [
+                'req' => true,
+                'dis' => 'readonly'
+            ],
+            'type' => [
+                'req' => true,
+                'eql' => $this->entity->getType()
+            ]
+        ]);
+
         // Call parent
         parent::putAction();
 

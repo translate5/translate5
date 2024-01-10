@@ -2100,7 +2100,13 @@ Editor.data.l10n = {
         title: '<?php echo $this->translate->_('Benutzerdefinierte Felder für Aufgaben');?>',
         save: '<?php echo $this->translate->_('Speichern');?>',
         cancel: '<?php echo $this->translate->_('Abbrechen');?>',
-        delete: '<?php echo $this->translate->_('Löschen');?>',
+        delete: {
+            button: '<?php echo $this->translate->_('Löschen');?>',
+            confirm: {
+                field: '<?php echo $this->translate->_('Sind Sie sicher, dass Sie dieses benutzerdefinierte Feld löschen möchten?');?>',
+                option: '<?php echo $this->translate->_('Bitte denken Sie daran, dass alle Verwendungen dieser Option (falls vorhanden) entfernt werden, wenn sie in einem der bestehenden Projekte/Aufgaben erfüllt werden. Fortfahren?');?>'
+            }
+        },
         meta: {
             label: '<?php echo $this->translate->_('Label');?>',
             tooltip: '<?php echo $this->translate->_('Tooltip');?>',

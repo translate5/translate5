@@ -68,21 +68,27 @@ Ext.define('Editor.model.admin.task.CustomField', {
     },*/ {
         name: 'label',
         type: 'string',
+        critical: true
     }, {
         name: 'tooltip',
         type: 'string',
+        critical: true
     }, {
         name: 'type',
-        type: 'string'
+        type: 'string',
+        critical: true
     }, {
         name: 'comboboxData',
-        type: 'string'
+        type: 'string',
+        critical: true
     }, {
         name: 'regex',
-        type: 'string'
+        type: 'string',
+        critical: true
     }, {
         name: 'mode',
-        type: 'string'
+        type: 'string',
+        critical: true
     }, {
         name: 'placesToShow',
         type: 'string',
@@ -93,7 +99,7 @@ Ext.define('Editor.model.admin.task.CustomField', {
         critical: true,
         //mapping: function
         convert:   v => v && 'shift' in v ? {roles: v} : v,
-        serialize: v => 'roles' in v ? (v.roles.join ? v.roles.join(',') : v.roles) : ''
+        serialize: v => v && 'roles' in v ? (v.roles.join ? v.roles.join(',') : v.roles) : ''
     }, {
         name: 'position',
         type: 'number'
