@@ -172,6 +172,9 @@ class Field extends ZfExtended_Models_Entity_Abstract {
         // Get db adapter
         $db = $this->db->getAdapter();
 
+        // Get acl instance
+        //$acl = \ZfExtended_Acl::getInstance();
+
         // Shortcuts
         $right = "customField" . $this->getId();
         $was = $this->getRoles();
@@ -181,11 +184,21 @@ class Field extends ZfExtended_Models_Entity_Abstract {
         $ins = array_diff($now, $was);
         $del = array_diff($was, $now);
 
+        // Get roles that were kept
+        //$kept = array_diff($was, $del);
+
+        // Get full list of roles, including roles auto auto_set_role-roles
+        //$full = $acl->mergeAutoSetRoles($ins, $kept);
+
         // If some roles were removed - DELETE corresponding acl-records
         if ($del) $db->query(
             'DELETE FROM `Zf_acl_rules` WHERE FIND_IN_SET(`role`, ?) AND `right` = ?',
             [join(',', $del), $right]
         );
+
+        //class_exists('editor_Utils');
+        //i($acl->mergeAutoSetRoles($ins, array_diff($was, $del)), 'a');
+        //i($acl->mergeAutoSetRoles(['clientpm'], ['editor']), 'a');
 
         // If some roles were added - INSERT corresponding acl-records
         foreach ($ins as $role) {
