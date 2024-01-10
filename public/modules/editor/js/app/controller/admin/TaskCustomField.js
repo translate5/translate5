@@ -108,8 +108,12 @@ Ext.define('Editor.controller.admin.TaskCustomField', {
             // Foreach custom field
             Editor.data.editor.task.customFields.forEach(field => {
 
-                // If field should not be shown in project wizard - skip
+                // If field should not be shown in current formType - skip
                 if (!field.placesToShow.match(formType)) return;
+
+                // If field should be shown in project wizard, but it's
+                // a readonly-field - skip, as it does not have any value at this step
+                if (formType === 'projectWizard' && field.mode === 'readonly') return;
 
                 // Get labels and tooltips
                 var labelL10n = Ext.JSON.decode(field.label, true) || {};
@@ -145,7 +149,7 @@ Ext.define('Editor.controller.admin.TaskCustomField', {
                     // Re-structure to format supported by extjs
                     Ext.Object.each(decoded, (value, title) => store.push({
                         value: value,
-                        title: title,
+                        title: title[Editor.data.locale],
                     }));
 
                     // Apply combobox-specific configs

@@ -113,11 +113,29 @@ class editor_TaskcustomfieldController extends ZfExtended_RestController {
             ]
         ]);
 
+        // If it's a combobox field
+        if ($this->entity->getType() === 'combobox') {
+
+            // Get current combobox options
+            $was = array_keys(json_decode($this->entity->getComboboxData(), true));
+
+            // Get updated combobox options
+            $now = array_keys(json_decode($this->getParam('comboboxData'), true));
+
+            // Get combobox options that are going to be deleted
+            $del = array_diff($was, $now);
+        }
+
         // Call parent
         parent::putAction();
 
         // Set roles and refresh rights
         $this->onAfterSave();
+
+        // If some options were deleted - clear usages
+        if (isset($del) && count($del)) {
+            $this->entity->clearComboboxOptionUsages($del);
+        }
     }
 
     public function indexAction()

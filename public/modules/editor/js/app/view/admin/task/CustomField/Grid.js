@@ -60,9 +60,9 @@ Ext.define('Editor.view.admin.task.CustomField.Grid', {
             msgTarget: 'side',
         },
         defaults: {
-            //disabled: true,
+            disabled: true,
             bind: {
-                //disabled: '{!customField || customField.mode == "readonly"}'
+                disabled: '{!customField || customField.mode == "readonly"}'
             },
         },
         dockedItems: [{
@@ -72,13 +72,13 @@ Ext.define('Editor.view.admin.task.CustomField.Grid', {
             border: 0,
             defaults: {
                 width: '33%',
-                //disabled: true
+                disabled: true
             },
             items: [{
                 glyph: 'f0c7@FontAwesome5FreeSolid',
                 bind: {
                     text: '{l10n.taskCustomField.save}',
-                    //disabled: '{!customField || customField.mode == "readonly"}'
+                    disabled: '{!customField || customField.mode == "readonly"}'
                 },
                 handler: 'onSave'
             }, {
@@ -92,7 +92,7 @@ Ext.define('Editor.view.admin.task.CustomField.Grid', {
                 glyph: 'f2ed@FontAwesome5FreeSolid',
                 bind: {
                     text: '{l10n.taskCustomField.delete.button}',
-                    //disabled: '{!customField || customField.mode == "readonly"}'
+                    disabled: '{!customField || customField.mode == "readonly"}'
                 },
                 handler: 'onDelete',
             }]
@@ -159,13 +159,13 @@ Ext.define('Editor.view.admin.task.CustomField.Grid', {
             }],
             columns: [{
                 dataIndex: 'index',
+                getEditor: record => record.modified && 'index' in record.modified
+                    ? {xtype: 'textfield', maxLength: 10, regex: /^[a-zA-Z0-9_]+$/}
+                    : false,
                 text: '-',
                 bind: {
                     text: '{l10n.taskCustomField.meta.comboboxData.value}',
-                },
-                getEditor: record => record.modified && 'index' in record.modified
-                    ? {xtype: 'textfield', maxLength: 10}
-                    : false
+                }
             }, {
                 dataIndex: 'value',
                 flex: 1,

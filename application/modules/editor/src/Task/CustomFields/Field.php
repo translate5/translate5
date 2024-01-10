@@ -76,7 +76,7 @@ class Field extends ZfExtended_Models_Entity_Abstract {
     /**
      * Drop db column from the tasks table structure
      */
-    public function delete() {
+    public function delete() : void {
 
         // Get id of a newly created custom field
         $id = $this->getId();
@@ -140,7 +140,7 @@ class Field extends ZfExtended_Models_Entity_Abstract {
      *
      * @return array
      */
-    public function loadAllSorted() {
+    public function loadAllSorted() : array {
         $s = $this->db->select();
         $s->order('position');
         return $this->loadFilterdCustom($s);
@@ -152,7 +152,7 @@ class Field extends ZfExtended_Models_Entity_Abstract {
      * @return string[]
      * @throws Zend_Db_Statement_Exception
      */
-    public function getRoles(?int $id = null) {
+    public function getRoles(?int $id = null) : array {
 
         // Use own id if not given by 1st arg
         if (!$id) $id = $this->getId();
@@ -167,7 +167,7 @@ class Field extends ZfExtended_Models_Entity_Abstract {
      * @param ?string $roles
      * @throws Zend_Db_Statement_Exception
      */
-    public function setRoles(?string $roles) {
+    public function setRoles(?string $roles) : void {
 
         // Get db adapter
         $db = $this->db->getAdapter();
@@ -211,5 +211,26 @@ class Field extends ZfExtended_Models_Entity_Abstract {
                 ', [$role, $right]
             );
         }
+    }
+
+    /**
+     * Clear usages of options from LEK_task-table in case if those options were
+     * deleted from custom field's combobox definition
+     *
+     * @param array $deletedOptions
+     */
+    public function clearComboboxOptionUsages(array $deletedOptions) : void {
+
+        // Get db adapter
+        $db = $this->db->getAdapter();
+
+        // Get col name
+        $column = 'customField' . $this->getId();
+
+        // Prepare WHERE clause
+        $where = $db->quoteInto("`$column` IN (?)", $deletedOptions);
+
+        // Do clear
+        $db->query("UPDATE `LEK_task` SET `$column` = '' WHERE $where");
     }
 }
