@@ -74,10 +74,7 @@ Ext.define('Editor.controller.TmOverview', {
         importing: '#UT#Die Sprachressource {0} wird gerade importiert. Bitte warten Sie, bis der Import abgeschlossen ist.',
         beingTrained: '#UT#Die Sprachressource {0} wird gerade trainiert. Bitte warten Sie, bis das Training abgeschlossen ist.',
         deletionForbidden: '#UT#Sie sind nicht berechtigt, diese Sprachressource zu entfernen.',
-        error: '#UT#Fehler',
-        conversionStarted: '#UT#Konvertierung gestarted',
-        conversionConfirm: '#UT#Konvertierung starten',
-        conversionConfirmText: '#UT#Soll die gewählte Sprachressource "{0}" wirklich endgültig gelöscht werden?',
+        error: '#UT#Fehler'
     },
     refs: [{
         ref: 'tmOverviewPanel',
@@ -495,8 +492,8 @@ Ext.define('Editor.controller.TmOverview', {
     handleTmConversion: function (view, cell, cellIdx, rec) {
         const me = this;
         Ext.Msg.confirm(
-            this.strings.conversionConfirm,
-            this.strings.conversionConfirmText,
+            Editor.data.l10n.contentProtection.conversionConfirm,
+            Editor.data.l10n.contentProtection.conversionConfirmText,
             function (btn) {
                 if (btn !== 'yes') {
                     return;
@@ -508,7 +505,7 @@ Ext.define('Editor.controller.TmOverview', {
                     },
                     method: 'POST',
                     failure: (records, op) => Editor.app.getController('ServerException').handleException(op.error.response),
-                    success: () => Editor.MessageBox.addSuccess(me.strings.conversionStarted)
+                    success: () => Editor.MessageBox.addSuccess(Editor.data.l10n.contentProtection.conversionStarted)
                 });
             }
         );

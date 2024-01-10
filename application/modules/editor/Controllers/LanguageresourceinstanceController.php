@@ -112,8 +112,7 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         //add custom filters
         $this->handleFilterCustom();
 
-        $this->view->rows = $this->entity->loadAllByServices();
-        $this->view->total = $this->entity->getTotalCount();
+        $rows = $this->entity->loadAllByServices();
 
         $serviceManager = ZfExtended_Factory::get(editor_Services_Manager::class);
         $resources = [];
@@ -126,7 +125,7 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
             return $resources[$id];
         };
 
-        $languageResourcesIds = array_column($this->view->rows, 'id');
+        $languageResourcesIds = array_column($rows, 'id');
         $this->prepareTaskInfo($languageResourcesIds);
 
         $eventLogger = ZfExtended_Factory::get(editor_Models_Logger_LanguageResources::class);
@@ -149,12 +148,32 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
             ContentProtector::create(ZfExtended_Factory::get(Whitespace::class))
         );
 
-        foreach ($this->view->rows as &$lrData) {
+        $filterTmNeedsConversion = $this->getParam('filterTmNeedsConversion', false);
+
+        foreach ($rows as $rowId => &$lrData) {
             $resource = $getResource($lrData['serviceType'], $lrData['resourceId']);
             /* @var editor_Models_LanguageResources_Resource $resource */
             if (!empty($resource)) {
                 $lrData = array_merge($lrData, $resource->getMetaData());
             }
+
+            $id = $lrData['id'];
+            $lrData['serviceName'] = $serviceManager->getUiNameByType($lrData['serviceType']);
+
+            $lrData['tmNeedsConversion'] = false;
+            $lrData['tmConversionInProgress'] = false;
+
+            if (editor_Services_Manager::SERVICE_OPENTM2 === $lrData['serviceType']) {
+                $lrData['tmNeedsConversion'] = !$tmConversionService->isTmConverted($id);
+                $lrData['tmConversionInProgress'] = $tmConversionService->isConversionInProgress($id);
+            }
+
+            if ($filterTmNeedsConversion && !$lrData['tmNeedsConversion']) {
+                unset($rows[$rowId]);
+
+                continue;
+            }
+
             // translate the "specificDta" field for the frontend and store the unserialized data
             $specificData = $this->prepareSpecificData($lrData, true);
             $languageResourceInstance = ZfExtended_Factory::get(editor_Models_LanguageResources_LanguageResource::class);
@@ -172,8 +191,6 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
                 }
             }
 
-            $id = $lrData['id'];
-            $lrData['serviceName'] = $serviceManager->getUiNameByType($lrData['serviceType']);
             //add customer assocs
             $lrData['customerIds'] = $this->getCustassoc($custAssoc, 'customerId', $id);
             $lrData['customerUseAsDefaultIds'] = $this->getCustassocByIndex($custAssoc, 'useAsDefault', $id);
@@ -183,13 +200,6 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
             $lrData['sourceLang'] = $this->getLanguage($languages, 'sourceLang', $id);
             $lrData['targetLang'] = $this->getLanguage($languages, 'targetLang', $id);
 
-            $lrData['needsConversion'] = false;
-
-            if (editor_Services_Manager::SERVICE_OPENTM2 === $lrData['serviceType']) {
-                $lrData['tmNeedsConversion'] = !$tmConversionService->isTmConverted($id);
-                $lrData['tmConversionInProgress'] = $tmConversionService->isConversionInProgress($id);
-            }
-
             // categories (for the moment: just display labels for info, no editing)
             $categoryLabels = [];
             foreach ($this->getCategoryassoc($categoryAssocs, 'categoryId', $id) as $categoryId) {
@@ -198,6 +208,9 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
             $lrData['categories'] = $categoryLabels;
             $lrData['eventsCount'] = isset($eventLoggerGroupped[$id]) ? (integer)$eventLoggerGroupped[$id] : 0;
         }
+
+        $this->view->rows = array_values($rows);
+        $this->view->total = count($rows);
     }
 
     public function defaulttmneedsconversionAction(): void
@@ -247,6 +260,28 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         }
 
         $tmConversionService->startConversion($postData['id'], $postData['languageId']);
+    }
+
+    public function synchronizetmbatchAction(): void
+    {
+        $postData = $this->getAllParams();
+        $tmConversionService = new TmConversionService(
+            new ContentProtectionRepository(),
+            ContentProtector::create(ZfExtended_Factory::get(Whitespace::class))
+        );
+
+        $this->view->success = true;
+
+        foreach ($postData['data'] as $resource) {
+            if (
+                $tmConversionService->isTmConverted((int)$resource->languageResourceId)
+                || $tmConversionService->isConversionInProgress((int)$resource->languageResourceId)
+            ) {
+                continue;
+            }
+
+            $tmConversionService->startConversion((int)$resource->languageResourceId, (int)$resource->languageId);
+        }
     }
 
     /**

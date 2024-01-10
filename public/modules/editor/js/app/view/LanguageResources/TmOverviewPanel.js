@@ -405,6 +405,29 @@ Ext.define('Editor.view.LanguageResources.TmOverviewPanel', {
                         text: me.strings.addResource,
                         tooltip: Editor.data.l10n.languageResources.create,
                         hidden: canNotAddLangresource,
+                    },
+                    {
+                        xtype: 'tbspacer',
+                        flex: 1.6
+                    },
+                    {
+                        xtype: 'button',
+                        iconCls: 'x-fa fa-exchange',
+                        itemId: 'btnConvertTms',
+                        bind: {
+                            text: '{l10n.contentProtection.convert_tms}'
+                        },
+                        handler: 'onConvertTms',
+                        hidden: true
+                    },
+                    {
+                        xtype: 'button',
+                        iconCls: 'x-fa fa-filter',
+                        bind: {
+                            text: '{l10n.contentProtection.show_only_not_converted}'
+                        },
+                        enableToggle: true,
+                        toggleHandler: 'onShowOnlyNotConverted'
                     }]
                 }]
       };

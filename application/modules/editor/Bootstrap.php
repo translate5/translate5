@@ -593,12 +593,23 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
 
         $queryRoute = new ZfExtended_Controller_RestLikeRoute(
             'editor/languageresourceinstance/:id/synchronizetm',
-            array(
+            [
                 'module' => 'editor',
                 'controller' => 'languageresourceinstance',
                 'action' => 'synchronizetm'
-            ));
-        $this->front->getRouter()->addRoute('languageresources_languageresourceinstance_tasks', $queryRoute);
+            ]
+        );
+        $this->front->getRouter()->addRoute('languageresources_languageresourceinstance_synchronizetm', $queryRoute);
+
+        $queryRoute = new ZfExtended_Controller_RestLikeRoute(
+            'editor/languageresourceinstance/synchronizetm/batch',
+            [
+                'module' => 'editor',
+                'controller' => 'languageresourceinstance',
+                'action' => 'synchronizetmbatch'
+            ]
+        );
+        $this->front->getRouter()->addRoute('languageresources_languageresourceinstance_synchronizetm_batch', $queryRoute);
 
         $queryRoute = new ZfExtended_Controller_RestLikeRoute(
             'editor/languageresourceresource/:resourceType/engines',

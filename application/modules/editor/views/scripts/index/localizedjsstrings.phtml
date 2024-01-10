@@ -1767,11 +1767,7 @@ Ext.define('Editor.controller.Localizer', {
             importing: '<?php echo $this->translate->_('Die Sprachressource {0} wird gerade importiert. Bitte warten Sie, bis der Import abgeschlossen ist.');?>',
             beingTrained: '<?php echo $this->translate->_('Die Sprachressource {0} wird gerade trainiert. Bitte warten Sie, bis das Training abgeschlossen ist.');?>',
             deletionForbidden: '<?php echo $this->translate->_('Sie sind nicht berechtigt, diese Sprachressource zu entfernen.');?>',
-            error: '<?php echo $this->translate->_('Fehler');?>',
-            conversionStarted: '<?= $this->translate->_('Konvertierung gestarted'); ?>',
-            conversionConfirm: '<?= $this->translate->_('Konvertierung starten'); ?>',
-            conversionConfirmText: '<?= $this->translate->_('Achtung: Die Konvertierung kann nicht ohne den Verlust von TM-Matches rückgängig gemacht werden. Bitte machen Sie vorher ein Backup der Sprachressource(n). Die Konvertierung beeinflusst die Matches von laufenden Aufgaben. Auf der folgenden Confluence-Seite wird beschrieben, wie Sie dies umgehen können.'); ?>',
-        }
+            error: '<?php echo $this->translate->_('Fehler');?>'}
     });
 
     Ext.define("Editor.locale.view.LanguageResources.AddTmWindow", {
@@ -2310,6 +2306,11 @@ Editor.data.l10n = {
         confirm_deletion_title: '<?= $this->translate->_('Löschung bestätigen') ?>',
         tm_not_converted: '<?= $this->translate->_('Die Regeln für die Erkennung von Inhalten haben sich für diese Sprachressource geändert, sie sollte konvertiert werden. Gehen Sie dazu auf die Konfigurationsseite der Erkennungsregeln oder Fragen Sie Ihren Projektmanager (alle Kunden).');?>',
         tm_conversion_in_progress: '<?= $this->translate->_('Konvertierung läuft') ?>',
+        convert_tms: '<?= $this->translate->_('Konvertieren Sie TMs') ?>',
+        show_only_not_converted: '<?= $this->translate->_('Nur nicht konvertiert anzeigen') ?>',
+        conversionStarted: '<?= $this->translate->_('Konvertierung gestarted'); ?>',
+        conversionConfirm: '<?= $this->translate->_('Konvertierung starten'); ?>',
+        conversionConfirmText: '<?= $this->translate->_('Achtung: Die Konvertierung kann nicht ohne den Verlust von TM-Matches rückgängig gemacht werden. Bitte machen Sie vorher ein Backup der Sprachressource(n). Die Konvertierung beeinflusst die Matches von laufenden Aufgaben. Auf der folgenden Confluence-Seite wird beschrieben, wie Sie dies umgehen können.'); ?>',
         contentRecognition: {
             title: '<?= $this->translate->_('Nummernerkennung') ?>',
             infobox: '<?= $this->translate->_('Content Recognition Rules tab info box') ?>',
@@ -2351,6 +2352,7 @@ Editor.data.l10n = {
         enabled: '<?= $this->translate->_('Aktiviert') ?>',
         showDefault: '<?= $this->translate->_('Defaults anzeigen') ?>',
         hideDefault: '<?= $this->translate->_('Defaults ausblenden') ?>',
+        showAll: '<?= $this->translate->_('Zeige alles') ?>'
     },
     helpButton: {
         tooltip: '<?= $this->translate->_('Tutorial-Videos aufrufen') ?>'

@@ -47,5 +47,51 @@ Ext.define('Editor.view.LanguageResources.TmOverviewViewController', {
     },
     onTmOverviewRoute: function() {
         Editor.app.openAdministrationSection(this.getView());
+    },
+    onShowOnlyNotConverted: function(btn, pressed) {
+        if (pressed) {
+            btn.setText(Editor.data.l10n.general.showAll);
+            this.getView().getStore().load({
+                params: {
+                    filterTmNeedsConversion: true
+                }
+            });
+
+            btn.up().down('#btnConvertTms').show();
+
+            return;
+        }
+
+        btn.up().down('#btnConvertTms').hide();
+        btn.setText(Editor.data.l10n.contentProtection.show_only_not_converted);
+        this.getView().getStore().load();
+    },
+    onConvertTms: function () {
+        const me = this;
+        Ext.Msg.confirm(
+            Editor.data.l10n.contentProtection.conversionConfirm,
+            Editor.data.l10n.contentProtection.conversionConfirmText,
+            function (btn) {
+                if (btn !== 'yes') {
+                    return;
+                }
+
+                let resources = [];
+                me.getView().getStore().each(rec => resources.push({
+                    languageResourceId: rec.get('id'),
+                    languageId: rec.get('sourceLang')[0]
+                }))
+
+                Ext.Ajax.request({
+                    url: Editor.data.restpath + 'languageresourceinstance/synchronizetm/batch',
+                    jsonData: {
+                        data: resources
+                    },
+                    method: 'POST',
+                    failure: (records, op) => Editor.app.getController('ServerException').handleException(op.error.response),
+                    success: () => Editor.MessageBox.addSuccess(Editor.data.l10n.contentProtection.conversionStarted)
+                });
+            }
+        );
     }
 });
