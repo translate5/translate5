@@ -62,11 +62,6 @@ class editor_TaskcustomfieldController extends ZfExtended_RestController {
      */
     protected $entityClass = Field::class;
 
-    protected function decodePutData(): void
-    {
-        parent::decodePutData();
-    }
-
     public function postAction()
     {
         // Make sure
