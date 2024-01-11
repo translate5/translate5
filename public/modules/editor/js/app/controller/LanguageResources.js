@@ -177,7 +177,7 @@ Ext.define('Editor.controller.LanguageResources', {
           me.setValueForEditor(matchRecord.get('target'));
           me.fireEvent('prepareCompleteReplace',matchRecord.get('target'),false); // if TrackChanges are activated, DEL- and INS-markups are added first and then setValueForEditor is applied from there (= again, but so what)
 
-          let referenceField = editor.mainEditor.getReferenceField(rec.get('target'));
+          let referenceField = editor.mainEditor.getReferenceField(rec.get('target'), rec.get('pretrans'));
 
           //we don't support the matchrate saving for tasks with alternatives:
           if(task.get('defaultSegmentLayout')) {
