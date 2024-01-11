@@ -29,10 +29,8 @@
 namespace MittagQI\Translate5\Task\CustomFields;
 
 use Zend_Db_Statement_Exception;
-use Zend_Db_Table_Row_Exception;
+use MittagQI\Translate5\Acl\TaskCustomField;
 use ZfExtended_Models_Entity_Abstract;
-use ZfExtended_Models_Entity_Exceptions_IntegrityConstraint;
-use ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey;
 
 /**
  *
@@ -62,9 +60,9 @@ class Field extends ZfExtended_Models_Entity_Abstract {
      *
      * @var string
      */
-    protected $dbInstanceClass = \MittagQI\Translate5\Task\CustomFields\Db::class;
+    protected $dbInstanceClass = Db::class;
 
-    protected $validatorInstanceClass = \MittagQI\Translate5\Task\CustomFields\Validator::class;
+    protected $validatorInstanceClass = Validator::class;
 
     /**
      * Add db column to the tasks table structure
@@ -152,6 +150,7 @@ class Field extends ZfExtended_Models_Entity_Abstract {
     }
 
     /**
+     * Get roles for which custom field (current or having $id if given) is enabled for
      *
      * @param int|null $id
      * @return string[]
@@ -211,9 +210,9 @@ class Field extends ZfExtended_Models_Entity_Abstract {
                 INSERT INTO `Zf_acl_rules` SET 
                   `module` = "editor", 
                   `role` = ?,
-                  `resource` = "frontend", 
+                  `resource` = ?, 
                   `right` = ? 
-                ', [$role, $right]
+                ', [$role, TaskCustomField::ID, $right]
             );
         }
     }

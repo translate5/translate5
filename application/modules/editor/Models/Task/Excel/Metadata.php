@@ -139,7 +139,7 @@ class editor_Models_Task_Excel_Metadata extends ZfExtended_Models_Entity_ExcelEx
         // Get custom fields
         $customFields = ZfExtended_Factory
             ::get(MittagQI\Translate5\Task\CustomFields\Field::class)
-            ->loadAll();
+            ->loadAllSorted();
 
         // Get current locale
         $locale = ZfExtended_Authentication::getInstance()->getUser()->getLocale();
