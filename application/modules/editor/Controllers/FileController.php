@@ -170,9 +170,8 @@ class editor_FileController extends ZfExtended_RestController
                 $worker->setBlocking();
             }
             $worker->queue();
-            if ($this->getParam('saveToMemory', false)) {
-                $this->queueUpdateTmWorkers();
-            }
+
+            $this->queueUpdateTmWorkers();
 
             $this->view->success = true;
         } catch (Throwable $exception) {
@@ -182,13 +181,21 @@ class editor_FileController extends ZfExtended_RestController
         }
     }
 
-    /***
-     * Queue tm update workers for the current task. Only the writable language resources will be updated
+    /**
+     * Queue tm update workers for the current task if configured. Only the writable language resources will be updated.
+     *
      * @throws Exception
      * @throws ZfExtended_Exception
+     * @throws ReflectionException|Zend_Db_Statement_Exception
      */
     protected function queueUpdateTmWorkers(): void
     {
+        $saveToMemory = $this->getCurrentTask()->getConfig()
+            ->runtimeOptions->task->package->reimport->saveToMemory ?? false;
+
+        if(empty($saveToMemory)){
+            return;
+        }
 
         $assoc = ZfExtended_Factory::get(TaskAssociation::class);
 
