@@ -33,6 +33,8 @@ use MittagQI\Translate5\Test\Import\Config;
  */
 class Translate3483Test extends editor_Test_JsonTest {
 
+    const EDITOR_TASKCUSTOMFIELD_ROUTE = 'editor/taskcustomfield/';
+
     protected static array $forbiddenPlugins = [
     ];
 
@@ -82,13 +84,65 @@ class Translate3483Test extends editor_Test_JsonTest {
             $this->api()->getTask()->{$customFieldName}
         );
 
-
-        $this->api()->delete('editor/taskcustomfield/'.self::$customFieldTaskAssigned->id);
-        $this->assertNotEmpty($this->api()->getLastResponseDecodeed(), 'Custom field was not deleted');
+        self::deleteField(self::$customFieldTaskAssigned->id);
     }
 
-    private static function addCustomField(array $data)
+    /**
+     * Readonly field should not be changeable via api or via the UI.
+     *
+     * @return void
+     * @throws Zend_Http_Client_Exception
+     */
+    public function testReadOnlyChange()
     {
+
+        $field = self::addCustomField();
+
+
+        self::api()->allowHttpStatusOnce(409);
+
+        $response = self::api()->putJson(self::EDITOR_TASKCUSTOMFIELD_ROUTE .$field->id, [
+            'mode' => 'readonly'
+        ]);
+
+        $this->assertEquals('E1586',$response->errorCode, 'Error code is not E1586');
+
+        self::deleteField($field->id);
+    }
+
+    public function testTypeChange()
+    {
+        $field = self::addCustomField();
+
+        self::api()->allowHttpStatusOnce(409);
+
+        $response = self::api()->putJson(self::EDITOR_TASKCUSTOMFIELD_ROUTE .$field->id, [
+            'type' => 'combobox'
+        ]);
+
+        $this->assertEquals('E1586',$response->errorCode, 'Error code is not E1586');
+
+        self::deleteField($field->id);
+    }
+
+    private static function deleteField(int $fieldId): void
+    {
+        self::api()->delete(self::EDITOR_TASKCUSTOMFIELD_ROUTE .$fieldId);
+        self::assertNotEmpty(self::api()->getLastResponseDecodeed(), 'Custom field was not deleted');
+    }
+
+    private static function addCustomField(array $data = [])
+    {
+        if(empty($data)){
+            $data = [
+                'label' => '{"en":"Simple en lable","de":"Simple de lable"}',
+                'type' => 'textarea',
+                'mode' => 'optional',
+                'placesToShow' => 'projectWizard,taskGrid',
+                'position' => 1,
+                'roles' => 'editor'
+            ];
+        }
         self::api()->postJson('editor/taskcustomfield', $data);
         $result = self::api()->getLastResponseDecodeed();
         self::assertNotEmpty($result, 'Custom field was not created:'.print_r($data, true));

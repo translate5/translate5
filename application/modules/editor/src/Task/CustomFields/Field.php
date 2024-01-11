@@ -159,7 +159,9 @@ class Field extends ZfExtended_Models_Entity_Abstract {
     public function getRoles(?int $id = null) : array {
 
         // Use own id if not given by 1st arg
-        if (!$id) $id = $this->getId();
+        if (!$id) {
+            $id = $this->getId();
+        }
 
         // Get roles from acl table
         return $this->db->getAdapter()

@@ -46,31 +46,19 @@ class editor_TaskcustomfieldController extends ZfExtended_RestController {
     protected bool $decodePutAssociative = true;
 
     /**
-     * @throws Zend_Session_Exception
-     */
-    public function init() {
-
-        // Call parent
-        parent::init();
-
-        // If request contains json-encoded 'data'-param, decode it and append to request params
-        $this->handleData();
-    }
-
-    /**
      * @var string
      */
     protected $entityClass = Field::class;
 
+    /**
+     * @throws ZfExtended_Models_Entity_Exceptions_FieldNotModifiable
+     */
     public function postAction()
     {
-        // Prevent creation of readonly custom field
-        $this->jcheck([
-            'mode' => [
-                'req' => true,
-                'dis' => 'readonly'
-            ]
-        ]);
+
+        $this->decodePutData();
+
+        $this->checkReadOnlyField('Cannot create readonly field');
 
         // Call parent
         parent::postAction();
@@ -84,8 +72,12 @@ class editor_TaskcustomfieldController extends ZfExtended_RestController {
         // Load entity instance
         $this->entityLoad();
 
-        // If it's a readonly-field - prevent deletion
-        $this->jcheck(['mode' => ['dis' => 'readonly']], $this->entity);
+        if($this->entity->isReadOnly()) {
+            throw new ZfExtended_Models_Entity_Exceptions_IntegrityConstraint('E1016', [
+                'entity' => get_class($this),
+                'error' => 'Can not delete readonly field'
+            ]);
+        }
 
         // Call parent
         parent::deleteAction();
@@ -93,20 +85,25 @@ class editor_TaskcustomfieldController extends ZfExtended_RestController {
 
     public function putAction()
     {
-        // Load entity instance
+        $this->decodePutData();
+
+        $this->checkReadOnlyField('Can not update readonly field');
+
         $this->entityLoad();
 
-        // Make sure it's not a readonly-field, and the PUTted type is the same as field currently have
-        $this->jcheck([
-            'mode' => [
-                'req' => true,
-                'dis' => 'readonly'
-            ],
-            'type' => [
-                'req' => true,
-                'eql' => $this->entity->getType()
-            ]
-        ]);
+        if(!empty($this->data['type']) && $this->data['type'] !== $this->entity->getType()) {
+            throw new ZfExtended_Models_Entity_Exceptions_FieldNotModifiable('E1586', [
+                'entity' => get_class($this),
+                'field' => 'type',
+                'message' => 'Can not change type of field'
+            ]);
+        }
+
+        // Call parent
+        parent::putAction();
+
+        // Set roles and refresh rights
+        $this->onAfterSave();
 
         // If it's a combobox field
         if ($this->entity->getType() === 'combobox') {
@@ -120,12 +117,6 @@ class editor_TaskcustomfieldController extends ZfExtended_RestController {
             // Get combobox options that are going to be deleted
             $del = array_diff($was, $now);
         }
-
-        // Call parent
-        parent::putAction();
-
-        // Set roles and refresh rights
-        $this->onAfterSave();
 
         // If some options were deleted - clear usages
         if (isset($del) && count($del)) {
@@ -154,5 +145,21 @@ class editor_TaskcustomfieldController extends ZfExtended_RestController {
         $this->view->userRights = ZfExtended_Acl::getInstance()->getFrontendRights(
             ZfExtended_Authentication::getInstance()->getUserRoles()
         );
+    }
+
+    /**
+     * @param string $message
+     * @return void
+     * @throws ZfExtended_Models_Entity_Exceptions_FieldNotModifiable
+     */
+    public function checkReadOnlyField(string $message): void
+    {
+        if (!empty($this->data['mode']) && $this->data['mode'] === 'readonly') {
+            throw new ZfExtended_Models_Entity_Exceptions_FieldNotModifiable('E1586', [
+                'entity' => get_class($this),
+                'field' => 'mode',
+                'message' => $message
+            ]);
+        }
     }
 }
