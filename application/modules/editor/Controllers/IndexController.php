@@ -443,17 +443,7 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
             'editor.task.reimport.supportedExtensions',
             FileparserRegistry::getInstance()->getSupportedFileTypes()
         );
-
-        // Setup allowed custom fields
-        $auth = ZfExtended_Authentication::getInstance();
-        $all = ZfExtended_Factory::get(TaskCustomField::class)->loadAllSorted();
-        $allowed = [];
-        foreach ($all as $field) {
-            if ($auth->isUserAllowed('frontend', "customField{$field['id']}")) {
-                $allowed []= $field;
-            }
-        }
-        $this->view->Php2JsVars()->set('editor.task.customFields', $allowed);
+        $this->setupAllowedCustomFields();
 
         $this->setJsAppData();
         editor_Segment_Quality_Manager::instance()->addAppJsData($this->view->Php2JsVars());
@@ -943,6 +933,25 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
         } catch (Zend_Acl_Exception) {
             return false;
         }
+    }
+
+    /**
+     * Set the allowed custom fields in the frontend as frontend variable
+     * @return void
+     * @throws ReflectionException
+     */
+    public function setupAllowedCustomFields(): void
+    {
+        // Setup allowed custom fields
+        $auth = ZfExtended_Authentication::getInstance();
+        $all = ZfExtended_Factory::get(TaskCustomField::class)->loadAllSorted();
+        $allowed = [];
+        foreach ($all as $field) {
+            if ($auth->isUserAllowed('frontend', "customField{$field['id']}")) {
+                $allowed [] = $field;
+            }
+        }
+        $this->view->Php2JsVars()->set('editor.task.customFields', $allowed);
     }
 }
 

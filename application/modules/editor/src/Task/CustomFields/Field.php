@@ -73,6 +73,11 @@ class Field extends ZfExtended_Models_Entity_Abstract {
         $this->alterTasksTable('insert', $this->getId());
     }
 
+    public function isReadOnly(): bool
+    {
+        return $this->getMode() === 'readonly';
+    }
+
     /**
      * Drop db column from the tasks table structure
      */
