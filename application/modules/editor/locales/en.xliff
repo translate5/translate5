@@ -9639,8 +9639,8 @@ E-Mail: service@MittagQI.com</pre>
                 <target>
                 List of active input rules.
                 <br/>To activate a rule it has to be mapped to a source language.
-                <br/>Once the content is found in the source language and an active output rule for the target language is defined, it will be protected as internal tag and converted automatically according to the defined output rule.
-                <br/>Higher priorities will be mapped first.
+                <br/>Once the content is found in the source language <b>and</b> active output rule for the target language is defined, it will be protected as internal tag <b>and</b> converted automatically according to the defined output rule.
+                <br/><b>Higher priorities will be mapped first.</b>
                 <br/>If the wanted rule is not available in the drop-down activate (or add and activate) it in the "Content Recognition Rules" tab.
                 </target>
             </trans-unit>
@@ -9648,7 +9648,7 @@ E-Mail: service@MittagQI.com</pre>
                 <source>Active Output Rules tab info box</source>
                 <target>
                 List of active output rules.
-                <br/>Add rules here per target language for your active input rules to protect and convert content.
+                <br/>Add rules here per <b>target language</b> for your active input rules to protect and convert content.
                 <br/>If the wanted output rule is not available in the drop-down activate (or add and activate) it in the "Content Recognition Rules" tab.
                 </target>
             </trans-unit>

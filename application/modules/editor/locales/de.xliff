@@ -9465,8 +9465,8 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
                 <target>
                 Liste der aktiven Input-Regeln.
                 <br/>Um eine Regel zu aktivieren, muss sie einer Ausgangssprache zugewiesen werden.
-                <br/>Sobald der Inhalt für die Ausgangssprache gefunden wird und eine aktive Output-Regel für die Zielsprache definiert ist, wird er als internes Tag geschützt und automatisch entsprechend der Output-Regel konvertiert.
-                <br/>Höhere Priorität wird zuerst gemappt.
+                <br/>Sobald der Inhalt für die Ausgangssprache gefunden wird <b>und</b> eine aktive Output-Regel für die Zielsprache definiert ist, wird er als internes Tag geschützt <b>und</b> automatisch entsprechend der Output-Regel konvertiert.
+                <br/><b>Höhere Priorität wird zuerst gemappt.</b>
                 <br/>Wenn die gewünschte Regel im Dropdown nicht angezeigt wird, aktivieren (ggf. erst hinzufügen und dann aktivieren) Sie diese unter "Regeln für die Erkennung von Inhalten".
                 </target>
             </trans-unit>
@@ -9474,7 +9474,7 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
                 <source>Active Output Rules tab info box</source>
                 <target>
                 Liste der aktiven Output-Regeln.
-                <br/>Fügen Sie hier Regeln pro Zielsprache für Ihre aktiven Input-Regeln hinzu, um Inhalte zu schützen und zu konvertieren.
+                <br/>Fügen Sie hier Regeln pro <b>Zielsprache</b> für Ihre aktiven Input-Regeln hinzu, um Inhalte zu schützen und zu konvertieren.
                 <br/>Wenn die gewünschte Output-Regel im Dropdown nicht angezeigt wird, aktivieren (ggf. erst hinzufügen und dann aktivieren) Sie diese unter "Regeln für die Erkennung von Inhalten".
                 </target>
             </trans-unit>
