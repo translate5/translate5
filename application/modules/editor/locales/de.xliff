@@ -9452,7 +9452,7 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
                 <source>Content Recognition Rules tab info box</source>
                 <target>
                 Liste der vordefinierten regulären Ausdrücke, die zum Schutz und/oder Konvertieren von Inhalten verwendet werden können.
-                <br/>Oder definieren Sie Ihre eigenen Regeln. Aktivieren Sie aller Regeln hier, die Sie für den Input und Output verwenden wollen.
+                <br/>Oder definieren Sie Ihre eigenen Regeln. Aktivieren Sie alle Regeln hier, die Sie für den Input und Output verwenden wollen.
                 <br/>Regeln für Formatstrings finden Sie hier:
                 <br/><a href="https://icu4c-demos.unicode.org/icu-bin/locexp?d_=de#region" target="_blank" rel="noopener noreferrer">1. Gebietsschema-bezogene Formatvorgaben</a>
                 <br/><a href="https://unicode-org.github.io/icu/userguide/format_parse/datetime/#datetime-format-syntax" target="_blank" rel="noopener noreferrer">2. Syntax für Datumsangaben</a>
