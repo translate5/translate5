@@ -594,8 +594,8 @@ Ext.define('Editor.view.admin.task.CustomField.GridController', {
                     selection.length
                         ? selection
                         : (store.getCount()
-                        ? [store.last()]
-                        : [])
+                            ? [store.last()]
+                            : [])
                 );
             }
         })

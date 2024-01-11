@@ -145,6 +145,7 @@ class Field extends ZfExtended_Models_Entity_Abstract {
     }
 
     /**
+     * Get roles for which custom field (current or having $id if given) is enabled for
      *
      * @param int|null $id
      * @return string[]

@@ -64,7 +64,7 @@ class editor_TaskcustomfieldController extends ZfExtended_RestController {
 
     public function postAction()
     {
-        // Make sure
+        // Prevent creation of readonly custom field
         $this->jcheck([
             'mode' => [
                 'req' => true,
@@ -138,7 +138,7 @@ class editor_TaskcustomfieldController extends ZfExtended_RestController {
         // Call parent
         parent::indexAction();
 
-        // Make sure roles are available on frontend for each customField
+        // Setup data for roles checkboxes for each customField
         foreach ($this->view->rows as &$row) {
             $row['roles'] = $this->entity->getRoles($row['id']);
         }
@@ -149,7 +149,7 @@ class editor_TaskcustomfieldController extends ZfExtended_RestController {
         // Set roles
         $this->entity->setRoles($this->data['roles']);
 
-        // Make it possible to refresh Editor.data.app.userRights
+        // Prepare data to spoof Editor.data.app.userRights with
         ZfExtended_Acl::reset();
         $this->view->userRights = ZfExtended_Acl::getInstance()->getFrontendRights(
             ZfExtended_Authentication::getInstance()->getUserRoles()

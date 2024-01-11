@@ -449,7 +449,7 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
         $all = ZfExtended_Factory::get(TaskCustomField::class)->loadAllSorted();
         $allowed = [];
         foreach ($all as $field) {
-            if ($auth->isUserAllowed('frontend', "customField{$field['id']}")) {
+            if ($auth->isUserAllowed(MittagQI\Translate5\Acl\TaskCustomField::ID, "customField{$field['id']}")) {
                 $allowed []= $field;
             }
         }
