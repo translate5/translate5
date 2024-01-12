@@ -25,7 +25,8 @@ START LICENSE AND COPYRIGHT
 
 END LICENSE AND COPYRIGHT
 */
-
+use MittagQI\Translate5\Task\CustomFields\Field;
+use ZfExtended_Factory as Factory;
 /**#@+
  * @author Marc Mittag
  * @package editor
@@ -137,9 +138,7 @@ class editor_Models_Task_Excel_Metadata extends ZfExtended_Models_Entity_ExcelEx
         ]);
 
         // Get custom fields
-        $customFields = ZfExtended_Factory
-            ::get(MittagQI\Translate5\Task\CustomFields\Field::class)
-            ->loadAllSorted();
+        $customFields = Factory::get(Field::class)->loadAllSorted();
 
         // Get current locale
         $locale = ZfExtended_Authentication::getInstance()->getUser()->getLocale();
