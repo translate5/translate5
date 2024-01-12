@@ -26,6 +26,8 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\ZfExtended\MismatchException;
+
 /**
  *
  */
@@ -102,7 +104,7 @@ class editor_AttributedatatypeController extends ZfExtended_RestController
     /**
      * Delete attribute
      *
-     * @throws ZfExtended_Mismatch
+     * @throws MismatchException
      */
     public function deleteAction() {
         throw new BadMethodCallException();
@@ -111,7 +113,7 @@ class editor_AttributedatatypeController extends ZfExtended_RestController
     /**
      * Update attribute
      *
-     * @throws ZfExtended_Mismatch
+     * @throws MismatchException
      */
     public function putAction() {
 

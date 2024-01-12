@@ -32,6 +32,9 @@ END LICENSE AND COPYRIGHT
  * @version 1.0
  *
  */
+
+use MittagQI\Translate5\LanguageResource\Adapter\UpdatableAdapterInterface;
+
 /**
  * FIXME reactivate me for pretranslation and analysis tests!
  *
@@ -42,8 +45,10 @@ END LICENSE AND COPYRIGHT
  * This should be the CSV defaults.
  * The first column must be an id, the second the source and the theird column the target values. Other columns are ignored.
  */
-class editor_Services_DummyFileTm_Connector extends editor_Services_Connector_FilebasedAbstract {
-
+class editor_Services_DummyFileTm_Connector
+    extends editor_Services_Connector_FilebasedAbstract
+    implements UpdatableAdapterInterface
+{
     /**
      * Paging information for search requests
      * @var integer
@@ -119,27 +124,31 @@ class editor_Services_DummyFileTm_Connector extends editor_Services_Connector_Fi
         return join("\n", $result);
     }
 
-    public function update(editor_Models_Segment $segment) {
+    public function update(editor_Models_Segment $segment, bool $recheckOnUpdate = self::DO_NOT_RECHECK_ON_UPDATE): void
+    {
         $source = $this->tagHandler->prepareQuery($this->getQueryString($segment));
         $target = $this->tagHandler->prepareQuery($segment->getTargetEdit());
 
         $s = $this->db->select()->where('source = ?', $source);
-        if($this->isInternalFuzzy()) {
+
+        if ($this->isInternalFuzzy()) {
             $s->where('internalFuzzy = 1');
         }
+
         $row = $this->db->fetchRow($s);
-        if($row) {
+
+        if ($row) {
             $row->target = $target;
-        }
-        else {
+        } else {
             $row = $this->db->createRow([
                 'languageResourceId' => $this->languageResource->getId(),
                 'mid' => $segment->getMid(),
-                'internalFuzzy' => (int) $this->isInternalFuzzy(),
+                'internalFuzzy' => (int)$this->isInternalFuzzy(),
                 'source' => $source,
                 'target' => $target,
             ]);
         }
+
         $row->save();
     }
     

@@ -36,6 +36,9 @@
       <file>../Plugins/VisualReview/tests/VisualVideoTest.php</file>
       <file>../Plugins/VisualReview/tests/VisualWgetTest.php</file>
     </testsuite>
+    <testsuite name="connectworldserver">
+      <file>../Plugins/ConnectWorldserver/tests/ExternalOnlineReviewTest.php</file>
+    </testsuite>
     <testsuite name="deepl">
       <file>../Plugins/DeepL/tests/DeepLGlossaryTest.php</file>
       <file>../Plugins/DeepL/tests/DeepLLanguageResourceApiTest.php</file>

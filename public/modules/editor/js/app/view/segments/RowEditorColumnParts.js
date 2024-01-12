@@ -317,7 +317,7 @@ Ext.define('Editor.view.segments.RowEditorColumnParts', {
 
         me.setColumnToEdit(me.context.column);
 
-        let referenceField = me.mainEditor.getReferenceField(record.get('target'));
+        let referenceField = me.mainEditor.getReferenceField(record.get('target'), record.get('pretrans'));
 
         me.mainEditor.setValueAndMarkup(record.get(me.columnToEdit), record, me.columnToEdit, referenceField);
     },

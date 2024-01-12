@@ -69,8 +69,8 @@ Ext.define('Editor.view.LanguageResources.EditTmWindow', {
         render:'onTmWindowRender'
     },
 
-    height : 500,
-    width : 500,
+    height : 600,
+    width : 800,
     modal : true,
     layout:'fit',
     initConfig : function(instanceConfig) {

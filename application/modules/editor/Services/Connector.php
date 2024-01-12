@@ -36,7 +36,7 @@ use MittagQI\Translate5\Segment\TagRepair\HtmlProcessor;
  * @method editor_Services_ServiceResult query() query(editor_Models_Segment $segment)
  * @method editor_Services_ServiceResult search() search(string $searchString, $field = 'source', $offset = null)
  * @method editor_Services_ServiceResult translate() translate(string $searchString)
- * @method void update(editor_Models_Segment $segment) editor_Services_Connector_Abstract::update()
+ * @method void update(editor_Models_Segment $segment, $recheckOnUpdate = false) editor_Services_Connector_Abstract::update()
  * @method string getStatus() getStatus(editor_Models_LanguageResources_Resource $resource, editor_Models_LanguageResources_LanguageResource $languageResource = null) returns the LanguageResource status
  * @method string getLastStatusInfo() getLastStatusInfo() returns the last store status info from the last getStatus call
  * @method string getTm($mime, string $tmName = '') editor_Services_Connector_FilebasedAbstract::getTm()
@@ -45,7 +45,6 @@ use MittagQI\Translate5\Segment\TagRepair\HtmlProcessor;
  */
 class editor_Services_Connector
 {
-    
     /***
      * The request source when language resources is used is InstantTranslate
      * @var string

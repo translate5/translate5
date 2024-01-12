@@ -47,6 +47,20 @@ class editor_Services_TermCollection_Connector extends editor_Services_Connector
     }
 
     /**
+     * Set the source and the target langauge with the same value as the requested search langauges values.
+     * Later the SearchCollection class filters the languages using the fuzzy logic.
+     * @param int|null $sourceLang
+     * @param int|null $targetLang
+     * @return void
+     */
+    protected function setServiceLanguages(?int $sourceLang, ?int $targetLang): void
+    {
+        $this->sourceLang = $sourceLang;
+        $this->targetLang = $targetLang;
+    }
+
+    /**
+     *
      * {@inheritDoc}
      * @see editor_Services_Connector_FilebasedAbstract::addTm()
      */

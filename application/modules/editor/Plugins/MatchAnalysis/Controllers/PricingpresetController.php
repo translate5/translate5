@@ -26,6 +26,8 @@
  END LICENSE AND COPYRIGHT
  */
 use MittagQI\Translate5\Plugins\MatchAnalysis\Models\Pricing\Preset;
+use MittagQI\ZfExtended\MismatchException;
+
 /**
  * REST Endpoint Controller to serve the presets list for the pricing-Management in the Preferences
  *
@@ -52,7 +54,7 @@ class editor_Plugins_MatchAnalysis_PricingpresetController extends ZfExtended_Re
 
     /**
      * @throws Zend_Db_Statement_Exception
-     * @throws ZfExtended_Mismatch
+     * @throws MismatchException
      */
     public function init() {
 
@@ -90,12 +92,13 @@ class editor_Plugins_MatchAnalysis_PricingpresetController extends ZfExtended_Re
     /**
      * Delete preset
      *
+     * @return void
      * @throws Zend_Db_Statement_Exception
      * @throws Zend_Db_Table_Row_Exception
+     * @throws Zend_Exception
      * @throws ZfExtended_Models_Entity_Exceptions_IntegrityConstraint
      * @throws ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey
      * @throws ZfExtended_NoAccessException
-     * @throws Zend_Exception
      */
     public function deleteAction() {
 
@@ -117,7 +120,7 @@ class editor_Plugins_MatchAnalysis_PricingpresetController extends ZfExtended_Re
             }
 
         // Catch mismatch-exception
-        } catch (ZfExtended_Mismatch $e) {
+        } catch (MismatchException $e) {
 
             // Flush msg
             $this->jflush(false, $e->getMessage());
@@ -171,7 +174,7 @@ class editor_Plugins_MatchAnalysis_PricingpresetController extends ZfExtended_Re
             ]);
 
         // Catch mismatch-exception
-        } catch (ZfExtended_Mismatch $e) {
+        } catch (MismatchException $e) {
 
             // Flush msg
             $this->jflush(false, $e->getMessage());
@@ -240,7 +243,7 @@ class editor_Plugins_MatchAnalysis_PricingpresetController extends ZfExtended_Re
             }
 
         // Catch mismatch-exception
-        } catch (ZfExtended_Mismatch $e) {
+        } catch (MismatchException $e) {
 
             // Flush msg
             $this->jflush(false, $e->getMessage());
@@ -298,7 +301,7 @@ class editor_Plugins_MatchAnalysis_PricingpresetController extends ZfExtended_Re
             ]);
 
         // Catch mismatch-exception
-        } catch (ZfExtended_Mismatch $e) {
+        } catch (MismatchException $e) {
 
             // Flush msg
             $this->jflush(false, $e->getMessage());
@@ -335,7 +338,7 @@ class editor_Plugins_MatchAnalysis_PricingpresetController extends ZfExtended_Re
             ]);
 
         // Catch mismatch-exception and flush msg
-        } catch (ZfExtended_Mismatch $e) {
+        } catch (MismatchException $e) {
             $this->jflush(false, $e->getMessage());
         }
 
