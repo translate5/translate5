@@ -988,7 +988,10 @@ Ext.define('Editor.view.segments.HtmlEditor', {
         }
 
         if (!this.tagsCheckResult.isSuccessful()) {
-            const referenceField = this.getReferenceField(me.currentSegment.get('target'));
+            const referenceField = this.getReferenceField(
+                me.currentSegment.get('target'),
+                me.currentSegment.get('pretrans')
+            );
 
             //first item the field to check, second item: the error text:
             let todo = [
@@ -1434,9 +1437,10 @@ Ext.define('Editor.view.segments.HtmlEditor', {
      * Distinguish which field should be used for reference tags
      *
      * @param {String} targetContent
+     * @param {Boolean} pretrans
      * @returns {string}
      */
-    getReferenceField: function (targetContent) {
+    getReferenceField: function (targetContent, pretrans) {
         const useSourceAsReference = Editor.app.getTaskConfig('editor.frontend.reviewTask.useSourceForReference');
 
         if (useSourceAsReference) {
@@ -1444,6 +1448,11 @@ Ext.define('Editor.view.segments.HtmlEditor', {
         }
 
         if (targetContent.trim() === '') {
+            return 'source';
+        }
+
+        // If target was filled during pretranslation, use source as reference
+        if (pretrans) {
             return 'source';
         }
 

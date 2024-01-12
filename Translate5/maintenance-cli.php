@@ -33,7 +33,8 @@ require_once 'vendor/autoload.php';
 const TRANSLATE5_CLI = true;
 
 use Symfony\Component\Console\Application;
-use Translate5\MaintenanceCli\Command\{AuthTokenCommand,
+use Translate5\MaintenanceCli\Command\{
+    AuthTokenCommand,
     AuthTokenDeleteCommand,
     AuthTokenListCommand,
     CachePurgeCommand,
@@ -44,6 +45,7 @@ use Translate5\MaintenanceCli\Command\{AuthTokenCommand,
     DatabaseStatCommand,
     DatabaseUpdateCommand,
     DevelopmentCreatetestCommand,
+    DevelopmentDevCommand,
     DevelopmentEcodeCommand,
     DevelopmentGithookCommand,
     DevelopmentLocalServicesCommand,
@@ -176,6 +178,23 @@ $commands = [
     new WorkflowListCommand(),
     new WorkflowStepCommand(),
 ];
+
+// integrate Plugin-specific CLI commands
+foreach (glob(getcwd().'/application/modules/editor/Plugins/*/CLI/*Command.php') as $pluginCommandFile) {
+    $pluginCommandFileSplitt = explode(DIRECTORY_SEPARATOR, $pluginCommandFile);
+    
+    $pluginName = $pluginCommandFileSplitt[(array_key_last($pluginCommandFileSplitt) - 2)];
+    $commandName = pathinfo($pluginCommandFile, PATHINFO_FILENAME);
+    $commandClass = sprintf('MittagQI\\Translate5\\Plugins\\%s\\CLI\\%s', $pluginName, $commandName);
+    
+    // cause "use" does not work inside the foreach-loop, we simply make a require_once() to include the command-file
+    require_once($pluginCommandFile);
+    
+    // and finally we can add the plugin-specific command to general maintenance-cli :-)
+    $commands[] = new $commandClass();
+}
+
+
 if (file_exists('.git')) {
     $commands[] = new DevelopmentGithookCommand();
     $commands[] = new DevelopmentNewdbchangeCommand();
@@ -198,6 +217,7 @@ if (file_exists('.git')) {
     $commands[] = new DevelopmentOkapiBconfNextVersionCommand();
     $commands[] = new DevelopmentLocalServicesCommand();
     $commands[] = new DevelopmentSymlinksCommand();
+    $commands[] = new DevelopmentDevCommand();
 }
 $app->addCommands($commands);
 $app->run();

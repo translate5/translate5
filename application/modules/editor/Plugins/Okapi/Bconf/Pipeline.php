@@ -26,6 +26,8 @@
  END LICENSE AND COPYRIGHT
  */
 
+use MittagQI\ZfExtended\MismatchException;
+
 /**
  * Class representing the pipeline of a BCONF
  * This generally is a xml file with x-properties Sections
@@ -144,7 +146,7 @@ writerOptions.escapeGT.b=false
             $this->content = preg_replace('~targetSrxPath\s*=\s*'.pathinfo($this->targetSrxPath, PATHINFO_FILENAME).'~', 'targetSrxPath='.pathinfo($file, PATHINFO_FILENAME), $this->content);
             $this->targetSrxPath = $file;
         } else {
-            throw new ZfExtended_Mismatch('E2004', [ $field, 'field' ]);
+            throw new MismatchException('E2004', [ $field, 'field' ]);
         }
     }
 

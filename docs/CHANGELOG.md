@@ -8,14 +8,76 @@ Missing Versions are merged into in the next upper versions, so no extra section
 
 All updates are (downwards) compatible! If not this is listed in the important release notes.
 
+## [7.0.1] - 2024-01-08
+
+### Important Notes:
 
 
+### Changed
+**[TRANSLATE-3632](https://jira.translate5.net/browse/TRANSLATE-3632): t5memory - Log if segment is not saved  to TM** <br>
+Add check if a segment was updated properly in t5memory and if not - log that for debug purposes
+
+**[TRANSLATE-3629](https://jira.translate5.net/browse/TRANSLATE-3629): Package Ex and Re-Import - Translator package import: Move checkbox for "save to TM" from upload window to sysconfig** <br>
+Write segments to TM on package re-import is now configurable on customer and task level and is not available any more as separate checkbox on re-import dialogue.
 
 
+### Bugfixes
+**[TRANSLATE-3639](https://jira.translate5.net/browse/TRANSLATE-3639): Auto-QA, MatchAnalysis & Pretranslation - Inserted fuzzy should not write into "target at import time" field** <br>
+Target text (at time of import / pretranslation) is now not updated anymore when applying match from translation memory match (was erroneously introduced in 7.0.0)
+
+**[TRANSLATE-3638](https://jira.translate5.net/browse/TRANSLATE-3638): Auto-QA, TrackChanges - Tags checker doesn't ignore deleted tags** <br>
+Fix bug when deleted tags weren't ignored during tags validation
+
+**[TRANSLATE-3614](https://jira.translate5.net/browse/TRANSLATE-3614): InstantTranslate - TM match in instant translate ignored** <br>
+Fix for translating segmented text in instant-translate so that more results come from TMs if assigned.
 
 
+## [7.0.0] - 2023-12-19
+
+### Important Notes:
+#### [TRANSLATE-3436](https://jira.translate5.net/browse/TRANSLATE-3436)
+To update to this version PHP 8.1.23 is required.
+ 
 
 
+### Added
+**[TRANSLATE-3436](https://jira.translate5.net/browse/TRANSLATE-3436): LanguageResources - Integrate GPT-4 with translate5 as translation engine** <br>
+New Private Plugin "OpenAI" to use OpenAI-Models as language-resource and base functionality to fine-tune these models
+
+
+### Bugfixes
+**[TRANSLATE-3627](https://jira.translate5.net/browse/TRANSLATE-3627): Main back-end mechanisms (Worker, Logging, etc.) - HOTFIX: Progress reporting of Looped Segment Processing Workers does not work** <br>
+FIX: progress of termtagger and spellcheck workers was not properly reported to GUI
+
+**[TRANSLATE-3624](https://jira.translate5.net/browse/TRANSLATE-3624): InstantTranslate - Instant Translate will find no en-us terms** <br>
+Fix: list all regional language results from term collections when searching with the main language code 
+
+**[TRANSLATE-3590](https://jira.translate5.net/browse/TRANSLATE-3590): Main back-end mechanisms (Worker, Logging, etc.) - Create Globally usable API-request to replace usage of InstantTranslate in various places** <br>
+Code cleanup: Centralize API-request from InsrtantTranslate as base-code
+
+
+## [6.9.1] - 2023-12-18
+
+### Important Notes:
+ 
+
+
+### Added
+**[TRANSLATE-3553](https://jira.translate5.net/browse/TRANSLATE-3553): TermPortal - Extend folder-based term import to work via sftp** <br>
+translate5 - 6.9.0: Added support for terminology import from remote SFTP directory
+translate5 - 6.9.1: Added additional config value check
+
+
+### Bugfixes
+**[TRANSLATE-3626](https://jira.translate5.net/browse/TRANSLATE-3626): t5memory - Write to instant translate t5memory memory** <br>
+Fix for writing to instant-translate memory.
+
+**[TRANSLATE-3619](https://jira.translate5.net/browse/TRANSLATE-3619): Editor general - SQL error when filtering repetitions with bookmarks** <br>
+FIXED: sql-error when both bookbarks and repetiions filters are used
+
+**[TRANSLATE-3419](https://jira.translate5.net/browse/TRANSLATE-3419): Task Management - Click on PM name in project overview opens mail with undefined address - and logs out user in certain cases** <br>
+translate5 - 6.7.0: FIXED: 'mailto:undefined' links in PM names in Project overview
+translate5 - 6.9.1: project task grid fix
 
 
 ## [6.9.0] - 2023-12-14

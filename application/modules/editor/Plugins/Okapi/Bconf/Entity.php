@@ -26,6 +26,8 @@
  END LICENSE AND COPYRIGHT
  */
 
+use MittagQI\ZfExtended\MismatchException;
+
 /**
  * Okapi Bconf Entity Object
  *
@@ -466,7 +468,7 @@ class editor_Plugins_Okapi_Bconf_Entity extends ZfExtended_Models_Entity_Abstrac
      */
     public function getSrxNameFor(string $field): string {
         if($field !== 'source' && $field !== 'target'){
-            throw new ZfExtended_Mismatch('E2004', [ $field, 'field' ]);
+            throw new MismatchException('E2004', [ $field, 'field' ]);
         }
         return $this->getContent()->getSrxFile($field);
     }
@@ -482,7 +484,7 @@ class editor_Plugins_Okapi_Bconf_Entity extends ZfExtended_Models_Entity_Abstrac
      */
     public function getSrx(string $field) : editor_Plugins_Okapi_Bconf_Segmentation_Srx {
         if($field !== 'source' && $field !== 'target'){
-            throw new ZfExtended_Mismatch('E2004', [ $field, 'field' ]);
+            throw new MismatchException('E2004', [ $field, 'field' ]);
         }
         $path = $this->createPath($this->getSrxNameFor($field));
         return new editor_Plugins_Okapi_Bconf_Segmentation_Srx($path);
