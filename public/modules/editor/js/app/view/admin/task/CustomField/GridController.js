@@ -485,11 +485,14 @@ Ext.define('Editor.view.admin.task.CustomField.GridController', {
         // Clear filter, if any
         modeStore.clearFilter();
 
-        // If nothing selected in custom fields grid - return
-        if (!customField || !customField.id) return;
+        // If nothing selected in custom fields grid
+        if (!customField) {
 
-        // If currently selected customField is readonly
-        if (customField.get('mode') !== 'readonly') {
+            // Exclude readonly-option from the list of available options
+            modeStore.filterBy(mode => mode.get('value') !== 'readonly');
+
+        // Else if currently selected customField is readonly
+        } else if (customField.get('mode') !== 'readonly') {
 
             // If currently selected customField is checkbox
             if (customField.get('type') === 'checkbox') {
