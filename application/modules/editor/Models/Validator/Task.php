@@ -25,7 +25,8 @@ START LICENSE AND COPYRIGHT
 
 END LICENSE AND COPYRIGHT
 */
-
+use MittagQI\Translate5\Task\CustomFields\Field;
+use ZfExtended_Factory as Factory;
 class editor_Models_Validator_Task extends ZfExtended_Models_Validator_Abstract
 {
 
@@ -86,8 +87,7 @@ class editor_Models_Validator_Task extends ZfExtended_Models_Validator_Abstract
     public function addValidatorsForCustomFields() {
 
         // Get custom fields
-        $customFieldA = ZfExtended_Factory
-            ::get(MittagQI\Translate5\Task\CustomFields\Field::class)->loadAll();
+        $customFieldA = Factory::get(Field::class)->loadAll();
 
         // Foreach custom field
         foreach ($customFieldA as $customField) {
