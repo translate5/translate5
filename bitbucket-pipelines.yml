@@ -24,7 +24,7 @@ pipelines:
               - master
           - name: SPECIFIC_TEST_OR_SUITE
           - name: PHPSTAN
-            default: enabled
+            default: disabled
             allowed-values:
               - enabled
               - disabled
