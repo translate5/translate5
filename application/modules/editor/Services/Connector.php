@@ -245,6 +245,7 @@ class editor_Services_Connector
 
         return $this->contentProtector->protectAndConvert(
             $utilities->tagProtection->protectTags($markup, false),
+            true,
             $this->adapter->getSourceLang(),
             $this->adapter->getTargetLang(),
             $shortTagIdent,
