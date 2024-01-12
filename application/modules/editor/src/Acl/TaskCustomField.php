@@ -73,7 +73,9 @@ class TaskCustomField extends AbstractResource {
 
         // If current resource is not yet added  - add it
         // This can be the case when no custom fields are created yet or there are no roles any of them is enabled for
-        if (!$acl->has(self::ID)) $acl->addResource(self::ID);
+        if (!$acl->has(self::ID)) {
+            $acl->addResource(self::ID);
+        }
     }
 
     /**

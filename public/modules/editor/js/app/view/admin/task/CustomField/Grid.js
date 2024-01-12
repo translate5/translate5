@@ -67,7 +67,7 @@ Ext.define('Editor.view.admin.task.CustomField.Grid', {
         },
         dockedItems: [{
             xtype: 'toolbar',
-            dock: 'top',
+            dock: 'bottom',
             ui: 'default',
             border: 0,
             defaults: {

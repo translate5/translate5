@@ -181,9 +181,10 @@ class editor_Models_Task_Excel_Metadata extends ZfExtended_Models_Entity_ExcelEx
         /* @var $taskModel editor_Models_Task */
         $taskGridTextCols = $taskModel::getTaskGridTextCols();
         foreach ($this->taskColumns as $key => $colName) {
-            if (array_key_exists($colName, $taskGridTextCols)) { // Not all column-names in the taskGrid have a translation.
+            // Not all column-names in the taskGrid have a translation.
+            if (array_key_exists($colName, $taskGridTextCols)) {
                 $colHeadline = $this->translate->_($taskGridTextCols[$colName]);
-            } else if (array_key_exists($colName, $this->taskCustomColumns)){
+            } elseif (array_key_exists($colName, $this->taskCustomColumns)){
                 $colHeadline = $this->taskCustomColumns[$colName]['header'];
             } else {
                 $colHeadline = $colName;

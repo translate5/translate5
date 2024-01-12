@@ -59,26 +59,29 @@ Ext.define('Editor.view.admin.config.type.SimpleMapController', {
         grid.store.each(function (rec) {
             newValue[rec.get('index')] = rec.get('value');
         });
-        if (confRec) {
-            confRec.set('value', newValue);
-            if (this.preventSave) {
-                win.close();
-            } else {
-                win.setLoading('saving...');
-                confRec.save({
-                    success: function () {
-                        win.setLoading(false);
-                        win.close();
-                    },
-                    failure: function () {
-                        win.setLoading(false);
-                    }
-                });
-            }
-        } else {
+
+        if(!confRec){
             this.jsonField.setValue(Ext.JSON.encode(newValue));
             win.close();
+            return;
         }
+
+        confRec.set('value', newValue);
+
+        if (this.preventSave) {
+            win.close();
+            return;
+        }
+        win.setLoading('saving...');
+        confRec.save({
+            success: function () {
+                win.setLoading(false);
+                win.close();
+            },
+            failure: function () {
+                win.setLoading(false);
+            }
+        });
     },
 
     /**
