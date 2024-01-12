@@ -177,26 +177,12 @@ Ext.define('Editor.controller.LanguageResources', {
           me.setValueForEditor(matchRecord.get('target'));
           me.fireEvent('prepareCompleteReplace',matchRecord.get('target'),false); // if TrackChanges are activated, DEL- and INS-markups are added first and then setValueForEditor is applied from there (= again, but so what)
 
-          let referenceField = editor.mainEditor.getReferenceField(rec.get('target'));
+          let referenceField = editor.mainEditor.getReferenceField(rec.get('target'), rec.get('pretrans'));
 
           //we don't support the matchrate saving for tasks with alternatives:
           if(task.get('defaultSegmentLayout')) {
               rec.set('matchRate', matchrate);
               rec.wasOriginalTargetUpdated = true;
-
-              if (rec.get('target').trim() === '') {
-                  // This is done to keep tags in updated target consistent with
-                  // reference field tags
-                  editor.mainEditor.setValueAndMarkup(
-                      matchRecord.get('target'),
-                      rec,
-                      'target',
-                      referenceField,
-                      true
-                  );
-                  // when taking over a match we want the original target to be updated to the match/pretranslated value
-                  rec.set('target', editor.getValueForSaving());
-              }
 
               //TODO how to implement a check if user modified the match afterwards to add the "interactive" flag?
               rec.set('matchRateType', Editor.data.LanguageResources.matchrateTypeChangedState+';languageResourceid='+matchRecord.get('languageResourceid'));
