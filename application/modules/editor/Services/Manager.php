@@ -32,6 +32,9 @@ END LICENSE AND COPYRIGHT
  * @version 1.0
  *
  */
+
+use MittagQI\Translate5\LanguageResource\Adapter\UpdatableAdapterInterface;
+
 /**
  * LanguageResource Service Manager
  * TODO all services classes should be located somewhere under language resources
@@ -327,7 +330,7 @@ class editor_Services_Manager {
         $task->loadByTaskGuid($segment->getTaskGuid());
         $this->visitAllAssociatedTms($task, function(editor_Services_Connector $connector, $languageResource, $assoc) use ($segment) {
             if(!empty($assoc['segmentsUpdateable'])) {
-                $connector->update($segment);
+                $connector->update($segment, UpdatableAdapterInterface::RECHECK_ON_UPDATE);
             }
         }, function(Exception $e, editor_Models_LanguageResources_LanguageResource $languageResource, ZfExtended_Logger_Event $event) {
             self::reportTMUpdateError(null, $event->message, $event->eventCode);
