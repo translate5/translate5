@@ -73,11 +73,12 @@ final class Placeable
     }
 
     /**
-     * Replaces als Placeables in the given markup with the placeables content
+     * Replaces all Placeables in the given markup with the placeables content
      * @param string $segment
      * @return string
      */
-    public static function replace(string $segment){
+    public static function replace(string $segment): string
+    {
         return preg_replace_callback(self::DETECTION_REGEX, function($matches) {
             if(count($matches) === 1){
                 $inner = [];
