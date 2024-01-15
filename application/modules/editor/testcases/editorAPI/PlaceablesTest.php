@@ -29,7 +29,7 @@ END LICENSE AND COPYRIGHT
 use MittagQI\Translate5\Segment\Tag\Placeable;
 use MittagQI\Translate5\Test\Import\Config;
 
-/***
+/**
  * Tests the Import of Placeables
  */
 class PlaceablesTest extends editor_Test_JsonTest {
