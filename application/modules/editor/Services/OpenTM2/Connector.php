@@ -219,10 +219,33 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
      */
     public function addAdditionalTm(array $fileinfo = null, array $params = null): bool
     {
-        return $this->importTmxIntoMemory(
-            file_get_contents($fileinfo['tmp_name']),
+        try {
+            $importFilename = $this->conversionService->convertTMXForImport(
+                $fileinfo['tmp_name'],
+                (int) $this->languageResource->getSourceLang(),
+                (int) $this->languageResource->getTargetLang()
+            );
+        } catch (RuntimeException $e) {
+            $this->logger->error(
+                'E1590',
+                'Conversion: Error in process of TMX file conversion',
+                [
+                    'reason' => $e->getMessage(),
+                    'languageResource' => $this->languageResource
+                ]
+            );
+
+            return false;
+        }
+
+        $result = $this->importTmxIntoMemory(
+            file_get_contents($importFilename),
             $params['tmName'] ?? $this->getWritableMemory()
         );
+
+        unlink($importFilename);
+
+        return $result;
     }
 
     /**

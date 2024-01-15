@@ -29,6 +29,8 @@ END LICENSE AND COPYRIGHT
 use editor_Models_Segment_Whitespace as Whitespace;
 use MittagQI\Translate5\ContentProtection\ContentProtector;
 use MittagQI\Translate5\ContentProtection\Model\ContentProtectionRepository;
+use MittagQI\Translate5\ContentProtection\Model\LanguageResourceRulesHash;
+use MittagQI\Translate5\ContentProtection\Model\LanguageRulesHash;
 use MittagQI\Translate5\ContentProtection\T5memory\TmConversionService;
 use MittagQI\Translate5\LanguageResource\CleanupAssociation\Customer;
 use MittagQI\Translate5\LanguageResource\TaskAssociation;
@@ -848,6 +850,13 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
             //save again to save changes made by the connector
             $this->entity->save();
         }
+
+        $tmConversionService = new TmConversionService(
+            new ContentProtectionRepository(),
+            ContentProtector::create(ZfExtended_Factory::get(Whitespace::class))
+        );
+
+        $tmConversionService->createRuleHashes($this->entity->getId(), $sourceLangId);
 
         $this->view->rows = $this->entity->getDataObject();
         $this->view->success = true;

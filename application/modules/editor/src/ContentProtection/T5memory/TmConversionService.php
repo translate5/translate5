@@ -52,9 +52,11 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\ContentProtection\T5memory;
 
+use editor_Models_Languages;
 use MittagQI\Translate5\ContentProtection\ContentProtector;
 use MittagQI\Translate5\ContentProtection\Model\ContentProtectionRepository;
 use MittagQI\Translate5\ContentProtection\Model\LanguageResourceRulesHash;
+use MittagQI\Translate5\ContentProtection\Model\LanguageRulesHash;
 use MittagQI\Translate5\ContentProtection\NumberProtector;
 use RuntimeException;
 use XMLReader;
@@ -75,6 +77,30 @@ class TmConversionService
     ) {
         $this->languageRulesHashMap = $contentProtectionRepository->getLanguageRulesHashMap();
         $this->languageResourceRulesHashMap = $contentProtectionRepository->getLanguageResourceRulesHashMap();
+    }
+
+    /**
+     * @return array{LanguageResourceRulesHash, LanguageRulesHash}
+     */
+    public function createRuleHashes(int $languageResourceId, int $languageId): array
+    {
+        $lang = ZfExtended_Factory::get(editor_Models_Languages::class);
+        $lang->load($languageId);
+
+        $hash = $this->contentProtectionRepository->getRulesHashBy($lang);
+
+        $languageResourceRulesHash = ZfExtended_Factory::get(LanguageResourceRulesHash::class);
+        $languageResourceRulesHash->setLanguageResourceId($languageResourceId);
+        $languageResourceRulesHash->setLanguageId($languageId);
+        $languageResourceRulesHash->setHash($hash);
+        $languageResourceRulesHash->save();
+
+        $languageRulesHash = ZfExtended_Factory::get(LanguageRulesHash::class);
+        $languageRulesHash->setLanguageId($languageId);
+        $languageRulesHash->setHash($hash);
+        $languageRulesHash->save();
+
+        return [$languageResourceRulesHash, $languageRulesHash];
     }
 
     public static function fullTagRegex(): string

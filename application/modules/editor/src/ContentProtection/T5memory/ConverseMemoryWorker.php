@@ -37,16 +37,11 @@ use MittagQI\Translate5\ContentProtection\ContentProtector;
 use MittagQI\Translate5\ContentProtection\Model\ContentProtectionRepository;
 use MittagQI\Translate5\ContentProtection\Model\LanguageResourceRulesHash;
 use MittagQI\Translate5\ContentProtection\Model\LanguageRulesHash;
-use MittagQI\Translate5\LanguageResource\Status as LanguageResourceStatus;
-use RuntimeException;
 use ZfExtended_Factory;
-use ZfExtended_Logger;
 use ZfExtended_Worker_Abstract;
 
 class ConverseMemoryWorker extends ZfExtended_Worker_Abstract
 {
-    private const WAIT_TIME_SECONDS = 600;
-    private const WAIT_TICK_TIME_SECONDS = 5;
     private int $languageResourceId;
     private int $languageId;
     private LanguageResource $languageResource;
@@ -148,28 +143,10 @@ class ConverseMemoryWorker extends ZfExtended_Worker_Abstract
             return false;
         }
 
-        try {
-            $importFilename = $this->tmConversionService->convertTMXForImport(
-                $exportFilename,
-                $sourceLang,
-                $targetLang
-            );
-            unlink($exportFilename);
-        } catch (RuntimeException $e) {
-            $this->log->error(
-                'E1590',
-                'Conversion: Error in process of TMX file conversion',
-                [
-                    'reason' => $e->getMessage(),
-                    'languageResource' => $this->languageResource
-                ]
-            );
-        }
-
         $fileinfo = [
-            'tmp_name' => $importFilename,
+            'tmp_name' => $exportFilename,
             'type' => $connector->getValidExportTypes()['TMX'],
-            'name' => basename($importFilename),
+            'name' => basename($exportFilename),
         ];
 
         if (!$connector->addTm($fileinfo, ['createNewMemory' => true])) {
@@ -177,36 +154,18 @@ class ConverseMemoryWorker extends ZfExtended_Worker_Abstract
                 'E1588',
                 'Conversion: Failed to import file: {filename}',
                 [
-                    'filename' => $importFilename,
+                    'filename' => $exportFilename,
                     'languageResource' => $this->languageResource
                 ]
             );
 
-            $this->resetConversionStarted();
-
-            return false;
-        }
-
-        try {
-            $this->waitUntilImportFinished($connector);
-            unlink($importFilename);
-        } catch (RuntimeException $e) {
             $this->restoreLangResourceMemories();
-
-            $this->log->error(
-                'E1588',
-                'Conversion: Failed to import file: {filename}',
-                [
-                    'filename' => $importFilename,
-                    'reason' => $e->getMessage(),
-                    'languageResource' => $this->languageResource,
-                ]
-            );
-
             $this->resetConversionStarted();
 
             return false;
         }
+
+        unlink($exportFilename);
 
         foreach ($this->memoriesBackup as $memory) {
             if (!$connector->deleteMemory($memory['filename'])) {
@@ -228,27 +187,5 @@ class ConverseMemoryWorker extends ZfExtended_Worker_Abstract
     {
         $this->languageResourceRulesHash->setConversionStarted(null);
         $this->languageResourceRulesHash->save();
-    }
-
-    private function waitUntilImportFinished(Connector $connector): void
-    {
-        $timeElapsed = 0;
-
-        while ($timeElapsed < self::WAIT_TIME_SECONDS) {
-            $status = $connector->getStatus($connector->getResource(), $this->languageResource);
-
-            if ($status === LanguageResourceStatus::AVAILABLE) {
-                return;
-            }
-
-            if ($status === LanguageResourceStatus::ERROR) {
-                throw new RuntimeException('Error occurred during importing');
-            }
-
-            sleep(self::WAIT_TICK_TIME_SECONDS);
-            $timeElapsed += self::WAIT_TICK_TIME_SECONDS;
-        }
-
-        throw new RuntimeException('Import not finished after ' . self::WAIT_TIME_SECONDS . ' seconds');
     }
 }
