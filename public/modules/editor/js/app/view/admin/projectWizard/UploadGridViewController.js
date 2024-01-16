@@ -47,8 +47,8 @@ Ext.define('Editor.view.admin.projectWizard.UploadGridViewController', {
     },
 
     listeners:{
-        workfileAdded:'onWorkfileAdded',
-        workfilesRemoved:'onWorkfilesRemoved'
+        workfileAdded: 'onWorkfileAdded',
+        workfilesRemoved: 'onWorkfilesRemoved'
     },
     control: {
         // This selector will select all menuitems inside toolbar's overflow-menu
@@ -167,21 +167,15 @@ Ext.define('Editor.view.admin.projectWizard.UploadGridViewController', {
 
             // a blacklist validation is needed for reference files, as some types have to be rejected for security reasons
             if(rec.get('type') === Editor.model.admin.projectWizard.File.TYPE_REFERENCE){
-                if(Ext.Array.contains(Editor.data.import.forbiddenReferenceExtensions, rec.getExtension())) {
-                    new Ext.util.DelayedTask(function(){
-                        Ext.Msg.alert(me.getView().strings.errorColumnText, Ext.String.format(msg.extension, file.name, rec.getExtension()));
-                    }).delay(100);// needs to be delayed because it is not shown when the error pops-up when drag and drop on "Add project" button
-                } else {
+                if(me.validateReferenceFile(rec)){
                     rec.commit();
                     store.addSorted(rec);
                 }
                 return true;
             }
 
-            if(!Ext.Array.contains(Editor.data.import.validExtensions, rec.getExtension())){
-                new Ext.util.DelayedTask(function(){
-                    Ext.Msg.alert(me.getView().strings.errorColumnText, Ext.String.format(msg.extension, file.name, rec.getExtension()));
-                }).delay(100);// needs to be delayed because it is not shown when the error pops-up when drag and drop on "Add project" button
+            // the workfile validation is dynamic
+            if(!me.validateWorkFile(rec)){
                 return true;
             }
 
@@ -227,6 +221,61 @@ Ext.define('Editor.view.admin.projectWizard.UploadGridViewController', {
      */
     onWorkfilesRemoved:function (itemsLeft){
         this.getView().isValid();
+    },
+
+    /**
+     * @param {Editor.model.admin.projectWizard.File} record
+     * @returns {boolean}
+     */
+    validateWorkFile: function(record){
+
+        // the event may writes the record's "valid" prop which by default is null!
+        this.getView().fireEvent('validateWorkfile', record, this);
+
+        // the workfile is either valid by plugin-validation/event or the default extensions
+        if(record.valid === true || Ext.Array.contains(Editor.data.import.validExtensions, record.getExtension())) {
+            return true;
+        }
+
+        this.showFileExtensionError(record.get('name'), record.getExtension());
+        return false;
+    },
+
+    /**
+     * @param {Editor.model.admin.projectWizard.File} record
+     * @param {Object} file
+     * @returns {boolean}
+     */
+    validateReferenceFile: function(record){
+        if(Ext.Array.contains(Editor.data.import.forbiddenReferenceExtensions, record.getExtension())) {
+            this.showFileExtensionError(record.get('name'), record.getExtension());
+            return false;
+        }
+        return true;
+    },
+
+    /**
+     * Raises a wrong filetype alert
+     * @param {String} fileName
+     * @param {String} fileExtension
+     */
+    showFileExtensionError: function(fileName, fileExtension){
+        this.showDelayedMessage(
+            this.getView().strings.errorColumnText,
+            Ext.String.format(this.errorMessages.extension, fileName, fileExtension)
+        );
+    },
+
+    /**
+     * A validation error needs to be delayed because it is not shown when the error pops-up
+     * when drag and drop on "Add project" button
+     * @param {String} errorTitle
+     * @param {String} errorMsg
+     */
+    showDelayedMessage: function(errorTitle, errorMsg){
+        new Ext.util.DelayedTask(function(){
+            Ext.Msg.alert(errorTitle, errorMsg);
+        }).delay(100);
     },
 
     /***
@@ -316,7 +365,7 @@ Ext.define('Editor.view.admin.projectWizard.UploadGridViewController', {
     },
 
     /***
-     * Validate if for each uploaded pivot file, there is work-file with the same name. If no work-file with the same name is found,
+     * Validate if for each uploaded pivot file, there is work-fimele with the same name. If no work-file with the same name is found,
      * the pivot file will be marked as error
      */
     validatePivotFileName: function (){
