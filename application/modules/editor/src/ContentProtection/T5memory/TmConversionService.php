@@ -84,21 +84,25 @@ class TmConversionService
      */
     public function createRuleHashes(int $languageResourceId, int $languageId): array
     {
-        $lang = ZfExtended_Factory::get(editor_Models_Languages::class);
-        $lang->load($languageId);
+        $languageRulesHash = ZfExtended_Factory::get(LanguageRulesHash::class);
+        try {
+            $languageRulesHash->loadByLanguageId($languageId);
+            $hash = $languageRulesHash->getHash();
+        } catch (ZfExtended_Models_Entity_NotFoundException) {
+            $lang = ZfExtended_Factory::get(editor_Models_Languages::class);
+            $lang->load($languageId);
+            $hash = $this->contentProtectionRepository->getRulesHashBy($lang);
 
-        $hash = $this->contentProtectionRepository->getRulesHashBy($lang);
+            $languageRulesHash->setLanguageId($languageId);
+            $languageRulesHash->setHash($hash);
+            $languageRulesHash->save();
+        }
 
         $languageResourceRulesHash = ZfExtended_Factory::get(LanguageResourceRulesHash::class);
         $languageResourceRulesHash->setLanguageResourceId($languageResourceId);
         $languageResourceRulesHash->setLanguageId($languageId);
         $languageResourceRulesHash->setHash($hash);
         $languageResourceRulesHash->save();
-
-        $languageRulesHash = ZfExtended_Factory::get(LanguageRulesHash::class);
-        $languageRulesHash->setLanguageId($languageId);
-        $languageRulesHash->setHash($hash);
-        $languageRulesHash->save();
 
         return [$languageResourceRulesHash, $languageRulesHash];
     }
