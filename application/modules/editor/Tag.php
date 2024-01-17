@@ -998,6 +998,7 @@ class editor_Tag {
         return $this->render();
     }
     /**
+     * Renders the children (text-nodes & markup-nodes)
      * @param string[] $skippedTypes: meaningful only in inheriting classes
      * @return string
      */
@@ -1006,6 +1007,23 @@ class editor_Tag {
         if($this->hasChildren()){
             foreach($this->children as $child){
                 $html .= $child->render($skippedTypes);
+            }
+        }
+        return $html;
+    }
+
+    /**
+     * Renders the replaced contents what usually means without markup
+     * (only internal tags may have markup depending on the mode)
+     * @param string $mode
+     * @return string
+     */
+    public function renderReplaced(string $mode): string
+    {
+        $html = '';
+        if($this->hasChildren()){
+            foreach($this->children as $child){
+                $html .= $child->renderReplaced($mode);
             }
         }
         return $html;

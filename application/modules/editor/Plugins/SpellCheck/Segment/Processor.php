@@ -155,7 +155,7 @@ class Processor extends AbstractProcessor
             foreach ($tags->getTargets() as $target) {
 
                 // Add targetField's value to the list of to be processed
-                Check::addBatchTarget($segment, $target->getField());
+                Check::addBatchTarget($segment, $target);
 
                 // Prevent other target-columns from being processed as this is not fully supported yet
                 break;
@@ -188,7 +188,7 @@ class Processor extends AbstractProcessor
         foreach ($segmentTags->getTargets() as $target) {
 
             // Do check
-            $check = new Check($segment, $target->getField(), $this->adapter, $this->language);
+            $check = new Check($segment, $target, $this->adapter, $this->language);
 
             // Process check results
             foreach ($check->getStates() as $category => $qualities) {

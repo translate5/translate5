@@ -105,17 +105,9 @@ Ext.define('Editor.view.ViewPortEditor', {
             region: 'center', // implicit flex:1
             height: 236, // 236 is high enough to show all action buttons on the right
             xtype: 'segments.grid',
-                id: 'segment-grid',
-                itemId: 'segmentgrid',
-                stateful: {
-                    segmentSize: true,
-                    columns: true,
-                    sorters: false,
-                    filters: false,
-                    grouper: false,
-                    storeState: false // → does not work
-                }
-                //stateful:true → see additional config in Grid Class
+            id: 'segment-grid',
+            itemId: 'segmentgrid',
+            stateful:true
         },{
             xtype: 'panel',
             stateId: 'editor.eastPanel',

@@ -46,6 +46,53 @@ Ext.define('Editor.view.quality.FalsePositivesController', {
     falsePositiveCssClass: 't5qfalpos', // as defined in editor_segment_Tag::CSS_CLASS_FALSEPOSITIVE. TODO FIXME: better add to Editor.data ?
     qualityIdDataName: 't5qid', // as defined in editor_segment_Tag::DATA_NAME_QUALITYID. TODO FIXME: better add to Editor.data ?
 
+    statics: {
+
+        /**
+         * Update data-t5qfp="true/false" attribute for the quality tag/node
+         *
+         * @param {int} qualityId
+         * @param {boolean} falsePositive
+         */
+        applyFalsePositiveStyle: function(qualityId, falsePositive) {
+            // Get quality tags/nodes
+            var tags = document.querySelectorAll('[data-t5qid="' + qualityId + '"]'),
+                tip = Editor.data.l10n.falsePositives.hover, cell, row, rid, rec;
+
+            // If found - update data-t5qfp="" attribute
+            tags.forEach(tag => {
+
+                // Update data-t5qfp attr
+                tag.setAttribute('data-t5qfp', falsePositive ? 'true' : 'false');
+
+                // Set/remove data-qtip attr
+                if(falsePositive){
+                    tag.removeAttribute('data-qtip');
+                } else {
+                    tag.setAttribute('data-qtip', tip);
+                }
+
+                // If tag is inside source-column
+                cell = tag.closest('td[data-columnid="sourceColumn"]');
+                if (cell) {
+
+                    // Get record
+                    row = cell.closest('table.x-grid-item');
+                    rid = row.getAttribute('data-recordid');
+                    rec = Ext.getCmp(row.getAttribute('data-boundview')).getStore().getByInternalId(rid);
+
+                    // Update source, so that updated value will be picked by segmenteditor once opened
+                    tag.removeAttribute('id');
+                    rec.set('source', cell.querySelector('.x-grid-cell-inner').innerHTML + '');
+
+                    // Set up sourceUpdated-flag to prevent endless loop
+                    rec.set('sourceUpdated', true);
+                    rec.commit();
+                }
+            });
+        }
+    },
+
     /**
      * When QMs are set/unset, our store will have entries added/removed an we have to reflect this
      */
@@ -57,7 +104,7 @@ Ext.define('Editor.view.quality.FalsePositivesController', {
      * Handler to sync the new state with the server (to catch false positives without tags) & add decorations in the editor
      */
     onFalsePositiveChanged: function(column, rowIndex, checked, record){
-        var me = this, vm = this.getViewModel(), qualityId = record.get('id'), falsePositive = (checked) ? 1 : 0,
+        var qualityId = record.get('id'), falsePositive = (checked) ? 1 : 0,
             other, otherRec;
 
         // If there are tags in the editor we need to decorate them
@@ -85,7 +132,7 @@ Ext.define('Editor.view.quality.FalsePositivesController', {
                 record.commit();
 
                 // Update data-t5qfp="true/false" attribute for the quality tag/node
-                me.applyFalsePositiveStyle(record.get('id'), falsePositive);
+                Editor.view.quality.FalsePositivesController.applyFalsePositiveStyle(record.get('id'), falsePositive);
 
                 // Prepare component query selector for other instance of falsePositive-panel
                 other = 'falsePositives[floating=' + (!column.up('fieldset').floating).toString() + ']';
@@ -123,54 +170,12 @@ Ext.define('Editor.view.quality.FalsePositivesController', {
     },
 
     /**
-     * Update data-t5qfp="true/false" attribute for the quality tag/node
-     *
-     * @param qualityId
-     * @param falsePositive
-     */
-    applyFalsePositiveStyle: function(qualityId, falsePositive) {
-
-        // Get quality tags/nodes
-        var tagA = document.querySelectorAll('[data-t5qid="' + qualityId + '"]'),
-            tip = Editor.data.l10n.falsePositives.hover, cell, row, rid, rec;
-
-        // If found - update data-t5qfp="" attribute
-        tagA.forEach(tag => {
-
-            // Update data-t5qfp attr
-            tag.setAttribute('data-t5qfp', falsePositive ? 'true' : 'false');
-
-            // Set/remove data-qtip attr
-            falsePositive
-                ? tag.removeAttribute('data-qtip')
-                : tag.setAttribute('data-qtip', tip);
-
-            // If tag is inside source-column
-            if (cell = tag.closest('td[data-columnid="sourceColumn"]')) {
-
-                // Get record
-                row = cell.closest('table.x-grid-item');
-                rid = row.getAttribute('data-recordid');
-                rec = Ext.getCmp(row.getAttribute('data-boundview')).getStore().getByInternalId(rid);
-
-                // Update source, so that updated value will be picked by segmenteditor once opened
-                tag.removeAttribute('id');
-                rec.set('source', cell.querySelector('.x-grid-cell-inner').innerHTML + '');
-
-                // Set up sourceUpdated-flag to prevent endless loop
-                rec.set('sourceUpdated', true);
-                rec.commit();
-            }
-        });
-    },
-
-    /**
      * Spread falsePositive-flag's state for all other occurrences of such [quality - content] pair across the task
      *
      * @param button
      */
     onFalsePositiveSpread: function(button) {
-        var me = this, vm = this.getViewModel(), record = button.getWidgetRecord(), other, otherRec;
+        var vm = this.getViewModel(), record = button.getWidgetRecord(), other;
 
         // Change the value in the checkbox-column
         record.set('falsePositive', record.get('falsePositive') ? 0 : 1);
@@ -198,7 +203,7 @@ Ext.define('Editor.view.quality.FalsePositivesController', {
                 if (json = Ext.JSON.decode(xhr.responseText, true)) {
 
                     // Update data-t5qfp="true/false" attribute for the similar qualities tags/nodes
-                    json.ids.forEach((id) => me.applyFalsePositiveStyle(id, record.get('falsePositive')));
+                    json.ids.forEach((id) => Editor.view.quality.FalsePositivesController.applyFalsePositiveStyle(id, record.get('falsePositive')));
                 }
 
                 // Hide floating panel if click came from there
@@ -231,7 +236,10 @@ Ext.define('Editor.view.quality.FalsePositivesController', {
         meta.tdCls += ' quality';
 
         // Build label
-        var qlty = record.get('typeText'); if (qlty !== text) qlty += ' » ' + text;
+        var qlty = record.get('typeText');
+        if (qlty !== text) {
+            qlty += ' » ' + text;
+        }
 
         // Category index shortcut
         var cidx = record.get('categoryIndex');
@@ -249,7 +257,7 @@ Ext.define('Editor.view.quality.FalsePositivesController', {
         // Apply qtip for record if we're NOT inside floating false-positives panel
         if (!view.up('falsePositives[floating]')) {
             if (rowIndex < 10) {
-                meta.tdAttr = 'data-qtip="Ctrl + Alt + ' + (rowIndex === 9 ? 0 : rowIndex + 1) + '"'
+                meta.tdAttr = 'data-qtip="Ctrl + Alt + ' + (rowIndex === 9 ? 0 : rowIndex + 1) + '"';
             }
         }
 
@@ -273,7 +281,7 @@ Ext.define('Editor.view.quality.FalsePositivesController', {
         // if not found in the html-editor we search in the other contents of the html-editor. This is only for optical reasons
         htmlEditor = Ext.ComponentQuery.query('#roweditor')[0];
         if(htmlEditor){
-            elements = htmlEditor.getEl().dom.querySelectorAll('.segment-tag-container ' + selector);
+            var elements = htmlEditor.getEl().dom.querySelectorAll('.segment-tag-container ' + selector);
             return this.decorateElements(elements, checked);
         }
         return false;

@@ -39,6 +39,9 @@ Ext.define('Editor.store.admin.Users', {
   remoteSort: true,
   pageSize: 0,
   userGuidName: {},
+  statefulFilters: true,
+  trackStateChanges: true,
+
   /**
    * returns the Username either by id or by guid
    * getting by guid caches the association guid => username internally

@@ -32,6 +32,11 @@ END LICENSE AND COPYRIGHT
 Ext.define('Editor.controller.SegmentQualitiesBase', {
     extend: 'Ext.app.Controller',
 
+    requires:[
+        'Editor.util.dom.Manipulation',
+        'Editor.view.quality.FalsePositivesController'
+    ],
+
     mixins: [
         'Editor.util.Range',
         'Editor.util.SegmentEditor',
@@ -111,183 +116,68 @@ Ext.define('Editor.controller.SegmentQualitiesBase', {
 
                         // Foreach quality - apply false positive styles
                         for (const quality of data[field]) {
-                            this.applyFalsePositiveStyle(quality.id, quality.falsePositive);
+                            Editor.view.quality.FalsePositivesController.applyFalsePositiveStyle(quality.id, quality.falsePositive);
                         }
 
                     // Else if we're going to apply styles for other quality types (only spellcheck-qualities currently)
                     } else {
 
-                        // Make sure each match range to have it's own node ref
-                        data[field].forEach(match => match.range.containerNode = cellNode);
-
                         // Apply matches
-                        this.applyCustomMatches(cellNode, data[field], operation === 'cancelled');
+                        this.applyCustomMatches(cellNode, data[field]);
                     }
                 }
             }
         }
     },
 
-    applyCustomMatches: function (cellNode, matches, skipMindTags) {
+    /* structure of a match:
+
+        {
+            "content": " potrebu",
+            "matchIndex": 0,
+            "range": {
+              "start": 165,
+              "end": 173
+            },
+            "message": "Najdena morebitna napaka pri črkovanju.",
+            "replacements": [
+              "Krnčevega",
+              "krnečega"
+            ],
+            "infoURLs": [],
+            "cssClassErrorType": "t5misspelling",
+            "id": 296556,
+            "falsePositive": 0
+          }
+
+        */
+    applyCustomMatches: function (cellNode, matches) {
         if (!cellNode || !this.editor) {
             return;
         }
 
-        let me = this,
-            rangeForMatch,
-            documentFragmentForMatch,
-            qualityHighlightNode;
+        var match, decorationProps,
+            domManipulation = Ext.create('Editor.util.dom.Manipulation'),
+            // full definition of internal-tags and with which placeholders they are sent
+            // CRUCIAL: more qualified classes must come first !
+            // see MittagQI\Translate5\Plugins\SpellCheck\Segment\Check
+            ignored = [
+                { "tag": "div", "classes": ["newline", "internal-tag"], "placeholder": "\n" },
+                { "tag": "div", "classes": ["space", "internal-tag"], "placeholder": " " },
+                { "tag": "div", "classes": ["tab", "internal-tag"], "placeholder": "\t" },
+                { "tag": "div", "classes": ["nbsp", "internal-tag"], "placeholder": " " },
+                { "tag": "div", "classes": ["char", "internal-tag"], "placeholder": "□" },
+                { "tag": "div", "classes": ["internal-tag"], "placeholder": '' },
+                { "tag": "del", "classes": [], "placeholder": '' },
+            ];
 
-        // apply the matches (iterate in reverse order; otherwise the ranges get lost due to DOM-changes "in front of them")
-        me.cleanUpNode(cellNode);
-        rangeForMatch = rangy.createRange(cellNode);
-        Ext.Array.each(matches, function (match, index) {
-            if (!skipMindTags) {
-                me.mindTags(match);
-            }
-
-            rangeForMatch.moveToBookmark(match.range);
-            rangeForMatch = me.cleanBordersOfCharacterbasedRange(rangeForMatch);
-            documentFragmentForMatch = rangeForMatch.extractContents();
-            qualityHighlightNode = me.createQualityHighlightNode(index, matches);
-            qualityHighlightNode.appendChild(documentFragmentForMatch);
-            rangeForMatch.insertNode(qualityHighlightNode);
-        }, me, true);
-    },
-
-    mindTags: function (match) {
-        let shift,
-            html = new Editor.util.HtmlCleanup().cleanHtmlTags(
-                match.range.containerNode.innerHTML
-                    .replace(/title="[^"]+"/g, (attr) => {
-                        return attr.replace(/</g, '&lt;').replace(/>/g, '&gt;')
-                    })
-                    .replace(/<([0-9]+)\/>/g, '&lt;$1/&gt;'), '<del>'
-            ).replace(/&lt;/g, '<').replace(/&gt;/g, '>'),
-            tagm,
-            tags = [],
-            tag, start,
-            end,
-            debug = false;
-
-        // Create backup for initial offsets
-        if (!('backup' in match)) match.backup = {
-            start: match.range.start + 0,
-            end: match.range.end + 0
+        for(var i = 0; i < matches.length; i++){
+            match = matches[i];
+            decorationProps = this.createQualityHighlightProps(match, i);
+            domManipulation
+                .selectIndices(cellNode, match.range.start, match.range.end, ignored)
+                .decorate(decorationProps.tagName, decorationProps.classes, decorationProps.attributes);
         }
-
-        // Debug
-        if (debug) {
-            console.log('html before', match.range.containerNode.innerHTML);
-            console.log('html after', html);
-        }
-
-        // Get regexp iterator containing matches
-        tagm = html.matchAll(/(?<del><del.*?>)(.+?)<\/del>|(?<white><[0-9]+\/>)|(?<other><\/?[^>]+>)/g);
-
-        // Get array of matches for further use to be more handy
-        while (tag = tagm.next()) {
-            if (tag.value) {
-                tags.push(tag.value);
-            } else {
-                break;
-            }
-        }
-
-        // Debug
-        if (debug) {
-            console.log(tags);
-            console.log('match.backup.start', match.backup.start);
-        }
-
-        // Shortcuts
-        start = match.backup.start + 0;
-        end = match.backup.end + 0;
-
-        // Foreach tag
-        for (let i = 0; i < tags.length; i++) {
-
-            // Debug
-            if (debug) { console.log('tag#', i, 'was index', tags[i].index); }
-
-            // Reduce current tag match index (offset position) by cutting off html stuff of previous tags to make
-            // it possible to rely on that index (offset position) while spell check styles coords calculation
-            for (let j = 0; j < i; j++) {
-
-                // If it's one of the del-tags
-                if (tags[j].groups.del) {
-                    tags[i].index -= tags[j][0].length - tags[j][2].length;
-                }
-            }
-
-            // Debug
-            if (debug) {  console.log('tag#', i, 'now index', tags[i].index, 'start is', start); }
-
-            // If current tag appears before the word having quality-error
-            if (tags[i].index <= start) {
-
-                // Debug
-                if (debug) { console.log('tag#', i, 'both start and end will be shifted'); }
-
-                // If it's one of the whitespace-tags
-                if (tags[i][2] === undefined) {
-
-                    // Shift quality coords to the right, by whitespace-tag's outerHTML length,
-                    // which is = 4 in most cases, as whitespace tags look like <1/>, <2/> etc
-                    shift = tags[i][0].length;
-
-                    // Else if it's one of the del-tags
-                } else {
-
-                    // Shift quality coords to the right, by del-tags content length
-                    shift = tags[i][2].length;
-                }
-
-                // Debug
-                if (debug) { console.log('tag#', i, 'start was', start, 'start now', start + shift); }
-
-                // Do shift
-                start += shift;
-                end += shift;
-
-            // Else if current tag appears after the position where the word
-            // having quality-error begins, but before the position where the word ends
-            } else if (tags[i].index <= end) {
-
-                // Debug
-                if (debug) { console.log('tag#', i, 'end will be shifted only, end is', end); }
-
-                // If it's one of the whitespace-tags
-                if (tags[i][2] === undefined) {
-
-                    // Shift quality coords to the right, by whitespace-tag's outerHTML length,
-                    // which is = 4 in most cases, as whitespace tags look like <1/>, <2/> etc
-                    shift = tags[i][0].length;
-
-                // Else if it's one of the del-tags
-                } else {
-
-                    // Shift quality coords to the right, by del-tags content length
-                    shift = tags[i][2].length;
-                }
-
-                // Debug
-                if (debug) { console.log('tag#', i, 'end was', end, 'end now', end + shift); }
-
-                // Do shift
-                end += shift;
-            }
-        }
-
-        // Debug
-        if (debug) { console.log(html, 'was', [match.backup.start, match.backup.end], 'shifted by ', start - match.backup.start); }
-
-        // Update offsets
-        match.range.start = start;
-        match.range.end = end;
-
-        // Debug
-        if (debug) { console.log(html, 'now', [match.range.start, match.range.end]); }
     },
 
     onEditableColumnRender: function (column) {
@@ -310,7 +200,7 @@ Ext.define('Editor.controller.SegmentQualitiesBase', {
     },
 
     /**
-     * Create and return a new node for Quality-Match of the given index.
+     * Create the element-properties for a Quality-Match of the given index.
      * For match-specific data, get the data from the tool.
      *
      * @param {integer} index
@@ -318,23 +208,20 @@ Ext.define('Editor.controller.SegmentQualitiesBase', {
      *
      * @returns {Object}
      */
-    createQualityHighlightNode: function(index, matches){
-        let me = this,
-            match = matches ? matches[index] : me.allMatches[index],
-            nodeElParams = { tag: me.self.NODE_NAME_MATCH };
-        // CSS-class(es)
-        nodeElParams['cls'] = me.self.CSS_CLASSNAME_MATCH + ' ' + match.cssClassErrorType;
+    createQualityHighlightProps: function(match, index){
+        var props = {
+            tagName: this.self.NODE_NAME_MATCH,
+            classes: [ this.self.CSS_CLASSNAME_MATCH, match.cssClassErrorType ],
+            attributes: {}
+        };
         // activeMatchIndex
-        nodeElParams[me.self.ATTRIBUTE_ACTIVEMATCHINDEX] = index;
-        nodeElParams[me.self.ATTRIBUTE_QUALITY_ID] = match.id;
-        nodeElParams[me.self.ATTRIBUTE_QUALITY_FALSEPOSITIVE] = match.falsePositive ? 'true' : 'false';
+        props.attributes[this.self.ATTRIBUTE_ACTIVEMATCHINDEX] = index;
+        props.attributes[this.self.ATTRIBUTE_QUALITY_ID] = match.id;
+        props.attributes[this.self.ATTRIBUTE_QUALITY_FALSEPOSITIVE] = match.falsePositive ? 'true' : 'false';
         if (!match.falsePositive) {
-            nodeElParams[me.self.ATTRIBUTE_QUALITY_FALSEPOSITIVE_TIP] = Editor.data.l10n.falsePositives.hover;
+            props.attributes[this.self.ATTRIBUTE_QUALITY_FALSEPOSITIVE_TIP] = Editor.data.l10n.falsePositives.hover;
         }
-        // create and return node
-        return Ext.DomHelper.createDom(nodeElParams);
-    },
-}, function() {
-    // TODO FIXME: make the target function static ... and get rid of the ugly "borrow"
-    this.borrow(Editor.view.quality.FalsePositivesController, ['applyFalsePositiveStyle']);
+        // create and return node-props
+        return props;
+    }
 });

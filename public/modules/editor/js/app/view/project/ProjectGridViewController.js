@@ -45,6 +45,12 @@ Ext.define('Editor.view.project.ProjectGridViewController', {
         component:{
             '#resetFilterBtn':{
                 click:'onResetFilterButtonClick'
+            },
+            '#onlyMyProjects': {
+                click: 'onlyMyProjectsClick'
+            },
+            'projectGrid': {
+                filterchange: 'onProjectGridFilterChange'
             }
         }
     },
@@ -64,6 +70,48 @@ Ext.define('Editor.view.project.ProjectGridViewController', {
         }
 
         project.load();
+    },
+
+    /**
+     * Set/clear filter for pmName-column
+     *
+     * @param btn
+     */
+    onlyMyProjectsClick: function(btn) {
+        var me = this,
+            grid = me.getView(),
+            column = grid.down('[dataIndex=pmName]');
+
+        if (column && column.filter) {
+            if (btn.pressed) {
+                column.filter.filter.setValue(Editor.data.app.user.longUserName);
+                column.filter.active = false;
+                column.filter.setActive(true);
+            } else {
+                column.filter.setActive(false);
+            }
+        }
+    },
+
+    /**
+     * Make sure #onlyMyProjects is pressed based on whether pmName-column's filter value is Editor.data.app.user.longUserName
+     *
+     * @param store
+     * @param filters
+     */
+    onProjectGridFilterChange: function(store, filters) {
+        var me = this,
+            grid = me.getView(),
+            button = grid.down('#onlyMyProjects'),
+            pressed = false;
+
+        filters.forEach(filter => {
+            if (filter.getProperty() === 'pmName' && filter.getValue() === Editor.data.app.user.longUserName) {
+                pressed = true;
+            }
+        });
+
+        button.setPressed(pressed);
     },
 
     handleProjectReload: function (task, ev) {

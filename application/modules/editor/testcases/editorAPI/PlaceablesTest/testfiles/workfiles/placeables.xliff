@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2" xmlns:ax="AcrossXliff" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="urn:oasis:names:tc:xliff:document:1.2 xliff-core-1.2-transitional.xsd" ax:time-stamp="03/22/2023 10:06:58">
+  <file source-language="en-GB" ax:src-lang="7a65eb90-eab3-489b-9080-4df129b60f8f" target-language="sl-SI" ax:trg-lang="1c35e6db-f6e1-4d2d-a964-2af4d92aeb20" original="placeables.idml" datatype="x-across-translation" category="ExampleTopic" ax:start-date="03/22/2023 08:28:39" ax:due-date="03/28/2023 15:00:31">
+    <header>
+      <tool tool-id="Across.XLIFF" tool-name="Across.XLIFF" tool-version="1.2" tool-company="Across Systems GmbH" />
+      <ax:project>
+        <ax:name>placeables-test</ax:name>
+        <ax:responsible-person contact-name="Joe Doe" contact-email="joe.doe@example.info" />
+      </ax:project>
+      <ax:properties>
+        <ax:property name="subjects">
+          <ax:value>Subjects</ax:value>
+        </ax:property>
+        <ax:property name="relations">
+          <ax:value>Standard</ax:value>
+        </ax:property>
+        <ax:property name="Business Division">
+          <ax:value>04 Personal Health Care</ax:value>
+        </ax:property>
+      </ax:properties>
+    </header>
+    <body>
+      <trans-unit id="01" ax:state-name="Corrected" ax:state-id="4" ax:state-flags="37748736">
+        <source><bpt id="1" rid="1" ax:s-id="11" ax:s-is-base-style="True" ax:s-font-name="Myriad Pro Cond" ax:s-font-size="7.5" ax:s-fore-color="-16777216" ax:s-script="Baseline" ax:s-caps="Normal" /><bpt id="3" rid="2" ax:s-id="3" />Thank you for choosing a <ph id="5" ax:element-id="6000">COMPANY</ph> blood pressure monitor.<ept id="4" rid="2" /><ept id="2" rid="1" /></source>
+        <target><bpt id="1" rid="1" ax:s-id="11" ax:s-is-base-style="True" ax:s-font-name="Myriad Pro Cond" ax:s-font-size="7.5" ax:s-fore-color="-16777216" ax:s-script="Baseline" ax:s-caps="Normal" /><bpt id="3" rid="2" ax:s-id="3" />Zahvaljujemo se vam, ker ste izbrali meilnik krvnega tlaka <ph id="5" ax:element-id="6000">COMPANY</ph>.<ept id="4" rid="2" /><ept id="2" rid="1" /></target>
+        <context-group>
+          <context context-type="x-xpath">Story34.xml/Story/Story[@Self="u134"]/ParagraphStyleRange[3]/CharacterStyleRange[1]</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="02" ax:state-name="Corrected" ax:state-id="4" ax:state-flags="37748736">
+        <source><bpt id="1" rid="1" ax:s-id="11" ax:s-is-base-style="True" ax:s-font-name="Myriad Pro Cond" ax:s-font-size="7.5" ax:s-fore-color="-16777216" ax:s-script="Baseline" ax:s-caps="Normal" /><bpt id="3" rid="2" ax:s-id="3" />The <ph id="5" ax:element-id="6000">Product® BPU 26</ph> is a quality product intended for fully automatic blood pressure measurement on the upper arm of adults and is suitable for clinical and domestic use.<ept id="4" rid="2" /><ept id="2" rid="1" /></source>
+        <target><bpt id="1" rid="1" ax:s-id="11" ax:s-is-base-style="True" ax:s-font-name="Myriad Pro Cond" ax:s-font-size="7.5" ax:s-fore-color="-16777216" ax:s-script="Baseline" ax:s-caps="Normal" /><bpt id="3" rid="2" ax:s-id="3" /><ph id="5" ax:element-id="6000">Product® BPU 26</ph> je kakovosten proizvod, namenjen za samodejno merijenje krvnega tlaka na nadlakti odrasle osebe in je primeren za klinično ter domačo uporabo.<ept id="4" rid="2" /><ept id="2" rid="1" /></target>
+        <context-group>
+          <context context-type="x-xpath">Story34.xml/Story/Story[@Self="u134"]/ParagraphStyleRange[3]/CharacterStyleRange[1]</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="03" ax:state-name="Corrected" ax:state-id="4" ax:state-flags="37748736">
+        <source><bpt id="1" rid="1" ax:s-id="11" ax:s-is-base-style="True" ax:s-font-name="Myriad Pro Cond" ax:s-font-size="7.5" ax:s-fore-color="-16777216" ax:s-script="Baseline" ax:s-caps="Normal" /><bpt id="3" rid="2" ax:s-id="3" />Requiring no preliminary settings, this blood pressure monitor easily and automatically inflates for simple, quick and reliable measurement of the systolic and diastolic blood pressure and the pulse rate.<ept id="4" rid="2" /><ept id="2" rid="1" /></source>
+        <target><bpt id="1" rid="1" ax:s-id="11" ax:s-is-base-style="True" ax:s-font-name="Myriad Pro Cond" ax:s-font-size="7.5" ax:s-fore-color="-16777216" ax:s-script="Baseline" ax:s-caps="Normal" /><bpt id="3" rid="2" ax:s-id="3" />Merilnik krvnega tlaka ne potrebuje predhodnih nastavitev in se preprosto ter samodejno napihne, da hitro in zanesljivo izmeri meritev sistoličnega in diastoličnega krnevega tlaka ter frekvenco srčnega utripa.<ept id="4" rid="2" /><ept id="2" rid="1" /></target>
+        <context-group>
+          <context context-type="x-xpath">Story34.xml/Story/Story[@Self="u134"]/ParagraphStyleRange[3]/CharacterStyleRange[1]</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="04" ax:state-name="Corrected" ax:state-id="4" ax:state-flags="37748736">
+        <source><bpt id="1" rid="1" ax:s-id="11" ax:s-is-base-style="True" ax:s-font-name="Myriad Pro Cond" ax:s-font-size="7.5" ax:s-fore-color="-16777216" ax:s-script="Baseline" ax:s-caps="Normal" /><bpt id="3" rid="2" ax:s-id="3" />The monitor also indicates if it detects an irregular heartbeat.<ept id="4" rid="2" /><ept id="2" rid="1" /></source>
+        <target><bpt id="1" rid="1" ax:s-id="11" ax:s-is-base-style="True" ax:s-font-name="Myriad Pro Cond" ax:s-font-size="7.5" ax:s-fore-color="-16777216" ax:s-script="Baseline" ax:s-caps="Normal" /><bpt id="3" rid="2" ax:s-id="3" />Merilnik vas prav tako opozori v primeru nepravilnega srčnega utripa.<ept id="4" rid="2" /><ept id="2" rid="1" /></target>
+        <context-group>
+          <context context-type="x-xpath">Story34.xml/Story/Story[@Self="u134"]/ParagraphStyleRange[3]/CharacterStyleRange[1]/Content[2]</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="05" ax:state-name="Corrected" ax:state-id="4" ax:state-flags="37748736">
+        <source><bpt id="1" rid="1" ax:s-id="11" ax:s-is-base-style="True" ax:s-font-name="Myriad Pro Cond" ax:s-font-size="7.5" ax:s-fore-color="-16777216" ax:s-script="Baseline" ax:s-caps="Normal" /><bpt id="3" rid="2" ax:s-id="3" />The blood pressure monitor can be connected to a smartphone or tablet via <ept id="4" rid="2" /><bpt id="5" rid="3" ax:s-id="3" /><ph id="7" ax:element-id="6000">Bluetooth®</ph>.<ept id="6" rid="3" /><ept id="2" rid="1" /></source>
+        <target><bpt id="1" rid="1" ax:s-id="11" ax:s-is-base-style="True" ax:s-font-name="Myriad Pro Cond" ax:s-font-size="7.5" ax:s-fore-color="-16777216" ax:s-script="Baseline" ax:s-caps="Normal" /><bpt id="3" rid="2" ax:s-id="3" />Merilnik krvnega tlaka je mogoče povezati s pametnim telefonom ali tabličnim računalnikom prek tehnologije <ph id="5" ax:element-id="6000">Bluetooth®</ph>.<ept id="4" rid="2" /><ept id="2" rid="1" /></target>
+        <context-group>
+          <context context-type="x-xpath">Story34.xml/Story/Story[@Self="u134"]/ParagraphStyleRange[3]/CharacterStyleRange[1]/Content[3]</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="06" ax:state-name="Corrected" ax:state-id="4" ax:state-flags="37748736">
+        <source><bpt id="1" rid="1" ax:s-id="11" ax:s-is-base-style="True" ax:s-font-name="Myriad Pro Cond" ax:s-font-size="7.5" ax:s-fore-color="-16777216" ax:s-script="Baseline" ax:s-caps="Normal" /><bpt id="3" rid="2" ax:s-id="3" />On the smartphone/tablet you can evaluate the measured values using the <ph id="5" ax:element-id="6000">Product® some.thing</ph> app.<ept id="4" rid="2" /><ept id="2" rid="1" /></source>
+        <target><bpt id="1" rid="1" ax:s-id="11" ax:s-is-base-style="True" ax:s-font-name="Myriad Pro Cond" ax:s-font-size="7.5" ax:s-fore-color="-16777216" ax:s-script="Baseline" ax:s-caps="Normal" /><bpt id="3" rid="2" ax:s-id="3" />Na zaslonu pametnega telefona/tabličnega računalnika lahko ovrednotite izmerjene vrednosti prek aplikacije <ph id="5" ax:element-id="6000">Product® some.thing</ph>.<ept id="4" rid="2" /><ept id="2" rid="1" /></target>
+        <context-group>
+          <context context-type="x-xpath">Story34.xml/Story/Story[@Self="u134"]/ParagraphStyleRange[3]/CharacterStyleRange[1]/Content[3]</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="07" ax:state-name="Corrected" ax:state-id="4" ax:state-flags="37748736">
+        <source><bpt id="1" rid="1" ax:s-id="11" ax:s-is-base-style="True" ax:s-font-name="Myriad Pro Cond" ax:s-font-size="7.5" ax:s-fore-color="-16777216" ax:s-script="Baseline" ax:s-caps="Normal" /><bpt id="3" rid="2" ax:s-id="3" />We wish you the best of health.<ept id="4" rid="2" /><ept id="2" rid="1" /></source>
+        <target><bpt id="1" rid="1" ax:s-id="11" ax:s-is-base-style="True" ax:s-font-name="Myriad Pro Cond" ax:s-font-size="7.5" ax:s-fore-color="-16777216" ax:s-script="Baseline" ax:s-caps="Normal" /><bpt id="3" rid="2" ax:s-id="3" />Želimo vam krepostnega zdravja.<ept id="4" rid="2" /><ept id="2" rid="1" /></target>
+        <context-group>
+          <context context-type="x-xpath">Story34.xml/Story/Story[@Self="u134"]/ParagraphStyleRange[3]/CharacterStyleRange[3]/Content[2]</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="07" ax:state-name="Corrected" ax:state-id="4" ax:state-flags="37748736">
+        <source><bpt id="1" rid="1" ax:s-id="11" ax:s-is-base-style="True" ax:s-font-name="Myriad Pro Cond" ax:s-font-size="7.5" ax:s-fore-color="-16777216" ax:s-script="Baseline" ax:s-caps="Normal" /><bpt id="3" rid="2" ax:s-id="3" />Use the monitor in accordance with the information provided in the instructions for use.<ept id="4" rid="2" /><ept id="2" rid="1" /></source>
+        <target><bpt id="1" rid="1" ax:s-id="11" ax:s-is-base-style="True" ax:s-font-name="Myriad Pro Cond" ax:s-font-size="7.5" ax:s-fore-color="-16777216" ax:s-script="Baseline" ax:s-caps="Normal" /><bpt id="3" rid="2" ax:s-id="3" />Merilnik uporabljajte v skladu z informacijami, navedenimi v navodilh za uporabo.<ept id="4" rid="2" /><ept id="2" rid="1" /></target>
+        <alt-trans match-quality="56%">
+          <source><bpt id="1" rid="1" ax:s-id="10" />Apply the dressings and the <ph id="5" ax:element-id="6001">Product Port</ph>s in <ept id="2" rid="1" /><bpt id="3" rid="2" ax:s-id="13" ax:s-font-name="Myriad Pro Cond" ax:s-font-size="8.0" ax:s-fore-color="-16777216" ax:s-script="Baseline" ax:s-caps="Normal" />accordance with the instructions for use of the <ph id="6" ax:element-id="6000">SomeProduct Foam Kits</ph>.<ept id="4" rid="2" /></source>
+          <target><bpt id="1" rid="1" ax:s-id="13" ax:s-font-name="Myriad Pro Cond" ax:s-font-size="8.0" ax:s-fore-color="-16777216" ax:s-script="Baseline" ax:s-caps="Normal" />Oblogi in priključka <ph id="3" ax:element-id="6001">Product Port</ph> namestite v skladu z navodili za uporabo kompletov<ph id="4" ax:element-id="6000">SomeProduct Foam Kits</ph>.<ept id="2" rid="1" /></target>
+          <ax:properties>
+            <ax:property name="CreatedBy">
+              <ax:value>Some Body</ax:value>
+            </ax:property>
+            <ax:property name="Created">
+              <ax:value>01/25/2022 17:36:56</ax:value>
+            </ax:property>
+            <ax:property name="ModifiedBy">
+              <ax:value>Some Body Else</ax:value>
+            </ax:property>
+            <ax:property name="Modified">
+              <ax:value>03/30/2022 14:51:55</ax:value>
+            </ax:property>
+            <ax:property name="State">
+              <ax:value>Released</ax:value>
+            </ax:property>
+            <ax:property name="Subjects">
+              <ax:value>01_Packaging</ax:value>
+            </ax:property>
+            <ax:property name="Business Division">
+              <ax:value>02 Wound</ax:value>
+            </ax:property>
+            <ax:property name="Relations">
+              <ax:value>Standard</ax:value>
+            </ax:property>
+            <ax:property name="Projects">
+              <ax:value>Some Third Person</ax:value>
+            </ax:property>
+          </ax:properties>
+        </alt-trans>
+        <context-group>
+          <context context-type="x-xpath">Story34.xml/Story/Story[@Self="u134"]/ParagraphStyleRange[3]/CharacterStyleRange[3]/Content[3]</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="08" ax:state-name="Corrected" ax:state-id="4" ax:state-flags="37748736">
+        <source><bpt id="1" rid="1" ax:s-id="11" ax:s-is-base-style="True" ax:s-font-name="Myriad Pro Cond" ax:s-font-size="7.5" ax:s-fore-color="-16777216" ax:s-script="Baseline" ax:s-caps="Normal" /><bpt id="3" rid="2" ax:s-id="3" />You should discuss this with your doctor, especially if you have frequently elevated or borderline blood pressure values (see Chapter 3 ‘Blood pressure information’).<ept id="4" rid="2" /><ept id="2" rid="1" /></source>
+        <target><bpt id="1" rid="1" ax:s-id="11" ax:s-is-base-style="True" ax:s-font-name="Myriad Pro Cond" ax:s-font-size="7.5" ax:s-fore-color="-16777216" ax:s-script="Baseline" ax:s-caps="Normal" /><bpt id="3" rid="2" ax:s-id="3" />O tem se posvetujte s svojim zdravnikom, zlasti če imate začasno povečane ali mejne vrednosti krvnega tlaka (preberite 3. poglavje Informacije o krvnem tlaku).<ept id="4" rid="2" /><ept id="2" rid="1" /></target>
+        <context-group>
+          <context context-type="x-xpath">Story_u509.xml/Story/Story[@Self="u509"]/ParagraphStyleRange[1]/CharacterStyleRange[1]</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="09" ax:state-name="Corrected" ax:state-id="4" ax:state-flags="37748736">
+        <source><bpt id="1" rid="1" ax:s-id="11" ax:s-is-base-style="True" ax:s-font-name="Myriad Pro Cond" ax:s-font-size="7.5" ax:s-fore-color="-16777216" ax:s-script="Baseline" ax:s-caps="Normal" /><bpt id="3" rid="2" ax:s-id="3" />The <ph id="7" ax:element-id="6001">Product® some.thing</ph> app lets you share your readings easily with your doctor by email or as a print-out; (see chapter 7 ‘Transferring measured values via <ept id="4" rid="2" /><bpt id="5" rid="3" ax:s-id="3" /><ph id="8" ax:element-id="6002">Bluetooth®</ph> to the <ph id="9" ax:element-id="6000">Product® some.thing</ph> app‘).<ept id="6" rid="3" /><ept id="2" rid="1" /></source>
+        <target><bpt id="1" rid="1" ax:s-id="11" ax:s-is-base-style="True" ax:s-font-name="Myriad Pro Cond" ax:s-font-size="7.5" ax:s-fore-color="-16777216" ax:s-script="Baseline" ax:s-caps="Normal" /><bpt id="3" rid="2" ax:s-id="3" />Z aplikacijo <ph id="5" ax:element-id="6001">Product® some.thing</ph> lahko rezultate posredujete svojemu zdravniku po e-pošti ali jih natisnete (preberite 7. poglavje Prenos izmerjenih vrednsoti prek tehnologije <ph id="6" ax:element-id="6002">Bluetooth®</ph> v aplikacijo <ph id="7" ax:element-id="6000">Product® some.thing</ph>).<ept id="4" rid="2" /><ept id="2" rid="1" /></target>
+        <context-group>
+          <context context-type="x-xpath">Story_u509.xml/Story/Story[@Self="u509"]/ParagraphStyleRange[1]/CharacterStyleRange[1]</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="10" ax:state-name="Corrected" ax:state-id="4" ax:state-flags="37748736">
+        <source><bpt id="1" rid="1" ax:s-id="11" ax:s-is-base-style="True" ax:s-font-name="Myriad Pro Cond" ax:s-font-size="7.5" ax:s-fore-color="-16777216" ax:s-script="Baseline" ax:s-caps="Normal" /><bpt id="3" rid="2" ax:s-id="3" />Your doctor will initiate appropriate measures.<ept id="4" rid="2" /><ept id="2" rid="1" /></source>
+        <target><bpt id="1" rid="1" ax:s-id="11" ax:s-is-base-style="True" ax:s-font-name="Myriad Pro Cond" ax:s-font-size="7.5" ax:s-fore-color="-16777216" ax:s-script="Baseline" ax:s-caps="Normal" /><bpt id="3" rid="2" ax:s-id="3" />Vaš zdravnik bo poskrbel za ustrezne ukrepe.<ept id="4" rid="2" /><ept id="2" rid="1" /></target>
+        <context-group>
+          <context context-type="x-xpath">Story_u509.xml/Story/Story[@Self="u509"]/ParagraphStyleRange[1]/CharacterStyleRange[1]</context>
+        </context-group>
+      </trans-unit>
+    </body>
+  </file>
+</xliff>
