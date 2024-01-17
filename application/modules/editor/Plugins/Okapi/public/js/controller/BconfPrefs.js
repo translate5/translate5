@@ -171,7 +171,7 @@ Ext.define('Editor.plugins.Okapi.controller.BconfPrefs', {
     /**
      * Validates an added Import file from the Import Wizard
      * If a bconf is selected, we request a special endpoint that checks, if the given extension is in the mapping
-     * This is a validation that only sets a positive responseDataresult (as Okapi is not the only file-parser)
+     * This is a validation that reports only a positive result (as Okapi is not the only file-parser)
      * @param {Editor.model.admin.projectWizard.File} record
      * @param {Editor.view.admin.projectWizard.UploadGridViewController} viewController
      */
@@ -191,7 +191,7 @@ Ext.define('Editor.plugins.Okapi.controller.BconfPrefs', {
                 success: function(response){
                     var responseData = Ext.JSON.decode(response.responseText);
                     if(responseData.success && responseData.extension){
-                        record.valid = true;
+                        record.importable = true;
                     }
                 }
             });

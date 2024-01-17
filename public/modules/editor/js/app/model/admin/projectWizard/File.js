@@ -41,9 +41,9 @@ Ext.define('Editor.model.admin.projectWizard.File', {
     },
 
     /**
-     * Used to validate Wizard files in external contexts
+     * Used to validate Wizard workfiles via event
      */
-    valid: null,
+    importable: false,
 
     fields: [{
         name: 'file'

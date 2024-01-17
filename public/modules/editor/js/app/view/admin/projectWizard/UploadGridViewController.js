@@ -229,11 +229,17 @@ Ext.define('Editor.view.admin.projectWizard.UploadGridViewController', {
      */
     validateWorkFile: function(record){
 
-        // the event may writes the record's "valid" prop which by default is null!
+        // base validation via global list of supported filetypes
+        record.importable = Ext.Array.contains(Editor.data.import.validExtensions, record.getExtension());
+        if(record.importable){
+            return true;
+        }
+
+        // the event may writes the record's "importable" prop in case there are plugins that can parse the filetype
         this.getView().fireEvent('validateWorkfile', record, this);
 
         // the workfile is either valid by plugin-validation/event or the default extensions
-        if(record.valid === true || Ext.Array.contains(Editor.data.import.validExtensions, record.getExtension())) {
+        if(record.importable) {
             return true;
         }
 
