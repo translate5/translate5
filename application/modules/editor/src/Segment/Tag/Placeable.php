@@ -41,7 +41,7 @@ final class Placeable
 {
     const MARKER_CLASS = 't5placeable';
 
-    const DETECTION_REGEX = '~<div\s*class="[^"]*t5placeable[^"]*internal-tag[^"]*"[^>]*>.+?</div>~i';
+    const DETECTION_REGEX = '~<div[^>]*class="[^"]*t5placeable[^"]*internal-tag[^"]*"[^>]*>.+?</div>~i';
 
     const DOCTYPE = '<?xml version="1.0" encoding="UTF-8"?>';
 
