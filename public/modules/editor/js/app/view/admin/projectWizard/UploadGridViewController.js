@@ -249,7 +249,6 @@ Ext.define('Editor.view.admin.projectWizard.UploadGridViewController', {
 
     /**
      * @param {Editor.model.admin.projectWizard.File} record
-     * @param {Object} file
      * @returns {boolean}
      */
     validateReferenceFile: function(record){
@@ -371,7 +370,7 @@ Ext.define('Editor.view.admin.projectWizard.UploadGridViewController', {
     },
 
     /***
-     * Validate if for each uploaded pivot file, there is work-fimele with the same name. If no work-file with the same name is found,
+     * Validate if for each uploaded pivot file, there is work-file with the same name. If no work-file with the same name is found,
      * the pivot file will be marked as error
      */
     validatePivotFileName: function (){
