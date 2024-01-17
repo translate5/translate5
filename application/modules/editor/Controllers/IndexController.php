@@ -340,6 +340,9 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
         $this->view->Php2JsVars()->set('enableSourceEditing', (bool)$rop->import->enableSourceEditing);
 
         // set supported extensions
+        // TODO FIXME: when implementing the "Bconf per workfile" feature, use only the
+        // extensionsWithParser list from FileTypeSupport since then the check for Okapi parseable filetypes
+        // is fully dynamic
         $this->view->Php2JsVars()->set('import.validExtensions', FileTypeSupport::defaultInstance()->getSupportedExtensions());
         $this->view->Php2JsVars()->set(
             'import.forbiddenReferenceExtensions',
