@@ -59,7 +59,13 @@ abstract class editor_Services_Connector_HttpApiAbstract {
      * @var Zend_Http_Response
      */
     protected $response;
-    
+
+    /**
+     * Flag ror json_decode to return an associative array instead of an object from the decoded json responses
+     * @var bool
+     */
+    private bool $associativeResult = false;
+
     /**
      * returns the found errors
      */
@@ -145,7 +151,7 @@ abstract class editor_Services_Connector_HttpApiAbstract {
                 'method' => $this->httpMethod,
                 'url' => $url,
             ];
-            $this->result = json_decode($responseBody);
+            $this->result = json_decode($responseBody, $this->associativeResult);
             
             $lastJsonError = json_last_error();
             
@@ -158,7 +164,7 @@ abstract class editor_Services_Connector_HttpApiAbstract {
                 $responseBody = preg_replace_callback('/[[:cntrl:]]/', function($x){
                     return substr(json_encode($x[0]), 1, -1);
                 }, $responseBody);
-                $this->result = json_decode($responseBody);
+                $this->result = json_decode($responseBody, $this->associativeResult);
                 
                 //get json error to proceed as usual
                 $lastJsonError = json_last_error();
@@ -167,7 +173,7 @@ abstract class editor_Services_Connector_HttpApiAbstract {
             if ($lastJsonError === JSON_ERROR_UTF8) {
                 $responseBody = mb_convert_encoding($responseBody, 'UTF-8', 'UTF-8');
 
-                $this->result = json_decode($responseBody);
+                $this->result = json_decode($responseBody, $this->associativeResult);
 
                 //get json error to proceed as usual
                 $lastJsonError = json_last_error();
@@ -182,5 +188,14 @@ abstract class editor_Services_Connector_HttpApiAbstract {
         }
         
         return empty($this->error);
+    }
+
+    /**
+     * @param bool $associativeResult
+     * @return void
+     */
+    public function setAssociativeResult(bool $associativeResult): void
+    {
+        $this->associativeResult = $associativeResult;
     }
 }
