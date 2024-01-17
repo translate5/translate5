@@ -1487,7 +1487,11 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
      */
     private function checkUpdatedSegment(editor_Models_Segment $segment, bool $recheckOnUpdate): void
     {
-        if (!$this->config->runtimeOptions->LanguageResources->checkSegmentsAfterUpdate
+        if (!in_array(
+                $this->getResource()->getUrl(),
+                $this->config->runtimeOptions->LanguageResources->checkSegmentsAfterUpdate->toArray(),
+                true
+            )
             || !$recheckOnUpdate
         ) {
             // Checking segment after update is disabled in config or in parameter, nothing to do
