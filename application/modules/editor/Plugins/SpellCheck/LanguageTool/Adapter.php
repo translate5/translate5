@@ -175,7 +175,7 @@ final class Adapter {
                 . 'Spellcheck: ' . self::METHOD_LANGUAGES . ' / ' . self::PATH_LANGUAGES
                 . 'Result: ' . "\n"
                 . json_encode(self::$languages['languageTool'],
-                    JSON_PRETTY_PRINT| JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_UNICODE)
+                    JSON_PRETTY_PRINT| JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES)
                 . "\n==========\n"
             );
         }
@@ -277,7 +277,7 @@ final class Adapter {
                 error_log(
                     'Params: ' . "\n"
                     . json_encode(['annotation' => $annotation],
-                        JSON_PRETTY_PRINT| JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_UNICODE)
+                        JSON_PRETTY_PRINT| JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES)
                 );
             }
 
@@ -332,7 +332,7 @@ final class Adapter {
                 error_log(
                     'Result: ' . "\n"
                     . json_encode($result,
-                        JSON_PRETTY_PRINT| JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_UNICODE)
+                        JSON_PRETTY_PRINT| JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES)
                     . "\n==========\n"
                 );
             }
