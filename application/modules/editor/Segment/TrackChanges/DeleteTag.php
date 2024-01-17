@@ -52,4 +52,15 @@ class  editor_Segment_TrackChanges_DeleteTag extends editor_Segment_Tag {
     public function isInsertTag() : bool{
         return false;
     }
+
+    /**
+     * Renders the replaced contents
+     * what must be an empty string for del-tags (not bring present in textual content)
+     * @param string $mode
+     * @return string
+     */
+    public function renderReplaced(string $mode): string
+    {
+        return '';
+    }
 }

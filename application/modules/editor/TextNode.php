@@ -127,6 +127,16 @@ final class editor_TextNode extends editor_Tag {
         return $this->text;
     }
 
+    /**
+     * Text-nodes have to return their text-contents in replaced (stripped) rendering
+     * @param string $mode
+     * @return string
+     */
+    public function renderReplaced(string $mode): string
+    {
+        return $this->text;
+    }
+
     protected function renderStart(bool $withDataAttribs=true) : string {
         return '';
     }
