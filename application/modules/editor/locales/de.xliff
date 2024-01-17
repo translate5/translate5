@@ -7332,6 +7332,10 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
                 <source>Filter zurücksetzen</source>
                 <target>Filter zurücksetzen</target>
             </trans-unit>
+            <trans-unit id='TnVyIG1laW5lIFByb2pla3Rl'>
+                <source>Nur meine Projekte</source>
+                <target>Nur meine Projekte</target>
+            </trans-unit>
             <trans-unit id='UmVzc291cmNlOiB7bmFtZX0='>
                 <source>Ressource: {name}</source>
                 <target>Ressource: {name}</target>

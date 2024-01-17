@@ -68,14 +68,6 @@ Ext.define('Editor.view.project.ProjectPanel', {
             items:[{
                     xtype: 'projectGrid',
                     reference: 'projectGrid',
-                    stateful: {
-                        height: false,
-                        weight: false,
-                        columns: false, //grid state not tested here yet, so save only height and width
-                        width: true
-                    },
-                    stateId: 'projectGrid',
-                    stateEvents: ['resize'], //currently we save sizes only!
                     header: false,
                     region: 'west',
                     split: true,

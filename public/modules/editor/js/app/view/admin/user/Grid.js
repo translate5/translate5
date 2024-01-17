@@ -37,7 +37,7 @@ Ext.define('Editor.view.admin.user.Grid', {
   plugins: ['gridfilters'],
   itemId: 'adminUserGrid',
   controller: 'adminUserGrid',
-  stateId: 'adminUserGrid',
+  stateId: 'editor.adminUserGrid',
   stateful: true,
   cls: 'adminUserGrid',
   title: '#UT#Benutzer',

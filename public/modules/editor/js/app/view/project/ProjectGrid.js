@@ -35,28 +35,10 @@ Ext.define('Editor.view.project.ProjectGrid', {
 	],
 	controller:'projectGrid',
 	itemId: 'projectGrid',
-	strings: {
-		addProject:'#UT#Projekt hinzufügen',
-		addProjectTip:'#UT#Neues Projekt hinzufügen',
-		reloadBtn: '#UT#Aktualisieren',
-		reloadBtnTip: '#UT#Projektliste vom Server aktualisieren.'
-		
-	},
-	text_cols: {
-	      taskActions: '#UT#Aktionen',
-	      customerId: '#UT#Endkunde',
-	      taskName: '#UT#Name',
-	      taskNr: '#UT#Auftragsnr.',
-	      sourceLang: '#UT#Quellsprache',
-	      pmGuid: '#UT#Projektmanager',
-	      orderdate: '#UT#Bestelldatum',
-	      description: '#UT#Projektbeschreibung',
-		  id:'#UT#Id',
-		  notFound: '#UT#nicht gefunden',
-		  resetFilterText:'#UT#Filter zurücksetzen'
-	},
-	stateful:false,
-	plugins: ['gridfilters'],
+	stateful: true,
+    stateId: 'editor.projectGrid',
+    stateEvents: ['resize'], //currently we save sizes only!
+    plugins: ['gridfilters'],
 	store: 'project.Project',
 	viewConfig: {
 	      getRowClass: function(task) {
@@ -103,13 +85,19 @@ Ext.define('Editor.view.project.ProjectGrid', {
                             //Ext.grid.filters.filter.prototype.createMenu.call(this);
                         //}
                     },
-	                text: me.text_cols.id
+                    text: Editor.data.l10n.projectGrid.text_cols.id,
+                    bind: {
+                        text: '{l10n.projectGrid.text_cols.id}'
+                    }
         		},{
-                    text: me.text_cols.taskActions,
                     menuDisabled: true,//must be disabled, because of disappearing filter menu entry on missing filter
                     xtype: 'taskActionColumn',
                     stateId:'taskGridActionColumn',
-                    sortable: false
+                    sortable: false,
+                    text: Editor.data.l10n.projectGrid.text_cols.taskActions,
+                    bind: {
+                        text: '{l10n.projectGrid.text_cols.taskActions}'
+                    }
         		},{
         			xtype: 'gridcolumn',
                     width: 220,
@@ -118,7 +106,10 @@ Ext.define('Editor.view.project.ProjectGrid', {
                     filter: {
                         type: 'string'
                     },
-                    text: me.text_cols.taskName
+                    text: Editor.data.l10n.projectGrid.text_cols.taskName,
+                    bind: {
+                        text: '{l10n.projectGrid.text_cols.taskName}'
+                    }
         		},{
         			xtype: 'gridcolumn',
                     width: 135,
@@ -128,7 +119,10 @@ Ext.define('Editor.view.project.ProjectGrid', {
                     filter: {
                         type: 'customer' // [Multitenancy]
                     },
-                    text: me.text_cols.customerId
+                    text: Editor.data.l10n.projectGrid.text_cols.customerId,
+                    bind: {
+                        text: '{l10n.projectGrid.text_cols.customerId}'
+                    }
         		},{
         			xtype: 'gridcolumn',
                     width: 135,
@@ -147,7 +141,10 @@ Ext.define('Editor.view.project.ProjectGrid', {
                   	  }
                         return ret;
                     },
-                    text: me.text_cols.pmGuid
+                    text: Editor.data.l10n.projectGrid.text_cols.pmGuid,
+                    bind: {
+                        text: '{l10n.projectGrid.text_cols.pmGuid}'
+                    }
         		},{
                     xtype: 'gridcolumn',
                     width: 110,
@@ -160,8 +157,11 @@ Ext.define('Editor.view.project.ProjectGrid', {
                         options: Editor.data.languages,
                         phpMode: false
                     },
-                    tooltip: me.text_cols.sourceLang,
-                    text: me.text_cols.sourceLang,
+                    text: Editor.data.l10n.projectGrid.text_cols.sourceLang,
+                    bind: {
+                        tooltip: '{l10n.projectGrid.text_cols.sourceLang}',
+                        text: '{l10n.projectGrid.text_cols.sourceLang}',
+                    },
                     sortable: false
         		},{
                     xtype: 'gridcolumn',
@@ -172,7 +172,10 @@ Ext.define('Editor.view.project.ProjectGrid', {
                         type: 'string'
                     },
                     tdCls: 'taskNr',
-                    text: me.text_cols.taskNr
+                    text: Editor.data.l10n.projectGrid.text_cols.taskNr,
+                    bind: {
+                        text: '{l10n.projectGrid.text_cols.taskNr}',
+                    }
         		},{
                     xtype: 'gridcolumn',
                     width: 137,
@@ -182,7 +185,10 @@ Ext.define('Editor.view.project.ProjectGrid', {
                         type: 'string'
                     },
                     tdCls: 'description',
-                    text: me.text_cols.description
+                    text: Editor.data.l10n.projectGrid.text_cols.description,
+                    bind: {
+                        text: '{l10n.projectGrid.text_cols.description}'
+                    }
         		},{
                     xtype: 'datecolumn',
                     width: 100,
@@ -192,7 +198,10 @@ Ext.define('Editor.view.project.ProjectGrid', {
                         type: 'date',
                         dateFormat: Editor.DATE_ISO_FORMAT
                     },
-                    text: me.text_cols.orderdate
+                    text: Editor.data.l10n.projectGrid.text_cols.orderdate,
+                    bind: {
+                        text: '{l10n.projectGrid.text_cols.orderdate}'
+                    }
         		}],
         		dockedItems: [{
         	        xtype: 'toolbar',
@@ -204,8 +213,10 @@ Ext.define('Editor.view.project.ProjectGrid', {
         	            xtype: 'button',
         	            glyph: 'f2f1@FontAwesome5FreeSolid',
         	            itemId: 'reloadProjectbtn',
-        	            text: me.strings.reloadBtn,
-        	            tooltip: me.strings.reloadBtnTip
+                        bind: {
+                            text: '{l10n.projectGrid.strings.reloadBtn}',
+                            tooltip: '{l10n.projectGrid.strings.reloadBtnTip}'
+                        }
         	        },{
         	            xtype: 'button',
         	            glyph: 'f067@FontAwesome5FreeSolid',
@@ -218,15 +229,26 @@ Ext.define('Editor.view.project.ProjectGrid', {
                             },
                             scope: 'controller'
                         },
-        	            text: me.strings.addProject,
+                        bind: {
+                            text: '{l10n.projectGrid.strings.addProject}',
+                            tooltip: '{l10n.projectGrid.strings.addProjectTip}'
+                        },
         	            hidden: ! Editor.app.authenticatedUser.isAllowed('editorAddTask'),
-        	            tooltip: me.strings.addProjectTip
         	        },{
                         xtype: 'button',
                         glyph: 'f068@FontAwesome5FreeSolid',
                         itemId: 'resetFilterBtn',
-                        text: me.strings.resetFilterText,
-                        tooltip: me.strings.resetFilterText
+                        bind: {
+                            text: '{l10n.projectGrid.strings.resetFilterText}',
+                            tooltip: '{l10n.projectGrid.strings.resetFilterText}'
+                        }
+                    }, {
+        	            xtype: 'button',
+                        itemId: 'onlyMyProjects',
+                        enableToggle: true,
+                        bind: {
+        	                text: '{l10n.projectGrid.strings.onlyMyProjects}'
+                        }
                     }]
         		}]
         };
@@ -270,7 +292,7 @@ Ext.define('Editor.view.project.ProjectGrid', {
             md.tdAttr = 'data-qtip="' + customer + ' (id: ' + val + ')"';
             return customer;
         }
-        return this.strings.notFound;
+        return Editor.data.l10n.projectGrid.strings.notFound;
     },
     
     /**
@@ -290,7 +312,7 @@ Ext.define('Editor.view.project.ProjectGrid', {
         if (!val || val == "0") {
             return '';
         }
-        return me.strings.notFound;
+        return Editor.data.l10n.projectGrid.strings.notFound;
     },
     
     /***
