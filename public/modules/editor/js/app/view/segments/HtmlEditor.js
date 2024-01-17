@@ -1437,7 +1437,7 @@ Ext.define('Editor.view.segments.HtmlEditor', {
      * Distinguish which field should be used for reference tags
      *
      * @param {String} targetContent
-     * @param {Boolean} pretrans
+     * @param {number} pretrans
      * @returns {string}
      */
     getReferenceField: function (targetContent, pretrans) {
@@ -1452,7 +1452,7 @@ Ext.define('Editor.view.segments.HtmlEditor', {
         }
 
         // If target was filled during pretranslation, use source as reference
-        if (pretrans) {
+        if (0 !== pretrans) {
             return 'source';
         }
 
