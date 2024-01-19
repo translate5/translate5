@@ -137,37 +137,28 @@ class editor_Models_Task_Excel_Metadata extends ZfExtended_Models_Entity_ExcelEx
             ],
         ]);
 
-        // Get custom fields
         $customFields = Factory::get(Field::class)->loadAllSorted();
 
-        // Get current locale
         $locale = ZfExtended_Authentication::getInstance()->getUser()->getLocale();
 
-        // Foreach custom field
         foreach ($customFields as $customField) {
 
             // Get label according to current locale
             $label = json_decode($customField['label'], true)[$locale];
 
-            // Get column dataIndex
             $index = "customField{$customField['id']}";
 
-            // Add heading
             $this->taskCustomColumns[$index]['header'] = $label;
 
-            // If custom field type is boolean
             if ($customField['type'] === 'checkbox') {
 
-                // Get [value => localized title] pairs
                 $this->taskCustomColumns[$index]['value'] = [
                     0 => 'No',
                     1 => 'Yes'
                 ];
 
-            // Else if custom field type is picklist
-            } else if ($customField['type'] === 'combobox') {
+            } elseif ($customField['type'] === 'combobox') {
 
-                // Get [value => localized title] pairs
                 foreach (json_decode($customField['comboboxData'], true) as $value => $l10nTitle) {
                     $this->taskCustomColumns[$index]['value'][$value] = $l10nTitle;
                 }

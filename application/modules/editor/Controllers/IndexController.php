@@ -940,7 +940,7 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
      * @return void
      * @throws ReflectionException
      */
-    public function setupAllowedCustomFields(): void
+    private function setupAllowedCustomFields(): void
     {
         // Setup allowed custom fields
         $auth = ZfExtended_Authentication::getInstance();
