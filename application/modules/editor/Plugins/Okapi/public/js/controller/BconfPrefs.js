@@ -149,7 +149,10 @@ Ext.define('Editor.plugins.Okapi.controller.BconfPrefs', {
         }
     },
     addBconfComboToTaskMainCard: function(taskMainCard){
-        taskMainCard.down('#taskMainCardContainer').add({
+        var leftSide = taskMainCard.down('#taskMainCardContainer'),
+            insertAt = leftSide.query().length - leftSide.query('[isCustom]').length;
+
+        leftSide.insert(insertAt, {
             xtype: 'combobox',
             queryMode: 'local',
             forceSelection: true,

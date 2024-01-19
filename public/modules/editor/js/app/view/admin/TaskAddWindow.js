@@ -118,7 +118,7 @@ Ext.define('Editor.view.admin.TaskAddWindow', {
         var me = this,
             now = new Date(),
             config;
-        
+
         //init the card group arrays
         me.groupCards['preimport']=[];
         me.groupCards['import']=[];

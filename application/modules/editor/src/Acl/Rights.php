@@ -187,6 +187,12 @@ final class Rights extends AbstractResource {
     public const TASK_USER_ASSOC_FRONTEND_CONTROLLER = 'taskUserAssocFrontendController';
 
     /**
+     * allows the usage of the task custom fields (UI)
+     * @group Task custom fields management
+     */
+    public const TASK_CUSTOM_FIELD_FRONTEND_CONTROLLER = 'taskCustomField';
+
+    /**
      * allows usage of GET param force on DELETE task via API,
      *  which deletes the task even if the current task state prohibits it
      * @group Task usage

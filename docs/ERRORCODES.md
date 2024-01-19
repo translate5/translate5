@@ -77,6 +77,7 @@ https://confluence.translate5.net/display/TAD/EventCodes
 | <a id="E2008"></a>E2008 | Validation | Object of type "{0}" already exists having key "{1}"                 | Given key should not be in use by any of existing records so far                                     |
 | <a id="E2009"></a>E2009 | Validation | Value "{0}" of param "{1}" should be minimum "{2}"                   | Greater value must be specified                                                                      |
 | <a id="E2009"></a>E2010 | Validation | Value "{0}" of param "{1}" should be maximum "{2}"                   | Less value must be specified                                                                         |
+| <a id="E1586"></a>E1586 | Validation | Unable to change this entity field                                   | The given value for the entity field is not allowed                                                  |
 
 
 ### Authentication

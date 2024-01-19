@@ -36,7 +36,7 @@ use MittagQI\Translate5\Task\TaskContextTrait;
 use MittagQI\Translate5\Cronjob\CronIpFactory;
 use MittagQI\ZfExtended\Acl\SetAclRoleResource as BaseRoles;
 use MittagQI\ZfExtended\CsrfProtection;
-
+use MittagQI\Translate5\Task\CustomFields\Field as TaskCustomField;
 /**
  * Dummy Index Controller
  */
@@ -79,6 +79,7 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
         'admin.TaskOverview'            => [Rights::TASK_OVERVIEW_FRONTEND_CONTROLLER],
         'admin.TaskPreferences'         => [Rights::TASK_OVERVIEW_FRONTEND_CONTROLLER],
         'admin.TaskUserAssoc'           => [Rights::TASK_USER_ASSOC_FRONTEND_CONTROLLER],
+        'admin.TaskCustomField'         => [Rights::TASK_CUSTOM_FIELD_FRONTEND_CONTROLLER],
         'admin.Customer'                => [Rights::CUSTOMER_ADMINISTRATION],
         'LanguageResourcesTaskassoc'    => [Rights::LANGUAGE_RESOURCES_TASKASSOC],
         'LanguageResources'             => [
@@ -445,6 +446,8 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
             'editor.task.reimport.supportedExtensions',
             FileparserRegistry::getInstance()->getSupportedFileTypes()
         );
+        $this->setupAllowedCustomFields();
+
         $this->setJsAppData();
         editor_Segment_Quality_Manager::instance()->addAppJsData($this->view->Php2JsVars());
     }
@@ -933,6 +936,25 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
         } catch (Zend_Acl_Exception) {
             return false;
         }
+    }
+
+    /**
+     * Set the allowed custom fields in the frontend as frontend variable
+     * @return void
+     * @throws ReflectionException
+     */
+    private function setupAllowedCustomFields(): void
+    {
+        // Setup allowed custom fields
+        $auth = ZfExtended_Authentication::getInstance();
+        $all = ZfExtended_Factory::get(TaskCustomField::class)->loadAllSorted();
+        $allowed = [];
+        foreach ($all as $field) {
+            if ($auth->isUserAllowed(MittagQI\Translate5\Acl\TaskCustomField::ID, "customField{$field['id']}")) {
+                $allowed [] = $field;
+            }
+        }
+        $this->view->Php2JsVars()->set('editor.task.customFields', $allowed);
     }
 }
 

@@ -28,6 +28,7 @@ END LICENSE AND COPYRIGHT
 
 use MittagQI\Translate5\Acl\Rights;
 use MittagQI\Translate5\Acl\Roles;
+use MittagQI\Translate5\Acl\TaskCustomField;
 use MittagQI\Translate5\Applet\AppletAbstract;
 use MittagQI\Translate5\Applet\Dispatcher;
 use MittagQI\Translate5\DbConfig\ActionsEventHandler;
@@ -155,6 +156,7 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
 
         //add the module based ACL resources:
         AclResourceManager::registerResource(Rights::class);
+        AclResourceManager::registerResource(TaskCustomField::class);
         AclResourceManager::registerResource(Dispatcher::class, true);
 
         $eventManager = Zend_EventManager_StaticEventManager::getInstance();
@@ -191,12 +193,12 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
      */
     public function _initRestRoutes()
     {
-        
+
         $restRoute = new Zend_Rest_Route($this->front, [], [
             'editor' => [
                 'file','filetree', 'segment', 'alikesegment', 'customer', 'customermeta', 'referencefile', 'comment', 'attributedatatype',
                 'task', 'user', 'taskuserassoc', 'segmentfield', 'workflowuserpref', 'worker','taskmeta',
-                'config', 'segmentuserassoc', 'session', 'language','termcollection',
+                'config', 'segmentuserassoc', 'session', 'language','termcollection', 'taskcustomfield',
                 'languageresourceresource','languageresourcetaskassoc','languageresourcetaskpivotassoc',
                 'languageresourceinstance','taskusertracking', 'term', 'attribute', 'termattribute', 'category',
                 'quality','userassocdefault', 'log', 'collectionattributedatatype', 'token',

@@ -57,6 +57,7 @@ Ext.define('Editor.view.project.ProjectGrid', {
     //the required columns,translations and renderer functions are duplicated here. With this the projectGrid does not depend on the taskGrid component.
     initConfig: function(instanceConfig) {
         var me = this,
+            customColumns = Editor.controller.admin.TaskCustomField.getGridColumnsFor('projectGrid'),
         	config={
         		languageStore: Ext.StoreMgr.get('admin.Languages'),
         		columns:[{
@@ -202,7 +203,7 @@ Ext.define('Editor.view.project.ProjectGrid', {
                     bind: {
                         text: '{l10n.projectGrid.text_cols.orderdate}'
                     }
-        		}],
+        		}].concat(customColumns),
         		dockedItems: [{
         	        xtype: 'toolbar',
         	        dock: 'top',
