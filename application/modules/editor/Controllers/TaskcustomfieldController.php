@@ -112,7 +112,7 @@ class editor_TaskcustomfieldController extends ZfExtended_RestController {
             $was = array_keys(json_decode($this->entity->getComboboxData(), true));
 
             // Get updated combobox options
-            $now = array_keys(json_decode($this->getParam('comboboxData'), true));
+            $now = array_keys(json_decode($this->data['comboboxData'], true));
 
             // Get combobox options that are going to be deleted
             $del = array_diff($was, $now);

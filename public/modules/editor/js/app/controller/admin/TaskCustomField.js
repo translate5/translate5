@@ -41,7 +41,9 @@ Ext.define('Editor.controller.admin.TaskCustomField', {
             Editor.data.editor.task.customFields.forEach(field => {
 
                 // If field should not be shown in given gridType - skip
-                if (!field.placesToShow.match(gridType)) return;
+                if (!field.placesToShow.match(gridType)){
+                    return;
+                }
 
                 // Get labels and tooltips
                 var labelL10n = Ext.JSON.decode(field.label, true) || {};
@@ -68,7 +70,7 @@ Ext.define('Editor.controller.admin.TaskCustomField', {
                         options: [],
                         phpMode: false,
                         labelField: 'text'
-                    }
+                    };
 
                     // If it's a checkbox
                     if (field.type === 'checkbox') {
@@ -81,17 +83,23 @@ Ext.define('Editor.controller.admin.TaskCustomField', {
 
                     // Else if it's a combobox
                     } else if (field.type === 'combobox') {
-
                         // Decode field's comboboxData, if possible
                         column.comboboxData = Ext.JSON.decode(field.comboboxData, true) || {};
 
                         // Convert combobox data into filter options
-                        Ext.Object.each(column.comboboxData, (value, title) =>
-                            column.filter.options.push([value, title]))
+                        Ext.Object.each(column.comboboxData, function (value, title) {
+                            column.filter.options.push([value, title[Editor.data.locale]]);
+                        });
 
                         // Make sure the right title is shown for a value
-                        column.renderer = (value, _1, _2, _3, colIndex, _4, view) =>
-                            view.getHeaderCt().getHeaderAtIndex(colIndex).comboboxData[value];
+                        column.renderer = function (value, _1, _2, _3, colIndex, _4, view) {
+                            var selectedOption = view.getHeaderCt().getHeaderAtIndex(colIndex).comboboxData[value];
+                            if(!selectedOption){
+                                return value;
+                            }
+                            return selectedOption[Editor.data.locale];
+                        };
+
                     }
                 }
 
