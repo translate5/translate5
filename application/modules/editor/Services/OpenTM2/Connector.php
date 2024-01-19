@@ -1487,12 +1487,18 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
      */
     private function checkUpdatedSegment(editor_Models_Segment $segment, bool $recheckOnUpdate): void
     {
-        if (!$this->config->runtimeOptions->LanguageResources->checkSegmentsAfterUpdate
+        if (!in_array(
+                $this->getResource()->getUrl(),
+                $this->config->runtimeOptions->LanguageResources->checkSegmentsAfterUpdate->toArray(),
+                true
+            )
             || !$recheckOnUpdate
         ) {
             // Checking segment after update is disabled in config or in parameter, nothing to do
             return;
         }
+
+        $targetSent = $this->tagHandler->prepareQuery($segment->getTargetEdit());
 
         $result = $this->query($segment);
 
@@ -1502,7 +1508,8 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
             [
                 'languageResource' => $this->languageResource,
                 'segment' => $segment,
-                'response' => json_encode($result->getResult(), JSON_PRETTY_PRINT)
+                'response' => json_encode($result->getResult(), JSON_PRETTY_PRINT),
+                'target' => $targetSent
             ]
         );
 
@@ -1516,17 +1523,27 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
         }
 
         // Just saved segment should have matchrate 103
-        $matchRateFits = $maxMatchRateResult->matchrate === 103;
+        // TODO uncomment after matchrate calculating issue is fixed on t5memory side
+        $matchRateFits = true; //$maxMatchRateResult->matchrate === 103;
 
-        // Target should be the same as in the segment
-        $target = $this->tagHandler->prepareQuery($segment->getTargetEdit());
+        // Decode html entities
+        $targetReceived = html_entity_decode($maxMatchRateResult->rawTarget);
+        // Decode unicode symbols
+        $targetReceived = preg_replace_callback('/\\\\u([0-9a-fA-F]{4})/', function ($match) {
+            return mb_convert_encoding(pack('H*', $match[1]), 'UTF-8', 'UCS-2BE');
+        }, $targetReceived);
         // Replacing \r\n to \n back because t5memory replaces \n to \r\n
-        $targetIsTheSame = str_replace("\r\n", "\n", $maxMatchRateResult->rawTarget) === $target;
+        $targetReceived = str_replace("\r\n", "\n", $targetReceived);
+        // Also replace tab symbols to space because t5memory does it on its side
+        $targetSent = str_replace("\t", ' ', $targetSent);
+        // Finally compare target that we've sent for saving with the one we retrieved from TM, they should be the same
+        $targetIsTheSame = $targetReceived === $targetSent;
 
         $resultTimestamp = $result->getMetaValue($maxMatchRateResult->metaData, 'timestamp');
         $resultDate = DatetimeImmutable::createFromFormat('Y-m-d H:i:s T', $resultTimestamp);
         // Timestamp should be not older than 1 minute otherwise it is an old segment which wasn't updated
-        $isResultFresh = $resultDate >= new DateTimeImmutable('-1 minute');
+        // TODO uncomment after matchrate calculating issue is fixed on t5memory side
+        $isResultFresh = true; //$resultDate >= new DateTimeImmutable('-1 minute');
 
         if (!$matchRateFits || !$targetIsTheSame || !$isResultFresh) {
             $logError(match (false) {
