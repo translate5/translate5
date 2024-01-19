@@ -120,6 +120,9 @@ Ext.define('Editor.view.segments.SpecialCharacters', {
         }
         var matches =  Editor.util.Util.getFuzzyLanguagesForCode(targetLang.get('rfc5646'));
 
+        // in case there are characters defined for all languages using the all key, add them to the matches
+        matches.push('all');
+
         Ext.Array.each(matches, function(rec) {
             if(specialCharactersJosn[rec] !== undefined){
                 Ext.Array.each(specialCharactersJosn[rec], function(r) {
