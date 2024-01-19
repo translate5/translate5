@@ -203,11 +203,15 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
 
         $memories = $this->languageResource->getSpecificData('memories', parseAsArray: true) ?? [];
 
+        usort($memories, fn ($m1, $m2) => $m1['id'] <=> $m2['id']);
+
+        $id = 0;
         foreach ($memories as &$memory) {
+            $memory['id'] = $id++;
             $memory['readonly'] = true;
         }
 
-        $memories[] = ['id' => count($memories) + 1, 'filename' => $tmName, 'readonly' => false];
+        $memories[] = ['id' => $id, 'filename' => $tmName, 'readonly' => false];
 
         $this->languageResource->addSpecificData('memories', $memories);
         //saving it here makes the TM available even when the TMX import was crashed
@@ -520,7 +524,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
                 $isSource)
             );
         }
-        error_log(print_r($resultList->getResult(), true));
+
         return $resultList;
     }
 
@@ -557,17 +561,20 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
         }
     }
 
-    public function deleteMemory(string $filename): bool
+    public function deleteMemory(string $filename, ?callable $onSuccess = null): bool
     {
         $deleted = $this->api->delete($filename);
 
         if ($deleted) {
+            $onSuccess && $onSuccess();
+
             return true;
         }
 
         $resp = $this->api->getResponse();
 
         if ($resp->getStatus() == 404) {
+            $onSuccess && $onSuccess();
             // if the result was a 404, then there is nothing to delete,
             // so throw no error then and delete just locally
             return true;
@@ -1398,7 +1405,18 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
     {
         $memories = $languageResource->getSpecificData('memories', parseAsArray: true);
 
-        return $memories[0]['filename'] . '_' . count($memories);
+        $pattern = '/_next-(\d+)/';
+
+        $currentMax = 0;
+        foreach ($memories as $memory) {
+            if (!preg_match($pattern, $memory['filename'], $matches)) {
+                return $memory['filename'] . '_next-1';
+            }
+
+            $currentMax = $currentMax > $matches[1] ? $currentMax : (int)$matches[1];
+        }
+
+        return preg_replace($pattern, '_next-' . ($currentMax + 1), $memories[0]['filename']);
     }
 
     // region export TM
@@ -1436,6 +1454,8 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
 
         stream_filter_register('fix-t5n-tag', T5NTagSchemaFixFilter::class);
 
+        $writtenElements = 0;
+
         foreach ($memories as $memoryNumber => $memory) {
             $filename = $exportDir . $memory['filename'] . '_' . uniqid() . '.tmx';
             file_put_contents(
@@ -1448,7 +1468,9 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
             $reader->open($stream);
 
             while ($reader->read()) {
+
                 if ($reader->nodeType == XMLReader::ELEMENT && $reader->name == 'tu') {
+                    $writtenElements++;
                     $writer->writeRaw($this->conversionService->convertT5MemoryTagToNumber($reader->readOuterXML()));
                 }
 
@@ -1491,9 +1513,13 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
 
         $writer->flush();
 
-        // Finalizing document with $writer->endDocument() adds closing tags for all bpt-ept tags
-        // so add body and tmx closing tags manually
-        file_put_contents($resultFilename, PHP_EOL . '</body>' . PHP_EOL . '</tmx>', FILE_APPEND);
+        if (0 !== $writtenElements) {
+            // Finalizing document with $writer->endDocument() adds closing tags for all bpt-ept tags
+            // so add body and tmx closing tags manually
+            file_put_contents($resultFilename, PHP_EOL . '</body>', FILE_APPEND);
+        }
+
+        file_put_contents($resultFilename, PHP_EOL . '</tmx>', FILE_APPEND);
 
         return $resultFilename;
     }

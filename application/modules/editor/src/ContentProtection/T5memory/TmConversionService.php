@@ -119,7 +119,7 @@ class TmConversionService
         }
 
         foreach ($this->languageResourceRulesHashMap[$languageResourceId] as ['languageId' => $id, 'hash' => $hash]) {
-            if ($this->languageRulesHashMap[(int)$id] !== $hash) {
+            if (empty($this->languageRulesHashMap[(int)$id]) || $this->languageRulesHashMap[(int)$id] !== $hash) {
                 return false;
             }
         }
@@ -159,8 +159,9 @@ class TmConversionService
         $languageResourceRulesHash->save();
 
         $worker = ZfExtended_Factory::get(ConverseMemoryWorker::class);
-        $worker->init(parameters: ['languageResourceId' => $languageResourceId, 'languageId' => $languageId]);
-        $worker->queue();
+        if ($worker->init(parameters: ['languageResourceId' => $languageResourceId, 'languageId' => $languageId])) {
+            $worker->queue();
+        }
     }
 
     public function convertT5MemoryTagToNumber(string $string): string
@@ -223,6 +224,7 @@ class TmConversionService
 
         $reader = new XMLReader();
         $reader->open($filenameWithPath);
+        $writtenElements = 0;
 
         while ($reader->read()) {
             if ($reader->nodeType == XMLReader::ELEMENT && $reader->name == 'header') {
@@ -230,6 +232,7 @@ class TmConversionService
             }
 
             if ($reader->nodeType == XMLReader::ELEMENT && $reader->name == 'tu') {
+                $writtenElements++;
                 $writer->writeRaw($this->convertTransUnit($reader->readOuterXML(), $sourceLang, $targetLang));
             }
 
@@ -256,9 +259,13 @@ class TmConversionService
 
         $writer->flush();
 
-        // Finalizing document with $writer->endDocument() adds closing tags for all bpt-ept tags
-        // so add body and tmx closing tags manually
-        file_put_contents($resultFilename, PHP_EOL . '</body>' . PHP_EOL . '</tmx>', FILE_APPEND);
+        if (0 !== $writtenElements) {
+            // Finalizing document with $writer->endDocument() adds closing tags for all bpt-ept tags
+            // so add body and tmx closing tags manually
+            file_put_contents($resultFilename, PHP_EOL . '</body>', FILE_APPEND);
+        }
+
+        file_put_contents($resultFilename, PHP_EOL . '</tmx>', FILE_APPEND);
 
         return $resultFilename;
     }
