@@ -814,29 +814,6 @@ Ext.define('Editor.controller.Localizer', {
         }
     });
 
-    Ext.define("Editor.locale.de.view.project.ProjectGrid", {
-        override: "Editor.view.project.ProjectGrid",
-        strings: {
-            addProject: '<?php echo $this->translate->_('Projekt hinzufügen');?>',
-            addProjectTip: '<?php echo $this->translate->_('Neues Projekt hinzufügen');?>',
-            reloadBtn: '<?php echo $this->translate->_('Aktualisieren');?>',
-            reloadBtnTip: '<?php echo $this->translate->_('Projektliste vom Server aktualisieren');?>',
-            notFound: '<?php echo $this->translate->_('nicht gefunden');?>',
-            resetFilterText: '<?php echo $this->translate->_('Filter zurücksetzen');?>'
-        },
-        text_cols: {
-            taskNr: '<?php echo $this->translate->_('Auftragsnr.');?>',
-            taskName: '<?php echo $this->translate->_('Name');?>',
-            taskActions: '<?php echo $this->translate->_('Aktionen');?>',
-            sourceLang: '<?php echo $this->translate->_('Quellsprache');?>',
-            customerId: '<?php echo $this->translate->_('Endkunde');?>',
-            orderdate: '<?php echo $this->translate->_('Bestelldatum');?>',
-            description: '<?php echo $this->translate->_('Projektbeschreibung');?>',
-            id: '<?php echo $this->translate->_('Id');?>',
-            pmGuid: '<?php echo $this->translate->_('Projektmanager');?>'
-        }
-    });
-
      Ext.define("Editor.locale.de.view.project.ProjectGridViewController", {
         override: "Editor.view.project.ProjectGridViewController",
         strings: {
@@ -2078,7 +2055,27 @@ Editor.data.l10n = {
     },
     projectGrid:{
         tooltip: '<?php echo $this->translate->_('Zur Projektliste wechseln');?>',
-        taskDestroy: '<?php echo $this->translate->_('Projekt "{0}" wird gelöscht...');?>'
+        taskDestroy: '<?php echo $this->translate->_('Projekt "{0}" wird gelöscht...');?>',
+        strings: {
+            addProject: '<?php echo $this->translate->_('Projekt hinzufügen');?>',
+            addProjectTip: '<?php echo $this->translate->_('Neues Projekt hinzufügen');?>',
+            reloadBtn: '<?php echo $this->translate->_('Aktualisieren');?>',
+            reloadBtnTip: '<?php echo $this->translate->_('Projektliste vom Server aktualisieren');?>',
+            notFound: '<?php echo $this->translate->_('nicht gefunden');?>',
+            resetFilterText: '<?php echo $this->translate->_('Filter zurücksetzen');?>',
+            onlyMyProjects: '<?php echo $this->translate->_('Nur meine Projekte');?>'
+        },
+        text_cols: {
+            taskNr: '<?php echo $this->translate->_('Auftragsnr.');?>',
+            taskName: '<?php echo $this->translate->_('Name');?>',
+            taskActions: '<?php echo $this->translate->_('Aktionen');?>',
+            sourceLang: '<?php echo $this->translate->_('Quellsprache');?>',
+            customerId: '<?php echo $this->translate->_('Endkunde');?>',
+            orderdate: '<?php echo $this->translate->_('Bestelldatum');?>',
+            description: '<?php echo $this->translate->_('Projektbeschreibung');?>',
+            id: '<?php echo $this->translate->_('Id');?>',
+            pmGuid: '<?php echo $this->translate->_('Projektmanager');?>'
+        }
     },
     tasksGrid:{
         tooltip: '<?php echo $this->translate->_('Zur Aufgabenliste wechseln');?>',
@@ -2092,6 +2089,61 @@ Editor.data.l10n = {
         exportMenu:{
             packageExportItem: '<?php echo $this->translate->_('Übersetzerpaket herunterladen');?>'
         }
+    },
+    taskCustomField: {
+        create: '<?php echo $this->translate->_('Neues benutzerdefiniertes Feld erstellen');?>',
+        refresh: '<?php echo $this->translate->_('Aktualisieren');?>',
+        search: '<?php echo $this->translate->_('Suche');?>',
+        title: '<?php echo $this->translate->_('Benutzerdefinierte Felder für Aufgaben');?>',
+        save: '<?php echo $this->translate->_('Speichern');?>',
+        cancel: '<?php echo $this->translate->_('Abbrechen');?>',
+        delete: {
+            button: '<?php echo $this->translate->_('Löschen');?>',
+            confirm: {
+                field: '<?php echo $this->translate->_('Sind Sie sicher, dass Sie dieses benutzerdefinierte Feld löschen möchten?');?>',
+                option: '<?php echo $this->translate->_('Bitte denken Sie daran, dass alle Verwendungen dieser Option (falls vorhanden) entfernt werden, wenn sie in einem der bestehenden Projekte/Aufgaben erfüllt werden. Fortfahren?');?>'
+            }
+        },
+        meta: {
+            label: '<?php echo $this->translate->_('Label');?>',
+            tooltip: '<?php echo $this->translate->_('Tooltip');?>',
+            type: {
+                name: '<?php echo $this->translate->_('Typ');?>',
+                data: [
+                    {value: 'textfield', name: '<?php echo $this->translate->_('Text');?>'},
+                    {value: 'textarea',  name: '<?php echo $this->translate->_('Textarea');?>'},
+                    {value: 'checkbox',  name: '<?php echo $this->translate->_('Checkbox');?>'},
+                    {value: 'combobox',  name: '<?php echo $this->translate->_('Auswahlliste');?>'}
+                ]
+            },
+            comboboxData: {
+                label: '<?php echo $this->translate->_('Daten der Auswahlliste');?>',
+                value: '<?php echo $this->translate->_('Wert');?>',
+                title: '<?php echo $this->translate->_('Übersetzungen');?>'
+            },
+            regex: '<?php echo $this->translate->_('Regex für die UI-Validierung');?>',
+            mode: {
+                name: '<?php echo $this->translate->_('Mode');?>',
+                data: [
+                    {value: 'optional', name: '<?php echo $this->translate->_('Optional');?>'},
+                    {value: 'required', name: '<?php echo $this->translate->_('Erforderlich');?>'},
+                    {value: 'readonly', name: '<?php echo $this->translate->_('Readonly');?>'}
+                ]
+            },
+            placesToShow: {
+                name: '<?php echo $this->translate->_('Orte der Ausstellung');?>',
+                data: [
+                    {value: 'projectWizard', name: '<?php echo $this->translate->_('Projekt-Assistent');?>'},
+                    {value: 'projectGrid',   name: '<?php echo $this->translate->_('Projektraster');?>'},
+                    {value: 'taskGrid',      name: '<?php echo $this->translate->_('Aufgabenraster');?>'}
+                ]
+            },
+            roles: {
+                name: '<?php echo $this->translate->_('Systemrollen');?>',
+                tooltip: '<?php echo $this->translate->_(' ² Systemrollen bestimmen darüber, welche Rechte im System ein Nutzer hat. Die Rolle Editor darf auf alle Komponenten des Editors zugreifen, sowie auf die Komponenten der Aufgabenübersicht, die für das Editieren von Aufgaben nötig sind. Die Rolle PM darf Benutzer verwalten und Benutzer Aufgaben im Workflow zuweisen oder entziehen. Achtung: Systemrollen dürfen nicht mit Workflowrollen wie Lektor oder Übersetzer verwechselt werden. Benutzer die im Workflow Aufgaben übernehmen sollen müssen mindestens die Systemrolle Editor erhalten.');?>'
+            },
+            position: '<?php echo $this->translate->_('Position');?>'
+        },
     },
     synonymSearch: {
         searchSourceInfoText: '<?php echo $this->translate->_('Sucht in der Ausgangssprache');?>'

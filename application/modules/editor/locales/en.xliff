@@ -5562,6 +5562,10 @@ The following task was imported with errors / warnings / notices. Please take ca
                 <source>Filter zurücksetzen</source>
                 <target>Reset filters</target>
             </trans-unit>
+            <trans-unit id='TnVyIG1laW5lIFByb2pla3Rl'>
+                <source>Nur meine Projekte</source>
+                <target>Only my projects</target>
+            </trans-unit>
             <trans-unit id='TW9udGVuZWdyaW5pc2No'>
                 <source>Montenegrinisch</source>
                 <target>Montenegrin</target>
@@ -9560,6 +9564,98 @@ E-Mail: service@MittagQI.com</pre>
             <trans-unit id='RGllIE9wZW5JRC1Db25uZWN0LUltcGxlbWVudGllcnVuZyB2b24gdHJhbnNsYXRlNSBlcm3DtmdsaWNodCBlcywgZWluZW4gQ2xpZW50IGF1ZiBkZXIgSURQLVNlaXRlIGVpbmVtIENsaWVudCBpbiB0cmFuc2xhdGU1IHp1enVvcmRuZW4uIERpZSBadW9yZG51bmcgZXJmb2xndCDDvGJlciBkaWUgS3VuZGVubnVtbWVyLiBXZWl0ZXJlIEluZm9ybWF0aW9uZW4gZmluZGVuIFNpZSBpbiBkZXIgPGEgaHJlZj0iaHR0cHM6Ly9jb25mbHVlbmNlLnRyYW5zbGF0ZTUubmV0L3gvQmdEZ0F3IiB0YXJnZXQ9Il9ibGFuayI+RG9rdW1lbnRhdGlvbjwvYT4gdm9uIHRyYW5zbGF0ZTUu'>
                 <source>Die OpenID-Connect-Implementierung von translate5 ermöglicht es, einen Client auf der IDP-Seite einem Client in translate5 zuzuordnen. Die Zuordnung erfolgt über die Kundennummer. Weitere Informationen finden Sie in der <a href="https://confluence.translate5.net/x/BgDgAw" target="_blank">Dokumentation</a> von translate5.</source>
                 <target>The OpenID Connect implementation of translate5 makes it possible to assign a client on the IDP side to a client in translate5. The assignment is made via the client number. Further information can be found in the translate5 <a href="https://confluence.translate5.net/x/BgDgAw" target="_blank">documentation.</a></target>
+            </trans-unit>
+            <trans-unit id='TmV1ZXMgYmVudXR6ZXJkZWZpbmllcnRlcyBGZWxkIGVyc3RlbGxlbg=='>
+                <source>Neues benutzerdefiniertes Feld erstellen</source>
+                <target>Create new custom field</target>
+            </trans-unit>
+            <trans-unit id='QmVudXR6ZXJkZWZpbmllcnRlIEZlbGRlciBmw7xyIEF1ZmdhYmVu'>
+                <source>Benutzerdefinierte Felder für Aufgaben</source>
+                <target>Task custom fields</target>
+            </trans-unit>
+            <trans-unit id='TGFiZWw='>
+                <source>Label</source>
+                <target>Label</target>
+            </trans-unit>
+            <trans-unit id='UXVpY2tJbmZv'>
+                <source>QuickInfo</source>
+                <target>Tooltip</target>
+            </trans-unit>
+            <trans-unit id='VGV4dA=='>
+                <source>Text</source>
+                <target>Text</target>
+            </trans-unit>
+            <trans-unit id='VGV4dGFyZWE='>
+                <source>Textarea</source>
+                <target>Textarea</target>
+            </trans-unit>
+            <trans-unit id='Q2hlY2tib3g='>
+                <source>Checkbox</source>
+                <target>Checkbox</target>
+            </trans-unit>
+            <trans-unit id='QXVzd2FobGxpc3Rl'>
+                <source>Auswahlliste</source>
+                <target>Picklist</target>
+            </trans-unit>
+            <trans-unit id='RGF0ZW4gZGVyIEF1c3dhaGxsaXN0ZQ=='>
+                <source>Daten der Auswahlliste</source>
+                <target>Picklist data</target>
+            </trans-unit>
+            <trans-unit id='UmVnZXggZsO8ciBkaWUgVUktVmFsaWRpZXJ1bmc='>
+                <source>Regex für die UI-Validierung</source>
+                <target>Regex for UI validation</target>
+            </trans-unit>
+            <trans-unit id='TW9kZQ=='>
+                <source>Mode</source>
+                <target>Mode</target>
+            </trans-unit>
+            <trans-unit id='T3B0aW9uYWw='>
+                <source>Optional</source>
+                <target>Optional</target>
+            </trans-unit>
+            <trans-unit id='RXJmb3JkZXJsaWNo'>
+                <source>Erforderlich</source>
+                <target>Required</target>
+            </trans-unit>
+            <trans-unit id='U2NocmVpYmdlc2Now7x0enQ='>
+                <source>Schreibgeschützt</source>
+                <target>Readonly</target>
+            </trans-unit>
+            <trans-unit id='T3J0ZSBkZXIgQXVzc3RlbGx1bmc='>
+                <source>Orte der Ausstellung</source>
+                <target>Places to show</target>
+            </trans-unit>
+            <trans-unit id='UHJvamVrdC1Bc3Npc3RlbnQ='>
+                <source>Projekt-Assistent</source>
+                <target>Project Wizard</target>
+            </trans-unit>
+            <trans-unit id='UHJvamVrdHJhc3Rlcg=='>
+                <source>Projektraster</source>
+                <target>Project grid</target>
+            </trans-unit>
+            <trans-unit id='QXVmZ2FiZW5yYXN0ZXI='>
+                <source>Aufgabenraster</source>
+                <target>Task grid</target>
+            </trans-unit>
+            <trans-unit id='UG9zaXRpb24='>
+                <source>Position</source>
+                <target>Position</target>
+            </trans-unit>
+            <trans-unit id='V2VydA=='>
+                <source>Wert</source>
+                <target>Value</target>
+            </trans-unit>
+            <trans-unit id='w5xiZXJzZXR6dW5nZW4='>
+                <source>Übersetzungen</source>
+                <target>Translations</target>
+            </trans-unit>
+            <trans-unit id='U2luZCBTaWUgc2ljaGVyLCBkYXNzIFNpZSBkaWVzZXMgYmVudXR6ZXJkZWZpbmllcnRlIEZlbGQgbMO2c2NoZW4gbcO2Y2h0ZW4/'>
+                <source>Sind Sie sicher, dass Sie dieses benutzerdefinierte Feld löschen möchten?</source>
+                <target>Are you sure you want to delete this custom field?</target>
+            </trans-unit>
+            <trans-unit id='Qml0dGUgZGVua2VuIFNpZSBkYXJhbiwgZGFzcyBhbGxlIFZlcndlbmR1bmdlbiBkaWVzZXIgT3B0aW9uIChmYWxscyB2b3JoYW5kZW4pIGVudGZlcm50IHdlcmRlbiwgd2VubiBzaWUgaW4gZWluZW0gZGVyIGJlc3RlaGVuZGVuIFByb2pla3RlL0F1ZmdhYmVuIGVyZsO8bGx0IHdlcmRlbi4gRm9ydGZhaHJlbj8='>
+                <source>Bitte denken Sie daran, dass alle Verwendungen dieser Option (falls vorhanden) entfernt werden, wenn sie in einem der bestehenden Projekte/Aufgaben erfüllt werden. Fortfahren?</source>
+                <target>Please keep in mind that all the usages (if any) of this option will be removed if met in any of existing projects/tasks. Proceed?</target>
             </trans-unit>
         </body>
     </file>

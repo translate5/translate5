@@ -322,6 +322,15 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
                 'action'     => 'setdefault'
             ]);
         $r->addRoute('plugins_okapi_bconf_setdefault', $route);
+        // route to check support for file-types
+        $route = new ZfExtended_Controller_RestLikeRoute(
+            'editor/plugins_okapi_bconf/filetypesupport',
+            [
+                'module'     => 'editor',
+                'controller' => 'plugins_okapi_bconf',
+                'action'     => 'filetypesupport'
+            ]);
+        $r->addRoute('plugins_okapi_bconf_filetypesupport', $route);
 
         // routes for bconf filters
         $route = new Zend_Rest_Route($f, [], [

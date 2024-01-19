@@ -25,7 +25,8 @@ START LICENSE AND COPYRIGHT
 
 END LICENSE AND COPYRIGHT
 */
-
+use MittagQI\Translate5\Task\CustomFields\Field;
+use ZfExtended_Factory as Factory;
 class editor_Models_Validator_Task extends ZfExtended_Models_Validator_Abstract
 {
 
@@ -76,5 +77,56 @@ class editor_Models_Validator_Task extends ZfExtended_Models_Validator_Abstract
         $this->addValidator('projectId', 'int');
         $this->addValidator('diffExportUsable', 'int');
         $this->addValidator('reimportable', 'int');
+        $this->addValidatorsForCustomFields();
+    }
+
+    /**
+     * @throws ReflectionException
+     * @throws Zend_Exception
+     */
+    public function addValidatorsForCustomFields() {
+
+        // Get custom fields
+        $customFieldA = Factory::get(Field::class)->loadAll();
+
+        // Foreach custom field
+        foreach ($customFieldA as $customField) {
+
+            // Prepare field name
+            $name = "customField{$customField['id']}";
+
+            // If it's a textfield or textarea
+            if (in_array($customField['type'], ['textfield', 'textarea'])) {
+
+                // Prevent values longer than 1024 chars. Also prevent empty values if field is required
+                $this->addValidator($name, 'stringLength', [
+                    'min' => $customField['mode'] === 'required' ? 1 : 0,
+                    'max' => 1024
+                ]);
+
+                // If regex is defined for this custom field - add validator
+                if ($customField['regex']) {
+                    $this->addValidatorCustom($name, fn($value) => preg_match("~{$customField['regex']}~", $value));
+                }
+
+            // Else if it's a combobox
+            } else if ($customField['type'] === 'combobox') {
+
+                // Extract values from [value => title] pairs
+                $values = array_keys(json_decode($customField['comboboxData'], true) ?? []);
+
+                // If field is not mandatory - add empty string to the list of allowed values
+                if ($customField['mode'] !== 'required') $values []= '';
+
+                // Setup the while list
+                $this->addValidator($name, 'inArray', [$values]);
+
+            // Else if it's a checkbox
+            } else if ($customField['type'] === 'checkbox') {
+
+                // Make sure only 0 and 1 values are allowed
+                $this->addValidator($name, 'inArray', [[0, 1]], false);
+            }
+        }
     }
 }

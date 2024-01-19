@@ -49,17 +49,18 @@ abstract class editor_ImageTag {
     public function getHtmlTag(array $parameters) {
         // CRUCIAL: Newlines in internal tags will break frontend-functionality. Therefore we turn all newlines in the content & title to "↵"
         // the export/back-conversion will be done with the base64-encoded data thus this replacing otherwise will do no harm
-        if(isset($parameters['text'])){
+        if(array_key_exists('text', $parameters)){
             $parameters['text'] = editor_Utils::visualizeNewlines($parameters['text']);
+        } else {
+            $parameters['text'] = '';
         }
-        if(isset($parameters['title'])){
+        if(array_key_exists('title', $parameters) && $parameters['title'] !== null){
             $parameters['title'] = editor_Utils::visualizeNewlines($parameters['title']);
-        }
-        if(! isset($parameters['length'])) {
-            $parameters['length'] = -1;
-        }
-        if(! isset($parameters['title']) || is_null($parameters['title'])) {
+        } else {
             $parameters['title'] = htmlspecialchars($parameters['text'], ENT_COMPAT, null, false);
+        }
+        if(!array_key_exists('length', $parameters)) {
+            $parameters['length'] = -1;
         }
         $keys = array_map(function($k){
             return '{'.$k.'}';
