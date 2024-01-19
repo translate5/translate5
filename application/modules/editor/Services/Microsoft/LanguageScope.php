@@ -26,11 +26,13 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+/**
+ * Available language scopes for Microsoft translator api.
+ */
 abstract class editor_Services_Microsoft_LanguageScope
 {
     const TRANSLATION = 'translation';
 
-    // Currently disabled because it is not used in translate5
     //const TRANSLITERATION = 'transliteration';
     const DICTIONARY = 'dictionary';
 }
