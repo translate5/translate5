@@ -1,24 +1,27 @@
 ## Updating git-based import BCONF components
 
+### IMPORTANT: Only translate5 adjusted stuff (in a subfolder "/translate5") can be adjusted. Anything else is not customizable !
+
 ### 1) translate5 adjuatedSegmentation / SRX-files
 
 if the translate5 adjusted SRX is updated, it must be added to the folder "/translate5/application/modules/editor/Plugins/Okapi/data/srx/translate5/"
 This folder holds all SRX versions from the rollout of the feature on, what may is useful to track the changes of the rules.
 The naming should be "languages-N.srx" if source/target are identical or "languages-source-N.srx" / "languages-source-N.srx" if different.
-"N" here relates to the counter of files in the directory and is not really relevant.
+"N" here relates to the counter/order of files in the directory and is not really relevant.
 The added files then **must** be added to the SRX Inventory file "/translate5/application/modules/editor/Plugins/Okapi/data/srx/translate5-segmentation.json" as well.
 This file is the Inventory of the translate5 adjusted SRX files and their hashes. Since - opposed to FPRM files - the SRX files have no database-based versioning, we need all the hash-values of default-SRX files to identify them when importing bconfs.
-To add an entry there, a new JSON Item must be added to the **top** of the list like this:
+To add an entry there, a new JSON Item **must** be added to the **top** of the list like this:
 
 `{
     "version": -1,
-    "source": "languages-source-1.srx",
-    "target": "languages-target-1.srx",
+    "source": "languages-source-27.srx",
+    "target": "languages-target-27.srx",
     "sourceHash": "",
     "targetHash": ""
 }`
 
-Hash and BCONF-Version-Index will be automatically set with the use of the "dev:okapibconfversion" command (see 4), which not only increases the version but also evaluates the hashes & the correct version of an added SRX.
+Hash and BCONF-Version-Index will be automatically set with the use of the "t5 dev:okapibconfversion" command (see 4), which not only increases the version but also evaluates the hashes & the correct version of an added SRX.
+The adjusted SRX **must** be added with this command to become the new default SRX. Note, that the "version" in the JSON relates to the global BCONF-Version-Index and needs not to be in-sync with the file-numbering!
 
 ### 2) translate5 adjuated FPRMs
 
