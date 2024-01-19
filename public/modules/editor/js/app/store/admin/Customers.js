@@ -32,5 +32,7 @@ Ext.define('Editor.store.admin.Customers', {
     pageSize: 0,
     model: 'Editor.model.admin.Customer',
     autoLoad: false,
-    storeId: 'customersStore'
+    storeId: 'customersStore',
+    statefulFilters: true,
+    trackStateChanges: true
 });

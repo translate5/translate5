@@ -8,6 +8,204 @@ Missing Versions are merged into in the next upper versions, so no extra section
 
 All updates are (downwards) compatible! If not this is listed in the important release notes.
 
+
+
+
+## [7.1.0] - 2024-01-19
+
+### Important Notes:
+#### [TRANSLATE-3483](https://jira.translate5.net/browse/TRANSLATE-3483)
+Defining and changing field can be high resource usage. Please do it with coordination with the translate5 support team.
+ 
+
+
+### Added
+**[TRANSLATE-3650](https://jira.translate5.net/browse/TRANSLATE-3650): Editor general - Special characters listed for all languages** <br>
+Can be defined special characters in the editor to be available for all languages.
+
+**[TRANSLATE-3533](https://jira.translate5.net/browse/TRANSLATE-3533): Import/Export, VisualReview / VisualTranslation - Placeables in translate5** <br>
+Added capabilities to identify Placeables in xliff-tags. Placeables are single internal tags that will be shown with their text-content instead as tag. For identification XPaths have to be defined in the configuration.
+
+**[TRANSLATE-3483](https://jira.translate5.net/browse/TRANSLATE-3483): Task Management - Custom project/task meta data fields** <br>
+New feature where custom fields can be defined for a task.
+
+**[TRANSLATE-2276](https://jira.translate5.net/browse/TRANSLATE-2276): Client management, LanguageResources, Task Management, User Management - Save customization of project, task, language resource, user and client management** <br>
+Columns in main grids do now remember their order, visibility, sorting and filtering
+
+
+### Changed
+**[TRANSLATE-3636](https://jira.translate5.net/browse/TRANSLATE-3636): Auto-QA - FIX Quality Decorations in Segment Grid** <br>
+FIX: Spellcheck decorations may have wrong positions and/or wrong Segment-Text in right-click layer in the segment-grid
+
+**[TRANSLATE-3622](https://jira.translate5.net/browse/TRANSLATE-3622): Main back-end mechanisms (Worker, Logging, etc.) - Zip and upload data-directory to Indi Engine logger after pipeline completion** <br>
+Translate5 instance logger improvements.
+
+
+### Bugfixes
+**[TRANSLATE-3669](https://jira.translate5.net/browse/TRANSLATE-3669): TBX-Import - Cross API connector was not working on php 8.1 due class loading problems** <br>
+The Across TBX Import was not working anymore with php 8.1
+
+**[TRANSLATE-3664](https://jira.translate5.net/browse/TRANSLATE-3664): sso - Missing header in proxy config** <br>
+For https request the http host was set with wrong value leading SSO customers to be not detected based on the domain.
+
+**[TRANSLATE-3662](https://jira.translate5.net/browse/TRANSLATE-3662): LanguageResources - Dictionary search language support** <br>
+Check for dictionary supported languages before searching for result.
+
+**[TRANSLATE-3661](https://jira.translate5.net/browse/TRANSLATE-3661): Okapi integration - Okapi config allows deletion of okapi instances even if in use** <br>
+Okapi servers being in use by several tasks could be deleted over the UI, this is prevented now.
+
+**[TRANSLATE-3658](https://jira.translate5.net/browse/TRANSLATE-3658): file format settings - File formats: Make format-check in the import-wizard dynamic** <br>
+FIX: Check of added workfiles did not respect the extension-mapping of the selected bconf
+
+**[TRANSLATE-3653](https://jira.translate5.net/browse/TRANSLATE-3653): t5memory - t5memory TMX Upload does not work anymore** <br>
+The TMX upload was not working anymore in hosted environments
+
+**[TRANSLATE-3652](https://jira.translate5.net/browse/TRANSLATE-3652): Import/Export - Remove wrong SRX rule from all languages** <br>
+Remove erroneus SRX-rule from translate5 default File-format settings (BCONF)
+
+**[TRANSLATE-3640](https://jira.translate5.net/browse/TRANSLATE-3640): Client management - email link to task not working for clients with own domain** <br>
+Fix for translate5 url in email templates.
+
+**[TRANSLATE-3635](https://jira.translate5.net/browse/TRANSLATE-3635): Auto-QA, Editor general - Usage of "target at import time" as source for tags: Only for bilingual tasks** <br>
+Target at import time is considered to be a reference field for checking tags only for files where we did directly get the bilingual files in the import
+
+**[TRANSLATE-3633](https://jira.translate5.net/browse/TRANSLATE-3633): VisualReview / VisualTranslation - Visual: Order of merged PDFs random** <br>
+FIX: When merging PDFs for a Visual, the order of Files is now sorted by name
+
+**[TRANSLATE-3617](https://jira.translate5.net/browse/TRANSLATE-3617): Editor general - Help button is not visible in editor** <br>
+Fix for help button not visible in editor overview.
+
+
+## [7.1.0] - 2024-01-19
+
+### Important Notes:
+#### [TRANSLATE-3483](https://jira.translate5.net/browse/TRANSLATE-3483)
+Defining and changing field can be high resource usage. Please do it with coordination with the translate5 support team.
+ 
+
+
+### Added
+**[TRANSLATE-3650](https://jira.translate5.net/browse/TRANSLATE-3650): Editor general - Special characters listed for all languages** <br>
+Can be defined special characters in the editor to be available for all languages.
+
+**[TRANSLATE-3533](https://jira.translate5.net/browse/TRANSLATE-3533): Import/Export, VisualReview / VisualTranslation - Placeables in translate5** <br>
+Added capabilities to identify Placeables in xliff-tags. Placeables are single internal tags that will be shown with their text-content instead as tag. For identification XPaths have to be defined in the configuration.
+
+**[TRANSLATE-3483](https://jira.translate5.net/browse/TRANSLATE-3483): Task Management - Custom project/task meta data fields** <br>
+New feature where custom fields can be defined for a task.
+
+**[TRANSLATE-2276](https://jira.translate5.net/browse/TRANSLATE-2276): Client management, LanguageResources, Task Management, User Management - Save customization of project, task, language resource, user and client management** <br>
+Columns in main grids do now remember their order, visibility, sorting and filtering
+
+
+### Changed
+**[TRANSLATE-3636](https://jira.translate5.net/browse/TRANSLATE-3636): Auto-QA - FIX Quality Decorations in Segment Grid** <br>
+FIX: Spellcheck decorations may have wrong positions and/or wrong Segment-Text in right-click layer in the segment-grid
+
+**[TRANSLATE-3622](https://jira.translate5.net/browse/TRANSLATE-3622): Main back-end mechanisms (Worker, Logging, etc.) - Zip and upload data-directory to Indi Engine logger after pipeline completion** <br>
+Translate5 instance logger improvements.
+
+
+### Bugfixes
+**[TRANSLATE-3669](https://jira.translate5.net/browse/TRANSLATE-3669): TBX-Import - Cross API connector was not working on php 8.1 due class loading problems** <br>
+The Across TBX Import was not working anymore with php 8.1
+
+**[TRANSLATE-3664](https://jira.translate5.net/browse/TRANSLATE-3664): sso - Missing header in proxy config** <br>
+For https request the http host was set with wrong value leading SSO customers to be not detected based on the domain.
+
+**[TRANSLATE-3662](https://jira.translate5.net/browse/TRANSLATE-3662): LanguageResources - Dictionary search language support** <br>
+Check for dictionary supported languages before searching for result.
+
+**[TRANSLATE-3661](https://jira.translate5.net/browse/TRANSLATE-3661): Okapi integration - Okapi config allows deletion of okapi instances even if in use** <br>
+Okapi servers being in use by several tasks could be deleted over the UI, this is prevented now.
+
+**[TRANSLATE-3658](https://jira.translate5.net/browse/TRANSLATE-3658): file format settings - File formats: Make format-check in the import-wizard dynamic** <br>
+FIX: Check of added workfiles did not respect the extension-mapping of the selected bconf
+
+**[TRANSLATE-3653](https://jira.translate5.net/browse/TRANSLATE-3653): t5memory - t5memory TMX Upload does not work anymore** <br>
+The TMX upload was not working anymore in hosted environments
+
+**[TRANSLATE-3652](https://jira.translate5.net/browse/TRANSLATE-3652): Import/Export - Remove wrong SRX rule from all languages** <br>
+Remove erroneus SRX-rule from translate5 default File-format settings (BCONF)
+
+**[TRANSLATE-3640](https://jira.translate5.net/browse/TRANSLATE-3640): Client management - email link to task not working for clients with own domain** <br>
+Fix for translate5 url in email templates.
+
+**[TRANSLATE-3635](https://jira.translate5.net/browse/TRANSLATE-3635): Auto-QA, Editor general - Usage of "target at import time" as source for tags: Only for bilingual tasks** <br>
+Target at import time is considered to be a reference field for checking tags only for files where we did directly get the bilingual files in the import
+
+**[TRANSLATE-3633](https://jira.translate5.net/browse/TRANSLATE-3633): VisualReview / VisualTranslation - Visual: Order of merged PDFs random** <br>
+FIX: When merging PDFs for a Visual, the order of Files is now sorted by name
+
+**[TRANSLATE-3617](https://jira.translate5.net/browse/TRANSLATE-3617): Editor general - Help button is not visible in editor** <br>
+Fix for help button not visible in editor overview.
+
+
+## [7.1.0] - 2024-01-19
+
+### Important Notes:
+#### [TRANSLATE-3483](https://jira.translate5.net/browse/TRANSLATE-3483)
+Defining and changing field can be high resource usage. Please do it with coordination with the translate5 support team.
+ 
+
+
+### Added
+**[TRANSLATE-3650](https://jira.translate5.net/browse/TRANSLATE-3650): Editor general - Special characters listed for all languages** <br>
+Can be defined special characters in the editor to be available for all languages.
+
+**[TRANSLATE-3533](https://jira.translate5.net/browse/TRANSLATE-3533): Import/Export, VisualReview / VisualTranslation - Placeables in translate5** <br>
+Added capabilities to identify Placeables in xliff-tags. Placeables are single internal tags that will be shown with their text-content instead as tag. For identification XPaths have to be defined in the configuration.
+
+**[TRANSLATE-3483](https://jira.translate5.net/browse/TRANSLATE-3483): Task Management - Custom project/task meta data fields** <br>
+New feature where custom fields can be defined for a task.
+
+**[TRANSLATE-2276](https://jira.translate5.net/browse/TRANSLATE-2276): Client management, LanguageResources, Task Management, User Management - Save customization of project, task, language resource, user and client management** <br>
+Columns in main grids do now remember their order, visibility, sorting and filtering
+
+
+### Changed
+**[TRANSLATE-3636](https://jira.translate5.net/browse/TRANSLATE-3636): Auto-QA - FIX Quality Decorations in Segment Grid** <br>
+FIX: Spellcheck decorations may have wrong positions and/or wrong Segment-Text in right-click layer in the segment-grid
+
+**[TRANSLATE-3622](https://jira.translate5.net/browse/TRANSLATE-3622): Main back-end mechanisms (Worker, Logging, etc.) - Zip and upload data-directory to Indi Engine logger after pipeline completion** <br>
+Translate5 instance logger improvements.
+
+
+### Bugfixes
+**[TRANSLATE-3669](https://jira.translate5.net/browse/TRANSLATE-3669): TBX-Import - Cross API connector was not working on php 8.1 due class loading problems** <br>
+The Across TBX Import was not working anymore with php 8.1
+
+**[TRANSLATE-3664](https://jira.translate5.net/browse/TRANSLATE-3664): sso - Missing header in proxy config** <br>
+For https request the http host was set with wrong value leading SSO customers to be not detected based on the domain.
+
+**[TRANSLATE-3662](https://jira.translate5.net/browse/TRANSLATE-3662): LanguageResources - Dictionary search language support** <br>
+Check for dictionary supported languages before searching for result.
+
+**[TRANSLATE-3661](https://jira.translate5.net/browse/TRANSLATE-3661): Okapi integration - Okapi config allows deletion of okapi instances even if in use** <br>
+Okapi servers being in use by several tasks could be deleted over the UI, this is prevented now.
+
+**[TRANSLATE-3658](https://jira.translate5.net/browse/TRANSLATE-3658): file format settings - File formats: Make format-check in the import-wizard dynamic** <br>
+FIX: Check of added workfiles did not respect the extension-mapping of the selected bconf
+
+**[TRANSLATE-3653](https://jira.translate5.net/browse/TRANSLATE-3653): t5memory - t5memory TMX Upload does not work anymore** <br>
+The TMX upload was not working anymore in hosted environments
+
+**[TRANSLATE-3652](https://jira.translate5.net/browse/TRANSLATE-3652): Import/Export - Remove wrong SRX rule from all languages** <br>
+Remove erroneus SRX-rule from translate5 default File-format settings (BCONF)
+
+**[TRANSLATE-3640](https://jira.translate5.net/browse/TRANSLATE-3640): Client management - email link to task not working for clients with own domain** <br>
+Fix for translate5 url in email templates.
+
+**[TRANSLATE-3635](https://jira.translate5.net/browse/TRANSLATE-3635): Auto-QA, Editor general - Usage of "target at import time" as source for tags: Only for bilingual tasks** <br>
+Target at import time is considered to be a reference field for checking tags only for files where we did directly get the bilingual files in the import
+
+**[TRANSLATE-3633](https://jira.translate5.net/browse/TRANSLATE-3633): VisualReview / VisualTranslation - Visual: Order of merged PDFs random** <br>
+FIX: When merging PDFs for a Visual, the order of Files is now sorted by name
+
+**[TRANSLATE-3617](https://jira.translate5.net/browse/TRANSLATE-3617): Editor general - Help button is not visible in editor** <br>
+Fix for help button not visible in editor overview.
+
+
 ## [7.0.1] - 2024-01-08
 
 ### Important Notes:

@@ -98,6 +98,7 @@
 		"ext-xmlwriter": "*",
 		"ext-sockets" : "*",
 		"ext-iconv" : "*",
+		"ext-soap" : "*",
       	"ext-zip": "*",
       	"ext-fileinfo": "*",
       	"ext-curl": "*",

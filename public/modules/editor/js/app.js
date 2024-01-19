@@ -110,7 +110,8 @@ Ext.application({
         'admin.CustomerConfig',
         'admin.task.Config',
         'admin.UserAssocDefault',
-        'admin.WizardTasks'
+        'admin.WizardTasks',
+        'admin.task.CustomField'
     ],
     requires: [
         'Editor.view.ViewPort',

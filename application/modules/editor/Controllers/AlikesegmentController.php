@@ -178,8 +178,9 @@ class Editor_AlikesegmentController extends ZfExtended_RestController {
                 $useSourceForReference = $task->getConfig()->runtimeOptions->editor
                     ->frontend->reviewTask->useSourceForReference;
 
-                $useSourceTags = $useSourceForReference ||
-                    empty($this->entity->getTarget());
+                $useSourceTags = $useSourceForReference
+                    || empty($this->entity->getTarget())
+                    || 0 !== (int)$this->entity->getPretrans();
 
                 if(!$sourceSuccess || !$repetitionUpdater->updateTarget($useSourceTags)) {
                     //the segment has to be ignored!

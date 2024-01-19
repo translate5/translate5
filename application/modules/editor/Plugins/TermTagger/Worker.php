@@ -124,10 +124,11 @@ class Worker extends ProcessingWorker
             // in any case we continue processing
             return 1;
         }
-        // a Down Exception will be created if all services are down to create an import error. If other URLs are still up, we simply end the worker without further notice
+        // a Down Exception will be created if all services are down to create an import error.
+        // If other URLs are still up, we simply end the worker without further notice
         if($loopedProcessingException instanceof editor_Plugins_TermTagger_Exception_Down) {
             // we log only, if the last service is down ...
-            if($this->service->setServiceUrlDown($this->serviceUrl)){
+            if($this->setServiceUrlDown()){
                 $this->logException($loopedProcessingException);
             }
             // this will terminate the processing
