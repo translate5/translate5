@@ -244,11 +244,10 @@ abstract class Worker extends editor_Models_Task_AbstractWorker
                 for ($i = 0; $i < $this->maxParallel; $i++) {
                     $this->slots[] = [
                         'resource' => $serviceId . ucfirst($this->resourcePool), // the resource-name for the worker model
-                        'slot' => $slotName . $i,                         // the slot that represents a "virtualized" url and not the real URL anymore as with other workers
+                        'slot' => $slotName . ($isLoadBalanced ? '' : $i),       // the slot that represents a "virtualized" url and not the real URL anymore as with other workers
                         'url' => ($i < $numUrls) ? $serviceUrls[$i] : (($numUrls > 1) ? $serviceUrls[random_int(0, $numUrls - 1)] : $serviceUrls[0]) // the actual URL (saved in the worker-params)
                     ];
                 }
-                $this->maxParallel = 1;
             }
             if ($this->doDebug) {
                 error_log('PooledService Worker::initSlots(): number of Workers: ' . $this->maxParallel . ' / slots: ' . print_r($this->slots, true));
