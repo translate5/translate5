@@ -922,7 +922,7 @@ final class Helper extends ZfExtended_Test_ApiHelper
 
     /**
      * Checks, if the passed configs are set / set to the wanted value
-     * Hint: if the passed configs ave null as value, they are only checked for existance, otherwise for equality
+     * Hint: if the passed configs have null as value, they are only checked for existance, otherwise for equality
      * @param array $configsToTest
      * @return bool
      * @throws Zend_Db_Statement_Exception

@@ -375,7 +375,7 @@ abstract class AbstractRequest
             if (!$this->response->hasData()) {
                 error_log("\n    EMPTY RESPONSE!");
             } else if ($this->response->hasDataObject() || $this->response->hasDataArray()) {
-                error_log("\n    RESPONSE:\n" . json_encode($this->response->getData(), JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_UNICODE));
+                error_log("\n    RESPONSE:\n" . json_encode($this->response->getData(), JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
             } else {
                 $data = $this->response->getData();
                 error_log("\n    RESPONSE: " . (is_string($data) ? '"' . $data . '"' : strval($data)));

@@ -814,29 +814,6 @@ Ext.define('Editor.controller.Localizer', {
         }
     });
 
-    Ext.define("Editor.locale.de.view.project.ProjectGrid", {
-        override: "Editor.view.project.ProjectGrid",
-        strings: {
-            addProject: '<?php echo $this->translate->_('Projekt hinzufügen');?>',
-            addProjectTip: '<?php echo $this->translate->_('Neues Projekt hinzufügen');?>',
-            reloadBtn: '<?php echo $this->translate->_('Aktualisieren');?>',
-            reloadBtnTip: '<?php echo $this->translate->_('Projektliste vom Server aktualisieren');?>',
-            notFound: '<?php echo $this->translate->_('nicht gefunden');?>',
-            resetFilterText: '<?php echo $this->translate->_('Filter zurücksetzen');?>'
-        },
-        text_cols: {
-            taskNr: '<?php echo $this->translate->_('Auftragsnr.');?>',
-            taskName: '<?php echo $this->translate->_('Name');?>',
-            taskActions: '<?php echo $this->translate->_('Aktionen');?>',
-            sourceLang: '<?php echo $this->translate->_('Quellsprache');?>',
-            customerId: '<?php echo $this->translate->_('Endkunde');?>',
-            orderdate: '<?php echo $this->translate->_('Bestelldatum');?>',
-            description: '<?php echo $this->translate->_('Projektbeschreibung');?>',
-            id: '<?php echo $this->translate->_('Id');?>',
-            pmGuid: '<?php echo $this->translate->_('Projektmanager');?>'
-        }
-    });
-
      Ext.define("Editor.locale.de.view.project.ProjectGridViewController", {
         override: "Editor.view.project.ProjectGridViewController",
         strings: {
@@ -2078,7 +2055,27 @@ Editor.data.l10n = {
     },
     projectGrid:{
         tooltip: '<?php echo $this->translate->_('Zur Projektliste wechseln');?>',
-        taskDestroy: '<?php echo $this->translate->_('Projekt "{0}" wird gelöscht...');?>'
+        taskDestroy: '<?php echo $this->translate->_('Projekt "{0}" wird gelöscht...');?>',
+        strings: {
+            addProject: '<?php echo $this->translate->_('Projekt hinzufügen');?>',
+            addProjectTip: '<?php echo $this->translate->_('Neues Projekt hinzufügen');?>',
+            reloadBtn: '<?php echo $this->translate->_('Aktualisieren');?>',
+            reloadBtnTip: '<?php echo $this->translate->_('Projektliste vom Server aktualisieren');?>',
+            notFound: '<?php echo $this->translate->_('nicht gefunden');?>',
+            resetFilterText: '<?php echo $this->translate->_('Filter zurücksetzen');?>',
+            onlyMyProjects: '<?php echo $this->translate->_('Nur meine Projekte');?>'
+        },
+        text_cols: {
+            taskNr: '<?php echo $this->translate->_('Auftragsnr.');?>',
+            taskName: '<?php echo $this->translate->_('Name');?>',
+            taskActions: '<?php echo $this->translate->_('Aktionen');?>',
+            sourceLang: '<?php echo $this->translate->_('Quellsprache');?>',
+            customerId: '<?php echo $this->translate->_('Endkunde');?>',
+            orderdate: '<?php echo $this->translate->_('Bestelldatum');?>',
+            description: '<?php echo $this->translate->_('Projektbeschreibung');?>',
+            id: '<?php echo $this->translate->_('Id');?>',
+            pmGuid: '<?php echo $this->translate->_('Projektmanager');?>'
+        }
     },
     tasksGrid:{
         tooltip: '<?php echo $this->translate->_('Zur Aufgabenliste wechseln');?>',

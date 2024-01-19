@@ -26,6 +26,8 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\Segment\Tag\Placeable;
+
 /**
  * Internal struct to contain a tag and its data parts for the import
  * TODO move TagTrait functionality into this class too
@@ -101,6 +103,8 @@ class editor_Models_Import_FileParser_Tag {
      * @var string
      */
     public string $renderedTag;
+
+    public Placeable $placeable;
 
     /**
      * The partner of a paired tag, null for single tags.
@@ -185,13 +189,28 @@ class editor_Models_Import_FileParser_Tag {
             self::$renderer[$this->type] = ZfExtended_Factory::get(self::$renderer[$this->type]);
         }
 
+        $classes = [ $this->parseSegmentGetStorageClass($this->originalContent, $this->xmlTags) ];
+        $text = $this->text ?? htmlentities($this->originalContent, ENT_COMPAT); //PHP 8.1 fix - default changed!
+        if($cls !== null){
+            $classes[] = trim($cls);
+        }
+        // special processing of a placeable
+        if(isset($this->placeable)){
+            $classes[] = $this->placeable->getCssClass();
+            // title will reflect the original tag/content
+            $title = htmlspecialchars($text, ENT_COMPAT, null, false);
+            // while content/content-length is only the referenced content by the xpath
+            $text = $this->placeable->getContent();
+            $length = $this->placeable->getContentLength();
+        }
+
         return $this->renderedTag = self::$renderer[$this->type]->getHtmlTag([
-            'class' => $this->parseSegmentGetStorageClass($this->originalContent, $this->xmlTags) . ($cls ?? ''),
-            'text' => $this->text ?? htmlentities($this->originalContent, ENT_COMPAT), //PHP 8.1 fix - default changed!
+            'class' => implode(' ', $classes),
+            'text' => $text,
             'shortTag' => $this->tagNr,
             'id' => $this->id, //mostly original tag id
             'length' => $length,
-            'title' => $title,
+            'title' => $title
         ]);
     }
 

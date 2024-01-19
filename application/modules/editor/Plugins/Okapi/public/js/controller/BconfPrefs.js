@@ -81,6 +81,9 @@ Ext.define('Editor.plugins.Okapi.controller.BconfPrefs', {
                         }
                     }
                 }
+            },
+            '#adminTaskAddWindow wizardUploadGrid': {
+                validateWorkfile: 'onValidateImportWorkfile'
             }
         }
     },
@@ -166,7 +169,35 @@ Ext.define('Editor.plugins.Okapi.controller.BconfPrefs', {
                 '</tpl></ul>'
             )
         });
+    },
+
+    /**
+     * Validates an added Import file from the Import Wizard
+     * If a bconf is selected, we request a special endpoint that checks, if the given extension is in the mapping
+     * This is a validation that reports only a positive result (as Okapi is not the only file-parser)
+     * @param {Editor.model.admin.projectWizard.File} record
+     * @param {Editor.view.admin.projectWizard.UploadGridViewController} viewController
+     */
+    onValidateImportWorkfile: function(record, viewController){
+        var bconfCombo = Ext.getCmp('taskImportBconfId'),
+            bconfVal = bconfCombo.getValue(),
+            bconfRecord = bconfVal ? bconfCombo.findRecordByValue(bconfVal) : null,
+            bconfId = bconfRecord ? bconfRecord.getId() : null;
+        if(bconfId){
+            Ext.Ajax.request({
+                url: Editor.data.restpath + 'plugins_okapi_bconf/filetypesupport',
+                async: false, // crucial: otherwise the result will not matter ...
+                params: {
+                    id: bconfId,
+                    extension: record.getExtension()
+                },
+                success: function(response){
+                    var responseData = Ext.JSON.decode(response.responseText);
+                    if(responseData.success && responseData.extension){
+                        record.importable = true;
+                    }
+                }
+            });
+        }
     }
-
-
 });

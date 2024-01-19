@@ -5562,6 +5562,10 @@ The following task was imported with errors / warnings / notices. Please take ca
                 <source>Filter zurücksetzen</source>
                 <target>Reset filters</target>
             </trans-unit>
+            <trans-unit id='TnVyIG1laW5lIFByb2pla3Rl'>
+                <source>Nur meine Projekte</source>
+                <target>Only my projects</target>
+            </trans-unit>
             <trans-unit id='TW9udGVuZWdyaW5pc2No'>
                 <source>Montenegrinisch</source>
                 <target>Montenegrin</target>

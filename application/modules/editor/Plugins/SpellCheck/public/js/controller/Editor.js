@@ -100,7 +100,7 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
         NODE_NAME_MATCH: 'span',
         // CSS-Classes for the spellcheck-Node
         // INFO: moved as separate constant in Editor.util.HtmlClasses
-        //CSS_CLASSNAME_MATCH: 't5quality',
+        // CSS_CLASSNAME_MATCH: 't5quality',
         // CSS-Classes for error-types
         // Attributes for the spellcheck-Node
         ATTRIBUTE_ACTIVEMATCHINDEX: 'data-spellCheck-activeMatchIndex',
