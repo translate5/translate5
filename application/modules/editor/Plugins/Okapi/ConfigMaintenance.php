@@ -171,7 +171,7 @@ class ConfigMaintenance
     /***
      * Check if the removed config is used from the tasks. If yes, this action is not allowed. We can not remove
      * used config name/server.
-     * @param array $serverList
+     * @param array $serverList plain array of removed servers
      * @return int
      */
     public function countTaskUsageSum(array $serverList): int
@@ -179,6 +179,7 @@ class ConfigMaintenance
         if (empty($serverList)) {
             return 0;
         }
+        $serverList = array_flip(array_values($serverList));
 
         $usageForAllInstances = $this->countTaskUsage();
 
