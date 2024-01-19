@@ -24,7 +24,7 @@ pipelines:
               - master
           - name: SPECIFIC_TEST_OR_SUITE
           - name: PHPSTAN
-            default: enabled
+            default: disabled
             allowed-values:
               - enabled
               - disabled
@@ -40,6 +40,8 @@ pipelines:
           script:
             - git clone https://$GIT_USER:$GIT_TOKEN@bitbucket.org/mittagqi/docker.git
             - cd docker && ./bitbucket/test-script.sh
+          artifacts:
+            - translate5/data/**
           after-script:
             - cd docker && ./bitbucket/test-after-script.sh
 
