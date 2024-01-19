@@ -111,7 +111,7 @@ class editor_Services_Microsoft_Connector extends editor_Services_Connector_Abst
      * @param boolean $useDictionary
      * @return boolean
      */
-    protected function queryApi($searchString, &$useDictionary = false): bool{
+    protected function queryApi($searchString, $useDictionary = false): bool{
         return $this->api->search($searchString, $this->languageResource->getSourceLangCode(), $this->languageResource->getTargetLangCode(), $useDictionary);
     }
 
@@ -134,16 +134,18 @@ class editor_Services_Microsoft_Connector extends editor_Services_Connector_Abst
             return $this->resultList;
         }
 
-        //the dictionary lookup translation is active only for less than or equal to DICTONARY_SEARCH_CHARACTERS_BORDER
-        $useDictionary = mb_strlen($searchString) <= self::DICTONARY_SEARCH_CHARACTERS_BORDER;
+        $useDictionary = $this->useDictionary($searchString);
 
-
-        $hasResults = $this->queryApi($searchString, $useDictionary);
-
-        if(!$hasResults && $useDictionary) {
-            // in case dictionary lookup is used and no results are found, we try again without dictionary
-            $this->queryApi($searchString);
-            $useDictionary = false;
+        //query either with dictionary or without as fallback
+        // $useDictionary may be set to false by the search itself, if the languages do not support a dictionary lookup
+        if ($this->queryApi($searchString, $useDictionary)) {
+            $results = $this->api->getResult();
+            $hasNoDictResults = $useDictionary
+                && (empty($results) || empty($results[0]) || empty($results[0]->translations));
+            //if there was no dictionary translation we call it again without dictionary
+            if($hasNoDictResults && $this->queryApi($searchString)) {
+                $useDictionary = false; //set to false for further processing of the data
+            }
         }
 
         if(!is_null($this->api->getError())) {
@@ -313,5 +315,21 @@ class editor_Services_Microsoft_Connector extends editor_Services_Connector_Abst
     protected function getResourceName(): string
     {
         return 'Microsoft Translator';
+    }
+
+    /**
+     * Check if the current search text can be translated using the dictionary lookup
+     * @param string $text
+     * @return bool
+     */
+    private function useDictionary(string $text): bool {
+
+        if(mb_strlen($text) > self::DICTONARY_SEARCH_CHARACTERS_BORDER){
+            return false;
+        }
+        return $this->api->isValidDictionaryLookup(
+            $this->languageResource->getSourceLangCode(),
+            $this->languageResource->getTargetLangCode()
+        );
     }
 }
