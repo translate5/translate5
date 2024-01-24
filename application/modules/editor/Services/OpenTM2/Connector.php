@@ -677,8 +677,12 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
 
             // TM exists and is loaded into memory
             case 'open':
-
                 switch ($tmxImportStatus) {
+                    case '':
+                        $result = LanguageResourceStatus::AVAILABLE;
+
+                        break;
+
                     case 'available':
                         if (isset($apiResponse->importTime) && $apiResponse->importTime === 'not finished') {
                             $result = LanguageResourceStatus::IMPORT;
