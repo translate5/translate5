@@ -443,7 +443,7 @@ abstract class editor_TagSequence implements JsonSerializable {
                 $nearest = $container->getNearestContainer($tag); // this is the "normal" way of nesting the sorted cloned tags
             }
             // Will log rendering problems
-            if(static::VALIDATION_MODE && $nearest == null){
+            if(static::VALIDATION_MODE && $nearest === null){
                 error_log("\n============== HOLDER =============\n");
                 error_log($holder->toJson());
                 error_log("\n============== CONTAINER =============\n");
@@ -453,13 +453,13 @@ abstract class editor_TagSequence implements JsonSerializable {
                 error_log("\n========================================\n");
             }
             // TS-1337: This error happend "in the wild". It can only happen with malformed Markup. We need more data for a proper investigation
-            if($nearest == null){
+            if($nearest === null){
                 $errorData = [];
                 $errorData['holder'] = $holder->toJson();
                 $errorData['container'] = $container->toJson();
                 $errorData['tag'] = $tag->toJson();
                 $errorData = $this->logError('E1343', 'Rendering TagSequence tags led to a invalid tag structure that could not be processed', $errorData);
-                throw new ZfExtended_Exception('editor_TagSequence::render: Rendering failed presumably due to invalid tag structure.'."\n".json_encode($errorData, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
+                throw new ZfExtended_ErrorCodeException('E1343', $errorData);
             }
             $nearest->addChild($tag);
             $container = $tag;
@@ -795,7 +795,7 @@ abstract class editor_TagSequence implements JsonSerializable {
     protected function logError(string $code, string $msg, array $errorData=[]) : array {
         $this->addErrorDetails($errorData);
         if($this->captureErrors){
-            // when capturing the errors7exceptions the cade initiating the capture is responsible for processing them !
+            // when capturing the errors/exceptions the cade initiating the capture is responsible for processing them !
             $error = new ZfExtended_ErrorCodeException($code, $errorData);
             $error->setMessage($msg);
             $error->setDomain(static::$logger_domain);
@@ -805,6 +805,7 @@ abstract class editor_TagSequence implements JsonSerializable {
         }
         return $errorData;
     }
+
     /**
      * To be extended in inheriting classes
      * @param array $errorData

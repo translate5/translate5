@@ -105,6 +105,12 @@ class ConnectorTest extends TestCase
                 'importTime' => null,
                 'expectedResult' => LanguageResourceStatus::UNKNOWN
             ],
+            'Empty tmxImportStatus' => [
+                'status' => 'open',
+                'tmxImportStatus' => null,
+                'importTime' => null,
+                'expectedResult' => LanguageResourceStatus::AVAILABLE
+            ],
         ];
     }
 
