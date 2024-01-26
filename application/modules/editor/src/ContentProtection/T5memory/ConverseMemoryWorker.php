@@ -32,18 +32,19 @@ namespace MittagQI\Translate5\ContentProtection\T5memory;
 
 use editor_Models_Segment_Whitespace as Whitespace;
 use editor_Models_LanguageResources_LanguageResource as LanguageResource;
+use editor_Services_Manager;
 use editor_Services_OpenTM2_Connector as Connector;
 use MittagQI\Translate5\ContentProtection\ContentProtector;
 use MittagQI\Translate5\ContentProtection\Model\ContentProtectionRepository;
 use MittagQI\Translate5\ContentProtection\Model\LanguageResourceRulesHash;
 use MittagQI\Translate5\ContentProtection\Model\LanguageRulesHash;
+use MittagQI\Translate5\LanguageResource\Status;
 use ZfExtended_Factory;
 use ZfExtended_Worker_Abstract;
 
 class ConverseMemoryWorker extends ZfExtended_Worker_Abstract
 {
     private int $languageResourceId;
-    private int $languageId;
     private LanguageResource $languageResource;
     private array $memoriesBackup;
     private LanguageResourceRulesHash $languageResourceRulesHash;
@@ -71,29 +72,22 @@ class ConverseMemoryWorker extends ZfExtended_Worker_Abstract
             return false;
         }
 
-        if (!array_key_exists('languageId', $parameters)) {
-            return false;
-        }
-
         $this->languageResourceId = (int) $parameters['languageResourceId'];
-        $this->languageId = (int) $parameters['languageId'];
 
         $this->languageResource = ZfExtended_Factory::get(LanguageResource::class);
         $this->languageResource->load($this->languageResourceId);
 
+        if (editor_Services_Manager::SERVICE_OPENTM2 !== $this->languageResource->getServiceType()) {
+            return false;
+        }
+
         $this->memoriesBackup = $this->languageResource->getSpecificData('memories', parseAsArray: true) ?? [];
-        
+
         $this->languageResourceRulesHash = ZfExtended_Factory::get(LanguageResourceRulesHash::class);
         try {
-            $this->languageResourceRulesHash->loadByLanguageResourceIdAndLanguageId(
-                $this->languageResourceId,
-                $this->languageId
-            );
+            $this->languageResourceRulesHash->loadByLanguageResourceId($this->languageResourceId);
         } catch (\ZfExtended_Models_Entity_NotFoundException) {
-            $this->languageResourceRulesHash->init([
-                'languageResourceId' => $this->languageResourceId,
-                'languageId' => $this->languageId
-            ]);
+            $this->languageResourceRulesHash->init(['languageResourceId' => $this->languageResourceId]);
         }
 
         return true;
@@ -108,9 +102,6 @@ class ConverseMemoryWorker extends ZfExtended_Worker_Abstract
     
     protected function work(): bool
     {
-        $languageRulesHash = ZfExtended_Factory::get(LanguageRulesHash::class);
-        $languageRulesHash->loadByLanguageId($this->languageId);
-
         if ($this->tmConversionService->isTmConverted($this->languageResourceId)) {
             return true;
         }
@@ -125,6 +116,21 @@ class ConverseMemoryWorker extends ZfExtended_Worker_Abstract
         $targetLang = (int)$this->languageResource->getTargetLang();
 
         $connector->connectTo($this->languageResource, $sourceLang, $targetLang);
+        $status = $connector->getStatus($this->languageResource->getResource(), $this->languageResource);
+
+        if (Status::AVAILABLE !== $status) {
+            $this->log->error(
+                'E1377',
+                'OpenTM2: Unable to use the memory because of the memory status {status}.',
+                [
+                    'languageResource' => $this->languageResource,
+                    'status' => $status,
+                ]
+            );
+            $this->resetConversionStarted();
+
+            return false;
+        }
 
         $exportFilename = $connector->export($connector->getValidExportTypes()['TMX']);
 
@@ -167,8 +173,19 @@ class ConverseMemoryWorker extends ZfExtended_Worker_Abstract
 
         unlink($exportFilename);
 
+        $onMemoryDeleted = fn ($filename) =>
+            fn () => $this->languageResource->addSpecificData(
+                'memories',
+                array_values(
+                    array_filter(
+                        $this->languageResource->getSpecificData('memories', parseAsArray: true),
+                        fn ($memory) => $memory['filename'] !== $filename
+                    )
+                )
+            );
+
         foreach ($this->memoriesBackup as $memory) {
-            if (!$connector->deleteMemory($memory['filename'])) {
+            if (!$connector->deleteMemory($memory['filename'], $onMemoryDeleted($memory['filename']))) {
                 $this->log->error(
                     'E1589',
                     'Conversion: Memory [{filename}] was not deleted in process of conversion',
@@ -177,7 +194,17 @@ class ConverseMemoryWorker extends ZfExtended_Worker_Abstract
             }
         }
 
-        $this->languageResourceRulesHash->setHash($languageRulesHash->getHash());
+        // Language Resource was possibly changed in $onMemoryDeleted call
+        $this->languageResource->save();
+
+        $languageRulesHash = ZfExtended_Factory::get(LanguageRulesHash::class);
+
+        $languageRulesHash->loadByLanguageId($sourceLang);
+        $this->languageResourceRulesHash->setInputHash($languageRulesHash->getInputHash());
+
+        $languageRulesHash->loadByLanguageId($targetLang);
+        $this->languageResourceRulesHash->setOutputHash($languageRulesHash->getOutputHash());
+
         $this->resetConversionStarted();
 
         return true;

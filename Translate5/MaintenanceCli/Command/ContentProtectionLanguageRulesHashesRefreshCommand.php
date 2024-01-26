@@ -31,6 +31,7 @@ use editor_Models_Languages;
 use MittagQI\Translate5\ContentProtection\Model\ContentProtectionRepository;
 use MittagQI\Translate5\ContentProtection\Model\InputMapping;
 use MittagQI\Translate5\ContentProtection\Model\LanguageRulesHash;
+use MittagQI\Translate5\ContentProtection\Model\OutputMapping;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use ZfExtended_Factory;
@@ -51,10 +52,31 @@ class ContentProtectionLanguageRulesHashesRefreshCommand extends Translate5Abstr
 
         $dbMapping = ZfExtended_Factory::get(InputMapping::class)->db;
         $select = $dbMapping->select()
-            ->from(['mapping' => $dbMapping->info($dbMapping::NAME)], ['distinct(languageId)']);
+            ->from(['mapping' => $dbMapping->info($dbMapping::NAME)], ['distinct(languageId)'])
+        ;
 
-        $languageIds = array_column($dbMapping->fetchAll($select)->toArray(), 'languageId');
+        $this->recalculateForLangs(
+            true,
+            $repository,
+            array_column($dbMapping->fetchAll($select)->toArray(), 'languageId')
+        );
 
+        $dbMapping = ZfExtended_Factory::get(OutputMapping::class)->db;
+        $select = $dbMapping->select()
+            ->from(['mapping' => $dbMapping->info($dbMapping::NAME)], ['distinct(languageId)'])
+        ;
+
+        $this->recalculateForLangs(
+            false,
+            $repository,
+            array_column($dbMapping->fetchAll($select)->toArray(), 'languageId')
+        );
+
+        return 0;
+    }
+
+    private function recalculateForLangs(bool $input, ContentProtectionRepository $repository, array $languageIds): void
+    {
         $language = ZfExtended_Factory::get(editor_Models_Languages::class);
         $languageRulesHash = ZfExtended_Factory::get(LanguageRulesHash::class);
 
@@ -66,13 +88,16 @@ class ContentProtectionLanguageRulesHashesRefreshCommand extends Translate5Abstr
             } catch (ZfExtended_Models_Entity_NotFoundException) {
                 // if not found we simply create new
                 $languageRulesHash->init();
-                $languageRulesHash->setLanguageId((int)$languageId);
+                $languageRulesHash->setLanguageId((int) $languageId);
             }
 
-            $languageRulesHash->setHash($repository->getRulesHashBy($language));
+            if ($input) {
+                $languageRulesHash->setInputHash($repository->getInputRulesHashBy($language));
+            } else {
+                $languageRulesHash->setOutputHash($repository->getOutputRulesHashBy($language));
+            }
+
             $languageRulesHash->save();
         }
-
-        return 0;
     }
 }

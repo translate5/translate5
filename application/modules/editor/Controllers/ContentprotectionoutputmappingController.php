@@ -55,9 +55,12 @@ class editor_ContentprotectionoutputmappingController extends ZfExtended_RestCon
 
     public function deleteAction()
     {
+        $this->entityLoad();
+        $entity = clone $this->entity;
+
         parent::deleteAction();
 
-        $this->queueRecalculateRulesHashWorker();
+        $this->queueRecalculateRulesHashWorker((int) $entity->getLanguageId());
     }
 
     public function postAction()
@@ -72,7 +75,7 @@ class editor_ContentprotectionoutputmappingController extends ZfExtended_RestCon
             throw new ZfExtended_UnprocessableEntity('E1591', ['mapping' => 'Output', 'index' => 'language-rule']);
         }
 
-        $this->queueRecalculateRulesHashWorker();
+        $this->queueRecalculateRulesHashWorker((int) $this->entity->getLanguageId());
     }
 
     public function getAction(): void
@@ -86,10 +89,13 @@ class editor_ContentprotectionoutputmappingController extends ZfExtended_RestCon
         $this->view->total = count($this->view->rows);
     }
 
-    private function queueRecalculateRulesHashWorker(): void
+    private function queueRecalculateRulesHashWorker(int $languageId): void
     {
         $worker = ZfExtended_Factory::get(RecalculateRulesHashWorker::class);
-        $worker->init(parameters: ['languageId' => $this->entity->getLanguageId()]);
+        $worker->init(parameters: [
+            'languageId' => $languageId,
+            'direction' => RecalculateRulesHashWorker::DIRECTION_OUTPUT
+        ]);
         $worker->queue();
     }
 }

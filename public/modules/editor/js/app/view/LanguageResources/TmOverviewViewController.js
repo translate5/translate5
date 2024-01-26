@@ -77,10 +77,7 @@ Ext.define('Editor.view.LanguageResources.TmOverviewViewController', {
                 }
 
                 let resources = [];
-                me.getView().getStore().each(rec => resources.push({
-                    languageResourceId: rec.get('id'),
-                    languageId: rec.get('sourceLang')[0]
-                }))
+                me.getView().getStore().each(rec => resources.push(rec.get('id')))
 
                 Ext.Ajax.request({
                     url: Editor.data.restpath + 'languageresourceinstance/synchronizetm/batch',

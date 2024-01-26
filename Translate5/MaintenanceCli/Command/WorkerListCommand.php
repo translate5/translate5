@@ -134,8 +134,8 @@ class WorkerListCommand extends Translate5AbstractCommand
                     if (empty($workerRow['starttime'])) {
                         $row[] = '';
                     } else {
-                        $endtime = empty($workerRow['endtime']) ? time() : strtotime($workerRow['endtime']);
-                        $row[] = $this->printDuration(strtotime($workerRow['starttime']), $endtime);
+                        $endtime = empty($workerRow['endtime']) ? date('Y-m-d H:i:s', time()) : $workerRow['endtime'];
+                        $row[] = $this->printDuration($workerRow['starttime'], $endtime);
                     }
                 } else {
                     $row[] = $workerRow[$key];

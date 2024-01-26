@@ -28,6 +28,7 @@ END LICENSE AND COPYRIGHT
 
 use MittagQI\Translate5\ContentProtection\ContentProtector;
 use MittagQI\Translate5\Task\Import\FileParser\Xlf\Namespaces\AbstractNamespace as XlfNamespaces;
+use MittagQI\Translate5\Segment\Tag\Placeable;
 
 /**
  * Converts XLF segment content chunks into translate5 internal segment content string
@@ -47,7 +48,7 @@ class editor_Models_Import_FileParser_Xlf_ContentConverter {
      */
     protected array $result = [];
     
-    protected \MittagQI\Translate5\Task\Import\FileParser\Xlf\Namespaces\AbstractNamespace $namespaces;
+    protected XlfNamespaces $namespaces;
     
     /**
      * @var array
@@ -77,7 +78,13 @@ class editor_Models_Import_FileParser_Xlf_ContentConverter {
      * Flag to switch normal mode and remove tags mode
      * @var string
      */
-    protected $removeTags = false;
+    protected bool $removeTags = false;
+
+    protected bool $protectTags;
+
+    protected bool $findPlaceables;
+
+    protected array $placeablesXpathes;
 
     protected bool $inMrk = false;
     
@@ -171,6 +178,11 @@ class editor_Models_Import_FileParser_Xlf_ContentConverter {
         
         $this->xmlparser->registerElement('*', [$this, 'handleUnknown']); // → all other tags
         $this->xmlparser->registerOther([$this, 'handleText']);
+
+        $config = $task->getConfig();
+        $this->protectTags = $config->runtimeOptions->import->fileparser->options->protectTags ?? false;
+        $this->placeablesXpathes = $config->runtimeOptions->import->xlf->placeablesXpathes->toArray();
+        $this->findPlaceables = count($this->placeablesXpathes) > 0;
     }
 
     /**
@@ -229,6 +241,12 @@ class editor_Models_Import_FileParser_Xlf_ContentConverter {
         $tagObj->id = $this->getId($openerMeta, $originalContent, in_array($tag, self::TAGS_WITH_CONTENT));
         $tagObj->rid = $this->getRid($openerMeta);
         $tagObj->originalContent = $originalContent;
+
+
+        // find placeables in the original content
+        if($this->findPlaceables){
+            Placeable::detect($originalContent, $this->placeablesXpathes, $tagObj);
+        }
 
         $this->shortTagNumbers->addTag($tagObj);
         return $tagObj;
@@ -374,7 +392,7 @@ class editor_Models_Import_FileParser_Xlf_ContentConverter {
         // although the whitespace of the content may not be preserved here, if there remain multiple spaces or other space characters,
         // we have to protect them here
         
-        if($this->task->getConfig()->runtimeOptions->import->fileparser->options->protectTags ?? false) {
+        if($this->protectTags) {
             //since we are in a XML file format, plain tags in the content are encoded, which we have to undo first
             //$text is here for example: Dies &lt;strong&gt;ist ein&lt;/strong&gt; Test. &amp;nbsp;
             $text = html_entity_decode($text);

@@ -25,7 +25,8 @@ START LICENSE AND COPYRIGHT
 
 END LICENSE AND COPYRIGHT
 */
-
+use MittagQI\Translate5\Task\CustomFields\Field;
+use ZfExtended_Factory as Factory;
 /**#@+
  * @author Marc Mittag
  * @package editor
@@ -73,7 +74,14 @@ class editor_Models_Task_Excel_Metadata extends ZfExtended_Models_Entity_ExcelEx
      * @var array
      */
     protected $taskColumns = [];
-    
+
+    /**
+     * Info about task custom columns
+     *
+     * @var array
+     */
+    protected $taskCustomColumns = [];
+
     /**
      * the number of the row in the metadata-sheet
      * @var integer
@@ -128,15 +136,46 @@ class editor_Models_Task_Excel_Metadata extends ZfExtended_Models_Entity_ExcelEx
                 'size' => '12',
             ],
         ]);
-        
+
+        $customFields = Factory::get(Field::class)->loadAllSorted();
+
+        $locale = ZfExtended_Authentication::getInstance()->getUser()->getLocale();
+
+        foreach ($customFields as $customField) {
+
+            // Get label according to current locale
+            $label = json_decode($customField['label'], true)[$locale];
+
+            $index = "customField{$customField['id']}";
+
+            $this->taskCustomColumns[$index]['header'] = $label;
+
+            if ($customField['type'] === 'checkbox') {
+
+                $this->taskCustomColumns[$index]['value'] = [
+                    0 => 'No',
+                    1 => 'Yes'
+                ];
+
+            } elseif ($customField['type'] === 'combobox') {
+
+                foreach (json_decode($customField['comboboxData'], true) as $value => $l10nTitle) {
+                    $this->taskCustomColumns[$index]['value'][$value] = $l10nTitle;
+                }
+            }
+        }
+
         // write fieldnames in header, set their font to bold, set their width to auto
         $sheetCol = 'A';
         $taskModel = ZfExtended_Factory::get('editor_Models_Task');
         /* @var $taskModel editor_Models_Task */
         $taskGridTextCols = $taskModel::getTaskGridTextCols();
         foreach ($this->taskColumns as $key => $colName) {
-            if (array_key_exists($colName, $taskGridTextCols)) { // Not all column-names in the taskGrid have a translation.
+            // Not all column-names in the taskGrid have a translation.
+            if (array_key_exists($colName, $taskGridTextCols)) {
                 $colHeadline = $this->translate->_($taskGridTextCols[$colName]);
+            } elseif (array_key_exists($colName, $this->taskCustomColumns)){
+                $colHeadline = $this->taskCustomColumns[$colName]['header'];
             } else {
                 $colHeadline = $colName;
             }
@@ -238,7 +277,7 @@ class editor_Models_Task_Excel_Metadata extends ZfExtended_Models_Entity_ExcelEx
                     $value = count($allTaskassocs) . ': ' . implode(', ', $values);
                     break;
                 default:
-                    $value = $task[$colName];
+                    $value = $this->taskCustomColumns[$colName]['value'][$task[$colName]] ?? $task[$colName];
                     break;
             }
             $sheet->setCellValue($sheetCol.$this->taskRow, $value);

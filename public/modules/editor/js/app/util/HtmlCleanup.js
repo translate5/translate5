@@ -76,13 +76,17 @@ Ext.define('Editor.util.HtmlCleanup', {
 	 * Internal whitespace tags will be turned to appropriate markup and thus reflected in the Live Editing
 	 * In this process open-single-close combinations will lead to a single split and close followed by such a construct or open predeceeded by such a construct will be reduced to one split.
 	 * open-close combinations will be preserved as it can be assumed they once surrounded some text which was removed by the author
+	 * @param string html
 	 * @param string splitKey: defaults to "<t5split>"
-	 * @return string: the cleaned text with split-values
+	 * @return string: the cleaned html with split-values
 	 */
 	cleanAndSplitInternalTagsForLiveEditing: function(html, splitKey){
 		if(!splitKey){
 			splitKey = '<t5split>';
 		}
+		// replace Placeables
+		html = this.replacePlaceables(html, splitKey);
+
 		// replace whitespace-tags with rendered whitespace
 		html = this.cleanInternalTags(html, "&nbsp;<t5split>", ['single','nbsp']);
 		html = this.cleanInternalTags(html, "<br/><t5split>", ['single','newline']);
@@ -220,5 +224,27 @@ Ext.define('Editor.util.HtmlCleanup', {
 				return html;
 			}
 		}
+	},
+
+	/**
+	 * Replaces Placeables with the placeablöe text and wraps the placeable with the given split-value
+	 * @param string html
+	 * @param string splitKey: defaults to "<t5split>"
+	 * @return string: the replaced html with split-values
+	 */
+	replacePlaceables: function(html, splitKey){
+
+		return html.replace(/<div[^>]+t5placeable[^>]+internal-tag[^>]+>.+?<\/div>/ig, function(internalTag){
+
+			var search = /<span[^>]+full[^>]+>(.+)<\/span>/ig,
+				matches = search.exec(internalTag);
+
+			if(matches.length === 2){
+				return splitKey + '<span class="t5placeable">' + matches[1] + '</span>' + splitKey;
+			}
+			// should not happen
+			console.log('ERROR - invaid structure of internal tag: ', internalTag);
+			return '';
+		});
 	}
 });

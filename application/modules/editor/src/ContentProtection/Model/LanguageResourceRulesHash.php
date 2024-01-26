@@ -61,10 +61,10 @@ use ZfExtended_Models_Entity_Abstract;
  *
  * @method string getLanguageResourceId()
  * @method void setLanguageResourceId(int $languageResourceId)
- * @method string getLanguageId()
- * @method void setLanguageId(int $languageId)
- * @method string getHash()
- * @method void setHash(string $hash)
+ * @method string getInputHash()
+ * @method void setInputHash(string $hash)
+ * @method string getOutputHash()
+ * @method void setOutputHash(string $hash)
  * @method string getConversionStarted()
  * @method void setConversionStarted(?string $datetime)
  */
@@ -75,16 +75,14 @@ class LanguageResourceRulesHash extends ZfExtended_Models_Entity_Abstract
     /**
      * @throws \ZfExtended_Models_Entity_NotFoundException
      */
-    public function loadByLanguageResourceIdAndLanguageId(
-        int $languageResourceId,
-        int $languageId
-    ): ?Zend_Db_Table_Row_Abstract {
+    public function loadByLanguageResourceId(int $languageResourceId): ?Zend_Db_Table_Row_Abstract
+    {
         $s = $this->db->select();
-        $s->where('languageId = ?', $languageId)->where('languageResourceId = ?', $languageResourceId);
+        $s->where('languageResourceId = ?', $languageResourceId);
 
         $this->row = $this->db->fetchRow($s);
         if (empty($this->row)){
-            $this->notFound("#by languageId, languageResourceId", "{$languageId}, {$languageResourceId}");
+            $this->notFound("#by languageResourceId", "{$languageResourceId}");
         }
 
         return $this->row;

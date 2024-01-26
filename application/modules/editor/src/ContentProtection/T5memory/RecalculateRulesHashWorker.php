@@ -34,6 +34,7 @@ use editor_Models_Languages;
 use MittagQI\Translate5\ContentProtection\Model\ContentProtectionRepository;
 use MittagQI\Translate5\ContentProtection\Model\InputMapping;
 use MittagQI\Translate5\ContentProtection\Model\LanguageRulesHash;
+use MittagQI\Translate5\ContentProtection\Model\OutputMapping;
 use ZfExtended_Factory;
 use ZfExtended_Models_Entity_NotFoundException;
 use ZfExtended_Worker_Abstract;
@@ -44,8 +45,13 @@ use ZfExtended_Worker_Abstract;
  */
 class RecalculateRulesHashWorker extends ZfExtended_Worker_Abstract
 {
+    public const DIRECTION_BOTH = 0;
+    public const DIRECTION_INPUT = 1;
+    public const DIRECTION_OUTPUT = 2;
+
     private ?int $recognitionId = null;
-    private array $languageIds = [];
+    private int $languageId = 0;
+    private int $direction = self::DIRECTION_BOTH;
     private ContentProtectionRepository $repository;
 
     public function __construct()
@@ -56,6 +62,10 @@ class RecalculateRulesHashWorker extends ZfExtended_Worker_Abstract
 
     protected function validateParameters($parameters = [])
     {
+        if (array_key_exists('direction', $parameters)) {
+            $this->direction = (int) $parameters['direction'];
+        }
+
         if (array_key_exists('recognitionId', $parameters)) {
             $this->recognitionId = (int) $parameters['recognitionId'];
 
@@ -63,7 +73,7 @@ class RecalculateRulesHashWorker extends ZfExtended_Worker_Abstract
         }
 
         if (array_key_exists('languageId', $parameters)) {
-            $this->languageIds[] = (int) $parameters['languageId'];
+            $this->languageId = (int) $parameters['languageId'];
 
             return true;
         }
@@ -74,19 +84,47 @@ class RecalculateRulesHashWorker extends ZfExtended_Worker_Abstract
     protected function work()
     {
         if (null !== $this->recognitionId) {
-            $dbMapping = ZfExtended_Factory::get(InputMapping::class)->db;
-            $select = $dbMapping->select()
-                ->from(['mapping' => $dbMapping->info($dbMapping::NAME)], ['languageId'])
-                ->where('contentRecognitionId = ?', $this->recognitionId)
-            ;
+            $this->recalculateForRecognition($this->recognitionId);
 
-            array_push($this->languageIds, ...array_column($dbMapping->fetchAll($select)->toArray(), 'languageId'));
+            return true;
         }
 
+        $this->recalculateForLangs($this->direction, $this->languageId);
+
+        return true;
+    }
+
+    private function recalculateForRecognition(int $recognitionId): void
+    {
+        $dbMapping = ZfExtended_Factory::get(InputMapping::class)->db;
+        $select = $dbMapping->select()
+            ->from(['mapping' => $dbMapping->info($dbMapping::NAME)], ['distinct(languageId)'])
+            ->where('contentRecognitionId = ?', $recognitionId)
+        ;
+
+        $this->recalculateForLangs(
+            self::DIRECTION_INPUT,
+            ...array_column($dbMapping->fetchAll($select)->toArray(), 'languageId')
+        );
+
+        $dbMapping = ZfExtended_Factory::get(OutputMapping::class)->db;
+        $select = $dbMapping->select()
+            ->from(['mapping' => $dbMapping->info($dbMapping::NAME)], ['distinct(languageId)'])
+            ->where('outputContentRecognitionId = ?', $recognitionId)
+        ;
+
+        $this->recalculateForLangs(
+            self::DIRECTION_OUTPUT,
+            ...array_column($dbMapping->fetchAll($select)->toArray(), 'languageId')
+        );
+    }
+
+    private function recalculateForLangs(int $direction, int|string ...$languageIds): void
+    {
         $language = ZfExtended_Factory::get(editor_Models_Languages::class);
         $languageRulesHash = ZfExtended_Factory::get(LanguageRulesHash::class);
 
-        foreach ($this->languageIds as $languageId) {
+        foreach ($languageIds as $languageId) {
             $language->load($languageId);
 
             try {
@@ -97,11 +135,14 @@ class RecalculateRulesHashWorker extends ZfExtended_Worker_Abstract
                 $languageRulesHash->setLanguageId((int) $languageId);
             }
 
-            $languageRulesHash->setHash($this->repository->getRulesHashBy($language));
+            if (in_array($direction, [self::DIRECTION_INPUT, self::DIRECTION_BOTH], true)) {
+                $languageRulesHash->setInputHash($this->repository->getInputRulesHashBy($language));
+            }
+            if (in_array($direction, [self::DIRECTION_OUTPUT, self::DIRECTION_BOTH], true)) {
+                $languageRulesHash->setOutputHash($this->repository->getOutputRulesHashBy($language));
+            }
 
             $languageRulesHash->save();
         }
-
-        return true;
     }
 }

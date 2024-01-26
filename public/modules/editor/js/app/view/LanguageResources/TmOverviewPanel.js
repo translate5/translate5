@@ -46,6 +46,8 @@ Ext.define('Editor.view.LanguageResources.TmOverviewPanel', {
     alias: 'widget.tmOverviewPanel',
     controller: 'tmOverviewPanel',
     itemId: 'tmOverviewPanel',
+    stateful: true,
+    stateId: 'editor.tmOverviewPanel',
     title: '#UT#Sprachressourcen',
     helpSection: 'languageresource',
     glyph: 'xf1c0@FontAwesome5FreeSolid',
@@ -407,8 +409,14 @@ Ext.define('Editor.view.LanguageResources.TmOverviewPanel', {
                         hidden: canNotAddLangresource,
                     },
                     {
-                        xtype: 'tbspacer',
-                        flex: 1.6
+                        xtype: 'button',
+                        iconCls: 'x-fa fa-filter',
+                        id: 'showConvertedFilter',
+                        bind: {
+                            text: '{l10n.contentProtection.show_only_not_converted}'
+                        },
+                        enableToggle: true,
+                        toggleHandler: 'onShowOnlyNotConverted'
                     },
                     {
                         xtype: 'button',
@@ -419,15 +427,6 @@ Ext.define('Editor.view.LanguageResources.TmOverviewPanel', {
                         },
                         handler: 'onConvertTms',
                         hidden: true
-                    },
-                    {
-                        xtype: 'button',
-                        iconCls: 'x-fa fa-filter',
-                        bind: {
-                            text: '{l10n.contentProtection.show_only_not_converted}'
-                        },
-                        enableToggle: true,
-                        toggleHandler: 'onShowOnlyNotConverted'
                     }]
                 }]
       };
