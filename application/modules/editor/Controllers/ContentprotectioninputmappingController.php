@@ -47,9 +47,12 @@ class editor_ContentprotectioninputmappingController extends ZfExtended_RestCont
 
     public function deleteAction()
     {
+        $this->entityLoad();
+        $entity = clone $this->entity;
+
         parent::deleteAction();
 
-        $this->queueRecalculateRulesHashWorker();
+        $this->queueRecalculateRulesHashWorker((int) $entity->getLanguageId());
     }
 
     public function postAction()
@@ -68,14 +71,17 @@ class editor_ContentprotectioninputmappingController extends ZfExtended_RestCont
             }
 
             if (strpos($prevMassage, $this->entity->getLanguageId() . '-' . $this->entity->getPriority())) {
-                throw new ZfExtended_UnprocessableEntity('E1591', ['mapping' => 'Input', 'index' => 'language-priority']);
+                throw new ZfExtended_UnprocessableEntity('E1591', [
+                    'mapping' => 'Input',
+                    'index' => 'language-priority'
+                ]);
             }
 
             throw $e;
             
         }
 
-        $this->queueRecalculateRulesHashWorker();
+        $this->queueRecalculateRulesHashWorker((int) $this->entity->getLanguageId());
     }
 
     public function putAction()
@@ -83,7 +89,7 @@ class editor_ContentprotectioninputmappingController extends ZfExtended_RestCont
         parent::putAction();
 
         if (array_key_exists('priority', (array)$this->data)) {
-            $this->queueRecalculateRulesHashWorker();
+            $this->queueRecalculateRulesHashWorker((int) $this->entity->getLanguageId());
         }
     }
 
@@ -99,10 +105,13 @@ class editor_ContentprotectioninputmappingController extends ZfExtended_RestCont
         $this->view->total = $this->entity->getTotalCount();
     }
 
-    private function queueRecalculateRulesHashWorker(): void
+    private function queueRecalculateRulesHashWorker(int $languageId): void
     {
         $worker = ZfExtended_Factory::get(RecalculateRulesHashWorker::class);
-        $worker->init(parameters: ['languageId' => $this->entity->getLanguageId()]);
+        $worker->init(parameters: [
+            'languageId' => $languageId,
+            'direction' => RecalculateRulesHashWorker::DIRECTION_INPUT
+        ]);
         $worker->queue();
     }
 

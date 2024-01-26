@@ -301,7 +301,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
 
         $fileName = $this->getFileName($segment);
         $source = $this->tagHandler->prepareQuery($this->getQueryString($segment));
-        $target = $this->tagHandler->prepareQuery($segment->getTargetEdit());
+        $target = $this->tagHandler->prepareQuery($segment->getTargetEdit(), false);
 
         $tmName = $this->getWritableMemory();
 
@@ -1462,10 +1462,16 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
 
         foreach ($memories as $memoryNumber => $memory) {
             $filename = $exportDir . $memory['filename'] . '_' . uniqid() . '.tmx';
-            file_put_contents(
-                $filename,
-                $this->getTm($mime, $memory['filename'])
-            );
+            try {
+                file_put_contents(
+                    $filename,
+                    $this->getTm($mime, $memory['filename'])
+                );
+            } catch (editor_Services_Connector_Exception $e) {
+                $this->logger->exception($e);
+
+                continue;
+            }
 
             $stream = "php://filter/read=fix-t5n-tag/resource=$filename";
             $reader = new XMLReader();
@@ -1475,7 +1481,11 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
 
                 if ($reader->nodeType == XMLReader::ELEMENT && $reader->name == 'tu') {
                     $writtenElements++;
-                    $writer->writeRaw($this->conversionService->convertT5MemoryTagToNumber($reader->readOuterXML()));
+                    $writer->writeRaw(
+//                        $this->conversionService->convertT5MemoryTagToNumber(
+                            $reader->readOuterXML()
+//                        )
+                    );
                 }
 
                 // Further code is only applicable for the first file
@@ -1590,7 +1600,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
             return;
         }
 
-        $targetSent = $this->tagHandler->prepareQuery($segment->getTargetEdit());
+        $targetSent = $this->tagHandler->prepareQuery($segment->getTargetEdit(), false);
 
         $result = $this->query($segment);
 

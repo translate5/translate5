@@ -85,6 +85,9 @@ Ext.define('Editor.controller.TmOverview', {
     }, {
         ref: 'TmWindow',
         selector: '#addTmWindow'
+    }, {
+        ref: 'showConvertedFilterBtn',
+        selector: '#tmOverviewPanel #showConvertedFilter'
     }],
     listen: {
         component: {
@@ -211,6 +214,7 @@ Ext.define('Editor.controller.TmOverview', {
     },
     handleButtonRefreshClick: function () {
         this.getTmOverviewPanel().getStore().load();
+        this.getTmOverviewPanel().getController().onShowOnlyNotConverted(this.getShowConvertedFilterBtn(), false);
         Ext.StoreManager.get('Editor.store.LanguageResources.Resources').load();
     },
     handleSaveAddClick: function (button) {
@@ -500,9 +504,6 @@ Ext.define('Editor.controller.TmOverview', {
                 }
                 Ext.Ajax.request({
                     url: Editor.data.restpath + 'languageresourceinstance/' + rec.get('id') + '/synchronizetm/',
-                    params: {
-                        languageId: rec.get('sourceLang')[0]
-                    },
                     method: 'POST',
                     failure: (records, op) => Editor.app.getController('ServerException').handleException(op.error.response),
                     success: () => Editor.MessageBox.addSuccess(Editor.data.l10n.contentProtection.conversionStarted)

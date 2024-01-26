@@ -261,7 +261,7 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
             return;
         }
 
-        $tmConversionService->startConversion($postData['id'], $postData['languageId']);
+        $tmConversionService->startConversion($postData['id']);
     }
 
     public function synchronizetmbatchAction(): void
@@ -276,13 +276,13 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
 
         foreach ($postData['data'] as $resource) {
             if (
-                $tmConversionService->isTmConverted((int)$resource->languageResourceId)
-                || $tmConversionService->isConversionInProgress((int)$resource->languageResourceId)
+                $tmConversionService->isTmConverted((int)$resource)
+                || $tmConversionService->isConversionInProgress((int)$resource)
             ) {
                 continue;
             }
 
-            $tmConversionService->startConversion((int)$resource->languageResourceId, (int)$resource->languageId);
+            $tmConversionService->startConversion((int)$resource);
         }
     }
 

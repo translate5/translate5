@@ -204,7 +204,7 @@ class editor_Models_Import_FileParser_Tag {
             $length = $this->placeable->getContentLength();
         }
 
-        return $this->renderedTag = self::$renderer[$this->type]->getHtmlTag([
+        return $this->renderedTag = static::$renderer[$this->type]->getHtmlTag([
             'class' => implode(' ', $classes),
             'text' => $text,
             'shortTag' => $this->tagNr,

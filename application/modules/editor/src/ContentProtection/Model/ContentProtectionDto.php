@@ -52,8 +52,6 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\ContentProtection\Model;
 
-use Zend_Db_Table_Row;
-
 /**
  * @property-read string $type
  * @property-read string $name

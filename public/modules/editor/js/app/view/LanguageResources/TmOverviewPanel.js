@@ -409,8 +409,14 @@ Ext.define('Editor.view.LanguageResources.TmOverviewPanel', {
                         hidden: canNotAddLangresource,
                     },
                     {
-                        xtype: 'tbspacer',
-                        flex: 1.6
+                        xtype: 'button',
+                        iconCls: 'x-fa fa-filter',
+                        id: 'showConvertedFilter',
+                        bind: {
+                            text: '{l10n.contentProtection.show_only_not_converted}'
+                        },
+                        enableToggle: true,
+                        toggleHandler: 'onShowOnlyNotConverted'
                     },
                     {
                         xtype: 'button',
@@ -421,15 +427,6 @@ Ext.define('Editor.view.LanguageResources.TmOverviewPanel', {
                         },
                         handler: 'onConvertTms',
                         hidden: true
-                    },
-                    {
-                        xtype: 'button',
-                        iconCls: 'x-fa fa-filter',
-                        bind: {
-                            text: '{l10n.contentProtection.show_only_not_converted}'
-                        },
-                        enableToggle: true,
-                        toggleHandler: 'onShowOnlyNotConverted'
                     }]
                 }]
       };

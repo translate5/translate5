@@ -87,21 +87,24 @@ class TmConversionService
         $languageRulesHash = ZfExtended_Factory::get(LanguageRulesHash::class);
         try {
             $languageRulesHash->loadByLanguageId($languageId);
-            $hash = $languageRulesHash->getHash();
+            $inputHash = $languageRulesHash->getInputHash();
+            $outputHash = $languageRulesHash->getOtputHash();
         } catch (ZfExtended_Models_Entity_NotFoundException) {
             $lang = ZfExtended_Factory::get(editor_Models_Languages::class);
             $lang->load($languageId);
-            $hash = $this->contentProtectionRepository->getRulesHashBy($lang);
+
+            [$inputHash, $outputHash] = $this->contentProtectionRepository->getInputRulesHashBy($lang);
 
             $languageRulesHash->setLanguageId($languageId);
-            $languageRulesHash->setHash($hash);
+            $languageRulesHash->setInputHash($inputHash);
+            $languageRulesHash->setOutputHash($outputHash);
             $languageRulesHash->save();
         }
 
         $languageResourceRulesHash = ZfExtended_Factory::get(LanguageResourceRulesHash::class);
         $languageResourceRulesHash->setLanguageResourceId($languageResourceId);
-        $languageResourceRulesHash->setLanguageId($languageId);
-        $languageResourceRulesHash->setHash($hash);
+        $languageResourceRulesHash->setInputHash($inputHash);
+        $languageResourceRulesHash->setOutputHash($outputHash);
         $languageResourceRulesHash->save();
 
         return [$languageResourceRulesHash, $languageRulesHash];
@@ -118,10 +121,18 @@ class TmConversionService
             return false;
         }
 
-        foreach ($this->languageResourceRulesHashMap[$languageResourceId] as ['languageId' => $id, 'hash' => $hash]) {
-            if (empty($this->languageRulesHashMap[(int)$id]) || $this->languageRulesHashMap[(int)$id] !== $hash) {
-                return false;
-            }
+        ['input' => $inputHash, 'output' => $outputHash] = $this->languageResourceRulesHashMap[$languageResourceId];
+
+        if (!isset($this->languageRulesHashMap[$inputHash['langId']]) || !isset($this->languageRulesHashMap[$outputHash['langId']])) {
+            return false;
+        }
+
+        if ($this->languageRulesHashMap[$inputHash['langId']]['inputHash'] !== $inputHash['hash']) {
+            return false;
+        }
+
+        if ($this->languageRulesHashMap[$outputHash['langId']]['outputHash'] !== $outputHash['hash']) {
+            return false;
         }
 
         return true;
@@ -133,33 +144,30 @@ class TmConversionService
             return false;
         }
 
-        foreach ($this->languageResourceRulesHashMap[$languageResourceId] as ['conversionStarted' => $started]) {
-            if (!empty($started)) {
-                return true;
-            }
+        if (!empty($this->languageResourceRulesHashMap[$languageResourceId]['conversionStarted'])) {
+            return true;
         }
 
         return false;
     }
 
-    public function startConversion(int $languageResourceId, int $languageId): void
+    public function startConversion(int $languageResourceId): void
     {
         $languageResourceRulesHash = ZfExtended_Factory::get(LanguageResourceRulesHash::class);
 
         try {
-            $languageResourceRulesHash->loadByLanguageResourceIdAndLanguageId($languageResourceId, $languageId);
+            $languageResourceRulesHash->loadByLanguageResourceId($languageResourceId);
         } catch (ZfExtended_Models_Entity_NotFoundException) {
             // if not found we simply create new
             $languageResourceRulesHash->init();
             $languageResourceRulesHash->setLanguageResourceId($languageResourceId);
-            $languageResourceRulesHash->setLanguageId($languageId);
         }
 
         $languageResourceRulesHash->setConversionStarted(date('Y-m-d H:i:s'));
         $languageResourceRulesHash->save();
 
         $worker = ZfExtended_Factory::get(ConverseMemoryWorker::class);
-        if ($worker->init(parameters: ['languageResourceId' => $languageResourceId, 'languageId' => $languageId])) {
+        if ($worker->init(parameters: ['languageResourceId' => $languageResourceId])) {
             $worker->queue();
         }
     }

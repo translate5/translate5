@@ -45,7 +45,6 @@ use ZfExtended_Worker_Abstract;
 class ConverseMemoryWorker extends ZfExtended_Worker_Abstract
 {
     private int $languageResourceId;
-    private int $languageId;
     private LanguageResource $languageResource;
     private array $memoriesBackup;
     private LanguageResourceRulesHash $languageResourceRulesHash;
@@ -73,12 +72,7 @@ class ConverseMemoryWorker extends ZfExtended_Worker_Abstract
             return false;
         }
 
-        if (!array_key_exists('languageId', $parameters)) {
-            return false;
-        }
-
         $this->languageResourceId = (int) $parameters['languageResourceId'];
-        $this->languageId = (int) $parameters['languageId'];
 
         $this->languageResource = ZfExtended_Factory::get(LanguageResource::class);
         $this->languageResource->load($this->languageResourceId);
@@ -91,15 +85,9 @@ class ConverseMemoryWorker extends ZfExtended_Worker_Abstract
 
         $this->languageResourceRulesHash = ZfExtended_Factory::get(LanguageResourceRulesHash::class);
         try {
-            $this->languageResourceRulesHash->loadByLanguageResourceIdAndLanguageId(
-                $this->languageResourceId,
-                $this->languageId
-            );
+            $this->languageResourceRulesHash->loadByLanguageResourceId($this->languageResourceId);
         } catch (\ZfExtended_Models_Entity_NotFoundException) {
-            $this->languageResourceRulesHash->init([
-                'languageResourceId' => $this->languageResourceId,
-                'languageId' => $this->languageId
-            ]);
+            $this->languageResourceRulesHash->init(['languageResourceId' => $this->languageResourceId]);
         }
 
         return true;
@@ -114,9 +102,6 @@ class ConverseMemoryWorker extends ZfExtended_Worker_Abstract
     
     protected function work(): bool
     {
-        $languageRulesHash = ZfExtended_Factory::get(LanguageRulesHash::class);
-        $languageRulesHash->loadByLanguageId($this->languageId);
-
         if ($this->tmConversionService->isTmConverted($this->languageResourceId)) {
             return true;
         }
@@ -212,7 +197,14 @@ class ConverseMemoryWorker extends ZfExtended_Worker_Abstract
         // Language Resource was possibly changed in $onMemoryDeleted call
         $this->languageResource->save();
 
-        $this->languageResourceRulesHash->setHash($languageRulesHash->getHash());
+        $languageRulesHash = ZfExtended_Factory::get(LanguageRulesHash::class);
+
+        $languageRulesHash->loadByLanguageId($sourceLang);
+        $this->languageResourceRulesHash->setInputHash($languageRulesHash->getInputHash());
+
+        $languageRulesHash->loadByLanguageId($targetLang);
+        $this->languageResourceRulesHash->setOutputHash($languageRulesHash->getOutputHash());
+
         $this->resetConversionStarted();
 
         return true;

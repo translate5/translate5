@@ -62,8 +62,10 @@ use ZfExtended_Models_Entity_NotFoundException;
  *
  * @method string getLanguageId()
  * @method void setLanguageId(int $languageId)
- * @method string getHash()
- * @method void setHash(string $hash)
+ * @method string getInputHash()
+ * @method void setInputHash(string $hash)
+ * @method string getOutputHash()
+ * @method void setOutputHash(string $hash)
  */
 class LanguageRulesHash extends ZfExtended_Models_Entity_Abstract
 {
