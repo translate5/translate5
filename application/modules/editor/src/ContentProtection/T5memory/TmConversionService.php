@@ -82,32 +82,41 @@ class TmConversionService
     /**
      * @return array{LanguageResourceRulesHash, LanguageRulesHash}
      */
-    public function createRuleHashes(int $languageResourceId, int $languageId): array
+    public function createRuleHashes(int $languageResourceId, int $sourceLanguageId, int $targetLangId): array
     {
-        $languageRulesHash = ZfExtended_Factory::get(LanguageRulesHash::class);
+        $sourceLanguageRulesHash = ZfExtended_Factory::get(LanguageRulesHash::class);
         try {
-            $languageRulesHash->loadByLanguageId($languageId);
-            $inputHash = $languageRulesHash->getInputHash();
-            $outputHash = $languageRulesHash->getOtputHash();
+            $sourceLanguageRulesHash->loadByLanguageId($sourceLanguageId);
         } catch (ZfExtended_Models_Entity_NotFoundException) {
             $lang = ZfExtended_Factory::get(editor_Models_Languages::class);
-            $lang->load($languageId);
+            $lang->load($sourceLanguageId);
 
-            [$inputHash, $outputHash] = $this->contentProtectionRepository->getInputRulesHashBy($lang);
+            $sourceLanguageRulesHash->setLanguageId($sourceLanguageId);
+            $sourceLanguageRulesHash->setInputHash($this->contentProtectionRepository->getInputRulesHashBy($lang));
+            $sourceLanguageRulesHash->setOutputHash($this->contentProtectionRepository->getOutputRulesHashBy($lang));
+            $sourceLanguageRulesHash->save();
+        }
 
-            $languageRulesHash->setLanguageId($languageId);
-            $languageRulesHash->setInputHash($inputHash);
-            $languageRulesHash->setOutputHash($outputHash);
-            $languageRulesHash->save();
+        $targetLanguageRulesHash = ZfExtended_Factory::get(LanguageRulesHash::class);
+        try {
+            $targetLanguageRulesHash->loadByLanguageId($targetLangId);
+        } catch (ZfExtended_Models_Entity_NotFoundException) {
+            $lang = ZfExtended_Factory::get(editor_Models_Languages::class);
+            $lang->load($targetLangId);
+
+            $targetLanguageRulesHash->setLanguageId($targetLangId);
+            $targetLanguageRulesHash->setInputHash($this->contentProtectionRepository->getInputRulesHashBy($lang));
+            $targetLanguageRulesHash->setOutputHash($this->contentProtectionRepository->getOutputRulesHashBy($lang));
+            $targetLanguageRulesHash->save();
         }
 
         $languageResourceRulesHash = ZfExtended_Factory::get(LanguageResourceRulesHash::class);
         $languageResourceRulesHash->setLanguageResourceId($languageResourceId);
-        $languageResourceRulesHash->setInputHash($inputHash);
-        $languageResourceRulesHash->setOutputHash($outputHash);
+        $languageResourceRulesHash->setInputHash($sourceLanguageRulesHash->getInputHash());
+        $languageResourceRulesHash->setOutputHash($targetLanguageRulesHash->getOutputHash());
         $languageResourceRulesHash->save();
 
-        return [$languageResourceRulesHash, $languageRulesHash];
+        return [$languageResourceRulesHash, $sourceLanguageRulesHash];
     }
 
     public static function fullTagRegex(): string

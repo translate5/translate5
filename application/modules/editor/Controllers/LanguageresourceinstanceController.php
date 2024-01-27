@@ -856,7 +856,7 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
             ContentProtector::create(ZfExtended_Factory::get(Whitespace::class))
         );
 
-        $tmConversionService->createRuleHashes($this->entity->getId(), $sourceLangId);
+        $tmConversionService->createRuleHashes($this->entity->getId(), $sourceLangId, $targetLangId);
 
         $this->view->rows = $this->entity->getDataObject();
         $this->view->success = true;
