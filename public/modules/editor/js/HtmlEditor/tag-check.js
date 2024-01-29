@@ -12,6 +12,11 @@ class TagCheck {
         let excessTags = [];
 
         for (let node of nodeList) {
+            if (node.parentNode && node.parentNode.nodeName.toLowerCase() === "del") {
+                // Ignore deleted nodes
+                continue;
+            }
+
             // node id can have word locked followed by number, so we need to use negative lookbehind
             const match = node.id.match(new RegExp(this.idPrefix + '([a-zA-Z]+)(\\d+)'));
 

@@ -105,6 +105,7 @@ class editor_LanguageresourcetaskpivotassocController extends ZfExtended_RestCon
             $wq = ZfExtended_Factory::get(Queue::class);
             $wq->trigger();
         }
+        $this->view->success = true;
     }
 
     /***

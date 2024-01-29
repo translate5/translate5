@@ -39,19 +39,9 @@ use MittagQI\Translate5\Segment\AbstractProcessor;
 final class Looper
 {
     /**
-     * @var editor_Models_Task
-     */
-    private editor_Models_Task $task;
-
-    /**
      * @var State
      */
     private State $state;
-
-    /**
-     * @var AbstractProcessor
-     */
-    private AbstractProcessor $processor;
 
     /**
      * @var State[]
@@ -75,13 +65,21 @@ final class Looper
     private int $loopingPause;
 
     /**
+     * Tracks the number of processed segments
+     * @var int
+     */
+    private int $numProcessed = 0;
+
+    /**
+     * @param ProgressInterface $progressReporter
      * @param editor_Models_Task $task
      * @param AbstractProcessor $processor
      */
-    public function __construct(editor_Models_Task $task, AbstractProcessor $processor)
+    public function __construct(
+        private ProgressInterface  $progressReporter,
+        private editor_Models_Task $task,
+        private AbstractProcessor  $processor)
     {
-        $this->task = $task;
-        $this->processor = $processor;
         $this->loopingPause = $processor->getLoopingPause();
         $this->state = new State($processor->getServiceId());
         $this->batchSize = $processor->getBatchSize();
@@ -111,9 +109,13 @@ final class Looper
             // we do that only, if the processing saves back to the tag-state, otherwise we create nested locks in an potentially uncertain order
             if (count($segmentsTags) === 1) {
                 $this->processor->process($segmentsTags[0]);
+                $this->numProcessed++;
             } else {
                 $this->processor->processBatch($segmentsTags);
+                $this->numProcessed += count($segmentsTags);
             }
+            // report the progress of processed segments
+            $this->progressReporter->reportProcessed($this->numProcessed);
             // if configured, we wait before fetching the next segments
             if ($this->loopingPause > 0) {
                 usleep($this->loopingPause);
@@ -124,7 +126,7 @@ final class Looper
     }
 
     /**
-     * Retrieves the current progress of the processing
+     * Retrieves the current progress of the processing as float between 0 and 1
      * @return float
      */
     public function getProgress(): float
@@ -140,7 +142,6 @@ final class Looper
     {
         return $this->toProcess;
     }
-
 
     /**
      * @param State[] $problematicStates

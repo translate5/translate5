@@ -27,6 +27,7 @@ END LICENSE AND COPYRIGHT
 */
 
 use editor_Models_Task as Task;
+use MittagQI\Translate5\LanguageResource\Adapter\UpdatableAdapterInterface;
 use MittagQI\Translate5\LanguageResource\Status as LanguageResourceStatus;
 use MittagQI\Translate5\Service\T5Memory;
 
@@ -35,7 +36,7 @@ use MittagQI\Translate5\Service\T5Memory;
  *
  * IMPORTANT: see the doc/comments in MittagQI\Translate5\Service\T5Memory
  */
-class editor_Services_OpenTM2_Connector extends editor_Services_Connector_FilebasedAbstract
+class editor_Services_OpenTM2_Connector extends editor_Services_Connector_FilebasedAbstract implements UpdatableAdapterInterface
 {
     private const CONCORDANCE_SEARCH_NUM_RESULTS = 20;
     /**
@@ -247,7 +248,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
         $this->throwBadGateway();
     }
 
-    public function update(editor_Models_Segment $segment): void
+    public function update(editor_Models_Segment $segment, bool $recheckOnUpdate = self::DO_NOT_RECHECK_ON_UPDATE): void
     {
         if ($this->isReorganizingAtTheMoment()) {
             throw new editor_Services_Connector_Exception('E1512', [
@@ -265,6 +266,8 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
         $successful = $this->api->update($source, $target, $segment, $fileName, $tmName, !$this->isInternalFuzzy);
 
         if ($successful) {
+            $this->checkUpdatedSegment($segment, $recheckOnUpdate);
+
             return;
         }
 
@@ -275,6 +278,8 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
             $successful = $this->api->update($source, $target, $segment, $fileName, $tmName, !$this->isInternalFuzzy);
 
             if ($successful) {
+                $this->checkUpdatedSegment($segment, $recheckOnUpdate);
+
                 return;
             }
         } elseif ($this->isMemoryOverflown($this->api->getError())) {
@@ -285,6 +290,8 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
             $successful = $this->api->update($source, $target, $segment, $fileName, $tmName, !$this->isInternalFuzzy);
 
             if ($successful) {
+                $this->checkUpdatedSegment($segment, $recheckOnUpdate);
+
                 return;
             }
         }
@@ -670,8 +677,12 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
 
             // TM exists and is loaded into memory
             case 'open':
-
                 switch ($tmxImportStatus) {
+                    case '':
+                        $result = LanguageResourceStatus::AVAILABLE;
+
+                        break;
+
                     case 'available':
                         if (isset($apiResponse->importTime) && $apiResponse->importTime === 'not finished') {
                             $result = LanguageResourceStatus::IMPORT;
@@ -1183,7 +1194,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
                 $segment,
                 $fileName
             );
-            $resultList->addResult($target, $matchrate, $this->getMetaData($found));
+            $resultList->addResult($target, $matchrate, $this->getMetaData($found), $found->target);
             $resultList->setSource($source);
         }
 
@@ -1468,4 +1479,82 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
         return $zipFileName;
     }
     // endregion export TM
+
+    /**
+     * Check if segment was updated properly
+     * and if not - add a log record for that for debug purposes
+     *
+     * @param editor_Models_Segment $segment
+     * @param bool $recheckOnUpdate
+     *
+     * @return void
+     */
+    private function checkUpdatedSegment(editor_Models_Segment $segment, bool $recheckOnUpdate): void
+    {
+        if (!in_array(
+                $this->getResource()->getUrl(),
+                $this->config->runtimeOptions->LanguageResources->checkSegmentsAfterUpdate->toArray(),
+                true
+            )
+            || !$recheckOnUpdate
+        ) {
+            // Checking segment after update is disabled in config or in parameter, nothing to do
+            return;
+        }
+
+        $targetSent = $this->tagHandler->prepareQuery($segment->getTargetEdit());
+
+        $result = $this->query($segment);
+
+        $logError = fn(string $reason) => $this->logger->error(
+            'E1586',
+            $reason,
+            [
+                'languageResource' => $this->languageResource,
+                'segment' => $segment,
+                'response' => json_encode($result->getResult(), JSON_PRETTY_PRINT),
+                'target' => $targetSent
+            ]
+        );
+
+        $maxMatchRateResult = $result->getMaxMatchRateResult();
+
+        // If there is no result at all, it means that segment was not saved to TM
+        if (!$maxMatchRateResult) {
+            $logError('Segment was not saved to TM');
+
+            return;
+        }
+
+        // Just saved segment should have matchrate 103
+        // TODO uncomment after matchrate calculating issue is fixed on t5memory side
+        $matchRateFits = true; //$maxMatchRateResult->matchrate === 103;
+
+        // Decode html entities
+        $targetReceived = html_entity_decode($maxMatchRateResult->rawTarget);
+        // Decode unicode symbols
+        $targetReceived = preg_replace_callback('/\\\\u([0-9a-fA-F]{4})/', function ($match) {
+            return mb_convert_encoding(pack('H*', $match[1]), 'UTF-8', 'UCS-2BE');
+        }, $targetReceived);
+        // Replacing \r\n to \n back because t5memory replaces \n to \r\n
+        $targetReceived = str_replace("\r\n", "\n", $targetReceived);
+        // Also replace tab symbols to space because t5memory does it on its side
+        $targetSent = str_replace("\t", ' ', $targetSent);
+        // Finally compare target that we've sent for saving with the one we retrieved from TM, they should be the same
+        $targetIsTheSame = $targetReceived === $targetSent;
+
+        $resultTimestamp = $result->getMetaValue($maxMatchRateResult->metaData, 'timestamp');
+        $resultDate = DatetimeImmutable::createFromFormat('Y-m-d H:i:s T', $resultTimestamp);
+        // Timestamp should be not older than 1 minute otherwise it is an old segment which wasn't updated
+        // TODO uncomment after matchrate calculating issue is fixed on t5memory side
+        $isResultFresh = true; //$resultDate >= new DateTimeImmutable('-1 minute');
+
+        if (!$matchRateFits || !$targetIsTheSame || !$isResultFresh) {
+            $logError(match (false) {
+                $matchRateFits => 'Match rate is not 103',
+                $targetIsTheSame => 'Saved segment target differs with provided',
+                $isResultFresh => 'Got old result',
+            });
+        }
+    }
 }

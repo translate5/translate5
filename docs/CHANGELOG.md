@@ -11,12 +11,118 @@ All updates are (downwards) compatible! If not this is listed in the important r
 
 
 
+## [7.1.0] - 2024-01-19
+
+### Important Notes:
+#### [TRANSLATE-3483](https://jira.translate5.net/browse/TRANSLATE-3483)
+Defining and changing field can be high resource usage. Please do it with coordination with the translate5 support team.
+ 
+
+
+### Added
+**[TRANSLATE-3650](https://jira.translate5.net/browse/TRANSLATE-3650): Editor general - Special characters listed for all languages** <br>
+Can be defined special characters in the editor to be available for all languages.
+
+**[TRANSLATE-3533](https://jira.translate5.net/browse/TRANSLATE-3533): Import/Export, VisualReview / VisualTranslation - Placeables in translate5** <br>
+Added capabilities to identify Placeables in xliff-tags. Placeables are single internal tags that will be shown with their text-content instead as tag. For identification XPaths have to be defined in the configuration.
+
+**[TRANSLATE-3483](https://jira.translate5.net/browse/TRANSLATE-3483): Task Management - Custom project/task meta data fields** <br>
+New feature where custom fields can be defined for a task.
+
+**[TRANSLATE-2276](https://jira.translate5.net/browse/TRANSLATE-2276): Client management, LanguageResources, Task Management, User Management - Save customization of project, task, language resource, user and client management** <br>
+Columns in main grids do now remember their order, visibility, sorting and filtering
+
+
+### Changed
+**[TRANSLATE-3636](https://jira.translate5.net/browse/TRANSLATE-3636): Auto-QA - FIX Quality Decorations in Segment Grid** <br>
+FIX: Spellcheck decorations may have wrong positions and/or wrong Segment-Text in right-click layer in the segment-grid
+
+**[TRANSLATE-3622](https://jira.translate5.net/browse/TRANSLATE-3622): Main back-end mechanisms (Worker, Logging, etc.) - Zip and upload data-directory to Indi Engine logger after pipeline completion** <br>
+Translate5 instance logger improvements.
+
+
+### Bugfixes
+**[TRANSLATE-3669](https://jira.translate5.net/browse/TRANSLATE-3669): TBX-Import - Cross API connector was not working on php 8.1 due class loading problems** <br>
+The Across TBX Import was not working anymore with php 8.1
+
+**[TRANSLATE-3664](https://jira.translate5.net/browse/TRANSLATE-3664): sso - Missing header in proxy config** <br>
+For https request the http host was set with wrong value leading SSO customers to be not detected based on the domain.
+
+**[TRANSLATE-3662](https://jira.translate5.net/browse/TRANSLATE-3662): LanguageResources - Dictionary search language support** <br>
+Check for dictionary supported languages before searching for result.
+
+**[TRANSLATE-3661](https://jira.translate5.net/browse/TRANSLATE-3661): Okapi integration - Okapi config allows deletion of okapi instances even if in use** <br>
+Okapi servers being in use by several tasks could be deleted over the UI, this is prevented now.
+
+**[TRANSLATE-3658](https://jira.translate5.net/browse/TRANSLATE-3658): file format settings - File formats: Make format-check in the import-wizard dynamic** <br>
+FIX: Check of added workfiles did not respect the extension-mapping of the selected bconf
+
+**[TRANSLATE-3653](https://jira.translate5.net/browse/TRANSLATE-3653): t5memory - t5memory TMX Upload does not work anymore** <br>
+The TMX upload was not working anymore in hosted environments
+
+**[TRANSLATE-3652](https://jira.translate5.net/browse/TRANSLATE-3652): Import/Export - Remove wrong SRX rule from all languages** <br>
+Remove erroneus SRX-rule from translate5 default File-format settings (BCONF)
+
+**[TRANSLATE-3640](https://jira.translate5.net/browse/TRANSLATE-3640): Client management - email link to task not working for clients with own domain** <br>
+Fix for translate5 url in email templates.
+
+**[TRANSLATE-3635](https://jira.translate5.net/browse/TRANSLATE-3635): Auto-QA, Editor general - Usage of "target at import time" as source for tags: Only for bilingual tasks** <br>
+Target at import time is considered to be a reference field for checking tags only for files where we did directly get the bilingual files in the import
+
+**[TRANSLATE-3633](https://jira.translate5.net/browse/TRANSLATE-3633): VisualReview / VisualTranslation - Visual: Order of merged PDFs random** <br>
+FIX: When merging PDFs for a Visual, the order of Files is now sorted by name
+
+**[TRANSLATE-3617](https://jira.translate5.net/browse/TRANSLATE-3617): Editor general - Help button is not visible in editor** <br>
+Fix for help button not visible in editor overview.
 
 
 
+## [7.0.1] - 2024-01-08
+
+### Important Notes:
 
 
+### Changed
+**[TRANSLATE-3632](https://jira.translate5.net/browse/TRANSLATE-3632): t5memory - Log if segment is not saved  to TM** <br>
+Add check if a segment was updated properly in t5memory and if not - log that for debug purposes
 
+**[TRANSLATE-3629](https://jira.translate5.net/browse/TRANSLATE-3629): Package Ex and Re-Import - Translator package import: Move checkbox for "save to TM" from upload window to sysconfig** <br>
+Write segments to TM on package re-import is now configurable on customer and task level and is not available any more as separate checkbox on re-import dialogue.
+
+
+### Bugfixes
+**[TRANSLATE-3639](https://jira.translate5.net/browse/TRANSLATE-3639): Auto-QA, MatchAnalysis & Pretranslation - Inserted fuzzy should not write into "target at import time" field** <br>
+Target text (at time of import / pretranslation) is now not updated anymore when applying match from translation memory match (was erroneously introduced in 7.0.0)
+
+**[TRANSLATE-3638](https://jira.translate5.net/browse/TRANSLATE-3638): Auto-QA, TrackChanges - Tags checker doesn't ignore deleted tags** <br>
+Fix bug when deleted tags weren't ignored during tags validation
+
+**[TRANSLATE-3614](https://jira.translate5.net/browse/TRANSLATE-3614): InstantTranslate - TM match in instant translate ignored** <br>
+Fix for translating segmented text in instant-translate so that more results come from TMs if assigned.
+
+
+## [7.0.0] - 2023-12-19
+
+### Important Notes:
+#### [TRANSLATE-3436](https://jira.translate5.net/browse/TRANSLATE-3436)
+To update to this version PHP 8.1.23 is required.
+ 
+
+
+### Added
+**[TRANSLATE-3436](https://jira.translate5.net/browse/TRANSLATE-3436): LanguageResources - Integrate GPT-4 with translate5 as translation engine** <br>
+New Private Plugin "OpenAI" to use OpenAI-Models as language-resource and base functionality to fine-tune these models
+
+
+### Bugfixes
+**[TRANSLATE-3627](https://jira.translate5.net/browse/TRANSLATE-3627): Main back-end mechanisms (Worker, Logging, etc.) - HOTFIX: Progress reporting of Looped Segment Processing Workers does not work** <br>
+FIX: progress of termtagger and spellcheck workers was not properly reported to GUI
+
+**[TRANSLATE-3624](https://jira.translate5.net/browse/TRANSLATE-3624): InstantTranslate - Instant Translate will find no en-us terms** <br>
+Fix: list all regional language results from term collections when searching with the main language code 
+
+**[TRANSLATE-3590](https://jira.translate5.net/browse/TRANSLATE-3590): Main back-end mechanisms (Worker, Logging, etc.) - Create Globally usable API-request to replace usage of InstantTranslate in various places** <br>
+Code cleanup: Centralize API-request from InsrtantTranslate as base-code
 
 
 ## [6.9.1] - 2023-12-18

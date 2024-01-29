@@ -32,5 +32,7 @@ Ext.define('Editor.store.project.Project', {
     alias: 'store.project',
     remoteSort: true,
     remoteFilter: true,
-    leadingBufferZone: 100
+    leadingBufferZone: 100,
+    statefulFilters: true,
+    trackStateChanges: true
 });

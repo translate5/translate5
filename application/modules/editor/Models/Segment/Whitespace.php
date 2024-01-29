@@ -343,16 +343,19 @@ class editor_Models_Segment_Whitespace {
 
         //generate the html tag for the editor
         switch ($type) {
+
             case 'open':
                 $type = editor_Models_Import_FileParser_Tag::TYPE_OPEN;
                 $shortTag = $this->currentShortTagNumber++;
                 $this->tagShortcutNumberMap[$id] = $shortTag;
                 break;
+
             case 'close':
                 //on tag protection it is ensured that tag pairs are wellformed, so on close we can rely that open nr exists:
                 $type = editor_Models_Import_FileParser_Tag::TYPE_CLOSE;
                 $shortTag = $this->tagShortcutNumberMap[$id];
                 break;
+
             case 'single':
             default:
                 $type = editor_Models_Import_FileParser_Tag::TYPE_SINGLE;
@@ -485,15 +488,17 @@ class editor_Models_Segment_Whitespace {
                 $text = self::LABEL_NEWLINE;
                 $title = 'Newline';
                 break;
+
             case 'space':
                 $text = str_repeat(self::LABEL_SPACE, $length);
                 $title = $length . ' whitespace character' . ($length > 1 ? 's' : '');
                 break;
-            case 'tab':
 
+            case 'tab':
                 $text = str_repeat(self::LABEL_TAB, $length);
                 $title = $length . ' tab character' . ($length > 1 ? 's' : '');
                 break;
+
             case 'char':
             default:
                 //'char' => ['text' => 'protected Special character'],

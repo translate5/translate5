@@ -28,6 +28,7 @@
 
 use MittagQI\Translate5\Plugins\MatchAnalysis\Models\Pricing\Preset;
 use MittagQI\Translate5\Plugins\MatchAnalysis\Models\Pricing\PresetRange;
+use MittagQI\ZfExtended\MismatchException;
 use ZfExtended_Factory as Factory;
 /**
  *
@@ -58,7 +59,7 @@ class editor_Plugins_MatchAnalysis_PricingpresetrangeController extends ZfExtend
 
     /**
      * @throws Zend_Db_Statement_Exception
-     * @throws ZfExtended_Mismatch
+     * @throws MismatchException
      */
     public function init() {
 
@@ -106,7 +107,7 @@ class editor_Plugins_MatchAnalysis_PricingpresetrangeController extends ZfExtend
             }
 
         // Catch mismatch-exception
-        } catch (ZfExtended_Mismatch $e) {
+        } catch (MismatchException $e) {
 
             // Flush msg
             $this->jflush(false, $e->getMessage());
@@ -146,7 +147,7 @@ class editor_Plugins_MatchAnalysis_PricingpresetrangeController extends ZfExtend
      * Delete pricing preset range
      *
      * @throws Zend_Db_Statement_Exception
-     * @throws ZfExtended_Mismatch
+     * @throws MismatchException
      * @throws ZfExtended_Models_Entity_Exceptions_IntegrityConstraint
      * @throws ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey
      * @throws ZfExtended_Models_Entity_NotFoundException
@@ -183,7 +184,7 @@ class editor_Plugins_MatchAnalysis_PricingpresetrangeController extends ZfExtend
             }
 
         // Catch mismatch-exception
-        } catch (ZfExtended_Mismatch $e) {
+        } catch (MismatchException $e) {
 
             // Flush msg
             $this->jflush(false, $e->getMessage());
@@ -260,7 +261,7 @@ class editor_Plugins_MatchAnalysis_PricingpresetrangeController extends ZfExtend
             ]);
 
         // Catch mismatch-exception
-        } catch (ZfExtended_Mismatch $e) {
+        } catch (MismatchException $e) {
 
             // Flush msg
             $this->jflush(false, $e->getMessage());

@@ -59,7 +59,10 @@ class editor_Segment_Internal_Provider extends editor_Segment_Quality_Provider {
         $useSourceForReference = $task->getConfig()->runtimeOptions->editor
             ->frontend->reviewTask->useSourceForReference;
 
-        if (!$useSourceForReference && $originalTarget && !$originalTarget->isEmpty()) {
+        if (!$useSourceForReference
+            && (!$originalTarget?->isEmpty())
+            && 0 === (int)$tags->getSegment()->getPretrans()
+        ) {
             $against = $originalTarget;
         }
 
