@@ -1481,11 +1481,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
 
                 if ($reader->nodeType == XMLReader::ELEMENT && $reader->name == 'tu') {
                     $writtenElements++;
-                    $writer->writeRaw(
-//                        $this->conversionService->convertT5MemoryTagToNumber(
-                            $reader->readOuterXML()
-//                        )
-                    );
+                    $writer->writeRaw($this->conversionService->convertT5MemoryTagToNumber($reader->readOuterXML()));
                 }
 
                 // Further code is only applicable for the first file
