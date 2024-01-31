@@ -487,7 +487,7 @@ Ext.define('Editor.util.dom.Selection', {
             // if a node has start & end in the chain, we condense it to a single node
             // and mark it as "fully wrapped"
             lastIdx = this.lastPosInChain(chain, idx);
-            if(lastIdx > -1){
+            if(lastIdx > idx){
                 chain.splice(idx + 1, lastIdx - idx);
                 this.selectionMap.set(chain[idx], true);
             }
