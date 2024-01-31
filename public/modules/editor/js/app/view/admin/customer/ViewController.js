@@ -101,8 +101,16 @@ Ext.define('Editor.view.admin.customer.ViewController', {
     /***
      * Customer grid row select handler
      */
-    customerGridSelect: function(grid, record){
-        this.editCustomer(record);
+    customerGridSelect: function(selection, record){
+        var view = this.getView(),
+            grid = view && view.down('#customerPanelGrid');
+
+        if(grid && grid.isVisible(true)){
+            // Set the record for editing only if the component is visible. The grid selection can be triggered
+            // from multiple places (ex: reloading the customers store) which can lead to trying to edit the record,
+            // when the component is not visible
+            this.editCustomer(record);
+        }
     },
 
     /***
