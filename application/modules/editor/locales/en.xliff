@@ -7274,6 +7274,10 @@ The following task was imported with errors / warnings / notices. Please take ca
                 <source>Nur gleicher Kontext</source>
                 <target>Same context only</target>
             </trans-unit>
+            <trans-unit id='WmllbHdpZWRlcmhvbHVuZ2VuIHN0YW5kYXJkbcOkw59pZyBhdXNzY2hsaWXDn2VuLCBkaWUgbmljaHQgYXVjaCBRdWVsbHdpZWRlcmhvbHVuZ2VuIHNpbmQ='>
+                <source>Zielwiederholungen standardmäßig ausschließen, die nicht auch Quellwiederholungen sind</source>
+                <target>Deselect by default target repetitions, that are not also source repetitions</target>
+            </trans-unit>
             <trans-unit id="S29udGV4dC1UcmVmZmVy">
                 <source>Kontext-Treffer</source>
                 <target>Context hits</target>

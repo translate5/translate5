@@ -594,6 +594,10 @@
                 <source>Nur gleicher Kontext</source>
                 <target>Nur gleicher Kontext</target>
             </trans-unit>
+            <trans-unit id='WmllbHdpZWRlcmhvbHVuZ2VuIHN0YW5kYXJkbcOkw59pZyBhdXNzY2hsaWXDn2VuLCBkaWUgbmljaHQgYXVjaCBRdWVsbHdpZWRlcmhvbHVuZ2VuIHNpbmQ='>
+                <source>Zielwiederholungen standardmäßig ausschließen, die nicht auch Quellwiederholungen sind</source>
+                <target>Zielwiederholungen standardmäßig ausschließen, die nicht auch Quellwiederholungen sind</target>
+            </trans-unit>
             <trans-unit id='QWJicmVjaGVu'>
                 <source>Abbrechen</source>
                 <target>Abbrechen</target>
