@@ -1,6 +1,8 @@
 <?php
 namespace MittagQI\Translate5\Plugins\TermImport\Services\Across;
 
+use SoapFault;
+
 class SoapConnector extends \SoapClient {
 
     protected static $ACROSS_API_URL_WSDL = '/crossAPI/crossAPI.wsdl';
@@ -22,18 +24,17 @@ class SoapConnector extends \SoapClient {
 
     /**
      * Initialize the soap connection and load the across securityToken which is need for every soap-request
+     * @throws Exception
      */
-    public function __construct($apiUrl, $apiLogin, $apiPass) {
+    public function __construct($apiUrl, $apiLogin, $apiPass, array $additionalOptions = []) {
         $soapConfig = [
-            //'location' => self::$ACROSS_API_URL_WSDL,
-            //needed for tunneling via SSH to the across Server - otherwise we are redirected
             'location' => $apiUrl.self::$ACROSS_API_URL_WSDL,
-            //'uri' => self::$ACROSS_API_URL_WSDL, // TODO: what is this parameter for?
             'soap_version' => SOAP_1_1,
             'trace' => 1,
             'login' => $apiLogin,
             'password' => $apiPass,
         ];
+        $soapConfig = array_merge($soapConfig, $additionalOptions);
         try {
             parent::__construct($apiUrl.self::$ACROSS_API_URL_WSDL, $soapConfig);
             $this->createSecurityToken($apiLogin,$apiPass);
