@@ -291,18 +291,12 @@ Ext.define('Editor.controller.MetaPanel', {
     /**
      * Starts the creation of the segment's quality related GUIs
      */
-    handleQualitiesLoaded: function (store, records, successful, operation) {
+    handleQualitiesLoaded: function (store, records, successful) {
         var me = this,
             metaFalPosPanel = me.getMetaFalPosPanel(),
             grid = me.getSegmentGrid(),
             ordered = [],
             qidA = [];
-
-        // If load was not successful
-        //if (!successful) {
-        //    console.log(operation.error);
-        //    return;
-        //}
 
         // In case there is no meta panel, or even no segment grid - ignore the logic below
         if (!metaFalPosPanel || !grid || !successful) {
