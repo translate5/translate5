@@ -62,5 +62,8 @@ Ext.define('Editor.model.AlikeSegment', {
       rootProperty: 'data',
       writeAllFields: false
     }
+  },
+  isTargetOnly: function() {
+    return this.get('targetMatch') && !this.get('sourceMatch');
   }
 });

@@ -57,7 +57,8 @@ Ext.define('Editor.view.LanguageResources.TmWindowViewController', {
     labelTooltipInstance:null,
 
     /**
-     * Resource combo handler
+     * Resource combo handler.
+     * Info: the resource value can be also null!!
      */
     onResourceChange: function(field,resource){
         var me = this,
@@ -92,7 +93,7 @@ Ext.define('Editor.view.LanguageResources.TmWindowViewController', {
         targetField.clearValue(null);
         targetField.resumeEvents();
 
-        if (me.isEngineBasedResource(record)) {
+        if (record && me.isEngineBasedResource(record)) {
 
             engineCombo.suspendEvents();
             engineCombo.clearValue(null);
@@ -103,15 +104,13 @@ Ext.define('Editor.view.LanguageResources.TmWindowViewController', {
                 reader : {
                     rootProperty: 'rows',
                     type : 'json'
-                },
+                }
             });
             engineCombo.getStore().load();
             engineCombo.resumeEvents();
-
-            return;
         }
 
-        //for non engine type resource load the resource languages
+        // set the source and target languages for the selected resource
         let sourceData = record ? record.get('sourceLanguages') : [],
             targetData = record ? record.get('targetLanguages') : [];
             

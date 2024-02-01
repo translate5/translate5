@@ -413,6 +413,18 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
 
             //reset the result collection
             $matches->resetResult();
+
+            // Mark the segment as fuzzy match in the TM
+            // Checking for matchrate >= 100 is for edge case when segments have the same-same source but different
+            // source md5hash so they are not a repetitions. Updating the segment in this case would lead to omitting
+            // translation for other segments with the same-same source, but different source md5hash
+            if ($bestMatchRateResult->matchrate < 100 && $this->internalFuzzy && $connector->isInternalFuzzy()) {
+                $origTarget = $segment->getTargetEdit();
+                $dummyTargetText = self::renderDummyTargetText($segment->getTaskGuid());
+                $segment->setTargetEdit($dummyTargetText);
+                $connector->update($segment);
+                $segment->setTargetEdit($origTarget);
+            }
         }
 
         return $bestMatchRateResult;
@@ -487,20 +499,13 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
             /* @var $dummyResult editor_Services_ServiceResult */
             $matches->setLanguageResource($connector->getLanguageResource());
             $matches->addResult('', $connector->getDefaultMatchRate());
+
             return $matches;
         }
 
         // if the current resource type is not MT, query the tm or termcollection
         $matches = $connector->query($segment);
 
-        //update the segment with custom target in fuzzy tm
-        if ($this->internalFuzzy && $connector->isInternalFuzzy()) {
-            $origTarget = $segment->getTargetEdit();
-            $dummyTargetText = self::renderDummyTargetText($segment->getTaskGuid());
-            $segment->setTargetEdit($dummyTargetText);
-            $connector->update($segment);
-            $segment->setTargetEdit($origTarget);
-        }
         return $matches;
     }
 

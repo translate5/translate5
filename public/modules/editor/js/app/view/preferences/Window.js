@@ -40,7 +40,7 @@ END LICENSE AND COPYRIGHT
 Ext.define('Editor.view.preferences.Window', {
     extend: 'Ext.window.Window',
 
-    height: 440,
+    height: 460,
     itemId: 'preferencesWindow',
     width: 460,
     resizable: false, //needed for boxLabel width
@@ -130,6 +130,13 @@ Ext.define('Editor.view.preferences.Window', {
                       boxLabel: '{l10n.preferences.repetitions.alikeBehaviourIndividual}',
                     },
                     inputValue: 'individual'
+                  }, {
+                    xtype: 'checkbox',
+                    name: 'deselectTargetOnly',
+                    margin: '0 0 0 30',
+                    bind: {
+                      boxLabel: '{l10n.preferences.repetitions.deselectTargetOnly}',
+                    },
                   },
                   {
                     xtype: 'radiofield',

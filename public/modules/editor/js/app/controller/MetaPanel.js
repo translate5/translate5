@@ -112,6 +112,7 @@ Ext.define('Editor.controller.MetaPanel', {
      * A flag specifying our editing mode. can be: 'none', 'readonly', 'edit'
      */
     editingMode: 'none',
+
     /**
      * Gibt die RowEditing Instanz des Grids zurück
      * @returns Editor.view.segments.RowEditing
@@ -292,28 +293,63 @@ Ext.define('Editor.controller.MetaPanel', {
      */
     handleQualitiesLoaded: function (store, records) {
         var me = this,
-            metaFalPosPanel = me.getMetaFalPosPanel();
+            metaFalPosPanel = me.getMetaFalPosPanel(),
+            grid = me.getSegmentGrid(),
+            ordered = [],
+            qidA = [];
 
-        // in case there is no meta panel, ignore the logic below
-        if(!metaFalPosPanel){
+        // In case there is no meta panel, or even no segment grid - ignore the logic below
+        if (!metaFalPosPanel || !grid) {
             return;
         }
 
         // Get all the content-qualities (which can be spellcheck-qualities and termtagger-qualities)
         // in the order they appear inside the segment
-        var qidm = me.getSegmentGrid().el
-            .down('[data-recordId="' + this.record.internalId + '"]')
-            .getHtml().matchAll(/data-t5qid="(?<id>[0-9]+)"/g), qid, qidA = [],
-            ordered = [];
+        var row = grid.el?.down('[data-recordId="' + me.record.internalId + '"]');
 
-        // Get array of matches for further use to be more handy
-        while (qid = qidm.next()) {
-            if (qid.value) {
-                qidA.push(parseInt(qid.value.groups.id));
-            } else {
-                break;
+        /**
+         * Arrays of qualities ids in the order of appearance within the segment, grouped by segment ids
+         * {
+         *     "segmentId1": ["qid1", "qid2", "qid3"],
+         *     "segmentId2": ["qid4", "qid5", "qid6"],
+         *     ...
+         * }
+         */
+        grid.qualityIdABySegmentId = grid.qualityIdABySegmentId || {};
+
+        // If row, that qualities were loaded for - it available in the segment grid
+        if (row) {
+
+            // Match qualities ids within row's DOM node 'data-t5qid' attributes
+            var qidm = row.getHtml().matchAll(/data-t5qid="(?<id>[0-9]+)"/g), qid;
+
+            // Get array of matches for further use to be more handy
+            while (qid = qidm.next()) {
+                if (qid.value) {
+                    qidA.push(parseInt(qid.value.groups.id));
+                } else {
+                    break;
+                }
             }
-        }
+
+            // Remember the order
+            grid.qualityIdABySegmentId[me.record.getId()] = qidA;
+
+            //
+            //console.log('qualities order picked from DOM', qidA);
+
+        // Else if not exists in DOM anymore but it was before so the order was saved
+        } else if (me.record.getId() in grid.qualityIdABySegmentId) {
+
+            // Pick from saved
+            qidA = grid.qualityIdABySegmentId[me.record.getId()];
+
+            //
+            //console.log('qualities order picked from saved', qidA);
+
+        // Else skip
+        } else return;
+
 
         // Setup array of qualities, where we have spellcheck and termtagger qualities added
         // in the order they appear in the current segment, and all other qualities are added afterwards

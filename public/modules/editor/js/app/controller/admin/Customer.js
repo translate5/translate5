@@ -424,9 +424,9 @@ Ext.define('Editor.controller.admin.Customer', {
         if(sorters && sorters.length > 0){
             sorters.clear();
         }
+        customerColumn = grid.columnManager.getHeaderByDataIndex(customerColumnName);
         if (val == '') {
             me.consoleLog('GRID ' + grid.getId() + ' remove customer-filter');
-            customerColumn = grid.columnManager.getHeaderByDataIndex(customerColumnName);
             if(!customerColumn){
                 //the column should not be rendered, remove the filter only from the store
                 //TODO: the users grid is not filtered
@@ -436,12 +436,17 @@ Ext.define('Editor.controller.admin.Customer', {
             }
         } else {
             me.consoleLog('GRID ' + grid.getId() + ' add customer-filter');
-            gridFilters.addFilters([{
-                type: 'customer',
-                dataIndex: customerColumnName,
-                property: customerColumnName,
-                value: val
-            }]);
+            if (!customerColumn) {
+                gridFilters.addFilters([{
+                    type: 'customer',
+                    dataIndex: customerColumnName,
+                    property: customerColumnName,
+                    value: val
+                }]);
+            } else {
+                customerColumn.filter.setValue(val);
+                customerColumn.filter.setActive(true);
+            }
         }
     },
     

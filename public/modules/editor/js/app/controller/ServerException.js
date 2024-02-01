@@ -121,6 +121,8 @@ Ext.define('Editor.controller.ServerException', {
             tpl = new Ext.Template(str.serverMsg),
             action = response && response.request && response.request.options.action,
             errorCode,
+            url = response?.request?.requestOptions?.url?.replaceAll('"', '~') || 'null',
+            method = response?.request?.requestOptions?.method || 'null',
             getServerMsg = function() {
                 if(json.errorMessage){
                     return json.errorMessage;
@@ -137,7 +139,7 @@ Ext.define('Editor.controller.ServerException', {
                 }
                 return msg + tpl.apply(['', getServerMsg()]);
             };
-        
+
         try {
             json = Ext.JSON.decode(respText);
 
@@ -163,6 +165,8 @@ Ext.define('Editor.controller.ServerException', {
                     jslogger.addLogEntry({type: 'info', message: 'statusText-arg: ' + statusText.toString().replaceAll('"', '~')});;
                     jslogger.addLogEntry({type: 'info', message: 'Response headers: ' + JSON.stringify(response.getAllResponseHeaders()).replaceAll('"', '~')});;
                     jslogger.addLogEntry({type: 'info', message: 'Response text: ' + respText.toString().replaceAll('"', '~')});;
+                    jslogger.addLogEntry({type: 'info', message: 'Request URL: ' + method + ' ' + url});
+                    jslogger.addLogEntry({type: 'info', message: 'Request URL Length: ' + url.length});
                 }
             }
 
