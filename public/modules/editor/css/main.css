@@ -773,7 +773,7 @@ a.x-btn span.task-confirmation {
 /*
 .matchGrid .x-grid-item-selected .x-grid-item-over > div {background-image:url(../images/information.png); background-repeat:no-repeat; background-position:18px center;}
 */
-.matchGrid tr.match-state-loaded td.info-icon:hover > div,
+.matchGrid tr.match-state-loaded:hover td.info-icon > div,
 .matchGrid tr.match-state-loaded td.info-icon-shown > div {
     background-image:url(../images/information.png); background-repeat:no-repeat; background-position:85% 15%;
 }
