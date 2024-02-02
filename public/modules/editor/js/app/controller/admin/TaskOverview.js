@@ -338,6 +338,7 @@ Ext.define('Editor.controller.admin.TaskOverview', {
     onAdminTaskGridFilterChange: function (store) {
         var me = this;
         //get the store active filters object as parameter
+        console.log('onAdminTaskGridFilterChange');
         me.getAdvancedFilterToolbar().loadFilters(store.getFilters(false));
     },
 
@@ -653,7 +654,7 @@ Ext.define('Editor.controller.admin.TaskOverview', {
         //clear the taskGrid store from the filters
         taskStore.clearFilter(addFilter);
         //add the custom filtering where the filterchange event will be suspended
-        taskGrid.activateGridColumnFilter(filtersarray, true);
+        taskGrid.activateGridColumnFilter(filtersarray, false);
         //load the filters into the filter holder tagfield
         toolbar.loadFilters(taskStore.getFilters(false));
     },
