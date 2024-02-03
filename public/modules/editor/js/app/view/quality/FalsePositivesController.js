@@ -194,7 +194,7 @@ Ext.define('Editor.view.quality.FalsePositivesController', {
                 record.commit();
 
                 // Prepare component query selector for other instance of falsePositive-panel
-                other = 'falsePositives[floating=' + (!button.up('fieldset').floating).toString() + ']';
+                other = 'falsePositives[floating=' + (!button.up('fieldset')?.floating).toString() + ']';
 
                 // Show tast message
                 Editor.MessageBox.addSuccess(vm.get('l10n.falsePositives.spreaded'));
