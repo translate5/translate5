@@ -109,7 +109,7 @@ class ConnectorTest extends TestCase
                 'status' => 'open',
                 'tmxImportStatus' => bin2hex(random_bytes(10)),
                 'importTime' => null,
-                'expectedResult' => LanguageResourceStatus::AVAILABLE
+                'expectedResult' => LanguageResourceStatus::UNKNOWN
             ],
             'Reorganize in progress' => [
                 'status' => 'reorganize',
