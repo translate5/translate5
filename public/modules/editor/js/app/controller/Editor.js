@@ -905,7 +905,8 @@ Ext.define('Editor.controller.Editor', {
      */
     calcPrev: function(inWorkflow){
         var type = inWorkflow ? 'workflow' : 'editable',
-            filtersAreUsed = this.getSegmentGrid().getStore().getFilters().getCount(),
+            store = this.getSegmentGrid().getStore(),
+            filtersAreUsed = store.getFilters().getCount() || store.getProxy().getExtraParams().qualities,
             msg = filtersAreUsed
                 ? this.messages.gridStartReachedFiltered
                 : (inWorkflow
@@ -918,7 +919,8 @@ Ext.define('Editor.controller.Editor', {
      */
     calcNext: function(inWorkflow){
         var type = inWorkflow ? 'workflow' : 'editable',
-            filtersAreUsed = this.getSegmentGrid().getStore().getFilters().getCount(),
+            store = this.getSegmentGrid().getStore(),
+            filtersAreUsed = store.getFilters().getCount() || store.getProxy().getExtraParams().qualities,
             msg = filtersAreUsed
                 ? this.messages.gridEndReachedFiltered
                 : (inWorkflow
