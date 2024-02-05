@@ -32,7 +32,18 @@ END LICENSE AND COPYRIGHT
  * This is the base for the Tag-Comparision in the AutoQA as well as the automatic tag repair
  */
 class editor_Segment_Internal_TagCheckBase {
-    
+
+    /**
+     * Helper to order an array of tags by their index in the Fieldtags-Model
+     * @param editor_Segment_Internal_Tag $a
+     * @param editor_Segment_Internal_Tag $b
+     * @return int
+     */
+    public static function compareByIdx(editor_Segment_Internal_Tag $a, editor_Segment_Internal_Tag $b): int
+    {
+        return $a->_idx - $b->_idx;
+    }
+
     /**
      *
      * @var editor_Segment_Internal_Tag[]
@@ -76,16 +87,20 @@ class editor_Segment_Internal_TagCheckBase {
     /**
      * Finds for an opener the corresponding closer, no matter if there are overlaps or anything else
      */
-    protected function findCounterparts() {
+    protected function findCounterparts(): void
+    {
         for($i=0; $i < $this->numCheckTags; $i++){
             $this->checkTags[$i]->_idx = $i;
-            if($this->checkTags[$i]->isOpening() && $this->checkTags[$i]->counterpart == NULL){
+            if($this->checkTags[$i]->isOpening() && $this->checkTags[$i]->counterpart == null){
                 $tagIndex = $this->checkTags[$i]->getTagIndex();
                 if($tagIndex > -1){
                     // finding counterpart forward
                     if($i < $this->numCheckTags - 1){
                         for($j = $i + 1; $j < $this->numCheckTags; $j++){
-                            if($j != $i && $this->checkTags[$j]->isClosing() && $this->checkTags[$j]->counterpart == NULL && $this->checkTags[$j]->getTagIndex() === $tagIndex){
+                            if($j != $i && $this->checkTags[$j]->isClosing()
+                                && $this->checkTags[$j]->counterpart == null
+                                && $this->checkTags[$j]->getTagIndex() === $tagIndex){
+
                                 $this->checkTags[$i]->counterpart = $this->checkTags[$j];
                                 $this->checkTags[$j]->counterpart = $this->checkTags[$i];
                                 break;
@@ -93,9 +108,12 @@ class editor_Segment_Internal_TagCheckBase {
                         }
                     }
                     // finding counterpart backwards if forward didn't work
-                    if($this->checkTags[$i]->counterpart == NULL && $i > 1){
+                    if($this->checkTags[$i]->counterpart == null && $i > 1){
                         for($j = $i - 1; $j >= 0; $j--){
-                            if($j != $i && $this->checkTags[$j]->isClosing() && $this->checkTags[$j]->counterpart == NULL && $this->checkTags[$j]->getTagIndex() === $tagIndex){
+                            if($j != $i && $this->checkTags[$j]->isClosing()
+                                && $this->checkTags[$j]->counterpart == null
+                                && $this->checkTags[$j]->getTagIndex() === $tagIndex){
+
                                 $this->checkTags[$i]->counterpart = $this->checkTags[$j];
                                 $this->checkTags[$j]->counterpart = $this->checkTags[$i];
                                 break;
@@ -106,12 +124,18 @@ class editor_Segment_Internal_TagCheckBase {
             }
         }
     }
+
     /**
-     * Checks, if the given internal tag is structurally valid. That means, the tag is either single or it has a counterpart that comes behind the tag (for a opener) and there are no overlapping tags in-between
-     * @param editor_Segment_Internal_Tag $tag
+     * Checks, if the given internal tag is structurally valid.
+     * That means, the tag is either single or it has a counterpart that comes behind the tag (for a opener)
+     * and there are no overlapping tags in-between
+     * @param editor_Segment_Internal_Tag[] $tags
+     * @param int $index
      * @return bool
      */
-    protected function isStructurallyValid(editor_Segment_Internal_Tag $tag) : bool {
+    protected function isStructurallyValid(array $tags, int $index): bool
+    {
+        $tag = $tags[$index];
         // single tags are always valid
         if($tag->isSingle()){
             return true;
@@ -121,38 +145,159 @@ class editor_Segment_Internal_TagCheckBase {
             return false;
         }
         if($tag->isOpening()){
-            if($tag->counterpart->_idx < $tag->_idx || $tag->counterpart->startIndex < $tag->endIndex){
+            if ($tag->counterpart->_idx < $tag->_idx || $tag->counterpart->startIndex < $tag->endIndex) {
                 return false;
             }
-            return $this->hasNoOverlaps($tag->_idx, $tag->counterpart->_idx, $tag->endIndex, $tag->counterpart->startIndex);
-        } else {
+            return $this->hasNoOverlaps(
+                $tags,
+                $tag->_idx,
+                $tag->counterpart->_idx,
+                $tag->endIndex,
+                $tag->counterpart->startIndex,
+                $tag->hasSameTextIndex($tag->counterpart)
+            );
+         } else {
             if($tag->_idx < $tag->counterpart->_idx || $tag->startIndex < $tag->counterpart->endIndex){
                 return false;
             }
-            return $this->hasNoOverlaps($tag->counterpart->_idx, $tag->_idx, $tag->counterpart->endIndex, $tag->startIndex);
+            return $this->hasNoOverlaps(
+                $tags,
+                $tag->counterpart->_idx,
+                $tag->_idx,
+                $tag->counterpart->endIndex,
+                $tag->startIndex,
+                $tag->hasSameTextIndex($tag->counterpart)
+            );
         }
     }
+
     /**
      * Evaluates if all tags from the given start to the given end index are between the given text-indices
      * It does not take care, if the tags in-between are not valid in terms of structure
+     * @param editor_Segment_Internal_Tag[] $tags
      * @param int $startIndex
      * @param int $endIndex
      * @param int $startTextIndex
      * @param int $endTextIndex
      * @return bool
      */
-    protected function hasNoOverlaps(int $startIndex, int $endIndex, int $startTextIndex, int $endTextIndex) : bool {
+    protected function hasNoOverlaps(
+        array $tags,
+        int $startIndex,
+        int $endIndex,
+        int $startTextIndex,
+        int $endTextIndex,
+        bool $hasSameTextIndex): bool
+    {
         if($startIndex < ($endIndex - 1)){
             for($i = $startIndex + 1; $i < $endIndex; $i++){
-                $tag = $this->checkTags[$i];
+                $tag = $tags[$i];
+                if($hasSameTextIndex && !$tag->isSingle() && $tag->counterpart != null){
+                    // when dealing with a same text-index sequence we can only accept other same-index pairs
+                    // that have indexes between those of the checked tags
+                    // theoretically we should also check the orders (as the order decides in case of same-index tags)
+                    // but it seems the preceiding run of fixSameIndexSequences already fixes this
+                    // if ever more problems arise with non-detected same-text-index-tags,
+                    // this would be a potential place to detect such problems
+                    if(!$tag->hasSameTextIndex($tag->counterpart)
+                        || $tag->counterpart->_idx >= $endIndex
+                        || $tag->counterpart->_idx <= $startIndex
+                    ){
+                        return false;
+                    }
+                }
                 if($tag->startIndex < $startTextIndex || $tag->endIndex > $endTextIndex){
                     return false;
                 }
-                if($tag->counterpart != NULL && ($tag->counterpart->startIndex < $startTextIndex || $tag->counterpart->endIndex > $endTextIndex)){
+                if($tag->counterpart != null
+                    && ($tag->counterpart->startIndex < $startTextIndex
+                        || $tag->counterpart->endIndex > $endTextIndex)){
                     return false;
                 }
             }
         }
         return true;
+    }
+
+    /**
+     * Finds all indexes wich have more then one tag with start === end on them
+     * Returns structure like
+     * [
+     *      textIndex => [                  // the textIndex is the start/end index of all tags
+     *          tagIndex => [               // the tagIndex is the original index in checktags (-> may has gaps)
+     *              { ... }                 // the tag
+     *          ]
+     *  ]
+     * ]
+     *
+     * @param editor_Segment_Internal_Tag[] $tags
+     * @return array
+     */
+    protected function findSameIndexSequences(array $tags): array
+    {
+        $sequences = [];
+        // order all singular or multiple tags with identfixSameIndexClusterical start/end by index
+        foreach($tags as $index => $tag){
+            // we ignore singular tags here as they can not be overlapping/interleaving
+            if(!$tag->isSingle() && $tag->counterpart !== null && $tag->startIndex === $tag->endIndex){
+                if(!array_key_exists($tag->startIndex, $sequences)){
+                    $sequences[$tag->startIndex] = [];
+                }
+                $sequences[$tag->startIndex][] = $tag;
+            }
+        }
+        // remove all sequences that have less than 2 elements
+        $filteredSequences = [];
+        foreach($sequences as $sequence){
+            if(count($sequence) > 1){
+                $filteredSequences[] = $sequence;
+            }
+        }
+        return $filteredSequences;
+    }
+
+    /**
+     * Checks wether a sequence of tags on the same text-index has a proper sequential structure
+     * @param array $tagsOnTextIndex
+     * @return array: an array of indices of opening tags which refer to the passed array $tagsOnTextIndex and do overlap
+     */
+    protected function checkSameIndexSequence(array $tagsOnTextIndex): array
+    {
+        $faultyIndices = [];
+        $numTags = count($tagsOnTextIndex);
+        foreach($tagsOnTextIndex as $index => $tag){ /* @var editor_Segment_Internal_Tag $tag */
+            if($tag->isOpening() && $this->isOverlappingInSequence($tag, $index, $tagsOnTextIndex, $numTags)){
+                $faultyIndices[$index] = 1;
+            }
+        }
+        return array_keys($faultyIndices);
+    }
+
+    /**
+     * Checks if a opening internal tag on index $index is overlapping with any other tag in passed sequence
+     * @param editor_Segment_Internal_Tag $opener
+     * @param int $index
+     * @param array $tagsOnIndex
+     * @param int $numTags
+     * @return bool
+     */
+    protected function isOverlappingInSequence(
+        editor_Segment_Internal_Tag $opener,
+        int $index,
+        array $tagsOnIndex,
+        int $numTags): bool
+    {
+        for($i = 0; $i < $numTags; $i++){
+            if($i != $index){
+                $lIdx = $tagsOnIndex[$i]->_idx;
+                $ridx = $tagsOnIndex[$i]->counterpart->_idx;
+                if(($lIdx > $opener->_idx && $lIdx < $opener->counterpart->_idx && $ridx > $opener->counterpart->_idx)
+                    || ($ridx > $opener->_idx && $ridx < $opener->counterpart->_idx) && $lIdx < $opener->_idx){
+                    // add to existing cluster stretching it's boundaries
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 }

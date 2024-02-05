@@ -205,6 +205,13 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract
     protected array $contextData = [];
 
     /**
+     * Array of ids of all segments that are the first occurrences in their repetition groups
+     *
+     * @var array|null
+     */
+    protected ?array $firstSegmentsOfEachRepetitionsGroup = null;
+
+    /**
      * init the internal segment field and the DB object
      */
     public function __construct()
@@ -312,6 +319,10 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract
             }
             return 'CAST('.$adapter->quoteIdentifier($searchInField) . ' AS BINARY) REGEXP BINARY ' . $adapter->quote($queryString);
         }
+
+        // Escape mysql-wildcards
+        $queryString = $this->filter->escapeMysqlWildcards($queryString);
+
         //search type regular wildcard
         if ($parameters['searchType'] === 'wildcardsSearch') {
             $queryString = str_replace("*", "%", $queryString);
@@ -403,7 +414,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract
     public function setMatchRateType($type)
     {
         $oldValue = $this->getMatchRateType();
-        if (editor_Models_Segment_MatchRateType::isUpdateable($oldValue)) {
+        if (editor_Models_Segment_MatchRateType::isUpdatable($oldValue)) {
             return $this->__call(__FUNCTION__, [$type]);
         }
         return $oldValue;
@@ -1102,6 +1113,19 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract
     }
 
     /**
+     * If the given exception was thrown because of a missing view do nothing.
+     * If it was another Db Exception throw it!
+     * @param Zend_Db_Statement_Exception $e
+     */
+    protected function catchMissingView(Zend_Db_Statement_Exception $e)
+    {
+        $m = $e->getMessage();
+        if (strpos($m, 'SQLSTATE') !== 0 || strpos($m, 'Base table or view not found') === false) {
+            throw $e;
+        }
+    }
+
+    /**
      * Loads segments by task-guid and file-id. Returns just a simple array of id and sgmentNrInTask ordered by sgmentNrInTask
      * @param string $taskGuid
      * @param int $fileId
@@ -1281,6 +1305,11 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract
         $this->applyFilterAndSort($s); //respecting filters if set any
         $s = $this->addWatchlistJoin($s, $this->tableName);
         $s = $this->addWhereTaskGuid($s, $taskGuid);
+
+        // If only repetitions need to be fetched, make sure first occurrences
+        // are excluded unless it's explicitly specified they should be kept
+        $this->excludeFirstRepetitionOccurrencesIfNeed($s);
+
         $s->where($this->tableName . '.id > ?', $id)
             ->order($this->tableName . '.id ASC')
             ->limit(1);
@@ -1354,7 +1383,69 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract
             $callback($s, $this->tableName);
         }
 
-        return parent::loadFilterdCustom($s);
+        // Apply filter and sort to Select-object
+        $this->applyFilterAndSort($s);
+
+        // If only repetitions need to be fetched, make sure first occurrences
+        // are excluded unless it's explicitly specified they should be kept
+        $this->excludeFirstRepetitionOccurrencesIfNeed($s);
+
+        // Fetch Result
+        $result = $this->db->fetchAll($s)->toArray();
+
+        // Return
+        return $result;
+    }
+
+    /**
+     * @param Zend_Db_Select $s
+     * @throws Zend_Db_Select_Exception
+     * @throws Zend_Db_Statement_Exception
+     */
+    public function excludeFirstRepetitionOccurrencesIfNeed(Zend_Db_Select &$s) {
+
+        // Get current WHERE-clause
+        $where = implode(' ', $s->getPart(Zend_Db_Select::WHERE));
+
+        // If isRepeated-column is NOT mentioned within WHERE-clause - return
+        if (!preg_match('~isRepeated in \(([0-4, ]+)\)~', $where, $m)) {
+            return;
+        }
+
+        // Get values of isRepeated-filter
+        $isRepeated = array_flip(explode(', ', $m[1]));
+
+        // If repetitions (source/target/both) are NOT being explicitly searched - return
+        if (!isset($isRepeated[1]) && !isset($isRepeated[2]) && !isset($isRepeated[3])) {
+            return;
+        }
+
+        // If first repetition occurrences should be kept - return
+        if (isset($isRepeated[4])) {
+            return;
+        }
+
+        // Get FROM expression (including LEFT JOIN, if any)
+        $from = preg_match('~FROM (.*?)\s*(?:WHERE|ORDER|LIMIT|$)~s', $s->assemble(), $m) ? $m[1] : '';
+
+        // Shortcut to table name
+        $t = "`$this->tableName`";
+
+        // Get array of ids of first repetition occurrences, if we haven't fetched it previously
+        $this->firstSegmentsOfEachRepetitionsGroup = $this->firstSegmentsOfEachRepetitionsGroup
+            ?? $this->db->getAdapter()->query("
+                SELECT SUBSTRING_INDEX(GROUP_CONCAT($t.`id`), ',', 1) AS `first`
+                FROM $from
+                WHERE $where
+                GROUP BY IF($t.`isRepeated` = 1, $t.`sourceMd5`, IF($t.`isRepeated` = 2, $t.`targetMd5`, CONCAT($t.`sourceMd5`, '-', $t.`targetMd5`)))
+                HAVING COUNT($t.`id`) > 1
+                ORDER BY $t.`fileOrder`, $t.`id`
+            ")->fetchAll(PDO::FETCH_COLUMN);
+
+        // Exclude
+        if ($this->firstSegmentsOfEachRepetitionsGroup) {
+            $s->where("$t.`id` NOT IN (?)", $this->firstSegmentsOfEachRepetitionsGroup);
+        }
     }
 
     /**
@@ -1379,6 +1470,10 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract
         $s = $this->addWhereTaskGuid($s, $taskGuid);
         $s = $this->addWatchlistJoin($s);
 
+        // If only repetitions need to be fetched, make sure first occurrences
+        // are excluded unless it's explicitly specified they should be kept
+        $this->excludeFirstRepetitionOccurrencesIfNeed($s);
+
         $totalCount = $this->db->fetchRow($s)->numrows;
         $s->reset($s::COLUMNS);
         $s->reset($s::FROM);
@@ -1402,15 +1497,24 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract
     }
 
     /**
-     * Loads segments by a specific workflowStep, fetch only specific fields.
+     * Get all changed segments of a task workflow for given workflow step.
+     * TODO: this is very workflow specific function and should be moved from here.
+     *
      * @param editor_Models_Task $task
      * @param string $workflowStep
      * @param int $workflowStepNr
+     * @return array
+     * @throws ReflectionException
+     * @throws editor_Models_ConfigException
      */
-    public function loadByWorkflowStep(editor_Models_Task $task, string $workflowStep, $workflowStepNr)
+    public function getWorkflowStepSegments(editor_Models_Task $task, string $workflowStep, int $workflowStepNr): array
     {
         $this->setConfig($task->getConfig());
+
         $pmChanges = $this->config->runtimeOptions->editor->notification->pmChanges;
+        // This should be task specific config. If changed above, this must be adjusted to
+        $showCommentedSegments = (bool) $this->config->runtimeOptions->editor->notification->showCommentedSegments;
+
         $this->segmentFieldManager->initFields($task->getTaskGuid());
         $this->reInitDb($task->getTaskGuid());
 
@@ -1419,7 +1523,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract
 
         $this->initDefaultSort();
         $s = $this->db->select(false);
-        $db = $this->db;
+
         $s->from($this->db, $fields);
         $s = $this->addWatchlistJoin($s);
         $s = $this->addWhereTaskGuid($s, $task->getTaskGuid());
@@ -1445,6 +1549,11 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract
                 $s->where($this->tableName . '.workflowStep = ?', $workflowStep);
                 break;
         }
+
+        if($showCommentedSegments){
+            $s->orWhere('comments IS NOT NULL');
+        }
+
         $list = parent::loadFilterdCustom($s);
         
         // add the Segment's Qualities (which are stored in the qualities table) as names
@@ -1815,7 +1924,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract
     {
         $result = parent::getModifiedData(); //assoc mit key = dataindex und value = modValue
         $modKeys = array_keys($result);
-        $modFields = array_unique(array_diff($this->modified, $modKeys));
+        $modFields = array_unique(array_diff(array_keys($this->modified), $modKeys));
         foreach ($modFields as $field) {
             if ($this->segmentFieldManager->getDataLocationByKey($field) !== false) {
                 $result[$field] = $this->get($field);

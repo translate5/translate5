@@ -21,18 +21,17 @@ START LICENSE AND COPYRIGHT
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
 
-/** #@+
- * @author Marc Mittag
- * @package editor
- * @version 1.0
- */
-
+use editor_Models_Import_FileParser_Xlf_LengthRestriction as XlfLengthRestriction;
+use editor_Models_Import_FileParser_Xlf_SurroundingTagRemover_Abstract as AbstractSurroundingTagRemover;
 use editor_Models_Import_FileParser_XmlParser as XmlParser;
+use MittagQI\Translate5\Task\Import\FileParser\Xlf\Comments;
+use MittagQI\Translate5\Task\Import\FileParser\Xlf\NamespaceRegistry;
+use MittagQI\Translate5\Task\Import\FileParser\Xlf\Namespaces\Namespaces;
 
 /**
  * Fileparsing for import of XLIFF 1.1 and 1.2 files
@@ -64,9 +63,8 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
     
     /**
      * Helper to call namespace specfic parsing stuff
-     * @var editor_Models_Import_FileParser_Xlf_Namespaces
      */
-    protected $namespaces;
+    protected Namespaces $namespaces;
     
     /**
      * Stack of the group translate information
@@ -167,15 +165,16 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
     protected $matchRate = [];
     
     /**
-     * @var editor_Models_Import_FileParser_Xlf_LengthRestriction
+     * @var XlfLengthRestriction
      */
-    protected $lengthRestriction;
+    protected XlfLengthRestriction $lengthRestriction;
     
     /**
-     * @var editor_Models_Import_FileParser_Xlf_SurroundingTagRemover_Abstract
+     * @var AbstractSurroundingTagRemover
      */
-    protected editor_Models_Import_FileParser_Xlf_SurroundingTagRemover_Abstract $surroundingTags;
-    
+    protected AbstractSurroundingTagRemover $surroundingTags;
+    private Comments $comments;
+
     /**
      * (non-PHPdoc)
      * @see editor_Models_Import_FileParser::getFileExtensions()
@@ -183,21 +182,29 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
     public static function getFileExtensions() {
         return ['xlf','xlif','xliff','mxliff','mqxliff'];
     }
-    
+
     /**
      * Init tagmapping
+     * @throws editor_Models_ConfigException
      */
-    public function __construct(string $path, string $fileName, int $fileId, editor_Models_Task $task) {
+    public function __construct(string $path, string $fileName, int $fileId, editor_Models_Task $task)
+    {
         parent::__construct($path, $fileName, $fileId, $task);
-        $this->initNamespaces();
-        $this->contentConverter = ZfExtended_Factory::get('editor_Models_Import_FileParser_Xlf_ContentConverter', [$this->namespaces, $this->task, $fileName]);
-        $this->internalTag = ZfExtended_Factory::get('editor_Models_Segment_InternalTag');
-        $this->segmentBareInstance = ZfExtended_Factory::get('editor_Models_Segment');
-        $this->log = ZfExtended_Factory::get('ZfExtended_Log');
-        $this->lengthRestriction = ZfExtended_Factory::get('editor_Models_Import_FileParser_Xlf_LengthRestriction',[
+
+        $this->xmlparser = ZfExtended_Factory::get(XmlParser::class, [[
+            'preparsexml' => $this->config->runtimeOptions->import->xlf->preparse
+        ]]);
+        $this->comments = ZfExtended_Factory::get(Comments::class, [$this->task]);
+        $this->namespaces = NamespaceRegistry::getImportNamespace($this->_origFile, $this->xmlparser, $this->comments);
+
+        $this->contentConverter = $this->namespaces->getContentConverter($this->task, $fileName);
+        $this->internalTag = ZfExtended_Factory::get(editor_Models_Segment_InternalTag::class);
+        $this->segmentBareInstance = ZfExtended_Factory::get(editor_Models_Segment::class);
+        $this->log = ZfExtended_Factory::get(ZfExtended_Log::class);
+        $this->lengthRestriction = ZfExtended_Factory::get(XlfLengthRestriction::class, [
             $this->task->getConfig()
         ]);
-        $this->surroundingTags = editor_Models_Import_FileParser_Xlf_SurroundingTagRemover_Abstract::factory($this->config);
+        $this->surroundingTags = AbstractSurroundingTagRemover::factory($this->config);
         $this->otherContent = ZfExtended_Factory::get('editor_Models_Import_FileParser_Xlf_OtherContent', [
             $this->contentConverter, $this->segmentBareInstance, $this->task, $fileId
         ]);
@@ -213,31 +220,30 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
     {
         return $this->wordCount;
     }
-    
+
     /**
      * (non-PHPdoc)
+     * @throws ReflectionException
+     * @throws Zend_Exception
+     * @throws editor_Models_Import_FileParser_Xlf_Exception
      * @see editor_Models_Import_FileParser::parse()
      */
     protected function parse() {
         $this->segmentCount = 0;
 
-        $options = [
-            'preparsexml' => $this->config->runtimeOptions->import->xlf->preparse
-        ];
-
-        $this->xmlparser = $parser = ZfExtended_Factory::get(XmlParser::class, [$options]);
+        $parser = $this->xmlparser;
 
         $this->registerStructural();
         $this->registerMeta();
         $this->registerContent();
-        $this->namespaces->registerParserHandler($this->xmlparser);
-        
+        $this->registerNoteComments();
+
         $preserveWhitespaceDefault = $this->config->runtimeOptions->import->xlf->preserveWhitespace;
         
         try {
-            $this->_skeletonFile = $parser->parse($this->_origFile, $preserveWhitespaceDefault);
-        }
-        catch(editor_Models_Import_FileParser_InvalidXMLException $e) {
+            $this->skeletonFile = $parser->parse($this->_origFile, $preserveWhitespaceDefault);
+        }catch (editor_Models_Import_FileParser_InvalidXMLException $e)
+        {
             $logger = Zend_Registry::get('logger')->cloneMe('editor.import.fileparser.xlf');
             //we log the XML error as own exception, so that the error is listed in task overview
             $e->addExtraData(['task' => $this->task]);
@@ -266,7 +272,7 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
      * registers handlers for nodes with meta data
      */
     protected function registerMeta() {
-        $this->xmlparser->registerElement('trans-unit count', function($tag, $attributes, $key){
+        $this->xmlparser->registerElement('trans-unit count', function ($tag, $attributes, $key){
             $this->addupSegmentWordCount($attributes);
         });
     }
@@ -274,15 +280,16 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
     /**
      * registers handlers for source, seg-source and target nodes to be stored for later processing
      */
-    protected function registerContent() {
-        $sourceEndHandler = function($tag, $key, $opener){
+    protected function registerContent()
+    {
+        $sourceEndHandler = function ($tag, $key, $opener){
             $this->handleSourceTag($tag, $key, $opener);
         };
         
         $sourceTag = 'trans-unit > source, trans-unit > seg-source, trans-unit > seg-source mrk[mtype=seg]';
         $sourceTag .= ', trans-unit > source sub, trans-unit > seg-source sub';
         
-        $this->xmlparser->registerElement($sourceTag, function($tag, $attributes){
+        $this->xmlparser->registerElement($sourceTag, function ($tag, $attributes){
             $sourceImportance = $this->compareSourceOrigin($tag);
             //set the source origin where we are currently (mrk or sub or plain source or seg-source)
             $this->setSourceOrigin($tag);
@@ -295,7 +302,8 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
             $mid = $this->calculateMid(['tag' => $tag, 'attributes' => $attributes], true);
             if($sourceImportance >= 0){
                 //preset the source segment for sorting purposes
-                // if we just add the content in the end handler, sub tags are added before the surrounding text content,
+                // if we just add the content in the end handler,
+                // sub tags are added before the surrounding text content,
                 // but it is better if sub content is listed after the content of the corresponding segment
                 // for that we just set the source indizes here in the startHandler, here the order is correct
                 $this->sourceProcessOrder[] = $mid;
@@ -303,47 +311,84 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
         }, $sourceEndHandler);
         
         //register to seg-source directly to enable / disable the collection of other content
-        $this->xmlparser->registerElement('xliff trans-unit > seg-source', null, function($tag, $key, $opener) {
+        $this->xmlparser->registerElement('xliff trans-unit > seg-source', null, function ($tag, $key, $opener)
+        {
             //if we have a seg-source we probably have also mrks where no other content is allowed to be outside the mrks
             $this->otherContent->setSourceBoundary($opener['openerKey'], $key);
         });
 
-        $this->xmlparser->registerElement('trans-unit > target', null, function($tag, $key, $opener){
+        $this->xmlparser->registerElement('trans-unit > target', null, function ($tag, $key, $opener)
+        {
             //if empty targets are given as Single Tags
             $this->currentPlainTarget = $this->getTargetMeta($tag, $key, $opener);
-            if($this->isEmptyTarget($opener, $key)) {
+            if ($this->isEmptyTarget($opener, $key)) {
                 return;
             }
-            foreach($this->currentTarget as $target) {
-                if($target['tag'] == 'mrk'){
+            foreach ($this->currentTarget as $target) {
+
+                if ($target['tag'] === 'mrk') {
                     //if there is already target content coming from mrk tags inside,
                     // do nothing at the end of the main target tag, but we need the target boundary
                     $this->otherContent->setTargetBoundary($opener['openerKey'], $key);
                     return;
                 }
             }
-            //add the main target tag to the list of processable targets, needed only without mrk tags and if target is not empty
+            //add the main target tag to the list of processable targets,
+            // needed only without mrk tags and if target is not empty
             $this->otherContent->initTarget(); //if we use the plainTarget (no mrks), the otherContent is the plainTarget and no further checks are needed
             $this->currentTarget[$this->calculateMid($opener, false)] = $this->currentPlainTarget;
         });
         
         //handling sub segment mrks and sub tags
-        $this->xmlparser->registerElement('trans-unit > target mrk[mtype=seg], trans-unit > target sub', null, function($tag, $key, $opener){
+        $this->xmlparser->registerElement(
+            'trans-unit > target mrk[mtype=seg], trans-unit > target sub',
+            null,
+            function ($tag, $key, $opener) {
             $mid = $this->calculateMid($opener, false);
-            if($tag == 'mrk') {
+            if ($tag === 'mrk') {
                 //if we have a mrk we enable the content outside mrk check
-                $this->otherContent->addTarget($mid, $opener['openerKey'], $key); //add a new container for the content after the current mrk
+                $this->otherContent->addTarget(
+                    $mid,
+                    $opener['openerKey'],
+                    $key)
+                ; //add a new container for the content after the current mrk
             }
             $this->currentTarget[$mid] = $this->getTargetMeta($tag, $key, $opener);
         });
         
-        $this->xmlparser->registerElement('trans-unit alt-trans', function($tag, $attributes){
+        $this->xmlparser->registerElement('trans-unit alt-trans', function ($tag, $attributes) {
             $mid = $this->xmlparser->getAttribute($attributes, 'mid', 0); //defaulting to 0 for transunits without mrks
             $matchRate = $this->xmlparser->getAttribute($attributes, 'match-quality', false);
-            if($matchRate !== false) {
+            if ($matchRate !== false) {
                 $this->matchRate[$mid] = (int) trim($matchRate,'% '); //removing the percent sign
             }
         });
+    }
+
+    protected function registerNoteComments(): void
+    {
+        //handling sub segment mrks and sub tags
+        $this->xmlparser->registerElement(
+            'trans-unit > note',
+            null,
+            function ($tag, $key, $opener) {
+                $attributes = [
+                    'lang' => null,
+                    'from' => null,
+                    'priority' => null,
+                    'annotates' => 'general',
+                ];
+                foreach($attributes as $attribute => $default) {
+                    $attributes[$attribute] = $this->xmlparser->getAttribute(
+                        $opener['attributes'],
+                        $attribute,
+                        $default
+                    );
+                }
+                $content = $this->xmlparser->getRange($opener['openerKey'] + 1, $key - 1, true);
+                $this->comments->addByNote($content, $attributes);
+            }
+        );
     }
     
     
@@ -382,7 +427,8 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
         ];
 
         if($tag == 'source'){
-            //set <source> only if no seg-source was set already, seg-source can always be used, seg-source is more important as source tag
+            //set <source> only if no seg-source was set already,
+            // seg-source can always be used, seg-source is more important as source tag
             if(empty($this->currentPlainSource)) {
                 //point to the plain/real source tag, needed for <target> injection
                 $this->currentPlainSource = $source;
@@ -393,10 +439,11 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
             }
         }
 
-        //set <source> only if no seg-source was set already, seg-source can always be used, seg-source is more important as source tag
-        if($tag == 'seg-source'){
+        //set <source> only if no seg-source was set already,
+        // seg-source can always be used, seg-source is more important as source tag
+        if ($tag === 'seg-source') {
             //source was set before, store it as unsegmentedSource in the plain source
-            if(!empty($this->currentPlainSource)) {
+            if (!empty($this->currentPlainSource)) {
                 $source['unsegmentedSource'] = $this->currentPlainSource;
             }
             //point to the plain/real source tag, needed for <target> injection
@@ -407,13 +454,17 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
 
         $mid = $this->calculateMid($opener, true);
 
-        if($tag === 'mrk') {
-            $this->otherContent->addSource($mid, $opener['openerKey'], $key); //add a new container for the content after the current mrk
+        if ($tag === 'mrk') {
+            $this->otherContent->addSource(
+                $mid,
+                $opener['openerKey'],
+                $key
+            ); //add a new container for the content after the current mrk
         }
 
         //source content with heigher importance was set before, ignore current content
         // for the importance see $this->sourceOriginImportance
-        if($sourceImportance < 0){
+        if ($sourceImportance < 0) {
             return;
         }
 
@@ -431,7 +482,8 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
         //if the content was coming from a:
         // mrk tag, we have to track the mrks mids for target matching
         // sub tag, we have to uses the parent tags id to identify the sub element.
-        //   This is important for alignment of the sub tags, if the parent tags have flipped positions in source and target
+        //  This is important for alignment of the sub tags,
+        //  if the parent tags have flipped positions in source and target
         $prefix = '';
         if($opener['tag'] == 'sub') {
             $prefix = self::PREFIX_SUB;
@@ -520,7 +572,11 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
         $this->xmlparser->registerElement('xliff', function($tag, $attributes, $key){
             $this->checkXliffVersion($attributes, $key);
         });
-        
+
+        $this->xmlparser->registerElement('file', function($tag, $attributes, $key) {
+            $this->sourceFileId = $attributes['original'] ?? '';
+        });
+
         $this->xmlparser->registerElement('group', function($tag, $attributes, $key){
             $this->handleGroup($attributes);
         }, function(){
@@ -543,26 +599,29 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
 //From Globalese:
 //<trans-unit id="segmentNrInTask">
 //<source>Installation and Configuration</source>
-//<target state="needs-review-translation" state-qualifier="leveraged-mt" translate5:origin="Globalese">Installation und Konfiguration</target>
+//<target state="needs-review-translation" state-qualifier="leveraged-mt" translate5:origin="Globalese">
+//Installation und Konfiguration
+//</target>
 //</trans-unit>
         }, function($tag, $key, $opener) {
             try {
                 $createdSegmentIds = $this->extractSegment($opener['attributes']);
                 //we collect all created segmentIds fur further usage on export (if needed by namespace)
-                $this->xmlparser->replaceChunk($key, '<t5:unitSegIds ids="'.join(',', $createdSegmentIds).'" />'.$this->xmlparser->getChunk($key));
-            }
-            catch(ZfExtended_ErrorCodeException $e){
+                $this->xmlparser->replaceChunk(
+                    $key,
+                    '<t5:unitSegIds ids="'.join(',', $createdSegmentIds).'" />'.$this->xmlparser->getChunk($key)
+                );
+            }catch (ZfExtended_ErrorCodeException $e) {
                 $e->addExtraData(['trans-unit' => $opener['attributes']]);
                 throw $e;
-            }
-            catch(Throwable $e){
+            }catch (Throwable $e) {
                 $msg = $e->getMessage()."\n".'In trans-unit '.print_r($opener['attributes']);
-                if($e instanceof ZfExtended_Exception){
-                    $e->setMessage($msg,1);
+                if ($e instanceof ZfExtended_Exception) {
+                    $e->setMessage($msg, 1);
                     throw $e;
                 }
 
-                throw new ZfExtended_Exception($msg,0,$e);
+                throw new ZfExtended_Exception($msg, 0,$e);
             }
             //leaving a transunit means disable segment processing
             $this->processSegment = false;
@@ -575,10 +634,10 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
      */
     protected function isTranslateable($transunitAttributes) {
         if(!empty($transunitAttributes['translate'])) {
-            return $transunitAttributes['translate'] == 'yes';
+            return $transunitAttributes['translate'] === 'yes';
         }
         $reverse = array_reverse($this->groupTranslate);
-        foreach($reverse as $group) {
+        foreach ($reverse as $group) {
             if(is_null($group)) {
                 continue; //if the previous group provided no information, loop up
             }
@@ -605,10 +664,6 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
         }
     }
     
-    protected function initNamespaces() {
-        $this->namespaces = ZfExtended_Factory::get("editor_Models_Import_FileParser_Xlf_Namespaces",[$this->_origFile]);
-    }
-    
     /**
      * Handles a group tag
      * @param array $attributes
@@ -626,22 +681,51 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
     /**
      * parses the TransUnit attributes
      * @param array $attributes transUnit attributes
-     * @param int $mid MRK tag mid or 0 if no mrk mtype seg used
+     * @param string $mid MRK tag mid or 0 if no mrk mtype seg used
      * @param array|null $currentSource
      * @param array|null $currentTarget
      * @return editor_Models_Import_FileParser_SegmentAttributes
      * @throws editor_Models_Import_FileParser_Exception
      * @throws editor_Models_Import_MetaData_Exception
      */
-    protected function parseSegmentAttributes($attributes, $mid, array $currentSource = null, array $currentTarget = null): editor_Models_Import_FileParser_SegmentAttributes {
-        //build mid from id of segment plus segmentCount, because xlf-file can have more than one file in it with repeatingly the same ids.
-        // and one trans-unit (where the id comes from) can contain multiple mrk type seg tags, which are all converted into single segments.
-        // instead of using mid from the mrk type seg element, the segmentCount as additional ID part is fine.
+    protected function parseSegmentAttributes(
+        array $attributes,
+        string $mid,
+        array $currentSource = null,
+        array $currentTarget = null): editor_Models_Import_FileParser_SegmentAttributes {
+
+        //build mid from id of segment plus segmentCount, because xlf-file can have more than one file in it with
+        // repeatingly the same ids. And one trans-unit (where the id comes from) can contain multiple mrk type
+        // seg tags, which are all converted into single segments. instead of using mid from the mrk type seg element,
+        // the segmentCount as additional ID part is fine.
         $transunitId = $this->xmlparser->getAttribute($attributes, 'id', null);
-        $id = $transunitId.'_'.++$this->segmentCount;
-        
-        $segmentAttributes = $this->createSegmentAttributes($id);
+
+        // increase the segment count
+        ++$this->segmentCount;
+
+        if (str_starts_with((string) $mid, self::PREFIX_SUB)){
+            // Add the $mid to the transunit hash calculation, so we can differ the sub-segment from the other segments
+            // in this trans unit
+            $transunitHash = $this->transunitHash->createForSub($this->sourceFileId, $transunitId, $mid);
+        }else {
+            // To make unique trans-unit identifier, the transunitHash is a hash value out of:
+            // - the current fileId. This is the id of the current file in the LEK_files table
+            // - the value of the original attribute from the file tag
+            // - the id of the current trans-unit
+            $transunitHash = $this->transunitHash->create($this->sourceFileId, $transunitId);
+        }
+
+        $this->setMidWithHash($transunitHash, $mid);
+
+        $segmentAttributes = $this->createSegmentAttributes($this->_mid);
+
+        $segmentAttributes->transunitId = $transunitId;
+
+        $segmentAttributes->transunitHash = $transunitHash;
+
         $segmentAttributes->mrkMid = $mid;
+
+        $segmentAttributes->sourceFileId = $this->sourceFileId;
         
         $this->calculateMatchRate($segmentAttributes);
 
@@ -656,38 +740,35 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
             $this->namespaces->currentTarget($currentTarget, $segmentAttributes);
         }
 
-        $this->setMid($id);
-        
-        if(!empty($this->currentPlainTarget) && $state = $this->xmlparser->getAttribute($this->currentPlainTarget['openerMeta']['attributes'], 'state')) {
+        if (
+            !empty($this->currentPlainTarget) &&
+            $state = $this->xmlparser->getAttribute($this->currentPlainTarget['openerMeta']['attributes'], 'state')
+        ) {
             $segmentAttributes->targetState = $state;
             $segmentAttributes->isPreTranslated = in_array($state, self::PRE_TRANS_STATES);
         }
         
-        if(!$this->processSegment) {
+        if (!$this->processSegment) {
             //add also translate="no" segments but readonly and locked!
             $segmentAttributes->editable = false; //this is to mark the segment non editable in the application
             $segmentAttributes->locked = true; //this is to mark it explicitly locked (so that editable can not be changed)
         }
         
-        // since a transunitId can exist in each file of a translate5 task the fileId must be added for uniqness of the transunitId in the DB
-        // also in each XLIFF there can be multiple file containers, which must be reflected in the transunitId too.
-        //  Easiest way: each transunit of the xlf file gets a counter
-        $segmentAttributes->transunitId = $this->_fileId.'_'.$this->transUnitCnt.'_'.$transunitId;
-        
         try {
             $this->lengthRestriction->addAttributes($this->xmlparser, $attributes, $segmentAttributes);
-        }
-        catch(editor_Models_Import_MetaData_Exception $e) {
+        }catch (editor_Models_Import_MetaData_Exception $e) {
             $e->addExtraData([
                 'task' => $this->task,
+                'fileId' => $this->_fileId,
+                'sourceFileId' => $this->sourceFileId,
                 'rawTransUnitId' => $transunitId,
-                'transUnitId' => $segmentAttributes->transunitId,
+                'transunitHash' => $segmentAttributes->transunitHash,
             ]);
             throw $e;
         }
         return $segmentAttributes;
     }
-    
+
     protected function calculateMatchRate(editor_Models_Import_FileParser_SegmentAttributes $attributes) {
         $mid = $attributes->mrkMid;
         if(strpos($mid, editor_Models_Import_FileParser_Xlf::PREFIX_MRK) === 0) {
@@ -707,7 +788,11 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
      *
      * @param array $transUnit In this class this are the trans-unit attributes only
      * @return array array of segmentIds created from that trans unit
+     * @throws ReflectionException
+     * @throws Zend_Db_Statement_Exception
      * @throws ZfExtended_Exception
+     * @throws ZfExtended_Models_Entity_Exceptions_IntegrityConstraint
+     * @throws ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey
      * @throws editor_Models_Import_FileParser_Exception
      * @throws editor_Models_Import_MetaData_Exception
      */
@@ -720,7 +805,7 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
         
         //must be set before the loop, since in the loop the currentTarget is cleared on success
         $hasTargets = !(empty($this->currentTarget));
-        $sourceEdit = $this->task->getEnableSourceEditing();
+        $sourceEdit = (bool) $this->task->getEnableSourceEditing();
 
         $hasNoTarget = is_null($this->currentPlainTarget);
         $hasTargetSingle = !$hasNoTarget && $this->currentPlainTarget['openerMeta']['isSingle'];
@@ -804,7 +889,7 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
                 }
             }
             
-            if($sourceEdit && $isSourceMrkMissing || $hasTargets && (empty($this->currentTarget[$mid]) && $this->currentTarget[$mid] !== "0")){
+            if(($sourceEdit && $isSourceMrkMissing) || ($hasTargets && (empty($this->currentTarget[$mid]) && $this->currentTarget[$mid] !== '0'))){
                 $this->throwSegmentationException('E1067', [
                     'transUnitId' => $this->xmlparser->getAttribute($transUnit, 'id', '-na-'),
                     'mid' => $mid,
@@ -871,11 +956,6 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
             } elseif($currentSource == self::MISSING_MRK) {
                 $attributes->matchRateType = editor_Models_Segment_MatchRateType::TYPE_MISSING_SOURCE_MRK;
             }
-            
-            //The internal $mid has to be added to the DB mid of <sub> element, needed for exporting the content again
-            if(str_starts_with($mid, self::PREFIX_SUB)) {
-                $this->setMid($this->_mid.'-'.$mid);
-            }
 
             $emptyInitialTarget = empty($targetChunksOriginal);
             $hasCutTargetContent = empty($this->segmentData[$targetName]['original']) || $this->segmentData[$targetName]['original'] === "0";
@@ -893,7 +973,7 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
             $createdSegmentIds[] = $segmentId = $this->setAndSaveSegmentValues();
             //only with a segmentId (in case of ProofProcessor) we can save comments
             if($segmentId !== false && is_numeric($segmentId)) {
-                $this->importComments((int) $segmentId);
+                $this->comments->importComments((int) $segmentId);
             }
             if($currentTarget !== self::MISSING_MRK) {
                 //we add a placeholder if it is a real segment, not just a placeholder for a missing mrk
@@ -1007,30 +1087,6 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
      */
     protected function hasText($segmentContent) {
         return $this->internalTag->hasText($segmentContent);
-    }
-    
-    /**
-     * Imports the comments of last processed segment
-     * @param int $segmentId
-     */
-    protected function importComments($segmentId) {
-        $comments = $this->namespaces->getComments();
-        if(empty($comments)) {
-            return;
-        }
-        foreach($comments as $comment) {
-            /* @var $comment editor_Models_Comment */
-            $comment->setTaskGuid($this->task->getTaskGuid());
-            $comment->setSegmentId($segmentId);
-            $comment->save();
-        }
-        //if there was at least one processed comment, we have to sync the comment contents to the segment
-        if(!empty($comment)){
-            $segment = ZfExtended_Factory::get('editor_Models_Segment');
-            /* @var $segment editor_Models_Segment */
-            $segment->load($segmentId);
-            $comment->updateSegment($segment, $this->task->getTaskGuid());
-        }
     }
     
     /**

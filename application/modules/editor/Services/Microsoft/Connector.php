@@ -111,7 +111,7 @@ class editor_Services_Microsoft_Connector extends editor_Services_Connector_Abst
      * @param boolean $useDictionary
      * @return boolean
      */
-    protected function queryApi($searchString, &$useDictionary = false): bool{
+    protected function queryApi($searchString, $useDictionary = false): bool{
         return $this->api->search($searchString, $this->languageResource->getSourceLangCode(), $this->languageResource->getTargetLangCode(), $useDictionary);
     }
 
@@ -122,49 +122,52 @@ class editor_Services_Microsoft_Connector extends editor_Services_Connector_Abst
     {
         return $this->api->getResult();
     }
-    
+
     /**
      * {@inheritDoc}
+     * @throws editor_Services_Connector_Exception
      * @see editor_Services_Connector_Abstract::translate()
      */
+
     public function translate(string $searchString){
-        if(empty($searchString)&&$searchString!=="0") {
+        if(empty($searchString) && $searchString !== '0') {
             return $this->resultList;
         }
-        
-        $results = [];
-        //the dictonary lookup translation is active only for less than or equal to DICTONARY_SEARCH_CHARACTERS_BORDER
-        $useDictionary = mb_strlen($searchString) <= self::DICTONARY_SEARCH_CHARACTERS_BORDER;
-        
+
+        $useDictionary = $this->useDictionary($searchString);
+
         //query either with dictionary or without as fallback
         // $useDictionary may be set to false by the search itself, if the languages do not support a dictionary lookup
         if ($this->queryApi($searchString, $useDictionary)) {
             $results = $this->api->getResult();
-            $hasNoDictResults = $useDictionary && (empty($results) || empty($results[0]) || empty($results[0]->translations));
+            $hasNoDictResults = $useDictionary
+                && (empty($results) || empty($results[0]) || empty($results[0]->translations));
             //if there was no dictionary translation we call it again without dictionary
             if($hasNoDictResults && $this->queryApi($searchString)) {
                 $useDictionary = false; //set to false for further processing of the data
             }
         }
-        
+
         if(!is_null($this->api->getError())) {
             throw $this->createConnectorException();
         }
-        
+
+
         $this->processTranslateResults($useDictionary);
-        
+
         return $this->resultList;
     }
-    
+
     /**
      * process the instant translate results
      * @param bool $useDictionary
      */
-    protected function processTranslateResults(bool $useDictionary) {
+    protected function processTranslateResults(bool $useDictionary): void
+    {
         $foundText = null;
         $metaData = [];
         
-        //loop over all results, if using dictionary we collect also additional meta data
+        //loop over all results, if using dictionary we collect also additional metadata
         foreach ($this->api->getResult() as $result) {
             if(empty($result->translations)){
                 continue;
@@ -172,7 +175,7 @@ class editor_Services_Microsoft_Connector extends editor_Services_Connector_Abst
             foreach($result->translations as $translation) {
                 //use first translation as result:
                 if(is_null($foundText)) {
-                    //the translation is in a different field, depending if dictionary used or not:
+                    //the translation is in a different field, depending on if dictionary used or not:
                     $foundText = $useDictionary ? $translation->displayTarget : $translation->text;
                 }
                 if($useDictionary) {
@@ -239,7 +242,7 @@ class editor_Services_Microsoft_Connector extends editor_Services_Connector_Abst
      * {@inheritDoc}
      * @see editor_Services_Connector_Abstract::getStatus()
      */
-    public function getStatus(editor_Models_LanguageResources_Resource $resource){
+    public function getStatus(editor_Models_LanguageResources_Resource $resource, editor_Models_LanguageResources_LanguageResource $languageResource = null): string {
         $this->lastStatusInfo = '';
         $this->api = ZfExtended_Factory::get('editor_Services_Microsoft_HttpApi',[$resource]);
         
@@ -312,5 +315,21 @@ class editor_Services_Microsoft_Connector extends editor_Services_Connector_Abst
     protected function getResourceName(): string
     {
         return 'Microsoft Translator';
+    }
+
+    /**
+     * Check if the current search text can be translated using the dictionary lookup
+     * @param string $text
+     * @return bool
+     */
+    private function useDictionary(string $text): bool {
+
+        if(mb_strlen($text) > self::DICTONARY_SEARCH_CHARACTERS_BORDER){
+            return false;
+        }
+        return $this->api->isValidDictionaryLookup(
+            $this->languageResource->getSourceLangCode(),
+            $this->languageResource->getTargetLangCode()
+        );
     }
 }

@@ -26,6 +26,7 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\Segment\Tag\Placeable;
 use PHPHtmlParser\Dom\Node\HtmlNode;
 use PHPHtmlParser\Dom\Node\AbstractNode;
 use MittagQI\Translate5\Tools\Markup;
@@ -99,6 +100,8 @@ final class editor_Segment_Internal_Tag extends editor_Segment_Tag {
     protected static $nodeName = 'div';
     
     protected static $identificationClass = self::CSS_CLASS;
+    public $_idx;
+    public $_sidx;
 
     /**
      * Replaces all Internal Tags in a segment-text
@@ -272,11 +275,23 @@ final class editor_Segment_Internal_Tag extends editor_Segment_Tag {
     }
 
     /**
+     * Evaluates, if the internal tag represents a (breaking) space
+     * @return boolean
+     */
+    public function isSpace(): bool {
+        return ($this->isSingle() && $this->hasClass(self::CSS_CLASS_SPACE));
+    }
+
+    /**
      * Evaluates, if the internal tag represents a tab
      * @return boolean
      */
     public function isTab(): bool {
         return ($this->isSingle() && $this->hasClass(self::CSS_CLASS_TAB));
+    }
+
+    public function isPlaceable(): bool {
+        return ($this->isSingle() && $this->hasClass(Placeable::MARKER_CLASS));
     }
 
     /**
@@ -320,7 +335,17 @@ final class editor_Segment_Internal_Tag extends editor_Segment_Tag {
         }
         return md5($this->render());
     }
-    
+
+
+    /**
+     * Renders the short-tag as unescaped markup like "<5/>"
+     * @return string
+     */
+    public function getShortTagMarkup(): string
+    {
+        return htmlspecialchars_decode($this->shortTag->getText());
+    }
+
     /* *************************************** Overwritten Tag API *************************************** */
     
     /**
@@ -366,6 +391,14 @@ final class editor_Segment_Internal_Tag extends editor_Segment_Tag {
     public function getTextLength(){
         return 0;
     }
+
+    /**
+     * The length as defined by the data-attribute
+     * @return int
+     */
+    public function getDataLength(){
+        return ($this->hasData('length')) ? intval($this->getData('length')) : 1;
+    }
     /**
      * Must be overwritten to ensure, the internal tag does add it's text nor text-length to the field-tags
      * {@inheritDoc}
@@ -389,6 +422,76 @@ final class editor_Segment_Internal_Tag extends editor_Segment_Tag {
         }
         return $html;
     }
+
+    /**
+     * Renders the replaced contents what differs for internal tags depending on the mode
+     * @param string $mode
+     * @return string
+     */
+    public function renderReplaced(string $mode): string
+    {
+        // QUIRK: is the feature with length-attributes for whitespace-tags still in use ?
+        if($mode === editor_TagSequence::MODE_STRIPPED){
+
+            return '';
+
+        } else if($mode === editor_TagSequence::MODE_LABELED){
+
+            $content = $this->getLabeledContent();
+
+        } else if($mode === editor_TagSequence::MODE_ORIGINAL){
+
+            $content = $this->getOriginalContent();
+        }
+        $length = $this->getDataLength();
+        if($length === 1){
+            return $content;
+        } else if($length > 1){
+            return str_repeat($content, $length);
+        }
+        return '';
+    }
+
+    /**
+     * Provides the content for the replaced labeled mode
+     * @return string
+     */
+    private function getLabeledContent(): string
+    {
+        if($this->isSpecialCharacter()){
+            return editor_Models_Segment_Whitespace::LABEL_CHARACTER;
+        } else if($this->isNewline()) {
+            return editor_Models_Segment_Whitespace::LABEL_NEWLINE;
+        } else if($this->isTab()) {
+            return editor_Models_Segment_Whitespace::LABEL_TAB;
+        } else if($this->isNbsp()) {
+            return editor_Models_Segment_Whitespace::LABEL_NBSP;
+        } else if($this->isSpace()) {
+            return editor_Models_Segment_Whitespace::LABEL_SPACE;
+        }
+        return '';
+    }
+
+    /**
+     * Provides the content for the replaced original mode
+     * @return string
+     */
+    private function getOriginalContent(): string
+    {
+        if($this->isSpecialCharacter()){
+            return '□';
+        } else if($this->isNewline()) {
+            return "\n";
+        } else if($this->isTab()) {
+            return "\t";
+        } else if($this->isNbsp()) {
+            return " ";
+        } else if($this->isSpace()) {
+            return ' ';
+        }
+        return '';
+    }
+
     /**
      * Needs to be overwritten to ignore the singular-prop when rendering 
      * {@inheritDoc}

@@ -29,6 +29,8 @@
 namespace Translate5\MaintenanceCli\Command;
 
 use MittagQI\Translate5\Test\TestConfiguration;
+use MittagQI\ZfExtended\Service\ConfigHelper;
+use PDO;
 use Symfony\Component\Console\Input\InputOption;
 use Translate5\MaintenanceCli\WebAppBridge\Application;
 use Zend_Registry;
@@ -42,16 +44,29 @@ abstract class Translate5AbstractTestCommand extends Translate5AbstractCommand
     const RELATIVE_TEST_DIR = self::RELATIVE_TEST_ROOT . 'editorAPI/';
 
     /**
+     * Enables the -m option to let the current tests to be run as master-tests
      * @var bool
-     * Enables the -m option to let the current tests to be run a s master-tests
      */
     protected static bool $canMimicMasterTest = true;
 
     /**
-     * @var bool
      * Enables the -k option to let the current test to not cleanup resources & generated files
+     * @var bool
      */
     protected static bool $canKeepTestData = true;
+
+    /**
+     * Enables the -s option to skip the passed tests from running the suite
+     * @var bool
+     */
+    protected static bool $canSkipTests = true;
+
+    /**
+     * Some configs need the base-url
+     * To not fetch multiple times, we cache it
+     * @var string
+     */
+    protected static string $applicationBaseUrl;
 
     /**
      * General Options of all test-commands
@@ -76,20 +91,33 @@ abstract class Translate5AbstractTestCommand extends Translate5AbstractCommand
             InputOption::VALUE_NONE,
             'Leads to the testsuite stopping on the first failure (not error!).');
 
-        if(static::$canKeepTestData){
+        if (static::$canKeepTestData) {
             $this->addOption(
                 'keep-data',
                 'k',
                 InputOption::VALUE_NONE,
-                'Prevents that the test data (tasks, etc) is cleaned up after the test. Useful for debugging a test. Must be implemented in the test itself, so not all tests support that flag yet.');
+                'Prevents that the test data (tasks, etc) is cleaned up after the test.'
+                . ' Useful for debugging a test. Must be implemented in the test itself,'
+                . ' so not all tests support that flag yet.');
         }
 
-        if(static::$canMimicMasterTest){
+        if (static::$canMimicMasterTest) {
             $this->addOption(
                 'master-test',
                 'm',
                 InputOption::VALUE_NONE,
-                'Leads to the testsuite running in master mode. Be aware that this might create costs for using paid external APIs.');
+                'Leads to the testsuite running in master mode.'
+                . ' Be aware that this might create costs for using paid external APIs.');
+        }
+
+        if (static::$canSkipTests) {
+            $this->addOption(
+                'skip',
+                null,
+                InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY,
+                'Excludes the given API-test from running a suite.'
+                . ' Provide only the pure classname without namespace.'
+                . ' Note, that Unit-tests can not be skipped.');
         }
     }
 
@@ -181,6 +209,11 @@ abstract class Translate5AbstractTestCommand extends Translate5AbstractCommand
 
         if (static::$canMimicMasterTest && $this->input->getOption('master-test')) {
             putenv('MASTER_TEST=1');
+        }
+
+        // skipping tests makes only sense for suites/all
+        if (static::$canSkipTests && !empty($this->input->getOption('skip'))) {
+            putenv('SKIP_TESTS=' . implode(',', $this->input->getOption('skip')));
         }
 
         // command options usable for all tests
@@ -574,20 +607,56 @@ abstract class Translate5AbstractTestCommand extends Translate5AbstractCommand
     private function getApplicationConfiguration(string $applicationDbName, string $host, string $username, string $password): array
     {
         $this->io->note('Copying config-values from database \'' . $applicationDbName . '\'');
-        $pdo = new \PDO('mysql:host=' . $host . ';dbname=' . $applicationDbName, $username, $password);
+        $pdo = new PDO('mysql:host=' . $host . ';dbname=' . $applicationDbName, $username, $password);
         $neededConfigs = TestConfiguration::getTestConfigs();
         foreach ($neededConfigs as $name => $value) {
-            if ($value === null) { // value should be taken from application DB
-                $query = 'SELECT `value` FROM `Zf_configuration` WHERE `name` = ?';
-                $stmt = $pdo->prepare($query);
-                $stmt->execute([$name]);
-                $appVal = $stmt->fetchColumn();
+            // value should be taken from application DB if defined as null
+            if ($value === null) {
+                $appVal = $this->fetchApplicationConfigurationVal($pdo, $name);
                 if ($appVal !== false) {
                     $neededConfigs[$name] = $appVal;
                 }
+
+            // value needs to be complemented with base-url of current installation. This is e.g. needed, when fake-APIs are used
+            } else if(str_contains($value, ConfigHelper::BASE_URL)){
+
+                $baseUrl = $this->getApplicationBaseUrl($pdo);
+                $neededConfigs[$name] = str_replace(ConfigHelper::BASE_URL, $baseUrl, $value);
             }
         }
         return $neededConfigs;
+    }
+
+    /**
+     * Retrieves the base-URL from of the application config DB
+     * @param PDO $pdo
+     * @return string
+     */
+    private function getApplicationBaseUrl(PDO $pdo): string
+    {
+        if(!isset(static::$applicationBaseUrl)){
+            static::$applicationBaseUrl =
+                $this->fetchApplicationConfigurationVal($pdo, 'runtimeOptions.server.protocol')
+                .$this->fetchApplicationConfigurationVal($pdo, 'runtimeOptions.server.name');
+        }
+        return static::$applicationBaseUrl;
+    }
+
+    /**
+     * Retrieves a single config-value out of the application config DB
+     * @param PDO $pdo
+     * @return string
+     */
+    private function fetchApplicationConfigurationVal(PDO $pdo, string $name): ?string
+    {
+        $query = 'SELECT `value` FROM `Zf_configuration` WHERE `name` = ?';
+        $stmt = $pdo->prepare($query);
+        $stmt->execute([$name]);
+        $appVal = $stmt->fetchColumn();
+        if ($appVal !== false && $appVal !== null) {
+            return (string)$appVal;
+        }
+        return null;
     }
 
     /**

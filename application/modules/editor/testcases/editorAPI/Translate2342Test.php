@@ -80,7 +80,7 @@ class Translate2342Test extends editor_Test_ImportTest {
 
         // run the import workers and check wait for task import
         static::api()->getJson('editor/task/'.$taskId.'/import');
-        static::api()->checkTaskStateLoop();
+        static::api()->waitForCurrentTaskStateOpen();
         
         $result = static::api()->getJson('editor/task/importprogress',[
             'taskGuid' => $taskGuid

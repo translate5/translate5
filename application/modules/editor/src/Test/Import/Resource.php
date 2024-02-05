@@ -159,6 +159,13 @@ abstract class Resource
         if (str_starts_with($name, '_')) {
             throw new Exception('Resource::setProperty: you can not set internal vars');
         }
+        // in case the customField is set, we assume it exsitst and set it
+        // this case is only used for the customField test
+        if(str_starts_with($name,'customField')){
+            $this->$name = $val;
+            return $this;
+        }
+
         if (!property_exists($this, $name)) {
             throw new Exception('Resource::setProperty: property "' . $name . '" does not exist');
         }

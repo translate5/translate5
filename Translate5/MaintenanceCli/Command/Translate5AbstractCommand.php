@@ -65,6 +65,11 @@ abstract class Translate5AbstractCommand extends Command
      */
     protected bool $isPorcelain = false;
 
+    public static function create(): static
+    {
+        return new static();
+    }
+
     public function __construct($name = null)
     {
         parent::__construct($name);
@@ -250,5 +255,22 @@ END LICENSE AND COPYRIGHT
             $this->io->note('You\'re running the command as user "' . $username . '"');
         }
         return false;
+    }
+
+    /**
+     * Prints the instance specific client-specific/instance-notes.md file if any
+     * @return void
+     */
+    protected function printNotes() {
+        $notesFile = APPLICATION_ROOT.'/client-specific/instance-notes.md';
+        if (file_exists($notesFile)) {
+            $this->io->section('Important instance notes (client-specific/instance-notes.md)');
+            $this->io->writeln(file_get_contents($notesFile));
+        }
+    }
+
+    protected function printDuration($start, $end): string {
+        $s = (int)strtotime($end) - strtotime($start);
+        return sprintf(' %02d:%02d:%02d', $s/3600, $s/60%60, $s%60) . ' ('.$s.')';
     }
 }

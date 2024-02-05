@@ -123,6 +123,12 @@ class ConnectorTest extends TestCase
                 'importTime' => null,
                 'expectedResult' => LanguageResourceStatus::REORGANIZE_FAILED
             ],
+            'Empty tmxImportStatus' => [
+                'status' => 'open',
+                'tmxImportStatus' => null,
+                'importTime' => null,
+                'expectedResult' => LanguageResourceStatus::AVAILABLE
+            ],
         ];
     }
 

@@ -52,19 +52,12 @@ class editor_Services_ServiceResult {
     protected $nextOffset = null;
     
     /**
-     * Total results, needed for paging
-     * @var editor_Models_Segment_InternalTag
-     */
-    protected $internalTag;
-    
-    /**
      * A default source text for the results and a defaultMatchrate can be set
      * The default values are the used as initial value for new added result sets
      * @param string $defaultSource
      * @param int $defaultMatchrate
      */
     public function __construct($defaultSource = '', $defaultMatchrate = 0) {
-        $this->internalTag = ZfExtended_Factory::get('editor_Models_Segment_InternalTag');
         $this->defaultMatchrate = (int) $defaultMatchrate;
         $this->defaultSource = $defaultSource;
     }
@@ -112,10 +105,11 @@ class editor_Services_ServiceResult {
      * 
      * @return stdClass the last added result
      */
-    public function addResult($target, $matchrate = 0, array $metaData = null) {
+    public function addResult($target, $matchrate = 0, array $metaData = null, ?string $rawTarget = null) {
         $result = new stdClass();
         
         $result->target = $target;
+        $result->rawTarget = $rawTarget;
         $result->matchrate = (int) $matchrate;
         $result->source = $this->defaultSource;
         $result->languageResourceid = $this->languageResource->getId();
@@ -127,6 +121,7 @@ class editor_Services_ServiceResult {
         
         $this->results[] = $result;
         $this->lastAdded = $result;
+
         return $result;
     }
     
@@ -193,5 +188,20 @@ class editor_Services_ServiceResult {
             }
         }
         return false;
+    }
+
+    public function getMaxMatchRateResult(): ?stdClass
+    {
+        $maxMatchRate = 0;
+        $maxMatchRateResult = null;
+
+        foreach ($this->getResult() as $result) {
+            if (isset($result->matchrate) && $result->matchrate > $maxMatchRate) {
+                $maxMatchRate = $result->matchrate;
+                $maxMatchRateResult = $result;
+            }
+        }
+
+        return $maxMatchRateResult;
     }
 }

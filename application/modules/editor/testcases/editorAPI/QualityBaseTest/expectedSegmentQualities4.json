@@ -13,7 +13,6 @@
         "falsifiable": true,
         "content": "betretenen",
         "similarQty": 0,
-        "falsePositiveChanged": 0,
         "hasTag": true,
         "tagName": "img",
         "cssClass": "qmflag"
@@ -32,7 +31,6 @@
         "falsifiable": true,
         "content": "gelagerten",
         "similarQty": 0,
-        "falsePositiveChanged": 0,
         "hasTag": true,
         "tagName": "img",
         "cssClass": "qmflag"

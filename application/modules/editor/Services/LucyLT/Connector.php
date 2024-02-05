@@ -221,7 +221,7 @@ class editor_Services_LucyLT_Connector extends editor_Services_Connector_Abstrac
         return $this->defaultMatchRate;
     }
     
-    public function getStatus(editor_Models_LanguageResources_Resource $resource){
+    public function getStatus(editor_Models_LanguageResources_Resource $resource, editor_Models_LanguageResources_LanguageResource $languageResource = null): string {
         $this->lastStatusInfo = '';
         $http = ZfExtended_Factory::get('Zend_Http_Client');
         /* @var $http Zend_Http_Client */

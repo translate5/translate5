@@ -85,13 +85,17 @@ class editor_Plugins_MatchAnalysis_Worker extends editor_Models_Task_AbstractWor
 
     /**
      * @return boolean
+     * @throws ReflectionException
+     * @throws Zend_Db_Statement_Exception
+     * @throws ZfExtended_Models_Db_Exceptions_DeadLockHandler
+     * @throws ZfExtended_Models_Entity_Exceptions_IntegrityConstraint
+     * @throws ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey
      */
-    protected function doWork()
+    protected function doWork(): bool
     {
         $params = $this->workerModel->getParameters();
 
-        $analysisAssoc = ZfExtended_Factory::get('editor_Plugins_MatchAnalysis_Models_TaskAssoc');
-        /* @var $analysisAssoc editor_Plugins_MatchAnalysis_Models_TaskAssoc */
+        $analysisAssoc = ZfExtended_Factory::get(editor_Plugins_MatchAnalysis_Models_TaskAssoc::class);
         $analysisAssoc->setTaskGuid($this->task->getTaskGuid());
 
         //set flag for internal fuzzy usage
@@ -130,7 +134,7 @@ class editor_Plugins_MatchAnalysis_Worker extends editor_Models_Task_AbstractWor
         }
 
         //setting null takes the current date from DB
-        $analysisAssoc->finishNow();
+        $analysisAssoc->finishNow($this->analysis->getErrorCount());
 
         $this->task->unlock();
         return $return;

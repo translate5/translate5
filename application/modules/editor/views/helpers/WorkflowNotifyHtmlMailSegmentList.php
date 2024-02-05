@@ -62,12 +62,12 @@ class View_Helper_WorkflowNotifyHtmlMailSegmentList extends Zend_View_Helper_Abs
      * @param string $comments
      * @return string
      */
-    protected function prepareComments($comments) {
-        $search = array('<span class="author">', '<span class="modified">', '</div>');
-        $replace = array("~#br#~", ' (', ") ~#br#~~#br#~");
+    protected function prepareComments(string $comments): string
+    {
+        $search = ['<span class="author">', '<span class="modified">', '</div>'];
+        $replace = ["~#br#~", ' (', ") ~#br#~~#br#~"];
         $comments = str_replace($search, $replace, $comments);
-        $comments = str_replace('~#br#~', '<br />', strip_tags($comments));
-        return $comments;
+        return str_replace('~#br#~', '<br />', strip_tags($comments));
     }
     
     /**
@@ -148,9 +148,12 @@ class View_Helper_WorkflowNotifyHtmlMailSegmentList extends Zend_View_Helper_Abs
      */
     protected function render() {
         //the segments list should not be send to reviewers when the previous workflow step was translations
-        if(isset($this->view->triggeringRole) && $this->view->triggeringRole == editor_Workflow_Default::ROLE_TRANSLATOR){
+        if (isset($this->view->triggeringRole) &&
+            $this->view->triggeringRole == editor_Workflow_Default::ROLE_TRANSLATOR)
+        {
             return '';
         }
+
         $states = ZfExtended_Factory::get('editor_Models_Segment_AutoStates');
         /* @var $states editor_Models_Segment_AutoStates */
         $stateMap = $states->getLabelMap();
@@ -165,7 +168,10 @@ class View_Helper_WorkflowNotifyHtmlMailSegmentList extends Zend_View_Helper_Abs
         
         $task = $this->view->task;
         /* @var $task editor_Models_Task */
-        
+
+
+        $showImportTargetColumn = $task->getConfig()->runtimeOptions->editor->notification->showImportTargetColumn;
+
         $sfm = editor_Models_SegmentFieldManager::getForTaskGuid($task->getTaskGuid());
         
         $fields = $sfm->getFieldList();
@@ -175,9 +181,15 @@ class View_Helper_WorkflowNotifyHtmlMailSegmentList extends Zend_View_Helper_Abs
                 continue;
             }
             //show the original source
-            if($field->type == editor_Models_SegmentField::TYPE_SOURCE) {
+            if($field->type === editor_Models_SegmentField::TYPE_SOURCE) {
                 $fieldsToShow[$field->name] = $t->_($field->label);
             }
+
+            // show the target on import if configured
+            if ($field->type === editor_Models_SegmentField::TYPE_TARGET && $showImportTargetColumn) {
+                $fieldsToShow[$field->name] = $t->_($field->label);
+            }
+
             //if field is editable (source or target), show the edited data
             if($field->editable) {
                 $fieldsToShow[$sfm->getEditIndex($field->name)] = sprintf($t->_('%s - bearbeitet'), $t->_($field->label));
@@ -204,11 +216,7 @@ class View_Helper_WorkflowNotifyHtmlMailSegmentList extends Zend_View_Helper_Abs
         $result[] = $th.$t->_('Matchrate').'</th>';
         $result[] = $th.$t->_('Kommentare').'</th>';
         $result[] = '</tr>';
-        
-        $translateQm = function($qm) use ($t) {
-            return $t->_($qm);
-        };
-        
+
         foreach($this->segments as $segment) {
             $state = $stateMap[$segment['autoStateId']] ?? '- not found -'; //else tree should not be so untranslated
             $result[] = "\n".'<tr>';
@@ -221,7 +229,7 @@ class View_Helper_WorkflowNotifyHtmlMailSegmentList extends Zend_View_Helper_Abs
             $result[] = '<td valign="top" nowrap="nowrap">'.$joinedQualities.'</td>';
             $result[] = '<td valign="top">'.$t->_($state).'</td>';
             $result[] = '<td valign="top">'.$segment['matchRate'].'%</td>';
-            $result[] = '<td valign="top">'.$this->prepareComments($segment['comments']).'</td>';
+            $result[] = '<td valign="top">'.$this->prepareComments($segment['comments'] ?? '').'</td>';
             $result[] = '</tr>';
         }
         $result[] = '</table>';

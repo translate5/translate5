@@ -30,8 +30,9 @@ END LICENSE AND COPYRIGHT
  * Base Implementation for all Quality Providers
  *
  */
-abstract class editor_Segment_Quality_Provider implements editor_Segment_TagProviderInterface {
-    
+abstract class editor_Segment_Quality_Provider implements editor_Segment_TagProviderInterface
+{
+    public const CATEGORY_CRITICAL_ERROR_TOOLTIP = 'Alle Fehler der folgenden Kategorie sollten behoben ODER auf “falscher Fehler” gesetzt werden';
     /**
      * Retrieves our type
      * @return string
@@ -168,7 +169,7 @@ abstract class editor_Segment_Quality_Provider implements editor_Segment_TagProv
 
     public function translateTypeTooltipCriticalSuffix(ZfExtended_Zendoverwrites_Translate $translate) : string
     {
-        return $translate->_('Alle Fehler der folgenden Gruppe ODER setzen Sie sie auf “falscher Fehler”');
+        return $translate->_(self::CATEGORY_CRITICAL_ERROR_TOOLTIP);
     }
 
     /**
@@ -201,7 +202,7 @@ abstract class editor_Segment_Quality_Provider implements editor_Segment_TagProv
         string $category,
         editor_Models_Task $task
     ) : string {
-        return $translate->_('Alle Fehler der folgenden Gruppe ODER setzen Sie sie auf “falscher Fehler”');
+        return $translate->_(self::CATEGORY_CRITICAL_ERROR_TOOLTIP);
     }
 
     /* *************** REST view API *************** */

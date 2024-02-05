@@ -26,6 +26,8 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\Segment\TransUnitHash;
+
 /**#@+
  * @author Marc Mittag
  * @package editor
@@ -43,10 +45,12 @@ abstract class editor_Models_Import_FileParser {
      * @var string
      */
     protected $_origFile = NULL;
+
     /**
      * @var string
      */
-    protected $_skeletonFile = NULL;
+    protected string $skeletonFile = '';
+
     /**
      * @var string
      */
@@ -139,6 +143,16 @@ abstract class editor_Models_Import_FileParser {
      */
     const IS_REIMPORTABLE = false;
 
+    /***
+     * Identifier defined in one of the tags for the currently processed file.
+     * For example for xlf file, this is the original value from the file tag.
+     * ex: <file original="file1.html" source-language="de" target-language="en" datatype="html">
+     * @var string
+     */
+    protected string $sourceFileId = '';
+
+    protected TransUnitHash $transunitHash;
+
     /**
      * returns the file extensions (in lower case) parsable by this fileparser
      * @return array;
@@ -156,7 +170,7 @@ abstract class editor_Models_Import_FileParser {
     {
         return str_replace('_Import_', '_Export_', static::class);
     }
-    
+
     /**
      * Basically we assume that each Parser is able to parse its exceptions, so this functions defaults to return true.
      * If this not the case forexample due multi purpose extensions like XML, the isParsable must be calculated in the
@@ -169,13 +183,16 @@ abstract class editor_Models_Import_FileParser {
         $errorMsg = '';
         return true;
     }
-    
+
     /**
      * FIXME change first Parameter to SplFileInfo!
      * @param string $path pfad zur Datei in der Kodierung des Filesystems (also runtimeOptions.fileSystemEncoding)
      * @param string $fileName Dateiname utf-8 kodiert
      * @param int $fileId
      * @param editor_Models_Task $task
+     * @throws ReflectionException
+     * @throws editor_Models_ConfigException
+     * @throws editor_Models_Import_FileParser_Exception
      */
     public function __construct(string $path, string $fileName, int $fileId, editor_Models_Task $task){
         $this->config = $task->getConfig();
@@ -184,13 +201,14 @@ abstract class editor_Models_Import_FileParser {
         $this->_path = $path;
         $this->_fileName = $fileName;
         $this->_fileId = $fileId;
+        $this->transunitHash = ZfExtended_Factory::get(TransUnitHash::class, [$this->config, $fileId]);
         $this->task = $task;
         $this->_taskGuid = $task->getTaskGuid();
-        $this->autoStates = ZfExtended_Factory::get('editor_Models_Segment_AutoStates');
-        $this->matchRateType = ZfExtended_Factory::get('editor_Models_Segment_MatchRateType');
+        $this->autoStates = ZfExtended_Factory::get(editor_Models_Segment_AutoStates::class);
+        $this->matchRateType = ZfExtended_Factory::get(editor_Models_Segment_MatchRateType::class);
         $this->updateFile(get_class($this));
         
-        $this->utilities = ZfExtended_Factory::get('editor_Models_Segment_UtilityBroker');
+        $this->utilities = ZfExtended_Factory::get(editor_Models_Segment_UtilityBroker::class);
     }
     
     /**
@@ -246,8 +264,9 @@ abstract class editor_Models_Import_FileParser {
      * Gibt den Inhalt das erzeugte Skeleton File zurück
      * @return string
      */
-    public function getSkeletonFile() {
-        return $this->_skeletonFile;
+    public function getSkeletonFile(): string
+    {
+        return $this->skeletonFile;
     }
     
     /**
@@ -419,6 +438,18 @@ abstract class editor_Models_Import_FileParser {
         }
         $this->_mid = $mid;
     }
+
+    /**
+     * Generate the mid value out of the transunitHash and the mid
+     * @param string $transunitHash
+     * @param string $mid
+     * @return void
+     * @throws editor_Models_Import_FileParser_Exception
+     */
+    protected function setMidWithHash(string $transunitHash, string $mid): void
+    {
+        $this->setMid($transunitHash . '_' . $mid);
+    }
     
     /**
      * calculates and sets segment attributes needed by us, this info doesnt exist directly in the segment.
@@ -496,5 +527,21 @@ abstract class editor_Models_Import_FileParser {
      */
     public function setIsReimport(bool $isReimport = true) {
         $this->isReimport = $isReimport;
+    }
+
+    /***
+     * @return editor_Models_Task
+     */
+    public function getTask(): editor_Models_Task
+    {
+        return $this->task;
+    }
+
+    /**
+     * @return int|null
+     */
+    public function getFileId(): ?int
+    {
+        return $this->_fileId;
     }
 }

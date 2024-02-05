@@ -39,7 +39,7 @@ Ext.define('Editor.view.admin.TaskGrid', {
     controller: 'taskGrid',
     alias: 'widget.adminTaskGrid',
     itemId: 'adminTaskGrid',
-    stateId: 'adminTaskGrid',
+    stateId: 'editor.adminTaskGrid',
     stateful: true,
     cls: 'adminTaskGrid',
     title: '#UT#Aufgaben',
@@ -317,6 +317,7 @@ Ext.define('Editor.view.admin.TaskGrid', {
             userStates = ['open', 'waiting', 'finished', 'unconfirmed'],//TODO get me from backend
             stateFilterOrder = ['open', 'locked', 'end', 'unconfirmed', 'import', 'error'],
             relaisLanguages = Ext.Array.clone(Editor.data.languages),
+            customColumns = Editor.controller.admin.TaskCustomField.getGridColumnsFor('taskGrid'),
             addQtip = function (meta, text) {
                 meta.tdAttr = 'data-qtip="' + Ext.String.htmlEncode(text) + '"';
             },
@@ -355,6 +356,7 @@ Ext.define('Editor.view.admin.TaskGrid', {
 
         config = {
             title: me.title, //see EXT6UPD-9
+            tooltip: Editor.data.l10n.tasksGrid.tooltip,
             languageStore: Ext.StoreMgr.get('admin.Languages'),
             customerStore: Ext.StoreManager.get('customersStore'),
             columns: {
@@ -545,7 +547,13 @@ Ext.define('Editor.view.admin.TaskGrid', {
                             type: 'string'
                         },
                         tdCls: 'taskNr',
-                        text: me.text_cols.taskNr
+                        text: me.text_cols.taskNr,
+                        renderer: function(value, meta, rec) {
+                            if (!(rec.isErroneous() || rec.isImporting() || !rec.isOpenable() || rec.isCustomState())) {
+                                meta.tdAttr = 'data-qtip="' + Editor.data.l10n.tasksGrid.actionColumn.actionEdit + '"';
+                            }
+                            return value;
+                        }
                     }, {
                         xtype: 'numbercolumn',
                         width: 70,
@@ -666,7 +674,7 @@ Ext.define('Editor.view.admin.TaskGrid', {
                                 ret = v;
                             if (Editor.data.frontend.tasklist.pmMailTo) {
                                 tooltip = rec.get('pmMail');
-                                ret = '<a alt="' + tooltip + '" href="mailto:' + tooltip + '">' + v + '</a>';
+                                ret = '<a alt="' + tooltip + '" href="mailto:' + tooltip + '" target="_blank">' + v + '</a>';
                                 meta.tdAttr = 'data-qtip="' + tooltip + '"';
                             }
                             return ret;
@@ -739,7 +747,7 @@ Ext.define('Editor.view.admin.TaskGrid', {
                         },
                         tooltip: me.text_cols.enableSourceEditing,
                         text: me.text_cols.enableSourceEditing
-                    }]
+                    }].concat(customColumns)
             },
             dockedItems: [{
                 xtype: 'toolbar',
@@ -875,7 +883,7 @@ Ext.define('Editor.view.admin.TaskGrid', {
         });
     },
     onDestroy: function () {
-        if (this.tooltip) {
+        if (this.tooltip && this.tooltip.destroy) {
             this.tooltip.destroy();
         }
         this.callParent(arguments);

@@ -34,22 +34,22 @@ END LICENSE AND COPYRIGHT
  */
 /**
  * Comment Entity Object
- * @method integer getId() getId()
- * @method void setId() setId(int $id)
- * @method string getTaskGuid() getTaskGuid()
- * @method void setTaskGuid() setTaskGuid(string $taskGuid)
- * @method integer getSegmentId() getSegmentId()
- * @method void setSegmentId() setSegmentId(int $segmentId)
- * @method string getUserGuid() getUserGuid()
- * @method void setUserGuid() setUserGuid(string $userGuid)
- * @method string getUserName() getUserName()
- * @method void setUserName() setUserName(string $username)
- * @method string getComment() getComment()
- * @method void setComment() setComment(string $comment)
- * @method string getCreated() getCreated()
- * @method void setCreated() setCreated(string $created)
- * @method string getModified() getModified()
- * @method void setModified() setModified(string $modified)
+ * @method integer getId()
+ * @method void setId(int $id)
+ * @method string getTaskGuid()
+ * @method void setTaskGuid(string $taskGuid)
+ * @method integer getSegmentId()
+ * @method void setSegmentId(int $segmentId)
+ * @method string getUserGuid()
+ * @method void setUserGuid(string $userGuid)
+ * @method string getUserName()
+ * @method void setUserName(string $username)
+ * @method string getComment()
+ * @method void setComment(string $comment)
+ * @method string getCreated()
+ * @method void setCreated(string $created)
+ * @method string getModified()
+ * @method void setModified(string $modified)
  */
 class editor_Models_Comment extends ZfExtended_Models_Entity_Abstract {
     
@@ -116,8 +116,7 @@ class editor_Models_Comment extends ZfExtended_Models_Entity_Abstract {
    * @return array
    */
   public function loadBySegmentId(int $segmentId, string $taskGuid) {
-      $sessionUser = new Zend_Session_Namespace('user');
-      $userGuid = $sessionUser->data->userGuid ?? null;
+      $userGuid = ZfExtended_Authentication::getInstance()->getUserGuid();
       $comments = $this->loadBySegmentAndTaskPlain($segmentId, $taskGuid);
       $editable = true;
       //comment is editable until an other user has edited it. 
@@ -174,13 +173,12 @@ class editor_Models_Comment extends ZfExtended_Models_Entity_Abstract {
    * calculates the isEditable state of the current comment
    */
   public function isEditable() {
-      $sessionUser = new Zend_Session_Namespace('user');
-      //SELECT explained: 
+      //SELECT explained:
       //if there are newer comments (id > ?) to this segment (segId=?) of another user (userGuid=?), the actual user cant edit the comment anymore
       $s = $this->db->select()
           ->where('id > ?', $this->getId())
           ->where('segmentId = ?', $this->getSegmentId())
-          ->where('userGuid != ?', $sessionUser->data->userGuid);
+          ->where('userGuid != ?', ZfExtended_Authentication::getInstance()->getUserGuid());
       $res = $this->db->getAdapter()->fetchAll($s);
       return empty($res);
   }

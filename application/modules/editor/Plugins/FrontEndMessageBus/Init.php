@@ -131,9 +131,9 @@ class editor_Plugins_FrontEndMessageBus_Init extends ZfExtended_Plugin_Abstract 
      * @return boolean true if we have an authenticated user, false if not
      */
     public function handleStartSession(Zend_EventManager_Event $event) {
-        $user = new Zend_Session_Namespace('user');
-        if(!empty($user->data->userGuid)) {
-            $this->bus->startSession(Zend_Session::getId(), $user->data);
+        $auth = ZfExtended_Authentication::getInstance();
+        if($auth->isAuthenticated()) {
+            $this->bus->startSession(Zend_Session::getId(), $auth->getUserData());
             return true;
         }
         return false;
@@ -193,7 +193,7 @@ class editor_Plugins_FrontEndMessageBus_Init extends ZfExtended_Plugin_Abstract 
         }
 
         //3. load the session id to the internal session
-        $sessIntId = new ZfExtended_Models_Db_SessionMapInternalUniqId();
+        $sessIntId = new ZfExtended_Models_Db_Session();
         $row = $sessIntId->fetchRow(['internalSessionUniqId = ?' => $job->getUsedInternalSessionUniqId()]);
         $result = $this->bus->sessionHasConnection($row->session_id);
         $hasConnection = $result->instanceResult ?? true; //in doubt say true so the job is not unlocked!

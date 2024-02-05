@@ -71,7 +71,7 @@ Ext.define('Editor.view.admin.customer.Panel', {
         propertiesTabPanelTitle: '#UT#Allgemein',
         configTabTitle:'#UT#Überschreibung der Systemkonfiguration',
         actionColumn:'#UT#Aktionen',
-        customerEditActionIcon:'#UT#Kunden bearbeiten',
+        customerEditActionIcon:'#UT#Kundenprofil bearbeiten',
         openIdTabPanelDisabledTooltip:'#UT#Bitte konfigurieren Sie zunächst das Feld "translate5 Domain" im Tab "Allgemein". Danach können Sie OpenID Connect für diesen Kunden einrichten.'
     },
     shrinkWrap: 0,
@@ -84,14 +84,22 @@ Ext.define('Editor.view.admin.customer.Panel', {
     defaultButton: 'saveButton',
     referenceHolder: true,
 
+    domainLabelInfoTooltip: null,
+
     initConfig: function(instanceConfig) {
         var me = this,
+            canNotAddCustomer =  ! Editor.app.authenticatedUser.isAllowed('editorAddCustomer'),
+            canNotDeleteCustomer =  ! Editor.app.authenticatedUser.isAllowed('editorDeleteCustomer'),
             config = {
                 title: me.title, //see EXT6UPD-9
+                tooltip: Editor.data.l10n.clients.tooltip,
                 items: [
                     {
                         xtype: 'gridpanel',
                         cls: 'customerPanelGrid',
+                        itemId: 'customerPanelGrid',
+                        stateful: true,
+                        stateId: 'editor.customerPanelGrid',
                         flex: 0.3,
                         region: 'center',
                         split: true,
@@ -131,8 +139,8 @@ Ext.define('Editor.view.admin.customer.Panel', {
                             },{
                                 xtype: 'actioncolumn',
                                 text:  me.strings.actionColumn,
+                                minWidth: 90,
                                 sortable: false,
-                                fixed: true,
                                 items:[{
                                     glyph: 'f044@FontAwesome5FreeSolid',
                                     tooltip: me.strings.customerEditActionIcon,
@@ -145,14 +153,16 @@ Ext.define('Editor.view.admin.customer.Panel', {
                                     handler:'onTmExportClick'
                                 },{
                                     glyph: 'f0c5@FontAwesome5FreeSolid',
-                                    tooltip: 'Copy',
+                                    tooltip: Editor.data.l10n.clients.copy,
                                     scope:'controller',
-                                    handler:'onCopyActionClick'
+                                    handler:'onCopyActionClick',
+                                    hidden: canNotAddCustomer
                                 },{
                                     glyph: 'f2ed@FontAwesome5FreeSolid',
-                                    tooltip:me.strings.remove,
+                                    tooltip:Editor.data.l10n.clients.delete,
                                     scope:'controller',
-                                    handler:'remove'
+                                    handler:'remove',
+                                    hidden: canNotDeleteCustomer
                                 }]
                             },{
                                 xtype: 'gridcolumn',
@@ -262,13 +272,28 @@ Ext.define('Editor.view.admin.customer.Panel', {
                                     maxLength: 255
                                 },{
                                     xtype:'textfield',
+                                    listeners: {
+                                        afterrender: function (cmp){
+                                            // Gets the fiel label and registers tooltip for it
+                                            var label = cmp && cmp.labelEl;
+                                            if(!label){
+                                                return;
+                                            }
+                                            me.domainLabelInfoTooltip = Ext.create('Ext.tip.ToolTip', {
+                                                target: label,
+                                                title: '',
+                                                autoHide: false,
+                                                closable: true,
+                                                html: Editor.data.l10n.clients.domainInfoTooltip
+                                            });
+
+                                        }
+                                    },
                                     fieldLabel:me.strings.domain,
                                     name:'domain',
                                     reference:'customerDomain',
                                     publishes:'value',
-                                    bind:{
-                                        visible: '{!isOpenIdHidden}'
-                                    },
+                                    labelClsExtra: 'lableInfoIcon',
                                     itemId:'openIdDomain'
                                 }]
                         },{
@@ -311,6 +336,7 @@ Ext.define('Editor.view.admin.customer.Panel', {
                                 xtype: 'button',
                                 glyph: 'f2f1@FontAwesome5FreeSolid',
                                 text: me.strings.reload,
+                                tooltip: Editor.data.l10n.clients.refresh,
                                 listeners: {
                                     click: {
                                         fn: 'refresh',
@@ -322,6 +348,8 @@ Ext.define('Editor.view.admin.customer.Panel', {
                                 xtype: 'button',
                                 glyph: 'f067@FontAwesome5FreeSolid',
                                 text: me.strings.addCustomerTitle,
+                                tooltip: Editor.data.l10n.clients.create,
+                                hidden: canNotAddCustomer,
                                 listeners: {
                                     click: {
                                         fn: 'add',
@@ -332,6 +360,7 @@ Ext.define('Editor.view.admin.customer.Panel', {
                                 xtype: 'button',
                                 glyph: 'f1c3@FontAwesome5FreeSolid',
                                 text: me.strings.export,
+                                tooltip: Editor.data.l10n.clients.export,
                                 listeners: {
                                     click: {
                                         fn: 'onTmExportClick',
@@ -348,5 +377,12 @@ Ext.define('Editor.view.admin.customer.Panel', {
         }
         return me.callParent([config]);
     },
+
+    onDestroy: function () {
+        if (this.domainLabelInfoTooltip && this.domainLabelInfoTooltip.destroy) {
+            this.domainLabelInfoTooltip.destroy();
+        }
+        this.callParent(arguments);
+    }
 
 });

@@ -21,7 +21,7 @@ START LICENSE AND COPYRIGHT
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
@@ -88,7 +88,7 @@ class Editor_AlikesegmentController extends ZfExtended_RestController {
 
         $wfh = $this->_helper->workflow;
         /* @var $wfh Editor_Controller_Helper_Workflow */
-        $wfh->checkWorkflowWriteable($task->getTaskGuid(), editor_User::instance()->getGuid());
+        $wfh->checkWorkflowWriteable($task->getTaskGuid(), ZfExtended_Authentication::getInstance()->getUserGuid());
 
         $sfm = editor_Models_SegmentFieldManager::getForTaskGuid($task->getTaskGuid());
         //Only default Layout and therefore no relais can be processed:
@@ -118,7 +118,7 @@ class Editor_AlikesegmentController extends ZfExtended_RestController {
         $states = ZfExtended_Factory::get('editor_Models_Segment_AutoStates');
         /* @var $states editor_Models_Segment_AutoStates */
         
-        $userGuid = (new Zend_Session_Namespace('user'))->data->userGuid;
+        $userGuid = ZfExtended_Authentication::getInstance()->getUserGuid();
         
         $tua = editor_Models_Loaders_Taskuserassoc::loadByTask($userGuid, $task);
         
@@ -175,7 +175,14 @@ class Editor_AlikesegmentController extends ZfExtended_RestController {
                 // desired tags (all tags from source on translation or targetOriginal on review)
                 // into the targetEdit of the master segment and take the result then.
                 // if that fails, the segment can not be processed automatically and must remain for a manual review by the user
-                if(!$sourceSuccess || !$repetitionUpdater->updateTarget($task->isTranslation())) {
+                $useSourceForReference = $task->getConfig()->runtimeOptions->editor
+                    ->frontend->reviewTask->useSourceForReference;
+
+                $useSourceTags = $useSourceForReference
+                    || empty($this->entity->getTarget())
+                    || 0 !== (int)$this->entity->getPretrans();
+
+                if(!$sourceSuccess || !$repetitionUpdater->updateTarget($useSourceTags)) {
                     //the segment has to be ignored!
                     continue;
                 }

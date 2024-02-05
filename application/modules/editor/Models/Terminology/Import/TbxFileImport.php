@@ -50,33 +50,8 @@ class editor_Models_Terminology_Import_TbxFileImport
     /** @var editor_Models_Terminology_TbxObjects_DataType  */
     protected editor_Models_Terminology_TbxObjects_DataType  $dataType;
 
-    /**
-     * Images quantities
-     *
-     * @var array
-     */
-    protected $imageQty = [
-
-        /**
-         * Newly created images on disk
-         */
-        'created' => 0,
-
-        /**
-         * Recreated as having equal contentMd5Hash but missing on disk
-         */
-        'recreated' => 0,
-
-        /**
-         * Unchanged as having equal contentMd5Hash and existing on disk
-         */
-        'unchanged' => 0,
-
-        /**
-         * Sum of all above
-         */
-        'totalCount' => 0
-    ];
+    /** @var editor_Models_Terminology_Import_TbxBinaryDataImport  */
+    protected editor_Models_Terminology_Import_TbxBinaryDataImport  $binaryImport;
 
     /**
      * $tbxMap = segment names for different TBX standards
@@ -218,7 +193,8 @@ class editor_Models_Terminology_Import_TbxFileImport
      * @throws Exception
      * @return int
      */
-    public function importXmlFile(string $tbxFilePath, editor_Models_TermCollection_TermCollection $collection, ZfExtended_Models_User $user, bool $mergeTerms): int
+    public function importXmlFile(string $tbxFilePath, editor_Models_TermCollection_TermCollection $collection,
+                                  ZfExtended_Models_User $user, bool $mergeTerms): int
     {
         $this->collection = $collection;
         $this->mergeTerms = $mergeTerms;
@@ -241,11 +217,18 @@ class editor_Models_Terminology_Import_TbxFileImport
 
         $totalCount = $this->countTermEntries($xmlReader);
 
-        $xmlReader->reopen($tbxFilePath); //reset pointer to beginning
-        $this->processTermEntries($xmlReader, $totalCount);
+        // Setup binaryImport instance
+        $this->binaryImport = ZfExtended_Factory
+            ::get(editor_Models_Terminology_Import_TbxBinaryDataImport::class, [
+                $this->tbxFilePath,
+                $this->collection
+            ]);
 
         $xmlReader->reopen($tbxFilePath); //reset pointer to beginning
         $this->processRefObjects($xmlReader);
+
+        $xmlReader->reopen($tbxFilePath); //reset pointer to beginning
+        $this->processTermEntries($xmlReader, $totalCount);
 
         $this->logUnknownLanguages();
 
@@ -265,22 +248,43 @@ class editor_Models_Terminology_Import_TbxFileImport
         // update the collection import statistics with the new counted totals
         $this->setCollectionImportStatistic();
 
+        $unknownStates = $this->termNoteStatus->getUnknownStates();
+        if(!empty($unknownStates)) {
+            $this->log('TBX Import: The TBX contains terms with unknown administrative / normative states. See details for a list of states.', 'E1360', ['unknown' => $unknownStates], 'warn');
+        }
+
+        // If some image definitions are missing
+        if ($definitions = $this->binaryImport->missingImages['definitions']) {
+
+            // Prepare msg
+            $msg = "TBX Import: Image definition is missing in back-matter for the figure-attribute's target";
+
+            // Do log
+            $this->log($msg, 'E1540', ['forWhichTargets' => array_keys($definitions)], 'warn');
+        }
+
+        // If some image files are missing
+        if ($files = $this->binaryImport->missingImages['files']) {
+
+            // Prepare log msg
+            $msg = "TBX Import: Image file is missing in extracted zip-archive under the path given by xGraphic's target or figure's back-matter";
+
+            // Do log
+            $this->log($msg, 'E1544', ['forWhichPaths' => array_keys($files)], 'warn');
+        }
+
         $data = [
             'termEntries' => $this->bulkTermEntry->getStatistics(),
             'terms' => $this->bulkTerm->getStatistics(),
             'attributes' => $this->bulkAttribute->getStatistics(),
             'transacGroups' => $this->bulkTransacGrp->getStatistics(),
-            'images' => $this->imageQty,
+            'images' => $this->binaryImport->imageQty + ['totalCount' => array_sum($this->binaryImport->imageQty)],
             'refObjects' => $this->bulkRefObject->getStatistics(),
             'collection' => $this->collection->getName(),
             'maxMemUsed in MB' => round(memory_get_peak_usage() / 2**20),
         ];
         $this->log('Imported TBX data into collection {collection}', 'E1028', $data);
 
-        $unknownStates = $this->termNoteStatus->getUnknownStates();
-        if(!empty($unknownStates)) {
-            $this->log('TBX Import: The TBX contains terms with unknown administrative / normative states. See details for a list of states.', 'E1360', ['unknown' => $unknownStates], 'warn');
-        }
         return $totalCount;
     }
 
@@ -400,12 +404,8 @@ $memLog('Loaded terms:        ');
         while ($xmlReader->name === 'refObjectList') {
             $listType = $xmlReader->getAttribute('type');
             $node = new SimpleXMLElement($xmlReader->readOuterXML(), LIBXML_PARSEHUGE);
-            if($listType == 'binaryData') {
-                /** @var $binImport editor_Models_Terminology_Import_TbxBinaryDataImport */
-                $binImport = ZfExtended_Factory::get('editor_Models_Terminology_Import_TbxBinaryDataImport', [$this->tbxFilePath]);
-                foreach ($binImport->import($this->collection, $node) as $type => $qty) {
-                    $this->imageQty[$type] += $qty;
-                }
+            if ($listType === 'binaryData') {
+                $this->binaryImport->import($node);
             }
             else {
                 $this->importOtherRefObjects($node, $listType);
@@ -526,6 +526,12 @@ $memLog('Loaded terms:        ');
         }
 
         $this->setDiscriptGrp($languageGroup,$newLangSet,'langSet');
+
+        if (isset($languageGroup->transacGrp)) {
+            foreach ($languageGroup->transacGrp as $transacGrp) {
+                $newLangSet->transacGrp = $this->setTransacAttributes($transacGrp, false, 'langSet', $newLangSet);
+            }
+        }
 
         if (isset($languageGroup->note)) {
             $this->setAttributeTypes($languageGroup->note, $newLangSet);
@@ -669,7 +675,7 @@ $memLog('Loaded terms:        ');
     {
         $attributes = [];
         /** @var SimpleXMLElement $value */
-        foreach ($element as $key => $value) {
+        foreach ($element as $elementName => $value) {
 
             // Get type
             $type = (string) $value->attributes()->{'type'};
@@ -678,21 +684,62 @@ $memLog('Loaded terms:        ');
             // Note: '0'-value of $type is also considered as empty
             // because it's a falsy value and proceeding with that may
             // lead to problems with the other parts of the application
-            if (!$type && $key !== 'note') {
+            if (!$type && $elementName !== 'note') {
 
                 // Skip that
                 continue;
             }
 
+            // Get xml tag name
+            $target = (string) $value->attributes()->target;
+
+            // If elementName is xref and target-attr is a local path
+            if ($elementName === 'xref' && $type === 'xGraphic' && $this->targetIsLocalPath($target)) {
+
+                // Spoof $elementName and $type
+                $elementName = 'descrip';
+                $type = 'figure';
+
+                // Import from xGraphic or collect missing file's path
+                if ($this->binaryImport->importSingleImage($target) === false) {
+
+                    // Prepare log data
+                    $this->binaryImport->missingImages['files'][$target] = true;
+                }
+
+                // Setup flag indicating that we spoofed xGraphic with figure
+                $figureIsSpoof = true;
+
+            // Else
+            } else {
+
+                // Setup flag indicating that we haven't spoofed xGraphic with figure
+                $figureIsSpoof = false;
+            }
+
             // Create attribute
             $attributes[] = $this->createAndAddAttribute(
                 $parentNode,
-                $key,
+                $elementName,
                 $type,
-                (string) $value->attributes()->{'target'},
+                $target,
                 (string) $value,
                 $isDescripGrp
             );
+
+            // If it's a figure-attribute
+            if ($elementName === 'descrip' && $type === 'figure' && !$figureIsSpoof) {
+
+                // If there is no file behind
+                if (!isset($this->binaryImport->figureExists[$target])) {
+
+                    // Prepare log data
+                    $this->binaryImport->missingImages['definitions'][$target] = true;
+
+                    // Increment missing images counter
+                    $this->binaryImport->imageQty['missing'] ++;
+                }
+            }
         }
 
         return $attributes;
@@ -1095,5 +1142,46 @@ $memLog('Loaded terms:        ');
      */
     protected function getTransacMappingIfExists($value) {
         return $this->transacMap[$value] ?? $value;
+    }
+
+    /**
+     * Check whether given $target arg is a string that looks like a local path to a file
+     *
+     * @param string $target
+     * @return bool
+     */
+    protected function targetIsLocalPath(string $target) : bool {
+
+        // If $target is empty - return false
+        if (!$target) {
+            return false;
+        }
+
+        // If $target contains double dots, double shashes, or backslash - return false
+        if (preg_match('~(\.\./|/\.\.|//|' . preg_quote('\\', '~') . ')~', $target)) {
+            return false;
+        }
+
+        // If $target contains any characters that are not in list - return false
+        //if (preg_match('~[^a-z0-9_\-/.äöüß ]~i', $target)) {
+        if (preg_match('~[^\p{L}\p{N}\s\p{Pd}_./\~!@#$%^&(),+\[\]{};\'`]~iu', $target)) {
+            return false;
+        }
+
+        // If $target starts with / - return false
+        if (preg_match('~^/~', $target)) {
+            return false;
+        }
+
+        // Get extension
+        $ext = pathinfo($target, PATHINFO_EXTENSION);
+
+        // If no extension or it's longer than 4 chars - return false
+        if (!$ext || strlen($ext) > 4) {
+            return false;
+        }
+
+        // Hm, seems like $target looks like local path
+        return true;
     }
 }

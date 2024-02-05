@@ -443,6 +443,10 @@ class Models_Installer_Standalone {
      */
     protected function postInstallation(): void
     {
+        //we clean here the memcache and the sessions
+        $cache = Zend_Cache::factory('Core', new ZfExtended_Cache_MySQLMemoryBackend());
+        $cache->clean();
+
         if(!$this->isInstallation){
             return;
         }
@@ -890,21 +894,29 @@ class Models_Installer_Standalone {
      */
     private function mockDbConfig(): void
     {
-        Zend_Registry::set('config', new Zend_Config([
-            'resources' => new Zend_Config([
-                'db' => new Zend_Config([
-                    'adapter' => "PDO_MYSQL",
-                    'isDefaultTableAdapter' => 1,
-                    'params' => new Zend_Config([
-                        'charset' => "utf8mb4",
-                        'host' => $this->dbCredentials['host'],
-                        'username' => $this->dbCredentials['username'],
-                        'password' => $this->dbCredentials['password'],
-                        'dbname' => $this->dbCredentials['dbname'],
-                        'port' => $this->dbCredentials['port'],
+        $dbConfig = [
+            'charset' => "utf8mb4",
+            'host' => $this->dbCredentials['host'],
+            'username' => $this->dbCredentials['username'],
+            'password' => $this->dbCredentials['password'],
+            'dbname' => $this->dbCredentials['dbname'],
+        ];
+
+        if (array_key_exists('port', $this->dbCredentials)) {
+            $dbConfig['port'] = $this->dbCredentials['port'];
+        }
+
+        Zend_Registry::set(
+            'config',
+            new Zend_Config([
+                'resources' => new Zend_Config([
+                    'db' => new Zend_Config([
+                        'adapter' => "PDO_MYSQL",
+                        'isDefaultTableAdapter' => 1,
+                        'params' => new Zend_Config($dbConfig)
                     ])
                 ])
             ])
-        ]));
+        );
     }
 }

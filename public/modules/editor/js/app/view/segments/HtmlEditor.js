@@ -44,6 +44,7 @@ Ext.define('Editor.view.segments.HtmlEditor', {
     alias: 'widget.segmentsHtmleditor',
     itemId: 'segmentsHtmleditor',
     markupImages: null,
+    tags: null,
     //prefix der img Tag ids im HTML Editor
     idPrefix: 'tag-image-',
     requires: [
@@ -78,10 +79,14 @@ Ext.define('Editor.view.segments.HtmlEditor', {
     tagsFromReferenceFieldOnly: false,
 
     strings: {
-        tagOrderErrorText: '#UT# Einige der im Segment verwendeten Tags sind in der falschen Reihenfolgen (schließender vor öffnendem Tag).',
-        tagMissingText: '#UT#Folgende Tags fehlen:<br/><ul><li>{0}</li></ul>So entfernen Sie den Fehler:<br/><ul><li>Klicken Sie auf OK, um diese Nachricht zu entfernen</li><li>Drücken Sie ESC, um das Segment ohne Speichern zu verlassen</li><li>Öffnen Sie das Segment erneut</li></ul>Wiederholen Sie jetzt Ihre Änderungen.<br/>Verwenden Sie alternativ die Hilfeschaltfläche, und suchen Sie nach Tastenkombinationen, um die fehlenden Tags aus der Quelle einzugeben.',
+        source: '#UT#Quelltext',
+        targetAtImportTime: '#UT#Zieltext zur Importzeit',
+        tagOrderErrorText: '#UT#Einige der im Segment verwendeten Tags sind in der falschen Reihenfolgen (schließender vor öffnendem Tag).',
+        tagMissingTextSource: '#UT#Folgende Tags fehlen:<br/><ul><li>{0}</li></ul>So entfernen Sie den Fehler:<br/><ul><li>Klicken Sie auf OK, um diese Nachricht zu entfernen</li><li>Drücken Sie ESC, um das Segment ohne Speichern zu verlassen</li><li>Öffnen Sie das Segment erneut</li></ul>Wiederholen Sie jetzt Ihre Änderungen.<br/>Verwenden Sie alternativ die Hilfeschaltfläche, und suchen Sie nach Tastenkombinationen, um die fehlenden Tags aus der Quelle einzugeben.',
+        tagMissingTextTarget: '#UT#Folgende Tags fehlen im Zieltext (zur Importzeit/Vorübersetzung):<br/><ul><li>{0}</li></ul>So entfernen Sie den Fehler:<br/><ul><li>Klicken Sie auf OK, um diese Nachricht zu entfernen</li><li>Drücken Sie ESC, um das Segment ohne Speichern zu verlassen</li><li>Öffnen Sie das Segment erneut</li></ul>Wiederholen Sie jetzt Ihre Änderungen.<br/>Verwenden Sie alternativ die Hilfeschaltfläche, und suchen Sie nach Tastenkombinationen, um die fehlenden Tags aus der Quelle einzugeben.',
         tagDuplicatedText: '#UT#Die nachfolgenden Tags wurden beim Editieren dupliziert, das Segment kann nicht gespeichert werden. Löschen Sie die duplizierten Tags. <br />Duplizierte Tags:{0}',
-        tagExcessText: '#UT#Die folgenden Tags existieren nicht in der Quellsprache:<br/><ul><li>{0}</li></ul>So entfernen Sie den Fehler:<br/><ul><li>Klicken Sie auf OK, um diese Nachricht zu entfernen</li><li>Drücken Sie ESC, um das Segment ohne Speichern zu verlassen</li><li>Öffnen Sie das Segment erneut</li></ul>Wiederholen Sie jetzt Ihre Änderungen.',
+        tagExcessTextSource: '#UT#Die folgenden Tags existieren nicht in der Ausgangtext:<br/><ul><li>{0}</li></ul>So entfernen Sie den Fehler:<br/><ul><li>Klicken Sie auf OK, um diese Nachricht zu entfernen</li><li>Drücken Sie ESC, um das Segment ohne Speichern zu verlassen</li><li>Öffnen Sie das Segment erneut</li></ul>Wiederholen Sie jetzt Ihre Änderungen.',
+        tagExcessTextTarget: '#UT#Die folgenden Tags existieren nicht in der Zieltext (zur Importzeit/Vorübersetzung):<br/><ul><li>{0}</li></ul>So entfernen Sie den Fehler:<br/><ul><li>Klicken Sie auf OK, um diese Nachricht zu entfernen</li><li>Drücken Sie ESC, um das Segment ohne Speichern zu verlassen</li><li>Öffnen Sie das Segment erneut</li></ul>Wiederholen Sie jetzt Ihre Änderungen.',
         tagRemovedText: '#UT# Es wurden Tags mit fehlendem Partner entfernt!',
         cantEditContents: '#UT#Es ist Ihnen nicht erlaubt, den Segmentinhalt zu bearbeiten. Bitte verwenden Sie STRG+Z um Ihre Änderungen zurückzusetzen oder brechen Sie das Bearbeiten des Segments ab.',
     },
@@ -271,14 +276,14 @@ Ext.define('Editor.view.segments.HtmlEditor', {
 
         if (referenceFieldName) {
             this.markupForEditor(segment.get(referenceFieldName));
-            this.tagsCheck = new TagCheck(this.markupImages, this.idPrefix);
+            this.tagsCheck = new TagCheck(this.tags, this.idPrefix);
         }
 
         me.setValue(me.markupForEditor(data.value, tagsFromReferenceFieldOnly) + checkTag);
         me.statusStrip.updateSegment(data.segment, fieldName);
 
         if (!referenceFieldName) {
-            this.tagsCheck = new TagCheck(this.markupImages, this.idPrefix);
+            this.tagsCheck = new TagCheck(this.tags, this.idPrefix);
         }
 
         me.fireEvent('afterSetValueAndMarkup');
@@ -359,6 +364,12 @@ Ext.define('Editor.view.segments.HtmlEditor', {
             result;
         me.contentEdited = false;
         me.markupImages = {};
+        me.tags = {
+            open: [],
+            close: [],
+            single: [],
+            whitespace: [],
+        };
 
         result = me.markup(value, plainContent, false, tagsFromReferenceFieldOnly);
         me.plainContent = plainContent; //stores only the text content and content tags for "original content has changed" comparision
@@ -560,29 +571,55 @@ Ext.define('Editor.view.segments.HtmlEditor', {
             }
 
             let data = me.getData(item, me.getInitialData());
+            let tag;
 
             if (tagsFromReferenceFieldOnly) {
                 switch (data.type) {
                     case 'open':
+                        tag = me.tagsCheck.getOpeningReferenceTagAtIndexOrNext(openTagNumber);
                         openTagNumber++;
-                        data = me.tagsCheck.getOpeningReferenceTagAtIndex(openTagNumber).data;
+
+                        if (null === tag) {
+                            return;
+                        }
+
+                        data = tag.data;
+
                         break;
 
                     case 'close':
+                        tag = me.tagsCheck.getClosingReferenceTagAtIndexOrNext(closeTagNumber);
                         closeTagNumber++;
-                        data = me.tagsCheck.getClosingReferenceTagAtIndex(closeTagNumber).data;
+
+                        if (null === tag) {
+                            return;
+                        }
+
+                        data = tag.data;
 
                         break;
 
                     case 'whitespace':
+                        tag = me.tagsCheck.getWhitespaceReferenceTagAtIndex(whitespaceTagNumber);
                         whitespaceTagNumber++;
-                        data = me.tagsCheck.getWhitespaceReferenceTagAtIndex(whitespaceTagNumber).data;
+
+                        if (null === tag) {
+                            return;
+                        }
+
+                        data = tag.data;
 
                         break;
 
                     case 'single':
+                        tag = me.tagsCheck.getSingleReferenceTagAtIndexOrNext(singleTagNumber);
                         singleTagNumber++;
-                        data = me.tagsCheck.getSingleReferenceTagAtIndex(singleTagNumber).data;
+
+                        if (null === tag) {
+                            return;
+                        }
+
+                        data = tag.data;
 
                         break;
                 }
@@ -597,15 +634,18 @@ Ext.define('Editor.view.segments.HtmlEditor', {
                     fullWidth: data.fullWidth,
                     shortWidth: data.shortWidth,
                     whitespaceTag: data.whitespaceTag,
-                    html: me.renderInternalTags(item.className, data),
+                    placeableTag: data.placeableTag,
+                    html: me.renderInternalTags(data.className, data),
                     data: data
                 };
+
+                me.tags[data.whitespaceTag ? 'whitespace' : data.type].push({data: data});
             }
 
-            if (me.viewModesController.isFullTag() || data.whitespaceTag) {
-                data.path = me.getSvg(data.text, data.fullWidth);
+            if (me.viewModesController.isFullTag() || data.whitespaceTag || data.placeableTag) {
+                data.path = me.getSvg(data.text, data.fullWidth, data.placeableTag);
             } else {
-                data.path = me.getSvg(data.shortTag, data.shortWidth);
+                data.path = me.getSvg(data.shortTag, data.shortWidth, false);
             }
 
             me.result.push(me.applyTemplate('internalimg', data));
@@ -613,13 +653,14 @@ Ext.define('Editor.view.segments.HtmlEditor', {
         });
     },
 
-    getSvg: function (text, width) {
+    getSvg: function (text, width, isPlaceable) {
         var prefix = 'data:image/svg+xml;charset=utf-8,',
             svg = '',
             //cell = Ext.fly(this.up('segmentroweditor').context.row).select('.segment-tag-column .x-grid-cell-inner').first(),
             cell = Ext.fly(this.getEditorBody()),
             styles = cell.getStyle(['font-size', 'font-style', 'font-weight', 'font-family', 'line-height', 'text-transform', 'letter-spacing', 'word-break']),
-            lineHeight = styles['line-height'].replace(/px/, '');
+            lineHeight = styles['line-height'].replace(/px/, ''),
+            fill = 'rgb(207,207,207)';
 
         if (!Ext.isNumber(lineHeight)) {
             lineHeight = Math.round(styles['font-size'].replace(/px/, '') * 1.3);
@@ -628,9 +669,11 @@ Ext.define('Editor.view.segments.HtmlEditor', {
         //padding left 1px and right 1px by adding x+1 and width + 2
         //svg += '<?xml version="1.0" encoding="UTF-8" standalone="no"?>';
         svg += '<svg xmlns="http://www.w3.org/2000/svg" height="' + lineHeight + '" width="' + (width + 2) + '">';
-        svg += '<rect width="100%" height="100%" fill="rgb(207,207,207)" rx="3" ry="3"/>';
-        svg += '<text x="1" y="' + (lineHeight - 5) + '" font-size="' + styles['font-size'] + '" font-weight="' + styles['font-weight'] + '" font-family="' + styles['font-family'].replace(/"/g, "'") + '">'
-        svg += Ext.String.htmlEncode(text) + '</text></svg>';
+        svg += '<rect width="100%" height="100%" fill="' + fill + '" rx="3" ry="3"/>';
+        svg += '<text x="1" y="' + (lineHeight - 5) + '" font-size="' + styles['font-size'] + '" font-weight="' + styles['font-weight'] + '" font-family="' + styles['font-family'].replace(/"/g, "'") + '">';
+        // QUIRK: since &nbsp; can not be decoded it will end up as double-encoded. This corrupts a SVG, therefore we manually remove double-encoded nbsp's
+        svg += Ext.String.htmlEncode(text).split('&amp;nbsp;').join('&nbsp;') + '</text></svg>';
+
         return prefix + encodeURI(svg);
     },
 
@@ -651,6 +694,7 @@ Ext.define('Editor.view.segments.HtmlEditor', {
         data.title = Ext.htmlEncode(spanShort.getAttribute('title'));
         data.length = spanFull.getAttribute('data-length');
         data.originalItem = item;
+        data.className = item.className;
 
         //old way is to use only the id attribute, new way is to use separate data fields
         // both way are currently used!
@@ -667,7 +711,7 @@ Ext.define('Editor.view.segments.HtmlEditor', {
         data = me.renderTagTypeInData(item.className, data);
 
         //if it is a whitespace tag we have to precalculate the pixel width of the tag (if possible)
-        if (data.whitespaceTag) {
+        if (data.whitespaceTag || data.placeableTag) {
             data.pixellength = Editor.view.segments.PixelMapping.getPixelLengthFromTag(item, me.currentSegment.get('metaCache'), me.currentSegment.get('fileId'));
         } else {
             data.pixellength = 0;
@@ -690,6 +734,7 @@ Ext.define('Editor.view.segments.HtmlEditor', {
         data.key = data.type + data.nr;
         data.shortTag = '&lt;' + data.shortTag + '&gt;';
         data.whitespaceTag = /nbsp|tab|space|newline|char/.test(className);
+        data.placeableTag = /t5placeable/.test(className);
 
         if (data.whitespaceTag) {
             data.type += ' whitespace';
@@ -860,14 +905,14 @@ Ext.define('Editor.view.segments.HtmlEditor', {
     },
 
     unmarkImage: function (item) {
-        var me = this;
-        if (me.tagsCheck.isDuplicateSaveTag(item)) {
+        var img;
+        if (this.tagsCheck.isDuplicateSaveTag(item)) {
             img = Ext.fly(item);
-            return me.getDuplicateCheckImg(img.getAttribute('data-segmentid'), img.getAttribute('data-fieldname'));
-        } else if (markupImage = me.getMarkupImage(item.id)) {
-            return markupImage.html;
+            return this.getDuplicateCheckImg(img.getAttribute('data-segmentid'), img.getAttribute('data-fieldname'));
+        } else if (img = this.getMarkupImage(item.id)) {
+            return img.html;
         } else if (/^qm-image-/.test(item.id)) {
-            return me.imgNodeToString(item, false);
+            return this.imgNodeToString(item, false);
         }
     },
 
@@ -948,25 +993,33 @@ Ext.define('Editor.view.segments.HtmlEditor', {
         }
 
         if (!this.tagsCheckResult.isSuccessful()) {
+            const referenceField = this.getReferenceField(
+                me.currentSegment.get('target'),
+                me.currentSegment.get('pretrans')
+            );
+
             //first item the field to check, second item: the error text:
-            let todo = [
-                    ['missingTags', 'tagMissingText'],
-                    ['duplicatedTags', 'tagDuplicatedText'],
-                    ['excessTags', 'tagExcessText']
-                ];
+            let useFull, text, width, todo = [
+                ['missingTags', referenceField === 'source' ? 'tagMissingTextSource' : 'tagMissingTextTarget'],
+                ['duplicatedTags', 'tagDuplicatedText'],
+                ['excessTags', referenceField === 'source' ? 'tagExcessTextSource' : 'tagExcessTextTarget']
+            ];
 
             for (let i = 0; i < todo.length; i++) {
-                let missingSvg = '';
+                let affectedTags = '';
 
                 if (this.tagsCheckResult[todo[i][0]].length > 0) {
                     msg += me.strings[todo[i][1]];
 
-                    Ext.each(me.tagsCheckResult[todo[i][0]], function (tag) {
-                        missingSvg += '<img src="' + me.getSvg(tag.whitespaceTag ? tag.fullTag : tag.shortTag, tag.whitespaceTag ? tag.fullWidth : tag.shortWidth) + '"> ';
-                        //msg += '<img src="'+me.getSvg(tag.whitespaceTag ? tag.fullTag : tag.shortTag, tag.whitespaceTag ? tag.fullWidth : tag.shortWidth)+'"> ';
-                    });
+                    for(const tagData of me.tagsCheckResult[todo[i][0]]) {
+                        useFull = (tagData.data.whitespaceTag || tagData.data.placeableTag);
+                        text = useFull ? tagData.data.fullTag : tagData.data.shortTag;
+                        width = useFull ? tagData.data.fullWidth : tagData.data.shortWidth;
+                        affectedTags += '<img src="' + me.getSvg(text, width, tagData.data.placeableTag) + '"> ';
+                        //msg += '<img src="'+me.getSvg(text, width, tagData.data.placeableTag)+'"> ';
+                    }
 
-                    msg = Ext.String.format(msg, missingSvg);
+                    msg = Ext.String.format(msg, affectedTags);
                     msg += '<br /><br />';
                 }
             }
@@ -1151,16 +1204,26 @@ Ext.define('Editor.view.segments.HtmlEditor', {
     },
 
     setImagePath: function (target) {
-        var me = this;
-        Ext.each(Ext.query('img', true, me.getEditorBody()), function (item) {
-            var markupImage;
-            if (markupImage = me.getMarkupImage(item.id)) {
-                if (target == 'fullPath' || markupImage.whitespaceTag) {
-                    item.src = me.getSvg(Ext.String.htmlDecode(markupImage.fullTag), markupImage.fullWidth);
+        var me = this,
+            markupImage;
+        Ext.each(Ext.query('img', true, this.getEditorBody()), function (item) {
+            markupImage = me.getMarkupImage(item.id);
+
+            if(markupImage){
+                if (target === 'fullPath' || markupImage.whitespaceTag || markupImage.placeableTag) {
+                    item.src = me.getSvg(
+                        Ext.String.htmlDecode(markupImage.fullTag),
+                        markupImage.fullWidth, markupImage.placeableTag
+                    );
                 } else {
-                    item.src = me.getSvg(Ext.String.htmlDecode(markupImage.shortTag), markupImage.shortWidth);
+                    item.src = me.getSvg(
+                        Ext.String.htmlDecode(markupImage.shortTag),
+                        markupImage.shortWidth,
+                        false
+                    );
                 }
             }
+
         });
     },
 
@@ -1385,5 +1448,31 @@ Ext.define('Editor.view.segments.HtmlEditor', {
         data.fullWidth = Math.ceil(this.ruler.getBoundingClientRect().width);
         this.ruler.innerHTML = data.shortTag;
         data.shortWidth = Math.ceil(this.ruler.getBoundingClientRect().width);
+    },
+
+    /**
+     * Distinguish which field should be used for reference tags
+     *
+     * @param {String} targetContent
+     * @param {number} pretrans
+     * @returns {string}
+     */
+    getReferenceField: function (targetContent, pretrans) {
+        const useSourceAsReference = Editor.app.getTaskConfig('editor.frontend.reviewTask.useSourceForReference');
+
+        if (useSourceAsReference) {
+            return 'source';
+        }
+
+        if (targetContent.trim() === '') {
+            return 'source';
+        }
+
+        // If target was filled during pretranslation, use source as reference
+        if (0 !== pretrans) {
+            return 'source';
+        }
+
+        return 'target';
     }
 });

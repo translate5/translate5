@@ -32,6 +32,9 @@ END LICENSE AND COPYRIGHT
  * @version 1.0
  *
  */
+
+use MittagQI\Translate5\LanguageResource\Adapter\UpdatableAdapterInterface;
+
 /**
  * LanguageResource Service Manager
  * TODO all services classes should be located somewhere under language resources
@@ -42,12 +45,44 @@ class editor_Services_Manager {
     const CLS_CONNECTOR = '_Connector';
 
     public const SERVICE_OPENTM2 = 'editor_Services_OpenTM2';
+
+    /**
+     * Generates a translated error-msg to report TM-update errors to the frontend
+     * @param array|stdClass|null $errors
+     * @param string|null $errorMsg
+     * @param string $errorType
+     * @param string $origin
+     * @return void
+     * @throws Zend_Exception
+     */
+    public static function reportTMUpdateError(array|stdClass $errors = null, string $errorMsg = null, string $errorType = 'Error', string $origin = 'core'): void
+    {
+        $translate= ZfExtended_Zendoverwrites_Translate::getInstance();
+        $msg =
+            $translate->_('Das Segment konnte nicht ins TM gespeichert werden')
+            . '. '
+            . $translate->_('Bitte kontaktieren Sie Ihren Administrator')
+            . '!<br />'
+            . $translate->_('Gemeldete Fehler')
+            . ':';
+        if(empty($errors)){
+            $data = [
+                'type' => $errorType,
+                'error' => $errorMsg,
+            ];
+        } else {
+            $data = (is_array($errors)) ? $errors : [$errors];
+        }
+        /* @var ZfExtended_Models_Messages $messages */
+        $messages = Zend_Registry::get('rest_messages');
+        $messages->addError($msg, $origin, null, $data);
+    }
     
     /**
      * The registered services are currently hardcoded
      * @var array
      */
-    static protected $registeredServices = array(
+    protected static $registeredServices = [
         self::SERVICE_OPENTM2,
         'editor_Services_Moses',
         'editor_Services_LucyLT',
@@ -56,38 +91,44 @@ class editor_Services_Manager {
         'editor_Services_Google',
         'editor_Services_Microsoft'
         //'editor_Services_DummyFileTm',
-    );
+    ];
 
     public function getAll() {
         return self::$registeredServices;
     }
 
-    public function getAllNames(): array
+    public function getAllUiNames(): array
     {
         $names = [];
 
         foreach ($this->getAll() as $serviceName) {
-            $names[] = ZfExtended_Factory::get($this->getServiceClassName($serviceName))->getName();
+            $names[] = ZfExtended_Factory::get($this->getServiceClassName($serviceName))->getUiName();
         }
 
         return $names;
     }
 
+    public function getUiNameByType(string $serviceType): string
+    {
+        return ZfExtended_Factory::get($this->getServiceClassName($serviceType))->getUiName();
+    }
+
     /**
      * Creates all configured connector resources.
      *
-     * @return array
+     * @return editor_Models_LanguageResources_Resource[]
      */
     public function getAllResources(): array
     {
-        $serviceResources = array();
+        $serviceResources = [];
 
         foreach (self::$registeredServices as $serviceName) {
+            /** @var editor_Services_ServiceAbstract $service */
             $service = ZfExtended_Factory::get($this->getServiceClassName($serviceName));
-            $serviceResources = array_merge($serviceResources, $service->getResources());
+            $serviceResources[] = $service->getResources();
         }
 
-        return $serviceResources;
+        return array_merge(...$serviceResources);
     }
 
     /**
@@ -116,7 +157,7 @@ class editor_Services_Manager {
      *
      * @return array
      */
-    public function getAllUnconfiguredServices(): array
+    public function getAllUnconfiguredServices(bool $forUi = false): array
     {
         $serviceNames = [];
 
@@ -126,7 +167,7 @@ class editor_Services_Manager {
 
             if (!$service->isConfigured() || empty($service->getResources())) {
                 $serviceNames[] = (object)[
-                    'name' => '[' . $service->getName() . ']',
+                    'name' => '[' . ($forUi ? $service->getUiName() : $service->getName()) . ']',
                     'serviceName' => $service->getName(),
                     'helppage' => urldecode($service->getHelppage())
                 ];
@@ -144,7 +185,7 @@ class editor_Services_Manager {
             }
 
             $serviceNames[] = (object)[
-                'name' => '[' . $service->getName() . ']',
+                'name' => '[' . ($forUi ? $service->getUiName() : $service->getName()) . ']',
                 'serviceName' => $service->getName(),
                 'helppage' => urldecode($service->getHelppage())
             ];
@@ -164,9 +205,6 @@ class editor_Services_Manager {
             'editor_Plugins_DeepL_Init' => (object) ['name' => '[DeepL]',
                                                      'serviceName' => 'DeepL',
                                                      'helppage' => urldecode('https://confluence.translate5.net/display/CON/DeepL')],
-            'editor_Plugins_NecTm_Init' => (object) ['name' => '[NEC-TM]',
-                                                     'serviceName' => 'NEC-TM',
-                                                     'helppage' => urldecode('https://confluence.translate5.net/display/CON/NEC-TM')],
             'editor_Plugins_PangeaMt_Init' => (object) ['name' => '[PangeaMT]',
                                                      'serviceName' => 'PangeaMT',
                                                      'helppage' => urldecode('https://confluence.translate5.net/display/CON/PangeaMT')],
@@ -292,16 +330,10 @@ class editor_Services_Manager {
         $task->loadByTaskGuid($segment->getTaskGuid());
         $this->visitAllAssociatedTms($task, function(editor_Services_Connector $connector, $languageResource, $assoc) use ($segment) {
             if(!empty($assoc['segmentsUpdateable'])) {
-                $connector->update($segment);
+                $connector->update($segment, UpdatableAdapterInterface::RECHECK_ON_UPDATE);
             }
         }, function(Exception $e, editor_Models_LanguageResources_LanguageResource $languageResource, ZfExtended_Logger_Event $event) {
-            /** @var ZfExtended_Models_Messages $messages */
-            $messages = Zend_Registry::get('rest_messages');
-            $msg = 'Das Segment konnte nicht ins TM gespeichert werden! Bitte kontaktieren Sie Ihren Administrator! <br />Gemeldete Fehler:';
-            $messages->addError($msg, data: [
-                'type' => $event->eventCode,
-                'error' => $event->message,
-            ]);
+            self::reportTMUpdateError(null, $event->message, $event->eventCode);
         });
     }
 

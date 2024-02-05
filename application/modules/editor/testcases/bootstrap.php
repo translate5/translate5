@@ -77,6 +77,7 @@ ZfExtended_Test_ApiHelper::setup([
     'LOGOUT_PATH' => $config->runtimeOptions->loginUrl,
     'CAPTURE_MODE' => (getenv('DO_CAPTURE') === '1'),
     'SKIP_PRETESTS' => (getenv('SKIP_PRETESTS') === '1'),
+    'SKIP_TESTS' => (empty(getenv('SKIP_TESTS')) ? [] : explode(',', getenv('SKIP_TESTS'))),
     'XDEBUG_ENABLE' => (getenv('XDEBUG_ENABLE') === '1'),
     'KEEP_DATA' => (getenv('KEEP_DATA') === '1'),
     'LEGACY_DATA' => (getenv('LEGACY_DATA') === '1'),

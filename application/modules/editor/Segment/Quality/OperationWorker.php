@@ -45,8 +45,9 @@ class editor_Segment_Quality_OperationWorker extends editor_Models_Task_Abstract
     }
     
     protected function work(){
-        
-        if (!$this->task->lock(NOW_ISO, editor_Task_Operation::AUTOQA)) {
+
+        // if not importing, we have to lock the task
+        if ($this->processingMode != editor_Segment_Processing::IMPORT && !$this->task->lock(NOW_ISO, editor_Task_Operation::AUTOQA)) {
             return false;
         }
 

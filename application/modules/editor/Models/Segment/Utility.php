@@ -60,24 +60,30 @@ class editor_Models_Segment_Utility {
         // so if the CSV contains &amp; &szlig; ß < this would be converted to &amp;amp; &amp;szlig; ß &gt; to be displayed correctly in the browser
         return htmlentities($textNode, ENT_XML1);
     }
-    
+
     /**
      * protects whitespace inside a segment with a tag
      *
-     * @param string $segment
+     * @param string|null $segment
      * @param callable $textNodeCallback callback which is applied to the text node
      * @return string $segment
      */
-    public static function foreachSegmentTextNode($segment, callable $textNodeCallback) {
+    public static function foreachSegmentTextNode(?string $segment, callable $textNodeCallback): string
+    {
+        if (ZfExtended_Utils::emptyString($segment)) {
+            return '';
+        }
+
+        // split the segment into text nodes and tags
         $split = preg_split('#(<[^\s][^>]*>)#', $segment, flags: PREG_SPLIT_DELIM_CAPTURE);
-        
+
         $i = 0;
-        foreach($split as $idx => $chunk) {
-            if($i++ % 2 === 1 || strlen($chunk) == 0) {
+        foreach ($split as $idx => $chunk) {
+            if ($i++ % 2 === 1 || strlen($chunk) == 0) {
                 //ignore found tags in the content or empty chunks
                 continue;
             }
-            
+
             $split[$idx] = $textNodeCallback($chunk);
         }
         return join($split);

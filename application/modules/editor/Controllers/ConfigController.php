@@ -26,6 +26,9 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\ZfExtended\Acl\ConfigLevelResource;
+use MittagQI\ZfExtended\Service\ConfigHelper;
+
 /**
  */
 class editor_ConfigController extends ZfExtended_RestController {
@@ -81,7 +84,7 @@ class editor_ConfigController extends ZfExtended_RestController {
         // we have to add dynamic sanitization here depending on the config type
         $this->data->value = ZfExtended_Sanitizer::sanitize(
             $this->data->value,
-            ZfExtended_DbConfig_Type_CoreTypes::getSanitizationType($this->entity->getType())
+            ZfExtended_DbConfig_Type_CoreTypes::sanitizationType($this->entity->getType())
         );
         
         $level = null;
@@ -222,6 +225,39 @@ class editor_ConfigController extends ZfExtended_RestController {
         //merge the current entity with the custom config data ($row)
         $this->view->rows = array_merge($row, $configRow);
     }
+
+    /**
+     * Special endpoint to retrieve config-values for API-tests
+     * This endpoint can only be called during API-tests
+     * @return void
+     * @throws ReflectionException
+     * @throws Zend_Exception
+     * @throws ZfExtended_Exception
+     */
+    public function apitestAction(): void
+    {
+        $configs = $this->_request->getParam('configs');
+        $taskGuid = $this->_request->getParam('taskGuid');
+        $this->view->rows = [];
+        if (!empty($configs)) {
+            // config is either the task-config or the global config
+            $config = empty($taskGuid) ?
+                Zend_Registry::get('config')
+                : editor_ModelInstances::taskByGuid($taskGuid)->getConfig();
+            // for retrieving the api-test configs we need the configured mock-configs as well
+            $pluginManager = ZfExtended_Factory::get(ZfExtended_Plugin_Manager::class);
+            // this creates a config-accessor for the sum of the "normal" configs and the mock-configs
+            $configHelper = new ConfigHelper($config, $pluginManager->getMockConfigs());
+            foreach ($configs as $configName) {
+                $name = str_starts_with(trim($configName), 'runtimeOptions')
+                    ? trim($configName) : 'runtimeOptions.' . trim($configName);
+                // some tests test for values like 0 or []
+                if ($configHelper->hasValue($name, true)) {
+                    $this->view->rows[$configName] = $configHelper->getValue($name);
+                }
+            }
+        }
+    }
     
     /**
      * (non-PHPdoc)
@@ -248,10 +284,8 @@ class editor_ConfigController extends ZfExtended_RestController {
      * @throws editor_Models_ConfigException
      */
     protected function checkConfigUpdateAllowed(int $level) {
-        $user = ZfExtended_Authentication::getInstance()->getUser();
         $acl = ZfExtended_Acl::getInstance();
-        /* @var $acl ZfExtended_Acl */
-        if(!$acl->isInAllowedRoles($user->getRoles(),$user::APPLICATION_CONFIG_LEVEL,$this->entity->getConfigLevelLabel($level))){
+        if(!$acl->isInAllowedRoles(ZfExtended_Authentication::getInstance()->getUserRoles(), ConfigLevelResource::ID, $this->entity->getConfigLevelLabel($level))){
             throw new editor_Models_ConfigException('E1292', [
                 'level' => $level
             ]);
@@ -304,23 +338,34 @@ class editor_ConfigController extends ZfExtended_RestController {
      *
      * @return array
      */
-    protected function loadConfig() {
+    protected function loadConfig(): array
+    {
+        $userGuid = $this->getParam('userGuid');
         $taskGuid = $this->getParam('taskGuid');
-        if(!empty($taskGuid)){
+
+        if (!empty($userGuid)) {
+            editor_Models_Config::checkUserGuid($userGuid);
+
+            $taskConfig = [];
+            if (!empty($taskGuid)) {
+                $taskConfig = $this->entity->mergeTaskValues($taskGuid, [], false);
+            }
+
+            return array_values($this->entity->mergeUserValues($userGuid, $taskConfig));
+        }
+
+        if (!empty($taskGuid)) {
             return array_values($this->entity->mergeTaskValues($taskGuid));
         }
+
         $customerId = $this->getParam('customerId');
-        if(!empty($customerId)){
+        if (!empty($customerId)) {
             //ignore invalid customer ids
-            if(!is_numeric($customerId)){
+            if (!is_numeric($customerId)) {
                 return [];
             }
+
             return array_values($this->entity->mergeCustomerValues($customerId));
-        }
-        $userGuid = $this->getParam('userGuid');
-        if(!empty($userGuid)){
-            editor_Models_Config::checkUserGuid($userGuid);
-            return array_values($this->entity->mergeUserValues($userGuid));
         }
 
         return array_values($this->entity->mergeInstanceValue());

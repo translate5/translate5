@@ -40,6 +40,11 @@ Ext.define('Editor.model.admin.projectWizard.File', {
         TYPE_REFERENCE: 'reference',
     },
 
+    /**
+     * Used to validate Wizard workfiles via event
+     */
+    importable: false,
+
     fields: [{
         name: 'file'
     },{

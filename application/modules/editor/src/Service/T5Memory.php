@@ -30,8 +30,27 @@ namespace MittagQI\Translate5\Service;
 
 /**
  * The t5memory languageResource Service
+ *
+ * IMPORTANT
+ *
+ * For now (09/2023), T5memory is used primarily, but still OpenTM2 is in use in production (T5memory is the linux ported mod of the windows OpenTM2)
+ * Therefore in the Code there are still code-sections distinguishing between the two.
+ * Whenever OpenTM2 is completely out of production, we should refeactor those. They are marked with "TODO T5MEMORY"
+ *
+ * T5MEMORY QUIRKS
+ *
+ * For now, some commands in t5memory are buggy as they lead to t5memory not answering requests anymore. Mainly reorganizing memories
+ * Therefore a high Timeout is neccessary for t5memory requests to make sure, those requests can run through and we do not falsely detect t5memory as being "down"
+ * This behaviour change in future versions and we should then refactor this code
+ * Also it seems, one can queue reorganizations by calling reorganize while one is running but get's no response
+ *
  */
 final class T5Memory extends DockerServiceAbstract {
+
+    /**
+     * The general timeoout for t5memory that is neccessary, because t5memory does not answer requests during reorganization
+     */
+    const REQUEST_TIMEOUT = 3600;
 
     /**
      * It is possible to have an installation without having t5memory set up

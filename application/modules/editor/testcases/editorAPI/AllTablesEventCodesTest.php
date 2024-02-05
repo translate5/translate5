@@ -69,6 +69,8 @@ class AllTablesEventCodesTest extends \editor_Test_UnitTest {
         
         $collectedCodes = array_unique($collectedCodes);
         $docuUrl = ZfExtended_Logger_Writer_EcodeWriter::ECODE_FILE;
+        // FIXME validate ERRORCODES.md against existing ones, this may never be! Check Pavels codes, he just jumped.
+        // how to find gaps?
         $text = file_get_contents($docuUrl);
         $codes = [];
         preg_match_all("/(E[0-9]{4})/", $text, $codes);

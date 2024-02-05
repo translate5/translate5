@@ -322,6 +322,35 @@ class editor_Segment_FieldTags extends editor_TagSequence {
         }
         return false;
     }
+
+    /**
+     * Retrieves if there are tags of the specified class and type that either are between the given boundaries
+     * or overlap with the section defined by the given boundaries
+     * @param string $type
+     * @param string $className
+     * @param int $fromIdx
+     * @param int $toIdx
+     * @param bool $includeDeleted
+     * @return bool
+     */
+    public function hasTypeAndClassBetweenIndices(
+        string $type,
+        string $className,
+        int $fromIdx,
+        int $toIdx,
+        bool $includeDeleted=false
+    ): bool {
+        foreach($this->tags as $tag){
+            if($tag->getType() == $type
+                && $tag->hasClass($className)
+                && ($includeDeleted || !$tag->wasDeleted)
+                && (($tag->startIndex >= $fromIdx && $tag->startIndex < $toIdx)
+                    || ($tag->endIndex >= $fromIdx && $tag->endIndex < $toIdx))){
+                return true;
+            }
+        }
+        return false;
+    }
     /**
      * Retrieves, how many internal tags representing whitespace, are present
      * @return int

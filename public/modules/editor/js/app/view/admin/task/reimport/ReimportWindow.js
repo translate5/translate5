@@ -82,21 +82,6 @@ Ext.define('Editor.view.admin.task.reimport.ReimportWindow', {
                         bind:{
                             value :'<i>{l10n.projectOverview.taskManagement.taskReimportWindow.nameDontMatchInfoLabel}</i>'
                         }
-                    },{
-                        xtype:'checkbox',
-                        itemId: 'saveToMemory',
-                        name: 'saveToMemory',
-                        inputValue: 1,
-                        uncheckedValue: 0,
-                        bind:{
-                            fieldLabel:'{l10n.projectOverview.taskManagement.taskReimportWindow.saveToMemoryLable}',
-                        },
-                        labelClsExtra: 'checkBoxLableInfoIconDefault',
-                        autoEl: {
-                            tag: 'div',
-                            'data-qtip':  locales.saveToMemoryTooltip
-                        },
-                        value: me.getCustomerSaveToMemory(),
                     }]
                 }],
                 dockedItems : [{
@@ -149,9 +134,5 @@ Ext.define('Editor.view.admin.task.reimport.ReimportWindow', {
      */
     getSupportedFilesRegex: function (){
         return new RegExp('('+this.supportedExtensions.join('|')+')');
-    },
-
-    getCustomerSaveToMemory: function (){
-        return Ext.getStore('admin.task.Config').getConfig('task.reimport.saveToMemory');
     }
 });

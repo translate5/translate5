@@ -63,7 +63,7 @@ $dep->application = [
 $dep->dependencies = [[
         "name" => "third-party-dependencies",               //used as internal name of the package / dependency
         "label" => "Third Party Dependencies pulled in by PHP composer",    //shown as name to the user
-        "url" => "RELEASE:third-party-dependencies.zip",    //URL of the package to be downloaded
+        "url" => "RELEASE:third-party-dependencies-7.0.0.zip",    //URL of the package to be downloaded
         "version" => "-na-",                                // currently not used, just for the sake of completeness
         "target" => "vendor/",                              //due to a bug in the downloader a target always must be given!
                                                             // without a target the whole application is getting deleted!
@@ -90,7 +90,7 @@ $dep->dependencies = [[
             // title       optional, overwrites default title (defined in ZfExtended_Models_Installer_License)
         ]]
     ],[
-        "name" => "termtagger",
+        "name" => "termtagger", //DEPRECATED WITH DOCKER!
         "label" => "openTMS TermTagger",
         "url" => "RELEASE:openTMStermTagger.zip",
         "target" => "application/modules/editor/ThirdParty/XliffTermTagger/",

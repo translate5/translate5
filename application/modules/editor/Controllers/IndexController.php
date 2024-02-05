@@ -26,21 +26,24 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\Acl\Rights;
+use MittagQI\Translate5\Acl\Roles;
 use MittagQI\Translate5\Applet\Dispatcher;
 use MittagQI\Translate5\Task\FileTypeSupport;
-use MittagQI\Translate5\Service\Services;
 use MittagQI\Translate5\Task\Current\NoAccessException;
 use MittagQI\Translate5\Task\Reimport\FileparserRegistry;
 use MittagQI\Translate5\Task\TaskContextTrait;
 use MittagQI\Translate5\Cronjob\CronIpFactory;
+use MittagQI\ZfExtended\Acl\SetAclRoleResource as BaseRoles;
 use MittagQI\ZfExtended\CsrfProtection;
-
+use MittagQI\Translate5\Task\CustomFields\Field as TaskCustomField;
 /**
  * Dummy Index Controller
  */
 class Editor_IndexController extends ZfExtended_Controllers_Action
 {
     use TaskContextTrait;
+
     /**
      * @var ZfExtended_Zendoverwrites_Translate
      */
@@ -73,13 +76,17 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
         'JsLogger'                      => true,
         'editor.CustomPanel'            => true,
         //if value is string[], then controlled by ACL, enabling frontend rights given here
-        'admin.TaskOverview'            => ['taskOverviewFrontendController'],
-        'admin.TaskPreferences'         => ['taskOverviewFrontendController'],
-        'admin.TaskUserAssoc'           => ['taskUserAssocFrontendController'],
-        'admin.Customer'                => ['customerAdministration'],
-        'LanguageResourcesTaskassoc'    => ['languageResourcesTaskassoc'],
-        'LanguageResources'             => ['languageResourcesMatchQuery', 'languageResourcesSearchQuery'],
-        'TmOverview'                    => ['languageResourcesOverview'],
+        'admin.TaskOverview'            => [Rights::TASK_OVERVIEW_FRONTEND_CONTROLLER],
+        'admin.TaskPreferences'         => [Rights::TASK_OVERVIEW_FRONTEND_CONTROLLER],
+        'admin.TaskUserAssoc'           => [Rights::TASK_USER_ASSOC_FRONTEND_CONTROLLER],
+        'admin.TaskCustomField'         => [Rights::TASK_CUSTOM_FIELD_FRONTEND_CONTROLLER],
+        'admin.Customer'                => [Rights::CUSTOMER_ADMINISTRATION],
+        'LanguageResourcesTaskassoc'    => [Rights::LANGUAGE_RESOURCES_TASKASSOC],
+        'LanguageResources'             => [
+            Rights::LANGUAGE_RESOURCES_MATCH_QUERY,
+            Rights::LANGUAGE_RESOURCES_SEARCH_QUERY
+        ],
+        'TmOverview'                    => [Rights::LANGUAGE_RESOURCES_OVERVIEW],
         'Localizer'                     => true,
         'Quality'                       => true,
         //the check if this controller is active is task specific
@@ -120,7 +127,7 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
         $this->view->pathToIMAGES = APPLICATION_RUNDIR . $this->config->runtimeOptions->server->pathToIMAGES;
 
         $userConfig = ZfExtended_Factory::get(editor_Models_Config::class);
-        $userConfig = $userConfig->mergeUserValues(ZfExtended_Authentication::getInstance()->getUser()->getUserGuid());
+        $userConfig = $userConfig->mergeUserValues(ZfExtended_Authentication::getInstance()->getUserGuid());
         $userTheme = $userConfig['runtimeOptions.extJs.theme']['value'];
         $defaultTheme = $this->config->runtimeOptions->extJs->defaultTheme;
         $userTheme = $userTheme == 'default' ? $defaultTheme : $userTheme;
@@ -167,6 +174,7 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
         $this->_helper->layout->disableLayout();
         $validator = new ZfExtended_Models_SystemRequirement_Validator(false);
         $results = $validator->validate();
+        $this->view->hostname = gethostname();
         $this->view->validationResults = $results;
     }
 
@@ -188,14 +196,14 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
         settype($_POST['maxHeight'], 'integer');
         settype($_POST['usedWidth'], 'integer');
         settype($_POST['usedHeight'], 'integer');
-        $userSession = new Zend_Session_Namespace('user');
+        $auth = ZfExtended_Authentication::getInstance();
 
         $log = ZfExtended_Factory::get('editor_Models_BrowserLog');
         /* @var $log editor_Models_BrowserLog */
 
         $log->setDatetime(NOW_ISO);
-        $log->setLogin($userSession->data->login);
-        $log->setUserGuid($userSession->data->userGuid);
+        $log->setLogin($auth->getLogin());
+        $log->setUserGuid($auth->getUserGuid());
         $log->setAppVersion($_POST['appVersion']);
         $log->setUserAgent($_POST['userAgent']);
         $log->setBrowserName($_POST['browserName']);
@@ -220,7 +228,7 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
             [APPLICATION_ROOT]
         );
 
-        if (! $this->isAllowed('getUpdateNotification')) {
+        if (! $this->isAllowed(Rights::ID, Rights::GET_UPDATE_NOTIFICATION)) {
             return;
         }
         $onlineVersion = $downloader->getAvailableVersion();
@@ -333,6 +341,9 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
         $this->view->Php2JsVars()->set('enableSourceEditing', (bool)$rop->import->enableSourceEditing);
 
         // set supported extensions
+        // TODO FIXME: when implementing the "Bconf per workfile" feature, use only the
+        // extensionsWithParser list from FileTypeSupport since then the check for Okapi parseable filetypes
+        // is fully dynamic
         $this->view->Php2JsVars()->set('import.validExtensions', FileTypeSupport::defaultInstance()->getSupportedExtensions());
         $this->view->Php2JsVars()->set(
             'import.forbiddenReferenceExtensions',
@@ -370,12 +381,6 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
 
         // to identify the default customer in the frontend
         $this->view->Php2JsVars()->set('customers.defaultCustomerName', 'defaultcustomer');
-
-        //is the openid data visible for the default customer
-        $this->view->Php2JsVars()->set(
-            'customers.openid.showOpenIdDefaultCustomerData',
-            (boolean)$rop->customers->openid->showOpenIdDefaultCustomerData
-        );
 
         $this->editorOnlyModeConfig($rop);
 
@@ -441,6 +446,8 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
             'editor.task.reimport.supportedExtensions',
             FileparserRegistry::getInstance()->getSupportedFileTypes()
         );
+        $this->setupAllowedCustomFields();
+
         $this->setJsAppData();
         editor_Segment_Quality_Manager::instance()->addAppJsData($this->view->Php2JsVars());
     }
@@ -476,7 +483,7 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
 
         $serviceManager = ZfExtended_Factory::get(editor_Services_Manager::class);
 
-        $this->view->Php2JsVars()->set('LanguageResources.serviceNames', $serviceManager->getAllNames());
+        $this->view->Php2JsVars()->set('LanguageResources.serviceNames', $serviceManager->getAllUiNames());
     }
 
     /**
@@ -485,10 +492,6 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
      */
     protected function setJsAppData()
     {
-        $userSession = new Zend_Session_Namespace('user');
-        $userSession->data->passwd = '********';
-        $userSession->data->openIdSubject = '';
-
         $ed = $this->config->runtimeOptions->editor;
 
         $php2js = $this->view->Php2JsVars();
@@ -511,7 +514,7 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
         $php2js->set('app.branding', (string)$this->translate->_($ed->branding));
         $php2js->set('app.company', $this->config->runtimeOptions->companyName);
         $php2js->set('app.name', $this->config->runtimeOptions->appName);
-        $userData = (array) $userSession->data;
+        $userData = (array) ZfExtended_Authentication::getInstance()->getUserData();
 
         // Trim TermPortal-roles if TermPortal plugin is disabled
         if (! $this->pluginManager->isActive('TermPortal')) {
@@ -529,28 +532,33 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
         $php2js->set('app.serverId', ZfExtended_Utils::installationHash('MessageBus'));
         $php2js->set('app.sessionKey', session_name());
 
-        $allRoles = $this->acl->getAllRoles();
-        $roles = array();
-        foreach ($allRoles as $role) {
-            if ($role == 'noRights' || $role == 'basic') {
-                continue;
-            }
+        $roles = [];
+        foreach (Roles::getFrontendRoles() as $role) {
             //set the setable, if the user is able to set/modify this role
             $roles[$role] = [
                 'label' => $this->translate->_(ucfirst($role)),
-                'setable' => $this->isAllowed('setaclrole', $role) //role name is used as right in setaclrole
+                //role name is used as right in setaclrole
+                'setable' => $this->isAllowed(BaseRoles::ID, $role)
             ];
         }
         $php2js->set('app.roles', $roles);
 
-        $wm = ZfExtended_Factory::get('editor_Workflow_Manager');
-        /* @var $wm editor_Workflow_Manager */
+        $clientPmSubRoles = [];
+        foreach (Roles::getClientPmSubroles() as $role) {
+            $clientPmSubRoles[] = [
+                $role,
+                $this->translate->_($role)
+            ];
+        }
+        $php2js->set('app.clientPmSubRoles', $clientPmSubRoles);
+
+        $wm = ZfExtended_Factory::get(editor_Workflow_Manager::class);
         $php2js->set('app.workflows', $wm->getWorkflowData());
         $php2js->set('app.workflow.CONST', $wm->getWorkflowConstants());
 
         $php2js->set(
             'app.userRights',
-            $this->acl->getFrontendRights(ZfExtended_Authentication::getInstance()->getRoles())
+            $this->acl->getFrontendRights(ZfExtended_Authentication::getInstance()->getUserRoles())
         );
 
         $php2js->set('app.version', $this->view->appVersion);
@@ -609,7 +617,7 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
         // we try to load the first suitable job
         try {
             $job = editor_Models_Loaders_Taskuserassoc::loadByTask(
-                ZfExtended_Authentication::getInstance()->getUser()->getUserGuid(),
+                ZfExtended_Authentication::getInstance()->getUserGuid(),
                 $this->getCurrentTask()
             );
             return $this->getCurrentTask()->getTaskActiveWorkflow()->getInitialUsageState($job);
@@ -632,7 +640,7 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
         foreach ($this->frontendEndControllers as $controller => $enabled) {
             if (is_array($enabled)) {
                 foreach ($enabled as $neededRightForController) {
-                    if ($this->isAllowed('frontend', $neededRightForController)) {
+                    if ($this->isAllowed(Rights::ID, $neededRightForController)) {
                         $enabled = true;
                         break; //at least only one right is needed out of the list
                     }
@@ -694,7 +702,7 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
         $this->_helper->layout->disableLayout();
 
         $cronIp = CronIpFactory::create();
-        $hasAppStateACL = $this->isAllowed('backend', 'applicationstate');
+        $hasAppStateACL = $this->isAllowed(Rights::ID, Rights::APPLICATIONSTATE);
         //since application state contains sensible information we show that only to the cron TP,
         // or with more details to the API users
         if ($cronIp->isAllowed() || $hasAppStateACL) {
@@ -904,7 +912,7 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
     private function editorOnlyModeConfig(Zend_Config $rop)
     {
         $config = $rop->editor->toolbar;
-        $forceLeaveButton = $this->isAllowed('frontend', 'editorOnlyOverride');
+        $forceLeaveButton = $this->isAllowed(Rights::ID, Rights::EDITOR_ONLY_OVERRIDE);
         $hideClosebutton = $config->hideCloseButton || $forceLeaveButton;
         $hideLeaveButton = $config->hideLeaveTaskButton && !$forceLeaveButton;
         $this->view->Php2JsVars()->setMultiple([
@@ -920,14 +928,33 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
     /**
      * convenient shortcut to ACLs
      */
-    private function isAllowed(string $resource, ?string $right = null): string
+    private function isAllowed(string $resource, ?string $right = null): bool
     {
-        $roles = ZfExtended_Authentication::getInstance()->getRoles();
+        $roles = ZfExtended_Authentication::getInstance()->getUserRoles();
         try {
             return $this->acl->isInAllowedRoles($roles, $resource, $right);
         } catch (Zend_Acl_Exception) {
             return false;
         }
+    }
+
+    /**
+     * Set the allowed custom fields in the frontend as frontend variable
+     * @return void
+     * @throws ReflectionException
+     */
+    private function setupAllowedCustomFields(): void
+    {
+        // Setup allowed custom fields
+        $auth = ZfExtended_Authentication::getInstance();
+        $all = ZfExtended_Factory::get(TaskCustomField::class)->loadAllSorted();
+        $allowed = [];
+        foreach ($all as $field) {
+            if ($auth->isUserAllowed(MittagQI\Translate5\Acl\TaskCustomField::ID, "customField{$field['id']}")) {
+                $allowed [] = $field;
+            }
+        }
+        $this->view->Php2JsVars()->set('editor.task.customFields', $allowed);
     }
 }
 

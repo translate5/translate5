@@ -413,6 +413,18 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
 
             //reset the result collection
             $matches->resetResult();
+
+            // Mark the segment as fuzzy match in the TM
+            // Checking for matchrate >= 100 is for edge case when segments have the same-same source but different
+            // source md5hash so they are not a repetitions. Updating the segment in this case would lead to omitting
+            // translation for other segments with the same-same source, but different source md5hash
+            if ($bestMatchRateResult->matchrate < 100 && $this->internalFuzzy && $connector->isInternalFuzzy()) {
+                $origTarget = $segment->getTargetEdit();
+                $dummyTargetText = self::renderDummyTargetText($segment->getTaskGuid());
+                $segment->setTargetEdit($dummyTargetText);
+                $connector->update($segment);
+                $segment->setTargetEdit($origTarget);
+            }
         }
 
         return $bestMatchRateResult;
@@ -456,7 +468,9 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
         $this->log->exception($e, [
             'level' => $this->log::LEVEL_WARN,
             'domain' => $this->log->getDomain(),
-            'task' => $this->task,
+            'extra' => [
+                'task' => $this->task,
+            ]
         ]);
         settype($this->connectorErrorCount[$id], 'integer');
         $this->connectorErrorCount[$id]++;
@@ -485,20 +499,13 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
             /* @var $dummyResult editor_Services_ServiceResult */
             $matches->setLanguageResource($connector->getLanguageResource());
             $matches->addResult('', $connector->getDefaultMatchRate());
+
             return $matches;
         }
 
         // if the current resource type is not MT, query the tm or termcollection
         $matches = $connector->query($segment);
 
-        //update the segment with custom target in fuzzy tm
-        if ($this->internalFuzzy && $connector->isInternalFuzzy()) {
-            $origTarget = $segment->getTargetEdit();
-            $dummyTargetText = self::renderDummyTargetText($segment->getTaskGuid());
-            $segment->setTargetEdit($dummyTargetText);
-            $connector->update($segment);
-            $segment->setTargetEdit($origTarget);
-        }
         return $matches;
     }
 
@@ -596,7 +603,7 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
                 $connector->setWorkerUserGuid($this->userGuid);
 
                 //throw a warning if the language resource is not available
-                $status = $connector->getStatus($resource);
+                $status = $connector->getStatus($resource, $languageresource);
                 if (!in_array($status, $availableConnectorStatus)) {
                     $this->log->warn('E1239', 'MatchAnalysis Plug-In: Language resource "{name}" has status "{status}" and is not available for match analysis and pre-translations.', [
                         'task' => $this->task,
@@ -630,9 +637,11 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
                     'languageResource' => $languageresource,
                 ], $errors));
                 $this->log->exception($e, [
-                    'task' => $this->task,
                     'level' => $this->log::LEVEL_WARN,
                     'domain' => $this->log->getDomain(),
+                    'extra' => [
+                        'task' => $this->task,
+                    ]
                 ]);
                 continue;
             }
@@ -695,6 +704,15 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
         //remove fuzzy languageResource from opentm2
         $this->removeFuzzyResources();
         $this->connectors = null;
+    }
+
+    /**
+     * returns the error count sum
+     * @return int
+     */
+    public function getErrorCount(): int
+    {
+        return array_sum($this->connectorErrorCount);
     }
 
     public function setPretranslate($pretranslate)

@@ -21,7 +21,7 @@ START LICENSE AND COPYRIGHT
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
@@ -31,6 +31,9 @@ END LICENSE AND COPYRIGHT
  * @package editor
  * @version 1.0
  */
+
+use MittagQI\Translate5\Task\Export\FileParser\Xlf\Comments;
+use MittagQI\Translate5\Task\Import\FileParser\Xlf\NamespaceRegistry;
 
 /**
  *
@@ -46,9 +49,8 @@ class editor_Models_Export_FileParser_Xlf extends editor_Models_Export_FileParse
     
     /**
      * Helper to call namespace specfic parsing stuff
-     * @var editor_Models_Export_FileParser_Xlf_Namespaces
      */
-    protected $namespaces;
+    protected editor_Models_Export_FileParser_Xlf_Namespaces $namespace;
     
     /**
      * @var array
@@ -85,14 +87,40 @@ class editor_Models_Export_FileParser_Xlf extends editor_Models_Export_FileParse
      * - befüllt $this->_exportFile
      */
     protected function parse() {
-        $xmlparser = ZfExtended_Factory::get('editor_Models_Import_FileParser_XmlParser');
-        /* @var $xmlparser editor_Models_Import_FileParser_XmlParser */
-        
+        $xmlparser = ZfExtended_Factory::get(editor_Models_Import_FileParser_XmlParser::class);
+
+        $config = $this->_task->getConfig();
+        $comments = ZfExtended_Factory::get(Comments::class, [
+            (bool) $config->runtimeOptions->editor->export->exportComments,
+            (bool) $config->runtimeOptions->export->xliff->commentAddTranslate5Namespace
+        ]);
+
         //namespaces are not available until the xliff start tag was parsed!
-        $xmlparser->registerElement('xliff', function($tag, $attributes, $key) use ($xmlparser){
-            $this->namespaces = ZfExtended_Factory::get("editor_Models_Export_FileParser_Xlf_Namespaces",[$xmlparser->getChunk($key)]);
-            $this->namespaces->registerParserHandler($xmlparser, $this->_task);
-        });
+        $xmlparser->registerElement(
+            'xliff',
+            function ($tag, $attributes, $key) use ($xmlparser, $comments) {
+                $this->namespace = NamespaceRegistry::getExportNamespace(
+                    $xmlparser->getChunk($key),
+                    $xmlparser,
+                    $comments
+                );
+            },
+            function ($tag, $key, $opener) use ($comments, $xmlparser) {
+                $namespaceAdded = $xmlparser->getAttribute($opener['attributes'], 'xmlns:translate5');
+
+                //add translate5 namespace definition to the xliff header if needed
+                if ($comments->getTranslate5CommentCount() > 0 && !$namespaceAdded) {
+                    $xmlparser->replaceChunk(
+                        $opener['openerKey'],
+                        str_replace(
+                            '>',
+                            ' xmlns:translate5="http://www.translate5.net/">',
+                            $xmlparser->getChunk($opener['openerKey'])
+                        )
+                    );
+                }
+            }
+        );
         
         $xmlparser->registerElement('lekTargetSeg', null, function($tag, $key, $opener) use ($xmlparser){
             $attributes = $opener['attributes'];
@@ -132,7 +160,7 @@ class editor_Models_Export_FileParser_Xlf extends editor_Models_Export_FileParse
 
         $xmlparser->registerElement('trans-unit', function(){
             $this->transUnitLength = 0;
-        }, function($tag, $key, $opener) use ($xmlparser){
+        }, function($tag, $key, $opener) use ($xmlparser, $comments){
             $segments = [];
             foreach($this->segmentIdsPerUnit as $segmentId) {
                 $segments[] = $this->getSegment($segmentId);
@@ -190,15 +218,20 @@ class editor_Models_Export_FileParser_Xlf extends editor_Models_Export_FileParse
                     $this->logSegment($originalAttributes, 'segment to long');
                 }
             }
+
+            //does return empty comments if already processed by a namespace
+            $xmlparser->replaceChunk($key, $comments->getCommentXml().$xmlparser->getChunk($key));
         });
 
-        //the unit segment id container must be removed on export, they are mainly needed for namespace related features, which are executed before
-        $xmlparser->registerElement('t5:unitSegIds', null, function($tag, $key) use ($xmlparser){
+        //the unit segment id container must be removed on export,
+        // they are mainly needed for namespace related features, which are executed before
+        $xmlparser->registerElement('t5:unitSegIds', null, function($tag, $key, $opener) use ($xmlparser, $comments) {
+            $comments->loadComments($opener['attributes'], $this->_task);
             $xmlparser->replaceChunk($key, '');
         });
 
         $preserveWhitespaceDefault = $this->config->runtimeOptions->import->xlf->preserveWhitespace;
-        $this->_exportFile = $xmlparser->parse($this->_skeletonFile, $preserveWhitespaceDefault);
+        $this->_exportFile = $xmlparser->parse($this->skeletonFile, $preserveWhitespaceDefault);
         
         if($this->options['sourcetoemptytarget']) {
             //UGLY: typecast to string here
@@ -327,35 +360,31 @@ class editor_Models_Export_FileParser_Xlf extends editor_Models_Export_FileParse
         if(stripos($content, '<sub') === false) {
             return $content;
         }
-        
-        //get the transunit part of the root segment
-        $transunitMid = $this->_segmentEntity->getMid();
-        $transunitMid = explode('_', $transunitMid)[0];
-        
-        $xmlparser = ZfExtended_Factory::get('editor_Models_Import_FileParser_XmlParser');
-        /* @var $xmlparser editor_Models_Import_FileParser_XmlParser */
-        
+
+        $meta = $this->_segmentEntity->meta();
+
+        $xmlparser = ZfExtended_Factory::get(editor_Models_Import_FileParser_XmlParser::class);
+
         //restoring of sub tags is working only if the parent tag has a valid id - this is the identifier for the sub segment content
         $xmlparser->registerElement('sub', function($tag, $attributes, $key) use($xmlparser){
             //disable handling of tags if we reach a sub, this is done recursivly in the loaded content of the found sub
             $xmlparser->disableHandlersUntilEndtag();
-        }, function($tag, $key, $opener) use ($xmlparser, $transunitMid, $field){
+        }, function($tag, $key, $opener) use ($xmlparser, $field,$meta){
             $tagId = $this->getParentTagId($xmlparser);
             if(empty($tagId) && $tagId !== '0') {
                 error_log("Could not restore sub tag content since there is no id in the surrounding <ph>,<bpt>,<ept>,<it> tag!"); //FIXME better logging
                 return;
             }
-            //now we need the segmentId to the found MID:
-            // since the MID of a <sub> segment is defined as:
-            // SEGTRANSUNITID _ SEGNR -sub- TAGID
-            // and we have only the first and the last part, we have to use like to get the segmentId
+
+            // create the mid for the segment to the sub content to load it
+            $mid = $this->createSubSegmentMid($tagId,$meta);
             $s = $this->_segmentEntity->db->select('id')
                 ->where('taskGuid = ?', $this->_taskGuid)
-                ->where('mid like ?', $transunitMid.'_%-sub-'.$tagId);
+                ->where('mid = ?', $mid);
             $segmentRow = $this->_segmentEntity->db->fetchRow($s);
-            
+
             //if we got a segment we have to get its segmentContent and set it as the new content in our resulting XML
-            // since we are calling getSegmentContent recursivly, the <sub> segments are replaced from innerst one out
+            // since we are calling getSegmentContent recursively, the <sub> segments are replaced from innerst one out
             if($segmentRow) {
                 //remove all chunks between the sub tag
                 $xmlparser->replaceChunk($opener['openerKey']+1,'', $key-$opener['openerKey']-1);
@@ -399,5 +428,34 @@ class editor_Models_Export_FileParser_Xlf extends editor_Models_Export_FileParse
             return $this->utilities->tagProtection->unprotect($segment);
         }
         return $segment;
+    }
+
+    /**
+     * Create segment mid for segments out of sub tag
+     * @param string $tagId
+     * @param editor_Models_Segment_Meta $parentSegmentMeta the meta element to the parent segment
+     * @return string
+     */
+    protected function createSubSegmentMid(string $tagId, editor_Models_Segment_Meta $parentSegmentMeta): string
+    {
+        $mid = 'sub-'.$tagId;
+        $includeSubInLength = (bool)$this->config->runtimeOptions->import->xlf->includedSubElementInLengthCalculation;
+
+        if ($includeSubInLength) {
+            // we can reuse the parent segments transunitHash, since it's the same
+            $transunitHash = $parentSegmentMeta->getTransunitHash();
+        } else {
+            // in case the sub elements are not included in the transunit length calculation,
+            // we have to recalulate the transunitHash since it is different as the one of $parentSegmentMeta
+            $transunitHash = $this->transunitHash->createForSub(
+                $parentSegmentMeta->getSourceFileId(),
+                (string) $parentSegmentMeta->getTransunitId(),
+                $mid
+            );
+        }
+
+        // At the end, the segment mid is transunitHash + calculated mid for sub - like on import
+        //@see \editor_Models_Import_FileParser::setMidWithHash
+        return $transunitHash.'_'.$mid;
     }
 }

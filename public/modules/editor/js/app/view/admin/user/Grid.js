@@ -37,7 +37,7 @@ Ext.define('Editor.view.admin.user.Grid', {
   plugins: ['gridfilters'],
   itemId: 'adminUserGrid',
   controller: 'adminUserGrid',
-  stateId: 'adminUserGrid',
+  stateId: 'editor.adminUserGrid',
   stateful: true,
   cls: 'adminUserGrid',
   title: '#UT#Benutzer',
@@ -91,6 +91,7 @@ Ext.define('Editor.view.admin.user.Grid', {
         },
     config = {
       title: me.title, //see EXT6UPD-9
+      tooltip: Editor.data.l10n.user.tooltip,
       columns: [{
           xtype: 'gridcolumn',
           width: 100,
@@ -172,7 +173,7 @@ Ext.define('Editor.view.admin.user.Grid', {
           dataIndex: 'roles',
           stateId: 'roles',
           renderer: function(v) {
-              if(!v || v==""){
+              if(!v || v === ""){
                   return "";
               }
               return Ext.Array.map(v.split(','), function(item){

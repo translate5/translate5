@@ -26,6 +26,8 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\Acl\Rights;
+
 /**
  * Default Workflow Class, contains the workflow definition and workflow state, all handlers/actions etc are in the handler instance
  * Default roles are:
@@ -74,7 +76,7 @@ class editor_Workflow_Default {
     const STEP_WORKFLOW_ENDED   = 'workflowEnded';
     
     const CACHE_KEY             = 'workflow_definitions_';
-    
+
     /**
      * This part is very ugly: in the frontend we are working only with all states expect the ones listed here.
      * The states listed here are only used in the frontend grid for rendering purposes,
@@ -483,12 +485,16 @@ class editor_Workflow_Default {
     }
     
     /**
-     * returns a subset of getAssignableSteps, respecting the rights of the current user filtering the steps which are not allowed to be used by the current user in task user associations
+     * returns a subset of getAssignableSteps, respecting the rights of the current user filtering the steps which
+     * are not allowed to be used by the current user in task user associations
      * @return array
      */
     public function getUsableSteps(): array {
         $steps = $this->getAssignableSteps();
-        if(editor_User::instance()->isAllowed('frontend', 'editorChangeUserAssocTask')) {
+        if (ZfExtended_Authentication::getInstance()->isUserAllowed(
+            Rights::ID,
+            Rights::EDITOR_CHANGE_USER_ASSOC_TASK)
+        ) {
             return $steps;
         }
         return [];

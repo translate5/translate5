@@ -65,7 +65,7 @@ abstract class editor_Test_ApiTest extends TestCase
     /**
      * @var int
      */
-    private static int $_testCustomerId;
+    private static array $_testCustomers = [];
 
     /**
      * @var
@@ -140,12 +140,15 @@ abstract class editor_Test_ApiTest extends TestCase
     }
 
     /**
-     * Retrieves the id of the general test-customer
+     * Retrieves the id of the general test-customer, by default the first one but customer 2 and 3 can be retrieved by providing "1" or "2" as indexes
      * @return int
      */
-    final public static function getTestCustomerId(): int
+    final public static function getTestCustomerId(int $index = 0): int
     {
-        return static::$_testCustomerId;
+        if($index > 2 || $index < 0){
+            throw new ZfExtended_Exception('getTestCustomerId supports only indexes 0,1,2');
+        }
+        return static::$_testCustomers[$index];
     }
 
     /**
@@ -212,15 +215,30 @@ abstract class editor_Test_ApiTest extends TestCase
 
     /**
      * asserts that a certain user is loggedin
-     * @param string $user
+     * @param string $login
      * @return stdClass the login/status JSON for further processing
      */
-    public static function assertLogin(string $user)
+    public static function assertLogin(string $login)
     {
         $json = static::api()->getJson('editor/session/' . Helper::getAuthCookie());
-        static::assertTrue(is_object($json), 'User "' . $user . '" is not authenticated!');
-        static::assertEquals('authenticated', $json->state, 'User "' . $user . '" is not authenticated!');
-        static::assertEquals($user, $json->user->login);
+        static::assertTrue(is_object($json), 'User "' . $login . '" is not authenticated!');
+        static::assertEquals('authenticated', $json->state, 'User "' . $login . '" is not authenticated!');
+        static::assertEquals($login, $json->user->login);
+        return $json;
+    }
+
+    /**
+     * asserts that one of the passed users is logged in
+     * @param array $users
+     * @return stdClass
+     * @throws Zend_Http_Client_Exception
+     */
+    public static function assertLogins(array $logins)
+    {
+        $json = static::api()->getJson('editor/session/' . Helper::getAuthCookie());
+        static::assertTrue(is_object($json), 'User "' . Helper::getAuthLogin() . '" is not authenticated!');
+        static::assertEquals('authenticated', $json->state, 'User "' . Helper::getAuthLogin() . '" is not authenticated!');
+        static::assertTrue(in_array($json->user->login, $logins), 'Logged in user is not '.implode(' or ', $logins));
         return $json;
     }
 
@@ -276,6 +294,9 @@ abstract class editor_Test_ApiTest extends TestCase
     final public static function setUpBeforeClass(): void
     {
         try {
+
+            self::logTestStart();
+
             static::testSpecificInit();
 
             // each test gets an own api-object, the instance of the current test is for code-completion and does not hurt, since the constructor does nothing
@@ -286,11 +307,20 @@ abstract class editor_Test_ApiTest extends TestCase
                 self::testRunSetup(static::$_api);
             }
 
-            if(static::$skipIfOptionsMissing && !static::api()->checkConfigs(static::$requiredRuntimeOptions)){
+            if(static::$_api->isTestSkipped()){
 
+                // skip test when --skip option demanded to do so
+                static::markTestSkipped('Skipped test "' . static::class . '" as requested.');
+
+            } else if(static::$skipIfOptionsMissing && !static::api()->checkConfigs(static::$requiredRuntimeOptions)){
+
+                // skip test when configs/runtimeOptions are missing
                 static::markTestSkipped('Skipped test "' . static::class . '" because neccessary configs are not set or missing.');
 
             } else {
+
+                // make sure the setup always happens as testmanager
+                static::api()->login('testmanager');
 
                 // checks for the plugin & config dependencies that have been defined for this test
                 static::assertAppState();
@@ -319,6 +349,10 @@ abstract class editor_Test_ApiTest extends TestCase
 
     final public static function tearDownAfterClass(): void
     {
+        self::logTestEnd();
+
+        // ensure the teardown happens as testmanager
+        static::api()->login('testmanager');
         // everything is wrapped in try-catch to make sure, all cleanups are executed. Anyone knows a better way to collect exceptions ?
         $errors = [];
         // for single tests, the cleanup can be prevented via KEEP_DATA
@@ -388,7 +422,7 @@ abstract class editor_Test_ApiTest extends TestCase
             // makes sure all test users are present in the DB & correctly configured
             static::assertNeededUsers();
             // makes sure the test customer is present in the DB and exposes it's id
-            static::assertTestCustomer();
+            static::assertTestCustomers();
         }
     }
 
@@ -423,6 +457,9 @@ abstract class editor_Test_ApiTest extends TestCase
         }
         if (!$state->database->isUptodate) {
             $errors[] = 'Database is not up to date! ' . $state->database->newCount . ' new / ' . $state->database->modCount . ' modified.';
+            if ($state->database->newCount > 0) {
+                $errors[]= "New files: \n" . print_r($state->database->newFiles, true);
+            }
         }
         if (count($errors) > 0) {
             // UGLY: no Exception can terminate the suite with a single "Explanation", so to avoid all tests failing we simply die ...
@@ -506,12 +543,33 @@ abstract class editor_Test_ApiTest extends TestCase
     /**
      * Asserts that the default test customer is loaded and makes it's id accessible for the test run
      */
-    private static function assertTestCustomer()
+    private static function assertTestCustomers()
     {
-        $customer = static::api()->getCustomerByNumber(Helper::TEST_CUSTOMER_NUMBER);
-        static::assertIsObject($customer, 'Unable to load test customer.No test customer was found for customer-number: ' . Helper::TEST_CUSTOMER_NUMBER);
-        $response = static::api()->getLastResponse();
-        static::assertEquals(200, $response->getStatus(), 'Load test customer Request does not respond HTTP 200! Body was: ' . $response->getBody());
-        static::$_testCustomerId = $customer->id;
+        $customerNumbers = [Helper::TEST_CUSTOMER_NUMBER, Helper::TEST_CUSTOMER_NUMBER_1, Helper::TEST_CUSTOMER_NUMBER_2];
+        foreach($customerNumbers as $index => $customerNumber){
+            $customer = static::api()->getCustomerByNumber($customerNumber);
+            static::assertIsObject($customer, 'Unable to load test customer. No test customer was found for customer-number: ' . $customerNumber);
+            $response = static::api()->getLastResponse();
+            static::assertEquals(200, $response->getStatus(), 'Load test customer request does not respond HTTP 200! Body was: ' . $response->getBody());
+            static::$_testCustomers[$index] = $customer->id;
+        }
+    }
+
+    /**
+     * Logs the start of a test
+     * @return void
+     */
+    private static function logTestStart(): void
+    {
+        error_log('Starting test: ' . static::class. ' | ' . date("Y-m-d H:i:s") );
+    }
+
+    /**
+     * Logs the end of a test
+     * @return void
+     */
+    private static function logTestEnd(): void
+    {
+        error_log('Finished test: ' . static::class . ' | ' . date("Y-m-d H:i:s") );
     }
 }

@@ -116,6 +116,9 @@ class SystemCheckCommand extends Translate5AbstractCommand
                 $this->io->writeln('');
             }
         }
+
+        $this->printNotes();
+
         return $result;
     }
 }

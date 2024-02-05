@@ -26,7 +26,9 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\Acl\Rights;
 use MittagQI\Translate5\Task\FileTypeSupport;
+use MittagQI\ZfExtended\Session\SessionInternalUniqueId;
 
 /**
  * Task Object Instance as needed in the application
@@ -138,6 +140,12 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
     protected $validatorInstanceClass = 'editor_Models_Validator_Task';
 
     /**
+     * Tasks must be filtered by role-driven restrictions
+     */
+    protected ?array $clientAccessRestriction = ['field' => 'customerId'];
+
+
+    /**
      * @var editor_Models_Task_Meta
      */
     protected $meta;
@@ -192,8 +200,7 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
      * @throws editor_Models_ConfigException
      */
     public function getConfig(bool $disableCache = false) {
-        $taskConfig = ZfExtended_Factory::get('editor_Models_TaskConfig');
-        /* @var $taskConfig editor_Models_TaskConfig */
+        $taskConfig = ZfExtended_Factory::get(editor_Models_TaskConfig::class);
         if($disableCache){
             $taskConfig->cleanConfigCache();
         }
@@ -303,13 +310,17 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
      *
      * @param string $userGuid
      * @return array
+     * @throws ReflectionException
+     * @throws Zend_Acl_Exception
+     * @throws Zend_Db_Statement_Exception
+     * @throws Zend_Db_Table_Select_Exception
      */
-    public function loadUserList(string $userGuid) {
-        /** @var ZfExtended_Models_User $userModel */
-        $userModel = ZfExtended_Factory::get('ZfExtended_Models_User');
+    public function loadUserList(string $userGuid): array
+    {
+        $userModel = ZfExtended_Factory::get(ZfExtended_Models_User::class);
 
         // here no check for pmGuid, since this is done in task::loadListByUserAssoc
-        $loadAll = editor_User::instance()->isAllowed('backend', 'loadAllTasks');
+        $loadAll = ZfExtended_Authentication::getInstance()->isUserAllowed(Rights::ID, Rights::LOAD_ALL_TASKS);
         $ignoreAnonStuff = $this->rolesAllowReadAnonymizedUsers();
 
         $anonSql = '';
@@ -359,9 +370,7 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
      */
     public function getTotalCountByUserAssoc(string $userGuid, $loadAll = false) {
         $s = $this->getSelectByUserAssocSql($userGuid, array('numrows' => 'count(*)'), $loadAll);
-        if(!empty($this->filter)) {
-            $this->filter->applyToSelect($s, false);
-        }
+        $this->applyFilterToSelect($s);
         return $this->db->fetchRow($s)->numrows;
     }
 
@@ -732,9 +741,11 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
      * @return boolean
      */
     public function lockForSessionUser(string $datetime): bool {
-        $user = new Zend_Session_Namespace('user');
-        $session = new Zend_Session_Namespace();
-        return $this->_lock($datetime, $user->data->userGuid, $session->internalSessionUniqId);
+        return $this->_lock(
+            $datetime,
+            ZfExtended_Authentication::getInstance()->getUserGuid(),
+            SessionInternalUniqueId::getInstance()->get()
+        );
     }
 
 
@@ -1166,17 +1177,20 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
         }
         return !($this->rolesAllowReadAnonymizedUsers($customRoles));
     }
-    
+
     /**
      * returns true if the given roles (or the roles of the current user) disallow seeing all user data
-     * @param array $rolesToCheck
+     * @param array|null $rolesToCheck
+     * @return bool
+     * @throws Zend_Acl_Exception
      */
-    protected function rolesAllowReadAnonymizedUsers(array $rolesToCheck = null) {
+    protected function rolesAllowReadAnonymizedUsers(array $rolesToCheck = null): bool
+    {
         if(empty($rolesToCheck)) {
-            $rolesToCheck = ZfExtended_Authentication::getInstance()->getRoles();
+            $rolesToCheck = ZfExtended_Authentication::getInstance()->getUserRoles();
         }
         $aclInstance = ZfExtended_Acl::getInstance();
-        return $aclInstance->isInAllowedRoles($rolesToCheck, "frontend", "readAnonymyzedUsers");
+        return $aclInstance->isInAllowedRoles($rolesToCheck, Rights::ID, Rights::READ_ANONYMYZED_USERS);
     }
 
     /***

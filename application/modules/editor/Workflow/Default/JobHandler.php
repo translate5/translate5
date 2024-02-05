@@ -41,7 +41,7 @@ class editor_Workflow_Default_JobHandler extends editor_Workflow_Default_Abstrac
     const HANDLE_JOB_ADD                 = 'handleUserAssociationAdded';
     const HANDLE_JOB_DELETE              = 'handleUserAssociationDeleted';
     const HANDLE_JOB_EDITED              = 'handleUserAssociationEdited';
-    
+
     /**
      * {@inheritDoc}
      * @see editor_Workflow_Default_AbstractHandler::execute()
@@ -75,7 +75,7 @@ class editor_Workflow_Default_JobHandler extends editor_Workflow_Default_Abstrac
         $actionConfig->events->trigger($state, $actionConfig->workflow, ['oldTua' => $actionConfig->oldTua, 'newTua' => $actionConfig->newTua]);
         
         //call here stuff which must be done between the before trigger and the other code (normally saving the TUA)
-        $saveCallback();
+        $saveCallback($state);
         
         //ensure that segment MV is createad
         $actionConfig->task->createMaterializedView();

@@ -1,10 +1,11 @@
 {
 	"config" : {
 		"platform" : {
-			"php" : "8.0.15"
+			"php" : "8.1.23"
 		},
 		"allow-plugins": {
-			"wikimedia/composer-merge-plugin": true
+			"wikimedia/composer-merge-plugin": true,
+			"php-http/discovery": true
 		}
 	},
 	"autoload" : {
@@ -87,18 +88,22 @@
 		}		
 	],
 	"require" : {
+		"ext-xml": "*",
 		"ext-simplexml": "*",
 		"ext-libxml": "*",
 		"ext-pdo": "*",
 		"ext-dom": "*",
 		"ext-mysqli": "*",
 		"ext-xmlreader": "*",
+		"ext-xmlwriter": "*",
 		"ext-sockets" : "*",
 		"ext-iconv" : "*",
+		"ext-soap" : "*",
       	"ext-zip": "*",
       	"ext-fileinfo": "*",
       	"ext-curl": "*",
 		"ext-posix": "*",
+		"ext-zlib": "*",
 		"phpunit/phpunit": "^9",
 		"shardj/zf1-future" : "dev-master",
 		"symfony/console" : "^5.0",
@@ -124,7 +129,8 @@
 		"symfony/yaml": "^6.0",
 		"symfony/lock": "^6.0",
 		"cesargb/php-log-rotation": "^2.7",
-		"ifsnop/mysqldump-php": "^v2.9"
+		"ifsnop/mysqldump-php": "^v2.9",
+		"http-interop/http-factory-guzzle": "^1.2"
     },
 	"extra" : {
 		"merge-plugin" : {

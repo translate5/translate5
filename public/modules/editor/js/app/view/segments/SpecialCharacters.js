@@ -58,7 +58,9 @@ Ext.define('Editor.view.segments.SpecialCharacters', {
                     padding:0,
                     text: '→',
                     itemId: 'btnInsertWhitespaceTab',
-                    tooltip: 'TAB'
+                    bind: {
+                        tooltip: '{l10n.segmentGrid.toolbar.chars.tab}'
+                    }
                 },{
                     xtype: 'button',
                     border: 1,
@@ -71,7 +73,9 @@ Ext.define('Editor.view.segments.SpecialCharacters', {
                     padding:0,
                     text: '↵',
                     itemId: 'btnInsertWhitespaceNewline',
-                    tooltip: 'SHIFT+ENTER'
+                    bind: {
+                        tooltip: '{l10n.segmentGrid.toolbar.chars.shiftEnter}'
+                    }
                 },{
                     xtype: 'button',
                     border: 1,
@@ -84,7 +88,10 @@ Ext.define('Editor.view.segments.SpecialCharacters', {
                     padding:0,
                     text: '⎵',
                     itemId: 'btnInsertWhitespaceNbsp',
-                    tooltip: 'CTRL+SHIFT+Space'
+                    tooltip: 'CTRL+SHIFT+Space',
+                    bind: {
+                        tooltip: '{l10n.segmentGrid.toolbar.chars.ctrlShiftSpace}'
+                    }
                 }]
             };
 
@@ -113,13 +120,17 @@ Ext.define('Editor.view.segments.SpecialCharacters', {
         }
         var matches =  Editor.util.Util.getFuzzyLanguagesForCode(targetLang.get('rfc5646'));
 
+        // in case there are characters defined for all languages using the all key, add them to the matches
+        matches.push('all');
+
         Ext.Array.each(matches, function(rec) {
             if(specialCharactersJosn[rec] !== undefined){
                 Ext.Array.each(specialCharactersJosn[rec], function(r) {
                     items.push({
                         xtype:'specialCharactersButton',
                         text: r.visualized,
-                        value: Editor.util.Util.toUnicodeCodePointEscape(r.unicode)
+                        value: Editor.util.Util.toUnicodeCodePointEscape(r.unicode),
+                        tooltip: Editor.data.l10n.segmentGrid.toolbar.chars[r.unicode]
                     });
                 });
             }

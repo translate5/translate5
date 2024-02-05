@@ -26,6 +26,7 @@
       <file>../Plugins/Okapi/tests/OkapiBconfFilterTest.php</file>
       <file>../Plugins/Okapi/tests/OkapiExportTest.php</file>
       <file>../Plugins/Okapi/tests/OkapiExtensionMappingTest.php</file>
+      <file>../Plugins/Okapi/tests/OkapiSegmentationTest.php</file>
     </testsuite>
     <testsuite name="visual">
       <file>../Plugins/VisualReview/tests/VisualHtmlTest.php</file>
@@ -34,6 +35,9 @@
       <file>../Plugins/VisualReview/tests/VisualMergePdfTest.php</file>
       <file>../Plugins/VisualReview/tests/VisualVideoTest.php</file>
       <file>../Plugins/VisualReview/tests/VisualWgetTest.php</file>
+    </testsuite>
+    <testsuite name="connectworldserver">
+      <file>../Plugins/ConnectWorldserver/tests/ExternalOnlineReviewTest.php</file>
     </testsuite>
     <testsuite name="deepl">
       <file>../Plugins/DeepL/tests/DeepLGlossaryTest.php</file>
@@ -51,10 +55,22 @@
       <file>editorAPI/Translate2491Test.php</file>
       <file>editorAPI/Translate3013Test.php</file>
       <file>editorAPI/TbxSpecialcharsTest.php</file>
+      <file>editorAPI/Translate3207Test.php</file>
+    </testsuite>
+    <testsuite name="tilde">
+      <file>../Plugins/TildeMT/tests/Functional/MtTest.php</file>
+    </testsuite>
+    <testsuite name="translate24">
+      <file>../Plugins/Translate24/tests/Api/ErrorTest.php</file>
+      <file>../Plugins/Translate24/tests/Api/ResultTest.php</file>
+      <file>../Plugins/Translate24/tests/Api/TmApiTest.php</file>
+      <file>../Plugins/Translate24/tests/Api/GlossaryApiTest.php</file>
+      <file>../Plugins/Translate24/tests/functional/Quality24TranslateTest.php</file>
     </testsuite>
     <testsuite name="auth">
       <file>editorAPI/Translate3108Test.php</file>
       <file>editorAPI/SessionApiTest.php</file>
+      <file>editorAPI/ClientPmTest.php</file>
     </testsuite>
     <testsuite name="unit">
       <directory>Unit</directory>

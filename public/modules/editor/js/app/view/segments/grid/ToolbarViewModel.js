@@ -74,6 +74,7 @@ Ext.define('Editor.view.segments.grid.ToolbarViewModel', {
         }
     },
     data: {
-        trackChangesButtonsActive: false
+        trackChangesButtonsActive: false,
+        proposeTerminologyButtonActive: false
     }
 });

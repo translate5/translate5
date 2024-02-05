@@ -27,6 +27,7 @@
  */
 
 use MittagQI\Translate5\Segment\CharacterCount;
+use MittagQI\Translate5\Task\Import\SkeletonFile;
 
 /**#@+
  * @author Marc Mittag
@@ -68,10 +69,16 @@ class editor_Models_Import_SegmentProcessor_Review extends editor_Models_Import_
      * @var int
      */
     protected $segmentNrInTask = 0;
-    
+
+    protected SkeletonFile $skeletonFile;
+
     /**
      * @param editor_Models_Task $task
      * @param editor_Models_Import_Configuration $config
+     * @throws ReflectionException
+     * @throws Zend_Exception
+     * @throws ZfExtended_Models_Entity_NotFoundException
+     * @throws editor_Models_ConfigException
      */
     public function __construct(editor_Models_Task $task, editor_Models_Import_Configuration $config){
         parent::__construct($task);
@@ -80,14 +87,15 @@ class editor_Models_Import_SegmentProcessor_Review extends editor_Models_Import_
         $this->taskConf = $this->task->getConfig();
 
         //init word counter
-        $langModel = ZfExtended_Factory::get('editor_Models_Languages');
-        /* @var $langModel editor_Models_Languages */
+        $langModel = ZfExtended_Factory::get(editor_Models_Languages::class);
         $langModel->load($task->getSourceLang());
 
-        $this->wordCount = ZfExtended_Factory::get('editor_Models_Segment_WordCount',[
+        $this->wordCount = ZfExtended_Factory::get(editor_Models_Segment_WordCount::class, [
             $langModel->getRfc5646()
         ]);
+
         $this->characterCount = ZfExtended_Factory::get('\MittagQI\Translate5\Segment\CharacterCount');
+        $this->skeletonFile = ZfExtended_Factory::get(SkeletonFile::class, [$task]);
     }
 
     public function process(editor_Models_Import_FileParser $parser){
@@ -133,7 +141,10 @@ class editor_Models_Import_SegmentProcessor_Review extends editor_Models_Import_
      * @param editor_Models_Segment $seg
      * @param editor_Models_Import_FileParser_SegmentAttributes $attributes
      */
-    protected function processSegmentMeta(editor_Models_Segment $seg, editor_Models_Import_FileParser_SegmentAttributes $attributes) {
+    protected function processSegmentMeta(
+        editor_Models_Segment $seg,
+        editor_Models_Import_FileParser_SegmentAttributes $attributes)
+    {
         $meta = $seg->meta();
         if(!empty($attributes->maxNumberOfLines) && !is_null($attributes->maxNumberOfLines)) {
             $meta->setMaxNumberOfLines($attributes->maxNumberOfLines);
@@ -159,7 +170,15 @@ class editor_Models_Import_SegmentProcessor_Review extends editor_Models_Import_
         if(!empty($attributes->additionalUnitLength)) {
             $meta->setAdditionalUnitLength($attributes->additionalUnitLength);
         }
-        if(!empty($attributes->transunitId) && !is_null($attributes->transunitId)) {
+        if(!empty($attributes->transunitHash) && !is_null($attributes->transunitHash)) {
+            $meta->setTransunitHash($attributes->transunitHash);
+        }
+        else {
+            //transunitHash must not be null, so if no info given we use segmentNr to assume that just the single segment is in a transunit
+            $meta->setTransunitHash((string) $seg->getSegmentNrInTask());
+        }
+
+        if(!empty($attributes->transunitId)) {
             $meta->setTransunitId($attributes->transunitId);
         }
         else {
@@ -174,6 +193,9 @@ class editor_Models_Import_SegmentProcessor_Review extends editor_Models_Import_
         if(!empty($attributes->locked)) {
             $meta->setLocked($attributes->locked);
         }
+
+        $meta->setMrkMid($attributes->mrkMid);
+        $meta->setSourceFileId($attributes->sourceFileId ?? '');
 
         //add custom meta fields
         if(!empty($attributes->customMetaAttributes)) {
@@ -191,17 +213,19 @@ class editor_Models_Import_SegmentProcessor_Review extends editor_Models_Import_
         $meta->setSiblingData($seg);
         $meta->save();
     }
-    
+
     /**
-     * Überschriebener Post Parse Handler, erstellt in diesem Fall das Skeleton File
+     * overrideable handler, creates the skeleton file
      * @override
      * @param editor_Models_Import_FileParser $parser
+     * @throws ReflectionException
+     * @throws ZfExtended_Exception
+     * @throws ZfExtended_Models_Entity_NotFoundException
      */
     public function postParseHandler(editor_Models_Import_FileParser $parser) {
-        $file = ZfExtended_Factory::get('editor_Models_File');
-        /* @var $file editor_Models_File */
+        $file = ZfExtended_Factory::get(editor_Models_File::class);
         $file->load($this->fileId);
-        $file->saveSkeletonToDisk($parser->getSkeletonFile(), $this->task);
+        $this->skeletonFile->saveToDisk($file, $parser->getSkeletonFile());
         
         $this->saveFieldWidth($parser);
     }

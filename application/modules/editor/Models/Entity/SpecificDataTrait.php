@@ -34,38 +34,49 @@ trait editor_Models_Entity_SpecificDataTrait {
     
     /***
      * Set the specificData field. The given value will be json encoded.
-     * @param string $value
+     * @param array|stdClass $value
      */
     public function setSpecificData($value){
         $this->__call('setSpecificData', array(
             json_encode($value)
         ));
     }
-    
-    /***
+
+    /**
      * Get specificData field value. The returned value will be json decoded.
-     * If $propertyName is provided, only the value for this field will be returned if exisit.
-     * @param string $propertyName
+     * If $propertyName is provided, only the value for this field will be returned if exists.
+     *
+     * @param string|null $propertyName
+     * @param bool $parseAsArray
+     *
      * @return mixed|NULL
+     *
+     * @throws Zend_Exception
      */
-    public function getSpecificData($propertyName=null){
-        $specificData=$this->__call('getSpecificData', array());
-        
-        if(empty($specificData)){
+    public function getSpecificData(?string $propertyName = null, bool $parseAsArray = false): mixed
+    {
+        $specificData = $this->__call('getSpecificData', []);
+
+        if (empty($specificData)) {
             return null;
         }
+
         //try to decode the data
         try {
-            $specificData=json_decode($specificData);
-            
+            $specificData = json_decode($specificData, $parseAsArray, flags: JSON_THROW_ON_ERROR);
+
             //return the property name value if exist
-            if(isset($propertyName)){
+            if ($parseAsArray && isset($specificData[$propertyName])) {
+                return $specificData[$propertyName];
+            } elseif (isset($propertyName)) {
                 return $specificData->$propertyName ?? null;
             }
+
             return $specificData;
         } catch (Exception $e) {
-            
+            // Do nothing as null will be returned
         }
+
         return null;
     }
     

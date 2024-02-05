@@ -346,7 +346,7 @@ class Translate2991Test extends \editor_Test_JsonTest {
 
         // Remove the created timestamp since is not relevant for the test
         foreach ($json as &$row) {
-            unset ($row->created);
+            unset ($row->created,$row->errorCount);
         }
 
         // Overwrite file contents if capture mode is On

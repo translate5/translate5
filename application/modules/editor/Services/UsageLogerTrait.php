@@ -111,20 +111,20 @@ trait editor_Services_UsageLogerTrait {
             //set the request source to instant-translate
             $logger->setRequestSource(editor_Services_Connector::REQUEST_SOURCE_INSTANT_TRANSLATE);
             // for instant translate search use the session user
-            $logger->setUserGuid(editor_User::instance()->getGuid());
+            $logger->setUserGuid(ZfExtended_Authentication::getInstance()->getUserGuid());
         }
 
         // if no user is set from above, try to set one
         if($logger->getUserGuid() === null){
 
-            $session = new Zend_Session_Namespace('user');
+            $auth = ZfExtended_Authentication::getInstance();
 
             if(!is_null($this->workerUserGuid)){
                 // it is worker context, use the user from there (this call is from analysis)
                 $logger->setUserGuid($this->workerUserGuid);
-            }elseif(isset($session->data->id)){
+            }elseif($auth->isAuthenticated()){
                 // the session user exist, use the session user (this call is from regular query action)
-                $logger->setUserGuid($session->data->userGuid);
+                $logger->setUserGuid($auth->getUserGuid());
             }else{
                 // no user was found, set the system user (this call is from the tests)
                 $logger->setUserGuid(ZfExtended_Models_User::SYSTEM_GUID);

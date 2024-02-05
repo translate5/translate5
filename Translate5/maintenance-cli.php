@@ -35,6 +35,8 @@ const TRANSLATE5_CLI = true;
 use Symfony\Component\Console\Application;
 use Translate5\MaintenanceCli\Command\{
     AuthTokenCommand,
+    AuthTokenDeleteCommand,
+    AuthTokenListCommand,
     CachePurgeCommand,
     ChangelogCommand,
     ConfigCommand,
@@ -43,53 +45,62 @@ use Translate5\MaintenanceCli\Command\{
     DatabaseStatCommand,
     DatabaseUpdateCommand,
     DevelopmentCreatetestCommand,
+    DevelopmentDevCommand,
     DevelopmentEcodeCommand,
     DevelopmentGithookCommand,
-    DevelopmentNewModelCommand,
+    DevelopmentLocalServicesCommand,
     DevelopmentNewdbchangeCommand,
-    DevelopmentTriggerworkflowCommand,
+    DevelopmentNewModelCommand,
     DevelopmentOkapiBconfNextVersionCommand,
+    DevelopmentSymlinksCommand,
+    DevelopmentTriggerworkflowCommand,
+    DevelopmentWorkertreeCommand,
     L10nAddCommand,
     L10nRemoveCommand,
+    L10nTaskcreateCommand,
     LogCommand,
     MaintenanceAnnounceCommand,
-    MaintenanceNotifyCommand,
     MaintenanceCommand,
     MaintenanceDisableCommand,
     MaintenanceMessageCommand,
+    MaintenanceNotifyCommand,
     MaintenanceSetCommand,
     OkapiAddCommand,
+    OkapiCleanBconfsCommand,
     OkapiListCommand,
     OkapiPurgeCommand,
     OkapiUpdateCommand,
-    OkapiCleanBconfsCommand,
-    OpenTm2MigrationCommand,
     PluginDisableCommand,
     PluginEnableCommand,
     PluginListCommand,
     ReleaseNotesCommand,
+    RoleListCommand,
     ServiceAutodiscoveryCommand,
     ServiceCheckCommand,
-    DevelopmentLocalServicesCommand,
+    ServicePingCommand,
     SessionImpersonateCommand,
     StatusCommand,
     SystemCheckCommand,
     SystemMailtestCommand,
+    T5Memory\T5MemoryDeleteTmCommand,
+    T5Memory\T5MemoryMigrationCommand,
+    T5Memory\T5MemoryReorganizeCommand,
+    T5Memory\T5memoryTmListCommand,
     TaskCleanCommand,
+    TaskImportCommand,
     TaskInfoCommand,
     TaskSkeletonfileCommand,
-    TermportalReindexCommand,
+    TaskUnlockCommand,
     TermportalDatatypecheckCommand,
+    TermportalReindexCommand,
+    TestAddIniSectionCommand,
+    TestApplicationRunCommand,
     TestApplytestsqlCommand,
+    TestCleanupCommand,
+    TestCreateFaultySegmentCommand,
     TestRunAllCommand,
     TestRunCommand,
     TestRunSuiteCommand,
-    TestApplicationRunCommand,
-    TestAddIniSectionCommand,
-    TestCleanupCommand,
-    TestCreateFaultySegmentCommand,
-    T5memoryTmListCommand,
-    T5MemoryReorganizeCommand,
     UserCreateCommand,
     UserInfoCommand,
     UserUpdateCommand,
@@ -97,12 +108,18 @@ use Translate5\MaintenanceCli\Command\{
     VisualImplantReflownWysiwyg,
     WorkerCleanCommand,
     WorkerListCommand,
-    WorkerQueueCommand};
+    WorkerQueueCommand,
+    WorkerRunCommand,
+    WorkflowCloneCommand,
+    WorkflowListCommand,
+    WorkflowStepCommand};
 use Translate5\MaintenanceCli\Command\SegmentHistoryCommand;
 
 $app = new Application('Translate5 CLI Maintenance', '1.0');
 $commands = [
     new AuthTokenCommand(),
+    new AuthTokenListCommand(),
+    new AuthTokenDeleteCommand(),
     new CachePurgeCommand(),
     new ChangelogCommand(),
     new ConfigCommand(),
@@ -113,13 +130,13 @@ $commands = [
     new LogCommand(),
     new L10nAddCommand(),
     new L10nRemoveCommand(),
+    new L10nTaskcreateCommand(),
     new MaintenanceAnnounceCommand(),
     new MaintenanceNotifyCommand(),
     new MaintenanceCommand(),
     new MaintenanceDisableCommand(),
     new MaintenanceMessageCommand(),
     new MaintenanceSetCommand(),
-    new OpenTm2MigrationCommand(),
     new OkapiAddCommand(),
     new OkapiListCommand(),
     new OkapiPurgeCommand(),
@@ -128,20 +145,26 @@ $commands = [
     new PluginDisableCommand(),
     new PluginEnableCommand(),
     new PluginListCommand(),
+    new RoleListCommand(),
     new SegmentHistoryCommand(),
     new ServiceAutodiscoveryCommand(),
     new ServiceCheckCommand(),
+    new ServicePingCommand(),
     new SessionImpersonateCommand(),
     new StatusCommand(),
     new SystemCheckCommand(),
     new SystemMailtestCommand(),
     new TaskCleanCommand(),
     new TaskInfoCommand(),
+    new TaskImportCommand(),
     new TaskSkeletonfileCommand(),
+    new TaskUnlockCommand(),
     new TermportalReindexCommand(),
     new TermportalDatatypecheckCommand(),
+    new T5MemoryDeleteTmCommand(),
     new T5memoryTmListCommand(),
     new T5MemoryReorganizeCommand(),
+    new T5MemoryMigrationCommand(),
     new UserCreateCommand(),
     new UserUpdateCommand(),
     new UserInfoCommand(),
@@ -150,11 +173,33 @@ $commands = [
     new WorkerCleanCommand(),
     new WorkerListCommand(),
     new WorkerQueueCommand(),
+    new WorkerRunCommand(),
+    new WorkflowCloneCommand(),
+    new WorkflowListCommand(),
+    new WorkflowStepCommand(),
 ];
-if(file_exists('.git')) {
+
+// integrate Plugin-specific CLI commands
+foreach (glob(getcwd().'/application/modules/editor/Plugins/*/CLI/*Command.php') as $pluginCommandFile) {
+    $pluginCommandFileSplitt = explode(DIRECTORY_SEPARATOR, $pluginCommandFile);
+    
+    $pluginName = $pluginCommandFileSplitt[(array_key_last($pluginCommandFileSplitt) - 2)];
+    $commandName = pathinfo($pluginCommandFile, PATHINFO_FILENAME);
+    $commandClass = sprintf('MittagQI\\Translate5\\Plugins\\%s\\CLI\\%s', $pluginName, $commandName);
+    
+    // cause "use" does not work inside the foreach-loop, we simply make a require_once() to include the command-file
+    require_once($pluginCommandFile);
+    
+    // and finally we can add the plugin-specific command to general maintenance-cli :-)
+    $commands[] = new $commandClass();
+}
+
+
+if (file_exists('.git')) {
     $commands[] = new DevelopmentGithookCommand();
     $commands[] = new DevelopmentNewdbchangeCommand();
     $commands[] = new DevelopmentCreatetestCommand();
+    $commands[] = new DevelopmentWorkertreeCommand();
     $commands[] = new TestApplytestsqlCommand();
     $commands[] = new TestRunAllCommand();
     $commands[] = new TestRunCommand();
@@ -171,6 +216,8 @@ if(file_exists('.git')) {
     $commands[] = new \Translate5\MaintenanceCli\Command\TmxFixOpenTM2Command();
     $commands[] = new DevelopmentOkapiBconfNextVersionCommand();
     $commands[] = new DevelopmentLocalServicesCommand();
+    $commands[] = new DevelopmentSymlinksCommand();
+    $commands[] = new DevelopmentDevCommand();
 }
 $app->addCommands($commands);
 $app->run();

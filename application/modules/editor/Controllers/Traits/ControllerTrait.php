@@ -26,6 +26,8 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\ZfExtended\MismatchException;
+
 trait editor_Controllers_Traits_ControllerTrait {
 
     /**
@@ -39,7 +41,8 @@ trait editor_Controllers_Traits_ControllerTrait {
      * @param $ruleA
      * @param array|null|ZfExtended_Models_Entity_Abstract $data
      * @return array
-     * @throws ZfExtended_Mismatch
+     * @throws MismatchException
+     * @throws ReflectionException
      * @throws Zend_Db_Statement_Exception
      * @see editor_Utils::jcheck
      */
@@ -90,7 +93,7 @@ trait editor_Controllers_Traits_ControllerTrait {
      * This may happen while running tests
      *
      * @throws Zend_Db_Statement_Exception
-     * @throws ZfExtended_Mismatch
+     * @throws MismatchException
      * @throws Zend_Db_Statement_Exception
      */
     public function handleData() {

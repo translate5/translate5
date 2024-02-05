@@ -71,7 +71,7 @@ class Editor_SegmentuserassocController extends ZfExtended_RestController {
     public function postAction() {
         $this->decodePutData();
         $this->checkSegmentTaskGuid($this->data->segmentId);
-        $this->entity->createAndSave($this->getCurrentTask()->getTaskGuid(), (int) $this->data->segmentId, editor_User::instance()->getGuid());
+        $this->entity->createAndSave($this->getCurrentTask()->getTaskGuid(), (int) $this->data->segmentId, ZfExtended_Authentication::getInstance()->getUserGuid());
         $this->view->rows = $this->entity->getDataObject();
     }
     

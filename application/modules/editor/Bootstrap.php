@@ -26,18 +26,22 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-/**#@+
- * @author Marc Mittag
- * @package editor
- * @version 1.0
- *
- */
-
+use MittagQI\Translate5\Acl\Rights;
+use MittagQI\Translate5\Acl\Roles;
+use MittagQI\Translate5\Acl\TaskCustomField;
 use MittagQI\Translate5\Applet\AppletAbstract;
+use MittagQI\Translate5\Applet\Dispatcher;
 use MittagQI\Translate5\DbConfig\ActionsEventHandler;
+use MittagQI\Translate5\Segment\UpdateLanguageResourcesWorker;
 use MittagQI\Translate5\Task\Import\DanglingImportsCleaner;
 use MittagQI\Translate5\Task\Import\ImportEventTrigger;
 use MittagQI\Translate5\Service\SystemCheck;
+use MittagQI\Translate5\Task\TaskEventTrigger;
+use MittagQI\Translate5\Workflow\DeleteOpenidUsersAction;
+use MittagQI\ZfExtended\Acl\AutoSetRoleResource;
+use MittagQI\ZfExtended\Acl\ResourceManager as AclResourceManager;
+use MittagQI\ZfExtended\Acl\SetAclRoleResource;
+use ZfExtended_Plugin_Manager as PluginManager;
 
 /**
  * Klasse zur Portalinitialisierung
@@ -100,17 +104,38 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
             }
         );
 
-        $handler = new ActionsEventHandler();
+        $eventHandler = new ActionsEventHandler();
 
         $eventManager->attach(
             editor_ConfigController::class,
             'afterIndexAction',
-            $handler->addDefaultsForNonZeroQualityErrorsSettingOnIndexAction()
+            $eventHandler->addDefaultsForNonZeroQualityErrorsSettingOnIndexAction()
         );
         $eventManager->attach(
             editor_ConfigController::class,
             'afterPutAction',
-            $handler->addDefaultsForNonZeroQualityErrorsSettingOnPutAction()
+            $eventHandler->addDefaultsForNonZeroQualityErrorsSettingOnPutAction()
+        );
+
+        $eventManager->attach(
+            TaskEventTrigger::class,
+            TaskEventTrigger::AFTER_SEGMENT_UPDATE,
+            function (Zend_EventManager_Event $event) {
+                $worker = ZfExtended_Factory::get(UpdateLanguageResourcesWorker::class);
+                $worker->init(parameters: ['segmentId' => $event->getParam('segment')->getId()]);
+                $worker->queue();
+            }
+        );
+
+        $eventManager->attach(
+            editor_ConfigController::class,
+            'afterIndexAction',
+            $eventHandler->addDefaultPMUsersOnIndexAction(DeleteOpenidUsersAction::FALLBACK_PM_CONFIG)
+        );
+        $eventManager->attach(
+            editor_ConfigController::class,
+            'afterPutAction',
+            $eventHandler->addDefaultPMUsersOnPutAction(DeleteOpenidUsersAction::FALLBACK_PM_CONFIG)
         );
     }
     
@@ -119,10 +144,24 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
         ZfExtended_Models_SystemRequirement_Validator::addModule('servicecheck', SystemCheck::class);
 
         // add the default applet editor, if this will change move the register into editor bootstrap
-        \MittagQI\Translate5\Applet\Dispatcher::getInstance()->registerApplet('editor', new class extends AppletAbstract {
+        Dispatcher::getInstance()->registerApplet('editor', new class extends AppletAbstract {
             protected int $weight = 100; //editor should have the heighest weight
             protected string $urlPathPart = '/editor/';
-            protected string $initialPage = 'editor';
+            protected string $initialPage = Rights::APPLET_EDITOR;
+        });
+
+        //configure the Role based resources with the current roleset:
+        SetAclRoleResource::$roleDefinition = Roles::class;
+        AutoSetRoleResource::$roleDefinition = Roles::class;
+
+        //add the module based ACL resources:
+        AclResourceManager::registerResource(Rights::class);
+        AclResourceManager::registerResource(TaskCustomField::class);
+        AclResourceManager::registerResource(Dispatcher::class, true);
+
+        $eventManager = Zend_EventManager_StaticEventManager::getInstance();
+        $eventManager->attach(PluginManager::class, PluginManager::EVENT_AFTER_PLUGIN_BOOTSTRAP, function() {
+            AclResourceManager::registerResource(editor_Task_Type::class, true);
         });
     }
 
@@ -154,15 +193,15 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
      */
     public function _initRestRoutes()
     {
-        
+
         $restRoute = new Zend_Rest_Route($this->front, [], [
             'editor' => [
                 'file','filetree', 'segment', 'alikesegment', 'customer', 'customermeta', 'referencefile', 'comment', 'attributedatatype',
                 'task', 'user', 'taskuserassoc', 'segmentfield', 'workflowuserpref', 'worker','taskmeta',
-                'config', 'segmentuserassoc', 'session', 'language','termcollection',
+                'config', 'segmentuserassoc', 'session', 'language','termcollection', 'taskcustomfield',
                 'languageresourceresource','languageresourcetaskassoc','languageresourcetaskpivotassoc',
                 'languageresourceinstance','taskusertracking', 'term', 'attribute', 'termattribute', 'category',
-                'quality','userassocdefault', 'log', 'collectionattributedatatype'
+                'quality','userassocdefault', 'log', 'collectionattributedatatype', 'token',
             ],
         ]);
         $this->front->getRouter()->addRoute('editorRestDefault', $restRoute);
@@ -514,7 +553,6 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
             ));
         $this->front->getRouter()->addRoute('languageresources_languageresourceinstance_search', $queryRoute);
 
-
         $translateRoute = new ZfExtended_Controller_RestLikeRoute(
             'editor/languageresourceinstance/:languageResourceId/translate',
             array(
@@ -523,7 +561,6 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
                 'action' => 'translate'
             ));
         $this->front->getRouter()->addRoute('languageresources_languageresourceinstance_translate', $translateRoute);
-
 
         $queryRoute = new ZfExtended_Controller_RestLikeRoute(
             'editor/languageresourceinstance/:id/import',
@@ -551,7 +588,6 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
                 'action' => 'engines'
             ));
         $this->front->getRouter()->addRoute('languageresources_languageresourceresource_esngines', $queryRoute);
-
 
         $this->front->getRouter()->addRoute('editorLanguageResourcesEvents', new ZfExtended_Controller_RestLikeRoute(
             'editor/languageresourceinstance/:id/events',
@@ -690,6 +726,36 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
                 'controller' => 'term',
                 'action' => 'transfer'
             ]));
+
+        $this->front->getRouter()->addRoute('editorAttributeHistory', new ZfExtended_Controller_RestLikeRoute(
+            'editor/attribute/:id/history',
+            [
+                'module' => 'editor',
+                'controller' => 'attribute',
+                'action' => 'history'
+            ]
+        ));
+
+        $this->front->getRouter()->addRoute('editorTermHistory', new ZfExtended_Controller_RestLikeRoute(
+            'editor/term/:id/history',
+            [
+                'module' => 'editor',
+                'controller' => 'term',
+                'action' => 'history'
+            ]
+        ));
+
+        // special endpoint to provide configs for API-Tests. Must only be added when serving API-tests
+        if(defined('APPLICATION_APITEST') && APPLICATION_APITEST){
+            $this->front->getRouter()->addRoute('editorConfigApiTest', new ZfExtended_Controller_RestLikeRoute(
+                'editor/config/apitest',
+                array(
+                    'module' => 'editor',
+                    'controller' => 'config',
+                    'action' => 'apitest'
+                )
+            ));
+        }
     }
     
     

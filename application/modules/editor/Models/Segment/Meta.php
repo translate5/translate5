@@ -28,41 +28,47 @@ END LICENSE AND COPYRIGHT
 
 /**
  * Entity Model for segment meta data
- * @method integer getId() getId()
- * @method void setId() setId(int $id)
- * @method string getTaskGuid() getTaskGuid()
- * @method void setTaskGuid() setTaskGuid(string $guid)
- * @method integer getSegmentId() getSegmentId()
- * @method void setSegmentId() setSegmentId(int $id)
- * @method integer getTransunitId() getTransunitId()
- * @method void setTransunitId() setTransunitId(int $id)
- * @method string getSiblingData() getSiblingData()
- * @method integer getMinWidth() getMinWidth()
- * @method void setMinWidth() setMinWidth(int $width)
- * @method integer getMaxWidth() getMaxWidth()
- * @method void setMaxWidth() setMaxWidth(int $width)
- * @method integer getMaxNumberOfLines() getMaxNumberOfLines()
- * @method void setMaxNumberOfLines() setMaxNumberOfLines(int $maxNumberOfLines)
- * @method string getSizeUnit() getSizeUnit()
- * @method void setSizeUnit() setSizeUnit(string $sizeUnit)
- * @method string getFont() getFont()
- * @method void setFont() setFont(string $font)
- * @method integer getFontSize() getFontSize()
- * @method void setFontSize() setFontSize(int $fontSize)
- * @method integer getAdditionalUnitLength() getAdditionalUnitLength()
- * @method void setAdditionalUnitLength() setAdditionalUnitLength(int $length)
- * @method integer getAdditionalMrkLength() getAdditionalMrkLength()
- * @method void setAdditionalMrkLength() setAdditionalMrkLength(int $length) DEPRECATED!
- * @method integer getAutopropagated() getAutopropagated()
- * @method void setAutopropagated() setAutopropagated(int $autopropagated)
- * @method integer getLocked() getLocked()
- * @method void setLocked() setLocked(int $locked)
- * @method integer getSourceWordCount() getSourceWordCount()
- * @method void setSourceWordCount() setSourceWordCount(int $count)
- * @method integer getSourceCharacterCount() getSourceCharacterCount()
- * @method void setSourceCharacterCount() setSourceCharacterCount(int $count)
- * @method string getPreTransLangResUuid() getPreTransLangResUuid()
- * @method void setPreTransLangResUuid() setPreTransLangResUuid(string $uuid)
+ * @method integer getId()
+ * @method void setId(int $id)
+ * @method string getTaskGuid()
+ * @method void setTaskGuid(string $guid)
+ * @method integer getSegmentId()
+ * @method void setSegmentId(int $id)
+ * @method integer getTransunitId()
+ * @method void setTransunitId(int $id)
+ * @method string getTransunitHash()
+ * @method void setTransunitHash(string $transunitHash)
+ * @method string getSiblingData()
+ * @method integer getMinWidth()
+ * @method void setMinWidth(int $width)
+ * @method integer getMaxWidth()
+ * @method void setMaxWidth(int $width)
+ * @method integer getMaxNumberOfLines()
+ * @method void setMaxNumberOfLines(int $maxNumberOfLines)
+ * @method string getSizeUnit()
+ * @method void setSizeUnit(string $sizeUnit)
+ * @method string getFont()
+ * @method void setFont(string $font)
+ * @method integer getFontSize()
+ * @method void setFontSize(int $fontSize)
+ * @method integer getAdditionalUnitLength()
+ * @method void setAdditionalUnitLength(int $length)
+ * @method integer getAdditionalMrkLength()
+ * @method void setAdditionalMrkLength(int $length) DEPRECATED!
+ * @method integer getAutopropagated()
+ * @method void setAutopropagated(bool $autopropagated)
+ * @method integer getLocked()
+ * @method void setLocked(bool $locked)
+ * @method integer getSourceWordCount()
+ * @method void setSourceWordCount(int $count)
+ * @method integer getSourceCharacterCount()
+ * @method void setSourceCharacterCount(int $count)
+ * @method string getPreTransLangResUuid()
+ * @method void setPreTransLangResUuid(string $uuid)
+ * @method string getMrkMid()
+ * @method void setMrkMid(string $mrkMid)
+ * @method string getSourceFileId()
+ * @method void setSourceFileId(string $sourceFileId)
  */
 class editor_Models_Segment_Meta extends ZfExtended_Models_Entity_MetaAbstract {
     protected $dbInstanceClass = 'editor_Models_Db_SegmentMeta';
@@ -102,13 +108,13 @@ class editor_Models_Segment_Meta extends ZfExtended_Models_Entity_MetaAbstract {
      * Updates the additional unit lengths of a transunit
      * Warning: This does not update the materialized view! (Currently not needed since used only in import before mat view creation)
      * @param string $taskGuid
-     * @param string $transunitId
+     * @param string $transunitHash
      * @param integer $additionalUnitLength
      */
-    public function updateAdditionalUnitLength(string $taskGuid, string $transunitId, int $additionalUnitLength) {
+    public function updateAdditionalUnitLength(string $taskGuid, string $transunitHash, int $additionalUnitLength) {
         $this->db->update(['additionalUnitLength' => $additionalUnitLength], [
             'taskGuid = ?' => $taskGuid,
-            'transunitId = ?' => $transunitId,
+            'transunitHash = ?' => $transunitHash,
         ]);
     }
     

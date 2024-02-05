@@ -26,6 +26,8 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\Acl\Rights;
+
 /**
  * Decodes the filter qualities sent by request
  * This is used for the qualities itself as well as the segment grid filter
@@ -34,7 +36,7 @@ END LICENSE AND COPYRIGHT
  * NOTE: the user-restriction is not related to the Request obviously since it is session based but it is needed everywhere the other filters are needed ...
  */
 class editor_Models_Quality_RequestState {
-    
+
     /**
      * 
      * @var editor_Models_Task
@@ -90,8 +92,12 @@ class editor_Models_Quality_RequestState {
             $this->collapsed = (count($parts) < 3 || empty($parts[2]) || $parts[2] == 'NONE') ? '' : $parts[2];
         }
         //  our user restriction, depends on if the user is a normal editor or has the right to manage qualities (and thus sees other users qualities)
-        if(!ZfExtended_Acl::getInstance()->isInAllowedRoles(ZfExtended_Authentication::getInstance()->getRoles(), 'frontend', 'editorManageQualities')){
-            $this->userGuid = ZfExtended_Authentication::getInstance()->getUser()->getUserGuid();
+        if(!ZfExtended_Acl::getInstance()->isInAllowedRoles(
+            ZfExtended_Authentication::getInstance()->getUserRoles(),
+            Rights::ID,
+            Rights::EDITOR_MANAGE_QUALITIES
+        )){
+            $this->userGuid = ZfExtended_Authentication::getInstance()->getUserGuid();
         }
     }
     /**

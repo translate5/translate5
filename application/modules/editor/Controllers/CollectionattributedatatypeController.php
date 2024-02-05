@@ -26,6 +26,8 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\ZfExtended\MismatchException;
+
 /**
  *
  */
@@ -54,9 +56,9 @@ class editor_CollectionattributedatatypeController extends ZfExtended_RestContro
     protected $collectionIds = false;
 
     /**
-     * @throws Zend_Session_Exception
-     * @throws ZfExtended_Mismatch
+     * @throws ReflectionException
      * @throws Zend_Db_Statement_Exception
+     * @throws MismatchException
      */
     public function init() {
 
@@ -66,22 +68,18 @@ class editor_CollectionattributedatatypeController extends ZfExtended_RestContro
         // If request contains json-encoded 'data'-param, decode it and append to request params
         $this->handleData();
 
-        // Pick session
-        $this->_session = (new Zend_Session_Namespace('user'))->data;
-
         // If current user has 'anyCollection'-right on 'editor_term'-resource, it means all collections are accessible
         // Else we should apply collectionsIds-restriction everywhere, so get accessible collections
         $this->collectionIds =
             $this->isAllowed( 'editor_term', 'anyCollection')
-                ?: ZfExtended_Factory
-                    ::get(editor_Models_TermCollection_TermCollection::class)
-                    ->getAccessibleCollectionIds(editor_User::instance()->getModel());
+                ?: ZfExtended_Factory::get(editor_Models_TermCollection_TermCollection::class)
+                    ->getAccessibleCollectionIds(ZfExtended_Authentication::getInstance()->getUser());
     }
 
     /**
      *
      * @throws Zend_Db_Statement_Exception
-     * @throws ZfExtended_Mismatch
+     * @throws MismatchException
      */
     public function indexAction()
     {
@@ -134,7 +132,7 @@ class editor_CollectionattributedatatypeController extends ZfExtended_RestContro
      * Change mapping record
      *
      * @throws Zend_Db_Statement_Exception
-     * @throws ZfExtended_Mismatch
+     * @throws MismatchException
      * @throws ZfExtended_Models_Entity_Exceptions_IntegrityConstraint
      * @throws ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey
      * @throws ZfExtended_Models_Entity_NotFoundException

@@ -26,7 +26,9 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-use MittagQI\Translate5\Segment\QualityService;
+use MittagQI\Translate5\Acl\Rights;
+use MittagQI\Translate5\Task\TaskService;
+use MittagQI\ZfExtended\Acl\SystemResource;
 
 /**
  * Controller for the User Task Associations
@@ -86,7 +88,7 @@ class Editor_TaskuserassocController extends ZfExtended_RestController {
 
     public function postDispatch()
     {
-        if ($this->isAllowed('readAuthHash')) {
+        if ($this->isAllowed(Rights::ID, Rights::READ_AUTH_HASH)) {
             parent::postDispatch();
             return;
         }
@@ -273,28 +275,19 @@ class Editor_TaskuserassocController extends ZfExtended_RestController {
                 ]);
             }
         }
-
-        if (
-            isset($this->data->state)
-            && editor_Workflow_Default::STATE_FINISH != $this->data->state
-            && (new QualityService())->taskHasCriticalErrors($this->entity->getTaskGuid())
-        ) {
-            ZfExtended_Models_Entity_Conflict::addCodes([
-                'E1542' => 'Bitte lösen Sie alle Fehler der folgenden Kategorie ODER setzen Sie sie auf “falscher Fehler”'
-            ]);
-
-            throw ZfExtended_Models_Entity_Conflict::createResponse(
-                'E1542',
-                ['Bitte lösen Sie alle Fehler der folgenden Kategorie ODER setzen Sie sie auf “falscher Fehler”'],
-                ['task' => $this->entity]
-            );
-        }
         
         $this->entity->validate();
 
-        $workflow->hookin()->doWithUserAssoc($oldEntity, $this->entity, function () {
-            $this->entity->save();
-        });
+        $workflow->hookin()->doWithUserAssoc(
+            $oldEntity,
+            $this->entity,
+            function (?string $state) {
+                if ($state) {
+                    TaskService::validateForTaskFinish($state, $this->entity, $this->task);
+                }
+                $this->entity->save();
+            }
+        );
 
         $this->view->rows = $this->entity->getDataObject();
         $this->addUserInfoToResult();
@@ -352,16 +345,13 @@ class Editor_TaskuserassocController extends ZfExtended_RestController {
      * Check if the current logged in user is allowed to POST/PUT/DELETE the given TaskUser Assoc entry
      */
     protected function checkAuthenticatedIsParentOfEntity(){
-        $userSession = new Zend_Session_Namespace('user');
-        $authenticated = $userSession->data;
-        
-        //if i am allowed to see any user:
-        if($this->isAllowed('backend', 'seeAllUsers')) {
+        //if I am allowed to see any user:
+        if($this->isAllowed(SystemResource::ID, SystemResource::SEE_ALL_USERS)) {
             return;
         }
         
         //The authenticated user is allowed to see/edit himself
-        if($this->entity->getUserGuid() === $authenticated->userGuid){
+        if($this->entity->getUserGuid() === ZfExtended_Authentication::getInstance()->getUserGuid()){
             return;
         }
         
@@ -370,7 +360,7 @@ class Editor_TaskuserassocController extends ZfExtended_RestController {
         $user->loadByGuid($this->entity->getUserGuid());
         
         //if the authenticated user is no parent, then he is not allowed to proceed
-        if(!$user->hasParent($authenticated->id)){
+        if(!$user->hasParent(ZfExtended_Authentication::getInstance()->getUserId())){
             throw new ZfExtended_NoAccessException();
         }
     }
@@ -396,33 +386,31 @@ class Editor_TaskuserassocController extends ZfExtended_RestController {
      * Add editable/deletable variable calculated for each user in the response rows.
      */
     protected function applyEditableAndDeletable(){
-        $userSession = new Zend_Session_Namespace('user');
-        $userData=$userSession->data;
-        /** @var ZfExtended_Models_User $userModel */
-        $userModel = ZfExtended_Factory::get('ZfExtended_Models_User');
-        $seeAllUsersAllowed = $this->isAllowed("backend","seeAllUsers");
+        $authentication = ZfExtended_Authentication::getInstance();
+        $userModel = ZfExtended_Factory::get(ZfExtended_Models_User::class);
+        $seeAllUsersAllowed = $this->isAllowed(SystemResource::ID, SystemResource::SEE_ALL_USERS);
         
         if(is_array($this->view->rows)) {
             foreach ($this->view->rows as &$row){
-                if($seeAllUsersAllowed || $row['login']==$userData->login){
+                if($seeAllUsersAllowed || $row['login'] === $authentication->getLogin()){
                     $row['editable']=true;
                     $row['deletable']=true;
                     continue;
                 }
                 //check if the current loged user is a parent for the user in the row
-                $hasParent=$userModel->hasParent($userData->id, $row['parentIds']);
+                $hasParent=$userModel->hasParent($authentication->getUserId(), $row['parentIds']);
                 $row['editable']=$hasParent;
                 $row['deletable']=$hasParent;
             }
         }
         elseif(is_object($this->view->rows)) {
-            if($seeAllUsersAllowed || $this->view->rows->login==$userData->login){
+            if($seeAllUsersAllowed || $this->view->rows->login === $authentication->getLogin()){
                 $this->view->rows->editable=true;
                 $this->view->rows->deletable=true;
                 return;
             }
             //check if the current loged user is a parent for the user in the row
-            $hasParent=$userModel->hasParent($userData->id, $this->view->rows->parentIds);
+            $hasParent=$userModel->hasParent($authentication->getUserId(), $this->view->rows->parentIds);
             $this->view->rows->editable=$hasParent;
             $this->view->rows->deletable=$hasParent;
         }

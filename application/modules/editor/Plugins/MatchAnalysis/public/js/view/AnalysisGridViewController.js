@@ -92,6 +92,20 @@ Ext.define('Editor.plugins.MatchAnalysis.view.AnalysisGridViewController', {
      * On match analysis record is loaded in the store
      */
     onAnalysisRecordLoad:function(store, records, success, operation) {
+
+        // If Tasks-tab was opened by default on t5 app load,
+        // and then MatchAnalysis window was opened via 'MatchAnalysis' menu-item
+        // of the selected task's menu - this handler 'onAnalysisRecordLoad' is
+        // triggered twice, because at this point we have two instances of matchAnalysisGrid-view
+        // and each having it's own instance of matchAnalysisGrid-viewcontroller
+        // Second ones are the ones instantiated by clicking 'MatchAnalysis' menu-item
+        // and it's ok with that, but the first [view + viewcontroller] pair was created
+        // on initial t5 app load, despite Projects-tab was not active by default, and this
+        // means that task was NOT set up for the first view, as that view is not event exist in DOM
+        // So in that case we just skip that
+        if (!this.getView().task) {
+            return;
+        }
         var me=this,
         	view=me.getView(),
             vm = view.getViewModel(),
@@ -110,6 +124,7 @@ Ext.define('Editor.plugins.MatchAnalysis.view.AnalysisGridViewController', {
             hasAnalysisData: hasData,
             created: record && record.get('created'),
             internalFuzzy: record && record.get('internalFuzzy'),
+            errorCount: record && record.get('errorCount'),
             editFullMatch: task && task.get('edit100PercentMatch'),
             strings: view.strings
         });
@@ -127,7 +142,9 @@ Ext.define('Editor.plugins.MatchAnalysis.view.AnalysisGridViewController', {
 
         // Get preset
         var preset = pricingPresetCombo.getSelection();
-        pricingPresetCombo.setDisabled(!preset);
+        if (Editor.app.authenticatedUser.isAllowed('pluginMatchAnalysisPricingPreset')) {
+            pricingPresetCombo.setDisabled(!preset);
+        }
 
         // Set price adjustment and final amount
         if (preset) {

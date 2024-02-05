@@ -185,30 +185,40 @@ final class Config
     /**
      * @param string $type : see LanguageResource::XXX
      * @param string|null $resourceFileName
-     * @param array|null $customerIds
+     * @param int $customerId
      * @param string|null $sourceLanguage
      * @param string|null $targetLanguage
      * @return LanguageResource
      * @throws Exception
      */
-    public function addLanguageResource(string $type, string $resourceFileName = null, int $customerId = -1, string $sourceLanguage = null, string $targetLanguage = null): LanguageResource
-    {
+    public function addLanguageResource(
+        string $type,
+        string $resourceFileName = null,
+        int $customerId = -1,
+        string $sourceLanguage = null,
+        string $targetLanguage = null
+    ): LanguageResource {
         $next = count($this->langResources);
         $resource = $this->createLanguageResource($type, $next);
 
         if ($resourceFileName !== null) {
             $resource->addUploadFile($resourceFileName);
         }
+
         if ($customerId > 0) {
             $resource->setProperty('customerIds', [$customerId]);
         }
+
         if ($sourceLanguage !== null && $resource->hasProperty('sourceLang')) {
             $resource->setProperty('sourceLang', $sourceLanguage);
         }
+
         if ($targetLanguage !== null && $resource->hasProperty('targetLang')) {
             $resource->setProperty('targetLang', $targetLanguage);
         }
+
         $this->langResources[] = $resource;
+
         return $resource;
     }
 
@@ -380,6 +390,17 @@ final class Config
             case LanguageResource::MICROSOFT_TRANSLATOR:
             case 'mstranslator':
                 return new MicrosoftTranslator($this->testClass, $nextIndex);
+
+            case LanguageResource::GOOGLE_TRANSLATE:
+                return new GoogleTranslate($this->testClass,$nextIndex);
+
+            case LanguageResource::OPEN_AI:
+                // TODO FIXME / UGLY: Using classes from Private Plugins ... how to solve ?
+                return new \MittagQI\Translate5\Plugins\OpenAI\Test\Import\OpenAI($this->testClass, $nextIndex);
+
+            case LanguageResource::TILDE_MT:
+                // TODO FIXME / UGLY: Using classes from Private Plugins ... how to solve ?
+                return new \MittagQI\Translate5\Plugins\TildeMT\Test\Import\TildeMt($this->testClass, $nextIndex);
 
             default:
                 throw new Exception('Unknown language-resource type "' . $type . '"');

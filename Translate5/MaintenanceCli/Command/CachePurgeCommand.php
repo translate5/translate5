@@ -70,6 +70,11 @@ class CachePurgeCommand extends Translate5AbstractCommand
             $this->io->error("Errors on purging application cache!");
         }
 
+        //FIXME ebenfalls memcache löschen!
+        // memcache doch in reg legen und alle Nutzungen darauf umbauen, aber erst nach merge von Leons aktueller Glossary Anbindung von 24translate
+        $cache = \Zend_Cache::factory('Core', new \ZfExtended_Cache_MySQLMemoryBackend());
+        $cache->clean();
+
         return 0;
     }
 }

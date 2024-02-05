@@ -129,7 +129,7 @@ class Pivot
                 $connector->setWorkerUserGuid($this->userGuid);
 
                 //throw a warning if the language resource is not available
-                $status = $connector->getStatus($resource);
+                $status = $connector->getStatus($resource, $languageresource);
                 if (!in_array($status, $availableConnectorStatus)) {
                     $this->log->warn('E1239', 'Language resource "{name}" has status "{status}" and is not available for pivot pre-translations.', [
                         'task' => $this->task,
@@ -168,9 +168,9 @@ class Pivot
                     'languageResource' => $languageresource,
                 ], $errors));
                 $this->log->exception($e, [
-                    'task' => $this->task,
                     'level' => $this->log::LEVEL_WARN,
                     'domain' => $this->log->getDomain(),
+                    'extra' => ['task' => $this->task],
                 ]);
                 continue;
             }
@@ -538,7 +538,7 @@ class Pivot
         $this->log->exception($e, [
             'level' => $this->log::LEVEL_WARN,
             'domain' => $this->log->getDomain(),
-            'task' => $this->task,
+            'extra' => ['task' => $this->task],
         ]);
         settype($this->connectorErrorCount[$id], 'integer');
         $this->connectorErrorCount[$id]++;

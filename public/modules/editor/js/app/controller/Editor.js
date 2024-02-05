@@ -72,6 +72,9 @@ Ext.define('Editor.controller.Editor', {
         ref:'filepanel',
         selector:'#filepanel'
     },{
+        ref: 'falsePositiveCheckColumn',
+        selector: '#metapanel #falsePositives grid checkcolumn'
+    },{
         ref:'segmentsHtmleditor',
         selector:'#segmentsHtmleditor'
     },{
@@ -221,12 +224,13 @@ Ext.define('Editor.controller.Editor', {
             'F2':             [Ext.EventObjectImpl.F2,{ctrl: false, alt: false}, me.handleF2KeyPress, true],
             'F3':             [Ext.EventObjectImpl.F3,{ctrl: false, alt: false}, me.handleF3KeyPress, true],
             'alt-F3':         [Ext.EventObjectImpl.F3,{ctrl: false, alt: true}, me.handleAltF3KeyPress, true],
-            'ctrl-insert':    [Ext.EventObjectImpl.INSERT,{ctrl: true, alt: false}, me.copySourceToTarget],
-            'ctrl-dot':       [190,{ctrl: true, alt: false}, me.copySourceToTarget], //Mac Alternative key code,
+            'ctrl-insert':    [Ext.EventObjectImpl.INSERT,{ctrl: true, alt: false}, me.copyReferenceToTarget],
+            'ctrl-dot':       [190,{ctrl: true, alt: false}, me.copyReferenceToTarget], //Mac Alternative key code,
             // DEC_DIGITS:
             // (If you change the setting for a defaultEventAction for DEC_DIGITS,
             // please check if eventIsTranslate5() still works as expected 
             // in Editor.util.Event).
+            'ctrl-alt-DIGIT': [me.DEC_DIGITS,{ctrl: true, alt: true}, me.toggleFalsePositive, true],
             'alt-DIGIT':      [me.DEC_DIGITS,{ctrl: false, alt: true}, me.handleAssignMQMTag, true],
             'DIGIT':          [me.DEC_DIGITS,{ctrl: false, alt: false}, me.handleDigit],
             'ctrl-zoomIn':    [[187, Ext.EventObjectImpl.NUM_PLUS],{ctrl: true, alt: false, shift: false}, me.handleZoomIn, true],
@@ -402,12 +406,14 @@ Ext.define('Editor.controller.Editor', {
         //if needed add current edited segment here too
         vm.set('isEditingSegment', true);
         me.prevNextSegment.calculateRows(context); //context.record, context.rowIdx TODO
-        me.getSourceTags(context);
+        me.getReferenceTags(context);
     },
-    getSourceTags: function(context) {
+    getReferenceTags: function(context) {
         var me = this,
             plug = me.getEditPlugin(),
-            source = context.record.get('source'),
+            source = context.record.get(
+                plug.editor.mainEditor.getReferenceField(context.record.get('target'), context.record.get('pretrans'))
+            ),
             tempNode, walkNodes;
 
         me.sourceTags = [];
@@ -524,7 +530,14 @@ Ext.define('Editor.controller.Editor', {
         if(me.editorKeyMap) {
             me.editorKeyMap.destroy();
         }
-        
+        if(me.editorKeyMap_rowpanel) {
+            me.editorKeyMap_rowpanel.destroy();
+        }
+
+        editor.editorKeyMap_rowpanel = me.editorKeyMap_rowpanel = new Editor.view.segments.EditorKeyMap({
+            target: editor.up().el,
+            binding: me.getKeyMapConfig('editor_rowpanel')
+        });
         editor.editorKeyMap = me.editorKeyMap = new Editor.view.segments.EditorKeyMap({
             target: docEl,
             binding: me.getKeyMapConfig('editor', {
@@ -1103,6 +1116,25 @@ Ext.define('Editor.controller.Editor', {
     handleOpenComments: function() {
         Ext.fireEvent('editorOpenComments');
     },
+
+    /**
+     * Toggle false-positive on any of first 10 qualities, identified by numeric keys 1-9, and key '0' for 10th
+     *
+     * @param key
+     */
+    toggleFalsePositive: function(key) {
+        var me = this,
+            column = me.getFalsePositiveCheckColumn(),
+            rowIndex = (Number(key) - 48 || 10) - 1,
+            record = column.up('grid').getStore().getAt(rowIndex);
+
+        // If no record exists at such rowIndex - return
+        if (!record) return;
+
+        // Fire checkchange-event
+        column.fireEvent('checkchange', column, rowIndex, !record.get('falsePositive'), record);
+    },
+
     /**
      * Handles pressing the MQM tag shortcuts, without shift 1-10, with shift 11-20
      */
@@ -1330,13 +1362,22 @@ Ext.define('Editor.controller.Editor', {
      * F3 editor event handler.
      * This will set the focus in the targetSearch field of concordance search panel
      */
-    handleF3KeyPress: function() {
+    handleF3KeyPress: function(keyCode, event) {
         var me = this,
             searchGrid = me.getLanguageResourceSearchGrid(),
-            field;
+            field,
+            domNode,
+            fieldType;
+
+        if ((domNode = event.getTarget('.type-source'))) {
+            fieldType = 'source';
+        } else {
+            domNode = event.getTarget('.type-target');
+            fieldType = 'target';
+        }
 
         me.searchConcordenceOrSynonym(searchGrid,function (selectedText){
-            field = searchGrid.down('#targetSearch');
+            field = searchGrid.down('#' + fieldType + 'Search');
             if( selectedText === ''){
                 field.focus(false,500);
                 return;
@@ -1345,7 +1386,7 @@ Ext.define('Editor.controller.Editor', {
             field.setValue(selectedText);
             searchGrid.getController().setLastActiveField(field);
             searchGrid.getController().handleSearchAll();
-        });
+        }, domNode);
 
     },
 
@@ -1376,23 +1417,25 @@ Ext.define('Editor.controller.Editor', {
      * @param component
      * @param textCallback
      */
-    searchConcordenceOrSynonym: function (component, textCallback){
+    searchConcordenceOrSynonym: function (component, textCallback, node){
         var me = this,
             editorPanel = me.getLanguageResourceEditorPanel(),
             delay,
             selectedText;
 
-        if(!editorPanel || !component){
+        if(!component){
             return;
         }
-        // expand if collapsed and set the delay to 0.5 sec (delay because of expand animation)
-        if(editorPanel.getCollapsed()){
-            editorPanel.expand();
-            delay = 500;
+        if (editorPanel) {
+            // expand if collapsed and set the delay to 0.5 sec (delay because of expand animation)
+            if(editorPanel.getCollapsed()){
+                editorPanel.expand();
+                delay = 500;
+            }
+            editorPanel.setActiveTab(component);
         }
-        editorPanel.setActiveTab(component);
 
-        selectedText = me.getSelectedTextInEditor();
+        selectedText = me.getSelectedTextInNode(node);
         textCallback(selectedText);
     },
 
@@ -1531,7 +1574,15 @@ Ext.define('Editor.controller.Editor', {
         e.preventDefault();
         var me = this,
             plug = me.getEditPlugin(),
-            segmentId = plug.context.record.get('id'),
+            record = plug.context ? plug.context.record : null;
+
+        // if the user is fast enough to close the window and after this use ctr + v to paste the content, the event
+        // will be fired but the row editor will not exist anymore
+        if(!record){
+            return;
+        }
+
+        var segmentId = record.get('id'),
             internalClip = me.copiedSelectionWithTagHandling || {},
             clipboard = (e.browserEvent.clipboardData || window.clipboardData),
             clipboardText = clipboard.getData('Text'),
@@ -1582,7 +1633,7 @@ Ext.define('Editor.controller.Editor', {
      */
     onEditorSelectionChange: function (){
         var me = this,
-            selectedText = me.getSelectedTextInEditor(),
+            selectedText = me.getSelectedTextInNode(),
             synonymGridExist =  me.getSynonymSearch() !== undefined,
             editorPanelExist = me.getLanguageResourceEditorPanel() !== undefined;
 
@@ -1603,13 +1654,17 @@ Ext.define('Editor.controller.Editor', {
         me.quickSearchInfoMessage.showMessage();
     },
 
-    copySourceToTarget: function() {
+    copyReferenceToTarget: function() {
         var plug = this.getEditPlugin();
         //do only something when editing targets:
         if(!this.isEditing || !/^target/.test(plug.editor.columnToEdit)){
             return;
         }
-        plug.editor.mainEditor.insertMarkup(plug.context.record.get('source'));
+        const referenceField = plug.editor.mainEditor.getReferenceField(
+            plug.context.record.get('target'),
+            plug.context.record.get('pretrans')
+        );
+        plug.editor.mainEditor.insertMarkup(plug.context.record.get(referenceField));
     },
     insertWhitespaceNbsp: function(key,e) {
         this.insertWhitespace(key,e,'nbsp');
@@ -1993,16 +2048,15 @@ Ext.define('Editor.controller.Editor', {
      * Return the current selected text in editor without tags.
      * @returns {string|*}
      */
-    getSelectedTextInEditor: function (){
+    getSelectedTextInNode: function (node){
         var me = this,
-            plug = me.getEditPlugin(),
-            editor = plug.editor.mainEditor,
             selectionInEditor,
-            rangeForSelection,
-            selectedText;
+            rangeForSelection;
 
+        // Use editor body as node by default
+        if (!node) node = me.getEditPlugin().editor.mainEditor.getEditorBody();
 
-        selectionInEditor = rangy.getSelection(editor.getEditorBody());
+        selectionInEditor = rangy.getSelection(node);
         rangeForSelection = selectionInEditor.rangeCount ? selectionInEditor.getRangeAt(0) : null;
         if (rangeForSelection == null || rangeForSelection.collapsed){
             return '';
@@ -2024,7 +2078,7 @@ Ext.define('Editor.controller.Editor', {
         } else {
             var button = this.getSegmentGrid().down('segmentsToolbar #' + item.itemId);
             if (button.dispatcher) {
-                this.buttonClickDispatcher(item);
+                this.buttonClickDispatcher(item,event);
             } else {
                 button.click();
             }

@@ -26,10 +26,19 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\ZfExtended\Acl\ResourceInterface;
+use MittagQI\ZfExtended\Acl\RightDTO;
+
 /**
  * Encapsulates all task types and task type tests
  */
-final class editor_Task_Type {
+final class editor_Task_Type implements ResourceInterface {
+
+    /**
+     * ACL Resource ID
+     */
+    const ID = 'initial_tasktype';
+
     /**
      * Singleton instance
      * @var editor_Task_Type $instance
@@ -183,5 +192,32 @@ final class editor_Task_Type {
      */
     public function getImportProjectType(): string {
         return $this->importTypeProject;
+    }
+
+    /**
+     * Creates the ACL right list provided by the tasktypes
+     * @return array|RightDTO[]
+     */
+    public function getRights(): array
+    {
+        $rights = [];
+        foreach(self::$registeredTypes as $id => $instance) {
+            $acl = new RightDTO();
+            $acl->id = $instance::class;
+            $acl->name = $id;
+            $acl->resource = editor_Task_Type::ID;
+            $acl->description = 'TODO read with reflection from '.$acl->id;
+            $rights[] = $acl;
+        }
+        return $rights;
+    }
+
+    /**
+     * returns the resource ID
+     * @return string
+     */
+    public function getId(): string
+    {
+        return self::ID;
     }
 }

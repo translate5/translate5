@@ -26,6 +26,8 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\Acl\Rights;
+
 /**
  * Import the whole task from an earlier exported Excel-file
  */
@@ -265,10 +267,12 @@ class editor_Models_Import_Excel extends editor_Models_Excel_AbstractExImport {
             $this->addSegmentError($segment->nr, 'count of tags in segment changed in excel');
         }
     }
-    
+
     /**
      * prepares the isPmOveride taskUserAssoc if needed!
      * @return editor_Models_TaskUserAssoc
+     * @throws ReflectionException
+     * @throws Zend_Acl_Exception
      */
     protected function prepareTaskUserAssociation(): editor_Models_TaskUserAssoc {
         $userTaskAssoc = ZfExtended_Factory::get('editor_Models_TaskUserAssoc');
@@ -276,7 +280,11 @@ class editor_Models_Import_Excel extends editor_Models_Excel_AbstractExImport {
         try {
             $acl=ZfExtended_Acl::getInstance();
             $isUserPm=$this->task->getPmGuid()==$this->user->getUserGuid();
-            $isEditAllAllowed=$acl->isInAllowedRoles($this->user->getRoles(), 'backend', 'editAllTasks');
+            $isEditAllAllowed = $acl->isInAllowedRoles(
+                $this->user->getRoles(),
+                Rights::ID,
+                Rights::EDIT_ALL_TASKS
+            );
             $isEditAllTasks = $isEditAllAllowed || $isUserPm;
             //if the user is allowe to load all, use the default loader
             if($isEditAllTasks){

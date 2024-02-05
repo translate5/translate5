@@ -36,12 +36,15 @@ use MittagQI\Translate5\Segment\TagRepair\HtmlProcessor;
  * @method editor_Services_ServiceResult query() query(editor_Models_Segment $segment)
  * @method editor_Services_ServiceResult search() search(string $searchString, $field = 'source', $offset = null)
  * @method editor_Services_ServiceResult translate() translate(string $searchString)
- * @method string getStatus() getStatus(editor_Models_LanguageResources_Resource $resource) returns the LanguageResource status
+ * @method void update(editor_Models_Segment $segment, $recheckOnUpdate = false) editor_Services_Connector_Abstract::update()
+ * @method string getStatus() getStatus(editor_Models_LanguageResources_Resource $resource, editor_Models_LanguageResources_LanguageResource $languageResource = null) returns the LanguageResource status
  * @method string getLastStatusInfo() getLastStatusInfo() returns the last store status info from the last getStatus call
+ * @method string getTm($mime, string $tmName = '') editor_Services_Connector_FilebasedAbstract::getTm()
+ * @method boolean addTm(array $fileInfo = null,array $params=null) editor_Services_Connector_Abstract::addTm()
+ * @method boolean addAdditionalTm(array $fileinfo = null, array $params = null) editor_Services_Connector_Abstract::addAdditionalTm()
  */
 class editor_Services_Connector
 {
-    
     /***
      * The request source when language resources is used is InstantTranslate
      * @var string
@@ -116,6 +119,7 @@ class editor_Services_Connector
     
     /**
      * Init connector for fuzzy usage
+     * TODO FIXME: The method is improperly named as it actually clones or creates a fuzzy connector
      * @param integer  $analysisId
      * @return editor_Services_Connector
      */
@@ -160,12 +164,12 @@ class editor_Services_Connector
      * @return editor_Services_ServiceResult
      */
     protected function _search(string $searchString, $field = 'source', $offset = null) {
-        //searches are always with out tags
+        //searches are always without tags
         return $this->adapter->search(strip_tags($searchString), $field, $offset);
     }
     
     /***
-     * Invoke the translate resource action so the MT logger can be used
+     * Invoke translate resource action so the MT logger can be used
      * This is the main entry point for InstantTranslate
      * @param string $searchString
      * @return editor_Services_ServiceResult
@@ -391,5 +395,19 @@ class editor_Services_Connector
         // for batch query supported resources, set the content field to relais. For pre-translation based on the content field,
         // we check if the field is empty. Pretranslation is posible only for empty content fields
         $this->adapter->setContentField($contentField);
+    }
+
+    /**
+     * Shows if connector can export tm as a file, not a string
+     *
+     * @return bool
+     */
+    public function exportsFile(): bool
+    {
+        if (method_exists($this->adapter, 'exportsFile')) {
+            return $this->adapter->exportsFile();
+        }
+
+        return false;
     }
 }

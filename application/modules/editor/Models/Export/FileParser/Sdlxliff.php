@@ -121,7 +121,7 @@ class editor_Models_Export_FileParser_Sdlxliff extends editor_Models_Export_File
             'user' => htmlspecialchars($comment['userName']),
             'date' => $modifiedObj->format($modifiedObj::ATOM),
             'version' => '1.0',
-            'comment' => htmlspecialchars($comment['comment']),
+            'comment' => htmlspecialchars($comment['comment'], ENT_XML1, 'UTF-8'),
         ];
         if($comment['userGuid'] !== editor_Models_Import_FileParser_Sdlxliff::USERGUID) {
             return '';
@@ -131,8 +131,14 @@ class editor_Models_Export_FileParser_Sdlxliff extends editor_Models_Export_File
             $tagParams['severity'] = $commentMeta->getSeverity();
             $tagParams['version'] = $commentMeta->getVersion();
 
-            //currenly only source comments may (and must since in skeleton) reuse there original id
-            if($commentMeta->getAffectedField() === editor_Models_Import_FileParser_Sdlxliff::SOURCE) {
+            // currently only source and transUnit comments may (and must since in skeleton) reuse there original id
+            if(in_array(
+                $commentMeta->getAffectedField(),
+                [
+                    editor_Models_Import_FileParser_Sdlxliff::SOURCE,
+                    editor_Models_Import_FileParser_Sdlxliff::TRANS_UNIT
+                ]
+            )) {
                 return $commentMeta->getOriginalId();
             }
         }
@@ -150,6 +156,11 @@ class editor_Models_Export_FileParser_Sdlxliff extends editor_Models_Export_File
      */
     protected function writeMatchRate(array $file, int $i) {
         $matchRate = $this->_segmentEntity->getMatchRate();
+        // in case the match-rate is 0, do not generate the percent tag
+        if($matchRate < 1){
+            return $file;
+        }
+
         $mid = $this->_segmentEntity->getMid();
         $segPart =& $file[$i+1];
         //example string
@@ -208,6 +219,8 @@ class editor_Models_Export_FileParser_Sdlxliff extends editor_Models_Export_File
             $commentsAsString = implode('', $this->comments);
             if (strpos($this->_exportFile, '</cmt-defs>')!== false) {
                 $this->_exportFile = str_replace('</cmt-defs>', $commentsAsString . '</cmt-defs>', $this->_exportFile);
+            }elseif (strpos($this->_exportFile, '<cmt-meta-defs>')!== false) {
+                $this->_exportFile = str_replace('<cmt-meta-defs>', '<cmt-defs>' . $commentsAsString . '</cmt-defs><cmt-meta-defs>', $this->_exportFile);
             } elseif (strpos($this->_exportFile, '</doc-info>')!== false) {
                 $this->_exportFile = str_replace('</doc-info>', '<cmt-defs>' . $commentsAsString . '</cmt-defs></doc-info>', $this->_exportFile);
             }

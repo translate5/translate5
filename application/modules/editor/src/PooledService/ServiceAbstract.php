@@ -101,6 +101,17 @@ abstract class ServiceAbstract extends DockerServiceAbstract
     }
 
     /**
+     * Special API for pooled services with a single URL for one pool:
+     * This also is expected to represent a load-balancing and for a single URL maybe multiple workers are queued
+     * @param string $serviceUrl
+     * @return int
+     */
+    public function hasLoadBalancingBehindSingularPool(string $pool): bool
+    {
+        return true;
+    }
+
+    /**
      * Compat with non-pooled services
      * Retrieves the unique sum of all our configured URLs
      * @return array
@@ -108,7 +119,10 @@ abstract class ServiceAbstract extends DockerServiceAbstract
      */
     public function getServiceUrls(): array
     {
-        return array_unique(array_merge($this->getDefaultServiceUrls(), $this->getGuiServiceUrls(), $this->getImportServiceUrls()));
+        $sumUrls = array_merge($this->getDefaultServiceUrls(), $this->getGuiServiceUrls(), $this->getImportServiceUrls());
+        // IMPORTANT: array_unique handles duplicate urls,  array_filter handles misconfigured empty urls
+        // and array_values handles irregular indexed output of these
+        return array_values(array_filter(array_unique($sumUrls)));
     }
 
     /**
@@ -147,6 +161,7 @@ abstract class ServiceAbstract extends DockerServiceAbstract
      * To enable a transition from pooled services (providing an t5-based load-balancing) to docker services which include load-balancing,
      * a pooled-service with just one default-url configured will count as non-pooled service.
      * This will lead to parallel workers up to IPs behind the single URL
+     * Note: also pooled services can have this kind of load-balancing when only a single URL is defined for a pool
      * @return bool
      */
     public function isPooled(): bool
@@ -323,7 +338,7 @@ abstract class ServiceAbstract extends DockerServiceAbstract
      */
     private function getDefaultServiceUrls(): array
     {
-        return $this->getConfigValueFromName($this->configurationConfig['name'], $this->configurationConfig['type'], true);
+        return $this->configHelper->getValue($this->configurationConfig['name'], $this->configurationConfig['type'], true);
     }
 
     /**
@@ -333,7 +348,7 @@ abstract class ServiceAbstract extends DockerServiceAbstract
      */
     private function getGuiServiceUrls(): array
     {
-        return $this->getConfigValueFromName($this->guiConfigurationConfig['name'], $this->guiConfigurationConfig['type'], true);
+        return $this->configHelper->getValue($this->guiConfigurationConfig['name'], $this->guiConfigurationConfig['type'], true);
     }
 
     /**
@@ -343,7 +358,7 @@ abstract class ServiceAbstract extends DockerServiceAbstract
      */
     private function getImportServiceUrls(): array
     {
-        return $this->getConfigValueFromName($this->importConfigurationConfig['name'], $this->importConfigurationConfig['type'], true);
+        return $this->configHelper->getValue($this->importConfigurationConfig['name'], $this->importConfigurationConfig['type'], true);
     }
 
     /**

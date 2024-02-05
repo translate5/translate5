@@ -46,7 +46,9 @@ Ext.define('Editor.view.LanguageResources.TmOverviewPanel', {
     alias: 'widget.tmOverviewPanel',
     controller: 'tmOverviewPanel',
     itemId: 'tmOverviewPanel',
-    title:'#UT#Sprachressourcen',
+    stateful: true,
+    stateId: 'editor.tmOverviewPanel',
+    title: '#UT#Sprachressourcen',
     helpSection: 'languageresource',
     glyph: 'xf1c0@FontAwesome5FreeSolid',
     strings: {
@@ -58,7 +60,7 @@ Ext.define('Editor.view.LanguageResources.TmOverviewPanel', {
         color: '#UT#Farbe',
         refresh: '#UT#Aktualisieren',
         addResource: '#UT#Sprachressource hinzufügen',
-        noTaskAssigned:'#UT#Keine Aufgaben zugewiesen.',
+        noTaskAssigned: '#UT#Keine Aufgaben zugewiesen.',
         sourceLang: '#UT#Quellsprache',
         targetLang: '#UT#Zielsprache',
         languageResourceStatusColumn: '#UT#Status',
@@ -70,18 +72,21 @@ Ext.define('Editor.view.LanguageResources.TmOverviewPanel', {
             noconnection: '#UT#Keine Verbindung!',
             import: '#UT#Import läuft',
             notloaded: '#UT#verfügbar',
-            notchecked:'#UT#Nicht geprüft',
-            novalidlicense: '#UT#Keine gültige Lizenz.'
+            notchecked: '#UT#Nicht geprüft',
+            novalidlicense: '#UT#Keine gültige Lizenz.',
+            tuninginprogress: '#UT#Wird trainiert',
+            reorganize_in_progress: '#UT#Wird reorganisiert',
+            reorganize_failed: '#UT#Reorganisation gescheitert'
         },
-        customers:'#UT#Kunden',
-        useAsDefault:'#UT#Leserechte standardmäßig',
-        writeAsDefault:'#UT#Schreibrechte standardmäßig',
-        taskassocgridcell:'#UT#Zugewiesene Aufgaben',
+        customers: '#UT#Kunden',
+        useAsDefault: '#UT#Leserechte standardmäßig',
+        writeAsDefault: '#UT#Schreibrechte standardmäßig',
+        taskassocgridcell: '#UT#Zugewiesene Aufgaben',
         groupHeader: '#UT#Ressource: {name}',
-        specificDataText:'#UT#Zusätzliche Infos',
-        pivotAsDefault:'#UT#Standardmäßig als Pivot verwenden'
+        specificDataText: '#UT#Zusätzliche Infos',
+        pivotAsDefault: '#UT#Standardmäßig als Pivot verwenden'
     },
-    cls:'tmOverviewPanel',
+    cls: 'tmOverviewPanel',
     height: '100%',
     layout: {
         type: 'fit'
@@ -91,12 +96,15 @@ Ext.define('Editor.view.LanguageResources.TmOverviewPanel', {
 
     initConfig: function(instanceConfig) {
         var me = this,
+            canNotAddLangresource =  ! Editor.app.authenticatedUser.isAllowed('editorAddLangresource'),
+            canNotDeleteLangresource =  ! Editor.app.authenticatedUser.isAllowed('editorDeleteLangresource'),
             service = function(rec) {
                 return Editor.util.LanguageResources.getService(rec.get('serviceName'));
             },
             config = {
                 title: me.title, //see EXT6UPD-9
-                store :'Editor.store.LanguageResources.LanguageResource',
+                tooltip: Editor.data.l10n.languageResources.tooltip,
+                store : 'Editor.store.LanguageResources.LanguageResource',
                 plugins: ['gridfilters'],
                 viewConfig: {
                     getRowClass: function(record) {
@@ -114,11 +122,20 @@ Ext.define('Editor.view.LanguageResources.TmOverviewPanel', {
                     }
                 },
                 features: [{
-                    ftype:'grouping',
+                    ftype: 'grouping',
                     hideGroupedHeader: true,
                     enableGroupingMenu: false
                 }],
                 columns: [{
+                    xtype: 'gridcolumn',
+                    width: 50,
+                    text: 'ID',
+                    dataIndex: 'id',
+                    hidden: true,
+                    filter: {
+                        type: 'numeric'
+                    }
+                },{
                     xtype: 'gridcolumn',
                     width: 170,
                     text: me.strings.resource,
@@ -161,6 +178,7 @@ Ext.define('Editor.view.LanguageResources.TmOverviewPanel', {
                         tooltip: me.strings.erase,
                         action: 'delete',
                         iconCls: 'ico-tm-delete',
+                        hidden: canNotDeleteLangresource,
                         isDisabled: function( view, rowIndex, colIndex, item, record ) {
                             return record.get('status') === 'novalidlicense' ? true : false;
                         }
@@ -168,46 +186,59 @@ Ext.define('Editor.view.LanguageResources.TmOverviewPanel', {
                         tooltip: me.strings.tasks,
                         action: 'tasks',
                         iconCls: 'ico-tm-tasks',
-                        hidden:true,
+                        hidden: true,
                         isDisabled: function( view, rowIndex, colIndex, item, record ) {
-                            item.hidden=!record.get('writable');
+                            // this icon is hidden for resources which are NOT writable
+                            // and visible for all writable resources like (TM - t5memory for example)
+                            item.hidden = !record.get('writable');
+                        }
+                    },{
+                        action: 'specific',
+                        getClass: function(v, meta, r) {
+                            return service(r).getEditSpecificIconClass(r);
+                        },
+                        getTip: function(view, metadata, r){
+                            return service(r).getEditSpecificTooltip(r);
+                        },
+                        isDisabled: function(view, rowIndex, colIndex, item, record) {
+                            return service(record).isEditSpecificDisabled(record);
                         }
                     },{
                         action: 'import',
-	                    getClass:function(v,meta,r) {
+	                    getClass: function(v,meta,r) {
                         	return service(r).getImportIconClass(r);
                         },
-	                    getTip:function(view,metadata,r){
+	                    getTip: function(view,metadata,r){
                             return service(r).getAddTooltip(r);
 	                    },
                         isDisabled: function( view, rowIndex, colIndex, item, record ) {
                             return [record.STATUS_IMPORT, record.STATUS_LOADING].includes(record.get('status'));
-                        },
+                        }
                     },{
                         action: 'download',
-                        getClass:function(v,meta,r) {
+                        getClass: function(v,meta,r) {
                         	return service(r).getDownloadIconClass(r);
                         },
-	                    getTip:function(view,metadata,r){
+	                    getTip: function(view,metadata,r){
 	                    	return service(r).getDownloadTooltip(r);
 	                    },
                         isDisabled: function( view, rowIndex, colIndex, item, record ) {
                             return [record.STATUS_IMPORT, record.STATUS_LOADING].includes(record.get('status'));
-                        },
+                        }
                     },{
                         action: 'export',
-                        getClass:function(v,meta,r) {
+                        getClass: function(v,meta,r) {
                         	return service(r).getExportIconClass(r);
                         },
-	                    getTip:function(view,metadata,r){
+	                    getTip: function(view,metadata,r){
 	                    	return service(r).getExportTooltip(r);
 	                    },
                         isDisabled: function( view, rowIndex, colIndex, item, record ) {
                             return [record.STATUS_IMPORT, record.STATUS_LOADING].includes(record.get('status'));
-                        },
+                        }
                     },{
-                        tooltip: me.strings.log,
                         action: 'log',
+                        tooltip: me.strings.log,
                         getTip:function(view,metadata,r){
                         	return service(r).getLogTooltip(r);
 	                    },
@@ -238,43 +269,44 @@ Ext.define('Editor.view.LanguageResources.TmOverviewPanel', {
                 },{
                     xtype: 'gridcolumn',
                     width: 100,
-                    dataIndex:'customerIds',
+                    dataIndex: 'customerIds',
                     filter: {
                         type: 'customer' // [Multitenancy]
                     },
                     text:me.strings.customers,
+                    tooltip: Editor.data.l10n.languageResources.customers.tooltip,
                     renderer:me.resourceCustomersRenderer
                 },{
                     xtype: 'gridcolumn',
                     width: 270,
-                    dataIndex:'customerUseAsDefaultIds',
+                    dataIndex: 'customerUseAsDefaultIds',
                     filter: {
                         type: 'string'
                     },
                     text:me.strings.useAsDefault,
-                    tooltip:me.strings.useAsDefault,
+                    tooltip: Editor.data.l10n.languageResources.useAsDefault.tooltip,
                     renderer:me.defaultCustomersRenderer
                 },
                 {
                     xtype: 'gridcolumn',
                     width: 270,
-                    dataIndex:'customerWriteAsDefaultIds',
+                    dataIndex: 'customerWriteAsDefaultIds',
                     filter: {
                         type: 'string'
                     },
                     text:me.strings.writeAsDefault,
-                    tooltip:me.strings.writeAsDefault,
+                    tooltip: Editor.data.l10n.languageResources.writeAsDefault.tooltip,
                     renderer:me.defaultCustomersRenderer
                 },
                 {
                     xtype: 'gridcolumn',
                     width: 270,
-                    dataIndex:'customerPivotAsDefaultIds',
+                    dataIndex: 'customerPivotAsDefaultIds',
                     filter: {
                         type: 'string'
                     },
                     text:me.strings.pivotAsDefault,
-                    tooltip:me.strings.pivotAsDefault,
+                    tooltip: Editor.data.l10n.languageResources.pivotAsDefault.tooltip,
                     renderer:me.defaultCustomersRenderer
                 },
                 {
@@ -282,15 +314,18 @@ Ext.define('Editor.view.LanguageResources.TmOverviewPanel', {
                     width: 100,
                     dataIndex: 'color',
                     renderer: function(value, metaData, record) {
-                        return '<div style="float: left; width: 15px; height: 15px;margin-right:5px; border: 1px solid rgba(0, 0, 0, .2);background: #'+record.data.color+';"></div>';
+                        return '<div style="float:left; width:15px; height:15px; margin-right:5px;' +
+                            ' border:1px solid rgba(0,0,0,.2); background:#' +
+                            record.data.color +
+                            ';"></div>';
                     },
                     text: me.strings.color
                 },{
                     xtype: 'gridcolumn',
-                    text:me.strings.specificDataText,
+                    text: me.strings.specificDataText,
                     width: 160,
-                    tdCls:'specificData',
-                    renderer:me.specificDataRenderer,
+                    tdCls: 'specificData',
+                    renderer: me.specificDataRenderer,
                     dataIndex: 'specificData'
                 },{
                     xtype: 'gridcolumn',
@@ -304,7 +339,7 @@ Ext.define('Editor.view.LanguageResources.TmOverviewPanel', {
                         if(value === "loading") { 
                             // show list as soon as possible, so show status on click only due to different latency of the requested TMs
                             meta.tdCls = 'loading';
-                            meta.tdAttr = 'data-qtip="'+str.loading+'"';
+                            meta.tdAttr = 'data-qtip="' + str.loading + '"';
                             return ''; //no string since icon set
                         }
                         if(str[value]){
@@ -324,9 +359,9 @@ Ext.define('Editor.view.LanguageResources.TmOverviewPanel', {
 
                     }
                 },{
-                    xtype:'gridcolumn',
+                    xtype: 'gridcolumn',
                     width: 40,
-                    dataIndex:'taskList',
+                    dataIndex: 'taskList',
                     filter: {
                         type: 'string'
                     },
@@ -357,13 +392,14 @@ Ext.define('Editor.view.LanguageResources.TmOverviewPanel', {
                         glyph: 'f2f1@FontAwesome5FreeSolid',
                         itemId: 'btnRefresh',
                         text: me.strings.refresh,
-                        tooltip: me.strings.refresh
+                        tooltip: Editor.data.l10n.languageResources.refresh
                     },{
                         xtype: 'button',
                         glyph: 'f067@FontAwesome5FreeSolid',
                         itemId: 'btnAddTm',
                         text: me.strings.addResource,
-                        tooltip: me.strings.addResource
+                        tooltip: Editor.data.l10n.languageResources.create,
+                        hidden: canNotAddLangresource,
                     }]
                 }]
       };
@@ -376,19 +412,13 @@ Ext.define('Editor.view.LanguageResources.TmOverviewPanel', {
 
     initComponent: function () {
         var me = this;
-        me.statisticTpl = new Ext.XTemplate(
-            '<table>',
-            '<tpl for=".">',
-            '<tr><td>{text}: </td><td>{value}</td></tr>',
-            '</tpl>',
-            '</table>');
         me.callParent(arguments);
         me.view.on('afterrender', function () {
             me.tooltip = me.createToolTip();
             me.tooltip.on({
                 beforeshow:{
-                    scope:me,
-                    fn:me.onSpecificDataTooltipBeforeShow
+                    scope: me,
+                    fn: me.createSpecificDataTooltip
                 }
             });
         });
@@ -396,7 +426,7 @@ Ext.define('Editor.view.LanguageResources.TmOverviewPanel', {
     },
 
     onDestroy: function () {
-        if (this.tooltip) {
+        if (this.tooltip && this.tooltip.destroy) {
             this.tooltip.destroy();
         }
         this.callParent(arguments);
@@ -408,9 +438,8 @@ Ext.define('Editor.view.LanguageResources.TmOverviewPanel', {
      * @returns {Ext.tip.ToolTip}
      */
     createToolTip: function () {
-        var me = this;
         return Ext.create('Ext.tip.ToolTip', {
-            target: me.view.el,
+            target: this.view.el,
             delegate: 'td.specificData',
             dismissDelay: 0,
             showDelay: 200,
@@ -419,21 +448,71 @@ Ext.define('Editor.view.LanguageResources.TmOverviewPanel', {
         });
     },
 
-    /***
-     * On specificData column before tooltip show event handler
-     * @param tip
+    /**
+     * Creates the specific-data tooltip contents out of the specific-data
+     * @param {Ext.tip.ToolTip} tip
      * @returns {boolean}
      */
-    onSpecificDataTooltipBeforeShow: function updateTipBody(tip) {
-        var me=this,
-            tr = Ext.fly(tip.triggerElement).up('tr'),
-            record = me.view.getRecord(tr),
-            value = record.get('specificData');
+    createSpecificDataTooltip: function updateTipBody(tip) {
+        var tr = Ext.fly(tip.triggerElement).up('tr'),
+            record = this.view.getRecord(tr),
+            specificData = record.getSpecificData(),
+            serviceName = record.get('serviceName');
 
-        if(Ext.isEmpty(value)){
+        if(Ext.Object.isEmpty(specificData)){
             return false;
         }
-        tip.update(me.statisticTpl.apply(Ext.JSON.decode(value)));
+
+        var key, rows = '';
+
+        // fileName shall always come first
+        if(specificData.hasOwnProperty('fileName')){
+            rows += this.createSpecificDataRow('fileName', serviceName, specificData.fileName);
+        }
+
+        // then the others
+        for (key in specificData) {
+            if (key !== 'fileName' && key !== 'status' && key !== 'memories') {
+                rows += this.createSpecificDataRow(key, serviceName, specificData[key]);
+            }
+        }
+
+        // status shall always come last
+        if(specificData.hasOwnProperty('status')){
+            rows += this.createSpecificDataRow('status', serviceName, specificData.status);
+        }
+
+        tip.update('<table>' + rows + '</table>');
+    },
+
+    /**
+     *
+     * @param {string} key
+     * @param {string} serviceName
+     * @param {*} value
+     * @returns {string}
+     */
+    createSpecificDataRow: function(key, serviceName, value){
+        return '<tr><td>' +
+            this.localizeSpecificDataKey(key, serviceName) +
+            ': </td><td>' + value + '</td></tr>';
+    },
+
+    /**
+     * Translates a key of the specific-data using the modern localization via Editor.data.l10n
+     * @param {string} key
+     * @param {string} serviceName
+     * @returns {string}
+     */
+    localizeSpecificDataKey: function(key, serviceName){
+        if(Editor.data.l10n.languageResources.specificData.hasOwnProperty(serviceName) &&
+            Editor.data.l10n.languageResources.specificData[serviceName].hasOwnProperty(key)){
+            return (Editor.data.l10n.languageResources.specificData[serviceName])[key];
+        }
+        if(Editor.data.l10n.languageResources.specificData.all.hasOwnProperty(key)){
+            return Editor.data.l10n.languageResources.specificData.all[key];
+        }
+        return key.charAt(0).toUpperCase() + key.slice(1);
     },
 
     langRenderer : function(val, md) {

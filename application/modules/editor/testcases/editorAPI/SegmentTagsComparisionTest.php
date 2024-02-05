@@ -159,12 +159,96 @@ class SegmentTagsComparisionTest extends editor_Test_SegmentTagsTest {
         $this->createEditedComparisionTest($source, $targetEdited, ['internal_tags_missing']);
         $this->createEditedComparisionTest($targetOriginal, $targetEdited, ['internal_tags_missing']);
     }
+
+    /**
+     * This test ist for a HOTFIX: TS-2856 / TRANSLATE-3495
+     * @return void
+     */
+    public function testRealDataComparision2(): void
+    {
+        $original = 'Tolerances apply from 0.05<div class="open 6270742069643d2231223e266c743b5370656369616c43686172616374657220547970653d224e6f6e427265616b696e675370616365222667743b3c2f627074 internal-tag ownttip"><span class="short" title="<SpecialCharacter Type=&quot;NonBreakingSpace&quot;>">&lt;3&gt;</span><span class="full" data-originalid="1" data-length="-1">&lt;SpecialCharacter Type="NonBreakingSpace"&gt;</span></div><div class="single 636861722074733d226332613022206c656e6774683d2231222f nbsp internal-tag ownttip"><span class="short" title="<1/>: No-Break Space (NBSP)">&lt;1/&gt;</span><span class="full" data-originalid="char" data-length="1">⎵</span></div><div class="close 6570742069643d2231223e266c743b2f5370656369616c4368617261637465722667743b3c2f657074 internal-tag ownttip"><span class="short" title="</SpecialCharacter>">&lt;/3&gt;</span><span class="full" data-originalid="1" data-length="-1">&lt;/SpecialCharacter&gt;</span></div>m to 10<div class="open 6270742069643d2232223e266c743b5370656369616c43686172616374657220547970653d224e6f6e427265616b696e675370616365222667743b3c2f627074 internal-tag ownttip"><span class="short" title="<SpecialCharacter Type=&quot;NonBreakingSpace&quot;>">&lt;4&gt;</span><span class="full" data-originalid="2" data-length="-1">&lt;SpecialCharacter Type="NonBreakingSpace"&gt;</span></div><div class="single 636861722074733d226332613022206c656e6774683d2231222f nbsp internal-tag ownttip"><span class="short" title="<2/>: No-Break Space (NBSP)">&lt;2/&gt;</span><span class="full" data-originalid="char" data-length="1">⎵</span></div><div class="close 6570742069643d2232223e266c743b2f5370656369616c4368617261637465722667743b3c2f657074 internal-tag ownttip"><span class="short" title="</SpecialCharacter>">&lt;/4&gt;</span><span class="full" data-originalid="2" data-length="-1">&lt;/SpecialCharacter&gt;</span></div>m with a confidence level of 95%.';
+        $edited = 'Tolerancia sa aplikuje od 0,05<div class="open 6270742069643d2231223e266c743b5370656369616c43686172616374657220547970653d224e6f6e427265616b696e675370616365222667743b3c2f627074 internal-tag ownttip"><span class="short" title="<SpecialCharacter Type=&quot;NonBreakingSpace&quot;>">&lt;3&gt;</span><span class="full" data-originalid="1" data-length="-1">&lt;SpecialCharacter Type="NonBreakingSpace"&gt;</span></div><div class="single 636861722074733d226332613022206c656e6774683d2231222f nbsp internal-tag ownttip"><span class="short" title="<1/>: No-Break Space (NBSP)">&lt;1/&gt;</span><span class="full" data-originalid="char" data-length="1">⎵</span></div><div class="close 6570742069643d2231223e266c743b2f5370656369616c4368617261637465722667743b3c2f657074 internal-tag ownttip"><span class="short" title="</SpecialCharacter>">&lt;/3&gt;</span><span class="full" data-originalid="1" data-length="-1">&lt;/SpecialCharacter&gt;</span></div>m do 10<div class="open 6270742069643d2232223e266c743b5370656369616c43686172616374657220547970653d224e6f6e427265616b696e675370616365222667743b3c2f627074 internal-tag ownttip"><span class="short" title="<SpecialCharacter Type=&quot;NonBreakingSpace&quot;>">&lt;4&gt;</span><span class="full" data-originalid="2" data-length="-1">&lt;SpecialCharacter Type="NonBreakingSpace"&gt;</span></div><div class="single 636861722074733d226332613022206c656e6774683d2231222f nbsp internal-tag ownttip"><span class="short" title="<2/>: No-Break Space (NBSP)">&lt;2/&gt;</span><span class="full" data-originalid="char" data-length="1">⎵</span></div><div class="close 6570742069643d2232223e266c743b2f5370656369616c4368617261637465722667743b3c2f657074 internal-tag ownttip"><span class="short" title="</SpecialCharacter>">&lt;/4&gt;</span><span class="full" data-originalid="2" data-length="-1">&lt;/SpecialCharacter&gt;</span></div>m s<div class="single 636861722074733d226332613022206c656e6774683d2231222f nbsp internal-tag ownttip"><span class="short" title="<1/>: No-Break Space (NBSP)">&lt;1/&gt;</span><span class="full" data-originalid="char" data-length="1">⎵</span></div>95 % úrovňou spoľahlivosti.';
+        $this->createEditedComparisionTest($original, $edited, ['whitespace_tags_added']);
+    }
+
+    /**
+     * Tests sequences of tags with overlaps/interleaves
+     * @return void
+     */
+    public function testSequenceComparision0()
+    {
+        $markup = 'Lorem ipsum<1><2><5/></1></2> dolor<3><6/></3> sit amet';
+        $this->createStructuralTest($markup, ['internal_tag_structure_faulty']);
+    }
+
+    /**
+     * Tests sequences of tags with overlaps/interleaves
+     * @return void
+     */
+    public function testSequenceComparision1()
+    {
+        $markup = 'Lorem ipsum<1><2><5/></2></1> dolor<3><6/></3> sit amet';
+        $this->createStructuralTest($markup, []);
+    }
+
+    /**
+     * Tests sequences of tags with overlaps/interleaves
+     * @return void
+     */
+    public function testSequenceComparision2()
+    {
+        $markup = 'Lorem ipsum<1><2><5/></2></1> dolor<6/></3><3> sit amet';
+        $this->createStructuralTest($markup, ['internal_tag_structure_faulty']);
+    }
+
+    /**
+     * Tests sequences of tags with overlaps/interleaves
+     * @return void
+     */
+    public function testSequenceComparision3()
+    {
+        $markup = 'Lorem ipsum<7/><1><2></2><3></3><4></4></1><5/> dolor<3><6/></3> sit amet';
+        $this->createStructuralTest($markup, []);
+    }
+
+    /**
+     * Tests sequences of tags with overlaps/interleaves
+     * @return void
+     */
+    public function testSequenceComparision4()
+    {
+        $markup = 'Lorem ipsum<7/><1><2></2><3><4></3></4></1><5/> dolor<3><6/></3> sit amet';
+        $this->createStructuralTest($markup, ['internal_tag_structure_faulty']);
+    }
+
+    /**
+     * Tests sequences of tags with overlaps/interleaves
+     * @return void
+     */
+    public function testSequenceComparision5()
+    {
+        $markup = 'Lorem ipsum<1><2><3><5/></1><6/></2><7/></3>  dolor sit amet';
+        $this->createStructuralTest($markup, ['internal_tag_structure_faulty']);
+    }
+
+    /**
+     * Tests sequences of tags with overlaps/interleaves
+     * @return void
+     */
+    public function testSequenceComparision6()
+    {
+        $markup = 'Lorem ipsum<1><2><5/></1></2><6/><4><3><7/></4></3>  dolor sit amet';
+        $this->createStructuralTest($markup, ['internal_tag_structure_faulty']);
+    }
+
     /**
      * Creates a test only to check the structure of the given markup
      * @param string $markup
      * @param array|string $expectedState
      */
-    private function createStructuralTest($markup, $expectedState){
+    private function createStructuralTest(string $markup, array|string $expectedState)
+    {
+        $markup = $this->replaceInternalComparisionTags($markup);
         $tags = new editor_Segment_FieldTags($this->getTestTask(), 123456, $markup, 'target', 'targetEdit');
         $tagComparision = new editor_Segment_Internal_TagComparision($tags, null);
         $this->assertEquals($expectedState, $tagComparision->getStati());

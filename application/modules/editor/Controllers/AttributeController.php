@@ -25,6 +25,10 @@ START LICENSE AND COPYRIGHT
 
 END LICENSE AND COPYRIGHT
 */
+use editor_Models_Terminology_Models_TermModel as TermModel;
+use editor_Models_Terminology_Models_AttributeModel as AttributeModel;
+use editor_Models_TermCollection_TermCollection as TermCollection;
+use MittagQI\ZfExtended\MismatchException;
 
 /**
  *
@@ -39,10 +43,10 @@ class editor_AttributeController extends ZfExtended_RestController
     /**
      * @var string
      */
-    protected $entityClass = 'editor_Models_Terminology_Models_AttributeModel';
+    protected $entityClass = AttributeModel::class;
 
     /**
-     * @var editor_Models_Terminology_Models_AttributeModel
+     * @var AttributeModel
      */
     protected $entity;
 
@@ -92,13 +96,13 @@ class editor_AttributeController extends ZfExtended_RestController
         // If request contains json-encoded 'data'-param, decode it and append to request params
         $this->handleData();
 
-        $termCollection = ZfExtended_Factory::get(editor_Models_TermCollection_TermCollection::class);
+        $termCollection = ZfExtended_Factory::get(TermCollection::class);
 
         // If current user has 'termPM_allClients' role, it means all collections are accessible
         // Else we should apply collectionsIds-restriction everywhere, so get accessible collections
         $this->collectionIds =
             $this->isAllowed('editor_term', 'anyCollection')
-                ?: $termCollection->getAccessibleCollectionIds(editor_User::instance()->getModel());
+                ?: $termCollection->getAccessibleCollectionIds(ZfExtended_Authentication::getInstance()->getUser());
     }
 
     /**
@@ -142,7 +146,7 @@ class editor_AttributeController extends ZfExtended_RestController
 
             // Fetch ids of ALL terms matching last search, excluding ids given by 'except'-param
             $termIdA = ZfExtended_Factory
-                ::get('editor_Models_Terminology_Models_TermModel')
+                ::get(TermModel::class)
                 ->searchTermByParams(
                     $_SESSION['lastParams'] + ['except' => join(',', $termIdA)],
                     $total
@@ -162,7 +166,7 @@ class editor_AttributeController extends ZfExtended_RestController
      * Create attribute
      *
      * @throws Zend_Db_Statement_Exception
-     * @throws ZfExtended_Mismatch
+     * @throws MismatchException
      */
     public function postAction() {
 
@@ -172,7 +176,7 @@ class editor_AttributeController extends ZfExtended_RestController
         // Validate termId-param and also validate dataType-param and load it's model instance
         $_ = $this->jcheck([
             'termId' => [
-                'req' => true,
+                'req' => !$this->getParam('batch'),
                 'rex' => $this->getParam('batch') ? 'int11list' : 'int11'
             ],
             'level' => [
@@ -260,7 +264,7 @@ class editor_AttributeController extends ZfExtended_RestController
      *
      * @param $_
      * @throws Zend_Db_Statement_Exception
-     * @throws ZfExtended_Mismatch
+     * @throws MismatchException
      */
     protected function _postCheck($_) {
 
@@ -269,7 +273,7 @@ class editor_AttributeController extends ZfExtended_RestController
             'termId' => [
                 'req' => true,
                 'rex' => 'int11',
-                'key' => 'editor_Models_Terminology_Models_TermModel'
+                'key' => TermModel::class
             ],
         ]);
 
@@ -299,7 +303,7 @@ class editor_AttributeController extends ZfExtended_RestController
     /**
      * Update attribute
      *
-     * @throws ZfExtended_Mismatch
+     * @throws MismatchException
      */
     public function putAction() {
 
@@ -461,7 +465,7 @@ class editor_AttributeController extends ZfExtended_RestController
     /**
      * Delete attribute
      *
-     * @throws ZfExtended_Mismatch
+     * @throws MismatchException
      */
     public function deleteAction() {
 
@@ -526,7 +530,7 @@ class editor_AttributeController extends ZfExtended_RestController
 
             // Update collection stats
             ZfExtended_Factory
-                ::get('editor_Models_TermCollection_TermCollection')
+                ::get(TermCollection::class)
                 ->updateStats($this->entity->getCollectionId(), [
                     'termEntry' => 0,
                     'term' => 0,
@@ -550,7 +554,7 @@ class editor_AttributeController extends ZfExtended_RestController
     /**
      *
      * @throws Zend_Db_Statement_Exception
-     * @throws ZfExtended_Mismatch
+     * @throws MismatchException
      */
     public function xrefcreateAction($_) {
 
@@ -583,7 +587,7 @@ class editor_AttributeController extends ZfExtended_RestController
 
     /**
      * @throws Zend_Db_Statement_Exception
-     * @throws ZfExtended_Mismatch
+     * @throws MismatchException
      */
     public function refcreateAction($_) {
 
@@ -616,7 +620,7 @@ class editor_AttributeController extends ZfExtended_RestController
 
     /**
      * @throws Zend_Db_Statement_Exception
-     * @throws ZfExtended_Mismatch
+     * @throws MismatchException
      */
     public function figurecreateAction($_) {
 
@@ -652,7 +656,7 @@ class editor_AttributeController extends ZfExtended_RestController
     }
 
     /**
-     * @throws ZfExtended_Mismatch
+     * @throws MismatchException
      */
     public function attrcreateAction($_) {
 
@@ -715,7 +719,7 @@ class editor_AttributeController extends ZfExtended_RestController
 
 
     /**
-     * @throws ZfExtended_Mismatch
+     * @throws MismatchException
      */
     public function xrefupdateAction() {
 
@@ -747,7 +751,7 @@ class editor_AttributeController extends ZfExtended_RestController
     }
 
     /**
-     * @throws ZfExtended_Mismatch
+     * @throws MismatchException
      */
     public function refupdateAction() {
 
@@ -794,7 +798,7 @@ class editor_AttributeController extends ZfExtended_RestController
             $refTargetIdA[$target] = [$level, $attrId];
 
             // Call $this->_refTarget() with that args
-            editor_Models_Terminology_Models_AttributeModel::refTarget($refA, $refTargetIdA, $prefLangA, $level);
+            AttributeModel::refTarget($refA, $refTargetIdA, $prefLangA, $level);
 
             // Append refTarget data to the response
             $data += $refA[$level][$attrId];
@@ -805,7 +809,7 @@ class editor_AttributeController extends ZfExtended_RestController
     }
 
     /**
-     * @throws ZfExtended_Mismatch
+     * @throws MismatchException
      */
     public function figureupdateAction() {
 
@@ -858,11 +862,11 @@ class editor_AttributeController extends ZfExtended_RestController
     }
 
     /**
-     * @param editor_Models_Terminology_Models_AttributeModel|null $drop
+     * @param AttributeModel|null $drop
      * @throws ZfExtended_Exception
-     * @throws ZfExtended_Mismatch
+     * @throws MismatchException
      */
-    public function attrupdateAction(editor_Models_Terminology_Models_AttributeModel $drop = null) {
+    public function attrupdateAction(AttributeModel $drop = null) {
 
         // Check request params and return an array, containing records
         // fetched from database by dataTypeId-param (and termId-param, if given)
@@ -882,7 +886,7 @@ class editor_AttributeController extends ZfExtended_RestController
 
             // Update collection stats
             ZfExtended_Factory
-                ::get('editor_Models_TermCollection_TermCollection')
+                ::get(TermCollection::class)
                 ->updateStats($drop->getCollectionId(), [
                     'termEntry' => 0,
                     'term' => 0,
@@ -960,12 +964,12 @@ class editor_AttributeController extends ZfExtended_RestController
      * so this method get all term's attributes that may affect term's `status` and recalculate
      * and return the value for `status`
      *
-     * @param editor_Models_Terminology_Models_TermModel $termM
-     * @param editor_Models_Terminology_Models_AttributeModel $attrM
+     * @param TermModel $termM
+     * @param AttributeModel $attrM
      * @return array
      * @throws ZfExtended_Exception
      */
-    protected function _updateTermStatus(editor_Models_Terminology_Models_TermModel $termM, editor_Models_Terminology_Models_AttributeModel $attrM): array {
+    protected function _updateTermStatus(TermModel $termM, AttributeModel $attrM): array {
 
         /* @var $termNoteStatus editor_Models_Terminology_TermStatus */
         $termNoteStatus = ZfExtended_Factory::get('editor_Models_Terminology_TermStatus');
@@ -1009,7 +1013,7 @@ class editor_AttributeController extends ZfExtended_RestController
      *
      * @param bool $valueRequired
      * @return array
-     * @throws ZfExtended_Mismatch
+     * @throws MismatchException
      */
     protected function _attrupdateCheck($valueRequired = true) {
 
@@ -1020,7 +1024,7 @@ class editor_AttributeController extends ZfExtended_RestController
             ],
             'termId' => [
                 'rex' => 'int11',
-                'key' => 'editor_Models_Terminology_Models_TermModel'
+                'key' => TermModel::class
             ]
         ], $this->entity);
 
@@ -1042,38 +1046,15 @@ class editor_AttributeController extends ZfExtended_RestController
      * If is not allowed - exception will be thrown
      *
      * @param array $_ data, picked by previous $this->jcheck() call
-     * @throws ZfExtended_Mismatch
+     * @throws MismatchException
      */
     protected function _attrupdateCheckProcessStatusChangeIsAllowed($_) {
 
         // Get current value of processStatus attribute, that should be involved in validation
         $current = $_['termId']->getProposal() ? 'unprocessed' : $this->entity->getValue();
 
-        // Define which old values can be changed to which new values
-        $allow = false;
-        $allowByRight = [
-            'review'    => ['unprocessed' => ['provisionallyProcessed' => true, 'rejected' => true]],
-            'finalize'  => ['provisionallyProcessed' => ['finalized' => true, 'rejected' => true]],
-            'propose'   => [],
-            'anyStatus' => true, // any change allowed
-        ];
-
-        // Merge allowed
-        foreach ($allowByRight as $right => $info) {
-            if ($this->isAllowed('editor_term', $right)) {
-                $allow = is_bool($info) || is_bool($allow)
-                    ? $info
-                    : $info + $allow;
-            }
-        }
-
-        // Prepare list of allowed values
-        $allowed = [];
-        foreach(explode(',', $_['dataTypeId']['picklistValues']) as $possible) {
-            if ($allow === true || (is_array($allow[$current] ?? 0) && ($allow[$current][$possible] ?? 0))) {
-                $allowed []= $possible;
-            }
-        }
+        // Get list of allowed process statuses
+        $allowed = TermModel::getAllowedProcessStatuses($current, false);
 
         // Make sure only allowed values can be set as new value of processStatus attribute
         $this->jcheck([
@@ -1116,5 +1097,30 @@ class editor_AttributeController extends ZfExtended_RestController
             //'dataType' => null
             'isDraft' => $this->batch ? 1 : 0
         ]);
+    }
+
+    /**
+     * Get history for an attribute
+     *
+     * @throws ReflectionException
+     * @throws Zend_Db_Statement_Exception
+     * @throws MismatchException
+     */
+    public function historyAction() {
+
+        // Load entity internally
+        $this->entityLoad();
+
+        // If no or only certain collections are accessible - validate collection accessibility
+        if ($this->collectionIds !== true) $this->jcheck([
+            'collectionId' => [
+                'fis' => $this->collectionIds ?: 'invalid' // FIND_IN_SET
+            ],
+        ], $this->entity);
+
+        // Load history and assign to response
+        $this->view->history = ZfExtended_Factory
+            ::get(editor_Models_Term_AttributeHistory::class)
+            ->getByAttrId($this->entity->getId(), $this->getParam('language'));
     }
 }

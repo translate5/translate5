@@ -47,6 +47,20 @@ class editor_Services_TermCollection_Connector extends editor_Services_Connector
     }
 
     /**
+     * Set the source and the target langauge with the same value as the requested search langauges values.
+     * Later the SearchCollection class filters the languages using the fuzzy logic.
+     * @param int|null $sourceLang
+     * @param int|null $targetLang
+     * @return void
+     */
+    protected function setServiceLanguages(?int $sourceLang, ?int $targetLang): void
+    {
+        $this->sourceLang = $sourceLang;
+        $this->targetLang = $targetLang;
+    }
+
+    /**
+     *
      * {@inheritDoc}
      * @see editor_Services_Connector_FilebasedAbstract::addTm()
      */
@@ -70,12 +84,12 @@ class editor_Services_TermCollection_Connector extends editor_Services_Connector
 
         $import->mergeTerms = isset($params['mergeTerms']) ? filter_var($params['mergeTerms'], FILTER_VALIDATE_BOOLEAN) : false;
 
-        $userGuid = $params['userGuid'] ?? editor_User::instance()->getGuid();
+        $userGuid = $params['userGuid'] ?? ZfExtended_Authentication::getInstance()->getUserGuid();
         $import->loadUser($userGuid);
 
         //import the term collection
         if (!$import->parseTbxFile($fileinfo, $this->languageResource->getId())) {
-            $this->logger->error('E1321', 'Term Collection Import: Errors on parsing the TBX, the file could not be imported.');
+            $this->logger->error('E1321', 'Term Collection Import: Errors on parsing the TBX, the file could not be imported or contains no term entries.');
             return false;
         }
 
@@ -200,8 +214,16 @@ class editor_Services_TermCollection_Connector extends editor_Services_Connector
      * {@inheritDoc}
      * @see editor_Services_Connector_Abstract::getStatus()
      */
-    public function getStatus(editor_Models_LanguageResources_Resource $resource)
+    public function getStatus(
+        editor_Models_LanguageResources_Resource $resource,
+        editor_Models_LanguageResources_LanguageResource $languageResource = null
+    ): string
     {
+        // is may injected with the call
+        if(!empty($languageResource)){
+            $this->languageResource = $languageResource;
+        }
+
         if (!isset($this->languageResource)) {
             //this should come from the resource status check in the resources api request
             return self::STATUS_AVAILABLE;

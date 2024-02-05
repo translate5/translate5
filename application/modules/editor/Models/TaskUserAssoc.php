@@ -32,50 +32,53 @@ END LICENSE AND COPYRIGHT
  * @version 1.0
  *
  */
+
+use MittagQI\ZfExtended\Logger\CustomFileLogger;
+use MittagQI\ZfExtended\Session\SessionInternalUniqueId;
+
 /**
  * TaskUserAssoc Object Instance as needed in the application
- * @method integer getId() getId()
- * @method string getTaskGuid() getTaskGuid()
- * @method string getUserGuid() getUserGuid()
- * @method string getState() getState()
- * @method string getRole() getRole()
- * @method string getWorkflowStepName() getWorkflowStepName()
- * @method string getWorkflow() getWorkflow()
- * @method string getSegmentrange() getSegmentrange()
- * @method string getUsedState() getUsedState()
- * @method string getUsedInternalSessionUniqId() getUsedInternalSessionUniqId()
- * @method boolean getIsPmOverride() getIsPmOverride()
- * @method void setId() setId(int $id)
- * @method void setTaskGuid() setTaskGuid(string $taskGuid)
- * @method void setUserGuid() setUserGuid(string $userGuid)
- * @method void setState() setState(string $state)
- * @method void setRole() setRole(string $role)
- * @method void setWorkflowStepName() setWorkflowStepName(string $step)
- * @method void setWorkflow() setWorkflow(string $workflow)
- * @method void setSegmentrange() setSegmentrange(string $segmentrange)
- * @method void setUsedState() setUsedState(string $state)
- * @method void setUsedInternalSessionUniqId() setUsedInternalSessionUniqId(string $sessionId)
- * @method void setIsPmOverride() setIsPmOverride(bool $isPmOverride)
- * @method string getStaticAuthHash() getStaticAuthHash()
- * @method void setStaticAuthHash() setStaticAuthHash(string $hash)
- * @method string getAssignmentDate() getAssignmentDate()
- * @method void setAssignmentDate() setAssignmentDate(string $assignment)
- * @method string getFinishedDate() getFinishedDate()
- * @method void setFinishedDate() setFinishedDate(string $datetime)
- * @method string getDeadlineDate() getDeadlineDate()
- * @method void setDeadlineDate() setDeadlineDate(string $datetime)
- * @method int getTrackchangesShow() getTrackchangesShow()
- * @method void setTrackchangesShow() setTrackchangesShow(int $isAllowed)
- * @method int getTrackchangesShowAll() getTrackchangesShowAll()
- * @method void setTrackchangesShowAll() setTrackchangesShowAll(int $isAllowed)
- * @method int getTrackchangesAcceptReject() getTrackchangesAcceptReject()
- * @method void setTrackchangesAcceptReject() setTrackchangesAcceptReject(int $isAllowed)
+ * @method integer getId()
+ * @method string getTaskGuid()
+ * @method string getUserGuid()
+ * @method string getState()
+ * @method string getRole()
+ * @method string getWorkflowStepName()
+ * @method string getWorkflow()
+ * @method string getSegmentrange()
+ * @method string getUsedState()
+ * @method string getUsedInternalSessionUniqId()
+ * @method boolean getIsPmOverride()
+ * @method void setId(int $id)
+ * @method void setTaskGuid(string $taskGuid)
+ * @method void setUserGuid(string $userGuid)
+ * @method void setState(string $state)
+ * @method void setRole(string $role)
+ * @method void setWorkflowStepName(string $step)
+ * @method void setWorkflow(string $workflow)
+ * @method void setSegmentrange(string $segmentrange)
+ * @method void setUsedState(string $state)
+ * @method void setUsedInternalSessionUniqId(string $sessionId)
+ * @method void setIsPmOverride(bool $isPmOverride)
+ * @method string getStaticAuthHash()
+ * @method void setStaticAuthHash(string $hash)
+ * @method string getAssignmentDate()
+ * @method void setAssignmentDate(string $assignment)
+ * @method string getFinishedDate()
+ * @method void setFinishedDate(string $datetime)
+ * @method string getDeadlineDate()
+ * @method void setDeadlineDate(string $datetime)
+ * @method int getTrackchangesShow()
+ * @method void setTrackchangesShow(int $isAllowed)
+ * @method int getTrackchangesShowAll()
+ * @method void setTrackchangesShowAll(int $isAllowed)
+ * @method int getTrackchangesAcceptReject()
+ * @method void setTrackchangesAcceptReject(int $isAllowed)
  *
  */
 class editor_Models_TaskUserAssoc extends ZfExtended_Models_Entity_Abstract {
     protected $dbInstanceClass = 'editor_Models_Db_TaskUserAssoc';
     protected $validatorInstanceClass = 'editor_Models_Validator_TaskUserAssoc';
-
 
     /***
      * @param string $taskGuid
@@ -480,6 +483,12 @@ class editor_Models_TaskUserAssoc extends ZfExtended_Models_Entity_Abstract {
         $sessions = new ZfExtended_Models_Db_Session();
         $validSessionIds = $sessions->getValidSessionsSql();
 
+        // TODO: REMOVE ME LATER WHEN WE HAVE INFO ABOUT THE NOACCESS ERROR. THIS IS ONLY TEMP DEBUG CODE TO COLLECT
+        // MORE INFO ABOUT THE BUG
+        $customFileLogger = ZfExtended_Factory::get(CustomFileLogger::class);
+        $customFileLogger->log('Request url: '.$_SERVER['REQUEST_URI']);
+        $customFileLogger->log('Found validSessionIds sql : '.$validSessionIds);
+
         //load all used jobs where the usage is not valid anymore
         $where = array('not usedState is null and (usedInternalSessionUniqId not in ('.$validSessionIds.') or usedInternalSessionUniqId is null)' => null);
         if(!empty($taskGuid)) {
@@ -490,11 +499,17 @@ class editor_Models_TaskUserAssoc extends ZfExtended_Models_Entity_Abstract {
             $where['taskGuid = ?'] = $taskGuid;
         }
 
+
         $s = $this->db->select()->from($this->db, ['taskGuid', 'userGuid']);
         foreach($where as $condition => $valToQuote) {
             $s->where($condition, $valToQuote);
         }
         $taskUserAssoc = $this->db->fetchAll($s)->toArray();
+
+        // TODO: REMOVE ME LATER WHEN WE HAVE INFO ABOUT THE NOACCESS ERROR. THIS IS ONLY TEMP DEBUG CODE TO COLLECT
+        // MORE INFO ABOUT THE BUG
+        $customFileLogger->log('TaskUserAssocs query: '.$s->assemble());
+        $customFileLogger->log('TaskUserAssocs query results : '.print_r($taskUserAssoc,true));
 
         //reopen each found job, keeping workflow transition check
         $taskGuids = array_unique(array_column($taskUserAssoc, 'taskGuid'));
@@ -526,6 +541,15 @@ class editor_Models_TaskUserAssoc extends ZfExtended_Models_Entity_Abstract {
         foreach($taskUserAssoc as $job) {
             $task->unlockForUser($job['userGuid'], $job['taskGuid']);
         }
+
+        // TODO: REMOVE ME LATER WHEN WE HAVE INFO ABOUT THE NOACCESS ERROR. THIS IS ONLY TEMP DEBUG CODE TO COLLECT
+        // MORE INFO ABOUT THE BUG
+        if(Zend_Session::isStarted() && !Zend_Session::isDestroyed()){
+            $customFileLogger->log('My current internalSessionUniqId : '.SessionInternalUniqueId::getInstance()->get());
+            $customFileLogger->log('My current sessionId : '.Zend_Session::getId());
+        }
+
+        $customFileLogger->write();
     }
 
     /**
@@ -534,7 +558,7 @@ class editor_Models_TaskUserAssoc extends ZfExtended_Models_Entity_Abstract {
      */
     public function isUsed() {
         $validSessionIds = ZfExtended_Models_Db_Session::GET_VALID_SESSIONS_SQL;
-        $validSessionIds .= ' AND internalSessionUniqId = ?';
+        $validSessionIds .= ' AND s.internalSessionUniqId = ?';
         $res = $this->db->getAdapter()->query($validSessionIds, array($this->getUsedInternalSessionUniqId()));
         $validSessions = $res->fetchAll();
         //if usedInternalSessionUniqId not exists in the session table reset it,

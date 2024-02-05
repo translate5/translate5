@@ -26,6 +26,7 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\Acl\Rights;
 use MittagQI\Translate5\Segment\QualityService;
 use MittagQI\Translate5\Task\Export\Package\Downloader;
 use MittagQI\Translate5\Task\Import\ImportService;
@@ -34,7 +35,9 @@ use MittagQI\Translate5\Task\Import\TaskDefaults;
 use MittagQI\Translate5\Task\Import\TaskUsageLogger;
 use MittagQI\Translate5\Task\Lock;
 use MittagQI\Translate5\Task\TaskContextTrait;
+use MittagQI\Translate5\Task\TaskService;
 use MittagQI\ZfExtended\Controller\Response\Header;
+use MittagQI\ZfExtended\Session\SessionInternalUniqueId;
 use PhpOffice\PhpSpreadsheet\Writer\Exception;
 
 class editor_TaskController extends ZfExtended_RestController
@@ -42,6 +45,7 @@ class editor_TaskController extends ZfExtended_RestController
 
     use TaskContextTrait;
 
+    const BACKEND = 'backend';
     protected $entityClass = 'editor_Models_Task';
 
     /**
@@ -52,9 +56,9 @@ class editor_TaskController extends ZfExtended_RestController
 
     /**
      * logged in user
-     * @var Zend_Session_Namespace
+     * @var ZfExtended_Models_User|null
      */
-    protected $user;
+    protected ?ZfExtended_Models_User $authenticatedUser;
 
     /**
      * @var editor_Models_Task
@@ -157,7 +161,7 @@ class editor_TaskController extends ZfExtended_RestController
 
         parent::init();
         $this->now = date('Y-m-d H:i:s', $_SERVER['REQUEST_TIME']);
-        $this->user = new Zend_Session_Namespace('user');
+        $this->authenticatedUser = ZfExtended_Authentication::getInstance()->getUser();
         $this->workflowManager = ZfExtended_Factory::get(editor_Workflow_Manager::class);
         $this->translate = ZfExtended_Zendoverwrites_Translate::getInstance();
         $this->config = Zend_Registry::get('config');
@@ -294,7 +298,7 @@ class editor_TaskController extends ZfExtended_RestController
         $this->addDefaultSort();
         //set the default table to lek_task
         $this->entity->getFilter()->setDefaultTable('LEK_task');
-        $this->view->rows=$this->entity->loadUserList($this->user->data->userGuid);
+        $this->view->rows=$this->entity->loadUserList($this->authenticatedUser->getUserGuid());
     }
 
     /**
@@ -303,7 +307,7 @@ class editor_TaskController extends ZfExtended_RestController
      */
     protected function loadAll(){
         // here no check for pmGuid, since this is done in task::loadListByUserAssoc
-        $isAllowedToLoadAll = $this->isAllowed('backend', 'loadAllTasks');
+        $isAllowedToLoadAll = $this->isAllowed(Rights::ID, Rights::LOAD_ALL_TASKS);
         //set the default table to lek_task
         $this->entity->getFilter()->setDefaultTable('LEK_task');
         if($isAllowedToLoadAll) {
@@ -311,8 +315,11 @@ class editor_TaskController extends ZfExtended_RestController
             $rows = $this->entity->loadAll();
         }
         else {
-            $this->totalCount = $this->entity->getTotalCountByUserAssoc($this->user->data->userGuid, $isAllowedToLoadAll);
-            $rows = $this->entity->loadListByUserAssoc($this->user->data->userGuid, $isAllowedToLoadAll);
+            $this->totalCount = $this->entity->getTotalCountByUserAssoc(
+                $this->authenticatedUser->getUserGuid(),
+                $isAllowedToLoadAll
+            );
+            $rows = $this->entity->loadListByUserAssoc($this->authenticatedUser->getUserGuid(), $isAllowedToLoadAll);
         }
         return $rows;
     }
@@ -327,10 +334,20 @@ class editor_TaskController extends ZfExtended_RestController
         $file = ZfExtended_Factory::get('editor_Models_File');
         /* @var $file editor_Models_File */
         $isTransfer = $file->getTransfersPerTasks(array_column($rows, 'taskGuid'));
+
+        // If the config for mailto link in project grid pm user column is configured
+        $isMailTo = $this->config->runtimeOptions->frontend->tasklist->pmMailTo;
+        if ($isMailTo) {
+            $userData = $this->getUsersForRendering($rows);
+        }
+
         foreach ($rows as &$row) {
             unset($row['qmSubsegmentFlags']); // unneccessary in the project overview
             $row['customerName'] = empty($customerData[$row['customerId']]) ? '' : $customerData[$row['customerId']];
             $row['isTransfer'] = isset($isTransfer[$row['taskGuid']]);
+            if ($isMailTo) {
+                $row['pmMail'] = empty($userData[$row['pmGuid']]) ? '' : $userData[$row['pmGuid']];
+            }
         }
         return $rows;
     }
@@ -342,6 +359,12 @@ class editor_TaskController extends ZfExtended_RestController
     protected function loadAllForTaskOverview(): array
     {
         $rows = $this->loadAll();
+
+        //if we have no paging parameters, we omit all additional data gathering to improve performace!
+        if ($this->getParam('limit', 0) === 0 && !$this->getParam('filter', false)) {
+            return $rows;
+        }
+
         $taskGuids = array_map(fn ($item) => $item['taskGuid'], $rows);
 
         $file = ZfExtended_Factory::get(editor_Models_File::class);
@@ -372,14 +395,23 @@ class editor_TaskController extends ZfExtended_RestController
             $userData = $this->getUsersForRendering($rows);
         }
 
+        $tua = ZfExtended_Factory::get(editor_Models_TaskUserAssoc::class);
+        $sessionUser = ZfExtended_Authentication::getInstance()->getUser();
+
         foreach ($rows as &$row) {
-            $row['hasCriticalErrors'] = $this->qualityService->taskHasCriticalErrors($row['taskGuid']);
+            try {
+                $tua->loadByStepOrSortedState($sessionUser->getUserGuid(), $row['taskGuid'], $row['workflowStepName']);
+                $row['hasCriticalErrors'] = $this->qualityService->taskHasCriticalErrors($row['taskGuid'], $tua);
+            } catch (ZfExtended_Models_Entity_NotFoundException) {
+                // In case if current user is not associated to task (PM for example)
+                $row['hasCriticalErrors'] = $this->qualityService->taskHasCriticalErrors($row['taskGuid']);
+            }
             $row['lastErrors'] = $this->getLastErrorMessage($row['taskGuid'], $row['state']);
             $this->initWorkflow($row['workflow']);
     
             $row['customerName'] = empty($customerData[$row['customerId']]) ? '' : $customerData[$row['customerId']];
 
-            $isEditAll = $this->isAllowed('backend', 'editAllTasks') || $this->isAuthUserTaskPm($row['pmGuid']);
+            $isEditAll = $this->isAllowed(Rights::ID, Rights::EDIT_ALL_TASKS) || $this->isAuthUserTaskPm($row['pmGuid']);
 
             $this->_helper->TaskUserInfo->initForTask($this->workflow, $this->entity, $this->isTaskProvided());
             $this->_helper->TaskUserInfo->addUserInfos($row, $isEditAll);
@@ -528,20 +560,19 @@ class editor_TaskController extends ZfExtended_RestController
             //if not explicitly disabled the import starts always automatically to be compatible with legacy API users
             $this->data['autoStartImport'] = true;
         }
-        $pm = ZfExtended_Factory::get(ZfExtended_Models_User::class);
-        /* @var $pm ZfExtended_Models_User */
-        if (empty($this->data['pmGuid']) || !$this->isAllowed('frontend', 'editorEditTaskPm')) {
-            $this->data['pmGuid'] = $this->user->data->userGuid;
-            $pm->init((array)$this->user->data);
+        if (empty($this->data['pmGuid']) || !$this->isAllowed(Rights::ID, 'editorEditTaskPm')) {
+            $this->data['pmGuid'] = $this->authenticatedUser->getUserGuid();
+            $this->data['pmName'] = $this->authenticatedUser->getUsernameLong();
         } else {
+            $pm = ZfExtended_Factory::get(ZfExtended_Models_User::class);
             $pm->loadByGuid($this->data['pmGuid']);
+            $this->data['pmName'] = $pm->getUsernameLong();
         }
 
         if (empty($this->data['taskType'])) {
             $this->data['taskType'] = editor_Task_Type_Default::ID;
         }
 
-        $this->data['pmName'] = $pm->getUsernameLong();
         $this->processClientReferenceVersion();
 
         $this->setDataInEntity();
@@ -806,13 +837,11 @@ class editor_TaskController extends ZfExtended_RestController
                 [
                     $this->entity,
                     $tempFilename,
-                    $this->user->data->userGuid
+                    $this->authenticatedUser->getUserGuid()
                 ]
             );
-            $user = ZfExtended_Factory::get(ZfExtended_Models_User::class);
-            $user->init((array) $this->user->data);
             // on error an editor_Models_Excel_ExImportException is thrown
-            $excelReimport->reimport($this->translate, $this->restMessages, $user);
+            $excelReimport->reimport($this->translate, $this->restMessages, $this->authenticatedUser);
             $this->log->info('E1011', 'Task re-imported from excel file and unlocked for further processing.');
 
         } catch(editor_Models_Excel_ExImportException $e) {
@@ -1022,7 +1051,7 @@ class editor_TaskController extends ZfExtended_RestController
         }
 
         //updateUserState does also call workflow "do" methods!
-        $this->updateUserState($this->user->data->userGuid);
+        $this->updateUserState($this->authenticatedUser->getUserGuid());
 
         //closing a task must be done after all workflow "do" calls which triggers some events
         $this->closeAndUnlock();
@@ -1048,7 +1077,8 @@ class editor_TaskController extends ZfExtended_RestController
 
         //because we are mixing objects (getDataObject) and arrays (loadAll) as entity container we have to cast here
         $row = (array) $obj;
-        $isEditAll = $this->isAllowed('backend', 'editAllTasks') || $this->isAuthUserTaskPm($row['pmGuid']);
+        $isEditAll =
+            $this->isAllowed(Rights::ID, Rights::EDIT_ALL_TASKS) || $this->isAuthUserTaskPm($row['pmGuid']);
         $this->_helper->TaskUserInfo->initForTask($this->workflow, $this->entity, $this->isTaskProvided());
         $this->_helper->TaskUserInfo->addUserInfos($row, $isEditAll, $this->data->userState ?? null);
         $this->view->rows = (object)$row;
@@ -1070,10 +1100,14 @@ class editor_TaskController extends ZfExtended_RestController
      * @throws ZfExtended_Models_Entity_Conflict
      */
     protected function checkTaskAccess() {
-        $mayLoadAllTasks = $this->isAllowed('backend', 'loadAllTasks') || $this->isAuthUserTaskPm($this->entity->getPmGuid());
+        $mayLoadAllTasks = $this->isAllowed(Rights::ID, Rights::LOAD_ALL_TASKS)
+            || $this->isAuthUserTaskPm($this->entity->getPmGuid());
         
         try {
-            $tua = editor_Models_Loaders_Taskuserassoc::loadByTask($this->user->data->userGuid, $this->entity);
+            $tua = editor_Models_Loaders_Taskuserassoc::loadByTask(
+                $this->authenticatedUser->getUserGuid(),
+                $this->entity
+            );
         }
         catch(ZfExtended_Models_Entity_NotFoundException $e) {
             $tua = null;
@@ -1118,7 +1152,7 @@ class editor_TaskController extends ZfExtended_RestController
                 '$mayLoadAllTasks' => $mayLoadAllTasks,
                 'tua' => $tua ? $tua->getDataObject() : 'no tua',
                 'isPmOver' => $tua && $tua->getIsPmOverride(),
-                'loadAllTasks' => $this->isAllowed('backend', 'loadAllTasks'),
+                'loadAllTasks' => $this->isAllowed(Rights::ID, Rights::LOAD_ALL_TASKS),
                 'isAuthUserTaskPm' => $this->isAuthUserTaskPm($this->entity->getPmGuid()),
                 '$isTaskDisallowEditing' => $isTaskDisallowEditing,
                 '$isTaskDisallowReading' => $isTaskDisallowReading,
@@ -1253,7 +1287,7 @@ class editor_TaskController extends ZfExtended_RestController
         }
         $taskUserTracking = ZfExtended_Factory::get('editor_Models_TaskUserTracking');
         /* @var $taskUserTracking editor_Models_TaskUserTracking */
-        $taskUserTracking->insertTaskUserTrackingEntry($taskguid, $this->user->data->userGuid, $role);
+        $taskUserTracking->insertTaskUserTrackingEntry($taskguid, $this->authenticatedUser->getUserGuid(), $role);
     }
 
     /**
@@ -1302,11 +1336,11 @@ class editor_TaskController extends ZfExtended_RestController
         if(!$isEnding && (!$this->isLeavingTaskRequest())){
             return;
         }
-        $this->entity->unlockForUser($this->user->data->userGuid);
+        $this->entity->unlockForUser($this->authenticatedUser->getUserGuid());
         $this->unregisterTask();
 
         if($resetToOpen) {
-            $this->updateUserState($this->user->data->userGuid, true);
+            $this->updateUserState($this->authenticatedUser->getUserGuid(), true);
         }
         $this->events->trigger("afterTaskClose", $this, array(
             'task' => $task,
@@ -1330,42 +1364,44 @@ class editor_TaskController extends ZfExtended_RestController
      * @param string $userGuid
      * @param bool $disableWorkflowEvents optional, defaults to false
      */
-    protected function updateUserState(string $userGuid, $disableWorkflowEvents = false) {
-        if(empty($this->data->userState)) {
+    protected function updateUserState(string $userGuid, $disableWorkflowEvents = false): void
+    {
+        if (empty($this->data->userState)) {
             return;
         }
         settype($this->data->userStatePrevious, 'string');
 
-        if(!in_array($this->data->userState, $this->workflow->getStates())) {
+        if (!in_array($this->data->userState, $this->workflow->getStates())) {
             throw new ZfExtended_ValidateException('Given UserState '.$this->data->userState.' does not exist.');
         }
 
-        $isEditAllTasks = $this->isAllowed('backend', 'editAllTasks') || $this->isAuthUserTaskPm($this->entity->getPmGuid());
+        $isEditAllTasks = $this->isAllowed(Rights::ID, Rights::EDIT_ALL_TASKS)
+            || $this->isAuthUserTaskPm($this->entity->getPmGuid());
         $isOpen = $this->isOpenTaskRequest();
-        $isPmOverride = false;
 
         $userTaskAssoc = ZfExtended_Factory::get('editor_Models_TaskUserAssoc');
         /* @var $userTaskAssoc editor_Models_TaskUserAssoc */
         try {
-            
-            if($isEditAllTasks){
-                $userTaskAssoc=editor_Models_Loaders_Taskuserassoc::loadByTaskForceWorkflowRole($userGuid, $this->entity);
-            }else{
-                $userTaskAssoc=editor_Models_Loaders_Taskuserassoc::loadByTask($userGuid, $this->entity);
+            if ($isEditAllTasks) {
+                $userTaskAssoc = editor_Models_Loaders_Taskuserassoc::loadByTaskForceWorkflowRole($userGuid, $this->entity);
+            } else {
+                $userTaskAssoc = editor_Models_Loaders_Taskuserassoc::loadByTask($userGuid, $this->entity);
             }
             
             $isPmOverride = (boolean) $userTaskAssoc->getIsPmOverride();
-        }
-        catch(ZfExtended_Models_Entity_NotFoundException $e) {
-            if(! $isEditAllTasks){
-                if($this->isLeavingTaskRequest()) {
+        } catch (ZfExtended_Models_Entity_NotFoundException $e) {
+            if (!$isEditAllTasks) {
+                if ($this->isLeavingTaskRequest()) {
                     $messages = Zend_Registry::get('rest_messages');
                     /* @var $messages ZfExtended_Models_Messages */
                     $messages->addError('Achtung: die aktuell geschlossene Aufgabe wurde Ihnen entzogen.');
+
                     return; //just allow the user to leave the task - but send a message
                 }
+
                 throw $e;
             }
+
             $userTaskAssoc->setUserGuid($userGuid);
             $userTaskAssoc->setTaskGuid($this->entity->getTaskGuid());
             $userTaskAssoc->setWorkflow($this->workflow->getName());
@@ -1375,37 +1411,47 @@ class editor_TaskController extends ZfExtended_RestController
             $isPmOverride = true;
             $userTaskAssoc->setIsPmOverride($isPmOverride);
         }
+
         $oldUserTaskAssoc = clone $userTaskAssoc;
 
-        if($isOpen){
-            $session = new Zend_Session_Namespace();
-            $userTaskAssoc->setUsedInternalSessionUniqId($session->internalSessionUniqId);
+        if ($isOpen) {
+            $userTaskAssoc->setUsedInternalSessionUniqId(
+                SessionInternalUniqueId::getInstance()->get()
+            );
             $userTaskAssoc->setUsedState($this->data->userState);
         } else {
-            if($isPmOverride && $isEditAllTasks) {
+            if ($isPmOverride && $isEditAllTasks) {
                 $this->log->info('E1011', 'PM left task');
                 $userTaskAssoc->deletePmOverride();
+
                 return;
             }
+
             $userTaskAssoc->setUsedInternalSessionUniqId(null);
             $userTaskAssoc->setUsedState(null);
         }
 
-        if($this->workflow->isStateChangeable($userTaskAssoc, $this->data->userStatePrevious)) {
+        if ($this->workflow->isStateChangeable($userTaskAssoc, $this->data->userStatePrevious)) {
             $userTaskAssoc->setState($this->data->userState);
         }
 
 
-        if($disableWorkflowEvents) {
+        if ($disableWorkflowEvents) {
             $userTaskAssoc->save();
-        }
-        else {
-            $this->workflow->hookin()->doWithUserAssoc($oldUserTaskAssoc, $userTaskAssoc, function() use ($userTaskAssoc) {
-                $userTaskAssoc->save();
-            });
+        } else {
+            $this->workflow->hookin()->doWithUserAssoc(
+                $oldUserTaskAssoc,
+                $userTaskAssoc,
+                function (?string $state) use ($userTaskAssoc) {
+                    if ($state) {
+                        TaskService::validateForTaskFinish($state, $userTaskAssoc, $this->entity);
+                    }
+                    $userTaskAssoc->save();
+                }
+            );
         }
 
-        if($oldUserTaskAssoc->getState() != $this->data->userState){
+        if ($oldUserTaskAssoc->getState() != $this->data->userState) {
             $this->log->info('E1011', 'job status changed from {oldState} to {newState}', [
                 'tua' => $oldUserTaskAssoc,
                 'oldState' => $oldUserTaskAssoc->getState(),
@@ -1441,11 +1487,17 @@ class editor_TaskController extends ZfExtended_RestController
     /**
      * Validate the taskType: check if given tasktype is allowed according to role
      * @throws ZfExtended_UnprocessableEntity
+     * @throws Zend_Acl_Exception
      */
     protected function validateTaskType() {
         $acl = ZfExtended_Acl::getInstance();
-        /* @var $acl ZfExtended_Acl */
-        $isTaskTypeAllowed = $acl->isInAllowedRoles($this->user->data->roles, 'initial_tasktype', $this->entity->getTaskType()->id());
+
+        $isTaskTypeAllowed = $acl->isInAllowedRoles(
+            ZfExtended_Authentication::getInstance()->getUserRoles(),
+            \editor_Task_Type::ID,
+            $this->entity->getTaskType()->id()
+        );
+
         if (!$isTaskTypeAllowed) {
             ZfExtended_UnprocessableEntity::addCodes([
                 'E1217' => 'TaskType not allowed.'
@@ -1473,20 +1525,23 @@ class editor_TaskController extends ZfExtended_RestController
         $isTaskPm = $this->isAuthUserTaskPm($this->entity->getPmGuid());
         $tua = null;
         try {
-            $tua = editor_Models_Loaders_Taskuserassoc::loadByTask($this->user->data->userGuid, $this->entity);
+            $tua = editor_Models_Loaders_Taskuserassoc::loadByTask(
+                $this->authenticatedUser->getUserGuid(),
+                $this->entity
+            );
         }
         catch(ZfExtended_Models_Entity_NotFoundException $e) {
             //do nothing here
         }
         
         //to access a task the user must either have the loadAllTasks right, or must be the tasks PM, or must be associated to the task
-        $isTaskAccessable = $this->isAllowed('backend', 'loadAllTasks') || $isTaskPm || !is_null($tua);
+        $isTaskAccessable = $this->isAllowed(Rights::ID, Rights::LOAD_ALL_TASKS) || $isTaskPm || !is_null($tua);
         if(!$isTaskAccessable) {
             unset($this->view->rows);
             throw new ZfExtended_Models_Entity_NoAccessException();
         }
         
-        $isEditAll = $this->isAllowed('backend', 'editAllTasks') || $isTaskPm;
+        $isEditAll = $this->isAllowed(Rights::ID, Rights::EDIT_ALL_TASKS) || $isTaskPm;
         $this->_helper->TaskUserInfo->initForTask($this->workflow, $this->entity, $this->isTaskProvided());
         $this->_helper->TaskUserInfo->addUserInfos($row, $isEditAll);
         $this->addMissingSegmentrangesToResult($row);
@@ -1510,7 +1565,7 @@ class editor_TaskController extends ZfExtended_RestController
 
     public function deleteAction()
     {
-        $forced = $this->getParam('force', false) && $this->isAllowed('backend', 'taskForceDelete');
+        $forced = $this->getParam('force', false) && $this->isAllowed(Rights::ID, Rights::TASK_FORCE_DELETE);
         $this->entityLoad();
         $this->checkStateDelete($this->entity, $forced);
 
@@ -1584,7 +1639,7 @@ class editor_TaskController extends ZfExtended_RestController
         // exports, the user will get error message. This is checked by checkExportAllowed and this function must be
         // used if other export types are implemented in future
 
-        $context = $this->_helper->getHelper('contextSwitch')->getCurrentContext();
+        $context = $this->_helper->getHelper('contextSwitch')->getCurrentContext() ?? '';
 
         $this->getAction();
 
@@ -1597,7 +1652,7 @@ class editor_TaskController extends ZfExtended_RestController
                 return;
 
             case 'excelhistory':
-                if (!$this->isAllowed('frontend', 'editorExportExcelhistory')) {
+                if (!$this->isAllowed(Rights::ID, Rights::EDITOR_EXPORT_EXCELHISTORY)) {
                     throw new ZfExtended_NoAccessException();
                 }
                 // run history excel export
@@ -1677,7 +1732,8 @@ class editor_TaskController extends ZfExtended_RestController
         // Setup worker. 'cookie' in 2nd arg is important only if $context is 'transfer'
         $inited = $finalExportWorker->setup($this->entity->getTaskGuid(), [
             'exportFolder' => $exportFolder,
-            'cookie' => Zend_Session::getId()
+            'cookie' => Zend_Session::getId(),
+            'userId' => ZfExtended_Authentication::getInstance()->getUserId(),
         ]);
 
         // If $content is not 'filetranslation' or 'transfer' assume init return value is zipFile name
@@ -1816,7 +1872,7 @@ class editor_TaskController extends ZfExtended_RestController
      * @throws ZfExtended_NotFoundException
      */
     protected function downloadImportArchive() {
-        if(!$this->isAllowed('frontend','downloadImportArchive')) {
+        if(!$this->isAllowed(Rights::ID, Rights::DOWNLOAD_IMPORT_ARCHIVE)) {
             throw new ZfExtended_NoAccessException("The Archive ZIP can not be accessed");
         }
         $archiveZip = new SplFileInfo($this->entity->getAbsoluteTaskDataPath().'/'.editor_Models_Import_DataProvider_Abstract::TASK_ARCHIV_ZIP_NAME);
@@ -1826,14 +1882,15 @@ class editor_TaskController extends ZfExtended_RestController
         $this->provideZipDownload($archiveZip, ' - ImportArchive.zip');
     }
 
-    /***
+    /**
      * Check if the given pmGuid(userGuid) is the same with the current logged user userGuid
      *
-     * @param string $pmGuid
+     * @param $taskPmGuid
      * @return boolean
      */
-    protected function isAuthUserTaskPm($taskPmGuid){
-        return $this->user->data->userGuid===$taskPmGuid;
+    protected function isAuthUserTaskPm($taskPmGuid): bool
+    {
+        return $this->authenticatedUser->getUserGuid() === $taskPmGuid;
     }
 
     /**
@@ -1848,7 +1905,7 @@ class editor_TaskController extends ZfExtended_RestController
         ];
 
         //pre check pm change first
-        if(!empty($this->data->pmGuid) && $this->isAllowed('frontend', 'editorEditTaskPm')){
+        if(!empty($this->data->pmGuid) && $this->isAllowed(Rights::ID, 'editorEditTaskPm')){
             //if the pmGuid is modified, set the pmName
             $userModel = ZfExtended_Factory::get('ZfExtended_Models_User');
             /* @var $userModel  ZfExtended_Models_User*/
@@ -1858,7 +1915,7 @@ class editor_TaskController extends ZfExtended_RestController
 
         //then loop over all allowed fields
         foreach($fieldToRight as $field => $right) {
-            if(!empty($this->data->$field) && !$this->isAllowed('frontend', $right)) {
+            if(!empty($this->data->$field) && !$this->isAllowed(Rights::ID, $right)) {
                 unset($this->data->$field);
                 $this->log->warn('E1011', 'The user is not allowed to modify the tasks field {field}', ['field' => $field]);
             }
@@ -2038,7 +2095,7 @@ class editor_TaskController extends ZfExtended_RestController
     }
 
     protected function handleCancelImport() {
-        $isAllowedToCancel = $this->isAllowed('frontend', 'editorCancelImport') || $this->isAuthUserTaskPm($this->entity->getPmGuid());
+        $isAllowedToCancel = $this->isAllowed(Rights::ID, Rights::EDITOR_CANCEL_IMPORT) || $this->isAuthUserTaskPm($this->entity->getPmGuid());
 
         //if no state is set or user is not allowed to cancel, do nothing
         if(empty($this->data->state)) {

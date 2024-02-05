@@ -76,6 +76,11 @@ END LICENSE AND COPYRIGHT
 class editor_Models_Customer_Customer extends ZfExtended_Models_Entity_Abstract {
     protected $dbInstanceClass = 'editor_Models_Db_Customer';
     protected $validatorInstanceClass   = 'editor_Models_Validator_Customer';
+
+    /**
+     * Customers must be filtered by role-driven restrictions
+     */
+    protected ?array $clientAccessRestriction = ['field' => 'id'];
     
     CONST DEFAULTCUSTOMER_NUMBER = 'default for legacy data';
     /**
@@ -248,6 +253,22 @@ class editor_Models_Customer_Customer extends ZfExtended_Models_Entity_Abstract 
      */
     public function isDefaultCustomer(){
         return ($this->getNumber() == self::DEFAULTCUSTOMER_NUMBER);
+    }
+
+    /**
+     * Get the customer domain with the configured server protocol. The customer domain is always
+     * saved without protocol.
+     * @return string
+     * @throws Zend_Exception
+     */
+    public function getFullDomain(): string
+    {
+        if(empty($this->getDomain())){
+            return '';
+        }
+        $config = Zend_Registry::get('config');
+        $protocol = $config->runtimeOptions->server->protocol ?? 'https://';
+        return $protocol.rtrim($this->getDomain(),'/');
     }
     
     public function __toString() {

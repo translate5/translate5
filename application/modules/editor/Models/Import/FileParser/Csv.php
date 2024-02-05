@@ -98,7 +98,6 @@ class editor_Models_Import_FileParser_Csv extends editor_Models_Import_FileParse
     
     public function __construct(string $path, string $fileName, int $fileId, editor_Models_Task $task) {
 
-        ini_set('auto_detect_line_endings', true);//to tell php to respect mac-lineendings
         parent::__construct($path, $fileName, $fileId, $task);
 
         $this->_delimiter = $this->config->runtimeOptions->import->csv->delimiter;
@@ -207,8 +206,6 @@ class editor_Models_Import_FileParser_Csv extends editor_Models_Import_FileParse
             ]);
         }
         
-        //for this ini set see php docu: http://de2.php.net/manual/en/filesystem.configuration.php#ini.auto-detect-line-endings
-        ini_set("auto_detect_line_endings", true);
         $csv = new SplTempFileObject();
         //we skip empty lines in the CSV files
         $csv->fwrite($this->_origFile);
@@ -292,7 +289,7 @@ class editor_Models_Import_FileParser_Csv extends editor_Models_Import_FileParse
             $extracted = $this->extractSegment($line);
             $skel[] = $this->str_putcsv($extracted, $this->_delimiter, $this->_enclosure, $this->break);
         }
-        $this->_skeletonFile = join('', $skel);
+        $this->skeletonFile = join('', $skel);
     }
     
     /**

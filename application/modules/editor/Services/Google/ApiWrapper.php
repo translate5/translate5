@@ -125,7 +125,7 @@ class editor_Services_Google_ApiWrapper {
     public function isValidLanguage($languageCode){
         $languages = $this->getLanguages();
         $languages = array_map('strtolower', $languages);
-        return in_array($languageCode, $languages);
+        return in_array(strtolower($languageCode), $languages);
     }
     
     /**

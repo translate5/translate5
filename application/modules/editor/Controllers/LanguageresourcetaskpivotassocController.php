@@ -66,7 +66,10 @@ class editor_LanguageresourcetaskpivotassocController extends ZfExtended_RestCon
                 'taskGuid' => 'The taskGuid field is empty'
             ]);
         }
-        $this->view->rows =  $this->entity->loadAllAvailableForTask($taskGuid);
+        $this->view->rows =  $this->entity->loadAllAvailableForTask(
+            $taskGuid,
+            ZfExtended_Factory::get('editor_Services_Manager')
+        );
     }
 
     public function putAction()
@@ -102,6 +105,7 @@ class editor_LanguageresourcetaskpivotassocController extends ZfExtended_RestCon
             $wq = ZfExtended_Factory::get(Queue::class);
             $wq->trigger();
         }
+        $this->view->success = true;
     }
 
     /***

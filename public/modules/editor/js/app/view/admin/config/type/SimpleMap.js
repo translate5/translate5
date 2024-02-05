@@ -33,19 +33,32 @@ END LICENSE AND COPYRIGHT
  */
 Ext.define('Editor.view.admin.config.type.SimpleMap', {
     extend: 'Ext.window.Window',
+    alias: 'widget.simplemap',
     requires: [
         'Editor.view.admin.config.type.SimpleMapController'
     ],
     controller: 'configTypeSimpleMap',
 
     record: null,
+    jsonField: null,
+    hideTbar: false,
+    readonlyIndex: false,
+    valueMaxLength: Number.MAX_VALUE,
+    preventSave: false,
 
     /**
      * This statics must be implemented in classes used as custom config editors
      */
     statics: {
         getConfigEditor: function (record) {
-            var win = new this({record: record});
+            var win = new this(record.isModel ? {record: record} : record);
+            win.show();
+
+            //prevent cell editing:
+            return null;
+        },
+        getJsonFieldEditor: function (config) {
+            var win = new this(config);
             win.show();
 
             //prevent cell editing:
@@ -66,9 +79,17 @@ Ext.define('Editor.view.admin.config.type.SimpleMap', {
     },
     initConfig: function (instanceConfig) {
         var me = this,
-            data = [], config;
+            data = [], config, value;
 
-        Ext.Object.each(instanceConfig.record.get('value'), function (key, value) {
+        if (instanceConfig.record) {
+            value = instanceConfig.record.get('value');
+        } else if (instanceConfig.jsonField) {
+            value = (Ext.JSON.decode(instanceConfig.jsonField.getValue(), true) || {});
+        } else {
+            value = {};
+        }
+
+        Ext.Object.each(value, function (key, value) {
             data.push([key, value]);
         });
         config = {
@@ -100,30 +121,33 @@ Ext.define('Editor.view.admin.config.type.SimpleMap', {
                     clicksToEdit: 2
                 }],
                 border: false,
-                tbar: [{
-                    type: 'button',
-                    bind: {
-                        text: '{l10n.configuration.add}',
-                    },
-                    glyph: 'f067@FontAwesome5FreeSolid',
-                    handler: 'onAdd'
-                }, {
-                    type: 'button',
-                    bind: {
-                        text: '{l10n.configuration.remove}',
-                    },
-                    glyph: 'f2ed@FontAwesome5FreeSolid',
-                    handler: 'onRemove'
-                }],
+                tbar: {
+                    hidden: instanceConfig.hideTbar,
+                    items: [{
+                        type: 'button',
+                        bind: {
+                            text: '{l10n.configuration.add}',
+                        },
+                        glyph: 'f067@FontAwesome5FreeSolid',
+                        handler: 'onAdd'
+                    }, {
+                        type: 'button',
+                        bind: {
+                            text: '{l10n.configuration.remove}',
+                        },
+                        glyph: 'f2ed@FontAwesome5FreeSolid',
+                        handler: 'onRemove'
+                    }]
+                },
                 columns: [{
                     bind: {
                         text: '{l10n.configuration.index}',
                     },
                     dataIndex: 'index',
-                    editor: {
+                    editor: !(instanceConfig.readonlyIndex || {
                         xtype: 'textfield',
                         itemId: 'index'
-                    }
+                    })
                 }, {
                     bind: {
                         text: '{l10n.configuration.value}',
@@ -131,7 +155,8 @@ Ext.define('Editor.view.admin.config.type.SimpleMap', {
                     dataIndex: 'value',
                     editor: {
                         xtype: 'textfield',
-                        itemId: 'value'
+                        itemId: 'value',
+                        maxLength: instanceConfig.valueMaxLength
                     }
                 }],
                 store: Ext.create('Ext.data.ArrayStore', {

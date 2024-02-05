@@ -152,6 +152,13 @@
         <source><bpt id="1" rid="1" ax:s-id="2" ax:s-is-base-style="True" ax:s-font-name="Arial" ax:s-font-size="7.0" /><bpt id="3" rid="2" ax:s-id="6" ax:s-font-name="Wingdings 2" /><ept id="4" rid="2" /><ept id="2" rid="1" /></source>
         <target><bpt id="1" rid="1" ax:s-id="2" ax:s-is-base-style="True" ax:s-font-name="Arial" ax:s-font-size="7.0" /><bpt id="3" rid="2" ax:s-id="6" ax:s-font-name="Wingdings 2" /><ept id="4" rid="2" /><ept id="2" rid="1" /></target>
       </trans-unit>
+      <trans-unit id="663" ax:state-name="Corrected" ax:state-id="4" ax:state-flags="37748736">
+        <source><bpt id="1" rid="1" ax:s-id="11" ax:s-is-base-style="True" ax:s-font-name="Myriad Pro Cond" ax:s-font-size="7.5" ax:s-fore-color="-16777216" ax:s-script="Baseline" ax:s-caps="Normal" /><bpt id="3" rid="2" ax:s-id="3" />The <ph id="7" ax:element-id="6001">Translate5® test</ph> app lets you share your tests easily with your developer by email or as a print-out; (see chapter 7 ‘Transferring tests via <ept id="4" rid="2" /><bpt id="5" rid="3" ax:s-id="3" /><ph id="8" ax:element-id="6002">Bluetooth®</ph> to the <ph id="9" ax:element-id="6000">Translate5® test</ph> app‘).<ept id="6" rid="3" /><ept id="2" rid="1" /></source>
+        <target><bpt id="1" rid="1" ax:s-id="11" ax:s-is-base-style="True" ax:s-font-name="Myriad Pro Cond" ax:s-font-size="7.5" ax:s-fore-color="-16777216" ax:s-script="Baseline" ax:s-caps="Normal" /><bpt id="3" rid="2" ax:s-id="3" />Die <ph id="5" ax:element-id="6001">Translate5® test</ph> App können Sie Ihre Tests ganz einfach per E-Mail oder als Ausdruck an Ihre Entwickler weitergeben (siehe Kapitel 7 "Übertragen von Tests per <ph id="6" ax:element-id="6002">Bluetooth®</ph> in die <ph id="7" ax:element-id="6000">Translate5® test</ph> App).<ept id="4" rid="2" /><ept id="2" rid="1" /></target>
+        <context-group>
+          <context context-type="x-xpath">Story_u509.xml/Story/Story[@Self="u509"]/ParagraphStyleRange[1]/CharacterStyleRange[1]</context>
+        </context-group>
+      </trans-unit>
     </body>
   </file>
 </xliff>

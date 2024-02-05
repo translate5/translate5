@@ -29,17 +29,16 @@ END LICENSE AND COPYRIGHT
 Ext.define('Editor.view.admin.customer.TagField', {
     extend: 'Ext.form.field.Tag',
     alias: 'widget.customers',
-    itemId:'customers',
-    name:'customers',
-
-    fieldLabel:'#UT#Endkunde',
-
-    allowBlank: true,
+    itemId: 'customers',
+    name: 'customers',
+    fieldLabel: '#UT#Endkunde',
+    /* client restriction makes it neccessary to select a customer when a new user is created */
+    allowBlank: !Editor.data.app.user.isClientRestricted,
     typeAhead: true,
     anyMatch: true,
     forceSelection: true,
     displayField: 'name',
     valueField: 'id',
-    store:'customersStore',
+    store: 'customersStore',
     queryMode: 'local'
 });

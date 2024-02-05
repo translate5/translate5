@@ -21,10 +21,12 @@ START LICENSE AND COPYRIGHT
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
+
+use MittagQI\Translate5\Acl\Rights;
 
 /**
  * Segment Auto States Helper Class
@@ -523,26 +525,20 @@ class editor_Models_Segment_AutoStates {
      * @param editor_Models_Segment $segment
      */
     public function updateAfterCommented(editor_Models_Segment $segment, editor_Models_TaskUserAssoc $tua) {
-        $workflow = ZfExtended_Factory::get('editor_Workflow_Manager')->getActive($segment->getTaskGuid());
-        if($tua->getRole() == $workflow::ROLE_TRANSLATORCHECK) {
-            $segment->setAutoStateId(self::REVIEWED_TRANSLATOR); //TODO if we have TRANSLATE-1704 then this must be changed too
-            return;
-        }
-        if($tua->getRole() == $workflow::ROLE_REVIEWER) {
-            $segment->setAutoStateId(self::REVIEWED_UNCHANGED);
-            return;
-        }
-        if($this->isEditWithoutAssoc($tua)){
-            $segment->setAutoStateId(self::REVIEWED_PM_UNCHANGED);
-            return;
-        }
+        $calculated = $this->calculateSegmentState($segment,$tua);
+        $segment->setAutoStateId($calculated);
     }
 
     /**
      * returns true if user has right to edit all Tasks, checks optionally the workflow role of the user
      * @param editor_Models_TaskUserAssoc $tua optional, if not given only acl is considered
+     * @return bool
+     * @throws ReflectionException
+     * @throws Zend_Acl_Exception
+     * @throws ZfExtended_Models_Entity_NotFoundException
      */
-    protected function isEditWithoutAssoc(editor_Models_TaskUserAssoc $tua) {
+    protected function isEditWithoutAssoc(editor_Models_TaskUserAssoc $tua): bool
+    {
         $auth = ZfExtended_Authentication::getInstance();
         $role = $tua && $tua->getRole();
         $acl = ZfExtended_Acl::getInstance();
@@ -553,7 +549,7 @@ class editor_Models_Segment_AutoStates {
         $task->loadByTaskGuid($tua->getTaskGuid());
         $sameUserGuid = $task->getPmGuid() === $auth->getUser()->getUserGuid();
         $systemUser = $auth->getUser()->getUserGuid() == ZfExtended_Models_User::SYSTEM_GUID;
-        $editAllTasks = $acl->isInAllowedRoles($auth->getRoles(), 'backend', 'editAllTasks');
+        $editAllTasks = $acl->isInAllowedRoles($auth->getUserRoles(), Rights::ID, Rights::EDIT_ALL_TASKS);
         return empty($role) && ($editAllTasks || $sameUserGuid || $systemUser);
     }
     

@@ -60,10 +60,10 @@ abstract class editor_Test_UnitTest extends TestCase
 
     /**
      * This API can be used overwrite the config for the lifespan of the test
-     * @param stdClass $config
+     * @param object $config
      * @return void
      */
-    final public static function setConfig(stdClass $config): void
+    final public static function setConfig(object $config): void
     {
         Zend_Registry::set('config', $config);
     }

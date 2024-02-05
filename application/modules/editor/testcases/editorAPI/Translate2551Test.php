@@ -32,20 +32,10 @@ use MittagQI\Translate5\Test\Import\Config;
  */
 class Translate2551Test extends editor_Test_JsonTest {
 
-    protected static array $forbiddenPlugins = [
-    ];
-
     protected static array $requiredPlugins = [
         'editor_Plugins_Okapi_Init'
     ];
 
-    protected static array $requiredRuntimeOptions = [
-    ];
- 
-    protected static bool $setupOwnCustomer = false;
-    
-    protected static string $setupUserLogin = 'testmanager';
-    
     protected static function setupImport(Config $config): void
     {
 
@@ -73,7 +63,7 @@ class Translate2551Test extends editor_Test_JsonTest {
             'fileId' => $files->id
         ], null, false, true);
 
-        static::api()->checkTaskStateLoop();
+        static::api()->waitForCurrentTaskStateOpen();
 
         self::api()->setTaskToEdit();
         $segmentsActual = static::api()->getSegmentsWithBasicData();

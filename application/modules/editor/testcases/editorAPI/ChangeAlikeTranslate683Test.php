@@ -59,7 +59,7 @@ class ChangeAlikeTranslate683Test extends editor_Test_JsonTest {
     ];
 
     protected static array $requiredRuntimeOptions = [
-        'alike.segmentMetaFields' => '[]'
+        'alike.segmentMetaFields' => []
     ];
 
     protected static $useSourceEditing = false;

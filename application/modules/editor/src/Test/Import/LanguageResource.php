@@ -35,18 +35,16 @@ use MittagQI\Translate5\Test\Api\Helper;
  */
 abstract class LanguageResource extends Resource
 {
-    const OPEN_TM2 = 'opentm2';
+    public const OPEN_TM2 = 'opentm2';
+    public const DEEPL = 'deepl';
+    public const TERM_COLLECTION = 'termcollection';
+    public const DUMMY_TM = 'dummytm';
+    public const ZDemo_MT = 'zdemomt';
+    public const MICROSOFT_TRANSLATOR = 'microsofttranslator';
+    public const TILDE_MT = 'tildemt';
+    public const OPEN_AI = 'openai';
 
-    const DEEPL = 'deepl';
-
-    const TERM_COLLECTION = 'termcollection';
-
-    const DUMMY_TM = 'dummytm';
-
-    const ZDemo_MT = 'zdemomt';
-
-    const MICROSOFT_TRANSLATOR = 'microsofttranslator';
-
+    public const GOOGLE_TRANSLATE = 'googletranslate';
 
     public string $name;
     public array $customerIds = [];

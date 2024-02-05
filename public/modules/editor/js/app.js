@@ -93,7 +93,11 @@ if(Ext.browser.is.IE) {
 Ext.application({
     name: 'Editor',
     models: ['File', 'Segment', 'admin.User', 'admin.Task', 'segment.Field', 'Config', 'TaskConfig', 'CustomerConfig', 'admin.UserAssocDefault'],
-    stores: ['Files', 'ReferenceFiles', 'Segments', 'AlikeSegments', 'admin.Languages', 'UserConfig', 'admin.Config', 'admin.CustomerConfig', 'admin.task.Config', 'admin.UserAssocDefault','admin.WizardTasks'],
+    stores: [
+        'admin.TokenStore','Files','ReferenceFiles', 'Segments', 'AlikeSegments', 'admin.Languages', 'UserConfig',
+        'admin.Config', 'admin.CustomerConfig', 'admin.task.Config', 'admin.UserAssocDefault','admin.WizardTasks',
+        'admin.task.CustomField'
+    ],
     requires: [
         'Editor.view.ViewPort',
         'Editor.view.ViewPortEditor',
@@ -203,8 +207,8 @@ Ext.application({
 
         me.authenticatedUser = Ext.create('Editor.model.admin.User', Editor.data.app.user);
 
-        // load the customers store if the user is allowed
-        if (me.authenticatedUser.isAllowed('customerAdministration')) {
+        // load the customers store if the user is allowed OR has access to other UIs that need the customer store
+        if (me.authenticatedUser.needsCustomersStore()) {
             Ext.getStore('customersStore').load();
         }
 
@@ -238,6 +242,11 @@ Ext.application({
             // There is no other technical need for the defer as showing the logos
             me.initViewportLaunch(initMethod);
         }, showConsortiumLogos);
+
+        Ext.getDoc().on('mousedown', function(){
+            var msg = document.querySelector('.app-msg');
+            if (msg) Ext.get(msg).ghost("t", {remove:true});
+        });
     },
 
     /***
@@ -335,7 +344,7 @@ Ext.application({
             preventDefaultHandler: true,
             scope: me,
             success: function (task) {
-                task.set('userState', Editor.data.app.initState);
+                task.set('userState', task.getInitUserState());
                 task.save({
                     scope: me,
                     preventDefaultHandler: true,
@@ -388,6 +397,10 @@ Ext.application({
         let me = this, tabPanel;
         if (!Editor.controller.admin || !Editor.controller.admin.TaskOverview) {
             return;
+        }
+        if (task) {
+            // reload when we leave the task
+            Ext.state.Manager.getProvider().store.reload();
         }
         me.removeTaskFromUrl();
         if (me.viewport) {
@@ -633,17 +646,26 @@ Ext.application({
      */
     loadEditorConfigData: function (task, callback) {
         var me = this,
-            store = Ext.StoreManager.get('admin.task.Config');
+            taskStore = Ext.StoreManager.get('admin.task.Config'),
+            userStore = Ext.state.Manager.getProvider().store,
+            counter = 0;
 
-        store.loadByTaskGuid(task.get('taskGuid'), function (records, operation, success) {
-            me.unmask();
+        const onLoadedCallback = (store) => (records, operation, success) => {
+            counter++;
             if (!success) {
                 Editor.app.getController('ServerException').handleCallback(records, operation, false);
                 return;
             }
             store.clearFilter(true);
-            callback();
-        });
+
+            if (2 === counter) {
+                me.unmask();
+                callback();
+            }
+        };
+
+        taskStore.loadByTaskGuid(task.get('taskGuid'), onLoadedCallback(taskStore));
+        userStore.loadByTaskGuid(task.get('taskGuid'), onLoadedCallback(userStore));
     },
 
     /***

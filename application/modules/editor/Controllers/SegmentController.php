@@ -26,7 +26,7 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-use MittagQI\Translate5\Segment\FilteredIterator;
+use MittagQI\Translate5\Acl\Rights;
 use MittagQI\Translate5\Segment\Operations;
 use MittagQI\Translate5\Task\Current\NoAccessException;
 use MittagQI\Translate5\Task\TaskContextTrait;
@@ -203,8 +203,10 @@ class Editor_SegmentController extends ZfExtended_RestController
      */
     protected function getUsersAutoStateIds(){
         if($this->cachedAutostates == NULL){
-            $sessionUser = new Zend_Session_Namespace('user');
-            $taskUserAssoc = editor_Models_Loaders_Taskuserassoc::loadByTaskGuid($sessionUser->data->userGuid, $this->getCurrentTask()->getTaskGuid());
+            $taskUserAssoc = editor_Models_Loaders_Taskuserassoc::loadByTaskGuid(
+                ZfExtended_Authentication::getInstance()->getUserGuid(),
+                $this->getCurrentTask()->getTaskGuid()
+            );
             if ($taskUserAssoc->getIsPmOverride()) {
                 $userRole = 'pm';
             } else {
@@ -287,8 +289,7 @@ class Editor_SegmentController extends ZfExtended_RestController
         $assoc = ZfExtended_Factory::get('editor_Models_SegmentUserAssoc');
         /* @var $assoc editor_Models_SegmentUserAssoc */
 
-        $sessionUser = new Zend_Session_Namespace('user');
-        $watched = $assoc->loadIsWatched($ids, $sessionUser->data->userGuid);
+        $watched = $assoc->loadIsWatched($ids, ZfExtended_Authentication::getInstance()->getUserGuid());
         $watchedById = array();
         array_map(function ($assoc) use (&$watchedById) {
             $watchedById[$assoc['segmentId']] = $assoc['id'];
@@ -304,7 +305,7 @@ class Editor_SegmentController extends ZfExtended_RestController
 
     public function putAction()
     {
-        $sessionUser = ZfExtended_Authentication::getInstance()->getUser();
+        $auth = ZfExtended_Authentication::getInstance();
         $this->entity->load((int)$this->_getParam('id'));
 
         //check if update is allowed
@@ -313,12 +314,12 @@ class Editor_SegmentController extends ZfExtended_RestController
         /* @var $task editor_Models_Task */
         $wfh = $this->_helper->workflow;
         /* @var $wfh Editor_Controller_Helper_Workflow */
-        $wfh->checkWorkflowWriteable($this->entity->getTaskGuid(), $sessionUser->getUserGuid());
+        $wfh->checkWorkflowWriteable($this->entity->getTaskGuid(), $auth->getUserGuid());
 
         //the history entry must be created before the original entity is modified
         $history = $this->entity->getNewHistoryEntity();
         //update the segment
-        $updater = ZfExtended_Factory::get('editor_Models_Segment_Updater', [$task,$sessionUser->getUserGuid()]);
+        $updater = ZfExtended_Factory::get('editor_Models_Segment_Updater', [$task, $auth->getUserGuid()]);
 
         $allowedAlternatesToChange = $this->entity->getEditableDataIndexList(true);
 
@@ -340,8 +341,8 @@ class Editor_SegmentController extends ZfExtended_RestController
         $this->sanitizeEditedContent($updater, $allowedAlternatesToChange);
 
         $this->setDataInEntity(array_merge($allowedToChange, $allowedAlternatesToChange), self::SET_DATA_WHITELIST);
-        $this->entity->setUserGuid($sessionUser->getUserGuid());
-        $this->entity->setUserName($sessionUser->getUserName());
+        $this->entity->setUserGuid($auth->getUser()->getUserGuid());
+        $this->entity->setUserName($auth->getUser()->getUserName());
 
         /* @var $updater editor_Models_Segment_Updater */
         $updater->update($this->entity, $history);
@@ -398,6 +399,24 @@ class Editor_SegmentController extends ZfExtended_RestController
         $this->view->rows = $result;
         $this->view->total = count($result);
         $this->view->hasMqm = $this->isMqmTask($parameters['taskGuid']);
+        $this->view->isOpenedByMoreThanOneUser = $this->isOpenedByMoreThanOneUser($parameters['taskGuid']);
+    }
+
+    /**
+     * Check whether task is opened by more than one user
+     *
+     * @param string $taskGuid
+     * @return bool
+     * @throws ReflectionException
+     * @throws Zend_Db_Statement_Exception
+     */
+    public function isOpenedByMoreThanOneUser(string $taskGuid) : bool {
+
+        // Get usage records
+        $usedBy = ZfExtended_Factory::get(editor_Models_TaskUserAssoc::class)->loadUsed($taskGuid);
+
+        // Return flag indicating whether there are more than one such a record
+        return count($usedBy) > 1;
     }
 
     /***
@@ -418,7 +437,7 @@ class Editor_SegmentController extends ZfExtended_RestController
         $task->loadByTaskGuid($parameters['taskGuid']);
         $t = ZfExtended_Zendoverwrites_Translate::getInstance();
         /* @var $t ZfExtended_Zendoverwrites_Translate */
-        if ($task->getUsageMode() == $task::USAGE_MODE_SIMULTANEOUS) {
+        if ($task->getUsageMode() == $task::USAGE_MODE_SIMULTANEOUS && $this->isOpenedByMoreThanOneUser($parameters['taskGuid'])) {
             throw new editor_Models_SearchAndReplace_Exception('E1192', ['task' => $task]);
         }
 
@@ -512,8 +531,10 @@ class Editor_SegmentController extends ZfExtended_RestController
                 $task->loadByTaskGuid($this->entity->getTaskGuid());
                 $this->log->exception($e, [
                     'level' => $this->log::LEVEL_WARN,
-                    'task' => $task,
-                    'loadedSegment' => $this->entity->getDataObject(),
+                    'extra' => [
+                        'task' => $task,
+                        'loadedSegment' => $this->entity->getDataObject(),
+                    ]
                 ]);
             }
 
@@ -620,12 +641,11 @@ class Editor_SegmentController extends ZfExtended_RestController
 
         if ($isTaskGuidAndEditable && $editable) {
             // if the user can edit only segmentranges, we must also check if s/he is allowed to edit and save this segment
-            $sessionUser = new Zend_Session_Namespace('user');
-            $sessionUserGuid = $sessionUser->data->userGuid;
-            $tua = editor_Models_Loaders_Taskuserassoc::loadByTask($sessionUserGuid, $task);
+            $authUserGuid = ZfExtended_Authentication::getInstance()->getUserGuid();
+            $tua = editor_Models_Loaders_Taskuserassoc::loadByTask($authUserGuid, $task);
             $step = $tua->getWorkflowStepName();
             if ($tua->isSegmentrangedTaskForStep($task, $step)) {
-                $assignedSegments = $tua->getAllAssignedSegmentsByUserAndStep($task->getTaskGuid(), $sessionUserGuid, $step);
+                $assignedSegments = $tua->getAllAssignedSegmentsByUserAndStep($task->getTaskGuid(), $authUserGuid, $step);
                 if (!in_array($this->entity->getSegmentNrInTask(), $assignedSegments)) {
                     $isTaskGuidAndEditable = false;
                 }
@@ -694,12 +714,12 @@ class Editor_SegmentController extends ZfExtended_RestController
      * @throws editor_Models_Segment_Exception
      */
     public function lockOperation(bool $lock = true) {
-        $acl = $lock ? 'lockSegmentOperation' : 'unlockSegmentOperation';
+        $acl = $lock ? Rights::LOCK_SEGMENT_OPERATION : Rights::UNLOCK_SEGMENT_OPERATION;
 
         //the amount of new ACL rules would be huge to handle that lock/unlock Batch/Operations with
         // ordinary controller right handling since currently role editor has access to all methods here.
         // So its easier to double access to that functions for PM users then
-        $this->checkAccess('frontend', $acl, __CLASS__.'::'.($lock ? __FUNCTION__ : 'unlockOperation'));
+        $this->checkAccess(Rights::ID, $acl, __CLASS__.'::'.($lock ? __FUNCTION__ : 'unlockOperation'));
         $this->getAction();
 
         /* @var Operations $operations */
@@ -734,8 +754,8 @@ class Editor_SegmentController extends ZfExtended_RestController
      * @throws \MittagQI\Translate5\Task\Current\Exception
      */
     public function lockBatch(bool $lock = true) {
-        $acl = $lock ? 'lockSegmentBatch' : 'unlockSegmentBatch';
-        $this->checkAccess('frontend', $acl, __CLASS__.'::'.($lock ? __FUNCTION__ : 'unlockBatch'));
+        $acl = $lock ? Rights::LOCK_SEGMENT_BATCH : Rights::UNLOCK_SEGMENT_BATCH;
+        $this->checkAccess(Rights::ID, $acl, __CLASS__.'::'.($lock ? __FUNCTION__ : 'unlockBatch'));
         $this->applyQualityFilter();
 
         /* @var Operations $operations */
@@ -797,8 +817,12 @@ class Editor_SegmentController extends ZfExtended_RestController
         $segment = \ZfExtended_Factory::get(editor_Models_Segment::class);
         $segment->load((int) $this->_getParam('id'));
 
+        // Get desired locale either from request or from session
+        $desiredLocale = $this->getRequest()->getParam('locale')
+            ?: ZfExtended_Authentication::getInstance()->getUser()->getLocale();
+
         // Get locale
-        $locale = ZfExtended_Utils::getLocale($this->getRequest()->getParam('locale'));
+        $locale = ZfExtended_Utils::getLocale($desiredLocale);
 
         //generate portlet data
         $data = (new TermportletData(
@@ -928,16 +952,15 @@ class Editor_SegmentController extends ZfExtended_RestController
         if ($task->getUsageMode() !== $task::USAGE_MODE_SIMULTANEOUS) {
             return false;
         }
-        $sessionUser = new Zend_Session_Namespace('user');
-        $sessionUserGuid = $sessionUser->data->userGuid;
-        $tua = editor_Models_Loaders_Taskuserassoc::loadByTask($sessionUserGuid, $task);
+        $authUserGuid = ZfExtended_Authentication::getInstance()->getUserGuid();
+        $tua = editor_Models_Loaders_Taskuserassoc::loadByTask($authUserGuid, $task);
         /* @var $tua editor_Models_TaskUserAssoc */
         $step = $tua->getWorkflowStepName();
         $handleSegmentranges = $tua->isSegmentrangedTaskForStep($task, $step);
         if (!$handleSegmentranges) {
             return false;
         }
-        return $tua->getAllAssignedSegmentsByUserAndStep($task->getTaskGuid(), $sessionUserGuid, $step);
+        return $tua->getAllAssignedSegmentsByUserAndStep($task->getTaskGuid(), $authUserGuid, $step);
     }
 
     /***
@@ -951,8 +974,7 @@ class Editor_SegmentController extends ZfExtended_RestController
      */
     protected function addJumpToSegmentIndex()
     {
-        $sessionUser = new Zend_Session_Namespace('user');
-        $userGuid = $sessionUser->data->userGuid;
+        $authUserGuid = ZfExtended_Authentication::getInstance()->getUserGuid();
         $taskGuid = $this->getCurrentTask()->getTaskGuid();
 
         //needed only on first page and if we have rows
@@ -968,7 +990,7 @@ class Editor_SegmentController extends ZfExtended_RestController
         //we need a clone of the entity, so that the filters are initialized
         $segment = clone $this->entity;
         /* @var $segment editor_Models_Segment */
-        $segmentId = $segment->getLastEditedByUserAndTask($taskGuid, $userGuid);
+        $segmentId = $segment->getLastEditedByUserAndTask($taskGuid, $authUserGuid);
 
         if ($segmentId > 0) {
             //last edited segment found, find and set the segment index
@@ -979,7 +1001,7 @@ class Editor_SegmentController extends ZfExtended_RestController
 
         $tua = null;
         try {
-            $tua = editor_Models_Loaders_Taskuserassoc::loadByTaskGuidForceWorkflowRole($userGuid, $taskGuid);
+            $tua = editor_Models_Loaders_Taskuserassoc::loadByTaskGuidForceWorkflowRole($authUserGuid, $taskGuid);
         } catch (ZfExtended_Models_Entity_NotFoundException $e) {
         }
 

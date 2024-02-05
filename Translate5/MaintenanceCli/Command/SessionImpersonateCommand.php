@@ -33,6 +33,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Translate5\MaintenanceCli\WebAppBridge\Application;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
+use ZfExtended_Models_Db_Session;
 
 
 class SessionImpersonateCommand extends Translate5AbstractCommand
@@ -90,9 +91,9 @@ class SessionImpersonateCommand extends Translate5AbstractCommand
         $locale = $auth->getUser()->getLocale();
         $session->locale = \ZfExtended_Utils::getLocale($locale);
 
-        $sessionDb = \ZfExtended_Factory::get('ZfExtended_Models_Db_Session');
+        $sessionDb = new ZfExtended_Models_Db_Session();
         $sessionId = session_id();
-        $token = $sessionDb->updateAuthToken($sessionId);
+        $token = $sessionDb->updateAuthToken($sessionId, intval($auth->getUser()->getId()));
         $this->io->text([
             '<info>Impersonate as:</info> <options=bold>'.$auth->getUser()->getUsernameLong().'</>',
             '    <info>Session Id:</info> '.$sessionId,
@@ -104,9 +105,6 @@ class SessionImpersonateCommand extends Translate5AbstractCommand
             ''
         ]);
         
-        $userSession = new \Zend_Session_Namespace('user');
-        //set a flag to identify that this session was started by API
-        $userSession->loginByApiAuth = true;
         return 0;
     }
 

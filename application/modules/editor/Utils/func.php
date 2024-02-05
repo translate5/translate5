@@ -1,4 +1,9 @@
 <?php
+
+/**
+ * @deprecated Must be removed!
+ */
+
 /**
  * Performance detection. 'mt' mean 'microtime'
  * Returns the time between the previous and current calls of this function
@@ -61,13 +66,13 @@ function d($value) {
 function i($value, $mode = 'w', $file = 'debug.txt') {
 
     // Get the document root, with trimmed right trailing slash
-    $doc = rtrim($_SERVER['DOCUMENT_ROOT'], '\\/');
+    $doc = APPLICATION_ROOT . '/public';
 
     // Get the absolute path of a file, that will be used for writing data to
     $abs = $doc . '/' . $file;
 
     // If value is bool
-    if (is_bool($value)) {
+    if (is_bool($value) || is_null($value)) {
 
         // Use var_dump for dumping, as print_r() will give 1 or 0 instead of 'bool(true)' or 'bool(false)'
         ob_start(); var_dump($value); $value = ob_get_clean();

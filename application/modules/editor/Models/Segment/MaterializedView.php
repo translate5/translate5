@@ -238,7 +238,7 @@ class editor_Models_Segment_MaterializedView {
      * @param editor_Models_Segment $segment
      */
     public function updateSiblingMetaCache(editor_Models_Segment $segment) {
-        $groupId = $segment->meta()->getTransunitId();
+        $groupId = $segment->meta()->getTransunitHash();
         //using two selects to force the optimizer to run first the very inner SELECT and after that make a join with the outer view. 
         // without that, it can happen, that MySQL first runs over each view entry, and over each segments content, which is then very long 
         $sql = 'update '.$this->viewName.' view, (SELECT * FROM (SELECT m.segmentId,';
@@ -253,7 +253,7 @@ class editor_Models_Segment_MaterializedView {
     }
     
     /**
-     * creates a reusable SQL fragment for updating the mat view metaCache field for a whole task or a given groupId/transunitId (including fileId)
+     * creates a reusable SQL fragment for updating the mat view metaCache field for a whole task or a given groupId/transunitHash (including fileId)
      * @param bool $forWholeTask
      * @return string
      */
@@ -268,12 +268,12 @@ class editor_Models_Segment_MaterializedView {
         $selectSql .= ' FROM LEK_segment_data d, LEK_segments s';
         $selectSql .= ' LEFT JOIN LEK_segments_meta m ON m.taskGuid = s.taskGuid AND m.segmentId = s.id ';
         if(empty($segmentId)) {
-            $selectSql .= ' LEFT JOIN `siblings` ON `siblings`.`transunitId` = m.`transunitId`';
+            $selectSql .= ' LEFT JOIN `siblings` ON `siblings`.`transunitHash` = m.`transunitHash`';
             $selectSql .= ' WHERE d.taskGuid = ? and s.taskGuid = d.taskGuid and d.segmentId = s.id';
         }
         else {
-            $selectSql .= ' LEFT JOIN '.$this->metaCacheInnerSql($segmentId).' siblings ON siblings.transunitId = m.transunitId';
-            $selectSql .= ' WHERE s.taskGuid = ? and m.transunitId = ? and d.segmentId = s.id';
+            $selectSql .= ' LEFT JOIN '.$this->metaCacheInnerSql($segmentId).' siblings ON siblings.transunitHash = m.transunitHash';
+            $selectSql .= ' WHERE s.taskGuid = ? and m.transunitHash = ? and d.segmentId = s.id';
         }
         $selectSql .= ' GROUP BY d.segmentId';
         return $selectSql;
@@ -282,7 +282,7 @@ class editor_Models_Segment_MaterializedView {
     protected function metaCacheCreateTempTable() {
         $db = Zend_Db_Table::getDefaultAdapter();
         $sql = 'DROP TEMPORARY TABLE IF EXISTS `siblings`;';
-        $sql .= 'CREATE TEMPORARY TABLE siblings (INDEX (`transunitId`)) AS '.$this->metaCacheInnerSql().';';
+        $sql .= 'CREATE TEMPORARY TABLE siblings (INDEX (`transunitHash`)) AS '.$this->metaCacheInnerSql().';';
         $db->query($sql, [$this->taskGuid]);
     }
     
@@ -291,19 +291,19 @@ class editor_Models_Segment_MaterializedView {
         // otherwise long segments with many mrks could produce invalid JSON
         $db = Zend_Db_Table::getDefaultAdapter();
         $db->query('SET SESSION group_concat_max_len = 100000;');
-        
+
         //integer cast is also save, no need for binding
         $segmentId = (int)$segmentId;
-        $sql  = '(SELECT m1.transunitId, GROUP_CONCAT(CONCAT(\'"\',m1.segmentId,\'": \',m1.siblingData) SEPARATOR ",") siblingData ';
+        $sql  = '(SELECT m1.transunitHash, GROUP_CONCAT(CONCAT(\'"\',m1.segmentId,\'": \',m1.siblingData) SEPARATOR ",") siblingData ';
         $sql .= ' FROM LEK_segments_meta m1';
         if(empty($segmentId)) {
             $sql .= ' WHERE m1.taskGuid = ? ';
         }
         else {
             $sql .= ' LEFT JOIN LEK_segments_meta m2 ON m2.segmentId = '.$segmentId;
-            $sql .= ' WHERE m1.taskGuid = ? AND m1.transunitId = m2.transunitId ';
+            $sql .= ' WHERE m1.taskGuid = ? AND m1.transunitHash = m2.transunitHash ';
         }
-        $sql .= ' GROUP BY transunitId)';
+        $sql .= ' GROUP BY transunitHash)';
         return $sql;
     }
     

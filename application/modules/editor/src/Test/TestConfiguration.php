@@ -46,6 +46,11 @@ final class TestConfiguration {
     const DATA_DIRECTORY = 'testdata';
 
     /**
+     * Represents a config-value that can be present in test-configs that must be replaced with the installations base-url
+     */
+    const BASE_URL = '{BASE_URL}';
+
+    /**
      * The configs that define USERDATA pathes//null checks for no concrete value but if not empty
      */
     const DATA_CONFIGS = [
@@ -56,6 +61,7 @@ final class TestConfiguration {
         'runtimeOptions.dir.logs' => '../testdata/cache',
         /* 'runtimeOptions.dir.locales' => '../testdata/locales', Will not be relocated as it containes git-controlled files */
         'runtimeOptions.dir.taskData' => '../testdata/editorImportedTasks',
+        'runtimeOptions.dir.languageResourceData' => '../testdata/editorLanguageResources',
         'runtimeOptions.plugins.Okapi.dataDir' => '../testdata/editorOkapiBconf',
         'runtimeOptions.plugins.VisualReview.fontsDataDir' => '../testdata/editorVisualReviewFonts'
     ];
@@ -77,7 +83,7 @@ final class TestConfiguration {
         'runtimeOptions.tbx.termLabelMap' => '{"legalTerm": "permitted", "admittedTerm": "permitted", "preferredTerm": "preferred", "regulatedTerm": "permitted", "deprecatedTerm": "forbidden", "supersededTerm": "forbidden", "standardizedTerm": "permitted"}',
 
         /* Configs that need to be taken from the application database */
-
+        'runtimeOptions.worker.server' => null,
         'runtimeOptions.server.name' => null,
         'runtimeOptions.server.protocol' => null,
         'runtimeOptions.errorCodesUrl' => null,

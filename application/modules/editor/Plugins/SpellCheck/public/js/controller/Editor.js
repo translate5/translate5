@@ -100,10 +100,11 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
         NODE_NAME_MATCH: 'span',
         // CSS-Classes for the spellcheck-Node
         // INFO: moved as separate constant in Editor.util.HtmlClasses
-        //CSS_CLASSNAME_MATCH: 't5quality',
+        // CSS_CLASSNAME_MATCH: 't5quality',
         // CSS-Classes for error-types
         // Attributes for the spellcheck-Node
         ATTRIBUTE_ACTIVEMATCHINDEX: 'data-spellCheck-activeMatchIndex',
+        ATTRIBUTE_QTIP: 'data-qtip',
         // In ToolTips
         CSS_CLASSNAME_TOOLTIP_HEADER:  'spellcheck-tooltip-header',
         CSS_CLASSNAME_REPLACEMENTLINK:  'spellcheck-replacement',
@@ -205,6 +206,8 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
             plain: true,
             renderTo: Ext.getBody(),
             items: [],
+            onClick: Ext.emptyFn, // Actually, it's a built-in behaviour that ENTER-key press is equvalent to menuitem-click
+                                  // But somewhy this was not working that way until i made onClick to me empty function
             listeners: {
                 beforeshow: function() {
                     me.handleSpellCheckTooltip();
@@ -293,6 +296,7 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
             //same shortcut in micros%ft Word
             cont.keyMapConfig['F7'] = [Ext.event.Event.F7, {ctrl: false, alt: false}, me.startSpellCheckViaShortcut, true, me];
         }
+        cont.keyMapConfig['CTRL+R'] = [Ext.event.Event.R, {ctrl: true, alt: false}, me.showToolTipViaShortcut, true, me];
     },
     /**
      * Adds a "Run SpellCheck"-Button to the StatusStrip.
@@ -595,7 +599,7 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
             rangeForMatchBookmark,
             replaceText,
             bookmarkForCaretOnReplacement;
-        
+
         bookmarkForCaretOnReplacement = me.getPositionOfCaret();
         
         // Find and bookmark the range that belongs to the SpellCheck-Node for the current ToolTip.
@@ -776,9 +780,10 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
             match = matches ? matches[index] : me.allMatches[index],
             nodeElParams = { tag: me.self.NODE_NAME_MATCH };
         // CSS-class(es)
-        nodeElParams['cls'] = Editor.util.HtmlClasses.CSS_CLASSNAME_SPELLCHECK + ' ' + match.cssClassErrorType;
+        nodeElParams['cls'] = Editor.util.HtmlClasses.CSS_CLASSNAME_SPELLCHECK + ' ' + match.cssClassErrorType + ' ownttip';
         // activeMatchIndex
         nodeElParams[me.self.ATTRIBUTE_ACTIVEMATCHINDEX] = index;
+        nodeElParams[me.self.ATTRIBUTE_QTIP] = Editor.data.l10n.SpellCheck.nodeTitle;
         // create and return node
         return Ext.DomHelper.createDom(nodeElParams);
     },
@@ -906,7 +911,7 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
         // infoURL(s)
         if (infoURLs.length > 0) {
             Ext.Array.each(infoURLs, function(url) {
-                items.push({text: me.spellCheckMessages.moreInformation,
+                items.push({text: Editor.data.l10n.SpellCheck.moreInformation,
                             cls: me.self.CSS_CLASSNAME_TOOLTIP_MOREINFO,
                             href: url,
                             hrefTarget: '_blank'});
@@ -920,7 +925,37 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
             posY = event.getY() + me.editor.iframeEl.getY();
         me.activeMatchNode = event.currentTarget;
         me.initTooltips(); // me.spellCheckTooltip.hide() is not enough (e.g. after a contextmenu had been shown with a long list of replacements, the next contextmenu was placed as if it still has that height)
-        me.spellCheckTooltip.showAt(posX,posY);
+        me.spellCheckTooltip.showAt(posX,posY).focus();
     },
+
+    showToolTipViaShortcut: function(_, event) {
+
+        // Auxiliary variables
+        var ed = this.editor, selection = ed.getWin().getSelection(),
+            node = selection.focusNode.parentNode;
+
+        // Go upper until .t5spellcheck-node is met, if possible
+        while (node.classList && !node.classList.contains('t5spellcheck') && node.parentNode) {
+            node = node.parentNode;
+        }
+
+        // If it was possible to met .t5spellcheck-node, e.g. cursor is inside such a node
+        if (node.classList?.contains('t5spellcheck')) {
+
+            // Get node sizing info
+            var rect = node.getBoundingClientRect();
+
+            // Spoof event.xy with synthetic values
+            event.xy = [
+                rect.left + rect.width * 0.5,
+                rect.top + rect.height * 0.5
+            ];
+
+            // Spoof event.currentTarget with .t5spellcheck-node
+            event.currentTarget = node;
+
+            // Feed that to showToolTip()
+            this.showToolTip(event);
+        }
+    }
 });
-// var matches = Ext.getCmp('segment-grid').getStore().getAt(1).get('spellCheck').target;

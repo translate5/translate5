@@ -56,14 +56,25 @@ final class editor_Segment_Quality_Manager
         // check if the current tsak state allows operations
         $task->checkStateAllowsActions();
         // creates the operation wrapper, that sets the needed task-states
-        $parentId = editor_Task_Operation::create(editor_Task_Operation::AUTOQA, $task);
-        // this triggers a refresh of the task's TBX cache
-        $task->meta()->resetTbxHash([$task->getTaskGuid()]);
-        // queues the operation workers
-        self::instance()->queueOperation(editor_Segment_Processing::RETAG, $task, $parentId);
-        // triggers the worker-queue
-        $workerQueue = ZfExtended_Factory::get(Queue::class);
-        $workerQueue->trigger();
+        $operation = editor_Task_Operation::create(editor_Task_Operation::AUTOQA, $task);
+        try {
+
+            // this triggers a refresh of the task's TBX cache
+            $task->meta()->resetTbxHash([$task->getTaskGuid()]);
+            // queues the operation workers
+            self::instance()->queueOperation(editor_Segment_Processing::RETAG, $task, $operation->getWorkerId(), ZfExtended_Models_Worker::STATE_PREPARE);
+            // start the operation
+            $operation->start();
+            // triggers the worker-queue
+            $workerQueue = ZfExtended_Factory::get(Queue::class);
+            $workerQueue->trigger();
+
+
+        } catch(Throwable $e){
+
+            $operation->onQueueingError();
+            throw $e;
+        }
     }
 
     /**
@@ -80,12 +91,22 @@ final class editor_Segment_Quality_Manager
         // check if the current tsak state allows operations
         $task->checkStateAllowsActions();
         // queue a task operation and the depending quality operation
-        $parentId = editor_Task_Operation::create(editor_Task_Operation::TAGTERMS, $task);
-        // queues the operation workers
-        self::instance()->queueOperation(editor_Segment_Processing::TAGTERMS, $task, $parentId);
-        // trigger the workers to work
-        $wq = ZfExtended_Factory::get(Queue::class);
-        $wq->trigger();
+        $operation = editor_Task_Operation::create(editor_Task_Operation::TAGTERMS, $task);
+        try {
+
+            // queues the operation workers
+            self::instance()->queueOperation(editor_Segment_Processing::TAGTERMS, $task, $operation->getWorkerId(), ZfExtended_Models_Worker::STATE_PREPARE);
+            // start the operation
+            $operation->start();
+            // trigger the workers to work
+            $workerQueue = ZfExtended_Factory::get(Queue::class);
+            $workerQueue->trigger();
+
+        } catch(Throwable $e){
+
+            $operation->onQueueingError();
+            throw $e;
+        }
     }
 
     /**
@@ -199,16 +220,21 @@ final class editor_Segment_Quality_Manager
      * @param editor_Models_Task $task
      * @param int $workerParentId
      */
-    public function queueImport(editor_Models_Task $task, int $workerParentId=0){
+    public function queueImport(editor_Models_Task $task, int $workerParentId = 0){
+
+        if($this->isProcessingSkipped(editor_Segment_Processing::IMPORT, $task, true)){
+            return;
+        }
         // add starting worker
-        $worker = ZfExtended_Factory::get(editor_Segment_Quality_ImportWorker::class);
-        if($worker->init($task->getTaskGuid())){
+        $workerParams = ['processingMode' => editor_Segment_Processing::IMPORT ]; // mandatory for any quality processing
+        $worker = ZfExtended_Factory::get(editor_Segment_Quality_OperationWorker::class);
+        if($worker->init($task->getTaskGuid(), $workerParams)){
             $qualityParentId = $worker->queue($workerParentId, null, false);
             // add the workers of our providers
             $this->queueProviderWorkers(editor_Segment_Processing::IMPORT, $task, $workerParentId, []);
             // add finishing worker
-            $worker = ZfExtended_Factory::get(editor_Segment_Quality_ImportFinishingWorker::class);
-            if($worker->init($task->getTaskGuid())) {
+            $worker = ZfExtended_Factory::get(editor_Segment_Quality_OperationFinishingWorker::class);
+            if($worker->init($task->getTaskGuid(), $workerParams)) {
                 $worker->queue($qualityParentId, null, false);
             }
         }
@@ -218,14 +244,20 @@ final class editor_Segment_Quality_Manager
      * @param string $processingMode: as defined in editor_Segment_Processing
      * @param editor_Models_Task $task
      * @param int $workerParentId: this must be the id of the wrapping operation worker
+     * @param string|null $workerState
+     * @return void
+     * @throws ReflectionException
      */
-    public function queueOperation(string $processingMode, editor_Models_Task $task, int $workerParentId){
+    public function queueOperation(string $processingMode, editor_Models_Task $task, int $workerParentId, string $workerState = null){
+
+        if($this->isProcessingSkipped($processingMode, $task, true)){
+            return;
+        }
         // add starting worker
         $workerParams = ['processingMode' => $processingMode ]; // mandatory for any quality processing
         $worker = ZfExtended_Factory::get(editor_Segment_Quality_OperationWorker::class);
         if($worker->init($task->getTaskGuid(), $workerParams)) {
-
-            $qualityParentId = $worker->queue($workerParentId, null, false);
+            $qualityParentId = $worker->queue($workerParentId, $workerState, false);
             // add the workers of our providers
             $this->queueProviderWorkers($processingMode, $task, $qualityParentId, []);
             // add finishing worker
@@ -246,33 +278,27 @@ final class editor_Segment_Quality_Manager
      */
     public function prepareOperation(string $processingMode, editor_Models_Task $task, int $parentWorkerId){
 
-        if(self::ACTIVE) {
+        if($this->isProcessingSkipped($processingMode, $task)){
+            return;
+        }
+        $qualityConfig = $task->getConfig()->runtimeOptions->autoQA;
 
-            $qualityConfig = $task->getConfig()->runtimeOptions->autoQA;
+        //  we have to remove all existing qualities when performing an operation ... NOT when running a solitary operation as then the qualities of the other providers remain untouched
+        $typeToRemove = editor_Segment_Processing::isSolitaryOperation($processingMode) ? editor_Segment_Processing::getProviderTypeForSolitaryOperation($processingMode) : null;
+        editor_Models_Db_SegmentQuality::deleteForTask($task->getTaskGuid(), $typeToRemove);
 
-            //  we have to remove all existing qualities when performing an operation ... NOT when running a solitary operation as then the qualities of the other providers remain untouched
-            $typeToRemove = editor_Segment_Processing::isSolitaryOperation($processingMode) ? editor_Segment_Processing::getProviderTypeForSolitaryOperation($processingMode) : null;
-            editor_Models_Db_SegmentQuality::deleteForTask($task->getTaskGuid(), $typeToRemove);
+        // if we have workers we must prepare the State processing table
+        if($this->hasProviderWorkers($processingMode, $qualityConfig)){
 
-            // If should be skipped - do so
-            if ($this->skipOnImport($processingMode, $task, $qualityConfig)) {
-                // Log and return
-                $task->logger('editor.task')->warn('E1432', 'AutoQA-step of the import process - is deactivated');
-                return;
-            }
-            // if we have workers we must prepare the State processing table
-            if($this->hasProviderWorkers($processingMode, $qualityConfig)){
+            // create entries for all segmentIds
+            $table = new Processing();
+            $table->prepareOperation($task->getTaskGuid());
 
-                // create entries for all segmentIds
-                $table = new Processing();
-                $table->prepareOperation($task->getTaskGuid());
-
-                // maybe some workers need to prepare additional entries by setting custom States
-                foreach ($this->getProviderTypesForProcessing($processingMode) as $type) {
-                    $provider = $this->getProvider($type);
-                    if ($provider->hasOperationWorker($processingMode, $qualityConfig)) {
-                        $provider->prepareOperation($task, $processingMode);
-                    }
+            // maybe some workers need to prepare additional entries by setting custom States
+            foreach ($this->getProviderTypesForProcessing($processingMode) as $type) {
+                $provider = $this->getProvider($type);
+                if ($provider->hasOperationWorker($processingMode, $qualityConfig)) {
+                    $provider->prepareOperation($task, $processingMode);
                 }
             }
         }
@@ -287,80 +313,76 @@ final class editor_Segment_Quality_Manager
      */
     public function finishOperation(string $processingMode, editor_Models_Task $task){
 
-        if(self::ACTIVE) {
+        if($this->isProcessingSkipped($processingMode, $task)){
+            return;
+        }
+        $qualityConfig = $task->getConfig()->runtimeOptions->autoQA;
+        $taskGuid = $task->getTaskGuid();
+        $segmentTable = ZfExtended_Factory::get(editor_Models_Db_Segments::class);
+        $segmentIds = $segmentTable->getAllIdsForTask($task->getTaskGuid(), true);
+        $segment = ZfExtended_Factory::get(editor_Models_Segment::class);
+        // when we had workers we have to use the Processing-table to fetch the segments. Currently, this always will be the case but who knows ...
+        $processingTable = ($this->hasProviderWorkers($processingMode, $qualityConfig)) ? new Processing() : null;
+        // represent the quality-types that are involved in the processing ... for Solitary Operations this may just be a single type
+        $processedTypes = $this->getProviderTypesForProcessing($processingMode);
+        // solitary operations use the processing cache just for the state but the segment is saved directly when processing
+        // In this case we do not need to process the segments further and can skip that step
+        $isSolitaryWorkerProcess = (editor_Segment_Processing::isSolitaryOperation($processingMode)
+            && $this->getProvider($processedTypes[0])->hasOperationWorker($processingMode, $qualityConfig));
 
-            $taskGuid = $task->getTaskGuid();
-            $qualityConfig = $task->getConfig()->runtimeOptions->autoQA;
-            // If should be skipped - do so
-            if ($this->skipOnImport($processingMode, $task, $qualityConfig)) {
-                return;
-            }
-            $segmentTable = ZfExtended_Factory::get(editor_Models_Db_Segments::class);
-            $segmentIds = $segmentTable->getAllIdsForTask($taskGuid, true);
-            $segment = ZfExtended_Factory::get(editor_Models_Segment::class);
-            // when we had workers we have to use the Processing-table to fetch the segments. Currently, this always will be the case but who knows ...
-            $processingTable = ($this->hasProviderWorkers($processingMode, $qualityConfig)) ? new Processing() : null;
-            // represent the quality-types that are involved in the processing ... for Solitary Operations this may just be a single type
-            $processedTypes = $this->getProviderTypesForProcessing($processingMode);
-            // solitary operations use the processing cache just for the state but the segment is saved directly when processing
-            // In this case we do not need to process the segments further and can skip that step
-            $isSolitaryWorkerProcess = (editor_Segment_Processing::isSolitaryOperation($processingMode)
-                && $this->getProvider($processedTypes[0])->hasOperationWorker($processingMode, $qualityConfig));
+        if(!$isSolitaryWorkerProcess){
 
-            if(!$isSolitaryWorkerProcess){
+            $qualities = [];
 
-                $qualities = [];
+            foreach ($segmentIds as $segmentId) {
 
-                foreach ($segmentIds as $segmentId) {
-
-                    $tags = null;
-                    // fetch the segment-tags-model. When there have wbeen worker-operations it will originate from the processing-model
-                    // when there were no workers involved, the tagsJson of the State is not set and we fetch the contents from the segment-table
-                    if($processingTable !== null){
-                        $row = $processingTable->fetchRow($processingTable->select()->where('segmentId = ?', $segmentId));
-                        if(!empty($row->tagsJson)){
-                            $tags = editor_Segment_Tags::fromJson($task, $processingMode, $row->tagsJson);
-                        }
+                $tags = null;
+                // fetch the segment-tags-model. When there have wbeen worker-operations it will originate from the processing-model
+                // when there were no workers involved, the tagsJson of the State is not set and we fetch the contents from the segment-table
+                if($processingTable !== null){
+                    $row = $processingTable->fetchRow($processingTable->select()->where('segmentId = ?', $segmentId));
+                    if(!empty($row->tagsJson)){
+                        $tags = editor_Segment_Tags::fromJson($task, $processingMode, $row->tagsJson);
                     }
-                    if($tags === null){
-                        $segment->load($segmentId);
-                        $tags = editor_Segment_Tags::fromSegment($task, $processingMode, $segment);
-                    }
-                    // process all quality providers that do not have an worker for the current operation
-                    foreach ($processedTypes as $type) {
-                        $provider = $this->getProvider($type);
-                        if (!$provider->hasOperationWorker($processingMode, $qualityConfig)) {
-                            $tags = $provider->processSegment($task, $qualityConfig, $tags, $processingMode);
-                        }
-                    }
-                    // we save all qualities at once to reduce db-strain
-                    $qualities = array_merge($qualities, $tags->extractNewQualities());
-                    // save the segment tags content back to the segment
-                    // in an worker-based operation this will save the segments back
-                    $tags->saveToSegment();
                 }
-
-                // save qualities
-                editor_Models_Db_SegmentQuality::saveRows($qualities);
-            }
-
-            // clean up processing & retrieve the number of processed segments for each state ... when we have a processing
-            $processingResult = ($processingTable === null) ? ['segments' => count($segmentIds)] : $processingTable->getOperationResult($taskGuid);
-
-            // post actions: post-processing (needed for quality-workers that need to contextualize all segments) or finalization for qualities with operation workers
-            foreach ($processedTypes as $type) {
-                $provider = $this->getProvider($type);
-                if ($provider->hasOperationWorker($processingMode, $qualityConfig)) {
-                    $provider->finalizeOperation($task, $processingMode, $processingResult);
-                } else {
-                    // Append qualities, that can be detected only after all segments have been processed
-                    $provider->postProcessTask($task, $qualityConfig, $processingMode);
+                if($tags === null){
+                    $segment->load($segmentId);
+                    $tags = editor_Segment_Tags::fromSegment($task, $processingMode, $segment);
                 }
+                // process all quality providers that do not have an worker for the current operation
+                foreach ($processedTypes as $type) {
+                    $provider = $this->getProvider($type);
+                    if (!$provider->hasOperationWorker($processingMode, $qualityConfig)) {
+                        $tags = $provider->processSegment($task, $qualityConfig, $tags, $processingMode);
+                    }
+                }
+                // we save all qualities at once to reduce db-strain
+                $qualities = array_merge($qualities, $tags->extractNewQualities());
+                // save the segment tags content back to the segment
+                // in an worker-based operation this will save the segments back
+                $tags->saveToSegment();
             }
-            // removes all entries from the processing table if the processing-model was used
-            if($processingTable){
-                $processingTable->finishOperation($taskGuid);
+
+            // save qualities
+            editor_Models_Db_SegmentQuality::saveRows($qualities);
+        }
+
+        // clean up processing & retrieve the number of processed segments for each state ... when we have a processing
+        $processingResult = ($processingTable === null) ? ['segments' => count($segmentIds)] : $processingTable->getOperationResult($taskGuid);
+
+        // post actions: post-processing (needed for quality-workers that need to contextualize all segments) or finalization for qualities with operation workers
+        foreach ($processedTypes as $type) {
+            $provider = $this->getProvider($type);
+            if ($provider->hasOperationWorker($processingMode, $qualityConfig)) {
+                $provider->finalizeOperation($task, $processingMode, $processingResult);
+            } else {
+                // Append qualities, that can be detected only after all segments have been processed
+                $provider->postProcessTask($task, $qualityConfig, $processingMode);
             }
+        }
+        // removes all entries from the processing table if the processing-model was used
+        if($processingTable){
+            $processingTable->finishOperation($taskGuid);
         }
     }
 
@@ -373,21 +395,16 @@ final class editor_Segment_Quality_Manager
      */
     public function processSegment(editor_Models_Segment $segment, editor_Models_Task $task, string $processingMode){
 
-        if(self::ACTIVE) {
-
-            $qualityConfig = $task->getConfig()->runtimeOptions->autoQA;
-            // If should be skipped - do so
-            if ($this->skipOnImport($processingMode, $task, $qualityConfig)) {
-                return;
-            }
-
-            $tags = editor_Segment_Tags::fromSegment($task, $processingMode, $segment);
-            foreach ($this->getProviderTypesForProcessing($processingMode) as $type) {
-                $tags = $this->getProvider($type)->processSegment($task, $qualityConfig, $tags, $processingMode);
-            }
-            // saves back to the segment
-            $tags->save();
+        if($this->isProcessingSkipped($processingMode, $task)){
+            return;
         }
+        $qualityConfig = $task->getConfig()->runtimeOptions->autoQA;
+        $tags = editor_Segment_Tags::fromSegment($task, $processingMode, $segment);
+        foreach ($this->getProviderTypesForProcessing($processingMode) as $type) {
+            $tags = $this->getProvider($type)->processSegment($task, $qualityConfig, $tags, $processingMode);
+        }
+        // saves back to the segment
+        $tags->save();
     }
 
     /**
@@ -400,36 +417,14 @@ final class editor_Segment_Quality_Manager
      * @throws editor_Models_ConfigException
      */
     public function preProcessTask(editor_Models_Task $task, string $processingMode) {
-        if(self::ACTIVE) {
-            $qualityConfig = $task->getConfig()->runtimeOptions->autoQA;
 
-            // If should be skipped - do so
-            if ($this->skipOnImport($processingMode, $task, $qualityConfig)) {
-                return;
-            }
-            foreach ($this->getProviderTypesForProcessing($processingMode) as $type) {
-                $this->getProvider($type)->preProcessTask($task, $qualityConfig, $processingMode);
-            }
+        if($this->isProcessingSkipped($processingMode, $task)){
+            return;
         }
-    }
-
-    /**
-     * Return true if $processingMode arg is 'import' and autoStartOnImport
-     * is disabled either on task-config level or on task-type-config-level
-     *
-     * @param $processingMode
-     * @param editor_Models_Task $task
-     * @param Zend_Config $qualityConfig
-     * @return bool
-     */
-    public function skipOnImport($processingMode, editor_Models_Task $task, Zend_Config $qualityConfig) : bool {
-        // If $processingMode is not 'import' question about whether skip or not - is not applicable here
-        if ($processingMode != editor_Segment_Processing::IMPORT) {
-            // So return false
-            return false;
+        $qualityConfig = $task->getConfig()->runtimeOptions->autoQA;
+        foreach ($this->getProviderTypesForProcessing($processingMode) as $type) {
+            $this->getProvider($type)->preProcessTask($task, $qualityConfig, $processingMode);
         }
-        // If autoStatOnImport is disabled either on task-config level or on task-type-config-level - return true
-        return !$qualityConfig->autoStartOnImport || !$task->getTaskType()->isAutoStartAutoQA();
     }
 
     /**
@@ -441,16 +436,13 @@ final class editor_Segment_Quality_Manager
      * @throws editor_Models_ConfigException
      */
     public function postProcessTask(editor_Models_Task $task, string $processingMode) {
-        if(self::ACTIVE){
-            $qualityConfig = $task->getConfig()->runtimeOptions->autoQA;
 
-            // If should be skipped - do so
-            if ($this->skipOnImport($processingMode, $task, $qualityConfig)) {
-                return;
-            }
-            foreach ($this->getProviderTypesForProcessing($processingMode) as $type) {
-                $this->getProvider($type)->postProcessTask($task, $qualityConfig, $processingMode);
-            }
+        if($this->isProcessingSkipped($processingMode, $task)){
+            return;
+        }
+        $qualityConfig = $task->getConfig()->runtimeOptions->autoQA;
+        foreach ($this->getProviderTypesForProcessing($processingMode) as $type) {
+            $this->getProvider($type)->postProcessTask($task, $qualityConfig, $processingMode);
         }
     }
 
@@ -462,23 +454,19 @@ final class editor_Segment_Quality_Manager
      * @throws editor_Models_ConfigException
      */
     public function processAlikeSegment(editor_Models_Segment $segment, editor_Models_Task $task, editor_Segment_Alike_Qualities $alikeQualities){
-        if(self::ACTIVE) {
-            $processingMode = editor_Segment_Processing::ALIKE;
-            $qualityConfig = $task->getConfig()->runtimeOptions->autoQA;
 
-            // If should be skipped - do so
-            if ($this->skipOnImport($processingMode, $task, $qualityConfig)) {
-                return;
-            }
-
-            $tags = editor_Segment_Tags::fromSegment($task, $processingMode, $segment);
-            $tags->initAlikeQualities($alikeQualities);
-            foreach ($this->getProviderTypesForProcessing($processingMode) as $type) {
-                $tags = $this->getProvider($type)->processSegment($task, $qualityConfig, $tags, $processingMode);
-            }
-            // saves back to the segment
-            $tags->save();
+        if($this->isProcessingSkipped(editor_Segment_Processing::ALIKE, $task)){
+            return;
         }
+        $processingMode = editor_Segment_Processing::ALIKE;
+        $qualityConfig = $task->getConfig()->runtimeOptions->autoQA;
+        $tags = editor_Segment_Tags::fromSegment($task, $processingMode, $segment);
+        $tags->initAlikeQualities($alikeQualities);
+        foreach ($this->getProviderTypesForProcessing($processingMode) as $type) {
+            $tags = $this->getProvider($type)->processSegment($task, $qualityConfig, $tags, $processingMode);
+        }
+        // saves back to the segment
+        $tags->save();
     }
     /**
      * The central API to identify the needed Tag class by classnames and attributes
@@ -704,8 +692,7 @@ final class editor_Segment_Quality_Manager
 
     public function mustBeZeroErrors(string $type, string $category, editor_Models_Task $task): bool
     {
-        return $this->isFaultyInternalTagType($type, $category)
-            || $this->getProvider($type)?->mustBeZeroErrors($type, $category, $task->getConfig());
+        return (bool) $this->getProvider($type)?->mustBeZeroErrors($type, $category, $task->getConfig());
     }
 
     public function typeHasMustBeZeroErrorsCategories(string $type, editor_Models_Task $task): bool
@@ -810,5 +797,25 @@ final class editor_Segment_Quality_Manager
             return [];
         }
         return array_keys($this->registry);
+    }
+
+    /**
+     * Returns true if the processing should be completely skipped for a processing-mode
+     * @param string $processingMode
+     * @param editor_Models_Task $task
+     * @return bool
+     * @throws editor_Models_ConfigException
+     */
+    private function isProcessingSkipped(string $processingMode, editor_Models_Task $task, bool $logSkipping = false){
+        if(!self::ACTIVE){
+            return true;
+        }
+        if($processingMode === editor_Segment_Processing::IMPORT && (!$task->getTaskType()->isAutoStartAutoQA() || !$task->getConfig()->runtimeOptions->autoQA->autoStartOnImport)){
+            if($logSkipping){
+                $task->logger('editor.task')->warn('E1432', 'AutoQA-step of the import process - is deactivated');
+            }
+            return true;
+        }
+        return false;
     }
 }

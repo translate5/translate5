@@ -52,7 +52,7 @@ Ext.define('Ext.overrides.data.proxy.Server', {
  * needed for ext-6.0.0
  * recheck on update
  */
-Ext.define('Ext.overrides.fixed.BufferedStore', {
+Ext.define('Ext.overrides.data.BufferedStore', {
     override: 'Ext.data.BufferedStore',
     contains: function(record) {
         return this.indexOf(record) > -1;
@@ -65,7 +65,7 @@ Ext.define('Ext.overrides.fixed.BufferedStore', {
  * needed for ext-6.0.0
  * should be solved natively with ext-6.0.1
  */
-Ext.define('Ext.overrides.fixed.PageMap', {
+Ext.define('Ext.overrides.data.PageMap', {
     override: 'Ext.data.PageMap',
     getByInternalId: function(internalId) {
         var index = this.indexMap[internalId];
@@ -80,7 +80,7 @@ Ext.define('Ext.overrides.fixed.PageMap', {
  * needed for ext-6.0.0
  * should be solved natively with ext-6.0.1
  */
-Ext.define('Ext.overrides.fixed.ListFilter', {
+Ext.define('Ext.overrides.grid.filters.filter.List', {
     override: 'Ext.grid.filters.filter.List',
     getGridStoreListeners: function() {
         if(this.autoStore) {
@@ -1289,18 +1289,6 @@ Ext.override(Ext.panel.Table, {
 });
 
 /**
- * ExtJS 6.2 bug: there is currently no other way to enable stateful grid with columns only.
- * Since there is currently no need to have stateful filters in one of the grids, 
- * we just disable that generally
- */
-Ext.override(Ext.grid.filters.Filters, {
-    init: function(grid) {
-        this.callParent([grid]);
-        grid.store.statefulFilters = false;
-    }
-});
-
-/**
  * Fixes regarding states and grid table
  */
 Ext.override(Ext.grid.column.Column, {
@@ -1761,9 +1749,5 @@ Ext.define('Ext.overrides.grid.filters.filter.Base', {
 
 Ext.define('Ext.overrides.grid.filters.filter.Number', {
     override: 'Ext.grid.filters.filter.Number',
-    createMenu: function () {
-        var me = this;
-        me.callParent();
-        me.setUpdateBuffer(0);
-    }
+    updateBuffer: 0
 });

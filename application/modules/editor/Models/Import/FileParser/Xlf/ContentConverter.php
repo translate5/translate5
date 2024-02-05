@@ -26,6 +26,9 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\Task\Import\FileParser\Xlf\Namespaces\AbstractNamespace as XlfNamespaces;
+use MittagQI\Translate5\Segment\Tag\Placeable;
+
 /**
  * Converts XLF segment content chunks into translate5 internal segment content string
  */
@@ -44,10 +47,7 @@ class editor_Models_Import_FileParser_Xlf_ContentConverter {
      */
     protected array $result = [];
     
-    /**
-     * @var editor_Models_Import_FileParser_Xlf_Namespaces
-     */
-    protected $namespaces;
+    protected XlfNamespaces $namespaces;
     
     /**
      * @var array
@@ -58,7 +58,7 @@ class editor_Models_Import_FileParser_Xlf_ContentConverter {
      * store the filename of the imported file for debugging reasons
      * @var string
      */
-    protected $filename;
+    protected string $filename;
     
     /**
      * store the task for debugging reasons
@@ -77,7 +77,13 @@ class editor_Models_Import_FileParser_Xlf_ContentConverter {
      * Flag to switch normal mode and remove tags mode
      * @var string
      */
-    protected $removeTags = false;
+    protected bool $removeTags = false;
+
+    protected bool $protectTags;
+
+    protected bool $findPlaceables;
+
+    protected array $placeablesXpathes;
 
     protected bool $inMrk = false;
     
@@ -92,11 +98,11 @@ class editor_Models_Import_FileParser_Xlf_ContentConverter {
     protected editor_Models_Import_FileParser_Xlf_ShortTagNumbers $shortTagNumbers;
 
     /**
-     * @param array $namespaces
+     * @param XlfNamespaces $namespaces
      * @param editor_Models_Task $task for debugging reasons only
      * @param string $filename for debugging reasons only
      */
-    public function __construct(editor_Models_Import_FileParser_Xlf_Namespaces $namespaces, editor_Models_Task $task, $filename) {
+    public function __construct(XlfNamespaces $namespaces, editor_Models_Task $task, string $filename) {
         $this->namespaces = $namespaces;
         $this->task = $task;
         $this->filename = $filename;
@@ -165,6 +171,11 @@ class editor_Models_Import_FileParser_Xlf_ContentConverter {
         
         $this->xmlparser->registerElement('*', [$this, 'handleUnknown']); // → all other tags
         $this->xmlparser->registerOther([$this, 'handleText']);
+
+        $config = $task->getConfig();
+        $this->protectTags = $config->runtimeOptions->import->fileparser->options->protectTags ?? false;
+        $this->placeablesXpathes = $config->runtimeOptions->import->xlf->placeablesXpathes->toArray();
+        $this->findPlaceables = count($this->placeablesXpathes) > 0;
     }
 
     /**
@@ -224,6 +235,12 @@ class editor_Models_Import_FileParser_Xlf_ContentConverter {
         $tagObj->rid = $this->getRid($openerMeta);
         $tagObj->originalContent = $originalContent;
 
+
+        // find placeables in the original content
+        if($this->findPlaceables){
+            Placeable::detect($originalContent, $this->placeablesXpathes, $tagObj);
+        }
+
         $this->shortTagNumbers->addTag($tagObj);
         return $tagObj;
     }
@@ -244,6 +261,7 @@ class editor_Models_Import_FileParser_Xlf_ContentConverter {
     /**
      * @param array $openerMeta
      * @param string $originalContent
+     * @param bool $tagWithContent
      * @return string
      */
     protected function getId(array $openerMeta, string $originalContent, bool $tagWithContent): string {
@@ -363,7 +381,7 @@ class editor_Models_Import_FileParser_Xlf_ContentConverter {
         // we have to protect them here
         
         $wh = $this->utilities->whitespace;
-        if($this->task->getConfig()->runtimeOptions->import->fileparser->options->protectTags ?? false) {
+        if($this->protectTags) {
             //since we are in a XML file format, plain tags in the content are encoded, which we have to undo first
             //$text is here for example: Dies &lt;strong&gt;ist ein&lt;/strong&gt; Test. &amp;nbsp;
             $text = html_entity_decode($text);
@@ -386,27 +404,26 @@ class editor_Models_Import_FileParser_Xlf_ContentConverter {
      * Inner PH tag text handler
      * @param string $text
      */
-    public function handleContentTagText($text) {
+    public function handleContentTagText(string $text):void
+    {
         $this->innerTag[] = $text;
     }
-    
+
     /**
      * Handler for X tags
      * @param string $tag
      * @param int $key
      * @param array $opener
+     * @throws editor_Models_Import_FileParser_Xlf_Exception
      */
-    public function handleReplacerTag($tag, $key, $opener) {
+    public function handleReplacerTag(string $tag, int $key, array $opener): void
+    {
         $chunk = $this->xmlparser->getChunk($key);
-        $single = $this->namespaces->getSingleTag($chunk);
-        if(!empty($single)) {
-            $this->result[] = $single;
-            return;
-        }
         //hack so that we can replace original tags with <x> tag internally
         // and here we restore then the original content to be visible in the frontend
-        // (<ph>orig</ph> tag would be correcter instead <x>, but can not be used due index shifting of the xml chunks then)
-        if($originalTagData = $this->xmlparser->getAttribute($opener['attributes'], 'translate5OriginalContent')) {
+        // (<ph>orig</ph> tag would be correcter instead <x>,
+        //  but can not be used due index shifting of the xml chunks then)
+        if ($originalTagData = $this->xmlparser->getAttribute($opener['attributes'], 'translate5OriginalContent')) {
             $chunk = htmlspecialchars_decode($originalTagData);
         }
         $this->result[] = $this->createTag($opener, $tag, $chunk);
@@ -419,34 +436,25 @@ class editor_Models_Import_FileParser_Xlf_ContentConverter {
      * @param int $key
      * @throws editor_Models_Import_FileParser_Xlf_Exception
      */
-    public function handleGTagOpener($tag, $attributes, $key) {
+    public function handleGTagOpener(string $tag, array $attributes, int $key): void
+    {
         $chunk = $this->xmlparser->getChunk($key);
-        $result = $this->namespaces->getPairedTag($chunk, null);
-        if(!empty($result)) {
-            $this->result[] = $result[0];
-            return;
-        }
         $this->result[] = $this->createTag($this->xmlparser->current(), $tag, $chunk);
     }
-    
+
     /**
      * Handler for G tags
      * @param string $tag
      * @param int $key
      * @param array $opener
+     * @throws editor_Models_Import_FileParser_Xlf_Exception
      */
-    public function handleGTagCloser($tag, $key, $opener) {
+    public function handleGTagCloser(string $tag, int $key, array $opener): void
+    {
         if ($opener['isSingle']) {
             return; // the tag was already handled in the opener
         }
-        $openerKey = $opener['openerKey'];
-        $openChunk = $this->xmlparser->getChunk($openerKey);
         $closeChunk = $this->xmlparser->getChunk($key);
-        $result = $this->namespaces->getPairedTag($openChunk, $closeChunk);
-        if(!empty($result)) {
-            $this->result[] = $result[1];
-            return;
-        }
         $this->result[] = $this->createTag($opener, $tag.'-close', $closeChunk);
     }
 
@@ -457,10 +465,12 @@ class editor_Models_Import_FileParser_Xlf_ContentConverter {
      * @param int $key
      * @throws editor_Models_Import_FileParser_Xlf_Exception
      */
-    public function handleUnknown(string $tag, array $attributes, int $key) {
+    public function handleUnknown(string $tag, array $attributes, int $key):void
+    {
         //below tags are given to the content converter,
         // they are known so far, just not handled by the converter
-        // or they are not intended to be handled since the main action happens in the closer handler not in the opener handler
+        // or they are not intended to be handled since the main action
+        //  happens in the closer handler not in the opener handler
         switch ($tag) {
             case 'x':
             case 'g':
@@ -482,7 +492,8 @@ class editor_Models_Import_FileParser_Xlf_ContentConverter {
         ]);
     }
     
-    public function getFileName() {
+    public function getFileName(): string
+    {
         return $this->filename;
     }
 }

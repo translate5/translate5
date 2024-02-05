@@ -26,6 +26,7 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\Acl\Rights;
 use MittagQI\Translate5\Task\Current\Exception;
 use MittagQI\Translate5\Task\Current\NoAccessException;
 use MittagQI\Translate5\Task\TaskContextTrait;
@@ -81,9 +82,9 @@ class Editor_FiletreeController extends ZfExtended_RestController
         $task = ZfExtended_Factory::get('editor_Models_Task');
         $task->loadByTaskGuid($taskGuid);
 
-        $isPm = $task->getPmGuid() === ZfExtended_Authentication::getInstance()->getUser()->getUserGuid();
+        $isPm = $task->getPmGuid() === ZfExtended_Authentication::getInstance()->getUserGuid();
 
-        $mayLoadAllTasks = $this->isAllowed('backend', 'loadAllTasks') || ($isPm);
+        $mayLoadAllTasks = $this->isAllowed(Rights::ID, Rights::LOAD_ALL_TASKS) || ($isPm);
 
         if( $mayLoadAllTasks === false){
             $this->view->rows = [];
@@ -115,10 +116,10 @@ class Editor_FiletreeController extends ZfExtended_RestController
 
         $wfh = $this->_helper->workflow;
         /* @var $wfh Editor_Controller_Helper_Workflow */
-        $wfh->checkWorkflowWriteable($taskGuid, editor_User::instance()->getGuid());
+        $wfh->checkWorkflowWriteable($taskGuid, ZfExtended_Authentication::getInstance()->getUserGuid());
 
         $this->entity->loadByTaskGuid($taskGuid);
-        $mover = ZfExtended_Factory::get('editor_Models_Foldertree_Mover', array($this->entity));
+        $mover = ZfExtended_Factory::get(editor_Models_Foldertree_Mover::class, array($this->entity));
         $mover->moveNode((int)$data->id, (int)$data->parentId, (int)$data->index);
         $this->entity->syncTreeToFiles();
         $this->syncSegmentFileOrder($taskGuid);

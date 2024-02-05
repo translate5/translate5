@@ -36,6 +36,11 @@ Ext.define('Editor.view.admin.customer.ViewController', {
 
 
     listen:{
+        controller: {
+            '#Editor.$application': {
+                adminSectionChanged: 'onApplicationSectionChanged'
+            }
+        },
         component:{
             '#saveOpenIdButton':{
                 click:'save'
@@ -48,7 +53,37 @@ Ext.define('Editor.view.admin.customer.ViewController', {
             // so that click event is triggered on toolbar's corresponding item
             'button[iconCls="x-toolbar-more-icon"] > menu > menuitem': {
                 click: menuitem => menuitem.masterComponent.fireEvent('click')
+            },
+            '#displayTabPanel': {
+                tabchange: 'onDisplayTabPanelTabChanged'
             }
+        },
+        store:{
+            'customersStore': {
+                filterchange: 'onCustomerStoreFilterChange'
+            }
+        }
+    },
+
+    /**
+     * Will hide the domain tooltip when the application section is changed.
+     * The domain tooltip is only visible in the customer section, and it has the closable
+     * flag set because of the inner tooltip link.
+     * @param openedView
+     */
+    onApplicationSectionChanged: function (openedView){
+        var me = this,
+            view = me.getView();
+
+        if(!view || !openedView){
+            return;
+        }
+        if(view.getXType() === openedView.getXType()){
+            return;
+        }
+
+        if(view.domainLabelInfoTooltip && view.domainLabelInfoTooltip.isVisible()){
+            view.domainLabelInfoTooltip.hide();
         }
     },
 
@@ -66,8 +101,16 @@ Ext.define('Editor.view.admin.customer.ViewController', {
     /***
      * Customer grid row select handler
      */
-    customerGridSelect: function(grid, record){
-        this.editCustomer(record);
+    customerGridSelect: function(selection, record){
+        var view = this.getView(),
+            grid = view && view.down('#customerPanelGrid');
+
+        if(grid && grid.isVisible(true)){
+            // Set the record for editing only if the component is visible. The grid selection can be triggered
+            // from multiple places (ex: reloading the customers store) which can lead to trying to edit the record,
+            // when the component is not visible
+            this.editCustomer(record);
+        }
     },
 
     /***
@@ -310,4 +353,59 @@ Ext.define('Editor.view.admin.customer.ViewController', {
 
         window.open(url);
     },
+
+    /**
+     * Auto-select first record if current selection do not match the filters
+     *
+     * @param store
+     */
+    onCustomerStoreFilterChange: function(store) {
+
+        // Get selection model
+        var sm = this.getView().down('#customerPanelGrid').getSelectionModel();
+
+        // If we have some record selected
+        if (sm.getSelection().length) {
+
+            // Get that record
+            var record = sm.getSelection()[0];
+
+            // If it's still in the store despite the filters - do nothing
+            if (~store.findExact('id', record.getId())) {
+
+            // Else if not, but store is not empty
+            } else if (store.getCount()){
+
+                // Select first record we have
+                sm.select(store.first());
+
+            // Else if store is empty
+            } else {
+
+                // Clear selection
+                sm.deselect([record]);
+
+                // Reset right panel
+                this.cancelEdit();
+            }
+
+        // Ele select first record
+        } else {
+            sm.select(store.first());
+        }
+    },
+
+    /**
+     * Check and hide the domain tooltip when the tab is changed and the active tab is not
+     * the customer form.
+     * @param tabPanel
+     */
+    onDisplayTabPanelTabChanged: function(tabPanel) {
+        if(tabPanel.getActiveTab().getItemId() === 'customersForm'){
+            return;
+        }
+        if(this.getView().domainLabelInfoTooltip && this.getView().domainLabelInfoTooltip.isVisible()){
+            this.getView().domainLabelInfoTooltip.hide();
+        }
+    }
 });

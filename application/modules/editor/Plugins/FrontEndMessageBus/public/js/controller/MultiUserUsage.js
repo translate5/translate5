@@ -44,9 +44,12 @@ Ext.define('Editor.plugins.FrontEndMessageBus.controller.MultiUserUsage', {
     refs: [{
         ref : 'segmentGrid',
         selector : '#segmentgrid'
+    },{
+        ref:'searchReplaceWindow',
+        selector:'#searchreplacetabpanel'
     }],
     strings: {
-        noConnection: '#UT#Keine Verbindung zum Server',
+        noConnection: '#UT#Sie haben Verbindungsprobleme zum Internet. <br />Bitte prüfen Sie die Stabilität Ihrer Internetverbindung. <br />Sollte diese Meldung dauerhaft zu sehen sein, kann es auch sein, <br />dass das Websocket-Protokoll wss:// in Ihrer Firewall blockiert ist.',
         noConnectionSeg: '#UT#Sie können kein Segment editieren, so lange keine Verbindung zum Server besteht.',
         inUseTitle: '#UT#Segment bereits in Bearbeitung',
         inUse: '#UT#Ein anderer Benutzer war schneller und hat im Moment das Segment zur Bearbeitung gesperrt.',
@@ -120,11 +123,14 @@ Ext.define('Editor.plugins.FrontEndMessageBus.controller.MultiUserUsage', {
                 version: conf.clientVersion
             };
         }
-        
-        url.push(conf.socketServer.schema, '://');
-        url.push(conf.socketServer.httpHost || window.location.hostname);
-        url.push(':', conf.socketServer.port, conf.socketServer.route);
-        
+
+        var schema = location.protocol.match('https') ? 'wss' : 'ws',
+            host = conf.socketServer.httpHost || window.location.hostname,
+            port = conf.socketServer.port || (schema === 'wss' ? 443 : 80),
+            path = '/' + schema + conf.socketServer.route;
+
+        url.push(schema, '://', host, ':', port, path);
+
         Ext.Ajax.setDefaultHeaders(Ext.apply({
             'X-Translate5-MessageBus-ConnId': conf.connectionId
         }, Ext.Ajax.getDefaultHeaders()));
@@ -571,6 +577,14 @@ return; //FIXME prepare that socket server is only triggered for simultaneous us
         }
         //reloads the currently opened task
         if(taskGuid && taskGuid == data.taskGuid) {
+
+            // in case the current task is not a task model, create it as a model and trigger the reload
+            if(!Editor.data.task.load){
+                // when the task is not model, the object contains id and the taskGuid in it
+                // Based on that, we can use it as init object for the new model
+                Editor.data.task = Ext.create('Editor.model.admin.Task', Editor.data.task);
+            }
+
             Editor.data.task.load();
         }
     },
@@ -605,10 +619,16 @@ return; //FIXME prepare that socket server is only triggered for simultaneous us
         if(!store || !me.onlineUsers) {
             return;
         }
+        var onlineQty = 0, srw = me.getSearchReplaceWindow();
         Ext.Object.each(me.onlineUsers.onlineInTask, function(key, val){
             var item = store.getById(key);
                 item && item.set('isOnline', val);
+            if (val) onlineQty ++;
         });
+
+        if (srw) {
+            srw.getViewModel().set('isOpenedByMoreThanOneUser', onlineQty > 1);
+        }
         store.commitChanges();
     }
 });

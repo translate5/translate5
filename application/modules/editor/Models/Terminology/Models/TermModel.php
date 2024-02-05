@@ -726,6 +726,25 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
         return $data;
     }
 
+    /**
+     * Get array of termEntryIds where the given $term exists and have given $languageId and $collectionId,
+     *
+     * @param int $collectionId
+     * @param string $language
+     * @param string $term
+     * @return array
+     * @throws Zend_Db_Statement_Exception
+     */
+    public function searchTermEntryIdsBy(int $collectionId, string $language, string $term) : array {
+        return $this->db->getAdapter()->query("
+            SELECT `termEntryId` 
+            FROM `terms_term` 
+            WHERE `collectionId` = $collectionId 
+              AND `language` = ?
+              AND ? IN (`term`, `proposal`) 
+        ", [$language, trim($term)])->fetchAll(PDO::FETCH_COLUMN);
+    }
+
     public function searchTermByParams(array $params = [], &$total = null) {
         /*if (!$params)
         $params = [
@@ -1022,9 +1041,7 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
      */
     public function isProposableAllowed(): bool
     {
-        $user = ZfExtended_Factory::get('ZfExtended_Models_User');
-        /* @var $user ZfExtended_Models_User */
-        return $user->hasRole('termProposer');
+        return ZfExtended_Authentication::getInstance()->hasUserRole('termProposer');
     }
 
     /**
@@ -1229,9 +1246,11 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
 
                     $model->setSourceLang($x['languageId']);
                     $model->setSourceLangCode($x['rfc5646']);
+                    $model->setSourceLangName($x['langName']);
 
                     $model->setTargetLang($y['languageId']);
                     $model->setTargetLangCode($y['rfc5646']);
+                    $model->setTargetLangName($y['langName']);
 
                     $model->setLanguageResourceId($key);
                     $model->save();
@@ -1674,8 +1693,8 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
                 $tmpTerm['attribute'] = $changeMyCollorTag.$row['attribute-value'];
                 $tmpTerm['lastEditor'] = $changeMyCollorTag.$row['attribute-lastEditor'];
                 $tmpTerm['lastEditedDate'] = $changeMyCollorTag.$row['attribute-lastEditedDate'];
-                $tmpTerm['term'] = str_replace($changeMyCollorTag,'',$row['term-term']);
-                $tmpTerm['termProposal'] = str_replace($changeMyCollorTag,'',$row['termproposal-term']);
+                $tmpTerm['term'] = str_replace($changeMyCollorTag,'',$row['term-term'] ?? '');
+                $tmpTerm['termProposal'] = str_replace($changeMyCollorTag,'',$row['termproposal-term'] ?? '');
             }
 
             //if the attribute proposal is set, set the change color and last editor for the attribute proposal
@@ -2523,5 +2542,56 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
 
         // Return
         return $termIdByAttrIdA;
+    }
+
+    /**
+     * Get the array of allowed values for processStatus-attribute according to current user's rights
+     *
+     * @param string $current Current status that we should base on
+     * @param bool $includeCurrent Include current status to the array of returned. This is useful when
+     *                             we need to prepare data for processStatus-combobox store
+     * @return array
+     */
+    public static function getAllowedProcessStatuses(
+        string $current = 'unprocessed',
+        bool $includeCurrent = true
+    ) : array {
+
+        // Define which old values can be changed to which new values
+        $allow = false;
+        $allowByRight = [
+            'review'    => ['unprocessed' => ['provisionallyProcessed' => true, 'rejected' => true]],
+            'finalize'  => ['provisionallyProcessed' => ['finalized' => true, 'rejected' => true]],
+            'propose'   => [],
+            'anyStatus' => true, // any change allowed
+        ];
+
+        // Get auth
+        $auth = ZfExtended_Authentication::getInstance();
+
+        // Merge allowed
+        foreach ($allowByRight as $right => $info) {
+            if ($auth->isUserAllowed('editor_term', $right)) {
+                $allow = is_bool($info) || is_bool($allow)
+                    ? $info
+                    : $info + $allow;
+            }
+        }
+
+        // Prepare list of allowed values
+        $allowed = [];
+
+        // Include current status to the list
+        if ($includeCurrent) $allowed[$current] = $current;
+
+        // Append other allowed values
+        foreach(explode(',', 'unprocessed,provisionallyProcessed,finalized,rejected') as $possible) {
+            if ($allow === true || (is_array($allow[$current] ?? 0) && ($allow[$current][$possible] ?? 0))) {
+                $allowed[$possible] = $possible;
+            }
+        }
+
+        // Return as ordinary array rather than associative
+        return array_values($allowed);
     }
 }

@@ -142,11 +142,11 @@ $languageSelector[] = '</form>';
 
 <div id="containerTranslation" class="container container__instanttranslate container__instanttranslatebody">
     <div id="source">
-        <div class="switchSourceTarget box bg-grey_01">
+        <div class="switchSourceTarget box bg-grey_01" title="<?= $translate->_('Übersetzungsrichtung umkehren'); ?>">
             <svg class="icon icon-t5_switcher"/>
         </div>
         <form id="sourceLanguageAndContent">
-            <select id="sourceLocaleText" class="selectSourceTarget" name="sourceLocaleText">
+            <select id="sourceLocaleText" class="selectSourceTarget" name="sourceLocaleText" title="<?= $translate->_('Übersetzen aus'); ?>">
                 <?php
                 $sourceLangSelected = false;
                 $getParamSource = $this->source;
@@ -200,7 +200,7 @@ $languageSelector[] = '</form>';
                     class="icon icon-t5_close clearTextinput clearable-clear"
                     title="<?= $this->translations["clearText"] ?>"
                 />
-                <span id="countedCharacters" class="countedCharacters_">0</span>
+                <span id="countedCharacters" class="countedCharacters_" title="<?= $translate->_('Verfügbare Zeichen'); ?>">0</span>
             </div>
             <div id="dropSourceFile" class="dropSourceFile box marginTop show-if-source-is-file font-size-big">
                 <svg class="icon icon-t5_upload iconsize-giant"/>
@@ -222,7 +222,13 @@ $languageSelector[] = '</form>';
             <input
                 id="translationSubmit"
                 name="translationSubmit"
-                value="<?= $this->translations["translate"] ?>"
+                value="<?php
+                $buttonText = $this->translations["translate"];
+                if(!Zend_Registry::get('config')->runtimeOptions->InstantTranslate->instantTranslationIsActive){
+                    $buttonText.= ' (ALT + ENTER)';
+                }
+                echo $buttonText;
+                ?>"
                 type="submit"
                 class="translationSubmit marginTop click-starts-translation ui-corner-all ui-button ui-widget"
             />
@@ -232,7 +238,7 @@ $languageSelector[] = '</form>';
     </div>
     <div id="target">
         <form id="targetControls">
-            <select id="targetLocale" class="selectSourceTarget" name="targetLocale">
+            <select id="targetLocale" class="selectSourceTarget" name="targetLocale" title="<?= $translate->_('Übersetzen in'); ?>">
                 <?php
                 $targetLangSelected = false;
                 $getParamTarget = $this->target;

@@ -105,10 +105,7 @@ class editor_Models_Terminology_Models_AttributeModel extends editor_Models_Term
      */
     public function isProposableAllowed(): bool
     {
-        $user = ZfExtended_Factory::get('ZfExtended_Models_User');
-        /* @var $user ZfExtended_Models_User */
-
-        return $user->hasRole('termProposer');
+        return ZfExtended_Authentication::getInstance()->hasUserRole('termProposer');
     }
 
     /**

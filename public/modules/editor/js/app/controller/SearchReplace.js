@@ -864,7 +864,8 @@ Ext.define('Editor.controller.SearchReplace', {
                 }
 
                 tabPanelviewModel.set('hasMqm',responseData.hasMqm ? true : false);
-                
+                tabPanelviewModel.set('isOpenedByMoreThanOneUser', responseData.isOpenedByMoreThanOneUser ? true : false);
+
                 if(!foundSegments && message){
                     Editor.MessageBox.addInfo(message);
                     return;

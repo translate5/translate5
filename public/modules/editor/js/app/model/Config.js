@@ -64,6 +64,7 @@ Ext.define('Editor.model.Config', {
           case 'map':
           case 'list':
           case 'regexlist':
+          case 'xpathlist':
             if(Ext.isArray(value) || Ext.isObject(value)) {
               return value;
             }

@@ -179,6 +179,22 @@ class editor_Models_Segment_Whitespace {
     }
 
     /**
+     * returns all tags
+     * @param string $segment
+     * @return array
+     */
+    public function get(string $segment): array
+    {
+        $matches = null;
+        preg_match_all(editor_Models_Segment_InternalTag::REGEX_INTERNAL_TAGS, $segment, $matches);
+        $realTags = array_filter($matches[3], function ($value) {
+            return in_array($value, editor_Models_Segment_Whitespace::WHITESPACE_TAGS);
+        });
+        //return the real tags (with cleaned index) from matches[0] by the keys from the found real tags above
+        return array_values(array_intersect_key($matches[0], $realTags));
+    }
+
+    /**
      * protects all whitespace and special characters coming from the import formats
      * WARNING: should be called only on plain text fragments without tags!
      * @param string $textNode should not contain tags, since special characters in the tag content would also be protected then
@@ -327,16 +343,19 @@ class editor_Models_Segment_Whitespace {
 
         //generate the html tag for the editor
         switch ($type) {
+
             case 'open':
                 $type = editor_Models_Import_FileParser_Tag::TYPE_OPEN;
                 $shortTag = $this->currentShortTagNumber++;
                 $this->tagShortcutNumberMap[$id] = $shortTag;
                 break;
+
             case 'close':
                 //on tag protection it is ensured that tag pairs are wellformed, so on close we can rely that open nr exists:
                 $type = editor_Models_Import_FileParser_Tag::TYPE_CLOSE;
                 $shortTag = $this->tagShortcutNumberMap[$id];
                 break;
+
             case 'single':
             default:
                 $type = editor_Models_Import_FileParser_Tag::TYPE_SINGLE;
@@ -469,15 +488,17 @@ class editor_Models_Segment_Whitespace {
                 $text = self::LABEL_NEWLINE;
                 $title = 'Newline';
                 break;
+
             case 'space':
                 $text = str_repeat(self::LABEL_SPACE, $length);
                 $title = $length . ' whitespace character' . ($length > 1 ? 's' : '');
                 break;
-            case 'tab':
 
+            case 'tab':
                 $text = str_repeat(self::LABEL_TAB, $length);
                 $title = $length . ' tab character' . ($length > 1 ? 's' : '');
                 break;
+
             case 'char':
             default:
                 //'char' => ['text' => 'protected Special character'],

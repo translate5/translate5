@@ -52,7 +52,7 @@ use ZfExtended_Utils;
 
 class StatusCommand extends Translate5AbstractCommand
 {
-    CONST SECTION_LENGTH = 40;
+    const SECTION_LENGTH = 40;
 
     // the name of the command (the part after "bin/console")
     protected static $defaultName = 'status';
@@ -87,12 +87,14 @@ class StatusCommand extends Translate5AbstractCommand
         $this->writeTitle('Translate5 status overview');
 
         $this->writeSystemCheck();
-        $this->writeVersion();
+        $this->writeVersion(); //FIXME add maintenance status!
         $this->writeWorkerSummary();
         $this->writeSection('Connected Sessions', $this->messageBus());
         $this->writeTaskAndJobs();
+        $this->writeLogins();
         $this->io->text('');
         $this->writeLastErrors();
+        $this->printNotes();
 
         return 0;
     }
@@ -291,5 +293,31 @@ class StatusCommand extends Translate5AbstractCommand
             $color = $isUptodate ? 'green' : 'red';
             $this->writeSection('Version', '<fg='.$color.';options=bold>'.$version.'</>');
         }
+    }
+
+    /**
+     * @throws \ReflectionException
+     * @throws \Zend_Db_Table_Exception
+     */
+    private function writeLogins(): void
+    {
+        /** @var \ZfExtended_Models_LoginLog $loginlog */
+        $loginlog = ZfExtended_Factory::get(\ZfExtended_Models_LoginLog::class);
+        $logins = $loginlog->loadLastGrouped();
+        if (empty($logins)) {
+            $this->writeSection('Logins', '<fg=yellow;options=bold>No logins yet</>');
+            return;
+        }
+        $result = [];
+        foreach($logins as $day => $cnt) {
+            if (count($result) > 3) {
+                break;
+            }
+            if($cnt === $loginlog::GROUP_COUNT) {
+                $cnt = '>'.$cnt;
+            }
+            $result[] = $day.': <options=bold>'.$cnt.'</>';
+        }
+        $this->writeSection('Logins', join('; ', $result));
     }
 }

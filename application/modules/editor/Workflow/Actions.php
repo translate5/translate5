@@ -267,6 +267,7 @@ class editor_Workflow_Actions extends editor_Workflow_Actions_Abstract {
         $http->setMethod($http::POST);
         $http->setHeaders('Accept-charset', 'UTF-8');
         $http->setHeaders('Accept', 'application/json; charset=utf-8');
+        $http->setHeaders('Content-Type', 'application/json; charset=utf-8');
 
         if( !empty($task)){
             $data->task = $task->getDataObject();
@@ -282,6 +283,7 @@ class editor_Workflow_Actions extends editor_Workflow_Actions_Abstract {
             $data->tua = $tua;
 
         }
+        //FIXME es fehlen Infos zum Workflow, flexible Parameter aus der Workflow_action config Spalte
 
         if(isset($data)){
             $http->setRawData(json_encode($data, JSON_PRETTY_PRINT));

@@ -92,7 +92,7 @@ class OkapiListCommand extends Translate5AbstractCommand
                 'name' => $serverName,
                 'url' => $data['url'] ?? '- na -',
                 'task count' => $data['taskUsageCount'] ?? 0,
-                'customer config (IDs)' => join(',', $data['customerIdUsage']) ?? ''
+                'customer config (IDs)' => join(',', $data['customerIdUsage'] ?? []) ?? ''
             ];
         }
         $this->writeTable($table);

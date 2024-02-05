@@ -33,6 +33,9 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Command\LockableTrait;
+use ZfExtended_Factory;
+use ZfExtended_Models_Worker;
+use ZfExtended_Worker_GarbageCleaner;
 
 class TestApplicationRunCommand extends Translate5AbstractTestCommand
 {
@@ -48,7 +51,7 @@ class TestApplicationRunCommand extends Translate5AbstractTestCommand
      * A master
      * @var bool
      */
-    protected static bool $canMimicMasterTest = false;
+    protected static bool $canMimicMasterTest = true;
     
     protected function configure()
     {
@@ -77,6 +80,12 @@ class TestApplicationRunCommand extends Translate5AbstractTestCommand
             'd',
             InputOption::VALUE_REQUIRED,
             'Use this option to recreate the application database with it\'s name as option. This will also clean the /data directory contents.');
+
+        $this->addOption(
+            'worker-cleanup',
+            'w',
+            InputOption::VALUE_NONE,
+            'Use this option to delete all workers from the db. An error is shown if there are running, scheduled or prepared workers in the DB');
 
         parent::configure();
     }
@@ -117,6 +126,22 @@ class TestApplicationRunCommand extends Translate5AbstractTestCommand
         }
         // crucial: this initializes the "normal" application environment
         if($this->initTestEnvironment('application', false)){
+
+            // special option: clean workers to avoid test-quirks
+            if ($this->input->getOption('worker-cleanup')) {
+
+                $worker = ZfExtended_Factory::get(ZfExtended_Models_Worker::class);
+                // remove done & defunct workers and garbage-cleaner
+                $worker->db->delete(['state in (?)' => [$worker::STATE_DONE, $worker::STATE_DEFUNCT]]);
+                $worker->db->delete(['worker = ?' => ZfExtended_Worker_GarbageCleaner::class]);
+                // if there are still workers, we refuse to run
+                $countRemaining = count($worker->loadAll());
+                if ($countRemaining > 0) {
+                    $this->io->warning('Theere are ' . $countRemaining . ' remaining workers in the DB, terminating.');
+                    return Command::FAILURE;
+                }
+            }
+
             $this->startApiTest($testPath, $testSuite);
         }
         return Command::SUCCESS;

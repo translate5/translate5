@@ -64,8 +64,9 @@ class editor_Tag {
      * @param string $text
      * @return string
      */
-    public static function unescapeAttribute($text) : string {
-        if(empty($text)){
+    public static function unescapeAttribute($text) : string
+    {
+        if (\ZfExtended_Utils::emptyString($text)) {
             return '';
         }
         $text = str_replace(["\r\n","\n","\r","\t"], ' ', $text);
@@ -78,7 +79,7 @@ class editor_Tag {
      * @return string
      */
     public static function escapeHTML($text) : string {
-        if(empty($text)){
+        if (\ZfExtended_Utils::emptyString($text)) {
             return '';
         }
         return str_replace(['&','"','<','>'],['&amp;','&quot;','&lt;','&gt;'], $text);
@@ -90,7 +91,7 @@ class editor_Tag {
      * @return string
      */
     public static function unescapeHTML($text) : string {
-        if(empty($text)){
+        if (\ZfExtended_Utils::emptyString($text)) {
             return '';
         }
         return str_replace(['&quot;','&lt;','&gt;','&amp;'], ['"','<','>','&'], $text);
@@ -133,7 +134,7 @@ class editor_Tag {
      * @return string
      */
     public static function idAttr($id) : string {
-        if(empty(trim($id))){
+        if(\ZfExtended_Utils::emptyString(trim($id))){
             return '';
         }
         return static::createAttribute('id', trim($id));
@@ -180,7 +181,7 @@ class editor_Tag {
      */
     public static function createAttribute($name, $value='') : string {
         // attribs that do not need to be included when empty
-        if((empty($value) || trim($value) == '') && ($name == 'style' || $name == 'id' || $name == 'class' || substr($name, 0, 2) == 'on'))
+        if((\ZfExtended_Utils::emptyString($value) || trim($value) == '') && ($name == 'style' || $name == 'id' || $name == 'class' || substr($name, 0, 2) == 'on'))
             return '';
         // name-only attribs
         if($name == 'controls' || $name == 'autoplay' || $name == 'allowfullscreen' || $name == 'loop' || $name == 'muted' || $name == 'novalidate' || $name == 'playsinline')
@@ -291,7 +292,7 @@ class editor_Tag {
         if(is_a($node, 'PHPHtmlParser\Dom\Node\HtmlNode')){
             return static::fromHtmlNode($node);
         }
-        if($node->isTextNode() && !empty($node->text())){
+        if($node->isTextNode() && !\ZfExtended_Utils::emptyString($node->text())){
             return new editor_TextNode($node->text());
         }
         return NULL;
@@ -313,7 +314,7 @@ class editor_Tag {
         if(is_a($node, 'PHPHtmlParser\Dom\Node\HtmlNode')){
             return static::fromHtmlNode($node);
         }
-        if($node->isTextNode() && !empty($node->text())){
+        if($node->isTextNode() && !\ZfExtended_Utils::emptyString($node->text())){
             return new editor_TextNode($node->text());
         }
         return NULL;
@@ -605,7 +606,7 @@ class editor_Tag {
      * @return editor_Tag
      */
     public function setId($id) : editor_Tag {
-        if(!empty(trim($id)))
+        if(!\ZfExtended_Utils::emptyString(trim($id)))
             $this->setAttribute('id', trim($id));
         return $this;
     }
@@ -997,6 +998,7 @@ class editor_Tag {
         return $this->render();
     }
     /**
+     * Renders the children (text-nodes & markup-nodes)
      * @param string[] $skippedTypes: meaningful only in inheriting classes
      * @return string
      */
@@ -1005,6 +1007,23 @@ class editor_Tag {
         if($this->hasChildren()){
             foreach($this->children as $child){
                 $html .= $child->render($skippedTypes);
+            }
+        }
+        return $html;
+    }
+
+    /**
+     * Renders the replaced contents what usually means without markup
+     * (only internal tags may have markup depending on the mode)
+     * @param string $mode
+     * @return string
+     */
+    public function renderReplaced(string $mode): string
+    {
+        $html = '';
+        if($this->hasChildren()){
+            foreach($this->children as $child){
+                $html .= $child->renderReplaced($mode);
             }
         }
         return $html;

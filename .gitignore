@@ -16,6 +16,7 @@
 
 # Files
 /.jshintrc
+/.env
 /application/config/installation*
 /cghooks.lock
 /composer.phar

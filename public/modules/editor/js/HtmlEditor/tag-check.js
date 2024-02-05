@@ -12,7 +12,32 @@ class TagCheck {
         let excessTags = [];
 
         for (let node of nodeList) {
-            let id = node.id.replace(new RegExp('^' + this.idPrefix), '');
+            if (node.parentNode && node.parentNode.nodeName.toLowerCase() === "del") {
+                // Ignore deleted nodes
+                continue;
+            }
+
+            // node id can have word locked followed by number, so we need to use negative lookbehind
+            const match = node.id.match(new RegExp(this.idPrefix + '([a-zA-Z]+)(\\d+)'));
+
+            if (!match) {
+                continue;
+            }
+
+            let type = match[1];
+
+            if (type.includes('locked')) {
+                type = type.replace('locked', '');
+            }
+
+            const number = parseInt(match[2], 10);
+            const id = type + number;
+
+            let isQaTag = /qmflag/.test(node.className);
+
+            if (isQaTag) {
+                continue;
+            }
 
             let isWhitespaceTag = /whitespace/.test(node.className);
 
@@ -23,7 +48,8 @@ class TagCheck {
                 continue;
             }
 
-            if (!this.referenceTags.hasOwnProperty(id)) {
+            // data.nr can be prefixed by the word locked, so we need to remove that to get the number of the tag
+            if (!this.referenceTags[type].find(t => parseInt(t.data.nr.replace('locked', '')) === number)) {
                 if (isWhitespaceTag && this.isAllowedAddingWhitespaceTags()) {
                     continue;
                 }
@@ -41,13 +67,16 @@ class TagCheck {
         }
 
         let missingTags = [];
-        for (const [key, item] of Object.entries(this.referenceTags)) {
-            if (ignoreWhitespace && item.whitespaceTag) {
-                continue;
-            }
+        for (const [type, tags] of Object.entries(this.referenceTags)) {
+            for (const tag of tags) {
+                if (ignoreWhitespace && type === 'whitespace') {
+                    continue;
+                }
 
-            if (!foundIds.includes(key)) {
-                missingTags.push(item);
+                // Check if tag is deleted keeping in mind that data.nr can be prefixed by the word locked
+                if (!foundIds.includes(type + tag.data.nr.replace('locked', ''))) {
+                    missingTags.push(tag);
+                }
             }
         }
 
@@ -126,25 +155,32 @@ class TagCheck {
     }
 
     getReferenceTagAtIndex(type, index) {
-        let key = type + index;
+        return this.referenceTags[type][index] !== undefined ? this.referenceTags[type][index] : null;
+    }
 
-        if (this.referenceTags.hasOwnProperty(key)) {
-            return this.referenceTags[key];
+    // Since tags ordering is not always in order, we need to check the next tag
+    getReferenceTagAtIndexOrNext(type, index) {
+        for (let i = index; i <= index + 10; i++) {
+            let tag = this.getReferenceTagAtIndex(type, i);
+
+            if (tag) {
+                return tag;
+            }
         }
 
         return null;
     }
 
-    getOpeningReferenceTagAtIndex(index) {
-        return this.getReferenceTagAtIndex('open', index);
+    getOpeningReferenceTagAtIndexOrNext(index) {
+        return this.getReferenceTagAtIndexOrNext('open', index);
     }
 
-    getClosingReferenceTagAtIndex(index) {
-        return this.getReferenceTagAtIndex('close', index);
+    getClosingReferenceTagAtIndexOrNext(index) {
+        return this.getReferenceTagAtIndexOrNext('close', index);
     }
 
-    getSingleReferenceTagAtIndex(index) {
-        return this.getReferenceTagAtIndex('single', index);
+    getSingleReferenceTagAtIndexOrNext(index) {
+        return this.getReferenceTagAtIndexOrNext('single', index);
     }
 
     getWhitespaceReferenceTagAtIndex(index) {

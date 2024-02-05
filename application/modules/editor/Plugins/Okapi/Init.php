@@ -26,6 +26,7 @@
  END LICENSE AND COPYRIGHT
  */
 
+use MittagQI\Translate5\Acl\Rights;
 use MittagQI\Translate5\Task\FileTypeSupport;
 use MittagQI\Translate5\Plugins\Okapi\ImportFilter;
 use MittagQI\Translate5\Plugins\Okapi\Service;
@@ -50,7 +51,7 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
      * This must be increased each time, a git-based fprm or srx is changed
      * @var int
      */
-    const BCONF_VERSION_INDEX = 5;
+    const BCONF_VERSION_INDEX = 7;
 
     /**
      * The filename of the system default import bconf
@@ -244,7 +245,7 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
     protected $localePath = 'locales';
 
     protected $frontendControllers = array(
-        'pluginOkapiBconfPrefs' => 'Editor.plugins.Okapi.controller.BconfPrefs'
+        Rights::PLUGIN_OKAPI_BCONF_PREFS => 'Editor.plugins.Okapi.controller.BconfPrefs'
     );
 
     #region Plugin Init
@@ -321,6 +322,15 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
                 'action'     => 'setdefault'
             ]);
         $r->addRoute('plugins_okapi_bconf_setdefault', $route);
+        // route to check support for file-types
+        $route = new ZfExtended_Controller_RestLikeRoute(
+            'editor/plugins_okapi_bconf/filetypesupport',
+            [
+                'module'     => 'editor',
+                'controller' => 'plugins_okapi_bconf',
+                'action'     => 'filetypesupport'
+            ]);
+        $r->addRoute('plugins_okapi_bconf_filetypesupport', $route);
 
         // routes for bconf filters
         $route = new Zend_Rest_Route($f, [], [

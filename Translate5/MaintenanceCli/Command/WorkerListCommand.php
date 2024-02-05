@@ -27,11 +27,15 @@
  */
 namespace Translate5\MaintenanceCli\Command;
 
+use ReflectionException;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
+use Zend_Exception;
+use ZfExtended_Factory;
+use ZfExtended_Models_Entity_NotFoundException;
+use ZfExtended_Models_Worker;
 
 class WorkerListCommand extends Translate5AbstractCommand
 {
@@ -64,6 +68,12 @@ class WorkerListCommand extends Translate5AbstractCommand
     /**
      * Execute the command
      * {@inheritDoc}
+     * @param InputInterface $input
+     * @param OutputInterface $output
+     * @return int
+     * @throws ReflectionException
+     * @throws Zend_Exception
+     * @throws ZfExtended_Models_Entity_NotFoundException
      * @see \Symfony\Component\Console\Command\Command::execute()
      */
     protected function execute(InputInterface $input, OutputInterface $output)
@@ -73,8 +83,8 @@ class WorkerListCommand extends Translate5AbstractCommand
         
         $this->writeTitle('worker list');
         
-        $worker = \ZfExtended_Factory::get('ZfExtended_Models_Worker');
-        /* @var $worker \ZfExtended_Models_Worker */
+        $worker = ZfExtended_Factory::get('ZfExtended_Models_Worker');
+        /* @var $worker ZfExtended_Models_Worker */
         
         if($id = $this->input->getArgument('workerId')) {
             $worker->load($id);
@@ -92,6 +102,7 @@ class WorkerListCommand extends Translate5AbstractCommand
             'pid'       => 'Process id:',
             'starttime' => 'Starttime:',
             'endtime'   => 'Endtime:',
+            'duration'  => 'Duration:',
             'taskGuid'  => 'TaskGuid:',
             'worker'    => 'Worker:',
             'progress'  => 'Progress:',
@@ -104,31 +115,41 @@ class WorkerListCommand extends Translate5AbstractCommand
         else {
             $statesToIgnore = [$worker::STATE_DEFUNCT, $worker::STATE_DONE];
         }
-        
-        $rows = [];
-        foreach($allWorker as $worker) {
-            if(in_array($worker['state'], $statesToIgnore)){
-                settype($resultNotListed[$worker['state']], 'integer');
-                $resultNotListed[$worker['state']]++;
+
+        $table = $this->io->createTable();
+        $table->setHeaders($headlines);
+        foreach($allWorker as $workerRow) {
+            if(in_array($workerRow['state'], $statesToIgnore)){
+                settype($resultNotListed[$workerRow['state']], 'integer');
+                $resultNotListed[$workerRow['state']]++;
                 continue;
             }
+
+            //resort fields by headline order
             $row = [];
             foreach($headlines as $key => $title) {
-                if($key == 'progress') {
-                    $row[] = round($worker[$key] * 100).'%';
-                }else {
-                    $row[] = $worker[$key];
+                if($key === 'progress') {
+                    $row[] = round($workerRow[$key] * 100).'%';
+                } elseif ($key === 'duration') {
+                    if (empty($workerRow['starttime'])) {
+                        $row[] = '';
+                    } else {
+                        $endtime = empty($workerRow['endtime']) ? date('Y-m-d H:i:s', time()) : $workerRow['endtime'];
+                        $row[] = $this->printDuration($workerRow['starttime'], $endtime);
+                    }
+                } else {
+                    $row[] = $workerRow[$key];
                 }
             }
-            $rows[] = $row;
+            $table->addRow($row);
         }
-        
-        $this->io->table($headlines, $rows);
+
+        $table->render();
         
         if(!empty($resultNotListed)) {
             $this->io->section('Not listed workers:');
-            foreach($resultNotListed as $worker => $count) {
-                $this->io->text($worker.' count '.$count);
+            foreach($resultNotListed as $workerRow => $count) {
+                $this->io->text($workerRow.' count '.$count);
             }
         }
         return 0;
