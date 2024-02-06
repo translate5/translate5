@@ -27,9 +27,10 @@ END LICENSE AND COPYRIGHT
 */
 
 use editor_Models_Task as Task;
+use MittagQI\Translate5\LanguageResource\Adapter\Exception\RescheduleUpdateNeededException;
 use MittagQI\Translate5\LanguageResource\Adapter\UpdatableAdapterInterface;
 use MittagQI\Translate5\LanguageResource\Status as LanguageResourceStatus;
-use MittagQI\Translate5\Service\T5Memory;
+use editor_Models_LanguageResources_LanguageResource as LanguageResource;
 
 /**
  * T5memory / OpenTM2 Connector
@@ -69,12 +70,6 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
      */
     private ?editor_Services_OpenTM2_HttpApi $parentApi = null;
 
-    /**
-     * marks an fuzzy connector as reorganizing the TM, holds the beginning timestamp
-     * @var int
-     */
-    private int $fuzzyReorganize = -1;
-
     public function __construct()
     {
         editor_Services_Connector_Exception::addCodes([
@@ -92,7 +87,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
      * {@inheritDoc}
      */
     public function connectTo(
-        editor_Models_LanguageResources_LanguageResource $languageResource,
+        LanguageResource $languageResource,
         $sourceLang,
         $targetLang
     ): void
@@ -248,9 +243,16 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
         $this->throwBadGateway();
     }
 
-    public function update(editor_Models_Segment $segment, bool $recheckOnUpdate = self::DO_NOT_RECHECK_ON_UPDATE): void
-    {
+    public function update(
+        editor_Models_Segment $segment,
+        bool $recheckOnUpdate = self::DO_NOT_RECHECK_ON_UPDATE,
+        bool $rescheduleUpdateOnError = self::DO_NOT_RESCHEDULE_UPDATE_ON_ERROR
+    ): void {
         if ($this->isReorganizingAtTheMoment()) {
+            if ($rescheduleUpdateOnError) {
+                throw new RescheduleUpdateNeededException();
+            }
+
             throw new editor_Services_Connector_Exception('E1512', [
                 'service' => $this->getResource()->getName(),
                 'languageResource' => $this->languageResource,
@@ -271,7 +273,9 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
             return;
         }
 
-        if ($this->needsReorganizing($this->api->getError())) {
+        $apiError = $this->api->getError();
+
+        if ($this->needsReorganizing($apiError)) {
             $this->addReorganizeWarning($segment->getTask());
             $this->reorganizeTm($tmName);
 
@@ -282,7 +286,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
 
                 return;
             }
-        } elseif ($this->isMemoryOverflown($this->api->getError())) {
+        } elseif ($this->isMemoryOverflown($apiError)) {
             $newName = $this->generateNextMemoryName($this->languageResource);
             $newName = $this->api->createEmptyMemory($newName, $this->languageResource->getSourceLangCode());
             $this->addMemoryToLanguageResource($newName);
@@ -296,15 +300,13 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
             }
         }
 
-        $error = $this->api->getError();
-
         // send the error to the frontend
-        editor_Services_Manager::reportTMUpdateError($error);
+        editor_Services_Manager::reportTMUpdateError($apiError);
 
         $this->logger->error('E1306', 'OpenTM2: could not save segment to TM', [
             'languageResource' => $this->languageResource,
             'segment' => $segment,
-            'apiError' => $error
+            'apiError' => $apiError
         ]);
     }
 
@@ -429,6 +431,9 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
 
                 continue;
             }
+
+            // In case we have at least one successful search, we reset the reorganize attempts
+            $this->resetReorganizeAttempts($this->languageResource);
 
             $result = $this->api->getResult();
 
@@ -569,7 +574,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
      */
     public function getStatus(
         editor_Models_LanguageResources_Resource $resource,
-        editor_Models_LanguageResources_LanguageResource $languageResource = null,
+        LanguageResource $languageResource = null,
         ?string $tmName = null
     ): string
     {
@@ -600,9 +605,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
         // let's check the internal state before calling API for status as import worker may be running
         $status = $this->languageResource->getStatus();
 
-        // TODO remove after reorganize status is implemented in status query on t5memory side
-        if ($this->isReorganizingAtTheMoment()) {
-            // Status import to prevent any other queries to TM to be performed
+        if ($status === LanguageResourceStatus::IMPORT) {
             return LanguageResourceStatus::IMPORT;
         }
 
@@ -619,12 +622,6 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
         // - the requested TM is currently not loaded, so there is no info about the existence
         // - So we display the STATUS_NOT_LOADED instead
         if ($this->api->getResponse()->getStatus() === 404) {
-            if ($status === LanguageResourceStatus::ERROR) {
-                $this->lastStatusInfo = 'Es gab einen Fehler beim Import, bitte prüfen Sie das Fehlerlog.';
-
-                return LanguageResourceStatus::ERROR;
-            }
-
             $this->lastStatusInfo = 'Die Ressource ist generell verfügbar, '
                 . 'stellt aber keine Informationen über das angefragte TM bereit, da dies nicht geladen ist.';
 
@@ -1006,16 +1003,11 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
             && $status !== LanguageResourceStatus::REORGANIZE_IN_PROGRESS
             && $status !== LanguageResourceStatus::REORGANIZE_FAILED;
 
-        $maxReorganizeAttempts = $this->config->runtimeOptions->LanguageResources->t5memory->maxReorganizeAttempts;
-
-        if ($needsReorganizing
-            && $this->languageResource
-            && $this->languageResource->getSpecificData(self::REORGANIZE_ATTEMPTS) >= $maxReorganizeAttempts
-        ) {
+        if ($needsReorganizing && $this->isMaxReorganizeAttemptsReached($this->languageResource)) {
             $this->logger->warn(
                 'E1314',
                 'The queried TM returned error which is configured for automatic TM reorganization.' .
-                'But there already were ' . $maxReorganizeAttempts . ' attempts to reorganize it.',
+                'But maximum amount of attempts to reorganize it reached.',
                 ['apiError' => $this->api->getError()]
             );
             $needsReorganizing = false;
@@ -1035,18 +1027,8 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
             // without refreshing from DB, which leads th that here it is tried to be inserted as new one
             // so refreshing it here. Need to check if we can do this in editor_Services_Manager::visitAllAssociatedTms
             $this->languageResource->refresh();
-            $this->languageResource->addSpecificData(
-                self::REORGANIZE_ATTEMPTS,
-                ($this->languageResource->getSpecificData(self::REORGANIZE_ATTEMPTS) ?? 0) + 1
-            );
-            $this->languageResource->save();
+            $this->increaseReorganizeAttempts($this->languageResource);
         }
-
-        // HOTFIX for t5memory BUG: It seems a reorganize may deletes recently updated segments
-        // an export of the cloned memory before seems to heal that
-        $validExportTypes = $this->getValidExportTypes();
-        $this->getTm($validExportTypes['TM'], $tmName);
-        sleep(1);
 
         $this->api->reorganizeTm($tmName);
 
@@ -1054,9 +1036,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
         $sleepTime = 5;
 
         while ($elapsedTime < self::REORGANIZE_WAIT_TIME_SECONDS) {
-            $status = $this->getStatus($this->resource);
-
-            if ($status === LanguageResourceStatus::AVAILABLE) {
+            if (!$this->isReorganizingAtTheMoment()) {
                 return true;
             }
 
@@ -1092,6 +1072,33 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
             'The queried TM returned error which is configured for automatic TM reorganization',
             $params
         );
+    }
+
+    private function isMaxReorganizeAttemptsReached(?LanguageResource $languageResource): bool
+    {
+        if (null === $languageResource) {
+            return false;
+        }
+
+        $currentAttempts = $languageResource->getSpecificData(self::REORGANIZE_ATTEMPTS) ?? 0;
+        $maxAttempts = $this->config->runtimeOptions->LanguageResources->t5memory->maxReorganizeAttempts;
+
+        return $currentAttempts >= $maxAttempts;
+    }
+
+    private function increaseReorganizeAttempts(LanguageResource $languageResource): void
+    {
+        $languageResource->addSpecificData(
+            self::REORGANIZE_ATTEMPTS,
+            ($languageResource->getSpecificData(self::REORGANIZE_ATTEMPTS) ?? 0) + 1
+        );
+        $languageResource->save();
+    }
+
+    private function resetReorganizeAttempts(LanguageResource $languageResource): void
+    {
+        $languageResource->removeSpecificData(self::REORGANIZE_ATTEMPTS);
+        $languageResource->save();
     }
     #endregion Reorganize TM
 
@@ -1139,6 +1146,9 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
 
                 continue;
             }
+
+            // In case we have at least one successful lookup, we reset the reorganize attempts
+            $this->resetReorganizeAttempts($this->languageResource);
 
             $result = $this->api->getResult();
 
@@ -1318,7 +1328,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
         }
     }
 
-    private function generateNextMemoryName(editor_Models_LanguageResources_LanguageResource $languageResource): string
+    private function generateNextMemoryName(LanguageResource $languageResource): string
     {
         $memories = $languageResource->getSpecificData('memories', parseAsArray: true);
 

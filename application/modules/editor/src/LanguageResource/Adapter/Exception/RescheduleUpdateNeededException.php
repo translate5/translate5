@@ -25,23 +25,12 @@ START LICENSE AND COPYRIGHT
 
 END LICENSE AND COPYRIGHT
 */
-
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\LanguageResource\Adapter;
+namespace MittagQI\Translate5\LanguageResource\Adapter\Exception;
 
-use editor_Models_Segment as SegmentModel;
+use Exception;
 
-interface UpdatableAdapterInterface
+class RescheduleUpdateNeededException extends Exception
 {
-    public const RECHECK_ON_UPDATE = true;
-    public const DO_NOT_RECHECK_ON_UPDATE = false;
-    public const RESCHEDULE_UPDATE_ON_ERROR = true;
-    public const DO_NOT_RESCHEDULE_UPDATE_ON_ERROR = false;
-
-    public function update(
-        SegmentModel $segment,
-        bool $recheckOnUpdate = self::DO_NOT_RECHECK_ON_UPDATE,
-        bool $rescheduleUpdateOnError = self::DO_NOT_RESCHEDULE_UPDATE_ON_ERROR
-    ): void;
 }

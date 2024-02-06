@@ -43,8 +43,8 @@ class Status
     public const NOVALIDLICENSE = 'novalidlicense';
     public const NOT_LOADED = 'notloaded';
     public const QUOTA_EXCEEDED = 'quotaexceeded';
-    public const REORGANIZE_IN_PROGRESS = 'reorganize_in_progress';
-    public const REORGANIZE_FAILED = 'reorganize_failed';
+    public const REORGANIZE_IN_PROGRESS = 'reorganize';
+    public const REORGANIZE_FAILED = 'reorganize failed';
     public const TUNING_IN_PROGRESS = 'tuninginprogress';
     public const IMPORT = 'import';
 

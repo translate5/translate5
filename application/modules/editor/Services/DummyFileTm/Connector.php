@@ -124,8 +124,11 @@ class editor_Services_DummyFileTm_Connector
         return join("\n", $result);
     }
 
-    public function update(editor_Models_Segment $segment, bool $recheckOnUpdate = self::DO_NOT_RECHECK_ON_UPDATE): void
-    {
+    public function update(
+        editor_Models_Segment $segment,
+        bool $recheckOnUpdate = self::DO_NOT_RECHECK_ON_UPDATE,
+        bool $rescheduleUpdateOnError = self::DO_NOT_RESCHEDULE_UPDATE_ON_ERROR
+    ): void {
         $source = $this->tagHandler->prepareQuery($this->getQueryString($segment));
         $target = $this->tagHandler->prepareQuery($segment->getTargetEdit());
 

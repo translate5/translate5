@@ -536,8 +536,10 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
     {
         parent::processResponse($response);
 
-        //Normally the ReturnValue is 0 if there is no error.
-        $returnValueError = !empty($this->result->ReturnValue) && $this->result->ReturnValue > 0;
+        // Normally the ReturnValue is 0 if there is no error.
+        // Also 10010 and 10011 are valid ReturnValue values
+        $returnValueError = !empty($this->result->ReturnValue)
+            && !in_array((int)$this->result->ReturnValue, [10010, 10011, 0]);
 
         //For some errors this is not true, then only a ErrorMsg is set, but return value is 0,
         if ($returnValueError || !empty($this->result->ErrorMsg)) {
@@ -648,22 +650,6 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
             return T5Memory::REQUEST_TIMEOUT + $seconds;
         } else {
             return $seconds;
-        }
-    }
-
-    public function isRequestable(string $tmName): bool
-    {
-        if (empty($this->languageResource)) {
-            $this->getHttp('GET', '/');
-        } else {
-            $this->getHttpWithMemory('GET', $tmName, '/status');
-        }
-        $this->http->setConfig(['timeout' => 3]);
-
-        try {
-            return $this->processResponse($this->http->request());
-        } catch (editor_Services_Exceptions_InvalidResponse $e) {
-            return false;
         }
     }
 }

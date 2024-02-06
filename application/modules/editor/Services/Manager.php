@@ -325,16 +325,23 @@ class editor_Services_Manager {
         if($segment->hasEmptySource() || $segment->hasEmptyTarget()){
             return;
         }
-        $task = ZfExtended_Factory::get('editor_Models_Task');
-        /* @var $task editor_Models_Task */
+        $task = ZfExtended_Factory::get(editor_Models_Task::class);
         $task->loadByTaskGuid($segment->getTaskGuid());
-        $this->visitAllAssociatedTms($task, function(editor_Services_Connector $connector, $languageResource, $assoc) use ($segment) {
-            if(!empty($assoc['segmentsUpdateable'])) {
-                $connector->update($segment, UpdatableAdapterInterface::RECHECK_ON_UPDATE);
+        $this->visitAllAssociatedTms(
+            $task,
+            function(editor_Services_Connector $connector, $languageResource, $assoc) use ($segment) {
+                if(!empty($assoc['segmentsUpdateable'])) {
+                    $connector->update(
+                        $segment,
+                        UpdatableAdapterInterface::RECHECK_ON_UPDATE,
+                        UpdatableAdapterInterface::RESCHEDULE_UPDATE_ON_ERROR
+                    );
+                }
+            },
+            function(Exception $e, editor_Models_LanguageResources_LanguageResource $languageResource, ZfExtended_Logger_Event $event) {
+                self::reportTMUpdateError(null, $event->message, $event->eventCode);
             }
-        }, function(Exception $e, editor_Models_LanguageResources_LanguageResource $languageResource, ZfExtended_Logger_Event $event) {
-            self::reportTMUpdateError(null, $event->message, $event->eventCode);
-        });
+        );
     }
 
     /**
