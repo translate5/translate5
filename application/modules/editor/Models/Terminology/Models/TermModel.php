@@ -2619,7 +2619,7 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
 
         $logger = Zend_Registry::get('logger')->cloneMe('editor.languageresource');
 
-        $logger->info('E0000', 'Deleted term: {name}',[
+        $logger->info('E1592', 'Deleted term: {name}',[
             'name' => $termData['term'] ?? '',
             'data' => $termData,
             'languageResource' => $collection
