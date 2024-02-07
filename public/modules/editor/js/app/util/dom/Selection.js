@@ -302,6 +302,14 @@ Ext.define('Editor.util.dom.Selection', {
             state.chain.push(node);
             if(state.to < (state.pos + length)){
                 // if area ends within, cut node, finish
+                if (jslogger) {
+                    var logState = Ext.clone(state);
+                    logState.chain = logState.chain.length;
+                    jslogger.addLogEntry({
+                        type: 'info',
+                        message: 'selection state: ' + JSON.stringify(logState).replaceAll('"', '~')
+                    });
+                }
                 node.splitText(state.to - state.pos);
                 offset++;
                 state.ended = true;
