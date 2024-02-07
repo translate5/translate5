@@ -54,6 +54,19 @@ class editor_Models_Terminology_Import_TbxFileImport
     protected editor_Models_Terminology_Import_TbxBinaryDataImport  $binaryImport;
 
     /**
+     * Array of [ECODE => info] pairs, where info is an array of [qty => ..., msg => ...] with quantity to be incremented
+     * each time event with a given ECODE occurs. WARNING: for any ECODE, added as a key into this array events having such a
+     * ECODE won't be logged individually, but a single event will be logged only on tbx import completion, with quantity
+     * of occurrences as an extraData, so that extraData for each individual events is NOT preserved
+     *
+     * @var array|array[]
+     */
+    protected array $eventQty = [
+        'E1472' => ['qty' => 0, 'msg' => ''],
+        'E1446' => ['qty' => 0, 'msg' => ''],
+    ];
+
+    /**
      * $tbxMap = segment names for different TBX standards
      * $this->tbxMap['tig'] = 'tig'; - or if 'ntig' element - $this->tbxMap['tig'] = 'ntig';
      * each possible segment for TBX standard must be defined and will be merged in translate5 standard!
@@ -271,6 +284,19 @@ class editor_Models_Terminology_Import_TbxFileImport
 
             // Do log
             $this->log($msg, 'E1544', ['forWhichPaths' => array_keys($files)], 'warn');
+        }
+
+        // Foreach counted events
+        foreach ($this->eventQty as $ecode => $info) {
+
+            // If no occurences
+            if ($info['qty'] === 0) continue;
+
+            // Make sure below $this->log() call with do log instead of increment count
+            unset($this->eventQty[$ecode]);
+
+            // Do log
+            $this->log($info['msg'], $ecode, ['occurrencesQty' => $info['qty']], 'warn');
         }
 
         $data = [
@@ -1074,11 +1100,16 @@ $memLog('Loaded terms:        ');
 
     private function log($logMessage, $code = 'E1028', array $extra = [], $level = 'info')
     {
-        $extra['languageResource'] = $this->collection;
-        if (!empty($this->task)) {
-            $extra['task'] = $this->task;
+        if (array_key_exists($code, $this->eventQty)) {
+            $this->eventQty[$code]['qty'] ++;
+            $this->eventQty[$code]['msg'] = $logMessage;
+        } else {
+            $extra['languageResource'] = $this->collection;
+            if (!empty($this->task)) {
+                $extra['task'] = $this->task;
+            }
+            $this->logger->$level($code, $logMessage, $extra);
         }
-        $this->logger->$level($code, $logMessage, $extra);
     }
 
     /**
