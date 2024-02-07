@@ -338,7 +338,6 @@ Ext.define('Editor.controller.admin.TaskOverview', {
     onAdminTaskGridFilterChange: function (store) {
         var me = this;
         //get the store active filters object as parameter
-        console.log('onAdminTaskGridFilterChange');
         me.getAdvancedFilterToolbar().loadFilters(store.getFilters(false));
     },
 
