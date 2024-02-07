@@ -602,7 +602,7 @@ Ext.define('Editor.util.dom.Selection', {
         if(length > 2 && window.jslogger){
             window.jslogger.addLogEntry({
                 type: 'info',
-                message: 'Witespace tag: length-attribute: ~' + element.dataset.length + '~, evaluated length: ~' + length + '~'
+                message: 'Whitespace tag: length-attribute: ~' + element.dataset.length + '~, evaluated length: ~' + length + '~'
             });
         }
         return length;
