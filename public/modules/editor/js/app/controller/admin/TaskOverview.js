@@ -653,7 +653,7 @@ Ext.define('Editor.controller.admin.TaskOverview', {
         //clear the taskGrid store from the filters
         taskStore.clearFilter(addFilter);
         //add the custom filtering where the filterchange event will be suspended
-        taskGrid.activateGridColumnFilter(filtersarray, true);
+        taskGrid.activateGridColumnFilter(filtersarray, false);
         //load the filters into the filter holder tagfield
         toolbar.loadFilters(taskStore.getFilters(false));
     },
@@ -750,6 +750,17 @@ Ext.define('Editor.controller.admin.TaskOverview', {
      * @param {Object} record
      */
     taskActionDispatcher: function (view, cell, row, col, ev, record) {
+        // In some rear cases, the record is not provided by the view. In this case, try to get the record from the store
+        // based on the provided row index. In case the second try fails, log an error and do not create the manu.
+        // Trying to create menu with no record, will produce UI error.
+        if(!record){
+            var grid = view.grid;
+            record = grid && grid.getStore().getAt(row);
+            if(!record){
+                Ext.log({msg:"taskActionDispatcher: no valid task record detected. Unable to create menu."});
+                return;
+            }
+        }
         this.callMenuAction('Task', record, ev);
     },
 
