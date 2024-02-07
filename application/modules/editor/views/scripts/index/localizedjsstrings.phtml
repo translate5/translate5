@@ -339,8 +339,10 @@ Ext.define('Editor.controller.Localizer', {
             noVisibleContentColumn: '<?php echo $this->translate->_('Ausgeblendete bearbeitbare Spalten wurden sichtbar geschaltet, da die Aufgabe zum Editieren geöffnet wurde, aber keine editierbare Spalte sichtbar war.');?>',
             gridEndReached: '<?php echo $this->translate->_('Kein weiteres Segment bearbeitbar!');?>',
             gridStartReached: '<?php echo $this->translate->_('Kein vorheriges Segment bearbeitbar!');?>',
-            gridEndReachedFiltered: '<?php echo $this->translate->_('Kein weiteres Segment im Workflow bearbeitbar!');?>',
-            gridStartReachedFiltered: '<?php echo $this->translate->_('Kein vorheriges Segment im Workflow bearbeitbar!');?>'
+            gridEndReachedWorkflow: '<?php echo $this->translate->_('Kein weiteres Segment im Workflow bearbeitbar!');?>',
+            gridEndReachedFiltered: '<?php echo $this->translate->_('Keine weiteren Segmente in der aktuellen Filterung');?>',
+            gridStartReachedWorkflow: '<?php echo $this->translate->_('Kein vorheriges Segment im Workflow bearbeitbar!');?>',
+            gridStartReachedFiltered: '<?php echo $this->translate->_('Keine vorherigen Segmente in der aktuellen Filterung');?>'
         }
     });
 
