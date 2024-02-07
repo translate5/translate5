@@ -144,7 +144,7 @@ class UserInfoCommand extends UserAbstractCommand
             $this->io->section('Current sessions (session_id, last modfied)');
         }
         foreach($sessions as $session) {
-            $this->io->text(substr($session['session_id'],0, 4).'... '.date('Y-m-d H:i:s', $session['modified']));
+            $this->io->text(substr($session['session_id'],0, 4).'... '.$session['modified']);
         }
     }
 }
