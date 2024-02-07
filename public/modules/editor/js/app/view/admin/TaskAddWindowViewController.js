@@ -61,6 +61,21 @@ Ext.define('Editor.view.admin.TaskAddWindowViewController', {
 
         me.getView().mask();
 
+        /**
+         * https://jira.translate5.net/browse/TRANSLATE-3587
+         *
+         * Inside the above mask() call, tabindex-attributes of all tabbable children are set to '-1'
+         * to prevent them from being tabbable while mask is shown. This, however, happens only for
+         * children that are not disabled at the point of time where they are queried, and that is why
+         * setting tabindex=-1 for combobox#bconfId was skipped so focus jumped straight into there
+         * on Tab-key press as that combo is enabled back shortly while mask is still shown
+         *
+         * So, here we restore values of tabindex-attribute back to make sure fields are tabbable even
+         * despite the mask itself is not yet hidden so far due to we're waiting for the customer config
+         * store load callback
+         */
+        me.getView().el.restoreTabbableState();
+
         // reset the pivot langauge on each customer change
         pivotLanguageCombo.setValue(null);
 

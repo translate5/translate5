@@ -11,6 +11,72 @@ All updates are (downwards) compatible! If not this is listed in the important r
 
 
 
+
+## [7.1.1] - 2024-02-02
+
+### Important Notes:
+ 
+
+
+### Changed
+**[TRANSLATE-3654](https://jira.translate5.net/browse/TRANSLATE-3654): t5memory - Improve t5memory status response handling** <br>
+Improve t5memory status response handling
+
+**[TRANSLATE-3586](https://jira.translate5.net/browse/TRANSLATE-3586): Editor general - Always show info icon in match rate panel** <br>
+Info icon in the first column of a match-rate panel - is now always shown
+
+
+### Bugfixes
+**[TRANSLATE-3686](https://jira.translate5.net/browse/TRANSLATE-3686): Editor general - RootCause: Cannot read properties of null (reading 'forEach')** <br>
+Fix for UI when loading qualities.
+
+**[TRANSLATE-3685](https://jira.translate5.net/browse/TRANSLATE-3685): Auto-QA, Editor general - RootCause error: Cannot read properties of undefined (reading 'floating')** <br>
+Fix for UI error when saving false positive with slow requests.
+
+**[TRANSLATE-3684](https://jira.translate5.net/browse/TRANSLATE-3684): Editor general - RootCause error: resourceType is null** <br>
+Fix for UI error when creating Language resources and selecting resource from the dropdown.
+
+**[TRANSLATE-3682](https://jira.translate5.net/browse/TRANSLATE-3682): Editor general - RootCause error: Cannot read properties of null (reading 'get')** <br>
+Fix for problem when selecting customer in task add wizard
+
+**[TRANSLATE-3681](https://jira.translate5.net/browse/TRANSLATE-3681): Editor general - RootCause: Cannot read properties of null (reading 'getHtml')** <br>
+Fix for UI error when filtering for qualities by clicking on the three. 
+
+**[TRANSLATE-3680](https://jira.translate5.net/browse/TRANSLATE-3680): Client management - Action column in clients grid not resizeable** <br>
+Fix for clients action column not resizable.
+
+**[TRANSLATE-3678](https://jira.translate5.net/browse/TRANSLATE-3678): GroupShare integration, InstantTranslate - InstantTranslate does not use Groupshare TMs** <br>
+Fix for a problem where group share results where not listed in instant translate.
+
+**[TRANSLATE-3677](https://jira.translate5.net/browse/TRANSLATE-3677): Editor general - RootCause error: this.getMarkupImage is not a function** <br>
+Fix for UI error when changing editor view modes.
+
+**[TRANSLATE-3674](https://jira.translate5.net/browse/TRANSLATE-3674): Editor general - RootCause error: Cannot read properties of null (reading 'dom')** <br>
+Fix for UI error when displaying tooltip in editor.
+
+**[TRANSLATE-3673](https://jira.translate5.net/browse/TRANSLATE-3673): Editor general - FIX "Cannot read properties of undefined" from markup-decoration lib / Placeables** <br>
+FIX potential JavaScript Error when decorating segments for SpellCheck
+
+**[TRANSLATE-3671](https://jira.translate5.net/browse/TRANSLATE-3671): Client management - Dropdown "Client" does not work anymore after TRANSLATE-2276** <br>
+Fix for global customer filter not working for tasks and resources.
+
+**[TRANSLATE-3651](https://jira.translate5.net/browse/TRANSLATE-3651): MatchAnalysis & Pretranslation - Some segments are not pre-translated, although 100% matches exist in the TM** <br>
+Fix pretranslation for repetitions
+
+**[TRANSLATE-3642](https://jira.translate5.net/browse/TRANSLATE-3642): Auto-QA, Editor general - change default for tag check reference field to source** <br>
+Changed default value for useSourceForReference config to 'Activated'
+
+**[TRANSLATE-3641](https://jira.translate5.net/browse/TRANSLATE-3641): Repetition editor - Repetitions editor: Activate/deactivate target repetitions** <br>
+Added ability to define whether target-only repetitions should be excluded from the default pre-selection in repetition editor
+
+**[TRANSLATE-3623](https://jira.translate5.net/browse/TRANSLATE-3623): TermPortal - batch edit in term collection will lead to error value in termID is invalid** <br>
+Fix for a problem when batch editing in term portal.
+
+**[TRANSLATE-3217](https://jira.translate5.net/browse/TRANSLATE-3217): Editor general - RootCause: Invalid JSON - answer seems not to be from translate5 - x-translate5-version header is missing** <br>
+5.9.0: added some debug code.
+7.1.1: additional debugging code
+
+
 ## [7.1.0] - 2024-01-19
 
 ### Important Notes:

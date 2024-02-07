@@ -106,7 +106,9 @@ class editor_Models_Validator_Task extends ZfExtended_Models_Validator_Abstract
 
                 // If regex is defined for this custom field - add validator
                 if ($customField['regex']) {
-                    $this->addValidatorCustom($name, fn($value) => preg_match("~{$customField['regex']}~", $value));
+                    $this->addValidatorCustom($name,
+                        fn($value) => strlen($value) === 0 || preg_match("~{$customField['regex']}~", $value)
+                    );
                 }
 
             // Else if it's a combobox
