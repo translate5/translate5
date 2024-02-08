@@ -609,6 +609,12 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
             return LanguageResourceStatus::IMPORT;
         }
 
+        // TODO remove after fully migrated to t5memory v0.5.x
+        if ($this->getT5MemoryVersion() === self::VERSION_0_4 && $this->isReorganizingAtTheMoment()) {
+            // Status import to prevent any other queries to TM to be performed
+            return LanguageResourceStatus::IMPORT;
+        }
+
         if ($this->api->status($name)) {
             $result = $this->api->getResult();
 
@@ -977,7 +983,11 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
     #region Reorganize TM
     // Need to move this region to a dedicated class while refactoring connector
     private const REORGANIZE_ATTEMPTS = 'reorganize_attempts';
+    private const REORGANIZE_STARTED_AT = 'reorganize_started_at';
+    private const MAX_REORGANIZE_TIME_MINUTES = 30;
     private const REORGANIZE_WAIT_TIME_SECONDS = 60;
+    private const VERSION_0_4 = '0.4';
+    private const VERSION_0_5 = '0.5';
 
     private function needsReorganizing(stdClass $error): bool
     {
@@ -990,8 +1000,6 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
             $this->config->runtimeOptions->LanguageResources->t5memory->reorganizeErrorCodes
         );
 
-        $status = $this->getStatus($this->resource);
-
         $errorSupposesReorganizing = (
                 isset($error->code)
                 && str_replace($errorCodes, '', $error->code) !== $error->code
@@ -999,9 +1007,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
             || (isset($error->error) && $error->error === 500);
 
         // Check if error codes contains any of the values
-        $needsReorganizing = $errorSupposesReorganizing
-            && $status !== LanguageResourceStatus::REORGANIZE_IN_PROGRESS
-            && $status !== LanguageResourceStatus::REORGANIZE_FAILED;
+        $needsReorganizing = $errorSupposesReorganizing && !$this->isReorganizingAtTheMoment();
 
         if ($needsReorganizing && $this->isMaxReorganizeAttemptsReached($this->languageResource)) {
             $this->logger->warn(
@@ -1028,33 +1034,44 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
             // so refreshing it here. Need to check if we can do this in editor_Services_Manager::visitAllAssociatedTms
             $this->languageResource->refresh();
             $this->increaseReorganizeAttempts($this->languageResource);
+            $this->setReorganizeStatusInProgress($this->languageResource);
+            $this->languageResource->save();
         }
 
-        $this->api->reorganizeTm($tmName);
+        $version = $this->getT5MemoryVersion();
 
-        $elapsedTime = 0;
-        $sleepTime = 5;
+        $reorganized = $this->api->reorganizeTm($tmName);
 
-        while ($elapsedTime < self::REORGANIZE_WAIT_TIME_SECONDS) {
-            if (!$this->isReorganizingAtTheMoment()) {
-                return true;
-            }
-
-            sleep($sleepTime);
-            $elapsedTime += $sleepTime;
+        if ($version === self::VERSION_0_5) {
+            $reorganized = $this->waitReorganizeFinished();
         }
 
-        return false;
+        $this->languageResource->setStatus(
+            $reorganized ? LanguageResourceStatus::AVAILABLE : LanguageResourceStatus::REORGANIZE_FAILED
+        );
+        $this->languageResource->save();
+
+        return $reorganized;
     }
 
     public function isReorganizingAtTheMoment(): bool
     {
-        return $this->getStatus($this->resource) === LanguageResourceStatus::REORGANIZE_IN_PROGRESS;
+        $this->resetReorganizingIfNeeded();
+
+        if ($this->getT5MemoryVersion() === self::VERSION_0_5) {
+            return $this->getStatus($this->resource) === LanguageResourceStatus::REORGANIZE_IN_PROGRESS;
+        }
+
+        return $this->languageResource->getStatus() === LanguageResourceStatus::REORGANIZE_IN_PROGRESS;
     }
 
     public function isReorganizeFailed(): bool
     {
-        return $this->getStatus($this->resource) === LanguageResourceStatus::REORGANIZE_FAILED;
+        if ($this->getT5MemoryVersion() === self::VERSION_0_5) {
+            return $this->getStatus($this->resource) === LanguageResourceStatus::REORGANIZE_FAILED;
+        }
+
+        return $this->languageResource->getStatus() === LanguageResourceStatus::REORGANIZE_FAILED;
     }
 
     private function addReorganizeWarning(Task $task = null): void
@@ -1072,6 +1089,23 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
             'The queried TM returned error which is configured for automatic TM reorganization',
             $params
         );
+    }
+
+    private function waitReorganizeFinished(): bool
+    {
+        $elapsedTime = 0;
+        $sleepTime = 5;
+
+        while ($elapsedTime < self::REORGANIZE_WAIT_TIME_SECONDS) {
+            if (!$this->isReorganizingAtTheMoment()) {
+                return true;
+            }
+
+            sleep($sleepTime);
+            $elapsedTime += $sleepTime;
+        }
+
+        return false;
     }
 
     private function isMaxReorganizeAttemptsReached(?LanguageResource $languageResource): bool
@@ -1092,13 +1126,92 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
             self::REORGANIZE_ATTEMPTS,
             ($languageResource->getSpecificData(self::REORGANIZE_ATTEMPTS) ?? 0) + 1
         );
-        $languageResource->save();
     }
 
     private function resetReorganizeAttempts(LanguageResource $languageResource): void
     {
+        if ($this->isInternalFuzzy()) {
+            return;
+        }
+
         $languageResource->removeSpecificData(self::REORGANIZE_ATTEMPTS);
         $languageResource->save();
+    }
+
+    private function getT5MemoryVersion(): string
+    {
+        $defaultVersion = self::VERSION_0_4;
+
+        if (!$this->languageResource || $this->api->isOpentm2()) {
+            return $defaultVersion;
+        }
+
+        $version = $this->languageResource->getSpecificData('version', true);
+
+        if (isset($version['version'], $version['lastSynced'])
+            && null !== $version
+            && (new DateTime($version['lastSynced']))->modify('+30 minutes') > new DateTime()
+        ) {
+            return $version['version'];
+        }
+
+        $success = $this->api->resources();
+
+        if (!$success) {
+            return $defaultVersion;
+        }
+
+        $resources = $this->api->getResult();
+
+        $version = str_starts_with($resources->Version ?? '', self::VERSION_0_5) ? self::VERSION_0_5 : self::VERSION_0_4;
+
+        if (!$this->isInternalFuzzy()) {
+            // TODO In editor_Services_Manager::visitAllAssociatedTms language resource is initialized
+            // without refreshing from DB, which leads th that here it is tried to be inserted as new one
+            // so refreshing it here. Need to check if we can do this in editor_Services_Manager::visitAllAssociatedTms
+            $this->languageResource->refresh();
+            $this->languageResource->addSpecificData('version', [
+                'version' => $version,
+                'lastSynced' => date(DateTimeInterface::RFC3339),
+            ]);
+            $this->languageResource->save();
+        }
+
+        return $version;
+    }
+
+    /**
+     * Applicable only for t5memory 0.4.x
+     */
+    private function resetReorganizingIfNeeded(): void
+    {
+        $reorganizeStartedAt = $this->languageResource->getSpecificData(self::REORGANIZE_STARTED_AT);
+
+        if (null === $reorganizeStartedAt || $this->isInternalFuzzy()) {
+            return;
+        }
+
+        if ((new DateTimeImmutable($reorganizeStartedAt))->modify(
+                sprintf('+%d minutes', self::MAX_REORGANIZE_TIME_MINUTES)
+            ) < new DateTimeImmutable()
+        ) {
+            // TODO In editor_Services_Manager::visitAllAssociatedTms language resource is initialized
+            // without refreshing from DB, which leads th that here it is tried to be inserted as new one
+            // so refreshing it here. Need to check if we can do this in editor_Services_Manager::visitAllAssociatedTms
+            $this->languageResource->refresh();
+            $this->languageResource->removeSpecificData(self::REORGANIZE_STARTED_AT);
+            $this->languageResource->setStatus(LanguageResourceStatus::AVAILABLE);
+            $this->languageResource->save();
+        }
+    }
+
+    /**
+     * Applicable only for t5memory 0.4.x
+     */
+    private function setReorganizeStatusInProgress(LanguageResource $languageResource): void
+    {
+        $languageResource->setStatus(LanguageResourceStatus::REORGANIZE_IN_PROGRESS);
+        $languageResource->addSpecificData(self::REORGANIZE_STARTED_AT, date(DateTimeInterface::RFC3339));
     }
     #endregion Reorganize TM
 

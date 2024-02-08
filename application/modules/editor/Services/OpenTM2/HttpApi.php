@@ -485,6 +485,15 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
         return false;
     }
 
+    public function resources(): bool
+    {
+        $http = $this->getHttp('GET', '/resources');
+        $http->setConfig(['timeout' => $this->createTimeout(3)]);
+        $http->setUri(rtrim($this->resource->getUrl(), '/') . '_service/resources');
+
+        return $this->processResponse($http->request());
+    }
+
     /***
      * Get the default update memory json
      */
