@@ -248,7 +248,9 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
         bool $recheckOnUpdate = self::DO_NOT_RECHECK_ON_UPDATE,
         bool $rescheduleUpdateOnError = self::DO_NOT_RESCHEDULE_UPDATE_ON_ERROR
     ): void {
-        if ($this->isReorganizingAtTheMoment()) {
+        $tmName = $this->getWritableMemory();
+
+        if ($this->isReorganizingAtTheMoment($tmName)) {
             if ($rescheduleUpdateOnError) {
                 throw new RescheduleUpdateNeededException();
             }
@@ -263,8 +265,6 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
         $source = $this->tagHandler->prepareQuery($this->getQueryString($segment));
         $target = $this->tagHandler->prepareQuery($segment->getTargetEdit());
 
-        $tmName = $this->getWritableMemory();
-
         $successful = $this->api->update($source, $target, $segment, $fileName, $tmName, !$this->isInternalFuzzy);
 
         if ($successful) {
@@ -275,7 +275,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
 
         $apiError = $this->api->getError();
 
-        if ($this->needsReorganizing($apiError)) {
+        if ($this->needsReorganizing($apiError, $tmName)) {
             $this->addReorganizeWarning($segment->getTask());
             $this->reorganizeTm($tmName);
 
@@ -416,11 +416,15 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
                 continue;
             }
 
+            if ($this->isReorganizingAtTheMoment($tmName)) {
+                continue;
+            }
+
             $numResults = self::CONCORDANCE_SEARCH_NUM_RESULTS - $resultsCount;
 
             $successful = $this->api->search($searchString, $tmName, $field, $tmOffset, $numResults);
 
-            if (!$successful && $this->needsReorganizing($this->api->getError())) {
+            if (!$successful && $this->needsReorganizing($this->api->getError(), $tmName)) {
                 $this->addReorganizeWarning();
                 $this->reorganizeTm($tmName);
                 $successful = $this->api->search($searchString, $tmName, $field, $tmOffset, $numResults);
@@ -610,7 +614,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
         }
 
         // TODO remove after fully migrated to t5memory v0.5.x
-        if ($this->getT5MemoryVersion() === self::VERSION_0_4 && $this->isReorganizingAtTheMoment()) {
+        if ($this->getT5MemoryVersion() === self::VERSION_0_4 && $this->isReorganizingAtTheMoment($name)) {
             // Status import to prevent any other queries to TM to be performed
             return LanguageResourceStatus::IMPORT;
         }
@@ -989,7 +993,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
     private const VERSION_0_4 = '0.4';
     private const VERSION_0_5 = '0.5';
 
-    private function needsReorganizing(stdClass $error): bool
+    private function needsReorganizing(stdClass $error, string $tmName): bool
     {
         if ($this->api->isOpentm2()) {
             return false;
@@ -1007,7 +1011,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
             || (isset($error->error) && $error->error === 500);
 
         // Check if error codes contains any of the values
-        $needsReorganizing = $errorSupposesReorganizing && !$this->isReorganizingAtTheMoment();
+        $needsReorganizing = $errorSupposesReorganizing && !$this->isReorganizingAtTheMoment($tmName);
 
         if ($needsReorganizing && $this->isMaxReorganizeAttemptsReached($this->languageResource)) {
             $this->logger->warn(
@@ -1054,21 +1058,27 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
         return $reorganized;
     }
 
-    public function isReorganizingAtTheMoment(): bool
+    public function isReorganizingAtTheMoment(?string $tmName = null): bool
     {
         $this->resetReorganizingIfNeeded();
 
         if ($this->getT5MemoryVersion() === self::VERSION_0_5) {
-            return $this->getStatus($this->resource) === LanguageResourceStatus::REORGANIZE_IN_PROGRESS;
+            return $this->getStatus(
+                $this->resource,
+                tmName: $tmName
+            ) === LanguageResourceStatus::REORGANIZE_IN_PROGRESS;
         }
 
         return $this->languageResource->getStatus() === LanguageResourceStatus::REORGANIZE_IN_PROGRESS;
     }
 
-    public function isReorganizeFailed(): bool
+    public function isReorganizeFailed(?string $tmName = null): bool
     {
         if ($this->getT5MemoryVersion() === self::VERSION_0_5) {
-            return $this->getStatus($this->resource) === LanguageResourceStatus::REORGANIZE_FAILED;
+            return $this->getStatus(
+                $this->resource,
+                tmName: $tmName
+            ) === LanguageResourceStatus::REORGANIZE_FAILED;
         }
 
         return $this->languageResource->getStatus() === LanguageResourceStatus::REORGANIZE_FAILED;
@@ -1246,16 +1256,22 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
         $results = [];
 
         foreach ($this->languageResource->getSpecificData('memories', parseAsArray: true) as $memory) {
-            $successful = $this->api->lookup($segment, $query, $fileName, $memory['filename']);
+            $tmName = $memory['filename'];
 
-            if (!$successful && $this->needsReorganizing($this->api->getError())) {
+            if ($this->isReorganizingAtTheMoment($tmName)) {
+                continue;
+            }
+
+            $successful = $this->api->lookup($segment, $query, $fileName, $tmName);
+
+            if (!$successful && $this->needsReorganizing($this->api->getError(), $tmName)) {
                 $this->addReorganizeWarning($segment->getTask());
-                $this->reorganizeTm($memory['filename']);
-                $successful = $this->api->lookup($segment, $query, $fileName, $memory['filename']);
+                $this->reorganizeTm($tmName);
+                $successful = $this->api->lookup($segment, $query, $fileName, $tmName);
             }
 
             if (!$successful) {
-                $this->logger->exception($this->getBadGatewayException($memory['filename']));
+                $this->logger->exception($this->getBadGatewayException($tmName));
 
                 continue;
             }
@@ -1342,7 +1358,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
                 ]);
             }
 
-            if (!$successful && $this->needsReorganizing($this->api->getError())) {
+            if (!$successful && $this->needsReorganizing($this->api->getError(), $tmName)) {
                 $this->addReorganizeWarning();
                 $this->reorganizeTm($tmName);
             }
