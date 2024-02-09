@@ -127,8 +127,8 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract
         // Adds the pricingPresetId to the task-meta
         $this->eventManager->attach(
             ImportEventTrigger::class,
-            ImportEventTrigger::BEFORE_PROCESS_UPLOADED_FILE,
-            [$this, 'handleBeforeProcessUploadedFile']
+            ImportEventTrigger::INIT_TASK_META,
+            [$this, 'handleInitTaskMeta']
         );
 
         $this->eventManager->attach(
@@ -157,7 +157,7 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract
      * @throws ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey
      * @throws ZfExtended_Models_Entity_NotFoundException
      */
-    public function handleBeforeProcessUploadedFile(Zend_EventManager_Event $event): void
+    public function handleInitTaskMeta(Zend_EventManager_Event $event): void
     {
         /* @var $meta editor_Models_Task_Meta */
         $meta = $event->getParam('meta');
