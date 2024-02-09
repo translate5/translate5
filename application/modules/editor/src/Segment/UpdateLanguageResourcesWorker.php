@@ -32,6 +32,8 @@ namespace MittagQI\Translate5\Segment;
 use editor_Models_Segment;
 use editor_Models_Segment_MatchRateType;
 use editor_Services_Manager;
+use MittagQI\Translate5\LanguageResource\Adapter\Exception\RescheduleUpdateNeededException;
+use MittagQI\Translate5\Task\TaskEventTrigger;
 use ZfExtended_Factory;
 use ZfExtended_Models_Entity_NotFoundException;
 use ZfExtended_Worker_Abstract;
@@ -59,8 +61,16 @@ class UpdateLanguageResourcesWorker extends ZfExtended_Worker_Abstract
 
     protected function work()
     {
-        if (editor_Models_Segment_MatchRateType::isUpdatable($this->segment->getMatchRateType())) {
+        if (!editor_Models_Segment_MatchRateType::isUpdatable($this->segment->getMatchRateType())) {
+            return;
+        }
+
+        try {
             ZfExtended_Factory::get(editor_Services_Manager::class)->updateSegment($this->segment);
+        } catch (RescheduleUpdateNeededException) {
+            // Wait a little bit and reschedule self for next try
+            sleep(30);
+            (new TaskEventTrigger())->triggerAfterSegmentUpdate($this->segment->getTask(), $this->segment);
         }
     }
 }
