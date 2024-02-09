@@ -63,6 +63,12 @@ class ConnectorTest extends TestCase
                 'importTime' => null,
                 'expectedResult' => LanguageResourceStatus::AVAILABLE
             ],
+            'Available just loaded' => [
+                'status' => 'open',
+                'tmxImportStatus' => null,
+                'importTime' => null,
+                'expectedResult' => LanguageResourceStatus::AVAILABLE
+            ],
             'Additional file import not finished' => [
                 'status' => "open",
                 'tmxImportStatus' => "available",
@@ -104,6 +110,18 @@ class ConnectorTest extends TestCase
                 'tmxImportStatus' => bin2hex(random_bytes(10)),
                 'importTime' => null,
                 'expectedResult' => LanguageResourceStatus::UNKNOWN
+            ],
+            'Reorganize in progress' => [
+                'status' => 'reorganize',
+                'tmxImportStatus' => null,
+                'importTime' => null,
+                'expectedResult' => LanguageResourceStatus::REORGANIZE_IN_PROGRESS
+            ],
+            'Reorganize failed' => [
+                'status' => 'reorganize failed',
+                'tmxImportStatus' => null,
+                'importTime' => null,
+                'expectedResult' => LanguageResourceStatus::REORGANIZE_FAILED
             ],
             'Empty tmxImportStatus' => [
                 'status' => 'open',
