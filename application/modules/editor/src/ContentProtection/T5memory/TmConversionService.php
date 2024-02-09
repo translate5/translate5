@@ -291,13 +291,17 @@ class TmConversionService
     {
         $transUnit = $this->convertT5MemoryTagToNumber($transUnit);
         preg_match_all(
-            '/<tuv xml:lang="((\w|-)+)">((\n|\r|\r\n)?.+)+<\/tuv>/Uum',
+            '/<tuv xml:lang="((\w|-)+)">((\n|\r|\r\n)?.+(\n|\r|\r\n)*)+<\/tuv>/Uum',
             $transUnit,
             $matches,
             PREG_SET_ORDER
         );
 
         $numberTagMap = [];
+
+        if (empty($matches[0][0]) || empty($matches[1][0])) {
+            dump($transUnit);
+        }
 
         [$source, $target] = $this->contentProtector->filterTags(
             $this->contentProtector->protect(
