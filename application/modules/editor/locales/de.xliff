@@ -594,6 +594,10 @@
                 <source>Nur gleicher Kontext</source>
                 <target>Nur gleicher Kontext</target>
             </trans-unit>
+            <trans-unit id='WmllbHdpZWRlcmhvbHVuZ2VuIHN0YW5kYXJkbcOkw59pZyBhdXNzY2hsaWXDn2VuLCBkaWUgbmljaHQgYXVjaCBRdWVsbHdpZWRlcmhvbHVuZ2VuIHNpbmQ='>
+                <source>Zielwiederholungen standardmäßig ausschließen, die nicht auch Quellwiederholungen sind</source>
+                <target>Zielwiederholungen standardmäßig ausschließen, die nicht auch Quellwiederholungen sind</target>
+            </trans-unit>
             <trans-unit id='QWJicmVjaGVu'>
                 <source>Abbrechen</source>
                 <target>Abbrechen</target>
@@ -3414,6 +3418,14 @@
             <trans-unit id='S2VpbiB3ZWl0ZXJlcyBTZWdtZW50IGltIFdvcmtmbG93IGJlYXJiZWl0YmFyIQ=='>
                 <source>Kein weiteres Segment im Workflow bearbeitbar!</source>
                 <target>Kein weiteres Segment im Workflow bearbeitbar!</target>
+            </trans-unit>
+            <trans-unit id='S2VpbmUgd2VpdGVyZW4gU2VnbWVudGUgaW4gZGVyIGFrdHVlbGxlbiBGaWx0ZXJ1bmc='>
+                <source>Keine weiteren Segmente in der aktuellen Filterung</source>
+                <target>Keine weiteren Segmente in der aktuellen Filterung</target>
+            </trans-unit>
+            <trans-unit id='S2VpbmUgdm9yaGVyaWdlbiBTZWdtZW50ZSBpbiBkZXIgYWt0dWVsbGVuIEZpbHRlcnVuZw=='>
+                <source>Keine vorherigen Segmente in der aktuellen Filterung</source>
+                <target>Keine vorherigen Segmente in der aktuellen Filterung</target>
             </trans-unit>
             <trans-unit id='S2VpbiB2b3JoZXJpZ2VzIFNlZ21lbnQgaW0gV29ya2Zsb3cgYmVhcmJlaXRiYXIh'>
                 <source>Kein vorheriges Segment im Workflow bearbeitbar!</source>
@@ -7880,7 +7892,7 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
             </trans-unit>
             <trans-unit id='VW5laW5oZWl0bGljaGVzIFppZWw='>
                 <source>Uneinheitliches Ziel</source>
-                <target>Inconsistent target</target>
+                <target>Uneinheitliches Ziel</target>
             </trans-unit>
             <trans-unit id='RmluZGV0IFNlZ21lbnRlIG1pdCBkZXIgc2VsYmVuIFF1ZWxsZSwgYWJlciB1bnRlcnNjaGllZGxpY2hlbSBaaWVsIChUYWdzIHdlcmRlbiBpZ25vcmllcnQp'>
                 <source>Findet Segmente mit der selben Quelle, aber unterschiedlichem Ziel (Tags werden ignoriert)</source>

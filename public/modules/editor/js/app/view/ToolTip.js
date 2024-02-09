@@ -59,8 +59,17 @@ Ext.define('Editor.view.ToolTip', {
 
     // Change content dynamically depending on which element triggered the show.
     onBeforeShow: function(tip) {
-        var me = this, t = tip.triggerElement,
-            fly = Ext.fly(t), up = fly.up(), qtip = me.getQtip(fly) || me.getQtip(up);
+
+        var me = this;
+
+        if (!tip || !tip.triggerElement || !Ext.fly(tip.triggerElement) || !Ext.fly(tip.triggerElement).up()) {
+            return false;
+        }
+
+        var t = tip.triggerElement,
+            fly = Ext.fly(t),
+            up = fly.up(),
+            qtip = me.getQtip(fly) || me.getQtip(up);
 
         if (me.hasCustomTip(fly)) {
             if (qtip) {
@@ -86,6 +95,9 @@ Ext.define('Editor.view.ToolTip', {
     },
 
     getQtip: function(el) {
+        if(!el || !el.dom) {
+            return false;
+        }
         return el.dom.getAttribute('data-qtip');
     },
 

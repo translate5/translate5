@@ -119,9 +119,7 @@ Ext.define('Editor.util.dom.Manipulation', {
         this.created = [];
 
         // now insert the decorator nodes
-        if(this.selection.getSize() > 0){
-            this.insert();
-        }
+        this.insert();
 
         // if wanted, add the decorated text-content as a special data-attribute for all nodes
         if(textDataName !== null){
@@ -160,7 +158,7 @@ Ext.define('Editor.util.dom.Manipulation', {
             if(this.selection.isFullySelected(selectedNodes[0])){
                 this.wrap(selectedNodes);
             }
-        } else {
+        } else if(selectedNodes.length > 1) {
             var idx = 0,
                 nodes = [],
                 parent = selectedNodes[0].parentNode,
@@ -182,19 +180,22 @@ Ext.define('Editor.util.dom.Manipulation', {
                     idx++; // crucial: otherwise we get an endless loop!
                 }
 
-                if(idx >= selectedNodes.length){
-                    // we reached the end!
-                    ended = true;
-                } else {
-                    // we reached the point where we move a level up or down in the node hierarchy
-                    // we restart the sub-chain and set the current parent to the new levels parent
-                    // if the element before is a level down, we do not include the current as it is
-                    // only decorated partially and was already decorated on the inside
-                    if(!this.selection.isFullySelected(selectedNodes[idx])){
-                        idx++;
-                    }
+                // we reached the point where we move a level up or down in the node hierarchy
+                // we restart the sub-chain and set the current parent to the new levels parent
+                // if the element before is a level down, we do not include the current as it is
+                // only decorated partially and was already decorated on the inside
+                if(idx < selectedNodes.length && !this.selection.isFullySelected(selectedNodes[idx])){
+                    idx++;
+                }
+
+                if(idx < selectedNodes.length){
+                    // next item of main while-loop
                     nodes = [];
                     parent = selectedNodes[idx].parentNode;
+
+                } else {
+                    // we reached the end!
+                    ended = true;
                 }
             }
         }

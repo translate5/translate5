@@ -140,8 +140,8 @@ Ext.define('Editor.view.admin.customer.Panel', {
                             },{
                                 xtype: 'actioncolumn',
                                 text:  me.strings.actionColumn,
+                                minWidth: 90,
                                 sortable: false,
-                                fixed: true,
                                 items:[{
                                     glyph: 'f044@FontAwesome5FreeSolid',
                                     tooltip: me.strings.customerEditActionIcon,

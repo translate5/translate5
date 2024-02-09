@@ -1767,6 +1767,14 @@
                 <source>Kein weiteres Segment im Workflow bearbeitbar!</source>
                 <target>No more segment in the workflow is editable!</target>
             </trans-unit>
+            <trans-unit id='S2VpbmUgd2VpdGVyZW4gU2VnbWVudGUgaW4gZGVyIGFrdHVlbGxlbiBGaWx0ZXJ1bmc='>
+                <source>Keine weiteren Segmente in der aktuellen Filterung</source>
+                <target>No further segments in the current filtering</target>
+            </trans-unit>
+            <trans-unit id='S2VpbmUgdm9yaGVyaWdlbiBTZWdtZW50ZSBpbiBkZXIgYWt0dWVsbGVuIEZpbHRlcnVuZw=='>
+                <source>Keine vorherigen Segmente in der aktuellen Filterung</source>
+                <target>No previous segments in the current filtering</target>
+            </trans-unit>
             <trans-unit id='S2VpbiB2b3JoZXJpZ2VzIFNlZ21lbnQgaW0gV29ya2Zsb3cgYmVhcmJlaXRiYXIh'>
                 <source>Kein vorheriges Segment im Workflow bearbeitbar!</source>
                 <target>No previous segment in the workflow is editable!</target>
@@ -7273,6 +7281,10 @@ The following task was imported with errors / warnings / notices. Please take ca
             <trans-unit id='TnVyIGdsZWljaGVyIEtvbnRleHQ='>
                 <source>Nur gleicher Kontext</source>
                 <target>Same context only</target>
+            </trans-unit>
+            <trans-unit id='WmllbHdpZWRlcmhvbHVuZ2VuIHN0YW5kYXJkbcOkw59pZyBhdXNzY2hsaWXDn2VuLCBkaWUgbmljaHQgYXVjaCBRdWVsbHdpZWRlcmhvbHVuZ2VuIHNpbmQ='>
+                <source>Zielwiederholungen standardmäßig ausschließen, die nicht auch Quellwiederholungen sind</source>
+                <target>Deselect by default target repetitions, that are not also source repetitions</target>
             </trans-unit>
             <trans-unit id="S29udGV4dC1UcmVmZmVy">
                 <source>Kontext-Treffer</source>

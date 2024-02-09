@@ -81,7 +81,8 @@ Ext.define('Editor.controller.Preferences', {
           alikeBehaviour: Editor.app.getUserConfig('alike.defaultBehaviour'),
           showOnEmptyTarget: Editor.app.getUserConfig('alike.showOnEmptyTarget'),
           repetitionType: Editor.app.getUserConfig('alike.repetitionType'),
-          sameContextOnly: Editor.app.getUserConfig('alike.sameContextOnly')
+          sameContextOnly: Editor.app.getUserConfig('alike.sameContextOnly'),
+          deselectTargetOnly: Editor.app.getUserConfig('alike.deselectTargetOnly')
       });
       //disable change alike settings if a segment is currently opened. 
       // If not a user would be able to change the change alike behaviour, 
@@ -99,12 +100,13 @@ Ext.define('Editor.controller.Preferences', {
    * Idea: make a store which contains all configs updateable by the user. From that store we can then fill the preferences here
    */
   handleSave: function() {
-    var me = this, value,
+    var me = this, values,
         store = Ext.state.Manager.getProvider().store,
         alike = Editor.app.getUserConfig('alike.defaultBehaviour',true),
         emptyTarget = Editor.app.getUserConfig('alike.showOnEmptyTarget',true),
         repetitionType = Editor.app.getUserConfig('alike.repetitionType',true),
-        sameContextOnly = Editor.app.getUserConfig('alike.sameContextOnly',true);
+        sameContextOnly = Editor.app.getUserConfig('alike.sameContextOnly',true),
+        deselectTargetOnly = Editor.app.getUserConfig('alike.deselectTargetOnly',true);
 
     // Temporarily enable form items that are currently disabled
     // to make sure their values to be picked by below getValues() call
@@ -120,6 +122,7 @@ Ext.define('Editor.controller.Preferences', {
     emptyTarget.set('value', values.showOnEmptyTarget);
     repetitionType.set('value', values.repetitionType);
     sameContextOnly.set('value', values.sameContextOnly);
+    deselectTargetOnly.set('value', values.deselectTargetOnly);
 
     // If there are some configs changed
     if (store.getModifiedRecords().length) {
@@ -146,9 +149,10 @@ Ext.define('Editor.controller.Preferences', {
   },
 
     onAlikeBehaviourChange: function() {
-        var me = this, disabled = !me.window.down('[name=alikeBehaviour][inputValue=always]').checked;
-        me.window.query('[name/="repetitionType|sameContextOnly"]').forEach(function(item){
-            item.setDisabled(disabled);
-        });
+        var me = this,
+            always = me.window.down('[name=alikeBehaviour][inputValue=always]').checked,
+            individual = me.window.down('[name=alikeBehaviour][inputValue=individual]').checked;
+        me.window.query('[name/="repetitionType|sameContextOnly"]').forEach(item => item.setDisabled(!always));
+        me.window.query('[name/="deselectTargetOnly"]').forEach(item => item.setDisabled(!individual));
     }
 });

@@ -47,12 +47,35 @@ Ext.define('Editor.view.changealike.Grid', {
    * @param {Editor.model.AlikeSegment} records
    */
   setAlikes: function(records) {
-      var me = this;
+      var me = this, toBeSelected = [];
       me.store.removeAll();
       if(me.filters) {
           me.filters.clearFilters();
       }
       me.store.loadRecords(records);
-      me.getSelectionModel().selectAll();
+
+      // If repetitions, that are target-only repetitions - should be excluded from pre-selection
+      if (Editor.app.getUserConfig('alike.deselectTargetOnly')) {
+
+          // Foreach repetition
+          records.forEach(record => {
+
+              // If current repetitions is NOT target-only repetition
+              if (!record.isTargetOnly()) {
+
+                  // Make sure it to be pre-selected
+                  toBeSelected.push(record);
+              }
+          });
+
+          // If we have something to be selected - do select
+          if (toBeSelected.length) {
+              me.getSelectionModel().select(toBeSelected);
+          }
+
+      // Else just select all repetiions by default
+      } else {
+          me.getSelectionModel().selectAll();
+      }
   }
 });

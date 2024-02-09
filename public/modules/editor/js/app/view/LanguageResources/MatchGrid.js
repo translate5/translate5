@@ -145,7 +145,7 @@ Ext.define('Editor.view.LanguageResources.MatchGrid', {
 					  idx: (meta.rowIndex + 1),
 					  takeMsg: me.strings.tooltipMsg
 				  }))+'"';
-				  meta.tdCls  = meta.tdCls  + ' info-icon';
+				  meta.tdCls  = meta.tdCls  + ' info-icon-shown';
 
 				  return meta.rowIndex + 1 + (
 					  record.get('tmNeedsConversion')

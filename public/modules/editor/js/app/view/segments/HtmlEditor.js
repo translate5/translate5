@@ -1223,15 +1223,26 @@ Ext.define('Editor.view.segments.HtmlEditor', {
     },
 
     setImagePath: function (target) {
-        var markupImage;
+        var me = this,
+            markupImage;
         Ext.each(Ext.query('img', true, this.getEditorBody()), function (item) {
-            if (markupImage = this.getMarkupImage(item.id)) {
-                if (target == 'fullPath' || markupImage.whitespaceTag || markupImage.placeableTag) {
-                    item.src = this.getSvg(Ext.String.htmlDecode(markupImage.fullTag), markupImage.fullWidth, markupImage.placeableTag);
+            markupImage = me.getMarkupImage(item.id);
+
+            if(markupImage){
+                if (target === 'fullPath' || markupImage.whitespaceTag || markupImage.placeableTag) {
+                    item.src = me.getSvg(
+                        Ext.String.htmlDecode(markupImage.fullTag),
+                        markupImage.fullWidth, markupImage.placeableTag
+                    );
                 } else {
-                    item.src = this.getSvg(Ext.String.htmlDecode(markupImage.shortTag), markupImage.shortWidth, false);
+                    item.src = me.getSvg(
+                        Ext.String.htmlDecode(markupImage.shortTag),
+                        markupImage.shortWidth,
+                        false
+                    );
                 }
             }
+
         });
     },
 

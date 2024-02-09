@@ -280,19 +280,31 @@ Ext.define('Editor.util.dom.Selection', {
      * Searches in a text-node for start/end
      * @param {Text} node
      * @param {Object} state
-     * @param {int} length
-     * @returns {int}
+     * @param {int} length: the length of the passed text-node
+     * @returns {int} the number of added text-nodes
      */
     walkText: function(node, state, length){
         // when we add nodes, the calling loop needs to skip those for a consistent logic
-        var offset = 0;
+        var cut, logState, nodeOffset = 0;
         // node starts the decoration
-        if(!state.started && (state.pos + length) >= state.from){
+        if(!state.started && (state.pos + length) > state.from){
             state.started = true;
             // if area starts within, cut node, set new part as current node
             if(state.from > state.pos){
-                node = node.splitText(state.from - state.pos);
-                offset++;
+                cut = state.from - state.pos;
+                // QUIRK: this check should not be neccessary
+                if(cut > 0 && cut < length){
+                    node = node.splitText(cut);
+                    nodeOffset++;
+                } else if(window.jslogger){
+                    // TODO: remove logging when TRANSLATE-3702 is solved
+                    logState = Ext.clone(state);
+                    logState.chain = logState.chain.length;
+                    window.jslogger.addLogEntry({
+                        type: 'info',
+                        message: 'selection state: ' + JSON.stringify(logState).replaceAll('"', '~')
+                    });
+                }
                 state.pos = state.from;
                 length = node.textContent.length;
             }
@@ -302,8 +314,20 @@ Ext.define('Editor.util.dom.Selection', {
             state.chain.push(node);
             if(state.to < (state.pos + length)){
                 // if area ends within, cut node, finish
-                node.splitText(state.to - state.pos);
-                offset++;
+                cut = state.to - state.pos;
+                // QUIRK: this check should not be neccessary
+                if(cut > 0 && cut < length){
+                    node.splitText(cut);
+                    nodeOffset++;
+                } else if(window.jslogger){
+                    // TODO: remove logging when TRANSLATE-3702 is solved
+                    logState = Ext.clone(state);
+                    logState.chain = logState.chain.length;
+                    window.jslogger.addLogEntry({
+                        type: 'info',
+                        message: 'selection state: ' + JSON.stringify(logState).replaceAll('"', '~')
+                    });
+                }
                 state.ended = true;
                 state.pos = state.to;
             } else if(state.to === (state.pos + length)){
@@ -316,7 +340,7 @@ Ext.define('Editor.util.dom.Selection', {
         } else {
             state.pos += length;
         }
-        return offset;
+        return nodeOffset;
     },
 
     /**
@@ -487,7 +511,7 @@ Ext.define('Editor.util.dom.Selection', {
             // if a node has start & end in the chain, we condense it to a single node
             // and mark it as "fully wrapped"
             lastIdx = this.lastPosInChain(chain, idx);
-            if(lastIdx > -1){
+            if(lastIdx > idx){
                 chain.splice(idx + 1, lastIdx - idx);
                 this.selectionMap.set(chain[idx], true);
             }
@@ -554,15 +578,34 @@ Ext.define('Editor.util.dom.Selection', {
             for(var item of this.ignored[tagName]){
                 if(this.elementHasClasses(element, item.classes)){
                     if(item.placeholder !== ''){
-                        // QUIRK: do we have whitespace tags with an amount greater 1 ?
-                        var amount = element.dataset.length ? parseInt(element.dataset.length) : 1;
-                        return isNaN(amount) ? item.placeholder.length : item.placeholder.length * amount;
+                        // QUIRK: do we have whitespace tags with an amount greater 1 ? currently not
+                        return item.placeholder.length * this.parseLengthAttribute(element);
                     }
                     return 0;
                 }
             }
         }
         return -1;
+    },
+
+    /**
+     * Retrives the value of a potential length-attribute in an Element
+     * The length-attribute will only be parsed, if it is a number
+     * @param {Element} element
+     * @returns {int}
+     */
+    parseLengthAttribute: function(element){
+        var length = (element.dataset && element.dataset.length) ? String(element.dataset.length) : '';
+        length = (/^[0-9]+$/.test(length)) ? parseInt(length) : 1;
+
+        // TODO: remove when TRANSLATE-3702 is solved
+        if(length > 2 && window.jslogger){
+            window.jslogger.addLogEntry({
+                type: 'info',
+                message: 'Whitespace tag: length-attribute: ~' + element.dataset.length + '~, evaluated length: ~' + length + '~'
+            });
+        }
+        return length;
     },
 
     /**
