@@ -1194,7 +1194,13 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
                 $segment,
                 $fileName
             );
-            $resultList->addResult($target, $matchrate, $this->getMetaData($found), $found->target);
+            $metaData = $this->getMetaData($found);
+            $metaDataAssoc = array_column($metaData, 'value', 'name');
+            $timestamp = 0;
+            if(!empty($metaDataAssoc['timestamp'])) {
+                $timestamp = (int) strtotime($metaDataAssoc['timestamp']);
+            }
+            $resultList->addResult($target, $matchrate, $metaData, $found->target, $timestamp);
             $resultList->setSource($source);
         }
 
