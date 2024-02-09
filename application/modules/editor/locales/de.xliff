@@ -3419,6 +3419,14 @@
                 <source>Kein weiteres Segment im Workflow bearbeitbar!</source>
                 <target>Kein weiteres Segment im Workflow bearbeitbar!</target>
             </trans-unit>
+            <trans-unit id='S2VpbmUgd2VpdGVyZW4gU2VnbWVudGUgaW4gZGVyIGFrdHVlbGxlbiBGaWx0ZXJ1bmc='>
+                <source>Keine weiteren Segmente in der aktuellen Filterung</source>
+                <target>Keine weiteren Segmente in der aktuellen Filterung</target>
+            </trans-unit>
+            <trans-unit id='S2VpbmUgdm9yaGVyaWdlbiBTZWdtZW50ZSBpbiBkZXIgYWt0dWVsbGVuIEZpbHRlcnVuZw=='>
+                <source>Keine vorherigen Segmente in der aktuellen Filterung</source>
+                <target>Keine vorherigen Segmente in der aktuellen Filterung</target>
+            </trans-unit>
             <trans-unit id='S2VpbiB2b3JoZXJpZ2VzIFNlZ21lbnQgaW0gV29ya2Zsb3cgYmVhcmJlaXRiYXIh'>
                 <source>Kein vorheriges Segment im Workflow bearbeitbar!</source>
                 <target>Kein vorheriges Segment im Workflow bearbeitbar!</target>
