@@ -91,6 +91,7 @@ class TmConversionService
             $lang = ZfExtended_Factory::get(editor_Models_Languages::class);
             $lang->load($sourceLanguageId);
 
+            $sourceLanguageRulesHash->init();
             $sourceLanguageRulesHash->setLanguageId($sourceLanguageId);
             $sourceLanguageRulesHash->setInputHash($this->contentProtectionRepository->getInputRulesHashBy($lang));
             $sourceLanguageRulesHash->setOutputHash($this->contentProtectionRepository->getOutputRulesHashBy($lang));
@@ -104,6 +105,7 @@ class TmConversionService
             $lang = ZfExtended_Factory::get(editor_Models_Languages::class);
             $lang->load($targetLangId);
 
+            $targetLanguageRulesHash->init();
             $targetLanguageRulesHash->setLanguageId($targetLangId);
             $targetLanguageRulesHash->setInputHash($this->contentProtectionRepository->getInputRulesHashBy($lang));
             $targetLanguageRulesHash->setOutputHash($this->contentProtectionRepository->getOutputRulesHashBy($lang));
