@@ -12,6 +12,70 @@ All updates are (downwards) compatible! If not this is listed in the important r
 
 
 
+
+## [7.1.2] - 2024-02-09
+
+### Important Notes:
+#### [TRANSLATE-3404](https://jira.translate5.net/browse/TRANSLATE-3404)
+t5memory v0.5 requires version >0.5.59
+ 
+
+
+### Changed
+**[TRANSLATE-3692](https://jira.translate5.net/browse/TRANSLATE-3692): TermPortal - Log deleted terms** <br>
+Implement logging when term is deleted from a term collection.
+
+**[TRANSLATE-3404](https://jira.translate5.net/browse/TRANSLATE-3404): t5memory - Change t5memory reorganize call to async** <br>
+Added support of t5memory v0.5.x 
+
+**[TRANSLATE-3332](https://jira.translate5.net/browse/TRANSLATE-3332): SpellCheck (LanguageTool integration) - New error type for languageTool** <br>
+'Numbers'-category errors detected by SpellCheck's LanguageTool are now counted and shown in the left AutoQA panel
+
+
+### Bugfixes
+**[TRANSLATE-3706](https://jira.translate5.net/browse/TRANSLATE-3706): MatchAnalysis & Pretranslation - Pretranslation choses match with same matchrate independent of age** <br>
+Use the newer TM match-rate in case there are more than 100% or greater match-rates.
+
+**[TRANSLATE-3703](https://jira.translate5.net/browse/TRANSLATE-3703): file format settings - custom file extension for file filter not recognized and no UI error message** <br>
+FIXED: Backend rejected file-type although matching file-format was set in the frontend
+
+**[TRANSLATE-3698](https://jira.translate5.net/browse/TRANSLATE-3698): Editor general - User info command line tool error** <br>
+Fix for user info command line tool.
+
+**[TRANSLATE-3696](https://jira.translate5.net/browse/TRANSLATE-3696): Task Management - RootCause: Cannot read properties of null (reading 'get')** <br>
+FIXED: task user special properties were not addable
+
+**[TRANSLATE-3693](https://jira.translate5.net/browse/TRANSLATE-3693): Configuration - Custom field with regex UI validation stops project creation wizard** <br>
+Fix for a custom field validations in project creation wizard
+
+**[TRANSLATE-3689](https://jira.translate5.net/browse/TRANSLATE-3689): Editor general - No record in task action menu** <br>
+Improve the task detection when action menu is created.
+
+**[TRANSLATE-3688](https://jira.translate5.net/browse/TRANSLATE-3688): Client management - Advanced filters in task overview are not saved** <br>
+FIXED: advanced filters are now saved as well
+
+**[TRANSLATE-3687](https://jira.translate5.net/browse/TRANSLATE-3687): Editor general - RootCause error: record is undefined** <br>
+Fix for UI error when trying to update edited segments in visual review layout.
+
+**[TRANSLATE-3656](https://jira.translate5.net/browse/TRANSLATE-3656): Import/Export - Buttons do not work in project wizard, if moved to "burger" menu** <br>
+FIXED: overflow-menu buttons not working in the 'User assignment defaults' step of project wizard
+
+**[TRANSLATE-3613](https://jira.translate5.net/browse/TRANSLATE-3613): Editor general - Message on "no more segments in workflow" misleading** <br>
+FIXED: misleading messages when editing inside filtered segments grid is reached top or bottom
+
+**[TRANSLATE-3604](https://jira.translate5.net/browse/TRANSLATE-3604): Auto-QA - Consistency quality** <br>
+FIXED: wrong translation for 'Inconsistent target' AutoQA label
+
+**[TRANSLATE-3587](https://jira.translate5.net/browse/TRANSLATE-3587): Import/Export - navigation through fields in task creation wizard** <br>
+FIXED: tabbable fields problem while mask is shown in project wizard
+
+**[TRANSLATE-3568](https://jira.translate5.net/browse/TRANSLATE-3568): InstantTranslate - DeepL swallos full stop between sentences** <br>
+Text was re-segmented if source language had to be auto-detected
+
+**[TRANSLATE-3466](https://jira.translate5.net/browse/TRANSLATE-3466): Import/Export - TBX-import: reduce log data during import** <br>
+Reduced logs for E1472 and E1446 so that total quantity of occurrences happened during import is logged once per event type, instead of logging each occurrence individually
+
+
 ## [7.1.1] - 2024-02-02
 
 ### Important Notes:

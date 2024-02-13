@@ -664,19 +664,19 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
             return $this->api->status(null) ? LanguageResourceStatus::AVAILABLE : LanguageResourceStatus::ERROR;
         }
 
+        // let's check the internal state before calling API for status as import worker might not have run yet
+        if (!$this->hasMemories($this->languageResource)
+            && $this->languageResource->getStatus() === LanguageResourceStatus::IMPORT
+        ) {
+            return LanguageResourceStatus::IMPORT;
+        }
+
         $name = $tmName ?: $this->getWritableMemory();
 
         if (empty($name)) {
             $this->lastStatusInfo = 'The internal stored filename is invalid';
 
             return LanguageResourceStatus::NOCONNECTION;
-        }
-
-        // let's check the internal state before calling API for status as import worker may be running
-        $status = $this->languageResource->getStatus();
-
-        if ($status === LanguageResourceStatus::IMPORT) {
-            return LanguageResourceStatus::IMPORT;
         }
 
         // TODO remove after fully migrated to t5memory v0.5.x
@@ -1378,7 +1378,13 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
                 $segment,
                 $fileName
             );
-            $resultList->addResult($target, $matchrate, $this->getMetaData($found), $found->target);
+            $metaData = $this->getMetaData($found);
+            $metaDataAssoc = array_column($metaData, 'value', 'name');
+            $timestamp = 0;
+            if(!empty($metaDataAssoc['timestamp'])) {
+                $timestamp = (int) strtotime($metaDataAssoc['timestamp']);
+            }
+            $resultList->addResult($target, $matchrate, $metaData, $found->target, $timestamp);
             $resultList->setSource($source);
         }
 
@@ -1396,6 +1402,11 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
         throw new editor_Services_Connector_Exception('E1564', [
             'name' => $this->languageResource->getName(),
         ]);
+    }
+
+    private function hasMemories(LanguageResource $languageResource): bool
+    {
+        return !empty($languageResource->getSpecificData('memories', parseAsArray: true));
     }
 
     private function isMemoryOverflown(object $error): bool
