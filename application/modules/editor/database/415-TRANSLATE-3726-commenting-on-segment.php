@@ -52,8 +52,14 @@ if(empty($this) || empty($argv) || $argc < 5 || $argc > 7) {
     die("please dont call the script direct! Call it by using DBUpdater!\n\n");
 }
 
-$db = Zend_Db_Table::getDefaultAdapter();
 $task=ZfExtended_Factory::get(editor_Models_Task::class);
+$db = $task->db;
+$s = $db->select()->from('task', ['*'])->where('state NOT IN(?)', [
+    editor_Models_Task::STATE_ERROR,
+    editor_Models_Task::STATE_END,
+    editor_Models_Task::STATE_IMPORT,
+    editor_Models_Task::STATE_PROJECT
+]);
 $allTasks=$task->loadAll();
 foreach ($allTasks as $t){
     $task->init($t);
