@@ -11,6 +11,136 @@ All updates are (downwards) compatible! If not this is listed in the important r
 
 
 
+
+
+## [7.1.2] - 2024-02-09
+
+### Important Notes:
+#### [TRANSLATE-3404](https://jira.translate5.net/browse/TRANSLATE-3404)
+t5memory v0.5 requires version >0.5.59
+ 
+
+
+### Changed
+**[TRANSLATE-3692](https://jira.translate5.net/browse/TRANSLATE-3692): TermPortal - Log deleted terms** <br>
+Implement logging when term is deleted from a term collection.
+
+**[TRANSLATE-3404](https://jira.translate5.net/browse/TRANSLATE-3404): t5memory - Change t5memory reorganize call to async** <br>
+Added support of t5memory v0.5.x 
+
+**[TRANSLATE-3332](https://jira.translate5.net/browse/TRANSLATE-3332): SpellCheck (LanguageTool integration) - New error type for languageTool** <br>
+'Numbers'-category errors detected by SpellCheck's LanguageTool are now counted and shown in the left AutoQA panel
+
+
+### Bugfixes
+**[TRANSLATE-3706](https://jira.translate5.net/browse/TRANSLATE-3706): MatchAnalysis & Pretranslation - Pretranslation choses match with same matchrate independent of age** <br>
+Use the newer TM match-rate in case there are more than 100% or greater match-rates.
+
+**[TRANSLATE-3703](https://jira.translate5.net/browse/TRANSLATE-3703): file format settings - custom file extension for file filter not recognized and no UI error message** <br>
+FIXED: Backend rejected file-type although matching file-format was set in the frontend
+
+**[TRANSLATE-3698](https://jira.translate5.net/browse/TRANSLATE-3698): Editor general - User info command line tool error** <br>
+Fix for user info command line tool.
+
+**[TRANSLATE-3696](https://jira.translate5.net/browse/TRANSLATE-3696): Task Management - RootCause: Cannot read properties of null (reading 'get')** <br>
+FIXED: task user special properties were not addable
+
+**[TRANSLATE-3693](https://jira.translate5.net/browse/TRANSLATE-3693): Configuration - Custom field with regex UI validation stops project creation wizard** <br>
+Fix for a custom field validations in project creation wizard
+
+**[TRANSLATE-3689](https://jira.translate5.net/browse/TRANSLATE-3689): Editor general - No record in task action menu** <br>
+Improve the task detection when action menu is created.
+
+**[TRANSLATE-3688](https://jira.translate5.net/browse/TRANSLATE-3688): Client management - Advanced filters in task overview are not saved** <br>
+FIXED: advanced filters are now saved as well
+
+**[TRANSLATE-3687](https://jira.translate5.net/browse/TRANSLATE-3687): Editor general - RootCause error: record is undefined** <br>
+Fix for UI error when trying to update edited segments in visual review layout.
+
+**[TRANSLATE-3656](https://jira.translate5.net/browse/TRANSLATE-3656): Import/Export - Buttons do not work in project wizard, if moved to "burger" menu** <br>
+FIXED: overflow-menu buttons not working in the 'User assignment defaults' step of project wizard
+
+**[TRANSLATE-3613](https://jira.translate5.net/browse/TRANSLATE-3613): Editor general - Message on "no more segments in workflow" misleading** <br>
+FIXED: misleading messages when editing inside filtered segments grid is reached top or bottom
+
+**[TRANSLATE-3604](https://jira.translate5.net/browse/TRANSLATE-3604): Auto-QA - Consistency quality** <br>
+FIXED: wrong translation for 'Inconsistent target' AutoQA label
+
+**[TRANSLATE-3587](https://jira.translate5.net/browse/TRANSLATE-3587): Import/Export - navigation through fields in task creation wizard** <br>
+FIXED: tabbable fields problem while mask is shown in project wizard
+
+**[TRANSLATE-3568](https://jira.translate5.net/browse/TRANSLATE-3568): InstantTranslate - DeepL swallos full stop between sentences** <br>
+Text was re-segmented if source language had to be auto-detected
+
+**[TRANSLATE-3466](https://jira.translate5.net/browse/TRANSLATE-3466): Import/Export - TBX-import: reduce log data during import** <br>
+Reduced logs for E1472 and E1446 so that total quantity of occurrences happened during import is logged once per event type, instead of logging each occurrence individually
+
+
+## [7.1.1] - 2024-02-02
+
+### Important Notes:
+ 
+
+
+### Changed
+**[TRANSLATE-3654](https://jira.translate5.net/browse/TRANSLATE-3654): t5memory - Improve t5memory status response handling** <br>
+Improve t5memory status response handling
+
+**[TRANSLATE-3586](https://jira.translate5.net/browse/TRANSLATE-3586): Editor general - Always show info icon in match rate panel** <br>
+Info icon in the first column of a match-rate panel - is now always shown
+
+
+### Bugfixes
+**[TRANSLATE-3686](https://jira.translate5.net/browse/TRANSLATE-3686): Editor general - RootCause: Cannot read properties of null (reading 'forEach')** <br>
+Fix for UI when loading qualities.
+
+**[TRANSLATE-3685](https://jira.translate5.net/browse/TRANSLATE-3685): Auto-QA, Editor general - RootCause error: Cannot read properties of undefined (reading 'floating')** <br>
+Fix for UI error when saving false positive with slow requests.
+
+**[TRANSLATE-3684](https://jira.translate5.net/browse/TRANSLATE-3684): Editor general - RootCause error: resourceType is null** <br>
+Fix for UI error when creating Language resources and selecting resource from the dropdown.
+
+**[TRANSLATE-3682](https://jira.translate5.net/browse/TRANSLATE-3682): Editor general - RootCause error: Cannot read properties of null (reading 'get')** <br>
+Fix for problem when selecting customer in task add wizard
+
+**[TRANSLATE-3681](https://jira.translate5.net/browse/TRANSLATE-3681): Editor general - RootCause: Cannot read properties of null (reading 'getHtml')** <br>
+Fix for UI error when filtering for qualities by clicking on the three. 
+
+**[TRANSLATE-3680](https://jira.translate5.net/browse/TRANSLATE-3680): Client management - Action column in clients grid not resizeable** <br>
+Fix for clients action column not resizable.
+
+**[TRANSLATE-3678](https://jira.translate5.net/browse/TRANSLATE-3678): GroupShare integration, InstantTranslate - InstantTranslate does not use Groupshare TMs** <br>
+Fix for a problem where group share results where not listed in instant translate.
+
+**[TRANSLATE-3677](https://jira.translate5.net/browse/TRANSLATE-3677): Editor general - RootCause error: this.getMarkupImage is not a function** <br>
+Fix for UI error when changing editor view modes.
+
+**[TRANSLATE-3674](https://jira.translate5.net/browse/TRANSLATE-3674): Editor general - RootCause error: Cannot read properties of null (reading 'dom')** <br>
+Fix for UI error when displaying tooltip in editor.
+
+**[TRANSLATE-3673](https://jira.translate5.net/browse/TRANSLATE-3673): Editor general - FIX "Cannot read properties of undefined" from markup-decoration lib / Placeables** <br>
+FIX potential JavaScript Error when decorating segments for SpellCheck
+
+**[TRANSLATE-3671](https://jira.translate5.net/browse/TRANSLATE-3671): Client management - Dropdown "Client" does not work anymore after TRANSLATE-2276** <br>
+Fix for global customer filter not working for tasks and resources.
+
+**[TRANSLATE-3651](https://jira.translate5.net/browse/TRANSLATE-3651): MatchAnalysis & Pretranslation - Some segments are not pre-translated, although 100% matches exist in the TM** <br>
+Fix pretranslation for repetitions
+
+**[TRANSLATE-3642](https://jira.translate5.net/browse/TRANSLATE-3642): Auto-QA, Editor general - change default for tag check reference field to source** <br>
+Changed default value for useSourceForReference config to 'Activated'
+
+**[TRANSLATE-3641](https://jira.translate5.net/browse/TRANSLATE-3641): Repetition editor - Repetitions editor: Activate/deactivate target repetitions** <br>
+Added ability to define whether target-only repetitions should be excluded from the default pre-selection in repetition editor
+
+**[TRANSLATE-3623](https://jira.translate5.net/browse/TRANSLATE-3623): TermPortal - batch edit in term collection will lead to error value in termID is invalid** <br>
+Fix for a problem when batch editing in term portal.
+
+**[TRANSLATE-3217](https://jira.translate5.net/browse/TRANSLATE-3217): Editor general - RootCause: Invalid JSON - answer seems not to be from translate5 - x-translate5-version header is missing** <br>
+5.9.0: added some debug code.
+7.1.1: additional debugging code
+
+
 ## [7.1.0] - 2024-01-19
 
 ### Important Notes:

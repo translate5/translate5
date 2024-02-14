@@ -76,16 +76,20 @@ class ImportService
     /**
      * @throws Exception
      */
-    public function importViaAPI(
+    public function importFromPost(
         editor_Models_Task $project,
         ZfExtended_Sanitized_HttpRequest $request,
         array $data,
     ): array {
+
         $single = $this->prepareTaskType(
             $project,
             count($data['targetLang']) > 1,
             $request->getParam('taskType', editor_Task_Type_Default::ID)
         );
+
+        $this->eventTrigger->triggerTaskMetaEvent($project, $data);
+
         $user = ZfExtended_Authentication::getInstance()->getUser();
 
         if ($single) {
@@ -224,8 +228,7 @@ class ImportService
         ZfExtended_Models_User $user
     ): void {
 
-        $task->meta();
-        $this->eventTrigger->triggerBeforeProcessUploadedFile($task, $data);
+        $this->eventTrigger->triggerTaskMetaEvent($task, $data);
 
         try {
             $importConfig = $this->prepareImportConfig($task, $dataProvider, $user, $data);
