@@ -194,6 +194,7 @@ class Editor_CommentController extends ZfExtended_RestController {
         $task->loadByTaskGuid($taskGuid);
         $task->changeSegmentFinishCount($task, $newAutoState, $oldAutoState);
 
+        $task->loadByTaskGuid($taskGuid);
         // TODO: make me with message bus
         $this->view->segmentFinishCount = $task->getSegmentFinishCount();
     }
