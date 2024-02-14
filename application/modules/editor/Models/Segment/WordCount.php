@@ -26,14 +26,17 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use editor_Models_Segment_InternalTag as InternalTag;
 use MittagQI\Translate5\ContentProtection\ContentProtector;
 use MittagQI\Translate5\ContentProtection\NumberProtector;
+use MittagQI\Translate5\Segment\Tag\Placeable;
 
 /**
  * Count the word in segment text
  */
-class editor_Models_Segment_WordCount {
-
+class editor_Models_Segment_WordCount
+{
+    private const INTERNAL_TAGS_NOT_TO_COUNT = [NumberProtector::TAG_NAME, Placeable::MARKER_CLASS, 'char'];
     /***
      * Segment entity
      * @var editor_Models_Segment
@@ -232,10 +235,16 @@ class editor_Models_Segment_WordCount {
      */
     public function getSourceCount(): float|int
     {
-        //replace white space tags with real white space, before clean all teh tags
-        $text = $this->utilityBroker->internalTag->restore($this->queryString, $this->contentProtector->tagList());
-        $text = $this->contentProtector->unprotect($text, true, NumberProtector::alias());
-        $text=$this->segment->stripTags($text);
+        $text = $this->utilityBroker->internalTag->replace($this->queryString, function ($matches) {
+            if (in_array($matches[InternalTag::TAG_TYPE_MATCH_ID], self::INTERNAL_TAGS_NOT_TO_COUNT, true)) {
+                return '';
+            }
+
+            return $matches[0];
+        });
+        $text = $this->utilityBroker->internalTag->restore($text);
+        $text = $this->contentProtector->unprotect($text, true);
+        $text = $this->segment->stripTags($text);
         //average words in East Asian languages by language
         //Chinese (all forms): 2.8
         //Japanese: 3.0
