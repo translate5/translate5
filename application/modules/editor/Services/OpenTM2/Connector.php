@@ -1508,6 +1508,8 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
         $writer->startDocument('1.0', 'UTF-8');
         $writer->setIndent(true);
 
+        $writtenElements = 0;
+
         foreach ($memories as $memoryNumber => $memory) {
             $filename = $exportDir . $memory['filename'] . '_' . uniqid() . '.tmx';
             file_put_contents(
@@ -1519,7 +1521,8 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
             $reader->open($filename);
 
             while ($reader->read()) {
-                if ($reader->nodeType == XMLReader::ELEMENT && $reader->name == 'tu') {
+                if ($reader->nodeType == XMLReader::ELEMENT && $reader->name === 'tu') {
+                    $writtenElements++;
                     $writer->writeRaw($reader->readOuterXML());
                 }
 
@@ -1562,9 +1565,13 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
 
         $writer->flush();
 
-        // Finalizing document with $writer->endDocument() adds closing tags for all bpt-ept tags
-        // so add body and tmx closing tags manually
-        file_put_contents($resultFilename, PHP_EOL . '</body>' . PHP_EOL . '</tmx>', FILE_APPEND);
+        if (0 !== $writtenElements) {
+            // Finalizing document with $writer->endDocument() adds closing tags for all bpt-ept tags
+            // so add body and tmx closing tags manually
+            file_put_contents($resultFilename, PHP_EOL . '</body>', FILE_APPEND);
+        }
+
+        file_put_contents($resultFilename, PHP_EOL . '</tmx>', FILE_APPEND);
 
         return $resultFilename;
     }
