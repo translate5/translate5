@@ -26,8 +26,6 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-use editor_Models_Segment_Whitespace as Whitespace;
-
 /**
  * Numbers check
  */
@@ -111,33 +109,60 @@ class editor_Segment_Numbers_Check {
     public static $lang = null;
 
     /**
+     * editor_Segment_Numbers_Check constructor.
      * @param editor_Models_Task $task
+     * @param editor_Models_Segment $segment
+     * @param editor_Segment_FieldTags $source
+     * @param editor_Segment_FieldTags $target
+     * @throws ReflectionException
      */
-    public function __construct(editor_Models_Task $task, $targetField, editor_Models_Segment $segment) {
+    public function __construct(
+        editor_Models_Task $task,
+        editor_Models_Segment $segment,
+        editor_Segment_FieldTags $source,
+        editor_Segment_FieldTags $target
+    ) {
 
         // Get source text, and replace whitespace-placeholder-characters for non-breaking space, linebreak, tab and ordinary space with themselves
         // Note: the non-commented space (1st item in 2nd arg of str_replace call) is the non-breaking space with code 160
         //       and the commented one is an ordinary space with code 32
-        $source = $task->getEnableSourceEditing() ? $segment->getSourceEditToSort() : $segment->getSourceToSort();
-        $source = Whitespace::replaceLabelledCharacters($source);
+        $sourceText = self::prepareTarget($segment, $source);
 
         // Do same for target text
-        $target = $segment->{'get' . ucfirst($targetField) . 'EditToSort'}();
-        $target = Whitespace::replaceLabelledCharacters($target);
+        $targetText = self::prepareTarget($segment, $target);
 
         // Load langs [id => rfc5646] pairs if not yet loaded
-        self::$lang = self::$lang ?? ZfExtended_Factory
+        self::$lang ??= ZfExtended_Factory
             ::get('editor_Models_Languages')
             ->loadAllKeyValueCustom('id', 'sublanguage');
 
         // Run check
         $this->states = numbers_check(
-            $source,
-            $target,
+            $sourceText,
+            $targetText,
             self::$lang[$task->getSourceLang()],
             self::$lang[$task->getTargetLang()],
             $task
         );
+    }
+
+    /**
+     * Get value of $segment's $targetField applicable to be sent to LanguageTool
+     *
+     * @param editor_Models_Segment $segment
+     * @param editor_Segment_FieldTags $target
+     * @return string
+     */
+    public static function prepareTarget(editor_Models_Segment $segment, editor_Segment_FieldTags $target) : string {
+
+        // Get target text with all tags being either stripped or replaced with their original contents (in case of whitespace)
+        $targetText = $target->renderReplaced(editor_TagSequence::MODE_ORIGINAL);
+
+        // replace escaped entities: TODO FIXME: This will create trouble with text-indices !!
+        $targetText = str_replace(['&lt;', '&gt;'], ['<', '>'], $targetText);
+
+        // Return string applicable to be sent to LanguageTool
+        return $targetText;
     }
 
     /**
