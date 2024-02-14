@@ -36,7 +36,7 @@ Ext.define('Editor.view.admin.task.CustomField.Grid', {
     alias: 'widget.taskCustomFieldGrid',
     itemId: 'taskCustomFieldGrid',
     controller: 'taskCustomFieldGridController',
-    store: Ext.create('Editor.store.admin.task.CustomField'),
+    store: 'taskCustomFieldStore',
     border: 0,
     viewModel: {
         data: {
