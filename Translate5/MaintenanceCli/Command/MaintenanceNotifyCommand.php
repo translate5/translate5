@@ -39,6 +39,7 @@ class MaintenanceNotifyCommand extends Translate5AbstractCommand {
     
     protected function configure()
     {
+        $this->setAliases(['mnt:notify']);
         $this
         // the short description shown while running "php bin/console list"
         ->setDescription('Sends a message directly to all connected users (if messagebus enabled) which opens a popup to the user then.')
