@@ -61,7 +61,9 @@ use MittagQI\Translate5\ContentProtection\NumberProtector;
 use RuntimeException;
 use XMLReader;
 use XMLWriter;
+use Zend_Registry;
 use ZfExtended_Factory;
+use ZfExtended_Logger;
 use ZfExtended_Models_Entity_NotFoundException;
 
 class TmConversionService
@@ -70,6 +72,7 @@ class TmConversionService
 
     private array $languageRulesHashMap;
     private array $languageResourceRulesHashMap;
+    private ZfExtended_Logger $logger;
 
     public function __construct(
         private ContentProtectionRepository $contentProtectionRepository,
@@ -77,6 +80,7 @@ class TmConversionService
     ) {
         $this->languageRulesHashMap = $contentProtectionRepository->getLanguageRulesHashMap();
         $this->languageResourceRulesHashMap = $contentProtectionRepository->getLanguageResourceRulesHashMap();
+        $this->logger = Zend_Registry::get('logger')->cloneMe('translate5.content_protection');
     }
 
     /**
@@ -302,7 +306,13 @@ class TmConversionService
         $numberTagMap = [];
 
         if (empty($matches[0][0]) || empty($matches[1][0])) {
-            dump($transUnit);
+            $this->logger->error(
+                'E1593',
+                'Trans unit has unexpected structure and was excluded from TMX import',
+                ['tu' => $transUnit]
+            );
+
+            return '';
         }
 
         [$source, $target] = $this->contentProtector->filterTags(
