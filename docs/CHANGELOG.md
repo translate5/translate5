@@ -13,6 +13,32 @@ All updates are (downwards) compatible! If not this is listed in the important r
 
 
 
+
+## [7.1.3] - 2024-02-14
+
+### Important Notes:
+#### [TRANSLATE-3404](https://jira.translate5.net/browse/TRANSLATE-3404)
+t5memory v0.5 requires version >0.5.59
+ 
+
+
+### Changed
+**[TRANSLATE-3692](https://jira.translate5.net/browse/TRANSLATE-3692): TermPortal - Log deleted terms** <br>
+Implement logging when term is deleted from a term collection.
+
+**[TRANSLATE-3404](https://jira.translate5.net/browse/TRANSLATE-3404): t5memory - Change t5memory reorganize call to async** <br>
+translate5 - 7.1.2: Added support of t5memory v0.5.x 
+translate5 - 7.1.3: Provide fixes for migration command
+
+
+### Bugfixes
+**[TRANSLATE-3726](https://jira.translate5.net/browse/TRANSLATE-3726): Editor general - Commenting on segment does not update the progress** <br>
+Fix for a problem when no workflow progress was registered when commenting on a segment.
+
+**[TRANSLATE-3704](https://jira.translate5.net/browse/TRANSLATE-3704): LanguageResources - Increase timeout for requests to TildeMT to 1 min** <br>
+Request timeout for TildeMT increased to 60 seconds
+
+
 ## [7.1.2] - 2024-02-09
 
 ### Important Notes:

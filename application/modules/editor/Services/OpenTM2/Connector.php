@@ -1586,6 +1586,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
         $writer->setIndent(true);
 
         stream_filter_register('fix-t5n-tag', T5NTagSchemaFixFilter::class);
+        $writtenElements = 0;
 
         $writtenElements = 0;
 
@@ -1611,6 +1612,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
                 if ($reader->nodeType == XMLReader::ELEMENT && $reader->name == 'tu') {
                     $writtenElements++;
                     $writer->writeRaw($this->conversionService->convertT5MemoryTagToNumber($reader->readOuterXML()));
+                    $writtenElements++;
                 }
 
                 // Further code is only applicable for the first file

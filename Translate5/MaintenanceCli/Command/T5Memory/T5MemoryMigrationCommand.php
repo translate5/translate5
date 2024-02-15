@@ -236,6 +236,8 @@ class T5MemoryMigrationCommand extends Translate5AbstractCommand
 
             $languageResource = $this->cloneLanguageResourceIfNeeded($languageResource, $cloneLanguageResource);
             $languageResource->setResourceId($targetResourceId);
+            $languageResource->removeSpecificData('memories');
+            $languageResource->removeSpecificData('version');
 
             try {
                 $this->importOrCreateEmpty($connector, $languageResource, $filenameWithPath, $type);
@@ -632,10 +634,12 @@ class T5MemoryMigrationCommand extends Translate5AbstractCommand
                 )),
                 null
             );
-            $id = $this->io->askQuestion($askMemories);
+
+            $chosen = $this->io->askQuestion($askMemories);
+            $name = explode(' | ', $chosen)[0];
 
             $languageResourcesData = [
-                $languageResourcesData[array_search($id, array_column($languageResourcesData, 'name'), true)]
+                $languageResourcesData[array_search($name, array_column($languageResourcesData, 'name'), true)]
             ];
         }
 

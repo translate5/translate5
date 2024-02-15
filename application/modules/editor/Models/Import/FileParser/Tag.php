@@ -190,7 +190,7 @@ class editor_Models_Import_FileParser_Tag {
         }
 
         $classes = [ $this->parseSegmentGetStorageClass($this->originalContent, $this->xmlTags) ];
-        $text = $this->text ?? htmlentities($this->originalContent, ENT_COMPAT); //PHP 8.1 fix - default changed!
+        $text = $this->text ?? htmlentities($this->originalContent, ENT_COMPAT);
         if($cls !== null){
             $classes[] = trim($cls);
         }
