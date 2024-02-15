@@ -35,7 +35,7 @@ Ext.define('Editor.view.help.Video', {
 
     initConfig: function(instanceConfig) {
         var me = this,
-            url=Ext.String.format(me.getLoaderUrl(), Editor.data.helpSection, Editor.data.locale),
+            url = Ext.String.format(me.getLoaderUrl(), Editor.data.helpSection, Editor.data.locale),
             isRemote=url.match(/^(http:\/\/|https:\/\/|ftp:\/\/|\/\/)([-a-zA-Z0-9@:%_\+.~#?&//=])+$/)!==null,
             config = {
             };
@@ -44,9 +44,10 @@ Ext.define('Editor.view.help.Video', {
         if(isRemote){
             config.html='<iframe src="'+url+'" width="100%" height="100%" ></iframe>';
         }else{
+            url += url.endsWith('/') ? '' : '/';
             //the url is not remote, set the loader configuration
             config.loader={
-                url:url,
+                url: url,
                 renderer: 'html',
                 autoLoad: true,
                 scripts: true

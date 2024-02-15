@@ -185,7 +185,18 @@ class Editor_CommentController extends ZfExtended_RestController {
         $segment = ZfExtended_Factory::get('editor_Models_Segment');
         /* @var $segment editor_Models_Segment */
         $segment->load($segmentId);
+
+        $oldAutoState = $segment->getAutoStateId();
         $this->entity->updateSegment($segment, $taskGuid);
+        $newAutoState = $segment->getAutoStateId();
+
+        $task = ZfExtended_Factory::get(editor_Models_Task::class);
+        $task->loadByTaskGuid($taskGuid);
+        $task->changeSegmentFinishCount($task, $newAutoState, $oldAutoState);
+
+        $task->loadByTaskGuid($taskGuid);
+        // TODO: make me with message bus
+        $this->view->segmentFinishCount = $task->getSegmentFinishCount();
     }
 
     //getting a single comment is actually unnecessary

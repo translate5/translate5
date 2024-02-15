@@ -388,6 +388,7 @@ Ext.define('Editor.view.admin.config.Grid', {
                 break;
             case 'list':
             case 'regexlist':
+            case 'xpathlist':
                 config = {
                     xtype: 'tagfield',
                     name: 'value',

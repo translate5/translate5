@@ -57,7 +57,9 @@ Ext.define('Editor.view.admin.task.Preferences', {
         Ext.Object.each(Editor.data.app.workflows, function(key, item) {
             workflows.push([item.id, item.label]);
         });
-        
+
+        me.getViewModel().set('currentTask', me.task);
+
         me.items = [{
                 xtype: 'editorAdminTaskUserPrefsGrid',
                 region: 'center'

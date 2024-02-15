@@ -59,8 +59,17 @@ Ext.define('Editor.view.ToolTip', {
 
     // Change content dynamically depending on which element triggered the show.
     onBeforeShow: function(tip) {
-        var me = this, t = tip.triggerElement,
-            fly = Ext.fly(t), up = fly.up(), qtip = me.getQtip(fly) || me.getQtip(up);
+
+        var me = this;
+
+        if (!tip || !tip.triggerElement || !Ext.fly(tip.triggerElement) || !Ext.fly(tip.triggerElement).up()) {
+            return false;
+        }
+
+        var t = tip.triggerElement,
+            fly = Ext.fly(t),
+            up = fly.up(),
+            qtip = me.getQtip(fly) || me.getQtip(up);
 
         if (me.hasCustomTip(fly)) {
             if (qtip) {
@@ -86,6 +95,9 @@ Ext.define('Editor.view.ToolTip', {
     },
 
     getQtip: function(el) {
+        if(!el || !el.dom) {
+            return false;
+        }
         return el.dom.getAttribute('data-qtip');
     },
 
@@ -136,20 +148,24 @@ Ext.define('Editor.view.ToolTip', {
         
 
         //Workaround to show the titles of the img tags always in fulltag mode
-        if(
+        if (
             fly.hasCls('internal-tag')
-            && me.flyHasOneOfCls(fly, ['number', 'tab', 'space', 'newline', 'nbsp', 'char'])
+            && me.flyHasOneOfCls(fly, ['number', 'tab', 'space', 'newline', 'nbsp', 'char', 't5placeable'])
         ) {
-            result = fly.down('span.short').getAttribute('title') + (result ? '<br>'+result : '');
+            var dom = fly.down('span.short');
+            result = dom ? dom.getAttribute('title') + (result ? '<br>'+result : '') : null;
         }
 
-        result = result.replaceAll('<br>', ' ');
+        if(result){
+            result = result.replaceAll('<br>', ' ');
 
-        if (appendText) {
-            result += '<br><br>' + appendText;
+            if (appendText) {
+                result += '<br><br>' + appendText;
+            }
+
+            tip.update(result);
         }
 
-        tip.update(result);
         return !!result; //if there is no content for ttip, we return false to prevent the show of the tooltip
     },
 

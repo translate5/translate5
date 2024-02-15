@@ -26,6 +26,7 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 use MittagQI\Translate5\Plugins\TermImport\DTO\InstructionsDTO;
+use MittagQI\Translate5\Plugins\TermImport\Services\Across\TbxSoapConnector;
 use editor_Models_Customer_Customer as Customer;
 use editor_Models_TermCollection_TermCollection as TermCollection;
 use editor_Models_LanguageResources_CustomerAssoc as CustomerAssoc;
@@ -79,6 +80,8 @@ class editor_Plugins_TermImport_Services_Import {
      * @var string
      */
     const IMPORT_ACOSS_API_PWD="apiPassword";
+
+    const IMPORT_ACROSS_API_SSL_PEER_NAME = 'ssl_peer_name';
 
     /***
      * Key from the crossapi config file for the across export files directory
@@ -241,6 +244,7 @@ class editor_Plugins_TermImport_Services_Import {
      * The files will be imported in the configured collection in the crossapi config file
      *
      * @return string[]
+     * @throws \MittagQI\Translate5\Plugins\TermImport\Services\Across\Exception
      */
     public function handleAccrossApiImport(){
         if(empty($this->configMap)){
@@ -280,8 +284,13 @@ class editor_Plugins_TermImport_Services_Import {
             return $this->returnMessage;
         }
 
-        //FIXME: split the php file into classes ?
-        require_once('AcrossTbxExport.php');
+        $additionalConfig = [];
+        if (!empty($this->configMap[self::IMPORT_ACROSS_API_SSL_PEER_NAME])) {
+            $additionalConfig['stream_context'] = stream_context_create([
+                'ssl' => ['peer_name' => $this->configMap[self::IMPORT_ACROSS_API_SSL_PEER_NAME]]
+            ]);
+        }
+
 
         //get all across export files from the dir
         $it = new FilesystemIterator($exportFilesDir, FilesystemIterator::SKIP_DOTS);
@@ -290,8 +299,7 @@ class editor_Plugins_TermImport_Services_Import {
         foreach ($it as $fileinfo) {
             $file=$fileinfo->getFilename();
 
-            $connector=new TbxAcrossSoapConnector($apiUrl,$apiUser,$apiPwd);
-            /* @var $connector TbxAcrossSoapConnector */
+            $connector = new TbxSoapConnector($apiUrl, $apiUser, $apiPwd, $additionalConfig);
 
             $params=$this->handleCollectionForFile($file);
 

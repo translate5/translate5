@@ -359,16 +359,18 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
             $matchRateInternal->matchrate = null;
             //for each match, find the best match rate, and save it
             foreach ($matchResults as $match) {
+                $isTermCollection = $match->languageResourceType == editor_Models_Segment_MatchRateType::TYPE_TERM_COLLECTION;
                 if ($matchRateInternal->matchrate > $match->matchrate) {
                     continue;
                 }
 
                 // If the matchrate is the same, we only check for a new best match if it is from a termcollection
-                if ($matchRateInternal->matchrate == $match->matchrate && $match->languageResourceType != editor_Models_Segment_MatchRateType::TYPE_TERM_COLLECTION) {
+                // or if the match has a newer timestamp
+                if ($matchRateInternal->matchrate == $match->matchrate && !$isTermCollection) {
                     continue;
                 }
 
-                if ($match->languageResourceType == editor_Models_Segment_MatchRateType::TYPE_TERM_COLLECTION) {
+                if ($isTermCollection) {
                     // - preferred terms > permitted terms
                     // - if multiple permitted terms: take the first
                     if (!is_null($bestMatchRateResult) && $bestMatchRateResult->languageResourceType == editor_Models_Segment_MatchRateType::TYPE_TERM_COLLECTION) {
@@ -389,7 +391,13 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
 
                 $matchRateInternal = $match;
                 //store best match rate results(do not compare agains the mt results)
-                if ($matchRateInternal->matchrate > $bestMatchRate && !$isMtResource) {
+                // if match of another TM has the same >=100 matchrate, use the newer one
+                if (($matchRateInternal->matchrate > $bestMatchRate
+                        || $matchRateInternal->matchrate === $bestMatchRate
+                        && $bestMatchRate >= 100
+                        && $match->timestamp > $bestMatchRateResult->timestamp)
+                    && !$isMtResource
+                ) {
                     $bestMatchRateResult = $match;
                     $bestMatchRateResult->internalLanguageResourceid = $languageResourceid;
                 }
@@ -413,6 +421,18 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
 
             //reset the result collection
             $matches->resetResult();
+
+            // Mark the segment as fuzzy match in the TM
+            // Checking for matchrate >= 100 is for edge case when segments have the same-same source but different
+            // source md5hash so they are not a repetitions. Updating the segment in this case would lead to omitting
+            // translation for other segments with the same-same source, but different source md5hash
+            if ($bestMatchRateResult->matchrate < 100 && $this->internalFuzzy && $connector->isInternalFuzzy()) {
+                $origTarget = $segment->getTargetEdit();
+                $dummyTargetText = self::renderDummyTargetText($segment->getTaskGuid());
+                $segment->setTargetEdit($dummyTargetText);
+                $connector->update($segment);
+                $segment->setTargetEdit($origTarget);
+            }
         }
 
         return $bestMatchRateResult;
@@ -487,20 +507,13 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
             /* @var $dummyResult editor_Services_ServiceResult */
             $matches->setLanguageResource($connector->getLanguageResource());
             $matches->addResult('', $connector->getDefaultMatchRate());
+
             return $matches;
         }
 
         // if the current resource type is not MT, query the tm or termcollection
         $matches = $connector->query($segment);
 
-        //update the segment with custom target in fuzzy tm
-        if ($this->internalFuzzy && $connector->isInternalFuzzy()) {
-            $origTarget = $segment->getTargetEdit();
-            $dummyTargetText = self::renderDummyTargetText($segment->getTaskGuid());
-            $segment->setTargetEdit($dummyTargetText);
-            $connector->update($segment);
-            $segment->setTargetEdit($origTarget);
-        }
         return $matches;
     }
 

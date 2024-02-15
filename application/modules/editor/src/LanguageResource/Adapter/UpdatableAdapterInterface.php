@@ -36,6 +36,12 @@ interface UpdatableAdapterInterface
 {
     public const RECHECK_ON_UPDATE = true;
     public const DO_NOT_RECHECK_ON_UPDATE = false;
+    public const RESCHEDULE_UPDATE_ON_ERROR = true;
+    public const DO_NOT_RESCHEDULE_UPDATE_ON_ERROR = false;
 
-    public function update(SegmentModel $segment, bool $recheckOnUpdate = self::DO_NOT_RECHECK_ON_UPDATE): void;
+    public function update(
+        SegmentModel $segment,
+        bool $recheckOnUpdate = self::DO_NOT_RECHECK_ON_UPDATE,
+        bool $rescheduleUpdateOnError = self::DO_NOT_RESCHEDULE_UPDATE_ON_ERROR
+    ): void;
 }

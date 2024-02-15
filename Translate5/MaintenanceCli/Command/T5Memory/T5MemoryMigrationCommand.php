@@ -71,6 +71,8 @@ class T5MemoryMigrationCommand extends Translate5AbstractCommand
     private const OPTION_CLONED_NAME_PART = 'cloned_name_part';
     private const OPTION_TM_NAME = 'tm-name';
     private const OPTION_CREATE_EMPTY = 'create-empty';
+    private const OPTION_SOURCE_LANGUAGE  = 'source-language';
+    private const OPTION_TARGET_LANGUAGE  = 'target-language';
     private const DATA_RELATIVE_PATH = '/../data/';
     private const EXPORT_FILE_EXTENSION = '.tmx';
     private const DEFAULT_WAIT_TIME_SECONDS = 600;
@@ -139,6 +141,18 @@ class T5MemoryMigrationCommand extends Translate5AbstractCommand
                 InputOption::VALUE_REQUIRED,
                 'UUID of the TM. If provided empty memory is created in the destination ' .
                 't5memory omitting the export/import process'
+            )
+            ->addOption(
+                self::OPTION_SOURCE_LANGUAGE,
+                null,
+                InputOption::VALUE_REQUIRED,
+                'Source language code to filter language resources, doesn\'t work with --tm-name option'
+            )
+            ->addOption(
+                self::OPTION_TARGET_LANGUAGE,
+                null,
+                InputOption::VALUE_REQUIRED,
+                'Target language code to filter language resources, doesn\'t work with --tm-name option'
             );
     }
 
@@ -222,6 +236,8 @@ class T5MemoryMigrationCommand extends Translate5AbstractCommand
 
             $languageResource = $this->cloneLanguageResourceIfNeeded($languageResource, $cloneLanguageResource);
             $languageResource->setResourceId($targetResourceId);
+            $languageResource->removeSpecificData('memories');
+            $languageResource->removeSpecificData('version');
 
             try {
                 $this->importOrCreateEmpty($connector, $languageResource, $filenameWithPath, $type);
@@ -584,9 +600,23 @@ class T5MemoryMigrationCommand extends Translate5AbstractCommand
             return [$data];
         }
 
-        if (!$this->isFilteringByName()) {
+        if (!$this->isFilteringByName() && !$this->isFilteringByLanguages()) {
             // Return all language resources for given source resource id in case there is no filter by name
             return $languageResource->getByResourceId($sourceResourceId);
+        }
+
+        if ($this->isFilteringByLanguages()) {
+            if ($this->isFilteringByName()) {
+                throw new RuntimeException(
+                    'Filtering by name and languages at the same time is not supported'
+                );
+            }
+
+            return $languageResource->getByResourceIdFilteredByLanguageCodes(
+                $sourceResourceId,
+                $input->getOption(self::OPTION_SOURCE_LANGUAGE),
+                $input->getOption(self::OPTION_TARGET_LANGUAGE)
+            );
         }
 
         $languageResourcesData = $languageResource->getByResourceIdFilteredByNamePart(
@@ -597,13 +627,19 @@ class T5MemoryMigrationCommand extends Translate5AbstractCommand
         if (count($languageResourcesData) > 1) {
             $askMemories = new ChoiceQuestion(
                 'Please choose a Memory:',
-                array_values(array_map(static fn($data) => $data['name'], $languageResourcesData)),
+                array_values(array_map(
+                    static fn($data) =>
+                        sprintf('%s | %s | %s', $data['name'], $data['sourceLangCode'], $data['targetLangCode']),
+                    $languageResourcesData
+                )),
                 null
             );
-            $id = $this->io->askQuestion($askMemories);
+
+            $chosen = $this->io->askQuestion($askMemories);
+            $name = explode(' | ', $chosen)[0];
 
             $languageResourcesData = [
-                $languageResourcesData[array_search($id, array_column($languageResourcesData, 'name'), true)]
+                $languageResourcesData[array_search($name, array_column($languageResourcesData, 'name'), true)]
             ];
         }
 
@@ -618,5 +654,20 @@ class T5MemoryMigrationCommand extends Translate5AbstractCommand
     protected function getInput(): InputInterface
     {
         return $this->input;
+    }
+
+    private function isFilteringByLanguages(): bool
+    {
+        $sourceLanguage = $this->input->getOption(self::OPTION_SOURCE_LANGUAGE);
+        $targetLanguage = $this->input->getOption(self::OPTION_TARGET_LANGUAGE);
+
+        if (($sourceLanguage !== null && $targetLanguage === null)
+            || ($sourceLanguage === null && $targetLanguage !== null)
+        ) {
+            throw new RuntimeException('Both source and target language must be provided');
+        }
+
+        return $sourceLanguage !== null
+            && $targetLanguage !== null;
     }
 }

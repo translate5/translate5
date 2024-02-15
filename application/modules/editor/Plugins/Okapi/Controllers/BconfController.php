@@ -197,6 +197,19 @@ class editor_Plugins_Okapi_BconfController extends ZfExtended_RestController {
     }
 
     /**
+     * Helper to check if a Bconf supports a specific extension
+     */
+    public function filetypesupportAction(){
+        $this->entityLoad();
+        $extension = $this->getParam('extension');
+        $this->view->success = false;
+        if(!empty($extension) && $this->entity->getExtensionMapping()->hasExtension(strtolower($extension))){
+            $this->view->success = true;
+            $this->view->extension = strtolower($extension);
+        }
+    }
+
+    /**
      * Helper to load the entity and repack it if the bconf is outdated
      * This is needed to avoid outdated stuff leaving the system or being cloned
      * @return void

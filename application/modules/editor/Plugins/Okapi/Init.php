@@ -51,7 +51,7 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
      * This must be increased each time, a git-based fprm or srx is changed
      * @var int
      */
-    const BCONF_VERSION_INDEX = 6;
+    const BCONF_VERSION_INDEX = 7;
 
     /**
      * The filename of the system default import bconf
@@ -322,6 +322,15 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
                 'action'     => 'setdefault'
             ]);
         $r->addRoute('plugins_okapi_bconf_setdefault', $route);
+        // route to check support for file-types
+        $route = new ZfExtended_Controller_RestLikeRoute(
+            'editor/plugins_okapi_bconf/filetypesupport',
+            [
+                'module'     => 'editor',
+                'controller' => 'plugins_okapi_bconf',
+                'action'     => 'filetypesupport'
+            ]);
+        $r->addRoute('plugins_okapi_bconf_filetypesupport', $route);
 
         // routes for bconf filters
         $route = new Zend_Rest_Route($f, [], [
@@ -416,8 +425,8 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
         // adds the bconfId to the task-meta
         $this->eventManager->attach(
             ImportEventTrigger::class,
-            ImportEventTrigger::BEFORE_PROCESS_UPLOADED_FILE,
-            [$this, 'handleBeforeProcessUploadedFile']
+            ImportEventTrigger::INIT_TASK_META,
+            [$this, 'handleInitTaskMeta']
         );
 
         $this->eventManager->attach(
@@ -537,7 +546,7 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
 
     /**
      * Hook that adds the bconfId sent by the Import wizard to the task-meta
-     * Called in the same request as handleBeforeProcessUploadedFile, handleAfterUploadPreparation
+     * Called in the same request as handleInitTaskMeta, handleAfterUploadPreparation
      * Take care: the task is not yet saved here
      *
      * @param Zend_EventManager_Event $event
@@ -549,7 +558,7 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
      * @throws editor_Models_ConfigException
      * @throws editor_Plugins_Okapi_Exception
      */
-    public function handleBeforeProcessUploadedFile(Zend_EventManager_Event $event){
+    public function handleInitTaskMeta(Zend_EventManager_Event $event){
         /* @var $task editor_Models_Task */
         $task = $event->getParam('task');
         /* @var $meta editor_Models_Task_Meta */
@@ -558,7 +567,7 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
         $requestData = $event->getParam('data');
         $bconfId = array_key_exists('bconfId', $requestData) ? $requestData['bconfId'] : null;
 
-        if (static::$doDebug) { error_log('OKAPI::handleBeforeProcessUploadedFile: task ' . $task->getTaskGuid() . ', requestBconfId: ' . ($bconfId === null ? 'null' : $bconfId)); }
+        if (static::$doDebug) { error_log('OKAPI::handleInitTaskMeta: task ' . $task->getTaskGuid() . ', requestBconfId: ' . ($bconfId === null ? 'null' : $bconfId)); }
 
         // empty makes sense here since we only accept an bconf-id > 0
         if(empty($bconfId)){
@@ -570,7 +579,7 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
 
     /**
      * Hook that adds the used bconf to the ImportArchive as a long-term reference which bconf was used
-     * Called in the same request as handleBeforeProcessUploadedFile, handleAfterUploadPreparation
+     * Called in the same request as handleInitTaskMeta, handleAfterUploadPreparation
      * Take care: the task is not yet saved here
      *
      * @param Zend_EventManager_Event $event

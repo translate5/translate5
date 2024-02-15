@@ -1289,18 +1289,6 @@ Ext.override(Ext.panel.Table, {
 });
 
 /**
- * ExtJS 6.2 bug: there is currently no other way to enable stateful grid with columns only.
- * Since there is currently no need to have stateful filters in one of the grids, 
- * we just disable that generally
- */
-Ext.override(Ext.grid.filters.Filters, {
-    init: function(grid) {
-        this.callParent([grid]);
-        grid.store.statefulFilters = false;
-    }
-});
-
-/**
  * Fixes regarding states and grid table
  */
 Ext.override(Ext.grid.column.Column, {

@@ -30,6 +30,10 @@ namespace MittagQI\Translate5\Plugins\SpellCheck\Segment;
 
 use editor_Models_Segment;
 use editor_Models_Segment_Whitespace as Whitespace;
+use editor_Segment_FieldTags;
+use editor_Segment_Internal_Tag;
+use editor_Segment_Tag;
+use editor_TagSequence;
 use MittagQI\Translate5\Plugins\SpellCheck\Exception\DownException;
 use MittagQI\Translate5\Plugins\SpellCheck\Exception\MalfunctionException;
 use MittagQI\Translate5\Plugins\SpellCheck\Exception\RequestException;
@@ -150,7 +154,7 @@ class Check {
 
     /**
      * @param editor_Models_Segment $segment
-     * @param $targetField
+     * @param editor_Segment_FieldTags $target
      * @param Adapter $adapter
      * @param string $spellCheckLang
      * @throws Zend_Exception
@@ -159,7 +163,12 @@ class Check {
      * @throws RequestException
      * @throws TimeOutException
      */
-    public function __construct(editor_Models_Segment $segment, $targetField, Adapter $adapter, string $spellCheckLang) {
+    public function __construct(
+        editor_Models_Segment    $segment,
+        editor_Segment_FieldTags $target,
+        Adapter                  $adapter,
+        string                   $spellCheckLang)
+    {
 
         // If we're in batch-mode
         if (self::$batch) {
@@ -179,47 +188,66 @@ class Check {
         } else {
 
             // Prepare target
-            $target = self::prepareTarget($segment, $targetField);
+            $targetText = self::prepareTarget($segment, $target);
 
             // If empty target - return
-            if (strlen($target) === 0) {
+            if (strlen($targetText) === 0) {
                 return;
             }
 
             // Get LanguageTool response
-            $data = $adapter->getMatches($target, $spellCheckLang);
+            $data = $adapter->getMatches($targetText, $spellCheckLang);
         }
 
         // Foreach match given by LanguageTool API response
         foreach ($data->matches as $index => $match) {
 
+
             // If match's issueType is known to Translate5
             if ($category = self::$map[$match->rule->issueType] ?? 0) {
 
+                // IMPORTANT: if we have whitespace-errors when single internal tags are
+                // these single internal tags usually represent a variable or placeable (which
+                // must be terminated by whitespace). Therefor we ignore such errors
+                // QUIRK: technically it would be more correct to not send the double whitespace
+                // but this would require a far better data-model in the frontend
+                // ANOTHER QUIRK: sometimes these whitespace-errors are reported as "uncategorized"
+                if(($category === self::WHITESPACE || $category === self::UNCATEGORIZED)
+                    && $target->hasTypeAndClassBetweenIndices(
+                        editor_Segment_Tag::TYPE_INTERNAL,
+                        editor_Segment_Internal_Tag::CSS_CLASS_SINGLE,
+                        $match->offset,
+                        $match->offset + $match->length
+                    )){
+                    continue;
+                }
+
                 // Convert into special data structure
-                $this->states[$category] []= (object) [
-                    'content'           => mb_substr(
-                        $match->context->text,
-                        $match->context->offset,
-                        $match->context->length),
-                    'matchIndex'        => $index,                                                       // Integer
-                    'range'             => [                                                             // Rangy bookmark
+                $this->states[$category][]= (object) [
+                    'content'           => mb_substr($match->sentence, $match->offset, $match->length),
+                    'matchIndex'        => $index,                                                              // Integer
+                    'range'             => [                                                                    // Text coordinates
                         'start' => $match->offset,
                         'end'   => $match->offset + $match->context->length
                     ],
-                    'message'           => $match->message,                                              // String
-                    'replacements'      => array_column($match->replacements ?? [], 'value'),            // Array
-                    'infoURLs'          => array_column($match->rule->urls   ?? [], 'value'),            // Array
-                    'cssClassErrorType' => self::$css[$category]                                         // String
+                    'message'           => $match->message,                                                     // String
+                    'replacements'      => array_column($match->replacements ?? [], 'value'),   // Array
+                    'infoURLs'          => array_column($match->rule->urls   ?? [], 'value'),   // Array
+                    'cssClassErrorType' => self::$css[$category]                                                // String
                 ];
 
             // Else log that detected error is of a kind previously unknown to translate5 app
             } else {
-                $segment->getTask()->logger('editor.task.autoqa')->warn('E1418', 'LanguageTool (which stands behind AutoQA Spell Check) detected an error of a kind previously unknown to translate5 app', [
-                    'lang' => $spellCheckLang,
-                    'text' => $target,
-                    'match' => $match
-                ]);
+                $segment->getTask()->logger('editor.task.autoqa')
+                    ->warn(
+                        'E1418',
+                        'LanguageTool (which stands behind AutoQA Spell Check)'
+                        . ' detected an error of a kind previously unknown to translate5 app',
+                        [
+                            'lang' => $spellCheckLang,
+                            'text' => $targetText,
+                            'match' => $match
+                        ]);
             }
         }
     }
@@ -254,10 +282,10 @@ class Check {
      * Append the value of $segment's $targetField to the list of to be processed
      *
      * @param editor_Models_Segment $segment
-     * @param string $targetField
+     * @param editor_Segment_FieldTags $target
      */
-    public static function addBatchTarget(editor_Models_Segment $segment, string $targetField) {
-        self::$batch['target'][$segment->getSegmentNrInTask()] = self::prepareTarget($segment, $targetField);
+    public static function addBatchTarget(editor_Models_Segment $segment, editor_Segment_FieldTags $target) {
+        self::$batch['target'][$segment->getSegmentNrInTask()] = self::prepareTarget($segment, $target);
     }
 
     /**
@@ -267,17 +295,16 @@ class Check {
      * @param string $targetField
      * @return string
      */
-    public static function prepareTarget(editor_Models_Segment $segment, string $targetField) : string {
+    public static function prepareTarget(editor_Models_Segment $segment, editor_Segment_FieldTags $target) : string {
 
-        // Get target text, strip tags, replace htmlentities
-        $target = $segment->{'get' . ucfirst($targetField) . 'EditToSort'}();
-        $target = str_replace(['&lt;', '&gt;'], ['<', '>'], $target);
+        // Get target text with all tags being either stripped or replaced with their original contents (in case of whitespace)
+        $targetText = $target->renderReplaced(editor_TagSequence::MODE_ORIGINAL);
 
-        // Replace whitespace-placeholders with the actual characters they represent
-        $target = Whitespace::replaceLabelledCharacters($target);
+        // replace escaped entities: TODO FIXME: This will create trouble with text-indices !!
+        $targetText = str_replace(['&lt;', '&gt;'], ['<', '>'], $targetText);
 
         // Return string applicable to be sent to LanguageTool
-        return $target;
+        return $targetText;
     }
 
     /**

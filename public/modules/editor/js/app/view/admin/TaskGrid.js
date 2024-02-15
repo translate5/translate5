@@ -39,7 +39,7 @@ Ext.define('Editor.view.admin.TaskGrid', {
     controller: 'taskGrid',
     alias: 'widget.adminTaskGrid',
     itemId: 'adminTaskGrid',
-    stateId: 'adminTaskGrid',
+    stateId: 'editor.adminTaskGrid',
     stateful: true,
     cls: 'adminTaskGrid',
     title: '#UT#Aufgaben',
@@ -317,6 +317,7 @@ Ext.define('Editor.view.admin.TaskGrid', {
             userStates = ['open', 'waiting', 'finished', 'unconfirmed'],//TODO get me from backend
             stateFilterOrder = ['open', 'locked', 'end', 'unconfirmed', 'import', 'error'],
             relaisLanguages = Ext.Array.clone(Editor.data.languages),
+            customColumns = Editor.controller.admin.TaskCustomField.getGridColumnsFor('taskGrid'),
             addQtip = function (meta, text) {
                 meta.tdAttr = 'data-qtip="' + Ext.String.htmlEncode(text) + '"';
             },
@@ -746,7 +747,7 @@ Ext.define('Editor.view.admin.TaskGrid', {
                         },
                         tooltip: me.text_cols.enableSourceEditing,
                         text: me.text_cols.enableSourceEditing
-                    }]
+                    }].concat(customColumns)
             },
             dockedItems: [{
                 xtype: 'toolbar',

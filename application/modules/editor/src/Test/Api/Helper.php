@@ -277,14 +277,34 @@ final class Helper extends ZfExtended_Test_ApiHelper
     public function importTask(array $task, bool $failOnError = true, bool $waitForImport = true)
     {
         $this->initTaskPostData($task);
-        $this->test::assertLogins(['testmanager', 'testclientpm']); // make sure testmanager or testclientpm is logged in
-        $this->task = $this->postJson('editor/task', $task);
+
+        // prevent the allowed states to be reset with session requests
+        $allowedStatuses = $this->getAllowHttpStatusOnce();
+
+        // make sure testmanager or testclientpm is logged in
+        $this->test::assertLogins(['testmanager', 'testclientpm']);
+
+        $response = $this->postJson('editor/task', $task,expectedToFail: !$failOnError);
+
+        if(is_object($response) && isset($response->error) && $failOnError === false){
+            return $response;
+        }
+
+        $this->task = $response;
+        
         // the project tasks will only be part of the first request
         $projectTasks = (property_exists($this->task, 'projectTasks')) ? $this->task->projectTasks : null;
+
+        // re add the collected allowed states after the task request is done
+        foreach ($allowedStatuses as $status) {
+            $this->allowHttpStatusOnce($status);
+        }
+
         $this->assertResponseStatus($this->getLastResponse(), 'Import');
         if (!$waitForImport) {
             return $this->task;
         }
+        
         if ($this->task->taskType == self::INITIAL_TASKTYPE_PROJECT) {
             $this->waitForCurrentProjectStateOpen($failOnError);
         } else {
@@ -902,7 +922,7 @@ final class Helper extends ZfExtended_Test_ApiHelper
 
     /**
      * Checks, if the passed configs are set / set to the wanted value
-     * Hint: if the passed configs ave null as value, they are only checked for existance, otherwise for equality
+     * Hint: if the passed configs have null as value, they are only checked for existance, otherwise for equality
      * @param array $configsToTest
      * @return bool
      * @throws Zend_Db_Statement_Exception

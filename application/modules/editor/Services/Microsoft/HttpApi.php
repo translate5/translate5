@@ -26,15 +26,18 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-class editor_Services_Microsoft_HttpApi extends editor_Services_Connector_HttpApiAbstract {
-    public function __construct(editor_Services_Microsoft_Resource $resource) {
+class editor_Services_Microsoft_HttpApi extends editor_Services_Connector_HttpApiAbstract
+{
+
+    public function __construct(editor_Services_Microsoft_Resource $resource)
+    {
         $this->resource = $resource;
     }
 
     /**
      * Search the api for given source/target language by domainCode
      *
-     * @param string $text
+     * @param mixed $text
      * @param string $sourceLang
      * @param string $targetLang
      * @param bool $useDictionary
@@ -42,23 +45,22 @@ class editor_Services_Microsoft_HttpApi extends editor_Services_Connector_HttpAp
      * @throws Zend_Http_Client_Exception
      * @throws editor_Services_Exceptions_InvalidResponse
      */
-    public function search($text, $sourceLang, $targetLang, &$useDictionary = false) {
+    public function search(mixed $text, string $sourceLang, string $targetLang, bool $useDictionary = false): bool
+    {
 
-        $useDictionary = $useDictionary && $this->isValidDictionaryLookup($sourceLang, $targetLang);
-        
         $path = $useDictionary ? '/dictionary/lookup' : '/translate';
         $this->getHttp('POST', $path);
 
-        if(!is_array($text)){
+        if (!is_array($text)) {
             $text = [$text];
         }
-        $requestBody  = [];
+        $requestBody = [];
         foreach ($text as $t) {
             $requestBody[] = ['Text' => $t];
         }
 
         $this->http->setRawData(json_encode($requestBody));
-        
+
         $this->http->setParameterGet([
             'from' => $sourceLang,
             'to' => $targetLang,
@@ -67,33 +69,38 @@ class editor_Services_Microsoft_HttpApi extends editor_Services_Connector_HttpAp
         return $this->processResponse($this->http->request());
     }
 
-    /***
-     * Check if it is valid direcory lookup for the given language combination.
+    /**
+     * Check if it is valid dictionary lookup for the given language combination.
      * The microsoft translator supports only from en or to en directory lookup.
      * More info: https://docs.microsoft.com/en-us/azure/cognitive-services/Translator/language-support
      * @param string $sourceLang
      * @param string $targetLang
      * @return boolean
      */
-    protected function isValidDictionaryLookup($sourceLang,$targetLang){
-        //FIXME compare against dictionary language list??? not cached, must be loaded again...
-        return (mb_substr(strtolower($sourceLang), 0,2)=='en' || mb_substr(strtolower($targetLang), 0,2)=='en');
+    public function isValidDictionaryLookup(string $sourceLang, string $targetLang)
+    {
+        $languages = $this->getLanguages(editor_Services_Microsoft_LanguageScope::DICTIONARY);
+        if(isset($languages[$sourceLang]) && in_array($targetLang, $languages[$sourceLang])){
+            return true;
+        }
+        return false;
     }
 
     /**
      * Check the api status
      * @return boolean
      */
-    public function getStatus(){
+    public function getStatus()
+    {
         //TODO does that produce costs? There is no other way to check the API authentication (the languages call does not check authentication)
         $this->getHttp('POST', '/dictionary/lookup');
-        $this->http->setConfig(['timeout'=>5]);
+        $this->http->setConfig(['timeout' => 5]);
         $this->http->setRawData(json_encode([['Text' => '']]));
         $this->http->setParameterGet([
             'from' => 'de',
             'to' => 'en',
         ]);
-        
+
         return $this->processResponse($this->http->request());
     }
 
@@ -103,31 +110,82 @@ class editor_Services_Microsoft_HttpApi extends editor_Services_Connector_HttpAp
      * @param string $endpointPath
      * @return Zend_Http_Client
      */
-    protected function getHttp($method, $endpointPath = '') {
-        parent::getHttp($method, '/'.ltrim($endpointPath, '/'));
+    protected function getHttp($method, $endpointPath = '')
+    {
+        parent::getHttp($method, '/' . ltrim($endpointPath, '/'));
         $this->http->setParameterGet('api-version', '3.0');
-        $this->http->setConfig(['timeout'=>30]);
+        $this->http->setConfig(['timeout' => 30]);
         $this->http->setHeaders('Content-type', 'application/json');
         $this->http->setHeaders('Ocp-Apim-Subscription-Key', $this->resource->getAuthenticationKey());
         $location = $this->resource->getLocation();
-        if(!empty($location)) {
+        if (!empty($location)) {
             $this->http->setHeaders('Ocp-Apim-Subscription-Region', $location);
         }
         $this->http->setHeaders('X-ClientTraceId', ZfExtended_Utils::uuid());
         return $this->http;
     }
 
-    /***
+    /**
      * Gets from API the set of languages currently supported for translation
-     * @return array|null
+     * @return mixed
      */
-    public function getLanguages(): ?array {
-        $this->getHttp('GET', '/languages');
-        $this->http->setParameterGet('scope', 'translation');
-        if($this->processResponse($this->http->request())) {
-            // we consider only the translation languages
-            return array_keys(get_object_vars($this->result->translation));
+    public function getLanguages(string $scope = editor_Services_Microsoft_LanguageScope::TRANSLATION): mixed
+    {
+        $memCache = Zend_Registry::get('cache');
+        $result = $memCache->load('editor_Services_Microsoft_HttpApi_getLanguages');
+        if($result !== false){
+            // INFO: currently only one scope is need, so we do not make it more complex
+            return $result[$scope] ?? null;
         }
+
+        $this->getHttp('GET', '/languages');
+        // currently we will cache only the required scopes to save memory
+        $this->http->setParameterGet('scope', implode(',',[
+            editor_Services_Microsoft_LanguageScope::TRANSLATION, editor_Services_Microsoft_LanguageScope::DICTIONARY
+        ]));
+
+        // to return results as array
+        $this->setAssociativeResult(true);
+
+        if ($this->processResponse($this->http->request())) {
+            $result = $this->sanitizeLanguages($this->result);
+            if($memCache->save($result, 'editor_Services_Microsoft_HttpApi_getLanguages')){
+                return $this->getLanguages($scope);
+            }
+
+        }
+
         return null;
+    }
+
+    /**
+     * Filter out not needed data from the langauges result data.
+     * @param mixed $result
+     * @return array
+     */
+    private function sanitizeLanguages(mixed $result): array
+    {
+        if(!empty($result[editor_Services_Microsoft_LanguageScope::TRANSLATION])){
+            $result[editor_Services_Microsoft_LanguageScope::TRANSLATION] = array_keys(
+                $result[editor_Services_Microsoft_LanguageScope::TRANSLATION]
+            );
+        }
+
+        if(!empty($result[editor_Services_Microsoft_LanguageScope::DICTIONARY])){
+
+            foreach ($result[editor_Services_Microsoft_LanguageScope::DICTIONARY] as $key => $item) {
+                $key = strtolower($key);
+                $translations = [];
+                if(isset($item['translations']) && is_array($item['translations'])){
+                    foreach ($item['translations'] as $translation) {
+                        $translations[] = strtolower($translation['code']);
+                    }
+                }
+                $result[editor_Services_Microsoft_LanguageScope::DICTIONARY][$key] = $translations;
+            }
+
+        }
+
+        return $result;
     }
 }

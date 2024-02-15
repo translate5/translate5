@@ -72,6 +72,22 @@ abstract class editor_TagSequence implements JsonSerializable {
     const VALIDATION_MODE = false;
 
     /**
+     * Mode for the replaced rendering: Strips all Markup & internal tags
+     */
+    const MODE_STRIPPED = 'stripped';
+
+    /**
+     * Mode for the replaced rendering: Strip all Markup, use "labeled" contents (e.g. "↵" nfor newline tags)
+     */
+    const MODE_LABELED = 'labeled';
+
+    /**
+     * Mode for the replaced rendering: Strip all Markup, render whitespace-tags & special chars in their original form
+     */
+    const MODE_ORIGINAL = 'original';
+
+
+    /**
      * Defines the error-domain to log
      * @var string
      */
@@ -320,15 +336,46 @@ abstract class editor_TagSequence implements JsonSerializable {
     /* Rendering API */
 
     /**
-     *
+     * Renders the tag-sequence
      * @param string[] $skippedTypes: if set, internal tags of this type will not be rendered
      * @return string
      */
-    public function render(array $skippedTypes=NULL) : string {
+    public function render(array $skippedTypes = null): string
+    {
         // nothing to do without tags
         if(count($this->tags) == 0){
             return $this->text;
         }
+        // create holder and render it's children
+        $holder = $this->createRenderingHolder();
+        return $holder->renderChildren($skippedTypes);
+    }
+
+    /**
+     * Renders the tag-sequence in replaced mode, what means with markup stripped
+     * and some special adjustments depending on the mode
+     * @param string $mode
+     * @return string
+     * @throws ZfExtended_Exception
+     */
+    public function renderReplaced(string $mode = self::MODE_STRIPPED): string
+    {
+        // nothing to do without tags
+        if(count($this->tags) == 0){
+            return $this->text;
+        }
+        // create holder and render it's children
+        $holder = $this->createRenderingHolder();
+        return $holder->renderReplaced($mode);
+    }
+
+    /**
+     *
+     * @param string[] $skippedTypes: if set, internal tags of this type will not be rendered
+     * @return string
+     */
+    private function createRenderingHolder(): editor_Segment_AnyTag
+    {
         $this->sort();
         // first, clone our tags to have a disposable rendering model. This may split some tags that are allowed to overlap into "subtags" (like mqm)
         $clones = [];
@@ -396,7 +443,7 @@ abstract class editor_TagSequence implements JsonSerializable {
                 $nearest = $container->getNearestContainer($tag); // this is the "normal" way of nesting the sorted cloned tags
             }
             // Will log rendering problems
-            if(static::VALIDATION_MODE && $nearest == null){
+            if(static::VALIDATION_MODE && $nearest === null){
                 error_log("\n============== HOLDER =============\n");
                 error_log($holder->toJson());
                 error_log("\n============== CONTAINER =============\n");
@@ -406,13 +453,13 @@ abstract class editor_TagSequence implements JsonSerializable {
                 error_log("\n========================================\n");
             }
             // TS-1337: This error happend "in the wild". It can only happen with malformed Markup. We need more data for a proper investigation
-            if($nearest == null){
+            if($nearest === null){
                 $errorData = [];
                 $errorData['holder'] = $holder->toJson();
                 $errorData['container'] = $container->toJson();
                 $errorData['tag'] = $tag->toJson();
                 $errorData = $this->logError('E1343', 'Rendering TagSequence tags led to a invalid tag structure that could not be processed', $errorData);
-                throw new ZfExtended_Exception('editor_TagSequence::render: Rendering failed presumably due to invalid tag structure.'."\n".json_encode($errorData, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
+                throw new ZfExtended_ErrorCodeException('E1343', $errorData);
             }
             $nearest->addChild($tag);
             $container = $tag;
@@ -421,9 +468,10 @@ abstract class editor_TagSequence implements JsonSerializable {
         // distributes the text-portions to the now re-nested structure
         $holder->addSegmentText($this);
         $processed = $clones = null;
-        // finally, render the holder's children
-        return $holder->renderChildren($skippedTypes);
+        // this holder is the base for all renering APIs
+        return $holder;
     }
+
     /**
      * Helper for the rendering-phase: Finds a tag by it's (valid) order-index
      * Please note that this may fails when multiple tags with the same order have been added
@@ -747,7 +795,7 @@ abstract class editor_TagSequence implements JsonSerializable {
     protected function logError(string $code, string $msg, array $errorData=[]) : array {
         $this->addErrorDetails($errorData);
         if($this->captureErrors){
-            // when capturing the errors7exceptions the cade initiating the capture is responsible for processing them !
+            // when capturing the errors/exceptions the cade initiating the capture is responsible for processing them !
             $error = new ZfExtended_ErrorCodeException($code, $errorData);
             $error->setMessage($msg);
             $error->setDomain(static::$logger_domain);
@@ -757,6 +805,7 @@ abstract class editor_TagSequence implements JsonSerializable {
         }
         return $errorData;
     }
+
     /**
      * To be extended in inheriting classes
      * @param array $errorData

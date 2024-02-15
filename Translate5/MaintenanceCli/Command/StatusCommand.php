@@ -66,6 +66,12 @@ class StatusCommand extends Translate5AbstractCommand
         // the full command description shown when running the command with
         // the "--help" option
         ->setHelp('Tool to print a brief system status.');
+
+        $this->addOption(
+            name: 'with-logo',
+            mode: InputOption::VALUE_NONE,
+            description: 'Shows the translate5 logo before the status information.'
+        );
     }
 
     /**
@@ -84,6 +90,9 @@ class StatusCommand extends Translate5AbstractCommand
 
         $this->initInputOutput($input, $output);
         $this->initTranslate5();
+        if ($input->getOption('with-logo')) {
+            $this->io->writeln($this->getLogo());
+        }
         $this->writeTitle('Translate5 status overview');
 
         $this->writeSystemCheck();

@@ -98,6 +98,8 @@ Ext.define('Editor.view.admin.customer.Panel', {
                         xtype: 'gridpanel',
                         cls: 'customerPanelGrid',
                         itemId: 'customerPanelGrid',
+                        stateful: true,
+                        stateId: 'editor.customerPanelGrid',
                         flex: 0.3,
                         region: 'center',
                         split: true,
@@ -138,8 +140,8 @@ Ext.define('Editor.view.admin.customer.Panel', {
                             },{
                                 xtype: 'actioncolumn',
                                 text:  me.strings.actionColumn,
+                                minWidth: 90,
                                 sortable: false,
-                                fixed: true,
                                 items:[{
                                     glyph: 'f044@FontAwesome5FreeSolid',
                                     tooltip: me.strings.customerEditActionIcon,
