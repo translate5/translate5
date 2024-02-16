@@ -98,13 +98,14 @@ Ext.define('Editor.view.admin.contentProtection.contentRecognition.GridControlle
         }
 
         if (col.dataIndex === 'rowEnabled') {
+            let confirmed = false;
             Ext.MessageBox.confirm(
                 Editor.data.l10n.contentProtection.contentRecognition.confirm_enable_title,
                 Editor.data.l10n.contentProtection.contentRecognition.confirm_enable_message,
-                callback
-            );
+                (btn) => (confirmed = 'yes' === btn) && callback()
+            )
 
-            return true;
+            return confirmed;
         }
 
         callback();

@@ -9559,11 +9559,11 @@ E-Mail: service@MittagQI.com</pre>
             </trans-unit>
             <trans-unit id="U2luZCBTaWUgc2ljaGVyLCBkYXNzIFNpZSBkaWUgTnVtbWVybmVya2VubnVuZyBsw7ZzY2hlbiBtw7ZjaHRlbj8=">
                 <source>Sind Sie sicher, dass Sie die Nummernerkennung löschen möchten?</source>
-                <target>Are you sure you want to delete rule?</target>
+                <target>Are you sure you want to delete rule? It may lead to the loss of 100% matches in new tasks unless you convert all affected language resources.</target>
             </trans-unit>
             <trans-unit id="U2luZCBTaWUgc2ljaGVyLCBkYXNzIFNpZSBkaWUgWnVvcmRudW5nIGzDtnNjaGVuIG3DtmNodGVuPw==">
                 <source>Sind Sie sicher, dass Sie die Zuordnung löschen möchten?</source>
-                <target>Are you sure you want to delete mapping?</target>
+                <target>Are you sure you want to delete mapping? It may lead to the loss of 100% matches in new tasks unless you convert all affected language resources.</target>
             </trans-unit>
             <trans-unit id="TnVtbWVybmVya2VubnVuZw==">
                 <source>Nummernerkennung</source>
@@ -9708,15 +9708,13 @@ E-Mail: service@MittagQI.com</pre>
                 <source>Die OpenID-Connect-Implementierung von translate5 ermöglicht es, einen Client auf der IDP-Seite einem Client in translate5 zuzuordnen. Die Zuordnung erfolgt über die Kundennummer. Weitere Informationen finden Sie in der <a href="https://confluence.translate5.net/x/BgDgAw" target="_blank">Dokumentation</a> von translate5.</source>
                 <target>The OpenID Connect implementation of translate5 makes it possible to assign a client on the IDP side to a client in translate5. The assignment is made via the client number. Further information can be found in the translate5 <a href="https://confluence.translate5.net/x/BgDgAw" target="_blank">documentation.</a></target>
             </trans-unit>
-<<<<<<< HEAD
             <trans-unit id="RGllIFJlZ2VsbiBmw7xyIGRpZSBFcmtlbm51bmcgdm9uIEluaGFsdGVuIGhhYmVuIHNpY2ggZsO8ciBkaWVzZSBTcHJhY2hyZXNzb3VyY2UgZ2XDpG5kZXJ0LCBzaWUgc29sbHRlIGtvbnZlcnRpZXJ0IHdlcmRlbi4=">
                 <source>Die Regeln für die Erkennung von Inhalten haben sich für diese Sprachressource geändert, sie sollte konvertiert werden.</source>
                 <target>Content protection rules for this resource have changed, it needs conversion.</target>
-=======
+            </trans-unit>
             <trans-unit id="RGllIFJlZ2VsbiBmw7xyIGRpZSBFcmtlbm51bmcgdm9uIEluaGFsdGVuIGhhYmVuIHNpY2ggZsO8ciBkaWVzZSBTcHJhY2hyZXNzb3VyY2UgZ2XDpG5kZXJ0LCBzaWUgc29sbHRlIGtvbnZlcnRpZXJ0IHdlcmRlbi4gR2VoZW4gU2llIGRhenUgYXVmIGRpZSBLb25maWd1cmF0aW9uc3NlaXRlIGRlciBFcmtlbm51bmdzcmVnZWxuIG9kZXIgRnJhZ2VuIFNpZSBJaHJlbiBQcm9qZWt0bWFuYWdlciAoYWxsZSBLdW5kZW4pLg==">
                 <source>Die Regeln für die Erkennung von Inhalten haben sich für diese Sprachressource geändert, sie sollte konvertiert werden. Gehen Sie dazu auf die Konfigurationsseite der Erkennungsregeln oder Fragen Sie Ihren Projektmanager (alle Kunden).</source>
                 <target>Content protection rules for this resource have changed, it needs conversion. Please go to the content protection configuration page or ask your project manager (all clients).</target>
->>>>>>> feature/TRANSLATE-3206-Protect-numbers-during-import-for-translation-RELEASE
             </trans-unit>
             <trans-unit id='S29udmVydGllcnVuZyBnZXN0YXJ0ZWQ='>
                 <source>Konvertierung gestarted</source>
@@ -9742,9 +9740,17 @@ E-Mail: service@MittagQI.com</pre>
                 <source>Bestätigen Sie die Regelaktivierung</source>
                 <target>Confirm rule enabling</target>
             </trans-unit>
+            <trans-unit id='RGllIEFrdGl2aWVydW5nL0RlYWt0aXZpZXJ1bmcgdm9uIFJlZ2VsbiBrYW5uIGluIG5ldWVuIFByb2pla3RlbiB6dW0gVmVybHVzdCB2b24gMTAwJS1NYXRjaGVzIGbDvGhyZW4sIHdlbm4gU2llIGRpZSBiZXRyb2ZmZW5lbiBTcHJhY2hyZXNzb3VyY2VuIG5pY2h0IGtvbnZlcnRpZXJlbi4='>
+                <source>Die Aktivierung/Deaktivierung von Regeln kann in neuen Projekten zum Verlust von 100%-Matches führen, wenn Sie die betroffenen Sprachressourcen nicht konvertieren.</source>
+                <target>Activation/Deactivation of rules may lead to the loss of 100% matches in new tasks unless you convert all affected language resources.</target>
+            </trans-unit>
             <trans-unit id='RGFzIEFrdGl2aWVyZW4gdm9uIElucHV0LVJlZ2VsbiBrYW5uIGluIG5ldWVuIFByb2pla3RlbiB6dW0gVmVybHVzdCB2b24gMTAwJS1NYXRjaGVzIGbDvGhyZW4sIHdlbm4gU2llIGRpZSBiZXRyb2ZmZW5lbiBTcHJhY2hyZXNzb3VyY2VuIG5pY2h0IGtvbnZlcnRpZXJlbi4='>
                 <source>Das Aktivieren von Input-Regeln kann in neuen Projekten zum Verlust von 100%-Matches führen, wenn Sie die betroffenen Sprachressourcen nicht konvertieren.</source>
                 <target>Activation of input mapping rules may lead to the loss of 100% matches in new tasks unless you convert all affected language resources.</target>
+            </trans-unit>
+            <trans-unit id='RGFzIEFrdGl2aWVyZW4gdm9uIE91dHB1dC1SZWdlbG4ga2FubiBpbiBuZXVlbiBQcm9qZWt0ZW4genVtIFZlcmx1c3Qgdm9uIDEwMCUtTWF0Y2hlcyBmw7xocmVuLCB3ZW5uIFNpZSBkaWUgYmV0cm9mZmVuZW4gU3ByYWNocmVzc291cmNlbiBuaWNodCBrb252ZXJ0aWVyZW4u'>
+                <source>Das Aktivieren von Output-Regeln kann in neuen Projekten zum Verlust von 100%-Matches führen, wenn Sie die betroffenen Sprachressourcen nicht konvertieren.</source>
+                <target>Activation of Output mapping rules may lead to the loss of 100% matches in new tasks unless you convert all affected language resources.</target>
             </trans-unit>
             <trans-unit id='S29udmVydGllcnVuZyBsw6R1ZnQ='>
                 <source>Konvertierung läuft</source>
@@ -9857,6 +9863,10 @@ E-Mail: service@MittagQI.com</pre>
             <trans-unit id='Qml0dGUgZGVua2VuIFNpZSBkYXJhbiwgZGFzcyBhbGxlIFZlcndlbmR1bmdlbiBkaWVzZXIgT3B0aW9uIChmYWxscyB2b3JoYW5kZW4pIGVudGZlcm50IHdlcmRlbiwgd2VubiBzaWUgaW4gZWluZW0gZGVyIGJlc3RlaGVuZGVuIFByb2pla3RlL0F1ZmdhYmVuIGVyZsO8bGx0IHdlcmRlbi4gRm9ydGZhaHJlbj8='>
                 <source>Bitte denken Sie daran, dass alle Verwendungen dieser Option (falls vorhanden) entfernt werden, wenn sie in einem der bestehenden Projekte/Aufgaben erfüllt werden. Fortfahren?</source>
                 <target>Please keep in mind that all the usages (if any) of this option will be removed if met in any of existing projects/tasks. Proceed?</target>
+            </trans-unit>
+            <trans-unit id='QmVzdMOkdGlndW5nIGVyZm9yZGVybGljaA=='>
+                <source>Bestätigung erforderlich</source>
+                <target>Confirmation required</target>
             </trans-unit>
         </body>
     </file>

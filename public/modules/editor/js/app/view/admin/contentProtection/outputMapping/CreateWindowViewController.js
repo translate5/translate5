@@ -63,18 +63,28 @@ Ext.define('Editor.view.admin.contentProtection.outputMapping.CreateWindowViewCo
         record.set('inputContentRecognitionId', form.getValues().inputContentRecognitionId);
         record.set('outputContentRecognitionId', form.getValues().outputContentRecognitionId);
 
-        record.save({
-            preventDefaultHandler: true,
-            success: function() {
-                Editor.MessageBox.addSuccess('Success');
-                store.load();
-                win.setLoading(false);
-                win.close();
-            },
-            failure: function(rec, op) {
-                win.setLoading(false);
-                Editor.app.getController('ServerException').handleFormFailure(form, rec, op);
+        const callback = (btn) => {
+            if ('yes' === btn) {
+                record.save({
+                    preventDefaultHandler: true,
+                    success: function () {
+                        Editor.MessageBox.addSuccess('Success');
+                        store.load();
+                        win.setLoading(false);
+                        win.close();
+                    },
+                    failure: function (rec, op) {
+                        win.setLoading(false);
+                        Editor.app.getController('ServerException').handleFormFailure(form, rec, op);
+                    }
+                });
             }
-        });
+        };
+
+        Ext.MessageBox.confirm(
+            Editor.data.l10n.contentProtection.mapping.output.confirm_add_title,
+            Editor.data.l10n.contentProtection.mapping.output.confirm_add_message,
+            callback
+        );
     }
 });
