@@ -37,6 +37,8 @@ class MaintenanceSetCommand extends MaintenanceCommand {
     
     protected function configure()
     {
+        $this->setAliases(['mnt:set']);
+
         $this
         // the short description shown while running "php bin/console list"
         ->setDescription('Sets the maintenance mode.')
