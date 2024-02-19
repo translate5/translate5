@@ -133,6 +133,7 @@ class editor_Services_Connector_TagHandler_Xliff extends editor_Services_Connect
         bool $isSource = true,
         bool $unprotectContent = false
     ): ?string {
+        $this->handleIsInSourceScope = $isSource;
         $this->hasRestoreErrors = false;
         //strip other then x|ex|bx|g|/g
         $resultString = strip_tags($this->replaceTagsWithContent($resultString), static::ALLOWED_TAGS);

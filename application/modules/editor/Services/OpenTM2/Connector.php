@@ -1361,7 +1361,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
         $results = array_merge(...$results);
 
         foreach ($results as $found) {
-            $target = $this->tagHandler->restoreInResult($found->target);
+            $target = $this->tagHandler->restoreInResult($found->target, false);
             $hasTargetErrors = $this->tagHandler->hasRestoreErrors();
 
             $source = $this->tagHandler->restoreInResult($found->source);

@@ -91,7 +91,7 @@ class editor_Services_Connector_TagHandler_T5MemoryXliff extends editor_Services
             $resultString = $this->contentProtector->unprotect($resultString, $isSource, WhitespaceProtector::alias());
         }
 
-        return parent::restoreInResult($resultString);
+        return parent::restoreInResult($resultString, $isSource);
     }
 
     protected function convertQuery(string $queryString, bool $isSource): string
