@@ -2374,10 +2374,18 @@ Editor.data.l10n = {
             matchId: '<?= $this->translate->_('Geschützte Regex-Gruppe') ?>',
             matchIdQTip: '<?= $this->translate->_('Protected regex group qtip') ?>',
             formatExampleRender: '<?= $this->translate->_('Format-Rendering-Beispiel') ?>',
-            confirm_enable_title: '<?= $this->translate->_('Bestätigen Sie die Regelaktivierung') ?>',
-            confirm_enable_message: '<?= $this->translate->_('Das Aktivieren von Input-Regeln kann in neuen Projekten zum Verlust von 100%-Matches führen, wenn Sie die betroffenen Sprachressourcen nicht konvertieren.') ?>'
+            confirm_enable_title: '<?= $this->translate->_('Bestätigung erforderlich') ?>',
+            confirm_enable_message: '<?= $this->translate->_('Die Aktivierung/Deaktivierung von Regeln kann in neuen Projekten zum Verlust von 100%-Matches führen, wenn Sie die betroffenen Sprachressourcen nicht konvertieren.') ?>'
         },
         mapping: {
+            input: {
+                confirm_add_title: '<?= $this->translate->_('Bestätigen Sie die Regelaktivierung') ?>',
+                confirm_add_message: '<?= $this->translate->_('Das Aktivieren von Intput-Regeln kann in neuen Projekten zum Verlust von 100%-Matches führen, wenn Sie die betroffenen Sprachressourcen nicht konvertieren.') ?>'
+            },
+            output: {
+                confirm_add_title: '<?= $this->translate->_('Bestätigen Sie die Regelaktivierung') ?>',
+                confirm_add_message: '<?= $this->translate->_('Das Aktivieren von Output-Regeln kann in neuen Projekten zum Verlust von 100%-Matches führen, wenn Sie die betroffenen Sprachressourcen nicht konvertieren.') ?>'
+            },
             rule_name: '<?= $this->translate->_('Regelname') ?>',
             rule_description: '<?= $this->translate->_('Regelbeschreibung') ?>',
             input_rule_name: '<?= $this->translate->_('Name der Eingaberegel') ?>',

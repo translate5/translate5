@@ -392,7 +392,7 @@ class editor_Models_Import_FileParser_Xlf_ContentConverter {
         // although the whitespace of the content may not be preserved here, if there remain multiple spaces or other space characters,
         // we have to protect them here
         
-        if($this->protectTags) {
+        if ($this->protectTags) {
             //since we are in a XML file format, plain tags in the content are encoded, which we have to undo first
             //$text is here for example: Dies &lt;strong&gt;ist ein&lt;/strong&gt; Test. &amp;nbsp;
             $text = html_entity_decode($text);
@@ -407,8 +407,7 @@ class editor_Models_Import_FileParser_Xlf_ContentConverter {
                 $this->task->getTargetLang(),
                 ContentProtector::ENTITY_MODE_OFF
             );
-        }
-        else {
+        } else {
             $text = $this->contentProtector->protect(
                 $text,
                 $this->handleIsInSourceScope,
