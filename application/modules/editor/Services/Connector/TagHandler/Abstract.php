@@ -95,7 +95,6 @@ abstract class editor_Services_Connector_TagHandler_Abstract
     protected int $sourceLang = 0;
     protected int $targetLang = 0;
 
-    protected bool $protectNonWhitespaceContentOnXmlParsing = true;
     protected bool $handleIsInSourceScope = true;
     
     public function __construct() {
@@ -118,7 +117,7 @@ abstract class editor_Services_Connector_TagHandler_Abstract
                     $this->sourceLang,
                     $this->targetLang,
                     ContentProtector::ENTITY_MODE_KEEP,
-                    $this->protectNonWhitespaceContentOnXmlParsing ? '' : NumberProtector::alias()
+                    NumberProtector::alias()
                 ),
                 $this->shortTagIdent,
                 $this->shortcutNumberMap

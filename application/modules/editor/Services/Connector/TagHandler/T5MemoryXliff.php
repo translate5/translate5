@@ -87,7 +87,6 @@ class editor_Services_Connector_TagHandler_T5MemoryXliff extends editor_Services
         }
 
         if ($unprotectContent) {
-            $this->protectNonWhitespaceContentOnXmlParsing = false;
             $resultString = $this->contentProtector->unprotect($resultString, $isSource, WhitespaceProtector::alias());
         }
 
