@@ -38,7 +38,7 @@ class MaintenanceDisableCommand extends MaintenanceCommand {
 
     protected function configure()
     {
-        $this->setAliases(['maintenance:end']);
+        $this->setAliases(['maintenance:end', 'mnt:end', 'mnt:disable']);
 
         $this
         // the short description shown while running "php bin/console list"

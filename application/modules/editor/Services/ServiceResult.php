@@ -105,7 +105,13 @@ class editor_Services_ServiceResult {
      * 
      * @return stdClass the last added result
      */
-    public function addResult($target, $matchrate = 0, array $metaData = null, ?string $rawTarget = null) {
+    public function addResult(
+        $target,
+        $matchrate = 0,
+        array $metaData = null,
+        ?string $rawTarget = null,
+        int $timestamp = 0
+    ) {
         $result = new stdClass();
         
         $result->target = $target;
@@ -118,7 +124,8 @@ class editor_Services_ServiceResult {
         $result->state = self::STATUS_LOADED;
         
         $result->metaData = $metaData;
-        
+        $result->timestamp = $timestamp > 0 ? $timestamp : null;
+
         $this->results[] = $result;
         $this->lastAdded = $result;
 

@@ -61,8 +61,10 @@ Ext.define('Editor.controller.Editor', {
         noVisibleContentColumn:'#UT#Ausgeblendete bearbeitbare Spalten wurden sichtbar geschaltet, da die Aufgabe zum Editieren geöffnet wurde, aber keine editierbare Spalte sichtbar war.',
         gridEndReached: '#UT#Kein weiteres Segment bearbeitbar!',
         gridStartReached: '#UT#Kein vorheriges Segment bearbeitbar!',
-        gridEndReachedFiltered: '#UT#Kein weiteres Segment im Workflow bearbeitbar!',
-        gridStartReachedFiltered: '#UT#Kein vorheriges Segment im Workflow bearbeitbar!'
+        gridEndReachedWorkflow: '#UT#Kein weiteres Segment im Workflow bearbeitbar!',
+        gridEndReachedFiltered: '#UT#Keine weiteren Segmente in der aktuellen Filterung',
+        gridStartReachedWorkflow: '#UT#Kein vorheriges Segment im Workflow bearbeitbar!',
+        gridStartReachedFiltered: '#UT#Keine vorherigen Segmente in der aktuellen Filterung'
     },
     DEC_DIGITS: [48, 49, 50, 51, 52, 53, 54, 55, 56, 57],
     refs : [{
@@ -902,16 +904,29 @@ Ext.define('Editor.controller.Editor', {
      * triggers the calculation of the prev segment with the appropriate configs/msg
      */
     calcPrev: function(inWorkflow){
-        var type = (inWorkflow) ? 'workflow' : 'editable',
-            msg = (inWorkflow) ? this.messages.gridStartReachedFiltered : this.messages.gridStartReached;
+        var type = inWorkflow ? 'workflow' : 'editable',
+            store = this.getSegmentGrid().getStore(),
+            filtersAreUsed = store.getFilters().getCount() || store.getProxy().getExtraParams().qualities,
+            msg = filtersAreUsed
+                ? this.messages.gridStartReachedFiltered
+                : (inWorkflow
+                    ? this.messages.gridStartReachedWorkflow
+                    : this.messages.gridStartReached);
         this.prevNextSegment.calcPrev(type, msg);
     },
     /**
      * triggers the calculation of the next segment with the appropriate configs/msg
      */
     calcNext: function(inWorkflow){
-        var type = (inWorkflow) ? 'workflow' : 'editable',
-            msg = (inWorkflow) ? this.messages.gridEndReachedFiltered : this.messages.gridEndReached;
+        var type = inWorkflow ? 'workflow' : 'editable',
+            store = this.getSegmentGrid().getStore(),
+            filtersAreUsed = store.getFilters().getCount() || store.getProxy().getExtraParams().qualities,
+            msg = filtersAreUsed
+                ? this.messages.gridEndReachedFiltered
+                : (inWorkflow
+                    ? this.messages.gridEndReachedWorkflow
+                    : this.messages.gridEndReached);
+
         this.prevNextSegment.calcNext(type, msg);
     },
     /**

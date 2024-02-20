@@ -617,7 +617,7 @@ class editor_TaskController extends ZfExtended_RestController
         $this->initWorkflow();
 
         try {
-            $tasks = $this->importService->importViaAPI(
+            $tasks = $this->importService->importFromPost(
                 $this->entity,
                 $this->getRequest(),
                 $this->data,

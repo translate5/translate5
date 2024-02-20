@@ -63,12 +63,18 @@ class ImportEventTrigger
     /* Our triggered Events, in the order they'll be triggered */
     const IMPORT_WORKER_QUEUED = 'importWorkerQueued';
     const BEFORE_IMPORT = 'beforeImport';
-    const BEFORE_PROCESS_UPLOADED_FILE = 'beforeProcessUploadedFile';
     const AFTER_UPLOAD_PREPARATION = 'afterUploadPreparation';
     const AFTER_PROJECT_UPLOAD_PREPARATION = 'afterProjectUploadPreparation';
     const IMPORT_WORKER_STARTED = 'importWorkerStarted';
     public const AFTER_IMPORT = 'afterImport';
     public const AFTER_IMPORT_ERROR = 'afterImportError';
+    public const INIT_TASK_META = 'initTaskMeta';
+
+    /**
+     * Cache for preventig tasks-meta events to be called twice for a task per request
+     * @var array
+     */
+    private static array $metaTasks = [];
 
 
     private ZfExtended_EventManager $events;
@@ -142,13 +148,23 @@ class ImportEventTrigger
         ]);
     }
 
-    public function triggerBeforeProcessUploadedFile(editor_Models_Task $task, array $data): void
+    /**
+     * Triggers the evaluation of task-meta params,
+     * which are used throughout the whole import-process and should be evaluated as early as possible
+     * @param editor_Models_Task $task
+     * @param array $data
+     * @return void
+     */
+    public function triggerTaskMetaEvent(editor_Models_Task $task, array $data): void
     {
-        $this->triggerEvent(self::BEFORE_PROCESS_UPLOADED_FILE, [
-            'task' => $task,
-            'meta' => $task->meta(),
-            'data' => $data,
-        ]);
+        if(!in_array($task->getTaskGuid(), static::$metaTasks)){
+            static::$metaTasks[] = $task->getTaskGuid();
+            $this->triggerEvent(self::INIT_TASK_META, [
+                'task' => $task,
+                'meta' => $task->meta(),
+                'data' => $data,
+            ]);
+        }
     }
 
     public function triggerBeforeImport(

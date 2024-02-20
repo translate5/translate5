@@ -540,8 +540,12 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
         if ($this->getTbxUpdatedBy()) $personIds[$this->getTbxUpdatedBy()] = true;
         $personIds = array_keys($personIds);
 
+        $termData = $this->toArray();
+
         // Call parent
         parent::delete();
+
+        $this->logDeletedTerm($termData);
 
         // Drop terms_transacgrp_person-records if not used anymore
         ZfExtended_Factory
@@ -2593,5 +2597,32 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
 
         // Return as ordinary array rather than associative
         return array_values($allowed);
+    }
+
+    /**
+     * Log deleted terms in the language resources log
+     * @param array $termData
+     * @return void
+     * @throws ReflectionException
+     * @throws Zend_Exception
+     * @throws ZfExtended_Models_Entity_NotFoundException
+     *
+     */
+    private function logDeletedTerm(array $termData = [])
+    {
+        if(empty($termData) || empty($termData['collectionId'])) {
+            return;
+        }
+
+        $collection = ZfExtended_Factory::get(editor_Models_TermCollection_TermCollection::class);
+        $collection->load($termData['collectionId']);
+
+        $logger = Zend_Registry::get('logger')->cloneMe('editor.languageresource');
+
+        $logger->info('E1592', 'Deleted term: {name}',[
+            'name' => $termData['term'] ?? '',
+            'data' => $termData,
+            'languageResource' => $collection
+        ]);
     }
 }

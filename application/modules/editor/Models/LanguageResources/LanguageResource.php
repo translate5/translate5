@@ -260,8 +260,35 @@ class editor_Models_LanguageResources_LanguageResource extends ZfExtended_Models
         $s = $this->db
             ->select()
             ->from(['lr' => 'LEK_languageresources'], ['lr.*'])
+            ->setIntegrityCheck(false)
+            ->joinLeft(
+                ['l' => 'LEK_languageresources_languages'],
+                'lr.id = l.languageResourceId',
+                ['sourceLangCode', 'targetLangCode']
+            )
             ->where('lr.resourceId = ?', $resourceId)
             ->where('lr.name LIKE ?', '%' . $namePart . '%');
+
+        return $this->db->fetchAll($s)->toArray();
+    }
+
+    public function getByResourceIdFilteredByLanguageCodes(
+        string $resourceId,
+        string $sourceLanguageCode,
+        string $targetLanguageCode
+    ): array {
+        $s = $this->db
+            ->select()
+            ->from(['lr' => 'LEK_languageresources'], ['lr.*'])
+            ->setIntegrityCheck(false)
+            ->joinLeft(
+                ['l' => 'LEK_languageresources_languages'],
+                'lr.id = l.languageResourceId',
+                ['sourceLangCode', 'targetLangCode']
+            )
+            ->where('lr.resourceId = ?', $resourceId)
+            ->where('l.sourceLangCode = ?', $sourceLanguageCode)
+            ->where('l.targetLangCode = ?', $targetLanguageCode);
 
         return $this->db->fetchAll($s)->toArray();
     }
