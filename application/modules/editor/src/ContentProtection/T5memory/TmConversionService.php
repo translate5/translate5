@@ -187,7 +187,7 @@ class TmConversionService
         }
     }
 
-    public function convertT5MemoryTagToNumber(string $string): string
+    public function convertT5MemoryTagToContent(string $string): string
     {
         return preg_replace(self::fullTagRegex(), '\3', $string);
     }
@@ -295,7 +295,7 @@ class TmConversionService
 
     private function convertTransUnit(string $transUnit, int $sourceLang, int $targetLang): string
     {
-        $transUnit = $this->convertT5MemoryTagToNumber($transUnit);
+        $transUnit = $this->convertT5MemoryTagToContent($transUnit);
         preg_match_all(
             '/<tuv xml:lang="((\w|-)+)">((\n|\r|\r\n)?.+(\n|\r|\r\n)*)+<\/tuv>/Uum',
             $transUnit,

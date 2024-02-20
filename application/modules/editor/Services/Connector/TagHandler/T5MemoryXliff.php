@@ -56,11 +56,8 @@ class editor_Services_Connector_TagHandler_T5MemoryXliff extends editor_Services
         });
     }
 
-    public function restoreInResult(
-        string $resultString,
-        bool $isSource = true,
-        bool $unprotectContent = false
-    ): ?string {
+    public function restoreInResult(string $resultString, bool $isSource = true): ?string
+    {
         $t5nTagRegex = TmConversionService::fullTagRegex();
 
         if (preg_match_all($t5nTagRegex, $resultString, $matches, PREG_SET_ORDER)) {
@@ -84,10 +81,6 @@ class editor_Services_Connector_TagHandler_T5MemoryXliff extends editor_Services
                     $resultString = str_replace($tag, $number, $resultString);
                 }
             }
-        }
-
-        if ($unprotectContent) {
-            $resultString = $this->contentProtector->unprotect($resultString, $isSource, WhitespaceProtector::alias());
         }
 
         return parent::restoreInResult($resultString, $isSource);

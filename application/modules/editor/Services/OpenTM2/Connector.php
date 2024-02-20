@@ -444,16 +444,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
 
         $isSource = $field === 'source';
 
-        $searchString = $this->tagHandler->prepareQuery(
-            $this->contentProtector->protect(
-                $searchString,
-                $isSource,
-                (int) $this->languageResource->getSourceLang(),
-                (int) $this->languageResource->getSourceLang(),
-                ContentProtector::ENTITY_MODE_RESTORE,
-                WhitespaceProtector::alias()
-            )
-        );
+        $searchString = $this->tagHandler->prepareQuery($searchString, $isSource);
 
         $resultList = new editor_Services_ServiceResult();
         $resultList->setLanguageResource($this->languageResource);
@@ -520,16 +511,16 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
 
         //$found->{$field}
         //[NextSearchPosition] =>
+        $searchString = $this->conversionService->convertT5MemoryTagToContent($searchString);
         foreach ($results as $result) {
-            $searchString = $this->conversionService->convertT5MemoryTagToNumber($searchString);
             $resultList->addResult($this->highlight(
                 $searchString,
-                $this->tagHandler->restoreInResult($result->target, $isSource, true),
+                $this->tagHandler->restoreInResult($result->target, $isSource),
                 $field === 'target'
             ));
             $resultList->setSource($this->highlight(
                 $searchString,
-                $this->tagHandler->restoreInResult($result->source, $isSource, true),
+                $this->tagHandler->restoreInResult($result->source, $isSource),
                 $isSource)
             );
         }
@@ -1611,7 +1602,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
 
                 if ($reader->nodeType == XMLReader::ELEMENT && $reader->name == 'tu') {
                     $writtenElements++;
-                    $writer->writeRaw($this->conversionService->convertT5MemoryTagToNumber($reader->readOuterXML()));
+                    $writer->writeRaw($this->conversionService->convertT5MemoryTagToContent($reader->readOuterXML()));
                     $writtenElements++;
                 }
 
