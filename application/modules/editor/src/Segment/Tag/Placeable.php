@@ -32,6 +32,7 @@ use DOMDocument;
 use DOMNode;
 use DOMXPath;
 use editor_Models_Import_FileParser_Tag as FileParserTag;
+use MittagQI\Translate5\Tools\Markup;
 use Throwable;
 
 /**
@@ -101,10 +102,34 @@ final class Placeable
      */
     private static function xpathSearch(string $content, array $xpathes): ?string
     {
+        // normal: we search the Placeable in an attribute or in the the content of the xliff
+        $match = self::xpathSearchInMarkup($content, $xpathes);
+        if($match === null
+            && (str_starts_with($content, '<ph') || str_starts_with($content, '<it'))
+            && str_ends_with($content, '>')
+        ){
+            // Special Feature: If the content of a ph/it tag is (escaped) Markup, we search in this markup as well
+            // the root for the xpath is the content of the ph/it then
+            $content = Markup::unescapeText(strip_tags($content));
+            if(Markup::isMarkup($content)){
+                $match = self::xpathSearchInMarkup($content, $xpathes);
+            }
+        }
+        return $match;
+    }
+
+    /**
+     * Searches for the passed xpathes in the passed markup and returns the first match
+     * @param string $markup
+     * @param array $xpathes
+     * @return string|null
+     */
+    private static function xpathSearchInMarkup(string $markup, array $xpathes): ?string
+    {
         try {
-            // generate DOM documentt with proper XML doctype avoiding UTF-8 quirks
+            // generate DOM document with proper XML doctype avoiding UTF-8 quirks
             $doc = new DOMDocument();
-            $doc->loadXML(self::DOCTYPE . self::convertContent($content));
+            $doc->loadXML(self::DOCTYPE . self::convertContent($markup));
             // create a XPath to query with
             $domXpath = new DOMXpath($doc);
 
@@ -123,11 +148,11 @@ final class Placeable
                         $nodes = $nodes[0]->childNodes;
                     }
 
-                    $content = '';
+                    $markup = '';
                     foreach($nodes as $node){
-                        $content .= self::renderDomNode($node);
+                        $markup .= self::renderDomNode($node);
                     }
-                    return $content;
+                    return $markup;
                 }
             }
 
@@ -169,7 +194,7 @@ final class Placeable
     private static function convertContent(string $content): string
     {
         // un-namespace starting & singular tags
-        $content = preg_replace('~<([a-zA-Z_]+):([a-zA-Z0-9_.\-]+)~', '<\1-\2', $content);
+        $content = preg_replace('~<([a-zA-Z_]+):([a-zA-Z0-9_.\-]+)~', '<\1-\2', trim($content));
         // un-namespace ending tags
         $content = preg_replace('~</([a-zA-Z_]+):([a-zA-Z0-9_.\-]+)~', '</\1-\2', $content);
         // un-namespace attribute names
