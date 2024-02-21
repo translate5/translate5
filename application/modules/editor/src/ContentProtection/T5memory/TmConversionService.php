@@ -248,6 +248,7 @@ class TmConversionService
         $reader = new XMLReader();
         $reader->open($filenameWithPath);
         $writtenElements = 0;
+        $brokenTus = [];
 
         while ($reader->read()) {
             if ($reader->nodeType == XMLReader::ELEMENT && $reader->name == 'header') {
@@ -256,7 +257,7 @@ class TmConversionService
 
             if ($reader->nodeType == XMLReader::ELEMENT && $reader->name == 'tu') {
                 $writtenElements++;
-                $writer->writeRaw($this->convertTransUnit($reader->readOuterXML(), $sourceLang, $targetLang));
+                $writer->writeRaw($this->convertTransUnit($reader->readOuterXML(), $sourceLang, $targetLang, $brokenTus));
             }
 
             if (!in_array($reader->name, ['tmx', 'body'], true)) {
@@ -290,10 +291,18 @@ class TmConversionService
 
         file_put_contents($resultFilename, PHP_EOL . '</tmx>', FILE_APPEND);
 
+        if (!empty($brokenTus)) {
+            $this->logger->error(
+                'E1593',
+                'Trans unit has unexpected structure and was excluded from TMX import',
+                ['tus' => implode(PHP_EOL, $brokenTus)]
+            );
+        }
+
         return $resultFilename;
     }
 
-    private function convertTransUnit(string $transUnit, int $sourceLang, int $targetLang): string
+    private function convertTransUnit(string $transUnit, int $sourceLang, int $targetLang, array &$brokenTus): string
     {
         $transUnit = $this->convertT5MemoryTagToContent($transUnit);
         preg_match_all(
@@ -306,11 +315,7 @@ class TmConversionService
         $numberTagMap = [];
 
         if (empty($matches[0][0]) || empty($matches[1][0])) {
-            $this->logger->error(
-                'E1593',
-                'Trans unit has unexpected structure and was excluded from TMX import',
-                ['tu' => $transUnit]
-            );
+            $brokenTus[] = $transUnit;
 
             return '';
         }

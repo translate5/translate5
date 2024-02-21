@@ -138,7 +138,7 @@ class ContentProtectionRepository
     /**
      * @return iterable<ContentProtectionDto>
      */
-    public function getAllForTarget(Languages $sourceLang, Languages $targetLang, bool $useCache): iterable
+    public function getAllForTarget(Languages $sourceLang, Languages $targetLang, bool $useCache = true): iterable
     {
         $dbInputMapping = ZfExtended_Factory::get(InputMapping::class)->db;
         $dbOutputMapping = ZfExtended_Factory::get(OutputMapping::class)->db;
