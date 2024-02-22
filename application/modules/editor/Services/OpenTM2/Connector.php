@@ -792,8 +792,6 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
     public function initForFuzzyAnalysis($analysisId)
     {
         $mime = 'TM';
-        // TODO FIXME: This brings the "Mother-TM" into fuzzy-mode, why is this done ? Maybe a historic artefact due to the ugly "clone" in the base-implementation ??
-        $this->isInternalFuzzy = true;
         $validExportTypes = $this->getValidExportTypes();
 
         if (empty($validExportTypes[$mime])) {
