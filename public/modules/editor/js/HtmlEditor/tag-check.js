@@ -32,6 +32,7 @@ class TagCheck {
 
             const number = parseInt(match[2], 10);
             const id = type + number;
+            const originalId = match[1] + match[2];
 
             let isQaTag = /qmflag/.test(node.className);
 
@@ -54,11 +55,11 @@ class TagCheck {
                     continue;
                 }
 
-                excessTags.push(markupImagesCache[id]);
+                excessTags.push(markupImagesCache[originalId]);
             }
 
             if (foundIds.includes(id) && node.parentNode.nodeName.toLowerCase() !== "del") {
-                duplicatedTags.push(markupImagesCache[id]);
+                duplicatedTags.push(markupImagesCache[originalId]);
             } else {
                 if (node.parentNode.nodeName.toLowerCase() !== "del") {
                     foundIds.push(id);

@@ -14,6 +14,69 @@ All updates are (downwards) compatible! If not this is listed in the important r
 
 
 
+
+## [7.1.4] - 2024-02-23
+
+### Important Notes:
+#### [TRANSLATE-3736](https://jira.translate5.net/browse/TRANSLATE-3736)
+Fix or UI error when displaying tag errors.
+
+#### [TRANSLATE-3716](https://jira.translate5.net/browse/TRANSLATE-3716)
+By default single tags on the start and end of a segment will now be imported. See runtimeOptions.import.xlf.ignoreFramingTags
+
+#### [TRANSLATE-3591](https://jira.translate5.net/browse/TRANSLATE-3591)
+This is a backwards incompatible feature. If you need the old behavior, change the config value of the option runtimeOptions.LanguageResources.enableMtForNonUntranslatedSegments.
+Please note: If you turn this option on again in the config, again for each segment opening costs at the MT will be generated.
+ 
+
+
+### Bugfixes
+**[TRANSLATE-3750](https://jira.translate5.net/browse/TRANSLATE-3750): t5memory - Fix deletion of TMs on fuzzy TM errors** <br>
+In very rare cases TMs in t5memory get deleted.
+
+**[TRANSLATE-3747](https://jira.translate5.net/browse/TRANSLATE-3747): Import/Export - Extend Placeables to also inspect contents of <ph> & <it> tags** <br>
+Improve Placeables: scan the contents of <ph> and <it> tags instead of the tags
+
+**[TRANSLATE-3743](https://jira.translate5.net/browse/TRANSLATE-3743): LanguageResources - Changes in the OpenAI API lead to errors when training a model** <br>
+Updating OpenAI lib
+
+**[TRANSLATE-3742](https://jira.translate5.net/browse/TRANSLATE-3742): t5memory - Fix resetting reorganize attempts** <br>
+Fix error while saving segment to t5memory
+
+**[TRANSLATE-3737](https://jira.translate5.net/browse/TRANSLATE-3737): SpellCheck (LanguageTool integration) - Warning instead of error when the target language is not supported by the spell checker** <br>
+Warning instead of error when the target language is not supported by the spell checker.
+
+**[TRANSLATE-3736](https://jira.translate5.net/browse/TRANSLATE-3736): Editor general - RootCause error: tagData is undefined** <br>
+Fix for a problem when displaying tag errors popup.
+
+**[TRANSLATE-3734](https://jira.translate5.net/browse/TRANSLATE-3734): Editor general - Reconnect and closed websocket connections** <br>
+Fix for message bus reconnecting when connection is lost.
+
+**[TRANSLATE-3732](https://jira.translate5.net/browse/TRANSLATE-3732): MatchAnalysis & Pretranslation - RootCause: Cannot read properties of null (reading 'getMetadata')** <br>
+Fix for UI error when analysis load returns not results
+
+**[TRANSLATE-3730](https://jira.translate5.net/browse/TRANSLATE-3730): Import/Export - across hotfolder bug fixing** <br>
+Several smaller fixes in instruction.xml evaluation regarding the PM to be used.
+
+**[TRANSLATE-3716](https://jira.translate5.net/browse/TRANSLATE-3716): Import/Export - Change default for runtimeOptions.import.xlf.ignoreFramingTags to "paired"** <br>
+It often leads to problems for users, who do not know translate5 well enough, that the default setting for runtimeOptions.import.xlf.ignoreFramingTags is "all".
+Because in some import formats there are stand-alone tags, that stand for words, and with "all" they would be excluded from the segment and miss as info for the translator and can not be moved with the text inside the segment.
+Therefore the default is changed to runtimeOptions.import.xlf.ignoreFramingTags = "paired"
+
+**[TRANSLATE-3690](https://jira.translate5.net/browse/TRANSLATE-3690): Workflows - workflow starts with "view only"** <br>
+Fix for a problem where the initial task workflow step is set to a wrong value when we have default assigned user with workflow role "view only".
+
+**[TRANSLATE-3679](https://jira.translate5.net/browse/TRANSLATE-3679): LanguageResources, Task Management - deselecting language resources in task creation wizard not saved** <br>
+Fix for a problem where the resources association grid was not updated after task creating in the project overview.
+
+**[TRANSLATE-3591](https://jira.translate5.net/browse/TRANSLATE-3591): Editor general - Only query MT in fuzzy panel of editor, if segment untranslated** <br>
+So far with each opening of a segment, all match resources are queried.
+
+In the future this should only happen for MT resources, if the segment is in the segment status "untranslated".
+
+The old behavior can be turned on again by a new config options, overwritable on client, import and task level. It's name needs to be specified in the important release notes of this issue.
+
+
 ## [7.1.3] - 2024-02-14
 
 ### Important Notes:

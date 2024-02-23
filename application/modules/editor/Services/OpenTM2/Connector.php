@@ -849,8 +849,6 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
     public function initForFuzzyAnalysis($analysisId)
     {
         $mime = 'TM';
-        // TODO FIXME: This brings the "Mother-TM" into fuzzy-mode, why is this done ? Maybe a historic artefact due to the ugly "clone" in the base-implementation ??
-        $this->isInternalFuzzy = true;
         $validExportTypes = $this->getValidExportTypes();
 
         if (empty($validExportTypes[$mime])) {
@@ -1201,6 +1199,12 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
             return;
         }
 
+        if ($languageResource->getSpecificData(self::REORGANIZE_ATTEMPTS) === null) {
+            return;
+        }
+
+        // In some cases language resource is detached from DB
+        $languageResource->refresh();
         $languageResource->removeSpecificData(self::REORGANIZE_ATTEMPTS);
         $languageResource->save();
     }
@@ -1742,8 +1746,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
         }
 
         // Just saved segment should have matchrate 103
-        // TODO uncomment after matchrate calculating issue is fixed on t5memory side
-        $matchRateFits = true; //$maxMatchRateResult->matchrate === 103;
+        $matchRateFits = $maxMatchRateResult->matchrate === 103;
 
         // Decode html entities
         $targetReceived = html_entity_decode($maxMatchRateResult->rawTarget);
@@ -1761,8 +1764,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
         $resultTimestamp = $result->getMetaValue($maxMatchRateResult->metaData, 'timestamp');
         $resultDate = DatetimeImmutable::createFromFormat('Y-m-d H:i:s T', $resultTimestamp);
         // Timestamp should be not older than 1 minute otherwise it is an old segment which wasn't updated
-        // TODO uncomment after matchrate calculating issue is fixed on t5memory side
-        $isResultFresh = true; //$resultDate >= new DateTimeImmutable('-1 minute');
+        $isResultFresh = $resultDate >= new DateTimeImmutable('-1 minute');
 
         if (!$matchRateFits || !$targetIsTheSame || !$isResultFresh) {
             $logError(match (false) {

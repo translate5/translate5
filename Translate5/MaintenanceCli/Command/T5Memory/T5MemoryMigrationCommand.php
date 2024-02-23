@@ -368,7 +368,6 @@ class T5MemoryMigrationCommand extends Translate5AbstractCommand
     private function generateFilename(LanguageResource $languageResource): string
     {
         $fileName = $languageResource->getSpecificData('memories', true)[0]['filename'];
-        $fileName = str_replace('ID' . $languageResource->getId(), '', $fileName);
 
         return $fileName . self::EXPORT_FILE_EXTENSION;
     }
@@ -627,19 +626,24 @@ class T5MemoryMigrationCommand extends Translate5AbstractCommand
         if (count($languageResourcesData) > 1) {
             $askMemories = new ChoiceQuestion(
                 'Please choose a Memory:',
-                array_values(array_map(
+                array_map(
                     static fn($data) =>
-                        sprintf('%s | %s | %s', $data['name'], $data['sourceLangCode'], $data['targetLangCode']),
+                        sprintf(
+                            '%d | %s | %s | %s',
+                            $data['id'],
+                            $data['name'],
+                            $data['sourceLangCode'],
+                            $data['targetLangCode']
+                        ),
                     $languageResourcesData
-                )),
+                ),
                 null
             );
 
-            $chosen = $this->io->askQuestion($askMemories);
-            $name = explode(' | ', $chosen)[0];
+            $id = explode(' | ', $this->io->askQuestion($askMemories))[0];
 
             $languageResourcesData = [
-                $languageResourcesData[array_search($name, array_column($languageResourcesData, 'name'), true)]
+                $languageResourcesData[array_search($id, array_column($languageResourcesData, 'id'), true)]
             ];
         }
 
