@@ -67,10 +67,19 @@ class ContentProtectionRepository
      */
     private array $targetContentProtections = [];
 
+    public function hasActiveRules(?Languages $sourceLang, ?Languages $targetLang): bool
+    {
+        if (null === $sourceLang || null === $targetLang) {
+            return false;
+        }
+
+        return $this->getAllForSource($sourceLang, $targetLang)->valid();
+    }
+
     /**
      * @return iterable<ContentProtectionDto>
      */
-    public function getAllForSource(Languages $sourceLang, Languages $targetLang, bool $useCache = true): iterable
+    public function getAllForSource(Languages $sourceLang, Languages $targetLang, bool $useCache = true): \Iterator
     {
         $dbInputMapping = ZfExtended_Factory::get(InputMapping::class)->db;
         $dbOutputMapping = ZfExtended_Factory::get(OutputMapping::class)->db;
@@ -183,8 +192,8 @@ class ContentProtectionRepository
                 ['inputRecognition.format as outputFormat']
             )
             ->where('outputMapping.languageId IN (?)', $targetIds)
-            ->orWhere('recognition.keepAsIs = true')
             ->where('recognition.enabled = true')
+            ->orWhere('recognition.keepAsIs = true')
         ;
 
         if ($useCache) {

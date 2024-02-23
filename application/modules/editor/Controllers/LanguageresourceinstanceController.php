@@ -29,13 +29,12 @@ END LICENSE AND COPYRIGHT
 use editor_Models_Segment_Whitespace as Whitespace;
 use MittagQI\Translate5\ContentProtection\ContentProtector;
 use MittagQI\Translate5\ContentProtection\Model\ContentProtectionRepository;
-use MittagQI\Translate5\ContentProtection\Model\LanguageResourceRulesHash;
-use MittagQI\Translate5\ContentProtection\Model\LanguageRulesHash;
 use MittagQI\Translate5\ContentProtection\T5memory\TmConversionService;
 use MittagQI\Translate5\LanguageResource\CleanupAssociation\Customer;
 use MittagQI\Translate5\LanguageResource\TaskAssociation;
 use MittagQI\Translate5\LanguageResource\TaskPivotAssociation;
 use MittagQI\Translate5\LanguageResource\Status as LanguageResourceStatus;
+use MittagQI\Translate5\Repository\LanguageRepository;
 use MittagQI\Translate5\Task\Current\NoAccessException;
 use MittagQI\Translate5\Task\Import\TaskDefaults;
 use MittagQI\Translate5\Task\TaskContextTrait;
@@ -147,7 +146,8 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
 
         $tmConversionService = new TmConversionService(
             new ContentProtectionRepository(),
-            ContentProtector::create(ZfExtended_Factory::get(Whitespace::class))
+            ContentProtector::create(ZfExtended_Factory::get(Whitespace::class)),
+            new LanguageRepository()
         );
 
         $filterTmNeedsConversion = $this->getParam('filterTmNeedsConversion', false);
@@ -220,7 +220,8 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         $postData = $this->getAllParams();
         $tmConversionService = new TmConversionService(
             new ContentProtectionRepository(),
-            ContentProtector::create(ZfExtended_Factory::get(Whitespace::class))
+            ContentProtector::create(ZfExtended_Factory::get(Whitespace::class)),
+            new LanguageRepository()
         );
 
         $customerAssoc = ZfExtended_Factory::get(editor_Models_LanguageResources_CustomerAssoc::class);
@@ -249,7 +250,8 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         $postData = $this->getAllParams();
         $tmConversionService = new TmConversionService(
             new ContentProtectionRepository(),
-            ContentProtector::create(ZfExtended_Factory::get(Whitespace::class))
+            ContentProtector::create(ZfExtended_Factory::get(Whitespace::class)),
+            new LanguageRepository()
         );
 
         $this->view->success = true;
@@ -269,7 +271,8 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         $postData = $this->getAllParams();
         $tmConversionService = new TmConversionService(
             new ContentProtectionRepository(),
-            ContentProtector::create(ZfExtended_Factory::get(Whitespace::class))
+            ContentProtector::create(ZfExtended_Factory::get(Whitespace::class)),
+            new LanguageRepository()
         );
 
         $this->view->success = true;
@@ -853,7 +856,8 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
 
         $tmConversionService = new TmConversionService(
             new ContentProtectionRepository(),
-            ContentProtector::create(ZfExtended_Factory::get(Whitespace::class))
+            ContentProtector::create(ZfExtended_Factory::get(Whitespace::class)),
+            new LanguageRepository()
         );
 
         $tmConversionService->createRuleHashes($this->entity->getId(), $sourceLangId, $targetLangId);
@@ -1430,7 +1434,8 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
 
         $tmConversionService = new TmConversionService(
             new ContentProtectionRepository(),
-            ContentProtector::create(ZfExtended_Factory::get(editor_Models_Segment_Whitespace::class))
+            ContentProtector::create(ZfExtended_Factory::get(editor_Models_Segment_Whitespace::class)),
+            new LanguageRepository()
         );
 
         $this->view->segmentId = $segment->getId(); //return the segmentId back, just for reference

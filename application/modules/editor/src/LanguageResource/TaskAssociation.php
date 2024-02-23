@@ -33,6 +33,7 @@ use editor_Services_Manager;
 use MittagQI\Translate5\ContentProtection\ContentProtector;
 use MittagQI\Translate5\ContentProtection\Model\ContentProtectionRepository;
 use MittagQI\Translate5\ContentProtection\T5memory\TmConversionService;
+use MittagQI\Translate5\Repository\LanguageRepository;
 use Zend_Db_Expr;
 use Zend_Db_Table_Row_Abstract;
 use ZfExtended_Exception;
@@ -212,7 +213,8 @@ class TaskAssociation extends AssociationAbstract {
         $serviceManager = ZfExtended_Factory::get(editor_Services_Manager::class);
         $tmConversionService = new TmConversionService(
             new ContentProtectionRepository(),
-            ContentProtector::create(ZfExtended_Factory::get(editor_Models_Segment_Whitespace::class))
+            ContentProtector::create(ZfExtended_Factory::get(editor_Models_Segment_Whitespace::class)),
+            new LanguageRepository()
         );
 
         $resources = [];

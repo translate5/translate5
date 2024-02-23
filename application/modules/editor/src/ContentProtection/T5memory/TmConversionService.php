@@ -58,6 +58,7 @@ use MittagQI\Translate5\ContentProtection\Model\ContentProtectionRepository;
 use MittagQI\Translate5\ContentProtection\Model\LanguageResourceRulesHash;
 use MittagQI\Translate5\ContentProtection\Model\LanguageRulesHash;
 use MittagQI\Translate5\ContentProtection\NumberProtector;
+use MittagQI\Translate5\Repository\LanguageRepository;
 use RuntimeException;
 use XMLReader;
 use XMLWriter;
@@ -76,7 +77,8 @@ class TmConversionService
 
     public function __construct(
         private ContentProtectionRepository $contentProtectionRepository,
-        private ContentProtector $contentProtector
+        private ContentProtector $contentProtector,
+        private LanguageRepository $languageRepository
     ) {
         $this->languageRulesHashMap = $contentProtectionRepository->getLanguageRulesHashMap();
         $this->languageResourceRulesHashMap = $contentProtectionRepository->getLanguageResourceRulesHashMap();
@@ -229,8 +231,15 @@ class TmConversionService
         return $queryString;
     }
 
-    public function convertTMXForImport(string $filenameWithPath, int $sourceLang, int $targetLang): string
+    public function convertTMXForImport(string $filenameWithPath, int $sourceLangId, int $targetLangId): string
     {
+        $sourceLang = $sourceLangId ? $this->languageRepository->find($sourceLangId) : null;
+        $targetLang = $targetLangId ? $this->languageRepository->find($targetLangId) : null;
+
+        if (!$this->contentProtectionRepository->hasActiveRules($sourceLang, $targetLang)) {
+            return $filenameWithPath;
+        }
+
         $exportDir = APPLICATION_PATH . '/../data/TMConversion/';
         @mkdir($exportDir, recursive: true);
 
@@ -257,7 +266,7 @@ class TmConversionService
 
             if ($reader->nodeType == XMLReader::ELEMENT && $reader->name == 'tu') {
                 $writtenElements++;
-                $writer->writeRaw($this->convertTransUnit($reader->readOuterXML(), $sourceLang, $targetLang, $brokenTus));
+                $writer->writeRaw($this->convertTransUnit($reader->readOuterXML(), $sourceLangId, $targetLangId, $brokenTus));
             }
 
             if (!in_array($reader->name, ['tmx', 'body'], true)) {

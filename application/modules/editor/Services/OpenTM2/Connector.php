@@ -37,6 +37,7 @@ use MittagQI\Translate5\LanguageResource\Adapter\Exception\RescheduleUpdateNeede
 use MittagQI\Translate5\LanguageResource\Adapter\UpdatableAdapterInterface;
 use MittagQI\Translate5\LanguageResource\Status as LanguageResourceStatus;
 use editor_Models_LanguageResources_LanguageResource as LanguageResource;
+use MittagQI\Translate5\Repository\LanguageRepository;
 
 /**
  * T5memory / OpenTM2 Connector
@@ -90,7 +91,11 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
         ZfExtended_Logger::addDuplicatesByEcode('E1333', 'E1306', 'E1314');
 
         $this->contentProtector = ContentProtector::create(ZfExtended_Factory::get(Whitespace::class));
-        $this->conversionService = new TmConversionService(new ContentProtectionRepository(), $this->contentProtector);
+        $this->conversionService = new TmConversionService(
+            new ContentProtectionRepository(),
+            $this->contentProtector,
+            new LanguageRepository()
+        );
 
         parent::__construct();
     }
