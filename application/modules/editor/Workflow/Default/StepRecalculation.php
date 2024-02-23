@@ -148,40 +148,49 @@ class editor_Workflow_Default_StepRecalculation {
      * - sets the tasks workflow step depending the associated jobs
      * - sets the initial states depending on the workflow step of the task and task usage mode
      * @param editor_Models_Task $task
+     * @throws ReflectionException
      */
-    public function setupInitialWorkflow(editor_Models_Task $task) {
-        /* @var $job editor_Models_TaskUserAssoc */
-        $job = ZfExtended_Factory::get('editor_Models_TaskUserAssoc');
+    public function setupInitialWorkflow(editor_Models_Task $task): void
+    {
+        $job = ZfExtended_Factory::get(editor_Models_TaskUserAssoc::class);
         $jobs = $job->loadByTaskGuidList([$task->getTaskGuid()]);
         
         $usedJobs = [];
         $usedSteps = [];
         //delete jobs created by default which are not belonging to the tasks workflow and collect used steps
         foreach($jobs as $rawJob) {
-            if($rawJob['workflow'] === $task->getWorkflow()) {
-                $usedJobs[] = $rawJob;
-                $usedSteps[] = $rawJob['workflowStepName'];
-            }
-            else {
+            
+            if($rawJob['workflow'] !== $task->getWorkflow()){
                 $job->db->delete(['id = ?' => $rawJob['id']]);
+                continue;
             }
+            // if the tua step name is not in the workflow chain, ignore the job collection
+            // workflow step names which are not part of the workflow chain should not be used for calculation the
+            // initial workflow step
+            if(!in_array($rawJob['workflowStepName'],$this->workflow->getStepChain())){
+                continue;
+            }
+
+            $usedJobs[] = $rawJob;
+            $usedSteps[] = $rawJob['workflowStepName'];
         }
         $task->updateTask();
         if(empty($usedJobs)) {
             return;
         }
-        
+
         //sort the found steps regarding the step chain
         $usedSteps = array_unique($usedSteps);
         usort($usedSteps, [$this->workflow, 'compareSteps']);
         
-        //we set the tasks workflow step to the first found step of the assigned users, respecting the order of the step chain
+        // we set the tasks workflow step to the first found step of the assigned users,
+        // respecting the order of the step chain
         $currentStep = array_shift($usedSteps);
         $task->updateWorkflowStep($currentStep, false);
         
         $isComp = $task->getUsageMode() == $task::USAGE_MODE_COMPETITIVE;
         foreach($usedJobs as $rawJob) {
-            //currentstep jobs are open
+            //current step jobs are open
             if($currentStep === $rawJob['workflowStepName']) {
                 $state = $isComp ? $this->workflow::STATE_UNCONFIRMED : $this->workflow::STATE_OPEN;
             }

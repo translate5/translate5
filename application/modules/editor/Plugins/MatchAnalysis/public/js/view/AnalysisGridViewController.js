@@ -106,6 +106,12 @@ Ext.define('Editor.plugins.MatchAnalysis.view.AnalysisGridViewController', {
         if (!this.getView().task) {
             return;
         }
+
+        // If load request was not successful for some reason - return
+        if (success === false) {
+            return;
+        }
+
         var me=this,
         	view=me.getView(),
             vm = view.getViewModel(),
