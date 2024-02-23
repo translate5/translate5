@@ -47,7 +47,7 @@ class Translate2149Test extends editor_Test_JsonTest {
 
     protected static array $requiredRuntimeOptions = [
         'import.xlf.preserveWhitespace' => 0,
-        'import.xlf.ignoreFramingTags' => 'all'
+        'import.xlf.ignoreFramingTags' => 'paired'
     ];
 
     // protected static string $setupUserLogin = 'testlector';
