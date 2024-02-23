@@ -97,11 +97,6 @@ Ext.define('Editor.controller.ChangeAlike', {
     selector : '#segmentgrid #repetitionsBtn'
   }],
   listen: {
-      messagebus: {
-          '#translate5': {
-              reconnect: 'handleBusReconnect'
-          }
-      },
       component: {
           '#changealikeWindow #saveBtn' : {
               click: 'handleSaveChangeAlike'
@@ -129,6 +124,9 @@ Ext.define('Editor.controller.ChangeAlike', {
           '#Segments': {
               afterSaveCall: 'onAfterSaveCall',
               saveComplete: 'onSaveComplete'
+          },
+          '#Editor.plugins.FrontEndMessageBus.controller.MultiUserUsage':{
+              taskOpenedOnReconnect: 'onTaskOpenedOnReconnect'
           }
       }
   },
@@ -221,9 +219,9 @@ Ext.define('Editor.controller.ChangeAlike', {
   },
 
   /**
-   * on frontendmessag bus reconnection we have to retrigger the get alike call
+   * After task is opened when messagebus reconnects
    */
-  handleBusReconnect: function(bus) {
+  onTaskOpenedOnReconnect: function(bus) {
       var grid = this.getSegmentGrid();
       Editor.app.getController('JsLogger').addLogEntryToLogger('ChangeAlike::handleBusReconnect');
       if(grid && grid.editingPlugin.editing) {

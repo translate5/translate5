@@ -59,6 +59,7 @@ Ext.define('Editor.plugins.FrontEndMessageBus.controller.MultiUserUsage', {
         myself: '#UT#Ich',
         selectedBy: '#UT#Ausgewählt von'
     },
+
     listen: {
         messagebus: {
             '#translate5': {
@@ -104,6 +105,11 @@ Ext.define('Editor.plugins.FrontEndMessageBus.controller.MultiUserUsage', {
             }
         }
     },
+
+    listeners:{
+        taskOpenedOnReconnect:'onTaskOpenedOnReconnect'
+    },
+
     init: function(){
         var me = this,
             conf = Editor.data.plugins.FrontEndMessageBus,
@@ -170,6 +176,9 @@ return; //FIXME prepare that socket server is only triggered for simultaneous us
      */
     onClose: function(bus){
         var me = this;
+
+        console.log('onClose called',new Date().toLocaleString());
+
         var task = new Ext.util.DelayedTask(function(){
             if(!me.bus.isReady()) {
                 Editor.app.viewport && Editor.app.viewport.mask(me.strings.noConnection + '<br>' + me.bus.getUrl());
@@ -213,6 +222,7 @@ return; //FIXME prepare that socket server is only triggered for simultaneous us
                 success: function() {
                     Editor.app.viewport && Editor.app.viewport.unmask();
                     me.bus.send('task', 'openTask', [Editor.data.task.get('taskGuid')]);
+                    me.fireEvent('taskOpenedOnReconnect', Editor.data.task);
                 },
                 failure: function(record, op) {
                     Editor.app.viewport && Editor.app.viewport.unmask();
@@ -223,17 +233,23 @@ return; //FIXME prepare that socket server is only triggered for simultaneous us
         else {
             Editor.app.viewport && Editor.app.viewport.unmask();
         }
-        
+    },
+
+    onTaskOpenedOnReconnect: function(task) {
+        var me = this,
+            grid = me.getSegmentGrid(),
+            sel;
+
         if(grid && (sel = grid.getSelectionModel().getSelection()) && sel.length > 0) {
             me.clickSegment(null, sel[0]);
         }
-        
+
         if(grid && grid.editingPlugin.editing) {
             me.enterSegment(grid.editingPlugin, [grid.editingPlugin.context.record]);
-            //alikes GET is triggerd again in change alike controller 
+            //alikes GET is triggerd again in change alike controller
         }
-        
     },
+
     enterSegment: function(plugin, context) {
         var me = this,
             msg = me.strings,
