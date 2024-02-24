@@ -43,7 +43,7 @@ class Translate3069Test extends editor_Test_JsonTest {
 
     protected static array $requiredRuntimeOptions = [
         'import.xlf.preserveWhitespace' => 0,
-        'runtimeOptions.import.xlf.ignoreFramingTags' => 'all'
+        'import.xlf.ignoreFramingTags' => 'paired'
     ];
 
     protected static bool $setupOwnCustomer = true;
