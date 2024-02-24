@@ -59,9 +59,27 @@ use ZfExtended_Factory;
 class ContentProtectionRepository
 {
     /**
+     * @var ContentProtectionDto[]
+     */
+    private array $sourceContentProtections = [];
+    /**
+     * @var ContentProtectionDto[]
+     */
+    private array $targetContentProtections = [];
+
+    public function hasActiveRules(?Languages $sourceLang, ?Languages $targetLang): bool
+    {
+        if (null === $sourceLang || null === $targetLang) {
+            return false;
+        }
+
+        return $this->getAllForSource($sourceLang, $targetLang)->valid();
+    }
+
+    /**
      * @return iterable<ContentProtectionDto>
      */
-    public function getAllForSource(Languages $sourceLang, Languages $targetLang): iterable
+    public function getAllForSource(Languages $sourceLang, Languages $targetLang, bool $useCache = true): \Iterator
     {
         $dbInputMapping = ZfExtended_Factory::get(InputMapping::class)->db;
         $dbOutputMapping = ZfExtended_Factory::get(OutputMapping::class)->db;
@@ -110,7 +128,18 @@ class ContentProtectionRepository
             ->order('priority desc')
         ;
 
-        foreach ($dbInputMapping->fetchAll($select) as $formatData) {
+        if ($useCache) {
+            $key = "{$sourceLang->getId()}:{$targetLang->getId()}";
+            if (!isset($this->sourceContentProtections[$key])) {
+                $this->sourceContentProtections[$key] = $dbInputMapping->fetchAll($select);
+            }
+
+            $rows = $this->sourceContentProtections[$key];
+        } else {
+            $rows = $dbInputMapping->fetchAll($select);
+        }
+
+        foreach ($rows as $formatData) {
             yield ContentProtectionDto::fromRow($formatData->toArray());
         }
     }
@@ -118,7 +147,7 @@ class ContentProtectionRepository
     /**
      * @return iterable<ContentProtectionDto>
      */
-    public function getAllForTarget(Languages $sourceLang, Languages $targetLang): iterable
+    public function getAllForTarget(Languages $sourceLang, Languages $targetLang, bool $useCache = true): iterable
     {
         $dbInputMapping = ZfExtended_Factory::get(InputMapping::class)->db;
         $dbOutputMapping = ZfExtended_Factory::get(OutputMapping::class)->db;
@@ -163,11 +192,22 @@ class ContentProtectionRepository
                 ['inputRecognition.format as outputFormat']
             )
             ->where('outputMapping.languageId IN (?)', $targetIds)
-            ->orWhere('recognition.keepAsIs = true')
             ->where('recognition.enabled = true')
+            ->orWhere('recognition.keepAsIs = true')
         ;
 
-        foreach ($dbInputMapping->fetchAll($select) as $formatData) {
+        if ($useCache) {
+            $key = "{$sourceLang->getId()}:{$targetLang->getId()}";
+            if (!isset($this->targetContentProtections[$key])) {
+                $this->targetContentProtections[$key] = $dbOutputMapping->fetchAll($select);
+            }
+
+            $rows = $this->targetContentProtections[$key];
+        } else {
+            $rows = $dbOutputMapping->fetchAll($select);
+        }
+
+        foreach ($rows as $formatData) {
             yield ContentProtectionDto::fromRow($formatData->toArray());
         }
     }

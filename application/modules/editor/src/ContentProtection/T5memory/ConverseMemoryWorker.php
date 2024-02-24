@@ -39,6 +39,7 @@ use MittagQI\Translate5\ContentProtection\Model\ContentProtectionRepository;
 use MittagQI\Translate5\ContentProtection\Model\LanguageResourceRulesHash;
 use MittagQI\Translate5\ContentProtection\Model\LanguageRulesHash;
 use MittagQI\Translate5\LanguageResource\Status;
+use MittagQI\Translate5\Repository\LanguageRepository;
 use ZfExtended_Factory;
 use ZfExtended_Worker_Abstract;
 
@@ -56,7 +57,8 @@ class ConverseMemoryWorker extends ZfExtended_Worker_Abstract
             ->cloneMe('editor.content-protection.opentm2.conversion');
         $this->tmConversionService = new TmConversionService(
             new ContentProtectionRepository(),
-            ContentProtector::create(ZfExtended_Factory::get(Whitespace::class))
+            ContentProtector::create(ZfExtended_Factory::get(Whitespace::class)),
+            new LanguageRepository()
         );
     }
 

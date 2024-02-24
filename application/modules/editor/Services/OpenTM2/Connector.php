@@ -37,6 +37,7 @@ use MittagQI\Translate5\LanguageResource\Adapter\Exception\RescheduleUpdateNeede
 use MittagQI\Translate5\LanguageResource\Adapter\UpdatableAdapterInterface;
 use MittagQI\Translate5\LanguageResource\Status as LanguageResourceStatus;
 use editor_Models_LanguageResources_LanguageResource as LanguageResource;
+use MittagQI\Translate5\Repository\LanguageRepository;
 
 /**
  * T5memory / OpenTM2 Connector
@@ -90,7 +91,11 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
         ZfExtended_Logger::addDuplicatesByEcode('E1333', 'E1306', 'E1314');
 
         $this->contentProtector = ContentProtector::create(ZfExtended_Factory::get(Whitespace::class));
-        $this->conversionService = new TmConversionService(new ContentProtectionRepository(), $this->contentProtector);
+        $this->conversionService = new TmConversionService(
+            new ContentProtectionRepository(),
+            $this->contentProtector,
+            new LanguageRepository()
+        );
 
         parent::__construct();
     }
@@ -444,16 +449,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
 
         $isSource = $field === 'source';
 
-        $searchString = $this->tagHandler->prepareQuery(
-            $this->contentProtector->protect(
-                $searchString,
-                $isSource,
-                (int) $this->languageResource->getSourceLang(),
-                (int) $this->languageResource->getSourceLang(),
-                ContentProtector::ENTITY_MODE_RESTORE,
-                WhitespaceProtector::alias()
-            )
-        );
+        $searchString = $this->tagHandler->prepareQuery($searchString, $isSource);
 
         $resultList = new editor_Services_ServiceResult();
         $resultList->setLanguageResource($this->languageResource);
@@ -520,16 +516,16 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
 
         //$found->{$field}
         //[NextSearchPosition] =>
+        $searchString = $this->conversionService->convertT5MemoryTagToContent($searchString);
         foreach ($results as $result) {
-            $searchString = $this->conversionService->convertT5MemoryTagToNumber($searchString);
             $resultList->addResult($this->highlight(
                 $searchString,
-                $this->tagHandler->restoreInResult($result->target, $isSource, true),
+                $this->tagHandler->restoreInResult($result->target, $isSource),
                 $field === 'target'
             ));
             $resultList->setSource($this->highlight(
                 $searchString,
-                $this->tagHandler->restoreInResult($result->source, $isSource, true),
+                $this->tagHandler->restoreInResult($result->source, $isSource),
                 $isSource)
             );
         }
@@ -1365,7 +1361,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
         $results = array_merge(...$results);
 
         foreach ($results as $found) {
-            $target = $this->tagHandler->restoreInResult($found->target);
+            $target = $this->tagHandler->restoreInResult($found->target, false);
             $hasTargetErrors = $this->tagHandler->hasRestoreErrors();
 
             $source = $this->tagHandler->restoreInResult($found->source);
@@ -1590,7 +1586,6 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
         $writer->setIndent(true);
 
         stream_filter_register('fix-t5n-tag', T5NTagSchemaFixFilter::class);
-        $writtenElements = 0;
 
         $writtenElements = 0;
 
@@ -1615,7 +1610,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
 
                 if ($reader->nodeType == XMLReader::ELEMENT && $reader->name == 'tu') {
                     $writtenElements++;
-                    $writer->writeRaw($this->conversionService->convertT5MemoryTagToNumber($reader->readOuterXML()));
+                    $writer->writeRaw($this->conversionService->convertT5MemoryTagToContent($reader->readOuterXML()));
                     $writtenElements++;
                 }
 

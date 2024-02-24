@@ -128,11 +128,9 @@ class editor_Services_Connector_TagHandler_Xliff extends editor_Services_Connect
      * @param string $resultString
      * @return string|NULL NULL on error
      */
-    public function restoreInResult(
-        string $resultString,
-        bool $isSource = true,
-        bool $unprotectContent = false
-    ): ?string {
+    public function restoreInResult(string $resultString, bool $isSource = true): ?string
+    {
+        $this->handleIsInSourceScope = $isSource;
         $this->hasRestoreErrors = false;
         //strip other then x|ex|bx|g|/g
         $resultString = strip_tags($this->replaceTagsWithContent($resultString), static::ALLOWED_TAGS);

@@ -58,6 +58,7 @@ use MittagQI\Translate5\ContentProtection\Model\ContentProtectionRepository;
 use MittagQI\Translate5\ContentProtection\Model\LanguageResourceRulesHash;
 use MittagQI\Translate5\ContentProtection\Model\LanguageRulesHash;
 use MittagQI\Translate5\ContentProtection\NumberProtector;
+use MittagQI\Translate5\Repository\LanguageRepository;
 use RuntimeException;
 use XMLReader;
 use XMLWriter;
@@ -76,7 +77,8 @@ class TmConversionService
 
     public function __construct(
         private ContentProtectionRepository $contentProtectionRepository,
-        private ContentProtector $contentProtector
+        private ContentProtector $contentProtector,
+        private LanguageRepository $languageRepository
     ) {
         $this->languageRulesHashMap = $contentProtectionRepository->getLanguageRulesHashMap();
         $this->languageResourceRulesHashMap = $contentProtectionRepository->getLanguageResourceRulesHashMap();
@@ -187,7 +189,7 @@ class TmConversionService
         }
     }
 
-    public function convertT5MemoryTagToNumber(string $string): string
+    public function convertT5MemoryTagToContent(string $string): string
     {
         return preg_replace(self::fullTagRegex(), '\3', $string);
     }
@@ -229,8 +231,15 @@ class TmConversionService
         return $queryString;
     }
 
-    public function convertTMXForImport(string $filenameWithPath, int $sourceLang, int $targetLang): string
+    public function convertTMXForImport(string $filenameWithPath, int $sourceLangId, int $targetLangId): string
     {
+        $sourceLang = $sourceLangId ? $this->languageRepository->find($sourceLangId) : null;
+        $targetLang = $targetLangId ? $this->languageRepository->find($targetLangId) : null;
+
+        if (!$this->contentProtectionRepository->hasActiveRules($sourceLang, $targetLang)) {
+            return $filenameWithPath;
+        }
+
         $exportDir = APPLICATION_PATH . '/../data/TMConversion/';
         @mkdir($exportDir, recursive: true);
 
@@ -248,6 +257,7 @@ class TmConversionService
         $reader = new XMLReader();
         $reader->open($filenameWithPath);
         $writtenElements = 0;
+        $brokenTus = [];
 
         while ($reader->read()) {
             if ($reader->nodeType == XMLReader::ELEMENT && $reader->name == 'header') {
@@ -256,7 +266,7 @@ class TmConversionService
 
             if ($reader->nodeType == XMLReader::ELEMENT && $reader->name == 'tu') {
                 $writtenElements++;
-                $writer->writeRaw($this->convertTransUnit($reader->readOuterXML(), $sourceLang, $targetLang));
+                $writer->writeRaw($this->convertTransUnit($reader->readOuterXML(), $sourceLangId, $targetLangId, $brokenTus));
             }
 
             if (!in_array($reader->name, ['tmx', 'body'], true)) {
@@ -290,12 +300,20 @@ class TmConversionService
 
         file_put_contents($resultFilename, PHP_EOL . '</tmx>', FILE_APPEND);
 
+        if (!empty($brokenTus)) {
+            $this->logger->error(
+                'E1593',
+                'Trans unit has unexpected structure and was excluded from TMX import',
+                ['tus' => implode(PHP_EOL, $brokenTus)]
+            );
+        }
+
         return $resultFilename;
     }
 
-    private function convertTransUnit(string $transUnit, int $sourceLang, int $targetLang): string
+    private function convertTransUnit(string $transUnit, int $sourceLang, int $targetLang, array &$brokenTus): string
     {
-        $transUnit = $this->convertT5MemoryTagToNumber($transUnit);
+        $transUnit = $this->convertT5MemoryTagToContent($transUnit);
         preg_match_all(
             '/<tuv xml:lang="((\w|-)+)">((\n|\r|\r\n)?.+(\n|\r|\r\n)*)+<\/tuv>/Uum',
             $transUnit,
@@ -306,11 +324,7 @@ class TmConversionService
         $numberTagMap = [];
 
         if (empty($matches[0][0]) || empty($matches[1][0])) {
-            $this->logger->error(
-                'E1593',
-                'Trans unit has unexpected structure and was excluded from TMX import',
-                ['tu' => $transUnit]
-            );
+            $brokenTus[] = $transUnit;
 
             return '';
         }
