@@ -25,7 +25,7 @@ START LICENSE AND COPYRIGHT
 
 END LICENSE AND COPYRIGHT
 */
-
+use MittagQI\Translate5\Plugins\SpellCheck\Segment\Check;
 /**
  * Numbers check
  */
@@ -126,10 +126,10 @@ class editor_Segment_Numbers_Check {
         // Get source text, and replace whitespace-placeholder-characters for non-breaking space, linebreak, tab and ordinary space with themselves
         // Note: the non-commented space (1st item in 2nd arg of str_replace call) is the non-breaking space with code 160
         //       and the commented one is an ordinary space with code 32
-        $sourceText = self::prepareTarget($segment, $source);
+        $sourceText = Check::prepareTarget($segment, $source);
 
-        // Do same for target text
-        $targetText = self::prepareTarget($segment, $target);
+        // Do same for target text. Here we need same preparation both for source and target
+        $targetText = Check::prepareTarget($segment, $target);
 
         // Load langs [id => rfc5646] pairs if not yet loaded
         self::$lang ??= ZfExtended_Factory
@@ -144,25 +144,6 @@ class editor_Segment_Numbers_Check {
             self::$lang[$task->getTargetLang()],
             $task
         );
-    }
-
-    /**
-     * Get value of $segment's $targetField applicable to be sent to LanguageTool
-     *
-     * @param editor_Models_Segment $segment
-     * @param editor_Segment_FieldTags $target
-     * @return string
-     */
-    public static function prepareTarget(editor_Models_Segment $segment, editor_Segment_FieldTags $target) : string {
-
-        // Get target text with all tags being either stripped or replaced with their original contents (in case of whitespace)
-        $targetText = $target->renderReplaced(editor_TagSequence::MODE_ORIGINAL);
-
-        // replace escaped entities: TODO FIXME: This will create trouble with text-indices !!
-        $targetText = str_replace(['&lt;', '&gt;'], ['<', '>'], $targetText);
-
-        // Return string applicable to be sent to LanguageTool
-        return $targetText;
     }
 
     /**
