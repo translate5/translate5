@@ -149,7 +149,9 @@ Ext.define('Editor.view.LanguageResources.MatchGridViewController', {
             me.cachedResults.add(segId,new Ext.util.HashMap());
             me.segmentStack.push(segId);
             me.assocStore.each(function(record){
-               me.cacheMatchPanelResults(record,segment);
+                if (me.proceedWithCaching(record, segment)) {
+                    me.cacheMatchPanelResults(record,segment);
+                }
             });
         }
     },
@@ -214,8 +216,11 @@ Ext.define('Editor.view.LanguageResources.MatchGridViewController', {
         if(segmentId != this.editedSegmentId){
             return;
         }
-        var me = this;
+        var me = this, segment = Ext.data.StoreManager.get('Segments').getById(segmentId);
         if(!me.cachedResults.get(segmentId)){
+            return;
+        }
+        if (!segment) {
             return;
         }
         var res =me.cachedResults.get(segmentId);
@@ -224,13 +229,28 @@ Ext.define('Editor.view.LanguageResources.MatchGridViewController', {
             return;
         }
         me.assocStore.each(function(record){
-            if(res.get(record.get('languageResourceId'))){
+            if (res.get(record.get('languageResourceId'))) {
                 var rcd =res.get(record.get('languageResourceId')).rows;
                 me.getView().getStore('editorquery').loadRawData(rcd,true);
-            }else{
-                me.cacheSingleMatchPanelResults(record,segmentId,query);
+            } else {
+                if (me.proceedWithCaching(record, segment)) {
+                    me.cacheSingleMatchPanelResults(record,segmentId,query);
+                }
             }
         });
+    },
+
+    /**
+     * Check whether we should proceed with caching
+     *
+     * @param {Editor.model.LanguageResources.TaskAssoc} languageResourceAssoc
+     * @param {Editor.model.Segment} segment
+     * @returns {boolean}
+     */
+    proceedWithCaching: function(languageResourceAssoc, segment) {
+        return Editor.app.getTaskConfig('LanguageResources.enableMtForNonUntranslatedSegments')
+            || languageResourceAssoc.get('resourceType') !== 'mt'
+            || segment.get('autoStateId') === Editor.data.segments.autoStates.NOT_TRANSLATED
     },
     setFirsEditableRow: function(fer) {
         var me = this;
