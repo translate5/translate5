@@ -75,9 +75,21 @@ class Translate2417Test extends editor_Test_JsonTest {
 
         // query the results from this segment and compare them against the expected initial json
         $jsonFileName = 'tmResultsBeforeEdit.json';
-        $tmResults = static::api()->getJson('editor/languageresourceinstance/'.$tmId.'/query', ['segmentId' => $segToTest->id], $jsonFileName);
-        $this->assertIsArray($tmResults, 'GET editor/languageresourceinstance/'.$tmId.'/query does not return an array but: '.print_r($tmResults,1).' and raw result is '.print_r(static::api()->getLastResponse(),1));
-        $this->assertTmResultEqualsJsonFile($jsonFileName, $tmResults, 'The received tm results before segment modification are not as expected!');
+        $tmResults = $this->cleanTimestamps(static::api()->getJson(
+            'editor/languageresourceinstance/'.$tmId.'/query',
+            ['segmentId' => $segToTest->id],
+            $jsonFileName
+        ));
+        $this->assertIsArray(
+            $tmResults,
+            'GET editor/languageresourceinstance/'.$tmId.'/query does not return an array but: '.
+            print_r($tmResults,1).' and raw result is '.print_r(static::api()->getLastResponse(),1)
+        );
+        $this->assertTmResultEqualsJsonFile(
+            $jsonFileName,
+            $tmResults,
+            'The received tm results before segment modification are not as expected!'
+        );
 
         // set dummy translation for the first segment and save it. This should upload this translation to the tm to.
         $segToTest->targetEdit = "Aleks test tm update.";
@@ -85,7 +97,29 @@ class Translate2417Test extends editor_Test_JsonTest {
 
         // after the segment save, check for the tm results for the same segment
         $jsonFileName = 'tmResultsAfterEdit.json';
-        $tmResults = static::api()->getJson('editor/languageresourceinstance/'.$tmId.'/query', ['segmentId' => $segToTest->id], $jsonFileName);
-        $this->assertTmResultEqualsJsonFile($jsonFileName, $tmResults, 'The received tm results after segment modification are not as expected!');
+        $tmResults = $this->cleanTimestamps(
+            static::api()->getJson(
+                'editor/languageresourceinstance/'.$tmId.'/query',
+                ['segmentId' => $segToTest->id],
+                $jsonFileName
+            )
+        );
+        $this->assertTmResultEqualsJsonFile(
+            $jsonFileName,
+            $tmResults,
+            'The received tm results after segment modification are not as expected!'
+        );
+    }
+
+    /**
+     * @param array $tmResults
+     * @return array
+     */
+    private function cleanTimestamps(array $tmResults): array
+    {
+        foreach ($tmResults as $obj) {
+            $obj->timestamp = 'TEST_TIMESTAMP';
+        }
+        return $tmResults;
     }
 }
