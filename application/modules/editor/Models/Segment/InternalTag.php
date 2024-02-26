@@ -73,6 +73,12 @@ class editor_Models_Segment_InternalTag extends editor_Models_Segment_TagAbstrac
      */
     protected array $ridMap;
 
+    /**
+     * tag-map (xlf => internal tags) to be used for tag generation
+     * @var array
+     */
+    private array $inputTagMap;
+
     public function __construct($replacerTemplate = null)
     {
         $this->replacerRegex = self::REGEX_INTERNAL_TAGS;
@@ -292,8 +298,24 @@ class editor_Models_Segment_InternalTag extends editor_Models_Segment_TagAbstrac
             $replaceMap = [];
         }
 
+        // if inputTagMap is given we have to start with the IDs higher as the given ones, unless
+        // $newid is set from outside, then we assume the value is correct and usable
+        if (!empty($this->inputTagMap) && $newid === 1) {
+            $newid = count($this->inputTagMap) + 1;
+        }
+
         $this->ridMap = [];
         $result = $this->replace($segment, function ($match) use (&$newid, &$replaceMap) {
+            //strict XML content: convert <tag>&lt;foo></tag> to <tag>&lt;foo&gt;</tag>
+            $match[0] = MittagQI\Translate5\Tools\Markup::escape($match[0]);
+
+            // use already existing xlf tags from given inputTagMap
+            if (!empty($this->inputTagMap) && $foundInputTag = array_search($match[0], $this->inputTagMap, true)) {
+                $replaceMap[$foundInputTag] = [$foundInputTag, $match[0]];
+                unset($this->inputTagMap[$foundInputTag]);
+                return $foundInputTag;
+            }
+
             //original id coming from import format
             $id = $match[3];
             $type = $match[1];
@@ -319,6 +341,9 @@ class editor_Models_Segment_InternalTag extends editor_Models_Segment_TagAbstrac
             $replaceMap[$result] = [$result, $match[0]];
             return $result;
         });
+
+        //by definition this is cleaned after usage
+        $this->inputTagMap = [];
 
         if ($removeOther) {
             return strip_tags($result, '<x><x/><bpt><bpt/><ept><ept/><bx><bx/><ex><ex/><it><it/>');
@@ -539,11 +564,19 @@ class editor_Models_Segment_InternalTag extends editor_Models_Segment_TagAbstrac
      */
     public function reapply2dMap(string $segment, array $map)
     {
-        foreach ($map as $tupel) {
+        foreach ($map as $idx => $tupel) {
             $key = $tupel[0];
             $value = $tupel[1];
             //since $key may not be unique, we cannot use str_replace here, str_replace would replace all occurences
             $pos = mb_strpos($segment, $key);
+
+            // if it was used with gTagPaired, and g tag itself is not found
+            // we have also to search for corresponding bx/ex
+            if ($pos === false && (count($tupel) > 2 || $key === '</g>')) {
+                $key = $idx;
+                $pos = mb_strpos($segment, $key);
+            }
+
             if ($pos !== false) {
                 $segment = mb_substr($segment, 0, $pos) . $value . mb_substr($segment, $pos + mb_strlen($key));
             }
@@ -775,5 +808,17 @@ class editor_Models_Segment_InternalTag extends editor_Models_Segment_TagAbstrac
             $this->ridMap[$id] = count($this->ridMap) + 1;
         }
         return $this->ridMap[$id];
+    }
+
+    /**
+     * sets a tag-map for the tag conversion (format: xlf tags => internal tags)
+     * is used only for the next toXliff / toXliffPaired call, is automatically reset after usage!
+     * FIXME not implemented for xliff 2 yes
+     * @param array $tagMap
+     * @return void
+     */
+    public function setInputTagMap(array $tagMap): void
+    {
+        $this->inputTagMap = array_map([MittagQI\Translate5\Tools\Markup::class, 'escape'], $tagMap);
     }
 }

@@ -290,6 +290,9 @@ final class editor_Segment_Internal_Tag extends editor_Segment_Tag {
         return ($this->isSingle() && $this->hasClass(self::CSS_CLASS_TAB));
     }
 
+    /**
+     * @return bool
+     */
     public function isPlaceable(): bool {
         return ($this->isSingle() && $this->hasClass(Placeable::MARKER_CLASS));
     }

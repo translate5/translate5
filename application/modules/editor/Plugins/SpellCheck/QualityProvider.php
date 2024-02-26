@@ -97,7 +97,7 @@ class editor_Plugins_SpellCheck_QualityProvider extends editor_Segment_Quality_P
         // HINT: the existing qualities will be removed in the prepeareOperation call anyway
         if (!$spellCheckLang) {
             // Log event
-            $this->getLogger($processingMode)->error('E1413', 'SpellCheck can not work when target language is not supported by LanguageTool.', [ 'task' => $task ]);
+            $this->getLogger($processingMode)->warn('E1413', 'SpellCheck can not work when target language is not supported by LanguageTool.', [ 'task' => $task ]);
             return;
         }
 
