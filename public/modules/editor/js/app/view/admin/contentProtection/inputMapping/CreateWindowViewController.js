@@ -63,21 +63,23 @@ Ext.define('Editor.view.admin.contentProtection.inputMapping.CreateWindowViewCon
         record.set('contentRecognitionId', form.getValues().contentRecognitionId);
 
         const callback = (btn) => {
-            if ('yes' === btn) {
-                record.save({
-                    preventDefaultHandler: true,
-                    success: function () {
-                        Editor.MessageBox.addSuccess('Success');
-                        store.load();
-                        win.setLoading(false);
-                        win.close();
-                    },
-                    failure: function (rec, op) {
-                        win.setLoading(false);
-                        Editor.app.getController('ServerException').handleFormFailure(form, rec, op);
-                    }
-                });
+            if ('yes' !== btn) {
+                win.setLoading(false);
             }
+
+            record.save({
+                preventDefaultHandler: true,
+                success: function () {
+                    Editor.MessageBox.addSuccess('Success');
+                    store.load();
+                    win.setLoading(false);
+                    win.close();
+                },
+                failure: function (rec, op) {
+                    win.setLoading(false);
+                    Editor.app.getController('ServerException').handleFormFailure(form, rec, op);
+                }
+            });
         };
 
         Ext.MessageBox.confirm(
