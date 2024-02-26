@@ -854,13 +854,15 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
             $this->entity->save();
         }
 
-        $tmConversionService = new TmConversionService(
-            new ContentProtectionRepository(),
-            ContentProtector::create(ZfExtended_Factory::get(Whitespace::class)),
-            new LanguageRepository()
-        );
+        if (editor_Services_Manager::SERVICE_OPENTM2 === $this->entity->getServiceType()) {
+            $tmConversionService = new TmConversionService(
+                new ContentProtectionRepository(),
+                ContentProtector::create(ZfExtended_Factory::get(Whitespace::class)),
+                new LanguageRepository()
+            );
 
-        $tmConversionService->createRuleHashes($this->entity->getId(), $sourceLangId, $targetLangId);
+            $tmConversionService->createRuleHashes($this->entity->getId(), $sourceLangId, $targetLangId);
+        }
 
         $this->view->rows = $this->entity->getDataObject();
         $this->view->success = true;
