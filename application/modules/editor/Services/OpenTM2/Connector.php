@@ -263,6 +263,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
 
         $fileName = $this->getFileName($segment);
         $source = $this->tagHandler->prepareQuery($this->getQueryString($segment));
+        $this->tagHandler->setInputTagMap($this->tagHandler->getTagMap());
         $target = $this->tagHandler->prepareQuery($segment->getTargetEdit());
 
         $successful = $this->api->update($source, $target, $segment, $fileName, $tmName, !$this->isInternalFuzzy);
@@ -787,7 +788,10 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
      * Download and save the existing tm with "fuzzy" name. The new fuzzy connector will be returned.
      * @param int $analysisId
      * @return editor_Services_Connector_Abstract
+     * @throws ReflectionException
+     * @throws Zend_Exception
      * @throws ZfExtended_NotFoundException
+     * @throws editor_Services_Exceptions_NoService
      */
     public function initForFuzzyAnalysis($analysisId)
     {
