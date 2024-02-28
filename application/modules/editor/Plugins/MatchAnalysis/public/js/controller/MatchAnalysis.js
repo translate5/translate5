@@ -184,10 +184,10 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
         }
 
         configStore.loadByCustomerId(task.get('customerId'),function (){
-            var config = configStore.getConfig('plugins.MatchAnalysis.enableAnalysisActionMenu'),
-                menuItem = menu.down('#analysisActionItem');
-
-            menuItem.setDisabled(!config);
+            var config = configStore.getConfig('plugins.MatchAnalysis.enableAnalysisActionMenu');
+            if (menu.rendered) {
+                menu.down('#analysisActionItem').setDisabled(!config);
+            }
         });
     },
 
