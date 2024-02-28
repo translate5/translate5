@@ -81,6 +81,7 @@ abstract class AbstractAuthenticatedService extends AbstractExternalService
                 }
             }
         }
-        return $checked;
+
+        return $checked && $this->checkFoundVersions();
     }
 }

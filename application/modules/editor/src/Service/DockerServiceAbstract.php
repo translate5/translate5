@@ -119,7 +119,8 @@ abstract class DockerServiceAbstract extends AbstractHttpService
                 }
             }
         }
-        return $checked;
+
+        return $checked && $this->checkFoundVersions();
     }
 
     public function checkUrl(string $url, ?string $healthCheck): bool
@@ -174,8 +175,9 @@ abstract class DockerServiceAbstract extends AbstractHttpService
      * @param string $url
      * @return bool
      */
-    protected function checkConfiguredServiceUrl(string $url): bool
+    protected function checkConfiguredServiceUrl(string $url, bool $addResult = true): bool
     {
+        // basic check is just a DNS check on the domain
         $urlParsed = $this->parseUrl($url);
         if (empty($urlParsed['host'])) {
             return false;
@@ -210,5 +212,21 @@ abstract class DockerServiceAbstract extends AbstractHttpService
     protected function findVersionInResponseBody(string $responseBody, string $serviceUrl): ?string
     {
         return null;
+    }
+
+    /**
+     * Some Docker Services bundle several endpoints and provide several versions
+     * The format then looks like "API: 0.6, Browser: HeadlessChrome/98.0.4758.0 ... "
+     * @param string $foundVersion
+     * @return string
+     */
+    protected function extractServiceVersion(string $foundVersion): string
+    {
+        $matches = [];
+        preg_match('/API:\s*([0-9a-zA-Z.\-]+),/', $foundVersion, $matches);
+        if(count($matches) > 1){
+            return $matches[1];
+        }
+        return $foundVersion;
     }
 }
