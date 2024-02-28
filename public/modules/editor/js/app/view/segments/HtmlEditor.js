@@ -689,6 +689,7 @@ Ext.define('Editor.view.segments.HtmlEditor', {
         spanFull = divItem.down('span.full');
         spanShort = divItem.down('span.short');
         data.text = spanFull.dom.innerHTML.replace(/"/g, '&quot;');
+        data.fullTag = data.text;
         data.id = spanFull.getAttribute('data-originalid');
         data.qualityId = me.getElementsQualityId(divItem);
         data.title = Ext.htmlEncode(spanShort.getAttribute('title'));
