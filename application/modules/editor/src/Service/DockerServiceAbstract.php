@@ -172,12 +172,12 @@ abstract class DockerServiceAbstract extends AbstractHttpService
 
     /**
      * Checks a single URL (usually pointing to a docker container)
+     * This basic check is just a DNS check on the domain
      * @param string $url
      * @return bool
      */
-    protected function checkConfiguredServiceUrl(string $url, bool $addResult = true): bool
+    protected function checkConfiguredServiceUrl(string $url): bool
     {
-        // basic check is just a DNS check on the domain
         $urlParsed = $this->parseUrl($url);
         if (empty($urlParsed['host'])) {
             return false;
