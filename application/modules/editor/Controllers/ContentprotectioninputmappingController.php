@@ -62,16 +62,16 @@ class editor_ContentprotectioninputmappingController extends ZfExtended_RestCont
         } catch (ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey $e) {
             $prevMassage = $e->getPrevious()->getMessage();
 
-            ZfExtended_UnprocessableEntity::addCodes([
+            ZfExtended_Models_Entity_Conflict::addCodes([
                 'E1591' => 'You already created an {mapping} mapping for this {index} combination'
             ], 'editor.content-protection');
 
             if (strpos($prevMassage, $this->entity->getLanguageId() . '-' . $this->entity->getContentRecognitionId())) {
-                throw new ZfExtended_UnprocessableEntity('E1591', ['mapping' => 'Input', 'index' => 'language-rule']);
+                throw new ZfExtended_Models_Entity_Conflict('E1591', ['mapping' => 'Input', 'index' => 'language-rule']);
             }
 
             if (strpos($prevMassage, $this->entity->getLanguageId() . '-' . $this->entity->getPriority())) {
-                throw new ZfExtended_UnprocessableEntity('E1591', [
+                throw new ZfExtended_Models_Entity_Conflict('E1591', [
                     'mapping' => 'Input',
                     'index' => 'language-priority'
                 ]);
