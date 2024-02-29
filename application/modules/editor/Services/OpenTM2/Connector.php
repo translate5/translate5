@@ -298,6 +298,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
 
         $fileName = $this->getFileName($segment);
         $source = $this->tagHandler->prepareQuery($this->getQueryString($segment));
+        $this->tagHandler->setInputTagMap($this->tagHandler->getTagMap());
         $target = $this->tagHandler->prepareQuery($segment->getTargetEdit(), false);
 
         $successful = $this->api->update($source, $target, $segment, $fileName, $tmName, !$this->isInternalFuzzy);
@@ -837,7 +838,10 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
      * Download and save the existing tm with "fuzzy" name. The new fuzzy connector will be returned.
      * @param int $analysisId
      * @return editor_Services_Connector_Abstract
+     * @throws ReflectionException
+     * @throws Zend_Exception
      * @throws ZfExtended_NotFoundException
+     * @throws editor_Services_Exceptions_NoService
      */
     public function initForFuzzyAnalysis($analysisId)
     {
@@ -1752,7 +1756,9 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
         // Also replace tab symbols to space because t5memory does it on its side
         $targetSent = str_replace("\t", ' ', $targetSent);
         // Finally compare target that we've sent for saving with the one we retrieved from TM, they should be the same
-        $targetIsTheSame = $targetReceived === $targetSent;
+        // htmlentities() is used because sometimes t5memory returns target with decoded
+        // html entities regardless of the original target
+        $targetIsTheSame = $targetReceived === $targetSent || htmlentities($targetReceived) === $targetSent;
 
         $resultTimestamp = $result->getMetaValue($maxMatchRateResult->metaData, 'timestamp');
         $resultDate = DatetimeImmutable::createFromFormat('Y-m-d H:i:s T', $resultTimestamp);

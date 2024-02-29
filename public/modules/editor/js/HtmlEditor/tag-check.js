@@ -156,32 +156,21 @@ class TagCheck {
     }
 
     getReferenceTagAtIndex(type, index) {
-        return this.referenceTags[type][index] !== undefined ? this.referenceTags[type][index] : null;
+        return this.referenceTags[type].find(
+            t => parseInt(t.data.nr.replace('locked', '')) === parseInt(index)
+        ) || null;
     }
 
-    // Since tags ordering is not always in order, we need to check the next tag
-    getReferenceTagAtIndexOrNext(type, index) {
-        for (let i = index; i <= index + 10; i++) {
-            let tag = this.getReferenceTagAtIndex(type, i);
-
-            if (tag) {
-                return tag;
-            }
-        }
-
-        return null;
+    getOpeningReferenceTagAtIndex(index) {
+        return this.getReferenceTagAtIndex('open', index);
     }
 
-    getOpeningReferenceTagAtIndexOrNext(index) {
-        return this.getReferenceTagAtIndexOrNext('open', index);
+    getClosingReferenceTagAtIndex(index) {
+        return this.getReferenceTagAtIndex('close', index);
     }
 
-    getClosingReferenceTagAtIndexOrNext(index) {
-        return this.getReferenceTagAtIndexOrNext('close', index);
-    }
-
-    getSingleReferenceTagAtIndexOrNext(index) {
-        return this.getReferenceTagAtIndexOrNext('single', index);
+    getSingleReferenceTagAtIndex(index) {
+        return this.getReferenceTagAtIndex('single', index);
     }
 
     getWhitespaceReferenceTagAtIndex(index) {
