@@ -60,12 +60,12 @@ use ZfExtended_Models_Entity_NotFoundException;
 /**
  * Indicates current state of rules for language
  *
- * @method string getLanguageId()
- * @method void setLanguageId(int $languageId)
- * @method string getInputHash()
- * @method void setInputHash(string $hash)
- * @method string getOutputHash()
- * @method void setOutputHash(string $hash)
+ * @method string getSourceLanguageId()
+ * @method void setSourceLanguageId(int $languageId)
+ * @method string getTargetLanguageId()
+ * @method void setTargetLanguageId(int $languageId)
+ * @method string getHash()
+ * @method void setHash(string $hash)
  */
 class LanguageRulesHash extends ZfExtended_Models_Entity_Abstract
 {
@@ -74,14 +74,14 @@ class LanguageRulesHash extends ZfExtended_Models_Entity_Abstract
     /**
      * @throws ZfExtended_Models_Entity_NotFoundException
      */
-    public function loadByLanguageId(int $langId): ?Zend_Db_Table_Row_Abstract
+    public function loadByLanguages(int $sourceLanguageId, int $targetLangId): ?Zend_Db_Table_Row_Abstract
     {
         $s = $this->db->select();
-        $s->where('languageId = ?', $langId);
+        $s->where('sourceLanguageId = ?', $sourceLanguageId)->where('targetLanguageId = ?', $targetLangId);
 
         $this->row = $this->db->fetchRow($s);
         if (empty($this->row)){
-            $this->notFound("#by languageId", $langId);
+            $this->notFound("#by sourceLanguageId, targetLangId", "{$sourceLanguageId}, {$targetLangId}");
         }
 
         return $this->row;

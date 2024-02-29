@@ -57,7 +57,7 @@ namespace MittagQI\Translate5\ContentProtection\Model;
  * @property-read string $name
  * @property-read string $regex
  * @property-read int $matchId
- * @property-read string|null $format
+ * @property-read ?string $format
  * @property-read bool $keepAsIs
  * @property-read int $priority
  */
@@ -71,6 +71,7 @@ class ContentProtectionDto
         public ?string $format,
         public bool $keepAsIs,
         public ?string $outputFormat,
+        public int $priority,
     ) {}
 
     public static function fromRow(array $row): self
@@ -83,6 +84,7 @@ class ContentProtectionDto
             $row['format'],
             (bool) $row['keepAsIs'],
             $row['outputFormat'],
+            (int) $row['priority'],
         );
     }
 }

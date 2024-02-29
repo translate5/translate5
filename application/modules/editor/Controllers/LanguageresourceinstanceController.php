@@ -26,15 +26,11 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-use editor_Models_Segment_Whitespace as Whitespace;
-use MittagQI\Translate5\ContentProtection\ContentProtector;
-use MittagQI\Translate5\ContentProtection\Model\ContentProtectionRepository;
 use MittagQI\Translate5\ContentProtection\T5memory\TmConversionService;
 use MittagQI\Translate5\LanguageResource\CleanupAssociation\Customer;
 use MittagQI\Translate5\LanguageResource\TaskAssociation;
 use MittagQI\Translate5\LanguageResource\TaskPivotAssociation;
 use MittagQI\Translate5\LanguageResource\Status as LanguageResourceStatus;
-use MittagQI\Translate5\Repository\LanguageRepository;
 use MittagQI\Translate5\Task\Current\NoAccessException;
 use MittagQI\Translate5\Task\Import\TaskDefaults;
 use MittagQI\Translate5\Task\TaskContextTrait;
@@ -144,11 +140,7 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         $languages = $languages->loadResourceIdsGrouped();
         $translate = ZfExtended_Zendoverwrites_Translate::getInstance();
 
-        $tmConversionService = new TmConversionService(
-            new ContentProtectionRepository(),
-            ContentProtector::create(ZfExtended_Factory::get(Whitespace::class)),
-            new LanguageRepository()
-        );
+        $tmConversionService = TmConversionService::create();
 
         $filterTmNeedsConversion = $this->getParam('filterTmNeedsConversion', false);
 
@@ -218,11 +210,7 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
     public function defaulttmneedsconversionAction(): void
     {
         $postData = $this->getAllParams();
-        $tmConversionService = new TmConversionService(
-            new ContentProtectionRepository(),
-            ContentProtector::create(ZfExtended_Factory::get(Whitespace::class)),
-            new LanguageRepository()
-        );
+        $tmConversionService = TmConversionService::create();
 
         $customerAssoc = ZfExtended_Factory::get(editor_Models_LanguageResources_CustomerAssoc::class);
 
@@ -248,11 +236,7 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
     public function synchronizetmAction(): void
     {
         $postData = $this->getAllParams();
-        $tmConversionService = new TmConversionService(
-            new ContentProtectionRepository(),
-            ContentProtector::create(ZfExtended_Factory::get(Whitespace::class)),
-            new LanguageRepository()
-        );
+        $tmConversionService = TmConversionService::create();
 
         $this->view->success = true;
 
@@ -269,11 +253,7 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
     public function synchronizetmbatchAction(): void
     {
         $postData = $this->getAllParams();
-        $tmConversionService = new TmConversionService(
-            new ContentProtectionRepository(),
-            ContentProtector::create(ZfExtended_Factory::get(Whitespace::class)),
-            new LanguageRepository()
-        );
+        $tmConversionService = TmConversionService::create();
 
         $this->view->success = true;
 
@@ -855,13 +835,7 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         }
 
         if (editor_Services_Manager::SERVICE_OPENTM2 === $this->entity->getServiceType()) {
-            $tmConversionService = new TmConversionService(
-                new ContentProtectionRepository(),
-                ContentProtector::create(ZfExtended_Factory::get(Whitespace::class)),
-                new LanguageRepository()
-            );
-
-            $tmConversionService->createRuleHashes($this->entity->getId(), $sourceLangId, $targetLangId);
+            TmConversionService::create()->setRulesHash($this->entity, $sourceLangId, $targetLangId);
         }
 
         $this->view->rows = $this->entity->getDataObject();
@@ -1434,11 +1408,7 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
             $result=$this->markDiff($segment, $result,$connector);
         }
 
-        $tmConversionService = new TmConversionService(
-            new ContentProtectionRepository(),
-            ContentProtector::create(ZfExtended_Factory::get(editor_Models_Segment_Whitespace::class)),
-            new LanguageRepository()
-        );
+        $tmConversionService = TmConversionService::create();
 
         $this->view->segmentId = $segment->getId(); //return the segmentId back, just for reference
         $this->view->languageResourceId = $this->entity->getId();

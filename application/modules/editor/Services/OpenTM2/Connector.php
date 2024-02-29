@@ -26,18 +26,13 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-use editor_Models_Segment_Whitespace as Whitespace;
 use editor_Models_Task as Task;
-use MittagQI\Translate5\ContentProtection\ContentProtector;
-use MittagQI\Translate5\ContentProtection\Model\ContentProtectionRepository;
 use MittagQI\Translate5\ContentProtection\T5memory\T5NTagSchemaFixFilter;
 use MittagQI\Translate5\ContentProtection\T5memory\TmConversionService;
-use MittagQI\Translate5\ContentProtection\WhitespaceProtector;
 use MittagQI\Translate5\LanguageResource\Adapter\Exception\RescheduleUpdateNeededException;
 use MittagQI\Translate5\LanguageResource\Adapter\UpdatableAdapterInterface;
 use MittagQI\Translate5\LanguageResource\Status as LanguageResourceStatus;
 use editor_Models_LanguageResources_LanguageResource as LanguageResource;
-use MittagQI\Translate5\Repository\LanguageRepository;
 
 /**
  * T5memory / OpenTM2 Connector
@@ -78,7 +73,6 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
     private ?editor_Services_OpenTM2_HttpApi $parentApi = null;
 
     private TmConversionService $conversionService;
-    private ContentProtector $contentProtector;
 
     public function __construct()
     {
@@ -87,15 +81,9 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
             'E1333' => 'The queried OpenTM2 server has to many open TMs!',
         ]);
 
-        //ZfExtended_Logger::addDuplicatesByMessage('E1314');
         ZfExtended_Logger::addDuplicatesByEcode('E1333', 'E1306', 'E1314');
 
-        $this->contentProtector = ContentProtector::create(ZfExtended_Factory::get(Whitespace::class));
-        $this->conversionService = new TmConversionService(
-            new ContentProtectionRepository(),
-            $this->contentProtector,
-            new LanguageRepository()
-        );
+        $this->conversionService = TmConversionService::create();
 
         parent::__construct();
     }

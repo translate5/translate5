@@ -30,16 +30,11 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\ContentProtection\T5memory;
 
-use editor_Models_Segment_Whitespace as Whitespace;
 use editor_Models_LanguageResources_LanguageResource as LanguageResource;
 use editor_Services_Manager;
 use editor_Services_OpenTM2_Connector as Connector;
-use MittagQI\Translate5\ContentProtection\ContentProtector;
-use MittagQI\Translate5\ContentProtection\Model\ContentProtectionRepository;
-use MittagQI\Translate5\ContentProtection\Model\LanguageResourceRulesHash;
 use MittagQI\Translate5\ContentProtection\Model\LanguageRulesHash;
 use MittagQI\Translate5\LanguageResource\Status;
-use MittagQI\Translate5\Repository\LanguageRepository;
 use ZfExtended_Factory;
 use ZfExtended_Worker_Abstract;
 
@@ -48,18 +43,13 @@ class ConverseMemoryWorker extends ZfExtended_Worker_Abstract
     private int $languageResourceId;
     private LanguageResource $languageResource;
     private array $memoriesBackup;
-    private LanguageResourceRulesHash $languageResourceRulesHash;
+    private TmConversionService $tmConversionService;
 
     public function __construct()
     {
         parent::__construct();
-        $this->log = \Zend_Registry::get('logger')
-            ->cloneMe('editor.content-protection.opentm2.conversion');
-        $this->tmConversionService = new TmConversionService(
-            new ContentProtectionRepository(),
-            ContentProtector::create(ZfExtended_Factory::get(Whitespace::class)),
-            new LanguageRepository()
-        );
+        $this->log = \Zend_Registry::get('logger')->cloneMe('editor.content-protection.opentm2.conversion');
+        $this->tmConversionService = TmConversionService::create();
     }
 
     private function restoreLangResourceMemories(): void
@@ -77,20 +67,18 @@ class ConverseMemoryWorker extends ZfExtended_Worker_Abstract
         $this->languageResourceId = (int) $parameters['languageResourceId'];
 
         $this->languageResource = ZfExtended_Factory::get(LanguageResource::class);
-        $this->languageResource->load($this->languageResourceId);
+
+        try {
+            $this->languageResource->load($this->languageResourceId);
+        } catch (\ZfExtended_Models_Entity_NotFoundException) {
+            return false;
+        }
 
         if (editor_Services_Manager::SERVICE_OPENTM2 !== $this->languageResource->getServiceType()) {
             return false;
         }
 
         $this->memoriesBackup = $this->languageResource->getSpecificData('memories', parseAsArray: true) ?? [];
-
-        $this->languageResourceRulesHash = ZfExtended_Factory::get(LanguageResourceRulesHash::class);
-        try {
-            $this->languageResourceRulesHash->loadByLanguageResourceId($this->languageResourceId);
-        } catch (\ZfExtended_Models_Entity_NotFoundException) {
-            $this->languageResourceRulesHash->init(['languageResourceId' => $this->languageResourceId]);
-        }
 
         return true;
     }
@@ -196,16 +184,10 @@ class ConverseMemoryWorker extends ZfExtended_Worker_Abstract
             }
         }
 
-        // Language Resource was possibly changed in $onMemoryDeleted call
-        $this->languageResource->save();
-
         $languageRulesHash = ZfExtended_Factory::get(LanguageRulesHash::class);
+        $languageRulesHash->loadByLanguages($sourceLang, $targetLang);
 
-        $languageRulesHash->loadByLanguageId($sourceLang);
-        $this->languageResourceRulesHash->setInputHash($languageRulesHash->getInputHash());
-
-        $languageRulesHash->loadByLanguageId($targetLang);
-        $this->languageResourceRulesHash->setOutputHash($languageRulesHash->getOutputHash());
+        $this->languageResource->addSpecificData(LanguageResource::PROTECTION_HASH, $languageRulesHash->getHash());
 
         $this->resetConversionStarted();
 
@@ -214,7 +196,7 @@ class ConverseMemoryWorker extends ZfExtended_Worker_Abstract
 
     private function resetConversionStarted(): void
     {
-        $this->languageResourceRulesHash->setConversionStarted(null);
-        $this->languageResourceRulesHash->save();
+        $this->languageResource->addSpecificData(LanguageResource::PROTECTION_CONVERSION_STARTED, null);
+        $this->languageResource->save();
     }
 }
