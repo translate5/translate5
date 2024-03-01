@@ -631,8 +631,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
         editor_Models_LanguageResources_Resource $resource,
         LanguageResource $languageResource = null,
         ?string $tmName = null
-    ): string
-    {
+    ): string {
         $this->lastStatusInfo = '';
 
         // is may injected with the call
@@ -650,9 +649,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
         }
 
         // let's check the internal state before calling API for status as import worker might not have run yet
-        if (!$this->hasMemories($this->languageResource)
-            && $this->languageResource->getStatus() === LanguageResourceStatus::IMPORT
-        ) {
+        if ($this->languageResource->getStatus() === LanguageResourceStatus::IMPORT) {
             return LanguageResourceStatus::IMPORT;
         }
 
@@ -1439,7 +1436,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
         }
 
         $this->waitForImportFinish($tmName);
-        $status = $this->getStatus($this->languageResource->getResource(), $this->languageResource, $tmName);
+        $status = $this->getStatus($this->languageResource->getResource(), $this->languageResource, $tmName, true);
 
         $error = $this->api->getError();
         // In case we've got memory overflow error we need to create another memory and import further
@@ -1516,7 +1513,12 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
     private function waitForImportFinish(string $tmName): void
     {
         while (true) {
-            $status = $this->getStatus($this->languageResource->getResource(), $this->languageResource, $tmName);
+            if ($this->api->status($tmName)) {
+                break;
+            }
+
+            $result = $this->api->getResult();
+            $status =  $this->processImportStatus(is_object($result) ? $result : null);
 
             if ($status !== LanguageResourceStatus::IMPORT) {
                 break;

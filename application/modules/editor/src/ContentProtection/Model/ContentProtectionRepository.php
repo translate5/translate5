@@ -130,8 +130,6 @@ class ContentProtectionRepository
             ->order('priority desc')
         ;
 
-        error_log($select->assemble());
-
         if ($useCache) {
             $key = "{$sourceLang->getId()}:{$targetLang->getId()}";
             if (!isset($this->sourceContentProtections[$key])) {
@@ -268,16 +266,6 @@ class ContentProtectionRepository
             if (null === $dto->format) {
                 continue;
             }
-
-            error_log(sprintf(
-                '%s:%s:%s:%s:%s:%s',
-                $dto->regex,
-                $dto->matchId,
-                (int) $dto->keepAsIs,
-                $dto->format,
-                $dto->outputFormat,
-                $dto->priority
-            ));
 
             $inputLines[] = sprintf(
                 '%s:%s:%s:%s:%s:%s',

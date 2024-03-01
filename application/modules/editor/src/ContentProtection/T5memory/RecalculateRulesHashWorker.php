@@ -156,15 +156,12 @@ class RecalculateRulesHashWorker extends ZfExtended_Worker_Abstract
 
     private function recalculateForLangs(int $direction, int $languageId): void
     {
-        error_log('$direction, int $languageId: ' . $direction . ' ' . $languageId);
         $dbInputMapping = ZfExtended_Factory::get(InputMapping::class)->db;
 
         $select = null;
 
         if (self::DIRECTION_INPUT === $direction) {
             $select = $this->getSelectionBase(true)->where('InputMapping.languageId = ?', $languageId);
-
-            error_log('DIRECTION_INPUT' . PHP_EOL . $select->assemble() . PHP_EOL);
 
             foreach ($this->languageRulesHashService->findAllBySourceLang($languageId) as $hash) {
                 $this->updateHashesFor((int)$hash->getSourceLanguageId(), (int)$hash->getTargetLanguageId());
@@ -174,7 +171,6 @@ class RecalculateRulesHashWorker extends ZfExtended_Worker_Abstract
         if (self::DIRECTION_OUTPUT === $direction) {
             $select = $this->getSelectionBase(true)->where('OutputMapping.languageId = ?', $languageId);
 
-            error_log('DIRECTION_INPUT' . PHP_EOL . $select->assemble() . PHP_EOL);
             foreach ($this->languageRulesHashService->findAllByTargetLang($languageId) as $hash) {
                 $this->updateHashesFor((int)$hash->getSourceLanguageId(), (int)$hash->getTargetLanguageId());
             }

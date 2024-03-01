@@ -74,7 +74,6 @@ class DateProtector extends AbstractProtector
 
     public function getFormatedExample(string $format): string
     {
-        error_log($format);
         return (new DateTime())->format($format);
     }
 
