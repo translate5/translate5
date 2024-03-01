@@ -31,7 +31,8 @@ Ext.define('Editor.view.admin.config.Grid', {
     requires: [
         'Editor.view.admin.config.GridViewModel',
         'Editor.view.admin.config.GridViewController',
-        'Editor.view.admin.config.type.SimpleMap'
+        'Editor.view.admin.config.type.SimpleMap',
+        'Editor.view.admin.config.type.FixedMap'
     ],
     controller: 'adminConfigGrid',
     viewModel:{

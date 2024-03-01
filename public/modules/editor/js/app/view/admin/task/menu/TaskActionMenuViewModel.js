@@ -151,23 +151,9 @@ Ext.define('Editor.view.admin.task.menu.TaskActionMenuViewModel', {
         isTranslatorPackageAvailable: {
             get: Editor.util.Util.isTranslatorPackageAvailable,
             bind: '{task}'
-        },
-
-        /***
-         * On task change, reconfigure the export menu
-         * The old menu will be destroyed by the owner component
-         */
-        exportMenuConfig: {
-            get: function(task) {
-                return Ext.widget('adminExportMenu', {
-                    task: task,
-                    fields: (task && task.hasMqm()) ? task.segmentFields() : false
-                });
-            },
-            bind: '{task}'
         }
     },
-    
+
     /***
      * Is the menu action allowed for the user for given task
      */

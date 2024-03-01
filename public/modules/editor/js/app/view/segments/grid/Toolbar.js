@@ -624,7 +624,7 @@ Ext.define('Editor.view.segments.grid.Toolbar', {
                 },{
                     xtype: 'button',
                     //FIXME let me come from a config:
-                    href: 'http://confluence.translate5.net/display/BUS/Editor+keyboard+shortcuts',
+                    href: me.getKeyboardShortcutUrl(),
                     hrefTarget: '_blank',
                     icon: Editor.data.moduleFolder + 'images/help.png',
                     bind: {
@@ -673,5 +673,12 @@ Ext.define('Editor.view.segments.grid.Toolbar', {
         };
 
         return config;
+    },
+
+    getKeyboardShortcutUrl: function(){
+        if(Editor.data.locale === 'en'){
+            return 'https://confluence.translate5.net/x/KIDoHQ';
+        }
+        return 'https://confluence.translate5.net/x/BgCVGQ';
     }
 });
