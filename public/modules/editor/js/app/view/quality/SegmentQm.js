@@ -54,7 +54,7 @@ Ext.define('Editor.view.quality.SegmentQm', {
      * @param {Integer} segmentId for which the qualities should be loaded
      * @param {boolean} isActive: if the component is active
      */
-    startEditing: function(records, segmentId, isActive){
+    createActiveCheckBoxes: function(records, segmentId, isActive){
         if(isActive){
             this.labels = [];
             this.removeAll();
@@ -83,19 +83,12 @@ Ext.define('Editor.view.quality.SegmentQm', {
     startTaskEditing: function(){
         this.createInactiveCheckBoxes();
     },
-    /**
-     * Ends editing, invalidates our checkboxes (by adding new checkboxes without listeners. It was not possible, to remove a listener that was autoconnected to our ViewControler...
-     */
-    endEditing: function(isActive, isSaving){
-        if(isActive){
-            this.removeAll();
-            this.createInactiveCheckBoxes();
-        }
-    },
+
     /**
      * Creates the boxes that represent the QMs in the inactive state
      */
     createInactiveCheckBoxes: function(){
+        this.removeAll();
         Ext.each(Editor.data.segments.qualityFlags, function(item){
             this.add({
                 xtype: 'checkbox',

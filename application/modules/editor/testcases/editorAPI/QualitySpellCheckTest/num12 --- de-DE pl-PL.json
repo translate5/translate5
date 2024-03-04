@@ -1,8 +1,8 @@
 {
     "qid": -1,
     "qtype": "root",
-    "qcount": 34,
-    "qtotal": 34,
+    "qcount": 1,
+    "qtotal": 1,
     "qcategory": null,
     "qcomplete": true,
     "expanded": true,
@@ -71,7 +71,7 @@
         {
             "qid": -1,
             "qtype": "internal",
-            "qcount": 1,
+            "qcount": 0,
             "qcomplete": true,
             "children": [
                 {
@@ -116,12 +116,11 @@
                     "checked": false
                 },
                 {
-                    "qid": "30",
+                    "qid": -1,
                     "qtype": "internal",
-                    "qcount": 1,
+                    "qcount": 0,
                     "qcomplete": true,
                     "qcategory": "whitespace_tags_added",
-                    "qcatidx": "-1",
                     "qcountfp": 0,
                     "text": "Whitespace has been added",
                     "qtooltip": "",
@@ -149,14 +148,14 @@
             "mustBeZeroErrors": true,
             "qcountfp": 0,
             "text": "Internal tags",
-            "qtotal": 1,
-            "expanded": true,
+            "qtotal": 0,
+            "expanded": false,
             "checked": false
         },
         {
             "qid": -1,
             "qtype": "spellcheck",
-            "qcount": 19,
+            "qcount": 1,
             "qcomplete": true,
             "children": [
                 {
@@ -173,12 +172,11 @@
                     "checked": false
                 },
                 {
-                    "qid": "1",
+                    "qid": -1,
                     "qtype": "spellcheck",
-                    "qcount": 19,
+                    "qcount": 0,
                     "qcomplete": true,
                     "qcategory": "misspelling",
-                    "qcatidx": "-1",
                     "qcountfp": 0,
                     "text": "Spelling",
                     "qtooltip": "The text contains a misspelling.",
@@ -282,7 +280,7 @@
                 {
                     "qid": -1,
                     "qtype": "spellcheck",
-                    "qcount": 0,
+                    "qcount": 1,
                     "qcomplete": true,
                     "children": [
                         {
@@ -403,11 +401,12 @@
                             "checked": false
                         },
                         {
-                            "qid": -1,
+                            "qid": "35",
                             "qtype": "spellcheck",
-                            "qcount": 0,
+                            "qcount": 1,
                             "qcomplete": true,
                             "qcategory": "numbers",
+                            "qcatidx": "-1",
                             "qcountfp": 0,
                             "text": "Numbers formatting",
                             "qtooltip": "",
@@ -431,7 +430,7 @@
             "mustBeZeroErrors": false,
             "qcountfp": 0,
             "text": "LanguageTool",
-            "qtotal": 19,
+            "qtotal": 1,
             "expanded": true,
             "checked": false
         },
@@ -861,16 +860,15 @@
         {
             "qid": -1,
             "qtype": "numbers",
-            "qcount": 14,
+            "qcount": 0,
             "qcomplete": true,
             "children": [
                 {
-                    "qid": "20",
+                    "qid": -1,
                     "qtype": "numbers",
-                    "qcount": 3,
+                    "qcount": 0,
                     "qcomplete": true,
                     "qcategory": "num1",
-                    "qcatidx": "-1",
                     "qcountfp": 0,
                     "text": "Numbers source ≠ target",
                     "qtooltip": "",
@@ -879,12 +877,11 @@
                     "checked": false
                 },
                 {
-                    "qid": "31",
+                    "qid": -1,
                     "qtype": "numbers",
-                    "qcount": 1,
+                    "qcount": 0,
                     "qcomplete": true,
                     "qcategory": "num10",
-                    "qcatidx": "-1",
                     "qcountfp": 0,
                     "text": "Format alteration (ordinal numbers, leading zero etc.)",
                     "qtooltip": "",
@@ -893,12 +890,11 @@
                     "checked": false
                 },
                 {
-                    "qid": "33",
+                    "qid": -1,
                     "qtype": "numbers",
-                    "qcount": 1,
+                    "qcount": 0,
                     "qcomplete": true,
                     "qcategory": "num11",
-                    "qcatidx": "-1",
                     "qcountfp": 0,
                     "text": "Different character/formatting for number interval",
                     "qtooltip": "",
@@ -907,12 +903,11 @@
                     "checked": false
                 },
                 {
-                    "qid": "26",
+                    "qid": -1,
                     "qtype": "numbers",
-                    "qcount": 1,
+                    "qcount": 0,
                     "qcomplete": true,
                     "qcategory": "num12",
-                    "qcatidx": "-1",
                     "qcountfp": 0,
                     "text": "1000-separator not allowed",
                     "qtooltip": "",
@@ -934,12 +929,11 @@
                     "checked": false
                 },
                 {
-                    "qid": "21",
+                    "qid": -1,
                     "qtype": "numbers",
-                    "qcount": 1,
+                    "qcount": 0,
                     "qcomplete": true,
                     "qcategory": "num2",
-                    "qcatidx": "-1",
                     "qcountfp": 0,
                     "text": "Alphanumerical character sequences: Differences",
                     "qtooltip": "",
@@ -948,12 +942,11 @@
                     "checked": false
                 },
                 {
-                    "qid": "22",
+                    "qid": -1,
                     "qtype": "numbers",
-                    "qcount": 1,
+                    "qcount": 0,
                     "qcomplete": true,
                     "qcategory": "num3",
-                    "qcatidx": "-1",
                     "qcountfp": 0,
                     "text": "Format alteration (date information etc.)",
                     "qtooltip": "",
@@ -962,12 +955,11 @@
                     "checked": false
                 },
                 {
-                    "qid": "23",
+                    "qid": -1,
                     "qtype": "numbers",
-                    "qcount": 1,
+                    "qcount": 0,
                     "qcomplete": true,
                     "qcategory": "num4",
-                    "qcatidx": "-1",
                     "qcountfp": 0,
                     "text": "Separator(s) not localised",
                     "qtooltip": "",
@@ -976,12 +968,11 @@
                     "checked": false
                 },
                 {
-                    "qid": "24",
+                    "qid": -1,
                     "qtype": "numbers",
-                    "qcount": 2,
+                    "qcount": 0,
                     "qcomplete": true,
                     "qcategory": "num5",
-                    "qcatidx": "-1",
                     "qcountfp": 0,
                     "text": "Formatting of 1000s number altered",
                     "qtooltip": "",
@@ -990,12 +981,11 @@
                     "checked": false
                 },
                 {
-                    "qid": "27",
+                    "qid": -1,
                     "qtype": "numbers",
-                    "qcount": 1,
+                    "qcount": 0,
                     "qcomplete": true,
                     "qcategory": "num6",
-                    "qcatidx": "-1",
                     "qcountfp": 0,
                     "text": "Different minus characters",
                     "qtooltip": "",
@@ -1017,12 +1007,11 @@
                     "checked": false
                 },
                 {
-                    "qid": "28",
+                    "qid": -1,
                     "qtype": "numbers",
-                    "qcount": 1,
+                    "qcount": 0,
                     "qcomplete": true,
                     "qcategory": "num8",
-                    "qcatidx": "-1",
                     "qcountfp": 0,
                     "text": "Numeral from source found as number in target",
                     "qtooltip": "",
@@ -1031,12 +1020,11 @@
                     "checked": false
                 },
                 {
-                    "qid": "29",
+                    "qid": -1,
                     "qtype": "numbers",
-                    "qcount": 1,
+                    "qcount": 0,
                     "qcomplete": true,
                     "qcategory": "num9",
-                    "qcatidx": "-1",
                     "qcountfp": 0,
                     "text": "Number from source found as numeral in target",
                     "qtooltip": "",
@@ -1051,8 +1039,8 @@
             "mustBeZeroErrors": false,
             "qcountfp": 0,
             "text": "Numbers",
-            "qtotal": 14,
-            "expanded": true,
+            "qtotal": 0,
+            "expanded": false,
             "checked": false
         },
         {
