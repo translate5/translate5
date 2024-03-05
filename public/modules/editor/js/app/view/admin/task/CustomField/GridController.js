@@ -469,7 +469,9 @@ Ext.define('Editor.view.admin.task.CustomField.GridController', {
     onSelectionChange: function(selModel, selected) {
 
         // Adjust options available in Mode-combobox based on value in Type-combobox
-        if (selected.length) this.adjustModeChoices();
+        if (selected.length) {
+            this.adjustModeChoices();
+        }
 
         // Check whether selected record's type is combobox and load json comboboxData-prop into comboboxDataGrid's store
         this.setupComboboxData(selected);
