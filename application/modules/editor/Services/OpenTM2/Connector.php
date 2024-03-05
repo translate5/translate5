@@ -226,6 +226,8 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
                     'languageResource' => $this->languageResource
                 ]
             );
+            $this->languageResource->setStatus(LanguageResourceStatus::AVAILABLE);
+            $this->languageResource->save();
 
             return false;
         }

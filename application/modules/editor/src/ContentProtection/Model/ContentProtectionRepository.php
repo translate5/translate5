@@ -185,7 +185,7 @@ class ContentProtectionRepository
                 ['inputMapping' => $dbInputMapping->info($dbInputMapping::NAME)],
                 'inputMapping.languageId IN (' . implode(',', $sourceIds) . ')
                 AND outputMapping.inputContentRecognitionId = inputMapping.contentRecognitionId',
-                []
+                ['priority']
             )
             ->joinLeft(
                 ['inputRecognition' => $contentRecognitionTable],
