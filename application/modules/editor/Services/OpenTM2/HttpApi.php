@@ -408,8 +408,7 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
         string $filename,
         string $tmName,
         bool $save2disk = true
-    ): bool
-    {
+    ): bool {
         $this->error = null;
 
         $http = $this->getHttpWithMemory('POST', $tmName, 'entry');
@@ -423,7 +422,8 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
         $json->author = $segment->getUserName();
         $json->timeStamp = $this->nowDate();
         $json->context = $segment->getMid(); //INFO: this is segment stuff
-        $json->save2disk = $save2disk;
+        // t5memory does not understand boolean parameters, so we have to convert them to 0/1
+        $json->save2disk = $save2disk ? '1' : '0';
 
         $http->setRawData($this->jsonEncode($json), 'application/json; charset=utf-8');
 
