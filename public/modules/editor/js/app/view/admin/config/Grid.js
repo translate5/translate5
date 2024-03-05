@@ -120,7 +120,7 @@ Ext.define('Editor.view.admin.config.Grid', {
         //publish this field so it is bindable
         extraParams: true
     },
-    
+    border: 0,
     /***
      * allow the store extra params to be configurable on grid level. This will enable flexible loads via binding
      * This function only expects and handles extraParams with valid taskGuid or customerId as parameter.

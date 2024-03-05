@@ -161,9 +161,11 @@ Ext.define('Editor.view.admin.log.Grid', {
                         }
                     }
                 ],
+                border: 0,
                 dockedItems: [{
                     xtype: 'toolbar',
                     dock: 'top',
+                    border: 0,
                     items: [{
                         xtype: 'button',
                         itemId: 'userPrefReload',

@@ -68,6 +68,7 @@ Ext.define('Editor.view.admin.task.TaskAttributes', {
         disabled:'{!enablePanel}'
     },
     title: '#UT#Eigenschaften',
+    border: 0,
     initConfig: function(instanceConfig) {
         var me = this,
             config,
@@ -93,6 +94,7 @@ Ext.define('Editor.view.admin.task.TaskAttributes', {
                     enableOverflow: true,
                     defaultButtonUI: false,
                     ui: 'footer',
+                    border: '1 0 0 0',
                     items: [
                         {
                             xtype: 'tbfill'
