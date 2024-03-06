@@ -226,9 +226,10 @@ final class PageUrl
 
         } else {
 
-            $this->url = curl_getinfo($ch, CURLINFO_EFFECTIVE_URL);
+            $effectiveUrl = curl_getinfo($ch, CURLINFO_EFFECTIVE_URL);
+            $this->url = ($effectiveUrl === false) ? null : $effectiveUrl;
 
-            if ($this->url === false) {
+            if ($this->url === null) {
 
                 $this->found = false;
 

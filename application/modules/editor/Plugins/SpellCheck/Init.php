@@ -33,6 +33,8 @@ use MittagQI\Translate5\Plugins\SpellCheck\Segment\Check;
 /**
  * Initial Class of Plugin "SpellCheck"
  * Hint: class must be named NOT Bootstrap, otherwise we will get a strange Zend Error
+ *
+ * @method static Service createService(string $serviceName, Zend_Config $config = null)
  */
 class editor_Plugins_SpellCheck_Init extends ZfExtended_Plugin_Abstract {
     protected static string $description = 'Provides the languagetool spell-checker.';

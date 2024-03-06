@@ -34,7 +34,7 @@ use editor_Plugins_TermTagger_Exception_Request;
 use editor_Plugins_TermTagger_Exception_TimeOut;
 use Exception;
 use MittagQI\Translate5\Plugins\TermTagger\Service\ServiceData;
-use MittagQI\Translate5\PooledService\ServiceAbstract;
+use MittagQI\Translate5\PooledService\AbstractPooledService;
 use stdClass;
 use Throwable;
 use Zend_Http_Client;
@@ -50,7 +50,7 @@ use ZfExtended_Zendoverwrites_Http_Exception_TimeOut;
 /**
  * Service Class of Plugin "TermTagger"
  */
-final class Service extends ServiceAbstract {
+final class Service extends AbstractPooledService {
 
     const SERVICE_ID = 'termtagger';
     /**
