@@ -325,12 +325,12 @@ class editor_Models_Import_FileParser_Csv extends editor_Models_Import_FileParse
         }
 
         [$source, $target] = $this->contentProtector->filterTags(
-            $this->segmentData[editor_Models_SegmentField::TYPE_SOURCE],
-            $this->segmentData[editor_Models_SegmentField::TYPE_TARGET]
+            $this->segmentData[editor_Models_SegmentField::TYPE_SOURCE]['original'],
+            $this->segmentData[editor_Models_SegmentField::TYPE_TARGET]['original']
         );
 
-        $this->segmentData[editor_Models_SegmentField::TYPE_SOURCE] = $this->convertSegmentToInternalTags($source);
-        $this->segmentData[editor_Models_SegmentField::TYPE_TARGET] = $this->convertSegmentToInternalTags($target);
+        $this->segmentData[editor_Models_SegmentField::TYPE_SOURCE]['original'] = $this->convertSegmentToInternalTags($source);
+        $this->segmentData[editor_Models_SegmentField::TYPE_TARGET]['original'] = $this->convertSegmentToInternalTags($target);
 
         //just create a segment attributes object with default values
         $this->createSegmentAttributes($this->_mid);
