@@ -75,6 +75,7 @@ class Check {
     const TERMINOLOGY             = 'terminology';
     const INTERNATIONALIZATION    = 'internationalization';
     const NON_CONFORMANCE         = 'non-conformance';
+    const NUMBERS                 = 'numbers';
 
     // Remaining error types
     const GRAMMAR         = 'grammar';
@@ -105,6 +106,7 @@ class Check {
         self::TERMINOLOGY             => self::CSS_GROUP_STYLE,
         self::INTERNATIONALIZATION    => self::CSS_GROUP_STYLE,
         self::NON_CONFORMANCE         => self::CSS_GROUP_STYLE,
+        self::NUMBERS                 => self::CSS_GROUP_STYLE,
 
         // Remaining
         self::GRAMMAR       => self::CSS_GRAMMAR,
@@ -131,6 +133,7 @@ class Check {
         'terminology'             => self::TERMINOLOGY,
         'internationalization'    => self::INTERNATIONALIZATION,
         'non-conformance'         => self::NON_CONFORMANCE,
+        'numbers'                 => self::NUMBERS,
 
         // Remaining error types
         'grammar'                 => self::GRAMMAR,

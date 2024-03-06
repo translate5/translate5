@@ -122,7 +122,7 @@ Ext.define('Editor.view.admin.task.TaskAttributes', {
                                 click:'onSaveTaskAttributesClick'
                             },
                             text: me.strings.btnSave
-                        },
+                        }
                     ]
                 }
             ]
@@ -204,8 +204,12 @@ Ext.define('Editor.view.admin.task.TaskAttributes', {
         }));
         
         me.setUsageModeConfig(items);
-        
-        return items;
+
+        return items.concat(
+            Editor.controller.admin.TaskCustomField.getFormFieldsFor(
+                'projectWizard',
+                true
+            ));
     },
     applyIfNotAllowed: function(baseItem, right, overwrite) {
         if(Editor.app.authenticatedUser.isAllowed(right)) {

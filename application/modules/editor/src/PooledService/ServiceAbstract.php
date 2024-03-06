@@ -210,7 +210,8 @@ abstract class ServiceAbstract extends DockerServiceAbstract
                 }
             }
         }
-        return $checked;
+
+        return $checked && $this->checkFoundVersions();
     }
 
     /**

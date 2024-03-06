@@ -110,18 +110,33 @@ Ext.define('Editor.controller.admin.TaskCustomField', {
             //
             return columns;
         },
-        getFormFieldsFor: function(formType) {
-            var locale = Editor.data.locale, config, fields = [];
+
+        /**
+         * Get item configs for the custom fields and render them in the defined place. If formType is 'projectWizard'
+         *  and editMode is true, the fields are rendered in task properties panel.
+         * @param formType
+         * @param editMode
+         * @returns {*[]}
+         */
+        getFormFieldsFor: function(formType, editMode) {
+            var locale = Editor.data.locale,
+                config,
+                fields = [];
 
             // Foreach custom field
             Editor.data.editor.task.customFields.forEach(field => {
 
                 // If field should not be shown in current formType - skip
-                if (!field.placesToShow.match(formType)) return;
+                if (!field.placesToShow.match(formType))
+                {
+                    return;
+                }
 
                 // If field should be shown in project wizard, but it's
                 // a readonly-field - skip, as it does not have any value at this step
-                if (formType === 'projectWizard' && field.mode === 'readonly') return;
+                if (formType === 'projectWizard' && field.mode === 'readonly'){
+                    return;
+                }
 
                 // Get labels and tooltips
                 var labelL10n = Ext.JSON.decode(field.label, true) || {};
@@ -139,6 +154,10 @@ Ext.define('Editor.controller.admin.TaskCustomField', {
                     allowBlank: field.type === 'checkbox' || field.mode !== 'required',
                     isCustom  : true
                 };
+
+                if(editMode){
+                    config.bind = '{currentTask.customField' + field.id+'}';
+                }
 
                 // If it's a checkbox
                 if (field.type === 'checkbox') {

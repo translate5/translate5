@@ -106,7 +106,8 @@ abstract class AbstractExternalService extends AbstractHttpService
                 }
             }
         }
-        return $checked;
+
+        return $checked && $this->checkFoundVersions();
     }
 
     public function checkUrl(string $url): bool

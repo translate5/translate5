@@ -15,6 +15,69 @@ All updates are (downwards) compatible! If not this is listed in the important r
 
 
 
+
+## [7.2.0] - 2024-03-04
+
+### Important Notes:
+#### [TRANSLATE-3780](https://jira.translate5.net/browse/TRANSLATE-3780)
+In addition to changing the default instance level value to disabled for the "runtimeOptions.editor.frontend.reviewTask.useSourceForReference" config, also the customer specific overwrites for this config will be set to disabled.
+
+#### [TRANSLATE-3554](https://jira.translate5.net/browse/TRANSLATE-3554)
+The visual enhancements works only with the latest visualconverter image (translate5/visualconverter:0.6). Using an older converter will lead to constant failure!
+ 
+
+
+### Changed
+**[TRANSLATE-3764](https://jira.translate5.net/browse/TRANSLATE-3764): InstantTranslate - make runtimeOptions.InstantTranslate.user.defaultLanguages possible in UI** <br>
+Default selected languages for instant translate are configurable.
+
+**[TRANSLATE-3759](https://jira.translate5.net/browse/TRANSLATE-3759): ConnectWorldserver - Failing Test MittagQI\Translate5\Plugins\ConnectWorldserver\tests\ExternalOnlineReviewTest::testCreateTaskFromWorldserverTestdata** <br>
+Bugfix failing test
+
+**[TRANSLATE-3757](https://jira.translate5.net/browse/TRANSLATE-3757): Editor general - New documentation links** <br>
+Add new documentation links.
+
+**[TRANSLATE-3554](https://jira.translate5.net/browse/TRANSLATE-3554): VisualReview / VisualTranslation - Enhancements for visual as ordered by translate5 Consortium** <br>
+Visual: Improved the Text-Reflow of the WYSIWYG Visual (right frame) to:
+* detect sequences of text as justified, right/left aligned and centered paragraphs
+* avoid lost segments due to changed text-order
+* improve detection & rendering of lists
+* avoid overlapping elements in the frontend
+* improve handling of superflous whitespace from the segments
+
+
+### Bugfixes
+**[TRANSLATE-3780](https://jira.translate5.net/browse/TRANSLATE-3780): Trados integration - Change default of runtimeOptions.editor.frontend.reviewTask.useSourceForReference back to "Disabled"** <br>
+Revoke the default value for the "runtimeOptions.editor.frontend.reviewTask.useSourceForReference" config back to disabled.
+
+**[TRANSLATE-3773](https://jira.translate5.net/browse/TRANSLATE-3773): Editor general - Task action menu error** <br>
+Fix for UI error where the task action menu was not up to date with the task.
+
+**[TRANSLATE-3767](https://jira.translate5.net/browse/TRANSLATE-3767): Editor general - UI error when Tag-Checking** <br>
+Fix improper use of ExtJS-API
+
+**[TRANSLATE-3762](https://jira.translate5.net/browse/TRANSLATE-3762): Task Management - RootCause: Cannot read properties of null (reading 'items')** <br>
+FIXED: error popping on frequent subsequent clicks on task menu icon
+
+**[TRANSLATE-3755](https://jira.translate5.net/browse/TRANSLATE-3755): Main back-end mechanisms (Worker, Logging, etc.) - PHP E_ERROR: Uncaught TypeError: gzdeflate(): Argument #1 ($data) must be of type string, bool given** <br>
+FIXED: if error happens on json-encoding events to be logged - is now POSTed to logger instead
+
+**[TRANSLATE-3754](https://jira.translate5.net/browse/TRANSLATE-3754): LanguageResources - Fix tag handling in taking over matches from matchresource panel** <br>
+When taking over matches from the matchpanel tag order of the source is applied to the target.
+
+**[TRANSLATE-3751](https://jira.translate5.net/browse/TRANSLATE-3751): Editor general - Reduce log level for not found errors** <br>
+Reduce log level of multiple errors.
+
+**[TRANSLATE-3745](https://jira.translate5.net/browse/TRANSLATE-3745): t5memory - Querying segments with flipped tags between source and target does not work** <br>
+When dealing with segments where the tag order has changed between source and target, the order of tags was saved wrong and restored wrong from t5memory when re-using such a segment. 
+
+**[TRANSLATE-3735](https://jira.translate5.net/browse/TRANSLATE-3735): Editor general - Manual QA complete segment not editable, if segment is opened for editing** <br>
+FIXED: Manual QA was disabled when segment opened
+
+**[TRANSLATE-3697](https://jira.translate5.net/browse/TRANSLATE-3697): InstantTranslate - Missing whitespaces in InstantTranslate** <br>
+Fix wrong newline conversion
+
+
 ## [7.1.4] - 2024-02-23
 
 ### Important Notes:
