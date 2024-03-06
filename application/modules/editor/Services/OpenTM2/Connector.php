@@ -26,18 +26,13 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-use editor_Models_Segment_Whitespace as Whitespace;
 use editor_Models_Task as Task;
-use MittagQI\Translate5\ContentProtection\ContentProtector;
-use MittagQI\Translate5\ContentProtection\Model\ContentProtectionRepository;
 use MittagQI\Translate5\ContentProtection\T5memory\T5NTagSchemaFixFilter;
 use MittagQI\Translate5\ContentProtection\T5memory\TmConversionService;
-use MittagQI\Translate5\ContentProtection\WhitespaceProtector;
 use MittagQI\Translate5\LanguageResource\Adapter\Exception\RescheduleUpdateNeededException;
 use MittagQI\Translate5\LanguageResource\Adapter\UpdatableAdapterInterface;
 use MittagQI\Translate5\LanguageResource\Status as LanguageResourceStatus;
 use editor_Models_LanguageResources_LanguageResource as LanguageResource;
-use MittagQI\Translate5\Repository\LanguageRepository;
 
 /**
  * T5memory / OpenTM2 Connector
@@ -78,7 +73,6 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
     private ?editor_Services_OpenTM2_HttpApi $parentApi = null;
 
     private TmConversionService $conversionService;
-    private ContentProtector $contentProtector;
 
     public function __construct()
     {
@@ -87,15 +81,9 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
             'E1333' => 'The queried OpenTM2 server has to many open TMs!',
         ]);
 
-        //ZfExtended_Logger::addDuplicatesByMessage('E1314');
         ZfExtended_Logger::addDuplicatesByEcode('E1333', 'E1306', 'E1314');
 
-        $this->contentProtector = ContentProtector::create(ZfExtended_Factory::get(Whitespace::class));
-        $this->conversionService = new TmConversionService(
-            new ContentProtectionRepository(),
-            $this->contentProtector,
-            new LanguageRepository()
-        );
+        $this->conversionService = TmConversionService::create();
 
         parent::__construct();
     }
@@ -238,6 +226,8 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
                     'languageResource' => $this->languageResource
                 ]
             );
+            $this->languageResource->setStatus(LanguageResourceStatus::AVAILABLE);
+            $this->languageResource->save();
 
             return false;
         }
@@ -310,6 +300,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
 
         $fileName = $this->getFileName($segment);
         $source = $this->tagHandler->prepareQuery($this->getQueryString($segment));
+        $this->tagHandler->setInputTagMap($this->tagHandler->getTagMap());
         $target = $this->tagHandler->prepareQuery($segment->getTargetEdit(), false);
 
         $successful = $this->api->update($source, $target, $segment, $fileName, $tmName, !$this->isInternalFuzzy);
@@ -642,8 +633,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
         editor_Models_LanguageResources_Resource $resource,
         LanguageResource $languageResource = null,
         ?string $tmName = null
-    ): string
-    {
+    ): string {
         $this->lastStatusInfo = '';
 
         // is may injected with the call
@@ -661,9 +651,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
         }
 
         // let's check the internal state before calling API for status as import worker might not have run yet
-        if (!$this->hasMemories($this->languageResource)
-            && $this->languageResource->getStatus() === LanguageResourceStatus::IMPORT
-        ) {
+        if ($this->languageResource->getStatus() === LanguageResourceStatus::IMPORT) {
             return LanguageResourceStatus::IMPORT;
         }
 
@@ -849,7 +837,10 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
      * Download and save the existing tm with "fuzzy" name. The new fuzzy connector will be returned.
      * @param int $analysisId
      * @return editor_Services_Connector_Abstract
+     * @throws ReflectionException
+     * @throws Zend_Exception
      * @throws ZfExtended_NotFoundException
+     * @throws editor_Services_Exceptions_NoService
      */
     public function initForFuzzyAnalysis($analysisId)
     {
@@ -1447,7 +1438,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
         }
 
         $this->waitForImportFinish($tmName);
-        $status = $this->getStatus($this->languageResource->getResource(), $this->languageResource, $tmName);
+        $status = $this->getStatus($this->languageResource->getResource(), $this->languageResource, $tmName, true);
 
         $error = $this->api->getError();
         // In case we've got memory overflow error we need to create another memory and import further
@@ -1524,7 +1515,12 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
     private function waitForImportFinish(string $tmName): void
     {
         while (true) {
-            $status = $this->getStatus($this->languageResource->getResource(), $this->languageResource, $tmName);
+            if ($this->api->status($tmName)) {
+                break;
+            }
+
+            $result = $this->api->getResult();
+            $status =  $this->processImportStatus(is_object($result) ? $result : null);
 
             if ($status !== LanguageResourceStatus::IMPORT) {
                 break;
@@ -1764,7 +1760,9 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
         // Also replace tab symbols to space because t5memory does it on its side
         $targetSent = str_replace("\t", ' ', $targetSent);
         // Finally compare target that we've sent for saving with the one we retrieved from TM, they should be the same
-        $targetIsTheSame = $targetReceived === $targetSent;
+        // htmlentities() is used because sometimes t5memory returns target with decoded
+        // html entities regardless of the original target
+        $targetIsTheSame = $targetReceived === $targetSent || htmlentities($targetReceived) === $targetSent;
 
         $resultTimestamp = $result->getMetaValue($maxMatchRateResult->metaData, 'timestamp');
         $resultDate = DatetimeImmutable::createFromFormat('Y-m-d H:i:s T', $resultTimestamp);

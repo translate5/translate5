@@ -30,13 +30,14 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\ContentProtection\T5memory;
 
-use editor_Models_Languages;
 use MittagQI\Translate5\ContentProtection\Model\ContentProtectionRepository;
+use MittagQI\Translate5\ContentProtection\Model\ContentRecognition;
 use MittagQI\Translate5\ContentProtection\Model\InputMapping;
-use MittagQI\Translate5\ContentProtection\Model\LanguageRulesHash;
+use MittagQI\Translate5\ContentProtection\Model\LanguageRulesHashService;
 use MittagQI\Translate5\ContentProtection\Model\OutputMapping;
+use MittagQI\Translate5\Repository\LanguageRepository;
+use Zend_Db_Table_Select;
 use ZfExtended_Factory;
-use ZfExtended_Models_Entity_NotFoundException;
 use ZfExtended_Worker_Abstract;
 
 /**
@@ -45,19 +46,26 @@ use ZfExtended_Worker_Abstract;
  */
 class RecalculateRulesHashWorker extends ZfExtended_Worker_Abstract
 {
-    public const DIRECTION_BOTH = 0;
-    public const DIRECTION_INPUT = 1;
-    public const DIRECTION_OUTPUT = 2;
+    public const DIRECTION_INPUT = 0;
+    public const DIRECTION_OUTPUT = 1;
 
     private ?int $recognitionId = null;
-    private int $languageId = 0;
-    private int $direction = self::DIRECTION_BOTH;
-    private ContentProtectionRepository $repository;
+    private ?int $languageId = null;
+    private int $direction = self::DIRECTION_INPUT;
+    private ContentProtectionRepository $protectionRepository;
+    private LanguageRepository $languageRepository;
+    private LanguageRulesHashService $languageRulesHashService;
+    private array $processedPairs = [];
 
     public function __construct()
     {
         parent::__construct();
-        $this->repository = new ContentProtectionRepository();
+        $this->protectionRepository = new ContentProtectionRepository();
+        $this->languageRepository = new LanguageRepository();
+        $this->languageRulesHashService = new LanguageRulesHashService(
+            $this->protectionRepository,
+            $this->languageRepository
+        );
     }
 
     protected function validateParameters($parameters = [])
@@ -68,17 +76,13 @@ class RecalculateRulesHashWorker extends ZfExtended_Worker_Abstract
 
         if (array_key_exists('recognitionId', $parameters)) {
             $this->recognitionId = (int) $parameters['recognitionId'];
-
-            return true;
         }
 
         if (array_key_exists('languageId', $parameters)) {
             $this->languageId = (int) $parameters['languageId'];
-
-            return true;
         }
 
-        return false;
+        return true;
     }
     
     protected function work()
@@ -89,60 +93,108 @@ class RecalculateRulesHashWorker extends ZfExtended_Worker_Abstract
             return true;
         }
 
-        $this->recalculateForLangs($this->direction, $this->languageId);
+        if (null !== $this->languageId) {
+            $this->recalculateForLangs($this->direction, $this->languageId);
+
+            return true;
+        }
+
+        $dbInputMapping = ZfExtended_Factory::get(InputMapping::class)->db;
+
+        foreach ($dbInputMapping->fetchAll($this->getSelectionBase()) as $pair) {
+            $this->updateHashesFor((int)$pair->sourceLang, (int)$pair->targetLang);
+        }
 
         return true;
     }
 
     private function recalculateForRecognition(int $recognitionId): void
     {
-        $dbMapping = ZfExtended_Factory::get(InputMapping::class)->db;
-        $select = $dbMapping->select()
-            ->from(['mapping' => $dbMapping->info($dbMapping::NAME)], ['distinct(languageId)'])
-            ->where('contentRecognitionId = ?', $recognitionId)
-        ;
+        $dbInputMapping = ZfExtended_Factory::get(InputMapping::class)->db;
 
-        $this->recalculateForLangs(
-            self::DIRECTION_INPUT,
-            ...array_column($dbMapping->fetchAll($select)->toArray(), 'languageId')
-        );
+        $select = $this->getSelectionBase()->where('contentRecognitionId = ?', $recognitionId);
 
-        $dbMapping = ZfExtended_Factory::get(OutputMapping::class)->db;
-        $select = $dbMapping->select()
-            ->from(['mapping' => $dbMapping->info($dbMapping::NAME)], ['distinct(languageId)'])
-            ->where('outputContentRecognitionId = ?', $recognitionId)
-        ;
-
-        $this->recalculateForLangs(
-            self::DIRECTION_OUTPUT,
-            ...array_column($dbMapping->fetchAll($select)->toArray(), 'languageId')
-        );
+        foreach ($dbInputMapping->fetchAll($select) as $pair) {
+            $this->updateHashesFor((int)$pair->sourceLang, (int)$pair->targetLang);
+        }
     }
 
-    private function recalculateForLangs(int $direction, int|string ...$languageIds): void
+    private function getSelectionBase(bool $onlyActiveRules = false): Zend_Db_Table_Select
     {
-        $language = ZfExtended_Factory::get(editor_Models_Languages::class);
-        $languageRulesHash = ZfExtended_Factory::get(LanguageRulesHash::class);
+        $dbInputMapping = ZfExtended_Factory::get(InputMapping::class)->db;
+        $dbOutputMapping = ZfExtended_Factory::get(OutputMapping::class)->db;
+        $dbContentRecognition = ZfExtended_Factory::get(ContentRecognition::class)->db;
+        $contentRecognitionTable = $dbContentRecognition->info($dbContentRecognition::NAME);
 
-        foreach ($languageIds as $languageId) {
-            $language->load($languageId);
+        return $dbInputMapping->select()
+            ->setIntegrityCheck(false)
+            ->from(
+                ['InputMapping' => $dbInputMapping->info($dbInputMapping::NAME)],
+                ['InputMapping.languageId as sourceLang']
+            )
+            ->join(
+                ['inputRecognition' => $contentRecognitionTable],
+                'inputRecognition.id = InputMapping.contentRecognitionId'
+                . ($onlyActiveRules ? ' AND inputRecognition.enabled = true' : ''),
+                []
+            )
+            ->join(
+                ['OutputMapping' => $dbOutputMapping->info($dbOutputMapping::NAME)],
+                'InputMapping.contentRecognitionId = OutputMapping.inputContentRecognitionId',
+                ['OutputMapping.languageId as targetLang']
+            )
+            ->join(
+                ['outputRecognition' => $contentRecognitionTable],
+                'outputRecognition.id = OutputMapping.outputContentRecognitionId'
+                . ($onlyActiveRules ? ' AND inputRecognition.enabled = true' : ''),
+                []
+            )
+            ->where('InputMapping.languageId != OutputMapping.languageId')
+            ->group(['sourceLang', 'targetLang'])
+        ;
+    }
 
-            try {
-                $languageRulesHash->loadByLanguageId((int) $languageId);
-            } catch (ZfExtended_Models_Entity_NotFoundException) {
-                // if not found we simply create new
-                $languageRulesHash->init();
-                $languageRulesHash->setLanguageId((int) $languageId);
+    private function recalculateForLangs(int $direction, int $languageId): void
+    {
+        $dbInputMapping = ZfExtended_Factory::get(InputMapping::class)->db;
+
+        $select = null;
+
+        if (self::DIRECTION_INPUT === $direction) {
+            $select = $this->getSelectionBase(true)->where('InputMapping.languageId = ?', $languageId);
+
+            foreach ($this->languageRulesHashService->findAllBySourceLang($languageId) as $hash) {
+                $this->updateHashesFor((int)$hash->getSourceLanguageId(), (int)$hash->getTargetLanguageId());
             }
-
-            if (in_array($direction, [self::DIRECTION_INPUT, self::DIRECTION_BOTH], true)) {
-                $languageRulesHash->setInputHash($this->repository->getInputRulesHashBy($language));
-            }
-            if (in_array($direction, [self::DIRECTION_OUTPUT, self::DIRECTION_BOTH], true)) {
-                $languageRulesHash->setOutputHash($this->repository->getOutputRulesHashBy($language));
-            }
-
-            $languageRulesHash->save();
         }
+
+        if (self::DIRECTION_OUTPUT === $direction) {
+            $select = $this->getSelectionBase(true)->where('OutputMapping.languageId = ?', $languageId);
+
+            foreach ($this->languageRulesHashService->findAllByTargetLang($languageId) as $hash) {
+                $this->updateHashesFor((int)$hash->getSourceLanguageId(), (int)$hash->getTargetLanguageId());
+            }
+        }
+
+        if (null === $select) {
+            return;
+        }
+
+        foreach ($dbInputMapping->fetchAll($select) as $pair) {
+            $this->updateHashesFor((int)$pair->sourceLang, (int)$pair->targetLang);
+        }
+    }
+
+    private function updateHashesFor(int $sourceLang, int $targetLang): void
+    {
+        $processedKey = $sourceLang . ':' . $targetLang;
+
+        if (isset($this->processedPairs[$processedKey])) {
+            return;
+        }
+
+        $this->processedPairs[$processedKey] = true;
+
+        $this->languageRulesHashService->updateBy($sourceLang, $targetLang);
     }
 }

@@ -76,7 +76,6 @@ abstract class ValidatorWithContext extends ZfExtended_Models_Validator_Abstract
             $messages = [];
 
             foreach ($this->customFieldFilterInstances[$field] as $instance) {
-                error_log(implode(PHP_EOL, $instance->getMessages()));
                 $messages[] = $instance->getMessages();
             }
             $this->messages[$field] = array_merge($this->messages[$field] ?? [], ...$messages);

@@ -774,11 +774,12 @@ https://confluence.translate5.net/display/TAD/EventCodes
 | <a id="E3061"></a>E3061 | Plug-In TextShuttle  | TextShuttle Plug-In: Too long segments.                                                | Currently, segments that are too long for TextShuttle (> 3000 characters) can't be translated. They would need to be split between sentences but there is currently no strategy defined to put the results back together. Only possible solution for now: Split the segments manually before using the plugin. |
 
 #### Plug-In IndiEngine
-| EventCode               | Context            | EventMessage                                                             | Description/Solution                                                                           |
-|:------------------------|:-------------------|:-------------------------------------------------------------------------|:-----------------------------------------------------------------------------------------------|
-| <a id="E1550"></a>E1550 | Plug-In IndiEngine | Logger URL endpoint for posting events is not configured                 | Please set up IndiEngine logger instance URL endpoint in runtimeOptions.plugins.IndiEngine.url |
-| <a id="E1551"></a>E1551 | Plug-In IndiEngine | Curl-error occurred on attempt to POST events: {curl_error}              | Please contact the support.                                                                    |
-| <a id="E1552"></a>E1552 | Plug-In IndiEngine | Logger responded with failure code {code}                                | Please contact the support.                                                                    |
+| EventCode               | Context            | EventMessage                                                                                      | Description/Solution                                                                           |
+|:------------------------|:-------------------|:--------------------------------------------------------------------------------------------------|:-----------------------------------------------------------------------------------------------|
+| <a id="E1550"></a>E1550 | Plug-In IndiEngine | Logger URL endpoint for posting events is not configured                                          | Please set up IndiEngine logger instance URL endpoint in runtimeOptions.plugins.IndiEngine.url |
+| <a id="E1551"></a>E1551 | Plug-In IndiEngine | Curl-error occurred on attempt to POST events: {curl_error}                                       | Please contact the support.                                                                    |
+| <a id="E1552"></a>E1552 | Plug-In IndiEngine | Logger responded with failure code {code}                                                         | Please contact the support.                                                                    |
+| <a id="E1594"></a>E1594 | Plug-In IndiEngine | JSON error with code {json_error_code} occurred on attempt to json_encode events: {json_error_msg}| Please contact the support.                                                                    |
 
 #### Content Protection
 | EventCode               | Context            | EventMessage                                                          | Description/Solution                                                                                                                            |

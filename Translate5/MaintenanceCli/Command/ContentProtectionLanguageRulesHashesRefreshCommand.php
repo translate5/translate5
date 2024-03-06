@@ -27,15 +27,11 @@
  */
 namespace Translate5\MaintenanceCli\Command;
 
-use editor_Models_Languages;
-use MittagQI\Translate5\ContentProtection\Model\ContentProtectionRepository;
-use MittagQI\Translate5\ContentProtection\Model\InputMapping;
-use MittagQI\Translate5\ContentProtection\Model\LanguageRulesHash;
-use MittagQI\Translate5\ContentProtection\Model\OutputMapping;
+use MittagQI\Translate5\ContentProtection\T5memory\RecalculateRulesHashWorker;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use ZfExtended_Factory;
-use ZfExtended_Models_Entity_NotFoundException;
+use ZfExtended_Models_Worker;
 
 class ContentProtectionLanguageRulesHashesRefreshCommand extends Translate5AbstractCommand
 {
@@ -48,56 +44,22 @@ class ContentProtectionLanguageRulesHashesRefreshCommand extends Translate5Abstr
 
         $this->writeTitle('Content protection: Refresh language rules hashes');
 
-        $repository = new ContentProtectionRepository();
+        $worker = ZfExtended_Factory::get(RecalculateRulesHashWorker::class);
 
-        $dbMapping = ZfExtended_Factory::get(InputMapping::class)->db;
-        $select = $dbMapping->select()
-            ->from(['mapping' => $dbMapping->info($dbMapping::NAME)], ['distinct(languageId)'])
-        ;
-
-        $this->recalculateForLangs(
-            true,
-            $repository,
-            array_column($dbMapping->fetchAll($select)->toArray(), 'languageId')
-        );
-
-        $dbMapping = ZfExtended_Factory::get(OutputMapping::class)->db;
-        $select = $dbMapping->select()
-            ->from(['mapping' => $dbMapping->info($dbMapping::NAME)], ['distinct(languageId)'])
-        ;
-
-        $this->recalculateForLangs(
-            false,
-            $repository,
-            array_column($dbMapping->fetchAll($select)->toArray(), 'languageId')
-        );
-
-        return 0;
-    }
-
-    private function recalculateForLangs(bool $input, ContentProtectionRepository $repository, array $languageIds): void
-    {
-        $language = ZfExtended_Factory::get(editor_Models_Languages::class);
-        $languageRulesHash = ZfExtended_Factory::get(LanguageRulesHash::class);
-
-        foreach ($languageIds as $languageId) {
-            $language->load($languageId);
-
-            try {
-                $languageRulesHash->loadByLanguageId((int) $languageId);
-            } catch (ZfExtended_Models_Entity_NotFoundException) {
-                // if not found we simply create new
-                $languageRulesHash->init();
-                $languageRulesHash->setLanguageId((int) $languageId);
-            }
-
-            if ($input) {
-                $languageRulesHash->setInputHash($repository->getInputRulesHashBy($language));
-            } else {
-                $languageRulesHash->setOutputHash($repository->getOutputRulesHashBy($language));
-            }
-
-            $languageRulesHash->save();
+        if (!$worker->init()) {
+            return 1;
         }
+
+        $worker->queue();
+        $model = $worker->getModel();
+        $model->setState(ZfExtended_Models_Worker::STATE_WAITING);
+        $model->save();
+
+        $workerInstance = \ZfExtended_Worker_Abstract::instanceByModel($model);
+        if (!$workerInstance || !$workerInstance->runQueued()) {
+            return self::FAILURE;
+        }
+
+        return self::SUCCESS;
     }
 }

@@ -497,11 +497,6 @@ Ext.define('Editor.view.segments.HtmlEditor', {
     ) {
         var me = this;
 
-        let openTagNumber = 0;
-        let closeTagNumber = 0;
-        let whitespaceTagNumber = 0;
-        let singleTagNumber = 0;
-
         Ext.each(rootnode.childNodes, function (item) {
             if (Ext.isTextNode(item)) {
                 var text = item.data.replace(new RegExp(Editor.TRANSTILDE, "g"), ' ');
@@ -581,10 +576,11 @@ Ext.define('Editor.view.segments.HtmlEditor', {
             let tag;
 
             if (tagsFromReferenceFieldOnly) {
+                const tagNumber = data.nr.replace('locked', '');
+
                 switch (data.type) {
                     case 'open':
-                        tag = me.tagsCheck.getOpeningReferenceTagAtIndexOrNext(openTagNumber);
-                        openTagNumber++;
+                        tag = me.tagsCheck.getOpeningReferenceTagAtIndex(tagNumber);
 
                         if (null === tag) {
                             return;
@@ -595,8 +591,7 @@ Ext.define('Editor.view.segments.HtmlEditor', {
                         break;
 
                     case 'close':
-                        tag = me.tagsCheck.getClosingReferenceTagAtIndexOrNext(closeTagNumber);
-                        closeTagNumber++;
+                        tag = me.tagsCheck.getClosingReferenceTagAtIndex(tagNumber);
 
                         if (null === tag) {
                             return;
@@ -607,8 +602,7 @@ Ext.define('Editor.view.segments.HtmlEditor', {
                         break;
 
                     case 'whitespace':
-                        tag = me.tagsCheck.getWhitespaceReferenceTagAtIndex(whitespaceTagNumber);
-                        whitespaceTagNumber++;
+                        tag = me.tagsCheck.getWhitespaceReferenceTagAtIndex(tagNumber);
 
                         if (null === tag) {
                             return;
@@ -619,8 +613,7 @@ Ext.define('Editor.view.segments.HtmlEditor', {
                         break;
 
                     case 'single':
-                        tag = me.tagsCheck.getSingleReferenceTagAtIndexOrNext(singleTagNumber);
-                        singleTagNumber++;
+                        tag = me.tagsCheck.getSingleReferenceTagAtIndex(tagNumber);
 
                         if (null === tag) {
                             return;
@@ -701,6 +694,7 @@ Ext.define('Editor.view.segments.HtmlEditor', {
         spanFull = divItem.down('span.full');
         spanShort = divItem.down('span.short');
         data.text = spanFull.dom.innerHTML.replace(/"/g, '&quot;');
+        data.fullTag = data.text;
         data.id = spanFull.getAttribute('data-originalid');
         data.qualityId = me.getElementsQualityId(divItem);
         data.title = Ext.htmlEncode(spanShort.getAttribute('title'));

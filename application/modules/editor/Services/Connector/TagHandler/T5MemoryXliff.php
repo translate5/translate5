@@ -26,16 +26,12 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-use MittagQI\Translate5\ContentProtection\Model\ContentProtectionRepository;
 use MittagQI\Translate5\ContentProtection\NumberProtector;
 use MittagQI\Translate5\ContentProtection\T5memory\TmConversionService;
-use MittagQI\Translate5\ContentProtection\WhitespaceProtector;
-use MittagQI\Translate5\Repository\LanguageRepository;
 
 class editor_Services_Connector_TagHandler_T5MemoryXliff extends editor_Services_Connector_TagHandler_Xliff
 {
     protected const ALLOWED_TAGS = '<x><x/><bx><bx/><ex><ex/><g><number>';
-    private ContentProtectionRepository $contentProtectionRepository;
     private NumberProtector $numberProtector;
     private TmConversionService $conversionService;
     private array $numberTagMap = [];
@@ -43,12 +39,7 @@ class editor_Services_Connector_TagHandler_T5MemoryXliff extends editor_Services
     public function __construct(array $options = [])
     {
         parent::__construct($options);
-        $this->contentProtectionRepository = new ContentProtectionRepository();
-        $this->conversionService = new TmConversionService(
-            $this->contentProtectionRepository,
-            $this->contentProtector,
-            new LanguageRepository()
-        );
+        $this->conversionService = TmConversionService::create();
         $this->numberProtector = NumberProtector::create();
         $this->xmlparser->registerElement(NumberProtector::TAG_NAME, null, function ($tagName, $key, $opener) {
             $this->xmlparser->replaceChunk($key, function () use ($key) {
