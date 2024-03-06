@@ -350,7 +350,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
     /**
      * Helper function to get the metadata which should be shown in the GUI out of a single result
      *
-     * @return object[]
+     * @return stdClass[]
      */
     private function getMetaData(object $found): array
     {
@@ -1698,6 +1698,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
                 $matchRateFits => 'Match rate is not 103',
                 $targetIsTheSame => 'Saved segment target differs with provided',
                 $isResultFresh => 'Got old result',
+                default => 'Unknown reason',
             });
         }
     }
