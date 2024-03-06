@@ -68,10 +68,16 @@ class UserRepository
     /**
      * @return iterable<ZfExtended_Models_User>
      */
-    public function getPmList(): iterable
+    public function getPmList(bool $includePmlite = false): iterable
     {
         $userModel = ZfExtended_Factory::get(ZfExtended_Models_User::class);
-        $users = ZfExtended_Factory::get(ZfExtended_Models_User::class)->loadAllByRole([ACL_ROLE_PM]);
+
+        $roles = ['pm'];
+        if ($includePmlite) {
+            $roles[] = 'pmlight';
+        }
+
+        $users = ZfExtended_Factory::get(ZfExtended_Models_User::class)->loadAllByRole($roles);
 
         foreach ($users as $user) {
             $userModel->init($user);
