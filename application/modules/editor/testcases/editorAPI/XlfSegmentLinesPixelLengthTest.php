@@ -50,6 +50,7 @@ class XlfSegmentLinesPixelLengthTest extends editor_Test_JsonTest {
         $config
             ->addTask('en', 'de')
             ->addUploadFolder('testfiles')
+            ->addTaskConfig('runtimeOptions.import.xlf.ignoreFramingTags', 'all')
             ->setToEditAfterImport();
     }
 

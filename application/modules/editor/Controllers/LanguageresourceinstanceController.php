@@ -1405,6 +1405,7 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         $result = $connector->query($segment);
 
         if($this->entity->getResourceType() == editor_Models_Segment_MatchRateType::TYPE_TM){
+            $result = $this->filterResults($result);
             $result=$this->markDiff($segment, $result,$connector);
         }
 
@@ -1752,5 +1753,34 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         if(!empty(array_diff($this->entity->getCustomers(), $allowedCustomerIs))){
             throw new ZfExtended_NoAccessException('Deletion of LanguageResource is not allowed due to client-restriction');
         }
+    }
+
+    /**
+     * Filter results by configured match-rate threshold
+     * @param editor_Services_ServiceResult $result
+     * @return editor_Services_ServiceResult
+     * @throws \MittagQI\Translate5\Task\Current\Exception|editor_Models_ConfigException
+     */
+    private function filterResults(editor_Services_ServiceResult $result): editor_Services_ServiceResult
+    {
+        $matchRateThreshold = $this->getCurrentTask()->getConfig()
+            ->runtimeOptions
+            ->LanguageResources
+            ->TM
+            ->matchPanelMatchrate ?? 0;
+
+        if ($matchRateThreshold === 0) {
+            return $result;
+        }
+        
+        $result->setResults(
+            array_filter(
+                $result->getResult(),
+                static function ($row) use ($matchRateThreshold) {
+                    return $row->matchrate >= $matchRateThreshold;
+                }
+            )
+        );
+        return $result;
     }
 }

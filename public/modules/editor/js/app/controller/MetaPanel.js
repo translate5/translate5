@@ -282,6 +282,9 @@ Ext.define('Editor.controller.MetaPanel', {
         me.hasQmQualities = Editor.app.getTaskConfig('autoQA.enableQm');
         me.record = record;
         // our component controllers are listening for the load event & create their views
+        if (me.hasQmQualities) {
+            me.getMetaQmPanel().createInactiveCheckBoxes();
+        }
         me.getQualitiesStore().load({
             params: {segmentId: segmentId}
         });
@@ -364,7 +367,7 @@ Ext.define('Editor.controller.MetaPanel', {
         metaFalPosPanel.loadFalsifiable(ordered);
 
         var segmentId = this.record.get('id');
-        this.getMetaQmPanel().startEditing(ordered, segmentId, this.hasQmQualities);
+        this.getMetaQmPanel().createActiveCheckBoxes(ordered, segmentId, this.hasQmQualities);
     },
     /**
      * opens metapanel for readonly segments
@@ -393,7 +396,6 @@ Ext.define('Editor.controller.MetaPanel', {
      */
     saveEdit: function () {
         this.record.set('stateId', this.getMetaInfoForm().getValues().stateId);
-        this.getMetaQmPanel().endEditing(this.hasQmQualities, true);
         this.editingMode = 'none';
         this.toggleOnEdit(false);
     },
@@ -402,7 +404,6 @@ Ext.define('Editor.controller.MetaPanel', {
      * @hint metapanel
      */
     cancelEdit: function () {
-        this.getMetaQmPanel().endEditing(this.hasQmQualities, false);
         this.editingMode = 'none';
         this.toggleOnEdit(false);
     },

@@ -250,10 +250,6 @@ Ext.define('Editor.view.admin.task.CustomField.Grid', {
             bind: {
                 fieldLabel: '{l10n.taskCustomField.meta.roles.name} &#8505;',
                 value: '{customField.roles}',
-            },
-            autoEl: {
-                tag: 'div',
-                'data-qtip': Ext.String.htmlEncode(Editor.data.l10n.taskCustomField.meta.roles.tooltip)
             }
         }, {
             xtype: 'numberfield',
