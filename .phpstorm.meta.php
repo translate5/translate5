@@ -11,7 +11,8 @@ namespace PHPSTORM_META {
     override(
         \Zend_Registry::get(0),
         map([
-            'logger' => \ZfExtended_logger::class,
+            'logger' => \ZfExtended_Logger::class,
+            'config' => \Zend_Config::class,
         ])
     );
 }
