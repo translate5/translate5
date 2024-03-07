@@ -16,6 +16,52 @@ All updates are (downwards) compatible! If not this is listed in the important r
 
 
 
+
+## [7.2.1] - 2024-03-07
+
+### Important Notes:
+ 
+
+
+### Added
+**[TRANSLATE-3752](https://jira.translate5.net/browse/TRANSLATE-3752): Editor general - Only display TM matches above a minimum match rate** <br>
+Added new config for translation memory matches below the configured match rate will not be shown in the fuzzy match panel.
+
+
+### Changed
+**[TRANSLATE-3771](https://jira.translate5.net/browse/TRANSLATE-3771): Editor general, usability editor - Highlight better the actual error in the right panel** <br>
+UI improvements in the QA overview of an opened segment in the editor.
+
+
+### Bugfixes
+**[TRANSLATE-3788](https://jira.translate5.net/browse/TRANSLATE-3788): User Management - change Mrs. to Ms. in user salutation** <br>
+fix wrong English translation in the UI
+
+**[TRANSLATE-3783](https://jira.translate5.net/browse/TRANSLATE-3783): t5memory - Fix sending save2disk parameter to t5memory** <br>
+t5memory did not properly store saved segments on disk due a wrong flag send by translate5.
+
+**[TRANSLATE-3779](https://jira.translate5.net/browse/TRANSLATE-3779): TermPortal - RootCause: [PromiseRejectionEvent] Ext.route.Router.onRouteRejection()** <br>
+FIXED: javascript error popping when no default languages are configured for TermPortal
+
+**[TRANSLATE-3778](https://jira.translate5.net/browse/TRANSLATE-3778): TermPortal - RootCause: Cannot read properties of null (reading 'setAttribute')** <br>
+FIXED: UI problem with tooltips
+
+**[TRANSLATE-3777](https://jira.translate5.net/browse/TRANSLATE-3777): Task Management - RootCause: Cannot read properties of undefined (reading 'taskCustomField')** <br>
+FIXED: tooltip problem for custom field roles checkboxes group
+
+**[TRANSLATE-3763](https://jira.translate5.net/browse/TRANSLATE-3763): Editor general - RootCause: Cannot read properties of null (reading 'style')** <br>
+Fix a UI problem in the task/project add window.
+
+**[TRANSLATE-3744](https://jira.translate5.net/browse/TRANSLATE-3744): Editor general - Task events entity load** <br>
+Fix for entity loading in the task events API endpoint.
+
+**[TRANSLATE-3663](https://jira.translate5.net/browse/TRANSLATE-3663): Editor general - Make custom fields editable** <br>
+Defined custom field values for a task, can be edited.
+
+**[TRANSLATE-3420](https://jira.translate5.net/browse/TRANSLATE-3420): Import/Export - SDLxliff corrupt after export, if imported untranslated into translate5 and containing internal tags of type locked** <br>
+Exported files with locked tags producing errors on re-import.
+
+
 ## [7.2.0] - 2024-03-04
 
 ### Important Notes:
