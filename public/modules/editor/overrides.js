@@ -1751,3 +1751,91 @@ Ext.define('Ext.overrides.grid.filters.filter.Number', {
     override: 'Ext.grid.filters.filter.Number',
     updateBuffer: 0
 });
+
+/**
+ * overridden to handle case when there is an attempt to set z-index for a component having no dom-node anymore
+ */
+Ext.override(Ext.ZIndexManager, {
+    onCollectionSort: function() {
+        var me = this,
+            oldFront = me.front,
+            zIndex = me.zseed,
+            a = me.zIndexStack.getRange(),
+            len = a.length,
+            i, comp, topModal, topVisible,
+            doFocus = !oldFront || oldFront.isVisible();
+
+        me.sortCount++;
+        for (i = 0; i < len; i++) {
+            comp = a[i];
+
+            if (comp.destroying || comp.destroyed) {
+                continue;
+            }
+            if (comp.el && !comp.el.dom) {                                          // +
+                console.log('no dom node anymore: ' + comp.id + ', ' + comp.xtype); // +
+                continue;                                                           // +
+            }                                                                       // +
+
+            // Setting the zIndex of a Component returns the topmost zIndex consumed by
+            // that Component.
+            // If it's just a plain floating Component such as a BoundList, then the
+            // return value is the passed value plus 10, ready for the next item.
+            // If a floating *Container* has its zIndex set, it re-orders its managed
+            // floating children, starting from that new base, and returns a value 10000 above
+            // the highest zIndex which it allocates.
+            zIndex = comp.setZIndex(zIndex);
+
+            // Only register a new topmost to activate if we find one that is visible
+            // Unfiltered panels with hidden:"true can end up here during an animated hide process
+            // When the hidden flag is set, and the ghost show operation kicks the ZIndexManager's sort.
+            if (!comp.hidden) {
+                topVisible = comp;
+
+                // Track topmost visible modal so we can place the modal mask just below it.
+                if (comp.modal) {
+                    topModal = comp;
+                }
+            }
+        }
+
+        // Sort resulted in a different component (possibly no component) at the top of the stack
+        if (topVisible !== oldFront) {
+
+            // Clear active flag on old front component. Just fires the deactivate event/
+            // Do not inform it, if the reason for its deactivation is that it's being destroyed.
+            if (oldFront && !oldFront.destroying) {
+                oldFront.setActive(false);
+            }
+
+            // Only activate topmost *visible* component.
+            // Only focus it if the previous topmost contained focus.
+            if (topVisible) {
+                // If the topVisible is focusable, then focus it if either it is modal, OR, it is configured to focusOnToFront
+                doFocus = doFocus && (topVisible.isFocusable(true) &&
+                    (topVisible.modal || (topVisible.focusOnToFront && !topVisible.preventFocusOnActivate)));
+                topVisible.setActive(true, doFocus);
+            }
+        }
+
+        // Cache the top of the stack
+        me.front = topVisible || null;
+
+        // If we encountered a modal in our reassigment, ensure our modal mask is just below it.
+        if (topModal) {
+            // If it's the same topmost, then just ensure the
+            // correct z-index and size of mask.
+            if (topModal === oldFront) {
+                me.syncModalMask(topModal);
+            }
+            // If it's a new top, we must re-show the mask because of tabbability resets.
+            else {
+                me.showModalMask(topModal);
+            }
+        } else {
+            me.hideModalMask();
+        }
+        return zIndex;
+    }
+});
+

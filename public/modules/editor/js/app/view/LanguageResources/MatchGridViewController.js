@@ -213,16 +213,19 @@ Ext.define('Editor.view.LanguageResources.MatchGridViewController', {
         });
     },
     loadCachedDataIntoGrid: function(segmentId,languageResourceid,query) {
-        if(segmentId != this.editedSegmentId){
+        if(segmentId != this.editedSegmentId)
+        {
             return;
         }
-        var me = this, segment = Ext.data.StoreManager.get('Segments').getById(segmentId);
-        if(!me.cachedResults.get(segmentId)){
+
+        var me = this,
+            segment = Ext.data.StoreManager.get('Segments').getById(segmentId);
+
+        if(!me.cachedResults.get(segmentId) || !segment)
+        {
             return;
         }
-        if (!segment) {
-            return;
-        }
+
         var res =me.cachedResults.get(segmentId);
         if(languageResourceid > 0 && res.get(languageResourceid)){
             me.getView().getStore('editorquery').loadRawData(res.get(languageResourceid).rows,true);
@@ -275,7 +278,8 @@ Ext.define('Editor.view.LanguageResources.MatchGridViewController', {
     handleRequestSuccess: function(controller,response,segmentId,languageResourceid,query){
         var me = controller,
             resp = Ext.util.JSON.decode(response.responseText),
-            editorquery =me.getView() &&  me.getView().getStore('editorquery');
+            editorquery =me.getView() &&  me.getView().getStore('editorquery'),
+            hasRows = typeof resp.rows !== 'undefined' && resp.rows !== null && resp.rows.length;
 
         if(!editorquery){
             return;
@@ -292,12 +296,12 @@ Ext.define('Editor.view.LanguageResources.MatchGridViewController', {
             return;
         }
 
-        if(typeof resp.rows !== 'undefined' && resp.rows !== null && resp.rows.length){
+        if(hasRows){
             me.cachedResults.get(segmentId).add(languageResourceid,resp);
             me.loadCachedDataIntoGrid(segmentId,languageResourceid);
             return;
         }
-        
+
         var noresults = {
                 rows: [{
                     source: me.strings.noresults,

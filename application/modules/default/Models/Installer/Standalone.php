@@ -784,12 +784,19 @@ class Models_Installer_Standalone {
      */
     protected function done(): void
     {
+        $version = ZfExtended_Utils::getAppVersion();
+
         if($this->isInstallation){
             //since passwords are encrypted, we have to do that for the demo users too
             editor_Utils::initDemoAndTestUserPasswords();
+        } else {
+            Zend_Registry::get('logger')->info(
+                'E1598',
+                'Translate5 update to version {version}',
+                ['version' => $version]
+            );
         }
 
-        $version = ZfExtended_Utils::getAppVersion();
         $this->log("\nTranslate5 installation / update to version $version done.\n");
         if(!empty($this->hostname)) {
             $this->log("\nPlease visit http://".$this->hostname."/ to enjoy Translate5.\n");

@@ -69,7 +69,7 @@ Ext.define('Editor.view.admin.task.CustomField.GridController', {
      * @param cbgroup
      */
     onRolesBoxReady: function(cbgroup) {
-        var items = [];
+        var items = [], qtip = cbgroup.up('[viewModel]').getViewModel().get('l10n.taskCustomField.meta.roles.tooltip');
 
         // For each role
         Ext.Object.each(Editor.data.app.roles, (key, value) => {
@@ -88,6 +88,9 @@ Ext.define('Editor.view.admin.task.CustomField.GridController', {
 
         // Do add
         cbgroup.add(items);
+
+        // Set tooltip
+        cbgroup.el.dom.setAttribute('data-qtip', qtip);
     },
 
     /**
@@ -466,7 +469,9 @@ Ext.define('Editor.view.admin.task.CustomField.GridController', {
     onSelectionChange: function(selModel, selected) {
 
         // Adjust options available in Mode-combobox based on value in Type-combobox
-        if (selected.length) this.adjustModeChoices();
+        if (selected.length) {
+            this.adjustModeChoices();
+        }
 
         // Check whether selected record's type is combobox and load json comboboxData-prop into comboboxDataGrid's store
         this.setupComboboxData(selected);

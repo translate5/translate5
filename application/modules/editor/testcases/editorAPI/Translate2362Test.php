@@ -50,6 +50,7 @@ class Translate2362Test extends editor_Test_JsonTest {
         $config
             ->addTask('de', 'en')
             ->addUploadFolder('testfiles')
+            ->addTaskConfig('runtimeOptions.import.xlf.ignoreFramingTags', 'all')
             ->setToEditAfterImport();
     }
     
