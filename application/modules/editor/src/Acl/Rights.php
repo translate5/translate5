@@ -95,6 +95,12 @@ final class Rights extends AbstractResource {
     public const EDITOR_DELETE_CUSTOMER = 'editorDeleteCustomer';
 
     /**
+     * allows the administration of the OpenID authentication in the customer management
+     * @group Customer Administration
+     */
+    public const CUSTOMER_OPENID_ADMINISTRATION = 'customerOpenIdAdministration';
+
+    /**
      * allows reading the auth hash via task user assoc API
      * @group API
      */
