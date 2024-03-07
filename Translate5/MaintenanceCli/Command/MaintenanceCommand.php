@@ -93,8 +93,12 @@ class MaintenanceCommand extends Translate5AbstractCommand {
         }
         $this->io->text('');
     }
-    
-    protected function showStatus() {
+
+    /**
+     * @throws \Zend_Db_Statement_Exception
+     */
+    protected function showStatus(): void
+    {
         $conf = $this->mm->status();
 
         //FIXME add porcelain here
@@ -107,18 +111,17 @@ class MaintenanceCommand extends Translate5AbstractCommand {
             $msg[] = '';
             $this->io->text($msg);
             $this->printNotes();
-            return 0;
+            return;
         }
-        $startTimeStamp = strtotime($conf->startDate);
-        $now = time();
-        if($startTimeStamp < $now) {
+
+        if($this->mm->isActive()) {
             $this->io->text("<info>Maintenance mode:</> <fg=red;options=bold>active!</>");
         }
-        
-        elseif ($startTimeStamp - ($conf->timeToNotify*60) < $now){
+        elseif ($this->mm->isNotified()){
             $this->io->text("<info>Maintenance mode:</> <fg=yellow;options=bold>notified!</>");
         }
-        
+
+        $startTimeStamp = strtotime($conf->startDate);
         $this->output->writeln([
             '',
             '            <info>start:</> '.date('Y-m-d H:i (O)', $startTimeStamp),
@@ -130,7 +133,5 @@ class MaintenanceCommand extends Translate5AbstractCommand {
         ]);
 
         $this->printNotes();
-
-        return 0;
     }
 }

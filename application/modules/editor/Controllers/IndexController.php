@@ -158,10 +158,10 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
             $this->view->headLink()->appendStylesheet(APPLICATION_RUNDIR . "/" . $oneCss);
         }
 
-        $this->view->appVersion = ZfExtended_Utils::getAppVersion();
+        $this->view->appVersion = $appVersion = ZfExtended_Utils::getAppVersion();
         $this->setJsVarsInView();
         $this->setThemeVarsInView($userConfig['runtimeOptions.extJs.theme']['defaults']);
-        $this->checkForUpdates($this->view->appVersion);
+        $this->checkForUpdates($appVersion);
     }
 
     /**
