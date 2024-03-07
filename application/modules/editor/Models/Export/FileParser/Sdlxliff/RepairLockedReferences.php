@@ -77,7 +77,7 @@ class editor_Models_Export_FileParser_Sdlxliff_RepairLockedReferences
         );
 
         // filter out the tag pairs where the target tu ids are not equal
-        $xmlparser->registerElement('body',closer: function($tag, $key, $opener) use ($xmlparser,&$lockedReferences) {
+        $xmlparser->registerElement('body',closer: function($tag, $key, $opener) use (&$lockedReferences) {
             foreach ($lockedReferences as $key => $lockedTuId) {
                 if (!$lockedTuId->match()) {
                     unset($lockedReferences[$key]);
