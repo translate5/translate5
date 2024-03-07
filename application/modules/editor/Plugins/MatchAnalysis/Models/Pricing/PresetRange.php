@@ -37,13 +37,13 @@ use ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey;
 /**
  * Class representing matchrate range for which a price can be defined, inside a certain pricing preset
  *
- * @method integer getId()
+ * @method string getId()
  * @method void setId(int $id)
- * @method integer getPresetId()
+ * @method string getPresetId()
  * @method void setPresetId(int $presetId)
- * @method integer getFrom()
+ * @method string getFrom()
  * @method void setFrom(int $from)
- * @method integer getTill()
+ * @method string getTill()
  * @method void setTill(int $till)
  */
 class PresetRange extends ZfExtended_Models_Entity_Abstract {

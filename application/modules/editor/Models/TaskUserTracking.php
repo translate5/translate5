@@ -43,22 +43,22 @@ END LICENSE AND COPYRIGHT
  * - if a task has been imported and opened before TaskUserTracking has been implemented
  * - if a user is assigned to a task, but has never opened the task so far
  *
- * @method integer getId() getId()
- * @method void setId() setId(int $id)
- * @method string getTaskGuid() getTaskGuid()
- * @method void setTaskGuid() setTaskGuid(string $guid)
- * @method string getUserGuid() getUserGuid()
- * @method void setUserGuid() setUserGuid(string $guid)
- * @method integer getTaskOpenerNumber() getTaskOpenerNumber()
- * @method void setTaskOpenerNumber() setTaskOpenerNumber(int $id)
- * @method string getFirstName() getFirstName()
- * @method void setFirstName() setFirstName(string $guid)
- * @method string getSurName() getSurName()
- * @method void setSurName() setSurName(string $guid)
- * @method string getUserName() getUserName()
- * @method void setUserName() setUserName(string $guid)
- * @method string getRole() getRole()
- * @method void setRole() setRole(string $guid)
+ * @method string getId()
+ * @method void setId(int $id)
+ * @method string getTaskGuid()
+ * @method void setTaskGuid(string $guid)
+ * @method string getUserGuid()
+ * @method void setUserGuid(string $guid)
+ * @method string getTaskOpenerNumber()
+ * @method void setTaskOpenerNumber(int $id)
+ * @method string getFirstName()
+ * @method void setFirstName(string $guid)
+ * @method string getSurName()
+ * @method void setSurName(string $guid)
+ * @method string getUserName()
+ * @method void setUserName(string $guid)
+ * @method string getRole()
+ * @method void setRole(string $guid)
  *
  */
 class editor_Models_TaskUserTracking extends ZfExtended_Models_Entity_Abstract {

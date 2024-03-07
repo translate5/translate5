@@ -27,21 +27,21 @@ END LICENSE AND COPYRIGHT
 */
 
 /**
- * @method int getId()
+ * @method string getId()
  * @method void setId(int $id)
- * @method int getSourceLang()
+ * @method string getSourceLang()
  * @method void setSourceLang(int $id)
  * @method string getSourceLangCode()
  * @method void setSourceLangCode(string $lang)
  * @method string getSourceLangName()
  * @method void setSourceLangName(string $langName)
- * @method int getTargetLang()
+ * @method string getTargetLang()
  * @method void setTargetLang(int $id)
  * @method string getTargetLangCode()
  * @method void setTargetLangCode(string $lang)
  * @method string getTargetLangName()
  * @method void setTargetLangName(string $langName)
- * @method int getLanguageResourceId()
+ * @method string getLanguageResourceId()
  * @method void setLanguageResourceId(int $languageResourceId)
  *
  */

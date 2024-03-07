@@ -39,22 +39,23 @@ use ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey;
 use ZfExtended_Models_Entity_NotFoundException as NotFoundException;
 use ZfExtended_Factory as Factory;
 use ZfExtended_NoAccessException;
+
 /**
  *
- * @method integer getId()
+ * @method string getId()
  * @method void setId(int $id)
  * @method string getName()
  * @method void setName(string $name)
  * @method string getUnitType()
  * @method void setUnitType(string $unitType)
- * @method int getIsDefault()
- * @method setIsDefault(int $int)
+ * @method string getIsDefault()
+ * @method void setIsDefault(int $int)
  * @method string getDescription()
- * @method float getPriceAdjustment()
- * @method setPriceAdjustment(float $priceAdjustment)
- * @method setDescription(string $string)
- * @method int getCustomerId()
- * @method setCustomerId(mixed $customerId)
+ * @method string getPriceAdjustment()
+ * @method void setPriceAdjustment(float $priceAdjustment)
+ * @method void setDescription(string $string)
+ * @method string getCustomerId()
+ * @method void setCustomerId(mixed $customerId)
  */
 class Preset extends ZfExtended_Models_Entity_Abstract {
 

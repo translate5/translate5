@@ -31,24 +31,24 @@ use editor_Models_Terminology_Models_CollectionAttributeDataType as CollectionAt
 /**
  * Languageresources Entity Object
  *
- * @method integer getId() getId()
- * @method void setId() setId(int $id)
- * @method string getLangResUuid() getLangResUuid()
- * @method void setLangResUuid() setLangResUuid(string $guid)
- * @method string getName() getName()
- * @method void setName() setName(string $name)
- * @method string getColor() getColor()
- * @method void setColor() setColor(string $color)
- * @method string getResourceId() getResourceId() The id of the used resource
- * @method void setResourceId() setResourceId(string $resourceId)
- * @method string getServiceType() getServiceType() The PHP class name for the service
- * @method void setServiceType() setServiceType(string $type)
- * @method string getServiceName() getServiceName() The speakable name of the service as configured in the resource
- * @method void setServiceName() setServiceName(string $resName)
- * @method string getResourceType() getResourceType()  "tm" or "mt" or "termcollection"
- * @method void setResourceType() setResourceType(string $resourceType)
- * @method bool getWriteSource() getWriteSource()
- * @method void setWriteSource() setWriteSource(bool $writeSource)
+ * @method string getId()
+ * @method void setId(int $id)
+ * @method string getLangResUuid()
+ * @method void setLangResUuid(string $guid)
+ * @method string getName()
+ * @method void setName(string $name)
+ * @method string getColor()
+ * @method void setColor(string $color)
+ * @method string getResourceId() The id of the used resource
+ * @method void setResourceId(string $resourceId)
+ * @method string getServiceType() The PHP class name for the service
+ * @method void setServiceType(string $type)
+ * @method string getServiceName() The speakable name of the service as configured in the resource
+ * @method void setServiceName(string $resName)
+ * @method string getResourceType()  "tm" or "mt" or "termcollection"
+ * @method void setResourceType(string $resourceType)
+ * @method string getWriteSource()
+ * @method void setWriteSource(bool $writeSource)
  *
  */
 class editor_Models_LanguageResources_LanguageResource extends ZfExtended_Models_Entity_Abstract

@@ -28,14 +28,14 @@ END LICENSE AND COPYRIGHT
 
 /**
  * Entity Model for comment meta data
- * @method integer getId() getId()
- * @method void setId() setId(int $id)
- * @method integer getCustomerId() getCustomerId()
- * @method void setCustomerId() setCustomerId(integer $id)
- * @method integer getDefaultBconfId() getDefaultBconfId()
- * @method void setDefaultBconfId() setDefaultBconfId(integer $id)
- * @method integer getDefaultPricingPresetId() getDefaultPricingPresetId()
- * @method void setDefaultPricingPresetId() setDefaultPricingPresetId(integer $id)
+ * @method string getId()
+ * @method void setId(int $id)
+ * @method string getCustomerId()
+ * @method void setCustomerId(integer $id)
+ * @method string getDefaultBconfId()
+ * @method void setDefaultBconfId(integer $id)
+ * @method string getDefaultPricingPresetId()
+ * @method void setDefaultPricingPresetId(integer $id)
  */
 class editor_Models_Customer_Meta extends ZfExtended_Models_Entity_MetaAbstract {
     protected $dbInstanceClass = 'editor_Models_Db_CustomerMeta';

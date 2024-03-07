@@ -30,10 +30,10 @@ END LICENSE AND COPYRIGHT
  * Class editor_Models_Terminology_Models_Transacgrp
  * TermsTransacgrp Instance
  *
- * @method integer getId() getId()
- * @method void setId() setId(integer $id)
- * @method string getKey() getKey()
- * @method void setKey() setKey(string $key)
+ * @method string getId()
+ * @method void setId(integer $id)
+ * @method string getKey()
+ * @method void setKey(string $key)
  */
 class editor_Models_Terminology_Models_RefObjectModel extends editor_Models_Terminology_Models_Abstract {
     protected $dbInstanceClass = 'editor_Models_Db_Terminology_RefObject';
