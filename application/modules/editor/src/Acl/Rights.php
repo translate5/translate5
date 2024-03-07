@@ -563,10 +563,17 @@ final class Rights extends AbstractResource {
     public const PLUGIN_SPELL_CHECK_MAIN = 'pluginSpellCheckMain';
 
     /**
-     * Enables the UI invocation of the match analysis pricing presets
+     * Enables the UI invocation of the match analysis pricing presets, global UI and for all customers
      * @group Plug-In Matchanalysis
      */
     public const PLUGIN_MATCH_ANALYSIS_PRICING_PRESET = 'pluginMatchAnalysisPricingPreset';
+
+    /**
+     * Enables the UI invocation of the match analysis pricing presets just for selected customers
+     * This is a either-or right with ::PLUGIN_MATCH_ANALYSIS_PRICING_PRESET
+     * @group Plug-In Matchanalysis
+     */
+    public const PLUGIN_MATCH_ANALYSIS_CUSTOMER_PRICING_PRESET = 'pluginMatchAnalysisCustomerPricingPreset';
 
     /**
      * Enables the UI invocation of the match analysis in general
@@ -581,10 +588,17 @@ final class Rights extends AbstractResource {
     public const PLUGIN_GLOBALESE_PRE_TRANSLATION = 'pluginGlobalesePreTranslationGlobalese';
 
     /**
-     * Allows the administration of the BCONF preferences
+     * Allows the administration of the BCONF preferences, the global UI and all customer UIs
      * @group Plug-In Okapi
      */
     public const PLUGIN_OKAPI_BCONF_PREFS = 'pluginOkapiBconfPrefs';
+
+    /**
+     * Allows the administration of the BCONF preferences only for the accessible customers
+     * This is a either-or right with ::PLUGIN_OKAPI_BCONF_PREFS
+     * @group Plug-In Okapi
+     */
+    public const PLUGIN_OKAPI_BCONF_CUSTOMER_PREFS = 'pluginOkapiBconfCustomerPrefs';
 
     /**
      * enables the corresponding JS controller

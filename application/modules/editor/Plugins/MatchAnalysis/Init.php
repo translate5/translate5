@@ -49,7 +49,8 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract
      */
     protected $frontendControllers = array(
         Rights::PLUGIN_MATCH_ANALYSIS_MATCH_ANALYSIS => 'Editor.plugins.MatchAnalysis.controller.MatchAnalysis',
-        Rights::PLUGIN_MATCH_ANALYSIS_PRICING_PRESET => 'Editor.plugins.MatchAnalysis.controller.admin.PricingPreset'
+        Rights::PLUGIN_MATCH_ANALYSIS_PRICING_PRESET => 'Editor.plugins.MatchAnalysis.controller.admin.PricingPreset',
+        Rights::PLUGIN_MATCH_ANALYSIS_CUSTOMER_PRICING_PRESET => 'Editor.plugins.MatchAnalysis.controller.admin.PricingPreset'
     );
 
     protected $localePath = 'locales';
