@@ -103,8 +103,8 @@ abstract class ServiceAbstract extends DockerServiceAbstract
     /**
      * Special API for pooled services with a single URL for one pool:
      * This also is expected to represent a load-balancing and for a single URL maybe multiple workers are queued
-     * @param string $serviceUrl
-     * @return int
+     * @param string $pool
+     * @return bool
      */
     public function hasLoadBalancingBehindSingularPool(string $pool): bool
     {

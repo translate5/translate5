@@ -21,12 +21,12 @@ START LICENSE AND COPYRIGHT
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
 
-use MittagQI\Translate5\Test\Import\Config;
+use PHPUnit\Framework\AssertionFailedError as AssertionFailedErrorAlias;
 
 /**
  * Creates combobox and checkbox fields and try to create task once with non-existing value for those fields and once
@@ -47,6 +47,9 @@ class Translate3483TestFail extends editor_Test_JsonTest {
 
     /**
      * @return void
+     * @throws Zend_Http_Client_Exception
+     * @throws ZfExtended_Exception
+     * @throws \MittagQI\Translate5\Test\Import\Exception
      */
     public function testComboBoxField()
     {
@@ -62,6 +65,11 @@ class Translate3483TestFail extends editor_Test_JsonTest {
         ],'option1');
     }
 
+    /**
+     * @throws \MittagQI\Translate5\Test\Import\Exception
+     * @throws ZfExtended_Exception
+     * @throws Zend_Http_Client_Exception
+     */
     public function testBooleanField()
     {
         self::createAndTestField([
@@ -71,9 +79,14 @@ class Translate3483TestFail extends editor_Test_JsonTest {
             'placesToShow' => 'projectWizard,taskGrid',
             'position' => 1,
             'roles' => 'editor'
-        ],1);
+        ],'1');
     }
 
+    /**
+     * @throws ZfExtended_Exception
+     * @throws \MittagQI\Translate5\Test\Import\Exception
+     * @throws Zend_Http_Client_Exception
+     */
     private static function createAndTestField(array $fieldData, string $value): void
     {
         $field = self::addCustomField($fieldData);
@@ -84,7 +97,7 @@ class Translate3483TestFail extends editor_Test_JsonTest {
                 'customField' . $field->id,
                 'NotExistingValue'
             );
-        }catch (\PHPUnit\Framework\AssertionFailedError $e) {
+        } catch (AssertionFailedErrorAlias $e) {
             if(str_contains($e->getMessage(), 'NotExistingValue') === false){
                 self::api()->delete('editor/taskcustomfield/'.$field->id);
                 self::assertNotEmpty(self::api()->getLastResponseDecodeed(), 'Custom field was not deleted');
@@ -118,6 +131,9 @@ class Translate3483TestFail extends editor_Test_JsonTest {
         $config->import($task);
     }
 
+    /**
+     * @throws Zend_Http_Client_Exception
+     */
     private static function addCustomField(array $data)
     {
         self::api()->postJson('editor/taskcustomfield', $data);

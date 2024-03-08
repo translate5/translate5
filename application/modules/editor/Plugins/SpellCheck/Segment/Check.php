@@ -39,11 +39,14 @@ use MittagQI\Translate5\Plugins\SpellCheck\Exception\MalfunctionException;
 use MittagQI\Translate5\Plugins\SpellCheck\Exception\RequestException;
 use MittagQI\Translate5\Plugins\SpellCheck\Exception\TimeOutException;
 use MittagQI\Translate5\Plugins\SpellCheck\LanguageTool\Adapter;
+use stdClass;
 use Zend_Exception;
+use ZfExtended_Exception;
 
 /**
  *
- * Checks the consistency of translations: Segments with an identical target but different sources or with identical sources but different targets
+ * Checks the consistency of translations: Segments with an identical target
+ * but different sources or with identical sources but different targets
  * This Check can only be done for all segments of a task at once
  *
  */
@@ -87,7 +90,7 @@ class Check {
      *
      * @var array
      */
-    public static $css = [
+    public static array $css = [
 
         // General
         self::CHARACTERS            => self::CSS_GROUP_GENERAL,
@@ -114,7 +117,7 @@ class Check {
         self::TYPOGRAPHICAL => self::CSS_TYPOGRAPHICAL,
     ];
 
-    public static $map = [
+    public static array $map = [
 
         // General error types
         'characters'            => self::CHARACTERS,
@@ -146,14 +149,14 @@ class Check {
      *
      * @var array
      */
-    private $states = [];
+    private array $states = [];
 
     /**
      * If we're in batch mode, this array will contain keys 'target' and 'result'
      *
      * @var array
      */
-    private static $batch = [];
+    private static array $batch = [];
 
     /**
      * @param editor_Models_Segment $segment
@@ -180,7 +183,7 @@ class Check {
             if ($matches = self::$batch['result'][$segment->getSegmentNrInTask()] ?? 0) {
 
                 // Prepare $data stdClass instance having those pre-detected matches
-                $data = new \stdClass();
+                $data = new stdClass();
                 $data->matches = $matches;
 
             } else {
@@ -228,15 +231,15 @@ class Check {
                 // Convert into special data structure
                 $this->states[$category][]= (object) [
                     'content'           => mb_substr($match->sentence, $match->offset, $match->length),
-                    'matchIndex'        => $index,                                                              // Integer
-                    'range'             => [                                                                    // Text coordinates
+                    'matchIndex'        => $index,                                                 // Integer
+                    'range'             => [                                                       // Text coordinates
                         'start' => $match->offset,
                         'end'   => $match->offset + $match->context->length
                     ],
-                    'message'           => $match->message,                                                     // String
-                    'replacements'      => array_column($match->replacements ?? [], 'value'),   // Array
-                    'infoURLs'          => array_column($match->rule->urls   ?? [], 'value'),   // Array
-                    'cssClassErrorType' => self::$css[$category]                                                // String
+                    'message'           => $match->message,                                                   // String
+                    'replacements'      => array_column($match->replacements ?? [], 'value'), // Array
+                    'infoURLs'          => array_column($match->rule->urls   ?? [], 'value'), // Array
+                    'cssClassErrorType' => self::$css[$category]                                              // String
                 ];
 
             // Else log that detected error is of a kind previously unknown to translate5 app
@@ -248,7 +251,7 @@ class Check {
                         . ' detected an error of a kind previously unknown to translate5 app',
                         [
                             'lang' => $spellCheckLang,
-                            'text' => $targetText,
+                            'text' => $targetText ?? '',
                             'match' => $match
                         ]);
             }
@@ -274,7 +277,8 @@ class Check {
     /**
      * Clear batch-data
      */
-    public static function purgeBatch() {
+    public static function purgeBatch(): void
+    {
         self::$batch = [
             'target' => [],
             'result' => []
@@ -286,8 +290,10 @@ class Check {
      *
      * @param editor_Models_Segment $segment
      * @param editor_Segment_FieldTags $target
+     * @throws ZfExtended_Exception
      */
-    public static function addBatchTarget(editor_Models_Segment $segment, editor_Segment_FieldTags $target) {
+    public static function addBatchTarget(editor_Models_Segment $segment, editor_Segment_FieldTags $target): void
+    {
         self::$batch['target'][$segment->getSegmentNrInTask()] = self::prepareTarget($segment, $target);
     }
 
@@ -295,30 +301,30 @@ class Check {
      * Get value of $segment's $targetField applicable to be sent to LanguageTool
      *
      * @param editor_Models_Segment $segment
-     * @param string $targetField
+     * @param editor_Segment_FieldTags $target
      * @return string
+     * @throws ZfExtended_Exception
      */
     public static function prepareTarget(editor_Models_Segment $segment, editor_Segment_FieldTags $target) : string {
 
-        // Get target text with all tags being either stripped or replaced with their original contents (in case of whitespace)
+        // Get target text with all tags being either stripped or
+        // replaced with their original contents (in case of whitespace)
         $targetText = $target->renderReplaced(editor_TagSequence::MODE_ORIGINAL);
 
         // replace escaped entities: TODO FIXME: This will create trouble with text-indices !!
-        $targetText = str_replace(['&lt;', '&gt;'], ['<', '>'], $targetText);
-
         // Return string applicable to be sent to LanguageTool
-        return $targetText;
+        return str_replace(['&lt;', '&gt;'], ['<', '>'], $targetText);
     }
 
     /**
      * @param Adapter $adapter
      * @param string $spellCheckLang
      * @throws DownException
-     * @throws MalfunctionException
      * @throws RequestException
      * @throws TimeOutException
      */
-    public static function runBatchAndSplitResults(Adapter $adapter, string $spellCheckLang) {
+    public static function runBatchAndSplitResults(Adapter $adapter, string $spellCheckLang): void
+    {
 
         // Separator
         $separator = Adapter::BATCH_SEPARATOR;
@@ -336,7 +342,7 @@ class Check {
         $segmentNrByIndex = array_keys(self::$batch['target']);
 
         // Foreach match given by LanguageTool API response
-        foreach ($data->matches as $index => $match) {
+        foreach ($data->matches as $match) {
 
             // Get text from the beginning and up to the reported word/phrase, inclusively
             $text = mb_substr($whole, 0, $match->offset + $match->length);

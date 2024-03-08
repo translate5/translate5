@@ -35,7 +35,8 @@ END LICENSE AND COPYRIGHT
 /**
  * Parsed mit editor_Models_Import_FileParser_Sdlxliff geparste Dateien für den Export
  */
-class editor_Models_Export_FileParser_Sdlxliff extends editor_Models_Export_FileParser {
+class editor_Models_Export_FileParser_Sdlxliff extends editor_Models_Export_FileParser
+{
     /**
      * @var string Klassenname des Difftaggers
      */
@@ -45,9 +46,10 @@ class editor_Models_Export_FileParser_Sdlxliff extends editor_Models_Export_File
      * Rekonstruiert in einem Segment die ursprüngliche Form der enthaltenen Tags
      *
      */
-    protected function parseSegment($segment) {
+    protected function parseSegment($segment)
+    {
         //@todo nächste Zeile rauswerfen, wenn qm-subsegments im Export korrekt abgebildet werden. Das gleiche gilt für den vermerk in tasks.phtml
-        $segment = preg_replace('"<img[^>]*>"','', $segment);
+        $segment = preg_replace('"<img[^>]*>"', '', $segment);
         return parent::parseSegment($segment);
     }
 
@@ -56,13 +58,14 @@ class editor_Models_Export_FileParser_Sdlxliff extends editor_Models_Export_File
      * @param int $segmentId
      * @return string $id of comments index in $this->comments | null if no comments exist
      */
-    protected function injectComments(int $segmentId, string $segment, string $field) {
+    protected function injectComments(int $segmentId, string $segment, string $field)
+    {
         $commentModel = ZfExtended_Factory::get('editor_Models_Comment');
         /* @var $commentModel editor_Models_Comment */
         $comments = $commentModel->loadBySegmentAndTaskPlain($segmentId, $this->_taskGuid);
 
         //we may only run this function once per segment, so restrict to $field target
-        if(empty($comments) || $field != 'target') {
+        if (empty($comments) || $field != 'target') {
             return $segment;
         }
 
@@ -76,15 +79,14 @@ class editor_Models_Export_FileParser_Sdlxliff extends editor_Models_Export_File
         $targetGuid = ZfExtended_Utils::uuid();
         $cmtDefContainer = [];
         $hasTargetComments = false;
-        foreach($comments as $comment) {
+        foreach ($comments as $comment) {
             $tagParams = [];
             $guid = $this->processOneComment($comment, $tagParams, $commentMeta);
-            if(empty($guid)) {
+            if (empty($guid)) {
                 //target comment
                 $hasTargetComments = true;
                 $guidToUse = $targetGuid;
-            }
-            else {
+            } else {
                 //source comment
                 $guidToUse = $guid;
             }
@@ -93,12 +95,12 @@ class editor_Models_Export_FileParser_Sdlxliff extends editor_Models_Export_File
         }
 
         //group all Comments by guid into one cmt-def
-        foreach($cmtDefContainer as $guid => $comments) {
-            $this->comments[$guid] = '<cmt-def id="'.$guid.'"><Comments>'.implode('', $comments).'</Comments></cmt-def>';
+        foreach ($cmtDefContainer as $guid => $comments) {
+            $this->comments[$guid] = '<cmt-def id="' . $guid . '"><Comments>' . implode('', $comments) . '</Comments></cmt-def>';
         }
 
-        if($hasTargetComments) {
-            return '<mrk mtype="x-sdl-comment" sdl:cid="'.$targetGuid.'">'.$segment.'</mrk>';
+        if ($hasTargetComments) {
+            return '<mrk mtype="x-sdl-comment" sdl:cid="' . $targetGuid . '">' . $segment . '</mrk>';
         }
         //if only source comments, we don't have to add the markers since in source they exist already
         return $segment;
@@ -112,7 +114,8 @@ class editor_Models_Export_FileParser_Sdlxliff extends editor_Models_Export_File
      * @param editor_Models_Comment_Meta $commentMeta
      * @return string original source comment guid or empty string if target comment or no source comment guid found
      */
-    protected function processOneComment(array $comment, array &$tagParams, editor_Models_Comment_Meta $commentMeta): string {
+    protected function processOneComment(array $comment, array &$tagParams, editor_Models_Comment_Meta $commentMeta): string
+    {
         $modifiedObj = new DateTime($comment['modified']);
         //if the +0200 at the end makes trouble use the following
         //gmdate('Y-m-d\TH:i:s\Z', $modified->getTimestamp());
@@ -123,7 +126,7 @@ class editor_Models_Export_FileParser_Sdlxliff extends editor_Models_Export_File
             'version' => '1.0',
             'comment' => htmlspecialchars($comment['comment'], ENT_XML1, 'UTF-8'),
         ];
-        if($comment['userGuid'] !== editor_Models_Import_FileParser_Sdlxliff::USERGUID) {
+        if ($comment['userGuid'] !== editor_Models_Import_FileParser_Sdlxliff::USERGUID) {
             return '';
         }
         try {
@@ -132,7 +135,7 @@ class editor_Models_Export_FileParser_Sdlxliff extends editor_Models_Export_File
             $tagParams['version'] = $commentMeta->getVersion();
 
             // currently only source and transUnit comments may (and must since in skeleton) reuse there original id
-            if(in_array(
+            if (in_array(
                 $commentMeta->getAffectedField(),
                 [
                     editor_Models_Import_FileParser_Sdlxliff::SOURCE,
@@ -141,8 +144,7 @@ class editor_Models_Export_FileParser_Sdlxliff extends editor_Models_Export_File
             )) {
                 return $commentMeta->getOriginalId();
             }
-        }
-        catch (ZfExtended_Models_Entity_NotFoundException $e){
+        } catch (ZfExtended_Models_Entity_NotFoundException $e) {
             //do nothing if no meta found, assume it is a target comment then → return empty guid
         }
         return '';
@@ -154,23 +156,24 @@ class editor_Models_Export_FileParser_Sdlxliff extends editor_Models_Export_File
      * @param int $i position of current segment in the file array
      * @return array
      */
-    protected function writeMatchRate(array $file, int $i) {
+    protected function writeMatchRate(array $file, int $i)
+    {
         $matchRate = $this->_segmentEntity->getMatchRate();
         // in case the match-rate is 0, do not generate the percent tag
-        if($matchRate < 1){
+        if ($matchRate < 1) {
             return $file;
         }
 
         $mid = $this->_segmentEntity->getMid();
-        $segPart =& $file[$i+1];
+        $segPart =& $file[$i + 1];
         //example string
         //<sdl:seg-defs><sdl:seg id="16" conf="Translated" origin="tm" origin-system="Bosch_Ruoff_de-DE-en-US" percent="100"
-        if(preg_match('#<sdl:seg[^>]* id="'.$mid.'"[^>]*percent="\d+"#', $segPart)===1){
+        if (preg_match('#<sdl:seg[^>]* id="' . $mid . '"[^>]*percent="\d+"#', $segPart) === 1) {
             //if percent attribute is already defined
-            $segPart = preg_replace('#(<sdl:seg[^>]* id="'.$mid.'"[^>]*percent=)"\d+"#', '\\1"'.$matchRate.'"', $segPart);
+            $segPart = preg_replace('#(<sdl:seg[^>]* id="' . $mid . '"[^>]*percent=)"\d+"#', '\\1"' . $matchRate . '"', $segPart);
             return $file;
         }
-        $segPart = preg_replace('#(<sdl:seg[^>]* id="'.$mid.'" *)#', '\\1 percent="'.$matchRate.'" ', $segPart);
+        $segPart = preg_replace('#(<sdl:seg[^>]* id="' . $mid . '" *)#', '\\1 percent="' . $matchRate . '" ', $segPart);
         return $file;
     }
 
@@ -179,11 +182,13 @@ class editor_Models_Export_FileParser_Sdlxliff extends editor_Models_Export_File
      *
      * @return string file
      */
-    protected function getFile() {
+    protected function getFile()
+    {
         parent::getFile();
         $this->_exportFile = preg_replace('"(<mrk[^>]*[^/])></mrk>"i', '\\1/>', $this->_exportFile);
         $this->injectRevisions();
         $this->injectCommentsHead();
+        $this->fixLockSegmentTags();
         return $this->_exportFile;
     }
 
@@ -192,15 +197,16 @@ class editor_Models_Export_FileParser_Sdlxliff extends editor_Models_Export_File
      * Beispiel einer Revision: <rev-def id="b37e487f-2c70-4259-84e0-677d8c01f5b8" type="Delete" author="christine.schulze" date="10/23/2012 10:25:04" />
      * @return string
      */
-    protected function generateRevisions() {
+    protected function generateRevisions()
+    {
         $createRevision = function ($rev, $tagType = NULL) {
-                    $delete = '';
-                    if ($tagType == 'delete') {
-                        $delete = ' type="Delete"';
-                    }
-                    return '<rev-def id="' . $rev['guid'] . '"' . $delete . ' author="' .
-                            $rev['username'] . '" date="' . date('m/d/Y H:i:s', strtotime($rev['timestamp'])) . '" />';
-                };
+            $delete = '';
+            if ($tagType == 'delete') {
+                $delete = ' type="Delete"';
+            }
+            return '<rev-def id="' . $rev['guid'] . '"' . $delete . ' author="' .
+                $rev['username'] . '" date="' . date('m/d/Y H:i:s', strtotime($rev['timestamp'])) . '" />';
+        };
         $revisions = "";
         foreach ($this->_diffTagger->_additions as $rev) {
             $revisions .= $createRevision($rev);
@@ -214,41 +220,58 @@ class editor_Models_Export_FileParser_Sdlxliff extends editor_Models_Export_File
     /**
      *
      */
-    protected function injectCommentsHead() {
-        if(!empty($this->comments)){
+    protected function injectCommentsHead()
+    {
+        if (!empty($this->comments)) {
             $commentsAsString = implode('', $this->comments);
-            if (strpos($this->_exportFile, '</cmt-defs>')!== false) {
+            if (strpos($this->_exportFile, '</cmt-defs>') !== false) {
                 $this->_exportFile = str_replace('</cmt-defs>', $commentsAsString . '</cmt-defs>', $this->_exportFile);
-            }elseif (strpos($this->_exportFile, '<cmt-meta-defs>')!== false) {
+            } elseif (strpos($this->_exportFile, '<cmt-meta-defs>') !== false) {
                 $this->_exportFile = str_replace('<cmt-meta-defs>', '<cmt-defs>' . $commentsAsString . '</cmt-defs><cmt-meta-defs>', $this->_exportFile);
-            } elseif (strpos($this->_exportFile, '</doc-info>')!== false) {
+            } elseif (strpos($this->_exportFile, '</doc-info>') !== false) {
                 $this->_exportFile = str_replace('</doc-info>', '<cmt-defs>' . $commentsAsString . '</cmt-defs></doc-info>', $this->_exportFile);
-            }
-            else {
+            } else {
                 $this->_exportFile =
-                        preg_replace('"(<xliff[^>]*xmlns:sdl=\")([^\"]*)(\"[^>]*>)"',
-                                '\\1\\2\\3<doc-info xmlns="\\2"><cmt-defs>' .
-                                $commentsAsString . '</cmt-defs></doc-info>', $this->_exportFile);
+                    preg_replace('"(<xliff[^>]*xmlns:sdl=\")([^\"]*)(\"[^>]*>)"',
+                        '\\1\\2\\3<doc-info xmlns="\\2"><cmt-defs>' .
+                        $commentsAsString . '</cmt-defs></doc-info>', $this->_exportFile);
             }
         }
     }
+
     /**
      * Injiziert die Revisionshistorie in den head der sdlxliff-Datei
      */
-    protected function injectRevisions() {
+    protected function injectRevisions()
+    {
         $revisions = $this->generateRevisions();
         if ($revisions != '') {
-            if (strpos($this->_exportFile, '</rev-defs>')!== false) {
+            if (strpos($this->_exportFile, '</rev-defs>') !== false) {
                 $this->_exportFile = str_replace('</rev-defs>', $revisions . '</rev-defs>', $this->_exportFile);
-            } elseif (strpos($this->_exportFile, '</doc-info>')!== false) {
+            } elseif (strpos($this->_exportFile, '</doc-info>') !== false) {
                 $this->_exportFile = str_replace('</doc-info>', '<rev-defs>' . $revisions . '</rev-defs></doc-info>', $this->_exportFile);
-            }
-            else {
+            } else {
                 $this->_exportFile =
-                        preg_replace('"(<xliff[^>]*xmlns:sdl=\")([^\"]*)(\"[^>]*>)"',
-                                '\\1\\2\\3<doc-info xmlns="\\2"><rev-defs>' .
-                                $revisions . '</rev-defs></doc-info>', $this->_exportFile);
+                    preg_replace('"(<xliff[^>]*xmlns:sdl=\")([^\"]*)(\"[^>]*>)"',
+                        '\\1\\2\\3<doc-info xmlns="\\2"><rev-defs>' .
+                        $revisions . '</rev-defs></doc-info>', $this->_exportFile);
             }
+        }
+    }
+
+    /**
+     * Repair the locked tag references
+     * @return void
+     * @throws ReflectionException
+     */
+    private function fixLockSegmentTags(): void
+    {
+        if (strpos($this->_exportFile, 'xid="lockTU_') !== false) {
+            $repair = new editor_Models_Export_FileParser_Sdlxliff_RepairLockedReferences(
+                ZfExtended_Factory::get(editor_Models_Import_FileParser_XmlParser::class),
+                $this->_exportFile
+            );
+            $this->_exportFile = $repair->repair();
         }
     }
 }

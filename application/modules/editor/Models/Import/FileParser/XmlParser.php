@@ -565,7 +565,7 @@ class editor_Models_Import_FileParser_XmlParser {
             return true;
         }
         
-        if(preg_match('/([^\^=$*!]+)([^\^=$*!]{0,1}=)([^=]+)$/', $filter, $parts)) {
+        if(preg_match('/([^\^=$*!]+)([\^=$*!]{0,1}=)([^=]+)$/', $filter, $parts)) {
             $attribute = $parts[1];
             $operator = $parts[2];
             $comparator = $parts[3];
@@ -766,7 +766,11 @@ class editor_Models_Import_FileParser_XmlParser {
      * @return string
      */
     public function __toString(): string {
-        return $this->join($this->xmlChunks);
+        return str_replace(
+            array_keys($this->nonXmlBlocks),
+            array_values($this->nonXmlBlocks),
+            $this->join($this->xmlChunks)
+        );
     }
     
     public function join(array $chunks): string {
