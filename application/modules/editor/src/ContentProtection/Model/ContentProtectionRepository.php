@@ -262,6 +262,8 @@ class ContentProtectionRepository
 
     public function getRulesHashBy(Languages $sourceLang, Languages $targetLang): string
     {
+        $inputLines = [];
+
         foreach ($this->getAllForSource($sourceLang, $targetLang, false) as $dto) {
             if (null === $dto->format) {
                 continue;
