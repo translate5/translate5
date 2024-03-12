@@ -21002,5 +21002,10 @@ $ignoreErrors[] = [
 	'count' => 1,
 	'path' => __DIR__ . '/../library/ZfExtended/views/helpers/TemplateApply.php',
 ];
+$ignoreErrors[] = [
+	'message' => '#^Comparison operation ">" between 0 and 0 is always false.$#',
+	'count' => 1,
+	'path' => __DIR__ . '/../library/ZfExtended/TemplateBasedMail',
+];
 
 return ['parameters' => ['ignoreErrors' => $ignoreErrors]];

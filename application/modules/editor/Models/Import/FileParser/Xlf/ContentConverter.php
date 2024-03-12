@@ -76,7 +76,6 @@ class editor_Models_Import_FileParser_Xlf_ContentConverter {
     
     /**
      * Flag to switch normal mode and remove tags mode
-     * @var string
      */
     protected bool $removeTags = false;
 

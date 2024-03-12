@@ -156,6 +156,7 @@
 		}
 	},
 	"scripts" : {
+		"phpstan" : "vendor/bin/phpstan",
 		"post-install-cmd" : "cghooks add --ignore-lock; cghooks update",
 		"post-update-cmd" : "cghooks update",
 		"pre-install-cmd" : "Translate5\\Installer\\HookIn::postPackageInstall"

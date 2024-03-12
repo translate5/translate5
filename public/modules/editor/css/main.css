@@ -1031,15 +1031,21 @@ tr.x-grid-row.pointer > td[class*="x-grid-cell-gridcolumn-"]{
 }
 .x-fieldset.segmentQualities .quality .x-grid-cell-inner > div:first-child {
     line-height: 15px;
+    white-space: break-spaces;
+    display: inline;
 }
 .x-fieldset.segmentQualities .quality .x-grid-cell-inner > div:nth-child(2) {
     line-height: initial;
+    white-space: break-spaces;
+    font-weight: bold;
+    display: inline-block;
+}
+.x-fieldset.segmentQualities .quality .x-grid-cell-inner > div.no-content {
+    font-weight: unset;
 }
 .x-fieldset.segmentQualities .quality .x-grid-cell-inner > div:nth-child(2):before {
-    content: '- ';
-}
-.x-fieldset.segmentQualities .quality .x-grid-cell-inner > div:nth-child(2):after {
-    content: ' -';
+    font-weight: normal;
+    content: ' » ';
 }
 .t5falsePositivesGrid .fa {
     font-family: FontAwesome5FreeSolid;
