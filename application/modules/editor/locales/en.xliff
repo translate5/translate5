@@ -9677,6 +9677,10 @@ E-Mail: service@MittagQI.com</pre>
                 <source>Bitte denken Sie daran, dass alle Verwendungen dieser Option (falls vorhanden) entfernt werden, wenn sie in einem der bestehenden Projekte/Aufgaben erfüllt werden. Fortfahren?</source>
                 <target>Please keep in mind that all the usages (if any) of this option will be removed if met in any of existing projects/tasks. Proceed?</target>
             </trans-unit>
+            <trans-unit id='RGFzIERlZmluaWVyZW4gdW5kIMOEbmRlcm4gdm9uIEZlbGRlcm4ga2FubiB6dSBlaW5lbSBob2hlbiBSZXNzb3VyY2VudmVyYnJhdWNoIGbDvGhyZW4sIHdlbm4gZGFzIEZlbGQgZ2VzcGVpY2hlcnQgd2lyZC4gQml0dGUgdHVuIFNpZSBkaWVzIGluIEFic3RpbW11bmcgbWl0IGRlbSB0cmFuc2xhdGU1LVN1cHBvcnR0ZWFtLg=='>
+                <source>Das Definieren und Ändern von Feldern kann zu einem hohen Ressourcenverbrauch führen, wenn das Feld gespeichert wird. Bitte tun Sie dies in Abstimmung mit dem translate5-Supportteam.</source>
+                <target>Defining and changing field can lead to high resource usage, when saving the field. Please do it with coordination with the translate5 support team.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

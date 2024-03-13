@@ -9500,6 +9500,10 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
                 <source>Bitte denken Sie daran, dass alle Verwendungen dieser Option (falls vorhanden) entfernt werden, wenn sie in einem der bestehenden Projekte/Aufgaben erfüllt werden. Fortfahren?</source>
                 <target>Bitte denken Sie daran, dass alle Verwendungen dieser Option (falls vorhanden) entfernt werden, wenn sie in einem der bestehenden Projekte/Aufgaben erfüllt werden. Fortfahren?</target>
             </trans-unit>
+            <trans-unit id='RGFzIERlZmluaWVyZW4gdW5kIMOEbmRlcm4gdm9uIEZlbGRlcm4ga2FubiB6dSBlaW5lbSBob2hlbiBSZXNzb3VyY2VudmVyYnJhdWNoIGbDvGhyZW4sIHdlbm4gZGFzIEZlbGQgZ2VzcGVpY2hlcnQgd2lyZC4gQml0dGUgdHVuIFNpZSBkaWVzIGluIEFic3RpbW11bmcgbWl0IGRlbSB0cmFuc2xhdGU1LVN1cHBvcnR0ZWFtLg=='>
+                <source>Das Definieren und Ändern von Feldern kann zu einem hohen Ressourcenverbrauch führen, wenn das Feld gespeichert wird. Bitte tun Sie dies in Abstimmung mit dem translate5-Supportteam.</source>
+                <target>Das Definieren und Ändern von Feldern kann zu einem hohen Ressourcenverbrauch führen, wenn das Feld gespeichert wird. Bitte tun Sie dies in Abstimmung mit dem translate5-Supportteam.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>
