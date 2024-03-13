@@ -41,6 +41,8 @@ use editor_Models_Terminology_Models_CollectionAttributeDataType as CollectionAt
  * @method void setColor(string $color)
  * @method string getResourceId() The id of the used resource
  * @method void setResourceId(string $resourceId)
+ * @method string getSpecificId()
+ * @method void setSpecificId(string $specificId)
  * @method string getServiceType() The PHP class name for the service
  * @method void setServiceType(string $type)
  * @method string getServiceName() The speakable name of the service as configured in the resource

@@ -800,7 +800,7 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
     protected function decodePutData()
     {
         parent::decodePutData();
-        unset($this->data->langResUuid);
+        unset($this->data->langResUuid, $this->data->specificId);
     }
     
     /**
