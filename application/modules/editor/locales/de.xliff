@@ -3783,13 +3783,21 @@
                 <source>Status "{0}" durch einen anderen Benutzer</source>
                 <target>Status "{0}" durch einen anderen Benutzer</target>
             </trans-unit>
-            <trans-unit id='QXVmZ2FiZW4gcmVpbXBvcnRpZXJlbg=='>
-                <source>Aufgaben reimportieren</source>
-                <target>Aufgaben reimportieren</target>
+            <trans-unit id='QWxsZSBTZWdtZW50ZSBpbSBUTSBzcGVpY2hlcm4='>
+                <source>Alle Segmente im TM speichern</source>
+                <target>Alle Segmente im TM speichern</target>
             </trans-unit>
-            <trans-unit id='QXVzZ2V3w6RobHRlIEF1ZmdhYmVuIGVybmV1dCBpbnMgYWt0dWVsbGUgVE0gaW1wb3J0aWVyZW4='>
-                <source>Ausgewählte Aufgaben erneut ins aktuelle TM importieren</source>
-                <target>Ausgewählte Aufgaben erneut ins aktuelle TM importieren</target>
+            <trans-unit id='QmVudXR6ZXItZ2VzcGVpY2hlcnRlIFNlZ21lbnRlIGltIFRNIHNwZWljaGVybg=='>
+                <source>Benutzer-gespeicherte Segmente im TM speichern</source>
+                <target>Benutzer-gespeicherte Segmente im TM speichern</target>
+            </trans-unit>
+            <trans-unit id='U3BlaWNoZXJ0IGFsbGUgU2VnbWVudGUgYWxsZXIgQXVmZ2FiZW4sIGRpZSBvYmVuIGFuZ2VoYWt0IHNpbmQgdW5kIGRlbSBUTSBtaXQgU2NocmVpYnJlY2h0ZW4genVnZXdpZXNlbiBzaW5k'>
+                <source>Speichert alle Segmente aller Aufgaben, die oben angehakt sind und dem TM mit Schreibrechten zugewiesen sind</source>
+                <target>Speichert alle Segmente aller Aufgaben, die oben angehakt sind und dem TM mit Schreibrechten zugewiesen sind</target>
+            </trans-unit>
+            <trans-unit id='U3BlaWNoZXJ0IG51ciBkaWUgQWJzY2huaXR0ZSwgZGllIHp1dm9yIHZvbiBlaW5lbSBCZW51dHplciBtYW51ZWxsIGdlc3BlaWNoZXJ0IHd1cmRlbi4gRGllcyBnaWx0IGbDvHIgYWxsZSBBdWZnYWJlbiwgZGllIG9iZW4gYW5nZWhha3Qgc2luZCB1bmQgZGVtIFRNIG1pdCBTY2hyZWlicmVjaHRlbiB6dWdld2llc2VuIHNpbmQ='>
+                <source>Speichert nur die Abschnitte, die zuvor von einem Benutzer manuell gespeichert wurden. Dies gilt für alle Aufgaben, die oben angehakt sind und dem TM mit Schreibrechten zugewiesen sind</source>
+                <target>Speichert nur die Abschnitte, die zuvor von einem Benutzer manuell gespeichert wurden. Dies gilt für alle Aufgaben, die oben angehakt sind und dem TM mit Schreibrechten zugewiesen sind</target>
             </trans-unit>
             <trans-unit id='R2xvYmFsZXNlIFZvcsO8YmVyc2V0enVuZyDDvGJlcnNwcmluZ2Vu'>
                 <source>Globalese Vorübersetzung überspringen</source>

@@ -51,12 +51,11 @@ Ext.define('Editor.view.LanguageResources.TaskGridWindowViewModel', {
         record: null
     },
     initConfig: function(instanceConfig) {
-        var me = this,
+        let me = this,
             config = {
                 stores: {
                     tasklist: {
-                        buffered: true,
-                        pageSize: 200,
+                        pageSize: 1000,
                         autoLoad: false,
                         model: 'Editor.model.LanguageResources.Task',
                         sorters: [{
@@ -66,9 +65,11 @@ Ext.define('Editor.view.LanguageResources.TaskGridWindowViewModel', {
                     }
                 }
             };
+
         if (instanceConfig) {
             me.self.getConfigurator().merge(me, config, instanceConfig);
         }
+
         return me.callParent([config]);
     }
 });

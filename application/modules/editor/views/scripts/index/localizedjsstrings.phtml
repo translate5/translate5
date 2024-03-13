@@ -1923,8 +1923,10 @@ Ext.define('Editor.controller.Localizer', {
             state: '<?php echo $this->translate->_('Status');?>',
             inUse: '<?php echo $this->translate->_('Status "{0}" durch einen anderen Benutzer');?>',
             close: '<?php echo $this->translate->_('Schließen');?>',
-            reimport: '<?php echo $this->translate->_('Aufgaben reimportieren');?>',
-            reimportTooltip: '<?php echo $this->translate->_('Ausgewählte Aufgaben erneut ins aktuelle TM importieren');?>',
+            reimportAll: '<?php echo $this->translate->_('Alle Segmente im TM speichern');?>',
+            reimportUserSaved: '<?php echo $this->translate->_('Benutzer-gespeicherte Segmente im TM speichern');?>',
+            reimportAllTooltip: '<?php echo $this->translate->_('Speichert alle Segmente aller Aufgaben, die oben angehakt sind und dem TM mit Schreibrechten zugewiesen sind');?>',
+            reimportUserSavedTooltip: '<?php echo $this->translate->_('Speichert nur die Abschnitte, die zuvor von einem Benutzer manuell gespeichert wurden. Dies gilt für alle Aufgaben, die oben angehakt sind und dem TM mit Schreibrechten zugewiesen sind');?>',
             gotoTask: '<?php echo $this->translate->_('zur Aufgabe springen');?>'
         }
     });
