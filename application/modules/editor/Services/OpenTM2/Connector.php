@@ -1682,11 +1682,12 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
         // Replacing \r\n to \n back because t5memory replaces \n to \r\n
         $targetReceived = str_replace("\r\n", "\n", $targetReceived);
         // Also replace tab symbols to space because t5memory does it on its side
-        $targetSent = str_replace("\t", ' ', $targetSent);
+        $targetSent = str_replace(["\t", "\r\n"], [' ', "\n"], $targetSent);
         // Finally compare target that we've sent for saving with the one we retrieved from TM, they should be the same
-        // htmlentities() is used because sometimes t5memory returns target with decoded
+        // html_entity_decode() is used because sometimes t5memory returns target with decoded
         // html entities regardless of the original target
-        $targetIsTheSame = $targetReceived === $targetSent || htmlentities($targetReceived) === $targetSent;
+        $targetIsTheSame = $targetReceived === $targetSent
+            || html_entity_decode($targetReceived) === html_entity_decode($targetSent);
 
         $resultTimestamp = $result->getMetaValue($maxMatchRateResult->metaData, 'timestamp');
         $resultDate = DatetimeImmutable::createFromFormat('Y-m-d H:i:s T', $resultTimestamp);
