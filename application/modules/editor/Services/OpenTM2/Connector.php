@@ -195,14 +195,57 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
     }
 
     /**
+     * @return iterable<string>
+     */
+    private function getImportFilesFromUpload(?array $fileInfo): iterable
+    {
+        if (null === $fileInfo) {
+            return [];
+        }
+
+        $validator = new Zend_Validate_File_IsCompressed();
+        if (!$validator->isValid($fileInfo['tmp_name'])) {
+            return [$fileInfo['tmp_name']];
+        }
+
+        $zip = new ZipArchive();
+        if (!$zip->open($fileInfo['tmp_name'])) {
+            $this->logger->error('E1596', 'OpenTM2: Unable to open zip file from file-path:' . $fileInfo['tmp_name']);
+
+            return [];
+        }
+
+        $newPath = sys_get_temp_dir() . DIRECTORY_SEPARATOR . pathinfo($fileInfo['name'], PATHINFO_FILENAME);
+
+        if (!$zip->extractTo($newPath)) {
+            $this->logger->error('E1597', 'OpenTM2: Content from zip file could not be extracted.');
+            $zip->close();
+
+            return [];
+        }
+
+        $zip->close();
+
+        foreach (editor_Utils::generatePermutations('tmx') as $patter) {
+            yield from glob($newPath . DIRECTORY_SEPARATOR . '*.' . implode($patter)) ?: [];
+        }
+    }
+
+    /**
      * {@inheritDoc}
      */
     public function addAdditionalTm(array $fileinfo = null, array $params = null): bool
     {
-        return $this->importTmxIntoMemory(
-            file_get_contents($fileinfo['tmp_name']),
-            $params['tmName'] ?? $this->getWritableMemory()
-        );
+        $result = true;
+
+        foreach ($this->getImportFilesFromUpload($fileinfo) as $file) {
+            $result = $result && $this->importTmxIntoMemory(
+                file_get_contents($file),
+                $params['tmName'] ?? $this->getWritableMemory()
+            );
+        }
+
+        return $result;
     }
 
     /**
@@ -211,6 +254,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
     public function getValidFiletypes(): array
     {
         return [
+            'ZIP' => ['application/zip'],
             'TM' => ['application/zip'],
             'TMX' => ['application/xml', 'text/xml'],
         ];
