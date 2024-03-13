@@ -175,10 +175,11 @@ class T5MemoryMigrationCommand extends Translate5AbstractCommand
 
         if (count($languageResourcesData) === 0) {
             $this->io->warning('No language resources found for the given source URL');
+            // Check if there are any language resources left for the source resource id and ask if it should be removed
+            $languageResource = ZfExtended_Factory::get(LanguageResource::class);
+            $lrsRemainWithResourceId = $languageResource->getByResourceId($sourceResourceId);
 
-            if (!$this->isFilteringByName() // We are not filtering by name, but processing all resources
-                && !$this->createEmptyRequested() // We are not creating empty resource in target t5memory
-            ) {
+            if (count($lrsRemainWithResourceId) === 0) {
                 $helper = $this->getHelper('question');
                 $question = new ConfirmationQuestion(
                     'Do you want to remove ' . $sourceUrl . ' from config? (Y/N)',
@@ -186,7 +187,7 @@ class T5MemoryMigrationCommand extends Translate5AbstractCommand
                 );
 
                 if ($helper->ask($this->input, $this->output, $question)) {
-                    $this->cleanupConfig($sourceUrl, $targetUrl);
+                    $this->cleanupConfig($sourceUrl);
                 }
             }
 
