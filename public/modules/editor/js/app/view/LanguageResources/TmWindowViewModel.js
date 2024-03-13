@@ -20,7 +20,7 @@ START LICENSE AND COPYRIGHT
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
@@ -35,8 +35,10 @@ Ext.define('Editor.view.LanguageResources.TmWindowViewModel', {
     data: {
         serviceName: false,
         resourceType: false,
+        resourceId: null,
         uploadLabel: null,
         engineBased: null,
+        strippingFramingTagsSupported: false
     },
     stores: {
         customers: {
@@ -81,6 +83,9 @@ Ext.define('Editor.view.LanguageResources.TmWindowViewModel', {
         },
         isTmResourceType: function (get) {
             return get('resourceType') === Editor.util.LanguageResources.resourceType.TM;
+        },
+        isStrippingFramingTagsSupported: function (get) {
+            return get('strippingFramingTagsSupported');
         }
     }
 });

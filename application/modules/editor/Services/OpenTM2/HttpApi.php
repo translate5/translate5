@@ -27,6 +27,7 @@ END LICENSE AND COPYRIGHT
 */
 
 use MittagQI\Translate5\Service\T5Memory;
+use MittagQI\Translate5\T5Memory\Enum\StripFramingTags;
 
 /**
  * OpenTM2 HTTP Connection API
@@ -100,7 +101,7 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
     /**
      * This method imports a memory from a TMX file.
      */
-    public function importMemory($tmData, string $tmName)
+    public function importMemory($tmData, string $tmName, StripFramingTags $stripFramingTags)
     {
         //In:{ "Method":"import", "Memory":"MyTestMemory", "TMXFile":"C:/FileArea/MyTstMemory.TMX" }
         //Out: { "ReturnValue":0, "ErrorMsg":"" }
@@ -115,6 +116,7 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
             $tmData = $tmxRepairer->convert($tmData);
         }
         $data->tmxData = base64_encode($tmData);
+        $data->stripFramingTags = $stripFramingTags->value;
 
         $http = $this->getHttpWithMemory('POST', $tmName, '/import');
         $http->setConfig(['timeout' => $this->createTimeout(1200)]);
