@@ -200,19 +200,19 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
     private function getImportFilesFromUpload(?array $fileInfo): iterable
     {
         if (null === $fileInfo) {
-            return [];
+            return yield from [];
         }
 
         $validator = new Zend_Validate_File_IsCompressed();
         if (!$validator->isValid($fileInfo['tmp_name'])) {
-            return [$fileInfo['tmp_name']];
+            return yield $fileInfo['tmp_name'];
         }
 
         $zip = new ZipArchive();
         if (!$zip->open($fileInfo['tmp_name'])) {
             $this->logger->error('E1596', 'OpenTM2: Unable to open zip file from file-path:' . $fileInfo['tmp_name']);
 
-            return [];
+            return yield from [];
         }
 
         $newPath = sys_get_temp_dir() . DIRECTORY_SEPARATOR . pathinfo($fileInfo['name'], PATHINFO_FILENAME);
@@ -221,7 +221,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
             $this->logger->error('E1597', 'OpenTM2: Content from zip file could not be extracted.');
             $zip->close();
 
-            return [];
+            return yield from [];
         }
 
         $zip->close();
