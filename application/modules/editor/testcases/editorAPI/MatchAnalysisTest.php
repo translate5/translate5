@@ -55,11 +55,11 @@ class MatchAnalysisTest extends editor_Test_ImportTest {
         $customerId = static::getTestCustomerId();
 
         // collect the original config value so it will be set again after the test is finished
-        self::$changedConfigs[] = static::api()->getConfig('runtimeOptions.frontend.importTask.edit100PercentMatch');
+        self::$changedConfigs[] = static::api()->getConfig('runtimeOptions.import.edit100PercentMatch');
 
         static::api()->putJson('editor/config/',[
             'value' => 0,
-            'name' => 'runtimeOptions.frontend.importTask.edit100PercentMatch'
+            'name' => 'runtimeOptions.import.edit100PercentMatch'
         ]);
 
         $config

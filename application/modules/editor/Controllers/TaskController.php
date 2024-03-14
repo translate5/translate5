@@ -548,11 +548,12 @@ class editor_TaskController extends ZfExtended_RestController
 
         settype($this->data['wordCount'], 'integer');
         settype($this->data['enableSourceEditing'], 'integer');
-        settype($this->data['edit100PercentMatch'], 'integer');
         settype($this->data['lockLocked'], 'integer');
+
         if (array_key_exists('enddate', $this->data)) {
             unset($this->data['enddate']);
         }
+
         if (array_key_exists('autoStartImport', $this->data)) {
             //if the value exists we assume boolean
             settype($this->data['autoStartImport'], 'boolean');
@@ -560,6 +561,7 @@ class editor_TaskController extends ZfExtended_RestController
             //if not explicitly disabled the import starts always automatically to be compatible with legacy API users
             $this->data['autoStartImport'] = true;
         }
+
         if (empty($this->data['pmGuid']) || !$this->isAllowed(Rights::ID, 'editorEditTaskPm')) {
             $this->data['pmGuid'] = $this->authenticatedUser->getUserGuid();
             $this->data['pmName'] = $this->authenticatedUser->getUsernameLong();
@@ -605,6 +607,9 @@ class editor_TaskController extends ZfExtended_RestController
         //init workflow id for the task, based on customer or general config as fallback
         $this->entity->setWorkflow($c->runtimeOptions->workflow->initialWorkflow);
 
+        $this->entity->setEdit100PercentMatch(
+            (int) ($this->data['edit100PercentMatch'] ?? $c->runtimeOptions->import->edit100PercentMatch)
+        );
 
         if (!$this->validate()) {
             // we have to prevent attached events, since when we get here the task is not created,
