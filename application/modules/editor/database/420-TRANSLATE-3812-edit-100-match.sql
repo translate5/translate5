@@ -26,5 +26,6 @@
 -- */
 
 UPDATE Zf_configuration
-SET name = 'runtimeOptions.import.edit100PercentMatch', level = 4
+SET name = 'runtimeOptions.import.edit100PercentMatch', level = 4,
+    description = 'If set to active, the import option that decides if 100% matches can be edited in the task is activated by default. Else it is disabled by default (but can be enabled in the import settings). Api integrations are also affected.'
 WHERE name = 'runtimeOptions.frontend.importTask.edit100PercentMatch';
