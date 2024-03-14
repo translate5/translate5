@@ -60,7 +60,7 @@ Ext.define('Editor.view.admin.task.CustomField.GridController', {
      * Routes
      */
     routesToSet: {
-        ':recordId': 'onRecordRoute',
+        ':recordId': 'onRecordRoute'
     },
 
     /**
@@ -382,7 +382,8 @@ Ext.define('Editor.view.admin.task.CustomField.GridController', {
      * Save changes to new or existing custom field
      */
     onSave:function(){
-        var me = this, view = me.getView(),
+        var me = this,
+            view = me.getView(),
             record = view.getSelection().pop();
 
         // Put a mask on the whole view
@@ -396,6 +397,13 @@ Ext.define('Editor.view.admin.task.CustomField.GridController', {
         // Start saving request
         record.save({
             success: (rec, operation) => {
+
+                Ext.MessageBox.show({
+                    title: Editor.data.l10n.taskCustomField.validationTitle,
+                    msg: Editor.data.l10n.taskCustomField.validationMessage,
+                    buttons: Ext.MessageBox.OK,
+                    icon: Ext.MessageBox.WARNING
+                });
 
                 // Get response json
                 var json = operation.getResponse().responseJson;

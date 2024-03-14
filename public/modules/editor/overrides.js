@@ -1839,3 +1839,101 @@ Ext.override(Ext.ZIndexManager, {
     }
 });
 
+Ext.override(Ext.dom.Element, {
+
+    /**
+     * This method is overridden to show source.outerHTML in console for being able to further investigate
+     * where such attribute name is coming from in this error message
+     * "Failed to execute 'setAttribute' on 'Element': 'vorlage,' is not a valid attribute name."
+     *
+     * This method is the same as original except the lines ending with '// +' which were added by this override
+     *
+     * @param source
+     */
+    syncContent: function(source) {
+        source = Ext.getDom(source);
+        var sourceNodes = source.childNodes,
+            sourceLen = sourceNodes.length,
+            dest = this.dom,
+            destNodes = dest.childNodes,
+            destLen = destNodes.length,
+            i,  destNode, sourceNode,
+            nodeType, newAttrs, attLen, attName,
+            elData = dest._extData;
+
+        // Copy top node's attributes across. Use IE-specific method if possible.
+        // In IE10, there is a problem where the className will not get updated
+        // in the view, even though the className on the dom element is correct.
+        // See EXTJSIV-9462
+        if (Ext.isIE9m && dest.mergeAttributes) {
+            dest.mergeAttributes(source, true);
+
+            // EXTJSIV-6803. IE's mergeAttributes appears not to make the source's "src" value available until after the image is ready.
+            // So programmatically copy any src attribute.
+            dest.src = source.src;
+        } else {
+            newAttrs = source.attributes;
+            attLen = newAttrs.length;
+            for (i = 0; i < attLen; i++) {
+                attName = newAttrs[i].name;
+                //if (!attrName.match(/^[0-9a-zA-Z_\-\.]+$/)){                                           // +
+                //    continue;                                                                          // +
+                //}                                                                                      // +
+                if (attName !== 'id') {
+                    try {                                                                                // +
+                        dest.setAttribute(attName, newAttrs[i].value);
+                    } catch (e) {                                                                        // +
+                        console.log(source.outerHTML);                                                   // +
+                        if (jslogger) {                                                                  // +
+                            jslogger.addLogEntry({                                                       // +
+                                type: 'info',                                                            // +
+                                message: 'source.outerHTML: '                                            // +
+                                    + source.outerHTML.replaceAll('"', '~')       // +
+                            });                                                                          // +
+                        }                                                                                // +
+                        throw e;                                                                         // +
+                    }
+                }
+            }
+        }
+
+        // The element's data is no longer synchronized. We just overwrite it in the DOM
+        if (elData) {
+            elData.isSynchronized = false;
+        }
+
+        // If the number of child nodes does not match, fall back to replacing innerHTML
+        if (sourceLen !== destLen) {
+            dest.innerHTML = source.innerHTML;
+            return;
+        }
+
+        // Loop through source nodes.
+        // If there are fewer, we must remove excess
+        for (i = 0; i < sourceLen; i++) {
+            sourceNode = sourceNodes[i];
+            destNode = destNodes[i];
+            nodeType = sourceNode.nodeType;
+
+            // If node structure is out of sync, just drop innerHTML in and return
+            if (nodeType !== destNode.nodeType || (nodeType === 1 && sourceNode.tagName !== destNode.tagName)) {
+                dest.innerHTML = source.innerHTML;
+                return;
+            }
+
+            // Update text node
+            if (nodeType === 3) {
+                destNode.data = sourceNode.data;
+            }
+            // Sync element content
+            else {
+                if (sourceNode.id && destNode.id !== sourceNode.id) {
+                    destNode.id = sourceNode.id;
+                }
+                destNode.style.cssText = sourceNode.style.cssText;
+                destNode.className = sourceNode.className;
+                Ext.fly(destNode, '_syncContent').syncContent(sourceNode);
+            }
+        }
+    },
+});

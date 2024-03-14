@@ -68,7 +68,7 @@ Ext.define('Editor.view.LanguageResources.ImportTmWindow', {
                         xtype: 'filefield',
                         fieldLabel: me.strings.file,
                         toolTip: me.strings.importTmx,
-                        regex: /\.tmx$/i,
+                        regex: /(\.tmx|\.zip)$/i,
                         regexText: me.strings.importTmxType,
                         labelWidth: 160,
                         anchor: '100%',

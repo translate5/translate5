@@ -154,8 +154,8 @@ Ext.define('Editor.controller.editor.PrevNextSegment', {
             grid = ed.grid,
             isBorderReached = rowMeta.isBorderReached,
             rowMeta = rowMeta[type + 'Next'],
-            prevIndex = me.prev['NEXTeditable'] ? me.prev['NEXTeditable'].idx : 0;
-            
+            prevIndex = (me.prev && me.prev['NEXTeditable']) ? me.prev['NEXTeditable'].idx : -1;
+
         if(!rowMeta) {
             rowMeta = {}; //nothing found
         }
@@ -167,7 +167,7 @@ Ext.define('Editor.controller.editor.PrevNextSegment', {
         rowMeta.errorText = errorText;
         rowMeta.isLoading = !!me.isLoading;
         rowMeta.isBorderReached = isBorderReached;
-        rowMeta.isMoveEditor = me.isMoveEditor(rowMeta.idx, prevIndex);
+        rowMeta.isMoveEditor = prevIndex >= 0 ? me.isMoveEditor(rowMeta.idx, prevIndex) : false;
         return rowMeta;
     },
     

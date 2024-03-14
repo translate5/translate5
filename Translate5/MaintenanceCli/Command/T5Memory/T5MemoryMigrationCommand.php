@@ -175,10 +175,11 @@ class T5MemoryMigrationCommand extends Translate5AbstractCommand
 
         if (count($languageResourcesData) === 0) {
             $this->io->warning('No language resources found for the given source URL');
+            // Check if there are any language resources left for the source resource id and ask if it should be removed
+            $languageResource = ZfExtended_Factory::get(LanguageResource::class);
+            $lrsRemainWithResourceId = $languageResource->getByResourceId($sourceResourceId);
 
-            if (!$this->isFilteringByName() // We are not filtering by name, but processing all resources
-                && !$this->createEmptyRequested() // We are not creating empty resource in target t5memory
-            ) {
+            if (count($lrsRemainWithResourceId) === 0) {
                 $helper = $this->getHelper('question');
                 $question = new ConfirmationQuestion(
                     'Do you want to remove ' . $sourceUrl . ' from config? (Y/N)',
@@ -186,7 +187,7 @@ class T5MemoryMigrationCommand extends Translate5AbstractCommand
                 );
 
                 if ($helper->ask($this->input, $this->output, $question)) {
-                    $this->cleanupConfig($sourceUrl, $targetUrl);
+                    $this->cleanupConfig($sourceUrl);
                 }
             }
 
@@ -214,11 +215,16 @@ class T5MemoryMigrationCommand extends Translate5AbstractCommand
 
         $progressBar = new ProgressBar($output, count($languageResourcesData));
 
+        $logger = Zend_Registry::get('logger')->cloneMe('editor.languageresource');
         foreach ($languageResourcesData as $languageResourceData) {
             $progressBar->advance();
 
             $languageResource = ZfExtended_Factory::get(LanguageResource::class);
             $languageResource->load($languageResourceData['id']);
+            $logger->info('E0000', 'Language resource migrate start: {tm}', [
+                'languageResource' => $languageResource,
+                'tm' => $languageResource->getId().' - '.$languageResource->getName()
+            ]);
 
             $type = $connector->getValidExportTypes()['TMX'];
             $filenameWithPath = $this->getFilePath() . $this->generateFilename($languageResource);
@@ -249,6 +255,11 @@ class T5MemoryMigrationCommand extends Translate5AbstractCommand
 
                 $this->revertChanges($languageResource, $languageResourceData);
             }
+
+            $logger->info('E0000', 'Language resource migrate finish: {tm}', [
+                'languageResource' => $languageResource,
+                'tm' => $languageResource->getId().' - '.$languageResource->getName()
+            ]);
         }
 
         $this->writeResult($processingErrors);
