@@ -215,11 +215,16 @@ class T5MemoryMigrationCommand extends Translate5AbstractCommand
 
         $progressBar = new ProgressBar($output, count($languageResourcesData));
 
+        $logger = Zend_Registry::get('logger')->cloneMe('editor.languageresource');
         foreach ($languageResourcesData as $languageResourceData) {
             $progressBar->advance();
 
             $languageResource = ZfExtended_Factory::get(LanguageResource::class);
             $languageResource->load($languageResourceData['id']);
+            $logger->info('E0000', 'Language resource migrate start: {tm}', [
+                'languageResource' => $languageResource,
+                'tm' => $languageResource->getId().' - '.$languageResource->getName()
+            ]);
 
             $type = $connector->getValidExportTypes()['TMX'];
             $filenameWithPath = $this->getFilePath() . $this->generateFilename($languageResource);
@@ -250,6 +255,11 @@ class T5MemoryMigrationCommand extends Translate5AbstractCommand
 
                 $this->revertChanges($languageResource, $languageResourceData);
             }
+
+            $logger->info('E0000', 'Language resource migrate finish: {tm}', [
+                'languageResource' => $languageResource,
+                'tm' => $languageResource->getId().' - '.$languageResource->getName()
+            ]);
         }
 
         $this->writeResult($processingErrors);
