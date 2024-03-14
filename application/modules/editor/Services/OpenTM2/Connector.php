@@ -1096,10 +1096,14 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
             $reorganized = $this->waitReorganizeFinished();
         }
 
-        $this->languageResource->setStatus(
-            $reorganized ? LanguageResourceStatus::AVAILABLE : LanguageResourceStatus::REORGANIZE_FAILED
-        );
-        $this->languageResource->save();
+        if (!$this->isInternalFuzzy())
+        {
+            $this->languageResource->setStatus(
+                $reorganized ? LanguageResourceStatus::AVAILABLE : LanguageResourceStatus::REORGANIZE_FAILED
+            );
+
+            $this->languageResource->save();
+        }
 
         return $reorganized;
     }
