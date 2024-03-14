@@ -369,7 +369,7 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
 
         $this->view->Php2JsVars()->set(
             'frontend.importTask.edit100PercentMatch',
-            (bool)$rop->frontend->importTask->edit100PercentMatch
+            (bool)$rop->import->edit100PercentMatch
         );
 
         $this->view->Php2JsVars()->set(
