@@ -75,7 +75,7 @@ Ext.define('Editor.view.LanguageResources.AddTmWindow', {
     layout: 'fit',
     autoScroll: true,
 
-    tmxRegex: /\.(tm|tmx)$/i,
+    tmxRegex: /\.(tm|tmx|zip)$/i,
     tbxRegex: /\.(tbx|zip)$/i,
 
     listeners: {
