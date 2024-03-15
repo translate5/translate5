@@ -41,7 +41,47 @@ class Validator extends ZfExtended_Models_Validator_Abstract
         // creates validators from the above table definition
         // allowNull is set to true, because the default values are resolved on db level
         $this->addValidator('id', 'int', allowNull: true);
-        $this->addValidator('label', 'stringLength', ['min' => 0, 'max' => 255], allowNull: true);
+
+        $this->addValidatorCustom('label', function ($value) {
+            if (empty($value) || strlen($value) > 255) {
+                $this->addMessage(
+                    'label',
+                    'invalidLabel',
+                    'The label must be a string with a maximum length of 255 characters'
+                );
+                return false;
+            }
+            try {
+                $decoded = json_decode($value);
+                if (json_last_error() !== JSON_ERROR_NONE) {
+                    $this->addMessage(
+                        'label',
+                        'invalidLabel',
+                        'Error on decoding the label JSON string'
+                    );
+                    return false;
+                }
+                foreach ($decoded as $label) {
+                    if (empty($label)) {
+                        $this->addMessage(
+                            'label',
+                            'invalidLabel',
+                            'The label must be a valid JSON string and all values must be non empty strings'
+                        );
+                        return false;
+                    }
+                }
+            } catch (\Zend_Exception $e) {
+                $this->addMessage(
+                    'label',
+                    'invalidLabel',
+                    'The label must be a valid JSON string');
+                return false;
+            }
+
+            return true;
+        }, allowNull: true);
+
         $this->addValidator('tooltip', 'stringLength', ['min' => 0, 'max' => 255], allowNull: true);
         $this->addValidator('type', 'inArray', [['textfield', 'textarea', 'checkbox', 'combobox']], allowNull: true);
         $this->addValidator('comboboxData', 'stringLength', ['min' => 0, 'max' => 65535], allowNull: true);

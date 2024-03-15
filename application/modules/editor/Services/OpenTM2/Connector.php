@@ -207,37 +207,80 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
     }
 
     /**
+     * @return iterable<string>
+     */
+    private function getImportFilesFromUpload(?array $fileInfo): iterable
+    {
+        if (null === $fileInfo) {
+            return yield from [];
+        }
+
+        $validator = new Zend_Validate_File_IsCompressed();
+        if (!$validator->isValid($fileInfo['tmp_name'])) {
+            return yield $fileInfo['tmp_name'];
+        }
+
+        $zip = new ZipArchive();
+        if (!$zip->open($fileInfo['tmp_name'])) {
+            $this->logger->error('E1596', 'OpenTM2: Unable to open zip file from file-path:' . $fileInfo['tmp_name']);
+
+            return yield from [];
+        }
+
+        $newPath = sys_get_temp_dir() . DIRECTORY_SEPARATOR . pathinfo($fileInfo['name'], PATHINFO_FILENAME);
+
+        if (!$zip->extractTo($newPath)) {
+            $this->logger->error('E1597', 'OpenTM2: Content from zip file could not be extracted.');
+            $zip->close();
+
+            return yield from [];
+        }
+
+        $zip->close();
+
+        foreach (editor_Utils::generatePermutations('tmx') as $patter) {
+            yield from glob($newPath . DIRECTORY_SEPARATOR . '*.' . implode($patter)) ?: [];
+        }
+    }
+
+    /**
      * {@inheritDoc}
      */
     public function addAdditionalTm(array $fileinfo = null, array $params = null): bool
     {
-        try {
-            $importFilename = $this->conversionService->convertTMXForImport(
-                $fileinfo['tmp_name'],
-                (int) $this->languageResource->getSourceLang(),
-                (int) $this->languageResource->getTargetLang()
-            );
-        } catch (RuntimeException $e) {
-            $this->logger->error(
-                'E1590',
-                'Conversion: Error in process of TMX file conversion',
-                [
-                    'reason' => $e->getMessage(),
-                    'languageResource' => $this->languageResource
-                ]
-            );
-            $this->languageResource->setStatus(LanguageResourceStatus::AVAILABLE);
-            $this->languageResource->save();
+        $result = true;
 
-            return false;
+        foreach ($this->getImportFilesFromUpload($fileinfo) as $file) {
+            try {
+                $importFilename = $this->conversionService->convertTMXForImport(
+                    $file,
+                    (int) $this->languageResource->getSourceLang(),
+                    (int) $this->languageResource->getTargetLang()
+                );
+            } catch (RuntimeException $e) {
+                $this->logger->error(
+                    'E1590',
+                    'Conversion: Error in process of TMX file conversion',
+                    [
+                        'reason' => $e->getMessage(),
+                        'languageResource' => $this->languageResource
+                    ]
+                );
+                $this->languageResource->setStatus(LanguageResourceStatus::AVAILABLE);
+                $this->languageResource->save();
+
+                $result = false;
+
+                continue;
+            }
+
+            $result = $result && $this->importTmxIntoMemory(
+                file_get_contents($importFilename),
+                $params['tmName'] ?? $this->getWritableMemory()
+            );
+
+            unlink($importFilename);
         }
-
-        $result = $this->importTmxIntoMemory(
-            file_get_contents($importFilename),
-            $params['tmName'] ?? $this->getWritableMemory()
-        );
-
-        unlink($importFilename);
 
         return $result;
     }
@@ -248,6 +291,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
     public function getValidFiletypes(): array
     {
         return [
+            'ZIP' => ['application/zip'],
             'TM' => ['application/zip'],
             'TMX' => ['application/xml', 'text/xml'],
         ];
@@ -1101,10 +1145,14 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
             $reorganized = $this->waitReorganizeFinished();
         }
 
-        $this->languageResource->setStatus(
-            $reorganized ? LanguageResourceStatus::AVAILABLE : LanguageResourceStatus::REORGANIZE_FAILED
-        );
-        $this->languageResource->save();
+        if (!$this->isInternalFuzzy())
+        {
+            $this->languageResource->setStatus(
+                $reorganized ? LanguageResourceStatus::AVAILABLE : LanguageResourceStatus::REORGANIZE_FAILED
+            );
+
+            $this->languageResource->save();
+        }
 
         return $reorganized;
     }
@@ -1758,11 +1806,12 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
         // Replacing \r\n to \n back because t5memory replaces \n to \r\n
         $targetReceived = str_replace("\r\n", "\n", $targetReceived);
         // Also replace tab symbols to space because t5memory does it on its side
-        $targetSent = str_replace("\t", ' ', $targetSent);
+        $targetSent = str_replace(["\t", "\r\n"], [' ', "\n"], $targetSent);
         // Finally compare target that we've sent for saving with the one we retrieved from TM, they should be the same
-        // htmlentities() is used because sometimes t5memory returns target with decoded
+        // html_entity_decode() is used because sometimes t5memory returns target with decoded
         // html entities regardless of the original target
-        $targetIsTheSame = $targetReceived === $targetSent || htmlentities($targetReceived) === $targetSent;
+        $targetIsTheSame = $targetReceived === $targetSent
+            || html_entity_decode($targetReceived) === html_entity_decode($targetSent);
 
         $resultTimestamp = $result->getMetaValue($maxMatchRateResult->metaData, 'timestamp');
         $resultDate = DatetimeImmutable::createFromFormat('Y-m-d H:i:s T', $resultTimestamp);

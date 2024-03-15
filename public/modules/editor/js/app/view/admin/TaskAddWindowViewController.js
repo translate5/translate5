@@ -53,7 +53,8 @@ Ext.define('Editor.view.admin.TaskAddWindowViewController', {
      */
     onCustomerChange: function (comboBox, customerId){
         var me = this,
-            pivotLanguageCombo = me.getView().down('#relaisLangaugeTaskUploadWizard');
+            pivotLanguageCombo = me.getView().down('#relaisLangaugeTaskUploadWizard'),
+            edit100PercentCheckBox = me.getView().down('[name=edit100PercentMatch]');
 
         if(! me.selectedCustomersConfigStore){
             me.selectedCustomersConfigStore = Ext.create('Editor.store.admin.CustomerConfig');
@@ -80,13 +81,18 @@ Ext.define('Editor.view.admin.TaskAddWindowViewController', {
         pivotLanguageCombo.setValue(null);
 
         me.selectedCustomersConfigStore.loadByCustomerId(customerId,function (){
-            var view = me.getView();
+            let view = me.getView(),
+                edit100PercentMatch = me.selectedCustomersConfigStore.getConfig('import.edit100PercentMatch');
 
             if(!view){
                 // the window is already closed. Do not process any customer change
                 return;
             }
 
+            if(edit100PercentCheckBox) {
+                edit100PercentCheckBox.setValue(edit100PercentMatch);
+            }
+            
             var config = me.selectedCustomersConfigStore.getConfig('project.defaultPivotLanguage'),
                 langId = config ? Ext.getStore('admin.Languages').getIdByRfc(config) : null;
 
