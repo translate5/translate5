@@ -17,6 +17,76 @@ All updates are (downwards) compatible! If not this is listed in the important r
 
 
 
+
+## [7.2.2] - 2024-03-15
+
+### Important Notes:
+#### [TRANSLATE-3812](https://jira.translate5.net/browse/TRANSLATE-3812)
+The config runtimeOptions.frontend.importTask.edit100PercentMatch is renamed to runtimeOptions.import.edit100PercentMatch and affects now API imports too. Previously this was always false for API imports.
+
+#### [TRANSLATE-3796](https://jira.translate5.net/browse/TRANSLATE-3796)
+t5memory / OpenTM2 URL configuration is now only possible from CLI, not any more from UI. See issue for reason.
+ 
+
+
+### Added
+**[TRANSLATE-3794](https://jira.translate5.net/browse/TRANSLATE-3794): t5memory - Improve reimport tasks mechanism** <br>
+New command is added for reimport task segments to TM
+Added new button to the language resources UI for reimporting only updated segments
+
+**[TRANSLATE-3748](https://jira.translate5.net/browse/TRANSLATE-3748): LanguageResources - TMX zip-import** <br>
+Added support for zip uploads in t5memory resources.
+
+
+### Changed
+**[TRANSLATE-3812](https://jira.translate5.net/browse/TRANSLATE-3812): Import/Export - Make runtimeOptions.frontend.importTask.edit100PercentMatch affect the server side** <br>
+The config runtimeOptions.frontend.importTask.edit100PercentMatch is renamed to runtimeOptions.import.edit100PercentMatch and affects now API imports too. Previously this was always false for API imports.
+
+
+### Bugfixes
+**[TRANSLATE-3810](https://jira.translate5.net/browse/TRANSLATE-3810): Editor general - Reorganize tm can save status of internal fuzzy memory** <br>
+FIx for a problem with the memory name for t5memory language resources.
+
+**[TRANSLATE-3805](https://jira.translate5.net/browse/TRANSLATE-3805): Editor general - RootCause error: Cannot read properties of null (reading 'NEXTeditable')** <br>
+Fix for UI error when saving segment and there are no available next segments in the workflow.
+
+**[TRANSLATE-3804](https://jira.translate5.net/browse/TRANSLATE-3804): Editor general - RootCause: Cannot read properties of null (reading 'items')** <br>
+DEBUG: more info about the problem will be captured for further investigation once it happen next time
+
+**[TRANSLATE-3799](https://jira.translate5.net/browse/TRANSLATE-3799): t5memory - Segment check after update in t5memory doesn't work properly with escaped symbols** <br>
+Fixed check if segment was updated properly in t5memory
+
+**[TRANSLATE-3798](https://jira.translate5.net/browse/TRANSLATE-3798): Editor general - RootCause: Failed to execute 'setAttribute' on 'Element': 'vorlage,' is not a valid attribute name.** <br>
+Added more detailed logging of such cases for further investigation
+
+**[TRANSLATE-3797](https://jira.translate5.net/browse/TRANSLATE-3797): Editor general - Do not run CLI cron jobs with active maintenance** <br>
+Scheduled cron jobs via CLI may not run when maintenance is enabled.
+
+**[TRANSLATE-3796](https://jira.translate5.net/browse/TRANSLATE-3796): t5memory - Fix t5memory migration command** <br>
+Fix cleaning config value in t5memory:migrate command
+
+**[TRANSLATE-3793](https://jira.translate5.net/browse/TRANSLATE-3793): LanguageResources - change date format in file name of resource usage export** <br>
+Fix date-format in excel-export zip-file-names to become the standard "Y-m-d"
+
+**[TRANSLATE-3789](https://jira.translate5.net/browse/TRANSLATE-3789): VisualReview / VisualTranslation - Remove "Max number of layout errors" from visual, just "warn" from a certain thresh on, that errors happened** <br>
+Visual: Tasks are imported, even if the thresh of layout-errors is exceeded; Only a warning will be added in such cases
+
+**[TRANSLATE-3782](https://jira.translate5.net/browse/TRANSLATE-3782): Repetition editor - repetions editor target text not shown** <br>
+FIXED: target tests were not visible in repetitions editor
+
+**[TRANSLATE-3758](https://jira.translate5.net/browse/TRANSLATE-3758): Configuration - move config edit100PercentMatch to client level** <br>
+Attention: See als TRANSLATE-3812! The config runtimeOptions.frontend.importTask.edit100PercentMatch is renamed to runtimeOptions.import.edit100PercentMatch and affects now API imports too, and can be set on client level.
+
+**[TRANSLATE-3755](https://jira.translate5.net/browse/TRANSLATE-3755): Main back-end mechanisms (Worker, Logging, etc.) - PHP E_ERROR: Uncaught TypeError: gzdeflate(): Argument #1 ($data) must be of type string, bool given** <br>
+FIXED: if error happens on json-encoding events to be logged - is now POSTed to logger instead
+
+**[TRANSLATE-3741](https://jira.translate5.net/browse/TRANSLATE-3741): Import/Export - Pricing scheme selected on client level is not respected for projects coming over the hotfolder** <br>
+Fix Task creation process. Provide pricing preset from Client config
+
+**[TRANSLATE-3670](https://jira.translate5.net/browse/TRANSLATE-3670): Editor general - Task custom fields label should be required** <br>
+Label field is not required when creating new custom field.
+
+
 ## [7.2.1] - 2024-03-07
 
 ### Important Notes:
