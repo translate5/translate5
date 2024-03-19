@@ -68,11 +68,6 @@ Ext.define('Editor.view.LanguageResources.ImportTmWindow', {
             },
             config = {
                 title:me.strings.title,
-                items: [
-                    {
-                        xtype: 'form',
-                        padding: 5,
-                        ui: 'default-frame',
                 items : [{
                     xtype: 'form',
                     padding: 5,
@@ -98,26 +93,26 @@ Ext.define('Editor.view.LanguageResources.ImportTmWindow', {
                         name: 'tmUpload'
                     },
                     {
-                                xtype: 'combo',
-                                itemId: 'stripFramingTags',
-                                name: 'stripFramingTags',
-                                fieldLabel: me.strings.stripFramingTags,
-                                store: new Ext.data.ArrayStore({
-                                    fields: ['id', 'value'],
-                                }),
-                                queryMode: 'local',
-                                displayField: 'value',
-                                valueField: 'id',
-                                value: 'none',
-                                bind: {
-                                    disabled: '{!isStrippingFramingTagsSupported}',
-                                    hidden: '{!isStrippingFramingTagsSupported}'
-                                },
-                                labelClsExtra: 'lableInfoIcon',
-                                autoEl: {
-                                    tag: 'div',
-                                    'data-qtip': me.strings.stripFramingTagsTooltip
-                                }
+                        xtype: 'combo',
+                        itemId: 'stripFramingTags',
+                        name: 'stripFramingTags',
+                        fieldLabel: me.strings.stripFramingTags,
+                        store: new Ext.data.ArrayStore({
+                            fields: ['id', 'value'],
+                        }),
+                        queryMode: 'local',
+                        displayField: 'value',
+                        valueField: 'id',
+                        value: 'none',
+                        bind: {
+                            disabled: '{!isStrippingFramingTagsSupported}',
+                            hidden: '{!isStrippingFramingTagsSupported}'
+                        },
+                        labelClsExtra: 'lableInfoIcon',
+                        autoEl: {
+                            tag: 'div',
+                            'data-qtip': me.strings.stripFramingTagsTooltip
+                        }
                     }]
                 }],
                 dockedItems : [{
