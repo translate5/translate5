@@ -73,30 +73,31 @@ Ext.define('Editor.view.LanguageResources.ImportTmWindow', {
                         xtype: 'form',
                         padding: 5,
                         ui: 'default-frame',
-                        defaults: defaults,
-                        items: [
-                            {
-                                ui: 'default-frame',
-                                html: me.strings.importTmx,
-                                padding: 5
-                            },
-                            {
-                                xtype: 'hiddenfield',
-                                name: 'CsrfToken',
-                                value: Editor.data.csrfToken
-                            },
-                            {
-                                xtype: 'filefield',
-                                fieldLabel: me.strings.file,
-                                toolTip: me.strings.importTmx,
-                                regex: /\.tmx$/i,
-                                regexText: me.strings.importTmxType,
-                                labelWidth: 160,
-                                anchor: '100%',
-                                vtype: 'tmFileUploadSize',
-                                name: 'tmUpload'
-                            },
-                            {
+                items : [{
+                    xtype: 'form',
+                    padding: 5,
+                    ui: 'default-frame',
+                    defaults: defaults,
+                    items: [{
+                        ui: 'default-frame',
+                        html: me.strings.importTmx,
+                        padding: 5
+                    },{
+                        xtype: 'hiddenfield',
+                        name: 'CsrfToken',
+                        value: Editor.data.csrfToken
+                    },{
+                        xtype: 'filefield',
+                        fieldLabel: me.strings.file,
+                        toolTip: me.strings.importTmx,
+                        regex: /(\.tmx|\.zip)$/i,
+                        regexText: me.strings.importTmxType,
+                        labelWidth: 160,
+                        anchor: '100%',
+                        vtype:'tmFileUploadSize',
+                        name: 'tmUpload'
+                    },
+                    {
                                 xtype: 'combo',
                                 itemId: 'stripFramingTags',
                                 name: 'stripFramingTags',
@@ -117,10 +118,8 @@ Ext.define('Editor.view.LanguageResources.ImportTmWindow', {
                                     tag: 'div',
                                     'data-qtip': me.strings.stripFramingTagsTooltip
                                 }
-                            },
-                        ]
-                    }
-                ],
+                    }]
+                }],
                 dockedItems : [{
                     xtype : 'toolbar',
                     dock : 'bottom',

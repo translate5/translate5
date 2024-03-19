@@ -1724,7 +1724,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract
             return array();
         }
         $segmentsViewName = $this->segmentFieldManager->getView()->getName();
-        $sql = 'select id, segmentNrInTask, source, target, sourceMd5=? sourceMatch, targetMd5=? targetMatch, matchRate, autostateId
+        $sql = 'select id, segmentNrInTask, source, targetEdit as target, sourceMd5=? sourceMatch, targetMd5=? targetMatch, matchRate, autostateId
                 from ' . $segmentsViewName . '
                 where ((sourceMd5 = ? and sourceMd5 != ?)
                     or (targetMd5 = ? and targetMd5 != ?))
@@ -1792,7 +1792,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract
 
         // Fetch context data
         return $this->contextData = $this->db->getAdapter()->query('
-            SELECT `segmentNrInTask`, `id`, `fileId`, `sourceMd5`, `source`, `target` 
+            SELECT `segmentNrInTask`, `id`, `fileId`, `sourceMd5`, `source`, `targetEdit` as `target` 
             FROM `' . $segmentsViewName . '`
             WHERE `segmentNrInTask` IN (' . join(',', $nrA) . ') 
         ')->fetchAll(PDO::FETCH_UNIQUE);

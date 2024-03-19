@@ -28,15 +28,16 @@
 
 namespace Translate5\MaintenanceCli\Command;
 
-use Editor_CronController;
 use MittagQI\Translate5\Cronjob\CronEventTrigger;
 use MittagQI\Translate5\Cronjob\Cronjobs;
+use ReflectionException;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Zend_Exception;
 use Zend_Registry;
 use ZfExtended_Factory;
+use ZfExtended_Models_Installer_Maintenance as Maintenance;
 
 class CronCommand extends Translate5AbstractCommand
 {
@@ -63,12 +64,19 @@ class CronCommand extends Translate5AbstractCommand
      * Execute the command
      * {@inheritDoc}
      * @throws Zend_Exception
+     * @throws ReflectionException
      * @see \Symfony\Component\Console\Command\Command::execute()
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $this->initInputOutput($input, $output);
         $this->initTranslate5();
+
+        $maintenance = ZfExtended_Factory::get(Maintenance::class);
+        if ($maintenance->isLoginLock()) {
+            $this->io->warning('Maintenance in progress - nothing executed.');
+            return self::SUCCESS;
+        }
 
         $cron = ZfExtended_Factory::get(Cronjobs::class, [
             Zend_Registry::get('bootstrap'),

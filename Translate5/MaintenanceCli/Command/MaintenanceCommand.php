@@ -27,18 +27,21 @@
  */
 namespace Translate5\MaintenanceCli\Command;
 
+use ReflectionException;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Zend_Db_Statement_Exception;
+use Zend_Exception;
+use ZfExtended_Models_Installer_Maintenance;
 
 class MaintenanceCommand extends Translate5AbstractCommand {
-    
-        // the name of the command (the part after "bin/console")
+    private const DATE_FORMAT = 'Y-m-d H:i (O)';
     protected static $defaultName = 'maintenance:status';
     
     /**
-     * @var \ZfExtended_Models_Installer_Maintenance
+     * @var ZfExtended_Models_Installer_Maintenance
      */
-    protected $mm = null;
+    protected ZfExtended_Models_Installer_Maintenance $mm;
     
     protected function configure()
     {
@@ -50,10 +53,11 @@ class MaintenanceCommand extends Translate5AbstractCommand {
         // the "--help" option
         ->setHelp('Returns information about the maintenance mode.');
     }
-    
+
     /**
      * Execute the command
      * {@inheritDoc}
+     * @throws Zend_Exception
      * @see \Symfony\Component\Console\Command\Command::execute()
      */
     protected function execute(InputInterface $input, OutputInterface $output)
@@ -63,9 +67,12 @@ class MaintenanceCommand extends Translate5AbstractCommand {
         
         $this->writeTitle('maintenance mode');
         
-        $this->mm = new \ZfExtended_Models_Installer_Maintenance();
+        $this->mm = new ZfExtended_Models_Installer_Maintenance();
         if ($this->mm->isInIni()) {
-            $this->io->error(['There is some maintenance configuration in the installation.ini, ', 'please remove it for proper usage of this tool!']);
+            $this->io->error([
+                'There is some maintenance configuration in the installation.ini, ',
+                'please remove it for proper usage of this tool!'
+            ]);
             return 1;
         }
         
@@ -78,8 +85,12 @@ class MaintenanceCommand extends Translate5AbstractCommand {
     protected function _execute() {
         //for status do nothing
     }
-    
-    protected function announce(string $time, string $msg) {
+
+    /**
+     * @throws ReflectionException
+     */
+    protected function announce(string $time, string $msg): void
+    {
         $result = $this->mm->announce($time, $msg);
         if(!empty($result['error'])) {
             $this->io->error($result['error']);
@@ -93,11 +104,27 @@ class MaintenanceCommand extends Translate5AbstractCommand {
         }
         $this->io->text('');
     }
-    
-    protected function showStatus() {
+
+    /**
+     * @throws Zend_Db_Statement_Exception
+     * @throws Zend_Exception
+     */
+    protected function showStatus(): void
+    {
         $conf = $this->mm->status();
 
-        //FIXME add porcelain here
+        if ($this->isPorcelain) {
+            if ($this->mm->isActive()) {
+                $this->output->write('Maintenance mode ACTIVE since '.$this->mm->status()->startDate);
+            } elseif ($this->mm->isNotified()) {
+                $loginLock = $this->mm::isLoginLock() ? ' login lock reached' : '';
+                $this->output->write('Maintenance mode SCHEDULED for '.$this->mm->status()->startDate.' '.$loginLock);
+            } else {
+                $this->output->write('Maintenance mode DISABLED');
+            }
+            $this->output->writeln('');
+            return;
+        }
 
         if(empty($conf->startDate)) {
             $msg = ["  <info>Maintenance mode:</> <fg=green;options=bold>disabled!</>"];
@@ -107,30 +134,27 @@ class MaintenanceCommand extends Translate5AbstractCommand {
             $msg[] = '';
             $this->io->text($msg);
             $this->printNotes();
-            return 0;
+            return;
         }
-        $startTimeStamp = strtotime($conf->startDate);
-        $now = time();
-        if($startTimeStamp < $now) {
+
+        if($this->mm->isActive()) {
             $this->io->text("<info>Maintenance mode:</> <fg=red;options=bold>active!</>");
         }
-        
-        elseif ($startTimeStamp - ($conf->timeToNotify*60) < $now){
+        elseif ($this->mm->isNotified()){
             $this->io->text("<info>Maintenance mode:</> <fg=yellow;options=bold>notified!</>");
         }
-        
+
+        $startTimeStamp = strtotime($conf->startDate);
         $this->output->writeln([
             '',
-            '            <info>start:</> '.date('Y-m-d H:i (O)', $startTimeStamp),
-            '     <info>start notify:</> '.date('Y-m-d H:i (O)', $startTimeStamp - ($conf->timeToNotify*60)),
-            '       <info>login lock:</> '.date('Y-m-d H:i (O)', $startTimeStamp - ($conf->timeToLoginLock*60)),
+            '            <info>start:</> '.date(self::DATE_FORMAT, $startTimeStamp),
+            '     <info>start notify:</> '.date(self::DATE_FORMAT, $startTimeStamp - ((int) $conf->timeToNotify*60)),
+            '       <info>login lock:</> '.date(self::DATE_FORMAT, $startTimeStamp - ((int) $conf->timeToLoginLock*60)),
             '          <info>message:</> '.$conf->message,
             '        <info>receivers:</> '.$conf->announcementMail,
             '',
         ]);
 
         $this->printNotes();
-
-        return 0;
     }
 }

@@ -49,7 +49,7 @@ class Comments
     protected const ANNOTATE_TARGET = 'target';
 
     /**
-     * @var editor_Models_Comment[]
+     * @var editor_Models_Comment[]|null[]
      */
     private array $comments = [];
 
@@ -94,7 +94,7 @@ class Comments
 
     /**
      * @param string $commentText
-     * @param array{lang: string, from: string, priority: string, annotates: string} $attributes
+     * @param array{lang: string, from: ?string, priority: string, annotates: string} $attributes
      * @return void
      * @throws ReflectionException
      */

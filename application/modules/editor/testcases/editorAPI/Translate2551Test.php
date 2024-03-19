@@ -33,7 +33,8 @@ use MittagQI\Translate5\Test\Import\Config;
 class Translate2551Test extends editor_Test_JsonTest {
 
     protected static array $requiredPlugins = [
-        'editor_Plugins_Okapi_Init'
+        'editor_Plugins_Okapi_Init',
+        'editor_Plugins_TrackChanges_Init',
     ];
 
     protected static function setupImport(Config $config): void
@@ -44,8 +45,12 @@ class Translate2551Test extends editor_Test_JsonTest {
             ->addUploadFolder('testfiles');
     }
 
+    /**
+     * @throws \MittagQI\Translate5\Test\Import\Exception
+     * @throws ReflectionException
+     * @throws Zend_Http_Client_Exception
+     */
     public function testFileReimport(){
-
         $route = '/editor/taskid/' . $this->getTask()->getId() . '/file/';
 
         $this->api()->get($route);
@@ -63,36 +68,45 @@ class Translate2551Test extends editor_Test_JsonTest {
             'fileId' => $files->id
         ], null, false, true);
 
+        sleep(1);
         static::api()->waitForCurrentTaskStateOpen();
 
         self::api()->setTaskToEdit();
         $segmentsActual = static::api()->getSegmentsWithBasicData();
         self::api()->setTaskToOpen();
 
-        static::api()->isCapturing() && file_put_contents(static::api()->getFile('expected.json', null, false), json_encode($segmentsActual, JSON_PRETTY_PRINT));
+        static::api()->isCapturing() && file_put_contents(
+            static::api()->getFile('expected.json', null, false),
+            json_encode($segmentsActual, JSON_PRETTY_PRINT)
+        );
 
         $expected = static::api()->getFileContent('expected.json');
 
-        $this->compoareSegments($segmentsActual,$expected);
+        $this->compareSegments($segmentsActual, $expected);
     }
 
-    /***
+    /**
      * Compare the segments with protected tags
      * @param array $actual
      * @param array $expected
      * @return void
+     * @throws ReflectionException
      */
-    public function compoareSegments(array $actual, array $expected): void
+    public function compareSegments(array $actual, array $expected): void
     {
         $segmentTagger = ZfExtended_Factory::get('editor_Models_Segment_InternalTag');
         $actualFiltered = [];
 
         foreach ($actual as $a) {
-            $actualFiltered[$a['segmentNrInTask']] = $segmentTagger->toXliff($a['targetEdit']);
+            $actualFiltered[$a['segmentNrInTask']] = $segmentTagger->toDebug($a['targetEdit']);
         }
 
         foreach ($expected as $e) {
-            static::assertEquals($actualFiltered[$e->segmentNrInTask],$segmentTagger->toXliff($e->targetEdit),'The compared segment content is not equal');
+            static::assertEquals(
+                $segmentTagger->toDebug($e->targetEdit),
+                $actualFiltered[$e->segmentNrInTask],
+                'The compared segment [#'.$e->segmentNrInTask.'] content is not equal'
+            );
         }
     }
 }

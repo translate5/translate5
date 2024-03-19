@@ -31,6 +31,8 @@ use editor_Models_Task;
 use editor_Models_TaskUserAssoc;
 use editor_Plugins_FrontEndMessageBus_Bus;
 use editor_Plugins_FrontEndMessageBus_Init;
+use Exception;
+use ReflectionException;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Throwable;
@@ -39,10 +41,13 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Formatter\OutputFormatter;
 use Symfony\Component\Console\Input\InputArgument;
 use Zend_Db_Statement_Exception;
+use Zend_Db_Table_Exception;
 use Zend_Registry;
 use ZfExtended_Factory;
 use ZfExtended_Models_Db_ErrorLog;
 use ZfExtended_Models_Installer_Downloader;
+use ZfExtended_Models_Installer_Maintenance;
+use ZfExtended_Models_LoginLog as LoginLog;
 use ZfExtended_Models_SystemRequirement_Result;
 use ZfExtended_Models_SystemRequirement_Validator;
 use ZfExtended_Models_Worker;
@@ -96,7 +101,8 @@ class StatusCommand extends Translate5AbstractCommand
         $this->writeTitle('Translate5 status overview');
 
         $this->writeSystemCheck();
-        $this->writeVersion(); //FIXME add maintenance status!
+        $this->writeMaintenance();
+        $this->writeVersion();
         $this->writeWorkerSummary();
         $this->writeSection('Connected Sessions', $this->messageBus());
         $this->writeTaskAndJobs();
@@ -199,9 +205,12 @@ class StatusCommand extends Translate5AbstractCommand
 //        }
     }
 
-    protected function writeWorkerSummary() {
-        $worker = ZfExtended_Factory::get('ZfExtended_Models_Worker');
-        /* @var $worker ZfExtended_Models_Worker */
+    /**
+     * @throws ReflectionException
+     */
+    protected function writeWorkerSummary(): void
+    {
+        $worker = ZfExtended_Factory::get(ZfExtended_Models_Worker::class);
 
         $workerSummary = $worker->getSummary();
         $workerSumText = [
@@ -227,17 +236,19 @@ class StatusCommand extends Translate5AbstractCommand
         $this->writeSection('Worker', join(', ', $result));
     }
 
-    protected function writeSystemCheck() {
+    /**
+     * @throws Exception
+     */
+    protected function writeSystemCheck(): void
+    {
         $validator = new ZfExtended_Models_SystemRequirement_Validator(false);
-        /* @var $validator ZfExtended_Models_SystemRequirement_Validator */
         $results = $validator->validate();
 
         $error =  0;
         $warning =  0;
         $ok =  0;
 
-        foreach($results as $module => $oneResult) {
-            /* @var $validator ZfExtended_Models_SystemRequirement_Result */
+        foreach($results as $oneResult) {
             if($oneResult->hasError()) {
                 $error++;
             }
@@ -252,14 +263,15 @@ class StatusCommand extends Translate5AbstractCommand
             $shortResult = '<fg=green;options=bold>all ok ('.$ok.' checks)</>';
         }
         elseif ($error === 0) {
-            $shortResult = '<fg=yellow;options=bold>not optimal: '.$warning.' warning(s)</>, call translate5.sh system:check command';
+            $shortResult = '<fg=yellow;options=bold>not optimal: '.
+                $warning.' warning(s)</>, call t5 system:check command';
         }
         else {
             $shortResult = '<fg=red;options=bold>problematic: '.$error.' error(s)';
             if($warning > 0){
                 $shortResult .= ', '.$warning.' warning(s)';
             }
-            $shortResult .= '</>, call translate5.sh system:check command';
+            $shortResult .= '</>, call t5 system:check command';
         }
         $this->writeSection('System Check', $shortResult);
     }
@@ -267,11 +279,12 @@ class StatusCommand extends Translate5AbstractCommand
     /**
      * @throws Zend_Db_Statement_Exception
      */
-    protected function writeLastErrors()
+    protected function writeLastErrors(): void
     {
         $this->writeSection('Last Log (Errors / Warnings)');
         $log = new ZfExtended_Models_Db_ErrorLog();
-        $foo = $log->getAdapter()->query('select id, created, duplicates, level, eventCode, message, domain from Zf_errorlog where level < 8 order by id desc limit 5;');
+        $foo = $log->getAdapter()->query('select id, created, duplicates, level, eventCode, message, domain
+                                              from Zf_errorlog where level < 8 order by id desc limit 5;');
         foreach($foo->fetchAll() as $row) {
             $idBlock = '(# '.$row['id'];
             if($row['duplicates'] > 0) {
@@ -291,12 +304,13 @@ class StatusCommand extends Translate5AbstractCommand
         /* @var $downloader ZfExtended_Models_Installer_Downloader */
         try {
             $isUptodate = $downloader->applicationIsUptodate();
-        } catch (\Exception $e) {
+        } catch (Exception) {
             $isUptodate = false;
         }
         $version = ZfExtended_Utils::getAppVersion();
         if($version == ZfExtended_Utils::VERSION_DEVELOPMENT) {
-            $this->writeSection('Version', '<fg=green;options=bold>development:</> '.exec('cd '.APPLICATION_PATH.'; git status -bs | head -1'));
+            $this->writeSection('Version', '<fg=green;options=bold>development:</> '.
+                exec('cd '.APPLICATION_PATH.'; git status -bs 2>/dev/null | head -1'));
         }
         else {
             $color = $isUptodate ? 'green' : 'red';
@@ -305,13 +319,12 @@ class StatusCommand extends Translate5AbstractCommand
     }
 
     /**
-     * @throws \ReflectionException
-     * @throws \Zend_Db_Table_Exception
+     * @throws ReflectionException
+     * @throws Zend_Db_Table_Exception
      */
     private function writeLogins(): void
     {
-        /** @var \ZfExtended_Models_LoginLog $loginlog */
-        $loginlog = ZfExtended_Factory::get(\ZfExtended_Models_LoginLog::class);
+        $loginlog = ZfExtended_Factory::get(LoginLog::class);
         $logins = $loginlog->loadLastGrouped();
         if (empty($logins)) {
             $this->writeSection('Logins', '<fg=yellow;options=bold>No logins yet</>');
@@ -328,5 +341,23 @@ class StatusCommand extends Translate5AbstractCommand
             $result[] = $day.': <options=bold>'.$cnt.'</>';
         }
         $this->writeSection('Logins', join('; ', $result));
+    }
+
+    /**
+     * @throws Zend_Db_Statement_Exception
+     */
+    private function writeMaintenance(): void
+    {
+        $maintenance = new ZfExtended_Models_Installer_Maintenance();
+        $statusObj = $maintenance->status();
+
+        if ($maintenance->isActive()) {
+            $this->writeSection('Maintenance', '<fg=red;options=bold>ACTIVE</>, since ' . $statusObj->startDate);
+        } elseif ($maintenance->isNotified()) {
+            $this->writeSection(
+                'Maintenance',
+                '<fg=yellow;options=bold>notified</>, will start ' . $statusObj->startDate
+            );
+        }
     }
 }

@@ -29,7 +29,9 @@ END LICENSE AND COPYRIGHT
 namespace MittagQI\Translate5\Service;
 
 use Throwable;
+use Zend_Db_Statement_Exception;
 use Zend_Http_Client;
+use ZfExtended_Exception;
 use ZfExtended_Factory;
 
 /**
@@ -50,6 +52,19 @@ final class Php extends DockerServiceAbstract {
         'healthcheck' => '/editor/index/applicationstate',
         'healthcheckIsJson' => true
     ];
+
+    /**
+     * @throws Zend_Db_Statement_Exception
+     * @throws ZfExtended_Exception
+     */
+    public function check(): bool {
+        $maintenance = new \ZfExtended_Models_Installer_Maintenance();
+        if($maintenance->isActive()) {
+            $this->warnings[] = 'Instance is in maintenance';
+            return false;
+        }
+        return parent::check();
+    }
 
     protected function findVersionInResponseBody(string $responseBody, string $serviceUrl): ?string
     {
