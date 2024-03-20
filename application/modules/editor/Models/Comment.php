@@ -34,11 +34,11 @@ END LICENSE AND COPYRIGHT
  */
 /**
  * Comment Entity Object
- * @method integer getId()
+ * @method string getId()
  * @method void setId(int $id)
  * @method string getTaskGuid()
  * @method void setTaskGuid(string $taskGuid)
- * @method integer getSegmentId()
+ * @method string getSegmentId()
  * @method void setSegmentId(int $segmentId)
  * @method string getUserGuid()
  * @method void setUserGuid(string $userGuid)

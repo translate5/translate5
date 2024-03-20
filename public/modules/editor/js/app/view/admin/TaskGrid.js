@@ -936,7 +936,13 @@ Ext.define('Editor.view.admin.TaskGrid', {
                     gridFilter.setActive(true);
                     break;
                 default :
-                    gridFilter.setValue(value);
+                    try {
+                        gridFilter.setValue(value);
+                    } catch (e) {
+                        console.log('Filter type ' + gridFilter.type);
+                        console.log('Filter dataIndex ' + gridFilter.dataIndex);
+                        throw e;
+                    }
                     break;
             }
         });

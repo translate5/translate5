@@ -1218,6 +1218,30 @@ class editor_Utils {
         $segment = ZfExtended_Factory::get('editor_Models_Segment');
         return ZfExtended_Utils::emptyString($segment->stripTags($segmentText));
     }
+
+    /**
+     * Returns an array of all combination upper and lower case characters of string
+     * 'abc' => [['a', 'b', 'c'], ['a', 'B', 'c'], ..., ['A', 'B', 'C']]
+     * @return array<array<string>>
+     */
+    public static function generatePermutations(string $text): array {
+        $permutations = [];
+        $chars = str_split($text);
+
+        // Count the number of possible permutations and loop over each group
+        for ($i = 0; $i < 2 ** strlen($text); $i++) {
+            // Loop over each letter [a,b,c] for each group and switch its case
+            for ($j = 0; $j < strlen($text); $j++) {
+                // isBitSet checks to see if this letter in this group has been checked before
+                // read more about it here: http://php.net/manual/en/language.operators.bitwise.php
+                $permutations[$i][] = ($i >> $j & 1) != 0
+                    ? strtoupper($chars[$j])
+                    : $chars[$j];
+            }
+        }
+
+        return $permutations;
+    }
 }
 
 /**

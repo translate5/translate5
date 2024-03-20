@@ -43,8 +43,11 @@ Ext.define('Editor.view.LanguageResources.TaskGridWindowViewController', {
     },
     listen: {
         component: {
-            '#import-task-tm-btn': {
-                click: 'importTaskIntoTm'
+            '#import-all-btn': {
+                click: function () { this.importTaskIntoTm(); }
+            },
+            '#import-user-saved-btn': {
+                click: function () { this.importTaskIntoTm(true); }
             },
             '#cancel': {
                 click: 'close'
@@ -60,35 +63,38 @@ Ext.define('Editor.view.LanguageResources.TaskGridWindowViewController', {
     },
     /**
      */
-    importTaskIntoTm: function() {
-        var me = this, 
+    importTaskIntoTm: function(onlyEdited = false) {
+        let me = this,
             languageResource = me.getViewModel().get('record'),
             proxy = languageResource.proxy,
             url = proxy.url,
             selected = me.getView().down('grid').getSelection();
-            
-        if(!selected || !selected.length) {
+
+        if (!selected || !selected.length) {
             return;
         }
-        
+
         if (!url.match(proxy.slashRe)) {
             url += '/';
         }
-        url += languageResource.get('id')+'/tasks';
-        
+        url += languageResource.get('id') + '/tasks';
+
         me.getView().mask('Start reimport...');
         Ext.Ajax.request({
             url: url,
             method: 'POST',
-            success: function() {
+            params: {
+                data: Ext.JSON.encode({
+                    toReImport: selected.map(function (rec) {
+                        return rec.get('taskGuid');
+                    }),
+                    onlyEdited: onlyEdited,
+                }),
+            },
+            success: function () {
                 me.getView().close();
                 Editor.MessageBox.addSuccess("Reimport started, please press refresh button in your task overview periodically."); //FIXME translation
             },
-            params: {
-                data: Ext.JSON.encode({toReImport: selected.map(function(rec){
-                    return rec.get('taskGuid');
-                })})
-            }
         });
     }
 });

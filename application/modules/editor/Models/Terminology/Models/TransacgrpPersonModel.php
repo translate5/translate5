@@ -30,10 +30,10 @@ END LICENSE AND COPYRIGHT
  * Class editor_Models_Terminology_Models_TransacgrpPerson
  * TermsTransacgrp Instance
  *
- * @method integer getId() getId()
- * @method void setId() setId(integer $id)
- * @method string getName() getName()
- * @method string setName() setName(string $name)
+ * @method string getId()
+ * @method void setId(integer $id)
+ * @method string getName()
+ * @method void setName(string $name)
  */
 class editor_Models_Terminology_Models_TransacgrpPersonModel extends editor_Models_Terminology_Models_Abstract {
     protected $dbInstanceClass = 'editor_Models_Db_Terminology_TransacgrpPerson';

@@ -54,6 +54,7 @@ class Translate2874Test extends editor_Test_JsonTest {
             ->addTask($sourceLangRfc, $targetLangRfc, $customerId)
             ->addUploadFolder('testfiles')
             ->setProperty('edit100PercentMatch', false)
+            ->addTaskConfig('runtimeOptions.import.xlf.ignoreFramingTags', 'all')
             ->setToEditAfterImport();
     }
 

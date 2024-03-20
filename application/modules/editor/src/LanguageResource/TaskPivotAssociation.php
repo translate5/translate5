@@ -9,14 +9,14 @@ use ZfExtended_Factory;
 use ZfExtended_Models_Entity_Abstract;
 
 /***
- * @method integer getId() getId()
- * @method void setId() setId(int $id)
- * @method integer getLanguageResourceId() getLanguageResourceId()
- * @method void setLanguageResourceId() setLanguageResourceId(int $languageResourceid)
- * @method string getTaskGuid() getTaskGuid()
- * @method void setTaskGuid() setTaskGuid(string $taskGuid)
- * @method integer getAutoCreatedOnImport() getAutoCreatedOnImport()
- * @method void setAutoCreatedOnImport() setAutoCreatedOnImport(int $autoCreatedOnImport)
+ * @method string getId()
+ * @method void setId(int $id)
+ * @method string getLanguageResourceId()
+ * @method void setLanguageResourceId(int $languageResourceid)
+ * @method string getTaskGuid()
+ * @method void setTaskGuid(string $taskGuid)
+ * @method string getAutoCreatedOnImport()
+ * @method void setAutoCreatedOnImport(int $autoCreatedOnImport)
  */
 class TaskPivotAssociation extends AssociationAbstract {
     protected $dbInstanceClass = 'MittagQI\Translate5\LanguageResource\Db\TaskPivotAssociation';

@@ -47,7 +47,11 @@ Ext.define('Editor.view.admin.task.CustomField.Grid', {
         selection: '{customField}'
     },
 
-    /** @property {string} routePrefix Used to setup routes on different view instances */
+    viewConfig: {
+        enableTextSelection: true
+    },
+
+    /** @property {string} routePrefix Used to set up routes on different view instances */
     routePrefix: 'taskCustomFields',
     dockedItems: [{
         xtype: 'form',
@@ -57,13 +61,13 @@ Ext.define('Editor.view.admin.task.CustomField.Grid', {
             labelAlign: "left",
             labelWidth: 150,
             anchor: '100%',
-            msgTarget: 'side',
+            msgTarget: 'side'
         },
         defaults: {
             disabled: true,
             bind: {
                 disabled: '{!customField || customField.mode == "readonly"}'
-            },
+            }
         },
         dockedItems: [{
             xtype: 'toolbar',
@@ -94,7 +98,7 @@ Ext.define('Editor.view.admin.task.CustomField.Grid', {
                     text: '{l10n.taskCustomField.delete.button}',
                     disabled: '{!customField || customField.mode == "readonly"}'
                 },
-                handler: 'onDelete',
+                handler: 'onDelete'
             }]
         }],
         bodyPadding: 15,
@@ -152,7 +156,7 @@ Ext.define('Editor.view.admin.task.CustomField.Grid', {
                 handler: 'onComboboxOptionAdd'
             }, {
                 bind: {
-                    text: '{l10n.configuration.remove}',
+                    text: '{l10n.configuration.remove}'
                 },
                 glyph: 'f2ed@FontAwesome5FreeSolid',
                 handler: 'onComboboxOptionRemove'
@@ -164,14 +168,14 @@ Ext.define('Editor.view.admin.task.CustomField.Grid', {
                     : false,
                 text: '-',
                 bind: {
-                    text: '{l10n.taskCustomField.meta.comboboxData.value}',
+                    text: '{l10n.taskCustomField.meta.comboboxData.value}'
                 }
             }, {
                 dataIndex: 'value',
                 flex: 1,
                 text: '-',
                 bind: {
-                    text: '{l10n.taskCustomField.meta.comboboxData.title}',
+                    text: '{l10n.taskCustomField.meta.comboboxData.title}'
                 },
                 renderer: value => Editor.view.admin.config.type.SimpleMap.renderer(value),
                 getEditor: record => Editor.view.admin.config.type.SimpleMap.getConfigEditor({
@@ -200,7 +204,7 @@ Ext.define('Editor.view.admin.task.CustomField.Grid', {
             readOnly: true,
             hidden: true,
             bind: {
-                value: '{customField.comboboxData}',
+                value: '{customField.comboboxData}'
             }
         }, {
             xtype: 'textfield',
@@ -225,7 +229,7 @@ Ext.define('Editor.view.admin.task.CustomField.Grid', {
             },
             queryMode: 'local',
             displayField: 'name',
-            valueField: 'value',
+            valueField: 'value'
         }, {
             xtype: 'tagfield',
             forceSelection: true,
@@ -249,11 +253,7 @@ Ext.define('Editor.view.admin.task.CustomField.Grid', {
             columns: 2,
             bind: {
                 fieldLabel: '{l10n.taskCustomField.meta.roles.name} &#8505;',
-                value: '{customField.roles}',
-            },
-            autoEl: {
-                tag: 'div',
-                'data-qtip': Ext.String.htmlEncode(Editor.data.l10n.taskCustomField.meta.roles.tooltip)
+                value: '{customField.roles}'
             }
         }, {
             xtype: 'numberfield',
@@ -262,7 +262,7 @@ Ext.define('Editor.view.admin.task.CustomField.Grid', {
                 value: '{customField.position}'
             }
         }],
-        weight: 1,
+        weight: 1
     }, {
         xtype: 'toolbar',
         dock: 'top',
@@ -313,13 +313,11 @@ Ext.define('Editor.view.admin.task.CustomField.Grid', {
             },
             {
                 xtype: 'tbspacer',
-                flex: 1.6,
-            },
-        ],
+                flex: 1.6
+            }
+        ]
     }],
-    viewConfig: {
-        enableTextSelection: true,
-    },
+
     initConfig: function (instanceConfig) {
         var me = this,
             config = {};
@@ -377,14 +375,14 @@ Ext.define('Editor.view.admin.task.CustomField.Grid', {
                 xtype: 'gridcolumn',
                 dataIndex: 'regex',
                 bind: {
-                    text: '{l10n.taskCustomField.meta.regex}',
+                    text: '{l10n.taskCustomField.meta.regex}'
                 },
                 width: 150
             }, {
                 xtype: 'gridcolumn',
                 dataIndex: 'mode',
                 bind: {
-                    text: '{l10n.taskCustomField.meta.mode.name}',
+                    text: '{l10n.taskCustomField.meta.mode.name}'
                 },
                 renderer: 'modeRenderer',
                 width: 100
@@ -392,16 +390,16 @@ Ext.define('Editor.view.admin.task.CustomField.Grid', {
                 xtype: 'gridcolumn',
                 dataIndex: 'placesToShow',
                 bind: {
-                    text: '{l10n.taskCustomField.meta.placesToShow.name}',
+                    text: '{l10n.taskCustomField.meta.placesToShow.name}'
                 },
                 renderer: 'placesToShowRenderer',
-                width: 250,
+                width: 250
             }, {
                 xtype: 'numbercolumn',
                 dataIndex: 'position',
                 align: 'end',
                 bind: {
-                    text: '{l10n.taskCustomField.meta.position}',
+                    text: '{l10n.taskCustomField.meta.position}'
                 },
                 format: '0',
                 width: 100

@@ -372,7 +372,7 @@
             </trans-unit>
             <trans-unit id="RnJhdQ==">
                 <source>Frau</source>
-                <target>Mrs.</target>
+                <target>Ms.</target>
             </trans-unit>
             <trans-unit id="SGVycg==">
                 <source>Herr</source>
@@ -2103,7 +2103,7 @@
             </trans-unit>
             <trans-unit id='U2VociBnZWVocnRlIEZyYXU='>
                 <source>Sehr geehrte Frau</source>
-                <target>Dear Mrs.</target>
+                <target>Dear Ms.</target>
             </trans-unit>
             <trans-unit id='VHJhbnNsYXRlNSAtIEF1ZmdhYmUgZnJlaWdlZ2ViZW4='>
                 <source>Translate5 - Aufgabe freigegeben</source>
@@ -3562,10 +3562,6 @@ A task was associated to you in the task-portal {portalLink}.
                 <source>Export der Bearbeitungen pro Workflowschritt als Excel</source>
                 <target>Export editing history per workflow-step as Excel</target>
             </trans-unit>
-            <trans-unit id='QXVzZ2V3w6RobHRlIEF1ZmdhYmVuIGVybmV1dCBpbnMgYWt0dWVsbGUgVE0gaW1wb3J0aWVyZW4='>
-                <source>Ausgewählte Aufgaben erneut ins aktuelle TM importieren</source>
-                <target>Re-import chosen tasks into current TM</target>
-            </trans-unit>
             <trans-unit id='VGVybVBvcnRhbA=='>
                 <source>TermPortal</source>
                 <target>TermPortal</target>
@@ -4090,9 +4086,21 @@ A task was associated to you in the task-portal {portalLink}.
                 <source>Die angefragte OpenTM2 Instanz ist nicht erreichbar</source>
                 <target>The queried OpenTM2 instance is not available</target>
             </trans-unit>
-            <trans-unit id='QXVmZ2FiZW4gcmVpbXBvcnRpZXJlbg=='>
-                <source>Aufgaben reimportieren</source>
-                <target>Reimport tasks</target>
+            <trans-unit id='QWxsZSBTZWdtZW50ZSBpbSBUTSBzcGVpY2hlcm4='>
+                <source>Alle Segmente im TM speichern</source>
+                <target>Save all segments to TM</target>
+            </trans-unit>
+            <trans-unit id='QmVudXR6ZXItZ2VzcGVpY2hlcnRlIFNlZ21lbnRlIGltIFRNIHNwZWljaGVybg=='>
+                <source>Benutzer-gespeicherte Segmente im TM speichern</source>
+                <target>Save user-saved segments to TM</target>
+            </trans-unit>
+            <trans-unit id='U3BlaWNoZXJ0IGFsbGUgU2VnbWVudGUgYWxsZXIgQXVmZ2FiZW4sIGRpZSBvYmVuIGFuZ2VoYWt0IHNpbmQgdW5kIGRlbSBUTSBtaXQgU2NocmVpYnJlY2h0ZW4genVnZXdpZXNlbiBzaW5k'>
+                <source>Speichert alle Segmente aller Aufgaben, die oben angehakt sind und dem TM mit Schreibrechten zugewiesen sind</source>
+                <target>Saves all segments of all tasks, that are checked above and are assigned to the TM with write permissions</target>
+            </trans-unit>
+            <trans-unit id='U3BlaWNoZXJ0IG51ciBkaWUgQWJzY2huaXR0ZSwgZGllIHp1dm9yIHZvbiBlaW5lbSBCZW51dHplciBtYW51ZWxsIGdlc3BlaWNoZXJ0IHd1cmRlbi4gRGllcyBnaWx0IGbDvHIgYWxsZSBBdWZnYWJlbiwgZGllIG9iZW4gYW5nZWhha3Qgc2luZCB1bmQgZGVtIFRNIG1pdCBTY2hyZWlicmVjaHRlbiB6dWdld2llc2VuIHNpbmQ='>
+                <source>Speichert nur die Abschnitte, die zuvor von einem Benutzer manuell gespeichert wurden. Dies gilt für alle Aufgaben, die oben angehakt sind und dem TM mit Schreibrechten zugewiesen sind</source>
+                <target>Saves only those segments, that previously have been manually saved by a user. Does this for all tasks, that are checked above and are assigned to the TM with write permissions</target>
             </trans-unit>
             <trans-unit id='S3VuZGUgYmVyZWl0cyBkZXIgUmVzc291cmNlIHswfSBhbHMgU3RhbmRhcmQgZsO8ciB7MX0gYmlzIHsyfSB6dWdld2llc2VuIC0gWnVvcmRudW5nIGVudGZlcm5lbiB1bmQgZGVyIGFrdHVlbGxlbiBSZXNzb3VyY2UgenV3ZWlzZW4/'>
                 <source>Kunde bereits der Ressource {0} als Standard für {1} bis {2} zugewiesen - Zuordnung entfernen und der aktuellen Ressource zuweisen?</source>
@@ -7214,6 +7222,26 @@ The following task was imported with errors / warnings / notices. Please take ca
                 <source>Standardmäßig als Pivot verwenden</source>
                 <target>Use as pivot by default</target>
             </trans-unit>
+            <trans-unit id='VW1zY2hsaWXDn2VuZGUgVGFncyBiZWltIEltcG9ydCBsw7ZzY2hlbg=='>
+                <source>Umschließende Tags beim Import löschen</source>
+                <target>Strip framing tags at import</target>
+            </trans-unit>
+            <trans-unit id='QXJiZWl0ZXQgYW5hbG9nIHp1ciBTeXN0ZW1rb25maWd1cmF0aW9uIHJ1bnRpbWVPcHRpb25zLmltcG9ydC54bGYuaWdub3JlRnJhbWluZ1RhZ3MsIGFiZXIgZsO8ciBUTVgtSW1wb3J0LiBTaWUgZW50ZmVybnQgYWxsZSAob2RlciBudXIgZ2VwYWFydGUpIFRhZ3Mgdm9tIEFuZmFuZyB1bmQgRW5kZSBlaW5lcyBpbXBvcnRpZXJ0ZW4gU2VnbWVudHMsIGZhbGxzIGFrdGl2aWVydC4gRGllIFN5c3RlbWtvbmZpZ3VyYXRpb24gc29sbHRlIGRhaGVyIGbDvHIgZGVuc2VsYmVuIEt1bmRlbiBkaWUgZ2xlaWNoZSBFaW5zdGVsbHVuZyBmw7xyIHp1IGltcG9ydGllcmVuZGUgQXVmZ2FiZW4gaGFiZW4uIFdlbm4gU2llIGJlc3RlaGVuZGUgVE1zIGtvbnZlcnRpZXJlbiBtw7xzc2VuLCBiaXR0ZW4gU2llIGRlbiB0cmFuc2xhdGU1LVN1cHBvcnQgdW0gSGlsZmUu'>
+                <source>Arbeitet analog zur Systemkonfiguration runtimeOptions.import.xlf.ignoreFramingTags, aber für TMX-Import. Sie entfernt alle (oder nur gepaarte) Tags vom Anfang und Ende eines importierten Segments, falls aktiviert. Die Systemkonfiguration sollte daher für denselben Kunden die gleiche Einstellung für zu importierende Aufgaben haben. Wenn Sie bestehende TMs konvertieren müssen, bitten Sie den translate5-Support um Hilfe.</source>
+                <target>Works analogous to system config runtimeOptions.import.xlf.ignoreFramingTags, but for TMX import. It strips all (or only paired) tags from the start and end of an imported segment, if activated. The system config should therefore have the same setting for the same client for to be imported tasks. If you need to convert exiting TMs, please ask the translate5 support for help.</target>
+            </trans-unit>
+            <trans-unit id='RW50ZmVybnQga2VpbmU='>
+                <source>Entfernt keine</source>
+                <target>None</target>
+            </trans-unit>
+            <trans-unit id='QWxsZQ=='>
+                <source>Alle</source>
+                <target>All</target>
+            </trans-unit>
+            <trans-unit id='VGFncGFhcmU='>
+                <source>Tagpaare</source>
+                <target>Paired</target>
+            </trans-unit>
             <trans-unit id='Vm9yw7xiZXJzZXR6dW5n'>
                 <source>Vorübersetzung</source>
                 <target>Pre-translation</target>
@@ -9668,6 +9696,10 @@ E-Mail: service@MittagQI.com</pre>
             <trans-unit id='Qml0dGUgZGVua2VuIFNpZSBkYXJhbiwgZGFzcyBhbGxlIFZlcndlbmR1bmdlbiBkaWVzZXIgT3B0aW9uIChmYWxscyB2b3JoYW5kZW4pIGVudGZlcm50IHdlcmRlbiwgd2VubiBzaWUgaW4gZWluZW0gZGVyIGJlc3RlaGVuZGVuIFByb2pla3RlL0F1ZmdhYmVuIGVyZsO8bGx0IHdlcmRlbi4gRm9ydGZhaHJlbj8='>
                 <source>Bitte denken Sie daran, dass alle Verwendungen dieser Option (falls vorhanden) entfernt werden, wenn sie in einem der bestehenden Projekte/Aufgaben erfüllt werden. Fortfahren?</source>
                 <target>Please keep in mind that all the usages (if any) of this option will be removed if met in any of existing projects/tasks. Proceed?</target>
+            </trans-unit>
+            <trans-unit id='RGFzIERlZmluaWVyZW4gdW5kIMOEbmRlcm4gdm9uIEZlbGRlcm4ga2FubiB6dSBlaW5lbSBob2hlbiBSZXNzb3VyY2VudmVyYnJhdWNoIGbDvGhyZW4sIHdlbm4gZGFzIEZlbGQgZ2VzcGVpY2hlcnQgd2lyZC4gQml0dGUgdHVuIFNpZSBkaWVzIGluIEFic3RpbW11bmcgbWl0IGRlbSB0cmFuc2xhdGU1LVN1cHBvcnR0ZWFtLg=='>
+                <source>Das Definieren und Ändern von Feldern kann zu einem hohen Ressourcenverbrauch führen, wenn das Feld gespeichert wird. Bitte tun Sie dies in Abstimmung mit dem translate5-Supportteam.</source>
+                <target>Defining and changing field can lead to high resource usage, when saving the field. Please do it with coordination with the translate5 support team.</target>
             </trans-unit>
         </body>
     </file>

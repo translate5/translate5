@@ -548,11 +548,12 @@ class editor_TaskController extends ZfExtended_RestController
 
         settype($this->data['wordCount'], 'integer');
         settype($this->data['enableSourceEditing'], 'integer');
-        settype($this->data['edit100PercentMatch'], 'integer');
         settype($this->data['lockLocked'], 'integer');
+
         if (array_key_exists('enddate', $this->data)) {
             unset($this->data['enddate']);
         }
+
         if (array_key_exists('autoStartImport', $this->data)) {
             //if the value exists we assume boolean
             settype($this->data['autoStartImport'], 'boolean');
@@ -560,6 +561,7 @@ class editor_TaskController extends ZfExtended_RestController
             //if not explicitly disabled the import starts always automatically to be compatible with legacy API users
             $this->data['autoStartImport'] = true;
         }
+
         if (empty($this->data['pmGuid']) || !$this->isAllowed(Rights::ID, 'editorEditTaskPm')) {
             $this->data['pmGuid'] = $this->authenticatedUser->getUserGuid();
             $this->data['pmName'] = $this->authenticatedUser->getUsernameLong();
@@ -605,6 +607,9 @@ class editor_TaskController extends ZfExtended_RestController
         //init workflow id for the task, based on customer or general config as fallback
         $this->entity->setWorkflow($c->runtimeOptions->workflow->initialWorkflow);
 
+        $this->entity->setEdit100PercentMatch(
+            (int) ($this->data['edit100PercentMatch'] ?? $c->runtimeOptions->import->edit100PercentMatch)
+        );
 
         if (!$this->validate()) {
             // we have to prevent attached events, since when we get here the task is not created,
@@ -940,11 +945,16 @@ class editor_TaskController extends ZfExtended_RestController
 
     /**
      * returns the logged events for the given task
+     * @throws ZfExtended_Models_Entity_NoAccessException|ReflectionException
      */
-    public function eventsAction() {
-        $this->getAction();
-        $events = ZfExtended_Factory::get('editor_Models_Logger_Task');
-        /* @var $events editor_Models_Logger_Task */
+    public function eventsAction(): void
+    {
+
+        $this->entityLoad();
+
+        $this->isTaskAccessibleForCurrentUser();
+
+        $events = ZfExtended_Factory::get(editor_Models_Logger_Task::class);
 
         //filter and limit for events entity
         $offset = $this->_getParam('start');
@@ -1508,12 +1518,14 @@ class editor_TaskController extends ZfExtended_RestController
 
     /**
      * (non-PHPdoc)
+     * @throws ZfExtended_Models_Entity_NoAccessException
      * @see ZfExtended_RestController::getAction()
      */
     public function getAction() {
         parent::getAction();
-        $taskguid = $this->entity->getTaskGuid();
         $this->initWorkflow();
+
+        $hasRightForTask = $this->isTaskAccessibleForCurrentUser();
 
         $obj = $this->entity->getDataObject();
 
@@ -1521,27 +1533,8 @@ class editor_TaskController extends ZfExtended_RestController
 
         //because we are mixing objects (getDataObject) and arrays (loadAll) as entity container we have to cast here
         $row = (array) $obj;
-
-        $isTaskPm = $this->isAuthUserTaskPm($this->entity->getPmGuid());
-        $tua = null;
-        try {
-            $tua = editor_Models_Loaders_Taskuserassoc::loadByTask(
-                $this->authenticatedUser->getUserGuid(),
-                $this->entity
-            );
-        }
-        catch(ZfExtended_Models_Entity_NotFoundException $e) {
-            //do nothing here
-        }
         
-        //to access a task the user must either have the loadAllTasks right, or must be the tasks PM, or must be associated to the task
-        $isTaskAccessable = $this->isAllowed(Rights::ID, Rights::LOAD_ALL_TASKS) || $isTaskPm || !is_null($tua);
-        if(!$isTaskAccessable) {
-            unset($this->view->rows);
-            throw new ZfExtended_Models_Entity_NoAccessException();
-        }
-        
-        $isEditAll = $this->isAllowed(Rights::ID, Rights::EDIT_ALL_TASKS) || $isTaskPm;
+        $isEditAll = $this->isAllowed(Rights::ID, Rights::EDIT_ALL_TASKS) || $hasRightForTask;
         $this->_helper->TaskUserInfo->initForTask($this->workflow, $this->entity, $this->isTaskProvided());
         $this->_helper->TaskUserInfo->addUserInfos($row, $isEditAll);
         $this->addMissingSegmentrangesToResult($row);
@@ -1552,7 +1545,7 @@ class editor_TaskController extends ZfExtended_RestController
         //add task assoc to the task
         $languageResourcemodel = ZfExtended_Factory::get('editor_Models_LanguageResources_LanguageResource');
         /*@var $languageResourcemodel editor_Models_LanguageResources_LanguageResource */
-        $resultlist = $languageResourcemodel->loadByAssociatedTaskGuid($taskguid);
+        $resultlist = $languageResourcemodel->loadByAssociatedTaskGuid($this->entity->getTaskGuid());
         $this->view->rows->taskassocs = $resultlist;
 
         // Add pixelMapping-data for the fonts used in the task.
@@ -2213,5 +2206,37 @@ class editor_TaskController extends ZfExtended_RestController
                 . ' This happens when the user selects multiple target languages in the dropdown'
                 . ' and then imports a bilingual file via drag and drop.',
         ], [], $e);
+    }
+
+    /**
+     * Check if the current authenticated user can access the task. This method expect the entity to be loaded and
+     * will throw exception if the current user has no rights to access the task at all.
+     * @return bool
+     * @throws ZfExtended_Models_Entity_NoAccessException
+     */
+    public function isTaskAccessibleForCurrentUser(): bool
+    {
+        $hasRightForTask = $this->isAuthUserTaskPm($this->entity->getPmGuid());
+        $tua = null;
+        try {
+            $tua = editor_Models_Loaders_Taskuserassoc::loadByTask(
+                $this->authenticatedUser->getUserGuid(),
+                $this->entity
+            );
+        } catch (ZfExtended_Models_Entity_NotFoundException $e) {
+            //do nothing here
+        }
+
+        // to access a task the user must either have the loadAllTasks right,
+        // or must be the tasks PM, or must be associated to the task
+        $isTaskAccessible = $this->isAllowed(
+                Rights::ID,
+                Rights::LOAD_ALL_TASKS
+            ) || $hasRightForTask || !is_null($tua);
+        if (!$isTaskAccessible) {
+            unset($this->view->rows);
+            throw new ZfExtended_Models_Entity_NoAccessException();
+        }
+        return $hasRightForTask;
     }
 }

@@ -352,6 +352,32 @@ class editor_Models_Segment_InternalTag extends editor_Models_Segment_TagAbstrac
     }
 
     /**
+     * @throws ReflectionException
+     */
+    public function toDebug(string $segment): string
+    {
+        $taghelperTrackChanges = ZfExtended_Factory::get(editor_Models_Segment_TrackChangeTag::class);
+        $segment = $taghelperTrackChanges->replace(
+            $segment,
+            fn($del) => preg_replace('#<del[^>]+>#', '<del>', $del[0])
+        );
+        $segment = preg_replace('#<ins[^>]+>#', '<ins>', $segment);
+
+        $result = $this->replace($segment, function ($match) {
+            //original id coming from import format
+            $type = $match[1];
+            $shortCutNr = $this->getTagNumber($match[0]);
+            return match ($type) {
+                'open' => sprintf('<%s>', $shortCutNr),
+                'close' => sprintf('</%s>', $shortCutNr),
+                default => sprintf('<%s/>', $shortCutNr),
+            };
+        });
+
+        return html_entity_decode($result, ENT_XML1);
+    }
+
+    /**
      * converts the given string (mainly the internal tags in the string) into excel tag-placeholder.
      * Sample:
      * <img class=".. open .." .. /> => <1>

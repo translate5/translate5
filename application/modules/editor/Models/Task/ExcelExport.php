@@ -28,14 +28,14 @@ END LICENSE AND COPYRIGHT
 
 /**
  * Entity Model for excel export data
- * @method integer getId() getId()
- * @method void setId() setId(int $id)
- * @method string getTaskGuid() getTaskGuid()
- * @method void setTaskGuid() setTaskGuid(string $guid)
- * @method string getUserGuid() getUserGuid()
- * @method void setUserGuid() setUserGuid(string $guid)
- * @method string getExported() getExported()
- * @method void setExported() setExported(string $timestamp)
+ * @method string getId()
+ * @method void setId(int $id)
+ * @method string getTaskGuid()
+ * @method void setTaskGuid(string $guid)
+ * @method string getUserGuid()
+ * @method void setUserGuid(string $guid)
+ * @method string getExported()
+ * @method void setExported(string $timestamp)
  */
 class editor_Models_Task_ExcelExport extends ZfExtended_Models_Entity_Abstract {
     protected $dbInstanceClass = 'editor_Models_Db_TaskExcelExport';

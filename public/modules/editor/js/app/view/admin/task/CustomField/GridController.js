@@ -60,7 +60,7 @@ Ext.define('Editor.view.admin.task.CustomField.GridController', {
      * Routes
      */
     routesToSet: {
-        ':recordId': 'onRecordRoute',
+        ':recordId': 'onRecordRoute'
     },
 
     /**
@@ -69,7 +69,7 @@ Ext.define('Editor.view.admin.task.CustomField.GridController', {
      * @param cbgroup
      */
     onRolesBoxReady: function(cbgroup) {
-        var items = [];
+        var items = [], qtip = cbgroup.up('[viewModel]').getViewModel().get('l10n.taskCustomField.meta.roles.tooltip');
 
         // For each role
         Ext.Object.each(Editor.data.app.roles, (key, value) => {
@@ -88,6 +88,9 @@ Ext.define('Editor.view.admin.task.CustomField.GridController', {
 
         // Do add
         cbgroup.add(items);
+
+        // Set tooltip
+        cbgroup.el.dom.setAttribute('data-qtip', qtip);
     },
 
     /**
@@ -379,7 +382,8 @@ Ext.define('Editor.view.admin.task.CustomField.GridController', {
      * Save changes to new or existing custom field
      */
     onSave:function(){
-        var me = this, view = me.getView(),
+        var me = this,
+            view = me.getView(),
             record = view.getSelection().pop();
 
         // Put a mask on the whole view
@@ -393,6 +397,13 @@ Ext.define('Editor.view.admin.task.CustomField.GridController', {
         // Start saving request
         record.save({
             success: (rec, operation) => {
+
+                Ext.MessageBox.show({
+                    title: Editor.data.l10n.taskCustomField.validationTitle,
+                    msg: Editor.data.l10n.taskCustomField.validationMessage,
+                    buttons: Ext.MessageBox.OK,
+                    icon: Ext.MessageBox.WARNING
+                });
 
                 // Get response json
                 var json = operation.getResponse().responseJson;
@@ -466,7 +477,9 @@ Ext.define('Editor.view.admin.task.CustomField.GridController', {
     onSelectionChange: function(selModel, selected) {
 
         // Adjust options available in Mode-combobox based on value in Type-combobox
-        if (selected.length) this.adjustModeChoices();
+        if (selected.length) {
+            this.adjustModeChoices();
+        }
 
         // Check whether selected record's type is combobox and load json comboboxData-prop into comboboxDataGrid's store
         this.setupComboboxData(selected);

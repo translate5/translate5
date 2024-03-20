@@ -330,17 +330,20 @@ class editor_Services_TermCollection_Connector extends editor_Services_Connector
         }
         $zip->close();
 
-        // list all extracted tbx files from the location
-        $list = glob($newPath . DIRECTORY_SEPARATOR . "*.tbx");
-
         $newFileInfo = [];
 
-        foreach ($list as $item) {
-            $newFileInfo[] = [
-                'tmp_name' => $item,
-                'name' => basename($item),
-            ];
+        // list all extracted tbx files from the location
+        foreach (editor_Utils::generatePermutations('tbx') as $pattern) {
+            $list = glob($newPath . DIRECTORY_SEPARATOR . '*.' . implode($pattern));
+
+            foreach ($list as $item) {
+                $newFileInfo[] = [
+                    'tmp_name' => $item,
+                    'name' => basename($item),
+                ];
+            }
         }
+
         return $newFileInfo;
     }
 

@@ -27,20 +27,20 @@ END LICENSE AND COPYRIGHT
 */
 
 /**
- * @method integer getId() getId()
- * @method void setId() setId(int $id)
- * @method void getTaskGuid() getTaskGuid()
- * @method void setTaskGuid() setTaskGuid(void $taskGuid)
- * @method integer getFileId() getFileId()
- * @method void setFileId() setFileId(int $fileId)
- * @method string getFont() getFont()
- * @method void setFont() setFont(string $font)
- * @method integer getFontsize() getFontsize()
- * @method void setFontsize() setFontsize(int $fontsize)
- * @method string getUnicodeChar() getUnicodeChar()
- * @method void setUnicodeChar() setUnicodeChar(string $unicodeChar)
- * @method integer getPixelWidth() getPixelWidth()
- * @method void setPixelWidth() setPixelWidth(int $pixelWidth)
+ * @method string getId()
+ * @method void setId(int $id)
+ * @method void getTaskGuid()
+ * @method void setTaskGuid(void $taskGuid)
+ * @method string getFileId()
+ * @method void setFileId(int $fileId)
+ * @method string getFont()
+ * @method void setFont(string $font)
+ * @method string getFontsize()
+ * @method void setFontsize(int $fontsize)
+ * @method string getUnicodeChar()
+ * @method void setUnicodeChar(string $unicodeChar)
+ * @method string getPixelWidth()
+ * @method void setPixelWidth(int $pixelWidth)
 */
 class editor_Models_PixelMapping extends ZfExtended_Models_Entity_Abstract {
     protected $dbInstanceClass = 'editor_Models_Db_PixelMapping';

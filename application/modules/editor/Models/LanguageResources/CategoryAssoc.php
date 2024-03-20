@@ -27,14 +27,14 @@ END LICENSE AND COPYRIGHT
 */
 
 /**
- * @method integer getId() getId()
- * @method void setId() setId(int $id)
+ * @method string getId()
+ * @method void setId(int $id)
  * 
- * @method integer getLanguageResourceId getLanguageResourceId()
- * @method void setLanguageResourceId() setLanguageResourceId(int $languageResourceId)
+ * @method string getLanguageResourceId()
+ * @method void setLanguageResourceId(int $languageResourceId)
  * 
- * @method integer getCategoryId() getCategoryId()
- * @method void setCategoryId() setCategoryId(int $categoryId)
+ * @method string getCategoryId()
+ * @method void setCategoryId(int $categoryId)
  * 
  */
 class editor_Models_LanguageResources_CategoryAssoc extends ZfExtended_Models_Entity_Abstract {
