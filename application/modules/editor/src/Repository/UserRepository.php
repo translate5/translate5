@@ -52,6 +52,7 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\Repository;
 
+use MittagQI\ZfExtended\Acl\Roles;
 use ZfExtended_Acl;
 use ZfExtended_Factory;
 use ZfExtended_Models_User;
@@ -72,9 +73,9 @@ class UserRepository
     {
         $userModel = ZfExtended_Factory::get(ZfExtended_Models_User::class);
 
-        $roles = ['pm'];
+        $roles = [Roles::PM];
         if ($includePmlite) {
-            $roles[] = 'pmlight';
+            $roles[] = Roles::PMLIGHT;
         }
 
         $users = ZfExtended_Factory::get(ZfExtended_Models_User::class)->loadAllByRole($roles);
