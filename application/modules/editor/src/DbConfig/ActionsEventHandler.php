@@ -84,9 +84,6 @@ class ActionsEventHandler
         };
     }
 
-    /***
-     * @param Zend_EventManager_Event $event
-     */
     public function addDefaultPMUsersOnIndexAction(string $configName, bool $includePmlite = false): callable
     {
         return function (Zend_EventManager_Event $event) use ($configName, $includePmlite) {
