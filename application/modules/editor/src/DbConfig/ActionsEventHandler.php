@@ -73,7 +73,7 @@ class ActionsEventHandler
         $this->userRepository = new UserRepository();
     }
 
-    public function addDefaultPMUsersOnPutAction(string $configName, bool $includePmlite): callable
+    public function addDefaultPMUsersOnPutAction(string $configName, bool $includePmlite = false): callable
     {
         return function (Zend_EventManager_Event $event) use ($configName, $includePmlite) {
             if ($event->getParam('request')->getParam('id') != $configName) {
@@ -87,7 +87,7 @@ class ActionsEventHandler
     /***
      * @param Zend_EventManager_Event $event
      */
-    public function addDefaultPMUsersOnIndexAction(string $configName, bool $includePmlite): callable
+    public function addDefaultPMUsersOnIndexAction(string $configName, bool $includePmlite = false): callable
     {
         return function (Zend_EventManager_Event $event) use ($configName, $includePmlite) {
             if (!$rows = $event->getParam('view')->rows ?? []) {
