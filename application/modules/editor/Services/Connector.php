@@ -33,12 +33,12 @@ use MittagQI\Translate5\Segment\TagRepair\HtmlProcessor;
  * - provides a connection to a concrete language resource, via the internal adapter (which contains the concrete connector instance)
  * - intercepts some calls to the adapter to provide unified logging etc per each call
  * - all non intercepted methods are passed directly to the underlying adapter
- * @method editor_Services_ServiceResult query() query(editor_Models_Segment $segment)
- * @method editor_Services_ServiceResult search() search(string $searchString, $field = 'source', $offset = null)
- * @method editor_Services_ServiceResult translate() translate(string $searchString)
+ * @method editor_Services_ServiceResult query(editor_Models_Segment $segment)
+ * @method editor_Services_ServiceResult search(string $searchString, $field = 'source', $offset = null)
+ * @method editor_Services_ServiceResult translate(string $searchString)
  * @method void update(editor_Models_Segment $segment, $recheckOnUpdate = false, $rescheduleOnError = false) editor_Services_Connector_Abstract::update()
- * @method string getStatus() getStatus(editor_Models_LanguageResources_Resource $resource, editor_Models_LanguageResources_LanguageResource $languageResource = null) returns the LanguageResource status
- * @method string getLastStatusInfo() getLastStatusInfo() returns the last store status info from the last getStatus call
+ * @method string getStatus(editor_Models_LanguageResources_Resource $resource, editor_Models_LanguageResources_LanguageResource $languageResource = null) returns the LanguageResource status
+ * @method string getLastStatusInfo() returns the last store status info from the last getStatus call
  * @method string getTm($mime, string $tmName = '') editor_Services_Connector_FilebasedAbstract::getTm()
  * @method boolean addTm(array $fileInfo = null,array $params=null) editor_Services_Connector_Abstract::addTm()
  * @method boolean addAdditionalTm(array $fileinfo = null, array $params = null) editor_Services_Connector_Abstract::addAdditionalTm()

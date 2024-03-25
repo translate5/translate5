@@ -27,7 +27,7 @@ END LICENSE AND COPYRIGHT
 */
 
 use MittagQI\Translate5\LanguageResource\CleanupAssociation\Customer;
-use MittagQI\Translate5\LanguageResource\CleanupAssociation\Task;
+use MittagQI\Translate5\LanguageResource\ReimportSegments;
 use MittagQI\Translate5\LanguageResource\TaskAssociation;
 use MittagQI\Translate5\LanguageResource\TaskPivotAssociation;
 use MittagQI\Translate5\LanguageResource\Status as LanguageResourceStatus;
@@ -800,7 +800,7 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
     protected function decodePutData()
     {
         parent::decodePutData();
-        unset($this->data->langResUuid);
+        unset($this->data->langResUuid, $this->data->specificId);
     }
     
     /**
@@ -963,33 +963,43 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
      * Loads all task information entities for the given languageResource
      * The returned data is no real task entity, although the task model is used in the frontend!
      */
-    public function tasksAction() {
+    public function tasksAction(): void
+    {
         try {
             $this->getAction();
         } catch (editor_Services_Connector_Exception $e) {
             $e->addExtraData(['languageResource' => $this->entity]);
+
             throw $e;
         }
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $this->decodePutData();
-            if(!empty($this->data) && !empty($this->data->toReImport)) {
-                foreach($this->data->toReImport as $taskGuid) {
-                    $worker = ZfExtended_Factory::get('editor_Models_LanguageResources_Worker');
-                    /* @var $worker editor_Models_LanguageResources_Worker */
+            if (!empty($this->data) && !empty($this->data->toReImport)) {
+                foreach ($this->data->toReImport as $taskGuid) {
+                    $worker = ZfExtended_Factory::get(editor_Models_LanguageResources_Worker::class);
 
                     // init worker and queue it
-                    // Since it has to be done in a none worker request to have session access, we have to insert the worker before the taskPost
-                    if (!$worker->init($taskGuid, ['languageResourceId' => $this->entity->getId()])) {
+                    $success = $worker->init(
+                        $taskGuid,
+                        [
+                            'languageResourceId' => $this->entity->getId(),
+                            ReimportSegments::FILTER_ONLY_EDITED => $this->data->onlyEdited
+                        ]
+                    );
+
+                    // Since it has to be done in a none worker request to have session access,
+                    // we have to insert the worker before the taskPost
+                    if (!$success) {
                         throw new ZfExtended_Exception('LanguageResource ReImport Error on worker init()');
                     }
+
                     $worker->queue();
                 }
             }
         }
 
-        $assoc = ZfExtended_Factory::get('MittagQI\Translate5\LanguageResource\TaskAssociation');
-        /* @var $assoc MittagQI\Translate5\LanguageResource\TaskAssociation */
+        $assoc = ZfExtended_Factory::get(TaskAssociation::class);
         $taskinfo = $assoc->getTaskInfoForLanguageResources([$this->entity->getId()]);
         //FIXME replace lockingUser guid with concrete username and show it in the frontend!
         $this->view->rows = $taskinfo;
@@ -1317,6 +1327,7 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         $result = $connector->query($segment);
 
         if($this->entity->getResourceType() == editor_Models_Segment_MatchRateType::TYPE_TM){
+            $result = $this->filterResults($result);
             $result=$this->markDiff($segment, $result,$connector);
         }
 
@@ -1653,5 +1664,34 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         if(!empty(array_diff($this->entity->getCustomers(), $allowedCustomerIs))){
             throw new ZfExtended_NoAccessException('Deletion of LanguageResource is not allowed due to client-restriction');
         }
+    }
+
+    /**
+     * Filter results by configured match-rate threshold
+     * @param editor_Services_ServiceResult $result
+     * @return editor_Services_ServiceResult
+     * @throws \MittagQI\Translate5\Task\Current\Exception|editor_Models_ConfigException
+     */
+    private function filterResults(editor_Services_ServiceResult $result): editor_Services_ServiceResult
+    {
+        $matchRateThreshold = $this->getCurrentTask()->getConfig()
+            ->runtimeOptions
+            ->LanguageResources
+            ->TM
+            ->matchPanelMatchrate ?? 0;
+
+        if ($matchRateThreshold === 0) {
+            return $result;
+        }
+        
+        $result->setResults(
+            array_filter(
+                $result->getResult(),
+                static function ($row) use ($matchRateThreshold) {
+                    return $row->matchrate >= $matchRateThreshold;
+                }
+            )
+        );
+        return $result;
     }
 }

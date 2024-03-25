@@ -77,7 +77,12 @@ class Models_SystemRequirement_Modules_Configuration extends ZfExtended_Models_S
         if ($hasWorkerUrl) {
             $outputWorker = $this->callUrl($config->runtimeOptions->worker->server.$path, $curlErrorWorker);
         }
-        
+
+        if (str_contains($curlErrorWorker, '503 Service Unavailable')) {
+            $this->result->warning[] = 'Checked instance URL is in maintenance mode, test can not be done!';
+            return;
+        }
+
         $memcache->remove(self::MEMCACHE_ID);
         
         if ($output === false) {

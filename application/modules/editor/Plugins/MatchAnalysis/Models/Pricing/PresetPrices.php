@@ -40,17 +40,17 @@ use ZfExtended_Models_Entity_NotFoundException;
 /**
  * Class representing actual price-list in a certain currency for a pair of certain source and target languages
  *
- * @method integer getId()
+ * @method string getId()
  * @method void setId(int $id)
- * @method integer getPresetId()
+ * @method string getPresetId()
  * @method void setPresetId(int $presetId)
- * @method int getSourceLanguageId()
+ * @method string getSourceLanguageId()
  * @method void setSourceLanguageId(int $sourceLanguageId)
- * @method int getTargetLanguageId()
+ * @method string getTargetLanguageId()
  * @method void setTargetLanguageId(int $targetLanguageId)
  * @method string getCurrency()
  * @method void setCurrency(string $currency)
- * @method float getNoMatch()
+ * @method string getNoMatch()
  * @method void setNoMatch(float $noMatch)
  * @method string getPricesByRangeIds()
  * @method void setPricesByRangeIds(string $pricesByRangeIds)

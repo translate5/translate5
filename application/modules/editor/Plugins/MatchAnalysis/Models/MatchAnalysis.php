@@ -31,37 +31,37 @@ use ZfExtended_Factory as Factory;
 /**
  * MatchAnalysis Entity Object
  *
- * @method integer getId() getId()
- * @method void setId() setId(int $id)
+ * @method string getId()
+ * @method void setId(int $id)
  *
- * @method string getTaskGuid() getTaskGuid()
- * @method void setTaskGuid() setTaskGuid(string $taskGuid)
- * @method integer getSegmentId() getSegmentId()
- * @method void setSegmentId() setSegmentId(int $segmentId)
+ * @method string getTaskGuid()
+ * @method void setTaskGuid(string $taskGuid)
+ * @method string getSegmentId()
+ * @method void setSegmentId(int $segmentId)
  *
- * @method integer getSegmentNrInTask() getSegmentNrInTask()
- * @method void setSegmentNrInTask() setSegmentNrInTask(int $segmentNrInTask)
+ * @method string getSegmentNrInTask()
+ * @method void setSegmentNrInTask(int $segmentNrInTask)
  *
- * @method integer getLanguageResourceid() getLanguageResourceid()
- * @method void setLanguageResourceid() setLanguageResourceid(int $languageResourceid)
+ * @method string getLanguageResourceid()
+ * @method void setLanguageResourceid(int $languageResourceid)
  *
- * @method integer getMatchRate() getMatchRate()
- * @method void setMatchRate() setMatchRate(int $matchrate)
+ * @method string getMatchRate()
+ * @method void setMatchRate(int $matchrate)
  *
- * @method integer getWordCount() getWordCount()
- * @method void setWordCount() setWordCount(int $wordCount)
+ * @method string getWordCount()
+ * @method void setWordCount(int $wordCount)
  *
- * @method integer getCharacterCount() getCharacterCount()
- * @method void setCharacterCount() setCharacterCount(int $characterCount)
+ * @method string getCharacterCount()
+ * @method void setCharacterCount(int $characterCount)
  *
- * @method string getType() getType()
- * @method void setType() setType(string $type)
+ * @method string getType()
+ * @method void setType(string $type)
  *
- * @method integer getAnalysisId() getAnalysisId()
- * @method void setAnalysisId() setAnalysisId(int $analysisId)
+ * @method string getAnalysisId()
+ * @method void setAnalysisId(int $analysisId)
  *
- * @method integer getInternalFuzzy() getInternalFuzzy()
- * @method void setInternalFuzzy() setInternalFuzzy(int $internalFuzzy)
+ * @method string getInternalFuzzy()
+ * @method void setInternalFuzzy(int $internalFuzzy)
  *
  */
 class editor_Plugins_MatchAnalysis_Models_MatchAnalysis extends ZfExtended_Models_Entity_Abstract

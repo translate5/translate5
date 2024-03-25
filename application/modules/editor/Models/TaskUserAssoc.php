@@ -38,7 +38,7 @@ use MittagQI\ZfExtended\Session\SessionInternalUniqueId;
 
 /**
  * TaskUserAssoc Object Instance as needed in the application
- * @method integer getId()
+ * @method string getId()
  * @method string getTaskGuid()
  * @method string getUserGuid()
  * @method string getState()
@@ -48,7 +48,15 @@ use MittagQI\ZfExtended\Session\SessionInternalUniqueId;
  * @method string getSegmentrange()
  * @method string getUsedState()
  * @method string getUsedInternalSessionUniqId()
- * @method boolean getIsPmOverride()
+ * @method string getIsPmOverride()
+ * @method string getStaticAuthHash()
+ * @method string getAssignmentDate()
+ * @method string getFinishedDate()
+ * @method string getDeadlineDate()
+ * @method string getTrackchangesShow()
+ * @method string getTrackchangesShowAll()
+ * @method string getTrackchangesAcceptReject()
+ *
  * @method void setId(int $id)
  * @method void setTaskGuid(string $taskGuid)
  * @method void setUserGuid(string $userGuid)
@@ -60,19 +68,12 @@ use MittagQI\ZfExtended\Session\SessionInternalUniqueId;
  * @method void setUsedState(string $state)
  * @method void setUsedInternalSessionUniqId(string $sessionId)
  * @method void setIsPmOverride(bool $isPmOverride)
- * @method string getStaticAuthHash()
  * @method void setStaticAuthHash(string $hash)
- * @method string getAssignmentDate()
  * @method void setAssignmentDate(string $assignment)
- * @method string getFinishedDate()
  * @method void setFinishedDate(string $datetime)
- * @method string getDeadlineDate()
  * @method void setDeadlineDate(string $datetime)
- * @method int getTrackchangesShow()
  * @method void setTrackchangesShow(int $isAllowed)
- * @method int getTrackchangesShowAll()
  * @method void setTrackchangesShowAll(int $isAllowed)
- * @method int getTrackchangesAcceptReject()
  * @method void setTrackchangesAcceptReject(int $isAllowed)
  *
  */

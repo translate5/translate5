@@ -38,15 +38,16 @@ END LICENSE AND COPYRIGHT
  * @method void setRelaisLang(int $target)
  * @method void setFileOrder(int $order)
  * @method void setIsReimportable(int $isReimportable)
- * @method integer getId()
+ *
+ * @method string getId()
  * @method string getTaskGuid()
  * @method string getFileName()
  * @method string getFileParser()
- * @method integer getSourceLang()
- * @method integer getTargetLang()
- * @method integer getRelaisLang()
- * @method integer getFileOrder()
- * @method integer getIsReimportable()
+ * @method string getSourceLang()
+ * @method string getTargetLang()
+ * @method string getRelaisLang()
+ * @method string getFileOrder()
+ * @method string getIsReimportable()
  */
 class editor_Models_File extends ZfExtended_Models_Entity_Abstract {
     protected $dbInstanceClass = 'editor_Models_Db_Files';

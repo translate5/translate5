@@ -34,14 +34,14 @@ END LICENSE AND COPYRIGHT
  */
 /**
  * Categories Object Instance as needed in the application
- * @method integer getId() getId()
- * @method void setId() setId(int $id)
- * @method string getOrigin() getOrigin()
- * @method void setOrigin() setOrigin(string $origin)
- * @method string getLabel() getLabel()
- * @method void setLabel() setLabel(string $label)
- * @method string getOriginalCategoryId() getOriginalCategoryId()
- * @method void setOriginalCategoryId() setOriginalCategoryId(string $originalCategoryId)
+ * @method string getId()
+ * @method void setId(int $id)
+ * @method string getOrigin()
+ * @method void setOrigin(string $origin)
+ * @method string getLabel()
+ * @method void setLabel(string $label)
+ * @method string getOriginalCategoryId()
+ * @method void setOriginalCategoryId(string $originalCategoryId)
  */
 class editor_Models_Categories extends ZfExtended_Models_Entity_Abstract {
     use editor_Models_Entity_SpecificDataTrait;

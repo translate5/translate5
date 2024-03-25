@@ -75,6 +75,8 @@ trait T5MemoryLocalTmsTrait
                     'uuid' => $languageResource->getLangResUuid(),
                     'url' => $url,
                     'status' => $status,
+                    'sourceLang' => $languageResource->getSourceLangCode(),
+                    'targetLang' => $languageResource->getTargetLangCode(),
                 ];
             }
         }
@@ -91,7 +93,7 @@ trait T5MemoryLocalTmsTrait
         $list = [];
 
         foreach ($this->getLocalTms($nameFilter) as $item) {
-            $list[$item['uuid']] = $item['name'];
+            $list[$item['uuid']] = $item['name'] . ' [ ' . $item['sourceLang'] . ' -> ' . $item['targetLang'] . ' ] ';
         }
 
         return $list;

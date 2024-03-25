@@ -101,7 +101,7 @@ class EventWriter extends ZfExtended_Logger_Writer_Database
         $this->httpHost = $eventA[0]['httpHost'] ?? $_SERVER['SERVER_NAME'] ?? $_SERVER['HTTP_HOST'] ?? 'localhost';
 
         // Json encode events
-        $json_encoded = json_encode($eventA);
+        $json_encoded = json_encode($eventA, JSON_INVALID_UTF8_SUBSTITUTE);
 
         // If json encoding failed
         if ($json_encoded === false) {

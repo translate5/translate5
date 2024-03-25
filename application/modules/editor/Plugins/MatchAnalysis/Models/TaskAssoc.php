@@ -29,26 +29,26 @@ END LICENSE AND COPYRIGHT
 /**
  * MatchAnalysis TaskAssoc Entity Object
  *
- * @method integer getId() getId()
- * @method void setId() setId(int $id)
+ * @method string getId()
+ * @method void setId(int $id)
  *
- * @method string getTaskGuid() getTaskGuid()
- * @method void setTaskGuid() setTaskGuid(string $taskGuid)
+ * @method string getTaskGuid()
+ * @method void setTaskGuid(string $taskGuid)
  *
- * @method string getUuid() getUuid()
- * @method void setUuid() setUuid(string $taskUuid)
+ * @method string getUuid()
+ * @method void setUuid(string $taskUuid)
  *
- * @method boolean getInternalFuzzy() getInternalFuzzy()
- * @method void setInternalFuzzy() setInternalFuzzy(bool $internalFuzzy)
+ * @method string getInternalFuzzy()
+ * @method void setInternalFuzzy(bool $internalFuzzy)
  *
- * @method integer getPretranslateMatchrate() getPretranslateMatchrate()
- * @method void setPretranslateMatchrate() setPretranslateMatchrate(int $pretranslateMatchrate)
+ * @method string getPretranslateMatchrate()
+ * @method void setPretranslateMatchrate(int $pretranslateMatchrate)
  *
- * @method integer getCreated() getCreated()
- * @method void setCreated() setCreated(string $created)
+ * @method string getCreated()
+ * @method void setCreated(string $created)
  *
- * @method integer getFinishedAt() getFinishedAt()
- * @method void setFinishedAt() setFinishedAt(string $finishedAt)
+ * @method string getFinishedAt()
+ * @method void setFinishedAt(string $finishedAt)
  */
 class editor_Plugins_MatchAnalysis_Models_TaskAssoc extends ZfExtended_Models_Entity_Abstract {
     protected $dbInstanceClass = 'editor_Plugins_MatchAnalysis_Models_Db_TaskAssoc';
