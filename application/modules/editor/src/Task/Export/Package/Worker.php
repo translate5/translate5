@@ -132,7 +132,7 @@ class Worker extends editor_Models_Export_Worker
 
         try {
 
-            Lock::taskLock($this->task, Downloader::PACKAGE_EXPORT);
+            Lock::taskLock($this->task, editor_Models_Task::STATE_PACKAGE_EXPORT);
 
             $this->exportSource = ZfExtended_Factory::get(ExportSource::class, [
                 $this->task
