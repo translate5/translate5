@@ -9681,6 +9681,10 @@ E-Mail: service@MittagQI.com</pre>
                 <source>Das Definieren und Ändern von Feldern kann zu einem hohen Ressourcenverbrauch führen, wenn das Feld gespeichert wird. Bitte tun Sie dies in Abstimmung mit dem translate5-Supportteam.</source>
                 <target>Defining and changing field can lead to high resource usage, when saving the field. Please do it with coordination with the translate5 support team.</target>
             </trans-unit>
+            <trans-unit id='VHVya21lbmlzY2ggKFR1cmttZW5pc3Rhbik='>
+                <source>Turkmenisch (Turkmenistan)</source>
+                <target>Turkmen (Turkmenistan)</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>
