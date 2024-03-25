@@ -128,8 +128,11 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
 
         $noFile = empty($fileinfo);
         $tmxUpload = !$noFile
-            && in_array($fileinfo['type'], $validFileTypes['TMX'])
-            && preg_match('/\.tmx$/', $fileinfo['name']);
+            && (
+                in_array($fileinfo['type'], $validFileTypes['TMX'])
+                || in_array($fileinfo['type'], $validFileTypes['ZIP'])
+            )
+            && preg_match('/(\.tmx|\.zip)$/', strtolower($fileinfo['name']));
 
         if ($noFile || $tmxUpload) {
             $tmName = $this->api->createEmptyMemory($name, $sourceLang);

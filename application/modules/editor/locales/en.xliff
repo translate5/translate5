@@ -4006,9 +4006,9 @@ A task was associated to you in the task-portal {portalLink}.
                 <source>Weitere TM Daten erfolgreich importiert!</source>
                 <target>Imported additional TM data successfully!</target>
             </trans-unit>
-            <trans-unit id='VE0vVE1YLURhdGVpIChvcHRpb25hbCk='>
-                <source>TM/TMX-Datei (optional)</source>
-                <target>TM/TMX-file (optional)</target>
+            <trans-unit id='WklQL1RNL1RNWC1EYXRlaSAob3B0aW9uYWwp'>
+                <source>ZIP/TM/TMX-Datei (optional)</source>
+                <target>ZIP/TM/TMX-file (optional)</target>
             </trans-unit>
             <trans-unit id='Qml0dGUgdmVyd2VuZGVuIFNpZSBlaW5lIFRNIG9kZXIgVE1YIERhdGVpIQ=='>
                 <source>Bitte verwenden Sie eine TM oder TMX Datei!</source>

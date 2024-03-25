@@ -49,7 +49,7 @@ Ext.define('Editor.view.LanguageResources.AddTmWindow', {
         add: '#UT#Sprachressource hinzufügen',
         resource: '#UT#Ressource',
         name: '#UT#Name',
-        file: '#UT#TM/TMX-Datei (optional)',
+        file: '#UT#ZIP/TM/TMX-Datei (optional)',
         importTmxType: '#UT#Bitte verwenden Sie eine TM oder TMX Datei!',
         categories: '#UT#Kategorien',
         color: '#UT#Farbe',
@@ -75,7 +75,7 @@ Ext.define('Editor.view.LanguageResources.AddTmWindow', {
     layout: 'fit',
     autoScroll: true,
 
-    tmxRegex: /\.(tm|tmx)$/i,
+    tmxRegex: /\.(tm|tmx|zip)$/i,
     tbxRegex: /\.(tbx|zip)$/i,
 
     listeners: {
