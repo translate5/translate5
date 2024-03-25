@@ -290,7 +290,8 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
     public function update(
         editor_Models_Segment $segment,
         bool $recheckOnUpdate = self::DO_NOT_RECHECK_ON_UPDATE,
-        bool $rescheduleUpdateOnError = self::DO_NOT_RESCHEDULE_UPDATE_ON_ERROR
+        bool $rescheduleUpdateOnError = self::DO_NOT_RESCHEDULE_UPDATE_ON_ERROR,
+        bool $useSegmentTimestamp = self::DO_NOT_USE_SEGMENT_TIMESTAMP
     ): void {
         $tmName = $this->getWritableMemory();
 
@@ -310,7 +311,15 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
         $this->tagHandler->setInputTagMap($this->tagHandler->getTagMap());
         $target = $this->tagHandler->prepareQuery($segment->getTargetEdit());
 
-        $successful = $this->api->update($source, $target, $segment, $fileName, $tmName, !$this->isInternalFuzzy);
+        $successful = $this->api->update(
+            $source,
+            $target,
+            $segment,
+            $fileName,
+            $tmName,
+            !$this->isInternalFuzzy,
+            $useSegmentTimestamp
+        );
 
         if ($successful) {
             $this->checkUpdatedSegment($segment, $recheckOnUpdate);
