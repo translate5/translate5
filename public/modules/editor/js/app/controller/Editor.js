@@ -103,6 +103,8 @@ Ext.define('Editor.controller.Editor', {
 
     quickSearchInfoMessage: null,
 
+    taskOpenRequest: false,
+
     listen: {
         controller: {
             '#Editor.$application': {
@@ -114,6 +116,9 @@ Ext.define('Editor.controller.Editor', {
             },
             '#Editor.plugins.TrackChanges.controller.Editor':{
                 setValueForEditor: 'setValueForEditor'
+            },
+            '#ServerException':{
+                serverExceptionE1600: 'onServerExceptionE1600'
             }
         },
         component: {
@@ -239,6 +244,33 @@ Ext.define('Editor.controller.Editor', {
             'ctrl-zoomOut':   [[189, Ext.EventObjectImpl.NUM_MINUS],{ctrl: true, alt: false, shift: false}, me.handleZoomOut, true]
         };
     },
+
+    /**
+     *
+     * @returns {boolean}
+     */
+    onServerExceptionE1600: function (){
+        var me = this;
+
+        if(!Editor.data.task)
+        {
+            // let the error be handled by the default error handler
+            return true;
+        }
+        if(me.taskOpenRequest)
+        {
+            return false;
+        }
+
+        me.taskOpenRequest = true;
+
+        me.openTaskRequest(Editor.data.task.get('id'),function (success,task){
+            me.taskOpenRequest = !success;
+        });
+
+        return false;
+    },
+
     /**
      * track isEditing state 
      */
@@ -1976,6 +2008,20 @@ Ext.define('Editor.controller.Editor', {
             },
             failure: function(record, op, success) {
                 Editor.app.getController('ServerException').handleException(op.error.response);
+            }
+        });
+    },
+
+    openTaskRequest: function(taskId,callback){
+        //if the task is loaded, do nothing
+        Editor.model.admin.Task.load(taskId, {
+            success: function(task) {
+                Editor.util.TaskActions.openTaskRequest(task);
+                callback(true,task);
+            },
+            failure: function(record, op, success) {
+                Editor.app.getController('ServerException').handleException(op.error.response);
+                callback(false,null);
             }
         });
     },

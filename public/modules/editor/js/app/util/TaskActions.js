@@ -92,6 +92,11 @@ Ext.define('Editor.util.TaskActions', {
             (new this()).openTask(task, readonly);
             return;
         },
+
+        openTaskRequest: function(task, readonly) {
+            (new this()).openTaskRequest(task, readonly);
+        },
+
         /**
          * Opens the given task for editing or viewing (readonly = true)
          * @param {Editor.models.admin.Task} task
@@ -278,6 +283,21 @@ Ext.define('Editor.util.TaskActions', {
             failure: app.unmask
         });
     },
+
+    openTaskRequest: function(task, readonly) {
+        var me = this,
+            initialState,
+            app = Editor.app;
+
+        initialState = me.getInitialState(task, readonly);
+        task.set('userState', initialState);
+        task.save({
+            success: function(rec, op) {
+            },
+            failure: app.unmask
+        });
+    },
+
     /**
      * calculates the initial userState for a task for open requests
      * @param {Editor.models.Task} task
