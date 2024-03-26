@@ -602,7 +602,8 @@ $memLog('Loaded terms:        ');
         $newTerm->languageId = $parsedLangSet->languageId;
         $newTerm->termEntryGuid = $newTerm->parentEntry->entryGuid;
         $newTerm->termEntryTbxId = $newTerm->parentEntry->termEntryTbxId;
-        $newTerm->term = trim($term);
+        // Remove all leading and trailing whitespaces and remove the non-breaking spaces
+        $newTerm->term = ZfExtended_Utils::cleanString($term);
         $newTerm->termTbxId = $this->getIdOrGenerate($tig->term);
         $newTerm->langSetGuid = $parsedLangSet->langSetGuid;
 
