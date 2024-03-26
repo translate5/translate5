@@ -80,11 +80,19 @@ class editor_Services_ImportWorker extends ZfExtended_Worker_Abstract {
         $this->languageResource->load($params['languageResourceId']);
         
         $connector=$this->getConnector($this->languageResource);
-        
-        if(isset($params['addnew']) && $params['addnew']){
-            $return = $connector->addTm($params['fileinfo'],$params);
-        } else {
-            $return = $connector->addAdditionalTm($params['fileinfo'],$params);
+
+        try {
+            if (isset($params['addnew']) && $params['addnew']) {
+                $return = $connector->addTm($params['fileinfo'], $params);
+            } else {
+                $return = $connector->addAdditionalTm($params['fileinfo'], $params);
+            }
+        } catch (Exception $e) {
+            $this->log->exception($e);
+            $this->languageResource->setStatus(LanguageResourceStatus::AVAILABLE);
+            $this->languageResource->save();
+
+            return false;
         }
 
         // Must be reloaded because the status or additional info can be changed in addTem/addAdditionalTm
