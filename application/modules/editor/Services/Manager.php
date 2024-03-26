@@ -33,6 +33,7 @@ END LICENSE AND COPYRIGHT
  *
  */
 
+use MittagQI\Translate5\LanguageResource\Adapter\Exception\RescheduleUpdateNeededException;
 use MittagQI\Translate5\LanguageResource\Adapter\UpdatableAdapterInterface;
 
 /**
@@ -318,18 +319,22 @@ class editor_Services_Manager {
     /**
      * @throws Zend_Exception
      * @throws editor_Models_ConfigException
+     * @throws RescheduleUpdateNeededException
+     * @see \editor_Services_OpenTM2_Connector::update
      */
-    public function updateSegment(editor_Models_Segment $segment) {
+    public function updateSegment(editor_Models_Segment $segment)
+    {
         // segments with empty sources or targets will not be updated
         // TODO FIXME: In the Frontend we should show an error when editing segments without source and save-back is active
-        if($segment->hasEmptySource() || $segment->hasEmptyTarget()){
+        if ($segment->hasEmptySource() || $segment->hasEmptyTarget()) {
             return;
         }
+
         $task = ZfExtended_Factory::get(editor_Models_Task::class);
         $task->loadByTaskGuid($segment->getTaskGuid());
         $this->visitAllAssociatedTms(
             $task,
-            function(editor_Services_Connector $connector, $languageResource, $assoc) use ($segment) {
+            function (editor_Services_Connector $connector, $languageResource, $assoc) use ($segment): void {
                 if(!empty($assoc['segmentsUpdateable'])) {
                     $connector->update(
                         $segment,
@@ -338,7 +343,11 @@ class editor_Services_Manager {
                     );
                 }
             },
-            function(Exception $e, editor_Models_LanguageResources_LanguageResource $languageResource, ZfExtended_Logger_Event $event) {
+            function(
+                Exception $e,
+                editor_Models_LanguageResources_LanguageResource $languageResource,
+                ZfExtended_Logger_Event $event
+            ): void {
                 self::reportTMUpdateError(null, $event->message, $event->eventCode);
             }
         );

@@ -63,12 +63,6 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
         //Binding the worker clean up to the after import event, since import
         // is currently the main use case for workers
         $eventManager = Zend_EventManager_StaticEventManager::getInstance();
-        
-        $eventManager->attach(ImportEventTrigger::class, ImportEventTrigger::AFTER_IMPORT, function () {
-            $worker = ZfExtended_Factory::get(ZfExtended_Worker_GarbageCleaner::class);
-            $worker->init();
-            $worker->queue(); // not parent ID here, since the GarbageCleaner should run without a parent relation
-        }, 0);
 
         $cleanUp = function () {
             // first clean up jobs
@@ -141,7 +135,7 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
     
     public static function initModuleSpecific(){
 
-        ZfExtended_Models_SystemRequirement_Validator::addModule('servicecheck', SystemCheck::class);
+        ZfExtended_Models_SystemRequirement_Validator::addModule(SystemCheck::CHECK_NAME, SystemCheck::class);
 
         // add the default applet editor, if this will change move the register into editor bootstrap
         Dispatcher::getInstance()->registerApplet('editor', new class extends AppletAbstract {

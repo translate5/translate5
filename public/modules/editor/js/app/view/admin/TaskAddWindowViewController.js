@@ -81,13 +81,15 @@ Ext.define('Editor.view.admin.TaskAddWindowViewController', {
         pivotLanguageCombo.setValue(null);
 
         me.selectedCustomersConfigStore.loadByCustomerId(customerId,function (){
-            let view = me.getView(),
-                edit100PercentMatch = me.selectedCustomersConfigStore.getConfig('import.edit100PercentMatch');
+            let view = me.getView();
 
+            // Info: do any code processing in the callback only if the view exist.
             if(!view){
-                // the window is already closed. Do not process any customer change
+                // The window is already closed/destroyed. Do not process any customer change
                 return;
             }
+
+            let edit100PercentMatch = me.selectedCustomersConfigStore.getConfig('import.edit100PercentMatch');
 
             if(edit100PercentCheckBox) {
                 edit100PercentCheckBox.setValue(edit100PercentMatch);
@@ -103,7 +105,7 @@ Ext.define('Editor.view.admin.TaskAddWindowViewController', {
             }
 
             pivotLanguageCombo.setValue(langId);
-        })
+        });
     },
 
     /***

@@ -38,10 +38,13 @@ interface UpdatableAdapterInterface
     public const DO_NOT_RECHECK_ON_UPDATE = false;
     public const RESCHEDULE_UPDATE_ON_ERROR = true;
     public const DO_NOT_RESCHEDULE_UPDATE_ON_ERROR = false;
+    public const USE_SEGMENT_TIMESTAMP = true;
+    public const DO_NOT_USE_SEGMENT_TIMESTAMP = false;
 
     public function update(
         SegmentModel $segment,
         bool $recheckOnUpdate = self::DO_NOT_RECHECK_ON_UPDATE,
-        bool $rescheduleUpdateOnError = self::DO_NOT_RESCHEDULE_UPDATE_ON_ERROR
+        bool $rescheduleUpdateOnError = self::DO_NOT_RESCHEDULE_UPDATE_ON_ERROR,
+        bool $useSegmentTimestamp = self::DO_NOT_USE_SEGMENT_TIMESTAMP,
     ): void;
 }

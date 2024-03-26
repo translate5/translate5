@@ -2087,16 +2087,23 @@ class editor_TaskController extends ZfExtended_RestController
         }
     }
 
-    protected function handleCancelImport() {
-        $isAllowedToCancel = $this->isAllowed(Rights::ID, Rights::EDITOR_CANCEL_IMPORT) || $this->isAuthUserTaskPm($this->entity->getPmGuid());
+    protected function handleCancelImport(): void
+    {
+        $isAllowedToCancel = $this->isAllowed(
+                Rights::ID,
+                Rights::EDITOR_CANCEL_IMPORT) || $this->isAuthUserTaskPm($this->entity->getPmGuid()
+        );
 
         //if no state is set or user is not allowed to cancel, do nothing
         if(empty($this->data->state)) {
             return;
         }
 
-        //if task is importing and state is tried to be set to something other as error, unset state and do nothing here
-        if($this->entity->isImporting() && ($this->data->state != $this->entity::STATE_ERROR || !$isAllowedToCancel)){
+        // if task is importing or in special export state and state is tried to be set to something other as error,
+        // unset state and do nothing here
+        if(($this->entity->isImporting() || $this->entity->isSpecialExportState() )
+            && ($this->data->state != $this->entity::STATE_ERROR || !$isAllowedToCancel))
+        {
             unset($this->data->state);
             return;
         }
@@ -2106,10 +2113,9 @@ class editor_TaskController extends ZfExtended_RestController
             unset($this->data->entityVersion);
         }
 
-        $worker = ZfExtended_Factory::get('ZfExtended_Models_Worker');
-        /* @var $worker ZfExtended_Models_Worker */
+        $worker = ZfExtended_Factory::get(ZfExtended_Models_Worker::class);
         try {
-            $worker->loadFirstOf('editor_Models_Import_Worker', $this->entity->getTaskGuid());
+            $worker->loadFirstOf(editor_Models_Import_Worker::class, $this->entity->getTaskGuid());
             $worker->setState($worker::STATE_DEFUNCT);
             $worker->save();
             $worker->defuncRemainingOfGroup();
