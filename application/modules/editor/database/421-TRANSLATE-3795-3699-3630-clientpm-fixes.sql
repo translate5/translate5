@@ -25,9 +25,10 @@
 -- END LICENSE AND COPYRIGHT
 -- */
 
--- prevent cclientpm elevating himself to term-pm
+-- prevent client-pm elevating to term-pm all clients
 DELETE FROM `Zf_acl_rules` WHERE `Zf_acl_rules`.`module` = 'editor' AND `Zf_acl_rules`.`role` = 'clientpm' AND `Zf_acl_rules`.`resource` = 'setaclrole' AND `Zf_acl_rules`.`right` = 'termPM';
 
+-- frontend-rights for file-format-settings & pricing-presets selected clients
 INSERT INTO `Zf_acl_rules` (`module`, `role`, `resource`, `right`) VALUES
     ('editor', 'pm', 'frontend', 'customerOpenIdAdministration'),
     ('editor', 'clientpm', 'frontend', 'pluginMatchAnalysisCustomerPricingPreset'),
