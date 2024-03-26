@@ -116,7 +116,7 @@ abstract class editor_Services_Connector_TagHandler_Abstract
                     $this->handleIsInSourceScope,
                     $this->sourceLang,
                     $this->targetLang,
-                    ContentProtector::ENTITY_MODE_KEEP,
+                    ContentProtector::ENTITY_MODE_RESTORE,
                     NumberProtector::alias()
                 ),
                 $this->shortTagIdent,
