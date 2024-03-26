@@ -249,14 +249,19 @@ class editor_Services_Connector
         $textWithTags =  $utilities->whitespace->unprotectWhitespace($textWithTags);
         return $textWithTags;
     }
+
     /***
      * This magic method is invoked each time a nonexistent method is called on the object.
      * If the function exist in the adapter it will be called there.
      * @param string $method
      * @param mixed $arguments
      * @return mixed
+     * @throws Zend_Exception
      * @throws ZfExtended_BadGateway
      * @throws editor_Services_Connector_Exception
+     * @uses self::_query()
+     * @uses self::_translate()
+     * @uses self::_search()
      */
     public function __call(string $method, array $arguments): mixed {
         $toThrow = null;
