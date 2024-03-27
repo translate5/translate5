@@ -121,7 +121,7 @@ class EventWriter extends ZfExtended_Logger_Writer_Database
         }
 
         // Deflate
-        $deflate = gzdeflate(json_encode($eventA), 9);
+        $deflate = gzdeflate(json_encode($eventA, JSON_INVALID_UTF8_SUBSTITUTE), 9);
 
         // Setup newLastId if there was no json error
         if ($json_encoded !== false){
