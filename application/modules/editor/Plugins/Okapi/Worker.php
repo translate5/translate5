@@ -186,9 +186,9 @@ class editor_Plugins_Okapi_Worker extends editor_Models_Task_AbstractWorker {
         
         $manifestFile = new SplFileInfo($this->getDataDir().'/'.$this->getManifestFile($fileId));
 
-        $api = ZfExtended_Factory::get(editor_Plugins_Okapi_Connector::class, [
-            $this->task->getConfig()
-        ]);
+        $taskConfig = $this->task->getConfig();
+
+        $api = ZfExtended_Factory::get(editor_Plugins_Okapi_Connector::class, [$taskConfig]);
 
         $language = ZfExtended_Factory::get(editor_Models_Languages::class);
 
@@ -223,7 +223,9 @@ class editor_Plugins_Okapi_Worker extends editor_Models_Task_AbstractWorker {
             $api->executeTask($sourceLang, $targetLang);
             //the exported work file (containing xlf) must be renamed so that
             // the merged file can be saved under the original file name
-            rename($workFile, $workFile.$api::OUTPUT_FILE_EXTENSION);
+            if ($taskConfig->runtimeOptions->plugins->Okapi->preserveGeneratedXlfFiles) {
+                rename($workFile, $workFile.$api::OUTPUT_FILE_EXTENSION);
+            }
             $api->downloadMergedFile($originalFile, $workFile);
             
             //TRANSLATE-2002: Currently Okapi can not reconvert PDF files,

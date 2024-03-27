@@ -477,6 +477,11 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/../application/modules/default/Controllers/IndexController.php',
 ];
 $ignoreErrors[] = [
+    'message' => '#^Access to an undefined property Zend_Controller_Action_HelperBroker\\:\\:\\$layout\\.$#',
+    'count' => 1,
+    'path' => __DIR__ . '/../application/modules/default/Controllers/IndexController.php',
+];
+$ignoreErrors[] = [
 	'message' => '#^Access to an undefined property Zend_Controller_Action_Helper_Abstract\\:\\:\\$view\\.$#',
 	'count' => 1,
 	'path' => __DIR__ . '/../application/modules/default/Controllers/LoginController.php',
@@ -7160,6 +7165,16 @@ $ignoreErrors[] = [
 	'message' => '#^Parameter \\#3 \\$callback of method Zend_EventManager_SharedEventManager\\:\\:attach\\(\\) expects callback, array\\<int, \\$this\\(editor_Plugins_DeepL_Init\\)\\|string\\> given\\.$#',
 	'count' => 2,
 	'path' => __DIR__ . '/../application/modules/editor/Plugins/DeepL/Init.php',
+];
+$ignoreErrors[] = [
+    'message' => '#^Parameter \\#3 \\$callback of method Zend_EventManager_SharedEventManager\\:\\:attach\\(\\) expects callback, array\\<int, \\$this\\(editor_Plugins_MittagQI_Init\\)\\|string\\> given\\.$#',
+    'count' => 2,
+    'path' => __DIR__ . '/../application/modules/editor/Plugins/MittagQI/Init.php',
+];
+$ignoreErrors[] = [
+    'message' => '#^Parameter \\#3 \\$callback of method Zend_EventManager_SharedEventManager\\:\\:attach\\(\\) expects callback, array\\<int, \\$this\\(editor_Plugins_MittagQI_Init\\)\\|string\\> given\\.$#',
+    'count' => 2,
+    'path' => __DIR__ . '/../application/modules/editor/PrivatePlugins/MittagQI/Init.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^PHPDoc tag @param for parameter \\$data with type mixed is not subtype of native type object\\.$#',

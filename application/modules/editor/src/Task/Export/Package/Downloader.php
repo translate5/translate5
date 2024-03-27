@@ -45,8 +45,6 @@ use ZfExtended_Models_Entity_NotFoundException;
  */
 class Downloader
 {
-    public const PACKAGE_EXPORT = 'PackageExport';
-
     /**
      * @param editor_Models_Task $task
      * @param bool $diff
@@ -168,7 +166,7 @@ class Downloader
      */
     public static function getZipFileName(string $sufix = ''): string
     {
-        return self::PACKAGE_EXPORT.$sufix.'.zip';
+        return editor_Models_Task::STATE_PACKAGE_EXPORT.$sufix.'.zip';
     }
 
 }

@@ -83,7 +83,7 @@ class Remover
         foreach ($files as $file) {
 
             // Check if the file is a zip file and has the correct prefix
-            if (str_starts_with($file, Downloader::PACKAGE_EXPORT) && pathinfo($file, PATHINFO_EXTENSION) === 'zip') {
+            if (str_starts_with($file, editor_Models_Task::STATE_PACKAGE_EXPORT) && pathinfo($file, PATHINFO_EXTENSION) === 'zip') {
                 // Get the file's creation time
                 $file_time = filectime($dir . $file);
 

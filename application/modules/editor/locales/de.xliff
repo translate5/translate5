@@ -5501,9 +5501,9 @@ Im Projektportal {portalLink} wurde die Aufgabe
                 <source>Weitere TM Daten erfolgreich importiert!</source>
                 <target>Weitere TM Daten erfolgreich importiert!</target>
             </trans-unit>
-            <trans-unit id='VE0vVE1YLURhdGVpIChvcHRpb25hbCk='>
-                <source>TM/TMX-Datei (optional)</source>
-                <target>TM/TMX-Datei (optional)</target>
+            <trans-unit id='WklQL1RNL1RNWC1EYXRlaSAob3B0aW9uYWwp'>
+                <source>ZIP/TM/TMX-Datei (optional)</source>
+                <target>ZIP/TM/TMX-Datei (optional)</target>
             </trans-unit>
             <trans-unit id='Qml0dGUgdmVyd2VuZGVuIFNpZSBlaW5lIFRNIG9kZXIgVE1YIERhdGVpIQ=='>
                 <source>Bitte verwenden Sie eine TM oder TMX Datei!</source>
@@ -9503,6 +9503,10 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
             <trans-unit id='RGFzIERlZmluaWVyZW4gdW5kIMOEbmRlcm4gdm9uIEZlbGRlcm4ga2FubiB6dSBlaW5lbSBob2hlbiBSZXNzb3VyY2VudmVyYnJhdWNoIGbDvGhyZW4sIHdlbm4gZGFzIEZlbGQgZ2VzcGVpY2hlcnQgd2lyZC4gQml0dGUgdHVuIFNpZSBkaWVzIGluIEFic3RpbW11bmcgbWl0IGRlbSB0cmFuc2xhdGU1LVN1cHBvcnR0ZWFtLg=='>
                 <source>Das Definieren und Ändern von Feldern kann zu einem hohen Ressourcenverbrauch führen, wenn das Feld gespeichert wird. Bitte tun Sie dies in Abstimmung mit dem translate5-Supportteam.</source>
                 <target>Das Definieren und Ändern von Feldern kann zu einem hohen Ressourcenverbrauch führen, wenn das Feld gespeichert wird. Bitte tun Sie dies in Abstimmung mit dem translate5-Supportteam.</target>
+            </trans-unit>
+            <trans-unit id='VHVya21lbmlzY2ggKFR1cmttZW5pc3Rhbik='>
+                <source>Turkmenisch (Turkmenistan)</source>
+                <target>Turkmenisch (Turkmenistan)</target>
             </trans-unit>
         </body>
     </file>

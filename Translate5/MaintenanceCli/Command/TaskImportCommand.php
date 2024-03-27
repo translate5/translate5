@@ -127,7 +127,7 @@ class TaskImportCommand extends Translate5AbstractCommand
         try {
             $pm = ZfExtended_Factory::get(ZfExtended_Models_User::class);
             if (is_numeric($pmId)) {
-                $pm->load($pmId);
+                $pm->load((int)$pmId);
             } elseif ((new \ZfExtended_Validate_Guid)->isValid($pmId)) {
                 $pm->loadByGuid($pmId);
             } else {
