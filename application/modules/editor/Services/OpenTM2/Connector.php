@@ -1321,6 +1321,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
         // we have to set the default source here to fill the be added internal tags
         $resultList->setDefaultSource($queryString);
         $query = $this->tagHandler->prepareQuery($queryString);
+
         $results = [];
 
         foreach ($this->languageResource->getSpecificData('memories', parseAsArray: true) as $memory) {
