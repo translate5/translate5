@@ -18,6 +18,61 @@ All updates are (downwards) compatible! If not this is listed in the important r
 
 
 
+
+## [7.2.4] - 2024-03-28
+
+### Important Notes:
+#### [TRANSLATE-3837](https://jira.translate5.net/browse/TRANSLATE-3837)
+for on premise docker users: healthcheck for termtagger changed
+ 
+
+
+### Changed
+**[TRANSLATE-3837](https://jira.translate5.net/browse/TRANSLATE-3837): Installation & Update - docker on premise: termtagger and languagetool healthcheck changed** <br>
+docker compose pull to get the latest containers. For termtagger there is now a health check which forces the termtagger to restart when it consumes to much memory.
+
+**[TRANSLATE-3824](https://jira.translate5.net/browse/TRANSLATE-3824): Installation & Update - Show hosting status in UI and create separate monitoring endpoint** <br>
+Add a separate monitoring endpoint, add in hosting some information about the hosting status.
+
+**[TRANSLATE-3820](https://jira.translate5.net/browse/TRANSLATE-3820): Task Management - Add tk-TM (Turkmen (Turkmenistan)) to translate5 languages** <br>
+Add tk-TM (Turkmen (Turkmenistan)) to language list
+
+**[TRANSLATE-3815](https://jira.translate5.net/browse/TRANSLATE-3815): MatchAnalysis & Pretranslation - Fix MatchAnalysisTest** <br>
+Fixed test
+
+**[TRANSLATE-3814](https://jira.translate5.net/browse/TRANSLATE-3814): Import/Export - FIX: Enable use of TMX zip archive in TM creation process** <br>
+Fix translations and zip usage on TM creation process
+
+
+### Bugfixes
+**[TRANSLATE-3832](https://jira.translate5.net/browse/TRANSLATE-3832): Editor general - RootCause error: Cannot read properties of null (reading 'expand')** <br>
+UI fixing a problem expanding the quality tree.
+
+**[TRANSLATE-3826](https://jira.translate5.net/browse/TRANSLATE-3826): Editor general - RootCause error: me.selectedCustomersConfigStore is null** <br>
+Fix for a problem when opening the task creation window and closing it immediately.
+
+**[TRANSLATE-3825](https://jira.translate5.net/browse/TRANSLATE-3825): Editor general - No access exception: reopen locked task** <br>
+Fix for a problem where task was unlocked by the inactive-cleanup component, but the user has still the translate5 task-editing UI open.
+
+**[TRANSLATE-3823](https://jira.translate5.net/browse/TRANSLATE-3823): TermPortal - Remove non breaking spaces from terms** <br>
+Remove non breaking spaces and non regular white-spaces on term import and from all existing terms in the database.
+
+**[TRANSLATE-3821](https://jira.translate5.net/browse/TRANSLATE-3821): Export - Across Hotfoler: Export worker does not wait for Okapi worker** <br>
+Fix Across Hotfolder tasks export
+
+**[TRANSLATE-3817](https://jira.translate5.net/browse/TRANSLATE-3817): InstantTranslate - translate5 sends unescaped xml special char via InstantTranslate to t5memory** <br>
+Escape potentially unescaped content sent to t5memory since this may crashes t5memory
+
+**[TRANSLATE-3811](https://jira.translate5.net/browse/TRANSLATE-3811): VisualReview / VisualTranslation - Visual: Font may be mis-selected when one font's name is containing the other** <br>
+FIX: Some visual fonts have been mis-identified as being identical
+
+**[TRANSLATE-3769](https://jira.translate5.net/browse/TRANSLATE-3769): Editor general - Cancel import unlocks exporting task** <br>
+Fix for a problem with task cancel import logic.
+
+**[TRANSLATE-3643](https://jira.translate5.net/browse/TRANSLATE-3643): User Management - enable PM role to create MT resources** <br>
+PM's are allowed to create MT resources.
+
+
 ## [7.2.2] - 2024-03-15
 
 ### Important Notes:

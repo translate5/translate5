@@ -130,8 +130,11 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
 
         $noFile = empty($fileinfo);
         $tmxUpload = !$noFile
-            && in_array($fileinfo['type'], $validFileTypes['TMX'])
-            && preg_match('/\.tmx$/', $fileinfo['name']);
+            && (
+                in_array($fileinfo['type'], $validFileTypes['TMX'])
+                || in_array($fileinfo['type'], $validFileTypes['ZIP'])
+            )
+            && preg_match('/(\.tmx|\.zip)$/', strtolower($fileinfo['name']));
 
         if ($noFile || $tmxUpload) {
             $tmName = $this->api->createEmptyMemory($name, $sourceLang);
@@ -295,7 +298,8 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
     public function update(
         editor_Models_Segment $segment,
         bool $recheckOnUpdate = self::DO_NOT_RECHECK_ON_UPDATE,
-        bool $rescheduleUpdateOnError = self::DO_NOT_RESCHEDULE_UPDATE_ON_ERROR
+        bool $rescheduleUpdateOnError = self::DO_NOT_RESCHEDULE_UPDATE_ON_ERROR,
+        bool $useSegmentTimestamp = self::DO_NOT_USE_SEGMENT_TIMESTAMP
     ): void {
         $tmName = $this->getWritableMemory();
 
@@ -315,7 +319,15 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
         $this->tagHandler->setInputTagMap($this->tagHandler->getTagMap());
         $target = $this->tagHandler->prepareQuery($segment->getTargetEdit());
 
-        $successful = $this->api->update($source, $target, $segment, $fileName, $tmName, !$this->isInternalFuzzy);
+        $successful = $this->api->update(
+            $source,
+            $target,
+            $segment,
+            $fileName,
+            $tmName,
+            !$this->isInternalFuzzy,
+            $useSegmentTimestamp
+        );
 
         if ($successful) {
             $this->checkUpdatedSegment($segment, $recheckOnUpdate);
@@ -1314,6 +1326,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
         // we have to set the default source here to fill the be added internal tags
         $resultList->setDefaultSource($queryString);
         $query = $this->tagHandler->prepareQuery($queryString);
+
         $results = [];
 
         foreach ($this->languageResource->getSpecificData('memories', parseAsArray: true) as $memory) {

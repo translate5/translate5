@@ -59,10 +59,10 @@ class UpdateLanguageResourcesWorker extends ZfExtended_Worker_Abstract
         return true;
     }
 
-    protected function work()
+    protected function work(): bool
     {
         if (!editor_Models_Segment_MatchRateType::isUpdatable($this->segment->getMatchRateType())) {
-            return;
+            return true;
         }
 
         try {
@@ -71,6 +71,10 @@ class UpdateLanguageResourcesWorker extends ZfExtended_Worker_Abstract
             // Wait a little bit and reschedule self for next try
             sleep(30);
             (new TaskEventTrigger())->triggerAfterSegmentUpdate($this->segment->getTask(), $this->segment);
+
+            return false;
         }
+
+        return true;
     }
 }

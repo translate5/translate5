@@ -44,7 +44,9 @@ use MittagQI\Translate5\Task\Import\ImportEventTrigger;
  *
  * for documentation of the BCONF management, see editor_Plugins_Okapi_Bconf_Entity
  */
-class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
+class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract
+{
+    const CONFIG_PRESERVE_XLF_FILES = 'runtimeOptions.plugins.Okapi.preserveGeneratedXlfFiles';
 
     /**
      * The current internal version index of the bconf's

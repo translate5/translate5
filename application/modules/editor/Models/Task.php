@@ -116,6 +116,9 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
     const STATE_ERROR = 'error';
     const STATE_UNCONFIRMED = 'unconfirmed';
     const STATE_EXCELEXPORTED = 'ExcelExported';
+
+    const STATE_PACKAGE_EXPORT = 'PackageExport';
+
     const STATE_REIMPORT = 'reimport';
 
     const USAGE_MODE_COMPETITIVE = 'competitive';
@@ -865,6 +868,16 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
      */
     public function isImporting() {
         return in_array($this->getState(), [self::STATE_IMPORT, self::STATE_PREPARATION]);
+    }
+
+    /**
+     * Is the task in special exporting state. When the task in this kind of state is, some actions will not be allowed.
+     * ex: task editing is not allowed
+     * @return bool
+     */
+    public function isSpecialExportState(): bool
+    {
+        return in_array($this->getState(), [self::STATE_EXCELEXPORTED, self::STATE_PACKAGE_EXPORT]);
     }
 
 

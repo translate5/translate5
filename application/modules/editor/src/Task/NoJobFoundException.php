@@ -26,18 +26,17 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-namespace MittagQI\Translate5\Service;
+namespace MittagQI\Translate5\Task;
 
-class SystemCheck extends \ZfExtended_Models_SystemRequirement_Modules_BulkAbstract
-{
-    public const CHECK_NAME = 'servicecheck';
-
+class NoJobFoundException extends \ZfExtended_ErrorCodeException {
     /**
-     * @throws \ZfExtended_Exception
-     * @throws \Zend_Exception
+     * @var string
      */
-    public function validateBulk(array & $results): void
-    {
-        Services::addServiceChecksAsSystemChecks($results, true);
-    }
+    protected $domain = 'editor.currenttask';
+
+    protected $httpReturnCode = 423;
+
+    protected static $localErrorCodes = [
+        'E1600' => 'No job available for the current user.'
+    ];
 }
