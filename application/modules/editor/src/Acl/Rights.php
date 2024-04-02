@@ -67,20 +67,26 @@ final class Rights extends AbstractResource {
      * @group Task usage
      */
     public const TASK_OVERVIEW_FRONTEND_CONTROLLER = 'taskOverviewFrontendController';
+//endregion
 
+//region Administration
     /**
      * allows the usage of the user administration (as tab in the main window)
      * @group Administration
      */
     public const USER_ADMINISTRATION = 'userAdministration';
-//endregion
 
-//region Administration
     /**
      * allows the usage of the customer administration (as tab in the main window)
      * @group Customer Administration
      */
     public const CUSTOMER_ADMINISTRATION = 'customerAdministration';
+
+    /**
+     * allows the association of customers to users, therefore loads the customer controller
+     * @group Customer Administration
+     */
+    public const CUSTOMER_ASSOCIATION = 'customerAssociation';
 
     /**
      * allows the adding of customers

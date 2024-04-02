@@ -31,6 +31,7 @@ DELETE FROM `Zf_acl_rules` WHERE `Zf_acl_rules`.`module` = 'editor' AND `Zf_acl_
 -- frontend-rights for file-format-settings & pricing-presets selected clients
 INSERT INTO `Zf_acl_rules` (`module`, `role`, `resource`, `right`) VALUES
     ('editor', 'pm', 'frontend', 'customerOpenIdAdministration'),
+    ('editor', 'clientpm', 'frontend', 'customerAssociation'),
     ('editor', 'clientpm', 'frontend', 'pluginMatchAnalysisCustomerPricingPreset'),
     ('editor', 'clientpm', 'editor_plugins_matchanalysis_pricingpresetrange', 'all'),
     ('editor', 'clientpm', 'editor_plugins_matchanalysis_pricingpresetprices', 'all'),
