@@ -77,7 +77,7 @@ trait TaskContextTrait
         $this->_currentTask = ZfExtended_Factory::get('editor_Models_Task');
         $this->_currentTask->loadByTaskGuid($taskGuid);
         if ($loadJob) {
-            $this->_loadCurrentJob();
+            $this->loadCurrentJob();
         }
     }
 
@@ -113,26 +113,23 @@ trait TaskContextTrait
         $this->_currentTask->load($taskId);
 
         if ($loadJob) {
-            $this->_loadCurrentJob();
+            $this->loadCurrentJob();
         }
     }
 
     /**
      * Loads the current job of the current user to the current task
-     * @throws NoAccessException
+     * @throws NoJobFoundException
      */
-    protected function _loadCurrentJob()
+    protected function loadCurrentJob(): void
     {
         //load job, if there is no job in usage, throw 403
         $userGuid = ZfExtended_Authentication::getInstance()->getUserGuid();
 
         $this->_currentJob = editor_Models_Loaders_Taskuserassoc::loadFirstInUse($userGuid, $this->_currentTask);
 
-        //TODO if it turns out, that the checking of the jobs to find out if the user is allowed to access the taskid is to error prone,
-        // then change to a taskid list of opened tasks in the session
         if (is_null($this->_currentJob)) {
-            //ensures that no segments for example can be loaded if task was not opened properly
-            throw new NoAccessException(code: 423); //423 code to distinguish in UI and trigger logger there
+            throw new NoJobFoundException('E1600');
         }
     }
 

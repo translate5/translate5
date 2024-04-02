@@ -31,6 +31,7 @@ use MittagQI\Translate5\Acl\Roles;
 use MittagQI\Translate5\Applet\Dispatcher;
 use MittagQI\Translate5\Task\FileTypeSupport;
 use MittagQI\Translate5\Task\Current\NoAccessException;
+use MittagQI\Translate5\Task\NoJobFoundException;
 use MittagQI\Translate5\Task\Reimport\FileparserRegistry;
 use MittagQI\Translate5\Task\TaskContextTrait;
 use MittagQI\Translate5\Cronjob\CronIpFactory;
@@ -589,7 +590,7 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
             // try to use the job of the current user and task, the one with a usedState,
         } catch (ZfExtended_Models_Entity_NotFoundException) { //SEE TRANSLATE-2972
             $this->redirect(APPLICATION_RUNDIR);
-        } catch (NoAccessException) {
+        } catch (NoAccessException|NoJobFoundException) {
             // NoAccess is thrown here only of no job with used state was found,
             // this is handled later on getting the initState
         }

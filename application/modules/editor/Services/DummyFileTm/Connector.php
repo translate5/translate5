@@ -127,7 +127,8 @@ class editor_Services_DummyFileTm_Connector
     public function update(
         editor_Models_Segment $segment,
         bool $recheckOnUpdate = self::DO_NOT_RECHECK_ON_UPDATE,
-        bool $rescheduleUpdateOnError = self::DO_NOT_RESCHEDULE_UPDATE_ON_ERROR
+        bool $rescheduleUpdateOnError = self::DO_NOT_RESCHEDULE_UPDATE_ON_ERROR,
+        bool $useSegmentTimestamp = self::DO_NOT_USE_SEGMENT_TIMESTAMP
     ): void {
         $source = $this->tagHandler->prepareQuery($this->getQueryString($segment));
         $target = $this->tagHandler->prepareQuery($segment->getTargetEdit());

@@ -36,6 +36,7 @@ use editor_Models_Segment_AutoStates as AutoStates;
 use editor_Models_Segment_Iterator;
 use editor_Models_Task as Task;
 use editor_Services_Manager;
+use MittagQI\Translate5\LanguageResource\Adapter\UpdatableAdapterInterface;
 use MittagQI\Translate5\Segment\FilteredIterator;
 use ReflectionException;
 use stdClass;
@@ -53,6 +54,7 @@ class ReimportSegments
 {
     public const FILTER_TIMESTAMP = 'timestamp';
     public const FILTER_ONLY_EDITED = 'onlyEdited';
+    public const USE_SEGMENT_TIMESTAMP = 'useSegmentTimestamp';
 
     private const STATE_REIMPORT = 'reimporttm';
 
@@ -98,7 +100,10 @@ class ReimportSegments
         ];
         $segments = $this->getSegmentIterator($task, $filters);
 
-        $this->updateSegments($segments);
+        $this->updateSegments(
+            $segments,
+            $params[self::USE_SEGMENT_TIMESTAMP] ?? UpdatableAdapterInterface::DO_NOT_USE_SEGMENT_TIMESTAMP
+        );
 
         $this->reopenTask();
         $this->getLogger()->info('E0000', 'Task re-imported successfully into the desired TM');
@@ -189,8 +194,10 @@ class ReimportSegments
      * @throws ReflectionException
      * @throws editor_Models_ConfigException
      */
-    private function updateSegments(editor_Models_Segment_Iterator $segments): void
-    {
+    private function updateSegments(
+        editor_Models_Segment_Iterator $segments,
+        bool $useSegmentTimestamp
+    ): void {
         // in case of filtered segments, the initialization of the segments
         // iterator can result with no segments found for the applied filter
         if ($segments->isEmpty()) {
@@ -214,12 +221,12 @@ class ReimportSegments
         $connector = $manager->getConnector($this->languageResource, null, null, $this->task->getConfig());
 
         foreach ($segments as $segment) {
-            if (empty($segment->getTargetEdit()) || str_contains($segment->getTargetEdit(), "\n")) {
-                continue;
+            if ($segment->hasEmptySource() || $segment->hasEmptyTarget()) {
+                return;
             }
 
             try {
-                $connector->update($segment);
+                $connector->update($segment, useSegmentTimestamp: $useSegmentTimestamp);
             } catch (\ZfExtended_Zendoverwrites_Http_Exception|\editor_Services_Connector_Exception) {
                 // if the TM is not available (due service restart or whatever)
                 // we just wait some time and try it again once.

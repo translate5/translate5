@@ -142,7 +142,17 @@ class Markup {
      * @return string
      */
     public static function escapeText(string $textWithoutTags) : string {
-        return htmlspecialchars($textWithoutTags, ENT_XML1 | ENT_COMPAT, null, false);
+        return self::encodeHtmlEntities($textWithoutTags);
+    }
+
+    /**
+     * @param string $text
+     * @return string
+     */
+    public static function encodeHtmlEntities(string $text): string
+    {
+        return htmlspecialchars($text, ENT_XML1 | ENT_COMPAT, null, false);
+
     }
     /**
      * Unescapes text that was escaped with our ::escape API
