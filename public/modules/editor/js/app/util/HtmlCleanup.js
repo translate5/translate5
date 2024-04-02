@@ -97,7 +97,7 @@ Ext.define('Editor.util.HtmlCleanup', {
 		} else {
 			// replace whitespace-tags with rendered whitespace
 			html = this.cleanInternalTags(html, "&nbsp;<t5split>", ['single','nbsp']);
-			html = this.cleanInternalTags(html, "<br/><t5split>", ['single','newline']);
+			html = this.cleanInternalTags(html, '<br class="t5ws" /><t5split>', ['single','newline']);
 			html = this.cleanInternalTags(html, " &emsp;<t5split>", ['single','tab']);
 		}
 		
