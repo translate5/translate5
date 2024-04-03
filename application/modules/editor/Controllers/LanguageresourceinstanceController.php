@@ -984,7 +984,8 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
                         $taskGuid,
                         [
                             'languageResourceId' => $this->entity->getId(),
-                            ReimportSegments::FILTER_ONLY_EDITED => $this->data->onlyEdited
+                            ReimportSegments::FILTER_ONLY_EDITED => $this->data->onlyEdited,
+                            ReimportSegments::USE_SEGMENT_TIMESTAMP => $this->data->timeOption === 'segment'
                         ]
                     );
 

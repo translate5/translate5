@@ -7268,6 +7268,22 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
                 <source>zur Aufgabe springen</source>
                 <target>zur Aufgabe springen</target>
             </trans-unit>
+            <trans-unit id='WmVpdG9wdGlvbg=='>
+                <source>Zeitoption</source>
+                <target>Zeitoption</target>
+            </trans-unit>
+            <trans-unit id='QWt0dWVsbGVyIFplaXRwdW5rdA=='>
+                <source>Aktueller Zeitpunkt</source>
+                <target>Aktueller Zeitpunkt</target>
+            </trans-unit>
+            <trans-unit id='WmVpdHB1bmt0IGRlciBTZWdtZW50c3BlaWNoZXJ1bmc='>
+                <source>Zeitpunkt der Segmentspeicherung</source>
+                <target>Zeitpunkt der Segmentspeicherung</target>
+            </trans-unit>
+            <trans-unit id='QWxzIERhdHVtIHVuZCBVaHJ6ZWl0IGRlcyBlcnpldWd0ZW4gVE0tRWludHJhZ3Mgd2lyZCBiZWkgIlplaXRwdW5rdCBkZXIgU2VnbWVudHNwZWljaGVydW5nIiBkYXMgRGF0dW0gdmVyd2VuZGV0LCBhbiBkZW0gZXIgbGV0enRlIEJlbnV0emVyIGRhcyBTZWdtZW50IGluIGRlciBBdWZnYWJlIGdlc3BlaWNoZXJ0IGhhdC4gQW5kZXJuZmFsbHMgd2lyZCBkZXIgWmVpdHB1bmt0IHZlcndlbmRldCwgYW4gZGVtIGRpZSBBdWZnYWJlIG5ldSBpbnMgVE0gZHVyY2hnZXNwZWljaGVydCB3aXJk'>
+                <source>Als Datum und Uhrzeit des erzeugten TM-Eintrags wird bei "Zeitpunkt der Segmentspeicherung" das Datum verwendet, an dem er letzte Benutzer das Segment in der Aufgabe gespeichert hat. Andernfalls wird der Zeitpunkt verwendet, an dem die Aufgabe neu ins TM durchgespeichert wird</source>
+                <target>Als Datum und Uhrzeit des erzeugten TM-Eintrags wird bei "Zeitpunkt der Segmentspeicherung" das Datum verwendet, an dem er letzte Benutzer das Segment in der Aufgabe gespeichert hat. Andernfalls wird der Zeitpunkt verwendet, an dem die Aufgabe neu ins TM durchgespeichert wird</target>
+            </trans-unit>
             <trans-unit id='QXVmZ2FiZW5tZW7DvCBhbnplaWdlbg=='>
                 <source>Aufgabenmenü anzeigen</source>
                 <target>Aufgabenmenü anzeigen</target>
