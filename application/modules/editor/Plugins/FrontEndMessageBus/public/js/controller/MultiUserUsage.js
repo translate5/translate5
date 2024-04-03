@@ -181,7 +181,7 @@ return; //FIXME prepare that socket server is only triggered for simultaneous us
 
         var task = new Ext.util.DelayedTask(function(){
             if(!me.bus.isReady()) {
-                Editor.app.viewport && Editor.app.viewport.mask(me.strings.noConnection + '<br>' + me.bus.getUrl());
+                Editor.app.maskViewport(me.strings.noConnection + '<br>' + me.bus.getUrl());
             }
         });
         task.delay(1000);
@@ -220,18 +220,18 @@ return; //FIXME prepare that socket server is only triggered for simultaneous us
             task.set('userState', task.get('userState'));
             task.save({
                 success: function() {
-                    Editor.app.viewport && Editor.app.viewport.unmask();
+                    Editor.app.unmaskViewport();
                     me.bus.send('task', 'openTask', [Editor.data.task.get('taskGuid')]);
                     me.fireEvent('taskOpenedOnReconnect', Editor.data.task);
                 },
                 failure: function(record, op) {
-                    Editor.app.viewport && Editor.app.viewport.unmask();
+                    Editor.app.unmaskViewport();
                     Editor.app.getController('ServerException').handleFailedRequest(op.error.status, op.error.statusText, op.error.response);
                 }
             });
         }
         else {
-            Editor.app.viewport && Editor.app.viewport.unmask();
+            Editor.app.unmaskViewport();
         }
     },
 
