@@ -136,7 +136,7 @@ Ext.define('Editor.util.HtmlCleanup', {
      * Multiple internal tags in a sequence are condensed to one replacement
      * @param {string} html: the markup to clean
      * @param {string} replacement: the replacement for the tag, defaults to ""
-     * @param {string} classNames: if set, can specify the additional classnames of the internal tag to replace
+     * @param {string[]} classNames: if set, can specify the additional classnames of the internal tag to replace
      * @return {string}: the cleaned text
      */
     cleanInternalTags: function(html, replacement, classNames){
