@@ -74,7 +74,7 @@ Ext.define('Editor.util.HtmlCleanup', {
 
 	/**
 	 * Removes internal tags and replaces them with a split-value.
-	 * Internal whitespace tags will be turned to appropriate markup and thus reflected in the Live Editing
+	 * Internal whitespace tags will be turned to appropriate markup (if they should not be stripped)
 	 * In this process open-single-close combinations will lead to a single split and close followed by such a construct
 	 * or open predeceeded by such a construct will be reduced to one split.
 	 * Open-close combinations will be preserved as it can be assumed they once surrounded some text which was removed
@@ -84,7 +84,7 @@ Ext.define('Editor.util.HtmlCleanup', {
 	 * @param {Boolean} stripWhitespace: if set, all internal whitespace tags are removed
 	 * @return {string}: the cleaned html with split-values
 	 */
-	cleanAndSplitInternalTagsForLiveEditing: function(html, splitKey, stripWhitespace){
+	cleanAndSplitInternalTags: function(html, splitKey, stripWhitespace){
 		if(!splitKey){
 			splitKey = '<t5split>';
 		}
@@ -97,7 +97,7 @@ Ext.define('Editor.util.HtmlCleanup', {
 		} else {
 			// replace whitespace-tags with rendered whitespace
 			html = this.cleanInternalTags(html, "&nbsp;<t5split>", ['single','nbsp']);
-			html = this.cleanInternalTags(html, '<br class="t5ws" /><t5split>', ['single','newline']);
+			html = this.cleanInternalTags(html, '<br/><t5split>', ['single','newline']);
 			html = this.cleanInternalTags(html, " &emsp;<t5split>", ['single','tab']);
 		}
 		
@@ -119,6 +119,17 @@ Ext.define('Editor.util.HtmlCleanup', {
 		html = html.replace(/<t5close>/ig, splitKey);
 		return html.replace(/<t5single>/ig, splitKey);
 	},
+
+	/**
+	 * Removes any whitespace that may have been added by splitting/replacing internal tags with cleanAndSplitInternalTags
+	 * @param {string} html
+	 * @returns {string}
+	 */
+	cleanReplacedWhitespaceTags: function(html){
+		// the split-values need to match what was added in cleanAndSplitInternalTags !!
+		return html.split('<br/>').join('').split('&nbsp;').join(' ').split(' &emsp;').join(' ');
+	},
+
 	/**
      * Removes the "internal tags", div's with the classname "internal" and their contents.
 	 * The replacement can be given, the default is the empty string
