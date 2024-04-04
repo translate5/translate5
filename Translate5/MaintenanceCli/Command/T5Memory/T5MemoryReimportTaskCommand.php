@@ -52,7 +52,8 @@ class T5MemoryReimportTaskCommand extends Translate5AbstractCommand
 
         $this
             ->setName('t5memory:reimport-task')
-            ->setDescription('Reimport task segments into the t5memory')
+            ->setDescription('Reimport task segments into the t5memory.' .
+                ' Reimports only those segments, that previously have been manually saved by a user.')
             ->addOption(
                 self::OPTION_USE_SEGMENT_TIMESTAMP,
                 null,
