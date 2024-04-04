@@ -38,14 +38,9 @@ use MittagQI\Translate5\Task\Import\FileParser\Xlf\NamespaceRegistry;
 /**
  *
  */
-class editor_Models_Export_FileParser_Xlf extends editor_Models_Export_FileParser {
-
+class editor_Models_Export_FileParser_Xlf extends editor_Models_Export_FileParser
+{
     const SOURCE_TO_EMPTY_TARGET_SUFFIX = '.sourceInEmptyTarget.xlf';
-    
-    /**
-     * @var string Klassenname des Difftaggers
-     */
-    protected $_classNameDifftagger = 'editor_Models_Export_DiffTagger_Sdlxliff';
     
     /**
      * Helper to call namespace specfic parsing stuff
@@ -78,6 +73,11 @@ class editor_Models_Export_FileParser_Xlf extends editor_Models_Export_FileParse
         $this->options['sourcetoemptytarget'] = false;
         
         parent::__construct($task, $fileId, $path, $options);
+    }
+
+    protected function classNameDifftagger(): editor_Models_Export_DiffTagger
+    {
+        return new editor_Models_Export_DiffTagger_Sdlxliff();
     }
     
     /**
@@ -352,7 +352,8 @@ class editor_Models_Export_FileParser_Xlf extends editor_Models_Export_FileParse
      * {@inheritDoc}
      * @see editor_Models_Export_FileParser::getSegmentContent()
      */
-    protected function getSegmentContent($segmentId, $field) {
+    protected function getSegmentContent(int|string $segmentId, string $field): string
+    {
         $this->segmentIdsPerUnit[] = $segmentId;
         $content = parent::getSegmentContent($segmentId, $field);
         $this->transUnitLength += $this->lastSegmentLength;

@@ -37,24 +37,96 @@ END LICENSE AND COPYRIGHT
  */
 class editor_Models_Export_FileParser_Sdlxliff extends editor_Models_Export_FileParser
 {
-    /**
-     * @var string Klassenname des Difftaggers
-     */
-    protected $_classNameDifftagger = 'editor_Models_Export_DiffTagger_Sdlxliff';
+    private bool $isTrackChangesPluginActive;
+
+    private array $revisions = [];
+
+    private editor_Models_Import_FileParser_XmlParser $xmlParser;
+
+    public function __construct(editor_Models_Task $task, int $fileId, string $path, array $options = [])
+    {
+        $this->isTrackChangesPluginActive = Zend_Registry::get('PluginManager')->isActive('TrackChanges');
+        parent::__construct($task, $fileId, $path, $options);
+
+        $this->xmlParser = new editor_Models_Import_FileParser_XmlParser();
+
+        $this->registerTrackChangesMarkupTransform($task);
+    }
+
+    private function registerTrackChangesMarkupTransform(editor_Models_Task $task): void
+    {
+        if (!$this->isTrackChangesPluginActive) {
+            return;
+        }
+
+        $trackChangeIdToUserName = array_column(
+            ZfExtended_Factory::get(editor_Models_TaskUserTracking::class)->getByTaskGuid($task->getTaskGuid()),
+            'userName',
+            'id'
+        );
+        $this->xmlParser->registerElement(
+            'ins, del',
+            fn($tag, $attr, $key) => $this->xmlParser->replaceChunk($key, ''),
+            function (string $tag, int $key, array $opener) use ($trackChangeIdToUserName): void {
+                $attrs = $opener['attributes'];
+                $uuid = ZfExtended_Utils::uuid();
+                $ins = 'ins' === $opener['tag'];
+
+                $revTag = sprintf(
+                    '<rev-def id="%s"%s author="%s" date="%s" />',
+                    $uuid,
+                    $ins ? '' : ' type="Delete"',
+                    $trackChangeIdToUserName[$attrs['data-usertrackingid']],
+                    DateTime::createFromFormat('Y-m-d\TH:i:sO', $attrs['data-timestamp'])->format('m/d/Y H:i:s')
+                );
+
+                $this->revisions[] = $revTag;
+
+                $mrk = sprintf(
+                    '<mrk mtype="x-sdl-%s" sdl:revid="%s">%s</mrk>',
+                    $ins ? 'added' : 'deleted',
+                    $uuid,
+                    $this->xmlParser->getRange($opener['openerKey'] + 1, $key - 1, true)
+                );
+                $this->xmlParser->replaceChunk($opener['openerKey'] + 1, $mrk);
+                $this->xmlParser->replaceChunk($key, '');
+            }
+        );
+    }
+
+    protected function classNameDifftagger(): ?editor_Models_Export_DiffTagger
+    {
+        return $this->isTrackChangesPluginActive ? null : new editor_Models_Export_DiffTagger_Sdlxliff();
+    }
+
+    protected function getEditedSegment(?editor_Segment_Export $segmentExport): string
+    {
+        if (!$segmentExport) {
+            return '';
+        }
+
+        // This removes all segment tags but the ones needed for export
+        return $segmentExport->process($this->isTrackChangesPluginActive);
+    }
 
     /**
      * Rekonstruiert in einem Segment die ursprüngliche Form der enthaltenen Tags
      *
      */
-    protected function parseSegment($segment)
+    protected function parseSegment($segment): string
     {
-        //@todo nächste Zeile rauswerfen, wenn qm-subsegments im Export korrekt abgebildet werden. Das gleiche gilt für den vermerk in tasks.phtml
         $segment = preg_replace('"<img[^>]*>"', '', $segment);
+
+        if ($this->isTrackChangesPluginActive) {
+            return $this->xmlParser->parse(parent::parseSegment($segment));
+        }
+
         return parent::parseSegment($segment);
     }
 
     /**
-     * sets $this->comments[$guid] = '<cmt-def id="'.$guid.'"><Comments><Comment severity="Medium" user="userName" date="2016-07-21T19:40:01.80725+02:00" version="1.0">comment content</Comment>...</Comments></cmt-def>';
+     * sets $this->comments[$guid] = '<cmt-def id="'.$guid.'"><Comments><Comment severity="Medium" user="userName"
+     * date="2016-07-21T19:40:01.80725+02:00" version="1.0">comment content</Comment>...</Comments></cmt-def>';
      * @param int $segmentId
      * @return string $id of comments index in $this->comments | null if no comments exist
      */
@@ -194,12 +266,17 @@ class editor_Models_Export_FileParser_Sdlxliff extends editor_Models_Export_File
 
     /**
      * Generiert die Revisionshistorie für den head der sdlxliff-Datei
-     * Beispiel einer Revision: <rev-def id="b37e487f-2c70-4259-84e0-677d8c01f5b8" type="Delete" author="christine.schulze" date="10/23/2012 10:25:04" />
+     * Beispiel einer Revision: <rev-def id="b37e487f-2c70-4259-84e0-677d8c01f5b8" type="Delete"
+     * author="christine.schulze" date="10/23/2012 10:25:04" />
      * @return string
      */
     protected function generateRevisions()
     {
-        $createRevision = function ($rev, $tagType = NULL) {
+        if ($this->isTrackChangesPluginActive) {
+            return implode(PHP_EOL, $this->revisions);
+        }
+
+        $createRevision = function ($rev, $tagType = null) {
             $delete = '';
             if ($tagType == 'delete') {
                 $delete = ' type="Delete"';

@@ -32,6 +32,8 @@ END LICENSE AND COPYRIGHT
  * @version 1.0
  */
 
+use editor_Models_Import_FileParser_Sdlxliff_TransunitParser as TransunitParser;
+
 /**
  * Enthält Methoden zum Fileparsing für den Import von Sdlxliff-Dateien
  *
@@ -56,7 +58,8 @@ END LICENSE AND COPYRIGHT
  *   Generierung der Tags (sprich die Tags waren alle schon da) dauerte es 5 min 18 sek
  *
  */
-class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_FileParser {
+class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_FileParser
+{
     const SOURCE = 'source';
     const TARGET = 'target';
     /**
@@ -85,14 +88,51 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
 
     /**
      * defines the GUI representation of internal used tags
-     * @var array
+     * Mapping von tagId zu Name und anzuzeigendem Text fuer den Nutzer
+     *
+     *  - kann in der Klassenvar-Def. bereits Inhalte enthalten, die für spezielle
+     *    Zwecke benötigt werden und nicht dynamisch aus der sdlxliff-Datei kommen.
+     *
+     *    Beispiel bpt:
+     *    [1192]=>
+     *     array(6) {
+     *       ["name"]=>
+     *       string(3) "bpt"
+     *       ["text"]=>
+     *       string(44) "&lt;cf style=&quot;z_AS_disclaimer&quot;&gt;"
+     *       ["eptName"]=>
+     *       string(3) "ept"
+     *       ["eptText"]=>
+     *       string(11) "&lt;/cf&gt;"
+     *       ["imgEptText"]=>
+     *       string(5) "</cf>"
+     *     }
+     *    Beispiel ph:
+     *     [0]=>
+     *      array(3) {
+     *        ["name"]=>
+     *        string(2) "ph"
+     *        ["text"]=>
+     *        string(58) "&lt;format type=&quot;&amp;lt;fullPara/&amp;gt;&quot;/&gt;"
+     *      }
+     *
+     * @var array array('tagId' => array('text' => string '',['eptName' => string '', 'eptText' => string
+     *      '','imgEptText' => string '']),'tagId2' => ...)
+     * /
      */
-    protected $_tagMapping = [];
+    protected array $_tagMapping = [
+        'mrkSingle' => [
+            'text' => '&lt;InternalReference/&gt;'
+        ],
+        'mrkPaired' => [
+            'text' => '&lt;InternalReference&gt;',
+            'eptName' => 'ept',
+            'eptText' => '&lt;/InternalReference&gt;',
+            'imgEptText' => '</InternalReference>'
+        ],
+    ];
 
-    /**
-     * @var editor_Models_Import_FileParser_Sdlxliff_TransunitParser
-     */
-    protected $transunitParser;
+    protected TransunitParser $transunitParser;
 
     /**
      * contains the collected comments out of tag cmt-defs
@@ -104,19 +144,26 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
      * @var ZfExtended_Logger
      */
     protected $logger;
-    
+
     /**
      * Needed CXT meta Definitions in the SDLXLIFF file
      * @var array
      */
     protected $cxtDefinitions = [];
-    
+
     /**
      * Container to collect previous origins per trans-unit
      * @var array
      */
     protected $previousOrigins;
-    
+
+    /**
+     * @var array<string, array{author: string, date: DateTime, workflowStep: string}>
+     */
+    private array $revIdToUserDataMap;
+
+    private bool $isTrackChangesPluginActive;
+
     /**
      * (non-PHPdoc)
      * @see editor_Models_Import_FileParser::getFileExtensions()
@@ -128,19 +175,18 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
     /**
      * Initiert Tagmapping
      */
-    public function __construct(string $path, string $fileName, int $fileId, editor_Models_Task $task) {
-        //add sdlxliff tagMapping
-        $this->addSldxliffTagMappings();
+    public function __construct(string $path, string $fileName, int $fileId, editor_Models_Task $task)
+    {
         parent::__construct($path, $fileName, $fileId, $task);
-//         if(!empty($this->html5Tags)){
-//             $this->_tagDefMapping = array_merge($this->_tagDefMapping,array_combine($this->html5Tags, $this->html5Tags));
-//         }
+
+        $this->isTrackChangesPluginActive = Zend_Registry::get('PluginManager')->isActive('TrackChanges');
         $this->checkForSdlChangeMarker();
         $this->prepareTagMapping();
         $this->readCxtMetaDefinitions();
         $this->logger = Zend_Registry::get('logger')->cloneMe('editor.import.fileparser.sdlxliff');
-        $this->transunitParser = ZfExtended_Factory::get('editor_Models_Import_FileParser_Sdlxliff_TransunitParser',[
-            $this->config
+        $this->transunitParser = ZfExtended_Factory::get(TransunitParser::class, [
+            $this->config,
+            $task
         ]);
         //diff export for this task can be used
         $this->task->setDiffExportUsable(1);
@@ -151,52 +197,23 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
     }
 
     /**
-     * Adds the sdlxliff specific tagmappings
-     * Mapping von tagId zu Name und anzuzeigendem Text fuer den Nutzer
-     *
-     * - kann in der Klassenvar-Def. bereits Inhalte enthalten, die für spezielle
-     *   Zwecke benötigt werden und nicht dynamisch aus der sdlxliff-Datei kommen.
-     *
-     *   Beispiel bpt:
-     *   [1192]=>
-     *    array(6) {
-     *      ["name"]=>
-     *      string(3) "bpt"
-     *      ["text"]=>
-     *      string(44) "&lt;cf style=&quot;z_AS_disclaimer&quot;&gt;"
-     *      ["eptName"]=>
-     *      string(3) "ept"
-     *      ["eptText"]=>
-     *      string(11) "&lt;/cf&gt;"
-     *      ["imgEptText"]=>
-     *      string(5) "</cf>"
-     *    }
-     *   Beispiel ph:
-     *    [0]=>
-     *     array(3) {
-     *       ["name"]=>
-     *       string(2) "ph"
-     *       ["text"]=>
-     *       string(58) "&lt;format type=&quot;&amp;lt;fullPara/&amp;gt;&quot;/&gt;"
-     *     }
-     * @var array array('tagId' => array('text' => string '',['eptName' => string '', 'eptText' => string '','imgEptText' => string '']),'tagId2' => ...)
-     */
-    private function addSldxliffTagMappings() {
-        $this->_tagMapping['mrkSingle'] = array('text' => '&lt;InternalReference/&gt;');
-        $this->_tagMapping['mrkPaired'] = array('text' => '&lt;InternalReference&gt;','eptName'=>'ept','eptText'=>'&lt;/InternalReference&gt;','imgEptText'  => '</InternalReference>');
-    }
-
-    /**
      * Checks, if there are any change-markers in the sdlxliff.
      * If import is allowed do nothing, if not and change marks are contained: triggers an error
      */
-    protected function checkForSdlChangeMarker() {
-        if($this->config->runtimeOptions->import->sdlxliff->applyChangeMarks) {
+    protected function checkForSdlChangeMarker()
+    {
+        if ($this->isTrackChangesPluginActive) {
             return;
         }
-        $added = strpos($this->_origFile, 'mtype="x-sdl-added"')!== false;
-        $deleted = strpos($this->_origFile, 'mtype="x-sdl-deleted"')!== false;
-        $refs = strpos($this->_origFile, '<rev-defs>')!== false;
+
+        if ($this->config->runtimeOptions->import->sdlxliff->applyChangeMarks) {
+            return;
+        }
+
+        $added = strpos($this->_origFile, 'mtype="x-sdl-added"') !== false;
+        $deleted = strpos($this->_origFile, 'mtype="x-sdl-deleted"') !== false;
+        $refs = strpos($this->_origFile, '<rev-defs>') !== false;
+
         if ($added || $deleted || $refs) {
             //There are change Markers in the sdlxliff-file which are not supported!
             throw new editor_Models_Import_FileParser_Sdlxliff_Exception('E1003', [
@@ -256,7 +273,7 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
         //und gruppierende Eigenschaft haben
         $this->_origFile = str_replace(array('<bin-unit', '</bin-unit>'), array('<group bin-unit ', '/bin-unit</group>'), $this->_origFile);
         $this->extractComments();
-        $this->removeRevDefs();
+        $this->processRevDefs();
         //gibt die Verschachtelungstiefe der <group>-Tags an
         $groupLevel = 0;
         //array, in dem die Verschachtelungstiefe der Group-Tags in Relation zu ihrer
@@ -462,13 +479,12 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
         
         $xmlparser->parse($cxtDefs);
     }
-    
+
     /**
      * extrahiert die Tags aus den einzelnen Tag-Defs Abschnitten
-     *
-     * @param string $data
      */
-    protected function extractTags($data) {
+    protected function extractTags(string $data): void
+    {
         $data = explode('</tag-defs>', $data);
         $tags = '<tag-defs>' . $data[0] . '</tag-defs>';
         unset($data);
@@ -484,13 +500,16 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
                 'filename' => $this->_fileName,
             ]);
         }
+
         $tagList = $dom->getElementsByTagName('tag');
+
         foreach ($tagList as $node) {
             $id = $node->getAttribute('id');
             $firstChild = $node->firstChild;
             $text = $firstChild->textContent;
             $name = $firstChild->tagName;
             $this->_tagMapping[$id]['text'] = htmlentities($text, ENT_QUOTES, 'utf-8');
+
             if ($name === 'bpt') {
                 $eptList = $node->getElementsByTagName('ept');
                 $ept = $eptList->item(0);
@@ -499,7 +518,8 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
                 $this->_tagMapping[$id]['eptText'] = htmlentities($eptText, ENT_QUOTES, 'utf-8');
                 $this->_tagMapping[$id]['imgEptText'] = $eptText;
             }
-            if (!isset($this->_tagDefMapping[$name])) {
+
+            if (!isset($this->_tagDefMapping[$name]) && !empty($name)) {
                 //the tag is not defined in _tagDefMapping array
                 throw new editor_Models_Import_FileParser_Sdlxliff_Exception('E1007', [
                     'task' => $this->task,
@@ -514,40 +534,51 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
      * parse the given transunit and saves the segments
      *
      * @param string $transUnit
-     * @return string contains the replacement-Tags <lekTargetSeg id=""/> instead the content, where id is the DB segment ID
+     * @return string contains the replacement-Tags <lekTargetSeg id=""/> instead the content, where id is the DB
+     *     segment ID
      */
-    protected function extractSegment($transUnit, array $groupCxtIds) {
-        $this->segmentData = array();
+    protected function extractSegment($transUnit, array $groupCxtIds)
+    {
+        $this->segmentData = [];
         $numSegmentsInTransUnit = 0;
-        $result = $this->transunitParser->parse('<trans-unit'.$transUnit, function($mid, $source, $target, $comments) use ($groupCxtIds, &$numSegmentsInTransUnit) {
-            if(strlen(trim(strip_tags($source))) === 0 && strlen(trim(strip_tags($target))) === 0){
-                return null;
-            }
-            $numSegmentsInTransUnit++;
-            $sourceName = $this->segmentFieldManager->getFirstSourceName();
-            $targetName = $this->segmentFieldManager->getFirstTargetName();
+        $result = $this->transunitParser->parse(
+            '<trans-unit' . $transUnit,
+            function ($mid, $source, $target, $comments) use ($groupCxtIds, &$numSegmentsInTransUnit) {
+                if (strlen(trim(strip_tags($source))) === 0 && strlen(trim(strip_tags($target))) === 0) {
+                    return null;
+                }
+                $numSegmentsInTransUnit++;
+                $sourceName = $this->segmentFieldManager->getFirstSourceName();
+                $targetName = $this->segmentFieldManager->getFirstTargetName();
 
-            $transUnitHash = $this->transunitHash->create($this->sourceFileId, $this->transunitParser->getTransunitId());
+                $transUnitHash = $this->transunitHash->create(
+                    $this->sourceFileId,
+                    $this->transunitParser->getTransunitId()
+                );
 
-            $this->setMid($mid);
+                $this->setMid($mid);
 
-            //after defining the MID segment we have the mid and can access the attributes object,
-            // to set the length attributes
-            $attributes = $this->processCxtMetaTagsForSegment($groupCxtIds);
+                //after defining the MID segment we have the mid and can access the attributes object,
+                // to set the length attributes
+                $attributes = $this->processCxtMetaTagsForSegment($groupCxtIds);
 
-            $attributes->transunitHash = $transUnitHash;
-            $attributes->transunitId = $this->transunitParser->getTransunitId();
-            $attributes->mrkMid = $mid;
+                $attributes->transunitHash = $transUnitHash;
+                $attributes->transunitId = $this->transunitParser->getTransunitId();
+                $attributes->mrkMid = $mid;
 
-            $this->segmentData[$sourceName] = ['original' => $this->parseSegment($source,true)];
-            $this->segmentData[$targetName] = ['original' => $this->parseSegment($target,true)];
-            $segmentId = $this->setAndSaveSegmentValues();
-            $this->saveComments($segmentId, $comments);
-            return $this->getFieldPlaceholder($segmentId, $targetName);
-        });
+                $this->segmentData[$sourceName] = ['original' => $this->parseSegment($source, true)];
+                $this->segmentData[$targetName] = ['original' => $this->parseSegment($target, true)];
+                $segmentId = $this->setAndSaveSegmentValues();
+                $this->saveComments($segmentId, $comments);
 
-        // we have to limit the number of segments per tarns-unit as this might compromises further processing (-> sibling-data)
-        if($numSegmentsInTransUnit > editor_Models_Import_Configuration::MAX_SEGMENTS_PER_TRANSUNIT){
+                return $this->getFieldPlaceholder($segmentId, $targetName);
+            },
+            $this->revIdToUserDataMap
+        );
+
+        // we have to limit the number of segments per tarns-unit as this might compromises further processing
+        // (-> sibling-data)
+        if ($numSegmentsInTransUnit > editor_Models_Import_Configuration::MAX_SEGMENTS_PER_TRANSUNIT) {
             throw new editor_Models_Import_FileParser_Exception('E1523', [
                 'max' => editor_Models_Import_Configuration::MAX_SEGMENTS_PER_TRANSUNIT,
                 'amount' => $numSegmentsInTransUnit,
@@ -556,10 +587,11 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
             ]);
         }
 
-        // add leading <trans-unit for parsing, then strip it again (we got the $transUnit without it, so we return it without it)
+        // add leading <trans-unit for parsing, then strip it again
+        // (we got the $transUnit without it, so we return it without it)
         return substr($result, 11);
     }
-    
+
     /**
      * calculates and sets segment attributes needed by us, this info doesnt exist directly in the segment.
      * These are currently: pretrans, editable, autoStateId
@@ -798,14 +830,22 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
      * @param editor_Models_Import_FileParser_Sdlxliff_parseSegmentData $data enthält alle für das Segmentparsen wichtigen Daten
      * @return editor_Models_Import_FileParser_Sdlxliff_parseSegmentData  $data enthält alle für das Segmentparsen wichtigen Daten
      */
-    protected function parseLeftTag($data) {
+    protected function parseLeftTag($data)
+    {
         $tag = &$data->segment[$data->i];
-        $data->openCounter++;
         $tagName = preg_replace('"<([^ ]*).*>"', '\\1', $tag);
+
+        if (in_array($tagName, ['ins', 'del'], true)) {
+            return $data;
+        }
+
+        $data->openCounter++;
+
         $this->verifyTagName($tagName, $data);
         $tagId = $this->parseSegmentGetTagId($tag, $tagName);
         $shortTagIdent = $data->j;
-        if (strpos($tagId, 'locked')!== false) {
+
+        if (strpos($tagId, 'locked') !== false) {
             //The opening tag $tagName contains a non valid tagId according to our reverse engineering
             throw new editor_Models_Import_FileParser_Sdlxliff_Exception('E1001', [
                 'task' => $this->task,
@@ -815,6 +855,7 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
                 'segment' => implode('', $data->segment),
             ]);
         }
+
         $data->openTags[$data->openCounter]['tagName'] = $tagName;
         $data->openTags[$data->openCounter]['tagId'] = $tagId;
         $data->openTags[$data->openCounter]['nr'] = $data->j;
@@ -822,12 +863,13 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
         //ersetzte gegen Tag für die Anzeige
         $tagObj = new editor_Models_Import_FileParser_Tag(editor_Models_Import_FileParser_Tag::TYPE_OPEN);
         $tagObj->originalContent = $tag;
-        $tagObj->tagNr = $shortTagIdent;;
+        $tagObj->tagNr = $shortTagIdent;
         $tagObj->id = $tagId;
         $tagObj->text = $this->encodeTagsForDisplay($this->_tagMapping[$tagId]['text']);
         $tag = $tagObj->renderTag();
 
         $data->j++;
+
         return $data;
     }
 
@@ -837,14 +879,20 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
      * @param editor_Models_Import_FileParser_Sdlxliff_parseSegmentData $data enthält alle für das Segmentparsen wichtigen Daten
      * @return editor_Models_Import_FileParser_Sdlxliff_parseSegmentData  $data enthält alle für das Segmentparsen wichtigen Daten
      */
-    protected function parseRightTag($data) {
-        if(empty($data->openTags[$data->openCounter])){
+    protected function parseRightTag($data)
+    {
+        $tagName = trim(str_replace(['<', '/', '>'], '', $data->segment[$data->i]));
+        if (in_array($tagName, ['ins', 'del'], true)) {
+            return $data;
+        }
+
+        if (empty($data->openTags[$data->openCounter])) {
             //Found a closing tag without an opening one!
             throw new editor_Models_Import_FileParser_Sdlxliff_Exception('E1002', [
                 'task' => $this->task,
                 'filename' => $this->_fileName,
                 'mid' => $this->_mid,
-                'currentTag' => join('', $data->segment),
+                'data' => $data,
             ]);
         }
         $openTag = $data->openTags[$data->openCounter];
@@ -853,12 +901,13 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
         //generate the html tag for the editor
         $tagObj = new editor_Models_Import_FileParser_Tag(editor_Models_Import_FileParser_Tag::TYPE_CLOSE);
         $tagObj->originalContent = $data->segment[$data->i];
-        $tagObj->tagNr = $openTag['nr'];;
+        $tagObj->tagNr = $openTag['nr'];
         $tagObj->id = $openTag['tagId'];
         $tagObj->text = $this->encodeTagsForDisplay($mappedTag['eptText']);
         $data->segment[$data->i] = $tagObj->renderTag();
 
         $data->openCounter--;
+
         return $data;
     }
 
@@ -943,13 +992,32 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
     /**
      * Removes the rev-def(s) tags from the sdlxliff
      */
-    protected function removeRevDefs() {
+    protected function processRevDefs()
+    {
         //checkForSdlChangeMarker throws an exception if import change mark feature is disabled in config
-        $startComments = strpos($this->_origFile, '<rev-defs');
-        $endComments = strpos($this->_origFile, '</rev-defs>') + 11; //add the length of the end tag
-        if($startComments === false || $startComments >= $endComments){
+        $startRevs = strpos($this->_origFile, '<rev-defs');
+        $endRevs = strpos($this->_origFile, '</rev-defs>') + 11; //add the length of the end tag
+
+        if ($startRevs === false || $startRevs >= $endRevs) {
             return;
         }
-        $this->_origFile = substr_replace($this->_origFile, '', $startComments, $endComments - $startComments);
+
+        if ($this->isTrackChangesPluginActive) {
+            $xmlParser = new editor_Models_Import_FileParser_XmlParser();
+            $xmlParser->registerElement(
+                'rev-def',
+                null,
+                function (string $tag, int $key, array $opener): void {
+                    $this->revIdToUserDataMap[$opener['attributes']['id']] = [
+                        'author' => trim(preg_replace('/\s{2,}/', ' ', $opener['attributes']['author'])),
+                        'date' => DateTime::createFromFormat('m/d/Y H:i:s', $opener['attributes']['date']),
+                        'workflowStep' => $this->task->getWorkflow() . $this->task->getWorkflowStep(),
+                    ];
+                }
+            );
+            $xmlParser->parse(substr($this->_origFile, $startRevs, $endRevs - $startRevs));
+        }
+
+        $this->_origFile = substr_replace($this->_origFile, '', $startRevs, $endRevs - $startRevs);
     }
 }

@@ -38,7 +38,8 @@ use MittagQI\Translate5\Task\Import\SkeletonFile;
 /**
  * Enthält Methoden zum Fileparsing für den Export
  */
-abstract class editor_Models_Export_FileParser {
+abstract class editor_Models_Export_FileParser
+{
     use editor_Models_Export_FileParser_MQMTrait;
     
     /**
@@ -145,6 +146,8 @@ abstract class editor_Models_Export_FileParser {
     protected TransUnitHash $transunitHash;
     protected SkeletonFile $skeletonFileInstance;
 
+    protected ?editor_Models_Export_DiffTagger $_diffTagger;
+
     /**
      * @param editor_Models_Task $task
      * @param int $fileId
@@ -156,14 +159,8 @@ abstract class editor_Models_Export_FileParser {
      * @throws editor_Models_Export_FileParser_Exception
      */
     public function __construct(editor_Models_Task $task, int $fileId, string $path, array $options = []) {
-        if(is_null($this->_classNameDifftagger)){
-            //this->_classNameDifftagger must be defined in the child class.
-            throw new editor_Models_Export_FileParser_Exception('E1085', [
-                'task' => $task,
-            ]);
-        }
         $this->_fileId = $fileId;
-        $this->_diffTagger = ZfExtended_Factory::get($this->_classNameDifftagger);
+        $this->_diffTagger = $this->classNameDifftagger();
         $this->options = array_replace($this->options, $options);
         $this->_task = $task;
         $this->_taskGuid = $task->getTaskGuid();
@@ -182,6 +179,8 @@ abstract class editor_Models_Export_FileParser {
 
         $this->skeletonFileInstance = ZfExtended_Factory::get(SkeletonFile::class, [$task]);
     }
+
+    abstract protected function classNameDifftagger(): ?editor_Models_Export_DiffTagger;
 
     /**
      * Gibt eine zu exportierende Datei bereits korrekt für den Export geparsed zurück
@@ -318,7 +317,8 @@ abstract class editor_Models_Export_FileParser {
      * @param string $field fieldname to get the content from
      * @return string
      */
-    protected function getSegmentContent($segmentId, $field) {
+    protected function getSegmentContent(int|string $segmentId, string $field): string
+    {
         $this->_segmentEntity = $segment = $this->getSegment($segmentId);
         /* @var $segment editor_Models_Segment */
         $segmentMeta = $segment->meta();
@@ -334,10 +334,9 @@ abstract class editor_Models_Export_FileParser {
 
         $segmentExport = $segment->getFieldExport($field, $this->_task, $useEdited, $fixFaultyTags, $findFaultyTags);
 
-        // This removes all segment tags but the ones needed for export
-        $edited = ($segmentExport == NULL) ? '' : $segmentExport->process();
+        $edited = $this->getEditedSegment($segmentExport);
         
-        if($segmentExport != NULL){
+        if ($segmentExport != null) {
             if($segmentExport->hasFaultyTags()){
                 $this->faultySegments[] = [
                     'id' => $segmentId,
@@ -367,18 +366,37 @@ abstract class editor_Models_Export_FileParser {
         $original = ($segmentOriginal == NULL) ? '' : $segmentOriginal->process();
 
         $original = $this->parseSegment($original);
-        try {
-            $diffed = $this->_diffTagger->diffSegment($original, $edited, $segment->getTimestamp(), $segment->getUserName());
+
+        $result = $edited;
+
+        if (null !== $this->_diffTagger) {
+            try {
+                $result = $this->_diffTagger->diffSegment(
+                    $original,
+                    $edited,
+                    $segment->getTimestamp(),
+                    $segment->getUserName()
+                );
+            } catch (Exception $e) {
+                throw new editor_Models_Export_FileParser_Exception('E1088', [
+                    'task' => $this->_task,
+                    'fileId' => $this->_fileId,
+                ], $e);
+            }
         }
-        catch (Exception $e) {
-            throw new editor_Models_Export_FileParser_Exception('E1088', [
-                'task' => $this->_task,
-                'fileId' => $this->_fileId,
-            ], $e);
-            
-        }
+
         // unprotectWhitespace must be done after diffing!
-        return $this->unprotectContent($diffed);
+        return $this->unprotectContent($result);
+    }
+
+    protected function getEditedSegment(?editor_Segment_Export $segmentExport): string
+    {
+        if (!$segmentExport) {
+            return '';
+        }
+
+        // This removes all segment tags but the ones needed for export
+        return $segmentExport->process();
     }
 
     /**
