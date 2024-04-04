@@ -88,8 +88,9 @@ Ext.define('Editor.view.admin.customer.Panel', {
 
     initConfig: function(instanceConfig) {
         var me = this,
-            canNotAddCustomer =  ! Editor.app.authenticatedUser.isAllowed('editorAddCustomer'),
-            canNotDeleteCustomer =  ! Editor.app.authenticatedUser.isAllowed('editorDeleteCustomer'),
+            canNotAddCustomer = !Editor.app.authenticatedUser.isAllowed('editorAddCustomer'),
+            canNotDeleteCustomer = !Editor.app.authenticatedUser.isAllowed('editorDeleteCustomer'),
+            isNotOpenIdEditor = !Editor.app.authenticatedUser.isAllowed('customerOpenIdAdministration'),
             config = {
                 title: me.title, //see EXT6UPD-9
                 tooltip: Editor.data.l10n.clients.tooltip,
@@ -271,7 +272,7 @@ Ext.define('Editor.view.admin.customer.Panel', {
                                     },
                                     maxLength: 255
                                 },{
-                                    xtype:'textfield',
+                                    xtype: 'textfield',
                                     listeners: {
                                         afterrender: function (cmp){
                                             // Gets the fiel label and registers tooltip for it
@@ -286,15 +287,15 @@ Ext.define('Editor.view.admin.customer.Panel', {
                                                 closable: true,
                                                 html: Editor.data.l10n.clients.domainInfoTooltip
                                             });
-
                                         }
                                     },
-                                    fieldLabel:me.strings.domain,
-                                    name:'domain',
-                                    reference:'customerDomain',
-                                    publishes:'value',
+                                    fieldLabel: me.strings.domain,
+                                    name: 'domain',
+                                    reference: 'customerDomain',
+                                    publishes: 'value',
                                     labelClsExtra: 'lableInfoIcon',
-                                    itemId:'openIdDomain'
+                                    itemId: 'openIdDomain',
+                                    disabled: isNotOpenIdEditor
                                 }]
                         },{
                             xtype: 'adminUserAssoc',
@@ -320,6 +321,7 @@ Ext.define('Editor.view.admin.customer.Panel', {
                                 },
                                 tooltip: me.strings.openIdTabPanelDisabledTooltip
                             },
+                            hidden: isNotOpenIdEditor,
                             bind:{
                                 disabled:'{!customerDomain.value}'
                             }
