@@ -67,20 +67,26 @@ final class Rights extends AbstractResource {
      * @group Task usage
      */
     public const TASK_OVERVIEW_FRONTEND_CONTROLLER = 'taskOverviewFrontendController';
+//endregion
 
+//region Administration
     /**
      * allows the usage of the user administration (as tab in the main window)
      * @group Administration
      */
     public const USER_ADMINISTRATION = 'userAdministration';
-//endregion
 
-//region Administration
     /**
      * allows the usage of the customer administration (as tab in the main window)
      * @group Customer Administration
      */
     public const CUSTOMER_ADMINISTRATION = 'customerAdministration';
+
+    /**
+     * allows the association of customers to users, therefore loads the customer controller
+     * @group Customer Administration
+     */
+    public const CUSTOMER_ASSOCIATION = 'customerAssociation';
 
     /**
      * allows the adding of customers
@@ -93,6 +99,12 @@ final class Rights extends AbstractResource {
      * @group Customer Administration
      */
     public const EDITOR_DELETE_CUSTOMER = 'editorDeleteCustomer';
+
+    /**
+     * allows the administration of the OpenID authentication in the customer management
+     * @group Customer Administration
+     */
+    public const CUSTOMER_OPENID_ADMINISTRATION = 'customerOpenIdAdministration';
 
     /**
      * allows reading the auth hash via task user assoc API
@@ -563,10 +575,17 @@ final class Rights extends AbstractResource {
     public const PLUGIN_SPELL_CHECK_MAIN = 'pluginSpellCheckMain';
 
     /**
-     * Enables the UI invocation of the match analysis pricing presets
+     * Enables the UI invocation of the match analysis pricing presets, global UI and for all customers
      * @group Plug-In Matchanalysis
      */
     public const PLUGIN_MATCH_ANALYSIS_PRICING_PRESET = 'pluginMatchAnalysisPricingPreset';
+
+    /**
+     * Enables the UI invocation of the match analysis pricing presets just for selected customers
+     * This is a either-or right with ::PLUGIN_MATCH_ANALYSIS_PRICING_PRESET
+     * @group Plug-In Matchanalysis
+     */
+    public const PLUGIN_MATCH_ANALYSIS_CUSTOMER_PRICING_PRESET = 'pluginMatchAnalysisCustomerPricingPreset';
 
     /**
      * Enables the UI invocation of the match analysis in general
@@ -581,10 +600,17 @@ final class Rights extends AbstractResource {
     public const PLUGIN_GLOBALESE_PRE_TRANSLATION = 'pluginGlobalesePreTranslationGlobalese';
 
     /**
-     * Allows the administration of the BCONF preferences
+     * Allows the administration of the BCONF preferences, the global UI and all customer UIs
      * @group Plug-In Okapi
      */
     public const PLUGIN_OKAPI_BCONF_PREFS = 'pluginOkapiBconfPrefs';
+
+    /**
+     * Allows the administration of the BCONF preferences only for the accessible customers
+     * This is a either-or right with ::PLUGIN_OKAPI_BCONF_PREFS
+     * @group Plug-In Okapi
+     */
+    public const PLUGIN_OKAPI_BCONF_CUSTOMER_PREFS = 'pluginOkapiBconfCustomerPrefs';
 
     /**
      * enables the corresponding JS controller

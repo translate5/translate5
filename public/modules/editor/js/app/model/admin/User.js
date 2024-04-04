@@ -233,6 +233,7 @@ Ext.define('Editor.model.admin.User', {
         // QUIRK: there might be more rights/functionalities requiring the customers-store. But they are all bound to role "clintpm" or "pm"
         // instead of this evaluation we may better test for those two roles instead
         return Editor.data.app.userRights.includes('customerAdministration') ||
+            Editor.data.app.userRights.includes('customerAssociation') ||
             Editor.data.app.userRights.includes('editorAddLangresource') ||
             Editor.data.app.userRights.includes('editorAddTask') ||
             Editor.data.app.userRights.includes('editorAddUser') ||
