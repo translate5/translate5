@@ -523,9 +523,16 @@ abstract class AbstractRequest
      * @param array $extraData
      * @return ZfExtended_ErrorCodeException
      */
-    final public function createException(string $ecode, string $errorMessage = null, array $extraData = []): ZfExtended_ErrorCodeException
-    {
-        return new $this->exceptionClass($ecode, $this->createExtraData($errorMessage, $extraData));
+    final public function createException(
+        string $ecode,
+        string $errorMessage = null,
+        array $extraData = []
+    ): ZfExtended_ErrorCodeException {
+        $extraData = $this->createExtraData($errorMessage, $extraData);
+        $exception = new $this->exceptionClass($ecode, $extraData);
+        $exception->addExtraData($extraData);
+
+        return $exception;
     }
 
     /**
@@ -538,8 +545,11 @@ abstract class AbstractRequest
      * @param array $extraData
      * @return ZfExtended_ErrorCodeException
      */
-    final protected function castException(Throwable $exception, string $newEcode, string $errorMessage = null): ZfExtended_ErrorCodeException
-    {
+    final protected function castException(
+        Throwable $exception,
+        string $newEcode,
+        string $errorMessage = null
+    ): ZfExtended_ErrorCodeException {
         // do not cast for no reason
         if (get_class($exception) === $this->exceptionClass && $exception->getErrorCode() === $newEcode) {
             return $exception;
@@ -547,13 +557,22 @@ abstract class AbstractRequest
         // a "real" cast only if the thrown exception already is error-coded
         if (is_a($exception, ZfExtended_ErrorCodeException::class)) {
             /* @var ZfExtended_ErrorCodeException $exception */
-            // we merge the "current" extra-data over the "old" to have the chance to override stuff. Therefore we cannot use ->createException
+            // we merge the "current" extra-data over the "old" to have the chance to override stuff.
+            // Therefore, we cannot use ->createException
             $extraData = array_merge($exception->getErrors(), $this->createExtraData($errorMessage));
-            return new $this->exceptionClass($newEcode, $extraData);
+            $casted = new $this->exceptionClass($newEcode, $extraData);
+            $casted->addExtraData($extraData);
+
+            return $casted;
         }
         // make sure $previous always represents the first ...
         $previous = ($exception->getPrevious() === null) ? $exception : $exception->getPrevious();
-        return new $this->exceptionClass($newEcode, $this->createExtraData($errorMessage), $previous);
+
+        $extraData = $this->createExtraData($errorMessage);
+        $casted = new $this->exceptionClass($newEcode, $extraData, $previous);
+        $casted->addExtraData($extraData);
+
+        return $casted;
     }
 
     /**

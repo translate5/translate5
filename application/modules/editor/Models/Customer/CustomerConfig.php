@@ -65,6 +65,7 @@ class editor_Models_Customer_CustomerConfig extends ZfExtended_Models_Entity_Abs
         /* @var $configOperator ZfExtended_Resource_DbConfig */
         $configOperator->initDbOptionsTree($result);
         $config->merge(new Zend_Config($configOperator->getDbOptionTree(),true));
+        $config->customerId = $customerId;
         
         return $config;
     }

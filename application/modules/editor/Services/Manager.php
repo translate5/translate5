@@ -166,7 +166,7 @@ class editor_Services_Manager {
      *
      * @return array
      */
-    public function getAllUnconfiguredServices(bool $forUi = false): array
+    public function getAllUnconfiguredServices(bool $forUi = false, Zend_Config $config = null): array
     {
         $serviceNames = [];
 
@@ -188,7 +188,7 @@ class editor_Services_Manager {
                 $connector = ZfExtended_Factory::get('editor_Services_Connector');
 
                 //the service is also not available when connection cannot be established
-                if ($connector && $connector->ping($resource)) {
+                if ($connector && $connector->ping($resource, $config)) {
                     continue 2;
                 }
             }
