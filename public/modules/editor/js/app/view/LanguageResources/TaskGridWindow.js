@@ -64,7 +64,11 @@ Ext.define('Editor.view.LanguageResources.TaskGridWindow', {
         reimportUserSaved: '#UT#Benutzer-gespeicherte Segmente im TM speichern',
         reimportAllTooltip: '#UT#Speichert alle Segmente aller Aufgaben, die oben angehakt sind und dem TM mit Schreibrechten zugewiesen sind',
         reimportUserSavedTooltip: '#UT#Speichert nur die Abschnitte, die zuvor von einem Benutzer manuell gespeichert wurden. Dies gilt für alle Aufgaben, die oben angehakt sind und dem TM mit Schreibrechten zugewiesen sind',
-        gotoTask: '#UT#zur Aufgabe springen'
+        gotoTask: '#UT#zur Aufgabe springen',
+        timeOption: '#UT#Zeitoption',
+        currentTime: '#UT#Aktueller Zeitpunkt',
+        segmentSaveTime: '#UT#Zeitpunkt der Segmentspeicherung',
+        timeOptionTooltip: '#UT#Als Datum und Uhrzeit des erzeugten TM-Eintrags wird bei "Zeitpunkt der Segmentspeicherung" das Datum verwendet, an dem er letzte Benutzer das Segment in der Aufgabe gespeichert hat. Andernfalls wird der Zeitpunkt verwendet, an dem die Aufgabe neu ins TM durchgespeichert wird.',
     },
     controller: 'languageResourceTaskGridWindow',
     viewModel: {
@@ -75,7 +79,7 @@ Ext.define('Editor.view.LanguageResources.TaskGridWindow', {
     modal: true,
     layout: 'fit',
     initConfig: function (instanceConfig) {
-        var me = this,
+        let me = this,
             config = {
                 bind: {
                     title: me.strings.title + ': {record.name}'
@@ -135,6 +139,33 @@ Ext.define('Editor.view.LanguageResources.TaskGridWindow', {
                         items: [
                             {
                                 xtype: 'tbfill'
+                            },
+                            {
+                                xtype: 'combo',
+                                itemId: 'import-time-option',
+                                allowBlank: false,
+                                editable: false,
+                                forceSelection: true,
+                                store: Ext.create('Ext.data.ArrayStore', {
+                                    fields: ['name', 'value'],
+                                    data: [
+                                        [this.strings.currentTime, 'current'],
+                                        [this.strings.segmentSaveTime, 'segment'],
+                                    ]
+                                }),
+                                queryMode: 'local',
+                                displayField: 'name',
+                                valueField: 'value',
+                                fieldLabel: me.strings.timeOption,
+                                listeners: {
+                                    afterrender: function(combo) {
+                                        combo.select(combo.getStore().getAt(0));
+                                        new Ext.tip.ToolTip({
+                                            target: combo.inputEl,
+                                            html: me.strings.timeOptionTooltip
+                                        });
+                                    },
+                                }
                             },
                             {
                                 xtype: 'button',
