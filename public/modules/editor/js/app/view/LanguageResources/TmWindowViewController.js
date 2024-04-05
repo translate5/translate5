@@ -353,10 +353,7 @@ Ext.define('Editor.view.LanguageResources.TmWindowViewController', {
         const stripFramingTagsConfig = resourceType ? resourceType.get('stripFramingTagsConfig') : [];
 
         if (!stripFramingTagsConfig.length) {
-            viewModel.set(
-                'strippingFramingTagsSupported',
-                false
-            );
+            viewModel.set('strippingFramingTagsSupported', false);
 
             return;
         }
