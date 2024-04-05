@@ -481,10 +481,16 @@ abstract class editor_Test_ApiTest extends TestCase
             static::assertFalse(empty($state->termtagger), 'Termtagger Plugin not active!');
             static::assertTrue($state->termtagger->runningAll, 'Some configured termtaggers are not running: ' . print_r($state->termtagger->running, 1));
         }
-        // test the plugins blacklist
-        foreach (static::$forbiddenPlugins as $plugin) {
-            self::assertNotContains($plugin, $state->pluginsLoaded, 'Plugin ' . $plugin . ' must not be activated for this test case!');
+
+        if (count(static::$forbiddenPlugins) > 0 && !DbHelper::deactivatePlugins(static::$forbiddenPlugins)) {
+            static::fail(
+                sprintf(
+                    "One or more of the following forbidden Plugins could not be deactivated: '%s'",
+                    implode("', '", static::$forbiddenPlugins)
+                )
+            );
         }
+
         // evaluate the plugins whitelist
         foreach (static::$requiredPlugins as $plugin) {
             if(!in_array($plugin, $state->pluginsLoaded)){
