@@ -32,22 +32,22 @@
  * Represent a single customized FPRM file that has been customized by the user.
  * see editor_Plugins_Okapi_Bconf_Filters and editor_Plugins_Okapi_Bconf_Filter_Fprm for more documentation
  *
- * @method integer getId() getId()
- * @method void setId() setId(int $id)
- * @method integer getBconfId() getBconfId()
- * @method void setBconfId() setBconfId(int $bconfId)
- * @method string getOkapiType() getOkapiType()
- * @method void setOkapiType() setOkapiType(string $okapiType)
- * @method string getOkapiId() getOkapiId()
- * @method void setOkapiId() setOkapiId(string $okapiId)
- * @method string getMimeType() getMimeType()
- * @method void setMimeType() setMimeType(string $mimeType)
- * @method string getName() getName()
- * @method void setName() setName(string $name)
- * @method string getDescription() getDescription()
- * @method void setDescription() setDescription(string $description)
- * @method string getHash() getHash()
- * @method void setHash() setHash(string $hash)
+ * @method string getId()
+ * @method void setId(int $id)
+ * @method string getBconfId()
+ * @method void setBconfId(int $bconfId)
+ * @method string getOkapiType()
+ * @method void setOkapiType(string $okapiType)
+ * @method string getOkapiId()
+ * @method void setOkapiId(string $okapiId)
+ * @method string getMimeType()
+ * @method void setMimeType(string $mimeType)
+ * @method string getName()
+ * @method void setName(string $name)
+ * @method string getDescription()
+ * @method void setDescription(string $description)
+ * @method string getHash()
+ * @method void setHash(string $hash)
  */
 class editor_Plugins_Okapi_Bconf_Filter_Entity extends ZfExtended_Models_Entity_Abstract {
 

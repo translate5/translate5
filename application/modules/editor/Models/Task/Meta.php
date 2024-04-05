@@ -28,19 +28,19 @@ END LICENSE AND COPYRIGHT
 use MittagQI\Translate5\Plugins\MatchAnalysis\Models\Pricing\Preset;
 /**
  * Entity Model for task meta data
- * @method integer getId() getId()
- * @method void setId() setId(int $id)
- * @method string getTaskGuid() getTaskGuid()
- * @method void setTaskGuid() setTaskGuid(string $guid)
- * @method int getBconfId() getBconfId()
- * @method setBconfId(int $bconfId)
- * @method string getBconfInZip() getBconfInZip()
- * @method setBconfInZip(string $bconfInZip)
- * @method setPricingPresetId(int $pricingPresetId)
- * @method string getMappingType() getMappingType()
- * @method setMappingType(string $mappingType)
- * @method bool getPerTaskExport()
- * @method setPerTaskExport(bool $perTaskExport)
+ * @method string getId()
+ * @method void setId(int $id)
+ * @method string getTaskGuid()
+ * @method void setTaskGuid(string $guid)
+ * @method string getBconfId()
+ * @method void setBconfId(int $bconfId)
+ * @method string getBconfInZip()
+ * @method void setBconfInZip(string $bconfInZip)
+ * @method void setPricingPresetId(int $pricingPresetId)
+ * @method string getMappingType()
+ * @method void setMappingType(string $mappingType)
+ * @method string getPerTaskExport()
+ * @method void setPerTaskExport(bool $perTaskExport)
  */
 class editor_Models_Task_Meta extends ZfExtended_Models_Entity_MetaAbstract {
     protected $dbInstanceClass = 'editor_Models_Db_TaskMeta';

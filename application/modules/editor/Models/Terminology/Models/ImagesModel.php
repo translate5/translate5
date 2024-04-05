@@ -30,18 +30,18 @@ END LICENSE AND COPYRIGHT
  * Class editor_Models_Terms_Images
  * TermsImage Instance
  *
- * @method integer getId() getId()
- * @method void setId() setId(integer $id)
- * @method string getTargetId() getTargetId()
- * @method string setTargetId() setTargetId(string $targetId)
- * @method string getName() getName()
- * @method string setName() setName(string $name)
- * @method string getUniqueName() getUniqueName()
- * @method string setUniqueName() setUniqueName(string $uniqueName)
- * @method string getFormat() getFormat()
- * @method string setFormat() setFormat(string $format)
- * @method integer getCollectionId() getCollectionId()
- * @method integer setCollectionId() setCollectionId(integer $collectionId)
+ * @method string getId()
+ * @method void setId(integer $id)
+ * @method string getTargetId()
+ * @method void setTargetId(string $targetId)
+ * @method string getName()
+ * @method void setName(string $name)
+ * @method string getUniqueName()
+ * @method void setUniqueName(string $uniqueName)
+ * @method string getFormat()
+ * @method void setFormat(string $format)
+ * @method string getCollectionId()
+ * @method void setCollectionId(integer $collectionId)
  */
 class editor_Models_Terminology_Models_ImagesModel extends ZfExtended_Models_Entity_Abstract {
     protected $dbInstanceClass = 'editor_Models_Db_Terminology_Images';

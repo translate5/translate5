@@ -7238,6 +7238,26 @@ The following task was imported with errors / warnings / notices. Please take ca
                 <source>Standardmäßig als Pivot verwenden</source>
                 <target>Use as pivot by default</target>
             </trans-unit>
+            <trans-unit id='VW1zY2hsaWXDn2VuZGUgVGFncyBiZWltIEltcG9ydCBsw7ZzY2hlbg=='>
+                <source>Umschließende Tags beim Import löschen</source>
+                <target>Strip framing tags at import</target>
+            </trans-unit>
+            <trans-unit id='QXJiZWl0ZXQgYW5hbG9nIHp1ciBTeXN0ZW1rb25maWd1cmF0aW9uIHJ1bnRpbWVPcHRpb25zLmltcG9ydC54bGYuaWdub3JlRnJhbWluZ1RhZ3MsIGFiZXIgZsO8ciBUTVgtSW1wb3J0LiBTaWUgZW50ZmVybnQgYWxsZSAob2RlciBudXIgZ2VwYWFydGUpIFRhZ3Mgdm9tIEFuZmFuZyB1bmQgRW5kZSBlaW5lcyBpbXBvcnRpZXJ0ZW4gU2VnbWVudHMsIGZhbGxzIGFrdGl2aWVydC4gRGllIFN5c3RlbWtvbmZpZ3VyYXRpb24gc29sbHRlIGRhaGVyIGbDvHIgZGVuc2VsYmVuIEt1bmRlbiBkaWUgZ2xlaWNoZSBFaW5zdGVsbHVuZyBmw7xyIHp1IGltcG9ydGllcmVuZGUgQXVmZ2FiZW4gaGFiZW4uIFdlbm4gU2llIGJlc3RlaGVuZGUgVE1zIGtvbnZlcnRpZXJlbiBtw7xzc2VuLCBiaXR0ZW4gU2llIGRlbiB0cmFuc2xhdGU1LVN1cHBvcnQgdW0gSGlsZmUu'>
+                <source>Arbeitet analog zur Systemkonfiguration runtimeOptions.import.xlf.ignoreFramingTags, aber für TMX-Import. Sie entfernt alle (oder nur gepaarte) Tags vom Anfang und Ende eines importierten Segments, falls aktiviert. Die Systemkonfiguration sollte daher für denselben Kunden die gleiche Einstellung für zu importierende Aufgaben haben. Wenn Sie bestehende TMs konvertieren müssen, bitten Sie den translate5-Support um Hilfe.</source>
+                <target>Works analogous to system config runtimeOptions.import.xlf.ignoreFramingTags, but for TMX import. It strips all (or only paired) tags from the start and end of an imported segment, if activated. The system config should therefore have the same setting for the same client for to be imported tasks. If you need to convert existing TMs, please ask the translate5 support for help.</target>
+            </trans-unit>
+            <trans-unit id='RW50ZmVybnQga2VpbmU='>
+                <source>Entfernt keine</source>
+                <target>None</target>
+            </trans-unit>
+            <trans-unit id='QWxsZQ=='>
+                <source>Alle</source>
+                <target>All</target>
+            </trans-unit>
+            <trans-unit id='VGFncGFhcmU='>
+                <source>Tagpaare</source>
+                <target>Paired</target>
+            </trans-unit>
             <trans-unit id='Vm9yw7xiZXJzZXR6dW5n'>
                 <source>Vorübersetzung</source>
                 <target>Pre-translation</target>

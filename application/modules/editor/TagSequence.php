@@ -371,8 +371,9 @@ abstract class editor_TagSequence implements JsonSerializable {
 
     /**
      *
-     * @param string[] $skippedTypes: if set, internal tags of this type will not be rendered
-     * @return string
+     * @return editor_Segment_AnyTag
+     * @throws Zend_Exception
+     * @throws ZfExtended_ErrorCodeException
      */
     private function createRenderingHolder(): editor_Segment_AnyTag
     {

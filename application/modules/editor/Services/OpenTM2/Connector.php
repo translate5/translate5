@@ -31,6 +31,8 @@ use MittagQI\Translate5\LanguageResource\Adapter\Exception\RescheduleUpdateNeede
 use MittagQI\Translate5\LanguageResource\Adapter\UpdatableAdapterInterface;
 use MittagQI\Translate5\LanguageResource\Status as LanguageResourceStatus;
 use editor_Models_LanguageResources_LanguageResource as LanguageResource;
+use MittagQI\Translate5\Service\T5Memory;
+use MittagQI\Translate5\T5Memory\Enum\StripFramingTags;
 
 /**
  * T5memory / OpenTM2 Connector
@@ -142,7 +144,10 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
 
                 //if initial upload is a TMX file, we have to import it.
                 if ($tmxUpload) {
-                    return $this->addAdditionalTm($fileinfo, ['tmName' => $tmName]);
+                    return $this->addAdditionalTm($fileinfo, [
+                        'tmName' => $tmName,
+                        'stripFramingTags' => $params['stripFramingTags'] ?? null,
+                    ]);
                 }
 
                 return true;
@@ -244,7 +249,8 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
         foreach ($this->getImportFilesFromUpload($fileinfo) as $file) {
             $result = $result && $this->importTmxIntoMemory(
                 file_get_contents($file),
-                $params['tmName'] ?? $this->getWritableMemory()
+                $params['tmName'] ?? $this->getWritableMemory(),
+                $this->getStripFramingTagsValue($params)
             );
         }
 
@@ -406,7 +412,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
     /**
      * Helper function to get the metadata which should be shown in the GUI out of a single result
      *
-     * @return object[]
+     * @return stdClass[]
      */
     private function getMetaData(object $found): array
     {
@@ -1424,12 +1430,15 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
             && str_replace($errorCodes, '', $error->error) !== $error->error;
     }
 
-    private function importTmxIntoMemory(string $fileContent, string $tmName): bool
-    {
+    private function importTmxIntoMemory(
+        string $fileContent,
+        string $tmName,
+        StripFramingTags $stripFramingTags
+    ): bool {
         $successful = false;
 
         try {
-            $successful = $this->api->importMemory($fileContent, $tmName);
+            $successful = $this->api->importMemory($fileContent, $tmName, $stripFramingTags);
 
             if (!$successful) {
                 $this->logger->error('E1303', 'OpenTM2: could not add TMX data to TM', [
@@ -1466,7 +1475,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
             );
 
             // Import further
-            return $this->importTmxIntoMemory($fileContent, $newName);
+            return $this->importTmxIntoMemory($fileContent, $newName, $stripFramingTags);
         }
 
         return $successful;
@@ -1759,7 +1768,13 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
                 $matchRateFits => 'Match rate is not 103',
                 $targetIsTheSame => 'Saved segment target differs with provided',
                 $isResultFresh => 'Got old result',
+                default => 'Unknown reason',
             });
         }
+    }
+
+    private function getStripFramingTagsValue(array $params): StripFramingTags
+    {
+        return StripFramingTags::tryFrom($params['stripFramingTags'] ?? '') ?? StripFramingTags::None;
     }
 }

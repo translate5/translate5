@@ -43,18 +43,18 @@ use MittagQI\ZfExtended\MismatchException;
  *
  * see editor_Plugins_Okapi_Bconf_Filters, editor_Plugins_Okapi_Bconf_ExtensionMapping, editor_Plugins_Okapi_Bconf_Filter_Fprm and editor_Plugins_Okapi_Bconf_Segmentation for more documentation
  *
- * @method integer getId()
+ * @method string getId()
  * @method void setId(int $id)
  * @method string getName()
  * @method void setName(string $name)
- * @method int getIsDefault()
- * @method setIsDefault(int $int)
+ * @method string getIsDefault()
+ * @method void setIsDefault(int $int)
  * @method string getDescription()
- * @method setDescription(string $string)
- * @method int getCustomerId()
- * @method setCustomerId(mixed $customerId)
- * @method int getVersionIdx()
- * @method setVersionIdx(int $versionIdx)
+ * @method void setDescription(string $string)
+ * @method string getCustomerId()
+ * @method void setCustomerId(mixed $customerId)
+ * @method string getVersionIdx()
+ * @method void setVersionIdx(int $versionIdx)
  */
 class editor_Plugins_Okapi_Bconf_Entity extends ZfExtended_Models_Entity_Abstract {
 

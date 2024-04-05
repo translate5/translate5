@@ -59,6 +59,7 @@ Ext.define('Editor.view.admin.task.UserAssoc', {
     bind: {
         disabled: '{!enablePanel}'
     },
+    border: 0,
     initConfig: function (instanceConfig) {
         var me = this,
             config;

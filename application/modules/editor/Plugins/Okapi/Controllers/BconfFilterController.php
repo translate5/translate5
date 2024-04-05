@@ -50,7 +50,7 @@ class editor_Plugins_Okapi_BconfFilterController extends ZfExtended_RestControll
         $this->view->total = count($this->view->rows);
 
         // the extension mapping is sent as meta-data
-        if(!$this->view->metaData){
+        if(!$this->view?->metaData){
             $this->view->metaData = new stdClass();
         }
         $this->view->metaData->extensionMapping = $bconf->getExtensionMapping()->getIdentifierMap();

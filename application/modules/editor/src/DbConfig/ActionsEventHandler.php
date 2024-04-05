@@ -73,23 +73,20 @@ class ActionsEventHandler
         $this->userRepository = new UserRepository();
     }
 
-    public function addDefaultPMUsersOnPutAction(string $configName): callable
+    public function addDefaultPMUsersOnPutAction(string $configName, bool $includePmlite = false): callable
     {
-        return function (Zend_EventManager_Event $event) use ($configName) {
+        return function (Zend_EventManager_Event $event) use ($configName, $includePmlite) {
             if ($event->getParam('request')->getParam('id') != $configName) {
                 return;
             }
 
-            $event->getParam('view')->rows['defaults'] = $this->getPmUsers();
+            $event->getParam('view')->rows['defaults'] = $this->getPmUsers($includePmlite);
         };
     }
 
-    /***
-     * @param Zend_EventManager_Event $event
-     */
-    public function addDefaultPMUsersOnIndexAction(string $configName): callable
+    public function addDefaultPMUsersOnIndexAction(string $configName, bool $includePmlite = false): callable
     {
-        return function (Zend_EventManager_Event $event) use ($configName) {
+        return function (Zend_EventManager_Event $event) use ($configName, $includePmlite) {
             if (!$rows = $event->getParam('view')->rows ?? []) {
                 return;
             }
@@ -97,7 +94,7 @@ class ActionsEventHandler
             // Config index
             $index = array_search($configName, array_column($rows, 'name'));
 
-            $event->getParam('view')->rows[$index]['defaults'] = $this->getPmUsers();
+            $event->getParam('view')->rows[$index]['defaults'] = $this->getPmUsers($includePmlite);
         };
     }
 
@@ -177,10 +174,10 @@ class ActionsEventHandler
         return Zend_Registry::get('config');
     }
 
-    private function getPmUsers(): string
+    private function getPmUsers(bool $includePmlite): string
     {
         $defaults = [];
-        foreach ($this->userRepository->getPmList() as $pm) {
+        foreach ($this->userRepository->getPmList($includePmlite) as $pm) {
             $defaults[$pm->getId()] = sprintf(
                 '%s %s (%s)',
                 $pm->getFirstName(),

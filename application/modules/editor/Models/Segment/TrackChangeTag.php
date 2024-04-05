@@ -127,34 +127,33 @@ class editor_Models_Segment_TrackChangeTag extends editor_Models_Segment_TagAbst
     }
     
     /***
-     * Create trackchanges html node as string 
+     * Create trackchanges html node as string
      *
      * @param string $nodeName
      * @param string $nodeText
      * @return string|string
      */
-    public function createTrackChangesNode($nodeName,$nodeText){
-        
+    public function createTrackChangesNode($nodeName, $nodeText, ?DateTime $dateTime = null): string
+    {
         $node = [];
-        $node[] = '<'.$nodeName;
-        $node[] = 'class="'.$this->getTrackChangesCss($nodeName).'"';
-        
+        $node[] = '<' . $nodeName;
+        $node[] = 'class="' . $this->getTrackChangesCss($nodeName) . '"';
+
         // id to identify the user who did the editing (also used for verifying checks)
-        $node[] = self::ATTRIBUTE_USERTRACKINGID.'="'.$this->userTrackingId.'"';
-        
+        $node[] = self::ATTRIBUTE_USERTRACKINGID . '="' . $this->userTrackingId . '"';
+
         // css-selector with specific number for this user
-        $node[] = self::ATTRIBUTE_USERCSSNR.'="'.self::ATTRIBUTE_USERCSSNR_VALUE_PREFIX.$this->userColorNr.'"';
-        
+        $node[] = self::ATTRIBUTE_USERCSSNR . '="' . self::ATTRIBUTE_USERCSSNR_VALUE_PREFIX . $this->userColorNr . '"';
+
         //workflow-step:
-        $node[] = self::ATTRIBUTE_WORKFLOWSTEP.'="'.$this->attributeWorkflowstep.'"';
-        
+        $node[] = self::ATTRIBUTE_WORKFLOWSTEP . '="' . $this->attributeWorkflowstep . '"';
+
         // timestamp af the change:
-        $node[] = self::ATTRIBUTE_TIMESTAMP.'="'.date("c").'"';
-        
-        $node[] = '>'.$nodeText.'</'.$nodeName.'>';
-        
+        $node[] = self::ATTRIBUTE_TIMESTAMP . '="' . ($dateTime ? $dateTime->format('c') : date("c")) . '"';
+
+        $node[] = '>' . $nodeText . '</' . $nodeName . '>';
+
         return implode(' ', $node);
-        
     }
     
     /***

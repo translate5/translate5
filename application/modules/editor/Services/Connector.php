@@ -33,15 +33,16 @@ use MittagQI\Translate5\Segment\TagRepair\HtmlProcessor;
  * - provides a connection to a concrete language resource, via the internal adapter (which contains the concrete connector instance)
  * - intercepts some calls to the adapter to provide unified logging etc per each call
  * - all non intercepted methods are passed directly to the underlying adapter
- * @method editor_Services_ServiceResult query() query(editor_Models_Segment $segment)
- * @method editor_Services_ServiceResult search() search(string $searchString, $field = 'source', $offset = null)
- * @method editor_Services_ServiceResult translate() translate(string $searchString)
- * @method void update(editor_Models_Segment $segment, $recheckOnUpdate = false, $rescheduleOnError = false, bool $useSegmentTimestamp = false) editor_Services_Connector_Abstract::update()
- * @method string getStatus() getStatus(editor_Models_LanguageResources_Resource $resource, editor_Models_LanguageResources_LanguageResource $languageResource = null) returns the LanguageResource status
- * @method string getLastStatusInfo() getLastStatusInfo() returns the last store status info from the last getStatus call
+ * @method editor_Services_ServiceResult query(editor_Models_Segment $segment)
+ * @method editor_Services_ServiceResult search(string $searchString, $field = 'source', $offset = null)
+ * @method editor_Services_ServiceResult translate(string $searchString)
+ * @method void update(editor_Models_Segment $segment, $recheckOnUpdate = false, $rescheduleOnError = false) editor_Services_Connector_Abstract::update()
+ * @method string getStatus(editor_Models_LanguageResources_Resource $resource, editor_Models_LanguageResources_LanguageResource $languageResource = null) returns the LanguageResource status
+ * @method string getLastStatusInfo() returns the last store status info from the last getStatus call
  * @method string getTm($mime, string $tmName = '') editor_Services_Connector_FilebasedAbstract::getTm()
  * @method boolean addTm(array $fileInfo = null,array $params=null) editor_Services_Connector_Abstract::addTm()
  * @method boolean addAdditionalTm(array $fileinfo = null, array $params = null) editor_Services_Connector_Abstract::addAdditionalTm()
+ * @method void setConfig(Zend_Config $config) editor_Services_Connector_Abstract::setConfig(Zend_Config $config)
  */
 class editor_Services_Connector
 {
@@ -105,12 +106,18 @@ class editor_Services_Connector
      *
      * @param editor_Models_LanguageResources_Resource $resource
      */
-    protected function connectToResourceOnly(editor_Models_LanguageResources_Resource $resource): void
-    {
+    protected function connectToResourceOnly(
+        editor_Models_LanguageResources_Resource $resource,
+        ?Zend_Config $config = null
+    ): void {
         if (method_exists($resource, 'getConnector')) {
             $connector = $resource->getConnector();
         } else {
             $connector = ZfExtended_Factory::get($resource->getServiceType() . editor_Services_Manager::CLS_CONNECTOR);
+        }
+
+        if ($config !== null) {
+            $connector->setConfig($config);
         }
 
         $connector->setResource($resource);
@@ -337,10 +344,15 @@ class editor_Services_Connector
      * @param editor_Models_LanguageResources_Resource $resource
      * @return boolean
      */
-    public function ping(editor_Models_LanguageResources_Resource $resource){
-        $this->connectToResourceOnly($resource);
+    public function ping(editor_Models_LanguageResources_Resource $resource, ?Zend_Config $config)
+    {
+        $this->connectToResourceOnly($resource, $config);
         //a ping is successfull if the status of the resource is available or not loaded
-        $isValidFor = [editor_Services_Connector_Abstract::STATUS_AVAILABLE, editor_Services_Connector_Abstract::STATUS_NOT_LOADED];
+        $isValidFor = [
+            editor_Services_Connector_Abstract::STATUS_AVAILABLE,
+            editor_Services_Connector_Abstract::STATUS_NOT_LOADED
+        ];
+
         return in_array($this->getStatus($resource), $isValidFor);
     }
     

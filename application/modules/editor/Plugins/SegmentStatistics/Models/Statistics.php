@@ -35,24 +35,24 @@ END LICENSE AND COPYRIGHT
 /**
  * Default Model for Plugin SegmentStatistics
  * 
- * @method void setId() setId(int $id)
- * @method void setTaskGuid() setTaskGuid(string $guid)
- * @method void setSegmentId() setSegmentId(int $segmentid)
- * @method void setFileId() setFileId(int $fileid)
- * @method void setFieldName() setFieldName(string $name)
- * @method void setFieldType() setFieldType(string $type)
- * @method void setTermFound() setTermFound(int $count)
- * @method void setTermNotFound() setTermNotFound(int $count)
- * @method void setCharCount() setCharCount(int $count)
+ * @method void setId(int $id)
+ * @method void setTaskGuid(string $guid)
+ * @method void setSegmentId(int $segmentid)
+ * @method void setFileId(int $fileid)
+ * @method void setFieldName(string $name)
+ * @method void setFieldType(string $type)
+ * @method void setTermFound(int $count)
+ * @method void setTermNotFound(int $count)
+ * @method void setCharCount(int $count)
  * 
- * @method integer getId() getId()
- * @method string getTaskGuid() getTaskGuid()
- * @method integer getSegmentId() getSegmentId()
- * @method integer getFileId() getFileId()
- * @method string getFieldType() getFieldType()
- * @method integer getTermFound() getTermFound()
- * @method integer getTermNotFound() getTermNotFound()
- * @method integer getCharCount() getCharCount()
+ * @method string getId()
+ * @method string getTaskGuid()
+ * @method string getSegmentId()
+ * @method string getFileId()
+ * @method string getFieldType()
+ * @method string getTermFound()
+ * @method string getTermNotFound()
+ * @method string getCharCount()
  */
 class editor_Plugins_SegmentStatistics_Models_Statistics extends ZfExtended_Models_Entity_Abstract {
     protected $dbInstanceClass = 'editor_Plugins_SegmentStatistics_Models_Db_Statistics';

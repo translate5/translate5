@@ -30,16 +30,16 @@ END LICENSE AND COPYRIGHT
  * Class editor_Models_Terms_Term_Entry
  * TermsTermEntry Instance
  *
- * @method integer getId() getId()
- * @method void setId() setId(integer $id)
- * @method integer getCollectionId() getCollectionId()
- * @method integer setCollectionId() setCollectionId(integer $collectionId)
- * @method string getTermEntryTbxId() getTermEntryTbxId()
- * @method string setTermEntryTbxId() setTermEntryTbxId(string $termEntryTbxId)
- * @method string getIsCreatedLocally() getIsCreatedLocally()
- * @method string setIsCreatedLocally() setIsCreatedLocally(string $isCreatedLocally)
- * @method string getEntryGuid() getEntryGuid()
- * @method string setEntryGuid() setEntryGuid(string $uniqueId)
+ * @method string getId()
+ * @method void setId(integer $id)
+ * @method string getCollectionId()
+ * @method void setCollectionId(integer $collectionId)
+ * @method string getTermEntryTbxId()
+ * @method void setTermEntryTbxId(string $termEntryTbxId)
+ * @method string getIsCreatedLocally()
+ * @method void setIsCreatedLocally(string $isCreatedLocally)
+ * @method string getEntryGuid()
+ * @method void setEntryGuid(string $uniqueId)
  */
 class editor_Models_Terminology_Models_TermEntryModel extends editor_Models_Terminology_Models_Abstract {
     protected $dbInstanceClass = 'editor_Models_Db_Terminology_TermEntry';

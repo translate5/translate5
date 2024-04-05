@@ -66,7 +66,7 @@ Ext.define('Editor.view.admin.task.UserAssocGrid', {
     states: {
         edit: '#UT#in Arbeit'
     },
-
+    border: 0,
     plugins: ['gridfilters'],
     initConfig: function (instanceConfig) {
         var me = this,

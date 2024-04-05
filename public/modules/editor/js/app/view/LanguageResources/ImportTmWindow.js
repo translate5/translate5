@@ -30,6 +30,10 @@ Ext.define('Editor.view.LanguageResources.ImportTmWindow', {
     extend: 'Ext.window.Window',
     alias: 'widget.importTmWindow',
     itemId: 'importTmWindow',
+    requries: [
+        'Editor.view.LanguageResources.TmWindowViewController',
+    ],
+    controller: 'tmwindowviewcontroller',
     strings: {
         file: '#UT#TMX-Datei',
         title: '#UT#TMX Datei importieren',
@@ -37,12 +41,25 @@ Ext.define('Editor.view.LanguageResources.ImportTmWindow', {
         importTmxType: '#UT#Bitte verwenden Sie eine TMX Datei!',
         importSuccess: '#UT#Weitere TM Daten erfolgreich importiert!',
         save: '#UT#Speichern',
-        cancel: '#UT#Abbrechen'
+        cancel: '#UT#Abbrechen',
+        stripFramingTags: '#UT#Umschließende Tags beim Import löschen',
+        stripFramingTagsTooltip: '#UT#Arbeitet analog zur Systemkonfiguration runtimeOptions.import.xlf.ignoreFramingTags, aber für TMX-Import. Sie entfernt alle (oder nur gepaarte) Tags vom Anfang und Ende eines importierten Segments, falls aktiviert. Die Systemkonfiguration sollte daher für denselben Kunden die gleiche Einstellung für zu importierende Aufgaben haben. Wenn Sie bestehende TMs konvertieren müssen, bitten Sie den translate5-Support um Hilfe.',
     },
     height : 300,
     width : 500,
     modal : true,
     layout:'fit',
+    viewModel: {
+        data: {
+            resourceId: null,
+            strippingFramingTagsSupported: false
+        },
+        formulas: {
+            isStrippingFramingTagsSupported: function(get) {
+                return get('strippingFramingTagsSupported');
+            }
+        }
+    },
     initConfig : function(instanceConfig) {
         var me = this,
             defaults = {
@@ -74,6 +91,28 @@ Ext.define('Editor.view.LanguageResources.ImportTmWindow', {
                         anchor: '100%',
                         vtype:'tmFileUploadSize',
                         name: 'tmUpload'
+                    },
+                    {
+                        xtype: 'combo',
+                        itemId: 'stripFramingTags',
+                        name: 'stripFramingTags',
+                        fieldLabel: me.strings.stripFramingTags,
+                        store: new Ext.data.ArrayStore({
+                            fields: ['id', 'value'],
+                        }),
+                        queryMode: 'local',
+                        displayField: 'value',
+                        valueField: 'id',
+                        value: 'none',
+                        bind: {
+                            disabled: '{!isStrippingFramingTagsSupported}',
+                            hidden: '{!isStrippingFramingTagsSupported}'
+                        },
+                        labelClsExtra: 'lableInfoIcon',
+                        autoEl: {
+                            tag: 'div',
+                            'data-qtip': me.strings.stripFramingTagsTooltip
+                        }
                     }]
                 }],
                 dockedItems : [{
@@ -108,9 +147,11 @@ Ext.define('Editor.view.LanguageResources.ImportTmWindow', {
      * loads the record into the form, does set the role checkboxes according to the roles value
      * @param record
      */
-    loadRecord: function(record) {
-        var me=this;
-        me.setTitle(me.strings.title+': '+record.get('name'));
+    loadRecord: function (record) {
+        const me = this;
+        me.setTitle(me.strings.title + ': ' + record.get('name'));
         me.languageResourceRecord = record;
+        this.getViewModel().set('resourceId', record.get('resourceId'));
+        this.getController().updateStrippingFramingTagsSupport(true);
     }
 });

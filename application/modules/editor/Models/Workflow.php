@@ -29,12 +29,12 @@ END LICENSE AND COPYRIGHT
 /**
  * Workflow Entity Objekt
  *
- * @method integer getId() getId()
- * @method void setId() setId(int $id)
- * @method string getName() getName()
- * @method void setName() setName(string $name)
- * @method string getLabel() getLabel()
- * @method void setLabel() setLabel(string $label)
+ * @method string getId()
+ * @method void setId(int $id)
+ * @method string getName()
+ * @method void setName(string $name)
+ * @method string getLabel()
+ * @method void setLabel(string $label)
  */
 class editor_Models_Workflow extends ZfExtended_Models_Entity_Abstract {
     protected $dbInstanceClass          = 'editor_Models_Db_Workflow_Workflow';

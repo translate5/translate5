@@ -35,14 +35,16 @@ END LICENSE AND COPYRIGHT
 /**
  * Just an empty class since default XLF export can be used for Zend XLF
  */
-class editor_Models_Export_FileParser_XlfZend extends editor_Models_Export_FileParser_Xlf {
+class editor_Models_Export_FileParser_XlfZend extends editor_Models_Export_FileParser_Xlf
+{
 
     /**
      * restores the original HTML tags from the ph and bpt ept tags
      * {@inheritDoc}
      * @see editor_Models_Export_FileParser_Xlf::getSegmentContent()
      */
-    protected function getSegmentContent($segmentId, $field) {
+    protected function getSegmentContent(int|string $segmentId, string $field): string
+    {
         $content = parent::getSegmentContent($segmentId, $field);
         $parser = ZfExtended_Factory::get('editor_Models_Import_FileParser_XmlParser');
         /* @var $parser editor_Models_Import_FileParser_XmlParser */

@@ -30,10 +30,11 @@ namespace MittagQI\Translate5\Plugins\SpellCheck\LanguageTool;
 
 use MittagQI\Translate5\Plugins\SpellCheck\Exception\DownException;
 use MittagQI\Translate5\Plugins\SpellCheck\Exception\TimeOutException;
-use MittagQI\Translate5\PooledService\ServiceAbstract;
+use MittagQI\Translate5\PooledService\AbstractPooledService;
 use Throwable;
+use ZfExtended_Exception;
 
-final class Service extends ServiceAbstract
+final class Service extends AbstractPooledService
 {
 
     /**
@@ -83,10 +84,11 @@ final class Service extends ServiceAbstract
 
     /**
      * Creates an LanguageTool Adapter, either for the passed URL or for a random URL out of the passed pool
-     * The adapters will be cached throughout an request
+     * The adapters will be cached throughout a request
      * @param string|null $serviceUrl
      * @param string $servicePool
      * @return Adapter
+     * @throws ZfExtended_Exception
      */
     public function getAdapter(string $serviceUrl = null, string $servicePool = 'gui'): Adapter
     {
@@ -94,10 +96,10 @@ final class Service extends ServiceAbstract
         if(empty($url)){
             throw new DownException('E1466');
         }
-        if(!array_key_exists($url, static::$adapters)){
-            static::$adapters[$url] = new Adapter($url);
+        if(!array_key_exists($url, self::$adapters)){
+            self::$adapters[$url] = new Adapter($url);
         }
-        return static::$adapters[$url];
+        return self::$adapters[$url];
     }
 
     /**
@@ -106,10 +108,7 @@ final class Service extends ServiceAbstract
      *     success: bool,
      *     version: string|null
      * }
-     */
-    /**
-     * @param string $url
-     * @return array
+     * @throws ZfExtended_Exception
      */
     protected function checkServiceUrl(string $url): array
     {
@@ -118,7 +117,7 @@ final class Service extends ServiceAbstract
         // Try to check a simple phrase
         try {
             $response = $adapter->getMatches('a simple test', 'en-US');
-        } catch (TimeOutException $e) {
+        } catch (TimeOutException) {
             $result['success'] = true; // can not respond due it is processing data
             return $result;
         } catch (Throwable) {

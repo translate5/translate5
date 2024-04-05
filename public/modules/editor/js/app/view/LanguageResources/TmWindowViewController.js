@@ -60,27 +60,26 @@ Ext.define('Editor.view.LanguageResources.TmWindowViewController', {
      * Resource combo handler.
      * Info: the resource value can be also null!!
      */
-    onResourceChange: function(field,resource){
-        var me = this,
+    onResourceChange: function (field, resource) {
+        let me = this,
             view = me.getView(),
             serviceName = field.getSelection() && field.getSelection().get('serviceName'),
             resourceType = field.getSelection() && field.getSelection().get('resourceType'),
             engineBased = field.getSelection() && field.getSelection().get('engineBased'),
             helppage = field.getSelection() && field.getSelection().get('helppage'),
-            vm = view.getViewModel(),
+            viewModel = view.getViewModel(),
             engineCombo = view.down('#engine');
 
         if (!me.isValidService(serviceName, helppage)) {
             return false;
         }
-        
-        vm.set('serviceName', serviceName);
-        vm.set('resourceType', resourceType);
-        vm.set('engineBased', engineBased);
 
+        viewModel.set('serviceName', serviceName);
+        viewModel.set('resourceType', resourceType);
+        viewModel.set('resourceId', resource);
+        viewModel.set('engineBased', engineBased);
         // upload field has different tooltip and label based on the selected resource
         me.updateUploadFieldConfig();
-
         let record = Ext.StoreManager.get('Editor.store.LanguageResources.Resources').getById(resource),
             sourceField = view.down('combo[name="sourceLang"]'),
             targetField = view.down('combo[name="targetLang"]');
@@ -93,18 +92,19 @@ Ext.define('Editor.view.LanguageResources.TmWindowViewController', {
         targetField.clearValue(null);
         targetField.resumeEvents();
 
-        if (record && me.isEngineBasedResource(record)) {
+        this.updateStrippingFramingTagsSupport();
 
+        if (record && me.isEngineBasedResource(record)) {
             engineCombo.suspendEvents();
             engineCombo.clearValue(null);
             engineCombo.getStore().clearFilter();
             engineCombo.getStore().setProxy({
                 type: 'ajax',
                 url: Editor.data.restpath + 'languageresourceresource/' + record.get('serviceName') + '/engines',
-                reader : {
+                reader: {
                     rootProperty: 'rows',
-                    type : 'json'
-                }
+                    type: 'json'
+                },
             });
             engineCombo.getStore().load();
             engineCombo.resumeEvents();
@@ -113,11 +113,15 @@ Ext.define('Editor.view.LanguageResources.TmWindowViewController', {
         // set the source and target languages for the selected resource
         let sourceData = record ? record.get('sourceLanguages') : [],
             targetData = record ? record.get('targetLanguages') : [];
-            
+
         sourceField.getStore().loadRawData(sourceData);
         targetField.getStore().loadRawData(targetData);
     },
-    
+
+    onSelectFile: function (field, value) {
+        this.updateStrippingFramingTagsSupport();
+    },
+
     /**
      * Check if the selected service is valid to be used. If not, the user gets a message shown.
      * @returns boolean
@@ -334,5 +338,46 @@ Ext.define('Editor.view.LanguageResources.TmWindowViewController', {
         if (!record.data.creatable) {
             return false;
         }
+    },
+
+    updateStrippingFramingTagsSupport: function (skipExtensionCheck = false) {
+        const viewModel = this.getView().getViewModel(),
+            resourceType = Ext.StoreManager.get('Editor.store.LanguageResources.Resources').getById(viewModel.get('resourceId')),
+            uploadFileValue = this.getView().down('filefield[name="tmUpload"]').value,
+            stripFramingTagsField = this.getView().down('combo[name="stripFramingTags"]');
+
+        stripFramingTagsField.suspendEvents();
+        stripFramingTagsField.clearValue(null);
+        stripFramingTagsField.resumeEvents();
+
+        const stripFramingTagsConfig = resourceType ? resourceType.get('stripFramingTagsConfig') : [];
+
+        if (!Object.keys(stripFramingTagsConfig).length) {
+            viewModel.set('strippingFramingTagsSupported', false);
+
+            return;
+        }
+
+        const values = stripFramingTagsConfig['values'] ?? [];
+        stripFramingTagsField.getStore().loadRawData(values);
+
+        if (values.length > 0) {
+            stripFramingTagsField.setValue(values[0]);
+        }
+
+        const supportedByResource = resourceType.get('supportsStrippingFramingTags');
+
+        let supportedByExtension = skipExtensionCheck;
+        for (const extension of stripFramingTagsConfig['fileExtensions'] ?? []) {
+            if (uploadFileValue.endsWith(extension)) {
+                supportedByExtension = true;
+                break;
+            }
+        }
+
+        viewModel.set(
+            'strippingFramingTagsSupported',
+            supportedByResource && supportedByExtension
+        );
     },
 });

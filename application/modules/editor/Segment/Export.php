@@ -26,13 +26,15 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use editor_Segment_Quality_Manager as QualityManager;
+
 /**
  * Processes a single segment field for export
  * Removes all internal tags albeit those needed for further processing (internal & mqm tags)
  * Repairs Segments with tag-faults that have been detected by the AutoQA
  */
-class editor_Segment_Export {
-    
+class editor_Segment_Export
+{
     /**
      * Processes a segment for export (fix internal tag faults, remove internal tags)
      * @param editor_Segment_FieldTags $fieldTags
@@ -76,15 +78,18 @@ class editor_Segment_Export {
      * Processes the export
      * @return string
      */
-    public function process() : string {
+    public function process(bool $preserveTrackChanges = false) : string
+    {
         // this removes all segment tags not needed for export
-        $this->fieldTags = ($this->fieldTags->hasTrackChanges()) ?
-            $this->fieldTags->cloneWithoutTrackChanges(editor_Segment_Quality_Manager::instance()->getAllExportedTypes()) : 
-            $this->fieldTags->cloneFiltered(editor_Segment_Quality_Manager::instance()->getAllExportedTypes());
-        if($this->isFaultyInTask && $this->fixFaulty){
-            $repair = new editor_Segment_Internal_TagRepair($this->fieldTags, NULL);
+        $this->fieldTags = !$preserveTrackChanges && $this->fieldTags->hasTrackChanges()
+            ? $this->fieldTags->cloneWithoutTrackChanges(QualityManager::instance()->getAllExportedTypes())
+            : $this->fieldTags->cloneFiltered(QualityManager::instance()->getAllExportedTypes());
+
+        if ($this->isFaultyInTask && $this->fixFaulty){
+            $repair = new editor_Segment_Internal_TagRepair($this->fieldTags, null);
             $this->tagErrorsFixed = $repair->hadErrors();
         }
+
         return $this->fieldTags->render();
     }
 

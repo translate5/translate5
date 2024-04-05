@@ -40,7 +40,8 @@ class Translate682Test extends editor_Test_ImportTest {
     protected static bool $termtaggerRequired = true;
 
     protected static array $forbiddenPlugins = [
-        'editor_Plugins_ManualStatusCheck_Bootstrap'
+        editor_Plugins_ManualStatusCheck_Bootstrap::class,
+        editor_Plugins_TrackChanges_Init::class,
     ];
 
     protected static $expectedCsvResult;

@@ -28,16 +28,16 @@ END LICENSE AND COPYRIGHT
 
 /**
  * User meta Entity Object
- * @method integer getId() getId()
- * @method void setId() setId(int $id)
- * @method integer getUserId() getUserId()
- * @method void setUserId() setUserId(int $userId)
- * @method integer getSourceLangDefault() getSourceLangDefault()
- * @method void setSourceLangDefault() setSourceLangDefault(int $sourceLangDefault)
- * @method integer getTargetLangDefault() getTargetLangDefault()
- * @method void setTargetLangDefault() setTargetLangDefault(int $targetLangDefault)
- * @method string getLastUsedApp() getLastUsedApp()
- * @method void setLastUsedApp() setLastUsedApp(string $lastUsedApp)
+ * @method string getId()
+ * @method void setId(int $id)
+ * @method string getUserId()
+ * @method void setUserId(int $userId)
+ * @method string getSourceLangDefault()
+ * @method void setSourceLangDefault(int $sourceLangDefault)
+ * @method string getTargetLangDefault()
+ * @method void setTargetLangDefault(int $targetLangDefault)
+ * @method string getLastUsedApp()
+ * @method void setLastUsedApp(string $lastUsedApp)
  * @method string getSourceIsAutoDetected()
  * @method void setSourceIsAutoDetected(bool $sourceIsAutoDetected)
  */
