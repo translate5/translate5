@@ -160,7 +160,7 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
     /**
      * @var array<string, array{author: string, date: DateTime, workflowStep: string}>
      */
-    private array $revIdToUserDataMap;
+    private array $revIdToUserDataMap = [];
 
     private bool $isTrackChangesPluginActive;
 
