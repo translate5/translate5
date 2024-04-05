@@ -249,7 +249,8 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
         foreach ($this->getImportFilesFromUpload($fileinfo) as $file) {
             $result = $result && $this->importTmxIntoMemory(
                 file_get_contents($file),
-                $params['tmName'] ?? $this->getWritableMemory()
+                $params['tmName'] ?? $this->getWritableMemory(),
+                $this->getStripFramingTagsValue($params)
             );
         }
 
@@ -1432,12 +1433,12 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
     private function importTmxIntoMemory(
         string $fileContent,
         string $tmName,
-        StripFramingTags $stripFramingTags
+        ?StripFramingTags $stripFramingTags
     ): bool {
         $successful = false;
 
         try {
-            $successful = $this->api->importMemory($fileContent, $tmName, $stripFramingTags);
+            $successful = $this->api->importMemory($fileContent, $tmName, $stripFramingTags ?: StripFramingTags::None);
 
             if (!$successful) {
                 $this->logger->error('E1303', 'OpenTM2: could not add TMX data to TM', [
