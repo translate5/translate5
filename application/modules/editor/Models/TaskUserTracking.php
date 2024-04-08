@@ -43,22 +43,22 @@ END LICENSE AND COPYRIGHT
  * - if a task has been imported and opened before TaskUserTracking has been implemented
  * - if a user is assigned to a task, but has never opened the task so far
  *
- * @method integer getId() getId()
- * @method void setId() setId(int $id)
- * @method string getTaskGuid() getTaskGuid()
- * @method void setTaskGuid() setTaskGuid(string $guid)
- * @method string getUserGuid() getUserGuid()
- * @method void setUserGuid() setUserGuid(string $guid)
- * @method integer getTaskOpenerNumber() getTaskOpenerNumber()
- * @method void setTaskOpenerNumber() setTaskOpenerNumber(int $id)
- * @method string getFirstName() getFirstName()
- * @method void setFirstName() setFirstName(string $guid)
- * @method string getSurName() getSurName()
- * @method void setSurName() setSurName(string $guid)
- * @method string getUserName() getUserName()
- * @method void setUserName() setUserName(string $guid)
- * @method string getRole() getRole()
- * @method void setRole() setRole(string $guid)
+ * @method string getId()
+ * @method void setId(int $id)
+ * @method string getTaskGuid()
+ * @method void setTaskGuid(string $guid)
+ * @method string getUserGuid()
+ * @method void setUserGuid(string $guid)
+ * @method string getTaskOpenerNumber()
+ * @method void setTaskOpenerNumber(int $id)
+ * @method string getFirstName()
+ * @method void setFirstName(string $guid)
+ * @method string getSurName()
+ * @method void setSurName(string $guid)
+ * @method string getUserName()
+ * @method void setUserName(string $guid)
+ * @method string getRole()
+ * @method void setRole(string $guid)
  *
  */
 class editor_Models_TaskUserTracking extends ZfExtended_Models_Entity_Abstract {
@@ -159,36 +159,51 @@ class editor_Models_TaskUserTracking extends ZfExtended_Models_Entity_Abstract {
      * insert or update TaskUserTracking entry.
      * If users have already opened the task before, we only keep their data updated.
      * If it's a user who hasn't opened the task before, the user will get the next taskOpenerNumber for this task.
-     * @param string $taskGuid
-     * @param string $userGuid
-     * @param string $role
+     *
+     * @return array{id: string, taskOpenerNumber: string}
      */
-    public function insertTaskUserTrackingEntry($taskGuid, $userGuid, $role) {
+    public function insertTaskUserTrackingEntry(string $taskGuid, ?string $userGuid, string $role): array
+    {
         $user = ZfExtended_Factory::get('ZfExtended_Models_User');
         /* @var $user ZfExtended_Models_User */
         $user->loadByGuid($userGuid);
-        $firstName = $user->getFirstName();
-        $surName = $user->getSurName();
-        $userName = $user->getUserName();
+
+        return $this->createTaskUserTrackingEntry(editor_Models_TaskUserTrackingDto::fromUser($taskGuid, $user, $role));
+    }
+
+    public function createTaskUserTrackingEntry(editor_Models_TaskUserTrackingDto $dto): array
+    {
         // TODO: is this SQL-statement safe regarding  race conditions? (see https://stackoverflow.com/a/5360154)
-        $sql= 'INSERT INTO LEK_taskUserTracking (`taskGuid`, `userGuid`, `taskOpenerNumber`, `firstName`, `surName`, `userName`, `role`)
+        $sql = 'INSERT INTO LEK_taskUserTracking (`taskGuid`, `userGuid`, `taskOpenerNumber`, `firstName`, `surName`, `userName`, `role`)
                VALUES (?, ?,
                        (SELECT coalesce(MAX(`taskOpenerNumber`), 0) FROM LEK_taskUserTracking t2 WHERE t2.taskGuid = ?) + 1,
                        ?, ?, ?, ?)
-               ON DUPLICATE KEY UPDATE `firstName` = ?,`surName` = ?,`userName` = ?,`role` = ?';
-        $bindings = array(
-            $taskGuid, $userGuid, $taskGuid, $firstName, $surName, $userName, $role,
-            $firstName, $surName, $userName, $role
-        );
+               ON DUPLICATE KEY UPDATE `firstName` = ?,`surName` = ?,`userName` = ?,`role` = ?
+               RETURNING `id`,`taskOpenerNumber`';
+        $bindings = [
+            $dto->taskGuid,
+            $dto->userGuid,
+            $dto->taskGuid,
+            $dto->firstName,
+            $dto->surName,
+            $dto->userName,
+            $dto->role,
+            $dto->firstName,
+            $dto->surName,
+            $dto->userName,
+            $dto->role,
+        ];
         $stmt = $this->db->getAdapter()->query($sql, $bindings);
 
-        if($stmt->rowCount() > 0) {
+        if ($stmt->rowCount() > 0) {
             //we trigger the event only, if really something was changed.
             $this->events->trigger('afterUserTrackingInsert', $this, [
-                'taskGuid' => $taskGuid,
-                'userGuid' => $userGuid,
-                'role' => $role
+                'taskGuid' => $dto->taskGuid,
+                'userGuid' => $dto->userGuid,
+                'role' => $dto->role
             ]);
         }
+
+        return $stmt->fetch();
     }
 }

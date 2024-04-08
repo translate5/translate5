@@ -963,20 +963,6 @@ final class Helper extends ZfExtended_Test_ApiHelper
         return json_decode(json_encode($foundConfigs), true);
     }
 
-    private function isConfigValueEmpty(mixed $value): bool
-    {
-        if(is_array($value) && empty($value)){
-            return true;
-        }
-        if(is_string($value) && strlen($value) < 1){
-            return true;
-        }
-        if((is_int($value) || is_float($value)) && $value == 0){
-            return true;
-        }
-        return false;
-    }
-
     /**
      * Get configs like the frontend normally does
      * Get instance level config fro given config name. This function will not perform any asserts

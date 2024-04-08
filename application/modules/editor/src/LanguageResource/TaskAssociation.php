@@ -38,16 +38,16 @@ use ZfExtended_Factory;
 /**
  * LanguageResource TaskAssoc Entity Object
  *
- * @method integer getId() getId()
- * @method void setId() setId(int $id)
- * @method integer getLanguageResourceId() getLanguageResourceId()
- * @method void setLanguageResourceId() setLanguageResourceId(int $languageResourceid)
- * @method string getTaskGuid() getTaskGuid()
- * @method void setTaskGuid() setTaskGuid(string $taskGuid)
- * @method boolean getSegmentsUpdateable() getSegmentsUpdateable()
- * @method void setSegmentsUpdateable() setSegmentsUpdateable(bool $updateable)
- * @method integer getAutoCreatedOnImport() getAutoCreatedOnImport()
- * @method void setAutoCreatedOnImport() setAutoCreatedOnImport(int $autoCreatedOnImport)
+ * @method string getId()
+ * @method void setId(int $id)
+ * @method string getLanguageResourceId()
+ * @method void setLanguageResourceId(int $languageResourceid)
+ * @method string getTaskGuid()
+ * @method void setTaskGuid(string $taskGuid)
+ * @method string getSegmentsUpdateable()
+ * @method void setSegmentsUpdateable(bool $updateable)
+ * @method string getAutoCreatedOnImport()
+ * @method void setAutoCreatedOnImport(int $autoCreatedOnImport)
  */
 class TaskAssociation extends AssociationAbstract {
 

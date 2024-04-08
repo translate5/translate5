@@ -5498,6 +5498,22 @@ The following task was imported with errors / warnings / notices. Please take ca
                 <source>zur Aufgabe springen</source>
                 <target>jump to task</target>
             </trans-unit>
+            <trans-unit id='WmVpdG9wdGlvbg=='>
+                <source>Zeitoption</source>
+                <target>Time option</target>
+            </trans-unit>
+            <trans-unit id='QWt0dWVsbGVyIFplaXRwdW5rdA=='>
+                <source>Aktueller Zeitpunkt</source>
+                <target>Current timestamp</target>
+            </trans-unit>
+            <trans-unit id='WmVpdHB1bmt0IGRlciBTZWdtZW50c3BlaWNoZXJ1bmc='>
+                <source>Zeitpunkt der Segmentspeicherung</source>
+                <target>Time of segment saving</target>
+            </trans-unit>
+            <trans-unit id='QWxzIERhdHVtIHVuZCBVaHJ6ZWl0IGRlcyBlcnpldWd0ZW4gVE0tRWludHJhZ3Mgd2lyZCBiZWkgIlplaXRwdW5rdCBkZXIgU2VnbWVudHNwZWljaGVydW5nIiBkYXMgRGF0dW0gdmVyd2VuZGV0LCBhbiBkZW0gZXIgbGV0enRlIEJlbnV0emVyIGRhcyBTZWdtZW50IGluIGRlciBBdWZnYWJlIGdlc3BlaWNoZXJ0IGhhdC4gQW5kZXJuZmFsbHMgd2lyZCBkZXIgWmVpdHB1bmt0IHZlcndlbmRldCwgYW4gZGVtIGRpZSBBdWZnYWJlIG5ldSBpbnMgVE0gZHVyY2hnZXNwZWljaGVydCB3aXJk'>
+                <source>Als Datum und Uhrzeit des erzeugten TM-Eintrags wird bei "Zeitpunkt der Segmentspeicherung" das Datum verwendet, an dem er letzte Benutzer das Segment in der Aufgabe gespeichert hat. Andernfalls wird der Zeitpunkt verwendet, an dem die Aufgabe neu ins TM durchgespeichert wird</source>
+                <target> The date and time of the TM entry created is the timestamp on which the last user saved the segment in the task. Otherwise, the timestamp on which the task is saved to TM is used.</target>
+            </trans-unit>
             <trans-unit id='QXVmZ2FiZW5tZW7DvCBhbnplaWdlbg=='>
                 <source>Aufgabenmenü anzeigen</source>
                 <target>Show task menu</target>
@@ -7221,6 +7237,26 @@ The following task was imported with errors / warnings / notices. Please take ca
             <trans-unit id='U3RhbmRhcmRtw6TDn2lnIGFscyBQaXZvdCB2ZXJ3ZW5kZW4='>
                 <source>Standardmäßig als Pivot verwenden</source>
                 <target>Use as pivot by default</target>
+            </trans-unit>
+            <trans-unit id='VW1zY2hsaWXDn2VuZGUgVGFncyBiZWltIEltcG9ydCBsw7ZzY2hlbg=='>
+                <source>Umschließende Tags beim Import löschen</source>
+                <target>Strip framing tags at import</target>
+            </trans-unit>
+            <trans-unit id='QXJiZWl0ZXQgYW5hbG9nIHp1ciBTeXN0ZW1rb25maWd1cmF0aW9uIHJ1bnRpbWVPcHRpb25zLmltcG9ydC54bGYuaWdub3JlRnJhbWluZ1RhZ3MsIGFiZXIgZsO8ciBUTVgtSW1wb3J0LiBTaWUgZW50ZmVybnQgYWxsZSAob2RlciBudXIgZ2VwYWFydGUpIFRhZ3Mgdm9tIEFuZmFuZyB1bmQgRW5kZSBlaW5lcyBpbXBvcnRpZXJ0ZW4gU2VnbWVudHMsIGZhbGxzIGFrdGl2aWVydC4gRGllIFN5c3RlbWtvbmZpZ3VyYXRpb24gc29sbHRlIGRhaGVyIGbDvHIgZGVuc2VsYmVuIEt1bmRlbiBkaWUgZ2xlaWNoZSBFaW5zdGVsbHVuZyBmw7xyIHp1IGltcG9ydGllcmVuZGUgQXVmZ2FiZW4gaGFiZW4uIFdlbm4gU2llIGJlc3RlaGVuZGUgVE1zIGtvbnZlcnRpZXJlbiBtw7xzc2VuLCBiaXR0ZW4gU2llIGRlbiB0cmFuc2xhdGU1LVN1cHBvcnQgdW0gSGlsZmUu'>
+                <source>Arbeitet analog zur Systemkonfiguration runtimeOptions.import.xlf.ignoreFramingTags, aber für TMX-Import. Sie entfernt alle (oder nur gepaarte) Tags vom Anfang und Ende eines importierten Segments, falls aktiviert. Die Systemkonfiguration sollte daher für denselben Kunden die gleiche Einstellung für zu importierende Aufgaben haben. Wenn Sie bestehende TMs konvertieren müssen, bitten Sie den translate5-Support um Hilfe.</source>
+                <target>Works analogous to system config runtimeOptions.import.xlf.ignoreFramingTags, but for TMX import. It strips all (or only paired) tags from the start and end of an imported segment, if activated. The system config should therefore have the same setting for the same client for to be imported tasks. If you need to convert existing TMs, please ask the translate5 support for help.</target>
+            </trans-unit>
+            <trans-unit id='RW50ZmVybnQga2VpbmU='>
+                <source>Entfernt keine</source>
+                <target>None</target>
+            </trans-unit>
+            <trans-unit id='QWxsZQ=='>
+                <source>Alle</source>
+                <target>All</target>
+            </trans-unit>
+            <trans-unit id='VGFncGFhcmU='>
+                <source>Tagpaare</source>
+                <target>Paired</target>
             </trans-unit>
             <trans-unit id='Vm9yw7xiZXJzZXR6dW5n'>
                 <source>Vorübersetzung</source>

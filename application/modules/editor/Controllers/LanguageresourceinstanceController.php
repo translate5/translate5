@@ -381,7 +381,10 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         $eventLoggerGroupped=$eventLogger->getLatesEventsCount([$this->entity->getId()]);
         $this->view->rows->eventsCount = isset($eventLoggerGroupped[$this->entity->getId()]) ? (integer)$eventLoggerGroupped[$this->entity->getId()] : 0;
 
-        $connector = $serviceManager->getConnector($this->entity);
+        $connector = $serviceManager->getConnector(
+            $this->entity,
+            config: $this->getSingleCustomerOrDefaultConfig()
+        );
         $this->view->rows->status = $connector->getStatus($this->entity->getResource(), $this->entity);
         $this->view->rows->statusInfo = $t->_($connector->getLastStatusInfo());
 
@@ -393,6 +396,22 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         $this->view->rows->targetLang = $this->getLanguage($languages, 'targetLang', $this->entity->getId());
 
         $this->prepareSpecificData($this->view->rows, false);
+    }
+
+    private function getSingleCustomerOrDefaultConfig(): Zend_Config
+    {
+        $auth = ZfExtended_Authentication::getInstance();
+        $customerIds = $auth->getUser()->getCustomersArray();
+
+        // We use the customer config if only one customer is set for the user
+        if (1 === count($customerIds)) {
+            $customer = ZfExtended_Factory::get(editor_Models_Customer_Customer::class);
+            $customer->load($customerIds[0]);
+
+            return $customer->getConfig();
+        }
+
+        return Zend_Registry::get('config');
     }
 
     /**
@@ -685,7 +704,10 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         }
 
         /* @var $connector editor_Services_Connector */
-        $connector = $serviceManager->getConnector($this->entity);
+        $connector = $serviceManager->getConnector(
+            $this->entity,
+            config: $this->getSingleCustomerOrDefaultConfig()
+        );
 
         $validExportTypes = $connector->getValidExportTypes();
 
@@ -889,7 +911,7 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
     protected function decodePutData()
     {
         parent::decodePutData();
-        unset($this->data->langResUuid);
+        unset($this->data->langResUuid, $this->data->specificId);
     }
     
     /**
@@ -1073,7 +1095,8 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
                         $taskGuid,
                         [
                             'languageResourceId' => $this->entity->getId(),
-                            ReimportSegments::FILTER_ONLY_EDITED => $this->data->onlyEdited
+                            ReimportSegments::FILTER_ONLY_EDITED => $this->data->onlyEdited,
+                            ReimportSegments::USE_SEGMENT_TIMESTAMP => $this->data->timeOption === 'segment'
                         ]
                     );
 
@@ -1139,7 +1162,10 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
      * @param editor_Services_Manager $manager
      */
     protected function handleInitialFileUpload(editor_Services_Manager $manager) {
-        $connector = $manager->getConnector($this->entity);
+        $connector = $manager->getConnector(
+            $this->entity,
+            config: $this->getSingleCustomerOrDefaultConfig()
+        );
         /* @var $connector editor_Services_Connector */
 
         $importInfo = $this->handleFileUpload($connector);
@@ -1166,7 +1192,10 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
      * @param editor_Services_Manager $manager
      */
     protected function handleAdditionalFileUpload(editor_Services_Manager $manager) {
-        $connector = $manager->getConnector($this->entity);
+        $connector = $manager->getConnector(
+            $this->entity,
+            config: $this->getSingleCustomerOrDefaultConfig()
+        );
         /* @var $connector editor_Services_Connector */
         $importInfo = $this->handleFileUpload($connector);
 

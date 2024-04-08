@@ -33,18 +33,18 @@ END LICENSE AND COPYRIGHT
  *
  */
 /**
- * @method integer getId() getId()
- * @method void setId() setId(int $id)
- * @method integer getFileId() getFileId()
- * @method void setFileId() setFileId(int $fileId)
- * @method string getType() getType()
- * @method void setType() setType(string $type)
- * @method string getFilter() getFilter()
- * @method void setFilter() setFilter(string $filterClass)
- * @method string getParameters() getParameters()
- * @method void setParameters() setParameters(string $parameters)
- * @method string getTaskGuid() getTaskGuid()
- * @method void setTaskGuid() setTaskGuid(string $taskGuid)
+ * @method string getId()
+ * @method void setId(int $id)
+ * @method string getFileId()
+ * @method void setFileId(int $fileId)
+ * @method string getType()
+ * @method void setType(string $type)
+ * @method string getFilter()
+ * @method void setFilter(string $filterClass)
+ * @method string getParameters()
+ * @method void setParameters(string $parameters)
+ * @method string getTaskGuid()
+ * @method void setTaskGuid(string $taskGuid)
  */
 class editor_Models_File_Filter extends ZfExtended_Models_Entity_Abstract {
     protected $dbInstanceClass = 'editor_Models_Db_File_Filter';

@@ -29,22 +29,22 @@ END LICENSE AND COPYRIGHT
 /**
  * Workflow_Action Entity Objekt
  * 
- * @method integer getId() getId()
- * @method void setId() setId(int $id)
- * @method string getWorkflow() getWorkflow()
- * @method void setWorkflow() setWorkflow(string $workflowId)
- * @method string getTrigger() getTrigger()
- * @method void setTrigger() setTrigger(string $trigger)
- * @method string getByRole() getByRole()
- * @method void setByRole() setByRole(string $role)
- * @method string getUserState() getUserState()
- * @method void setUserState() setUserState(string $state)
- * @method string getActionClass() getActionClass()
- * @method void setActionClass() setActionClass(string $class)
- * @method string getAction() getAction()
- * @method void setAction() setAction(string $action)
- * @method string getDescription() getDescription()
- * @method void setDescription() setDescription(string $description)
+ * @method string getId()
+ * @method void setId(int $id)
+ * @method string getWorkflow()
+ * @method void setWorkflow(string $workflowId)
+ * @method string getTrigger()
+ * @method void setTrigger(string $trigger)
+ * @method string getByRole()
+ * @method void setByRole(string $role)
+ * @method string getUserState()
+ * @method void setUserState(string $state)
+ * @method string getActionClass()
+ * @method void setActionClass(string $class)
+ * @method string getAction()
+ * @method void setAction(string $action)
+ * @method string getDescription()
+ * @method void setDescription(string $description)
  */
 class editor_Models_Workflow_Action extends ZfExtended_Models_Entity_Abstract {
     protected $dbInstanceClass          = 'editor_Models_Db_Workflow_Action';

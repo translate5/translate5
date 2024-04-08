@@ -29,7 +29,6 @@ END LICENSE AND COPYRIGHT
 namespace MittagQI\Translate5\PooledService;
 
 use editor_Models_Task_AbstractWorker;
-use MittagQI\Translate5\Service\AbstractHttpService;
 use Zend_Exception;
 use Zend_Registry;
 use ZfExtended_Debug;
@@ -40,7 +39,7 @@ use ZfExtended_Factory;
  * Extends the import worker to work with pooled services tailored for processing segments
  * The Worker will be instantiated as many times as the service has max parallel configured or a single service-url has IPs or as many url's are configured for the pool
  * Then each of these workers will process the segments in a loop until no unprocessed segments are available anymore
- * The worker can operate with non-pooled services or pooled workers, that are configured as non-pooled (see MittagQI\Translate5\PooledService\ServiceAbstract::isPooled) as well
+ * The worker normally operates with pooled services or services, that are setup as such (see MittagQI\Translate5\PooledService\AbstractPooledService::isPooled)
  * Then the amount of workers to queue is evaluated on the fly by getting the IP-Adresses the configured host has
  * the URL of the service is not the slot anymore but a seperate worker-param "serviceUrl"
  */
@@ -94,9 +93,9 @@ abstract class Worker extends editor_Models_Task_AbstractWorker
     protected array $calculatedSlot;
 
     /**
-     * @var ServiceAbstract|AbstractHttpService
+     * @var PooledServiceInterface
      */
-    protected ServiceAbstract|AbstractHttpService $service;
+    protected PooledServiceInterface $service;
 
     /**
      * @var bool
@@ -116,9 +115,9 @@ abstract class Worker extends editor_Models_Task_AbstractWorker
     /**
      * Must be implemented to create the service
      * This function is also used in a static context and must not use internal dependencis
-     * @return ServiceAbstract|AbstractHttpService
+     * @return PooledServiceInterface
      */
-    abstract protected function createService(): ServiceAbstract|AbstractHttpService;
+    abstract protected function createService(): PooledServiceInterface;
 
     /**
      * Must be implemented to create the no services available exception
@@ -204,10 +203,7 @@ abstract class Worker extends editor_Models_Task_AbstractWorker
                 // SPECIAL: Pooled service with pools having only one URL
                 // are expected to inbuilt load-balancing / horizontal scaling behind that URL
                 // we set maxParallel to the number of IPs, this will result in an equal amount of different slots
-                if($this->maxParallel === 1
-                    && method_exists($this->service, 'hasLoadBalancingBehindSingularPool')
-                    && $this->service->hasLoadBalancingBehindSingularPool($this->resourcePool)){
-
+                if($this->maxParallel === 1 && $this->service->hasLoadBalancingBehindSingularPool($this->resourcePool)){
                     $this->maxParallel = $this->service->getNumIpsForUrl($serviceUrls[0]);
                     $isLoadBalanced = ($this->maxParallel > 1);
                 }
@@ -269,7 +265,7 @@ abstract class Worker extends editor_Models_Task_AbstractWorker
      * @param array $parameters
      * @return bool
      */
-    protected function validateParameters($parameters = [])
+    protected function validateParameters($parameters = []): bool
     {
         if ($this->isPooled && array_key_exists('resourcePool', $parameters) && $this->service->isValidPool($parameters['resourcePool'])) {
             $this->resourcePool = $parameters['resourcePool'];

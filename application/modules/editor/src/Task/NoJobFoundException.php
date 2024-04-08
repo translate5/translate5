@@ -37,6 +37,6 @@ class NoJobFoundException extends \ZfExtended_ErrorCodeException {
     protected $httpReturnCode = 423;
 
     protected static $localErrorCodes = [
-        'E6666' => 'No job available for the current user.'
+        'E1600' => 'No job available for the current user.'
     ];
 }

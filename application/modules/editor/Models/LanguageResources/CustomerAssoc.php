@@ -27,23 +27,23 @@ END LICENSE AND COPYRIGHT
 */
 
 /**
- * @method integer getId() getId()
- * @method void setId() setId(int $id)
+ * @method string getId()
+ * @method void setId(int $id)
  *
- * @method integer getLanguageResourceId getLanguageResourceId()
- * @method void setLanguageResourceId() setLanguageResourceId(int $languageResourceId)
+ * @method string getLanguageResourceId()
+ * @method void setLanguageResourceId(int $languageResourceId)
  *
- * @method integer getCustomerId() getCustomerId()
- * @method void setCustomerId() setCustomerId(int $customerId)
+ * @method string getCustomerId()
+ * @method void setCustomerId(int $customerId)
  *
- * @method integer getUseAsDefault() getUseAsDefault()
- * @method void setUseAsDefault() setUseAsDefault(int $useAsDefault)
+ * @method string getUseAsDefault()
+ * @method void setUseAsDefault(int $useAsDefault)
  * 
- * @method integer getWriteAsDefault() getWriteAsDefault()
- * @method void setWriteAsDefault() setWriteAsDefault(int $writeAsDefault)
+ * @method string getWriteAsDefault()
+ * @method void setWriteAsDefault(int $writeAsDefault)
  *
- * @method integer getPivotAsDefault() getPivotAsDefault()
- * @method void setPivotAsDefault() setPivotAsDefault(int $pivotAsDefault)
+ * @method string getPivotAsDefault()
+ * @method void setPivotAsDefault(int $pivotAsDefault)
  * 
  */
 class editor_Models_LanguageResources_CustomerAssoc extends ZfExtended_Models_Entity_Abstract {

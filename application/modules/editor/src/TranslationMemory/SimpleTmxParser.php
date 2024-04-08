@@ -163,7 +163,7 @@ final class SimpleTmxParser extends editor_Models_Import_FileParser_XmlParser {
         // parse the XML
         $this->parse($xmlString);
 
-        return ($this->numSegments > 0);
+        return $this->countSegments() > 0;
     }
 
     /**

@@ -37,13 +37,10 @@ END LICENSE AND COPYRIGHT
  *
  * Parsed mit editor_Models_Import_FileParser_Transit geparste Dateien für den Export
  */
-class editor_Models_Export_FileParser_Transit extends editor_Models_Export_FileParser {
+class editor_Models_Export_FileParser_Transit extends editor_Models_Export_FileParser
+{
     use editor_Plugins_Transit_TraitParse;
     
-    /**
-     * @var string Klassenname des Difftaggers
-     */
-    protected $_classNameDifftagger = 'editor_Models_Export_DiffTagger_Csv';
     /**
      *
      * @var string  (is local encoded)
@@ -85,6 +82,11 @@ class editor_Models_Export_FileParser_Transit extends editor_Models_Export_FileP
         parent::__construct($task, $fileId, $path, $options);
         $this->targetFileName = basename($path);
         //stand: herausfinden von source-namen anhand des path und speichern der source-Datei im exportfolder
+    }
+
+    protected function classNameDifftagger(): editor_Models_Export_DiffTagger
+    {
+        return new editor_Models_Export_DiffTagger_Csv();
     }
     
     /**

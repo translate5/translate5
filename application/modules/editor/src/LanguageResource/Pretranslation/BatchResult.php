@@ -32,14 +32,14 @@ use editor_Services_ServiceResult;
 use ZfExtended_Models_Entity_Abstract;
 
 /**
- * @method integer getId() getId()
- * @method void setId() setId(int $id)
- * @method integer getLanguageResource() getLanguageResource()
- * @method void setLanguageResource() setLanguageResource(int $languageResource)
- * @method integer getSegmentId() getSegmentId()
- * @method void setSegmentId() setSegmentId(int $segmentId)
- * @method string getResult() getResult()
- * @method void setResult() setResult(string $result)
+ * @method string getId()
+ * @method void setId(int $id)
+ * @method string getLanguageResource()
+ * @method void setLanguageResource(int $languageResource)
+ * @method string getSegmentId()
+ * @method void setSegmentId(int $segmentId)
+ * @method string getResult()
+ * @method void setResult(string $result)
  */
 class BatchResult extends ZfExtended_Models_Entity_Abstract {
 

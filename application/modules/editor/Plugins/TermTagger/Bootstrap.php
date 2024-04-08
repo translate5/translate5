@@ -33,6 +33,8 @@ use MittagQI\Translate5\Terminology\CleanupCollection;
 
 /**
  * Initial Class of Plugin "TermTagger"
+ *
+ * @method static Service createService(string $serviceName, Zend_Config $config = null)
  */
 class editor_Plugins_TermTagger_Bootstrap extends ZfExtended_Plugin_Abstract {
 

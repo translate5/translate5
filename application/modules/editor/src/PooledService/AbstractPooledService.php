@@ -33,7 +33,6 @@ use MittagQI\Translate5\Service\DockerServiceAbstract;
 use MittagQI\Translate5\Service\Services;
 use stdClass;
 use Symfony\Component\Console\Style\SymfonyStyle;
-use Zend_Cache_Exception;
 use Zend_Db_Statement_Exception;
 use Zend_Exception;
 use ZfExtended_Exception;
@@ -44,7 +43,7 @@ use ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey;
  * This represents a multi-url service where the URLs are pooled for "gui" (for editing), "import" and "default"
  * The default-service is represented by $configurationConfig while gui and import have their own setup-data
  */
-abstract class ServiceAbstract extends DockerServiceAbstract
+abstract class AbstractPooledService extends DockerServiceAbstract implements PooledServiceInterface
 {
     /**
      * Structure see DockerServiceAbstract::configurationConfig
@@ -131,7 +130,6 @@ abstract class ServiceAbstract extends DockerServiceAbstract
      * @param bool $saveStateToMemCache
      * @return stdClass
      * @throws ZfExtended_Exception
-     * @throws Zend_Cache_Exception
      */
     public function getServiceState(bool $saveStateToMemCache=true): stdClass
     {

@@ -426,7 +426,9 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
             // Checking for matchrate >= 100 is for edge case when segments have the same-same source but different
             // source md5hash so they are not a repetitions. Updating the segment in this case would lead to omitting
             // translation for other segments with the same-same source, but different source md5hash
-            if ($bestMatchRateResult->matchrate < 100 && $this->internalFuzzy && $connector->isInternalFuzzy()) {
+            if ($bestMatchRateResult !== null && $bestMatchRateResult->matchrate < 100 &&
+                $this->internalFuzzy && $connector->isInternalFuzzy())
+            {
                 $origTarget = $segment->getTargetEdit();
                 $dummyTargetText = self::renderDummyTargetText($segment->getTaskGuid());
                 $segment->setTargetEdit($dummyTargetText);

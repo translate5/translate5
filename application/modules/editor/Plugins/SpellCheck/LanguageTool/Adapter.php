@@ -35,9 +35,11 @@ use MittagQI\Translate5\Plugins\SpellCheck\Exception\MalfunctionException;
 use MittagQI\Translate5\Plugins\SpellCheck\Exception\RequestException;
 use MittagQI\Translate5\Plugins\SpellCheck\Exception\TimeOutException;
 use Zend_Http_Client;
+use Zend_Http_Client_Exception;
 use Zend_Http_Response;
 use ZfExtended_Debug;
 use ZfExtended_Factory;
+use ZfExtended_Zendoverwrites_Http_Exception;
 use ZfExtended_Zendoverwrites_Http_Exception_Down;
 use ZfExtended_Zendoverwrites_Http_Exception_NoResponse;
 use ZfExtended_Zendoverwrites_Http_Exception_TimeOut;
@@ -150,10 +152,11 @@ final class Adapter {
     private function processResponse(Zend_Http_Response $response){
         return json_decode(trim($response->getBody()));
     }
-    
+
     /**
      * Get all languages supported by LanguageTool.
      * @return array
+     * @throws Zend_Http_Client_Exception
      */
     public function getLanguages(){
 
@@ -377,26 +380,37 @@ final class Adapter {
      * @param string $targetLangCode
      * @return object|false
      */
-    public function getSupportedLanguage($targetLangCode) {
-
+    public function getSupportedLanguage($targetLangCode)
+    {
         // Get supported languages
-        $supportedLanguages = $this->getLanguages();
+        try {
+            $supportedLanguages = $this->getLanguages();
+        } catch (ZfExtended_Zendoverwrites_Http_Exception) {
+            //the whole error handling is only made for the main segment processing,
+            // so we return just false here on connection problems
+            return false;
+        }
+
         $languagesModel = ZfExtended_Factory::get(editor_Models_Languages::class);
 
         // Get main-language and sub-language
         $mainlanguage = $languagesModel->getMainlanguageByRfc5646($targetLangCode);
-        $sublanguage  = $languagesModel->getSublanguageByRfc5646($targetLangCode);
+        $sublanguage = $languagesModel->getSublanguageByRfc5646($targetLangCode);
 
         // Try to find sublanguage among supported languages
         foreach ($supportedLanguages as $lang) {
-            if ($lang->longCode == $sublanguage) {      // priority: check if longCode (e.g. "de-DE","cs") is the default sublanguage ("de-DE", "cs-CZ") of the targetLangCode ("de", "cs-CZ")
+            // priority: check if longCode (e.g. "de-DE","cs") is the default sublanguage ("de-DE", "cs-CZ")
+            // of the targetLangCode ("de", "cs-CZ")
+            if ($lang->longCode == $sublanguage) {
                 return $lang;
             }
         }
 
         // Try to find mainlanguage among supported languages
         foreach ($supportedLanguages as $lang) {
-            if ($lang->longCode == $mainlanguage) {     // fallback: check if longCode (e.g. "fr", "cs") is the mainlanguage ("fr", "cs") of the targetLangCode ("fr", "cs-CZ")
+            // fallback: check if longCode (e.g. "fr", "cs") is the mainlanguage ("fr", "cs")
+            // of the targetLangCode ("fr", "cs-CZ")
+            if ($lang->longCode == $mainlanguage) {
                 return $lang;
             }
         }

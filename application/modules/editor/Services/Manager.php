@@ -56,9 +56,14 @@ class editor_Services_Manager {
      * @return void
      * @throws Zend_Exception
      */
-    public static function reportTMUpdateError(array|stdClass $errors = null, string $errorMsg = null, string $errorType = 'Error', string $origin = 'core'): void
+    public static function reportTMUpdateError(
+        array|stdClass $errors = null,
+        string $errorMsg = null,
+        string $errorType = 'Error',
+        string $origin = 'core',
+    ): void
     {
-        $translate= ZfExtended_Zendoverwrites_Translate::getInstance();
+        $translate = ZfExtended_Zendoverwrites_Translate::getInstance();
         $msg =
             $translate->_('Das Segment konnte nicht ins TM gespeichert werden')
             . '. '
@@ -66,7 +71,7 @@ class editor_Services_Manager {
             . '!<br />'
             . $translate->_('Gemeldete Fehler')
             . ':';
-        if(empty($errors)){
+        if (empty($errors)) {
             $data = [
                 'type' => $errorType,
                 'error' => $errorMsg,
@@ -74,9 +79,12 @@ class editor_Services_Manager {
         } else {
             $data = (is_array($errors)) ? $errors : [$errors];
         }
-        /* @var ZfExtended_Models_Messages $messages */
-        $messages = Zend_Registry::get('rest_messages');
-        $messages->addError($msg, $origin, null, $data);
+
+        if (Zend_Registry::isRegistered('rest_messages')) {
+            /* @var ZfExtended_Models_Messages $messages */
+            $messages = Zend_Registry::get('rest_messages');
+            $messages->addError($msg, $origin, null, $data);
+        }
     }
     
     /**
@@ -158,7 +166,7 @@ class editor_Services_Manager {
      *
      * @return array
      */
-    public function getAllUnconfiguredServices(bool $forUi = false): array
+    public function getAllUnconfiguredServices(bool $forUi = false, Zend_Config $config = null): array
     {
         $serviceNames = [];
 
@@ -180,7 +188,7 @@ class editor_Services_Manager {
                 $connector = ZfExtended_Factory::get('editor_Services_Connector');
 
                 //the service is also not available when connection cannot be established
-                if ($connector && $connector->ping($resource)) {
+                if ($connector && $connector->ping($resource, $config)) {
                     continue 2;
                 }
             }

@@ -18,6 +18,128 @@ All updates are (downwards) compatible! If not this is listed in the important r
 
 
 
+
+
+## [7.3.0] - 2024-04-05
+
+### Important Notes:
+#### [TRANSLATE-3655](https://jira.translate5.net/browse/TRANSLATE-3655)
+Needs at least t5memory >= 0.5.58, versions prior 0.5 must be migrated with the CLI t5memory:migration command!
+This feature is disabled by default and can be enabled by the translate5 team on hosted instances. On self-hosted instances, it can be enabled via the translate5 command-line tool by setting runtimeOptions.LanguageResources.t5memory.stripFramingTagsEnabled to 1.
+ 
+
+
+### Added
+**[TRANSLATE-3790](https://jira.translate5.net/browse/TRANSLATE-3790): LanguageResources - Overwrite DeepL API key per client** <br>
+Allow rewrite DeepL API key on customer config level
+
+**[TRANSLATE-3534](https://jira.translate5.net/browse/TRANSLATE-3534): Import/Export, TrackChanges - TrackChanges sdlxliff round-trip** <br>
+Accept track changes sdlxliff markup on import and transform it to translate5 syntax.
+Propagate translate5 track changes to sdlxliff file on export
+
+
+### Changed
+**[TRANSLATE-3842](https://jira.translate5.net/browse/TRANSLATE-3842): VisualReview / VisualTranslation - Newlines from segments (internal whitespace tags) do often "destroy" the layout, especially in the new paragraph layouts** <br>
+ENHANCEMENT: 
+* Configurable option to strip newlines from the segments when translating the WYSIWYG
+* always strip newlines from segments for pragraph-fields in the WYSIWYG
+
+**[TRANSLATE-3841](https://jira.translate5.net/browse/TRANSLATE-3841): Main back-end mechanisms (Worker, Logging, etc.) - TextShuttle available for clients with support contract** <br>
+TextShuttle plugin is now available with support contract.
+
+**[TRANSLATE-3839](https://jira.translate5.net/browse/TRANSLATE-3839): LanguageResources - Add possibility to UI to use timestamp of last segment save, when re-importing a task to the TM** <br>
+Add new option to reimport task UI which purpose is to specify which time should be used for updating segment in translation memory.
+
+**[TRANSLATE-3733](https://jira.translate5.net/browse/TRANSLATE-3733): LanguageResources - Introduce new language resource identifier specificId** <br>
+Introduce a new ID field for language resources in available also via ID. 
+It should contain an ID generated / coming from the originating data system - if any.
+
+**[TRANSLATE-3655](https://jira.translate5.net/browse/TRANSLATE-3655): LanguageResources - implement new switch to deal with framing tags on TMX import** <br>
+Added new option "Strip framing tags at import" for TMX import which influences the behavior of t5memory regarding segment framing tags on import.
+
+
+### Bugfixes
+**[TRANSLATE-3845](https://jira.translate5.net/browse/TRANSLATE-3845): Editor general - RootCause error: null is not an object (evaluating 'd.mask')** <br>
+Fix problem for UI error when message bus re-sync is triggered.
+
+**[TRANSLATE-3840](https://jira.translate5.net/browse/TRANSLATE-3840): Hotfolder Import - Hotfolder import deadline format is too strict** <br>
+The deadline timeformats were to strict
+
+**[TRANSLATE-3834](https://jira.translate5.net/browse/TRANSLATE-3834): Import/Export - runtimeOptions.project.defaultPivotLanguage not working for hotfolder projects** <br>
+FIX: Apply runtimeOptions.project.defaultPivotLanguage setting on Project creation with Hotfolder plugin
+
+**[TRANSLATE-3799](https://jira.translate5.net/browse/TRANSLATE-3799): t5memory - Segment check after update in t5memory doesn't work properly with escaped symbols** <br>
+translate5 - 7.4.0: Remove tab replacement again
+translate5 - 7.3.0: Additional code improvement
+translate5 - 7.2.2: Fixed check if segment was updated properly in t5memory 
+
+**[TRANSLATE-3795](https://jira.translate5.net/browse/TRANSLATE-3795): Client management - clientPM should not be able to give himself term PM rights** <br>
+FIX: Remove right for "PM selected clients" to make himself a "Term PM all clients"
+
+**[TRANSLATE-3731](https://jira.translate5.net/browse/TRANSLATE-3731): Task Management - Empty projects shows tasks of previous project** <br>
+If due errors only a project is created but no tasks belonging to it, then the task list of such project behaves strange.
+
+**[TRANSLATE-3699](https://jira.translate5.net/browse/TRANSLATE-3699): User Management - Client PM can choose user with role Light PM as PM** <br>
+FIX: PM for selected clients was able to select PMs not being assigned to his clients
+
+**[TRANSLATE-3630](https://jira.translate5.net/browse/TRANSLATE-3630): User Management - clientPM should be able to see all client configs** <br>
+FIX: The PM selected clients now has access to "File format settings" and "pricing presets" for his selected clients
+
+
+## [7.2.4] - 2024-03-28
+
+### Important Notes:
+#### [TRANSLATE-3837](https://jira.translate5.net/browse/TRANSLATE-3837)
+for on premise docker users: healthcheck for termtagger changed
+ 
+
+
+### Changed
+**[TRANSLATE-3837](https://jira.translate5.net/browse/TRANSLATE-3837): Installation & Update - docker on premise: termtagger and languagetool healthcheck changed** <br>
+docker compose pull to get the latest containers. For termtagger there is now a health check which forces the termtagger to restart when it consumes to much memory.
+
+**[TRANSLATE-3824](https://jira.translate5.net/browse/TRANSLATE-3824): Installation & Update - Show hosting status in UI and create separate monitoring endpoint** <br>
+Add a separate monitoring endpoint, add in hosting some information about the hosting status.
+
+**[TRANSLATE-3820](https://jira.translate5.net/browse/TRANSLATE-3820): Task Management - Add tk-TM (Turkmen (Turkmenistan)) to translate5 languages** <br>
+Add tk-TM (Turkmen (Turkmenistan)) to language list
+
+**[TRANSLATE-3815](https://jira.translate5.net/browse/TRANSLATE-3815): MatchAnalysis & Pretranslation - Fix MatchAnalysisTest** <br>
+Fixed test
+
+**[TRANSLATE-3814](https://jira.translate5.net/browse/TRANSLATE-3814): Import/Export - FIX: Enable use of TMX zip archive in TM creation process** <br>
+Fix translations and zip usage on TM creation process
+
+
+### Bugfixes
+**[TRANSLATE-3832](https://jira.translate5.net/browse/TRANSLATE-3832): Editor general - RootCause error: Cannot read properties of null (reading 'expand')** <br>
+UI fixing a problem expanding the quality tree.
+
+**[TRANSLATE-3826](https://jira.translate5.net/browse/TRANSLATE-3826): Editor general - RootCause error: me.selectedCustomersConfigStore is null** <br>
+Fix for a problem when opening the task creation window and closing it immediately.
+
+**[TRANSLATE-3825](https://jira.translate5.net/browse/TRANSLATE-3825): Editor general - No access exception: reopen locked task** <br>
+Fix for a problem where task was unlocked by the inactive-cleanup component, but the user has still the translate5 task-editing UI open.
+
+**[TRANSLATE-3823](https://jira.translate5.net/browse/TRANSLATE-3823): TermPortal - Remove non breaking spaces from terms** <br>
+Remove non breaking spaces and non regular white-spaces on term import and from all existing terms in the database.
+
+**[TRANSLATE-3821](https://jira.translate5.net/browse/TRANSLATE-3821): Export - Across Hotfoler: Export worker does not wait for Okapi worker** <br>
+Fix Across Hotfolder tasks export
+
+**[TRANSLATE-3817](https://jira.translate5.net/browse/TRANSLATE-3817): InstantTranslate - translate5 sends unescaped xml special char via InstantTranslate to t5memory** <br>
+Escape potentially unescaped content sent to t5memory since this may crashes t5memory
+
+**[TRANSLATE-3811](https://jira.translate5.net/browse/TRANSLATE-3811): VisualReview / VisualTranslation - Visual: Font may be mis-selected when one font's name is containing the other** <br>
+FIX: Some visual fonts have been mis-identified as being identical
+
+**[TRANSLATE-3769](https://jira.translate5.net/browse/TRANSLATE-3769): Editor general - Cancel import unlocks exporting task** <br>
+Fix for a problem with task cancel import logic.
+
+**[TRANSLATE-3643](https://jira.translate5.net/browse/TRANSLATE-3643): User Management - enable PM role to create MT resources** <br>
+PM's are allowed to create MT resources.
+
+
 ## [7.2.2] - 2024-03-15
 
 ### Important Notes:

@@ -34,7 +34,7 @@ use ZfExtended_Models_Entity_Abstract;
 
 /**
  *
- * @method integer getId()
+ * @method string getId()
  * @method void setId(int $id)
  * @method string getLabel()
  * @method void setLabel(string $label)

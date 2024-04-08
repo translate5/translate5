@@ -63,6 +63,7 @@ Ext.define('Editor.view.LanguageResources.TaskAssocPanel', {
     },
     padding: 0,
     layout:'fit',
+    border: 0,
     bind:{
         loading:'{isLoadingActive}'
     },
@@ -73,6 +74,7 @@ Ext.define('Editor.view.LanguageResources.TaskAssocPanel', {
             dockedItems : [],
             items : [{
                 xtype : 'grid',
+                border: 0,
                 itemId : 'languageResourcesTaskAssocGrid',
             	bind:{
             		store:'{taskAssoc}',

@@ -91,12 +91,10 @@ Ext.define('Editor.plugins.Okapi.controller.BconfPrefs', {
         ref: 'preferencesOverviewPanel',
         selector: '#preferencesOverviewPanel'
     }],
-    /** @property {Editor.plugins.Okapi.view.BconfGrid} bconfPanel reference to our main view */
-    bconfPanel: null,
     // adds the Font-Prefs-Panel to the Overview Panel if the right is present
     addBconfToSettingsPanel: function(panel){
         if(Editor.app.authenticatedUser.isAllowed('pluginOkapiBconfPrefs')){
-            this.bconfPanel = panel.insert(2, {
+            panel.insert(2, {
                 xtype: 'okapiBconfGrid',
                 routePrefix: 'preferences/',
                 store: {
@@ -111,7 +109,9 @@ Ext.define('Editor.plugins.Okapi.controller.BconfPrefs', {
         }
     },
     addBconfToCustomerPanel: function(tabPanel){
-        if(Editor.app.authenticatedUser.isAllowed('pluginOkapiBconfPrefs')){
+        if(Editor.app.authenticatedUser.isAllowed('pluginOkapiBconfPrefs')
+            || Editor.app.authenticatedUser.isAllowed('pluginOkapiBconfCustomerPrefs')
+        ){
             // create filtered store from bconfStore & apply it to the grid's view-model
             var vm = tabPanel.up('[viewModel]').getViewModel();
             var vmStores = vm.storeInfo || {};

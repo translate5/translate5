@@ -29,13 +29,12 @@ END LICENSE AND COPYRIGHT
 /**
  * Export FileParser for DisplayText XML files
  */
-class editor_Models_Export_FileParser_DisplayTextXml extends editor_Models_Export_FileParser {
-
-    /**
-     * TODO makes no sense but must be defined
-     * @var string
-     */
-    protected $_classNameDifftagger = 'editor_Models_Export_DiffTagger_Csv';
+class editor_Models_Export_FileParser_DisplayTextXml extends editor_Models_Export_FileParser
+{
+    protected function classNameDifftagger(): editor_Models_Export_DiffTagger
+    {
+        return new editor_Models_Export_DiffTagger_Csv();
+    }
     
     /**
      * replaces <lekTargetSeg... placeholders with segment content and fills the _exportFile data container

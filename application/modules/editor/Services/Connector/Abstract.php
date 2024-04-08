@@ -77,9 +77,9 @@ abstract class editor_Services_Connector_Abstract {
     protected $defaultMatchRate=0;
     
     /**
-     * @var editor_Models_LanguageResources_LanguageResource
+     * @var editor_Models_LanguageResources_LanguageResource|null
      */
-    protected $languageResource;
+    protected $languageResource = null;
     
     /**
      * Container for the connector results

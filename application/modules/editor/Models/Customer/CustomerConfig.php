@@ -27,14 +27,14 @@ END LICENSE AND COPYRIGHT
 */
 
 /***
-* @method void setId() setId(int $id)
-* @method int getId() getId()
-* @method void setTaskGuid() setTaskGuid(guid $taskGuid)
-* @method guid getTaskGuid() getTaskGuid()
-* @method void setName() setName(string $name)
-* @method string getName() getName()
-* @method void setValue() setValue(string $value)
-* @method string getValue() getValue()
+* @method void setId(int $id)
+* @method string getId()
+* @method void setTaskGuid(guid $taskGuid)
+* @method string getTaskGuid()
+* @method void setName(string $name)
+* @method string getName()
+* @method void setValue(string $value)
+* @method string getValue()
 */
 
 class editor_Models_Customer_CustomerConfig extends ZfExtended_Models_Entity_Abstract {
@@ -65,6 +65,7 @@ class editor_Models_Customer_CustomerConfig extends ZfExtended_Models_Entity_Abs
         /* @var $configOperator ZfExtended_Resource_DbConfig */
         $configOperator->initDbOptionsTree($result);
         $config->merge(new Zend_Config($configOperator->getDbOptionTree(),true));
+        $config->customerId = $customerId;
         
         return $config;
     }

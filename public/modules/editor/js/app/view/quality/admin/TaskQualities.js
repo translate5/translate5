@@ -44,6 +44,7 @@ Ext.define('Editor.view.quality.admin.TaskQualities', {
         'Editor.view.quality.admin.TaskQualitiesViewModel',
         'Editor.view.quality.admin.TaskQualitiesController'
     ],
+    border: 0,
     controller: 'taskQualities',
     viewModel: {
         type: 'taskQualities'
@@ -101,6 +102,7 @@ Ext.define('Editor.view.quality.admin.TaskQualities', {
                 cls: 'taskQualities',
                 items:[{
                     xtype: 'treepanel',
+                    border: 0,
                     itemId: 'taskQualitiesTree',
                     store: me.store,
                     rootVisible: false,
@@ -180,6 +182,7 @@ Ext.define('Editor.view.quality.admin.TaskQualities', {
                     xtype: 'toolbar',
                     dock: 'bottom',
                     enableOverflow: true,
+                    border: '1 0 0 0',
                     ui: 'footer',
                     defaultButtonUI: false,
                     itemId: 'analysisToolbar',

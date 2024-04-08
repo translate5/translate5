@@ -33,6 +33,8 @@ use MittagQI\Translate5\LanguageResource\Adapter\Exception\RescheduleUpdateNeede
 use MittagQI\Translate5\LanguageResource\Adapter\UpdatableAdapterInterface;
 use MittagQI\Translate5\LanguageResource\Status as LanguageResourceStatus;
 use editor_Models_LanguageResources_LanguageResource as LanguageResource;
+use MittagQI\Translate5\Service\T5Memory;
+use MittagQI\Translate5\T5Memory\Enum\StripFramingTags;
 
 /**
  * T5memory / OpenTM2 Connector
@@ -150,7 +152,10 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
 
                 //if initial upload is a TMX file, we have to import it.
                 if ($tmxUpload) {
-                    return $this->addAdditionalTm($fileinfo, ['tmName' => $tmName]);
+                    return $this->addAdditionalTm($fileinfo, [
+                        'tmName' => $tmName,
+                        'stripFramingTags' => $params['stripFramingTags'] ?? null,
+                    ]);
                 }
 
                 return true;
@@ -279,7 +284,8 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
 
             $result = $result && $this->importTmxIntoMemory(
                 file_get_contents($importFilename),
-                $params['tmName'] ?? $this->getWritableMemory()
+                $params['tmName'] ?? $this->getWritableMemory(),
+                $this->getStripFramingTagsValue($params)
             );
 
             unlink($importFilename);
@@ -443,7 +449,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
     /**
      * Helper function to get the metadata which should be shown in the GUI out of a single result
      *
-     * @return object[]
+     * @return stdClass[]
      */
     private function getMetaData(object $found): array
     {
@@ -1370,6 +1376,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
         // we have to set the default source here to fill the be added internal tags
         $resultList->setDefaultSource($queryString);
         $query = $this->tagHandler->prepareQuery($queryString);
+
         $results = [];
 
         foreach ($this->languageResource->getSpecificData('memories', parseAsArray: true) as $memory) {
@@ -1472,12 +1479,15 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
             && str_replace($errorCodes, '', $error->error) !== $error->error;
     }
 
-    private function importTmxIntoMemory(string $fileContent, string $tmName): bool
-    {
+    private function importTmxIntoMemory(
+        string $fileContent,
+        string $tmName,
+        StripFramingTags $stripFramingTags
+    ): bool {
         $successful = false;
 
         try {
-            $successful = $this->api->importMemory($fileContent, $tmName);
+            $successful = $this->api->importMemory($fileContent, $tmName, $stripFramingTags);
 
             if (!$successful) {
                 $this->logger->error('E1303', 'OpenTM2: could not add TMX data to TM', [
@@ -1514,7 +1524,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
             );
 
             // Import further
-            return $this->importTmxIntoMemory($fileContent, $newName);
+            return $this->importTmxIntoMemory($fileContent, $newName, $stripFramingTags);
         }
 
         return $successful;
@@ -1817,8 +1827,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
         }, $targetReceived);
         // Replacing \r\n to \n back because t5memory replaces \n to \r\n
         $targetReceived = str_replace("\r\n", "\n", $targetReceived);
-        // Also replace tab symbols to space because t5memory does it on its side
-        $targetSent = str_replace(["\t", "\r\n"], [' ', "\n"], $targetSent);
+        $targetSent = str_replace("\r\n", "\n", $targetSent);
         // Finally compare target that we've sent for saving with the one we retrieved from TM, they should be the same
         // html_entity_decode() is used because sometimes t5memory returns target with decoded
         // html entities regardless of the original target
@@ -1835,7 +1844,13 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
                 $matchRateFits => 'Match rate is not 103',
                 $targetIsTheSame => 'Saved segment target differs with provided',
                 $isResultFresh => 'Got old result',
+                default => 'Unknown reason',
             });
         }
+    }
+
+    private function getStripFramingTagsValue(array $params): StripFramingTags
+    {
+        return StripFramingTags::tryFrom($params['stripFramingTags'] ?? '') ?? StripFramingTags::None;
     }
 }

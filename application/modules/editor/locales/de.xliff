@@ -7268,6 +7268,22 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
                 <source>zur Aufgabe springen</source>
                 <target>zur Aufgabe springen</target>
             </trans-unit>
+            <trans-unit id='WmVpdG9wdGlvbg=='>
+                <source>Zeitoption</source>
+                <target>Zeitoption</target>
+            </trans-unit>
+            <trans-unit id='QWt0dWVsbGVyIFplaXRwdW5rdA=='>
+                <source>Aktueller Zeitpunkt</source>
+                <target>Aktueller Zeitpunkt</target>
+            </trans-unit>
+            <trans-unit id='WmVpdHB1bmt0IGRlciBTZWdtZW50c3BlaWNoZXJ1bmc='>
+                <source>Zeitpunkt der Segmentspeicherung</source>
+                <target>Zeitpunkt der Segmentspeicherung</target>
+            </trans-unit>
+            <trans-unit id='QWxzIERhdHVtIHVuZCBVaHJ6ZWl0IGRlcyBlcnpldWd0ZW4gVE0tRWludHJhZ3Mgd2lyZCBiZWkgIlplaXRwdW5rdCBkZXIgU2VnbWVudHNwZWljaGVydW5nIiBkYXMgRGF0dW0gdmVyd2VuZGV0LCBhbiBkZW0gZXIgbGV0enRlIEJlbnV0emVyIGRhcyBTZWdtZW50IGluIGRlciBBdWZnYWJlIGdlc3BlaWNoZXJ0IGhhdC4gQW5kZXJuZmFsbHMgd2lyZCBkZXIgWmVpdHB1bmt0IHZlcndlbmRldCwgYW4gZGVtIGRpZSBBdWZnYWJlIG5ldSBpbnMgVE0gZHVyY2hnZXNwZWljaGVydCB3aXJk'>
+                <source>Als Datum und Uhrzeit des erzeugten TM-Eintrags wird bei "Zeitpunkt der Segmentspeicherung" das Datum verwendet, an dem er letzte Benutzer das Segment in der Aufgabe gespeichert hat. Andernfalls wird der Zeitpunkt verwendet, an dem die Aufgabe neu ins TM durchgespeichert wird</source>
+                <target>Als Datum und Uhrzeit des erzeugten TM-Eintrags wird bei "Zeitpunkt der Segmentspeicherung" das Datum verwendet, an dem er letzte Benutzer das Segment in der Aufgabe gespeichert hat. Andernfalls wird der Zeitpunkt verwendet, an dem die Aufgabe neu ins TM durchgespeichert wird</target>
+            </trans-unit>
             <trans-unit id='QXVmZ2FiZW5tZW7DvCBhbnplaWdlbg=='>
                 <source>Aufgabenmenü anzeigen</source>
                 <target>Aufgabenmenü anzeigen</target>
@@ -9055,6 +9071,26 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
             <trans-unit id='U3RhbmRhcmRtw6TDn2lnIGFscyBQaXZvdCB2ZXJ3ZW5kZW4='>
                 <source>Standardmäßig als Pivot verwenden</source>
                 <target>Standardmäßig als Pivot verwenden</target>
+            </trans-unit>
+            <trans-unit id='VW1zY2hsaWXDn2VuZGUgVGFncyBiZWltIEltcG9ydCBsw7ZzY2hlbg=='>
+                <source>Umschließende Tags beim Import löschen</source>
+                <target>Umschließende Tags beim Import löschen</target>
+            </trans-unit>
+            <trans-unit id='QXJiZWl0ZXQgYW5hbG9nIHp1ciBTeXN0ZW1rb25maWd1cmF0aW9uIHJ1bnRpbWVPcHRpb25zLmltcG9ydC54bGYuaWdub3JlRnJhbWluZ1RhZ3MsIGFiZXIgZsO8ciBUTVgtSW1wb3J0LiBTaWUgZW50ZmVybnQgYWxsZSAob2RlciBudXIgZ2VwYWFydGUpIFRhZ3Mgdm9tIEFuZmFuZyB1bmQgRW5kZSBlaW5lcyBpbXBvcnRpZXJ0ZW4gU2VnbWVudHMsIGZhbGxzIGFrdGl2aWVydC4gRGllIFN5c3RlbWtvbmZpZ3VyYXRpb24gc29sbHRlIGRhaGVyIGbDvHIgZGVuc2VsYmVuIEt1bmRlbiBkaWUgZ2xlaWNoZSBFaW5zdGVsbHVuZyBmw7xyIHp1IGltcG9ydGllcmVuZGUgQXVmZ2FiZW4gaGFiZW4uIFdlbm4gU2llIGJlc3RlaGVuZGUgVE1zIGtvbnZlcnRpZXJlbiBtw7xzc2VuLCBiaXR0ZW4gU2llIGRlbiB0cmFuc2xhdGU1LVN1cHBvcnQgdW0gSGlsZmUu'>
+                <source>Arbeitet analog zur Systemkonfiguration runtimeOptions.import.xlf.ignoreFramingTags, aber für TMX-Import. Sie entfernt alle (oder nur gepaarte) Tags vom Anfang und Ende eines importierten Segments, falls aktiviert. Die Systemkonfiguration sollte daher für denselben Kunden die gleiche Einstellung für zu importierende Aufgaben haben. Wenn Sie bestehende TMs konvertieren müssen, bitten Sie den translate5-Support um Hilfe.</source>
+                <target>Arbeitet analog zur Systemkonfiguration runtimeOptions.import.xlf.ignoreFramingTags, aber für TMX-Import. Sie entfernt alle (oder nur gepaarte) Tags vom Anfang und Ende eines importierten Segments, falls aktiviert. Die Systemkonfiguration sollte daher für denselben Kunden die gleiche Einstellung für zu importierende Aufgaben haben. Wenn Sie bestehende TMs konvertieren müssen, bitten Sie den translate5-Support um Hilfe.</target>
+            </trans-unit>
+            <trans-unit id='RW50ZmVybnQga2VpbmU='>
+                <source>Entfernt keine</source>
+                <target>Keine</target>
+            </trans-unit>
+            <trans-unit id='QWxsZQ=='>
+                <source>Alle</source>
+                <target>Alle</target>
+            </trans-unit>
+            <trans-unit id='VGFncGFhcmU='>
+                <source>Tagpaare</source>
+                <target>Tagpaare</target>
             </trans-unit>
             <trans-unit id='Vm9yw7xiZXJzZXR6dW5n'>
                 <source>Vorübersetzung</source>
