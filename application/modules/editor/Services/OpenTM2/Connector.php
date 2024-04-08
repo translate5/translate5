@@ -37,6 +37,8 @@ use MittagQI\Translate5\LanguageResource\Adapter\Exception\RescheduleUpdateNeede
 use MittagQI\Translate5\LanguageResource\Adapter\UpdatableAdapterInterface;
 use MittagQI\Translate5\LanguageResource\Status as LanguageResourceStatus;
 use editor_Models_LanguageResources_LanguageResource as LanguageResource;
+use MittagQI\Translate5\Service\T5Memory;
+use MittagQI\Translate5\T5Memory\Enum\StripFramingTags;
 
 /**
  * T5memory / OpenTM2 Connector
@@ -139,8 +141,11 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
 
         $noFile = empty($fileinfo);
         $tmxUpload = !$noFile
-            && in_array($fileinfo['type'], $validFileTypes['TMX'])
-            && preg_match('/\.tmx$/', $fileinfo['name']);
+            && (
+                in_array($fileinfo['type'], $validFileTypes['TMX'])
+                || in_array($fileinfo['type'], $validFileTypes['ZIP'])
+            )
+            && preg_match('/(\.tmx|\.zip)$/', strtolower($fileinfo['name']));
 
         if ($noFile || $tmxUpload) {
             $tmName = $this->api->createEmptyMemory($name, $sourceLang);
@@ -150,7 +155,10 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
 
                 //if initial upload is a TMX file, we have to import it.
                 if ($tmxUpload) {
-                    return $this->addAdditionalTm($fileinfo, ['tmName' => $tmName]);
+                    return $this->addAdditionalTm($fileinfo, [
+                        'tmName' => $tmName,
+                        'stripFramingTags' => $params['stripFramingTags'] ?? null,
+                    ]);
                 }
 
                 return true;
@@ -206,14 +214,58 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
     }
 
     /**
+     * @return iterable<string>
+     */
+    private function getImportFilesFromUpload(?array $fileInfo): iterable
+    {
+        if (null === $fileInfo) {
+            return yield from [];
+        }
+
+        $validator = new Zend_Validate_File_IsCompressed();
+        if (!$validator->isValid($fileInfo['tmp_name'])) {
+            return yield $fileInfo['tmp_name'];
+        }
+
+        $zip = new ZipArchive();
+        if (!$zip->open($fileInfo['tmp_name'])) {
+            $this->logger->error('E1596', 'OpenTM2: Unable to open zip file from file-path:' . $fileInfo['tmp_name']);
+
+            return yield from [];
+        }
+
+        $newPath = sys_get_temp_dir() . DIRECTORY_SEPARATOR . pathinfo($fileInfo['name'], PATHINFO_FILENAME);
+
+        if (!$zip->extractTo($newPath)) {
+            $this->logger->error('E1597', 'OpenTM2: Content from zip file could not be extracted.');
+            $zip->close();
+
+            return yield from [];
+        }
+
+        $zip->close();
+
+        foreach (editor_Utils::generatePermutations('tmx') as $patter) {
+            yield from glob($newPath . DIRECTORY_SEPARATOR . '*.' . implode($patter)) ?: [];
+        }
+    }
+
+    /**
      * {@inheritDoc}
      */
     public function addAdditionalTm(array $fileinfo = null, array $params = null): bool
     {
-        return $this->importTmxIntoMemory(
-            file_get_contents($fileinfo['tmp_name']),
-            $params['tmName'] ?? $this->getWritableMemory()
-        );
+        $result = true;
+
+        foreach ($this->getImportFilesFromUpload($fileinfo) as $file) {
+            $result = $result && $this->importTmxIntoMemory(
+                file_get_contents($file),
+                $params['tmName'] ?? $this->getWritableMemory(),
+                $this->getStripFramingTagsValue($params)
+            );
+        }
+
+        return $result;
     }
 
     /**
@@ -222,6 +274,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
     public function getValidFiletypes(): array
     {
         return [
+            'ZIP' => ['application/zip'],
             'TM' => ['application/zip'],
             'TMX' => ['application/xml', 'text/xml'],
         ];
@@ -257,7 +310,8 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
     public function update(
         editor_Models_Segment $segment,
         bool $recheckOnUpdate = self::DO_NOT_RECHECK_ON_UPDATE,
-        bool $rescheduleUpdateOnError = self::DO_NOT_RESCHEDULE_UPDATE_ON_ERROR
+        bool $rescheduleUpdateOnError = self::DO_NOT_RESCHEDULE_UPDATE_ON_ERROR,
+        bool $useSegmentTimestamp = self::DO_NOT_USE_SEGMENT_TIMESTAMP
     ): void {
         $tmName = $this->getWritableMemory();
 
@@ -274,9 +328,18 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
 
         $fileName = $this->getFileName($segment);
         $source = $this->tagHandler->prepareQuery($this->getQueryString($segment));
+        $this->tagHandler->setInputTagMap($this->tagHandler->getTagMap());
         $target = $this->tagHandler->prepareQuery($segment->getTargetEdit());
 
-        $successful = $this->api->update($source, $target, $segment, $fileName, $tmName, !$this->isInternalFuzzy);
+        $successful = $this->api->update(
+            $source,
+            $target,
+            $segment,
+            $fileName,
+            $tmName,
+            !$this->isInternalFuzzy,
+            $useSegmentTimestamp
+        );
 
         if ($successful) {
             $this->checkUpdatedSegment($segment, $recheckOnUpdate);
@@ -360,7 +423,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
     /**
      * Helper function to get the metadata which should be shown in the GUI out of a single result
      *
-     * @return object[]
+     * @return stdClass[]
      */
     private function getMetaData(object $found): array
     {
@@ -812,13 +875,14 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
      * Download and save the existing tm with "fuzzy" name. The new fuzzy connector will be returned.
      * @param int $analysisId
      * @return editor_Services_Connector_Abstract
+     * @throws ReflectionException
+     * @throws Zend_Exception
      * @throws ZfExtended_NotFoundException
+     * @throws editor_Services_Exceptions_NoService
      */
     public function initForFuzzyAnalysis($analysisId)
     {
         $mime = 'TM';
-        // TODO FIXME: This brings the "Mother-TM" into fuzzy-mode, why is this done ? Maybe a historic artefact due to the ugly "clone" in the base-implementation ??
-        $this->isInternalFuzzy = true;
         $validExportTypes = $this->getValidExportTypes();
 
         if (empty($validExportTypes[$mime])) {
@@ -1075,10 +1139,14 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
             $reorganized = $this->waitReorganizeFinished();
         }
 
-        $this->languageResource->setStatus(
-            $reorganized ? LanguageResourceStatus::AVAILABLE : LanguageResourceStatus::REORGANIZE_FAILED
-        );
-        $this->languageResource->save();
+        if (!$this->isInternalFuzzy())
+        {
+            $this->languageResource->setStatus(
+                $reorganized ? LanguageResourceStatus::AVAILABLE : LanguageResourceStatus::REORGANIZE_FAILED
+            );
+
+            $this->languageResource->save();
+        }
 
         return $reorganized;
     }
@@ -1169,6 +1237,12 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
             return;
         }
 
+        if ($languageResource->getSpecificData(self::REORGANIZE_ATTEMPTS) === null) {
+            return;
+        }
+
+        // In some cases language resource is detached from DB
+        $languageResource->refresh();
         $languageResource->removeSpecificData(self::REORGANIZE_ATTEMPTS);
         $languageResource->save();
     }
@@ -1278,6 +1352,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
         // we have to set the default source here to fill the be added internal tags
         $resultList->setDefaultSource($queryString);
         $query = $this->tagHandler->prepareQuery($queryString);
+
         $results = [];
 
         foreach ($this->languageResource->getSpecificData('memories', parseAsArray: true) as $memory) {
@@ -1380,12 +1455,15 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
             && str_replace($errorCodes, '', $error->error) !== $error->error;
     }
 
-    private function importTmxIntoMemory(string $fileContent, string $tmName): bool
-    {
+    private function importTmxIntoMemory(
+        string $fileContent,
+        string $tmName,
+        StripFramingTags $stripFramingTags
+    ): bool {
         $successful = false;
 
         try {
-            $successful = $this->api->importMemory($fileContent, $tmName);
+            $successful = $this->api->importMemory($fileContent, $tmName, $stripFramingTags);
 
             if (!$successful) {
                 $this->logger->error('E1303', 'OpenTM2: could not add TMX data to TM', [
@@ -1422,7 +1500,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
             );
 
             // Import further
-            return $this->importTmxIntoMemory($fileContent, $newName);
+            return $this->importTmxIntoMemory($fileContent, $newName, $stripFramingTags);
         }
 
         return $successful;
@@ -1690,8 +1768,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
         }
 
         // Just saved segment should have matchrate 103
-        // TODO uncomment after matchrate calculating issue is fixed on t5memory side
-        $matchRateFits = true; //$maxMatchRateResult->matchrate === 103;
+        $matchRateFits = $maxMatchRateResult->matchrate === 103;
 
         // Decode html entities
         $targetReceived = html_entity_decode($maxMatchRateResult->rawTarget);
@@ -1701,23 +1778,30 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
         }, $targetReceived);
         // Replacing \r\n to \n back because t5memory replaces \n to \r\n
         $targetReceived = str_replace("\r\n", "\n", $targetReceived);
-        // Also replace tab symbols to space because t5memory does it on its side
-        $targetSent = str_replace("\t", ' ', $targetSent);
+        $targetSent = str_replace("\r\n", "\n", $targetSent);
         // Finally compare target that we've sent for saving with the one we retrieved from TM, they should be the same
-        $targetIsTheSame = $targetReceived === $targetSent;
+        // html_entity_decode() is used because sometimes t5memory returns target with decoded
+        // html entities regardless of the original target
+        $targetIsTheSame = $targetReceived === $targetSent
+            || html_entity_decode($targetReceived) === html_entity_decode($targetSent);
 
         $resultTimestamp = $result->getMetaValue($maxMatchRateResult->metaData, 'timestamp');
         $resultDate = DatetimeImmutable::createFromFormat('Y-m-d H:i:s T', $resultTimestamp);
         // Timestamp should be not older than 1 minute otherwise it is an old segment which wasn't updated
-        // TODO uncomment after matchrate calculating issue is fixed on t5memory side
-        $isResultFresh = true; //$resultDate >= new DateTimeImmutable('-1 minute');
+        $isResultFresh = $resultDate >= new DateTimeImmutable('-1 minute');
 
         if (!$matchRateFits || !$targetIsTheSame || !$isResultFresh) {
             $logError(match (false) {
                 $matchRateFits => 'Match rate is not 103',
                 $targetIsTheSame => 'Saved segment target differs with provided',
                 $isResultFresh => 'Got old result',
+                default => 'Unknown reason',
             });
         }
+    }
+
+    private function getStripFramingTagsValue(array $params): StripFramingTags
+    {
+        return StripFramingTags::tryFrom($params['stripFramingTags'] ?? '') ?? StripFramingTags::None;
     }
 }

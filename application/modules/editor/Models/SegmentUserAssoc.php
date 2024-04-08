@@ -28,17 +28,18 @@ END LICENSE AND COPYRIGHT
 
 /**
  * SegmentUserAssoc Object Instance as needed in the application
- * @method integer getId() getId()
- * @method string getSegmentId() getSegmentId()
- * @method string getUserGuid() getUserGuid()
- * @method string getTaskGuid() getTaskGuid()
- * @method void setSegmentId() setSegmentId(string $segmentId)
- * @method void setUserGuid() setUserGuid(string $userGuid)
- * @method void setTaskGuid() setTaskGuid(string $taskGuid)
- * @method setCreated(string $timestamp)
- * @method setModified(string $timestamp)
+ * @method string getId()
+ * @method string getSegmentId()
+ * @method string getUserGuid()
+ * @method string getTaskGuid()
  * @method string getCreated()
  * @method string getModified()
+ *
+ * @method void setSegmentId(string $segmentId)
+ * @method void setUserGuid(string $userGuid)
+ * @method void setTaskGuid(string $taskGuid)
+ * @method void setCreated(string $timestamp)
+ * @method void setModified(string $timestamp)
  */
 class editor_Models_SegmentUserAssoc extends ZfExtended_Models_Entity_Abstract {
     protected $dbInstanceClass = 'editor_Models_Db_SegmentUserAssoc';

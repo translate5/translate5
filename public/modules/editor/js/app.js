@@ -495,6 +495,38 @@ Ext.application({
         //no "this" usage, so we can use this method directly as failure handler
         Editor.app.appMask && Editor.app.appMask.close();
     },
+
+    /**
+     * Apply mask to the current viewport
+     * @param msg
+     */
+    maskViewport: function (msg) {
+        var me = this,
+            vp = me.viewport;
+
+        if (!vp) {
+            return;
+        }
+
+        vp.mask(msg);
+    },
+
+    /**
+     * Remove the mask from the current viewport
+     */
+    unmaskViewport: function () {
+        let me = this,
+            vp = me.viewport,
+            maskTarget = vp && (vp.getMaskTarget() || vp.el);
+
+        if (!vp || !maskTarget) {
+            return;
+        }
+
+        maskTarget.unmask();
+        vp.setMasked(false);
+    },
+
     logout: function () {
         window.location = Editor.data.loginUrl;
     },

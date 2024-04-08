@@ -29,47 +29,47 @@ END LICENSE AND COPYRIGHT
 /**
  * Customer Entity Objekt
  * 
- * @method integer getId() getId()
- * @method void setId() setId(int $id)
+ * @method string getId()
+ * @method void setId(int $id)
  * 
- * @method string getName() getName()
- * @method void setName() setName(string $name)
+ * @method string getName()
+ * @method void setName(string $name)
  * 
- * @method string getNumber() getNumber()
- * @method void setNumber() setNumber(string $number)
+ * @method string getNumber()
+ * @method void setNumber(string $number)
  * 
- * @method integer getSearchCharacterLimit() getSearchCharacterLimit()
- * @method void setSearchCharacterLimit() setSearchCharacterLimit(int $searchCharacterLimit)
+ * @method string getSearchCharacterLimit()
+ * @method void setSearchCharacterLimit(int $searchCharacterLimit)
  * 
- * @method string getDomain() getDomain()
- * @method void setDomain() setDomain(string $domain)
+ * @method string getDomain()
+ * @method void setDomain(string $domain)
  * 
- * @method string getOpenIdServer() getOpenIdServer()
- * @method void setOpenIdServer() setOpenIdServer(string $openIdServer)
+ * @method string getOpenIdServer()
+ * @method void setOpenIdServer(string $openIdServer)
  * 
- * @method string getOpenIdIssuer() getOpenIdIssuer()
- * @method void setOpenIdIssuer() setOpenIdIssuer(string $openIdIssuer)
+ * @method string getOpenIdIssuer()
+ * @method void setOpenIdIssuer(string $openIdIssuer)
  * 
- * @method string getOpenIdAuth2Url() getOpenIdAuth2Url()
- * @method void setOpenIdAuth2Url() setOpenIdAuth2Url(string $openIdAuth2Url)
+ * @method string getOpenIdAuth2Url()
+ * @method void setOpenIdAuth2Url(string $openIdAuth2Url)
  * 
- * @method string getOpenIdServerRoles() getOpenIdServerRoles()
- * @method void setOpenIdServerRoles() setOpenIdServerRoles(string $openIdServerRoles)
+ * @method string getOpenIdServerRoles()
+ * @method void setOpenIdServerRoles(string $openIdServerRoles)
  * 
- * @method string getOpenIdDefaultServerRoles() getOpenIdDefaultServerRoles()
- * @method void setOpenIdDefaultServerRoles() setOpenIdDefaultServerRoles(string $openIdDefaultServerRoles)
+ * @method string getOpenIdDefaultServerRoles()
+ * @method void setOpenIdDefaultServerRoles(string $openIdDefaultServerRoles)
  * 
- * @method string getOpenIdClientId() getOpenIdClientId()
- * @method void setOpenIdClientId() setOpenIdClientId(string $openIdClientId)
+ * @method string getOpenIdClientId()
+ * @method void setOpenIdClientId(string $openIdClientId)
  * 
- * @method string getOpenIdClientSecret() getOpenIdClientSecret()
- * @method void setOpenIdClientSecret() setOpenIdClientSecret(string $openIdClientSecret)
+ * @method string getOpenIdClientSecret()
+ * @method void setOpenIdClientSecret(string $openIdClientSecret)
  * 
- * @method string getOpenIdRedirectLabel() getOpenIdRedirectLabel()
- * @method void setOpenIdRedirectLabel() setOpenIdRedirectLabel(string $openIdRedirectLabel)
+ * @method string getOpenIdRedirectLabel()
+ * @method void setOpenIdRedirectLabel(string $openIdRedirectLabel)
  * 
- * @method integer getOpenIdRedirectCheckbox() getOpenIdRedirectCheckbox()
- * @method void setOpenIdRedirectCheckbox() setOpenIdRedirectCheckbox(integer $openIdRedirectCheckbox)
+ * @method string getOpenIdRedirectCheckbox()
+ * @method void setOpenIdRedirectCheckbox(integer $openIdRedirectCheckbox)
  * 
  * 
 */

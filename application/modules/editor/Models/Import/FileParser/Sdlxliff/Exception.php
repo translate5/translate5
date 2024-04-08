@@ -37,7 +37,7 @@ class editor_Models_Import_FileParser_Sdlxliff_Exception extends editor_Models_I
     static protected $localErrorCodes = [
         'E1001' => 'The opening tag "{tagName}" contains the tagId "{tagId}" which is no valid SDLXLIFF!',
         'E1002' => 'Found a closing tag without an opening one. Segment MID: "{mid}".',
-        'E1003' => 'There are change-markers in the sdlxliff-file "{filename}", but the import of change-markers is disabled.',
+        'E1003' => 'There are change-markers in the sdlxliff-file "{filename}", but the import of change-markers is disabled or plug-in TrackChanges is disabled or not available',
         'E1004' => 'Locked-tag-content was requested but tag does not contain a xid attribute.',
         'E1005' => '<sdl:seg-defs was not found in the current transunit: "{transunit}"',
         'E1006' => 'Loading the tag information from the SDLXLIFF header has failed!',

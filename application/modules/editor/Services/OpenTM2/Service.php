@@ -40,6 +40,8 @@ class editor_Services_OpenTM2_Service extends editor_Services_ServiceAbstract
     public const NAME = 'OpenTM2';
     public const DEFAULT_COLOR = 'aaff7f';
 
+    protected $resourceClass = editor_Services_OpenTM2_Resource::class;
+
     /**
      * URL to confluence-page
      * @var string

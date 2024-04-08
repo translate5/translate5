@@ -178,19 +178,14 @@ Ext.define('Editor.view.admin.task.menu.TaskActionMenu', {
                     hidden: true,
                     exportMenu: null,//Custom bindable menu property.
                     bind: {
-                        hidden: '{!isEditorShowexportmenuTask}',
-                        exportMenu: '{exportMenuConfig}'
+                        hidden: '{!isEditorShowexportmenuTask}'
                     },
                     glyph: 'f56e@FontAwesome5FreeSolid',
                     sortIndex: 12,
-                    publishes: {
-                        exportMenu: true
-                    },
-                    //INFO: initialize the menu, it is hidden and configured via view model
-                    menu: {},
-                    setExportMenu: function (newMenu) {
-                        var me = this;
-                        me.setMenu(newMenu, true);
+                    menu: {
+                        xtype:'adminExportMenu',
+                        task: task,
+                        fields: (task && task.hasMqm()) ? task.segmentFields() : false
                     }
                 }, {
                     // - Excel Reimport Icon, bei Klick darauf öffnet sich der Datei-Upload-Dialog zum Reimport der Excel-Datei

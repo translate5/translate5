@@ -121,6 +121,9 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
         store:{
             '#languageResourcesTaskAssoc':{
                 load:'onLanguageResourcesTaskAssocStoreLoad'
+            },
+            '#projectTasks': {
+                load: 'onProjectTaskLoad'
             }
         }
     },
@@ -184,10 +187,10 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
         }
 
         configStore.loadByCustomerId(task.get('customerId'),function (){
-            var config = configStore.getConfig('plugins.MatchAnalysis.enableAnalysisActionMenu'),
-                menuItem = menu.down('#analysisActionItem');
-
-            menuItem.setDisabled(!config);
+            var config = configStore.getConfig('plugins.MatchAnalysis.enableAnalysisActionMenu');
+            if (menu.rendered) {
+                menu.down('#analysisActionItem').setDisabled(!config);
+            }
         });
     },
 
@@ -235,6 +238,7 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
             xtype : 'toolbar',
             dock : 'bottom',
             ui: 'footer',
+            border: '1 0 0 0',
             items: [{
                 xtype:'button',
                 text: me.strings.analysis,
@@ -272,7 +276,6 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
                 //align: 'left'
             },
             padding: 5,
-
             defaults: {
                 padding: 5
             },
@@ -494,6 +497,22 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
             return 0;
         }
         return component.checked ? 1 : 0;
-    }
+    },
 
+    /**
+     * Disable analysis tab if project has no tasks for some reason
+     *
+     * @param store
+     * @param records
+     * @param successful
+     */
+    onProjectTaskLoad: function(store, records, successful) {
+        if (successful === false) {
+            return;
+        }
+        if (!records.length) {
+            this.getMatchAnalysisPanel().setDisabled();
+            this.getMatchAnalysisPanel().down('grid').getViewModel().set('hasAnalysisData', false);
+        }
+    }
 });

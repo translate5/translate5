@@ -28,22 +28,22 @@ END LICENSE AND COPYRIGHT
 
 /**
  * Entity Model for segment fields
- * @method integer getId() getId()
- * @method void setId() setId(int $id)
- * @method string getTaskGuid() getTaskGuid()
- * @method void setTaskGuid() setTaskGuid(string $guid)
- * @method string getName() getName()
- * @method void setName() setName(string $name)
- * @method string getType() getType()
- * @method void setType() setType(string $type)
- * @method string getLabel() getLabel()
- * @method void setLabel() setLabel(string $label)
- * @method string getWidth() getWidth()
- * @method void setWidth() setWidth(string $width)
- * @method boolean getRankable() getRankable()
- * @method void setRankable() setRankable(bool $rankable)
- * @method boolean getEditable() getEditable()
- * @method void setEditable() setEditable(bool $editable)
+ * @method string getId()
+ * @method void setId(int $id)
+ * @method string getTaskGuid()
+ * @method void setTaskGuid(string $guid)
+ * @method string getName()
+ * @method void setName(string $name)
+ * @method string getType()
+ * @method void setType(string $type)
+ * @method string getLabel()
+ * @method void setLabel(string $label)
+ * @method string getWidth()
+ * @method void setWidth(string $width)
+ * @method string getRankable()
+ * @method void setRankable(bool $rankable)
+ * @method string getEditable()
+ * @method void setEditable(bool $editable)
  */
 class editor_Models_SegmentField extends ZfExtended_Models_Entity_Abstract {
     //consts also defined in GUI Model Editor.model.segment.Field 

@@ -26,7 +26,7 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-
+use MittagQI\Translate5\LanguageResource\ReimportSegments;
 use MittagQI\Translate5\LanguageResource\TaskAssociation;
 use MittagQI\Translate5\Task\Current\Exception;
 use MittagQI\Translate5\Task\Current\NoAccessException;
@@ -210,7 +210,7 @@ class editor_FileController extends ZfExtended_RestController
             // we have to insert the worker before the taskPost
             if (!$worker->init($this->getCurrentTask()->getTaskGuid(), [
                 'languageResourceId' => $resource['languageResourceId'],
-                'segmentFilter' => NOW_ISO
+                ReimportSegments::FILTER_TIMESTAMP => NOW_ISO
             ])) {
                 throw new ZfExtended_Exception('LanguageResource ReImport Error on worker init()');
             }

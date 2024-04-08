@@ -47,12 +47,10 @@ Ext.define('Editor.controller.admin.TaskCustomField', {
 
                 // Get labels and tooltips
                 var labelL10n = Ext.JSON.decode(field.label, true) || {};
-                var tooltipL10n = Ext.JSON.decode(field.tooltip, true) || {};
 
                 // Primary config
                 column = {
                     text      : locale in labelL10n ? labelL10n[locale] : field.label,
-                    //tooltip   : locale in tooltipL10n ? tooltipL10n[locale] : field.tooltip,
                     xtype     : 'gridcolumn',
                     dataIndex : 'customField' + field.id,
                     stateId   : 'customField' + field.id,
@@ -110,18 +108,34 @@ Ext.define('Editor.controller.admin.TaskCustomField', {
             //
             return columns;
         },
-        getFormFieldsFor: function(formType) {
-            var locale = Editor.data.locale, config, fields = [];
+
+        /**
+         * Get item configs for the custom fields and render them in the defined place. If formType is 'projectWizard'
+         *  and editMode is true, the fields are rendered in task properties panel.
+         * @param formType
+         * @param editMode
+         * @returns {*[]}
+         */
+        getFormFieldsFor: function(formType, editMode) {
+            var locale = Editor.data.locale,
+                config,
+                fields = [];
 
             // Foreach custom field
             Editor.data.editor.task.customFields.forEach(field => {
 
                 // If field should not be shown in current formType - skip
-                if (!field.placesToShow.match(formType)) return;
+                if (!field.placesToShow.match(formType))
+                {
+                    return;
+                }
 
                 // If field should be shown in project wizard, but it's
                 // a readonly-field - skip, as it does not have any value at this step
-                if (formType === 'projectWizard' && field.mode === 'readonly') return;
+                if (formType === 'projectWizard' && field.mode === 'readonly')
+                {
+                    return;
+                }
 
                 // Get labels and tooltips
                 var labelL10n = Ext.JSON.decode(field.label, true) || {};
@@ -140,12 +154,16 @@ Ext.define('Editor.controller.admin.TaskCustomField', {
                     isCustom  : true
                 };
 
+                if(editMode){
+                    config.bind = '{currentTask.customField' + field.id+'}';
+                }
+
                 // If it's a checkbox
                 if (field.type === 'checkbox') {
 
                     // Use '1' instead of 'on', '0' instead of '' and submit anyway
                     config.getSubmitValue = function() {
-                        return this.checked ? 1 : 0
+                        return this.checked ? 1 : 0;
                     };
 
                 // Else if it's a combobox
@@ -157,7 +175,7 @@ Ext.define('Editor.controller.admin.TaskCustomField', {
                     // Re-structure to format supported by extjs
                     Ext.Object.each(decoded, (value, title) => store.push({
                         value: value,
-                        title: title[Editor.data.locale],
+                        title: title[Editor.data.locale]
                     }));
 
                     // Apply combobox-specific configs
@@ -189,27 +207,10 @@ Ext.define('Editor.controller.admin.TaskCustomField', {
             '#preferencesOverviewPanel': {
                 render: 'addToSettingsPanel'
             },
-            /*'#displayTabPanel': { // customerPanel > tabPanel
-                added: 'addToCustomerPanel',
-            },*/
             '#taskMainCard': {
                 render: {
                     fn: 'addCustomFieldsToTaskMainCard',
                     priority: 900 // we want after customersCombo has been added
-                }
-            },
-            '#taskMainCard combobox#customerId': {
-                change: {
-                    fn: function(customerCombo, customerId){
-                        customerId = (!customerId) ? null : customerId; // may be ''
-                        var selection = customerCombo.getSelection();
-                        if(selection){
-                            /*var store = Ext.getStore('taskCustomFieldStore').createImportWizardCustomFieldsMetaData(customerId),
-                                pgrid = Ext.getCmp('taskMainCardCustomFieldPropertyGrid');
-                            pgrid.setStore(store);
-                            pgrid.enable();*/
-                        }
-                    }
                 }
             }
         }
@@ -231,44 +232,7 @@ Ext.define('Editor.controller.admin.TaskCustomField', {
             });
         }
     },
-    /*addToCustomerPanel: function(tabPanel) {
-        if(Editor.app.authenticatedUser.isAllowed('taskCustomField')){
-            // create filtered store from taskCustomFieldStore & apply it to the grid's view-model
-            var vm = tabPanel.up('[viewModel]').getViewModel();
-            var vmStores = vm.storeInfo || {};
-            vmStores.customersTaskCustomFieldStore = {
-                source: 'taskCustomFieldStore',
-                storeId: 'customersTaskCustomFieldStore',
-                filters: [{
-                    id: 'clientFilter',
-                    property: 'customerId',
-                    value: '{list.selection}',
-                    filterFn: function(rec){
-                        return !rec.get('customerId') || (this._value && this._value.id === rec.get('customerId'));
-                    },
-                }],
-                sorters: [{
-                    property: 'customerId',
-                    direction: 'ASC'
-                }, {
-                    property: 'position',
-                    direction: 'ASC'
-                }]
-            };
-            vm.setStores(vmStores);
-            // add the custom fields grid to the tabPanel and bind it to the customer
-            tabPanel.insert(2, {
-                xtype: 'taskCustomFieldGrid',
-                routePrefix: 'client/:clientId/',
-                bind: {
-                    customer: '{list.selection}', // list is reference name of customerGrid
-                    store: '{customersTaskCustomFieldStore}'
-                },
-                isCustomerGrid: true,
-            });
-            tabPanel.setActiveTab(0);
-        }
-    },*/
+
     addCustomFieldsToTaskMainCard: function(taskMainCard) {
         taskMainCard.down('#taskMainCardContainer').add(
             Editor.controller.admin.TaskCustomField.getFormFieldsFor('projectWizard')

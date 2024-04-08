@@ -28,7 +28,11 @@ END LICENSE AND COPYRIGHT
 
 use MittagQI\Translate5\LanguageResource\Status as LanguageResourceStatus;
 
-class editor_Models_LanguageResources_Resource {
+class editor_Models_LanguageResources_Resource
+{
+    public const STRIP_FRAMING_TAGS_VALUES = 'values';
+    public const STRIP_FRAMING_TAGS_FILE_EXTENSIONS = 'fileExtensions';
+
     /**
      * name of the resource
      * @var string
@@ -75,6 +79,8 @@ class editor_Models_LanguageResources_Resource {
     protected $service;
     
     protected $serviceName;
+
+    protected bool $supportsStrippingFramingTags = false;
     
     /**
      * index is the fieldname for export values in the controller
@@ -93,7 +99,8 @@ class editor_Models_LanguageResources_Resource {
             'writable' => 'writable',
             'defaultColor' => 'defaultColor',
             'creatable' => 'creatable',
-            'engineBased' => 'engineBased'
+            'engineBased' => 'engineBased',
+            'supportsStrippingFramingTags' => 'supportsStrippingFramingTags',
     );
     
     /**
@@ -350,5 +357,15 @@ class editor_Models_LanguageResources_Resource {
     public function getEngineBased(): bool
     {
         return $this->engineBased;
+    }
+
+    public function getSupportsStrippingFramingTags(): bool
+    {
+        return $this->supportsStrippingFramingTags;
+    }
+
+    public function getStrippingFramingTagsConfig(): array
+    {
+        return [];
     }
 }

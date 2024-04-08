@@ -131,7 +131,7 @@ Ext.define('Editor.view.ToolTip', {
             result = me.getQmFlagData(node);
         } else {
             var allQmFlagNodes = node.getElementsByClassName('qmflag');
-            if (allQmFlagNodes.length == 1) {
+            if (allQmFlagNodes.length === 1) {
                 result = me.getQmFlagData(allQmFlagNodes[0]);
             } else {
                 // a) there is no qmFlag-Node
@@ -145,7 +145,6 @@ Ext.define('Editor.view.ToolTip', {
         } else if (node.parentNode && /(^|[\s])trackchanges([\s]|$)/.test(node.parentNode.className)) {
             result += me.getTrackChangesData(node.parentNode);
         }
-        
 
         //Workaround to show the titles of the img tags always in fulltag mode
         if (
@@ -153,7 +152,7 @@ Ext.define('Editor.view.ToolTip', {
             && me.flyHasOneOfCls(fly, ['number', 'tab', 'space', 'newline', 'nbsp', 'char', 't5placeable'])
         ) {
             var dom = fly.down('span.short');
-            result = dom ? dom.getAttribute('title') + (result ? '<br>'+result : '') : null;
+            result = dom ? dom.getAttribute('title').split('<').join('&lt;') + (result ? '<br>'+result : '') : null;
         }
 
         if(result){

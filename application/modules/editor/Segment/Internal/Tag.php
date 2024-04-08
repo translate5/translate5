@@ -290,6 +290,9 @@ final class editor_Segment_Internal_Tag extends editor_Segment_Tag {
         return ($this->isSingle() && $this->hasClass(self::CSS_CLASS_TAB));
     }
 
+    /**
+     * @return bool
+     */
     public function isPlaceable(): bool {
         return ($this->isSingle() && $this->hasClass(Placeable::MARKER_CLASS));
     }
@@ -430,6 +433,7 @@ final class editor_Segment_Internal_Tag extends editor_Segment_Tag {
      */
     public function renderReplaced(string $mode): string
     {
+        $content = '';
         // QUIRK: is the feature with length-attributes for whitespace-tags still in use ?
         if($mode === editor_TagSequence::MODE_STRIPPED){
 

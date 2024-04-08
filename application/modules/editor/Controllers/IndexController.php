@@ -31,6 +31,7 @@ use MittagQI\Translate5\Acl\Roles;
 use MittagQI\Translate5\Applet\Dispatcher;
 use MittagQI\Translate5\Task\FileTypeSupport;
 use MittagQI\Translate5\Task\Current\NoAccessException;
+use MittagQI\Translate5\Task\NoJobFoundException;
 use MittagQI\Translate5\Task\Reimport\FileparserRegistry;
 use MittagQI\Translate5\Task\TaskContextTrait;
 use MittagQI\Translate5\Cronjob\CronIpFactory;
@@ -80,7 +81,10 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
         'admin.TaskPreferences'         => [Rights::TASK_OVERVIEW_FRONTEND_CONTROLLER],
         'admin.TaskUserAssoc'           => [Rights::TASK_USER_ASSOC_FRONTEND_CONTROLLER],
         'admin.TaskCustomField'         => [Rights::TASK_CUSTOM_FIELD_FRONTEND_CONTROLLER],
-        'admin.Customer'                => [Rights::CUSTOMER_ADMINISTRATION],
+        'admin.Customer'                => [
+            Rights::CUSTOMER_ADMINISTRATION,
+            Rights::CUSTOMER_ASSOCIATION
+        ],
         'LanguageResourcesTaskassoc'    => [Rights::LANGUAGE_RESOURCES_TASKASSOC],
         'LanguageResources'             => [
             Rights::LANGUAGE_RESOURCES_MATCH_QUERY,
@@ -158,10 +162,10 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
             $this->view->headLink()->appendStylesheet(APPLICATION_RUNDIR . "/" . $oneCss);
         }
 
-        $this->view->appVersion = ZfExtended_Utils::getAppVersion();
+        $this->view->appVersion = $appVersion = ZfExtended_Utils::getAppVersion();
         $this->setJsVarsInView();
         $this->setThemeVarsInView($userConfig['runtimeOptions.extJs.theme']['defaults']);
-        $this->checkForUpdates($this->view->appVersion);
+        $this->checkForUpdates($appVersion);
     }
 
     /**
@@ -369,7 +373,7 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
 
         $this->view->Php2JsVars()->set(
             'frontend.importTask.edit100PercentMatch',
-            (bool)$rop->frontend->importTask->edit100PercentMatch
+            (bool)$rop->import->edit100PercentMatch
         );
 
         $this->view->Php2JsVars()->set(
@@ -589,7 +593,7 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
             // try to use the job of the current user and task, the one with a usedState,
         } catch (ZfExtended_Models_Entity_NotFoundException) { //SEE TRANSLATE-2972
             $this->redirect(APPLICATION_RUNDIR);
-        } catch (NoAccessException) {
+        } catch (NoAccessException|NoJobFoundException) {
             // NoAccess is thrown here only of no job with used state was found,
             // this is handled later on getting the initState
         }

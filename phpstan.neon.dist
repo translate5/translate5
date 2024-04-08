@@ -1,10 +1,14 @@
 includes:
 	- .phpstan/baseline.php
 parameters:
+	universalObjectCratesClasses:
+		- Zend_Config
+		- Zend_View
 	bootstrapFiles:
 		- .phpstan/constants.php
 	editorUrl: 'phpstorm://open?file=%%relFile%%&line=%%line%%'
 	level: 5
+	reportUnmatchedIgnoredErrors: false
 	paths:
 		- application
 		- library

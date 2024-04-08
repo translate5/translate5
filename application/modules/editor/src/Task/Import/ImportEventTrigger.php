@@ -157,8 +157,8 @@ class ImportEventTrigger
      */
     public function triggerTaskMetaEvent(editor_Models_Task $task, array $data): void
     {
-        if(!in_array($task->getTaskGuid(), static::$metaTasks)){
-            static::$metaTasks[] = $task->getTaskGuid();
+        if(!in_array($task->getTaskGuid(), self::$metaTasks)){
+            self::$metaTasks[] = $task->getTaskGuid();
             $this->triggerEvent(self::INIT_TASK_META, [
                 'task' => $task,
                 'meta' => $task->meta(),

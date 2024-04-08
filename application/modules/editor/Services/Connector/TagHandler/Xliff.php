@@ -205,4 +205,18 @@ class editor_Services_Connector_TagHandler_Xliff extends editor_Services_Connect
 
         return $result;
     }
+
+    /**
+     * sets the tag inputMap and converts it from xlftag => array format to xlftag => internal tag format
+     * @see editor_Models_Segment_InternalTag::setInputTagMap
+     * @param array $tagMap
+     * @return void
+     */
+    public function setInputTagMap(array $tagMap): void
+    {
+        foreach($tagMap as $key => $value) {
+            $tagMap[$key] = $value[1];
+        }
+        $this->utilities->internalTag->setInputTagMap($tagMap);
+    }
 }

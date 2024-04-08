@@ -1030,7 +1030,6 @@ Ext.define('Editor.controller.admin.TaskOverview', {
         if(menuXtype === 'projectActionMenu'){
             vm && vm.set('hasImportingTasks', me.getProjectImportingTasksCount(selectedTask) > 0);
         }
-        vm && vm.notify();
         menu.showAt(event.getXY());
     },
 

@@ -31,7 +31,8 @@ Ext.define('Editor.view.admin.config.Grid', {
     requires: [
         'Editor.view.admin.config.GridViewModel',
         'Editor.view.admin.config.GridViewController',
-        'Editor.view.admin.config.type.SimpleMap'
+        'Editor.view.admin.config.type.SimpleMap',
+        'Editor.view.admin.config.type.FixedMap'
     ],
     controller: 'adminConfigGrid',
     viewModel:{
@@ -119,7 +120,7 @@ Ext.define('Editor.view.admin.config.Grid', {
         //publish this field so it is bindable
         extraParams: true
     },
-    
+    border: 0,
     /***
      * allow the store extra params to be configurable on grid level. This will enable flexible loads via binding
      * This function only expects and handles extraParams with valid taskGuid or customerId as parameter.

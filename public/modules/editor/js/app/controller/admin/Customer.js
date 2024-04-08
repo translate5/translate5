@@ -107,7 +107,7 @@ Ext.define('Editor.controller.admin.Customer', {
      */
     onHeadPanelAfterRender: function(toolbar) {
         //if we are in edit task mode, do not add the multitenancy button
-        if(Ext.ComponentQuery.query('#segmentgrid')[0] || !this.isCustomerOverviewAllowed()){
+        if(Ext.ComponentQuery.query('#segmentgrid')[0]){
             return;
         }
         // multitenancy: add the drop-down "Switch client"
@@ -118,9 +118,6 @@ Ext.define('Editor.controller.admin.Customer', {
      * Admin add window after render handler
      */
     onAdminUserAddWindowAfterRender:function(adminWindow){
-        if(!this.isCustomerOverviewAllowed()){
-            return;
-        }
         var me = this,
             loginFieldset = adminWindow.down('#loginDetailsFieldset');
 
@@ -134,10 +131,6 @@ Ext.define('Editor.controller.admin.Customer', {
      * On admin user grid before render handler.
      */
     onAdminUserGridBeforeRender:function(taskgrid){
-        if(!this.isCustomerOverviewAllowed()){
-            return;
-        }
-
         //insert the customer column in the user grid
         var me = this,
             grid = taskgrid.getView().grid,
@@ -164,10 +157,10 @@ Ext.define('Editor.controller.admin.Customer', {
                 if(!v || v.length === 0){
                     return '';
                 }
-                var v = v.replace(/(^,)|(,$)/g, ''),
-                    customersStore=Ext.StoreManager.get('customersStore');
-                v=v.split(',');
-                for(var i=0;i<v.length;i++){
+                var customersStore=Ext.StoreManager.get('customersStore');
+                v = v.replace(/(^,)|(,$)/g, '');
+                v = v.split(',');
+                for(var i=0; i<v.length; i++){
                     var tmpRec=customersStore.findRecord('id',v[i],0,false,false,true);
                     tmpRec && names.push(tmpRec.get('name'));
                 }
@@ -178,13 +171,6 @@ Ext.define('Editor.controller.admin.Customer', {
         //insert the column after the locale column
         grid.headerCt.insert((grid.down('gridcolumn[dataIndex=locale]').fullColumnIndex + 1), column);
         grid.getView().refresh();
-    },
-
-    /**
-     * Check if the user has a frontend right to see the customer overview 
-     */
-    isCustomerOverviewAllowed:function(){
-        return Editor.app.authenticatedUser.isAllowed('customerAdministration');
     },
 
     /**

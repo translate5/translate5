@@ -51,6 +51,9 @@ Ext.define('Editor.view.admin.config.GridViewController', {
         store: {
             '#admin.Config':{
                 load:'onStoreLoad'
+            },
+            '#projectTasks': {
+                load: 'onProjectTaskLoad'
             }
         }
     },
@@ -312,5 +315,21 @@ Ext.define('Editor.view.admin.config.GridViewController', {
                 });
             }
          }, me);
+    },
+
+    /**
+     * Clear config store if project has no tasks for some reason
+     *
+     * @param store
+     * @param records
+     * @param successful
+     */
+    onProjectTaskLoad: function(store, records, successful) {
+        if (successful === false) {
+            return;
+        }
+        if (!records.length) {
+            this.getView().getStore().loadData([]);
+        }
     }
 });

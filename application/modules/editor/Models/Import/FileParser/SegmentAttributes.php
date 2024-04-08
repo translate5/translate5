@@ -109,7 +109,7 @@ class editor_Models_Import_FileParser_SegmentAttributes {
     
     /**
      * Max. number of lines in a segment (used for pixel-based length check only)
-     * @var integer
+     * @var integer|null
      */
     public $maxNumberOfLines = null;
     

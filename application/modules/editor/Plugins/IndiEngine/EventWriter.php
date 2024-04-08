@@ -91,19 +91,42 @@ class EventWriter extends ZfExtended_Logger_Writer_Database
      */
     public function getBase64() :string
     {
+        // Get log model
+        $log = ZfExtended_Factory::get(ZfExtended_Models_Log::class);
+
         // Get events
-        $eventA = ZfExtended_Factory
-            ::get(ZfExtended_Models_Log::class)
-            ->getAllAfter($this->config->lastPostedEventId, 1000);
+        $eventA = $log->getAllAfter($this->config->lastPostedEventId, 1000);
 
         // Setup httpHost
         $this->httpHost = $eventA[0]['httpHost'] ?? $_SERVER['SERVER_NAME'] ?? $_SERVER['HTTP_HOST'] ?? 'localhost';
 
-        // Deflate
-        $deflate = gzdeflate(json_encode($eventA), 9);
+        // Json encode events
+        $json_encoded = json_encode($eventA, JSON_INVALID_UTF8_SUBSTITUTE);
 
-        // Setup newLastId
-        $this->newLastId = $eventA ? array_pop($eventA)['id'] : false;
+        // If json encoding failed
+        if ($json_encoded === false) {
+
+            // Setup local logger instance
+            $localLogger = Zend_Registry::get('logger')->cloneMe('plugin.IndiEngine');
+
+            // Log that
+            $localLogger->warn('E1594', 'JSON error with code {json_error_code} occurred on attempt to json_encode events: {json_error_msg}', [
+                'json_error_code' => json_last_error(),
+                'json_error_msg' => json_last_error_msg(),
+                'range' => "Some of further " . count($eventA) . " events after ID {$this->config->lastPostedEventId}"
+            ]);
+
+            // Spoof events to be POSTed
+            $eventA = $log->getAllAfter($this->config->lastPostedEventId, 1, 'E1594');
+        }
+
+        // Deflate
+        $deflate = gzdeflate(json_encode($eventA, JSON_INVALID_UTF8_SUBSTITUTE), 9);
+
+        // Setup newLastId if there was no json error
+        if ($json_encoded !== false){
+            $this->newLastId = $eventA ? array_pop($eventA)['id'] : false;
+        }
 
         // Base64-encode
         return base64_encode($deflate);

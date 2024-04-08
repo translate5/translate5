@@ -35,6 +35,7 @@ Ext.define('Editor.plugins.MatchAnalysis.view.AnalysisPanelViewController', {
             grid = view && view.down('matchAnalysisGrid'),
             store = grid && grid.getStore();
 
-        store && store.load();
+        //save only when taskGuid given to prevent E1103 editor_Plugins_MatchAnalysis_Exception
+        store && 'taskGuid' in store.getProxy().getExtraParams() && store.load();
     }
 });

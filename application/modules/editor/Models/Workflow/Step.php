@@ -29,7 +29,7 @@ END LICENSE AND COPYRIGHT
 /**
  * Workflow Step Entity Objekt
  *
- * @method integer getId()
+ * @method string getId()
  * @method void setId(int $id)
  * @method string getWorkflowName()
  * @method void setWorkflowName(string $workflowName)
@@ -39,9 +39,9 @@ END LICENSE AND COPYRIGHT
  * @method void setLabel(string $label)
  * @method string getRole()
  * @method void setRole(string $role)
- * @method integer|null getPosition()
+ * @method string getPosition()
  * @method void setPosition(?integer $position)
- * @method bool getFlagInitiallyFiltered()
+ * @method string getFlagInitiallyFiltered()
  * @method void setFlagInitiallyFiltered(bool $filter)
  */
 class editor_Models_Workflow_Step extends ZfExtended_Models_Entity_Abstract {

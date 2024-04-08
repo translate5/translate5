@@ -38,52 +38,52 @@ use MittagQI\Translate5\ContentProtection\ContentProtector;
 /**
  * Segment Entity Object
  *
- * @method integer getId() getId()
- * @method void setId() setId(int $id)
- * @method int getSegmentNrInTask() getSegmentNrInTask()
- * @method void setSegmentNrInTask() setSegmentNrInTask(int $nr)
- * @method int getFileId() getFileId()
- * @method void setFileId() setFileId(int $id)
- * @method string getMid() getMid()
- * @method void setMid() setMid(string $mid)
- * @method string getUserGuid() getUserGuid()
- * @method void setUserGuid() setUserGuid(string $guid)
- * @method string getUserName() getUserName()
- * @method void setUserName() setUserName(string $name)
- * @method string getTaskGuid() getTaskGuid()
- * @method void setTaskGuid() setTaskGuid(string $guid)
- * @method int getTimestamp() getTimestamp()
- * @method void setTimestamp() setTimestamp(int $timestamp)
- * @method bool getEditable() getEditable()
- * @method void setEditable() setEditable(bool $editable)
- * @method bool getPretrans() getPretrans()
- * @method void setPretrans() setPretrans(bool $pretrans)
- * @method int getMatchRate() getMatchRate()
- * @method void setMatchRate() setMatchRate(int $matchrate)
- * @method string getMatchRateType() getMatchRateType()
- * @method int getStateId() getStateId()
- * @method void setStateId() setStateId(int $id)
- * @method integer getAutoStateId() getAutoStateId()
- * @method void setAutoStateId() setAutoStateId(int $id)
- * @method int getFileOrder() getFileOrder()
- * @method void setFileOrder() setFileOrder(int $order)
- * @method string getComments() getComments()
- * @method void setComments() setComments(string $comments)
- * @method integer getWorkflowStepNr() getWorkflowStepNr()
- * @method void setWorkflowStepNr() setWorkflowStepNr(int $stepNr)
- * @method string getWorkflowStep() getWorkflowStep()
- * @method void setWorkflowStep() setWorkflowStep(string $name)
+ * @method string getId()
+ * @method void setId(int $id)
+ * @method string getSegmentNrInTask()
+ * @method void setSegmentNrInTask(int $nr)
+ * @method string getFileId()
+ * @method void setFileId(int $id)
+ * @method string getMid()
+ * @method void setMid(string $mid)
+ * @method string getUserGuid()
+ * @method void setUserGuid(string $guid)
+ * @method string getUserName()
+ * @method void setUserName(string $name)
+ * @method string getTaskGuid()
+ * @method void setTaskGuid(string $guid)
+ * @method string getTimestamp()
+ * @method void setTimestamp(int $timestamp)
+ * @method string getEditable()
+ * @method void setEditable(bool $editable)
+ * @method string getPretrans()
+ * @method void setPretrans(bool $pretrans)
+ * @method string getMatchRate()
+ * @method void setMatchRate(int $matchrate)
+ * @method string getMatchRateType()
+ * @method string getStateId()
+ * @method void setStateId(int $id)
+ * @method string getAutoStateId()
+ * @method void setAutoStateId(int $id)
+ * @method string getFileOrder()
+ * @method void setFileOrder(int $order)
+ * @method string getComments()
+ * @method void setComments(string $comments)
+ * @method string getWorkflowStepNr()
+ * @method void setWorkflowStepNr(int $stepNr)
+ * @method string getWorkflowStep()
+ * @method void setWorkflowStep(string $name)
  *
  * this are just some helper for the always existing segment fields, similar named methods exists for all segment fields:
- * @method string getSource() getSource()
- * @method void setSource() setSource(string $content)
- * @method void setSourceEdit() setSourceEdit(string $content)
- * @method void setSourceMd5() setSourceMd5(string $md5hash)
- * @method string getTarget() getTarget()
- * @method void setTarget() setTarget(string $content)
- * @method string getTargetEdit() getTargetEdit()
- * @method void setTargetEdit() setTargetEdit(string $content)
- * @method void setTargetMd5() setTargetMd5(string $md5hash)
+ * @method string getSource()
+ * @method void setSource(string $content)
+ * @method void setSourceEdit(string $content)
+ * @method void setSourceMd5(string $md5hash)
+ * @method string getTarget()
+ * @method void setTarget(string $content)
+ * @method string getTargetEdit()
+ * @method void setTargetEdit(string $content)
+ * @method void setTargetMd5(string $md5hash)
  *
  */
 class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract
@@ -1724,7 +1724,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract
             return array();
         }
         $segmentsViewName = $this->segmentFieldManager->getView()->getName();
-        $sql = 'select id, segmentNrInTask, source, target, sourceMd5=? sourceMatch, targetMd5=? targetMatch, matchRate, autostateId
+        $sql = 'select id, segmentNrInTask, source, targetEdit as target, sourceMd5=? sourceMatch, targetMd5=? targetMatch, matchRate, autostateId
                 from ' . $segmentsViewName . '
                 where ((sourceMd5 = ? and sourceMd5 != ?)
                     or (targetMd5 = ? and targetMd5 != ?))
@@ -1792,7 +1792,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract
 
         // Fetch context data
         return $this->contextData = $this->db->getAdapter()->query('
-            SELECT `segmentNrInTask`, `id`, `fileId`, `sourceMd5`, `source`, `target` 
+            SELECT `segmentNrInTask`, `id`, `fileId`, `sourceMd5`, `source`, `targetEdit` as `target` 
             FROM `' . $segmentsViewName . '`
             WHERE `segmentNrInTask` IN (' . join(',', $nrA) . ') 
         ')->fetchAll(PDO::FETCH_UNIQUE);

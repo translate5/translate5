@@ -32,6 +32,7 @@ class TagCheck {
 
             const number = parseInt(match[2], 10);
             const id = type + number;
+            const originalId = match[1] + match[2];
 
             let isQaTag = /qmflag/.test(node.className);
 
@@ -54,11 +55,11 @@ class TagCheck {
                     continue;
                 }
 
-                excessTags.push(markupImagesCache[id]);
+                excessTags.push(markupImagesCache[originalId]);
             }
 
             if (foundIds.includes(id) && node.parentNode.nodeName.toLowerCase() !== "del") {
-                duplicatedTags.push(markupImagesCache[id]);
+                duplicatedTags.push(markupImagesCache[originalId]);
             } else {
                 if (node.parentNode.nodeName.toLowerCase() !== "del") {
                     foundIds.push(id);
@@ -155,32 +156,21 @@ class TagCheck {
     }
 
     getReferenceTagAtIndex(type, index) {
-        return this.referenceTags[type][index] !== undefined ? this.referenceTags[type][index] : null;
+        return this.referenceTags[type].find(
+            t => parseInt(t.data.nr.replace('locked', '')) === parseInt(index)
+        ) || null;
     }
 
-    // Since tags ordering is not always in order, we need to check the next tag
-    getReferenceTagAtIndexOrNext(type, index) {
-        for (let i = index; i <= index + 10; i++) {
-            let tag = this.getReferenceTagAtIndex(type, i);
-
-            if (tag) {
-                return tag;
-            }
-        }
-
-        return null;
+    getOpeningReferenceTagAtIndex(index) {
+        return this.getReferenceTagAtIndex('open', index);
     }
 
-    getOpeningReferenceTagAtIndexOrNext(index) {
-        return this.getReferenceTagAtIndexOrNext('open', index);
+    getClosingReferenceTagAtIndex(index) {
+        return this.getReferenceTagAtIndex('close', index);
     }
 
-    getClosingReferenceTagAtIndexOrNext(index) {
-        return this.getReferenceTagAtIndexOrNext('close', index);
-    }
-
-    getSingleReferenceTagAtIndexOrNext(index) {
-        return this.getReferenceTagAtIndexOrNext('single', index);
+    getSingleReferenceTagAtIndex(index) {
+        return this.getReferenceTagAtIndex('single', index);
     }
 
     getWhitespaceReferenceTagAtIndex(index) {

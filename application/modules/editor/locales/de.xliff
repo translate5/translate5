@@ -3783,13 +3783,21 @@
                 <source>Status "{0}" durch einen anderen Benutzer</source>
                 <target>Status "{0}" durch einen anderen Benutzer</target>
             </trans-unit>
-            <trans-unit id='QXVmZ2FiZW4gcmVpbXBvcnRpZXJlbg=='>
-                <source>Aufgaben reimportieren</source>
-                <target>Aufgaben reimportieren</target>
+            <trans-unit id='QWxsZSBTZWdtZW50ZSBpbSBUTSBzcGVpY2hlcm4='>
+                <source>Alle Segmente im TM speichern</source>
+                <target>Alle Segmente im TM speichern</target>
             </trans-unit>
-            <trans-unit id='QXVzZ2V3w6RobHRlIEF1ZmdhYmVuIGVybmV1dCBpbnMgYWt0dWVsbGUgVE0gaW1wb3J0aWVyZW4='>
-                <source>Ausgewählte Aufgaben erneut ins aktuelle TM importieren</source>
-                <target>Ausgewählte Aufgaben erneut ins aktuelle TM importieren</target>
+            <trans-unit id='QmVudXR6ZXItZ2VzcGVpY2hlcnRlIFNlZ21lbnRlIGltIFRNIHNwZWljaGVybg=='>
+                <source>Benutzer-gespeicherte Segmente im TM speichern</source>
+                <target>Benutzer-gespeicherte Segmente im TM speichern</target>
+            </trans-unit>
+            <trans-unit id='U3BlaWNoZXJ0IGFsbGUgU2VnbWVudGUgYWxsZXIgQXVmZ2FiZW4sIGRpZSBvYmVuIGFuZ2VoYWt0IHNpbmQgdW5kIGRlbSBUTSBtaXQgU2NocmVpYnJlY2h0ZW4genVnZXdpZXNlbiBzaW5k'>
+                <source>Speichert alle Segmente aller Aufgaben, die oben angehakt sind und dem TM mit Schreibrechten zugewiesen sind</source>
+                <target>Speichert alle Segmente aller Aufgaben, die oben angehakt sind und dem TM mit Schreibrechten zugewiesen sind</target>
+            </trans-unit>
+            <trans-unit id='U3BlaWNoZXJ0IG51ciBkaWUgQWJzY2huaXR0ZSwgZGllIHp1dm9yIHZvbiBlaW5lbSBCZW51dHplciBtYW51ZWxsIGdlc3BlaWNoZXJ0IHd1cmRlbi4gRGllcyBnaWx0IGbDvHIgYWxsZSBBdWZnYWJlbiwgZGllIG9iZW4gYW5nZWhha3Qgc2luZCB1bmQgZGVtIFRNIG1pdCBTY2hyZWlicmVjaHRlbiB6dWdld2llc2VuIHNpbmQ='>
+                <source>Speichert nur die Abschnitte, die zuvor von einem Benutzer manuell gespeichert wurden. Dies gilt für alle Aufgaben, die oben angehakt sind und dem TM mit Schreibrechten zugewiesen sind</source>
+                <target>Speichert nur die Abschnitte, die zuvor von einem Benutzer manuell gespeichert wurden. Dies gilt für alle Aufgaben, die oben angehakt sind und dem TM mit Schreibrechten zugewiesen sind</target>
             </trans-unit>
             <trans-unit id='R2xvYmFsZXNlIFZvcsO8YmVyc2V0enVuZyDDvGJlcnNwcmluZ2Vu'>
                 <source>Globalese Vorübersetzung überspringen</source>
@@ -5493,9 +5501,9 @@ Im Projektportal {portalLink} wurde die Aufgabe
                 <source>Weitere TM Daten erfolgreich importiert!</source>
                 <target>Weitere TM Daten erfolgreich importiert!</target>
             </trans-unit>
-            <trans-unit id='VE0vVE1YLURhdGVpIChvcHRpb25hbCk='>
-                <source>TM/TMX-Datei (optional)</source>
-                <target>TM/TMX-Datei (optional)</target>
+            <trans-unit id='WklQL1RNL1RNWC1EYXRlaSAob3B0aW9uYWwp'>
+                <source>ZIP/TM/TMX-Datei (optional)</source>
+                <target>ZIP/TM/TMX-Datei (optional)</target>
             </trans-unit>
             <trans-unit id='Qml0dGUgdmVyd2VuZGVuIFNpZSBlaW5lIFRNIG9kZXIgVE1YIERhdGVpIQ=='>
                 <source>Bitte verwenden Sie eine TM oder TMX Datei!</source>
@@ -7259,6 +7267,22 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
             <trans-unit id='enVyIEF1ZmdhYmUgc3ByaW5nZW4='>
                 <source>zur Aufgabe springen</source>
                 <target>zur Aufgabe springen</target>
+            </trans-unit>
+            <trans-unit id='WmVpdG9wdGlvbg=='>
+                <source>Zeitoption</source>
+                <target>Zeitoption</target>
+            </trans-unit>
+            <trans-unit id='QWt0dWVsbGVyIFplaXRwdW5rdA=='>
+                <source>Aktueller Zeitpunkt</source>
+                <target>Aktueller Zeitpunkt</target>
+            </trans-unit>
+            <trans-unit id='WmVpdHB1bmt0IGRlciBTZWdtZW50c3BlaWNoZXJ1bmc='>
+                <source>Zeitpunkt der Segmentspeicherung</source>
+                <target>Zeitpunkt der Segmentspeicherung</target>
+            </trans-unit>
+            <trans-unit id='QWxzIERhdHVtIHVuZCBVaHJ6ZWl0IGRlcyBlcnpldWd0ZW4gVE0tRWludHJhZ3Mgd2lyZCBiZWkgIlplaXRwdW5rdCBkZXIgU2VnbWVudHNwZWljaGVydW5nIiBkYXMgRGF0dW0gdmVyd2VuZGV0LCBhbiBkZW0gZXIgbGV0enRlIEJlbnV0emVyIGRhcyBTZWdtZW50IGluIGRlciBBdWZnYWJlIGdlc3BlaWNoZXJ0IGhhdC4gQW5kZXJuZmFsbHMgd2lyZCBkZXIgWmVpdHB1bmt0IHZlcndlbmRldCwgYW4gZGVtIGRpZSBBdWZnYWJlIG5ldSBpbnMgVE0gZHVyY2hnZXNwZWljaGVydCB3aXJk'>
+                <source>Als Datum und Uhrzeit des erzeugten TM-Eintrags wird bei "Zeitpunkt der Segmentspeicherung" das Datum verwendet, an dem er letzte Benutzer das Segment in der Aufgabe gespeichert hat. Andernfalls wird der Zeitpunkt verwendet, an dem die Aufgabe neu ins TM durchgespeichert wird</source>
+                <target>Als Datum und Uhrzeit des erzeugten TM-Eintrags wird bei "Zeitpunkt der Segmentspeicherung" das Datum verwendet, an dem er letzte Benutzer das Segment in der Aufgabe gespeichert hat. Andernfalls wird der Zeitpunkt verwendet, an dem die Aufgabe neu ins TM durchgespeichert wird</target>
             </trans-unit>
             <trans-unit id='QXVmZ2FiZW5tZW7DvCBhbnplaWdlbg=='>
                 <source>Aufgabenmenü anzeigen</source>
@@ -9048,6 +9072,26 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
                 <source>Standardmäßig als Pivot verwenden</source>
                 <target>Standardmäßig als Pivot verwenden</target>
             </trans-unit>
+            <trans-unit id='VW1zY2hsaWXDn2VuZGUgVGFncyBiZWltIEltcG9ydCBsw7ZzY2hlbg=='>
+                <source>Umschließende Tags beim Import löschen</source>
+                <target>Umschließende Tags beim Import löschen</target>
+            </trans-unit>
+            <trans-unit id='QXJiZWl0ZXQgYW5hbG9nIHp1ciBTeXN0ZW1rb25maWd1cmF0aW9uIHJ1bnRpbWVPcHRpb25zLmltcG9ydC54bGYuaWdub3JlRnJhbWluZ1RhZ3MsIGFiZXIgZsO8ciBUTVgtSW1wb3J0LiBTaWUgZW50ZmVybnQgYWxsZSAob2RlciBudXIgZ2VwYWFydGUpIFRhZ3Mgdm9tIEFuZmFuZyB1bmQgRW5kZSBlaW5lcyBpbXBvcnRpZXJ0ZW4gU2VnbWVudHMsIGZhbGxzIGFrdGl2aWVydC4gRGllIFN5c3RlbWtvbmZpZ3VyYXRpb24gc29sbHRlIGRhaGVyIGbDvHIgZGVuc2VsYmVuIEt1bmRlbiBkaWUgZ2xlaWNoZSBFaW5zdGVsbHVuZyBmw7xyIHp1IGltcG9ydGllcmVuZGUgQXVmZ2FiZW4gaGFiZW4uIFdlbm4gU2llIGJlc3RlaGVuZGUgVE1zIGtvbnZlcnRpZXJlbiBtw7xzc2VuLCBiaXR0ZW4gU2llIGRlbiB0cmFuc2xhdGU1LVN1cHBvcnQgdW0gSGlsZmUu'>
+                <source>Arbeitet analog zur Systemkonfiguration runtimeOptions.import.xlf.ignoreFramingTags, aber für TMX-Import. Sie entfernt alle (oder nur gepaarte) Tags vom Anfang und Ende eines importierten Segments, falls aktiviert. Die Systemkonfiguration sollte daher für denselben Kunden die gleiche Einstellung für zu importierende Aufgaben haben. Wenn Sie bestehende TMs konvertieren müssen, bitten Sie den translate5-Support um Hilfe.</source>
+                <target>Arbeitet analog zur Systemkonfiguration runtimeOptions.import.xlf.ignoreFramingTags, aber für TMX-Import. Sie entfernt alle (oder nur gepaarte) Tags vom Anfang und Ende eines importierten Segments, falls aktiviert. Die Systemkonfiguration sollte daher für denselben Kunden die gleiche Einstellung für zu importierende Aufgaben haben. Wenn Sie bestehende TMs konvertieren müssen, bitten Sie den translate5-Support um Hilfe.</target>
+            </trans-unit>
+            <trans-unit id='RW50ZmVybnQga2VpbmU='>
+                <source>Entfernt keine</source>
+                <target>Keine</target>
+            </trans-unit>
+            <trans-unit id='QWxsZQ=='>
+                <source>Alle</source>
+                <target>Alle</target>
+            </trans-unit>
+            <trans-unit id='VGFncGFhcmU='>
+                <source>Tagpaare</source>
+                <target>Tagpaare</target>
+            </trans-unit>
             <trans-unit id='Vm9yw7xiZXJzZXR6dW5n'>
                 <source>Vorübersetzung</source>
                 <target>Vorübersetzung</target>
@@ -9648,6 +9692,14 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
             <trans-unit id='Qml0dGUgZGVua2VuIFNpZSBkYXJhbiwgZGFzcyBhbGxlIFZlcndlbmR1bmdlbiBkaWVzZXIgT3B0aW9uIChmYWxscyB2b3JoYW5kZW4pIGVudGZlcm50IHdlcmRlbiwgd2VubiBzaWUgaW4gZWluZW0gZGVyIGJlc3RlaGVuZGVuIFByb2pla3RlL0F1ZmdhYmVuIGVyZsO8bGx0IHdlcmRlbi4gRm9ydGZhaHJlbj8='>
                 <source>Bitte denken Sie daran, dass alle Verwendungen dieser Option (falls vorhanden) entfernt werden, wenn sie in einem der bestehenden Projekte/Aufgaben erfüllt werden. Fortfahren?</source>
                 <target>Bitte denken Sie daran, dass alle Verwendungen dieser Option (falls vorhanden) entfernt werden, wenn sie in einem der bestehenden Projekte/Aufgaben erfüllt werden. Fortfahren?</target>
+            </trans-unit>
+            <trans-unit id='RGFzIERlZmluaWVyZW4gdW5kIMOEbmRlcm4gdm9uIEZlbGRlcm4ga2FubiB6dSBlaW5lbSBob2hlbiBSZXNzb3VyY2VudmVyYnJhdWNoIGbDvGhyZW4sIHdlbm4gZGFzIEZlbGQgZ2VzcGVpY2hlcnQgd2lyZC4gQml0dGUgdHVuIFNpZSBkaWVzIGluIEFic3RpbW11bmcgbWl0IGRlbSB0cmFuc2xhdGU1LVN1cHBvcnR0ZWFtLg=='>
+                <source>Das Definieren und Ändern von Feldern kann zu einem hohen Ressourcenverbrauch führen, wenn das Feld gespeichert wird. Bitte tun Sie dies in Abstimmung mit dem translate5-Supportteam.</source>
+                <target>Das Definieren und Ändern von Feldern kann zu einem hohen Ressourcenverbrauch führen, wenn das Feld gespeichert wird. Bitte tun Sie dies in Abstimmung mit dem translate5-Supportteam.</target>
+            </trans-unit>
+            <trans-unit id='VHVya21lbmlzY2ggKFR1cmttZW5pc3Rhbik='>
+                <source>Turkmenisch (Turkmenistan)</source>
+                <target>Turkmenisch (Turkmenistan)</target>
             </trans-unit>
         </body>
     </file>

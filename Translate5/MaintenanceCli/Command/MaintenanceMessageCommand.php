@@ -39,6 +39,7 @@ class MaintenanceMessageCommand extends MaintenanceCommand {
     
     protected function configure()
     {
+        $this->setAliases(['mnt:message', 'mnt:msg']);
         $this
         // the short description shown while running "php bin/console list"
         ->setDescription('Sets just a message in the maintenance announce message box to application users.')

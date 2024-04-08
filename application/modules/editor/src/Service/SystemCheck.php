@@ -30,6 +30,8 @@ namespace MittagQI\Translate5\Service;
 
 class SystemCheck extends \ZfExtended_Models_SystemRequirement_Modules_BulkAbstract
 {
+    public const CHECK_NAME = 'servicecheck';
+
     /**
      * @throws \ZfExtended_Exception
      * @throws \Zend_Exception

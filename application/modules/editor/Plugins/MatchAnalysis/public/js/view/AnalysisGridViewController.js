@@ -59,10 +59,11 @@ Ext.define('Editor.plugins.MatchAnalysis.view.AnalysisGridViewController', {
      * @param newTask
      */
     onProjectTaskSelectionChange: function (newTask){
+        var view = this.getView();
         if(!newTask){
+            view?.setTask(newTask);
             return;
         }
-        var view = this.getView();
         if (view) {
 
             view.down('#unitType').suspendEvent('change');
@@ -106,6 +107,12 @@ Ext.define('Editor.plugins.MatchAnalysis.view.AnalysisGridViewController', {
         if (!this.getView().task) {
             return;
         }
+
+        // If load request was not successful for some reason - return
+        if (success === false) {
+            return;
+        }
+
         var me=this,
         	view=me.getView(),
             vm = view.getViewModel(),

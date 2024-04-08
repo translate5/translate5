@@ -109,7 +109,7 @@ abstract class Worker extends PooledServiceWorker implements ProgressInterface
      * @param array $parameters
      * @return bool
      */
-    protected function validateParameters($parameters = [])
+    protected function validateParameters($parameters = []): bool
     {
         // required param defines the mode as defined in editor_Segment_Processing
         if (array_key_exists('processingMode', $parameters)) {
@@ -193,7 +193,7 @@ abstract class Worker extends PooledServiceWorker implements ProgressInterface
                 }
                 $flag = $this->onLooperException($processingException, $this->looper->getProcessedStates(), $this->looper->isReprocessingLoop());
                 if ($flag > 0) {
-                    // let the loop to continue processing the next segments and retrying the failed segment later on (if the exception-handling is correctly implemented)
+                    // let the loop continue processing the next segments and retrying the failed segment later on (if the exception-handling is correctly implemented)
                     $isFinished = false;
                 } else if ($flag === 0) {
                     // this finishes the loop and the whole processing without an exception

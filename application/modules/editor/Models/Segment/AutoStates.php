@@ -401,7 +401,8 @@ class editor_Models_Segment_AutoStates {
      */
     public function recalculateLockedState(editor_Models_Segment $segment): int
     {
-        return match ($segment->getAutoStateId()) {
+        $currentAutoState = (int) $segment->getAutoStateId();
+        return match ($currentAutoState) {
             self::TRANSLATED,
             self::REVIEWED_UNTOUCHED,
             self::REVIEWED_UNCHANGED,
@@ -411,7 +412,7 @@ class editor_Models_Segment_AutoStates {
             self::PRETRANSLATED
                 => self::LOCKED,
             default
-                => $segment->getAutoStateId(),
+                => $currentAutoState,
         };
     }
 

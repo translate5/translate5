@@ -67,7 +67,11 @@ Ext.define('Editor.view.admin.task.TaskManagement', {
         
         if(auth.isAllowed('languageResourcesTaskassoc')) {
             tabs.push({
-                xtype: 'languageResourceTaskAssocPanel'
+                xtype: 'languageResourceTaskAssocPanel',
+                bind:{
+                    loading:'{isLoadingActive}',
+                    disabled: '{!enablePanel}'
+                },
             });
         }
 

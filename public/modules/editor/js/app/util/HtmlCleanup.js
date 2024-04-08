@@ -71,73 +71,99 @@ Ext.define('Editor.util.HtmlCleanup', {
 		html = this.cleanInsertTags(html);
 		return html;
 	},
+
 	/**
 	 * Removes internal tags and replaces them with a split-value.
-	 * Internal whitespace tags will be turned to appropriate markup and thus reflected in the Live Editing
-	 * In this process open-single-close combinations will lead to a single split and close followed by such a construct or open predeceeded by such a construct will be reduced to one split.
-	 * open-close combinations will be preserved as it can be assumed they once surrounded some text which was removed by the author
-	 * @param string html
-	 * @param string splitKey: defaults to "<t5split>"
-	 * @return string: the cleaned html with split-values
+	 * Internal whitespace tags will be turned to appropriate markup (if they should not be stripped)
+	 * In this process open-single-close combinations will lead to a single split and close followed by such a construct
+	 * or open predeceeded by such a construct will be reduced to one split.
+	 * Open-close combinations will be preserved as it can be assumed they once surrounded some text which was removed
+	 * by the author
+	 * @param {string} html
+	 * @param {string} splitKey: defaults to "<t5split>"
+	 * @param {Boolean} stripWhitespace: if set, all internal whitespace tags are removed
+	 * @return {string}: the cleaned html with split-values
 	 */
-	cleanAndSplitInternalTagsForLiveEditing: function(html, splitKey){
+	cleanAndSplitInternalTags: function(html, splitKey, stripWhitespace){
 		if(!splitKey){
 			splitKey = '<t5split>';
 		}
 		// replace Placeables
 		html = this.replacePlaceables(html, splitKey);
 
-		// replace whitespace-tags with rendered whitespace
-		html = this.cleanInternalTags(html, "&nbsp;<t5split>", ['single','nbsp']);
-		html = this.cleanInternalTags(html, "<br/><t5split>", ['single','newline']);
-		html = this.cleanInternalTags(html, " &emsp;<t5split>", ['single','tab']);
+		if(stripWhitespace){
+			// strip whitespace-tags, just split
+			html = this.cleanInternalTags(html, "<t5split>", ['single','(nbsp|newline|tab)']);
+		} else {
+			// replace whitespace-tags with rendered whitespace
+			html = this.cleanInternalTags(html, "&nbsp;<t5split>", ['single','nbsp']);
+			html = this.cleanInternalTags(html, '<br/><t5split>', ['single','newline']);
+			html = this.cleanInternalTags(html, " &emsp;<t5split>", ['single','tab']);
+		}
 		
 		html = this.cleanInternalTags(html, "<t5open>", ['open']);
         html = this.cleanInternalTags(html, "<t5close>", ['close']);
 		html = this.cleanInternalTags(html, "<t5single>", ['single']);
 		// crucial: open/close sequences may contain just internal single tags and will be replaced as a whole
 		html = html.replace(/<t5open>(<t5single>)*<t5close>/ig, '<t5split>');
-		// neighbouring open-split or split-close construct are also replaced, only open/close combinations with real content in between (or no = empty real content) shall be kept
+		// neighbouring open-split or split-close construct are also replaced, only open/close combinations with
+		// real content in between (or no = empty real content) shall be kept
 		html = html.replace(/<t5close>(<t5split>)+/ig, '<t5close>');
 		html = html.replace(/(<t5split>)+<t5open>/ig, '<t5open>');
-		// replace remaining open / close (and fore safety single as well)
+		// adjust split-key if different
+		if(splitKey !== '<t5split>'){
+			html = html.split('<t5split>').join(splitKey);
+		}
+		// replace remaining open / close (and to make sure single as well)
 		html = html.replace(/<t5open>/ig, splitKey);
 		html = html.replace(/<t5close>/ig, splitKey);
 		return html.replace(/<t5single>/ig, splitKey);
 	},
+
 	/**
-     * Removes the "internal tags", div's with the classname "internal" and their contents. The replacement can be given, the default is the empty string
+	 * Removes any whitespace that may have been added by splitting/replacing internal tags with cleanAndSplitInternalTags
+	 * @param {string} html
+	 * @returns {string}
+	 */
+	cleanReplacedWhitespaceTags: function(html){
+		// the split-values need to match what was added in cleanAndSplitInternalTags !!
+		return html.split('<br/>').join('').split('&nbsp;').join(' ').split(' &emsp;').join(' ');
+	},
+
+	/**
+     * Removes the "internal tags", div's with the classname "internal" and their contents.
+	 * The replacement can be given, the default is the empty string
      * Multiple internal tags in a sequence are condensed to one replacement
-     * @param string html: the markup to clean
-     * @param string replacement: the replacement for the tag, defaults to ""
-     * @param string itClassName: if set, can specify the classname of the internal tag to replace (can be "open", "close" or "single")
-     * @return string: the cleaned text
+     * @param {string} html: the markup to clean
+     * @param {string} replacement: the replacement for the tag, defaults to ""
+     * @param {string[]} classNames: if set, can specify the additional classnames of the internal tag to replace
+     * @return {string}: the cleaned text
      */
     cleanInternalTags: function(html, replacement, classNames){
         if(!replacement){
             replacement = '';
         }
-        if(!classNames || classNames.length == 0){
+        if(!classNames || classNames.length === 0){
             return html.replace(/<div[^>]+internal-tag[^>]+>.+?<\/div>/ig, replacement);
         }
-        classNames = (classNames.length == 1) ? classNames[0] : classNames.join('[^>]+');
+        classNames = (classNames.length === 1) ? classNames[0] : classNames.join('[^>]+');
         var regex = new RegExp('<div[^>]+internal-tag[^>]+'+classNames+'[^>]+>.+?</div>', 'ig');
         html = html.replace(regex, replacement);
-        var regex = new RegExp('<div[^>]+'+classNames+'[^>]+internal-tag[^>]+>.+?</div>', 'ig');
+        regex = new RegExp('<div[^>]+'+classNames+'[^>]+internal-tag[^>]+>.+?</div>', 'ig');
         return html.replace(regex, replacement);
     },
     /**
      * Protects internal tags for further regex-processing by replacing the tag-name
-     * @param string html
-     * @return string
+     * @param {string} html
+     * @return {string}
      */
     cleanProtectInternalTags: function(html){
         return html.replace(/<div[^>]+internal-tag[^>]+>.+?<\/div>/ig, function(match){ return ("<t5intag" + match.substring(4, match.length - 6) + "</t5intag>"); });
     },
     /**
      * Reverses internal tags protected with ::cleanProtectInternalTags back to their proper form
-     * @param string html
-     * @return string
+     * @param {string} html
+     * @return {string}
      */
     cleanUnprotectInternalTags: function(html){
         return html.split("<t5intag").join("<div").split("</t5intag>").join("</div>");
@@ -228,9 +254,9 @@ Ext.define('Editor.util.HtmlCleanup', {
 
 	/**
 	 * Replaces Placeables with the placeablöe text and wraps the placeable with the given split-value
-	 * @param string html
-	 * @param string splitKey: defaults to "<t5split>"
-	 * @return string: the replaced html with split-values
+	 * @param {string} html
+	 * @param {string} splitKey: defaults to "<t5split>"
+	 * @return {string}: the replaced html with split-values
 	 */
 	replacePlaceables: function(html, splitKey){
 

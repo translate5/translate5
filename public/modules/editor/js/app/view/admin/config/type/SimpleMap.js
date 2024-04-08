@@ -94,7 +94,7 @@ Ext.define('Editor.view.admin.config.type.SimpleMap', {
         });
         config = {
             bind: {
-                title: '{l10n.configuration.title}',
+                title: '{l10n.configuration.title}'
             },
             height: 600,
             modal: true,
@@ -102,13 +102,13 @@ Ext.define('Editor.view.admin.config.type.SimpleMap', {
             layout: 'fit',
             bbar: ['->', {
                 bind: {
-                    text: '{l10n.configuration.save}',
+                    text: '{l10n.configuration.save}'
                 },
                 glyph: 'f00c@FontAwesome5FreeSolid',
                 handler: 'onSave'
             }, {
                 bind: {
-                    text: '{l10n.configuration.cancel}',
+                    text: '{l10n.configuration.cancel}'
                 },
                 glyph: 'f00d@FontAwesome5FreeSolid',
                 handler: 'onCancel'
@@ -126,14 +126,14 @@ Ext.define('Editor.view.admin.config.type.SimpleMap', {
                     items: [{
                         type: 'button',
                         bind: {
-                            text: '{l10n.configuration.add}',
+                            text: '{l10n.configuration.add}'
                         },
                         glyph: 'f067@FontAwesome5FreeSolid',
                         handler: 'onAdd'
                     }, {
                         type: 'button',
                         bind: {
-                            text: '{l10n.configuration.remove}',
+                            text: '{l10n.configuration.remove}'
                         },
                         glyph: 'f2ed@FontAwesome5FreeSolid',
                         handler: 'onRemove'
@@ -141,7 +141,7 @@ Ext.define('Editor.view.admin.config.type.SimpleMap', {
                 },
                 columns: [{
                     bind: {
-                        text: '{l10n.configuration.index}',
+                        text: '{l10n.configuration.index}'
                     },
                     dataIndex: 'index',
                     editor: !(instanceConfig.readonlyIndex || {
@@ -150,7 +150,7 @@ Ext.define('Editor.view.admin.config.type.SimpleMap', {
                     })
                 }, {
                     bind: {
-                        text: '{l10n.configuration.value}',
+                        text: '{l10n.configuration.value}'
                     },
                     dataIndex: 'value',
                     editor: {

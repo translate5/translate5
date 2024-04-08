@@ -85,7 +85,11 @@
                                         "reference" : "1.13.0"
                                 }
                         }
-		}		
+		}, {
+			"_README" : "A fork of the openai-php/client OpenAI PHP Client to be able to deliver fixes more rapidly",
+			"type" : "git",
+			"url" : "https://github.com/translate5/openai-client/"
+		}
 	],
 	"require" : {
 		"ext-xml": "*",
@@ -152,6 +156,7 @@
 		}
 	},
 	"scripts" : {
+		"phpstan" : "vendor/bin/phpstan",
 		"post-install-cmd" : "cghooks add --ignore-lock; cghooks update",
 		"post-update-cmd" : "cghooks update",
 		"pre-install-cmd" : "Translate5\\Installer\\HookIn::postPackageInstall"

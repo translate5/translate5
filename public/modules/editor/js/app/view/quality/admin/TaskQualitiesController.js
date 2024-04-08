@@ -38,6 +38,11 @@ Ext.define('Editor.view.quality.admin.TaskQualitiesController', {
             'taskGrid': {
                 taskImportFinished: 'onTaskImportFinished'
             }
+        },
+        store: {
+            '#projectTasks': {
+                load: 'onProjectTaskLoad'
+            }
         }
     },
     /**
@@ -45,5 +50,21 @@ Ext.define('Editor.view.quality.admin.TaskQualitiesController', {
      */
     onTaskImportFinished: function(task){
         this.getView().refreshStore(task.get('taskGuid'));
+    },
+
+    /**
+     * Clear qualities store if project has no tasks for some reason
+     *
+     * @param store
+     * @param records
+     * @param successful
+     */
+    onProjectTaskLoad: function(store, records, successful) {
+        if (successful === false) {
+            return;
+        }
+        if (!records.length) {
+            this.getView().down('treepanel').getStore().loadData([]);
+        }
     }
 });

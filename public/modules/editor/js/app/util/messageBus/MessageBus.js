@@ -95,8 +95,15 @@ Ext.define('Editor.util.messageBus.MessageBus', {
         /**
          * @cfg {Int} reconnectInterval Interval for trying a reconnection, in milliseconds
          */
-        reconnectInterval: 5000
+        reconnectInterval: 5000,
+
+        /**
+         * @cfg {Int} pingInterval Interval for sending a ping message to the server, in milliseconds
+         */
+        pingInterval: 60000
     },
+
+    pingTask: null,
     socket: null,
     currentChannel: null,
     reconnectTask: null,
@@ -173,6 +180,9 @@ console.log('↓ ', data.channel, data.command, data.payload);
          */
         ws.onopen = function (event) {
             me.currentChannel = null; //needed in order to let the events come from the bus instance
+            if(!me.pingTask){
+                me.startPing();
+            }
             // if there is a reconnection task, disable it on successful connection open
             if (me.reconnectTask) {
                 Ext.Logger.info('MessageBus: reconnected busId '+me.getBusId());
@@ -183,13 +193,17 @@ console.log('↓ ', data.channel, data.command, data.payload);
             else {
                 me.fireEvent('open', me, event);
             }
-        }
+        };
         
         /**
          * WebSocket on close handler
          */
         ws.onclose = function (event) {
             me.currentChannel = null; //needed in order to let the events come from the bus instance
+            if (me.pingTask) {
+                Ext.TaskManager.stop(me.pingTask);
+                me.pingTask = null;
+            }
             me.fireEvent('close', me, event);
             //start reconnection interval task
             Ext.Logger.info('MessageBus: connection close busId '+me.getBusId());
@@ -203,7 +217,7 @@ console.log('↓ ', data.channel, data.command, data.payload);
                     }
                 });
             }
-        }
+        };
         
         /**
          * WebSocket on error handler
@@ -212,7 +226,7 @@ console.log('↓ ', data.channel, data.command, data.payload);
             me.currentChannel = null; //needed in order to let the events come from the bus instance
             me.fireEvent('error', me, event);
             //event did not provide useful information in some tests, so currently no further processing of event here 
-        }
+        };
     },
     /**
      * returns if the websocket connection is ready
@@ -226,6 +240,7 @@ console.log('↓ ', data.channel, data.command, data.payload);
      * @return {Number} current websocket status (0: connecting, 1: open, 2: closing, 3: closed)
      */
     getReadyStatus: function () {
+        console.log('getReadyStatus called',new Date().toLocaleString(), this.socket.readyState);
         return this.socket.readyState;
     },
     send: function(channel, command, data) {
@@ -238,5 +253,23 @@ console.log('↓ ', data.channel, data.command, data.payload);
             console.log('↑', msgObj.channel, msgObj.command, msgObj.payload);
             this.socket.send(Ext.JSON.encode(msgObj));
         }
+    },
+
+    /**
+     * Register ping task to check if the connection is still alive.
+     * This is required because in case of a connection loss, the onclose event is not always triggered. And based on
+     * that, the state flag of the websocket will not be updated. Because of that, the connection lost mask will not be
+     * shown to the user, and he is able to do actions leading to UI and in some cases back-end errors.
+     */
+    startPing: function() {
+        var me = this;
+        me.pingTask = Ext.TaskManager.start({
+            interval: me.getPingInterval(),
+            run: function () {
+                if (me.getReadyStatus() === me.OPEN) {
+                    me.send('instance', 'ping');
+                }
+            }
+        });
     }
 });

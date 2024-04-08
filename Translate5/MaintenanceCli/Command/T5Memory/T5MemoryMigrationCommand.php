@@ -39,6 +39,7 @@ use Exception;
 use GuzzleHttp\Psr7\Uri;
 use JsonException;
 use MittagQI\Translate5\LanguageResource\Status as LanguageResourceStatus;
+use MittagQI\Translate5\T5Memory\Enum\StripFramingTags;
 use RuntimeException;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Input\InputArgument;
@@ -73,6 +74,7 @@ class T5MemoryMigrationCommand extends Translate5AbstractCommand
     private const OPTION_CREATE_EMPTY = 'create-empty';
     private const OPTION_SOURCE_LANGUAGE  = 'source-language';
     private const OPTION_TARGET_LANGUAGE  = 'target-language';
+    private const OPTION_STRIP_FRAMING_TAGS_ON_IMPORT = 'strip-framing-tags-on-import';
     private const DATA_RELATIVE_PATH = '/../data/';
     private const EXPORT_FILE_EXTENSION = '.tmx';
     private const DEFAULT_WAIT_TIME_SECONDS = 600;
@@ -153,6 +155,13 @@ class T5MemoryMigrationCommand extends Translate5AbstractCommand
                 null,
                 InputOption::VALUE_REQUIRED,
                 'Target language code to filter language resources, doesn\'t work with --tm-name option'
+            )
+            ->addOption(
+                self::OPTION_STRIP_FRAMING_TAGS_ON_IMPORT,
+                's',
+                InputOption::VALUE_REQUIRED,
+                'Option can have 3 possible values: `none`, `all`, `paired`. Default value is `none`' .
+                ' And tells t5memory if it should strip framing tags on TMX import'
             );
     }
 
@@ -175,10 +184,11 @@ class T5MemoryMigrationCommand extends Translate5AbstractCommand
 
         if (count($languageResourcesData) === 0) {
             $this->io->warning('No language resources found for the given source URL');
+            // Check if there are any language resources left for the source resource id and ask if it should be removed
+            $languageResource = ZfExtended_Factory::get(LanguageResource::class);
+            $lrsRemainWithResourceId = $languageResource->getByResourceId($sourceResourceId);
 
-            if (!$this->isFilteringByName() // We are not filtering by name, but processing all resources
-                && !$this->createEmptyRequested() // We are not creating empty resource in target t5memory
-            ) {
+            if (count($lrsRemainWithResourceId) === 0) {
                 $helper = $this->getHelper('question');
                 $question = new ConfirmationQuestion(
                     'Do you want to remove ' . $sourceUrl . ' from config? (Y/N)',
@@ -186,7 +196,7 @@ class T5MemoryMigrationCommand extends Translate5AbstractCommand
                 );
 
                 if ($helper->ask($this->input, $this->output, $question)) {
-                    $this->cleanupConfig($sourceUrl, $targetUrl);
+                    $this->cleanupConfig($sourceUrl);
                 }
             }
 
@@ -205,6 +215,7 @@ class T5MemoryMigrationCommand extends Translate5AbstractCommand
             }
         }
 
+        $stripFramingTagsOnImport = $this->getStripTagsOnImport($input);
         $targetResourceId = $this->getTargetResourceId($targetUrl);
 
         $cloneLanguageResource = $input->getOption(self::OPTION_CLONE_LANGUAGE_RESOURCE);
@@ -214,11 +225,16 @@ class T5MemoryMigrationCommand extends Translate5AbstractCommand
 
         $progressBar = new ProgressBar($output, count($languageResourcesData));
 
+        $logger = Zend_Registry::get('logger')->cloneMe('editor.languageresource');
         foreach ($languageResourcesData as $languageResourceData) {
             $progressBar->advance();
 
             $languageResource = ZfExtended_Factory::get(LanguageResource::class);
             $languageResource->load($languageResourceData['id']);
+            $logger->info('E0000', 'Language resource migrate start: {tm}', [
+                'languageResource' => $languageResource,
+                'tm' => $languageResource->getId().' - '.$languageResource->getName()
+            ]);
 
             $type = $connector->getValidExportTypes()['TMX'];
             $filenameWithPath = $this->getFilePath() . $this->generateFilename($languageResource);
@@ -240,7 +256,13 @@ class T5MemoryMigrationCommand extends Translate5AbstractCommand
             $languageResource->removeSpecificData('version');
 
             try {
-                $this->importOrCreateEmpty($connector, $languageResource, $filenameWithPath, $type);
+                $this->importOrCreateEmpty(
+                    $connector,
+                    $languageResource,
+                    $filenameWithPath,
+                    $type,
+                    $stripFramingTagsOnImport
+                );
             } catch (Throwable $e) {
                 $processingErrors[] = [
                     'language resource: ' => $languageResourceData['id'] . ' (' . $languageResource->getName() . ')',
@@ -249,6 +271,11 @@ class T5MemoryMigrationCommand extends Translate5AbstractCommand
 
                 $this->revertChanges($languageResource, $languageResourceData);
             }
+
+            $logger->info('E0000', 'Language resource migrate finish: {tm}', [
+                'languageResource' => $languageResource,
+                'tm' => $languageResource->getId().' - '.$languageResource->getName()
+            ]);
         }
 
         $this->writeResult($processingErrors);
@@ -368,7 +395,6 @@ class T5MemoryMigrationCommand extends Translate5AbstractCommand
     private function generateFilename(LanguageResource $languageResource): string
     {
         $fileName = $languageResource->getSpecificData('memories', true)[0]['filename'];
-        $fileName = str_replace('ID' . $languageResource->getId(), '', $fileName);
 
         return $fileName . self::EXPORT_FILE_EXTENSION;
     }
@@ -409,20 +435,25 @@ class T5MemoryMigrationCommand extends Translate5AbstractCommand
         Connector $connector,
         LanguageResource $languageResource,
         string $filenameWithPath,
-        string $type
+        string $type,
+        StripFramingTags $stripFramingTagsOnImport
     ): void {
-        if (!$this->createEmptyRequested()) {
+        if ($this->createEmptyRequested()) {
+            $fileInfo = [];
+        } else {
             $fileInfo = [
                 'tmp_name' => $filenameWithPath,
                 'type' => $type,
                 'name' => basename($filenameWithPath),
             ];
-        } else {
-            $fileInfo = [];
         }
 
-        $connector->connectTo($languageResource, $languageResource->getSourceLang(), $languageResource->getTargetLang());
-        $successful = $connector->addTm($fileInfo);
+        $connector->connectTo(
+            $languageResource,
+            $languageResource->getSourceLang(),
+            $languageResource->getTargetLang()
+        );
+        $successful = $connector->addTm($fileInfo, ['stripFramingTags' => $stripFramingTagsOnImport->value]);
 
         if (!$successful) {
             throw new RuntimeException('Failed to import file to ' . $filenameWithPath);
@@ -627,19 +658,24 @@ class T5MemoryMigrationCommand extends Translate5AbstractCommand
         if (count($languageResourcesData) > 1) {
             $askMemories = new ChoiceQuestion(
                 'Please choose a Memory:',
-                array_values(array_map(
+                array_map(
                     static fn($data) =>
-                        sprintf('%s | %s | %s', $data['name'], $data['sourceLangCode'], $data['targetLangCode']),
+                        sprintf(
+                            '%d | %s | %s | %s',
+                            $data['id'],
+                            $data['name'],
+                            $data['sourceLangCode'],
+                            $data['targetLangCode']
+                        ),
                     $languageResourcesData
-                )),
+                ),
                 null
             );
 
-            $chosen = $this->io->askQuestion($askMemories);
-            $name = explode(' | ', $chosen)[0];
+            $id = explode(' | ', $this->io->askQuestion($askMemories))[0];
 
             $languageResourcesData = [
-                $languageResourcesData[array_search($name, array_column($languageResourcesData, 'name'), true)]
+                $languageResourcesData[array_search($id, array_column($languageResourcesData, 'id'), true)]
             ];
         }
 
@@ -669,5 +705,22 @@ class T5MemoryMigrationCommand extends Translate5AbstractCommand
 
         return $sourceLanguage !== null
             && $targetLanguage !== null;
+    }
+
+    private function getStripTagsOnImport(InputInterface $input): StripFramingTags
+    {
+        $requestedValue = $input->getOption(self::OPTION_STRIP_FRAMING_TAGS_ON_IMPORT) ?? '';
+
+        $stripFramingTags = StripFramingTags::tryFrom($requestedValue);
+
+        if (null !== $stripFramingTags) {
+            return $stripFramingTags;
+        }
+
+        if ('' !== $requestedValue) {
+            throw new RuntimeException(self::OPTION_STRIP_FRAMING_TAGS_ON_IMPORT . ' value is invalid.');
+        }
+
+        return StripFramingTags::None;
     }
 }

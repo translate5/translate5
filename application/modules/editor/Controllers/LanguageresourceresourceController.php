@@ -21,7 +21,7 @@ START LICENSE AND COPYRIGHT
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
@@ -49,11 +49,11 @@ class editor_LanguageresourceresourceController extends ZfExtended_RestControlle
      * @throws ReflectionException
      * @throws Zend_Acl_Exception
      */
-    public function indexAction() {
-        $serviceManager = ZfExtended_Factory::get('editor_Services_Manager');
-        /* @var $serviceManager editor_Services_Manager */
+    public function indexAction(): void
+    {
+        $serviceManager = ZfExtended_Factory::get(editor_Services_Manager::class);
         $result = array();
-        
+
         $acl = ZfExtended_Acl::getInstance();
         $userRoles = ZfExtended_Authentication::getInstance()->getUserRoles();
 
@@ -68,58 +68,71 @@ class editor_LanguageresourceresourceController extends ZfExtended_RestControlle
             Rights::ID,
             Rights::LANGUAGE_RESOURCES_ADD_NON_FILEBASED
         );
-        
+
         // (1) the resources of the configured services
         $resources = $serviceManager->getAllResources();
-        foreach($resources as $resource) {
-            /* @var $resource editor_Models_LanguageResources_Resource */
+
+        foreach ($resources as $resource) {
             $isFilebased = $resource->getFilebased();
-            if($isFilebased ? !$isAllowedFilebased : !$isAllowedNonFilebased) {
+
+            if ($isFilebased ? !$isAllowedFilebased : !$isAllowedNonFilebased) {
                 continue;
             }
+
             $id = $resource->getid();
             $result[$id] = $resource->getDataObject();
-            
+
             //add languages to usable resources
-            $connector = ZfExtended_Factory::get('editor_Services_Connector');
-            /* @var $connector editor_Services_Connector */
-            
+            $connector = ZfExtended_Factory::get(editor_Services_Connector::class);
+
             $languages = $connector->languages($resource);
-            $result[$id]->sourceLanguages =$this->handleLanguageCodes($languages[editor_Services_Connector_Abstract::SOURCE_LANGUAGES_KEY] ?? $languages);
-            $result[$id]->targetLanguages =$this->handleLanguageCodes($languages[editor_Services_Connector_Abstract::TARGET_LANGUAGES_KEY] ?? $languages);
+            $result[$id]->sourceLanguages = $this->handleLanguageCodes(
+                $languages[editor_Services_Connector_Abstract::SOURCE_LANGUAGES_KEY] ?? $languages
+            );
+            $result[$id]->targetLanguages = $this->handleLanguageCodes(
+                $languages[editor_Services_Connector_Abstract::TARGET_LANGUAGES_KEY] ?? $languages
+            );
+
+            $result[$id]->stripFramingTagsConfig = $this->getStrippingFramingTagsConfig($resource);
         }
-        
-        // (2)  the unconfigured services
+
+        // (2) the unconfigured services
         $allUnconfiguredServices = $serviceManager->getAllUnconfiguredServices(true);
+
         foreach ($allUnconfiguredServices as $unconfiguredService) {
-            //filter out all configured but not reachable services(the api status request returns different status from available)
-            if(isset($unconfiguredService->id) && isset($result[$unconfiguredService->id])){
-                unset($result[$unconfiguredService->id]);
-                unset($unconfiguredService->id);
+            //filter out all configured but not reachable services
+            //(the api status request returns different status from available)
+            if (isset($unconfiguredService->id, $result[$unconfiguredService->id])) {
+                unset($result[$unconfiguredService->id], $unconfiguredService->id);
             }
+
             $result[] = $unconfiguredService;
         }
-        
+
         // (3)  the services from plug-ins that are not installed
         $allUninstalledPluginServices = $serviceManager->getAllUninstalledPluginServices();
+
         foreach ($allUninstalledPluginServices as $uninstalledService) {
             $result[] = $uninstalledService;
         }
-        
+
         //remove the resource id as array key (it is not required)
         $result = array_values($result);
-        
+
         //sort the results alphabetically by name
-        $customSort = function($a,$b){
-            if ($a->name == $b->name){
+        $customSort = static function ($a, $b) {
+            if ($a->name === $b->name) {
                 return 0;
             }
-            return ($a->name<$b->name) ? -1 : 1;
+
+            return ($a->name < $b->name) ? -1 : 1;
         };
-        usort($result,$customSort);
+
+        usort($result, $customSort);
         $this->view->rows = array_values($result);
         $this->view->total = count($result);
     }
+
     public function getAction() {
         throw new ZfExtended_BadMethodCallException(__CLASS__.'->get');
     }
@@ -168,6 +181,31 @@ class editor_LanguageresourceresourceController extends ZfExtended_RestControlle
         $mapper = ZfExtended_Factory::get('editor_Models_LanguageResources_LanguagesMapper');
         /* @var $mapper editor_Models_LanguageResources_LanguagesMapper */
         return $mapper->map($languages);
+    }
+
+    private function getStrippingFramingTagsConfig(editor_Models_LanguageResources_Resource $resource): array
+    {
+        $config = \Zend_Registry::get('config');
+
+        if (!$config->runtimeOptions->LanguageResources->t5memory->stripFramingTagsEnabled) {
+            return [];
+        }
+
+        $translate = ZfExtended_Zendoverwrites_Translate::getInstance();
+        $config = $resource->getStrippingFramingTagsConfig();
+
+        if (empty($config[editor_Models_LanguageResources_Resource::STRIP_FRAMING_TAGS_VALUES])) {
+            return $config;
+        }
+
+        array_walk(
+            $config[editor_Models_LanguageResources_Resource::STRIP_FRAMING_TAGS_VALUES],
+            static function (&$value) use ($translate) {
+                $value[1] = $translate->_($value[1]);
+            }
+        );
+
+        return $config;
     }
 }
 

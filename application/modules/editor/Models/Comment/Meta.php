@@ -28,18 +28,18 @@ END LICENSE AND COPYRIGHT
 
 /**
  * Entity Model for comment meta data
- * @method integer getId() getId()
- * @method void setId() setId(int $id)
- * @method integer getCommentId() getCommentId()
- * @method void setCommentId() setCommentId(integer $id)
- * @method integer getOriginalId() getOriginalId()
- * @method void setOriginalId() setOriginalId(integer $id)
- * @method string getSeverity() getSeverity()
- * @method void setSeverity() setSeverity(string $severity)
- * @method string getVersion() getVersion()
- * @method void setVersion() setVersion(string $version)
- * @method string getAffectedField() getAffectedField()
- * @method void setAffectedField() setAffectedField(string $field)
+ * @method string getId()
+ * @method void setId(int $id)
+ * @method string getCommentId()
+ * @method void setCommentId(integer $id)
+ * @method string getOriginalId()
+ * @method void setOriginalId(integer $id)
+ * @method string getSeverity()
+ * @method void setSeverity(string $severity)
+ * @method string getVersion()
+ * @method void setVersion(string $version)
+ * @method string getAffectedField()
+ * @method void setAffectedField(string $field)
  */
 class editor_Models_Comment_Meta extends ZfExtended_Models_Entity_MetaAbstract {
     protected $dbInstanceClass = 'editor_Models_Db_CommentMeta';

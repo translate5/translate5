@@ -42,15 +42,7 @@ class QualitySpellCheckTest extends editor_Test_JsonTest {
         'autoQA.enableSegmentSpellCheck' => 1
     ];
 
-    protected static function setupImport(Config $config): void
-    {
-        $config
-            ->addTask('de-DE', 'en-US')
-            ->addUploadFile('testfiles/ten segments --- de-DE en-US.csv')
-            ->setToEditAfterImport();
-    }
-
-    public function testSpellCheck()
+    public function testVersion()
     {
         // extract the language-tool version out of the service-check
         // this way at least the maintainer of the test can easily see, that the error originates from a different languagetool-version
@@ -62,14 +54,38 @@ class QualitySpellCheckTest extends editor_Test_JsonTest {
         $checkResult = (count($matches) > 0) ? 'Version: ' . trim($matches[1]) : 'UNKNOWN VERSION';
         $expectedResult = static::api()->getFileContent('languagetool-version.txt', $checkResult);
         $this->assertEquals($expectedResult, $checkResult, 'The language-tool differs to what the testdata was created with, this certainly leads to a failing test.');
+    }
+
+    public function testTask1(){
+        $this->performTestForTask('ten segments --- de-DE en-US', 10);
+    }
+
+    public function testTask2(){
+        $this->performTestForTask('num12 --- de-DE pl-PL', 1);
+    }
+
+    private function performTestForTask(string $taskName, int $expectedSegmentQuantity){
+
+        // Detect source and target languages from filename
+        $lang = [];
+        preg_match('~ --- ([^ ]+) ([^ ]+)$~', $taskName, $lang);
+
+        // import task
+        $config = static::getConfig();
+        $config->import(
+            $config
+                ->addTask($lang[1], $lang[2])
+                ->addUploadFile('testfiles/' . $taskName . '.csv')
+                ->addTaskConfig('runtimeOptions.autoQA.enableSegmentSpellCheck', '1 ')
+                ->setToEditAfterImport()
+        );
 
         // Get segments and check their quantity
-        $expectedSegmentQuantity = 10;
-        $factQty = count(static::api()->getSegments(null, 10));
-        static::assertEquals($factQty, $expectedSegmentQuantity, 'Not enough segments in the imported task');
+        $segmentQuantity = count(static::api()->getSegments(null, 10));
+        static::assertEquals($expectedSegmentQuantity, $segmentQuantity, 'Not enough segments in the imported task');
 
         // Check qualities
-        $jsonFile = 'ten segments --- de-DE en-US.json';
+        $jsonFile = $taskName.'.json';
         $tree = static::api()->getJsonTree('/editor/quality', [], $jsonFile);
         $treeFilter = Filter::createSingle('qtype', 'spellcheck');
         $this->assertModelEqualsJsonFile('FilterQuality', $jsonFile, $tree, '', $treeFilter);

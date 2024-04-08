@@ -27,20 +27,20 @@ END LICENSE AND COPYRIGHT
 */
 
 /***
-* @method void setId() setId(int $id)
-* @method int getId() getId()
-* @method void setTaskType() setTaskType(string $taskType)
-* @method string getTaskType() getTaskType()
-* @method void setSourceLang() setSourceLang(int $sourceLang)
-* @method int getSourceLang() getSourceLang()
-* @method void setTargetLang() setTargetLang(int $targetLang)
-* @method int getTargetLang() getTargetLang()
-* @method void setCustomerId() setCustomerId(int $customerId)
-* @method int getCustomerId() getCustomerId()
-* @method void setYearAndMonth() setYearAndMonth(string $yearAndMonth)
-* @method string getYearAndMonth() getYearAndMonth()
-* @method void setTaskCount() setTaskCount(int $taskCount)
-* @method int getTaskCount() getTaskCount()
+* @method void setId(int $id)
+* @method string getId()
+* @method void setTaskType(string $taskType)
+* @method string getTaskType()
+* @method void setSourceLang(int $sourceLang)
+* @method string getSourceLang()
+* @method void setTargetLang(int $targetLang)
+* @method string getTargetLang()
+* @method void setCustomerId(int $customerId)
+* @method string getCustomerId()
+* @method void setYearAndMonth(string $yearAndMonth)
+* @method string getYearAndMonth()
+* @method void setTaskCount(int $taskCount)
+* @method string getTaskCount()
 */
 
 class editor_Models_TaskUsageLog extends ZfExtended_Models_Entity_Abstract {

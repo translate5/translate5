@@ -35,12 +35,8 @@ END LICENSE AND COPYRIGHT
 /**
  * Parses files parsed with mit editor_Models_Import_FileParser_Csv for the export
  */
-class editor_Models_Export_FileParser_Csv extends editor_Models_Export_FileParser {
-    /**
-     * @var string classname of difftagger
-     */
-
-    protected $_classNameDifftagger = 'editor_Models_Export_DiffTagger_Csv';
+class editor_Models_Export_FileParser_Csv extends editor_Models_Export_FileParser
+{
     /**
      * @var string
      */
@@ -62,6 +58,12 @@ class editor_Models_Export_FileParser_Csv extends editor_Models_Export_FileParse
         $this->_delimiter = $this->config->runtimeOptions->import->csv->delimiter;
         $this->_enclosure = $this->config->runtimeOptions->import->csv->enclosure;
     }
+
+    protected function classNameDifftagger(): editor_Models_Export_DiffTagger
+    {
+        return new editor_Models_Export_DiffTagger_Csv();
+    }
+
     /**
      * reconstructs segment to the original source format
      * - nothing todo here for csv so far, cause tags are not supported so far
@@ -89,7 +91,8 @@ class editor_Models_Export_FileParser_Csv extends editor_Models_Export_FileParse
      * (non-PHPdoc)
      * @see editor_Models_Export_FileParser::getSegmentContent()
      */
-    protected function getSegmentContent($segmentId, $field) {
+    protected function getSegmentContent(int|string $segmentId, string $field): string
+    {
         $segment = parent::getSegmentContent($segmentId, $field);
         //decoding the htmlspecialchars before exporting to CSV
 

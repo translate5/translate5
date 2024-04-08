@@ -27,12 +27,15 @@ END LICENSE AND COPYRIGHT
 */
 
 use MittagQI\Translate5\Service\T5Memory;
+use MittagQI\Translate5\T5Memory\Enum\StripFramingTags;
 
 /**
  * OpenTM2 HTTP Connection API
  */
 class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiAbstract
 {
+    private const DATE_FORMAT = 'Ymd\THis\Z';
+
     const MAX_STR_LENGTH = 2048;
 
     /**
@@ -100,7 +103,7 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
     /**
      * This method imports a memory from a TMX file.
      */
-    public function importMemory($tmData, string $tmName)
+    public function importMemory($tmData, string $tmName, StripFramingTags $stripFramingTags)
     {
         //In:{ "Method":"import", "Memory":"MyTestMemory", "TMXFile":"C:/FileArea/MyTstMemory.TMX" }
         //Out: { "ReturnValue":0, "ErrorMsg":"" }
@@ -115,6 +118,7 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
             $tmData = $tmxRepairer->convert($tmData);
         }
         $data->tmxData = base64_encode($tmData);
+        $data->stripFramingTags = $stripFramingTags->value;
 
         $http = $this->getHttpWithMemory('POST', $tmName, '/import');
         $http->setConfig(['timeout' => $this->createTimeout(1200)]);
@@ -407,9 +411,9 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
         editor_Models_Segment $segment,
         string $filename,
         string $tmName,
-        bool $save2disk = true
-    ): bool
-    {
+        bool $save2disk = true,
+        bool $useSegmentTimestamp = false
+    ): bool {
         $this->error = null;
 
         $http = $this->getHttpWithMemory('POST', $tmName, 'entry');
@@ -419,11 +423,16 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
             return false;
         }
 
+        $timestamp = $useSegmentTimestamp
+            ? (new DateTimeImmutable($segment->getTimestamp()))->format(self::DATE_FORMAT)
+            : $this->nowDate();
+
         $json->documentName = $filename; // 101 doc match
         $json->author = $segment->getUserName();
-        $json->timeStamp = $this->nowDate();
+        $json->timeStamp = $timestamp;
         $json->context = $segment->getMid(); //INFO: this is segment stuff
-        $json->save2disk = $save2disk;
+        // t5memory does not understand boolean parameters, so we have to convert them to 0/1
+        $json->save2disk = $save2disk ? '1' : '0';
 
         $http->setRawData($this->jsonEncode($json), 'application/json; charset=utf-8');
 
@@ -567,7 +576,7 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
      */
     protected function nowDate()
     {
-        return gmdate('Ymd\THis\Z');
+        return gmdate(self::DATE_FORMAT);
     }
 
     /**

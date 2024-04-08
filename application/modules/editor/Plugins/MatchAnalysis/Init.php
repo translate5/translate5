@@ -49,7 +49,8 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract
      */
     protected $frontendControllers = array(
         Rights::PLUGIN_MATCH_ANALYSIS_MATCH_ANALYSIS => 'Editor.plugins.MatchAnalysis.controller.MatchAnalysis',
-        Rights::PLUGIN_MATCH_ANALYSIS_PRICING_PRESET => 'Editor.plugins.MatchAnalysis.controller.admin.PricingPreset'
+        Rights::PLUGIN_MATCH_ANALYSIS_PRICING_PRESET => 'Editor.plugins.MatchAnalysis.controller.admin.PricingPreset',
+        Rights::PLUGIN_MATCH_ANALYSIS_CUSTOMER_PRICING_PRESET => 'Editor.plugins.MatchAnalysis.controller.admin.PricingPreset'
     );
 
     protected $localePath = 'locales';
@@ -137,14 +138,11 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract
             [$this, 'handleCustomerAfterIndex']
         );
 
-        $config = Zend_Registry::get('config');
-        if ($config->runtimeOptions->plugins?->MatchAnalysis?->autoPretranslateOnTaskImport) {
-            $this->eventManager->attach(
-                ImportEventTrigger::class,
-                ImportEventTrigger::IMPORT_WORKER_STARTED,
-                [$this, 'handleImportWorkerQueued']
-            );
-        }
+        $this->eventManager->attach(
+            ImportEventTrigger::class,
+            ImportEventTrigger::IMPORT_WORKER_STARTED,
+            [$this, 'handleImportWorkerQueued']
+        );
     }
 
     /**
@@ -296,7 +294,10 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract
     {
         /* @var editor_Models_Task $task */
         $task = $event->getParam('task');
-        $this->handleOperation($task, ['pretranslate' => true, 'isTaskImport' => true]);
+        $config = $task->getConfig();
+        if ($config->runtimeOptions->plugins?->MatchAnalysis?->autoPretranslateOnTaskImport) {
+            $this->handleOperation($task, ['pretranslate' => true, 'isTaskImport' => true]);
+        }
     }
 
     /**

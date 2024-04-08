@@ -27,14 +27,14 @@ END LICENSE AND COPYRIGHT
 */
 
 /**
- * @method integer getId() getId()
- * @method void setId() setId(int $id)
- * @method string getUserGuid() getUserGuid()
- * @method void setUserGuid() setUserGuid(string $userGuid)
- * @method string getName() getName()
- * @method void setName() setName(string $name)
- * @method string getValue() getValue()
- * @method void setValue() setValue(string $value)
+ * @method string getId()
+ * @method void setId(int $id)
+ * @method string getUserGuid()
+ * @method void setUserGuid(string $userGuid)
+ * @method string getName()
+ * @method void setName(string $name)
+ * @method string getValue()
+ * @method void setValue(string $value)
  */
 class editor_Models_UserConfig extends ZfExtended_Models_Entity_Abstract {
     protected $dbInstanceClass = 'editor_Models_Db_UserConfig';

@@ -1755,7 +1755,7 @@ Ext.define('Editor.controller.Localizer', {
             add: '<?php echo $this->translate->_('Sprachressource hinzufügen');?>',
             resource: '<?php echo $this->translate->_('Ressource');?>',
             name: '<?php echo $this->translate->_('Name');?>',
-            file: '<?php echo $this->translate->_('TM/TMX-Datei (optional)');?>',
+            file: '<?php echo $this->translate->_('ZIP/TM/TMX-Datei (optional)');?>',
             importTmxType: '<?php echo $this->translate->_('Bitte verwenden Sie eine TM oder TMX Datei!');?>',
             color: '<?php echo $this->translate->_('Farbe');?>',
             categories: '<?php echo $this->translate->_('Kategorien');?>',
@@ -1772,7 +1772,9 @@ Ext.define('Editor.controller.Localizer', {
             writeAsDefaultTooltip: '<?php echo $this->translate->_('Standardmäßig wird bei neuen Aufgaben für die gewählten Kunden gesetzt, dass Segmente beim Segment speichern in die Sprachresource geschrieben werden');?>',
             collectionUploadTooltip: '<?php echo $this->translate->_('Erlaubte Dateiformate: TBX oder eine Zip-Datei, die eine oder mehrere TBX-Dateien enthält.');?>',
             pivotAsDefault: '<?php echo $this->translate->_('Standardmäßig als Pivot verwenden');?>',
-            pivotAsDefaultTooltip: '<?php echo $this->translate->_('Standardmäßig als Pivot verwenden');?>'
+            pivotAsDefaultTooltip: '<?php echo $this->translate->_('Standardmäßig als Pivot verwenden');?>',
+            stripFramingTags: '<?php echo $this->translate->_('Umschließende Tags beim Import löschen');?>',
+            stripFramingTagsTooltip: '<?php echo $this->translate->_('Arbeitet analog zur Systemkonfiguration runtimeOptions.import.xlf.ignoreFramingTags, aber für TMX-Import. Sie entfernt alle (oder nur gepaarte) Tags vom Anfang und Ende eines importierten Segments, falls aktiviert. Die Systemkonfiguration sollte daher für denselben Kunden die gleiche Einstellung für zu importierende Aufgaben haben. Wenn Sie bestehende TMs konvertieren müssen, bitten Sie den translate5-Support um Hilfe.');?>'
         }
     });
 
@@ -1891,7 +1893,9 @@ Ext.define('Editor.controller.Localizer', {
             importTmxType: '<?php echo $this->translate->_('Bitte verwenden Sie eine TMX Datei!');?>',
             importSuccess: '<?php echo $this->translate->_('Weitere TM Daten erfolgreich importiert!');?>',
             save: '<?php echo $this->translate->_('Speichern');?>',
-            cancel: '<?php echo $this->translate->_('Abbrechen');?>'
+            cancel: '<?php echo $this->translate->_('Abbrechen');?>',
+            stripFramingTags: '<?php echo $this->translate->_('Umschließende Tags beim Import löschen');?>',
+            stripFramingTagsTooltip: '<?php echo $this->translate->_('Arbeitet analog zur Systemkonfiguration runtimeOptions.import.xlf.ignoreFramingTags, aber für TMX-Import. Sie entfernt alle (oder nur gepaarte) Tags vom Anfang und Ende eines importierten Segments, falls aktiviert. Die Systemkonfiguration sollte daher für denselben Kunden die gleiche Einstellung für zu importierende Aufgaben haben. Wenn Sie bestehende TMs konvertieren müssen, bitten Sie den translate5-Support um Hilfe.');?>'
         }
     });
 
@@ -1923,9 +1927,15 @@ Ext.define('Editor.controller.Localizer', {
             state: '<?php echo $this->translate->_('Status');?>',
             inUse: '<?php echo $this->translate->_('Status "{0}" durch einen anderen Benutzer');?>',
             close: '<?php echo $this->translate->_('Schließen');?>',
-            reimport: '<?php echo $this->translate->_('Aufgaben reimportieren');?>',
-            reimportTooltip: '<?php echo $this->translate->_('Ausgewählte Aufgaben erneut ins aktuelle TM importieren');?>',
-            gotoTask: '<?php echo $this->translate->_('zur Aufgabe springen');?>'
+            reimportAll: '<?php echo $this->translate->_('Alle Segmente im TM speichern');?>',
+            reimportUserSaved: '<?php echo $this->translate->_('Benutzer-gespeicherte Segmente im TM speichern');?>',
+            reimportAllTooltip: '<?php echo $this->translate->_('Speichert alle Segmente aller Aufgaben, die oben angehakt sind und dem TM mit Schreibrechten zugewiesen sind');?>',
+            reimportUserSavedTooltip: '<?php echo $this->translate->_('Speichert nur die Abschnitte, die zuvor von einem Benutzer manuell gespeichert wurden. Dies gilt für alle Aufgaben, die oben angehakt sind und dem TM mit Schreibrechten zugewiesen sind');?>',
+            gotoTask: '<?php echo $this->translate->_('zur Aufgabe springen');?>',
+            timeOption: '<?php echo $this->translate->_('Zeitoption');?>',
+            currentTime: '<?php echo $this->translate->_('Aktueller Zeitpunkt');?>',
+            segmentSaveTime: '<?php echo $this->translate->_('Zeitpunkt der Segmentspeicherung');?>',
+            timeOptionTooltip: '<?php echo $this->translate->_('Als Datum und Uhrzeit des erzeugten TM-Eintrags wird bei "Zeitpunkt der Segmentspeicherung" das Datum verwendet, an dem er letzte Benutzer das Segment in der Aufgabe gespeichert hat. Andernfalls wird der Zeitpunkt verwendet, an dem die Aufgabe neu ins TM durchgespeichert wird');?>',
         }
     });
 
@@ -2099,6 +2109,8 @@ Editor.data.l10n = {
         title: '<?php echo $this->translate->_('Benutzerdefinierte Felder für Aufgaben');?>',
         save: '<?php echo $this->translate->_('Speichern');?>',
         cancel: '<?php echo $this->translate->_('Abbrechen');?>',
+        validationTitle: '<?php echo $this->translate->_('Warnung!');?>',
+        validationMessage: '<?php echo $this->translate->_('Das Definieren und Ändern von Feldern kann zu einem hohen Ressourcenverbrauch führen, wenn das Feld gespeichert wird. Bitte tun Sie dies in Abstimmung mit dem translate5-Supportteam.');?>',
         delete: {
             button: '<?php echo $this->translate->_('Löschen');?>',
             confirm: {
