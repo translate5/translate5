@@ -34,6 +34,9 @@ END LICENSE AND COPYRIGHT
 
 /**
  * Parsed mit editor_Models_Import_FileParser_Sdlxliff geparste Dateien für den Export
+ *
+ * INFO: Do not join any xml elements with new lines. This produces problems when the exported
+ * file is imported in other systems!
  */
 class editor_Models_Export_FileParser_Sdlxliff extends editor_Models_Export_FileParser
 {
@@ -273,7 +276,7 @@ class editor_Models_Export_FileParser_Sdlxliff extends editor_Models_Export_File
     protected function generateRevisions()
     {
         if ($this->isTrackChangesPluginActive) {
-            return implode(PHP_EOL, $this->revisions);
+            return implode('', $this->revisions);
         }
 
         $createRevision = function ($rev, $tagType = null) {
