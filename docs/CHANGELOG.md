@@ -19,6 +19,73 @@ All updates are (downwards) compatible! If not this is listed in the important r
 
 
 
+
+## [7.3.0] - 2024-04-05
+
+### Important Notes:
+#### [TRANSLATE-3655](https://jira.translate5.net/browse/TRANSLATE-3655)
+Needs at least t5memory >= 0.5.58, versions prior 0.5 must be migrated with the CLI t5memory:migration command!
+This feature is disabled by default and can be enabled by the translate5 team on hosted instances. On self-hosted instances, it can be enabled via the translate5 command-line tool by setting runtimeOptions.LanguageResources.t5memory.stripFramingTagsEnabled to 1.
+ 
+
+
+### Added
+**[TRANSLATE-3790](https://jira.translate5.net/browse/TRANSLATE-3790): LanguageResources - Overwrite DeepL API key per client** <br>
+Allow rewrite DeepL API key on customer config level
+
+**[TRANSLATE-3534](https://jira.translate5.net/browse/TRANSLATE-3534): Import/Export, TrackChanges - TrackChanges sdlxliff round-trip** <br>
+Accept track changes sdlxliff markup on import and transform it to translate5 syntax.
+Propagate translate5 track changes to sdlxliff file on export
+
+
+### Changed
+**[TRANSLATE-3842](https://jira.translate5.net/browse/TRANSLATE-3842): VisualReview / VisualTranslation - Newlines from segments (internal whitespace tags) do often "destroy" the layout, especially in the new paragraph layouts** <br>
+ENHANCEMENT: 
+* Configurable option to strip newlines from the segments when translating the WYSIWYG
+* always strip newlines from segments for pragraph-fields in the WYSIWYG
+
+**[TRANSLATE-3841](https://jira.translate5.net/browse/TRANSLATE-3841): Main back-end mechanisms (Worker, Logging, etc.) - TextShuttle available for clients with support contract** <br>
+TextShuttle plugin is now available with support contract.
+
+**[TRANSLATE-3839](https://jira.translate5.net/browse/TRANSLATE-3839): LanguageResources - Add possibility to UI to use timestamp of last segment save, when re-importing a task to the TM** <br>
+Add new option to reimport task UI which purpose is to specify which time should be used for updating segment in translation memory.
+
+**[TRANSLATE-3733](https://jira.translate5.net/browse/TRANSLATE-3733): LanguageResources - Introduce new language resource identifier specificId** <br>
+Introduce a new ID field for language resources in available also via ID. 
+It should contain an ID generated / coming from the originating data system - if any.
+
+**[TRANSLATE-3655](https://jira.translate5.net/browse/TRANSLATE-3655): LanguageResources - implement new switch to deal with framing tags on TMX import** <br>
+Added new option "Strip framing tags at import" for TMX import which influences the behavior of t5memory regarding segment framing tags on import.
+
+
+### Bugfixes
+**[TRANSLATE-3845](https://jira.translate5.net/browse/TRANSLATE-3845): Editor general - RootCause error: null is not an object (evaluating 'd.mask')** <br>
+Fix problem for UI error when message bus re-sync is triggered.
+
+**[TRANSLATE-3840](https://jira.translate5.net/browse/TRANSLATE-3840): Hotfolder Import - Hotfolder import deadline format is too strict** <br>
+The deadline timeformats were to strict
+
+**[TRANSLATE-3834](https://jira.translate5.net/browse/TRANSLATE-3834): Import/Export - runtimeOptions.project.defaultPivotLanguage not working for hotfolder projects** <br>
+FIX: Apply runtimeOptions.project.defaultPivotLanguage setting on Project creation with Hotfolder plugin
+
+**[TRANSLATE-3799](https://jira.translate5.net/browse/TRANSLATE-3799): t5memory - Segment check after update in t5memory doesn't work properly with escaped symbols** <br>
+translate5 - 7.4.0: Remove tab replacement again
+translate5 - 7.3.0: Additional code improvement
+translate5 - 7.2.2: Fixed check if segment was updated properly in t5memory 
+
+**[TRANSLATE-3795](https://jira.translate5.net/browse/TRANSLATE-3795): Client management - clientPM should not be able to give himself term PM rights** <br>
+FIX: Remove right for "PM selected clients" to make himself a "Term PM all clients"
+
+**[TRANSLATE-3731](https://jira.translate5.net/browse/TRANSLATE-3731): Task Management - Empty projects shows tasks of previous project** <br>
+If due errors only a project is created but no tasks belonging to it, then the task list of such project behaves strange.
+
+**[TRANSLATE-3699](https://jira.translate5.net/browse/TRANSLATE-3699): User Management - Client PM can choose user with role Light PM as PM** <br>
+FIX: PM for selected clients was able to select PMs not being assigned to his clients
+
+**[TRANSLATE-3630](https://jira.translate5.net/browse/TRANSLATE-3630): User Management - clientPM should be able to see all client configs** <br>
+FIX: The PM selected clients now has access to "File format settings" and "pricing presets" for his selected clients
+
+
 ## [7.2.4] - 2024-03-28
 
 ### Important Notes:
