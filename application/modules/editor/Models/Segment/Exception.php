@@ -40,5 +40,6 @@ class editor_Models_Segment_Exception extends ZfExtended_ErrorCodeException {
         'E1081' => 'Textlength by pixel failed; most probably data about the pixelWidth is missing: fontFamily: "{fontFamily} fontSize: "{fontSize}" character: "{char} ({charCode})".',
         'E1082' => 'Segment length calculation: missing pixel width for several characters.',
         'E1155' => 'Unable to save the segment. The segment model tried to save to the materialized view directly.',
+        'E1343' => 'Setting the FieldTags tags by text led to a changed text-content presumably because the encoded tags have been improperly processed'
     ];
 }

@@ -166,12 +166,20 @@ abstract class editor_TagSequence implements JsonSerializable {
     protected array $capturedErrors = [];
 
     /**
+     * Holds the initially set markup for later logging
+     * @var string|null
+     */
+    private ?string $originalMarkup = null;
+
+    /**
      * Sets the internal tags & the text by markup, acts like a constructor
      * @param string $text
      * @throws ZfExtended_Exception
      */
     protected function _setMarkup(string $text=NULL){
         if(!empty($text) && $text != editor_Segment_Tag::strip($text)){
+            // for better error-tracking, we cache the initial markup to be able to log it
+            $this->originalMarkup = $text;
             $this->unparse($text);
             // This debug can be used to evaluate the quality of the DOM parsing
             if(static::VALIDATION_MODE && $this->text != editor_Segment_Tag::strip($text)){
@@ -243,6 +251,9 @@ abstract class editor_TagSequence implements JsonSerializable {
         $this->_setMarkup($text);
         if($this->text != $textBefore){
             $extraData = ['textBefore' => $textBefore ];
+            if($this->originalMarkup !== null){
+                $extraData['originalMarkup'] = $this->originalMarkup;
+            }
             $this->logError('E1343', 'Setting the tags by text led to a changed text-content presumably because the encoded tags have been improperly processed', $extraData);
         }
     }
@@ -456,11 +467,15 @@ abstract class editor_TagSequence implements JsonSerializable {
             // TS-1337: This error happend "in the wild". It can only happen with malformed Markup. We need more data for a proper investigation
             if($nearest === null){
                 $errorData = [];
+                if($this->originalMarkup !== null){
+                    $errorData['originalMarkup'] = $this->originalMarkup;
+                }
                 $errorData['holder'] = $holder->toJson();
                 $errorData['container'] = $container->toJson();
                 $errorData['tag'] = $tag->toJson();
+
                 $errorData = $this->logError('E1343', 'Rendering TagSequence tags led to a invalid tag structure that could not be processed', $errorData);
-                throw new ZfExtended_ErrorCodeException('E1343', $errorData);
+                throw new editor_Models_Segment_Exception('E1343', $errorData);
             }
             $nearest->addChild($tag);
             $container = $tag;
