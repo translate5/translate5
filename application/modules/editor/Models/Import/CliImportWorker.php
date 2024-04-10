@@ -3,7 +3,7 @@
 START LICENSE AND COPYRIGHT
 
  This file is part of translate5
- 
+
  Copyright (c) 2013 - 2021 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
 
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
@@ -13,15 +13,15 @@ START LICENSE AND COPYRIGHT
  included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
-  
+
  There is a plugin exception available for use with this release of translate5 for
  translate5: Please see http://www.translate5.net/plugin-exception.txt or
  plugin-exception.txt in the root folder of translate5.
-  
+
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
@@ -45,7 +45,6 @@ class editor_Models_Import_CliImportWorker extends ZfExtended_Worker_Abstract
 
     /**
      * (non-PHPdoc)
-     * @return bool
      * @throws ReflectionException
      * @throws ZfExtended_Models_Entity_NotFoundException
      * @see ZfExtended_Worker_Abstract::work()
@@ -63,12 +62,12 @@ class editor_Models_Import_CliImportWorker extends ZfExtended_Worker_Abstract
         $customer->loadByNumber($parameters['customerNumber']);
 
         $language = ZfExtended_Factory::get(editor_Models_Languages::class);
-        if (!is_numeric($parameters['source'])) {
+        if (! is_numeric($parameters['source'])) {
             $language->loadByRfc5646($parameters['source']);
             $parameters['source'] = $language->getId();
         }
 
-        if (!is_null($parameters['pivotLanguage']) && !is_numeric($parameters['pivotLanguage'])) {
+        if (! is_null($parameters['pivotLanguage']) && ! is_numeric($parameters['pivotLanguage'])) {
             $language->loadByRfc5646($parameters['pivotLanguage']);
             $parameters['pivotLanguage'] = $language->getId();
         }
@@ -84,7 +83,7 @@ class editor_Models_Import_CliImportWorker extends ZfExtended_Worker_Abstract
         );
 
         foreach ($parameters['targets'] as $idx => $lang) {
-            if (!is_numeric($lang)) {
+            if (! is_numeric($lang)) {
                 $language->loadByRfc5646($lang);
                 $parameters['targets'][$idx] = $language->getId();
             }
@@ -126,7 +125,7 @@ class editor_Models_Import_CliImportWorker extends ZfExtended_Worker_Abstract
         $project->setImportAppVersion(ZfExtended_Utils::getAppVersion());
 
         $project->setSourceLang($sourceLang);
-        if (!is_null($pivotLanguage)) {
+        if (! is_null($pivotLanguage)) {
             $project->setRelaisLang($pivotLanguage);
         }
         $project->setTaskName($taskName);

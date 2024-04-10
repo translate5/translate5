@@ -1,10 +1,12 @@
 <?php
+
 namespace MittagQI\Translate5\Plugins\TermImport\Services\Across;
 
 /**
  * Special AcrossSoapConnector Exception extends the normal Exception
  */
-class Exception extends \ZfExtended_ErrorCodeException {
+class Exception extends \ZfExtended_ErrorCodeException
+{
     /**
      * @var string
      */

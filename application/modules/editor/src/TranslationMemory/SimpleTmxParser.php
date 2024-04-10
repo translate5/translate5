@@ -3,21 +3,21 @@
 START LICENSE AND COPYRIGHT
 
  This file is part of translate5
- 
+
  Copyright (c) 2013 - 2021 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
 
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
  This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
- as published by the Free Software Foundation and appearing in the file agpl3-license.txt 
- included in the packaging of this file.  Please review the following information 
+ as published by the Free Software Foundation and appearing in the file agpl3-license.txt
+ included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
-  
+
  There is a plugin exception available for use with this release of translate5 for
- translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or
  plugin-exception.txt in the root folder of translate5.
-  
+
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
@@ -39,8 +39,8 @@ use ZfExtended_Languages;
  * Also, only segments that have at least two following characters are returned,
  * everything else is not regarded as textual
  */
-final class SimpleTmxParser extends editor_Models_Import_FileParser_XmlParser {
-
+final class SimpleTmxParser extends editor_Models_Import_FileParser_XmlParser
+{
     /*
 
     A TMX file generally looks like this
@@ -96,12 +96,6 @@ final class SimpleTmxParser extends editor_Models_Import_FileParser_XmlParser {
     /**
      * Extracts the segments for the given languages out of the given absolute xml-path
      * Returns, if at least one segment could be extracted
-     * @param string $tmxFilePath
-     * @param string $sourceLanguageCode
-     * @param string $targetLanguageCode
-     * @param bool $stripXliffTags
-     * @param bool $fuzzyTargetMatching
-     * @return bool
      * @throws ZfExtended_Exception
      */
     public function extractFile(
@@ -110,13 +104,13 @@ final class SimpleTmxParser extends editor_Models_Import_FileParser_XmlParser {
         string $targetLanguageCode,
         bool $stripXliffTags = true,
         bool $fuzzyTargetMatching = false,
-    ): bool
-    {
+    ): bool {
         // load file
         $xmlString = @file_get_contents($tmxFilePath);
-        if(!$xmlString){
-            throw new ZfExtended_Exception('SimpleTmxParser: Could not get contents of file '.basename($tmxFilePath));
+        if (! $xmlString) {
+            throw new ZfExtended_Exception('SimpleTmxParser: Could not get contents of file ' . basename($tmxFilePath));
         }
+
         return $this->extract(
             $xmlString,
             $sourceLanguageCode,
@@ -125,15 +119,10 @@ final class SimpleTmxParser extends editor_Models_Import_FileParser_XmlParser {
             $fuzzyTargetMatching
         );
     }
+
     /**
      * Extracts the segments for the given languages out of the given xml-string
      * Returns, if at least one segment could be extracted
-     * @param string $xmlString
-     * @param string $sourceLanguageCode
-     * @param string $targetLanguageCode
-     * @param bool $stripXliffTags
-     * @param bool $fuzzyTargetMatching
-     * @return bool
      */
     public function extract(
         string $xmlString,
@@ -141,8 +130,7 @@ final class SimpleTmxParser extends editor_Models_Import_FileParser_XmlParser {
         string $targetLanguageCode,
         bool $stripXliffTags = true,
         bool $fuzzyTargetMatching = false,
-    ): bool
-    {
+    ): bool {
         $this->sourceLang = $sourceLanguageCode;
         $this->targetLang = $targetLanguageCode;
         $this->stripTags = $stripXliffTags;
@@ -170,16 +158,12 @@ final class SimpleTmxParser extends editor_Models_Import_FileParser_XmlParser {
      * Retrieves a 2-dimensional array of segments
      * The 2nd dimension is also numerical, the first element is the source as string,
      * the second element is an array with at least one entry when fuzzy-search was set, or otherwise also a string
-     * @return array
      */
     public function getSegments(): array
     {
         return $this->segments;
     }
 
-    /**
-     * @return int
-     */
     public function countSegments(): int
     {
         return $this->numSegments;
@@ -187,42 +171,32 @@ final class SimpleTmxParser extends editor_Models_Import_FileParser_XmlParser {
 
     /**
      * Handler when trans-unit starts
-     * @param string $tag
-     * @param array $attributes
-     * @param int $key
-     * @param bool $isSingle
-     * @return void
      */
     public function startTransUnit(string $tag, array $attributes, int $key, bool $isSingle): void
     {
-
         $this->currentVariants = [];
         $this->currentLang = null;
     }
 
     /**
      * Handler sets the collected target content to the evaluated target-node (if the target-node was no single node)
-     * @param string $tag
-     * @param int $key
-     * @param array $opener
-     * @return void
      */
     public function endTransUnit(string $tag, int $key, array $opener): void
     {
         $source = null;
         $target = [];
 
-        foreach($this->currentVariants as $lang => $content){
-            if($this->languageMatches($lang, true)){
+        foreach ($this->currentVariants as $lang => $content) {
+            if ($this->languageMatches($lang, true)) {
                 $source = $content;
-            } else if($this->languageMatches($lang, false)){
+            } elseif ($this->languageMatches($lang, false)) {
                 $target[$lang] = $content;
             }
         }
 
         $numTargets = count($target);
-        if(!empty($source) && $numTargets > 0){
-            if(!$this->fuzzyTargets || ($this->singleTargetsNoArray && $numTargets === 1)){
+        if (! empty($source) && $numTargets > 0) {
+            if (! $this->fuzzyTargets || ($this->singleTargetsNoArray && $numTargets === 1)) {
                 $this->segments[] = [$source, reset($target)];
             } else {
                 $this->segments[] = [$source, $target];
@@ -233,22 +207,18 @@ final class SimpleTmxParser extends editor_Models_Import_FileParser_XmlParser {
 
     private function languageMatches(string $lang, bool $isSource): bool
     {
-        $primary = substr($lang, 0,2);
-        if($isSource){
+        $primary = substr($lang, 0, 2);
+        if ($isSource) {
             return $lang === $this->sourceLang ||
                 ($this->fuzzyTargets && ($primary === $this->sourceLang || $primary === $this->primarySourceLang));
         }
+
         return $lang === $this->targetLang ||
             ($this->fuzzyTargets && ($primary === $this->targetLang || $primary === $this->primaryTargetLang));
     }
 
     /**
      * Starts a variant: gets the language from attributes
-     * @param string $tag
-     * @param array $attributes
-     * @param int $key
-     * @param bool $isSingle
-     * @return void
      */
     public function startTransUnitVariant(string $tag, array $attributes, int $key, bool $isSingle): void
     {
@@ -257,17 +227,13 @@ final class SimpleTmxParser extends editor_Models_Import_FileParser_XmlParser {
 
     /**
      * Ends a variant-segment: extracts the segment-content
-     * @param string $tag
-     * @param int $key
-     * @param array $opener
-     * @return void
      */
     public function endTransUnitVariantSegment(string $tag, int $key, array $opener): void
     {
         $content = $this->prepareContent(
             $this->getRange($opener['openerKey'] + 1, $key - 1, true)
         );
-        if($this->currentLang !== null && strlen($content) > 0){
+        if ($this->currentLang !== null && strlen($content) > 0) {
             $this->currentVariants[$this->currentLang] = $content;
         }
         $this->currentLang = null;
@@ -275,12 +241,10 @@ final class SimpleTmxParser extends editor_Models_Import_FileParser_XmlParser {
 
     /**
      * Prepares a segment
-     * @param string $content
-     * @return string
      */
     private function prepareContent(string $content): string
     {
-        if($this->stripTags){
+        if ($this->stripTags) {
             // some TMs have lots of escaped contents, makes no sense for textual contents
             $content = html_entity_decode($content, ENT_QUOTES);
             $content = strip_tags($content);
@@ -288,9 +252,10 @@ final class SimpleTmxParser extends editor_Models_Import_FileParser_XmlParser {
         $content = trim($content);
 
         // use only matches, that have a least two following "real" characters
-        if(preg_match('/\pL\pL/u', $content) === 1){
+        if (preg_match('/\pL\pL/u', $content) === 1) {
             return $content;
         }
+
         return '';
     }
 }

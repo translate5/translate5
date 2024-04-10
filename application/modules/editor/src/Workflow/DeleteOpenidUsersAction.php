@@ -3,7 +3,7 @@
 START LICENSE AND COPYRIGHT
 
  This file is part of translate5
- 
+
  Copyright (c) 2013 - 2021 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
 
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
@@ -13,15 +13,15 @@ START LICENSE AND COPYRIGHT
  included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
-  
+
  There is a plugin exception available for use with this release of translate5 for
  translate5: Please see http://www.translate5.net/plugin-exception.txt or
  plugin-exception.txt in the root folder of translate5.
-  
+
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
@@ -38,6 +38,7 @@ use ZfExtended_Models_User;
 class DeleteOpenidUsersAction extends editor_Workflow_Actions_Abstract
 {
     public const FALLBACK_PM_CONFIG = 'runtimeOptions.openid.fallbackPm';
+
     public function deleteOpenidUsers(bool $logOnDelete = true)
     {
         $openidConfig = Zend_Registry::get('config')->runtimeOptions->openid;
@@ -60,9 +61,13 @@ class DeleteOpenidUsersAction extends editor_Workflow_Actions_Abstract
 
         $select = $userDb->select()
             ->setIntegrityCheck(false)
-            ->from(['user' => $userDb->info($userDb::NAME)])
+            ->from([
+                'user' => $userDb->info($userDb::NAME),
+            ])
             ->join(
-                ['loginLog' => $loginLog->info($loginLog::NAME)],
+                [
+                    'loginLog' => $loginLog->info($loginLog::NAME),
+                ],
                 'user.login = loginLog.login',
                 ['max(created) as last_login']
             )
@@ -93,11 +98,13 @@ class DeleteOpenidUsersAction extends editor_Workflow_Actions_Abstract
 
             $logins[] = $row->login;
 
-            $userTaskAssocDb->delete(['userGuid = ?' => $user->getUserGuid()]);
+            $userTaskAssocDb->delete([
+                'userGuid = ?' => $user->getUserGuid(),
+            ]);
             $user->delete();
         }
 
-        if (!empty($logins) && $logOnDelete) {
+        if (! empty($logins) && $logOnDelete) {
             $logger->info(
                 'E1013',
                 sprintf(

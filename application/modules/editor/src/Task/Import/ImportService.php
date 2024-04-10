@@ -21,7 +21,7 @@ START LICENSE AND COPYRIGHT
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
@@ -53,10 +53,13 @@ use ZfExtended_Sanitized_HttpRequest;
 class ImportService
 {
     private TaskUsageLogger $usageLogger;
+
     private TaskDefaults $defaults;
+
     private ProjectWorkersService $workersService;
+
     private ImportEventTrigger $eventTrigger;
-    
+
     public function __construct()
     {
         $this->defaults = new TaskDefaults();
@@ -81,7 +84,6 @@ class ImportService
         ZfExtended_Sanitized_HttpRequest $request,
         array $data,
     ): array {
-
         $single = $this->prepareTaskType(
             $project,
             count($data['targetLang']) > 1,
@@ -117,7 +119,6 @@ class ImportService
     /**
      * Handles the import for non project data.
      * This will evaluate what kind of data provider should be used, and it will process the uploaded files
-     * @return array
      * @throws Exception
      */
     private function importSingleTask(
@@ -143,7 +144,7 @@ class ImportService
         $this->defaults->setTaskDefaults($task, $importWizardUsed);
 
         //for internal tasks the usage log requires different handling, so log only non-internal tasks
-        if (!$task->getTaskType()->isInternalTask()) {
+        if (! $task->getTaskType()->isInternalTask()) {
             //update the task usage log for the current task
             $this->usageLogger->log($task);
         }
@@ -159,8 +160,7 @@ class ImportService
         editor_Models_Import_DataProvider_Abstract $dataProvider,
         array $data,
         ZfExtended_Models_User $user
-    ): array
-    {
+    ): array {
         $entityId = $project->save();
         $project->initTaskDataDirectory();
 
@@ -178,7 +178,7 @@ class ImportService
         $project->setProjectId($entityId);
         $project->setTaskType($taskType->getImportProjectType());
 
-        $project->save();// save the entity to keep the project id in case the task import fails.
+        $project->save(); // save the entity to keep the project id in case the task import fails.
 
         $languages = ZfExtended_Factory::get(editor_Models_Languages::class);
         $languages = $languages->loadAllKeyValueCustom('id', 'rfc5646');
@@ -227,7 +227,6 @@ class ImportService
         array $data,
         ZfExtended_Models_User $user
     ): void {
-
         $this->eventTrigger->triggerTaskMetaEvent($task, $data);
 
         try {
@@ -260,12 +259,12 @@ class ImportService
         array $data
     ): editor_Models_Import_Configuration {
         $task->initTaskDataDirectory();
-        
+
         $importConfig = ZfExtended_Factory::get(editor_Models_Import_Configuration::class);
 
         $importConfig->userName = $user->getUsername();
         $importConfig->userGuid = $user->getUserGuid();
-        
+
         Zend_Registry::set('affected_taskGuid', $task->getTaskGuid()); //for TRANSLATE-600 only
 
         //pre import methods:
@@ -292,7 +291,7 @@ class ImportService
 
             $importConfig->isValid($task->getTaskGuid());
 
-            if (!$importConfig->hasRelaisLanguage()) {
+            if (! $importConfig->hasRelaisLanguage()) {
                 //reset given relais language value if no relais data is provided / feature is off
                 $task->setRelaisLang(0);
             }
@@ -312,7 +311,7 @@ class ImportService
 
             throw $e;
         }
-        
+
         return $importConfig;
     }
 

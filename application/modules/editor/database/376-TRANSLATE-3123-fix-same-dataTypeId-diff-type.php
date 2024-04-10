@@ -1,4 +1,5 @@
-<?php 
+<?php
+
 /*
 START LICENSE AND COPYRIGHT
 
@@ -27,9 +28,6 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-/**
- *
- */
 set_time_limit(0);
 
 //uncomment the following line, so that the file is not marked as processed:
@@ -45,7 +43,7 @@ $SCRIPT_IDENTIFIER = '377-TRANSLATE-3123-fix-same-dataTypeId-diff-type.php';
  * define database credential variables
  */
 $argc = count($argv);
-if(empty($this) || empty($argv) || $argc < 5 || $argc > 7) {
+if (empty($this) || empty($argv) || $argc < 5 || $argc > 7) {
     die("please dont call the script direct! Call it by using DBUpdater!\n\n");
 }
 
@@ -64,7 +62,6 @@ $byType = $db->query("
  * Find datatype-record by attribute-record's type (e.g $problem['attributeType']),
  * or create new datatype-record based on attribute-record's type and elementName (e.g. $problem['attributeTag'])
  *
- * @param editor_Models_Terminology_Models_AttributeDataType $dataType
  * @param array $problem
  * @param array $byType
  * @throws Zend_Db_Statement_Exception
@@ -72,21 +69,19 @@ $byType = $db->query("
  * @throws ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey
  * @throws ZfExtended_Models_Entity_NotFoundException
  */
-function findOrCreateDataType(editor_Models_Terminology_Models_AttributeDataType $dataType, $problem, &$byType) {
-
+function findOrCreateDataType(editor_Models_Terminology_Models_AttributeDataType $dataType, $problem, &$byType)
+{
     // If there is an existing datatype-record having type same as attribute-record type
     if ($dataTypeId = $byType[$problem['attributeType']] ?? 0) {
-
         // Load datatype-record by id
         $dataType->load($dataTypeId);
 
-    // Else
+        // Else
     } else {
-
         // Init new datatype-record
         $dataType->init([
             'label' => $problem['attributeTag'],
-            'type'  => $problem['attributeType']
+            'type' => $problem['attributeType'],
         ]);
 
         // Save it
@@ -100,12 +95,10 @@ function findOrCreateDataType(editor_Models_Terminology_Models_AttributeDataType
 /**
  * Update attributes at the step where we surely know the correct values for `dataTypeId`, `type` and `elementName`
  *
- * @param editor_Models_Terminology_Models_AttributeDataType $dataType
- * @param $problem
  * @param string $whereColumn
  */
-function updateAttributes(editor_Models_Terminology_Models_AttributeDataType $dataType, $problem, $whereColumn = 'dataTypeId') {
-
+function updateAttributes(editor_Models_Terminology_Models_AttributeDataType $dataType, $problem, $whereColumn = 'dataTypeId')
+{
     // Set attribute-record's dataTypeId to be as per datatype-record found attribute-record's type
     $dataType->db->getAdapter()->query("
         UPDATE `terms_attributes` 
@@ -124,17 +117,17 @@ function updateAttributes(editor_Models_Terminology_Models_AttributeDataType $da
 // Get checker
 $checker = new \editor_Models_Terminology_DataTypeConsistencyCheck();
 
-// Foreach 
+// Foreach
 foreach ($checker->checkAttributesAgainstDataTypes() as $problem) {
-
     // If it's a note-datatype (e.g. have label='note' and type='')
-    if (!$problem['datatypeType']) {
-
+    if (! $problem['datatypeType']) {
         // If attribute-record's type is 'note', it means we just need to load note-datatype-record
         // into $dataType model instance for further processing, but for doing that we just need to
         // make sure datatype-record's id to be picked from $byType[''] in findOrCreateDataType() call
         $_problem = $problem['attributeType'] == 'note'
-            ? ['attributeType' => '']
+            ? [
+                'attributeType' => '',
+            ]
             : $problem;
 
         // Load correct datatype-record into $dataType model instance (such record is created, if need)
@@ -143,9 +136,8 @@ foreach ($checker->checkAttributesAgainstDataTypes() as $problem) {
         // Update attributes
         updateAttributes($dataType, $problem);
 
-    // Else
+        // Else
     } else {
-
         // If attribute-record's dataTypeId is NULL then value of $problem['datatypeId']
         // is an id of attribute-record rather than id of datatype-record
         $whereColumn = $problem['datatypeType'] == 'NOT EXISTENT' ? 'id' : 'dataTypeId';

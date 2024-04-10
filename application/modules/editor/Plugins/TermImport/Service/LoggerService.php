@@ -80,7 +80,9 @@ class LoggerService
         $this->logger->error(
             'E1569',
             'Plug-In TermImport: Invalid filesystem config provided: "{config}"',
-            ['config' => json_encode($config)]
+            [
+                'config' => json_encode($config),
+            ]
         );
     }
 
@@ -97,7 +99,9 @@ class LoggerService
         $this->logger->error(
             'E1571',
             'Plug-In TermImport: Filesystem is not reachable: "{config}"',
-            ['config' => json_encode($config)]
+            [
+                'config' => json_encode($config),
+            ]
         );
     }
 

@@ -21,7 +21,7 @@ START LICENSE AND COPYRIGHT
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
@@ -34,7 +34,6 @@ use MittagQI\Translate5\Task\Export\Package\Source\Collection;
 use MittagQI\Translate5\Task\Export\Package\Source\Memory;
 use MittagQI\Translate5\Task\Export\Package\Source\Reference;
 use MittagQI\Translate5\Task\Export\Package\Source\Task;
-use ZfExtended_ErrorCodeException;
 use ZfExtended_Factory;
 use ZfExtended_Models_Worker;
 use ZfExtended_Utils;
@@ -47,21 +46,14 @@ class ExportSource
         Task::class,
         Collection::class,
         Memory::class,
-        Reference::class
+        Reference::class,
     ];
 
-    /**
-     * @param editor_Models_Task $task
-     */
-    public function __construct(private editor_Models_Task $task)
-    {
-
+    public function __construct(
+        private editor_Models_Task $task
+    ) {
     }
 
-
-    /**
-     * @return string
-     */
     public function initFileStructure(): string
     {
         $root = $this->getRootFolder();
@@ -76,7 +68,7 @@ class ExportSource
             /** @var Base $r */
             $r = ZfExtended_Factory::get($resource, [
                 $this->task,
-                $this
+                $this,
             ]);
             $this->mkdir($r->getFolderPath());
         }
@@ -95,7 +87,7 @@ class ExportSource
             /** @var Base $r */
             $r = ZfExtended_Factory::get($resource, [
                 $this->task,
-                $this
+                $this,
             ]);
             $r->validate();
         }
@@ -108,7 +100,7 @@ class ExportSource
             /** @var Base $r */
             $r = ZfExtended_Factory::get($resource, [
                 $this->task,
-                $this
+                $this,
             ]);
             $r->export($workerModel);
         }
@@ -123,24 +115,18 @@ class ExportSource
         if (is_dir($path)) {
             return;
         }
-        if (!mkdir($path) && !is_dir($path)) {
+        if (! mkdir($path) && ! is_dir($path)) {
             throw new Exception('E1454', [
-                'path' => $path
+                'path' => $path,
             ]);
         }
     }
 
-    /**
-     * @return string
-     */
     public function getRootFolder(): string
     {
         return $this->task->getAbsoluteTaskDataPath() . DIRECTORY_SEPARATOR . self::PACKAGE_FOLDER_NAME;
     }
 
-    /**
-     * @return array
-     */
     public function getExportSources(): array
     {
         return $this->exportSources;

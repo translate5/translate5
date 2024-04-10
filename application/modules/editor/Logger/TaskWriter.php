@@ -3,7 +3,7 @@
 START LICENSE AND COPYRIGHT
 
  This file is part of translate5
- 
+
  Copyright (c) 2013 - 2021 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
 
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
@@ -13,15 +13,15 @@ START LICENSE AND COPYRIGHT
  included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
-  
+
  There is a plugin exception available for use with this release of translate5 for
  translate5: Please see http://www.translate5.net/plugin-exception.txt or
  plugin-exception.txt in the root folder of translate5.
-  
+
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
@@ -76,7 +76,7 @@ class editor_Logger_TaskWriter extends ZfExtended_Logger_Writer_Abstract
                 //we get also modified values if value is the same, but the type was changed (integer vs string)
                 // therefore we check == for 0, so we get all falsy value changes
                 // otherwise we compare typeless to get only changed values
-                if ($value == 0 || $value != $task->__call('get' . ucfirst($field), array())) {
+                if ($value == 0 || $value != $task->__call('get' . ucfirst($field), [])) {
                     $event->extra['Task field ' . $field] = $value;
                 }
             }
@@ -89,6 +89,7 @@ class editor_Logger_TaskWriter extends ZfExtended_Logger_Writer_Abstract
         unset($event->extra['task']);
         unset($event->extraFlat['task']);
         $taskLog->setExtra($event->getExtraAsJson());
+
         try {
             $taskLog->save();
         } catch (Throwable) {
@@ -106,6 +107,7 @@ class editor_Logger_TaskWriter extends ZfExtended_Logger_Writer_Abstract
         if ($task && (is_string($task) || is_a($task, 'editor_Models_Task'))) {
             return parent::isAccepted($event);
         }
+
         return false;
     }
 }

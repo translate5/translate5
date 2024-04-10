@@ -21,7 +21,7 @@ START LICENSE AND COPYRIGHT
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
@@ -47,12 +47,12 @@ use ZfExtended_Models_User;
  */
 class ReimportFile
 {
-
     private FileDto $fileDto;
 
-    public function __construct(private editor_Models_Task $task, private ZfExtended_Models_User $user)
-    {
-
+    public function __construct(
+        private editor_Models_Task $task,
+        private ZfExtended_Models_User $user
+    ) {
     }
 
     /**
@@ -66,7 +66,7 @@ class ReimportFile
 
         $parserHelper = ZfExtended_Factory::get(Factory::class, [
             $this->task,
-            $segmentFieldManager
+            $segmentFieldManager,
         ]);
 
         $file = ZfExtended_Factory::get(editor_Models_File::class);
@@ -84,7 +84,7 @@ class ReimportFile
 
         $segmentProcessor = ZfExtended_Factory::get(Reimport::class, [
             $this->task,
-            $this->user
+            $this->user,
         ]);
 
         $segmentProcessor->setSegmentFile($fileId, $parser->getFileName());
@@ -95,9 +95,6 @@ class ReimportFile
         $parser->parseFile();
     }
 
-    /**
-     * @param FileDto $fileDto
-     */
     public function setFileDto(FileDto $fileDto): void
     {
         $this->fileDto = $fileDto;

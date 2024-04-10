@@ -21,7 +21,7 @@ START LICENSE AND COPYRIGHT
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
@@ -64,18 +64,17 @@ END LICENSE AND COPYRIGHT
  * @method string getGuid()
  * @method void setGuid(string $guid)
  */
-class editor_Models_Term_History extends ZfExtended_Models_Entity_Abstract {
+class editor_Models_Term_History extends ZfExtended_Models_Entity_Abstract
+{
     protected $dbInstanceClass = 'editor_Models_Db_Term_History';
 
     /**
      * Get array of history-records for a given term id
      *
-     * @param int $termId
-     * @return array
      * @throws Zend_Db_Statement_Exception
      */
-    public function getByTermId(int $termId): array {
-
+    public function getByTermId(int $termId): array
+    {
         // Fetch history
         $history = $this->db->getAdapter()->query('
             SELECT 

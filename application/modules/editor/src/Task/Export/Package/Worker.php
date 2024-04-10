@@ -3,7 +3,7 @@
 START LICENSE AND COPYRIGHT
 
  This file is part of translate5
- 
+
  Copyright (c) 2013 - 2021 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
 
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
@@ -13,15 +13,15 @@ START LICENSE AND COPYRIGHT
  included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
-  
+
  There is a plugin exception available for use with this release of translate5 for
  translate5: Please see http://www.translate5.net/plugin-exception.txt or
  plugin-exception.txt in the root folder of translate5.
-  
+
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
@@ -37,22 +37,14 @@ use ZfExtended_Authentication;
 use ZfExtended_Factory;
 use ZfExtended_Logger;
 
-/**
- *
- */
 class Worker extends editor_Models_Export_Worker
 {
-
     /***
      * @var ExportSource
      */
     private ExportSource $exportSource;
 
     /**
-     *
-     * @param editor_Models_Task $task
-     * @param bool $diff
-     * @return string
      * @throws Exception
      */
     public function initExport(editor_Models_Task $task, bool $diff): string
@@ -60,7 +52,7 @@ class Worker extends editor_Models_Export_Worker
         $this->task = $task;
 
         $this->exportSource = ZfExtended_Factory::get(ExportSource::class, [
-            $this->task
+            $this->task,
         ]);
 
         $root = $this->exportSource->initFileStructure();
@@ -69,14 +61,13 @@ class Worker extends editor_Models_Export_Worker
             $this->exportSource->validate();
             $this->events->trigger('initPackageFileStructure', $this, [
                 'exportSource' => $this->exportSource,
-                'task' => $this->task
+                'task' => $this->task,
             ]);
         } catch (\ZfExtended_ErrorCodeException $throwable) {
             throw new Exception('E1453', [
-                'task' => $task
+                'task' => $task,
             ], $throwable);
         }
-
 
         return $this->initFolderExport($task, $diff, $root);
     }
@@ -85,19 +76,17 @@ class Worker extends editor_Models_Export_Worker
      * @param $parameters
      * @return bool
      */
-    protected function validateParameters($parameters = array()): bool
+    protected function validateParameters($parameters = []): bool
     {
-        if (!parent::validateParameters($parameters)) {
+        if (! parent::validateParameters($parameters)) {
             return false;
         }
-        return !empty($parameters['userGuid']);
+
+        return ! empty($parameters['userGuid']);
     }
 
     /**
      * inits a export to a given directory
-     * @param editor_Models_Task $task
-     * @param bool $diff
-     * @param string $exportFolder
      * @return string the folder which receives the exported data
      */
     public function initFolderExport(editor_Models_Task $task, bool $diff, string $exportFolder)
@@ -105,9 +94,10 @@ class Worker extends editor_Models_Export_Worker
         $parameter = [
             'diff' => $diff,
             self::PARAM_EXPORT_FOLDER => $exportFolder,
-            'userGuid' => ZfExtended_Authentication::getInstance()->getUserGuid()
+            'userGuid' => ZfExtended_Authentication::getInstance()->getUserGuid(),
         ];
         $this->init($task->getTaskGuid(), $parameter);
+
         return $exportFolder;
     }
 
@@ -126,16 +116,15 @@ class Worker extends editor_Models_Export_Worker
             $this->task->loadByTaskGuid($this->taskGuid);
         }
 
-        if (!$this->validateParameters($parameters)) {
+        if (! $this->validateParameters($parameters)) {
             return false;
         }
 
         try {
-
             Lock::taskLock($this->task, editor_Models_Task::STATE_PACKAGE_EXPORT);
 
             $this->exportSource = ZfExtended_Factory::get(ExportSource::class, [
-                $this->task
+                $this->task,
             ]);
             $this->exportSource->export($this->workerModel);
         } catch (Throwable $throwable) {
@@ -143,14 +132,15 @@ class Worker extends editor_Models_Export_Worker
             /* @var ZfExtended_Logger $logger */
             $logger->exception($throwable, [
                 'extra' => [
-                    'task' => $this->task
-                ]
+                    'task' => $this->task,
+                ],
             ]);
 
             Lock::taskUnlock($this->task);
 
             throw $throwable;
         }
+
         return true;
     }
 }

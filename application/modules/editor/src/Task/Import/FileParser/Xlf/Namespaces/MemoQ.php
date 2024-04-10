@@ -3,7 +3,7 @@
 START LICENSE AND COPYRIGHT
 
  This file is part of translate5
- 
+
  Copyright (c) 2013 - 2021 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
 
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
@@ -13,11 +13,11 @@ START LICENSE AND COPYRIGHT
  included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
-  
+
  There is a plugin exception available for use with this release of translate5 for
  translate5: Please see http://www.translate5.net/plugin-exception.txt or
  plugin-exception.txt in the root folder of translate5.
-  
+
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
@@ -30,22 +30,25 @@ namespace MittagQI\Translate5\Task\Import\FileParser\Xlf\Namespaces;
 
 use editor_Models_Comment;
 use editor_Models_Export_FileParser_Xlf_Namespaces_MemoQ;
+use editor_Models_Import_FileParser_SegmentAttributes as SegmentAttributes;
 use editor_Models_Import_FileParser_XmlParser as XmlParser;
 use editor_Models_Segment_MatchRateType;
 use MittagQI\Translate5\Task\Import\FileParser\Xlf\Comments;
 use ZfExtended_Factory;
-use editor_Models_Import_FileParser_SegmentAttributes as SegmentAttributes;
 
 /**
  * XLF Fileparser Add On to parse MemoQ XLF specific stuff
  */
 class MemoQ extends AbstractNamespace
 {
-    const MEMOQ_XLIFF_NAMESPACE = 'xmlns:mq="MQXliff"';
-    const USERGUID = 'memoq-imported';
+    public const MEMOQ_XLIFF_NAMESPACE = 'xmlns:mq="MQXliff"';
 
-    public function __construct(protected XmlParser $xmlparser, protected Comments $comments)
-    {
+    public const USERGUID = 'memoq-imported';
+
+    public function __construct(
+        protected XmlParser $xmlparser,
+        protected Comments $comments
+    ) {
         parent::__construct($xmlparser, $comments);
         $this->registerParserHandler();
     }
@@ -68,7 +71,7 @@ class MemoQ extends AbstractNamespace
                 $attr = $opener['attributes'];
 
                 //if the comment is marked as deleted or is empty (a single attribute), we just do not import it
-                if ($opener['isSingle'] || (!empty($attr['deleted']) && strtolower($attr['deleted']) == 'true')) {
+                if ($opener['isSingle'] || (! empty($attr['deleted']) && strtolower($attr['deleted']) == 'true')) {
                     return;
                 }
 
@@ -111,29 +114,33 @@ class MemoQ extends AbstractNamespace
         switch ($status) {
             case 'notstarted':
                 $segmentAttributes->matchRateType = editor_Models_Segment_MatchRateType::TYPE_EMPTY;
+
                 break;
             case 'manuallyconfirmed':
             case 'partiallyedited':
                 $segmentAttributes->matchRateType = editor_Models_Segment_MatchRateType::TYPE_INTERACTIVE;
+
                 break;
             case 'pretranslated':
                 $segmentAttributes->isPreTranslated = true;
                 $segmentAttributes->matchRateType = editor_Models_Segment_MatchRateType::TYPE_TM;
+
                 break;
             case 'machinetranslated':
                 $segmentAttributes->isPreTranslated = true;
                 $segmentAttributes->matchRateType = editor_Models_Segment_MatchRateType::TYPE_MT;
-                if (!empty($attributes['mq:translatorcommitmatchrate'])) {
+                if (! empty($attributes['mq:translatorcommitmatchrate'])) {
                     $segmentAttributes->matchRate = $attributes['mq:translatorcommitmatchrate'];
                 }
+
                 break;
             default:
                 break;
         }
-        if (!empty($attributes['mq:percent'])) {
+        if (! empty($attributes['mq:percent'])) {
             $segmentAttributes->matchRate = $attributes['mq:percent'];
         }
-        if (!empty($attributes['mq:locked'])) {
+        if (! empty($attributes['mq:locked'])) {
             $segmentAttributes->locked = true;
         }
     }

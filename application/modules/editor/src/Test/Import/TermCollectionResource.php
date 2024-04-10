@@ -21,7 +21,7 @@ START LICENSE AND COPYRIGHT
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
@@ -34,8 +34,12 @@ namespace MittagQI\Translate5\Test\Import;
 final class TermCollectionResource extends LanguageResource
 {
     public bool $mergeTerms = false;
+
     public bool $useAsGlossarySource = false;
+
     protected string $serviceName = 'TermCollection';
+
     protected string $serviceType = 'editor_Services_TermCollection';
+
     protected string $_deleteRoute = 'editor/termcollection/';
 }

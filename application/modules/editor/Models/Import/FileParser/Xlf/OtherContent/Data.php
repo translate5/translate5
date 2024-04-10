@@ -21,54 +21,48 @@ START LICENSE AND COPYRIGHT
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
 
-class editor_Models_Import_FileParser_Xlf_OtherContent_Data {
+class editor_Models_Import_FileParser_Xlf_OtherContent_Data
+{
     public string $mid;
+
     public int $startMrkIdx;
+
     public int $endMrkIdx;
 
     /**
      * Contains the content as string with internal tags,
      *  with or without preserved whitespace, depending on the same name flag,
-     * @var string
      */
     public string $content = '';
 
     /**
      * Contains the above content as chunks - so no reparse is needed
-     * @var array
      */
     public array $contentChunks = [];
 
     /**
      * Contains the above content as original chunks - so no reparse is needed
      *  original means: internal tags are converted back - but all after the multiple whitespaces were condensed
-     * @var array
      */
     public array $contentChunksOriginal = [];
 
     /**
      * Contains the above content as original content in one string
-     * @var string
      */
     public string $contentOriginal = '';
 
     /**
      * Flag if current element should be imported
-     * @var bool
      */
     public bool $toBeImported = false;
 
-    /**
-     * @param string $mid
-     * @param int $startIdx
-     * @param int $endIdx
-     */
-    public function __construct(string $mid, int $startIdx, int $endIdx) {
+    public function __construct(string $mid, int $startIdx, int $endIdx)
+    {
         $this->mid = $mid;
         $this->startMrkIdx = $startIdx;
         $this->endMrkIdx = $endIdx;

@@ -21,7 +21,7 @@
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
- 		     http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
  END LICENSE AND COPYRIGHT
  */
@@ -31,8 +31,8 @@ use MittagQI\Translate5\Task\CustomFields\Field;
 /**
  * @property Field $entity
  */
-class editor_TaskcustomfieldController extends ZfExtended_RestController {
-
+class editor_TaskcustomfieldController extends ZfExtended_RestController
+{
     /**
      * Use trait
      */
@@ -55,7 +55,6 @@ class editor_TaskcustomfieldController extends ZfExtended_RestController {
      */
     public function postAction()
     {
-
         $this->decodePutData();
 
         $this->checkReadOnlyField('Cannot create readonly field');
@@ -72,10 +71,10 @@ class editor_TaskcustomfieldController extends ZfExtended_RestController {
         // Load entity instance
         $this->entityLoad();
 
-        if($this->entity->isReadOnly()) {
+        if ($this->entity->isReadOnly()) {
             throw new ZfExtended_Models_Entity_Exceptions_IntegrityConstraint('E1016', [
                 'entity' => get_class($this),
-                'error' => 'Can not delete readonly field'
+                'error' => 'Can not delete readonly field',
             ]);
         }
 
@@ -91,11 +90,11 @@ class editor_TaskcustomfieldController extends ZfExtended_RestController {
 
         $this->entityLoad();
 
-        if(!empty($this->data['type']) && $this->data['type'] !== $this->entity->getType()) {
+        if (! empty($this->data['type']) && $this->data['type'] !== $this->entity->getType()) {
             throw new ZfExtended_Models_Entity_Exceptions_FieldNotModifiable('E1586', [
                 'entity' => get_class($this),
                 'field' => 'type',
-                'message' => 'Can not change type of field'
+                'message' => 'Can not change type of field',
             ]);
         }
 
@@ -107,7 +106,6 @@ class editor_TaskcustomfieldController extends ZfExtended_RestController {
 
         // If it's a combobox field
         if ($this->entity->getType() === 'combobox') {
-
             // Get current combobox options
             $was = array_keys(json_decode($this->entity->getComboboxData(), true));
 
@@ -135,8 +133,8 @@ class editor_TaskcustomfieldController extends ZfExtended_RestController {
         }
     }
 
-    private function onAfterSave() {
-
+    private function onAfterSave()
+    {
         // Set roles
         $this->entity->setRoles($this->data['roles']);
 
@@ -148,17 +146,15 @@ class editor_TaskcustomfieldController extends ZfExtended_RestController {
     }
 
     /**
-     * @param string $message
-     * @return void
      * @throws ZfExtended_Models_Entity_Exceptions_FieldNotModifiable
      */
     public function checkReadOnlyField(string $message): void
     {
-        if (!empty($this->data['mode']) && $this->data['mode'] === 'readonly') {
+        if (! empty($this->data['mode']) && $this->data['mode'] === 'readonly') {
             throw new ZfExtended_Models_Entity_Exceptions_FieldNotModifiable('E1586', [
                 'entity' => get_class($this),
                 'field' => 'mode',
-                'message' => $message
+                'message' => $message,
             ]);
         }
     }

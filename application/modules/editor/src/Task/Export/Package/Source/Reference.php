@@ -21,37 +21,29 @@ START LICENSE AND COPYRIGHT
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
 
-
 namespace MittagQI\Translate5\Task\Export\Package\Source;
 
 use editor_Models_Import_DirectoryParser_ReferenceFiles;
-use MittagQI\Translate5\Task\Export\Package\ExportSource;
-use ZfExtended_Factory;
 use ZfExtended_Models_Worker;
 use ZfExtended_Utils;
 
 class Reference extends Base
 {
-
     protected string $fileName = 'reference';
 
-
-    /**
-     * @return void
-     */
     public function export(?ZfExtended_Models_Worker $workerModel): void
     {
-        $referencesDirectory = $this->task->getAbsoluteTaskDataPath().DIRECTORY_SEPARATOR.editor_Models_Import_DirectoryParser_ReferenceFiles::getDirectory();
-        if( !is_dir($referencesDirectory)){
+        $referencesDirectory = $this->task->getAbsoluteTaskDataPath() . DIRECTORY_SEPARATOR . editor_Models_Import_DirectoryParser_ReferenceFiles::getDirectory();
+        if (! is_dir($referencesDirectory)) {
             // in case there is no references' directory, ignore the copy
             return;
         }
-        ZfExtended_Utils::recursiveCopy($referencesDirectory,$this->getFolderPath());
+        ZfExtended_Utils::recursiveCopy($referencesDirectory, $this->getFolderPath());
     }
 
     public function validate(): void

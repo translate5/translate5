@@ -41,37 +41,17 @@ abstract class AbstractProcessor
      */
     protected int $loopingPause = 0;
 
-    /**
-     * @var editor_Models_Task
-     */
     protected editor_Models_Task $task;
 
-    /**
-     * @var AbstractHttpService
-     */
     protected AbstractHttpService $service;
 
-    /**
-     * @var string
-     */
     protected string $serviceUrl;
 
-    /**
-     * @var string
-     */
     protected string $processingMode;
 
-    /**
-     * @var bool
-     */
     protected bool $isWorkerContext;
 
     /**
-     * @param editor_Models_Task $task
-     * @param AbstractHttpService $service
-     * @param string $processingMode
-     * @param string|null $serviceUrl
-     * @param bool $isWorkerContext
      * @throws ZfExtended_Exception
      */
     public function __construct(
@@ -97,14 +77,11 @@ abstract class AbstractProcessor
     /**
      * Processes a single segment (either for a retag in the worker or when editing segments via the frontend)
      * HINT: do not process stuff for the whole task, this API is called for single-segment actions!
-     * @param editor_Segment_Tags $segmentTags
-     * @param bool $saveTags
      */
     abstract public function process(editor_Segment_Tags $segmentTags, bool $saveTags = true);
 
     /**
      * Retrieves the ID of the bound service
-     * @return string
      */
     public function getServiceId(): string
     {
@@ -113,7 +90,6 @@ abstract class AbstractProcessor
 
     /**
      * Retrieves the url of the bound service, which is usually set as constructor-argument
-     * @return string
      */
     public function getServiceUrl(): string
     {
@@ -122,7 +98,6 @@ abstract class AbstractProcessor
 
     /**
      * Retrieves the size of the batch we wish to process
-     * @return int
      */
     public function getBatchSize(): int
     {
@@ -131,7 +106,6 @@ abstract class AbstractProcessor
 
     /**
      * Adds slepping-time between caving the processed & fetching unprocessed segments in looped processing
-     * @return int
      */
     public function getLoopingPause(): int
     {
@@ -143,8 +117,6 @@ abstract class AbstractProcessor
      * It will be called by every worker before starting the work
      * This is meant for situations, where in the queuing phase of the workers conditions may are not yet set that affect, if a processing is neccessary or not
      * Note, that the worker inited the processor before so dependencies are set
-     * @param int $workerIndex: The worker index iterates from 0 ...n depending on how many parallel workers have been queued. This gives no hint, how many workers are really working in parallel !!
-     * @return bool
      */
     public function prepareWorkload(int $workerIndex): bool
     {

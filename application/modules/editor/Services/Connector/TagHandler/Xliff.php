@@ -3,25 +3,25 @@
 START LICENSE AND COPYRIGHT
 
  This file is part of translate5
- 
+
  Copyright (c) 2013 - 2021 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
 
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
  This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
- as published by the Free Software Foundation and appearing in the file agpl3-license.txt 
- included in the packaging of this file.  Please review the following information 
+ as published by the Free Software Foundation and appearing in the file agpl3-license.txt
+ included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
-  
+
  There is a plugin exception available for use with this release of translate5 for
- translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or
  plugin-exception.txt in the root folder of translate5.
-  
+
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
@@ -35,13 +35,13 @@ END LICENSE AND COPYRIGHT
 /**
  * protects the translate5 internal tags as XLIFF for language resource processing
  */
-class editor_Services_Connector_TagHandler_Xliff extends editor_Services_Connector_TagHandler_Abstract {
-
+class editor_Services_Connector_TagHandler_Xliff extends editor_Services_Connector_TagHandler_Abstract
+{
     /**
      * @var integer
      */
     protected $mapCount = 0;
-    
+
     /**
      * Counter for additional tags in one segment content block
      * @var integer
@@ -50,19 +50,18 @@ class editor_Services_Connector_TagHandler_Xliff extends editor_Services_Connect
 
     /**
      * Flag if bx/ex tags should be paired to g tags or if bx/ex should be kept
-     * @var bool
      */
     protected bool $gTagPairing = true;
 
     /**
      * Valid options are: gTagPairing bool en/disables if bx/ex bpt/ept tags should be paired to g tags or not
-     * @param array $options
      */
-    public function __construct(array $options = []) {
+    public function __construct(array $options = [])
+    {
         parent::__construct();
 
         //en/disable gTagPairing
-        if(array_key_exists('gTagPairing', $options)) {
+        if (array_key_exists('gTagPairing', $options)) {
             $this->gTagPairing = (bool) $options['gTagPairing'];
         }
 
@@ -71,20 +70,23 @@ class editor_Services_Connector_TagHandler_Xliff extends editor_Services_Connect
         $this->xmlparserUnusableTags->registerElement(
             't5xliffresult > it,t5xliffresult > ph,t5xliffresult > ept,t5xliffresult > bpt',
             null,
-            function($tag, $key, $opener){
+            function ($tag, $key, $opener) {
                 switch ($tag) {
                     case 'bpt':
                         $tag = '<bx';
+
                         break;
                     case 'ept':
                         $tag = '<ex';
+
                         break;
                     default:
                         $tag = '<x';
+
                         break;
                 }
-                $this->xmlparserUnusableTags->replaceChunk($opener['openerKey'], '', $opener['isSingle'] ? 1 : ($key-$opener['openerKey']+1));
-                $this->xmlparserUnusableTags->replaceChunk($opener['openerKey'], $tag.' mid="additional-'.($this->additionalTagCount++).'" />');
+                $this->xmlparserUnusableTags->replaceChunk($opener['openerKey'], '', $opener['isSingle'] ? 1 : ($key - $opener['openerKey'] + 1));
+                $this->xmlparserUnusableTags->replaceChunk($opener['openerKey'], $tag . ' mid="additional-' . ($this->additionalTagCount++) . '" />');
             }
         );
     }
@@ -93,11 +95,9 @@ class editor_Services_Connector_TagHandler_Xliff extends editor_Services_Connect
      * protects the internal tags as xliff tags x,bx,ex and g pair
      *
      * calculates and sets map and mapCount internally
-     *
-     * @param string $queryString
-     * @return string
      */
-    public function prepareQuery(string $queryString): string {
+    public function prepareQuery(string $queryString): string
+    {
         $this->realTagCount = 0;
         $tag = $this->utilities->internalTag;
         $queryString = $this->restoreWhitespaceForQuery($queryString);
@@ -106,81 +106,86 @@ class editor_Services_Connector_TagHandler_Xliff extends editor_Services_Connect
         $this->map = [];
         $this->realTagCount = $tag->count($queryString);
 
-        if($this->gTagPairing) {
+        if ($this->gTagPairing) {
             $queryString = $tag->toXliffPaired($queryString, true, $this->map);
-        }
-        else {
+        } else {
             $queryString = $tag->toXliff($queryString, true, $this->map);
         }
 
         $this->mapCount = count($this->map);
+
         return $queryString;
     }
 
     /**
      * protects the internal tags for language resource processing as defined in the class
-     * @param string $resultString
-     * @return string|NULL NULL on error
+     * @return string|null NULL on error
      */
-    public function restoreInResult(string $resultString): ?string {
+    public function restoreInResult(string $resultString): ?string
+    {
         $this->hasRestoreErrors = false;
         //strip other then x|ex|bx|g|/g
         $resultString = strip_tags($this->replaceTagsWithContent($resultString), '<x><x/><bx><bx/><ex><ex/><g>');
+
         //since protectWhitespace should run on plain text nodes we have to call it before the internal tags are reapplied,
         // since then the text contains xliff tags and the xliff tags should not contain affected whitespace
         // this is triggered here with the parse call
         try {
             $target = $this->xmlparser->parse($resultString);
-        }
-        catch (editor_Models_Import_FileParser_InvalidXMLException $e) {
-            $this->logger->exception($e, ['level' => $this->logger::LEVEL_WARN]);
+        } catch (editor_Models_Import_FileParser_InvalidXMLException $e) {
+            $this->logger->exception($e, [
+                'level' => $this->logger::LEVEL_WARN,
+            ]);
             //See previous InvalidXMLException
-            $this->logger->warn('E1302', 'The LanguageResource did contain invalid XML, all tags were removed. See also previous InvalidXMLException in Log.',[
+            $this->logger->warn('E1302', 'The LanguageResource did contain invalid XML, all tags were removed. See also previous InvalidXMLException in Log.', [
                 'givenContent' => $resultString,
             ]);
             $this->hasRestoreErrors = true;
+
             return strip_tags($resultString);
         }
         $target = $this->utilities->internalTag->reapply2dMap($target, $this->map);
+
         return $this->replaceAdditionalTags($target, $this->mapCount);
     }
-    
+
     /**
      * If the XLF result from a TM contains <it> ,<ph>,<bpt> and <ept> tags, they could not be replaced by the sent <x|bx|ex|g> tags in the source,
      *   so they have to be considered as additional tags then
-     * @param string $segmentContent
      */
-    protected function replaceTagsWithContent(string $content): string {
+    protected function replaceTagsWithContent(string $content): string
+    {
         //just concat source and target to check both:
-        if(preg_match('#<(it|ph|ept|bpt)[^>]*>#', $content)) {
+        if (preg_match('#<(it|ph|ept|bpt)[^>]*>#', $content)) {
             //surround the content with tmp tags(used later as selectors)
-            $content = $this->xmlparserUnusableTags->parse('<t5xliffresult>'.$content.'</t5xliffresult>');
-            
+            $content = $this->xmlparserUnusableTags->parse('<t5xliffresult>' . $content . '</t5xliffresult>');
+
             //remove the helper tags
             return strtr($content, [
-                '<t5xliffresult>'=>'',
-                '</t5xliffresult>'=>''
+                '<t5xliffresult>' => '',
+                '</t5xliffresult>' => '',
             ]);
         }
+
         return $content;
     }
-    
+
     /**
      * replace additional tags from the TM to internal tags which are ignored in the frontend then
-     * @param string $segment
      * @param int $mapCount used as start number for the short tag numbering
-     * @return string
      */
-    protected function replaceAdditionalTags(string $segment, int $mapCount): ?string {
+    protected function replaceAdditionalTags(string $segment, int $mapCount): ?string
+    {
         $addedTags = false;
         $shortTagNr = $mapCount;
-        
-        $result = preg_replace_callback('#<(x|ex|bx|g|/g)[^>]*>#', function() use (&$shortTagNr, &$addedTags) {
+
+        $result = preg_replace_callback('#<(x|ex|bx|g|/g)[^>]*>#', function () use (&$shortTagNr, &$addedTags) {
             $addedTags = true;
+
             return $this->utilities->internalTag->makeAdditionalHtmlTag(++$shortTagNr);
         }, $segment);
-        
-        if($addedTags) {
+
+        if ($addedTags) {
             // FOR NOW WE DO NOT LOG THIS AT IT UNNECCESSARILY FILLS THE LOG WITH THOUSANDS OF ENTRIES IN SOME TASKS
             // logging as debug only, since in GUI they are removed. FIXME whats with pretranslation?
             // $this->logger->debug('E1300', 'The LanguageResource answer did contain additional tags which were added to the segment, starting with Tag Nr {nr}.',[
@@ -188,18 +193,17 @@ class editor_Services_Connector_TagHandler_Xliff extends editor_Services_Connect
             //    'givenContent' => $segment,
             // ]);
         }
+
         return $result;
     }
 
     /**
      * sets the tag inputMap and converts it from xlftag => array format to xlftag => internal tag format
      * @see editor_Models_Segment_InternalTag::setInputTagMap
-     * @param array $tagMap
-     * @return void
      */
     public function setInputTagMap(array $tagMap): void
     {
-        foreach($tagMap as $key => $value) {
+        foreach ($tagMap as $key => $value) {
             $tagMap[$key] = $value[1];
         }
         $this->utilities->internalTag->setInputTagMap($tagMap);

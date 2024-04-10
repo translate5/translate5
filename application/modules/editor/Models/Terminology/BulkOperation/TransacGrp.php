@@ -21,23 +21,26 @@ START LICENSE AND COPYRIGHT
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
-class editor_Models_Terminology_BulkOperation_TransacGrp extends editor_Models_Terminology_BulkOperation_Abstract {
-    const LOAD_EXISTING = 'termEntryId = ?';
+class editor_Models_Terminology_BulkOperation_TransacGrp extends editor_Models_Terminology_BulkOperation_Abstract
+{
+    public const LOAD_EXISTING = 'termEntryId = ?';
 
     /**
      * @var editor_Models_Terminology_Models_TransacgrpModel
      */
     protected $model;
+
     /**
      * @var editor_Models_Terminology_TbxObjects_TransacGrp
      */
     protected $importObject;
 
-    public function __construct() {
+    public function __construct()
+    {
         $this->model = new editor_Models_Terminology_Models_TransacgrpModel();
         $this->importObject = new editor_Models_Terminology_TbxObjects_TransacGrp();
     }
@@ -45,7 +48,8 @@ class editor_Models_Terminology_BulkOperation_TransacGrp extends editor_Models_T
     /**
      * @throws Zend_Db_Statement_Exception
      */
-    public function loadExisting(int $id) {
+    public function loadExisting(int $id)
+    {
         $this->existing = [];
         parent::loadExisting($id);
     }

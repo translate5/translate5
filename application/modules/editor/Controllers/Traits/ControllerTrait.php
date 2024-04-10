@@ -21,24 +21,20 @@ START LICENSE AND COPYRIGHT
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
 
 use MittagQI\ZfExtended\MismatchException;
 
-trait editor_Controllers_Traits_ControllerTrait {
-
-    /**
-     * @var ZfExtended_Models_User|null
-     */
+trait editor_Controllers_Traits_ControllerTrait
+{
     protected ?ZfExtended_Models_User $user;
 
     /**
      * Alias for editor_Utils::jcheck(), except that if $data arg is not given - request params will be used by default
      *
-     * @param $ruleA
      * @param array|null|ZfExtended_Models_Entity_Abstract $data
      * @return array
      * @throws MismatchException
@@ -46,21 +42,20 @@ trait editor_Controllers_Traits_ControllerTrait {
      * @throws Zend_Db_Statement_Exception
      * @see editor_Utils::jcheck
      */
-    public function jcheck($ruleA, $data = null) {
+    public function jcheck($ruleA, $data = null)
+    {
         return editor_Utils::jcheck($ruleA, $data ?? $this->getRequest()->getParams());
     }
 
     /**
      * Show confirmation prompt
      *
-     * @param $msg
      * @param string $buttons OKCANCEL, YESNO, YESNOCANCEL
      * @param string|null $cancelMsg Msg, that will be shown in case if 'Cancel'
      *                    button was pressed or confirmation window was closed
-     * @return
      */
-    public function confirm($msg, $buttons = 'OKCANCEL', $cancelMsg = null) {
-
+    public function confirm($msg, $buttons = 'OKCANCEL', $cancelMsg = null)
+    {
         // Get answer index
         $answerIdx = editor_Utils::rif(editor_Utils::$answer, count(editor_Utils::$answer) + 1);
 
@@ -68,10 +63,14 @@ trait editor_Controllers_Traits_ControllerTrait {
         $answer = $this->getParam('answer' . $answerIdx);
 
         // If no answer, flush confirmation prompt
-        if (!$answer) editor_Utils::jconfirm(is_array($msg) ? join('<br>', $msg) : $msg, $buttons);
+        if (! $answer) {
+            editor_Utils::jconfirm(is_array($msg) ? join('<br>', $msg) : $msg, $buttons);
+        }
 
         // If answer is 'cancel' - stop request processing
-        else if ($answer == 'cancel') $this->jflush(false, $cancelMsg);
+        elseif ($answer == 'cancel') {
+            $this->jflush(false, $cancelMsg);
+        }
 
         // Return answer
         return editor_Utils::$answer[count(editor_Utils::$answer)] = $answer;
@@ -80,11 +79,11 @@ trait editor_Controllers_Traits_ControllerTrait {
     /**
      * Alias for editor_Utils::jflush()
      *
-     * @param $success
      * @param string $msg
      * @return mixed
      */
-    public function jflush($success, $msg = '') {
+    public function jflush($success, $msg = '')
+    {
         return forward_static_call_array(['editor_Utils', 'jflush'], func_get_args());
     }
 
@@ -96,10 +95,14 @@ trait editor_Controllers_Traits_ControllerTrait {
      * @throws MismatchException
      * @throws Zend_Db_Statement_Exception
      */
-    public function handleData() {
-
+    public function handleData()
+    {
         // If request contains json-encoded 'data'-param, decode it and append to request params
-        if ($data = $this->jcheck(['data' => ['rex' => 'json']])['data'] ?? 0) {
+        if ($data = $this->jcheck([
+            'data' => [
+                'rex' => 'json',
+            ],
+        ])['data'] ?? 0) {
             $this->getRequest()->setParams(
                 $this->getRequest()->getParams() + (array) $data
             );
@@ -111,7 +114,8 @@ trait editor_Controllers_Traits_ControllerTrait {
      *
      * @return ZfExtended_Models_User|null
      */
-    public function user() {
+    public function user()
+    {
         return $this->user = $this->user ?? ZfExtended_Authentication::getInstance()->getUser();
     }
 }

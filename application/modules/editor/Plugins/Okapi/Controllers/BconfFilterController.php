@@ -1,9 +1,9 @@
 <?php
 /*
  START LICENSE AND COPYRIGHT
- 
+
  This file is part of translate5
- 
+
  Copyright (c) 2013 - 2022 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
 
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
@@ -21,27 +21,26 @@
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
- 		     http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
- 
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+
  END LICENSE AND COPYRIGHT
  */
 
 /**
- *
  * REST Endpoint Controller to serve a Bconfs Filter List for the Bconf-Management in the Preferences
  *
  * @property editor_Plugins_Okapi_Bconf_Filter_Entity $entity
  */
-class editor_Plugins_Okapi_BconfFilterController extends ZfExtended_RestController {
-
+class editor_Plugins_Okapi_BconfFilterController extends ZfExtended_RestController
+{
     protected $entityClass = 'editor_Plugins_Okapi_Bconf_Filter_Entity';
 
     /**
      * This also transfers the Extension-Mapping and the default Extensions to the frontend via metaData
-     * @return void
      * @throws editor_Plugins_Okapi_Exception
      */
-    public function indexAction() {
+    public function indexAction()
+    {
         $bconf = new editor_Plugins_Okapi_Bconf_Entity();
         $bconf->load($this->getParam('bconfId'));
 
@@ -50,7 +49,7 @@ class editor_Plugins_Okapi_BconfFilterController extends ZfExtended_RestControll
         $this->view->total = count($this->view->rows);
 
         // the extension mapping is sent as meta-data
-        if(!$this->view?->metaData){
+        if (! $this->view?->metaData) {
             $this->view->metaData = new stdClass();
         }
         $this->view->metaData->extensionMapping = $bconf->getExtensionMapping()->getIdentifierMap();
@@ -63,7 +62,8 @@ class editor_Plugins_Okapi_BconfFilterController extends ZfExtended_RestControll
      * @throws ZfExtended_Models_Entity_NotFoundException
      * @throws editor_Plugins_Okapi_Exception
      */
-    public function postAction(){
+    public function postAction()
+    {
         parent::postAction();
         // extensions have been sent as put-data
         $extensions = explode(',', $this->data->extensions);
@@ -83,7 +83,8 @@ class editor_Plugins_Okapi_BconfFilterController extends ZfExtended_RestControll
      * @throws ZfExtended_Models_Entity_NotFoundException
      * @throws editor_Plugins_Okapi_Exception
      */
-    public function putAction(){
+    public function putAction()
+    {
         parent::putAction();
         // extensions have been sent as put-data
         $extensions = explode(',', $this->data->extensions);
@@ -103,7 +104,8 @@ class editor_Plugins_Okapi_BconfFilterController extends ZfExtended_RestControll
      * @throws ZfExtended_Models_Entity_NotFoundException
      * @throws editor_Plugins_Okapi_Exception
      */
-    public function deleteAction(){
+    public function deleteAction()
+    {
         $this->entityLoad();
         $bconf = $this->entity->getRelatedBconf();
         // remove the filter from the extension mapping (which also updates the content/TOC)
@@ -121,7 +123,8 @@ class editor_Plugins_Okapi_BconfFilterController extends ZfExtended_RestControll
      * @throws ZfExtended_Models_Entity_NotFoundException
      * @throws editor_Plugins_Okapi_Exception
      */
-    public function getfprmAction(){
+    public function getfprmAction()
+    {
         $this->entityLoad();
         $fprm = $this->entity->getFprm();
         // Create the data to send to the Frontend GUIs
@@ -138,20 +141,21 @@ class editor_Plugins_Okapi_BconfFilterController extends ZfExtended_RestControll
      * @throws ZfExtended_UnprocessableEntity
      * @throws editor_Plugins_Okapi_Exception
      */
-    public function savefprmAction(){
+    public function savefprmAction()
+    {
         $this->entityLoad();
         // create a fprm from the sent raw content
         $fprm = new editor_Plugins_Okapi_Bconf_Filter_Fprm(
             $this->entity->getPath(),
             $this->getRequest()->getRawBody()
         );
-        $validationError = NULL;
-        if($fprm->validate()){
+        $validationError = null;
+        if ($fprm->validate()) {
             // only x-properties based fprms can be properly tested by parsing the content. the others need a validation by using them in longhorn
-            if($fprm->getType() != editor_Plugins_Okapi_Bconf_Filter_Fprm::TYPE_XPROPERTIES){
+            if ($fprm->getType() != editor_Plugins_Okapi_Bconf_Filter_Fprm::TYPE_XPROPERTIES) {
                 $okapiValidation = new editor_Plugins_Okapi_Bconf_Filter_FprmValidation($this->entity->getRelatedBconf(), $fprm);
                 // this
-                if($okapiValidation->validate()){
+                if ($okapiValidation->validate()) {
                     // update/pack the hash, flushing of bconf & fprm is already done by the validator
                     $this->entity->setHash($fprm->getHash());
                     $this->entity->save();
@@ -168,14 +172,18 @@ class editor_Plugins_Okapi_BconfFilterController extends ZfExtended_RestControll
         } else {
             // this can normally only happen if the implementation of a filter-frontend generated faulty data.
             // Only with YAML or XML currently this is a user-error, as both are edited as a whole in a big textfield
-            if($fprm->getType() == editor_Plugins_Okapi_Bconf_Filter_Fprm::TYPE_YAML || $fprm->getType() == editor_Plugins_Okapi_Bconf_Filter_Fprm::TYPE_XML){
+            if ($fprm->getType() == editor_Plugins_Okapi_Bconf_Filter_Fprm::TYPE_YAML || $fprm->getType() == editor_Plugins_Okapi_Bconf_Filter_Fprm::TYPE_XML) {
                 $validationError = $fprm->getValidationError();
             } else {
-                throw new editor_Plugins_Okapi_Exception('E1409', ['details' => $fprm->getValidationError(), 'filterfile' => $this->entity->getFile(), 'bconfId' => $this->entity->getBconfId()]);
+                throw new editor_Plugins_Okapi_Exception('E1409', [
+                    'details' => $fprm->getValidationError(),
+                    'filterfile' => $this->entity->getFile(),
+                    'bconfId' => $this->entity->getBconfId(),
+                ]);
             }
         }
         // the editor will stay open when a user-error occurs, therefore no server-exception then
-        if($validationError != NULL){
+        if ($validationError != null) {
             $this->view->success = false;
             $this->view->error = $validationError;
         } else {
@@ -186,11 +194,12 @@ class editor_Plugins_Okapi_BconfFilterController extends ZfExtended_RestControll
     /**
      * Overwritten for additional processing on postAction
      */
-    protected function decodePutData(){
+    protected function decodePutData()
+    {
         // crucial: new entries are sent with a temp identifier 'NEW@FILTER' which needs to be turned to a valid custom identifier and id
         // this represents a clone-operation and the original identifier can be restored from the (cloned) okapiType / okapiId
         parent::decodePutData();
-        if($this->data->identifier === 'NEW@FILTER'){
+        if ($this->data->identifier === 'NEW@FILTER') {
             // we need to copy the FPRM-file and generate the new identifier (returns Object with properties okapiId | identifier | path | hash
             $newData = editor_Plugins_Okapi_Bconf_Filter_Entity::preProcessNewEntry(
                 intval($this->data->bconfId),

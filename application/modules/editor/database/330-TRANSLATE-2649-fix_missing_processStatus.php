@@ -1,4 +1,5 @@
-<?php 
+<?php
+
 /*
 START LICENSE AND COPYRIGHT
 
@@ -45,7 +46,7 @@ $SCRIPT_IDENTIFIER = '323-TRANSLATE-1405-TermPortal_nulls_for_createdBy_if_unkno
  * define database credential variables
  */
 $argc = count($argv);
-if(empty($this) || empty($argv) || $argc < 5 || $argc > 7) {
+if (empty($this) || empty($argv) || $argc < 5 || $argc > 7) {
     die("please dont call the script direct! Call it by using DBUpdater!\n\n");
 }
 
@@ -56,8 +57,7 @@ defined('ZFEXTENDED_IS_WORKER_THREAD') || define('ZFEXTENDED_IS_WORKER_THREAD', 
 $dataType = ZfExtended_Factory::get('editor_Models_Terminology_Models_AttributeDataType');
 
 // If datatype-record for processStatus-attr not exists - create it
-if (!$_ = $dataType->getIdsForTerms(['termNote#processStatus'])) {
-
+if (! $_ = $dataType->getIdsForTerms(['termNote#processStatus'])) {
     // Init
     $dataType->init([
         'label' => 'termNote',
@@ -67,7 +67,7 @@ if (!$_ = $dataType->getIdsForTerms(['termNote#processStatus'])) {
         'level' => 'term',
         'dataType' => 'picklist',
         'picklistValues' => 'unprocessed,provisionallyProcessed,finalized,rejected',
-        'isTbxBasic' => 1
+        'isTbxBasic' => 1,
     ]);
 
     // Save
@@ -76,9 +76,8 @@ if (!$_ = $dataType->getIdsForTerms(['termNote#processStatus'])) {
     // Get id
     $id = $dataType->getId();
 
-// Else get existing id
+    // Else get existing id
 } else {
-
     // Get id
     $id = $_['termNote#processStatus'];
 

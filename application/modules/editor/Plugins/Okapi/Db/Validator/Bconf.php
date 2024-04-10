@@ -21,22 +21,29 @@
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
- 		     http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
  END LICENSE AND COPYRIGHT
  */
 
-class editor_Plugins_Okapi_Db_Validator_Bconf extends ZfExtended_Models_Validator_Abstract {
-
+class editor_Plugins_Okapi_Db_Validator_Bconf extends ZfExtended_Models_Validator_Abstract
+{
     /**
      * Validators for Okapi Bconf Entity
      */
-    protected function defineValidators() {
+    protected function defineValidators()
+    {
         $this->addValidator('id', 'int');
         $this->addValidator('isDefault', 'boolean');
         $this->addValidator('customerId', 'int');
-        $this->addValidator('name', 'stringLength', array('min' => 1, 'max' => 50));
-        $this->addValidator('description', 'stringLength', array('min' => 1, 'max' => 255));
+        $this->addValidator('name', 'stringLength', [
+            'min' => 1,
+            'max' => 50,
+        ]);
+        $this->addValidator('description', 'stringLength', [
+            'min' => 1,
+            'max' => 255,
+        ]);
         $this->addValidator('versionIdx', 'int');
     }
 }

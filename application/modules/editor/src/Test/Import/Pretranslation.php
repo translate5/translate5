@@ -21,7 +21,7 @@ START LICENSE AND COPYRIGHT
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
@@ -36,9 +36,13 @@ use MittagQI\Translate5\Test\Api\Helper;
 final class Pretranslation extends Operation
 {
     public int $internalFuzzy = 1;
+
     public ?int $pretranslateMatchrate = 100;
+
     public int $pretranslateTmAndTerm = 1;
+
     public int $pretranslateMt = 0;
+
     public int $isTaskImport = 0;
 
     public function request(Helper $api): void

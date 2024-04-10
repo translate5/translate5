@@ -21,7 +21,7 @@ START LICENSE AND COPYRIGHT
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
@@ -29,55 +29,34 @@ END LICENSE AND COPYRIGHT
 /**
  * editor_Plugins_SegmentStatistics_Worker Class
  */
-class editor_Plugins_SegmentStatistics_Worker extends editor_Models_Task_AbstractWorker {
-    const TYPE_IMPORT = 'import';
-    const TYPE_EXPORT = 'export';
+class editor_Plugins_SegmentStatistics_Worker extends editor_Models_Task_AbstractWorker
+{
+    public const TYPE_IMPORT = 'import';
+
+    public const TYPE_EXPORT = 'export';
 
     /**
      * contains the stat type
-     * @var string
      */
     protected string $type;
 
-    /**
-     * @var array
-     */
     protected array $taskFieldsStat = [];
 
-    /**
-     * @var editor_Plugins_SegmentStatistics_Bootstrap
-     */
     protected editor_Plugins_SegmentStatistics_Bootstrap $plugin;
 
-    /**
-     * @var editor_Models_Terminology_Models_TermModel
-     */
     protected editor_Models_Terminology_Models_TermModel $term;
 
-    /**
-     * @var array
-     */
     protected array $termFoundCounter = [];
 
-    /**
-     * @var array
-     */
     protected array $termNotFoundCounter = [];
 
     /**
      * contains a mid => termContent mapping
-     * @var array
      */
     protected array $termContent = [];
 
-    /**
-     * @var editor_Plugins_SegmentStatistics_Models_Statistics
-     */
     protected editor_Plugins_SegmentStatistics_Models_Statistics $stat;
 
-    /**
-     * @var editor_Plugins_SegmentStatistics_Models_TermStatistics
-     */
     protected editor_Plugins_SegmentStatistics_Models_TermStatistics $termStat;
 
     /**
@@ -96,12 +75,11 @@ class editor_Plugins_SegmentStatistics_Worker extends editor_Models_Task_Abstrac
      * (non-PHPdoc)
      * @param array $parameters
      * @see ZfExtended_Worker_Abstract::validateParameters()
-     * @return bool
      */
     protected function validateParameters($parameters = []): bool
     {
         if (empty($parameters['type'])) {
-            error_log('Missing Parameter "type" in '.__CLASS__);
+            error_log('Missing Parameter "type" in ' . __CLASS__);
 
             return false;
         }
@@ -153,9 +131,6 @@ class editor_Plugins_SegmentStatistics_Worker extends editor_Models_Task_Abstrac
 
     /**
      * Counts the [not]Found terms in segment content, counts also over all segments for each term mid
-     * @param string $segmentContent
-     * @param string $fieldName
-     * @return array
      */
     protected function termCounter(string $segmentContent, string $fieldName): array
     {
@@ -187,24 +162,24 @@ class editor_Plugins_SegmentStatistics_Worker extends editor_Models_Task_Abstrac
 
     /**
      * Finds the term to a given termId and stores it internally
-     * @param string $termId
      */
     protected function findTermContent(string $termId)
     {
-        if (!empty($this->termContent[$termId])) {
+        if (! empty($this->termContent[$termId])) {
             return;
         }
 
         try {
-            $assoc=ZfExtended_Factory::get('editor_Models_TermCollection_TermCollection');
+            $assoc = ZfExtended_Factory::get('editor_Models_TermCollection_TermCollection');
             /* @var $assoc editor_Models_TermCollection_TermCollection */
-            $collectionIds=$assoc->getCollectionsForTask($this->taskGuid);
+            $collectionIds = $assoc->getCollectionsForTask($this->taskGuid);
             if (empty($collectionIds)) {
                 return;
             }
             $t = $this->term->loadByMid($termId, $collectionIds);
         } catch (ZfExtended_Models_Entity_NotFoundException $e) {
-            $this->termContent[$termId] = "Term not found in DB! termId: ".$termId;
+            $this->termContent[$termId] = "Term not found in DB! termId: " . $termId;
+
             return;
         }
 
@@ -213,10 +188,6 @@ class editor_Plugins_SegmentStatistics_Worker extends editor_Models_Task_Abstrac
 
     /**
      * Stores the segment stats in the DB
-     * @param editor_Models_Segment $segment
-     * @param string $segmentContent
-     * @param Zend_Db_Table_Row $field
-     * @param array $termCount
      */
     protected function storeSegmentStats(editor_Models_Segment $segment, string $segmentContent, Zend_Db_Table_Row $field, array $termCount)
     {
@@ -224,7 +195,7 @@ class editor_Plugins_SegmentStatistics_Worker extends editor_Models_Task_Abstrac
         $stat->init();
         $stat->setTaskGuid($this->taskGuid);
         $stat->setSegmentId($segment->getId());
-        $stat->setFieldName($field->name);//always the name without "Edit"!
+        $stat->setFieldName($field->name); //always the name without "Edit"!
         $stat->setFieldType($field->type);
         $stat->setType($this->type);
         $stat->setFileId($segment->getFileId());
@@ -237,9 +208,6 @@ class editor_Plugins_SegmentStatistics_Worker extends editor_Models_Task_Abstrac
 
     /**
      * Stores the term usage in the DB (on export only!)
-     * @param editor_Models_Segment $segment
-     * @param Zend_Db_Table_Row $field
-     * @param array $termCount
      */
     protected function storeTermStats(editor_Models_Segment $segment, Zend_Db_Table_Row $field, array $termCount)
     {
@@ -264,10 +232,6 @@ class editor_Plugins_SegmentStatistics_Worker extends editor_Models_Task_Abstrac
 
     /**
      * returns the affected segmentContent (which is the edited field for editable ones)
-     * @param editor_Models_SegmentFieldManager $sfm
-     * @param editor_Models_Segment $segment
-     * @param Zend_Db_Table_Row $field
-     * @return string
      */
     protected function getSegmentContent(editor_Models_SegmentFieldManager $sfm, editor_Models_Segment $segment, Zend_Db_Table_Row $field): string
     {
@@ -302,7 +266,6 @@ class editor_Plugins_SegmentStatistics_Worker extends editor_Models_Task_Abstrac
     /**
      * Method to write statistics to task data directory
      * parameter decides if configured filter should be used or not
-     * @param bool $filtered
      */
     protected function writeToDisk(bool $filtered = false)
     {
@@ -330,7 +293,7 @@ class editor_Plugins_SegmentStatistics_Worker extends editor_Models_Task_Abstrac
 
         $this->fillStatistics($statistics);
 
-        $filename = $task->getAbsoluteTaskDataPath().DIRECTORY_SEPARATOR.$this->getFileName();
+        $filename = $task->getAbsoluteTaskDataPath() . DIRECTORY_SEPARATOR . $this->getFileName();
         if ($filtered) {
             //overwrite segment counts with filtered values
             $statistics->segmentCount = $this->stat->calculateSegmentCountFiltered($this->taskGuid);
@@ -346,7 +309,7 @@ class editor_Plugins_SegmentStatistics_Worker extends editor_Models_Task_Abstrac
      */
     protected function fillStatistics($statistics)
     {
-        if($this->type === self::TYPE_IMPORT) {
+        if ($this->type === self::TYPE_IMPORT) {
             $statistics->filesImport = $this->getFileStatistics(self::TYPE_IMPORT);
         } else {
             $statistics->filesImport = $this->getFileStatistics(self::TYPE_IMPORT);
@@ -357,15 +320,13 @@ class editor_Plugins_SegmentStatistics_Worker extends editor_Models_Task_Abstrac
     }
 
     /**
-     * @param editor_Models_Task $task
-     * @param stdClass $statistics
      * @param string $filename
      */
     protected function export(editor_Models_Task $task, stdClass $statistics, $filename)
     {
         $exporters = [
-                'editor_Plugins_SegmentStatistics_Models_Export_Xml',
-                'editor_Plugins_SegmentStatistics_Models_Export_Xls',
+            'editor_Plugins_SegmentStatistics_Models_Export_Xml',
+            'editor_Plugins_SegmentStatistics_Models_Export_Xls',
         ];
 
         foreach ($exporters as $cls) {
@@ -378,8 +339,6 @@ class editor_Plugins_SegmentStatistics_Worker extends editor_Models_Task_Abstrac
 
     /**
      * returns the file statistics for the given type
-     * @param string $type
-     * @return array
      */
     protected function getFileStatistics(string $type): array
     {
@@ -400,7 +359,8 @@ class editor_Plugins_SegmentStatistics_Worker extends editor_Models_Task_Abstrac
         return $files;
     }
 
-    protected function initTaskFieldsStat(& $fileStat, $type) {
+    protected function initTaskFieldsStat(&$fileStat, $type)
+    {
         $fieldName = $fileStat['fieldName'];
         settype($fileStat['segmentsPerFileFound'], 'integer');
         settype($fileStat['segmentsPerFileNotFound'], 'integer');
@@ -409,26 +369,22 @@ class editor_Plugins_SegmentStatistics_Worker extends editor_Models_Task_Abstrac
 
         $taskFieldStat = &$this->taskFieldsStat[$type][$fieldName];
 
-        $taskSums = array(
+        $taskSums = [
             'taskCharFoundCount' => 'charFoundCount',
             'taskCharNotFoundCount' => 'charNotFoundCount',
             'taskWordFoundCount' => 'wordFoundCount',
             'taskWordNotFoundCount' => 'wordNotFoundCount',
             'taskTermFoundCount' => 'termFoundCount',
             'taskTermNotFoundCount' => 'termNotFoundCount',
-        );
+        ];
 
-        foreach($taskSums as $k => $v) {
+        foreach ($taskSums as $k => $v) {
             settype($fileStat[$v], 'integer');
             settype($taskFieldStat[$k], 'integer');
             $taskFieldStat[$k] += $fileStat[$v];
         }
     }
 
-    /**
-     * @param array $fileStat
-     * @param string $type
-     */
     protected function addSourceStatistics(array &$fileStat, string $type)
     {
         $fieldName = $fileStat['fieldName'];
@@ -455,7 +411,6 @@ class editor_Plugins_SegmentStatistics_Worker extends editor_Models_Task_Abstrac
 
     /**
      * returns the filename for the xml stat file
-     * @return string
      */
     protected function getFileName(): string
     {
@@ -466,6 +421,6 @@ class editor_Plugins_SegmentStatistics_Worker extends editor_Models_Task_Abstrac
             return 'segmentstatistics-export';
         }
 
-        return 'segmentstatistics-export-'.date('Y-m-d-H-i');
+        return 'segmentstatistics-export-' . date('Y-m-d-H-i');
     }
 }

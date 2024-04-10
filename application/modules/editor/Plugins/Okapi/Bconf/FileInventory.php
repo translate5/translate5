@@ -21,7 +21,7 @@
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
- 		     http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
  END LICENSE AND COPYRIGHT
  */
@@ -29,16 +29,15 @@
 /**
  * Class representing the static dta of a filebase inventory with a JSON inventory-file
  */
-abstract class editor_Plugins_Okapi_Bconf_FileInventory {
+abstract class editor_Plugins_Okapi_Bconf_FileInventory
+{
     /**
      * Relative to the static data-dir
-     * @var string
      */
     protected string $inventoryFile;
 
     /**
      * Relative to the static data-dir
-     * @var string
      */
     protected string $inventoryFolder;
 
@@ -47,25 +46,26 @@ abstract class editor_Plugins_Okapi_Bconf_FileInventory {
      */
     protected array $inventory;
 
-    protected function __construct(){
+    protected function __construct()
+    {
         $this->inventory = json_decode(file_get_contents($this->getFilePath()));
     }
 
     /**
-     * @return string
      * @throws editor_Models_ConfigException
      * @throws editor_Plugins_Okapi_Exception
      */
-    public function getFolderPath() : string {
+    public function getFolderPath(): string
+    {
         return editor_Plugins_Okapi_Init::getDataDir() . $this->inventoryFolder;
     }
 
     /**
-     * @return string
      * @throws editor_Models_ConfigException
      * @throws editor_Plugins_Okapi_Exception
      */
-    public function getFilePath() : string {
+    public function getFilePath(): string
+    {
         return editor_Plugins_Okapi_Init::getDataDir() . $this->inventoryFile;
     }
 
@@ -73,7 +73,8 @@ abstract class editor_Plugins_Okapi_Bconf_FileInventory {
      * Retrieves all items in the inventory
      * @return stdClass[]
      */
-    public function getInventory() : array {
+    public function getInventory(): array
+    {
         return $this->inventory;
     }
 

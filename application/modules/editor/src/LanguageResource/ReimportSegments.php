@@ -21,7 +21,7 @@ START LICENSE AND COPYRIGHT
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
@@ -53,12 +53,15 @@ use ZfExtended_Models_Filter_ExtJs6;
 class ReimportSegments
 {
     public const FILTER_TIMESTAMP = 'timestamp';
+
     public const FILTER_ONLY_EDITED = 'onlyEdited';
+
     public const USE_SEGMENT_TIMESTAMP = 'useSegmentTimestamp';
 
     private const STATE_REIMPORT = 'reimporttm';
 
     private string $oldState;
+
     private ZfExtended_Logger $logger;
 
     public function __construct(
@@ -80,7 +83,7 @@ class ReimportSegments
 
         $locked = $task->lock(NOW_ISO, self::STATE_REIMPORT);
 
-        if (!$locked) {
+        if (! $locked) {
             $this->getLogger()->error(
                 'E1169',
                 'The task is in use and cannot be reimported into the associated language resources.'
@@ -133,7 +136,7 @@ class ReimportSegments
      */
     public function getLogger(): ZfExtended_Logger
     {
-        if (!isset($this->logger)) {
+        if (! isset($this->logger)) {
             $this->logger = Zend_Registry::get('logger')->cloneMe('editor.languageresource', [
                 'task' => $this->task ?? null,
                 'languageResource' => $this->languageresource ?? null,
@@ -185,7 +188,7 @@ class ReimportSegments
 
         return ZfExtended_Factory::get(FilteredIterator::class, [
             $task->getTaskGuid(),
-            $segment
+            $segment,
         ]);
     }
 

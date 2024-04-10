@@ -22,7 +22,7 @@ START LICENSE AND COPYRIGHT
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
@@ -50,5 +50,7 @@ WHERE parent.id IS NULL;')->fetchAll();
 
 foreach ($inconsistentAssocs as $assoc) {
     $this->log->warn('E1553', 'Deleting inconsistent user default assoc for customer ID {customerId}', $assoc);
-    $db->delete('LEK_user_assoc_default', ['id = ?' => $assoc['id']]);
+    $db->delete('LEK_user_assoc_default', [
+        'id = ?' => $assoc['id'],
+    ]);
 }

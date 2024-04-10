@@ -36,27 +36,16 @@ namespace MittagQI\Translate5\LanguageResource\Adapter;
  */
 class EngineDTO
 {
-    /**
-     * @param string $id
-     * @param string $name
-     * @param string $source
-     * @param string|null $sourceIso
-     * @param string $target
-     * @param string|null $targetIso
-     * @param string|null $domainCode
-     * @param string|null $engineName
-     */
     public function __construct(
-        private string  $id,
-        private string  $name,
-        private string  $source,
+        private string $id,
+        private string $name,
+        private string $source,
         private ?string $sourceIso,
-        private string  $target,
+        private string $target,
         private ?string $targetIso,
         private ?string $domainCode,
         private ?string $engineName = null
-    )
-    {
+    ) {
     }
 
     public function toArray(): array
@@ -69,7 +58,7 @@ class EngineDTO
             'target' => $this->target,
             'targetIso' => $this->targetIso,
             'domainCode' => $this->domainCode,
-            'engineName' => empty($this->engineName) ? $this->name : $this->engineName
+            'engineName' => empty($this->engineName) ? $this->name : $this->engineName,
         ];
     }
 }

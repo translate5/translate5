@@ -34,39 +34,32 @@ final class Tree
 {
     /**
      * Compare leafs by weight
-     * @param Leaf $a
-     * @param Leaf $b
-     * @return int
      */
     public static function compare(Leaf $a, Leaf $b): int
     {
         if ($a->getWeight() > $b->getWeight()) {
             return 1;
-        } else if ($a->getWeight() < $b->getWeight()) {
+        } elseif ($a->getWeight() < $b->getWeight()) {
             return -1;
         }
+
         return 0;
     }
 
     /**
      * condensing visible name
-     * @param string $worker
-     * @return string
      */
     public static function createTitle(string $worker): string
     {
         if (str_starts_with($worker, 'MittagQI\\Translate5\\')) {
             return substr($worker, 20);
         }
+
         return $worker;
     }
 
     /**
      * Finds the children for a worker by talking the operation(s) into account
-     * @param Zend_Db_Adapter_Abstract $dbAdapter
-     * @param string $worker
-     * @param array $operations
-     * @return array
      */
     public static function findChildren(Zend_Db_Adapter_Abstract $dbAdapter, string $worker, array $operations): array
     {
@@ -76,14 +69,13 @@ final class Tree
                 $leafs[] = $row['worker'];
             }
         }
+
         return $leafs;
     }
 
     /**
      * Find's all Workers
      * TODO FIXME: we should find the workers in the Code instead !
-     * @param Zend_Db_Adapter_Abstract $dbAdapter
-     * @return array
      */
     public static function findAllWorkers(Zend_Db_Adapter_Abstract $dbAdapter): array
     {
@@ -92,14 +84,16 @@ final class Tree
             $all[$row['dependency']] = 1;
             $all[$row['worker']] = 1;
         }
+
         return array_keys($all);
     }
 
     private static function fetchAllDependencies(Zend_Db_Adapter_Abstract $dbAdapter): array
     {
-        if (!isset(self::$dependencies)) {
+        if (! isset(self::$dependencies)) {
             self::$dependencies = $dbAdapter->fetchAssoc('SELECT * FROM `Zf_worker_dependencies`');
         }
+
         return self::$dependencies;
     }
 
@@ -110,8 +104,9 @@ final class Tree
      */
     private array $leafs;
 
-    public function __construct(private Zend_Db_Adapter_Abstract $dbAdapter)
-    {
+    public function __construct(
+        private Zend_Db_Adapter_Abstract $dbAdapter
+    ) {
     }
 
     public function load(): void
@@ -135,7 +130,6 @@ final class Tree
         // order children by depth
         usort($this->leafs, Leaf::class . '::compare');
     }
-
 
     public function render(bool $isFull, string $newline = "\n"): string
     {
@@ -173,7 +167,7 @@ final class Tree
         sort($allUsed);
         $unused = array_diff($allWorkers, $allUsed);
 
-        if(count($unused) > 0){
+        if (count($unused) > 0) {
             $text .=
                 $newline
                 . $newline
@@ -182,7 +176,7 @@ final class Tree
                 . '==============================='
                 . $newline
                 . $newline;
-            foreach($unused as $worker){
+            foreach ($unused as $worker) {
                 $text .= self::createTitle($worker) . $newline;
             }
         }

@@ -58,6 +58,7 @@ use ZfExtended_Factory;
 class CronEventTrigger
 {
     public const PERIODICAL = 'periodical';
+
     public const DAILY = 'daily';
 
     private ZfExtended_EventManager $events;

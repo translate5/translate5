@@ -21,7 +21,7 @@
   @copyright  Marc Mittag, MittagQI - Quality Informatics
   @author     MittagQI - Quality Informatics
   @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
- 			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
  END LICENSE AND COPYRIGHT
  */
@@ -39,17 +39,18 @@ use MittagQI\Translate5\Task\Import\SkeletonFile;
  * Stellt Methoden zur Verarbeitung der vom Parser ermittelteten Segment Daten bereit
  * - speichert die ermittelten Segment Daten als Segmente in die DB
  */
-class editor_Models_Import_SegmentProcessor_Review extends editor_Models_Import_SegmentProcessor {
+class editor_Models_Import_SegmentProcessor_Review extends editor_Models_Import_SegmentProcessor
+{
     /**
      * @var Zend_Db_Adapter_Mysqli
      */
-    protected $db = NULL;
-    
+    protected $db = null;
+
     /**
      * @var Zend_Config
      */
     protected $taskConf;
-    
+
     /**
      * @var editor_Models_Import_Configuration
      */
@@ -73,14 +74,13 @@ class editor_Models_Import_SegmentProcessor_Review extends editor_Models_Import_
     protected SkeletonFile $skeletonFile;
 
     /**
-     * @param editor_Models_Task $task
-     * @param editor_Models_Import_Configuration $config
      * @throws ReflectionException
      * @throws Zend_Exception
      * @throws ZfExtended_Models_Entity_NotFoundException
      * @throws editor_Models_ConfigException
      */
-    public function __construct(editor_Models_Task $task, editor_Models_Import_Configuration $config){
+    public function __construct(editor_Models_Task $task, editor_Models_Import_Configuration $config)
+    {
         parent::__construct($task);
         $this->importConfig = $config;
         $this->db = Zend_Registry::get('db');
@@ -91,14 +91,15 @@ class editor_Models_Import_SegmentProcessor_Review extends editor_Models_Import_
         $langModel->load($task->getSourceLang());
 
         $this->wordCount = ZfExtended_Factory::get(editor_Models_Segment_WordCount::class, [
-            $langModel->getRfc5646()
+            $langModel->getRfc5646(),
         ]);
 
         $this->characterCount = ZfExtended_Factory::get('\MittagQI\Translate5\Segment\CharacterCount');
         $this->skeletonFile = ZfExtended_Factory::get(SkeletonFile::class, [$task]);
     }
 
-    public function process(editor_Models_Import_FileParser $parser){
+    public function process(editor_Models_Import_FileParser $parser)
+    {
         $seg = ZfExtended_Factory::get('editor_Models_Segment');
         /* @var $seg editor_Models_Segment */
         //statische, Task spezifische Daten zum Segment
@@ -106,91 +107,88 @@ class editor_Models_Import_SegmentProcessor_Review extends editor_Models_Import_
         $seg->setUserName($this->importConfig->userName);
 
         $seg->setTaskGuid($this->taskGuid);
-        
+
         //Segment Spezifische Daten
         $mid = $parser->getMid();
         $seg->setMid($mid);
         $seg->setFileId($this->fileId);
-        
+
         $attributes = $parser->getSegmentAttributes($mid);
         $seg->setMatchRate($attributes->matchRate);
         $seg->setMatchRateType($attributes->matchRateType);
         $seg->setEditable($attributes->editable);
         $seg->setAutoStateId($attributes->autoStateId);
         $seg->setPretrans($attributes->isPreTranslated ? $seg::PRETRANS_INITIAL : $seg::PRETRANS_NOTDONE);
-        
+
         $this->segmentNrInTask++;
         $seg->setSegmentNrInTask($this->segmentNrInTask);
         $sfm = $parser->getSegmentFieldManager();
         $seg->setFieldContents($sfm, $parser->getFieldContents());
-        
+
         $this->events->trigger("process", $this, [
             'config' => $this->taskConf,
             'segment' => $seg, //editor_Models_Segment
             'segmentAttributes' => $attributes, //editor_Models_Import_FileParser_SegmentAttributes
-            'importConfig' => $this->importConfig //editor_Models_Import_Configuration
+            'importConfig' => $this->importConfig, //editor_Models_Import_Configuration
         ]);
-        
+
         $segmentId = $seg->save();
         $this->processSegmentMeta($seg, $attributes);
+
         return $segmentId;
     }
-    
+
     /**
      * Processes additional segment attributes which are stored in the segment meta table
-     * @param editor_Models_Segment $seg
-     * @param editor_Models_Import_FileParser_SegmentAttributes $attributes
      */
     protected function processSegmentMeta(
         editor_Models_Segment $seg,
-        editor_Models_Import_FileParser_SegmentAttributes $attributes)
-    {
+        editor_Models_Import_FileParser_SegmentAttributes $attributes
+    ) {
         $meta = $seg->meta();
-        if(!empty($attributes->maxNumberOfLines) && !is_null($attributes->maxNumberOfLines)) {
+        if (! empty($attributes->maxNumberOfLines) && ! is_null($attributes->maxNumberOfLines)) {
             $meta->setMaxNumberOfLines($attributes->maxNumberOfLines);
         }
-        if(!empty($attributes->maxWidth) && !is_null($attributes->maxWidth)) {
+        if (! empty($attributes->maxWidth) && ! is_null($attributes->maxWidth)) {
             $meta->setMaxWidth($attributes->maxWidth);
         }
-        if(!empty($attributes->minWidth) && !is_null($attributes->minWidth)) {
+        if (! empty($attributes->minWidth) && ! is_null($attributes->minWidth)) {
             $meta->setMinWidth($attributes->minWidth);
         }
-        if(!empty($attributes->sizeUnit) && !is_null($attributes->sizeUnit)) {
+        if (! empty($attributes->sizeUnit) && ! is_null($attributes->sizeUnit)) {
             $meta->setSizeUnit($attributes->sizeUnit);
         }
-        if(!empty($attributes->font) && !is_null($attributes->font)) {
+        if (! empty($attributes->font) && ! is_null($attributes->font)) {
             $meta->setFont($attributes->font);
         }
-        if(!empty($attributes->fontSize) && !is_null($attributes->fontSize)) {
+        if (! empty($attributes->fontSize) && ! is_null($attributes->fontSize)) {
             $meta->setFontSize($attributes->fontSize);
         }
-        if(!empty($attributes->additionalMrkLength)) {
+        if (! empty($attributes->additionalMrkLength)) {
             $meta->setAdditionalMrkLength($attributes->additionalMrkLength);
         }
-        if(!empty($attributes->additionalUnitLength)) {
+        if (! empty($attributes->additionalUnitLength)) {
             $meta->setAdditionalUnitLength($attributes->additionalUnitLength);
         }
-        if(!empty($attributes->transunitHash) && !is_null($attributes->transunitHash)) {
+        if (! empty($attributes->transunitHash) && ! is_null($attributes->transunitHash)) {
             $meta->setTransunitHash($attributes->transunitHash);
-        }
-        else {
+        } else {
             //transunitHash must not be null, so if no info given we use segmentNr to assume that just the single segment is in a transunit
             $meta->setTransunitHash((string) $seg->getSegmentNrInTask());
         }
 
-        if(!empty($attributes->transunitId)) {
+        if (! empty($attributes->transunitId)) {
             $meta->setTransunitId($attributes->transunitId);
-        }
-        else {
+        } else {
             //transunitId must not be null, so if no info given we use segmentNr to assume that just the single segment is in a transunit
             $meta->setTransunitId($seg->getSegmentNrInTask());
         }
-        
-        if(!empty($attributes->autopropagated)) {
+
+        if (! empty($attributes->autopropagated)) {
             $meta->setAutopropagated($attributes->autopropagated);
         }
-        
-        if(!empty($attributes->locked)) {
+
+        if (! empty($attributes->locked)) {
             $meta->setLocked($attributes->locked);
         }
 
@@ -198,15 +196,15 @@ class editor_Models_Import_SegmentProcessor_Review extends editor_Models_Import_
         $meta->setSourceFileId($attributes->sourceFileId ?? '');
 
         //add custom meta fields
-        if(!empty($attributes->customMetaAttributes)) {
-            foreach($attributes->customMetaAttributes as $key => $value) {
-                $meta->__call('set'.ucfirst($key), [$value]);
+        if (! empty($attributes->customMetaAttributes)) {
+            foreach ($attributes->customMetaAttributes as $key => $value) {
+                $meta->__call('set' . ucfirst($key), [$value]);
             }
         }
 
         $this->characterCount->setSegment($seg);
         $meta->setSourceCharacterCount($this->characterCount->getCharacterCount());
-        
+
         $this->wordCount->setSegment($seg);
         $meta->setSourceWordCount($this->wordCount->getSourceCount());
 
@@ -217,24 +215,25 @@ class editor_Models_Import_SegmentProcessor_Review extends editor_Models_Import_
     /**
      * overrideable handler, creates the skeleton file
      * @override
-     * @param editor_Models_Import_FileParser $parser
      * @throws ReflectionException
      * @throws ZfExtended_Exception
      * @throws ZfExtended_Models_Entity_NotFoundException
      */
-    public function postParseHandler(editor_Models_Import_FileParser $parser) {
+    public function postParseHandler(editor_Models_Import_FileParser $parser)
+    {
         $file = ZfExtended_Factory::get(editor_Models_File::class);
         $file->load($this->fileId);
         $this->skeletonFile->saveToDisk($file, $parser->getSkeletonFile());
-        
+
         $this->saveFieldWidth($parser);
     }
-    
+
     /**
      * (non-PHPdoc)
      * @see editor_Models_Import_SegmentProcessor::postProcessHandler()
      */
-    public function postProcessHandler(editor_Models_Import_FileParser $parser, $segmentId) {
+    public function postProcessHandler(editor_Models_Import_FileParser $parser, $segmentId)
+    {
         $this->calculateFieldWidth($parser);
     }
 }

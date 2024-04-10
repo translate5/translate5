@@ -21,7 +21,7 @@ START LICENSE AND COPYRIGHT
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
@@ -42,8 +42,7 @@ class CronIp
         Zend_Config $config,
         private IpMatcher $ipMatcher,
         private ZfExtended_RemoteAddress $remoteAddress
-    )
-    {
+    ) {
         $configValue = explode(',', $config->runtimeOptions->cronIP);
 
         foreach ($configValue as $item) {
@@ -53,14 +52,10 @@ class CronIp
 
     /**
      * Check if particular IP against configured list, use the calculated remote address if omitted
-     *
-     * @param string|null $ip
-     *
-     * @return bool
      */
     public function isAllowed(?string $ip = null): bool
     {
-        if(is_null($ip)) {
+        if (is_null($ip)) {
             $ip = $this->remoteAddress->getIpAddress();
         }
 
@@ -79,8 +74,6 @@ class CronIp
 
     /**
      * Return list af all configured IPs
-     *
-     * @return array
      */
     public function getAllowedIps(): array
     {
@@ -89,10 +82,6 @@ class CronIp
 
     /**
      * Parse provided value and store in configuredIps property
-     *
-     * @param string $item
-     *
-     * @return void
      */
     private function parse(string $item): void
     {
@@ -101,7 +90,7 @@ class CronIp
         }
 
         // IP can contain a subnet, so taking that in count
-        [$subnet, ] = explode('/', $item);
+        [$subnet] = explode('/', $item);
 
         if (filter_var($subnet, FILTER_VALIDATE_IP)) {
             $this->configuredIps[] = $item;

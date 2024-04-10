@@ -52,23 +52,25 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\Plugins\TermImport;
 
+use editor_Plugins_TermImport_Services_Import as ImportService;
 use MittagQI\Translate5\Plugins\TermImport\DTO\InstructionsDTO;
 use MittagQI\Translate5\Plugins\TermImport\Exception\TermImportException;
 use MittagQI\Translate5\Plugins\TermImport\Service\Filesystem\FilesystemFactory;
 use MittagQI\Translate5\Plugins\TermImport\Service\Filesystem\FilesystemService;
 use MittagQI\Translate5\Plugins\TermImport\Service\LoggerService;
 use MittagQI\Translate5\Plugins\TermImport\Worker\CheckHostForUpdates;
-use editor_Plugins_TermImport_Services_Import as ImportService;
 use Throwable;
 use Zend_Registry;
 
 class TermImport
 {
     private LoggerService $logger;
+
     private ImportService $importService;
 
-    public function __construct(private FilesystemFactory $filesystemFactory)
-    {
+    public function __construct(
+        private FilesystemFactory $filesystemFactory
+    ) {
         $this->logger = new LoggerService();
         $this->importService = new ImportService();
     }
@@ -89,10 +91,11 @@ class TermImport
         }
 
         $db = new \editor_Models_Db_CustomerConfig();
-        $customerConfigs = $db->fetchAll($db
-            ->select()->setIntegrityCheck(false)
-            ->from($db, ['customerId', 'value'])
-            ->where('LEK_customer_config.name = ?', FilesystemFactory::FILESYSTEM_CONFIG_NAME)
+        $customerConfigs = $db->fetchAll(
+            $db
+                ->select()->setIntegrityCheck(false)
+                ->from($db, ['customerId', 'value'])
+                ->where('LEK_customer_config.name = ?', FilesystemFactory::FILESYSTEM_CONFIG_NAME)
         );
 
         foreach ($customerConfigs as $config) {
@@ -102,7 +105,7 @@ class TermImport
                 continue;
             }
 
-            if (!FilesystemFactory::isValidFilesystemConfig($filesystemConfig)) {
+            if (! FilesystemFactory::isValidFilesystemConfig($filesystemConfig)) {
                 $this->logger->invalidFilesystemConfig($filesystemConfig);
 
                 continue;
@@ -115,7 +118,9 @@ class TermImport
     public function queueFilesystem(string $key): void
     {
         $worker = new CheckHostForUpdates();
-        $worker->init(null, ['filesystemKey' => $key]);
+        $worker->init(null, [
+            'filesystemKey' => $key,
+        ]);
         $worker->queue();
 
         $this->logger->filesystemQueuedForCheck($key);
@@ -128,7 +133,7 @@ class TermImport
             return;
         }
 
-        if (!$filesystem->validDir("{$key}://")) {
+        if (! $filesystem->validDir("{$key}://")) {
             return;
         }
 
@@ -179,7 +184,6 @@ class TermImport
         FilesystemService $filesystem,
         string $filesystemKey
     ): void {
-
         // Get filesystem identifier usable in directory name, e.g it
         // will be either 'default' or some customer id from our db
         // We do that because $filesystemKey is a base64-encoded value
@@ -193,7 +197,6 @@ class TermImport
 
         // Try to download tbx files mentioned in $instructions->FileMapping
         try {
-
             // For each file that mentioned in $instructions->FileMapping but that not exists
             // - warning with code E1577 will be logged and it will be unset from $instructions->FileMapping
             $filesystem->downloadTbxFiles(
@@ -202,15 +205,15 @@ class TermImport
                 'local://' . ltrim($targetTbxDir, '/')
             );
 
-        // If something was thrown - remove temp dir andre throw
+            // If something was thrown - remove temp dir andre throw
         } catch (Throwable $e) {
             rmdir($targetTbxDir);
+
             throw $e;
         }
 
         // If there are still file mappings kept/left
         if (count($instructions->FileMapping) > 0) {
-
             // Do import and get tbx-files that were successfully imported
             $importedTbxFiles = $this->importService->import($instructions, $targetTbxDir, $filesystem->getAdapterType(), $this->logger);
 

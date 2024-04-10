@@ -1,13 +1,28 @@
 <?php
+
 function check_zahlen($data, &$checkMessages, &$msgCounts, &$msgMatches, $emptyTrgMids)
 {
     $sncSettings = [];
     $kombi = key($data);
-    $checkProps = ['standard' => true, 'checkFunc' => 'check_zahlen', 'checkID' => 'ST-0'];
+    $checkProps = [
+        'standard' => true,
+        'checkFunc' => 'check_zahlen',
+        'checkID' => 'ST-0',
+    ];
     $sourceLang = $data[$kombi]['Lose_Dateien']['file']['fileInfo']['srcLang'];
     $targetLang = $data[$kombi]['Lose_Dateien']['file']['fileInfo']['trgLang'];
-    $currentData = ['kombi' => $kombi, 'langs' => [$sourceLang, $targetLang]];
-    $checks = ['functions' => ['check_zahlen' => ['checkID' => 'ST-0', 'standard' => true]]];
+    $currentData = [
+        'kombi' => $kombi,
+        'langs' => [$sourceLang, $targetLang],
+    ];
+    $checks = [
+        'functions' => [
+            'check_zahlen' => [
+                'checkID' => 'ST-0',
+                'standard' => true,
+            ],
+        ],
+    ];
 
     $checkFunc = $checkProps['checkFunc'];
     $checkID = $checkProps['checkID'];
@@ -164,7 +179,7 @@ function countAndStripKiloSpaceNums($numsCount, &$checkSeg)
 
             foreach ($matches as $match) {
                 $num = $match;
-                if (!isset($numsCount[$i][$num])) {
+                if (! isset($numsCount[$i][$num])) {
                     $numsCount[$i][$num] = 0;
                 }
                 $numsCount[$i][$num]++;
@@ -192,7 +207,7 @@ function countAllOtherNums($numsCount, $checkSeg, $langs)
     for ($i = 0; $i < 2; $i++) {
         if (preg_match_all("#((?<![\d\p{L}\p{Pd}])[+\-\p{Pd}])?$numCharRegExClass+#u", $checkSeg[$i], $m)) {
             foreach ($m[0] as $num) {
-                if (!preg_match('!\d!u', $num)) {
+                if (! preg_match('!\d!u', $num)) {
                     continue;
                 }
 
@@ -212,6 +227,7 @@ function countAllOtherNums($numsCount, $checkSeg, $langs)
                         //echo "splitNums \$i = $i, \$num = $num, \$pattern = $pattern\n";
                         //print_r($splitNums);
                         $isInvalid = true;
+
                         continue;
                     }
                 }
@@ -231,7 +247,7 @@ function countAllOtherNums($numsCount, $checkSeg, $langs)
                     echo "numPostCleanUp: [$num] \n";
                 }
 
-                if (!isset($numsCount[$i][$num])) {
+                if (! isset($numsCount[$i][$num])) {
                     $numsCount[$i][$num] = 0;
                 }
                 $numsCount[$i][$num]++;
@@ -260,7 +276,7 @@ function countAllOtherNums($numsCount, $checkSeg, $langs)
                 }
 
                 foreach ($partNums as $partNum) {
-                    if (!isset($numsCount[$i][$partNum])) {
+                    if (! isset($numsCount[$i][$partNum])) {
                         $numsCount[$i][$partNum] = 0;
                     }
                     $numsCount[$i][$partNum]++;
@@ -284,7 +300,7 @@ function getDecimalPointLangs()
 
     static $decimalPointLangs = [];
 
-    if (!empty($decimalPointLangs)) {
+    if (! empty($decimalPointLangs)) {
         return $decimalPointLangs;
     }
 
@@ -320,7 +336,7 @@ function isMonoTypeDE($srcLang, $trgLang)
 {
     $decimalPointLangs = getDecimalPointLangs();
 
-    if ((!in_array($srcLang, $decimalPointLangs)) && (!in_array($trgLang, $decimalPointLangs))) {
+    if ((! in_array($srcLang, $decimalPointLangs)) && (! in_array($trgLang, $decimalPointLangs))) {
         return true;
     }
 
@@ -339,7 +355,7 @@ function isMixedTypesDE2EN($srcLang, $trgLang)
 {
     $decimalPointLangs = getDecimalPointLangs();
 
-    if ((!in_array($srcLang, $decimalPointLangs)) && (in_array($trgLang, $decimalPointLangs))) {
+    if ((! in_array($srcLang, $decimalPointLangs)) && (in_array($trgLang, $decimalPointLangs))) {
         return true;
     }
 
@@ -349,7 +365,7 @@ function isMixedTypesEN2DE($srcLang, $trgLang)
 {
     $decimalPointLangs = getDecimalPointLangs();
 
-    if ((in_array($srcLang, $decimalPointLangs)) && (!in_array($trgLang, $decimalPointLangs))) {
+    if ((in_array($srcLang, $decimalPointLangs)) && (! in_array($trgLang, $decimalPointLangs))) {
         return true;
     }
 
@@ -522,14 +538,14 @@ function isRealNum_lang($num, $lang)
     $upperDeciLimit = 8;
 
     // Leerzeichen als 1000er-Trenner, Komma/Punkt als Dezimaltrenner
-    if (!isDecimalPointLang($lang)) {
+    if (! isDecimalPointLang($lang)) {
         $realRegEx1 = "!^[+-]?[0-9]{1,3}(([\p{Zs}][0-9]{3})*(\,[0-9]{1,$upperDeciLimit})?|[0-9]*(\,[0-9]{1,$upperDeciLimit})?)$!u";
     } else {
         $realRegEx1 = "!^[+-]?[0-9]{1,3}(([\p{Zs}][0-9]{3})*(\.[0-9]{1,$upperDeciLimit})?|[0-9]*(\.[0-9]{1,$upperDeciLimit})?)$!u";
     }
 
     // Punkt/Komma als 1000er-Trenner, Komma/Punkt als Dezimaltrenner
-    if (!isDecimalPointLang($lang)) {
+    if (! isDecimalPointLang($lang)) {
         $realRegEx2 = "!^[+-]?[0-9]{1,3}(([\.][0-9]{3})*(\,[0-9]{1,$upperDeciLimit})?|[0-9]*(\,[0-9]{1,$upperDeciLimit})?)$!u";
     } else {
         $realRegEx2 = "!^[+-]?[0-9]{1,3}(([\,][0-9]{3})*(\.[0-9]{1,$upperDeciLimit})?|[0-9]*(\.[0-9]{1,$upperDeciLimit})?)$!u";
@@ -1452,7 +1468,7 @@ function subCheck_zahlen_normalizeSegs($checkSeg, $dateInfo, $monthInfo, $data, 
     */
     $checkDate_active = false;
     $dateChecked = false;
-    if ($checkDate_active && !empty($dateInfo[$srcLang]) && !empty($dateInfo[$trgLang])) {
+    if ($checkDate_active && ! empty($dateInfo[$srcLang]) && ! empty($dateInfo[$trgLang])) {
         $dateChecked = true;
         $checkSeg = subCheck_dates($checkSeg, $dateInfo, $monthInfo, $data, $currentData, $checkProps, $checks, $sncSettings, $checkMessages, $msgCounts, $msgMatches);
     }
@@ -1663,12 +1679,11 @@ function subCheck_zahlen_normalizeSegs($checkSeg, $dateInfo, $monthInfo, $data, 
 
     //Sonderbehandlung CH -- wenn SRC DE-Style
 
-    if (($langs[1] == 'fr-CH') && (!isDecimalPointLang($langs[0]))) {
+    if (($langs[1] == 'fr-CH') && (! isDecimalPointLang($langs[0]))) {
         // in Ch schauen ob <währung><num> enthalten
         // <num> beschränken auf \d{1,3}\.\d{2}
         if (preg_match_all("!(EURO?|€|CHF|Fr\.|\$|£)?\p{Zs}?(\d{1,3},\d{2})\p{Zs}?(EURO?|€|CHF|Fr\.|\$|£)?!iu", $checkSeg[1], $m)) {
-
-            if($debug){
+            if ($debug) {
                 echo "MID: $mid\n";
                 print_r($m);
             }
@@ -1706,7 +1721,7 @@ function subCheck_zahlen_normalizeSegs($checkSeg, $dateInfo, $monthInfo, $data, 
         // in Ch schauen ob <währung><num> enthalten
         // <num> beschränken auf \d{1,3}\.\d{2}
         if (preg_match_all("!(EURO?|€|CHF|Fr\.|\$|£)?\p{Zs}?(\d{1,3}\.\d{2})\p{Zs}?(EURO?|€|CHF|Fr\.|\$|£)?!iu", $checkSeg[1], $m)) {
-            if($debug){
+            if ($debug) {
                 echo "MID: $mid\n";
                 print_r($m);
             }
@@ -1777,7 +1792,9 @@ function subCheck_zahlen_v1($checkSeg, $dateChecked, $data, $currentData, $check
     $numsCount = compareNumCounts_explode2($numsCount, $currentData, $checkProps, $checks, $sncSettings, $checkMessages, $msgCounts, $msgMatches);
     $numsCount = compareNumCounts_spelledOut($numsCount, $currentData, $checkProps, $checks, $sncSettings, $checkMessages, $msgCounts, $msgMatches);
 
-    if ((empty($numsCount[0])) && (empty($numsCount[1]))) return;
+    if ((empty($numsCount[0])) && (empty($numsCount[1]))) {
+        return;
+    }
 
     $checkResults['checkMessage'] = 'Unstimmigkeiten in SRC vs TRG, bitte auch Trenner prüfen';
     $checkResults['checkMessage_EN'] = 'Discrepancy in SRC vs TRG, please also check separators <br>';
@@ -1788,12 +1805,12 @@ function subCheck_zahlen_v1($checkSeg, $dateChecked, $data, $currentData, $check
     }
 
     foreach ($numsCount[0] as $origNum => $srcCount) {
-        if (!isset($numsCount[1][$origNum])) {
+        if (! isset($numsCount[1][$origNum])) {
             $numsCount[1][$origNum] = 0;
         }
     }
     foreach ($numsCount[1] as $origNum => $trgCount) {
-        if (!isset($numsCount[0][$origNum])) {
+        if (! isset($numsCount[0][$origNum])) {
             $numsCount[0][$origNum] = 0;
         }
     }
@@ -1809,8 +1826,12 @@ function subCheck_zahlen_v1($checkSeg, $dateChecked, $data, $currentData, $check
         $match = $num;
         $match = str_replace("\-", "\p{Pd}", preg_quote($match));
         $checkResults['replaceString'] = '<span class="matchZahlen">' . $num . '</span>';
-        if (!preg_match('!^\d+$!', $match)) $checkResults['matchRegEx'] = "#(?<![\d])" . $match . "(?![\d])#u";
-        if (preg_match('!^\d+$!', $match)) $checkResults['matchRegEx'] = "#(?<![\d\"])" . $match . "(?![\d\"])#u";
+        if (! preg_match('!^\d+$!', $match)) {
+            $checkResults['matchRegEx'] = "#(?<![\d])" . $match . "(?![\d])#u";
+        }
+        if (preg_match('!^\d+$!', $match)) {
+            $checkResults['matchRegEx'] = "#(?<![\d\"])" . $match . "(?![\d\"])#u";
+        }
         $num = "<code class=\"term\">{$num}</code>";
         if ($trgCount == 0 || $srcCount == 0 || $srcCount < $trgCount || $srcCount > $trgCount) {
             $checkResults['markSrc'] = true;
@@ -1926,23 +1947,23 @@ function subCheck_1000er_trenner_nicht_erlaubt($data, $currentData, $checkProps,
     }
 
     if ($debug) {
-        if (!empty($kiloSpaceNums)) {
+        if (! empty($kiloSpaceNums)) {
             echo 'kiloSpaceNums';
             print_r($kiloSpaceNums);
         }
-        if (!empty($kiloPointNums)) {
+        if (! empty($kiloPointNums)) {
             echo 'kiloPointNums';
             print_r($kiloPointNums);
         }
-        if (!empty($kiloCommaNums)) {
+        if (! empty($kiloCommaNums)) {
             echo 'kiloCommaNums';
             print_r($kiloCommaNums);
         }
-        if (!empty($deciCommaNums)) {
+        if (! empty($deciCommaNums)) {
             echo 'deciCommaNums';
             print_r($deciCommaNums);
         }
-        if (!empty($deciPointNums)) {
+        if (! empty($deciPointNums)) {
             echo 'deciPointNums';
             print_r($deciPointNums);
         }
@@ -1990,7 +2011,7 @@ function subCheck_1000er_trenner_nicht_erlaubt($data, $currentData, $checkProps,
         }
     }
 
-    if (!isDecimalPointLang($langs[1])) {
+    if (! isDecimalPointLang($langs[1])) {
         if (isset($kiloPointNums[1])) {
             foreach ($kiloPointNums[1] as $theNum) {
                 //if(in_array($theNum, $srcNumbersPlusDivs)) continue;
@@ -2053,10 +2074,10 @@ function subCheck_alphanumStrings($data, $currentData, $checkProps, &$checks, $s
         $m[2] = array_unique($m[2]);
 
         foreach ($m[2] as $key => $match) {
-            if (!preg_match('![A-Zx]!', $match)) {
+            if (! preg_match('![A-Zx]!', $match)) {
                 continue;
             }
-            if (!preg_match('![0-9]!', $match)) {
+            if (! preg_match('![0-9]!', $match)) {
                 continue;
             }
             if (preg_match('!^KW\d{1,2}!', $match)) {
@@ -2093,10 +2114,10 @@ function subCheck_alphanumStrings($data, $currentData, $checkProps, &$checks, $s
         $m[2] = array_unique($m[2]);
 
         foreach ($m[2] as $key => $match) {
-            if (!preg_match('![A-Zx]!', $match)) {
+            if (! preg_match('![A-Zx]!', $match)) {
                 continue;
             }
-            if (!preg_match('![0-9]!', $match)) {
+            if (! preg_match('![0-9]!', $match)) {
                 continue;
             }
 
@@ -2333,7 +2354,7 @@ function subCheck_dates($checkSeg, $dateInfo, $monthInfo, $data, $currentData, $
 
         // valide sourceDates im Langformat ( = mit ausgeschriebenem Monat) aus srcSeg auslesen
 
-        if (!isset($regExes_months2[$srcLang])) {
+        if (! isset($regExes_months2[$srcLang])) {
             print_r("Keine Suche nach Datumsangaben mit abgekürzten oder ausgeschriebenen Monatsnamen in {$srcLang}. [regExes_months2] fehlt]\n");
             //trigger_error("Keine Suche nach Datumsangaben mit abgekürzten oder ausgeschriebenen Monatsnamen in {$srcLang}. [regExes_months2] fehlt]\n", E_USER_NOTICE);
         } else {
@@ -2355,13 +2376,14 @@ function subCheck_dates($checkSeg, $dateInfo, $monthInfo, $data, $currentData, $
                         $month = $matches['month'][$key];
                         $year = '';
                         $year = $matches['year'][$key];
-                        if (!empty($matches['year'][$key])) {
+                        if (! empty($matches['year'][$key])) {
                             $year = $matches['year'][$key];
                         }
                         $monthNum = '';
                         for ($i = 1; $i < 13; $i++) {
-                            if (!empty($matches['m' . $i][$key])) {
+                            if (! empty($matches['m' . $i][$key])) {
                                 $monthNum = $i;
+
                                 break;
                             }
                         }
@@ -2488,7 +2510,7 @@ function subCheck_dates($checkSeg, $dateInfo, $monthInfo, $data, $currentData, $
         }
         if ($checkLong) {
             if (isset($data['month_num']) &&
-                !empty($data['month_num']) &&
+                ! empty($data['month_num']) &&
                 isset($monthInfo[$trgLang]) &&
                 isset($formats_month[$trgLang])) {
                 $monthNum = $data['month_num'];
@@ -2573,7 +2595,7 @@ function subCheck_dates($checkSeg, $dateInfo, $monthInfo, $data, $currentData, $
         }
         if ($checkLong) {
             if (isset($data['month_num']) &&
-                !empty($data['month_num']) &&
+                ! empty($data['month_num']) &&
                 isset($monthInfo[$trgLang]) &&
                 isset($formats_month[$trgLang])) {
                 $monthNum = $data['month_num'];
@@ -2817,10 +2839,11 @@ function checkForInvalidNums($numsCount, $currentData, $checkProps, &$checks, $s
     $mixedTypesDE2EN = isMixedTypesDE2EN($langs[0], $langs[1]);
 
     foreach ($numsCount[0] as $numOrig => $count) {
-        if (!isset($numsCount[1][$numOrig])) {
+        if (! isset($numsCount[1][$numOrig])) {
             if ($debug) {
                 echo "kein trg-Count für $numOrig \n";
             }
+
             continue;
         }
 
@@ -2828,7 +2851,7 @@ function checkForInvalidNums($numsCount, $currentData, $checkProps, &$checks, $s
             $doMessage = false;
 
             if ($monoTypeDE || $mixedTypesEN2DE) {
-                if ((isKiloCommaNum($numOrig)) && (!isDeciCommaNum($numOrig))) {
+                if ((isKiloCommaNum($numOrig)) && (! isDeciCommaNum($numOrig))) {
                     $checkProps['checkSubType_extra'] = "In {$langs[1]} ggf. ungültige Zahl";
                     $checkProps['checkSubType_extra_EN'] = "Possibly invalid number in {$langs[1]}";
 
@@ -2836,7 +2859,7 @@ function checkForInvalidNums($numsCount, $currentData, $checkProps, &$checks, $s
                     $checkResults['checkMessage_EN'] = "[{$numOrig}] possibly invalid in {$langs[1]} (comma as 1000s separator?)";
 
                     $doMessage = true;
-                } elseif ((preg_match('!,!', $numOrig)) && (!isDeciCommaNum($numOrig)) && (!isKiloCommaNum($numOrig))) {
+                } elseif ((preg_match('!,!', $numOrig)) && (! isDeciCommaNum($numOrig)) && (! isKiloCommaNum($numOrig))) {
                     $checkProps['checkSubType_extra'] = 'Ggf. ungültige Zahl gefunden';
                     $checkProps['checkSubType_extra_EN'] = 'Possibly invalid number found';
 
@@ -2846,7 +2869,7 @@ function checkForInvalidNums($numsCount, $currentData, $checkProps, &$checks, $s
                     $doMessage = true;
                 }
             } elseif ($monoTypeEN || $mixedTypesDE2EN) {
-                if ((isDeciCommaNum($numOrig)) && (!isKiloCommaNum($numOrig))) {
+                if ((isDeciCommaNum($numOrig)) && (! isKiloCommaNum($numOrig))) {
                     $checkProps['checkSubType_extra'] = "In {$langs[1]} ggf. ungültige Zahl";
                     $checkProps['checkSubType_extra_EN'] = 'Possibly invalid number found';
 
@@ -2854,7 +2877,7 @@ function checkForInvalidNums($numsCount, $currentData, $checkProps, &$checks, $s
                     $checkResults['checkMessage_EN'] = "[{$numOrig}] possibly invalid in {$langs[1]} (Comma used as decimal separator?)";
 
                     $doMessage = true;
-                } elseif ((preg_match('!,!', $numOrig)) && (!isKiloCommaNum($numOrig))) {
+                } elseif ((preg_match('!,!', $numOrig)) && (! isKiloCommaNum($numOrig))) {
                     $checkProps['checkSubType_extra'] = 'Ggf. ungültige Zahl gefunden';
                     $checkProps['checkSubType_extra_EN'] = 'Possibly invalid number found';
 
@@ -2923,10 +2946,11 @@ function compareNumCounts_asIs2($numsCount, $currentData, $checkProps, &$checks,
     $mixedTypesDE2EN = isMixedTypesDE2EN($langs[0], $langs[1]);
 
     foreach ($numsCount[0] as $numOrig => $count) {
-        if (!isset($numsCount[1][$numOrig])) {
+        if (! isset($numsCount[1][$numOrig])) {
             if ($debug) {
                 echo "kein trg-Count für $numOrig \n";
             }
+
             continue;
         }
 
@@ -2936,12 +2960,12 @@ function compareNumCounts_asIs2($numsCount, $currentData, $checkProps, &$checks,
             (is_int($numOrig)) ||
             ($monoTypeDE) ||
             ($monoTypeEN) ||
-            (!isRealNum($numOrig))) {
+            (! isRealNum($numOrig))) {
             if ($debug) {
                 echo "bed1: $numOrig\n";
             }
             $doCheck = true;
-        } elseif (($mixedTypesDE2EN || $mixedTypesEN2DE) && (!isRealNum($numOrig))) {
+        } elseif (($mixedTypesDE2EN || $mixedTypesEN2DE) && (! isRealNum($numOrig))) {
             if ($debug) {
                 echo "bed2: $numOrig\n";
             }
@@ -2957,6 +2981,7 @@ function compareNumCounts_asIs2($numsCount, $currentData, $checkProps, &$checks,
             if ($debug) {
                 echo "Keine Bed erfüllt, skip für $numOrig\n";
             }
+
             continue;
         }
     }
@@ -3034,7 +3059,7 @@ function compareNumCounts_explode2($numsCount, $currentData, $checkProps, &$chec
 
                 $split = false;
 
-                if (!isRealNum($num)) {
+                if (! isRealNum($num)) {
                     $split = true;
                 } else {
                     if ($debug) {
@@ -3076,7 +3101,7 @@ function compareNumCounts_explode2($numsCount, $currentData, $checkProps, &$chec
 
                     $allNormalNumsInTU2[$num] = true;
 
-                    if (!isset($normalNumsCount[$i][$num])) {
+                    if (! isset($normalNumsCount[$i][$num])) {
                         $normalNumsCount[$i][$num] = 0;
                     }
                     $normalNumsCount[$i][$num]++;
@@ -3172,7 +3197,7 @@ function compareNumCounts_explode2($numsCount, $currentData, $checkProps, &$chec
         if (count($numPartsAll[0]) > count($numPartsAll[1])) {
             $diffNums = array_values(array_diff($numPartsAll[0], $numPartsAll[1]));
 
-            if (!isset($diffNums[0])) {
+            if (! isset($diffNums[0])) {
                 if ($debug) {
                     echo "keine Diffnum (v1) in numPartsAll. nehme anderes Array\n";
                 }
@@ -3238,6 +3263,7 @@ function compareNumCounts_explode2($numsCount, $currentData, $checkProps, &$chec
                         }
 
                         $origNums2[1][$diffNum][] = $word;
+
                         break;
                     } elseif ($debug) {
                         echo "Kein match!\n";
@@ -3248,7 +3274,7 @@ function compareNumCounts_explode2($numsCount, $currentData, $checkProps, &$chec
                     print_r($normalNumsCount);
                 }
 
-                if (!isset($normalNumsCount[1][$diffNum])) {
+                if (! isset($normalNumsCount[1][$diffNum])) {
                     $normalNumsCount[1][$diffNum] = $wordsCount;
                 } else {
                     $normalNumsCount[1][$diffNum] = $normalNumsCount[1][$diffNum] + $wordsCount;
@@ -3260,7 +3286,7 @@ function compareNumCounts_explode2($numsCount, $currentData, $checkProps, &$chec
         } elseif (count($numPartsAll[0]) < count($numPartsAll[1])) {
             $diffNums = array_values(array_diff($numPartsAll[1], $numPartsAll[0]));
 
-            if (!isset($diffNums[0])) {
+            if (! isset($diffNums[0])) {
                 if ($debug) {
                     echo "keine Diffnum (v2) in numPartsAll. nehme anderes Array\n";
                 }
@@ -3326,6 +3352,7 @@ function compareNumCounts_explode2($numsCount, $currentData, $checkProps, &$chec
                         }
 
                         $origNums2[0][$diffNum][] = $word;
+
                         break;
                     }
                 }
@@ -3333,7 +3360,7 @@ function compareNumCounts_explode2($numsCount, $currentData, $checkProps, &$chec
                 if ($debug) {
                     print_r($normalNumsCount);
                 }
-                if (!isset($normalNumsCount[0][$diffNum])) {
+                if (! isset($normalNumsCount[0][$diffNum])) {
                     $normalNumsCount[0][$diffNum] = $wordsCount;
                 } else {
                     $normalNumsCount[0][$diffNum] = $normalNumsCount[0][$diffNum] + $wordsCount;
@@ -3346,10 +3373,10 @@ function compareNumCounts_explode2($numsCount, $currentData, $checkProps, &$chec
     }
 
     foreach ($allNormalNumsInTU2 as $num => $state) {
-        if (!isset($normalNumsCount[0][$num])) {
+        if (! isset($normalNumsCount[0][$num])) {
             $normalNumsCount[0][$num] = 0;
         }
-        if (!isset($normalNumsCount[1][$num])) {
+        if (! isset($normalNumsCount[1][$num])) {
             $normalNumsCount[1][$num] = 0;
         }
     }
@@ -3461,7 +3488,7 @@ function compareNumCounts_explode2($numsCount, $currentData, $checkProps, &$chec
         for ($i = 0; $i < 2; $i++) {
             foreach ($unsets[$i] as $match) {
                 $checkResults['replaceString'] = '<span class="matchHinweis">' . $match . '</span>';
-                if (!is_int($match)) {
+                if (! is_int($match)) {
                     $checkResults['matchRegEx'] = "#(?<![\d])" . preg_quote($match) . "(?![\d])#u";
                 }
                 if (is_int($match)) {
@@ -3569,7 +3596,7 @@ function compareNumCounts_flipDiv($numsCount, $currentData, $checkProps, &$check
             }
             $allNormalNumsInTU2[$num] = true;
 
-            if (!isset($normalNumsCount[$i][$num])) {
+            if (! isset($normalNumsCount[$i][$num])) {
                 $normalNumsCount[$i][$num] = $count;
             } else {
                 $normalNumsCount[$i][$num] = $count + $normalNumsCount[$i][$num];
@@ -3601,10 +3628,10 @@ function compareNumCounts_flipDiv($numsCount, $currentData, $checkProps, &$check
     }
 
     foreach ($allNormalNumsInTU2 as $num => $state) {
-        if (!isset($normalNumsCount[0][$num])) {
+        if (! isset($normalNumsCount[0][$num])) {
             $normalNumsCount[0][$num] = 0;
         }
-        if (!isset($normalNumsCount[1][$num])) {
+        if (! isset($normalNumsCount[1][$num])) {
             $normalNumsCount[1][$num] = 0;
         }
     }
@@ -3616,7 +3643,7 @@ function compareNumCounts_flipDiv($numsCount, $currentData, $checkProps, &$check
     }
 
     foreach ($normalNumsCount[0] as $numSrcNormal => $srcCount) {
-        if (!isset($normalNumsCount[1][$numSrcNormal])) {
+        if (! isset($normalNumsCount[1][$numSrcNormal])) {
             continue;
         }
         $trgCount = $normalNumsCount[1][$numSrcNormal];
@@ -3649,7 +3676,7 @@ function compareNumCounts_flipDiv($numsCount, $currentData, $checkProps, &$check
     }
 
     foreach ($normalNumsCount[1] as $numTrgNormal => $trgCount) {
-        if (!isset($normalNumsCount[0][$numTrgNormal])) {
+        if (! isset($normalNumsCount[0][$numTrgNormal])) {
             continue;
         }
         $srcCount = $normalNumsCount[0][$numTrgNormal];
@@ -3700,7 +3727,7 @@ function compareNumCounts_flipDiv($numsCount, $currentData, $checkProps, &$check
         print_r($flipDivNums);
     }
 
-    if ((!empty($flipDivNums[0])) && (!empty($flipDivNums[1]))) {
+    if ((! empty($flipDivNums[0])) && (! empty($flipDivNums[1]))) {
         if (count($flipDivNums[0]) == count($flipDivNums[1])) {
             foreach ($flipDivNums[0] as $normalNum => $numOrigSrc) {
                 $numOrigTrg = $flipDivNums[1][$normalNum];
@@ -3714,11 +3741,11 @@ function compareNumCounts_flipDiv($numsCount, $currentData, $checkProps, &$check
                     $doMessage = true;
                 }
 
-                if ((!isDecimalPointLang($langs[0])) &&
+                if ((! isDecimalPointLang($langs[0])) &&
                     ($langs[1] == 'fr-CH') &&
                     (isDeciPointNum($numOrigTrg))) {
                     if ((preg_match("!(EURO?|€|CHF|Fr\.|\$|£)?\p{Zs}?{$numOrigTrg}\p{Zs}?(EURO?|€|CHF|Fr\.|\$|£)?!iu", $checkSeg[1], $m)) &&
-                        ((!empty($m[1])) || (!empty($m[2])))) {
+                        ((! empty($m[1])) || (! empty($m[2])))) {
                         if ($debug) {
                             echo "\n!! Waehrung !!\n";
                         }
@@ -3830,7 +3857,7 @@ function compareNumCounts_leadingZero_trailingPeriod($numsCount, $currentData, $
 
             $split = false;
 
-            if (!isRealNum($num)) {
+            if (! isRealNum($num)) {
                 $split = true;
             } else {
                 if ($debug) {
@@ -3869,7 +3896,7 @@ function compareNumCounts_leadingZero_trailingPeriod($numsCount, $currentData, $
 
             $allNormalNumsInTU2[$num] = true;
 
-            if (!isset($normalNumsCount[$i][$num])) {
+            if (! isset($normalNumsCount[$i][$num])) {
                 $normalNumsCount[$i][$num] = $count;
             } else {
                 $normalNumsCount[$i][$num] = $count + $normalNumsCount[$i][$num];
@@ -3902,10 +3929,10 @@ function compareNumCounts_leadingZero_trailingPeriod($numsCount, $currentData, $
     }
 
     foreach ($allNormalNumsInTU2 as $num => $state) {
-        if (!isset($normalNumsCount[0][$num])) {
+        if (! isset($normalNumsCount[0][$num])) {
             $normalNumsCount[0][$num] = 0;
         }
-        if (!isset($normalNumsCount[1][$num])) {
+        if (! isset($normalNumsCount[1][$num])) {
             $normalNumsCount[1][$num] = 0;
         }
     }
@@ -3917,7 +3944,7 @@ function compareNumCounts_leadingZero_trailingPeriod($numsCount, $currentData, $
     }
 
     foreach ($normalNumsCount[0] as $numSrcNormal => $srcCount) {
-        if (!isset($normalNumsCount[1][$numSrcNormal])) {
+        if (! isset($normalNumsCount[1][$numSrcNormal])) {
             continue;
         }
         $trgCount = $normalNumsCount[1][$numSrcNormal];
@@ -3927,7 +3954,7 @@ function compareNumCounts_leadingZero_trailingPeriod($numsCount, $currentData, $
                 echo "match $numSrcNormal -> $srcCount === $trgCount\n";
             }
 
-            if (!isset($origNums2[0][$numSrcNormal])) {
+            if (! isset($origNums2[0][$numSrcNormal])) {
                 echo "NISSET \n";
             }
 
@@ -3959,7 +3986,7 @@ function compareNumCounts_leadingZero_trailingPeriod($numsCount, $currentData, $
     }
 
     foreach ($normalNumsCount[1] as $numTrgNormal => $trgCount) {
-        if (!isset($normalNumsCount[0][$numTrgNormal])) {
+        if (! isset($normalNumsCount[0][$numTrgNormal])) {
             continue;
         }
         $srcCount = $normalNumsCount[0][$numTrgNormal];
@@ -4015,7 +4042,7 @@ function compareNumCounts_leadingZero_trailingPeriod($numsCount, $currentData, $
         print_r($normalNumsCount);
     }
 
-    if ((!empty($explodeNums[0])) && (!empty($explodeNums[1]))) {
+    if ((! empty($explodeNums[0])) && (! empty($explodeNums[1]))) {
         if (count($explodeNums[0]) == count($explodeNums[1])) {
             foreach ($explodeNums[0] as $normalNum => $numOrigSrc) {
                 $numOrigTrg = $explodeNums[1][$normalNum];
@@ -4041,7 +4068,7 @@ function compareNumCounts_leadingZero_trailingPeriod($numsCount, $currentData, $
                 // // doMatches SRC
                 $match = $numOrigSrc;
                 $checkResults['replaceString'] = '<span class="matchHinweis">' . $match . '</span>';
-                if (!is_int($match)) {
+                if (! is_int($match)) {
                     $checkResults['matchRegEx'] = "#(?<![\d])" . preg_quote($match) . "(?![\d])#u";
                 }
                 if (is_int($match)) {
@@ -4053,7 +4080,7 @@ function compareNumCounts_leadingZero_trailingPeriod($numsCount, $currentData, $
                 // // doMatches TRG
                 $match = $numOrigTrg;
                 $checkResults['replaceString'] = '<span class="matchHinweis">' . $match . '</span>';
-                if (!is_int($match)) {
+                if (! is_int($match)) {
                     $checkResults['matchRegEx'] = "#(?<![\d])" . preg_quote($match) . "(?![\d])#u";
                 }
                 if (is_int($match)) {
@@ -4127,7 +4154,7 @@ function compareNumCounts_noDiv($numsCount, $currentData, $checkProps, &$checks,
                 echo "num1 $num\n";
             }
 
-            if (!isDecimalPointLang($langs[$i])) {
+            if (! isDecimalPointLang($langs[$i])) {
                 if ((isKiloSpaceNum($num)) ||
                     (isKiloNoDivNum($num)) ||
                     (isKiloPointNum($num)) ||
@@ -4137,6 +4164,7 @@ function compareNumCounts_noDiv($numsCount, $currentData, $checkProps, &$checks,
                     if ($debug) {
                         echo " $num ist keine gültige 1000er-Zahl in {$langs[$i]}!!\n";
                     }
+
                     continue;
                 }
             } else {
@@ -4149,6 +4177,7 @@ function compareNumCounts_noDiv($numsCount, $currentData, $checkProps, &$checks,
                     if ($debug) {
                         echo " $num ist keine gültige 1000er-Zahl in {$langs[$i]}!!\n";
                     }
+
                     continue;
                 }
             }
@@ -4157,7 +4186,7 @@ function compareNumCounts_noDiv($numsCount, $currentData, $checkProps, &$checks,
                 echo "-> num2 $num\n";
             }
             $allNormalNumsInTU2[$num] = true;
-            if (!isset($normalNumsCount[$i][$num])) {
+            if (! isset($normalNumsCount[$i][$num])) {
                 $normalNumsCount[$i][$num] = $count;
             } else {
                 $normalNumsCount[$i][$num] = $count + $normalNumsCount[$i][$num];
@@ -4170,7 +4199,7 @@ function compareNumCounts_noDiv($numsCount, $currentData, $checkProps, &$checks,
         }
     }
 
-    if ((!isset($normalNumsCount[0])) || (!isset($normalNumsCount[1]))) {
+    if ((! isset($normalNumsCount[0])) || (! isset($normalNumsCount[1]))) {
         return $numsCount;
     }
 
@@ -4194,10 +4223,10 @@ function compareNumCounts_noDiv($numsCount, $currentData, $checkProps, &$checks,
     }
 
     foreach ($allNormalNumsInTU2 as $num => $state) {
-        if (!isset($normalNumsCount[0][$num])) {
+        if (! isset($normalNumsCount[0][$num])) {
             $normalNumsCount[0][$num] = 0;
         }
-        if (!isset($normalNumsCount[1][$num])) {
+        if (! isset($normalNumsCount[1][$num])) {
             $normalNumsCount[1][$num] = 0;
         }
     }
@@ -4210,7 +4239,7 @@ function compareNumCounts_noDiv($numsCount, $currentData, $checkProps, &$checks,
     }
 
     foreach ($normalNumsCount[0] as $numSrcNormal => $srcCount) {
-        if (!isset($normalNumsCount[1][$numSrcNormal])) {
+        if (! isset($normalNumsCount[1][$numSrcNormal])) {
             continue;
         }
         $trgCount = $normalNumsCount[1][$numSrcNormal];
@@ -4243,7 +4272,7 @@ function compareNumCounts_noDiv($numsCount, $currentData, $checkProps, &$checks,
     }
 
     foreach ($normalNumsCount[1] as $numTrgNormal => $trgCount) {
-        if (!isset($normalNumsCount[0][$numTrgNormal])) {
+        if (! isset($normalNumsCount[0][$numTrgNormal])) {
             continue;
         }
         $srcCount = $normalNumsCount[0][$numTrgNormal];
@@ -4298,7 +4327,7 @@ function compareNumCounts_noDiv($numsCount, $currentData, $checkProps, &$checks,
         print_r($noDivNums);
     }
 
-    if ((!empty($noDivNums[0])) && (!empty($noDivNums[1]))) {
+    if ((! empty($noDivNums[0])) && (! empty($noDivNums[1]))) {
         if (count($noDivNums[0]) == count($noDivNums[1])) {
             foreach ($noDivNums[0] as $normalNum => $numOrigSrc) {
                 $numOrigTrg = $noDivNums[1][$normalNum];
@@ -4327,7 +4356,7 @@ function compareNumCounts_noDiv($numsCount, $currentData, $checkProps, &$checks,
                 $match = $numOrigSrc;
 
                 $checkResults['replaceString'] = '<span class="matchHinweis">' . $match . '</span>';
-                if (!is_int($match)) {
+                if (! is_int($match)) {
                     $checkResults['matchRegEx'] = "#(?<![\d])" . preg_quote($match) . "(?![\d])#u";
                 }
                 if (is_int($match)) {
@@ -4341,7 +4370,7 @@ function compareNumCounts_noDiv($numsCount, $currentData, $checkProps, &$checks,
                 $match = $numOrigTrg;
 
                 $checkResults['replaceString'] = '<span class="matchHinweis">' . $match . '</span>';
-                if (!is_int($match)) {
+                if (! is_int($match)) {
                     $checkResults['matchRegEx'] = "#(?<![\d])" . preg_quote($match) . "(?![\d])#u";
                 }
                 if (is_int($match)) {
@@ -4421,10 +4450,11 @@ function compareNumCounts_sameDiv($numsCount, $checkSeg, $currentData, $checkPro
     foreach ($numsCount[0] as $numOrig => $count) {
         $numPattern = preg_replace('!\d!', '#', $numOrig);
 
-        if (!isset($numsCount[1][$numOrig])) {
+        if (! isset($numsCount[1][$numOrig])) {
             if ($debug) {
                 echo "kein trg-Count für $numOrig \n";
             }
+
             continue;
         }
 
@@ -4432,28 +4462,32 @@ function compareNumCounts_sameDiv($numsCount, $checkSeg, $currentData, $checkPro
             unset($numsCount[0][$numOrig]);
             unset($numsCount[1][$numOrig]);
 
-            if (!isRealNum($numOrig)) {
+            if (! isRealNum($numOrig)) {
                 if ($debug) {
                     echo "!isRealNum $numOrig \n";
                 }
+
                 continue;
             }
             if (isNonLokaNum($numOrig, $checkSeg)) {
                 if ($debug) {
                     echo "!isRealNum $numOrig \n";
                 }
+
                 continue;
             }
             if (isKiloSpaceNum($numOrig)) {
                 if ($debug) {
                     echo "KiloSPace -> skip $numOrig\n";
                 }
+
                 continue;
             }
-            if (!preg_match('![\.,]!', $numOrig)) {
+            if (! preg_match('![\.,]!', $numOrig)) {
                 if ($debug) {
                     echo "kein [.,] -> skip $numOrig\n";
                 }
+
                 continue;
             }
 
@@ -4484,7 +4518,7 @@ function compareNumCounts_sameDiv($numsCount, $checkSeg, $currentData, $checkPro
 
             if ($mixedTypesDE2EN) {
                 if ((isKiloCommaNum($numOrig)) &&
-                    (!isDeciCommaNum($numOrig))) {
+                    (! isDeciCommaNum($numOrig))) {
                     if ($debug) {
                         echo "mixedTypesDE2EN : isKiloCommaNum && !isDeciCommaNum : $numOrig --> in Dezimalkommasprache ist scheinbar Komma als 1000er-Trenner verwendet worden (statt Punkt)\n";
                     }
@@ -4508,15 +4542,16 @@ function compareNumCounts_sameDiv($numsCount, $checkSeg, $currentData, $checkPro
                     // doMatches($checkResults, $currentData, $checkProps, $msgMatches, $checks);
 
                     continue;
-                } elseif (!isRealNum_lang($numOrig, $langs[0])) {
+                } elseif (! isRealNum_lang($numOrig, $langs[0])) {
                     if ($debug) {
                         echo "!isRealNum_lang $numOrig {$langs[0]} \n";
                     }
+
                     continue;
                 }
             } elseif ($mixedTypesEN2DE) {
                 if ((isDeciCommaNum($numOrig)) &&
-                    (!isKiloCommaNum($numOrig))) {
+                    (! isKiloCommaNum($numOrig))) {
                     if ($debug) {
                         echo "mixedTypesEN2DE : isDeciCommaNum && !isKiloCommaNum : $numOrig --> in Dezimalpunktsprache ist scheinbar Komma als Dezimaltrenner verwendet worden (statt Punkt)\n";
                     }
@@ -4541,7 +4576,7 @@ function compareNumCounts_sameDiv($numsCount, $checkSeg, $currentData, $checkPro
 
                     continue;
                 } elseif ((isKiloPointNum($numOrig)) &&
-                    (!isDeciPointNum($numOrig))) {
+                    (! isDeciPointNum($numOrig))) {
                     if ($debug) {
                         echo "mixedTypesEN2DE : isKiloPointNum && !isDeciPointNum : $numOrig --> in Dezimalpunktsprache ist scheinbar Punkt als 1000er-Trenner verwendet worden (statt Komma)\n";
                     }
@@ -4703,7 +4738,7 @@ function compareNumCounts_spelledOut($numsCount, $currentData, $checkProps, &$ch
 
         $doCheck = true;
 
-        if (!is_integer($num)) {
+        if (! is_integer($num)) {
             if ($debug) {
                 echo "$num ist keine ganze Zahl -> Skip\n";
             }
@@ -4717,7 +4752,7 @@ function compareNumCounts_spelledOut($numsCount, $currentData, $checkProps, &$ch
             $doCheck = false;
         }
 
-        if (!isset($numWords[1][$num])) {
+        if (! isset($numWords[1][$num])) {
             if ($debug) {
                 echo "Kein numWord für $num in {$langs[1]} -> Skip\n";
             }
@@ -4735,6 +4770,7 @@ function compareNumCounts_spelledOut($numsCount, $currentData, $checkProps, &$ch
                         echo "Zahl $num ausgeschrieben als $word in srcSeg gefunden -> skip ausgeschr\n";
                     }
                     $doCheck = false;
+
                     break;
                 } else {
                     if ($debug) {
@@ -4757,7 +4793,7 @@ function compareNumCounts_spelledOut($numsCount, $currentData, $checkProps, &$ch
                     echo 'trgSegPure: |' . $segPure[1] . "|\n";
                 }
 
-                if (!isAsianLang($langs[1])) {
+                if (! isAsianLang($langs[1])) {
                     $wordRegEx = "#(?<!\p{L})$word(?!\p{L})#ui";
                 } else {
                     $wordRegEx = "#$word#ui";
@@ -4789,6 +4825,7 @@ function compareNumCounts_spelledOut($numsCount, $currentData, $checkProps, &$ch
                             echo "numOrigTrg != num: $numOrigTrg !== $num \n";
                         }
                         $wordsCount = 0;
+
                         continue;
                     } else {
                         $numOrigTrg = $word;
@@ -4802,7 +4839,7 @@ function compareNumCounts_spelledOut($numsCount, $currentData, $checkProps, &$ch
 
         $normalNumsCount[0][$num] = $numsCount[0][$num];
 
-        if (!isset($normalNumsCount[1][$num])) {
+        if (! isset($normalNumsCount[1][$num])) {
             $normalNumsCount[1][$num] = $trgCount + $wordsCount;
         } else {
             $normalNumsCount[1][$num] = $trgCount + $normalNumsCount[1][$num] + $wordsCount;
@@ -4843,7 +4880,7 @@ function compareNumCounts_spelledOut($numsCount, $currentData, $checkProps, &$ch
 
         $doCheck = true;
 
-        if (!is_integer($num)) {
+        if (! is_integer($num)) {
             if ($debug) {
                 echo "$num ist keine ganze Zahl -> Skip\n";
             }
@@ -4857,7 +4894,7 @@ function compareNumCounts_spelledOut($numsCount, $currentData, $checkProps, &$ch
             $doCheck = false;
         }
 
-        if (!isset($numWords[0][$num])) {
+        if (! isset($numWords[0][$num])) {
             if ($debug) {
                 echo "Kein numWord für $num in {$langs[0]} -> Skip\n";
             }
@@ -4877,7 +4914,7 @@ function compareNumCounts_spelledOut($numsCount, $currentData, $checkProps, &$ch
                     echo 'srcSegPure: |' . $segPure[0] . "|\n";
                 }
 
-                if (!isAsianLang($langs[0])) {
+                if (! isAsianLang($langs[0])) {
                     $wordRegEx = "#(?<!\p{L})$word(?!\p{L})#ui";
                 } else {
                     $wordRegEx = "#$word#ui";
@@ -4909,6 +4946,7 @@ function compareNumCounts_spelledOut($numsCount, $currentData, $checkProps, &$ch
                             echo "numOrigTrg != num: $numOrigSrc !== $num \n";
                         }
                         $wordsCount = 0;
+
                         continue;
                     } else {
                         $numOrigSrc = $word;
@@ -4922,7 +4960,7 @@ function compareNumCounts_spelledOut($numsCount, $currentData, $checkProps, &$ch
 
         $normalNumsCount[1][$num] = $numsCount[1][$num];
 
-        if (!isset($normalNumsCount[0][$num])) {
+        if (! isset($normalNumsCount[0][$num])) {
             $normalNumsCount[0][$num] = $srcCount + $wordsCount;
         } else {
             $normalNumsCount[0][$num] = $srcCount + $normalNumsCount[0][$num] + $wordsCount;
@@ -4960,10 +4998,10 @@ function compareNumCounts_spelledOut($numsCount, $currentData, $checkProps, &$ch
     }
 
     foreach ($allNormalNumsInTU2 as $num => $state) {
-        if (!isset($normalNumsCount[0][$num])) {
+        if (! isset($normalNumsCount[0][$num])) {
             $normalNumsCount[0][$num] = 0;
         }
-        if (!isset($normalNumsCount[1][$num])) {
+        if (! isset($normalNumsCount[1][$num])) {
             $normalNumsCount[1][$num] = 0;
         }
     }
@@ -4976,7 +5014,7 @@ function compareNumCounts_spelledOut($numsCount, $currentData, $checkProps, &$ch
     }
 
     foreach ($normalNumsCount[0] as $numSrcNormal => $srcCount) {
-        if (!isset($normalNumsCount[1][$numSrcNormal])) {
+        if (! isset($normalNumsCount[1][$numSrcNormal])) {
             continue;
         }
         $trgCount = $normalNumsCount[1][$numSrcNormal];
@@ -4990,12 +5028,14 @@ function compareNumCounts_spelledOut($numsCount, $currentData, $checkProps, &$ch
                 if ($debug) {
                     echo "count != 1 {$origNums2[0][$numSrcNormal]}\n";
                 }
+
                 continue;
             }
             if (count($origNums2[1][$numSrcNormal]) != 1) {
                 if ($debug) {
                     echo "count != 1 {$origNums2[1][$numSrcNormal]}\n";
                 }
+
                 continue;
             }
 
@@ -5022,7 +5062,7 @@ function compareNumCounts_spelledOut($numsCount, $currentData, $checkProps, &$ch
     }
 
     if ($debug) {
-        if (!empty($spelledOutNums[0])) {
+        if (! empty($spelledOutNums[0])) {
             echo "spelledOutNums[0]: \n";
             print_r($spelledOutNums[0]);
         }
@@ -5035,7 +5075,7 @@ function compareNumCounts_spelledOut($numsCount, $currentData, $checkProps, &$ch
     }
 
     foreach ($normalNumsCount[1] as $numTrgNormal => $trgCount) {
-        if (!isset($normalNumsCount[0][$numTrgNormal])) {
+        if (! isset($normalNumsCount[0][$numTrgNormal])) {
             continue;
         }
         $srcCount = $normalNumsCount[0][$numTrgNormal];
@@ -5075,7 +5115,7 @@ function compareNumCounts_spelledOut($numsCount, $currentData, $checkProps, &$ch
     }
 
     if ($debug) {
-        if (!empty($spelledOutNums[1])) {
+        if (! empty($spelledOutNums[1])) {
             echo "spelledOutNums[1]: \n";
             print_r($spelledOutNums[1]);
         }
@@ -5093,7 +5133,7 @@ function compareNumCounts_spelledOut($numsCount, $currentData, $checkProps, &$ch
         print_r($normalNumsCount);
     }
 
-    if ((!empty($spelledOutNums[0]))) {
+    if ((! empty($spelledOutNums[0]))) {
         $checkProps['checkSeverity_extra'] = 'notice';
 
         foreach ($spelledOutNums[0] as $normalNum => $numOrigSrc) {
@@ -5117,7 +5157,7 @@ function compareNumCounts_spelledOut($numsCount, $currentData, $checkProps, &$ch
             $match = $numOrigSrc;
 
             $checkResults['replaceString'] = '<span class="matchHinweis">' . $match . '</span>';
-            if (!is_int($match)) {
+            if (! is_int($match)) {
                 $checkResults['matchRegEx'] = "#(?<![\p{L}])" . preg_quote($match) . "(?![\p{L}])#u";
             }
             if (is_int($match)) {
@@ -5131,7 +5171,7 @@ function compareNumCounts_spelledOut($numsCount, $currentData, $checkProps, &$ch
             $match = $normalNum;
 
             $checkResults['replaceString'] = '<span class="matchHinweis">' . $match . '</span>';
-            if (!is_int($match)) {
+            if (! is_int($match)) {
                 $checkResults['matchRegEx'] = "#(?<![\d])" . preg_quote($match) . "(?![\d])#u";
             }
             if (is_int($match)) {
@@ -5142,7 +5182,7 @@ function compareNumCounts_spelledOut($numsCount, $currentData, $checkProps, &$ch
         }
     }
 
-    if ((!empty($spelledOutNums[1]))) {
+    if ((! empty($spelledOutNums[1]))) {
         $checkProps['checkSeverity_extra'] = 'notice';
 
         foreach ($spelledOutNums[1] as $normalNum => $numOrigTrg) {
@@ -5162,7 +5202,7 @@ function compareNumCounts_spelledOut($numsCount, $currentData, $checkProps, &$ch
             $match = $normalNum;
 
             $checkResults['replaceString'] = '<span class="matchHinweis">' . $match . '</span>';
-            if (!is_int($match)) {
+            if (! is_int($match)) {
                 $checkResults['matchRegEx'] = "#(?<![\d])" . preg_quote($match) . "(?![\d])#u";
             }
             if (is_int($match)) {
@@ -5176,7 +5216,7 @@ function compareNumCounts_spelledOut($numsCount, $currentData, $checkProps, &$ch
             $match = $numOrigTrg;
 
             $checkResults['replaceString'] = '<span class="matchHinweis">' . $match . '</span>';
-            if (!is_int($match)) {
+            if (! is_int($match)) {
                 $checkResults['matchRegEx'] = "#(?<![\p{L}])" . preg_quote($match) . "(?![\p{L}])#u";
             }
             if (is_int($match)) {

@@ -3,7 +3,7 @@
 START LICENSE AND COPYRIGHT
 
  This file is part of translate5
- 
+
  Copyright (c) 2013 - 2023 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
 
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
@@ -13,15 +13,15 @@ START LICENSE AND COPYRIGHT
  included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
-  
+
  There is a plugin exception available for use with this release of translate5 for
  translate5: Please see http://www.translate5.net/plugin-exception.txt or
  plugin-exception.txt in the root folder of translate5.
-  
+
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
@@ -34,13 +34,15 @@ use MittagQI\Translate5\Test\Import\LanguageResource;
  * Test if google translator as language resources works. This will create single segment task and pre-translate it
  * with google translator language resource.
  */
-class Translate3445Test extends editor_Test_JsonTest {
-
+class Translate3445Test extends editor_Test_JsonTest
+{
     protected static bool $skipIfOptionsMissing = true;
 
     protected static array $requiredRuntimeOptions = [
-        'runtimeOptions.LanguageResources.google.projectId' => null,//null checks for no concrete value but if not empty
-        'runtimeOptions.LanguageResources.google.apiKey' => null//null checks for no concrete value but if not empty
+        'runtimeOptions.LanguageResources.google.projectId' => null,
+        //null checks for no concrete value but if not empty
+        'runtimeOptions.LanguageResources.google.apiKey' => null,
+        //null checks for no concrete value but if not empty
     ];
 
     /**
@@ -49,7 +51,7 @@ class Translate3445Test extends editor_Test_JsonTest {
      */
     protected static function setupImport(Config $config): void
     {
-        if (!self::isMasterTest()) {
+        if (! self::isMasterTest()) {
             self::markTestSkipped('Test runs only in master test to reduce usage/costs.');
         } else {
             $config
@@ -67,9 +69,7 @@ class Translate3445Test extends editor_Test_JsonTest {
                 ->setToEditAfterImport();
         }
     }
-    
-    /**
-     */
+
     public function testSegmentValuesAfterImport(): void
     {
         $jsonFileName = 'expectedSegments.json';

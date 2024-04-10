@@ -4,7 +4,7 @@
 START LICENSE AND COPYRIGHT
 
  This file is part of translate5
- 
+
  Copyright (c) 2013 - 2022 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
 
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
@@ -14,15 +14,15 @@ START LICENSE AND COPYRIGHT
  included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
-  
+
  There is a plugin exception available for use with this release of translate5 for
  translate5: Please see http://www.translate5.net/plugin-exception.txt or
  plugin-exception.txt in the root folder of translate5.
-  
+
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
@@ -33,8 +33,8 @@ use MittagQI\Translate5\Test\Api\Helper;
  * Test for the CSRF Protection
  * Generally all Tests test this feature so here more the error-cases are tested
  */
-class Translate3048Test extends editor_Test_ApiTest {
-
+class Translate3048Test extends editor_Test_ApiTest
+{
     private static string $apitestToken;
 
     private static ?ZfExtended_Auth_Token_Entity $authTokenEntity = null;
@@ -129,27 +129,23 @@ class Translate3048Test extends editor_Test_ApiTest {
         static::api()->login('testmanager');
     }
 
-
     /**
      * Fetches the /user endpoint and validates the result as an example for an API-call
      * @throws Zend_Http_Client_Exception
      */
-    private function fetchAndAssertUsers(){
+    private function fetchAndAssertUsers()
+    {
         $users = static::api()->getJson('/editor/user');
         static::assertTrue(is_array($users), 'Fetching the Users-List failed');
         $testmanagerFound = false;
-        foreach($users as $user){
-            if($user->login === 'testmanager'){
+        foreach ($users as $user) {
+            if ($user->login === 'testmanager') {
                 $testmanagerFound = true;
             }
         }
         static::assertTrue($testmanagerFound, 'The Users-List did not contain a user with login "testmanager"');
     }
 
-    /**
-     * @param string|null $token
-     * @return void
-     */
     private function switchToRealToken(string $token = null)
     {
         // logout & destroy session & use normal app origin
@@ -160,9 +156,6 @@ class Translate3048Test extends editor_Test_ApiTest {
         static::api()->login('testmanager');
     }
 
-    /**
-     * @return void
-     */
     private function switchToTestToken()
     {
         // restore original state
@@ -175,7 +168,7 @@ class Translate3048Test extends editor_Test_ApiTest {
     public static function afterTests(): void
     {
         // remove the temporary auth-token
-        if(static::$authTokenEntity !== null){
+        if (static::$authTokenEntity !== null) {
             static::$authTokenEntity->delete();
         }
         // restore working state no matter if tests passed or failed

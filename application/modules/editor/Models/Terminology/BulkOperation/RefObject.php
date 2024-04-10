@@ -21,13 +21,12 @@ START LICENSE AND COPYRIGHT
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
-class editor_Models_Terminology_BulkOperation_RefObject extends editor_Models_Terminology_BulkOperation_Abstract {
-
-
+class editor_Models_Terminology_BulkOperation_RefObject extends editor_Models_Terminology_BulkOperation_Abstract
+{
     /**
      * @var editor_Models_Terminology_Models_RefObjectModel
      */
@@ -38,26 +37,25 @@ class editor_Models_Terminology_BulkOperation_RefObject extends editor_Models_Te
      */
     protected $importObject;
 
-    /**
-     * @var Zend_Db_Statement
-     */
     protected Zend_Db_Statement $preparedStmt;
 
     protected int $collectionId;
 
-    public function __construct() {
+    public function __construct()
+    {
         $this->model = new editor_Models_Terminology_Models_RefObjectModel();
         $this->importObject = new editor_Models_Terminology_TbxObjects_RefObject();
     }
 
     /**
      * returns the fields to be loaded by loadExisting
-     * @return array
      */
-    protected function getFieldsToLoad(): array {
+    protected function getFieldsToLoad(): array
+    {
         $fields = $this->importObject->getUpdateableFields();
         $fields[] = 'id';
         $fields[] = 'key';
+
         return $fields;
     }
 
@@ -73,7 +71,8 @@ class editor_Models_Terminology_BulkOperation_RefObject extends editor_Models_Te
         throw new BadMethodCallException('Use createOrUpdatePerson instead!');
     }
 
-    public function createOrUpdateRefObject($listType, $key, $data) {
+    public function createOrUpdateRefObject($listType, $key, $data)
+    {
         $obj = $this->getNewImportObject();
         /* @var $obj editor_Models_Terminology_TbxObjects_RespPerson */
         $obj->key = $key;
@@ -82,20 +81,18 @@ class editor_Models_Terminology_BulkOperation_RefObject extends editor_Models_Te
         $existing = $this->findExisting($obj, $payload);
 
         $upsert = true;
-        if(is_null($existing)) {
+        if (is_null($existing)) {
             $this->processedCount['created']++;
-        }
-        else {
+        } else {
             $hash = array_shift($payload);
-            if($obj->getDataHash() !== $hash) {
+            if ($obj->getDataHash() !== $hash) {
                 $this->processedCount['updated']++;
-            }
-            else {
+            } else {
                 $upsert = false;
                 $this->processedCount['unchanged']++;
             }
         }
-        if($upsert) {
+        if ($upsert) {
             $this->preparedStmt->execute([$this->collectionId, $listType, $key, $obj->data]);
         }
     }

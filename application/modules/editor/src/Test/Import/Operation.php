@@ -21,7 +21,7 @@ START LICENSE AND COPYRIGHT
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
@@ -36,23 +36,22 @@ use MittagQI\Translate5\Test\Api\Helper;
 abstract class Operation extends Resource
 {
     protected int $_taskId;
+
     protected string $_taskGuid;
 
     /**
-     * @param int $taskId
      * @return $this
      */
     public function setTask(Task $task): Operation
     {
         $this->_taskId = $task->getId();
         $this->_taskGuid = $task->getTaskGuid();
+
         return $this;
     }
 
     /**
      * Queues the analysis
-     * @param Helper $api
-     * @param int $taskId
      * @throws \Zend_Http_Client_Exception
      */
     public function import(Helper $api, Config $config): void
@@ -69,8 +68,6 @@ abstract class Operation extends Resource
 
     /**
      * Implements the actual request
-     * @param Helper $api
-     * @param Config $config
      */
     abstract protected function request(Helper $api): void;
 

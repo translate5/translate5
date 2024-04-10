@@ -56,8 +56,9 @@ use Exception;
 
 class InvalidInstructionsIniFileException extends Exception
 {
-    public function __construct(public array $errors)
-    {
+    public function __construct(
+        public array $errors
+    ) {
         parent::__construct('', 0, null);
     }
 }

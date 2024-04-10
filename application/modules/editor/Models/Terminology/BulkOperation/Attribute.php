@@ -21,17 +21,19 @@ START LICENSE AND COPYRIGHT
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
-class editor_Models_Terminology_BulkOperation_Attribute extends editor_Models_Terminology_BulkOperation_Abstract {
-    const LOAD_EXISTING = 'termEntryId = ?';
+class editor_Models_Terminology_BulkOperation_Attribute extends editor_Models_Terminology_BulkOperation_Abstract
+{
+    public const LOAD_EXISTING = 'termEntryId = ?';
 
     /**
      * @var editor_Models_Terminology_Models_AttributeModel
      */
     protected $model;
+
     /**
      * @var editor_Models_Terminology_TbxObjects_Attribute
      */
@@ -56,15 +58,16 @@ class editor_Models_Terminology_BulkOperation_Attribute extends editor_Models_Te
      */
     protected array $duplicateCheck = [];
 
-    public function __construct() {
+    public function __construct()
+    {
         $this->model = new editor_Models_Terminology_Models_AttributeModel();
         $this->importObject = new editor_Models_Terminology_TbxObjects_Attribute();
     }
 
-    public function add(editor_Models_Terminology_TbxObjects_Abstract $importObject) {
-
+    public function add(editor_Models_Terminology_TbxObjects_Abstract $importObject)
+    {
         // check and merge if the imported object exist in the toBeProcessed array
-        if($this->checkForDuplicates($importObject)){
+        if ($this->checkForDuplicates($importObject)) {
             return;
         }
         $this->toBeProcessed[] = $importObject;
@@ -73,7 +76,8 @@ class editor_Models_Terminology_BulkOperation_Attribute extends editor_Models_Te
     /**
      * @throws Zend_Db_Statement_Exception
      */
-    public function loadExisting(int $id) {
+    public function loadExisting(int $id)
+    {
         $this->existing = [];
         parent::loadExisting($id);
     }
@@ -101,13 +105,10 @@ class editor_Models_Terminology_BulkOperation_Attribute extends editor_Models_Te
     {
         // If type is not empty
         if ($type = $importObject->type ?? '') {
-
             // If target is not empty as well
             if ($importObject->target ?? '') {
-
                 // If target is NOT supported for that type
-                if (!isset(static::$targetSupported[$type])) {
-
+                if (! isset(static::$targetSupported[$type])) {
                     // Backup target
                     $importObject->wasTarget = $importObject->target;
 
@@ -117,15 +118,17 @@ class editor_Models_Terminology_BulkOperation_Attribute extends editor_Models_Te
             }
         }
 
-        if( !isset($this->duplicateCheck[$importObject->getCollectionKey()])){
+        if (! isset($this->duplicateCheck[$importObject->getCollectionKey()])) {
             $this->duplicateCheck[$importObject->getCollectionKey()] = true;
+
             return false;
         }
 
         // duplicate exist -> find the original element and merge the values
         foreach ($this->toBeProcessed as $processed) {
-            if($processed->getCollectionKey() === $importObject->getCollectionKey()){
-                $processed->value .= ', '.$importObject->value;
+            if ($processed->getCollectionKey() === $importObject->getCollectionKey()) {
+                $processed->value .= ', ' . $importObject->value;
+
                 return true;
             }
         }

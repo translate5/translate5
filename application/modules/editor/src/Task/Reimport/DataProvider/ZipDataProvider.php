@@ -21,7 +21,7 @@ START LICENSE AND COPYRIGHT
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
@@ -79,9 +79,10 @@ class ZipDataProvider extends AbstractDataProvider
                 continue;
             }
 
-            $tempFile = $this->getTempDir().'/refile-'.$matchingFile->fileId;
+            $tempFile = $this->getTempDir() . '/refile-' . $matchingFile->fileId;
             if (! file_put_contents($tempFile, $data)) {
                 $matchingFile->addError('Could not write temp file to disk');
+
                 continue;
             }
 
@@ -96,7 +97,7 @@ class ZipDataProvider extends AbstractDataProvider
         //if at least one file was found, go ahead
         if ($filesFoundForImport === 0) {
             throw new Exception('E1462', [
-                'task' => $this->task
+                'task' => $this->task,
             ]);
         }
     }
@@ -110,21 +111,20 @@ class ZipDataProvider extends AbstractDataProvider
         //loop over Dtos and get from there, also take from
         return array_merge(
             array_map(function ($additonalFile) {
-                return $additonalFile.': ignored - no match in task files;';
+                return $additonalFile . ': ignored - no match in task files;';
             }, $this->zipAdditionalFile),
             array_filter(array_map(function (FileDto $file) {
                 if (empty($file->getErrors())) {
                     return null;
                 }
-                return $file->filePath.join(', ', $file->getErrors()).';';
+
+                return $file->filePath . join(', ', $file->getErrors()) . ';';
             }, $this->getFiles()))
         );
     }
 
     /**
      * Checks the file info from zip, return the filename if it is a file to be processed
-     * @param array $zipFile
-     * @return string|null
      */
     private function checkFileFromZip(array $zipFile): ?string
     {
@@ -133,7 +133,7 @@ class ZipDataProvider extends AbstractDataProvider
         $name = str_replace('\\', '/', $zipFile['name']);
 
         //get only workfiles
-        if (! str_starts_with($name, Task::TASK_FOLDER_NAME.'/')) {
+        if (! str_starts_with($name, Task::TASK_FOLDER_NAME . '/')) {
             return null;
         }
 
@@ -143,7 +143,7 @@ class ZipDataProvider extends AbstractDataProvider
         }
 
         // ignore folders
-        if (str_ends_with($zipFile['name'],'/')){
+        if (str_ends_with($zipFile['name'], '/')) {
             return null;
         }
 
@@ -159,6 +159,7 @@ class ZipDataProvider extends AbstractDataProvider
             return $this->filesMetaData[$finalFileNames[$nameFromZip]];
         }
         $this->zipAdditionalFile[] = $nameFromZip;
+
         return null;
     }
 
@@ -167,10 +168,12 @@ class ZipDataProvider extends AbstractDataProvider
         if (is_subclass_of($matchingFile->fileParser, editor_Models_Import_FileParser::class)) {
             if (! $matchingFile->fileParser::IS_REIMPORTABLE) {
                 $matchingFile->addError('Re-import is not supported for that file type');
+
                 return null;
             }
         } else {
             $matchingFile->addError('Invalid fileparser found!');
+
             return null;
         }
 
@@ -178,12 +181,14 @@ class ZipDataProvider extends AbstractDataProvider
 
         if ($data === false) {
             $matchingFile->addError('Could not extract file from zip!');
+
             return null;
         }
 
         $errorMessage = '';
         if (! $matchingFile->fileParser::isParsable(substr($data, 0, 512), $errorMessage)) {
             $matchingFile->addError($errorMessage);
+
             return null;
         }
 
@@ -205,7 +210,7 @@ class ZipDataProvider extends AbstractDataProvider
         $errorHelper = new class() extends Zend_Filter_Compress_Zip {
             public function _errorString($error): string
             {
-                return parent::_errorString($error).' ('.$error.')';
+                return parent::_errorString($error) . ' (' . $error . ')';
             }
         };
 

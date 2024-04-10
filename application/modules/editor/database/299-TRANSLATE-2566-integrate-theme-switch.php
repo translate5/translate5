@@ -1,4 +1,5 @@
-<?php 
+<?php
+
 /*
 START LICENSE AND COPYRIGHT
 
@@ -45,7 +46,7 @@ $SCRIPT_IDENTIFIER = '299-TRANSLATE-2566-integrate-theme-switch.php';
  * define database credential variables
  */
 $argc = count($argv);
-if(empty($this) || empty($argv) || $argc < 5 || $argc > 7) {
+if (empty($this) || empty($argv) || $argc < 5 || $argc > 7) {
     die("please dont call the script direct! Call it by using DBUpdater!\n\n");
 }
 
@@ -61,7 +62,7 @@ $result = reset($result);
 // the ols name should look like: /build/classic/theme-triton/resources/theme-triton-all.css
 $re = '/\/build\/classic\/theme-(.*?)\/resources\/theme-.*/';
 preg_match($re, $result['value'], $matches, PREG_OFFSET_CAPTURE, 0);
-if(empty($matches)){
+if (empty($matches)) {
     return;
 }
 $newName = $matches[1][0];

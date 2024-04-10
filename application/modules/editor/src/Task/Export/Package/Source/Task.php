@@ -21,7 +21,7 @@ START LICENSE AND COPYRIGHT
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
@@ -39,12 +39,8 @@ use Zend_Exception;
 use ZfExtended_Factory;
 use ZfExtended_Models_Worker;
 
-/**
- *
- */
 class Task extends Base
 {
-
     /***
      * Folder name where all segment files will be placed in the export package
      */
@@ -57,24 +53,21 @@ class Task extends Base
     }
 
     /**
-     * @return void
      * @throws Exception
      * @throws editor_Models_Export_Exception
      */
     public function validate(): void
     {
-        if (!is_dir($this->getFolderPath()) || !is_writable($this->getFolderPath())) {
+        if (! is_dir($this->getFolderPath()) || ! is_writable($this->getFolderPath())) {
             //The task export folder does not exist or is not writeable, no export ZIP file can be created.
             throw new editor_Models_Export_Exception('E1147', [
                 'task' => $this->task,
-                'exportFolder' => $this->getFolderPath()
+                'exportFolder' => $this->getFolderPath(),
             ]);
         }
         /** @var editor_Models_File $files */
         $files = ZfExtended_Factory::get('editor_Models_File');
         $files = $files->loadByTaskGuid($this->task->getTaskGuid());
-
-
 
         foreach ($files as $file) {
             if (! FileparserRegistry::getInstance()->isSupported($file['fileParser'])) {
@@ -82,16 +75,13 @@ class Task extends Base
                     'supported' => FileparserRegistry::getInstance()->getRegisteredFileparsers(),
                     'file' => $file['fileName'],
                     'current' => $file['fileParser'],
-                    'task' => $this->task
+                    'task' => $this->task,
                 ]);
             }
-
         }
     }
 
     /**
-     * @param ZfExtended_Models_Worker|null $workerModel
-     * @return void
      * @throws Zend_Exception
      */
     public function export(?ZfExtended_Models_Worker $workerModel): void

@@ -3,25 +3,25 @@
 START LICENSE AND COPYRIGHT
 
  This file is part of translate5
- 
+
  Copyright (c) 2013 - 2021 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
 
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
  This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
- as published by the Free Software Foundation and appearing in the file agpl3-license.txt 
- included in the packaging of this file.  Please review the following information 
+ as published by the Free Software Foundation and appearing in the file agpl3-license.txt
+ included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
-  
+
  There is a plugin exception available for use with this release of translate5 for
- translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or
  plugin-exception.txt in the root folder of translate5.
-  
+
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
@@ -29,15 +29,14 @@ END LICENSE AND COPYRIGHT
 /**
  * Clones an existing task
  */
-class editor_Task_Cloner {
-
+class editor_Task_Cloner
+{
     protected editor_Models_Task $clone;
+
     protected editor_Models_Task $original;
 
     /**
      * Clones the given task and returns the cloned instance
-     * @param editor_Models_Task $entity
-     * @return editor_Models_Task
      * @throws Zend_Db_Statement_Exception
      * @throws ZfExtended_Models_Entity_Exceptions_IntegrityConstraint
      * @throws ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey
@@ -76,8 +75,9 @@ class editor_Task_Cloner {
      * @throws Zend_Db_Statement_Exception
      * @throws ZfExtended_Models_Entity_Exceptions_IntegrityConstraint
      */
-    protected function handleSingleTask(& $data) {
-        if((string) $this->original->getTaskType() !== editor_Task_Type_Default::ID || $this->original->getId() !== $this->original->getProjectId()){
+    protected function handleSingleTask(&$data)
+    {
+        if ((string) $this->original->getTaskType() !== editor_Task_Type_Default::ID || $this->original->getId() !== $this->original->getProjectId()) {
             return;
         }
         // 1. we create the project out of the current task
@@ -105,7 +105,8 @@ class editor_Task_Cloner {
         $this->original->save();
     }
 
-    public function cloneDependencies() {
+    public function cloneDependencies()
+    {
         $this->cloneLanguageResources();
         $this->clonePivotLanguageResources();
         $this->cloneTaskSpecificConfig();
@@ -114,21 +115,23 @@ class editor_Task_Cloner {
     /**
      * Clone existing language resources from oldTaskGuid for newTaskGuid.
      */
-    protected function cloneLanguageResources(){
+    protected function cloneLanguageResources()
+    {
         /** @var MittagQI\Translate5\LanguageResource\TaskAssociation $job */
         $job = ZfExtended_Factory::get('MittagQI\Translate5\LanguageResource\TaskAssociation');
         $jobs = $job->loadByTaskGuids([$this->original->getTaskGuid()]);
-        if(empty($jobs)){
+        if (empty($jobs)) {
             return;
         }
-        foreach($jobs as $jobData){
+        foreach ($jobs as $jobData) {
             unset($jobData['id']);
-            if(!empty($jobData['autoCreatedOnImport'])) {
+            if (! empty($jobData['autoCreatedOnImport'])) {
                 //do not clone such TermCollection associations, since they are recreated through the cloned import package
                 continue;
             }
             $jobData['taskGuid'] = $this->clone->getTaskGuid();
             $job->init($jobData);
+
             try {
                 $job->save();
             } catch (Zend_Db_Statement_Exception | ZfExtended_Models_Entity_Exceptions_IntegrityConstraint | ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey) {
@@ -145,13 +148,14 @@ class editor_Task_Cloner {
         /** @var \MittagQI\Translate5\LanguageResource\TaskPivotAssociation $job */
         $job = ZfExtended_Factory::get('\MittagQI\Translate5\LanguageResource\TaskPivotAssociation');
         $jobs = $job->loadTaskAssociated($this->original->getTaskGuid());
-        if(empty($jobs)){
+        if (empty($jobs)) {
             return;
         }
-        foreach($jobs as $jobData){
+        foreach ($jobs as $jobData) {
             unset($jobData['id']);
             $jobData['taskGuid'] = $this->clone->getTaskGuid();
             $job->init($jobData);
+
             try {
                 $job->save();
             } catch (Zend_Db_Statement_Exception | ZfExtended_Models_Entity_Exceptions_IntegrityConstraint | ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey) {
@@ -163,10 +167,10 @@ class editor_Task_Cloner {
     /**
      * Clone all values and configs from $oldTaskGuid to $newTaskGuid
      */
-    protected function cloneTaskSpecificConfig() {
-        $taskConfig =ZfExtended_Factory::get('editor_Models_TaskConfig');
+    protected function cloneTaskSpecificConfig()
+    {
+        $taskConfig = ZfExtended_Factory::get('editor_Models_TaskConfig');
         /* @var $taskConfig editor_Models_TaskConfig */
         $taskConfig->cloneTaskConfig($this->original->getTaskGuid(), $this->clone->getTaskGuid());
     }
-
 }

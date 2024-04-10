@@ -1,4 +1,5 @@
-<?php 
+<?php
+
 /*
 START LICENSE AND COPYRIGHT
 
@@ -48,36 +49,35 @@ $SCRIPT_IDENTIFIER = '279-TRANSLATE-2375_Set_default_deadline_per_workflow_step_
  * define database credential variables
  */
 $argc = count($argv);
-if(empty($this) || empty($argv) || $argc < 5 || $argc > 7) {
+if (empty($this) || empty($argv) || $argc < 5 || $argc > 7) {
     die("please dont call the script direct! Call it by using DBUpdater!\n\n");
 }
 
-
 $wm = ZfExtended_Factory::get('editor_Workflow_Manager');
 /* @var $wm editor_Workflow_Manager */
-$stepToIgnode=['no workflow','workflowEnded'];
+$stepToIgnode = ['no workflow', 'workflowEnded'];
 $configs = [];
-foreach ($wm->getWorkflowData() as $workflow){
+foreach ($wm->getWorkflowData() as $workflow) {
     foreach ($workflow->stepChain as $step) {
-        if(!in_array($step, $stepToIgnode)){
-            $configs[] = '.'.$workflow->id.'.'.$step.'.';
+        if (! in_array($step, $stepToIgnode)) {
+            $configs[] = '.' . $workflow->id . '.' . $step . '.';
         }
     }
 }
-if(empty($configs)){
+if (empty($configs)) {
     return;
 }
-$configs=array_map(function($item){
-    return 'runtimeOptions.workflow'.$item.'defaultDeadlineDate';
+$configs = array_map(function ($item) {
+    return 'runtimeOptions.workflow' . $item . 'defaultDeadlineDate';
 }, $configs);
 
 //we do not transalte the zf configuration gui name etc..
 $labels = [
-    'translation'=>'Translation',
-    'reviewing'=>'Review',
-    'translatorCheck'=>'Second review',
+    'translation' => 'Translation',
+    'reviewing' => 'Review',
+    'translatorCheck' => 'Second review',
 ];
-foreach ($configs as $config){
+foreach ($configs as $config) {
     $model = ZfExtended_Factory::get('editor_Models_Config');
     /* @var $model editor_Models_Config */
     $model->setConfirmed(1);
@@ -91,14 +91,14 @@ foreach ($configs as $config){
     $model->setValue("");
     $model->setDefault("");
     $model->setDefaults("");
-    
-    $tmp = explode('.', str_replace(['runtimeOptions.workflow.','.defaultDeadlineDate'], '',$config ));
-    $model->setGuiName('Default deadline date: workflow:'.$tmp[0].',step:'.$labels[$tmp[1]] ?? $tmp[1]);
+
+    $tmp = explode('.', str_replace(['runtimeOptions.workflow.', '.defaultDeadlineDate'], '', $config));
+    $model->setGuiName('Default deadline date: workflow:' . $tmp[0] . ',step:' . $labels[$tmp[1]] ?? $tmp[1]);
     $model->setName($config);
+
     try {
         $model->save();
-    }
-    catch (ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey $e) {
+    } catch (ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey $e) {
         //ignore this case, may happen on installation when struggling with the order of the SQL alter files
     }
 }

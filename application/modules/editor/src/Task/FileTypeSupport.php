@@ -52,7 +52,6 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\Task;
 
-
 use editor_Models_Import_FileParser;
 use editor_Models_Import_FileParser_Csv;
 use editor_Models_Import_FileParser_DisplayTextXml;
@@ -77,39 +76,42 @@ final class FileTypeSupport
     /**
      * TODO FIXME: Should better be a global definition or in a more basic class
      */
-    const SCOPE_CORE = 'Core';
+    public const SCOPE_CORE = 'Core';
 
     /**
      * Retrieves the global instance representing the general support for files
      * This usually represents the settings for the "defaultcustomer"
      * Please note, that e.g. for the import process, you will need a task-specific instance, use ::taskInstance then
-     * @return FileTypeSupport
      */
     public static function defaultInstance(): FileTypeSupport
     {
-        if(!array_key_exists('DEFAULT', self::$_instances)){
+        if (! array_key_exists('DEFAULT', self::$_instances)) {
             self::$_instances['DEFAULT'] = new FileTypeSupport();
             // event to let plugins and other providers register their filetypes
-            self::$events = ZfExtended_Factory::get(ZfExtended_EventManager::class, [ self::class ]);
-            self::$events->trigger('registerSupportedFileTypes', self::$_instances['DEFAULT'], ['task' => null]);
+            self::$events = ZfExtended_Factory::get(ZfExtended_EventManager::class, [self::class]);
+            self::$events->trigger('registerSupportedFileTypes', self::$_instances['DEFAULT'], [
+                'task' => null,
+            ]);
         }
+
         return self::$_instances['DEFAULT'];
     }
 
     /**
      * Retrieves the FileType support for a concrete task. This is only accessible, if a task has a GUID
-     * @param editor_Models_Task $task
-     * @return FileTypeSupport
      */
     public static function taskInstance(editor_Models_Task $task): FileTypeSupport
     {
         $taskIdentifier = trim($task->getTaskGuid(), '{}');
-        if(!array_key_exists($taskIdentifier, self::$_instances)){
+        if (! array_key_exists($taskIdentifier, self::$_instances)) {
             self::$_instances[$taskIdentifier] = new FileTypeSupport();
             // event to let plugins and other providers register their filetypes
-            self::$events = ZfExtended_Factory::get(ZfExtended_EventManager::class, [ self::class ]);
-            self::$events->trigger('registerSupportedFileTypes', self::$_instances[$taskIdentifier], ['task' => $task]);
+            self::$events = ZfExtended_Factory::get(ZfExtended_EventManager::class, [self::class]);
+            self::$events->trigger('registerSupportedFileTypes', self::$_instances[$taskIdentifier], [
+                'task' => $task,
+            ]);
         }
+
         return self::$_instances[$taskIdentifier];
     }
 
@@ -131,38 +133,34 @@ final class FileTypeSupport
         editor_Models_Import_FileParser_Transit::class,
         editor_Models_Import_FileParser_Xlf::class,
         editor_Models_Import_FileParser_XlfZend::class,
-        editor_Models_Import_FileParser_Xml::class
+        editor_Models_Import_FileParser_Xml::class,
     ];
 
     /**
      * The map of extensions mapped to their file parsers
-     * @var array
      */
     private array $extensionsWithParser = [];
 
     /**
      * The list of extensions which can be imported via preprocessors (which convert the file then to format known by file parsers)
-     * @var array
      */
     private array $extensionsSupported = [];
 
     /**
      * The list of extensions which should be ignored in import processing (and therefore do not produce a unprocessed warning)
      *  in other words, file is ignored in default import process, but still is used as secondary input file for special fileparsers like transit
-     * @var array
      */
     private array $extensionsIgnored = [];
 
     /**
      * Enables Plugins to store further data
-     * @var array
      */
     private array $pluginData = [];
 
-
-    private function __construct() {
+    private function __construct()
+    {
         // registers the core fileparsers - if not already done by another instance
-        if(isset(self::$coreExtensionsWithParser)){
+        if (isset(self::$coreExtensionsWithParser)) {
             $this->extensionsWithParser = self::$coreExtensionsWithParser;
         } else {
             $this->registerCoreFileParsers();
@@ -175,24 +173,18 @@ final class FileTypeSupport
     /**
      * Registers the given file type to be handleable by translate5, but without a concrete parser
      *  due multiple pre-processing steps, this filetype is probably preprocessed and converted before giving finally to the FileParsers
-     * @param string $extension
-     * @param string $scope
-     * @return void
      */
     public function register(string $extension, string $scope): void
     {
-        if (!array_key_exists(strtolower($extension), $this->extensionsSupported)) {
-            $this->extensionsSupported[strtolower($extension)] = [ $scope ];
-        } else if(!in_array($scope, $this->extensionsSupported[strtolower($extension)])){
+        if (! array_key_exists(strtolower($extension), $this->extensionsSupported)) {
+            $this->extensionsSupported[strtolower($extension)] = [$scope];
+        } elseif (! in_array($scope, $this->extensionsSupported[strtolower($extension)])) {
             $this->extensionsSupported[strtolower($extension)][] = $scope;
         }
     }
 
     /**
      * Can be used to add plugin-specific data
-     * @param mixed $data
-     * @param string $pluginName
-     * @return void
      */
     public function registerPluginData(mixed $data, string $pluginName): void
     {
@@ -202,29 +194,27 @@ final class FileTypeSupport
     /**
      * Registers the given file type to be ignored by translate5,
      *  useful if file is needed by the fileparser as additional data source, but should not be listed in file list
-     * @param string $extension
      */
     public function registerIgnored(string $extension): void
     {
         //only add if it does not already exist
-        if (!in_array(strtolower($extension), $this->extensionsIgnored)) {
+        if (! in_array(strtolower($extension), $this->extensionsIgnored)) {
             $this->extensionsIgnored[] = strtolower($extension);
         }
     }
 
     /**
      * Registers a file parser
-     * @param string $extension
-     * @param string $importFileParserClass
-     * @param string $pluginName
-     * @return void
      */
     public function registerFileParser(string $extension, string $importFileParserClass, string $pluginName): void
     {
-        if (!array_key_exists(strtolower($extension), $this->extensionsWithParser)) {
+        if (! array_key_exists(strtolower($extension), $this->extensionsWithParser)) {
             $this->extensionsWithParser[strtolower($extension)] = [];
         }
-        $this->extensionsWithParser[strtolower($extension)][] = ['parser' => $importFileParserClass, 'scope' => $pluginName];
+        $this->extensionsWithParser[strtolower($extension)][] = [
+            'parser' => $importFileParserClass,
+            'scope' => $pluginName,
+        ];
     }
 
     /**
@@ -240,27 +230,27 @@ final class FileTypeSupport
     /**
      * Retrieves the list of supported extensions pointing to the plugins/scope it comes from
      * This is needed in the import wizard to evaluate the resulting support when file-format settings are changed
-     * @return array
      */
     public function getSupportedExtensionsList(): array
     {
         $list = [];
-        foreach($this->extensionsWithParser as $extension => $parsers){
-            if(!empty($parsers)){
+        foreach ($this->extensionsWithParser as $extension => $parsers) {
+            if (! empty($parsers)) {
                 $list[$extension] = [];
-                foreach($parsers as $parser){
+                foreach ($parsers as $parser) {
                     $list[$extension][] = $parser['scope'];
                 }
             }
         }
-        foreach($this->extensionsSupported as $extension => $scopes){
-            if(!array_key_exists($extension, $list)){
+        foreach ($this->extensionsSupported as $extension => $scopes) {
+            if (! array_key_exists($extension, $list)) {
                 $list[$extension] = [];
             }
-            foreach($scopes as $scope){
+            foreach ($scopes as $scope) {
                 $list[$extension][] = $scope;
             }
         }
+
         return $list;
     }
 
@@ -276,30 +266,25 @@ final class FileTypeSupport
 
     /**
      * gets the rgistered data for the given plugin
-     * @param string $pluginName
-     * @return mixed
      */
     public function getRegisteredPluginData(string $pluginName): mixed
     {
-        if(array_key_exists($pluginName, $this->pluginData)){
+        if (array_key_exists($pluginName, $this->pluginData)) {
             return $this->pluginData[$pluginName];
         }
+
         return null;
     }
 
     /**
      * returns the suitable parser for extension and a given concrete file
-     * @param string $ext
-     * @param SplFileInfo $file
-     * @param array $errorMessages
-     * @return string|null
      */
     public function hasSupportedParser(string $ext, SplFileInfo $file, array &$errorMessages = []): ?string
     {
         $fileObject = $file->openFile();
         $fileHead = $fileObject->fread(512);
 
-        if($fileHead === false) {
+        if ($fileHead === false) {
             return null;
         }
 
@@ -308,17 +293,17 @@ final class FileTypeSupport
 
     /**
      * returns the parser class names to the given extension
-     * @param string $extension
      * @return string[] possible parser class names
      */
     public function getParsers(string $extension): array
     {
         $parsers = [];
-        if(array_key_exists(strtolower($extension), $this->extensionsWithParser)){
-            foreach($this->extensionsWithParser[strtolower($extension)] as $parserData){
+        if (array_key_exists(strtolower($extension), $this->extensionsWithParser)) {
+            foreach ($this->extensionsWithParser[strtolower($extension)] as $parserData) {
                 $parsers[] = $parserData['parser'];
             }
         }
+
         return $parsers;
     }
 
@@ -333,20 +318,18 @@ final class FileTypeSupport
 
     /**
      * returns true if file extension is supported natively by a fileparser (no pre conversion like Okapi is needed for that file).
-     * @param string $extension
-     * @return bool
      */
-    public function hasParser(string $extension) : bool
+    public function hasParser(string $extension): bool
     {
-        if(array_key_exists(strtolower($extension), $this->extensionsWithParser)){
+        if (array_key_exists(strtolower($extension), $this->extensionsWithParser)) {
             return count($this->extensionsWithParser[strtolower($extension)]) > 0;
         }
+
         return false;
     }
 
     /**
      * returns true if extension as to be ignored by the directory parser at all
-     * @param string $extension
      * @return boolean
      */
     public function isIgnored(string $extension): bool
@@ -354,13 +337,7 @@ final class FileTypeSupport
         return in_array(strtolower($extension), $this->extensionsIgnored);
     }
 
-    /**
-     * @param string $extension
-     * @param string $fileHead
-     * @param array $errorMessages
-     * @return string|null
-     */
-    private function hasSupportedParserByContent(string $extension, string $fileHead, array & $errorMessages): ?string
+    private function hasSupportedParserByContent(string $extension, string $fileHead, array &$errorMessages): ?string
     {
         $errorMsg = '';
         $parserClasses = $this->getParsers(strtolower($extension));
@@ -370,10 +347,11 @@ final class FileTypeSupport
                 // if the first found file parser to that extension may parse it, we use it
                 return $parserClass;
             }
-            if (!empty($errorMsg)) {
+            if (! empty($errorMsg)) {
                 $errorMessages[$parserClass] = $errorMsg;
             }
         }
+
         return null;
     }
 
@@ -382,7 +360,7 @@ final class FileTypeSupport
      */
     private function registerCoreFileParsers(): void
     {
-        foreach($this->coreParsers as $parserCls){
+        foreach ($this->coreParsers as $parserCls) {
             $extensions = $parserCls::getFileExtensions();
             foreach ($extensions as $extension) {
                 $this->registerFileParser($extension, $parserCls, self::SCOPE_CORE);

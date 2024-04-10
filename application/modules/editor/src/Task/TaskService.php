@@ -96,8 +96,7 @@ class TaskService
         string $state,
         editor_Models_TaskUserAssoc $userTaskAssoc,
         editor_Models_Task $task
-    ): void
-    {
+    ): void {
         if ('beforeFinish' !== $state) {
             return;
         }
@@ -109,12 +108,17 @@ class TaskService
             return;
         }
 
-        ZfExtended_Models_Entity_Conflict::addCodes(['E1542' => QualityService::ERROR_MASSAGE_PLEASE_SOLVE_ERRORS]);
+        ZfExtended_Models_Entity_Conflict::addCodes([
+            'E1542' => QualityService::ERROR_MASSAGE_PLEASE_SOLVE_ERRORS,
+        ]);
 
         throw ZfExtended_Models_Entity_Conflict::createResponse(
             'E1542',
             [QualityService::ERROR_MASSAGE_PLEASE_SOLVE_ERRORS],
-            ['task' => $task, 'categories' => implode('</br>', $errorCategories)]
+            [
+                'task' => $task,
+                'categories' => implode('</br>', $errorCategories),
+            ]
         );
     }
 }

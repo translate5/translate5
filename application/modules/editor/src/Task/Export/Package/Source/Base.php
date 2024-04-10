@@ -21,7 +21,7 @@ START LICENSE AND COPYRIGHT
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
@@ -34,29 +34,22 @@ use ZfExtended_Models_Worker;
 
 abstract class Base
 {
-
     protected string $fileName;
 
     protected string $folderPath;
 
-
-    /**
-     * @param editor_Models_Task $task
-     */
-    public function __construct(protected editor_Models_Task $task, protected ExportSource $exportSource)
-    {
-        $this->folderPath = $exportSource->getRootFolder().DIRECTORY_SEPARATOR.$this->fileName;
+    public function __construct(
+        protected editor_Models_Task $task,
+        protected ExportSource $exportSource
+    ) {
+        $this->folderPath = $exportSource->getRootFolder() . DIRECTORY_SEPARATOR . $this->fileName;
     }
 
     /**
      * Validate source before export. In case of invalid source, throw exception
-     * @return void
      */
     abstract public function validate(): void;
 
-    /**
-     * @return void
-     */
     abstract public function export(?ZfExtended_Models_Worker $workerModel): void;
 
     /***
@@ -67,12 +60,8 @@ abstract class Base
         return $this->folderPath;
     }
 
-    /**
-     * @return ExportSource
-     */
     public function getExportSource(): ExportSource
     {
         return $this->exportSource;
     }
-
 }

@@ -31,12 +31,10 @@ namespace MittagQI\Translate5\Segment\Processing;
 /**
  * Interface of progress reporters for use in segment processing loopers
  */
-interface ProgressInterface {
-
+interface ProgressInterface
+{
     /**
      * Reports the number of processed segments which can be used to trigger progress-reporting
-     * @param int $numProcessed
-     * @return void
      */
     public function reportProcessed(int $numProcessed): void;
 }
