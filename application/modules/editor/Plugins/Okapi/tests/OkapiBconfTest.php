@@ -3,7 +3,7 @@
 START LICENSE AND COPYRIGHT
 
  This file is part of translate5
- 
+
  Copyright (c) 2013 - 2022 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
 
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
@@ -13,31 +13,31 @@ START LICENSE AND COPYRIGHT
  included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
-  
+
  There is a plugin exception available for use with this release of translate5 for
  translate5: Please see http://www.translate5.net/plugin-exception.txt or
  plugin-exception.txt in the root folder of translate5.
-  
+
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
 
-use MittagQI\Translate5\Test\Import\Config;
-use MittagQI\Translate5\Test\Import\Bconf;
 use MittagQI\Translate5\Plugins\Okapi\Service;
+use MittagQI\Translate5\Test\Import\Bconf;
+use MittagQI\Translate5\Test\Import\Config;
 
 /**
  * Testcase for TRANSLATE-2266 Custom file filter configuration with GUI / BCONF Management
  * For details see the issue.
  */
-class OkapiBconfTest extends editor_Test_JsonTest {
-
+class OkapiBconfTest extends editor_Test_JsonTest
+{
     protected static array $requiredPlugins = [
-        'editor_Plugins_Okapi_Init'
+        'editor_Plugins_Okapi_Init',
     ];
 
     private static Bconf $testBconf;
@@ -46,13 +46,11 @@ class OkapiBconfTest extends editor_Test_JsonTest {
 
     /**
      * Just imports a bconf to test with
-     * @param Config $config
-     * @return void
      */
     protected static function setupImport(Config $config): void
     {
         // TODO FIXME: still neccessary ?
-        if(!Zend_Registry::isRegistered('Zend_Locale')){
+        if (! Zend_Registry::isRegistered('Zend_Locale')) {
             Zend_Registry::set('Zend_Locale', new Zend_Locale('en'));
         }
 
@@ -70,8 +68,10 @@ class OkapiBconfTest extends editor_Test_JsonTest {
         self::assertNotEmpty($service->getConfiguredServiceUrl($okapiConf->serverToUse, false), 'runtimeOptions.plugins.Okapi.api.url not set');
 
         $t5defaultImportBconf = editor_Utils::joinPath(editor_Plugins_Okapi_Init::getDataDir(), editor_Plugins_Okapi_Init::BCONF_SYSDEFAULT_IMPORT);
-        self::assertFileExists($t5defaultImportBconf,
-            "File '$t5defaultImportBconf' missing. As the Translate5 provided default import .bconf file for Okapi Task Imports it must exist!");
+        self::assertFileExists(
+            $t5defaultImportBconf,
+            "File '$t5defaultImportBconf' missing. As the Translate5 provided default import .bconf file for Okapi Task Imports it must exist!"
+        );
 
         static::$bconf = new editor_Plugins_Okapi_Bconf_Entity();
         static::$bconf->load(static::$testBconf->getId());
@@ -89,7 +89,8 @@ class OkapiBconfTest extends editor_Test_JsonTest {
      * Test if new srx files are packed into bconf.
      * @depends test10_ConfigurationAndApi
      */
-    public function test20_SrxUpload() {
+    public function test20_SrxUpload()
+    {
         $bconf = static::$bconf;
         $id = $bconf->getId();
 
@@ -122,9 +123,11 @@ class OkapiBconfTest extends editor_Test_JsonTest {
     /**
      * @depends test10_ConfigurationAndApi
      */
-    public function test30_AutoImportAndVersionUpdate() {
-        if(!self::isMasterTest()){
+    public function test30_AutoImportAndVersionUpdate()
+    {
+        if (! self::isMasterTest()) {
             self::markTestSkipped('runs only in master test to not mess with important default bconf.');
+
             return;
         }
         $bconf = static::$bconf;
@@ -151,15 +154,16 @@ class OkapiBconfTest extends editor_Test_JsonTest {
 
         // Ensure system bconf dir can't be deleted
         $e = null;
+
         try {
             $newSystemBconf->delete();
-        } catch(ZfExtended_NoAccessException $e){
+        } catch (ZfExtended_NoAccessException $e) {
         } finally {
             self::assertNotNull($e, 'Deleting the system bconf directory was not prevented by ZfExtended_NoAccessException');
         }
 
         // Ensure system bconf is updated on version mismatch when using it
-        $version = (int)$newSystemBconf->getVersionIdx();
+        $version = (int) $newSystemBconf->getVersionIdx();
         self::assertGreaterThan(0, $version, 'Bconf version is 0');
         $newSystemBconf->setVersionIdx($version - 1);
         $newSystemBconf->save();
@@ -177,11 +181,13 @@ class OkapiBconfTest extends editor_Test_JsonTest {
 
         try {
             $newSystemBconf->delete();
-        } catch(ZfExtended_NoAccessException $e){ }
+        } catch (ZfExtended_NoAccessException $e) {
+        }
         $e = null;
+
         try {
             $newSystemBconf->load($newSystemBconfId);
-        } catch(ZfExtended_Models_Entity_NotFoundException $e){
+        } catch (ZfExtended_Models_Entity_NotFoundException $e) {
         } finally {
             self::assertNotNull($e, "Deleting the bconf with id '$newSystemBconfId' did not work");
         }
@@ -190,7 +196,8 @@ class OkapiBconfTest extends editor_Test_JsonTest {
     /**
      * Verify Task Import using Okapi is working with the LEK_okapi_bconf based Bconf management
      */
-    public function test40_OkapiTaskImport() {
+    public function test40_OkapiTaskImport()
+    {
         $config = static::getConfig();
         $config->import(
             $config
@@ -204,7 +211,8 @@ class OkapiBconfTest extends editor_Test_JsonTest {
      * @depends test10_ConfigurationAndApi
      * @depends test40_OkapiTaskImport
      */
-    public function test50_OkapiTaskImportWithBconfIdAndMultipleFiles() {
+    public function test50_OkapiTaskImportWithBconfIdAndMultipleFiles()
+    {
         // cleanup will be atomatically done on teardown
         $config = static::getConfig();
         $config->import(
@@ -213,7 +221,7 @@ class OkapiBconfTest extends editor_Test_JsonTest {
                 ->setImportBconfId(static::$bconf->getDefaultBconfId())
                 ->addUploadFiles([
                     'workfiles/TRANSLATE-2266-de-en.txt',
-                    'workfiles/TRANSLATE-2266-de-en-2.txt'
+                    'workfiles/TRANSLATE-2266-de-en-2.txt',
                 ])
         );
     }
@@ -222,11 +230,12 @@ class OkapiBconfTest extends editor_Test_JsonTest {
      * Verify ImportArchives with bconfs are supported
      * @depends test50_OkapiTaskImportWithBconfIdAndMultipleFiles
      */
-    public function test55_BconfInImportArchive() {
+    public function test55_BconfInImportArchive()
+    {
         $config = static::getConfig();
         $config->import(
             $config
-                ->addTask('de', 'en', -1,'workfiles/BconfWithin-de-en.zip')
+                ->addTask('de', 'en', -1, 'workfiles/BconfWithin-de-en.zip')
                 ->setToEditAfterImport()
         );
         $jsonFileName = 'expectedSegments.json';
@@ -237,13 +246,15 @@ class OkapiBconfTest extends editor_Test_JsonTest {
     /**
      * Provoke Exceptions via invalid inputs
      */
-    public function test60_InvalidFiles() {
+    public function test60_InvalidFiles()
+    {
         $bconf = new editor_Plugins_Okapi_Bconf_Entity();
-        $testDir = NULL;
+        $testDir = null;
+
         try {
             $bconf->setId(0);
             $testDir = $bconf->getDataDirectory();
-            if(!is_dir($testDir)){
+            if (! is_dir($testDir)) {
                 mkdir($testDir); // Created as test user for unit test. Make sure to remove in every circumstance!
             }
             $filesToTest = [
@@ -254,21 +265,22 @@ class OkapiBconfTest extends editor_Test_JsonTest {
                 'NoPipeline.bconf',
                 'NoExtMapping.bconf',
             ];
-            foreach($filesToTest as $file){
+            foreach ($filesToTest as $file) {
                 $e = null;
+
                 try {
                     $bconf->unpack(static::api()->getFile("invalid/$file"));
-                } catch(ZfExtended_UnprocessableEntity|editor_Plugins_Okapi_Exception $e){
+                } catch (ZfExtended_UnprocessableEntity|editor_Plugins_Okapi_Exception $e) {
                     self::assertNotNull($e, "Did not reject invalid/$file with ZfExtended_UnprocessableEntity.");
                 }
             }
-        } catch(Exception $outerEx){
+        } catch (Exception $outerEx) {
         } finally {
             // Make sure to delete directory
-            if($testDir !== NULL){
+            if ($testDir !== null) {
                 ZfExtended_Utils::recursiveDelete($testDir);
             }
-            if(!empty($outerEx)){
+            if (! empty($outerEx)) {
                 throw $outerEx;
             }
         }

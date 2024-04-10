@@ -21,7 +21,7 @@ START LICENSE AND COPYRIGHT
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
@@ -61,7 +61,7 @@ class UpdateLanguageResourcesWorker extends ZfExtended_Worker_Abstract
 
     protected function work(): bool
     {
-        if (!editor_Models_Segment_MatchRateType::isUpdatable($this->segment->getMatchRateType())) {
+        if (! editor_Models_Segment_MatchRateType::isUpdatable($this->segment->getMatchRateType())) {
             return true;
         }
 

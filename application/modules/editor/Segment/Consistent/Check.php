@@ -3,7 +3,7 @@
 START LICENSE AND COPYRIGHT
 
  This file is part of translate5
- 
+
  Copyright (c) 2013 - 2017 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
 
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
@@ -13,36 +13,34 @@ START LICENSE AND COPYRIGHT
  included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
-  
+
  There is a plugin exception available for use with this release of translate5 for
  translate5: Please see http://www.translate5.net/plugin-exception.txt or
  plugin-exception.txt in the root folder of translate5.
-  
+
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
 
 /**
- * 
  * Checks the consistency of translations: Segments with an identical target but different sources or with identical sources but different targets
  * This Check can only be done for all segments of a task at once
- *
  */
-class editor_Segment_Consistent_Check {
-    
+class editor_Segment_Consistent_Check
+{
     /**
      * @var string
      */
-    const SOURCE = 'source';
+    public const SOURCE = 'source';
 
     /**
      * @var string
      */
-    const TARGET = 'target';
+    public const TARGET = 'target';
 
     /**
      * @var array
@@ -56,11 +54,8 @@ class editor_Segment_Consistent_Check {
      */
     public $mvName = null;
 
-    /**
-     * @param editor_Models_Task $task
-     */
-    public function __construct(editor_Models_Task $task) {
-
+    public function __construct(editor_Models_Task $task)
+    {
         // Get arrays of comma-separated ids of segments having inconsistent sources/targets
         $byCategory = $this->getInconsistentSegmentNrsInTask($task);
 
@@ -80,27 +75,27 @@ class editor_Segment_Consistent_Check {
      * Retrieves the evaluated states
      * @return string[]
      */
-    public function getStates(){
+    public function getStates()
+    {
         return $this->states;
     }
 
     /**
-     * 
      * @return boolean
      */
-    public function hasStates() {
+    public function hasStates()
+    {
         return count($this->states) > 0;
     }
 
     /**
      * Get `segmentNrInTask`-values of segments having inconsistent sources or targets, with respect to task's 'enableSourceEditing' option
      *
-     * @param editor_Models_Task $task
      * @return array
      * @throws Zend_Db_Statement_Exception
      */
-    public function getInconsistentSegmentNrsInTask(editor_Models_Task $task) {
-
+    public function getInconsistentSegmentNrsInTask(editor_Models_Task $task)
+    {
         $result = [];
 
         // Get materialized view
@@ -138,7 +133,6 @@ class editor_Segment_Consistent_Check {
 
         // Foreach target field
         foreach ($targetA as $targetI) {
-
             // Col names
             $col['target'] = $targetI . 'EditToSort';
             $col['source'] = $task->getEnableSourceEditing() ? 'sourceEditToSort' : 'sourceToSort';

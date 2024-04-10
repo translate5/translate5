@@ -21,7 +21,7 @@ START LICENSE AND COPYRIGHT
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
@@ -34,7 +34,10 @@ namespace MittagQI\Translate5\Test\Import;
 final class DummyTm extends LanguageResource
 {
     public string|array $sourceLang = 'en';
+
     public string|array $targetLang = 'de';
+
     protected string $serviceName = 'DummyFile TM';
+
     protected string $serviceType = 'editor_Services_DummyFileTm';
 }

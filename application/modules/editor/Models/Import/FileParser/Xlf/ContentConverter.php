@@ -3,76 +3,74 @@
 START LICENSE AND COPYRIGHT
 
  This file is part of translate5
- 
+
  Copyright (c) 2013 - 2021 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
 
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
  This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
- as published by the Free Software Foundation and appearing in the file agpl3-license.txt 
- included in the packaging of this file.  Please review the following information 
+ as published by the Free Software Foundation and appearing in the file agpl3-license.txt
+ included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
-  
+
  There is a plugin exception available for use with this release of translate5 for
- translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or
  plugin-exception.txt in the root folder of translate5.
-  
+
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
 
-use MittagQI\Translate5\Task\Import\FileParser\Xlf\Namespaces\AbstractNamespace as XlfNamespaces;
 use MittagQI\Translate5\Segment\Tag\Placeable;
+use MittagQI\Translate5\Task\Import\FileParser\Xlf\Namespaces\AbstractNamespace as XlfNamespaces;
 
 /**
  * Converts XLF segment content chunks into translate5 internal segment content string
  */
-class editor_Models_Import_FileParser_Xlf_ContentConverter {
-
-    const TAGS_WITH_CONTENT = ['it', 'ph', 'bpt', 'ept'];
+class editor_Models_Import_FileParser_Xlf_ContentConverter
+{
+    public const TAGS_WITH_CONTENT = ['it', 'ph', 'bpt', 'ept'];
 
     /**
      * @var editor_Models_Import_FileParser_XmlParser
      */
     protected $xmlparser = null;
-    
+
     /**
      * containing the result of the current parse call
-     * @var array
      */
     protected array $result = [];
-    
+
     protected XlfNamespaces $namespaces;
-    
+
     /**
      * @var array
      */
     protected $innerTag;
-    
+
     /**
      * store the filename of the imported file for debugging reasons
-     * @var string
      */
     protected string $filename;
-    
+
     /**
      * store the task for debugging reasons
      * @var editor_Models_Task
      */
     protected $task;
-    
+
     /**
      * @var boolean
      */
     protected $useTagContentOnlyNamespace;
-    
+
     protected bool $preserveWhitespace = false;
-    
+
     /**
      * Flag to switch normal mode and remove tags mode
      */
@@ -85,23 +83,17 @@ class editor_Models_Import_FileParser_Xlf_ContentConverter {
     protected array $placeablesXpathes;
 
     protected bool $inMrk = false;
-    
-    /**
-     * @var editor_Models_Segment_UtilityBroker
-     */
+
     protected editor_Models_Segment_UtilityBroker $utilities;
 
-    /**
-     * @var editor_Models_Import_FileParser_Xlf_ShortTagNumbers
-     */
     protected editor_Models_Import_FileParser_Xlf_ShortTagNumbers $shortTagNumbers;
 
     /**
-     * @param XlfNamespaces $namespaces
      * @param editor_Models_Task $task for debugging reasons only
      * @param string $filename for debugging reasons only
      */
-    public function __construct(XlfNamespaces $namespaces, editor_Models_Task $task, string $filename) {
+    public function __construct(XlfNamespaces $namespaces, editor_Models_Task $task, string $filename)
+    {
         $this->namespaces = $namespaces;
         $this->task = $task;
         $this->filename = $filename;
@@ -112,62 +104,63 @@ class editor_Models_Import_FileParser_Xlf_ContentConverter {
         $this->shortTagNumbers = ZfExtended_Factory::get('editor_Models_Import_FileParser_Xlf_ShortTagNumbers');
 
         $this->useTagContentOnlyNamespace = $this->namespaces->useTagContentOnly();
-        
+
         $this->xmlparser = ZfExtended_Factory::get('editor_Models_Import_FileParser_XmlParser');
-        $this->xmlparser->registerElement('mrk', function($tag, $attributes){
-            if($this->xmlparser->getAttribute($attributes, 'mtype') === 'seg') {
+        $this->xmlparser->registerElement('mrk', function ($tag, $attributes) {
+            if ($this->xmlparser->getAttribute($attributes, 'mtype') === 'seg') {
                 $this->inMrk = true;
                 $this->xmlparser->disableHandlersUntilEndtag();
+
                 return;
             }
+
             //test transunits with mrk tags are disabledd in the test xlf!
             //The trans-unit content contains MRK tags other than type=seg, which are currently not supported! Stop Import.
             throw new editor_Models_Import_FileParser_Xlf_Exception('E1195', [
                 'file' => $this->filename,
                 'task' => $this->task,
             ]);
-        }, function($tag, $key, $opener){
+        }, function ($tag, $key, $opener) {
             $start = $opener['openerKey'];
             $length = $key - $start + 1; //from start to end inclusive the end tag itself
 
             //by definition mrk seg tags may not be handled by the content converter, since their content must be extracted first to be handled here
-            if($this->xmlparser->getAttribute($opener['attributes'], 'mtype') === 'seg') {
+            if ($this->xmlparser->getAttribute($opener['attributes'], 'mtype') === 'seg') {
                 $this->inMrk = false;
                 //we have to remove remaining MRK seg tags (may happen due nesting inside a g tag) for correct tag removing.
                 // the content of them are checked separately as distinguished segment
                 $this->xmlparser->replaceChunk($start, '', $length);
             }
         });
-        
+
         //since phs may contain only <sub> elements we have to handle text only inside a ph
         // that implies that the handling of <sub> elements is done in the main Xlf Parser and in the ph we get just a placeholder
         // see class description of parent Xlf Parser
-        $this->xmlparser->registerElement('ph,it,bpt,ept', function($tag, $attributes){
+        $this->xmlparser->registerElement('ph,it,bpt,ept', function ($tag, $attributes) {
             $this->innerTag = [];
             $this->xmlparser->registerOther([$this, 'handleContentTagText']);
-        }, function($tag, $key, $opener) {
+        }, function ($tag, $key, $opener) {
             $this->xmlparser->registerOther([$this, 'handleText']);
             $originalContent = $this->xmlparser->getRange($opener['openerKey'], $key, true);
-            if($this->useTagContentOnly($tag, $key, $opener)) {
+            if ($this->useTagContentOnly($tag, $key, $opener)) {
                 $text = $this->xmlparser->join($this->innerTag);
-                if(strlen($text) === 0) {
+                if (strlen($text) === 0) {
                     $text = null; //a empty text makes no sense here, so we set to null so that a usable text is generated later
                 }
-            }
-            else {
+            } else {
                 $text = null;
             }
             $this->result[] = $this->createTag($opener, $tag, $originalContent, $text);
         });
-        
+
         $this->xmlparser->registerElement('x,bx,ex', null, [$this, 'handleReplacerTag']);
         $this->xmlparser->registerElement('g', [$this, 'handleGTagOpener'], [$this, 'handleGTagCloser']);
 
-        $this->xmlparser->registerElement('sub', function() {
+        $this->xmlparser->registerElement('sub', function () {
             //disable this parser until the end of the sub tag.
             $this->xmlparser->disableHandlersUntilEndtag();
         });
-        
+
         $this->xmlparser->registerElement('*', [$this, 'handleUnknown']); // → all other tags
         $this->xmlparser->registerOther([$this, 'handleText']);
 
@@ -180,30 +173,30 @@ class editor_Models_Import_FileParser_Xlf_ContentConverter {
     /**
      * creates an internal tag out of the given data
      * @param array $openerMeta openerMeta array to get the ID to identify tag pairs (for tagNr calculation)
-     * @param string $tag
      * @param string $originalContent this is value which is restored on export
      * @param string|null $text optional, this is the tag value which should be shown in the frontend
-     * @return editor_Models_Import_FileParser_Tag|null
      */
-    protected function createTag(array $openerMeta, string $tag, string $originalContent, string $text = null): ?editor_Models_Import_FileParser_Tag {
-        if($this->removeTags){
+    protected function createTag(array $openerMeta, string $tag, string $originalContent, string $text = null): ?editor_Models_Import_FileParser_Tag
+    {
+        if ($this->removeTags) {
             return null;
         }
 
         switch ($tag) {
             // ID mandatory, no content, SINGLE TAG
             case 'x':
-            // ID mandatory, content, SINGLE TAG
+                // ID mandatory, content, SINGLE TAG
             case 'ph':
-            // ID mandatory, pos mandatory, content, SINGLE TAG containing one partner of a pair
+                // ID mandatory, pos mandatory, content, SINGLE TAG containing one partner of a pair
             case 'it':
                 $tagType = editor_Models_Import_FileParser_Tag::TYPE_SINGLE;
+
                 break;
 
-            // bx / ex: ID mandatory, RID for referencing the bx/ex partner (optional), no content, PAIRED TAG
-            // Since it is unclear from the spec if a bx/ex pair must be in the same trans-unit or not
-            // and since tag numbering should be consistent in our segments and since one trans-unit can contain multiple segments (mrk type seg)
-            // we define the type after parsing the whole segment, so we know if the partner is inside the same segment or not
+                // bx / ex: ID mandatory, RID for referencing the bx/ex partner (optional), no content, PAIRED TAG
+                // Since it is unclear from the spec if a bx/ex pair must be in the same trans-unit or not
+                // and since tag numbering should be consistent in our segments and since one trans-unit can contain multiple segments (mrk type seg)
+                // we define the type after parsing the whole segment, so we know if the partner is inside the same segment or not
             case 'bx':
             case 'bpt':
                 // bpt/ept ID mandatory, RID optional, content
@@ -214,13 +207,16 @@ class editor_Models_Import_FileParser_Xlf_ContentConverter {
                 // regarding the type, see bx / ex
             case 'g':
                 $tagType = editor_Models_Import_FileParser_Tag::TYPE_OPEN;
+
                 break;
             case 'g-close':
                 //g-close tag is just a hack to distinguish between open and close
                 $tag = 'g';
+                // no break
             case 'ex':
             case 'ept': // ID mandatory, RID optional, content
                 $tagType = editor_Models_Import_FileParser_Tag::TYPE_CLOSE;
+
                 break;
             default:
                 // 'E1363' => 'Unknown XLF tag found: {tag} - can not import that.',
@@ -234,51 +230,47 @@ class editor_Models_Import_FileParser_Xlf_ContentConverter {
         $tagObj->rid = $this->getRid($openerMeta);
         $tagObj->originalContent = $originalContent;
 
-
         // find placeables in the original content
-        if($this->findPlaceables){
+        if ($this->findPlaceables) {
             Placeable::detect($originalContent, $this->placeablesXpathes, $tagObj);
         }
 
         $this->shortTagNumbers->addTag($tagObj);
+
         return $tagObj;
     }
 
     /**
      * Calculates an identifier of a tag, to match opener and closer tag (for tag numbering).
-     * @param array $openerMeta
-     * @return string|null
      */
-    protected function getRid(array $openerMeta): ?string {
+    protected function getRid(array $openerMeta): ?string
+    {
         $rid = $this->xmlparser->getAttribute($openerMeta['attributes'], 'rid');
-        if($rid !== false) {
+        if ($rid !== false) {
             return $rid;
         }
+
         return null;
     }
 
-    /**
-     * @param array $openerMeta
-     * @param string $originalContent
-     * @param bool $tagWithContent
-     * @return string
-     */
-    protected function getId(array $openerMeta, string $originalContent, bool $tagWithContent): string {
+    protected function getId(array $openerMeta, string $originalContent, bool $tagWithContent): string
+    {
         $id = $this->xmlparser->getAttribute($openerMeta['attributes'], 'id');
-        if($id !== false) {
+        if ($id !== false) {
             return $id;
         }
 
-        if($tagWithContent) {
+        if ($tagWithContent) {
             //we use the content as id, so we can match tag numbers in source and target by that id then
             // if there is sub content, it must be removed since the sub content in different languages produces different md5 hashes
             // since sub tags can contained nested content wthe greedy approach is ok to remove from first <sub> to last </sub>
-            return md5(preg_replace('#<sub>.*</sub>#','<sub/>', $originalContent));
+            return md5(preg_replace('#<sub>.*</sub>#', '<sub/>', $originalContent));
         }
 
-        if(empty($openerMeta['fakedRid'])){
-            $openerMeta['fakedRid'] = $openerMeta['tag'].'-'.$openerMeta['openerKey'];
+        if (empty($openerMeta['fakedRid'])) {
+            $openerMeta['fakedRid'] = $openerMeta['tag'] . '-' . $openerMeta['openerKey'];
         }
+
         return $openerMeta['fakedRid'];
     }
 
@@ -290,41 +282,42 @@ class editor_Models_Import_FileParser_Xlf_ContentConverter {
      * @param array $opener
      * @return boolean
      */
-    protected function useTagContentOnly($tag, $key, $opener) {
+    protected function useTagContentOnly($tag, $key, $opener)
+    {
         //if the namespace defines a way how to use the tag content, use that way
-        if(!is_null($this->useTagContentOnlyNamespace)) {
+        if (! is_null($this->useTagContentOnlyNamespace)) {
             return $this->useTagContentOnlyNamespace;
         }
         //the native way is to check for a ctype in the tag, if there is one, show the tags also
-        if(array_key_exists('ctype', $opener['attributes'])) {
+        if (array_key_exists('ctype', $opener['attributes'])) {
             return false;
         }
         // same if the tag contains only tags, then the surrounding tag also must be shown
-        if($key - $opener['openerKey'] <= 2) {
+        if ($key - $opener['openerKey'] <= 2) {
             //if there is only one chunk in between, we mask only that text excluding tags
             return true;
         }
-        $contentRange = trim($this->xmlparser->getRange($opener['openerKey']+1, $key-1, true)).'<end>';
+        $contentRange = trim($this->xmlparser->getRange($opener['openerKey'] + 1, $key - 1, true)) . '<end>';
+
         //FIXME a img tag with sub inside a ph is not exposed as <img> but as <ph> in the GUI
         //returns false if contentRange starts with <sub and ends with sub>, what means contains a sub text only
         return (stripos($contentRange, '<sub') !== 0 || stripos($contentRange, 'sub><end>') === false);
     }
-    
+
     /**
      * parses the given chunks containing segment source, seg-source or target content, or their child elements content like sub or mrk mtype="seg"
      * the result is not returned as string but as array for post processing of the generated chunks
      *
      * @param array|string $chunks can be either an array of chunks or a string which then will be parsed
-     * @param bool $source
      * @param bool $preserveWhitespace defines if the whitespace in the XML nodes should be preserved or not
-     * @return array
      */
-    public function convert(array|string $chunks, bool $source, bool $preserveWhitespace = false): array {
+    public function convert(array|string $chunks, bool $source, bool $preserveWhitespace = false): array
+    {
         $this->result = [];
         $this->removeTags = false;
         $this->shortTagNumbers->init($source);
 
-        if($source) {
+        if ($source) {
             $this->utilities->whitespace->resetTagNumberMap();
         }
         //on source we collect the tag numbers, on target we use them:
@@ -332,14 +325,13 @@ class editor_Models_Import_FileParser_Xlf_ContentConverter {
 
         //get the flag just from outside, must not be parsed by inline element parser, since xml:space may occur only outside of inline content
         $this->preserveWhitespace = $preserveWhitespace;
-        if(is_array($chunks)) {
+        if (is_array($chunks)) {
             $this->xmlparser->parseList($chunks);
-        }
-        else {
+        } else {
             $this->xmlparser->parse($chunks);
         }
-        
-        if(!empty($this->result) && !$this->preserveWhitespace) {
+
+        if (! empty($this->result) && ! $this->preserveWhitespace) {
             $lastIdx = count($this->result) - 1;
             $this->result[0] = ltrim($this->result[0]);
             $this->result[$lastIdx] = rtrim($this->result[$lastIdx]);
@@ -356,63 +348,59 @@ class editor_Models_Import_FileParser_Xlf_ContentConverter {
      * @throws editor_Models_ConfigException
      * @throws editor_Models_Import_FileParser_Xlf_Exception
      */
-    public function handleText($text) {
-        if($this->inMrk) {
+    public function handleText($text)
+    {
+        if ($this->inMrk) {
             return;
         }
-        if(!$this->preserveWhitespace) {
+        if (! $this->preserveWhitespace) {
             $text = preg_replace("/[ \t\n\r]+/u", ' ', $text);
-            if(is_null($text)) {
-                $errorMsg = array_flip(array_filter(get_defined_constants(true)['pcre'], function($item){
+            if (is_null($text)) {
+                $errorMsg = array_flip(array_filter(get_defined_constants(true)['pcre'], function ($item) {
                     return is_int($item);
                 }))[preg_last_error()] ?? 'Unknown Error';
-                
+
                 // Whitespace in text content can not be cleaned by preg_replace. Error Message: "{msg}". Stop Import.
                 throw new editor_Models_Import_FileParser_Xlf_Exception('E1196', [
                     'file' => $this->filename,
                     'task' => $this->task,
-                    'pregMsg' => $errorMsg
+                    'pregMsg' => $errorMsg,
                 ]);
             }
         }
         //we have to decode entities here, otherwise our generated XLF wont be valid
         // although the whitespace of the content may not be preserved here, if there remain multiple spaces or other space characters,
         // we have to protect them here
-        
+
         $wh = $this->utilities->whitespace;
-        if($this->protectTags) {
+        if ($this->protectTags) {
             //since we are in a XML file format, plain tags in the content are encoded, which we have to undo first
             //$text is here for example: Dies &lt;strong&gt;ist ein&lt;/strong&gt; Test. &amp;nbsp;
             $text = html_entity_decode($text);
             //$text is now: Dies <strong>ist ein</strong> Test. &nbsp;
-            
+
             $text = $this->utilities->tagProtection->protectTags($text);
             $text = $wh->protectWhitespace($text, $wh::ENTITY_MODE_OFF); //disable entity handling here, since already done in tagProtection
-        }
-        else {
+        } else {
             $text = $wh->protectWhitespace($text);
         }
 
         $xmlChunks = [];
         $wh->convertToInternalTags($text, $this->shortTagNumbers->shortTagIdent, $xmlChunks);
         //to keep the generated tag objects we have to use the chunklist instead of the returned string
-        array_push($this->result, ... $xmlChunks);
+        array_push($this->result, ...$xmlChunks);
     }
-    
+
     /**
      * Inner PH tag text handler
-     * @param string $text
      */
-    public function handleContentTagText(string $text):void
+    public function handleContentTagText(string $text): void
     {
         $this->innerTag[] = $text;
     }
 
     /**
      * Handler for X tags
-     * @param string $tag
-     * @param int $key
-     * @param array $opener
      * @throws editor_Models_Import_FileParser_Xlf_Exception
      */
     public function handleReplacerTag(string $tag, int $key, array $opener): void
@@ -430,9 +418,6 @@ class editor_Models_Import_FileParser_Xlf_ContentConverter {
 
     /**
      * Handler for G tags
-     * @param string $tag
-     * @param array $attributes
-     * @param int $key
      * @throws editor_Models_Import_FileParser_Xlf_Exception
      */
     public function handleGTagOpener(string $tag, array $attributes, int $key): void
@@ -443,9 +428,6 @@ class editor_Models_Import_FileParser_Xlf_ContentConverter {
 
     /**
      * Handler for G tags
-     * @param string $tag
-     * @param int $key
-     * @param array $opener
      * @throws editor_Models_Import_FileParser_Xlf_Exception
      */
     public function handleGTagCloser(string $tag, int $key, array $opener): void
@@ -454,17 +436,14 @@ class editor_Models_Import_FileParser_Xlf_ContentConverter {
             return; // the tag was already handled in the opener
         }
         $closeChunk = $this->xmlparser->getChunk($key);
-        $this->result[] = $this->createTag($opener, $tag.'-close', $closeChunk);
+        $this->result[] = $this->createTag($opener, $tag . '-close', $closeChunk);
     }
 
     /**
      * Fallback for unknown tags
-     * @param string $tag
-     * @param array $attributes
-     * @param int $key
      * @throws editor_Models_Import_FileParser_Xlf_Exception
      */
-    public function handleUnknown(string $tag, array $attributes, int $key):void
+    public function handleUnknown(string $tag, array $attributes, int $key): void
     {
         //below tags are given to the content converter,
         // they are known so far, just not handled by the converter
@@ -476,21 +455,23 @@ class editor_Models_Import_FileParser_Xlf_ContentConverter {
             case 'bx':
             case 'ex':
                 return;
-            // in content convertion the T5_MRK_TAG could just be ignored and returned as it is
+                // in content convertion the T5_MRK_TAG could just be ignored and returned as it is
             case editor_Models_Import_FileParser_Xlf_OtherContent::T5_MRK_TAG:
                 $this->result[] = $this->xmlparser->getChunk($key);
+
                 return;
             default:
                 break;
         }
+
         // The file "{file}" contains "{tag}" tags, which are currently not supported! Stop Import.
         throw new editor_Models_Import_FileParser_Xlf_Exception('E1194', [
             'file' => $this->filename,
             'task' => $this->task,
-            'tag' => $tag
+            'tag' => $tag,
         ]);
     }
-    
+
     public function getFileName(): string
     {
         return $this->filename;

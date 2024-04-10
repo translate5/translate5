@@ -21,7 +21,7 @@ START LICENSE AND COPYRIGHT
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
@@ -31,12 +31,8 @@ namespace MittagQI\Translate5\LanguageResource\CleanupAssociation;
 use ZfExtended_Factory;
 use ZfExtended_UnprocessableEntity;
 
-/**
- *
- */
 class Task extends Base
 {
-
     /***
      * Get the conflicting association by given entity class name (TaskAssociation or TaskPivotAssociation)
      *
@@ -46,6 +42,7 @@ class Task extends Base
     protected function getConflictByEntity(string $entityClass): array
     {
         $taskAssoc = ZfExtended_Factory::get($entityClass);
+
         return $taskAssoc->getAssociatedByResource($this->languageResourceId);
     }
 
@@ -58,10 +55,10 @@ class Task extends Base
         throw ZfExtended_UnprocessableEntity::createResponse('E1473', [
             'errorMessages' => [
                 'Die zu löschende Sprachressource wird von folgenden Aufgaben benutzt:',
-                'Beim Löschen werden die Zuweisungen der Sprachressource zu den Aufgaben ebenfalls entfernt. Wollen Sie wirklich die Sprachressource und ihre Zuweisungen löschen?'
-            ]
+                'Beim Löschen werden die Zuweisungen der Sprachressource zu den Aufgaben ebenfalls entfernt. Wollen Sie wirklich die Sprachressource und ihre Zuweisungen löschen?',
+            ],
         ], extraData: [
-            'taskList' => $taskNames
+            'taskList' => $taskNames,
         ]);
     }
 }

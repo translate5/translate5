@@ -3,7 +3,7 @@
 START LICENSE AND COPYRIGHT
 
  This file is part of translate5
- 
+
  Copyright (c) 2013 - 2021 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
 
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
@@ -13,11 +13,11 @@ START LICENSE AND COPYRIGHT
  included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
-  
+
  There is a plugin exception available for use with this release of translate5 for
  translate5: Please see http://www.translate5.net/plugin-exception.txt or
  plugin-exception.txt in the root folder of translate5.
-  
+
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
@@ -26,22 +26,26 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use editor_Plugins_IpAuthentication_Models_IpBaseUser as IpBaseUser;
 use MittagQI\Translate5\Plugins\IpAuthentication\AclResource;
 use MittagQI\ZfExtended\Acl\ResourceManager as ACLResourceManager;
-use editor_Plugins_IpAuthentication_Models_IpBaseUser as IpBaseUser;
 
 /**
  * For certain roles where it makes sense it should be possible to authenticate at translate5 only by the fact,
  * that the user comes from a certain IP address. Currently, this makes sense for
  * the roles termCustomerSearch and InstantTranslate (the user must have no other roles).
  */
-class editor_Plugins_IpAuthentication_Init extends ZfExtended_Plugin_Abstract {
+class editor_Plugins_IpAuthentication_Init extends ZfExtended_Plugin_Abstract
+{
     protected static string $description = 'Provides the possibility to authenticate InstantTranslate and TermSearch '
-                                           .'roles only by IP address (must be configured).';
+                                           . 'roles only by IP address (must be configured).';
+
     protected static bool $enabledByDefault = true;
+
     protected static bool $activateForTests = true;
-    
-    public function init() {
+
+    public function init()
+    {
         ACLResourceManager::registerResource(AclResource::class);
         $this->eventManager->attach(
             'ZfExtended_Resource_GarbageCollector',
@@ -64,7 +68,6 @@ class editor_Plugins_IpAuthentication_Init extends ZfExtended_Plugin_Abstract {
             [$this, 'onInstantTranslateTermPortalAfterIndexAction']
         );
     }
-    
 
     public function onInstantTranslateTermPortalAfterIndexAction(Zend_EventManager_Event $event): void
     {
@@ -87,22 +90,23 @@ class editor_Plugins_IpAuthentication_Init extends ZfExtended_Plugin_Abstract {
     {
         $logger = Zend_Registry::get('logger')->cloneMe('plugin.ipAuthentication');
         /* @var $logger ZfExtended_Logger */
-        
+
         $user = ZfExtended_Factory::get('editor_Plugins_IpAuthentication_Models_IpBaseUser');
         /* @var $user editor_Plugins_IpAuthentication_Models_IpBaseUser */
 
         // if there is no ip configuration, do nothing
-        if(empty($user->getConfiguredIps())){
+        if (empty($user->getConfiguredIps())) {
             return;
         }
 
-        if(!$user->isIpBasedRequest()){
+        if (! $user->isIpBasedRequest()) {
             $logger->debug('E0000', 'Login denied from {ip}', [
                 'ip' => $user->getIp(),
             ]);
+
             return;
         }
-        
+
         $user->handleIpBasedUser();
         $logger->info('E0000', 'Logged in as {user} from {ip}', [
             'user' => $user->getLogin(),
@@ -121,14 +125,14 @@ class editor_Plugins_IpAuthentication_Init extends ZfExtended_Plugin_Abstract {
         //remove all ip based user wich can not be found in the session
         $users = ZfExtended_Factory::get('editor_Plugins_IpAuthentication_Models_IpBaseUser');
         /* @var $users editor_Plugins_IpAuthentication_Models_IpBaseUser */
-        
+
         $users = $users->findAllExpired();
-        
-        if(empty($users)){
+
+        if (empty($users)) {
             return;
         }
-        
-        foreach ($users as $user){
+
+        foreach ($users as $user) {
             $model = ZfExtended_Factory::get('ZfExtended_Models_User');
             /* @var $model ZfExtended_Models_User */
             $model->init($user);
@@ -142,18 +146,17 @@ class editor_Plugins_IpAuthentication_Init extends ZfExtended_Plugin_Abstract {
      *   1. load all tasks where the given user is pm
      *   2. remove all of those tasks and with this all user task associations
      *   3. remove the given user
-     * @param ZfExtended_Models_User $user
      * @throws ReflectionException
      * @throws ZfExtended_Models_Entity_NotFoundException
      */
     protected function deleteTemporaryUser(ZfExtended_Models_User $user): void
     {
-        $taskModel=ZfExtended_Factory::get('editor_Models_Task');
+        $taskModel = ZfExtended_Factory::get('editor_Models_Task');
         /* @var $taskModel editor_Models_Task */
-        $tasks=$taskModel->loadListByPmGuid($user->getUserGuid());
-        
-        if(!empty($tasks)){
-            $taskGuids = array_column($tasks,'taskGuid');
+        $tasks = $taskModel->loadListByPmGuid($user->getUserGuid());
+
+        if (! empty($tasks)) {
+            $taskGuids = array_column($tasks, 'taskGuid');
 
             //remove all tasks and all files with the task, where the current user is pm
             foreach ($taskGuids as $taskGuid) {

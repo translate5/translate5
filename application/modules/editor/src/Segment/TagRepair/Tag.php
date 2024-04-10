@@ -3,25 +3,25 @@
 START LICENSE AND COPYRIGHT
 
  This file is part of translate5
- 
+
  Copyright (c) 2013 - 2021 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
 
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
  This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
- as published by the Free Software Foundation and appearing in the file agpl3-license.txt 
- included in the packaging of this file.  Please review the following information 
+ as published by the Free Software Foundation and appearing in the file agpl3-license.txt
+ included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
-  
+
  There is a plugin exception available for use with this release of translate5 for
- translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or
  plugin-exception.txt in the root folder of translate5.
-  
+
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
@@ -38,42 +38,44 @@ namespace MittagQI\Translate5\Segment\TagRepair;
  * @method Tag cloneProps(\editor_Tag $tag, bool $withDataAttribs=false, bool $withId=false)
  * @property Tag|\editor_TextNode[] $children
  */
-class Tag extends \editor_Segment_Tag {
+class Tag extends \editor_Segment_Tag
+{
+    /**
+     * @var string
+     */
+    public const REQUEST_TAG_TPL = '<img id="t5tag-@TYPE@-@TAGIDX@" src="example.jpg" />';
 
     /**
      * @var string
      */
-    const REQUEST_TAG_TPL = '<img id="t5tag-@TYPE@-@TAGIDX@" src="example.jpg" />';
+    public const REQUEST_TAG_REGEX = '~(<img\s*id="t5tag\-[a-z]+\-[0-9]+"\s*src="[^>]+"\s*/>)~i';
+
     /**
      * @var string
      */
-    const REQUEST_TAG_REGEX = '~(<img\s*id="t5tag\-[a-z]+\-[0-9]+"\s*src="[^>]+"\s*/>)~i';
+    public const COMMENT_NODE_NAME = 't5comment';
+
     /**
      * @var string
      */
-    const COMMENT_NODE_NAME = 't5comment';
-    /**
-     * @var string
-     */
-    const COMMENTS_REPLACE_REGEX = '~<!--(.*)-->~Us';
+    public const COMMENTS_REPLACE_REGEX = '~<!--(.*)-->~Us';
 
     /**
      * Prepares comments to be parsed as comment-tags
-     * @param string $markup
-     * @return string
      */
-    public static function replaceComments(string $markup) : string {
-        return preg_replace_callback(static::COMMENTS_REPLACE_REGEX, function($matches){
+    public static function replaceComments(string $markup): string
+    {
+        return preg_replace_callback(static::COMMENTS_REPLACE_REGEX, function ($matches) {
             // crucial: since we are turning the comment into "normal" markup we have to make sure, markup in comments is protected which is also neccessary to make this a proper attribute
-            return '<'.self::COMMENT_NODE_NAME.' comment="'.htmlspecialchars($matches[1], ENT_COMPAT, null, true).'" />';
+            return '<' . self::COMMENT_NODE_NAME . ' comment="' . htmlspecialchars($matches[1], ENT_COMPAT, null, true) . '" />';
         }, $markup);
     }
+
     /**
      * Strips all comments out of the markup
-     * @param string $markup
-     * @return string
      */
-    public static function stripComments(string $markup) : string {
+    public static function stripComments(string $markup): string
+    {
         return preg_replace(self::COMMENTS_REPLACE_REGEX, '', $markup);
     }
 
@@ -81,81 +83,71 @@ class Tag extends \editor_Segment_Tag {
      * We need to expand the singular tags to cover the xliff tags
      * @var string[]
      */
-    protected static $singularTypes = array('img','input','br','hr','wbr','area','col','embed','keygen','link','meta','param','source','track','command','x','bx','ex', self::COMMENT_NODE_NAME);
-    
+    protected static $singularTypes = ['img', 'input', 'br', 'hr', 'wbr', 'area', 'col', 'embed', 'keygen', 'link', 'meta', 'param', 'source', 'track', 'command', 'x', 'bx', 'ex', self::COMMENT_NODE_NAME];
+
     protected static $type = 'repair';
 
     /**
      * A unique ID that will re-identify the after the request returned and when recreating the original state
-     * @var int
      */
     protected int $repairIdx;
+
     /**
      * Additional markup to render after our start tag
-     * @var string
      */
     protected string $afterStartMarkup = '';
+
     /**
      * Additional markup to render before our end tag
-     * @var string
      */
     protected string $beforeEndMarkup = '';
+
     /**
      * The number of words we cover
-     * @var int
      */
     protected int $numWords;
+
     /**
      * The number of words before relative to the whole text
-     * @var int
      */
     protected int $numWordsBefore;
+
     /**
      * The number of words after relative to the whole text
-     * @var int
      */
     protected int $numWordsAfter;
+
     /**
      * The number of words before relative to the parent tag
-     * @var int
      */
     protected int $numWordsBeforeParent;
+
     /**
      * If a singular tag is before or after whitespace
-     * @var bool
      */
     protected bool $isBeforeWhitespace;
+
     /**
      * The number of words after relative to the parent tag
-     * @var int
      */
     protected int $numWordsAfterParent;
-    /**
-     * @var int
-     */
+
     public int $oldStartIndex;
-    /**
-     * @var int
-     */
+
     public int $oldEndIndex;
+
     /**
      * The repairIdx of our parentTag
-     * @var int
      */
     protected int $parentTagIdx;
+
     /**
      * Defines, if a tag is on the left or right side of the parent tag and does not contain text
-     * @var bool
      */
     public bool $isLateral = false;
 
-    /**
-     * @param int $startIndex
-     * @param int $endIndex
-     * @param string $category
-     * @param string $nodeName
-     */
-    public function __construct(int $startIndex, int $endIndex, string $category='', string $nodeName='span', int $repairIdx=0) {
+    public function __construct(int $startIndex, int $endIndex, string $category = '', string $nodeName = 'span', int $repairIdx = 0)
+    {
         $this->startIndex = $startIndex;
         $this->endIndex = $endIndex;
         $this->category = $category;
@@ -163,51 +155,60 @@ class Tag extends \editor_Segment_Tag {
         $this->repairIdx = $repairIdx;
         $this->singular = in_array($nodeName, static::$singularTypes);
     }
+
     /**
      * retrieves the unique index of the tag
-     * @return int
      */
-    public function getRepairIndex() : int {
+    public function getRepairIndex(): int
+    {
         return $this->repairIdx;
     }
+
     /**
      * Must only be used in the pre pairing phase to manipulate the repair index for paired internal tags ...
-     * @param int $idx
      */
-    public function setRepairIndex(int $idx) {
+    public function setRepairIndex(int $idx)
+    {
         $this->repairIdx = $idx;
     }
+
     /**
-     * {@inheritDoc}
      * @see \editor_Tag::createBaseClone()
      * @return Tag
      */
-    protected function createBaseClone(){
+    protected function createBaseClone()
+    {
         return new Tag($this->startIndex, $this->endIndex, $this->category, $this->name);
     }
+
     /**
      * ANY Repair tags shall not be be consolidated
      * {@inheritDoc}
      * @see editor_Segment_Tag::isEqualType()
      */
-    public function isEqualType(\editor_Tag $tag) : bool {
+    public function isEqualType(\editor_Tag $tag): bool
+    {
         return false;
     }
 
-    public function addAttribute($name, $val=null) : Tag {
+    public function addAttribute($name, $val = null): Tag
+    {
         // crucial: comment tags must have the unescaped value as comment-text (stored in the ::replaceComments prop)
-        if($this->isComment() && $name === 'comment'){
+        if ($this->isComment() && $name === 'comment') {
             // we have to revert the escaping applied in Tags::replaceComments
             $this->afterStartMarkup = htmlspecialchars_decode($val, ENT_COMPAT);
         }
         parent::addAttribute($name, $val);
+
         return $this;
     }
+
     /**
      * Repair tags that represent an comment will act specially, e.g. render a comment instead of tags
      * @return bool
      */
-    protected function isComment(){
+    protected function isComment()
+    {
         return ($this->name === self::COMMENT_NODE_NAME);
     }
 
@@ -216,10 +217,9 @@ class Tag extends \editor_Segment_Tag {
     /**
      * captures the position in words when evaluationg the original
      * also resets the text indices
-     * @param Tags $tags
-     * @param int $textLength
      */
-    public function capturePosition(Tags $tags, int $textLength){
+    public function capturePosition(Tags $tags, int $textLength)
+    {
         $this->numWords = 0;
         $this->numWordsBefore = 0;
         $this->numWordsAfter = 0;
@@ -228,65 +228,66 @@ class Tag extends \editor_Segment_Tag {
         $this->numWordsAfterParent = -1;
         $this->isBeforeWhitespace = false;
         $this->parentTagIdx = -1;
-        if(!$this->isSingular() && $this->endIndex > $this->startIndex){
+        if (! $this->isSingular() && $this->endIndex > $this->startIndex) {
             $this->numWords = $this->getNumWords($tags);
-        } else if($this->isSingular()){
+        } elseif ($this->isSingular()) {
             $this->isBeforeWhitespace = $tags->isWhitespaceCharAt($this->startIndex);
         }
-        if($this->startIndex > 0){
+        if ($this->startIndex > 0) {
             $this->numWordsBefore = $tags->countWords($tags->getTextPart(0, $this->startIndex));
         }
-        if($this->endIndex < $textLength){
+        if ($this->endIndex < $textLength) {
             $this->numWordsAfter = $tags->countWords($tags->getTextPart($this->endIndex, $textLength));
         }
         $parentTag = $tags->findByOrder($this->parentOrder);
-        if($parentTag != NULL){
+        if ($parentTag != null) {
             $this->parentTagIdx = $parentTag->getRepairIndex();
-            if($this->startIndex > $parentTag->startIndex){
+            if ($this->startIndex > $parentTag->startIndex) {
                 $this->numWordsBeforeParent = $tags->countWords($tags->getTextPart($parentTag->startIndex, $this->startIndex));
             }
-            if($this->endIndex < $parentTag->endIndex){
+            if ($this->endIndex < $parentTag->endIndex) {
                 $this->numWordsAfterParent = $tags->countWords($tags->getTextPart($this->endIndex, $parentTag->endIndex));
             }
         }
         $this->oldStartIndex = $this->startIndex;
         $this->oldEndIndex = $this->endIndex;
     }
+
     /**
      * unsets our text positions
      */
-    public function invalidatePosition(){
+    public function invalidatePosition()
+    {
         $this->startIndex = -1;
         $this->endIndex = -1;
     }
+
     /**
      * Retrieves the number of words currently covered by the tag
-     * @param Tags $tags
-     * @return int
      */
-    public function getNumWords(Tags $tags) : int {
-        if($this->isSingular()){
+    public function getNumWords(Tags $tags): int
+    {
+        if ($this->isSingular()) {
             return 0;
         }
+
         return $tags->countWords($tags->getTextPart($this->startIndex, $this->endIndex));
     }
+
     /**
      * Recreates the tag position for a full, non-singular tag
-     * @param Tags $tags
-     * @param int $textLength: the new length of the text
-     * @param float $wordRatio: the ratio of the number of words
-     * @param float $textRatio: the ratio of the number of characters
      */
-    public function reEvaluateTagPosition(Tags $tags, int $textLength,  float $wordRatio, float $textRatio){
+    public function reEvaluateTagPosition(Tags $tags, int $textLength, float $wordRatio, float $textRatio)
+    {
         // both positions could be restored
-        if($this->startIndex >= 0 && $this->endIndex >= 0){
+        if ($this->startIndex >= 0 && $this->endIndex >= 0) {
             // we have to care about all thinkable mishaps
-            if($this->startIndex >= $textLength && $this->endIndex >= $textLength){
+            if ($this->startIndex >= $textLength && $this->endIndex >= $textLength) {
                 $this->startIndex = $this->endIndex = $textLength;
-            } else if($this->endIndex >= $textLength) {
+            } elseif ($this->endIndex >= $textLength) {
                 $this->endIndex = $textLength;
-            } else if($this->startIndex > $this->endIndex){
-                if($this->startIndex >= $textLength){
+            } elseif ($this->startIndex > $this->endIndex) {
+                if ($this->startIndex >= $textLength) {
                     $this->startIndex = $this->endIndex = $textLength;
                 } else {
                     // in case the end-position is before the start we invalidate the end as we judge the start-position to be more important. This is purely a matter of taste though
@@ -294,18 +295,18 @@ class Tag extends \editor_Segment_Tag {
                 }
             }
         }
-        $parentTag = NULL;
+        $parentTag = null;
         $parentTagValid = false;
         $parentNumWords = $numWords = $halfNumWords = 0;
         // trick: if start and/or end index is lost, we first try to reEvaluate a parent tag if there was one
-        if(($this->startIndex < 0 || $this->endIndex < 0) && $this->parentTagIdx > -1){
+        if (($this->startIndex < 0 || $this->endIndex < 0) && $this->parentTagIdx > -1) {
             $parentTag = $tags->findByTagIdx($this->parentTagIdx);
-            if($parentTag != NULL){
-                if($parentTag->startIndex < 0 || $parentTag->endIndex < 0){
+            if ($parentTag != null) {
+                if ($parentTag->startIndex < 0 || $parentTag->endIndex < 0) {
                     $parentTag->reEvaluateTagPosition($tags, $textLength, $wordRatio, $textRatio);
                 }
                 // we only take a parentTag into account if it is found and has content
-                if($parentTag->startIndex >= 0 && $parentTag->endIndex > $parentTag->startIndex){
+                if ($parentTag->startIndex >= 0 && $parentTag->endIndex > $parentTag->startIndex) {
                     $parentTagValid = true;
                     $parentNumWords = $parentTag->getNumWords($tags);
                     $numWords = round(($parentNumWords / ($this->numWords + $this->numWordsBeforeParent + $this->numWordsAfterParent)) * $this->numWords);
@@ -314,21 +315,21 @@ class Tag extends \editor_Segment_Tag {
             }
         }
         // no indexes could be restored, the tag was completely lost !
-        if($this->startIndex < 0 && $this->endIndex < 0){
+        if ($this->startIndex < 0 && $this->endIndex < 0) {
             // if we have a faound parent tag, we will restore relative to it's position
-            if($parentTagValid){
-                if($parentNumWords > 1){
+            if ($parentTagValid) {
+                if ($parentNumWords > 1) {
                     // calculate relative number of words
-                    $oldCenter =  $this->oldStartIndex + (($this->oldEndIndex - $this->oldStartIndex) / 2);
+                    $oldCenter = $this->oldStartIndex + (($this->oldEndIndex - $this->oldStartIndex) / 2);
                     $oldParentCenter = $parentTag->oldStartIndex + (($parentTag->oldEndIndex - $parentTag->oldStartIndex) / 2);
                     $parentCenter = $parentTag->startIndex + (($parentTag->endIndex - $parentTag->startIndex) / 2);
                     $relativeCenter = round($parentCenter + (($oldCenter - $oldParentCenter) * $textRatio));
                     $this->startIndex = $tags->getPrevWordsPosition($relativeCenter, $halfNumWords);
                     $this->endIndex = $tags->getNextWordsPosition($relativeCenter, $halfNumWords);
-                    if($this->startIndex < $parentTag->startIndex){
+                    if ($this->startIndex < $parentTag->startIndex) {
                         $this->startIndex = $parentTag->startIndex;
                         $this->endIndex = min($tags->getNextWordsPosition($this->startIndex, $numWords), $parentTag->endIndex);
-                    } else if($this->endIndex > $parentTag->endIndex){
+                    } elseif ($this->endIndex > $parentTag->endIndex) {
                         $this->endIndex = $parentTag->endIndex;
                         $this->startIndex = max($tags->getPrevWordsPosition($this->endIndex, $numWords), $parentTag->startIndex);
                     }
@@ -339,7 +340,7 @@ class Tag extends \editor_Segment_Tag {
             } else {
                 // we will restore it from the scaled center, what mostly will be wrong but there is nothing we can do ..
                 $numWords = round($this->numWords * $wordRatio);
-                if($this->oldStartIndex == 0){
+                if ($this->oldStartIndex == 0) {
                     $this->startIndex = 0;
                     $this->endIndex = $tags->getNextWordsPosition(0, $numWords);
                 } else {
@@ -349,8 +350,8 @@ class Tag extends \editor_Segment_Tag {
             }
         }
         // only the start-tag got lost
-        if($this->startIndex < 0){
-            if($parentTagValid){
+        if ($this->startIndex < 0) {
+            if ($parentTagValid) {
                 $this->startIndex = max($tags->getPrevWordsPosition($this->endIndex, $numWords), $parentTag->startIndex);
             } else {
                 $numWords = round(($this->numWords) * $wordRatio);
@@ -358,8 +359,8 @@ class Tag extends \editor_Segment_Tag {
             }
         }
         // only the end-tag got lost
-        if($this->endIndex < 0){
-            if($parentTagValid){
+        if ($this->endIndex < 0) {
+            if ($parentTagValid) {
                 $this->endIndex = min($tags->getNextWordsPosition($this->startIndex, $numWords), $parentTag->endIndex);
             } else {
                 $numWords = round(($this->numWords) * $wordRatio);
@@ -367,42 +368,40 @@ class Tag extends \editor_Segment_Tag {
             }
         }
     }
+
     /**
      * Recreates the tag position for a singular tag
-     * @param Tags $tags
-     * @param int $textLength
-     * @param float $wordRatio
-     * @param float $textRatio: the ratio of the number of characters
      */
-    public function reEvaluateSingularTagPosition(Tags $tags, int $textLength, float $wordRatio, float $textRatio){
-         if($this->startIndex < 0){
+    public function reEvaluateSingularTagPosition(Tags $tags, int $textLength, float $wordRatio, float $textRatio)
+    {
+        if ($this->startIndex < 0) {
             // our position can not be found
-            if($this->parentTagIdx > -1){
+            if ($this->parentTagIdx > -1) {
                 $parentTag = $tags->findByTagIdx($this->parentTagIdx);
                 // when singular tags are evaluated, all full tags are already evaluated
-                if($parentTag != NULL && $parentTag->startIndex >= 0 && $parentTag->endIndex >= 0){
-                    if($parentTag->startIndex == $parentTag->endIndex){
+                if ($parentTag != null && $parentTag->startIndex >= 0 && $parentTag->endIndex >= 0) {
+                    if ($parentTag->startIndex == $parentTag->endIndex) {
                         $this->startIndex = $this->endIndex = $parentTag->startIndex;
-                    } else if($this->numWordsAfterParent > $this->numWordsBeforeParent) {
+                    } elseif ($this->numWordsAfterParent > $this->numWordsBeforeParent) {
                         $numWords = round($this->numWordsAfterParent * $wordRatio);
                         $this->startIndex = max($tags->getPrevWordsPosition($parentTag->endIndex, $numWords, $this->isBeforeWhitespace), $parentTag->startIndex);
                     } else {
                         $numWords = round($this->numWordsBeforeParent * $wordRatio);
-                        $this->startIndex = min($tags->getNextWordsPosition($parentTag->startIndex, $numWords, !$this->isBeforeWhitespace), $parentTag->endIndex);
+                        $this->startIndex = min($tags->getNextWordsPosition($parentTag->startIndex, $numWords, ! $this->isBeforeWhitespace), $parentTag->endIndex);
                     }
                 }
             }
             // if no parentTag was found, we have to evaluate relative to the holder
-            if($this->startIndex < 0){
-                if($this->numWordsAfter > $this->numWordsBefore) {
+            if ($this->startIndex < 0) {
+                if ($this->numWordsAfter > $this->numWordsBefore) {
                     $numWords = round($this->numWordsAfter * $wordRatio);
                     $this->startIndex = $tags->getPrevWordsPosition($textLength, $numWords, $this->isBeforeWhitespace);
                 } else {
                     $numWords = round($this->numWordsBefore * $wordRatio);
-                    $this->startIndex = $tags->getNextWordsPosition(0, $numWords, !$this->isBeforeWhitespace);
+                    $this->startIndex = $tags->getNextWordsPosition(0, $numWords, ! $this->isBeforeWhitespace);
                 }
             }
-            if($this->endIndex < 0){
+            if ($this->endIndex < 0) {
                 $this->endIndex = $this->startIndex;
             }
         }
@@ -410,7 +409,8 @@ class Tag extends \editor_Segment_Tag {
 
     /* sequencing API */
 
-    public function sequence(\editor_TagSequence $tags, int $parentOrder){
+    public function sequence(\editor_TagSequence $tags, int $parentOrder)
+    {
         $this->prepareSequencing();
         parent::sequence($tags, $parentOrder);
     }
@@ -419,33 +419,34 @@ class Tag extends \editor_Segment_Tag {
      * This Method is called before the tag is sequenced when unparsing
      * We then add any tags at the end or start of our children to the start / end markup
      */
-    public function prepareSequencing(){
-        if($this->hasChildren()){
+    public function prepareSequencing()
+    {
+        if ($this->hasChildren()) {
             // we mark all nodes from the start & from the end, that have no text before/after them as lateral
             $numChildren = count($this->children);
             $hasLateral = false;
-            for($i = 0; $i < $numChildren; $i++){
-                if($this->children[$i]->getTextLength() > 0){
+            for ($i = 0; $i < $numChildren; $i++) {
+                if ($this->children[$i]->getTextLength() > 0) {
                     break;
                 }
-                if(!$this->children[$i]->isText()){
+                if (! $this->children[$i]->isText()) {
                     $hasLateral = $this->children[$i]->isLateral = true;
                 }
             }
-            for($i = $numChildren - 1; $i >= 0; $i--){
-                if($this->children[$i]->getTextLength() > 0){
+            for ($i = $numChildren - 1; $i >= 0; $i--) {
+                if ($this->children[$i]->getTextLength() > 0) {
                     break;
                 }
-                if(!$this->children[$i]->isText()){
+                if (! $this->children[$i]->isText()) {
                     $hasLateral = $this->children[$i]->isLateral = true;
                 }
             }
-            if($hasLateral){
+            if ($hasLateral) {
                 $children = [];
                 $isLeft = true;
-                for($i = 0; $i < $numChildren; $i++){
-                    if(!$this->children[$i]->isText() && $this->children[$i]->isLateral){
-                        if($isLeft){
+                for ($i = 0; $i < $numChildren; $i++) {
+                    if (! $this->children[$i]->isText() && $this->children[$i]->isLateral) {
+                        if ($isLeft) {
                             $this->afterStartMarkup .= $this->children[$i]->render();
                         } else {
                             $this->beforeEndMarkup .= $this->children[$i]->render();
@@ -462,40 +463,42 @@ class Tag extends \editor_Segment_Tag {
 
     /* Request Rendering API */
 
-    public function renderForRequest() : string {
-        if($this->isSingular()){
+    public function renderForRequest(): string
+    {
+        if ($this->isSingular()) {
             return $this->renderRequestTag('singular');
         }
+
         // instead of a opener & closer we render
-        return
-            $this->renderRequestTag('start')
-            .$this->renderChildrenForRequest()
-            .$this->renderRequestTag('end');
+        return $this->renderRequestTag('start')
+            . $this->renderChildrenForRequest()
+            . $this->renderRequestTag('end');
     }
+
     /**
      * renders the children for request
-     * @return string
      */
-    public function renderChildrenForRequest() : string {
+    public function renderChildrenForRequest(): string
+    {
         $html = '';
-        if($this->hasChildren()){
-            foreach($this->children as $child){
+        if ($this->hasChildren()) {
+            foreach ($this->children as $child) {
                 // we have either a TextNode or a repair-tag
-                if($child->isText()){
+                if ($child->isText()) {
                     $html .= $child->render();
                 } else {
                     $html .= $child->renderForRequest();
                 }
             }
         }
+
         return $html;
     }
-    /**
-     * @param string $type
-     * @return string
-     */
-    protected function renderRequestTag(string $type) : string {
+
+    protected function renderRequestTag(string $type): string
+    {
         $tag = str_replace('@TYPE@', $type, static::REQUEST_TAG_TPL);
+
         return str_replace('@TAGIDX@', strval($this->repairIdx), $tag);
     }
 
@@ -503,49 +506,53 @@ class Tag extends \editor_Segment_Tag {
 
     /**
      * Retrieves, if the tag potentially can be paired in the pairing phase
-     * @return bool
      */
-    public function canBePaired() : bool {
+    public function canBePaired(): bool
+    {
         return false;
     }
+
     /**
      * This API is called before consolidation and before rendering for request
      */
-    public function preparePairing(){
-
+    public function preparePairing()
+    {
     }
+
     /**
      * This API is called before consolidation and before rendering for request
-     * @param Tag $tag
      */
-    public function prePairWith(Tag $tag){
-
+    public function prePairWith(Tag $tag)
+    {
     }
 
     /* Rendering API */
 
-    protected function renderStart(bool $withDataAttribs=true) : string {
-        if($this->isComment()){
-            return '<!--'.$this->afterStartMarkup.'-->';
+    protected function renderStart(bool $withDataAttribs = true): string
+    {
+        if ($this->isComment()) {
+            return '<!--' . $this->afterStartMarkup . '-->';
         }
-        return parent::renderStart($withDataAttribs).$this->afterStartMarkup;
+
+        return parent::renderStart($withDataAttribs) . $this->afterStartMarkup;
     }
 
-    protected function renderEnd() : string {
-        return $this->beforeEndMarkup.parent::renderEnd();
+    protected function renderEnd(): string
+    {
+        return $this->beforeEndMarkup . parent::renderEnd();
     }
 
-    public function cloneForRendering(){
+    public function cloneForRendering()
+    {
         $clone = $this->clone(true, true);
         $clone->cloneOrder($this);
         $clone->setInnerMarkup($this->afterStartMarkup, $this->beforeEndMarkup);
+
         return $clone;
     }
-    /**
-     * @param string $afterStartMarkup
-     * @param string $beforeEndMarkup
-     */
-    protected function setInnerMarkup(string $afterStartMarkup, string $beforeEndMarkup){
+
+    protected function setInnerMarkup(string $afterStartMarkup, string $beforeEndMarkup)
+    {
         $this->afterStartMarkup = $afterStartMarkup;
         $this->beforeEndMarkup = $beforeEndMarkup;
     }
@@ -554,18 +561,19 @@ class Tag extends \editor_Segment_Tag {
 
     /**
      * Use in inheriting classes for further serialization
-     * @param \stdClass $data
      */
-    protected function furtherSerialize(\stdClass $data){
+    protected function furtherSerialize(\stdClass $data)
+    {
         $data->repairIdx = $this->repairIdx;
         $data->afterStartMarkup = $this->afterStartMarkup;
         $data->beforeEndMarkup = $this->beforeEndMarkup;
     }
+
     /**
      * Use in inheriting classes for further unserialization
-     * @param \stdClass $data
      */
-    protected function furtherUnserialize(\stdClass $data){
+    protected function furtherUnserialize(\stdClass $data)
+    {
         $this->repairIdx = intval($data->repairIdx);
         $this->afterStartMarkup = $data->afterStartMarkup;
         $this->beforeEndMarkup = $data->beforeEndMarkup;

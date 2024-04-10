@@ -22,7 +22,7 @@ START LICENSE AND COPYRIGHT
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
@@ -46,44 +46,44 @@ $SCRIPT_IDENTIFIER = '392-TRANSLATE-3341-tbx-files-are-kept-on-disk.php';
  * define database credential variables
  */
 $argc = count($argv);
-if(empty($this) || empty($argv) || $argc < 5 || $argc > 7) {
+if (empty($this) || empty($argv) || $argc < 5 || $argc > 7) {
     die("please dont call the script direct! Call it by using DBUpdater!\n\n");
 }
 
 //get the tbx import directory path
-$collectionPath=editor_Models_Import_TermListParser_Tbx::getFilesystemCollectionDir();
-if (!is_dir($collectionPath)){
+$collectionPath = editor_Models_Import_TermListParser_Tbx::getFilesystemCollectionDir();
+if (! is_dir($collectionPath)) {
     return;
 }
 
 //get the collection ids from the tbx folders
 //the layout of the folder is tc_+ termcollection id
 $dir = new DirectoryIterator($collectionPath);
-$collectionIds=[];
+$collectionIds = [];
 foreach ($dir as $fileinfo) {
-    if ($fileinfo->isDir() && !$fileinfo->isDot()) {
-        $name=explode('_', $fileinfo->getFilename());
-        if (count($name)==2 && $name[0] === 'tc' && is_numeric($name[1])){
-            $collectionIds[]=$name[1];
+    if ($fileinfo->isDir() && ! $fileinfo->isDot()) {
+        $name = explode('_', $fileinfo->getFilename());
+        if (count($name) == 2 && $name[0] === 'tc' && is_numeric($name[1])) {
+            $collectionIds[] = $name[1];
         }
     }
 }
 
-if(empty($collectionIds)){
+if (empty($collectionIds)) {
     return;
 }
 
 //find all valid term collections
 $db = Zend_Db_Table::getDefaultAdapter();
 $sql = 'SELECT `id` FROM `LEK_languageresources` 
-        WHERE serviceName="TermCollection" and `id` IN ('.$db->quote($collectionIds).')';
+        WHERE serviceName="TermCollection" and `id` IN (' . $db->quote($collectionIds) . ')';
 $res = $db->query($sql);
 $existingCollections = $res->fetchAll(Zend_Db::FETCH_COLUMN);
 //filter only the unexisting colections, so we delete only the unneeded folders and tbx files
 $collectionIds = array_diff($collectionIds, $existingCollections);
-$removedCount=0;
+$removedCount = 0;
 foreach ($collectionIds as $coll) {
-    $collectionPath=editor_Models_Import_TermListParser_Tbx::getFilesystemCollectionDir().'tc_'.$coll;
+    $collectionPath = editor_Models_Import_TermListParser_Tbx::getFilesystemCollectionDir() . 'tc_' . $coll;
     if (is_dir($collectionPath)) {
         $recursivedircleaner = ZfExtended_Zendoverwrites_Controller_Action_HelperBroker::getStaticHelper(
             'Recursivedircleaner'
@@ -93,4 +93,4 @@ foreach ($collectionIds as $coll) {
         $removedCount++;
     }
 }
-echo 'Old tbx cache data was removed from '.$removedCount.' directories.';
+echo 'Old tbx cache data was removed from ' . $removedCount . ' directories.';

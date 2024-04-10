@@ -21,23 +21,43 @@
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
- 		     http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
  END LICENSE AND COPYRIGHT
  */
 
-class editor_Plugins_Okapi_Db_Validator_BconfFilter extends ZfExtended_Models_Validator_Abstract {
+class editor_Plugins_Okapi_Db_Validator_BconfFilter extends ZfExtended_Models_Validator_Abstract
+{
     /**
      * Validators for Okapi Bconf Filter Entity
      */
-    protected function defineValidators() {
+    protected function defineValidators()
+    {
         $this->addValidator('id', 'int');
         $this->addValidator('bconfId', 'int');
-        $this->addValidator('okapiType', 'stringLength', array('min' => 1, 'max' => 50));
-        $this->addValidator('okapiId', 'stringLength', array('min' => 1, 'max' => 255));
-        $this->addValidator('mimeType', 'stringLength', array('min' => 0, 'max' => 50));
-        $this->addValidator('name', 'stringLength', array('min' => 1, 'max' => 100));
-        $this->addValidator('description', 'stringLength', array('min' => 0, 'max' => 255));
-        $this->addValidator('hash', 'stringLength', array('min' => 32, 'max' => 32));
+        $this->addValidator('okapiType', 'stringLength', [
+            'min' => 1,
+            'max' => 50,
+        ]);
+        $this->addValidator('okapiId', 'stringLength', [
+            'min' => 1,
+            'max' => 255,
+        ]);
+        $this->addValidator('mimeType', 'stringLength', [
+            'min' => 0,
+            'max' => 50,
+        ]);
+        $this->addValidator('name', 'stringLength', [
+            'min' => 1,
+            'max' => 100,
+        ]);
+        $this->addValidator('description', 'stringLength', [
+            'min' => 0,
+            'max' => 255,
+        ]);
+        $this->addValidator('hash', 'stringLength', [
+            'min' => 32,
+            'max' => 32,
+        ]);
     }
 }

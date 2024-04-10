@@ -45,42 +45,42 @@ $SCRIPT_IDENTIFIER = '369-TRANSLATE-2932-Okapi-Filters-cleanup.php';
  * define database credential variables
  */
 $argc = count($argv);
-if(empty($this) || empty($argv) || $argc < 5 || $argc > 7) {
+if (empty($this) || empty($argv) || $argc < 5 || $argc > 7) {
     die("please dont call the script direct! Call it by using DBUpdater!\n\n");
 }
 
-if(!class_exists('editor_Plugins_Okapi_Bconf_Entity')) {
+if (! class_exists('editor_Plugins_Okapi_Bconf_Entity')) {
     return;
 }
 
 $deletaAll = false;
 $existingIds = [];
 $db = Zend_Db_Table::getDefaultAdapter();
+
 try {
     //get all available IDs
     $existingIds = $db->query('SELECT `id` FROM `LEK_okapi_bconf`')
         ->fetchAll(PDO::FETCH_COLUMN);
 } catch (Zend_Db_Statement_Exception $e) {
-    if(str_contains($e->getMessage(), 'Base table or view not found')) {
+    if (str_contains($e->getMessage(), 'Base table or view not found')) {
         // if table is not there, all files can be deleted
         $deletaAll = true;
-    }
-    else {
+    } else {
         throw $e;
     }
 }
+
 try {
     $rootDir = editor_Plugins_Okapi_Bconf_Entity::getUserDataDir();
     $directories = scandir($rootDir);
     foreach ($directories as $dir) {
-        if(in_array($dir, ['.', '..'])) {
+        if (in_array($dir, ['.', '..'])) {
             continue;
         }
-        if(!in_array($dir, $existingIds) || $deletaAll || $dir == 'tmp') {
-            ZfExtended_Utils::recursiveDelete($rootDir.DIRECTORY_SEPARATOR.$dir);
-            error_log('DELETED editorOkapiDir/'.$dir);
+        if (! in_array($dir, $existingIds) || $deletaAll || $dir == 'tmp') {
+            ZfExtended_Utils::recursiveDelete($rootDir . DIRECTORY_SEPARATOR . $dir);
+            error_log('DELETED editorOkapiDir/' . $dir);
         }
-
     }
 } catch (editor_Plugins_Okapi_Exception $e) {
     //do nothing here

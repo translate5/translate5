@@ -1,4 +1,5 @@
-<?php 
+<?php
+
 /*
 START LICENSE AND COPYRIGHT
 
@@ -47,7 +48,7 @@ $SCRIPT_IDENTIFIER = '345-TRANSLATE-2797-tbx-import-damage-datatypes.php';
  * define database credential variables
  */
 $argc = count($argv);
-if(empty($this) || empty($argv) || $argc < 5 || $argc > 7) {
+if (empty($this) || empty($argv) || $argc < 5 || $argc > 7) {
     die("please dont call the script direct! Call it by using DBUpdater!\n\n");
 }
 
@@ -56,16 +57,16 @@ $log = Zend_Registry::get('logger');
 
 $checker = new editor_Models_Terminology_DataTypeConsistencyCheck();
 $invalidDataTypes = $checker->checkAttributesAgainstDataTypes();
-if(!empty($invalidDataTypes)){
+if (! empty($invalidDataTypes)) {
     $log->error('E9999', 'Script 345-TRANSLATE-2797-tbx-import-damage-datatypes found inconsistent data!', [
-        'invalidDataTypes' => $invalidDataTypes
+        'invalidDataTypes' => $invalidDataTypes,
     ]);
 }
 
 $invalidAgainstDefault = $checker->checkDataTypesAgainstDefault();
 
-if(!empty($invalidAgainstDefault['notFound']) || !empty($invalidAgainstDefault['differentContent'])) {
+if (! empty($invalidAgainstDefault['notFound']) || ! empty($invalidAgainstDefault['differentContent'])) {
     $log->error('E9999', 'Script 345-TRANSLATE-2797-tbx-import-damage-datatypes found modified default datatypes!', [
-        'invalidAgainstDefault' => $invalidAgainstDefault
+        'invalidAgainstDefault' => $invalidAgainstDefault,
     ]);
 }

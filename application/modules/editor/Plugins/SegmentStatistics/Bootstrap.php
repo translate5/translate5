@@ -3,7 +3,7 @@
 START LICENSE AND COPYRIGHT
 
  This file is part of translate5
- 
+
  Copyright (c) 2013 - 2021 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
 
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
@@ -13,15 +13,15 @@ START LICENSE AND COPYRIGHT
  included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
-  
+
  There is a plugin exception available for use with this release of translate5 for
  translate5: Please see http://www.translate5.net/plugin-exception.txt or
  plugin-exception.txt in the root folder of translate5.
-  
+
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
@@ -37,13 +37,11 @@ class editor_Plugins_SegmentStatistics_Bootstrap extends ZfExtended_Plugin_Abstr
 
     /**
      * Just for better readability
-     * @var string
      */
     protected string $typeImport = editor_Plugins_SegmentStatistics_Worker::TYPE_IMPORT;
 
     /**
      * Just for better readability
-     * @var string
      */
     protected string $typeExport = editor_Plugins_SegmentStatistics_Worker::TYPE_EXPORT;
 
@@ -97,7 +95,6 @@ class editor_Plugins_SegmentStatistics_Bootstrap extends ZfExtended_Plugin_Abstr
 
     /**
      * handler for event: editor_Models_Export#afterExport
-     * @param Zend_EventManager_Event $event
      */
     public function handleAfterExport(Zend_EventManager_Event $event): void
     {
@@ -114,7 +111,6 @@ class editor_Plugins_SegmentStatistics_Bootstrap extends ZfExtended_Plugin_Abstr
     }
 
     /**
-     * @param editor_Models_Task $task
      * @param string $worker worker class name
      * @param string $type im- or export
      */
@@ -124,7 +120,9 @@ class editor_Plugins_SegmentStatistics_Bootstrap extends ZfExtended_Plugin_Abstr
         $task = $event->getParam('task');
         $worker = ZfExtended_Factory::get($worker);
         /* @var $worker editor_Plugins_SegmentStatistics_Worker */
-        $worker->init($task->getTaskGuid(), array('type' => $type));
+        $worker->init($task->getTaskGuid(), [
+            'type' => $type,
+        ]);
         $worker->queue($parentId);
     }
 }

@@ -21,11 +21,11 @@ START LICENSE AND COPYRIGHT
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace MittagQI\Translate5\Task\Reimport;
 
@@ -48,16 +48,15 @@ class FileparserRegistry
         editor_Models_Import_FileParser_Xlf::class => Xliff::class,
         editor_Models_Import_FileParser_Xml::class => Xliff::class,
     ];
+
     private array $supportedFileExtensions = [];
 
-    /**
-     * @return FileparserRegistry
-     */
     public static function getInstance(): self
     {
         if (empty(self::$singleton)) {
             self::$singleton = new self();
         }
+
         return self::$singleton;
     }
 
@@ -73,9 +72,6 @@ class FileparserRegistry
     }
 
     /**
-     * @param string $fileparserClass
-     * @param string $reimporterClass
-     * @return void
      * @throws ZfExtended_Exception
      */
     public function addFileparser(string $fileparserClass, string $reimporterClass): void
@@ -110,12 +106,11 @@ class FileparserRegistry
                 }
             } while (($class = get_parent_class($class)) !== false);
         }
+
         return null;
     }
 
     /**
-     * @param string $fileparser
-     * @return void
      * @throws ZfExtended_Exception
      */
     private function mergeSupportedExtensions(string $fileparser): void
@@ -130,8 +125,6 @@ class FileparserRegistry
 
     /**
      * returns true if the given file parser has re-import functionality
-     * @param string $fileparser
-     * @return bool
      */
     public function isSupported(string $fileparser): bool
     {

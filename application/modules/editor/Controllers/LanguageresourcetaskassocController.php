@@ -3,25 +3,25 @@
 START LICENSE AND COPYRIGHT
 
  This file is part of translate5
- 
+
  Copyright (c) 2013 - 2021 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
 
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
  This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
- as published by the Free Software Foundation and appearing in the file agpl3-license.txt 
- included in the packaging of this file.  Please review the following information 
+ as published by the Free Software Foundation and appearing in the file agpl3-license.txt
+ included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
-  
+
  There is a plugin exception available for use with this release of translate5 for
- translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or
  plugin-exception.txt in the root folder of translate5.
-  
+
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
@@ -31,50 +31,50 @@ use MittagQI\Translate5\LanguageResource\TaskAssociation;
 /**
  * Controller for the LanguageResources Associations
  */
-class editor_LanguageresourcetaskassocController extends ZfExtended_RestController {
-
+class editor_LanguageresourcetaskassocController extends ZfExtended_RestController
+{
     protected $entityClass = 'MittagQI\Translate5\LanguageResource\TaskAssociation'; //→ _Taskassoc
 
     /**
      * @var MittagQI\Translate5\LanguageResource\TaskAssociation;
      */
     protected $entity;
-    
+
     /**
      * ignoring ID field for POST Requests
      * @var array
      */
-    protected $postBlacklist = array('id');
-    
-    public function init() {
+    protected $postBlacklist = ['id'];
+
+    public function init()
+    {
         ZfExtended_Models_Entity_Conflict::addCodes([
             'E1050' => 'Referenced language resource not found.',
             'E1051' => 'Cannot remove language resource from task since task is used at the moment.',
         ], 'editor.languageresource.taskassoc');
         parent::init();
     }
-    
+
     /**
      * (non-PHPdoc)
      * @see ZfExtended_RestController::indexAction()
      */
-    public function indexAction(){
+    public function indexAction()
+    {
         $filter = $this->entity->getFilter();
-        if(!$filter->hasFilter('taskGuid', $taskGuid)) { //handle the rest default case
+        if (! $filter->hasFilter('taskGuid', $taskGuid)) { //handle the rest default case
             $this->view->rows = $this->entity->loadAll();
             $this->view->total = $this->entity->getTotalCount();
+
             return;
         }
-        
-        $result=$this->entity->getAssocTasksWithResources($taskGuid->value);
-        
+
+        $result = $this->entity->getAssocTasksWithResources($taskGuid->value);
+
         $this->view->rows = $result;
         $this->view->total = count($result);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function postAction(): void
     {
         try {
@@ -87,52 +87,52 @@ class editor_LanguageresourcetaskassocController extends ZfExtended_RestControll
             $this->view->rows = $this->entity->getDataObject();
         }
     }
-    
-    public function deleteAction(){
+
+    public function deleteAction()
+    {
         try {
             $this->entityLoad();
             $task = ZfExtended_Factory::get('editor_Models_Task');
             /* @var $task editor_Models_Task */
-            if($task->isUsed($this->entity->getTaskGuid())) {
-                throw ZfExtended_Models_Entity_Conflict::createResponse('E1050',[
-                    'Die Aufgabe wird bearbeitet, die Sprachressource kann daher im Moment nicht von der Aufgabe entfernt werden!'
+            if ($task->isUsed($this->entity->getTaskGuid())) {
+                throw ZfExtended_Models_Entity_Conflict::createResponse('E1050', [
+                    'Die Aufgabe wird bearbeitet, die Sprachressource kann daher im Moment nicht von der Aufgabe entfernt werden!',
                 ]);
             }
-            $clone=clone $this->entity;
+            $clone = clone $this->entity;
             $this->entity->delete();
-            $this->fireAfterAssocChangeEvent('delete' ,$clone);
-        }
-        catch(ZfExtended_Models_Entity_NotFoundException $e) {
+            $this->fireAfterAssocChangeEvent('delete', $clone);
+        } catch (ZfExtended_Models_Entity_NotFoundException $e) {
             //do nothing since it was already deleted, and thats ok since user tried to delete it
         }
     }
-    
+
     /**
      * does some prechecking of the data
      * {@inheritDoc}
      * @see ZfExtended_RestController::decodePutData()
-     * @return void
      */
     protected function decodePutData()
     {
         parent::decodePutData();
-        
+
         //this flag may not be set via API
         unset($this->data->autoCreatedOnImport);
-        
+
         $languageresource = ZfExtended_Factory::get('editor_Models_LanguageResources_LanguageResource');
+
         /* @var $languageresource editor_Models_LanguageResources_LanguageResource */
         try {
             $languageresource->load($this->data->languageResourceId);
         } catch (ZfExtended_NotFoundException) {
             throw ZfExtended_Models_Entity_Conflict::createResponse('E1050', [
-                'languageResourceId' => 'Die gewünschte Sprachressource gibt es nicht!'
+                'languageResourceId' => 'Die gewünschte Sprachressource gibt es nicht!',
             ], [
-                'languageresourceId' => $this->data->languageResourceId
+                'languageresourceId' => $this->data->languageResourceId,
             ]);
         }
         $resource = $languageresource->getResource();
-        
+
         //segments can only be updated when resource is writable:
         $this->data->segmentsUpdateable = $resource->getWritable() && $this->data->segmentsUpdateable;
     }
@@ -147,18 +147,20 @@ class editor_LanguageresourcetaskassocController extends ZfExtended_RestControll
      * @param TaskAssociation $entity
      * @return editor_Models_LanguageResources_LanguageResource
      */
-    protected function fireAfterAssocChangeEvent($action,TaskAssociation $entity): editor_Models_LanguageResources_LanguageResource{
+    protected function fireAfterAssocChangeEvent($action, TaskAssociation $entity): editor_Models_LanguageResources_LanguageResource
+    {
         $lr = ZfExtended_Factory::get('editor_Models_LanguageResources_LanguageResource');
         /* @var $lr editor_Models_LanguageResources_LanguageResource */
         $lr->load($entity->getLanguageResourceId());
-        
+
         //fire event with name of the saved language resource service name
         //separate with # so it is more clear that is is not regular after/before action event
         //ex: afterPost#OpenTM2
-        $eventName="after".ucfirst($action).'#'.$lr->getServiceName();
-        $this->events->trigger($eventName, $this, array(
+        $eventName = "after" . ucfirst($action) . '#' . $lr->getServiceName();
+        $this->events->trigger($eventName, $this, [
             'entity' => $entity,
-        ));
+        ]);
+
         return $lr;
     }
 }

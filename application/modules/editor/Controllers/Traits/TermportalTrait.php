@@ -21,41 +21,39 @@ START LICENSE AND COPYRIGHT
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
 
-trait editor_Controllers_Traits_TermportalTrait {
-
+trait editor_Controllers_Traits_TermportalTrait
+{
     // Declare trait usage
     use editor_Controllers_Traits_ControllerTrait;
 
     /**
      * Get [attrId => readonly] pairs for the current user
      *
-     * @param array $attrIds
      * @param bool $canDeleteOwn Flag indicating whether current user can't delete any attributes, but can delete own ones
-     * @return array
      * @throws Zend_Db_Statement_Exception
      */
-    public function getReadonlyFlags(array $attrIds, bool $canDeleteOwn = true) : array {
-
+    public function getReadonlyFlags(array $attrIds, bool $canDeleteOwn = true): array
+    {
         // Collect rights
         $rights = [];
         foreach (['propose', 'review', 'finalize'] as $right) {
             if ($this->isAllowed('editor_term', $right)) {
-                $rights []= $right;
+                $rights[] = $right;
             }
         }
 
         // Get [attrId => readonly] pairs
         return ZfExtended_Factory
             ::get('editor_Models_Terminology_Models_AttributeModel')
-            ->getReadonlyByIds(
-                $attrIds,
-                $canDeleteOwn ? $this->user()->getId() : false,
-                $rights
-            );
+                ->getReadonlyByIds(
+                    $attrIds,
+                    $canDeleteOwn ? $this->user()->getId() : false,
+                    $rights
+                );
     }
 }

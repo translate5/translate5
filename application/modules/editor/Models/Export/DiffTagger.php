@@ -3,25 +3,25 @@
 START LICENSE AND COPYRIGHT
 
  This file is part of translate5
- 
+
  Copyright (c) 2013 - 2021 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
 
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
  This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
- as published by the Free Software Foundation and appearing in the file agpl3-license.txt 
- included in the packaging of this file.  Please review the following information 
+ as published by the Free Software Foundation and appearing in the file agpl3-license.txt
+ included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
-  
+
  There is a plugin exception available for use with this release of translate5 for
- translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or
  plugin-exception.txt in the root folder of translate5.
-  
+
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
@@ -37,49 +37,51 @@ END LICENSE AND COPYRIGHT
  *
  */
 
-abstract class editor_Models_Export_DiffTagger {
-
+abstract class editor_Models_Export_DiffTagger
+{
     /***
      * Insert tag string
      * @var string
      */
-    const INSERT_TAG="ins";
+    public const INSERT_TAG = "ins";
 
     /***
      * Delete tag string
      * @var string
      */
-    const DELETE_TAG="del";
+    public const DELETE_TAG = "del";
 
     /***
      * Delete tag attributes. Defined as key value, where the key is the attribute name, and the value is the attribute value
      * @var array
      */
-    public  $deleteTagAttributes=array();
+    public $deleteTagAttributes = [];
 
     /***
      * Insert tag attributes. Defined as key value, where the key is the attribute name, and the value is the attribute value
      * @var array
      */
-    public  $insertTagAttributes=array();
+    public $insertTagAttributes = [];
 
     /**
      * @var array Regexes which define the opening and closing add changemarks
      */
-    protected $_regexChangeMark = array('OpeningAdd'=>null,'ClosingAdd'=>null);
+    protected $_regexChangeMark = [
+        'OpeningAdd' => null,
+        'ClosingAdd' => null,
+    ];
 
     /**
-     *
      * timestamp is a Unix-Timestamp
-     * @var array $_additions array(array('guid'=>(string)'','timestamp'=>(string)'','username'=>''),...)
+     * @var array array(array('guid'=>(string)'','timestamp'=>(string)'','username'=>''),...)
      */
-    public $_additions = array();
+    public $_additions = [];
+
     /**
-     *
      * timestamp is a Unix-Timestamp
-     * @var array $_deletions array(array('guid'=>(string)'','timestamp'=>(string)'','username'=>''),...)
+     * @var array array(array('guid'=>(string)'','timestamp'=>(string)'','username'=>''),...)
      */
-    public $_deletions = array();
+    public $_deletions = [];
 
     /**
      * zeichnet ein einzelnes Segment aus
@@ -89,9 +91,8 @@ abstract class editor_Models_Export_DiffTagger {
      * @param string $changeTimestamp Zeitpunkt der letzten Änderung des Segments
      * @param string $userName Benutzername des Lektors
      * @return string $edited mit diff-Syntax fertig ausgezeichnet
-     *
      */
-    abstract public function diffSegment($target, $edited,$changeTimestamp,$userName);
+    abstract public function diffSegment($target, $edited, $changeTimestamp, $userName);
 
     /**
      * Zerlegt die Wortteile des segment-Arrays anhand der Wortgrenzen in ein Array,
@@ -103,7 +104,8 @@ abstract class editor_Models_Export_DiffTagger {
      * @param array $segment
      * @return array $segment
      */
-    protected function wordBreakUp($segment){
+    protected function wordBreakUp($segment)
+    {
         return editor_Utils::wordBreakUp($segment);
     }
 
@@ -116,7 +118,8 @@ abstract class editor_Models_Export_DiffTagger {
      * @param string $segment
      * @return array $segment
      */
-    protected  function tagBreakUp($segment){
+    protected function tagBreakUp($segment)
+    {
         return editor_Utils::tagBreakUp($segment);
     }
 
@@ -127,19 +130,18 @@ abstract class editor_Models_Export_DiffTagger {
      * @param string $changeTimestamp
      * @param string $userName
      * @param boolean $addition true → addition, false → deletion
-     * @return string
      */
-    protected function addRevision($changeTimestamp, $userName, $addition = true): string{
+    protected function addRevision($changeTimestamp, $userName, $addition = true): string
+    {
         $revision = [
-            'guid'=>ZfExtended_Utils::uuid(),
-            'timestamp'=>$changeTimestamp,
-            'username'=>$userName
+            'guid' => ZfExtended_Utils::uuid(),
+            'timestamp' => $changeTimestamp,
+            'username' => $userName,
         ];
 
-        if($addition) {
+        if ($addition) {
             $this->_additions[] = $revision;
-        }
-        else {
+        } else {
             $this->_deletions[] = $revision;
         }
 
@@ -153,33 +155,36 @@ abstract class editor_Models_Export_DiffTagger {
      * array('OpeningAdd'=>null,'ClosingAdd'=>null,'OpeningDel'=>null,'ClosingDel'=>null);
      */
     //stand: tagremoval funzt noch nicht, wenn changes daneben und diff zeichnet neben tag auch nicht verändertes mit aus
-    protected function removeChangeMarksFromXliffQmTags($segment){
-        if(in_array(null, $this->_regexChangeMark, true)){
+    protected function removeChangeMarksFromXliffQmTags($segment)
+    {
+        if (in_array(null, $this->_regexChangeMark, true)) {
             throw new Zend_Exception('Regex for removal of changemarks is NULL');
         }
-        $mqm = array();
-        $callback = function ($matches) use(&$mqm){
+        $mqm = [];
+        $callback = function ($matches) use (&$mqm) {
             $nr = count($mqm);
             $mqm[] = $matches[0];
-            return '~'.$nr.'~';
+
+            return '~' . $nr . '~';
         };
         $segment = str_replace('~', '______tilde_translate5_____', $segment);
-        $segment = preg_replace_callback('"(<mqm:[^>]*>)"',$callback,$segment);
-        $search = array(
-            '"'.$this->_regexChangeMark['OpeningAdd'].
-                '([~\d]+)'.$this->_regexChangeMark['ClosingAdd'].
+        $segment = preg_replace_callback('"(<mqm:[^>]*>)"', $callback, $segment);
+        $search = [
+            '"' . $this->_regexChangeMark['OpeningAdd'] .
+                '([~\d]+)' . $this->_regexChangeMark['ClosingAdd'] .
                 '"',
-            '"([~\d]+)('.$this->_regexChangeMark['ClosingAdd'].
+            '"([~\d]+)(' . $this->_regexChangeMark['ClosingAdd'] .
                 ')"',
-            '"('.$this->_regexChangeMark['OpeningAdd'].
-                ')([~\d]+)"'
-            );
-        $segment = preg_replace($search, array('\\1','\\2\\1','\\2\\1'), $segment);
+            '"(' . $this->_regexChangeMark['OpeningAdd'] .
+                ')([~\d]+)"',
+        ];
+        $segment = preg_replace($search, ['\\1', '\\2\\1', '\\2\\1'], $segment);
         $count = count($mqm);
-        for($i=0; $i<$count; $i++){
-            $segment = str_replace('~'.$i.'~', $mqm[$i], $segment);
+        for ($i = 0; $i < $count; $i++) {
+            $segment = str_replace('~' . $i . '~', $mqm[$i], $segment);
         }
-        return str_replace('______tilde_translate5_____','~', $segment);
+
+        return str_replace('______tilde_translate5_____', '~', $segment);
     }
 
     /***
@@ -188,25 +193,26 @@ abstract class editor_Models_Export_DiffTagger {
      * @param string $content
      * @return string
      */
-    protected function surroundWith($tag,$content){
+    protected function surroundWith($tag, $content)
+    {
         //check which attribute array should be used
-        $attributes=null;
-        if($tag==self::INSERT_TAG){
-            $attributes=$this->insertTagAttributes;
-        }else{
-            $attributes=$this->deleteTagAttributes;
+        $attributes = null;
+        if ($tag == self::INSERT_TAG) {
+            $attributes = $this->insertTagAttributes;
+        } else {
+            $attributes = $this->deleteTagAttributes;
         }
 
         //build the opening tag and add the attributes
-        $tagcontent=[];
-        $tagcontent[]='<'.$tag;
-        foreach ($attributes as $att=>$value) {
-            $tagcontent[]=' '.$att.'="'.$value.'" ';
+        $tagcontent = [];
+        $tagcontent[] = '<' . $tag;
+        foreach ($attributes as $att => $value) {
+            $tagcontent[] = ' ' . $att . '="' . $value . '" ';
         }
-        $tagcontent[]='>';
+        $tagcontent[] = '>';
         //apply the content
-        $tagcontent[]=$content;
-        $tagcontent[]='</'.$tag.'>';
+        $tagcontent[] = $content;
+        $tagcontent[] = '</' . $tag . '>';
 
         //merge the content as string
         return implode('', $tagcontent);
@@ -217,7 +223,8 @@ abstract class editor_Models_Export_DiffTagger {
      * @param string $content
      * @return string
      */
-    protected function surroundWithIns($content){
+    protected function surroundWithIns($content)
+    {
         return $this->surroundWith(self::INSERT_TAG, $content);
     }
 
@@ -226,7 +233,8 @@ abstract class editor_Models_Export_DiffTagger {
      * @param string $content
      * @return string
      */
-    protected function surroundWithDel($content){
+    protected function surroundWithDel($content)
+    {
         return $this->surroundWith(self::DELETE_TAG, $content);
     }
 }

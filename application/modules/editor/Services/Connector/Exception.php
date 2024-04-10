@@ -3,7 +3,7 @@
 START LICENSE AND COPYRIGHT
 
  This file is part of translate5
- 
+
  Copyright (c) 2013 - 2021 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
 
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
@@ -13,11 +13,11 @@ START LICENSE AND COPYRIGHT
  included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
-  
+
  There is a plugin exception available for use with this release of translate5 for
  translate5: Please see http://www.translate5.net/plugin-exception.txt or
  plugin-exception.txt in the root folder of translate5.
-  
+
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
@@ -53,10 +53,11 @@ class editor_Services_Connector_Exception extends ZfExtended_BadGatewayErrorCode
         'E1537' => 'Request to service {service}: Invalid response.',
         'E1564' => 't5memory: Language Resource [{name}] has no writable memory in list',
         'E1565' => 'Invalid offset provided. Should be: tmId:offset',
-        'E1586' => 'Segment appeared to be not saved to TM properly'
+        'E1586' => 'Segment appeared to be not saved to TM properly',
     ];
-    
-    protected function setDuplication() {
+
+    protected function setDuplication()
+    {
         parent::setDuplication();
         ZfExtended_Logger::addDuplicatesByMessage('E1311', 'E1312', 'E1370', 'E1485', 'E1486', 'E1512');
     }

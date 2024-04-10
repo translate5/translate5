@@ -49,6 +49,7 @@ final class T5MemoryReorganizeCommand extends Translate5AbstractCommand
     protected static $defaultName = 't5memory:reorganize|memory:reorganize';
 
     private const OPTION_TM_NAME = 'tmName';
+
     private const ARGUMENT_UUID = 'uuid';
 
     protected function configure(): void
@@ -107,7 +108,7 @@ final class T5MemoryReorganizeCommand extends Translate5AbstractCommand
             $helper = $this->getHelper('question');
             $question = new ConfirmationQuestion('Do you really want to proceed? (Y/N)', false);
 
-            if (!$helper->ask($this->input, $this->output, $question)) {
+            if (! $helper->ask($this->input, $this->output, $question)) {
                 return null;
             }
         }
@@ -120,7 +121,6 @@ final class T5MemoryReorganizeCommand extends Translate5AbstractCommand
         $result = $connector->getApi()->getResult();
 
         if (property_exists($result, 'invalidSegmentCount')) {
-
             $invalid = (int) $result->invalidSegmentCount;
             $overall = (int) $result->reorganizedSegmentCount;
             $msg = $invalid . ' segments of ' . $overall . ' have been invalid/lost while reorganizing';
@@ -130,6 +130,7 @@ final class T5MemoryReorganizeCommand extends Translate5AbstractCommand
                 $this->io->info($msg);
             }
         }
+
         return $success;
     }
 

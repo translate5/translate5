@@ -53,13 +53,13 @@ declare(strict_types=1);
 namespace MittagQI\Translate5\Task\Import;
 
 use editor_Models_Task;
+use MittagQI\ZfExtended\Worker\Trigger\Factory as WorkerTriggerFactory;
 use ReflectionException;
 use Zend_Exception;
 use Zend_Registry;
 use ZfExtended_Factory;
 use ZfExtended_Models_Entity_NotFoundException;
 use ZfExtended_Models_Worker;
-use MittagQI\ZfExtended\Worker\Trigger\Factory as WorkerTriggerFactory;
 
 class DanglingImportsCleaner
 {
@@ -76,7 +76,7 @@ class DanglingImportsCleaner
         $worker = ZfExtended_Factory::get(ZfExtended_Models_Worker::class);
 
         $config = Zend_Registry::get('config');
-        $hours = (int)($config->runtimeOptions->import->timeout ?? 48);
+        $hours = (int) ($config->runtimeOptions->import->timeout ?? 48);
         $s = $task->db->select()
             ->where('state = ?', $task::STATE_IMPORT)
             ->where('created < DATE_SUB(NOW(), INTERVAL ? HOUR)', $hours);
@@ -103,7 +103,7 @@ class DanglingImportsCleaner
                 $worker->wakeupScheduled();
 
                 WorkerTriggerFactory::create()->triggerWorker(
-                    (string)$worker->getId(),
+                    (string) $worker->getId(),
                     $worker->getHash(),
                     $worker->getWorker(),
                     $task->getTaskGuid()

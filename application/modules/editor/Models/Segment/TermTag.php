@@ -21,7 +21,7 @@ START LICENSE AND COPYRIGHT
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
@@ -31,29 +31,25 @@ END LICENSE AND COPYRIGHT
  * This class contains the regex definition and related helper methods to term tags of translate5
  *
  * TO BE COMPLETED: There are several more places in translate5 which can make use of this class
- *
  */
 class editor_Models_Segment_TermTag
 {
     /**
      * @var string
      */
-    const REGEX_TERM_TAG_START = '/<div[^>]+((class="([^"]*)"[^>]+data-tbxid="([^"]*)")|(data-tbxid="([^"]*)"[^>]+class="([^"]*)"))[^>]*>/';
-    // just for historcal documentation: in the export the following regex was used: $termRegex = '/<div[^>]+class="term([^"]+)"\s+data-tbxid="([^"]+)"[^>]*>/s';
-    const STRING_TERM_TAG_END = '</div>';
+    public const REGEX_TERM_TAG_START = '/<div[^>]+((class="([^"]*)"[^>]+data-tbxid="([^"]*)")|(data-tbxid="([^"]*)"[^>]+class="([^"]*)"))[^>]*>/';
 
-    /**
-     * @var editor_Models_Segment_InternalTag
-     */
+    // just for historcal documentation: in the export the following regex was used: $termRegex = '/<div[^>]+class="term([^"]+)"\s+data-tbxid="([^"]+)"[^>]*>/s';
+    public const STRING_TERM_TAG_END = '</div>';
+
     protected editor_Models_Segment_InternalTag $internalTags;
 
     /**
      * Optional internalTag Instance, if not given it is created internally
-     * @param editor_Models_Segment_InternalTag|null $internalTag
      */
     public function __construct(editor_Models_Segment_InternalTag $internalTag = null)
     {
-        if (!empty($internalTag)) {
+        if (! empty($internalTag)) {
             $this->internalTags = $internalTag;
         }
     }
@@ -73,10 +69,8 @@ class editor_Models_Segment_TermTag
      * replaces term tags with either the callback or the given scalar
      * see preg_replace
      * see preg_replace_callback
-     * @param string $segment
-     * @param string|Callable $startTagReplacer If callable, parameters: $wholeMatch, $tbxId, array $cssClasses, $wholeSegment
+     * @param string|callable $startTagReplacer If callable, parameters: $wholeMatch, $tbxId, array $cssClasses, $wholeSegment
      * @param string $endTagReplacer scalar only, since str_replace is used insted of preg_replace
-     * @param bool $preserveInternal
      * @return mixed
      */
     public function replace(string $segment, $startTagReplacer, string $endTagReplacer, bool $preserveInternal = false): string
@@ -86,8 +80,8 @@ class editor_Models_Segment_TermTag
             $segment = $this->internalTags->protect($segment);
         }
         //if using a callback, we have to prepare matches to be the parameters
-        if (!is_string($startTagReplacer) && is_callable($startTagReplacer)) {
-            $replacer = function($match) use ($startTagReplacer, $segment) {
+        if (! is_string($startTagReplacer) && is_callable($startTagReplacer)) {
+            $replacer = function ($match) use ($startTagReplacer, $segment) {
                 $result = array_values($this->parseMatches($match));
                 array_unshift($result, $match[0]);
                 $result[] = $segment;
@@ -112,7 +106,6 @@ class editor_Models_Segment_TermTag
      * Removes term tags. Warning: if unsure if your content contains internal tags set parameter preserveInternal to true!
      * @param string $segment the segment content
      * @param bool $preserveInternal if true, internal tags are masked before removing term tags.
-     * @return string
      */
     public function remove(string $segment, bool $preserveInternal = false): string
     {
@@ -134,8 +127,6 @@ class editor_Models_Segment_TermTag
 
     /**
      * parses all term tags and returns a list with the tbxid (mid) and the css classes as array
-     * @param string $segment
-     * @return array
      */
     public function getInfos(string $segment): array
     {
@@ -151,7 +142,6 @@ class editor_Models_Segment_TermTag
 
     /**
      * parses the preg_ matches array for the term start tag regex
-     * @param array $match
      */
     protected function parseMatches(array $match): array
     {
@@ -166,6 +156,9 @@ class editor_Models_Segment_TermTag
             $classes = $match[7];
         }
 
-        return ['termId' => $termId, 'classes' => explode(' ', $classes)];
+        return [
+            'termId' => $termId,
+            'classes' => explode(' ', $classes),
+        ];
     }
 }

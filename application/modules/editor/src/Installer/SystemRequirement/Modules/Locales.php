@@ -3,7 +3,7 @@
 START LICENSE AND COPYRIGHT
 
  This file is part of translate5
- 
+
  Copyright (c) 2013 - 2021 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
 
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
@@ -13,15 +13,15 @@ START LICENSE AND COPYRIGHT
  included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
-  
+
  There is a plugin exception available for use with this release of translate5 for
  translate5: Please see http://www.translate5.net/plugin-exception.txt or
  plugin-exception.txt in the root folder of translate5.
-  
+
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
@@ -40,9 +40,7 @@ use ZfExtended_Zendoverwrites_Translate;
  */
 class Locales extends ZfExtended_Models_SystemRequirement_Modules_Abstract
 {
-
     /**
-     * {@inheritDoc}
      * @throws Zend_Exception
      * @see ZfExtended_Models_SystemRequirement_Modules_Abstract::validate()
      */
@@ -73,10 +71,10 @@ class Locales extends ZfExtended_Models_SystemRequirement_Modules_Abstract
         libxml_clear_errors(); //empty the error collector first!
         $doc = new DOMDocument();
         libxml_use_internal_errors(true);
-        if (!$doc->load($fileName)) {
+        if (! $doc->load($fileName)) {
             $errors = libxml_get_errors();
 
-            if (!empty($errors)) {
+            if (! empty($errors)) {
                 $errors = join(
                     '',
                     array_map(function ($error) {

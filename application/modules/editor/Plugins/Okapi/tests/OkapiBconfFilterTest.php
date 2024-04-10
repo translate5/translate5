@@ -3,7 +3,7 @@
 START LICENSE AND COPYRIGHT
 
  This file is part of translate5
- 
+
  Copyright (c) 2013 - 2022 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
 
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
@@ -13,21 +13,21 @@ START LICENSE AND COPYRIGHT
  included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
-  
+
  There is a plugin exception available for use with this release of translate5 for
  translate5: Please see http://www.translate5.net/plugin-exception.txt or
  plugin-exception.txt in the root folder of translate5.
-  
+
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
 
-use MittagQI\Translate5\Test\Import\Config;
 use MittagQI\Translate5\Test\Import\Bconf;
+use MittagQI\Translate5\Test\Import\Config;
 
 /**
  * Testcase for the Custom file filter configuration with GUI / BCONF Management
@@ -36,9 +36,8 @@ use MittagQI\Translate5\Test\Import\Bconf;
  */
 class OkapiBconfFilterTest extends editor_Test_JsonTest
 {
-
     protected static array $requiredPlugins = [
-        'editor_Plugins_Okapi_Init'
+        'editor_Plugins_Okapi_Init',
     ];
 
     private static Bconf $testBconf;
@@ -48,7 +47,7 @@ class OkapiBconfFilterTest extends editor_Test_JsonTest
     protected static function setupImport(Config $config): void
     {
         // TODO FIXME: still neccessary ?
-        if(!Zend_Registry::isRegistered('Zend_Locale')){
+        if (! Zend_Registry::isRegistered('Zend_Locale')) {
             Zend_Registry::set('Zend_Locale', new Zend_Locale('en'));
         }
         static::$testBconf = $config->addBconf('TestBconfAllFilters', 'all-customized-filters.bconf');
@@ -131,6 +130,7 @@ class OkapiBconfFilterTest extends editor_Test_JsonTest
         // mimic upload and test the functionality
         // source SRX
         $contentBefore = static::$bconf->getSrx('source')->getContent();
+
         try {
             editor_Plugins_Okapi_Bconf_Segmentation::instance()->processUpload(static::$bconf, 'source', static::api()->getFile('languages-invalid.srx'), 'languages-invalid.srx');
             self::fail('Invalid SRX "languages-invalid.srx" could be uploaded although it is invalid');
@@ -183,15 +183,16 @@ class OkapiBconfFilterTest extends editor_Test_JsonTest
     {
         $result = $this->_uploadResourceFile('languages-changed.srx', 'editor/plugins_okapi_bconf/uploadsrx', 'srx', [
             'id' => static::$bconf->getId(),
-            'purpose' => 'source'
+            'purpose' => 'source',
         ]);
         self::assertEquals(true, $result->success, 'Failed to upload changed SRX "languages-changed.srx" as new source SRX');
         // check update in pipeline
-        $pipeline = new editor_Plugins_Okapi_Bconf_Pipeline(static::$bconf->getPipelinePath(), NULL, static::$bconf->getId());
+        $pipeline = new editor_Plugins_Okapi_Bconf_Pipeline(static::$bconf->getPipelinePath(), null, static::$bconf->getId());
         self::assertEquals('languages-changed.srx', $pipeline->getSrxFile('source'), 'Failed to change pipeline.pln for updated source SRX "languages-changed.srx"');
         // check update in content
-        $content = new editor_Plugins_Okapi_Bconf_Content(static::$bconf->getContentPath(), NULL, static::$bconf->getId());
+        $content = new editor_Plugins_Okapi_Bconf_Content(static::$bconf->getContentPath(), null, static::$bconf->getId());
         self::assertEquals('languages-changed.srx', $content->getSrxFile('source'), 'Failed to change content.json for updated source SRX "languages-changed.srx"');
+
         try {
             $srx = new editor_Plugins_Okapi_Bconf_Segmentation_Srx(static::$bconf->createPath('languages-changed.srx'));
             self::assertEquals(true, str_contains($srx->getContent(), 'JUSTACHANGEDSTRING'), 'The updated SRX "languages-changed.srx" did not contain the expected contents');
@@ -255,23 +256,17 @@ class OkapiBconfFilterTest extends editor_Test_JsonTest
 
     /**
      * Creates a basic and extended test to test the FPRM validation
-     * @param string $filename
-     * @param string $identifier
-     * @param bool $valid
-     * @param array $validationErrors
-     * @param bool|null $validExtended
-     * @param array $extendedValidationErrors
      * @throws ZfExtended_Exception
      * @throws editor_Plugins_Okapi_Exception
      */
-    private function _createFprmTest(string $filename, string $identifier, bool $valid, array $validationErrors = [], bool $validExtended = NULL, array $extendedValidationErrors = [])
+    private function _createFprmTest(string $filename, string $identifier, bool $valid, array $validationErrors = [], bool $validExtended = null, array $extendedValidationErrors = [])
     {
         $fprmContent = static::api()->getFileContent($filename);
         $fprmPath = empty($identifier) ? static::$bconf->createPath($filename) : static::$bconf->createPath($identifier . '.fprm');
         $fprm = new editor_Plugins_Okapi_Bconf_Filter_Fprm($fprmPath, $fprmContent);
         $validValidation = $fprm->validate(false);
         self::assertEquals($valid, $validValidation, $filename . ' failed to validate to the expected state: ' . ($valid ? 'valid' : 'invalid'));
-        if (!$validValidation && count($validationErrors) > 0) {
+        if (! $validValidation && count($validationErrors) > 0) {
             $error = $fprm->getValidationError();
             // echo "\n\n FPRM $filename VALIDATION ERROR:\n$error\n";
             foreach ($validationErrors as $errorPart) {
@@ -279,15 +274,15 @@ class OkapiBconfFilterTest extends editor_Test_JsonTest
             }
         }
         // validate with real OKAPI processing
-        if ($validExtended !== NULL) {
+        if ($validExtended !== null) {
             $idata = editor_Plugins_Okapi_Bconf_Filters::parseIdentifier($identifier);
             $filterEntity = static::$bconf->findCustomFilterEntry($idata->type, $idata->id);
-            if ($filterEntity == NULL) {
+            if ($filterEntity == null) {
                 self::fail('Could not find filter "' . $identifier . '" in tested BCONF');
             } else {
                 $params = [
                     'id' => $filterEntity->getId(),
-                    'type' => $fprm->getType()
+                    'type' => $fprm->getType(),
                 ];
                 $content = file_get_contents(static::api()->getFile($filename));
                 $result = static::api()->postRawData('editor/plugins_okapi_bconffilter/savefprm', $content, $params);
@@ -307,15 +302,12 @@ class OkapiBconfFilterTest extends editor_Test_JsonTest
 
     /**
      * Creates a resource-file test
-     * @param editor_Plugins_Okapi_Bconf_ResourceFile $resourceFile
-     * @param bool $valid
-     * @param array $expectedErrors
      */
     private function _createResourceFileTest(editor_Plugins_Okapi_Bconf_ResourceFile $resourceFile, bool $valid, array $expectedErrors = [])
     {
         $resourceValid = $resourceFile->validate();
         self::assertEquals($valid, $resourceValid, basename($resourceFile->getPath()) . ' failed to validate to the expected state: ' . ($valid ? 'valid' : 'invalid'));
-        if (!$resourceValid && count($expectedErrors) > 0) {
+        if (! $resourceValid && count($expectedErrors) > 0) {
             $error = $resourceFile->getValidationError();
             foreach ($expectedErrors as $errorPart) {
                 self::assertEquals(true, str_contains(strtolower($error), strtolower($errorPart)));
@@ -325,9 +317,6 @@ class OkapiBconfFilterTest extends editor_Test_JsonTest
 
     /**
      * Creates a upload-test that expects to upload invalid bconfs
-     * @param string $invalidBconfFile
-     * @param string $expectedErrorCode
-     * @param array $expectedErrors
      */
     private function _uploadInvalidBconfTest(string $bconfName, string $invalidBconfFile, string $expectedErrorCode, array $expectedErrors)
     {
@@ -336,7 +325,7 @@ class OkapiBconfFilterTest extends editor_Test_JsonTest
             ->setNotToFailOnError();
         static::getConfig()->import($bconf);
         static::assertIsObject($bconf);
-        if(!$bconf->hasUploadFailed()){
+        if (! $bconf->hasUploadFailed()) {
             self::fail('Uploaded invalid BCONF "' . $invalidBconfFile . '" could be uploaded although it is invalid');
         } else {
             // check errorCode
@@ -350,10 +339,6 @@ class OkapiBconfFilterTest extends editor_Test_JsonTest
 
     /**
      * Creates a test that mimics the saving of a FPRM file
-     * @param string $filename
-     * @param string $identifier
-     * @param string $fprmType
-     * @param string $searchedString
      * @throws Zend_Http_Client_Exception
      * @throws ZfExtended_Exception
      */
@@ -361,16 +346,17 @@ class OkapiBconfFilterTest extends editor_Test_JsonTest
     {
         $idata = editor_Plugins_Okapi_Bconf_Filters::parseIdentifier($identifier);
         $filterEntity = static::$bconf->findCustomFilterEntry($idata->type, $idata->id);
-        if ($filterEntity == NULL) {
+        if ($filterEntity == null) {
             self::fail('Could not find filter "' . $identifier . '" in tested BCONF');
         } else {
             $params = [
                 'id' => $filterEntity->getId(),
-                'type' => $fprmType
+                'type' => $fprmType,
             ];
             $content = file_get_contents(static::api()->getFile($filename));
             $result = static::api()->postRawData('editor/plugins_okapi_bconffilter/savefprm', $content, $params);
             self::assertFalse(static::api()->isJsonResultError($result), 'Failed to save changed FPRM "' . $filename . '"');
+
             try {
                 $fprm = new editor_Plugins_Okapi_Bconf_Filter_Fprm(static::$bconf->createPath($filterEntity->getFile()));
                 self::assertEquals(true, str_contains($fprm->getContent(), $searchedString), 'The updated SRX "' . $filterEntity->getFile() . '" did not contain the expected contents');
@@ -381,11 +367,6 @@ class OkapiBconfFilterTest extends editor_Test_JsonTest
     }
 
     /**
-     * @param string $filename
-     * @param string $endpoint
-     * @param string $uploadName
-     * @param array $uploadParams
-     * @param string $uploadMime
      * @return mixed
      */
     private function _uploadResourceFile(string $filename, string $endpoint, string $uploadName, array $uploadParams = [], string $uploadMime = 'application/octet-stream')
@@ -394,12 +375,12 @@ class OkapiBconfFilterTest extends editor_Test_JsonTest
         static::api()->addFile($uploadName, $input->getPathname(), $uploadMime);
         // Run as api test that if case runtimeOptions.plugins.Okapi.dataDir is missing it's created as webserver user
         $result = static::api()->postJson($endpoint, $uploadParams);
+
         return $this->_getFullResult($result);
     }
 
     /**
      * turns the multitype-result of the API to an object that also represents the result of a failed request
-     * @param $result
      * @return mixed|stdClass
      */
     private function _getFullResult($result)
@@ -408,12 +389,13 @@ class OkapiBconfFilterTest extends editor_Test_JsonTest
             $responseBody = static::api()->getLastResponse()->getBody();
             $result = json_decode($responseBody);
             $result->success = false;
-        } else if (!$result) {
+        } elseif (! $result) {
             $result = new stdClass();
             $result->success = true;
         } else {
             $result->success = true;
         }
+
         return $result;
     }
 }

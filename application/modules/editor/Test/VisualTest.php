@@ -21,7 +21,7 @@ START LICENSE AND COPYRIGHT
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
@@ -33,17 +33,18 @@ END LICENSE AND COPYRIGHT
 abstract class editor_Test_VisualTest extends editor_Test_JsonTest
 {
     protected static array $requiredPlugins = [
-        'editor_Plugins_VisualReview_Init'
+        'editor_Plugins_VisualReview_Init',
     ];
+
     /**
      * Retrieves the visual files structure as json
-     * @param string $taskGuid
-     * @param string $jsonFileName
      * @return mixed
      */
-    protected function getVisualFilesJson(string $jsonFileName){
+    protected function getVisualFilesJson(string $jsonFileName)
+    {
         $taskGuid = static::getTask()->getTaskGuid();
-        return static::api()->getJson('/editor/plugins_visualreview_visualreview/files?taskGuid='.urlencode($taskGuid), [], $jsonFileName);
+
+        return static::api()->getJson('/editor/plugins_visualreview_visualreview/files?taskGuid=' . urlencode($taskGuid), [], $jsonFileName);
     }
 
     /**
@@ -53,81 +54,77 @@ abstract class editor_Test_VisualTest extends editor_Test_JsonTest
      * @return false|string
      * @throws \MittagQI\Translate5\Test\Import\Exception
      */
-    protected function getVisualHtmlFile(bool $isSplitFile=false, int $index=0) {
+    protected function getVisualHtmlFile(bool $isSplitFile = false, int $index = 0)
+    {
         $fileName = static::getTask()->getDataDirectory()
-            .editor_Plugins_VisualReview_Source_Files::FOLDER_REVIEW_DEPRICATED
-            .'/'.$this->getVisualHtmlFileName($isSplitFile, $index);
+            . editor_Plugins_VisualReview_Source_Files::FOLDER_REVIEW_DEPRICATED
+            . '/' . $this->getVisualHtmlFileName($isSplitFile, $index);
         $this->assertFileExists($fileName);
+
         return file_get_contents($fileName);
     }
+
     /**
      * Retrieves the visuals HTML file name for the given index and if split
-     * @param bool $isSplitFile: if given, this will be the split file (it does not always exist!)
-     * @param int $index: index of the file, matches the fileOrder of the visual source file
      * @return string
      */
-    protected function getVisualHtmlFileName(bool $isSplitFile=false, int $index=0){
-        $indexMarker = ($index < 1) ? '' : '-'.$index;
-        return ($isSplitFile) ? 'review'.$indexMarker.'.split.html' : 'review'.$indexMarker.'.html';
+    protected function getVisualHtmlFileName(bool $isSplitFile = false, int $index = 0)
+    {
+        $indexMarker = ($index < 1) ? '' : '-' . $index;
+
+        return ($isSplitFile) ? 'review' . $indexMarker . '.split.html' : 'review' . $indexMarker . '.html';
     }
+
     /**
      * Asserts whether the visual html file defined by $isSplitFile and $index contains the given text
-     * @param string $text
-     * @param bool $isSplitFile
-     * @param int $index
-     * @param string $message
      */
-    public function assertVisualHtmlContains(string $text, bool $isSplitFile=false, bool $doStripTags=false, int $index=0, string $message=''){
+    public function assertVisualHtmlContains(string $text, bool $isSplitFile = false, bool $doStripTags = false, int $index = 0, string $message = '')
+    {
         $html = $this->getVisualHtmlFile($isSplitFile, $index);
-        if($doStripTags){
+        if ($doStripTags) {
             $html = strip_tags($html);
         }
-        if(empty($html)){
-            $this->assertTrue(!empty($html), $message.' [File '.$this->getVisualHtmlFileName($isSplitFile, $index).' was not found or had no contents]');
+        if (empty($html)) {
+            $this->assertTrue(! empty($html), $message . ' [File ' . $this->getVisualHtmlFileName($isSplitFile, $index) . ' was not found or had no contents]');
         } else {
-            $this->assertTrue(str_contains($html, $text), $message.' [File '.$this->getVisualHtmlFileName($isSplitFile, $index).' did not contain "'.$text.'"]');
+            $this->assertTrue(str_contains($html, $text), $message . ' [File ' . $this->getVisualHtmlFileName($isSplitFile, $index) . ' did not contain "' . $text . '"]');
         }
     }
 
     /**
      * Asserts whether the visual html file defined by $isSplitFile and $index exists and does not contain the given text
-     * @param string $text
-     * @param bool $isSplitFile
-     * @param int $index
-     * @param string $message
      */
-    public function assertVisualHtmlNotContains(string $text, bool $isSplitFile=false, bool $doStripTags=false, int $index=0, string $message=''){
+    public function assertVisualHtmlNotContains(string $text, bool $isSplitFile = false, bool $doStripTags = false, int $index = 0, string $message = '')
+    {
         $html = $this->getVisualHtmlFile($isSplitFile, $index);
-        if($doStripTags){
+        if ($doStripTags) {
             $html = strip_tags($html);
         }
-        if(empty($html)){
-            $this->assertTrue(!empty($html), $message.' [File '.$this->getVisualHtmlFileName($isSplitFile, $index).' was not found or had no contents]');
+        if (empty($html)) {
+            $this->assertTrue(! empty($html), $message . ' [File ' . $this->getVisualHtmlFileName($isSplitFile, $index) . ' was not found or had no contents]');
         } else {
-            $this->assertFalse(str_contains($html, $text), $message.' [File '.$this->getVisualHtmlFileName($isSplitFile, $index).' did not contain "'.$text.'"]');
+            $this->assertFalse(str_contains($html, $text), $message . ' [File ' . $this->getVisualHtmlFileName($isSplitFile, $index) . ' did not contain "' . $text . '"]');
         }
     }
+
     /**
      * Asserts whether the visual html file defined by $isSplitFile and $index contains the given text
-     * @param string $pattern
-     * @param bool $isSplitFile
-     * @param int $index
-     * @param string $message
      */
-    public function assertVisualHtmlMatches(string $pattern, bool $isSplitFile=false, int $index=0, string $message=''){
+    public function assertVisualHtmlMatches(string $pattern, bool $isSplitFile = false, int $index = 0, string $message = '')
+    {
         $html = $this->getVisualHtmlFile($isSplitFile, $index);
-        if(empty($html)){
-            $this->assertTrue(!empty($html), $message.' [File '.$this->getVisualHtmlFileName($isSplitFile, $index).' was not found or had no contents]');
+        if (empty($html)) {
+            $this->assertTrue(! empty($html), $message . ' [File ' . $this->getVisualHtmlFileName($isSplitFile, $index) . ' was not found or had no contents]');
         } else {
-            $this->assertTrue((preg_match($pattern, $html) === 1), $message.' [File '.$this->getVisualHtmlFileName($isSplitFile, $index).' did not match "'.$pattern.'"]');
+            $this->assertTrue((preg_match($pattern, $html) === 1), $message . ' [File ' . $this->getVisualHtmlFileName($isSplitFile, $index) . ' did not match "' . $pattern . '"]');
         }
     }
+
     /**
      * Compares the visual files structure with the passed testfile and taskGuid
-     * @param string $fileToCompare
-     * @param string $message
      */
-    public function assertVisualFiles(string $fileToCompare, string $message=''){
+    public function assertVisualFiles(string $fileToCompare, string $message = '')
+    {
         $filesList = $this->getVisualFilesJson($fileToCompare);
         $this->assertModelsEqualsObjects('VisualSourceFile', static::api()->getFileContent($fileToCompare), $filesList, $message);
     }

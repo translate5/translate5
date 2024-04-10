@@ -3,7 +3,7 @@
 START LICENSE AND COPYRIGHT
 
  This file is part of translate5
- 
+
  Copyright (c) 2013 - 2021 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
 
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
@@ -13,11 +13,11 @@ START LICENSE AND COPYRIGHT
  included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
-  
+
  There is a plugin exception available for use with this release of translate5 for
  translate5: Please see http://www.translate5.net/plugin-exception.txt or
  plugin-exception.txt in the root folder of translate5.
-  
+
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
@@ -36,18 +36,21 @@ use editor_Models_Task;
 use MittagQI\Translate5\Task\Import\FileParser\Xlf\Comments;
 use ZfExtended_Factory;
 
-
 /**
  * XLF Fileparser Add On to parse Across XLF specific stuff
  */
 class Across extends AbstractNamespace
 {
-    const ACROSS_XLIFF_NAMESPACE = 'xmlns:ax="AcrossXliff"';
-    const USERGUID = 'across-imported';
+    public const ACROSS_XLIFF_NAMESPACE = 'xmlns:ax="AcrossXliff"';
+
+    public const USERGUID = 'across-imported';
+
     private ?editor_Models_Comment $currentComment;
 
-    public function __construct(XmlParser $xmlparser, protected Comments $comments)
-    {
+    public function __construct(
+        XmlParser $xmlparser,
+        protected Comments $comments
+    ) {
         parent::__construct($xmlparser, $comments);
         $this->registerParserHandler();
     }
@@ -64,14 +67,14 @@ class Across extends AbstractNamespace
                 }
             },
             function ($tag, $key, $opener) {
-                if (!$opener['attributes']['name'] == 'Comment') {
+                if (! $opener['attributes']['name'] == 'Comment') {
                     return;
                 }
                 $title = '';
-                if (!empty($this->currentComment->across_title)) {
+                if (! empty($this->currentComment->across_title)) {
                     $title .= 'Title: ' . $this->currentComment->across_title;
                 }
-                if (!empty($title)) {
+                if (! empty($title)) {
                     $title .= "\n";
                 }
                 $this->currentComment->setComment($title . $this->currentComment->getComment());
@@ -93,21 +96,26 @@ class Across extends AbstractNamespace
                 switch ($name) {
                     case 'annotates':
                         $this->currentComment->across_annotates = $value;
+
                         break;
                     case 'author':
                         $this->currentComment->setUserName($value);
                         $this->currentComment->setUserGuid(self::USERGUID);
+
                         break;
                     case 'text':
                         $this->currentComment->setComment($value);
+
                         break;
                     case 'created':
                         $value = date('Y-m-d H:i:s', strtotime($value));
                         $this->currentComment->setCreated($value);
                         $this->currentComment->setModified($value);
+
                         break;
                     case 'title':
                         $this->currentComment->across_title = $value;
+
                         break;
                     default:
                         //set nothing here
@@ -117,10 +125,6 @@ class Across extends AbstractNamespace
         );
     }
 
-    /**
-     * @param string $xliff
-     * @return bool
-     */
     public static function isApplicable(string $xliff): bool
     {
         return str_contains($xliff, self::ACROSS_XLIFF_NAMESPACE);
@@ -146,7 +150,7 @@ class Across extends AbstractNamespace
         return ZfExtended_Factory::get(Across\ContentConverter::class, [
             $this,
             $task,
-            $filename
+            $filename,
         ]);
     }
 }

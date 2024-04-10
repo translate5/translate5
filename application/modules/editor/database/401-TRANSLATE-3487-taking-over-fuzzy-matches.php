@@ -57,26 +57,33 @@ $db = ZfExtended_Factory::get(editor_Models_Db_SegmentData::class);
 
 $s = $db->select()
     ->setIntegrityCheck(false)
-    ->from([
-        'source' => $db->info($db::NAME)
-    ],
+    ->from(
+        [
+            'source' => $db->info($db::NAME),
+        ],
         [
             'source.segmentId',
             'source.taskGuid',
             'source.segmentId',
             'source.original AS sourceOriginal',
-            'source.taskGuid'
+            'source.taskGuid',
         ]
     )
-    ->join(['target' => $db->info($db::NAME)], 'source.segmentId = target.segmentId', [
-        'target.edited as targetEdited',
-        'target.id as targetDataId'
-    ])
-    ->join(['ls' => 'LEK_segments'], 'source.segmentId = ls.id', [])
     ->join([
-        'task' => 'LEK_task'
-    ],
-        'source.taskGuid = task.taskGuid',['emptyTargets']
+        'target' => $db->info($db::NAME),
+    ], 'source.segmentId = target.segmentId', [
+        'target.edited as targetEdited',
+        'target.id as targetDataId',
+    ])
+    ->join([
+        'ls' => 'LEK_segments',
+    ], 'source.segmentId = ls.id', [])
+    ->join(
+        [
+            'task' => 'LEK_task',
+        ],
+        'source.taskGuid = task.taskGuid',
+        ['emptyTargets']
     )
     ->where('target.edited REGEXP ?', '<div\\s*class="(open|close|single)\\s+([gxA-Fa-f0-9]*)[^"]*"\\s*.*?(?!</div>)<span[^>]*data-originalid="([^"]*).*?(?!</div>).</div>')
     ->where('ls.pretrans != 1')
@@ -93,16 +100,14 @@ $replaceInfo = [];
 $mappingData = [];
 
 foreach ($result as $item) {
-
-    if(!isset($mappingData[$item['targetDataId']])){
+    if (! isset($mappingData[$item['targetDataId']])) {
         $mappingData[$item['targetDataId']] = $item['targetEdited'];
     }
 
     $isReview = (bool) $item['emptyTargets'] === false;
 
-
-    $source =  html_entity_decode($item['sourceOriginal'], ENT_QUOTES | ENT_XML1);
-    $target =  html_entity_decode($item['targetEdited'], ENT_QUOTES | ENT_XML1);
+    $source = html_entity_decode($item['sourceOriginal'], ENT_QUOTES | ENT_XML1);
+    $target = html_entity_decode($item['targetEdited'], ENT_QUOTES | ENT_XML1);
 
     $sourceTags = $tag->getRealTags($source);
     $targetTags = $tag->getRealTags($target);
@@ -110,23 +115,21 @@ foreach ($result as $item) {
     $tagWhitespace = ZfExtended_Factory::get(editor_Models_Segment_Whitespace::class);
     $whiteSpaces = $tagWhitespace->get($item['targetEdited']);
 
-    $whiteSpacesData[] = checkWhitespaces($whiteSpaces,$item['targetEdited']);
+    $whiteSpacesData[] = checkWhitespaces($whiteSpaces, $item['targetEdited']);
 
-    $diff = $tag->diffArray($targetTags,$sourceTags);
+    $diff = $tag->diffArray($targetTags, $sourceTags);
 
-    if(empty($diff)){
+    if (empty($diff)) {
         continue;
     }
 
-    if($isReview)
-    {
-
+    if ($isReview) {
         $tmpData = [];
         $tmpData['source'] = $source;
         $tmpData['target'] = $target;
         $tmpData['diff'] = $diff;
 
-        if(!isset($reviewData[$item['taskGuid']])){
+        if (! isset($reviewData[$item['taskGuid']])) {
             $reviewData[$item['taskGuid']] = [];
             $reviewData[$item['taskGuid']][$item['segmentId']] = [];
         }
@@ -139,34 +142,32 @@ foreach ($result as $item) {
 
     $targetTags = $tag->getRealTags($item['targetEdited']);
 
+    $diff = $tag->diffArray($targetTags, $sourceTags);
 
-    $diff = $tag->diffArray($targetTags,$sourceTags);
+    foreach ($diff as $brokenTag) {
+        $replace = findCorrectTag($sourceTags, $brokenTag);
 
-    foreach ($diff as $brokenTag){
-
-        $replace = findCorrectTag($sourceTags,$brokenTag);
-
-        if(!empty($replace)){
+        if (! empty($replace)) {
             // this array contains the
             // id field in LEK_segment_data
             // the broken tag (what we should replace)
             // the correct tag (what we use for replace)
-            $replaceInfo[$item['targetDataId']][] = [$brokenTag,$replace,$item['segmentId']];
+            $replaceInfo[$item['targetDataId']][] = [$brokenTag, $replace, $item['segmentId']];
         }
     }
 }
 
-if(!empty($reviewData)){
-    error_log('Broken segments in review tasks where found and those will not be repaired automatically. Check '.APPLICATION_PATH.'/../data/logs/BrokenSegmentsInReviewTask.log file for more info');
-    file_put_contents(APPLICATION_PATH.'/../data/logs/BrokenSegmentsInReviewTask.log', print_r($reviewData,true),FILE_APPEND);
+if (! empty($reviewData)) {
+    error_log('Broken segments in review tasks where found and those will not be repaired automatically. Check ' . APPLICATION_PATH . '/../data/logs/BrokenSegmentsInReviewTask.log file for more info');
+    file_put_contents(APPLICATION_PATH . '/../data/logs/BrokenSegmentsInReviewTask.log', print_r($reviewData, true), FILE_APPEND);
 }
 
-if(!empty($whiteSpacesData)){
-    error_log('Broken whitespaces where found and those will not be repaired automatically. Check '.APPLICATION_PATH.'/../data/logs/BrokenSegmentsInReviewTask.log file for more info');
-    file_put_contents(APPLICATION_PATH.'/../data/logs/BrokenSegmentsInReviewTask.log', print_r($whiteSpacesData,true),FILE_APPEND);
+if (! empty($whiteSpacesData)) {
+    error_log('Broken whitespaces where found and those will not be repaired automatically. Check ' . APPLICATION_PATH . '/../data/logs/BrokenSegmentsInReviewTask.log file for more info');
+    file_put_contents(APPLICATION_PATH . '/../data/logs/BrokenSegmentsInReviewTask.log', print_r($whiteSpacesData, true), FILE_APPEND);
 }
 
-if(file_exists(APPLICATION_PATH.'/../data/logs/BrokenSegmentsInReviewTask.log')){
+if (file_exists(APPLICATION_PATH . '/../data/logs/BrokenSegmentsInReviewTask.log')) {
     $config = \Zend_Registry::get('config');
     /* @var $config \Zend_Config */
 
@@ -175,19 +176,19 @@ if(file_exists(APPLICATION_PATH.'/../data/logs/BrokenSegmentsInReviewTask.log'))
         ??
         $this->_config->resources->mail->defaultFrom->email;
 
-    if($receiver instanceof Zend_Config){
+    if ($receiver instanceof Zend_Config) {
         $receiver = $receiver->toArray();
     }
 
     $toEmail = is_array($receiver) ? $receiver[0] : $receiver;
 
     $mail = new \ZfExtended_Mailer('utf-8');
-    $mail->setSubject('Translate5 TRANSLATE-3487 E-Mail - from '.$config->runtimeOptions->server->name);
+    $mail->setSubject('Translate5 TRANSLATE-3487 E-Mail - from ' . $config->runtimeOptions->server->name);
     $mail->setBodyText('This is email for collected errors and debug output from TRANSLATE-3487');
     $mail->addTo($toEmail);
 
     $mail->createAttachment(
-        file_get_contents(APPLICATION_PATH.'/../data/logs/BrokenSegmentsInReviewTask.log'),
+        file_get_contents(APPLICATION_PATH . '/../data/logs/BrokenSegmentsInReviewTask.log'),
         'text/plain',
         Zend_Mime::DISPOSITION_ATTACHMENT,
         Zend_Mime::ENCODING_BASE64,
@@ -197,25 +198,23 @@ if(file_exists(APPLICATION_PATH.'/../data/logs/BrokenSegmentsInReviewTask.log'))
     $mail->send();
 }
 
-error_log('Number of segments to fix:'.count($replaceInfo));
+error_log('Number of segments to fix:' . count($replaceInfo));
 
-if(!empty($replaceInfo)){
-
+if (! empty($replaceInfo)) {
     $updatedRows = 0;
     $viewsToDrop = [];
     $affectedTasks = [];
 
     $segment = ZfExtended_Factory::get(editor_Models_Segment::class);
 
-    foreach ($replaceInfo as $id => $list){
-
+    foreach ($replaceInfo as $id => $list) {
         $targetEdit = $mappingData[$id];
 
         foreach ($list as $content) {
             $search = $content[0];
             $replace = $content[1];
 
-            $targetEdit = str_replace($search,$replace,$targetEdit);
+            $targetEdit = str_replace($search, $replace, $targetEdit);
         }
         // save the last version of the segment in segment history
         $segment->load($content[2]);
@@ -224,8 +223,7 @@ if(!empty($replaceInfo)){
 
         $viewsToDrop[] = $segment->getTaskGuid();
 
-        if(!isset($affectedTasks[$segment->getTaskGuid()])){
-
+        if (! isset($affectedTasks[$segment->getTaskGuid()])) {
             $task = ZfExtended_Factory::get(editor_Models_Task::class);
             $task->loadByTaskGuid($segment->getTaskGuid());
 
@@ -243,16 +241,14 @@ if(!empty($replaceInfo)){
             'targetEdit'
         );
         $tagComparision = new editor_Segment_Internal_TagComparision($tags, null);
-        $stati =  $tagComparision->getStati();
+        $stati = $tagComparision->getStati();
 
         $runTagRepair =
-            !empty($stati)
+            ! empty($stati)
             &&
-            array_key_exists(editor_Segment_Internal_TagComparision::TAG_STRUCTURE_FAULTY,$stati);
+            array_key_exists(editor_Segment_Internal_TagComparision::TAG_STRUCTURE_FAULTY, $stati);
 
-
-        if($runTagRepair){
-
+        if ($runTagRepair) {
             //REPAIR TAGS
             $brokenTags = new editor_Segment_FieldTags(
                 $task,
@@ -262,65 +258,57 @@ if(!empty($replaceInfo)){
                 'targetEdit'
             );
             $tagRepair = new editor_Segment_Internal_TagRepair($brokenTags, null);
-            if($tagRepair->hadErrors()){
+            if ($tagRepair->hadErrors()) {
                 $targetEdit = $brokenTags->render();
             }
         }
 
-        $res = $db->getAdapter()->query('UPDATE LEK_segment_data SET edited = ?, editedToSort = ? WHERE id = ?;',[
+        $res = $db->getAdapter()->query('UPDATE LEK_segment_data SET edited = ?, editedToSort = ? WHERE id = ?;', [
             $targetEdit, // Update the new version of segment target edited
             strip_tags($targetEdit), // remove the tags from the targetEdit
-            $id
+            $id,
         ]);
 
         $updatedRows += $res->rowCount();
     }
 
-    error_log('Fixed segments:'.$updatedRows);
+    error_log('Fixed segments:' . $updatedRows);
 
-    if($updatedRows > 0 ){
-
-        foreach ($viewsToDrop as $taskGuid){
-            $view = ZfExtended_Factory::get(editor_Models_Segment_MaterializedView::class,[
-                $taskGuid
+    if ($updatedRows > 0) {
+        foreach ($viewsToDrop as $taskGuid) {
+            $view = ZfExtended_Factory::get(editor_Models_Segment_MaterializedView::class, [
+                $taskGuid,
             ]);
             $view->drop();
         }
     }
 }
 
-
-
 /**
  * Collect the whitespaces where the css class has different content as expected
- * @param array $tags
- * @param string $target
- * @return array
  */
 function checkWhitespaces(array $tags, string $target): array
 {
-
     // collected invalid tags from the segment
     $invalid = [];
 
-    foreach ($tags as $tag){
+    foreach ($tags as $tag) {
         $matches = null;
         preg_match_all(editor_Models_Segment_InternalTag::REGEX_INTERNAL_TAGS, $tag, $matches);
 
-        if(!empty($matches)){
+        if (! empty($matches)) {
             $class = $matches[2][0];
             $type = $matches[3][0];
-            $decoded= pack('H*', $class);
+            $decoded = pack('H*', $class);
 
-
-            $typeInClass = explode(' ',$decoded);
+            $typeInClass = explode(' ', $decoded);
             $typeInClass = $typeInClass[0] ?? '';
-            $typeInClass = str_replace('/','',$typeInClass);
+            $typeInClass = str_replace('/', '', $typeInClass);
 
-            if($type !== $typeInClass){
+            if ($type !== $typeInClass) {
                 $invalid[] = [
                     'regexMatches' => $matches,
-                    'segment' => $target
+                    'segment' => $target,
                 ];
             }
         }
@@ -331,29 +319,25 @@ function checkWhitespaces(array $tags, string $target): array
 
 /**
  * This function will try to find the correct tag by searching for the tag number of the broken tag in the correctTags
- * @param array $correctTags
- * @param string $brokenTag
  * @return mixed|string
  */
 function findCorrectTag(array $correctTags, string $brokenTag): mixed
 {
-
     $pattern = '/<span class="short" title="([^"]*)">(.*?)<\/span>/i';
 
     preg_match($pattern, $brokenTag, $matches);
 
-    if(empty($matches)){
+    if (empty($matches)) {
         return '';
     }
 
     $shortTag = $matches[2];
 
-    foreach ($correctTags as $tag){
-
+    foreach ($correctTags as $tag) {
         // generate the short tag regex for matching
         // in addition escape the forward slashes because in some cases they can not be correct
-        $pattern = '/<span class="short" title="([^"]*)">'.str_replace('/','\/',$shortTag).'<\/span>/i';
-        if( preg_match($pattern,$tag,$newMatch)){
+        $pattern = '/<span class="short" title="([^"]*)">' . str_replace('/', '\/', $shortTag) . '<\/span>/i';
+        if (preg_match($pattern, $tag, $newMatch)) {
             return $tag;
         }
     }

@@ -53,12 +53,12 @@ declare(strict_types=1);
 namespace MittagQI\Translate5\Plugins\TermImport\Exception;
 
 use ZfExtended_ErrorCodeException;
+
 /**
  * Abstract Exception Class to get more details Information on Term-Error.
  */
 class TermImportException extends ZfExtended_ErrorCodeException
 {
-
     /**
      * @var string
      */
@@ -66,8 +66,6 @@ class TermImportException extends ZfExtended_ErrorCodeException
 
     /**
      * Error codes for plugins
-     *
-     * @var array
      */
     protected static array $localErrorCodes = [
         'E1568' => 'Plug-In TermImport: \'filesystemConfig\' is not set in config or invalid',

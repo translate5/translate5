@@ -21,40 +21,42 @@ START LICENSE AND COPYRIGHT
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
-class editor_Models_Terminology_TbxObjects_TermEntry extends editor_Models_Terminology_TbxObjects_Abstract{
+class editor_Models_Terminology_TbxObjects_TermEntry extends editor_Models_Terminology_TbxObjects_Abstract
+{
     /**
      * Table field for insert or update.
      * If:
      * 'fieldName' => false -> only insert no check for update attribute
      * 'fieldName' => true -> insert and update
      */
-    const TABLE_FIELDS = [
+    public const TABLE_FIELDS = [
         'termEntryTbxId' => true,
         'entryGuid' => false,
     ];
 
-    const GUID_FIELD = 'entryGuid';
+    public const GUID_FIELD = 'entryGuid';
 
     public int $id = 0;
+
     public int $collectionId = 0;
+
     public string $termEntryTbxId = '';
+
     public ?string $entryGuid = null;
+
     public array $transacGrp = [];
+
     public array $ref = [];
 
     /**
      * This definition is not saved into the term_entry table!
-     * @var string|null
      */
     public ?string $definition = null;
 
-    /**
-     * @return string
-     */
     public function getCollectionKey(): string
     {
         return $this->termEntryTbxId;
@@ -62,9 +64,9 @@ class editor_Models_Terminology_TbxObjects_TermEntry extends editor_Models_Termi
 
     /**
      * return the data hash + the entry guid attached with an #
-     * @return string
      */
-    public function getDataHash(): string {
-        return parent::getDataHash().'#'.$this->entryGuid;
+    public function getDataHash(): string
+    {
+        return parent::getDataHash() . '#' . $this->entryGuid;
     }
 }

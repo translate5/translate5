@@ -1,4 +1,5 @@
-<?php 
+<?php
+
 /*
 START LICENSE AND COPYRIGHT
 
@@ -51,20 +52,20 @@ $SCRIPT_IDENTIFIER = '415-TRANSLATE-3726-commenting-on-segment.php';
  * define database credential variables
  */
 $argc = count($argv);
-if(empty($this) || empty($argv) || $argc < 5 || $argc > 7) {
+if (empty($this) || empty($argv) || $argc < 5 || $argc > 7) {
     die("please dont call the script direct! Call it by using DBUpdater!\n\n");
 }
 
-$task=ZfExtended_Factory::get(editor_Models_Task::class);
+$task = ZfExtended_Factory::get(editor_Models_Task::class);
 $db = $task->db;
 $s = $db->select()->from('task', ['*'])->where('state NOT IN(?)', [
     editor_Models_Task::STATE_ERROR,
     editor_Models_Task::STATE_END,
     editor_Models_Task::STATE_IMPORT,
-    editor_Models_Task::STATE_PROJECT
+    editor_Models_Task::STATE_PROJECT,
 ]);
-$allTasks=$task->loadAll();
-foreach ($allTasks as $t){
+$allTasks = $task->loadAll();
+foreach ($allTasks as $t) {
     $task->init($t);
     // update the segment finish count
     $task->updateSegmentFinishCount();

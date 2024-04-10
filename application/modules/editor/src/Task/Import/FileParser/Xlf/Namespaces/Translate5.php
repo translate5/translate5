@@ -3,7 +3,7 @@
 START LICENSE AND COPYRIGHT
 
  This file is part of translate5
- 
+
  Copyright (c) 2013 - 2021 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
 
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
@@ -13,11 +13,11 @@ START LICENSE AND COPYRIGHT
  included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
-  
+
  There is a plugin exception available for use with this release of translate5 for
  translate5: Please see http://www.translate5.net/plugin-exception.txt or
  plugin-exception.txt in the root folder of translate5.
-  
+
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
@@ -41,10 +41,12 @@ use ZfExtended_Factory;
  */
 class Translate5 extends AbstractNamespace
 {
-    const TRANSLATE5_XLIFF_NAMESPACE = 'xmlns:translate5="http://www.translate5.net/"';
+    public const TRANSLATE5_XLIFF_NAMESPACE = 'xmlns:translate5="http://www.translate5.net/"';
+
     private Translate5\ContentConverter $contentConverter;
 
-    public function __construct(XmlParser $xmlparser, Comments $comments) {
+    public function __construct(XmlParser $xmlparser, Comments $comments)
+    {
         parent::__construct($xmlparser, $comments);
         $this->registerParserHandler($xmlparser);
     }
@@ -54,18 +56,17 @@ class Translate5 extends AbstractNamespace
         return str_contains($xliff, self::TRANSLATE5_XLIFF_NAMESPACE);
     }
 
-    public static function getExportCls(): ?string {
+    public static function getExportCls(): ?string
+    {
         return editor_Models_Export_FileParser_Xlf_Namespaces_Translate5::class;
     }
 
     /**
      * Internal tagmap
-     * @var array
      */
     protected array $tagMap = [];
 
     /**
-     * {@inheritDoc}
      * @see AbstractNamespace::transunitAttributes()
      */
     public function transunitAttributes(array $attributes, SegmentAttributes $segmentAttributes): void
@@ -95,7 +96,7 @@ class Translate5 extends AbstractNamespace
                 //we convert the tagMap to:
                 // $this->tagMap[<g id="123">] = [<internalOpener>,<internalCloser>];
                 // $this->tagMap[<x id="321">] = [<internalSingle>];
-                if (!empty($data[2])) {
+                if (! empty($data[2])) {
                     $closer = $data[2];
                     $this->contentConverter->setInTagMap($gTag, [$originalTag, $givenTagMap[$closer][1]]);
                 } else {
@@ -120,9 +121,10 @@ class Translate5 extends AbstractNamespace
         $this->contentConverter = ZfExtended_Factory::get(Translate5\ContentConverter::class, [
             $this,
             $task,
-            $filename
+            $filename,
         ]);
         $this->contentConverter->resetTagMap();
+
         return $this->contentConverter;
     }
 }

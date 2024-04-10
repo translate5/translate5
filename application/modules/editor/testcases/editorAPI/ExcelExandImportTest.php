@@ -3,25 +3,25 @@
 START LICENSE AND COPYRIGHT
 
  This file is part of translate5
- 
+
  Copyright (c) 2013 - 2021 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
 
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
  This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
- as published by the Free Software Foundation and appearing in the file agpl3-license.txt 
- included in the packaging of this file.  Please review the following information 
+ as published by the Free Software Foundation and appearing in the file agpl3-license.txt
+ included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
-  
+
  There is a plugin exception available for use with this release of translate5 for
- translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or
  plugin-exception.txt in the root folder of translate5.
-  
+
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
@@ -31,8 +31,8 @@ use MittagQI\Translate5\Test\Import\Config;
 /**
  * ExcelExandImportTest.php imports a simple task, checks export of excel and reimport then
  */
-class ExcelExandImportTest extends editor_Test_JsonTest {
-    
+class ExcelExandImportTest extends editor_Test_JsonTest
+{
     /**
      * @var string contains the file name to the downloaded excel
      */
@@ -40,11 +40,11 @@ class ExcelExandImportTest extends editor_Test_JsonTest {
 
     protected static array $forbiddenPlugins = [
         'editor_Plugins_LockSegmentsBasedOnConfig_Bootstrap',
-        'editor_Plugins_NoMissingTargetTerminology_Bootstrap'
+        'editor_Plugins_NoMissingTargetTerminology_Bootstrap',
     ];
 
     protected static array $requiredRuntimeOptions = [
-        'import.xlf.preserveWhitespace' => 0
+        'import.xlf.preserveWhitespace' => 0,
     ];
 
     protected static function setupImport(Config $config): void
@@ -55,29 +55,31 @@ class ExcelExandImportTest extends editor_Test_JsonTest {
     /**
      * Test the excel export
      */
-    public function testExcelExport() {
+    public function testExcelExport()
+    {
         $task = static::api()->getTask();
         //start task export
-        
+
         //get the excel
-        $response = static::api()->get('editor/task/'.$task->id.'/excelexport');
+        $response = static::api()->get('editor/task/' . $task->id . '/excelexport');
         self::$tempExcel = $tempExcel = tempnam(sys_get_temp_dir(), 't5testExcel');
         file_put_contents($tempExcel, $response->getBody());
-        
+
         $this->assertFileExists($tempExcel, 'Excel file could not be created');
-        
-        $zip = new ZipArchive;
+
+        $zip = new ZipArchive();
         $res = $zip->open($tempExcel);
         $this->assertTrue($res, 'Exported Excelfile could not opened for injecting edits');
         $strings = $zip->getFromName('xl/sharedStrings.xml');
         $zip->addFromString('xl/sharedStrings.xml', str_replace('Testtext', 'Testtext - edited', $strings));
         $zip->close();
     }
-    
+
     /**
      * @depends testExcelExport
      */
-    public function testTaskStatus() {
+    public function testTaskStatus()
+    {
         static::api()->reloadTask();
         $task = static::api()->getTask();
         $this->assertEquals('*translate5InternalLock*ExcelExported', $task->lockedInternalSessionUniqId);
@@ -85,23 +87,24 @@ class ExcelExandImportTest extends editor_Test_JsonTest {
         $this->assertEquals('ExcelExported', $task->state);
         $this->assertNotEmpty($task->locked);
     }
-    
+
     /**
      * @depends testExcelExport
      */
-    public function testReimport() {
+    public function testReimport()
+    {
         static::api()->addFile('excelreimportUpload', self::$tempExcel, 'application/data');
-        static::api()->post('editor/task/'.static::api()->getTask()->id.'/excelreimport');
+        static::api()->post('editor/task/' . static::api()->getTask()->id . '/excelreimport');
         static::api()->reloadTask();
         $task = static::api()->getTask();
-        $this->assertEmpty($task->lockingUser, 'Task is locked by user '.$task->lockingUser);
-        $this->assertEmpty($task->lockedInternalSessionUniqId, 'Task is locked by sessionUniqId '.$task->lockedInternalSessionUniqId);
+        $this->assertEmpty($task->lockingUser, 'Task is locked by user ' . $task->lockingUser);
+        $this->assertEmpty($task->lockedInternalSessionUniqId, 'Task is locked by sessionUniqId ' . $task->lockedInternalSessionUniqId);
         $this->assertEquals('open', $task->state);
         $this->assertEmpty($task->locked);
-        
+
         //open task
         static::api()->setTaskToEdit($task->id);
-        
+
         $jsonFileName = 'expectedSegments.json';
         $segments = static::api()->getSegments($jsonFileName, 47);
         $this->assertSegmentsEqualsJsonFile($jsonFileName, $segments, 'Imported segments are not as expected!');

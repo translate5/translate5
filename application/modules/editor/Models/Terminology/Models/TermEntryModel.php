@@ -21,13 +21,12 @@ START LICENSE AND COPYRIGHT
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
 
 /**
- * Class editor_Models_Terms_Term_Entry
  * TermsTermEntry Instance
  *
  * @method string getId()
@@ -41,17 +40,17 @@ END LICENSE AND COPYRIGHT
  * @method string getEntryGuid()
  * @method void setEntryGuid(string $uniqueId)
  */
-class editor_Models_Terminology_Models_TermEntryModel extends editor_Models_Terminology_Models_Abstract {
+class editor_Models_Terminology_Models_TermEntryModel extends editor_Models_Terminology_Models_Abstract
+{
     protected $dbInstanceClass = 'editor_Models_Db_Terminology_TermEntry';
 
-    public function insert($misc = []) {
-
+    public function insert($misc = [])
+    {
         // Save and get insert id
         $termEntryId = $this->save();
 
         // Create 'origination' and 'modification' `terms_transacgroup`-entries
         foreach (['origination', 'modification'] as $type) {
-
             // Create `terms_transacgrp` model instance
             $t = ZfExtended_Factory::get('editor_Models_Terminology_Models_TransacgrpModel');
 
@@ -79,8 +78,8 @@ class editor_Models_Terminology_Models_TermEntryModel extends editor_Models_Term
     /**
      * Delete termEntry and refresh collection's languages
      */
-    public function delete() {
-
+    public function delete()
+    {
         // Remember collectionId
         $collectionId = $this->getCollectionId();
 
@@ -90,12 +89,12 @@ class editor_Models_Terminology_Models_TermEntryModel extends editor_Models_Term
         // Remove old language assocs
         ZfExtended_Factory
             ::get('editor_Models_LanguageResources_Languages')
-            ->removeByResourceId([$collectionId]);
+                ->removeByResourceId([$collectionId]);
 
         // Add the new language assocs
         ZfExtended_Factory
             ::get('editor_Models_Terminology_Models_TermModel')
-            ->updateAssocLanguages([$collectionId]);
+                ->updateAssocLanguages([$collectionId]);
     }
 
     /***
@@ -104,11 +103,11 @@ class editor_Models_Terminology_Models_TermEntryModel extends editor_Models_Term
      * @param array $collectionIds
      * @return boolean
      */
-    public function removeEmptyFromCollection(array $collectionIds){
-        $collectionIds = join(',', array_map(function($i){
+    public function removeEmptyFromCollection(array $collectionIds)
+    {
+        $collectionIds = join(',', array_map(function ($i) {
             return (int) $i;
         }, $collectionIds));
-
 
         /*$sql='SELECT id FROM LEK_term_entry WHERE LEK_term_entry.groupId NOT IN (
                 SELECT LEK_term_entry.groupId from LEK_term_entry
@@ -131,7 +130,7 @@ class editor_Models_Terminology_Models_TermEntryModel extends editor_Models_Term
 
         $toRemove = $this->db->getAdapter()->query($sql)->fetchAll(PDO::FETCH_COLUMN);
 
-        if(empty($toRemove)){
+        if (empty($toRemove)) {
             return false;
         }
 
@@ -144,13 +143,12 @@ class editor_Models_Terminology_Models_TermEntryModel extends editor_Models_Term
     /**
      * Get termEntry-recors quantity per given collectionId
      *
-     * @param int $collectionId
      * @return string
      * @throws Zend_Db_Statement_Exception
      */
-    public function getQtyByCollectionId(int $collectionId) {
+    public function getQtyByCollectionId(int $collectionId)
+    {
         return $this->db->getAdapter()->query('
-            SELECT COUNT(*) FROM `terms_term_entry` WHERE `collectionId` = ?'
-        , $collectionId)->fetchColumn();
+            SELECT COUNT(*) FROM `terms_term_entry` WHERE `collectionId` = ?', $collectionId)->fetchColumn();
     }
 }

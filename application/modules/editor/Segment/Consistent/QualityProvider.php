@@ -1,44 +1,43 @@
 <?php
 /*
  START LICENSE AND COPYRIGHT
- 
+
  Copyright (c) 2013 - 2017 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
- 
+
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
- 
+
  This file is part of a plug-in for translate5.
  translate5 can be optained via the instructions that are linked at http://www.translate5.net
  For the license of translate5 itself please see http://www.translate5.net/license.txt
  For the license of this plug-in, please see below.
- 
+
  This file is part of a plug-in for translate5 and may be used under the terms of the
  GNU GENERAL PUBLIC LICENSE version 3 as published by the Free Software Foundation and
  appearing in the file gpl3-license.txt included in the packaging of the translate5 plug-in
  to which this file belongs. Please review the following information to ensure the
  GNU GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/gpl.html
- 
+
  There is a plugin exception available for use with this release of translate5 for
  translate5 plug-ins that are distributed under GNU GENERAL PUBLIC LICENSE version 3:
  Please see http://www.translate5.net/plugin-exception.txt or plugin-exception.txt in the
  root folder of translate5.
- 
+
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU GENERAL PUBLIC LICENSE version 3 with plugin-execption
  http://www.gnu.org/licenses/gpl.html
  http://www.translate5.net/plugin-exception.txt
- 
+
  END LICENSE AND COPYRIGHT
  */
 
 /**
- * 
- * The Quality provider 
+ * The Quality provider
  * This class just provides the translations for the filter backend
  */
-class editor_Segment_Consistent_QualityProvider extends editor_Segment_Quality_Provider {
-
+class editor_Segment_Consistent_QualityProvider extends editor_Segment_Quality_Provider
+{
     /**
      * Quality type
      *
@@ -55,12 +54,9 @@ class editor_Segment_Consistent_QualityProvider extends editor_Segment_Quality_P
 
     /**
      * Method to check whether this quality is turned On
-     *
-     * @param Zend_Config $qualityConfig
-     * @param Zend_Config $taskConfig
-     * @return bool
      */
-    public function isActive(Zend_Config $qualityConfig, Zend_Config $taskConfig) : bool {
+    public function isActive(Zend_Config $qualityConfig, Zend_Config $taskConfig): bool
+    {
         return $qualityConfig->enableSegmentConsistentCheck == 1;
     }
 
@@ -70,10 +66,10 @@ class editor_Segment_Consistent_QualityProvider extends editor_Segment_Quality_P
      * {@inheritDoc}
      * @see editor_Segment_Quality_Provider::processSegment()
      */
-    public function processSegment(editor_Models_Task $task, Zend_Config $qualityConfig, editor_Segment_Tags $tags, string $processingMode) : editor_Segment_Tags
+    public function processSegment(editor_Models_Task $task, Zend_Config $qualityConfig, editor_Segment_Tags $tags, string $processingMode): editor_Segment_Tags
     {
         // If this check is turned Off in config - return $tags
-        if (!$qualityConfig->enableSegmentConsistentCheck == 1) {
+        if (! $qualityConfig->enableSegmentConsistentCheck == 1) {
             return $tags;
         }
 
@@ -94,15 +90,15 @@ class editor_Segment_Consistent_QualityProvider extends editor_Segment_Quality_P
      * {@inheritDoc}
      * @see editor_Segment_Quality_Provider::postProcessTask()
      */
-    public function postProcessTask(editor_Models_Task $task, Zend_Config $qualityConfig, string $processingMode) {
-
+    public function postProcessTask(editor_Models_Task $task, Zend_Config $qualityConfig, string $processingMode)
+    {
         // If this check is turned Off in config - return $tags
-        if (!$qualityConfig->enableSegmentConsistentCheck == 1) {
+        if (! $qualityConfig->enableSegmentConsistentCheck == 1) {
             return;
         }
 
         // Else
-        if (!(in_array($processingMode, [editor_Segment_Processing::EDIT, editor_Segment_Processing::ALIKE])
+        if (! (in_array($processingMode, [editor_Segment_Processing::EDIT, editor_Segment_Processing::ALIKE])
             || editor_Segment_Processing::isOperation($processingMode))) {
             return;
         }
@@ -115,7 +111,6 @@ class editor_Segment_Consistent_QualityProvider extends editor_Segment_Quality_P
 
         // Foreach quality, that is active after segment was saved
         foreach ($check->getStates() as $segmentNrInTask => $nowCategoryA) {
-
             // Get segment qualities that were active before segment was saved
             $wasCategoryA = static::$was[$segmentNrInTask] ?? [];
 
@@ -127,7 +122,6 @@ class editor_Segment_Consistent_QualityProvider extends editor_Segment_Quality_P
 
         // Foreach quality, that was active before segment was saved
         foreach (static::$was as $segmentNrInTask => $wasCategoryA) {
-
             // Get segment qualities that are still active after segment was saved
             $nowCategoryA = $check->getStates()[$segmentNrInTask] ?? [];
 
@@ -139,7 +133,6 @@ class editor_Segment_Consistent_QualityProvider extends editor_Segment_Quality_P
 
         // If not empty
         if ($bySegmentNrA) {
-
             // Get SegmentQuality model shortcut
             $qualityM = ZfExtended_Factory::get('editor_Models_Db_SegmentQuality');
             /* @var editor_Models_Db_SegmentQuality $qualityM */
@@ -153,7 +146,6 @@ class editor_Segment_Consistent_QualityProvider extends editor_Segment_Quality_P
 
             // Drop qualities if need
             foreach ($bySegmentNrA as $segmentNr => $categoriesByAction) {
-
                 // If there is smth to be inserted - do insert
                 foreach ($categoriesByAction['ins'] ?? [] as $insCategoryI) {
                     $qualityR = $qualityM->createRow([], Zend_Db_Table_Abstract::DEFAULT_DB);
@@ -182,17 +174,16 @@ class editor_Segment_Consistent_QualityProvider extends editor_Segment_Quality_P
      * {@inheritDoc}
      * @see editor_Segment_Quality_Provider::postProcessTask()
      */
-    public function preProcessTask(editor_Models_Task $task, Zend_Config $qualityConfig, string $processingMode) {
-
+    public function preProcessTask(editor_Models_Task $task, Zend_Config $qualityConfig, string $processingMode)
+    {
         // If this check is turned Off in config - return $tags
-        if (!$qualityConfig->enableSegmentConsistentCheck == 1) {
+        if (! $qualityConfig->enableSegmentConsistentCheck == 1) {
             return;
         }
 
         // Else
         if (in_array($processingMode, [editor_Segment_Processing::EDIT, editor_Segment_Processing::ALIKE])
             || editor_Segment_Processing::isOperation($processingMode)) {
-
             // Get check object, containing detected quality categories
             $check = new editor_Segment_Consistent_Check($task);
 
@@ -204,11 +195,10 @@ class editor_Segment_Consistent_QualityProvider extends editor_Segment_Quality_P
     /**
      * Translate quality type
      *
-     * @param ZfExtended_Zendoverwrites_Translate $translate
-     * @return string|null
      * @throws Zend_Exception
      */
-    public function translateType(ZfExtended_Zendoverwrites_Translate $translate) : ?string {
+    public function translateType(ZfExtended_Zendoverwrites_Translate $translate): ?string
+    {
         return $translate->_('Einheitlichkeit');
     }
 
@@ -227,16 +217,15 @@ class editor_Segment_Consistent_QualityProvider extends editor_Segment_Quality_P
     /**
      * Translate category tooltip
      *
-     * @param ZfExtended_Zendoverwrites_Translate $translate
-     * @param string $category
-     * @param editor_Models_Task $task
      * @return string|null
      */
-    public function translateCategoryTooltip(ZfExtended_Zendoverwrites_Translate $translate, string $category, editor_Models_Task $task) : string {
-        switch($category){
+    public function translateCategoryTooltip(ZfExtended_Zendoverwrites_Translate $translate, string $category, editor_Models_Task $task): string
+    {
+        switch ($category) {
             case editor_Segment_Consistent_Check::SOURCE: return $translate->_('Findet Segmente mit dem selben Ziel, aber unterschiedlicher Quelle (Tags werden ignoriert)');
             case editor_Segment_Consistent_Check::TARGET: return $translate->_('Findet Segmente mit der selben Quelle, aber unterschiedlichem Ziel (Tags werden ignoriert)');
         }
+
         return '';
     }
 

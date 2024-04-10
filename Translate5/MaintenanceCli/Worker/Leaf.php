@@ -32,20 +32,16 @@ use Zend_Db_Adapter_Abstract;
 
 final class Leaf
 {
-
-    const INDENT = 4;
+    public const INDENT = 4;
 
     /**
      * helper to sort leafs
-     * @param Leaf $a
-     * @param Leaf $b
-     * @return int
      */
     public static function compare(Leaf $a, Leaf $b): int
     {
         if ($a->getDepth() < $b->getDepth()) {
             return 1;
-        } else if ($a->getDepth() > $b->getDepth()) {
+        } elseif ($a->getDepth() > $b->getDepth()) {
             return -1;
         } else {
             return strnatcasecmp($a->getTitle(), $b->getTitle());
@@ -56,17 +52,24 @@ final class Leaf
      * @var Leaf[]
      */
     private array $leafs;
+
     private int $level;
+
     private int $depth = 0;
+
     private int $weight = -1;
+
     /**
      * Holds the operation(s) a branch represents
      * @var string[]
      */
     private array $operations;
 
-    public function __construct(private Zend_Db_Adapter_Abstract $dbAdapter, private string $worker, private ?Leaf $parent = null)
-    {
+    public function __construct(
+        private Zend_Db_Adapter_Abstract $dbAdapter,
+        private string $worker,
+        private ?Leaf $parent = null
+    ) {
         // level is 0 for the workers starting a branch
         $this->level = ($parent === null) ? 0 : $parent->getLevel() + 1;
         // the operation is defined by the start worker and bubbles up otherwise
@@ -107,13 +110,12 @@ final class Leaf
         $numLevel = count($tree);
 
         // now we condense the array, elements in the topmost branch do not need to appear in lower-level branches
-        if (!$uncondensed) {
-
+        if (! $uncondensed) {
             $alreadyShown = [];
             for ($i = ($numLevel - 1); $i >= 0; $i--) {
                 $newItems = [];
                 foreach ($tree[$i] as $item) {
-                    if (!array_key_exists($item, $alreadyShown)) {
+                    if (! array_key_exists($item, $alreadyShown)) {
                         $newItems[] = $item;
                         $alreadyShown[$item] = 1;
                     }
@@ -130,6 +132,7 @@ final class Leaf
                 $text .= $newline . $this->createIndent($i) . $item;
             }
         }
+
         return $text;
     }
 
@@ -138,10 +141,10 @@ final class Leaf
         foreach ($this->leafs as $leaf) {
             $title = $leaf->getTitle();
             $level = $this->level + 1;
-            if (!array_key_exists($level, $tree)) {
+            if (! array_key_exists($level, $tree)) {
                 $tree[$level] = [];
             }
-            if (!in_array($title, $tree[$level])) {
+            if (! in_array($title, $tree[$level])) {
                 $tree[$level][] = $title;
             }
             $leaf->combine($tree);
@@ -173,9 +176,10 @@ final class Leaf
 
     public function getWeight(): int
     {
-        if($this->weight < 0){
+        if ($this->weight < 0) {
             $this->weight = Operation::calculateWeight($this->operations);
         }
+
         return $this->weight;
     }
 

@@ -1,38 +1,38 @@
 <?php
 /*
  START LICENSE AND COPYRIGHT
- 
+
  This file is part of translate5
- 
+
  Copyright (c) 2013 - 2017 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
- 
+
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
- 
+
  This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
  as published by the Free Software Foundation and appearing in the file agpl3-license.txt
  included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
- 
+
  There is a plugin exception available for use with this release of translate5 for
  translate5: Please see http://www.translate5.net/plugin-exception.txt or
  plugin-exception.txt in the root folder of translate5.
- 
+
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
  http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
- 
+
  END LICENSE AND COPYRIGHT
  */
 
 namespace Translate5\MaintenanceCli\Command;
 
 use MittagQI\Translate5\Service\Services;
-use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputArgument;
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Output\OutputInterface;
 use Zend_Db_Statement_Exception;
 use Zend_Exception;
 use Zend_Registry;
@@ -42,7 +42,6 @@ use ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey;
 use ZfExtended_Plugin_Exception;
 use ZfExtended_Plugin_Manager;
 
-
 class ServiceAutodiscoveryCommand extends Translate5AbstractCommand
 {
     protected const ARGUMENT_HOST = 'host';
@@ -50,9 +49,6 @@ class ServiceAutodiscoveryCommand extends Translate5AbstractCommand
     // the name of the command (the part after "bin/console")
     protected static $defaultName = 'service:autodiscovery';
 
-    /**
-     * @var ZfExtended_Plugin_Manager
-     */
     protected ZfExtended_Plugin_Manager $pluginmanager;
 
     /**
@@ -61,7 +57,7 @@ class ServiceAutodiscoveryCommand extends Translate5AbstractCommand
      */
     protected array $services = [
         'php' => [
-            'url' => 'http://php.:80' // used to configure the worker-trigger access
+            'url' => 'http://php.:80', // used to configure the worker-trigger access
         ],
         /*
         'proxy' => [
@@ -69,27 +65,33 @@ class ServiceAutodiscoveryCommand extends Translate5AbstractCommand
         ],
         */
         't5memory' => [
-            'url' => 'http://t5memory.:4040/t5memory'
+            'url' => 'http://t5memory.:4040/t5memory',
         ],
         'frontendmessagebus' => [
-            'url' => 'http://frontendmessagebus.:9057'
+            'url' => 'http://frontendmessagebus.:9057',
         ],
         'okapi' => [
-            'url' => 'http://okapi.:8080' //path part with version is added automatically on locate call
+            'url' => 'http://okapi.:8080', //path part with version is added automatically on locate call
         ],
         'languagetool' => [
-            'url' => ['default' => ['http://languagetool.:8010/v2'], 'gui' => ['http://languagetool.:8010/v2'], 'import' => ['http://languagetool.:8010/v2']] // pooled service, needs at least 3 entries
+            'url' => [
+                'default' => ['http://languagetool.:8010/v2'],
+                'gui' => ['http://languagetool.:8010/v2'],
+                'import' => ['http://languagetool.:8010/v2'],
+            ], // pooled service, needs at least 3 entries
         ],
         'termtagger' => [
             'url' => 'http://termtagger:9001',
-            'config' => ['autodetect' => 20] // pooled service with autodetect
+            'config' => [
+                'autodetect' => 20,
+            ], // pooled service with autodetect
         ],
         'pdfconverter' => [
-            'url' => 'http://pdfconverter.:8086'
+            'url' => 'http://pdfconverter.:8086',
         ],
         'visualconverter' => [
-            'url' => 'http://visualconverter.:80'
-        ]
+            'url' => 'http://visualconverter.:80',
+        ],
     ];
 
     protected function configure()
@@ -163,31 +165,29 @@ using the default ports.')
 
         $services = [];
         $host = null;
-        $doSave = (!$this->input->getOption('auto-set')) ? false : true;
-        $allAvailable = (!$this->input->getOption('all-available')) ? false : true;
-        $useUnterminatedDomains = (!$this->input->getOption('unterminated-domains')) ? false : true;
+        $doSave = (! $this->input->getOption('auto-set')) ? false : true;
+        $allAvailable = (! $this->input->getOption('all-available')) ? false : true;
+        $useUnterminatedDomains = (! $this->input->getOption('unterminated-domains')) ? false : true;
 
         // evaluate services to update
         $optionServices = $this->input->getOption('service');
-        if (!empty($optionServices)) {
-
+        if (! empty($optionServices)) {
             foreach ($optionServices as $service) {
                 $service = strtolower($service);
-                if (!array_key_exists($service, $this->services)) {
+                if (! array_key_exists($service, $this->services)) {
                     $this->io->error('The service "' . $service . '" is unknown with this command.');
                     $this->io->writeln('Valid services are: ' . join(', ', array_keys($this->services)));
+
                     return self::FAILURE;
                 }
                 $services[$service] = $this->services[$service];
             }
             // a single service can be set to a custom host
             $host = empty($this->input->getArgument(self::ARGUMENT_HOST)) ? null : $this->input->getArgument(self::ARGUMENT_HOST);
-
         } else {
-
             $services = $this->services;
 
-            if(!empty($this->input->getArgument(self::ARGUMENT_HOST))){
+            if (! empty($this->input->getArgument(self::ARGUMENT_HOST))) {
                 $this->io->warning('The host will be ignored when configuring all services');
             }
         }
@@ -198,12 +198,6 @@ using the default ports.')
     }
 
     /**
-     * @param array $services
-     * @param bool $doSave
-     * @param bool $allAvailableServices
-     * @param bool $useUnterminatedDomains
-     * @param string|null $host
-     * @return void
      * @throws Zend_Db_Statement_Exception
      * @throws Zend_Exception
      * @throws ZfExtended_Exception
@@ -213,7 +207,7 @@ using the default ports.')
      */
     protected function setServices(array $services, bool $doSave, bool $allAvailableServices = false, bool $useUnterminatedDomains = false, string $host = null)
     {
-        if($allAvailableServices){
+        if ($allAvailableServices) {
             $allServices = Services::getAllAvailableServices(Zend_Registry::get('config'));
         } else {
             // get configured services
@@ -224,36 +218,29 @@ using the default ports.')
 
         foreach ($services as $serviceName => $service) {
             if (array_key_exists($serviceName, $allServices)) {
-
                 $configuredService = $allServices[$serviceName];
-                if(is_array($service['url'])){
-
+                if (is_array($service['url'])) {
                     $serviceUrl = $service['url'];
-                    if(!array_key_exists('default', $serviceUrl) || !array_key_exists('gui', $serviceUrl) || !array_key_exists('import', $serviceUrl)){
-                        throw new Zend_Exception('Service "'.$serviceName.'" pooled URLs are not properly defined');
+                    if (! array_key_exists('default', $serviceUrl) || ! array_key_exists('gui', $serviceUrl) || ! array_key_exists('import', $serviceUrl)) {
+                        throw new Zend_Exception('Service "' . $serviceName . '" pooled URLs are not properly defined');
                     }
                     $serviceUrl['default'] = $this->createServiceUrl($serviceUrl['default'], $host, $useUnterminatedDomains, true);
                     $serviceUrl['gui'] = $this->createServiceUrl($serviceUrl['gui'], $host, $useUnterminatedDomains, true);
                     $serviceUrl['import'] = $this->createServiceUrl($serviceUrl['import'], $host, $useUnterminatedDomains, true);
-
                 } else {
                     $serviceUrl = $this->createServiceUrl($service['url'], $host, $useUnterminatedDomains);
                 }
                 $serviceConfig = array_key_exists('config', $service) ? $service['config'] : [];
 
-                if($configuredService->canBeLocated()){
-
+                if ($configuredService->canBeLocated()) {
                     if ($configuredService->locate($this->io, $serviceUrl, $doSave, $serviceConfig)) {
-
                         if ($configuredService->isPluginService()) {
                             $this->setPluginActive($configuredService->getPluginName(), true, $doSave);
                         } else {
                             $msg = ($doSave) ? 'Have configured service' : 'Would configure service';
                             $this->io->info($msg . ' "' . $serviceName . '"');
                         }
-
                     } else {
-
                         if ($configuredService->isPluginService()) {
                             $this->setPluginActive($configuredService->getPluginName(), false, $doSave);
                         } else {
@@ -262,14 +249,9 @@ using the default ports.')
                         }
                     }
                 } else {
-
                     $this->io->warning('Service "' . $serviceName . '" is a service that can not be located programmatically.');
                 }
-
-
-
             } else {
-
                 $this->io->note('Service "' . $serviceName . '" was not found in the instance\'s configured services probably because the holding plugin is not active.');
             }
         }
@@ -278,23 +260,21 @@ using the default ports.')
     /**
      * Replaces the host if a custom host is given or unterminates the url-host if wanted
      * @param string|array $url
-     * @param string|null $host
-     * @param bool $unterminateDomains
-     * @param bool $forceArray
      * @return string|array
      */
     protected function createServiceUrl(mixed $url, string $host = null, bool $unterminateDomains = false, bool $forceArray = false): mixed
     {
-        if(is_array($url)){
+        if (is_array($url)) {
             $newUrls = [];
-            foreach($url as $newUrl){
+            foreach ($url as $newUrl) {
                 $newUrls[] = $this->createServiceUrl($newUrl, $host, $unterminateDomains);
             }
+
             return $newUrls;
         }
-        if (!empty($host) || $unterminateDomains) {
-            $host = !empty($host) ? $host : parse_url($url, PHP_URL_HOST);
-            if($unterminateDomains){
+        if (! empty($host) || $unterminateDomains) {
+            $host = ! empty($host) ? $host : parse_url($url, PHP_URL_HOST);
+            if ($unterminateDomains) {
                 $host = trim($host, '.');
             }
             $url =
@@ -303,15 +283,12 @@ using the default ports.')
                 . parse_url($url, PHP_URL_PORT)
                 . (parse_url($url, PHP_URL_PATH) ?? '');
         }
-        return ($forceArray && !is_array($url)) ? [ $url ] : $url;
+
+        return ($forceArray && ! is_array($url)) ? [$url] : $url;
     }
 
     /**
      * En-/Disables a plugin (if auto-set is set)
-     * @param string $plugin
-     * @param bool $active
-     * @param bool $doSave
-     * @return void
      * @throws Zend_Db_Statement_Exception
      * @throws ZfExtended_Models_Entity_Exceptions_IntegrityConstraint
      * @throws ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey

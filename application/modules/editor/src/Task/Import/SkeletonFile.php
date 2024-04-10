@@ -61,15 +61,16 @@ use function gzuncompress;
 class SkeletonFile
 {
     public const SKELETON_DIR_NAME = 'skeletonfiles';
+
     public const SKELETON_PATH = '/skeletonfiles/file_%d.zlib';
 
-    public function __construct(private Task $task)
-    {
+    public function __construct(
+        private Task $task
+    ) {
     }
 
     /**
      * Saves the skeleton data for the current file to the disk
-     * @param File $file
      * @param string $data Skeletonfile data
      * @throws ZfExtended_Exception
      */
@@ -77,10 +78,10 @@ class SkeletonFile
     {
         $filePath = $this->getSkeletonPath($file);
         $skelDir = dirname($filePath);
-        if (!file_exists($skelDir)) {
+        if (! file_exists($skelDir)) {
             @mkdir($skelDir);
         }
-        if (!is_writable($skelDir)) {
+        if (! is_writable($skelDir)) {
             throw new ZfExtended_Exception('Skeleton directory is not writeable! Directory: ' . $skelDir);
         }
         file_put_contents($filePath, gzcompress($data));
@@ -88,8 +89,6 @@ class SkeletonFile
 
     /**
      * Returns tha ABSOLUTE path to the skeleton file
-     * @param File $file
-     * @return string
      */
     private function getSkeletonPath(File $file): string
     {
@@ -98,8 +97,6 @@ class SkeletonFile
 
     /**
      * gets the absolute pathname to other files from the skeleton dir of a task
-     * @param string $filename
-     * @return string
      */
     public function getAbsolutePath(string $filename): string
     {
@@ -111,28 +108,27 @@ class SkeletonFile
 
     public function ensureDirectory(): void
     {
-        $skeletondir = $this->task->getAbsoluteTaskDataPath().'/'. SkeletonFile::SKELETON_DIR_NAME;
-        if(!is_dir($skeletondir)) {
+        $skeletondir = $this->task->getAbsoluteTaskDataPath() . '/' . SkeletonFile::SKELETON_DIR_NAME;
+        if (! is_dir($skeletondir)) {
             @mkdir($skeletondir);
         }
     }
 
     /**
      * Loads the skeleton data for the current file from the disk and returns it
-     * @param File $file
-     * @return string
      * @throws ZfExtended_Exception
      */
     public function loadFromDisk(File $file): string
     {
         $filePath = $this->getSkeletonPath($file);
-        if (!file_exists($filePath)) {
+        if (! file_exists($filePath)) {
             throw new ZfExtended_Exception('Skeleton file does not exist or not readable! File: ' . $filePath);
         }
         $data = gzuncompress(file_get_contents($filePath));
         if ($data === false) {
             return '';
         }
+
         return $data;
     }
 }

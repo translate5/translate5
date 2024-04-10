@@ -3,25 +3,25 @@
 START LICENSE AND COPYRIGHT
 
  This file is part of translate5
- 
+
  Copyright (c) 2013 - 2021 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
 
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
  This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
- as published by the Free Software Foundation and appearing in the file agpl3-license.txt 
- included in the packaging of this file.  Please review the following information 
+ as published by the Free Software Foundation and appearing in the file agpl3-license.txt
+ included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
-  
+
  There is a plugin exception available for use with this release of translate5 for
- translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or
  plugin-exception.txt in the root folder of translate5.
-  
+
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
@@ -38,7 +38,6 @@ use editor_Models_Segment_TrackChangeTag as TrackChangeTag;
  */
 class editor_Models_Import_FileParser_Sdlxliff_TransunitParser
 {
-
     /**
      * The collected mrk source tags of one transunit
      * @var array
@@ -118,8 +117,10 @@ class editor_Models_Import_FileParser_Sdlxliff_TransunitParser
 
     private bool $isTrackChangesActive;
 
-    public function __construct(Zend_Config $config, private editor_Models_Task $task)
-    {
+    public function __construct(
+        Zend_Config $config,
+        private editor_Models_Task $task
+    ) {
         $this->config = $config;
         $this->xmlparser = ZfExtended_Factory::get('editor_Models_Import_FileParser_XmlParser');
         $this->taskUserTracking = ZfExtended_Factory::get(editor_Models_TaskUserTracking::class);
@@ -167,14 +168,14 @@ class editor_Models_Import_FileParser_Sdlxliff_TransunitParser
                 //if there were no target mrks, we have to insert them into the skeleton file
                 if (empty($this->targetMrkContent)) {
                     //add them into the transUnit and in the skeleton file
-                    $transUnit = str_replace('</target>', join('', $this->sourceEmptyMrkTags).'</target>', $transUnit);
+                    $transUnit = str_replace('</target>', join('', $this->sourceEmptyMrkTags) . '</target>', $transUnit);
                 }
                 // exception if source and target segment count does not match
                 elseif (count($this->sourceMrkContent) !== count($this->targetMrkContent)) {
                     throw new editor_Models_Import_FileParser_Sdlxliff_Exception('E1009', [
                         'filename' => $this->_fileName ?? 'not provided',
                         'task' => $this->task ?? 'not provided',
-                        'transunit' => $transUnit
+                        'transunit' => $transUnit,
                     ]);
                 }
 
@@ -253,7 +254,7 @@ class editor_Models_Import_FileParser_Sdlxliff_TransunitParser
                 // we collect the comment IDs and add a text container for the selected content there:
                 $this->comments[$commentId] = [
                     'text' => [],
-                    'field' => editor_Models_Import_FileParser_Sdlxliff::TARGET
+                    'field' => editor_Models_Import_FileParser_Sdlxliff::TARGET,
                 ];
             },
             function ($tag, $key, $opener) {
@@ -273,7 +274,7 @@ class editor_Models_Import_FileParser_Sdlxliff_TransunitParser
                 // we collect the comment IDs and add a text container for the selected content there:
                 $this->comments[$commentId] = [
                     'text' => [],
-                    'field' => editor_Models_Import_FileParser_Sdlxliff::SOURCE
+                    'field' => editor_Models_Import_FileParser_Sdlxliff::SOURCE,
                 ];
             },
             function ($tag, $key, $opener) {
@@ -361,7 +362,7 @@ class editor_Models_Import_FileParser_Sdlxliff_TransunitParser
             $commentId = $this->xmlparser->getAttribute($opener['attributes'], 'id');
             // store the element
             $this->unitComments[editor_Models_Import_FileParser_Sdlxliff::TRANS_UNIT][$commentId] = [
-                'field' => editor_Models_Import_FileParser_Sdlxliff::TRANS_UNIT
+                'field' => editor_Models_Import_FileParser_Sdlxliff::TRANS_UNIT,
             ];
         });
     }
@@ -375,13 +376,13 @@ class editor_Models_Import_FileParser_Sdlxliff_TransunitParser
             //replace track changes mrk with our tags
             $this->xmlparser->registerElement(
                 'trans-unit mrk[mtype=x-sdl-added]',
-                fn($tag, $attr, $key) => $this->xmlparser->replaceChunk($key, ''),
-                fn($tag, $key, $opener) => $this->replaceTrackChangeTag($key, $opener, true, $revIdToUserDataMap)
+                fn ($tag, $attr, $key) => $this->xmlparser->replaceChunk($key, ''),
+                fn ($tag, $key, $opener) => $this->replaceTrackChangeTag($key, $opener, true, $revIdToUserDataMap)
             );
             $this->xmlparser->registerElement(
                 'trans-unit mrk[mtype=x-sdl-deleted]',
-                fn($tag, $attr, $key) => $this->xmlparser->replaceChunk($key, ''),
-                fn($tag, $key, $opener) => $this->replaceTrackChangeTag($key, $opener, false, $revIdToUserDataMap)
+                fn ($tag, $attr, $key) => $this->xmlparser->replaceChunk($key, ''),
+                fn ($tag, $key, $opener) => $this->replaceTrackChangeTag($key, $opener, false, $revIdToUserDataMap)
             );
 
             return;
@@ -421,7 +422,7 @@ class editor_Models_Import_FileParser_Sdlxliff_TransunitParser
         $authorData = $revIdToUserDataMap[$opener['attributes']['sdl:revid']];
         $author = $authorData['author'];
 
-        if (!isset($this->authorToTrackChangeIdAndNr[$author])) {
+        if (! isset($this->authorToTrackChangeIdAndNr[$author])) {
             $this->authorToTrackChangeIdAndNr[$author] = $this->taskUserTracking->createTaskUserTrackingEntry(
                 editor_Models_TaskUserTrackingDto::fromUsername($this->task->getTaskGuid(), $author)
             );
@@ -446,24 +447,24 @@ class editor_Models_Import_FileParser_Sdlxliff_TransunitParser
     /**
      * if there is no or an empty target, easiest way to prepare it,
      *   is by cloning the source content and then ignore the so created content on parsing
-     * @param string $transUnit
-     * @return string
      */
-    protected function handleEmptyTarget(string $transUnit): string {
+    protected function handleEmptyTarget(string $transUnit): string
+    {
         //if there is no target or an empty target we have to insert it
-        if(strpos($transUnit, '<target') === false) {
-            $transUnit = str_replace('</seg-source>', '</seg-source>'.'<target></target>', $transUnit);
-        }
-        else{
+        if (strpos($transUnit, '<target') === false) {
+            $transUnit = str_replace('</seg-source>', '</seg-source>' . '<target></target>', $transUnit);
+        } else {
             //some versions of SDL Studio adds empty <target/> tags which must be converted then to
             $transUnit = preg_replace('#<target[^>]*/>#', '<target></target>', $transUnit);
         }
+
         //we fill the target with the source content
-        return preg_replace_callback('#<target>\s*</target>#', function() use ($transUnit){
+        return preg_replace_callback('#<target>\s*</target>#', function () use ($transUnit) {
             $this->wasEmptyTarget = true;
             //we split the transunit at the seg-source boundaries which gives as 3 elements, we return the one in the middle.
-            $source = preg_split('#<[/]{0,1}seg-source[^>]*>#',$transUnit);
-            return '<target>'.$source[1].'</target>';
+            $source = preg_split('#<[/]{0,1}seg-source[^>]*>#', $transUnit);
+
+            return '<target>' . $source[1] . '</target>';
         }, $transUnit);
     }
 
@@ -496,21 +497,22 @@ class editor_Models_Import_FileParser_Sdlxliff_TransunitParser
     {
         $collected = [];
         preg_match_all('/<sdl:cmt\s+id="([^"]+)"/', $transUnit, $matches);
-        if(!empty($matches)){
+        if (! empty($matches)) {
             foreach ($matches[1] as $commentId) {
                 $collected[$commentId] = [
-                    'field' => editor_Models_Import_FileParser_Sdlxliff::TRANS_UNIT
+                    'field' => editor_Models_Import_FileParser_Sdlxliff::TRANS_UNIT,
                 ];
             }
         }
+
         return $collected;
     }
 
     /**
      * returns the found trans-unit id
-     * @return string|NULL
      */
-    public function getTransunitId(): ?string {
+    public function getTransunitId(): ?string
+    {
         return $this->transunitId;
     }
 }

@@ -3,7 +3,7 @@
 START LICENSE AND COPYRIGHT
 
  This file is part of translate5
- 
+
  Copyright (c) 2013 - 2021 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
 
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
@@ -13,11 +13,11 @@ START LICENSE AND COPYRIGHT
  included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
-  
+
  There is a plugin exception available for use with this release of translate5 for
  translate5: Please see http://www.translate5.net/plugin-exception.txt or
  plugin-exception.txt in the root folder of translate5.
-  
+
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
@@ -26,16 +26,17 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-use MittagQI\Translate5\Task\Export\FileParser\Xlf\Comments;
 use editor_Models_Import_FileParser_XmlParser as XmlParser;
+use MittagQI\Translate5\Task\Export\FileParser\Xlf\Comments;
 
 /**
  * XLF Fileparser Add On abstract class
  */
 abstract class editor_Models_Export_FileParser_Xlf_Namespaces_Abstract
 {
-    public function __construct(protected XmlParser $xmlparser, protected Comments $comments)
-    {
-
+    public function __construct(
+        protected XmlParser $xmlparser,
+        protected Comments $comments
+    ) {
     }
 }

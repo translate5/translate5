@@ -3,7 +3,7 @@
 START LICENSE AND COPYRIGHT
 
  This file is part of translate5
- 
+
  Copyright (c) 2013 - 2021 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
 
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
@@ -13,11 +13,11 @@ START LICENSE AND COPYRIGHT
  included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
-  
+
  There is a plugin exception available for use with this release of translate5 for
  translate5: Please see http://www.translate5.net/plugin-exception.txt or
  plugin-exception.txt in the root folder of translate5.
-  
+
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
@@ -45,7 +45,9 @@ use ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey;
 class Comments
 {
     public const NOTE_USERGUID = 'xlf-note-imported';
+
     protected const ANNOTATE_SOURCE = 'source';
+
     protected const ANNOTATE_TARGET = 'target';
 
     /**
@@ -53,16 +55,13 @@ class Comments
      */
     private array $comments = [];
 
-    /**
-     * @param editor_Models_Task $task
-     */
-    public function __construct(private editor_Models_Task $task)
-    {
+    public function __construct(
+        private editor_Models_Task $task
+    ) {
     }
 
     /**
      * Imports the comments of last processed segment
-     * @param int $segmentId
      * @throws ReflectionException
      * @throws Zend_Db_Statement_Exception
      * @throws ZfExtended_Models_Entity_Exceptions_IntegrityConstraint
@@ -82,7 +81,7 @@ class Comments
             $comment->save();
         }
         //if there was at least one processed comment, we have to sync the comment contents to the segment
-        if (!is_null($comment)) {
+        if (! is_null($comment)) {
             $segment = ZfExtended_Factory::get(editor_Models_Segment::class);
             $segment->load($segmentId);
             $comment->updateSegment($segment, $this->task->getTaskGuid());
@@ -93,9 +92,7 @@ class Comments
     }
 
     /**
-     * @param string $commentText
      * @param array{lang: string, from: ?string, priority: string, annotates: string} $attributes
-     * @return void
      * @throws ReflectionException
      */
     public function addByNote(string $commentText, array $attributes): void
@@ -113,38 +110,32 @@ class Comments
         $comment->setModified(NOW_ISO);
     }
 
-    /**
-     * @param array $attributes
-     * @param string $commentText
-     * @return string
-     */
     private function addCommentMeta(array $attributes, string $commentText): string
     {
         $metaData = [];
         switch ($attributes['annotates']) {
             case self::ANNOTATE_SOURCE:
                 $metaData[] = 'annotates source column';
+
                 break;
             case self::ANNOTATE_TARGET:
                 $metaData[] = 'annotates target column';
+
                 break;
             default:
                 break;
         }
 
-        if (!is_null($attributes['priority'])) {
+        if (! is_null($attributes['priority'])) {
             $metaData[] = 'priority: ' . $attributes['priority'];
         }
-        if (!empty($metaData)) {
+        if (! empty($metaData)) {
             $commentText = join('; ', $metaData) . "\n" . $commentText;
         }
+
         return $commentText;
     }
 
-    /**
-     * @param editor_Models_Comment $comment
-     * @return void
-     */
     public function add(editor_Models_Comment $comment): void
     {
         $this->comments[] = $comment;

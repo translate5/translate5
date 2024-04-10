@@ -21,7 +21,7 @@ START LICENSE AND COPYRIGHT
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
@@ -36,28 +36,37 @@ use ZfExtended_Zendoverwrites_Translate;
 class Status
 {
     public const NOTCHECKED = 'notchecked';
-    public const ERROR = 'error';
-    public const AVAILABLE = 'available';
-    public const UNKNOWN = 'unknown';
-    public const NOCONNECTION = 'noconnection';
-    public const NOVALIDLICENSE = 'novalidlicense';
-    public const NOT_LOADED = 'notloaded';
-    public const QUOTA_EXCEEDED = 'quotaexceeded';
-    public const REORGANIZE_IN_PROGRESS = 'reorganize';
-    public const REORGANIZE_FAILED = 'reorganize failed';
-    public const TUNING_IN_PROGRESS = 'tuninginprogress';
-    public const IMPORT = 'import';
 
+    public const ERROR = 'error';
+
+    public const AVAILABLE = 'available';
+
+    public const UNKNOWN = 'unknown';
+
+    public const NOCONNECTION = 'noconnection';
+
+    public const NOVALIDLICENSE = 'novalidlicense';
+
+    public const NOT_LOADED = 'notloaded';
+
+    public const QUOTA_EXCEEDED = 'quotaexceeded';
+
+    public const REORGANIZE_IN_PROGRESS = 'reorganize';
+
+    public const REORGANIZE_FAILED = 'reorganize failed';
+
+    public const TUNING_IN_PROGRESS = 'tuninginprogress';
+
+    public const IMPORT = 'import';
 
     /**
      * Retrieve the linguistic equivalent of the status values above
-     * @param string $status
-     * @return string
      * @throws Zend_Exception
      */
     public static function statusInfo(string $status): string
     {
         $translate = ZfExtended_Zendoverwrites_Translate::getInstance();
+
         return match ($status) {
             self::NOTCHECKED => $translate->_('Nicht geprüft'),
             self::ERROR => $translate->_('Fehler'),

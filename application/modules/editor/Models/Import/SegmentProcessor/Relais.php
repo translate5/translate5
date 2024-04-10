@@ -3,25 +3,25 @@
 START LICENSE AND COPYRIGHT
 
  This file is part of translate5
- 
+
  Copyright (c) 2013 - 2021 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
 
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
  This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
- as published by the Free Software Foundation and appearing in the file agpl3-license.txt 
- included in the packaging of this file.  Please review the following information 
+ as published by the Free Software Foundation and appearing in the file agpl3-license.txt
+ included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
-  
+
  There is a plugin exception available for use with this release of translate5 for
- translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or
  plugin-exception.txt in the root folder of translate5.
-  
+
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
@@ -54,7 +54,6 @@ class editor_Models_Import_SegmentProcessor_Relais extends editor_Models_Import_
     protected Source $alignment;
 
     /**
-     * @param editor_Models_Task $task
      * @param editor_Models_SegmentFieldManager $sfm receive the already inited sfm
      */
     public function __construct(editor_Models_Task $task, editor_Models_SegmentFieldManager $sfm)
@@ -78,10 +77,12 @@ class editor_Models_Import_SegmentProcessor_Relais extends editor_Models_Import_
         if (is_null($segment)) {
             return false;
         }
+
         try {
             $data = $parser->getFieldContents();
             $target = $this->sfm->getFirstTargetName();
             $segment->addFieldContent($this->relaisField, $this->fileId, $parser->getMid(), $data[$target]);
+
             return $segment->getId();
         } catch (ZfExtended_Models_Entity_NotFoundException $e) {
             $this->alignment->addError(new \MittagQI\Translate5\Task\Import\Alignment\Error(
@@ -90,6 +91,7 @@ class editor_Models_Import_SegmentProcessor_Relais extends editor_Models_Import_
              source of original file, but still original segment not found in the database.﻿ See Details.',
                 [$e->getMessage()]
             ));
+
             return false;
         }
     }
@@ -97,7 +99,6 @@ class editor_Models_Import_SegmentProcessor_Relais extends editor_Models_Import_
     /**
      * Überschriebener Post Parse Handler, erstellt in diesem Fall das Skeleton File
      * @override
-     * @param editor_Models_Import_FileParser $parser
      * @throws Zend_Exception
      */
     public function postParseHandler(editor_Models_Import_FileParser $parser)
@@ -120,10 +121,12 @@ class editor_Models_Import_SegmentProcessor_Relais extends editor_Models_Import_
         $logger = Zend_Registry::get('logger');
         /* @var ZfExtended_Logger $logger */
 
-        foreach ($errors as $error){
+        foreach ($errors as $error) {
             /* @var \MittagQI\Translate5\Task\Import\Alignment\Error $error */
 
-            $logger->warn($error->getCode(),$error->getMessage(),
+            $logger->warn(
+                $error->getCode(),
+                $error->getMessage(),
                 array_merge(
                     [
                         'task' => $this->task,
@@ -142,6 +145,8 @@ class editor_Models_Import_SegmentProcessor_Relais extends editor_Models_Import_
      */
     public function postProcessHandler(editor_Models_Import_FileParser $parser, $segmentId): void
     {
-        $this->calculateFieldWidth($parser, [$this->sfm->getFirstTargetName() => 'relais']);
+        $this->calculateFieldWidth($parser, [
+            $this->sfm->getFirstTargetName() => 'relais',
+        ]);
     }
 }
