@@ -386,6 +386,54 @@ Your new login name:
                     </figure>
                 </target>
             </trans-unit>
+            <trans-unit id='e1Rlcm1Qb3J0YWxZb3V0dWJlVmlkZW9HdWlkZVVybH0='>
+                <source>{TermPortalYoutubeVideoGuideUrl}</source>
+                <target>https://www.youtube.com/embed/E6LDLIscwv8</target>
+            </trans-unit>
+            <trans-unit id='e1Rlcm1Qb3J0YWxZb3V0dWJlVmlkZW9HdWlkZURlc2NyaXB0aW9uQ29udGVudH0='>
+                <source>{TermPortalYoutubeVideoGuideDescriptionContent}</source>
+                <target>
+                    <br/>
+                    <br/>
+                    <figure>
+                        <figcaption>
+                            <b>Overview:</b>
+                        </figcaption>
+                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/E6LDLIscwv8?start=0&amp;autoplay=1" dir="auto">0:00</a> Intro
+                        <br/>
+                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/E6LDLIscwv8?start=9&amp;autoplay=1" dir="auto">0:09</a> Add termcollection
+                        <br/>
+                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/E6LDLIscwv8?start=28&amp;autoplay=1" dir="auto">0:28</a> Switch to TermPortal
+                        <br/>
+                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/E6LDLIscwv8?start=41&amp;autoplay=1" dir="auto">0:41</a> The different areas of the TermPortal
+                        <br/>
+                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/E6LDLIscwv8?start=67&amp;autoplay=1" dir="auto">1:07</a> Searchfield
+                        <br/>
+                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/E6LDLIscwv8?start=81&amp;autoplay=1" dir="auto">1:21</a> Filteroptions
+                        <br/>
+                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/E6LDLIscwv8?start=104&amp;autoplay=1" dir="auto">1:44</a> Search results
+                        <br/>
+                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/E6LDLIscwv8?start=120&amp;autoplay=1" dir="auto">2:00</a> Propose new term entry
+                        <br/>
+                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/E6LDLIscwv8?start=148&amp;autoplay=1" dir="auto">2:28</a> TermPortal user-rights
+                        <br/>
+                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/E6LDLIscwv8?start=165&amp;autoplay=1" dir="auto">2:45</a> Start translation
+                        <br/>
+                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/E6LDLIscwv8?start=226&amp;autoplay=1" dir="auto">3:46</a> Batch edit
+                        <br/>
+                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/E6LDLIscwv8?start=237&amp;autoplay=1" dir="auto">3:57</a> Terms of entry
+                        <br/>
+                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/E6LDLIscwv8?start=257&amp;autoplay=1" dir="auto">4:17</a> Propose new Term
+                        <br/>
+                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/E6LDLIscwv8?start=278&amp;autoplay=1" dir="auto">4:38</a> Attribute levels
+                        <br/>
+                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/E6LDLIscwv8?start=362&amp;autoplay=1" dir="auto">6:02</a> InstantTranslate
+                        <br/>
+                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/E6LDLIscwv8?start=387&amp;autoplay=1" dir="auto">6:27</a> Contact information
+                        <br/>
+                    </figure>
+                </target>
+            </trans-unit>
             <trans-unit id='e0VkaXRvcllvdXR1YmVWaWRlb0d1aWRlVXJsfQ=='>
                 <source>{EditorYoutubeVideoGuideUrl}</source>
                 <target>https://www.youtube.com/embed/uHJP6l1iXuU</target>
