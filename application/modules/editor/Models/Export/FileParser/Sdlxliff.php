@@ -109,7 +109,7 @@ class editor_Models_Export_FileParser_Sdlxliff extends editor_Models_Export_File
         }
 
         // This removes all segment tags but the ones needed for export
-        return $segmentExport->process($this->isTrackChangesPluginActive);
+        return $segmentExport->process($this->isTrackChangesPluginActive && ($this->options['diff'] ?? false));
     }
 
     /**
