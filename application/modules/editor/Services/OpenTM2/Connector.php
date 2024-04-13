@@ -1585,12 +1585,12 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
     private function waitForImportFinish(string $tmName): void
     {
         while (true) {
-            if ($this->api->status($tmName)) {
+            if (!$this->api->status($tmName)) {
                 break;
             }
 
             $result = $this->api->getResult();
-            $status =  $this->processImportStatus(is_object($result) ? $result : null);
+            $status = $this->processImportStatus(is_object($result) ? $result : null);
 
             if ($status !== LanguageResourceStatus::IMPORT) {
                 break;
