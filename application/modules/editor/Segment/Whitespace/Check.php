@@ -3,7 +3,7 @@
 START LICENSE AND COPYRIGHT
 
  This file is part of translate5
- 
+
  Copyright (c) 2013 - 2017 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
 
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
@@ -13,52 +13,54 @@ START LICENSE AND COPYRIGHT
  included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
-  
+
  There is a plugin exception available for use with this release of translate5 for
  translate5: Please see http://www.translate5.net/plugin-exception.txt or
  plugin-exception.txt in the root folder of translate5.
-  
+
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
 
 /**
- * 
  * Checks the consistency of translations: Segments with an identical target but different sources or with identical sources but different targets
  * This Check can only be done for all segments of a task at once
- *
  */
-class editor_Segment_Whitespace_Check {
+class editor_Segment_Whitespace_Check
+{
+    public const TAG_SPACE_BEG = 'tag_space_begin';
 
-    const TAG_SPACE_BEG = 'tag_space_begin';
-    const NBSP_BEG  = 'nbsp_begin';
-    const TAB_BEG   = 'tab_begin';
-    const LNBR_BEG  = 'lnbr_begin';
+    public const NBSP_BEG = 'nbsp_begin';
 
-    const SPACE_TAG_END = 'space_tag_end';
-    const NBSP_END  = 'nbsp_end';
-    const TAB_END   = 'tab_end';
-    const LNBR_END  = 'lnbr_end';
+    public const TAB_BEG = 'tab_begin';
 
-    const SPACE_LNBR = 'space_lnbr';
-    const LNBR_SPACE = 'lnbr_space';
+    public const LNBR_BEG = 'lnbr_begin';
+
+    public const SPACE_TAG_END = 'space_tag_end';
+
+    public const NBSP_END = 'nbsp_end';
+
+    public const TAB_END = 'tab_end';
+
+    public const LNBR_END = 'lnbr_end';
+
+    public const SPACE_LNBR = 'space_lnbr';
+
+    public const LNBR_SPACE = 'lnbr_space';
 
     /**
      * @var array
      */
     private $states = [];
 
-    /**
-     * @param editor_Models_Task $task
-     */
-    public function __construct(editor_Models_Task $task, editor_Segment_FieldTags $fieldTags, editor_Models_Segment $segment) {
-
+    public function __construct(editor_Models_Task $task, editor_Segment_FieldTags $fieldTags, editor_Models_Segment $segment)
+    {
         // If no tags - do nothing
-        if (!$fieldTags->hasTags()) {
+        if (! $fieldTags->hasTags()) {
             return;
         }
 
@@ -78,7 +80,6 @@ class editor_Segment_Whitespace_Check {
         // Foreach tag (excluding trackchanges-tags)
         /** @var editor_Segment_Internal_Tag $tag */
         foreach ($tags as $idx => $tag) {
-
             // If it's not an internal tag - skip
             if ($tag->getType() != editor_Segment_Tag::TYPE_INTERNAL) {
                 continue;
@@ -87,7 +88,7 @@ class editor_Segment_Whitespace_Check {
             // Check whether tag is located at the beginning and/or ending
             $sideA = [];
             if ($tag->startIndex === 0 && $idx == 0) {
-                $sideA['BEG'] = [ 0, self::TAG_SPACE_BEG, +1];
+                $sideA['BEG'] = [0, self::TAG_SPACE_BEG, +1];
             }
             if ($tag->endIndex === $endIndex && $idx == $tagsQty - 1) {
                 $sideA['END'] = [-1, self::SPACE_TAG_END, -1];
@@ -95,7 +96,6 @@ class editor_Segment_Whitespace_Check {
 
             // Foreach side
             foreach ($sideA as $side => $info) {
-
                 // Get neighbour tag, e.g. tag coming after/before current tag, if there is such
                 $neighbour = $tags[$idx + $info[2]] ?? false;
 
@@ -105,25 +105,27 @@ class editor_Segment_Whitespace_Check {
                 }
 
                 // If it's a ordinary space and if there is no neighbour right after/before current tag
-                if (mb_substr($fieldText, $tag->startIndex + $info[0], 1) == ' ' && !$neighbour) {
-
+                if (mb_substr($fieldText, $tag->startIndex + $info[0], 1) == ' ' && ! $neighbour) {
                     // Append quality category
                     $this->states[$info[1]] = $info[1];
                 }
             }
 
             // Detect the exact kind of whitespace
-                 if ($tag->isNbsp())    $kind = 'NBSP';
-            else if ($tag->isTab())     $kind = 'TAB';
-            else if ($tag->isNewline()) $kind = 'LNBR';
-            else                        $kind = false;
+            if ($tag->isNbsp()) {
+                $kind = 'NBSP';
+            } elseif ($tag->isTab()) {
+                $kind = 'TAB';
+            } elseif ($tag->isNewline()) {
+                $kind = 'LNBR';
+            } else {
+                $kind = false;
+            }
 
             // If kind is detected
             if ($kind) {
-
                 // If tag location at the beginning and/or ending detectedbegin
                 foreach ($sideA as $side => $info) {
-
                     // Get quality category by referring to a correct constant
                     $const = constant('self::' . $kind . '_' . $side);
 
@@ -133,13 +135,13 @@ class editor_Segment_Whitespace_Check {
 
                 // If whitespace kind is linebreak
                 if ($kind == 'LNBR') {
-
                     // Check prev and next character
-                    foreach ([self::SPACE_LNBR => -1, self::LNBR_SPACE => 0] as $category => $shift) {
-
+                    foreach ([
+                        self::SPACE_LNBR => -1,
+                        self::LNBR_SPACE => 0,
+                    ] as $category => $shift) {
                         // If it's a ordinary space
                         if (mb_substr($fieldText, $tag->startIndex + $shift, 1) == ' ') {
-
                             // Append quality category
                             $this->states[$category] = $category;
                         }
@@ -153,15 +155,16 @@ class editor_Segment_Whitespace_Check {
      * Retrieves the evaluated states
      * @return string[]
      */
-    public function getStates(){
+    public function getStates()
+    {
         return $this->states;
     }
 
     /**
-     * 
      * @return boolean
      */
-    public function hasStates() {
+    public function hasStates()
+    {
         return count($this->states) > 0;
     }
 }

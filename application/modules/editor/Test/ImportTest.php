@@ -21,7 +21,7 @@ START LICENSE AND COPYRIGHT
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
@@ -34,24 +34,18 @@ use MittagQI\Translate5\Test\Import\Task;
  */
 abstract class editor_Test_ImportTest extends editor_Test_ApiTest
 {
-    /**
-     * @var Config
-     */
     private static ?Config $_config = null;
 
     /**
      * This is the central method to setup an ImportTest
      * Here all tasks and resources have to be added to the config
-     * @param Config $config
      */
     protected static function setupImport(Config $config): void
     {
-
     }
 
     /**
      * Retrieves the test Config
-     * @return Config
      */
     protected static function getConfig(): Config
     {
@@ -60,7 +54,6 @@ abstract class editor_Test_ImportTest extends editor_Test_ApiTest
 
     /**
      * Retrieves the imported task (if eactly one was setup)
-     * @return Task
      * @throws \MittagQI\Translate5\Test\Import\Exception
      */
     protected static function getTask(): Task
@@ -70,8 +63,6 @@ abstract class editor_Test_ImportTest extends editor_Test_ApiTest
 
     /**
      * Convenience-API to get the task with the given index
-     * @param int $index
-     * @return Task
      * @throws \MittagQI\Translate5\Test\Import\Exception
      */
     protected static function getTaskAt(int $index): Task
@@ -81,7 +72,6 @@ abstract class editor_Test_ImportTest extends editor_Test_ApiTest
 
     /**
      * Resets the config as it points to stuff from the last test in the setup phase
-     * @return void
      */
     protected static function testSpecificInit()
     {
@@ -107,7 +97,7 @@ abstract class editor_Test_ImportTest extends editor_Test_ApiTest
     final protected static function testSpecificTeardown(bool $doCleanup)
     {
         // when early problems in the test-setup occurred, the config might not even was created
-        if($doCleanup && static::$_config){
+        if ($doCleanup && static::$_config) {
             // teardown the configured stuff
             static::$_config->teardown();
         }

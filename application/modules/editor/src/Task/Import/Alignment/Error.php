@@ -21,50 +21,32 @@ START LICENSE AND COPYRIGHT
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
 
 namespace MittagQI\Translate5\Task\Import\Alignment;
 
-/**
- *
- */
 class Error
 {
-    /**
-     * @param string $code
-     * @param string $message
-     * @param array $extra
-     */
     public function __construct(
         private string $code,
         private string $message,
         private array $extra
-    )
-    {
+    ) {
     }
 
-    /**
-     * @return string
-     */
     public function getCode(): string
     {
         return $this->code;
     }
 
-    /**
-     * @return string
-     */
     public function getMessage(): string
     {
         return $this->message;
     }
 
-    /**
-     * @return array
-     */
     public function getExtra(): array
     {
         return $this->extra;
@@ -78,7 +60,7 @@ class Error
     {
         if (is_array($add)) {
             $this->extra = array_merge($this->extra, $add);
-        }else {
+        } else {
             $this->extra[] = $add;
         }
     }

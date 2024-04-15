@@ -3,7 +3,7 @@
 START LICENSE AND COPYRIGHT
 
  This file is part of translate5
- 
+
  Copyright (c) 2013 - 2021 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
 
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
@@ -13,15 +13,15 @@ START LICENSE AND COPYRIGHT
  included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
-  
+
  There is a plugin exception available for use with this release of translate5 for
  translate5: Please see http://www.translate5.net/plugin-exception.txt or
  plugin-exception.txt in the root folder of translate5.
-  
+
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
@@ -40,24 +40,25 @@ class editor_Models_Import_Worker extends editor_Models_Task_AbstractWorker
      */
     protected function validateParameters($parameters = []): bool
     {
-        if (empty($parameters['config']) || !$parameters['config'] instanceof editor_Models_Import_Configuration) {
+        if (empty($parameters['config']) || ! $parameters['config'] instanceof editor_Models_Import_Configuration) {
             throw new ZfExtended_Exception(
                 'missing or wrong parameter config, must be if instance editor_Models_Import_Configuration'
             );
         }
-        
+
         if (
             empty($parameters['dataProvider'])
-            || !$parameters['dataProvider'] instanceof editor_Models_Import_DataProvider_Abstract
+            || ! $parameters['dataProvider'] instanceof editor_Models_Import_DataProvider_Abstract
         ) {
             throw new ZfExtended_Exception(
                 'missing or wrong parameter dataProvider,'
                 . ' must be if instance editor_Models_Import_DataProvider_Abstract'
             );
         }
+
         return true;
     }
-    
+
     /**
      * (non-PHPdoc)
      * @see ZfExtended_Worker_Abstract::work()
@@ -68,16 +69,16 @@ class editor_Models_Import_Worker extends editor_Models_Task_AbstractWorker
         if ($task->getState() != $task::STATE_IMPORT) {
             return false;
         }
-        
+
         $this->behaviour->registerShutdown();
-        
+
         //also containing an instance of the initial dataprovider.
         // The Dataprovider can itself hook on to several import events
         $parameters = $this->workerModel->getParameters();
         $importConfig = $parameters['config'];
         /* @var $importConfig editor_Models_Import_Configuration */
         $importConfig->workerId = $this->workerModel->getId();
-        
+
         // externalImport just triggers the event afterImport!
         $eventTrigger = new ImportEventTrigger();
 

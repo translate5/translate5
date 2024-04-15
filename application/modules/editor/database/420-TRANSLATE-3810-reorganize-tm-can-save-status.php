@@ -45,7 +45,7 @@ $SCRIPT_IDENTIFIER = '420-TRANSLATE-3810-reorganize-tm-can-save-status.php';
  * define database credential variables
  */
 $argc = count($argv);
-if(empty($this) || empty($argv) || $argc < 5 || $argc > 7) {
+if (empty($this) || empty($argv) || $argc < 5 || $argc > 7) {
     die("please dont call the script direct! Call it by using DBUpdater!\n\n");
 }
 
@@ -58,12 +58,12 @@ $result = $res->fetchAll();
 
 $logger = Zend_Registry::get('logger');
 
-if(count($result) === 0)
-{
+if (count($result) === 0) {
     $logger->info(
         'E0000',
         'No resource with -fuzzy- keyword in the name or specific data found'
     );
+
     return;
 }
 
@@ -72,14 +72,12 @@ $logger->error(
     'Detected resource with -fuzzy- keyword in the name or specific data: ' . count($result) . ' resource'
 );
 
-foreach ($result as $row)
-{
-
+foreach ($result as $row) {
     $logger->info(
         'E1599',
         'Processing detected resource: ' . $row['name'] . ' - ' . $row['id'],
         [
-            'specificData' => $row['specificData']
+            'specificData' => $row['specificData'],
         ]
     );
 
@@ -95,19 +93,18 @@ foreach ($result as $row)
 
     $memoryCount = 0;
 
-    foreach ($specificData['memories'] as &$memory)
-    {
+    foreach ($specificData['memories'] as &$memory) {
         $logger->info(
             'E1599',
-            'Processing detected resource memory: '.$memory['filename'],
+            'Processing detected resource memory: ' . $memory['filename'],
             [
-                'memory' => $memory
+                'memory' => $memory,
             ]
         );
 
         $correct = explode('-fuzzy-', $memory['filename']);
         $correct = $correct[0];
-        $memory['filename'] = $correct . ($memoryCount>0 ? '_'.$memoryCount : '');
+        $memory['filename'] = $correct . ($memoryCount > 0 ? '_' . $memoryCount : '');
 
         $memoryCount++;
     }
@@ -118,7 +115,7 @@ foreach ($result as $row)
         'E1599',
         'Resource after correction: ' . $model->getName() . ' - ' . $model->getId(),
         [
-            'specificData' => $model->getSpecificData(parseAsArray: true)
+            'specificData' => $model->getSpecificData(parseAsArray: true),
         ]
     );
 }

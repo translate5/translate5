@@ -3,25 +3,25 @@
 START LICENSE AND COPYRIGHT
 
  This file is part of translate5
- 
+
  Copyright (c) 2013 - 2021 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
 
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
  This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
- as published by the Free Software Foundation and appearing in the file agpl3-license.txt 
- included in the packaging of this file.  Please review the following information 
+ as published by the Free Software Foundation and appearing in the file agpl3-license.txt
+ included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
-  
+
  There is a plugin exception available for use with this release of translate5 for
- translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or
  plugin-exception.txt in the root folder of translate5.
-  
+
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
@@ -29,32 +29,36 @@ END LICENSE AND COPYRIGHT
 /**
  * process the importUpload field
  */
-class editor_Models_Import_UploadProcessor_ImportUpload extends editor_Models_Import_UploadProcessor_GenericUpload {
-
+class editor_Models_Import_UploadProcessor_ImportUpload extends editor_Models_Import_UploadProcessor_GenericUpload
+{
     protected $fieldName = 'importUpload';
-    
+
     protected $optional = false;
 
-    public function __construct(protected editor_Models_Task $task) {
+    public function __construct(
+        protected editor_Models_Task $task
+    ) {
         $this->targetDirectory = editor_Models_Import_Configuration::WORK_FILES_DIRECTORY;
     }
-    
+
     /**
      * checks the given upload data and inits matching the dataprovider
      * @return boolean
      */
-    public function initAndValidate(Zend_File_Transfer_Adapter_Http $upload, Callable $addErrorCallback): bool {
-        if(!parent::initAndValidate($upload, $addErrorCallback)) {
+    public function initAndValidate(Zend_File_Transfer_Adapter_Http $upload, callable $addErrorCallback): bool
+    {
+        if (! parent::initAndValidate($upload, $addErrorCallback)) {
             return false;
         }
-        
+
         $errors = $this->checkForFilesErrors($this->getFiles());
 
-        if(empty($errors)){
+        if (empty($errors)) {
             return true;
         }
 
         $addErrorCallback($errors);
+
         return false;
     }
 
@@ -74,15 +78,15 @@ class editor_Models_Import_UploadProcessor_ImportUpload extends editor_Models_Im
         $logger = Zend_Registry::get('logger');
 
         $fileIndex = 0;
-        foreach ($files as $file){
-
-            if(!$this->validateFileExtension($fileIndex)){
+        foreach ($files as $file) {
+            if (! $this->validateFileExtension($fileIndex)) {
                 $fileIndex++;
+
                 continue;
             }
 
             $ext = $this->getFileExtension($file);
-            if(!in_array($ext, $allValidExtensions)){
+            if (! in_array($ext, $allValidExtensions)) {
                 $data = [
                     'ext' => $ext,
                     'filename' => $file,
@@ -92,6 +96,7 @@ class editor_Models_Import_UploadProcessor_ImportUpload extends editor_Models_Im
             }
             $fileIndex++;
         }
+
         return $errors;
     }
 
@@ -101,11 +106,13 @@ class editor_Models_Import_UploadProcessor_ImportUpload extends editor_Models_Im
      * @param int $fileIndex
      * @return bool
      */
-    private function validateFileExtension(int $fileIndex): bool{
-        if(!$this->isProjectUpload()){
+    private function validateFileExtension(int $fileIndex): bool
+    {
+        if (! $this->isProjectUpload()) {
             return true;
         }
         $type = $_REQUEST['importUpload_type'][$fileIndex] ?? false;
+
         return $type !== 'reference';
     }
 
@@ -113,7 +120,8 @@ class editor_Models_Import_UploadProcessor_ImportUpload extends editor_Models_Im
      * Is the current upload project upload
      * @return bool
      */
-    private function isProjectUpload(): bool{
+    private function isProjectUpload(): bool
+    {
         return isset($_REQUEST['importUpload_type']);
     }
 }

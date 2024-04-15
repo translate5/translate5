@@ -21,7 +21,7 @@ START LICENSE AND COPYRIGHT
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
@@ -35,7 +35,6 @@ use editor_Models_Import_FileParser_Xlf_Exception;
 
 class ContentConverter extends editor_Models_Import_FileParser_Xlf_ContentConverter
 {
-
     /**
      * @var array[]
      */
@@ -65,7 +64,6 @@ class ContentConverter extends editor_Models_Import_FileParser_Xlf_ContentConver
     /**
      * Returns the Translate5 internal single tag to the given XLF single tag (<x>, <it> etc..)
      *   from the internal tagmap stored in translate5 XLF
-     * @param int $key
      * @return array the internal tag to the given xlf single tag
      */
     private function getSingleTag(int $key): array
@@ -73,23 +71,21 @@ class ContentConverter extends editor_Models_Import_FileParser_Xlf_ContentConver
         $xlfTag = $this->xmlparser->getChunk($key);
         //some foreign tools add spaces between the last attribute and the closing />
         $xlfTag = preg_replace('#"\s+/>$#', '"/>', $xlfTag);
-        if (!empty($this->tagMap[$xlfTag])) {
+        if (! empty($this->tagMap[$xlfTag])) {
             return $this->tagMap[$xlfTag];
         }
         //some tools convert <g> tag pair to just a self closing <g/> tag,
         // if we got no tagmap match we try to find a g tag without the slash then
         $xlfTag = preg_replace('#<g([^>]+)/>#', '<g$1>', $xlfTag);
-        if (!empty($this->tagMap[$xlfTag])) {
+        if (! empty($this->tagMap[$xlfTag])) {
             return $this->tagMap[$xlfTag];
         }
+
         return [];
     }
 
     /**
      * Handler for G tags
-     * @param string $tag
-     * @param array $attributes
-     * @param int $key
      * @throws editor_Models_Import_FileParser_Xlf_Exception
      */
     public function handleGTagOpener(string $tag, array $attributes, int $key): void
@@ -105,9 +101,6 @@ class ContentConverter extends editor_Models_Import_FileParser_Xlf_ContentConver
 
     /**
      * Handler for G tags
-     * @param string $tag
-     * @param int $key
-     * @param array $opener
      * @throws editor_Models_Import_FileParser_Xlf_Exception
      */
     public function handleGTagCloser(string $tag, int $key, array $opener): void

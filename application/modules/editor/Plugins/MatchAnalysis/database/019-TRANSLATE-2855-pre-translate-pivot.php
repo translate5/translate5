@@ -46,7 +46,7 @@ $SCRIPT_IDENTIFIER = '019-TRANSLATE-2855-pre-translate-pivot';
  * define database credential variables
  */
 $argc = count($argv);
-if(empty($this) || empty($argv) || $argc < 5 || $argc > 7) {
+if (empty($this) || empty($argv) || $argc < 5 || $argc > 7) {
     die("please dont call the script direct! Call it by using DBUpdater!\n\n");
 }
 
@@ -59,6 +59,6 @@ WHERE (`name` = 'runtimeOptions.plugins.MatchAnalysis.enableBatchQuery');");
 
 try {
     $db->query("ALTER TABLE `LEK_match_analysis_batchresults` RENAME TO  `LEK_languageresources_batchresults` ;");
-}catch (Exception $exception){
+} catch (Exception $exception) {
     // if this throws exception, the table is already renamed
 }

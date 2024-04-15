@@ -55,7 +55,6 @@ use ZfExtended_Logger;
 class Worker extends ProcessingWorker
 {
     /**
-     * @return Service
      * @throws ZfExtended_Exception
      */
     protected function createService(): Service
@@ -64,19 +63,17 @@ class Worker extends ProcessingWorker
     }
 
     /**
-     * @param string $processingMode
-     * @return ZfExtended_Logger
      * @throws Zend_Exception
      */
     protected function createLogger(string $processingMode): ZfExtended_Logger
     {
         $loggerDomain = Configuration::getLoggerDomain($processingMode);
+
         return Zend_Registry::get('logger')->cloneMe($loggerDomain);
     }
 
     /**
      * Creates the Processor
-     * @return Processor
      */
     protected function createProcessor(): Processor
     {
@@ -90,15 +87,12 @@ class Worker extends ProcessingWorker
     {
         // E1466 No reachable LanguageTool instances available, please specify LanguageTool urls to import this task.
         throw new DownException('E1466', [
-            'task' => $this->task
+            'task' => $this->task,
         ]);
     }
 
     /**
-     * @param Exception $loopedProcessingException
      * @param State[] $problematicStates
-     * @param bool $isReprocessing
-     * @return int
      */
     protected function onLooperException(Exception $loopedProcessingException, array $problematicStates, bool $isReprocessing): int
     {
@@ -106,55 +100,58 @@ class Worker extends ProcessingWorker
         // - we set the segments status to 'recheck', so each segment will be checked again, segment by segment, not in a bulk manner,
         //   but if while running one-by-one recheck it will result the same problem, then each status will be set as 'defect' one-by-one
         // - we log all the data producing the error.
-        if($loopedProcessingException instanceof MalfunctionException || $loopedProcessingException instanceof TimeOutException || $loopedProcessingException instanceof RequestException){
+        if ($loopedProcessingException instanceof MalfunctionException || $loopedProcessingException instanceof TimeOutException || $loopedProcessingException instanceof RequestException) {
             // set the failed segments either to reprocess or unprocessable depending if we are already reprocessing
-            if($isReprocessing){
+            if ($isReprocessing) {
                 $this->setUnprocessedStates($problematicStates, State::UNPROCESSABLE);
                 // log if it did not work in the second attempt
                 $this->logException($loopedProcessingException);
             } else {
                 $this->setUnprocessedStates($problematicStates, State::REPROCESS);
             }
+
             // in any case we continue processing
             return 1;
         }
         // a Down Exception will be created if all services are down to create an import error. If other URLs are still up, we simply end the worker without further notice
-        if($loopedProcessingException instanceof DownException) {
+        if ($loopedProcessingException instanceof DownException) {
             // we log only, if the last service is down ...
-            if($this->setServiceUrlDown()){
+            if ($this->setServiceUrlDown()) {
                 $this->logException($loopedProcessingException);
             }
+
             // this will terminate the processing
             return 0;
         }
         // unknown exceptions will terminate the processing
-        if($loopedProcessingException instanceof AbstractException) {
+        if ($loopedProcessingException instanceof AbstractException) {
             $this->logException($loopedProcessingException);
+
             return 0;
         }
+
         // all other exceptions will be thrown
         return -1;
     }
 
     /**
      * Spell checking takes approximately 15 % of the import time
-     * @return int
      */
-    public function getWeight(): int {
+    public function getWeight(): int
+    {
         return 15;
     }
 
     /**
      * Logs an task-error out of the exception
-     * @param AbstractException $exception
      */
     private function logException(AbstractException $exception)
     {
         $exception->addExtraData([
-            'task' => $this->task
+            'task' => $this->task,
         ]);
         $this->logger->exception($exception, [
-            'domain' => Configuration::getLoggerDomain($this->processingMode)
+            'domain' => Configuration::getLoggerDomain($this->processingMode),
         ]);
     }
 }

@@ -40,23 +40,16 @@ interface PauseWorkerProcessorInterface
     /**
      * Shows if the worker should wait and then check again
      * If false - the pause worker should be finished
-     *
-     * @param Task $task
-     * @return bool
      */
     public function shouldWait(Task $task): bool;
 
     /**
      * Shows maximum amount of time the worker should wait until finished
-     *
-     * @return int
      */
     public function getMaxWaitTimeSeconds(): int;
 
     /**
      * Shows how much time the worker should wait until the next check
-     *
-     * @return int
      */
     public function getSleepTimeSeconds(): int;
 }

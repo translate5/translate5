@@ -21,7 +21,7 @@ START LICENSE AND COPYRIGHT
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
@@ -63,7 +63,7 @@ abstract class AbstractActions
      * a call on /editor/mockapi/plugin/v2/myendpoint would result in
      * calling on Plugin::endpointAction with the endpoint "/v2/myendpoint"
      */
-    const BASE_ENDPOINT = '';
+    public const BASE_ENDPOINT = '';
 
     /**
      * If this is set to true,
@@ -71,60 +71,50 @@ abstract class AbstractActions
      * will be turned to /editor/mockapi/pluginname/some-crazy-action
      * leading to a call to Pluginname::someCrazyAction
      */
-    const SLASHES_TO_DASHES = false;
+    public const SLASHES_TO_DASHES = false;
 
     /**
      * Simple Helper to retrieve the pure classname out of a namespaced classname
      * TODO: might move to a global helper tool
-     * @param string $qualifiedClassName
-     * @return string
      */
     public static function pureClassName(string $qualifiedClassName): string
     {
         $parts = explode('\\', $qualifiedClassName);
+
         return array_pop($parts);
     }
 
     /**
      * Helper to turn sth like "this-is-groovy" to "thisIsGroovy"
      * TODO: might move to a global helper tool
-     * @param string $string
-     * @return string
      */
     public static function dashesToCamelCase(string $string): string
     {
         return lcfirst(str_replace('-', '', ucwords($string, '-')));
     }
 
-    /**
-     * @param Zend_Controller_Request_Http $request
-     * @param string $endpoint
-     */
     public function __construct(
         protected Zend_Controller_Request_Http $request,
-        protected string                       $endpoint
-    )
-    {
+        protected string $endpoint
+    ) {
     }
 
     /**
      * This API can be used to route certain endpoints to certain actions in inheriting classes
      * e.g. some/thing -> somethingdifferent will lead to somethingdifferentAction() being called
      * Also, the SLASHES_TO_DASHES constant will change this behaviour
-     * @param string $endpoint
-     * @return string
      */
     public function route(string $endpoint): string
     {
         if (static::SLASHES_TO_DASHES) {
             return str_replace('/', '-', trim($endpoint, '/'));
         }
+
         return $endpoint;
     }
 
     /**
      * Helper to quickly test endpoints or generally the extending class
-     * @return void
      */
     public function testAction(): void
     {
@@ -132,14 +122,12 @@ abstract class AbstractActions
             'success' => true,
             'endpoint' => $this->endpoint,
             'params' => $this->request->getParams(),
-            'provider' => static::pureClassName(static::class)
+            'provider' => static::pureClassName(static::class),
         ]);
     }
 
     /**
      * output of a json result and exit
-     * @param mixed $data
-     * @return void
      */
     final protected function json(mixed $data): void
     {
@@ -148,17 +136,11 @@ abstract class AbstractActions
         exit;
     }
 
-    /**
-     * @return Zend_Controller_Request_Http
-     */
     final public function getRequest(): Zend_Controller_Request_Http
     {
         return $this->request;
     }
 
-    /**
-     * @return string
-     */
     final public function getCalledEndpoint(): string
     {
         return $this->endpoint;

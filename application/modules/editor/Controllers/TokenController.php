@@ -3,7 +3,7 @@
 START LICENSE AND COPYRIGHT
 
  This file is part of translate5
- 
+
  Copyright (c) 2013 - 2021 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
 
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
@@ -13,15 +13,15 @@ START LICENSE AND COPYRIGHT
  included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
-  
+
  There is a plugin exception available for use with this release of translate5 for
  translate5: Please see http://www.translate5.net/plugin-exception.txt or
  plugin-exception.txt in the root folder of translate5.
-  
+
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
@@ -63,7 +63,7 @@ class editor_TokenController extends ZfExtended_RestController
             $errors['expires'] = $t->_('Das Ablaufdatum darf nicht kürzer sein als heute');
         }
 
-        if (!empty($errors)) {
+        if (! empty($errors)) {
             $this->handleErrors($errors);
 
             return;
@@ -83,7 +83,7 @@ class editor_TokenController extends ZfExtended_RestController
         $description = trim($this->getRequest()->getParam('description'));
         $expires = $this->getRequest()->getParam('expires');
 
-        if (!empty($description) && $this->entity->getDescription() !== $description) {
+        if (! empty($description) && $this->entity->getDescription() !== $description) {
             $this->entity->setDescription($description);
         }
 
@@ -92,7 +92,9 @@ class editor_TokenController extends ZfExtended_RestController
         if ($expirationDate && $expirationDate < new DateTime()) {
             $t = ZfExtended_Zendoverwrites_Translate::getInstance();
 
-            $this->handleErrors(['expires' => $t->_('Das Ablaufdatum darf nicht kürzer sein als heute')]);
+            $this->handleErrors([
+                'expires' => $t->_('Das Ablaufdatum darf nicht kürzer sein als heute'),
+            ]);
 
             return;
         }
@@ -101,7 +103,7 @@ class editor_TokenController extends ZfExtended_RestController
             $this->entity->setExpires($expirationDate->format('Y-m-d H:i:s'));
         }
 
-        if (!empty($description) || !empty($expires)) {
+        if (! empty($description) || ! empty($expires)) {
             $this->entity->validate();
             $this->entity->save();
         }
@@ -122,7 +124,6 @@ class editor_TokenController extends ZfExtended_RestController
         $this->entityLoad();
         $this->entity->delete();
     }
-
 
     public function handleErrors(array $errors): void
     {

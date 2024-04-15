@@ -21,7 +21,7 @@ START LICENSE AND COPYRIGHT
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
@@ -32,24 +32,24 @@ use MittagQI\Translate5\Test\Import\Config;
  * Test if the analysis and pre-translation field pretranslateMatchrate will be automatically set from the
  * config runtimeOptions.plugins.MatchAnalysis.pretranslateMatchRate
  */
-class Translate3069Test extends editor_Test_JsonTest {
-
+class Translate3069Test extends editor_Test_JsonTest
+{
     protected static array $forbiddenPlugins = [
     ];
+
     protected static array $requiredPlugins = [
         'editor_Plugins_Okapi_Init',
-        'editor_Plugins_MatchAnalysis_Init'
+        'editor_Plugins_MatchAnalysis_Init',
     ];
 
     protected static array $requiredRuntimeOptions = [
         'import.xlf.preserveWhitespace' => 0,
-        'import.xlf.ignoreFramingTags' => 'paired'
+        'import.xlf.ignoreFramingTags' => 'paired',
     ];
 
     protected static bool $setupOwnCustomer = true;
 
     protected static string $setupUserLogin = 'testmanager';
-
 
     private static int $configValue = 44;
 
@@ -62,10 +62,10 @@ class Translate3069Test extends editor_Test_JsonTest {
             ->addLanguageResource('zdemomt', null, $customerId, $sourceLangRfc, $targetLangRfc)
             ->addDefaultCustomerId($customerId);
 
-        static::api()->putJson('editor/config/',[
+        static::api()->putJson('editor/config/', [
             'value' => static::$configValue,
             'customerId' => $customerId,
-            'name' => 'runtimeOptions.plugins.MatchAnalysis.pretranslateMatchRate'
+            'name' => 'runtimeOptions.plugins.MatchAnalysis.pretranslateMatchRate',
         ]);
 
         $config
@@ -83,8 +83,8 @@ class Translate3069Test extends editor_Test_JsonTest {
         $analysis = ZfExtended_Factory::get('editor_Plugins_MatchAnalysis_Models_TaskAssoc');
         $result = $analysis->loadNewestByTaskGuid(static::api()->getTask()->taskGuid);
 
-        self::assertNotEmpty($result,'Empty analysis object');
+        self::assertNotEmpty($result, 'Empty analysis object');
 
-        self::assertEquals(static::$configValue,$result['pretranslateMatchrate'],'The analysis match-rate is not as expected');
+        self::assertEquals(static::$configValue, $result['pretranslateMatchrate'], 'The analysis match-rate is not as expected');
     }
 }

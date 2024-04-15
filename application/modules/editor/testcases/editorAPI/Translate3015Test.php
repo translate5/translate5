@@ -3,7 +3,7 @@
 START LICENSE AND COPYRIGHT
 
  This file is part of translate5
- 
+
  Copyright (c) 2013 - 2022 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
 
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
@@ -13,15 +13,15 @@ START LICENSE AND COPYRIGHT
  included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
-  
+
  There is a plugin exception available for use with this release of translate5 for
  translate5: Please see http://www.translate5.net/plugin-exception.txt or
  plugin-exception.txt in the root folder of translate5.
-  
+
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
@@ -37,46 +37,49 @@ END LICENSE AND COPYRIGHT
  *      <termNote type="geographicalUsage">USA</termNote>
  *
  */
-class Translate3015Test extends editor_Test_JsonTest {
-
-    public function testTbxImport(){
-
+class Translate3015Test extends editor_Test_JsonTest
+{
+    public function testTbxImport()
+    {
         $fileName = 'TBX-basic-sample.tbx';
 
         $termCollection = static::api()->postJson('editor/termcollection', [
             'name' => __CLASS__,
-            'customerIds' => static::getTestCustomerId()
+            'customerIds' => static::getTestCustomerId(),
         ]);
         $this->assertTrue(is_object($termCollection), 'Unable to create a test collection');
         $this->assertEquals(__CLASS__, $termCollection->name);
 
         $collectionId = $termCollection->id;
 
-
         static::api()->addFile($fileName, static::api()->getFile($fileName), "application/xml");
         static::api()->postJson('editor/termcollection/import', [
-            'collectionId' =>$collectionId,
+            'collectionId' => $collectionId,
             'customerIds' => static::getTestCustomerId(),
-            'mergeTerms'=>true
+            'mergeTerms' => true,
         ]);
 
         //export the generated file
-        $response = static::api()->postJson('editor/termcollection/export?format=1', array('collectionId' =>$collectionId));
+        $response = static::api()->postJson('editor/termcollection/export?format=1', [
+            'collectionId' => $collectionId,
+        ]);
 
-        $this->assertTrue(is_object($response),"Unable to export the terms by term collection");
-        $this->assertNotEmpty($response->filedata,"The exported tbx file by collection is empty");
+        $this->assertTrue(is_object($response), "Unable to export the terms by term collection");
+        $this->assertNotEmpty($response->filedata, "The exported tbx file by collection is empty");
 
-        if(static::api()->isCapturing()) {
-            file_put_contents(static::api()->getFile('/E_'.$fileName, null, false), $response->filedata);
+        if (static::api()->isCapturing()) {
+            file_put_contents(static::api()->getFile('/E_' . $fileName, null, false), $response->filedata);
         }
 
-        $expected = static::api()->getFileContent('E_'.$fileName);
+        $expected = static::api()->getFileContent('E_' . $fileName);
         $actual = $response->filedata;
 
         //check for differences between the expected and the actual content
-        $this->assertEquals($expected, $actual, "The expected file an the result file does not match.Test file name: ".$fileName);
+        $this->assertEquals($expected, $actual, "The expected file an the result file does not match.Test file name: " . $fileName);
 
-        $attributes = static::api()->getJson('editor/termcollection/testgetattributes', array('collectionId' =>$collectionId));
+        $attributes = static::api()->getJson('editor/termcollection/testgetattributes', [
+            'collectionId' => $collectionId,
+        ]);
 
         $termCount = 1;
         $termsAtributeCount = 10;
@@ -84,12 +87,12 @@ class Translate3015Test extends editor_Test_JsonTest {
         $languageAtributeCount = 1;
 
         //check if the generated attributes are matching
-        $this->assertTrue($termCount === (int)$attributes->termsCount, $fileName.' file test.Invalid number of terms created.Terms count:'.$attributes->termsCount.', expected:'.$termCount);
-        $this->assertTrue($termsAtributeCount ===  (int)$attributes->termsAtributeCount, $fileName.' file test.Invalid number of term attribute created.Terms attribute count:'.$attributes->termsAtributeCount.', expected:'.$termsAtributeCount);
-        $this->assertTrue($termsEntryAtributeCount === (int)$attributes->termsEntryAtributeCount, $fileName.' file test.Invalid and number of entry attribute created.Terms entry attribute count:'.$attributes->termsEntryAtributeCount.', expected:'.$termsEntryAtributeCount);
-        $this->assertTrue($languageAtributeCount === (int)$attributes->languageAtributeCount, $fileName.' file test.Invalid and number of language level attribute created.Language level attribute count:'.$attributes->languageAtributeCount.', expected:'.$languageAtributeCount);
+        $this->assertTrue($termCount === (int) $attributes->termsCount, $fileName . ' file test.Invalid number of terms created.Terms count:' . $attributes->termsCount . ', expected:' . $termCount);
+        $this->assertTrue($termsAtributeCount === (int) $attributes->termsAtributeCount, $fileName . ' file test.Invalid number of term attribute created.Terms attribute count:' . $attributes->termsAtributeCount . ', expected:' . $termsAtributeCount);
+        $this->assertTrue($termsEntryAtributeCount === (int) $attributes->termsEntryAtributeCount, $fileName . ' file test.Invalid and number of entry attribute created.Terms entry attribute count:' . $attributes->termsEntryAtributeCount . ', expected:' . $termsEntryAtributeCount);
+        $this->assertTrue($languageAtributeCount === (int) $attributes->languageAtributeCount, $fileName . ' file test.Invalid and number of language level attribute created.Language level attribute count:' . $attributes->languageAtributeCount . ', expected:' . $languageAtributeCount);
 
         static::api()->login('testmanager');
-        static::api()->delete('editor/termcollection/'.$collectionId);
+        static::api()->delete('editor/termcollection/' . $collectionId);
     }
 }

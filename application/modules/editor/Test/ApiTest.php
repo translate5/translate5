@@ -21,13 +21,13 @@ START LICENSE AND COPYRIGHT
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
 
-use MittagQI\Translate5\Test\Api\Helper;
 use MittagQI\Translate5\Test\Api\DbHelper;
+use MittagQI\Translate5\Test\Api\Helper;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -39,26 +39,19 @@ abstract class editor_Test_ApiTest extends TestCase
     /**
      * To distinguish UNIT / API tests
      */
-    const TYPE = 'api';
+    public const TYPE = 'api';
 
     /**
      * Will be added to most generated resource-names in the DB
      */
-    const NAME_PREFIX = 'API Testing::';
+    public const NAME_PREFIX = 'API Testing::';
 
-    /**
-     * @var Helper
-     */
     private static Helper $_api;
 
-    /**
-     * @var stdClass|null
-     */
     private static ?stdClass $_appState = null;
 
     /**
      * Holds the plugins temporarily activated for a test
-     * @var array
      */
     private static array $_addedPlugins = [];
 
@@ -76,14 +69,12 @@ abstract class editor_Test_ApiTest extends TestCase
     /**
      * Holds an array of active Plugin-classes that are required to run the test
      * These will be checked automatically in the test setup
-     * @var array
      */
     protected static array $requiredPlugins = [];
 
     /**
      * Holds an array of Plugin-classes that must not be active to run the test
      * These will be checked automatically in the test setup
-     * @var array
      */
     protected static array $forbiddenPlugins = [];
 
@@ -91,39 +82,33 @@ abstract class editor_Test_ApiTest extends TestCase
      * Holds an array of configs that must have the given value to run the test
      * Can be provided like [ 'autoQA.enableInternalTagCheck' => 1, ... ], "runtimeOptions." will be added automatically if not present
      * These will be checked automatically in the test setup BEFORE tasks are imported (so don't check configs set by task-config files)
-     * @var array
      */
     protected static array $requiredRuntimeOptions = [];
 
     /**
      * If the required runtimeOptions (defined with $requiredRuntimeOptions) are missing,
      * this decides if the test will be executed anyway (the default behaviour, leading to errors) or will be skipped
-     * @var bool
      */
     protected static bool $skipIfOptionsMissing = false;
 
     /**
      * The user that will be logged in in the base setup. This is the user logged in when ::beforeTests is called
      * When this is set to "testlector" imported tasks will be automatically assigned to the testlector
-     * @var string
      */
     protected static string $setupUserLogin = 'testmanager';
 
     /**
      * If set, a test-specific customer will be created on test-setup and removed on teardown. The customer will be accessible via ::$ownCustomer
-     * @var bool
      */
     protected static bool $setupOwnCustomer = false;
 
     /**
      * Holds the own customer if configured to be created
-     * @var stdClass|null
      */
     protected static ?stdClass $ownCustomer = null;
 
     /**
      * Retrieves the test API
-     * @return Helper
      */
     public static function api(): Helper
     {
@@ -132,7 +117,6 @@ abstract class editor_Test_ApiTest extends TestCase
 
     /**
      * Retrieves the application-state object
-     * @return stdClass
      */
     final public static function getAppState(): stdClass
     {
@@ -141,19 +125,18 @@ abstract class editor_Test_ApiTest extends TestCase
 
     /**
      * Retrieves the id of the general test-customer, by default the first one but customer 2 and 3 can be retrieved by providing "1" or "2" as indexes
-     * @return int
      */
     final public static function getTestCustomerId(int $index = 0): int
     {
-        if($index > 2 || $index < 0){
+        if ($index > 2 || $index < 0) {
             throw new ZfExtended_Exception('getTestCustomerId supports only indexes 0,1,2');
         }
+
         return static::$_testCustomers[$index];
     }
 
     /**
      * retrieves the id of the test#s own customer (if setup) or nothing
-     * @return int|null
      */
     final public static function getOwnCustomerId(): ?int
     {
@@ -162,7 +145,6 @@ abstract class editor_Test_ApiTest extends TestCase
 
     /**
      * Returns the user-login that is set-up to be logged in after the test is setup
-     * @return string
      */
     final public static function getTestLogin(): string
     {
@@ -174,7 +156,6 @@ abstract class editor_Test_ApiTest extends TestCase
      */
     public static function beforeTests(): void
     {
-
     }
 
     /**
@@ -182,17 +163,14 @@ abstract class editor_Test_ApiTest extends TestCase
      */
     public static function afterTests(): void
     {
-
     }
 
     /**
      * Just an init function that runs as the first thing in the (unfortunately static) test setup
      * Here static props can be reset to avoid leftovers from previous tests
-     * @return void
      */
     protected static function testSpecificInit()
     {
-
     }
 
     /**
@@ -206,16 +184,13 @@ abstract class editor_Test_ApiTest extends TestCase
     /**
      * internal teardown for the inheriting testcase-classes
      * Do not override in concrete test-classes, use afterTests there
-     * @param bool $doCleanup
      */
     protected static function testSpecificTeardown(bool $doCleanup)
     {
-
     }
 
     /**
      * asserts that a certain user is loggedin
-     * @param string $login
      * @return stdClass the login/status JSON for further processing
      */
     public static function assertLogin(string $login)
@@ -224,12 +199,12 @@ abstract class editor_Test_ApiTest extends TestCase
         static::assertTrue(is_object($json), 'User "' . $login . '" is not authenticated!');
         static::assertEquals('authenticated', $json->state, 'User "' . $login . '" is not authenticated!');
         static::assertEquals($login, $json->user->login);
+
         return $json;
     }
 
     /**
      * asserts that one of the passed users is logged in
-     * @param array $users
      * @return stdClass
      * @throws Zend_Http_Client_Exception
      */
@@ -238,7 +213,8 @@ abstract class editor_Test_ApiTest extends TestCase
         $json = static::api()->getJson('editor/session/' . Helper::getAuthCookie());
         static::assertTrue(is_object($json), 'User "' . Helper::getAuthLogin() . '" is not authenticated!');
         static::assertEquals('authenticated', $json->state, 'User "' . Helper::getAuthLogin() . '" is not authenticated!');
-        static::assertTrue(in_array($json->user->login, $logins), 'Logged in user is not '.implode(' or ', $logins));
+        static::assertTrue(in_array($json->user->login, $logins), 'Logged in user is not ' . implode(' or ', $logins));
+
         return $json;
     }
 
@@ -246,8 +222,6 @@ abstract class editor_Test_ApiTest extends TestCase
      * checks for task-specific configs
      * can be provided like [ 'autoQA.enableInternalTagCheck' => 1, ... ],
      * "runtimeOptions." will be added automatically if not present
-     * @param string $taskGuid
-     * @param array $configs
      */
     public static function assertTaskConfigs(string $taskGuid, array $configs): void
     {
@@ -259,12 +233,9 @@ abstract class editor_Test_ApiTest extends TestCase
      * TODO FIXME:
      * - the capture-param is a unneccessary dependency and can be evaluated directly in the method
      * - whitespace-normalization shoud be done on capturing, not on testing
-     * @param string $fileName
-     * @param string $actual
-     * @param string|null $message
      * @param bool $capture here can be passed the isCapturing parameter from outside if it is a test not extending JsonTest
      */
-    public function assertFileContents(string $fileName, string $actual, string $message = NULL, bool $capture = false)
+    public function assertFileContents(string $fileName, string $actual, string $message = null, bool $capture = false)
     {
         $filePath = static::api()->getFile($fileName, null, false);
         if ($capture) {
@@ -274,7 +245,7 @@ abstract class editor_Test_ApiTest extends TestCase
         $expected = file_get_contents($filePath);
 
         // If we're on Windows - replace CRLF with LF
-        if (PHP_OS_FAMILY == 'Windows'){
+        if (PHP_OS_FAMILY == 'Windows') {
             $expected = str_replace("\r\n", "\n", $expected);
         }
 
@@ -288,37 +259,31 @@ abstract class editor_Test_ApiTest extends TestCase
      */
     public static function isMasterTest(): bool
     {
-        return !!getenv('MASTER_TEST');
+        return ! ! getenv('MASTER_TEST');
     }
 
     final public static function setUpBeforeClass(): void
     {
         try {
-
             self::logTestStart();
 
             static::testSpecificInit();
 
             // each test gets an own api-object, the instance of the current test is for code-completion and does not hurt, since the constructor does nothing
-            static::$_api = new Helper(static::class, new static);
+            static::$_api = new Helper(static::class, new static());
 
             // this runs only once with the first API-Test
             if (static::$_appState === null) {
                 self::testRunSetup(static::$_api);
             }
 
-            if(static::$_api->isTestSkipped()){
-
+            if (static::$_api->isTestSkipped()) {
                 // skip test when --skip option demanded to do so
                 static::markTestSkipped('Skipped test "' . static::class . '" as requested.');
-
-            } else if(static::$skipIfOptionsMissing && !static::api()->checkConfigs(static::$requiredRuntimeOptions)){
-
+            } elseif (static::$skipIfOptionsMissing && ! static::api()->checkConfigs(static::$requiredRuntimeOptions)) {
                 // skip test when configs/runtimeOptions are missing
                 static::markTestSkipped('Skipped test "' . static::class . '" because neccessary configs are not set or missing.');
-
             } else {
-
                 // make sure the setup always happens as testmanager
                 static::api()->login('testmanager');
 
@@ -333,16 +298,15 @@ abstract class editor_Test_ApiTest extends TestCase
                 static::testSpecificSetup();
 
                 // log the user in that is setup as the needed test-user. Asserts the success if pretests shall not be skipped
-                if (static::api()->login(static::$setupUserLogin) && !static::$_api->doSkipPretests()) {
+                if (static::api()->login(static::$setupUserLogin) && ! static::$_api->doSkipPretests()) {
                     static::assertLogin(static::$setupUserLogin);
                 }
                 // this can be used in concrete tests as replacement for setUpBeforeClass()
                 static::beforeTests();
             }
-
-        } catch(Throwable $e){
-
+        } catch (Throwable $e) {
             static::tearDownAfterClass();
+
             throw $e;
         }
     }
@@ -357,12 +321,14 @@ abstract class editor_Test_ApiTest extends TestCase
         $errors = [];
         // for single tests, the cleanup can be prevented via KEEP_DATA
         $doCleanup = static::api()->doCleanup();
+
         try {
             // this can be used in concrete tests as replacement for tearDownAfterClass()
             static::afterTests();
         } catch (\Throwable $e) {
             $errors[] = $e->getMessage();
         }
+
         try {
             // internal method to clean up stuff in inheriting classes
             static::testSpecificTeardown($doCleanup);
@@ -379,7 +345,7 @@ abstract class editor_Test_ApiTest extends TestCase
             }
         }
         if (count(static::$_addedPlugins) > 0) {
-            if (!DbHelper::deactivatePlugins(static::$_addedPlugins)) {
+            if (! DbHelper::deactivatePlugins(static::$_addedPlugins)) {
                 $errors[] = 'One or more of the following neccessary Plugins could not be deactivated: \''
                     . implode("', '", static::$_addedPlugins) . "'";
             }
@@ -387,7 +353,7 @@ abstract class editor_Test_ApiTest extends TestCase
         }
         // as a final step., we check if the test left workers in the DB
         // for single running tests or if no cleanup is wanted, we do not remove the workers after test has run
-        $preventRemoval = !static::api()->isSuite() || !$doCleanup;
+        $preventRemoval = ! static::api()->isSuite() || ! $doCleanup;
         $state = DbHelper::cleanupWorkers(false, $preventRemoval, true);
         if ($state->cleanupNeccessary) {
             $task = static::api()->getTask();
@@ -395,7 +361,7 @@ abstract class editor_Test_ApiTest extends TestCase
                 . implode(PHP_EOL, $state->remainingWorkers) . PHP_EOL;
             $errors[] = 'The current task is:' . ($task ? $task->taskGuid : 'none');
         }
-        if (!empty($errors)) {
+        if (! empty($errors)) {
             static::fail(implode(PHP_EOL, $errors));
         }
     }
@@ -403,17 +369,14 @@ abstract class editor_Test_ApiTest extends TestCase
     /**
      * Is called once in the first API-Test of a test-run
      * Creates the appState for the run
-     * @param Helper $api
      */
     private static function testRunSetup(Helper $api)
     {
         // for dev-purposes it may be unwanted to have all the environment-tests before running the test
         // this reduces the requests to a single request on the app-state and an initial login
-        if($api->doSkipPretests()){
-
+        if ($api->doSkipPretests()) {
             static::$_appState = $api->getJson('editor/index/applicationstate');
             unset(static::$_appState->worker);
-
         } else {
             // cleanup before running the suite/test: removes any existing workers from the db
             DbHelper::removeWorkers();
@@ -428,10 +391,8 @@ abstract class editor_Test_ApiTest extends TestCase
 
     /**
      * Fetches the app-state for the current test-run and checks basic requirements
-     * @param Helper $api
      */
     /**
-     * @param Helper $api
      * @throws Zend_Http_Client_Exception
      */
     private static function evaluateAppState(Helper $api)
@@ -440,7 +401,7 @@ abstract class editor_Test_ApiTest extends TestCase
         $api->login('testapiuser');
         static::assertLogin('testapiuser');
         $state = $api->getJson('editor/index/applicationstate');
-        if (!is_object($state)) {
+        if (! is_object($state)) {
             // UGLY: no Exception can terminate the suite with a single "Explanation", so to avoid all tests failing we simply die ...
             die('Application state could not be fetched, terminating API-tests.' . "\n\n");
         }
@@ -455,10 +416,10 @@ abstract class editor_Test_ApiTest extends TestCase
         if ($state->worker->running > 0) {
             $errors[] = 'For API testing no running workers are allowed in the DB!';
         }
-        if (!$state->database->isUptodate) {
+        if (! $state->database->isUptodate) {
             $errors[] = 'Database is not up to date! ' . $state->database->newCount . ' new / ' . $state->database->modCount . ' modified.';
             if ($state->database->newCount > 0) {
-                $errors[]= "New files: \n" . print_r($state->database->newFiles, true);
+                $errors[] = "New files: \n" . print_r($state->database->newFiles, true);
             }
         }
         if (count($errors) > 0) {
@@ -482,7 +443,7 @@ abstract class editor_Test_ApiTest extends TestCase
             static::assertTrue($state->termtagger->runningAll, 'Some configured termtaggers are not running: ' . print_r($state->termtagger->running, 1));
         }
 
-        if (count(static::$forbiddenPlugins) > 0 && !DbHelper::deactivatePlugins(static::$forbiddenPlugins)) {
+        if (count(static::$forbiddenPlugins) > 0 && ! DbHelper::deactivatePlugins(static::$forbiddenPlugins)) {
             static::fail(
                 sprintf(
                     "One or more of the following forbidden Plugins could not be deactivated: '%s'",
@@ -493,18 +454,18 @@ abstract class editor_Test_ApiTest extends TestCase
 
         // evaluate the plugins whitelist
         foreach (static::$requiredPlugins as $plugin) {
-            if(!in_array($plugin, $state->pluginsLoaded)){
+            if (! in_array($plugin, $state->pluginsLoaded)) {
                 static::$_addedPlugins[] = $plugin;
             }
         }
         // try to activate plugins that are needed but not loaded
-        if(count(static::$_addedPlugins) > 0){
-            if(!DbHelper::activatePlugins(static::$_addedPlugins)){
-                static::fail('One or more of the following neccessary Plugins could not be activated: \''.implode("', '", static::$_addedPlugins)."'");
+        if (count(static::$_addedPlugins) > 0) {
+            if (! DbHelper::activatePlugins(static::$_addedPlugins)) {
+                static::fail('One or more of the following neccessary Plugins could not be activated: \'' . implode("', '", static::$_addedPlugins) . "'");
             }
         }
         // test the required runtimeOptions (these must already be checked if static::$skipIfOptionsMissing is set ...)
-        if (!static::$skipIfOptionsMissing && count(static::$requiredRuntimeOptions) > 0) {
+        if (! static::$skipIfOptionsMissing && count(static::$requiredRuntimeOptions) > 0) {
             static::api()->testConfigs(static::$requiredRuntimeOptions);
         }
     }
@@ -529,7 +490,6 @@ abstract class editor_Test_ApiTest extends TestCase
         static::assertContains('basic', $json->user->roles, 'Checking users roles:');
         static::assertContains('noRights', $json->user->roles, 'Checking users roles:');
 
-
         static::api()->login('testtermproposer');
         $json = static::assertLogin('testtermproposer');
         static::assertContains('termProposer', $json->user->roles, 'Checking users roles:');
@@ -552,7 +512,7 @@ abstract class editor_Test_ApiTest extends TestCase
     private static function assertTestCustomers()
     {
         $customerNumbers = [Helper::TEST_CUSTOMER_NUMBER, Helper::TEST_CUSTOMER_NUMBER_1, Helper::TEST_CUSTOMER_NUMBER_2];
-        foreach($customerNumbers as $index => $customerNumber){
+        foreach ($customerNumbers as $index => $customerNumber) {
             $customer = static::api()->getCustomerByNumber($customerNumber);
             static::assertIsObject($customer, 'Unable to load test customer. No test customer was found for customer-number: ' . $customerNumber);
             $response = static::api()->getLastResponse();
@@ -563,19 +523,17 @@ abstract class editor_Test_ApiTest extends TestCase
 
     /**
      * Logs the start of a test
-     * @return void
      */
     private static function logTestStart(): void
     {
-        error_log('Starting test: ' . static::class. ' | ' . date("Y-m-d H:i:s") );
+        error_log('Starting test: ' . static::class . ' | ' . date("Y-m-d H:i:s"));
     }
 
     /**
      * Logs the end of a test
-     * @return void
      */
     private static function logTestEnd(): void
     {
-        error_log('Finished test: ' . static::class . ' | ' . date("Y-m-d H:i:s") );
+        error_log('Finished test: ' . static::class . ' | ' . date("Y-m-d H:i:s"));
     }
 }

@@ -3,25 +3,25 @@
 START LICENSE AND COPYRIGHT
 
  This file is part of translate5
- 
+
  Copyright (c) 2013 - 2021 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
 
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
  This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
- as published by the Free Software Foundation and appearing in the file agpl3-license.txt 
- included in the packaging of this file.  Please review the following information 
+ as published by the Free Software Foundation and appearing in the file agpl3-license.txt
+ included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
-  
+
  There is a plugin exception available for use with this release of translate5 for
- translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or
  plugin-exception.txt in the root folder of translate5.
-  
+
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
@@ -37,85 +37,85 @@ class editor_Models_SegmentHistory extends ZfExtended_Models_Entity_Abstract
      * @var editor_Models_SegmentFieldManager
      */
     protected $segmentFieldManager = null;
-    
+
     /**
      * @var array
      */
-    protected $historydata     = array();
-    
-    
-    protected $fieldsToUpdate=array(
-            'taskGuid',
-            'userGuid',
-            'userName',
-            'timestamp',
-            'editable',
-            'pretrans',
-            'stateId',
-            'autoStateId',
-            'workflowStep',
-            'workflowStepNr',
-            'matchRate',
-            'matchRateType'
-    );
-    
+    protected $historydata = [];
+
+    protected $fieldsToUpdate = [
+        'taskGuid',
+        'userGuid',
+        'userName',
+        'timestamp',
+        'editable',
+        'pretrans',
+        'stateId',
+        'autoStateId',
+        'workflowStep',
+        'workflowStepNr',
+        'matchRate',
+        'matchRateType',
+    ];
+
     /**
      * loads the history entries to one segment, DESC sorted by id (creation), can be limited with $limit parameter
      * @param int $id
      * @param number $limit
      * @return array
      */
-    public function loadBySegmentId($id, $limit = 0) {
+    public function loadBySegmentId($id, $limit = 0)
+    {
         $s = $this->db->select();
         $s->where('segmentId = ?', $id)
             ->order('id DESC');
-        if($limit > 0) {
+        if ($limit > 0) {
             $s->limit($limit);
         }
+
         return $this->db->fetchAll($s)->toArray();
     }
-    
+
     /**
      * load the latest history entry data as array to a segment,
      *  optionally filtered by the given filter parameters, passing key and values directly to a where command
-     * @param int $id
-     * @param array $filter
-     * @return array
      */
-    public function loadLatestForSegment(int $id, array $filter = []): array {
+    public function loadLatestForSegment(int $id, array $filter = []): array
+    {
         $s = $this->db->select();
         $s->where('segmentId = ?', $id)
-        ->order('id DESC')->limit(1);
-        foreach($filter as $field => $value) {
+            ->order('id DESC')->limit(1);
+        foreach ($filter as $field => $value) {
             $s->where($field, $value);
         }
         $row = $this->db->fetchRow($s);
+
         return $row ? $row->toArray() : [];
     }
-    
+
     /**
      * sets the field manager
-     * @param editor_Models_SegmentFieldManager $sfm
      */
-    public function setSegmentFieldManager(editor_Models_SegmentFieldManager $sfm) {
+    public function setSegmentFieldManager(editor_Models_SegmentFieldManager $sfm)
+    {
         $this->segmentFieldManager = $sfm;
     }
-    
+
     /**
      * loads the segment data hunks for this segment history entry
-     * @param $segmentHistoryId
      */
-    protected function initData($segmentHistoryId) {
-        $this->historydata = array();
+    protected function initData($segmentHistoryId)
+    {
+        $this->historydata = [];
         $db = ZfExtended_Factory::get('editor_Models_Db_SegmentsHistoryData');
         /* @var $db editor_Models_Db_SegmentsHistoryData */
         $s = $db->select()->where('segmentHistoryId = ?', $segmentHistoryId);
         $datas = $db->fetchAll($s);
-        foreach($datas as $data) {
+        foreach ($datas as $data) {
             $this->historydata[$data['name']] = $data;
         }
     }
-    
+
     /**
      * filters the fluent fields and stores them separatly
      * @param string $name
@@ -123,22 +123,24 @@ class editor_Models_SegmentHistory extends ZfExtended_Models_Entity_Abstract
      * (non-PHPdoc)
      * @see ZfExtended_Models_Entity_Abstract::set()
      */
-    protected function set($name, $value) {
+    protected function set($name, $value)
+    {
         $loc = $this->segmentFieldManager->getDataLocationByKey($name);
-        if($loc === false) {
+        if ($loc === false) {
             return parent::set($name, $value);
         }
         $name = $loc['column'];
-        if(empty($this->historydata[$loc['field']])) {
+        if (empty($this->historydata[$loc['field']])) {
             $db = ZfExtended_Factory::get('editor_Models_Db_SegmentsHistoryData');
             /* @var $db editor_Models_Db_SegmentsHistoryData */
-            $this->historydata[$loc['field']] = $db->createRow(array(
-                            'name' => $loc['field'],
-                            'segmentHistoryId' => $this->getId(),
-                            'segmentId' => $this->getSegmentId(),
-                            'taskGuid' => $this->getTaskGuid()
-                            ));
+            $this->historydata[$loc['field']] = $db->createRow([
+                'name' => $loc['field'],
+                'segmentHistoryId' => $this->getId(),
+                'segmentId' => $this->getSegmentId(),
+                'taskGuid' => $this->getTaskGuid(),
+            ]);
         }
+
         return $this->historydata[$loc['field']]->__set($name, $value);
     }
 
@@ -148,79 +150,87 @@ class editor_Models_SegmentHistory extends ZfExtended_Models_Entity_Abstract
      * (non-PHPdoc)
      * @see ZfExtended_Models_Entity_Abstract::get()
      */
-    protected function get($name) {
+    protected function get($name)
+    {
         $loc = $this->segmentFieldManager->getDataLocationByKey($name);
-        if($loc === false) {
+        if ($loc === false) {
             return parent::get($name);
         }
-        if(empty($this->historydata[$loc['field']])) {
+        if (empty($this->historydata[$loc['field']])) {
             return null;
         }
+
         return $this->historydata[$loc['field']]->__get('edited');
     }
-    
+
     /**
      * integrates the segment fields into the hasfield check
      * (non-PHPdoc)
      * @see ZfExtended_Models_Entity_Abstract::hasField()
      */
-    public function hasField($field) {
+    public function hasField($field)
+    {
         $loc = $this->segmentFieldManager->getDataLocationByKey($field);
+
         return $loc !== false || parent::hasField($field);
     }
-    
+
     /**
      * save the segment and the associated segmentd data hunks
      * (non-PHPdoc)
      * @see ZfExtended_Models_Entity_Abstract::save()
      */
-    public function save() {
+    public function save()
+    {
         $segmentHistoryId = parent::save();
-        foreach($this->historydata as $data) {
+        foreach ($this->historydata as $data) {
             /* @var $data editor_Models_Db_SegmentDataRow */
-            if(empty($data->segmentHistoryId)) {
+            if (empty($data->segmentHistoryId)) {
                 $data->segmentHistoryId = $segmentHistoryId;
             }
             $data->save();
         }
     }
-    
+
     /**
      * since the duration field is stored in the HistoryData Object but is not
      * used transparently like the other alternate fields, we have to store it separtly
      * (duration is not needed in daily business in the segment grid, so does not exist in the MV!)
      * @param array $durations keys → fieldnames; values → durations
      */
-    public function setTimeTrackData(array $durations) {
+    public function setTimeTrackData(array $durations)
+    {
         $sfm = $this->segmentFieldManager;
-        foreach($durations as $field => $duration) {
-            if(isset($this->historydata[$field])) {
+        foreach ($durations as $field => $duration) {
+            if (isset($this->historydata[$field])) {
                 $this->historydata[$field]->duration = $duration;
             }
         }
     }
-    
-    public function getFieldsToUpdate(){
+
+    public function getFieldsToUpdate()
+    {
         return $this->fieldsToUpdate;
     }
-    
+
     /***
      * Insert record(s) in segment history table for autostates and taskguid as condition
      * Attention: no record in segment data history is inserted, because usage is where no related data was changed for the data table
      * @param string $taskGuid
      * @param array $autoStates
      */
-    public function createHistoryByAutoState($taskGuid,array $autoStates){
+    public function createHistoryByAutoState($taskGuid, array $autoStates)
+    {
         //get the updatable fields for LEK_segment_history table
-        $fieldsHistory = implode('`,`',$this->getFieldsToUpdate());
-        $fieldsSegments = implode('`,seg.`',$this->getFieldsToUpdate());
-        
+        $fieldsHistory = implode('`,`', $this->getFieldsToUpdate());
+        $fieldsSegments = implode('`,seg.`', $this->getFieldsToUpdate());
+
         $sql = 'INSERT INTO LEK_segment_history
-                   (segmentId, `'.$fieldsHistory.'`)
-              SELECT seg.id, seg.`'.$fieldsSegments.'`
+                   (segmentId, `' . $fieldsHistory . '`)
+              SELECT seg.id, seg.`' . $fieldsSegments . '`
               FROM LEK_segments as seg
               WHERE seg.taskGuid = ?
-              AND '.$this->db->getAdapter()->quoteInto('seg.autoStateId IN(?)', $autoStates);
+              AND ' . $this->db->getAdapter()->quoteInto('seg.autoStateId IN(?)', $autoStates);
         $this->db->getAdapter()->query($sql, [$taskGuid]);
     }
 }

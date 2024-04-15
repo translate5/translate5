@@ -33,32 +33,25 @@ use Zend_Config;
 
 class TransUnitHash
 {
-    public function __construct(protected Zend_Config $config, protected int $fileId)
-    {
-
+    public function __construct(
+        protected Zend_Config $config,
+        protected int $fileId
+    ) {
     }
 
-    /**
-     * @param string $sourceFileId
-     * @param string $transunitId
-     * @param string $subId
-     * @return string
-     */
     public function createForSub(string $sourceFileId, string $transunitId, string $subId): string
     {
-        $includeSubInLength = (bool)$this->config->runtimeOptions->import->xlf->includedSubElementInLengthCalculation;
-        if (!$includeSubInLength) {
+        $includeSubInLength = (bool) $this->config->runtimeOptions->import->xlf->includedSubElementInLengthCalculation;
+        if (! $includeSubInLength) {
             // Make a different tu hash if sub elements should not be included in the total transunit length.
             $transunitId .= $subId;
         }
+
         return $this->create($sourceFileId, $transunitId);
     }
 
     /**
      * Generating unique transunitHash out of the provided arguments
-     * @param string $sourceFileId
-     * @param string $transunitId
-     * @return string
      */
     public function create(string $sourceFileId, string $transunitId): string
     {

@@ -3,33 +3,31 @@
 START LICENSE AND COPYRIGHT
 
  This file is part of translate5
- 
+
  Copyright (c) 2013 - 2021 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
 
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
  This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
- as published by the Free Software Foundation and appearing in the file agpl3-license.txt 
- included in the packaging of this file.  Please review the following information 
+ as published by the Free Software Foundation and appearing in the file agpl3-license.txt
+ included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
-  
+
  There is a plugin exception available for use with this release of translate5 for
- translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or
  plugin-exception.txt in the root folder of translate5.
-  
+
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
 
-/**
- */
-class Translate3013Test extends \editor_Test_ApiTest {
-    
+class Translate3013Test extends \editor_Test_ApiTest
+{
     /***
      * First collection ID
      *
@@ -53,8 +51,6 @@ class Translate3013Test extends \editor_Test_ApiTest {
 
     /**
      * We need the termproposer to be logged in for the test
-     *
-     * @var string
      */
     protected static string $setupUserLogin = 'testtermproposer';
 
@@ -64,8 +60,8 @@ class Translate3013Test extends \editor_Test_ApiTest {
      * @throws Zend_Http_Client_Exception
      * @throws \MittagQI\Translate5\Test\Api\Exception
      */
-    public function testMapping(){
-
+    public function testMapping()
+    {
         // 1.TermCollection1: create
         $termCollection1 = static::api()->addResource([
             'name' => 'TermCollection1',
@@ -73,7 +69,7 @@ class Translate3013Test extends \editor_Test_ApiTest {
             'serviceType' => 'editor_Services_TermCollection',
             'serviceName' => 'TermCollection',
             'resourceId' => 'editor_Services_TermCollection',
-            'customerIds' => static::getTestCustomerId()
+            'customerIds' => static::getTestCustomerId(),
         ]);
         $this->assertTrue(is_object($termCollection1), 'Unable to create a TermCollection1');
         $this->assertEquals('TermCollection1', $termCollection1->name);
@@ -99,7 +95,7 @@ class Translate3013Test extends \editor_Test_ApiTest {
             'serviceType' => 'editor_Services_TermCollection',
             'serviceName' => 'TermCollection',
             'resourceId' => 'editor_Services_TermCollection',
-            'customerIds' => static::getTestCustomerId()
+            'customerIds' => static::getTestCustomerId(),
         ]);
         $this->assertTrue(is_object($termCollection2), 'Unable to create a TermCollection2');
         $this->assertEquals('TermCollection2', $termCollection2->name);
@@ -134,7 +130,9 @@ class Translate3013Test extends \editor_Test_ApiTest {
         //   yeah, still 1, as it was NOT the last attribute-record of it's dataTypeId
 
         //  - get german language
-        $german = static::api()->getJson('editor/language', ['filter' => '[{"operator":"eq","value":"de-DE","property":"rfc5646"}]']);
+        $german = static::api()->getJson('editor/language', [
+            'filter' => '[{"operator":"eq","value":"de-DE","property":"rfc5646"}]',
+        ]);
         $this->assertNotEmpty($german, 'Unable to load the german-language needed for the term search.');
         self::$german = $german[0];
 
@@ -144,7 +142,7 @@ class Translate3013Test extends \editor_Test_ApiTest {
             'collectionIds' => self::$collection2Id,
             'language' => self::$german->id,
             'start' => 0,
-            'limit' => 2
+            'limit' => 2,
         ]);
         $this->assertTrue(is_object($termsearch), 'No terms are found in the TermCollection2');
         $this->assertNotEmpty($termsearch->data, "No terms are found in the TermCollection2 for the search string '*'");
@@ -152,14 +150,16 @@ class Translate3013Test extends \editor_Test_ApiTest {
         // - get attrId of the 1st attribute-record to be used for further DELETE request
         $attr1Id = array_column(
             static::api()->postJson('editor/plugins_termportal_data/siblinginfo', [
-                'termId' => $termsearch->data[0]->id
+                'termId' => $termsearch->data[0]->id,
             ])->term->attributes,
             'id',
             'dataTypeId'
         )[$dataTypeId];
 
         // - delete that 1st attribute-record
-        $delete = static::api()->delete('editor/attribute', ['attrId' => $attr1Id]);
+        $delete = static::api()->delete('editor/attribute', [
+            'attrId' => $attr1Id,
+        ]);
         $this->assertObjectHasAttribute('updated', $delete, 'Something went wrong on attempt to DELETE 1st attribute-record having new dataTypeId');
 
         // - refresh mapping-record and check it's exists-prop is still 1
@@ -172,14 +172,16 @@ class Translate3013Test extends \editor_Test_ApiTest {
         // - get attrId of a 2nd attribute-record to be used for further DELETE request
         $attr2Id = array_column(
             static::api()->postJson('editor/plugins_termportal_data/siblinginfo', [
-                'termId' => $termsearch->data[1]->id
+                'termId' => $termsearch->data[1]->id,
             ])->term->attributes,
             'id',
             'dataTypeId'
         )[$dataTypeId];
 
         // - delete that 2nd attribute-record
-        $delete = static::api()->delete('editor/attribute', ['attrId' => $attr2Id]);
+        $delete = static::api()->delete('editor/attribute', [
+            'attrId' => $attr2Id,
+        ]);
         $this->assertObjectHasAttribute('updated', $delete, 'Something went wrong on attempt to DELETE 2nd attribute-record having new dataTypeId');
 
         // - refresh mapping-record and check it's exists prop became 0
@@ -193,7 +195,7 @@ class Translate3013Test extends \editor_Test_ApiTest {
         $attrcreate = static::api()->postJson('editor/attribute', [
             'termId' => $termsearch->data[0]->id,
             'level' => 'term',
-            'dataType' => $dataTypeId
+            'dataType' => $dataTypeId,
         ]);
         $this->assertTrue(is_object($attrcreate)
             && is_numeric($attrcreate->inserted->id), 'Unable to create attribute having new dataTypeId');
@@ -209,7 +211,7 @@ class Translate3013Test extends \editor_Test_ApiTest {
         // - disable new dataTypeId
         $response = static::api()->putJson('editor/collectionattributedatatype?answer=ok', [
             'mappingId' => $mapping->mappingId,
-            'enabled' => 0
+            'enabled' => 0,
         ]);
         $this->assertEquals(1, $response->success, 'TermCollection2: new dataTypeId was not successfully disabled');
 
@@ -225,7 +227,7 @@ class Translate3013Test extends \editor_Test_ApiTest {
             'language' => self::$german->id,
             'attr-' . $dataTypeId => '',
             'start' => 0,
-            'limit' => 10
+            'limit' => 10,
         ]);
         $this->assertIsObject($resp, 'Invalid response search response. ');
         $this->assertObjectHasAttribute('data', $resp, 'Response has no data-prop. ');
@@ -240,7 +242,7 @@ class Translate3013Test extends \editor_Test_ApiTest {
             'collectionIds' => self::$collection1Id,
             'language' => self::$german->id,
             'start' => 0,
-            'limit' => 1
+            'limit' => 1,
         ]);
         $this->assertIsObject($termsearch, 'Invalid response search response. ');
         $this->assertObjectHasAttribute('data', $termsearch, 'Response has no data-prop. ');
@@ -251,7 +253,7 @@ class Translate3013Test extends \editor_Test_ApiTest {
         $attrcreate = static::api()->postJson('editor/attribute', [
             'termId' => $termsearch->data[0]->id,
             'level' => 'term',
-            'dataType' => $dataTypeId
+            'dataType' => $dataTypeId,
         ], null, true, true);
 
         // - get the error saying value of collectionId-param is not in the list of allowed values
@@ -262,7 +264,7 @@ class Translate3013Test extends \editor_Test_ApiTest {
         $this->assertEquals(0, $mapping->exists, 'TermCollection1: mapping-record\'s exists-prop is NOT 0');
         $response = static::api()->putJson('editor/collectionattributedatatype?answer=ok', [
             'mappingId' => $mapping->mappingId,
-            'enabled' => 1
+            'enabled' => 1,
         ]);
         $this->assertEquals(1, $response->success, 'TermCollection1: new dataTypeId was not successfully enabled');
 
@@ -270,7 +272,7 @@ class Translate3013Test extends \editor_Test_ApiTest {
         $attrcreate = static::api()->postJson('editor/attribute', [
             'termId' => $termsearch->data[0]->id,
             'level' => 'term',
-            'dataType' => $dataTypeId
+            'dataType' => $dataTypeId,
         ]);
         $this->assertTrue(is_object($attrcreate)
             && is_numeric($attrcreate->inserted->id), 'Unable to create attribute having new dataTypeId in TermCollection1');
@@ -285,15 +287,15 @@ class Translate3013Test extends \editor_Test_ApiTest {
      * Get mapping-record for a given $collectionId and $dataTypeId
      * If $dataTypeId arg is not given - array of mappings for given $collectionId is returned
      *
-     * @param int $collectionId
-     * @param int $dataTypeId
      * @return mixed
      * @throws Zend_Http_Client_Exception
      */
-    public function getMapping(int $collectionId, int $dataTypeId = 0) {
-
+    public function getMapping(int $collectionId, int $dataTypeId = 0)
+    {
         // Get response
-        $response = static::api()->getJson('editor/collectionattributedatatype', ['collectionId' => $collectionId]);
+        $response = static::api()->getJson('editor/collectionattributedatatype', [
+            'collectionId' => $collectionId,
+        ]);
 
         // Pick mapping info by $dataTypeId, if given, else return mappings array
         return $dataTypeId ? $response->mappingA->$dataTypeId : (array) $response->mappingA;
@@ -304,9 +306,10 @@ class Translate3013Test extends \editor_Test_ApiTest {
      *
      * @throws Zend_Http_Client_Exception
      */
-    public static function afterTests(): void {
+    public static function afterTests(): void
+    {
         static::api()->login('testtermproposer');
-        static::api()->delete('editor/termcollection/'.self::$collection1Id);
-        static::api()->delete('editor/termcollection/'.self::$collection2Id);
+        static::api()->delete('editor/termcollection/' . self::$collection1Id);
+        static::api()->delete('editor/termcollection/' . self::$collection2Id);
     }
 }

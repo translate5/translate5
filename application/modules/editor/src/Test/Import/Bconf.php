@@ -21,7 +21,7 @@ START LICENSE AND COPYRIGHT
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
@@ -45,12 +45,6 @@ final class Bconf extends Resource
 
     private bool $_uploadFailed = false;
 
-    /**
-     * @param string $testClass
-     * @param int $index
-     * @param string $name
-     * @param string $bconfFileName
-     */
     public function __construct(string $testClass, int $index, string $name, string $bconfFileName)
     {
         parent::__construct($testClass, $index);
@@ -65,12 +59,12 @@ final class Bconf extends Resource
     public function setNotToFailOnError(): Bconf
     {
         $this->_failOnError = false;
+
         return $this;
     }
 
     /**
      * When an Bconf was imported with ::setNotToFailOnError() called, this retrieves if the upload really failed
-     * @return bool
      */
     public function hasUploadFailed(): bool
     {
@@ -79,25 +73,23 @@ final class Bconf extends Resource
 
     /**
      * Adds a term-collection
-     * @param Helper $api
-     * @param Config $config
      * @throws Exception
      * @throws \Zend_Http_Client_Exception
      */
     public function import(Helper $api, Config $config): void
     {
-        if($this->_requested){
+        if ($this->_requested) {
             throw new Exception('You cannot import a Bconf twice.');
         }
 
         $api->addFile('bconffile', $api->getFile($this->_uploadFile), 'application/octet-stream');
         $params = $this->getRequestParams();
-        if(empty($params['customerId'])){
+        if (empty($params['customerId'])) {
             unset($params['customerId']);
         }
-        $result = $api->postJson('editor/plugins_okapi_bconf/uploadbconf', $params, null, false, !$this->_failOnError);
+        $result = $api->postJson('editor/plugins_okapi_bconf/uploadbconf', $params, null, false, ! $this->_failOnError);
         // in case we want the bonf to fail we simply apply the result without validation
-        if(!$this->_failOnError && is_object($result) && !property_exists($result, 'id')){
+        if (! $this->_failOnError && is_object($result) && ! property_exists($result, 'id')) {
             $this->applyResult($result);
             $this->_uploadFailed = true;
         } else {
@@ -105,13 +97,9 @@ final class Bconf extends Resource
         }
     }
 
-    /**
-     * @param Helper $api
-     * @param Config $config
-     */
     public function cleanup(Helper $api, Config $config): void
     {
-        if($this->_requested && !$this->_uploadFailed){
+        if ($this->_requested && ! $this->_uploadFailed) {
             $api->delete('editor/plugins_okapi_bconf/' . $this->getId());
         }
     }

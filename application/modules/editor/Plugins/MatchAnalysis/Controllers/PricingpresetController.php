@@ -21,7 +21,7 @@
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
- 		     http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
  END LICENSE AND COPYRIGHT
  */
@@ -33,8 +33,8 @@ use MittagQI\ZfExtended\MismatchException;
  *
  * @property Preset $entity
  */
-class editor_Plugins_MatchAnalysis_PricingpresetController extends ZfExtended_RestController {
-
+class editor_Plugins_MatchAnalysis_PricingpresetController extends ZfExtended_RestController
+{
     /**
      * Use trait
      */
@@ -56,8 +56,8 @@ class editor_Plugins_MatchAnalysis_PricingpresetController extends ZfExtended_Re
      * @throws Zend_Db_Statement_Exception
      * @throws MismatchException
      */
-    public function init() {
-
+    public function init()
+    {
         // Call parent
         parent::init();
 
@@ -70,8 +70,8 @@ class editor_Plugins_MatchAnalysis_PricingpresetController extends ZfExtended_Re
      *
      * @see ZfExtended_RestController::indexAction()
      */
-    public function indexAction() {
-
+    public function indexAction()
+    {
         // Get rows and total
         $this->view->rows = $this->entity->getGridRows();
         $this->view->total = count($this->view->rows);
@@ -79,7 +79,6 @@ class editor_Plugins_MatchAnalysis_PricingpresetController extends ZfExtended_Re
         // Auto-import of default-preset: when there are no rows we can assume the feature
         // was just installed and the DB is empty then we automatically add the system default preset
         if ($this->view->total < 1) {
-
             // Do import
             $this->entity->importDefaultWhenNeeded();
 
@@ -92,7 +91,6 @@ class editor_Plugins_MatchAnalysis_PricingpresetController extends ZfExtended_Re
     /**
      * Delete preset
      *
-     * @return void
      * @throws Zend_Db_Statement_Exception
      * @throws Zend_Db_Table_Row_Exception
      * @throws Zend_Exception
@@ -100,18 +98,17 @@ class editor_Plugins_MatchAnalysis_PricingpresetController extends ZfExtended_Re
      * @throws ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey
      * @throws ZfExtended_NoAccessException
      */
-    public function deleteAction() {
-
+    public function deleteAction()
+    {
         // Check params
         try {
-
             // Check preset exists, and if yes - load into $this->entity
             $this->jcheck([
                 'presetId' => [
                     'req' => true,
                     'rex' => 'int11',
-                    'key' => $this->entity
-                ]
+                    'key' => $this->entity,
+                ],
             ]);
 
             // If this preset is default
@@ -119,15 +116,13 @@ class editor_Plugins_MatchAnalysis_PricingpresetController extends ZfExtended_Re
                 throw new editor_Plugins_MatchAnalysis_Exception('E1513');
             }
 
-        // Catch mismatch-exception
+            // Catch mismatch-exception
         } catch (MismatchException $e) {
-
             // Flush msg
             $this->jflush(false, $e->getMessage());
 
-        // Catch matchanalysis-exception
+            // Catch matchanalysis-exception
         } catch (editor_Plugins_MatchAnalysis_Exception $e) {
-
             // Log
             Zend_Registry::get('logger')
                 ->cloneMe('plugin.matchanalysis')
@@ -152,8 +147,8 @@ class editor_Plugins_MatchAnalysis_PricingpresetController extends ZfExtended_Re
      *
      * @throws Zend_Db_Statement_Exception
      */
-    public function cloneAction() {
-
+    public function cloneAction()
+    {
         // Check params
         try {
             $this->jcheck([
@@ -170,12 +165,11 @@ class editor_Plugins_MatchAnalysis_PricingpresetController extends ZfExtended_Re
                 'customerId' => [
                     'rex' => 'int11',                                                   // regular expression preset key or raw expression
                     'key' => 'LEK_customer',                                            // points to existing record in a given db table
-                ]
+                ],
             ]);
 
-        // Catch mismatch-exception
+            // Catch mismatch-exception
         } catch (MismatchException $e) {
-
             // Flush msg
             $this->jflush(false, $e->getMessage());
         }
@@ -185,7 +179,9 @@ class editor_Plugins_MatchAnalysis_PricingpresetController extends ZfExtended_Re
         $customerId = $this->getParam('customerId');
 
         // Do clone
-        $this->jflush(true, ['clone' => $this->entity->clone($name, $customerId)->toArray()]);
+        $this->jflush(true, [
+            'clone' => $this->entity->clone($name, $customerId)->toArray(),
+        ]);
     }
 
     /**
@@ -195,8 +191,8 @@ class editor_Plugins_MatchAnalysis_PricingpresetController extends ZfExtended_Re
      * @throws ZfExtended_Models_Entity_Exceptions_IntegrityConstraint
      * @throws ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey
      */
-    public function putAction() {
-
+    public function putAction()
+    {
         // Check params
         try {
             $this->jcheck([
@@ -216,7 +212,7 @@ class editor_Plugins_MatchAnalysis_PricingpresetController extends ZfExtended_Re
                     'rex' => 'varchar255',
                 ],
                 'priceAdjustment' => [
-                    'rex' => 'decimal112'
+                    'rex' => 'decimal112',
                 ],
                 'isDefault' => [
                     'rex' => 'bool',
@@ -233,24 +229,21 @@ class editor_Plugins_MatchAnalysis_PricingpresetController extends ZfExtended_Re
 
             // If we're going to rename preset
             if ($this->getParam('name') != $this->entity->getName()) {
-
                 // Make sure new name is NOT used by any other preset
                 $this->jcheck([
                     'name' => [
                         'key' => "!match_analysis_pricing_preset.name:$err",
-                    ]
+                    ],
                 ]);
             }
 
-        // Catch mismatch-exception
+            // Catch mismatch-exception
         } catch (MismatchException $e) {
-
             // Flush msg
             $this->jflush(false, $e->getMessage());
 
-        // Catch matchanalysis-exception
+            // Catch matchanalysis-exception
         } catch (editor_Plugins_MatchAnalysis_Exception $e) {
-
             // Log
             Zend_Registry::get('logger')
                 ->cloneMe('plugin.matchanalysis')
@@ -272,7 +265,9 @@ class editor_Plugins_MatchAnalysis_PricingpresetController extends ZfExtended_Re
         $this->entity->save();
 
         // Flush success
-        $this->jflush(true, ['updated' => $this->entity->toArray()]);
+        $this->jflush(true, [
+            'updated' => $this->entity->toArray(),
+        ]);
     }
 
     /**
@@ -282,11 +277,10 @@ class editor_Plugins_MatchAnalysis_PricingpresetController extends ZfExtended_Re
      * @throws ZfExtended_Models_Entity_Exceptions_IntegrityConstraint
      * @throws ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey
      */
-    public function postAction() {
-
+    public function postAction()
+    {
         // Check params
         try {
-
             // Check name-param is given and is not used by any other preset so far
             $this->jcheck([
                 'name' => [
@@ -297,12 +291,11 @@ class editor_Plugins_MatchAnalysis_PricingpresetController extends ZfExtended_Re
                 'customerId' => [
                     'rex' => 'int11',                                                   // regular expression preset key or raw expression
                     'key' => 'LEK_customer',                                            // points to existing record in a given db table
-                ]
+                ],
             ]);
 
-        // Catch mismatch-exception
+            // Catch mismatch-exception
         } catch (MismatchException $e) {
-
             // Flush msg
             $this->jflush(false, $e->getMessage());
         }
@@ -314,7 +307,9 @@ class editor_Plugins_MatchAnalysis_PricingpresetController extends ZfExtended_Re
         );
 
         // Flush success
-        $this->jflush(true, ['created' => $this->entity->toArray()]);
+        $this->jflush(true, [
+            'created' => $this->entity->toArray(),
+        ]);
     }
 
     /**
@@ -325,8 +320,8 @@ class editor_Plugins_MatchAnalysis_PricingpresetController extends ZfExtended_Re
      * @throws ZfExtended_Models_Entity_Exceptions_IntegrityConstraint
      * @throws ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey
      */
-    public function setdefaultAction(){
-
+    public function setdefaultAction()
+    {
         // Check params
         try {
             $this->jcheck([
@@ -334,10 +329,10 @@ class editor_Plugins_MatchAnalysis_PricingpresetController extends ZfExtended_Re
                     'req' => true,
                     'rex' => 'int11',
                     'key' => $this->entity,
-                ]
+                ],
             ]);
 
-        // Catch mismatch-exception and flush msg
+            // Catch mismatch-exception and flush msg
         } catch (MismatchException $e) {
             $this->jflush(false, $e->getMessage());
         }

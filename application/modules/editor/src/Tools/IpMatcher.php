@@ -21,7 +21,7 @@ START LICENSE AND COPYRIGHT
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
@@ -38,15 +38,13 @@ class IpMatcher
      * @param string $ipToCheck - ip address in dot notation to check against the particular range
      * @param string $range - ip range in dot notation with subnet mask e.g. (192.168.0.1/32),
      *                        please note that subnet mask can be omitted this will lead to simple ips comparison
-     *
-     * @return bool
      */
     public function isIpInRange(string $ipToCheck, string $range): bool
     {
         $parts = explode('/', $range);
 
         $subnet = $parts[0];
-        $bits = isset($parts[1]) ? (int)$parts[1] : 32;
+        $bits = isset($parts[1]) ? (int) $parts[1] : 32;
 
         $subnet = ip2long($subnet);
         $mask = -1 << (32 - $bits);
@@ -58,10 +56,6 @@ class IpMatcher
 
     /**
      * Get a list of IPv4 addresses corresponding to a given Internet host name
-     *
-     * @param string $domainName
-     *
-     * @return array
      */
     public function getIpsForDomain(string $domainName): array
     {

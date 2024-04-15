@@ -21,7 +21,7 @@ START LICENSE AND COPYRIGHT
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
@@ -44,8 +44,6 @@ final class DbHelper
 {
     /**
      * Tries to activate the passed plugins
-     * @param array $pluginClasses
-     * @return bool
      */
     public static function activatePlugins(array $pluginClasses): bool
     {
@@ -54,8 +52,6 @@ final class DbHelper
 
     /**
      * Tries to deactivate the passed plugins
-     * @param array $pluginClasses
-     * @return bool
      */
     public static function deactivatePlugins(array $pluginClasses): bool
     {
@@ -64,34 +60,29 @@ final class DbHelper
 
     /**
      * Activates/deactivates a bunch of plugins. returns the success of the action
-     * @param array $pluginClasses
-     * @param bool $activate
-     * @return bool
      */
     private static function disableOrEnablePlugins(array $pluginClasses, bool $activate): bool
     {
         $success = true;
+
         try {
             $pluginmanager = Zend_Registry::get('PluginManager');
             /* @var $pluginmanager ZfExtended_Plugin_Manager */
             foreach ($pluginClasses as $pluginClass) {
                 $plugin = $pluginmanager::getPluginNameByClass($pluginClass);
-                if (!$pluginmanager->setActive($plugin, $activate)) {
+                if (! $pluginmanager->setActive($plugin, $activate)) {
                     $success = false;
                 }
             }
         } catch (Throwable $e) {
             $success = false;
         }
+
         return $success;
     }
 
     /**
      * Checks the workers a test leaves in the DB for active ones. Cleans that up according the given params
-     * @param bool $forceRemoval: if set, the worker-db will be cleaned even if no non-done workers remained
-     * @param bool $preventRemoval: if set, the worker-table will not be cleaned no matter what
-     * @param bool $addRemainingWorkerTypes: if set, the unique list of remaining worrkers will be added
-     * @return stdClass
      */
     public static function cleanupWorkers(bool $forceRemoval = false, bool $preventRemoval = false, bool $addRemainingWorkerTypes = false): stdClass
     {
@@ -106,20 +97,20 @@ final class DbHelper
             + $summary[ZfExtended_Models_Worker::STATE_DEFUNCT];
         $result->cleanupNeccessary = ($numFaulty > 0);
 
-        if($result->cleanupNeccessary && $addRemainingWorkerTypes){
+        if ($result->cleanupNeccessary && $addRemainingWorkerTypes) {
             $result->remainingWorkers = $worker->getRemainingWorkerInfo();
         }
-        if (!$preventRemoval && ($numFaulty > 0 || $forceRemoval)) {
+        if (! $preventRemoval && ($numFaulty > 0 || $forceRemoval)) {
             // for the following tests to function properly running or dead workers are unwanted
             $worker->db->delete('1 = 1');
         }
         $result->worker = $summary;
+
         return $result;
     }
 
     /**
      * Removes all existing workers from the DB
-     * @return void
      */
     public static function removeWorkers()
     {

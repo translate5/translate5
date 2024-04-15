@@ -38,9 +38,6 @@ use MittagQI\Translate5\Segment\AbstractProcessor;
  */
 final class Looper
 {
-    /**
-     * @var State
-     */
     private State $state;
 
     /**
@@ -48,38 +45,25 @@ final class Looper
      */
     private array $toProcess;
 
-    /**
-     * @var int
-     */
     private int $batchSize;
 
-    /**
-     * @var bool
-     */
     private bool $isReprocessing = false;
 
     /**
      * Between processing segments and fetching new ones a pause can be configured to make db-deadlocks less probable
-     * @var int
      */
     private int $loopingPause;
 
     /**
      * Tracks the number of processed segments
-     * @var int
      */
     private int $numProcessed = 0;
 
-    /**
-     * @param ProgressInterface $progressReporter
-     * @param editor_Models_Task $task
-     * @param AbstractProcessor $processor
-     */
     public function __construct(
-        private ProgressInterface  $progressReporter,
+        private ProgressInterface $progressReporter,
         private editor_Models_Task $task,
-        private AbstractProcessor  $processor)
-    {
+        private AbstractProcessor $processor
+    ) {
         $this->loopingPause = $processor->getLoopingPause();
         $this->state = new State($processor->getServiceId());
         $this->batchSize = $processor->getBatchSize();
@@ -88,17 +72,14 @@ final class Looper
     /**
      * Loops through the segments tagsStates to process
      * returns true after all segments have been processed
-     * @param string $processingMode
      * @param bool $fromTheTop : if segments should be fetched ascending or descending
-     * @param bool $doDebug
-     * @return bool
      * @throws Exception
      */
     public function run(string $processingMode, bool $fromTheTop = true, bool $doDebug = false): bool
     {
         $this->fetchNext($fromTheTop);
         // looping through segments
-        while (!empty($this->toProcess)) {
+        while (! empty($this->toProcess)) {
             // create segment tags from State
             $segmentsTags = [];
             foreach ($this->toProcess as $state) {
@@ -122,12 +103,12 @@ final class Looper
             }
             $this->fetchNext($fromTheTop);
         }
+
         return true;
     }
 
     /**
      * Retrieves the current progress of the processing as float between 0 and 1
-     * @return float
      */
     public function getProgress(): float
     {
@@ -145,8 +126,6 @@ final class Looper
 
     /**
      * @param State[] $problematicStates
-     * @param int $errorState
-     * @param bool $doDebug
      */
     public function setUnprocessedStates(array $problematicStates, int $errorState, bool $doDebug = false)
     {
@@ -160,9 +139,6 @@ final class Looper
         }
     }
 
-    /**
-     * @return bool
-     */
     public function isReprocessingLoop(): bool
     {
         return $this->isReprocessing;

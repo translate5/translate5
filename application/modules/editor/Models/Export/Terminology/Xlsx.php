@@ -21,21 +21,21 @@ START LICENSE AND COPYRIGHT
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
+use WilsonGlasser\Spout\Common\Entity\ColumnDimension;
+use WilsonGlasser\Spout\Common\Entity\Style\Style;
 use WilsonGlasser\Spout\Writer\Common\Creator\Style\StyleBuilder;
 use WilsonGlasser\Spout\Writer\Common\Creator\WriterEntityFactory;
 use WilsonGlasser\Spout\Writer\Common\Helper\CellHelper;
-use WilsonGlasser\Spout\Common\Entity\Style\Style;
-use WilsonGlasser\Spout\Common\Entity\ColumnDimension;
 
 /**
  * exports term data stored in translate5 to valid XLSX files
  */
-class editor_Models_Export_Terminology_Xlsx {
-
+class editor_Models_Export_Terminology_Xlsx
+{
     /**
      * XLSX document header columns description
      *
@@ -58,8 +58,8 @@ class editor_Models_Export_Terminology_Xlsx {
                 'name' => 'name',
                 'guid' => 'guid',
                 'email' => 'e-mail',
-                'date' => 'date'
-            ]
+                'date' => 'date',
+            ],
         ],
         'entry.modification' => [
             'text' => 'TermEntry last modifier/modification properties',
@@ -68,13 +68,13 @@ class editor_Models_Export_Terminology_Xlsx {
                 'name' => 'name',
                 'guid' => 'guid',
                 'email' => 'e-mail',
-                'date' => 'date'
-            ]
+                'date' => 'date',
+            ],
         ],
         'entry.attribs' => [
             'text' => 'TermEntry level attributes',
             'color' => 'fff685',
-            'cols' => []
+            'cols' => [],
         ],
         'language.origination' => [
             'text' => 'Language level creator/creation properties',
@@ -83,8 +83,8 @@ class editor_Models_Export_Terminology_Xlsx {
                 'name' => 'name',
                 'guid' => 'guid',
                 'email' => 'e-mail',
-                'date' => 'date'
-            ]
+                'date' => 'date',
+            ],
         ],
         'language.modification' => [
             'text' => 'Language level last modifier/modification properties',
@@ -93,13 +93,13 @@ class editor_Models_Export_Terminology_Xlsx {
                 'name' => 'name',
                 'guid' => 'guid',
                 'email' => 'e-mail',
-                'date' => 'date'
-            ]
+                'date' => 'date',
+            ],
         ],
         'language.attribs' => [
             'text' => 'Language level attributes',
             'color' => 'bd7cb5',
-            'cols' => []
+            'cols' => [],
         ],
         'term.origination' => [
             'text' => 'Term level creator/creation properties',
@@ -108,8 +108,8 @@ class editor_Models_Export_Terminology_Xlsx {
                 'name' => 'name',
                 'guid' => 'guid',
                 'email' => 'e-mail',
-                'date' => 'date'
-            ]
+                'date' => 'date',
+            ],
         ],
         'term.modification' => [
             'text' => 'Term level last modifier/modification properties',
@@ -118,14 +118,14 @@ class editor_Models_Export_Terminology_Xlsx {
                 'name' => 'name',
                 'guid' => 'guid',
                 'email' => 'e-mail',
-                'date' => 'date'
-            ]
+                'date' => 'date',
+            ],
         ],
         'term.attribs' => [
             'text' => 'Term level attributes',
             'color' => 'add58a',
-            'cols' => []
-        ]
+            'cols' => [],
+        ],
     ];
 
     /**
@@ -186,24 +186,23 @@ class editor_Models_Export_Terminology_Xlsx {
     /**
      * Get exported file path
      *
-     * @param int $collectionId
      * @return string
      */
-    public function file(int $collectionId) {
+    public function file(int $collectionId)
+    {
         return join(DIRECTORY_SEPARATOR, [APPLICATION_ROOT, 'data', 'tmp', 'tc_' . $collectionId . '.xlsx']);
     }
 
     /**
      * Print status msg
      *
-     * @param $msg
      * @param null $arg If given, will be used as 2nd arg for sprintf() call
      * @throws Zend_Exception
      */
-    public function status($msg, $arg = null) {
-
+    public function status($msg, $arg = null)
+    {
         // Get translate instance if not yet got
-        if (!$this->l10n) {
+        if (! $this->l10n) {
             $this->l10n = ZfExtended_Zendoverwrites_Translate::getInstance();
         }
 
@@ -222,19 +221,21 @@ class editor_Models_Export_Terminology_Xlsx {
     /**
      * Do export
      *
-     * @param int $collectionId
      * @param int $byTermEntryQty
      * @throws Zend_Exception
      * @throws \WilsonGlasser\Spout\Common\Exception\IOException
      * @throws \WilsonGlasser\Spout\Common\Exception\UnsupportedTypeException
      */
-    public function exportCollectionById(int $collectionId, $byTermEntryQty = 1000) {
-
+    public function exportCollectionById(int $collectionId, $byTermEntryQty = 1000)
+    {
         // Load utils
-        class_exists('editor_Utils'); mt();
+        class_exists('editor_Utils');
+        mt();
 
         // Force immediate flushing
-        ob_implicit_flush(true); ob_end_flush(); ob_end_flush();
+        ob_implicit_flush(true);
+        ob_end_flush();
+        ob_end_flush();
 
         // Set no time limit
         set_time_limit(0);
@@ -243,12 +244,12 @@ class editor_Models_Export_Terminology_Xlsx {
         $this->collectionId = $collectionId;
 
         // Models shortcuts
-        $termEntryM           = ZfExtended_Factory::get('editor_Models_Terminology_Models_TermEntryModel');
-        $termM                = ZfExtended_Factory::get('editor_Models_Terminology_Models_TermModel');
-        $attrM                = ZfExtended_Factory::get('editor_Models_Terminology_Models_AttributeModel');
-        $trscM                = ZfExtended_Factory::get('editor_Models_Terminology_Models_TransacgrpModel');
-        $refObjectModelM      = ZfExtended_Factory::get('editor_Models_Terminology_Models_RefObjectModel');
-        $this->imagesModel    = ZfExtended_Factory::get('editor_Models_Terminology_Models_ImagesModel');
+        $termEntryM = ZfExtended_Factory::get('editor_Models_Terminology_Models_TermEntryModel');
+        $termM = ZfExtended_Factory::get('editor_Models_Terminology_Models_TermModel');
+        $attrM = ZfExtended_Factory::get('editor_Models_Terminology_Models_AttributeModel');
+        $trscM = ZfExtended_Factory::get('editor_Models_Terminology_Models_TransacgrpModel');
+        $refObjectModelM = ZfExtended_Factory::get('editor_Models_Terminology_Models_RefObjectModel');
+        $this->imagesModel = ZfExtended_Factory::get('editor_Models_Terminology_Models_ImagesModel');
 
         // Setup <level>.attribs-columns and write 2 header rows
         $this->openXlsxFile()->calcLevelAttribsCols()->writeFirstHeaderRow()->writeSecondHeaderRow();
@@ -265,7 +266,6 @@ class editor_Models_Export_Terminology_Xlsx {
 
         // Fetch usages by $byTermEntryQty at a time
         for ($p = 1; $p <= ceil($termEntryQty / $byTermEntryQty); $p++) {
-
             // Fetch offset
             $offset = ($p - 1) * $byTermEntryQty;
 
@@ -293,7 +293,7 @@ class editor_Models_Export_Terminology_Xlsx {
             $progress = ($offset + count($termEntryA)) / $termEntryQty * 100;
 
             // Print progress percentage
-            $this->status('Fortschritt: %s', floor($progress)  . '%');
+            $this->status('Fortschritt: %s', floor($progress) . '%');
 
             //
             //if ($p == 2) break;
@@ -321,15 +321,10 @@ class editor_Models_Export_Terminology_Xlsx {
     /**
      * Write row to an excel-export spreadsheet
      *
-     * @param $termEntry
-     * @param $lang
-     * @param $term
-     * @param $attrA
-     * @param $trscA
      * @throws Zend_Db_Statement_Exception
      */
-    public function writeRow($termEntry, $lang, $term, $attrA, $trscA) {
-
+    public function writeRow($termEntry, $lang, $term, $attrA, $trscA)
+    {
         // Excel column index shift
         $shift = 0;
 
@@ -338,10 +333,8 @@ class editor_Models_Export_Terminology_Xlsx {
 
         // Foreach column groups
         foreach ($this->cols as $group => $info) {
-
             // If it's main group
             if ($group == 'main') {
-
                 // Prepare data
                 $data = [
                     'termEntryTbxId' => $termEntry['termEntryTbxId'],
@@ -351,26 +344,31 @@ class editor_Models_Export_Terminology_Xlsx {
                     'processStatus' => $term['processStatus'],
                 ];
 
-            // Else if it's transacgrp-group
-            } else if (preg_match('~(entry|language|term)\.(origination|modification)~', $group, $m)) {
-
+                // Else if it's transacgrp-group
+            } elseif (preg_match('~(entry|language|term)\.(origination|modification)~', $group, $m)) {
                 // Prepare data
-                     if ($m[1] == 'entry')    $data = $this->transacGrpCells($trscA, $m[2], $termEntry['id']);
-                else if ($m[1] == 'language') $data = $this->transacGrpCells($trscA, $m[2], $termEntry['id'], $lang);
-                else if ($m[1] == 'term')     $data = $this->transacGrpCells($trscA, $m[2], $termEntry['id'], $lang, $term['id']);
+                if ($m[1] == 'entry') {
+                    $data = $this->transacGrpCells($trscA, $m[2], $termEntry['id']);
+                } elseif ($m[1] == 'language') {
+                    $data = $this->transacGrpCells($trscA, $m[2], $termEntry['id'], $lang);
+                } elseif ($m[1] == 'term') {
+                    $data = $this->transacGrpCells($trscA, $m[2], $termEntry['id'], $lang, $term['id']);
+                }
 
-            // Else if it's attribs-group
-            } else if (preg_match('~(entry|language|term)\.attribs~', $group, $m)) {
-
+                // Else if it's attribs-group
+            } elseif (preg_match('~(entry|language|term)\.attribs~', $group, $m)) {
                 // Prepare data
-                     if ($m[1] == 'entry')    $data = $this->attributeCells($attrA, $termEntry['id']);
-                else if ($m[1] == 'language') $data = $this->attributeCells($attrA, $termEntry['id'], $lang);
-                else if ($m[1] == 'term')     $data = $this->attributeCells($attrA, $termEntry['id'], $lang, $term['id']);
+                if ($m[1] == 'entry') {
+                    $data = $this->attributeCells($attrA, $termEntry['id']);
+                } elseif ($m[1] == 'language') {
+                    $data = $this->attributeCells($attrA, $termEntry['id'], $lang);
+                } elseif ($m[1] == 'term') {
+                    $data = $this->attributeCells($attrA, $termEntry['id'], $lang, $term['id']);
+                }
             }
 
             // Foreach column in group
             foreach (array_keys($info['cols']) as $idx => $key) {
-
                 // Create cell
                 $cell = WriterEntityFactory::createCell($data[$key] ?? '', $info['style']);
 
@@ -389,47 +387,43 @@ class editor_Models_Export_Terminology_Xlsx {
     /**
      * Prepare data for attributes cells
      *
-     * @param $attrA
-     * @param $termEntryId
      * @param string $language
      * @param string $termId
      * @return array
      * @throws Zend_Db_Statement_Exception
      */
-    public function attributeCells($attrA, $termEntryId, $language = '', $termId = '') {
-
+    public function attributeCells($attrA, $termEntryId, $language = '', $termId = '')
+    {
         // Aux variables
-        $data = []; $dataTypeId_figure = 0;
+        $data = [];
+        $dataTypeId_figure = 0;
 
         // Foreach attribute
         foreach ($attrA[$termEntryId][$language][$termId] ?? [] as $attr) {
-
             // If it's multi-occurence attribute
             if ($type = $this->usage->multi[$attr['dataTypeId']] ?? 0) {
-
                 // If it require two columns (e.g. it's xGraphic- or externalCrossReference-attr)
                 if ($this->usage->double[$attr['dataTypeId']] ?? 0) {
-                    $data[$attr['dataTypeId'] . '-value']  []= $attr['value'];
-                    $data[$attr['dataTypeId'] . '-target'] []= $attr['target'];
+                    $data[$attr['dataTypeId'] . '-value'][] = $attr['value'];
+                    $data[$attr['dataTypeId'] . '-target'][] = $attr['target'];
 
-                // Else if it's figure-attr
-                } else if ($type == 'figure') {
-                    $data[$dataTypeId_figure = $attr['dataTypeId']] [$attr['target']]= $attr['target'];
+                    // Else if it's figure-attr
+                } elseif ($type == 'figure') {
+                    $data[$dataTypeId_figure = $attr['dataTypeId']][$attr['target']] = $attr['target'];
 
-                // Else if it's crossReference-attr
+                    // Else if it's crossReference-attr
                 } else {
-                    $data[$attr['dataTypeId']] []= $attr['target'];
+                    $data[$attr['dataTypeId']][] = $attr['target'];
                 }
 
-            // Else
+                // Else
             } else {
-                $data[$attr['dataTypeId']] []= $attr['value'];
+                $data[$attr['dataTypeId']][] = $attr['value'];
             }
         }
 
         // Get images URLs
         if ($data[$dataTypeId_figure] ?? 0) {
-
             // Get image paths by target ids
             $paths = $this->imagesModel->getImagePathsByTargetIds($this->collectionId, $data[$dataTypeId_figure]);
 
@@ -451,25 +445,24 @@ class editor_Models_Export_Terminology_Xlsx {
     /**
      * Prepare data for transacgrp cells
      *
-     * @param $trscA
-     * @param $transac
-     * @param $termEntryId
      * @param string $language
      * @param string $termId
      * @return array
      */
-    public function transacGrpCells($trscA, $transac, $termEntryId, $language = '', $termId = '') {
-
+    public function transacGrpCells($trscA, $transac, $termEntryId, $language = '', $termId = '')
+    {
         // Foreach transacgrp-record
-        foreach ($trscA[$termEntryId][$language][$termId] ?? [] as $trsc)
-
+        foreach ($trscA[$termEntryId][$language][$termId] ?? [] as $trsc) {
             // If record's 'transac' prop is $transac ('origination', or 'modification') - prepare and return data
-            if ($trsc['transac'] == $transac) return [
-                'name' => $trsc['transacNote'],
-                'guid' => $trsc['target'],
-                'email' => $this->emailA[$trsc['target']] ?? '',
-                'date' => explode(' ', $trsc['date'])[0]
-            ];
+            if ($trsc['transac'] == $transac) {
+                return [
+                    'name' => $trsc['transacNote'],
+                    'guid' => $trsc['target'],
+                    'email' => $this->emailA[$trsc['target']] ?? '',
+                    'date' => explode(' ', $trsc['date'])[0],
+                ];
+            }
+        }
     }
 
     /**
@@ -477,8 +470,8 @@ class editor_Models_Export_Terminology_Xlsx {
      *
      * @return $this
      */
-    public function writeFirstHeaderRow() {
-
+    public function writeFirstHeaderRow()
+    {
         // Get current sheet
         $sheet = $this->writer->getCurrentSheet();
 
@@ -490,19 +483,21 @@ class editor_Models_Export_Terminology_Xlsx {
 
         // Foreach column group
         foreach ($this->cols as $group => $info) {
-
             // If no cols - skip
-            if (!$info['cols']) continue;
+            if (! $info['cols']) {
+                continue;
+            }
 
             // Prepare style
             $styleBuilder = new StyleBuilder();
-            if ($info['color'] ?? 0) $styleBuilder->setBackgroundColor($info['color']);
+            if ($info['color'] ?? 0) {
+                $styleBuilder->setBackgroundColor($info['color']);
+            }
             $styleBuilder->setHorizontalAlign(Style::ALIGN_MIDDLE);
             $style = $styleBuilder->build();
 
             // Foreach column in current group
             foreach (array_values($info['cols']) as $idx => $text) {
-
                 // Create cell
                 $cell = WriterEntityFactory::createCell($info['text'] ?? '', $style);
 
@@ -535,8 +530,8 @@ class editor_Models_Export_Terminology_Xlsx {
      *
      * @return $this
      */
-    public function writeSecondHeaderRow() {
-
+    public function writeSecondHeaderRow()
+    {
         // Column index shift
         $shift = 0;
 
@@ -545,10 +540,11 @@ class editor_Models_Export_Terminology_Xlsx {
 
         // Foreach columns groups
         foreach ($this->cols as $group => &$info) {
-
             // Prepare style for column header cells
             $styleBuilder = new StyleBuilder();
-            if ($info['color'] ?? 0) $styleBuilder->setBackgroundColor($info['color']);
+            if ($info['color'] ?? 0) {
+                $styleBuilder->setBackgroundColor($info['color']);
+            }
             $style = $styleBuilder->setFontBold()->build();
 
             // Prepare style for data-cells
@@ -558,7 +554,6 @@ class editor_Models_Export_Terminology_Xlsx {
 
             // Foreach column in current group
             foreach (array_values($info['cols']) as $idx => $text) {
-
                 // Create cell
                 $cell = WriterEntityFactory::createCell($text, $style);
 
@@ -567,7 +562,8 @@ class editor_Models_Export_Terminology_Xlsx {
 
                 // Setup width
                 $this->writer->getCurrentSheet()->addColumnDimension(new ColumnDimension(
-                    CellHelper::getCellIndexFromColumnIndex($shift + $idx), max(mb_strlen($text), 10)
+                    CellHelper::getCellIndexFromColumnIndex($shift + $idx),
+                    max(mb_strlen($text), 10)
                 ));
             }
 
@@ -589,27 +585,24 @@ class editor_Models_Export_Terminology_Xlsx {
      * Setup $this->cols[<level>.attribs]['cols'] columns definitions
      * based on attributes dataTypes usage
      */
-    public function calcLevelAttribsCols() {
-
+    public function calcLevelAttribsCols()
+    {
         // Get attribute datatypes usage info
         $this->usage = ZfExtended_Factory
             ::get('editor_Models_Terminology_Models_AttributeDataType')
-            ->getUsageForLevelsByCollectionId($this->collectionId);
+                ->getUsageForLevelsByCollectionId($this->collectionId);
 
         // Foreach $level => $dataTypeIdA pair
         foreach ($this->usage->usage as $level => $dataTypeIdA) {
-
             // Foreach $dataTypeId => $title pair
             foreach ($dataTypeIdA as $dataTypeId => $title) {
-
                 // If two columns required for his $dataTypeId
                 if ($this->usage->double[$dataTypeId] ?? 0) {
-
                     // Append two columns, for 'value' and 'target'
                     $this->cols[$level . '.attribs']['cols'][$dataTypeId . '-value'] = $title;
                     $this->cols[$level . '.attribs']['cols'][$dataTypeId . '-target'] = '';
 
-                // Else append one column
+                    // Else append one column
                 } else {
                     $this->cols[$level . '.attribs']['cols'][$dataTypeId] = $title;
                 }
@@ -627,8 +620,8 @@ class editor_Models_Export_Terminology_Xlsx {
      * @throws \WilsonGlasser\Spout\Common\Exception\IOException
      * @throws \WilsonGlasser\Spout\Common\Exception\UnsupportedTypeException
      */
-    public function openXlsxFile() {
-
+    public function openXlsxFile()
+    {
         // Build file path
         $file = $this->file($this->collectionId);
 

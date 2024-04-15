@@ -3,33 +3,31 @@
 START LICENSE AND COPYRIGHT
 
  This file is part of translate5
- 
+
  Copyright (c) 2013 - 2021 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
 
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
  This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
- as published by the Free Software Foundation and appearing in the file agpl3-license.txt 
- included in the packaging of this file.  Please review the following information 
+ as published by the Free Software Foundation and appearing in the file agpl3-license.txt
+ included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
-  
+
  There is a plugin exception available for use with this release of translate5 for
- translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or
  plugin-exception.txt in the root folder of translate5.
-  
+
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
 
-/**
- */
-class TermProposalTest extends \editor_Test_ApiTest {
-    
+class TermProposalTest extends \editor_Test_ApiTest
+{
     /***
      * The current active collection
      * @var integer
@@ -59,22 +57,19 @@ class TermProposalTest extends \editor_Test_ApiTest {
 
     /**
      * Termportal setup data (dictionaries, etc)
-     *
-     * @var
      */
     protected static $setup;
 
     /**
      * We need the termproposer to be logged in for the test
-     * @var string
      */
     protected static string $setupUserLogin = 'testtermproposer';
 
     /***
      * Test term and term attribute proposals.
      */
-    public function testTermProposal(){
-
+    public function testTermProposal()
+    {
         /*class_exists('editor_Utils');
         $last = editor_Utils::db()->query('SELECT `id` FROM `LEK_languageresources` ORDER BY `id` DESC LIMIT 1')->fetchColumn();
         static::api()->delete('editor/termcollection/' . $last);*/
@@ -82,7 +77,7 @@ class TermProposalTest extends \editor_Test_ApiTest {
         // [1] create empty term collection
         $termCollection = static::api()->postJson('editor/termcollection', [
             'name' => 'Test api collection',
-            'customerIds' => static::getTestCustomerId()
+            'customerIds' => static::getTestCustomerId(),
         ]);
         $this->assertTrue(is_object($termCollection), 'Unable to create a test collection');
         $this->assertEquals('Test api collection', $termCollection->name);
@@ -95,21 +90,27 @@ class TermProposalTest extends \editor_Test_ApiTest {
         static::api()->postJson('editor/termcollection/import', [
             'collectionId' => self::$collectionId,
             'customerIds' => static::getTestCustomerId(),
-            'mergeTerms' => true
+            'mergeTerms' => true,
         ]);
 
         // [3] get languages: german
-        $german = static::api()->getJson('editor/language', ['filter' => '[{"operator":"eq","value":"de-DE","property":"rfc5646"}]']);
+        $german = static::api()->getJson('editor/language', [
+            'filter' => '[{"operator":"eq","value":"de-DE","property":"rfc5646"}]',
+        ]);
         $this->assertNotEmpty($german, 'Unable to load the german-language needed for the term search.');
         self::$german = $german[0];
 
         // english
-        $english = static::api()->getJson('editor/language', ['filter' => '[{"operator":"eq","value":"en","property":"rfc5646"}]']);
+        $english = static::api()->getJson('editor/language', [
+            'filter' => '[{"operator":"eq","value":"en","property":"rfc5646"}]',
+        ]);
         $this->assertNotEmpty($english, 'Unable to load english-language needed for use in noTermDefinedFor filter');
         self::$english = $english[0];
 
         // italian
-        $italian = static::api()->getJson('editor/language', ['filter' => '[{"operator":"eq","value":"it","property":"rfc5646"}]']);
+        $italian = static::api()->getJson('editor/language', [
+            'filter' => '[{"operator":"eq","value":"it","property":"rfc5646"}]',
+        ]);
         $this->assertNotEmpty($italian, 'Unable to load italian-language needed for use in noTermDefinedFor-filter');
         self::$italian = $italian[0];
 
@@ -119,7 +120,7 @@ class TermProposalTest extends \editor_Test_ApiTest {
             'collectionIds' => self::$collectionId,
             'language' => self::$german->id,
             'start' => 0,
-            'limit' => 1
+            'limit' => 1,
         ]);
         $this->assertTrue(is_object($termsearch), 'No terms are found in the termcollection ' . self::$collectionId);
         $this->assertNotEmpty($termsearch->data, "No terms are found in the term collection for the search string '*'");
@@ -130,22 +131,24 @@ class TermProposalTest extends \editor_Test_ApiTest {
         // [5] create proposal 'TestTermProposal' for imported term
         $data = [
             'termId' => $importedTerm->id,
-            'proposal' => 'TestTermProposal'
+            'proposal' => 'TestTermProposal',
         ];
         $importedTermProposal = static::api()->putJson('editor/term', $data);
-        $this->assertTrue(is_object($importedTermProposal)
+        $this->assertTrue(
+            is_object($importedTermProposal)
             && $importedTermProposal->proposal === $data['proposal'],
-            'Unable to create proposal for the tbx-imported term');
+            'Unable to create proposal for the tbx-imported term'
+        );
 
         // Get imported term attributes
         $importedTermAttrA = static::api()->postJson('editor/plugins_termportal_data/siblinginfo', [
-            'termId' => $importedTerm->id
+            'termId' => $importedTerm->id,
         ])->term->attributes;
 
         // [6] reject that proposal, so we now have two separate terms, and last one is rejected
         $rejected = static::api()->putJson('editor/attribute', [
             'attrId' => array_column($importedTermAttrA, 'id', 'type')['processStatus'],
-            'value' => 'rejected'
+            'value' => 'rejected',
         ]);
 
         // [7] create new term entry with term = "Term1" (de-DE) and note-attr = "Note for Term1"
@@ -153,15 +156,17 @@ class TermProposalTest extends \editor_Test_ApiTest {
             'collectionId' => self::$collectionId,
             'language' => self::$german->rfc5646,
             'term' => 'Term1',
-            'note' => 'Note for Term1'
+            'note' => 'Note for Term1',
         ];
         $Term1 = static::api()->postJson('editor/term', $Term1_data);
 
         // Check if the term entry proposal is valid
-        $this->assertTrue(is_object($Term1)
+        $this->assertTrue(
+            is_object($Term1)
             && is_numeric($Term1->termEntryId)
             && $Term1->query === $Term1_data['term'],
-            'Unable to propose new term entry with new term.');
+            'Unable to propose new term entry with new term.'
+        );
 
         // [8] create new term for same term entry with term=Term2 and 'en'-language
         $data = [
@@ -184,7 +189,7 @@ class TermProposalTest extends \editor_Test_ApiTest {
         $figurecreate = static::api()->postJson('editor/attribute', [
             'termId' => $Term1->termId,
             'level' => 'entry',
-            'dataType' => 'figure'
+            'dataType' => 'figure',
         ]);
         $this->assertTrue(is_object($figurecreate)
             && is_numeric($figurecreate->inserted->id), 'Unable to create figure-attribute for the entry-level');
@@ -199,7 +204,7 @@ class TermProposalTest extends \editor_Test_ApiTest {
         $refcreate = static::api()->postJson('editor/attribute', [
             'termId' => $Term1->termId,
             'level' => 'entry',
-            'dataType' => 'crossReference'
+            'dataType' => 'crossReference',
         ]);
         $this->assertTrue(is_object($refcreate)
             && is_numeric($refcreate->inserted->id), 'Unable to create ref-attribute for the entry-level');
@@ -216,7 +221,7 @@ class TermProposalTest extends \editor_Test_ApiTest {
         $refcreate = static::api()->postJson('editor/attribute', [
             'termId' => $Term1->termId,
             'level' => 'term',
-            'dataType' => 'crossReference'
+            'dataType' => 'crossReference',
         ]);
         $this->assertTrue(is_object($refcreate)
             && is_numeric($refcreate->inserted->id), 'Unable to create ref-attribute for the entry-level');
@@ -233,7 +238,7 @@ class TermProposalTest extends \editor_Test_ApiTest {
         $xrefcreate = static::api()->postJson('editor/attribute', [
             'termId' => $Term1->termId,
             'level' => 'term',
-            'dataType' => 'externalCrossReference'
+            'dataType' => 'externalCrossReference',
         ]);
         $this->assertTrue(is_object($xrefcreate)
             && is_numeric($xrefcreate->inserted->id), 'Unable to create xref-attribute for the term-level');
@@ -242,7 +247,7 @@ class TermProposalTest extends \editor_Test_ApiTest {
         $xrefupdate = static::api()->putJson('editor/attribute', [
             'attrId' => $xrefcreate->inserted->id,
             'dataIndex' => 'value',
-            'value' => 'Wikipedia website'
+            'value' => 'Wikipedia website',
         ]);
         $this->assertTrue(is_object($xrefupdate)
             && property_exists($xrefupdate, 'isValidUrl'), 'Unable to set value for the term-level xref-attribute');
@@ -251,13 +256,15 @@ class TermProposalTest extends \editor_Test_ApiTest {
         $xrefdata = [
             'attrId' => $xrefcreate->inserted->id,
             'dataIndex' => 'target',
-            'value' => 'https://wikipedia.org'
+            'value' => 'https://wikipedia.org',
         ];
         $xrefupdate = static::api()->putJson('editor/attribute', $xrefdata);
         $this->assertTrue(is_object($xrefupdate) && $xrefupdate->isValidUrl, 'Unable to set target for the term-level xref-attribute');
 
         // [10] search for the term attributes
-        $terminfo = static::api()->postJson('editor/plugins_termportal_data/terminfo', ['termId' => $Term1->termId]);
+        $terminfo = static::api()->postJson('editor/plugins_termportal_data/terminfo', [
+            'termId' => $Term1->termId,
+        ]);
         $this->assertTrue(is_object($terminfo), 'No data returned by terminfo-call');
 
         // Check image-attr is there
@@ -279,17 +286,21 @@ class TermProposalTest extends \editor_Test_ApiTest {
 
         // Check props presence
         foreach ([
-             'locale', 'right', 'permission', 'activeItem', 'l10n', 'filterWindow', 'filterPanel', 'lang',
-             'langInclSubs', 'flag', 'langAll', 'language', 'cfg', 'itranslateQuery', 'time'] as $prop)
+            'locale', 'right', 'permission', 'activeItem', 'l10n', 'filterWindow', 'filterPanel', 'lang',
+            'langInclSubs', 'flag', 'langAll', 'language', 'cfg', 'itranslateQuery', 'time'] as $prop) {
             $this->assertObjectHasAttribute($prop, self::$setup, 'Termportal setup data has no ' . $prop . '-property');
+        }
 
         // [21] call siblinginfo to get attributes for Term1
-        $siblinginfo = static::api()->postJson('editor/plugins_termportal_data/siblinginfo', ['termId' => $Term1->termId]);
+        $siblinginfo = static::api()->postJson('editor/plugins_termportal_data/siblinginfo', [
+            'termId' => $Term1->termId,
+        ]);
         $this->assertIsObject($siblinginfo, 'Siblinginfo data is not an array');
 
         // Check props presence
-        foreach (['entry', 'language', 'term'] as $prop)
+        foreach (['entry', 'language', 'term'] as $prop) {
             $this->assertObjectHasAttribute($prop, $siblinginfo, 'Sibling info data has no ' . $prop . '-property');
+        }
 
         // Check ref-attr is there
         $this->assertNotEmpty($refs = $siblinginfo->term->refs, 'Unable to find any ref-attribute for Term1');
@@ -313,7 +324,7 @@ class TermProposalTest extends \editor_Test_ApiTest {
             'termId' => $termId_batch = join(',', [$importedTerm->id, $Term1->termId]),
             'level' => 'entry',
             'dataType' => $dataTypeId_note,
-            'batch' => '1'
+            'batch' => '1',
         ], 0, false);
 
         // Batch create image-attr for language-level
@@ -345,32 +356,42 @@ class TermProposalTest extends \editor_Test_ApiTest {
         );
 
         // [23] delete image-attr, check image full path not exists anymore
-        $figuredelete = static::api()->delete('editor/attribute', ['attrId' => $figurecreate->inserted->id]);
+        $figuredelete = static::api()->delete('editor/attribute', [
+            'attrId' => $figurecreate->inserted->id,
+        ]);
         $this->assertIsObject($figuredelete, 'Unable to delete the image-attr');
         $this->assertObjectHasAttribute('updated', $figuredelete, 'Image-attr deletion response does not contain "updated" prop');
         $result = static::api()->getRaw($src);
         $this->assertTrue(static::api()->isJsonResultError($result), 'Image-attr deleted but image-file still exists at ' . $src);
 
         // [24] delete 'TestTermProposal' [isLast=false]
-        $rejecteddelete = static::api()->delete('editor/term', ['termId' => $rejected->inserted->id]);
+        $rejecteddelete = static::api()->delete('editor/term', [
+            'termId' => $rejected->inserted->id,
+        ]);
         $this->assertIsObject($rejecteddelete, 'Unable to delete rejected term');
         $this->assertObjectHasAttribute('isLast', $rejecteddelete, 'Rejected term deletion response does not have isLast prop');
         $this->assertFalse($rejecteddelete->isLast, 'Deleted term should have not been the last - neither among its language nor among its termEntry');
 
         // [25] delete note-attr for Term1
         $attrId_note = array_column($siblinginfo->term->attributes, 'id', 'dataTypeId')[$dataTypeId_note];
-        $notedelete = static::api()->delete('editor/attribute', ['attrId' => $attrId_note]);
+        $notedelete = static::api()->delete('editor/attribute', [
+            'attrId' => $attrId_note,
+        ]);
         $this->assertIsObject($notedelete, 'Unable to delete note-attr');
         $this->assertObjectHasAttribute('updated', $notedelete, 'Unable to delete note-attr');
 
         // [26] delete Term2 (having language=en)    [isLast=language]
-        $Term2_delete = static::api()->delete('editor/term', ['termId' => $Term2->termId]);
+        $Term2_delete = static::api()->delete('editor/term', [
+            'termId' => $Term2->termId,
+        ]);
         $this->assertIsObject($Term2_delete, 'Unable to delete Term2 (having language=en) [isLast=language]');
         $this->assertObjectHasAttribute('isLast', $Term2_delete, 'Term2 deletion response does not have isLast prop');
         $this->assertEquals($Term2_delete->isLast, 'language', 'Deleted term should be the last among its language');
 
         // [27] delete Term1 (having language=de-DE) [isLast=termEntry]
-        $Term1_delete = static::api()->delete('editor/term', ['termId' => $Term1->termId]);
+        $Term1_delete = static::api()->delete('editor/term', [
+            'termId' => $Term1->termId,
+        ]);
         $this->assertIsObject($Term1_delete, 'Unable to delete Term2 (having language=en) [isLast=language]');
         $this->assertObjectHasAttribute('isLast', $Term1_delete, 'Term2 deletion response does not have isLast prop');
         $this->assertEquals($Term1_delete->isLast, 'entry', 'Deleted term should be the last among its termEntry');
@@ -380,7 +401,7 @@ class TermProposalTest extends \editor_Test_ApiTest {
         $labeledit = static::api()->putJson('editor/attributedatatype', [
             'dataTypeId' => $dataTypeId_note,
             'locale' => 'en',
-            'label' => $currentLabel . '-amended'
+            'label' => $currentLabel . '-amended',
         ]);
         $this->assertIsObject($labeledit, 'Unable to edit note-attr label');
         $this->assertObjectHasAttribute('label', $labeledit, 'Note-attr editing response has no label-prop');
@@ -389,15 +410,16 @@ class TermProposalTest extends \editor_Test_ApiTest {
         $labeledit = static::api()->putJson('editor/attributedatatype', [
             'dataTypeId' => $dataTypeId_note,
             'locale' => 'en',
-            'label' => $currentLabel
+            'label' => $currentLabel,
         ]);
         $this->assertIsObject($labeledit, 'Unable to revert note-attr label back');
         $this->assertObjectHasAttribute('label', $labeledit, 'Note-attr reverting back response has no label-prop');
     }
 
-    public static function afterTests(): void {
+    public static function afterTests(): void
+    {
         static::api()->login('testtermproposer');
-        static::api()->delete('editor/termcollection/'.self::$collectionId);
+        static::api()->delete('editor/termcollection/' . self::$collectionId);
     }
 
     /**
@@ -406,15 +428,15 @@ class TermProposalTest extends \editor_Test_ApiTest {
      * @param $qty Expected quantity of results
      * @param array $customParams
      */
-    public function assertSearchResultQty($qty, $customParams = []) {
-
+    public function assertSearchResultQty($qty, $customParams = [])
+    {
         // Common search params
         $commonParams = [
             'query' => '*',
             'collectionIds' => self::$collectionId,
             'language' => self::$german->id,
             'start' => 0,
-            'limit' => 10
+            'limit' => 10,
         ];
 
         // Append common data to custom data
@@ -435,30 +457,32 @@ class TermProposalTest extends \editor_Test_ApiTest {
 
     /**
      * Assert that termportal filters are working
-     *
-     * @param $dataTypeA
      */
-    public function assertFilters($dataTypeA) {
-
+    public function assertFilters($dataTypeA)
+    {
         // Currently there should be 3 terms total in term collection
         $this->assertSearchResultQty(3);
 
         // One of them is rejected
-        $this->assertSearchResultQty(1, ['processStatus' => 'rejected']);
+        $this->assertSearchResultQty(1, [
+            'processStatus' => 'rejected',
+        ]);
 
         // Two are rejected or unprocessed
-        $this->assertSearchResultQty(2, ['processStatus' => 'rejected,unprocessed']);
+        $this->assertSearchResultQty(2, [
+            'processStatus' => 'rejected,unprocessed',
+        ]);
 
         // Only one 'de-de'-term which is rejected or unprocessed and having no siblings for 'en'-language
         $this->assertSearchResultQty(1, [
             'processStatus' => 'rejected,unprocessed',
-            'noTermDefinedFor' => self::$english->id
+            'noTermDefinedFor' => self::$english->id,
         ]);
 
         // Two 'de-de'-terms which are rejected or unprocessed and having no siblings for 'it'-language
         $this->assertSearchResultQty(2, [
             'processStatus' => 'rejected,unprocessed',
-            'noTermDefinedFor' => self::$italian->id
+            'noTermDefinedFor' => self::$italian->id,
         ]);
 
         // Get customerSubset attrbiute datatype id
@@ -468,51 +492,61 @@ class TermProposalTest extends \editor_Test_ApiTest {
         $this->assertSearchResultQty(0, [
             'processStatus' => 'rejected,unprocessed',
             'noTermDefinedFor' => self::$italian->id,
-            'attr-' . $dataTypeId_customerSubset => 'Testkunde1'
+            'attr-' . $dataTypeId_customerSubset => 'Testkunde1',
         ]);
 
         // One term having this attribute defined with value 'Testkunde' and having no siblings for 'it'-language
         $this->assertSearchResultQty(1, [
             'processStatus' => 'rejected,unprocessed',
             'noTermDefinedFor' => self::$italian->id,
-            'attr-' . $dataTypeId_customerSubset => 'Testkunde'
+            'attr-' . $dataTypeId_customerSubset => 'Testkunde',
         ]);
 
         // Two terms having termEntryTbxId LIKE '%1111-2222-3333%'
-        $this->assertSearchResultQty(2, ['termEntryTbxId' => '1111-2222-3333']);
+        $this->assertSearchResultQty(2, [
+            'termEntryTbxId' => '1111-2222-3333',
+        ]);
 
         // One term having termTbxId = 37705a81-e0df-4209-9a12-eaddc93674e0
-        $this->assertSearchResultQty(1, ['termTbxId' => '37705a81-e0df-4209-9a12-eaddc93674e0']);
+        $this->assertSearchResultQty(1, [
+            'termTbxId' => '37705a81-e0df-4209-9a12-eaddc93674e0',
+        ]);
 
         // Get 'termproposer test'-person id
         $tbxPersonId = -1;
-        foreach (self::$setup->filterWindow->tbxCreatedBy as $createdBy){ /* @var stdClass $createdBy */
+        foreach (self::$setup->filterWindow->tbxCreatedBy as $createdBy) { /* @var stdClass $createdBy */
             if ($createdBy->name === 'termproposer test') {
                 $tbxPersonId = $createdBy->ids;
             }
         }
 
         // Two terms created by that person
-        $this->assertSearchResultQty(2, ['tbxCreatedBy' => $tbxPersonId]);
+        $this->assertSearchResultQty(2, [
+            'tbxCreatedBy' => $tbxPersonId,
+        ]);
 
         // One term created at 2019-07-15
-        $this->assertSearchResultQty(1, ['tbxCreatedAt' => '2019-07-15']);
+        $this->assertSearchResultQty(1, [
+            'tbxCreatedAt' => '2019-07-15',
+        ]);
 
         // Three terms created since 2019-07-15
-        $this->assertSearchResultQty(3, ['tbxCreatedGt' => '2019-07-15']);
+        $this->assertSearchResultQty(3, [
+            'tbxCreatedGt' => '2019-07-15',
+        ]);
 
         // One term created until 2019-07-15
-        $this->assertSearchResultQty(1, ['tbxCreatedLt' => '2019-07-15']);
+        $this->assertSearchResultQty(1, [
+            'tbxCreatedLt' => '2019-07-15',
+        ]);
     }
 
     /**
-     * @param $planQty
-     * @param $params
      * @param int $existingPlanQty
      * @param bool $save
      */
-    public function assertBatchEdit($planQty, $value, $postParams, $existingPlanQty = 0, $save = false) {
-
+    public function assertBatchEdit($planQty, $value, $postParams, $existingPlanQty = 0, $save = false)
+    {
         // Get response
         $resp = static::api()->postJson('editor/attribute', $postParams);
 
@@ -539,8 +573,10 @@ class TermProposalTest extends \editor_Test_ApiTest {
             $this->assertEquals($existingPlanQty, $existingFactQty, '$resp->existing contains '
                 . $existingFactQty . ' instead of ' . $existingPlanQty . '.' . $query);
 
-        // Else assert that there is no existing-prop in $resp
-        } else $this->assertObjectNotHasAttribute('existing', $resp, 'Response should have no existing-prop. ' . $query);
+            // Else assert that there is no existing-prop in $resp
+        } else {
+            $this->assertObjectNotHasAttribute('existing', $resp, 'Response should have no existing-prop. ' . $query);
+        }
 
         // Remember ids of inserted attrs
         $insertedIds = $resp->inserted->id;
@@ -548,9 +584,14 @@ class TermProposalTest extends \editor_Test_ApiTest {
         // Request params for PUT-request
         if ($postParams['dataType'] == 'figure') {
             static::api()->addFile('figure', $value, "image/jpg");
-            $putParams = ['attrId' => $insertedIds];
+            $putParams = [
+                'attrId' => $insertedIds,
+            ];
         } else {
-            $putParams = ['attrId' => $insertedIds, 'value' => $value];
+            $putParams = [
+                'attrId' => $insertedIds,
+                'value' => $value,
+            ];
         }
 
         // Batch update note-attr for termEntry-level
@@ -573,14 +614,13 @@ class TermProposalTest extends \editor_Test_ApiTest {
 
         // If $save arg is true
         if ($save) {
-
             // Pick values from inserted attrs and apply them to the existing attrs
             // Drop inserted attrs having existing attrs
             // Undraft inserted attrs having no existing attrs
             $resp = static::api()->putJson('editor/attribute', $params = [
                 'attrId' => join(',', array_values($existingFact)),
                 'dropId' => join(',', $dropIdA = array_keys($existingFact)),
-                'draft0' => join(',', array_diff(explode(',', $insertedIds), $dropIdA))
+                'draft0' => join(',', array_diff(explode(',', $insertedIds), $dropIdA)),
             ]);
 
             // Check $resp
@@ -588,9 +628,11 @@ class TermProposalTest extends \editor_Test_ApiTest {
             $this->assertIsBool($resp->success, 'Attr batch-save: $resp->success is not bool. ' . $query);
             $this->assertEquals(true, $resp->success, 'Attr batch-save: $resp->success is not true. ' . $query);
 
-        // Else batch delete note-attr
+            // Else batch delete note-attr
         } else {
-            $resp = static::api()->delete('editor/attribute', ['attrId' => $insertedIds]);
+            $resp = static::api()->delete('editor/attribute', [
+                'attrId' => $insertedIds,
+            ]);
             $this->assertIsObject($resp, 'Attrs batch-deletion response is not an object');
             $this->assertObjectHasAttribute('updated', $resp, 'Note-attr deletion response does not contain "updated" prop');
         }

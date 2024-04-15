@@ -3,7 +3,7 @@
 START LICENSE AND COPYRIGHT
 
  This file is part of translate5
- 
+
  Copyright (c) 2013 - 2021 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
 
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
@@ -13,15 +13,15 @@ START LICENSE AND COPYRIGHT
  included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
-  
+
  There is a plugin exception available for use with this release of translate5 for
  translate5: Please see http://www.translate5.net/plugin-exception.txt or
  plugin-exception.txt in the root folder of translate5.
-  
+
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
@@ -29,15 +29,16 @@ END LICENSE AND COPYRIGHT
 use MittagQI\Translate5\Acl\Rights;
 use MittagQI\Translate5\Acl\Roles;
 use MittagQI\Translate5\Applet\Dispatcher;
-use MittagQI\Translate5\Task\FileTypeSupport;
+use MittagQI\Translate5\Cronjob\CronIpFactory;
 use MittagQI\Translate5\Task\Current\NoAccessException;
+use MittagQI\Translate5\Task\CustomFields\Field as TaskCustomField;
+use MittagQI\Translate5\Task\FileTypeSupport;
 use MittagQI\Translate5\Task\NoJobFoundException;
 use MittagQI\Translate5\Task\Reimport\FileparserRegistry;
 use MittagQI\Translate5\Task\TaskContextTrait;
-use MittagQI\Translate5\Cronjob\CronIpFactory;
 use MittagQI\ZfExtended\Acl\SetAclRoleResource as BaseRoles;
 use MittagQI\ZfExtended\CsrfProtection;
-use MittagQI\Translate5\Task\CustomFields\Field as TaskCustomField;
+
 /**
  * Dummy Index Controller
  */
@@ -45,61 +46,55 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
 {
     use TaskContextTrait;
 
-    /**
-     * @var ZfExtended_Zendoverwrites_Translate
-     */
     protected ZfExtended_Zendoverwrites_Translate $translate;
 
-    /**
-     * @var Zend_Config
-     */
     protected Zend_Config $config;
 
     /**
      * Main Definition of core frontend controllers, each controller is required (for js compiling)
      * but only the required ones are activated.
-     * @var array
      */
     protected array $frontendEndControllers = [
-        'ServerException'               => true,
-        'ViewModes'                     => true,
-        'Segments'                      => true,
-        'Preferences'                   => true,
-        'MetaPanel'                     => true,
-        'Editor'                        => true,
-        'Fileorder'                     => true,
-        'ChangeAlike'                   => true,
-        'Comments'                      => true,
-        'CommentNavigation'             => true,
-        'SearchReplace'                 => true,
-        'SnapshotHistory'               => true,
-        'Termportal'                    => true, //FIXME should be moved into the termportal plugin
-        'JsLogger'                      => true,
-        'editor.CustomPanel'            => true,
+        'ServerException' => true,
+        'ViewModes' => true,
+        'Segments' => true,
+        'Preferences' => true,
+        'MetaPanel' => true,
+        'Editor' => true,
+        'Fileorder' => true,
+        'ChangeAlike' => true,
+        'Comments' => true,
+        'CommentNavigation' => true,
+        'SearchReplace' => true,
+        'SnapshotHistory' => true,
+        'Termportal' => true, //FIXME should be moved into the termportal plugin
+        'JsLogger' => true,
+        'editor.CustomPanel' => true,
         //if value is string[], then controlled by ACL, enabling frontend rights given here
-        'admin.TaskOverview'            => [Rights::TASK_OVERVIEW_FRONTEND_CONTROLLER],
-        'admin.TaskPreferences'         => [Rights::TASK_OVERVIEW_FRONTEND_CONTROLLER],
-        'admin.TaskUserAssoc'           => [Rights::TASK_USER_ASSOC_FRONTEND_CONTROLLER],
-        'admin.TaskCustomField'         => [Rights::TASK_CUSTOM_FIELD_FRONTEND_CONTROLLER],
-        'admin.Customer'                => [
+        'admin.TaskOverview' => [Rights::TASK_OVERVIEW_FRONTEND_CONTROLLER],
+        'admin.TaskPreferences' => [Rights::TASK_OVERVIEW_FRONTEND_CONTROLLER],
+        'admin.TaskUserAssoc' => [Rights::TASK_USER_ASSOC_FRONTEND_CONTROLLER],
+        'admin.TaskCustomField' => [Rights::TASK_CUSTOM_FIELD_FRONTEND_CONTROLLER],
+        'admin.Customer' => [
             Rights::CUSTOMER_ADMINISTRATION,
-            Rights::CUSTOMER_ASSOCIATION
+            Rights::CUSTOMER_ASSOCIATION,
         ],
-        'LanguageResourcesTaskassoc'    => [Rights::LANGUAGE_RESOURCES_TASKASSOC],
-        'LanguageResources'             => [
+        'LanguageResourcesTaskassoc' => [Rights::LANGUAGE_RESOURCES_TASKASSOC],
+        'LanguageResources' => [
             Rights::LANGUAGE_RESOURCES_MATCH_QUERY,
-            Rights::LANGUAGE_RESOURCES_SEARCH_QUERY
+            Rights::LANGUAGE_RESOURCES_SEARCH_QUERY,
         ],
-        'TmOverview'                    => [Rights::LANGUAGE_RESOURCES_OVERVIEW],
-        'Localizer'                     => true,
-        'Quality'                       => true,
+        'TmOverview' => [Rights::LANGUAGE_RESOURCES_OVERVIEW],
+        'Localizer' => true,
+        'Quality' => true,
         //the check if this controller is active is task specific
         // (runtimeOptions.autoQA.enableMqmTags, flag is task specific)
-        'QualityMqm'                    => true,
-        'SegmentQualitiesBase'          => true,
+        'QualityMqm' => true,
+        'SegmentQualitiesBase' => true,
     ];
 
     private ZfExtended_Acl $acl;
+
     private ZfExtended_Plugin_Manager $pluginManager;
 
     /**
@@ -237,7 +232,7 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
         }
         $onlineVersion = $downloader->getAvailableVersion();
 
-        if (!empty($onlineVersion) && version_compare($onlineVersion, $currentVersion)) {
+        if (! empty($onlineVersion) && version_compare($onlineVersion, $currentVersion)) {
             $msgBoxConf = $this->view->Php2JsVars()->get('messageBox');
             settype($msgBoxConf->initialMessages, 'array');
             $msg = 'Translate5 ist in der Version %1$s verfügbar, verwendet wird aktuell Version %2$s. <br/>Bitte benutzen Sie das Installations und Update Script um die aktuellste Version zu installieren.';
@@ -247,7 +242,6 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
 
     /**
      * returns additional configured CSS files
-     * @return array
      * @throws Zend_Exception
      */
     protected function getAdditionalCss(): array
@@ -264,6 +258,7 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
         if (is_string($css)) {
             return [$css];
         }
+
         return $css->toArray();
     }
 
@@ -318,7 +313,7 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
         $this->view->Php2JsVars()->set('segments.fullTagPath', $tagPath);
 
         //matchrate type to icon map
-        $typesWihtIcons = array();
+        $typesWihtIcons = [];
         foreach (editor_Models_Segment_MatchRateType::TYPES_WITH_ICONS as $type) {
             $typesWihtIcons[$type] = $this->view->publicModulePath . '/images/matchratetypes/' . $type . '.png';
         }
@@ -337,12 +332,12 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
 
         $this->view->Php2JsVars()->set('messageBox.delayFactor', $rop->messageBox->delayFactor);
 
-        $this->view->Php2JsVars()->set('headerOptions.height', (int)$rop->headerOptions->height);
+        $this->view->Php2JsVars()->set('headerOptions.height', (int) $rop->headerOptions->height);
         $this->view->Php2JsVars()->set('languages', $this->getAvailableLanguages());
 
         //Editor.data.enableSourceEditing → still needed for enabling / disabling the
         // whole feature (Checkbox at Import).
-        $this->view->Php2JsVars()->set('enableSourceEditing', (bool)$rop->import->enableSourceEditing);
+        $this->view->Php2JsVars()->set('enableSourceEditing', (bool) $rop->import->enableSourceEditing);
 
         // set supported extensions
         // TODO FIXME: when implementing the "Bconf per workfile" feature, use only the
@@ -355,13 +350,13 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
         );
         $this->view->Php2JsVars()->set('import.nativeParserExtensions', FileTypeSupport::defaultInstance()->getNativeParserExtensions());
 
-        $this->view->Php2JsVars()->set('columns.widthFactorHeader', (float)$rop->editor->columns->widthFactorHeader);
-        $this->view->Php2JsVars()->set('columns.widthOffsetEditable', (int)$rop->editor->columns->widthOffsetEditable);
+        $this->view->Php2JsVars()->set('columns.widthFactorHeader', (float) $rop->editor->columns->widthFactorHeader);
+        $this->view->Php2JsVars()->set('columns.widthOffsetEditable', (int) $rop->editor->columns->widthOffsetEditable);
         $this->view->Php2JsVars()->set(
             'columns.widthFactorErgonomic',
-            (float)$rop->editor->columns->widthFactorErgonomic
+            (float) $rop->editor->columns->widthFactorErgonomic
         );
-        $this->view->Php2JsVars()->set('columns.maxWidth', (int)$rop->editor->columns->maxWidth);
+        $this->view->Php2JsVars()->set('columns.maxWidth', (int) $rop->editor->columns->maxWidth);
 
         $this->view->Php2JsVars()->set('browserAdvice', $rop->browserAdvice);
         if ($rop->showSupportedBrowsersMsg) {
@@ -369,19 +364,19 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
         }
 
         //create mailto link in the task list grid pm name column
-        $this->view->Php2JsVars()->set('frontend.tasklist.pmMailTo', (boolean)$rop->frontend->tasklist->pmMailTo);
+        $this->view->Php2JsVars()->set('frontend.tasklist.pmMailTo', (bool) $rop->frontend->tasklist->pmMailTo);
 
         $this->view->Php2JsVars()->set(
             'frontend.importTask.edit100PercentMatch',
-            (bool)$rop->import->edit100PercentMatch
+            (bool) $rop->import->edit100PercentMatch
         );
 
         $this->view->Php2JsVars()->set(
             'frontend.importTask.pivotDropdownVisible',
-            (bool)$rop->frontend->importTask->pivotDropdownVisible
+            (bool) $rop->frontend->importTask->pivotDropdownVisible
         );
 
-        $this->view->Php2JsVars()->set('frontend.changeUserThemeVisible', (bool)$rop->frontend->changeUserThemeVisible);
+        $this->view->Php2JsVars()->set('frontend.changeUserThemeVisible', (bool) $rop->frontend->changeUserThemeVisible);
 
         // to identify the default customer in the frontend
         $this->view->Php2JsVars()->set('customers.defaultCustomerName', 'defaultcustomer');
@@ -397,7 +392,7 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
         $this->view->Php2JsVars()->set('editor.editorBrandingSource', $rop->editor->editorBrandingSource);
 
         $this->view->Php2JsVars()->set('editor.htmleditorCss', [
-            APPLICATION_RUNDIR . '/modules/' . Zend_Registry::get('module') . '/css/htmleditor.css'
+            APPLICATION_RUNDIR . '/modules/' . Zend_Registry::get('module') . '/css/htmleditor.css',
         ]);
 
         $helpWindowConfig = [];
@@ -423,7 +418,6 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
 
         $tmFileUploadSizeText = str_replace('{upload_max_filesize}', $uploadMaxFilesize, $tmFileUploadSizeText);
 
-
         //Info: custom vtype text must be translated here and set as frontend var.
         // There is no way of doing this with localizedjsstrings
         $this->view->Php2JsVars()->set('frontend.override.VTypes.tmFileUploadSizeText', $tmFileUploadSizeText);
@@ -431,13 +425,13 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
         // set the max allowed upload filesize into frontend variable.
         // This is used for upload file size validation in tm import
         $this->view->Php2JsVars()->set('frontend.php.upload_max_filesize', $uploadMaxFilesize);
-        
+
         // show Consortium Logos on application load for xyz seconds [default 3]
         $this->view->Php2JsVars()->set('startup.showConsortiumLogos', $rop->startup->showConsortiumLogos);
 
         //sets a list of url hashes to their redirects, shortcut to the applets
         $this->view->Php2JsVars()->set('directRedirects', Dispatcher::getInstance()->getHashPathMap());
-        
+
         // set special characters list into a front-end view variable.
         // This should be removed after this config is moved to lvl 16
         $this->view->Php2JsVars()->set(
@@ -476,13 +470,12 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
      */
     protected function setLanguageResourceJsVars()
     {
-
         $rop = $this->config->runtimeOptions;
 
         $this->view->Php2JsVars()->setMultiple([
             'LanguageResources.preloadedSegments' => $rop->LanguageResources?->preloadedTranslationSegments,
             'LanguageResources.matchrateTypeChangedState' =>
-                editor_Models_LanguageResources_LanguageResource::MATCH_RATE_TYPE_EDITED
+                editor_Models_LanguageResources_LanguageResource::MATCH_RATE_TYPE_EDITED,
         ]);
 
         $serviceManager = ZfExtended_Factory::get(editor_Services_Manager::class);
@@ -515,7 +508,7 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
 
         $php2js->set('app.viewport', $ed->editorViewPort);
         $php2js->set('app.startViewMode', $ed->startViewMode);
-        $php2js->set('app.branding', (string)$this->translate->_($ed->branding));
+        $php2js->set('app.branding', (string) $this->translate->_($ed->branding));
         $php2js->set('app.company', $this->config->runtimeOptions->companyName);
         $php2js->set('app.name', $this->config->runtimeOptions->appName);
         $userData = (array) ZfExtended_Authentication::getInstance()->getUserData();
@@ -542,7 +535,7 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
             $roles[$role] = [
                 'label' => $this->translate->_(ucfirst($role)),
                 //role name is used as right in setaclrole
-                'setable' => $this->isAllowed(BaseRoles::ID, $role)
+                'setable' => $this->isAllowed(BaseRoles::ID, $role),
             ];
         }
         $php2js->set('app.roles', $roles);
@@ -551,7 +544,7 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
         foreach (Roles::getClientPmSubroles() as $role) {
             $clientPmSubRoles[] = [
                 $role,
-                $this->translate->_($role)
+                $this->translate->_($role),
             ];
         }
         $php2js->set('app.clientPmSubRoles', $clientPmSubRoles);
@@ -578,13 +571,13 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
     }
 
     /**
-     * @param ZfExtended_View_Helper_Php2JsVars $php2js
      * @throws Exception
      */
     protected function loadCurrentTask(ZfExtended_View_Helper_Php2JsVars $php2js): void
     {
-        if (!$this->isTaskProvided()) {
+        if (! $this->isTaskProvided()) {
             $php2js->set('app.initMethod', 'openAdministration');
+
             return;
         }
 
@@ -614,16 +607,18 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
     protected function getInitialTaskUsedState(): string
     {
         $job = $this->getCurrentJob(); //currentJob is null if no
-        if (!is_null($job)) {
+        if (! is_null($job)) {
             // we use the used state if a used job was found
             return $job->getUsedState();
         }
+
         // we try to load the first suitable job
         try {
             $job = editor_Models_Loaders_Taskuserassoc::loadByTask(
                 ZfExtended_Authentication::getInstance()->getUserGuid(),
                 $this->getCurrentTask()
             );
+
             return $this->getCurrentTask()->getTaskActiveWorkflow()->getInitialUsageState($job);
         } catch (ZfExtended_Models_Entity_NotFoundException) {
             return editor_Workflow_Default::STATE_EDIT;
@@ -632,7 +627,6 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
 
     /**
      * returns a list with used JS frontend controllers
-     * @return array
      */
     protected function getActiveFrontendControllers(): array
     {
@@ -646,6 +640,7 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
                 foreach ($enabled as $neededRightForController) {
                     if ($this->isAllowed(Rights::ID, $neededRightForController)) {
                         $enabled = true;
+
                         break; //at least only one right is needed out of the list
                     }
                 }
@@ -657,12 +652,13 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
 
         //add the active controllers from plugins
         $pluginFrontendControllers = $this->pluginManager->getActiveFrontendControllers();
-        if (!empty($pluginFrontendControllers)) {
+        if (! empty($pluginFrontendControllers)) {
             $activeControllers = array_merge($activeControllers, $pluginFrontendControllers);
         }
 
         //Localizer must be the last in the list!
         $activeControllers[] = 'Localizer';
+
         return $activeControllers;
     }
 
@@ -673,6 +669,7 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
     protected function getAvailableLanguages(): array
     {
         $model = ZfExtended_Factory::get(editor_Models_Languages::class);
+
         return $model->loadAllForDisplay();
     }
 
@@ -681,7 +678,7 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
      */
     protected function setJsSegmentFlags($type, array $qualityFlags)
     {
-        $result = array();
+        $result = [];
         foreach ($qualityFlags as $key => $value) {
             if (empty($value)) {
                 continue;
@@ -745,7 +742,7 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
      */
     public function pluginpublicAction()
     {
-        $types = array(
+        $types = [
             'js' => 'text/javascript',
             'css' => 'text/css',
             'jpg' => 'image/jpeg',
@@ -760,15 +757,15 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
             'eot' => 'application/eot',
             'mp3' => 'audio/mp3',
             'mp4' => 'video/mp4',
-            'html' => 'text/html'
-        );
+            'html' => 'text/html',
+        ];
         $slash = '/';
         // get requested file from router
         $requestedType = $this->getParam(1);
         $requestedFile = $this->getParam(2);
         $requestedFileParts = explode($slash, $requestedFile);
         $extension = strtolower(pathinfo($requestedFile, PATHINFO_EXTENSION));
-        
+
         //pluginname is alpha characters only so check this for security reasons
         //ucfirst is needed, since in JS packages start per convention with lowercase, Plugins in PHP with uppercase!
         $plugin = ucfirst(preg_replace('/[^a-zA-Z0-9]/', '', array_shift($requestedFileParts)));
@@ -794,12 +791,12 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
         }
 
         // check if requested "fileType" is allowed
-        if (!$plugin->isPublicSubFolder($requestedType, $config)) {
+        if (! $plugin->isPublicSubFolder($requestedType, $config)) {
             throw new ZfExtended_NotFoundException();
         }
 
         $publicFile = $plugin->getPublicFile($requestedType, $requestedFileParts, $config);
-        if (empty($publicFile) || !$publicFile->isFile()) {
+        if (empty($publicFile) || ! $publicFile->isFile()) {
             throw new ZfExtended_NotFoundException();
         }
         // Override default content-type text/html https://www.php.net/manual/en/ini.core.php#ini.default-mimetype
@@ -823,7 +820,7 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
         // TODO FIXME: UGLY: the virtual Proxy-dir is defined in the visual plugin, that might not be active
         // pdfconverter outputs that will never change
         $isStaticVRFile = ($requestedType == 'T5Proxy' && $extension !== 'html');
-        if ($version === 'development' && !$isStaticVRFile) {
+        if ($version === 'development' && ! $isStaticVRFile) {
             $cacheBehaviour = 'no-cache'; // check for new version always
         } elseif ($isStaticVRFile || $this->getParam('_dc')) { // refreshed through url (plugin js)
             $cacheBehaviour = 'max-age=31536000, immutable'; // check after 1 year aka 'never'
@@ -831,9 +828,9 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
             $cacheBehaviour = 'max-age=36000, must-revalidate'; // check after 10 hours (plugin css/png, VR/scroller.js)
         }
 
-        header('Etag: '.$version);
-        header('Cache-Control: '.$cacheBehaviour);
-        header('Content-Length: '.$publicFile->getSize());
+        header('Etag: ' . $version);
+        header('Cache-Control: ' . $cacheBehaviour);
+        header('Content-Length: ' . $publicFile->getSize());
         readfile($publicFile);
         exit;
     }
@@ -850,7 +847,7 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
     public function makexliffAction()
     {
         $input = $this->getParam('input', '');
-        $matchrate = (integer)$this->getParam('matchrate', 50);
+        $matchrate = (int) $this->getParam('matchrate', 50);
         $this->view->input = $input;
         $this->view->matchrate = $matchrate;
         if (empty($input)) {
@@ -879,7 +876,7 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
                 similar_text($input, $message, $percentage);
                 $percentage = round($percentage);
                 if ($percentage > $matchrate) {
-                    $results[$key] = (integer)ceil($percentage);
+                    $results[$key] = (int) ceil($percentage);
                 }
             }
             asort($results);
@@ -890,7 +887,7 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
                 }
                 $this->view->enOut[] = [
                     'text' => $localeTemplate($inputKey, $input, $enMessages[$key]),
-                    'matchrate' => $percentage
+                    'matchrate' => $percentage,
                 ];
                 if (count($this->view->enOut) >= 5) {
                     break;
@@ -903,13 +900,16 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
             $this->view->noMatch = false;
             $this->view->enOut[] = [
                 'text' => $localeTemplate($inputKey, $input, $enMessages[$input]),
-                'matchrate' => 100
+                'matchrate' => 100,
             ];
         }
         if (empty($this->view->enOut)) {
             $this->view->exactMatch = false;
             $this->view->noMatch = true;
-            $this->view->enOut[] = ['text' => $localeTemplate($inputKey, $input, $input), 'matchrate' => 0];
+            $this->view->enOut[] = [
+                'text' => $localeTemplate($inputKey, $input, $input),
+                'matchrate' => 0,
+            ];
         }
     }
 
@@ -918,14 +918,14 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
         $config = $rop->editor->toolbar;
         $forceLeaveButton = $this->isAllowed(Rights::ID, Rights::EDITOR_ONLY_OVERRIDE);
         $hideClosebutton = $config->hideCloseButton || $forceLeaveButton;
-        $hideLeaveButton = $config->hideLeaveTaskButton && !$forceLeaveButton;
+        $hideLeaveButton = $config->hideLeaveTaskButton && ! $forceLeaveButton;
         $this->view->Php2JsVars()->setMultiple([
             //boolean config if the logout button in the segments editor header is visible or not
             'editor.toolbar.hideCloseButton' => $hideClosebutton,
             //boolean config if the leave task button in the segments editor header is visible or not
             'editor.toolbar.hideLeaveTaskButton' => $hideLeaveButton,
             //wrong naming, is evaluated on close and leave!
-            'editor.toolbar.askFinishOnClose' => (boolean) $config->askFinishOnClose,
+            'editor.toolbar.askFinishOnClose' => (bool) $config->askFinishOnClose,
         ]);
     }
 
@@ -935,6 +935,7 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
     private function isAllowed(string $resource, ?string $right = null): bool
     {
         $roles = ZfExtended_Authentication::getInstance()->getUserRoles();
+
         try {
             return $this->acl->isInAllowedRoles($roles, $resource, $right);
         } catch (Zend_Acl_Exception) {
@@ -944,7 +945,6 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
 
     /**
      * Set the allowed custom fields in the frontend as frontend variable
-     * @return void
      * @throws ReflectionException
      */
     private function setupAllowedCustomFields(): void
@@ -955,10 +955,9 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
         $allowed = [];
         foreach ($all as $field) {
             if ($auth->isUserAllowed(MittagQI\Translate5\Acl\TaskCustomField::ID, "customField{$field['id']}")) {
-                $allowed [] = $field;
+                $allowed[] = $field;
             }
         }
         $this->view->Php2JsVars()->set('editor.task.customFields', $allowed);
     }
 }
-

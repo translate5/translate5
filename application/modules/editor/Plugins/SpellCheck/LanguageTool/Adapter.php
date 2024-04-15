@@ -3,25 +3,25 @@
 START LICENSE AND COPYRIGHT
 
  This file is part of translate5
- 
+
  Copyright (c) 2013 - 2021 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
 
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
  This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
- as published by the Free Software Foundation and appearing in the file agpl3-license.txt 
- included in the packaging of this file.  Please review the following information 
+ as published by the Free Software Foundation and appearing in the file agpl3-license.txt
+ included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
-  
+
  There is a plugin exception available for use with this release of translate5 for
- translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or
  plugin-exception.txt in the root folder of translate5.
-  
+
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
@@ -47,28 +47,31 @@ use ZfExtended_Zendoverwrites_Http_Exception_TimeOut;
 /**
  * Connector to LanguageTool
  */
-final class Adapter {
-    
+final class Adapter
+{
     /**
      * LanguageTool
      */
-    const PATH_LANGUAGES = '/languages';
-    const PATH_MATCHES = '/check';
-    const METHOD_LANGUAGES = 'GET';
-    const METHOD_MATCHES = 'POST';
+    public const PATH_LANGUAGES = '/languages';
+
+    public const PATH_MATCHES = '/check';
+
+    public const METHOD_LANGUAGES = 'GET';
+
+    public const METHOD_MATCHES = 'POST';
 
     /**
      * Special separator-tag, used to distinguish between text chunks for
      * being able to pass multiple texts within single LanguageTool request
      */
-    const BATCH_SEPARATOR = '<separator/>';
+    public const BATCH_SEPARATOR = '<separator/>';
 
     /**
      * Request timeout for the api
      * @var integer
      */
-    const REQUEST_TIMEOUT_SECONDS = 360;
-    
+    public const REQUEST_TIMEOUT_SECONDS = 360;
+
     /**
      * Base-URL used for LanguagaTool - use the URL of your installed languageTool (without trailing slash!).
      * Taken from Zf_configuration (example: "http://yourlanguagetooldomain:8081/v2")
@@ -80,12 +83,11 @@ final class Adapter {
      * @var array
      */
     private static $languages = [
-
         /**
          * Translate5 languages [id => rfc5646] pairs.
          * Lazy-loaded by $this->getSpellCheckLangByTaskTargetLangId() call
          */
-        'translate5'   => null,
+        'translate5' => null,
 
         /**
          * Array of languages supported by LanguageTool, each represended as
@@ -102,7 +104,7 @@ final class Adapter {
          * of a certain task, so if `false` - it means that target language of that task is not supported by LanguageTool,
          * and in that case no segments will be processed by this quality provider
          */
-        'argByLangId'  => [],
+        'argByLangId' => [],
     ];
 
     /**
@@ -120,10 +122,8 @@ final class Adapter {
      */
     protected $lastStatus;
 
-    /**
-     * 
-     */
-    public function __construct($serviceUrl) {
+    public function __construct($serviceUrl)
+    {
         $this->serviceUrl = $serviceUrl;
         $this->doDebug = ZfExtended_Debug::hasLevel('plugin', 'SpellCheckRequests');
     }
@@ -135,21 +135,23 @@ final class Adapter {
      *
      * @return Zend_Http_Client
      */
-    private function getHttpClient($path) {
-
+    private function getHttpClient($path)
+    {
         $http = ZfExtended_Factory::get(Zend_Http_Client::class);
         $http->setUri($this->serviceUrl . $path);
-        $http->setConfig(['timeout' => self::REQUEST_TIMEOUT_SECONDS]);
+        $http->setConfig([
+            'timeout' => self::REQUEST_TIMEOUT_SECONDS,
+        ]);
 
         // Return http client with pre-configured request uri
         return $http;
     }
-    
+
     /**
-     * @param Zend_Http_Response $response
      * @return mixed
      */
-    private function processResponse(Zend_Http_Response $response){
+    private function processResponse(Zend_Http_Response $response)
+    {
         return json_decode(trim($response->getBody()));
     }
 
@@ -158,8 +160,8 @@ final class Adapter {
      * @return array
      * @throws Zend_Http_Client_Exception
      */
-    public function getLanguages(){
-
+    public function getLanguages()
+    {
         // Return cached, if already cached
         if (isset(self::$languages['languageTool'])) {
             return self::$languages['languageTool'];
@@ -168,17 +170,19 @@ final class Adapter {
         $http = $this->getHttpClient(self::PATH_LANGUAGES);
         $http->setHeaders('Content-Type: application/json');
         $http->setHeaders('Accept: application/json');
-        
+
         $response = $http->request(self::METHOD_LANGUAGES);
         self::$languages['languageTool'] = $this->processResponse($response);
 
-        if($this->doDebug){
+        if ($this->doDebug) {
             error_log(
                 "\n----------\n"
                 . 'Spellcheck: ' . self::METHOD_LANGUAGES . ' / ' . self::PATH_LANGUAGES
                 . 'Result: ' . "\n"
-                . json_encode(self::$languages['languageTool'],
-                    JSON_PRETTY_PRINT| JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES)
+                . json_encode(
+                    self::$languages['languageTool'],
+                    JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES
+                )
                 . "\n==========\n"
             );
         }
@@ -201,7 +205,7 @@ final class Adapter {
         // Get all translate5 languages
         $langA = ZfExtended_Factory
             ::get(editor_Models_Languages::class)
-            ->loadAllKeyValueCustom('rfc5646', 'langName');
+                ->loadAllKeyValueCustom('rfc5646', 'langName');
 
         // Sort by rfc
         ksort($langA);
@@ -211,12 +215,10 @@ final class Adapter {
 
         // Foreach rfc-code
         foreach ($langA as $rfc => $name) {
-
             // If supported
             if ($supported = $this->getSupportedLanguage($rfc)) {
-
                 // Collect the info for rendering the list further
-                $list []= [$name, $rfc, $supported->longCode];
+                $list[] = [$name, $rfc, $supported->longCode];
             }
         }
 
@@ -248,8 +250,8 @@ final class Adapter {
      * @param string $language
      * @return object
      */
-    public function getMatches($text, $language){
-
+    public function getMatches($text, $language)
+    {
         // Get client
         $http = $this->getHttpClient(self::PATH_MATCHES);
 
@@ -257,7 +259,7 @@ final class Adapter {
         $http->setHeaders('Content-Type: application/json');
         $http->setHeaders('Accept: application/json');
 
-        if($this->doDebug){
+        if ($this->doDebug) {
             error_log(
                 "\n----------\n"
                 . 'Spellcheck: ' . self::METHOD_MATCHES . ' / ' . self::PATH_MATCHES
@@ -266,30 +268,37 @@ final class Adapter {
 
         // If $text arg is an array, assume we're in the batch-mode
         if (is_array($text)) {
-
             // Prepare a structure described in LanguageTool docs
             $annotation = [];
             foreach ($text as $item) {
-                $annotation[] = ['text' => $item];
-                $annotation[] = ['markup' => self::BATCH_SEPARATOR, 'interpretAs' => "\n\n"];
+                $annotation[] = [
+                    'text' => $item,
+                ];
+                $annotation[] = [
+                    'markup' => self::BATCH_SEPARATOR,
+                    'interpretAs' => "\n\n",
+                ];
             }
-            $data = json_encode(['annotation' => $annotation]);
+            $data = json_encode([
+                'annotation' => $annotation,
+            ]);
             $http->setParameterPost('data', $data);
 
-            if($this->doDebug){
+            if ($this->doDebug) {
                 error_log(
                     'Params: ' . "\n"
-                    . json_encode(['annotation' => $annotation],
-                        JSON_PRETTY_PRINT| JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES)
+                    . json_encode(
+                        [
+                            'annotation' => $annotation,
+                        ],
+                        JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES
+                    )
                 );
             }
-
-
         } else {
-
             $http->setParameterPost('text', $text);
 
-            if($this->doDebug){
+            if ($this->doDebug) {
                 error_log(
                     'Param text: ' . "\n"
                      . $text
@@ -303,7 +312,6 @@ final class Adapter {
 
         // Try to
         try {
-
             // Extra data to be passed to exception
             $extraData = [
                 'httpMethod' => self::METHOD_MATCHES,
@@ -318,7 +326,6 @@ final class Adapter {
 
             // exception for unsuccessful requests
             if ($this->lastStatus < 200 || $this->lastStatus > 299) {
-
                 // Throw malfunction exception
                 throw new MalfunctionException('E1477', [
                     'httpStatus' => $this->getLastStatus(),
@@ -331,30 +338,29 @@ final class Adapter {
             // Return processed response
             $result = $this->processResponse($response);
 
-            if($this->doDebug){
+            if ($this->doDebug) {
                 error_log(
                     'Result: ' . "\n"
-                    . json_encode($result,
-                        JSON_PRETTY_PRINT| JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES)
+                    . json_encode(
+                        $result,
+                        JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES
+                    )
                     . "\n==========\n"
                 );
             }
 
             return $result;
 
-        // Catch timeout
+            // Catch timeout
         } catch (ZfExtended_Zendoverwrites_Http_Exception_TimeOut $httpException) {
             throw new TimeOutException('E1468', $extraData, $httpException);
-
-        // Catch spot down
+            // Catch spot down
         } catch (ZfExtended_Zendoverwrites_Http_Exception_Down $httpException) {
             throw new DownException('E1468', $extraData, $httpException);
-
-        // Catch no response
+            // Catch no response
         } catch (ZfExtended_Zendoverwrites_Http_Exception_NoResponse $httpException) {
             throw new RequestException('E1478', $extraData, $httpException);
-
-        // Others
+            // Others
         } catch (Exception $httpException) {
             throw new RequestException('E1479', $extraData, $httpException);
         }
@@ -422,10 +428,10 @@ final class Adapter {
     /**
      * Get target lang supported by LanguageTool by task's targetLangId-prop
      *
-     * @param int $targetLangId
      * @return string|false
      */
-    public function getSpellCheckLangByTaskTargetLangId(int $targetLangId) {
+    public function getSpellCheckLangByTaskTargetLangId(int $targetLangId)
+    {
         // If self::$languages['argByLangId'] is non-null this means
         // that we've already checked whether current task's target language is
         // supported by LanguageTool, and this, in its turn, means that this variable
@@ -439,7 +445,7 @@ final class Adapter {
         self::$languages['translate5'] = self::$languages['translate5']
             ?? ZfExtended_Factory
                 ::get('editor_Models_Languages')
-                ->loadAllKeyValueCustom('id', 'rfc5646');
+                    ->loadAllKeyValueCustom('id', 'rfc5646');
 
         // Get object representing language supported by LanguageTool
         $spellCheckLang = $this->getSupportedLanguage(self::$languages['translate5'][$targetLangId]);
@@ -453,8 +459,8 @@ final class Adapter {
      *
      * @return boolean
      */
-    public function wasSuccessfull() {
-
+    public function wasSuccessfull()
+    {
         // Get last status
         $stat = $this->getLastStatus();
 
@@ -467,7 +473,8 @@ final class Adapter {
      *
      * @return integer
      */
-    public function getLastStatus() {
+    public function getLastStatus()
+    {
         return (int) $this->lastStatus;
     }
 }

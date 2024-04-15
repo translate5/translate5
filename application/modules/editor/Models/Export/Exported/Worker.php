@@ -3,25 +3,25 @@
 START LICENSE AND COPYRIGHT
 
  This file is part of translate5
- 
+
  Copyright (c) 2013 - 2021 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
 
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
  This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
- as published by the Free Software Foundation and appearing in the file agpl3-license.txt 
- included in the packaging of this file.  Please review the following information 
+ as published by the Free Software Foundation and appearing in the file agpl3-license.txt
+ included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
-  
+
  There is a plugin exception available for use with this release of translate5 for
- translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or
  plugin-exception.txt in the root folder of translate5.
-  
+
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
@@ -36,24 +36,21 @@ END LICENSE AND COPYRIGHT
  *
  * Be careful: This class can not be used in worker_dependencies !
  */
-class editor_Models_Export_Exported_Worker extends ZfExtended_Worker_Abstract {
-
-    /**
-     * @inheritdoc
-     */
-    protected function validateParameters($parameters = []) {
+class editor_Models_Export_Exported_Worker extends ZfExtended_Worker_Abstract
+{
+    protected function validateParameters($parameters = [])
+    {
         return true;
     }
 
     /**
      * Get context-specific exported worker class instance if exists, or instance of self-class instance
      *
-     * @param string $context
      * @return mixed
      * @throws ReflectionException
      */
-    public static function factory(string $context) {
-
+    public static function factory(string $context)
+    {
         // Get context-specific class name
         $className = preg_replace('~_(Worker)$~', '_' . ucfirst($context) . '$1', __CLASS__);
 
@@ -65,12 +62,11 @@ class editor_Models_Export_Exported_Worker extends ZfExtended_Worker_Abstract {
     }
 
     /**
-     *
      * @see ZfExtended_Worker_Abstract::work()
      * @return bool
      */
-    public function work() {
-
+    public function work()
+    {
         // Get params
         $parameters = $this->workerModel->getParameters();
 
@@ -87,7 +83,10 @@ class editor_Models_Export_Exported_Worker extends ZfExtended_Worker_Abstract {
         $eventManager = ZfExtended_Factory::get('ZfExtended_EventManager', [__CLASS__]);
 
         // Trigger event
-        $eventManager->trigger('exportCompleted', $this, ['task' => $task, 'parameters' => $parameters]);
+        $eventManager->trigger('exportCompleted', $this, [
+            'task' => $task,
+            'parameters' => $parameters,
+        ]);
 
         // Return
         return true;
@@ -99,7 +98,8 @@ class editor_Models_Export_Exported_Worker extends ZfExtended_Worker_Abstract {
      *
      * @see ZfExtended_Worker_Abstract::init()
      */
-    public function setup($taskGuid, $parameters = []) {
+    public function setup($taskGuid, $parameters = [])
+    {
         return parent::init($taskGuid, $parameters);
     }
 }

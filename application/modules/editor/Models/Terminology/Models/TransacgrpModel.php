@@ -21,13 +21,12 @@ START LICENSE AND COPYRIGHT
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
 
 /**
- * Class editor_Models_Terminology_Models_Transacgrp
  * TermsTransacgrp Instance
  *
  * @method string getId()
@@ -65,27 +64,30 @@ END LICENSE AND COPYRIGHT
  * @method string getElementName()
  * @method void setElementName(string $elementName)
  */
-class editor_Models_Terminology_Models_TransacgrpModel extends editor_Models_Terminology_Models_Abstract {
+class editor_Models_Terminology_Models_TransacgrpModel extends editor_Models_Terminology_Models_Abstract
+{
     protected $dbInstanceClass = 'editor_Models_Db_Terminology_Transacgrp';
 
     /**
-     * @param $user
-     * @param $termEntryId
      * @param null $language
      * @param null $termId
      */
-    public function affectLevels($userName, $userGuid, $termEntryId, $language = null, $termId = null) {
-
+    public function affectLevels($userName, $userGuid, $termEntryId, $language = null, $termId = null)
+    {
         // Detect level that levels should be affected from and up to top
-        if ($termEntryId && $language && $termId) $level = 'term';
-        else if ($termEntryId && $language) $level = 'language';
-        else $level = 'entry';
+        if ($termEntryId && $language && $termId) {
+            $level = 'term';
+        } elseif ($termEntryId && $language) {
+            $level = 'language';
+        } else {
+            $level = 'entry';
+        }
 
         // Build WHERE clause for each level and all it's parent levels to be affected
         $where = [
-            'term'     => '(ISNULL(`language`) OR (`language` = :language AND (ISNULL(`termId`) OR `termId` = :termId)))',
+            'term' => '(ISNULL(`language`) OR (`language` = :language AND (ISNULL(`termId`) OR `termId` = :termId)))',
             'language' => '(ISNULL(`language`) OR (`language` = :language AND  ISNULL(`termId`)                       ))',
-            'entry'    => ' ISNULL(`language`)',
+            'entry' => ' ISNULL(`language`)',
         ];
 
         // Build param bindings
@@ -93,13 +95,18 @@ class editor_Models_Terminology_Models_TransacgrpModel extends editor_Models_Ter
             ':date' => date('Y-m-d H:i:s', $time = time()),
             ':userName' => $userName,
             ':userGuid' => $userGuid,
-            ':termEntryId' => $termEntryId
+            ':termEntryId' => $termEntryId,
         ];
-        if ($level == 'language' || $level == 'term') $bind[':language'] = strtolower($language);
-        if ($level == 'term') $bind[':termId'] = $termId;
+        if ($level == 'language' || $level == 'term') {
+            $bind[':language'] = strtolower($language);
+        }
+        if ($level == 'term') {
+            $bind[':termId'] = $termId;
+        }
 
         // Run query
-        $affectedFact = $this->db->getAdapter()->query('
+        $affectedFact = $this->db->getAdapter()->query(
+            '
             UPDATE `terms_transacgrp` 
             SET 
               `date` = :date, 
@@ -109,34 +116,36 @@ class editor_Models_Terminology_Models_TransacgrpModel extends editor_Models_Ter
               AND `termEntryId` = :termEntryId 
               AND `transac` = \'modification\'
               AND ' . $where[$level],
-        $bind)->rowCount();
+            $bind
+        )->rowCount();
 
         // How many row should be affected
         $affectedPlan = [
-            'term'     => 3,
+            'term' => 3,
             'language' => 2,
-            'entry'    => 1
+            'entry' => 1,
         ];
 
         // If $level is 'term'
         if ($level == 'term') {
-
             // Get source
             $source = $this->db->getAdapter()->query('SELECT * FROM `terms_term` WHERE `id` = ?', $termId)->fetch();
 
             // Load or create person
             $person = ZfExtended_Factory
                 ::get('editor_Models_Terminology_Models_TransacgrpPersonModel')
-                ->loadOrCreateByName($userName, $source['collectionId']);
+                    ->loadOrCreateByName($userName, $source['collectionId']);
 
             // Prepare data for term to be updated with
-            $termUpdate = ['tbxUpdatedBy' => $person->getId(), 'tbxUpdatedAt' => $bind[':date']];
+            $termUpdate = [
+                'tbxUpdatedBy' => $person->getId(),
+                'tbxUpdatedAt' => $bind[':date'],
+            ];
         }
 
         // If number of affected rows is less than it should be
         // it mean that terms_transacgrp-records for at least one level are missing
         if ($missing = $affectedFact < $affectedPlan[$level]) {
-
             // Setup definition for level-column
             $levelColumnToBeGroupedBy['term'] = '
               IF (`termEntryId` = :termEntryId AND ISNULL(`language`) AND ISNULL(`termId`), "entry", 
@@ -172,9 +181,9 @@ class editor_Models_Terminology_Models_TransacgrpModel extends editor_Models_Ter
 
             // Define which level should exist
             $levelA['should'] = [
-                'term'     => ['term', 'language', 'entry'],
-                'language' => [        'language', 'entry'],
-                'entry'    => [                    'entry'],
+                'term' => ['term', 'language', 'entry'],
+                'language' => ['language', 'entry'],
+                'entry' => ['entry'],
             ];
 
             // Get levels, that transacgrp-records are missing for
@@ -187,7 +196,7 @@ class editor_Models_Terminology_Models_TransacgrpModel extends editor_Models_Ter
                 $info['termTbxId'] = $source['termTbxId'];
                 $info['termGuid'] = $source['guid'];
 
-            // Else fetch terms_term_entry-record by $termEntryId arg
+                // Else fetch terms_term_entry-record by $termEntryId arg
             } else {
                 $source = $this->db->getAdapter()->query('SELECT * FROM `terms_term_entry` WHERE `id` = ?', $termEntryId)->fetch();
                 $info['termEntryGuid'] = $source['entryGuid'];
@@ -198,7 +207,6 @@ class editor_Models_Terminology_Models_TransacgrpModel extends editor_Models_Ter
 
             // Create missing terms_transacgrp-records
             foreach ($levelA['missing'] as $mlevel) {
-
                 // Props applicable for all levels
                 $byLevel = [
                     'collectionId' => $info['collectionId'],
@@ -207,25 +215,38 @@ class editor_Models_Terminology_Models_TransacgrpModel extends editor_Models_Ter
                 ];
 
                 // Props applicable for term- and language-levels
-                if ($mlevel == 'term' || $mlevel == 'language') $byLevel += [
-                    'language' => $language
-                ];
+                if ($mlevel == 'term' || $mlevel == 'language') {
+                    $byLevel += [
+                        'language' => $language,
+                    ];
+                }
 
                 // Props, applicable for term-level only
-                if ($mlevel == 'term') $byLevel += [
-                    'termId' => $termId,
-                    'termTbxId' => $info['termTbxId'],
-                    'termGuid' => $info['termGuid'],
-                ];
+                if ($mlevel == 'term') {
+                    $byLevel += [
+                        'termId' => $termId,
+                        'termTbxId' => $info['termTbxId'],
+                        'termGuid' => $info['termGuid'],
+                    ];
+                }
 
                 // Setup 'elementName'
-                if ($mlevel == 'term')          $byLevel += ['elementName' => 'tig'];
-                else if ($mlevel == 'language') $byLevel += ['elementName' => 'langSet'];
-                else if ($mlevel == 'entry')    $byLevel += ['elementName' => 'termEntry'];
+                if ($mlevel == 'term') {
+                    $byLevel += [
+                        'elementName' => 'tig',
+                    ];
+                } elseif ($mlevel == 'language') {
+                    $byLevel += [
+                        'elementName' => 'langSet',
+                    ];
+                } elseif ($mlevel == 'entry') {
+                    $byLevel += [
+                        'elementName' => 'termEntry',
+                    ];
+                }
 
                 // Create `terms_transacgrp`-records
                 foreach (['origination', 'modification'] as $type) {
-
                     // Create `terms_transacgrp` model instance
                     $t = ZfExtended_Factory::get('editor_Models_Terminology_Models_TransacgrpModel');
 
@@ -243,21 +264,24 @@ class editor_Models_Terminology_Models_TransacgrpModel extends editor_Models_Ter
                     $t->save();
 
                     // If level is 'term' but origination-transacgrp-record is missing
-                    if ($level == 'term' && $mlevel == 'term' && $type == 'origination')
-
+                    if ($level == 'term' && $mlevel == 'term' && $type == 'origination') {
                         // Append tbxCreatedBy and tbxCreatedAt to the data for term to be updated with
-                        $termUpdate += ['tbxCreatedBy' => $person->getId(), 'tbxCreatedAt' => $termUpdate['tbxUpdatedAt']];
+                        $termUpdate += [
+                            'tbxCreatedBy' => $person->getId(),
+                            'tbxCreatedAt' => $termUpdate['tbxUpdatedAt'],
+                        ];
+                    }
                 }
             }
         }
 
         // If $level is 'term'
         if ($level == 'term') {
-
             // Prepare col => value pairs as sql
             $cols = [];
-            foreach ($termUpdate as $prop => $value)
-                $cols []= '`' . $prop . '` = "' . $value . '"';
+            foreach ($termUpdate as $prop => $value) {
+                $cols[] = '`' . $prop . '` = "' . $value . '"';
+            }
 
             // Update terms_term-record
             $this->db->getAdapter()->query('UPDATE `terms_term` SET ' . join(', ', $cols) . ' WHERE `id` = ?', $termId);
@@ -277,7 +301,8 @@ class editor_Models_Terminology_Models_TransacgrpModel extends editor_Models_Ter
      * @return array
      * @throws Zend_Db_Statement_Exception
      */
-    public function getExportData($termEntryIds) {
+    public function getExportData($termEntryIds)
+    {
         return array_group_by($this->db->getAdapter()->query('
             SELECT `termEntryId`, `language`, `termId`, `elementName`, `transac`, `date`, `transacNote`, `transacType`, `isDescripGrp`, `target`  
             FROM `terms_transacgrp`
@@ -290,13 +315,12 @@ class editor_Models_Terminology_Models_TransacgrpModel extends editor_Models_Ter
      * It is used internally by TermModel->terminfo() and ->siblinginfo()
      * and should not be called directly
      *
-     * @param $levelColumnToBeGroupedBy
-     * @param $where
-     * @param $bind
      * @throws Zend_Db_Statement_Exception
      */
-    public function loadGroupedByLevel($levelColumnToBeGroupedBy, $where, $bind) {
-        return $this->db->getAdapter()->query('
+    public function loadGroupedByLevel($levelColumnToBeGroupedBy, $where, $bind)
+    {
+        return $this->db->getAdapter()->query(
+            '
             SELECT 
               ' . $levelColumnToBeGroupedBy . ',                   
               `transac`,
@@ -305,7 +329,8 @@ class editor_Models_Terminology_Models_TransacgrpModel extends editor_Models_Ter
             WHERE TRUE # TRUE here is just to beautify WHERE clause
               AND ' . $where . ' 
               AND `transacType` = "responsibility" 
-              AND `transac` IN ("modification", "origination")', $bind
+              AND `transac` IN ("modification", "origination")',
+            $bind
         )->fetchAll(PDO::FETCH_GROUP);
     }
 }

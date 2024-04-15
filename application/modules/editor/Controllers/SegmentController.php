@@ -9,19 +9,19 @@ START LICENSE AND COPYRIGHT
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
  This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
- as published by the Free Software Foundation and appearing in the file agpl3-license.txt 
- included in the packaging of this file.  Please review the following information 
+ as published by the Free Software Foundation and appearing in the file agpl3-license.txt
+ included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
 
  There is a plugin exception available for use with this release of translate5 for
- translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or
  plugin-exception.txt in the root folder of translate5.
 
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
@@ -44,7 +44,6 @@ class Editor_SegmentController extends ZfExtended_RestController
      */
     protected $filterClass = 'editor_Models_Filter_SegmentSpecific';
 
-
     /**
      * @var editor_Models_Segment
      */
@@ -56,11 +55,11 @@ class Editor_SegmentController extends ZfExtended_RestController
      * @var integer
      */
     protected $durationsDivisor = 1;
+
     /**
-     * 
      * @var string[]
      */
-    protected $cachedAutostates = NULL;
+    protected $cachedAutostates = null;
 
     /**
      * @throws ZfExtended_Models_Entity_NotFoundException
@@ -68,7 +67,8 @@ class Editor_SegmentController extends ZfExtended_RestController
      * @throws NoAccessException
      * @throws ZfExtended_NoAccessException
      */
-    public function preDispatch(){
+    public function preDispatch()
+    {
         parent::preDispatch();
         $this->initCurrentTask();
         $sfm = $this->initSegmentFieldManager($this->getCurrentTask()->getTaskGuid());
@@ -95,7 +95,8 @@ class Editor_SegmentController extends ZfExtended_RestController
     /**
      * @throws \MittagQI\Translate5\Task\Current\Exception
      */
-    public function indexAction() {
+    public function indexAction()
+    {
         $taskGuid = $this->getCurrentTask()->getTaskGuid();
 
         // apply quality filter
@@ -138,38 +139,39 @@ class Editor_SegmentController extends ZfExtended_RestController
         // ----- Specific handling of rows (end) -----
     }
 
-    /**
-     * 
-     */
-    public function nextsegmentsAction() {
+    public function nextsegmentsAction()
+    {
         $segmentId = (int) $this->_getParam('segmentId');
         if ($this->_getParam('nextFiltered', false) || $this->_getParam('prevFiltered', false)) {
             $autoStates = $this->getUsersAutoStateIds();
         }
         $this->entity->load($segmentId);
         $this->checkTaskGuidAndEditable();
-        
+
         $context = new stdClass(); // this needs to be an object to make sure it is passed by reference through the events API
         $context->result = [];
         $context->types = explode(',', $this->_getParam('parsertypes', 'editable,workflow'));
         $context->field = $this->_getParam('editedField', null);
-        
-        foreach($context->types as $type){
-            if($type == 'editable' || $type == 'workflow'){
-                $param = 'next_'.$type;
+
+        foreach ($context->types as $type) {
+            if ($type == 'editable' || $type == 'workflow') {
+                $param = 'next_' . $type;
                 if ($this->_getParam($param, false)) {
-                    $autoStates = ($type == 'workflow') ? $this->getUsersAutoStateIds() : NULL;
+                    $autoStates = ($type == 'workflow') ? $this->getUsersAutoStateIds() : null;
                     $context->result[$param] = $this->entity->findSurroundingEditables(true, $autoStates);
                 }
-                $param = 'prev_'.$type;
+                $param = 'prev_' . $type;
                 if ($this->_getParam($param, false)) {
-                    $autoStates = ($type == 'workflow') ? $this->getUsersAutoStateIds() : NULL;
+                    $autoStates = ($type == 'workflow') ? $this->getUsersAutoStateIds() : null;
                     $context->result[$param] = $this->entity->findSurroundingEditables(false, $autoStates);
                 }
             }
         }
         // this gives plugins (which may add types in the frontend) the chance to add the corresponding data
-        $this->events->trigger('nextsegmentsAction', $this, array('context' => $context, 'segment' => $this->entity));
+        $this->events->trigger('nextsegmentsAction', $this, [
+            'context' => $context,
+            'segment' => $this->entity,
+        ]);
 
         echo Zend_Json::encode((object) $context->result, Zend_Json::TYPE_OBJECT);
     }
@@ -182,13 +184,14 @@ class Editor_SegmentController extends ZfExtended_RestController
      */
     public function positionAction()
     {
-        $segmentNrInTask = (int)$this->_getParam('segmentNrInTask');
+        $segmentNrInTask = (int) $this->_getParam('segmentNrInTask');
         $this->entity->loadBySegmentNrInTask($segmentNrInTask, $this->getCurrentTask()->getTaskGuid());
         //$this->checkTaskGuidAndEditable();
         $index = $this->entity->getIndex();
         if ($index === null) {
             $e = new ZfExtended_NotFoundException("Segment is not contained in the segment filter");
             $e->setLogging(false); //a wanted exception, disable logging for that
+
             throw $e;
         }
         $this->view->segmentNrInTask = $segmentNrInTask;
@@ -201,8 +204,9 @@ class Editor_SegmentController extends ZfExtended_RestController
      * is neede for the autostate filter in the frontend
      * @throws \MittagQI\Translate5\Task\Current\Exception
      */
-    protected function getUsersAutoStateIds(){
-        if($this->cachedAutostates == NULL){
+    protected function getUsersAutoStateIds()
+    {
+        if ($this->cachedAutostates == null) {
             $taskUserAssoc = editor_Models_Loaders_Taskuserassoc::loadByTaskGuid(
                 ZfExtended_Authentication::getInstance()->getUserGuid(),
                 $this->getCurrentTask()->getTaskGuid()
@@ -220,11 +224,12 @@ class Editor_SegmentController extends ZfExtended_RestController
             }
             $this->cachedAutostates = $autoStateMap[$userRole];
         }
+
         return $this->cachedAutostates;
     }
+
     /**
      * adds the optional is first of file info to the affected segments
-     * @param string $taskGuid
      */
     protected function addIsFirstFileInfo(string $taskGuid)
     {
@@ -252,7 +257,7 @@ class Editor_SegmentController extends ZfExtended_RestController
             return;
         }
 
-        if(!isset($this->view->metaData)){
+        if (! isset($this->view->metaData)) {
             //since we dont use metaData otherwise, we can overwrite it completly
             $this->view->metaData = new stdClass();
         }
@@ -261,6 +266,7 @@ class Editor_SegmentController extends ZfExtended_RestController
         foreach ($this->view->rows as $idx => $segment) {
             if ($segment['editable']) {
                 $this->view->metaData->firstEditable = $idx;
+
                 return;
             }
         }
@@ -290,13 +296,13 @@ class Editor_SegmentController extends ZfExtended_RestController
         /* @var $assoc editor_Models_SegmentUserAssoc */
 
         $watched = $assoc->loadIsWatched($ids, ZfExtended_Authentication::getInstance()->getUserGuid());
-        $watchedById = array();
+        $watchedById = [];
         array_map(function ($assoc) use (&$watchedById) {
             $watchedById[$assoc['segmentId']] = $assoc['id'];
         }, $watched);
 
         foreach ($this->view->rows as &$row) {
-            $row['isWatched'] = !empty($watchedById[$row['id']]);
+            $row['isWatched'] = ! empty($watchedById[$row['id']]);
             if ($row['isWatched']) {
                 $row['segmentUserAssocId'] = $watchedById[$row['id']];
             }
@@ -306,7 +312,7 @@ class Editor_SegmentController extends ZfExtended_RestController
     public function putAction()
     {
         $auth = ZfExtended_Authentication::getInstance();
-        $this->entity->load((int)$this->_getParam('id'));
+        $this->entity->load((int) $this->_getParam('id'));
 
         //check if update is allowed
         $this->checkTaskGuidAndEditable();
@@ -325,7 +331,7 @@ class Editor_SegmentController extends ZfExtended_RestController
 
         // CRUCIAL: we need to exclude the segment-content fields from sanitization and sanitize them as HTML
         $this->dataSanitizationMap = [];
-        foreach($allowedAlternatesToChange as $key){
+        foreach ($allowedAlternatesToChange as $key) {
             $this->dataSanitizationMap[$key] = ZfExtended_Sanitizer::MARKUP;
         }
 
@@ -335,7 +341,7 @@ class Editor_SegmentController extends ZfExtended_RestController
         settype($this->data->durations, 'object');
         $this->entity->setTimeTrackData($this->data->durations, $this->durationsDivisor);
 
-        $allowedToChange = array('stateId', 'autoStateId', 'matchRate', 'matchRateType');
+        $allowedToChange = ['stateId', 'autoStateId', 'matchRate', 'matchRateType'];
 
         $this->checkPlausibilityOfPut($allowedAlternatesToChange);
         $this->sanitizeEditedContent($updater, $allowedAlternatesToChange);
@@ -383,16 +389,18 @@ class Editor_SegmentController extends ZfExtended_RestController
         $parameters['searchField'] = htmlentities($parameters['searchField'], ENT_XML1);
 
         //check character number limit
-        if (!$this->checkSearchStringLength($parameters['searchField'])) {
+        if (! $this->checkSearchStringLength($parameters['searchField'])) {
             return;
         }
 
         //find all segments for the search parameters
         $result = $this->entity->search($parameters);
 
-        if (!$result || empty($result)) {
-            $t = ZfExtended_Zendoverwrites_Translate::getInstance();/* @var $t ZfExtended_Zendoverwrites_Translate */;
+        if (! $result || empty($result)) {
+            $t = ZfExtended_Zendoverwrites_Translate::getInstance(); /* @var $t ZfExtended_Zendoverwrites_Translate */
+            ;
             $this->view->message = $t->_('Keine Ergebnisse für die aktuelle Suche!');
+
             return;
         }
 
@@ -405,13 +413,11 @@ class Editor_SegmentController extends ZfExtended_RestController
     /**
      * Check whether task is opened by more than one user
      *
-     * @param string $taskGuid
-     * @return bool
      * @throws ReflectionException
      * @throws Zend_Db_Statement_Exception
      */
-    public function isOpenedByMoreThanOneUser(string $taskGuid) : bool {
-
+    public function isOpenedByMoreThanOneUser(string $taskGuid): bool
+    {
         // Get usage records
         $usedBy = ZfExtended_Factory::get(editor_Models_TaskUserAssoc::class)->loadUsed($taskGuid);
 
@@ -438,24 +444,27 @@ class Editor_SegmentController extends ZfExtended_RestController
         $t = ZfExtended_Zendoverwrites_Translate::getInstance();
         /* @var $t ZfExtended_Zendoverwrites_Translate */
         if ($task->getUsageMode() == $task::USAGE_MODE_SIMULTANEOUS && $this->isOpenedByMoreThanOneUser($parameters['taskGuid'])) {
-            throw new editor_Models_SearchAndReplace_Exception('E1192', ['task' => $task]);
+            throw new editor_Models_SearchAndReplace_Exception('E1192', [
+                'task' => $task,
+            ]);
         }
 
         //check if the required search parameters are in the request
         $this->checkRequiredSearchParameters($parameters);
         $parameters['searchField'] = htmlentities($parameters['searchField'], ENT_XML1);
         $parameters['replaceField'] = htmlentities($parameters['replaceField'], ENT_XML1);
-        
+
         //check if the task has mqm tags
         //replace all is not supported for tasks with mqm
-        if($this->isMqmTask($parameters['taskGuid'])){
+        if ($this->isMqmTask($parameters['taskGuid'])) {
             $this->view->message = $t->_('Alle ersetzen wird für Aufgaben mit Segmenten mit MQM-Tags nicht unterstützt');
             $this->view->hasMqm = true;
+
             return;
         }
 
         //check character number limit
-        if (!$this->checkSearchStringLength($parameters['searchField'])) {
+        if (! $this->checkSearchStringLength($parameters['searchField'])) {
             return;
         }
 
@@ -466,16 +475,17 @@ class Editor_SegmentController extends ZfExtended_RestController
         $searchType = $parameters['searchType'] ?? $this->entity::DEFAULT_SEARCH_TYPE;
         $matchCase = isset($parameters['matchCase']) ? (strtolower($parameters['matchCase']) == 'true') : false;
 
-        if (!$results || empty($results)) {
+        if (! $results || empty($results)) {
             $this->view->message = $t->_('Keine Ergebnisse für die aktuelle Suche!');
+
             return;
         }
         $resultsCount = count($results);
         foreach ($results as $idx => $result) {
             $replace = ZfExtended_Factory::get('editor_Models_SearchAndReplace_ReplaceMatchesSegment', [
-                $result[$searchInField],//text to be replaced
-                $searchInField,//replace target field
-                $result['id']//segment id
+                $result[$searchInField], //text to be replaced
+                $searchInField, //replace target field
+                $result['id'], //segment id
             ]);
             /* @var $replace editor_Models_SearchAndReplace_ReplaceMatchesSegment */
 
@@ -510,7 +520,7 @@ class Editor_SegmentController extends ZfExtended_RestController
             $this->durationsDivisor = $resultsCount;
 
             $this->getRequest()->setParam('data', null);
-            $this->getRequest()->setParam('data', json_encode((array)$ob));
+            $this->getRequest()->setParam('data', json_encode((array) $ob));
 
             //trigger the before put action
             $this->beforeActionEvent('put');
@@ -534,7 +544,7 @@ class Editor_SegmentController extends ZfExtended_RestController
                     'extra' => [
                         'task' => $task,
                         'loadedSegment' => $this->entity->getDataObject(),
-                    ]
+                    ],
                 ]);
             }
 
@@ -560,22 +570,25 @@ class Editor_SegmentController extends ZfExtended_RestController
      */
     protected function checkPlausibilityOfPut($fieldnames)
     {
-        $error = array();
+        $error = [];
         foreach ($this->data as $key => $value) {
             //consider only changeable datafields:
-            if (!in_array($key, $fieldnames)) {
+            if (! in_array($key, $fieldnames)) {
                 continue;
             }
             //search for the img tag, get the data and remove it
             $regex = '#<img[^>]+class="duplicatesavecheck"[^>]+data-segmentid="([0-9]+)" data-fieldname="([^"]+)"[^>]*>#';
             $match = [];
-            if (!preg_match($regex, $value, $match)) {
+            if (! preg_match($regex, $value, $match)) {
                 continue;
             }
             $this->data->{$key} = str_replace($match[0], '', $value);
             //if segmentId and fieldname from content differ to the segment to be saved, throw the error!
             if ($match[2] != $key || $match[1] != $this->entity->getId()) {
-                $error['real fieldname: ' . $key] = array('segmentId' => $match[1], 'fieldName' => $match[2]);
+                $error['real fieldname: ' . $key] = [
+                    'segmentId' => $match[1],
+                    'fieldName' => $match[2],
+                ];
             }
         }
         if (empty($error)) {
@@ -599,19 +612,19 @@ class Editor_SegmentController extends ZfExtended_RestController
 
         $e = new ZfExtended_Exception();
         $e->setMessage('Aufgrund der langsamen Verarbeitung von Javascript im Internet Explorer konnte das Segment nicht korrekt gespeichert werden. Bitte öffnen Sie das Segment nochmals und speichern Sie es erneut. Sollte das Problem bestehen bleiben, drücken Sie bitte F5 und bearbeiten dann das Segment erneut. Vielen Dank!', true);
+
         throw $e;
     }
 
     /**
      * Applies the import whitespace replacing to the edited user by the content
-     * @param array $fieldnames
      */
     protected function sanitizeEditedContent(editor_Models_Segment_Updater $updater, array $fieldnames): void
     {
         $sanitized = false;
         foreach ($this->data as $key => $data) {
             //consider only changeable datafields:
-            if (!in_array($key, $fieldnames)) {
+            if (! in_array($key, $fieldnames)) {
                 continue;
             }
 
@@ -647,13 +660,13 @@ class Editor_SegmentController extends ZfExtended_RestController
             $step = $tua->getWorkflowStepName();
             if ($tua->isSegmentrangedTaskForStep($task, $step)) {
                 $assignedSegments = $tua->getAllAssignedSegmentsByUserAndStep($task->getTaskGuid(), $authUserGuid, $step);
-                if (!in_array($this->entity->getSegmentNrInTask(), $assignedSegments)) {
+                if (! in_array($this->entity->getSegmentNrInTask(), $assignedSegments)) {
                     $isTaskGuidAndEditable = false;
                 }
             }
         }
 
-        if (!$isTaskGuidAndEditable) {
+        if (! $isTaskGuidAndEditable) {
             //nach außen so tun als ob das gewünschte Entity nicht gefunden wurde
             throw new ZfExtended_Models_Entity_NoAccessException();
         }
@@ -673,6 +686,7 @@ class Editor_SegmentController extends ZfExtended_RestController
             //nach außen so tun als ob das gewünschte Entity nicht gefunden wurde
             throw new ZfExtended_Models_Entity_NoAccessException('Task is not confirmed so no segment can be edited! Task: ' . $task->getTaskGuid());
         }
+
         return $task;
     }
 
@@ -680,8 +694,9 @@ class Editor_SegmentController extends ZfExtended_RestController
     {
         return empty($this->entity->getEditable());
     }
-    
-    public function getAction() {
+
+    public function getAction()
+    {
         $this->entity->load($this->_getParam('id'));
         $this->validateTaskAccess($this->entity->getTaskGuid());
         //check if the segment range feature is active for the current segment and task,
@@ -714,19 +729,20 @@ class Editor_SegmentController extends ZfExtended_RestController
      * @throws \MittagQI\Translate5\Task\Current\Exception
      * @throws editor_Models_Segment_Exception
      */
-    public function lockOperation(bool $lock = true) {
+    public function lockOperation(bool $lock = true)
+    {
         $acl = $lock ? Rights::LOCK_SEGMENT_OPERATION : Rights::UNLOCK_SEGMENT_OPERATION;
 
         //the amount of new ACL rules would be huge to handle that lock/unlock Batch/Operations with
         // ordinary controller right handling since currently role editor has access to all methods here.
         // So its easier to double access to that functions for PM users then
-        $this->checkAccess(Rights::ID, $acl, __CLASS__.'::'.($lock ? __FUNCTION__ : 'unlockOperation'));
+        $this->checkAccess(Rights::ID, $acl, __CLASS__ . '::' . ($lock ? __FUNCTION__ : 'unlockOperation'));
         $this->getAction();
 
         /* @var Operations $operations */
         $operations = ZfExtended_Factory::get('\MittagQI\Translate5\Segment\Operations', [
             $this->getCurrentTask()->getTaskGuid(),
-            $this->entity
+            $this->entity,
         ]);
         $operations->toggleLockOperation($lock);
 
@@ -738,7 +754,8 @@ class Editor_SegmentController extends ZfExtended_RestController
      * @throws ZfExtended_NoAccessException
      * @throws editor_Models_Segment_Exception
      */
-    public function unlockOperation() {
+    public function unlockOperation()
+    {
         $this->lockOperation(false);
     }
 
@@ -746,7 +763,8 @@ class Editor_SegmentController extends ZfExtended_RestController
      * @throws ZfExtended_NoAccessException
      * @throws \MittagQI\Translate5\Task\Current\Exception
      */
-    public function unlockBatch() {
+    public function unlockBatch()
+    {
         $this->lockBatch(false);
     }
 
@@ -754,20 +772,22 @@ class Editor_SegmentController extends ZfExtended_RestController
      * @throws ZfExtended_NoAccessException
      * @throws \MittagQI\Translate5\Task\Current\Exception
      */
-    public function lockBatch(bool $lock = true) {
+    public function lockBatch(bool $lock = true)
+    {
         $acl = $lock ? Rights::LOCK_SEGMENT_BATCH : Rights::UNLOCK_SEGMENT_BATCH;
-        $this->checkAccess(Rights::ID, $acl, __CLASS__.'::'.($lock ? __FUNCTION__ : 'unlockBatch'));
+        $this->checkAccess(Rights::ID, $acl, __CLASS__ . '::' . ($lock ? __FUNCTION__ : 'unlockBatch'));
         $this->applyQualityFilter();
 
         /* @var Operations $operations */
         $operations = ZfExtended_Factory::get('\MittagQI\Translate5\Segment\Operations', [
             $this->getCurrentTask()->getTaskGuid(),
-            $this->entity
+            $this->entity,
         ]);
         $operations->toggleLockBatch($lock);
     }
 
-    public function unbookmarkBatch() {
+    public function unbookmarkBatch()
+    {
         $this->bookmarkBatch(false);
     }
 
@@ -775,15 +795,16 @@ class Editor_SegmentController extends ZfExtended_RestController
      * @throws ZfExtended_NoAccessException
      * @throws \MittagQI\Translate5\Task\Current\Exception
      */
-    public function bookmarkBatch(bool $bookmark = true) {
+    public function bookmarkBatch(bool $bookmark = true)
+    {
         $acl = $bookmark ? 'bookmarkBatch' : 'unbookmarkBatch';
-        $this->checkAccess('editor_segmentuserassoc', $acl, __CLASS__.'::'.$acl);
+        $this->checkAccess('editor_segmentuserassoc', $acl, __CLASS__ . '::' . $acl);
         $this->applyQualityFilter();
 
         /* @var Operations $operations */
         $operations = ZfExtended_Factory::get('\MittagQI\Translate5\Segment\Operations', [
             $this->getCurrentTask()->getTaskGuid(),
-            $this->entity
+            $this->entity,
         ]);
         $operations->toggleBookmarkBatch($bookmark);
     }
@@ -792,7 +813,6 @@ class Editor_SegmentController extends ZfExtended_RestController
 
     /**
      * returns the mapping between fileIds and segment row indizes
-     * @return void
      * @throws \MittagQI\Translate5\Task\Current\Exception
      */
     public function filemapAction()
@@ -828,7 +848,7 @@ class Editor_SegmentController extends ZfExtended_RestController
         //generate portlet data
         $data = (new TermportletData(
             $this->getCurrentTask(),
-            $this->isAllowed('editor_termportal') && !empty($plugin)
+            $this->isAllowed('editor_termportal') && ! empty($plugin)
         ))->generate($segment, $locale);
 
         //add translations
@@ -836,7 +856,7 @@ class Editor_SegmentController extends ZfExtended_RestController
         $data['locales']['entryAttrs'] = $translate->_('Attribute auf Eintragsebene');
         $data['locales']['languageAttrs'] = $translate->_('Attribute auf Sprachebene');
         $data['locales']['termAttrs'] = $translate->_('Attribute auf Benennungsebene');
-        if($data['noTerms']){
+        if ($data['noTerms']) {
             $data['locales']['noTermsMessage'] = $translate->_('Keine Terminologie vorhanden!');
         }
 
@@ -858,38 +878,41 @@ class Editor_SegmentController extends ZfExtended_RestController
         $sfm = $this->initSegmentFieldManager($this->getCurrentTask()->getTaskGuid());
         $mv = $sfm->getView();
         /* @var $mv editor_Models_Segment_MaterializedView */
-        $db = ZfExtended_Factory::get(get_class($this->entity->db), array(array(), $mv->getName()));
+        $db = ZfExtended_Factory::get(get_class($this->entity->db), [[], $mv->getName()]);
         $sql = $db->select()->from($db, 'matchrateType')->distinct();
 
         echo Zend_Json::encode($db->fetchAll($sql)->toArray(), Zend_Json::TYPE_ARRAY);
     }
+
     /**
      * Sets the stateId asynchronously. This enables the segment meta panel to be independent from saving or canceling the segment text
      */
-    public function stateidAction(){
+    public function stateidAction()
+    {
         $this->entity->load($this->_getParam('id'));
         $this->validateTaskAccess($this->entity->getTaskGuid());
         $stateId = intval($this->_getParam('stateId', -1));
-        if($stateId < 0){
+        if ($stateId < 0) {
             throw new ZfExtended_Models_Entity_NotFoundException('parameter stateId is required.');
         }
         $this->entity->setStateId($stateId);
         $this->entity->save();
         $this->view->success = 1;
     }
-    
+
     /***
      * Check if the search string length is in between 0 and 1024 characters long
      */
     private function checkSearchStringLength($searchField)
     {
-
         $isValid = true;
         if (empty($searchField) && strlen($searchField === 0)) {
             $t = ZfExtended_Zendoverwrites_Translate::getInstance();
             /* @var $t ZfExtended_Zendoverwrites_Translate */
 
-            $errors = array('searchField' => $t->_('Das Suchfeld ist leer.'));
+            $errors = [
+                'searchField' => $t->_('Das Suchfeld ist leer.'),
+            ];
             $e = new ZfExtended_ValidateException();
             $e->setErrors($errors);
             $this->handleValidateException($e);
@@ -901,7 +924,9 @@ class Editor_SegmentController extends ZfExtended_RestController
             $t = ZfExtended_Zendoverwrites_Translate::getInstance();
             /* @var $t ZfExtended_Zendoverwrites_Translate */
 
-            $errors = array('searchField' => $t->_('Der Suchbegriff ist zu groß.'));
+            $errors = [
+                'searchField' => $t->_('Der Suchbegriff ist zu groß.'),
+            ];
             $e = new ZfExtended_ValidateException();
             $e->setErrors($errors);
             $this->handleValidateException($e);
@@ -914,7 +939,6 @@ class Editor_SegmentController extends ZfExtended_RestController
     /**
      * Check if the required search parameters are provided
      *
-     * @param array $parameters
      * @throws ZfExtended_ValidateException
      */
     private function checkRequiredSearchParameters(array $parameters)
@@ -924,6 +948,7 @@ class Editor_SegmentController extends ZfExtended_RestController
             /* @var $t ZfExtended_Zendoverwrites_Translate */
             $e = new ZfExtended_ValidateException();
             $e->setMessage($t->_('Missing search parameter. Required parameters: searchInField, searchField, searchType. Given was: ') . print_r($parameters, 1));
+
             throw $e;
         }
     }
@@ -933,7 +958,8 @@ class Editor_SegmentController extends ZfExtended_RestController
      * @param string $taskGuid
      * @return boolean
      */
-    private function isMqmTask($taskGuid){
+    private function isMqmTask($taskGuid)
+    {
         return editor_Models_Db_SegmentQuality::hasTypeCategoryForTask($taskGuid, editor_Segment_Tag::TYPE_MQM);
     }
 
@@ -945,7 +971,7 @@ class Editor_SegmentController extends ZfExtended_RestController
      */
     protected function checkAndGetSegmentsRange(editor_Models_Task $task = null)
     {
-        if (!isset($task)) {
+        if (! isset($task)) {
             $task = ZfExtended_Factory::get('editor_Models_Task');
             /* @var $task editor_Models_Task */
             $task->loadByTaskGuid($this->getCurrentTask()->getTaskGuid());
@@ -958,9 +984,10 @@ class Editor_SegmentController extends ZfExtended_RestController
         /* @var $tua editor_Models_TaskUserAssoc */
         $step = $tua->getWorkflowStepName();
         $handleSegmentranges = $tua->isSegmentrangedTaskForStep($task, $step);
-        if (!$handleSegmentranges) {
+        if (! $handleSegmentranges) {
             return false;
         }
+
         return $tua->getAllAssignedSegmentsByUserAndStep($task->getTaskGuid(), $authUserGuid, $step);
     }
 
@@ -983,7 +1010,7 @@ class Editor_SegmentController extends ZfExtended_RestController
             return;
         }
 
-        if (!isset($this->view->metaData)) {
+        if (! isset($this->view->metaData)) {
             $this->view->metaData = new stdClass();
         }
 
@@ -997,10 +1024,12 @@ class Editor_SegmentController extends ZfExtended_RestController
             //last edited segment found, find and set the segment index
             $segment->load($segmentId);
             $this->view->metaData->jumpToSegmentIndex = $segment->getIndex();
+
             return;
         }
 
         $tua = null;
+
         try {
             $tua = editor_Models_Loaders_Taskuserassoc::loadByTaskGuidForceWorkflowRole($authUserGuid, $taskGuid);
         } catch (ZfExtended_Models_Entity_NotFoundException $e) {
@@ -1008,6 +1037,7 @@ class Editor_SegmentController extends ZfExtended_RestController
 
         if (empty($tua)) {
             $this->view->metaData->jumpToSegmentIndex = $this->view->metaData->firstEditable ?? 0;
+
             return;
         }
 
@@ -1016,17 +1046,19 @@ class Editor_SegmentController extends ZfExtended_RestController
         $task->loadByTaskGuid($taskGuid);
 
         //if for the task there are no ranges defined, use first editable(if defined) or 0
-        if (!$tua->isSegmentrangedTaskForStep($task, $tua->getWorkflowStepName())) {
+        if (! $tua->isSegmentrangedTaskForStep($task, $tua->getWorkflowStepName())) {
             $this->view->metaData->jumpToSegmentIndex = $this->view->metaData->firstEditable ?? 0;
+
             return;
         }
 
         $range = $tua->getSegmentrange() ?? null;
         //if there are ranges defined for the user, use the first defined range
-        if (!empty($range)) {
+        if (! empty($range)) {
             $segments = editor_Models_TaskUserAssoc_Segmentrange::getNumbers($range);
             $this->entity->loadBySegmentNrInTask(reset($segments), $taskGuid);
             $this->view->metaData->jumpToSegmentIndex = $this->entity->getIndex();
+
             return;
         }
         $this->view->metaData->jumpToSegmentIndex = 0;
@@ -1037,7 +1069,7 @@ class Editor_SegmentController extends ZfExtended_RestController
      */
     private function applyQualityFilter()
     {
-        if($this->getRequest()->getParam('qualities', '') != ''){
+        if ($this->getRequest()->getParam('qualities', '') != '') {
             $qualityState = new editor_Models_Quality_RequestState($this->getRequest()->getParam('qualities'), $this->getCurrentTask());
             $filter = $this->entity->getFilter();
             $filter->setQualityFilter($qualityState);

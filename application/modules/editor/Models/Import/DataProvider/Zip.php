@@ -3,25 +3,25 @@
 START LICENSE AND COPYRIGHT
 
  This file is part of translate5
- 
+
  Copyright (c) 2013 - 2021 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
 
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
  This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
- as published by the Free Software Foundation and appearing in the file agpl3-license.txt 
- included in the packaging of this file.  Please review the following information 
+ as published by the Free Software Foundation and appearing in the file agpl3-license.txt
+ included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
-  
+
  There is a plugin exception available for use with this release of translate5 for
- translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or
  plugin-exception.txt in the root folder of translate5.
-  
+
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
@@ -31,7 +31,6 @@ END LICENSE AND COPYRIGHT
  */
 class editor_Models_Import_DataProvider_Zip extends editor_Models_Import_DataProvider_Abstract
 {
-
     protected $importZip;
 
     public function __construct($pathToZipFile)
@@ -64,12 +63,12 @@ class editor_Models_Import_DataProvider_Zip extends editor_Models_Import_DataPro
             // DataProvider Zip: TaskData Import Archive Zip already exists
             throw new editor_Models_Import_DataProvider_Exception('E1243', [
                 'task' => $this->task,
-                'target' => $target
+                'target' => $target,
             ]);
         }
         // because of project uploads, copy is required instead of rename
         // at the end of the request the tmp files are removed
-        if(!copy($this->importZip, $target)) {
+        if (! copy($this->importZip, $target)) {
             //DataProvider Zip: Uploaded zip file "{file}" cannot be moved to "{target},
             throw new editor_Models_Import_DataProvider_Exception('E1372', [
                 'task' => $this->task,
@@ -79,10 +78,10 @@ class editor_Models_Import_DataProvider_Zip extends editor_Models_Import_DataPro
         }
         // prepare the zip for archiving
         $zip = new ZipArchive();
-        if ($zip->open($target) === TRUE){
+        if ($zip->open($target) === true) {
             // add additional Archive-files if set
-            if(count($this->additionalArchiveFiles) > 0){
-                foreach($this->additionalArchiveFiles as $fileName => $filePath){
+            if (count($this->additionalArchiveFiles) > 0) {
+                foreach ($this->additionalArchiveFiles as $fileName => $filePath) {
                     $zip->addFile($filePath, $fileName);
                 }
             }
@@ -97,23 +96,24 @@ class editor_Models_Import_DataProvider_Zip extends editor_Models_Import_DataPro
      */
     protected function unzip()
     {
-        $this->unzipArchive($this->importZip,$this->importFolder);
+        $this->unzipArchive($this->importZip, $this->importFolder);
     }
 
     /**
      * cleans the unzipped files from security relevant stuff
      * @throws Zend_Exception
      */
-    protected function securityCleanup(){
+    protected function securityCleanup()
+    {
         // for now, we only clean the reference-files folder
         editor_Models_Import_DirectoryParser_ReferenceFiles::cleanImportDirectory($this->importFolder);
     }
 
     /**
      * cleans the archive from security relevant stuff
-     * @param ZipArchive $zip
      */
-    protected function securityArchiveCleanup(ZipArchive $zip){
+    protected function securityArchiveCleanup(ZipArchive $zip)
+    {
         // for now, we only clean the reference-files folder
         editor_Models_Import_DirectoryParser_ReferenceFiles::cleanImportArchive($zip);
     }
@@ -142,6 +142,7 @@ class editor_Models_Import_DataProvider_Zip extends editor_Models_Import_DataPro
     {
         $parent = parent::__sleep();
         $parent[] = 'importZip';
+
         return $parent;
     }
 }

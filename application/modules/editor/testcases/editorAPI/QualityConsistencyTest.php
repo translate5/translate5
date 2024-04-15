@@ -21,19 +21,19 @@ START LICENSE AND COPYRIGHT
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
 
-use MittagQI\Translate5\Test\Import\Config;
 use MittagQI\Translate5\Test\Filter;
+use MittagQI\Translate5\Test\Import\Config;
 
 /**
  * Testcase for 'TRANSLATE-2537: AutoQA: Check inconsistent translations'
  */
-class QualityConsistencyTest extends editor_Test_JsonTest {
-
+class QualityConsistencyTest extends editor_Test_JsonTest
+{
     /**
      * @var array
      */
@@ -49,7 +49,8 @@ class QualityConsistencyTest extends editor_Test_JsonTest {
             ->setToEditAfterImport();
     }
 
-    public static function beforeTests(): void {
+    public static function beforeTests(): void
+    {
         // Get segments needed for the test and check their quantity
         static::$segments = static::api()->getSegments(null, 29);
         static::assertEquals(count(static::$segments), 29, 'Not enough segments in the imported task');
@@ -58,12 +59,13 @@ class QualityConsistencyTest extends editor_Test_JsonTest {
     /**
      * Test the qualities fetched for a segment
      */
-    public function testSegmentQualities(){
+    public function testSegmentQualities()
+    {
         foreach ([3, 4, 5, 6, 9, 10] as $idx) {
             $fileName = 'expectedSegmentQualities-' . $idx . '.json';
             $qualities = static::api()->getJson('/editor/quality/segment?segmentId=' . static::$segments[$idx]->id, [], $fileName);
             $qualityFilter = Filter::createSingle('type', 'consistent');
-            $this->assertModelsEqualsJsonFile('SegmentQuality', $fileName, $qualities, 'File '.$fileName.', Segment target: "'.static::$segments[$idx]->target.'"', $qualityFilter);
+            $this->assertModelsEqualsJsonFile('SegmentQuality', $fileName, $qualities, 'File ' . $fileName . ', Segment target: "' . static::$segments[$idx]->target . '"', $qualityFilter);
         }
     }
 }

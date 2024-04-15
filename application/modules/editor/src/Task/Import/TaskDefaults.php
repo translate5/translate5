@@ -13,15 +13,15 @@ START LICENSE AND COPYRIGHT
  included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
-  
+
  There is a plugin exception available for use with this release of translate5 for
  translate5: Please see http://www.translate5.net/plugin-exception.txt or
  plugin-exception.txt in the root folder of translate5.
-  
+
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
@@ -71,16 +71,17 @@ class TaskDefaults
     ): void {
         $config = null === $customer ? $this->config : $customer->getConfig();
 
-        if (!empty($config->runtimeOptions->project->defaultPivotLanguage)) {
+        if (! empty($config->runtimeOptions->project->defaultPivotLanguage)) {
             // get default pivot language value from the config
             $defaultPivot = $config->runtimeOptions->project->defaultPivotLanguage;
+
             try {
                 /** @var editor_Models_Languages $language */
                 $language = ZfExtended_Factory::get(editor_Models_Languages::class);
                 $language->loadByRfc5646($defaultPivot);
 
-                $project->setRelaisLang($language->getId());
-            }catch (Throwable) {
+                $project->setRelaisLang((int) $language->getId());
+            } catch (Throwable) {
                 // in case of wrong configured variable and the load language fails, do nothing
             }
         }
@@ -110,7 +111,6 @@ class TaskDefaults
      * Assign language resources by default that are set as useAsDefault for the task's client
      * (but only if the language combination matches).
      *
-     * @param editor_Models_Task $task
      * @throws Zend_Cache_Exception
      * @throws Zend_Db_Statement_Exception
      * @throws ZfExtended_Models_Entity_Exceptions_IntegrityConstraint
@@ -130,15 +130,15 @@ class TaskDefaults
 
         $this->applyAssocData(
             $this->findMatchingAssocData(
-                (int)$task->getSourceLang(),
-                (int)$task->getTargetLang(),
+                (int) $task->getSourceLang(),
+                (int) $task->getTargetLang(),
                 $data
             ),
             function ($assocRow) use ($taskGuid) {
                 $taskAssoc = ZfExtended_Factory::get(TaskAssociation::class);
                 $taskAssoc->setLanguageResourceId($assocRow['languageResourceId']);
                 $taskAssoc->setTaskGuid($taskGuid);
-                if (!empty($assocRow['writeAsDefault'])) {
+                if (! empty($assocRow['writeAsDefault'])) {
                     $taskAssoc->setSegmentsUpdateable(true);
                 }
                 $taskAssoc->save();
@@ -167,8 +167,8 @@ class TaskDefaults
 
         $this->applyAssocData(
             $this->findMatchingAssocData(
-                (int)$task->getSourceLang(),
-                (int)$task->getRelaisLang(),
+                (int) $task->getSourceLang(),
+                (int) $task->getRelaisLang(),
                 $data
             ),
             function ($assocRow) use ($taskGuid) {
@@ -222,7 +222,6 @@ class TaskDefaults
 
     /**
      * Add user which should be associated by default on task creation
-     * @param editor_Models_Task $task
      * @throws editor_Models_ConfigException
      */
     private function addDefaultUserAssoc(editor_Models_Task $task): void
@@ -258,7 +257,7 @@ class TaskDefaults
                     'workflow',
                     $model->getWorkflow(),
                     $model->getWorkflowStepName(),
-                    'defaultDeadlineDate'
+                    'defaultDeadlineDate',
                 ];
                 $taskConfig->updateInsertConfig($task->getTaskGuid(), implode('.', $name), $assoc['deadlineDate']);
             }
@@ -271,7 +270,7 @@ class TaskDefaults
                 ->{$model->getWorkflowStepName()}
                 ->defaultDeadlineDate ?? 0;
             if ($configValue > 0) {
-                $model->setDeadlineDate(editor_Utils::addBusinessDays((string)$task->getOrderdate(), $configValue));
+                $model->setDeadlineDate(editor_Utils::addBusinessDays((string) $task->getOrderdate(), $configValue));
             }
             // processing some trackchanges properties that can't be parted out to the trackchanges-plugin
             $model->setTrackchangesShow($assoc['trackchangesShow']);
@@ -285,8 +284,6 @@ class TaskDefaults
     /**
      * Disable the pivot autostart in case the import is done via the translate5 UI. For all api imports, the config
      * runtimeOptions.import.autoStartPivotTranslations will decide if the pivot pre-translation is auto-queued
-     * @param editor_Models_Task $task
-     * @return void
      */
     private function handlePivotAutostart(editor_Models_Task $task): void
     {

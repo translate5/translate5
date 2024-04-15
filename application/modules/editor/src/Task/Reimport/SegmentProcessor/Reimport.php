@@ -63,7 +63,6 @@ class Reimport extends editor_Models_Import_SegmentProcessor
      */
     protected $segmentTagger;
 
-
     /***
      * Collection of segments which are updated with the reimport (target, source or both)
      * @var array
@@ -83,16 +82,10 @@ class Reimport extends editor_Models_Import_SegmentProcessor
 
     protected FileDto $fileDto;
 
-
-    /**
-     * @param editor_Models_Task $task
-     * @param ZfExtended_Models_User $user
-     */
     public function __construct(
-        editor_Models_Task             $task,
+        editor_Models_Task $task,
         private ZfExtended_Models_User $user
-    )
-    {
+    ) {
         parent::__construct($task);
         $this->segmentTagger = ZfExtended_Factory::get('editor_Models_Segment_InternalTag');
 
@@ -106,7 +99,6 @@ class Reimport extends editor_Models_Import_SegmentProcessor
      */
     public function process(editor_Models_Import_FileParser $parser): bool|int
     {
-
         $content = $this->getContentClass($parser);
 
         $segment = $this->alignment->findSegment($parser);
@@ -131,12 +123,12 @@ class Reimport extends editor_Models_Import_SegmentProcessor
                 'E1435',
                 'Reimport Segment processor: Unable to save the segment:' . $segment->getSegmentNrInTask(),
                 [
-                    $e->getMessage()
+                    $e->getMessage(),
                 ]
             ));
+
             return false;
         }
-
     }
 
     /***
@@ -149,12 +141,12 @@ class Reimport extends editor_Models_Import_SegmentProcessor
         $reimporter = FileparserRegistry::getInstance()->getReimporterInstance($parser, [
             $this->task,
             $parser->getFieldContents(),
-            $this->user
+            $this->user,
         ]);
 
         if (is_null($reimporter)) {
             throw new Exception('E1441', [
-                'file' => basename($this->fileName)
+                'file' => basename($this->fileName),
             ]);
         }
 
@@ -164,7 +156,6 @@ class Reimport extends editor_Models_Import_SegmentProcessor
     /**
      * Überschriebener Post Parse Handler, erstellt in diesem Fall das Skeleton File
      * @override
-     * @param editor_Models_Import_FileParser $parser
      * @throws Zend_Exception
      */
     public function postParseHandler(editor_Models_Import_FileParser $parser)
@@ -174,8 +165,6 @@ class Reimport extends editor_Models_Import_SegmentProcessor
     }
 
     /**
-     * @param int $fileId
-     * @return void
      * @throws Zend_Exception
      */
     private function logFileInfo(int $fileId): void
@@ -192,7 +181,7 @@ class Reimport extends editor_Models_Import_SegmentProcessor
                 'fileId' => $fileId,
                 'updateCount' => count($this->updatedSegments),
                 'segments' => implode(',', $this->updatedSegments),
-                'fileName' => $this->fileDto->filteredFilePath
+                'fileName' => $this->fileDto->filteredFilePath,
             ]
         );
 
@@ -203,7 +192,7 @@ class Reimport extends editor_Models_Import_SegmentProcessor
                 'task' => $this->task,
                 'fileId' => $fileId,
                 'fileName' => $this->fileDto->filteredFilePath,
-                'extra' => implode(', ', $error->getExtra())
+                'extra' => implode(', ', $error->getExtra()),
             ]);
         }
     }
@@ -217,17 +206,11 @@ class Reimport extends editor_Models_Import_SegmentProcessor
         $this->calculateFieldWidth($parser);
     }
 
-    /**
-     * @param string $saveTimestamp
-     */
     public function setSaveTimestamp(string $saveTimestamp): void
     {
         $this->saveTimestamp = $saveTimestamp;
     }
 
-    /**
-     * @param FileDto $fileDto
-     */
     public function setFileDto(FileDto $fileDto): void
     {
         $this->fileDto = $fileDto;
@@ -244,10 +227,9 @@ class Reimport extends editor_Models_Import_SegmentProcessor
         if ($version === ZfExtended_Utils::VERSION_DEVELOPMENT) {
             return ZfExtended_Factory::get(Mid::class);
         }
-        $version = (int)str_replace('.', '', $version);
+        $version = (int) str_replace('.', '', $version);
+
         // For versions => 6.5.0 use always the new MID alignment
         return ZfExtended_Factory::get(($version >= self::ALIGNMENT_SWITCH_VERSION) ? Mid::class : Source::class);
     }
-
 }
-

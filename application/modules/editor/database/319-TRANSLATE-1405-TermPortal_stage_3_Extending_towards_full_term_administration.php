@@ -1,4 +1,5 @@
-<?php 
+<?php
+
 /*
 START LICENSE AND COPYRIGHT
 
@@ -45,7 +46,7 @@ $SCRIPT_IDENTIFIER = '319-TRANSLATE-1405-TermPortal_stage_3_Extending_towards_fu
  * define database credential variables
  */
 $argc = count($argv);
-if(empty($this) || empty($argv) || $argc < 5 || $argc > 7) {
+if (empty($this) || empty($argv) || $argc < 5 || $argc > 7) {
     die("please dont call the script direct! Call it by using DBUpdater!\n\n");
 }
 
@@ -56,15 +57,15 @@ $model = ZfExtended_Factory::get('editor_Models_TermCollection_TermCollection');
 /* @var $model editor_Models_TermCollection_TermCollection */
 $all = $model->loadAll();
 
-if(empty($all)){
+if (empty($all)) {
     return;
 }
 
-foreach ($all as $single){
+foreach ($all as $single) {
     $model->updateStats($single['id']);
 }
 
-$ids = array_column($all,'id');
+$ids = array_column($all, 'id');
 
 $term = ZfExtended_Factory::get('editor_Models_Terminology_Models_TermModel');
 /* @var $term editor_Models_Terminology_Models_TermModel */
@@ -74,4 +75,3 @@ $assoc = ZfExtended_Factory::get('editor_Models_LanguageResources_Languages');
 // remove all language resources languages, and re-calculate them
 $assoc->removeByResourceId($ids);
 $term->updateAssocLanguages($ids);
-

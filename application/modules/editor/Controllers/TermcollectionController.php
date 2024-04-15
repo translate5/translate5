@@ -3,25 +3,25 @@
 START LICENSE AND COPYRIGHT
 
  This file is part of translate5
- 
+
  Copyright (c) 2013 - 2021 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
 
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
  This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
- as published by the Free Software Foundation and appearing in the file agpl3-license.txt 
- included in the packaging of this file.  Please review the following information 
+ as published by the Free Software Foundation and appearing in the file agpl3-license.txt
+ included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
 
  There is a plugin exception available for use with this release of translate5 for
- translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or
  plugin-exception.txt in the root folder of translate5.
 
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
@@ -31,7 +31,7 @@ END LICENSE AND COPYRIGHT
  */
 class editor_TermcollectionController extends ZfExtended_RestController
 {
-    const FILE_UPLOAD_NAME = 'tbxUpload';
+    public const FILE_UPLOAD_NAME = 'tbxUpload';
 
     protected $entityClass = 'editor_Models_TermCollection_TermCollection';
 
@@ -43,7 +43,7 @@ class editor_TermcollectionController extends ZfExtended_RestController
     /**
      * @var array
      */
-    protected $uploadErrors = array();
+    protected $uploadErrors = [];
 
     /**
      * The download-actions need to be csrf unprotected!
@@ -59,16 +59,14 @@ class editor_TermcollectionController extends ZfExtended_RestController
 
         if ($this->validate()) {
             $customerIds = explode(',', $this->data->customerIds);
-            $collection = $this->entity->create($this->data->name,$customerIds);
+            $collection = $this->entity->create($this->data->name, $customerIds);
             $this->entity->setId($collection->getId());
             $this->view->rows = $this->entity->getDataObject();
         }
     }
-    
+
     /**
-     * {@inheritDoc}
      * @see ZfExtended_RestController::decodePutData()
-     * @return void
      */
     protected function decodePutData()
     {
@@ -105,12 +103,12 @@ class editor_TermcollectionController extends ZfExtended_RestController
     {
         $params = $this->getRequest()->getParams();
 
-        if (!isset($params['collectionId'])) {
+        if (! isset($params['collectionId'])) {
             throw new ZfExtended_ValidateException("The import term collection is not defined.");
         }
 
-        $filePath=$this->getUploadedTbxFilePaths();
-        if (!$this->validateUpload()) {
+        $filePath = $this->getUploadedTbxFilePaths();
+        if (! $this->validateUpload()) {
             $this->view->success = false;
         } else {
             //the return is needed for the tests
@@ -129,7 +127,7 @@ class editor_TermcollectionController extends ZfExtended_RestController
 
         // InstantTranslate supports translation of markup. This is unusable for Terms and thus we need to remove any Markup
         $numTerms = count($searchTerms);
-        for($i = 0; $i < $numTerms; $i++){
+        for ($i = 0; $i < $numTerms; $i++) {
             $searchTerms[$i]->text = strip_tags($searchTerms[$i]->text);
         }
         //get the language root and find all fuzzy languages
@@ -169,17 +167,19 @@ class editor_TermcollectionController extends ZfExtended_RestController
         $upload->addValidator('Extension', false, 'tbx');
         // Returns all known internal file information
         $files = $upload->getFileInfo();
-        $filePath=[];
+        $filePath = [];
         foreach ($files as $file => $info) {
             // file uploaded ?
-            if (!$upload->isUploaded($file)) {
-                $this->uploadErrors[]="The file is not uploaded";
+            if (! $upload->isUploaded($file)) {
+                $this->uploadErrors[] = "The file is not uploaded";
+
                 continue;
             }
 
             // validators are ok ?
-            if (!$upload->isValid($file)) {
-                $this->uploadErrors[]="The file:".$file." is with invalid file extension";
+            if (! $upload->isValid($file)) {
+                $this->uploadErrors[] = "The file:" . $file . " is with invalid file extension";
+
                 continue;
             }
 
@@ -200,7 +200,9 @@ class editor_TermcollectionController extends ZfExtended_RestController
         }
         $translate = ZfExtended_Zendoverwrites_Translate::getInstance();
         /* @var $translate ZfExtended_Zendoverwrites_Translate */
-        $errors = array(self::FILE_UPLOAD_NAME => array());
+        $errors = [
+            self::FILE_UPLOAD_NAME => [],
+        ];
 
         foreach ($this->uploadErrors as $error) {
             $errors[self::FILE_UPLOAD_NAME][] = $translate->_($error);
@@ -213,4 +215,3 @@ class editor_TermcollectionController extends ZfExtended_RestController
         return false;
     }
 }
-

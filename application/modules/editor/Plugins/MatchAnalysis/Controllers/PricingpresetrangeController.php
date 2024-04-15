@@ -1,9 +1,9 @@
 <?php
 /*
  START LICENSE AND COPYRIGHT
- 
+
  This file is part of translate5
- 
+
  Copyright (c) 2013 - 2022 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
 
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
@@ -21,8 +21,8 @@
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
- 		     http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
- 
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+
  END LICENSE AND COPYRIGHT
  */
 
@@ -30,11 +30,9 @@ use MittagQI\Translate5\Plugins\MatchAnalysis\Models\Pricing\Preset;
 use MittagQI\Translate5\Plugins\MatchAnalysis\Models\Pricing\PresetRange;
 use MittagQI\ZfExtended\MismatchException;
 use ZfExtended_Factory as Factory;
-/**
- *
- */
-class editor_Plugins_MatchAnalysis_PricingpresetrangeController extends ZfExtended_RestController {
 
+class editor_Plugins_MatchAnalysis_PricingpresetrangeController extends ZfExtended_RestController
+{
     /**
      * Use trait
      */
@@ -61,8 +59,8 @@ class editor_Plugins_MatchAnalysis_PricingpresetrangeController extends ZfExtend
      * @throws Zend_Db_Statement_Exception
      * @throws MismatchException
      */
-    public function init() {
-
+    public function init()
+    {
         // Call parent
         parent::init();
 
@@ -77,28 +75,27 @@ class editor_Plugins_MatchAnalysis_PricingpresetrangeController extends ZfExtend
      * @throws ZfExtended_Models_Entity_Exceptions_IntegrityConstraint
      * @throws ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey
      */
-    public function postAction() {
-
+    public function postAction()
+    {
         // Check params
         try {
-
             // Check both params are pointing each to existing record
             $_ = $this->jcheck([
                 'presetId' => [
                     'req' => true,
                     'rex' => 'int11',
-                    'key' => Preset::class
+                    'key' => Preset::class,
                 ],
                 'from,till' => [
                     'req' => true,
-                    'rex' => 'int11'
+                    'rex' => 'int11',
                 ],
                 'from' => [
-                    'max' => $this->getParam('till')
+                    'max' => $this->getParam('till'),
                 ],
                 'till' => [
-                    'min' => $this->getParam('from')
-                ]
+                    'min' => $this->getParam('from'),
+                ],
             ]);
 
             // If this preset is system default
@@ -106,15 +103,13 @@ class editor_Plugins_MatchAnalysis_PricingpresetrangeController extends ZfExtend
                 throw new editor_Plugins_MatchAnalysis_Exception('E1513');
             }
 
-        // Catch mismatch-exception
+            // Catch mismatch-exception
         } catch (MismatchException $e) {
-
             // Flush msg
             $this->jflush(false, $e->getMessage());
 
-        // Catch matchanalysis-exception
+            // Catch matchanalysis-exception
         } catch (editor_Plugins_MatchAnalysis_Exception $e) {
-
             // Log
             Zend_Registry::get('logger')
                 ->cloneMe('plugin.matchanalysis')
@@ -140,7 +135,9 @@ class editor_Plugins_MatchAnalysis_PricingpresetrangeController extends ZfExtend
         $this->entity->save();
 
         // Flush success
-        $this->jflush(true, ['created' => $this->entity->getId()]);
+        $this->jflush(true, [
+            'created' => $this->entity->getId(),
+        ]);
     }
 
     /**
@@ -153,23 +150,22 @@ class editor_Plugins_MatchAnalysis_PricingpresetrangeController extends ZfExtend
      * @throws ZfExtended_Models_Entity_NotFoundException
      * @throws Zend_Exception
      */
-    public function deleteAction() {
-
+    public function deleteAction()
+    {
         try {
-
             // Check preset exists, and if yes - load into $this->entity
             $_ = $this->jcheck([
                 'rangeIds' => [
                     'req' => true,
                     'rex' => 'int11list',
-                    'key' => "match_analysis_pricing_preset_range+"
-                ]
+                    'key' => "match_analysis_pricing_preset_range+",
+                ],
             ]);
 
             // Get id of system default preset
             $defaultId = Factory
                 ::get(Preset::class)
-                ->importDefaultWhenNeeded();
+                    ->importDefaultWhenNeeded();
 
             // If at least one range among those we're going to delete - belongs to system default preset - flush failure
             foreach ($_['rangeIds'] as $range) {
@@ -179,19 +175,17 @@ class editor_Plugins_MatchAnalysis_PricingpresetrangeController extends ZfExtend
             }
 
             // Prevent deletion of ranges related to more than one preset
-            if (count(array_column($_['rangeIds'], 'presetId','presetId')) > 1) {
+            if (count(array_column($_['rangeIds'], 'presetId', 'presetId')) > 1) {
                 throw new editor_Plugins_MatchAnalysis_Exception('E1514');
             }
 
-        // Catch mismatch-exception
+            // Catch mismatch-exception
         } catch (MismatchException $e) {
-
             // Flush msg
             $this->jflush(false, $e->getMessage());
 
-        // Catch matchanalysis-exception
+            // Catch matchanalysis-exception
         } catch (editor_Plugins_MatchAnalysis_Exception $e) {
-
             // Log
             Zend_Registry::get('logger')
                 ->cloneMe('plugin.matchanalysis')
@@ -208,7 +202,9 @@ class editor_Plugins_MatchAnalysis_PricingpresetrangeController extends ZfExtend
         }
 
         // Flush success
-        $this->jflush(true, ['deleted' => array_column($_['rangeIds'], 'id')]);
+        $this->jflush(true, [
+            'deleted' => array_column($_['rangeIds'], 'id'),
+        ]);
     }
 
     /**
@@ -216,18 +212,17 @@ class editor_Plugins_MatchAnalysis_PricingpresetrangeController extends ZfExtend
      * @throws ZfExtended_Models_Entity_Exceptions_IntegrityConstraint
      * @throws ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey
      */
-    public function putAction() {
-
+    public function putAction()
+    {
         // Check params
         try {
-
             // Check range exists, and if yes - load into $this->entity
             $this->jcheck([
                 'rangeId' => [
                     'req' => true,
                     'rex' => 'int11',
-                    'key' => $this->entity
-                ]
+                    'key' => $this->entity,
+                ],
             ]);
 
             // Get id of system default preset
@@ -241,28 +236,27 @@ class editor_Plugins_MatchAnalysis_PricingpresetrangeController extends ZfExtend
             // Limit
             $limit = [
                 'max' => 104,
-                'min' => 0
+                'min' => 0,
             ];
 
             // Check range exists, and if yes - load into $this->entity
             $this->jcheck([
                 'from,till' => [
                     'req' => true,
-                    'rex' => 'int11'
+                    'rex' => 'int11',
                 ],
                 'from' => [
                     'max' => min($this->getParam('till'), $limit['max']),
-                    'min' => ($this->entity->getPrevTill() ?: -1) + 1
+                    'min' => ($this->entity->getPrevTill() ?: -1) + 1,
                 ],
                 'till' => [
                     'min' => max($this->getParam('from'), $limit['min']),
-                    'max' => ($this->entity->getNextFrom() ?: $limit['max'] + 1) - 1
-                ]
+                    'max' => ($this->entity->getNextFrom() ?: $limit['max'] + 1) - 1,
+                ],
             ]);
 
-        // Catch mismatch-exception
+            // Catch mismatch-exception
         } catch (MismatchException $e) {
-
             // Flush msg
             $this->jflush(false, $e->getMessage());
         }
@@ -273,6 +267,8 @@ class editor_Plugins_MatchAnalysis_PricingpresetrangeController extends ZfExtend
         $this->entity->save();
 
         // Flush success
-        $this->jflush(true, ['updated' => $this->entity->toArray()]);
+        $this->jflush(true, [
+            'updated' => $this->entity->toArray(),
+        ]);
     }
 }

@@ -21,7 +21,7 @@
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
- 		     http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
  END LICENSE AND COPYRIGHT
  */
@@ -46,53 +46,73 @@
  *
  * see also editor_Plugins_Okapi_Bconf_Filter_Fprm for more documentation
  */
-class editor_Plugins_Okapi_Bconf_Filters {
-
+class editor_Plugins_Okapi_Bconf_Filters
+{
     /**
      * General seperator in the OKAPI filter naming scheme
      * @var string
      */
-    const IDENTIFIER_SEPERATOR = '@';
+    public const IDENTIFIER_SEPERATOR = '@';
 
     /**
      * All Filters that have a GUI must be defined here
      * Each filter must define extensions that can be tested alongside the filter. These files must exist in /application/modules/editor/Plugins/Okapi/data/$self::TESTFILE_FOLDER just as described with TESTABLE_EXTENSIONS
      * @var string[]
      */
-    const GUIS = [
-        'okf_html' => ['class' => 'Yaml', 'extensions' => ['html']],
-        'okf_icml' => ['class' => 'Icml', 'extensions' => []], // TODO BCONF: a testfile would be great
-        'okf_idml' => ['class' => 'Idml', 'extensions' => ['idml']],
-        'okf_itshtml5' => ['class' => 'Xml', 'extensions' => ['html']],
-        'okf_openxml' => ['class' => 'Openxml', 'extensions' => ['docx', 'pptx', 'xlsx']],
-        'okf_ttx' => ['class' => 'Ttx', 'extensions' => []],
-        'okf_xml' => ['class' => 'Xml', 'extensions' => ['xml']],
-        'okf_xmlstream' => ['class' => 'Yaml', 'extensions' => ['xml']]
+    public const GUIS = [
+        'okf_html' => [
+            'class' => 'Yaml',
+            'extensions' => ['html'],
+        ],
+        'okf_icml' => [
+            'class' => 'Icml',
+            'extensions' => [],
+        ], // TODO BCONF: a testfile would be great
+        'okf_idml' => [
+            'class' => 'Idml',
+            'extensions' => ['idml'],
+        ],
+        'okf_itshtml5' => [
+            'class' => 'Xml',
+            'extensions' => ['html'],
+        ],
+        'okf_openxml' => [
+            'class' => 'Openxml',
+            'extensions' => ['docx', 'pptx', 'xlsx'],
+        ],
+        'okf_ttx' => [
+            'class' => 'Ttx',
+            'extensions' => [],
+        ],
+        'okf_xml' => [
+            'class' => 'Xml',
+            'extensions' => ['xml'],
+        ],
+        'okf_xmlstream' => [
+            'class' => 'Yaml',
+            'extensions' => ['xml'],
+        ],
     ];
+
     /**
      * A list of file-extensions, that validation files exist for.
      * These files reside in /application/modules/editor/Plugins/Okapi/data/$self::TESTFILE_FOLDER and are all called "test.$EXTENSION"
      * For each extension here a file must exist, the language is expected to be be english / en
      */
-    const TESTABLE_EXTENSIONS = ['txt', 'xml', 'strings', 'csv', 'htm', 'html', 'sdlxliff', 'docx', 'odp', 'ods', 'odt', 'pptx', 'tbx', 'xlsx', 'idml'];
+    public const TESTABLE_EXTENSIONS = ['txt', 'xml', 'strings', 'csv', 'htm', 'html', 'sdlxliff', 'docx', 'odp', 'ods', 'odt', 'pptx', 'tbx', 'xlsx', 'idml'];
 
     /**
-     *
      * @var string
      */
-    const TESTFILE_FOLDER = 'testfiles';
+    public const TESTFILE_FOLDER = 'testfiles';
 
-    /**
-     * @var editor_Plugins_Okapi_Bconf_Filters|null
-     */
-    private static ?editor_Plugins_Okapi_Bconf_Filters $_instance = NULL;
+    private static ?editor_Plugins_Okapi_Bconf_Filters $_instance = null;
 
     /**
      * Evaluates if a filter has aExtJS GUI to be edited with
-     * @param string $filterType
-     * @return bool
      */
-    public static function hasGui(string $filterType) : bool {
+    public static function hasGui(string $filterType): bool
+    {
         return array_key_exists($filterType, self::GUIS);
     }
 
@@ -100,257 +120,238 @@ class editor_Plugins_Okapi_Bconf_Filters {
      * Small helper to create the filter-gui classname out of the filter type
      * Optionally defines the full ExtJS path
      * Returns an empty string when no Gui defined
-     * @param string $filterType
-     * @return string
      */
-    public static function getGuiClass(string $filterType, bool $fullPath=true) : string {
-        if(!self::hasGui($filterType)){
+    public static function getGuiClass(string $filterType, bool $fullPath = true): string
+    {
+        if (! self::hasGui($filterType)) {
             return '';
         }
         $className = self::GUIS[$filterType]['class'];
-        if($fullPath){
-            return 'Editor.plugins.Okapi.view.fprm.'.$className;
+        if ($fullPath) {
+            return 'Editor.plugins.Okapi.view.fprm.' . $className;
         }
+
         return $className;
     }
 
     /**
      * Evaluates, if the identifier represents an okapi default identifier (an identier that does not point to a fprm embedded in the bconf)
-     * @param string $identifier
-     * @return bool
      */
-    public static function isOkapiDefaultIdentifier(string $identifier) : bool {
-        return !str_contains($identifier, self::IDENTIFIER_SEPERATOR);
+    public static function isOkapiDefaultIdentifier(string $identifier): bool
+    {
+        return ! str_contains($identifier, self::IDENTIFIER_SEPERATOR);
     }
 
     /**
      * Retrieves the non-embedded counterpart for an embedded okapi-default identifier, eg. "okf_plaintext_regex_paragraphs" for "okf_plaintext@okf_plaintext_regex_paragraphs"
-     * @param string $identifier
-     * @return string|null
      * @throws ZfExtended_Exception
      */
-    public static function createOkapiDefaultIdentifier(string $identifier) : ?string {
-        if(!self::isOkapiDefaultIdentifier($identifier)){
+    public static function createOkapiDefaultIdentifier(string $identifier): ?string
+    {
+        if (! self::isOkapiDefaultIdentifier($identifier)) {
             $idata = self::parseIdentifier($identifier);
-            if(self::instance()->isEmbeddedOkapiDefaultFilter($idata->type, $idata->id)){
+            if (self::instance()->isEmbeddedOkapiDefaultFilter($idata->type, $idata->id)) {
                 return $idata->id;
             }
         }
-        return NULL;
+
+        return null;
     }
+
     /**
      * Parses an identifier that is part of the bconf file
-     * @param string $identifier
-     * @return stdClass
      * @throws ZfExtended_Exception
      */
-    public static function parseIdentifier(string $identifier) : stdClass {
+    public static function parseIdentifier(string $identifier): stdClass
+    {
         $parts = explode('@', $identifier);
-        if(count($parts) !== 2 || substr($parts[0], 0, 4) !== 'okf_') {
-            throw new ZfExtended_Exception('OKAPI FPRM identifier '.$identifier.' is not valid');
+        if (count($parts) !== 2 || substr($parts[0], 0, 4) !== 'okf_') {
+            throw new ZfExtended_Exception('OKAPI FPRM identifier ' . $identifier . ' is not valid');
         }
         $result = new stdClass();
         $result->type = $parts[0];
         $result->id = $parts[1];
+
         return $result;
     }
 
     /**
      * Creates an identifier out of okapiType and okapiId
-     * @param string $okapiType
-     * @param string $okapiId
-     * @return string
      */
-    public static function createIdentifier(string $okapiType, string $okapiId) : string {
-        return $okapiType.self::IDENTIFIER_SEPERATOR.$okapiId;
+    public static function createIdentifier(string $okapiType, string $okapiId): string
+    {
+        return $okapiType . self::IDENTIFIER_SEPERATOR . $okapiId;
     }
 
     /**
      * Creates an identifier out of a path to a fprm file
-     * @param string $fprmPath
-     * @return string
      */
-    public static function createIdentifierFromPath(string $fprmPath) : string {
+    public static function createIdentifierFromPath(string $fprmPath): string
+    {
         return pathinfo($fprmPath, PATHINFO_FILENAME);
     }
 
     /**
      * Creates the path of a testfile in the testfile-folder
-     * @param string $testFile
-     * @return string
      * @throws editor_Models_ConfigException
      * @throws editor_Plugins_Okapi_Exception
      */
-    public static function createTestfilePath(string $testFile) : string {
-        return editor_Plugins_Okapi_Init::getDataDir().self::TESTFILE_FOLDER.'/'.$testFile;
+    public static function createTestfilePath(string $testFile): string
+    {
+        return editor_Plugins_Okapi_Init::getDataDir() . self::TESTFILE_FOLDER . '/' . $testFile;
     }
 
-    /**
-     * @return editor_Plugins_Okapi_Bconf_Filters
-     */
-    public static function instance() : editor_Plugins_Okapi_Bconf_Filters {
-        if(self::$_instance == NULL){
+    public static function instance(): editor_Plugins_Okapi_Bconf_Filters
+    {
+        if (self::$_instance == null) {
             self::$_instance = new editor_Plugins_Okapi_Bconf_Filters();
         }
+
         return self::$_instance;
     }
 
-    /**
-     * @var editor_Plugins_Okapi_Bconf_Filter_Okapi
-     */
     private editor_Plugins_Okapi_Bconf_Filter_Okapi $okapiFilters;
 
-    /**
-     * @var editor_Plugins_Okapi_Bconf_Filter_Translate5
-     */
     private editor_Plugins_Okapi_Bconf_Filter_Translate5 $translate5Filters;
 
-    protected function __construct(){
+    protected function __construct()
+    {
         $this->okapiFilters = editor_Plugins_Okapi_Bconf_Filter_Okapi::instance();
         $this->translate5Filters = editor_Plugins_Okapi_Bconf_Filter_Translate5::instance();
     }
 
-    /**
-     * @param string $type
-     * @param string $id
-     * @return bool
-     */
-    public function isValidOkapiDefaultFilter(string $identifier) : bool {
-        if(str_contains($identifier, self::IDENTIFIER_SEPERATOR)){
+    public function isValidOkapiDefaultFilter(string $identifier): bool
+    {
+        if (str_contains($identifier, self::IDENTIFIER_SEPERATOR)) {
             return false;
         }
-        return (count($this->okapiFilters->findFilter(NULL, $identifier)) === 1);
+
+        return (count($this->okapiFilters->findFilter(null, $identifier)) === 1);
     }
 
     /**
      * Retrieves, if a filter identifier represents a customized filter
-     * @param string $identifier
-     * @return bool
      * @throws ZfExtended_Exception
      */
-    public function isCustomFilter(string $identifier) : bool {
-        if(self::isOkapiDefaultIdentifier($identifier)){
+    public function isCustomFilter(string $identifier): bool
+    {
+        if (self::isOkapiDefaultIdentifier($identifier)) {
             return false;
         }
         $idata = self::parseIdentifier($identifier);
-        return !$this->isEmbeddedDefaultFilter($idata->type, $idata->id);
+
+        return ! $this->isEmbeddedDefaultFilter($idata->type, $idata->id);
     }
 
     /**
      * Checks, whether the $identifier is a default identifier, either OKAPI default, OKAPI embedded default or translate5 adjusted default
-     * @param string $type
-     * @param string $id
-     * @return bool
      * @throws ZfExtended_Exception
      */
-    public function isEmbeddedDefaultFilter(string $type, string $id) : bool {
-        if(editor_Plugins_Okapi_Bconf_Filter_Translate5::isTranslate5Id($id)){
+    public function isEmbeddedDefaultFilter(string $type, string $id): bool
+    {
+        if (editor_Plugins_Okapi_Bconf_Filter_Translate5::isTranslate5Id($id)) {
             return $this->isEmbeddedTranslate5Filter($type, $id);
         } else {
             return $this->isEmbeddedOkapiDefaultFilter($type, $id);
         }
     }
 
-    /**
-     * @param string $type
-     * @param string $id
-     * @return bool
-     */
-    public function isEmbeddedOkapiDefaultFilter(string $type, string $id) : bool {
+    public function isEmbeddedOkapiDefaultFilter(string $type, string $id): bool
+    {
         $filters = $this->okapiFilters->findFilter($type, $id);
-        return(count($filters) > 0);
+
+        return (count($filters) > 0);
     }
 
-    /**
-     * @param string $type
-     * @param string $id
-     * @return bool
-     */
-    public function isEmbeddedTranslate5Filter(string $type, string $id) : bool {
+    public function isEmbeddedTranslate5Filter(string $type, string $id): bool
+    {
         $filters = $this->translate5Filters->findFilter($type, $id);
-        return(count($filters) > 0);
+
+        return (count($filters) > 0);
     }
 
     /**
      * Finds the fprm path for an OKAPI default filter
      * Note that this might actually return a tranlate5 adjusted filter in case it is a replacing filter
      * This API will return NULL for a filter that could not be found and false for filters that do not support a settings file
-     * @param $filterId
      * @return string|null|bool
      * @throws ZfExtended_Exception
      */
-    public function getOkapiDefaultFilterPathById($filterId) {
+    public function getOkapiDefaultFilterPathById($filterId)
+    {
         // first, search if there is a replacing filter
         $filters = $this->translate5Filters->findOkapiDefaultReplacingFilter($filterId);
-        if(count($filters) > 1){
-            throw new ZfExtended_Exception('translate5 replacing filter id '.$filterId.' is ambigous!');
-        } else if(count($filters) === 1){
+        if (count($filters) > 1) {
+            throw new ZfExtended_Exception('translate5 replacing filter id ' . $filterId . ' is ambigous!');
+        } elseif (count($filters) === 1) {
             return $this->translate5Filters->createFprmPath($filters[0]);
         }
         // search the OKAPI filters
-        $filters = $this->okapiFilters->findFilter(NULL, $filterId);
-        if(count($filters) > 1){
-            throw new ZfExtended_Exception('OKAPI filter id '.$filterId.' is ambigous!');
-        } else if(count($filters) === 1){
+        $filters = $this->okapiFilters->findFilter(null, $filterId);
+        if (count($filters) > 1) {
+            throw new ZfExtended_Exception('OKAPI filter id ' . $filterId . ' is ambigous!');
+        } elseif (count($filters) === 1) {
             // we may have filters without settings !
-            if(!$filters[0]->settings){
+            if (! $filters[0]->settings) {
                 return false;
             }
+
             return $this->okapiFilters->createFprmPath($filters[0]);
         }
-        return NULL;
+
+        return null;
     }
 
     /**
-     * @param string $type
-     * @param string $id
-     * @return string|null
      * @throws ZfExtended_Exception
      */
-    public function getTranslate5FilterPath(string $type, string $id) : ?string {
+    public function getTranslate5FilterPath(string $type, string $id): ?string
+    {
         $filters = $this->translate5Filters->findFilter($type, $id);
-        if(count($filters) > 1){
-            throw new ZfExtended_Exception('Translate5 filter identifier '.$type.self::IDENTIFIER_SEPERATOR.$id.' is ambigous!');
-        } else if(count($filters) === 1){
+        if (count($filters) > 1) {
+            throw new ZfExtended_Exception('Translate5 filter identifier ' . $type . self::IDENTIFIER_SEPERATOR . $id . ' is ambigous!');
+        } elseif (count($filters) === 1) {
             return $this->translate5Filters->createFprmPath($filters[0]);
         }
-        return NULL;
+
+        return null;
     }
 
     /**
      * Retrieves the filter-type for an (non-embedded) okapi default filter
-     * @param string $id
-     * @return string|null
      */
-    public function getOkapiDefaultFilterTypeById(string $id) : ?string {
-        $filters = $this->okapiFilters->findFilter(NULL, $id);
-        if(count($filters) === 1){
+    public function getOkapiDefaultFilterTypeById(string $id): ?string
+    {
+        $filters = $this->okapiFilters->findFilter(null, $id);
+        if (count($filters) === 1) {
             return $filters[0]->type;
         }
-        return NULL;
+
+        return null;
     }
 
     /**
      * Checks the existence of all the testfiles linked in our constants
-     * @return bool
      */
-    public function validate() : bool {
+    public function validate(): bool
+    {
         $valid = true;
         $extensions = self::TESTABLE_EXTENSIONS;
-        foreach(self::GUIS as $type => $data){
-            foreach($data['extensions'] as $guiExtension){
-                if(!in_array($guiExtension, $extensions)){
+        foreach (self::GUIS as $type => $data) {
+            foreach ($data['extensions'] as $guiExtension) {
+                if (! in_array($guiExtension, $extensions)) {
                     $extensions[] = $guiExtension;
                 }
             }
         }
-        $folder = editor_Plugins_Okapi_Init::getDataDir().self::TESTFILE_FOLDER;
-        foreach($extensions as $extension){
-            if(!file_exists($folder.'/test.'.$extension)){
-                error_log('Okapi Filter Testfile '.get_class($this).': Missing filter testfile test.'.$extension.' in '.$folder);
+        $folder = editor_Plugins_Okapi_Init::getDataDir() . self::TESTFILE_FOLDER;
+        foreach ($extensions as $extension) {
+            if (! file_exists($folder . '/test.' . $extension)) {
+                error_log('Okapi Filter Testfile ' . get_class($this) . ': Missing filter testfile test.' . $extension . ' in ' . $folder);
                 $valid = false;
             }
         }
+
         return $valid;
     }
 }

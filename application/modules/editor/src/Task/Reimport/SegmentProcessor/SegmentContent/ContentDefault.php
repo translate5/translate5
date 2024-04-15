@@ -21,7 +21,7 @@
   @copyright  Marc Mittag, MittagQI - Quality Informatics
   @author     MittagQI - Quality Informatics
   @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
- 			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
  END LICENSE AND COPYRIGHT
  */
@@ -30,15 +30,9 @@ namespace MittagQI\Translate5\Task\Reimport\SegmentProcessor\SegmentContent;
 
 use editor_Models_Segment;
 use editor_Models_Segment_AutoStates;
-use editor_Models_Segment_InternalTag;
-use ZfExtended_Factory;
 
-/**
- *
- */
 class ContentDefault extends ContentBase
 {
-
     /***
      * Internal flag which is calculated and set if the segment should be saved/updated
      * @var bool
@@ -48,9 +42,6 @@ class ContentDefault extends ContentBase
     /**
      * Save the collected content to the given segment. The segment will be updated/saved only if the new content
      * is different from the current segment content.
-     *
-     * @param editor_Models_Segment $segment
-     * @return void
      */
     public function saveSegment(editor_Models_Segment $segment, string $segmentSaveTimestamp): void
     {
@@ -67,18 +58,18 @@ class ContentDefault extends ContentBase
 
         //basically a source must exist, if not (in some specific XLF dialects) its null and must be ignored
         $newSource = $this->getDataSource();
-        if (!is_null($newSource) &&
-            !$this->isContentEqual($this->segment->getFieldOriginal($this->sfm->getFirstSourceName()), $newSource)) {
-
+        if (! is_null($newSource) &&
+            ! $this->isContentEqual($this->segment->getFieldOriginal($this->sfm->getFirstSourceName()), $newSource)) {
             $this->updateSource($this->getDataSource());
             $this->updateSegment = true;
         }
 
-        if (!$this->isContentEqual(
+        if (! $this->isContentEqual(
             $this->segment->getFieldEdited(
-                $this->sfm->getFirstTargetName()),
-            $this->getDataTarget())) {
-
+                $this->sfm->getFirstTargetName()
+            ),
+            $this->getDataTarget()
+        )) {
             $this->updateTarget($this->getDataTarget());
             $this->updateSegment = true;
         }
@@ -104,8 +95,6 @@ class ContentDefault extends ContentBase
     /**
      * Updates the segment target with the given content. In case of incorrect tag count, this will stil update
      * the segment(the autoqa tag check should find this problem)
-     * @param string $target
-     * @return void
      */
     protected function updateTarget(string $target): void
     {
@@ -116,18 +105,15 @@ class ContentDefault extends ContentBase
                     $fieldOriginal,
                     $target,
                     date(NOW_ISO),
-                    $this->user->getUserName());
+                    $this->user->getUserName()
+                );
             }
             $this->update($target, $this->sfm->getFirstTargetName(), $this->sfm->getFirstTargetNameEdit());
-        },true,true);
+        }, true, true);
     }
 
-    /**
-     * @return bool
-     */
     public function isUpdateSegment(): bool
     {
         return $this->updateSegment;
     }
-
 }

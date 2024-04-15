@@ -3,25 +3,25 @@
 START LICENSE AND COPYRIGHT
 
  This file is part of translate5
- 
+
  Copyright (c) 2013 - 2021 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
 
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
  This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
- as published by the Free Software Foundation and appearing in the file agpl3-license.txt 
- included in the packaging of this file.  Please review the following information 
+ as published by the Free Software Foundation and appearing in the file agpl3-license.txt
+ included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
-  
+
  There is a plugin exception available for use with this release of translate5 for
- translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or
  plugin-exception.txt in the root folder of translate5.
-  
+
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
@@ -29,13 +29,14 @@ END LICENSE AND COPYRIGHT
 /***
  *
  */
-class editor_Models_Import_DataProvider_Project  extends editor_Models_Import_DataProvider_Abstract {
-
+class editor_Models_Import_DataProvider_Project extends editor_Models_Import_DataProvider_Abstract
+{
     /***
      * The uploaded files
      * @var array
      */
     protected array $files = [];
+
     /***
      * Languages of the uploaded files.
      * @var array
@@ -48,7 +49,8 @@ class editor_Models_Import_DataProvider_Project  extends editor_Models_Import_Da
      */
     protected array $fileTypes = [];
 
-    public function __construct(array $files, array $langauges, array $types){
+    public function __construct(array $files, array $langauges, array $types)
+    {
         $this->files = $files;
         $this->fileLanguages = $langauges;
         $this->fileTypes = $types;
@@ -60,14 +62,15 @@ class editor_Models_Import_DataProvider_Project  extends editor_Models_Import_Da
      * @throws editor_Models_Import_DataProvider_Exception|ZfExtended_ErrorCodeException
      * @see editor_Models_Import_DataProvider_Abstract::checkAndPrepare()
      */
-    public function checkAndPrepare(editor_Models_Task $task) {
+    public function checkAndPrepare(editor_Models_Task $task)
+    {
         $this->setTask($task);
         $this->checkAndMakeTempImportFolder();
         // if the current task is project, no need to move files
-        if(!$task->isProject()){
+        if (! $task->isProject()) {
             $this->handleUploads();
         }
-        if(!is_dir($this->importFolder)){
+        if (! is_dir($this->importFolder)) {
             //DataProvider Directory: The importRootFolder "{importRoot}" does not exist!
             throw new editor_Models_Import_DataProvider_Exception('E1248', [
                 'task' => $this->task,
@@ -80,8 +83,8 @@ class editor_Models_Import_DataProvider_Project  extends editor_Models_Import_Da
      * @throws ZfExtended_ErrorCodeException
      * @throws editor_Models_Import_DataProvider_Exception
      */
-    public function handleUploads() {
-
+    public function handleUploads()
+    {
         $this->createTaskTempDir();
 
         $importFilesValues = array_values($this->files['importUpload']);
@@ -90,10 +93,9 @@ class editor_Models_Import_DataProvider_Project  extends editor_Models_Import_Da
         $matchingFiles = [];
         $matchingFilesTypes = [];
 
-
         // find all matching non pivot files
-        for($i=0, $iMax = count($this->fileLanguages); $i< $iMax; $i++){
-            if($this->isWorkfileFileMatch($i)){
+        for ($i = 0, $iMax = count($this->fileLanguages); $i < $iMax; $i++) {
+            if ($this->isWorkfileFileMatch($i)) {
                 $matchingFiles[$importFilesKeys[$i]] = $importFilesValues[$i];
                 // collect the matching type for the file
                 $matchingFilesTypes[$importFilesKeys[$i]] = $this->fileTypes[$i];
@@ -101,7 +103,7 @@ class editor_Models_Import_DataProvider_Project  extends editor_Models_Import_Da
         }
 
         // if not work-files are found, trigger exception
-        if(empty($matchingFiles)){
+        if (empty($matchingFiles)) {
             throw new editor_Models_Import_DataProvider_Exception('E1369', [
                 'task' => $this->task,
                 'files' => $this->files,
@@ -112,30 +114,29 @@ class editor_Models_Import_DataProvider_Project  extends editor_Models_Import_Da
 
         $pivotFiles = [];
         // check for pivot and reference files
-        for($i=0, $iMax = count($importFilesValues); $i< $iMax; $i++){
-            if($this->isPivotFileMatch($i)){
-                foreach($matchingFiles as $fileName) {
-                    if($this->filesMatch($fileName,$importFilesValues[$i])){
+        for ($i = 0, $iMax = count($importFilesValues); $i < $iMax; $i++) {
+            if ($this->isPivotFileMatch($i)) {
+                foreach ($matchingFiles as $fileName) {
+                    if ($this->filesMatch($fileName, $importFilesValues[$i])) {
                         // check if the pivot file name matches one of the matching work-file name
                         $pivotFiles[$importFilesKeys[$i]] = $importFilesValues[$i];
                         // collect the matching type for the file
                         $matchingFilesTypes[$importFilesKeys[$i]] = $this->fileTypes[$i];
                     }
                 }
-            }elseif ($this->isReferenceMatch($i)){ // is reference file at index $i
+            } elseif ($this->isReferenceMatch($i)) { // is reference file at index $i
                 $matchingFiles[$importFilesKeys[$i]] = $importFilesValues[$i];
                 // collect the matching type for the file
                 $matchingFilesTypes[$importFilesKeys[$i]] = $this->fileTypes[$i];
             }
         }
 
-
         // merge the other files with the pivot files
-        $matchingFiles = array_merge($matchingFiles,$pivotFiles);
+        $matchingFiles = array_merge($matchingFiles, $pivotFiles);
 
-        foreach($matchingFiles as $tmpFile => $fileName) {
-            $name = $this->getFilepathByName($fileName,$matchingFilesTypes[$tmpFile]);
-            if(!copy($tmpFile, $name)) {
+        foreach ($matchingFiles as $tmpFile => $fileName) {
+            $name = $this->getFilepathByName($fileName, $matchingFilesTypes[$tmpFile]);
+            if (! copy($tmpFile, $name)) {
                 //DataProvider SingleUpload: Uploaded file "{file}" cannot be moved to "{target}',
                 throw new editor_Models_Import_DataProvider_Exception('E1244', [
                     'task' => $this->task,
@@ -163,7 +164,8 @@ class editor_Models_Import_DataProvider_Project  extends editor_Models_Import_Da
      * @return void
      * @throws editor_Models_Import_DataProvider_Exception
      */
-    protected function createTaskTempDir(){
+    protected function createTaskTempDir()
+    {
         $this->mkdir($this->getTaskTempDir());
     }
 
@@ -173,7 +175,7 @@ class editor_Models_Import_DataProvider_Project  extends editor_Models_Import_Da
      */
     protected function getTaskTempDir(): string
     {
-        return $this->importFolder.DIRECTORY_SEPARATOR;
+        return $this->importFolder . DIRECTORY_SEPARATOR;
     }
 
     /***
@@ -201,13 +203,14 @@ class editor_Models_Import_DataProvider_Project  extends editor_Models_Import_Da
      * @return string
      * @throws editor_Models_Import_DataProvider_Exception
      */
-    protected function getFilepathByName(string $fileName,string $fileType): string
+    protected function getFilepathByName(string $fileName, string $fileType): string
     {
-        $target = $this->getTaskTempDir().$this->getTargetDir($fileType).DIRECTORY_SEPARATOR;
+        $target = $this->getTaskTempDir() . $this->getTargetDir($fileType) . DIRECTORY_SEPARATOR;
         $this->mkdir($target);
 
-        $name = ZfExtended_Utils::addNumberIfExist($fileName,$target);
-        return $target.$name;
+        $name = ZfExtended_Utils::addNumberIfExist($fileName, $target);
+
+        return $target . $name;
     }
 
     /***
@@ -250,7 +253,7 @@ class editor_Models_Import_DataProvider_Project  extends editor_Models_Import_Da
     {
         return (
             $this->isWorkFile($arrayIndex) && $this->fileLanguages[$arrayIndex] === $this->task->getTargetLang()
-            )
+        )
             ||
             empty($this->fileLanguages[$arrayIndex]);
     }
@@ -270,7 +273,8 @@ class editor_Models_Import_DataProvider_Project  extends editor_Models_Import_Da
      * @param int $arrayIndex
      * @return bool
      */
-    protected function isReferenceMatch(int $arrayIndex): bool{
+    protected function isReferenceMatch(int $arrayIndex): bool
+    {
         return $this->isReferenceFile($arrayIndex);
     }
 
@@ -284,26 +288,27 @@ class editor_Models_Import_DataProvider_Project  extends editor_Models_Import_Da
      */
     protected function filesMatch(string $workFile, string $pivotFile): bool
     {
-        if(editor_Utils::compareImportStyleFileName($workFile,$pivotFile)){
+        if (editor_Utils::compareImportStyleFileName($workFile, $pivotFile)) {
             return true;
         }
-        $ext = pathinfo($workFile,PATHINFO_EXTENSION);
+        $ext = pathinfo($workFile, PATHINFO_EXTENSION);
         // if the workFile has native parser and the files are not matched by name then those files have different name
-        if($this->task->getFileTypeSupport()->hasParser($ext)){
+        if ($this->task->getFileTypeSupport()->hasParser($ext)) {
             return false;
         }
         // if the extension is supported, this file will be processed by okapi
         $supported = in_array($ext, $this->task->getFileTypeSupport()->getSupportedExtensions());
-        return $supported && ($workFile.'.xlf' === $pivotFile);
-    }
 
+        return $supported && ($workFile . '.xlf' === $pivotFile);
+    }
 
     /**
      * Validate the uploaded files
      * @throws editor_Models_Import_DataProvider_Exception
      */
-    protected function validate(){
-        if(count($this->fileTypes) != count($this->files['importUpload']) && count($this->fileTypes) > ini_get('max_file_uploads')) {
+    protected function validate()
+    {
+        if (count($this->fileTypes) != count($this->files['importUpload']) && count($this->fileTypes) > ini_get('max_file_uploads')) {
             throw new editor_Models_Import_DataProvider_Exception('E1384');
         }
     }

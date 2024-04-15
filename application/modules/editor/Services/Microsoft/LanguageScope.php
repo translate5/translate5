@@ -21,7 +21,7 @@ START LICENSE AND COPYRIGHT
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
@@ -31,8 +31,8 @@ END LICENSE AND COPYRIGHT
  */
 abstract class editor_Services_Microsoft_LanguageScope
 {
-    const TRANSLATION = 'translation';
+    public const TRANSLATION = 'translation';
 
     //const TRANSLITERATION = 'transliteration';
-    const DICTIONARY = 'dictionary';
+    public const DICTIONARY = 'dictionary';
 }

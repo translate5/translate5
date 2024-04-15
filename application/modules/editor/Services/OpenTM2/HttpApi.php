@@ -3,7 +3,7 @@
 START LICENSE AND COPYRIGHT
 
  This file is part of translate5
- 
+
  Copyright (c) 2013 - 2021 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
 
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
@@ -13,15 +13,15 @@ START LICENSE AND COPYRIGHT
  included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
-  
+
  There is a plugin exception available for use with this release of translate5 for
  translate5: Please see http://www.translate5.net/plugin-exception.txt or
  plugin-exception.txt in the root folder of translate5.
-  
+
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
@@ -36,7 +36,7 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
 {
     private const DATE_FORMAT = 'Ymd\THis\Z';
 
-    const MAX_STR_LENGTH = 2048;
+    public const MAX_STR_LENGTH = 2048;
 
     /**
      * @var editor_Models_LanguageResources_LanguageResource
@@ -90,7 +90,9 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
         $data->data = base64_encode($tmData);
 
         $http = $this->getHttp('POST');
-        $http->setConfig(['timeout' => $this->createTimeout(1200)]);
+        $http->setConfig([
+            'timeout' => $this->createTimeout(1200),
+        ]);
         $http->setRawData($this->jsonEncode($data), 'application/json; charset=utf-8');
 
         if ($this->processResponse($http->request())) {
@@ -121,7 +123,9 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
         $data->stripFramingTags = $stripFramingTags->value;
 
         $http = $this->getHttpWithMemory('POST', $tmName, '/import');
-        $http->setConfig(['timeout' => $this->createTimeout(1200)]);
+        $http->setConfig([
+            'timeout' => $this->createTimeout(1200),
+        ]);
         $http->setRawData($this->jsonEncode($data), 'application/json; charset=utf-8');
 
         return $this->processResponse($http->request());
@@ -138,7 +142,9 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
         $data['newName'] = $this->addTmPrefix($targetMemory);
 
         $http = $this->getHttpWithMemory('POST', $tmName, 'clone');
-        $http->setConfig(['timeout' => $this->createTimeout(1200)]);
+        $http->setConfig([
+            'timeout' => $this->createTimeout(1200),
+        ]);
         $http->setRawData($this->jsonEncode($data), 'application/json; charset=utf-8');
 
         return $this->processResponse($http->request());
@@ -146,7 +152,6 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
 
     /**
      * prepares a Zend_Http_Client, prefilled with the configured URL + the given REST URL Parts (ID + verbs)
-     * @param string $httpMethod
      * @param string $urlSuffix
      * @return Zend_Http_Client
      */
@@ -161,15 +166,15 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
         $this->httpMethod = $method;
         $this->http->setHeaders('Accept-charset', 'UTF-8');
         $this->http->setHeaders('Accept', 'application/json; charset=utf-8');
-        $this->http->setConfig(['timeout' => $this->createTimeout(30)]);
+        $this->http->setConfig([
+            'timeout' => $this->createTimeout(30),
+        ]);
 
         return $this->http;
     }
 
     /**
      * prepares a Zend_Http_Client, prefilled with the configured URL + the Memory Name + additional URL parts
-     *
-     * @return Zend_Http_Client
      */
     protected function getHttpWithMemory(string $method, string $tmName, string $urlSuffix = ''): Zend_Http_Client
     {
@@ -180,8 +185,6 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
 
     /**
      * adds the internal TM prefix to the given TM name
-     * @param string $tmName
-     * @return string
      * @throws Zend_Exception
      */
     protected function addTmPrefix(string $tmName): string
@@ -189,9 +192,10 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
         //CRUCIAL: the prefix (if any) must be added on usage, and may not be stored in the specificName
         // that is relevant for security on a multi hosting environment
         $prefix = Zend_Registry::get('config')->runtimeOptions->LanguageResources->opentm2->tmprefix;
-        if (!empty($prefix) && !str_starts_with($tmName, $prefix.'-')) {
+        if (! empty($prefix) && ! str_starts_with($tmName, $prefix . '-')) {
             $tmName = $prefix . '-' . $tmName;
         }
+
         return $tmName;
     }
 
@@ -206,7 +210,9 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
             $mime = implode(',', $mime);
         }
         $http = $this->getHttpWithMemory('GET', $tmName);
-        $http->setConfig(['timeout' => $this->createTimeout(1200)]);
+        $http->setConfig([
+            'timeout' => $this->createTimeout(1200),
+        ]);
         $http->setHeaders('Accept', $mime);
         $response = $http->request();
         if ($response->getStatus() === 200) {
@@ -216,6 +222,7 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
                 $sourceLang = $this->languageResource->getSourceLangCode();
                 $this->result = $this->fixInvalidOpenTM2XML($this->fixLanguages->tmxOnDownload($sourceLang, $targetLang, $this->result));
             }
+
             return true;
         }
 
@@ -224,8 +231,6 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
 
     /**
      * repairs the TMX from OpenTM2 regarding encoded entities and newlines
-     * @param string $tmxData
-     * @return string
      * @throws Zend_Exception
      */
     protected function fixInvalidOpenTM2XML(string $tmxData): string
@@ -245,6 +250,7 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
                 'newLineCount' => $fix->getNewLineCount(),
             ]);
         }
+
         return $result;
     }
 
@@ -260,7 +266,9 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
             $this->getHttpWithMemory('GET', $tmName, '/status');
         }
 
-        $this->http->setConfig(['timeout' => $this->createTimeout(3)]);
+        $this->http->setConfig([
+            'timeout' => $this->createTimeout(3),
+        ]);
 
         try {
             //OpenTM2 returns invalid JSON on calling "/", so we have to fix this here by catching the invalid JSON Exception.
@@ -270,6 +278,7 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
             if ((empty($this->languageResource) || null === $tmName) && $e->getErrorCode() == 'E1315') {
                 return true;
             }
+
             throw $e;
         }
     }
@@ -293,17 +302,17 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
 
         $json->sourceLang = $this->fixLanguages->key($this->languageResource->getSourceLangCode());
         $json->targetLang = $this->fixLanguages->key($this->languageResource->getTargetLangCode());
-        
+
         if ($this->isToLong($queryString)) {
             $this->result = json_decode('{"ReturnValue":0,"ErrorMsg":"","NumOfFoundProposals":0}');
 
             return true;
         }
 
-//         $queryString = 'Start the <bpt i="1" mid="1" /><ph mid="2"/><ex mid="3" i="1"/> and wait until the LED is continuous green.';
-//         $queryString = 'Start the <it type="struct"/> and wait until the LED is continuous green.';
-//         $queryString = 'Start the <x mid="2"/> and wait until the LED is continuous green.';
-//         $queryString = 'Start the <bx mid="1" rid="1"/><x mid="2"/><ex mid="3" rid="1"/> and wait until the LED is continuous green.';
+        //         $queryString = 'Start the <bpt i="1" mid="1" /><ph mid="2"/><ex mid="3" i="1"/> and wait until the LED is continuous green.';
+        //         $queryString = 'Start the <it type="struct"/> and wait until the LED is continuous green.';
+        //         $queryString = 'Start the <x mid="2"/> and wait until the LED is continuous green.';
+        //         $queryString = 'Start the <bx mid="1" rid="1"/><x mid="2"/><ex mid="3" rid="1"/> and wait until the LED is continuous green.';
 
         $json->source = $queryString;
         // In general OpenTM2 can deal with whole paths, not only with filenames.
@@ -335,7 +344,7 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
             $resultUK = $this->processResponse($http->request());
             if ($resultUK) {
                 $resultsUK = clone $this->result;
-                if (!empty($resultsUK->results)) {
+                if (! empty($resultsUK->results)) {
                     foreach ($resultsUK->results as $oneResult) {
                         $oneResult->targetLang = 'en-GB'; //en-UK is stored as ?? and must be changed
                     }
@@ -348,7 +357,7 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
 
             if ($resultUK && $resultsUK->NumOfFoundProposals > 0) {
                 //if no GB results found or there was an error, we use just the UK entries
-                if (!$resultGB || $this->result->NumOfFoundProposals === 0) {
+                if (! $resultGB || $this->result->NumOfFoundProposals === 0) {
                     $this->result = $resultsUK;
                 } //merge the results
                 else {
@@ -361,6 +370,7 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
         }
 
         $http->setRawData($this->jsonEncode($json), 'application/json; charset=utf-8');
+
         return $this->processResponse($http->request());
     }
 
@@ -476,10 +486,10 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
             //     "invalidSegmentCount": "0" -> since 0.4.48
             // }
             if (property_exists($this->result, 'invalidSegmentCount')) {
-                $invalid = (int)$this->result->invalidSegmentCount;
+                $invalid = (int) $this->result->invalidSegmentCount;
 
                 if ($invalid > 0) {
-                    $overall = (int)$this->result->reorganizedSegmentCount;
+                    $overall = (int) $this->result->reorganizedSegmentCount;
                     $logger = Zend_Registry::get('logger');
                     $logger->warn('E1555', 'Errors during Translation Memory reorganization: {invalid} of {overall} segments invalid in "{tmname}".', [
                         'languageResource' => $this->languageResource,
@@ -489,15 +499,19 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
                     ]);
                 }
             }
+
             return true;
         }
+
         return false;
     }
 
     public function resources(): bool
     {
         $http = $this->getHttp('GET', '/resources');
-        $http->setConfig(['timeout' => $this->createTimeout(3)]);
+        $http->setConfig([
+            'timeout' => $this->createTimeout(3),
+        ]);
         $http->setUri(rtrim($this->resource->getUrl(), '/') . '_service/resources');
 
         return $this->processResponse($http->request());
@@ -508,7 +522,6 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
      */
     private function getUpdateJson(string $function, string $source, string $target): stdClass
     {
-
         if ($this->isToLong($source) || $this->isToLong($target)) {
             $translate = ZfExtended_Zendoverwrites_Translate::getInstance();
             $this->error = new stdClass();
@@ -518,6 +531,7 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
                 $translate->_(
                     'Das Segment konnte nur in der Aufgabe, nicht aber ins TM gespeichert werden. Segmente länger als 2048 Bytes sind nicht im TM speicherbar.'
                 );
+
             return new stdClass();
         }
 
@@ -536,7 +550,6 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
     /**
      * Creates a stdClass Object which is later converted to JSON for communication
      * @param string $method a method is always needed in the request JSON
-     * @param string $memory optional, if given this is added as memory to the JSON
      * @return stdClass;
      */
     protected function json(string $method)
@@ -556,11 +569,11 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
 
         // Normally the ReturnValue is 0 if there is no error.
         // Also 10010 and 10011 are valid ReturnValue values
-        $returnValueError = !empty($this->result->ReturnValue)
-            && !in_array((int)$this->result->ReturnValue, [10010, 10011, 0]);
+        $returnValueError = ! empty($this->result->ReturnValue)
+            && ! in_array((int) $this->result->ReturnValue, [10010, 10011, 0]);
 
         //For some errors this is not true, then only a ErrorMsg is set, but return value is 0,
-        if ($returnValueError || !empty($this->result->ErrorMsg)) {
+        if ($returnValueError || ! empty($this->result->ErrorMsg)) {
             $this->error = new stdClass();
             $this->error->method = $this->httpMethod;
             $this->error->url = $this->http->getUri(true);
@@ -581,7 +594,6 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
 
     /**
      * Sets internally the used language resource (and service resource)
-     * @param editor_Models_LanguageResources_LanguageResource $languageResource
      */
     public function setLanguageResource(editor_Models_LanguageResources_LanguageResource $languageResource)
     {
@@ -597,19 +609,18 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
     public function setResource(editor_Models_LanguageResources_Resource $resource)
     {
         parent::setResource($resource);
-        $this->isT5Memory = !str_contains($resource->getUrl(), '/otmmemoryservice');
+        $this->isT5Memory = ! str_contains($resource->getUrl(), '/otmmemoryservice');
         $this->fixLanguages->setDisabled($this->isT5Memory);
     }
 
     /**
      * returns true if the target system is OpenTM2, false if isT5Memory
-     * @return bool
      * @deprecated check all usages and remove them if OpenTM2 is replaced with t5memory
      * TODO T5MEMORY: remove when OpenTM2 is out of production
      */
     public function isOpenTM2(): bool
     {
-        return !$this->isT5Memory;
+        return ! $this->isT5Memory;
     }
 
     /**
@@ -617,8 +628,6 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
      * According some research, it seems that the magic border to crash OpenTM2 is on 2048 characters, but:
      * 1,2 and 3 Byte long characters are counting as 1 character, while 4Byte Characters are counting as 2 Characters.
      * There fore the below special count is needed.
-     * @param string $string
-     * @return bool
      */
     protected function isToLong(string $string): bool
     {
@@ -638,8 +647,6 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
     /**
      * @param array|stdClass $data
      *
-     * @return string
-     *
      * @throws JsonException
      */
     private function jsonEncode($data): string
@@ -647,7 +654,7 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
         $flags = JSON_THROW_ON_ERROR;
 
         // TODO T5MEMORY: remove when OpenTM2 is out of production
-        if (!$this->isOpenTM2()) {
+        if (! $this->isOpenTM2()) {
             $flags = JSON_THROW_ON_ERROR | JSON_PRETTY_PRINT;
         }
 
@@ -659,8 +666,6 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
     /**
      * Generates the Timeouts to use for a request
      * TODO T5MEMORY: remove when OpenTM2 is out of production
-     * @param int $seconds
-     * @return int
      */
     private function createTimeout(int $seconds): int
     {

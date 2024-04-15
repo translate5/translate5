@@ -21,7 +21,7 @@ START LICENSE AND COPYRIGHT
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
@@ -34,7 +34,7 @@ use PHPUnit\Framework\TestCase;
  */
 abstract class editor_Test_UnitTest extends TestCase
 {
-    const TYPE = 'unit';
+    public const TYPE = 'unit';
 
     private static Zend_Config $_config;
 
@@ -43,11 +43,10 @@ abstract class editor_Test_UnitTest extends TestCase
         try {
             static::$_config = Zend_Registry::get('config');
             static::beforeTests();
-
         } catch (Throwable $e) {
-
             Zend_Registry::set('config', static::$_config);
             static::afterTests();
+
             throw $e;
         }
     }
@@ -60,8 +59,6 @@ abstract class editor_Test_UnitTest extends TestCase
 
     /**
      * This API can be used overwrite the config for the lifespan of the test
-     * @param object $config
-     * @return void
      */
     final public static function setConfig(object $config): void
     {
@@ -73,7 +70,6 @@ abstract class editor_Test_UnitTest extends TestCase
      */
     public static function beforeTests(): void
     {
-
     }
 
     /**
@@ -81,7 +77,5 @@ abstract class editor_Test_UnitTest extends TestCase
      */
     public static function afterTests(): void
     {
-
     }
-
 }

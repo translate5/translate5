@@ -21,47 +21,32 @@
   @copyright  Marc Mittag, MittagQI - Quality Informatics
   @author     MittagQI - Quality Informatics
   @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
- 			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
  END LICENSE AND COPYRIGHT
  */
 
 namespace MittagQI\Translate5\Task\Reimport\SegmentProcessor;
 
-/**
- *
- */
 class ReimportSegmentErrors
 {
-    /**
-     * @param string $code
-     * @param string $message
-     * @param array $data
-     */
-    public function __construct(private string $code, private string $message, private array $data)
-    {
-
+    public function __construct(
+        private string $code,
+        private string $message,
+        private array $data
+    ) {
     }
 
-    /**
-     * @return string
-     */
     public function getCode(): string
     {
         return $this->code;
     }
 
-    /**
-     * @return string
-     */
     public function getMessage(): string
     {
         return $this->message;
     }
 
-    /**
-     * @return array
-     */
     public function getData(): array
     {
         return $this->data;

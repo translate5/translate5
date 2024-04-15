@@ -21,22 +21,15 @@
   @copyright  Marc Mittag, MittagQI - Quality Informatics
   @author     MittagQI - Quality Informatics
   @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
- 			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
  END LICENSE AND COPYRIGHT
  */
 
 namespace MittagQI\Translate5\Task\Reimport\SegmentProcessor\SegmentContent;
 
-use editor_Models_Segment_InternalTag;
-use ZfExtended_Factory;
-
-/**
- *
- */
 class Xliff extends ContentDefault
 {
-
     /***
      * Normalize the given content with converting the internal tags to xlif tags. Such normalized content can be used
      * to compare the contents.

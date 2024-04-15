@@ -3,25 +3,25 @@
 START LICENSE AND COPYRIGHT
 
  This file is part of translate5
- 
+
  Copyright (c) 2013 - 2021 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
 
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
  This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
- as published by the Free Software Foundation and appearing in the file agpl3-license.txt 
- included in the packaging of this file.  Please review the following information 
+ as published by the Free Software Foundation and appearing in the file agpl3-license.txt
+ included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
-  
+
  There is a plugin exception available for use with this release of translate5 for
- translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or
  plugin-exception.txt in the root folder of translate5.
-  
+
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
@@ -43,16 +43,13 @@ abstract class AbstractModel
     /**
      * generates an instance of the given type
      * This expects, that a model class for the passed type exists, e.g. if you pass 'segment' a MittagQI\Translate5\Test\Model\Segment will be created
-     * @param \stdClass $data
-     * @param string $type
-     * @return AbstractModel
      */
     public static function create(\stdClass $data, string $type): AbstractModel
     {
         $className = 'MittagQI\Translate5\Test\Model\\' . ucfirst($type);
+
         return new $className($data);
     }
-
 
     /**
      * Defines the fields that are sanitized and the type of sanitization applied (which will point to a method of Sanitizer)
@@ -62,6 +59,7 @@ abstract class AbstractModel
      * @var string[]
      */
     protected array $sanitized = [];
+
     /**
      * Defines the fields that are NOT compared, all others are taken for comparision
      * EITHER ::$blacklist OR ::$whitelist can be configured with $blacklist having higher precedence
@@ -69,6 +67,7 @@ abstract class AbstractModel
      * @var string[]
      */
     protected array $blacklist = [];
+
     /**
      * Defines the fields that are compared, all others are ignored
      * EITHER ::$blacklist OR ::$whitelist can be configured with $blacklist having higher precedence
@@ -76,6 +75,7 @@ abstract class AbstractModel
      * @var string[]
      */
     protected array $whitelist = [];
+
     /**
      * This Field defines if this is a tree (as ExtJs uses them)
      * If set, the tree will be created recursively and the tree can be compared by comparing the root element or any branch can be compared as well
@@ -83,43 +83,39 @@ abstract class AbstractModel
      * @var boolean
      */
     protected bool $isTree = false;
+
     /**
      * Defines the fields of the root-node of a tree being sanitized.
      * ONLY the root node fields will be sanitized, this is to come around issues with root-nodes usually containing the task-ID in the text
-     * @var array
      */
     protected array $treeRootSanitized = [];
+
     /**
      * Defines the fields of the root-node of a tree being sanitized if the tree has a filter applied
      * ONLY the root node fields will be sanitized, this is to come around issues with root-nodes usually containing the count of children which is incorrect if we filter the children
-     * @var array
      */
     protected array $treeRootFilteredSanitized = [];
+
     /**
      * This defines a field that will be added to the default message to identify the model
      * This can be a field not added to the equation
-     * @var string
      */
     protected string $messageField = 'id';
+
     /**
-     *
      * @var \stdClass
      */
     private $_data;
+
     /**
-     *
      * @var string
      */
     private $_identification = null;
 
-    /**
-     *
-     * @param \stdClass $data
-     */
     public function __construct(\stdClass $data)
     {
         $this->_data = $data;
-        if (!empty($this->messageField) && property_exists($data, $this->messageField)) {
+        if (! empty($this->messageField) && property_exists($data, $this->messageField)) {
             $field = $this->messageField;
             $this->_identification = $data->$field;
         }
@@ -127,44 +123,39 @@ abstract class AbstractModel
 
     /**
      * dynamically adds a field that will be compared
-     * @param string $field
-     * @return AbstractModel
      */
     public function addComparedField(string $field): AbstractModel
     {
-        if($this->useBlacklist()){
+        if ($this->useBlacklist()) {
             $this->removeField($this->blacklist, $field);
-        } else if(!in_array($field, $this->whitelist)) {
+        } elseif (! in_array($field, $this->whitelist)) {
             $this->whitelist[] = $field;
         }
+
         return $this;
     }
 
     /**
      * dynamically adds a sanitized field that will be compared
      * Keep in mind the passed sanitization must exist in Sanitizer
-     * @param string $field
-     * @param string $sanitizationName
-     * @return AbstractModel
      */
     public function addSanitizedField(string $field, string $sanitizationName): AbstractModel
     {
         $this->sanitized[$field] = $sanitizationName;
-        if($this->useBlacklist()){
+        if ($this->useBlacklist()) {
             $this->removeField($this->blacklist, $field);
         }
+
         return $this;
     }
 
     /**
      * Removes the field, either if a normal compared or a sanitized field
-     * @param string $field
-     * @return AbstractModel
      */
     public function removeComparedField(string $field): AbstractModel
     {
-        if($this->useBlacklist()){
-            if(!in_array($field, $this->blacklist)){
+        if ($this->useBlacklist()) {
+            if (! in_array($field, $this->blacklist)) {
                 $this->blacklist[] = $field;
             }
         } else {
@@ -173,17 +164,16 @@ abstract class AbstractModel
         if (array_key_exists($field, $this->sanitized)) {
             unset($this->sanitized[$field]);
         }
+
         return $this;
     }
 
     /**
      * Copies & sanitizes our data
-     * @param \stdClass $data
      * @param Filter|null $treeFilter : If given, a passed tree data will be filtered according to the passed filter
      * @param bool $isRoot : internal prop to hint if an item is the root of a tree
-     * @return \stdClass
      */
-    protected function copy(\stdClass $data, Filter $treeFilter = NULL, bool $isRoot = true): \stdClass
+    protected function copy(\stdClass $data, Filter $treeFilter = null, bool $isRoot = true): \stdClass
     {
         $result = new \stdClass();
         // copy sanitized fields
@@ -191,26 +181,25 @@ abstract class AbstractModel
             if (property_exists($data, $field)) {
                 $result->$field = Sanitizer::$functionName($data->$field);
             } else {
-                $result->$field = NULL;
+                $result->$field = null;
             }
         }
         // copy unsanitized fields (if not already defined in $sanitized)
-        if($this->useBlacklist()){
+        if ($this->useBlacklist()) {
             // via blacklist
-            foreach(get_object_vars($data) as $field){
-                if(!property_exists($result, $field) && !in_array($field, $this->blacklist)){
+            foreach (get_object_vars($data) as $field) {
+                if (! property_exists($result, $field) && ! in_array($field, $this->blacklist)) {
                     $result->$field = $data->$field;
                 }
             }
-
         } else {
             // or via whitelist
             foreach ($this->whitelist as $field) {
-                if (!property_exists($result, $field)) {
+                if (! property_exists($result, $field)) {
                     if (property_exists($data, $field)) {
                         $result->$field = $data->$field;
                     } else {
-                        $result->$field = NULL;
+                        $result->$field = null;
                     }
                 }
             }
@@ -221,17 +210,17 @@ abstract class AbstractModel
                 if (property_exists($data, $field)) {
                     $result->$field = Sanitizer::$functionName($data->$field);
                 } else {
-                    $result->$field = NULL;
+                    $result->$field = null;
                 }
             }
         }
         // additional sanitization of the Root field of a tree that is filtered
-        if ($this->isTree && $isRoot && $treeFilter !== NULL && count($this->treeRootFilteredSanitized) > 0) {
+        if ($this->isTree && $isRoot && $treeFilter !== null && count($this->treeRootFilteredSanitized) > 0) {
             foreach ($this->treeRootFilteredSanitized as $field => $functionName) {
                 if (property_exists($data, $field)) {
                     $result->$field = Sanitizer::$functionName($data->$field);
                 } else {
-                    $result->$field = NULL;
+                    $result->$field = null;
                 }
             }
         }
@@ -239,7 +228,7 @@ abstract class AbstractModel
         if ($this->isTree && property_exists($data, 'children')) {
             $result->children = [];
             foreach ($data->children as $child) {
-                if ($treeFilter === NULL || $treeFilter->matches($child)) {
+                if ($treeFilter === null || $treeFilter->matches($child)) {
                     $result->children[] = $this->copy($child, $treeFilter, false);
                 }
             }
@@ -275,60 +264,51 @@ abstract class AbstractModel
                 'isRepeated' => null,
             ];
             //fix the order of the associated array vs object then.
-            $result = (array)$result;
-            $result = (object)array_replace(array_intersect_key($foo, $result), $result);
+            $result = (array) $result;
+            $result = (object) array_replace(array_intersect_key($foo, $result), $result);
         }
+
         return $result;
     }
 
     /**
      * Generates a default message
-     * @param string $message
-     * @return string
      */
     protected function getDefaultMessage(string $message): string
     {
-        if (!empty($message)) {
+        if (! empty($message)) {
             return $message;
         }
         $parts = explode('_', __CLASS__);
         $message = 'Comparing ' . array_pop($parts);
-        $message .= ($this->_identification == NULL) ? ' failed!' : ' "' . $this->_identification . '" failed!';
+        $message .= ($this->_identification == null) ? ' failed!' : ' "' . $this->_identification . '" failed!';
+
         return $message;
     }
 
     /**
      * Compares the Model with test data for the passed testcase
-     * @param \editor_Test_JsonTest $testCase
-     * @param \stdClass $expected
-     * @param string $message
      * @param Filter|null $treeFilter : If given, a passed tree data will be filtered according to the passed filter
      */
-    public function compare(\editor_Test_JsonTest $testCase, \stdClass $expected, string $message = '', Filter $treeFilter = NULL)
+    public function compare(\editor_Test_JsonTest $testCase, \stdClass $expected, string $message = '', Filter $treeFilter = null)
     {
         $this->compareExpectation($testCase, $expected, $message, $treeFilter);
     }
 
     /**
      * Since test-models can act as expectation or actual data we provide both directions of comparision (a test-model is expected to represent real API data though)
-     * @param \editor_Test_JsonTest $testCase
-     * @param \stdClass $expected
-     * @param string $message
      * @param Filter|null $treeFilter : If given, a passed tree data will be filtered according to the passed filter
      */
-    public function compareExpectation(\editor_Test_JsonTest $testCase, \stdClass $expected, string $message = '', Filter $treeFilter = NULL)
+    public function compareExpectation(\editor_Test_JsonTest $testCase, \stdClass $expected, string $message = '', Filter $treeFilter = null)
     {
         $testCase->assertEquals($this->copy($expected, $treeFilter), $this->copy($this->_data, $treeFilter), $message);
     }
 
     /**
      * Since test-models can act as expectation or actual data we provide both directions of comparision (a test-model is expected to represent real API data though)
-     * @param \editor_Test_JsonTest $testCase
-     * @param \stdClass $actual
-     * @param string $message
      * @param Filter|null $treeFilter : If given, a passed tree data will be filtered according to the passed filter
      */
-    public function compareActual(\editor_Test_JsonTest $testCase, \stdClass $actual, string $message = '', Filter $treeFilter = NULL)
+    public function compareActual(\editor_Test_JsonTest $testCase, \stdClass $actual, string $message = '', Filter $treeFilter = null)
     {
         $testCase->assertEquals($this->copy($this->_data, $treeFilter), $this->copy($actual, $treeFilter), $message);
     }
@@ -344,7 +324,6 @@ abstract class AbstractModel
 
     /**
      * Decides if blacklist or whitelist has to be used
-     * @return bool
      */
     protected function useBlacklist(): bool
     {
@@ -353,10 +332,9 @@ abstract class AbstractModel
 
     /**
      * Removes an element of the whitelist or blacklist
-     * @param array $array
-     * @param string $value
      */
-    private function removeField(array &$array, string $field){
+    private function removeField(array &$array, string $field)
+    {
         if (($idx = array_search($field, $array)) !== false) {
             // this creates index-holes in the whitelist-array (what is acceptable as long we just use foreach)
             unset($array[$idx]);

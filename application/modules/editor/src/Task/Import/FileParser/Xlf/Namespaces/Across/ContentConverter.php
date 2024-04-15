@@ -21,7 +21,7 @@ START LICENSE AND COPYRIGHT
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
@@ -34,18 +34,13 @@ use editor_Models_Import_FileParser_Xlf_ContentConverter;
 
 class ContentConverter extends editor_Models_Import_FileParser_Xlf_ContentConverter
 {
-    /**
-     * @param array $openerMeta
-     * @param string $originalContent
-     * @param bool $tagWithContent
-     * @return string
-     */
     protected function getId(array $openerMeta, string $originalContent, bool $tagWithContent): string
     {
         $id = $this->xmlparser->getAttribute($openerMeta['attributes'], 'ax:element-id');
         if ($id === false) {
             return parent::getId($openerMeta, $originalContent, $tagWithContent);
         }
+
         return $id;
     }
 }

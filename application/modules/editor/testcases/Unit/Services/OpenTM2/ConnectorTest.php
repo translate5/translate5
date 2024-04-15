@@ -21,7 +21,7 @@ START LICENSE AND COPYRIGHT
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
@@ -30,9 +30,9 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\Test\Unit\Services\Connector\TagHandler;
 
+use editor_Services_OpenTM2_Connector as Connector;
 use MittagQI\Translate5\LanguageResource\Status as LanguageResourceStatus;
 use PHPUnit\Framework\TestCase;
-use editor_Services_OpenTM2_Connector as Connector;
 use stdClass;
 
 class ConnectorTest extends TestCase
@@ -55,79 +55,79 @@ class ConnectorTest extends TestCase
                 'status' => 'not found',
                 'tmxImportStatus' => null,
                 'importTime' => null,
-                'expectedResult' => LanguageResourceStatus::ERROR
+                'expectedResult' => LanguageResourceStatus::ERROR,
             ],
             'Available' => [
                 'status' => 'available',
                 'tmxImportStatus' => null,
                 'importTime' => null,
-                'expectedResult' => LanguageResourceStatus::AVAILABLE
+                'expectedResult' => LanguageResourceStatus::AVAILABLE,
             ],
             'Available just loaded' => [
                 'status' => 'open',
                 'tmxImportStatus' => null,
                 'importTime' => null,
-                'expectedResult' => LanguageResourceStatus::AVAILABLE
+                'expectedResult' => LanguageResourceStatus::AVAILABLE,
             ],
             'Additional file import not finished' => [
                 'status' => "open",
                 'tmxImportStatus' => "available",
                 'importTime' => "not finished",
-                'expectedResult' => LanguageResourceStatus::IMPORT
+                'expectedResult' => LanguageResourceStatus::IMPORT,
             ],
             'Primary file import not finished' => [
                 'status' => "open",
                 'tmxImportStatus' => "import",
                 'importTime' => null,
-                'expectedResult' => LanguageResourceStatus::IMPORT
+                'expectedResult' => LanguageResourceStatus::IMPORT,
             ],
             'Import finished successfully' => [
                 'status' => "open",
                 'tmxImportStatus' => "available",
                 'importTime' => 'finished',
-                'expectedResult' => LanguageResourceStatus::AVAILABLE
+                'expectedResult' => LanguageResourceStatus::AVAILABLE,
             ],
             'Import finished with error' => [
                 'status' => "open",
                 'tmxImportStatus' => "error",
                 'importTime' => null,
-                'expectedResult' => LanguageResourceStatus::ERROR
+                'expectedResult' => LanguageResourceStatus::ERROR,
             ],
             'Import failed' => [
                 'status' => "open",
                 'tmxImportStatus' => "failed",
                 'importTime' => null,
-                'expectedResult' => LanguageResourceStatus::ERROR
+                'expectedResult' => LanguageResourceStatus::ERROR,
             ],
             'Unknown status' => [
                 'status' => bin2hex(random_bytes(10)),
                 'tmxImportStatus' => null,
                 'importTime' => null,
-                'expectedResult' => LanguageResourceStatus::UNKNOWN
+                'expectedResult' => LanguageResourceStatus::UNKNOWN,
             ],
             'Unknown tmxImportStatus' => [
                 'status' => 'open',
                 'tmxImportStatus' => bin2hex(random_bytes(10)),
                 'importTime' => null,
-                'expectedResult' => LanguageResourceStatus::UNKNOWN
+                'expectedResult' => LanguageResourceStatus::UNKNOWN,
             ],
             'Reorganize in progress' => [
                 'status' => 'reorganize',
                 'tmxImportStatus' => null,
                 'importTime' => null,
-                'expectedResult' => LanguageResourceStatus::REORGANIZE_IN_PROGRESS
+                'expectedResult' => LanguageResourceStatus::REORGANIZE_IN_PROGRESS,
             ],
             'Reorganize failed' => [
                 'status' => 'reorganize failed',
                 'tmxImportStatus' => null,
                 'importTime' => null,
-                'expectedResult' => LanguageResourceStatus::REORGANIZE_FAILED
+                'expectedResult' => LanguageResourceStatus::REORGANIZE_FAILED,
             ],
             'Empty tmxImportStatus' => [
                 'status' => 'open',
                 'tmxImportStatus' => null,
                 'importTime' => null,
-                'expectedResult' => LanguageResourceStatus::AVAILABLE
+                'expectedResult' => LanguageResourceStatus::AVAILABLE,
             ],
         ];
     }

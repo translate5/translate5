@@ -3,25 +3,25 @@
 START LICENSE AND COPYRIGHT
 
  This file is part of translate5
- 
+
  Copyright (c) 2013 - 2021 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
 
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
  This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
- as published by the Free Software Foundation and appearing in the file agpl3-license.txt 
- included in the packaging of this file.  Please review the following information 
+ as published by the Free Software Foundation and appearing in the file agpl3-license.txt
+ included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
-  
+
  There is a plugin exception available for use with this release of translate5 for
- translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or
  plugin-exception.txt in the root folder of translate5.
-  
+
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
@@ -59,12 +59,13 @@ END LICENSE AND COPYRIGHT
  * @method void setUserName(string $guid)
  * @method string getRole()
  * @method void setRole(string $guid)
- *
  */
-class editor_Models_TaskUserTracking extends ZfExtended_Models_Entity_Abstract {
+class editor_Models_TaskUserTracking extends ZfExtended_Models_Entity_Abstract
+{
     protected $dbInstanceClass = 'editor_Models_Db_TaskUserTracking';
+
     protected $validatorInstanceClass = 'editor_Models_Validator_TaskUserTracking';
-    
+
     /**
      * has a row been loaded at all?
      * We correctly might not have any data for a user of a task; e.g.
@@ -72,89 +73,98 @@ class editor_Models_TaskUserTracking extends ZfExtended_Models_Entity_Abstract {
      * - if a user is assigned to a task, but has never opened the task so far
      * @return boolean
      */
-    public function hasEntry(): bool {
-        return (!is_null($this->row));
+    public function hasEntry(): bool
+    {
+        return (! is_null($this->row));
     }
-    
+
     /**
      * loads the TaskUserTracking-entry for the given task and userGuid (= unique)
      * @param string $taskGuid
      * @param string $userGuid
      */
-    public function loadEntry($taskGuid, $userGuid) {
+    public function loadEntry($taskGuid, $userGuid)
+    {
         $s = $this->db->select()
             ->where('taskGuid = ?', $taskGuid)
             ->where('userGuid = ?', $userGuid);
         $this->row = $this->db->fetchRow($s);
     }
-    
+
     /**
      * loads the TaskUserTracking-entry for the given task and taskOpenerNumber (= unique)
      * @param string $taskGuid
-     * @param string $userGuid
      */
-    public function loadEntryByTaskOpenerNumber($taskGuid, $taskOpenerNumber) {
+    public function loadEntryByTaskOpenerNumber($taskGuid, $taskOpenerNumber)
+    {
         $s = $this->db->select()
             ->where('taskGuid = ?', $taskGuid)
             ->where('taskOpenerNumber = ?', $taskOpenerNumber);
         $this->row = $this->db->fetchRow($s);
     }
-    
+
     /**
      * gets all TaskUserTracking-data for the given taskGuid
      * @param string $taskGuid
      * @return array
      */
-    public function getByTaskGuid($taskGuid) {
+    public function getByTaskGuid($taskGuid)
+    {
         try {
             $s = $this->db->select()->where('taskGuid = ?', $taskGuid);
+
             return $this->db->fetchAll($s)->toArray();
         } catch (Exception $e) {
             return [];
         }
     }
-    
+
     /**
      * gets all TaskUserTracking-data for the given taskGuid
-     * @param array $taskGuidList
      * @return array
      */
-    public function loadGroupedByTaskGuid(array $taskGuidList) {
+    public function loadGroupedByTaskGuid(array $taskGuidList)
+    {
         try {
             $result = array_fill_keys($taskGuidList, []);
             $s = $this->db->select()->where('taskGuid in (?)', $taskGuidList);
             $res = $this->db->fetchAll($s)->toArray();
-            foreach($res as $row) {
+            foreach ($res as $row) {
                 $result[$row['taskGuid']][] = $row;
             }
+
             return $result;
         } catch (Exception $e) {
             return [];
         }
     }
-    
+
     /**
      * returns the taskOpenerNumber of the currently loaded entry or null (we might not have a TaskUserTracking-entry loaded; that's ok).
-     * @return NULL|number
+     * @return null|number
      */
-    public function getTaskOpenerNumberForUser(){
-        if (!$this->hasEntry()){
+    public function getTaskOpenerNumberForUser()
+    {
+        if (! $this->hasEntry()) {
             return null;
         }
+
         return $this->getTaskOpenerNumber();
     }
-    
+
     /**
      * returns the (real, as tracked) username of the currently loaded entry or null (we might not have a TaskUserTracking-entry loaded; that's ok).
-     * @return NULL|string
+     * @return null|string
      */
-    public function getUsernameForUser(){
-        if (!$this->hasEntry()){
+    public function getUsernameForUser()
+    {
+        if (! $this->hasEntry()) {
             return null;
         }
+
         return $this->getUserName();
     }
-    
+
     /**
      * insert or update TaskUserTracking entry.
      * If users have already opened the task before, we only keep their data updated.
@@ -200,7 +210,7 @@ class editor_Models_TaskUserTracking extends ZfExtended_Models_Entity_Abstract {
             $this->events->trigger('afterUserTrackingInsert', $this, [
                 'taskGuid' => $dto->taskGuid,
                 'userGuid' => $dto->userGuid,
-                'role' => $dto->role
+                'role' => $dto->role,
             ]);
         }
 

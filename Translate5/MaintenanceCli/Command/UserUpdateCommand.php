@@ -1,28 +1,28 @@
 <?php
 /*
  START LICENSE AND COPYRIGHT
- 
+
  This file is part of translate5
- 
+
  Copyright (c) 2013 - 2017 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
- 
+
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
- 
+
  This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
  as published by the Free Software Foundation and appearing in the file agpl3-license.txt
  included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
- 
+
  There is a plugin exception available for use with this release of translate5 for
  translate5: Please see http://www.translate5.net/plugin-exception.txt or
  plugin-exception.txt in the root folder of translate5.
- 
+
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
  http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
- 
+
  END LICENSE AND COPYRIGHT
  */
 
@@ -30,19 +30,18 @@ namespace Translate5\MaintenanceCli\Command;
 
 use Exception;
 use RuntimeException;
-use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\InputArgument;
+use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Output\OutputInterface;
 use ZfExtended_Acl;
 use ZfExtended_Factory;
 use ZfExtended_Models_Passwdreset;
 use ZfExtended_Models_User;
 
-
 class UserUpdateCommand extends UserAbstractCommand
 {
-    const ROLES_FIXED = ['noRights', 'basic'];
+    public const ROLES_FIXED = ['noRights', 'basic'];
 
     // the name of the command (the part after "bin/console")
     protected static $defaultName = 'user:update';
@@ -150,7 +149,7 @@ class UserUpdateCommand extends UserAbstractCommand
         if (null !== $this->input->getOption('editable')) {
             $val = $this->input->getOption('editable');
 
-            if (!is_numeric($val) && !in_array($val, ['yes', 'no', 'false', 'true'], true)) {
+            if (! is_numeric($val) && ! in_array($val, ['yes', 'no', 'false', 'true'], true)) {
                 $this->io->warning('Invalid value provided for option `editable`');
             }
 
@@ -175,7 +174,7 @@ class UserUpdateCommand extends UserAbstractCommand
         $this->removeRoles($userModel);
 
         try {
-            if (!$this->resetPasswordIfAsked($userModel)) {
+            if (! $this->resetPasswordIfAsked($userModel)) {
                 $this->setUserPassword($userModel);
             }
 
@@ -200,7 +199,7 @@ class UserUpdateCommand extends UserAbstractCommand
 
     private function resetPasswordIfAsked(ZfExtended_Models_User $userModel): bool
     {
-        if (!$this->input->hasParameterOption('--reset-password')) {
+        if (! $this->input->hasParameterOption('--reset-password')) {
             return false;
         }
 
@@ -208,7 +207,7 @@ class UserUpdateCommand extends UserAbstractCommand
             ? $userModel->getEmail()
             : $userModel->getLogin();
 
-        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        if (! filter_var($email, FILTER_VALIDATE_EMAIL)) {
             throw new RuntimeException('User does not have valid e-mail address to reset password');
         }
 
@@ -219,7 +218,7 @@ class UserUpdateCommand extends UserAbstractCommand
 
     private function addRoles(ZfExtended_Models_User $userModel): void
     {
-        if (!$this->input->getOption('choose-add-roles') && !$this->input->getOption('add-roles')) {
+        if (! $this->input->getOption('choose-add-roles') && ! $this->input->getOption('add-roles')) {
             return;
         }
 
@@ -233,7 +232,7 @@ class UserUpdateCommand extends UserAbstractCommand
 
     private function removeRoles(ZfExtended_Models_User $userModel): void
     {
-        if (!$this->input->getOption('choose-remove-roles') && !$this->input->getOption('remove-roles')) {
+        if (! $this->input->getOption('choose-remove-roles') && ! $this->input->getOption('remove-roles')) {
             return;
         }
 
@@ -245,7 +244,7 @@ class UserUpdateCommand extends UserAbstractCommand
         $rolesToSet = [];
 
         foreach ($userModel->getRoles() as $role) {
-            if (!in_array($role, $selectedRoles, true)) {
+            if (! in_array($role, $selectedRoles, true)) {
                 $rolesToSet[] = $role;
             }
         }
@@ -258,7 +257,7 @@ class UserUpdateCommand extends UserAbstractCommand
         if ($this->input->getOption('email')) {
             $email = $this->input->getOption('email');
 
-            if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            if (! filter_var($email, FILTER_VALIDATE_EMAIL)) {
                 $this->io->warning(sprintf('User with login [%s] not found', $this->input->getArgument('login')));
 
                 return;
