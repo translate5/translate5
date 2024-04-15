@@ -1297,8 +1297,11 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract
         WHERE d.originalMd5 IN (
             SELECT originalMd5
             FROM LEK_segment_data
-            WHERE taskGuid = ? AND
-            originalMd5 != ? AND name = "%2$s" GROUP BY originalMd5 HAVING count(segmentId) > 1
+            WHERE taskGuid = ?
+              AND originalMd5 != ?
+              AND autoStateId NOT IN ("'.editor_Models_Segment_AutoStates::BLOCKED.'")
+              AND name = "%2$s"
+            GROUP BY originalMd5 HAVING count(segmentId) > 1
         )
         AND s.id = d.segmentId AND d.taskGuid = ?';
 
@@ -1321,12 +1324,18 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract
 
     /**
      * Loads the next segment after the given id from the given taskGuid
-     * next is defined as the segment with the next higher segmentId
+     * next is defined as the segment with the next higher segmentId. Optionally blocked segments can be ignored by
+     * applying filter on autoStateId
      * This method assumes that segmentFieldManager was already loaded internally
-     * @param int|null $fileId optional, loads first file of given fileId in task
-     * @return editor_Models_Segment | null if no next found
+     * @param string $taskGuid
+     * @param int $id
+     * @param int|null $fileId
+     * @param bool $ignoreBlocked
+     * @return $this|null
+     * @throws Zend_Db_Select_Exception
+     * @throws Zend_Db_Statement_Exception
      */
-    public function loadNext(string $taskGuid, int $id, int $fileId = null): ?static
+    public function loadNext(string $taskGuid, int $id, int $fileId = null, bool $ignoreBlocked = false): ?static
     {
         $this->segmentFieldManager->initFields($taskGuid);
 
@@ -1345,6 +1354,10 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract
 
         if (! empty($fileId)) {
             $s->where($this->tableName . '.fileId = ?', $fileId);
+        }
+
+        if($ignoreBlocked) {
+            $s->where($this->tableName . '.autoStateId NOT IN(?)', [editor_Models_Segment_AutoStates::BLOCKED]);
         }
 
         $row = $this->db->fetchRow($s);
@@ -2074,11 +2087,15 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract
         $mv->setTaskGuid($taskGuid);
         $viewName = $mv->getName();
         $sql = 'SELECT v1.id,v1.sourceMd5 FROM ' . $viewName . ' v1, (
-	          SELECT sourceMd5, count(sourceMd5) cnt
+	          SELECT sourceMd5, count(sourceMd5) cnt, autoStateId
                FROM ' . $viewName . '
+               WHERE autoStateId NOT IN ("'.editor_Models_Segment_AutoStates::BLOCKED.'")
                GROUP BY sourceMd5
               ) v2
-              WHERE v2.cnt > 1 and v1.sourceMd5 = v2.sourceMd5
+              WHERE v2.cnt > 1
+                AND v1.sourceMd5 = v2.sourceMd5
+                AND v1.autoStateId NOT IN ("'.editor_Models_Segment_AutoStates::BLOCKED.'")
+                AND v2.autoStateId NOT IN ("'.editor_Models_Segment_AutoStates::BLOCKED.'")
               ORDER BY v1.id';
 
         return $adapter->query($sql)->fetchAll();
