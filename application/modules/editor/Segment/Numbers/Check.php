@@ -26,6 +26,7 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 use MittagQI\Translate5\Plugins\SpellCheck\Segment\Check;
+
 /**
  * Numbers check
  */
@@ -110,10 +111,6 @@ class editor_Segment_Numbers_Check
 
     /**
      * editor_Segment_Numbers_Check constructor.
-     * @param editor_Models_Task $task
-     * @param editor_Models_Segment $segment
-     * @param editor_Segment_FieldTags $source
-     * @param editor_Segment_FieldTags $target
      * @throws ReflectionException
      */
     public function __construct(

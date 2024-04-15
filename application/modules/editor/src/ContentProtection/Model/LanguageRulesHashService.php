@@ -97,6 +97,7 @@ class LanguageRulesHashService
     public function findOrCreate(int $sourceLanguageId, int $targetLangId): LanguageRulesHash
     {
         $languageRulesHash = \ZfExtended_Factory::get(LanguageRulesHash::class);
+
         try {
             $languageRulesHash->loadByLanguages($sourceLanguageId, $targetLangId);
         } catch (\ZfExtended_Models_Entity_NotFoundException) {
@@ -127,6 +128,7 @@ class LanguageRulesHashService
     public function updateBy(int $sourceLangId, int $targetLangId): void
     {
         $languageRulesHash = \ZfExtended_Factory::get(LanguageRulesHash::class);
+
         try {
             $languageRulesHash->loadByLanguages($sourceLangId, $targetLangId);
         } catch (\ZfExtended_Models_Entity_NotFoundException) {
@@ -151,6 +153,7 @@ class LanguageRulesHashService
                 sprintf('Non existent lang provided: source = %s, target = %s', $sourceLanguageId, $targetLangId)
             );
         }
-        return array($sourceLang, $targetLang);
+
+        return [$sourceLang, $targetLang];
     }
 }

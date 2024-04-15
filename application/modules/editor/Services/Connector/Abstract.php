@@ -205,7 +205,7 @@ abstract class editor_Services_Connector_Abstract
     {
         return $this->targetLang;
     }
-    
+
     /**
      * Link this Connector Instance to the given LanguageResource and its resource, in the given language combination
      * @param int $sourceLang language id
@@ -231,7 +231,7 @@ abstract class editor_Services_Connector_Abstract
             (int) ($targetLang ?: $languageResource->getSourceLang())
         );
         $this->logger = $this->logger->cloneMe(
-            'editor.languageresource.'.strtolower($this->resource->getService()).'.connector'
+            'editor.languageresource.' . strtolower($this->resource->getService()) . '.connector'
         );
     }
 

@@ -52,8 +52,8 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\ContentProtection\T5memory;
 
-use editor_Models_Segment_Whitespace as Whitespace;
 use editor_Models_LanguageResources_LanguageResource as LanguageResource;
+use editor_Models_Segment_Whitespace as Whitespace;
 use MittagQI\Translate5\ContentProtection\ContentProtector;
 use MittagQI\Translate5\ContentProtection\Model\ContentProtectionRepository;
 use MittagQI\Translate5\ContentProtection\Model\LanguageRulesHashService;
@@ -71,7 +71,9 @@ class TmConversionService
     public const T5MEMORY_NUMBER_TAG = 't5:n';
 
     private array $languageRulesHashMap;
+
     private array $languageResourceRulesHashMap;
+
     private ZfExtended_Logger $logger;
 
     public function __construct(
@@ -116,17 +118,17 @@ class TmConversionService
 
     public function isTmConverted(int $languageResourceId): bool
     {
-        if (!isset($this->languageResourceRulesHashMap[$languageResourceId])) {
+        if (! isset($this->languageResourceRulesHashMap[$languageResourceId])) {
             return false;
         }
 
         ['languages' => $languages, 'hash' => $hash] = $this->languageResourceRulesHashMap[$languageResourceId];
 
-        if (!isset($this->languageRulesHashMap[$languages['source']])) {
+        if (! isset($this->languageRulesHashMap[$languages['source']])) {
             return false;
         }
 
-        if (!isset($this->languageRulesHashMap[$languages['source']][$languages['target']])) {
+        if (! isset($this->languageRulesHashMap[$languages['source']][$languages['target']])) {
             return false;
         }
 
@@ -135,11 +137,11 @@ class TmConversionService
 
     public function isConversionInProgress(int $languageResourceId): bool
     {
-        if (!isset($this->languageResourceRulesHashMap[$languageResourceId])) {
+        if (! isset($this->languageResourceRulesHashMap[$languageResourceId])) {
             return false;
         }
 
-        if (!empty($this->languageResourceRulesHashMap[$languageResourceId]['conversionStarted'])) {
+        if (! empty($this->languageResourceRulesHashMap[$languageResourceId]['conversionStarted'])) {
             return true;
         }
 
@@ -155,7 +157,9 @@ class TmConversionService
         $languageResource->save();
 
         $worker = ZfExtended_Factory::get(ConverseMemoryWorker::class);
-        if ($worker->init(parameters: ['languageResourceId' => $languageResourceId])) {
+        if ($worker->init(parameters: [
+            'languageResourceId' => $languageResourceId,
+        ])) {
             $worker->queue();
         }
     }
@@ -170,7 +174,7 @@ class TmConversionService
         $queryString = $this->contentProtector->unprotect($queryString, false, NumberProtector::alias());
         $regex = NumberProtector::fullTagRegex();
 
-        if (!preg_match_all($regex, $queryString, $tags, PREG_SET_ORDER)) {
+        if (! preg_match_all($regex, $queryString, $tags, PREG_SET_ORDER)) {
             return $queryString;
         }
 
@@ -207,7 +211,7 @@ class TmConversionService
         $sourceLang = $sourceLangId ? $this->languageRepository->find($sourceLangId) : null;
         $targetLang = $targetLangId ? $this->languageRepository->find($targetLangId) : null;
 
-        if (!$this->contentProtectionRepository->hasActiveRules($sourceLang, $targetLang)) {
+        if (! $this->contentProtectionRepository->hasActiveRules($sourceLang, $targetLang)) {
             return $filenameWithPath;
         }
 
@@ -218,7 +222,7 @@ class TmConversionService
 
         $writer = new XMLWriter();
 
-        if (!$writer->openURI($resultFilename)) {
+        if (! $writer->openURI($resultFilename)) {
             throw new RuntimeException('File for TMX conversion was not created. Filename: ' . $resultFilename);
         }
 
@@ -242,7 +246,7 @@ class TmConversionService
                 );
             }
 
-            if (!in_array($reader->name, ['tmx', 'body'], true)) {
+            if (! in_array($reader->name, ['tmx', 'body'], true)) {
                 continue;
             }
 
@@ -277,7 +281,9 @@ class TmConversionService
             $this->logger->error(
                 'E1593',
                 'Trans unit has unexpected structure and was excluded from TMX import',
-                ['count' => $brokenTus]
+                [
+                    'count' => $brokenTus,
+                ]
             );
         }
 
@@ -328,5 +334,4 @@ class TmConversionService
             $transUnit
         );
     }
-
 }

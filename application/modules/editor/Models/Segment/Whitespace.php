@@ -284,7 +284,6 @@ class editor_Models_Segment_Whitespace
      * protects all whitespace and special characters coming from the import formats
      * WARNING: should be called only on plain text fragments without tags!
      * @param string $textNode should not contain tags, since special characters in the tag content would also be protected then
-     * @param string $entityHandling defaults to ENTITY_MODE_RESTORE, decides how XML Entities are encoded, see inline comments
      */
     public function protectWhitespace(
         string $textNode,
@@ -317,7 +316,7 @@ class editor_Models_Segment_Whitespace
         // Attention caveat: copying the character &#128; into the browser vonverts it to € - assuming that not UTF8 but wincp was used!
         $textNode = preg_replace_callback('/&amp;#(128|129|1[3-5][0-9]);/', function ($match) {
             //always one single character is masked, so length = 1
-            return $this->maskSpecialContent('char', '&#'.$match[1].';', 1);
+            return $this->maskSpecialContent('char', '&#' . $match[1] . ';', 1);
         }, $textNode);
 
         return preg_replace_callback($this->getProtectedCharactersRegexes($excludedCharacters), function ($match) {
@@ -334,14 +333,14 @@ class editor_Models_Segment_Whitespace
 
         $regexList = [];
         foreach (self::PROTECTED_CHARACTERS as $regex => $setting) {
-            if (isset($setting['ts']) && !in_array($setting['ts'], $excludedCharacters, true)) {
+            if (isset($setting['ts']) && ! in_array($setting['ts'], $excludedCharacters, true)) {
                 $regexList[] = $regex;
             }
         }
 
         return $regexList;
     }
-    
+
     /**
      * unprotects tag protected whitespace inside the given segment content
      * keep attention to the different invocation points for this method!
@@ -479,10 +478,7 @@ class editor_Models_Segment_Whitespace
 
     /**
      * replaces the placeholder tags (<protectedTag> / <hardReturn> / <char> / <space> etc) with an internal tag
-     * @param string $segment
-     * @param int $shortTagIdent
      * @param array $shortcutNumberMap shorttag numbers can be provided from outside (needed for language resource usage)
-     * @return string
      */
     public function convertToInternalTagsFromService(
         string $segment,
@@ -491,7 +487,7 @@ class editor_Models_Segment_Whitespace
     ): string {
         // $tagShortcutNumberMap must be given explicitly here as non referenced variable from outside,
         // so that each call of the whitespaceTagReplacer function has its fresh list of tag numbers
-        return $this->convertToInternalTags($segment,$shortTagIdent, $shortcutNumberMap);
+        return $this->convertToInternalTags($segment, $shortTagIdent, $shortcutNumberMap);
     }
 
     /**
@@ -565,8 +561,7 @@ class editor_Models_Segment_Whitespace
             //either we get a reusable shortcut number in the map, or we have to increment one
             if (empty($shortcutNumberMap) || empty($shortcutNumberMap[$wholeTag])) {
                 $shortTagNumber = $this->currentShortTagNumber++;
-            }
-            else {
+            } else {
                 $shortTagNumber = array_shift($shortcutNumberMap[$wholeTag]);
             }
         }

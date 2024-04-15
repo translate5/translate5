@@ -52,7 +52,8 @@ class editor_Services_Connector_TagHandler_HtmlRepaired extends editor_Services_
      * Therefore a re-identifyable id must be provided
      * @throws ZfExtended_Exception
      */
-    public function prepareQuery(string $queryString, bool $isSource = true): string {
+    public function prepareQuery(string $queryString, bool $isSource = true): string
+    {
         if ($this->currentSegment === null) {
             throw new ZfExtended_Exception('editor_Services_Connector_TagHandler_HtmlRepaired::prepareQuery: A currentSegment must be provided per query to use this tag-handler');
         }

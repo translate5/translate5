@@ -57,10 +57,13 @@ use editor_Models_Segment_Whitespace as Whitespace;
 class WhitespaceProtector implements ProtectorInterface
 {
     private const TAG_REGEX = '/(<\w+ .+>|<\/\w+>|<\w+\s?.+\/>)/Uu';
+
     private array $numberWhitespaces = ['e28089', 'e280af']; // THSP and NNBSP
 
-    public function __construct(private Whitespace $whitespace, private bool $withoutNumberWhitespaces = false)
-    {
+    public function __construct(
+        private Whitespace $whitespace,
+        private bool $withoutNumberWhitespaces = false
+    ) {
     }
 
     public static function alias(): string
@@ -93,13 +96,10 @@ class WhitespaceProtector implements ProtectorInterface
         // Nothing to do here
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function protect(string $textNode, bool $isSource, int $sourceLangId, int $targetLangId): string
     {
         $excludedCharacters = $this->withoutNumberWhitespaces ? $this->numberWhitespaces : [];
-        if (!preg_match_all(self::TAG_REGEX, $textNode, $matches)) {
+        if (! preg_match_all(self::TAG_REGEX, $textNode, $matches)) {
             return $this->whitespace->protectWhitespace($textNode, $excludedCharacters);
         }
 
@@ -117,7 +117,7 @@ class WhitespaceProtector implements ProtectorInterface
                 );
             }
 
-            if (!isset($tags[$i])) {
+            if (! isset($tags[$i])) {
                 continue;
             }
 
@@ -137,9 +137,6 @@ class WhitespaceProtector implements ProtectorInterface
         return $this->whitespace->convertForStripping($content);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function convertToInternalTags(
         string $segment,
         int &$shortTagIdent,
@@ -151,9 +148,6 @@ class WhitespaceProtector implements ProtectorInterface
         return $this->whitespace->convertToInternalTags($segment, $shortTagIdent, $shortcutNumberMap);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function convertToInternalTagsInChunks(
         string $segment,
         int &$shortTagIdent,

@@ -92,6 +92,7 @@ class editor_Services_Connector
     protected $batchEnabled = false;
 
     private ContentProtector $contentProtector;
+
     public function __construct()
     {
         $this->contentProtector = ContentProtector::create(ZfExtended_Factory::get(Whitespace::class));
@@ -243,7 +244,7 @@ class editor_Services_Connector
      * Protect markup with whitespace & tags to internal tags
      * this simplifies but still copies the logic of editor_Models_Import_FileParser_Csv::parseSegment
      */
-    private function convertMarkupToInternalTags(string $markup, UtilityBroker $utilities) : string
+    private function convertMarkupToInternalTags(string $markup, UtilityBroker $utilities): string
     {
         $shortTagIdent = 1;
 

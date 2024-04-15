@@ -54,18 +54,20 @@ namespace MittagQI\Translate5\ContentProtection\NumberProtection\Protector;
 
 use editor_Models_Languages;
 use LogicException;
-use MittagQI\Translate5\ContentProtection\Model\ContentProtectionRepository;
 use MittagQI\Translate5\ContentProtection\Model\ContentProtectionDto;
+use MittagQI\Translate5\ContentProtection\Model\ContentProtectionRepository;
 use MittagQI\Translate5\ContentProtection\NumberProtection\NumberParsingException;
 use MittagQI\Translate5\ContentProtection\NumberProtector;
 
 abstract class AbstractProtector implements NumberProtectorInterface
 {
-    public function __construct(protected ContentProtectionRepository $formatRepository)
-    {
+    public function __construct(
+        protected ContentProtectionRepository $formatRepository
+    ) {
     }
 
     abstract public function validateFormat(string $format): bool;
+
     abstract public function getFormatedExample(string $format): string;
 
     protected function tagFormat(): string
@@ -77,16 +79,13 @@ abstract class AbstractProtector implements NumberProtectorInterface
         );
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function protect(
         string $number,
         ContentProtectionDto $protectionDto,
         editor_Models_Languages $sourceLang,
         editor_Models_Languages $targetLang
     ): string {
-        if (!$protectionDto->keepAsIs && empty($protectionDto->outputFormat)) {
+        if (! $protectionDto->keepAsIs && empty($protectionDto->outputFormat)) {
             throw new LogicException(
                 sprintf(
                     'Input rule of type "%s" and name "%s" does not have appropriate output rule',

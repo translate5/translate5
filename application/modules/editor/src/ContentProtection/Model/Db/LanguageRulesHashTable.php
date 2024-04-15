@@ -57,5 +57,6 @@ use Zend_Db_Table_Abstract;
 class LanguageRulesHashTable extends Zend_Db_Table_Abstract
 {
     protected $_name = 'LEK_content_protection_language_rules_hash';
+
     public $_primary = 'id';
 }

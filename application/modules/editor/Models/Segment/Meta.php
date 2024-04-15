@@ -107,7 +107,7 @@ class editor_Models_Segment_Meta extends ZfExtended_Models_Entity_MetaAbstract
                 $this,
                 $segment->getFileId(),
                 str_contains($field, editor_Models_SegmentField::TYPE_SOURCE)
-            ) + (int)$this->getAdditionalMrkLength();
+            ) + (int) $this->getAdditionalMrkLength();
         }
         $this->__call(__FUNCTION__, [json_encode($data)]);
     }

@@ -83,7 +83,7 @@ class FloatProtectorTest extends TestCase
     {
         $protectionDto = new ContentProtectionDto(
             'float',
-             'test-default',
+            'test-default',
             '/\b([1-9]\d{0,2},){1}(\d{3},)*\d{3}\.\d+\b/u',
             0,
             '#,##0.###',
@@ -208,7 +208,8 @@ class FloatProtectorTest extends TestCase
         ];
     }
 
-    public function testExceptionOnEmptyFormat(): void {
+    public function testExceptionOnEmptyFormat(): void
+    {
         $sourceLang = new editor_Models_Languages();
         $sourceLang->setId(5);
         $sourceLang->setRfc5646('en');

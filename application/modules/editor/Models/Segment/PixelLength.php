@@ -137,7 +137,7 @@ class editor_Models_Segment_PixelLength
 
         // prepare string for counting
         $segmentContent = $this->segment->prepareForPixelBasedLengthCount($segmentContent, $isSource);
-        
+
         // get length for string by adding each character's length
         $allCharsInSegment = $this->segmentContentAsCharacters($segmentContent);
         foreach ($allCharsInSegment as $char) {

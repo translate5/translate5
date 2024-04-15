@@ -79,336 +79,336 @@ class FloatObjectTest extends TestCase
         #region #,#.#
         yield [
             'float' => '567.078',
-            'object' => new FloatObject(567.078, 3)
+            'object' => new FloatObject(567.078, 3),
         ];
         yield [
             'float' => '123,234,567.890987654345678',
-            'object' => new FloatObject(123234567.890987654345678, 15)
+            'object' => new FloatObject(123234567.890987654345678, 15),
         ];
         yield [
             'float' => '123,234,567.89',
-            'object' => new FloatObject(123234567.89, 2)
+            'object' => new FloatObject(123234567.89, 2),
         ];
         yield [
             'float' => '123,234,567.89',
-            'object' => new FloatObject(123234567.89, 2)
+            'object' => new FloatObject(123234567.89, 2),
         ];
         yield [
             'float' => '12,234,567.89',
-            'object' => new FloatObject(12234567.89, 2)
+            'object' => new FloatObject(12234567.89, 2),
         ];
         yield [
             'float' => '1,234,567.89',
-            'object' => new FloatObject(1234567.89, 2)
+            'object' => new FloatObject(1234567.89, 2),
         ];
         yield [
             'float' => '234,567.89',
-            'object' => new FloatObject(234567.89, 2)
+            'object' => new FloatObject(234567.89, 2),
         ];
         yield [
             'float' => '34,567.89',
-            'object' => new FloatObject(34567.89, 2)
+            'object' => new FloatObject(34567.89, 2),
         ];
         yield [
             'float' => '4,567.89',
-            'object' => new FloatObject(4567.89, 2)
+            'object' => new FloatObject(4567.89, 2),
         ];
         yield [
             'float' => '567.89',
-            'object' => new FloatObject(567.89, 2)
+            'object' => new FloatObject(567.89, 2),
         ];
         yield [
             'float' => '67.89',
-            'object' => new FloatObject(67.89, 2)
+            'object' => new FloatObject(67.89, 2),
         ];
         yield [
             'float' => '7.89',
-            'object' => new FloatObject(7.89, 2)
+            'object' => new FloatObject(7.89, 2),
         ];
         yield [
             'float' => '0.89',
-            'object' => new FloatObject(0.89, 2)
+            'object' => new FloatObject(0.89, 2),
         ];
         #endregion #,#.#
 
         #region #.#,#
         yield [
             'float' => '123.234.567,890987654345678',
-            'object' => new FloatObject(123234567.890987654345678, 15)
+            'object' => new FloatObject(123234567.890987654345678, 15),
         ];
         yield [
             'float' => '123.234.567,89',
-            'object' => new FloatObject(123234567.89, 2)
+            'object' => new FloatObject(123234567.89, 2),
         ];
         yield [
             'float' => '123.234.567,89',
-            'object' => new FloatObject(123234567.89, 2 )
+            'object' => new FloatObject(123234567.89, 2),
         ];
 
         yield [
             'float' => '12.234.567,89',
-            'object' => new FloatObject(12234567.89, 2)
+            'object' => new FloatObject(12234567.89, 2),
         ];
         yield [
             'float' => '1.234.567,89',
-            'object' => new FloatObject(1234567.89, 2)
+            'object' => new FloatObject(1234567.89, 2),
         ];
         yield [
             'float' => '234.567,89',
-            'object' => new FloatObject(234567.89, 2)
+            'object' => new FloatObject(234567.89, 2),
         ];
         yield [
             'float' => '34.567,89',
-            'object' => new FloatObject(34567.89, 2)
+            'object' => new FloatObject(34567.89, 2),
         ];
         yield [
             'float' => '4.567,89',
-            'object' => new FloatObject(4567.89, 2)
+            'object' => new FloatObject(4567.89, 2),
         ];
         yield [
             'float' => '567,89',
-            'object' => new FloatObject(567.89, 2)
+            'object' => new FloatObject(567.89, 2),
         ];
         yield [
             'float' => '67,89',
-            'object' => new FloatObject(67.89, 2)
+            'object' => new FloatObject(67.89, 2),
         ];
         yield [
             'float' => '7,89',
-            'object' => new FloatObject(7.89, 2)
+            'object' => new FloatObject(7.89, 2),
         ];
         yield [
             'float' => '0,89',
-            'object' => new FloatObject(0.89, 2)
+            'object' => new FloatObject(0.89, 2),
         ];
         #endregion #.#,#
 
         #region # #.#
         yield [
             'float' => '123 234 567.890987654345678',
-            'object' => new FloatObject(123234567.890987654345678, 15)
+            'object' => new FloatObject(123234567.890987654345678, 15),
         ];
         yield [
             'float' => '123 234 567.89',
-            'object' => new FloatObject(123234567.89, 2)
+            'object' => new FloatObject(123234567.89, 2),
         ];
         yield [
             'float' => '123 234 567.89',
-            'object' => new FloatObject(123234567.89, 2)
+            'object' => new FloatObject(123234567.89, 2),
         ];
         yield [
             'float' => '12 234 567.89',
-            'object' => new FloatObject(12234567.89, 2)
+            'object' => new FloatObject(12234567.89, 2),
         ];
         yield [
             'float' => '1 234 567.89',
-            'object' => new FloatObject(1234567.89, 2)
+            'object' => new FloatObject(1234567.89, 2),
         ];
         yield [
             'float' => '234 567.89',
-            'object' => new FloatObject(234567.89, 2)
+            'object' => new FloatObject(234567.89, 2),
         ];
         yield [
             'float' => '34 567.89',
-            'object' => new FloatObject(34567.89, 2)
+            'object' => new FloatObject(34567.89, 2),
         ];
         yield [
             'float' => '4 567.89',
-            'object' => new FloatObject(4567.89, 2)
+            'object' => new FloatObject(4567.89, 2),
         ];
         #endregion # #.#
 
         #region # #,#
         yield [
             'float' => '123 234 567,890987654345678',
-            'object' => new FloatObject(123234567.890987654345678, 15)
+            'object' => new FloatObject(123234567.890987654345678, 15),
         ];
         yield [
             'float' => '123 234 567,89',
-            'object' => new FloatObject(123234567.89, 2)
+            'object' => new FloatObject(123234567.89, 2),
         ];
         yield [
             'float' => '123 234 567,89',
-            'object' => new FloatObject(123234567.89, 2)
+            'object' => new FloatObject(123234567.89, 2),
         ];
         yield [
             'float' => '12 234 567,89',
-            'object' => new FloatObject(12234567.89, 2)
+            'object' => new FloatObject(12234567.89, 2),
         ];
         yield [
             'float' => '1 234 567,89',
-            'object' => new FloatObject(1234567.89, 2)
+            'object' => new FloatObject(1234567.89, 2),
         ];
         yield [
             'float' => '234 567,89',
-            'object' => new FloatObject(234567.89, 2)
+            'object' => new FloatObject(234567.89, 2),
         ];
         yield [
             'float' => '34 567,89',
-            'object' => new FloatObject(34567.89, 2)
+            'object' => new FloatObject(34567.89, 2),
         ];
         yield [
             'float' => '4 567,89',
-            'object' => new FloatObject(4567.89, 2)
+            'object' => new FloatObject(4567.89, 2),
         ];
         #endregion # #,#
 
         #region #,#·#
         yield [
             'float' => '123,234,567·890987654345678',
-            'object' => new FloatObject(123234567.890987654345678, 15)
+            'object' => new FloatObject(123234567.890987654345678, 15),
         ];
         yield [
             'float' => '123,234,567·89',
-            'object' => new FloatObject(123234567.89, 2)
+            'object' => new FloatObject(123234567.89, 2),
         ];
         yield [
             'float' => '123,234,567·89',
-            'object' => new FloatObject(123234567.89, 2)
+            'object' => new FloatObject(123234567.89, 2),
         ];
         yield [
             'float' => '12,234,567·89',
-            'object' => new FloatObject(12234567.89, 2)
+            'object' => new FloatObject(12234567.89, 2),
         ];
         yield [
             'float' => '1,234,567·89',
-            'object' => new FloatObject(1234567.89, 2)
+            'object' => new FloatObject(1234567.89, 2),
         ];
         yield [
             'float' => '234,567·89',
-            'object' => new FloatObject(234567.89, 2)
+            'object' => new FloatObject(234567.89, 2),
         ];
         yield [
             'float' => '34,567·89',
-            'object' => new FloatObject(34567.89, 2)
+            'object' => new FloatObject(34567.89, 2),
         ];
         yield [
             'float' => '4,567·89',
-            'object' => new FloatObject(4567.89, 2)
+            'object' => new FloatObject(4567.89, 2),
         ];
         yield [
             'float' => '567·89',
-            'object' => new FloatObject(567.89, 2)
+            'object' => new FloatObject(567.89, 2),
         ];
         yield [
             'float' => '67·89',
-            'object' => new FloatObject(67.89, 2)
+            'object' => new FloatObject(67.89, 2),
         ];
         yield [
             'float' => '7·89',
-            'object' => new FloatObject(7.89, 2)
+            'object' => new FloatObject(7.89, 2),
         ];
         yield [
             'float' => '0·89',
-            'object' => new FloatObject(0.89, 2)
+            'object' => new FloatObject(0.89, 2),
         ];
         #endregion #,#·#
 
         #region #'#.#
         yield [
             'float' => "123'234'567.890987654345678",
-            'object' => new FloatObject(123234567.890987654345678, 15)
+            'object' => new FloatObject(123234567.890987654345678, 15),
         ];
         yield [
             'float' => "123'234'567.89",
-            'object' => new FloatObject(123234567.89, 2)
+            'object' => new FloatObject(123234567.89, 2),
         ];
         yield [
             'float' => "123'234'567.89",
-            'object' => new FloatObject(123234567.89, 2)
+            'object' => new FloatObject(123234567.89, 2),
         ];
         yield [
             'float' => "12'234'567.89",
-            'object' => new FloatObject(12234567.89, 2)
+            'object' => new FloatObject(12234567.89, 2),
         ];
         yield [
             'float' => "1'234'567.89",
-            'object' => new FloatObject(1234567.89, 2)
+            'object' => new FloatObject(1234567.89, 2),
         ];
         yield [
             'float' => "234'567.89",
-            'object' => new FloatObject(234567.89, 2)
+            'object' => new FloatObject(234567.89, 2),
         ];
         yield [
             'float' => "34'567.89",
-            'object' => new FloatObject(34567.89, 2)
+            'object' => new FloatObject(34567.89, 2),
         ];
         yield [
             'float' => "4'567.89",
-            'object' => new FloatObject(4567.89, 2)
+            'object' => new FloatObject(4567.89, 2),
         ];
         yield [
             'float' => "567.89",
-            'object' => new FloatObject(567.89, 2)
+            'object' => new FloatObject(567.89, 2),
         ];
         yield [
             'float' => "67.89",
-            'object' => new FloatObject(67.89, 2)
+            'object' => new FloatObject(67.89, 2),
         ];
         yield [
             'float' => "7.89",
-            'object' => new FloatObject(7.89, 2)
+            'object' => new FloatObject(7.89, 2),
         ];
         #endregion #'#.#
 
         #region #.#'#
         yield [
             'float' => "123.234.567'890987654345678",
-            'object' => new FloatObject(123234567.890987654345678, 15)
+            'object' => new FloatObject(123234567.890987654345678, 15),
         ];
         yield [
             'float' => "123.234.567'89",
-            'object' => new FloatObject(123234567.89, 2)
+            'object' => new FloatObject(123234567.89, 2),
         ];
         yield [
             'float' => "123.234.567'89",
-            'object' => new FloatObject(123234567.89, 2)
+            'object' => new FloatObject(123234567.89, 2),
         ];
         yield [
             'float' => "12.234.567'89",
-            'object' => new FloatObject(12234567.89, 2)
+            'object' => new FloatObject(12234567.89, 2),
         ];
         yield [
             'float' => "1.234.567'89",
-            'object' => new FloatObject(1234567.89, 2)
+            'object' => new FloatObject(1234567.89, 2),
         ];
         yield [
             'float' => "234.567'89",
-            'object' => new FloatObject(234567.89, 2)
+            'object' => new FloatObject(234567.89, 2),
         ];
         yield [
             'float' => "34.567'89",
-            'object' => new FloatObject(34567.89, 2)
+            'object' => new FloatObject(34567.89, 2),
         ];
         yield [
             'float' => "4.567'89",
-            'object' => new FloatObject(4567.89, 2)
+            'object' => new FloatObject(4567.89, 2),
         ];
         yield [
             'float' => "567'89",
-            'object' => new FloatObject(567.89, 2)
+            'object' => new FloatObject(567.89, 2),
         ];
         yield [
             'float' => "67'89",
-            'object' => new FloatObject(67.89, 2)
+            'object' => new FloatObject(67.89, 2),
         ];
         yield [
             'float' => "7'89",
-            'object' => new FloatObject(7.89, 2)
+            'object' => new FloatObject(7.89, 2),
         ];
         yield [
             'float' => "0'89",
-            'object' => new FloatObject(0.89, 2)
+            'object' => new FloatObject(0.89, 2),
         ];
         #endregion #'#.#
 
         yield [
             'float' => '1,2323,4567.89',
-            'object' => new FloatObject(123234567.89, 2)
+            'object' => new FloatObject(123234567.89, 2),
         ];
         yield [
             'float' => '12,32,34,567.89',
-            'object' => new FloatObject(123234567.89, 2)
+            'object' => new FloatObject(123234567.89, 2),
         ];
     }
 
@@ -417,7 +417,7 @@ class FloatObjectTest extends TestCase
      */
     public function testFormat(float $float, string $locale, ?string $format, string $expected): void
     {
-        self::assertEquals($expected, FloatObject::parse((string)$float)->format($format, $locale));
+        self::assertEquals($expected, FloatObject::parse((string) $float)->format($format, $locale));
     }
 
     public function formatProvider(): iterable
@@ -426,50 +426,50 @@ class FloatObjectTest extends TestCase
             'float' => 1234567.123456,
             'locale' => 'en',
             'format' => '#,##0.#',
-            'expected' => '1,234,567.123456'
+            'expected' => '1,234,567.123456',
         ];
         yield [
             'float' => 1234567.123456,
             'locale' => 'ar_EG',
             'format' => '#٬##0٫#',
-            'expected' => '١٬٢٣٤٬٥٦٧٫١٢٣٤٥٦'
+            'expected' => '١٬٢٣٤٬٥٦٧٫١٢٣٤٥٦',
         ];
         yield [
             'float' => 1234567.123456,
             'locale' => 'hi-IN',
             'format' => '#,##,##0.#',
-            'expected' => '12,34,567.123456'
+            'expected' => '12,34,567.123456',
         ];
 
         yield [
             'float' => 1234567.123456,
             'locale' => 'en',
             'format' => '#,##,##0.#',
-            'expected' => '12,34,567.123456'
+            'expected' => '12,34,567.123456',
         ];
         yield [
             'float' => 1234567.123456,
             'locale' => 'ar_EG',
             'format' => '#,##,##0.#',
-            'expected' => '١٢,٣٤,٥٦٧.١٢٣٤٥٦'
+            'expected' => '١٢,٣٤,٥٦٧.١٢٣٤٥٦',
         ];
         yield [
             'float' => 1234567.123456,
             'locale' => 'en',
             'format' => '#,###0.#',
-            'expected' => '123,4567.123456'
+            'expected' => '123,4567.123456',
         ];
         yield [
             'float' => 1234567.123456,
             'locale' => 'hi-IN',
             'format' => '#+###0*# MONEY',
-            'expected' => '123+4567*123456 MONEY'
+            'expected' => '123+4567*123456 MONEY',
         ];
         yield [
             'float' => 1234567.123456,
             'locale' => 'en',
             'format' => '#.#',
-            'expected' => '1234567.123456'
+            'expected' => '1234567.123456',
         ];
     }
 }

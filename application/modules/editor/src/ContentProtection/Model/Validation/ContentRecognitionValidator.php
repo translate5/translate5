@@ -3,7 +3,7 @@
 START LICENSE AND COPYRIGHT
 
  This file is part of translate5
- 
+
  Copyright (c) 2013 - 2021 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
 
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
@@ -13,15 +13,15 @@ START LICENSE AND COPYRIGHT
  included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
-  
+
  There is a plugin exception available for use with this release of translate5 for
  translate5: Please see http://www.translate5.net/plugin-exception.txt or
  plugin-exception.txt in the root folder of translate5.
-  
+
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
@@ -39,7 +39,9 @@ class ContentRecognitionValidator extends ValidatorWithContext
 {
     public function __construct(ZfExtended_Models_Entity_Abstract $entity)
     {
-        $this->customFieldFilterInstances = ['format' => [new FormatValidator()]];
+        $this->customFieldFilterInstances = [
+            'format' => [new FormatValidator()],
+        ];
         parent::__construct($entity);
     }
 
@@ -53,19 +55,31 @@ class ContentRecognitionValidator extends ValidatorWithContext
         $idValidator = new Zend_Validate();
         $idValidator->addValidator($this->validatorFactory('int'), true);
         // users should not be able neither create nor modify default records
-        $idValidator->addValidator(new RecordIsNotDefaultValidator(['table' => $table, 'field' => 'id']), true);
+        $idValidator->addValidator(new RecordIsNotDefaultValidator([
+            'table' => $table,
+            'field' => 'id',
+        ]), true);
         $this->addValidatorInstance('id', $idValidator);
 
         $this->addValidator('type', 'InArray', [NumberProtector::create()->types()]);
         //`name` varchar(255) NOT NULL,
-        $this->addValidator('name', 'stringLength', ['min' => 3, 'max' => 255]);
+        $this->addValidator('name', 'stringLength', [
+            'min' => 3,
+            'max' => 255,
+        ]);
 
         //`description` varchar(1024),
-        $this->addValidator('description', 'stringLength', ['min' => 3, 'max' => 1024], true);
+        $this->addValidator('description', 'stringLength', [
+            'min' => 3,
+            'max' => 1024,
+        ], true);
 
         //`regex` varchar(255) NOT NULL,
         $regexValidator = new Zend_Validate();
-        $regexValidator->addValidator($this->validatorFactory('stringLength', ['min' => 3, 'max' => 255]), true);
+        $regexValidator->addValidator($this->validatorFactory('stringLength', [
+            'min' => 3,
+            'max' => 255,
+        ]), true);
         $regexValidator->addValidator(new RegexPatternValidator(), true);
 
         $this->addValidatorInstance('regex', $regexValidator);
@@ -73,7 +87,10 @@ class ContentRecognitionValidator extends ValidatorWithContext
         $this->addValidator('matchId', 'int');
 
         //`format` varchar(255) NOT NULL,
-        $this->addValidator('format', 'stringLength', ['min' => 0, 'max' => 255]);
+        $this->addValidator('format', 'stringLength', [
+            'min' => 0,
+            'max' => 255,
+        ]);
 
         $this->addValidator('keepAsIs', 'boolean');
         $this->addValidator('enabled', 'boolean', allowNull: true);

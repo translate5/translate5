@@ -60,7 +60,7 @@ abstract class editor_Services_Connector_TagHandler_Abstract
     protected $highestShortcutNumber = 0;
 
     protected array $shortcutNumberMap = [];
-    
+
     /**
      * @var editor_Models_Segment_UtilityBroker
      */
@@ -86,21 +86,23 @@ abstract class editor_Services_Connector_TagHandler_Abstract
     protected ContentProtector $contentProtector;
 
     protected int $sourceLang = 0;
+
     protected int $targetLang = 0;
 
     protected bool $handleIsInSourceScope = true;
-    
-    public function __construct() {
+
+    public function __construct()
+    {
         $this->xmlparser = ZfExtended_Factory::get(editor_Models_Import_FileParser_XmlParser::class);
         $this->trackChange = ZfExtended_Factory::get(editor_Models_Segment_TrackChangeTag::class);
         $this->utilities = ZfExtended_Factory::get(editor_Models_Segment_UtilityBroker::class);
-        
+
         $this->logger = ZfExtended_Factory::get(ZfExtended_Logger_Queued::class);
 
         $this->contentProtector = ContentProtector::create($this->utilities->whitespace);
 
         //we have to use the XML parser to restore whitespace, otherwise protectWhitespace would destroy the tags
-        $this->xmlparser->registerOther(function($textNode, $key) {
+        $this->xmlparser->registerOther(function ($textNode, $key) {
             //set shortTagIdent of the tagTrait to the next usable number if there are new tags
             $this->shortTagIdent = $this->highestShortcutNumber + 1;
             $textNode = $this->contentProtector->convertToInternalTagsWithShortcutNumberMap(
@@ -123,7 +125,7 @@ abstract class editor_Services_Connector_TagHandler_Abstract
      * protects the internal tags for language resource processing as defined in the class
      */
     abstract public function prepareQuery(string $queryString, bool $isSource = true): string;
-    
+
     /**
      * protects the internal tags for language resource processing as defined in the class
      * @return string|null returns NULL on error

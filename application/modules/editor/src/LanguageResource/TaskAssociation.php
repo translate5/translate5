@@ -252,7 +252,7 @@ class TaskAssociation extends AssociationAbstract
                 $languageresource['serviceName'] = $serviceManager->getUiNameByType($languageresource['serviceType']);
 
                 if (editor_Services_Manager::SERVICE_OPENTM2 === $languageresource['serviceType']) {
-                    $languageresource['tmNeedsConversion'] = !$tmConversionService->isTmConverted(
+                    $languageresource['tmNeedsConversion'] = ! $tmConversionService->isTmConverted(
                         $languageresource['languageResourceId']
                     );
                     $languageresource['tmConversionInProgress'] = $tmConversionService->isConversionInProgress(

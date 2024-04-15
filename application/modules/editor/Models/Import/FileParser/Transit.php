@@ -218,12 +218,16 @@ class editor_Models_Import_FileParser_Transit extends editor_Models_Import_FileP
         $targetName = $this->segmentFieldManager->getFirstTargetName();
 
         [$parsedSource, $parsedTarget] = $this->contentProtector->filterTags(
-            $this->parseSegment($transUnit['source'],true),
-            $this->parseSegment($transUnit['target'],false)
+            $this->parseSegment($transUnit['source'], true),
+            $this->parseSegment($transUnit['target'], false)
         );
 
-        $this->segmentData[$sourceName] = ['original' => $parsedSource];
-        $this->segmentData[$targetName] = ['original' => $parsedTarget];
+        $this->segmentData[$sourceName] = [
+            'original' => $parsedSource,
+        ];
+        $this->segmentData[$targetName] = [
+            'original' => $parsedTarget,
+        ];
     }
 
     protected function addCustomSegmentsMeta(editor_Models_Import_FileParser_SegmentAttributes $attributes, editor_Plugins_Transit_Segment $targetseg, string $targetText)
@@ -247,7 +251,7 @@ class editor_Models_Import_FileParser_Transit extends editor_Models_Import_FileP
      */
     protected function parseSegment($segment, $isSource)
     {
-        $segment = editor_Models_Segment_Utility::foreachSegmentTextNode($segment, function($text) use ($isSource) {
+        $segment = editor_Models_Segment_Utility::foreachSegmentTextNode($segment, function ($text) use ($isSource) {
             return $this->contentProtector->protect(
                 $text,
                 $isSource,
@@ -262,7 +266,7 @@ class editor_Models_Import_FileParser_Transit extends editor_Models_Import_FileP
         $this->shortTagIdent = 1;
 
         $segment = $this->parseTags($segment);
-        
+
         $segment = $this->contentProtector->convertToInternalTags($segment, $this->shortTagIdent);
         $this->checkForUndefinedTags($segment);
 

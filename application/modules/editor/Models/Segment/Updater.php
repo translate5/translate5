@@ -26,9 +26,9 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-use MittagQI\Translate5\Task\TaskEventTrigger;
 use MittagQI\Translate5\ContentProtection\ContentProtector;
 use MittagQI\Translate5\ContentProtection\NumberProtector;
+use MittagQI\Translate5\Task\TaskEventTrigger;
 
 /**
  * Saving an existing Segment contains a lot of different steps in the business logic, not only just saving the content to the DB
@@ -65,9 +65,6 @@ class editor_Models_Segment_Updater
 
     protected ContentProtector $contentProtector;
 
-    /**
-     * @param editor_Models_Task $task
-     */
     public function __construct(
         editor_Models_Task $task,
         private string $userGuid
@@ -299,11 +296,11 @@ class editor_Models_Segment_Updater
         // This is because the user is not allowed to add new internal tags by adding plain special characters directly (only via adding it as tag in the frontend)
         $content = editor_Models_Segment_Utility::foreachSegmentTextNode(
             $content,
-            function($text) use ($isEditingTargetInFront) {
+            function ($text) use ($isEditingTargetInFront) {
                 return strip_tags(
                     $this->contentProtector->protect(
                         $text,
-                        !$isEditingTargetInFront,
+                        ! $isEditingTargetInFront,
                         $this->task->getSourceLang(),
                         $this->task->getTargetLang(),
                         ContentProtector::ENTITY_MODE_RESTORE,
@@ -312,7 +309,7 @@ class editor_Models_Segment_Updater
                 );
             }
         );
-        
+
         //revoke the internaltag replacement
         $content = $this->utilities->internalTag->unprotect($content);
 

@@ -151,7 +151,7 @@ class editor_Models_Import_FileParser_Xlf_OtherContent
         $data = $source ? $this->otherContentSource : $this->otherContentTarget;
         $containerBoundary = $source ? $this->sourceElementBoundary : $this->targetElementBoundary;
 
-        if(empty($data) || empty($containerBoundary)) {
+        if (empty($data) || empty($containerBoundary)) {
             return [];
         }
 

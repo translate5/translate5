@@ -175,7 +175,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract
     protected editor_Models_Segment_UtilityBroker $utilityBroker;
 
     protected ContentProtector $contentProtector;
-    
+
     /**
      * @var editor_Models_Segment_InternalTag
      */
@@ -634,7 +634,6 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract
     /**
      * Same as textLengthByMeta(), but here we use the editor_Models_Import_FileParser_SegmentAttributes
      * instead of editor_Models_Segment_Meta (on import, the segment and it's meta don't exist yet).
-     * @param string $content
      * @param string $taskGuid (other than in $segmentMeta, the $attributes don't have a taskGuid)
      * @param int $fileId
      * @return integer

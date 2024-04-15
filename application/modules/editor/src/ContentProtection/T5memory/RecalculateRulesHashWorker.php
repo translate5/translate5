@@ -3,25 +3,25 @@
 START LICENSE AND COPYRIGHT
 
  This file is part of translate5
- 
+
  Copyright (c) 2013 - 2021 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
 
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
  This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
- as published by the Free Software Foundation and appearing in the file agpl3-license.txt 
- included in the packaging of this file.  Please review the following information 
+ as published by the Free Software Foundation and appearing in the file agpl3-license.txt
+ included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
-  
+
  There is a plugin exception available for use with this release of translate5 for
- translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or
  plugin-exception.txt in the root folder of translate5.
-  
+
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
@@ -47,14 +47,21 @@ use ZfExtended_Worker_Abstract;
 class RecalculateRulesHashWorker extends ZfExtended_Worker_Abstract
 {
     public const DIRECTION_INPUT = 0;
+
     public const DIRECTION_OUTPUT = 1;
 
     private ?int $recognitionId = null;
+
     private ?int $languageId = null;
+
     private int $direction = self::DIRECTION_INPUT;
+
     private ContentProtectionRepository $protectionRepository;
+
     private LanguageRepository $languageRepository;
+
     private LanguageRulesHashService $languageRulesHashService;
+
     private array $processedPairs = [];
 
     public function __construct()
@@ -84,7 +91,7 @@ class RecalculateRulesHashWorker extends ZfExtended_Worker_Abstract
 
         return true;
     }
-    
+
     protected function work()
     {
         if (null !== $this->recognitionId) {
@@ -102,7 +109,7 @@ class RecalculateRulesHashWorker extends ZfExtended_Worker_Abstract
         $dbInputMapping = ZfExtended_Factory::get(InputMapping::class)->db;
 
         foreach ($dbInputMapping->fetchAll($this->getSelectionBase()) as $pair) {
-            $this->updateHashesFor((int)$pair->sourceLang, (int)$pair->targetLang);
+            $this->updateHashesFor((int) $pair->sourceLang, (int) $pair->targetLang);
         }
 
         return true;
@@ -115,7 +122,7 @@ class RecalculateRulesHashWorker extends ZfExtended_Worker_Abstract
         $select = $this->getSelectionBase()->where('contentRecognitionId = ?', $recognitionId);
 
         foreach ($dbInputMapping->fetchAll($select) as $pair) {
-            $this->updateHashesFor((int)$pair->sourceLang, (int)$pair->targetLang);
+            $this->updateHashesFor((int) $pair->sourceLang, (int) $pair->targetLang);
         }
     }
 
@@ -129,22 +136,30 @@ class RecalculateRulesHashWorker extends ZfExtended_Worker_Abstract
         return $dbInputMapping->select()
             ->setIntegrityCheck(false)
             ->from(
-                ['InputMapping' => $dbInputMapping->info($dbInputMapping::NAME)],
+                [
+                    'InputMapping' => $dbInputMapping->info($dbInputMapping::NAME),
+                ],
                 ['InputMapping.languageId as sourceLang']
             )
             ->join(
-                ['inputRecognition' => $contentRecognitionTable],
+                [
+                    'inputRecognition' => $contentRecognitionTable,
+                ],
                 'inputRecognition.id = InputMapping.contentRecognitionId'
                 . ($onlyActiveRules ? ' AND inputRecognition.enabled = true' : ''),
                 []
             )
             ->join(
-                ['OutputMapping' => $dbOutputMapping->info($dbOutputMapping::NAME)],
+                [
+                    'OutputMapping' => $dbOutputMapping->info($dbOutputMapping::NAME),
+                ],
                 'InputMapping.contentRecognitionId = OutputMapping.inputContentRecognitionId',
                 ['OutputMapping.languageId as targetLang']
             )
             ->join(
-                ['outputRecognition' => $contentRecognitionTable],
+                [
+                    'outputRecognition' => $contentRecognitionTable,
+                ],
                 'outputRecognition.id = OutputMapping.outputContentRecognitionId'
                 . ($onlyActiveRules ? ' AND inputRecognition.enabled = true' : ''),
                 []
@@ -164,7 +179,7 @@ class RecalculateRulesHashWorker extends ZfExtended_Worker_Abstract
             $select = $this->getSelectionBase(true)->where('InputMapping.languageId = ?', $languageId);
 
             foreach ($this->languageRulesHashService->findAllBySourceLang($languageId) as $hash) {
-                $this->updateHashesFor((int)$hash->getSourceLanguageId(), (int)$hash->getTargetLanguageId());
+                $this->updateHashesFor((int) $hash->getSourceLanguageId(), (int) $hash->getTargetLanguageId());
             }
         }
 
@@ -172,7 +187,7 @@ class RecalculateRulesHashWorker extends ZfExtended_Worker_Abstract
             $select = $this->getSelectionBase(true)->where('OutputMapping.languageId = ?', $languageId);
 
             foreach ($this->languageRulesHashService->findAllByTargetLang($languageId) as $hash) {
-                $this->updateHashesFor((int)$hash->getSourceLanguageId(), (int)$hash->getTargetLanguageId());
+                $this->updateHashesFor((int) $hash->getSourceLanguageId(), (int) $hash->getTargetLanguageId());
             }
         }
 
@@ -181,7 +196,7 @@ class RecalculateRulesHashWorker extends ZfExtended_Worker_Abstract
         }
 
         foreach ($dbInputMapping->fetchAll($select) as $pair) {
-            $this->updateHashesFor((int)$pair->sourceLang, (int)$pair->targetLang);
+            $this->updateHashesFor((int) $pair->sourceLang, (int) $pair->targetLang);
         }
     }
 

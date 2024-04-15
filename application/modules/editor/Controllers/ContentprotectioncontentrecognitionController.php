@@ -3,7 +3,7 @@
 START LICENSE AND COPYRIGHT
 
  This file is part of translate5
- 
+
  Copyright (c) 2013 - 2021 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
 
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
@@ -13,15 +13,15 @@ START LICENSE AND COPYRIGHT
  included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
-  
+
  There is a plugin exception available for use with this release of translate5 for
  translate5: Please see http://www.translate5.net/plugin-exception.txt or
  plugin-exception.txt in the root folder of translate5.
-  
+
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
@@ -44,6 +44,7 @@ class editor_ContentprotectioncontentrecognitionController extends ZfExtended_Re
      * @var ContentRecognition
      */
     protected $entity;
+
     protected $entityClass = ContentRecognition::class;
 
     protected $postBlacklist = ['id'];
@@ -79,11 +80,11 @@ class editor_ContentprotectioncontentrecognitionController extends ZfExtended_Re
         $updatedFields = array_keys($this->data);
         $importantKeys = ['enabled', 'regex', 'matchId', 'keepAsIs', 'format'];
 
-        if (!empty(array_intersect($importantKeys, $updatedFields))) {
+        if (! empty(array_intersect($importantKeys, $updatedFields))) {
             $this->queueRecalculateRulesHashWorker();
         }
 
-        if (!empty($this->view->rows)) {
+        if (! empty($this->view->rows)) {
             $this->fixRowTypes($this->view->rows);
         }
     }
@@ -103,7 +104,9 @@ class editor_ContentprotectioncontentrecognitionController extends ZfExtended_Re
     private function queueRecalculateRulesHashWorker(): void
     {
         $worker = ZfExtended_Factory::get(RecalculateRulesHashWorker::class);
-        $worker->init(parameters: ['recognitionId' => $this->entity->getId()]);
+        $worker->init(parameters: [
+            'recognitionId' => $this->entity->getId(),
+        ]);
         $worker->queue();
     }
 
@@ -136,13 +139,15 @@ class editor_ContentprotectioncontentrecognitionController extends ZfExtended_Re
         $protector = ContentProtector::create(ZfExtended_Factory::get(Whitespace::class));
 
         if (empty($request->get('type')) || empty($request->getParam('ruleFormat'))) {
-            $this->view->rows = ['example' => ''];
+            $this->view->rows = [
+                'example' => '',
+            ];
 
             return;
         }
 
         $this->view->rows = [
-            'example' => $protector->getFormatedExample($request->get('type'), $request->getParam('ruleFormat'))
+            'example' => $protector->getFormatedExample($request->get('type'), $request->getParam('ruleFormat')),
         ];
     }
 }

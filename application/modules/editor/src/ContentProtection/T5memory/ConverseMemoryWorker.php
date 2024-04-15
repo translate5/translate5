@@ -3,25 +3,25 @@
 START LICENSE AND COPYRIGHT
 
  This file is part of translate5
- 
+
  Copyright (c) 2013 - 2021 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
 
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
  This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
- as published by the Free Software Foundation and appearing in the file agpl3-license.txt 
- included in the packaging of this file.  Please review the following information 
+ as published by the Free Software Foundation and appearing in the file agpl3-license.txt
+ included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
-  
+
  There is a plugin exception available for use with this release of translate5 for
- translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or
  plugin-exception.txt in the root folder of translate5.
-  
+
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
@@ -41,8 +41,11 @@ use ZfExtended_Worker_Abstract;
 class ConverseMemoryWorker extends ZfExtended_Worker_Abstract
 {
     private int $languageResourceId;
+
     private LanguageResource $languageResource;
+
     private array $memoriesBackup;
+
     private TmConversionService $tmConversionService;
 
     public function __construct()
@@ -60,7 +63,7 @@ class ConverseMemoryWorker extends ZfExtended_Worker_Abstract
 
     protected function validateParameters($parameters = [])
     {
-        if (!array_key_exists('languageResourceId', $parameters)) {
+        if (! array_key_exists('languageResourceId', $parameters)) {
             return false;
         }
 
@@ -83,27 +86,28 @@ class ConverseMemoryWorker extends ZfExtended_Worker_Abstract
         return true;
     }
 
-    protected function handleWorkerException(\Throwable $workException) {
+    protected function handleWorkerException(\Throwable $workException)
+    {
         $this->workerException = $workException;
 
         $this->restoreLangResourceMemories();
         $this->resetConversionStarted();
     }
-    
+
     protected function work(): bool
     {
         if ($this->tmConversionService->isTmConverted($this->languageResourceId)) {
             return true;
         }
 
-        if (!$this->tmConversionService->isConversionInProgress($this->languageResourceId)) {
+        if (! $this->tmConversionService->isConversionInProgress($this->languageResourceId)) {
             return false;
         }
 
         $connector = new Connector();
 
-        $sourceLang = (int)$this->languageResource->getSourceLang();
-        $targetLang = (int)$this->languageResource->getTargetLang();
+        $sourceLang = (int) $this->languageResource->getSourceLang();
+        $targetLang = (int) $this->languageResource->getTargetLang();
 
         $connector->connectTo($this->languageResource, $sourceLang, $targetLang);
         $status = $connector->getStatus($this->languageResource->getResource(), $this->languageResource);
@@ -124,13 +128,13 @@ class ConverseMemoryWorker extends ZfExtended_Worker_Abstract
 
         $exportFilename = $connector->export($connector->getValidExportTypes()['TMX']);
 
-        if (!file_exists($exportFilename)) {
+        if (! file_exists($exportFilename)) {
             $this->log->error(
                 'E1587',
                 'Conversion: TM was not exported. TMX file does not exists: {filename}',
                 [
                     'filename' => $exportFilename,
-                    'languageResource' => $this->languageResource
+                    'languageResource' => $this->languageResource,
                 ]
             );
 
@@ -145,13 +149,15 @@ class ConverseMemoryWorker extends ZfExtended_Worker_Abstract
             'name' => basename($exportFilename),
         ];
 
-        if (!$connector->addTm($fileinfo, ['createNewMemory' => true])) {
+        if (! $connector->addTm($fileinfo, [
+            'createNewMemory' => true,
+        ])) {
             $this->log->error(
                 'E1588',
                 'Conversion: Failed to import file: {filename}',
                 [
                     'filename' => $exportFilename,
-                    'languageResource' => $this->languageResource
+                    'languageResource' => $this->languageResource,
                 ]
             );
 
@@ -175,11 +181,13 @@ class ConverseMemoryWorker extends ZfExtended_Worker_Abstract
             );
 
         foreach ($this->memoriesBackup as $memory) {
-            if (!$connector->deleteMemory($memory['filename'], $onMemoryDeleted($memory['filename']))) {
+            if (! $connector->deleteMemory($memory['filename'], $onMemoryDeleted($memory['filename']))) {
                 $this->log->error(
                     'E1589',
                     'Conversion: Memory [{filename}] was not deleted in process of conversion',
-                    array_merge($memory, ['languageResource' => $this->languageResource])
+                    array_merge($memory, [
+                        'languageResource' => $this->languageResource,
+                    ])
                 );
             }
         }

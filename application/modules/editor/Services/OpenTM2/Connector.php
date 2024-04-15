@@ -205,7 +205,11 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
             $memory['readonly'] = true;
         }
 
-        $memories[] = ['id' => $id, 'filename' => $tmName, 'readonly' => false];
+        $memories[] = [
+            'id' => $id,
+            'filename' => $tmName,
+            'readonly' => false,
+        ];
 
         $this->languageResource->addSpecificData('memories', $memories);
         //saving it here makes the TM available even when the TMX import was crashed
@@ -266,7 +270,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
                     'Conversion: Error in process of TMX file conversion',
                     [
                         'reason' => $e->getMessage(),
-                        'languageResource' => $this->languageResource
+                        'languageResource' => $this->languageResource,
                     ]
                 );
                 $this->languageResource->setStatus(LanguageResourceStatus::AVAILABLE);
@@ -619,6 +623,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
 
         if ($resp->getStatus() == 404) {
             $onSuccess && $onSuccess();
+
             // if the result was a 404, then there is nothing to delete,
             // so throw no error then and delete just locally
             return true;
@@ -1580,7 +1585,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
     private function waitForImportFinish(string $tmName): void
     {
         while (true) {
-            if (!$this->api->status($tmName)) {
+            if (! $this->api->status($tmName)) {
                 break;
             }
 
@@ -1603,11 +1608,11 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
 
         $currentMax = 0;
         foreach ($memories as $memory) {
-            if (!preg_match($pattern, $memory['filename'], $matches)) {
+            if (! preg_match($pattern, $memory['filename'], $matches)) {
                 return $memory['filename'] . '_next-1';
             }
 
-            $currentMax = $currentMax > $matches[1] ? $currentMax : (int)$matches[1];
+            $currentMax = $currentMax > $matches[1] ? $currentMax : (int) $matches[1];
         }
 
         return preg_replace($pattern, '_next-' . ($currentMax + 1), $memories[0]['filename']);
@@ -1652,6 +1657,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
 
         foreach ($memories as $memoryNumber => $memory) {
             $filename = $exportDir . $memory['filename'] . '_' . uniqid() . '.tmx';
+
             try {
                 file_put_contents(
                     $filename,
@@ -1668,7 +1674,6 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
             $reader->open($stream);
 
             while ($reader->read()) {
-
                 if ($reader->nodeType == XMLReader::ELEMENT && $reader->name == 'tu') {
                     $writtenElements++;
                     $writer->writeRaw($this->conversionService->convertT5MemoryTagToContent($reader->readOuterXML()));

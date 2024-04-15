@@ -145,7 +145,8 @@ class DateProtectorTest extends TestCase
         ];
     }
 
-    public function testExceptionOnWrongDate(): void {
+    public function testExceptionOnWrongDate(): void
+    {
         $sourceLang = new editor_Models_Languages();
         $sourceLang->setId(5);
         $sourceLang->setRfc5646('en');
@@ -169,7 +170,8 @@ class DateProtectorTest extends TestCase
         (new DateProtector($repo))->protect('2023/18/13', $protectionDto, $sourceLang, $targetLangDe);
     }
 
-    public function testExceptionOnEmptyFormat(): void {
+    public function testExceptionOnEmptyFormat(): void
+    {
         $sourceLang = new editor_Models_Languages();
         $sourceLang->setId(5);
         $sourceLang->setRfc5646('en');

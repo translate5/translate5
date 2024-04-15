@@ -103,7 +103,7 @@ class IntegerProtector extends FloatProtector
 
         $int = $fmt->parse(preg_replace('/[^\d]/u', '', $number), NumberFormatter::TYPE_INT64);
 
-        if (!is_int($int)) {
+        if (! is_int($int)) {
             throw new NumberParsingException();
         }
 

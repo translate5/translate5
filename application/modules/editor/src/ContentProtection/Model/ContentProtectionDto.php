@@ -72,7 +72,8 @@ class ContentProtectionDto
         public bool $keepAsIs,
         public ?string $outputFormat,
         public int $priority,
-    ) {}
+    ) {
+    }
 
     public static function fromRow(array $row): self
     {

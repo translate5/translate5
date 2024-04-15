@@ -64,8 +64,8 @@ interface NumberProtectorInterface
      * @throws NumberParsingException
      */
     public function protect(
-        string                  $number,
-        ContentProtectionDto    $protectionDto,
+        string $number,
+        ContentProtectionDto $protectionDto,
         editor_Models_Languages $sourceLang,
         editor_Models_Languages $targetLang
     ): string;

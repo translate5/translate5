@@ -62,7 +62,9 @@ class T5MemoryXliffTest extends TestCase
     {
         $tagHandler = ZfExtended_Factory::get(
             editor_Services_Connector_TagHandler_T5MemoryXliff::class,
-            [['gTagPairing' => false]]
+            [[
+                'gTagPairing' => false,
+            ]]
         );
         $tagHandler->setLanguages(5, 6);
 
@@ -79,7 +81,9 @@ class T5MemoryXliffTest extends TestCase
     {
         $tagHandler = ZfExtended_Factory::get(
             editor_Services_Connector_TagHandler_T5MemoryXliff::class,
-            [['gTagPairing' => false]]
+            [[
+                'gTagPairing' => false,
+            ]]
         );
         $tagHandler->setLanguages(5, 6);
 

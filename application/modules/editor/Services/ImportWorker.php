@@ -85,8 +85,8 @@ class editor_Services_ImportWorker extends ZfExtended_Worker_Abstract
         $this->languageResource = ZfExtended_Factory::get('editor_Models_LanguageResources_LanguageResource');
         /* @var $languageResource editor_Models_LanguageResources_LanguageResource */
         $this->languageResource->load($params['languageResourceId']);
-        
-        $connector=$this->getConnector($this->languageResource);
+
+        $connector = $this->getConnector($this->languageResource);
 
         try {
             if (isset($params['addnew']) && $params['addnew']) {

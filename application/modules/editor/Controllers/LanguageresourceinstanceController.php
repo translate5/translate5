@@ -166,11 +166,11 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
             $lrData['tmConversionInProgress'] = false;
 
             if (editor_Services_Manager::SERVICE_OPENTM2 === $lrData['serviceType']) {
-                $lrData['tmNeedsConversion'] = !$tmConversionService->isTmConverted($id);
+                $lrData['tmNeedsConversion'] = ! $tmConversionService->isTmConverted($id);
                 $lrData['tmConversionInProgress'] = $tmConversionService->isConversionInProgress($id);
             }
 
-            if ($filterTmNeedsConversion && !$lrData['tmNeedsConversion']) {
+            if ($filterTmNeedsConversion && ! $lrData['tmNeedsConversion']) {
                 unset($rows[$rowId]);
 
                 continue;
@@ -230,14 +230,16 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
 
         $has = false;
         foreach ($iterator as $data) {
-            if (!$tmConversionService->isTmConverted($data['languageResourceId'])) {
+            if (! $tmConversionService->isTmConverted($data['languageResourceId'])) {
                 $has = true;
 
                 break;
             }
         }
 
-        $this->view->result = ['hasLangResThatNeedsConversion' => $has];
+        $this->view->result = [
+            'hasLangResThatNeedsConversion' => $has,
+        ];
         $this->view->success = true;
     }
 
@@ -267,13 +269,13 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
 
         foreach ($postData['data'] as $resource) {
             if (
-                $tmConversionService->isTmConverted((int)$resource)
-                || $tmConversionService->isConversionInProgress((int)$resource)
+                $tmConversionService->isTmConverted((int) $resource)
+                || $tmConversionService->isConversionInProgress((int) $resource)
             ) {
                 continue;
             }
 
-            $tmConversionService->startConversion((int)$resource);
+            $tmConversionService->startConversion((int) $resource);
         }
     }
 
@@ -1496,7 +1498,7 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         $this->view->resourceType = $this->entity->getResourceType();
         $this->view->rows = $result->getResult();
         if (editor_Services_Manager::SERVICE_OPENTM2 === $this->entity->getServiceType()) {
-            $this->view->tmNeedsConversion = !$tmConversionService->isTmConverted($languageResourceId);
+            $this->view->tmNeedsConversion = ! $tmConversionService->isTmConverted($languageResourceId);
             $this->view->tmConversionInProgress = $tmConversionService->isConversionInProgress($languageResourceId);
 
             foreach ($this->view->rows as &$row) {

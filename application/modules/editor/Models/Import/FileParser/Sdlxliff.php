@@ -579,12 +579,16 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
                 $attributes->mrkMid = $mid;
 
                 [$parsedSource, $parsedTarget] = $this->contentProtector->filterTags(
-                    $this->parseSegment($source,true),
-                    $this->parseSegment($target,false)
+                    $this->parseSegment($source, true),
+                    $this->parseSegment($target, false)
                 );
 
-                $this->segmentData[$sourceName] = ['original' => $parsedSource];
-                $this->segmentData[$targetName] = ['original' => $parsedTarget];
+                $this->segmentData[$sourceName] = [
+                    'original' => $parsedSource,
+                ];
+                $this->segmentData[$targetName] = [
+                    'original' => $parsedTarget,
+                ];
                 $segmentId = $this->setAndSaveSegmentValues();
                 $this->saveComments($segmentId, $comments);
 
@@ -793,7 +797,7 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
      */
     protected function parseSegment($segment, $isSource): string
     {
-        $segment = editor_Models_Segment_Utility::foreachSegmentTextNode($segment, function($text) use ($isSource) {
+        $segment = editor_Models_Segment_Utility::foreachSegmentTextNode($segment, function ($text) use ($isSource) {
             return $this->contentProtector->protect(
                 $text,
                 $isSource,

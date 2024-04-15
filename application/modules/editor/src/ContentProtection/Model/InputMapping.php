@@ -70,6 +70,7 @@ use ZfExtended_Models_Entity_Abstract;
 class InputMapping extends ZfExtended_Models_Entity_Abstract
 {
     protected $dbInstanceClass = InputMappingTable::class;
+
     protected $validatorInstanceClass = InputMappingValidator::class;
 
     /**
@@ -82,9 +83,13 @@ class InputMapping extends ZfExtended_Models_Entity_Abstract
         $s = $this->db
             ->select()
             ->setIntegrityCheck(false)
-            ->from(['mapping' => $this->db->info($this->db::NAME)], ['mapping.id', 'languageId', 'priority'])
+            ->from([
+                'mapping' => $this->db->info($this->db::NAME),
+            ], ['mapping.id', 'languageId', 'priority'])
             ->join(
-                ['recognition' => $recognitionTable],
+                [
+                    'recognition' => $recognitionTable,
+                ],
                 'recognition.id = mapping.contentRecognitionId',
                 ['type', 'name', 'enabled', 'description']
             )

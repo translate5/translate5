@@ -154,6 +154,7 @@ abstract class editor_Models_Export_FileParser
     protected SkeletonFile $skeletonFileInstance;
 
     protected ContentProtector $contentProtector;
+
     protected ?editor_Models_Export_DiffTagger $_diffTagger;
 
     /**
@@ -179,7 +180,7 @@ abstract class editor_Models_Export_FileParser
 
         $this->utilities = ZfExtended_Factory::get('editor_Models_Segment_UtilityBroker');
         $this->contentProtector = ContentProtector::create($this->utilities->whitespace);
-        
+
         $this->segmentFieldManager = ZfExtended_Factory::get('editor_Models_SegmentFieldManager');
         $this->segmentFieldManager->initFields($this->_taskGuid);
 
@@ -366,11 +367,11 @@ abstract class editor_Models_Export_FileParser
         // so that the same remove must not be done again inside of textLength
         //also add additionalMrkLength to the segment length for final length calculation
         $this->lastSegmentLength = $segment->textLengthByMeta(
-                $edited,
-                $segmentMeta,
-                $segment->getFileId(),
-                str_contains($field, editor_Models_SegmentField::TYPE_SOURCE)
-            ) + $segmentMeta->getAdditionalMrkLength();
+            $edited,
+            $segmentMeta,
+            $segment->getFileId(),
+            str_contains($field, editor_Models_SegmentField::TYPE_SOURCE)
+        ) + $segmentMeta->getAdditionalMrkLength();
 
         $edited = $this->parseSegment($edited);
         $edited = $this->revertNonBreakingSpaces($edited);

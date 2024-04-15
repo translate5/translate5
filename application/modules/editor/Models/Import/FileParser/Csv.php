@@ -362,7 +362,7 @@ class editor_Models_Import_FileParser_Csv extends editor_Models_Import_FileParse
 
         return $this->parseSegmentReplacePlaceholders($segment);
     }
-    
+
     /**
      * @param mixed $segment
      * @param bool isSource

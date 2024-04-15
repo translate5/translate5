@@ -106,10 +106,10 @@ class editor_Models_Segment_WordCount
     protected ContentProtector $contentProtector;
 
     protected editor_Models_Segment_UtilityBroker $utilityBroker;
-    
-    public function __construct($rfcLanguage="")
+
+    public function __construct($rfcLanguage = "")
     {
-        $this->rfcLanguage=$rfcLanguage;
+        $this->rfcLanguage = $rfcLanguage;
         $this->utilityBroker = ZfExtended_Factory::get(editor_Models_Segment_UtilityBroker::class);
         $this->connector = ZfExtended_Factory::get(editor_Services_OpenTM2_Connector::class);
         $config = Zend_Registry::get('config');

@@ -78,6 +78,7 @@ use ZfExtended_Models_Entity_Abstract;
 class ContentRecognition extends ZfExtended_Models_Entity_Abstract
 {
     protected $dbInstanceClass = ContentRecognitionTable::class;
+
     protected $validatorInstanceClass = ContentRecognitionValidator::class;
 
     public function loadBy(string $type, string $name): ?Zend_Db_Table_Row_Abstract
@@ -86,7 +87,7 @@ class ContentRecognition extends ZfExtended_Models_Entity_Abstract
         $s->where('type = ?', $type)->where('name = ?', $name);
 
         $this->row = $this->db->fetchRow($s);
-        if (empty($this->row)){
+        if (empty($this->row)) {
             $this->notFound("#by type, name", "$type, $name");
         }
 
@@ -100,7 +101,7 @@ class ContentRecognition extends ZfExtended_Models_Entity_Abstract
         $data['keepAsIs'] = boolval($data['keepAsIs']);
         $data['enabled'] = boolval($data['enabled']);
         unset($data['id'], $data['isDefault']);
-        if (!$this->validator->isValid($data)) {
+        if (! $this->validator->isValid($data)) {
             $errors = $this->validator->getMessages();
             $error = print_r($errors, true);
             $e = new \ZfExtended_ValidateException($error);

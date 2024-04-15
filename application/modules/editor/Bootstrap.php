@@ -600,11 +600,11 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
                 [
                     'module' => 'editor',
                     'controller' => 'languageresourceinstance',
-                    'action' => 'defaulttmneedsconversion'
+                    'action' => 'defaulttmneedsconversion',
                 ]
             )
         );
-        
+
         $queryRoute = new ZfExtended_Controller_RestLikeRoute(
             'editor/languageresourceinstance/:id/tasks',
             [
@@ -620,7 +620,7 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
             [
                 'module' => 'editor',
                 'controller' => 'languageresourceinstance',
-                'action' => 'synchronizetm'
+                'action' => 'synchronizetm',
             ]
         );
         $this->front->getRouter()->addRoute('languageresources_languageresourceinstance_synchronizetm', $queryRoute);
@@ -630,7 +630,7 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
             [
                 'module' => 'editor',
                 'controller' => 'languageresourceinstance',
-                'action' => 'synchronizetmbatch'
+                'action' => 'synchronizetmbatch',
             ]
         );
         $this->front->getRouter()->addRoute('languageresources_languageresourceinstance_synchronizetm_batch', $queryRoute);
@@ -830,7 +830,7 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
                     'module' => 'editor',
                     'controller' => 'contentprotectionoutputmapping',
                     /** @see \editor_ContentprotectionoutputmappingController::namecomboAction */
-                    'action' => 'namecombo'
+                    'action' => 'namecombo',
                 ]
             )
         );
@@ -843,7 +843,7 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
                     'module' => 'editor',
                     'controller' => 'contentprotectioncontentrecognition',
                     /** @see \editor_ContentprotectioncontentrecognitionController::testformatAction */
-                    'action' => 'testformat'
+                    'action' => 'testformat',
                 ]
             )
         );
@@ -856,7 +856,7 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
                     'module' => 'editor',
                     'controller' => 'contentprotectioninputmapping',
                     /** @see \editor_ContentprotectioninputmappingController::namecomboAction */
-                    'action' => 'namecombo'
+                    'action' => 'namecombo',
                 ]
             )
         );

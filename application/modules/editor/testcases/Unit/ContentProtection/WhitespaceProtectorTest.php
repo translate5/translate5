@@ -82,122 +82,121 @@ class WhitespaceProtectorTest extends TestCase
     {
         yield 'hardReturn' => [
             'text' => "text with [\r\n] in it",
-            'expected' => 'text with [<hardReturn/>] in it'
+            'expected' => 'text with [<hardReturn/>] in it',
         ];
         yield 'softReturn' => [
             'text' => "text with [\n] in it",
-            'expected' => 'text with [<softReturn/>] in it'
+            'expected' => 'text with [<softReturn/>] in it',
         ];
         yield 'macReturn' => [
             'text' => "text with [\r] in it",
-            'expected' => 'text with [<macReturn/>] in it'
+            'expected' => 'text with [<macReturn/>] in it',
         ];
-
 
         yield 'End of Text (ETX)' => [
             'text' => "text with [] in it",
-            'expected' => 'text with [<char ts="03" length="1"/>] in it'
+            'expected' => 'text with [<char ts="03" length="1"/>] in it',
         ];
         yield 'Backspace (BS)' => [
             'text' => "text with [] in it",
-            'expected' => 'text with [<char ts="08" length="1"/>] in it'
+            'expected' => 'text with [<char ts="08" length="1"/>] in it',
         ];
 
         yield 'Character Tabulation (HT,TAB)' => [
             'text' => "text with [	] in it",
-            'expected' => 'text with [<tab ts="09" length="1"/>] in it'
+            'expected' => 'text with [<tab ts="09" length="1"/>] in it',
         ];
         yield 'Line Tabulation (VT)' => [
             'text' => "text with [] in it",
-            'expected' => 'text with [<char ts="0b" length="1"/>] in it'
+            'expected' => 'text with [<char ts="0b" length="1"/>] in it',
         ];
         yield 'Form Feed (FF)' => [
             'text' => "text with [] in it",
-            'expected' => 'text with [<char ts="0c" length="1"/>] in it'
+            'expected' => 'text with [<char ts="0c" length="1"/>] in it',
         ];
         yield 'Next Line (NEL)' => [
             'text' => "text with [] in it",
-            'expected' => 'text with [<char ts="c285" length="1"/>] in it'
+            'expected' => 'text with [<char ts="c285" length="1"/>] in it',
         ];
         yield 'No-Break Space (NBSP)' => [
             'text' => "text with [ ] in it",
-            'expected' => 'text with [<char ts="c2a0" length="1"/>] in it'
+            'expected' => 'text with [<char ts="c2a0" length="1"/>] in it',
         ];
         yield 'Ogham Space Mark' => [
             'text' => "text with [ ] in it",
-            'expected' => 'text with [<char ts="e19a80" length="1"/>] in it'
+            'expected' => 'text with [<char ts="e19a80" length="1"/>] in it',
         ];
         yield 'Mongolian Vowel Separator (MVS)' => [
             'text' => "text with [᠎] in it",
-            'expected' => 'text with [<char ts="e1a08e" length="1"/>] in it'
+            'expected' => 'text with [<char ts="e1a08e" length="1"/>] in it',
         ];
         yield 'En Quad' => [
             'text' => "text with [ ] in it",
-            'expected' => 'text with [<char ts="e28080" length="1"/>] in it'
+            'expected' => 'text with [<char ts="e28080" length="1"/>] in it',
         ];
         yield 'Em Quad' => [
             'text' => "text with [ ] in it",
-            'expected' => 'text with [<char ts="e28081" length="1"/>] in it'
+            'expected' => 'text with [<char ts="e28081" length="1"/>] in it',
         ];
         yield 'En Space' => [
             'text' => "text with [ ] in it",
-            'expected' => 'text with [<char ts="e28082" length="1"/>] in it'
+            'expected' => 'text with [<char ts="e28082" length="1"/>] in it',
         ];
         yield 'Em Space' => [
             'text' => "text with [ ] in it",
-            'expected' => 'text with [<char ts="e28083" length="1"/>] in it'
+            'expected' => 'text with [<char ts="e28083" length="1"/>] in it',
         ];
         yield 'Three-Per-Em Space' => [
             'text' => "text with [ ] in it",
-            'expected' => 'text with [<char ts="e28084" length="1"/>] in it'
+            'expected' => 'text with [<char ts="e28084" length="1"/>] in it',
         ];
         yield 'Four-Per-Em Space' => [
             'text' => "text with [ ] in it",
-            'expected' => 'text with [<char ts="e28085" length="1"/>] in it'
+            'expected' => 'text with [<char ts="e28085" length="1"/>] in it',
         ];
         yield 'Six-Per-Em Space' => [
             'text' => "text with [ ] in it",
-            'expected' => 'text with [<char ts="e28086" length="1"/>] in it'
+            'expected' => 'text with [<char ts="e28086" length="1"/>] in it',
         ];
         yield 'Figure Space' => [
             'text' => "text with [ ] in it",
-            'expected' => 'text with [<char ts="e28087" length="1"/>] in it'
+            'expected' => 'text with [<char ts="e28087" length="1"/>] in it',
         ];
         yield 'Punctuation Space' => [
             'text' => "text with [ ] in it",
-            'expected' => 'text with [<char ts="e28088" length="1"/>] in it'
+            'expected' => 'text with [<char ts="e28088" length="1"/>] in it',
         ];
         yield 'Thin Space' => [
             'text' => "text with [ ] in it",
-            'expected' => 'text with [<char ts="e28089" length="1"/>] in it'
+            'expected' => 'text with [<char ts="e28089" length="1"/>] in it',
         ];
         yield 'Hair Space' => [
             'text' => "text with [ ] in it",
-            'expected' => 'text with [<char ts="e2808a" length="1"/>] in it'
+            'expected' => 'text with [<char ts="e2808a" length="1"/>] in it',
         ];
         yield 'Zero Width Space (ZWSP)' => [
             'text' => "text with [​] in it",
-            'expected' => 'text with [<char ts="e2808b" length="1"/>] in it'
+            'expected' => 'text with [<char ts="e2808b" length="1"/>] in it',
         ];
         yield 'Line Separator' => [
             'text' => "text with [ ] in it",
-            'expected' => 'text with [<char ts="e280a8" length="1"/>] in it'
+            'expected' => 'text with [<char ts="e280a8" length="1"/>] in it',
         ];
         yield 'Paragraph Separator' => [
             'text' => "text with [ ] in it",
-            'expected' => 'text with [<char ts="e280a9" length="1"/>] in it'
+            'expected' => 'text with [<char ts="e280a9" length="1"/>] in it',
         ];
         yield 'Narrow No-Break Space (NNBSP)' => [
             'text' => "text with [ ] in it",
-            'expected' => 'text with [<char ts="e280af" length="1"/>] in it'
+            'expected' => 'text with [<char ts="e280af" length="1"/>] in it',
         ];
         yield 'Medium Mathematical Space (MMSP)' => [
             'text' => "text with [ ] in it",
-            'expected' => 'text with [<char ts="e2819f" length="1"/>] in it'
+            'expected' => 'text with [<char ts="e2819f" length="1"/>] in it',
         ];
         yield 'Ideographic Space' => [
             'text' => "text with [　] in it",
-            'expected' => 'text with [<char ts="e38080" length="1"/>] in it'
+            'expected' => 'text with [<char ts="e38080" length="1"/>] in it',
         ];
     }
 

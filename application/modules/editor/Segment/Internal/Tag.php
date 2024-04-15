@@ -26,8 +26,8 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-use MittagQI\Translate5\Segment\Tag\Placeable;
 use MittagQI\Translate5\ContentProtection\NumberProtector;
+use MittagQI\Translate5\Segment\Tag\Placeable;
 use MittagQI\Translate5\Tools\Markup;
 use PHPHtmlParser\Dom\Node\AbstractNode;
 
@@ -324,7 +324,8 @@ final class editor_Segment_Internal_Tag extends editor_Segment_Tag
         return ($this->isSingle() && $this->hasClass(Placeable::MARKER_CLASS));
     }
 
-    public function isNumber(): bool {
+    public function isNumber(): bool
+    {
         return $this->isSingle() && $this->hasClass(NumberProtector::TAG_NAME);
     }
 
@@ -539,8 +540,7 @@ final class editor_Segment_Internal_Tag extends editor_Segment_Tag
             return " ";
         } elseif ($this->isSpace()) {
             return ' ';
-        } else if ($this->isNumber()) {
-
+        } elseif ($this->isNumber()) {
             // Here dash-characters is used as it does not result in spellcheck-error
             // Initially, the idea was to use dash-character sequence of the same length
             // as protected number (e.g. '5,600' => '-----'), but the way of how number-tags

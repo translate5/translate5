@@ -46,6 +46,7 @@ class editor_Models_Segment_InternalTag extends editor_Models_Segment_TagAbstrac
      * @var string
      */
     public const TAG_TYPE_MATCH_ID = 3;
+
     public const REGEX_INTERNAL_TAGS = '#<div\s*class="(open|close|single)\s+([gxA-Fa-f0-9]*)[^"]*"\s*.*?(?!</div>)<span[^>]*data-originalid="([^"]*).*?(?!</div>).</div>#s';
 
     public const REGEX_STARTTAG = '#^<div class="open.+class="short"[^>]*>&lt;([0-9]+)&gt;</span>.+</div>$#';
@@ -229,10 +230,7 @@ class editor_Models_Segment_InternalTag extends editor_Models_Segment_TagAbstrac
     /**
      * restores the original escaped tag
 <<<<<<< HEAD
-     * @param string $segment
      * @param array $tagsToRestore optional, if not empty - only provided tags list will be rostored
-=======
-     * @param bool $whitespaceOnly optional, if true restore whitespace tags only
 >>>>>>> master
      * @param int &$highestTagNr if provided, it will be filled with the highest short tag number of all tags in $segment
      * @param array $shortcutNumberMap if provided, it will be filled with a 2d map of replaced entities and their used tag numbers
@@ -285,7 +283,7 @@ class editor_Models_Segment_InternalTag extends editor_Models_Segment_TagAbstrac
                 $shortcutNumberMapKey = NumberProtector::getIsoFromTag($result);
             }
 
-            if (!array_key_exists($shortcutNumberMapKey, $shortcutNumberMap)) {
+            if (! array_key_exists($shortcutNumberMapKey, $shortcutNumberMap)) {
                 $shortcutNumberMap[$shortcutNumberMapKey] = [];
             }
             $shortcutNumberMap[$shortcutNumberMapKey][] = $tagNr;
