@@ -264,7 +264,7 @@ Ext.define('Editor.controller.Localizer', {
   	Editor.view.quality.FilterPanel.prototype.strings = {
 		modeAll: '<?php echo $this->translate->_('Alle zeigen');?>',
 		modeErrors: '<?php echo $this->translate->_('Nur Fehler');?>',
-		modeFalsePositives: '<?php echo $this->translate->_('Nur Falsch-Positive');?>',
+		modeFalsePositives: '<?php echo $this->translate->_('Nur ignorierte Fehler');?>',
 		incompleteCatCaption: '<?php echo $this->translate->_('Segmente unvollständig geprüft');?>',
 		incompleteCatText: '<?php echo $this->translate->_('Diese Kategorie wurde nicht oder nur unvollständig geprüft');?>',
 		startAnalysisHint: '<?php echo $this->translate->_('Bitte stoßen Sie unten eine neue Prüfung an um das Problem zu beheben');?>',
@@ -2211,28 +2211,26 @@ Editor.data.l10n = {
         metaStates_tooltip_nokey: '<?php echo $this->translate->_('Segment auf den ausgewählten Status setzen');?>'
     },
     falsePositives: {
-        hover: "<?php echo $this->translate->_('Rechts klicken um als \'falsch erkannt\' zu markieren')?>",
+        hover: "<?php echo $this->translate->_('Rechtsklick um Fehler zu ignorieren')?>",
         legend: {
-            fixed: '<?php echo $this->translate->_('Falsch erkannte Fehler?')?>',
-            float: '<?php echo $this->translate->_('Ein falsch erkannter Fehler?')?>'
+            fixed: '<?php echo $this->translate->_('Fehler ignorieren')?>',
+            float: '<?php echo $this->translate->_('Fehler ignorieren?')?>'
         },
         close: '<?php echo $this->translate->_('Schließen');?>',
         spreaded: '<?php echo $this->translate->_('Diesen Status für alle Ereignisse innerhalb dieser Aufgabe verteilt');?>',
         window: {
             tooltip: '<?php echo join('. <br/>', [
-                    $this->translate->_('Ein Klick auf die Check-Box markiert den aktuellen Fehler als "falschen Fehler"'),
-                    $this->translate->_('Ein Klick auf die Zahl rechts markiert alle identischen Fehler als "falsche Fehler"'),
-                    $this->translate->_('Tastatur-Shortcut siehe Tooltip rechte Spalte "Qualitätssicherung"'),
+                    $this->translate->_('Anhaken der Check-box ignoriert den Fehler.'),
+                    $this->translate->_('Klick auf die Zahl rechts ignoriert alle identischen Fehler.'),
+                    $this->translate->_('Tastaturkürzel siehe Tooltip rechte Spalte "Qualitätssicherung".'),
             ])?>'
         },
         grid: {
             falsePositive: '<?php echo $this->translate->_('Ja');?>',
             text: '<?php echo $this->translate->_('Qualität');?>',
             emptyText: '<?php echo $this->translate->_('Ladequalität..');?>',
-            similarQty: {
-                tooltip: '<?php echo $this->translate->_('Anzahl aller Vorkommen eines solchen Paares [Qualität - Inhalt], die in dieser Aufgabe gefunden wurden');?>',
-                button: '<?php echo $this->translate->_('Alle identischen Fehler ebenfalls als falsche Fehler markieren.');?>'
-            }
+            rowTip: '<?php echo $this->translate->_('Klick auf die Zahl rechts ignoriert alle identischen Fehler.');?>',
+            similarQtyColTip: '<?php echo $this->translate->_('Anzahl aller Vorkommen eines solchen Paares [Qualität - Inhalt], die in dieser Aufgabe gefunden wurden');?>'
         }
     },
     projectOverview:{
