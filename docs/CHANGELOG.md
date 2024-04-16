@@ -20,6 +20,26 @@ All updates are (downwards) compatible! If not this is listed in the important r
 
 
 
+
+## [7.3.1] - 2024-04-09
+
+### Important Notes:
+ 
+
+
+### Changed
+**[TRANSLATE-3860](https://jira.translate5.net/browse/TRANSLATE-3860): VisualReview / VisualTranslation - FIX: Bugs of Visual Enhancements Milestone I** <br>
+FIX Visual: Segments may be duplicated in the reflow / WYSIWYG and appear multiple times overlapping other segments
+
+
+### Bugfixes
+**[TRANSLATE-3865](https://jira.translate5.net/browse/TRANSLATE-3865): LanguageResources, User Management - Error on language resources for admins with no assigned users** <br>
+Fix for a problem in language resources overview for users with 0 assigned customers.
+
+**[TRANSLATE-3864](https://jira.translate5.net/browse/TRANSLATE-3864): Import/Export - Problem with sdlxliff export and track changes** <br>
+Fix for sdlxliff export and track changes.
+
+
 ## [7.3.0] - 2024-04-05
 
 ### Important Notes:
