@@ -21,6 +21,29 @@ All updates are (downwards) compatible! If not this is listed in the important r
 
 
 
+
+## [7.3.2] - 2024-04-16
+
+### Important Notes:
+ 
+
+
+### Changed
+**[TRANSLATE-3877](https://jira.translate5.net/browse/TRANSLATE-3877): Hotfolder Import - Change importing user to system user** <br>
+Changed the importing user to system user instead the associated PM. This ensures that the PM gets an E-Mail when the task was created.
+
+**[TRANSLATE-3866](https://jira.translate5.net/browse/TRANSLATE-3866): Editor general - Improve logging of invalid markup on segment PUT** <br>
+FIX: Improve logging of invalid markup sent on segment PUT
+
+
+### Bugfixes
+**[TRANSLATE-3891](https://jira.translate5.net/browse/TRANSLATE-3891): Import/Export - Disable sdlxliff track changes  export** <br>
+Disable of sdlxliff track changes on export because of a problem in the segment data structure.
+
+**[TRANSLATE-3885](https://jira.translate5.net/browse/TRANSLATE-3885): Auto-QA, usability editor - Change wording for "false positives"** <br>
+Improved wordings for false positives in the auto-QA
+
+
 ## [7.3.1] - 2024-04-09
 
 ### Important Notes:
