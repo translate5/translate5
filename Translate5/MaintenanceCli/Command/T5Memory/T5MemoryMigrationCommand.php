@@ -258,7 +258,7 @@ class T5MemoryMigrationCommand extends Translate5AbstractCommand
             } catch (Throwable $e) {
                 $processingErrors[] = [
                     'language resource id' => $languageResourceData['id'],
-                    'message' => $e->getMessage(),
+                    'message' => \ZfExtended_Logger::renderException($e),
                 ];
 
                 continue;
