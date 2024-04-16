@@ -965,11 +965,8 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
                 }
             }
 
-<<<<<<< HEAD
             $this->contentProtector->filterTagsInChunks($sourceChunks, $targetChunks);
             
-=======
->>>>>>> master
             $this->surroundingTags->calculate($preserveWhitespace, $sourceChunks, $targetChunks, $this->xmlparser);
 
             $this->segmentData = [];
@@ -1000,12 +997,11 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
             }
 
             $emptyInitialTarget = empty($targetChunksOriginal);
-<<<<<<< HEAD
             $hasCutTargetContent = empty($this->segmentData[$targetName]['original'])
                 || $this->segmentData[$targetName]['original'] === "0";
 
-            $targetHasTagsOnly = !$this->hasText($this->segmentData[$targetName]['original']);
-            $sourceHasTagsOnly = !$this->hasText($this->segmentData[$sourceName]['original']);
+            $targetHasTagsOnly = ! $this->hasText($this->segmentData[$targetName]['original']);
+            $sourceHasTagsOnly = ! $this->hasText($this->segmentData[$sourceName]['original']);
 
             if (
                 $sourceHasTagsOnly
@@ -1017,15 +1013,8 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
             }
             // if source contains tags only or is empty (and is no missing source)
             // then we are able to ignore non textual segments if target fulfills the given 3 criterias
-            if (!$isSourceMrkMissing && $sourceHasTagsOnly && ($emptyInitialTarget || $hasCutTargetContent || $targetHasTagsOnly)) {
+            if (! $isSourceMrkMissing && $sourceHasTagsOnly && ($emptyInitialTarget || $hasCutTargetContent || $targetHasTagsOnly)) {
                 // if empty target, we fill the target with the source content, and ignore the segment then in translation
-=======
-            $hasCutTargetContent = empty($this->segmentData[$targetName]['original']) || $this->segmentData[$targetName]['original'] === "0";
-            $targetHasTagsOnly = ! $this->hasText($this->segmentData[$targetName]['original']);
-            //if source contains tags only or is empty (and is no missing source) then we are able to ignore non textual segments if target fulfills the given 3 criterias
-            if (! $isSourceMrkMissing && ! $this->hasText($this->segmentData[$sourceName]['original']) && ($emptyInitialTarget || $hasCutTargetContent || $targetHasTagsOnly)) {
-                //if empty target, we fill the target with the source content, and ignore the segment then in translation
->>>>>>> master
                 //  on reviewing and if target content was given, then it will be ignored too
                 //  on reviewing needs $hasOriginalTarget to be true, which is the case by above if
                 $placeHolders[$mid] = $this->xmlparser->join($emptyInitialTarget ? $sourceChunksOriginal : $targetChunksOriginal);

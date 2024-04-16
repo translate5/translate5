@@ -229,9 +229,7 @@ class editor_Models_Segment_InternalTag extends editor_Models_Segment_TagAbstrac
 
     /**
      * restores the original escaped tag
-<<<<<<< HEAD
      * @param array $tagsToRestore optional, if not empty - only provided tags list will be rostored
->>>>>>> master
      * @param int &$highestTagNr if provided, it will be filled with the highest short tag number of all tags in $segment
      * @param array $shortcutNumberMap if provided, it will be filled with a 2d map of replaced entities and their used tag numbers
      * @return mixed
