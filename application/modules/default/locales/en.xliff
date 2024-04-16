@@ -434,6 +434,14 @@ Your new login name:
                     </figure>
                 </target>
             </trans-unit>
+            <trans-unit id='e0luc3RhbnRUcmFuc2xhdGVZb3V0dWJlVmlkZW9HdWlkZVVybH0='>
+                <source>{InstantTranslateYoutubeVideoGuideUrl}</source>
+                <target>https://www.youtube.com/embed/4PAFACCcg8s</target>
+            </trans-unit>
+            <trans-unit id='e0luc3RhbnRUcmFuc2xhdGVZb3V0dWJlVmlkZW9HdWlkZURlc2NyaXB0aW9uQ29udGVudH0='>
+                <source>{InstantTranslateYoutubeVideoGuideDescriptionContent}</source>
+                <target><span/></target>
+            </trans-unit>
             <trans-unit id='e0VkaXRvcllvdXR1YmVWaWRlb0d1aWRlVXJsfQ=='>
                 <source>{EditorYoutubeVideoGuideUrl}</source>
                 <target>https://www.youtube.com/embed/uHJP6l1iXuU</target>
