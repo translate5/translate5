@@ -1,0 +1,356 @@
+<?xml version='1.0'?><!DOCTYPE martif SYSTEM "TBXBasiccoreStructV02.dtd">
+<martif>
+    <martifHeader>
+        <fileDesc>
+            <titleStmt>
+                <title>Export of translate5 termCollection termtagger-split</title>
+                <note>Contains the languages: de, en</note>
+            </titleStmt>
+            <sourceDesc>
+                <p>File is exported from translate5 instance at https://translate5.local by the user Project Manager</p>
+            </sourceDesc>
+        </fileDesc>
+        <encodingDesc>
+            <p type="XCSURI">http://www.lisa.org/fileadmin/standards/tbx_basic/TBXBasicXCSV02.xcs</p>
+        </encodingDesc>
+    </martifHeader>
+    <text>
+        <body>
+            <termEntry id="idfdab9dcf-2ccf-413e-8a21-d3909e2ac3bd">
+                <transacGrp>
+                    <transac type="transactionType">origination</transac>
+                    <transacNote type="responsibility" target="">Project Manager</transacNote>
+                    <date>2024-04-15</date>
+                </transacGrp>
+                <transacGrp>
+                    <transac type="transactionType">modification</transac>
+                    <transacNote type="responsibility" target="{e6828cdf-2ee0-4a25-af0a-92e6f060e9eb}">Project Manager</transacNote>
+                    <date>2024-04-15</date>
+                </transacGrp>
+                <langSet xml:lang="en">
+                    <transacGrp>
+                        <transac type="transactionType">origination</transac>
+                        <transacNote type="responsibility" target="{e6828cdf-2ee0-4a25-af0a-92e6f060e9eb}">Project Manager</transacNote>
+                        <date>2024-04-15</date>
+                    </transacGrp>
+                    <transacGrp>
+                        <transac type="transactionType">modification</transac>
+                        <transacNote type="responsibility" target="{e6828cdf-2ee0-4a25-af0a-92e6f060e9eb}">Project Manager</transacNote>
+                        <date>2024-04-15</date>
+                    </transacGrp>
+                    <tig>
+                        <term id="ida9424fcf-9a84-4047-b3c1-c7835ea261ac">term1-en-admitted</term>
+                        <termNote type="processStatus">finalized</termNote>
+                        <termNote type="administrativeStatus">admittedTerm-admn-sts</termNote>
+                        <transacGrp>
+                            <transac type="transactionType">origination</transac>
+                            <transacNote type="responsibility" target="{e6828cdf-2ee0-4a25-af0a-92e6f060e9eb}">Project Manager</transacNote>
+                            <date>2024-04-15</date>
+                        </transacGrp>
+                        <transacGrp>
+                            <transac type="transactionType">modification</transac>
+                            <transacNote type="responsibility" target="{e6828cdf-2ee0-4a25-af0a-92e6f060e9eb}">Project Manager</transacNote>
+                            <date>2024-04-15</date>
+                        </transacGrp>
+                    </tig>
+                </langSet>
+                <langSet xml:lang="de">
+                    <transacGrp>
+                        <transac type="transactionType">origination</transac>
+                        <transacNote type="responsibility" target="{e6828cdf-2ee0-4a25-af0a-92e6f060e9eb}">Project Manager</transacNote>
+                        <date>2024-04-15</date>
+                    </transacGrp>
+                    <transacGrp>
+                        <transac type="transactionType">modification</transac>
+                        <transacNote type="responsibility" target="{e6828cdf-2ee0-4a25-af0a-92e6f060e9eb}">Project Manager</transacNote>
+                        <date>2024-04-15</date>
+                    </transacGrp>
+                    <tig>
+                        <term id="idabbcd147-bd98-48fc-a112-40610e67080c">term1-de-admitted</term>
+                        <termNote type="processStatus">finalized</termNote>
+                        <termNote type="administrativeStatus">preferredTerm-admn-sts</termNote>
+                        <transacGrp>
+                            <transac type="transactionType">origination</transac>
+                            <transacNote type="responsibility" target="{e6828cdf-2ee0-4a25-af0a-92e6f060e9eb}">Project Manager</transacNote>
+                            <date>2024-04-15</date>
+                        </transacGrp>
+                        <transacGrp>
+                            <transac type="transactionType">modification</transac>
+                            <transacNote type="responsibility" target="{e6828cdf-2ee0-4a25-af0a-92e6f060e9eb}">Project Manager</transacNote>
+                            <date>2024-04-15</date>
+                        </transacGrp>
+                    </tig>
+                </langSet>
+            </termEntry>
+            <termEntry id="id4551a774-d9ac-4130-bfba-16e3fe62757d">
+                <transacGrp>
+                    <transac type="transactionType">origination</transac>
+                    <transacNote type="responsibility" target="">Project Manager</transacNote>
+                    <date>2024-04-15</date>
+                </transacGrp>
+                <transacGrp>
+                    <transac type="transactionType">modification</transac>
+                    <transacNote type="responsibility" target="{e6828cdf-2ee0-4a25-af0a-92e6f060e9eb}">Project Manager</transacNote>
+                    <date>2024-04-15</date>
+                </transacGrp>
+                <langSet xml:lang="en">
+                    <transacGrp>
+                        <transac type="transactionType">origination</transac>
+                        <transacNote type="responsibility" target="{e6828cdf-2ee0-4a25-af0a-92e6f060e9eb}">Project Manager</transacNote>
+                        <date>2024-04-15</date>
+                    </transacGrp>
+                    <transacGrp>
+                        <transac type="transactionType">modification</transac>
+                        <transacNote type="responsibility" target="{e6828cdf-2ee0-4a25-af0a-92e6f060e9eb}">Project Manager</transacNote>
+                        <date>2024-04-15</date>
+                    </transacGrp>
+                    <tig>
+                        <term id="id95d8bc58-c62e-43aa-a3c0-739cff42e469">term2-en-preferred</term>
+                        <termNote type="processStatus">finalized</termNote>
+                        <termNote type="administrativeStatus">preferredTerm-admn-sts</termNote>
+                        <transacGrp>
+                            <transac type="transactionType">origination</transac>
+                            <transacNote type="responsibility" target="{e6828cdf-2ee0-4a25-af0a-92e6f060e9eb}">Project Manager</transacNote>
+                            <date>2024-04-15</date>
+                        </transacGrp>
+                        <transacGrp>
+                            <transac type="transactionType">modification</transac>
+                            <transacNote type="responsibility" target="{e6828cdf-2ee0-4a25-af0a-92e6f060e9eb}">Project Manager</transacNote>
+                            <date>2024-04-15</date>
+                        </transacGrp>
+                    </tig>
+                </langSet>
+                <langSet xml:lang="de">
+                    <transacGrp>
+                        <transac type="transactionType">origination</transac>
+                        <transacNote type="responsibility" target="{e6828cdf-2ee0-4a25-af0a-92e6f060e9eb}">Project Manager</transacNote>
+                        <date>2024-04-15</date>
+                    </transacGrp>
+                    <transacGrp>
+                        <transac type="transactionType">modification</transac>
+                        <transacNote type="responsibility" target="{e6828cdf-2ee0-4a25-af0a-92e6f060e9eb}">Project Manager</transacNote>
+                        <date>2024-04-15</date>
+                    </transacGrp>
+                    <tig>
+                        <term id="id0343f1e9-e314-4edf-a756-ba2a0b64f034">term2-de-preferred</term>
+                        <termNote type="processStatus">finalized</termNote>
+                        <transacGrp>
+                            <transac type="transactionType">origination</transac>
+                            <transacNote type="responsibility" target="{e6828cdf-2ee0-4a25-af0a-92e6f060e9eb}">Project Manager</transacNote>
+                            <date>2024-04-15</date>
+                        </transacGrp>
+                        <transacGrp>
+                            <transac type="transactionType">modification</transac>
+                            <transacNote type="responsibility" target="{e6828cdf-2ee0-4a25-af0a-92e6f060e9eb}">Project Manager</transacNote>
+                            <date>2024-04-15</date>
+                        </transacGrp>
+                    </tig>
+                </langSet>
+            </termEntry>
+            <termEntry id="id47486130-c38a-4518-88c3-5583dc98fb3c">
+                <transacGrp>
+                    <transac type="transactionType">origination</transac>
+                    <transacNote type="responsibility" target="">Project Manager</transacNote>
+                    <date>2024-04-15</date>
+                </transacGrp>
+                <transacGrp>
+                    <transac type="transactionType">modification</transac>
+                    <transacNote type="responsibility" target="{e6828cdf-2ee0-4a25-af0a-92e6f060e9eb}">Project Manager</transacNote>
+                    <date>2024-04-15</date>
+                </transacGrp>
+                <langSet xml:lang="en">
+                    <transacGrp>
+                        <transac type="transactionType">origination</transac>
+                        <transacNote type="responsibility" target="{e6828cdf-2ee0-4a25-af0a-92e6f060e9eb}">Project Manager</transacNote>
+                        <date>2024-04-15</date>
+                    </transacGrp>
+                    <transacGrp>
+                        <transac type="transactionType">modification</transac>
+                        <transacNote type="responsibility" target="{e6828cdf-2ee0-4a25-af0a-92e6f060e9eb}">Project Manager</transacNote>
+                        <date>2024-04-15</date>
+                    </transacGrp>
+                    <tig>
+                        <term id="id460d776c-64d2-48dc-bcb5-0eb8a796f300">term3-en-standardized</term>
+                        <termNote type="processStatus">finalized</termNote>
+                        <termNote type="administrativeStatus">standardizedTerm-admn-sts</termNote>
+                        <transacGrp>
+                            <transac type="transactionType">origination</transac>
+                            <transacNote type="responsibility" target="{e6828cdf-2ee0-4a25-af0a-92e6f060e9eb}">Project Manager</transacNote>
+                            <date>2024-04-15</date>
+                        </transacGrp>
+                        <transacGrp>
+                            <transac type="transactionType">modification</transac>
+                            <transacNote type="responsibility" target="{e6828cdf-2ee0-4a25-af0a-92e6f060e9eb}">Project Manager</transacNote>
+                            <date>2024-04-15</date>
+                        </transacGrp>
+                    </tig>
+                </langSet>
+                <langSet xml:lang="de">
+                    <transacGrp>
+                        <transac type="transactionType">origination</transac>
+                        <transacNote type="responsibility" target="{e6828cdf-2ee0-4a25-af0a-92e6f060e9eb}">Project Manager</transacNote>
+                        <date>2024-04-15</date>
+                    </transacGrp>
+                    <transacGrp>
+                        <transac type="transactionType">modification</transac>
+                        <transacNote type="responsibility" target="{e6828cdf-2ee0-4a25-af0a-92e6f060e9eb}">Project Manager</transacNote>
+                        <date>2024-04-15</date>
+                    </transacGrp>
+                    <tig>
+                        <term id="id09fc5d7c-13c1-4d6f-88ac-fb3308c81fd2">term3-de-standardized</term>
+                        <termNote type="processStatus">finalized</termNote>
+                        <transacGrp>
+                            <transac type="transactionType">origination</transac>
+                            <transacNote type="responsibility" target="{e6828cdf-2ee0-4a25-af0a-92e6f060e9eb}">Project Manager</transacNote>
+                            <date>2024-04-15</date>
+                        </transacGrp>
+                        <transacGrp>
+                            <transac type="transactionType">modification</transac>
+                            <transacNote type="responsibility" target="{e6828cdf-2ee0-4a25-af0a-92e6f060e9eb}">Project Manager</transacNote>
+                            <date>2024-04-15</date>
+                        </transacGrp>
+                    </tig>
+                </langSet>
+            </termEntry>
+            <termEntry id="id68659768-6c0d-410e-b77f-c4a96ddb6e5b">
+                <transacGrp>
+                    <transac type="transactionType">origination</transac>
+                    <transacNote type="responsibility" target="">Project Manager</transacNote>
+                    <date>2024-04-15</date>
+                </transacGrp>
+                <transacGrp>
+                    <transac type="transactionType">modification</transac>
+                    <transacNote type="responsibility" target="{e6828cdf-2ee0-4a25-af0a-92e6f060e9eb}">Project Manager</transacNote>
+                    <date>2024-04-15</date>
+                </transacGrp>
+                <langSet xml:lang="en">
+                    <transacGrp>
+                        <transac type="transactionType">origination</transac>
+                        <transacNote type="responsibility" target="{e6828cdf-2ee0-4a25-af0a-92e6f060e9eb}">Project Manager</transacNote>
+                        <date>2024-04-15</date>
+                    </transacGrp>
+                    <transacGrp>
+                        <transac type="transactionType">modification</transac>
+                        <transacNote type="responsibility" target="{e6828cdf-2ee0-4a25-af0a-92e6f060e9eb}">Project Manager</transacNote>
+                        <date>2024-04-15</date>
+                    </transacGrp>
+                    <tig>
+                        <term id="id6be81c34-7bb5-4f0d-ba7c-210a7b6d46af">term4-en-other1-legal</term>
+                        <termNote type="processStatus">finalized</termNote>
+                        <termNote type="administrativeStatus">legalTerm-admn-sts</termNote>
+                        <transacGrp>
+                            <transac type="transactionType">origination</transac>
+                            <transacNote type="responsibility" target="{e6828cdf-2ee0-4a25-af0a-92e6f060e9eb}">Project Manager</transacNote>
+                            <date>2024-04-15</date>
+                        </transacGrp>
+                        <transacGrp>
+                            <transac type="transactionType">modification</transac>
+                            <transacNote type="responsibility" target="{e6828cdf-2ee0-4a25-af0a-92e6f060e9eb}">Project Manager</transacNote>
+                            <date>2024-04-15</date>
+                        </transacGrp>
+                    </tig>
+                </langSet>
+                <langSet xml:lang="de">
+                    <transacGrp>
+                        <transac type="transactionType">origination</transac>
+                        <transacNote type="responsibility" target="{e6828cdf-2ee0-4a25-af0a-92e6f060e9eb}">Project Manager</transacNote>
+                        <date>2024-04-15</date>
+                    </transacGrp>
+                    <transacGrp>
+                        <transac type="transactionType">modification</transac>
+                        <transacNote type="responsibility" target="{e6828cdf-2ee0-4a25-af0a-92e6f060e9eb}">Project Manager</transacNote>
+                        <date>2024-04-15</date>
+                    </transacGrp>
+                    <tig>
+                        <term id="id4e45bc92-d27a-48c8-a45a-0452bc551cd9">term4-de-other1-legal</term>
+                        <termNote type="processStatus">finalized</termNote>
+                        <transacGrp>
+                            <transac type="transactionType">origination</transac>
+                            <transacNote type="responsibility" target="{e6828cdf-2ee0-4a25-af0a-92e6f060e9eb}">Project Manager</transacNote>
+                            <date>2024-04-15</date>
+                        </transacGrp>
+                        <transacGrp>
+                            <transac type="transactionType">modification</transac>
+                            <transacNote type="responsibility" target="{e6828cdf-2ee0-4a25-af0a-92e6f060e9eb}">Project Manager</transacNote>
+                            <date>2024-04-15</date>
+                        </transacGrp>
+                    </tig>
+                </langSet>
+            </termEntry>
+            <termEntry id="ida07cd863-02c3-4d59-b1c7-421120adfa78">
+                <transacGrp>
+                    <transac type="transactionType">origination</transac>
+                    <transacNote type="responsibility" target="">Project Manager</transacNote>
+                    <date>2024-04-15</date>
+                </transacGrp>
+                <transacGrp>
+                    <transac type="transactionType">modification</transac>
+                    <transacNote type="responsibility" target="{e6828cdf-2ee0-4a25-af0a-92e6f060e9eb}">Project Manager</transacNote>
+                    <date>2024-04-15</date>
+                </transacGrp>
+                <langSet xml:lang="en">
+                    <transacGrp>
+                        <transac type="transactionType">origination</transac>
+                        <transacNote type="responsibility" target="{e6828cdf-2ee0-4a25-af0a-92e6f060e9eb}">Project Manager</transacNote>
+                        <date>2024-04-15</date>
+                    </transacGrp>
+                    <transacGrp>
+                        <transac type="transactionType">modification</transac>
+                        <transacNote type="responsibility" target="{e6828cdf-2ee0-4a25-af0a-92e6f060e9eb}">Project Manager</transacNote>
+                        <date>2024-04-15</date>
+                    </transacGrp>
+                    <tig>
+                        <term id="idad05f504-ea65-4cd2-b91f-6b808cb32df4">term5-en-other2-superseded</term>
+                        <termNote type="processStatus">finalized</termNote>
+                        <termNote type="administrativeStatus">supersededTerm-admn-sts</termNote>
+                        <transacGrp>
+                            <transac type="transactionType">origination</transac>
+                            <transacNote type="responsibility" target="{e6828cdf-2ee0-4a25-af0a-92e6f060e9eb}">Project Manager</transacNote>
+                            <date>2024-04-15</date>
+                        </transacGrp>
+                        <transacGrp>
+                            <transac type="transactionType">modification</transac>
+                            <transacNote type="responsibility" target="{e6828cdf-2ee0-4a25-af0a-92e6f060e9eb}">Project Manager</transacNote>
+                            <date>2024-04-15</date>
+                        </transacGrp>
+                    </tig>
+                </langSet>
+                <langSet xml:lang="de">
+                    <transacGrp>
+                        <transac type="transactionType">origination</transac>
+                        <transacNote type="responsibility" target="{e6828cdf-2ee0-4a25-af0a-92e6f060e9eb}">Project Manager</transacNote>
+                        <date>2024-04-15</date>
+                    </transacGrp>
+                    <transacGrp>
+                        <transac type="transactionType">modification</transac>
+                        <transacNote type="responsibility" target="{e6828cdf-2ee0-4a25-af0a-92e6f060e9eb}">Project Manager</transacNote>
+                        <date>2024-04-15</date>
+                    </transacGrp>
+                    <tig>
+                        <term id="id39948b60-1069-4ba2-81fc-35e38e499d26">term5-de-other2-superseded</term>
+                        <termNote type="processStatus">finalized</termNote>
+                        <transacGrp>
+                            <transac type="transactionType">origination</transac>
+                            <transacNote type="responsibility" target="{e6828cdf-2ee0-4a25-af0a-92e6f060e9eb}">Project Manager</transacNote>
+                            <date>2024-04-15</date>
+                        </transacGrp>
+                        <transacGrp>
+                            <transac type="transactionType">modification</transac>
+                            <transacNote type="responsibility" target="{e6828cdf-2ee0-4a25-af0a-92e6f060e9eb}">Project Manager</transacNote>
+                            <date>2024-04-15</date>
+                        </transacGrp>
+                    </tig>
+                </langSet>
+            </termEntry>
+        </body>
+        <back>
+            <refObjectList type="respPerson">
+                <refObject id="{e6828cdf-2ee0-4a25-af0a-92e6f060e9eb}">
+                    <item type="fn">Project Manager</item>
+                    <item type="email">noreply@translate5.net</item>
+                    <item type="role">systemadmin,admin,pm,editor,termCustomerSearch,termProposer,termFinalizer,termPM,termReviewer,instantTranslate</item>
+                </refObject>
+            </refObjectList>
+        </back>
+    </text>
+</martif>
