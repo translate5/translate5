@@ -1223,18 +1223,22 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract
      * The found segment is stored internally (like load).
      * First Segment is defined as the segment with the lowest id of the task
      *
-     * @param string $taskGuid
-     * @param int $fileId optional, loads first file of given fileId in task
-     * @return editor_Models_Segment
+     * @param $taskGuid
+     * @param $fileId : optional, loads first file of given fileId in task
+     * @param $ignoreBlocked : optional, if true blocked segments are ignored
+     * @return $this|null
+     * @throws Zend_Db_Select_Exception
+     * @throws Zend_Db_Statement_Exception
+     * @throws ZfExtended_Models_Entity_NotFoundException
      */
-    public function loadFirst($taskGuid, $fileId = null)
+    public function loadFirst($taskGuid, $fileId = null,$ignoreBlocked = false)
     {
         $this->segmentFieldManager->initFields($taskGuid);
         //ensure that view exists (does nothing if already):
         $this->segmentFieldManager->getView()->create();
         $this->reInitDb($taskGuid);
 
-        $seg = $this->loadNext($taskGuid, 0, $fileId);
+        $seg = $this->loadNext($taskGuid, 0, $fileId,$ignoreBlocked);
 
         if (empty($seg)) {
             $this->notFound('first segment of task', $taskGuid);
