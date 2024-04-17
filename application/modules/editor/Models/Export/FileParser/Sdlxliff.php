@@ -48,7 +48,8 @@ class editor_Models_Export_FileParser_Sdlxliff extends editor_Models_Export_File
 
     public function __construct(editor_Models_Task $task, int $fileId, string $path, array $options = [])
     {
-        $this->isTrackChangesPluginActive = Zend_Registry::get('PluginManager')->isActive('TrackChanges');
+        //$this->isTrackChangesPluginActive = Zend_Registry::get('PluginManager')->isActive('TrackChanges');
+        $this->isTrackChangesPluginActive = false;
         parent::__construct($task, $fileId, $path, $options);
 
         $this->xmlParser = new editor_Models_Import_FileParser_XmlParser();
