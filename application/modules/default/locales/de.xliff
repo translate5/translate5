@@ -925,6 +925,64 @@ Ihr neuer Login-Name:
                     </figure>
                 </target>
             </trans-unit>
+            <trans-unit id='e1Rlcm1Qb3J0YWxZb3V0dWJlVmlkZW9HdWlkZVVybH0='>
+                <source>{TermPortalYoutubeVideoGuideUrl}</source>
+                <target>https://www.youtube.com/embed/zwby0cMDdKM</target>
+            </trans-unit>
+            <trans-unit id='e1Rlcm1Qb3J0YWxZb3V0dWJlVmlkZW9HdWlkZURlc2NyaXB0aW9uQ29udGVudH0='>
+                <source>{TermPortalYoutubeVideoGuideDescriptionContent}</source>
+                <target>
+                    <br/>
+                    <br/>
+                    <figure>
+                        <figcaption>
+                            <b>Übersicht:</b>
+                        </figcaption>
+                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/E6LDLIscwv8?start=0&amp;autoplay=1" dir="auto">0:00</a> Intro
+                        <br/>
+                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/E6LDLIscwv8?start=10&amp;autoplay=1" dir="auto">0:10</a> Termcollection hinzufügen
+                        <br/>
+                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/E6LDLIscwv8?start=23&amp;autoplay=1" dir="auto">0:23</a> Zum TermPortal wechseln
+                        <br/>
+                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/E6LDLIscwv8?start=33&amp;autoplay=1" dir="auto">0:33</a> Die verschiedenen Bereiche des TermPortal
+                        <br/>
+                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/E6LDLIscwv8?start=61&amp;autoplay=1" dir="auto">1:01</a> Suchfeld
+                        <br/>
+                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/E6LDLIscwv8?start=75&amp;autoplay=1" dir="auto">1:15</a> Filteroptionen
+                        <br/>
+                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/E6LDLIscwv8?start=100&amp;autoplay=1" dir="auto">1:40</a> Suchergebnisse
+                        <br/>
+                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/E6LDLIscwv8?start=113&amp;autoplay=1" dir="auto">1:53</a> Neuen Termeintrag vorschlagen
+                        <br/>
+                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/E6LDLIscwv8?start=137&amp;autoplay=1" dir="auto">2:17</a> Rechte im TermPortal
+                        <br/>
+                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/E6LDLIscwv8?start=152&amp;autoplay=1" dir="auto">2:32</a> Starte Übersetzung
+                        <br/>
+                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/E6LDLIscwv8?start=200&amp;autoplay=1" dir="auto">3:20</a> Stapelbearbeitung
+                        <br/>
+                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/E6LDLIscwv8?start=212&amp;autoplay=1" dir="auto">3:32</a> Benennungen
+                        <br/>
+                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/E6LDLIscwv8?start=232&amp;autoplay=1" dir="auto">3:52</a> Neue Benennung vorschlagen
+                        <br/>
+                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/E6LDLIscwv8?start=254&amp;autoplay=1" dir="auto">4:14</a> Freigabeworkflow
+                        <br/>
+                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/E6LDLIscwv8?start=427&amp;autoplay=1" dir="auto">7:07</a> Attributsebenen
+                        <br/>
+                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/E6LDLIscwv8?start=507&amp;autoplay=1" dir="auto">8:27</a> InstantTranslate
+                        <br/>
+                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/E6LDLIscwv8?start=530&amp;autoplay=1" dir="auto">8:50</a> Kontaktinformationen
+                        <br/>
+                    </figure>
+                </target>
+            </trans-unit>
+            <trans-unit id='e0luc3RhbnRUcmFuc2xhdGVZb3V0dWJlVmlkZW9HdWlkZVVybH0='>
+                <source>{InstantTranslateYoutubeVideoGuideUrl}</source>
+                <target>https://www.youtube.com/embed/6h8vBsRbpjk</target>
+            </trans-unit>
+            <trans-unit id='e0luc3RhbnRUcmFuc2xhdGVZb3V0dWJlVmlkZW9HdWlkZURlc2NyaXB0aW9uQ29udGVudH0='>
+                <source>{InstantTranslateYoutubeVideoGuideDescriptionContent}</source>
+                <target><span/></target>
+             </trans-unit>
             <trans-unit id='e0VkaXRvcllvdXR1YmVWaWRlb0d1aWRlVXJsfQ=='>
                 <source>{EditorYoutubeVideoGuideUrl}</source>
                 <target>https://www.youtube.com/embed/fERwuq1yXUM</target>

@@ -169,7 +169,7 @@ class InstructionsDTO
         // If both are there - make sure customer numbers are not missing
         if (count($errors) === 0) {
             foreach (array_unique($instructions[$fGroup]) as $termCollection) {
-                if (! trim((string) $instructions[$cGroup][$termCollection] ?? '')) {
+                if (! trim((string) ($instructions[$cGroup][$termCollection] ?? ''))) {
                     $errors[] = "Client number is missing for TermCollection '$termCollection' in [$cGroup] section of ini-file";
                 }
             }
