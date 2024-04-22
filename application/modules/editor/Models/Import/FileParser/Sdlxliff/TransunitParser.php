@@ -124,7 +124,8 @@ class editor_Models_Import_FileParser_Sdlxliff_TransunitParser
         $this->config = $config;
         $this->xmlparser = ZfExtended_Factory::get('editor_Models_Import_FileParser_XmlParser');
         $this->taskUserTracking = ZfExtended_Factory::get(editor_Models_TaskUserTracking::class);
-        $this->isTrackChangesActive = Zend_Registry::get('PluginManager')->isActive('TrackChanges');
+        //$this->isTrackChangesActive = Zend_Registry::get('PluginManager')->isActive('TrackChanges');
+        $this->isTrackChangesActive = false;
     }
 
     protected function init()
