@@ -217,6 +217,10 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract
         $this->utilityBroker = ZfExtended_Factory::get(editor_Models_Segment_UtilityBroker::class);
         $this->segmentFieldManager = ZfExtended_Factory::get(editor_Models_SegmentFieldManager::class);
         $this->contentProtector = ContentProtector::create($this->utilityBroker->whitespace);
+        $this->tagHelper = ZfExtended_Factory::get(editor_Models_Segment_InternalTag::class);
+        $this->trackChangesTagHelper = ZfExtended_Factory::get(editor_Models_Segment_TrackChangeTag::class
+        );
+
         parent::__construct();
     }
 
