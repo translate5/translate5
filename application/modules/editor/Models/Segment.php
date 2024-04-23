@@ -1223,15 +1223,15 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract
      * The found segment is stored internally (like load).
      * First Segment is defined as the segment with the lowest id of the task
      *
-     * @param $taskGuid
-     * @param $fileId : optional, loads first file of given fileId in task
-     * @param $ignoreBlocked : optional, if true blocked segments are ignored
+     * @param string $taskGuid
+     * @param int|null $fileId optional, loads first file of given fileId in task
+     * @param bool $ignoreBlocked optional, if true blocked segments are ignored
      * @return $this|null
      * @throws Zend_Db_Select_Exception
      * @throws Zend_Db_Statement_Exception
      * @throws ZfExtended_Models_Entity_NotFoundException
      */
-    public function loadFirst($taskGuid, $fileId = null,$ignoreBlocked = false)
+    public function loadFirst(string $taskGuid, int $fileId = null,bool $ignoreBlocked = false): ?editor_Models_Segment
     {
         $this->segmentFieldManager->initFields($taskGuid);
         //ensure that view exists (does nothing if already):
@@ -1288,13 +1288,19 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract
 
     /**
      * synchronizes the isRepeated flag depending on if there are repetitions or not.
+     *
+     * @param string $taskGuid
      * @param bool $resetIsRepeated by default true, not needed on import, since there are all flags already false
+     * @return void
      */
     public function syncRepetitions(string $taskGuid, bool $resetIsRepeated = true)
     {
+        $adapter = $this->db->getAdapter();
         if ($resetIsRepeated) {
-            $this->db->getAdapter()->query('UPDATE LEK_segments SET isRepeated = 0 WHERE taskGuid = ?', [$taskGuid]);
+            $adapter->query('UPDATE LEK_segments SET isRepeated = 0 WHERE taskGuid = ?', [$taskGuid]);
         }
+
+        $blockedStates = $adapter->quote(editor_Models_Segment_AutoStates::$blockedStates, Zend_Db::INT_TYPE);
 
         $sql = 'UPDATE LEK_segments s, LEK_segment_data d
         SET s.isRepeated = s.isRepeated | %1$s
@@ -1303,7 +1309,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract
             FROM LEK_segment_data
             WHERE taskGuid = ?
               AND originalMd5 != ?
-              AND autoStateId NOT IN ("'.editor_Models_Segment_AutoStates::BLOCKED.'")
+              AND autoStateId NOT IN ('.$blockedStates.')
               AND name = "%2$s"
             GROUP BY originalMd5 HAVING count(segmentId) > 1
         )
@@ -1361,7 +1367,10 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract
         }
 
         if($ignoreBlocked) {
-            $s->where($this->tableName . '.autoStateId NOT IN(?)', [editor_Models_Segment_AutoStates::BLOCKED]);
+            $s->where(
+                $this->tableName . '.autoStateId NOT IN(?)',
+                editor_Models_Segment_AutoStates::$blockedStates
+            );
         }
 
         $row = $this->db->fetchRow($s);
@@ -2082,24 +2091,27 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract
      *
      * @param string $taskGuid
      * @return array
+     * @throws ReflectionException
+     * @throws Zend_Db_Statement_Exception
      */
-    public function getRepetitions(string $taskGuid)
+    public function getRepetitions(string $taskGuid): array
     {
         $adapter = $this->db->getAdapter();
-        $mv = ZfExtended_Factory::get('editor_Models_Segment_MaterializedView');
-        /* @var $mv editor_Models_Segment_MaterializedView */
+        $mv = ZfExtended_Factory::get(editor_Models_Segment_MaterializedView::class);
         $mv->setTaskGuid($taskGuid);
         $viewName = $mv->getName();
+
+        $blockedStates = $adapter->quote(editor_Models_Segment_AutoStates::$blockedStates, Zend_Db::INT_TYPE);
         $sql = 'SELECT v1.id,v1.sourceMd5 FROM ' . $viewName . ' v1, (
 	          SELECT sourceMd5, count(sourceMd5) cnt, autoStateId
                FROM ' . $viewName . '
-               WHERE autoStateId NOT IN ("'.editor_Models_Segment_AutoStates::BLOCKED.'")
+               WHERE autoStateId NOT IN ('.$blockedStates.')
                GROUP BY sourceMd5
               ) v2
               WHERE v2.cnt > 1
                 AND v1.sourceMd5 = v2.sourceMd5
-                AND v1.autoStateId NOT IN ("'.editor_Models_Segment_AutoStates::BLOCKED.'")
-                AND v2.autoStateId NOT IN ("'.editor_Models_Segment_AutoStates::BLOCKED.'")
+                AND v1.autoStateId NOT IN ('.$blockedStates.')
+                AND v2.autoStateId NOT IN ('.$blockedStates.')
               ORDER BY v1.id';
 
         return $adapter->query($sql)->fetchAll();
