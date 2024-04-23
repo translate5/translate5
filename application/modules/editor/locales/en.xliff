@@ -6288,9 +6288,9 @@ The following task was imported with errors / warnings / notices. Please take ca
                 <source>Nur Fehler</source>
                 <target>Only errors</target>
             </trans-unit>
-            <trans-unit id='TnVyIEZhbHNjaC1Qb3NpdGl2ZQ=='>
-                <source>Nur Falsch-Positive</source>
-                <target>Only false positives</target>
+            <trans-unit id='TnVyIGlnbm9yaWVydGUgRmVobGVy'>
+                <source>Nur ignorierte Fehler</source>
+                <target>Only ignored errors</target>
             </trans-unit>
             <trans-unit id='U2VnbWVudGUgdW52b2xsc3TDpG5kaWcgZ2VwcsO8ZnQ='>
                 <source>Segmente unvollständig geprüft</source>
@@ -6317,12 +6317,12 @@ The following task was imported with errors / warnings / notices. Please take ca
                 <target>False positives</target>
             </trans-unit>
             <trans-unit id='RmFsc2NoIGVya2FubnRlIEZlaGxlcj8='>
-                <source>Falsch erkannte Fehler?</source>
-                <target>False positives?</target>
+                <source>Fehler ignorieren</source>
+                <target>Ignore errors</target>
             </trans-unit>
-            <trans-unit id='RWluIGZhbHNjaCBlcmthbm50ZXIgRmVobGVyPw=='>
-                <source>Ein falsch erkannter Fehler?</source>
-                <target>False positive?</target>
+            <trans-unit id='RmVobGVyIGlnbm9yaWVyZW4/'>
+                <source>Fehler ignorieren?</source>
+                <target>Ignore error?</target>
             </trans-unit>
             <trans-unit id='SW50ZXJuZSBUYWcgRmVobGVy'>
                 <source>Interne Tag Fehler</source>
@@ -6348,33 +6348,29 @@ The following task was imported with errors / warnings / notices. Please take ca
                 <source>Die Qualität wurde entfernt</source>
                 <target>The quality has been removed</target>
             </trans-unit>
-            <trans-unit id='RWluIEtsaWNrIGF1ZiBkaWUgQ2hlY2stQm94IG1hcmtpZXJ0IGRlbiBha3R1ZWxsZW4gRmVobGVyIGFscyAiZmFsc2NoZW4gRmVobGVyIg=='>
-                <source>Ein Klick auf die Check-Box markiert den aktuellen Fehler als "falschen Fehler"</source>
-                <target>A click on the check box marks the current error as "false error"</target>
+            <trans-unit id='QW5oYWtlbiBkZXIgQ2hlY2stYm94IGlnbm9yaWVydCBkZW4gRmVobGVyLg=='>
+                <source>Anhaken der Check-box ignoriert den Fehler.</source>
+                <target>Checking the checkbox ignores the error.</target>
             </trans-unit>
-            <trans-unit id='RWluIEtsaWNrIGF1ZiBkaWUgWmFobCByZWNodHMgbWFya2llcnQgYWxsZSBpZGVudGlzY2hlbiBGZWhsZXIgYWxzICJmYWxzY2hlIEZlaGxlciI='>
-                <source>Ein Klick auf die Zahl rechts markiert alle identischen Fehler als "falsche Fehler"</source>
-                <target>A click on the number on the right marks all identical errors as "false errors"</target>
+            <trans-unit id='S2xpY2sgYXVmIGRpZSBaYWhsIHJlY2h0cyBpZ25vcmllcnQgYWxsZSBpZGVudGlzY2hlbiBGZWhsZXIu'>
+                <source>Klick auf die Zahl rechts ignoriert alle identischen Fehler.</source>
+                <target>Clicking on the number on the right ignores all identical errors.</target>
             </trans-unit>
-            <trans-unit id='VGFzdGF0dXItU2hvcnRjdXQgc2llaGUgVG9vbHRpcCByZWNodGUgU3BhbHRlICJRdWFsaXTDpHRzc2ljaGVydW5nIg=='>
-                <source>Tastatur-Shortcut siehe Tooltip rechte Spalte "Qualitätssicherung"</source>
-                <target>Keyboard shortcut see tooltip right column "Quality Assurance"</target>
+            <trans-unit id='VGFzdGF0dXJrw7xyemVsIHNpZWhlIFRvb2x0aXAgcmVjaHRlIFNwYWx0ZSAiUXVhbGl0w6R0c3NpY2hlcnVuZyIu'>
+                <source>Tastaturkürzel siehe Tooltip rechte Spalte "Qualitätssicherung".</source>
+                <target>Keyboard shortcut see tooltip right column "Quality assurance".</target>
             </trans-unit>
             <trans-unit id='RGllc2VuIFN0YXR1cyBmw7xyIGFsbGUgRXJlaWduaXNzZSBpbm5lcmhhbGIgZGllc2VyIEF1ZmdhYmUgdmVydGVpbHQ='>
                 <source>Diesen Status für alle Ereignisse innerhalb dieser Aufgabe verteilt</source>
                 <target>Spreaded such status for all occurrences within this task</target>
             </trans-unit>
-            <trans-unit id='UmVjaHRzIGtsaWNrZW4gdW0gYWxzICdmYWxzY2ggZXJrYW5udCcgenUgbWFya2llcmVu'>
-                <source>Rechts klicken um als 'falsch erkannt' zu markieren</source>
-                <target>Right-click to set as false positive</target>
+            <trans-unit id='UmVjaHRza2xpY2sgdW0gRmVobGVyIHp1IGlnbm9yaWVyZW4='>
+                <source>Rechtsklick um Fehler zu ignorieren</source>
+                <target>Right-click to ignore error</target>
             </trans-unit>
             <trans-unit id='QW56YWhsIGFsbGVyIFZvcmtvbW1lbiBlaW5lcyBzb2xjaGVuIFBhYXJlcyBbUXVhbGl0w6R0IC0gSW5oYWx0XSwgZGllIGluIGRpZXNlciBBdWZnYWJlIGdlZnVuZGVuIHd1cmRlbg=='>
                 <source>Anzahl aller Vorkommen eines solchen Paares [Qualität - Inhalt], die in dieser Aufgabe gefunden wurden</source>
                 <target>Quantity of all occurrences of such [quality - content] pair found in this task</target>
-            </trans-unit>
-            <trans-unit id='QWxsZSBpZGVudGlzY2hlbiBGZWhsZXIgZWJlbmZhbGxzIGFscyBmYWxzY2hlIEZlaGxlciBtYXJraWVyZW4u'>
-                <source>Alle identischen Fehler ebenfalls als falsche Fehler markieren.</source>
-                <target>Mark all identical errors as false errors as well.</target>
             </trans-unit>
             <trans-unit id='SmE='>
                 <source>Ja</source>

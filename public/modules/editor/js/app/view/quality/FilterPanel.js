@@ -58,7 +58,7 @@ Ext.define('Editor.view.quality.FilterPanel', {
     strings: {
         modeAll: '#UT#Alle zeigen',
         modeErrors: '#UT#Nur Fehler',
-        modeFalsePositives: '#UT#Nur Falsch-Positive',
+        modeFalsePositives: '#UT#Nur ignorierte Fehler',
         incompleteCatCaption: '#UT#Segmente unvollständig geprüft',
         incompleteCatText: '#UT#Diese Kategorie wurde nicht oder nur unvollständig geprüft',
         startAnalysisHint: '#UT#Bitte stoßen Sie unten eine neue Prüfung an um das Problem zu beheben',
