@@ -446,6 +446,16 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
         );
         $this->setupAllowedCustomFields();
 
+        // Is the current user allowed to export or import translator package.
+        // This config is used in the frontend to show/hide the package export/import buttons.
+        $allowedRoles = $rop->task->package->allowedToExport->toArray();
+        $userRoles = ZfExtended_Authentication::getInstance()->getUserRoles();
+        $commonRoles = array_intersect($allowedRoles, $userRoles);
+        $this->view->Php2JsVars()->set(
+            'export.package.canExport',
+            !empty($commonRoles)
+        );
+
         $this->setJsAppData();
         editor_Segment_Quality_Manager::instance()->addAppJsData($this->view->Php2JsVars());
     }
