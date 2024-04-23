@@ -65,7 +65,7 @@ class QualityTerminologyTest extends editor_Test_JsonTest
         // Check qualities
         $jsonFile = $testName . '.json';
         $tree = static::api()->getJsonTree('/editor/quality', [], $jsonFile);
-        $treeFilter = Filter::createSingle('qtype', 'terminology');
+        $treeFilter = Filter::createSingle('qtype', 'term');
         $this->assertModelEqualsJsonFile('FilterQuality', $jsonFile, $tree, '', $treeFilter);
     }
 }
