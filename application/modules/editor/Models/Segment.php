@@ -187,16 +187,6 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract
     protected $trackChangesTagHelper;
 
     /**
-     * @var editor_Models_Segment_Whitespace
-     */
-    protected $whitespaceHelper;
-
-    /**
-     * @var Zend_Db_Table_Row_Abstract
-     */
-    protected $tagsModel = null;
-
-    /**
      * static so that only one instance is used, for performance and logging issues
      * @var editor_Models_Segment_PixelLength
      */
