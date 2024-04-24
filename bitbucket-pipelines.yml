@@ -11,6 +11,36 @@ definitions:
       memory: 7128
 
 pipelines:
+  pull-requests:
+    '**':
+      - parallel:
+        - step:
+            size: 2x
+            name: PHP CodeSniffer Check
+            image: composer:2.7
+            script:
+              - composer install --ignore-platform-reqs
+              - MODIFIED_FILES=$(git --no-pager diff --diff-filter=d --name-only `git merge-base origin/$BITBUCKET_PR_DESTINATION_BRANCH HEAD` -- "**.php")
+              - >
+                if [ -z $MODIFIED_FILES ]; then
+                  echo "No PHP files have been modified.";
+                  exit 0;
+                fi
+              - ./vendor/bin/ecs check $MODIFIED_FILES
+
+        - step:
+            size: 2x
+            name: PHPStan Check
+            image: composer:2.7
+            script:
+              - composer install --ignore-platform-reqs
+              - MODIFIED_FILES=$(git --no-pager diff --diff-filter=d --name-only `git merge-base origin/$BITBUCKET_PR_DESTINATION_BRANCH HEAD` -- "**.php")
+              - >
+                if [ -z $MODIFIED_FILES ]; then
+                  echo "No PHP files have been modified.";
+                  exit 0;
+                fi
+              - ./vendor/bin/phpstan analyse -c ./phpstan.neon.dist $MODIFIED_FILES
   custom:
     test:
 
