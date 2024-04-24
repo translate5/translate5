@@ -41,6 +41,12 @@ class Translate3054Test extends \editor_Test_JsonTest
         'editor_Plugins_FrontendMessageBus_Init',
     ];
 
+    protected static bool $termtaggerRequired = true;
+
+    protected static array $requiredPlugins = [
+        'editor_Plugins_TermTagger_Bootstrap',
+    ];
+
     protected static array $segments = [];
 
     protected static ?Task $task = null;
