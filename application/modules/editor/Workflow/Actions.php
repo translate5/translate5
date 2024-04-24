@@ -103,9 +103,13 @@ class editor_Workflow_Actions extends editor_Workflow_Actions_Abstract
 
     /**
      * removes all competitive users in competitive mode
-     * @throws ZfExtended_Models_Entity_Conflict
+     * @throws ReflectionException
+     * @throws Zend_Exception
+     * @throws ZfExtended_ErrorCodeException
+     * @throws ZfExtended_Models_Entity_NotFoundException
+     * @used-by editor_Workflow_Default_AbstractHandler::callActions
      */
-    public function removeCompetitiveUsers()
+    public function removeCompetitiveUsers(): void
     {
         $task = $this->config->task;
         if ($task->getUsageMode() !== $task::USAGE_MODE_COMPETITIVE) {
@@ -118,7 +122,8 @@ class editor_Workflow_Actions extends editor_Workflow_Actions_Abstract
         } else {
             $tua = $this->config->newTua;
         }
-        $deleted = $tua->deleteOtherUsers($task->getTaskGuid(), $userGuid, $tua->getRole());
+
+        $deleted = $tua->deleteOtherUsers($task->getTaskGuid(), $userGuid, $tua->getWorkflowStepName());
         if ($deleted !== false) {
             $notifier = ZfExtended_Factory::get('editor_Workflow_Notification');
             /* @var $notifier editor_Workflow_Notification */
@@ -130,12 +135,15 @@ class editor_Workflow_Actions extends editor_Workflow_Actions_Abstract
 
             return;
         }
+
         ZfExtended_Models_Entity_Conflict::addCodes([
-            'E1160' => 'The competitive users can not be removed, probably some other user was faster and you are not assigned anymore to that task.',
+            'E1160' => 'The competitive users can not be removed, '
+                . 'probably some other user was faster and you are not assigned anymore to that task.',
         ]);
 
         throw ZfExtended_Models_Entity_Conflict::createResponse('E1160', [
-            'noField' => 'Die anderen Benutzer können nicht aus der Aufgabe entfernt werden, eventuell war ein anderer Benutzer schneller und hat Sie aus der Aufgabe entfernt.',
+            'noField' => 'Die anderen Benutzer können nicht aus der Aufgabe entfernt werden, '
+                . 'eventuell war ein anderer Benutzer schneller und hat Sie aus der Aufgabe entfernt.',
         ]);
     }
 
