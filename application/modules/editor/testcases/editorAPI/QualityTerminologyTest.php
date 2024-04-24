@@ -34,8 +34,10 @@ use MittagQI\Translate5\Test\Import\Config;
  */
 class QualityTerminologyTest extends editor_Test_JsonTest
 {
+    protected static bool $termtaggerRequired = true;
+
     protected static array $requiredPlugins = [
-        'editor_Plugins_TermTagger_Init',
+        'editor_Plugins_TermTagger_Bootstrap',
     ];
 
     protected static function setupImport(Config $config): void
