@@ -67,9 +67,10 @@ class Translate3054Test extends \editor_Test_JsonTest
         // Get segments needed for the test and check their quantity
         static::$segments = static::api()->getSegments();
         static::assertEquals(2, count(static::$segments), 'Unexpected segments qty in the imported task');
-
+        print_r(static::$segments);
         // Make sure initial value of segment #1 termtagger-quality's falsePositive flag is 0 and similarQty is 2
         $s1q = static::api()->getJson('/editor/quality/segment?segmentId=' . static::$segments[0]->id);
+        print_r($s1q);
         foreach ($s1q as $idx => $q) {
             if ($q->type == 'term') {
                 break;
