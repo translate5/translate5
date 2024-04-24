@@ -65,6 +65,9 @@ class OkapiListCommand extends Translate5AbstractCommand
         $this->initTranslate5();
 
         $config = new ConfigMaintenance();
+        if (! $config->isPluginActive()) {
+            $this->io->warning('Plugin Okapi is disabled - the config changes are still applied!');
+        }
         $usage = $config->getSummary();
 
         if ($input->getOption('as-json')) {
