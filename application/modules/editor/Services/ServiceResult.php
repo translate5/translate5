@@ -156,6 +156,15 @@ class editor_Services_ServiceResult
         return $this->results;
     }
 
+    /**
+     * Return serialized object
+     * @return string
+     */
+    public function getSerialized(): string
+    {
+        return serialize($this);
+    }
+
     public function setResults($results)
     {
         $this->results = $results;
