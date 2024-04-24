@@ -64,7 +64,7 @@ class TbxSoapConnector extends SoapConnector
             $tempReturn = $this->getFileFromServer($fileGuid);
         } catch (Exception $e) {
             // do nothing... but the temp file must be removed in case of error
-            error_log(__FILE__ . '::' . __LINE__ . '; ' . __CLASS__ . ' -> ' . __FUNCTION__ . '; ' . print_r($e, 1));
+            error_log(__FILE__ . '::' . __LINE__ . '; ' . __CLASS__ . ' -> ' . __FUNCTION__ . '; ' . print_r($e, true));
         }
         // remove the temp file
         $this->removeFileFromServer($fileGuid);

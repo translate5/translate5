@@ -55,6 +55,7 @@ namespace MittagQI\Translate5\Plugins\TermImport\Service;
 use Throwable;
 use Zend_Registry;
 use ZfExtended_Logger;
+use MittagQI\Translate5\Plugins\TermImport\Exception\TermImportException;
 
 class LoggerService
 {

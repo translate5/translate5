@@ -33,8 +33,10 @@ use editor_Models_Import_FileParser_Tag as Tag;
  *  whitespace numbering is done in the whitespace tag helper
  *
  * TRANSLATE-2658
- * with memoQ XLF we had the following problem - the id is correct to match between source and target, the rid indeed not.
- * The rid is only consistent inside either source or target to find bpt ept pairs, and is required to be used here, since the bpt / ept id is not matching.
+ * with memoQ XLF we had the following problem - the id is correct to match between source and target,
+ * the rid indeed not.
+ * The rid is only consistent inside either source or target to find bpt ept pairs, and is required to
+ * be used here, since the bpt / ept id is not matching.
  * Example:
  * source: <bpt id="1" rid="1">&lt;uf&gt;</bpt>TEXT<ept id="2" rid="1">&lt;uf&gt;</ept>
  * target: <bpt id="1" rid="2">&lt;uf&gt;</bpt>text<ept id="2" rid="2">&lt;uf&gt;</ept>
@@ -50,7 +52,6 @@ class editor_Models_Import_FileParser_Xlf_ShortTagNumbers
 
     /**
      * counter for internal tags - public since may be edited from outside
-     * @var integer
      */
     public int $shortTagIdent = 1;
 
@@ -60,13 +61,11 @@ class editor_Models_Import_FileParser_Xlf_ShortTagNumbers
      */
     protected array $allTags = [];
 
-    /**
-     * @var boolean
-     */
     protected bool $source = true;
 
     /**
-     * resets the shortTags - if source then reset completly, if not source (target then) keep the shorTags for finding existing ones
+     * resets the shortTags - if source then reset completly,
+     * if not source (target then) keep the shorTags for finding existing ones
      */
     public function init(bool $source)
     {
@@ -80,7 +79,9 @@ class editor_Models_Import_FileParser_Xlf_ShortTagNumbers
         } else {
             //if we parse the target, we have to reuse the tagNrs found in source, so we do not reset shortTagNumbers
             // but reset shortTagIdent for potential new tags to the highest previously found shortTagNumber + 1
-            $this->shortTagIdent = empty($this->shortTagNumbers) ? 1 : (max($this->shortTagNumbers) + 1);
+            $this->shortTagIdent = empty($this->shortTagNumbers) ?
+                1 :
+                (max(array_merge($this->shortTagNumbers['single'] ?? [], $this->shortTagNumbers['pair'] ?? [])) + 1);
         }
     }
 
@@ -88,7 +89,8 @@ class editor_Models_Import_FileParser_Xlf_ShortTagNumbers
      * calculates the short tag numbers and renders the tag
      * - partners are tried in each group (source or target) first by rid, if no rid set, lookup by id in the same group
      * - if we are in source collect all used short tag numbers by id
-     * - if we are in target use the short tag numbers used in source for tags with the same id, if no match, create a new shortTagNr
+     * - if we are in target use the short tag numbers used in source for tags with the same id, if no match,
+     * create a new shortTagNr
      */
     public function calculatePartnerAndType()
     {
@@ -136,21 +138,24 @@ class editor_Models_Import_FileParser_Xlf_ShortTagNumbers
                 continue;
             }
 
+            $shortTagNumberKey = $this->getShortTagNumberKey($tag);
+
             //if we are in source or no shortTagNumber was used for that tag ID yet, create one
-            if ($this->source || empty($this->shortTagNumbers[$tag->getId()])) {
+            if ($this->source || empty($this->shortTagNumbers[$shortTagNumberKey][$tag->getId()])) {
                 $tag->tagNr = $this->shortTagIdent++;
-                $this->shortTagNumbers[$tag->getId()] = $tag->tagNr;
+                $this->shortTagNumbers[$shortTagNumberKey][$tag->getId()] = $tag->tagNr;
             } else {
                 //only in target and if the same tag was already found in source, then reuse
-                $tag->tagNr = $this->shortTagNumbers[$tag->getId()];
+                $tag->tagNr = $this->shortTagNumbers[$shortTagNumberKey][$tag->getId()];
             }
 
             //if the tag has a partner, set the partners number too
             if (! empty($tag->partner)) {
                 $tag->partner->tagNr = $tag->tagNr;
                 //track the shortTagNumber of the partner if not already set
-                if (empty($this->shortTagNumbers[$tag->partner->getId()])) {
-                    $this->shortTagNumbers[$tag->partner->getId()] = $tag->partner->tagNr;
+                if (empty($this->shortTagNumbers[$shortTagNumberKey][$tag->partner->getId()])) {
+                    $this->shortTagNumbers[$shortTagNumberKey][$tag->partner->getId()]
+                        = $tag->partner->tagNr;
                 }
             }
 
@@ -170,5 +175,10 @@ class editor_Models_Import_FileParser_Xlf_ShortTagNumbers
         }
 
         $this->allTags[] = $tagObj;
+    }
+
+    private function getShortTagNumberKey(editor_Models_Import_FileParser_Tag $tag): string
+    {
+        return $tag->isSingle() ? 'single' : 'pair';
     }
 }

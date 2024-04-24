@@ -45,7 +45,18 @@ abstract class editor_Workflow_Default_AbstractHandler
      * @param string $role job step filter can be empty
      * @param string $state job state filter can be empty
      *
-     * @uses editor_Workflow_Notification::notifyAllFinishOfARole() //FIXME add the others
+     * @uses editor_Workflow_Notification::notifyAllFinishOfARole()
+     * @uses editor_Workflow_Actions::removeCompetitiveUsers()
+     * @uses editor_Workflow_Actions::cleanOldPackageExports()
+     * @uses editor_Workflow_Actions::triggerCallbackAction()
+     * @uses editor_Workflow_Actions::confirmCooperativeUsers()
+     * @uses editor_Workflow_Actions::deleteOldEndedTasks()
+     * @uses editor_Workflow_Actions::endTask()
+     * @uses editor_Workflow_Actions::finishOverduedTaskUserAssoc()
+     * @uses editor_Workflow_Actions::removeOldConnectorUsageLog()
+     * @uses editor_Workflow_Actions::segmentsSetInitialState()
+     * @uses editor_Workflow_Actions::segmentsSetUntouchedState()
+     * @uses editor_Workflow_Actions::setDefaultDeadlineDate()
      */
     protected function callActions(editor_Workflow_Actions_Config $config, $step = null, $role = null, $state = null)
     {

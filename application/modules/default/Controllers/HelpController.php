@@ -81,4 +81,11 @@ class HelpController extends ZfExtended_Controllers_Action
     {
         $this->_helper->layout->disableLayout();
     }
+
+    public function termportalAction() {
+        $this->_helper->layout->disableLayout();
+    }
+    public function itranslateAction() {
+        $this->_helper->layout->disableLayout();
+    }
 }

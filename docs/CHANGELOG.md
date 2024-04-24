@@ -10,18 +10,6 @@ All updates are (downwards) compatible! If not this is listed in the important r
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
 ## [7.3.2] - 2024-04-16
 
 ### Important Notes:
@@ -66,6 +54,9 @@ Fix for sdlxliff export and track changes.
 ## [7.3.0] - 2024-04-05
 
 ### Important Notes:
+#### [TRANSLATE-3534](https://jira.translate5.net/browse/TRANSLATE-3534)
+From this version on MariaDB 10.11 or higher is needed, MySQL support is dropped. If you are using the dockerized setup nothing must be done.
+
 #### [TRANSLATE-3655](https://jira.translate5.net/browse/TRANSLATE-3655)
 Needs at least t5memory >= 0.5.58, versions prior 0.5 must be migrated with the CLI t5memory:migration command!
 This feature is disabled by default and can be enabled by the translate5 team on hosted instances. On self-hosted instances, it can be enabled via the translate5 command-line tool by setting runtimeOptions.LanguageResources.t5memory.stripFramingTagsEnabled to 1.
