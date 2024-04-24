@@ -173,6 +173,7 @@ class editor_Models_Segment_AutoStates
 
     /**
      * Segment autostates ids for blocked segments
+     * TODO: after implementing TRANSLATE-3710, change this to constant
      * @var array|int[]
      */
     public static array $blockedStates = [

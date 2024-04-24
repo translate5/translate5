@@ -1337,11 +1337,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract
      * next is defined as the segment with the next higher segmentId. Optionally blocked segments can be ignored by
      * applying filter on autoStateId
      * This method assumes that segmentFieldManager was already loaded internally
-     * @param string $taskGuid
-     * @param int $id
-     * @param int|null $fileId
-     * @param bool $ignoreBlocked
-     * @return $this|null
+     *
      * @throws Zend_Db_Select_Exception
      * @throws Zend_Db_Statement_Exception
      */
