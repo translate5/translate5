@@ -61,7 +61,7 @@ class T5MemoryReimportTaskCommand extends Translate5AbstractCommand
                 null,
                 InputOption::VALUE_NEGATABLE,
                 'Use segment timestamp for reimport, otherwise current time is used',
-                false
+                true
             )
             ->addOption(
                 self::OPTION_SOURCE_LANGUAGE,
