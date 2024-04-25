@@ -35,10 +35,15 @@ use editor_Models_Segment as SegmentModel;
 interface UpdatableAdapterInterface
 {
     public const RECHECK_ON_UPDATE = true;
+
     public const DO_NOT_RECHECK_ON_UPDATE = false;
+
     public const RESCHEDULE_UPDATE_ON_ERROR = true;
+
     public const DO_NOT_RESCHEDULE_UPDATE_ON_ERROR = false;
+
     public const USE_SEGMENT_TIMESTAMP = true;
+
     public const DO_NOT_USE_SEGMENT_TIMESTAMP = false;
 
     public function update(

@@ -21,7 +21,7 @@
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
- 		     http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
  END LICENSE AND COPYRIGHT
  */
@@ -31,28 +31,18 @@
  */
 class editor_Plugins_Okapi_Bconf_Parser_ExtensionMapping
 {
-
     /**
      * @var string
      */
-    const INVALID_IDENTIFIER = 'INVALID';
+    public const INVALID_IDENTIFIER = 'INVALID';
 
-    /**
-     * @var array
-     */
     protected array $map = [];
 
-    /**
-     * @param array $unpackedLines
-     */
     public function __construct(array $unpackedLines)
     {
         $this->unpackContent($unpackedLines, []);
     }
 
-    /**
-     * @return array
-     */
     public function getMap(): array
     {
         return $this->map;
@@ -67,29 +57,20 @@ class editor_Plugins_Okapi_Bconf_Parser_ExtensionMapping
         foreach ($this->map as $extension => $identifier) {
             $filters[$identifier] = true;
         }
+
         return array_keys($filters);
     }
 
-    /**
-     * @return array
-     */
     public function getAllExtensions(): array
     {
         return array_keys($this->map);
     }
 
-    /**
-     * @param string $extension
-     * @return bool
-     */
     public function hasExtension(string $extension): bool
     {
         return array_key_exists(ltrim($extension, '.'), $this->map);
     }
 
-    /**
-     * @return bool
-     */
     public function hasEntries(): bool
     {
         return (count($this->map) > 0);
@@ -97,9 +78,6 @@ class editor_Plugins_Okapi_Bconf_Parser_ExtensionMapping
 
     /**
      * Internal API to parse our contents from unpacked bconf data (on import)
-     * @param array $unpackedLines
-     * @param array $replacementMap
-     * @return void
      */
     protected function unpackContent(array $unpackedLines, array $replacementMap): void
     {

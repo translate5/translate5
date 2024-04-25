@@ -1,28 +1,28 @@
 <?php
 /*
  START LICENSE AND COPYRIGHT
- 
+
  This file is part of translate5
- 
+
  Copyright (c) 2013 - 2017 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
- 
+
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
- 
+
  This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
  as published by the Free Software Foundation and appearing in the file agpl3-license.txt
  included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
- 
+
  There is a plugin exception available for use with this release of translate5 for
  translate5: Please see http://www.translate5.net/plugin-exception.txt or
  plugin-exception.txt in the root folder of translate5.
- 
+
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
  http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
- 
+
  END LICENSE AND COPYRIGHT
  */
 declare(strict_types=1);
@@ -72,7 +72,6 @@ class ServicePingCommand extends Translate5AbstractCommand
             InputOption::VALUE_NONE,
             'Checks if the host is connectable via SSL on the given port'
         );
-
     }
 
     /**
@@ -90,7 +89,7 @@ class ServicePingCommand extends Translate5AbstractCommand
 
         //we have to prepend a schema, otherwise parse_url would return
         // only a path instead a host if just a string is given:
-        if (!str_contains($url, '://')) {
+        if (! str_contains($url, '://')) {
             $url = 'tcp://' . $url;
         }
 
@@ -100,6 +99,7 @@ class ServicePingCommand extends Translate5AbstractCommand
         $port = $urlParts['port'] ?? ($checkSSL ? 443 : 80);
         if (empty($host)) {
             $this->io->error('Parsing the URL does not return a valid host!');
+
             return self::INVALID;
         }
 
@@ -107,6 +107,7 @@ class ServicePingCommand extends Translate5AbstractCommand
 
         if ($ips === false) {
             $this->io->error('No DNS entry found for host ' . $host);
+
             return self::FAILURE;
         }
 
@@ -161,13 +162,12 @@ class ServicePingCommand extends Translate5AbstractCommand
             $error = '';
             $this->io->writeln('');
             $this->io->section('SSL Check');
-            if ($this->checkService('https://'.$host, $port, $result, $error)) {
-                $this->io->success('SSL seems to be OK: '.$error);
+            if ($this->checkService('https://' . $host, $port, $result, $error)) {
+                $this->io->success('SSL seems to be OK: ' . $error);
             } else {
-                $this->io->error('SSL Problems: '.$error);
+                $this->io->error('SSL Problems: ' . $error);
                 $success = false;
             }
-
         }
 
         return $success ? self::SUCCESS : self::FAILURE;
@@ -190,8 +190,10 @@ class ServicePingCommand extends Translate5AbstractCommand
         if ($result === false) {
             $result = '';
             $error = curl_error($curl);
+
             return false;
         }
+
         return true;
     }
 }

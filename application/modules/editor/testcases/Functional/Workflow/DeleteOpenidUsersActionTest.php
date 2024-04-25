@@ -21,7 +21,7 @@ START LICENSE AND COPYRIGHT
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
@@ -43,8 +43,11 @@ use ZfExtended_Utils;
 class DeleteOpenidUsersActionTest extends editor_Test_UnitTest
 {
     private const USER_LOGIN = 'DeleteOpenidUsersActionTest';
+
     private const PM_USER_LOGIN = 'PM_DeleteOpenidUsersActionTest';
+
     private const FALLBACK_PM_USER_LOGIN = 'Fallback_PM_DeleteOpenidUsersActionTest';
+
     private const LAST_LOGIN_INTERVAL_IN_DB = 9;
 
     private $config;
@@ -52,7 +55,7 @@ class DeleteOpenidUsersActionTest extends editor_Test_UnitTest
     public function setUp(): void
     {
         $this->config = Zend_Registry::get('config');
-        $date = (new DateTime('- '.self::LAST_LOGIN_INTERVAL_IN_DB. ' days'))->format('Y-m-d H:i:s');
+        $date = (new DateTime('- ' . self::LAST_LOGIN_INTERVAL_IN_DB . ' days'))->format('Y-m-d H:i:s');
         $user = ZfExtended_Factory::get(ZfExtended_Models_User::class);
         $user->setLogin(self::USER_LOGIN);
         $user->setUserGuid(ZfExtended_Utils::guid(true));

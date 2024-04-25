@@ -3,25 +3,25 @@
 START LICENSE AND COPYRIGHT
 
  This file is part of translate5
- 
+
  Copyright (c) 2013 - 2021 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
 
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
  This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
- as published by the Free Software Foundation and appearing in the file agpl3-license.txt 
- included in the packaging of this file.  Please review the following information 
+ as published by the Free Software Foundation and appearing in the file agpl3-license.txt
+ included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
-  
+
  There is a plugin exception available for use with this release of translate5 for
- translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or
  plugin-exception.txt in the root folder of translate5.
-  
+
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
@@ -33,29 +33,30 @@ use MittagQI\ZfExtended\Acl\AbstractResource;
 /**
  * Holds and documents the translate5 ACL rights
  */
-final class Rights extends AbstractResource {
+final class Rights extends AbstractResource
+{
     /**
      * Basic resource for business logic rights
      */
     public const ID = 'frontend';
 
-//region Applets
+    //region Applets
     /**
      * enables the Editor Applet as initial page
      * @group Applet
      */
     public const APPLET_EDITOR = 'editor';
-//endregion
+    //endregion
 
-//region qualities
+    //region qualities
     /**
      * Allows the user to use the quality overview for a task and re-check qualities
      * @group Qualities
      */
     public const EDITOR_MANAGE_QUALITIES = 'editorManageQualities';
-//endregion
+    //endregion
 
-//region Main tabs
+    //region Main tabs
     /**
      * allows the usage of the project grid (as tab in the main window)
      * @group Task administration
@@ -67,9 +68,9 @@ final class Rights extends AbstractResource {
      * @group Task usage
      */
     public const TASK_OVERVIEW_FRONTEND_CONTROLLER = 'taskOverviewFrontendController';
-//endregion
+    //endregion
 
-//region Administration
+    //region Administration
     /**
      * allows the usage of the user administration (as tab in the main window)
      * @group Administration
@@ -117,9 +118,9 @@ final class Rights extends AbstractResource {
      * @group API
      */
     public const GET_UPDATE_NOTIFICATION = 'getUpdateNotification';
-//endregion
+    //endregion
 
-//region Task usage
+    //region Task usage
     /**
      * allows the usage of the task add window in the UI
      * @group Task usage
@@ -222,9 +223,9 @@ final class Rights extends AbstractResource {
      * @group Task usage
      */
     public const EDITOR_ANALYSIS_TASK = 'editorAnalysisTask';
-//endregion
+    //endregion
 
-//region Task editing
+    //region Task editing
 
     /**
      * allows locking a single segment
@@ -255,9 +256,9 @@ final class Rights extends AbstractResource {
      * @group Task editing
      */
     public const USE_CHANGE_ALIKES = 'useChangeAlikes';
-//endregion
+    //endregion
 
-//region Task export rights
+    //region Task export rights
     /**
      * Allow downloading a task in general (task download menu in the UI)
      * @group Task export
@@ -294,9 +295,9 @@ final class Rights extends AbstractResource {
      * @group Task re-import
      */
     public const EDITOR_PACKAGE_REIMPORT = 'editorPackageReimport';
-//endregion
+    //endregion
 
-//region Workflow
+    //region Workflow
     /**
      * allows user to task assignment in the UI (and listing of changeable workflow steps in the assignment)
      * @group Workflow
@@ -338,7 +339,7 @@ final class Rights extends AbstractResource {
      * @group Workflow
      */
     public const EDITOR_REOPEN_TASK = 'editorReopenTask';
-//endregion
+    //endregion
 
     /**
      * shows the application state data on the corresponding API endpoint
@@ -399,8 +400,8 @@ final class Rights extends AbstractResource {
      * @group User administration
      */
     public const EDITOR_RESET_PW_USER = 'editorResetPwUser';
-//region Configuration
-//FIXME link the rights somehow between the UI and PHP, the used-by ones are used only in the UI
+    //region Configuration
+    //FIXME link the rights somehow between the UI and PHP, the used-by ones are used only in the UI
 
     /**
      * enable the system configuration panel in the preferences view
@@ -413,8 +414,7 @@ final class Rights extends AbstractResource {
      * @group configuration
      */
     public const TASK_CONFIG_OVERWRITE_GRID = 'taskConfigOverwriteGrid';
-//endregion
-
+    //endregion
 
     /**
      * enable the customer change switch (multi-tenancy)
@@ -504,10 +504,9 @@ final class Rights extends AbstractResource {
      */
     public const EDITOR_DELETE_PROJECT = 'editorDeleteProject';
 
+    //endregion
 
-//endregion
-
-//region language resources
+    //region language resources
     /**
      * Allows the adding of filebased language resources (mostly TMs)
      * @group Language Resources
@@ -556,10 +555,10 @@ final class Rights extends AbstractResource {
      * @group Language Resources
      */
     public const LANGUAGE_RESOURCES_OVERVIEW = 'languageResourcesOverview';
-//endregion
+    //endregion
 
-//region PLUGINS
-// TODO MOVE INTO THE ORIGINATION PLUGIN!
+    //region PLUGINS
+    // TODO MOVE INTO THE ORIGINATION PLUGIN!
 
     /**
      * Enables the UI invocation of the spell-check in the editor (Editor.plugins.SpellCheck.controller.Editor)
@@ -617,5 +616,5 @@ final class Rights extends AbstractResource {
      * @group frontend controller
      */
     public const ACL_RIGHT_PLUGIN_CHANGE_LOG_CHANGELOG = 'pluginChangeLogChangelog';
-//endregion
+    //endregion
 }

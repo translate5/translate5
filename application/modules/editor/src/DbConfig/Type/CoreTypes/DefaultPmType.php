@@ -65,7 +65,6 @@ class DefaultPmType extends ZfExtended_DbConfig_Type_CoreTypes
      */
     public function isValidInDefaults(editor_Models_Config $config, string $value): bool
     {
-
         // Get user ids, having all-right on editor_task-resource
         $defaults = ZfExtended_Factory::get(ZfExtended_Models_User::class)->loadAllByRole([ACL_ROLE_PM]);
 

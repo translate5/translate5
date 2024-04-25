@@ -52,7 +52,6 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\Plugins\TermImport\Service\Filesystem;
 
-use editor_Models_Import_Configuration;
 use League\Flysystem\FilesystemException;
 use League\Flysystem\MountManager;
 use League\Flysystem\StorageAttributes;
@@ -63,28 +62,38 @@ use MittagQI\Translate5\Plugins\TermImport\Service\LoggerService;
 class FilesystemService
 {
     public const EXPORT_DIR = 'Export';
+
     public const PROCESSING_DIR = 'Import-running';
 
     private const INSTRUCTION_FILE_NAME = 'instruction.ini';
+
     private const IMPORT_DIR = 'Import';
+
     private const IMPORT_SUCCESS_DIR = 'Import-success';
+
     private const FAILED_DIR = 'Error';
+
     private int $maxDepth = 3;
 
-    public function __construct(private MountManager $mountManager, private LoggerService $logger, private string $adapterType)
-    {
+    public function __construct(
+        private MountManager $mountManager,
+        private LoggerService $logger,
+        private string $adapterType
+    ) {
     }
 
-    public function getAdapterType() {
+    public function getAdapterType()
+    {
         return $this->adapterType;
     }
 
     public function validDir(string $path): bool
     {
         try {
-            if (!$this->mountManager->directoryExists($path)) {
+            if (! $this->mountManager->directoryExists($path)) {
                 return false;
             }
+
             return $this->mountManager->listContents($path)->getIterator()->valid();
         } catch (FilesystemException) {
             return false;
@@ -98,7 +107,7 @@ class FilesystemService
      */
     public function moveReadyDirsToProcessingDir(string $dirPath, int $depth = 0): array
     {
-        if (!$this->validDir($dirPath)) {
+        if (! $this->validDir($dirPath)) {
             return [];
         }
 
@@ -114,13 +123,13 @@ class FilesystemService
 
         /** @var StorageAttributes $item */
         foreach ($this->mountManager->listContents($dirPath) as $item) {
-
             if ($item->isDir() && $depth < $this->maxDepth) {
                 $projectDirs = array_merge($projectDirs, $this->moveReadyDirsToProcessingDir($item->path(), $depth + 1));
+
                 continue;
             }
 
-            if (!str_contains($dirPath . '/', '/' . self::IMPORT_DIR . '/')) {
+            if (! str_contains($dirPath . '/', '/' . self::IMPORT_DIR . '/')) {
                 continue;
             }
 
@@ -139,13 +148,13 @@ class FilesystemService
 
     private function moveReadyProjectDir(StorageAttributes $item, string $dirPath, array &$projectDirs): bool
     {
-        if (!$this->isInstructionFile($item)) {
+        if (! $this->isInstructionFile($item)) {
             return false;
         }
 
         $temp_ini_path = tempnam(APPLICATION_DATA . '/tmp', 'termimport');
         file_put_contents($temp_ini_path, $this->mountManager->read($item->path()));
-        $instructions = parse_ini_file($temp_ini_path,true, INI_SCANNER_TYPED);
+        $instructions = parse_ini_file($temp_ini_path, true, INI_SCANNER_TYPED);
 
         if (false === $instructions) {
             $this->logger->invalidInstructions($item->path(), ['Invalid INI file']);
@@ -173,15 +182,14 @@ class FilesystemService
         string $sourceDir,
         string $targetDir
     ): void {
-
         foreach ($instructions->FileMapping as $tbxFileName => $termCollectionName) {
-
             $sourceFilePath = $sourceDir . '/' . $tbxFileName;
             $targetFilePath = $targetDir . '/' . $tbxFileName;
 
-            if (!$this->mountManager->fileExists($sourceFilePath)) {
+            if (! $this->mountManager->fileExists($sourceFilePath)) {
                 $this->logger->fileNotFound($tbxFileName);
                 unset($instructions->FileMapping[$tbxFileName]);
+
                 continue;
             }
 
@@ -191,7 +199,7 @@ class FilesystemService
 
     public function moveFailedDir(string $dirPath): void
     {
-        if (!$this->validDir($dirPath) || !str_contains($dirPath, self::PROCESSING_DIR)) {
+        if (! $this->validDir($dirPath) || ! str_contains($dirPath, self::PROCESSING_DIR)) {
             return;
         }
 
@@ -203,7 +211,7 @@ class FilesystemService
 
     public function moveSuccessfulDir(string $dirPath, array $successfulTbxFiles): void
     {
-        if (!$this->validDir($dirPath) || !str_contains($dirPath, self::PROCESSING_DIR)) {
+        if (! $this->validDir($dirPath) || ! str_contains($dirPath, self::PROCESSING_DIR)) {
             return;
         }
 
@@ -213,7 +221,7 @@ class FilesystemService
         /** @var StorageAttributes $item */
         foreach ($this->mountManager->listContents($dirPath) as $item) {
             $name = pathinfo($item->path(), PATHINFO_BASENAME);
-            if (!$item->isFile()
+            if (! $item->isFile()
                 || strtolower(pathinfo($item->path(), PATHINFO_EXTENSION)) !== 'tbx'
                 || in_array($name, $successfulTbxFiles)) {
                 $this->mountManager->move($dirPath . '/' . $name, $targetPath . '/' . $name);

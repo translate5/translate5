@@ -3,25 +3,25 @@
 START LICENSE AND COPYRIGHT
 
  This file is part of translate5
- 
+
  Copyright (c) 2013 - 2021 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
 
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
  This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
- as published by the Free Software Foundation and appearing in the file agpl3-license.txt 
- included in the packaging of this file.  Please review the following information 
+ as published by the Free Software Foundation and appearing in the file agpl3-license.txt
+ included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
-  
+
  There is a plugin exception available for use with this release of translate5 for
- translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or
  plugin-exception.txt in the root folder of translate5.
-  
+
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
@@ -51,36 +51,43 @@ use editor_Models_Terminology_Models_CollectionAttributeDataType as CollectionAt
  * @method void setResourceType(string $resourceType)
  * @method string getWriteSource()
  * @method void setWriteSource(bool $writeSource)
- *
  */
 class editor_Models_LanguageResources_LanguageResource extends ZfExtended_Models_Entity_Abstract
 {
     use editor_Models_Entity_SpecificDataTrait;
+
+    public const PROTECTION_HASH = 'protection_hash';
+
+    public const PROTECTION_CONVERSION_STARTED = 'conversionStarted';
 
     private const SPECIFIC_DATA_STATUS = 'status';
 
     /***
      * set as match rate type when match-rate was changed
      */
-    const MATCH_RATE_TYPE_EDITED = 'matchresourceusage';
+    public const MATCH_RATE_TYPE_EDITED = 'matchresourceusage';
 
     protected $dbInstanceClass = 'editor_Models_Db_LanguageResources_LanguageResource';
+
     protected $validatorInstanceClass = 'editor_Models_Validator_LanguageResources_LanguageResource';
 
     /**
      * Language-resources must be filtered by role-driven restrictions, what must be done via our customer-association
      * This differs from "customerIds" in the controller !
      */
-    protected ?array $clientAccessRestriction = ['field' => 'customerId', 'type' => 'list', 'assoc' => [
-        'table' => 'LEK_languageresources_customerassoc',
-        'foreignKey' => 'languageResourceId',
-        'localKey' => 'id',
-        'searchField' => 'customerId'
-    ]];
+    protected ?array $clientAccessRestriction = [
+        'field' => 'customerId',
+        'type' => 'list',
+        'assoc' => [
+            'table' => 'LEK_languageresources_customerassoc',
+            'foreignKey' => 'languageResourceId',
+            'localKey' => 'id',
+            'searchField' => 'customerId',
+        ],
+    ];
 
     /**
      * Caches the customers of a language-resource
-     * @var array
      */
     protected array $customers = [];
 
@@ -123,6 +130,7 @@ class editor_Models_LanguageResources_LanguageResource extends ZfExtended_Models
         $allservices = array_unique($allservices);
         $s = $this->db->select()
             ->where('LEK_languageresources.serviceType IN(?)', $allservices);
+
         return $this->loadFilterdCustom($s);
     }
 
@@ -135,6 +143,7 @@ class editor_Models_LanguageResources_LanguageResource extends ZfExtended_Models
     {
         $s = $this->db->select()
             ->where('LEK_languageresources.serviceName = ?', $serviceName);
+
         return $this->db->fetchAll($s)->toArray();
     }
 
@@ -149,23 +158,28 @@ class editor_Models_LanguageResources_LanguageResource extends ZfExtended_Models
      * @return array
      */
     public function getByTypeNameAndSpecificDataForTask(
-        string             $type,
-        string             $name,
-        array              $data,
+        string $type,
+        string $name,
+        array $data,
         editor_Models_Task $task
-    ): array
-    {
+    ): array {
         $s = $this->db
             ->select()
-            ->from(['lr' => 'LEK_languageresources'], ['lr.*'])
+            ->from([
+                'lr' => 'LEK_languageresources',
+            ], ['lr.*'])
             ->setIntegrityCheck(false)
             ->joinLeft(
-                ['l' => 'LEK_languageresources_languages'],
+                [
+                    'l' => 'LEK_languageresources_languages',
+                ],
                 'lr.id = l.languageResourceId',
                 ['sourceLang', 'targetLang']
             )
             ->joinLeft(
-                ['lca' => 'LEK_languageresources_customerassoc'],
+                [
+                    'lca' => 'LEK_languageresources_customerassoc',
+                ],
                 'lr.id = lca.languageResourceId',
                 ['customerId']
             )
@@ -183,26 +197,22 @@ class editor_Models_LanguageResources_LanguageResource extends ZfExtended_Models
     /**
      * Fetches language-resources of the specified types that have the given language-codes
      * The language-codes either must be identical (default) or are searched by similarity (primary language equals)
-     * @param array $types
-     * @param int $sourceLangId
-     * @param int $targetLangId
      * @param bool $respectCustomerRestriction : if set, the fetched resources must not have customers of this resource
-     * @return array
      * @throws ReflectionException
      * @throws Zend_Cache_Exception
      */
     public function getByTypesAndLanguages(
         array $types,
-        int   $sourceLangId,
-        int   $targetLangId,
-        bool  $respectCustomerRestriction = true): array
-    {
+        int $sourceLangId,
+        int $targetLangId,
+        bool $respectCustomerRestriction = true
+    ): array {
         // first, evaluate the fuzzy languages
         $languages = ZfExtended_Factory::get(editor_Models_Languages::class);
         $sourceLanguageIds = $languages->getFuzzyLanguages($sourceLangId, 'id', true);
         $targetLanguageIds = $languages->getFuzzyLanguages($targetLangId, 'id', true);
 
-         // evaluate Clients/Customers
+        // evaluate Clients/Customers
         $clientIds = ($respectCustomerRestriction) ? $this->getCustomers() : null;
         // the current user may is client-restricted and we have to respect that restriction in any case
         if (ZfExtended_Authentication::getInstance()->isUserClientRestricted()) {
@@ -218,12 +228,16 @@ class editor_Models_LanguageResources_LanguageResource extends ZfExtended_Models
         $select = $this->db
             ->select()
             ->from(
-                ['lr' => 'LEK_languageresources'],
+                [
+                    'lr' => 'LEK_languageresources',
+                ],
                 ['lr.id', 'lr.name', 'lr.serviceName', 'lr.resourceType', 'lr.specificData']
             )
             ->setIntegrityCheck(false)
             ->joinLeft(
-                ['lla' => 'LEK_languageresources_languages'],
+                [
+                    'lla' => 'LEK_languageresources_languages',
+                ],
                 'lr.id = lla.languageResourceId',
                 ['sourceLangCode', 'targetLangCode']
             );
@@ -238,12 +252,15 @@ class editor_Models_LanguageResources_LanguageResource extends ZfExtended_Models
         if ($clientIds !== null) {
             $select
                 ->joinLeft(
-                    ['lca' => 'LEK_languageresources_customerassoc'],
+                    [
+                        'lca' => 'LEK_languageresources_customerassoc',
+                    ],
                     'lr.id = lca.languageResourceId',
                     ['customerId']
                 );
             ZfExtended_Utils::addArrayCondition($select, $clientIds, 'lca.customerId');
         }
+
         return $this->db->fetchAll($select)->toArray();
     }
 
@@ -251,7 +268,9 @@ class editor_Models_LanguageResources_LanguageResource extends ZfExtended_Models
     {
         $s = $this->db
             ->select()
-            ->from(['lr' => 'LEK_languageresources'], ['lr.*'])
+            ->from([
+                'lr' => 'LEK_languageresources',
+            ], ['lr.*'])
             ->where('lr.resourceId = ?', $resourceId);
 
         return $this->db->fetchAll($s)->toArray();
@@ -261,10 +280,14 @@ class editor_Models_LanguageResources_LanguageResource extends ZfExtended_Models
     {
         $s = $this->db
             ->select()
-            ->from(['lr' => 'LEK_languageresources'], ['lr.*'])
+            ->from([
+                'lr' => 'LEK_languageresources',
+            ], ['lr.*'])
             ->setIntegrityCheck(false)
             ->joinLeft(
-                ['l' => 'LEK_languageresources_languages'],
+                [
+                    'l' => 'LEK_languageresources_languages',
+                ],
                 'lr.id = l.languageResourceId',
                 ['sourceLangCode', 'targetLangCode']
             )
@@ -281,10 +304,14 @@ class editor_Models_LanguageResources_LanguageResource extends ZfExtended_Models
     ): array {
         $s = $this->db
             ->select()
-            ->from(['lr' => 'LEK_languageresources'], ['lr.*'])
+            ->from([
+                'lr' => 'LEK_languageresources',
+            ], ['lr.*'])
             ->setIntegrityCheck(false)
             ->joinLeft(
-                ['l' => 'LEK_languageresources_languages'],
+                [
+                    'l' => 'LEK_languageresources_languages',
+                ],
                 'lr.id = l.languageResourceId',
                 ['sourceLangCode', 'targetLangCode']
             )
@@ -305,7 +332,6 @@ class editor_Models_LanguageResources_LanguageResource extends ZfExtended_Models
      */
     public function getAllMergedByAssoc($addArrayId = true, string $resourceType = null)
     {
-
         $serviceManager = ZfExtended_Factory::get('editor_Services_Manager');
         /* @var $serviceManager editor_Services_Manager */
         $resources = $serviceManager->getAllResources();
@@ -314,7 +340,7 @@ class editor_Models_LanguageResources_LanguageResource extends ZfExtended_Models
         foreach ($resources as $resource) {
             $tmpType = $resourceType ?? $resource->getType();
             /* @var $resource editor_Models_LanguageResources_Resource */
-            if (!in_array($resource->getService(), $services) && $tmpType == $resource->getType()) {
+            if (! in_array($resource->getService(), $services) && $tmpType == $resource->getType()) {
                 $services[] = $resource->getService();
             }
         }
@@ -341,19 +367,16 @@ class editor_Models_LanguageResources_LanguageResource extends ZfExtended_Models
      *  'targetLang2Id' => [langResource1Id, langResource3Id],
      * ]
      *
-     * @param int $customerId
-     * @param array $targetLangs
      * @return array
      * @throws Zend_Db_Statement_Exception
      */
     public function getUseAsDefaultForTaskAssoc(int $customerId, array $targetLangs)
     {
-
         // Get editor_Models_LanguageResources_CustomerAssoc model shortcut
         $lrcaM = ZfExtended_Factory::get('editor_Models_LanguageResources_CustomerAssoc');
 
         // Fetch `languageResourceId`-values by $customerId, having `useAsDefault`=1
-        if (!$languageResourceIds = $lrcaM->loadByCustomerIdsUseAsDefault([$customerId], 'languageResourceId')) {
+        if (! $languageResourceIds = $lrcaM->loadByCustomerIdsUseAsDefault([$customerId], 'languageResourceId')) {
             return [];
         }
 
@@ -381,32 +404,37 @@ class editor_Models_LanguageResources_LanguageResource extends ZfExtended_Models
         array $serviceNames = [],
         array $sourceLang = [],
         array $targetLang = []
-    ): array
-    {
+    ): array {
         $customers = ZfExtended_Authentication::getInstance()->getUser()?->getCustomersArray();
-        if(empty($customers)){
+        if (empty($customers)) {
             return [];
         }
 
         //each sdlcloud language resource can have only one language combination
         $s = $this->db->select()
-            ->from(['tm' => 'LEK_languageresources'],['tm.*'])
+            ->from([
+                'tm' => 'LEK_languageresources',
+            ], ['tm.*'])
             ->setIntegrityCheck(false)
-            ->join(['ca' => 'LEK_languageresources_customerassoc'], 'tm.id = ca.languageResourceId', '')
-            ->join(['l' => 'LEK_languageresources_languages'],'tm.id = l.languageResourceId', [
-                    'GROUP_CONCAT(`l`.`sourceLang`) as sourceLang',
-                    'GROUP_CONCAT(`l`.`targetLang`) as targetLang',
+            ->join([
+                'ca' => 'LEK_languageresources_customerassoc',
+            ], 'tm.id = ca.languageResourceId', '')
+            ->join([
+                'l' => 'LEK_languageresources_languages',
+            ], 'tm.id = l.languageResourceId', [
+                'GROUP_CONCAT(`l`.`sourceLang`) as sourceLang',
+                'GROUP_CONCAT(`l`.`targetLang`) as targetLang',
             ])->where('ca.customerId IN(?)', $customers);
 
-        if (!empty($serviceNames)) {
+        if (! empty($serviceNames)) {
             $s->where('tm.serviceName IN(?)', $serviceNames);
         }
 
-        if (!empty($sourceLang)) {
+        if (! empty($sourceLang)) {
             $s->where('l.sourceLang IN(?)', $sourceLang);
         }
 
-        if (!empty($targetLang)) {
+        if (! empty($targetLang)) {
             $s->where('l.targetLang IN(?)', $targetLang);
         }
         $s->group('tm.id');
@@ -417,13 +445,11 @@ class editor_Models_LanguageResources_LanguageResource extends ZfExtended_Models
     /**
      * Map all language codes to their rfc5646 representation in the given result as separate arrays(sourceLangCode
      * and targetLangCode). It will also convert the sourceLang and targetLang to arrays.
-     * @param array $result
-     * @return array
      * @throws ReflectionException
      */
     private function mapLanguageCodes(array $result = []): array
     {
-        if(empty($result)){
+        if (empty($result)) {
             return [];
         }
 
@@ -431,7 +457,7 @@ class editor_Models_LanguageResources_LanguageResource extends ZfExtended_Models
         $languagesMapping = $languages->loadAllKeyValueCustom('id', 'rfc5646');
 
         // explode the language codes and map them to their rfc5646 representation
-        $result = array_map(function($item) use ($languagesMapping){
+        $result = array_map(function ($item) use ($languagesMapping) {
             $item['sourceLang'] = explode(',', $item['sourceLang']);
             $item['targetLang'] = explode(',', $item['targetLang']);
 
@@ -441,6 +467,7 @@ class editor_Models_LanguageResources_LanguageResource extends ZfExtended_Models
             foreach ($item['targetLang'] as $langId) {
                 $item['targetLangCode'][] = $languagesMapping[$langId];
             }
+
             return $item;
         }, $result);
 
@@ -449,7 +476,6 @@ class editor_Models_LanguageResources_LanguageResource extends ZfExtended_Models
 
     /**
      * loads the task to languageResource assocs by a taskguid
-     * @param string $taskGuid
      * @return array
      */
     public function loadByAssociatedTaskGuid(string $taskGuid)
@@ -470,17 +496,16 @@ class editor_Models_LanguageResources_LanguageResource extends ZfExtended_Models
         $assocDb = new MittagQI\Translate5\LanguageResource\Db\TaskAssociation();
         $assocName = $assocDb->info($assocDb::NAME);
         $s = $this->db->select()
-            ->from($this->db, array('*', $assocName . '.taskGuid', $assocName . '.segmentsUpdateable'))
+            ->from($this->db, ['*', $assocName . '.taskGuid', $assocName . '.segmentsUpdateable'])
             ->setIntegrityCheck(false)
             ->join($assocName, $assocName . '.`languageResourceId` = ' . $this->db->info($assocDb::NAME) . '.`id`', '')
             ->where($assocName . '.`taskGuid` in (?)', $taskGuidList);
+
         return $this->db->fetchAll($s)->toArray();
     }
 
     /**
      * loads the task to languageResource assocs by list of taskGuids and resourceTypes
-     * @param array $taskGuid
-     * @param array $resourceTypes
      * @return array
      */
     public function loadByAssociatedTaskGuidListAndResourcesType(array $taskGuidList, array $resourceTypes)
@@ -492,21 +517,17 @@ class editor_Models_LanguageResources_LanguageResource extends ZfExtended_Models
         $tableName = $this->db->info($assocDb::NAME);
         $assocName = $assocDb->info($assocDb::NAME);
         $s = $this->db->select()
-            ->from($this->db, array('*', $assocName . '.taskGuid', $assocName . '.segmentsUpdateable'))
+            ->from($this->db, ['*', $assocName . '.taskGuid', $assocName . '.segmentsUpdateable'])
             ->setIntegrityCheck(false)
             ->join($assocName, $assocName . '.`languageResourceId` = ' . $tableName . '.`id`', '')
             ->where($assocName . '.`taskGuid` IN (?)', $taskGuidList)
             ->where($tableName . '.resourceType IN(?)', $resourceTypes);
+
         return $this->db->fetchAll($s)->toArray();
     }
 
     /**
      * Loads the task to languageResource assocs by list of taskGuids and serviceTypes
-     *
-     * @param array $taskGuidList
-     * @param array $serviceTypes
-     *
-     * @return array
      *
      * @throws Zend_Db_Table_Exception
      */
@@ -521,7 +542,7 @@ class editor_Models_LanguageResources_LanguageResource extends ZfExtended_Models
         $assocName = $assocDb->info($assocDb::NAME);
 
         $s = $this->db->select()
-            ->from($this->db, array('*', $assocName . '.taskGuid', $assocName . '.segmentsUpdateable'))
+            ->from($this->db, ['*', $assocName . '.taskGuid', $assocName . '.segmentsUpdateable'])
             ->setIntegrityCheck(false)
             ->join($assocName, $assocName . '.`languageResourceId` = ' . $tableName . '.`id`', '')
             ->where($assocName . '.`taskGuid` IN (?)', $taskGuidList)
@@ -532,19 +553,17 @@ class editor_Models_LanguageResources_LanguageResource extends ZfExtended_Models
 
     /**
      * loads the language resources to a specific service resource ID (language resource to a specific server (=resource))
-     * @param string $serviceResourceId
      * @return array
      */
     public function loadByResourceId(string $serviceResourceId)
     {
         $s = $this->db->select()->where('resourceId = ?', $serviceResourceId);
+
         return $this->db->fetchAll($s)->toArray();
     }
 
     /**
      * loads the language resources to a specific service resource ID (language resource to a specific server (=resource))
-     * @param string $uuid
-     * @return Zend_Db_Table_Row_Abstract|null
      * @throws ZfExtended_Models_Entity_NotFoundException
      */
     public function loadByUuid(string $uuid): ?Zend_Db_Table_Row_Abstract
@@ -554,6 +573,7 @@ class editor_Models_LanguageResources_LanguageResource extends ZfExtended_Models
         if (empty($this->row)) {
             $this->notFound('#langResUuid ' . $uuid);
         }
+
         return $this->row;
     }
 
@@ -568,9 +588,10 @@ class editor_Models_LanguageResources_LanguageResource extends ZfExtended_Models
         $manager = ZfExtended_Factory::get('editor_Services_Manager');
         /* @var $manager editor_Services_Manager */
         $res = $manager->getResource($this);
-        if (!empty($res)) {
+        if (! empty($res)) {
             return $res;
         }
+
         throw new editor_Services_Exceptions_NoService('E1316', [
             'service' => $this->getServiceName(),
             'languageResource' => $this,
@@ -580,17 +601,13 @@ class editor_Models_LanguageResources_LanguageResource extends ZfExtended_Models
     /**
      * checks if the given languageResource (and segmentid - optional) is usable by the given task
      *
-     * @param string $taskGuid
-     * @param int $languageResourceId
-     * @param editor_Models_Segment $segment
      * @throws ZfExtended_Models_Entity_NoAccessException
-     *
      */
     public function checkTaskAndLanguageResourceAccess(string $taskGuid, int $languageResourceId, editor_Models_Segment $segment = null)
     {
-
         //checks if the queried languageResource is associated to the task:
         $languageResourceTaskAssoc = ZfExtended_Factory::get('MittagQI\Translate5\LanguageResource\TaskAssociation');
+
         /* @var $languageResourceTaskAssoc MittagQI\Translate5\LanguageResource\TaskAssociation */
         try {
             //for security reasons a service can only be queried when a valid task association exists and this task is loaded
@@ -617,25 +634,26 @@ class editor_Models_LanguageResources_LanguageResource extends ZfExtended_Models
      * @throws ZfExtended_ValidateException
      * @return mixed
      */
-    protected function getCachedLanguagesField($fieldName){
-
+    protected function getCachedLanguagesField($fieldName)
+    {
         //check if the fieldName is defined
-        if(empty($fieldName)){
+        if (empty($fieldName)) {
             throw new ZfExtended_ValidateException('Missing field name.');
         }
-        
-        if($this->getId() === null){
+
+        if ($this->getId() === null) {
             throw new ZfExtended_ValidateException('Entity id is not set.');
         }
 
-        if(!isset($this->cachedLanguages) || count($this->cachedLanguages) === 0 || $this->cachedLanguages[0]['id'] != $this->getId()){
+        if (! isset($this->cachedLanguages) || count($this->cachedLanguages) === 0 || $this->cachedLanguages[0]['id'] != $this->getId()) {
             $model = ZfExtended_Factory::get(editor_Models_LanguageResources_Languages::class);
             //load the existing languages from the languageresource languages table
             $this->cachedLanguages = $model->loadByLanguageResourceId($this->getId());
         }
-        if(count($this->cachedLanguages) === 1){
+        if (count($this->cachedLanguages) === 1) {
             return $this->cachedLanguages[0][$fieldName];
         }
+
         return array_column($this->cachedLanguages, $fieldName);
     }
 
@@ -661,7 +679,6 @@ class editor_Models_LanguageResources_LanguageResource extends ZfExtended_Models
 
     /**
      * Get the source lang name from the languageresource language table
-     * @return string|array
      * @throws ZfExtended_ValidateException
      */
     public function getSourceLangName(): string|array
@@ -691,7 +708,6 @@ class editor_Models_LanguageResources_LanguageResource extends ZfExtended_Models
 
     /**
      * Get the target lang name from the languageresource language table
-     * @return string|array
      * @throws ZfExtended_ValidateException
      */
     public function getTargetLangName(): string|array
@@ -705,10 +721,11 @@ class editor_Models_LanguageResources_LanguageResource extends ZfExtended_Models
      */
     public function getCustomers(): array
     {
-        if (!array_key_exists($this->getId(), $this->customers)) {
+        if (! array_key_exists($this->getId(), $this->customers)) {
             $model = ZfExtended_Factory::get(editor_Models_LanguageResources_CustomerAssoc::class);
             $this->customers[$this->getId()] = array_column($model->loadByLanguageResourceId($this->getId()), 'customerId');
         }
+
         return $this->customers[$this->getId()];
     }
 
@@ -727,6 +744,7 @@ class editor_Models_LanguageResources_LanguageResource extends ZfExtended_Models
     protected function getCategories()
     {
         $categoryAssoc = ZfExtended_Factory::get('editor_Models_LanguageResources_CategoryAssoc');
+
         /* @var $categoryAssoc editor_Models_LanguageResources_CategoryAssoc */
         return $categoryAssoc->loadByLanguageResourceId($this->getId());
     }
@@ -746,6 +764,7 @@ class editor_Models_LanguageResources_LanguageResource extends ZfExtended_Models
             $m->load($categoryId);
             $categoriesOriginalIds[] = $m->getOriginalCategoryId();
         }
+
         return $categoriesOriginalIds;
     }
 
@@ -779,7 +798,7 @@ class editor_Models_LanguageResources_LanguageResource extends ZfExtended_Models
     /**
      * Get termcollection export filename, that tbx-contents will be written to
      */
-    static function exportFilename($collectionId)
+    public static function exportFilename($collectionId)
     {
         return editor_Models_Import_TermListParser_Tbx::getFilesystemCollectionDir() . 'tc_' . $collectionId . '/export.tbx';
     }
@@ -789,34 +808,31 @@ class editor_Models_LanguageResources_LanguageResource extends ZfExtended_Models
      */
     public function onAfterInsert()
     {
-
         // If new termcollection was created
         if ($this->getResourceType() == 'termcollection') {
-
             // Create [collectionId <=> dataTypeId] mappings set
             ZfExtended_Factory
                 ::get(CollectionAttributeDataType::class)
-                ->onTermCollectionInsert($this->getId());
+                    ->onTermCollectionInsert($this->getId());
         }
     }
 
     /**
      * Retrieves a path to store language-resource data
-     * @param bool $createDirIfNotExists: if set, the directory will be created if it does not exists
-     * @return string
      * @throws Zend_Exception
      */
     public function getAbsoluteDataPath(bool $createDirIfNotExists = false): string
     {
-        if(!isset($this->absoluteDataPath) || !str_ends_with($this->absoluteDataPath, strval($this->getId()))){
+        if (! isset($this->absoluteDataPath) || ! str_ends_with($this->absoluteDataPath, strval($this->getId()))) {
             $config = Zend_Registry::get('config');
             $this->absoluteDataPath =
                 $config->runtimeOptions->dir->languageResourceData
                 . DIRECTORY_SEPARATOR . $this->getId();
         }
-        if($createDirIfNotExists && !is_dir($this->absoluteDataPath)){
+        if ($createDirIfNotExists && ! is_dir($this->absoluteDataPath)) {
             mkdir($this->absoluteDataPath, 0777, true);
         }
+
         return $this->absoluteDataPath;
     }
 
@@ -825,7 +841,7 @@ class editor_Models_LanguageResources_LanguageResource extends ZfExtended_Models
         $dataPath = $this->getAbsoluteDataPath();
         parent::delete();
         // we delete the data after the entity to avoid deletion for entities that cannot be deleted
-        if(is_dir($dataPath)){
+        if (is_dir($dataPath)) {
             ZfExtended_Utils::recursiveDelete($dataPath);
         }
     }

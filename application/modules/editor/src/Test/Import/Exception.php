@@ -21,7 +21,7 @@ START LICENSE AND COPYRIGHT
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
@@ -31,10 +31,10 @@ namespace MittagQI\Translate5\Test\Import;
 /**
  * Base Class for all API Tests Import Exceptions
  */
-final class Exception extends \Exception {
-
+final class Exception extends \Exception
+{
     public function __construct($message = "", $code = 0, \Throwable $previous = null)
     {
-        parent::__construct('API-test IMPORT: '.$message, $code, $previous);
+        parent::__construct('API-test IMPORT: ' . $message, $code, $previous);
     }
 }

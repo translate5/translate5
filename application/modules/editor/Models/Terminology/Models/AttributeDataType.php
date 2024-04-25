@@ -21,51 +21,50 @@ START LICENSE AND COPYRIGHT
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
 
-class editor_Models_Terminology_Models_AttributeDataType extends ZfExtended_Models_Entity_Abstract {
+class editor_Models_Terminology_Models_AttributeDataType extends ZfExtended_Models_Entity_Abstract
+{
     protected $dbInstanceClass = 'editor_Models_Db_Terminology_AttributeDatatype';
-    protected $validatorInstanceClass   = 'editor_Models_Validator_Term_AttributeDatatype';
 
+    protected $validatorInstanceClass = 'editor_Models_Validator_Term_AttributeDatatype';
 
     /**
      * Load the label with given name,type and level, if it does not exist, the label will be created
-     * @param string $labelName
-     * @param string $labelType
      */
-    public function loadOrCreate(string $labelName, string $labelType = '',array $level = [
+    public function loadOrCreate(string $labelName, string $labelType = '', array $level = [
         editor_Models_Terminology_TbxObjects_Attribute::ATTRIBUTE_LEVEL_ENTRY,
         editor_Models_Terminology_TbxObjects_Attribute::ATTRIBUTE_LEVEL_LANGUAGE,
         editor_Models_Terminology_TbxObjects_Attribute::ATTRIBUTE_LEVEL_TERM])
     {
         $s = $this->db->select()
-        ->from($this->db)
-        ->where('label = ?', $labelName);
+            ->from($this->db)
+            ->where('label = ?', $labelName);
         if (ZfExtended_Utils::emptyString($labelType)) {
             $s->where('(type = "" or type is null)');
-        }
-        else {
+        } else {
             $s->where('type = ?', $labelType);
         }
         $levelSql = [];
         // for each level, add like search
         foreach ($level as $l) {
-            $levelSql[] = 'level LIKE "%'.$l.'%"';
+            $levelSql[] = 'level LIKE "%' . $l . '%"';
         }
-        $s->where(implode(' OR ',$levelSql));
+        $s->where(implode(' OR ', $levelSql));
         $row = $this->db->fetchRow($s);
         if ($row) {
             $this->row = $row;
+
             return;
         }
         $this->init();
         $this->setType(ZfExtended_Utils::emptyString($labelType) ? null : $labelType);
         $this->setLabel($labelName);
         $this->setDataType(editor_Models_Terminology_TbxObjects_Attribute::ATTRIBUTE_DEFAULT_DATATYPE);
-        $this->setLevel(implode(',',$level));
+        $this->setLevel(implode(',', $level));
         $this->save();
     }
 
@@ -91,7 +90,9 @@ class editor_Models_Terminology_Models_AttributeDataType extends ZfExtended_Mode
                   )
               ) AS `title`
             FROM `terms_attributes_datatype`
-        ', [':lang' => '$.' . $locale])->fetchAll(PDO::FETCH_KEY_PAIR);
+        ', [
+            ':lang' => '$.' . $locale,
+        ])->fetchAll(PDO::FETCH_KEY_PAIR);
     }
 
     /**
@@ -99,7 +100,8 @@ class editor_Models_Terminology_Models_AttributeDataType extends ZfExtended_Mode
      *
      * @return string
      */
-    public function getTbxBasicIds() {
+    public function getTbxBasicIds()
+    {
         return implode(',', $this->db->getAdapter()->query('
             SELECT `id` FROM `terms_attributes_datatype` WHERE `isTbxBasic` = 1
         ')->fetchAll(PDO::FETCH_COLUMN));
@@ -109,22 +111,19 @@ class editor_Models_Terminology_Models_AttributeDataType extends ZfExtended_Mode
      * provides a list of term level label and type tupels (as one string separated with #) and returns their datatype IDs
      * example "termNote#footype", "note#" returns for example the IDs for label termNote with type footype on level term and the id for label note with type null on level term
      * Only type may be empty (null)!
-     *
-     * @param array $labelTypeList
-     * @return array
      */
-    public function getIdsForTerms(array $labelTypeList): array {
+    public function getIdsForTerms(array $labelTypeList): array
+    {
         //we load all datatypes for the given labels / elementNames and filter them then on PHP level
         $s = $this->db->select()
             ->from($this->db, ['id', 'label', 'type']);
 
-        foreach($labelTypeList as $key) {
+        foreach ($labelTypeList as $key) {
             $parts = explode('#', $key);
             $s->orWhere('(label = ?', $parts[0]);
-            if(empty($parts[1])) {
+            if (empty($parts[1])) {
                 $s->where('type is null');
-            }
-            else {
+            } else {
                 $s->where('type = ?', $parts[1]);
             }
             $s->where('FIND_IN_SET( "term" ,level)>0 )');
@@ -132,76 +131,84 @@ class editor_Models_Terminology_Models_AttributeDataType extends ZfExtended_Mode
 
         $dbResult = $this->db->fetchAll($s)->toArray();
         $result = [];
-        foreach($dbResult as $row) {
-            $result[$row['label'].'#'.$row['type']] = $row['id'];
+        foreach ($dbResult as $row) {
+            $result[$row['label'] . '#' . $row['type']] = $row['id'];
         }
+
         return $result;
     }
 
     /**
      * Get dataTypeId by $type
      *
-     * @param string $type
      * @return string
      * @throws Zend_Db_Statement_Exception
      */
-    public function getIdByType(string $type) {
+    public function getIdByType(string $type)
+    {
         return $this->db->getAdapter()->query(
-            'SELECT `id` FROM `terms_attributes_datatype` WHERE `type` = ?', $type
+            'SELECT `id` FROM `terms_attributes_datatype` WHERE `type` = ?',
+            $type
         )->fetchColumn();
     }
 
     /**
      * Get dataTypeId by for note-attribute
      *
-     * @param string $type
      * @return string
      * @throws Zend_Db_Statement_Exception
      */
-    public function getNoteId() {
+    public function getNoteId()
+    {
         return $this->db->getAdapter()->query(
             'SELECT `id` FROM `terms_attributes_datatype` WHERE `label` = "note" AND `type` IS NULL'
         )->fetchColumn();
     }
 
-
     /**
      * Get array of terms_attributes.dataTypeId => terms_attributes.id pairs for a level, identified by $termEntryId,
      * $language and $termId args. Currently this is used to prevent creating more than 1 attributes having same dataTypeId
      *
-     * @param int $termEntryId
-     * @param string|null $language
-     * @param int|null $termId
      * @return array
      * @throws Zend_Db_Statement_Exception
      */
-    public function getAlreadyExistingFor(int $termEntryId, string $language = null, int $termId = null) {
-
+    public function getAlreadyExistingFor(int $termEntryId, string $language = null, int $termId = null)
+    {
         // Detect level
-        if ($termEntryId && $language && $termId) $level = 'term';
-        else if ($termEntryId && $language) $level = 'language';
-        else $level = 'entry';
+        if ($termEntryId && $language && $termId) {
+            $level = 'term';
+        } elseif ($termEntryId && $language) {
+            $level = 'language';
+        } else {
+            $level = 'entry';
+        }
 
         // Setup WHERE clauses for entry-, language- and term-level attributes
         $levelWHERE = [
-            'entry'    => '`termEntryId` = :termEntryId AND ISNULL(`language`) AND ISNULL(`termId`)',
+            'entry' => '`termEntryId` = :termEntryId AND ISNULL(`language`) AND ISNULL(`termId`)',
             'language' => '`termEntryId` = :termEntryId AND `language` = :language AND ISNULL(`termId`)',
-            'term'     => '`termId` = :termId'
+            'term' => '`termId` = :termId',
         ];
 
         // Params for binding to the existing attribute-fetching query
         $bind = [
-            'entry'    => [':termEntryId' => $termEntryId],
-            'language' => [':termEntryId' => $termEntryId, ':language' => $language],
-            'term'     => [':termId' => $termId]
+            'entry' => [
+                ':termEntryId' => $termEntryId,
+            ],
+            'language' => [
+                ':termEntryId' => $termEntryId,
+                ':language' => $language,
+            ],
+            'term' => [
+                ':termId' => $termId,
+            ],
         ];
 
         // Return existing attributes datatype ids
         return $this->db->getAdapter()->query('
             SELECT `dataTypeId`, `id` 
             FROM `terms_attributes`
-            WHERE ' . $levelWHERE[$level]
-        , $bind[$level])->fetchAll(PDO::FETCH_KEY_PAIR);
+            WHERE ' . $levelWHERE[$level], $bind[$level])->fetchAll(PDO::FETCH_KEY_PAIR);
     }
 
     /**
@@ -210,25 +217,22 @@ class editor_Models_Terminology_Models_AttributeDataType extends ZfExtended_Mode
      * @return array
      * @throws Zend_Db_Statement_Exception
      */
-    public function getEnabledCollectionIds() {
+    public function getEnabledCollectionIds()
+    {
         return $this->db->getAdapter()->query('
             SELECT `collectionId` 
             FROM `terms_collection_attribute_datatype` 
-            WHERE `dataTypeId` = ? AND `enabled` = "1"'
-        , $this->getId())->fetchAll(PDO::FETCH_COLUMN);
+            WHERE `dataTypeId` = ? AND `enabled` = "1"', $this->getId())->fetchAll(PDO::FETCH_COLUMN);
     }
 
     /**
      * Get array of attribute datatypes in a format, compatible with TermPortal client app
      *
-     * @param string $locale
-     * @param array $collectionIds
-     * @return array
      * @throws Zend_Db_Statement_Exception
      */
-    public function getLocalized(string $locale, array $collectionIds): array {
-
-        if(empty($collectionIds)) {
+    public function getLocalized(string $locale, array $collectionIds): array
+    {
+        if (empty($collectionIds)) {
             return [];
         }
 
@@ -258,19 +262,20 @@ class editor_Models_Terminology_Models_AttributeDataType extends ZfExtended_Mode
             FROM `terms_attributes_datatype` `a` 
             GROUP BY `a`.`id`
             ORDER BY `title`
-        ', [':lang' => '$.' . $locale])->fetchAll(PDO::FETCH_UNIQUE);
+        ', [
+            ':lang' => '$.' . $locale,
+        ])->fetchAll(PDO::FETCH_UNIQUE);
 
         // Make sure isTbxBasic to be integer in javascript
-        array_walk($attributes, fn(&$a) => $a['isTbxBasic'] += 0);
+        array_walk($attributes, fn (&$a) => $a['isTbxBasic'] += 0);
 
         // For each of those props
         foreach (['enabled', 'exists'] as $column) {
-
             // Get array of [dataTypeId => termcollectionIds] pairs having $column-prop = 1
             $colections = $this->db->getAdapter()->query('
                 SELECT `dataTypeId`, GROUP_CONCAT(`collectionId`)
                 FROM `terms_collection_attribute_datatype` 
-                WHERE `' . $column . '` = "1" AND `collectionId` IN (' . join(',',$collectionIds) . ')
+                WHERE `' . $column . '` = "1" AND `collectionId` IN (' . join(',', $collectionIds) . ')
                 GROUP BY `dataTypeId`
             ')->fetchAll(PDO::FETCH_KEY_PAIR);
 
@@ -296,13 +301,11 @@ class editor_Models_Terminology_Models_AttributeDataType extends ZfExtended_Mode
     }
 
     /**
-     * @param $collectionId
-     * @param string $locale
      * @return mixed
      * @throws Zend_Db_Statement_Exception
      */
-    public function getUsageForLevelsByCollectionId($collectionId, string $locale = 'en') {
-
+    public function getUsageForLevelsByCollectionId($collectionId, string $locale = 'en')
+    {
         // Get localized attrs
         $localized = $this->getLocalized($locale, [$collectionId]);
 
@@ -314,8 +317,9 @@ class editor_Models_Terminology_Models_AttributeDataType extends ZfExtended_Mode
             foreach ($localized as $dataTypeId => $dataType) {
                 if ($dataType['type'] == $type) {
                     $multi[$dataTypeId] = $dataType['type'];
-                    if (preg_match('~^(xGraphic|externalCrossReference)$~', $dataType['type']))
+                    if (preg_match('~^(xGraphic|externalCrossReference)$~', $dataType['type'])) {
                         $double[$dataTypeId] = $dataType['type'];
+                    }
                 }
             }
         }
@@ -362,8 +366,9 @@ class editor_Models_Terminology_Models_AttributeDataType extends ZfExtended_Mode
         // Collect usage info, so that for each level we have arrays of [dataTypeId => title] pairs
         foreach (compact('entry', 'language', 'term') as $level => $dataTypeIdA) {
             $usage[$level] = [];
-            foreach ($dataTypeIdA as $dataTypeId)
+            foreach ($dataTypeIdA as $dataTypeId) {
                 $usage[$level][$dataTypeId] = $localized[$dataTypeId]['title'];
+            }
         }
 
         // Return usage

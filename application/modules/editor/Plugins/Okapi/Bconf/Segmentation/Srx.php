@@ -21,7 +21,7 @@
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
- 		     http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
  END LICENSE AND COPYRIGHT
  */
@@ -31,14 +31,14 @@
  * A SRX is an xml with a defined structure containing nodes with language specific RegEx rules
  * for more documentation, see editor_Plugins_Okapi_Bconf_Segmentation
  */
-final class editor_Plugins_Okapi_Bconf_Segmentation_Srx extends editor_Plugins_Okapi_Bconf_ResourceFile {
-
-    const EXTENSION = 'srx';
+final class editor_Plugins_Okapi_Bconf_Segmentation_Srx extends editor_Plugins_Okapi_Bconf_ResourceFile
+{
+    public const EXTENSION = 'srx';
 
     /**
      * @var string
      */
-    const SYSTEM_TARGET_SRX = '/application/modules/editor/Plugins/Okapi/data/srx/translate5/languages-2.srx';
+    public const SYSTEM_TARGET_SRX = '/application/modules/editor/Plugins/Okapi/data/srx/translate5/languages-2.srx';
 
     /**
      * Create and return self instance using SYSTEM_TARGET_SRX as path
@@ -46,10 +46,10 @@ final class editor_Plugins_Okapi_Bconf_Segmentation_Srx extends editor_Plugins_O
      * @return editor_Plugins_Okapi_Bconf_Segmentation_Srx
      * @throws ZfExtended_Exception
      */
-    public static function createSystemTargetSrx() {
+    public static function createSystemTargetSrx()
+    {
         return new self(APPLICATION_ROOT . self::SYSTEM_TARGET_SRX);
     }
-
 
     // a SRX is generally a XML variant
     protected string $mime = 'text/xml';
@@ -57,42 +57,47 @@ final class editor_Plugins_Okapi_Bconf_Segmentation_Srx extends editor_Plugins_O
     /**
      * Validates a SRX
      * TODO FIXME: this basic validation can be improved
-     * @return bool
      */
-    public function validate(bool $forImport=false) : bool {
+    public function validate(bool $forImport = false): bool
+    {
         $parser = new ZfExtended_Dom();
         $parser->loadXML($this->content);
         // sloppy checking here as we do not know how tolerant longhorn actually is
-        if($parser->isValid()){
+        if ($parser->isValid()) {
             $rootTag = strtolower($parser->firstChild?->tagName);
-            if($rootTag === 'srx'){
+            if ($rootTag === 'srx') {
                 return true;
             } else {
                 // DEBUG
-                if($this->doDebug){ error_log('SRX FILE '.basename($this->path).' is invalid: No "srx" root tag found'); }
+                if ($this->doDebug) {
+                    error_log('SRX FILE ' . basename($this->path) . ' is invalid: No "srx" root tag found');
+                }
                 $this->validationError = 'No "srx" root tag found';
             }
         } else {
             // DEBUG
-            if($this->doDebug){ error_log('SRX FILE '.basename($this->path).' is invalid: Invalid XML'); }
+            if ($this->doDebug) {
+                error_log('SRX FILE ' . basename($this->path) . ' is invalid: Invalid XML');
+            }
             $this->validationError = 'Invalid XML';
         }
+
         return false;
     }
 
     /**
      * Updates the contents of a SRX
-     * @param string $content
      */
-    public function setContent(string $content) {
+    public function setContent(string $content)
+    {
         $this->content = $content;
     }
 
     /**
      * Updates our path
-     * @param string $path
      */
-    public function setPath(string $path) {
+    public function setPath(string $path)
+    {
         $this->path = $path;
     }
 
@@ -108,12 +113,9 @@ final class editor_Plugins_Okapi_Bconf_Segmentation_Srx extends editor_Plugins_O
      *         ['prev' => 'regex7', 'next' => 'regex8'],
      *     ]
      * ]
-     *
-     * @param string $rfc5646
-     * @return array|bool
      */
-    public function getSegmentationRules(string $rfc5646) : array|bool {
-
+    public function getSegmentationRules(string $rfc5646): array|bool
+    {
         // Get srx file contents and convert to php-array
         $srx = simplexml_load_string($this->getContent());
         $srx = json_encode($srx);
@@ -122,7 +124,7 @@ final class editor_Plugins_Okapi_Bconf_Segmentation_Srx extends editor_Plugins_O
         // Check whether any rules exist for the given $rfc5646,
         // and if yes - get the language name, that is used within srx-file
         // to map with the segmentation rules
-        foreach($srx['body']['maprules']['languagemap'] as $languagemap) {
+        foreach ($srx['body']['maprules']['languagemap'] as $languagemap) {
             $attr = $languagemap['@attributes'];
             if (preg_match('~' . $attr['languagepattern'] . '~', $rfc5646)) {
                 $languagerulename = $attr['languagerulename'];
@@ -130,14 +132,13 @@ final class editor_Plugins_Okapi_Bconf_Segmentation_Srx extends editor_Plugins_O
         }
 
         // If it was not possible to find <languagemap>-node for given $rfc5646 - return false
-        if (!isset($languagerulename)) {
+        if (! isset($languagerulename)) {
             return false;
         }
 
         // Rules array, grouped by purpose e.g insert/delete delimiter, based on break="yes|no"
         $ruleA = [];
         foreach ($srx['body']['languagerules']['languagerule'] as $languagerule) {
-
             // If those are rules NOT for the language we need - skip
             if ($languagerule['@attributes']['languagerulename'] !== $languagerulename) {
                 continue;
@@ -145,19 +146,21 @@ final class editor_Plugins_Okapi_Bconf_Segmentation_Srx extends editor_Plugins_O
 
             // Else foreach rule
             foreach ($languagerule['rule'] as $rule) {
-
                 // If <beforebreak> and/or <afterbreak> is empty - it's represented as empty array,
                 // so convert to string, else trim newlines/whitespaces
-                foreach (['beforebreak' => 'prev', 'afterbreak' => 'next'] as $node => $side) {
+                foreach ([
+                    'beforebreak' => 'prev',
+                    'afterbreak' => 'next',
+                ] as $node => $side) {
                     $rule[$side] = is_array($rule[$node]) ? '' : trim($rule[$node]);
-                    unset ($rule[$node]);
+                    unset($rule[$node]);
                 }
 
                 // Get purpose
                 $purpose = $rule['@attributes']['break'] === 'yes' ? 'insert' : 'delete';
 
                 // Unset @attributes-prop
-                unset ($rule['@attributes']);
+                unset($rule['@attributes']);
 
                 // Skip things we don't need
                 if (preg_match('~T5-IGNORE-(START|END)~', join('', $rule))) {
@@ -165,7 +168,7 @@ final class editor_Plugins_Okapi_Bconf_Segmentation_Srx extends editor_Plugins_O
                 }
 
                 // Collect rules
-                $ruleA[$purpose] []= $rule;
+                $ruleA[$purpose][] = $rule;
             }
         }
 
@@ -175,44 +178,38 @@ final class editor_Plugins_Okapi_Bconf_Segmentation_Srx extends editor_Plugins_O
 
     /**
      * Split given $text to segments based on array of rules given by $rules arg
-     *
-     * @param string $text
-     * @param array $rules
-     * @return array
      */
     public function splitTextToSegments(string $text, array $rules): array
     {
         // Prepare arrays of regexes to be used for delimiter insertion and deletion
         $rex = [];
         foreach (['insert', 'delete'] as $purpose) {
-
             // Define as empty array
             $rex[$purpose] = [];
 
             // Foreach [prev, next] regex pair
             foreach ($rules[$purpose] as $rule) {
-
                 // Build regex that will help to insert delimiter between prev and next
                 if ($purpose === 'insert') {
                     $expr = "~(?<prev>{$rule['prev']})(?<next>{$rule['next']})~u";
 
-                // Build regex that will help to delete delimiter, that was previously inserted between prev and next
+                    // Build regex that will help to delete delimiter, that was previously inserted between prev and next
                 } else {
                     $expr = "~(?<prev>{$rule['prev']})<delimiter/>(?<next>{$rule['next']})~u";
                 }
 
                 // If it's supported by PHP's PCRE2 - append to $rex array
-                if (@preg_match($expr,'') !== false) {
-                    $rex[$purpose] []= $expr;
+                if (@preg_match($expr, '') !== false) {
+                    $rex[$purpose][] = $expr;
                 }
             }
         }
 
         // Insert <delimiter/> between segments
-        $text = preg_replace_callback($rex['insert'], fn($m) => "{$m['prev']}<delimiter/>{$m['next']}", $text);
+        $text = preg_replace_callback($rex['insert'], fn ($m) => "{$m['prev']}<delimiter/>{$m['next']}", $text);
 
         // Delete <delimiter/> between segments, if those are, so to say, false-positives
-        $text = preg_replace_callback($rex['delete'], fn($m) => "{$m['prev']}{$m['next']}", $text);
+        $text = preg_replace_callback($rex['delete'], fn ($m) => "{$m['prev']}{$m['next']}", $text);
 
         // Use basic splitting
         return explode('<delimiter/>', $text);
@@ -221,11 +218,10 @@ final class editor_Plugins_Okapi_Bconf_Segmentation_Srx extends editor_Plugins_O
     /**
      * Convert capturing groups to non-capturing groups, if any in the given $regex
      *
-     * @param string $regex
      * @return array|string|string[]|null
      */
-    private function disableCapturingGroups(string $regex) {
-
+    private function disableCapturingGroups(string $regex)
+    {
         // No slash before
         $nsb = '(?<!\\\)';
 

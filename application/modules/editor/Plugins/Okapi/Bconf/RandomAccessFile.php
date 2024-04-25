@@ -21,64 +21,71 @@
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
- 		     http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
  END LICENSE AND COPYRIGHT
  */
 
 /**
- *
  * Common util class for bconf export and import
  * Java reads/writes/represents in BigEndian
  * Algorithmically a copy of the original JAVA implementation
  */
-class editor_Plugins_Okapi_Bconf_RandomAccessFile extends SplFileObject {
+class editor_Plugins_Okapi_Bconf_RandomAccessFile extends SplFileObject
+{
+    /**
+     * @var int
+     */
+    public const PHP_INT32_MAX = 0x7FFFFFFF;
 
     /**
      * @var int
      */
-    const PHP_INT32_MAX = 0x7FFFFFFF;
+    public const PHP_UINT32_MAX = 0xFFFFFFFF;
 
     /**
      * @var int
      */
-    const PHP_UINT32_MAX = 0xFFFFFFFF;
+    public const OVERFLOW_SUB = 0x100000000; // == PHP_UINT32_MAX +1
 
-    /**
-     * @var int
-     */
-    const OVERFLOW_SUB = 0x100000000; // == PHP_UINT32_MAX +1
-
-    public function __construct(string $filename, string $mode = "r", bool $useIncludePath = false, ?object $context = null){
+    public function __construct(string $filename, string $mode = "r", bool $useIncludePath = false, ?object $context = null)
+    {
         parent::__construct($filename, $mode, $useIncludePath, $context);
     }
 
     /**
      * Read next UTF-8 value
      */
-    public function readUTF() {
+    public function readUTF()
+    {
         try {
             $utflen = unpack("n", $this->fread(2))[1]; // n -> Big Endian unsigned short (Java)
+
             // unpack("A"...) strips whitespace!
             return $utflen > 0 ? unpack("a" . $utflen, $this->fread($utflen))[1] : '';
-        } catch(Exception $e){
-            throw new ZfExtended_UnprocessableEntity('E1026', ['errors' =>  [[$e]]]);
+        } catch (Exception $e) {
+            throw new ZfExtended_UnprocessableEntity('E1026', [
+                'errors' => [[$e]],
+            ]);
         }
     }
 
     /** Write the UTF-8 value in bconf
-     * @param $string
-     * @param bool $withNullByte
      */
-    public function writeUTF($string, bool $withNullByte = true) {
+    public function writeUTF($string, bool $withNullByte = true)
+    {
         $length = strlen($string);
         $this->fwrite(pack("n", $length));
         $this->fwrite($string . ($withNullByte ? "\0" : ''));
     }
 
-    /** Convert $string to binary as it would be written */
-    public static function toUTF($string): string {
+    /**
+     * Convert $string to binary as it would be written
+     */
+    public static function toUTF($string): string
+    {
         $length = strlen($string);
+
         return pack("n", $length) . $string;
     }
 
@@ -86,20 +93,23 @@ class editor_Plugins_Okapi_Bconf_RandomAccessFile extends SplFileObject {
      * QUIRK: PHP unpack has no option for signed 32bit Integer, so we have to convert after reading
      * @return int|mixed
      */
-    public function readInt(): mixed {
+    public function readInt(): mixed
+    {
         try {
             $uint32 = unpack("N", $this->fread(4))[1]; // N -> UInt32.BE but we want Int32
+
             return $uint32 <= self::PHP_INT32_MAX ? $uint32 : $uint32 - self::OVERFLOW_SUB;
-        } catch(Exception $e){
-            throw new ZfExtended_UnprocessableEntity('E1026', ['errors' =>  [[$e]]]);
+        } catch (Exception $e) {
+            throw new ZfExtended_UnprocessableEntity('E1026', [
+                'errors' => [[$e]],
+            ]);
         }
     }
 
     /** Write the Integer value in bconf
-     * @param $intValue
      */
-    public function writeInt($intValue) {
+    public function writeInt($intValue)
+    {
         $this->fwrite(pack("N", $intValue));
     }
-
 }

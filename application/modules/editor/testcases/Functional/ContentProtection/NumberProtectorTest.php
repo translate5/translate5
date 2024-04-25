@@ -53,9 +53,9 @@ declare(strict_types=1);
 namespace MittagQI\Translate5\Test\Functional\ContentProtection;
 
 use editor_Models_Languages;
+use MittagQI\Translate5\ContentProtection\Model\ContentProtectionDto;
 use MittagQI\Translate5\ContentProtection\Model\ContentProtectionRepository;
 use MittagQI\Translate5\ContentProtection\Model\ContentRecognition;
-use MittagQI\Translate5\ContentProtection\Model\ContentProtectionDto;
 use MittagQI\Translate5\ContentProtection\Model\InputMapping;
 use MittagQI\Translate5\ContentProtection\Model\OutputMapping;
 use MittagQI\Translate5\ContentProtection\NumberProtection\Protector\DateProtector;
@@ -104,7 +104,7 @@ class NumberProtectorTest extends TestCase
         $outputMapping->setOutputContentRecognitionId($contentRecognition2->getId());
         $outputMapping->save();
 
-        $protected = NumberProtector::create()->protect('12345 USD', (int)$langEn->getId(), (int)$langDe->getId());
+        $protected = NumberProtector::create()->protect('12345 USD', true, (int) $langEn->getId(), (int) $langDe->getId());
 
         $contentRecognition1->delete();
         $contentRecognition2->delete();
@@ -155,7 +155,7 @@ class NumberProtectorTest extends TestCase
         $outputMapping->setOutputContentRecognitionId($contentRecognition2->getId());
         $outputMapping->save();
 
-        $protected = NumberProtector::create()->protect('12345 USD', (int) $langEn->getId(), (int) $langDeAt->getId());
+        $protected = NumberProtector::create()->protect('12345 USD', true, (int) $langEn->getId(), (int) $langDeAt->getId());
 
         $contentRecognition1->delete();
         $contentRecognition2->delete();
@@ -175,7 +175,7 @@ class NumberProtectorTest extends TestCase
 
         self::assertTrue($protector->hasEntityToProtect($node));
 
-        self::assertSame($expected, $protector->protect($node, 5, 6));
+        self::assertSame($expected, $protector->protect($node, true, 5, 6));
     }
 
     public function testProtectRepeatableNumbers(): void
@@ -184,7 +184,7 @@ class NumberProtectorTest extends TestCase
 
         self::assertSame(
             'string <number type="date" name="default Ymd" source="20231020" iso="2023-10-20" target="2023-10-20"/> string <number type="date" name="default Ymd" source="20231020" iso="2023-10-20" target="2023-10-20"/> string',
-            $protector->protect('string 20231020 string 20231020 string', 5, 6)
+            $protector->protect('string 20231020 string 20231020 string', true, 5, 6)
         );
     }
 
@@ -195,7 +195,7 @@ class NumberProtectorTest extends TestCase
     {
         $protector = NumberProtector::create();
 
-        if (!$runTest) {
+        if (! $runTest) {
             // Test case designed for `protect` test only
             self::assertTrue(true);
 
@@ -218,7 +218,7 @@ class NumberProtectorTest extends TestCase
             $protector->unprotect('string <number type="float" name="test" source="1.23" iso="1.23" target="1,23"/> string', false)
         );
     }
-    
+
     public function numbersProvider(): iterable
     {
         yield from $this->datesProvider();
@@ -238,84 +238,84 @@ class NumberProtectorTest extends TestCase
     {
         yield [
             'string' => 'string 20231020 string',
-            'expected' => 'string <number type="date" name="default Ymd" source="20231020" iso="2023-10-20" target="2023-10-20"/> string'
+            'expected' => 'string <number type="date" name="default Ymd" source="20231020" iso="2023-10-20" target="2023-10-20"/> string',
         ];
         yield [
             'string' => 'string 5 7 2023 string',
-            'expected' => 'string <number type="date" name="default d m Y" source="5 7 2023" iso="2023-07-05" target="2023-07-05"/> string'
+            'expected' => 'string <number type="date" name="default d m Y" source="5 7 2023" iso="2023-07-05" target="2023-07-05"/> string',
         ];
         yield [
             'string' => 'string 31 5 2023 string',
-            'expected' => 'string <number type="date" name="default d m Y" source="31 5 2023" iso="2023-05-31" target="2023-05-31"/> string'
+            'expected' => 'string <number type="date" name="default d m Y" source="31 5 2023" iso="2023-05-31" target="2023-05-31"/> string',
         ];
         yield [
             'string' => 'string 2023 05 07 string',
-            'expected' => 'string <number type="date" name="default Y d m" source="2023 05 07" iso="2023-07-05" target="2023-07-05"/> string'
+            'expected' => 'string <number type="date" name="default Y d m" source="2023 05 07" iso="2023-07-05" target="2023-07-05"/> string',
         ];
         yield [
             'string' => 'string 2023 5 7 string',
-            'expected' => 'string <number type="date" name="default Y d m" source="2023 5 7" iso="2023-07-05" target="2023-07-05"/> string'
+            'expected' => 'string <number type="date" name="default Y d m" source="2023 5 7" iso="2023-07-05" target="2023-07-05"/> string',
         ];
         yield [
             'string' => 'string 2023 5 30 string',
-            'expected' => 'string <number type="date" name="default Y m d" source="2023 5 30" iso="2023-05-30" target="2023-05-30"/> string'
+            'expected' => 'string <number type="date" name="default Y m d" source="2023 5 30" iso="2023-05-30" target="2023-05-30"/> string',
         ];
         yield [
             'string' => 'string 2023 12 31 string',
-            'expected' => 'string <number type="date" name="default Y m d" source="2023 12 31" iso="2023-12-31" target="2023-12-31"/> string'
+            'expected' => 'string <number type="date" name="default Y m d" source="2023 12 31" iso="2023-12-31" target="2023-12-31"/> string',
         ];
 
         yield [
             'string' => 'string 05/07 2023 string',
-            'expected' => 'string <number type="date" name="default d/m Y" source="05/07 2023" iso="2023-07-05" target="2023-07-05"/> string'
+            'expected' => 'string <number type="date" name="default d/m Y" source="05/07 2023" iso="2023-07-05" target="2023-07-05"/> string',
         ];
         yield [
             'string' => 'string 31/12 2023 string',
-            'expected' => 'string <number type="date" name="default d/m Y" source="31/12 2023" iso="2023-12-31" target="2023-12-31"/> string'
+            'expected' => 'string <number type="date" name="default d/m Y" source="31/12 2023" iso="2023-12-31" target="2023-12-31"/> string',
         ];
     }
-    
+
     public function looksLikeDatesProvider(): iterable
     {
         yield [
             'string' => 'string 31 11 2023 string',
-            'expected' => 'string <number type="integer" name="default simple" source="31" iso="31" target="31"/> <number type="integer" name="default simple" source="11" iso="11" target="11"/> <number type="integer" name="default simple" source="2023" iso="2023" target="2023"/> string'
+            'expected' => 'string <number type="integer" name="default simple" source="31" iso="31" target="31"/> <number type="integer" name="default simple" source="11" iso="11" target="11"/> <number type="integer" name="default simple" source="2023" iso="2023" target="2023"/> string',
         ];
         yield [
             'string' => 'string 20233108 string',
-            'expected' => 'string <number type="integer" name="default simple" source="20233108" iso="20233108" target="20233108"/> string'
+            'expected' => 'string <number type="integer" name="default simple" source="20233108" iso="20233108" target="20233108"/> string',
         ];
         yield [
             'string' => 'string 05 07 23 string',
-            'expected' => 'string 05 07 <number type="integer" name="default simple" source="23" iso="23" target="23"/> string'
+            'expected' => 'string 05 07 <number type="integer" name="default simple" source="23" iso="23" target="23"/> string',
         ];
         yield [
             'string' => 'string 5 7 23 string',
-            'expected' => 'string <number type="integer" name="default simple" source="5" iso="5" target="5"/> <number type="integer" name="default simple" source="7" iso="7" target="7"/> <number type="integer" name="default simple" source="23" iso="23" target="23"/> string'
+            'expected' => 'string <number type="integer" name="default simple" source="5" iso="5" target="5"/> <number type="integer" name="default simple" source="7" iso="7" target="7"/> <number type="integer" name="default simple" source="23" iso="23" target="23"/> string',
         ];
         yield [
             'string' => 'string 2023 32 3 string',
-            'expected' => 'string <number type="integer" name="default simple" source="2023" iso="2023" target="2023"/> <number type="integer" name="default simple" source="32" iso="32" target="32"/> <number type="integer" name="default simple" source="3" iso="3" target="3"/> string'
+            'expected' => 'string <number type="integer" name="default simple" source="2023" iso="2023" target="2023"/> <number type="integer" name="default simple" source="32" iso="32" target="32"/> <number type="integer" name="default simple" source="3" iso="3" target="3"/> string',
         ];
         yield [
             'string' => 'string 05/07/123 string',
-            'expected' => 'string 05/07/123 string'
+            'expected' => 'string 05/07/123 string',
         ];
         yield [
             'string' => 'string 123/05/07 string',
-            'expected' => 'string 123/05/07 string'
+            'expected' => 'string 123/05/07 string',
         ];
         yield [
             'string' => 'string 35/7/2023 string',
-            'expected' => 'string 35/7/2023 string'
+            'expected' => 'string 35/7/2023 string',
         ];
         yield [
             'string' => 'string 35/07/2023 string',
-            'expected' => 'string 35/07/2023 string'
+            'expected' => 'string 35/07/2023 string',
         ];
         yield [
             'string' => 'string 2023 12/31 string',
-            'expected' => 'string <number type="integer" name="default simple" source="2023" iso="2023" target="2023"/> 12/31 string'
+            'expected' => 'string <number type="integer" name="default simple" source="2023" iso="2023" target="2023"/> 12/31 string',
         ];
         yield [
             'string' => 'This is <tag1><number type="integer" name="default simple" source="123" iso="123" target="123"/><tag2>malicious 546.5</tag2>2035</tag1> text',
@@ -324,19 +324,19 @@ class NumberProtectorTest extends TestCase
         ];
         yield [
             'string' => 'string 05.07.123 string',
-            'expected' => 'string 05.07.123 string'
+            'expected' => 'string 05.07.123 string',
         ];
         yield [
             'string' => 'string 05-07-123 string',
-            'expected' => 'string 05-07-123 string'
+            'expected' => 'string 05-07-123 string',
         ];
         yield [
             'string' => 'string 35-7-2023 string',
-            'expected' => 'string 35-7-2023 string'
+            'expected' => 'string 35-7-2023 string',
         ];
         yield [
             'string' => 'string 35-07-2023 string',
-            'expected' => 'string 35-07-2023 string'
+            'expected' => 'string 35-07-2023 string',
         ];
     }
 
@@ -344,104 +344,104 @@ class NumberProtectorTest extends TestCase
     {
         yield [
             'string' => 'string 9.012345 string',
-            'expected' => 'string <number type="float" name="default generic with dot" source="9.012345" iso="9.012345" target="9.012345"/> string'
+            'expected' => 'string <number type="float" name="default generic with dot" source="9.012345" iso="9.012345" target="9.012345"/> string',
         ];
         yield [
             'string' => 'string 123456789.12345 string',
-            'expected' => 'string <number type="float" name="default generic with dot" source="123456789.12345" iso="123456789.12345" target="123456789.12345"/> string'
+            'expected' => 'string <number type="float" name="default generic with dot" source="123456789.12345" iso="123456789.12345" target="123456789.12345"/> string',
         ];
         yield [
             'string' => 'string 123456789,12345 string',
-            'expected' => 'string <number type="float" name="default generic with comma" source="123456789,12345" iso="123456789.12345" target="123456789.12345"/> string'
+            'expected' => 'string <number type="float" name="default generic with comma" source="123456789,12345" iso="123456789.12345" target="123456789.12345"/> string',
         ];
         yield [
             'string' => 'string 123456789·12345 string',
-            'expected' => 'string <number type="float" name="default generic with middle dot" source="123456789·12345" iso="123456789.12345" target="123456789.12345"/> string'
+            'expected' => 'string <number type="float" name="default generic with middle dot" source="123456789·12345" iso="123456789.12345" target="123456789.12345"/> string',
         ];
 
         yield [
             'string' => 'string 1,234,567.89 string',
-            'expected' => 'string <number type="float" name="default with comma thousand decimal dot" source="1,234,567.89" iso="1234567.89" target="1234567.89"/> string'
+            'expected' => 'string <number type="float" name="default with comma thousand decimal dot" source="1,234,567.89" iso="1234567.89" target="1234567.89"/> string',
         ];
         yield [
             'string' => 'string 1,234,567·89 string',
-            'expected' => 'string <number type="float" name="default with comma thousand decimal middle dot" source="1,234,567·89" iso="1234567.89" target="1234567.89"/> string'
+            'expected' => 'string <number type="float" name="default with comma thousand decimal middle dot" source="1,234,567·89" iso="1234567.89" target="1234567.89"/> string',
         ];
         yield [
             'string' => 'string 12,34,567.89 string',
-            'expected' => 'string <number type="float" name="default indian" source="12,34,567.89" iso="1234567.89" target="1234567.89"/> string'
+            'expected' => 'string <number type="float" name="default indian" source="12,34,567.89" iso="1234567.89" target="1234567.89"/> string',
         ];
         yield [
             'string' => 'string 123,4567.89 string',
-            'expected' => 'string <number type="float" name="default chinese" source="123,4567.89" iso="1234567.89" target="1234567.89"/> string'
+            'expected' => 'string <number type="float" name="default chinese" source="123,4567.89" iso="1234567.89" target="1234567.89"/> string',
         ];
 
         yield [
             'string' => 'string 1 234 567.89 string',
-            'expected' => 'string <number type="float" name="default with whitespace thousand decimal dot" source="1 234 567.89" iso="1234567.89" target="1234567.89"/> string'
+            'expected' => 'string <number type="float" name="default with whitespace thousand decimal dot" source="1 234 567.89" iso="1234567.89" target="1234567.89"/> string',
         ];
         yield [
             'string' => 'string 1 234 567,89 string',
-            'expected' => 'string <number type="float" name="default with whitespace thousand decimal comma" source="1 234 567,89" iso="1234567.89" target="1234567.89"/> string'
+            'expected' => 'string <number type="float" name="default with whitespace thousand decimal comma" source="1 234 567,89" iso="1234567.89" target="1234567.89"/> string',
         ];
 
         yield [
             'string' => 'string 1 234 567.89 string',
-            'expected' => 'string <number type="float" name="default with [THSP] thousand decimal dot" source="1 234 567.89" iso="1234567.89" target="1234567.89"/> string'
+            'expected' => 'string <number type="float" name="default with [THSP] thousand decimal dot" source="1 234 567.89" iso="1234567.89" target="1234567.89"/> string',
         ];
         yield [
             'string' => 'string 1 234 567,89 string',
-            'expected' => 'string <number type="float" name="default with [THSP] thousand decimal comma" source="1 234 567,89" iso="1234567.89" target="1234567.89"/> string'
+            'expected' => 'string <number type="float" name="default with [THSP] thousand decimal comma" source="1 234 567,89" iso="1234567.89" target="1234567.89"/> string',
         ];
 
         yield [
             'string' => 'string 1 234 567.89 string',
-            'expected' => 'string <number type="float" name="default with [NNBSP] thousand decimal dot" source="1 234 567.89" iso="1234567.89" target="1234567.89"/> string'
+            'expected' => 'string <number type="float" name="default with [NNBSP] thousand decimal dot" source="1 234 567.89" iso="1234567.89" target="1234567.89"/> string',
         ];
         yield [
             'string' => 'string 1 234 567,89 string',
-            'expected' => 'string <number type="float" name="default with [NNBSP] thousand decimal comma" source="1 234 567,89" iso="1234567.89" target="1234567.89"/> string'
+            'expected' => 'string <number type="float" name="default with [NNBSP] thousand decimal comma" source="1 234 567,89" iso="1234567.89" target="1234567.89"/> string',
         ];
 
         yield [
             'string' => 'string 1˙234˙567.89 string',
-            'expected' => 'string <number type="float" name="default with &quot;˙&quot; thousand decimal dot" source="1˙234˙567.89" iso="1234567.89" target="1234567.89"/> string'
+            'expected' => 'string <number type="float" name="default with &quot;˙&quot; thousand decimal dot" source="1˙234˙567.89" iso="1234567.89" target="1234567.89"/> string',
         ];
         yield [
             'string' => 'string 1˙234˙567,89 string',
-            'expected' => 'string <number type="float" name="default with &quot;˙&quot; thousand decimal comma" source="1˙234˙567,89" iso="1234567.89" target="1234567.89"/> string'
+            'expected' => 'string <number type="float" name="default with &quot;˙&quot; thousand decimal comma" source="1˙234˙567,89" iso="1234567.89" target="1234567.89"/> string',
         ];
 
         yield [
             'string' => "string 1'234'567.89 string",
-            'expected' => 'string <number type="float" name="default with &quot;\'&quot; thousand decimal dot" source="1\'234\'567.89" iso="1234567.89" target="1234567.89"/> string'
+            'expected' => 'string <number type="float" name="default with &quot;\'&quot; thousand decimal dot" source="1\'234\'567.89" iso="1234567.89" target="1234567.89"/> string',
         ];
         yield [
             'string' => "string 1'234'567,89 string",
-            'expected' => 'string <number type="float" name="default with &quot;\'&quot; thousand decimal comma" source="1\'234\'567,89" iso="1234567.89" target="1234567.89"/> string'
+            'expected' => 'string <number type="float" name="default with &quot;\'&quot; thousand decimal comma" source="1\'234\'567,89" iso="1234567.89" target="1234567.89"/> string',
         ];
 
         yield [
             'string' => 'string 1.234.567,89 string',
-            'expected' => 'string <number type="float" name="default with dot thousand decimal comma" source="1.234.567,89" iso="1234567.89" target="1234567.89"/> string'
+            'expected' => 'string <number type="float" name="default with dot thousand decimal comma" source="1.234.567,89" iso="1234567.89" target="1234567.89"/> string',
         ];
         yield [
             'string' => "string 1.234.567'89 string",
-            'expected' => 'string <number type="float" name="default with &quot;\'&quot; separator" source="1.234.567\'89" iso="1234567.89" target="1234567.89"/> string'
+            'expected' => 'string <number type="float" name="default with &quot;\'&quot; separator" source="1.234.567\'89" iso="1234567.89" target="1234567.89"/> string',
         ];
 
         yield [
             'string' => "string 1.23e12 string",
-            'expected' => 'string <number type="float" name="default exponent" source="1.23e12" iso="1.23e12" target="1.23e12"/> string'
+            'expected' => 'string <number type="float" name="default exponent" source="1.23e12" iso="1.23e12" target="1.23e12"/> string',
         ];
         yield [
             'string' => "string 1.13e-15 string",
-            'expected' => 'string <number type="float" name="default exponent" source="1.13e-15" iso="1.13e-15" target="1.13e-15"/> string'
+            'expected' => 'string <number type="float" name="default exponent" source="1.13e-15" iso="1.13e-15" target="1.13e-15"/> string',
         ];
 
         yield [
             'string' => "string ١٬٢٣٤٬٥٦٧٫٨٩ string",
-            'expected' => 'string <number type="float" name="default arabian" source="١٬٢٣٤٬٥٦٧٫٨٩" iso="1234567.89" target="1234567.89"/> string'
+            'expected' => 'string <number type="float" name="default arabian" source="١٬٢٣٤٬٥٦٧٫٨٩" iso="1234567.89" target="1234567.89"/> string',
         ];
     }
 
@@ -449,11 +449,11 @@ class NumberProtectorTest extends TestCase
     {
         yield [
             'string' => 'string 0567,89 string',
-            'expected' => 'string 0567,89 string'
+            'expected' => 'string 0567,89 string',
         ];
         yield [
             'string' => 'string 5.67,89.45 string',
-            'expected' => 'string 5.67,89.45 string'
+            'expected' => 'string 5.67,89.45 string',
         ];
     }
 
@@ -461,40 +461,40 @@ class NumberProtectorTest extends TestCase
     {
         yield [
             'string' => 'string 123456789 string',
-            'expected' => 'string <number type="integer" name="default simple" source="123456789" iso="123456789" target="123456789"/> string'
+            'expected' => 'string <number type="integer" name="default simple" source="123456789" iso="123456789" target="123456789"/> string',
         ];
 
         yield [
             'string' => 'string 1,234,567 string',
-            'expected' => 'string <number type="integer" name="default generic with comma" source="1,234,567" iso="1234567" target="1234567"/> string'
+            'expected' => 'string <number type="integer" name="default generic with comma" source="1,234,567" iso="1234567" target="1234567"/> string',
         ];
         yield [
             'string' => 'string 12,34,567 string',
-            'expected' => 'string <number type="integer" name="default indian with comma thousand" source="12,34,567" iso="1234567" target="1234567"/> string'
+            'expected' => 'string <number type="integer" name="default indian with comma thousand" source="12,34,567" iso="1234567" target="1234567"/> string',
         ];
         yield [
             'string' => 'string 1,1234,4567 string',
-            'expected' => 'string <number type="integer" name="default chinese with comma thousand" source="1,1234,4567" iso="112344567" target="112344567"/> string'
+            'expected' => 'string <number type="integer" name="default chinese with comma thousand" source="1,1234,4567" iso="112344567" target="112344567"/> string',
         ];
 
         yield [
             'string' => 'string 1˙234˙567 string',
-            'expected' => 'string <number type="integer" name="default generic with dot above separator" source="1˙234˙567" iso="1234567" target="1234567"/> string'
+            'expected' => 'string <number type="integer" name="default generic with dot above separator" source="1˙234˙567" iso="1234567" target="1234567"/> string',
         ];
 
         yield [
             'string' => "string 1'234'567 string",
-            'expected' => 'string <number type="integer" name="default generic with apostrophe separator" source="1\'234\'567" iso="1234567" target="1234567"/> string'
+            'expected' => 'string <number type="integer" name="default generic with apostrophe separator" source="1\'234\'567" iso="1234567" target="1234567"/> string',
         ];
 
         yield [
             'string' => 'string 1.234.567 string',
-            'expected' => 'string <number type="integer" name="default generic with dot" source="1.234.567" iso="1234567" target="1234567"/> string'
+            'expected' => 'string <number type="integer" name="default generic with dot" source="1.234.567" iso="1234567" target="1234567"/> string',
         ];
 
         yield [
             'string' => "string ١٬٢٣٤٬٥٦٧ string",
-            'expected' => 'string <number type="integer" name="default arabian with separator" source="١٬٢٣٤٬٥٦٧" iso="1234567" target="1234567"/> string'
+            'expected' => 'string <number type="integer" name="default arabian with separator" source="١٬٢٣٤٬٥٦٧" iso="1234567" target="1234567"/> string',
         ];
     }
 
@@ -502,11 +502,11 @@ class NumberProtectorTest extends TestCase
     {
         yield [
             'string' => 'string 0567 string',
-            'expected' => 'string 0567 string'
+            'expected' => 'string 0567 string',
         ];
         yield [
             'string' => 'string 67 89 45 string',
-            'expected' => 'string <number type="integer" name="default simple" source="67" iso="67" target="67"/> <number type="integer" name="default simple" source="89" iso="89" target="89"/> <number type="integer" name="default simple" source="45" iso="45" target="45"/> string'
+            'expected' => 'string <number type="integer" name="default simple" source="67" iso="67" target="67"/> <number type="integer" name="default simple" source="89" iso="89" target="89"/> <number type="integer" name="default simple" source="45" iso="45" target="45"/> string',
         ];
     }
 
@@ -514,19 +514,19 @@ class NumberProtectorTest extends TestCase
     {
         yield [
             'string' => 'string 127.0.0.1 string',
-            'expected' => 'string <number type="ip-address" name="default" source="127.0.0.1" iso="127.0.0.1" target="127.0.0.1"/> string'
+            'expected' => 'string <number type="ip-address" name="default" source="127.0.0.1" iso="127.0.0.1" target="127.0.0.1"/> string',
         ];
         yield [
             'string' => 'string 255.255.255.255 string',
-            'expected' => 'string <number type="ip-address" name="default" source="255.255.255.255" iso="255.255.255.255" target="255.255.255.255"/> string'
+            'expected' => 'string <number type="ip-address" name="default" source="255.255.255.255" iso="255.255.255.255" target="255.255.255.255"/> string',
         ];
         yield [
             'string' => 'string 0.0.0.0 string',
-            'expected' => 'string <number type="ip-address" name="default" source="0.0.0.0" iso="0.0.0.0" target="0.0.0.0"/> string'
+            'expected' => 'string <number type="ip-address" name="default" source="0.0.0.0" iso="0.0.0.0" target="0.0.0.0"/> string',
         ];
         yield [
             'string' => 'string 1.1.1.1 string',
-            'expected' => 'string <number type="ip-address" name="default" source="1.1.1.1" iso="1.1.1.1" target="1.1.1.1"/> string'
+            'expected' => 'string <number type="ip-address" name="default" source="1.1.1.1" iso="1.1.1.1" target="1.1.1.1"/> string',
         ];
     }
 
@@ -534,23 +534,23 @@ class NumberProtectorTest extends TestCase
     {
         yield [
             'string' => 'string 1.0.0.1.1 string',
-            'expected' => 'string 1.0.0.1.1 string'
+            'expected' => 'string 1.0.0.1.1 string',
         ];
         yield [
             'string' => 'string 1.1.1.256 string',
-            'expected' => 'string 1.1.1.256 string'
+            'expected' => 'string 1.1.1.256 string',
         ];
         yield [
             'string' => 'string 256.0.0.1 string',
-            'expected' => 'string 256.0.0.1 string'
+            'expected' => 'string 256.0.0.1 string',
         ];
         yield [
             'string' => 'string 1.256.0.0 string',
-            'expected' => 'string 1.256.0.0 string'
+            'expected' => 'string 1.256.0.0 string',
         ];
         yield [
             'string' => 'string 1.0.256.1 string',
-            'expected' => 'string 1.0.256.1 string'
+            'expected' => 'string 1.0.256.1 string',
         ];
     }
 
@@ -558,23 +558,23 @@ class NumberProtectorTest extends TestCase
     {
         yield [
             'string' => 'string 01:02:03:04:ab:cd string',
-            'expected' => 'string <number type="mac-address" name="default" source="01:02:03:04:ab:cd" iso="01:02:03:04:ab:cd" target="01:02:03:04:ab:cd"/> string'
+            'expected' => 'string <number type="mac-address" name="default" source="01:02:03:04:ab:cd" iso="01:02:03:04:ab:cd" target="01:02:03:04:ab:cd"/> string',
         ];
         yield [
             'string' => 'string 01-02-03-04-ab-cd string',
-            'expected' => 'string <number type="mac-address" name="default" source="01-02-03-04-ab-cd" iso="01-02-03-04-ab-cd" target="01-02-03-04-ab-cd"/> string'
+            'expected' => 'string <number type="mac-address" name="default" source="01-02-03-04-ab-cd" iso="01-02-03-04-ab-cd" target="01-02-03-04-ab-cd"/> string',
         ];
         yield [
             'string' => 'string 00:00:00:00:00:00 string',
-            'expected' => 'string <number type="mac-address" name="default" source="00:00:00:00:00:00" iso="00:00:00:00:00:00" target="00:00:00:00:00:00"/> string'
+            'expected' => 'string <number type="mac-address" name="default" source="00:00:00:00:00:00" iso="00:00:00:00:00:00" target="00:00:00:00:00:00"/> string',
         ];
         yield [
             'string' => 'string FF:FF:FF:FF:FF:FF string',
-            'expected' => 'string <number type="mac-address" name="default" source="FF:FF:FF:FF:FF:FF" iso="FF:FF:FF:FF:FF:FF" target="FF:FF:FF:FF:FF:FF"/> string'
+            'expected' => 'string <number type="mac-address" name="default" source="FF:FF:FF:FF:FF:FF" iso="FF:FF:FF:FF:FF:FF" target="FF:FF:FF:FF:FF:FF"/> string',
         ];
         yield [
             'string' => 'string FF-11-FF-33-FF-44 string',
-            'expected' => 'string <number type="mac-address" name="default" source="FF-11-FF-33-FF-44" iso="FF-11-FF-33-FF-44" target="FF-11-FF-33-FF-44"/> string'
+            'expected' => 'string <number type="mac-address" name="default" source="FF-11-FF-33-FF-44" iso="FF-11-FF-33-FF-44" target="FF-11-FF-33-FF-44"/> string',
         ];
     }
 
@@ -582,39 +582,39 @@ class NumberProtectorTest extends TestCase
     {
         yield [
             'string' => 'string 01-02-03-04-ab-cd-11 string',
-            'expected' => 'string 01-02-03-04-ab-cd-11 string'
+            'expected' => 'string 01-02-03-04-ab-cd-11 string',
         ];
         yield [
             'string' => 'string FF:FF-FF:FF-FF:FF string',
-            'expected' => 'string FF:FF-FF:FF-FF:FF string'
+            'expected' => 'string FF:FF-FF:FF-FF:FF string',
         ];
         yield [
             'string' => 'string FG:FG:FF:FF:FF:FF string',
-            'expected' => 'string FG:FG:FF:FF:FF:FF string'
+            'expected' => 'string FG:FG:FF:FF:FF:FF string',
         ];
         yield [
             'string' => 'string 0H:00:00:00:00:00 string',
-            'expected' => 'string 0H:00:00:00:00:00 string'
+            'expected' => 'string 0H:00:00:00:00:00 string',
         ];
         yield [
             'string' => 'string 00:00:00:00:00:0I string',
-            'expected' => 'string 00:00:00:00:00:0I string'
+            'expected' => 'string 00:00:00:00:00:0I string',
         ];
         yield [
             'string' => 'string 00:00:00:00:00 string',
-            'expected' => 'string 00:00:00:00:00 string'
+            'expected' => 'string 00:00:00:00:00 string',
         ];
         yield [
             'string' => 'string 00:00:00:00:00:00:00 string',
-            'expected' => 'string 00:00:00:00:00:00:00 string'
+            'expected' => 'string 00:00:00:00:00:00:00 string',
         ];
         yield [
             'string' => 'string F:FF:FF:FF:FF:FF string',
-            'expected' => 'string F:FF:FF:FF:FF:FF string'
+            'expected' => 'string F:FF:FF:FF:FF:FF string',
         ];
         yield [
             'string' => 'string FF:FF:FF:FF:F:FF string',
-            'expected' => 'string FF:FF:FF:FF:F:FF string'
+            'expected' => 'string FF:FF:FF:FF:F:FF string',
         ];
     }
 
@@ -622,51 +622,51 @@ class NumberProtectorTest extends TestCase
     {
         yield [
             'string' => 'string &Alpha;123456789&quot; string',
-            'expected' => 'string &Alpha;123456789&quot; string'
+            'expected' => 'string &Alpha;123456789&quot; string',
         ];
         yield [
             'string' => 'string<someTag/>123456789 string',
-            'expected' => 'string<someTag/>123456789 string'
+            'expected' => 'string<someTag/>123456789 string',
         ];
         yield [
             'string' => 'string <someTag/>123456789<someTag/>string',
-            'expected' => 'string <someTag/>123456789<someTag/>string'
+            'expected' => 'string <someTag/>123456789<someTag/>string',
         ];
         yield [
             'string' => 'string<someTag/>123456789<someTag/>string',
-            'expected' => 'string<someTag/>123456789<someTag/>string'
+            'expected' => 'string<someTag/>123456789<someTag/>string',
         ];
         yield [
             'string' => 'string<someTag>123456789</someTag>string',
-            'expected' => 'string<someTag>123456789</someTag>string'
+            'expected' => 'string<someTag>123456789</someTag>string',
         ];
         yield [
             'string' => 'string 123456789<someTag/>string',
-            'expected' => 'string 123456789<someTag/>string'
+            'expected' => 'string 123456789<someTag/>string',
         ];
         yield [
             'string' => 'string <someTag/>123456789<someTag/> string',
-            'expected' => 'string <someTag/><number type="integer" name="default simple" source="123456789" iso="123456789" target="123456789"/><someTag/> string'
+            'expected' => 'string <someTag/><number type="integer" name="default simple" source="123456789" iso="123456789" target="123456789"/><someTag/> string',
         ];
         yield [
             'string' => 'string <someTag>123456789</someTag> string',
-            'expected' => 'string <someTag><number type="integer" name="default simple" source="123456789" iso="123456789" target="123456789"/></someTag> string'
+            'expected' => 'string <someTag><number type="integer" name="default simple" source="123456789" iso="123456789" target="123456789"/></someTag> string',
         ];
         yield [
             'string' => '123456789<someTag/> string',
-            'expected' => '<number type="integer" name="default simple" source="123456789" iso="123456789" target="123456789"/><someTag/> string'
+            'expected' => '<number type="integer" name="default simple" source="123456789" iso="123456789" target="123456789"/><someTag/> string',
         ];
         yield [
             'string' => '<someTag/>123456789<someTag/> string',
-            'expected' => '<someTag/><number type="integer" name="default simple" source="123456789" iso="123456789" target="123456789"/><someTag/> string'
+            'expected' => '<someTag/><number type="integer" name="default simple" source="123456789" iso="123456789" target="123456789"/><someTag/> string',
         ];
         yield [
             'string' => 'string <someTag/>123456789',
-            'expected' => 'string <someTag/><number type="integer" name="default simple" source="123456789" iso="123456789" target="123456789"/>'
+            'expected' => 'string <someTag/><number type="integer" name="default simple" source="123456789" iso="123456789" target="123456789"/>',
         ];
         yield [
             'string' => 'string <someTag/>123456789<someTag/>',
-            'expected' => 'string <someTag/><number type="integer" name="default simple" source="123456789" iso="123456789" target="123456789"/><someTag/>'
+            'expected' => 'string <someTag/><number type="integer" name="default simple" source="123456789" iso="123456789" target="123456789"/><someTag/>',
         ];
         yield 'date at the beginning and end of text' => [
             'string' => '2023/18/07 some text with date in it 2023/18/07',
@@ -684,7 +684,9 @@ class NumberProtectorTest extends TestCase
         $dbContentRecognition = ZfExtended_Factory::get(ContentRecognition::class)->db;
         $contentRecognitionTable = $dbContentRecognition->info($dbContentRecognition::NAME);
         $select = $dbContentRecognition->select()
-            ->from(['recognition' => $contentRecognitionTable], ['recognition.*'])
+            ->from([
+                'recognition' => $contentRecognitionTable,
+            ], ['recognition.*'])
             ->where('isDefault = true');
 
         $getAll = function ($select) use ($dbContentRecognition) {
@@ -704,7 +706,7 @@ class NumberProtectorTest extends TestCase
         $numberRepository = $this->createConfiguredMock(
             ContentProtectionRepository::class,
             [
-                'getAll' => $getAll($select),
+                'getAllForSource' => $getAll($select),
             ]
         );
 

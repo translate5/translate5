@@ -80,7 +80,7 @@ class FormatValidator extends Zend_Validate_Abstract
 
         $this->_setValue($value);
 
-        if (!$this->contentProtector->validateFormat($context['type'], $value)) {
+        if (! $this->contentProtector->validateFormat($context['type'], $value)) {
             $this->_error(self::INVALID);
 
             return false;

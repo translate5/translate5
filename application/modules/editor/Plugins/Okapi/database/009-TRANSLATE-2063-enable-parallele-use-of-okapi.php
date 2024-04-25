@@ -1,4 +1,5 @@
-<?php 
+<?php
+
 /*
 START LICENSE AND COPYRIGHT
 
@@ -45,34 +46,34 @@ $SCRIPT_IDENTIFIER = '009-TRANSLATE-2063-enable-parallele-use-of-okapi.php';
  * define database credential variables
  */
 $argc = count($argv);
-if(empty($this) || empty($argv) || $argc < 5 || $argc > 7) {
+if (empty($this) || empty($argv) || $argc < 5 || $argc > 7) {
     die("please dont call the script direct! Call it by using DBUpdater!\n\n");
 }
 
 $db = Zend_Db_Table::getDefaultAdapter();
 $res = $db->query("SELECT value FROM Zf_configuration WHERE name = 'runtimeOptions.plugins.Okapi.api.url'");
-$values =  $res->fetchAll();
+$values = $res->fetchAll();
 $url = $values[0]['value'] ?? '';
-if(empty($url)){
+if (empty($url)) {
     return;
 }
 $name = parse_url($url, PHP_URL_PATH);
-if(empty($name)){
+if (empty($name)) {
     return;
 }
 
-$name = str_replace('/','',$name);
+$name = str_replace('/', '', $name);
 
 # Update the available okapi servers from the okapi api url config
 $db->query('UPDATE `Zf_configuration`
-SET `value` = "{\"'.$name.'\":\"'.$url.'\"}",
-`default` = "{\"'.$name.'\":\"'.$url.'\"}" WHERE `name` = "runtimeOptions.plugins.Okapi.server"');
+SET `value` = "{\"' . $name . '\":\"' . $url . '\"}",
+`default` = "{\"' . $name . '\":\"' . $url . '\"}" WHERE `name` = "runtimeOptions.plugins.Okapi.server"');
 
 # Update the server used value with the same value as the okapi server
 $db->query('UPDATE `Zf_configuration`
-SET `value` = "'.$name.'",
-    `defaults` = "'.$name.'",
-    `default` = "'.$name.'"
+SET `value` = "' . $name . '",
+    `defaults` = "' . $name . '",
+    `default` = "' . $name . '"
 WHERE (`name` = "runtimeOptions.plugins.Okapi.serverUsed")');
 
 # Remove the old config

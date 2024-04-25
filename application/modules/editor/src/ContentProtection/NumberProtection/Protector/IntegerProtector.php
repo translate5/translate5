@@ -54,6 +54,7 @@ namespace MittagQI\Translate5\ContentProtection\NumberProtection\Protector;
 
 use editor_Models_Languages;
 use MittagQI\Translate5\ContentProtection\Model\ContentProtectionDto;
+use MittagQI\Translate5\ContentProtection\NumberProtection\NumberParsingException;
 use NumberFormatter;
 
 class IntegerProtector extends FloatProtector
@@ -99,7 +100,14 @@ class IntegerProtector extends FloatProtector
     private function parse(string $number): int
     {
         $fmt = NumberFormatter::create('en', NumberFormatter::DECIMAL);
-        return $fmt->parse(preg_replace('/[^\d]/u', '', $number), NumberFormatter::TYPE_INT64);
+
+        $int = $fmt->parse(preg_replace('/[^\d]/u', '', $number), NumberFormatter::TYPE_INT64);
+
+        if (! is_int($int)) {
+            throw new NumberParsingException();
+        }
+
+        return $int;
     }
 
     private function getTargetInteger(int $integer, string $targetFormat): string

@@ -21,7 +21,7 @@
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
- 		     http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
  END LICENSE AND COPYRIGHT
  */
@@ -42,9 +42,10 @@ use ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey;
  */
 class ConfigMaintenance
 {
+    public const CONFIG_SERVER_USED = 'runtimeOptions.plugins.Okapi.serverUsed';
 
-    const CONFIG_SERVER_USED = 'runtimeOptions.plugins.Okapi.serverUsed';
-    const CONFIG_SERVER = 'runtimeOptions.plugins.Okapi.server';
+    public const CONFIG_SERVER = 'runtimeOptions.plugins.Okapi.server';
+
     private editor_Models_Config $config;
 
     public function __construct()
@@ -54,9 +55,6 @@ class ConfigMaintenance
 
     /**
      * adds a new server, replace url if name exists already
-     * @param string $url
-     * @param string $name
-     * @return string|null
      * @throws Zend_Db_Statement_Exception
      * @throws ZfExtended_Models_Entity_Exceptions_IntegrityConstraint
      * @throws ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey
@@ -66,13 +64,14 @@ class ConfigMaintenance
         $oldValue = null;
         $this->config->loadByName(self::CONFIG_SERVER);
         $servers = $this->fromJson($this->config->getValue());
-        if (!empty($servers[$name])) {
+        if (! empty($servers[$name])) {
             $oldValue = $servers[$name];
         }
         $servers[$name] = $url;
         $this->config->setValue($this->toJson($servers));
         $this->config->save();
         $this->updateServerUsedDefaults($servers);
+
         return $oldValue;
     }
 
@@ -88,8 +87,6 @@ class ConfigMaintenance
 
     /**
      * Update server used config defaults when new server is added (runtimeOptions.plugins.Okapi.server)
-     * @param array $serverList
-     * @return void
      * @throws Zend_Db_Statement_Exception
      * @throws ZfExtended_Models_Entity_Exceptions_IntegrityConstraint
      * @throws ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey
@@ -108,8 +105,6 @@ class ConfigMaintenance
 
     /**
      * Update server used config defaults when new server is added (runtimeOptions.plugins.Okapi.server)
-     * @param string $name
-     * @return void
      * @throws Zend_Db_Statement_Exception
      * @throws ZfExtended_Models_Entity_Exceptions_IntegrityConstraint
      * @throws ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey
@@ -124,7 +119,6 @@ class ConfigMaintenance
     /**
      * returns the available defaults (used for config dropdowns)
      * @param string|null $selected receives the currently configured (selected) servername
-     * @return array
      */
     public function getServerUsedDefaults(?string &$selected): array
     {
@@ -133,13 +127,12 @@ class ConfigMaintenance
         }
         $defaults = explode(',', $this->config->getDefaults());
         $selected = $this->config->getValue();
+
         return $defaults;
     }
 
     /**
      * Remove non-existing server values from client overwrites and update default config to a valid one
-     * @param array $serverList
-     * @return void
      * @throws Zend_Db_Statement_Exception
      * @throws ZfExtended_Models_Entity_Exceptions_IntegrityConstraint
      * @throws ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey
@@ -149,11 +142,13 @@ class ConfigMaintenance
         $config = Factory::get(editor_Models_Customer_CustomerConfig::class);
         $db = $config->db;
 
-        $where = ['name = ? ' => self::CONFIG_SERVER_USED];
+        $where = [
+            'name = ? ' => self::CONFIG_SERVER_USED,
+        ];
 
         $serverList = array_keys($serverList);
 
-        if (!empty($serverList)) {
+        if (! empty($serverList)) {
             $where['value NOT IN (?)'] = $serverList;
         }
         // remove all serverUsed configs with non-existing server values
@@ -162,7 +157,7 @@ class ConfigMaintenance
         $this->config->loadByName(self::CONFIG_SERVER_USED);
 
         // if the current default config on instance level is not in the server list, we reset it to the last one
-        if (!in_array($this->config->getValue(), $serverList)) {
+        if (! in_array($this->config->getValue(), $serverList)) {
             $this->config->setValue(end($serverList));
             $this->config->save();
         }
@@ -184,6 +179,7 @@ class ConfigMaintenance
         $usageForAllInstances = $this->countTaskUsage();
 
         $foundUsages = array_intersect_key($usageForAllInstances, $serverList);
+
         return array_sum($foundUsages);
     }
 
@@ -198,12 +194,16 @@ class ConfigMaintenance
         $db = $config->db;
 
         $s = $db->select()
-            ->from($db, ['cnt' => 'count(*)', 'serverName' => 'value'])
+            ->from($db, [
+                'cnt' => 'count(*)',
+                'serverName' => 'value',
+            ])
             ->where('name = ?', self::CONFIG_SERVER_USED)
             ->group('value');
 
         // if result has values this means the removed config is used for one of the existing tasks
         $result = $db->getAdapter()->fetchAll($s);
+
         return array_column($result, 'cnt', 'serverName');
     }
 
@@ -214,12 +214,12 @@ class ConfigMaintenance
             //FIXME Logging / Exception?
             return [];
         }
+
         return $serverList;
     }
 
     /**
      * returns a summarized usage for each configured server
-     * @return array
      */
     public function getSummary(): array
     {
@@ -248,6 +248,7 @@ class ConfigMaintenance
         foreach ($taskUsage as $serverName => $usage) {
             $servers[$serverName]['taskUsageCount'] = $usage;
         }
+
         return $servers;
     }
 
@@ -265,12 +266,10 @@ class ConfigMaintenance
         $this->updateServerUsedDefaults($serverList);
     }
 
-    /**
-     * @return array
-     */
     public function getServerList(): array
     {
         $this->config->loadByName(self::CONFIG_SERVER);
+
         return $this->fromJson($this->config->getValue());
     }
 
@@ -278,7 +277,6 @@ class ConfigMaintenance
      * Purges the unused okapi config entries. Keeps either the latest one (by version) or the one given by name
      * @param array $summary the current summary of configured Okapi instances
      * @param string|null $nameToKeep if omitted keep the latest one (by version)
-     * @param bool $sortByVersion
      * @return array returns the serverlist to be used after purging
      * @throws Zend_Db_Statement_Exception
      * @throws ZfExtended_Models_Entity_Exceptions_IntegrityConstraint
@@ -305,12 +303,13 @@ class ConfigMaintenance
                 return $item['url'];
             },
             array_filter($summary, function ($data) {
-                return ($data['taskUsageCount'] ?? 0) > 0 && !empty($data['url']);
+                return ($data['taskUsageCount'] ?? 0) > 0 && ! empty($data['url']);
             })
         );
 
         $this->setServerList($serverList);
         $this->cleanUpNotUsed($serverList);
+
         return $serverList;
     }
 }

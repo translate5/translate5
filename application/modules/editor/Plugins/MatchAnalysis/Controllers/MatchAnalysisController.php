@@ -21,15 +21,13 @@
   @copyright  Marc Mittag, MittagQI - Quality Informatics
   @author     MittagQI - Quality Informatics
   @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
- 			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
  END LICENSE AND COPYRIGHT
  */
 
 use MittagQI\ZfExtended\Controller\Response\Header;
 
-/**
- */
 class editor_Plugins_MatchAnalysis_MatchAnalysisController extends ZfExtended_RestController
 {
     /**
@@ -66,22 +64,23 @@ class editor_Plugins_MatchAnalysis_MatchAnalysisController extends ZfExtended_Re
         $notGrouped = $this->getParam('notGrouped', false);
         if ($notGrouped) {
             $this->view->rows = $this->entity->loadLastByTaskGuid($taskGuid);
+
             return;
         }
 
         // based on a request parameter, set the analysis calculation unit
-        $this->view->rows = $this->entity->loadByBestMatchRate($taskGuid,unitType: $this->getParam('unitType'));
+        $this->view->rows = $this->entity->loadByBestMatchRate($taskGuid, unitType: $this->getParam('unitType'));
 
         $fieldConfig = [[
             'name' => 'id',
-            'type' => 'int'
-        ],[
+            'type' => 'int',
+        ], [
             'name' => 'created',
-        ],[
+        ], [
             'name' => 'unitCountTotal',
-            'type' => 'number'
+            'type' => 'number',
         ]];
-        foreach($this->entity->getFuzzyRanges() as $begin => $end) {
+        foreach ($this->entity->getFuzzyRanges() as $begin => $end) {
             $fieldConfig[] = [
                 'name' => (string) $begin,
                 'begin' => (string) $begin, //we just deliver begin and end in the field config to be used by the grid in the GUI then
@@ -100,10 +99,9 @@ class editor_Plugins_MatchAnalysis_MatchAnalysisController extends ZfExtended_Re
             "fields" => $fieldConfig,
             "pricingPresetId" => $pricingPresetId,
             "currency" => $this->entity->getPricing()['currency'],
-            'noPricing' => $this->entity->getPricing()['noPricing']
+            'noPricing' => $this->entity->getPricing()['noPricing'],
         ];
     }
-
 
     public function exportAction()
     {
@@ -114,10 +112,10 @@ class editor_Plugins_MatchAnalysis_MatchAnalysisController extends ZfExtended_Re
         $task->loadByTaskGuid($params['taskGuid']);
 
         $translate = ZfExtended_Zendoverwrites_Translate::getInstance();
-        $fileName = $translate->_('Trefferanalyse').' - '.$task->getTaskName();
+        $fileName = $translate->_('Trefferanalyse') . ' - ' . $task->getTaskName();
         $taskNr = $task->getTaskNr();
-        if(!empty($taskNr)) {
-            $fileName = $fileName . ' - ('.$taskNr.')';
+        if (! empty($taskNr)) {
+            $fileName = $fileName . ' - (' . $taskNr . ')';
         }
 
         switch ($params["type"]) {
@@ -132,7 +130,7 @@ class editor_Plugins_MatchAnalysis_MatchAnalysisController extends ZfExtended_Re
                 // Do export and download result file
                 ZfExtended_Factory
                     ::get(editor_Plugins_MatchAnalysis_Export_ExportExcel::class)
-                    ->generateExcelAndProvideDownload($task, $rows, $fileName);
+                        ->generateExcelAndProvideDownload($task, $rows, $fileName);
 
                 break;
             case "exportXml":
@@ -157,23 +155,24 @@ class editor_Plugins_MatchAnalysis_MatchAnalysisController extends ZfExtended_Re
 
                 // Download result
                 Header::sendDownload(
-                    rawurlencode($fileName.' '.date('- Y-m-d').'.xml'),
+                    rawurlencode($fileName . ' ' . date('- Y-m-d') . '.xml'),
                     'text/xml',
                     'no-cache',
                     -1,
-                    [ 'Expires' => '0' ]
+                    [
+                        'Expires' => '0',
+                    ]
                 );
                 echo $x->asXML();
 
                 //with XML formatting:
-//                 $dom = dom_import_simplexml($x)->ownerDocument;
-//                 $dom->formatOutput = true;
-//                 echo $dom->saveXML();
-//                 break;
-
+                //                 $dom = dom_import_simplexml($x)->ownerDocument;
+                //                 $dom->formatOutput = true;
+                //                 echo $dom->saveXML();
+                //                 break;
 
                 break;
-            default :
+            default:
                 throw new ZfExtended_NotFoundException('No analysis for given type found');
         }
     }

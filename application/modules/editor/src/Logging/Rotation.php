@@ -21,7 +21,7 @@ START LICENSE AND COPYRIGHT
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
@@ -30,14 +30,13 @@ namespace MittagQI\Translate5\Logging;
 
 use Cesargb\Log\Exceptions\RotationFailed;
 
-class Rotation {
-
+class Rotation
+{
     /**
      * Rotation failed exception handler
-     *
-     * @param RotationFailed $exception
      */
-    public static function fail(RotationFailed $exception) {
+    public static function fail(RotationFailed $exception)
+    {
         echo 'Log rotation failed: ' . $exception->getMessage(); /* print_r([
             $exception->getMessage(),
             $exception->getCode(),
@@ -52,8 +51,8 @@ class Rotation {
      * @param string $message For example: 'successful'
      * @param string $filename Absolute path to original log file
      */
-    public static function done(string $message, string $filename) {
-
+    public static function done(string $message, string $filename)
+    {
     }
 
     /**
@@ -62,18 +61,14 @@ class Rotation {
      * @param string $filenameTarget   Absolute path to compressed file, e.g with '.1.gz'-postfix to original log file
      * @param string $filenameRotated  Absolute path to original log file
      */
-    public static function then(string $filenameTarget, string $filenameRotated) {
-
+    public static function then(string $filenameTarget, string $filenameRotated)
+    {
     }
 
-    /**
-     * @param $name
-     */
-    public static function rotate(string $logFileName) {
-
+    public static function rotate(string $logFileName)
+    {
         // Get instance
         $rotation = new \Cesargb\Log\Rotation([
-
             // Optional, files are rotated 10 time before being removed. Default 366
             'files' => 10,
 
@@ -92,12 +87,12 @@ class Rotation {
             },
 
             // Optional, this method will be called when the process has finished
-            'finally' => function($message, $filename) {
+            'finally' => function ($message, $filename) {
                 self::done($message, $filename);
             },
 
             // Optional, to get filename target and original filename
-            'then' => function($filenameTarget, $filenameRotated) {
+            'then' => function ($filenameTarget, $filenameRotated) {
                 self::then($filenameTarget, $filenameRotated);
             },
         ]);

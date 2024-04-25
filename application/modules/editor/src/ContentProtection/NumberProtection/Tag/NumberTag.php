@@ -59,12 +59,13 @@ class NumberTag extends editor_Models_Import_FileParser_Tag
     public const TYPE_NUMBER = 4;
 
     public string $iso;
+
     public string $source;
 
     /**
      * @var array|\editor_ImageTag[]
      */
-    static array $renderer = [
+    public static array $renderer = [
         self::TYPE_OPEN => 'editor_ImageTag_Left',
         self::TYPE_CLOSE => 'editor_ImageTag_Right',
         self::TYPE_SINGLE => 'editor_ImageTag_Single',

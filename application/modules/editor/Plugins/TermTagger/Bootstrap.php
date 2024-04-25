@@ -3,25 +3,25 @@
 START LICENSE AND COPYRIGHT
 
  This file is part of translate5
- 
+
  Copyright (c) 2013 - 2021 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
 
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
  This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
- as published by the Free Software Foundation and appearing in the file agpl3-license.txt 
- included in the packaging of this file.  Please review the following information 
+ as published by the Free Software Foundation and appearing in the file agpl3-license.txt
+ included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
-  
+
  There is a plugin exception available for use with this release of translate5 for
- translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or
  plugin-exception.txt in the root folder of translate5.
-  
+
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
@@ -36,10 +36,12 @@ use MittagQI\Translate5\Terminology\CleanupCollection;
  *
  * @method static Service createService(string $serviceName, Zend_Config $config = null)
  */
-class editor_Plugins_TermTagger_Bootstrap extends ZfExtended_Plugin_Abstract {
-
+class editor_Plugins_TermTagger_Bootstrap extends ZfExtended_Plugin_Abstract
+{
     protected static string $description = 'Provides term-tagging';
+
     protected static bool $enabledByDefault = true;
+
     protected static bool $activateForTests = true;
 
     /**
@@ -47,7 +49,7 @@ class editor_Plugins_TermTagger_Bootstrap extends ZfExtended_Plugin_Abstract {
      * @var string[]
      */
     protected static array $services = [
-        'termtagger' => Service::class
+        'termtagger' => Service::class,
     ];
 
     /**
@@ -63,33 +65,34 @@ class editor_Plugins_TermTagger_Bootstrap extends ZfExtended_Plugin_Abstract {
     /**
      * @var array
      */
-    protected $frontendControllers = array(
-        'pluginTermTaggerMain' => 'Editor.plugins.TermTagger.controller.Main'
-    );
-    
-    public function init() {
+    protected $frontendControllers = [
+        'pluginTermTaggerMain' => 'Editor.plugins.TermTagger.controller.Main',
+    ];
+
+    public function init()
+    {
         $this->log = Zend_Registry::get('logger')->cloneMe('editor.terminology');
 
-        if(!$this->assertConfig()) {
+        if (! $this->assertConfig()) {
             return false;
         }
 
         // Adds our Quality Provider to the global Quality Manager
         editor_Segment_Quality_Manager::registerProvider(editor_Plugins_TermTagger_QualityProvider::class);
 
-        $this->eventManager->attach('Editor_IndexController', 'afterLocalizedjsstringsAction', array($this, 'initJsTranslations'));
-        $this->eventManager->attach('Editor_IndexController', 'afterIndexAction', array($this, 'injectFrontendConfig'));
+        $this->eventManager->attach('Editor_IndexController', 'afterLocalizedjsstringsAction', [$this, 'initJsTranslations']);
+        $this->eventManager->attach('Editor_IndexController', 'afterIndexAction', [$this, 'injectFrontendConfig']);
 
         // event-listeners
-        $this->eventManager->attach('editor_Models_Import_MetaData', 'importMetaData', array($this, 'handleImportMeta'));
-        $this->eventManager->attach('ZfExtended_Debug', 'applicationState', array($this, 'termtaggerStateHandler'));
-        $this->eventManager->attach('Editor_AlikesegmentController', 'beforeSaveAlike', array($this, 'handleBeforeSaveAlike'));
-        
-        $this->eventManager->attach('editor_LanguageresourcetaskassocController', 'afterPost#TermCollection', array($this, 'handleAfterTermCollectionAssocChange'));
-        $this->eventManager->attach('editor_LanguageresourcetaskassocController', 'afterDelete#TermCollection', array($this, 'handleAfterTermCollectionAssocChange'));
-        
+        $this->eventManager->attach('editor_Models_Import_MetaData', 'importMetaData', [$this, 'handleImportMeta']);
+        $this->eventManager->attach('ZfExtended_Debug', 'applicationState', [$this, 'termtaggerStateHandler']);
+        $this->eventManager->attach('Editor_AlikesegmentController', 'beforeSaveAlike', [$this, 'handleBeforeSaveAlike']);
+
+        $this->eventManager->attach('editor_LanguageresourcetaskassocController', 'afterPost#TermCollection', [$this, 'handleAfterTermCollectionAssocChange']);
+        $this->eventManager->attach('editor_LanguageresourcetaskassocController', 'afterDelete#TermCollection', [$this, 'handleAfterTermCollectionAssocChange']);
+
         //checks if the term taggers are available.
-        $this->eventManager->attach('ZfExtended_Resource_GarbageCollector', 'cleanUp', array($this, 'handleTermTaggerCheck'));
+        $this->eventManager->attach('ZfExtended_Resource_GarbageCollector', 'cleanUp', [$this, 'handleTermTaggerCheck']);
 
         $this->eventManager->attach('editor_ConfigController', 'afterIndexAction', [$this, 'handleAfterConfigIndexAction']);
         $this->eventManager->attach('Editor_SegmentController', 'afterIndexAction', [$this, 'handleAfterSegmentIndex']);
@@ -110,9 +113,9 @@ class editor_Plugins_TermTagger_Bootstrap extends ZfExtended_Plugin_Abstract {
         $collectionModel = ZfExtended_Factory::get(editor_Models_TermCollection_TermCollection::class);
         $collections = $collectionModel->loadAllEntities();
 
-        foreach ($collections as $collection){
-            $cleanup = ZfExtended_Factory::get(CleanupCollection::class,[
-                $collection
+        foreach ($collections as $collection) {
+            $cleanup = ZfExtended_Factory::get(CleanupCollection::class, [
+                $collection,
             ]);
             $cleanup->checkAndClean();
         }
@@ -141,11 +144,9 @@ class editor_Plugins_TermTagger_Bootstrap extends ZfExtended_Plugin_Abstract {
 
     /**
      * Append spellcheck data for each segment within segments store data
-     *
-     * @param Zend_EventManager_Event $event
      */
-    public function handleAfterSegmentIndex(Zend_EventManager_Event $event) {
-
+    public function handleAfterSegmentIndex(Zend_EventManager_Event $event)
+    {
         // Get array of segment ids
         $view = $event->getParam('view');
         $segmentIds = array_column($view->rows, 'id');
@@ -153,7 +154,7 @@ class editor_Plugins_TermTagger_Bootstrap extends ZfExtended_Plugin_Abstract {
         // Get [segmentId => termTaggerData] pairs
         $segmentTermTaggerDataById = ZfExtended_Factory
             ::get('editor_Models_SegmentQuality')
-            ->getTermTaggerData($segmentIds);
+                ->getTermTaggerData($segmentIds);
 
         // Apply to response
         foreach ($view->rows as &$row) {
@@ -163,18 +164,18 @@ class editor_Plugins_TermTagger_Bootstrap extends ZfExtended_Plugin_Abstract {
 
     /**
      * update defaultAdministrativeStatus defaults
-     * @param Zend_EventManager_Event $event
      */
-    public function handleAfterConfigIndexAction(Zend_EventManager_Event $event) {
+    public function handleAfterConfigIndexAction(Zend_EventManager_Event $event)
+    {
         $rows = $event->getParam('view')->rows ?? [];
-        if(empty($rows)){
+        if (empty($rows)) {
             return;
         }
 
         //find the defaultAdministrativeStatus config
         $toUpdate = array_search('runtimeOptions.tbx.defaultAdministrativeStatus', array_column($rows, 'name'));
 
-        if(empty($toUpdate)){
+        if (empty($toUpdate)) {
             return;
         }
         $config = $rows[$toUpdate];
@@ -182,10 +183,9 @@ class editor_Plugins_TermTagger_Bootstrap extends ZfExtended_Plugin_Abstract {
         /* @var $termNoteStatus editor_Models_Terminology_TermStatus */
         $termNoteStatus = ZfExtended_Factory::get('editor_Models_Terminology_TermStatus');
 
-
-        $defaults = implode(',',$termNoteStatus->getAdministrativeStatusValues());
+        $defaults = implode(',', $termNoteStatus->getAdministrativeStatusValues());
         //the config has the same values as defaults
-        if($config['defaults'] == $defaults){
+        if ($config['defaults'] == $defaults) {
             return;
         }
 
@@ -201,58 +201,59 @@ class editor_Plugins_TermTagger_Bootstrap extends ZfExtended_Plugin_Abstract {
 
     /**
      * Invokes to the meta file parsing of task, adds TBX parsing
-     * @param Zend_EventManager_Event $event
      */
-    public function handleImportMeta(Zend_EventManager_Event $event) {
+    public function handleImportMeta(Zend_EventManager_Event $event)
+    {
         $meta = $event->getParam('metaImporter');
         /* @var $meta editor_Models_Import_MetaData */
         $importer = ZfExtended_Factory::get('editor_Models_Import_TermListParser_Tbx');
         $meta->addImporter($importer);
     }
-    
+
     /***
      * After post action handler in language resources task assoc
      * @param Zend_EventManager_Event $event
      */
-    public function handleAfterTermCollectionAssocChange(Zend_EventManager_Event $event){
-        
+    public function handleAfterTermCollectionAssocChange(Zend_EventManager_Event $event)
+    {
         $entity = $event->getParam('entity');
         $entityGuid = $entity->getTaskGuid();
 
         $task = ZfExtended_Factory::get('editor_Models_Task');
         /* @var $task editor_Models_Task */
         $task->loadByTaskGuid($entityGuid);
-        
+
         $taskGuids = [$task->getTaskGuid()];
         //check if the current task is project.
-        if($task->isProject()){
+        if ($task->isProject()) {
             //collect all project tasks to check the terminologie
-            $taskGuids = $task->loadProjectTasks($task->getProjectId(),true);
+            $taskGuids = $task->loadProjectTasks($task->getProjectId(), true);
             $taskGuids = array_column($taskGuids, 'taskGuid');
         }
         foreach ($taskGuids as $taskGuid) {
             $this->removeTerminologieFile($taskGuid);
-            
-            $task=ZfExtended_Factory::get('editor_Models_Task');
+
+            $task = ZfExtended_Factory::get('editor_Models_Task');
             /* @var $task editor_Models_Task */
             //update the terminologie flag, based on if there is a termcollection
             //as language resource associated to the task
             $task->updateIsTerminologieFlag($taskGuid);
         }
     }
-    
+
     /***
      * Remove the terminologie file from the disk.
      * @param string $taskGuid
      */
-    private function removeTerminologieFile($taskGuid){
-        $task=ZfExtended_Factory::get('editor_Models_Task');
+    private function removeTerminologieFile($taskGuid)
+    {
+        $task = ZfExtended_Factory::get('editor_Models_Task');
         /* @var $task editor_Models_Task */
         $task->loadByTaskGuid($taskGuid);
-        
+
         //get/check if the tbx file exist
         $tbxPath = new SplFileInfo(editor_Models_Import_TermListParser_Tbx::getTbxPath($task));
-        if ($tbxPath->getPathname()!=null && file_exists($tbxPath->getPathname())){
+        if ($tbxPath->getPathname() != null && file_exists($tbxPath->getPathname())) {
             //Remove the file if exist. The file will be recreated on the initial try to tag a segment.
             unlink($tbxPath);
         }
@@ -260,32 +261,37 @@ class editor_Plugins_TermTagger_Bootstrap extends ZfExtended_Plugin_Abstract {
         $meta->setTbxHash("");
         $meta->save();
     }
-    
-    protected function assertConfig() {
+
+    protected function assertConfig()
+    {
         $config = Zend_Registry::get('config');
         $c = $config->runtimeOptions->termTagger->url;
-        if (!isset($c->default) || !isset($c->import) || !isset($c->gui)) {
+        if (! isset($c->default) || ! isset($c->import) || ! isset($c->gui)) {
             $this->log->error('E1126', 'Plugin TermTagger URL config default, import or gui not defined (check config runtimeOptions.termTagger.url)');
+
             return false;
         }
-        
+
         $defaultUrl = $c->default->toArray();
         if (empty($defaultUrl)) {
             $this->log->error('E1127', 'Plugin TermTagger default server not configured: configuration is empty.');
+
             return false;
         }
+
         return true;
     }
 
     /**
      * is called periodically to check the term tagger instances
      */
-    public function handleTermTaggerCheck() {
+    public function handleTermTaggerCheck()
+    {
         $state = $this->getService('termtagger')->getServiceState();
-        if(!$state->runningAll) {
+        if (! $state->runningAll) {
             $serverList = [];
-            foreach($state->running as $url => $stat) {
-                $serverList[] = "\n".$url . ': '. ($stat ? 'ONLINE': 'OFFLINE!');
+            foreach ($state->running as $url => $stat) {
+                $serverList[] = "\n" . $url . ': ' . ($stat ? 'ONLINE' : 'OFFLINE!');
             }
             $this->log->error('E1125', 'TermTagger DOWN: one or more configured TermTagger instances are not available: {serverList}', [
                 'serverList' => join('; ', $serverList),
@@ -296,10 +302,10 @@ class editor_Plugins_TermTagger_Bootstrap extends ZfExtended_Plugin_Abstract {
 
     /**
      * Adds the termtagger state to the general state handler
-     * @param Zend_EventManager_Event $event
      * @throws ZfExtended_Exception
      */
-    public function termtaggerStateHandler(Zend_EventManager_Event $event) {
+    public function termtaggerStateHandler(Zend_EventManager_Event $event)
+    {
         $applicationState = $event->getParam('applicationState');
         $applicationState->termtagger = $this->getService('termtagger')->getServiceState(false);
     }
@@ -307,10 +313,9 @@ class editor_Plugins_TermTagger_Bootstrap extends ZfExtended_Plugin_Abstract {
     /**
      * When using change alikes, the transFound information in the source has to be changed.
      * This is done by this handler.
-     *
-     * @param Zend_EventManager_Event $event
      */
-    public function handleBeforeSaveAlike(Zend_EventManager_Event $event) {
+    public function handleBeforeSaveAlike(Zend_EventManager_Event $event)
+    {
         $masterSegment = $event->getParam('masterSegment');
         /* @var $masterSegment editor_Models_Segment */
         $alikeSegment = $event->getParam('alikeSegment');
@@ -319,18 +324,18 @@ class editor_Plugins_TermTagger_Bootstrap extends ZfExtended_Plugin_Abstract {
         /* @var $task editor_Models_Task */
 
         // disable when source/target language similar, see TRANSLATE-2373
-        if($task->isSourceAndTargetLanguageSimilar()){
+        if ($task->isSourceAndTargetLanguageSimilar()) {
             return;
         }
-        
+
         // take over source original only for non editing source, see therefore TRANSLATE-549
         // Attention for alikes and if source is editable:
         //   - the whole content (including term trans[Not]Found info) must be changed in the editable field,
         //     this is done in the AlikeController
         //   - in the original only the transFound infor has to be updated, this is done here
-        
+
         // lazy instanciation of markTransFound
-        if(empty($this->markTransFound)) {
+        if (empty($this->markTransFound)) {
             $task = editor_ModelInstances::taskByGuid($masterSegment->getTaskGuid());
             $this->markTransFound = new RecalcTransFound($task);
         }

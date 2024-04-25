@@ -21,7 +21,7 @@ START LICENSE AND COPYRIGHT
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
@@ -42,13 +42,14 @@ class Cronjobs
 {
     private static bool $running = false;
 
-    public function __construct(private Bootstrap $bootstrap, private CronEventTrigger $eventTrigger)
-    {
+    public function __construct(
+        private Bootstrap $bootstrap,
+        private CronEventTrigger $eventTrigger
+    ) {
     }
 
     /**
      * returns true if current request is executed in a cron job
-     * @return bool
      */
     public static function isRunning(): bool
     {
@@ -94,15 +95,14 @@ class Cronjobs
     /**
      * Rotate logs
      */
-    public function rotateLogs() {
-
+    public function rotateLogs()
+    {
         // Rotate php log
         \MittagQI\Translate5\Logging\Rotation::rotate('php.log');
     }
 
     /**
      * call workflow action based on given name
-     * @param string $fn
      * @throws editor_Workflow_Exception
      */
     protected function doCronWorkflow(string $fn): void

@@ -140,7 +140,7 @@ Ext.define('Editor.view.admin.contentProtection.outputMapping.CreateWindow', {
                                         value: true
                                     },
                                     {
-                                        property: 'kepAsIs',
+                                        property: 'keepAsIs',
                                         value: false
                                     }
                                 ]

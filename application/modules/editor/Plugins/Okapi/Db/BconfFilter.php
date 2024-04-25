@@ -21,13 +21,14 @@
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
- 		     http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
  END LICENSE AND COPYRIGHT
  */
 
-class editor_Plugins_Okapi_Db_BconfFilter extends Zend_Db_Table_Abstract {
-    
+class editor_Plugins_Okapi_Db_BconfFilter extends Zend_Db_Table_Abstract
+{
     protected $_name = 'LEK_okapi_bconf_filter';
+
     public $_primary = 'id';
 }

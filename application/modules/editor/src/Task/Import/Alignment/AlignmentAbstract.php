@@ -21,7 +21,7 @@ START LICENSE AND COPYRIGHT
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
@@ -32,12 +32,8 @@ use editor_Models_Import_FileParser;
 use editor_Models_Segment;
 use ZfExtended_Factory;
 
-/**
- *
- */
 abstract class AlignmentAbstract
 {
-
     private array $errors = [];
 
     private editor_Models_Segment $segment;
@@ -47,19 +43,11 @@ abstract class AlignmentAbstract
         $this->initSegment();
     }
 
-    /**
-     * @param editor_Models_Import_FileParser $parser
-     * @return editor_Models_Segment|null
-     */
     abstract public function findSegment(editor_Models_Import_FileParser $parser): ?editor_Models_Segment;
 
-    /**
-     * @param Error $error
-     * @return void
-     */
     public function addError(Error $error): void
     {
-        if (!isset($this->errors[$error->getCode()])) {
+        if (! isset($this->errors[$error->getCode()])) {
             $this->errors[$error->getCode()] = new Error(
                 $error->getCode(),
                 $error->getMessage(),
@@ -76,26 +64,20 @@ abstract class AlignmentAbstract
     public function initSegment(string $taskGuid = ''): void
     {
         $this->segment = ZfExtended_Factory::get(editor_Models_Segment::class);
-        if (!empty($taskGuid)) {
+        if (! empty($taskGuid)) {
             $this->segment->init(
                 [
-                    'taskGuid' => $taskGuid
+                    'taskGuid' => $taskGuid,
                 ]
             );
         }
     }
 
-    /**
-     * @return array
-     */
     public function getErrors(): array
     {
         return $this->errors;
     }
 
-    /**
-     * @return editor_Models_Segment
-     */
     public function getSegment(): editor_Models_Segment
     {
         return $this->segment;

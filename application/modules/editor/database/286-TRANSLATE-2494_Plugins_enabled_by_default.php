@@ -1,4 +1,5 @@
-<?php 
+<?php
+
 /*
 START LICENSE AND COPYRIGHT
 
@@ -48,21 +49,21 @@ $SCRIPT_IDENTIFIER = '286-TRANSLATE-2494_Plugins_enabled_by_default.php';
  * define database credential variables
  */
 $argc = count($argv);
-if(empty($this) || empty($argv) || $argc < 5 || $argc > 7) {
+if (empty($this) || empty($argv) || $argc < 5 || $argc > 7) {
     die("please dont call the script direct! Call it by using DBUpdater!\n\n");
 }
 
 $manager = Zend_Registry::get('PluginManager');
 /* @var $manager ZfExtended_Plugin_Manager */
 $plugins = [
-    'PangeaMt'=>'editor_Plugins_PangeaMt_Init',
-    'IpAuthentication'=>'editor_Plugins_IpAuthentication_Init',
-    'ModelFront'=>'editor_Plugins_ModelFront_Init'
+    'PangeaMt' => 'editor_Plugins_PangeaMt_Init',
+    'IpAuthentication' => 'editor_Plugins_IpAuthentication_Init',
+    'ModelFront' => 'editor_Plugins_ModelFront_Init',
 ];
 
 $activeByDefault = [];
-foreach($plugins as $plugin=>$class) {
-    if($manager->setActive($plugin, true)){
+foreach ($plugins as $plugin => $class) {
+    if ($manager->setActive($plugin, true)) {
         $activeByDefault[] = $class;
     }
 }
@@ -73,10 +74,10 @@ $config->loadByName('runtimeOptions.plugins.active');
 
 try {
     $defaults = [];
-    if(!empty($config->getDefault())){
+    if (! empty($config->getDefault())) {
         $defaults = Zend_Json::decode($config->getDefault());
     }
-    $defaults = Zend_Json::encode(array_unique(array_merge($defaults,$activeByDefault)));
+    $defaults = Zend_Json::encode(array_unique(array_merge($defaults, $activeByDefault)));
     $config->setDefault($defaults);
     $config->save();
 } catch (Zend_Json_Exception $e) {

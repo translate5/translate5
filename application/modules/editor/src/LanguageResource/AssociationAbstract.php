@@ -21,7 +21,7 @@ START LICENSE AND COPYRIGHT
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
@@ -34,18 +34,20 @@ use ZfExtended_Models_Entity_Abstract;
 
 class AssociationAbstract extends ZfExtended_Models_Entity_Abstract
 {
-
     /**
      * Returns join between taskassoc table and task table for languageResource's id list
      * @param array $languageResourceids
      */
-    public function getTaskInfoForLanguageResources($languageResourceids){
-        if(empty($languageResourceids)) {
+    public function getTaskInfoForLanguageResources($languageResourceids)
+    {
+        if (empty($languageResourceids)) {
             return [];
         }
 
         $s = $this->db->select()
-            ->from(['assocs' => $this->tableName], [
+            ->from([
+                'assocs' => $this->tableName,
+            ], [
                 'assocs.id',
                 'assocs.taskGuid',
                 'task.id as taskId',
@@ -55,12 +57,15 @@ class AssociationAbstract extends ZfExtended_Models_Entity_Abstract
                 'task.lockingUser',
                 'task.taskNr',
                 'assocs.languageResourceId',
-                new Zend_Db_Expr($this->db->getAdapter()->quote($this->tableName).' as tableName')
+                new Zend_Db_Expr($this->db->getAdapter()->quote($this->tableName) . ' as tableName'),
             ])
             ->setIntegrityCheck(false)
-            ->join(['task' => 'LEK_task'],'assocs.taskGuid = task.taskGuid', '')
+            ->join([
+                'task' => 'LEK_task',
+            ], 'assocs.taskGuid = task.taskGuid', '')
             ->where('assocs.languageResourceId in (?)', $languageResourceids)
             ->group('assocs.id');
+
         return $this->db->fetchAll($s)->toArray();
     }
 
@@ -71,7 +76,8 @@ class AssociationAbstract extends ZfExtended_Models_Entity_Abstract
     public function loadTaskAssociated(string $taskGuid): ?array
     {
         $s = $this->db->select()
-            ->where('taskGuid = ?',$taskGuid);
+            ->where('taskGuid = ?', $taskGuid);
+
         return $this->db->getAdapter()->fetchAll($s);
     }
 
@@ -80,12 +86,18 @@ class AssociationAbstract extends ZfExtended_Models_Entity_Abstract
      * @param int $languageResourceId
      * @return array|null
      */
-    public function getAssociatedByResource(int $languageResourceId): ?array{
+    public function getAssociatedByResource(int $languageResourceId): ?array
+    {
         $s = $this->db->select()
-            ->from(['ta' => $this->db->info(Zend_Db_Table_Abstract::NAME)],['ta.*'])
+            ->from([
+                'ta' => $this->db->info(Zend_Db_Table_Abstract::NAME),
+            ], ['ta.*'])
             ->setIntegrityCheck(false)
-            ->join(['t' => 'LEK_task'], 'ta.taskGuid = t.taskGuid',['t.taskName as taskName'])
-            ->where('ta.languageResourceId = ?',$languageResourceId);
+            ->join([
+                't' => 'LEK_task',
+            ], 'ta.taskGuid = t.taskGuid', ['t.taskName as taskName'])
+            ->where('ta.languageResourceId = ?', $languageResourceId);
+
         return $this->db->getAdapter()->fetchAll($s);
     }
 
@@ -97,7 +109,9 @@ class AssociationAbstract extends ZfExtended_Models_Entity_Abstract
      */
     public function deleteAllForTask(string $taskGuid): bool
     {
-        return $this->db->delete(['taskGuid = ?' => $taskGuid]) > 0;
+        return $this->db->delete([
+            'taskGuid = ?' => $taskGuid,
+        ]) > 0;
     }
 
     /***
@@ -109,8 +123,9 @@ class AssociationAbstract extends ZfExtended_Models_Entity_Abstract
     public function isAssigned(int $resourceId, string $taskGuid): bool
     {
         $s = $this->db->select()
-            ->where('taskGuid = ?',$taskGuid)
-            ->where('languageResourceId = ?',$resourceId);
+            ->where('taskGuid = ?', $taskGuid)
+            ->where('languageResourceId = ?', $resourceId);
+
         return empty($this->db->getAdapter()->fetchAll($s)) === false;
     }
 
@@ -122,23 +137,25 @@ class AssociationAbstract extends ZfExtended_Models_Entity_Abstract
     public function getAssociatedByCustomer(array $customers, int $languageResourceId): array
     {
         $s = $this->db->select()
-            ->from(['ta' => $this->db->info(Zend_Db_Table_Abstract::NAME)],['ta.*'])
+            ->from([
+                'ta' => $this->db->info(Zend_Db_Table_Abstract::NAME),
+            ], ['ta.*'])
             ->setIntegrityCheck(false)
-            ->join(['t' => 'LEK_task'], 'ta.taskGuid = t.taskGuid',['t.taskName as taskName'])
-            ->where('t.customerId IN(?)',$customers)
-            ->where('ta.languageResourceId = ?',$languageResourceId);
-        
+            ->join([
+                't' => 'LEK_task',
+            ], 'ta.taskGuid = t.taskGuid', ['t.taskName as taskName'])
+            ->where('t.customerId IN(?)', $customers)
+            ->where('ta.languageResourceId = ?', $languageResourceId);
+
         return $this->db->fetchAll($s)->toArray();
     }
 
-    /**
-     * @param array $ids
-     * @return bool
-     */
     public function deleteByIds(array $ids): bool
     {
         $cast = array_map('intval', $ids);
-        return $this->db->delete(['id IN(?)' => $cast]) > 0;
-    }
 
+        return $this->db->delete([
+            'id IN(?)' => $cast,
+        ]) > 0;
+    }
 }

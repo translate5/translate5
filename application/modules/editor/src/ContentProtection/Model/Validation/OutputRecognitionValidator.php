@@ -59,6 +59,7 @@ use ZfExtended_Factory;
 class OutputRecognitionValidator extends Zend_Validate_Abstract
 {
     private const WRONG_TYPE = 'type';
+
     private const KEEP_AS_IS = 'keepAsIs';
 
     protected $_messageTemplates = [

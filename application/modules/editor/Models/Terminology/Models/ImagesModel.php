@@ -21,13 +21,12 @@ START LICENSE AND COPYRIGHT
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
 
 /**
- * Class editor_Models_Terms_Images
  * TermsImage Instance
  *
  * @method string getId()
@@ -43,36 +42,33 @@ END LICENSE AND COPYRIGHT
  * @method string getCollectionId()
  * @method void setCollectionId(integer $collectionId)
  */
-class editor_Models_Terminology_Models_ImagesModel extends ZfExtended_Models_Entity_Abstract {
+class editor_Models_Terminology_Models_ImagesModel extends ZfExtended_Models_Entity_Abstract
+{
     protected $dbInstanceClass = 'editor_Models_Db_Terminology_Images';
 
     /**
      * @string
      */
-    protected $tbxImportDirectoryPath = APPLICATION_PATH.'/../data/tbx-import/';
+    protected $tbxImportDirectoryPath = APPLICATION_PATH . '/../data/tbx-import/';
 
     /**
      * returns the image data arrays for a given list of targetIds
-     * @param int $collectionId
-     * @param array $targetIds
-     * @return array
      */
     public function loadByTargetIdList(int $collectionId, array $targetIds): array
     {
         $sql = $this->db->select()
             ->where('targetId IN (?)', $targetIds)
             ->where('collectionId = ?', $collectionId);
+
         return $this->db->fetchAll($sql)->toArray();
     }
 
     /**
      * returns the image paths to a collection ID and a list of targets
-     * @param int $collectionId
-     * @param array $targetIds
-     * @return array
      * @throws Zend_Db_Statement_Exception
      */
-    public function getImagePathsByTargetIds(int $collectionId, array $targetIds): array {
+    public function getImagePathsByTargetIds(int $collectionId, array $targetIds): array
+    {
         $sql = $this->db->select()
             ->from($this->db, ['targetId', 'uniqueName'])
             ->where('targetId IN (?)', $targetIds)
@@ -81,7 +77,7 @@ class editor_Models_Terminology_Models_ImagesModel extends ZfExtended_Models_Ent
 
         //generate the paths
         $uniqueNames = [];
-        foreach($images as $image) {
+        foreach ($images as $image) {
             $uniqueNames[$image['targetId']] = $this->getPublicPath($collectionId, $image['uniqueName']);
         }
 
@@ -92,10 +88,10 @@ class editor_Models_Terminology_Models_ImagesModel extends ZfExtended_Models_Ent
      * return the public webpath to an image
      * @param int|null $collectionId if omitted use the internal collectionId
      * @param string|null $imageName if omitted use the internal unique name
-     * @return string
      */
-    public function getPublicPath(int $collectionId = null, string $imageName = null): string {
-        return APPLICATION_RUNDIR.'/editor/plugins/termimage/TermPortal/tc_'.($collectionId ?? $this->getCollectionId()).'/'.($imageName ?? $this->getUniqueName());
+    public function getPublicPath(int $collectionId = null, string $imageName = null): string
+    {
+        return APPLICATION_RUNDIR . '/editor/plugins/termimage/TermPortal/tc_' . ($collectionId ?? $this->getCollectionId()) . '/' . ($imageName ?? $this->getUniqueName());
     }
 
     /**
@@ -104,7 +100,6 @@ class editor_Models_Terminology_Models_ImagesModel extends ZfExtended_Models_Ent
      *
      * $simpleResult[$term['term']]
      * $simpleResult['term'] = termId
-     * @param int $collectionId
      * @return array[]
      */
     public function getAllImagesByCollectionId(int $collectionId): array
@@ -113,7 +108,9 @@ class editor_Models_Terminology_Models_ImagesModel extends ZfExtended_Models_Ent
         $fullResult = [];
 
         $query = "SELECT * FROM terms_images WHERE collectionId = :collectionId";
-        $queryResults = $this->db->getAdapter()->query($query, ['collectionId' => $collectionId]);
+        $queryResults = $this->db->getAdapter()->query($query, [
+            'collectionId' => $collectionId,
+        ]);
 
         foreach ($queryResults as $image) {
             $fullResult[$image['targetId']] = $image;
@@ -132,11 +129,8 @@ class editor_Models_Terminology_Models_ImagesModel extends ZfExtended_Models_Ent
         return $this->db->getAdapter()->query($query, $sqlValue);
     }
 
-
     /**
      * loads a image by given collection and target internally
-     * @param int $collectionId
-     * @param string $targetId
      * @return mixed
      */
     public function loadByTargetId(int $collectionId, string $targetId)
@@ -147,7 +141,8 @@ class editor_Models_Terminology_Models_ImagesModel extends ZfExtended_Models_Ent
         ]);
     }
 
-    public function delete() {
+    public function delete()
+    {
         // If file exists delete it
         $src = $this->getImagePath($this->getCollectionId(), $this->getUniqueName());
         is_file($src) && unlink($src);
@@ -159,11 +154,12 @@ class editor_Models_Terminology_Models_ImagesModel extends ZfExtended_Models_Ent
      * returns false if the termcollection folder is not usable
      * @throws editor_Models_Terminology_Import_Exception
      */
-    public function checkImageTermCollectionFolder(int $collectionId) {
-        if(!is_dir($this->tbxImportDirectoryPath) || !is_writable($this->tbxImportDirectoryPath)) {
+    public function checkImageTermCollectionFolder(int $collectionId)
+    {
+        if (! is_dir($this->tbxImportDirectoryPath) || ! is_writable($this->tbxImportDirectoryPath)) {
             //TBX Import: Folder to save images does not exist or is not writable!
             throw new editor_Models_Terminology_Import_Exception('E1353', [
-                'path' => $this->tbxImportDirectoryPath
+                'path' => $this->tbxImportDirectoryPath,
             ]);
         }
 
@@ -175,21 +171,21 @@ class editor_Models_Terminology_Models_ImagesModel extends ZfExtended_Models_Ent
             }
         } catch (Throwable $e) {
         }
+
         //if we reach here the folder could not be created
         //TBX Import: Folder to save termcollection images could not be created!
         throw new editor_Models_Terminology_Import_Exception('E1354', [
-            'path' => $imagePath
+            'path' => $imagePath,
         ]);
     }
 
     /**
      * Returns the absolute path to term collection folder for images
-     * @param int $collectionId
      * @param string $file if given append the file to the path
-     * @return string
      */
-    public function getImagePath(int $collectionId, string $file = null): string {
-        return $this->tbxImportDirectoryPath.'term-images-public/tc_'.$collectionId.($file ? ('/'.$file) : '');
+    public function getImagePath(int $collectionId, string $file = null): string
+    {
+        return $this->tbxImportDirectoryPath . 'term-images-public/tc_' . $collectionId . ($file ? ('/' . $file) : '');
     }
 
     /**
@@ -197,23 +193,21 @@ class editor_Models_Terminology_Models_ImagesModel extends ZfExtended_Models_Ent
      * @param boolean $uniqueId
      * @return boolean
      */
-    public function isValidUniqueId($uniqueId): bool {
+    public function isValidUniqueId($uniqueId): bool
+    {
         return (bool) preg_match('/[a-z0-9-]{36}\.[a-zA-Z0-9]{3,4}/', $uniqueId);
     }
-
 
     /**
      * converts the term collection string to a valid integer
      */
-    public function readCollectionIdFromUrlPart(string $tcIdURL): int {
+    public function readCollectionIdFromUrlPart(string $tcIdURL): int
+    {
         return (int) str_replace('tc_', '', $tcIdURL);
     }
 
     /**
      * Save the given image to the term collection images folder. This function will check and create the required folder structure
-     * @param int $collectionId
-     * @param string $imageName
-     * @param string $imageContent
      */
     public function saveImageToDisk(int $collectionId, string $imageName, string $imageContent)
     {
@@ -222,65 +216,63 @@ class editor_Models_Terminology_Models_ImagesModel extends ZfExtended_Models_Ent
 
     /**
      * renames / moves a given file to the unique file name / given filename
-     * @param string $source
-     * @param int $collectionId
      * @param string|null $targetFile if omitted use internal unique ID
-     * @return bool
      */
-    public function moveImage(string $source, int $collectionId, string $targetFile = null): bool {
+    public function moveImage(string $source, int $collectionId, string $targetFile = null): bool
+    {
         $this->checkImageTermCollectionFolder($collectionId);
+
         return rename($source, $this->getImagePath($collectionId, $targetFile ?? $this->getUniqueName()));
     }
 
     /**
      * Copies a given file to the unique file name / given filename
-     * @param string $source
-     * @param int $collectionId
      * @param string|null $targetFile if omitted use internal unique ID
-     * @return bool
      */
-    public function copyImage(string $source, int $collectionId, string $targetFile = null): bool {
+    public function copyImage(string $source, int $collectionId, string $targetFile = null): bool
+    {
         $this->checkImageTermCollectionFolder($collectionId);
+
         return copy($source, $this->getImagePath($collectionId, $targetFile ?? $this->getUniqueName()));
     }
 
     /**
      * creates a unique name out of the given one
-     * @param string $name
-     * @return string
      */
-    public function createUniqueName(string $name): string {
-        $d = strrpos($name,".");
-        $extension = ($d===false) ? "" : ('.'.substr($name,$d+1));
-        return ZfExtended_Utils::uuid().$extension;
+    public function createUniqueName(string $name): string
+    {
+        $d = strrpos($name, ".");
+        $extension = ($d === false) ? "" : ('.' . substr($name, $d + 1));
+
+        return ZfExtended_Utils::uuid() . $extension;
     }
 
     /**
      * the images files on the disk, which are not in the images table, and returns the unique names in the DB where the file is missing
-     * @param int $collectionId
-     * @param array $filesInDb
      * @return array file table entries where the file on the disk is missing
      */
-    public function purgeImageFiles(int $collectionId, array $filesInDb): array {
+    public function purgeImageFiles(int $collectionId, array $filesInDb): array
+    {
         $found = scandir($this->getImagePath($collectionId));
         $filesInDb[] = '.';
         $filesInDb[] = '..';
         $toBeDeleted = array_diff($found, $filesInDb);
         $missingOnDisk = array_diff($filesInDb, $found);
-        foreach($toBeDeleted as $file) {
+        foreach ($toBeDeleted as $file) {
             $file = $this->getImagePath($collectionId, $file);
-            if(file_exists($file)) {
+            if (file_exists($file)) {
                 unlink($file);
             }
         }
+
         return $missingOnDisk;
     }
 
     /**
      * deletes terms_images entries which are not referenced by any attribute
-     * @param int $collectionId
      */
-    protected function purgeImageTable(int $collectionId) {
+    protected function purgeImageTable(int $collectionId)
+    {
         $this->db->getAdapter()->query('DELETE i FROM `terms_images` i
                 LEFT JOIN (
                     SELECT id, target FROM `terms_attributes` WHERE collectionId = ?
@@ -288,9 +280,9 @@ class editor_Models_Terminology_Models_ImagesModel extends ZfExtended_Models_Ent
                 WHERE a.id IS NULL AND i.collectionId = ?', [$collectionId, $collectionId]);
     }
 
-    public function getQtyByCollectionId($collectionId) {
+    public function getQtyByCollectionId($collectionId)
+    {
         return $this->db->getAdapter()->query('
-            SELECT COUNT(`id`) FROM `terms_images` WHERE `collectionId` = ?'
-        , $collectionId)->fetchColumn();
+            SELECT COUNT(`id`) FROM `terms_images` WHERE `collectionId` = ?', $collectionId)->fetchColumn();
     }
 }

@@ -27,9 +27,6 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-/**
- *
- */
 set_time_limit(0);
 
 //uncomment the following line, so that the file is not marked as processed:
@@ -45,7 +42,7 @@ $SCRIPT_IDENTIFIER = '416-TRANSLATE-3724-fix-duplicates-langres-uuid.php';
  * define database credential variables
  */
 $argc = count($argv);
-if(empty($this) || empty($argv) || $argc < 5 || $argc > 7) {
+if (empty($this) || empty($argv) || $argc < 5 || $argc > 7) {
     die("please dont call the script direct! Call it by using DBUpdater!\n\n");
 }
 
@@ -62,10 +59,8 @@ $duplicateA = $db->query("
 
 // Foreach duplicated uuid
 foreach ($duplicateA as $langResUuid_old => $ids) {
-
     // Foreach language resource record id
     foreach (explode(',', $ids) as $id) {
-
         // Create new uuid
         $langResUuid_new = ZfExtended_Utils::uuid();
 
@@ -73,12 +68,10 @@ foreach ($duplicateA as $langResUuid_old => $ids) {
         $taskGuidA = $db->query("
             SELECT `taskGuid` 
             FROM `LEK_languageresources_taskassoc` 
-            WHERE `languageResourceId` = ?"
-        , $id)->fetchAll(PDO::FETCH_COLUMN);
+            WHERE `languageResourceId` = ?", $id)->fetchAll(PDO::FETCH_COLUMN);
 
         // Foreach task where current language resource is used
         foreach ($taskGuidA as $taskGuid) {
-
             // Update value of preTransLangResUuid in segments meta
             $db->query("
                 UPDATE `LEK_segments_meta`

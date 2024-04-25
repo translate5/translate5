@@ -46,7 +46,7 @@ trait T5MemoryLocalTmsTrait
 
         foreach ($languageResourcesData as $languageResourceData) {
             if ($nameFilter
-                && !str_contains(mb_strtolower($languageResourceData['name']), mb_strtolower($nameFilter))
+                && ! str_contains(mb_strtolower($languageResourceData['name']), mb_strtolower($nameFilter))
             ) {
                 continue;
             }
@@ -85,7 +85,6 @@ trait T5MemoryLocalTmsTrait
     /**
      * Returns array of local TMs in format [uuid => name]
      *
-     * @param string|null $nameFilter
      * @return array<string, string>
      */
     protected function getLocalTmsList(?string $nameFilter = null): array

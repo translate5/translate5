@@ -92,8 +92,23 @@ Ext.define('Editor.view.admin.contentProtection.contentRecognition.GridControlle
             return false;
         }
 
-        record.set(col.dataIndex, checked);
-        record.save();
+        const callback = () => {
+            record.set(col.dataIndex, checked);
+            record.save();
+        }
+
+        if (col.dataIndex === 'rowEnabled') {
+            let confirmed = false;
+            Ext.MessageBox.confirm(
+                Editor.data.l10n.contentProtection.contentRecognition.confirm_enable_title,
+                Editor.data.l10n.contentProtection.contentRecognition.confirm_enable_message,
+                (btn) => (confirmed = 'yes' === btn) && callback()
+            )
+
+            return confirmed;
+        }
+
+        callback();
 
         return true;
     },

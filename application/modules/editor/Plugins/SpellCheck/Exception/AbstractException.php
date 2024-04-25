@@ -3,25 +3,25 @@
 START LICENSE AND COPYRIGHT
 
  This file is part of translate5
- 
+
  Copyright (c) 2013 - 2021 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
 
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
  This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
- as published by the Free Software Foundation and appearing in the file agpl3-license.txt 
- included in the packaging of this file.  Please review the following information 
+ as published by the Free Software Foundation and appearing in the file agpl3-license.txt
+ included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
-  
+
  There is a plugin exception available for use with this release of translate5 for
- translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or
  plugin-exception.txt in the root folder of translate5.
-  
+
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
@@ -38,12 +38,11 @@ use ZfExtended_Logger;
  */
 abstract class AbstractException extends ZfExtended_ErrorCodeException
 {
-
     /**
      * @var string
      */
     protected $domain = 'editor.spellcheck';
-    
+
     /**
      * Basically the spell-check exceptions produce just a warning
      *
@@ -53,7 +52,6 @@ abstract class AbstractException extends ZfExtended_ErrorCodeException
 
     /**
      * Error codes for spellcheck messages
-     * @var array
      */
     protected static array $localErrorCodes = [
         'E1413' => 'SpellCheck can not work when target language is not supported by LanguageTool.',
@@ -68,6 +66,6 @@ abstract class AbstractException extends ZfExtended_ErrorCodeException
         'E1476' => 'SpellCheck Worker can not be initialized!',
         'E1477' => 'SpellCheck returns an error on checking segments.',
         'E1478' => 'SpellCheck communication Error, probably crashing the SpellChecker instance.',
-        'E1479' => 'SpellCheck communication Error.'
+        'E1479' => 'SpellCheck communication Error.',
     ];
 }

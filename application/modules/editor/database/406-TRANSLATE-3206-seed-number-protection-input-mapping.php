@@ -22,7 +22,7 @@ START LICENSE AND COPYRIGHT
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
@@ -39,7 +39,6 @@ set_time_limit(0);
 $SCRIPT_IDENTIFIER = '406-TRANSLATE-3206-seed-number-protection-input-mapping.php';
 
 if (APPLICATION_ENV !== ZfExtended_BaseIndex::ENVIRONMENT_TEST) {
-
     $db = Zend_Db_Table::getDefaultAdapter();
 
     $lang = ZfExtended_Factory::get(editor_Models_Languages::class);
@@ -48,23 +47,32 @@ if (APPLICATION_ENV !== ZfExtended_BaseIndex::ENVIRONMENT_TEST) {
 
     try {
         $deId = $lang->getLangIdByRfc5646('de');
-    } catch (\ZfExtended_Models_Entity_NotFoundException) {}
+    } catch (\ZfExtended_Models_Entity_NotFoundException) {
+    }
+
     try {
         $enId = $lang->getLangIdByRfc5646('en');
-    } catch (\ZfExtended_Models_Entity_NotFoundException) {}
+    } catch (\ZfExtended_Models_Entity_NotFoundException) {
+    }
+
     try {
         $enUsId = $lang->getLangIdByRfc5646('en-US');
-    } catch (\ZfExtended_Models_Entity_NotFoundException) {}
+    } catch (\ZfExtended_Models_Entity_NotFoundException) {
+    }
+
     try {
         $enGbId = $lang->getLangIdByRfc5646('en-GB');
-    } catch (\ZfExtended_Models_Entity_NotFoundException) {}
+    } catch (\ZfExtended_Models_Entity_NotFoundException) {
+    }
+
     try {
         $frId = $lang->getLangIdByRfc5646('fr');
-    } catch (\ZfExtended_Models_Entity_NotFoundException) {}
+    } catch (\ZfExtended_Models_Entity_NotFoundException) {
+    }
 
     $inputMappings = [];
 
-// region Dates
+    // region Dates
     $s = $db->select()->from('LEK_number_protection_number_recognition', 'id')
         ->where('type = ?', 'date')->where('name = ?', 'default m/d/Y');
 
@@ -156,9 +164,9 @@ if (APPLICATION_ENV !== ZfExtended_BaseIndex::ENVIRONMENT_TEST) {
     if ($enGbId) {
         $inputMappings[] = "($enGbId, {$db->query($s)->fetchColumn()})";
     }
-// endregion Dates block
+    // endregion Dates block
 
-// region Floats
+    // region Floats
     $s = $db->select()->from('LEK_number_protection_number_recognition', 'id')
         ->where('type = ?', 'float')->where('name = ?', 'default with dot thousand decimal comma');
 
@@ -192,9 +200,9 @@ if (APPLICATION_ENV !== ZfExtended_BaseIndex::ENVIRONMENT_TEST) {
     if ($frId) {
         $inputMappings[] = "($frId, {$db->query($s)->fetchColumn()})";
     }
-// endregion
+    // endregion
 
-// region Integers
+    // region Integers
     $s = $db->select()->from('LEK_number_protection_number_recognition', 'id')
         ->where('type = ?', 'integer')->where('name = ?', 'default simple');
 
@@ -207,7 +215,7 @@ if (APPLICATION_ENV !== ZfExtended_BaseIndex::ENVIRONMENT_TEST) {
     if ($frId) {
         $inputMappings[] = "($frId, {$db->query($s)->fetchColumn()})";
     }
-// endregion
+    // endregion
 
     $db->query('INSERT INTO `LEK_number_protection_input_mapping` (`languageId`, `numberRecognitionId`) VALUES ' . implode(',', $inputMappings));
 }

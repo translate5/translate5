@@ -52,54 +52,84 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\ContentProtection\Model;
 
-use editor_Models_Languages;
+use editor_Models_LanguageResources_LanguageResource as LanguageResource;
+use editor_Models_LanguageResources_Languages as LRLanguages;
+use editor_Models_Languages as Languages;
+use editor_Services_Manager;
 use ZfExtended_Factory;
 
 class ContentProtectionRepository
 {
     /**
+     * @var ContentProtectionDto[]
+     */
+    private array $sourceContentProtections = [];
+
+    /**
+     * @var ContentProtectionDto[]
+     */
+    private array $targetContentProtections = [];
+
+    public function hasActiveRules(?Languages $sourceLang, ?Languages $targetLang): bool
+    {
+        if (null === $sourceLang || null === $targetLang) {
+            return false;
+        }
+
+        return $this->getAllForSource($sourceLang, $targetLang)->valid();
+    }
+
+    /**
      * @return iterable<ContentProtectionDto>
      */
-    public function getAllForSource(editor_Models_Languages $sourceLang, editor_Models_Languages $targetLang): iterable
+    public function getAllForSource(Languages $sourceLang, Languages $targetLang, bool $useCache = true): \Iterator
     {
         $dbInputMapping = ZfExtended_Factory::get(InputMapping::class)->db;
         $dbOutputMapping = ZfExtended_Factory::get(OutputMapping::class)->db;
         $dbContentRecognition = ZfExtended_Factory::get(ContentRecognition::class)->db;
         $contentRecognitionTable = $dbContentRecognition->info($dbContentRecognition::NAME);
 
-        $sourceIds = [$sourceLang->getId()];
-        $targetIds = [$targetLang->getId()];
+        $sourceIds = [(int) $sourceLang->getId()];
+        $targetIds = [(int) $targetLang->getId()];
 
         if ($sourceLang->getMajorRfc5646() !== $sourceLang->getRfc5646()) {
-            $major = ZfExtended_Factory::get(editor_Models_Languages::class);
+            $major = ZfExtended_Factory::get(Languages::class);
             $major->loadByRfc5646($sourceLang->getMajorRfc5646());
 
-            $sourceIds[] = $major->getId();
+            $sourceIds[] = (int) $major->getId();
         }
 
         if ($targetLang->getMajorRfc5646() !== $targetLang->getRfc5646()) {
-            $major = ZfExtended_Factory::get(editor_Models_Languages::class);
+            $major = ZfExtended_Factory::get(Languages::class);
             $major->loadByRfc5646($targetLang->getMajorRfc5646());
 
-            $targetIds[] = $major->getId();
+            $targetIds[] = (int) $major->getId();
         }
 
         $select = $dbInputMapping->select()
             ->setIntegrityCheck(false)
-            ->from(['inputMapping' => $dbInputMapping->info($dbInputMapping::NAME)], [])
+            ->from([
+                'inputMapping' => $dbInputMapping->info($dbInputMapping::NAME),
+            ], ['priority'])
             ->join(
-                ['recognition' => $contentRecognitionTable],
+                [
+                    'recognition' => $contentRecognitionTable,
+                ],
                 'recognition.id = inputMapping.contentRecognitionId',
                 ['recognition.*']
             )
             ->joinLeft(
-                ['outputMapping' => $dbOutputMapping->info($dbOutputMapping::NAME)],
+                [
+                    'outputMapping' => $dbOutputMapping->info($dbOutputMapping::NAME),
+                ],
                 'outputMapping.languageId IN (' . implode(',', $targetIds) . ')
                 AND outputMapping.inputContentRecognitionId = inputMapping.contentRecognitionId',
                 []
             )
             ->joinLeft(
-                ['outputRecognition' => $contentRecognitionTable],
+                [
+                    'outputRecognition' => $contentRecognitionTable,
+                ],
                 'outputRecognition.id = outputMapping.outputContentRecognitionId
                 AND outputRecognition.enabled = true',
                 ['outputRecognition.format as outputFormat']
@@ -109,7 +139,18 @@ class ContentProtectionRepository
             ->order('priority desc')
         ;
 
-        foreach ($dbInputMapping->fetchAll($select) as $formatData) {
+        if ($useCache) {
+            $key = "{$sourceLang->getId()}:{$targetLang->getId()}";
+            if (! isset($this->sourceContentProtections[$key])) {
+                $this->sourceContentProtections[$key] = $dbInputMapping->fetchAll($select);
+            }
+
+            $rows = $this->sourceContentProtections[$key];
+        } else {
+            $rows = $dbInputMapping->fetchAll($select);
+        }
+
+        foreach ($rows as $formatData) {
             yield ContentProtectionDto::fromRow($formatData->toArray());
         }
     }
@@ -117,7 +158,7 @@ class ContentProtectionRepository
     /**
      * @return iterable<ContentProtectionDto>
      */
-    public function getAllForTarget(editor_Models_Languages $sourceLang, editor_Models_Languages $targetLang): iterable
+    public function getAllForTarget(Languages $sourceLang, Languages $targetLang, bool $useCache = true): iterable
     {
         $dbInputMapping = ZfExtended_Factory::get(InputMapping::class)->db;
         $dbOutputMapping = ZfExtended_Factory::get(OutputMapping::class)->db;
@@ -128,14 +169,14 @@ class ContentProtectionRepository
         $targetIds = [$targetLang->getId()];
 
         if ($sourceLang->getMajorRfc5646() !== $sourceLang->getRfc5646()) {
-            $major = ZfExtended_Factory::get(editor_Models_Languages::class);
+            $major = ZfExtended_Factory::get(Languages::class);
             $major->loadByRfc5646($sourceLang->getMajorRfc5646());
 
             $sourceIds[] = $major->getId();
         }
 
         if ($targetLang->getMajorRfc5646() !== $targetLang->getRfc5646()) {
-            $major = ZfExtended_Factory::get(editor_Models_Languages::class);
+            $major = ZfExtended_Factory::get(Languages::class);
             $major->loadByRfc5646($targetLang->getMajorRfc5646());
 
             $targetIds[] = $major->getId();
@@ -143,30 +184,49 @@ class ContentProtectionRepository
 
         $select = $dbOutputMapping->select()
             ->setIntegrityCheck(false)
-            ->from(['outputMapping' => $dbOutputMapping->info($dbOutputMapping::NAME)], [])
+            ->from([
+                'outputMapping' => $dbOutputMapping->info($dbOutputMapping::NAME),
+            ], [])
             ->join(
-                ['recognition' => $contentRecognitionTable],
+                [
+                    'recognition' => $contentRecognitionTable,
+                ],
                 'recognition.id = outputMapping.outputContentRecognitionId',
                 ['recognition.*']
             )
             ->joinLeft(
-                ['inputMapping' => $dbInputMapping->info($dbInputMapping::NAME)],
+                [
+                    'inputMapping' => $dbInputMapping->info($dbInputMapping::NAME),
+                ],
                 'inputMapping.languageId IN (' . implode(',', $sourceIds) . ')
                 AND outputMapping.inputContentRecognitionId = inputMapping.contentRecognitionId',
-                []
+                ['priority']
             )
             ->joinLeft(
-                ['inputRecognition' => $contentRecognitionTable],
+                [
+                    'inputRecognition' => $contentRecognitionTable,
+                ],
                 'inputRecognition.id = outputMapping.inputContentRecognitionId
                 AND inputRecognition.enabled = true',
                 ['inputRecognition.format as outputFormat']
             )
             ->where('outputMapping.languageId IN (?)', $targetIds)
             ->where('recognition.enabled = true')
-            ->order('priority desc')
+            ->orWhere('recognition.keepAsIs = true')
         ;
 
-        foreach ($dbInputMapping->fetchAll($select) as $formatData) {
+        if ($useCache) {
+            $key = "{$sourceLang->getId()}:{$targetLang->getId()}";
+            if (! isset($this->targetContentProtections[$key])) {
+                $this->targetContentProtections[$key] = $dbOutputMapping->fetchAll($select);
+            }
+
+            $rows = $this->targetContentProtections[$key];
+        } else {
+            $rows = $dbOutputMapping->fetchAll($select);
+        }
+
+        foreach ($rows as $formatData) {
             yield ContentProtectionDto::fromRow($formatData->toArray());
         }
     }
@@ -179,13 +239,18 @@ class ContentProtectionRepository
 
         $select = $dbMapping->select()
             ->setIntegrityCheck(false)
-            ->from(['mapping' => $dbMapping->info($dbMapping::NAME)], [])
+            ->from([
+                'mapping' => $dbMapping->info($dbMapping::NAME),
+            ], [])
             ->join(
-                ['recognition' => $contentRecognitionTable],
+                [
+                    'recognition' => $contentRecognitionTable,
+                ],
                 'recognition.id = mapping.contentRecognitionId',
                 ['recognition.id', 'recognition.type', 'recognition.name']
             )
-            ->order('type asc')
+            ->where('recognition.enabled = true')
+            ->order('name asc')
         ;
 
         return $dbMapping->fetchAll($select)->toArray();
@@ -198,7 +263,9 @@ class ContentProtectionRepository
 
         $select = $dbContentRecognition->select()
             ->from(
-                ['recognition' => $contentRecognitionTable],
+                [
+                    'recognition' => $contentRecognitionTable,
+                ],
                 ['recognition.id', 'recognition.type', 'recognition.name']
             )
             ->where('recognition.enabled = true')
@@ -214,5 +281,90 @@ class ContentProtectionRepository
         $contentRecognition->loadBy($type, $name);
 
         return $contentRecognition;
+    }
+
+    public function getRulesHashBy(Languages $sourceLang, Languages $targetLang): string
+    {
+        $inputLines = [];
+
+        foreach ($this->getAllForSource($sourceLang, $targetLang, false) as $dto) {
+            if (null === $dto->format) {
+                continue;
+            }
+
+            $inputLines[] = sprintf(
+                '%s:%s:%s:%s:%s:%s',
+                $dto->regex,
+                $dto->matchId,
+                (int) $dto->keepAsIs,
+                $dto->format,
+                $dto->outputFormat,
+                $dto->priority
+            );
+        }
+
+        return md5(implode('|', $inputLines));
+    }
+
+    /**
+     * @return array{int, array{int, string}}
+     */
+    public function getLanguageRulesHashMap(): array
+    {
+        $db = ZfExtended_Factory::get(LanguageRulesHash::class)->db;
+        $select = $db->select()->from([
+            'hashes' => $db->info($db::NAME),
+        ], ['*']);
+
+        $map = [];
+
+        foreach ($db->fetchAll($select)->toArray() as $row) {
+            $map[(int) $row['sourceLanguageId']][(int) $row['targetLanguageId']] = $row['hash'];
+        }
+
+        return $map;
+    }
+
+    /**
+     * @return array<int, array{languages: array{source: int, target: int}, hash: string|null>
+     */
+    public function getLanguageResourceRulesHashMap(): array
+    {
+        $db = ZfExtended_Factory::get(LanguageResource::class)->db;
+        $dbLRLanguages = ZfExtended_Factory::get(LRLanguages::class)->db;
+        $lrLanguagesTable = $dbLRLanguages->info($dbLRLanguages::NAME);
+
+        $select = $db->select()
+            ->setIntegrityCheck(false)
+            ->from([
+                'LanguageResource' => $db->info($db::NAME),
+            ], ['id', 'specificData'])
+            ->join(
+                [
+                    'LRLanguages' => $lrLanguagesTable,
+                ],
+                'LRLanguages.languageResourceId = LanguageResource.id',
+                ['LRLanguages.sourceLang', 'LRLanguages.targetLang']
+            )
+            ->where('LanguageResource.serviceType = ?', editor_Services_Manager::SERVICE_OPENTM2);
+
+        $hashes = [];
+
+        foreach ($db->fetchAll($select) as $row) {
+            if (! isset($hashes[$row->id])) {
+                $hashes[$row->id] = [];
+            }
+
+            $specificData = json_decode($row['specificData'], true);
+
+            $hashes[$row->id]['languages'] = [
+                'source' => (int) $row->sourceLang,
+                'target' => (int) $row->targetLang,
+            ];
+            $hashes[$row->id]['hash'] = $specificData[LanguageResource::PROTECTION_HASH] ?? null;
+            $hashes[$row->id]['conversionStarted'] = $specificData[LanguageResource::PROTECTION_CONVERSION_STARTED] ?? null;
+        }
+
+        return $hashes;
     }
 }

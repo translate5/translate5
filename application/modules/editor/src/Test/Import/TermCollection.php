@@ -21,7 +21,7 @@ START LICENSE AND COPYRIGHT
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
@@ -36,18 +36,17 @@ use MittagQI\Translate5\Test\Api\Helper;
 final class TermCollection extends Resource
 {
     public string $name;
+
     public int $collectionId;
+
     public string|array $customerIds;
+
     public bool $mergeTerms = true;
+
     protected string $_tbxFile;
+
     protected string $_login;
 
-    /**
-     * @param string $testClass
-     * @param int $index
-     * @param string $tbxFile
-     * @param string $userlogin
-     */
     public function __construct(string $testClass, int $index, string $tbxFile, string $userlogin)
     {
         parent::__construct($testClass, $index);
@@ -57,21 +56,19 @@ final class TermCollection extends Resource
 
     /**
      * Adds a term-collection
-     * @param Helper $api
-     * @param Config $config
      * @throws Exception
      * @throws \Zend_Http_Client_Exception
      */
     public function import(Helper $api, Config $config): void
     {
-        if($this->_requested){
+        if ($this->_requested) {
             throw new Exception('You cannot import a TermCollection twice.');
         }
         $api->login($this->_login);
         // [1] Create empty term collection
         $termCollection = $api->postJson('editor/termcollection', [
             'name' => $this->name,
-            'customerIds' => $this->customerIds
+            'customerIds' => $this->customerIds,
         ]);
         $api->getTest()::assertTrue(is_object($termCollection), 'Unable to create a test collection');
         $api->getTest()::assertEquals($this->name, $termCollection->name);
@@ -84,18 +81,15 @@ final class TermCollection extends Resource
             [
                 'collectionId' => $this->collectionId,
                 'customerIds' => $this->customerIds,
-                'mergeTerms' => $this->mergeTerms
-            ]);
+                'mergeTerms' => $this->mergeTerms,
+            ]
+        );
         $this->validateResult($result, $api);
     }
 
-    /**
-     * @param Helper $api
-     * @param Config $config
-     */
     public function cleanup(Helper $api, Config $config): void
     {
-        if($this->_requested){
+        if ($this->_requested) {
             $api->login($this->_login);
             $api->delete('editor/termcollection/' . $this->collectionId);
         }

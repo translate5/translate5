@@ -21,7 +21,7 @@
   @copyright  Marc Mittag, MittagQI - Quality Informatics
   @author     MittagQI - Quality Informatics
   @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
- 			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
  END LICENSE AND COPYRIGHT
  */
@@ -41,12 +41,8 @@ use ZfExtended_Models_User;
 use ZfExtended_Plugin_Exception;
 use ZfExtended_Plugin_Manager;
 
-/**
- *
- */
 abstract class ContentBase
 {
-
     /***
      * @var editor_Models_SegmentFieldManager
      */
@@ -62,9 +58,6 @@ abstract class ContentBase
      */
     protected editor_Models_Segment $segment;
 
-    /**
-     * @var editor_Models_Segment_InternalTag
-     */
     protected editor_Models_Segment_InternalTag $segmentTagger;
 
     /***
@@ -72,48 +65,31 @@ abstract class ContentBase
      */
     protected $diffTagger;
 
-
-    /**
-     * @param editor_Models_Task $task
-     * @param ZfExtended_Models_User $user
-     */
     public function __construct(
-        protected editor_Models_Task     $task,
-        protected array                  $segmentData,
-        protected ZfExtended_Models_User $user)
-    {
+        protected editor_Models_Task $task,
+        protected array $segmentData,
+        protected ZfExtended_Models_User $user
+    ) {
         $this->sfm = ZfExtended_Factory::get('editor_Models_SegmentFieldManager');
         $this->sfm->initFields($this->task->getTaskGuid());
 
         $this->segmentUpdater = ZfExtended_Factory::get(
             editor_Models_Segment_Updater::class,
             [
-                $this->task, $this->user->getUserGuid()
+                $this->task, $this->user->getUserGuid(),
             ]
         );
         $this->segmentTagger = ZfExtended_Factory::get(editor_Models_Segment_InternalTag::class);
         $this->diffTagger = ZfExtended_Factory::get(
             editor_Models_Export_DiffTagger_TrackChanges::class,
             [
-                $this->task, $this->user
+                $this->task, $this->user,
             ]
         );
-
     }
 
-    /**
-     * @param editor_Models_Segment $segment
-     * @param string $segmentSaveTimestamp
-     * @return void
-     */
     abstract public function saveSegment(editor_Models_Segment $segment, string $segmentSaveTimestamp): void;
 
-    /**
-     * @param string $value
-     * @param string $fieldName
-     * @param string $fieldNameEdit
-     * @return void
-     */
     protected function update(string $value, string $fieldName, string $fieldNameEdit): void
     {
         $this->segment->set($fieldName, $value);
@@ -122,35 +98,21 @@ abstract class ContentBase
         $this->segment->updateToSort($fieldNameEdit);
     }
 
-    /**
-     * @param string $source
-     * @return void
-     */
     protected function updateSource(string $source): void
     {
         $this->update($source, $this->sfm->getFirstSourceName(), $this->sfm->getFirstSourceNameEdit());
     }
 
-    /**
-     * @param string $target
-     * @return void
-     */
     protected function updateTarget(string $target): void
     {
         $this->update($target, $this->sfm->getFirstTargetName(), $this->sfm->getFirstTargetNameEdit());
     }
 
-    /**
-     * @return string|null
-     */
     protected function getDataSource(): ?string
     {
         return $this->segmentData[$this->sfm->getFirstSourceName()]['original'] ?? null;
     }
 
-    /**
-     * @return mixed
-     */
     protected function getDataTarget(): mixed
     {
         return $this->segmentData[$this->sfm->getFirstTargetName()]['original'];
@@ -158,14 +120,12 @@ abstract class ContentBase
 
     /**
      * Replace tags with placeholders for easy content compare
-     * @param string $content
-     * @param array $tagMap
-     * @return string
      */
     protected function normalizeContent(string $content, array &$tagMap = []): string
     {
         $normalized = $this->segmentTagger->protect($content);
         $tagMap = $this->segmentTagger->getOriginalTags();
+
         return $normalized;
     }
 
@@ -182,15 +142,14 @@ abstract class ContentBase
     }
 
     /**
-     * @return bool
      * @throws Zend_Exception
      * @throws ZfExtended_Plugin_Exception
      */
     protected function isTrackChangesActive(): bool
     {
         $pluginmanager = Zend_Registry::get('PluginManager');
+
         /* @var ZfExtended_Plugin_Manager $pluginmanager */
         return $pluginmanager->isActive('TrackChanges');
     }
-
 }

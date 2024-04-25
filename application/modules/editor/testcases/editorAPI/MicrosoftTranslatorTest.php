@@ -3,7 +3,7 @@
 START LICENSE AND COPYRIGHT
 
  This file is part of translate5
- 
+
  Copyright (c) 2013 - 2021 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
 
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
@@ -13,11 +13,11 @@ START LICENSE AND COPYRIGHT
  included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
-  
+
  There is a plugin exception available for use with this release of translate5 for
  translate5: Please see http://www.translate5.net/plugin-exception.txt or
  plugin-exception.txt in the root folder of translate5.
-  
+
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
@@ -32,8 +32,8 @@ use MittagQI\Translate5\Test\Import\LanguageResource;
 /**
  * Test microsoft translator api for dictionary,normal and segmentation search
  */
-class MicrosoftTranslatorTest extends editor_Test_ImportTest {
-
+class MicrosoftTranslatorTest extends editor_Test_ImportTest
+{
     protected static LanguageResource $microsoftTranslator;
 
     protected static string $sourceLangRfc = 'de';
@@ -41,12 +41,12 @@ class MicrosoftTranslatorTest extends editor_Test_ImportTest {
     protected static string $targetLangRfc = 'en';
 
     protected static array $requiredPlugins = [
-        'editor_Plugins_InstantTranslate_Init'
+        'editor_Plugins_InstantTranslate_Init',
     ];
 
     protected static array $requiredRuntimeOptions = [
-        'runtimeOptions.LanguageResources.microsoft.apiUrl' => null,//null checks for no concrete value but if not empty
-        'runtimeOptions.LanguageResources.microsoft.apiKey' => null//null checks for no concrete value but if not empty
+        'runtimeOptions.LanguageResources.microsoft.apiUrl' => null, //null checks for no concrete value but if not empty
+        'runtimeOptions.LanguageResources.microsoft.apiKey' => null, //null checks for no concrete value but if not empty
     ];
 
     protected static bool $skipIfOptionsMissing = true; // we skip the tests if the neccessary configs are not there ...
@@ -57,7 +57,7 @@ class MicrosoftTranslatorTest extends editor_Test_ImportTest {
      */
     protected static function setupImport(Config $config): void
     {
-        if (!self::isMasterTest()) {
+        if (! self::isMasterTest()) {
             self::markTestSkipped('Test runs only in master test to reduce usage/costs.');
         } else {
             static::$microsoftTranslator = $config
@@ -75,16 +75,18 @@ class MicrosoftTranslatorTest extends editor_Test_ImportTest {
      * @throws \MittagQI\Translate5\Test\Import\Exception
      * @throws Zend_Http_Client_Exception
      */
-    public function testResource(){
-        $response = static::api()->getJson('editor/languageresourceinstance/'.static::$microsoftTranslator->getId());
-        static::assertEquals('available', $response->status, 'Tm import stoped. Tm state is:'.$response->status);
+    public function testResource()
+    {
+        $response = static::api()->getJson('editor/languageresourceinstance/' . static::$microsoftTranslator->getId());
+        static::assertEquals('available', $response->status, 'Tm import stoped. Tm state is:' . $response->status);
     }
 
     /**
      * @throws Zend_Http_Client_Exception
      * @throws \MittagQI\Translate5\Test\Import\Exception
      */
-    public function testSearch(){
+    public function testSearch()
+    {
         $this->simpleTextTranslation();
     }
 
@@ -92,14 +94,14 @@ class MicrosoftTranslatorTest extends editor_Test_ImportTest {
      * @throws Zend_Http_Client_Exception
      * @throws \MittagQI\Translate5\Test\Import\Exception
      */
-    public function testDictionary(){
+    public function testDictionary()
+    {
         $this->simpleDictionaryTranslation();
     }
 
     /**
      * This will search for single text just to test if the translator returns any translation data. This will not
      * check if the translated data is correct since this can be different from time to time
-     * @return void
      * @throws Zend_Http_Client_Exception
      * @throws \MittagQI\Translate5\Test\Import\Exception
      */
@@ -107,7 +109,7 @@ class MicrosoftTranslatorTest extends editor_Test_ImportTest {
     {
         $filtered = $this->translateRequest('Tür');
 
-        $this->assertNotEmpty($filtered->target,'Empty translation.');
+        $this->assertNotEmpty($filtered->target, 'Empty translation.');
     }
 
     /**
@@ -119,8 +121,8 @@ class MicrosoftTranslatorTest extends editor_Test_ImportTest {
     private function simpleDictionaryTranslation(): void
     {
         $filtered = $this->translateRequest('wagen');
-        $this->assertNotEmpty($filtered->target,'Empty dictionary translation.');
-        $this->assertNotEmpty($filtered->metaData,'Empty dictionary metaData translation.');
+        $this->assertNotEmpty($filtered->target, 'Empty dictionary translation.');
+        $this->assertNotEmpty($filtered->metaData, 'Empty dictionary metaData translation.');
         $this->assertNotEmpty(
             $filtered->metaData->alternativeTranslations,
             'Empty dictionary metaData->alternativeTranslations translation.'
@@ -128,18 +130,16 @@ class MicrosoftTranslatorTest extends editor_Test_ImportTest {
     }
 
     /**
-     * @param string $text
-     * @return stdClass
      * @throws Zend_Http_Client_Exception|\MittagQI\Translate5\Test\Import\Exception
      */
     private function translateRequest(string $text): stdClass
     {
-        $result = static::api()->getJson('editor/instanttranslateapi/translate',[
+        $result = static::api()->getJson('editor/instanttranslateapi/translate', [
             'text' => $text,
             'source' => self::$sourceLangRfc,
-            'target' => self::$targetLangRfc
+            'target' => self::$targetLangRfc,
         ]);
-        $this->assertNotEmpty($result,'No results found for the search request. Search was:'.$text);
+        $this->assertNotEmpty($result, 'No results found for the search request. Search was:' . $text);
 
         //filter only the microsoft results
         return $this->filterResult($result);
@@ -147,7 +147,6 @@ class MicrosoftTranslatorTest extends editor_Test_ImportTest {
 
     /**
      * Filter only the required fields for the test
-     * @param mixed $result
      * @return array|mixed
      * @throws \MittagQI\Translate5\Test\Import\Exception
      */
@@ -156,25 +155,26 @@ class MicrosoftTranslatorTest extends editor_Test_ImportTest {
         //filter only microsoft service results
         $serviceName = static::$microsoftTranslator->getServiceName();
         $resourceName = static::$microsoftTranslator->getName();
-        if(isset($result->{$serviceName})){
+        if (isset($result->{$serviceName})) {
             $result = $result->{$serviceName};
         }
         //for segmentation request only the best matches will be returned
-        if(isset($result->translationForSegmentedText)){
+        if (isset($result->translationForSegmentedText)) {
             return $result;
         }
         //filter out by language resource name
-        if(isset($result->{$resourceName})){
+        if (isset($result->{$resourceName})) {
             $result = $result->{$resourceName};
         }
         $filtered = [];
         //remove the result parametars which should not be tested
         foreach ($result as $r) {
-            if(isset($r->languageResourceid)){
+            if (isset($r->languageResourceid)) {
                 unset($r->languageResourceid);
             }
             $filtered = $r;
         }
+
         return $filtered;
     }
 }

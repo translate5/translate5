@@ -59,8 +59,8 @@ use DOMNode;
 use DOMText;
 use editor_Models_Import_FileParser_XmlParser as XmlParser;
 use editor_Models_Languages;
-use MittagQI\Translate5\ContentProtection\Model\ContentProtectionRepository;
 use MittagQI\Translate5\ContentProtection\Model\ContentProtectionDto;
+use MittagQI\Translate5\ContentProtection\Model\ContentProtectionRepository;
 use MittagQI\Translate5\ContentProtection\NumberProtection\NumberParsingException;
 use MittagQI\Translate5\ContentProtection\NumberProtection\Protector\AbstractProtector;
 use MittagQI\Translate5\ContentProtection\NumberProtection\Protector\DateProtector;
@@ -68,7 +68,6 @@ use MittagQI\Translate5\ContentProtection\NumberProtection\Protector\FloatProtec
 use MittagQI\Translate5\ContentProtection\NumberProtection\Protector\IntegerProtector;
 use MittagQI\Translate5\ContentProtection\NumberProtection\Protector\IPAddressProtector;
 use MittagQI\Translate5\ContentProtection\NumberProtection\Protector\MacAddressProtector;
-use MittagQI\Translate5\ContentProtection\NumberProtection\Protector\NumberProtectorInterface;
 use MittagQI\Translate5\ContentProtection\NumberProtection\Tag\NumberTag;
 use MittagQI\Translate5\Repository\LanguageRepository;
 use Zend_Registry;
@@ -78,6 +77,7 @@ use ZfExtended_Logger;
 class NumberProtector implements ProtectorInterface
 {
     public const TAG_NAME = 'number';
+
     /**
      * @var array<string, AbstractProtector>
      */
@@ -187,9 +187,6 @@ class NumberProtector implements ProtectorInterface
         return [self::TAG_NAME];
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function convertToInternalTags(
         string $segment,
         int &$shortTagIdent,
@@ -197,7 +194,9 @@ class NumberProtector implements ProtectorInterface
         array &$shortcutNumberMap = [],
         array &$xmlChunks = []
     ): string {
-        $xml = ZfExtended_Factory::get(XmlParser::class, [['normalizeTags' => false]]);
+        $xml = ZfExtended_Factory::get(XmlParser::class, [[
+            'normalizeTags' => false,
+        ]]);
         $xml->registerElement(
             self::TAG_NAME,
             null,
@@ -220,8 +219,7 @@ class NumberProtector implements ProtectorInterface
         int &$shortTagIdent,
         bool $collectTagNumbers = false,
         array &$shortcutNumberMap = []
-    ): array
-    {
+    ): array {
         $xmlChunks = [];
         $this->convertToInternalTags($segment, $shortTagIdent, $collectTagNumbers, $shortcutNumberMap, $xmlChunks);
 
@@ -249,7 +247,7 @@ class NumberProtector implements ProtectorInterface
 
         $this->loadXML("<node>$textNode</node>");
 
-        if (!$this->hasEntityToProtect($this->document->textContent)) {
+        if (! $this->hasEntityToProtect($this->document->textContent)) {
             return $textNode;
         }
 
@@ -264,27 +262,34 @@ class NumberProtector implements ProtectorInterface
             // then we'll need to do that in a couple of tries because in current case will get result as:
             // string <number ... source="12" ... /> 145 <number ... source="67" ... /> string
             while ($tries++ < 2) {
-                if (!preg_match_all($protectionDto->regex, $this->document->textContent, $matches)) {
+                if (! preg_match_all($protectionDto->regex, $this->document->textContent, $matches)) {
                     $tries = 0;
 
                     continue 2;
                 }
 
-                if (!$protectionDto->keepAsIs && empty($protectionDto->outputFormat)) {
+                if (! $protectionDto->keepAsIs && empty($protectionDto->outputFormat)) {
                     $this->loadXML(
-                        preg_replace(
+                        preg_replace_callback(
                             $protectionDto->regex,
-                            sprintf('<skip content="$%s"/>', $protectionDto->matchId),
+                            fn (array $matches) => str_replace(
+                                $matches[$protectionDto->matchId],
+                                sprintf('<skip content="%s"/>', $matches[$protectionDto->matchId]),
+                                $matches[0]
+                            ),
                             $this->getCurrentTextNode()
                         )
                     );
 
-                    if (!isset($this->invalidRules[$protectionDto->regex])) {
-                        $this->invalidRules[$protectionDto->regex] = true;
+                    if (! isset($this->invalidRules["{$protectionDto->type}:{$protectionDto->name}"])) {
+                        $this->invalidRules["{$protectionDto->type}:{$protectionDto->name}"] = true;
                         $this->logger->warn(
                             'E1585',
                             'Input rule of type "{type}" and name "{name}" does not have appropriate output rule',
-                            ['type' => $protectionDto->type, 'name' => $protectionDto->name]
+                            [
+                                'type' => $protectionDto->type,
+                                'name' => $protectionDto->name,
+                            ]
                         );
                     }
 
@@ -341,7 +346,7 @@ class NumberProtector implements ProtectorInterface
             $shortTagIdent++;
         }
         //either we get a reusable shortcut number in the map, or we have to increment one
-        elseif (!empty($shortcutNumberMap) && !empty($shortcutNumberMap[$iso])) {
+        elseif (! empty($shortcutNumberMap) && ! empty($shortcutNumberMap[$iso])) {
             $shortTagNumber = array_shift($shortcutNumberMap[$iso]);
         } else {
             $shortTagIdent++;
@@ -352,11 +357,14 @@ class NumberProtector implements ProtectorInterface
         $tagObj->tagNr = $shortTagNumber;
         $tagObj->id = self::TAG_NAME;
         $tagObj->tag = self::TAG_NAME;
-        $tagObj->text = json_encode(['source' => $source, 'target' => $target]);
+        $tagObj->text = json_encode([
+            'source' => $source,
+            'target' => $target,
+        ]);
         $tagObj->iso = $iso;
         $tagObj->source = $source;
         //title: Only translatable with using ExtJS QTips in the frontend, as title attribute not possible
-        $tagObj->renderTag(title:  '&lt;' . $shortTagNumber . '/&gt;: Number', cls: ' ' . self::TAG_NAME);
+        $tagObj->renderTag(title: '&lt;' . $shortTagNumber . '/&gt;: Number', cls: ' ' . self::TAG_NAME);
 
         return $tagObj;
     }
@@ -370,9 +378,19 @@ class NumberProtector implements ProtectorInterface
         preg_match_all(self::fullTagRegex(), $source, $sourceMatches, PREG_SET_ORDER);
         preg_match_all(self::fullTagRegex(), $target, $targetMatches, PREG_SET_ORDER);
 
-        if (!empty($sourceMatches) && empty($targetMatches)) {
-            $source = preg_replace(self::fullTagRegex(), '\3', $source);
+        if (! empty($sourceMatches) && empty($targetMatches)) {
+            $source = $this->unprotect($source, true);
 
+            return;
+        }
+
+        if (empty($sourceMatches) && ! empty($targetMatches)) {
+            $target = $this->unprotect($target, true);
+
+            return;
+        }
+
+        if (empty($sourceMatches) && empty($targetMatches)) {
             return;
         }
 
@@ -467,7 +485,7 @@ class NumberProtector implements ProtectorInterface
         ?editor_Models_Languages $sourceLang,
         ?editor_Models_Languages $targetLang
     ): bool {
-        if (!preg_match_all($langFormat->regex, $text->textContent, $matches)) {
+        if (! preg_match_all($langFormat->regex, $text->textContent, $matches)) {
             return false;
         }
 
@@ -485,7 +503,7 @@ class NumberProtector implements ProtectorInterface
                 $parentNode->insertBefore(new DOMText($parts[$i]), $text);
             }
 
-            if (!isset($numbers[$i])) {
+            if (! isset($numbers[$i])) {
                 continue;
             }
 
@@ -504,7 +522,7 @@ class NumberProtector implements ProtectorInterface
         ?editor_Models_Languages $sourceLang,
         ?editor_Models_Languages $targetLang
     ): iterable {
-        if (!isset($this->protectedNumbers[$number])) {
+        if (! isset($this->protectedNumbers[$number])) {
             try {
                 $protectedNumber = $this
                     ->protectors[$langFormat->type]
@@ -521,13 +539,13 @@ class NumberProtector implements ProtectorInterface
 
         $parts = explode($number, $wholeMatch);
 
-        if (!empty($parts[0])) {
+        if (! empty($parts[0])) {
             yield $this->document->importNode(new DOMText($parts[0]));
         }
 
         yield $this->document->importNode($this->protectedNumbers[$number]);
 
-        if (!empty($parts[1])) {
+        if (! empty($parts[1])) {
             yield $this->document->importNode(new DOMText($parts[1]));
         }
     }

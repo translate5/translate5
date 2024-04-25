@@ -3,7 +3,7 @@
 START LICENSE AND COPYRIGHT
 
  This file is part of translate5
- 
+
  Copyright (c) 2013 - 2021 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
 
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
@@ -13,15 +13,15 @@ START LICENSE AND COPYRIGHT
  included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
-  
+
  There is a plugin exception available for use with this release of translate5 for
  translate5: Please see http://www.translate5.net/plugin-exception.txt or
  plugin-exception.txt in the root folder of translate5.
-  
+
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
@@ -31,17 +31,14 @@ END LICENSE AND COPYRIGHT
  */
 class editor_Models_File_FilterManager
 {
-    const TYPE_IMPORT = 'import';
-    const TYPE_EXPORT = 'export';
-    
-    /**
-     * @var editor_Models_Task
-     */
+    public const TYPE_IMPORT = 'import';
+
+    public const TYPE_EXPORT = 'export';
+
     protected editor_Models_Task $task;
-    
+
     /**
      * currently loaded filter definitions per fileId
-     * @var array
      */
     protected array $filters;
 
@@ -54,8 +51,6 @@ class editor_Models_File_FilterManager
 
     /**
      * loads all file filters for a given task
-     * @param editor_Models_Task $task
-     * @param editor_Models_Import_Configuration $importConfig
      */
     public function initImport(editor_Models_Task $task, editor_Models_Import_Configuration $importConfig): void
     {
@@ -67,8 +62,6 @@ class editor_Models_File_FilterManager
 
     /**
      * loads all file filters for a given task
-     * @param editor_Models_Task $task
-     * @param string $context
      */
     public function initReImport(editor_Models_Task $task, string $context): void
     {
@@ -78,9 +71,6 @@ class editor_Models_File_FilterManager
 
     /**
      * loads all file filters for a given task
-     * @param editor_Models_Task $task
-     * @param int $workerId
-     * @param string $context
      */
     public function initExport(editor_Models_Task $task, int $workerId, string $context): void
     {
@@ -88,11 +78,9 @@ class editor_Models_File_FilterManager
         $this->config->parentWorkerId = $workerId;
         $this->loadFilters($task, self::TYPE_EXPORT);
     }
-    
+
     /**
      * loads all file filters for a given task
-     * @param editor_Models_Task $task
-     * @param string $type
      */
     protected function loadFilters(editor_Models_Task $task, string $type): void
     {
@@ -109,31 +97,17 @@ class editor_Models_File_FilterManager
 
     /**
      * returns the filename of the affected file (could be changed by the filters due conversion)
-     * @param string $path
-     * @param int $fileId
-     * @return string
      */
     public function applyImportFilters(string $path, int $fileId): string
     {
         return $this->applyFilters(self::TYPE_IMPORT, $path, $fileId);
     }
 
-    /**
-     * @param string $path
-     * @param int $fileId
-     * @return string
-     */
     public function applyExportFilters(string $path, int $fileId): string
     {
         return $this->applyFilters(self::TYPE_EXPORT, $path, $fileId);
     }
 
-    /**
-     * @param $type
-     * @param string $path
-     * @param int $fileId
-     * @return string
-     */
     protected function applyFilters($type, string $path, int $fileId): string
     {
         if (empty($this->filters[$fileId])) {
@@ -151,15 +125,12 @@ class editor_Models_File_FilterManager
                 $path = $filterInstance->applyImportFilter($this->task, $fileId, $path, $filter->parameters);
             }
         }
+
         return $path;
     }
 
     /**
      * Adds the given file filter for the given file
-     * @param string $type
-     * @param string $taskGuid
-     * @param int $fileId
-     * @param string $filterClass
      * @throws Zend_Db_Statement_Exception
      * @throws ZfExtended_Models_Entity_Exceptions_IntegrityConstraint
      * @throws ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey
@@ -178,9 +149,6 @@ class editor_Models_File_FilterManager
 
     /**
      * returns true if the file have at least one filter (or if $type given a for the specific type)
-     * @param int $fileId
-     * @param string|null $type
-     * @return bool
      */
     public function hasFilter(int $fileId, string $type = null): bool
     {
@@ -188,7 +156,7 @@ class editor_Models_File_FilterManager
             self::TYPE_EXPORT,
             self::TYPE_IMPORT,
         ];
-        if (!empty($type)) {
+        if (! empty($type)) {
             $checkTypes = [$type];
         }
         $filter = ZfExtended_Factory::get('editor_Models_File_Filter');
@@ -199,6 +167,7 @@ class editor_Models_File_FilterManager
                 return true;
             }
         }
+
         return false;
     }
 }

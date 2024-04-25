@@ -59,7 +59,7 @@ class RegexPatternValidator extends Zend_Validate_Abstract
     private const INVALID = 'invalid';
 
     protected $_messageTemplates = [
-        self::INVALID   => "Ungültiger Regulärer Ausdruck",
+        self::INVALID => "Ungültiger Regulärer Ausdruck",
     ];
 
     public function isValid($value)

@@ -1,4 +1,5 @@
-<?php 
+<?php
+
 /*
 START LICENSE AND COPYRIGHT
 
@@ -45,7 +46,7 @@ $SCRIPT_IDENTIFIER = '323-TRANSLATE-1405-TermPortal_nulls_for_createdBy_if_unkno
  * define database credential variables
  */
 $argc = count($argv);
-if(empty($this) || empty($argv) || $argc < 5 || $argc > 7) {
+if (empty($this) || empty($argv) || $argc < 5 || $argc > 7) {
     die("please dont call the script direct! Call it by using DBUpdater!\n\n");
 }
 
@@ -66,5 +67,6 @@ $user->db->getAdapter()->query('UPDATE `terms_attributes` SET `createdBy` = NULL
 $user->db->getAdapter()->query('UPDATE `terms_attributes` SET `updatedBy` = NULL WHERE `updatedBy` ' . $notIN);
 
 // Run queries for remaining tables
-foreach (['terms_attributes_history', 'terms_term', 'terms_term_history'] as $table)
+foreach (['terms_attributes_history', 'terms_term', 'terms_term_history'] as $table) {
     $user->db->getAdapter()->query('UPDATE `' . $table . '` SET `updatedBy` = NULL WHERE `updatedBy` ' . $notIN);
+}

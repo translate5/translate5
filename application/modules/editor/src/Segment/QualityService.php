@@ -54,11 +54,8 @@ namespace MittagQI\Translate5\Segment;
 
 use editor_ModelInstances;
 use editor_Models_Db_SegmentQuality;
-use editor_Models_Task;
 use editor_Models_TaskUserAssoc;
-use editor_Segment_Internal_TagComparision;
 use editor_Segment_Quality_Manager;
-use editor_Segment_Tag;
 use Generator;
 use Zend_Db;
 use ZfExtended_Factory;
@@ -67,6 +64,7 @@ class QualityService
 {
     public const ERROR_MASSAGE_PLEASE_SOLVE_ERRORS = 'Bitte lösen Sie alle Fehler der folgenden Kategorie ' .
     'ODER setzen Sie sie auf “falscher Fehler”:<br/>{categories}';
+
     private editor_Segment_Quality_Manager $manager;
 
     public function __construct()
@@ -97,7 +95,6 @@ class QualityService
         ?editor_Models_TaskUserAssoc $tua,
         bool $includeLabels = false
     ): Generator {
-
         $task = editor_ModelInstances::taskByGuid($taskGuid);
         $taskConfig = $task->getConfig();
 
@@ -117,16 +114,20 @@ class QualityService
         $select = $quality->getAdapter()->select();
         $select
             ->from(
-                ['qualities' => $quality->getName()],
+                [
+                    'qualities' => $quality->getName(),
+                ],
                 [
                     'qualities.type',
                     'qualities.category',
                     'count(qualities.id) as total',
-                    'sum(qualities.falsePositive) as falsePositive'
+                    'sum(qualities.falsePositive) as falsePositive',
                 ]
             )
             // we need the editable prop for assigning structural faults of non-editable segments a virtual category
-            ->from(['segments' => 'LEK_segments'], 'segments.editable')
+            ->from([
+                'segments' => 'LEK_segments',
+            ], 'segments.editable')
             ->where('qualities.segmentId = segments.id')
             ->where('qualities.hidden = 0')
             // we want qualities from editable segments, only exception are structural internal tag errors
@@ -145,7 +146,7 @@ class QualityService
                     $step
                 );
 
-                if (!empty($assignedSegments)) {
+                if (! empty($assignedSegments)) {
                     $select->where('segments.segmentNrInTask IN (?)', $assignedSegments);
                 }
             }

@@ -33,7 +33,7 @@ class Pivot
 {
     use ZfExtended_Logger_DebugTrait;
 
-    const MAX_ERROR_PER_CONNECTOR = 2;
+    public const MAX_ERROR_PER_CONNECTOR = 2;
 
     private $connectorErrorCount = [];
 
@@ -76,14 +76,15 @@ class Pivot
      */
     protected string $userName;
 
-    public function __construct(private editor_Models_Task $task)
-    {
+    public function __construct(
+        private editor_Models_Task $task
+    ) {
         $this->initLogger('E1100', 'languageresources.pretranslation', '', 'Pivot pre-translation: ');
-        $this->batchQuery = (boolean) Zend_Registry::get('config')->runtimeOptions->LanguageResources->Pretranslation->enableBatchQuery;
+        $this->batchQuery = (bool) Zend_Registry::get('config')->runtimeOptions->LanguageResources->Pretranslation->enableBatchQuery;
         $this->internalTag = ZfExtended_Factory::get('editor_Models_Segment_InternalTag');
 
         $taskConfig = $this->task->getConfig();
-        $this->usePretranslateMT = (boolean) $taskConfig->runtimeOptions->LanguageResources->Pretranslation->pivot->pretranslateMtDefault;
+        $this->usePretranslateMT = (bool) $taskConfig->runtimeOptions->LanguageResources->Pretranslation->pivot->pretranslateMtDefault;
     }
 
     /***
@@ -101,7 +102,7 @@ class Pivot
         $availableConnectorStatus = [
             editor_Services_Connector_Abstract::STATUS_AVAILABLE,
             //NOT_LOADED must be also considered as AVAILABLE, since OpenTM2 Tms are basically not loaded and therefore we can not decide if they are usable or not
-            editor_Services_Connector_Abstract::STATUS_NOT_LOADED
+            editor_Services_Connector_Abstract::STATUS_NOT_LOADED,
         ];
 
         if (empty($assocs)) {
@@ -112,16 +113,15 @@ class Pivot
         /* @var $manager editor_Services_Manager */
 
         foreach ($assocs as $assoc) {
-
             $languageresource = ZfExtended_Factory::get('editor_Models_LanguageResources_LanguageResource');
             /* @var editor_Models_LanguageResources_LanguageResource $languageresource */
 
             $languageresource->load($assoc['languageResourceId']);
 
-
             $resource = $manager->getResource($languageresource);
 
             $connector = null;
+
             try {
                 $connector = $manager->getConnector($languageresource, $this->task->getSourceLang(), $this->task->getRelaisLang(), $this->task->getConfig());
 
@@ -130,7 +130,7 @@ class Pivot
 
                 //throw a warning if the language resource is not available
                 $status = $connector->getStatus($resource, $languageresource);
-                if (!in_array($status, $availableConnectorStatus)) {
+                if (! in_array($status, $availableConnectorStatus)) {
                     $this->log->warn('E1239', 'Language resource "{name}" has status "{status}" and is not available for pivot pre-translations.', [
                         'task' => $this->task,
                         'name' => $languageresource->getName(),
@@ -138,9 +138,9 @@ class Pivot
                         'moreInfo' => $connector->getLastStatusInfo(),
                         'languageResource' => $languageresource,
                     ]);
+
                     continue;
                 }
-
 
                 // for batch query supported resources, set the content field to relais. Basedo on the content field,
                 // we check if the field is empty. Pretranslation is posible only for empty content fields
@@ -153,7 +153,6 @@ class Pivot
                 //store the languageResource
                 $this->resources[$languageresource->getId()] = $languageresource;
             } catch (Exception $e) {
-
                 //FIXME this try catch should not be needed anymore, after refactoring of December 2020
 
                 $errors = [];
@@ -170,18 +169,21 @@ class Pivot
                 $this->log->exception($e, [
                     'level' => $this->log::LEVEL_WARN,
                     'domain' => $this->log->getDomain(),
-                    'extra' => ['task' => $this->task],
+                    'extra' => [
+                        'task' => $this->task,
+                    ],
                 ]);
+
                 continue;
             }
 
             $this->connectors[$assoc['languageResourceId']] = $connector;
         }
+
         return $this->connectors;
     }
 
     /**
-     *
      * @param Closure|null $progressCallback : call to update the workerModel progress. It expects progress as argument (progress = 100 / task segment count)
      * @return boolean
      * @throws \ZfExtended_Models_Entity_NotFoundException|\editor_Models_ConfigException
@@ -209,10 +211,10 @@ class Pivot
             $progress = $segmentCounter / $this->task->getSegmentCount();
 
             // ignore the segments with relais content
-            if(!empty($segment->get('relais'))){
+            if (! empty($segment->get('relais'))) {
                 //report progress update
-                if(null !== $progressCallback){
-                    call_user_func($progressCallback,[$progress]);
+                if (null !== $progressCallback) {
+                    call_user_func($progressCallback, [$progress]);
                 }
 
                 continue;
@@ -225,7 +227,6 @@ class Pivot
 
             $mtUsed = $this->usePretranslateMT && $useMt;
             if ($mtUsed) {
-
                 // when mt is used, the request to the resource is not done before, we do it now
                 $bestMatchRateResult = $this->getMtResult($segment);
 
@@ -235,18 +236,18 @@ class Pivot
                 }
             }
             //if no mt is used but the matchrate is lower than the pretranslateMatchrate (match lower than pretranslateMatchrate comming from the TM)
-            if (!$mtUsed && !empty($bestMatchRateResult) && $bestMatchRateResult->matchrate < $this->pretranslateMatchrate) {
+            if (! $mtUsed && ! empty($bestMatchRateResult) && $bestMatchRateResult->matchrate < $this->pretranslateMatchrate) {
                 $bestMatchRateResult = null;
             }
 
             //if best matchrate results are found
-            if (!empty($bestMatchRateResult)) {
+            if (! empty($bestMatchRateResult)) {
                 $this->updateSegment($segment, $bestMatchRateResult);
             }
 
             //report progress update
-            if(null !== $progressCallback){
-                call_user_func($progressCallback,[$progress]);
+            if (null !== $progressCallback) {
+                call_user_func($progressCallback, [$progress]);
             }
         }
 
@@ -267,9 +268,6 @@ class Pivot
     /**
      * Get best result (best matchrate) for the segment. If $saveAnalysis is provided, for each best match rate for the tm,
      * one analysis will be saved
-     *
-     * @param editor_Models_Segment $segment
-     * @return NULL|stdClass
      */
     protected function getBestResult(editor_Models_Segment $segment): ?stdClass
     {
@@ -318,7 +316,7 @@ class Pivot
                 if ($match->languageResourceType == editor_Models_Segment_MatchRateType::TYPE_TERM_COLLECTION) {
                     // - preferred terms > permitted terms
                     // - if multiple permitted terms: take the first
-                    if (!is_null($bestMatchRateResult) && $bestMatchRateResult->languageResourceType == editor_Models_Segment_MatchRateType::TYPE_TERM_COLLECTION) {
+                    if (! is_null($bestMatchRateResult) && $bestMatchRateResult->languageResourceType == editor_Models_Segment_MatchRateType::TYPE_TERM_COLLECTION) {
                         $bestMatchMetaData = $bestMatchRateResult->metaData;
                         $bestMatchIsPreferredTerm = editor_Models_Terminology_Models_TermModel::isPreferredTerm($bestMatchMetaData['status']);
                         if ($bestMatchIsPreferredTerm) {
@@ -329,14 +327,14 @@ class Pivot
                     $metaData = $match->metaData;
                     $matchIsPreferredTerm = editor_Models_Terminology_Models_TermModel::isPreferredTerm($metaData['status']);
                     $matchIsPermittedTerm = editor_Models_Terminology_Models_TermModel::isPermittedTerm($metaData['status']);
-                    if (!$matchIsPreferredTerm && !$matchIsPermittedTerm) {
+                    if (! $matchIsPreferredTerm && ! $matchIsPermittedTerm) {
                         continue;
                     }
                 }
 
                 $matchRateInternal = $match;
                 //store best match rate results(do not compare agains the mt results)
-                if ($matchRateInternal->matchrate > $bestMatchRate && !$isMtResource) {
+                if ($matchRateInternal->matchrate > $bestMatchRate && ! $isMtResource) {
                     $bestMatchRateResult = $match;
                     $bestMatchRateResult->internalLanguageResourceId = $languageResourceid;
                 }
@@ -345,6 +343,7 @@ class Pivot
             //no match rate is found in the languageResource result
             if ($matchRateInternal->matchrate == null) {
                 $matches->resetResult();
+
                 continue;
             }
 
@@ -361,13 +360,7 @@ class Pivot
         return $bestMatchRateResult;
     }
 
-    /**
-     * @param editor_Services_Connector $connector
-     * @param editor_Models_Segment $segment
-     * @param bool $isMtResource
-     * @return editor_Services_ServiceResult
-     */
-    protected function getMatches(editor_Services_Connector $connector, editor_Models_Segment $segment,bool $isMtResource): editor_Services_ServiceResult
+    protected function getMatches(editor_Services_Connector $connector, editor_Models_Segment $segment, bool $isMtResource): editor_Services_ServiceResult
     {
         if ($isMtResource === false) {
             // if the current resource type is not MT, query the tm or termcollection
@@ -384,14 +377,14 @@ class Pivot
         /* @var $internalTag editor_Models_Segment_InternalTag */
         $queryString = $internalTag->toXliffPaired($queryString, true);
         $matches = ZfExtended_Factory::get('editor_Services_ServiceResult', [
-            $queryString
+            $queryString,
         ]);
         /* @var $dummyResult editor_Services_ServiceResult */
         $matches->setLanguageResource($connector->getLanguageResource());
         $matches->addResult('', $connector->getDefaultMatchRate());
+
         return $matches;
     }
-
 
     /***
      * Query the segment using the Mt engines assigned to the task.
@@ -399,8 +392,9 @@ class Pivot
      * @param editor_Models_Segment $segment
      * @return NULL|[stdClass]
      */
-    protected function getMtResult(editor_Models_Segment $segment){
-        if(empty($this->mtConnectors)){
+    protected function getMtResult(editor_Models_Segment $segment)
+    {
+        if (empty($this->mtConnectors)) {
             return null;
         }
         //INFO: use the first connector, since no mt engine priority exist
@@ -408,19 +402,21 @@ class Pivot
         /* @var $connector editor_Services_Connector */
 
         //if the current connector supports batch query, enable the batch query for this connector
-        if($connector->isBatchQuery() && $this->batchQuery){
+        if ($connector->isBatchQuery() && $this->batchQuery) {
             $connector->enableBatch();
         }
 
         $connector->resetResultList();
         $matches = $connector->query($segment);
-        $matchResults=$matches->getResult();
-        if(!empty($matchResults)){
-            $result=$matchResults[0];
-            $result->internalLanguageResourceId=$connector->getLanguageResource()->getId();
+        $matchResults = $matches->getResult();
+        if (! empty($matchResults)) {
+            $result = $matchResults[0];
+            $result->internalLanguageResourceId = $connector->getLanguageResource()->getId();
             $result->isMT = true;
+
             return $result;
         }
+
         return null;
     }
 
@@ -437,60 +433,57 @@ class Pivot
      */
     protected function updateSegment(editor_Models_Segment $segment, stdClass $result): void
     {
-
         //if the segment target is not empty or best match rate is not found do not pretranslate
         //pretranslation only for editable segments
-        if($segment->meta()->getLocked() || !empty($segment->get('relais'))){
+        if ($segment->meta()->getLocked() || ! empty($segment->get('relais'))) {
             return;
         }
 
         //the internalLanguageResourceId is set when the segment bestmatchrate is found(see analysis getbestmatchrate function)
-        $languageResourceid=$result->internalLanguageResourceId;
+        $languageResourceid = $result->internalLanguageResourceId;
 
         $history = $segment->getNewHistoryEntity();
 
-        $relaisResult=$result->target;
+        $relaisResult = $result->target;
 
         //set the type
         $languageResource = $this->resources[$languageResourceid];
         /* @var $languageResource editor_Models_LanguageResources_LanguageResource */
 
         $hasText = $this->internalTag->hasText($segment->getSource());
-        if($hasText) {
+        if ($hasText) {
             //if the result language resource is termcollection, set the target result first character to uppercase
-            if($this->isTermCollection($languageResourceid)){
-                $relaisResult=ZfExtended_Utils::mb_ucfirst($relaisResult);
+            if ($this->isTermCollection($languageResourceid)) {
+                $relaisResult = ZfExtended_Utils::mb_ucfirst($relaisResult);
             }
             $relaisResult = $this->internalTag->removeIgnoredTags($relaisResult);
-        }
-        else {
+        } else {
             //if the source contains no text but tags only, we set the target to the source directly
             // and the segment is not editable
             $relaisResult = $segment->getSource();
         }
         //check if the result is valid for log
-        if($this->isResourceLogValid($languageResource, $segment->getMatchRate())){
+        if ($this->isResourceLogValid($languageResource, $segment->getMatchRate())) {
             $this->connectors[$languageResourceid]->logAdapterUsage($segment, false);
         }
 
-        $segment->set('relais',$relaisResult); //use sfm->getFirstTargetName here
+        $segment->set('relais', $relaisResult); //use sfm->getFirstTargetName here
 
         $segment->updateToSort('relais');
 
-        $segment->setUserGuid($this->userGuid);//to the authenticated userGuid
-        $segment->setUserName($this->userName);//to the authenticated userName
+        $segment->setUserGuid($this->userGuid); //to the authenticated userGuid
+        $segment->setUserName($this->userName); //to the authenticated userName
 
-
-        if($this->task->getWorkflowStep() == 1){
+        if ($this->task->getWorkflowStep() == 1) {
             $hasher = ZfExtended_Factory::get('editor_Models_Segment_RepetitionHash', [$this->task]);
             /* @var $hasher editor_Models_Segment_RepetitionHash */
             //calculate and set segment hash
-            $segmentHash = $hasher->rehashRelais($segment,$relaisResult);
+            $segmentHash = $hasher->rehashRelais($segment, $relaisResult);
             $segment->setRelaisMd5($segmentHash);
         }
 
-        $duration=new stdClass();
-        $duration->relais=0;
+        $duration = new stdClass();
+        $duration->relais = 0;
         $segment->setTimeTrackData($duration);
 
         $history->save();
@@ -498,22 +491,20 @@ class Pivot
         $segment->save();
     }
 
-
     /**
      * Checks how many errors the connector has produced. If too much, disable it.
      *
-     * @param editor_Services_Connector $connector
      * @param integer $id
      * @return boolean
      */
-    protected function isDisabledDueErrors(editor_Services_Connector $connector,int $id): bool
+    protected function isDisabledDueErrors(editor_Services_Connector $connector, int $id): bool
     {
         //check if the connector itself is disabled
         if ($this->connectors[$id]->isDisabled()) {
             return true;
         }
 
-        if (!isset($this->connectorErrorCount[$id]) || $this->connectorErrorCount[$id] <= self::MAX_ERROR_PER_CONNECTOR) {
+        if (! isset($this->connectorErrorCount[$id]) || $this->connectorErrorCount[$id] <= self::MAX_ERROR_PER_CONNECTOR) {
             return false;
         }
 
@@ -525,25 +516,25 @@ class Pivot
             'service' => $langRes->getServiceName(),
         ]);
         $this->connectors[$id]->disable();
+
         return true;
     }
 
     /**
      * Log and count the connection error
-     * @param Exception $e
-     * @param int $id
      */
     protected function handleConnectionError(Exception $e, int $id): void
     {
         $this->log->exception($e, [
             'level' => $this->log::LEVEL_WARN,
             'domain' => $this->log->getDomain(),
-            'extra' => ['task' => $this->task],
+            'extra' => [
+                'task' => $this->task,
+            ],
         ]);
         settype($this->connectorErrorCount[$id], 'integer');
         $this->connectorErrorCount[$id]++;
     }
-
 
     /***
      * Check if the given language resource id is a valid termcollection resource
@@ -552,9 +543,10 @@ class Pivot
      */
     protected function isTermCollection(int $languageResourceId): bool
     {
-        if(!isset($this->resources[$languageResourceId])){
+        if (! isset($this->resources[$languageResourceId])) {
             return false;
         }
+
         return $this->resources[$languageResourceId]->isTc();
     }
 
@@ -568,7 +560,7 @@ class Pivot
     protected function isResourceLogValid(editor_Models_LanguageResources_LanguageResource $languageResource, int $matchRate): bool
     {
         //check if it is tm or tc, an if the matchrate is >= 100
-        return ($languageResource->isTm() || $languageResource->isTc()) && $matchRate>=editor_Services_Connector_FilebasedAbstract::EXACT_MATCH_VALUE;
+        return ($languageResource->isTm() || $languageResource->isTc()) && $matchRate >= editor_Services_Connector_FilebasedAbstract::EXACT_MATCH_VALUE;
     }
 
     /***
@@ -579,33 +571,21 @@ class Pivot
         $this->connectors = [];
     }
 
-    /**
-     * @return string
-     */
     public function getUserGuid(): string
     {
         return $this->userGuid;
     }
 
-    /**
-     * @param string $userGuid
-     */
     public function setUserGuid(string $userGuid): void
     {
         $this->userGuid = $userGuid;
     }
 
-    /**
-     * @return string
-     */
     public function getUserName(): string
     {
         return $this->userName;
     }
 
-    /**
-     * @param string $userName
-     */
     public function setUserName(string $userName): void
     {
         $this->userName = $userName;

@@ -40,11 +40,11 @@ final class Operation
         'taskPackageExport',
         'taskPackageReimport',
         'languageResourceImport',
-        'UNKNOWN'
+        'UNKNOWN',
     ];
+
     /**
      * Finds the operations the worker supports or 'UNKNOWN'
-     * @param string $worker
      * @return string[]
      */
     public static function detectOperations(string $worker): array
@@ -54,19 +54,16 @@ final class Operation
 
     /**
      * Checks, if the given worker can be part of the passed operation(s)
-     * @param string $worker
-     * @param array $operations
-     * @return bool
      */
     public static function workerValidForOperation(string $worker, array $operations): bool
     {
-        if(in_array('UNKNOWN', $operations)){
+        if (in_array('UNKNOWN', $operations)) {
             return true;
         }
 
         $workerOperations = self::findOperation($worker);
 
-        if(in_array('UNKNOWN', $workerOperations)){
+        if (in_array('UNKNOWN', $workerOperations)) {
             return true;
         }
 
@@ -77,15 +74,17 @@ final class Operation
 
     public static function calculateWeight(array $operations): int
     {
-        foreach(self::OPERATIONS as $index => $operation){
-            if($operations[0] === $operation){
+        foreach (self::OPERATIONS as $index => $operation) {
+            if ($operations[0] === $operation) {
                 // deduce a bit to ensure, combined operations succeed singular ones
-                if(count($operations) > 1){
+                if (count($operations) > 1) {
                     return 2 * $index;
                 }
+
                 return 2 * $index - 1;
             }
         }
+
         return 0;
     }
 
@@ -93,35 +92,35 @@ final class Operation
     {
         return match ($worker) {
             'editor_Models_Import_Worker_FileTree',
-                'editor_Models_Import_Worker_ReferenceFileTree',
-                'editor_Models_Import_Worker_FinalStep',
-                'editor_Plugins_VisualReview_HtmlImportWorker',
-                'editor_Plugins_VisualReview_PdfToHtmlWorker',
-                'editor_Plugins_VisualReview_WgetHtmlWorker',
-                'editor_Plugins_VisualReview_ImageOcrWorker',
-                'editor_Plugins_VisualReview_VideoHtmlWorker',
-                'editor_Plugins_VisualReview_XmlHtmlWorker',
-                'editor_Plugins_VisualReview_XmlXsltToHtmlWorker',
-                'editor_Plugins_VisualReview_SegmentationWorker',
-                'editor_Plugins_VisualReview_ImageHtmlWorker' => ['taskImport'],
+            'editor_Models_Import_Worker_ReferenceFileTree',
+            'editor_Models_Import_Worker_FinalStep',
+            'editor_Plugins_VisualReview_HtmlImportWorker',
+            'editor_Plugins_VisualReview_PdfToHtmlWorker',
+            'editor_Plugins_VisualReview_WgetHtmlWorker',
+            'editor_Plugins_VisualReview_ImageOcrWorker',
+            'editor_Plugins_VisualReview_VideoHtmlWorker',
+            'editor_Plugins_VisualReview_XmlHtmlWorker',
+            'editor_Plugins_VisualReview_XmlXsltToHtmlWorker',
+            'editor_Plugins_VisualReview_SegmentationWorker',
+            'editor_Plugins_VisualReview_ImageHtmlWorker' => ['taskImport'],
             'editor_Models_Export_Worker' => ['taskExport'],
             'MittagQI\Translate5\Task\Export\Package\Worker' => ['taskPackageExport'],
             'MittagQI\Translate5\Task\Reimport\Worker' => ['taskPackageReimport'],
             'editor_Models_Export_ExportedWorker',
-                'editor_Models_Export_Exported_FiletranslationWorker',
-                'editor_Models_Export_Exported_TransferWorker',
-                'editor_Models_Export_Exported_ZipDefaultWorker',
-                'MittagQI\Translate5\Task\Export\Exported\PackageWorker' => ['taskExport', 'taskPackageExport'],
+            'editor_Models_Export_Exported_FiletranslationWorker',
+            'editor_Models_Export_Exported_TransferWorker',
+            'editor_Models_Export_Exported_ZipDefaultWorker',
+            'MittagQI\Translate5\Task\Export\Exported\PackageWorker' => ['taskExport', 'taskPackageExport'],
             'editor_Task_Operation_StartingWorker',
-                'editor_Task_Operation_FinishingWorker' => ['taskOperation'],
+            'editor_Task_Operation_FinishingWorker' => ['taskOperation'],
             'MittagQI\Translate5\Plugins\MatchAnalysis\PauseMatchAnalysisWorker',
-                'MittagQI\Translate5\LanguageResource\Pretranslation\PausePivotWorker',
-                'MittagQI\Translate5\LanguageResource\Pretranslation\BatchCleanupWorker',
-                'editor_Segment_Quality_OperationWorker',
-                'editor_Segment_Quality_OperationFinishingWorker',
-                'editor_Plugins_MatchAnalysis_Worker',
-                'editor_Plugins_ModelFront_Worker',
-                'editor_Plugins_MatchAnalysis_BatchWorker' => ['taskImport', 'taskOperation'],
+            'MittagQI\Translate5\LanguageResource\Pretranslation\PausePivotWorker',
+            'MittagQI\Translate5\LanguageResource\Pretranslation\BatchCleanupWorker',
+            'editor_Segment_Quality_OperationWorker',
+            'editor_Segment_Quality_OperationFinishingWorker',
+            'editor_Plugins_MatchAnalysis_Worker',
+            'editor_Plugins_ModelFront_Worker',
+            'editor_Plugins_MatchAnalysis_BatchWorker' => ['taskImport', 'taskOperation'],
             'editor_Services_ImportWorker' => ['languageResourceImport'],
             default => ['UNKNOWN'],
         };

@@ -21,7 +21,7 @@ START LICENSE AND COPYRIGHT
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
@@ -31,8 +31,8 @@ use MittagQI\Translate5\Test\Api\Helper;
 /***
  * Application token authentication
  */
-class Translate3108Test extends editor_Test_ImportTest {
-
+class Translate3108Test extends editor_Test_ImportTest
+{
     private static ?ZfExtended_Auth_Token_Entity $authTokenEntity = null;
 
     private static string $appToken;
@@ -53,7 +53,7 @@ class Translate3108Test extends editor_Test_ImportTest {
 
         static::api()->getJson('editor/task/');
         $response = static::api()->getLastResponse();
-        self::assertContains($response->getStatus(),[200],'Error on authentication with app token');
+        self::assertContains($response->getStatus(), [200], 'Error on authentication with app token');
         // the access-control header should be present ... why is camel-case name changed by the server ?
         self::assertStringContainsString('access-control-allow-origin: *', strtolower($response->getHeadersAsString()));
     }
@@ -68,7 +68,7 @@ class Translate3108Test extends editor_Test_ImportTest {
 
         static::api()->getJson('editor/task/', expectedToFail: true);
         $response = static::api()->getLastResponse();
-        self::assertNotContains($response->getStatus(), [200],'Something is wrong, authentication with invalid app-token is possible!');
+        self::assertNotContains($response->getStatus(), [200], 'Something is wrong, authentication with invalid app-token is possible!');
     }
 
     public function testTokenImport()

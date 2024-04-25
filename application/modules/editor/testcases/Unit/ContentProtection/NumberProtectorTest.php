@@ -53,8 +53,8 @@ declare(strict_types=1);
 namespace MittagQI\Translate5\Test\Unit\ContentProtection;
 
 use editor_Models_Languages;
-use MittagQI\Translate5\ContentProtection\Model\ContentProtectionRepository;
 use MittagQI\Translate5\ContentProtection\Model\ContentProtectionDto;
+use MittagQI\Translate5\ContentProtection\Model\ContentProtectionRepository;
 use MittagQI\Translate5\ContentProtection\NumberProtection\Protector\IPAddressProtector;
 use MittagQI\Translate5\ContentProtection\NumberProtection\Protector\NumberProtectorInterface;
 use MittagQI\Translate5\ContentProtection\NumberProtection\Tag\NumberTag;
@@ -123,7 +123,7 @@ class NumberProtectorTest extends TestCase
 
     public function testHasEntityToProtect(): void
     {
-        $processor = new class implements NumberProtectorInterface {
+        $processor = new class() implements NumberProtectorInterface {
             public static function getType(): string
             {
                 return 'test';
@@ -170,10 +170,12 @@ class NumberProtectorTest extends TestCase
         $numberRepository = $this->createConfiguredMock(
             ContentProtectionRepository::class,
             [
-                'getAllForSource' => $getAllForSource()
+                'getAllForSource' => $getAllForSource(),
             ]
         );
-        $languageRepository = $this->createConfiguredMock(LanguageRepository::class, ['find' => $sourceLang]);
+        $languageRepository = $this->createConfiguredMock(LanguageRepository::class, [
+            'find' => $sourceLang,
+        ]);
         $logger = $this->createConfiguredMock(ZfExtended_Logger::class, []);
 
         $protector = new NumberProtector(
@@ -210,10 +212,12 @@ class NumberProtectorTest extends TestCase
         $numberRepository = $this->createConfiguredMock(
             ContentProtectionRepository::class,
             [
-                'getAllForSource' => $getAllForSource()
+                'getAllForSource' => $getAllForSource(),
             ]
         );
-        $languageRepository = $this->createConfiguredMock(LanguageRepository::class, ['find' => $sourceLang]);
+        $languageRepository = $this->createConfiguredMock(LanguageRepository::class, [
+            'find' => $sourceLang,
+        ]);
         $logger = $this->createConfiguredMock(ZfExtended_Logger::class, []);
         $logger->expects($this->once())->method('__call')->with('warn');
 

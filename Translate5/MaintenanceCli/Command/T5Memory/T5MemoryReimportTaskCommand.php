@@ -29,8 +29,8 @@ declare(strict_types=1);
 
 namespace Translate5\MaintenanceCli\Command\T5Memory;
 
-use editor_Models_Task as Task;
 use editor_Models_LanguageResources_LanguageResource as LanguageResource;
+use editor_Models_Task as Task;
 use editor_Services_OpenTM2_Service as Service;
 use MittagQI\Translate5\LanguageResource\ReimportSegments;
 use Symfony\Component\Console\Input\InputInterface;
@@ -43,8 +43,10 @@ use ZfExtended_Factory as Factory;
 class T5MemoryReimportTaskCommand extends Translate5AbstractCommand
 {
     private const OPTION_USE_SEGMENT_TIMESTAMP = 'use-segment-timestamp';
-    private const OPTION_SOURCE_LANGUAGE  = 'source-language';
-    private const OPTION_TARGET_LANGUAGE  = 'target-language';
+
+    private const OPTION_SOURCE_LANGUAGE = 'source-language';
+
+    private const OPTION_TARGET_LANGUAGE = 'target-language';
 
     protected function configure(): void
     {
@@ -165,6 +167,7 @@ class T5MemoryReimportTaskCommand extends Translate5AbstractCommand
             ['task', 'language resource'],
             'task'
         );
+
         return $this->io->askQuestion($question);
     }
 
@@ -202,14 +205,20 @@ class T5MemoryReimportTaskCommand extends Translate5AbstractCommand
         /** @var \Zend_Db_Table $db */
         $db = \Zend_Registry::get('db');
         $query = $db->select()
-            ->from(['task' => 'LEK_task'], 'task.id as taskId')
+            ->from([
+                'task' => 'LEK_task',
+            ], 'task.id as taskId')
             ->joinLeft(
-                ['lrt' => 'LEK_languageresources_taskassoc'],
+                [
+                    'lrt' => 'LEK_languageresources_taskassoc',
+                ],
                 'lrt.taskGuid = task.taskGuid',
                 'lrt.id as assocId'
             )
             ->joinLeft(
-                ['lr' => 'LEK_languageresources'],
+                [
+                    'lr' => 'LEK_languageresources',
+                ],
                 'lrt.languageResourceId = lr.id',
                 'lr.id as languageResourceId'
             )
@@ -228,10 +237,12 @@ class T5MemoryReimportTaskCommand extends Translate5AbstractCommand
             $targetLanguageCode = $this->input->getOption(self::OPTION_TARGET_LANGUAGE);
 
             $query->joinLeft(
-                    ['l' => 'LEK_languageresources_languages'],
-                    'lr.id = l.languageResourceId',
-                    ['sourceLangCode', 'targetLangCode']
-                )
+                [
+                    'l' => 'LEK_languageresources_languages',
+                ],
+                'lr.id = l.languageResourceId',
+                ['sourceLangCode', 'targetLangCode']
+            )
                 ->where('l.sourceLangCode = ?', $sourceLanguageCode)
                 ->where('l.targetLangCode = ?', $targetLanguageCode);
         }
@@ -249,14 +260,20 @@ class T5MemoryReimportTaskCommand extends Translate5AbstractCommand
         /** @var \Zend_Db_Table $db */
         $db = \Zend_Registry::get('db');
         $query = $db->select()
-            ->from(['task' => 'LEK_task'], ['task.id as taskId', 'task.taskName'])
+            ->from([
+                'task' => 'LEK_task',
+            ], ['task.id as taskId', 'task.taskName'])
             ->joinLeft(
-                ['lrt' => 'LEK_languageresources_taskassoc'],
+                [
+                    'lrt' => 'LEK_languageresources_taskassoc',
+                ],
                 'lrt.taskGuid = task.taskGuid',
                 'lrt.id as assocId'
             )
             ->joinLeft(
-                ['lr' => 'LEK_languageresources'],
+                [
+                    'lr' => 'LEK_languageresources',
+                ],
                 'lrt.languageResourceId = lr.id',
                 'lr.id as languageResourceId'
             )
@@ -268,7 +285,9 @@ class T5MemoryReimportTaskCommand extends Translate5AbstractCommand
             $targetLanguageCode = $this->input->getOption(self::OPTION_TARGET_LANGUAGE);
 
             $query->joinLeft(
-                ['l' => 'LEK_languageresources_languages'],
+                [
+                    'l' => 'LEK_languageresources_languages',
+                ],
                 'lr.id = l.languageResourceId',
                 ['sourceLangCode', 'targetLangCode']
             )
@@ -290,11 +309,15 @@ class T5MemoryReimportTaskCommand extends Translate5AbstractCommand
         $db = \Zend_Registry::get('db');
         $query = $db->select()
             ->from(
-                ['lr' => 'LEK_languageresources'],
+                [
+                    'lr' => 'LEK_languageresources',
+                ],
                 ['lr.id as languageResourceId', 'lr.name as languageResourceName']
             )
             ->joinLeft(
-                ['l' => 'LEK_languageresources_languages'],
+                [
+                    'l' => 'LEK_languageresources_languages',
+                ],
                 'lr.id = l.languageResourceId',
                 ['sourceLangCode', 'targetLangCode']
             )

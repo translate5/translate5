@@ -21,7 +21,7 @@ START LICENSE AND COPYRIGHT
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
@@ -34,12 +34,8 @@ use editor_Models_Segment;
 use ZfExtended_Factory;
 use ZfExtended_Models_Entity_NotFoundException;
 
-/**
- *
- */
 class Source extends AlignmentAbstract
 {
-
     public int $segmentNrInTask = 0;
 
     private editor_Models_Import_SegmentProcessor_RelaisSourceCompare $sourceCompare;
@@ -52,13 +48,8 @@ class Source extends AlignmentAbstract
         );
     }
 
-    /**
-     * @param editor_Models_Import_FileParser $parser
-     * @return editor_Models_Segment|null
-     */
     public function findSegment(editor_Models_Import_FileParser $parser): ?editor_Models_Segment
     {
-
         $data = $parser->getFieldContents();
         $source = $parser->getSegmentFieldManager()->getFirstSourceName();
         $mid = $parser->getMid();
@@ -68,14 +59,14 @@ class Source extends AlignmentAbstract
         $this->segmentNrInTask++;
 
         $this->initSegment($taskGuid);
+
         try {
             //try loading via fileId and Mid
             $this->getSegment()->loadByFileidMid($parser->getFileId(), $mid);
-
         } catch (ZfExtended_Models_Entity_NotFoundException $e) {
             //if above was not successful, load via segmentNrInTask (the mid is only for logging!)
             $loadBySegmentNr = $this->loadSegmentByNrInTask($parser->getMid(), $taskGuid);
-            if (!$loadBySegmentNr) {
+            if (! $loadBySegmentNr) {
                 //if no segment was found via segmentNr, we ignore it
                 return null;
             }
@@ -86,9 +77,9 @@ class Source extends AlignmentAbstract
         );
 
         //if content is not equal, but was loaded with mid, try to load with segment nr and compare again
-        if (!$contentIsEqual && !$loadBySegmentNr) {
+        if (! $contentIsEqual && ! $loadBySegmentNr) {
             //load via segmentNrInTask (the mid is only for logging!)
-            if (!$this->loadSegmentByNrInTask($mid, $taskGuid)) {
+            if (! $this->loadSegmentByNrInTask($mid, $taskGuid)) {
                 return null;
             }
             $contentIsEqual = $this->sourceCompare->isEqual(
@@ -98,7 +89,7 @@ class Source extends AlignmentAbstract
         }
 
         //if source and relais content is finally not equal, we log that and ignore the segment
-        if (!$contentIsEqual) {
+        if (! $contentIsEqual) {
             $extra = 'mid: ' . $parser->getMid() .
                 ' / Source content of processing file: ' .
                 $this->getSegment()->getFieldOriginal($source) .
@@ -118,14 +109,12 @@ class Source extends AlignmentAbstract
     /**
      * Tries to load the segment to current relais content via segmentNrInTask
      * returns true if found a segment, false if not. If false this is logged.
-     * @param string $mid
-     * @param string $taskGuid
-     * @return bool
      */
     protected function loadSegmentByNrInTask(string $mid, string $taskGuid): bool
     {
         try {
             $this->getSegment()->loadBySegmentNrInTask($this->segmentNrInTask, $taskGuid);
+
             return true;
         } catch (ZfExtended_Models_Entity_NotFoundException $e) {
             $this->addError(new Error(
@@ -134,8 +123,8 @@ class Source extends AlignmentAbstract
              could not be found in the original file, the segment(s) was/were ignored.﻿ See Details.',
                 [$mid]
             ));
+
             return false;
         }
     }
-
 }

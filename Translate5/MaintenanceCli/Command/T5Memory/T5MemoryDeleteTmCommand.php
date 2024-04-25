@@ -47,6 +47,7 @@ class T5MemoryDeleteTmCommand extends Translate5AbstractCommand
     protected static $defaultName = 't5memory:delete|memory:delete';
 
     private const OPTION_TM_NAME = 'tmName';
+
     private const ARGUMENT_UUID = 'uuid';
 
     protected function configure(): void
@@ -104,7 +105,7 @@ class T5MemoryDeleteTmCommand extends Translate5AbstractCommand
             $remover->remove(forced: true, deleteInResource: true);
 
             return true;
-        } catch(\ZfExtended_Models_Entity_Exceptions_IntegrityConstraint $e) {
+        } catch (\ZfExtended_Models_Entity_Exceptions_IntegrityConstraint $e) {
             $this->io->error('Fail to delete language resource: ' . $e->getMessage());
 
             return false;

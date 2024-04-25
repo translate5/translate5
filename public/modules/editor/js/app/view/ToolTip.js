@@ -155,15 +155,17 @@ Ext.define('Editor.view.ToolTip', {
             result = dom ? dom.getAttribute('title').split('<').join('&lt;') + (result ? '<br>'+result : '') : null;
         }
 
-        if(result){
-            result = result.replaceAll('<br>', ' ');
-
-            if (appendText) {
-                result += '<br><br>' + appendText;
-            }
-
-            tip.update(result);
+        if (!result) {
+            return false;
         }
+
+        result = result.replaceAll('<br>', ' ');
+
+        if (appendText) {
+            result += '<br><br>' + appendText;
+        }
+
+        tip.update(result);
 
         return !!result; //if there is no content for ttip, we return false to prevent the show of the tooltip
     },

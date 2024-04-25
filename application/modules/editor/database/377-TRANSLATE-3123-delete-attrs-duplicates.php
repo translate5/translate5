@@ -1,4 +1,5 @@
-<?php 
+<?php
+
 /*
 START LICENSE AND COPYRIGHT
 
@@ -27,9 +28,6 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-/**
- *
- */
 set_time_limit(0);
 
 //uncomment the following line, so that the file is not marked as processed:
@@ -45,7 +43,7 @@ $SCRIPT_IDENTIFIER = '376-TRANSLATE-3123-delete-attrs-duplicates.php';
  * define database credential variables
  */
 $argc = count($argv);
-if(empty($this) || empty($argv) || $argc < 5 || $argc > 7) {
+if (empty($this) || empty($argv) || $argc < 5 || $argc > 7) {
     die("please dont call the script direct! Call it by using DBUpdater!\n\n");
 }
 
@@ -68,15 +66,12 @@ $picklistA = $db->query("
 ")->fetchAll(PDO::FETCH_KEY_PAIR);
 
 /**
- * @param array $attrA
  * @param $db Zend_Db_Adapter_Abstract
- * @param array $picklistA
  */
-function cleanupAttrA(array $attrA, $db, array $picklistA) {
-
+function cleanupAttrA(array $attrA, $db, array $picklistA)
+{
     // Foreach attr having duplicates
     foreach ($attrA as $attrI) {
-
         // Trim comma from older ids
         $older = trim($attrI['older'], ',');
 
@@ -84,11 +79,11 @@ function cleanupAttrA(array $attrA, $db, array $picklistA) {
         $db->query("DELETE FROM `terms_attributes` WHERE `id` IN ($older)");
 
         // If this attribute is not a picklist
-        if (!isset($picklistA[$attrI['dataTypeId']])) {
-
+        if (! isset($picklistA[$attrI['dataTypeId']])) {
             // Set value of newer one to be distinct concatenated values across all records (newer + older)
             $db->query(
-                "UPDATE `terms_attributes` SET `value` = ? WHERE `id` = {$attrI['newer']}", $attrI['values']
+                "UPDATE `terms_attributes` SET `value` = ? WHERE `id` = {$attrI['newer']}",
+                $attrI['values']
             );
         }
     }
@@ -153,15 +148,13 @@ $checker = new \editor_Models_Terminology_DataTypeConsistencyCheck();
 
 // Foreach sameTypeDiffElementName-case found among attribute-records
 foreach ($checker->sameTypeDiffElementName() as $case) {
-
     // Get correct dataTypeId and elementName
-    list ($correct['dataTypeId'], $correct['elementName']) = explode('-', $case['correct-dataTypeId-elementName']);
+    list($correct['dataTypeId'], $correct['elementName']) = explode('-', $case['correct-dataTypeId-elementName']);
 
     // Foreach mistake
     foreach (explode(',', $case['mistake-list']) as $item) {
-
         // Extract mistake's dataTypeId and elementName
-        list ($mistake['dataTypeId'], $mistake['elementName']) = explode('-', $item);
+        list($mistake['dataTypeId'], $mistake['elementName']) = explode('-', $item);
 
         // Fix db data
         $db->query("
@@ -177,7 +170,6 @@ foreach ($checker->sameTypeDiffElementName() as $case) {
 
 // Foreach sameTypeUnexpectedLevel-case found among attribute-records
 foreach ($checker->sameTypeUnexpectedLevel() as $case) {
-
     // Get expected levels
     $level = array_flip(explode(',', $case['expected-levels']));
 
@@ -193,18 +185,16 @@ foreach ($checker->sameTypeUnexpectedLevel() as $case) {
 
 // Foreach sameTypeDiffLabelOrLevel-case found among datatype-records
 foreach ($checker->sameTypeDiffLabelOrLevel() as $case) {
-
     // Get correct id and label
-    list ($correct['id'], $correct['label'], $correct['level']) = explode('-', $case['correct-id-label-level']);
+    list($correct['id'], $correct['label'], $correct['level']) = explode('-', $case['correct-id-label-level']);
 
     // Get levels
     $level = array_flip(explode(',', $correct['level']));
 
     // Foreach mistake
     foreach (explode(';', $case['mistake-list']) as $item) {
-
         // Extract mistake's id and label
-        list ($mistake['id'], $mistake['label'], $mistake['level']) = explode('-', $item);
+        list($mistake['id'], $mistake['label'], $mistake['level']) = explode('-', $item);
 
         // Delete datatype-record created by mistake
         $db->query("DELETE FROM `terms_attributes_datatype` WHERE `id` = '{$mistake['id']}'");
@@ -218,7 +208,6 @@ foreach ($checker->sameTypeDiffLabelOrLevel() as $case) {
 
     // If not equal to original list of levels
     if ($level != $correct['level']) {
-
         // Update datatype-record with merged levels list
         $db->query("UPDATE `terms_attributes_datatype` SET `level` = '$level' WHERE `id` = '{$correct['id']}'");
     }

@@ -65,62 +65,41 @@ class InstructionsDTO
      *
      * @var string
      */
-    const FILE_MAPPING_GROUP = "FileMapping";
+    public const FILE_MAPPING_GROUP = "FileMapping";
 
     /**
      * Collection mapping group name inside ini-file
      *
      * @var string
      */
-    const COLLECTION_MAPPING_GROUP = "CollectionMapping";
+    public const COLLECTION_MAPPING_GROUP = "CollectionMapping";
 
-    /**
-     * @var bool
-     */
     public bool $mergeTerms = true;
 
-    /**
-     * @var string
-     */
     public string $deleteTermsLastTouchedOlderThan = '2018-05-01';
 
-    /**
-     * @var bool
-     */
     public bool $deleteTermsOlderThanCurrentImport = true;
 
-    /**
-     * @var string
-     */
     public string $deleteProposalsLastTouchedOlderThan = '2018-05-01';
 
-    /**
-     * @var bool
-     */
     public bool $deleteProposalsOlderThanCurrentImport = false;
 
     /**
      * Array of [Tbx-filename => Term collection name] pairs.
      * Initially, it's filled with the data from instructions file, but some pairs can be excluded
      * due to no customer found in db with number mapped for such term collection name
-     *
-     * @var array
      */
     public array $FileMapping = [];
 
     /**
      * Array of [Term collection name => Customer number]
      * Filled with the data from instructions file
-     *
-     * @var array
      */
     public array $CollectionMapping = [];
 
     /**
      * InstructionsDTO constructor.
      *
-     * @param array $instructions
-     * @param LoggerService $logger
      * @throws InvalidInstructionsIniFileException
      * @throws \ReflectionException
      */
@@ -130,7 +109,7 @@ class InstructionsDTO
         $errors = $this->validateInstructions($instructions);
 
         // If errors detected - throw exception
-        if (!empty($errors)) {
+        if (! empty($errors)) {
             throw new InvalidInstructionsIniFileException($errors);
         }
 
@@ -139,13 +118,13 @@ class InstructionsDTO
 
         // Pick values from ini-file and apply as public props
         foreach ([
-           'mergeTerms',
-           'deleteTermsLastTouchedOlderThan',
-           'deleteTermsOlderThanCurrentImport',
-           'deleteProposalsLastTouchedOlderThan',
-           'deleteProposalsOlderThanCurrentImport',
-           'FileMapping',
-           'CollectionMapping',
+            'mergeTerms',
+            'deleteTermsLastTouchedOlderThan',
+            'deleteTermsOlderThanCurrentImport',
+            'deleteProposalsLastTouchedOlderThan',
+            'deleteProposalsOlderThanCurrentImport',
+            'FileMapping',
+            'CollectionMapping',
         ] as $prop) {
             $this->$prop = $instructions[$prop] ?? $this->$prop;
         }
@@ -157,45 +136,41 @@ class InstructionsDTO
                     $customerM->loadByNumber($customerNumber);
                 } catch (ZfExtended_Models_Entity_NotFoundException) {
                     $logger->customerNotFound($customerNumber);
-                    unset ($this->FileMapping[$tbxFileName]);
+                    unset($this->FileMapping[$tbxFileName]);
                 }
             } else {
-                unset ($this->FileMapping[$tbxFileName]);
+                unset($this->FileMapping[$tbxFileName]);
             }
         }
     }
 
-    /**
-     * @param array $instructions
-     * @return array
-     */
     private function validateInstructions(array $instructions): array
     {
         // Errors will be collected here
         $errors = [];
 
         // Check file mapping group presence
-        if (!array_key_exists($fGroup = self::FILE_MAPPING_GROUP, $instructions)
-            || !is_array($instructions[$fGroup])
-            || !count($instructions[$fGroup])
+        if (! array_key_exists($fGroup = self::FILE_MAPPING_GROUP, $instructions)
+            || ! is_array($instructions[$fGroup])
+            || ! count($instructions[$fGroup])
         ) {
-            $errors []= "[$fGroup] section is missing or empty in ini-file";
+            $errors[] = "[$fGroup] section is missing or empty in ini-file";
         }
 
         // Check collection mapping group presence
         if (
-            !array_key_exists($cGroup = self::COLLECTION_MAPPING_GROUP, $instructions)
-            || !is_array($instructions[$cGroup])
-            || !count($instructions[$cGroup])
+            ! array_key_exists($cGroup = self::COLLECTION_MAPPING_GROUP, $instructions)
+            || ! is_array($instructions[$cGroup])
+            || ! count($instructions[$cGroup])
         ) {
-            $errors []= "[$cGroup] section is missing or empty in ini-file";
+            $errors[] = "[$cGroup] section is missing or empty in ini-file";
         }
 
         // If both are there - make sure customer numbers are not missing
         if (count($errors) === 0) {
             foreach (array_unique($instructions[$fGroup]) as $termCollection) {
-                if (!trim((string) $instructions[$cGroup][$termCollection] ?? '')) {
-                    $errors []= "Client number is missing for TermCollection '$termCollection' in [$cGroup] section of ini-file";
+                if (! trim((string) $instructions[$cGroup][$termCollection] ?? '')) {
+                    $errors[] = "Client number is missing for TermCollection '$termCollection' in [$cGroup] section of ini-file";
                 }
             }
         }

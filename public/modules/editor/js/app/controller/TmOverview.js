@@ -85,6 +85,9 @@ Ext.define('Editor.controller.TmOverview', {
     }, {
         ref: 'TmWindow',
         selector: '#addTmWindow'
+    }, {
+        ref: 'showConvertedFilterBtn',
+        selector: '#tmOverviewPanel #showConvertedFilter'
     }],
     listen: {
         component: {
@@ -211,6 +214,7 @@ Ext.define('Editor.controller.TmOverview', {
     },
     handleButtonRefreshClick: function () {
         this.getTmOverviewPanel().getStore().load();
+        this.getTmOverviewPanel().getController().onShowOnlyNotConverted(this.getShowConvertedFilterBtn(), false);
         Ext.StoreManager.get('Editor.store.LanguageResources.Resources').load();
     },
     handleSaveAddClick: function (button) {
@@ -476,12 +480,38 @@ Ext.define('Editor.controller.TmOverview', {
                 case 'log':
                     me.handleLogTm(view, cell, col, newRecord);
                     break;
+                case 'converseTm':
+                    me.handleTmConversion(view, cell, col, newRecord);
+                    break;
                 case 'specific':
                     me.handleEditSpecific(view, cell, col, newRecord);
+                    break;
+                case 'converseTm':
+                    me.handleTmConversion(view, cell, col, newRecord);
                     break;
             }
         });
     },
+
+    handleTmConversion: function (view, cell, cellIdx, rec) {
+        const me = this;
+        Ext.Msg.confirm(
+            Editor.data.l10n.contentProtection.conversionConfirm,
+            Editor.data.l10n.contentProtection.conversionConfirmText,
+            function (btn) {
+                if (btn !== 'yes') {
+                    return;
+                }
+                Ext.Ajax.request({
+                    url: Editor.data.restpath + 'languageresourceinstance/' + rec.get('id') + '/synchronizetm/',
+                    method: 'POST',
+                    failure: (records, op) => Editor.app.getController('ServerException').handleException(op.error.response),
+                    success: () => Editor.MessageBox.addSuccess(Editor.data.l10n.contentProtection.conversionStarted)
+                });
+            }
+        );
+    },
+
     handleDownloadTm: function (view, cell, cellIdx, rec, ev) {
         var me = this,
             proxy = rec.proxy,

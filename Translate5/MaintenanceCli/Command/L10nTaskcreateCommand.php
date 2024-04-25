@@ -20,23 +20,36 @@ use ZipArchive;
 class L10nTaskcreateCommand extends Translate5AbstractCommand
 {
     // the name of the command (the part after "bin/console")
-    const WORKFILES = 'workfiles';
-    const PIVOTFILES = 'relais';
-    const ZXLIFF = '.zxliff';
-    const TARGET_LANGUAGES = 'targetLanguages';
-    const REVIEW = 'review';
-    const PIVOT = 'pivot';
-    const KEEP_TARGET = 'keep-target';
-    const PM_LOGIN = 'pm-login';
-    const CUSTOMER = 'customer';
+    public const WORKFILES = 'workfiles';
+
+    public const PIVOTFILES = 'relais';
+
+    public const ZXLIFF = '.zxliff';
+
+    public const TARGET_LANGUAGES = 'targetLanguages';
+
+    public const REVIEW = 'review';
+
+    public const PIVOT = 'pivot';
+
+    public const KEEP_TARGET = 'keep-target';
+
+    public const PM_LOGIN = 'pm-login';
+
+    public const CUSTOMER = 'customer';
+
     protected static $defaultName = 'l10n:task:create';
 
     private string $zip;
 
     private string $sourceLanguage = 'de';
+
     private ZipArchive $zipArchive;
+
     private array $zxlfCleanUp = [];
+
     private bool $isReview = false;
+
     private array $targetLanguages = [];
 
     protected function configure()
@@ -108,7 +121,7 @@ class L10nTaskcreateCommand extends Translate5AbstractCommand
 
         $this->writeTitle('Translate5 L10n maintenance - create a translation package as translate5 task');
 
-        $this->isReview = (bool)$this->input->getOption(self::REVIEW);
+        $this->isReview = (bool) $this->input->getOption(self::REVIEW);
         $this->targetLanguages = $this->input->getArgument(self::TARGET_LANGUAGES);
 
         if ($this->isReview) {
@@ -136,8 +149,6 @@ class L10nTaskcreateCommand extends Translate5AbstractCommand
 
     /**
      * Create the zip packages with the translation data
-     * @param string $targetLanguage
-     * @param string $zipName
      * @throws ReflectionException
      * @throws Zend_Exception
      * @throws ZfExtended_Models_Entity_NotFoundException
@@ -154,12 +165,12 @@ class L10nTaskcreateCommand extends Translate5AbstractCommand
         $this->zipArchive->open($this->zip, ZipArchive::CREATE);
 
         $pivotLanguage = $this->input->getOption(self::PIVOT);
-        $keepTarget = (bool)$this->input->getOption(self::KEEP_TARGET);
+        $keepTarget = (bool) $this->input->getOption(self::KEEP_TARGET);
 
         $this->processXliffFiles($targetLanguage, keepTarget: $keepTarget);
         $this->addJsonFile($targetLanguage);
 
-        if (!is_null($pivotLanguage)) {
+        if (! is_null($pivotLanguage)) {
             $this->processXliffFiles($targetLanguage, $pivotLanguage);
             $this->addJsonFile($targetLanguage, $pivotLanguage);
         }
@@ -176,9 +187,9 @@ class L10nTaskcreateCommand extends Translate5AbstractCommand
      * @throws Zend_Exception
      */
     private function processXliffFiles(
-        string  $targetLanguage,
+        string $targetLanguage,
         ?string $pivotLanguage = null,
-        bool    $keepTarget = false
+        bool $keepTarget = false
     ): void {
         $xliffFiles = $this->getXliffFiles($targetLanguage);
 
@@ -190,13 +201,13 @@ class L10nTaskcreateCommand extends Translate5AbstractCommand
                 $filenameInZip = self::WORKFILES . $filenameInZip;
             } else {
                 $filenameInZip = self::PIVOTFILES . str_replace(
-                        '/' . $pivotLanguage . self::ZXLIFF,
-                        '/' . $targetLanguage . self::ZXLIFF,
-                        $filenameInZip
-                    );
+                    '/' . $pivotLanguage . self::ZXLIFF,
+                    '/' . $targetLanguage . self::ZXLIFF,
+                    $filenameInZip
+                );
             }
 
-            if ($this->isReview || !is_null($pivotLanguage) || $keepTarget) {
+            if ($this->isReview || ! is_null($pivotLanguage) || $keepTarget) {
                 $this->addToZip($filename, $filenameInZip);
             } else {
                 copy($filename, $zxlfFilename);
@@ -217,7 +228,7 @@ class L10nTaskcreateCommand extends Translate5AbstractCommand
         $paths = ZfExtended_Zendoverwrites_Translate::getInstance()->getTranslationDirectories();
         foreach ($paths as $path) {
             $path = $path . $language . '.xliff';
-            if (!file_exists($path)) {
+            if (! file_exists($path)) {
                 continue;
             }
             $xliffFiles[] = $path;
@@ -233,8 +244,6 @@ class L10nTaskcreateCommand extends Translate5AbstractCommand
 
     /**
      * Clean the existing target content to produce a translation task
-     * @param $filename
-     * @return void
      */
     private function removeTargetContent($filename): void
     {
@@ -245,9 +254,6 @@ class L10nTaskcreateCommand extends Translate5AbstractCommand
 
     /**
      * gets the available JSON file to a given language, currently hardcoded since only one!
-     * @param string $language
-     * @param string|null $pivotLanguage
-     * @return void
      */
     private function addJsonFile(string $language, ?string $pivotLanguage = null): void
     {
@@ -263,9 +269,6 @@ class L10nTaskcreateCommand extends Translate5AbstractCommand
 
     /**
      * Import the package into translate5 as tasks / project
-     * @param string $targetLanguage
-     * @param string|null $pivotLanguage
-     * @return void
      * @throws ReflectionException
      * @throws ZfExtended_Models_Entity_NotFoundException
      */
@@ -289,7 +292,7 @@ class L10nTaskcreateCommand extends Translate5AbstractCommand
         if (is_null($pmLogin)) {
             $pmGuid = User::SYSTEM_GUID;
         } else {
-            $pm = new User;
+            $pm = new User();
             $pm->loadByLogin($pmLogin);
             $pmGuid = $pm->getUserGuid();
         }
@@ -306,7 +309,7 @@ class L10nTaskcreateCommand extends Translate5AbstractCommand
                 'pivotLanguage' => $pivotLanguage,
                 'targets' => $this->isReview ? [$targetLanguage] : $this->targetLanguages,
                 'description' => 'description',
-                'workflow' => $customer->getConfig()->runtimeOptions->workflow->initialWorkflow
+                'workflow' => $customer->getConfig()->runtimeOptions->workflow->initialWorkflow,
             ]
         );
         $worker->queue();

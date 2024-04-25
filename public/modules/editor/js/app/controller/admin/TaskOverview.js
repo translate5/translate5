@@ -154,6 +154,10 @@ Ext.define('Editor.controller.admin.TaskOverview', {
         "editorDeleteTask": {
             title: '#UT#Aufgabe "{0}" komplett löschen?',
             msg: '#UT#Wollen Sie die Aufgabe wirklich komplett und unwiderruflich löschen?'
+        },
+        "editorImportTask": {
+            title: 'Bestätigen Sie den Aufgabenimport',
+            msg: ''
         }
     },
     strings: {
@@ -291,10 +295,43 @@ Ext.define('Editor.controller.admin.TaskOverview', {
     handleImportDefaults: function () {
         var me = this;
 
-        me.saveTask(function (task) {
+        var startImport = (task) => {
             me.fireEvent('wizardCardImportDefaults',task);
             me.startImport(task);
-        });
+        }
+
+        var successCallback = (task) => {
+            Ext.Ajax.request({
+                url: Editor.data.restpath + 'languageresourceinstance/defaulttmneedsconversion',
+                params: {
+                    customerId: task.get('customerId'),
+                    sourceId: task.get('sourceLang'),
+                    targetId: task.get('targetLang'),
+                },
+                method: 'POST',
+                failure: response => Editor.app.getController('ServerException').handleException(response),
+                success: response => {
+                    var resp = Ext.decode(response.responseText);
+
+                    if (resp.result.hasLangResThatNeedsConversion) {
+                        Ext.Msg.confirm(
+                            me.confirmStrings.editorImportTask.title,
+                            me.confirmStrings.editorImportTask.msg,
+                            btn => {
+                                if (btn === 'yes') {
+                                    startImport(task);
+                                }
+                            });
+
+                        return;
+                    }
+
+                    startImport(task);
+                }
+            });
+        }
+
+        me.saveTask(successCallback);
     },
 
     /**

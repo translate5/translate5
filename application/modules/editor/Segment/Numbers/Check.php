@@ -3,7 +3,7 @@
 START LICENSE AND COPYRIGHT
 
  This file is part of translate5
- 
+
  Copyright (c) 2013 - 2017 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
 
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
@@ -13,90 +13,89 @@ START LICENSE AND COPYRIGHT
  included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
-  
+
  There is a plugin exception available for use with this release of translate5 for
  translate5: Please see http://www.translate5.net/plugin-exception.txt or
  plugin-exception.txt in the root folder of translate5.
-  
+
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
-
-use editor_Models_Segment_Whitespace as Whitespace;
+use MittagQI\Translate5\Plugins\SpellCheck\Segment\Check;
 
 /**
  * Numbers check
  */
-class editor_Segment_Numbers_Check {
-    
+class editor_Segment_Numbers_Check
+{
     /**
      * @var string
      */
-    const NUM1 = 'num1';
+    public const NUM1 = 'num1';
 
     /**
      * @var string
      */
-    const NUM2 = 'num2';
+    public const NUM2 = 'num2';
 
     /**
      * @var string
      */
-    const NUM3 = 'num3';
+    public const NUM3 = 'num3';
 
     /**
      * @var string
      */
-    const NUM4 = 'num4';
+    public const NUM4 = 'num4';
 
     /**
      * @var string
      */
-    const NUM5 = 'num5';
+    public const NUM5 = 'num5';
 
     /**
      * @var string
      */
-    const NUM6 = 'num6';
+    public const NUM6 = 'num6';
 
     /**
      * @var string
      */
-    const NUM7 = 'num7';
+    public const NUM7 = 'num7';
 
     /**
      * @var string
      */
-    const NUM8 = 'num8';
+    public const NUM8 = 'num8';
 
     /**
      * @var string
      */
-    const NUM9 = 'num9';
+    public const NUM9 = 'num9';
 
     /**
      * @var string
      */
-    const NUM10 = 'num10';
+    public const NUM10 = 'num10';
 
     /**
      * @var string
      */
-    const NUM11 = 'num11';
+    public const NUM11 = 'num11';
 
     /**
      * @var string
      */
-    const NUM12 = 'num12';
+    public const NUM12 = 'num12';
 
     /**
      * @var string
      */
-    const NUM13 = 'num13';
+    public const NUM13 = 'num13';
 
     /**
      * @var array
@@ -111,29 +110,32 @@ class editor_Segment_Numbers_Check {
     public static $lang = null;
 
     /**
-     * @param editor_Models_Task $task
+     * editor_Segment_Numbers_Check constructor.
+     * @throws ReflectionException
      */
-    public function __construct(editor_Models_Task $task, $targetField, editor_Models_Segment $segment) {
-
+    public function __construct(
+        editor_Models_Task $task,
+        editor_Models_Segment $segment,
+        editor_Segment_FieldTags $source,
+        editor_Segment_FieldTags $target
+    ) {
         // Get source text, and replace whitespace-placeholder-characters for non-breaking space, linebreak, tab and ordinary space with themselves
         // Note: the non-commented space (1st item in 2nd arg of str_replace call) is the non-breaking space with code 160
         //       and the commented one is an ordinary space with code 32
-        $source = $task->getEnableSourceEditing() ? $segment->getSourceEditToSort() : $segment->getSourceToSort();
-        $source = Whitespace::replaceLabelledCharacters($source);
+        $sourceText = Check::prepareTarget($segment, $source);
 
-        // Do same for target text
-        $target = $segment->{'get' . ucfirst($targetField) . 'EditToSort'}();
-        $target = Whitespace::replaceLabelledCharacters($target);
+        // Do same for target text. Here we need same preparation both for source and target
+        $targetText = Check::prepareTarget($segment, $target);
 
         // Load langs [id => rfc5646] pairs if not yet loaded
-        self::$lang = self::$lang ?? ZfExtended_Factory
+        self::$lang ??= ZfExtended_Factory
             ::get('editor_Models_Languages')
-            ->loadAllKeyValueCustom('id', 'sublanguage');
+                ->loadAllKeyValueCustom('id', 'sublanguage');
 
         // Run check
         $this->states = numbers_check(
-            $source,
-            $target,
+            $sourceText,
+            $targetText,
             self::$lang[$task->getSourceLang()],
             self::$lang[$task->getTargetLang()],
             $task
@@ -144,15 +146,16 @@ class editor_Segment_Numbers_Check {
      * Retrieves the evaluated states
      * @return string[]
      */
-    public function getStates(){
+    public function getStates()
+    {
         return $this->states;
     }
 
     /**
-     * 
      * @return boolean
      */
-    public function hasStates() {
+    public function hasStates()
+    {
         return count($this->states) > 0;
     }
 }

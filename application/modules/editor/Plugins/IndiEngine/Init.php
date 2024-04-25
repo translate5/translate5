@@ -3,7 +3,7 @@
 START LICENSE AND COPYRIGHT
 
  This file is part of translate5
- 
+
  Copyright (c) 2013 - 2021 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
 
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
@@ -13,15 +13,15 @@ START LICENSE AND COPYRIGHT
  included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
-  
+
  There is a plugin exception available for use with this release of translate5 for
  translate5: Please see http://www.translate5.net/plugin-exception.txt or
  plugin-exception.txt in the root folder of translate5.
-  
+
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
@@ -35,21 +35,12 @@ use MittagQI\Translate5\Plugins\IndiEngine\EventWriter as EventWriter;
  */
 class editor_Plugins_IndiEngine_Init extends ZfExtended_Plugin_Abstract
 {
-    /**
-     * @var string
-     */
     protected static string $description = 'Send logs to external Indi Engine logger in batch manner';
 
-    /**
-     * @var bool
-     */
     protected static bool $enabledByDefault = true;
 
-    /**
-     * @var bool
-     */
     protected static bool $activateForTests = true;
-    
+
     /**
      * The configs that needed to be set/copied for tests
      *
@@ -59,9 +50,6 @@ class editor_Plugins_IndiEngine_Init extends ZfExtended_Plugin_Abstract
 
     ];
 
-    /**
-     * @var EventWriter
-     */
     public EventWriter $writer;
 
     /**
@@ -70,7 +58,7 @@ class editor_Plugins_IndiEngine_Init extends ZfExtended_Plugin_Abstract
      * @throws Zend_Exception
      * @throws ZfExtended_Logger_Exception
      */
-    public function init() : void
+    public function init(): void
     {
         // Get logger
         /** @var ZfExtended_Logger $logger */
@@ -79,7 +67,7 @@ class editor_Plugins_IndiEngine_Init extends ZfExtended_Plugin_Abstract
         // Setup writer
         $this->writer = ZfExtended_Logger_Writer_Abstract::create([
             'type' => EventWriter::class,
-            'filter' => ['level <= info']
+            'filter' => ['level <= info'],
         ]);
 
         // Spoof current db writer with $this->writer
@@ -96,17 +84,15 @@ class editor_Plugins_IndiEngine_Init extends ZfExtended_Plugin_Abstract
      * @throws Zend_Db_Statement_Exception
      * @throws Zend_Exception
      */
-    public function handleErrorlog() : void
+    public function handleErrorlog(): void
     {
         // If we're inside bitbucket pipeline run
         if ($_ENV['BITBUCKET_BUILD_NUMBER'] ?? 0) {
-
             // Just print base64-encoded data, as if will be recognized by Indi Engine
             echo '<Zf_errorlog>' . $this->writer->getBase64() . '</Zf_errorlog>';
 
-        // Else if events have to be sent to external Indi Engine logger instance
+            // Else if events have to be sent to external Indi Engine logger instance
         } else {
-
             // Do that
             $this->writer->batchWrite();
         }

@@ -3,54 +3,55 @@
 START LICENSE AND COPYRIGHT
 
  This file is part of translate5
- 
+
  Copyright (c) 2013 - 2021 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
 
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
  This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
- as published by the Free Software Foundation and appearing in the file agpl3-license.txt 
- included in the packaging of this file.  Please review the following information 
+ as published by the Free Software Foundation and appearing in the file agpl3-license.txt
+ included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
-  
+
  There is a plugin exception available for use with this release of translate5 for
- translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or
  plugin-exception.txt in the root folder of translate5.
-  
+
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
 
-use MittagQI\Translate5\Task\TaskEventTrigger;
 use MittagQI\Translate5\ContentProtection\ContentProtector;
 use MittagQI\Translate5\ContentProtection\NumberProtector;
+use MittagQI\Translate5\Task\TaskEventTrigger;
 
 /**
  * Saving an existing Segment contains a lot of different steps in the business logic, not only just saving the content to the DB
  * Therefore this updater class exists, which provides some functions to update a segment
  *  in the correct way from the business logic view point
  */
-class editor_Models_Segment_Updater {
+class editor_Models_Segment_Updater
+{
     /**
      * @var ZfExtended_EventManager
      */
     protected $events = false;
-    
+
     /**
      * @var editor_Models_Segment
      */
     protected $segment;
-    
+
     /**
      * @var editor_Models_Task
      */
     protected $task;
-    
+
     /**
      * @var editor_Models_Segment_UtilityBroker
      */
@@ -64,21 +65,18 @@ class editor_Models_Segment_Updater {
 
     protected ContentProtector $contentProtector;
 
-    /**
-     * @param editor_Models_Task $task
-     * @param string $userGuid
-     */
-    public function __construct(editor_Models_Task $task, private string $userGuid) {
+    public function __construct(
+        editor_Models_Task $task,
+        private string $userGuid
+    ) {
         $this->task = $task;
-        $this->events = ZfExtended_Factory::get('ZfExtended_EventManager', array(get_class($this)));
+        $this->events = ZfExtended_Factory::get('ZfExtended_EventManager', [get_class($this)]);
         $this->utilities = ZfExtended_Factory::get('editor_Models_Segment_UtilityBroker');
         $this->contentProtector = ContentProtector::create($this->utilities->whitespace);
     }
 
     /**
      * Updates the segment with all dependencies
-     * @param editor_Models_Segment $segment
-     * @param editor_Models_SegmentHistory $history
      * @throws ZfExtended_ValidateException
      * @throws editor_Models_ConfigException
      * @throws editor_Models_Segment_Exception
@@ -94,7 +92,7 @@ class editor_Models_Segment_Updater {
 
         $this->segment->save();
 
-        $this->afterSegmentUpdate($history,$oldHash);
+        $this->afterSegmentUpdate($history, $oldHash);
     }
 
     /***
@@ -129,11 +127,8 @@ class editor_Models_Segment_Updater {
 
     /**
      * Required method calls after the segment is saved on segment update
-     * @param string $oldSegmentHash
-     * @param editor_Models_SegmentHistory $history
-     * @return void
      */
-    protected function afterSegmentUpdate(editor_Models_SegmentHistory $history,string $oldSegmentHash,): void
+    protected function afterSegmentUpdate(editor_Models_SegmentHistory $history, string $oldSegmentHash): void
     {
         $this->segment->updateIsTargetRepeated($this->segment->getTargetMd5(), $oldSegmentHash);
 
@@ -163,7 +158,6 @@ class editor_Models_Segment_Updater {
      */
     protected function beforeSegmentUpdate(editor_Models_SegmentHistory $history): void
     {
-
         $this->updateToSort();
 
         $this->handleWorkflowOnUpdate();
@@ -183,7 +177,6 @@ class editor_Models_Segment_Updater {
 
     /**
      * Update toSort fields on segment update
-     * @return void
      */
     private function updateToSort(): void
     {
@@ -194,82 +187,87 @@ class editor_Models_Segment_Updater {
         // Sinnvoll, ja nein? selbes Problem mit dem ENT_XML1 stuff, bei replace all und excel nötig. Wie ists mit der Pretranslation?
         // Wie ist das mit den TMs und en ENT_XML1??
 
-        foreach($updateSearchAndSort as $field) {
+        foreach ($updateSearchAndSort as $field) {
             $this->segment->updateToSort($field);
         }
 
         //if no content changed, restore the original content (which contains terms, so segment may not be re-tagged)
         $this->segment->restoreNotModfied();
     }
-    
+
     /**
      * Updates the target original and targetMd5 hash for repetition calculation
      * Can be done only in Workflow Step 1 and if all targets were empty on import
      * This is more a hack as a right solution. See TRANSLATE-885 comments for more information!
      * See also in AlikesegmenController!
      */
-    protected function updateTargetHashAndOriginal() {
+    protected function updateTargetHashAndOriginal()
+    {
         //TODO: also a check is missing, if task has alternate targets or not.
         // With alternates no recalc is needed at all, since no repetition editor can be used
-        
+
         $hasher = ZfExtended_Factory::get('editor_Models_Segment_RepetitionHash', [$this->task]);
         /* @var $hasher editor_Models_Segment_RepetitionHash */
         $this->segment->setTargetMd5($hasher->rehashTarget($this->segment));
     }
-    
+
     /**
      * Before a segment is saved, the matchrate type has to be fixed to valid value
      */
-    protected function updateMatchRateType() {
+    protected function updateMatchRateType()
+    {
         $segment = $this->segment;
         /* @var $segment editor_Models_Segment */
         $givenType = $segment->getMatchRateType();
-        
+
         //if it was a normal segment edit, without overtaking the match we have to do nothing here
-        if(!$segment->isModified('matchRateType') || strpos($givenType, editor_Models_LanguageResources_LanguageResource::MATCH_RATE_TYPE_EDITED) !== 0) {
+        if (! $segment->isModified('matchRateType') || strpos($givenType, editor_Models_LanguageResources_LanguageResource::MATCH_RATE_TYPE_EDITED) !== 0) {
             return;
         }
-        
+
         $matchrateType = ZfExtended_Factory::get('editor_Models_Segment_MatchRateType');
         /* @var $matchrateType editor_Models_Segment_MatchRateType */
-        
-        $unknown = function() use ($matchrateType, $givenType, $segment){
+
+        $unknown = function () use ($matchrateType, $givenType, $segment) {
             $matchrateType->initEdited($matchrateType::TYPE_UNKNOWN, $givenType);
             $segment->setMatchRateType((string) $matchrateType);
         };
-        
+
         $matches = [];
         //if it was an invalid type set it to unknown
-        if(! preg_match('/'.editor_Models_LanguageResources_LanguageResource::MATCH_RATE_TYPE_EDITED.';languageResourceid=([0-9]+)/', $givenType, $matches)) {
+        if (! preg_match('/' . editor_Models_LanguageResources_LanguageResource::MATCH_RATE_TYPE_EDITED . ';languageResourceid=([0-9]+)/', $givenType, $matches)) {
             $unknown();
+
             return;
         }
-        
+
         //load the used languageResource to get more information about it (TM or MT)
         $languageResourceid = $matches[1];
         $languageresource = ZfExtended_Factory::get('editor_Models_LanguageResources_LanguageResource');
+
         /* @var $languageresource editor_Models_LanguageResources_LanguageResource */
         try {
             $languageresource->load($languageResourceid);
         } catch (ZfExtended_Models_Entity_NotFoundException $e) {
             $unknown();
+
             return;
         }
-        
+
         //just to display the TM name too, we add it here to the type
-        $type = $languageresource->getServiceName().' - '.$languageresource->getName();
-        
+        $type = $languageresource->getServiceName() . ' - ' . $languageresource->getName();
+
         //set the type
-        $matchrateType->initEdited($languageresource->getResource()->getType(),$type);
-        
+        $matchrateType->initEdited($languageresource->getResource()->getType(), $type);
+
         //REMINDER: this would be possible if we would know if the user edited the segment after using the TM
         //$matchrateType->add($matchrateType::TYPE_INTERACTIVE);
-        
+
         //save the type
         $segment->setMatchRateType((string) $matchrateType);
 
         //if it is tm or term collection and the matchrate is >=100, log the usage
-        if(($languageresource->isTm() || $languageresource->isTc()) && $segment->getMatchRate() >= editor_Services_Connector_FilebasedAbstract::EXACT_MATCH_VALUE){
+        if (($languageresource->isTm() || $languageresource->isTc()) && $segment->getMatchRate() >= editor_Services_Connector_FilebasedAbstract::EXACT_MATCH_VALUE) {
             $this->logAdapterUsageOnSegmentEdit($languageresource);
         }
     }
@@ -277,7 +275,6 @@ class editor_Models_Segment_Updater {
     /**
      * Applies the import whitespace replacing to the edited user by the content
      * @param string $content the content to be sanitized, the value is modified directly via reference!
-     * @return bool
      */
     public function sanitizeEditedContent(string &$content, bool $isEditingTargetInFront = false): bool
     {
@@ -290,20 +287,20 @@ class editor_Models_Segment_Updater {
 
         //if there are tags to be ignored, we remove them here
         $oldContent = $content = $this->utilities->internalTag->removeIgnoredTags($content);
-        
+
         //since our internal tags are a div span construct with plain content in between, we have to replace them first
         $content = $this->utilities->internalTag->protect($content);
-        
+
         //the following call splits the content at tag boundaries, and sanitizes the textNodes only
         // In the textnode additional / new protected characters (whitespace) is converted to internal tags and then removed
         // This is because the user is not allowed to add new internal tags by adding plain special characters directly (only via adding it as tag in the frontend)
         $content = editor_Models_Segment_Utility::foreachSegmentTextNode(
             $content,
-            function($text) use ($isEditingTargetInFront) {
+            function ($text) use ($isEditingTargetInFront) {
                 return strip_tags(
                     $this->contentProtector->protect(
                         $text,
-                        !$isEditingTargetInFront,
+                        ! $isEditingTargetInFront,
                         $this->task->getSourceLang(),
                         $this->task->getTargetLang(),
                         ContentProtector::ENTITY_MODE_RESTORE,
@@ -312,37 +309,34 @@ class editor_Models_Segment_Updater {
                 );
             }
         );
-        
+
         //revoke the internaltag replacement
         $content = $this->utilities->internalTag->unprotect($content);
-        
+
         //return true if some whitespace content was changed
         return editor_Models_Segment_Utility::entityCleanup($content) !== editor_Models_Segment_Utility::entityCleanup($oldContent);
     }
-    
+
     /***
      * This will write a log entry of how many characters are send to the adapter for translation.
      *
      * @param editor_Models_LanguageResources_LanguageResource $adapter
      */
-    protected function logAdapterUsageOnSegmentEdit(editor_Models_LanguageResources_LanguageResource $adapter) {
+    protected function logAdapterUsageOnSegmentEdit(editor_Models_LanguageResources_LanguageResource $adapter)
+    {
         $manager = ZfExtended_Factory::get('editor_Services_Manager');
         /* @var $manager editor_Services_Manager */
-        $connector = $manager->getConnector($adapter,$this->task->getSourceLang(),$this->task->getTargetLang(),$this->task->getConfig());
+        $connector = $manager->getConnector($adapter, $this->task->getSourceLang(), $this->task->getTargetLang(), $this->task->getConfig());
         /* @var $connector editor_Services_Connector */
         $connector->logAdapterUsage($this->segment);
     }
 
-    /**
-     * @param string $saveTimestamp
-     */
     public function setSaveTimestamp(string $saveTimestamp): void
     {
         $this->saveTimestamp = $saveTimestamp;
     }
 
     /**
-     * @return void
      * @throws ZfExtended_ValidateException
      */
     private function handleWorkflowOnUpdate(): void
@@ -361,7 +355,6 @@ class editor_Models_Segment_Updater {
 
     /**
      * Necessary quality function calls on segment update before the segment is saved
-     * @return void
      */
     private function qaBeforeSegmentSaveOnSegmentUpdate(): void
     {
@@ -377,7 +370,6 @@ class editor_Models_Segment_Updater {
 
     /**
      * Necessary quality function calls on segment update after the segment is saved
-     * @return void
      */
     private function qaAfterSegmentSaveOnSegmentUpdate(): void
     {
@@ -391,11 +383,9 @@ class editor_Models_Segment_Updater {
      */
     private function setTimestampOnSegmentUpdate(): void
     {
-        if (!isset($this->saveTimestamp)) {
+        if (! isset($this->saveTimestamp)) {
             $this->saveTimestamp = NOW_ISO;
         }
         $this->segment->setTimestamp($this->saveTimestamp); //see TRANSLATE-922
     }
-
-
 }

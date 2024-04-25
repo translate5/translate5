@@ -76,14 +76,11 @@ class ReimportOverwrite extends editor_Models_Import_SegmentProcessor
      */
     private string $saveTimestamp;
 
-    /**
-     * @param editor_Models_Task $task
-     * @param editor_Models_SegmentFieldManager $sfm
-     */
-    public function __construct(editor_Models_Task $task,
-                                private editor_Models_SegmentFieldManager $sfm,
-                                private ZfExtended_Models_User $user)
-    {
+    public function __construct(
+        editor_Models_Task $task,
+        private editor_Models_SegmentFieldManager $sfm,
+        private ZfExtended_Models_User $user
+    ) {
         parent::__construct($task);
         $this->segmentTagger = ZfExtended_Factory::get(editor_Models_Segment_InternalTag::class);
     }
@@ -96,22 +93,24 @@ class ReimportOverwrite extends editor_Models_Import_SegmentProcessor
     public function process(editor_Models_Import_FileParser $parser): bool|int
     {
         $segment = ZfExtended_Factory::get(editor_Models_Segment::class);
-        $segment->init(['taskGuid' => $this->taskGuid]);
+        $segment->init([
+            'taskGuid' => $this->taskGuid,
+        ]);
 
         $mid = $parser->getMid();
+
         try {
             $segment->loadByFileidMid($this->fileId, $mid);
+
             return $segment->getId();
         } catch (ZfExtended_Models_Entity_NotFoundException $e) {
             return false;
         }
-
     }
 
     /**
      * Überschriebener Post Parse Handler, erstellt in diesem Fall das Skeleton File
      * @override
-     * @param editor_Models_Import_FileParser $parser
      */
     public function postParseHandler(editor_Models_Import_FileParser $parser)
     {
@@ -120,10 +119,11 @@ class ReimportOverwrite extends editor_Models_Import_SegmentProcessor
 
         $content = $parser->getSkeletonFile();
 
-        error_log("Write to file".$file->getId().'['. date('m/d/Y h:i:s a', time()));
+        error_log("Write to file" . $file->getId() . '[' . date('m/d/Y h:i:s a', time()));
 
-        if (isCorruptSkeletonFileForFix($content)){
-            error_log("Corrupted skeleton file on postParseHandler for: ".$file->getId().'['. date('m/d/Y h:i:s a', time()));
+        if (isCorruptSkeletonFileForFix($content)) {
+            error_log("Corrupted skeleton file on postParseHandler for: " . $file->getId() . '[' . date('m/d/Y h:i:s a', time()));
+
             return;
         }
 
@@ -145,12 +145,10 @@ class ReimportOverwrite extends editor_Models_Import_SegmentProcessor
      */
     public function postProcessHandler(editor_Models_Import_FileParser $parser, $segmentId)
     {
-
     }
 
     /**
      * get all updated segments in the task
-     * @return array
      */
     public function getUpdatedSegments(): array
     {
@@ -159,27 +157,21 @@ class ReimportOverwrite extends editor_Models_Import_SegmentProcessor
 
     /**
      * get all segment errors
-     * @return array
      */
     public function getSegmentErrors(): array
     {
         return $this->segmentErrors;
     }
 
-    /**
-     * @param string $saveTimestamp
-     */
     public function setSaveTimestamp(string $saveTimestamp): void
     {
         $this->saveTimestamp = $saveTimestamp;
     }
-
 }
 
 $db = Zend_Db_Table::getDefaultAdapter();
 $res = $db->query("SELECT distinct(taskGuid) FROM LEK_task_log where eventCode = 'E1440'");
 $tasks = $res->fetchAll(Zend_Db::FETCH_COLUMN);
-
 
 if (empty($tasks)) {
     return;
@@ -194,7 +186,6 @@ foreach ($tasks as $task) {
     $file = ZfExtended_Factory::get(editor_Models_File::class);
     $allTaskFiles = $file->loadByTaskGuid($model->getTaskGuid());
 
-
     foreach ($allTaskFiles as $taskFile) {
         $file = ZfExtended_Factory::get(editor_Models_File::class);
         $file->load($taskFile['id']);
@@ -208,7 +199,7 @@ foreach ($tasks as $task) {
 
         // check if the skeleton file contains corrupted empty
         if (isCorruptSkeletonFileForFix($skeleton)) {
-            error_log("Corrupted skeleton found for task:" . $model->getTaskGuid() . ', and file:' . $file->getFileName() . ', fileId:'.$file->getId());
+            error_log("Corrupted skeleton found for task:" . $model->getTaskGuid() . ', and file:' . $file->getFileName() . ', fileId:' . $file->getId());
             $corruptedFiles[] = $file;
         }
     }
@@ -252,7 +243,7 @@ function fixFileCorruptedSkeletonFile(editor_Models_File $file): void
 
         $processor = ZfExtended_Factory::get(ReimportOverwrite::class, [$task, $sfm, $user]);
 
-        if (!class_exists($file->getFileParser())) {
+        if (! class_exists($file->getFileParser())) {
             error_log("No parser was found for the file:" . $file->getId() . ' | ' . $file->getFileParser());
         }
 
@@ -260,7 +251,7 @@ function fixFileCorruptedSkeletonFile(editor_Models_File $file): void
             $fullFile,
             $file->getFileName(),
             $file->getId(),
-            $task
+            $task,
         ]);
 
         $parser->setSegmentFieldManager($sfm);
@@ -269,11 +260,10 @@ function fixFileCorruptedSkeletonFile(editor_Models_File $file): void
         $parser->addSegmentProcessor($processor);
         $parser->parseFile();
 
-        error_log("Parsed file".$file->getId().'['. date('m/d/Y h:i:s a', time()));
+        error_log("Parsed file" . $file->getId() . '[' . date('m/d/Y h:i:s a', time()));
 
         $db = Zend_Db_Table::getDefaultAdapter();
         $db->query('INSERT INTO LEK_task_migration (`taskGuid`, `filename`) VALUES (?,?)', [$task->getTaskGuid(), '390-TRANSLATE-3297-corrupt-skeleton-file-on-reimport.php']);
-
     } catch (Throwable $e) {
         error_log("Error on fixing the task" . $file->getTaskGuid() . ' .The error was:' . $e->getMessage());
         error_log($e->getTraceAsString());
@@ -293,13 +283,10 @@ function fixFileCorruptedSkeletonFile(editor_Models_File $file): void
  */
 function getFileCorruptedSkeletonFile(editor_Models_Task $task, editor_Models_File $file)
 {
-
-
     // in case it is okapi
     $okapiPath = $task->getAbsoluteTaskDataPath() . '/' . editor_Plugins_Okapi_Worker::OKAPI_REL_DATA_DIR . '/';
 
     if (is_dir($okapiPath)) {
-
         // original file extension.
         $ext = ZfExtended_Utils::getFileExtension($file->getFileName());
 
@@ -318,12 +305,12 @@ function getFileCorruptedSkeletonFile(editor_Models_Task $task, editor_Models_Fi
     $config = Zend_Registry::get('config');
     $rootDir = $config->runtimeOptions->import->proofReadDirectory;
 
-    if (!is_dir($dir . $rootDir)) {
+    if (! is_dir($dir . $rootDir)) {
         $rootDir = 'proofRead';
-        if (!is_dir($dir . $rootDir)) {
+        if (! is_dir($dir . $rootDir)) {
             $rootDir = editor_Models_Import_Configuration::WORK_FILES_DIRECTORY;
 
-            if (!is_dir($dir . $rootDir)) {
+            if (! is_dir($dir . $rootDir)) {
                 throw new \Exception("No workfiles found for the task package for the file:" . $file->getId());
             }
         }
@@ -337,7 +324,7 @@ function getFileCorruptedSkeletonFile(editor_Models_Task $task, editor_Models_Fi
     $filelist = $treeDb->getPaths($file->getTaskGuid(), 'file');
 
     foreach ($filelist as $fileId => $path) {
-        if ((int)$fileId !== (int)$file->getId()) {
+        if ((int) $fileId !== (int) $file->getId()) {
             continue;
         }
 
@@ -349,7 +336,7 @@ function getFileCorruptedSkeletonFile(editor_Models_Task $task, editor_Models_Fi
         }
 
         $fileToProcess = $dir . $path;
-        if (!is_file($fileToProcess)) {
+        if (! is_file($fileToProcess)) {
             continue;
         }
 
@@ -367,23 +354,22 @@ function getFileCorruptedSkeletonFile(editor_Models_Task $task, editor_Models_Fi
  */
 function getReplacementFromImportArchive(editor_Models_Task $task)
 {
-
     $tempReimportRepair = $task->getAbsoluteTaskDataPath() . '/_tempReimportRepair';
 
     if (is_dir($tempReimportRepair)) {
         cleanUpTempReimportFixFolder($task);
     }
-    if (!mkdir($tempReimportRepair) && !is_dir($tempReimportRepair)) {
+    if (! mkdir($tempReimportRepair) && ! is_dir($tempReimportRepair)) {
         throw new \RuntimeException(sprintf('Directory "%s" was not created', $tempReimportRepair));
     }
 
     $archivePath = getReplacementArchivePath($task);
 
     $zip = ZfExtended_Factory::get('ZipArchive');
-    if (!$zip->open($archivePath)) {
+    if (! $zip->open($archivePath)) {
         throw new Zend_Exception('The file' . $archivePath . ' could not be opened!');
     }
-    if (!$zip->extractTo($tempReimportRepair)) {
+    if (! $zip->extractTo($tempReimportRepair)) {
         throw new Zend_Exception('The file ' . $tempReimportRepair . ' could not be extracted!');
     }
     $zip->close();
@@ -391,14 +377,13 @@ function getReplacementFromImportArchive(editor_Models_Task $task)
     return $tempReimportRepair . '/';
 }
 
-
 /***
  * Find the archive after the first reimport
  * @param editor_Models_Task $task
  * @return false|mixed
  */
-function getReplacementArchivePath(editor_Models_Task $task){
-
+function getReplacementArchivePath(editor_Models_Task $task)
+{
     $search_name = editor_Models_Import_DataProvider_Abstract::TASK_ARCHIV_ZIP_NAME;
     $dir_path = $task->getAbsoluteTaskDataPath();
 
@@ -413,18 +398,15 @@ function getReplacementArchivePath(editor_Models_Task $task){
 function cleanUpTempReimportFixFolder(editor_Models_Task $task)
 {
     $dir = $task->getAbsoluteTaskDataPath() . '/_tempReimportRepair';
-    if( is_dir($dir)){
+    if (is_dir($dir)) {
         ZfExtended_Utils::recursiveDelete($dir);
     }
 }
 
-/**
- * @param string $skeleton
- * @return bool
- */
 function isCorruptSkeletonFileForFix(string $skeleton): bool
 {
     $pattern = '/<(lekTargetSeg)(?=[^>]*\sid\s*=\s*(?:""|\'\'))[^>]*\/?>/';
     preg_match_all($pattern, $skeleton, $matches, PREG_SET_ORDER, 0);
-    return !empty($matches);
+
+    return ! empty($matches);
 }

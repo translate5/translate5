@@ -71,6 +71,7 @@ use ZfExtended_Models_Entity_Abstract;
 class OutputMapping extends ZfExtended_Models_Entity_Abstract
 {
     protected $dbInstanceClass = OutputMappingTable::class;
+
     protected $validatorInstanceClass = OutputMappingValidator::class;
 
     public function loadBy(int $langId, int $inputContentRecognitionId): ?Zend_Db_Table_Row_Abstract
@@ -79,7 +80,7 @@ class OutputMapping extends ZfExtended_Models_Entity_Abstract
         $s->where('languageId = ?', $langId)->where('inputContentRecognitionId = ?', $inputContentRecognitionId);
 
         $this->row = $this->db->fetchRow($s);
-        if (empty($this->row)){
+        if (empty($this->row)) {
             $this->notFound("#by languageId, inputContentRecognitionId", "$langId, $inputContentRecognitionId");
         }
 
@@ -92,14 +93,20 @@ class OutputMapping extends ZfExtended_Models_Entity_Abstract
         $s = $this->db
             ->select()
             ->setIntegrityCheck(false)
-            ->from(['mapping' => $this->db->info($this->db::NAME)], ['mapping.id', 'languageId'])
+            ->from([
+                'mapping' => $this->db->info($this->db::NAME),
+            ], ['mapping.id', 'languageId'])
             ->join(
-                ['inputRecognition' => $recognitionTable],
+                [
+                    'inputRecognition' => $recognitionTable,
+                ],
                 'inputRecognition.id = mapping.inputContentRecognitionId',
                 ['type', 'name as inputName', 'description as inputDescription']
             )
             ->joinLeft(
-                ['outputRecognition' => $recognitionTable],
+                [
+                    'outputRecognition' => $recognitionTable,
+                ],
                 'outputRecognition.id = mapping.outputContentRecognitionId',
                 ['name as outputName', 'description as outputDescription']
             );
@@ -107,11 +114,12 @@ class OutputMapping extends ZfExtended_Models_Entity_Abstract
         return $this->loadFilterdCustom($s);
     }
 
-    public function validate(){
+    public function validate()
+    {
         $this->validatorLazyInstatiation();
         $data = $this->row->toArray();
         unset($data['id']);
-        if(!$this->validator->isValid($data)) {
+        if (! $this->validator->isValid($data)) {
             //TODO the here thrown exception is the legacy fallback.
             // Each Validator should implement an own isValid which throws a UnprocessableEntity Exception it self.
             // See Segment Validator for an example

@@ -51,10 +51,12 @@ END LICENSE AND COPYRIGHT
 declare(strict_types=1);
 
 namespace MittagQI\Translate5\ContentProtection\Model\Db;
+
 use Zend_Db_Table_Abstract;
 
 class ContentRecognitionTable extends Zend_Db_Table_Abstract
 {
     protected $_name = 'LEK_content_protection_content_recognition';
+
     public $_primary = 'id';
 }

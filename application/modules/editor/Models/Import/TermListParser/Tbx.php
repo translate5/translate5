@@ -9,19 +9,19 @@ START LICENSE AND COPYRIGHT
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
  This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
- as published by the Free Software Foundation and appearing in the file agpl3-license.txt 
- included in the packaging of this file.  Please review the following information 
+ as published by the Free Software Foundation and appearing in the file agpl3-license.txt
+ included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
 
  There is a plugin exception available for use with this release of translate5 for
- translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or
  plugin-exception.txt in the root folder of translate5.
 
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
@@ -38,23 +38,16 @@ use MittagQI\Translate5\LanguageResource\TaskAssociation;
  * Collect the terms and the terms attributes from the tbx file and save them to the database
  *
  */
-class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_MetaData_IMetaDataImporter {
-    const TBX_ARCHIV_NAME = 'terminology.tbx';
+class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_MetaData_IMetaDataImporter
+{
+    public const TBX_ARCHIV_NAME = 'terminology.tbx';
 
-    /**
-     * @var editor_Models_Task
-     */
-    protected  editor_Models_Task $task;
+    protected editor_Models_Task $task;
 
-    /**
-     * @var array
-     */
     protected array $languages = [];
-
 
     /**
      * Das Array beinhaltet eine Zuordnung der in TBX möglichen Term Stati zu den im Editor verwendeten
-     * @var array
      */
     protected array $statusMap = [
         'preferredTerm' => editor_Models_Terminology_Models_TermModel::STAT_PREFERRED,
@@ -121,7 +114,7 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_Me
      */
     protected $config;
 
-	/***
+    /***
      *
      * @var ZfExtended_Models_User
      */
@@ -141,7 +134,9 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_Me
      */
     protected $termModel;
 
-    /** @var editor_Models_Terminology_Import_TbxFileImport  */
+    /**
+     * @var editor_Models_Terminology_Import_TbxFileImport
+     */
     protected $tbxFileImport;
 
     /**
@@ -150,7 +145,7 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_Me
      */
     public function __construct()
     {
-        if(!defined('LIBXML_VERSION') || LIBXML_VERSION < '20620') {
+        if (! defined('LIBXML_VERSION') || LIBXML_VERSION < '20620') {
             //Mindestversion siehe http://www.php.net/manual/de/xmlreader.readstring.php
             throw new Zend_Exception('LIBXML_VERSION must be at least 2.6.20 (or as integer 20620).');
         }
@@ -168,30 +163,28 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_Me
      * invocation of the automatic TBX import and term collection creation on the task import with a there provided TBX in the task ZIP.
      * (non-PHPdoc)
      * @see editor_Models_Import_MetaData_IMetaDataImporter::import()
-     * @param editor_Models_Task $task
-     * @param editor_Models_Import_MetaData $meta
      * @throws editor_Models_Import_TermListParser_Exception
      */
     public function import(editor_Models_Task $task, editor_Models_Import_MetaData $meta)
     {
         $tbxFilterRegex = '/\.tbx$/i';
         $tbxfiles = $meta->getMetaFileToImport($tbxFilterRegex);
-        if(empty($tbxfiles)){
+        if (empty($tbxfiles)) {
             return;
         }
 
         $this->task = $task;
 
         //the termcollection customer is the one in the task
-        if(empty($this->customerIds)){
-            $this->customerIds=[$this->task->getCustomerId()];
+        if (empty($this->customerIds)) {
+            $this->customerIds = [$this->task->getCustomerId()];
         }
 
         $this->loadUser($task->getPmGuid());
 
         //create term collection for the task and customer
         //the term collection will be created with autoCreateOnImport flag
-        $this->termCollection->create("Term Collection for ".$this->task->getTaskName(), $this->customerIds);
+        $this->termCollection->create("Term Collection for " . $this->task->getTaskName(), $this->customerIds);
 
         //add termcollection to task assoc
         $this->termCollection->addTermCollectionTaskAssoc($this->termCollection->getId(), $task->getTaskGuid());
@@ -200,11 +193,11 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_Me
         $this->resetTaskTbxHash();
 
         //all tbx files in the same term collection
-        foreach($tbxfiles as $file) {
-            if(!$file->isReadable()){
-                throw new editor_Models_Import_TermListParser_Exception('E1023',[
+        foreach ($tbxfiles as $file) {
+            if (! $file->isReadable()) {
+                throw new editor_Models_Import_TermListParser_Exception('E1023', [
                     'filename' => $file,
-                    'languageResource' => $this->termCollection
+                    'languageResource' => $this->termCollection,
                 ]);
             }
             $this->task->setTerminologie(1);
@@ -237,8 +230,7 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_Me
             //reset the taskHash for the task assoc of the current term collection
             $this->resetTaskTbxHash();
 
-            foreach ($filePath as $path){
-
+            foreach ($filePath as $path) {
                 $this->tbxFileImport = ZfExtended_Factory::get('editor_Models_Terminology_Import_TbxFileImport');
 
                 $tmpName = $path['tmp_name'] ?? $path;
@@ -248,12 +240,12 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_Me
                 $this->saveFileLocal($tmpName, $fileName);
 
                 $termEntryCount = $this->tbxFileImport->importXmlFile($tmpName, $this->termCollection, $this->user, $this->mergeTerms);
-                if($termEntryCount <= 0) {
+                if ($termEntryCount <= 0) {
                     $this->logger->warn(
                         'E1028',
                         'The currently imported TBX file "{fileName}" did not contain any term entries!',
                         $this->getDefaultLogData([
-                            'fileName' => $fileName ?? basename($tmpName)
+                            'fileName' => $fileName ?? basename($tmpName),
                         ])
                     );
                 }
@@ -266,11 +258,14 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_Me
                     return false;
                 }
             }
-        } catch (Throwable $e){
-            $this->logger->exception($e,[
+        } catch (Throwable $e) {
+            $this->logger->exception($e, [
                 'level' => ZfExtended_Logger::LEVEL_ERROR,
-                'extra' => ['languageResource' => $this->termCollection]
+                'extra' => [
+                    'languageResource' => $this->termCollection,
+                ],
             ]);
+
             return false;
         }
 
@@ -279,9 +274,6 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_Me
 
     /**
      * checks if the needed TBX file exists, otherwise recreate if from DB
-     * @param editor_Models_Task $task
-     * @param SplFileInfo $tbxPath
-     * @return string
      * @throws editor_Models_Term_TbxCreationException
      */
     public function assertTbxExists(editor_Models_Task $task, SplFileInfo $tbxPath): string
@@ -304,12 +296,10 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_Me
 
     /**
      * returns the path to the archived TBX file
-     * @param editor_Models_Task $task
-     * @return string
      */
     public static function getTbxPath(editor_Models_Task $task): string
     {
-        return $task->getAbsoluteTaskDataPath().DIRECTORY_SEPARATOR.self::TBX_ARCHIV_NAME;
+        return $task->getAbsoluteTaskDataPath() . DIRECTORY_SEPARATOR . self::TBX_ARCHIV_NAME;
     }
 
     /**
@@ -321,24 +311,20 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_Me
      *   restliche Sprachen ignorieren => return false
      *
      *   FIXME Performance: foreach term this loop is called!
-     *
      */
 
     /**
      * normalisiert den übergebenen Sprachstring für die interne Verwendung.
      * => strtolower
      * => trennt die per - oder _ getrennten Bestandteile in ein Array auf
-     * @param string $langString
-     * @return array
      */
     protected function normalizeLanguage(string $langString): array
     {
-        return explode('-',strtolower(str_replace('_','-',$langString)));
+        return explode('-', strtolower(str_replace('_', '-', $langString)));
     }
 
     /**
      * returns the status map
-     * @return array
      */
     public function getStatusMap(): array
     {
@@ -348,57 +334,55 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_Me
     /**
      * returns the default logging extra data for logging in this class
      * @param array $data give additional data to be used here
-     * @return array
      */
     private function getDefaultLogData(array $data = []): array
     {
         $data['languageResource'] = $this->termCollection;
         $data['userGuid'] = $this->user->getUserGuid();
         $data['userName'] = $this->user->getUserName();
-        if(!empty($this->task)){
+        if (! empty($this->task)) {
             $data['task'] = $this->task;
         }
+
         return $data;
     }
 
     /**
      * Validate import languages against tbx languages
-     * @return void
      */
     private function validateTbxLanguages(): void
     {
-
         $collection = ZfExtended_Factory::get(editor_Models_TermCollection_TermCollection::class);
 
         $collLangs = $collection->getLanguagesInTermCollections([
-            $this->termCollection->getId()
+            $this->termCollection->getId(),
         ]);
 
         //disable terminology when no terms for the term collection are available
-        if (empty($collLangs))
-        {
+        if (empty($collLangs)) {
             $this->logger->error('E1028', 'Terminology for task is disabled because no languages are defined in the automatically created and attached term collection', $this->getDefaultLogData());
             $this->task->setTerminologie(0);
+
             return;
         }
 
-        $collLangKeys = array_column($collLangs,'id');
+        $collLangKeys = array_column($collLangs, 'id');
 
         $fuzzyModel = ZfExtended_Factory::get(editor_Models_Languages::class);
 
         // get all task source/target languages including the fuzzy languages
         $sourceLanguages = array_merge(
-            $fuzzyModel->getFuzzyLanguages($this->task->getSourceLang(),includeMajor: true)
+            $fuzzyModel->getFuzzyLanguages($this->task->getSourceLang(), includeMajor: true)
         );
         $targetLanguages = array_merge(
-            $fuzzyModel->getFuzzyLanguages($this->task->getTargetLang(),includeMajor: true)
+            $fuzzyModel->getFuzzyLanguages($this->task->getTargetLang(), includeMajor: true)
         );
 
         $matchSource = array_intersect($sourceLanguages, $collLangKeys);
         $matchTarget = array_intersect($targetLanguages, $collLangKeys);
 
         // check if the task source and target language can be found in the collection languages
-        if (!empty($matchSource) && !empty($matchTarget)) {
+        if (! empty($matchSource) && ! empty($matchTarget)) {
             return;
         }
 
@@ -406,8 +390,8 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_Me
             'E1028',
             'Terminology for task is disabled because the automatically created and attached term collection does not contain suitable languages for the task.',
             $this->getDefaultLogData([
-                'taskLanguages' => $fuzzyModel->toRfcArray(array_merge($sourceLanguages,$targetLanguages)),
-                'collectionLanguages' => $fuzzyModel->toRfcArray($collLangKeys)
+                'taskLanguages' => $fuzzyModel->toRfcArray(array_merge($sourceLanguages, $targetLanguages)),
+                'collectionLanguages' => $fuzzyModel->toRfcArray($collLangKeys),
             ])
         );
         $this->task->setTerminologie(0);
@@ -416,7 +400,7 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_Me
     /***
      * Update term collection languages assoc.
      */
-    protected  function updateCollectionLanguage()
+    protected function updateCollectionLanguage()
     {
         //remove old language assocs
         $assoc = ZfExtended_Factory::get('editor_Models_LanguageResources_Languages');
@@ -435,63 +419,60 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_Me
      */
     private function saveFileLocal(string $filepath, string $name = null)
     {
-
         //if import source is not defined save it in filesystem folder
-        if (!$this->importSource) {
-            $this->importSource="filesystem";
+        if (! $this->importSource) {
+            $this->importSource = "filesystem";
         }
 
-        $tbxImportDirectoryPath = APPLICATION_PATH.'/../data/tbx-import/';
-        $newFilePath = $tbxImportDirectoryPath.'tbx-for-'.$this->importSource.'-import/tc_'.$this->termCollection->getId();
+        $tbxImportDirectoryPath = APPLICATION_PATH . '/../data/tbx-import/';
+        $newFilePath = $tbxImportDirectoryPath . 'tbx-for-' . $this->importSource . '-import/tc_' . $this->termCollection->getId();
 
         //check if the directory exist and it is writable
-        if (is_dir($tbxImportDirectoryPath) && !is_writable($tbxImportDirectoryPath)) {
+        if (is_dir($tbxImportDirectoryPath) && ! is_writable($tbxImportDirectoryPath)) {
             $this->logger->error(
                 'E1028',
                 'Unable to save the tbx file to the tbx import path. The file is not writable. Import path: {importPath}',
                 $this->getDefaultLogData([
-                    'importPath' => $tbxImportDirectoryPath
+                    'importPath' => $tbxImportDirectoryPath,
                 ])
             );
+
             return;
         }
 
         try {
-            $couldNotCreate = !file_exists($newFilePath) && !@mkdir($newFilePath, 0777, true);
+            $couldNotCreate = ! file_exists($newFilePath) && ! @mkdir($newFilePath, 0777, true);
         } catch (Throwable $e) {
             $couldNotCreate = false;
             $this->logger->exception($e);
         }
 
-        if($couldNotCreate) {
+        if ($couldNotCreate) {
             $this->logger->error(
                 'E1028',
                 'Unable to create directory for imported tbx files. Directory path: {importPath}',
                 $this->getDefaultLogData([
-                    'importPath' => $newFilePath
+                    'importPath' => $newFilePath,
                 ])
             );
+
             return;
         }
 
         $fi = new FilesystemIterator($newFilePath, FilesystemIterator::SKIP_DOTS);
         //if the name is set, use it as filename
         if ($name) {
-            $fileName = iterator_count($fi).'-'.$name;
+            $fileName = iterator_count($fi) . '-' . $name;
         } else {
-            $fileName = iterator_count($fi).'-'.basename($filepath);
+            $fileName = iterator_count($fi) . '-' . basename($filepath);
         }
 
-        $newFileName = $newFilePath.'/'.$fileName;
+        $newFileName = $newFilePath . '/' . $fileName;
 
         //copy the new file (rename probably not possible, if whole import folder is readonly in folder based imports)
         copy($filepath, $newFileName);
-
     }
 
-    /**
-     * @param string $userGuid
-     */
     public function loadUser(string $userGuid)
     {
         $this->user->loadByGuid($userGuid);
@@ -505,7 +486,7 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_Me
         $taskassoc = ZfExtended_Factory::get('MittagQI\Translate5\LanguageResource\TaskAssociation');
         /* @var $taskassoc TaskAssociation */
         $assocs = $taskassoc->getAssocTasksByLanguageResourceId($this->termCollection->getId());
-        if (empty($assocs)){
+        if (empty($assocs)) {
             return;
         }
         $affectedTasks = array_column($assocs, 'taskGuid');
@@ -516,10 +497,9 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_Me
 
     /**
      * Get filesystem imported collection directory
-     * @return string
      */
-    static public function getFilesystemCollectionDir(): string
+    public static function getFilesystemCollectionDir(): string
     {
-        return APPLICATION_PATH.'/../data/tbx-import/tbx-for-filesystem-import/';
+        return APPLICATION_PATH . '/../data/tbx-import/tbx-for-filesystem-import/';
     }
 }

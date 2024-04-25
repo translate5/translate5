@@ -55,14 +55,23 @@ namespace MittagQI\Translate5\ContentProtection;
 interface ProtectorInterface
 {
     public static function alias(): string;
+
     public function hasEntityToProtect(string $textNode, int $sourceLang = null): bool;
+
     public function hasTagsToConvert(string $textNode): bool;
+
     public function filterTags(string &$source, string &$target): void;
+
     public function filterTagsInChunks(array &$sourceChunks, array &$targetChunks): void;
+
     public function protect(string $textNode, bool $isSource, int $sourceLangId, int $targetLangId): string;
+
     public function unprotect(string $content, bool $isSource): string;
+
     public function convertForSorting(string $content, bool $isSource): string;
+
     public function priority(): int;
+
     /**
      * replaces the placeholder tags (<protectedTag> / <hardReturn> / <char> / <number> etc) with an internal tag
      */
@@ -72,16 +81,19 @@ interface ProtectorInterface
         bool $collectTagNumbers = false,
         array &$shortcutNumberMap = []
     ): string;
+
     public function convertToInternalTagsInChunks(
         string $segment,
         int &$shortTagIdent,
         bool $collectTagNumbers = false,
         array &$shortcutNumberMap = []
     ): array;
+
     public function convertToInternalTagsWithShortcutNumberMap(
         string $segment,
         int &$shortTagIdent,
         array $shortcutNumberMap
     ): string;
+
     public function tagList(): array;
 }

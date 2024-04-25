@@ -21,37 +21,32 @@ START LICENSE AND COPYRIGHT
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
-/**
- */
+
 class editor_Models_Terminology_Models_Abstract extends ZfExtended_Models_Entity_Abstract
 {
     /**
-     * @param string $bindings
-     * @param array $fields
-     * @param array $data
-     * @return Zend_Db_Statement
      * @throws Zend_Db_Table_Exception
      */
     public function createImportTbx(string $bindings, array $fields, array $data): Zend_Db_Statement
     {
-        $query = 'INSERT INTO '.$this->db->info($this->db::NAME).' ('.join(',', $fields).') VALUES '.$bindings;
+        $query = 'INSERT INTO ' . $this->db->info($this->db::NAME) . ' (' . join(',', $fields) . ') VALUES ' . $bindings;
+
         return $this->db->getAdapter()->query($query, $data);
     }
 
-    /**
-     * @param array $attributes
-     * @return bool
-     */
     public function updateImportTbx(array $attributes): bool
     {
         //TODO: Question for Thomas, why not building the sql and exec in one query ?
         foreach ($attributes as $attribute) {
-            $this->db->update($attribute, ['id=?'=> $attribute['id']]);
+            $this->db->update($attribute, [
+                'id=?' => $attribute['id'],
+            ]);
         }
+
         return true;
     }
 }

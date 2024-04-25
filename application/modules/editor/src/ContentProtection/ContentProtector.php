@@ -54,7 +54,6 @@ namespace MittagQI\Translate5\ContentProtection;
 
 use editor_Models_Segment_Utility as SegmentUtility;
 use editor_Models_Segment_Whitespace as Whitespace;
-use MittagQI\Translate5\ContentProtection\NumberProtection\Tag\NumberTag;
 
 class ContentProtector
 {
@@ -79,7 +78,9 @@ class ContentProtector
     public const ENTITY_MODE_OFF = 'off';
 
     private array $shortcutNumberMap = [];
+
     private bool $collectShortcutMap = false;
+
     /**
      * @var array<string, ProtectorInterface>
      */
@@ -110,7 +111,7 @@ class ContentProtector
         return new self([
             new WhitespaceProtector($whitespace, true),
             NumberProtector::create(),
-            new WhitespaceProtector($whitespace)
+            new WhitespaceProtector($whitespace),
         ]);
     }
 
@@ -287,7 +288,7 @@ class ContentProtector
     {
         $tagsPattern = '/<.+\/>/U';
         // we assume that tags that we interested in are all single tags
-        if (!preg_match_all($tagsPattern, $segment, $matches)) {
+        if (! preg_match_all($tagsPattern, $segment, $matches)) {
             return [$segment];
         }
 
@@ -303,7 +304,7 @@ class ContentProtector
                 $chunkStorage[] = [$strings[$i]];
             }
 
-            if (!isset($tags[$i])) {
+            if (! isset($tags[$i])) {
                 continue;
             }
 

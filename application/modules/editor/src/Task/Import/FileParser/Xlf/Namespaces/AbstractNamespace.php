@@ -3,7 +3,7 @@
 START LICENSE AND COPYRIGHT
 
  This file is part of translate5
- 
+
  Copyright (c) 2013 - 2021 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
 
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
@@ -13,11 +13,11 @@ START LICENSE AND COPYRIGHT
  included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
-  
+
  There is a plugin exception available for use with this release of translate5 for
  translate5: Please see http://www.translate5.net/plugin-exception.txt or
  plugin-exception.txt in the root folder of translate5.
-  
+
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
@@ -41,15 +41,14 @@ use ZfExtended_Factory;
  */
 abstract class AbstractNamespace
 {
-
-    public function __construct(protected XmlParser $xmlparser, protected Comments $comments)
-    {
+    public function __construct(
+        protected XmlParser $xmlparser,
+        protected Comments $comments
+    ) {
     }
 
     /**
      * returns true if the current Namespace class is applicable for the given XLF string
-     * @param string $xliff
-     * @return bool
      */
     abstract public static function isApplicable(string $xliff): bool;
 
@@ -58,26 +57,17 @@ abstract class AbstractNamespace
     /**
      * Provides an invocation for parsing custom trans-unit attributes
      * @param string[] $attributes
-     * @param SegmentAttributes $segmentAttributes
      */
     public function transunitAttributes(array $attributes, SegmentAttributes $segmentAttributes): void
     {
         //method stub
     }
 
-    /**
-     * @param array $currentSourceTag
-     * @param SegmentAttributes $segmentAttributes
-     */
     public function currentSource(array $currentSourceTag, SegmentAttributes $segmentAttributes): void
     {
         //method stub
     }
 
-    /**
-     * @param array $currentTargetTag
-     * @param SegmentAttributes $segmentAttributes
-     */
     public function currentTarget(array $currentTargetTag, SegmentAttributes $segmentAttributes): void
     {
         //method stub
@@ -86,7 +76,7 @@ abstract class AbstractNamespace
     /**
      * returns if the used XLIFF derivate must or must not use the plain tag content as internal tag text,
      *   or null if should depend on the tag
-     * @return boolean|NULL
+     * @return boolean|null
      */
     abstract public function useTagContentOnly(): ?bool;
 
@@ -98,7 +88,7 @@ abstract class AbstractNamespace
         return ZfExtended_Factory::get(ContentConverter::class, [
             $this,
             $task,
-            $filename
+            $filename,
         ]);
     }
 }

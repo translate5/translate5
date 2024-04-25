@@ -56,19 +56,21 @@ use NumberFormatter;
 
 class FloatObject
 {
-    public function __construct(private float $number, private int $fractionDigits)
-    {
+    public function __construct(
+        private float $number,
+        private int $fractionDigits
+    ) {
     }
 
     public static function parse(string $float): self
     {
-        $formater = numfmt_create( 'en', NumberFormatter::DECIMAL);
+        $formater = numfmt_create('en', NumberFormatter::DECIMAL);
         $symbols = array_filter(preg_split('/(\d+|[٠١٢٣٤٥٦٧٨٩]+)/u', $float));
         $decimalSeparator = end($symbols);
 
         $decimalPart = explode($decimalSeparator, $float)[1];
         // if format at the end has currency for example
-        if (!preg_match('/(\d+|[٠١٢٣٤٥٦٧٨٩]+)/u', $decimalPart)) {
+        if (! preg_match('/(\d+|[٠١٢٣٤٥٦٧٨٩]+)/u', $decimalPart)) {
             array_pop($symbols);
             $decimalSeparator = end($symbols);
         }
@@ -83,7 +85,7 @@ class FloatObject
     public function format(string $format, ?string $locale = null): string
     {
         $formater = numfmt_create($locale ?: 'en', NumberFormatter::DECIMAL);
-        if (!empty($format)) {
+        if (! empty($format)) {
             $this->setFormat($format, $formater);
         }
         $formater->setAttribute(NumberFormatter::MAX_FRACTION_DIGITS, $this->fractionDigits);
@@ -103,7 +105,7 @@ class FloatObject
         // Symbols are predefined by locale, so we have to enforce our desired ones
         $formater->setSymbol(NumberFormatter::DECIMAL_SEPARATOR_SYMBOL, $symbols[4] ?? $symbols[1]);
 
-        if (!isset($symbols[4])) {
+        if (! isset($symbols[4])) {
             $formater->setSymbol(NumberFormatter::GROUPING_SEPARATOR_SYMBOL, '');
 
             return;

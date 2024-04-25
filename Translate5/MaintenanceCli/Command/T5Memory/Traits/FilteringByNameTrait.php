@@ -39,14 +39,14 @@ trait FilteringByNameTrait
     private function isFilteringByName(): bool
     {
         // TODO move OPTION_TM_NAME constant here after migrating to PHP 8.2
-        return !empty($this->getInput()->getOption(self::OPTION_TM_NAME));
+        return ! empty($this->getInput()->getOption(self::OPTION_TM_NAME));
     }
 
     protected function getTmUuid(InputInterface $input): ?string
     {
         $uuid = $input->getArgument(self::ARGUMENT_UUID);
 
-        if (!empty($uuid)) {
+        if (! empty($uuid)) {
             return $uuid;
         }
 

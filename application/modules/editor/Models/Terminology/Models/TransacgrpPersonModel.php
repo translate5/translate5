@@ -21,13 +21,12 @@ START LICENSE AND COPYRIGHT
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
 
 /**
- * Class editor_Models_Terminology_Models_TransacgrpPerson
  * TermsTransacgrp Instance
  *
  * @method string getId()
@@ -35,31 +34,29 @@ END LICENSE AND COPYRIGHT
  * @method string getName()
  * @method void setName(string $name)
  */
-class editor_Models_Terminology_Models_TransacgrpPersonModel extends editor_Models_Terminology_Models_Abstract {
+class editor_Models_Terminology_Models_TransacgrpPersonModel extends editor_Models_Terminology_Models_Abstract
+{
     protected $dbInstanceClass = 'editor_Models_Db_Terminology_TransacgrpPerson';
 
     /**
-     * @param $name
      * @return $this
      */
-    public function loadOrCreateByName(string $name, $collectionId) {
-
+    public function loadOrCreateByName(string $name, $collectionId)
+    {
         // Build select
         $s = $this->db->select()->from($this->db)->where('name = ?', $name)->where('collectionId = ?', $collectionId);
 
         // If found
         if ($row = $this->db->fetchRow($s)) {
-
             // Set row
             $this->row = $row;
 
-        // Else
+            // Else
         } else {
-
             // Init
             $this->init([
                 'name' => $name,
-                'collectionId' => $collectionId
+                'collectionId' => $collectionId,
             ]);
 
             // Save
@@ -73,25 +70,25 @@ class editor_Models_Terminology_Models_TransacgrpPersonModel extends editor_Mode
     /**
      * Load transacgrp persons by $collectionIds
      *
-     * @param array $collectionIds
      * @return array
      */
-    public function loadByCollectionIds(array $collectionIds) {
-        if (!$collectionIds) $collectionIds = [0];
+    public function loadByCollectionIds(array $collectionIds)
+    {
+        if (! $collectionIds) {
+            $collectionIds = [0];
+        }
         $s = $this->db->select()->where('collectionId IN (?)', $collectionIds);
+
         return $this->loadFilterdCustom($s);
     }
 
     /**
      * Drop terms_transacgrp_person-records if not used anymore within `terms_term`.`tbx(Created|Updated)By` column
-     *
-     * @param array $personIds
      */
-    public function dropIfNotUsedAnymore(array $personIds) {
-
+    public function dropIfNotUsedAnymore(array $personIds)
+    {
         // Foreach person id
         foreach ($personIds as $personId) {
-
             // Check if still used
             $isStillUsedPerson = $this->db->getAdapter()->query('
                 SELECT `id` 
@@ -101,22 +98,23 @@ class editor_Models_Terminology_Models_TransacgrpPersonModel extends editor_Mode
             ', $personId)->fetchColumn() ? true : false;
 
             // If still used - skip to next person id
-            if ($isStillUsedPerson) continue;
+            if ($isStillUsedPerson) {
+                continue;
+            }
 
             // Else delete it
-            $this->load($personId); $this->delete();
+            $this->load($personId);
+            $this->delete();
         }
     }
 
     /**
      * Get array, containing lists of transacgrp-persons
      *
-     * @param array $collectionIds
-     * @return array
      * @throws Zend_Db_Statement_Exception
      */
-    public function getDistinctStores(array $collectionIds): array {
-
+    public function getDistinctStores(array $collectionIds): array
+    {
         // Build WHERE clause for collectionId column
         $where = $this->db->getAdapter()->quoteInto('`collectionId` IN (?)', $collectionIds);
 
@@ -129,8 +127,9 @@ class editor_Models_Terminology_Models_TransacgrpPersonModel extends editor_Mode
         ")->fetchAll();
 
         // Setup combobox-recognizable data for tbxCreatedBy and tbxUpdatedBy filterWindow filters
-        foreach (['tbxCreatedBy', 'tbxUpdatedBy'] as $prop)
+        foreach (['tbxCreatedBy', 'tbxUpdatedBy'] as $prop) {
             $data[$prop] = $tbxPersonA;
+        }
 
         // Return data
         return $data;

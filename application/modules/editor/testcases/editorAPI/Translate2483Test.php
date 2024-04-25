@@ -3,7 +3,7 @@
 START LICENSE AND COPYRIGHT
 
  This file is part of translate5
- 
+
  Copyright (c) 2013 - 2022 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
 
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
@@ -13,27 +13,26 @@ START LICENSE AND COPYRIGHT
  included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
-  
+
  There is a plugin exception available for use with this release of translate5 for
  translate5: Please see http://www.translate5.net/plugin-exception.txt or
  plugin-exception.txt in the root folder of translate5.
-  
+
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
-
 
 /***
  * This test will create and write content into instant translate memory. The content which is saved to the tm, will be
  * additionally validate with instant-translate search functionality
  *
  */
-class Translate2483Test extends editor_Test_JsonTest {
-
+class Translate2483Test extends editor_Test_JsonTest
+{
     /***
      * String which will be saved as source in the instant-translate memory
      * @var string
@@ -65,21 +64,21 @@ class Translate2483Test extends editor_Test_JsonTest {
     private static array $createdResources = [];
 
     protected static array $requiredPlugins = [
-        'editor_Plugins_InstantTranslate_Init'
+        'editor_Plugins_InstantTranslate_Init',
     ];
 
     /**
      * @throws ZfExtended_Exception
      * @throws Exception
      */
-    public static function beforeTests(): void {
-
+    public static function beforeTests(): void
+    {
         $json = self::assertLogin('testmanager');
         self::assertContains('instantTranslate', $json->user->roles, 'Missing role for user.');
         self::assertContains('instantTranslateWriteTm', $json->user->roles, 'Missing role for user.');
         $userIds = [];
-        foreach(explode(',', $json->user->customers) as $userId){
-            if(!empty($userId)){
+        foreach (explode(',', $json->user->customers) as $userId) {
+            if (! empty($userId)) {
                 $userIds[] = intval($userId);
             }
         }
@@ -92,35 +91,34 @@ class Translate2483Test extends editor_Test_JsonTest {
         self::$targetText = bin2hex(random_bytes(10));
     }
 
-
     /**
-     * @return void
      * @throws Zend_Http_Client_Exception
      */
-    public function testCreateAndWrite() {
+    public function testCreateAndWrite()
+    {
         $this->createAndWrite();
         $this->translate();
     }
 
     /**
      *  Create and write into instant-translate memory
-     * @return void
      * @throws Zend_Http_Client_Exception
      */
     private function createAndWrite(): void
     {
         self::assertLogin('testmanager');
-        $response = static::api()->postJson('editor/instanttranslateapi/writetm',
+        $response = static::api()->postJson(
+            'editor/instanttranslateapi/writetm',
             [
                 'source' => self::$sourceText,
                 'target' => self::$targetText,
                 'sourceLanguage' => self::$sourceLang,
-                'targetLanguage' => self::$targetLang
+                'targetLanguage' => self::$targetLang,
             ]
         );
 
         self::$createdResources = $response->created ?? [];
-        self::assertNotEmpty(self::$createdResources,"No Instant-Translate memories where created by this test");
+        self::assertNotEmpty(self::$createdResources, "No Instant-Translate memories where created by this test");
     }
 
     /**
@@ -133,7 +131,7 @@ class Translate2483Test extends editor_Test_JsonTest {
     private function translate(): void
     {
         $params = [];
-        $params['source']  = self::$sourceLang;
+        $params['source'] = self::$sourceLang;
         $params['target'] = self::$targetLang;
         $params['text'] = self::$sourceText;
 
@@ -143,26 +141,25 @@ class Translate2483Test extends editor_Test_JsonTest {
         // Is anything returned for Deep at all?
         $this->assertIsObject($responseBody, 'InstantTranslate: Response for translation does not return an object, check error log.');
         $this->assertIsObject($responseBody->rows, 'InstantTranslate: Response for translation does not return any rows.');
-        $allTranslations = (array)$responseBody->rows;
+        $allTranslations = (array) $responseBody->rows;
         $this->assertIsArray($allTranslations);
         $this->assertArrayHasKey('OpenTM2', $allTranslations, 'InstantTranslate: Translations do not include a response for OpenTM2.');
 
-        self::assertNotEmpty($allTranslations['OpenTM2'],"InstantTranslate: no translation where saved to the TM");
+        self::assertNotEmpty($allTranslations['OpenTM2'], "InstantTranslate: no translation where saved to the TM");
 
         // Does the result match our expectations?
-        foreach ($allTranslations['OpenTM2'] as $translation){
-
-            self::assertNotEmpty($translation,"InstantTranslate: no translation where saved to the TM");
+        foreach ($allTranslations['OpenTM2'] as $translation) {
+            self::assertNotEmpty($translation, "InstantTranslate: no translation where saved to the TM");
 
             $translation = htmlspecialchars_decode($translation[0]->target);
-            $this->assertEquals(self::$targetText, $translation, 'Result of translation is not as expected! Text was:'."\n".self::$sourceText);
+            $this->assertEquals(self::$targetText, $translation, 'Result of translation is not as expected! Text was:' . "\n" . self::$sourceText);
         }
     }
 
-
-    public static function afterTests(): void {
+    public static function afterTests(): void
+    {
         foreach (self::$createdResources as $createdResource) {
-            static::api()->delete('editor/languageresourceinstance/'.$createdResource);
+            static::api()->delete('editor/languageresourceinstance/' . $createdResource);
         }
     }
 }

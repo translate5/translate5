@@ -52,28 +52,63 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\ContentProtection\T5memory;
 
+use editor_Models_LanguageResources_LanguageResource as LanguageResource;
+use editor_Models_Segment_Whitespace as Whitespace;
 use MittagQI\Translate5\ContentProtection\ContentProtector;
 use MittagQI\Translate5\ContentProtection\Model\ContentProtectionRepository;
-use MittagQI\Translate5\ContentProtection\Model\LanguageResourceRulesHash;
+use MittagQI\Translate5\ContentProtection\Model\LanguageRulesHashService;
 use MittagQI\Translate5\ContentProtection\NumberProtector;
+use MittagQI\Translate5\Repository\LanguageRepository;
+use RuntimeException;
 use XMLReader;
 use XMLWriter;
+use Zend_Registry;
 use ZfExtended_Factory;
-use ZfExtended_Models_Entity_NotFoundException;
+use ZfExtended_Logger;
 
 class TmConversionService
 {
     public const T5MEMORY_NUMBER_TAG = 't5:n';
 
     private array $languageRulesHashMap;
+
     private array $languageResourceRulesHashMap;
+
+    private ZfExtended_Logger $logger;
 
     public function __construct(
         private ContentProtectionRepository $contentProtectionRepository,
-        private ContentProtector $contentProtector
+        private ContentProtector $contentProtector,
+        private LanguageRepository $languageRepository,
+        private LanguageRulesHashService $languageRulesHashService
     ) {
-//        $this->languageRulesHashMap = $contentProtectionRepository->getLanguageRulesHashMap();
-//        $this->languageResourceRulesHashMap = $contentProtectionRepository->getLanguageResourceRulesHashMap();
+        $this->languageRulesHashMap = $contentProtectionRepository->getLanguageRulesHashMap();
+        $this->languageResourceRulesHashMap = $contentProtectionRepository->getLanguageResourceRulesHashMap();
+        $this->logger = Zend_Registry::get('logger')->cloneMe('translate5.content_protection');
+    }
+
+    public static function create(?Whitespace $whitespace = null)
+    {
+        $contentProtectionRepository = new ContentProtectionRepository();
+        $languageRepository = new LanguageRepository();
+
+        return new self(
+            $contentProtectionRepository,
+            ContentProtector::create($whitespace ?: ZfExtended_Factory::get(Whitespace::class)),
+            $languageRepository,
+            new LanguageRulesHashService($contentProtectionRepository, $languageRepository),
+        );
+    }
+
+    public function setRulesHash(LanguageResource $languageResource, int $sourceLanguageId, int $targetLangId): void
+    {
+        $languageRulesHash = $this->languageRulesHashService->findOrCreate($sourceLanguageId, $targetLangId);
+
+        $languageResource->addSpecificData(
+            LanguageResource::PROTECTION_HASH,
+            $languageRulesHash->getHash()
+        );
+        $languageResource->save();
     }
 
     public static function fullTagRegex(): string
@@ -83,56 +118,53 @@ class TmConversionService
 
     public function isTmConverted(int $languageResourceId): bool
     {
-        if (!isset($this->languageRulesHashMap[$languageResourceId])) {
+        if (! isset($this->languageResourceRulesHashMap[$languageResourceId])) {
             return false;
         }
 
-        foreach ($this->languageResourceRulesHashMap[$languageResourceId] as ['languageId' => $id, 'hash' => $hash]) {
-            if ($this->languageRulesHashMap[(int)$id] !== $hash) {
-                return false;
-            }
+        ['languages' => $languages, 'hash' => $hash] = $this->languageResourceRulesHashMap[$languageResourceId];
+
+        if (! isset($this->languageRulesHashMap[$languages['source']])) {
+            return false;
         }
 
-        return true;
+        if (! isset($this->languageRulesHashMap[$languages['source']][$languages['target']])) {
+            return false;
+        }
+
+        return $this->languageRulesHashMap[$languages['source']][$languages['target']] === $hash;
     }
 
     public function isConversionInProgress(int $languageResourceId): bool
     {
-        if (!isset($this->languageRulesHashMap[$languageResourceId])) {
+        if (! isset($this->languageResourceRulesHashMap[$languageResourceId])) {
             return false;
         }
 
-        foreach ($this->languageResourceRulesHashMap[$languageResourceId] as ['conversionStarted' => $started]) {
-            if ($started) {
-                return true;
-            }
+        if (! empty($this->languageResourceRulesHashMap[$languageResourceId]['conversionStarted'])) {
+            return true;
         }
 
         return false;
     }
 
-    public function startConversion(int $languageResourceId, int $languageId): void
+    public function startConversion(int $languageResourceId): void
     {
-        $languageResourceRulesHash = ZfExtended_Factory::get(LanguageResourceRulesHash::class);
+        $languageResource = ZfExtended_Factory::get(LanguageResource::class);
+        $languageResource->load($languageResourceId);
 
-        try {
-            $languageResourceRulesHash->loadByLanguageResourceIdAndLanguageId($languageResourceId, $languageId);
-        } catch (ZfExtended_Models_Entity_NotFoundException) {
-            // if not found we simply create new
-            $languageResourceRulesHash->init();
-            $languageResourceRulesHash->setLanguageResourceId($languageResourceId);
-            $languageResourceRulesHash->setLanguageId($languageId);
-        }
-
-        $languageResourceRulesHash->setConversionStarted(date('Y-m-d H:i:s'));
-        $languageResourceRulesHash->save();
+        $languageResource->addSpecificData(LanguageResource::PROTECTION_CONVERSION_STARTED, date('Y-m-d H:i:s'));
+        $languageResource->save();
 
         $worker = ZfExtended_Factory::get(ConverseMemoryWorker::class);
-        $worker->init(parameters: ['languageResourceId' => $languageResourceId, 'languageId' => $languageId]);
-        $worker->queue();
+        if ($worker->init(parameters: [
+            'languageResourceId' => $languageResourceId,
+        ])) {
+            $worker->queue();
+        }
     }
 
-    public function convertT5MemoryTagToNumber(string $string): string
+    public function convertT5MemoryTagToContent(string $string): string
     {
         return preg_replace(self::fullTagRegex(), '\3', $string);
     }
@@ -142,7 +174,7 @@ class TmConversionService
         $queryString = $this->contentProtector->unprotect($queryString, false, NumberProtector::alias());
         $regex = NumberProtector::fullTagRegex();
 
-        if (!preg_match_all($regex, $queryString, $tags, PREG_SET_ORDER)) {
+        if (! preg_match_all($regex, $queryString, $tags, PREG_SET_ORDER)) {
             return $queryString;
         }
 
@@ -174,20 +206,33 @@ class TmConversionService
         return $queryString;
     }
 
-    public function convertTMXForImport(string $filenameWithPath, int $sourceLang, int $targetLang): string
+    public function convertTMXForImport(string $filenameWithPath, int $sourceLangId, int $targetLangId): string
     {
+        $sourceLang = $sourceLangId ? $this->languageRepository->find($sourceLangId) : null;
+        $targetLang = $targetLangId ? $this->languageRepository->find($targetLangId) : null;
+
+        if (! $this->contentProtectionRepository->hasActiveRules($sourceLang, $targetLang)) {
+            return $filenameWithPath;
+        }
+
         $exportDir = APPLICATION_PATH . '/../data/TMConversion/';
         @mkdir($exportDir, recursive: true);
 
         $resultFilename = $exportDir . str_replace('.tmx', '', basename($filenameWithPath)) . '_converted.tmx';
 
         $writer = new XMLWriter();
-        $writer->openURI($resultFilename);
+
+        if (! $writer->openURI($resultFilename)) {
+            throw new RuntimeException('File for TMX conversion was not created. Filename: ' . $resultFilename);
+        }
+
         $writer->startDocument('1.0', 'UTF-8');
         $writer->setIndent(true);
 
         $reader = new XMLReader();
         $reader->open($filenameWithPath);
+        $writtenElements = 0;
+        $brokenTus = 0;
 
         while ($reader->read()) {
             if ($reader->nodeType == XMLReader::ELEMENT && $reader->name == 'header') {
@@ -195,11 +240,13 @@ class TmConversionService
             }
 
             if ($reader->nodeType == XMLReader::ELEMENT && $reader->name == 'tu') {
-                $isSource = true;
-                $writer->writeRaw($this->convertTransUnit($reader->readOuterXML(), $isSource, $sourceLang, $targetLang));
+                $writtenElements++;
+                $writer->writeRaw(
+                    $this->convertTransUnit($reader->readOuterXML(), $sourceLangId, $targetLangId, $brokenTus)
+                );
             }
 
-            if (!in_array($reader->name, ['tmx', 'body'], true)) {
+            if (! in_array($reader->name, ['tmx', 'body'], true)) {
                 continue;
             }
 
@@ -222,19 +269,69 @@ class TmConversionService
 
         $writer->flush();
 
-        // Finalizing document with $writer->endDocument() adds closing tags for all bpt-ept tags
-        // so add body and tmx closing tags manually
-        file_put_contents($resultFilename, PHP_EOL . '</body>' . PHP_EOL . '</tmx>', FILE_APPEND);
+        if (0 !== $writtenElements) {
+            // Finalizing document with $writer->endDocument() adds closing tags for all bpt-ept tags
+            // so add body and tmx closing tags manually
+            file_put_contents($resultFilename, PHP_EOL . '</body>', FILE_APPEND);
+        }
+
+        file_put_contents($resultFilename, PHP_EOL . '</tmx>', FILE_APPEND);
+
+        if (0 !== $brokenTus) {
+            $this->logger->error(
+                'E1593',
+                'Trans unit has unexpected structure and was excluded from TMX import',
+                [
+                    'count' => $brokenTus,
+                ]
+            );
+        }
 
         return $resultFilename;
     }
 
-    private function convertTransUnit(string $transUnit, bool $isSource, int $sourceLang, int $targetLang): string
+    private function convertTransUnit(string $transUnit, int $sourceLang, int $targetLang, int &$brokenTus): string
     {
-        $transUnit = $this->convertT5MemoryTagToNumber($transUnit);
-        preg_match_all('/<tuv xml:lang="((\w|-)+)">((\n|\r|\r\n).+)+<\/tuv>/Uum', $transUnit, $matches, PREG_SET_ORDER);
+        $transUnit = $this->convertT5MemoryTagToContent($transUnit);
+        preg_match_all(
+            '/<tuv xml:lang="((\w|-)+)">((\n|\r|\r\n)?.+(\n|\r|\r\n)*)+<\/tuv>/Uum',
+            $transUnit,
+            $matches,
+            PREG_SET_ORDER
+        );
 
-        $transUnit = $this->contentProtector->protect($transUnit, $isSource, $sourceLang, $targetLang);
+        $numberTagMap = [];
+
+        if (empty($matches[0][0]) || empty($matches[1][0])) {
+            $brokenTus++;
+
+            return '';
+        }
+
+        [$source, $target] = $this->contentProtector->filterTags(
+            $this->contentProtector->protect(
+                $matches[0][0],
+                true,
+                $sourceLang,
+                $targetLang,
+                ContentProtector::ENTITY_MODE_OFF
+            ),
+            $this->contentProtector->protect(
+                $matches[1][0],
+                false,
+                $sourceLang,
+                $targetLang,
+                ContentProtector::ENTITY_MODE_OFF
+            )
+        );
+
+        return str_replace(
+            [$matches[0][0], $matches[1][0]],
+            [
+                $this->convertContentTagToT5MemoryTag($source, true, $numberTagMap),
+                $this->convertContentTagToT5MemoryTag($target, false, $numberTagMap),
+            ],
+            $transUnit
+        );
     }
-
 }

@@ -21,7 +21,7 @@ START LICENSE AND COPYRIGHT
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
@@ -32,22 +32,17 @@ use editor_Models_LanguageResources_LanguageResource;
 use editor_Services_Manager;
 use editor_Services_OpenTM2_Service;
 use MittagQI\Translate5\LanguageResource\TaskAssociation;
-use MittagQI\Translate5\Task\Export\Package\ExportSource;
 use ZfExtended_Factory;
 use ZfExtended_Models_Worker;
 
 class Memory extends Base
 {
-
     protected string $fileName = 'tmx';
 
     public function validate(): void
     {
     }
 
-    /**
-     * @return void
-     */
     public function export(?ZfExtended_Models_Worker $workerModel): void
     {
         $service = ZfExtended_Factory::get(editor_Services_OpenTM2_Service::class);
