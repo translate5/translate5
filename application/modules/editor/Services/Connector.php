@@ -26,6 +26,7 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\LanguageResource\Pretranslation\BatchResult;
 use MittagQI\Translate5\Segment\TagRepair\HtmlProcessor;
 
 /**
@@ -356,17 +357,20 @@ class editor_Services_Connector
         return in_array($this->getStatus($resource), $isValidFor);
     }
 
-    /***
-     * Load the lates service result cache for the given segment in the current language resource
+    /**
+     * Load the latest service result cache for the given segment in the current language resource
      * @param editor_Models_Segment $segment
      * @return editor_Services_ServiceResult
+     * @throws ReflectionException
      */
-    protected function getCachedResult(editor_Models_Segment $segment)
+    protected function getCachedResult(editor_Models_Segment $segment): editor_Services_ServiceResult
     {
-        $model = ZfExtended_Factory::get('MittagQI\Translate5\LanguageResource\Pretranslation\BatchResult');
+        $model = ZfExtended_Factory::get(BatchResult::class);
 
-        /* @var $model MittagQI\Translate5\LanguageResource\Pretranslation\BatchResult */
-        return $model->getResults($segment->getId(), $this->adapter->getLanguageResource()->getId());
+        return $model->getResults(
+            $segment->getId(),
+            $this->adapter->getLanguageResource()->getId()
+        );
     }
 
     /***

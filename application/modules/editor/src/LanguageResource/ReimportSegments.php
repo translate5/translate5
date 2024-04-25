@@ -109,7 +109,14 @@ class ReimportSegments
         );
 
         $this->reopenTask();
-        $this->getLogger()->info('E0000', 'Task re-imported successfully into the desired TM');
+        $this->getLogger()->info(
+            'E0000',
+            'Task {taskId} re-imported successfully into the desired TM {tmId}',
+            [
+                'taskId' => $this->task->getId(),
+                'tmId' => $this->languageResource->getId(),
+            ]
+        );
 
         return true;
     }
@@ -121,6 +128,9 @@ class ReimportSegments
      */
     public function reopenTask(): void
     {
+        if ($this->oldState === self::STATE_REIMPORT) {
+            $this->oldState = $this->task::STATE_OPEN;
+        }
         $this->task->setState($this->oldState);
         $this->task->save();
 

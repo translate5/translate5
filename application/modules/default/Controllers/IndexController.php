@@ -111,6 +111,14 @@ class IndexController extends ZfExtended_Controllers_Action
                 $this->view->monitoringHttpCode = 500;
                 $this->view->monitoringMessage = 'system status has errors or warnings';
 
+                Zend_Registry::get('logger')
+                    ->cloneMe('system.monitoring')
+                    ->warn(
+                        'E1602',
+                        'Monitoring not successful: {reason}',
+                        ['reason' => $this->view->monitoringMessage]
+                    );
+
                 return;
             }
         }
@@ -128,7 +136,7 @@ class IndexController extends ZfExtended_Controllers_Action
     /**
      * @throws ZfExtended_Models_MaintenanceException
      */
-    public function displayMaintenance()
+    public function displayMaintenance(): void
     {
         //disable default maintenance check for monitoring endpoint
         if ($this->_request->getActionName() == 'monitoring') {
