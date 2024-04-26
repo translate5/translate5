@@ -171,6 +171,15 @@ class editor_Models_Segment_AutoStates
         self::PRETRANSLATED => 'Vorübersetzt',
     ];
 
+    /**
+     * Segment autostates ids for blocked segments
+     * TODO: after implementing TRANSLATE-3710, change this to constant
+     * @var array|int[]
+     */
+    public static array $blockedStates = [
+        self::BLOCKED,
+    ];
+
     private editor_Models_SegmentHistory $segmentHistory;
 
     public function __construct()

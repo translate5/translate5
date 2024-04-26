@@ -1224,17 +1224,21 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract
      * First Segment is defined as the segment with the lowest id of the task
      *
      * @param string $taskGuid
-     * @param int $fileId optional, loads first file of given fileId in task
-     * @return editor_Models_Segment
+     * @param int|null $fileId optional, loads first file of given fileId in task
+     * @param bool $ignoreBlocked optional, if true blocked segments are ignored
+     * @return $this|null
+     * @throws Zend_Db_Select_Exception
+     * @throws Zend_Db_Statement_Exception
+     * @throws ZfExtended_Models_Entity_NotFoundException
      */
-    public function loadFirst($taskGuid, $fileId = null)
+    public function loadFirst(string $taskGuid, int $fileId = null,bool $ignoreBlocked = false): ?editor_Models_Segment
     {
         $this->segmentFieldManager->initFields($taskGuid);
         //ensure that view exists (does nothing if already):
         $this->segmentFieldManager->getView()->create();
         $this->reInitDb($taskGuid);
 
-        $seg = $this->loadNext($taskGuid, 0, $fileId);
+        $seg = $this->loadNext($taskGuid, 0, $fileId,$ignoreBlocked);
 
         if (empty($seg)) {
             $this->notFound('first segment of task', $taskGuid);
@@ -1284,21 +1288,30 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract
 
     /**
      * synchronizes the isRepeated flag depending on if there are repetitions or not.
+     *
+     * @param string $taskGuid
      * @param bool $resetIsRepeated by default true, not needed on import, since there are all flags already false
+     * @return void
      */
     public function syncRepetitions(string $taskGuid, bool $resetIsRepeated = true)
     {
+        $adapter = $this->db->getAdapter();
         if ($resetIsRepeated) {
-            $this->db->getAdapter()->query('UPDATE LEK_segments SET isRepeated = 0 WHERE taskGuid = ?', [$taskGuid]);
+            $adapter->query('UPDATE LEK_segments SET isRepeated = 0 WHERE taskGuid = ?', [$taskGuid]);
         }
+
+        $blockedStates = $adapter->quote(editor_Models_Segment_AutoStates::$blockedStates, Zend_Db::INT_TYPE);
 
         $sql = 'UPDATE LEK_segments s, LEK_segment_data d
         SET s.isRepeated = s.isRepeated | %1$s
         WHERE d.originalMd5 IN (
             SELECT originalMd5
             FROM LEK_segment_data
-            WHERE taskGuid = ? AND
-            originalMd5 != ? AND name = "%2$s" GROUP BY originalMd5 HAVING count(segmentId) > 1
+            WHERE taskGuid = ?
+              AND originalMd5 != ?
+              AND autoStateId NOT IN ('.$blockedStates.')
+              AND name = "%2$s"
+            GROUP BY originalMd5 HAVING count(segmentId) > 1
         )
         AND s.id = d.segmentId AND d.taskGuid = ?';
 
@@ -1321,12 +1334,14 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract
 
     /**
      * Loads the next segment after the given id from the given taskGuid
-     * next is defined as the segment with the next higher segmentId
+     * next is defined as the segment with the next higher segmentId. Optionally blocked segments can be ignored by
+     * applying filter on autoStateId
      * This method assumes that segmentFieldManager was already loaded internally
-     * @param int|null $fileId optional, loads first file of given fileId in task
-     * @return editor_Models_Segment | null if no next found
+     *
+     * @throws Zend_Db_Select_Exception
+     * @throws Zend_Db_Statement_Exception
      */
-    public function loadNext(string $taskGuid, int $id, int $fileId = null): ?static
+    public function loadNext(string $taskGuid, int $id, int $fileId = null, bool $ignoreBlocked = false): ?static
     {
         $this->segmentFieldManager->initFields($taskGuid);
 
@@ -1345,6 +1360,13 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract
 
         if (! empty($fileId)) {
             $s->where($this->tableName . '.fileId = ?', $fileId);
+        }
+
+        if($ignoreBlocked) {
+            $s->where(
+                $this->tableName . '.autoStateId NOT IN(?)',
+                editor_Models_Segment_AutoStates::$blockedStates
+            );
         }
 
         $row = $this->db->fetchRow($s);
@@ -2065,20 +2087,27 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract
      *
      * @param string $taskGuid
      * @return array
+     * @throws ReflectionException
+     * @throws Zend_Db_Statement_Exception
      */
-    public function getRepetitions(string $taskGuid)
+    public function getRepetitions(string $taskGuid): array
     {
         $adapter = $this->db->getAdapter();
-        $mv = ZfExtended_Factory::get('editor_Models_Segment_MaterializedView');
-        /* @var $mv editor_Models_Segment_MaterializedView */
+        $mv = ZfExtended_Factory::get(editor_Models_Segment_MaterializedView::class);
         $mv->setTaskGuid($taskGuid);
         $viewName = $mv->getName();
+
+        $blockedStates = $adapter->quote(editor_Models_Segment_AutoStates::$blockedStates, Zend_Db::INT_TYPE);
         $sql = 'SELECT v1.id,v1.sourceMd5 FROM ' . $viewName . ' v1, (
-	          SELECT sourceMd5, count(sourceMd5) cnt
+	          SELECT sourceMd5, count(sourceMd5) cnt, autoStateId
                FROM ' . $viewName . '
+               WHERE autoStateId NOT IN ('.$blockedStates.')
                GROUP BY sourceMd5
               ) v2
-              WHERE v2.cnt > 1 and v1.sourceMd5 = v2.sourceMd5
+              WHERE v2.cnt > 1
+                AND v1.sourceMd5 = v2.sourceMd5
+                AND v1.autoStateId NOT IN ('.$blockedStates.')
+                AND v2.autoStateId NOT IN ('.$blockedStates.')
               ORDER BY v1.id';
 
         return $adapter->query($sql)->fetchAll();

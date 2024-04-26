@@ -100,8 +100,11 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
     public function analyseAndPretranslate(Closure $progressCallback = null): bool
     {
         // create a segment-iterator to get all segments of this task as a list of editor_Models_Segment objects
-        $segments = ZfExtended_Factory::get('editor_Models_Segment_Iterator', [$this->task->getTaskGuid()]);
-        /* @var $segments editor_Models_Segment_Iterator */
+        $segments = ZfExtended_Factory::get(editor_Models_Segment_Iterator::class, [
+            $this->task->getTaskGuid()
+        ]);
+        $segments->setIgnoreBlockedSegments(true);
+
 
         $this->initConnectors();
 
