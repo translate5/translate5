@@ -124,6 +124,9 @@ class editor_Plugins_ArchiveTaskBeforeDelete_DbTables
         'LEK_workflow_step' => false,
         'LEK_workflow_userpref' => 'taskGuid',
         'Zf_dbversion' => true,
+        'LEK_content_protection_content_recognition' => false,
+        'LEK_content_protection_input_mapping' => false,
+        'LEK_content_protection_output_mapping' => false,
     ];
 
     /**

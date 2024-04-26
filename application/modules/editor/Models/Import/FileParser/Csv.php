@@ -32,6 +32,9 @@ END LICENSE AND COPYRIGHT
  * @version 1.0
  */
 
+use editor_Models_Segment_InternalTag as InternalTag;
+use MittagQI\Translate5\ContentProtection\ContentProtector;
+
 /**
  * Fileparsing for Csv-files
  *
@@ -314,17 +317,28 @@ class editor_Models_Import_FileParser_Csv extends editor_Models_Import_FileParse
 
                 continue;
             }
+
             $field = $this->segmentFieldManager->getByName($name);
             $isSource = $field->type == editor_Models_SegmentField::TYPE_SOURCE;
+
             if (empty($lineArr[$idx]) && $lineArr[$idx] !== "0") {
                 $original = '';
             } else {
                 $original = $lineArr[$idx];
             }
+
             $this->segmentData[$name] = [
                 'original' => $this->parseSegment($original, $isSource),
             ];
         }
+
+        [$source, $target] = $this->contentProtector->filterTags(
+            $this->segmentData[editor_Models_SegmentField::TYPE_SOURCE]['original'],
+            $this->segmentData[editor_Models_SegmentField::TYPE_TARGET]['original']
+        );
+
+        $this->segmentData[editor_Models_SegmentField::TYPE_SOURCE]['original'] = $this->convertSegmentToInternalTags($source);
+        $this->segmentData[editor_Models_SegmentField::TYPE_TARGET]['original'] = $this->convertSegmentToInternalTags($target);
 
         //just create a segment attributes object with default values
         $this->createSegmentAttributes($this->_mid);
@@ -338,6 +352,15 @@ class editor_Models_Import_FileParser_Csv extends editor_Models_Import_FileParse
         }
 
         return $lineArr;
+    }
+
+    private function convertSegmentToInternalTags(string $segment): string
+    {
+        $this->shortTagIdent = 1;
+        $segment = $this->contentProtector->convertToInternalTags($segment, $this->shortTagIdent);
+        $segment = $this->parseSegmentInsertPlaceholders($segment, InternalTag::REGEX_INTERNAL_TAGS);
+
+        return $this->parseSegmentReplacePlaceholders($segment);
     }
 
     /**
@@ -354,7 +377,6 @@ class editor_Models_Import_FileParser_Csv extends editor_Models_Import_FileParse
                 'task' => $this->task,
             ]);
         }
-        $this->shortTagIdent = 1;
 
         //at first protect MQM - they will be converted to MQM-tags later by MqmParser
         //for performance reasons only do this, if escaping MQM is necessary for later protections
@@ -370,23 +392,20 @@ class editor_Models_Import_FileParser_Csv extends editor_Models_Import_FileParse
         if ($this->config->runtimeOptions->import->fileparser->options->protectTags ?? false) {
             // because of the replaceRegularExpressionsAfterTagParsing we can only replace tags here but no whitespace so far!
             $segment = $this->utilities->tagProtection->protectTags($segment, false);
-
-            //now we have to protect thw so protected tags with the internal char based replacers
-            $segment = $this->utilities->whitespace->convertToInternalTags($segment, $this->shortTagIdent);
-            $segment = $this->parseSegmentInsertPlaceholders($segment, $this->regexInternalTags);
         }
 
         // protect regExes after tag parsing
         $segment = $this->parseSegmentRegEx($segment, $this->replaceRegularExpressionsAfterTagParsing);
 
         // now all whitespace and remaining entities are encoded
-        $segment = $this->utilities->whitespace->protectWhitespace($segment, $this->utilities->whitespace::ENTITY_MODE_KEEP);
-
         // if there are now internal tags added by the whitespace protection we have to protect them locally too
-        $segment = $this->utilities->whitespace->convertToInternalTags($segment, $this->shortTagIdent);
-        $segment = $this->parseSegmentInsertPlaceholders($segment, $this->regexInternalTags);
-
-        return $this->parseSegmentReplacePlaceholders($segment);
+        return $this->contentProtector->protect(
+            $segment,
+            $isSource,
+            $this->task->getSourceLang(),
+            $this->task->getTargetLang(),
+            ContentProtector::ENTITY_MODE_KEEP
+        );
     }
 
     /**
@@ -410,8 +429,7 @@ class editor_Models_Import_FileParser_Csv extends editor_Models_Import_FileParse
             $tagObj = new editor_Models_Import_FileParser_Tag(editor_Models_Import_FileParser_Tag::TYPE_SINGLE, false);
             $tagObj->originalContent = $tag;
             $tagObj->tagNr = $this->shortTagIdent++;
-            ;
-            $tagObj->id = editor_Models_Segment_InternalTag::TYPE_REGEX;
+            $tagObj->id = InternalTag::TYPE_REGEX;
             $tagObj->text = $this->encodeTagsForDisplay($tag);
 
             return $tagObj->renderTag();
@@ -420,7 +438,7 @@ class editor_Models_Import_FileParser_Csv extends editor_Models_Import_FileParse
             $text = preg_replace_callback($regEx, $mask, $text);
         }
 
-        return $this->parseSegmentInsertPlaceholders($text, $this->regexInternalTags);
+        return $this->parseSegmentInsertPlaceholders($text, InternalTag::REGEX_INTERNAL_TAGS);
     }
 
     /**

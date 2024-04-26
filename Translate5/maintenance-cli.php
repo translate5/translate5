@@ -41,6 +41,7 @@ use Translate5\MaintenanceCli\Command\{
     CachePurgeCommand,
     ChangelogCommand,
     ConfigCommand,
+    ContentProtectionLanguageRulesHashesRefreshCommand,
     CronCommand,
     DatabaseBackupCommand,
     DatabaseStatCommand,
@@ -182,6 +183,7 @@ $commands = [
     new WorkflowCloneCommand(),
     new WorkflowListCommand(),
     new WorkflowStepCommand(),
+    new ContentProtectionLanguageRulesHashesRefreshCommand(),
 ];
 
 // integrate Plugin-specific CLI commands

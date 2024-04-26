@@ -9581,6 +9581,62 @@ E-Mail: service@MittagQI.com</pre>
                 <source>Gemeldete Fehler</source>
                 <target>Reported errors</target>
             </trans-unit>
+            <trans-unit id='UHJpb3JpdMOkdA=='>
+                <source>Priorität</source>
+                <target>Priority</target>
+            </trans-unit>
+            <trans-unit id='VW52ZXLDpG5kZXJ0IMO8YmVybmVobWVu'>
+                <source>Unverändert übernehmen</source>
+                <target>Keep as is</target>
+            </trans-unit>
+            <trans-unit id='TnVtbWVybnNjaHV0eg=='>
+                <source>Nummernschutz</source>
+                <target>Content protection</target>
+            </trans-unit>
+            <trans-unit id="TMO2c2NodW5nIGJlc3TDpHRpZ2Vu">
+                <source>Löschung bestätigen</source>
+                <target>Confirm deletion</target>
+            </trans-unit>
+            <trans-unit id="U2luZCBTaWUgc2ljaGVyLCBkYXNzIFNpZSBkaWUgTnVtbWVybmVya2VubnVuZyBsw7ZzY2hlbiBtw7ZjaHRlbj8=">
+                <source>Sind Sie sicher, dass Sie die Nummernerkennung löschen möchten?</source>
+                <target>Are you sure you want to delete rule? It may lead to the loss of 100% matches in new tasks unless you convert all affected language resources.</target>
+            </trans-unit>
+            <trans-unit id="U2luZCBTaWUgc2ljaGVyLCBkYXNzIFNpZSBkaWUgWnVvcmRudW5nIGzDtnNjaGVuIG3DtmNodGVuPw==">
+                <source>Sind Sie sicher, dass Sie die Zuordnung löschen möchten?</source>
+                <target>Are you sure you want to delete mapping? It may lead to the loss of 100% matches in new tasks unless you convert all affected language resources.</target>
+            </trans-unit>
+            <trans-unit id="TnVtbWVybmVya2VubnVuZw==">
+                <source>Nummernerkennung</source>
+                <target>Content Recognition Rules</target>
+            </trans-unit>
+            <trans-unit id="RWluZ2FiZXp1b3JkbnVuZw==">
+                <source>Eingabezuordnung</source>
+                <target>Active Input Rules</target>
+            </trans-unit>
+            <trans-unit id="QXVzZ2FiZXp1b3JkbnVuZw==">
+                <source>Ausgabezuordnung</source>
+                <target>Active Output Rules</target>
+            </trans-unit>
+            <trans-unit id="TnVtbWVybmVya2VubnVuZyBlcnN0ZWxsZW4=">
+                <source>Nummernerkennung erstellen</source>
+                <target>Create content recognition rule</target>
+            </trans-unit>
+            <trans-unit id="WnVvcmRudW5nIGVyc3RlbGxlbg==">
+                <source>Zuordnung erstellen</source>
+                <target>Create mapping</target>
+            </trans-unit>
+            <trans-unit id='QWt0aXZpZXJ0'>
+                <source>Aktiviert</source>
+                <target>Enabled</target>
+            </trans-unit>
+            <trans-unit id='RGVmYXVsdHMgYW56ZWlnZW4='>
+                <source>Defaults anzeigen</source>
+                <target>Show defaults</target>
+            </trans-unit>
+            <trans-unit id='RGVmYXVsdHMgYXVzYmxlbmRlbg=='>
+                <source>Defaults ausblenden</source>
+                <target>Hide defaults</target>
+            </trans-unit>
             <trans-unit id='SW5pdGlhbCBlaW5tYWwgYXVmICJTdWNoZW4iIGtsaWNrZW4sIGJldm9yICJBbGxlIGVyc2V0emVuIiBhdXN3w6RobGJhciB3aXJkLg=='>
                 <source>Initial einmal auf "Suchen" klicken, bevor "Alle ersetzen" auswählbar wird.</source>
                 <target>Please click "Search" once to enable "Replace all" operation.</target>
@@ -9596,6 +9652,14 @@ E-Mail: service@MittagQI.com</pre>
             <trans-unit id='QmVncmlmZiBleGlzdGllcnQgYmVyZWl0cyBpbiBkZXIgYXVzZ2V3w6RobHRlbiBUZXJtQ29sbGVjdGlvbg=='>
                 <source>Begriff existiert bereits in der ausgewählten TermCollection</source>
                 <target>Term already exists in selected TermCollection</target>
+            </trans-unit>
+            <trans-unit id="R2VzY2jDvHR6dGUgUmVnZXgtR3J1cHBl">
+                <source>Geschützte Regex-Gruppe</source>
+                <target>Protected regex group</target>
+            </trans-unit>
+            <trans-unit id="UHJvdGVjdGVkIHJlZ2V4IGdyb3VwIHF0aXA=">
+                <source>Protected regex group qtip</source>
+                <target>Regexes can contain groupings defined with (). The selected number is the number of the protected grouping, counted from the start of the regex. If no grouping is defined, everything matched by the regex will be protected.</target>
             </trans-unit>
             <trans-unit id='RGFzIFNlZ21lbnQga29ubnRlIG51ciBpbiBkZXIgQXVmZ2FiZSwgbmljaHQgYWJlciBpbnMgVE0gZ2VzcGVpY2hlcnQgd2VyZGVuLiBTZWdtZW50ZSBsw6RuZ2VyIGFscyAyMDQ4IEJ5dGVzIHNpbmQgbmljaHQgaW0gVE0gc3BlaWNoZXJiYXIu'>
                 <source>Das Segment konnte nur in der Aufgabe, nicht aber ins TM gespeichert werden. Segmente länger als 2048 Bytes sind nicht im TM speicherbar.</source>
@@ -9613,9 +9677,140 @@ E-Mail: service@MittagQI.com</pre>
                 <source>Zur Aufgabenliste wechseln</source>
                 <target>Switch to the task list</target>
             </trans-unit>
+            <trans-unit id="Q29udGVudCBSZWNvZ25pdGlvbiBSdWxlcyB0YWIgaW5mbyBib3g=">
+                <source>Content Recognition Rules tab info box</source>
+                <target>
+                List of predefined regular expressions that can be used to protect and/or convert content.
+                <br/>Or define your own rules.
+                <br/>Activate any rule you want to use as input or output here.
+                <br/>To find format string rules you can look at:
+                <br/><a href="https://icu4c-demos.unicode.org/icu-bin/locexp?d_=en#region" target="_blank" rel="noopener noreferrer">1. Locale related format presets</a>
+                <br/><a href="https://unicode-org.github.io/icu/userguide/format_parse/datetime/#datetime-format-syntax" target="_blank" rel="noopener noreferrer">2. Dates syntax</a>
+                <br/><a href="https://unicode.org/reports/tr35/tr35-numbers.html#Number_Format_Patterns" target="_blank" rel="noopener noreferrer">3. Number syntax</a>
+                <br/><a href="https://icu4c-demos.unicode.org" target="_blank" rel="noopener noreferrer">4. ICU Demonstration</a>
+                </target>
+            </trans-unit>
+            <trans-unit id="QWN0aXZlIElucHV0IFJ1bGVzIHRhYiBpbmZvIGJveA==">
+                <source>Active Input Rules tab info box</source>
+                <target>
+                List of active input rules.
+                <br/>To activate a rule it has to be mapped to a source language.
+                <br/>Once the content is found in the source language <b>and</b> active output rule for the target language is defined, it will be protected as internal tag <b>and</b> converted automatically according to the defined output rule.
+                <br/><b>Higher priorities will be mapped first.</b>
+                <br/>If the wanted rule is not available in the drop-down activate (or add and activate) it in the "Content Recognition Rules" tab.
+                </target>
+            </trans-unit>
+            <trans-unit id="QWN0aXZlIE91dHB1dCBSdWxlcyB0YWIgaW5mbyBib3g=">
+                <source>Active Output Rules tab info box</source>
+                <target>
+                List of active output rules.
+                <br/>Add rules here per <b>target language</b> for your active input rules to protect and convert content.
+                <br/>If the wanted output rule is not available in the drop-down activate (or add and activate) it in the "Content Recognition Rules" tab.
+                </target>
+            </trans-unit>
+            <trans-unit id="UmVnZWxiZXNjaHJlaWJ1bmc=">
+                <source>Regelbeschreibung</source>
+                <target>Rule description</target>
+            </trans-unit>
+            <trans-unit id="UmVnZWxuYW1l">
+                <source>Regelname</source>
+                <target>Rule name</target>
+            </trans-unit>
+            <trans-unit id="TmFtZSBkZXIgRWluZ2FiZXJlZ2Vs">
+                <source>Name der Eingaberegel</source>
+                <target>Input Rule name</target>
+            </trans-unit>
+            <trans-unit id="TmFtZSBkZXIgQXVzZ2FiZXJlZ2Vs">
+                <source>Name der Ausgaberegel</source>
+                <target>Output Rule name</target>
+            </trans-unit>
+            <trans-unit id="QmVzY2hyZWlidW5nIGRlciBFaW5nYWJlcmVnZWw=">
+                <source>Beschreibung der Eingaberegel</source>
+                <target>Input Rule description</target>
+            </trans-unit>
+            <trans-unit id="QmVzY2hyZWlidW5nIGRlciBBdXNnYWJlcmVnZWw=">
+                <source>Beschreibung der Ausgaberegel</source>
+                <target>Output Rule description</target>
+            </trans-unit>
+            <trans-unit id="VW5nw7xsdGlnZXMgRm9ybWF0IGFuZ2VnZWJlbg==">
+                <source>Ungültiges Format angegeben</source>
+                <target>Invalid format provided</target>
+            </trans-unit>
+            <trans-unit id="Rm9ybWF0LVJlbmRlcmluZy1CZWlzcGllbA==">
+                <source>Format-Rendering-Beispiel</source>
+                <target>Format render example</target>
+            </trans-unit>
+            <trans-unit id="QXVzZ2FiZWZvcm1hdA==">
+                <source>Ausgabeformat</source>
+                <target>Output format</target>
+            </trans-unit>
             <trans-unit id='RGllIE9wZW5JRC1Db25uZWN0LUltcGxlbWVudGllcnVuZyB2b24gdHJhbnNsYXRlNSBlcm3DtmdsaWNodCBlcywgZWluZW4gQ2xpZW50IGF1ZiBkZXIgSURQLVNlaXRlIGVpbmVtIENsaWVudCBpbiB0cmFuc2xhdGU1IHp1enVvcmRuZW4uIERpZSBadW9yZG51bmcgZXJmb2xndCDDvGJlciBkaWUgS3VuZGVubnVtbWVyLiBXZWl0ZXJlIEluZm9ybWF0aW9uZW4gZmluZGVuIFNpZSBpbiBkZXIgPGEgaHJlZj0iaHR0cHM6Ly9jb25mbHVlbmNlLnRyYW5zbGF0ZTUubmV0L3gvQmdEZ0F3IiB0YXJnZXQ9Il9ibGFuayI+RG9rdW1lbnRhdGlvbjwvYT4gdm9uIHRyYW5zbGF0ZTUu'>
                 <source>Die OpenID-Connect-Implementierung von translate5 ermöglicht es, einen Client auf der IDP-Seite einem Client in translate5 zuzuordnen. Die Zuordnung erfolgt über die Kundennummer. Weitere Informationen finden Sie in der <a href="https://confluence.translate5.net/x/BgDgAw" target="_blank">Dokumentation</a> von translate5.</source>
                 <target>The OpenID Connect implementation of translate5 makes it possible to assign a client on the IDP side to a client in translate5. The assignment is made via the client number. Further information can be found in the translate5 <a href="https://confluence.translate5.net/x/BgDgAw" target="_blank">documentation.</a></target>
+            </trans-unit>
+            <trans-unit id="RGllIFJlZ2VsbiBmw7xyIGRpZSBFcmtlbm51bmcgdm9uIEluaGFsdGVuIGhhYmVuIHNpY2ggZsO8ciBkaWVzZSBTcHJhY2hyZXNzb3VyY2UgZ2XDpG5kZXJ0LCBzaWUgc29sbHRlIGtvbnZlcnRpZXJ0IHdlcmRlbi4=">
+                <source>Die Regeln für die Erkennung von Inhalten haben sich für diese Sprachressource geändert, sie sollte konvertiert werden.</source>
+                <target>Content protection rules for this resource have changed, it needs conversion.</target>
+            </trans-unit>
+            <trans-unit id="RGllIFJlZ2VsbiBmw7xyIGRpZSBFcmtlbm51bmcgdm9uIEluaGFsdGVuIGhhYmVuIHNpY2ggZsO8ciBkaWVzZSBTcHJhY2hyZXNzb3VyY2UgZ2XDpG5kZXJ0LCBzaWUgc29sbHRlIGtvbnZlcnRpZXJ0IHdlcmRlbi4gR2VoZW4gU2llIGRhenUgYXVmIGRpZSBLb25maWd1cmF0aW9uc3NlaXRlIGRlciBFcmtlbm51bmdzcmVnZWxuIG9kZXIgRnJhZ2VuIFNpZSBJaHJlbiBQcm9qZWt0bWFuYWdlciAoYWxsZSBLdW5kZW4pLg==">
+                <source>Die Regeln für die Erkennung von Inhalten haben sich für diese Sprachressource geändert, sie sollte konvertiert werden. Gehen Sie dazu auf die Konfigurationsseite der Erkennungsregeln oder Fragen Sie Ihren Projektmanager (alle Kunden).</source>
+                <target>Content protection rules for this resource have changed, it needs conversion. Please go to the content protection configuration page or ask your project manager (all clients).</target>
+            </trans-unit>
+            <trans-unit id='S29udmVydGllcnVuZyBnZXN0YXJ0ZWQ='>
+                <source>Konvertierung gestarted</source>
+                <target>Conversion started</target>
+            </trans-unit>
+            <trans-unit id='S29udmVydGllcnVuZyBzdGFydGVu'>
+                <source>Konvertierung starten</source>
+                <target>Start conversion</target>
+            </trans-unit>
+            <trans-unit id='V2FybmluZzogQ29udmVyc2lvbiBtYXkgbGVhZCB0byB0aGUgbG9zcyBvZiBUTSBtYXRjaGVz'>
+                <source>Warning: Conversion may lead to the loss of TM matches</source>
+                <target>Warning: Conversion may lead to the loss of TM matches. Please reimport all associated tasks and backup your resources before conversion. Conversion may affect matches in open tasks, please read how to avoid this on the following Confluence page.</target>
+            </trans-unit>
+            <trans-unit id="RGllIEF1c2dhYmVyZWdlbCBzb2xsdGUgdm9tIGdsZWljaGVuIFR5cCBzZWluIHdpZSBkaWUgRWluZ2FiZXJlZ2Vs">
+                <source>Die Ausgaberegel sollte vom gleichen Typ sein wie die Eingaberegel</source>
+                <target>Output rule should be of the same type as Input one</target>
+            </trans-unit>
+            <trans-unit id="RGllIFJlZ2VsICJVbnZlcsOkbmRlcnQgw7xiZXJuZWhtZW4iIGthbm4gbmljaHQgYWxzIEF1c2dhYmVyZWdlbCB2ZXJ3ZW5kZXQgd2VyZGVu">
+                <source>Die Regel "Unverändert übernehmen" kann nicht als Ausgaberegel verwendet werden</source>
+                <target>Cannot use "Keep As Is" rule as Output rule</target>
+            </trans-unit>
+            <trans-unit id='QmVzdMOkdGlnZW4gU2llIGRpZSBSZWdlbGFrdGl2aWVydW5n'>
+                <source>Bestätigen Sie die Regelaktivierung</source>
+                <target>Confirm rule enabling</target>
+            </trans-unit>
+            <trans-unit id='RGllIEFrdGl2aWVydW5nL0RlYWt0aXZpZXJ1bmcgdm9uIFJlZ2VsbiBrYW5uIGluIG5ldWVuIFByb2pla3RlbiB6dW0gVmVybHVzdCB2b24gMTAwJS1NYXRjaGVzIGbDvGhyZW4sIHdlbm4gU2llIGRpZSBiZXRyb2ZmZW5lbiBTcHJhY2hyZXNzb3VyY2VuIG5pY2h0IGtvbnZlcnRpZXJlbi4='>
+                <source>Die Aktivierung/Deaktivierung von Regeln kann in neuen Projekten zum Verlust von 100%-Matches führen, wenn Sie die betroffenen Sprachressourcen nicht konvertieren.</source>
+                <target>Activation/Deactivation of rules may lead to the loss of 100% matches in new tasks unless you convert all affected language resources.</target>
+            </trans-unit>
+            <trans-unit id='RGFzIEFrdGl2aWVyZW4gdm9uIElucHV0LVJlZ2VsbiBrYW5uIGluIG5ldWVuIFByb2pla3RlbiB6dW0gVmVybHVzdCB2b24gMTAwJS1NYXRjaGVzIGbDvGhyZW4sIHdlbm4gU2llIGRpZSBiZXRyb2ZmZW5lbiBTcHJhY2hyZXNzb3VyY2VuIG5pY2h0IGtvbnZlcnRpZXJlbi4='>
+                <source>Das Aktivieren von Input-Regeln kann in neuen Projekten zum Verlust von 100%-Matches führen, wenn Sie die betroffenen Sprachressourcen nicht konvertieren.</source>
+                <target>Activation of input mapping rules may lead to the loss of 100% matches in new tasks unless you convert all affected language resources.</target>
+            </trans-unit>
+            <trans-unit id='RGFzIEFrdGl2aWVyZW4gdm9uIE91dHB1dC1SZWdlbG4ga2FubiBpbiBuZXVlbiBQcm9qZWt0ZW4genVtIFZlcmx1c3Qgdm9uIDEwMCUtTWF0Y2hlcyBmw7xocmVuLCB3ZW5uIFNpZSBkaWUgYmV0cm9mZmVuZW4gU3ByYWNocmVzc291cmNlbiBuaWNodCBrb252ZXJ0aWVyZW4u'>
+                <source>Das Aktivieren von Output-Regeln kann in neuen Projekten zum Verlust von 100%-Matches führen, wenn Sie die betroffenen Sprachressourcen nicht konvertieren.</source>
+                <target>Activation of Output mapping rules may lead to the loss of 100% matches in new tasks unless you convert all affected language resources.</target>
+            </trans-unit>
+            <trans-unit id='S29udmVydGllcnVuZyBsw6R1ZnQ='>
+                <source>Konvertierung läuft</source>
+                <target>Conversion in progress</target>
+            </trans-unit>
+            <trans-unit id='QmVzdMOkdGlnZW4gU2llIGRlbiBBdWZnYWJlbmltcG9ydA=='>
+                <source>Bestätigen Sie den Aufgabenimport</source>
+                <target>Confirm task import</target>
+            </trans-unit>
+            <trans-unit id='QWxsZSBrb252ZXJ0aWVyZW4='>
+                <source>Alle konvertieren</source>
+                <target>Convert all</target>
+            </trans-unit>
+            <trans-unit id='TnVyIG5pY2h0IGtvbnZlcnRpZXJ0IGFuemVpZ2Vu'>
+                <source>Nur nicht konvertiert anzeigen</source>
+                <target>Show only not converted</target>
+            </trans-unit>
+            <trans-unit id='WmVpZ2UgYWxsZXM='>
+                <source>Zeige alles</source>
+                <target>Show all</target>
             </trans-unit>
             <trans-unit id='TmV1ZXMgYmVudXR6ZXJkZWZpbmllcnRlcyBGZWxkIGVyc3RlbGxlbg=='>
                 <source>Neues benutzerdefiniertes Feld erstellen</source>
@@ -9708,6 +9903,10 @@ E-Mail: service@MittagQI.com</pre>
             <trans-unit id='Qml0dGUgZGVua2VuIFNpZSBkYXJhbiwgZGFzcyBhbGxlIFZlcndlbmR1bmdlbiBkaWVzZXIgT3B0aW9uIChmYWxscyB2b3JoYW5kZW4pIGVudGZlcm50IHdlcmRlbiwgd2VubiBzaWUgaW4gZWluZW0gZGVyIGJlc3RlaGVuZGVuIFByb2pla3RlL0F1ZmdhYmVuIGVyZsO8bGx0IHdlcmRlbi4gRm9ydGZhaHJlbj8='>
                 <source>Bitte denken Sie daran, dass alle Verwendungen dieser Option (falls vorhanden) entfernt werden, wenn sie in einem der bestehenden Projekte/Aufgaben erfüllt werden. Fortfahren?</source>
                 <target>Please keep in mind that all the usages (if any) of this option will be removed if met in any of existing projects/tasks. Proceed?</target>
+            </trans-unit>
+            <trans-unit id='QmVzdMOkdGlndW5nIGVyZm9yZGVybGljaA=='>
+                <source>Bestätigung erforderlich</source>
+                <target>Confirmation required</target>
             </trans-unit>
             <trans-unit id='RGFzIERlZmluaWVyZW4gdW5kIMOEbmRlcm4gdm9uIEZlbGRlcm4ga2FubiB6dSBlaW5lbSBob2hlbiBSZXNzb3VyY2VudmVyYnJhdWNoIGbDvGhyZW4sIHdlbm4gZGFzIEZlbGQgZ2VzcGVpY2hlcnQgd2lyZC4gQml0dGUgdHVuIFNpZSBkaWVzIGluIEFic3RpbW11bmcgbWl0IGRlbSB0cmFuc2xhdGU1LVN1cHBvcnR0ZWFtLg=='>
                 <source>Das Definieren und Ändern von Feldern kann zu einem hohen Ressourcenverbrauch führen, wenn das Feld gespeichert wird. Bitte tun Sie dies in Abstimmung mit dem translate5-Supportteam.</source>

@@ -201,6 +201,7 @@ class editor_Models_Import_FileParser_Tag
 
         $classes = [$this->parseSegmentGetStorageClass($this->originalContent, $this->xmlTags)];
         $text = $this->text ?? htmlentities($this->originalContent, ENT_COMPAT); //PHP 8.1 fix - default changed!
+
         if ($cls !== null) {
             $classes[] = trim($cls);
         }
@@ -214,7 +215,7 @@ class editor_Models_Import_FileParser_Tag
             $length = $this->placeable->getContentLength();
         }
 
-        return $this->renderedTag = self::$renderer[$this->type]->getHtmlTag([
+        return $this->renderedTag = static::$renderer[$this->type]->getHtmlTag([
             'class' => implode(' ', $classes),
             'text' => $text,
             'shortTag' => $this->tagNr,

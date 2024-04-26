@@ -427,9 +427,9 @@ class editor_Models_Export_FileParser_Xlf extends editor_Models_Export_FileParse
      * {@inheritDoc}
      * @see editor_Models_Export_FileParser::unprotectContent()
      */
-    protected function unprotectContent(string $segment): string
+    protected function unprotectContent(string $segment, bool $isSource): string
     {
-        $segment = parent::unprotectContent($segment);
+        $segment = parent::unprotectContent($segment, $isSource);
         if ($this->config->runtimeOptions->import->fileparser->options->protectTags ?? false) {
             return $this->utilities->tagProtection->unprotect($segment);
         }
