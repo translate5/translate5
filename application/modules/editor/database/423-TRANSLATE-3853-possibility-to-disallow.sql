@@ -25,6 +25,15 @@
 -- END LICENSE AND COPYRIGHT
 -- */
 
-INSERT INTO `Zf_configuration` (`name`, `confirmed`, `module`, `category`, `value`, `default`, `defaults`, `type`, `description`, `level`, `guiName`, `guiGroup`, `comment`)
-VALUES ('runtimeOptions.task.package.allowedToExport', '1', 'editor', 'package', '["editor","pm","admin"]', '["editor","pm","admin"]', 'editor,pm,admin', 'list', 'List of roles which the current user has to have to export or import translator package.', 2, 'Translator package: allowed roles to export and import translator package', 'Translator package', '');
 
+# We already have entry for the editor. The reason why we add additional entire is because we want this feature to be
+# enabled/disabled based on acl entries.
+INSERT INTO `Zf_acl_rules` (`module`, `role`, `resource`, `right`)
+VALUES ('editor', 'admin', 'frontend', 'editorPackageExport'),
+       ('editor', 'admin', 'frontend', 'editorPackageReimport'),
+       ('editor', 'pm', 'frontend', 'editorPackageReimport'),
+       ('editor', 'pm', 'frontend', 'editorPackageReimport'),
+       ('editor', 'pmlight', 'frontend', 'editorPackageReimport'),
+       ('editor', 'pmlight', 'frontend', 'editorPackageReimport'),
+       ('editor', 'clientpm', 'frontend', 'editorPackageReimport'),
+       ('editor', 'clientpm', 'frontend', 'editorPackageReimport');

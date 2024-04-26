@@ -1672,6 +1672,10 @@ class editor_TaskController extends ZfExtended_RestController
 
         $context = $this->_helper->getHelper('contextSwitch')->getCurrentContext() ?? '';
 
+        if($context === 'package'){
+            $this->importExportTranslatorPackage();
+        }
+
         $this->getAction();
 
         $diff = (bool) $this->getRequest()->getParam('diff');
@@ -1922,6 +1926,19 @@ class editor_TaskController extends ZfExtended_RestController
             throw new ZfExtended_NotFoundException("Archive Zip for task " . $this->entity->getTaskGuid() . " could not be found");
         }
         $this->provideZipDownload($archiveZip, ' - ImportArchive.zip');
+    }
+
+    /**
+     * @throws ZfExtended_NoAccessException
+     */
+    public function importExportTranslatorPackage(): void
+    {
+        if (! $this->isAllowed(Rights::ID, Rights::EDITOR_PACKAGE_EXPORT)) {
+            throw new ZfExtended_NoAccessException("Not allowed to export translator package");
+        }
+        if (! $this->isAllowed(Rights::ID, Rights::EDITOR_PACKAGE_REIMPORT)) {
+            throw new ZfExtended_NoAccessException("Not allowed to import package");
+        }
     }
 
     /**

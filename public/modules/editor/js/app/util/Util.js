@@ -445,8 +445,7 @@ Ext.define('Editor.util.Util', {
             if (!task.get('reimportable') || !task.isNotErrorImportPendingCustom()){
                 return false;
             }
-            // is allowed to export package by config
-            return Editor.data.export.package.canExport;
+            return Editor.app.authenticatedUser.isAllowed('editorPackageExport',task);
         },
 
         /**
