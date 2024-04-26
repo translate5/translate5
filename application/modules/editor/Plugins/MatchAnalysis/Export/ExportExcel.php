@@ -78,14 +78,14 @@ class editor_Plugins_MatchAnalysis_Export_ExportExcel
 
         $sheet->setCellValue("A" . $sumRowIndex, $this->translate->_("Price adjustment"));
         $sheet->setCellValue("A" . ($sumRowIndex + 1), $this->translate->_("Final amount"));
-        $sheet->setCellValue("A" . ($sumRowIndex + 2),$this->translate->_("Quellsprache"));
-        $sheet->setCellValue("A" . ($sumRowIndex + 3),$this->translate->_("Zielsprache"));
-        $sheet->setCellValue("B" . ($sumRowIndex + 2),$task->getSourceLanguage()->getRfc5646());
-        $sheet->setCellValue("B" . ($sumRowIndex + 3),$task->getTargetLanguage()->getRfc5646());
-
+        $sheet->setCellValue("A" . ($sumRowIndex + 2), $this->translate->_("Quellsprache"));
+        $sheet->setCellValue("A" . ($sumRowIndex + 3), $this->translate->_("Zielsprache"));
+        $sheet->setCellValue("B" . ($sumRowIndex + 2), $task->getSourceLanguage()->getRfc5646());
+        $sheet->setCellValue("B" . ($sumRowIndex + 3), $task->getTargetLanguage()->getRfc5646());
 
         $sheet->setCellValue("B" . $sumRowIndex, $ma->getPricing()['priceAdjustment']);
-        $sheet->setCellValue("B" . ($sumRowIndex + 1),
+        $sheet->setCellValue(
+            "B" . ($sumRowIndex + 1),
             $ma->getPricing()['priceAdjustment'] + end($rows)['unitCountTotal']
         );
         $sheet->setCellValue("C" . $sumRowIndex, $ma->getPricing()['currency']);
