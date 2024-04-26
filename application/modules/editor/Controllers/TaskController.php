@@ -1673,7 +1673,7 @@ class editor_TaskController extends ZfExtended_RestController
         $context = $this->_helper->getHelper('contextSwitch')->getCurrentContext() ?? '';
 
         if($context === 'package'){
-            $this->isTranslatorPackageAllowed();
+            $this->assertTranslatorPackageAllowed();
         }
 
         $this->getAction();
@@ -1931,7 +1931,7 @@ class editor_TaskController extends ZfExtended_RestController
     /**
      * @throws ZfExtended_NoAccessException
      */
-    public function isTranslatorPackageAllowed(): void
+    public function assertTranslatorPackageAllowed(): void
     {
         if (! $this->isAllowed(Rights::ID, Rights::EDITOR_PACKAGE_EXPORT)) {
             throw new ZfExtended_NoAccessException("Not allowed to export translator package");
