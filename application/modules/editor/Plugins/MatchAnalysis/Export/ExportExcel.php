@@ -42,7 +42,17 @@ class editor_Plugins_MatchAnalysis_Export_ExportExcel
         $this->translate = ZfExtended_Zendoverwrites_Translate::getInstance();
     }
 
-    public function generateExcelAndProvideDownload(editor_Models_Task $task, $rows, $filename)
+    /**
+     * @param editor_Models_Task $task
+     * @param array $rows
+     * @param string $filename
+     * @return void
+     * @throws ReflectionException
+     * @throws Zend_Exception
+     * @throws ZfExtended_Models_Entity_NotFoundException
+     * @throws \PhpOffice\PhpSpreadsheet\Exception
+     */
+    public function generateExcelAndProvideDownload(editor_Models_Task $task, array $rows, string $filename): void
     {
         $this->task = $task;
 
@@ -68,9 +78,16 @@ class editor_Plugins_MatchAnalysis_Export_ExportExcel
 
         $sheet->setCellValue("A" . $sumRowIndex, $this->translate->_("Price adjustment"));
         $sheet->setCellValue("A" . ($sumRowIndex + 1), $this->translate->_("Final amount"));
+        $sheet->setCellValue("A" . ($sumRowIndex + 2), $this->translate->_("Quellsprache"));
+        $sheet->setCellValue("A" . ($sumRowIndex + 3), $this->translate->_("Zielsprache"));
+        $sheet->setCellValue("B" . ($sumRowIndex + 2), $task->getSourceLanguage()->getRfc5646());
+        $sheet->setCellValue("B" . ($sumRowIndex + 3), $task->getTargetLanguage()->getRfc5646());
 
         $sheet->setCellValue("B" . $sumRowIndex, $ma->getPricing()['priceAdjustment']);
-        $sheet->setCellValue("B" . ($sumRowIndex + 1), $ma->getPricing()['priceAdjustment'] + end($rows)['unitCountTotal']);
+        $sheet->setCellValue(
+            "B" . ($sumRowIndex + 1),
+            $ma->getPricing()['priceAdjustment'] + end($rows)['unitCountTotal']
+        );
         $sheet->setCellValue("C" . $sumRowIndex, $ma->getPricing()['currency']);
         $sheet->setCellValue("C" . ($sumRowIndex + 1), $ma->getPricing()['currency']);
 
@@ -91,16 +108,19 @@ class editor_Plugins_MatchAnalysis_Export_ExportExcel
     }
 
     /**
+     * @param array $rows
+     * @return array
      * @throws Zend_Exception
      */
-    protected function prepareDataArray($rows)
+    protected function prepareDataArray(array $rows): array
     {
-        //add to all groups 'Group' sufix, php excel does not handle integer keys
+        //add to all groups 'Group' suffix, php excel does not handle integer keys
         $result = [];
         foreach ($rows as $row) {
             //the order in the newRows array defines the result order in the spreadsheet
             $newRow = [
-                'resourceName' => empty($row['resourceName']) ? $this->translate->_("Repetitions") : $row['resourceName'],
+                'resourceName' => empty($row['resourceName']) ?
+                    $this->translate->_("Repetitions") : $row['resourceName'],
                 'unitCountTotal' => $row['unitCountTotal'],
             ];
 
@@ -122,7 +142,12 @@ class editor_Plugins_MatchAnalysis_Export_ExportExcel
         return $result;
     }
 
-    protected function setLabels(ZfExtended_Models_Entity_ExcelExport $spreadsheet)
+    /**
+     * @param ZfExtended_Models_Entity_ExcelExport $spreadsheet
+     * @return void
+     * @throws Zend_Exception
+     */
+    protected function setLabels(ZfExtended_Models_Entity_ExcelExport $spreadsheet): void
     {
         $spreadsheet->setLabel('resourceName', $this->translate->_("Name"));
 
@@ -152,19 +177,19 @@ class editor_Plugins_MatchAnalysis_Export_ExportExcel
         $spreadsheet->setLabel('internalFuzzy', $this->translate->_("Interner Fuzzy aktiv"));
     }
 
+    /**
+     * @param int $match
+     * @return string
+     * @throws Zend_Exception
+     */
     private function getSingleElementRangeLabel(int $match): string
     {
-        switch ($match) {
-            case 104:
-                return $this->translate->_("TermCollection Treffer (104%)");
-            case 103:
-                return $this->translate->_("Kontext Treffer (103%)");
-            case 102:
-                return $this->translate->_("Wiederholung (102%)");
-            case 101:
-                return $this->translate->_("Exact-exact Treffer (101%)");
-            default:
-                return sprintf('%d%%', $match);
-        }
+        return match ($match) {
+            104 => $this->translate->_("TermCollection Treffer (104%)"),
+            103 => $this->translate->_("Kontext Treffer (103%)"),
+            102 => $this->translate->_("Wiederholung (102%)"),
+            101 => $this->translate->_("Exact-exact Treffer (101%)"),
+            default => sprintf('%d%%', $match),
+        };
     }
 }
