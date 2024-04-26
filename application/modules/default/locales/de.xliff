@@ -981,7 +981,33 @@ Ihr neuer Login-Name:
             </trans-unit>
             <trans-unit id='e0luc3RhbnRUcmFuc2xhdGVZb3V0dWJlVmlkZW9HdWlkZURlc2NyaXB0aW9uQ29udGVudH0='>
                 <source>{InstantTranslateYoutubeVideoGuideDescriptionContent}</source>
-                <target><span/></target>
+                <target>
+                    <br/>
+                    <br/>
+                    <figure>
+                        <figcaption>
+                            <b>Übersicht:</b>
+                        </figcaption>
+                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/4PAFACCcg8s?start=0&amp;autoplay=1" dir="auto">0:00</a> Intro
+                        <br/>
+                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/4PAFACCcg8s?start=10&amp;autoplay=1" dir="auto">0:10</a> InstantTranslate aufrufen
+                        <br/>
+                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/4PAFACCcg8s?start=23&amp;autoplay=1" dir="auto">0:23</a> Text übersetzen
+                        <br/>
+                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/4PAFACCcg8s?start=60&amp;autoplay=1" dir="auto">1:00</a> Datei übersetzen
+                        <br/>
+                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/4PAFACCcg8s?start=99&amp;autoplay=1" dir="auto">1:39</a> Übersetzungsquellen
+                        <br/>
+                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/4PAFACCcg8s?start=105&amp;autoplay=1" dir="auto">1:45</a> TM-Matches
+                        <br/>
+                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/4PAFACCcg8s?start=145&amp;autoplay=1" dir="auto">2:25</a> Fuzzy-Match Einstellung
+                        <br/>
+                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/4PAFACCcg8s?start=171&amp;autoplay=1" dir="auto">2:51</a> Anbindung TermPortal
+                        <br/>
+                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/4PAFACCcg8s?start=203&amp;autoplay=1" dir="auto">3:23</a> Kontaktinformationen
+                        <br/>
+                    </figure>
+                </target>
              </trans-unit>
             <trans-unit id='e0VkaXRvcllvdXR1YmVWaWRlb0d1aWRlVXJsfQ=='>
                 <source>{EditorYoutubeVideoGuideUrl}</source>

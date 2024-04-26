@@ -36,7 +36,6 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use ZfExtended_Factory;
 use ZfExtended_Models_Worker;
-use ZfExtended_Worker_GarbageCleaner;
 
 class TestApplicationRunCommand extends Translate5AbstractTestCommand
 {
@@ -137,9 +136,6 @@ class TestApplicationRunCommand extends Translate5AbstractTestCommand
                 // remove done & defunct workers and garbage-cleaner
                 $worker->db->delete([
                     'state in (?)' => [$worker::STATE_DONE, $worker::STATE_DEFUNCT],
-                ]);
-                $worker->db->delete([
-                    'worker = ?' => ZfExtended_Worker_GarbageCleaner::class,
                 ]);
                 // if there are still workers, we refuse to run
                 $countRemaining = count($worker->loadAll());

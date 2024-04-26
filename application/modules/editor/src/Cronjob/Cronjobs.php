@@ -33,6 +33,7 @@ namespace MittagQI\Translate5\Cronjob;
 use Bootstrap;
 use editor_Workflow_Exception;
 use editor_Workflow_Manager;
+use MittagQI\Translate5\Logging\Rotation;
 use Zend_Application_Bootstrap_Exception as Zend_Application_Bootstrap_ExceptionAlias;
 use ZfExtended_Factory;
 use ZfExtended_Logger_Summary;
@@ -98,7 +99,8 @@ class Cronjobs
     public function rotateLogs()
     {
         // Rotate php log
-        \MittagQI\Translate5\Logging\Rotation::rotate('php.log');
+        Rotation::rotate('php.log');
+        Rotation::rotate('worker.log');
     }
 
     /**
