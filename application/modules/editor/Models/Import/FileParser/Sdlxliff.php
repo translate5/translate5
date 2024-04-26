@@ -182,7 +182,8 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
     {
         parent::__construct($path, $fileName, $fileId, $task);
 
-        $this->isTrackChangesPluginActive = Zend_Registry::get('PluginManager')->isActive('TrackChanges');
+        //$this->isTrackChangesPluginActive = Zend_Registry::get('PluginManager')->isActive('TrackChanges');
+        $this->isTrackChangesPluginActive = false;
         $this->checkForSdlChangeMarker();
         $this->prepareTagMapping();
         $this->readCxtMetaDefinitions();

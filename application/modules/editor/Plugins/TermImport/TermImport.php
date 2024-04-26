@@ -58,6 +58,7 @@ use MittagQI\Translate5\Plugins\TermImport\Exception\TermImportException;
 use MittagQI\Translate5\Plugins\TermImport\Service\Filesystem\FilesystemFactory;
 use MittagQI\Translate5\Plugins\TermImport\Service\Filesystem\FilesystemService;
 use MittagQI\Translate5\Plugins\TermImport\Service\LoggerService;
+use MittagQI\Translate5\Plugins\TermImport\Services\Across\Exception;
 use MittagQI\Translate5\Plugins\TermImport\Worker\CheckHostForUpdates;
 use Throwable;
 use Zend_Registry;
@@ -175,8 +176,13 @@ class TermImport
     }
 
     /**
+     * @param string $processingDir
+     * @param InstructionsDTO $instructions
+     * @param FilesystemService $filesystem
+     * @param string $filesystemKey
      * @throws TermImportException
-     * @throws Throwable
+     * @throws \ReflectionException
+     * @throws \Exception
      */
     private function processDir(
         string $processingDir,
@@ -205,7 +211,7 @@ class TermImport
                 'local://' . ltrim($targetTbxDir, '/')
             );
 
-            // If something was thrown - remove temp dir andre throw
+        // If something was thrown - remove temp dir and re-throw
         } catch (Throwable $e) {
             rmdir($targetTbxDir);
 

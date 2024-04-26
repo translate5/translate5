@@ -32,10 +32,14 @@ namespace MittagQI\Translate5\Plugins\Okapi;
 use editor_Models_Config;
 use editor_Models_Customer_CustomerConfig;
 use editor_Models_TaskConfig;
+use ReflectionException;
 use Zend_Db_Statement_Exception;
+use Zend_Exception;
+use Zend_Registry;
 use ZfExtended_Factory as Factory;
 use ZfExtended_Models_Entity_Exceptions_IntegrityConstraint;
 use ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey;
+use ZfExtended_Plugin_Manager;
 
 /**
  * Interface to maintain the Okapi server configurations
@@ -48,6 +52,9 @@ class ConfigMaintenance
 
     private editor_Models_Config $config;
 
+    /**
+     * @throws ReflectionException
+     */
     public function __construct()
     {
         $this->config = Factory::get(editor_Models_Config::class);
@@ -64,7 +71,7 @@ class ConfigMaintenance
         $oldValue = null;
         $this->config->loadByName(self::CONFIG_SERVER);
         $servers = $this->fromJson($this->config->getValue());
-        if (! empty($servers[$name])) {
+        if (!empty($servers[$name])) {
             $oldValue = $servers[$name];
         }
         $servers[$name] = $url;
@@ -132,42 +139,11 @@ class ConfigMaintenance
     }
 
     /**
-     * Remove non-existing server values from client overwrites and update default config to a valid one
-     * @throws Zend_Db_Statement_Exception
-     * @throws ZfExtended_Models_Entity_Exceptions_IntegrityConstraint
-     * @throws ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey
-     */
-    public function cleanUpNotUsed(array $serverList): void
-    {
-        $config = Factory::get(editor_Models_Customer_CustomerConfig::class);
-        $db = $config->db;
-
-        $where = [
-            'name = ? ' => self::CONFIG_SERVER_USED,
-        ];
-
-        $serverList = array_keys($serverList);
-
-        if (! empty($serverList)) {
-            $where['value NOT IN (?)'] = $serverList;
-        }
-        // remove all serverUsed configs with non-existing server values
-        $db->delete($where);
-
-        $this->config->loadByName(self::CONFIG_SERVER_USED);
-
-        // if the current default config on instance level is not in the server list, we reset it to the last one
-        if (! in_array($this->config->getValue(), $serverList)) {
-            $this->config->setValue(end($serverList));
-            $this->config->save();
-        }
-    }
-
-    /***
      * Check if the removed config is used from the tasks. If yes, this action is not allowed. We can not remove
      * used config name/server.
      * @param array $serverList plain array of removed servers
      * @return int
+     * @throws ReflectionException
      */
     public function countTaskUsageSum(array $serverList): int
     {
@@ -183,10 +159,11 @@ class ConfigMaintenance
         return array_sum($foundUsages);
     }
 
-    /***
+    /**
      * Check if the removed config is used from the tasks. If yes, this action is not allowed. We can not remove
      * used config name/server.
      * @return array
+     * @throws ReflectionException
      */
     public function countTaskUsage(): array
     {
@@ -220,6 +197,7 @@ class ConfigMaintenance
 
     /**
      * returns a summarized usage for each configured server
+     * @throws ReflectionException
      */
     public function getSummary(): array
     {
@@ -252,6 +230,59 @@ class ConfigMaintenance
         return $servers;
     }
 
+    public function getServerList(): array
+    {
+        $this->config->loadByName(self::CONFIG_SERVER);
+
+        return $this->fromJson($this->config->getValue());
+    }
+
+    /**
+     * Purges the unused okapi config entries. Keeps either the latest one (by version) or the one given by name
+     * @param array $summary the current summary of configured Okapi instances
+     * @param string|null $nameToKeep if omitted keep the latest one (by version)
+     * @return array returns the serverlist to be used after purging
+     * @throws ReflectionException
+     * @throws Zend_Db_Statement_Exception
+     * @throws ZfExtended_Models_Entity_Exceptions_IntegrityConstraint
+     * @throws ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey
+     */
+    public function purge(
+        array  $summary,
+        string $nameToKeep = null,
+        bool   $sortByVersion = false,
+        bool   $keepLast = true,
+    ): array
+    {
+        if ($sortByVersion) {
+            ksort($summary, SORT_NATURAL);
+        }
+
+        if ($keepLast && empty($nameToKeep)) {
+            $keys = array_keys($summary);
+            $nameToKeep = end($keys);
+        }
+
+        if (!is_null($nameToKeep) && isset($summary[$nameToKeep])) {
+            //we just set a value here to keep the entry
+            $summary[$nameToKeep]['taskUsageCount'] = 1;
+        }
+
+        $serverList = array_map(
+            function ($item) {
+                return $item['url'];
+            },
+            array_filter($summary, function ($data) {
+                return ($data['taskUsageCount'] ?? 0) > 0 && !empty($data['url']);
+            })
+        );
+
+        $this->setServerList($serverList);
+        $this->cleanUpNotUsed($serverList);
+
+        return $serverList;
+    }
+
     /**
      * Sets the given list of names and URLs as Okapi servers
      * @throws ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey
@@ -266,50 +297,46 @@ class ConfigMaintenance
         $this->updateServerUsedDefaults($serverList);
     }
 
-    public function getServerList(): array
-    {
-        $this->config->loadByName(self::CONFIG_SERVER);
-
-        return $this->fromJson($this->config->getValue());
-    }
-
     /**
-     * Purges the unused okapi config entries. Keeps either the latest one (by version) or the one given by name
-     * @param array $summary the current summary of configured Okapi instances
-     * @param string|null $nameToKeep if omitted keep the latest one (by version)
-     * @return array returns the serverlist to be used after purging
+     * Remove non-existing server values from client overwrites and update default config to a valid one
+     * @throws ReflectionException
      * @throws Zend_Db_Statement_Exception
      * @throws ZfExtended_Models_Entity_Exceptions_IntegrityConstraint
      * @throws ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey
      */
-    public function purge(array $summary, string $nameToKeep = null, bool $sortByVersion = false): array
+    public function cleanUpNotUsed(array $serverList): void
     {
-        if ($sortByVersion) {
-            ksort($summary, SORT_NATURAL);
+        $config = Factory::get(editor_Models_Customer_CustomerConfig::class);
+        $db = $config->db;
+
+        $where = [
+            'name = ? ' => self::CONFIG_SERVER_USED,
+        ];
+
+        $serverList = array_keys($serverList);
+
+        if (!empty($serverList)) {
+            $where['value NOT IN (?)'] = $serverList;
         }
+        // remove all serverUsed configs with non-existing server values
+        $db->delete($where);
 
-        if (empty($nameToKeep)) {
-            $keys = array_keys($summary);
-            $nameToKeep = end($keys);
+        $this->config->loadByName(self::CONFIG_SERVER_USED);
+
+        // if the current default config on instance level is not in the server list, we reset it to the last one
+        if (!in_array($this->config->getValue(), $serverList)) {
+            $this->config->setValue(end($serverList));
+            $this->config->save();
         }
+    }
 
-        if (isset($summary[$nameToKeep])) {
-            //we just set a value here to keep the entry
-            $summary[$nameToKeep]['taskUsageCount'] = 1;
-        }
-
-        $serverList = array_map(
-            function ($item) {
-                return $item['url'];
-            },
-            array_filter($summary, function ($data) {
-                return ($data['taskUsageCount'] ?? 0) > 0 && ! empty($data['url']);
-            })
-        );
-
-        $this->setServerList($serverList);
-        $this->cleanUpNotUsed($serverList);
-
-        return $serverList;
+    /**
+     * @throws Zend_Exception
+     */
+    public function isPluginActive(): bool
+    {
+        /* @var ZfExtended_Plugin_Manager $pluginmanager */
+        $pluginmanager = Zend_Registry::get('PluginManager');
+        return $pluginmanager->isActive('Okapi');
     }
 }

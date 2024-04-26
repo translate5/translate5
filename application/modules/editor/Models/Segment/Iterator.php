@@ -51,6 +51,12 @@ class editor_Models_Segment_Iterator implements Iterator
      */
     protected ?int $fileId = null;
 
+    /**
+     * If set, segments with autostateId = editor_Models_Segment_AutoStates::BLOCKED are ignored.
+     * @var boolean
+     */
+    private bool $ignoreBlockedSegments = false;
+
     public function __construct(string $taskGuid, ?int $fileId = null)
     {
         $this->fileId = $fileId;
@@ -72,7 +78,12 @@ class editor_Models_Segment_Iterator implements Iterator
      */
     public function next(): void
     {
-        $this->segment = $this->segment->loadNext($this->taskGuid, $this->key(), $this->fileId);
+        $this->segment = $this->segment->loadNext(
+            $this->taskGuid,
+            $this->key(),
+            $this->fileId,
+            $this->ignoreBlockedSegments
+        );
     }
 
     /**
@@ -94,7 +105,7 @@ class editor_Models_Segment_Iterator implements Iterator
         $this->initSegment();
 
         try {
-            $this->segment->loadFirst($this->taskGuid, $this->fileId);
+            $this->segment->loadFirst($this->taskGuid, $this->fileId,$this->ignoreBlockedSegments);
             $this->isEmpty = false;
         } catch (ZfExtended_Models_Entity_NotFoundException) {
             $this->segment = null;
@@ -118,5 +129,14 @@ class editor_Models_Segment_Iterator implements Iterator
     protected function initSegment(): void
     {
         $this->segment = ZfExtended_Factory::get('editor_Models_Segment');
+    }
+
+    /**
+     * Enable blocked segments (autoStateId = editor_Models_Segment_AutoStates::BLOCKED ) to be iterated
+     * @param bool $ignoreBlockedSegments
+     */
+    public function setIgnoreBlockedSegments(bool $ignoreBlockedSegments): void
+    {
+        $this->ignoreBlockedSegments = $ignoreBlockedSegments;
     }
 }

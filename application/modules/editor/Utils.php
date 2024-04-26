@@ -1053,11 +1053,27 @@ class editor_Utils
      *
      * Testing text: <<<EOD
 
+    Here are some URLs:
+    stackoverflow.com/questions/1188129/pregreplace-to-detect-html-php
+    Here's the answer: http://www.google.com/search?rls=en&q=42&ie=utf-8&oe=utf-8&hl=en. What was the question?
+    A quick look at http://en.wikipedia.org/wiki/URI_scheme#Generic_syntax is helpful.
+    There is no place like 127.0.0.1! Except maybe http://news.bbc.co.uk/1/hi/england/surrey/8168892.stm?
+    Ports: 192.168.0.1:8080, https://example.net:1234/.
+    Beware of Greeks bringing internationalized top-level domains: xn--hxajbheg2az3al.xn--jxalpdlp.
+    And remember.Nobody is perfect.
+
+    <script>alert('Remember kids: Say no to XSS-attacks! Always HTML escape untrusted input!');</script>
+    EOD;
+
      *
+     * @param ?string $text
      * @return string
      */
-    public static function url2a($text)
+    public static function url2a(?string $text)
     {
+        // If $text arg is given as null - return empty string
+        if ($text === null) return '';
+
         // Regexps
         $rexProtocol = '(https?://)?';
         $rexDomain = '((?:[-a-zA-Z0-9а-яА-Я]{1,63}\.)+[-a-zA-Z0-9а-яА-Я]{2,63}|(?:[0-9]{1,3}\.){3}[0-9]{1,3})';
@@ -1208,10 +1224,10 @@ class editor_Utils
      *
      * @param mixed $if
      * @param string $then
-     * @param string $else
-     * @return string
+     * @param mixed $else
+     * @return mixed
      */
-    public static function rif($if, $then, $else = '')
+    public static function rif($if, $then, mixed $else = '') : mixed
     {
         return $if ? str_replace('$1', is_scalar($if) ? $if : '$1', $then) : $else;
     }

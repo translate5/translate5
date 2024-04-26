@@ -80,6 +80,9 @@ class OkapiAddCommand extends Translate5AbstractCommand
         }
 
         $config = new ConfigMaintenance();
+        if (! $config->isPluginActive()) {
+            $this->io->warning('Plugin Okapi is disabled - the config changes are still applied!');
+        }
         $oldValue = $config->addServer($url, $name);
         if (empty($oldValue)) {
             $this->io->success('Added ' . $name . ' with ' . $url);

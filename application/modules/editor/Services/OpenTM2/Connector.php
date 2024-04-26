@@ -377,6 +377,8 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
                 return;
             }
         } elseif ($this->isMemoryOverflown($apiError)) {
+            $this->addOverflowWarning($segment->getTask());
+
             $newName = $this->generateNextMemoryName($this->languageResource);
             $newName = $this->api->createEmptyMemory($newName, $this->languageResource->getSourceLangCode());
             $this->addMemoryToLanguageResource($newName);
@@ -1216,6 +1218,24 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
         );
     }
 
+    private function addOverflowWarning(Task $task = null): void
+    {
+        $params = [
+            'name' => $this->languageResource->getName(),
+            'apiError' => $this->api->getError(),
+        ];
+
+        if (null !== $task) {
+            $params['task'] = $task;
+        }
+
+        $this->logger->warn(
+            'E1603',
+            'Language Resource [{name}] current writable memory is overflown, creating a new one',
+            $params
+        );
+    }
+
     private function waitReorganizeFinished(): bool
     {
         $elapsedTime = 0;
@@ -1509,6 +1529,8 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
         $error = $this->api->getError();
         // In case we've got memory overflow error we need to create another memory and import further
         if ($status === LanguageResourceStatus::ERROR && $this->isMemoryOverflown($error)) {
+            $this->addOverflowWarning();
+
             $newName = $this->generateNextMemoryName($this->languageResource);
             $newName = $this->api->createEmptyMemory($newName, $this->languageResource->getSourceLangCode());
             $this->addMemoryToLanguageResource($newName);
