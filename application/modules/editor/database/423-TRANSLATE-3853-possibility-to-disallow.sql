@@ -28,12 +28,12 @@
 
 # We already have entry for the editor. The reason why we add additional entire is because we want this feature to be
 # enabled/disabled based on acl entries.
-INSERT INTO `Zf_acl_rules` (`module`, `role`, `resource`, `right`)
+INSERT IGNORE INTO `Zf_acl_rules` (`module`, `role`, `resource`, `right`)
 VALUES ('editor', 'admin', 'frontend', 'editorPackageExport'),
        ('editor', 'admin', 'frontend', 'editorPackageReimport'),
+       ('editor', 'pm', 'frontend', 'editorPackageExport'),
        ('editor', 'pm', 'frontend', 'editorPackageReimport'),
-       ('editor', 'pm', 'frontend', 'editorPackageReimport'),
+       ('editor', 'pmlight', 'frontend', 'editorPackageExport'),
        ('editor', 'pmlight', 'frontend', 'editorPackageReimport'),
-       ('editor', 'pmlight', 'frontend', 'editorPackageReimport'),
-       ('editor', 'clientpm', 'frontend', 'editorPackageReimport'),
+       ('editor', 'clientpm', 'frontend', 'editorPackageExport'),
        ('editor', 'clientpm', 'frontend', 'editorPackageReimport');
