@@ -813,7 +813,10 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
 
                     case 'error':
                     case 'failed':
-                        $lastStatusInfo = $apiResponse->ErrorMsg;
+                        $lastStatusInfo = $apiResponse->ErrorMsg
+                            ?? $apiResponse->importErrorMsg
+                            ?? $apiResponse->reorganizeErrorMsg
+                            ?? 'Unknown error';
                         $result = LanguageResourceStatus::ERROR;
 
                         break;
@@ -1483,8 +1486,12 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
         return ! empty($languageResource->getSpecificData('memories', parseAsArray: true));
     }
 
-    private function isMemoryOverflown(object $error): bool
+    private function isMemoryOverflown(?object $error): bool
     {
+        if (null === $error) {
+            return false;
+        }
+
         $errorCodes = explode(
             ',',
             $this->config->runtimeOptions->LanguageResources->t5memory->memoryOverflowErrorCodes
