@@ -21,27 +21,27 @@ START LICENSE AND COPYRIGHT
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
-class editor_Models_Terminology_TbxObjects_RefObject extends editor_Models_Terminology_TbxObjects_Abstract {
-
-    const TABLE_FIELDS = [
+class editor_Models_Terminology_TbxObjects_RefObject extends editor_Models_Terminology_TbxObjects_Abstract
+{
+    public const TABLE_FIELDS = [
         'listType' => true,
-        'data' => true
+        'data' => true,
     ];
 
     public int $collectionId = 0;
+
     public string $listType = '';
+
     public string $key = '';
+
     public string $data = '';
 
-    /**
-     * @return string
-     */
     public function getCollectionKey(): string
     {
-        return $this->listType.'-'.$this->key;
+        return $this->listType . '-' . $this->key;
     }
 }

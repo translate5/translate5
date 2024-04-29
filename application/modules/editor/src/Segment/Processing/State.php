@@ -41,7 +41,6 @@ use ZfExtended_Factory;
 use ZfExtended_Models_Db_DeadLockHandlerTrait;
 use ZfExtended_Models_Db_Exceptions_DeadLockHandler;
 
-
 /**
  * This class represents the segment-state when processing segments with a segment-processor, usually looped
  * It work's with LEK_segment_processing ad DB-model
@@ -54,56 +53,57 @@ class State
     /**
      * A segment was not yet processed
      */
-    const UNPROCESSED = 0;
+    public const UNPROCESSED = 0;
+
     /**
      * A segment must be retried to process
      */
-    const REPROCESS = 1;
+    public const REPROCESS = 1;
+
     /**
      * A segment is being processed
      */
-    const INPROGRESS = 2;
+    public const INPROGRESS = 2;
+
     /**
      * A segment was successfully processed
      */
-    const PROCESSED = 3;
+    public const PROCESSED = 3;
+
     /**
      * A segment cannot be processed, either due to constraints of the segment (empty, invalid, ...) or because after 2 attempts it simply did not work
      */
-    const UNPROCESSABLE = 4;
+    public const UNPROCESSABLE = 4;
+
     /**
      * Segment is too long to be processed. This is a special for the termtagger
      */
-    const TOOLONG = 5;
+    public const TOOLONG = 5;
+
     /**
      * Segment has to be ignored presumably due to not being editable
      */
-    const IGNORED = 6;
+    public const IGNORED = 6;
 
     /**
      * All States have this suffix for their column name
      */
-    const COLUMN_SUFFIX = 'State';
+    public const COLUMN_SUFFIX = 'State';
 
     /**
      * In case of an deadlock we retry the operation after sleeping the below amount
      */
-    const DEADLOCK_MAXRETRIES = 3;
+    public const DEADLOCK_MAXRETRIES = 3;
 
     /**
      * In case of an DB-deadlock we wait this amount of time before trying again. Milliseconds
      */
-    const DEADLOCK_WAITINGTIME = 350;
+    public const DEADLOCK_WAITINGTIME = 350;
 
-    /**
-     * @var Processing
-     */
     private static Processing $table;
 
     /**
      * Creates the colmn-name for a service that holds the processing-state
-     * @param string $serviceId
-     * @return string
      */
     public static function createColumnName(string $serviceId): string
     {
@@ -112,53 +112,37 @@ class State
 
     /**
      * Creates a tags-model for the given segment saving the state for the given service
-     * @param int $segmentId
-     * @param string $serviceId
-     * @return State
      */
     public static function createForSegment(int $segmentId, string $serviceId): State
     {
         $table = new Processing();
         $row = $table->fetchRow($table->select()->where('segmentId = ?', $segmentId));
         if ($row === null) {
-            $row = $table->createRow(['segmentId' => $segmentId]);
+            $row = $table->createRow([
+                'segmentId' => $segmentId,
+            ]);
         }
+
         return new State($serviceId, $row);
     }
 
-
-    /**
-     * @var string
-     */
     private string $serviceId;
 
-    /**
-     * @var int
-     */
     private int $state = self::UNPROCESSED;
 
-    /**
-     * @var int
-     */
     private int $segmentId;
 
-    /**
-     * @var Zend_Db_Table_Row_Abstract|null
-     */
     private ?Zend_Db_Table_Row_Abstract $row;
-
 
     /**
      * If instantiated without $row the instance can only be used to save states non-persistent
      * Or to use the API not dealing with our row
-     * @param string $serviceId
-     * @param Zend_Db_Table_Row_Abstract|null $row
      */
     public function __construct(string $serviceId, Zend_Db_Table_Row_Abstract $row = null)
     {
         $this->serviceId = $serviceId;
         $this->segmentId = (is_null($row)) ? -1 : $row->segmentId;
-        if (!isset(static::$table)) {
+        if (! isset(static::$table)) {
             static::$table = new Processing();
         }
         $this->row = $row;
@@ -166,7 +150,6 @@ class State
 
     /**
      * Retrieves the current state
-     * @return int
      */
     public function getState(): int
     {
@@ -175,7 +158,6 @@ class State
 
     /**
      * Sets a new state for the entry and saves it
-     * @param int $newState
      */
     public function setState(int $newState)
     {
@@ -195,17 +177,11 @@ class State
         $this->setState(self::PROCESSED);
     }
 
-    /**
-     * @return string
-     */
     public function getColumnName(): string
     {
         return static::createColumnName($this->serviceId);
     }
 
-    /**
-     * @return int
-     */
     public function getSegmentId(): int
     {
         return $this->segmentId;
@@ -214,21 +190,18 @@ class State
     /**
      * returns our related segment
      * Use only when instance instantiated with a row, otherwise this will lead to an exception
-     * @return editor_Models_Segment
      */
     public function getSegment(): editor_Models_Segment
     {
         $row = ZfExtended_Factory::get(editor_Models_Segment::class);
         $row->load($this->segmentId);
+
         return $row;
     }
 
     /**
      * Retrieves the segment-tags model for the given task & processing mode
      * The segment-tags model will use us to save back the state and save back the processed tags
-     * @param editor_Models_Task $task
-     * @param string $processingMode
-     * @return editor_Segment_Tags
      * @throws Exception
      */
     public function getSegmentTags(editor_Models_Task $task, string $processingMode): editor_Segment_Tags
@@ -238,16 +211,14 @@ class State
 
     /**
      * Checks if the tags-model holds a serialized segment
-     * @return bool
      */
     public function hasTagsJson(): bool
     {
-        return !empty($this->row->tagsJson);
+        return ! empty($this->row->tagsJson);
     }
 
     /**
      * Retrieves the serialized segment as string
-     * @return string
      */
     public function getTagsJson(): string
     {
@@ -256,7 +227,6 @@ class State
 
     /**
      * Saves JSON back to the tags-model
-     * @param string $jsonString
      */
     public function saveTagsJson(string $jsonString)
     {
@@ -266,8 +236,6 @@ class State
 
     /**
      * Retrieves the progress of processed segments for the given task. This is a float 0 <= num <= 1
-     * @param string $taskGuid
-     * @return float
      */
     public function calculateProgress(string $taskGuid): float
     {
@@ -277,10 +245,7 @@ class State
     /**
      * Retrieves the next states to process and sets their state to INPROGRESS
      * In this transaction deadlocks may occur so we have a deadlock-catching/retrying implemented
-     * @param int $state
-     * @param string $taskGuid
      * @param bool $fromTheTop : if we should fetch from the top or bottom of the table
-     * @param int $limit
      * @return State[]
      * @throws Zend_Db_Exception
      * @throws ZfExtended_Models_Db_Exceptions_DeadLockHandler
@@ -289,7 +254,7 @@ class State
     public function fetchNextStates(int $state, string $taskGuid, bool $fromTheTop, int $limit = 1): array
     {
         // wrap query in the deadlock-retry helper since this table is potentially fetched by multiple workers/loopers at the same time ...
-        return $this->retryOnDeadlock(function() use ($state, $taskGuid, $fromTheTop, $limit){
+        return $this->retryOnDeadlock(function () use ($state, $taskGuid, $fromTheTop, $limit) {
             $states = [];
             $segmentIds = [];
             $column = $this->getColumnName();
@@ -304,24 +269,28 @@ class State
                 $states[] = new static($this->serviceId, $row);
             }
             if (count($segmentIds) > 1) {
-                static::$table->update([$column => self::INPROGRESS], ['segmentId IN (?)' => $segmentIds]);
-            } else if (count($segmentIds) === 1) {
+                static::$table->update([
+                    $column => self::INPROGRESS,
+                ], [
+                    'segmentId IN (?)' => $segmentIds,
+                ]);
+            } elseif (count($segmentIds) === 1) {
                 // first row of foreach loop
                 $row->$column = self::INPROGRESS;
                 $row->save();
             }
+
             return $states;
         });
     }
 
     /**
      * TODO FIXME: add as general API to ZfExtended as it is used here, in TaskUserAssoc and in ZfExtended_Models_Db_DeadLockHandlerTrait (where it cannot be added as static function)
-     * @param Zend_Db_Exception $e
-     * @return bool
      */
     private function isDeadlockException(Zend_Db_Exception $e): bool
     {
         $message = $e->getMessage();
+
         return (str_contains($message, 'Deadlock found when trying to get lock') || str_contains($message, 'Lock wait timeout exceeded'));
     }
 }

@@ -21,13 +21,12 @@ START LICENSE AND COPYRIGHT
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
 
 namespace MittagQI\Translate5\Terminology;
-
 
 use editor_Models_Languages;
 use editor_Models_TermCollection_TermCollection;
@@ -76,19 +75,21 @@ class SearchCollection
     private bool $useWildcard;
 
     /**
-     * @param string $query search query string
      * @param int $collectionId collectionId where should be searched
      * @param int $sourceLang query string should match all terms with this sourceLang
      * @param int $targetLang the resul terms will be in this targetLanguage
      * @throws Zend_Cache_Exception
      */
-    public function __construct(private int $collectionId, private int $sourceLang, private int $targetLang)
-    {
+    public function __construct(
+        private int $collectionId,
+        private int $sourceLang,
+        private int $targetLang
+    ) {
         $languageModel = ZfExtended_Factory::get(editor_Models_Languages::class);
 
         // get source and target language fuzzy
-        $this->sourceLangauges = $languageModel->getFuzzyLanguages($sourceLang,'id',true);
-        $this->targetLangauges = $languageModel->getFuzzyLanguages($targetLang,'id',true);
+        $this->sourceLangauges = $languageModel->getFuzzyLanguages($sourceLang, 'id', true);
+        $this->targetLangauges = $languageModel->getFuzzyLanguages($targetLang, 'id', true);
     }
 
     /***
@@ -100,12 +101,11 @@ class SearchCollection
      */
     public function search(string $query, bool $useWildcard = false): array
     {
-
         $this->query = $query;
         $this->useWildcard = $useWildcard;
 
         $entries = $this->findEntries();
-        if(empty($entries)){
+        if (empty($entries)) {
             return [];
         }
 
@@ -114,7 +114,7 @@ class SearchCollection
         foreach ($entries as $res) {
             $termEntryTbxIds[] = $res['termEntryTbxId'];
             //collect the searched terms, so thy are merged with the results
-            if (!isset($termEntryTbxIdSearch[$res['termEntryTbxId']])) {
+            if (! isset($termEntryTbxIdSearch[$res['termEntryTbxId']])) {
                 $termEntryTbxIdSearch[$res['termEntryTbxId']] = [];
             }
             $termEntryTbxIdSearch[$res['termEntryTbxId']][] = $res['term'];
@@ -123,10 +123,10 @@ class SearchCollection
         $targetResults = $this->findTargetTerms($termEntryTbxIds);
 
         //merge the searched terms with the result
-        foreach ($targetResults as &$single){
-            $single['default'.$this->searchField] = '';
-            if (!empty($termEntryTbxIdSearch[$single['termEntryTbxId']])) {
-                $single['default'.$this->searchField] = $termEntryTbxIdSearch[$single['termEntryTbxId']][0];
+        foreach ($targetResults as &$single) {
+            $single['default' . $this->searchField] = '';
+            if (! empty($termEntryTbxIdSearch[$single['termEntryTbxId']])) {
+                $single['default' . $this->searchField] = $termEntryTbxIdSearch[$single['termEntryTbxId']][0];
             }
         }
 
@@ -135,7 +135,6 @@ class SearchCollection
 
     /**
      * Search for the matching term entries for the searched term.
-     * @return array
      */
     private function findEntries(): array
     {
@@ -149,7 +148,7 @@ class SearchCollection
 
         // in case we use wildcards, we should search the terms table with LIKE and in addition, we should escape all
         // mysql wildcards in case the search string contains such
-        if($this->useWildcard){
+        if ($this->useWildcard) {
             $compareWith = 'LIKE';
 
             // escape the wildcards when searching with wildcards
@@ -160,17 +159,16 @@ class SearchCollection
         $s = $db->select()
             ->setIntegrityCheck(false)
             ->from('terms_term')
-            ->where('lower(term) '.$compareWith.' lower(?) COLLATE utf8mb4_bin', $this->query)
+            ->where('lower(term) ' . $compareWith . ' lower(?) COLLATE utf8mb4_bin', $this->query)
             ->where('collectionId = ?', $this->collectionId)
-            ->where('languageId IN(?)',$langauges)
+            ->where('languageId IN(?)', $langauges)
             ->group('termEntryTbxId');
-       return $db->fetchAll($s)->toArray();
+
+        return $db->fetchAll($s)->toArray();
     }
 
     /**
      * Search for terms in the target language for given term entry tbx id
-     * @param array $termEntryTbxIds
-     * @return array
      */
     private function findTargetTerms(array $termEntryTbxIds): array
     {
@@ -182,27 +180,24 @@ class SearchCollection
         // fill all terms in the opposite field of the matched term results
         $s = $db->select()
             ->setIntegrityCheck(false)
-            ->from(['t' => 'terms_term'])
-            ->joinLeft(['ta' => 'terms_attributes'], 'ta.termId = t.id AND ta.type = "processStatus"', ['ta.type AS processStatusAttribute', 'ta.value AS processStatusAttributeValue'])
+            ->from([
+                't' => 'terms_term',
+            ])
+            ->joinLeft([
+                'ta' => 'terms_attributes',
+            ], 'ta.termId = t.id AND ta.type = "processStatus"', ['ta.type AS processStatusAttribute', 'ta.value AS processStatusAttributeValue'])
             ->where('t.termEntryTbxId IN(?)', $termEntryTbxIds)
-            ->where('t.languageId IN(?)',$langauges)
+            ->where('t.languageId IN(?)', $langauges)
             ->where('t.collectionId = ?', $this->collectionId);
 
         return $db->fetchAll($s)->toArray();
     }
 
-
-    /**
-     * @return string
-     */
     public function getSearchField(): string
     {
         return $this->searchField;
     }
 
-    /**
-     * @param string $searchField
-     */
     public function setSearchField(string $searchField): void
     {
         $this->searchField = $searchField;

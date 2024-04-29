@@ -52,8 +52,6 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\Task;
 
-use editor_Models_Import_Configuration;
-use editor_Models_Import_DataProvider_Abstract;
 use editor_Models_Segment;
 use editor_Models_Task;
 use ZfExtended_EventManager;
@@ -74,13 +72,16 @@ class TaskEventTrigger
 
     public function triggerAfterSegmentUpdate(editor_Models_Task $task, editor_Models_Segment $segment): void
     {
-        $this->triggerEvent(self::AFTER_SEGMENT_UPDATE, ['task' => $task, 'segment' => $segment,]);
+        $this->triggerEvent(self::AFTER_SEGMENT_UPDATE, [
+            'task' => $task,
+            'segment' => $segment,
+        ]);
     }
 
     private function triggerEvent(string $event, array $params): void
     {
-        if($this->doDebug){
-            error_log('IMPORT EVENT: ' .$event . ', task: ' . (array_key_exists('task', $params) ? $params['task']->getTaskGuid() : 'null'));
+        if ($this->doDebug) {
+            error_log('IMPORT EVENT: ' . $event . ', task: ' . (array_key_exists('task', $params) ? $params['task']->getTaskGuid() : 'null'));
         }
         $this->events->trigger($event, self::class, $params);
     }

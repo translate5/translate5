@@ -21,11 +21,10 @@ START LICENSE AND COPYRIGHT
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
-
 
 namespace MittagQI\Translate5\Terminology;
 
@@ -49,11 +48,9 @@ class CleanupCollection
      */
     public const KEEP_FILES_COUNT = 3;
 
-    /**
-     * @param editor_Models_TermCollection_TermCollection $collection
-     */
-    public function __construct(private editor_Models_TermCollection_TermCollection $collection)
-    {
+    public function __construct(
+        private editor_Models_TermCollection_TermCollection $collection
+    ) {
     }
 
     /***
@@ -64,19 +61,18 @@ class CleanupCollection
     public function checkAndClean(): void
     {
         $files = $this->getFilesSorted();
-        $files = array_slice($files,self::KEEP_FILES_COUNT);
+        $files = array_slice($files, self::KEEP_FILES_COUNT);
 
         // Calculate the timestamp for 3 months ago
-        $threeMonthsAgo = strtotime('-'.self::FILE_OLDER_THAN_MONTHS.' months');
+        $threeMonthsAgo = strtotime('-' . self::FILE_OLDER_THAN_MONTHS . ' months');
 
-        foreach ($files as $path => $fileTimestamp){
+        foreach ($files as $path => $fileTimestamp) {
             // Check if the file is older than 3 months
             if ($fileTimestamp < $threeMonthsAgo) {
                 unlink($path);
             }
         }
     }
-
 
     /***
      * Get all collection files sorted by date.
@@ -85,18 +81,18 @@ class CleanupCollection
     private function getFilesSorted(): array
     {
         $collectionPath =
-            editor_Models_Import_TermListParser_Tbx::getFilesystemCollectionDir().
-            'tc_'.
+            editor_Models_Import_TermListParser_Tbx::getFilesystemCollectionDir() .
+            'tc_' .
             $this->collection->getId();
 
-        if (!is_dir($collectionPath)) {
+        if (! is_dir($collectionPath)) {
             return [];
         }
 
         $files = [];
         $iterator = new DirectoryIterator($collectionPath);
         foreach ($iterator as $fileInfo) {
-            if ($fileInfo->isDot() || $fileInfo->isDir() || !$fileInfo->isFile()) {
+            if ($fileInfo->isDot() || $fileInfo->isDir() || ! $fileInfo->isFile()) {
                 continue;
             }
             $fileInfo->getRealPath();
@@ -113,5 +109,4 @@ class CleanupCollection
 
         return $files;
     }
-
 }

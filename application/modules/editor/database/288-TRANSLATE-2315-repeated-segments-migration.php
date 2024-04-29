@@ -3,7 +3,7 @@
 START LICENSE AND COPYRIGHT
 
  This file is part of translate5
- 
+
  Copyright (c) 2013 - 2017 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
 
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
@@ -13,16 +13,16 @@ START LICENSE AND COPYRIGHT
  included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
-  
+
  There is a plugin exception available for use with this release of translate5 for
  translate5 plug-ins that are distributed under GNU AFFERO GENERAL PUBLIC LICENSE version 3:
  Please see http://www.translate5.net/plugin-exception.txt or plugin-exception.txt in the root
  folder of translate5.
-  
+
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
@@ -47,7 +47,7 @@ $SCRIPT_IDENTIFIER = '288-TRANSLATE-2315-repeated-segments-migration.php';
  * define database credential variables
  */
 $argc = count($argv);
-if(empty($this) || empty($argv) || $argc < 5 || $argc > 7) {
+if (empty($this) || empty($argv) || $argc < 5 || $argc > 7) {
     die("please dont call the script direct! Call it by using DBUpdater!\n\n");
 }
 
@@ -64,26 +64,26 @@ $tasks = $res->fetchAll(Zend_Db::FETCH_COLUMN);
 $this->doNotSavePhpForDebugging = false;
 
 $taskCount = count($tasks);
-error_log($SCRIPT_IDENTIFIER.' - tasks to be converted: '.$taskCount."\n");
+error_log($SCRIPT_IDENTIFIER . ' - tasks to be converted: ' . $taskCount . "\n");
 
 //calculate isRepeated flags for each task (and view)
 $i = 1;
 foreach ($tasks as $taskGuid) {
     $sfm = editor_Models_SegmentFieldManager::getForTaskGuid($taskGuid);
-    if($sfm->getView()->exists()) {
+    if ($sfm->getView()->exists()) {
         $view = $sfm->getView()->getName();
+
         try {
-            $db->query('ALTER TABLE '.$view.' ADD isRepeated TINYINT DEFAULT 0 NOT NULL');
-        }
-        catch(Throwable $e) {
-            error_log('On adding the isRepeated column to task view '.$view.' there was an exception '.$e);
+            $db->query('ALTER TABLE ' . $view . ' ADD isRepeated TINYINT DEFAULT 0 NOT NULL');
+        } catch (Throwable $e) {
+            error_log('On adding the isRepeated column to task view ' . $view . ' there was an exception ' . $e);
         }
     }
     $segment = ZfExtended_Factory::get('editor_Models_Segment');
     /* @var $segment editor_Models_Segment */
     $segment->syncRepetitions($taskGuid, false);
-    
-    error_log('Task '.$taskGuid.' converted ('.($i++).'/'.$taskCount.')');
+
+    error_log('Task ' . $taskGuid . ' converted (' . ($i++) . '/' . $taskCount . ')');
     $db->query('INSERT INTO LEK_task_migration (`taskGuid`, `filename`) VALUES (?,?)', [$taskGuid, $SCRIPT_IDENTIFIER]);
 }
 

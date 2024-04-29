@@ -167,6 +167,7 @@ Ext.define('Editor.controller.SegmentQualitiesBase', {
                 { "tag": "div", "classes": ["tab", "internal-tag"], "placeholder": "\t" },
                 { "tag": "div", "classes": ["nbsp", "internal-tag"], "placeholder": " " },
                 { "tag": "div", "classes": ["char", "internal-tag"], "placeholder": "□" },
+                { "tag": "div", "classes": ["number", "internal-tag"], "placeholder": '---' },
                 { "tag": "div", "classes": ["internal-tag"], "placeholder": '' },
                 { "tag": "del", "classes": [], "placeholder": '' },
             ];

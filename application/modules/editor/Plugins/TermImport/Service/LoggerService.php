@@ -55,6 +55,7 @@ namespace MittagQI\Translate5\Plugins\TermImport\Service;
 use Throwable;
 use Zend_Registry;
 use ZfExtended_Logger;
+use MittagQI\Translate5\Plugins\TermImport\Exception\TermImportException;
 
 class LoggerService
 {
@@ -80,7 +81,9 @@ class LoggerService
         $this->logger->error(
             'E1569',
             'Plug-In TermImport: Invalid filesystem config provided: "{config}"',
-            ['config' => json_encode($config)]
+            [
+                'config' => json_encode($config),
+            ]
         );
     }
 
@@ -97,7 +100,9 @@ class LoggerService
         $this->logger->error(
             'E1571',
             'Plug-In TermImport: Filesystem is not reachable: "{config}"',
-            ['config' => json_encode($config)]
+            [
+                'config' => json_encode($config),
+            ]
         );
     }
 

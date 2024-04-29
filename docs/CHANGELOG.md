@@ -10,11 +10,237 @@ All updates are (downwards) compatible! If not this is listed in the important r
 
 
 
+## [7.3.2] - 2024-04-16
+
+### Important Notes:
+ 
 
 
+### Changed
+**[TRANSLATE-3877](https://jira.translate5.net/browse/TRANSLATE-3877): Hotfolder Import - Change importing user to system user** <br>
+Changed the importing user to system user instead the associated PM. This ensures that the PM gets an E-Mail when the task was created.
+
+**[TRANSLATE-3866](https://jira.translate5.net/browse/TRANSLATE-3866): Editor general - Improve logging of invalid markup on segment PUT** <br>
+FIX: Improve logging of invalid markup sent on segment PUT
 
 
+### Bugfixes
+**[TRANSLATE-3891](https://jira.translate5.net/browse/TRANSLATE-3891): Import/Export - Disable sdlxliff track changes  export** <br>
+Disable of sdlxliff track changes on export because of a problem in the segment data structure.
 
+**[TRANSLATE-3885](https://jira.translate5.net/browse/TRANSLATE-3885): Auto-QA, usability editor - Change wording for "false positives"** <br>
+Improved wordings for false positives in the auto-QA
+
+
+## [7.3.1] - 2024-04-09
+
+### Important Notes:
+ 
+
+
+### Changed
+**[TRANSLATE-3860](https://jira.translate5.net/browse/TRANSLATE-3860): VisualReview / VisualTranslation - FIX: Bugs of Visual Enhancements Milestone I** <br>
+FIX Visual: Segments may be duplicated in the reflow / WYSIWYG and appear multiple times overlapping other segments
+
+
+### Bugfixes
+**[TRANSLATE-3865](https://jira.translate5.net/browse/TRANSLATE-3865): LanguageResources, User Management - Error on language resources for admins with no assigned users** <br>
+Fix for a problem in language resources overview for users with 0 assigned customers.
+
+**[TRANSLATE-3864](https://jira.translate5.net/browse/TRANSLATE-3864): Import/Export - Problem with sdlxliff export and track changes** <br>
+Fix for sdlxliff export and track changes.
+
+
+## [7.3.0] - 2024-04-05
+
+### Important Notes:
+#### [TRANSLATE-3534](https://jira.translate5.net/browse/TRANSLATE-3534)
+From this version on MariaDB 10.11 or higher is needed, MySQL support is dropped. If you are using the dockerized setup nothing must be done.
+
+#### [TRANSLATE-3655](https://jira.translate5.net/browse/TRANSLATE-3655)
+Needs at least t5memory >= 0.5.58, versions prior 0.5 must be migrated with the CLI t5memory:migration command!
+This feature is disabled by default and can be enabled by the translate5 team on hosted instances. On self-hosted instances, it can be enabled via the translate5 command-line tool by setting runtimeOptions.LanguageResources.t5memory.stripFramingTagsEnabled to 1.
+ 
+
+
+### Added
+**[TRANSLATE-3790](https://jira.translate5.net/browse/TRANSLATE-3790): LanguageResources - Overwrite DeepL API key per client** <br>
+Allow rewrite DeepL API key on customer config level
+
+**[TRANSLATE-3534](https://jira.translate5.net/browse/TRANSLATE-3534): Import/Export, TrackChanges - TrackChanges sdlxliff round-trip** <br>
+Accept track changes sdlxliff markup on import and transform it to translate5 syntax.
+Propagate translate5 track changes to sdlxliff file on export
+
+
+### Changed
+**[TRANSLATE-3842](https://jira.translate5.net/browse/TRANSLATE-3842): VisualReview / VisualTranslation - Newlines from segments (internal whitespace tags) do often "destroy" the layout, especially in the new paragraph layouts** <br>
+ENHANCEMENT: 
+* Configurable option to strip newlines from the segments when translating the WYSIWYG
+* always strip newlines from segments for pragraph-fields in the WYSIWYG
+
+**[TRANSLATE-3841](https://jira.translate5.net/browse/TRANSLATE-3841): Main back-end mechanisms (Worker, Logging, etc.) - TextShuttle available for clients with support contract** <br>
+TextShuttle plugin is now available with support contract.
+
+**[TRANSLATE-3839](https://jira.translate5.net/browse/TRANSLATE-3839): LanguageResources - Add possibility to UI to use timestamp of last segment save, when re-importing a task to the TM** <br>
+Add new option to reimport task UI which purpose is to specify which time should be used for updating segment in translation memory.
+
+**[TRANSLATE-3733](https://jira.translate5.net/browse/TRANSLATE-3733): LanguageResources - Introduce new language resource identifier specificId** <br>
+Introduce a new ID field for language resources in available also via ID. 
+It should contain an ID generated / coming from the originating data system - if any.
+
+**[TRANSLATE-3655](https://jira.translate5.net/browse/TRANSLATE-3655): LanguageResources - implement new switch to deal with framing tags on TMX import** <br>
+Added new option "Strip framing tags at import" for TMX import which influences the behavior of t5memory regarding segment framing tags on import.
+
+
+### Bugfixes
+**[TRANSLATE-3845](https://jira.translate5.net/browse/TRANSLATE-3845): Editor general - RootCause error: null is not an object (evaluating 'd.mask')** <br>
+Fix problem for UI error when message bus re-sync is triggered.
+
+**[TRANSLATE-3840](https://jira.translate5.net/browse/TRANSLATE-3840): Hotfolder Import - Hotfolder import deadline format is too strict** <br>
+The deadline timeformats were to strict
+
+**[TRANSLATE-3834](https://jira.translate5.net/browse/TRANSLATE-3834): Import/Export - runtimeOptions.project.defaultPivotLanguage not working for hotfolder projects** <br>
+FIX: Apply runtimeOptions.project.defaultPivotLanguage setting on Project creation with Hotfolder plugin
+
+**[TRANSLATE-3799](https://jira.translate5.net/browse/TRANSLATE-3799): t5memory - Segment check after update in t5memory doesn't work properly with escaped symbols** <br>
+translate5 - 7.4.0: Remove tab replacement again
+translate5 - 7.3.0: Additional code improvement
+translate5 - 7.2.2: Fixed check if segment was updated properly in t5memory 
+
+**[TRANSLATE-3795](https://jira.translate5.net/browse/TRANSLATE-3795): Client management - clientPM should not be able to give himself term PM rights** <br>
+FIX: Remove right for "PM selected clients" to make himself a "Term PM all clients"
+
+**[TRANSLATE-3731](https://jira.translate5.net/browse/TRANSLATE-3731): Task Management - Empty projects shows tasks of previous project** <br>
+If due errors only a project is created but no tasks belonging to it, then the task list of such project behaves strange.
+
+**[TRANSLATE-3699](https://jira.translate5.net/browse/TRANSLATE-3699): User Management - Client PM can choose user with role Light PM as PM** <br>
+FIX: PM for selected clients was able to select PMs not being assigned to his clients
+
+**[TRANSLATE-3630](https://jira.translate5.net/browse/TRANSLATE-3630): User Management - clientPM should be able to see all client configs** <br>
+FIX: The PM selected clients now has access to "File format settings" and "pricing presets" for his selected clients
+
+
+## [7.2.4] - 2024-03-28
+
+### Important Notes:
+#### [TRANSLATE-3837](https://jira.translate5.net/browse/TRANSLATE-3837)
+for on premise docker users: healthcheck for termtagger changed
+ 
+
+
+### Changed
+**[TRANSLATE-3837](https://jira.translate5.net/browse/TRANSLATE-3837): Installation & Update - docker on premise: termtagger and languagetool healthcheck changed** <br>
+docker compose pull to get the latest containers. For termtagger there is now a health check which forces the termtagger to restart when it consumes to much memory.
+
+**[TRANSLATE-3824](https://jira.translate5.net/browse/TRANSLATE-3824): Installation & Update - Show hosting status in UI and create separate monitoring endpoint** <br>
+Add a separate monitoring endpoint, add in hosting some information about the hosting status.
+
+**[TRANSLATE-3820](https://jira.translate5.net/browse/TRANSLATE-3820): Task Management - Add tk-TM (Turkmen (Turkmenistan)) to translate5 languages** <br>
+Add tk-TM (Turkmen (Turkmenistan)) to language list
+
+**[TRANSLATE-3815](https://jira.translate5.net/browse/TRANSLATE-3815): MatchAnalysis & Pretranslation - Fix MatchAnalysisTest** <br>
+Fixed test
+
+**[TRANSLATE-3814](https://jira.translate5.net/browse/TRANSLATE-3814): Import/Export - FIX: Enable use of TMX zip archive in TM creation process** <br>
+Fix translations and zip usage on TM creation process
+
+
+### Bugfixes
+**[TRANSLATE-3832](https://jira.translate5.net/browse/TRANSLATE-3832): Editor general - RootCause error: Cannot read properties of null (reading 'expand')** <br>
+UI fixing a problem expanding the quality tree.
+
+**[TRANSLATE-3826](https://jira.translate5.net/browse/TRANSLATE-3826): Editor general - RootCause error: me.selectedCustomersConfigStore is null** <br>
+Fix for a problem when opening the task creation window and closing it immediately.
+
+**[TRANSLATE-3825](https://jira.translate5.net/browse/TRANSLATE-3825): Editor general - No access exception: reopen locked task** <br>
+Fix for a problem where task was unlocked by the inactive-cleanup component, but the user has still the translate5 task-editing UI open.
+
+**[TRANSLATE-3823](https://jira.translate5.net/browse/TRANSLATE-3823): TermPortal - Remove non breaking spaces from terms** <br>
+Remove non breaking spaces and non regular white-spaces on term import and from all existing terms in the database.
+
+**[TRANSLATE-3821](https://jira.translate5.net/browse/TRANSLATE-3821): Export - Across Hotfoler: Export worker does not wait for Okapi worker** <br>
+Fix Across Hotfolder tasks export
+
+**[TRANSLATE-3817](https://jira.translate5.net/browse/TRANSLATE-3817): InstantTranslate - translate5 sends unescaped xml special char via InstantTranslate to t5memory** <br>
+Escape potentially unescaped content sent to t5memory since this may crashes t5memory
+
+**[TRANSLATE-3811](https://jira.translate5.net/browse/TRANSLATE-3811): VisualReview / VisualTranslation - Visual: Font may be mis-selected when one font's name is containing the other** <br>
+FIX: Some visual fonts have been mis-identified as being identical
+
+**[TRANSLATE-3769](https://jira.translate5.net/browse/TRANSLATE-3769): Editor general - Cancel import unlocks exporting task** <br>
+Fix for a problem with task cancel import logic.
+
+**[TRANSLATE-3643](https://jira.translate5.net/browse/TRANSLATE-3643): User Management - enable PM role to create MT resources** <br>
+PM's are allowed to create MT resources.
+
+
+## [7.2.2] - 2024-03-15
+
+### Important Notes:
+#### [TRANSLATE-3812](https://jira.translate5.net/browse/TRANSLATE-3812)
+The config runtimeOptions.frontend.importTask.edit100PercentMatch is renamed to runtimeOptions.import.edit100PercentMatch and affects now API imports too. Previously this was always false for API imports.
+
+#### [TRANSLATE-3796](https://jira.translate5.net/browse/TRANSLATE-3796)
+t5memory / OpenTM2 URL configuration is now only possible from CLI, not any more from UI. See issue for reason.
+ 
+
+
+### Added
+**[TRANSLATE-3794](https://jira.translate5.net/browse/TRANSLATE-3794): t5memory - Improve reimport tasks mechanism** <br>
+New command is added for reimport task segments to TM
+Added new button to the language resources UI for reimporting only updated segments
+
+**[TRANSLATE-3748](https://jira.translate5.net/browse/TRANSLATE-3748): LanguageResources - TMX zip-import** <br>
+Added support for zip uploads in t5memory resources.
+
+
+### Changed
+**[TRANSLATE-3812](https://jira.translate5.net/browse/TRANSLATE-3812): Import/Export - Make runtimeOptions.frontend.importTask.edit100PercentMatch affect the server side** <br>
+The config runtimeOptions.frontend.importTask.edit100PercentMatch is renamed to runtimeOptions.import.edit100PercentMatch and affects now API imports too. Previously this was always false for API imports.
+
+
+### Bugfixes
+**[TRANSLATE-3810](https://jira.translate5.net/browse/TRANSLATE-3810): Editor general - Reorganize tm can save status of internal fuzzy memory** <br>
+FIx for a problem with the memory name for t5memory language resources.
+
+**[TRANSLATE-3805](https://jira.translate5.net/browse/TRANSLATE-3805): Editor general - RootCause error: Cannot read properties of null (reading 'NEXTeditable')** <br>
+Fix for UI error when saving segment and there are no available next segments in the workflow.
+
+**[TRANSLATE-3804](https://jira.translate5.net/browse/TRANSLATE-3804): Editor general - RootCause: Cannot read properties of null (reading 'items')** <br>
+DEBUG: more info about the problem will be captured for further investigation once it happen next time
+
+**[TRANSLATE-3799](https://jira.translate5.net/browse/TRANSLATE-3799): t5memory - Segment check after update in t5memory doesn't work properly with escaped symbols** <br>
+Fixed check if segment was updated properly in t5memory
+
+**[TRANSLATE-3798](https://jira.translate5.net/browse/TRANSLATE-3798): Editor general - RootCause: Failed to execute 'setAttribute' on 'Element': 'vorlage,' is not a valid attribute name.** <br>
+Added more detailed logging of such cases for further investigation
+
+**[TRANSLATE-3797](https://jira.translate5.net/browse/TRANSLATE-3797): Editor general - Do not run CLI cron jobs with active maintenance** <br>
+Scheduled cron jobs via CLI may not run when maintenance is enabled.
+
+**[TRANSLATE-3796](https://jira.translate5.net/browse/TRANSLATE-3796): t5memory - Fix t5memory migration command** <br>
+Fix cleaning config value in t5memory:migrate command
+
+**[TRANSLATE-3793](https://jira.translate5.net/browse/TRANSLATE-3793): LanguageResources - change date format in file name of resource usage export** <br>
+Fix date-format in excel-export zip-file-names to become the standard "Y-m-d"
+
+**[TRANSLATE-3789](https://jira.translate5.net/browse/TRANSLATE-3789): VisualReview / VisualTranslation - Remove "Max number of layout errors" from visual, just "warn" from a certain thresh on, that errors happened** <br>
+Visual: Tasks are imported, even if the thresh of layout-errors is exceeded; Only a warning will be added in such cases
+
+**[TRANSLATE-3782](https://jira.translate5.net/browse/TRANSLATE-3782): Repetition editor - repetions editor target text not shown** <br>
+FIXED: target tests were not visible in repetitions editor
+
+**[TRANSLATE-3758](https://jira.translate5.net/browse/TRANSLATE-3758): Configuration - move config edit100PercentMatch to client level** <br>
+Attention: See als TRANSLATE-3812! The config runtimeOptions.frontend.importTask.edit100PercentMatch is renamed to runtimeOptions.import.edit100PercentMatch and affects now API imports too, and can be set on client level.
+
+**[TRANSLATE-3755](https://jira.translate5.net/browse/TRANSLATE-3755): Main back-end mechanisms (Worker, Logging, etc.) - PHP E_ERROR: Uncaught TypeError: gzdeflate(): Argument #1 ($data) must be of type string, bool given** <br>
+FIXED: if error happens on json-encoding events to be logged - is now POSTed to logger instead
+
+**[TRANSLATE-3741](https://jira.translate5.net/browse/TRANSLATE-3741): Import/Export - Pricing scheme selected on client level is not respected for projects coming over the hotfolder** <br>
+Fix Task creation process. Provide pricing preset from Client config
+
+**[TRANSLATE-3670](https://jira.translate5.net/browse/TRANSLATE-3670): Editor general - Task custom fields label should be required** <br>
+Label field is not required when creating new custom field.
 
 
 ## [7.2.1] - 2024-03-07

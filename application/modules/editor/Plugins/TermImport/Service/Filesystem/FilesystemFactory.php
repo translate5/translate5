@@ -52,6 +52,7 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\Plugins\TermImport\Service\Filesystem;
 
+use editor_Models_Customer_CustomerConfig as CustomerConfig;
 use League\Flysystem\FilesystemException;
 use League\Flysystem\FilesystemOperationFailed;
 use League\Flysystem\MountManager;
@@ -61,26 +62,27 @@ use MittagQI\Translate5\Tools\FlysystemFactory;
 use stdClass;
 use Zend_Registry;
 use ZfExtended_Factory as Factory;
-use editor_Models_Customer_CustomerConfig as CustomerConfig;
 
 class FilesystemFactory
 {
     public const DEFAULT_HOST_LABEL = 'default';
+
     public const FILESYSTEM_CONFIG_NAME = 'runtimeOptions.plugins.TermImport.filesystemConfig';
 
     private ?object $defaultFilesystemConfig;
 
-    public function __construct(private LoggerService $logger)
-    {
+    public function __construct(
+        private LoggerService $logger
+    ) {
         $config = Zend_Registry::get('config');
         $filesystemConfig = $config->runtimeOptions->plugins?->TermImport?->filesystemConfig;
         $filesystemConfig = $filesystemConfig ? (object) $filesystemConfig->toArray() : null;
 
-        if (!$filesystemConfig || ! (array) $filesystemConfig) {
+        if (! $filesystemConfig || ! (array) $filesystemConfig) {
             return;
         }
 
-        if (!self::isValidFilesystemConfig($filesystemConfig)) {
+        if (! self::isValidFilesystemConfig($filesystemConfig)) {
             throw new TermImportException('E1568');
         }
 
@@ -89,7 +91,6 @@ class FilesystemFactory
 
     /**
      * @param object{type: string, host: string}|object{type: string, location: string}|null $config
-     * @return bool
      */
     public static function isValidFilesystemConfig(?object $config): bool
     {
@@ -97,15 +98,15 @@ class FilesystemFactory
             return true;
         }
 
-        if (!property_exists($config, 'type')) {
+        if (! property_exists($config, 'type')) {
             return false;
         }
 
         if (FlysystemFactory::TYPE_SFTP === $config->type) {
-            return property_exists($config, 'host') && !empty($config->host);
+            return property_exists($config, 'host') && ! empty($config->host);
         }
 
-        return property_exists($config, 'location') && !empty($config->location);
+        return property_exists($config, 'location') && ! empty($config->location);
     }
 
     private function getFilesystemConfig(string $key): ?object
@@ -130,7 +131,7 @@ class FilesystemFactory
             return null;
         }
 
-        if (!self::isValidFilesystemConfig($config)) {
+        if (! self::isValidFilesystemConfig($config)) {
             $this->logger->invalidFilesystemConfig($config);
 
             return null;

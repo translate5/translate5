@@ -7,7 +7,9 @@
 
 function morphSegs_sdlxliff($segTypes, $tagDefs, $langs)
 {
-    $debug = false; $lockedTransUnits = []; $kombi = join('-', $langs);
+    $debug = false;
+    $lockedTransUnits = [];
+    $kombi = join('-', $langs);
 
     $segTypes['srcMrk2Snc'] = morphMrk2Snc($segTypes['srcRaw'], $lockedTransUnits);
     $segTypes['trgMrk2Snc'] = morphMrk2Snc($segTypes['trgRaw'], $lockedTransUnits);
@@ -184,9 +186,9 @@ function segVar2($seg, $otherSeg, $lang, $kombi)
     $seg = str_replace('( ', '(', $seg);
 
     // EN DASH normalisieren
-  $seg = str_replace('–', '-', $seg); // E2 80 93  EN DASH' (U+2013)
+    $seg = str_replace('–', '-', $seg); // E2 80 93  EN DASH' (U+2013)
 
-  // Bedingten Trennstrich entfernen
+    // Bedingten Trennstrich entfernen
     $seg = str_replace("\xc2\xAD", '', $seg);
 
     //Zero-width space entfernen
@@ -243,9 +245,9 @@ function segVar2b($seg, $otherSeg, $lang, $kombi, $lockedTransUnits)
     $seg = str_replace('( ', '(', $seg);
 
     // EN DASH normalisieren
-  $seg = str_replace('–', '-', $seg); // E2 80 93  EN DASH' (U+2013)
+    $seg = str_replace('–', '-', $seg); // E2 80 93  EN DASH' (U+2013)
 
-  // Bedingten Trennstrich entfernen
+    // Bedingten Trennstrich entfernen
     $seg = str_replace("\xc2\xAD", '', $seg);
 
     //Zero-width space entfernen
@@ -562,29 +564,31 @@ function replaceTagsSimple($seg)
 {
     $debug = false;
 
-    $seg = preg_replace_callback('!<([a-z0-9\?\-]+)([^>]*?)(/)?>!iu',
-              function ($match) {
-                  $debug = false;
-                  if ($debug) {
-                      echo "MMM match \n";
-                      print_r($match);
-                  }
-                  $plus = '';
-                  $slash = '';
-                  if (isset($match[2])) {
-                      $plus = '+';
-                  }
-                  if (isset($match[3])) {
-                      $slash = '/';
-                  }
-                  $newName = '<' . $match[1] . $plus . $slash . '>';
-                  if ($debug) {
-                      echo "MMM newName $newName \n";
-                  }
+    $seg = preg_replace_callback(
+        '!<([a-z0-9\?\-]+)([^>]*?)(/)?>!iu',
+        function ($match) {
+            $debug = false;
+            if ($debug) {
+                echo "MMM match \n";
+                print_r($match);
+            }
+            $plus = '';
+            $slash = '';
+            if (isset($match[2])) {
+                $plus = '+';
+            }
+            if (isset($match[3])) {
+                $slash = '/';
+            }
+            $newName = '<' . $match[1] . $plus . $slash . '>';
+            if ($debug) {
+                echo "MMM newName $newName \n";
+            }
 
-                  return $newName;
-              },
-              $seg);
+            return $newName;
+        },
+        $seg
+    );
 
     return $seg;
 }
@@ -675,12 +679,13 @@ function xSdlTags2SncMarkup($seg)
                         $previousTag = $m[$currentKey - $j][0];
                         $previousKey = $currentKey - $j;
                         $set = true;
+
                         break;
                     }
                 }
             }
 
-            if ($debug && !$set) {
+            if ($debug && ! $set) {
                 echo "!set!!!!!!!!!!\n";
             }
             if ($debug) {
@@ -726,7 +731,7 @@ function xSdlTags2SncMarkup($seg)
             }
         }
         // $m sollte nach Durchlaufen aller Matches leer sein, außer ein <mrk> mit unbekannten Attributen wurde gefunden oder es ist etwas anderes grob schief gegangen
-        if (!empty($m)) {
+        if (! empty($m)) {
             trigger_error('Problem [!empty($m)] bei Umwandlung SDL-Markup -> SNC-Markup aufgetreten (' . __FUNCTION__ . ")...\nORIG:\n{$segOrig}\n\nNEU:\n{$seg}\n\n", E_USER_NOTICE);
         }
     }
@@ -802,12 +807,13 @@ function stripXSdlTags($seg)
                         $previousTag = $m[$currentKey - $j][0];
                         $previousKey = $currentKey - $j;
                         $set = true;
+
                         break;
                     }
                 }
             }
 
-            if ($debug && !$set) {
+            if ($debug && ! $set) {
                 echo "!set!!!!!!!!!!\n";
             }
             if ($debug) {
@@ -840,7 +846,7 @@ function stripXSdlTags($seg)
             }
         }
         // $m sollte nach Durchlaufen aller Matches leer sein, außer ein <mrk> mit unbekannten Attributen wurde gefunden oder es ist etwas anderes grob schief gegangen
-        if (!empty($m)) {
+        if (! empty($m)) {
             trigger_error('Problem [!empty($m)] beim Entfernen von SDL-Markup aufgetreten (' . __FUNCTION__ . ")...\nORIG:\n{$segOrig}\n\nNEU:\n{$seg}\n\n", E_USER_NOTICE);
         }
     }
@@ -864,7 +870,7 @@ function lockedTags2sncLocked($seg, $lockedTransUnits)
 
     $lockTagRegEx = '!<x id="locked[^"]+" xid="(.*?)"( )?/>!';
 
-    if (!preg_match_all($lockTagRegEx, $seg, $m)) {
+    if (! preg_match_all($lockTagRegEx, $seg, $m)) {
         trigger_error("strpos auf 'lockTU_', aber kein preg_match auf {$lockTagRegEx}... Da ist was faul, bitte prüfen (lassen). Überspringe Schritt.", E_USER_NOTICE);
     } else {
         foreach ($m[0] as $key => $tag) {
@@ -945,6 +951,7 @@ function getRealTags($seg, $tagDefs)
             if (isset($tags[$currentKey - $j])) {
                 $previousTag = $tags[$currentKey - $j];
                 $previousKey = $currentKey - $j;
+
                 break;
             }
         }
@@ -972,7 +979,7 @@ function getRealTags($seg, $tagDefs)
     $realTags['tagPairs'] = $tagPairs;
     $realTags['tagPairsAll'] = $tagPairsAll;
 
-    if (!empty($tags)) {
+    if (! empty($tags)) {
         //echo "nicht alle tags erwischt... $seg \n -> continue; \n";
         trigger_error("Nicht alle Tags erwischt... $seg Abbruch.\n", E_USER_ERROR);
     }

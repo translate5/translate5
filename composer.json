@@ -107,6 +107,7 @@
       	"ext-fileinfo": "*",
       	"ext-curl": "*",
 		"ext-posix": "*",
+		"ext-intl": "*",
 		"ext-zlib": "*",
 		"phpunit/phpunit": "^9",
 		"shardj/zf1-future" : "dev-master",
@@ -178,6 +179,7 @@
 	"require-dev" : {
 		"brainmaestro/composer-git-hooks" : "^2.8",
 		"symfony/var-dumper": "^6.0",
-		"phpstan/phpstan": "^1.10"
+		"phpstan/phpstan": "^1.10",
+		"symplify/easy-coding-standard": "^12.1"
 	}
 }

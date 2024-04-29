@@ -21,10 +21,11 @@
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
- 		     http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
  END LICENSE AND COPYRIGHT
  */
+
 namespace MittagQI\Translate5\Plugins\MatchAnalysis\Models\Pricing;
 
 use editor_Models_Languages as Languages;
@@ -40,24 +41,23 @@ use ZfExtended_Models_Entity_NotFoundException;
 /**
  * Class representing actual price-list in a certain currency for a pair of certain source and target languages
  *
- * @method integer getId()
+ * @method string getId()
  * @method void setId(int $id)
- * @method integer getPresetId()
+ * @method string getPresetId()
  * @method void setPresetId(int $presetId)
- * @method int getSourceLanguageId()
+ * @method string getSourceLanguageId()
  * @method void setSourceLanguageId(int $sourceLanguageId)
- * @method int getTargetLanguageId()
+ * @method string getTargetLanguageId()
  * @method void setTargetLanguageId(int $targetLanguageId)
  * @method string getCurrency()
  * @method void setCurrency(string $currency)
- * @method float getNoMatch()
+ * @method string getNoMatch()
  * @method void setNoMatch(float $noMatch)
  * @method string getPricesByRangeIds()
  * @method void setPricesByRangeIds(string $pricesByRangeIds)
- *
  */
-class PresetPrices extends ZfExtended_Models_Entity_Abstract {
-
+class PresetPrices extends ZfExtended_Models_Entity_Abstract
+{
     /*
      * A `match_analysis_pricing_preset_prices`-entry has the following structure:
      {
@@ -80,12 +80,10 @@ class PresetPrices extends ZfExtended_Models_Entity_Abstract {
     /**
      * Get prices-entries by given $presetId
      *
-     * @param int $presetId
-     * @return array
      * @throws Zend_Db_Statement_Exception
      */
-    public function getByPresetId(int $presetId) : array {
-
+    public function getByPresetId(int $presetId): array
+    {
         // Get prices-records
         $pricesA = $this->db->getAdapter()->query('
             SELECT * 
@@ -114,15 +112,11 @@ class PresetPrices extends ZfExtended_Models_Entity_Abstract {
      *     'priceAdjustment' => 123
      * ]
      *
-     * @param int $presetId
-     * @param int $sourceLanguageId
-     * @param int $targetLanguageId
-     * @return array
      * @throws Zend_Db_Statement_Exception
      * @throws ZfExtended_Models_Entity_NotFoundException
      */
-    public function getPricesFor(int $presetId, int $sourceLanguageId, int $targetLanguageId) : array {
-
+    public function getPricesFor(int $presetId, int $sourceLanguageId, int $targetLanguageId): array
+    {
         // Get prices-records
         if ($prices = $this->db->getAdapter()->query('
             SELECT `currency`, `pricesByRangeIds`, `noMatch` 
@@ -131,7 +125,6 @@ class PresetPrices extends ZfExtended_Models_Entity_Abstract {
               AND `sourceLanguageId` = ?
               AND `targetLanguageId` = ?
         ', [$presetId, $sourceLanguageId, $targetLanguageId])->fetch()) {
-
             // Decode json
             $byRangeId = json_decode($prices['pricesByRangeIds'], true);
         }
@@ -153,10 +146,10 @@ class PresetPrices extends ZfExtended_Models_Entity_Abstract {
         return [
             'prices' => $byRangeFrom,
             'noMatch' => $prices['noMatch'] ?? 0,
-            'noPricing' => !$prices,
+            'noPricing' => ! $prices,
             'currency' => $prices['currency'] ?? '',
             'unitType' => $preset->getUnitType(),
-            'priceAdjustment' => $preset->getPriceAdjustment()
+            'priceAdjustment' => $preset->getPriceAdjustment(),
         ];
     }
 
@@ -164,35 +157,34 @@ class PresetPrices extends ZfExtended_Models_Entity_Abstract {
      * Clone current record for other source and target language ids combinations
      *
      * @param array $combinations ['langId1-langId2', 'langId1-langId3', 'langId2-langId1', ...]
-     * @return array
      * @throws Zend_Db_Statement_Exception
      * @throws ZfExtended_Models_Entity_Exceptions_IntegrityConstraint
      * @throws ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey
      */
-    public function cloneFor(array $combinations) : array {
-
+    public function cloneFor(array $combinations): array
+    {
         // Prepare ctor
-        $ctor = $this->toArray(); unset($ctor['id'], $ctor['sourceLanguageId'], $ctor['targetLanguageId']);
+        $ctor = $this->toArray();
+        unset($ctor['id'], $ctor['sourceLanguageId'], $ctor['targetLanguageId']);
 
         // Cloned records will be here
         $cloned = [];
 
         // For each combination
         foreach ($combinations as $combination) {
-
             // Extract source and target language ids from combination
-            list ($sourceLanguageId, $targetLanguageId) = explode('-', $combination);
+            list($sourceLanguageId, $targetLanguageId) = explode('-', $combination);
 
             // Create clone for $sourceLanguageId and $targetLanguageId
             $clone = new self();
             $clone->init([
                 'sourceLanguageId' => $sourceLanguageId,
-                'targetLanguageId' => $targetLanguageId
+                'targetLanguageId' => $targetLanguageId,
             ] + $ctor);
             $clone->save();
 
             // Append to clones array
-            $cloned []= $clone->toGridData();
+            $cloned[] = $clone->toGridData();
         }
 
         // Return array of cloned records
@@ -204,8 +196,8 @@ class PresetPrices extends ZfExtended_Models_Entity_Abstract {
      *
      * @return array
      */
-    public function toGridData() {
-
+    public function toGridData()
+    {
         // Get initial array data
         $array = $this->toArray();
 
@@ -222,8 +214,8 @@ class PresetPrices extends ZfExtended_Models_Entity_Abstract {
      * @param string $json
      * @return array
      */
-    private function _extract($json) {
-
+    private function _extract($json)
+    {
         // Extracted prices will be here as values under rangeId (prefixed with 'range') as keys
         $extracted = [];
 
@@ -245,22 +237,21 @@ class PresetPrices extends ZfExtended_Models_Entity_Abstract {
      * @return Languages|object
      * @throws ZfExtended_Models_Entity_NotFoundException
      */
-    public function getLanguageId($type, $instance = false) {
-
+    public function getLanguageId($type, $instance = false)
+    {
         // Prepare getter method name
         $getter = $type == 'source' ? 'getSourceLanguageId' : 'getTargetLanguageId';
 
         // If $foreign arg is true
         if ($instance) {
-
             // Load and return foreign model instance
             $_ = Factory::get(Languages::class);
             $_->load($this->$getter());
+
             return $_;
 
-        // Else
+            // Else
         } else {
-
             // Return as is
             return parent::$getter();
         }
@@ -269,16 +260,13 @@ class PresetPrices extends ZfExtended_Models_Entity_Abstract {
     /**
      * Create record for given $presetId and $targetLanguageId
      *
-     * @param int $presetId
-     * @param array $combinations
-     * @return array
      * @throws Zend_Db_Statement_Exception
      * @throws Zend_Exception
      * @throws ZfExtended_Models_Entity_Exceptions_IntegrityConstraint
      * @throws ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey
      */
-    public function createFor(int $presetId, array $combinations) : array {
-
+    public function createFor(int $presetId, array $combinations): array
+    {
         // Shortcut
         $db = $this->db->getAdapter();
 
@@ -290,9 +278,8 @@ class PresetPrices extends ZfExtended_Models_Entity_Abstract {
 
         // For each combination
         foreach ($combinations as $combination) {
-
             // Extract source and target language ids from combination
-            list ($sourceLanguageId, $targetLanguageId) = explode('-', $combination);
+            list($sourceLanguageId, $targetLanguageId) = explode('-', $combination);
 
             // Skip equal source and target language pair
             if ($sourceLanguageId == $targetLanguageId) {
@@ -309,7 +296,7 @@ class PresetPrices extends ZfExtended_Models_Entity_Abstract {
                     SELECT JSON_OBJECTAGG(`id`, 0)
                     FROM `match_analysis_pricing_preset_range` 
                     WHERE `presetId` = ?
-                ', $presetId)->fetchColumn() ?? '{}'
+                ', $presetId)->fetchColumn() ?? '{}',
             ]);
 
             // Save it
@@ -319,7 +306,7 @@ class PresetPrices extends ZfExtended_Models_Entity_Abstract {
             $clone = clone $this;
 
             // Prepare grid data for the created record
-            $created []= $clone->toGridData();
+            $created[] = $clone->toGridData();
         }
 
         // Return created records array in a format applicable to the grid
@@ -328,11 +315,9 @@ class PresetPrices extends ZfExtended_Models_Entity_Abstract {
 
     /**
      * Delete $rangeId-key from `pricesByRangeIds`-column's JSON-value all records having given $presetId
-     *
-     * @param int $presetId
-     * @param int $rangeId
      */
-    public function deleteBy(int $presetId, int $rangeId) : void {
+    public function deleteBy(int $presetId, int $rangeId): void
+    {
         $this->db->getAdapter()->query('
             UPDATE `match_analysis_pricing_preset_prices` 
             SET `pricesByRangeIds` = JSON_REMOVE(`pricesByRangeIds`, \'$."' . $rangeId . '"\') 
@@ -342,11 +327,9 @@ class PresetPrices extends ZfExtended_Models_Entity_Abstract {
 
     /**
      * Add $rangeId-key for `pricesByRangeIds`-column's JSON-value for all records having given $presetId
-     *
-     * @param $presetId
-     * @param $rangeId
      */
-    public function addRange(int $presetId, int $rangeId) : void {
+    public function addRange(int $presetId, int $rangeId): void
+    {
         $this->db->getAdapter()->query('
             UPDATE `match_analysis_pricing_preset_prices` 
             SET `pricesByRangeIds` = JSON_SET(`pricesByRangeIds`, \'$."' . $rangeId . '"\', 0.0000) 

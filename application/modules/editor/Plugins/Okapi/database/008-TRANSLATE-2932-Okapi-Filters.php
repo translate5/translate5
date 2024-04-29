@@ -45,14 +45,14 @@ $SCRIPT_IDENTIFIER = '008-TRANSLATE-2932-Okapi-Filters.php';
 /* @var $this ZfExtended_Models_Installer_DbUpdater */
 
 $bconf = new editor_Plugins_Okapi_Bconf_Entity();
-foreach($bconf->loadAll() as $bconfData){
+foreach ($bconf->loadAll() as $bconfData) {
     try {
         $bconf->load($bconfData['id']);
         $extensionMapping = $bconf->getExtensionMapping();
         $extensionMapping->rescanFilters();
         $bconf->repackIfOutdated(true);
     } catch (Exception $e) {
-        $msg = 'ERROR rescanning filters for bconf '.$bconf->getId().', "'.$bconf->getName().'": '.$e->getMessage();
+        $msg = 'ERROR rescanning filters for bconf ' . $bconf->getId() . ', "' . $bconf->getName() . '": ' . $e->getMessage();
         error_log($msg);
     }
 }

@@ -21,7 +21,7 @@ START LICENSE AND COPYRIGHT
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
@@ -29,8 +29,10 @@ END LICENSE AND COPYRIGHT
 /**
  * DB Row Model for term
  */
-class editor_Models_Db_Terminology_TermRow extends Zend_Db_Table_Row_Abstract {
-    public function getCleanData() {
+class editor_Models_Db_Terminology_TermRow extends Zend_Db_Table_Row_Abstract
+{
+    public function getCleanData()
+    {
         return $this->_cleanData;
     }
 }

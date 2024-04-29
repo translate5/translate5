@@ -52,7 +52,6 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\DbConfig;
 
-use editor_Models_Config;
 use editor_Models_Customer_Customer;
 use editor_Models_Task;
 use editor_Segment_Quality_Manager;
@@ -62,7 +61,6 @@ use Zend_Controller_Request_Abstract;
 use Zend_EventManager_Event;
 use Zend_Registry;
 use ZfExtended_Factory;
-use ZfExtended_Models_User;
 
 class ActionsEventHandler
 {
@@ -73,38 +71,35 @@ class ActionsEventHandler
         $this->userRepository = new UserRepository();
     }
 
-    public function addDefaultPMUsersOnPutAction(string $configName): callable
+    public function addDefaultPMUsersOnPutAction(string $configName, bool $includePmlite = false): callable
     {
-        return function (Zend_EventManager_Event $event) use ($configName) {
+        return function (Zend_EventManager_Event $event) use ($configName, $includePmlite) {
             if ($event->getParam('request')->getParam('id') != $configName) {
                 return;
             }
 
-            $event->getParam('view')->rows['defaults'] = $this->getPmUsers();
+            $event->getParam('view')->rows['defaults'] = $this->getPmUsers($includePmlite);
         };
     }
 
-    /***
-     * @param Zend_EventManager_Event $event
-     */
-    public function addDefaultPMUsersOnIndexAction(string $configName): callable
+    public function addDefaultPMUsersOnIndexAction(string $configName, bool $includePmlite = false): callable
     {
-        return function (Zend_EventManager_Event $event) use ($configName) {
-            if (!$rows = $event->getParam('view')->rows ?? []) {
+        return function (Zend_EventManager_Event $event) use ($configName, $includePmlite) {
+            if (! $rows = $event->getParam('view')->rows ?? []) {
                 return;
             }
 
             // Config index
             $index = array_search($configName, array_column($rows, 'name'));
 
-            $event->getParam('view')->rows[$index]['defaults'] = $this->getPmUsers();
+            $event->getParam('view')->rows[$index]['defaults'] = $this->getPmUsers($includePmlite);
         };
     }
 
     public function addDefaultsForNonZeroQualityErrorsSettingOnIndexAction(): callable
     {
         return function (Zend_EventManager_Event $event) {
-            if (!$rows = $event->getParam('view')->rows ?? []) {
+            if (! $rows = $event->getParam('view')->rows ?? []) {
                 return;
             }
 
@@ -121,7 +116,7 @@ class ActionsEventHandler
             $event->getParam('view')
                 ->rows[$index]['defaults'] = $this->getDefaultsForNonZeroQualityErrorsSetting(
                     $event->getParam('request')
-            );
+                );
         };
     }
 
@@ -143,7 +138,7 @@ class ActionsEventHandler
         $taskGuid = $request->getParam('taskGuid');
 
         $task = null;
-        if (!empty($taskGuid)) {
+        if (! empty($taskGuid)) {
             $task = ZfExtended_Factory::get(editor_Models_Task::class);
             $task->loadByTaskGuid($taskGuid);
         }
@@ -177,10 +172,10 @@ class ActionsEventHandler
         return Zend_Registry::get('config');
     }
 
-    private function getPmUsers(): string
+    private function getPmUsers(bool $includePmlite): string
     {
         $defaults = [];
-        foreach ($this->userRepository->getPmList() as $pm) {
+        foreach ($this->userRepository->getPmList($includePmlite) as $pm) {
             $defaults[$pm->getId()] = sprintf(
                 '%s %s (%s)',
                 $pm->getFirstName(),

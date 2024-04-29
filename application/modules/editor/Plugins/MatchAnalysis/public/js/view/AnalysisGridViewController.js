@@ -59,10 +59,11 @@ Ext.define('Editor.plugins.MatchAnalysis.view.AnalysisGridViewController', {
      * @param newTask
      */
     onProjectTaskSelectionChange: function (newTask){
+        var view = this.getView();
         if(!newTask){
+            view?.setTask(newTask);
             return;
         }
-        var view = this.getView();
         if (view) {
 
             view.down('#unitType').suspendEvent('change');

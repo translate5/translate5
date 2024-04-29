@@ -171,6 +171,7 @@ Ext.define('Editor.plugins.MatchAnalysis.view.AnalysisGrid', {
                     dock: 'bottom',
                     ui: 'footer',
                     enableOverflow: true,
+                    border: '1 0 0 0',
                     defaultButtonUI: false,
                     items: [{
                         xtype: 'textfield',
@@ -247,8 +248,10 @@ Ext.define('Editor.plugins.MatchAnalysis.view.AnalysisGrid', {
             proxy.setExtraParams({
                 taskGuid: task.get('taskGuid')
             });
+            store.load();
+        } else {
+            store.removeAll();
         }
-        store.load();
     },
 
     getTooltip: function() {

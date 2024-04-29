@@ -1,30 +1,31 @@
 <?php
 /*
  START LICENSE AND COPYRIGHT
- 
+
  This file is part of translate5
- 
+
  Copyright (c) 2013 - 2017 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
- 
+
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
- 
+
  This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
  as published by the Free Software Foundation and appearing in the file agpl3-license.txt
  included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
- 
+
  There is a plugin exception available for use with this release of translate5 for
  translate5: Please see http://www.translate5.net/plugin-exception.txt or
  plugin-exception.txt in the root folder of translate5.
- 
+
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
  http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
- 
+
  END LICENSE AND COPYRIGHT
  */
+
 namespace Translate5\MaintenanceCli\Command;
 
 use editor_Models_Customer_Customer;
@@ -102,7 +103,7 @@ class TaskImportCommand extends Translate5AbstractCommand
 
         $taskName = trim($input->getArgument('taskName'));
 
-        if (!$taskName) {
+        if (! $taskName) {
             $this->io->error('Please provide not empty Task name');
 
             return 1;
@@ -110,7 +111,7 @@ class TaskImportCommand extends Translate5AbstractCommand
 
         $path = $input->getArgument('path');
 
-        if (!file_exists($path)) {
+        if (! file_exists($path)) {
             $this->io->error(sprintf('File "%s" does not exists', $path));
 
             return 1;
@@ -118,7 +119,7 @@ class TaskImportCommand extends Translate5AbstractCommand
 
         $pmId = trim($input->getOption('pm'));
 
-        if (!$pmId) {
+        if (! $pmId) {
             $this->io->error('Please provide valid PM GUID / login / id');
 
             return 1;
@@ -127,8 +128,8 @@ class TaskImportCommand extends Translate5AbstractCommand
         try {
             $pm = ZfExtended_Factory::get(ZfExtended_Models_User::class);
             if (is_numeric($pmId)) {
-                $pm->load($pmId);
-            } elseif ((new \ZfExtended_Validate_Guid)->isValid($pmId)) {
+                $pm->load((int) $pmId);
+            } elseif ((new \ZfExtended_Validate_Guid())->isValid($pmId)) {
                 $pm->loadByGuid($pmId);
             } else {
                 $pm->loadByLogin($pmId);
@@ -170,7 +171,6 @@ class TaskImportCommand extends Translate5AbstractCommand
 
             return 1;
         }
-
 
         $worker = new \editor_Models_Import_CliImportWorker();
         $worker->init(

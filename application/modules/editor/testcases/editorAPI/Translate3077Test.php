@@ -3,7 +3,7 @@
 START LICENSE AND COPYRIGHT
 
  This file is part of translate5
- 
+
  Copyright (c) 2013 - 2022 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
 
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
@@ -13,15 +13,15 @@ START LICENSE AND COPYRIGHT
  included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
-  
+
  There is a plugin exception available for use with this release of translate5 for
  translate5: Please see http://www.translate5.net/plugin-exception.txt or
  plugin-exception.txt in the root folder of translate5.
-  
+
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
@@ -35,14 +35,14 @@ use MittagQI\Translate5\Test\Import\Config;
 class Translate3077Test extends editor_Test_JsonTest
 {
     protected static array $requiredPlugins = [
-        'editor_Plugins_DeepL_Init'
+        'editor_Plugins_DeepL_Init',
     ];
 
     protected static array $requiredRuntimeOptions = [
         'plugins.DeepL.server' => null, //null checks for no concrete value but if not empty
         'plugins.DeepL.authkey' => null, //null checks for no concrete value but if not empty
     ];
-    
+
     protected static bool $setupOwnCustomer = true;
 
     protected static string $setupUserLogin = 'testlector';
@@ -55,7 +55,7 @@ class Translate3077Test extends editor_Test_JsonTest
         $customerId = static::getTestCustomerId();
         $config
             ->addLanguageResource('deepl', null, $customerId, $sourceLangRfc, $relaisLangRfc)
-            ->addProperty('customerPivotAsDefaultIds', [ $customerId ]);
+            ->addProperty('customerPivotAsDefaultIds', [$customerId]);
         $config
             ->addTask($sourceLangRfc, $targetLangRfc, $customerId)
             ->addUploadFolder('testfiles')
@@ -66,15 +66,15 @@ class Translate3077Test extends editor_Test_JsonTest
     /***
      * Check if the segment pivot is pretranslated
      */
-    public function testPivotAutoPretranslation() {
+    public function testPivotAutoPretranslation()
+    {
         //get segment list
         $segments = $this->api()->getSegments();
 
         $this->assertCount(1, $segments);
 
-        foreach($segments as $segment) {
-            static::assertNotEmpty($segment->relais,'The pivot field for the segment is empty');
+        foreach ($segments as $segment) {
+            static::assertNotEmpty($segment->relais, 'The pivot field for the segment is empty');
         }
-
     }
 }

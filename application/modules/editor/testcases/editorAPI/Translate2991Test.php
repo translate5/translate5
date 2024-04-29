@@ -3,35 +3,33 @@
 START LICENSE AND COPYRIGHT
 
  This file is part of translate5
- 
+
  Copyright (c) 2013 - 2021 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
 
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
  This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
- as published by the Free Software Foundation and appearing in the file agpl3-license.txt 
- included in the packaging of this file.  Please review the following information 
+ as published by the Free Software Foundation and appearing in the file agpl3-license.txt
+ included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
-  
+
  There is a plugin exception available for use with this release of translate5 for
- translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or
  plugin-exception.txt in the root folder of translate5.
-  
+
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
 use MittagQI\Translate5\Test\Import\Config;
 use MittagQI\Translate5\Test\Import\LanguageResource;
 
-/**
- */
-class Translate2991Test extends \editor_Test_JsonTest {
-    
+class Translate2991Test extends \editor_Test_JsonTest
+{
     /**
      * Id of a preset that was created during test run
      *
@@ -53,7 +51,7 @@ class Translate2991Test extends \editor_Test_JsonTest {
      */
     protected $ranges = [
         'default' => [],
-        'created' => []
+        'created' => [],
     ];
 
     /**
@@ -63,27 +61,17 @@ class Translate2991Test extends \editor_Test_JsonTest {
      */
     protected $byFrom = [];
 
-    /**
-     * @var bool
-     */
     protected static bool $setupOwnCustomer = true;
 
-    /**
-     * @var array
-     */
     protected static array $requiredPlugins = [
         'editor_Plugins_Okapi_Init',
         'editor_Plugins_MatchAnalysis_Init',
-        'editor_Plugins_ZDemoMT_Init'
+        'editor_Plugins_ZDemoMT_Init',
     ];
 
-    /**
-     * @var LanguageResource
-     */
     private static LanguageResource $dummyMt;
 
     /**
-     * @param Config $config
      * @throws \MittagQI\Translate5\Test\Import\Exception
      */
     protected static function setupImport(Config $config): void
@@ -113,8 +101,8 @@ class Translate2991Test extends \editor_Test_JsonTest {
      *
      * @throws Zend_Http_Client_Exception
      */
-    public function testPricing(){
-
+    public function testPricing()
+    {
         // Check at least system default pricing preset exists
         /** @var Zend_Http_Response $resp */
         $json = static::api()->getJson('editor/plugins_matchanalysis_pricingpreset');
@@ -125,21 +113,23 @@ class Translate2991Test extends \editor_Test_JsonTest {
 
         // Get prices and ranges for system default preset
         $json = static::api()->get('editor/plugins_matchanalysis_pricingpresetprices', [
-            'presetId' => $rows[$default]
+            'presetId' => $rows[$default],
         ])->getBody();
         $json = json_decode($json, true);
         $this->assertIsArray($json, 'Response is not a valid json array');
         $this->assertArrayHasKey('metaData', $json, 'Response json has no metaData-key');
         $this->assertArrayHasKey('rows', $json, 'Response json has no metaData-key');
         $this->assertCount(10, $json['metaData'], 'Count of default ranges is not expected');
-        $this->assertCount( 0, $json['rows'    ], 'Count of default prices is not expected');
+        $this->assertCount(0, $json['rows'], 'Count of default prices is not expected');
 
         // Remember ranges from system default preset
         $this->ranges['default'] = $json['metaData'];
 
         // Create preset
         $name = 'Created preset';
-        $json = static::api()->postJson('editor/plugins_matchanalysis_pricingpreset', ['name' => $name]);
+        $json = static::api()->postJson('editor/plugins_matchanalysis_pricingpreset', [
+            'name' => $name,
+        ]);
         $this->assertTrue($json->success, 'Create preset failed');
         self::$createdPresetId = $json->created->id;
 
@@ -148,7 +138,7 @@ class Translate2991Test extends \editor_Test_JsonTest {
             'presetId' => self::$createdPresetId,
             'unitType' => 'character',
             'priceAdjustment' => 5,
-            'description' => 'Description for created preset'
+            'description' => 'Description for created preset',
         ]);
         $this->assertTrue($json->success, 'Preset props change request was unsuccessful');
         $this->assertEquals($data['unitType'], $json->updated->unitType, 'Unit type change failed');
@@ -157,14 +147,14 @@ class Translate2991Test extends \editor_Test_JsonTest {
 
         // Get prices and ranges for created preset
         $json = static::api()->get('editor/plugins_matchanalysis_pricingpresetprices', [
-            'presetId' => self::$createdPresetId
+            'presetId' => self::$createdPresetId,
         ])->getBody();
         $json = json_decode($json, true);
         $this->assertIsArray($json, 'Response is not a valid json array');
         $this->assertArrayHasKey('metaData', $json, 'Response json has no metaData-key');
         $this->assertArrayHasKey('rows', $json, 'Response json has no metaData-key');
         $this->assertCount(10, $json['metaData'], 'Count of default ranges is not expected');
-        $this->assertCount( 0, $json['rows'    ], 'Count of default prices is not expected');
+        $this->assertCount(0, $json['rows'], 'Count of default prices is not expected');
 
         // Get ranges from created preset
         $this->ranges['created'] = $json['metaData'];
@@ -172,9 +162,9 @@ class Translate2991Test extends \editor_Test_JsonTest {
         // Build [from => till] pairs from default-preset ranges and from created-preset ranges
         foreach (['default', 'created'] as $type) {
             foreach ($this->ranges[$type] as $range) {
-                $pairs[$type] []= [
+                $pairs[$type][] = [
                     'from' => $range['from'],
-                    'till' => $range['till']
+                    'till' => $range['till'],
                 ];
             }
         }
@@ -183,11 +173,12 @@ class Translate2991Test extends \editor_Test_JsonTest {
         $this->assertEquals(
             json_encode($pairs['default']),
             json_encode($pairs['created']),
-        'Ranges from default preset were not correctly cloned to created preset');
+            'Ranges from default preset were not correctly cloned to created preset'
+        );
 
         // Delete all ranges from created preset
         $json = static::api()->delete('editor/plugins_matchanalysis_pricingpresetrange', $data = [
-            'rangeIds' => join(',', $rangeIdA = array_column($this->ranges['created'], 'id'))
+            'rangeIds' => join(',', $rangeIdA = array_column($this->ranges['created'], 'id')),
         ]);
         $this->assertObjectHasAttribute('success', $json, 'Response json does not have success-prop');
         $this->assertTrue($json->success, 'Response json->success is NOT true');
@@ -197,7 +188,11 @@ class Translate2991Test extends \editor_Test_JsonTest {
         $this->ranges['created'] = [];
 
         // Add ranges 0-55, 56-79, 80-104
-        foreach ([0 => 55, 56 => 79, 80 => 104] as $from => $till) {
+        foreach ([
+            0 => 55,
+            56 => 79,
+            80 => 104,
+        ] as $from => $till) {
             $this->createRange($from, $till);
         }
 
@@ -206,7 +201,7 @@ class Translate2991Test extends \editor_Test_JsonTest {
             'presetId' => self::$createdPresetId,
             'sourceLanguageIds' => '5,361', // de, de-DE
             'targetLanguageIds' => '4,251', // en, en-GB
-            'currency' => '$'
+            'currency' => '$',
         ]);
         $this->assertTrue($json->success, 'Prices create request was unsuccessful');
         $this->assertCount(4, $json->append, 'Count of created prices is not expected');
@@ -263,7 +258,9 @@ class Translate2991Test extends \editor_Test_JsonTest {
         $this->assertTrue($json->success, 'Prices-record delete-request was not successful');
 
         // Delete range 80-104
-        $json = static::api()->delete('editor/plugins_matchanalysis_pricingpresetrange', ['rangeIds' => $this->byFrom['80']]);
+        $json = static::api()->delete('editor/plugins_matchanalysis_pricingpresetrange', [
+            'rangeIds' => $this->byFrom['80'],
+        ]);
         $this->assertTrue($json->success, 'Range delete request was not successful');
         $this->assertIsArray($json->deleted, 'Response delete-prop is not an array');
         $this->assertEquals($this->byFrom['80'], join(',', $json->deleted), 'List of deleted range ids is wrong');
@@ -272,14 +269,14 @@ class Translate2991Test extends \editor_Test_JsonTest {
         $json = static::api()->putJson('editor/plugins_matchanalysis_pricingpresetrange', $data = [
             'rangeId' => $this->byFrom['56'],
             'from' => 56,
-            'till' => 104
+            'till' => 104,
         ]);
         $this->assertTrue($json->success, 'Range expand request was not successful');
         $this->assertEquals($data['till'], $json->updated->till, 'Value of till-prop of expanded range is incorrect');
 
         $json = static::api()->postJson('editor/plugins_matchanalysis_pricingpreset/clone', $data = [
             'presetId' => self::$createdPresetId,
-            'name' => 'Clone preset from created one'
+            'name' => 'Clone preset from created one',
         ]);
         $this->assertTrue($json->success, 'Range expand request was not successful');
         $this->assertEquals($data['name'], $json->clone->name, 'Name of cloned preset is not as expected');
@@ -287,26 +284,26 @@ class Translate2991Test extends \editor_Test_JsonTest {
 
         // Get fresh prices and ranges for created preset within a single response
         $preset['created'] = static::api()->get('editor/plugins_matchanalysis_pricingpresetprices', [
-            'presetId' => self::$createdPresetId
+            'presetId' => self::$createdPresetId,
         ])->getBody();
         $preset['created'] = json_decode($preset['created'], true);
 
         // Get prices and ranges for the clone preset
         $preset['cloned'] = static::api()->get('editor/plugins_matchanalysis_pricingpresetprices', [
-            'presetId' => $json->clone->id
+            'presetId' => $json->clone->id,
         ])->getBody();
         $preset['cloned'] = json_decode($preset['cloned'], true);
 
         // Assert ranges and prices quantities are same
         $this->assertCount(count($preset['created']['metaData']), $preset['cloned']['metaData'], 'Ranges of a cloned preset are wrong');
-        $this->assertCount(count($preset['created']['rows'])    , $preset['cloned']['rows']    , 'Prices of a cloned preset are wrong');
+        $this->assertCount(count($preset['created']['rows']), $preset['cloned']['rows'], 'Prices of a cloned preset are wrong');
 
         // Setup pricingPresetId for the task
         $json = static::api()->putJson('editor/taskmeta', [
             'id' => static::api()->getTask()->taskGuid,
             'data' => json_encode($data = [
-                'pricingPresetId' => self::$createdPresetId
-            ])
+                'pricingPresetId' => self::$createdPresetId,
+            ]),
         ], null, false);
         $this->assertIsObject($json, 'Response is not object');
         $this->assertObjectHasAttribute('pricingPresetId', $json, 'Response object has now pricingPresetId-prop');
@@ -315,7 +312,7 @@ class Translate2991Test extends \editor_Test_JsonTest {
         // Change created preset's unitType back to 'word'
         $json = static::api()->putJson('editor/plugins_matchanalysis_pricingpreset', $data = [
             'presetId' => self::$createdPresetId,
-            'unitType' => 'word'
+            'unitType' => 'word',
         ]);
         $this->assertEquals($data['unitType'], $json->updated->unitType, 'Unit type change back failed');
 
@@ -323,7 +320,7 @@ class Translate2991Test extends \editor_Test_JsonTest {
         $json = static::api()->putJson('editor/plugins_matchanalysis_pricingpresetrange', $data = [
             'rangeId' => $this->byFrom['56'],
             'from' => 56,
-            'till' => 79
+            'till' => 79,
         ]);
         $this->assertTrue($json->success, 'Range expand request was not successful');
         $this->assertEquals($data['till'], $json->updated->till, 'Value of till-prop of expanded range is incorrect');
@@ -331,7 +328,7 @@ class Translate2991Test extends \editor_Test_JsonTest {
         // Create range 80-104 and it's price back
         $this->createRange(80, 104);
         $this->setPrices($de_en->id, [
-            $this->byFrom[80] => 0.07
+            $this->byFrom[80] => 0.07,
         ]);
 
         // File with json-encoded analysis data that is expected to be the same as fetch
@@ -339,14 +336,14 @@ class Translate2991Test extends \editor_Test_JsonTest {
 
         // Get analysis data
         $json = static::api()->getJson('editor/plugins_matchanalysis_matchanalysis', [
-            'taskGuid'=> static::api()->getTask()->taskGuid,
-            'unitType' => 'word'
+            'taskGuid' => static::api()->getTask()->taskGuid,
+            'unitType' => 'word',
         ]);
-        $this->assertNotEmpty($json,'No results found for the task matchanalysis');
+        $this->assertNotEmpty($json, 'No results found for the task matchanalysis');
 
         // Remove the created timestamp since is not relevant for the test
         foreach ($json as &$row) {
-            unset ($row->created,$row->errorCount);
+            unset($row->created,$row->errorCount);
         }
 
         // Overwrite file contents if capture mode is On
@@ -367,11 +364,10 @@ class Translate2991Test extends \editor_Test_JsonTest {
     /**
      * Create range
      *
-     * @param $from
-     * @param $till
      * @throws Zend_Http_Client_Exception
      */
-    private function createRange($from, $till) {
+    private function createRange($from, $till)
+    {
         $json = static::api()->postJson('editor/plugins_matchanalysis_pricingpresetrange', [
             'presetId' => self::$createdPresetId,
             'from' => $from,
@@ -379,22 +375,25 @@ class Translate2991Test extends \editor_Test_JsonTest {
         ]);
         $this->assertTrue($json->success, 'Range create request was unsuccessful');
         $this->assertIsNumeric($json->created, 'Created range id is not integer');
-        $this->ranges['created'][$json->created] = ['from' => $from, 'till' => $till];
+        $this->ranges['created'][$json->created] = [
+            'from' => $from,
+            'till' => $till,
+        ];
         $this->byFrom[$from] = $json->created;
     }
 
     /**
      * Set price-by-rangeId values within an existing prices-record
      *
-     * @param $pricesId
-     * @param $priceByRangeIdA
      * @throws Zend_Http_Client_Exception
      * @return array
      */
-    private function setPrices($pricesId, $priceByRangeIdA) {
-
+    private function setPrices($pricesId, $priceByRangeIdA)
+    {
         // Prepare request data to update prices, and do update
-        $data = ['pricesId' => $pricesId];
+        $data = [
+            'pricesId' => $pricesId,
+        ];
         foreach ($priceByRangeIdA as $rangeId => $price) {
             $data['range' . $rangeId] = $price;
         }
@@ -417,8 +416,13 @@ class Translate2991Test extends \editor_Test_JsonTest {
      *
      * @throws Zend_Http_Client_Exception
      */
-    public static function afterTests(): void {
-        static::api()->delete('editor/plugins_matchanalysis_pricingpreset?answer=yes', ['presetId' => self::$createdPresetId]);
-        static::api()->delete('editor/plugins_matchanalysis_pricingpreset?answer=yes', ['presetId' => self::$clonedPresetId]);
+    public static function afterTests(): void
+    {
+        static::api()->delete('editor/plugins_matchanalysis_pricingpreset?answer=yes', [
+            'presetId' => self::$createdPresetId,
+        ]);
+        static::api()->delete('editor/plugins_matchanalysis_pricingpreset?answer=yes', [
+            'presetId' => self::$clonedPresetId,
+        ]);
     }
 }

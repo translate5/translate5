@@ -3,7 +3,7 @@
 START LICENSE AND COPYRIGHT
 
  This file is part of ZfExtended library
- 
+
  Copyright (c) 2013 - 2021 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
 
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
@@ -17,7 +17,7 @@ https://www.gnu.org/licenses/lgpl-3.0.txt
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU LESSER GENERAL PUBLIC LICENSE version 3
-			 https://www.gnu.org/licenses/lgpl-3.0.txt
+             https://www.gnu.org/licenses/lgpl-3.0.txt
 
 END LICENSE AND COPYRIGHT
 */
@@ -32,7 +32,6 @@ class editor_Plugins_Okapi_DbConfig_OkapiConfigType extends ZfExtended_DbConfig_
 {
     /**
      * returns the GUI view class to be used or null for default handling
-     * @return string|null
      */
     public function getGuiViewCls(): ?string
     {
@@ -47,7 +46,7 @@ class editor_Plugins_Okapi_DbConfig_OkapiConfigType extends ZfExtended_DbConfig_
         $rawType = parent::validateValue($config, $newvalue, $errorStr);
 
         // if the raw type is not correct fail validation
-        if (!$rawType) {
+        if (! $rawType) {
             return false;
         }
         $okapiConfig = ZfExtended_Factory::get(ConfigMaintenance::class);
@@ -56,9 +55,9 @@ class editor_Plugins_Okapi_DbConfig_OkapiConfigType extends ZfExtended_DbConfig_
         $serverList = [];
 
         // validate the sent servers
-        foreach($newServerList as $serverKey => $serverUrl){
+        foreach ($newServerList as $serverKey => $serverUrl) {
             // if an entry is not identically in the old list is has changed
-            if(array_key_exists($serverKey, $oldServerList) && $oldServerList[$serverKey] === $serverUrl){
+            if (array_key_exists($serverKey, $oldServerList) && $oldServerList[$serverKey] === $serverUrl) {
                 // unchanged keys will be accepted
                 $serverList[$serverKey] = $serverUrl;
             } else {
@@ -66,6 +65,7 @@ class editor_Plugins_Okapi_DbConfig_OkapiConfigType extends ZfExtended_DbConfig_
                 $versionString = Service::fetchServerVersion($serverUrl);
                 if ($versionString === null) {
                     $errorStr .= ' Url "' . $serverUrl . '" of entry "' . $serverKey . '" is not valid.';
+
                     return false;
                 }
                 $serverList[Service::createServerKey($versionString)] = $serverUrl;
@@ -75,7 +75,8 @@ class editor_Plugins_Okapi_DbConfig_OkapiConfigType extends ZfExtended_DbConfig_
         $removedServers = array_diff(array_keys($oldServerList), array_keys($serverList));
 
         if (($count = $okapiConfig->countTaskUsageSum($removedServers)) > 0) {
-            $errorStr .= ' Unable to remove the server. It is already used by '.$count.' task(s).';
+            $errorStr .= ' Unable to remove the server. It is already used by ' . $count . ' task(s).';
+
             return false;
         }
 

@@ -21,7 +21,7 @@ START LICENSE AND COPYRIGHT
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
@@ -36,31 +36,43 @@ use MittagQI\Translate5\Test\Api\Helper;
 abstract class LanguageResource extends Resource
 {
     public const OPEN_TM2 = 'opentm2';
+
     public const DEEPL = 'deepl';
+
     public const TERM_COLLECTION = 'termcollection';
+
     public const DUMMY_TM = 'dummytm';
+
     public const ZDemo_MT = 'zdemomt';
+
     public const MICROSOFT_TRANSLATOR = 'microsofttranslator';
+
     public const TILDE_MT = 'tildemt';
+
     public const OPEN_AI = 'openai';
 
     public const GOOGLE_TRANSLATE = 'googletranslate';
 
     public string $name;
+
     public array $customerIds = [];
+
     public array $customerUseAsDefaultIds = [];
+
     public array $customerWriteAsDefaultIds = [];
+
     protected string $resourceId;
+
     protected string $serviceType;
+
     protected string $serviceName;
+
     protected ?string $_uploadFile = null;
+
     protected string $_deleteRoute = 'editor/languageresourceinstance/';
+
     protected bool $_associateToTasks = true;
 
-    /**
-     * @param string $testClass
-     * @param int $index
-     */
     public function __construct(string $testClass, int $index)
     {
         parent::__construct($testClass, $index);
@@ -69,25 +81,17 @@ abstract class LanguageResource extends Resource
 
     /**
      * Creates the resource-id
-     * @param int $resourceIndex
-     * @return string
      */
     protected function createResourceId(int $resourceIndex): string
     {
         return $this->serviceType;
     }
 
-    /**
-     * @return string
-     */
     public function getServiceName(): string
     {
         return $this->serviceName;
     }
 
-    /**
-     * @return string
-     */
     public function getServiceType(): string
     {
         return $this->serviceType;
@@ -95,29 +99,28 @@ abstract class LanguageResource extends Resource
 
     /**
      * Adds the upload for the language resource
-     * @param string $resourceFileName
      * @return $this
      */
     public function addUploadFile(string $resourceFileName): LanguageResource
     {
         $this->_uploadFile = $resourceFileName;
+
         return $this;
     }
 
     /**
-     * @param int $customerId
-     * @param bool $resourceIsTaskAssociated
      * @return $this
      */
     public function addDefaultCustomerId(int $customerId, bool $useForWriteAccess = false, bool $resourceIsTaskAssociated = false): LanguageResource
     {
-        if (!in_array($customerId, $this->customerUseAsDefaultIds)) {
+        if (! in_array($customerId, $this->customerUseAsDefaultIds)) {
             $this->customerUseAsDefaultIds[] = $customerId;
         }
-        if ($useForWriteAccess && !in_array($customerId, $this->customerWriteAsDefaultIds)) {
+        if ($useForWriteAccess && ! in_array($customerId, $this->customerWriteAsDefaultIds)) {
             $this->customerWriteAsDefaultIds[] = $customerId;
         }
         $this->_associateToTasks = $resourceIsTaskAssociated;
+
         return $this;
     }
 
@@ -127,25 +130,22 @@ abstract class LanguageResource extends Resource
     public function setIsNotTaskAssociated(): LanguageResource
     {
         $this->_associateToTasks = false;
+
         return $this;
     }
 
-    /**
-     * @return bool
-     */
     public function isTaskAssociated(): bool
     {
         return $this->_associateToTasks;
     }
 
     /**
-     * @param Helper $api
      * @throws \Zend_Http_Client_Exception
      */
     public function import(Helper $api, Config $config): void
     {
-        if($this->_requested){
-            throw new Exception('You cannot import a '.get_class($this).' twice.');
+        if ($this->_requested) {
+            throw new Exception('You cannot import a ' . get_class($this) . ' twice.');
         }
         $result = $api->addResource($this->getRequestParams(), $this->_uploadFile, true);
         $this->validateResult($result, $api);

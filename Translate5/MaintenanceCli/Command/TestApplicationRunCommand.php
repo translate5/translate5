@@ -1,41 +1,41 @@
 <?php
 /*
  START LICENSE AND COPYRIGHT
- 
+
  This file is part of translate5
- 
+
  Copyright (c) 2013 - 2017 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
- 
+
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
- 
+
  This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
  as published by the Free Software Foundation and appearing in the file agpl3-license.txt
  included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
- 
+
  There is a plugin exception available for use with this release of translate5 for
  translate5: Please see http://www.translate5.net/plugin-exception.txt or
  plugin-exception.txt in the root folder of translate5.
- 
+
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
  http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
- 
+
  END LICENSE AND COPYRIGHT
  */
+
 namespace Translate5\MaintenanceCli\Command;
 
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Command\LockableTrait;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Command\LockableTrait;
 use ZfExtended_Factory;
 use ZfExtended_Models_Worker;
-use ZfExtended_Worker_GarbageCleaner;
 
 class TestApplicationRunCommand extends Translate5AbstractTestCommand
 {
@@ -49,22 +49,22 @@ class TestApplicationRunCommand extends Translate5AbstractTestCommand
 
     /**
      * A master
-     * @var bool
      */
     protected static bool $canMimicMasterTest = true;
-    
+
     protected function configure()
     {
         $this
             // the short description shown while running "php bin/console list"
             ->setDescription('API-Tests: Runs all tests for the application environment.')
-        
+
             // the full command description shown when running the command with
             // the "--help" option
             ->setHelp('Runs all API-tests for the aplication environment and NOT the test-environment.');
 
         // on the master-system it can happen several dev's run the tests and we should avoid that
-        $this->addArgument('testorsuite',
+        $this->addArgument(
+            'testorsuite',
             InputArgument::OPTIONAL,
             'Filename of the Test to be called (don\'t forget *.php) or name of a suite'
         );
@@ -73,19 +73,22 @@ class TestApplicationRunCommand extends Translate5AbstractTestCommand
             'recreate-database',
             'r',
             InputOption::VALUE_NONE,
-            'Use this option to recreate the application database with it\'s name being prompted. This will also clean the /data directory contents.');
+            'Use this option to recreate the application database with it\'s name being prompted. This will also clean the /data directory contents.'
+        );
 
         $this->addOption(
             'database-recreation',
             'd',
             InputOption::VALUE_REQUIRED,
-            'Use this option to recreate the application database with it\'s name as option. This will also clean the /data directory contents.');
+            'Use this option to recreate the application database with it\'s name as option. This will also clean the /data directory contents.'
+        );
 
         $this->addOption(
             'worker-cleanup',
             'w',
             InputOption::VALUE_NONE,
-            'Use this option to delete all workers from the db. An error is shown if there are running, scheduled or prepared workers in the DB');
+            'Use this option to delete all workers from the db. An error is shown if there are running, scheduled or prepared workers in the DB'
+        );
 
         parent::configure();
     }
@@ -99,51 +102,53 @@ class TestApplicationRunCommand extends Translate5AbstractTestCommand
     {
         $this->initInputOutput($input, $output);
 
-        if (!$this->lock()) {
-            $this->io->warning('The '.$this->getName().' command is already executed by another user.');
+        if (! $this->lock()) {
+            $this->io->warning('The ' . $this->getName() . ' command is already executed by another user.');
+
             return Command::FAILURE;
         }
 
-        if($this->checkCliUsageAsRoot()){
+        if ($this->checkCliUsageAsRoot()) {
             return Command::FAILURE;
         }
 
         $testOrSuite = $this->input->getArgument('testorsuite');
         $extension = empty($testOrSuite) ? '' : strtolower(pathinfo($testOrSuite, PATHINFO_EXTENSION));
         $testPath = ($extension === 'php') ? $this->normalizeSingleTestPath($testOrSuite) : null;
-        $testSuite = ($extension === '' && !empty($testOrSuite)) ? $testOrSuite : null;
+        $testSuite = ($extension === '' && ! empty($testOrSuite)) ? $testOrSuite : null;
 
-        if($testPath !== null && !file_exists($testPath)){
-            throw new \RuntimeException('The given Test does not exist: '.$testOrSuite);
+        if ($testPath !== null && ! file_exists($testPath)) {
+            throw new \RuntimeException('The given Test does not exist: ' . $testOrSuite);
         }
 
         // reinitialize the database & data directory if we should
         $databaseForRecreation = $this->input->getOption('database-recreation');
-        if($databaseForRecreation || $this->input->getOption('recreate-database')){
-            if (!$this->reInitApplicationDatabase($databaseForRecreation)){
+        if ($databaseForRecreation || $this->input->getOption('recreate-database')) {
+            if (! $this->reInitApplicationDatabase($databaseForRecreation)) {
                 return Command::FAILURE;
             }
         }
         // crucial: this initializes the "normal" application environment
-        if($this->initTestEnvironment('application', false)){
-
+        if ($this->initTestEnvironment('application', false)) {
             // special option: clean workers to avoid test-quirks
             if ($this->input->getOption('worker-cleanup')) {
-
                 $worker = ZfExtended_Factory::get(ZfExtended_Models_Worker::class);
                 // remove done & defunct workers and garbage-cleaner
-                $worker->db->delete(['state in (?)' => [$worker::STATE_DONE, $worker::STATE_DEFUNCT]]);
-                $worker->db->delete(['worker = ?' => ZfExtended_Worker_GarbageCleaner::class]);
+                $worker->db->delete([
+                    'state in (?)' => [$worker::STATE_DONE, $worker::STATE_DEFUNCT],
+                ]);
                 // if there are still workers, we refuse to run
                 $countRemaining = count($worker->loadAll());
                 if ($countRemaining > 0) {
                     $this->io->warning('Theere are ' . $countRemaining . ' remaining workers in the DB, terminating.');
+
                     return Command::FAILURE;
                 }
             }
 
             $this->startApiTest($testPath, $testSuite);
         }
+
         return Command::SUCCESS;
     }
 }

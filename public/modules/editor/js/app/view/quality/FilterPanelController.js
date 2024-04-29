@@ -164,8 +164,15 @@ Ext.define('Editor.view.quality.FilterPanelController', {
      * Handles showing the loaded store & firing the filter event
      */
     onFilterStoreLoaded: function(store){
-        var me = this, view = this.getView();
-        store.getRoot().expand();
+        var me = this,
+            view = me.getView(),
+            root = store.getRoot();
+
+        if(!root){
+            return;
+        }
+
+        root.expand();
         view.afterLoad();
         me.delayedChange = new Ext.util.DelayedTask(function(){
             me.delayedChange = null;

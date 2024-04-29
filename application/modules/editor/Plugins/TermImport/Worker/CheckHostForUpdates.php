@@ -52,14 +52,15 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\Plugins\TermImport\Worker;
 
-use MittagQI\Translate5\Plugins\TermImport\TermImport;
 use MittagQI\Translate5\Plugins\TermImport\Service\Filesystem\FilesystemFactory;
 use MittagQI\Translate5\Plugins\TermImport\Service\LoggerService;
+use MittagQI\Translate5\Plugins\TermImport\TermImport;
 use ZfExtended_Worker_Abstract;
 
 class CheckHostForUpdates extends ZfExtended_Worker_Abstract
 {
     private TermImport $plugin;
+
     private string $filesystemKey;
 
     public function __construct()
@@ -82,5 +83,6 @@ class CheckHostForUpdates extends ZfExtended_Worker_Abstract
     protected function work()
     {
         $this->plugin->checkFilesystem($this->filesystemKey);
+        return true;
     }
 }

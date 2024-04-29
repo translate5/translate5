@@ -21,12 +21,11 @@ START LICENSE AND COPYRIGHT
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
-/**
- */
+
 class editor_Models_Terminology_Import_TbxBinaryDataImport
 {
     /**
@@ -40,15 +39,11 @@ class editor_Models_Terminology_Import_TbxBinaryDataImport
      * [someTarget => true] pairs for each value of id-attr mentioned in '<refObject id="someTarget">'-nodes
      * It will be further used as a dictionary which makes it handy to check whether the image definition exists
      * in back-matter for any value of target-attr in '<descrip type="figure" target="someTarget">'-nodes
-     *
-     * @var array
      */
     public array $figureExists = [];
 
     /**
      * Temporary directory where imported zip archive was extracted into
-     *
-     * @var string
      */
     protected string $extractedZipDir;
 
@@ -59,8 +54,6 @@ class editor_Models_Terminology_Import_TbxBinaryDataImport
 
     /**
      * Images quantities
-     *
-     * @var array
      */
     public array $imageQty = [
 
@@ -83,7 +76,7 @@ class editor_Models_Terminology_Import_TbxBinaryDataImport
          * Images whose paths are mentioned in back-matter or directly in
          * <xref type="xGraphic" target="some/path.jpg>-nodes, but no images found under that paths
          */
-        'missing' => 0
+        'missing' => 0,
     ];
 
     /**
@@ -98,12 +91,9 @@ class editor_Models_Terminology_Import_TbxBinaryDataImport
 
         // ['path/to/image.png' => true] pairs for each back-matter definition's path or xGraphic's target
         // (which is path as well) that have no real files in the zip-archive under that path. See E1544
-        'files'       => [],
+        'files' => [],
     ];
 
-    /**
-     * @var editor_Models_Terminology_Models_ImagesModel
-     */
     protected editor_Models_Terminology_Models_ImagesModel $imagesModel;
 
     /**
@@ -115,21 +105,17 @@ class editor_Models_Terminology_Import_TbxBinaryDataImport
 
     /**
      * Current term collection instance
-     *
-     * @var editor_Models_TermCollection_TermCollection
      */
     protected editor_Models_TermCollection_TermCollection $collection;
 
     /**
      * editor_Models_Terminology_Import_TbxBinaryDataImport constructor.
      *
-     * @param string $tbxFilePath
-     * @param editor_Models_TermCollection_TermCollection $collection
      * @throws Zend_Exception
      * @throws editor_Models_Terminology_Import_Exception
      */
-    public function __construct(string $tbxFilePath, editor_Models_TermCollection_TermCollection $collection) {
-
+    public function __construct(string $tbxFilePath, editor_Models_TermCollection_TermCollection $collection)
+    {
         // Get dir where imported zip-archive was extracted
         $this->extractedZipDir = pathinfo($tbxFilePath, PATHINFO_DIRNAME);
 
@@ -157,11 +143,8 @@ class editor_Models_Terminology_Import_TbxBinaryDataImport
 
     /**
      * Imports the binary data refObject as images
-     *
-     * @param SimpleXMLElement $refObjectList
-     * @return void
      */
-    public function import(SimpleXMLElement $refObjectList) : void
+    public function import(SimpleXMLElement $refObjectList): void
     {
         // Foreach coming image
         /** @var SimpleXMLElement $refObject */
@@ -176,32 +159,28 @@ class editor_Models_Terminology_Import_TbxBinaryDataImport
         );
 
         // If there are images mentioned in db but missing on disk - log that as warning
-        if (!empty($missingFiles)) {
+        if (! empty($missingFiles)) {
             $this->logger->warn('E1028', 'TBX Import: there are image files in the database which are missing on the disk', [
                 'termCollectionId' => $this->collection->getId(),
                 'languageResource' => $this->collection,
-                'missingFiles' => $missingFiles
+                'missingFiles' => $missingFiles,
             ]);
         }
     }
 
     /**
      * Import single image from either SimpleXMLElement instance, or from string local path within extracted zip-archive
-     *
-     * @param SimpleXMLElement|string $from
-     * @return bool
      */
-    public function importSingleImage(SimpleXMLElement|string $from) : bool {
-
+    public function importSingleImage(SimpleXMLElement|string $from): bool
+    {
         // Prepare record-data for coming image
         $coming = $this->makeImageData($from);
         $coming['uniqueName'] = $this->imagesModel->createUniqueName($coming['name']);
 
         // If image have no data
         if ($coming['data'] === false) {
-
             // Increment missing images counter
-            $this->imageQty['missing'] ++;
+            $this->imageQty['missing']++;
 
             // Return
             return false;
@@ -216,49 +195,46 @@ class editor_Models_Terminology_Import_TbxBinaryDataImport
 
         // If coming image-record is found among known ones
         if ($known) {
-
             // If values of contentMd5hash-prop are as well equal for known and coming image
             // the only thing we need to do here is to check whether image file does really
             // exist on disk and if no - recreate it
             if ($known['contentMd5hash'] === $coming['contentMd5hash']) {
-
                 // Get the absolute path to image
                 $abs = $this->imagesModel->getImagePath($this->collection->getId(), $known['uniqueName']);
 
                 // If image does not really exists on disk
-                if (!file_exists($abs)) {
-
+                if (! file_exists($abs)) {
                     // Recreate on disk
                     $this->imagesModel->saveImageToDisk($this->collection->getId(), $known['uniqueName'], $coming['data']);
 
                     // Count that
-                    $this->imageQty['recreated'] ++;
+                    $this->imageQty['recreated']++;
 
-                // Else increment unchanged-counter
+                    // Else increment unchanged-counter
                 } else {
-                    $this->imageQty['unchanged'] ++;
+                    $this->imageQty['unchanged']++;
                 }
 
-            // Else if coming image-record is found among known, but we got new file
+                // Else if coming image-record is found among known, but we got new file
             } else {
-
                 // Replace existing image-file with the new one
                 $this->imagesModel->saveImageToDisk($this->collection->getId(), $coming['uniqueName'], $coming['data']);
 
                 // Update known image record with values from coming image data
                 $this->imagesModel->db->update([
-                    'uniqueName'     => $coming['uniqueName'],
-                    'format'         => $coming['format'],
+                    'uniqueName' => $coming['uniqueName'],
+                    'format' => $coming['format'],
                     'contentMd5hash' => $coming['contentMd5hash'],
-                ], ['id = ?' => $known['id']]);
+                ], [
+                    'id = ?' => $known['id'],
+                ]);
 
                 // Count that
-                $this->imageQty['updated'] ++;
+                $this->imageQty['updated']++;
             }
 
-        // Else if coming image was NOT found among known ones
+            // Else if coming image was NOT found among known ones
         } else {
-
             // Save coming image file on disk
             $this->imagesModel->saveImageToDisk($this->collection->getId(), $coming['uniqueName'], $coming['data']);
 
@@ -272,7 +248,7 @@ class editor_Models_Terminology_Import_TbxBinaryDataImport
             $this->knownImageA[$coming['targetId']] = $coming;
 
             // Increment qty of images newly created on disk
-            $this->imageQty['created'] ++;
+            $this->imageQty['created']++;
         }
 
         //
@@ -281,12 +257,9 @@ class editor_Models_Terminology_Import_TbxBinaryDataImport
 
     /**
      * Makes an array with props for terms_image-record out of the XML node or value of target-attr
-     *
-     * @param SimpleXMLElement|string $from
-     * @return array
      */
-    protected function makeImageData(SimpleXMLElement|string $from) : array {
-
+    protected function makeImageData(SimpleXMLElement|string $from): array
+    {
         // Get target
         $targetId = $from instanceof SimpleXMLElement
             ? (string) $from->attributes()->id
@@ -306,45 +279,42 @@ class editor_Models_Terminology_Import_TbxBinaryDataImport
         // If $from arg is string - assume it's a string value of target-attr
         // of <xref type="xGraphic" target="some/file.jpg"></xref>
         if (is_string($from)) {
-
             // Set props
             $image['name'] = pathinfo($from, PATHINFO_BASENAME);
             $path = $this->extractedZipDir . '/' . $from;
             $image['data'] = file_exists($path) ? file_get_contents($path) : false;
             $image['format'] = $image['data'] ? mime_content_type($path) : '';
 
-        /**
-         * Else if $from is a SimpleXMLElement and has itemSet-node, assume it looks like specified here
-         * https://www.ttt.org/oscarStandards/tbx/tbx_oscar.pdf, point 11.3 (page 26), e.g:
-         *
-         * <itemSet>
-         *   <itemGrp>
-         *     <item>image.jpg</item>
-         *     <xref target="some/path/inside/zip/image.jpg"/>
-         *   </itemGrp>
-         * </itemSet>
-         */
-        } else if ($from->itemSet) {
-
+            /**
+             * Else if $from is a SimpleXMLElement and has itemSet-node, assume it looks like specified here
+             * https://www.ttt.org/oscarStandards/tbx/tbx_oscar.pdf, point 11.3 (page 26), e.g:
+             *
+             * <itemSet>
+             *   <itemGrp>
+             *     <item>image.jpg</item>
+             *     <xref target="some/path/inside/zip/image.jpg"/>
+             *   </itemGrp>
+             * </itemSet>
+             */
+        } elseif ($from->itemSet) {
             // Set props
             $image['name'] = (string) $from->itemSet->itemGrp->item;
             $path = $this->extractedZipDir . '/' . $from->itemSet->itemGrp->xref->attributes()->target;
             $image['data'] = file_exists($path) ? file_get_contents($path) : false;
             $image['format'] = $image['data'] ? mime_content_type($path) : '';
 
-        /**
-         * Else assume it looks like specified here:
-         *
-         * <item type="codePage">base64</item>
-         * <item type="format">jpg</item>
-         * <item type="data">base64-encoded data</item>
-         */
+            /**
+             * Else assume it looks like specified here:
+             *
+             * <item type="codePage">base64</item>
+             * <item type="format">jpg</item>
+             * <item type="data">base64-encoded data</item>
+             */
         } else {
-
             // The image data is stored in multiple item tags with different types, read them out:
             $items = [];
             foreach ($from->item as $item) {
-                $items[ (string) $item->attributes()->type ] = (string) $item;
+                $items[(string) $item->attributes()->type] = (string) $item;
             }
 
             // Setup name and encoding
@@ -364,7 +334,6 @@ class editor_Models_Terminology_Import_TbxBinaryDataImport
 
             // If hex
             if ($image['encoding'] === 'hex') {
-
                 // Convert the hex string to binary
                 $image['data'] = hex2bin($hexOrXbaseWithoutSpace);
 
@@ -373,9 +342,8 @@ class editor_Models_Terminology_Import_TbxBinaryDataImport
                     $image['data'] = base64_decode($image['data']);
                 }
 
-            // Else
+                // Else
             } else {
-
                 // Convert the base64 string to binary
                 $image['data'] = base64_decode($hexOrXbaseWithoutSpace);
             }

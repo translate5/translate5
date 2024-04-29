@@ -21,7 +21,7 @@ START LICENSE AND COPYRIGHT
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
@@ -35,16 +35,13 @@ use ZfExtended_Utils;
 
 /**
  * Check and clean the resource/pivot associations on a task when customer is removed from the language resource.
- *
  */
 class Customer extends Base
 {
-    /**
-     * @param int $languageResourceId
-     * @param array $customersLeft: The customers that shall remain as assocs
-     */
-    public function __construct(protected int $languageResourceId, protected array $customersLeft)
-    {
+    public function __construct(
+        protected int $languageResourceId,
+        protected array $customersLeft
+    ) {
     }
 
     /***
@@ -55,12 +52,11 @@ class Customer extends Base
      */
     protected function getConflictByEntity(string $entityClass): array
     {
-
         $assoc = ZfExtended_Factory::get(editor_Models_LanguageResources_CustomerAssoc::class);
         $customerAssocs = $assoc->loadCustomerIds($this->languageResourceId);
 
         $hasChange = ZfExtended_Utils::isArrayEqual($customerAssocs, $this->customersLeft) === false;
-        if (!$hasChange) {
+        if (! $hasChange) {
             return [];
         }
 
@@ -69,9 +65,9 @@ class Customer extends Base
             return [];
         }
         $taskAssoc = ZfExtended_Factory::get($entityClass);
+
         return $taskAssoc->getAssociatedByCustomer($toRemove, $this->languageResourceId);
     }
-
 
     /***
      * @param array $taskNames
@@ -87,10 +83,10 @@ class Customer extends Base
         throw ZfExtended_UnprocessableEntity::createResponse('E1447', [
             'errorMessages' => [
                 'Die entfernten Kunden werden in den folgenden Aufgaben verwendet:',
-                'Wenn Sie diese Kunden entfernen, wird die Zuordnung dieser Sprachressource zu den Aufgaben dieser Kunden aufgehoben. Möchten Sie die Zuweisungen aufheben? Nur dann können Sie die Kunden aus dieser Sprachressource hier in der Sprachressourcenverwaltung entfernen.'
-            ]
+                'Wenn Sie diese Kunden entfernen, wird die Zuordnung dieser Sprachressource zu den Aufgaben dieser Kunden aufgehoben. Möchten Sie die Zuweisungen aufheben? Nur dann können Sie die Kunden aus dieser Sprachressource hier in der Sprachressourcenverwaltung entfernen.',
+            ],
         ], extraData: [
-            'taskList' => $taskNames
+            'taskList' => $taskNames,
         ]);
     }
 }

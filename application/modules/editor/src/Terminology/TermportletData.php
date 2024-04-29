@@ -21,7 +21,7 @@ START LICENSE AND COPYRIGHT
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
@@ -50,18 +50,26 @@ use ZfExtended_Factory;
 class TermportletData
 {
     private array $result;
+
     private array $allUsedLanguageIds;
+
     private array $sourceLangs;
+
     private array $targetLangs;
+
     private array $collections;
+
     private TermModel $termModel;
+
     private array $allUsedLanguages;
 
     /**
      * @throws Zend_Cache_Exception
      */
-    public function __construct(private Task $task, private bool $termPortal)
-    {
+    public function __construct(
+        private Task $task,
+        private bool $termPortal
+    ) {
         $this->initializeLanguages();
 
         $assoc = ZfExtended_Factory::get(TermCollection::class);
@@ -71,9 +79,6 @@ class TermportletData
     }
 
     /**
-     * @param Segment $segment
-     * @param string $locale
-     * @return array
      * @throws Zend_Exception
      */
     public function generate(Segment $segment, string $locale): array
@@ -97,7 +102,7 @@ class TermportletData
             }
         }
 
-        if (!empty($termEntryIds)) {
+        if (! empty($termEntryIds)) {
             $this->result['attributeGroups'] = $this->getAttributesGroups(array_filter($termEntryIds), $locale);
         }
 
@@ -110,14 +115,12 @@ class TermportletData
      * Returns term-informations for $segmentId in $taskGuid.
      * Includes assoziated terms corresponding to the tagged terms
      *
-     * @param Segment $segment
-     * @return array
      * @throws Zend_Db_Statement_Exception
      * @throws editor_Models_ConfigException
      */
     private function getByTaskGuidAndSegment(Segment $segment): array
     {
-        if (empty($this->collections) || !$this->task->getTerminologie()) {
+        if (empty($this->collections) || ! $this->task->getTerminologie()) {
             return [];
         }
 
@@ -134,12 +137,10 @@ class TermportletData
     /**
      * Append homonym data to termportlet data
      *
-     * @param array $termportletData
-     * @return array
      * @throws Zend_Db_Statement_Exception
      */
-    public function appendHomonyms(array $termportletData): array {
-
+    public function appendHomonyms(array $termportletData): array
+    {
         // Get values of processStatus, that homonyms should have in order to be shown
         $processStatusA = $this->task->getConfig()->runtimeOptions->terminology->usedTermProcessStatus->toArray();
 
@@ -148,13 +149,10 @@ class TermportletData
 
         // Foreach [termEntryTbxId => terms array] pair
         foreach ($termportletData as $termA) {
-
             // Foreach stdClass-object representing the term inside terms array
             foreach ($termA as $termO) {
-
                 // If it's used in segment
                 if ($termO->used) {
-
                     // Prepare type
                     $type = $termO->isSource ? 'source' : 'target';
 
@@ -175,12 +173,11 @@ class TermportletData
 
         // Foreach ['source/target' => [[termEntryId => term], ...]] pairs
         foreach ($used as $type => $termByTermEntryIdA) {
-
             // Prepare parts of WHERE clause to find termEntries where homonyms are located, if any
             $where = [
                 'sameTerm' => $db->quoteInto('`term` IN (?)', array_unique($termByTermEntryIdA)),
                 'sameLanguageId' => $db->quoteInto('`languageId` IN (?)', $this->{$type . 'Langs'}),
-                'otherTermEntryId' => $db->quoteInto('`termEntryId` NOT IN (?)', array_keys($termByTermEntryIdA))
+                'otherTermEntryId' => $db->quoteInto('`termEntryId` NOT IN (?)', array_keys($termByTermEntryIdA)),
             ];
 
             // As long as we might already have some of homonyms within the current termportlet data we have to
@@ -198,7 +195,6 @@ class TermportletData
 
             // If we have something
             if ($homonymTermEntryIdA) {
-
                 // Prepare parts of WHERE clause to find homonyms themselves
                 $where = [
                     'homonymTermEntryId' => $db->quoteInto('`termEntryId` IN (?)', array_unique($homonymTermEntryIdA)),
@@ -221,7 +217,6 @@ class TermportletData
                 // Apply auxiliary props required by termportlet renderer
                 foreach ($homonymA as &$termA) {
                     foreach ($termA as $termO) {
-
                         // Setup isSource-flag
                         $termO->isSource = in_array($termO->languageId, $this->sourceLangs);
 
@@ -250,9 +245,6 @@ class TermportletData
      * First level contains source or target (the fieldname)
      * Second level contains a list of arrays with the found mids and div tags,
      * the div tag is needed for transfound check
-     *
-     * @param Segment $segment
-     * @return array
      */
     private function getTermMidsFromTaskSegment(Segment $segment): array
     {
@@ -279,7 +271,10 @@ class TermportletData
             return [];
         }
 
-        return ['source' => $sourceMatches, 'target' => $targetMatches];
+        return [
+            'source' => $sourceMatches,
+            'target' => $targetMatches,
+        ];
     }
 
     /**
@@ -288,7 +283,6 @@ class TermportletData
      * 2. level: terms of group groupId
      *
      * @param array $termIds as 2-dimensional array('source' => array(), 'target' => array())
-     * @return array
      * @throws Zend_Db_Statement_Exception
      * @throws editor_Models_ConfigException
      */
@@ -307,7 +301,7 @@ class TermportletData
         $statuses = $this->task->getConfig()->runtimeOptions->terminology->usedTermProcessStatus->toArray();
 
         if (empty($statuses)) {
-            $statuses =  [];
+            $statuses = [];
         }
 
         // Prepare comma-separated list, enclosed with single-quotes
@@ -315,14 +309,20 @@ class TermportletData
 
         // Fetch terms
         $sql = $this->termModel->db->getAdapter()->select()
-            ->from(['t1' =>'terms_term'], ['t2.*'])
+            ->from([
+                't1' => 'terms_term',
+            ], ['t2.*'])
             ->distinct()
             ->joinLeft(
-                ['t2' =>'terms_term'],
+                [
+                    't2' => 'terms_term',
+                ],
                 't1.termEntryId = t2.termEntryId AND t1.collectionId = t2.collectionId',
                 null
             )
-            ->join(['l' =>'LEK_languages'], 't2.languageId = l.id', 'rtl')
+            ->join([
+                'l' => 'LEK_languages',
+            ], 't2.languageId = l.id', 'rtl')
             ->where('t1.collectionId IN(?)', array_column($this->collections, 'id'))
             ->where('t1.termTbxId IN(?)', $allIds)
             ->where('t1.languageId IN (?)', $this->allUsedLanguageIds)
@@ -334,7 +334,7 @@ class TermportletData
                 ) DESC
             "]);
 
-        if (!empty($statuses)) {
+        if (! empty($statuses)) {
             $sql->where('t1.processStatus in (?)', $statuses);
             $sql->where('t2.processStatus in (?)', $statuses);
         }
@@ -348,7 +348,7 @@ class TermportletData
         foreach ($terms as $term) {
             $term = (object) $term;
 
-            if (!isset($termGroups[$term->termEntryTbxId])) {
+            if (! isset($termGroups[$term->termEntryTbxId])) {
                 $termGroups[$term->termEntryTbxId] = [];
             }
 
@@ -359,7 +359,7 @@ class TermportletData
                 $term->transFound = preg_match('/class="[^"]*transFound[^"]*"/', $transFoundSearch[$term->termTbxId]);
             }
 
-            $term->rtl = (bool)$term->rtl;
+            $term->rtl = (bool) $term->rtl;
 
             $term->collectionColor = $collectionColors[$term->collectionId]
                 ?? editor_Services_ServiceAbstract::DEFAULT_COLOR;
@@ -372,15 +372,14 @@ class TermportletData
 
     /**
      * Get all attributes for given term entries grouped by attribute type (language, entry and term)
-     * @param array $termEntries
-     * @param string $locale
-     * @return array
      * @throws Zend_Db_Statement_Exception
      */
     private function getAttributesGroups(array $termEntries, string $locale): array
     {
         $sql = $this->termModel->db->getAdapter()->select()
-            ->from(['t1' =>'terms_attributes'], ['t1.*'])
+            ->from([
+                't1' => 'terms_attributes',
+            ], ['t1.*'])
             ->where('t1.termEntryId IN (?)', $termEntries)
             ->where('(t1.language IN (?) OR ISNULL(t1.language))', array_keys($this->allUsedLanguages));
 

@@ -21,7 +21,7 @@
   @copyright  Marc Mittag, MittagQI - Quality Informatics
   @author     MittagQI - Quality Informatics
   @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
- 			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
  END LICENSE AND COPYRIGHT
  */
@@ -34,12 +34,14 @@ use MittagQI\Translate5\Test\Import\Config;
  * The valid test results are counted by hand.
  * For more info about the segment results check the Analysis test result Info.ods document in the test folder
  */
-class MatchAnalysisTest extends editor_Test_ImportTest {
-    
+class MatchAnalysisTest extends editor_Test_ImportTest
+{
+    use \MittagQI\Translate5\Test\Api\AnalysisTrait;
+
     protected static array $requiredPlugins = [
         'editor_Plugins_Okapi_Init',
         'editor_Plugins_MatchAnalysis_Init',
-        'editor_Plugins_InstantTranslate_Init'
+        'editor_Plugins_InstantTranslate_Init',
     ];
 
     /***
@@ -55,11 +57,11 @@ class MatchAnalysisTest extends editor_Test_ImportTest {
         $customerId = static::getTestCustomerId();
 
         // collect the original config value so it will be set again after the test is finished
-        self::$changedConfigs[] = static::api()->getConfig('runtimeOptions.frontend.importTask.edit100PercentMatch');
+        self::$changedConfigs[] = static::api()->getConfig('runtimeOptions.import.edit100PercentMatch');
 
-        static::api()->putJson('editor/config/',[
+        static::api()->putJson('editor/config/', [
             'value' => 0,
-            'name' => 'runtimeOptions.frontend.importTask.edit100PercentMatch'
+            'name' => 'runtimeOptions.import.edit100PercentMatch',
         ]);
 
         $config
@@ -72,10 +74,10 @@ class MatchAnalysisTest extends editor_Test_ImportTest {
             ->addPretranslation();
 
         $config
-            ->addTask($sourceLangRfc, $targetLangRfc, $customerId,'Test-task-en-de_v2.html')
+            ->addTask($sourceLangRfc, $targetLangRfc, $customerId, 'Test-task-en-de_v2.html')
             ->setProperty('wordCount', 114)
             ->setProperty('taskName', 'API Testing::MatchAnalysisTest')
-            ->setProperty('edit100PercentMatch',true);
+            ->setProperty('edit100PercentMatch', true);
     }
 
     /***
@@ -94,19 +96,11 @@ class MatchAnalysisTest extends editor_Test_ImportTest {
         $this->exportXmlResults(true);
     }
 
-    /**
-     *
-     * @return void
-     */
     public function testWordBasedResults(): void
     {
         $this->validateResults(false);
     }
 
-    /**
-     *
-     * @return void
-     */
     public function testCharacterBasedResults(): void
     {
         $this->validateResults(true);
@@ -117,29 +111,29 @@ class MatchAnalysisTest extends editor_Test_ImportTest {
      */
     private function exportXmlResults(bool $characterBased): void
     {
-
         $unitType = $characterBased ? 'character' : 'word';
 
         $taskGuid = static::api()->getTask()->taskGuid;
         $response = static::api()->get('editor/plugins_matchanalysis_matchanalysis/export', [
             'taskGuid' => $taskGuid,
-            'type' => 'exportXml'
+            'type' => 'exportXml',
         ]);
 
         self::assertTrue($response->getStatus() === 200, 'export XML HTTP Status is not 200');
         $actual = static::api()->formatXml($response->getBody());
 
         //sanitize task information
-        $actual = str_replace('number="'.$taskGuid.'"/>', 'number="UNTESTABLECONTENT"/>', $actual);
+        $actual = str_replace('number="' . $taskGuid . '"/>', 'number="UNTESTABLECONTENT"/>', $actual);
 
         //sanitize analysis information
         $actual = preg_replace(
             '/<taskInfo taskId="([^"]*)" runAt="([^"]*)" runTime="([^"]*)">/',
             '<taskInfo taskId="UNTESTABLECONTENT" runAt="UNTESTABLECONTENT" runTime="UNTESTABLECONTENT">',
-            $actual);
+            $actual
+        );
 
-        static::api()->isCapturing() && file_put_contents(static::api()->getFile('exportResults-'.$unitType.'.xml', null, false), $actual);
-        $expected = static::api()->getFileContent('exportResults-'.$unitType.'.xml');
+        static::api()->isCapturing() && file_put_contents(static::api()->getFile('exportResults-' . $unitType . '.xml', null, false), $actual);
+        $expected = static::api()->getFileContent('exportResults-' . $unitType . '.xml');
 
         //check for differences between the expected and the actual content
         self::assertEquals($expected, $actual, "The expected file(exportResults) an the result file does not match.");
@@ -157,63 +151,35 @@ class MatchAnalysisTest extends editor_Test_ImportTest {
     {
         $unitType = $characterBased ? 'character' : 'word';
 
-        $jsonFileName = 'analysis-'.$unitType.'.json';
+        $jsonFileName = 'analysis-' . $unitType . '.json';
         // fetch task data
-        $analysis = static::api()->getJson('editor/plugins_matchanalysis_matchanalysis', [ 'taskGuid'=> static::api()->getTask()->taskGuid, 'unitType' => $unitType ], $jsonFileName);
-        $this->assertNotEmpty($analysis,'No results found for the '.$unitType.'-based task-specific matchanalysis.');
+        $analysis = static::api()->getJson('editor/plugins_matchanalysis_matchanalysis', [
+            'taskGuid' => static::api()->getTask()->taskGuid,
+            'unitType' => $unitType,
+        ], $jsonFileName);
+        $this->assertNotEmpty($analysis, 'No results found for the ' . $unitType . '-based task-specific matchanalysis.');
         //check for differences between the expected and the actual content
         $expectedAnalysis = static::api()->getFileContent($jsonFileName);
-        $this->assertEquals($this->filterTaskAnalysis($expectedAnalysis), $this->filterTaskAnalysis($analysis), 'The expected file and the data does not match for the '.$unitType.'-based task-specific matchanalysis.');
+        $this->assertEquals($this->filterTaskAnalysis($expectedAnalysis), $this->filterTaskAnalysis($analysis), 'The expected file and the data does not match for the ' . $unitType . '-based task-specific matchanalysis.');
 
         //now test all results and matches
-        $jsonFileName = 'allanalysis-'.$unitType.'.json';
-        $analysis = static::api()->getJson('editor/plugins_matchanalysis_matchanalysis', [ 'taskGuid' => static::api()->getTask()->taskGuid, 'notGrouped' => static::api()->getTask()->taskGuid ], $jsonFileName);
-        $this->assertNotEmpty($analysis,'No results found for the '.$unitType.'-based not-grouped matchanalysis.');
+        $jsonFileName = 'allanalysis-' . $unitType . '.json';
+        $analysis = static::api()->getJson('editor/plugins_matchanalysis_matchanalysis', [
+            'taskGuid' => static::api()->getTask()->taskGuid,
+            'notGrouped' => static::api()->getTask()->taskGuid,
+        ], $jsonFileName);
+        $this->assertNotEmpty($analysis, 'No results found for the ' . $unitType . '-based not-grouped matchanalysis.');
         //check for differences between the expected and the actual content
         $expectedAnalysis = static::api()->getFileContent($jsonFileName);
         //check for differences between the expected and the actual content
         $this->assertEquals($this->filterUngroupedAnalysis($expectedAnalysis), $this->filterUngroupedAnalysis($analysis), "The expected file and the data does not match for the '.$unitType.'-based not-grouped matchanalysis..");
     }
-
-    /**
-     * @param array $data
-     * @return array
-     */
-    private function filterTaskAnalysis(array &$data) : array {
-        // remove the created timestamp since is not relevant for the test
-        foreach ($data as $a){
-            unset($a->created,$a->id,$a->taskGuid,$a->segmentId,$a->errorCount);
-        }
-        usort($data, function($a, $b){ return strcmp($a->resourceName, $b->resourceName); });
-        return $data;
-    }
-
-    /**
-     * @param array $data
-     * @return array
-     */
-    private function filterUngroupedAnalysis(array &$data): array
-    {
-        // remove some unneeded columns
-        foreach ($data as $a){
-            unset(
-                $a->id,
-                $a->taskGuid,
-                $a->analysisId,
-                $a->segmentId,
-                $a->languageResourceid,
-                $a->errorCount
-            );
-        }
-        return $data;
-    }
-
     public static function afterTests(): void
     {
-        foreach (self::$changedConfigs as $c){
-            static::api()->putJson('editor/config/',[
+        foreach (self::$changedConfigs as $c) {
+            static::api()->putJson('editor/config/', [
                 'value' => $c->value,
-                'name' => $c->name
+                'name' => $c->name,
             ]);
         }
     }

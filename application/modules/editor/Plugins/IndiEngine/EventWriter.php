@@ -21,7 +21,7 @@ START LICENSE AND COPYRIGHT
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
@@ -50,8 +50,6 @@ class EventWriter extends ZfExtended_Logger_Writer_Database
      *  ->lastPostedEventId
      *  ->postingMode
      *  ->verifyPeer
-     *
-     * @var Zend_Config
      */
     public Zend_Config $config;
 
@@ -60,15 +58,11 @@ class EventWriter extends ZfExtended_Logger_Writer_Database
      */
     public bool|int|string $newLastId = false;
 
-    /**
-     * @var string
-     */
     public string $httpHost = '';
 
     /**
      * editor_Plugins_IndiEngine_EventWriter constructor.
      *
-     * @param array $options
      * @throws ReflectionException
      * @throws Zend_Exception
      */
@@ -84,12 +78,11 @@ class EventWriter extends ZfExtended_Logger_Writer_Database
     /**
      * Get events to be sent to Indi Engine logger instance as json => deflate => base64
      *
-     * @return string
      * @throws ReflectionException
      * @throws Zend_Db_Statement_Exception
      * @throws Zend_Exception
      */
-    public function getBase64() :string
+    public function getBase64(): string
     {
         // Get log model
         $log = ZfExtended_Factory::get(ZfExtended_Models_Log::class);
@@ -105,7 +98,6 @@ class EventWriter extends ZfExtended_Logger_Writer_Database
 
         // If json encoding failed
         if ($json_encoded === false) {
-
             // Setup local logger instance
             $localLogger = Zend_Registry::get('logger')->cloneMe('plugin.IndiEngine');
 
@@ -113,7 +105,7 @@ class EventWriter extends ZfExtended_Logger_Writer_Database
             $localLogger->warn('E1594', 'JSON error with code {json_error_code} occurred on attempt to json_encode events: {json_error_msg}', [
                 'json_error_code' => json_last_error(),
                 'json_error_msg' => json_last_error_msg(),
-                'range' => "Some of further " . count($eventA) . " events after ID {$this->config->lastPostedEventId}"
+                'range' => "Some of further " . count($eventA) . " events after ID {$this->config->lastPostedEventId}",
             ]);
 
             // Spoof events to be POSTed
@@ -121,10 +113,10 @@ class EventWriter extends ZfExtended_Logger_Writer_Database
         }
 
         // Deflate
-        $deflate = gzdeflate(json_encode($eventA), 9);
+        $deflate = gzdeflate(json_encode($eventA, JSON_INVALID_UTF8_SUBSTITUTE), 9);
 
         // Setup newLastId if there was no json error
-        if ($json_encoded !== false){
+        if ($json_encoded !== false) {
             $this->newLastId = $eventA ? array_pop($eventA)['id'] : false;
         }
 
@@ -136,19 +128,16 @@ class EventWriter extends ZfExtended_Logger_Writer_Database
      * Try to make request to external Indi Engine logger instance.
      * If any problem occurred - log that via Translate5's built-in logger
      *
-     * @param array $requestData
-     * @return bool
      * @throws ReflectionException
      * @throws Zend_Exception
      */
-    protected function request(array $requestData) : bool
+    protected function request(array $requestData): bool
     {
         // Setup local logger instance
         $localLogger = Zend_Registry::get('logger')->cloneMe('plugin.IndiEngine');
 
         // If no url defined for Indi Engine logger instance
-        if (!$this->config->url) {
-
+        if (! $this->config->url) {
             // Log that
             $localLogger->warn('E1550', 'Logger URL endpoint for posting events is not configured');
 
@@ -164,7 +153,7 @@ class EventWriter extends ZfExtended_Logger_Writer_Database
             CURLOPT_URL => $this->config->url,
             CURLOPT_RETURNTRANSFER => 1,
             CURLOPT_SSL_VERIFYPEER => $this->config->verifyPeer,
-            CURLOPT_POSTFIELDS => $requestData
+            CURLOPT_POSTFIELDS => $requestData,
         ]);
 
         // Make request
@@ -172,10 +161,9 @@ class EventWriter extends ZfExtended_Logger_Writer_Database
 
         // If response is boolean false
         if ($response === false) {
-
             // Log that
             $localLogger->warn('E1551', 'Curl-error occurred on attempt to POST events: {curl_error}', [
-                'curl_error' => curl_error($curl)
+                'curl_error' => curl_error($curl),
             ]);
 
             // Return false
@@ -184,11 +172,10 @@ class EventWriter extends ZfExtended_Logger_Writer_Database
 
         // If response's status code is not 200
         if (($code = curl_getinfo($curl, CURLINFO_HTTP_CODE)) != 200) {
-
             // Log that
             $localLogger->warn('E1552', 'Logger responded with failure code {code}', [
                 'code' => $code,
-                'text' => $response
+                'text' => $response,
             ]);
 
             // Return false
@@ -217,21 +204,19 @@ class EventWriter extends ZfExtended_Logger_Writer_Database
      */
     public function batchWrite()
     {
-
         // Get base64-encoded data. Also $this->httpHost is set during this call
         $base64 = $this->getBase64();
 
         // Make request
         $this->request([
             'host' => $this->httpHost,
-            'base64' => $base64
+            'base64' => $base64,
         ]);
     }
 
     /**
      * Try to send one 'new' event to external Indi Engine logger instance
      *
-     * @param ZfExtended_Logger_Event $event
      * @throws ReflectionException
      * @throws Zend_Exception
      */

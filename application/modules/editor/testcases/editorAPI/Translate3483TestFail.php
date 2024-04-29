@@ -3,7 +3,7 @@
 START LICENSE AND COPYRIGHT
 
  This file is part of translate5
- 
+
  Copyright (c) 2013 - 2024 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
 
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
@@ -13,11 +13,11 @@ START LICENSE AND COPYRIGHT
  included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
-  
+
  There is a plugin exception available for use with this release of translate5 for
  translate5: Please see http://www.translate5.net/plugin-exception.txt or
  plugin-exception.txt in the root folder of translate5.
-  
+
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
@@ -32,28 +32,26 @@ use PHPUnit\Framework\AssertionFailedError as AssertionFailedErrorAlias;
  * Creates combobox and checkbox fields and try to create task once with non-existing value for those fields and once
  * with the correct one. In the first case it is expected the creation of task to fail.
  */
-class Translate3483TestFail extends editor_Test_JsonTest {
-
+class Translate3483TestFail extends editor_Test_JsonTest
+{
     protected static array $forbiddenPlugins = [
     ];
 
     protected static array $requiredPlugins = [
-        'editor_Plugins_Okapi_Init'
+        'editor_Plugins_Okapi_Init',
     ];
 
     protected static bool $setupOwnCustomer = false;
-    
+
     protected static string $setupUserLogin = 'testmanager';
 
     /**
-     * @return void
      * @throws Zend_Http_Client_Exception
      * @throws ZfExtended_Exception
      * @throws \MittagQI\Translate5\Test\Import\Exception
      */
     public function testComboBoxField()
     {
-
         self::createAndTestField([
             'label' => '{"en":"Numbers","de":"Zahlen"}',
             'type' => 'combobox',
@@ -61,8 +59,8 @@ class Translate3483TestFail extends editor_Test_JsonTest {
             'mode' => 'optional',
             'placesToShow' => 'projectWizard,taskGrid',
             'position' => 1,
-            'roles' => 'editor'
-        ],'option1');
+            'roles' => 'editor',
+        ], 'option1');
     }
 
     /**
@@ -78,8 +76,8 @@ class Translate3483TestFail extends editor_Test_JsonTest {
             'mode' => 'optional',
             'placesToShow' => 'projectWizard,taskGrid',
             'position' => 1,
-            'roles' => 'editor'
-        ],'1');
+            'roles' => 'editor',
+        ], '1');
     }
 
     /**
@@ -98,9 +96,10 @@ class Translate3483TestFail extends editor_Test_JsonTest {
                 'NotExistingValue'
             );
         } catch (AssertionFailedErrorAlias $e) {
-            if(str_contains($e->getMessage(), 'NotExistingValue') === false){
-                self::api()->delete('editor/taskcustomfield/'.$field->id);
+            if (str_contains($e->getMessage(), 'NotExistingValue') === false) {
+                self::api()->delete('editor/taskcustomfield/' . $field->id);
                 self::assertNotEmpty(self::api()->getLastResponseDecodeed(), 'Custom field was not deleted');
+
                 throw $e;
             }
             self::createTaskWithPropertyForTest(
@@ -109,7 +108,7 @@ class Translate3483TestFail extends editor_Test_JsonTest {
             );
         }
 
-        self::api()->delete('editor/taskcustomfield/'.$field->id);
+        self::api()->delete('editor/taskcustomfield/' . $field->id);
         self::assertNotEmpty(self::api()->getLastResponseDecodeed(), 'Custom field was not deleted');
     }
 
@@ -138,7 +137,8 @@ class Translate3483TestFail extends editor_Test_JsonTest {
     {
         self::api()->postJson('editor/taskcustomfield', $data);
         $result = self::api()->getLastResponseDecodeed();
-        self::assertNotEmpty($result, 'Custom field was not created:'.print_r($data, true));
+        self::assertNotEmpty($result, 'Custom field was not created:' . print_r($data, true));
+
         return $result;
     }
 }

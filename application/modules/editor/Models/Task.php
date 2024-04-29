@@ -3,25 +3,25 @@
 START LICENSE AND COPYRIGHT
 
  This file is part of translate5
- 
+
  Copyright (c) 2013 - 2021 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
 
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
  This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
- as published by the Free Software Foundation and appearing in the file agpl3-license.txt 
- included in the packaging of this file.  Please review the following information 
+ as published by the Free Software Foundation and appearing in the file agpl3-license.txt
+ included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
-  
+
  There is a plugin exception available for use with this release of translate5 for
- translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or
  plugin-exception.txt in the root folder of translate5.
-  
+
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
@@ -32,118 +32,136 @@ use MittagQI\ZfExtended\Session\SessionInternalUniqueId;
 
 /**
  * Task Object Instance as needed in the application
- * @method integer getId() getId()
- * @method void setId() setId(int $id)
- * @method string getTaskGuid() getTaskGuid()
- * @method void setTaskGuid() setTaskGuid(string $guid)
- * @method string getTaskNr() getTaskNr()
- * @method void setTaskNr() setTaskNr(string $nr)
- * @method string getForeignId() getForeignId()
- * @method void setForeignId() setForeignId(string $id)
- * @method string getTaskName() getTaskName()
- * @method void setTaskName() setTaskName(string $name)
- * @method string getForeignName() getForeignName()
- * @method void setForeignName() setForeignName(string $name)
- * @method string getForeignName() getDescription()
- * @method void setForeignName() setDescription(string $description)
- * @method integer getSourceLang() getSourceLang()
- * @method void setSourceLang() setSourceLang(int $id)
- * @method integer getTargetLang() getTargetLang()
- * @method void setTargetLang() setTargetLang(int $id)
- * @method integer getRelaisLang() getRelaisLang()
- * @method void setRelaisLang() setRelaisLang(int $id)
- * @method string getLockedInternalSessionUniqId() getLockedInternalSessionUniqId()
- * @method void setLockedInternalSessionUniqId() setLockedInternalSessionUniqId(string $id)
- * @method string getLocked() getLocked()
- * @method string getLockingUser() getLockingUser()
- * @method void setLockingUser() setLockingUser(string $guid)
- * @method string getPmGuid() getPmGuid()
- * @method void setPmGuid() setPmGuid(string $guid)
- * @method string getPmName() getPmName()
- * @method void setPmName() setPmName(string $guid)
- * @method string getState() getState()
- * @method void setState() setState(string $state)
- * @method string getWorkflow() getWorkflow()
- * @method void setWorkflow() setWorkflow(string $workflow)
- * @method integer getWorkflowStep() getWorkflowStep()
- * @method void setWorkflowStep() setWorkflowStep(int $stepNr)
- * @method string getWorkflowStepName() getWorkflowStepName()
- * @method integer getWordCount() getWordCount()
- * @method void setWordCount() setWordCount(int $wordcount)
- * @method string getOrderdate() getOrderdate()
- * @method void setOrderdate() setOrderdate(string $datetime)
- * @method string getEnddate() getEnddate()
- * @method void setEnddate() setEnddate(string $datetime)
- * @method boolean getReferenceFiles() getReferenceFiles()
- * @method void setReferenceFiles() setReferenceFiles(bool $flag)
- * @method boolean getEnableSourceEditing() getEnableSourceEditing()
- * @method void setEnableSourceEditing() setEnableSourceEditing(bool $flag)
- * @method boolean getEdit100PercentMatch() getEdit100PercentMatch()
- * @method void setEdit100PercentMatch() setEdit100PercentMatch(bool $flag)
- * @method boolean getLockLocked() getLockLocked()
- * @method void setLockLocked() setLockLocked(bool $flag)
- * @method string getQmSubsegmentFlags() getQmSubsegmentFlags() get Original Flags from DB
- * @method void setQmSubsegmentFlags() setQmSubsegmentFlags(string $flags) set Original Flags in DB
- * @method void delete() delete() see editor_Models_Task_Remover for complete task removal
- * @method boolean getEmptyTargets() getEmptyTargets()
- * @method void setEmptyTargets() setEmptyTargets(bool $emptyTargets)
- * @method string getImportAppVersion() getImportAppVersion()
- * @method void setImportAppVersion() setImportAppVersion(string $version)
- * @method integer getCustomerId() getCustomerId()
- * @method void setCustomerId() setCustomerId(int $customerId)
- * @method string getUsageMode() getUsageMode()
- * @method void setUsageMode() setUsageMode(string $usageMode)
- * @method int getSegmentCount() getSegmentCount()
- * @method void setSegmentCount() setSegmentCount(int $segmentCount)
- * @method integer getSegmentFinishCount() getSegmentFinishCount()
- * @method void setSegmentFinishCount() setSegmentFinishCount(int $segmentFinishCount)
- * @method void setTaskType() setTaskType(string $taskType)
- * @method string getProjectId() getProjectId()
- * @method void setProjectId() setProjectId(int $projectId)
- * @method boolean getDiffExportUsable() getDiffExportUsable()
- * @method void setDiffExportUsable() setDiffExportUsable(bool $flag)
- * @method boolean getReimportable() getReimportable()
- * @method void setReimportable() setReimportable(bool $reimportable)
- * @method string getCreated() getCreated()
+ * @method string getId()
+ * @method void setId(int $id)
+ * @method string getTaskGuid()
+ * @method void setTaskGuid(string $guid)
+ * @method string getTaskNr()
+ * @method void setTaskNr(string $nr)
+ * @method string getForeignId()
+ * @method void setForeignId(string $id)
+ * @method string getTaskName()
+ * @method void setTaskName(string $name)
+ * @method string getForeignName()
+ * @method void setForeignName(string $name)
+ * @method string getDescription()
+ * @method void setDescription(string $description)
+ * @method string getSourceLang()
+ * @method void setSourceLang(int $id)
+ * @method string getTargetLang()
+ * @method void setTargetLang(int $id)
+ * @method string getRelaisLang()
+ * @method void setRelaisLang(int $id)
+ * @method string getLockedInternalSessionUniqId()
+ * @method void setLockedInternalSessionUniqId(string $id)
+ * @method string getLocked()
+ * @method string getLockingUser()
+ * @method void setLockingUser(string $guid)
+ * @method string getPmGuid()
+ * @method void setPmGuid(string $guid)
+ * @method string getPmName()
+ * @method void setPmName(string $guid)
+ * @method string getState()
+ * @method void setState(string $state)
+ * @method string getWorkflow()
+ * @method void setWorkflow(string $workflow)
+ * @method string getWorkflowStep()
+ * @method void setWorkflowStep(int $stepNr)
+ * @method string getWorkflowStepName()
+ * @method string getWordCount()
+ * @method void setWordCount(int $wordcount)
+ * @method string getOrderdate()
+ * @method void setOrderdate(string $datetime)
+ * @method string getEnddate()
+ * @method void setEnddate(string $datetime)
+ * @method string getReferenceFiles()
+ * @method void setReferenceFiles(bool $flag)
+ * @method string getEnableSourceEditing()
+ * @method void setEnableSourceEditing(bool $flag)
+ * @method string getEdit100PercentMatch()
+ * @method void setEdit100PercentMatch(bool $flag)
+ * @method string getLockLocked()
+ * @method void setLockLocked(bool $flag)
+ * @method string getQmSubsegmentFlags() get Original Flags from DB
+ * @method void setQmSubsegmentFlags(string $flags) set Original Flags in DB
+ * @method void delete() see editor_Models_Task_Remover for complete task removal
+ * @method string getEmptyTargets()
+ * @method void setEmptyTargets(bool $emptyTargets)
+ * @method string getImportAppVersion()
+ * @method void setImportAppVersion(string $version)
+ * @method string getCustomerId()
+ * @method void setCustomerId(int $customerId)
+ * @method string getUsageMode()
+ * @method void setUsageMode(string $usageMode)
+ * @method string getSegmentCount()
+ * @method void setSegmentCount(int $segmentCount)
+ * @method string getSegmentFinishCount()
+ * @method void setSegmentFinishCount(int $segmentFinishCount)
+ * @method void setTaskType(string $taskType)
+ * @method string getProjectId()
+ * @method void setProjectId(int $projectId)
+ * @method string getDiffExportUsable()
+ * @method void setDiffExportUsable(bool $flag)
+ * @method string getReimportable()
+ * @method void setReimportable(bool $reimportable)
+ * @method string getCreated()
  */
-class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
-    const STATE_OPEN = 'open';
-    const STATE_END = 'end';
-    const STATE_PREPARATION = 'preparation';
-    const STATE_POST_PROCESSING = 'postprocessing';
-    const STATE_IMPORT = 'import';
-    const STATE_PROJECT = 'project'; //seems to be used as import status for projects!
-    const STATE_ERROR = 'error';
-    const STATE_UNCONFIRMED = 'unconfirmed';
-    const STATE_EXCELEXPORTED = 'ExcelExported';
-    const STATE_REIMPORT = 'reimport';
+class editor_Models_Task extends ZfExtended_Models_Entity_Abstract
+{
+    public const STATE_OPEN = 'open';
 
-    const USAGE_MODE_COMPETITIVE = 'competitive';
-    const USAGE_MODE_COOPERATIVE = 'cooperative';
-    const USAGE_MODE_SIMULTANEOUS = 'simultaneous';
+    public const STATE_END = 'end';
 
-    const ASSOC_TABLE_ALIAS = 'LEK_taskUserAssoc';
-    const TABLE_ALIAS = 'LEK_task';
+    public const STATE_PREPARATION = 'preparation';
 
-    const INTERNAL_LOCK = '*translate5InternalLock*';
+    public const STATE_POST_PROCESSING = 'postprocessing';
+
+    public const STATE_IMPORT = 'import';
+
+    public const STATE_PROJECT = 'project'; //seems to be used as import status for projects!
+
+    public const STATE_ERROR = 'error';
+
+    public const STATE_UNCONFIRMED = 'unconfirmed';
+
+    public const STATE_EXCELEXPORTED = 'ExcelExported';
+
+    public const STATE_PACKAGE_EXPORT = 'PackageExport';
+
+    public const STATE_REIMPORT = 'reimport';
+
+    public const USAGE_MODE_COMPETITIVE = 'competitive';
+
+    public const USAGE_MODE_COOPERATIVE = 'cooperative';
+
+    public const USAGE_MODE_SIMULTANEOUS = 'simultaneous';
+
+    public const ASSOC_TABLE_ALIAS = 'LEK_taskUserAssoc';
+
+    public const TABLE_ALIAS = 'LEK_task';
+
+    public const INTERNAL_LOCK = '*translate5InternalLock*';
+
     /**
      * The directory inside a task's data dir where log's can be stored (e.g. logs from docker-services)
      */
-    const LOG_DIR = 'log';
+    public const LOG_DIR = 'log';
 
     /**
      * Currently only used for getConfig, should be used for all relevant customer stuff in this class
      */
     protected static $customerCache = [];
-    
+
     protected $dbInstanceClass = 'editor_Models_Db_Task';
+
     protected $validatorInstanceClass = 'editor_Models_Validator_Task';
 
     /**
      * Tasks must be filtered by role-driven restrictions
      */
-    protected ?array $clientAccessRestriction = ['field' => 'customerId'];
-
+    protected ?array $clientAccessRestriction = [
+        'field' => 'customerId',
+    ];
 
     /**
      * @var editor_Models_Task_Meta
@@ -154,24 +172,26 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
      * @var string
      */
     protected $taskDataPath;
+
     /**
      * A Cache for the faulty segments the task holds
      * @var int[][]
      */
     protected $faultySegmentsCache = [];
+
     /**
      * A Cache for the evaluation of similar languages
      * @var int[][]
      */
     protected $languageCache = [];
 
-    
     /**
      * On cloning we need a new taskGuid and id
      * {@inheritDoc}
      * @see ZfExtended_Models_Entity_Abstract::__clone()
      */
-    public function __clone() {
+    public function __clone()
+    {
         $data = $this->row->toArray();
         unset($data['id']);
         unset($data['taskGuid']);
@@ -184,9 +204,9 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
 
     /**
      * returns the task type instance (can be casted to string)
-     * @return editor_Task_Type_Abstract
      */
-    public function getTaskType(): editor_Task_Type_Abstract {
+    public function getTaskType(): editor_Task_Type_Abstract
+    {
         return editor_Task_Type::getInstance()->getType($this->get('taskType'));
     }
 
@@ -199,32 +219,33 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
      * @return Zend_Config
      * @throws editor_Models_ConfigException
      */
-    public function getConfig(bool $disableCache = false) {
+    public function getConfig(bool $disableCache = false)
+    {
         $taskConfig = ZfExtended_Factory::get(editor_Models_TaskConfig::class);
-        if($disableCache){
+        if ($disableCache) {
             $taskConfig->cleanConfigCache();
         }
+
         return $taskConfig->getTaskConfig($this->getTaskGuid());
     }
 
     /**
      * access customer instances in a cached way
-     * @param int $id
-     * @return editor_Models_Customer_Customer
      */
-    protected function _getCachedCustomer(int $id): editor_Models_Customer_Customer {
-        if(empty(self::$customerCache[$id])) {
+    protected function _getCachedCustomer(int $id): editor_Models_Customer_Customer
+    {
+        if (empty(self::$customerCache[$id])) {
             $customer = ZfExtended_Factory::get('editor_Models_Customer_Customer');
             /* @var $customer editor_Models_Customer_Customer */
             $customer->load($id);
             self::$customerCache[$id] = $customer;
         }
+
         return self::$customerCache[$id];
     }
 
     /**
      * loads the task to the given guid
-     * @param string $taskGuid
      * @throws ZfExtended_Models_Entity_NotFoundException
      */
     public function loadByTaskGuid(string $taskGuid): void
@@ -235,7 +256,7 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
         } catch (Exception $e) {
             $this->notFound('NotFound after other Error', $e);
         }
-        if (!$row) {
+        if (! $row) {
             $this->notFound(__CLASS__ . '#taskGuid', $taskGuid);
         }
         //load implies loading one Row, so use only the first row
@@ -246,7 +267,8 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
      * (non-PHPdoc)
      * @see ZfExtended_Models_Entity_Abstract::init()
      */
-    public function init(array $data = null, $assumeDatabase = false) {
+    public function init(array $data = null, $assumeDatabase = false)
+    {
         parent::init($data, $assumeDatabase);
         $this->taskDataPath = null;
     }
@@ -255,30 +277,28 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
      * loads all Entities out of DB associated to the user (filtered by the TaskUserAssoc table)
      * if $loadAll is true, load all tasks, user infos joined only where possible,
      *   if false only the associated tasks
-     * @param string $userGuid
      * @param bool $loadAll optional, per default false
      * @return array
      */
-    public function loadListByUserAssoc(string $userGuid, $loadAll = false) {
+    public function loadListByUserAssoc(string $userGuid, $loadAll = false)
+    {
         return parent::loadFilterdCustom($this->getSelectByUserAssocSql($userGuid, '*', $loadAll));
     }
 
     /**
      * loads all tasks associated to a specific user as PM
-     * @param string $pmGuid
      * @return array
      */
-    public function loadListByPmGuid(string $pmGuid) {
+    public function loadListByPmGuid(string $pmGuid)
+    {
         $s = $this->db->select();
         $s->where('pmGuid = ?', $pmGuid);
+
         return parent::loadFilterdCustom($s);
     }
 
     /**
      * loads all tasks of the given tasktype that are associated to a specific user as PM
-     * @param string $pmGuid
-     * @param string $tasktype
-     * @return array
      */
     public function loadListByPmGuidAndTasktype(string $pmGuid, string $tasktype): array
     {
@@ -286,20 +306,21 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
         $s->where('pmGuid = ?', $pmGuid);
         $s->where('tasktype = ?', $tasktype);
         $s->order('orderdate DESC');
+
         return parent::loadFilterdCustom($s);
     }
 
     /**
      * loads all tasks of the given tasktype that shall be removed (because
      * their lifetime is over).
-     * @param string $tasktype
-     * @param int $orderDaysOffset
      * @return array
      */
-    public function loadListForCleanupByTasktype(string $tasktype, int $orderDaysOffset) {
+    public function loadListForCleanupByTasktype(string $tasktype, int $orderDaysOffset)
+    {
         $s = $this->db->select();
         $s->where('tasktype = ?', $tasktype);
         $s->where('`orderDate` < (CURRENT_DATE - INTERVAL ? DAY)', $orderDaysOffset);
+
         return parent::loadFilterdCustom($s);
     }
 
@@ -324,7 +345,7 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
         $ignoreAnonStuff = $this->rolesAllowReadAnonymizedUsers();
 
         $anonSql = '';
-        if(!$ignoreAnonStuff) {
+        if (! $ignoreAnonStuff) {
             //filter out all anonimized tasks
             //task is anonymized if runtimeOptions.customers.anonymizeUsers is set to 1 on task level
             //if anonymizeUsers is not defined on task level, the task customer anonymizeUsers value is used
@@ -339,7 +360,7 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
                         HAVING s IS NOT NULL) ';
         }
 
-        if($loadAll){
+        if ($loadAll) {
             $s = $this->db->select()->setIntegrityCheck(false);
         } else {
             $s = $this->getSelectByUserAssocSql($userGuid, '*', $loadAll);
@@ -347,16 +368,17 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
         //apply the frontend task filters
         $this->applyFilterAndSort($s);
         //the inner query is the current task list with activ filters
-        $userCols = 'Zf_users.`'.join('`, Zf_users.`', $userModel->getPublicColumns()).'`';
-        $sql = ' SELECT '.$userCols.',filter.taskGuid from Zf_users, '.
-            ' ('.$s->assemble().') as filter '.
-             ' INNER JOIN LEK_taskUserAssoc ON LEK_taskUserAssoc.taskGuid=filter.taskGuid '.
-             ' WHERE Zf_users.userGuid = LEK_taskUserAssoc.userGuid '.
-             $anonSql.
-             ' GROUP BY Zf_users.id '.
+        $userCols = 'Zf_users.`' . join('`, Zf_users.`', $userModel->getPublicColumns()) . '`';
+        $sql = ' SELECT ' . $userCols . ',filter.taskGuid from Zf_users, ' .
+            ' (' . $s->assemble() . ') as filter ' .
+             ' INNER JOIN LEK_taskUserAssoc ON LEK_taskUserAssoc.taskGuid=filter.taskGuid ' .
+             ' WHERE Zf_users.userGuid = LEK_taskUserAssoc.userGuid ' .
+             $anonSql .
+             ' GROUP BY Zf_users.id ' .
              ' ORDER BY Zf_users.surName; ';
 
         $stmt = $this->db->getAdapter()->query($sql);
+
         return $stmt->fetchAll();
     }
 
@@ -364,13 +386,16 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
      * gets the total count of all tasks associated to the user (filtered by the TaskUserAssoc table)
      * if $loadAll is true, load all tasks, user infos joined only where possible,
      *   if false only the associated tasks
-     * @param string $userGuid
      * @param bool $loadAll
      * @return number
      */
-    public function getTotalCountByUserAssoc(string $userGuid, $loadAll = false) {
-        $s = $this->getSelectByUserAssocSql($userGuid, array('numrows' => 'count(*)'), $loadAll);
+    public function getTotalCountByUserAssoc(string $userGuid, $loadAll = false)
+    {
+        $s = $this->getSelectByUserAssocSql($userGuid, [
+            'numrows' => 'count(*)',
+        ], $loadAll);
         $this->applyFilterToSelect($s);
+
         return $this->db->fetchRow($s)->numrows;
     }
 
@@ -379,26 +404,30 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
      * if $loadAll is true, load all tasks, user infos joined only where possible,
      *   if false only the associated tasks to the user
      * TODO: when state filter is refactored, remove the tasuserassoc object cast here
-     * @param string $userGuid
      * @param string $cols column definition
      * @param bool $loadAll
      * @return Zend_Db_Table_Select
      */
-    protected function getSelectByUserAssocSql(string $userGuid, $cols = '*', $loadAll = false) {
+    protected function getSelectByUserAssocSql(string $userGuid, $cols = '*', $loadAll = false)
+    {
         $s = $this->db->select()
-        ->from('LEK_task', $cols);
-        $defaultTable=$this->db->info($this->db::NAME);
-        if(!empty($this->filter)) {
+            ->from('LEK_task', $cols);
+        $defaultTable = $this->db->info($this->db::NAME);
+        if (! empty($this->filter)) {
             $this->filter->setDefaultTable($defaultTable);
         }
-        if($loadAll) {
-            $on ='LEK_taskUserAssoc_1.taskGuid = LEK_task.taskGuid AND LEK_taskUserAssoc_1.userGuid = '.$s->getAdapter()->quote($userGuid);
-            $s->joinLeft(['LEK_taskUserAssoc_1'=>'LEK_taskUserAssoc'], $on, array());
+        if ($loadAll) {
+            $on = 'LEK_taskUserAssoc_1.taskGuid = LEK_task.taskGuid AND LEK_taskUserAssoc_1.userGuid = ' . $s->getAdapter()->quote($userGuid);
+            $s->joinLeft([
+                'LEK_taskUserAssoc_1' => 'LEK_taskUserAssoc',
+            ], $on, []);
+        } else {
+            $s->joinLeft([
+                'LEK_taskUserAssoc_1' => 'LEK_taskUserAssoc',
+            ], 'LEK_taskUserAssoc_1.taskGuid = LEK_task.taskGuid', [])
+                ->where('LEK_taskUserAssoc_1.userGuid = ? OR LEK_task.pmGuid = ?', $userGuid);
         }
-        else {
-            $s->joinLeft(['LEK_taskUserAssoc_1'=>'LEK_taskUserAssoc'], 'LEK_taskUserAssoc_1.taskGuid = LEK_task.taskGuid', array())
-            ->where('LEK_taskUserAssoc_1.userGuid = ? OR LEK_task.pmGuid = ?', $userGuid);
-        }
+
         return $s;
     }
 
@@ -409,75 +438,88 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
      * @param string $prefix optional filename prefix
      * @return string
      */
-    public function getTasknameForDownload(string $suffix, $prefix = '') {
+    public function getTasknameForDownload(string $suffix, $prefix = '')
+    {
         //see TS-2156 and https://stackoverflow.com/questions/1401317/remove-non-utf8-characters-from-string
         $name = preg_replace('/[^[:print:]\n]/u', '', iconv("UTF-8", "UTF-8//IGNORE", $this->getTaskName()));
-        return rawurlencode(iconv('UTF-8', 'ASCII//TRANSLIT', $prefix.$name.$suffix));
+
+        return rawurlencode(iconv('UTF-8', 'ASCII//TRANSLIT', $prefix . $name . $suffix));
     }
 
     /**
      * @param bool $asJson if true, json is returned, otherwhise assoc-array
      * @return mixed depending on $asJson
      */
-    public function getMqmTypesTranslated($asJson = true){
+    public function getMqmTypesTranslated($asJson = true)
+    {
         // ugly defaults when no data set to avoid exceptions. Generally, no code should request this when MQMs are not configured
-        if($this->row->qmSubsegmentFlags == NULL){
-            if($asJson){
-                return NULL;
+        if ($this->row->qmSubsegmentFlags == null) {
+            if ($asJson) {
+                return null;
             }
+
             return [];
         }
         $translate = ZfExtended_Zendoverwrites_Translate::getInstance();
         /* @var $translate ZfExtended_Zendoverwrites_Translate */;
-        $walk = function(array $qmFlagTree) use ($translate, &$walk){
+        $walk = function (array $qmFlagTree) use ($translate, &$walk) {
             foreach ($qmFlagTree as $node) {
                 $node->text = $translate->_($node->text);
-                if(isset($node->children) && is_array($node->children)){
+                if (isset($node->children) && is_array($node->children)) {
                     $walk($node->children, $walk);
                 }
             }
+
             return $qmFlagTree;
         };
         $tree = Zend_Json::decode($this->row->qmSubsegmentFlags, Zend_Json::TYPE_OBJECT);
-        if(!isset($tree->qmSubsegmentFlags)){
+        if (! isset($tree->qmSubsegmentFlags)) {
             throw new Zend_Exception('qmSubsegmentFlags JSON Structure not OK, missing field qmSubsegmentFlags');
         }
         $qmFlagTree = $walk($tree->qmSubsegmentFlags);
-        if($asJson){
+        if ($asJson) {
             return Zend_Json::encode($qmFlagTree);
         }
+
         return $qmFlagTree;
     }
+
     /**
      * @return array('issueId'=>'issueText',...)
      */
-    public function getMqmTypesFlat(){
-        $flatTree = array();
-        $walk = function(array $qmFlagTree)use (&$walk, &$flatTree){
+    public function getMqmTypesFlat()
+    {
+        $flatTree = [];
+        $walk = function (array $qmFlagTree) use (&$walk, &$flatTree) {
             foreach ($qmFlagTree as $node) {
                 $flatTree[$node->id] = $node->text;
-                if(isset($node->children) && is_array($node->children)){
+                if (isset($node->children) && is_array($node->children)) {
                     $walk($node->children);
                 }
             }
         };
         $tree = Zend_Json::decode($this->row->qmSubsegmentFlags, Zend_Json::TYPE_OBJECT);
-        if(!isset($tree->qmSubsegmentFlags)){
+        if (! isset($tree->qmSubsegmentFlags)) {
             throw new Zend_Exception('qmSubsegmentFlags JSON Structure not OK, missing field qmSubsegmentFlags');
         }
         $walk($tree->qmSubsegmentFlags);
+
         return $flatTree;
     }
+
     /**
      * @return stdClass
      */
-    public function getMqmSeverities(){
+    public function getMqmSeverities()
+    {
         $tree = Zend_Json::decode($this->row->qmSubsegmentFlags, Zend_Json::TYPE_OBJECT);
-        if(!isset($tree->severities)){
+        if (! isset($tree->severities)) {
             throw new Zend_Exception('qmSubsegmentFlags JSON Structure not OK, missing field severities');
         }
+
         return $tree->severities;
     }
+
     /**
      * returns all configured Severities as JSON or PHP Data Structure:
      * [{
@@ -491,33 +533,39 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
      * @param Zend_Db_Table_Row_Abstract $row | null - if null, $this->row is used
      * @return string|array depends on $asJson
      */
-    public function getMqmSeveritiesTranslated($asJson = true, array $row = null) {
+    public function getMqmSeveritiesTranslated($asJson = true, array $row = null)
+    {
         $translate = ZfExtended_Zendoverwrites_Translate::getInstance();
         /* @var $translate ZfExtended_Zendoverwrites_Translate */
-        if(is_null($row)) {
+        if (is_null($row)) {
             $row = $this->row->toArray();
         }
         $tree = Zend_Json::decode($row['qmSubsegmentFlags'], Zend_Json::TYPE_OBJECT);
-        $result = array();
-        foreach($tree->severities as $key => $label) {
-            $result[] = (object)array('id' => $key, 'text' => $translate->_($label));
+        $result = [];
+        foreach ($tree->severities as $key => $label) {
+            $result[] = (object) [
+                'id' => $key,
+                'text' => $translate->_($label),
+            ];
         }
-        if($asJson){
+        if ($asJson) {
             return Zend_Json::encode($tree);
         }
+
         return $result;
     }
-
 
     /**
      * returns the relative path to the persistent data directory of the given or loaded taskguid
      * @param string $taskGuid optional, if not given use the taskguid of internal loaded task
      * @return string
      */
-    public function getRelativeTaskDataPath($taskGuid = null) {
-        if(empty($taskGuid)){
+    public function getRelativeTaskDataPath($taskGuid = null)
+    {
+        if (empty($taskGuid)) {
             $taskGuid = $this->getTaskGuid();
         }
+
         //use the TaskGuid as directory name, remove curly brackets "{" and "}"
         return trim($taskGuid, '{}');
     }
@@ -526,28 +574,29 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
      * returns the absolute path to the task data directory
      * @return SplFileInfo
      */
-    public function getAbsoluteTaskDataPath() {
-        if(empty($this->taskDataPath)){
+    public function getAbsoluteTaskDataPath()
+    {
+        if (empty($this->taskDataPath)) {
             $taskDataRel = $this->getRelativeTaskDataPath();
             $config = Zend_Registry::get('config');
-            $this->taskDataPath = $config->runtimeOptions->dir->taskData.DIRECTORY_SEPARATOR.$taskDataRel;
+            $this->taskDataPath = $config->runtimeOptions->dir->taskData . DIRECTORY_SEPARATOR . $taskDataRel;
         }
+
         return $this->taskDataPath;
     }
 
     /**
      * The log dir for various task-specific logs, will be created if it does not exist
-     * @param bool $createIfNeccessary
-     * @return string
      */
-    public function getAbsoluteTaskLogPath(bool $createIfNeccessary=true): string
+    public function getAbsoluteTaskLogPath(bool $createIfNeccessary = true): string
     {
-        $logDir =  $this->getAbsoluteTaskDataPath() . DIRECTORY_SEPARATOR . self::LOG_DIR;
-        if ($createIfNeccessary && !is_dir($logDir)) {
-            if (!mkdir($logDir, 0777, true) && !is_dir($logDir)) {
+        $logDir = $this->getAbsoluteTaskDataPath() . DIRECTORY_SEPARATOR . self::LOG_DIR;
+        if ($createIfNeccessary && ! is_dir($logDir)) {
+            if (! mkdir($logDir, 0777, true) && ! is_dir($logDir)) {
                 throw new RuntimeException(sprintf('Directory "%s" was not created', $logDir));
             }
         }
+
         return $logDir;
     }
 
@@ -556,36 +605,39 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
      * @throws Zend_Exception
      * @return SplFileInfo InfoObject of the TaskData Directory
      */
-    public function initTaskDataDirectory() {
+    public function initTaskDataDirectory()
+    {
         $taskDataRel = $this->getRelativeTaskDataPath();
         $config = Zend_Registry::get('config');
-        if(empty($config->runtimeOptions->dir->taskData)){
-        	throw new Zend_Exception('Config runtimeOptions.dir.taskData is NOT set!');
+        if (empty($config->runtimeOptions->dir->taskData)) {
+            throw new Zend_Exception('Config runtimeOptions.dir.taskData is NOT set!');
         }
         $taskDataRoot = new SplFileInfo($config->runtimeOptions->dir->taskData);
-        if(!$taskDataRoot->isDir() && !mkdir($taskDataRoot)) {
-            throw new Zend_Exception('TaskData root Directory could not be created: "'.$taskDataRoot->getPathname().'".');
+        if (! $taskDataRoot->isDir() && ! mkdir($taskDataRoot)) {
+            throw new Zend_Exception('TaskData root Directory could not be created: "' . $taskDataRoot->getPathname() . '".');
         }
-        if(!$taskDataRoot->isWritable()) {
-            throw new Zend_Exception('TaskData root Directory is not writeable: "'.$taskDataRoot->getPathname().'".');
+        if (! $taskDataRoot->isWritable()) {
+            throw new Zend_Exception('TaskData root Directory is not writeable: "' . $taskDataRoot->getPathname() . '".');
         }
 
-        $taskData = new SplFileInfo($taskDataRoot.DIRECTORY_SEPARATOR.$taskDataRel);
+        $taskData = new SplFileInfo($taskDataRoot . DIRECTORY_SEPARATOR . $taskDataRel);
         if (! $taskData->isDir() && ! mkdir($taskData)) {
-            throw new Zend_Exception('TaskData Directory could not be created, check parent folders:  "'.$taskData->getPathname().'".');
+            throw new Zend_Exception('TaskData Directory could not be created, check parent folders:  "' . $taskData->getPathname() . '".');
         }
 
-        if($taskData->isWritable()){
-        	return $this->taskDataPath = $taskData;
+        if ($taskData->isWritable()) {
+            return $this->taskDataPath = $taskData;
         }
-        throw new Zend_Exception('TaskData Directory is not writeable:  "'.$taskData->getPathname().'".');
+
+        throw new Zend_Exception('TaskData Directory is not writeable:  "' . $taskData->getPathname() . '".');
     }
 
     /**
      * creates (if needed) the materialized view to the task
      */
-    public function createMaterializedView() {
-        $mv = ZfExtended_Factory::get('editor_Models_Segment_MaterializedView', array($this->getTaskGuid()));
+    public function createMaterializedView()
+    {
+        $mv = ZfExtended_Factory::get('editor_Models_Segment_MaterializedView', [$this->getTaskGuid()]);
         /* @var $mv editor_Models_Segment_MaterializedView */
         $mv->create();
     }
@@ -593,27 +645,30 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
     /**
      * drops the materialized view to the task
      */
-    public function dropMaterializedView() {
-        $mv = ZfExtended_Factory::get('editor_Models_Segment_MaterializedView', array($this->getTaskGuid()));
+    public function dropMaterializedView()
+    {
+        $mv = ZfExtended_Factory::get('editor_Models_Segment_MaterializedView', [$this->getTaskGuid()]);
         /* @var $mv editor_Models_Segment_MaterializedView */
         $mv->drop();
     }
 
     /**
      * update the workflowStep of a specific task
-     * @param string $stepName
      * @param bool $increaseStep optional, by default true, increases then the workflow step nr
      */
-    public function updateWorkflowStep(string $stepName, $increaseStep = true) {
+    public function updateWorkflowStep(string $stepName, $increaseStep = true)
+    {
         $data = [
-                'workflowStepName' => $stepName,
+            'workflowStepName' => $stepName,
         ];
-        if($increaseStep) {
-            $data['workflowStep'] =  new Zend_Db_Expr('`workflowStep` + 1');
+        if ($increaseStep) {
+            $data['workflowStep'] = new Zend_Db_Expr('`workflowStep` + 1');
             //step nr is not updated in task entity! For correct value we have to reload the task and load the value form DB.
         }
         $this->__call('setWorkflowStepName', [$stepName]);
-        $this->db->update($data, ['taskGuid = ?' => $this->getTaskGuid()]);
+        $this->db->update($data, [
+            'taskGuid = ?' => $this->getTaskGuid(),
+        ]);
         $this->updateSegmentFinishCount();
     }
 
@@ -624,7 +679,8 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
      * @param string $stepName
      * @throws BadMethodCallException
      */
-    public function setWorkflowStepName($stepName) {
+    public function setWorkflowStepName($stepName)
+    {
         throw new BadMethodCallException('setWorkflowStepName may not be called directly. Either via Task::updateWorkflowStep or in Workflow Context via Workflow::setNextStep');
     }
 
@@ -632,7 +688,8 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
      * Convenience API
      * @return boolean
      */
-    public function isTranslation() : bool {
+    public function isTranslation(): bool
+    {
         return $this->getEmptyTargets();
     }
 
@@ -640,32 +697,31 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
      * Convenience API
      * @return boolean
      */
-    public function isReview() : bool {
-        return !$this->getEmptyTargets();
+    public function isReview(): bool
+    {
+        return ! $this->getEmptyTargets();
     }
 
     /**
      * Retrieves, if the full source and target language are equal, eg. en-GB === en-GB
-     * @return bool
      */
-    public function isSourceAndTargetLanguageEqual() : bool {
+    public function isSourceAndTargetLanguageEqual(): bool
+    {
         return ($this->getSourceLang() === $this->getTargetLang());
     }
 
     /**
      * Retrieves, if the rfc5646 source and target language are equal, eg. en === en
-     * @return bool
      * @throws ZfExtended_Models_Entity_NotFoundException
      */
-    public function isSourceAndTargetLanguageSimilar() : bool {
+    public function isSourceAndTargetLanguageSimilar(): bool
+    {
         return ($this->isSourceAndTargetLanguageEqual()
             || ($this->getSourceLanguage()->getMajorRfc5646() == $this->getTargetLanguage()->getMajorRfc5646()));
     }
 
     /**
      * Retrieves a cached language
-     * @param int $id
-     * @return editor_Models_Languages
      * @throws ZfExtended_Models_Entity_NotFoundException
      */
     protected function getCachedLanguage(int $id): editor_Models_Languages
@@ -675,12 +731,12 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
         }
         $this->languageCache[$id] = ZfExtended_Factory::get(editor_Models_Languages::class);
         $this->languageCache[$id]->load($id);
+
         return $this->languageCache[$id];
     }
 
     /**
      * Retrieves the source lang as language-object
-     * @return editor_Models_Languages
      * @throws ZfExtended_Models_Entity_NotFoundException
      */
     public function getSourceLanguage(): editor_Models_Languages
@@ -690,7 +746,6 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
 
     /**
      * Retrieves the target lang as language-object
-     * @return editor_Models_Languages
      * @throws ZfExtended_Models_Entity_NotFoundException
      */
     public function getTargetLanguage(): editor_Models_Languages
@@ -701,46 +756,55 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
     /**
      * unlocks all tasks, where the associated session is invalid
      */
-    public function cleanupLockedJobs() {
+    public function cleanupLockedJobs()
+    {
         $validSessionIds = ZfExtended_Models_Db_Session::GET_VALID_SESSIONS_SQL;
         //the below not like "*translate5InternalLock*%" gives us the possibility to define session independant locks:
         $where = 'not locked is null and (
-            lockedInternalSessionUniqId not in ('.$validSessionIds.')
+            lockedInternalSessionUniqId not in (' . $validSessionIds . ')
             and lockedInternalSessionUniqId not like "*translate5InternalLock*%"
             or lockedInternalSessionUniqId is null)';
-        $this->db->update(array('lockingUser' => null, 'locked' => null, 'lockedInternalSessionUniqId' => null), $where);
+        $this->db->update([
+            'lockingUser' => null,
+            'locked' => null,
+            'lockedInternalSessionUniqId' => null,
+        ], $where);
 
         //clean up remaining multi user task locks where no user is editing anymore
-        $multiUserId = self::INTERNAL_LOCK.self::USAGE_MODE_SIMULTANEOUS;
+        $multiUserId = self::INTERNAL_LOCK . self::USAGE_MODE_SIMULTANEOUS;
         $usedMultiUserLocks = 'SELECT t.id
-        FROM (SELECT id, taskGuid FROM LEK_task t WHERE t.lockedInternalSessionUniqId = "'.$multiUserId.'") t
+        FROM (SELECT id, taskGuid FROM LEK_task t WHERE t.lockedInternalSessionUniqId = "' . $multiUserId . '") t
         JOIN LEK_taskUserAssoc tua on tua.taskGuid = t.taskGuid
         WHERE not tua.usedState is null AND not tua.usedInternalSessionUniqId is null';
-        $where = 'not locked is null and lockedInternalSessionUniqId = "'.$multiUserId.'" and id not in ('.$usedMultiUserLocks.')';
+        $where = 'not locked is null and lockedInternalSessionUniqId = "' . $multiUserId . '" and id not in (' . $usedMultiUserLocks . ')';
 
-        $this->db->update(array('lockingUser' => null, 'locked' => null, 'lockedInternalSessionUniqId' => null), $where);
+        $this->db->update([
+            'lockingUser' => null,
+            'locked' => null,
+            'lockedInternalSessionUniqId' => null,
+        ], $where);
     }
 
     /**
      * locks the task
      * sets a locked-timestamp in LEK_task for the task, if locked column is null
      *
-     * @param string $datetime
      * @param string $lockId String to distinguish different lock types
      * @return boolean
      */
-    public function lock(string $datetime, string $lockId = ''): bool {
-        return $this->_lock($datetime, ZfExtended_Models_User::SYSTEM_GUID, self::INTERNAL_LOCK.$lockId);
+    public function lock(string $datetime, string $lockId = ''): bool
+    {
+        return $this->_lock($datetime, ZfExtended_Models_User::SYSTEM_GUID, self::INTERNAL_LOCK . $lockId);
     }
 
     /**
      * locks the task
      * sets a locked-timestamp in LEK_task for the task, if locked column is null
      *
-     * @param string $datetime
      * @return boolean
      */
-    public function lockForSessionUser(string $datetime): bool {
+    public function lockForSessionUser(string $datetime): bool
+    {
         return $this->_lock(
             $datetime,
             ZfExtended_Authentication::getInstance()->getUserGuid(),
@@ -748,30 +812,31 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
         );
     }
 
-
     /**
      * locks the task
      * sets a locked-timestamp in LEK_task for the task, if locked column is null
      *
-     * @param string $datetime
-     * @param bool $systemLock optional, default false. If true the lock is session independant, and must therefore revoked manually!
-     * @param string $systemIdentifier optional, default empty string. Is used to distinguish different lock types (mainly for system locks)
      * @return boolean
      */
-    protected function _lock(string $datetime, string $userGuid, string $sessionId): bool {
-        $update = array(
+    protected function _lock(string $datetime, string $userGuid, string $sessionId): bool
+    {
+        $update = [
             'locked' => $datetime,
             'lockingUser' => $userGuid,
             'lockedInternalSessionUniqId' => $sessionId,
-        );
-        $where = array('taskGuid = ? and locked is null'=>$this->getTaskGuid());
+        ];
+        $where = [
+            'taskGuid = ? and locked is null' => $this->getTaskGuid(),
+        ];
         $rowsUpdated = $this->db->update($update, $where);
-        if($rowsUpdated === 0){
+        if ($rowsUpdated === 0) {
             //true if no system lock, if system lock evaluate if sessionId (and therefore the type) equals
             $checkSystemLockType = strpos($sessionId, self::INTERNAL_LOCK) === false || $sessionId === $this->getLockedInternalSessionUniqId();
+
             //already locked by the same user with the same system lock type (if applicable).
-            return !is_null($this->getLocked()) && $this->getLockingUser() == $userGuid && $checkSystemLockType;
+            return ! is_null($this->getLocked()) && $this->getLockingUser() == $userGuid && $checkSystemLockType;
         }
+
         return true;
     }
 
@@ -780,25 +845,28 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
      * @return boolean false if task had not been locked or does not exist,
      *          true if task has been unlocked successfully
      */
-    public function unlock() {
-        $where = array('taskGuid = ? and locked is not null'=>$this->getTaskGuid());
-        $data = array(
-            'locked' => NULL,
-            'lockedInternalSessionUniqId' => NULL,
-            'lockingUser' => NULL,
-        );
+    public function unlock()
+    {
+        $where = [
+            'taskGuid = ? and locked is not null' => $this->getTaskGuid(),
+        ];
+        $data = [
+            'locked' => null,
+            'lockedInternalSessionUniqId' => null,
+            'lockingUser' => null,
+        ];
         $success = $this->db->update($data, $where) !== 0;
         //check how many rows are updated
         $this->events->trigger('unlock', $this, [
             'task' => $this,
             'success' => $success,
         ]);
+
         return $success;
     }
 
     /**
      * unlocks the task, for a specific user. Checks if user is allowed to unlock (lockingUser = givenUser) and respects multiuser editing
-     * @param string $userGuid
      * @param string|null $taskGuid optional, use the internally loaded taskGuid by default
      * @return boolean false if task had not been locked or does not exist,
      *          true if task has been unlocked successfully
@@ -807,7 +875,7 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
     {
         $taskGuid = $this->db->getAdapter()->quote($taskGuid ?? $this->getTaskGuid());
         $userGuid = $this->db->getAdapter()->quote($userGuid);
-        $multiUserId = $this->db->getAdapter()->quote(self::INTERNAL_LOCK.self::USAGE_MODE_SIMULTANEOUS);
+        $multiUserId = $this->db->getAdapter()->quote(self::INTERNAL_LOCK . self::USAGE_MODE_SIMULTANEOUS);
 
         $where = 'taskGuid = %1$s
         AND locked is not null
@@ -820,11 +888,12 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
                 AND not usedState is null AND not usedInternalSessionUniqId is null)
             )';
 
-        $data = array(
-            'locked' => NULL,
-            'lockedInternalSessionUniqId' => NULL,
-            'lockingUser' => NULL,
-        );
+        $data = [
+            'locked' => null,
+            'lockedInternalSessionUniqId' => null,
+            'lockingUser' => null,
+        ];
+
         //check how many rows are updated
         return $this->db->update($data, sprintf($where, $taskGuid, $userGuid, $multiUserId)) !== 0;
     }
@@ -833,14 +902,17 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
      * marks the task erroneous and unlocks its
      * @return boolean false if task had not been updated or does not exist,
      */
-    public function setErroneous() {
+    public function setErroneous()
+    {
         $data = [
             'state' => self::STATE_ERROR,
-            'locked' => NULL,
-            'lockedInternalSessionUniqId' => NULL,
-            'lockingUser' => NULL
+            'locked' => null,
+            'lockedInternalSessionUniqId' => null,
+            'lockingUser' => null,
         ];
-        $where = array('taskGuid = ?'=>$this->getTaskGuid());
+        $where = [
+            'taskGuid = ?' => $this->getTaskGuid(),
+        ];
         $success = $this->db->update($data, $where) !== 0;
         //check how many rows are updated
         //since the task is also unlocked here, we have to fire the according event too!
@@ -848,6 +920,7 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
             'task' => $this,
             'success' => $success,
         ]);
+
         return $success;
     }
 
@@ -855,7 +928,8 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
      * returns if tasks has import errors
      * @return boolean
      */
-    public function isErroneous() {
+    public function isErroneous()
+    {
         return $this->getState() == self::STATE_ERROR;
     }
 
@@ -863,39 +937,49 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
      * returns if tasks is importing
      * @return boolean
      */
-    public function isImporting() {
+    public function isImporting()
+    {
         return in_array($this->getState(), [self::STATE_IMPORT, self::STATE_PREPARATION]);
     }
 
+    /**
+     * Is the task in special exporting state. When the task in this kind of state is, some actions will not be allowed.
+     * ex: task editing is not allowed
+     */
+    public function isSpecialExportState(): bool
+    {
+        return in_array($this->getState(), [self::STATE_EXCELEXPORTED, self::STATE_PACKAGE_EXPORT]);
+    }
 
     /**
      * checks if the given taskGuid is locked. If optional userGuid is given,
      * checks if is locked by given userGuid.
-     * @param string $taskGuid
-     * @param string $userGuid
      * @return false|datetime returns false if not locked, lock timestamp if locked
      */
-    public function isLocked(string $taskGuid, string $userGuid = null) {
+    public function isLocked(string $taskGuid, string $userGuid = null)
+    {
         $s = $this->db->select()->where('taskGuid = ?', $taskGuid);
-        if(!empty($userGuid)) {
+        if (! empty($userGuid)) {
             $s->where('lockingUser = ?', $userGuid);
         }
         $row = $this->db->fetchRow($s);
-        if(empty($row) || empty($row['locked'])){
+        if (empty($row) || empty($row['locked'])) {
             return false;
         }
+
         return $row['locked'];
     }
-    /**
 
+    /**
      * checks if the given taskGuid is used by any user
-     * @param string $taskGuid
      */
-    public function isUsed(string $taskGuid) {
+    public function isUsed(string $taskGuid)
+    {
         /* @var $tua editor_Models_TaskUserAssoc */
         $tua = ZfExtended_Factory::get('editor_Models_TaskUserAssoc');
         $used = $tua->loadUsed($taskGuid);
-        return !empty($used);
+
+        return ! empty($used);
     }
 
     /**
@@ -903,15 +987,16 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
      * @param array $additionalNonExclusive additional states to be handled non exclusive
      * @return boolean
      */
-    public function isExclusiveState(array $additionalNonExclusive = []) {
+    public function isExclusiveState(array $additionalNonExclusive = [])
+    {
         $nonExclusiveStates = [self::STATE_OPEN, self::STATE_END, self::STATE_UNCONFIRMED];
-        return !in_array($this->getState(), array_merge($nonExclusiveStates, $additionalNonExclusive));
+
+        return ! in_array($this->getState(), array_merge($nonExclusiveStates, $additionalNonExclusive));
     }
 
     /**
      * Retrieves the file-type-support for a task.
      * Can only be used for saved tasks
-     * @return FileTypeSupport
      * @throws ZfExtended_Exception
      */
     public function getFileTypeSupport(): FileTypeSupport
@@ -922,9 +1007,10 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
     /**
      * creates a random task guid if no one is set
      */
-    public function createTaskGuidIfNeeded() {
+    public function createTaskGuidIfNeeded()
+    {
         $taskguid = $this->getTaskGuid();
-        if(! empty($taskguid)) {
+        if (! empty($taskguid)) {
             return;
         }
         $this->setTaskGuid(ZfExtended_Utils::guid(true));
@@ -934,17 +1020,18 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
      * returns true if current task is a real project and is never treated as importable task, that means:
      *   - a project can not be imported directly, only its sub tasks may be processed
      *   - a project can not be opened / edited, it is only an abstract construction to contain the sub tasks
-     * @return bool
      */
-    public function isProject(): bool {
-        return $this->getTaskType()->isProject() && !$this->getTaskType()->isTask();
+    public function isProject(): bool
+    {
+        return $this->getTaskType()->isProject() && ! $this->getTaskType()->isTask();
     }
-    
+
     /**
      * generates a statistics summary to the given task
      * @return stdClass
      */
-    public function getStatistics() {
+    public function getStatistics()
+    {
         $result = new stdClass();
         $result->taskGuid = $this->getTaskGuid();
         $result->taskName = $this->getTaskName();
@@ -952,7 +1039,8 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
         $segment = ZfExtended_Factory::get('editor_Models_Segment');
         /* @var $segment editor_Models_Segment */
         $result->segmentCount = $segment->count($this->getTaskGuid());
-        $result->segmentCountEditable = $segment->count($this->getTaskGuid(),true);
+        $result->segmentCountEditable = $segment->count($this->getTaskGuid(), true);
+
         return $result;
     }
 
@@ -960,8 +1048,10 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
      * generates a task overview statistics summary
      * @return array
      */
-    public function getSummary() {
+    public function getSummary()
+    {
         $stmt = $this->db->getAdapter()->query('select taskType, state, count(*) taskCount, sum(wordCount) wordCountSum, sum(segmentCount) segmentCountSum from LEK_task group by taskType, state');
+
         return $stmt->fetchAll();
     }
 
@@ -970,16 +1060,20 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
      * @param bool $reinit if true reinits the internal meta object completely (after adding a field for example)
      * @return editor_Models_Task_Meta
      */
-    public function meta(bool $reinit = false) {
+    public function meta(bool $reinit = false)
+    {
         $meta = $this->meta ?? $this->meta = ZfExtended_Factory::get('editor_Models_Task_Meta');
         $taskGuid = $this->getTaskGuid();
-        if($meta->getTaskGuid() != $taskGuid || $reinit){
+        if ($meta->getTaskGuid() != $taskGuid || $reinit) {
             try {
                 $meta->loadByTaskGuid($taskGuid);
-            } catch(ZfExtended_Models_Entity_NotFoundException){
-                $meta->init(['taskGuid' => $taskGuid]);
+            } catch (ZfExtended_Models_Entity_NotFoundException) {
+                $meta->init([
+                    'taskGuid' => $taskGuid,
+                ]);
             }
         }
+
         return $meta;
     }
 
@@ -990,12 +1084,13 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
      */
     public function checkStateAllowsActions(array $allow = []): void
     {
-        if($this->isErroneous() || ($this->isExclusiveState($allow) && $this->isLocked($this->getTaskGuid()))) {
+        if ($this->isErroneous() || ($this->isExclusiveState($allow) && $this->isLocked($this->getTaskGuid()))) {
             ZfExtended_Models_Entity_Conflict::addCodes([
                 'E1046' => 'The current task status does not allow that action.',
             ]);
+
             throw ZfExtended_Models_Entity_Conflict::createResponse('E1046', [
-                'Der aktuelle Status der Aufgabe verbietet diese Aktion!'
+                'Der aktuelle Status der Aufgabe verbietet diese Aktion!',
             ], [
                 'task' => $this,
                 'isLocked' => $this->isLocked($this->getTaskGuid()),
@@ -1015,30 +1110,31 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
     {
         // first check if disabled by state
         $this->checkStateAllowsActions();
-        
+
         $model = ZfExtended_Factory::get(ZfExtended_Models_Worker::class);
         // check if there are running exports
         if ($model->isExportRunning($this->getTaskGuid(), $exportClass)) {
             ZfExtended_Models_Entity_Conflict::addCodes([
                 'E1538' => 'Task export: the task already contains running or pending exports. Try again later',
             ]);
+
             throw ZfExtended_Models_Entity_Conflict::createResponse('E1538', [
-                'Task export: the task already contains running or pending exports. Try again later'
+                'Task export: the task already contains running or pending exports. Try again later',
             ], [
-                'task' => $this
+                'task' => $this,
             ]);
         }
-
     }
 
     /**
      * returns a logger instance with the given domain and the current task as default extra data
-     * @param string $domain
-     * @return ZfExtended_Logger
      * @throws Zend_Exception
      */
-    public function logger(string $domain = 'editor.task'): ZfExtended_Logger {
-        return Zend_Registry::get('logger')->cloneMe($domain, ['task' => $this]);
+    public function logger(string $domain = 'editor.task'): ZfExtended_Logger
+    {
+        return Zend_Registry::get('logger')->cloneMe($domain, [
+            'task' => $this,
+        ]);
     }
 
     /***
@@ -1048,18 +1144,19 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
      * @param string $searchString
      * @return array|array
      */
-    public function search($searchString,$fields=array()) {
+    public function search($searchString, $fields = [])
+    {
         $s = $this->db->select();
-        if(!empty($fields)){
-            $s->from($this->tableName,$fields);
+        if (! empty($fields)) {
+            $s->from($this->tableName, $fields);
         }
-        $s->where('lower(taskName) LIKE lower(?)','%'.$searchString.'%');
+        $s->where('lower(taskName) LIKE lower(?)', '%' . $searchString . '%');
+
         return $this->db->fetchAll($s)->toArray();
     }
 
     /**
      * Update the terminology flag based on if there is a term collection assigned as language resource to the task.
-     * @param string $taskGuid
      * @param array $ignoreAssocs : the provided languageresources taskassoc ids will be ignored
      */
     public function updateIsTerminologieFlag(string $taskGuid, array $ignoreAssocs = []): void
@@ -1067,10 +1164,10 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
         $service = ZfExtended_Factory::get(editor_Services_TermCollection_Service::class);
         $assoc = ZfExtended_Factory::get(MittagQI\Translate5\LanguageResource\TaskAssociation::class);
         $result = $assoc->loadAssocByServiceName($taskGuid, $service->getName(), $ignoreAssocs);
-        $hasTerminology = !empty($result);
+        $hasTerminology = ! empty($result);
         //update DB directly
         $this->db->update([
-            'terminologie' => $hasTerminology
+            'terminologie' => $hasTerminology,
         ], [
             'taskGuid = ?' => $taskGuid,
         ]);
@@ -1085,11 +1182,13 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
      * Overwrite getTerminologie: Return the DB value or false depending on the taskType.
      * @return boolean
      */
-    public function getTerminologie() {
+    public function getTerminologie()
+    {
         if ($this->getTaskType()->isTerminologyDisabled()) {
             // For some task types, terms don't need to be tagged (= no TermTagger needed).
             return false;
         }
+
         return parent::get('terminologie');
     }
 
@@ -1097,7 +1196,8 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
      * Overwrite setTerminologie: saves false instead of the given value depending on the taskType.
      * @param bool $flag
      */
-    public function setTerminologie($flag) {
+    public function setTerminologie($flag)
+    {
         if ($this->getTaskType()->isTerminologyDisabled()) {
             // For some task types, terms don't need to be tagged (= no TermTagger needed).
             $flag = false;
@@ -1112,16 +1212,17 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
      * @throws ZfExtended_Models_Entity_Exceptions_IntegrityConstraint
      * @throws ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey
      */
-    public function save() {
+    public function save()
+    {
         //automatically set enddate field
         $state = $this->getState();
         $oldState = $this->getOldValue('state');
-        if($state === self::STATE_END && $state != $oldState) {
+        if ($state === self::STATE_END && $state != $oldState) {
             $this->setEnddate(NOW_ISO);
-        }
-        elseif($oldState == self::STATE_END && $state != self::STATE_END) {
+        } elseif ($oldState == self::STATE_END && $state != self::STATE_END) {
             $this->setEnddate(null); //old value was ended and task is set to open again
         }
+
         return parent::save();
     }
 
@@ -1129,10 +1230,12 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
      * Return all combinations of font-family and font-size that are used in the task.
      * @return array
      */
-    public function getAllFontsInTask() {
+    public function getAllFontsInTask()
+    {
         // TODO: Get these infos from the config-data of the taskTemplate (unfortunately not implemented yet).
         // Workaround (!!!!): check the task's segments.
         $segMeta = ZfExtended_Factory::get('editor_Models_Segment_Meta');
+
         /* @var $segMeta editor_Models_Segment_Meta  */
         return $segMeta->getAllFontsInTask($this->getTaskGuid());
         /*
@@ -1167,29 +1270,30 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
      * @param bool $customRoles (optional) if checkUser = true the here provided roles are used for ACL check instead the currently logged in user
      * @return boolean
      */
-    public function anonymizeUsers(bool $checkUser = true, array $customRoles = null) {
+    public function anonymizeUsers(bool $checkUser = true, array $customRoles = null)
+    {
         $config = $this->getConfig();
-        if(!$config->runtimeOptions->customers->anonymizeUsers) {
+        if (! $config->runtimeOptions->customers->anonymizeUsers) {
             return false;
         }
-        if($checkUser === false) {
+        if ($checkUser === false) {
             return $config->runtimeOptions->customers->anonymizeUsers; // = true if we get here
         }
-        return !($this->rolesAllowReadAnonymizedUsers($customRoles));
+
+        return ! ($this->rolesAllowReadAnonymizedUsers($customRoles));
     }
 
     /**
      * returns true if the given roles (or the roles of the current user) disallow seeing all user data
-     * @param array|null $rolesToCheck
-     * @return bool
      * @throws Zend_Acl_Exception
      */
     protected function rolesAllowReadAnonymizedUsers(array $rolesToCheck = null): bool
     {
-        if(empty($rolesToCheck)) {
+        if (empty($rolesToCheck)) {
             $rolesToCheck = ZfExtended_Authentication::getInstance()->getUserRoles();
         }
         $aclInstance = ZfExtended_Acl::getInstance();
+
         return $aclInstance->isInAllowedRoles($rolesToCheck, Rights::ID, Rights::READ_ANONYMYZED_USERS);
     }
 
@@ -1197,9 +1301,10 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
      * Update the segment finish count based on the task workflow step valid autostates
      * @param editor_Models_Task $task
      */
-    public function updateSegmentFinishCount(){
+    public function updateSegmentFinishCount()
+    {
         $workflow = $this->getTaskActiveWorkflow();
-        if(empty($workflow)) {
+        if (empty($workflow)) {
             return;
         }
         $states = $this->getTaskRoleAutoStates() ?: [];
@@ -1211,21 +1316,24 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
         $isWorkflowEnded = $workflow->isEnded($this);
 
         $adapted = $this->db->getAdapter();
-        
-        if(!$isWorkflowEnded && !$states) {
+
+        if (! $isWorkflowEnded && ! $states) {
             //if workflow is not ended, and we do not have any states to the current steps' role, we do not update anything
             return;
         }
-        
-        if($isWorkflowEnded){
+
+        if ($isWorkflowEnded) {
             //if workflow is ended, set the count to 100% (segmentFinishCount=segmentCount)
-            $expression='segmentCount';
-        }
-        else {
+            $expression = 'segmentCount';
+        } else {
             //get the autostates for the valid task workflow states
-            $expression='(SELECT COUNT(*) FROM LEK_segments WHERE autoStateId IN('.implode(',', $states).') AND taskGuid='.$adapted->quote($this->getTaskGuid()).')';
+            $expression = '(SELECT COUNT(*) FROM LEK_segments WHERE autoStateId IN(' . implode(',', $states) . ') AND taskGuid=' . $adapted->quote($this->getTaskGuid()) . ')';
         }
-        $this->db->update(['segmentFinishCount'=>new Zend_Db_Expr($expression)],['taskGuid=?' => $this->getTaskGuid()]);
+        $this->db->update([
+            'segmentFinishCount' => new Zend_Db_Expr($expression),
+        ], [
+            'taskGuid=?' => $this->getTaskGuid(),
+        ]);
     }
 
     /***
@@ -1234,20 +1342,25 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
      * @param int $newAutostate
      * @param int $oldAutoState
      */
-    public function changeSegmentFinishCount(editor_Models_Task $task,int $newAutostate,int $oldAutoState){
-        $stateRoles=$this->getTaskRoleAutoStates();
-        if(!$stateRoles){
+    public function changeSegmentFinishCount(editor_Models_Task $task, int $newAutostate, int $oldAutoState)
+    {
+        $stateRoles = $this->getTaskRoleAutoStates();
+        if (! $stateRoles) {
             return;
         }
-        $expression='';
-        if(in_array($newAutostate, $stateRoles) && !in_array($oldAutoState, $stateRoles)){
-            $expression='segmentFinishCount + 1 ';
-        }elseif(in_array($oldAutoState, $stateRoles) && !in_array($newAutostate, $stateRoles)){
-            $expression='segmentFinishCount - 1 ';
-        }else{
+        $expression = '';
+        if (in_array($newAutostate, $stateRoles) && ! in_array($oldAutoState, $stateRoles)) {
+            $expression = 'segmentFinishCount + 1 ';
+        } elseif (in_array($oldAutoState, $stateRoles) && ! in_array($newAutostate, $stateRoles)) {
+            $expression = 'segmentFinishCount - 1 ';
+        } else {
             return;
         }
-        $this->db->update(['segmentFinishCount'=>new Zend_Db_Expr($expression)],['taskGuid=?' => $task->getTaskGuid()]);
+        $this->db->update([
+            'segmentFinishCount' => new Zend_Db_Expr($expression),
+        ], [
+            'taskGuid=?' => $task->getTaskGuid(),
+        ]);
     }
 
     /***
@@ -1256,33 +1369,36 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
      *
      * @return boolean|boolean|multitype:string
      */
-    protected function getTaskRoleAutoStates(){
+    protected function getTaskRoleAutoStates()
+    {
         try {
-            $workflow=$this->getTaskActiveWorkflow();
+            $workflow = $this->getTaskActiveWorkflow();
         } catch (ZfExtended_Exception $e) {
             //the workflow with $workflowStepName does not exist
             return false;
         }
-        $roleOfStep=$workflow->getRoleOfStep($this->getWorkflowStepName());
-        if(empty($roleOfStep)){
+        $roleOfStep = $workflow->getRoleOfStep($this->getWorkflowStepName());
+        if (empty($roleOfStep)) {
             return false;
         }
-        $autoState=new editor_Models_Segment_AutoStates();
-        $stateMap=$autoState->getRoleToStateMap();
+        $autoState = new editor_Models_Segment_AutoStates();
+        $stateMap = $autoState->getRoleToStateMap();
+
         return $stateMap[$roleOfStep] ?? false;
     }
 
     /**
      * Get the active workflow for the current task
-     * @return editor_Workflow_Default
      */
-    public function getTaskActiveWorkflow(): editor_Workflow_Default {
+    public function getTaskActiveWorkflow(): editor_Workflow_Default
+    {
         //get the current task active workflow
         $wfm = ZfExtended_Factory::get('editor_Workflow_Manager');
+
         /* @var $wfm editor_Workflow_Manager */
         return $wfm->getActiveByTask($this);
     }
-    
+
     /***
      * Load all tasks of a given project. If taskOnly is true, in the result array, the master(project) task
      * will not be included
@@ -1291,21 +1407,24 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
      * @param bool $tasksOnly
      * @return array
      */
-    public function loadProjectTasks(int $projectId,bool $tasksOnly=false) : array{
-        $s=$this->db->select();
-        if($tasksOnly){
+    public function loadProjectTasks(int $projectId, bool $tasksOnly = false): array
+    {
+        $s = $this->db->select();
+        if ($tasksOnly) {
             $s->where('taskType IN (?)', editor_Task_Type::getInstance()->getNonInternalTaskTypes());
         }
-        $s->where('projectId=?',$projectId);
+        $s->where('projectId=?', $projectId);
+
         return $this->db->fetchAll($s)->toArray();
     }
-    
+
     /**
      * Returns the matching of col-names as set in Editor.view.admin.TaskGrid.
      * @return array
      */
-    public static function getTaskGridTextCols () {
-        return array (
+    public static function getTaskGridTextCols()
+    {
+        return [
             // A-Z
             'customerId' => 'Endkunde',
             'edit100PercentMatch' => '100%-Treffer editierbar',
@@ -1321,7 +1440,7 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
             'referenceFiles' => 'Referenzdateien',
             'relaisLang' => 'Relaissprache',
             'sourceLang' => 'Quellsprache',
-            'state' =>'Status',
+            'state' => 'Status',
             'targetLang' => 'Zielsprache',
             'taskActions' => 'Aktionen',
             'taskassocs' => 'Anzahl zugewiesene Sprachressourcen',
@@ -1333,29 +1452,33 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
             'wordCountTT' => 'Anzahl Wörter',
             'workflow' => 'Workflow',
             'userCount' => 'Zahl zugewiesener Benutzer',
-        );
+        ];
     }
 
     /**
      * Updates the usercount of a task.
      * @param string|null $taskGuid Optional, if omitted operate on current task
      */
-    public function updateTask(string $taskGuid = null) {
+    public function updateTask(string $taskGuid = null)
+    {
         $sql = 'update `LEK_task` t, (select count(*) cnt, ? taskGuid from `LEK_taskUserAssoc` where taskGuid = ? and isPmOverride = 0) tua
             set t.userCount = tua.cnt where t.taskGuid = tua.taskGuid';
         $db = $this->db->getAdapter();
         $sql = $db->quoteInto($sql, $taskGuid ?? $this->getTaskGuid(), 'string', 2);
         $db->query($sql);
     }
+
     /**
      * Retrieves the ids of all faulty segments of this task (=segments with internal tag errors)
      * The result is cached so don't use this API in the context of e.g. an import
      * @return int[]
      */
-    public function getFaultySegmentIds() : array {
-        if(!array_key_exists($this->getId(), $this->faultySegmentsCache)){
+    public function getFaultySegmentIds(): array
+    {
+        if (! array_key_exists($this->getId(), $this->faultySegmentsCache)) {
             $this->faultySegmentsCache[$this->getId()] = editor_Models_Db_SegmentQuality::getFaultySegmentIds($this->getTaskGuid());
         }
+
         return $this->faultySegmentsCache[$this->getId()];
     }
 
@@ -1367,8 +1490,9 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
     {
         $s = $this->db->select()
             ->where('reimportable = 1')
-            ->where('state NOT IN(?)',[self::STATE_END,self::STATE_ERROR])
+            ->where('state NOT IN(?)', [self::STATE_END, self::STATE_ERROR])
             ->where('taskType IN (?)', editor_Task_Type::getInstance()->getNonInternalTaskTypes());
+
         return $this->db->fetchAll($s)->toArray();
     }
 }

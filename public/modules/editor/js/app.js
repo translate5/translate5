@@ -94,8 +94,23 @@ Ext.application({
     name: 'Editor',
     models: ['File', 'Segment', 'admin.User', 'admin.Task', 'segment.Field', 'Config', 'TaskConfig', 'CustomerConfig', 'admin.UserAssocDefault'],
     stores: [
-        'admin.TokenStore','Files','ReferenceFiles', 'Segments', 'AlikeSegments', 'admin.Languages', 'UserConfig',
-        'admin.Config', 'admin.CustomerConfig', 'admin.task.Config', 'admin.UserAssocDefault','admin.WizardTasks',
+        'admin.TokenStore',
+        'admin.contentProtection.InputMappingStore',
+        'admin.contentProtection.OutputMappingStore',
+        'admin.contentProtection.ContentRecognitionStore',
+        'admin.contentProtection.outputMapping.ContentRecognitionComboStore',
+        'admin.contentProtection.inputMapping.ContentRecognitionComboStore',
+        'Files',
+        'ReferenceFiles',
+        'Segments',
+        'AlikeSegments',
+        'admin.Languages',
+        'UserConfig',
+        'admin.Config',
+        'admin.CustomerConfig',
+        'admin.task.Config',
+        'admin.UserAssocDefault',
+        'admin.WizardTasks',
         'admin.task.CustomField'
     ],
     requires: [
@@ -480,6 +495,38 @@ Ext.application({
         //no "this" usage, so we can use this method directly as failure handler
         Editor.app.appMask && Editor.app.appMask.close();
     },
+
+    /**
+     * Apply mask to the current viewport
+     * @param msg
+     */
+    maskViewport: function (msg) {
+        var me = this,
+            vp = me.viewport;
+
+        if (!vp) {
+            return;
+        }
+
+        vp.mask(msg);
+    },
+
+    /**
+     * Remove the mask from the current viewport
+     */
+    unmaskViewport: function () {
+        let me = this,
+            vp = me.viewport,
+            maskTarget = vp && (vp.getMaskTarget() || vp.el);
+
+        if (!vp || !maskTarget) {
+            return;
+        }
+
+        maskTarget.unmask();
+        vp.setMasked(false);
+    },
+
     logout: function () {
         window.location = Editor.data.loginUrl;
     },

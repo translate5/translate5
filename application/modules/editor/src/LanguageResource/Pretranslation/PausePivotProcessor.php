@@ -31,9 +31,9 @@ declare(strict_types=1);
 namespace MittagQI\Translate5\LanguageResource\Pretranslation;
 
 use editor_Models_Task as Task;
-use MittagQI\Translate5\PauseWorker\PauseWorkerProcessorInterface;
 use MittagQI\Translate5\LanguageResource\TaskPivotAssociation;
 use MittagQI\Translate5\PauseWorker\AbstractLanguageResourcesProcessor;
+use MittagQI\Translate5\PauseWorker\PauseWorkerProcessorInterface;
 use Zend_Config;
 use Zend_Registry;
 use ZfExtended_Factory;

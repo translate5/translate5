@@ -21,7 +21,7 @@ START LICENSE AND COPYRIGHT
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
@@ -33,16 +33,14 @@ use MittagQI\Translate5\LanguageResource\TaskPivotAssociation;
 use Zend_Db_Table_Exception;
 use ZfExtended_Factory;
 
-/**
- *
- */
 abstract class Base
 {
     /***
      * @param int $languageResourceId
      */
-    public function __construct(protected int $languageResourceId)
-    {
+    public function __construct(
+        protected int $languageResourceId
+    ) {
     }
 
     /***
@@ -82,12 +80,12 @@ abstract class Base
     public function check()
     {
         $taskAssocs = $this->getConflictTaskAssoc();
-        if (!empty($taskAssocs)) {
+        if (! empty($taskAssocs)) {
             $taskNames = array_column($taskAssocs, 'taskName');
             $this->throwException($taskNames);
         }
         $taskPivotAssocs = $this->getConflictTaskPivotAssoc();
-        if (!empty($taskPivotAssocs)) {
+        if (! empty($taskPivotAssocs)) {
             $taskNames = array_column($taskPivotAssocs, 'taskName');
             $this->throwException($taskNames);
         }
@@ -101,14 +99,14 @@ abstract class Base
     public function cleanAssociation()
     {
         $taskAssocs = $this->getConflictTaskAssoc();
-        if (!empty($taskAssocs)) {
+        if (! empty($taskAssocs)) {
             $ids = array_column($taskAssocs, 'id');
             $taskAssoc = ZfExtended_Factory::get(TaskAssociation::class);
             $taskAssoc->deleteByIds($ids);
         }
 
         $taskPivotAssocs = $this->getConflictTaskPivotAssoc();
-        if (!empty($taskPivotAssocs)) {
+        if (! empty($taskPivotAssocs)) {
             $ids = array_column($taskPivotAssocs, 'id');
             $taskAssoc = ZfExtended_Factory::get(TaskPivotAssociation::class);
             $taskAssoc->deleteByIds($ids);

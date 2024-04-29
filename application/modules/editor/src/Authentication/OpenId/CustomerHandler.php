@@ -18,14 +18,13 @@ use ZfExtended_Models_Entity_NotFoundException;
  */
 class CustomerHandler
 {
-    public function __construct(private string $claimsCustomerNumber)
-    {
-
+    public function __construct(
+        private string $claimsCustomerNumber
+    ) {
     }
 
     /**
      * Creates a customer if it does not exist and returns the id of the customer
-     * @return int
      * @throws ReflectionException
      * @throws Zend_Db_Statement_Exception
      * @throws ZfExtended_Models_Entity_Exceptions_IntegrityConstraint
@@ -34,9 +33,10 @@ class CustomerHandler
     public function handleCustomer(): int
     {
         $customer = ZfExtended_Factory::get(editor_Models_Customer_Customer::class);
+
         try {
             $customer->loadByNumber($this->claimsCustomerNumber);
-        }catch (ZfExtended_Models_Entity_NotFoundException $e){
+        } catch (ZfExtended_Models_Entity_NotFoundException $e) {
             $customer->init([]);
             $customer->setNumber($this->claimsCustomerNumber);
             $customer->setName($this->claimsCustomerNumber);
@@ -46,7 +46,7 @@ class CustomerHandler
                 'customer' => $this->claimsCustomerNumber,
             ]);
         }
+
         return $customer->getId();
     }
-
 }

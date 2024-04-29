@@ -3,25 +3,25 @@
 START LICENSE AND COPYRIGHT
 
  This file is part of translate5
- 
+
  Copyright (c) 2013 - 2021 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
 
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
  This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
- as published by the Free Software Foundation and appearing in the file agpl3-license.txt 
- included in the packaging of this file.  Please review the following information 
+ as published by the Free Software Foundation and appearing in the file agpl3-license.txt
+ included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
-  
+
  There is a plugin exception available for use with this release of translate5 for
- translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or
  plugin-exception.txt in the root folder of translate5.
-  
+
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
@@ -29,8 +29,8 @@ END LICENSE AND COPYRIGHT
 namespace MittagQI\Translate5\Segment\Db;
 
 use editor_Models_Db_Segments;
-use Zend_Db_Table_Abstract;
 use MittagQI\Translate5\Segment\Processing\State;
+use Zend_Db_Table_Abstract;
 use Zend_Db_Table_Exception;
 use ZfExtended_Factory;
 
@@ -42,11 +42,9 @@ use ZfExtended_Factory;
 final class Processing extends Zend_Db_Table_Abstract
 {
     protected $_name = 'LEK_segment_processing';
+
     public $_primary = 'segmentId';
 
-    /**
-     * @return string
-     */
     public function getName(): string
     {
         return $this->_name;
@@ -54,7 +52,6 @@ final class Processing extends Zend_Db_Table_Abstract
 
     /**
      * Retrieves all of our state columns
-     * @return array
      * @throws Zend_Db_Table_Exception
      */
     public function getStateColumns(): array
@@ -65,14 +62,12 @@ final class Processing extends Zend_Db_Table_Abstract
                 $stateCols[] = $col;
             }
         }
+
         return $stateCols;
     }
 
     /**
      * Calculates the progress for a single state
-     * @param string $taskGuid
-     * @param string $serviceId
-     * @return float
      */
     public function calculateProgress(string $taskGuid, string $serviceId): float
     {
@@ -81,8 +76,8 @@ final class Processing extends Zend_Db_Table_Abstract
         $column = $db->quoteIdentifier(State::createColumnName($serviceId));
         $row = $db->fetchRow('SELECT count(1) as overallSegs, SUM(IF(' . $column . ' > 2, 1, 0)) as processedSegs FROM ' . $tableName . ' WHERE `taskGuid` = ?', $taskGuid);
 
-        $overallSegs = (int)$row['overallSegs'];
-        $processedSegs = (int)$row['processedSegs'];
+        $overallSegs = (int) $row['overallSegs'];
+        $processedSegs = (int) $row['processedSegs'];
 
         // fix for ERROR in core: E9999 - Division by zero
         if ($overallSegs === 0) {
@@ -94,36 +89,34 @@ final class Processing extends Zend_Db_Table_Abstract
 
     /**
      * Sets the state for several segments for the given service
-     * @param array $segmentIds
-     * @param string $serviceId
-     * @param int $processingState
      */
     public function setSegmentsToState(array $segmentIds, string $serviceId, int $processingState)
     {
-        if(!empty($segmentIds)){
+        if (! empty($segmentIds)) {
             $column = State::createColumnName($serviceId);
-            $this->update([$column => $processingState], ['segmentId IN (?)' => $segmentIds]);
+            $this->update([
+                $column => $processingState,
+            ], [
+                'segmentId IN (?)' => $segmentIds,
+            ]);
         }
     }
 
     /**
      * Sets the state for all segments of a task for the given service
-     * @param string $taskGuid
-     * @param string $serviceId
-     * @param int $processingState
      */
     public function setTaskToState(string $taskGuid, string $serviceId, int $processingState)
     {
         $column = State::createColumnName($serviceId);
-        $this->update([$column => $processingState], ['taskGuid = ?' => $taskGuid]);
+        $this->update([
+            $column => $processingState,
+        ], [
+            'taskGuid = ?' => $taskGuid,
+        ]);
     }
 
     /**
      * Retrieves the segment-id's for the passed task, service and state
-     * @param string $taskGuid
-     * @param string $serviceId
-     * @param int $processingState
-     * @return array
      */
     public function getSegmentsForState(string $taskGuid, string $serviceId, int $processingState): array
     {
@@ -131,14 +124,14 @@ final class Processing extends Zend_Db_Table_Abstract
         $where = $this->select()
             ->from($this->_name, ['segmentId'])
             ->where('taskGuid = ?', $taskGuid)
-            ->where($column.' = ?', $processingState);
+            ->where($column . ' = ?', $processingState);
         $rows = $this->fetchAll($where)->toArray();
+
         return array_column($rows, 'segmentId');
     }
 
     /**
      * Will generate empty entries for the given task to at least store the states in
-     * @param string $taskGuid
      */
     public function prepareOperation(string $taskGuid)
     {
@@ -151,7 +144,7 @@ final class Processing extends Zend_Db_Table_Abstract
         $segmentIds = $segmentsTable->getAllIdsForTask($taskGuid, false);
 
         // in case the task has no segments, do not try to insert rows
-        if(empty($segmentIds)){
+        if (empty($segmentIds)) {
             return;
         }
 
@@ -162,8 +155,6 @@ final class Processing extends Zend_Db_Table_Abstract
     }
 
     /**
-     * @param string $taskGuid
-     * @return array
      * @throws Zend_Db_Table_Exception
      */
     public function getOperationResult(string $taskGuid): array
@@ -177,17 +168,19 @@ final class Processing extends Zend_Db_Table_Abstract
             $sql .= ', SUM(IF(' . $db->quoteIdentifier($column) . ' > ' . State::INPROGRESS . ', 1, 0)) as ' . $column . 'Num';
         }
         $row = $db->fetchRow($sql . ' FROM ' . $db->quoteIdentifier($this->_name) . ' WHERE `taskGuid` = ?', $taskGuid);
-        $result = ['segments' => intval($row['overallSegs'])];
+        $result = [
+            'segments' => intval($row['overallSegs']),
+        ];
         foreach ($stateColumns as $column) {
             $stateName = substr($column, 0, (-1 * strlen(State::COLUMN_SUFFIX)));
             $result[$stateName] = intval($row[$column . 'Num']);
         }
+
         return $result;
     }
 
     /**
      * Will remove all processing entries for the passed task
-     * @param string $taskGuid
      */
     public function finishOperation(string $taskGuid)
     {

@@ -89,6 +89,7 @@ Ext.define('Editor.view.LanguageResources.TaskGridWindowViewController', {
                         return rec.get('taskGuid');
                     }),
                     onlyEdited: onlyEdited,
+                    timeOption: me.getView().down('#import-time-option').getValue(),
                 }),
             },
             success: function () {

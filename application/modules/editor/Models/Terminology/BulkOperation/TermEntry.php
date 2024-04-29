@@ -21,7 +21,7 @@ START LICENSE AND COPYRIGHT
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
@@ -31,12 +31,14 @@ class editor_Models_Terminology_BulkOperation_TermEntry extends editor_Models_Te
      * @var editor_Models_Terminology_Models_TermEntryModel
      */
     protected $model;
+
     /**
      * @var editor_Models_Terminology_TbxObjects_TermEntry
      */
     protected $importObject;
 
-    public function __construct() {
+    public function __construct()
+    {
         $this->model = new editor_Models_Terminology_Models_TermEntryModel();
         $this->importObject = new editor_Models_Terminology_TbxObjects_TermEntry();
     }
@@ -54,10 +56,11 @@ class editor_Models_Terminology_BulkOperation_TermEntry extends editor_Models_Te
         $this->importObject = $importObject;
     }
 
-    public function getCurrentEntry(): editor_Models_Terminology_TbxObjects_TermEntry {
+    public function getCurrentEntry(): editor_Models_Terminology_TbxObjects_TermEntry
+    {
         return $this->importObject;
     }
-    
+
     /**
      * Create or update a term entry record in the database, for the current collection and the actual termEntryId
      * (where groupId = termEntryId, where collectionId = termCollectionId)
@@ -70,7 +73,7 @@ class editor_Models_Terminology_BulkOperation_TermEntry extends editor_Models_Te
         $existing = $this->findExisting($this->importObject, $payload);
 
         //nothing found, create a new one
-        if(is_null($existing)) {
+        if (is_null($existing)) {
             //create a new entry guid
             $this->importObject->entryGuid = ZfExtended_Utils::uuid();
             $this->model->init([
@@ -84,6 +87,7 @@ class editor_Models_Terminology_BulkOperation_TermEntry extends editor_Models_Te
 
             //add the newly stored element to the existing list
             $this->processOneExistingRow($this->importObject->id, $this->importObject);
+
             return;
         }
 

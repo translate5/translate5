@@ -1,30 +1,31 @@
 <?php
 /*
  START LICENSE AND COPYRIGHT
- 
+
  This file is part of translate5
- 
+
  Copyright (c) 2013 - 2017 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
- 
+
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
- 
+
  This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
  as published by the Free Software Foundation and appearing in the file agpl3-license.txt
  included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
- 
+
  There is a plugin exception available for use with this release of translate5 for
  translate5: Please see http://www.translate5.net/plugin-exception.txt or
  plugin-exception.txt in the root folder of translate5.
- 
+
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
  http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
- 
+
  END LICENSE AND COPYRIGHT
  */
+
 namespace Translate5\MaintenanceCli\Command;
 
 use editor_Models_Import_Worker_FinalStep;
@@ -38,9 +39,8 @@ use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Helper\TableSeparator;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\InputOption;
-
+use Symfony\Component\Console\Output\OutputInterface;
 
 //FIXME https://github.com/bamarni/symfony-console-autocomplete
 
@@ -48,7 +48,7 @@ class TaskInfoCommand extends Translate5AbstractCommand
 {
     protected const WORKER_SECTION_END = [
         editor_Models_Import_Worker_FinalStep::class,
-        editor_Task_Operation_FinishingWorker::class
+        editor_Task_Operation_FinishingWorker::class,
     ];
 
     // the name of the command (the part after "bin/console")
@@ -59,7 +59,7 @@ class TaskInfoCommand extends Translate5AbstractCommand
         $this
             // the short description shown while running "php bin/console list"
             ->setDescription('Queries the task table and provides a listing of all found tasks, '
-                .'or detailed information if found only a single task.')
+                . 'or detailed information if found only a single task.')
 
             // the full command description shown when running the command with
             // the "--help" option
@@ -69,7 +69,7 @@ class TaskInfoCommand extends Translate5AbstractCommand
             'identifier',
             InputArgument::REQUIRED,
             'Either a complete numeric task ID or External ID, '
-                .'or a part of the task GUID, the order number, the taskname.'
+                . 'or a part of the task GUID, the order number, the taskname.'
         );
 
         $this->addOption(
@@ -77,7 +77,7 @@ class TaskInfoCommand extends Translate5AbstractCommand
             'i',
             InputOption::VALUE_NONE,
             'Force to search the identifier only in the ID column '
-                .'(to prevent find tasks containing the ID in one of the other searched columns)'
+                . '(to prevent find tasks containing the ID in one of the other searched columns)'
         );
 
         $this->addOption(
@@ -86,8 +86,8 @@ class TaskInfoCommand extends Translate5AbstractCommand
             InputOption::VALUE_NONE,
             'Shows all data fields of the task (expect qmSubsegmentFlags) and task meta instead the overview'
         );
-
     }
+
     /**
      * Execute the command
      * {@inheritDoc}
@@ -97,9 +97,9 @@ class TaskInfoCommand extends Translate5AbstractCommand
     {
         $this->initInputOutput($input, $output);
         $this->initTranslate5AppOrTest();
-        
+
         $this->writeTitle('Task Information');
-        
+
         $task = new Task();
         $search = $input->getArgument('identifier');
         $s = $task->db->select()
@@ -109,47 +109,49 @@ class TaskInfoCommand extends Translate5AbstractCommand
                 'TaskGUID' => 'taskGuid',
                 'Order No.' => 'taskNr',
                 'Task name' => 'taskName',
-                'External ID' => 'foreignId'
+                'External ID' => 'foreignId',
             ])
             ->where('id = ?', $search);
-        if(empty($input->getOption('id-only'))) {
+        if (empty($input->getOption('id-only'))) {
             $s->orWhere('foreignId = ?', $search)
-            ->orWhere('taskGuid like ?', '%'.$search.'%')
-            ->orWhere('taskName like ?', '%'.$search.'%')
-            ->orWhere('taskNr like ?', '%'.$search.'%');
+                ->orWhere('taskGuid like ?', '%' . $search . '%')
+                ->orWhere('taskName like ?', '%' . $search . '%')
+                ->orWhere('taskNr like ?', '%' . $search . '%');
         }
         $allFound = $task->db->fetchAll($s);
         $tasks = $allFound->toArray();
         $taskCount = count($tasks);
-        if($taskCount === 0) {
+        if ($taskCount === 0) {
             $this->io->warning('No task(s) found matching the given identifier!');
+
             return 1;
         }
-        if($taskCount > 1) {
-                $this->writeTable($tasks);
+        if ($taskCount > 1) {
+            $this->writeTable($tasks);
+
             return 0;
         }
         $task->load($tasks[0]['ID']);
         $data = (array) $task->getDataObject();
         unset($data['qmSubsegmentFlags']);
-        if(empty($input->getOption('detail'))) {
+        if (empty($input->getOption('detail'))) {
             $this->writeTask($task);
-        }
-        else {
+        } else {
             $this->writeAssoc($data);
             $this->io->section('Meta Table:');
             $this->writeAssoc((array) $task->meta()->getDataObject());
         }
+
         return 0;
     }
 
-    public function writeTask (Task $task): void
+    public function writeTask(Task $task): void
     {
-        $lang = new editor_Models_Languages;
+        $lang = new editor_Models_Languages();
         $languages = array_column($lang->loadByIds([
             $task->getSourceLang(),
             $task->getTargetLang(),
-            $task->getRelaisLang()
+            $task->getRelaisLang(),
         ]), 'rfc5646', 'id');
         $data = [
             'ID' => $task->getId(),
@@ -198,11 +200,11 @@ class TaskInfoCommand extends Translate5AbstractCommand
         }
 
         $this->io->section('Last Log (Errors / Warnings)');
-        foreach($errors as $row) {
-            $this->io->text('  '.$row['created'].' '.
-                LogCommand::LEVELS[$row['level']].' <options=bold>'.$row['eventCode'].'</> '.
-                OutputFormatter::escape((string) $row['domain']).' → '.
-                OutputFormatter::escape((string)str_replace("\n", ' ', $row['message'])));
+        foreach ($errors as $row) {
+            $this->io->text('  ' . $row['created'] . ' ' .
+                LogCommand::LEVELS[$row['level']] . ' <options=bold>' . $row['eventCode'] . '</> ' .
+                OutputFormatter::escape((string) $row['domain']) . ' → ' .
+                OutputFormatter::escape((string) str_replace("\n", ' ', $row['message'])));
         }
     }
 
@@ -215,7 +217,7 @@ class TaskInfoCommand extends Translate5AbstractCommand
         $workerLog = array_reverse($events->getByTaskGuidAndEventCodes($task->getTaskGuid(), ['E1547']));
 
         if (empty($workerLog)) {
-           return;
+            return;
         }
 
         $this->io->section('Worker timings');
@@ -240,8 +242,9 @@ class TaskInfoCommand extends Translate5AbstractCommand
             try {
                 $extra = json_decode($item['extra'], flags: JSON_THROW_ON_ERROR);
             } catch (JsonException $e) {
-                $table->addRow([$item['state'], 'Can not decode extra data: '.$e->getMessage(), 0]);
+                $table->addRow([$item['state'], 'Can not decode extra data: ' . $e->getMessage(), 0]);
                 $idx++;
+
                 continue;
             }
             if ($idx === 0) {
@@ -258,7 +261,7 @@ class TaskInfoCommand extends Translate5AbstractCommand
                 $sum += $extra->duration,
                 $extra->state,
             ]);
-            if ((($idx+1) < $workerCount) && in_array($extra->worker, self::WORKER_SECTION_END)) {
+            if ((($idx + 1) < $workerCount) && in_array($extra->worker, self::WORKER_SECTION_END)) {
                 $sum = 0;
                 $table->addRow(new TableSeparator());
             }
@@ -268,13 +271,6 @@ class TaskInfoCommand extends Translate5AbstractCommand
         $table->render();
     }
 
-    /**
-     * @param mixed $extra
-     * @param Task $task
-     * @param Table $table
-     * @param int $sum
-     * @return int
-     */
     private function addGapRow(mixed $extra, Task $task, Table $table, int $sum): int
     {
         $gapDuration = strtotime($extra->start) - strtotime($task->getCreated());
@@ -289,6 +285,7 @@ class TaskInfoCommand extends Translate5AbstractCommand
             $sum += $gapDuration,
             $extra->state,
         ]);
+
         return $sum;
     }
 
@@ -311,11 +308,11 @@ class TaskInfoCommand extends Translate5AbstractCommand
         $projectEnd = null;
 
         $events = \ZfExtended_Factory::get(editor_Models_Logger_Task::class);
-        foreach($tasks as $task) {
+        foreach ($tasks as $task) {
             $startImport = null;
             $endImport = null;
             $workerLog = $events->getByTaskGuidAndEventCodes($task['taskGuid'], ['E1547']);
-            foreach($workerLog as $item) {
+            foreach ($workerLog as $item) {
                 try {
                     $extra = json_decode($item['extra'], flags: JSON_THROW_ON_ERROR);
                 } catch (JsonException) {
@@ -340,7 +337,6 @@ class TaskInfoCommand extends Translate5AbstractCommand
 
             $projectStart = min($projectStart, $startImport);
             $projectEnd = max($projectEnd, $endImport);
-
         }
 
         //project itself:

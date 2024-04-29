@@ -21,7 +21,7 @@ START LICENSE AND COPYRIGHT
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
@@ -33,8 +33,8 @@ namespace MittagQI\Translate5\Plugins\MatchAnalysis;
 use editor_Models_LanguageResources_LanguageResource as LanguageResource;
 use editor_Models_Task as Task;
 use editor_Services_Manager as Manager;
-use MittagQI\Translate5\PauseWorker\PauseWorkerProcessorInterface;
 use MittagQI\Translate5\PauseWorker\AbstractLanguageResourcesProcessor;
+use MittagQI\Translate5\PauseWorker\PauseWorkerProcessorInterface;
 use Zend_Config;
 use Zend_Registry;
 use ZfExtended_Factory;
@@ -57,7 +57,7 @@ class PauseMatchAnalysisProcessor extends AbstractLanguageResourcesProcessor imp
     {
         $languageResourceIds = array_column(
             ZfExtended_Factory::get(LanguageResource::class)
-            ->loadByAssociatedTaskGuidListAndServiceTypes([$task->getTaskGuid()], [Manager::SERVICE_OPENTM2]),
+                ->loadByAssociatedTaskGuidListAndServiceTypes([$task->getTaskGuid()], [Manager::SERVICE_OPENTM2]),
             'id'
         );
         $languageResourceIds = array_map('intval', $languageResourceIds);

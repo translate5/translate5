@@ -264,7 +264,7 @@ Ext.define('Editor.controller.Localizer', {
   	Editor.view.quality.FilterPanel.prototype.strings = {
 		modeAll: '<?php echo $this->translate->_('Alle zeigen');?>',
 		modeErrors: '<?php echo $this->translate->_('Nur Fehler');?>',
-		modeFalsePositives: '<?php echo $this->translate->_('Nur Falsch-Positive');?>',
+		modeFalsePositives: '<?php echo $this->translate->_('Nur ignorierte Fehler');?>',
 		incompleteCatCaption: '<?php echo $this->translate->_('Segmente unvollständig geprüft');?>',
 		incompleteCatText: '<?php echo $this->translate->_('Diese Kategorie wurde nicht oder nur unvollständig geprüft');?>',
 		startAnalysisHint: '<?php echo $this->translate->_('Bitte stoßen Sie unten eine neue Prüfung an um das Problem zu beheben');?>',
@@ -503,8 +503,9 @@ Ext.define('Editor.controller.Localizer', {
             "editorUnfinishAllTask":  {title: "<?php echo $this->translate->_('Aufgabe für alle Nutzer wieder öffnen?');?>", msg: "<?php echo $this->translate->_('Wollen Sie die Aufgabe wirklich für alle Benutzer wieder öffnen?');?>"},
             "editorEndTask":          {title: "<?php echo $this->translate->_('Aufgabe endgültig beenden?');?>", msg: "<?php echo $this->translate->_('Wollen Sie die Aufgabe wirklich für alle Benutzer endgültig beenden?');?>"},
             "editorReopenTask":       {title: "<?php echo $this->translate->_('Beendete Aufgabe wieder öffnen?');?>", msg: "<?php echo $this->translate->_('Wollen Sie die beendete Aufgabe wirklich wieder öffnen?');?>"},
-            "editorDeleteTask":       {title: `<?php echo $this->translate->_('Aufgabe "{0}" komplett löschen?');?>`, msg: "<?php echo $this->translate->_('Wollen Sie die Aufgabe wirklich komplett und unwiderruflich löschen?');?>"}
-        }
+            "editorDeleteTask":       {title: `<?php echo $this->translate->_('Aufgabe "{0}" komplett löschen?');?>`, msg: "<?php echo $this->translate->_('Wollen Sie die Aufgabe wirklich komplett und unwiderruflich löschen?');?>"},
+            "editorImportTask":       {title: "<?= $this->translate->_('Bestätigen Sie den Aufgabenimport');?>", msg: "<?= $this->translate->_('Wollen Sie die Aufgabe wirklich komplett und unwiderruflich löschen?');?>"}
+    }
     });
 
     Ext.define("Editor.locale.de.view.admin.TaskGrid", {
@@ -1745,8 +1746,7 @@ Ext.define('Editor.controller.Localizer', {
             importing: '<?php echo $this->translate->_('Die Sprachressource {0} wird gerade importiert. Bitte warten Sie, bis der Import abgeschlossen ist.');?>',
             beingTrained: '<?php echo $this->translate->_('Die Sprachressource {0} wird gerade trainiert. Bitte warten Sie, bis das Training abgeschlossen ist.');?>',
             deletionForbidden: '<?php echo $this->translate->_('Sie sind nicht berechtigt, diese Sprachressource zu entfernen.');?>',
-            error: '<?php echo $this->translate->_('Fehler');?>'
-        }
+            error: '<?php echo $this->translate->_('Fehler');?>'}
     });
 
     Ext.define("Editor.locale.view.LanguageResources.AddTmWindow", {
@@ -1755,7 +1755,7 @@ Ext.define('Editor.controller.Localizer', {
             add: '<?php echo $this->translate->_('Sprachressource hinzufügen');?>',
             resource: '<?php echo $this->translate->_('Ressource');?>',
             name: '<?php echo $this->translate->_('Name');?>',
-            file: '<?php echo $this->translate->_('TM/TMX-Datei (optional)');?>',
+            file: '<?php echo $this->translate->_('ZIP/TM/TMX-Datei (optional)');?>',
             importTmxType: '<?php echo $this->translate->_('Bitte verwenden Sie eine TM oder TMX Datei!');?>',
             color: '<?php echo $this->translate->_('Farbe');?>',
             categories: '<?php echo $this->translate->_('Kategorien');?>',
@@ -1772,7 +1772,9 @@ Ext.define('Editor.controller.Localizer', {
             writeAsDefaultTooltip: '<?php echo $this->translate->_('Standardmäßig wird bei neuen Aufgaben für die gewählten Kunden gesetzt, dass Segmente beim Segment speichern in die Sprachresource geschrieben werden');?>',
             collectionUploadTooltip: '<?php echo $this->translate->_('Erlaubte Dateiformate: TBX oder eine Zip-Datei, die eine oder mehrere TBX-Dateien enthält.');?>',
             pivotAsDefault: '<?php echo $this->translate->_('Standardmäßig als Pivot verwenden');?>',
-            pivotAsDefaultTooltip: '<?php echo $this->translate->_('Standardmäßig als Pivot verwenden');?>'
+            pivotAsDefaultTooltip: '<?php echo $this->translate->_('Standardmäßig als Pivot verwenden');?>',
+            stripFramingTags: '<?php echo $this->translate->_('Umschließende Tags beim Import löschen');?>',
+            stripFramingTagsTooltip: '<?php echo $this->translate->_('Arbeitet analog zur Systemkonfiguration runtimeOptions.import.xlf.ignoreFramingTags, aber für TMX-Import. Sie entfernt alle (oder nur gepaarte) Tags vom Anfang und Ende eines importierten Segments, falls aktiviert. Die Systemkonfiguration sollte daher für denselben Kunden die gleiche Einstellung für zu importierende Aufgaben haben. Wenn Sie bestehende TMs konvertieren müssen, bitten Sie den translate5-Support um Hilfe.');?>'
         }
     });
 
@@ -1849,7 +1851,8 @@ Ext.define('Editor.controller.Localizer', {
             groupHeader: '<?php echo $this->translate->_('Ressource: {name}');?>',
             groupHeader: '<?php echo $this->translate->_('Ressource: {name}');?>',
             specificDataText: '<?php echo $this->translate->_('Zusätzliche Infos');?>',
-            pivotAsDefault: '<?php echo $this->translate->_('Standardmäßig als Pivot verwenden');?>'
+            pivotAsDefault: '<?php echo $this->translate->_('Standardmäßig als Pivot verwenden');?>',
+            tmNotConverted: '<?php echo $this->translate->_('Die Regeln für die Erkennung von Inhalten haben sich für diese Sprachressource geändert, sie sollte konvertiert werden.');?>'
         }
     });
 
@@ -1891,7 +1894,9 @@ Ext.define('Editor.controller.Localizer', {
             importTmxType: '<?php echo $this->translate->_('Bitte verwenden Sie eine TMX Datei!');?>',
             importSuccess: '<?php echo $this->translate->_('Weitere TM Daten erfolgreich importiert!');?>',
             save: '<?php echo $this->translate->_('Speichern');?>',
-            cancel: '<?php echo $this->translate->_('Abbrechen');?>'
+            cancel: '<?php echo $this->translate->_('Abbrechen');?>',
+            stripFramingTags: '<?php echo $this->translate->_('Umschließende Tags beim Import löschen');?>',
+            stripFramingTagsTooltip: '<?php echo $this->translate->_('Arbeitet analog zur Systemkonfiguration runtimeOptions.import.xlf.ignoreFramingTags, aber für TMX-Import. Sie entfernt alle (oder nur gepaarte) Tags vom Anfang und Ende eines importierten Segments, falls aktiviert. Die Systemkonfiguration sollte daher für denselben Kunden die gleiche Einstellung für zu importierende Aufgaben haben. Wenn Sie bestehende TMs konvertieren müssen, bitten Sie den translate5-Support um Hilfe.');?>'
         }
     });
 
@@ -1927,7 +1932,11 @@ Ext.define('Editor.controller.Localizer', {
             reimportUserSaved: '<?php echo $this->translate->_('Benutzer-gespeicherte Segmente im TM speichern');?>',
             reimportAllTooltip: '<?php echo $this->translate->_('Speichert alle Segmente aller Aufgaben, die oben angehakt sind und dem TM mit Schreibrechten zugewiesen sind');?>',
             reimportUserSavedTooltip: '<?php echo $this->translate->_('Speichert nur die Abschnitte, die zuvor von einem Benutzer manuell gespeichert wurden. Dies gilt für alle Aufgaben, die oben angehakt sind und dem TM mit Schreibrechten zugewiesen sind');?>',
-            gotoTask: '<?php echo $this->translate->_('zur Aufgabe springen');?>'
+            gotoTask: '<?php echo $this->translate->_('zur Aufgabe springen');?>',
+            timeOption: '<?php echo $this->translate->_('Zeitoption');?>',
+            currentTime: '<?php echo $this->translate->_('Aktueller Zeitpunkt');?>',
+            segmentSaveTime: '<?php echo $this->translate->_('Zeitpunkt der Segmentspeicherung');?>',
+            timeOptionTooltip: '<?php echo $this->translate->_('Als Datum und Uhrzeit des erzeugten TM-Eintrags wird bei "Zeitpunkt der Segmentspeicherung" das Datum verwendet, an dem er letzte Benutzer das Segment in der Aufgabe gespeichert hat. Andernfalls wird der Zeitpunkt verwendet, an dem die Aufgabe neu ins TM durchgespeichert wird');?>',
         }
     });
 
@@ -2203,28 +2212,26 @@ Editor.data.l10n = {
         metaStates_tooltip_nokey: '<?php echo $this->translate->_('Segment auf den ausgewählten Status setzen');?>'
     },
     falsePositives: {
-        hover: "<?php echo $this->translate->_('Rechts klicken um als \'falsch erkannt\' zu markieren')?>",
+        hover: "<?php echo $this->translate->_('Rechtsklick um Fehler zu ignorieren')?>",
         legend: {
-            fixed: '<?php echo $this->translate->_('Falsch erkannte Fehler?')?>',
-            float: '<?php echo $this->translate->_('Ein falsch erkannter Fehler?')?>'
+            fixed: '<?php echo $this->translate->_('Fehler ignorieren')?>',
+            float: '<?php echo $this->translate->_('Fehler ignorieren?')?>'
         },
         close: '<?php echo $this->translate->_('Schließen');?>',
         spreaded: '<?php echo $this->translate->_('Diesen Status für alle Ereignisse innerhalb dieser Aufgabe verteilt');?>',
         window: {
             tooltip: '<?php echo join('. <br/>', [
-                    $this->translate->_('Ein Klick auf die Check-Box markiert den aktuellen Fehler als "falschen Fehler"'),
-                    $this->translate->_('Ein Klick auf die Zahl rechts markiert alle identischen Fehler als "falsche Fehler"'),
-                    $this->translate->_('Tastatur-Shortcut siehe Tooltip rechte Spalte "Qualitätssicherung"'),
+                    $this->translate->_('Anhaken der Check-box ignoriert den Fehler.'),
+                    $this->translate->_('Klick auf die Zahl rechts ignoriert alle identischen Fehler.'),
+                    $this->translate->_('Tastaturkürzel siehe Tooltip rechte Spalte "Qualitätssicherung".'),
             ])?>'
         },
         grid: {
             falsePositive: '<?php echo $this->translate->_('Ja');?>',
             text: '<?php echo $this->translate->_('Qualität');?>',
             emptyText: '<?php echo $this->translate->_('Ladequalität..');?>',
-            similarQty: {
-                tooltip: '<?php echo $this->translate->_('Anzahl aller Vorkommen eines solchen Paares [Qualität - Inhalt], die in dieser Aufgabe gefunden wurden');?>',
-                button: '<?php echo $this->translate->_('Alle identischen Fehler ebenfalls als falsche Fehler markieren.');?>'
-            }
+            rowTip: '<?php echo $this->translate->_('Klick auf die Zahl rechts ignoriert alle identischen Fehler.');?>',
+            similarQtyColTip: '<?php echo $this->translate->_('Anzahl aller Vorkommen eines solchen Paares [Qualität - Inhalt], die in dieser Aufgabe gefunden wurden');?>'
         }
     },
     projectOverview:{
@@ -2359,10 +2366,66 @@ Editor.data.l10n = {
         copy_and_close_btn: '<?= $this->translate->_('App-Token kopieren') ?>',
         token_created_message: '<?= $this->translate->_('Der Zugriffstoken wird nur einmal angezeigt. Sie werden nicht gespeichert und können nicht abgerufen werden. Stellen Sie sicher, dass Sie es an einem sicheren Ort aufbewahren.<br/><br/><b>{0}</b>') ?>'
     },
+    contentProtection: {
+        title: '<?= $this->translate->_('Nummernschutz') ?>',
+        confirm_deletion_title: '<?= $this->translate->_('Löschung bestätigen') ?>',
+        tm_not_converted: '<?= $this->translate->_('Die Regeln für die Erkennung von Inhalten haben sich für diese Sprachressource geändert, sie sollte konvertiert werden.');?>',
+        tm_conversion_in_progress: '<?= $this->translate->_('Konvertierung läuft') ?>',
+        convert_tms: '<?= $this->translate->_('Alle konvertieren') ?>',
+        show_only_not_converted: '<?= $this->translate->_('Nur nicht konvertiert anzeigen') ?>',
+        conversionStarted: '<?= $this->translate->_('Konvertierung gestarted'); ?>',
+        conversionConfirm: '<?= $this->translate->_('Konvertierung starten'); ?>',
+        conversionConfirmText: '<?= $this->translate->_('Warning: Conversion may lead to the loss of TM matches'); ?>',
+        contentRecognition: {
+            title: '<?= $this->translate->_('Nummernerkennung') ?>',
+            infobox: '<?= $this->translate->_('Content Recognition Rules tab info box') ?>',
+            create_title: '<?= $this->translate->_('Nummernerkennung erstellen') ?>',
+            confirm_deletion_message: '<?= $this->translate->_('Sind Sie sicher, dass Sie die Nummernerkennung löschen möchten?') ?>',
+            matchId: '<?= $this->translate->_('Geschützte Regex-Gruppe') ?>',
+            matchIdQTip: '<?= $this->translate->_('Protected regex group qtip') ?>',
+            formatExampleRender: '<?= $this->translate->_('Format-Rendering-Beispiel') ?>',
+            confirm_enable_title: '<?= $this->translate->_('Bestätigung erforderlich') ?>',
+            confirm_enable_message: '<?= $this->translate->_('Die Aktivierung/Deaktivierung von Regeln kann in neuen Projekten zum Verlust von 100%-Matches führen, wenn Sie die betroffenen Sprachressourcen nicht konvertieren.') ?>'
+        },
+        mapping: {
+            input: {
+                confirm_add_title: '<?= $this->translate->_('Bestätigen Sie die Regelaktivierung') ?>',
+                confirm_add_message: '<?= $this->translate->_('Das Aktivieren von Input-Regeln kann in neuen Projekten zum Verlust von 100%-Matches führen, wenn Sie die betroffenen Sprachressourcen nicht konvertieren.') ?>'
+            },
+            output: {
+                confirm_add_title: '<?= $this->translate->_('Bestätigen Sie die Regelaktivierung') ?>',
+                confirm_add_message: '<?= $this->translate->_('Das Aktivieren von Output-Regeln kann in neuen Projekten zum Verlust von 100%-Matches führen, wenn Sie die betroffenen Sprachressourcen nicht konvertieren.') ?>'
+            },
+            rule_name: '<?= $this->translate->_('Regelname') ?>',
+            rule_description: '<?= $this->translate->_('Regelbeschreibung') ?>',
+            input_rule_name: '<?= $this->translate->_('Name der Eingaberegel') ?>',
+            input_rule_description: '<?= $this->translate->_('Beschreibung der Eingaberegel') ?>',
+            input_title: '<?= $this->translate->_('Eingabezuordnung') ?>',
+            input_infobox: '<?= $this->translate->_('Active Input Rules tab info box') ?>',
+            output_rule_name: '<?= $this->translate->_('Name der Ausgaberegel') ?>',
+            output_rule_description: '<?= $this->translate->_('Beschreibung der Ausgaberegel') ?>',
+            output_title: '<?= $this->translate->_('Ausgabezuordnung') ?>',
+            output_infobox: '<?= $this->translate->_('Active Output Rules tab info box') ?>',
+            output_format: '<?= $this->translate->_('Ausgabeformat') ?>',
+            create_title: '<?= $this->translate->_('Zuordnung erstellen') ?>',
+            confirm_deletion_message: '<?= $this->translate->_('Sind Sie sicher, dass Sie die Zuordnung löschen möchten?') ?>'
+        }
+    },
     general: {
         useForSearch: '<?= $this->translate->_('Bei der Suche verwenden');?>',
         description: '<?= $this->translate->_('Beschreibung') ?>',
-        creation_date: '<?= $this->translate->_('Erstellungsdatum') ?>'
+        creation_date: '<?= $this->translate->_('Erstellungsdatum') ?>',
+        language: '<?= $this->translate->_('Sprache') ?>',
+        name: '<?= $this->translate->_('Name') ?>',
+        type: '<?= $this->translate->_('Typ');?>',
+        format: '<?= $this->translate->_('Format') ?>',
+        priority: '<?= $this->translate->_('Priorität') ?>',
+        keepAsIs: '<?= $this->translate->_('Unverändert übernehmen') ?>',
+        regex: '<?= $this->translate->_('Regulärer Ausdruck') ?>',
+        enabled: '<?= $this->translate->_('Aktiviert') ?>',
+        showDefault: '<?= $this->translate->_('Defaults anzeigen') ?>',
+        hideDefault: '<?= $this->translate->_('Defaults ausblenden') ?>',
+        showAll: '<?= $this->translate->_('Zeige alles') ?>'
     },
     helpButton: {
         tooltip: '<?= $this->translate->_('Tutorial-Videos aufrufen') ?>'

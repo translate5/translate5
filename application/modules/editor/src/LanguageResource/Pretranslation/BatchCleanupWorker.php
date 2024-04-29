@@ -13,48 +13,46 @@ use ZfExtended_Factory;
  */
 class BatchCleanupWorker extends editor_Models_Task_AbstractWorker
 {
-
     /***
      * @param $parameters
      * @return bool
      */
-    protected function validateParameters($parameters = array()): bool
+    protected function validateParameters($parameters = []): bool
     {
         $neededEntries = ['taskGuid'];
         $foundEntries = array_keys($parameters);
         $keyDiff = array_diff($neededEntries, $foundEntries);
+
         //if there is not keyDiff all needed were found
         return empty($keyDiff);
     }
 
     protected function work()
     {
-
         $resources = [];
 
-        /** @var TaskAssociation $taskAssociation */
         $taskAssociation = ZfExtended_Factory::get(TaskAssociation::class);
         $result = $taskAssociation->loadByTaskGuids($this->taskGuid);
 
-        if(!empty($result)){
-            $resources = array_column($result,'languageResourceId');
+        if (! empty($result)) {
+            $resources = array_column($result, 'languageResourceId');
         }
 
-        /** @var TaskPivotAssociation  $taskPivotAssociation  */
         $taskPivotAssociation = ZfExtended_Factory::get(TaskPivotAssociation::class);
         $result = $taskPivotAssociation->loadTaskAssociated($this->taskGuid);
 
-        if(!empty($result)){
-            $resources = array_merge($resources,array_column($result,'languageResourceId'));
+        if (! empty($result)) {
+            $resources = array_merge($resources, array_column($result, 'languageResourceId'));
         }
 
         $resources = array_unique($resources);
 
-        /** @var BatchResult $batchResult */
         $batchResult = ZfExtended_Factory::get(BatchResult::class);
-        $batchResult->deleteForLanguageresource($resources);
+        $batchResult->deleteForLanguageresource(
+            $resources,
+            $this->taskGuid
+        );
 
         return true;
     }
-
 }

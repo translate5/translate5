@@ -3,25 +3,25 @@
 START LICENSE AND COPYRIGHT
 
  This file is part of translate5
- 
+
  Copyright (c) 2013 - 2021 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
 
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
  This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
- as published by the Free Software Foundation and appearing in the file agpl3-license.txt 
- included in the packaging of this file.  Please review the following information 
+ as published by the Free Software Foundation and appearing in the file agpl3-license.txt
+ included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
-  
+
  There is a plugin exception available for use with this release of translate5 for
- translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or
  plugin-exception.txt in the root folder of translate5.
-  
+
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
@@ -34,21 +34,17 @@ use PhpOffice\PhpSpreadsheet\Style\Alignment;
 /**
  * Export the whole task as an Excel-file
  */
-class editor_Models_Export_TaskHistoryExcel {
-    /**
-     * @var Spreadsheet
-     */
+class editor_Models_Export_TaskHistoryExcel
+{
     protected Spreadsheet $excel;
-    
-    /**
-     * @var editor_Models_Task
-     */
+
     protected editor_Models_Task $task;
 
     /**
      * @var editor_Models_LanguageResources_LanguageResource[]
      */
     protected array $languageResourceCache = [];
+
     private editor_Workflow_Default $workflow;
 
     /**
@@ -59,7 +55,8 @@ class editor_Models_Export_TaskHistoryExcel {
     /**
      * @throws \PhpOffice\PhpSpreadsheet\Exception
      */
-    public function __construct(editor_Models_Task $task) {
+    public function __construct(editor_Models_Task $task)
+    {
         $this->task = $task;
         $this->workflow = $this->task->getTaskActiveWorkflow();
         $this->toBeUsedSteps = $this->workflow->getStepChain();
@@ -72,7 +69,8 @@ class editor_Models_Export_TaskHistoryExcel {
     /**
      * @throws \PhpOffice\PhpSpreadsheet\Exception
      */
-    private function initExcel() {
+    private function initExcel()
+    {
         $this->excel = new Spreadsheet();
 
         //default format
@@ -82,7 +80,7 @@ class editor_Models_Export_TaskHistoryExcel {
             // text-align: left;
             ->setHorizontal(Alignment::HORIZONTAL_LEFT)
             // auto-wrap text to new line;
-            ->setWrapText(TRUE);
+            ->setWrapText(true);
 
         $sheet = $this->excel->getActiveSheet();
         $sheet->setTitle('task history');
@@ -108,18 +106,17 @@ class editor_Models_Export_TaskHistoryExcel {
 
         $col = 'E';
         $idx = 1;
-        foreach($this->toBeUsedSteps as $step) {
-            if($step == $this->workflow::STEP_NO_WORKFLOW) {
+        foreach ($this->toBeUsedSteps as $step) {
+            if ($step == $this->workflow::STEP_NO_WORKFLOW) {
                 $step = 'Pretranslation';
-            }
-            else {
-                $step = ($idx++).'. '.$step;
+            } else {
+                $step = ($idx++) . '. ' . $step;
             }
             $sheet->getColumnDimension($col)->setWidth(50);
-            $sheet->setCellValue($col.'1', $step);
+            $sheet->setCellValue($col . '1', $step);
             $col++;
         }
-        $sheet->getStyle('A1:'.$col.'1')->getFont()->setBold(TRUE);
+        $sheet->getStyle('A1:' . $col . '1')->getFont()->setBold(true);
     }
 
     /**
@@ -127,7 +124,8 @@ class editor_Models_Export_TaskHistoryExcel {
      * @param string $fileName where the XLS should go to
      * @throws \PhpOffice\PhpSpreadsheet\Writer\Exception
      */
-    protected function export(string $fileName): void {
+    protected function export(string $fileName): void
+    {
         // task view must exist
         $this->task->createMaterializedView();
 
@@ -141,13 +139,13 @@ class editor_Models_Export_TaskHistoryExcel {
 
         $sheet = $this->excel->getActiveSheet();
 
-        $setString = function(int $col, int $row, string $content) use($sheet) {
+        $setString = function (int $col, int $row, string $content) use ($sheet) {
             $sheet->setCellValueExplicitByColumnAndRow($col, $row, $content, DataType::TYPE_STRING);
         };
 
         // write the segments into the excel
         $row = 2; //row 1 = headlines
-        foreach($segments as $segment) {
+        foreach ($segments as $segment) {
             $col = 1;
             // First column: Segment number → as implemented
             $sheet->setCellValueByColumnAndRow($col++, $row, $segment->getSegmentNrInTask());
@@ -155,11 +153,10 @@ class editor_Models_Export_TaskHistoryExcel {
             // Second column: Language Resource resource_id  used for pre-translation (editor_Services_Deepl_1, editor_Services_t5memory_1, etc.)
             // Third column: Language Resource name (name given by the PM, when creating the language resource)
             $uuid = $segment->meta()->getPreTransLangResUuid();
-            if(is_null($uuid)) {
+            if (is_null($uuid)) {
                 $setString($col++, $row, 'Not pre-translated');
                 $setString($col++, $row, 'Not pre-translated');
-            }
-            else {
+            } else {
                 $langRes = $this->getLanguageResource($uuid);
                 $setString($col++, $row, $langRes->getResourceId());
                 $setString($col++, $row, $langRes->getName());
@@ -168,13 +165,12 @@ class editor_Models_Export_TaskHistoryExcel {
             // Fifth column: Source
             $setString($col++, $row, $internalTag->toExcel($segment->getSource()));
 
-
             // Sixth column: pre-translated target
             // Seventh column: target at end of first workflow step
             // Eighth column: target at end of second workflow step and so
             // this is calculated by getTargetsByStep
             $targets = $this->getTargetsByStep($segment);
-            foreach($targets as $target) {
+            foreach ($targets as $target) {
                 $setString($col++, $row, $internalTag->toExcel($target['target'] ?? ''));
             }
 
@@ -185,7 +181,8 @@ class editor_Models_Export_TaskHistoryExcel {
         $writer->save($fileName);
     }
 
-    protected function getTargetsByStep(editor_Models_Segment $segment): array {
+    protected function getTargetsByStep(editor_Models_Segment $segment): array
+    {
         $history = ZfExtended_Factory::get('editor_Models_SegmentHistory');
         /* @var $history editor_Models_SegmentHistory */
         $historyEntries = array_reverse($history->loadBySegmentId($segment->getId()));
@@ -198,12 +195,11 @@ class editor_Models_Export_TaskHistoryExcel {
 
         //unify history entries and current active segment content into $segmentData array
         $segmentData = [];
-        foreach($historyEntries as $entry) {
-            if(isset($historyDataEntries[$entry['id']])) {
+        foreach ($historyEntries as $entry) {
+            if (isset($historyDataEntries[$entry['id']])) {
                 $target = $historyDataEntries[$entry['id']];
                 $target = strlen($target['edited']) > 0 ? $target['edited'] : $target['original'];
-            }
-            else {
+            } else {
                 $target = '';
             }
 
@@ -232,21 +228,23 @@ class editor_Models_Export_TaskHistoryExcel {
         // since the first is always "no workflow" used for pretranslations here (which is the fallback).
         $lastUsedStep = $this->toBeUsedSteps[1] ?? $this->toBeUsedSteps[0];
 
-        foreach($segmentData as $entry) {
+        foreach ($segmentData as $entry) {
             //untranslated entries are ignored (so in excel they occur as empty string)
-            if($entry['autoStateId'] == editor_Models_Segment_AutoStates::NOT_TRANSLATED) {
+            if ($entry['autoStateId'] == editor_Models_Segment_AutoStates::NOT_TRANSLATED) {
                 continue;
             }
             //all pretranslated stuff is collected in "no workflow" since this is the first step in chain by definition
-            if((int) $entry['pretrans'] >= $segment::PRETRANS_INITIAL && empty($entry['workflowStep'])) {
+            if ((int) $entry['pretrans'] >= $segment::PRETRANS_INITIAL && empty($entry['workflowStep'])) {
                 $result[$this->workflow::STEP_NO_WORKFLOW] = $entry;
+
                 continue;
             }
 
             //if the entry does not belong to the workflow chain (like PM Check),
             // we assume it to belong to the last used one of the previous valid step:
-            if(!array_key_exists($entry['workflowStep'], $result)) {
+            if (! array_key_exists($entry['workflowStep'], $result)) {
                 $result[$lastUsedStep] = $entry;
+
                 continue;
             }
 
@@ -260,16 +258,15 @@ class editor_Models_Export_TaskHistoryExcel {
 
     /**
      * returns the language resource with the given uuid, returns a "not found" lang res if nothing found with that uuid
-     * @param string $uuid
-     * @return editor_Models_LanguageResources_LanguageResource
      */
     protected function getLanguageResource(string $uuid): editor_Models_LanguageResources_LanguageResource
     {
-        if(!empty($this->languageResourceCache[$uuid])) {
+        if (! empty($this->languageResourceCache[$uuid])) {
             return $this->languageResourceCache[$uuid];
         }
         /** @var editor_Models_LanguageResources_LanguageResource $langRes */
         $langRes = ZfExtended_Factory::get('editor_Models_LanguageResources_LanguageResource');
+
         try {
             $langRes->loadByUuid($uuid);
         } catch (ZfExtended_Models_Entity_NotFoundException) {
@@ -283,11 +280,12 @@ class editor_Models_Export_TaskHistoryExcel {
     /**
      * export xls from stored task, returns true if file was created
      * @param string $fileName where the XLS should go to
-     * @return bool
      * @throws \PhpOffice\PhpSpreadsheet\Writer\Exception
      */
-    public function exportAsFile(string $fileName): bool {
+    public function exportAsFile(string $fileName): bool
+    {
         $this->export($fileName);
+
         return true;
     }
 
@@ -295,9 +293,10 @@ class editor_Models_Export_TaskHistoryExcel {
      * provides the excel as download to the browser
      * @throws \PhpOffice\PhpSpreadsheet\Writer\Exception|ZfExtended_NoAccessException
      */
-    public function exportAsDownload(): void {
+    public function exportAsDownload(): void
+    {
         // output: first send headers
-        if(!$this->exportAsFile('php://output')) {
+        if (! $this->exportAsFile('php://output')) {
             throw new ZfExtended_NoAccessException('Task is in use by another user!');
         }
         Header::sendDownload(

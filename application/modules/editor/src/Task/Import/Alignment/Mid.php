@@ -21,7 +21,7 @@ START LICENSE AND COPYRIGHT
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
@@ -32,22 +32,14 @@ use editor_Models_Import_FileParser;
 use editor_Models_Segment;
 use ZfExtended_Models_Entity_NotFoundException;
 
-/**
- *
- */
 class Mid extends AlignmentAbstract
 {
-
-    /**
-     * @param editor_Models_Import_FileParser $parser
-     * @return editor_Models_Segment|null
-     */
     public function findSegment(editor_Models_Import_FileParser $parser): ?editor_Models_Segment
     {
         $this->initSegment($parser->getTask()->getTaskGuid());
         $mid = $parser->getMid();
-        try {
 
+        try {
             $this->getSegment()->loadByFileidMid($parser->getFileId(), $mid);
         } catch (ZfExtended_Models_Entity_NotFoundException $e) {
             $this->addError(new Error(
@@ -55,8 +47,10 @@ class Mid extends AlignmentAbstract
                 'Reimport Segment processor: No matching segment was found for the given mid.',
                 [$mid]
             ));
+
             return null;
         }
+
         return $this->getSegment();
     }
 }

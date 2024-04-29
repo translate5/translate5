@@ -21,7 +21,7 @@ START LICENSE AND COPYRIGHT
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
@@ -43,10 +43,7 @@ use ZipArchive;
 class TaskArchiveUpdater
 {
     /**
-     * @param editor_Models_Task $task
      * @param FileDto[] $fileToUpdate
-     * @return bool
-     *
      */
     public function updateFiles(editor_Models_Task $task, array $fileToUpdate): bool
     {
@@ -54,7 +51,7 @@ class TaskArchiveUpdater
         $origName = editor_Models_Import_DataProvider_Abstract::TASK_ARCHIV_ZIP_NAME;
 
         $originalArchiveName = $task->getAbsoluteTaskDataPath() . '/' . $origName;
-        if (!file_exists($originalArchiveName) || !is_writable($task->getAbsoluteTaskDataPath())) {
+        if (! file_exists($originalArchiveName) || ! is_writable($task->getAbsoluteTaskDataPath())) {
             return false;
         }
 
@@ -64,7 +61,7 @@ class TaskArchiveUpdater
 
         foreach ($fileToUpdate as $fileDto) {
             if (is_null($fileDto->reimportFile)) {
-               continue; //if there is no matching file, we can not store it in archive
+                continue; //if there is no matching file, we can not store it in archive
             }
             $zipIndex = $zip->locateName($fileDto->filteredFilePath);
             if ($zipIndex === false) {

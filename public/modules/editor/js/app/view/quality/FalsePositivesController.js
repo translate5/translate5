@@ -256,9 +256,17 @@ Ext.define('Editor.view.quality.FalsePositivesController', {
 
         // Apply qtip for record if we're NOT inside floating false-positives panel
         if (!view.up('falsePositives[floating]')) {
+
+            // Get tip
+            var tip = Ext.htmlEncode(Editor.data.l10n.falsePositives.grid.rowTip);
+
+            // Prepend keyboard shortcut
             if (rowIndex < 10) {
-                meta.tdAttr = 'data-qtip="Ctrl + Alt + ' + (rowIndex === 9 ? 0 : rowIndex + 1) + '"';
+                tip = 'Ctrl + Alt + ' + (rowIndex === 9 ? 0 : rowIndex + 1) + '. ' + tip;
             }
+
+            // Setup data-qtip attribute
+            meta.tdAttr = 'data-qtip="' + tip + '"';
         }
 
         // Prepare css class for no content

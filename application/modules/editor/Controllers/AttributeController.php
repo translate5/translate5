@@ -21,18 +21,15 @@ START LICENSE AND COPYRIGHT
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
-use editor_Models_Terminology_Models_TermModel as TermModel;
-use editor_Models_Terminology_Models_AttributeModel as AttributeModel;
 use editor_Models_TermCollection_TermCollection as TermCollection;
+use editor_Models_Terminology_Models_AttributeModel as AttributeModel;
+use editor_Models_Terminology_Models_TermModel as TermModel;
 use MittagQI\ZfExtended\MismatchException;
 
-/**
- *
- */
 class editor_AttributeController extends ZfExtended_RestController
 {
     /**
@@ -52,8 +49,6 @@ class editor_AttributeController extends ZfExtended_RestController
 
     /**
      * Collections, allowed for current user
-     *
-     * @var
      */
     protected $collectionIds = false;
 
@@ -66,8 +61,6 @@ class editor_AttributeController extends ZfExtended_RestController
 
     /**
      * Responses collected during batch-editing mode
-     *
-     * @var
      */
     public $responseA = [];
 
@@ -88,8 +81,8 @@ class editor_AttributeController extends ZfExtended_RestController
     /**
      * @throws Zend_Session_Exception
      */
-    public function init() {
-
+    public function init()
+    {
         // Call parent
         parent::init();
 
@@ -105,19 +98,14 @@ class editor_AttributeController extends ZfExtended_RestController
                 ?: $termCollection->getAccessibleCollectionIds(ZfExtended_Authentication::getInstance()->getUser());
     }
 
-    /**
-     *
-     */
     public function indexAction()
     {
         // Term attributes are currently not listable via REST API
         throw new BadMethodCallException();
     }
 
-    /**
-     *
-     */
-    public function getAction() {
+    public function getAction()
+    {
         throw new BadMethodCallException();
     }
 
@@ -128,16 +116,15 @@ class editor_AttributeController extends ZfExtended_RestController
      *
      * @return array
      */
-    private function _termIds() {
-
+    private function _termIds()
+    {
         // Get termId-param from request
         $termIdA = array_unique(editor_Utils::ar($this->getParam('termId')));
 
         // If except-param is given as true
         if ($this->getParam('except')) {
-
             // If $_SESSION['lastParams'] is not set - flush error msg
-            if (!isset($_SESSION['lastParams'])) {
+            if (! isset($_SESSION['lastParams'])) {
                 $this->jflush(false, 'Your should run search at least once');
             }
 
@@ -147,13 +134,15 @@ class editor_AttributeController extends ZfExtended_RestController
             // Fetch ids of ALL terms matching last search, excluding ids given by 'except'-param
             $termIdA = ZfExtended_Factory
                 ::get(TermModel::class)
-                ->searchTermByParams(
-                    $_SESSION['lastParams'] + ['except' => join(',', $termIdA)],
-                    $total
-                );
+                    ->searchTermByParams(
+                        $_SESSION['lastParams'] + [
+                            'except' => join(',', $termIdA),
+                        ],
+                        $total
+                    );
 
             // If nothing found - flush error msg
-            if (!$termIdA) {
+            if (! $termIdA) {
                 $this->jflush(false, 'Nothing to edit');
             }
         }
@@ -168,29 +157,29 @@ class editor_AttributeController extends ZfExtended_RestController
      * @throws Zend_Db_Statement_Exception
      * @throws MismatchException
      */
-    public function postAction() {
-
+    public function postAction()
+    {
         // Shortcut
         $dataType = $this->getParam('dataType');
 
         // Validate termId-param and also validate dataType-param and load it's model instance
         $_ = $this->jcheck([
             'termId' => [
-                'req' => !$this->getParam('batch'),
-                'rex' => $this->getParam('batch') ? 'int11list' : 'int11'
+                'req' => ! $this->getParam('batch'),
+                'rex' => $this->getParam('batch') ? 'int11list' : 'int11',
             ],
             'level' => [
                 'req' => true,
-                'fis' => 'entry,language,term'
+                'fis' => 'entry,language,term',
             ],
             'dataType' => [
                 'req' => true,
                 'rex' => is_numeric($dataType) ? 'int11' : '~^[a-zA-Z_]+$~',
-                'key' => 'editor_Models_Terminology_Models_AttributeDataType.' . (is_numeric($dataType) ? 'id' : 'type')
+                'key' => 'editor_Models_Terminology_Models_AttributeDataType.' . (is_numeric($dataType) ? 'id' : 'type'),
             ],
             'batch,except' => [
-                'rex' => 'bool'
-            ]
+                'rex' => 'bool',
+            ],
         ]);
 
         // Set 'level' prop inside $_ to be passed further
@@ -199,8 +188,8 @@ class editor_AttributeController extends ZfExtended_RestController
         // Check that the level we're going to create attr at is allowed for that attr datatype
         $this->jcheck([
             'level' => [
-                'fis' => $_['dataType']->getLevel() // FIND_IN_SET
-            ]
+                'fis' => $_['dataType']->getLevel(), // FIND_IN_SET
+            ],
         ], $_);
 
         // Detect whether we're in batch mode
@@ -208,10 +197,8 @@ class editor_AttributeController extends ZfExtended_RestController
 
         // If batch-mode was detected
         if ($this->batch) {
-
             // Foreach termId
             foreach ($this->_termIds() as $termId) {
-
                 // Use it to spoof 'termId' request-param
                 $this->setParam('termId', $termId);
 
@@ -219,25 +206,36 @@ class editor_AttributeController extends ZfExtended_RestController
                 $this->_postCheck($_);
             }
 
-        // Validate request params (and pull records if need)
-        } else $this->_postCheck($_);
+            // Validate request params (and pull records if need)
+        } else {
+            $this->_postCheck($_);
+        }
 
         // Foreach jchecked params combination
         foreach ($this->jchecked as $key => $jchecked) {
-
             // Get params
-            list ($params['termEntryId'], $params['language'], $params['termId']) = explode(':', $key);
+            list($params['termEntryId'], $params['language'], $params['termId']) = explode(':', $key);
 
             // Spoof params
-            foreach ($params as $name => $value) $this->setParam($name, $value);
+            foreach ($params as $name => $value) {
+                $this->setParam($name, $value);
+            }
 
             // Call the appropriate method depend on mode-param
             switch ($_['dataType']->getType()) {
                 case 'xGraphic':
-                case 'externalCrossReference': $this->xrefcreateAction  ($jchecked); break;
-                case 'crossReference':         $this->refcreateAction   ($jchecked); break;
-                case 'figure':                 $this->figurecreateAction($jchecked); break;
-                default:                       $this->attrcreateAction  ($jchecked); break;
+                case 'externalCrossReference': $this->xrefcreateAction($jchecked);
+
+                    break;
+                case 'crossReference':         $this->refcreateAction($jchecked);
+
+                    break;
+                case 'figure':                 $this->figurecreateAction($jchecked);
+
+                    break;
+                default:                       $this->attrcreateAction($jchecked);
+
+                    break;
             }
         }
 
@@ -248,12 +246,16 @@ class editor_AttributeController extends ZfExtended_RestController
 
         // Merge insertedId => existingId pairs among all responses
         $existing = [];
-        foreach ($this->responseA as $responseI)
-            if ($responseI['existing'] ?? 0)
+        foreach ($this->responseA as $responseI) {
+            if ($responseI['existing'] ?? 0) {
                 $existing += $responseI['existing'];
+            }
+        }
 
         // If not empty - append merged to respone
-        if ($existing) $response['existing'] = $existing;
+        if ($existing) {
+            $response['existing'] = $existing;
+        }
 
         // Flush response
         $this->view->assign($response);
@@ -262,39 +264,40 @@ class editor_AttributeController extends ZfExtended_RestController
     /**
      * Validate request params responsible for single attribute creation
      *
-     * @param $_
      * @throws Zend_Db_Statement_Exception
      * @throws MismatchException
      */
-    protected function _postCheck($_) {
-
+    protected function _postCheck($_)
+    {
         // Validate other params
         $_ += $this->jcheck([
             'termId' => [
                 'req' => true,
                 'rex' => 'int11',
-                'key' => TermModel::class
+                'key' => TermModel::class,
             ],
         ]);
 
         // If no or only certain collections are accessible - validate collection accessibility
-        if ($this->collectionIds !== true) $this->jcheck([
-            'collectionId' => [
-                'fis' => $this->collectionIds ?: 'invalid' // FIND_IN_SET
-            ],
-        ], $_['termId']);
+        if ($this->collectionIds !== true) {
+            $this->jcheck([
+                'collectionId' => [
+                    'fis' => $this->collectionIds ?: 'invalid', // FIND_IN_SET
+                ],
+            ], $_['termId']);
+        }
 
         // Check if attribute we're going to add is of dataType which is enabled for term's TermCollection
         $this->jcheck([
             'collectionId' => [
-                'fis' => $_['dataType']->getEnabledCollectionIds() ?: 'invalid' // FIND_IN_SET
-            ]
+                'fis' => $_['dataType']->getEnabledCollectionIds() ?: 'invalid', // FIND_IN_SET
+            ],
         ], $_['termId']);
 
         // Build params key
         $key = $_['termId']->getTermEntryId()
             . ':' . ($_['level'] != 'entry' ? $_['termId']->getLanguage() : '')
-            . ':' . ($_['level'] == 'term'  ? $_['termId']->getId() : '');
+            . ':' . ($_['level'] == 'term' ? $_['termId']->getId() : '');
 
         // Save jcheck return data
         $this->jchecked[$key] = $_;
@@ -305,21 +308,21 @@ class editor_AttributeController extends ZfExtended_RestController
      *
      * @throws MismatchException
      */
-    public function putAction() {
-
+    public function putAction()
+    {
         // Validate params
         $this->jcheck([
             'attrId' => [
-                'req' => !$this->getParam('draft0'),
-                'rex' => 'int11list'
+                'req' => ! $this->getParam('draft0'),
+                'rex' => 'int11list',
             ],
             'dropId' => [
-                'rex' => 'int11list'
+                'rex' => 'int11list',
             ],
             'draft0' => [
-                'req' => !$this->getParam('attrId') && !$this->getParam('value'),
-                'rex' => 'int11list'
-            ]
+                'req' => ! $this->getParam('attrId') && ! $this->getParam('value'),
+                'rex' => 'int11list',
+            ],
         ]);
 
         // Get attr ids array
@@ -328,8 +331,7 @@ class editor_AttributeController extends ZfExtended_RestController
         // If current user can't edit any attribute, for example
         // has none of termPM, termPM_allClients or admin roles,
         // but has other roles allowed to delete attributes only in certain circumstances
-        if (!$this->isAllowed('editor_attribute', 'putAny')) {
-
+        if (! $this->isAllowed('editor_attribute', 'putAny')) {
             // Get [attrId => readonly] pairs for the current user
             $readonlyA = $this->getReadonlyFlags($attrIdA);
 
@@ -339,20 +341,26 @@ class editor_AttributeController extends ZfExtended_RestController
                 : 'Some of the attributes are not editable';
 
             // If at least one is readonly - flush failure
-            foreach ($readonlyA as $attrId => $readonly)
+            foreach ($readonlyA as $attrId => $readonly) {
                 if ($readonly) {
                     $this->jflush(false, $msg);
                 }
+            }
         }
 
         // If dropId-param is given
         if ($dropId = $this->getParam('dropId')) {
-
             // Split by comma
             $dropIdA = editor_Utils::ar($dropId);
 
             // Make sure that qties of $attrIdA and $dropIdA are equal
-            $this->jcheck(['qty' => ['eql' => count($attrIdA)]], ['qty' => count($dropIdA)]);
+            $this->jcheck([
+                'qty' => [
+                    'eql' => count($attrIdA),
+                ],
+            ], [
+                'qty' => count($dropIdA),
+            ]);
         }
 
         // Attribute model instances whose value/target we're going to update
@@ -369,71 +377,101 @@ class editor_AttributeController extends ZfExtended_RestController
 
         // Foreach comma-separated value inside attrId-param
         foreach ($attrIdA as $idx => $attrId) {
-
             // Load attribute model instance, make a clone and append it to $attrA
-            $this->entity->load($attrId); $attrA[$attrId] = clone $this->entity;
+            $this->entity->load($attrId);
+            $attrA[$attrId] = clone $this->entity;
 
             // If no or only certain collections are accessible - validate collection accessibility
-            if ($this->collectionIds !== true) $this->jcheck([
-                'collectionId' => [
-                    'fis' => $this->collectionIds ?: 'invalid' // FIND_IN_SET
-                ],
-            ], $this->entity);
+            if ($this->collectionIds !== true) {
+                $this->jcheck([
+                    'collectionId' => [
+                        'fis' => $this->collectionIds ?: 'invalid', // FIND_IN_SET
+                    ],
+                ], $this->entity);
+            }
 
             // Setup an $unique flag inidcating whether this attribute should be unique having it's dataTypeId within it's level
-            $unique = !in_array($this->entity->getType(), ['xGraphic', 'externalCrossReference', 'crossReference', 'figure']);
+            $unique = ! in_array($this->entity->getType(), ['xGraphic', 'externalCrossReference', 'crossReference', 'figure']);
 
             // If attr should be unique and dropId-param is given
             if ($unique && $dropId ?? 0) {
-
                 // Load entity, make a clone and append it to $dropA under $attrId key
-                $this->entity->load($dropIdA[$idx]); $dropA[$attrId] = clone $this->entity;
+                $this->entity->load($dropIdA[$idx]);
+                $dropA[$attrId] = clone $this->entity;
 
                 // If no or only certain collections are accessible - validate collection accessibility
-                if ($this->collectionIds !== true) $this->jcheck([
-                    'collectionId' => [
-                        'fis' => $this->collectionIds ?: 'invalid' // FIND_IN_SET
-                    ],
-                ], $this->entity);
+                if ($this->collectionIds !== true) {
+                    $this->jcheck([
+                        'collectionId' => [
+                            'fis' => $this->collectionIds ?: 'invalid', // FIND_IN_SET
+                        ],
+                    ], $this->entity);
+                }
 
                 // Make sure that both instances in [attr => drop] pair has equal dataTypeId, termEntryId, language and termId props
                 $this->jcheck([
-                    'dataTypeId'  => ['eql' => $attrA[$attrId]->getDataTypeId()],
-                    'termEntryId' => ['eql' => $attrA[$attrId]->getTermEntryId()],
-                    'language'    => ['eql' => $attrA[$attrId]->getLanguage()],
-                    'termId'      => ['eql' => $attrA[$attrId]->getTermId()],
+                    'dataTypeId' => [
+                        'eql' => $attrA[$attrId]->getDataTypeId(),
+                    ],
+                    'termEntryId' => [
+                        'eql' => $attrA[$attrId]->getTermEntryId(),
+                    ],
+                    'language' => [
+                        'eql' => $attrA[$attrId]->getLanguage(),
+                    ],
+                    'termId' => [
+                        'eql' => $attrA[$attrId]->getTermId(),
+                    ],
                 ], $this->entity);
             }
 
             // Collect distinct dataTypeIds
-            if (!isset($dropId)) $dataTypeIdA[$this->entity->getDataTypeId()] = true;
+            if (! isset($dropId)) {
+                $dataTypeIdA[$this->entity->getDataTypeId()] = true;
+            }
         }
 
         // Check that all attributes belong to the same dataTypeId
-        if (!isset($dropId) && $attrIdA) $this->jcheck(['qty' => ['eql' => 1]], ['qty' => count($dataTypeIdA)]);
+        if (! isset($dropId) && $attrIdA) {
+            $this->jcheck([
+                'qty' => [
+                    'eql' => 1,
+                ],
+            ], [
+                'qty' => count($dataTypeIdA),
+            ]);
+        }
 
         // Foreach attribute model instance
         foreach ($attrA as $attrId => $entity) {
-
             // Spoof $this->entity
             $this->entity = $entity;
 
             // Call the appropriate method depend on attribute type
             switch ($this->entity->getType()) {
                 case 'xGraphic':
-                case 'externalCrossReference': $this->xrefupdateAction();   break;
-                case 'crossReference':         $this->refupdateAction();    break;
-                case 'figure':     $tmp_name = $this->figureupdateAction(); break;
-                default:                       $this->attrupdateAction($dropA[$attrId] ?? null);   break;
+                case 'externalCrossReference': $this->xrefupdateAction();
+
+                    break;
+                case 'crossReference':         $this->refupdateAction();
+
+                    break;
+                case 'figure':     $tmp_name = $this->figureupdateAction();
+
+                    break;
+                default:                       $this->attrupdateAction($dropA[$attrId] ?? null);
+
+                    break;
             }
         }
 
         // Delete uploaded temporary file
-        if ($tmp_name ?? 0) unlink($tmp_name);
+        if ($tmp_name ?? 0) {
+            unlink($tmp_name);
+        }
 
         // If draft0-param is given
         if ($draft0 = $this->getParam('draft0')) {
-
             // Setup isDraft=0 on attributes identified by that param and return array of special attributes ids.
             // Attribute is considered special if it requires special processing
             // Currently only processStatus-, definition- and administrativeStatus-attrs are special
@@ -441,7 +479,6 @@ class editor_AttributeController extends ZfExtended_RestController
 
             // Foreach special attrId
             foreach ($attrIdA_special as $attrId) {
-
                 // Load attribute model instance
                 $this->entity->load($attrId);
 
@@ -454,7 +491,13 @@ class editor_AttributeController extends ZfExtended_RestController
         }
 
         // Flush response. Actually, $this->responseA is contain responses only if attrId-param is not empty
-        if ($attrIdA) $this->view->assign($this->responseA[0]); else if ($draft0) $this->view->assign(['success' => true]);
+        if ($attrIdA) {
+            $this->view->assign($this->responseA[0]);
+        } elseif ($draft0) {
+            $this->view->assign([
+                'success' => true,
+            ]);
+        }
 
         // Add into response
         if ($this->affectedA['icons'] ?? 0) {
@@ -467,38 +510,43 @@ class editor_AttributeController extends ZfExtended_RestController
      *
      * @throws MismatchException
      */
-    public function deleteAction() {
-
+    public function deleteAction()
+    {
         // Validate attrId-param
         $this->jcheck([
             'attrId' => [
                 'req' => true,
-                'rex' => 'int11list'
-            ]
+                'rex' => 'int11list',
+            ],
         ]);
 
         // Model instances and dataTypeIds
-        $entityA = []; $dataTypeIdA = [];
+        $entityA = [];
+        $dataTypeIdA = [];
 
         // Foreach attribute - do checks
         foreach (editor_Utils::ar($this->getParam('attrId')) as $attrId) {
-
             // Load entity, make a clone and append it to $entityA
-            $this->entity->load($attrId); $entityA[$attrId] = clone $this->entity;
+            $this->entity->load($attrId);
+            $entityA[$attrId] = clone $this->entity;
 
             // If no or only certain collections are accessible - validate collection accessibility
-            if ($this->collectionIds !== true) $this->jcheck([
-                'collectionId' => [
-                    'fis' => $this->collectionIds ?: 'invalid' // FIND_IN_SET
-                ],
-            ], $this->entity);
+            if ($this->collectionIds !== true) {
+                $this->jcheck([
+                    'collectionId' => [
+                        'fis' => $this->collectionIds ?: 'invalid', // FIND_IN_SET
+                    ],
+                ], $this->entity);
+            }
 
             // Prevent deletion of processStatus and administrativeStatus attributes, if those are not drafts
-            if (!$this->entity->getIsDraft()) $this->jcheck([
-                'type' => [
-                    'dis' => 'processStatus,administrativeStatus'
-                ]
-            ], $this->entity);
+            if (! $this->entity->getIsDraft()) {
+                $this->jcheck([
+                    'type' => [
+                        'dis' => 'processStatus,administrativeStatus',
+                    ],
+                ], $this->entity);
+            }
 
             // Collect distinct dataTypeIds
             $dataTypeIdA[$this->entity->getDataTypeId()] = true;
@@ -507,8 +555,7 @@ class editor_AttributeController extends ZfExtended_RestController
         // If current user can't delete any attribute, for example
         // has none of termPM, termPM_allClients or admin roles,
         // but has other roles allowed to delete attributes only in certain curcumstances
-        if (!$this->isAllowed('editor_attribute', 'deleteAny')) {
-
+        if (! $this->isAllowed('editor_attribute', 'deleteAny')) {
             // Get attribute ids
             $attrIds = array_keys($entityA);
 
@@ -516,26 +563,28 @@ class editor_AttributeController extends ZfExtended_RestController
             $readonlyA = $this->getReadonlyFlags($attrIds);
 
             // If at least one is readonly - flush failure
-            foreach ($readonlyA as $attrId => $readonly)
-                if ($readonly) $this->jflush(false, count($entityA) == 1
-                    ? 'This attribute is not deletable'
-                    : 'Some of the attributes are not delatable');
+            foreach ($readonlyA as $attrId => $readonly) {
+                if ($readonly) {
+                    $this->jflush(false, count($entityA) == 1
+                        ? 'This attribute is not deletable'
+                        : 'Some of the attributes are not delatable');
+                }
+            }
         }
 
         // Foreach attribute - do delete
         foreach ($entityA as $attrId => $entity) {
-
             // Spoof $this->entity
             $this->entity = $entity;
 
             // Update collection stats
             ZfExtended_Factory
                 ::get(TermCollection::class)
-                ->updateStats($this->entity->getCollectionId(), [
-                    'termEntry' => 0,
-                    'term' => 0,
-                    'attribute' => -1
-                ]);
+                    ->updateStats($this->entity->getCollectionId(), [
+                        'termEntry' => 0,
+                        'term' => 0,
+                        'attribute' => -1,
+                    ]);
 
             // Delete attribute
             $data = $this->entity->delete([
@@ -544,7 +593,7 @@ class editor_AttributeController extends ZfExtended_RestController
             ]);
 
             // Flush response data
-            $this->responseA []= $data;
+            $this->responseA[] = $data;
         }
 
         // Flush response
@@ -552,12 +601,11 @@ class editor_AttributeController extends ZfExtended_RestController
     }
 
     /**
-     *
      * @throws Zend_Db_Statement_Exception
      * @throws MismatchException
      */
-    public function xrefcreateAction($_) {
-
+    public function xrefcreateAction($_)
+    {
         // Init attribute model with data
         $this->_attrInit($_, [
             'value' => null,
@@ -582,15 +630,18 @@ class editor_AttributeController extends ZfExtended_RestController
         ];
 
         // Append response data
-        $this->responseA []= ['inserted' => $inserted, 'updated' => $updated];
+        $this->responseA[] = [
+            'inserted' => $inserted,
+            'updated' => $updated,
+        ];
     }
 
     /**
      * @throws Zend_Db_Statement_Exception
      * @throws MismatchException
      */
-    public function refcreateAction($_) {
-
+    public function refcreateAction($_)
+    {
         // Init attribute model with data
         $this->_attrInit($_, [
             'value' => null,
@@ -615,15 +666,18 @@ class editor_AttributeController extends ZfExtended_RestController
         ];
 
         // Append response data
-        $this->responseA []= ['inserted' => $inserted, 'updated' => $updated];
+        $this->responseA[] = [
+            'inserted' => $inserted,
+            'updated' => $updated,
+        ];
     }
 
     /**
      * @throws Zend_Db_Statement_Exception
      * @throws MismatchException
      */
-    public function figurecreateAction($_) {
-
+    public function figurecreateAction($_)
+    {
         // Init attribute model with data
         $this->_attrInit($_, [
             'value' => 'Image',
@@ -652,14 +706,17 @@ class editor_AttributeController extends ZfExtended_RestController
         ];
 
         // Append response data
-        $this->responseA []= ['inserted' => $inserted, 'updated' => $updated];
+        $this->responseA[] = [
+            'inserted' => $inserted,
+            'updated' => $updated,
+        ];
     }
 
     /**
      * @throws MismatchException
      */
-    public function attrcreateAction($_) {
-
+    public function attrcreateAction($_)
+    {
         // Get dataTypeId => id pairs of already existing attributes
         $existingA = $_['dataType']->getAlreadyExistingFor(
             $this->getParam('termEntryId') ?: null,
@@ -672,7 +729,9 @@ class editor_AttributeController extends ZfExtended_RestController
         $attrId = $existingA[$_['dataType']->getId()] ?? false;
 
         // If we're not in batch mode - prevent creating attribute with such a dataTypeId
-        if (!$this->batch && $attrId) $this->jflush(false, 'Duplicates are not allowed');
+        if (! $this->batch && $attrId) {
+            $this->jflush(false, 'Duplicates are not allowed');
+        }
 
         // Default value for the attribute
         $value = $_['dataType']->getDataType() == 'picklist' ? explode(',', $_['dataType']->getPicklistValues())[0] : null;
@@ -686,7 +745,7 @@ class editor_AttributeController extends ZfExtended_RestController
         // Save attr and affect transacgrp-records
         $updated = $this->entity->insert($misc = [
             'userName' => $this->user()->getUserName(),
-            'userGuid' => $this->user()->getUserGuid()
+            'userGuid' => $this->user()->getUserGuid(),
         ]);
 
         // Prepare inserted data to be flushed into response json
@@ -703,35 +762,41 @@ class editor_AttributeController extends ZfExtended_RestController
         ];
 
         // Response data
-        $data = ['inserted' => $inserted, 'updated' => $updated];
+        $data = [
+            'inserted' => $inserted,
+            'updated' => $updated,
+        ];
 
         // If term status changed - append new value to json
-        if ($_['level'] == 'term' && !$this->entity->getIsDraft())
-            if ($status = $this->_updateTermStatus($_['termId'], $this->entity))
+        if ($_['level'] == 'term' && ! $this->entity->getIsDraft()) {
+            if ($status = $this->_updateTermStatus($_['termId'], $this->entity)) {
                 $data['status'] = $status;
+            }
+        }
 
         // Pass existing attrId into response as well, if detected
-        if ($attrId) $data['existing'][$inserted['id']] = (int) $attrId;
+        if ($attrId) {
+            $data['existing'][$inserted['id']] = (int) $attrId;
+        }
 
         // Append response data
-        $this->responseA []= $data;
+        $this->responseA[] = $data;
     }
-
 
     /**
      * @throws MismatchException
      */
-    public function xrefupdateAction() {
-
+    public function xrefupdateAction()
+    {
         // Validate params
         $this->jcheck([
             'dataIndex' => [
                 'req' => true,
-                'fis' => 'value,target' // FIND_IN_SET
+                'fis' => 'value,target', // FIND_IN_SET
             ],
             'value' => [
-                'rex' => 'varchar255'
-            ]
+                'rex' => 'varchar255',
+            ],
         ]);
 
         // Set attribute's dataIndex-defined prop
@@ -747,22 +812,25 @@ class editor_AttributeController extends ZfExtended_RestController
         $isValidUrl = preg_match('~ href="([^"]+)"~', editor_Utils::url2a($this->entity->getTarget()));
 
         // Flush response data
-        $this->responseA []= ['updated' => $updated, 'isValidUrl' => $isValidUrl];
+        $this->responseA[] = [
+            'updated' => $updated,
+            'isValidUrl' => $isValidUrl,
+        ];
     }
 
     /**
      * @throws MismatchException
      */
-    public function refupdateAction() {
-
+    public function refupdateAction()
+    {
         // Validate params
         $this->jcheck([
             'target' => [
                 'rex' => 'xmlid',
             ],
             'termLang,mainLang' => [
-                'rex' => 'rfc5646'
-            ]
+                'rex' => 'rfc5646',
+            ],
         ]);
 
         // Get param shortcuts
@@ -782,15 +850,20 @@ class editor_AttributeController extends ZfExtended_RestController
 
         // If given target is not empty
         if ($target) {
-
             // Detect level
             $level = $this->entity->getTermId() ? 'term' : 'entry';
 
             // Setup preferred languages array
             $prefLangA = [];
-            if ($termLang) $prefLangA[] = $termLang;
-            if ($mainLang) $prefLangA[] = $mainLang;
-            if ($level == 'term' && !$prefLangA) $prefLangA []= $this->entity->getLanguage();
+            if ($termLang) {
+                $prefLangA[] = $termLang;
+            }
+            if ($mainLang) {
+                $prefLangA[] = $mainLang;
+            }
+            if ($level == 'term' && ! $prefLangA) {
+                $prefLangA[] = $this->entity->getLanguage();
+            }
             $preLangA = array_unique($prefLangA);
 
             // Prepare first 2 arguments to be used for $this->_refTarget(&$refA, $refTargetIdA, $prefLangA) call
@@ -805,20 +878,20 @@ class editor_AttributeController extends ZfExtended_RestController
         }
 
         // Append response data
-        $this->responseA []= $data;
+        $this->responseA[] = $data;
     }
 
     /**
      * @throws MismatchException
      */
-    public function figureupdateAction() {
-
+    public function figureupdateAction()
+    {
         // Validate params and pick figure image file
         $_ = $this->jcheck([
             'figure' => [
                 'req' => true,
-                'ext' => '~^(gif|png|jpe?g)$~'
-            ]
+                'ext' => '~^(gif|png|jpe?g)$~',
+            ],
         ]);
 
         // Create `terms_images` model instance
@@ -832,12 +905,11 @@ class editor_AttributeController extends ZfExtended_RestController
             'uniqueName' => ZfExtended_Utils::uuid() . $_['figure']['.ext'],
             'encoding' => 'hex',
             'format' => $_['figure']['type'],
-            'collectionId' => $this->entity->getCollectionId()
+            'collectionId' => $this->entity->getCollectionId(),
         ]);
 
         // If uploaded file is successfully copied into proper location
         if ($i->copyImage($_['figure']['tmp_name'], $this->entity->getCollectionId())) {
-
             // Save `terms_images` record
             $i->save();
 
@@ -852,54 +924,63 @@ class editor_AttributeController extends ZfExtended_RestController
                 );
 
             // Flush response data
-            $this->responseA []= ['src' => $i->getPublicPath(), 'updated' => $updated];
+            $this->responseA[] = [
+                'src' => $i->getPublicPath(),
+                'updated' => $updated,
+            ];
 
             // Else flush empty src
-        } else $this->responseA []= ['src' => ''] + $_;
+        } else {
+            $this->responseA[] = [
+                'src' => '',
+            ] + $_;
+        }
 
         // Return uploaded temporary file path
         return $_['figure']['tmp_name'];
     }
 
     /**
-     * @param AttributeModel|null $drop
      * @throws ZfExtended_Exception
      * @throws MismatchException
      */
-    public function attrupdateAction(AttributeModel $drop = null) {
-
+    public function attrupdateAction(AttributeModel $drop = null)
+    {
         // Check request params and return an array, containing records
         // fetched from database by dataTypeId-param (and termId-param, if given)
         $_ = $this->_attrupdateCheck($drop ? false : true);
 
         // Default response data to be flushed in case of attribute change
-        $data = ['success' => true, 'updated' => $this->user()->getUserName() . ', ' . date('d.m.Y H:i:s')];
+        $data = [
+            'success' => true,
+            'updated' => $this->user()->getUserName() . ', ' . date('d.m.Y H:i:s'),
+        ];
 
         // If attr was not yet changed after importing from tbx - append current value to response
-        if (!$this->entity->getIsCreatedLocally()) $data['imported'] = $this->entity->getValue();
+        if (! $this->entity->getIsCreatedLocally()) {
+            $data['imported'] = $this->entity->getValue();
+        }
 
         // If $drop arg is given - use it's value
         $value = $drop ? $drop->getValue() : $this->getParam('value');
 
         // If $drop arg is given
         if ($drop) {
-
             // Update collection stats
             ZfExtended_Factory
                 ::get(TermCollection::class)
-                ->updateStats($drop->getCollectionId(), [
-                    'termEntry' => 0,
-                    'term' => 0,
-                    'attribute' => -1
-                ]);
+                    ->updateStats($drop->getCollectionId(), [
+                        'termEntry' => 0,
+                        'term' => 0,
+                        'attribute' => -1,
+                    ]);
 
             // Delete
             $drop->delete();
         }
 
         // If it's a processStatus-attribute
-        if ($this->entity->getType() == 'processStatus' && !$this->entity->getIsDraft()) {
-
+        if ($this->entity->getType() == 'processStatus' && ! $this->entity->getIsDraft()) {
             // Check whether current user is allowed to change processStatus from it's current value to given value
             $this->_attrupdateCheckProcessStatusChangeIsAllowed($_);
 
@@ -916,9 +997,8 @@ class editor_AttributeController extends ZfExtended_RestController
             // to update (administrative|process)Status-icons within left and center panels
             $this->affectedA['icons'][$_['termId']->getId()]['processStatus'] = $value;
 
-        // Else
+            // Else
         } else {
-
             // Update attribute value
             $this->entity->setValue($value);
             $this->entity->setUpdatedBy($this->user()->getId());
@@ -926,8 +1006,7 @@ class editor_AttributeController extends ZfExtended_RestController
             $this->entity->update();
 
             // If it's a definition-attribute
-            if ($this->entity->getType() == 'definition' && !$this->entity->getTermId()) {
-
+            if ($this->entity->getType() == 'definition' && ! $this->entity->getTermId()) {
                 // Replicate new value of definition-attribute to `terms_term`.`definition` where needed
                 // and return array containing new value and ids of affected `terms_term` records for
                 // being able to apply that on client side
@@ -937,11 +1016,12 @@ class editor_AttributeController extends ZfExtended_RestController
 
         // The term status is updated in in anycase (due implicit normativeAuthorization changes above),
         // not only if a attribute is changed mapped to the term status
-        if (isset($_['termId']) && !$this->entity->getIsDraft())
+        if (isset($_['termId']) && ! $this->entity->getIsDraft()) {
             if ($status = $this->_updateTermStatus($_['termId'], $this->entity)) {
                 $data['status'] = $status;
                 $this->affectedA['icons'][$_['termId']->getId()]['status'] = $status['status'];
             }
+        }
 
         // Update `date` and `transacNote` of 'modification'-records
         // for all levels starting from term-level and up to top
@@ -955,7 +1035,7 @@ class editor_AttributeController extends ZfExtended_RestController
             );
 
         // Collect response data
-        $this->responseA []= $data;
+        $this->responseA[] = $data;
     }
 
     /**
@@ -964,13 +1044,10 @@ class editor_AttributeController extends ZfExtended_RestController
      * so this method get all term's attributes that may affect term's `status` and recalculate
      * and return the value for `status`
      *
-     * @param TermModel $termM
-     * @param AttributeModel $attrM
-     * @return array
      * @throws ZfExtended_Exception
      */
-    protected function _updateTermStatus(TermModel $termM, AttributeModel $attrM): array {
-
+    protected function _updateTermStatus(TermModel $termM, AttributeModel $attrM): array
+    {
         /* @var $termNoteStatus editor_Models_Terminology_TermStatus */
         $termNoteStatus = ZfExtended_Factory::get('editor_Models_Terminology_TermStatus');
 
@@ -981,12 +1058,17 @@ class editor_AttributeController extends ZfExtended_RestController
         $status = $termNoteStatus->getStatusForUpdatedAttribute($updatedAttribute, $others);
 
         //update the other attributes with the new value
-        foreach($others as $id => $other) {
-            if($other['status'] === null) {
-                $attrM->db->delete(['id = ?' => $id]);
-            }
-            else {
-                $attrM->db->update(['value' => $other['status']], ['id = ?' => $id]);
+        foreach ($others as $id => $other) {
+            if ($other['status'] === null) {
+                $attrM->db->delete([
+                    'id = ?' => $id,
+                ]);
+            } else {
+                $attrM->db->update([
+                    'value' => $other['status'],
+                ], [
+                    'id = ?' => $id,
+                ]);
             }
         }
 
@@ -996,14 +1078,17 @@ class editor_AttributeController extends ZfExtended_RestController
         // If status is modified save it to the DB
         if ($termM->isModified('status')) {
             $termM->setUpdatedBy($this->user()->getId());
-            $termM->update(['updateProcessStatusAttr' => false]);
+            $termM->update([
+                'updateProcessStatusAttr' => false,
+            ]);
 
             // Return new status
             return [
                 'status' => $termM->getStatus(),
-                'others' => array_column($others, 'status', 'dataTypeId')
+                'others' => array_column($others, 'status', 'dataTypeId'),
             ];
         }
+
         return [];
     }
 
@@ -1015,27 +1100,28 @@ class editor_AttributeController extends ZfExtended_RestController
      * @return array
      * @throws MismatchException
      */
-    protected function _attrupdateCheck($valueRequired = true) {
-
+    protected function _attrupdateCheck($valueRequired = true)
+    {
         // Get attribute meta load term model instance, if current attr has non-empty termId
         $_ = $this->jcheck([
             'dataTypeId' => [
-                'key' => 'terms_attributes_datatype'
+                'key' => 'terms_attributes_datatype',
             ],
             'termId' => [
                 'rex' => 'int11',
-                'key' => TermModel::class
-            ]
+                'key' => TermModel::class,
+            ],
         ], $this->entity);
 
         // If attribute is a picklist - make sure given value is in the list of allowed values
-        if ($_['dataTypeId']['dataType'] == 'picklist')
+        if ($_['dataTypeId']['dataType'] == 'picklist') {
             $this->jcheck([
                 'value' => [
                     'req' => $valueRequired,
-                    'fis' => $_['dataTypeId']['picklistValues'] // FIND_IN_SET
-                ]
+                    'fis' => $_['dataTypeId']['picklistValues'], // FIND_IN_SET
+                ],
             ]);
+        }
 
         // Return records, fetched by dataTypeId-param (and termId-param, if given)
         return $_;
@@ -1048,8 +1134,8 @@ class editor_AttributeController extends ZfExtended_RestController
      * @param array $_ data, picked by previous $this->jcheck() call
      * @throws MismatchException
      */
-    protected function _attrupdateCheckProcessStatusChangeIsAllowed($_) {
-
+    protected function _attrupdateCheckProcessStatusChangeIsAllowed($_)
+    {
         // Get current value of processStatus attribute, that should be involved in validation
         $current = $_['termId']->getProposal() ? 'unprocessed' : $this->entity->getValue();
 
@@ -1059,8 +1145,8 @@ class editor_AttributeController extends ZfExtended_RestController
         // Make sure only allowed values can be set as new value of processStatus attribute
         $this->jcheck([
             'value' => [
-                'fis' => implode(',', $allowed ?: ['wontpass']) // FIND_IN_SET
-            ]
+                'fis' => implode(',', $allowed ?: ['wontpass']), // FIND_IN_SET
+            ],
         ]);
     }
 
@@ -1069,21 +1155,20 @@ class editor_AttributeController extends ZfExtended_RestController
      * and custom data, given by $data arg
      *
      * @param array $_ Common data holder
-     * @param array $data
      */
-    protected function _attrInit(array $_, array $data = []) {
-
+    protected function _attrInit(array $_, array $data = [])
+    {
         // Init
         $this->entity->init($data + [
-            'dataTypeId'  => $_['dataType']->getId(),
-            'type'        => $_['dataType']->getType(),
+            'dataTypeId' => $_['dataType']->getId(),
+            'type' => $_['dataType']->getType(),
             'elementName' => $_['dataType']->getLabel(),
 
             'collectionId' => $_['termId']->getCollectionId(),
-            'termEntryId'  => $_['termId']->getTermEntryId(),
-            'language'     => $l = $this->getParam('language') ?: null,
-            'termId'       => $this->getParam('termId') ?: null,
-            'termTbxId'    => $this->getParam('termId') ? $_['termId']->getTermTbxId() : null,
+            'termEntryId' => $_['termId']->getTermEntryId(),
+            'language' => $l = $this->getParam('language') ?: null,
+            'termId' => $this->getParam('termId') ?: null,
+            'termTbxId' => $this->getParam('termId') ? $_['termId']->getTermTbxId() : null,
             'isCreatedLocally' => 1,
             'createdBy' => $this->user()->getId(),
             'createdAt' => date('Y-m-d H:i:s'),
@@ -1095,7 +1180,7 @@ class editor_AttributeController extends ZfExtended_RestController
             'guid' => ZfExtended_Utils::uuid(),
             'attrLang' => $l,
             //'dataType' => null
-            'isDraft' => $this->batch ? 1 : 0
+            'isDraft' => $this->batch ? 1 : 0,
         ]);
     }
 
@@ -1106,21 +1191,23 @@ class editor_AttributeController extends ZfExtended_RestController
      * @throws Zend_Db_Statement_Exception
      * @throws MismatchException
      */
-    public function historyAction() {
-
+    public function historyAction()
+    {
         // Load entity internally
         $this->entityLoad();
 
         // If no or only certain collections are accessible - validate collection accessibility
-        if ($this->collectionIds !== true) $this->jcheck([
-            'collectionId' => [
-                'fis' => $this->collectionIds ?: 'invalid' // FIND_IN_SET
-            ],
-        ], $this->entity);
+        if ($this->collectionIds !== true) {
+            $this->jcheck([
+                'collectionId' => [
+                    'fis' => $this->collectionIds ?: 'invalid', // FIND_IN_SET
+                ],
+            ], $this->entity);
+        }
 
         // Load history and assign to response
         $this->view->history = ZfExtended_Factory
             ::get(editor_Models_Term_AttributeHistory::class)
-            ->getByAttrId($this->entity->getId(), $this->getParam('language'));
+                ->getByAttrId($this->entity->getId(), $this->getParam('language'));
     }
 }

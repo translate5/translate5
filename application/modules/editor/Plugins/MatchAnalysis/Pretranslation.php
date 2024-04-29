@@ -3,156 +3,152 @@
 START LICENSE AND COPYRIGHT
 
  This file is part of translate5
- 
+
  Copyright (c) 2013 - 2021 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
 
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
  This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
- as published by the Free Software Foundation and appearing in the file agpl3-license.txt 
- included in the packaging of this file.  Please review the following information 
+ as published by the Free Software Foundation and appearing in the file agpl3-license.txt
+ included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
-  
+
  There is a plugin exception available for use with this release of translate5 for
- translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or
  plugin-exception.txt in the root folder of translate5.
-  
+
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
 
-/**
- */
-class editor_Plugins_MatchAnalysis_Pretranslation{
+class editor_Plugins_MatchAnalysis_Pretranslation
+{
     use ZfExtended_Logger_DebugTrait;
-    
+
     /***
      *
      * @var editor_Models_Task
      */
     protected $task;
-    
+
     /***
      *
      * @var editor_Models_SegmentFieldManager
      */
     protected $sfm;
-    
+
     /***
      *
      * @var editor_Models_TaskUserAssoc
      */
     protected $userTaskAssoc;
-    
+
     /***
      *
      * @var string
      */
     protected $userGuid;
-    
+
     /***
      *
      * @var string
      */
     protected $userName;
-    
+
     /***
      * Collection of assigned languageResource resources types where key is languageResourceid and resource type is the value
      *
      * @var array
      */
-    protected $resources=array();
-    
-    
+    protected $resources = [];
+
     /***
      * Minimum matchrate so the segment is pretransalted
      * @var integer
      */
-    protected $pretranslateMatchrate=100;
-    
+    protected $pretranslateMatchrate = 100;
 
     /***
      * Pretranslate with translation memory and term collection priority
      * @var boolean
      */
-    protected $usePretranslateTMAndTerm=false;
-    
-    
+    protected $usePretranslateTMAndTerm = false;
+
     /***
      * Pretranslate with mt priority only when the tm pretranslation matchrate is not over the $pretranslateMatchrate
      * @var boolean
      */
-    protected $usePretranslateMT=false;
-    
+    protected $usePretranslateMT = false;
+
     /**
      * @var editor_Models_Segment_InternalTag
      */
     protected $internalTag;
-    
+
     /**
      * @var editor_Models_Segment_AutoStates
      */
     protected $autoStates;
-    
-    
+
     /***
      * Collection of assigned resources to the task
      * @var array
      */
-    protected $connectors=array();
-    
+    protected $connectors = [];
+
     /***
      * Pretranslation mt connectors(the mt resources associated to a task)
      * @var array
      */
-    protected $mtConnectors=array();
-    
+    protected $mtConnectors = [];
+
     /**
      * @var ZfExtended_EventManager
      */
     protected $events = false;
-    
+
     /***
      * Analysis id
      *
      * @var mixed
      */
     protected $analysisId;
-    
+
     /***
      * Is the current analysis and pretranslation running with batch query enabled
      * @var boolean
      */
     protected $batchQuery = false;
-    
-    public function __construct(int $analysisId){
+
+    public function __construct(int $analysisId)
+    {
         $this->initLogger('E1100', 'plugin.matchanalysis', '', 'Plug-In MatchAnalysis: ');
         $this->internalTag = ZfExtended_Factory::get('editor_Models_Segment_InternalTag');
         $this->autoStates = ZfExtended_Factory::get('editor_Models_Segment_AutoStates');
-        $this->events = ZfExtended_Factory::get('ZfExtended_EventManager', array('editor_Plugins_MatchAnalysis_Pretranslation'));
-        $this->analysisId=$analysisId;
+        $this->events = ZfExtended_Factory::get('ZfExtended_EventManager', ['editor_Plugins_MatchAnalysis_Pretranslation']);
+        $this->analysisId = $analysisId;
     }
-    
+
     /**
      * Use this for internal fuzzy match target that will be ignored.
      */
-    public static function renderDummyTargetText($taskGuid) {
-        return "translate5-unique-id[".$taskGuid."]";
+    public static function renderDummyTargetText($taskGuid)
+    {
+        return "translate5-unique-id[" . $taskGuid . "]";
     }
 
     /**
      * returns true if the given segment content is from a internal fuzzy
-     * @param string $segmentContent
-     * @return bool
      */
     protected function isInternalFuzzy(string $segmentContent): bool
     {
         $dummyTargetText = self::renderDummyTargetText($this->task->getTaskGuid());
+
         return str_contains($segmentContent, $dummyTargetText);
     }
 
@@ -167,64 +163,64 @@ class editor_Plugins_MatchAnalysis_Pretranslation{
      * @throws ZfExtended_Models_Entity_Exceptions_IntegrityConstraint
      * @throws ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey
      */
-    protected function updateSegment(editor_Models_Segment $segment, stdClass $result, bool $isRepetition){
-        
+    protected function updateSegment(editor_Models_Segment $segment, stdClass $result, bool $isRepetition)
+    {
         //if the segment target is not empty or best match rate is not found do not pretranslate
         //pretranslation only for editable segments
-        if($segment->meta()->getLocked() || $segment->getAutoStateId() != editor_Models_Segment_AutoStates::NOT_TRANSLATED){
+        if ($segment->meta()->getLocked() || $segment->getAutoStateId() != editor_Models_Segment_AutoStates::NOT_TRANSLATED) {
             return;
         }
 
         //the internalLanguageResourceid is set when the segment bestmatchrate is found(see analysis getbestmatchrate function)
-        $languageResourceid=$result->internalLanguageResourceid;
-        
+        $languageResourceid = $result->internalLanguageResourceid;
+
         $history = $segment->getNewHistoryEntity();
-        
-        $segmentField=$this->sfm->getFirstTargetName();
-        $segmentFieldEdit=$segmentField.'Edit';
-        
-        $targetResult=$result->target;
-        
+
+        $segmentField = $this->sfm->getFirstTargetName();
+        $segmentFieldEdit = $segmentField . 'Edit';
+
+        $targetResult = $result->target;
+
         $matchrateType = ZfExtended_Factory::get('editor_Models_Segment_MatchRateType');
         /* @var $matchrateType editor_Models_Segment_MatchRateType */
-        
+
         //set the type
         $languageResource = $this->resources[$languageResourceid];
         /* @var $languageResource editor_Models_LanguageResources_LanguageResource */
-        
+
         //just to display the TM name too, we add it here to the type
-        $type = $languageResource->getServiceName().' - '.$languageResource->getName();
-        
+        $type = $languageResource->getServiceName() . ' - ' . $languageResource->getName();
+
         //ignore internal fuzzy match target
-        if ($this->isInternalFuzzy($targetResult)){
+        if ($this->isInternalFuzzy($targetResult)) {
             //set the internal fuzzy available matchrate type
-            $matchrateType->initPretranslated(editor_Models_Segment_MatchRateType::TYPE_INTERNAL_FUZZY_AVAILABLE,$type);
+            $matchrateType->initPretranslated(editor_Models_Segment_MatchRateType::TYPE_INTERNAL_FUZZY_AVAILABLE, $type);
             $segment->setMatchRateType((string) $matchrateType);
-            
+
             //save the segment and history
-            $this->saveSegmentAndHistory($segment,$history);
+            $this->saveSegmentAndHistory($segment, $history);
+
             return;
         }
 
         $matchType = [];
         $hasText = $this->internalTag->hasText($segment->getSource());
-        if($hasText) {
+        if ($hasText) {
             //if the result language resource is termcollection, set the target result first character to uppercase
-            if($this->isTermCollection($languageResourceid)){
-                $targetResult=ZfExtended_Utils::mb_ucfirst($targetResult);
+            if ($this->isTermCollection($languageResourceid)) {
+                $targetResult = ZfExtended_Utils::mb_ucfirst($targetResult);
             }
             $targetResult = $this->internalTag->removeIgnoredTags($targetResult);
             $segment->setMatchRate($result->matchrate);
             $matchType[] = $languageResource->getResourceType();
             $matchType[] = $type;
-            if($isRepetition) {
+            if ($isRepetition) {
                 $matchType[] = $matchrateType::TYPE_AUTO_PROPAGATED;
             }
 
             //negated explanation is easier: lock the pretranslations if 100 matches in the task are not editable,
             $segment->setEditable($result->matchrate < 100 || $this->task->getEdit100PercentMatch());
-        }
-        else {
+        } else {
             //if the source contains no text but tags only, we set the target to the source directly
             // and the segment is not editable
             $targetResult = $segment->getSource();
@@ -235,29 +231,29 @@ class editor_Plugins_MatchAnalysis_Pretranslation{
         $matchrateType->initPretranslated(...$matchType);
 
         $segment->setMatchRateType((string) $matchrateType);
-        
+
         $segment->setAutoStateId($this->autoStates->calculatePretranslationState($segment->isEditable()));
         //a segment is only pretranslated if it contains content
         $segment->setPretrans($hasText ? $segment::PRETRANS_INITIAL : $segment::PRETRANS_NOTDONE);
-        
+
         //check if the result is valid for log
-        if($this->isResourceLogValid($languageResource, $segment->getMatchRate())){
+        if ($this->isResourceLogValid($languageResource, $segment->getMatchRate())) {
             $this->connectors[$languageResourceid]->logAdapterUsage($segment, $isRepetition);
         }
-        
-        $segment->set($segmentField,$targetResult); //use sfm->getFirstTargetName here
-        $segment->set($segmentFieldEdit,$targetResult); //use sfm->getFirstTargetName here
-        
+
+        $segment->set($segmentField, $targetResult); //use sfm->getFirstTargetName here
+        $segment->set($segmentFieldEdit, $targetResult); //use sfm->getFirstTargetName here
+
         $segment->updateToSort($segmentField);
         $segment->updateToSort($segmentFieldEdit);
-        
-        $segment->setUserGuid($this->userGuid);//to the authenticated userGuid
-        $segment->setUserName($this->userName);//to the authenticated userName
+
+        $segment->setUserGuid($this->userGuid); //to the authenticated userGuid
+        $segment->setUserName($this->userName); //to the authenticated userName
 
         //NOTE: remove me if to many problems
         //$segment->validate();
-        
-        if($this->task->getWorkflowStep()==1){
+
+        if ($this->task->getWorkflowStep() == 1) {
             //TODO move hasher creation out the segment loop
             $hasher = ZfExtended_Factory::get('editor_Models_Segment_RepetitionHash', [$this->task]);
             /* @var $hasher editor_Models_Segment_RepetitionHash */
@@ -265,31 +261,32 @@ class editor_Plugins_MatchAnalysis_Pretranslation{
             $segmentHash = $hasher->rehashTarget($segment, $targetResult);
             $segment->setTargetMd5($segmentHash);
         }
-        
+
         //set the used language resource uuid in the segments meta table
         $segment->meta()->setPreTransLangResUuid($languageResource->getLangResUuid());
         $segment->meta()->save();
-        
+
         //save the segment and history
         $this->saveSegmentAndHistory($segment, $history);
-        
+
         $this->events->trigger('afterAnalysisSegmentPretranslate', $this, [
             'entity' => $segment,
             'analysisId' => $this->analysisId,
             'languageResourceId' => $languageResourceid,
-            'result' => $result
+            'result' => $result,
         ]);
     }
-    
+
     /***
      * Init the task user assocition if exist. If not a default record will be initialized
      * @return editor_Models_TaskUserAssoc
      */
-    protected function initUsertTaskAssoc(){
-        if($this->userTaskAssoc){
+    protected function initUsertTaskAssoc()
+    {
+        if ($this->userTaskAssoc) {
             return $this->userTaskAssoc;
         }
-        
+
         try {
             $this->userTaskAssoc = editor_Models_Loaders_Taskuserassoc::loadByTaskForceWorkflowRole($this->userGuid, $this->task);
         } catch (ZfExtended_Models_Entity_NotFoundException $e) {
@@ -306,54 +303,59 @@ class editor_Plugins_MatchAnalysis_Pretranslation{
             $this->userTaskAssoc->setState(editor_Workflow_Default::STATE_EDIT);
         }
     }
-    
+
     /***
      * Query the segment using the Mt engines assigned to the task.
      * Ony the first mt engine will be used
      * @param editor_Models_Segment $segment
      * @return NULL|[stdClass]
      */
-    protected function getMtResult(editor_Models_Segment $segment){
-        if(empty($this->mtConnectors)){
+    protected function getMtResult(editor_Models_Segment $segment)
+    {
+        if (empty($this->mtConnectors)) {
             return null;
         }
         //INFO: use the first connector, since no mt engine priority exist
         $connector = $this->mtConnectors[0];
         /* @var $connector editor_Services_Connector */
-        
+
         //if the current connector supports batch query, enable the batch query for this connector
-        if($connector->isBatchQuery() && $this->batchQuery){
+        if ($connector->isBatchQuery() && $this->batchQuery) {
             $connector->enableBatch();
         }
-        
+
         $connector->resetResultList();
         $matches = $connector->query($segment);
-        $matchResults=$matches->getResult();
-        if(!empty($matchResults)){
-            $result=$matchResults[0];
-            $result->internalLanguageResourceid=$connector->getLanguageResource()->getId();
+        $matchResults = $matches->getResult();
+        if (! empty($matchResults)) {
+            $result = $matchResults[0];
+            $result->internalLanguageResourceid = $connector->getLanguageResource()->getId();
             $result->isMT = true;
+
             return $result;
         }
+
         return null;
     }
-    
+
     /***
      * Check if the given language resource id is a valid termcollection resource
      * @param int $languageResourceId
      * @return boolean
      */
-    protected function isTermCollection($languageResourceId){
-        if(!isset($this->resources[$languageResourceId])){
+    protected function isTermCollection($languageResourceId)
+    {
+        if (! isset($this->resources[$languageResourceId])) {
             return false;
         }
-        $lr=$this->resources[$languageResourceId];
+        $lr = $this->resources[$languageResourceId];
         /* @var $lr editor_Models_LanguageResources_LanguageResource */
-        $tcs=ZfExtended_Factory::get('editor_Services_TermCollection_Service');
+        $tcs = ZfExtended_Factory::get('editor_Services_TermCollection_Service');
+
         /* @var $tcs editor_Services_TermCollection_Service */
-        return $lr->getServiceName()==$tcs->getName();
+        return $lr->getServiceName() == $tcs->getName();
     }
-    
+
     /***
      * Should the current language resources result with matchrate be logged in the languageresources ussage log table
      *
@@ -361,57 +363,64 @@ class editor_Plugins_MatchAnalysis_Pretranslation{
      * @param int $matchRate
      * @return boolean
      */
-    protected function isResourceLogValid(editor_Models_LanguageResources_LanguageResource $languageResource, int $matchRate) {
+    protected function isResourceLogValid(editor_Models_LanguageResources_LanguageResource $languageResource, int $matchRate)
+    {
         //check if it is tm or tc, an if the matchrate is >= 100
-        return ($languageResource->isTm() || $languageResource->isTc()) && $matchRate>=editor_Services_Connector_FilebasedAbstract::EXACT_MATCH_VALUE;
+        return ($languageResource->isTm() || $languageResource->isTc()) && $matchRate >= editor_Services_Connector_FilebasedAbstract::EXACT_MATCH_VALUE;
     }
-    
+
     /***
      * Save the segment(set the duration and the timestamp) and the segmenthistory
      * @param editor_Models_Segment $segment
      * @param editor_Models_SegmentHistory $history
      */
-    protected function saveSegmentAndHistory(editor_Models_Segment $segment,editor_Models_SegmentHistory $history){
-        $segmentField=$this->sfm->getFirstTargetName();
-        $segmentFieldEdit=$segmentField.'Edit';
-        $duration=new stdClass();
-        $duration->$segmentField=0;
+    protected function saveSegmentAndHistory(editor_Models_Segment $segment, editor_Models_SegmentHistory $history)
+    {
+        $segmentField = $this->sfm->getFirstTargetName();
+        $segmentFieldEdit = $segmentField . 'Edit';
+        $duration = new stdClass();
+        $duration->$segmentField = 0;
         $segment->setTimeTrackData($duration);
-        
-        $duration=new stdClass();
-        $duration->$segmentFieldEdit=0;
+
+        $duration = new stdClass();
+        $duration->$segmentFieldEdit = 0;
         $segment->setTimeTrackData($duration);
-        
+
         $history->save();
         $segment->setTimestamp(NOW_ISO);
         $segment->save();
     }
-    
-    public function setUserGuid($userGuid) {
-        $this->userGuid=$userGuid;
+
+    public function setUserGuid($userGuid)
+    {
+        $this->userGuid = $userGuid;
     }
-    
-    public function setUserName($userName) {
-        $this->userName=$userName;
+
+    public function setUserName($userName)
+    {
+        $this->userName = $userName;
     }
-    
-    public function setPretranslateMatchrate($pretranslateMatchrate) {
-        $this->pretranslateMatchrate=$pretranslateMatchrate;
+
+    public function setPretranslateMatchrate($pretranslateMatchrate)
+    {
+        $this->pretranslateMatchrate = $pretranslateMatchrate;
     }
-    
+
     /***
      * Set pretranslate from Mt priority flag
      * @param bool $usePretranslateMT
      */
-    public function setPretranslateMt($usePretranslateMT) {
-        $this->usePretranslateMT=$usePretranslateMT;
+    public function setPretranslateMt($usePretranslateMT)
+    {
+        $this->usePretranslateMT = $usePretranslateMT;
     }
-    
+
     /***
      * Set the pretranslate from the Tm and termcollection priority flag. This flag also will run the pretranslations
      * @param bool $usePretranslateTMAndTerm
      */
-    public function setPretranslateTmAndTerm($usePretranslateTMAndTerm) {
-        $this->usePretranslateTMAndTerm=$usePretranslateTMAndTerm;
+    public function setPretranslateTmAndTerm($usePretranslateTMAndTerm)
+    {
+        $this->usePretranslateTMAndTerm = $usePretranslateTMAndTerm;
     }
 }

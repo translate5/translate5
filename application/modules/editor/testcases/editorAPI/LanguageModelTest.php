@@ -3,7 +3,7 @@
 START LICENSE AND COPYRIGHT
 
  This file is part of translate5
- 
+
  Copyright (c) 2013 - 2022 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
 
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
@@ -13,15 +13,15 @@ START LICENSE AND COPYRIGHT
  included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
-  
+
  There is a plugin exception available for use with this release of translate5 for
  translate5: Please see http://www.translate5.net/plugin-exception.txt or
  plugin-exception.txt in the root folder of translate5.
-  
+
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
@@ -30,11 +30,13 @@ END LICENSE AND COPYRIGHT
  * Unit Tests for Language Class
  * Should be extended as needed
  */
-class LanguageModelTest extends editor_Test_UnitTest {
+class LanguageModelTest extends editor_Test_UnitTest
+{
     /**
      * Testcase for "TRANSLATE-2939: Fix language matching on term tagging" to test language fuzzy logic.
      */
-    public function testFuzzyLanguageGetter() {
+    public function testFuzzyLanguageGetter()
+    {
         $allGermanRFCs = ['de', 'de-AT', 'de-CH', 'de-DE', 'de-LI', 'de-LU'];
         $allGermanSubRFCs = ['de-AT', 'de-CH', 'de-DE', 'de-LI', 'de-LU'];
 
@@ -46,7 +48,7 @@ class LanguageModelTest extends editor_Test_UnitTest {
         //clean fuzzy cache first
         $memcache = new ZfExtended_Cache_MySQLMemoryBackend();
         $cached = $memcache->getAllForPartOfId('getFuzzyLanguages');
-        if($cached) {
+        if ($cached) {
             foreach ($cached as $cache) {
                 $memcache->remove($cache['id']);
             }

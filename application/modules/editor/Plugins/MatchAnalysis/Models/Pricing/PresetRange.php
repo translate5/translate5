@@ -21,10 +21,11 @@
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
- 		     http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
  END LICENSE AND COPYRIGHT
  */
+
 namespace MittagQI\Translate5\Plugins\MatchAnalysis\Models\Pricing;
 
 use PDO;
@@ -37,17 +38,17 @@ use ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey;
 /**
  * Class representing matchrate range for which a price can be defined, inside a certain pricing preset
  *
- * @method integer getId()
+ * @method string getId()
  * @method void setId(int $id)
- * @method integer getPresetId()
+ * @method string getPresetId()
  * @method void setPresetId(int $presetId)
- * @method integer getFrom()
+ * @method string getFrom()
  * @method void setFrom(int $from)
- * @method integer getTill()
+ * @method string getTill()
  * @method void setTill(int $till)
  */
-class PresetRange extends ZfExtended_Models_Entity_Abstract {
-
+class PresetRange extends ZfExtended_Models_Entity_Abstract
+{
     /*
      * A `match_analysis_pricing_preset_range`-entry has the following structure:
      {
@@ -68,11 +69,10 @@ class PresetRange extends ZfExtended_Models_Entity_Abstract {
     /**
      * Get range-entries by given $presetId
      *
-     * @param int $presetId
-     * @return array
      * @throws Zend_Db_Statement_Exception
      */
-    public function getByPresetId(int $presetId, bool $byId = true) : array {
+    public function getByPresetId(int $presetId, bool $byId = true): array
+    {
         return $this->db->getAdapter()->query('
             SELECT `id`, `from`, `till` 
             FROM `match_analysis_pricing_preset_range` 
@@ -84,11 +84,10 @@ class PresetRange extends ZfExtended_Models_Entity_Abstract {
     /**
      * Get range-entries as [from => till] pairs by given $presetId
      *
-     * @param int $presetId
-     * @return array
      * @throws Zend_Db_Statement_Exception
      */
-    public function getPairsByPresetId(int $presetId) : array {
+    public function getPairsByPresetId(int $presetId): array
+    {
         return $this->db->getAdapter()->query('
             SELECT `from`, `till` 
             FROM `match_analysis_pricing_preset_range` 
@@ -100,11 +99,11 @@ class PresetRange extends ZfExtended_Models_Entity_Abstract {
     /**
      * In addition to normal deletion, keys from JSON in `match_analysis_pricing_preset_prices`.`pricesByRangeIds` are deleted as well
      */
-    public function delete() {
-
+    public function delete()
+    {
         // Shortcuts
         $presetId = $this->getPresetId();
-        $rangeId  = $this->getId();
+        $rangeId = $this->getId();
 
         // Call parent
         parent::delete();
@@ -117,26 +116,23 @@ class PresetRange extends ZfExtended_Models_Entity_Abstract {
      * Add {.., $rangeId: 0.00, ..} into `pricesByRangeIds`-prop's JSON-value
      * for all `match_analysis_pricing_preset_prices`-records having same $presetId
      */
-    public function onAfterInsert() {
-
+    public function onAfterInsert()
+    {
         // Shortcuts
         $presetId = $this->getPresetId();
-        $rangeId  = $this->getId();
+        $rangeId = $this->getId();
 
         // Add rangeId-keys
         Factory::get(PresetPrices::class)->addRange($presetId, $rangeId);
     }
 
     /**
-     * @param int $sourcePresetId
-     * @param int $targetPresetId
-     * @return array
      * @throws Zend_Db_Statement_Exception
      * @throws ZfExtended_Models_Entity_Exceptions_IntegrityConstraint
      * @throws ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey
      */
-    public function cloneByPresetId(int $sourcePresetId, int $targetPresetId) : array {
-
+    public function cloneByPresetId(int $sourcePresetId, int $targetPresetId): array
+    {
         // Get ranges set up for $sourcePresetId
         $sourceRangeA = $this->getByPresetId($sourcePresetId);
 
@@ -145,7 +141,6 @@ class PresetRange extends ZfExtended_Models_Entity_Abstract {
 
         // Foreach source range
         foreach ($sourceRangeA as $sourceRangeId => $sourceRangeI) {
-
             // Init range's clone
             $this->init([
                 'presetId' => $targetPresetId,
@@ -170,7 +165,8 @@ class PresetRange extends ZfExtended_Models_Entity_Abstract {
      *
      * @throws Zend_Db_Statement_Exception
      */
-    public function getPrevTill() {
+    public function getPrevTill()
+    {
         return $this->db->getAdapter()->query('
             SELECT `till`  
             FROM `match_analysis_pricing_preset_range` 
@@ -178,7 +174,7 @@ class PresetRange extends ZfExtended_Models_Entity_Abstract {
             ORDER BY `till` DESC
         ', [
             $this->getPresetId(),
-            $this->getFrom()
+            $this->getFrom(),
         ])->fetchColumn();
     }
 
@@ -188,7 +184,8 @@ class PresetRange extends ZfExtended_Models_Entity_Abstract {
      *
      * @throws Zend_Db_Statement_Exception
      */
-    public function getNextFrom() {
+    public function getNextFrom()
+    {
         return $this->db->getAdapter()->query('
             SELECT `from`  
             FROM `match_analysis_pricing_preset_range` 
@@ -196,7 +193,7 @@ class PresetRange extends ZfExtended_Models_Entity_Abstract {
             ORDER BY `from`
         ', [
             $this->getPresetId(),
-            $this->getTill()
+            $this->getTill(),
         ])->fetchColumn();
     }
 
@@ -205,7 +202,8 @@ class PresetRange extends ZfExtended_Models_Entity_Abstract {
      *
      * @throws Zend_Db_Statement_Exception
      */
-    public function isOverlappingOthers() {
+    public function isOverlappingOthers()
+    {
         return $this->db->getAdapter()->query('
             SELECT `id` 
             FROM `match_analysis_pricing_preset_range` 

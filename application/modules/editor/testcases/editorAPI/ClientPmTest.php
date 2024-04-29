@@ -3,31 +3,29 @@
 START LICENSE AND COPYRIGHT
 
  This file is part of translate5
- 
+
  Copyright (c) 2013 - 2021 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
 
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
  This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
- as published by the Free Software Foundation and appearing in the file agpl3-license.txt 
- included in the packaging of this file.  Please review the following information 
+ as published by the Free Software Foundation and appearing in the file agpl3-license.txt
+ included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
-  
+
  There is a plugin exception available for use with this release of translate5 for
- translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or
  plugin-exception.txt in the root folder of translate5.
-  
+
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
 
-use MittagQI\Translate5\Test\Api\Helper;
-use MittagQI\Translate5\Test\Import\Config;
 use MittagQI\Translate5\Test\Import\LanguageResource;
 
 /**
@@ -80,7 +78,7 @@ class ClientPmTest extends editor_Test_ImportTest
         $mainClientId = static::getTestCustomerId();
         $firstClientPmClientId = static::getTestCustomerId(1);
         $secondClientPmClientId = static::getTestCustomerId(2);
-        
+
         // add a User to work with, bound to the main customer
         static::api()->login('testmanager');
         $newUser = static::api()->postJson('editor/user/', [
@@ -104,7 +102,7 @@ class ClientPmTest extends editor_Test_ImportTest
         // login as testclientpm and add the second client-pm customer to the user
         static::api()->login('testclientpm');
         $result = static::api()->putJson('editor/user/' . static::$newUserId, [
-            'customers' => $firstClientPmClientId . ',' . $secondClientPmClientId // mimicing the frontend, we just send the two customers the clientpm can access !
+            'customers' => $firstClientPmClientId . ',' . $secondClientPmClientId, // mimicing the frontend, we just send the two customers the clientpm can access !
         ]);
         static::assertEquals(
             $this->normalizeCustomers([$mainClientId, $firstClientPmClientId, $secondClientPmClientId]),  // this MUST lead to the "main customer" is still assigned
@@ -113,7 +111,7 @@ class ClientPmTest extends editor_Test_ImportTest
 
         // test again, now remove the first clientPm customer
         $result = static::api()->putJson('editor/user/' . static::$newUserId, [
-            'customers' => $secondClientPmClientId // mimicing the frontend, we just send the customer accessible for the client-pm
+            'customers' => $secondClientPmClientId, // mimicing the frontend, we just send the customer accessible for the client-pm
         ]);
         static::assertEquals(
             $this->normalizeCustomers([$mainClientId, $secondClientPmClientId]), // this MUST lead to the "main customer" is still assigned
@@ -122,7 +120,7 @@ class ClientPmTest extends editor_Test_ImportTest
 
         // try to delete the added user as testclientpm, this must fail
         $result = static::api()->delete('editor/user/', [
-            'id' => static::$newUserId
+            'id' => static::$newUserId,
         ], true);
         static::assertEquals(403, $result->status);
         static::assertStringContainsString('not allowed due to client-restriction', $result->error);
@@ -131,7 +129,7 @@ class ClientPmTest extends editor_Test_ImportTest
         static::api()->login('testmanager');
         // assign only the main customer the client-pm is not restricted for
         $result = static::api()->putJson('editor/user/' . static::$newUserId, [
-            'customers' => $mainClientId
+            'customers' => $mainClientId,
         ]);
         static::assertEquals(
             $this->normalizeCustomers([$mainClientId]),
@@ -193,7 +191,7 @@ class ClientPmTest extends editor_Test_ImportTest
         // add customer to TM 2
         static::api()->login('testmanager');
         $result = static::api()->putJson('editor/languageresourceinstance/' . $dummyMt0->getId(), [
-            'customerIds' => [$mainClientId, $firstClientPmClientId]
+            'customerIds' => [$mainClientId, $firstClientPmClientId],
         ]);
         static::assertEquals(
             $this->normalizeCustomers([$mainClientId, $firstClientPmClientId]),
@@ -210,7 +208,7 @@ class ClientPmTest extends editor_Test_ImportTest
 
         // now add other client-pm customer as clientpm ... and ensure, the base-cusomer is still present
         $result = static::api()->putJson('editor/languageresourceinstance/' . $dummyMt0->getId(), [
-            'customerIds' => [$firstClientPmClientId, $secondClientPmClientId]
+            'customerIds' => [$firstClientPmClientId, $secondClientPmClientId],
         ]);
         static::assertEquals(
             $this->normalizeCustomers([$mainClientId, $firstClientPmClientId, $secondClientPmClientId]), // $mainClientId must be present !
@@ -220,15 +218,14 @@ class ClientPmTest extends editor_Test_ImportTest
 
     /**
      * Normalizes customers either from array or from the customers-prop of a user to be able to compare them
-     * @param string|array $customers
-     * @return array
      */
     private function normalizeCustomers(string|array $customers): array
     {
-        if(is_string($customers)){
+        if (is_string($customers)) {
             $customers = explode(',', trim($customers, ','));
         }
         sort($customers, SORT_NUMERIC);
+
         return $customers;
     }
 
@@ -237,9 +234,9 @@ class ClientPmTest extends editor_Test_ImportTest
      */
     public static function afterTests(): void
     {
-        if(static::$newUserId > 0){
+        if (static::$newUserId > 0) {
             static::api()->delete('editor/user/', [
-                'id' => static::$newUserId
+                'id' => static::$newUserId,
             ]);
         }
     }

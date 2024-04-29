@@ -21,81 +21,82 @@ START LICENSE AND COPYRIGHT
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
 /**
- * Class editor_Models_Terms_Attributes
  * Attributes Instance
  *
- * @method integer getId() getId()
- * @method void setId() setId(integer $id)
- * @method integer getCollectionId() getCollectionId()
- * @method integer setCollectionId() setCollectionId(integer $collectionId)
- * @method string getTermEntryId() getTermEntryId()
- * @method string setTermEntryId() setTermEntryId(string $termEntryId)
- * @method string getLanguage() getLanguage()
- * @method string setLanguage() setLanguage(string $language)
- * @method int getTermId() getTermId()
- * @method int setTermId() setTermId(int $termId)
- * @method string getTermTbxId() getTermTbxId()
- * @method string setTermTbxId() setTermTbxId(string $termTbxId)
- * @method string getDataTypeId() getDataTypeId()
- * @method string setDataTypeId() setDataTypeId(int $dataTypeId)
- * @method string getType() getType()
- * @method string setType() setType(string $type)
- * @method string getValue() getValue()
- * @method string setValue() setValue(string $value)
- * @method string getTarget() getTarget()
- * @method string setTarget() setTarget(string $target)
- * @method string getIsCreatedLocally() getIsCreatedLocally()
- * @method void setIsCreatedLocally() setIsCreatedLocally(int $isCreatedLocally)
- * @method string getCreatedBy() getCreatedBy()
- * @method void setCreatedBy() setCreatedBy(int $userId)
- * @method string getCreatedAt() getCreatedAt()
- * @method void setCreatedAt() setCreatedAt(string $createdAt)
- * @method string getUpdatedBy() getUpdatedBy()
- * @method void setUpdatedBy() setUpdatedBy(int $userId)
- * @method string getUpdatedAt() getUpdatedAt()
- * @method void setUpdatedAt() setUpdatedAt(string $updatedAt)
- * @method string getTermEntryGuid() getTermEntryGuid()
- * @method string setTermEntryGuid() setTermEntryGuid(string $termEntryGuid)
- * @method string getLangSetGuid() getLangSetGuid()
- * @method string setLangSetGuid() setLangSetGuid(string $langSetGuid)
- * @method string getTermGuid() getTermGuid()
- * @method string setTermGuid() setTermGuid(string $termGuid)
- * @method string getGuid() getGuid()
- * @method string setGuid() setGuid(string $guid)
- * @method string getElementName() getElementName()
- * @method string setElementName() setElementName(string $elementName)
- * @method string getAttrLang() getAttrLang()
- * @method string setAttrLang() setAttrLang(string $attrLang)
+ * @method string getId()
+ * @method void setId(integer $id)
+ * @method string getCollectionId()
+ * @method void setCollectionId(integer $collectionId)
+ * @method string getTermEntryId()
+ * @method void setTermEntryId(string $termEntryId)
+ * @method string getLanguage()
+ * @method void setLanguage(string $language)
+ * @method string getTermId()
+ * @method void setTermId(int $termId)
+ * @method string getTermTbxId()
+ * @method void setTermTbxId(string $termTbxId)
+ * @method string getDataTypeId()
+ * @method void setDataTypeId(int $dataTypeId)
+ * @method string getType()
+ * @method void setType(string $type)
+ * @method string getValue()
+ * @method void setValue(string $value)
+ * @method string getTarget()
+ * @method void setTarget(string $target)
+ * @method string getIsCreatedLocally()
+ * @method void setIsCreatedLocally(int $isCreatedLocally)
+ * @method string getCreatedBy()
+ * @method void setCreatedBy(int $userId)
+ * @method string getCreatedAt()
+ * @method void setCreatedAt(string $createdAt)
+ * @method string getUpdatedBy()
+ * @method void setUpdatedBy(int $userId)
+ * @method string getUpdatedAt()
+ * @method void setUpdatedAt(string $updatedAt)
+ * @method string getTermEntryGuid()
+ * @method void setTermEntryGuid(string $termEntryGuid)
+ * @method string getLangSetGuid()
+ * @method void setLangSetGuid(string $langSetGuid)
+ * @method string getTermGuid()
+ * @method void setTermGuid(string $termGuid)
+ * @method string getGuid()
+ * @method void setGuid(string $guid)
+ * @method string getElementName()
+ * @method void setElementName(string $elementName)
+ * @method string getAttrLang()
+ * @method void setAttrLang(string $attrLang)
  */
 class editor_Models_Terminology_Models_AttributeModel extends editor_Models_Terminology_Models_Abstract
 {
-    const ATTR_LEVEL_ENTRY = 'termEntry';
-    const ATTR_LEVEL_LANGSET = 'langSet';
-    const ATTR_LEVEL_TERM = 'term';
+    public const ATTR_LEVEL_ENTRY = 'termEntry';
+
+    public const ATTR_LEVEL_LANGSET = 'langSet';
+
+    public const ATTR_LEVEL_TERM = 'term';
+
     protected $dbInstanceClass = 'editor_Models_Db_Terminology_Attribute';
+
     protected $validatorInstanceClass = 'editor_Models_Validator_Term_Attribute';
 
     /**
      * loads attributes of a term, optionally filtered by element and type
-     * @param int $termId
-     * @param array $element
-     * @param array $type
-     * @return array
      */
-    public function loadByTerm(int $termId, array $element = [], array $type = []): array {
+    public function loadByTerm(int $termId, array $element = [], array $type = []): array
+    {
         $s = $this->db->select()
             ->where('termId = ?', $termId);
-        if(!empty($element)) {
+        if (! empty($element)) {
             $s->where('elementName in (?)', $element);
         }
-        if(!empty($type)) {
+        if (! empty($type)) {
             $s->where('type in (?)', $type);
         }
+
         return $this->db->fetchAll($s)->toArray();
     }
 
@@ -109,14 +110,13 @@ class editor_Models_Terminology_Models_AttributeModel extends editor_Models_Term
     }
 
     /**
-    * Check if given AttrType is for responsable person
-    * Info: the responsable person type is saved in with different values in some tbx files
-    * @param string|null $type
-    * @return boolean
-    */
+     * Check if given AttrType is for responsable person
+     * Info: the responsable person type is saved in with different values in some tbx files
+     * @return boolean
+     */
     public function isResponsablePersonAttribute(string $type = null): bool
     {
-        if (!empty($type)) {
+        if (! empty($type)) {
             return $type == 'responsiblePerson' || $type == 'responsibility';
         }
         if ($this->getType() != null) {
@@ -132,16 +132,18 @@ class editor_Models_Terminology_Models_AttributeModel extends editor_Models_Term
      * @param string $name optional, if both parameters are empty the values from $this are used
      * @param string $type optional, if both parameters are empty the values from $this are used
      */
-    public function isProposable($name = null, $type = null) {
-        if(empty($name) && empty($type)) {
+    public function isProposable($name = null, $type = null)
+    {
+        if (empty($name) && empty($type)) {
             $name = $this->getElementName();
             $type = $this->getType();
         }
-        return !($name == 'date'
-            || $name=='termNote' && $type=='processStatus'
-            || $name=='transacNote' && ($this->isResponsablePersonAttribute($type))
-            || $name=='transac' && ($type=='origination' || $type=='origination')
-            || $name=='transac' && $type=='modification');
+
+        return ! ($name == 'date'
+            || $name == 'termNote' && $type == 'processStatus'
+            || $name == 'transacNote' && ($this->isResponsablePersonAttribute($type))
+            || $name == 'transac' && ($type == 'origination' || $type == 'origination')
+            || $name == 'transac' && $type == 'modification');
     }
 
     /**
@@ -151,21 +153,24 @@ class editor_Models_Terminology_Models_AttributeModel extends editor_Models_Term
      * @throws ZfExtended_Models_Entity_Exceptions_IntegrityConstraint
      * @throws ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey
      */
-    public function update($misc = []) {
-
+    public function update($misc = [])
+    {
         $orig = $this->row->getCleanData();
 
         // Set up `isCreatedLocally` flag to 1 if not explicitly given
-        if (!$this->isModified('isCreatedLocally')) $this->setIsCreatedLocally(1);
+        if (! $this->isModified('isCreatedLocally')) {
+            $this->setIsCreatedLocally(1);
+        }
 
         // Call parent
         $return = parent::save();
 
         // If current data is not equal to original data
         if ($this->toArray() != $orig) {
-
             // Prepare data for history record
-            $init = $orig; $init['attrId'] = $orig['id']; unset($init['id'], $init['createdBy'], $init['createdAt']);
+            $init = $orig;
+            $init['attrId'] = $orig['id'];
+            unset($init['id'], $init['createdBy'], $init['createdAt']);
 
             // Create history instance
             $history = ZfExtended_Factory::get('editor_Models_Term_AttributeHistory');
@@ -178,9 +183,10 @@ class editor_Models_Terminology_Models_AttributeModel extends editor_Models_Term
         }
 
         // Affect transacgrp-records and return modification string, e.g. '<user name>, <date in d.m.Y H:i:s format>'
-        if (isset($misc['userName']))
+        if (isset($misc['userName'])) {
             $return = ZfExtended_Factory::get('editor_Models_Terminology_Models_TransacgrpModel')
                 ->affectLevels($misc['userName'], $misc['userGuid'], $this->getTermEntryId(), $this->getLanguage(), $this->getTermId());
+        }
 
         // Return
         return $return;
@@ -193,24 +199,24 @@ class editor_Models_Terminology_Models_AttributeModel extends editor_Models_Term
      * @throws ZfExtended_Models_Entity_Exceptions_IntegrityConstraint
      * @throws ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey
      */
-    public function insert($misc = []) {
-
+    public function insert($misc = [])
+    {
         // Call parent
         $return = parent::save();
 
         // Affect transacgrp-records
-        if ($misc['userName'] ?? 0)
+        if ($misc['userName'] ?? 0) {
             $return = ZfExtended_Factory::get('editor_Models_Terminology_Models_TransacgrpModel')
                 ->affectLevels($misc['userName'], $misc['userGuid'], $this->getTermEntryId(), $this->getLanguage(), $this->getTermId());
+        }
 
         // Load mapping-record
         $mapping = ZfExtended_Factory
             ::get('editor_Models_Terminology_Models_CollectionAttributeDataType')
-            ->loadBy($this->getCollectionId(), $this->getDataTypeId());
+                ->loadBy($this->getCollectionId(), $this->getDataTypeId());
 
         // If mapping-record's `exists` flag is false, e.g there are no other attributes with such dataTypeId in same TermCollection
-        if (!$mapping->getExists()) {
-
+        if (! $mapping->getExists()) {
             // Set `exists` flag to true for mapping-record
             $mapping->setExists(true)->save();
         }
@@ -226,42 +232,42 @@ class editor_Models_Terminology_Models_AttributeModel extends editor_Models_Term
      * @throws ZfExtended_Models_Entity_Exceptions_IntegrityConstraint
      * @throws ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey
      */
-    public function delete($misc = []) {
-
+    public function delete($misc = [])
+    {
         // If attribute's `type` is 'figure' and `target` is not empty
         if ($this->getType() == 'figure' && $this->getTarget()) {
-
             // Setup terms_images model
             $i = ZfExtended_Factory::get('editor_Models_Terminology_Models_ImagesModel');
 
             // If `terms_images` record found by attr's target - delete that record
-            if ($i->loadByTargetId($this->getCollectionId(), $this->getTarget())){
+            if ($i->loadByTargetId($this->getCollectionId(), $this->getTarget())) {
                 $i->delete();
             }
         }
 
         // If attribute's `type` is 'definition' - check whether we should update `terms_term`.`definition`
         // and if yes, what should be the new value and what terms should be affected
-        if ($this->getType() == 'definition')
+        if ($this->getType() == 'definition') {
             $return['definition'] = $this->replicateDefinition('deleted');
+        }
 
         // Affect transacgrp-records and return modification string, e.g. '<user name>, <date in d.m.Y H:i:s format>'
-        if ($misc['userName'] ?? 0)
+        if ($misc['userName'] ?? 0) {
             $return['updated'] = ZfExtended_Factory::get('editor_Models_Terminology_Models_TransacgrpModel')
                 ->affectLevels($misc['userName'], $misc['userGuid'], $this->getTermEntryId(), $this->getLanguage(), $this->getTermId());
+        }
 
         // Set isLast-check-skip flag
         $skipCheckIsLast = $misc['skipCheckIsLast'] ?? false;
 
         // If there are no other attributes with such dataTypeId in same TermCollection
-        if (!$skipCheckIsLast && $this->isLastOfDataTypeInCollection()) {
-
+        if (! $skipCheckIsLast && $this->isLastOfDataTypeInCollection()) {
             // Remove mapping
             ZfExtended_Factory
                 ::get('editor_Models_Terminology_Models_CollectionAttributeDataType')
-                ->loadBy($this->getCollectionId(), $this->getDataTypeId())
-                ->setExists(false)
-                ->save();
+                    ->loadBy($this->getCollectionId(), $this->getDataTypeId())
+                    ->setExists(false)
+                    ->save();
         }
 
         // Call parent
@@ -274,11 +280,11 @@ class editor_Models_Terminology_Models_AttributeModel extends editor_Models_Term
     /**
      * Check whether current attribute is the last having it's dataTypeId within it's collectionId
      *
-     * @return bool
      * @throws Zend_Db_Statement_Exception
      */
-    public function isLastOfDataTypeInCollection() : bool {
-        return !$this->db->getAdapter()->query('
+    public function isLastOfDataTypeInCollection(): bool
+    {
+        return ! $this->db->getAdapter()->query('
             SELECT `id` 
             FROM `terms_attributes` 
             WHERE 1
@@ -297,7 +303,7 @@ class editor_Models_Terminology_Models_AttributeModel extends editor_Models_Term
      * @return boolean
      * @throws Zend_Db_Statement_Exception
      */
-    public function removeProposalsOlderThan(array $collectionIds,string $olderThan): bool
+    public function removeProposalsOlderThan(array $collectionIds, string $olderThan): bool
     {
         // Get ids of attrs, that were created or updated after tbx-import
         $attrIdA = $this->db->getAdapter()->query('
@@ -308,10 +314,9 @@ class editor_Models_Terminology_Models_AttributeModel extends editor_Models_Term
               AND `collectionId` IN (' . implode(',', $collectionIds) . ')
         ')->fetchAll(PDO::FETCH_COLUMN);
 
-        if (empty($attrIdA)){
+        if (empty($attrIdA)) {
             return false;
         }
-
 
         // Get tbx-imported values for `value` and `target` props, that now have changed values in attributes-table
         $tbxA = $this->db->getAdapter()->query('
@@ -330,7 +335,7 @@ class editor_Models_Terminology_Models_AttributeModel extends editor_Models_Term
         $affectedQty = 0;
 
         // Delete created attrs, that are older than $olderThan
-        if (!empty($attrIdA_created)) {
+        if (! empty($attrIdA_created)) {
             //this speeds incredibly up the SQL since no cast must be done in SQL then
             $affectedQty += $this->db->delete([
                 'createdAt < ?' => $olderThan,
@@ -340,13 +345,15 @@ class editor_Models_Terminology_Models_AttributeModel extends editor_Models_Term
         }
 
         // Overwrite $attrIdA_updated array for it to keep only ids of attributes, that were last updated before $olderThan arg
-        if ($attrIdA_updated) $attrIdA_updated = $this->db->getAdapter()->query($sql = '
+        if ($attrIdA_updated) {
+            $attrIdA_updated = $this->db->getAdapter()->query($sql = '
             SELECT `id` 
             FROM `terms_attributes` 
             WHERE TRUE
               AND `id` IN (' . implode(',', $attrIdA_updated) . ')
               AND `updatedAt` < ? 
         ', $olderThan)->fetchAll(PDO::FETCH_COLUMN);
+        }
 
         // Revert updated attrs' `value` and `target` props to tbx-imported values
         foreach ($attrIdA_updated as $attrId) {
@@ -357,29 +364,30 @@ class editor_Models_Terminology_Models_AttributeModel extends editor_Models_Term
             $this->save();
 
             // Increase counter
-            $affectedQty ++;
+            $affectedQty++;
         }
 
         // Delete history-records for $attrIdA_updated attrs
-        if ($attrIdA_updated) ZfExtended_Factory::get('editor_Models_Term_AttributeHistory')->db->delete([
-            'attrId in (?)' => $attrIdA_updated,
-        ]);
+        if ($attrIdA_updated) {
+            ZfExtended_Factory::get('editor_Models_Term_AttributeHistory')->db->delete([
+                'attrId in (?)' => $attrIdA_updated,
+            ]);
+        }
 
         // Return
         return $affectedQty > 0;
     }
 
     /**
-     * @param array $refA
-     * @param $refTargetIdA
-     * @param array $prefLangA
      * @param string $level
      * @throws Zend_Db_Statement_Exception
      */
-    public static function refTarget(array &$refA, array $refTargetIdA, array $prefLangA, $level = null) {
-
+    public static function refTarget(array &$refA, array $refTargetIdA, array $prefLangA, $level = null)
+    {
         // If no ref-attributes having non-empty target-prop found - return
-        if (!$refTargetIdA) return;
+        if (! $refTargetIdA) {
+            return;
+        }
 
         // Shortcut to arg passed to IN (?)
         $in = '"' . implode('","', array_keys($refTargetIdA)) . '"';
@@ -387,7 +395,7 @@ class editor_Models_Terminology_Models_AttributeModel extends editor_Models_Term
         // Which tbx column to use
         $tbxCol = $level
             ? '`' . ($level == 'term' ? 'termTbxId' : 'termEntryTbxId') . '`'
-            : 'IF(`termTbxId` IN (' . $in .'), `termTbxId`, `termEntryTbxId`)';
+            : 'IF(`termTbxId` IN (' . $in . '), `termTbxId`, `termEntryTbxId`)';
 
         // Build WHERE clause
         $where = $level
@@ -415,12 +423,12 @@ class editor_Models_Terminology_Models_AttributeModel extends editor_Models_Term
 
         // Get preferred languages groups
         $prefLangGroupA = [];
-        foreach ($prefLangA as $prefLang)
+        foreach ($prefLangA as $prefLang) {
             $prefLangGroupA[substr($prefLang, 0, 2)] = true;
+        }
 
         // Foreach data item
         foreach ($dataByRefTargetIdA as $tbxId => &$refData) {
-
             // Decode json
             $refData['json'] = json_decode($refData['json'], true);
 
@@ -432,35 +440,36 @@ class editor_Models_Terminology_Models_AttributeModel extends editor_Models_Term
             // 2. reference-terms found for 'en-gb' and 'en-au' languages
             // So, 'en-au' may be chosen if it appears first before 'en-gb' in the database,
             // despite 'en-gb' is more preferable, so below we're preventing that
-            if (count($prefLangGroupA) == 1)
-                foreach ($prefLangA as $prefLang)
+            if (count($prefLangGroupA) == 1) {
+                foreach ($prefLangA as $prefLang) {
                     if ($value = $refData['json'][$prefLang] ?? null) {
                         $refData['language'] = $prefLang;
-                        list (
+                        list(
                             $refData['termId'],
                             $refData['languageId'],
                             $refData['value'],
                             $refData['processStatus'],
                             $refData['status']
-                            ) = explode(',', $value);
+                        ) = explode(',', $value);
 
                         // Jump to next $refData
                         continue 2;
                     }
+                }
+            }
 
             // Foreach preferred language
             foreach ($prefLangA as $prefLang) {
-
                 // If term exists for the preferred language
                 if (count($prefLangGroupA) >= 1 && $value = $refData['json'][$prefLang] ?? null) {
                     $refData['language'] = $prefLang;
-                    list (
+                    list(
                         $refData['termId'],
                         $refData['languageId'],
                         $refData['value'],
                         $refData['processStatus'],
                         $refData['status']
-                        ) = explode(',', $value);
+                    ) = explode(',', $value);
 
                     //
                     break;
@@ -468,18 +477,18 @@ class editor_Models_Terminology_Models_AttributeModel extends editor_Models_Term
                     // Else if language of clicked left result is like 'xx-yy',
                     // e.g. belongs to a group 'xx', or is like 'xx'
                 } else {
-
                     // Try to find term for the language within that group
                     foreach ($refData['json'] as $lang => $value) {
                         if (substr($lang, 0, 2) == substr($prefLang, 0, 2)) {
                             $refData['language'] = $lang;
-                            list (
+                            list(
                                 $refData['termId'],
                                 $refData['languageId'],
                                 $refData['value'],
                                 $refData['processStatus'],
                                 $refData['status']
-                                ) = explode(',', $value);
+                            ) = explode(',', $value);
+
                             break 2;
                         }
                     }
@@ -487,15 +496,15 @@ class editor_Models_Terminology_Models_AttributeModel extends editor_Models_Term
             }
 
             // If term for preferred languages is still not found - just use first
-            if (!isset($refData['language'])) {
+            if (! isset($refData['language'])) {
                 $refData['language'] = array_keys($refData['json'])[0];
-                list (
+                list(
                     $refData['termId'],
                     $refData['languageId'],
                     $refData['value'],
                     $refData['processStatus'],
                     $refData['status']
-                    ) = explode(',', $refData['json'][$refData['language']]);
+                ) = explode(',', $refData['json'][$refData['language']]);
             }
 
             // Unset data for other languages
@@ -506,7 +515,6 @@ class editor_Models_Terminology_Models_AttributeModel extends editor_Models_Term
         // 1. Overwritten: language, value
         // 2. Added: termEntryId
         foreach ($refTargetIdA as $refTargetId => $info) {
-
             // Pick level and attributeId
             list($level, $attributeId) = $info;
 
@@ -514,7 +522,9 @@ class editor_Models_Terminology_Models_AttributeModel extends editor_Models_Term
             $_ = $dataByRefTargetIdA[$refTargetId] ?? [];
 
             // Add isValidTbx flag
-            $_ += ['isValidTbx' => !!$_];
+            $_ += [
+                'isValidTbx' => ! ! $_,
+            ];
 
             // Merge into attribute, with a priority
             $refA[$level][$attributeId] = $_ + $refA[$level][$attributeId];
@@ -522,13 +532,11 @@ class editor_Models_Terminology_Models_AttributeModel extends editor_Models_Term
     }
 
     /**
-     * @param int $collectionId
-     * @param int $termEntryId
      * @param null $language
      * @throws Zend_Db_Statement_Exception
      */
-    public static function deleteImages(int $collectionId, int $termEntryId, $language = null) {
-
+    public static function deleteImages(int $collectionId, int $termEntryId, $language = null)
+    {
         // Setup query param bindings
         $bind[':collectionId'] = $collectionId;
         $bind[':termEntryId'] = $termEntryId;
@@ -537,7 +545,10 @@ class editor_Models_Terminology_Models_AttributeModel extends editor_Models_Term
         }
 
         // Build WHERE clause using bindings
-        $where = []; foreach ($bind as $key => $value) $where []= '`' . ltrim($key, ':') . '` = ' . $key;
+        $where = [];
+        foreach ($bind as $key => $value) {
+            $where[] = '`' . ltrim($key, ':') . '` = ' . $key;
+        }
 
         // Get image-attribute targets
         $targetIdA = editor_Utils::db()->query('
@@ -545,14 +556,16 @@ class editor_Models_Terminology_Models_AttributeModel extends editor_Models_Term
         ', $bind)->fetchAll(PDO::FETCH_KEY_PAIR);
 
         // If nothing found - return
-        if (!$targetIdA) return;
+        if (! $targetIdA) {
+            return;
+        }
 
         /* @var $i editor_Models_Terminology_Models_ImagesModel */
         $i = ZfExtended_Factory::get('editor_Models_Terminology_Models_ImagesModel');
 
         // Delete the images then
         $images = $i->loadByTargetIdList($collectionId, array_keys($targetIdA));
-        foreach($images as $image) {
+        foreach ($images as $image) {
             $i->init($image);
             $i->delete();
         }
@@ -566,8 +579,10 @@ class editor_Models_Terminology_Models_AttributeModel extends editor_Models_Term
      * @return array
      * @throws Zend_Db_Statement_Exception
      */
-    public function getExportData($termEntryIds, $tbxBasicOnly = false) {
-        return array_group_by($this->db->getAdapter()->query('
+    public function getExportData($termEntryIds, $tbxBasicOnly = false)
+    {
+        return array_group_by($this->db->getAdapter()->query(
+            '
             SELECT `termEntryId`, `language`, `termId`, `elementName`, `type`, `value`, `target`, `isDescripGrp`, `dataTypeId` 
             FROM `terms_attributes`
             WHERE `termEntryId` IN (' . $termEntryIds . ')' . editor_Utils::rif($tbxBasicOnly, ' AND `dataTypeId` IN ($1)')
@@ -578,22 +593,18 @@ class editor_Models_Terminology_Models_AttributeModel extends editor_Models_Term
      * Replicate new value of definition attribute to `terms_term`.`definition` where needed
      * and return array containing new value and ids of affected `terms_term` records for
      * being able to apply that on client side
-     *
-     * @param $event
      */
-    public function replicateDefinition($event) {
-
+    public function replicateDefinition($event)
+    {
         // If $event is 'deleted'
         if ($event == 'deleted') {
-
             // If it's a language-level definition-attribute is going to be deleted
             // get termEntry-level definition-attribute to be used as a replacement
             // or just use empty string
             $value = $this->getLanguage() ? $this->_entryLevelDef() : '';
 
-        // Else if $event is 'updated'
-        } else if ($event == 'updated') {
-
+            // Else if $event is 'updated'
+        } elseif ($event == 'updated') {
             // If we updated the language-level definition-attribute
             $value = $this->getLanguage()
 
@@ -612,7 +623,7 @@ class editor_Models_Terminology_Models_AttributeModel extends editor_Models_Term
         // otherwise we need to replicate definition to all terms, that have
         // no definition-attribute on their language-level, or have but it's empty,
         // so we find the languages matching that criteria within current termEntry
-        $bind []= $this->getLanguage()
+        $bind[] = $this->getLanguage()
             ? $this->getLanguage()
             : join(',', $this->_getLanguagesWithNoOrEmptyDefinition());
 
@@ -631,18 +642,20 @@ class editor_Models_Terminology_Models_AttributeModel extends editor_Models_Term
 
         // Foreach termId
         foreach ($termIdA as $termId) {
-
             // Load term and update definition, involving history-record creation
             $termM->load($termId);
             $termM->setDefinition($value);
             $termM->update();
 
             //
-            $affected []= $termId;
+            $affected[] = $termId;
         }
 
         // Return
-        return ['value' => $value, 'affected' => $affected];
+        return [
+            'value' => $value,
+            'affected' => $affected,
+        ];
     }
 
     /**
@@ -651,7 +664,8 @@ class editor_Models_Terminology_Models_AttributeModel extends editor_Models_Term
      * @return string
      * @throws Zend_Db_Statement_Exception
      */
-    protected function _entryLevelDef() {
+    protected function _entryLevelDef()
+    {
         return $this->db->getAdapter()->query('
             SELECT IFNULL(`value`, "") 
             FROM `terms_attributes` 
@@ -671,7 +685,8 @@ class editor_Models_Terminology_Models_AttributeModel extends editor_Models_Term
      * @return array
      * @throws Zend_Db_Statement_Exception
      */
-    protected function _getLanguagesWithNoOrEmptyDefinition() {
+    protected function _getLanguagesWithNoOrEmptyDefinition()
+    {
         return $this->db->getAdapter()->query('
             SELECT
               `t`.`language`,
@@ -696,14 +711,13 @@ class editor_Models_Terminology_Models_AttributeModel extends editor_Models_Term
      * It is used internally by TermModel->terminfo() and ->siblinginfo()
      * and should not be called directly
      *
-     * @param $levelColumnToBeGroupedBy
-     * @param $where
-     * @param $bind
      * @return array
      * @throws Zend_Db_Statement_Exception
      */
-    public function loadGroupedByLevel($levelColumnToBeGroupedBy, $where, $bind) {
-        return $this->db->getAdapter()->query('
+    public function loadGroupedByLevel($levelColumnToBeGroupedBy, $where, $bind)
+    {
+        return $this->db->getAdapter()->query(
+            '
             SELECT 
               ' . $levelColumnToBeGroupedBy . ', 
               `id`, 
@@ -717,7 +731,8 @@ class editor_Models_Terminology_Models_AttributeModel extends editor_Models_Term
               IFNULL(`updatedBy`, 0) AS `updatedBy`, DATE_FORMAT(`updatedAt`, "%d.%m.%Y %H:%i:%s") AS `updatedAt`
             FROM `terms_attributes` 
             WHERE ' . $where . ' AND `isDraft` = 0
-            ORDER BY `type` = "processStatus" DESC, `id` DESC', $bind
+            ORDER BY `type` = "processStatus" DESC, `id` DESC',
+            $bind
         )->fetchAll(PDO::FETCH_GROUP);
     }
 
@@ -725,12 +740,11 @@ class editor_Models_Terminology_Models_AttributeModel extends editor_Models_Term
      * Set up `isDraft` = 0 for records identified by comma-separated ids given by $ids arg
      * Return ids of special attrs among those (e.g. processStatus- and definition-attrs) if any
      *
-     * @param $ids
      * @return array
      * @throws Zend_Db_Statement_Exception
      */
-    public function undraftByIds($ids) {
-
+    public function undraftByIds($ids)
+    {
         // Set up `isDraft` = 0 for records identified by comma-separated ids given by $ids arg
         $this->db->getAdapter()->query('
             UPDATE `terms_attributes` SET `isDraft` = "0" WHERE `id` IN (' . $ids . ')
@@ -748,8 +762,8 @@ class editor_Models_Terminology_Models_AttributeModel extends editor_Models_Term
      *
      * @throws Zend_Db_Statement_Exception
      */
-    public function deleteDrafts() {
-
+    public function deleteDrafts()
+    {
         // Get ids array of draft attributes
         $attrIdA_isDraft = $this->db->getAdapter()->query('
             SELECT `id` FROM `terms_attributes` WHERE `isDraft` = "1"
@@ -757,7 +771,6 @@ class editor_Models_Terminology_Models_AttributeModel extends editor_Models_Term
 
         // Foreach id
         foreach ($attrIdA_isDraft as $attrId) {
-
             // Load model instance
             $this->load($attrId);
 
@@ -767,17 +780,13 @@ class editor_Models_Terminology_Models_AttributeModel extends editor_Models_Term
     }
 
     /**
-     * @param array $attrIds
-     * @param $createdBy
-     * @param array $rights
-     * @return array
      * @throws Zend_Db_Statement_Exception
      */
-    public function getReadonlyByIds(array $attrIds, $createdBy, array $rights) : array {
-
+    public function getReadonlyByIds(array $attrIds, $createdBy, array $rights): array
+    {
         // Shortcuts to bool flags indicating whether or not current user has certain rights
-        $canReview  =  in_array('review'  , $rights);
-        $canPropose  = in_array('propose' , $rights);
+        $canReview = in_array('review', $rights);
+        $canPropose = in_array('propose', $rights);
         $canFinalize = in_array('finalize', $rights);
 
         // Get termIds for those of given attrIds that belong to term-level
@@ -812,14 +821,16 @@ class editor_Models_Terminology_Models_AttributeModel extends editor_Models_Term
 
         // Group by termEntryId, preserving attrId as keys
         $attrA = [];
-        foreach ($_attrA as $attrId => $attr)
+        foreach ($_attrA as $attrId => $attr) {
             $attrA[$attr['termEntryId']][$attrId] = $attr;
+        }
 
         // As long as editing and deletion of language- and entry-level attributes is only allowed for cases when
         //  - ALL terms within given language, or
         //  - ALL terms within given entry
         // are having same processStatus we need to collect lists of distinct processStatus-values grouped by languages
-        $infoByTermEntryIdA = $attrA ? $this->db->getAdapter()->query('
+        $infoByTermEntryIdA = $attrA ? $this->db->getAdapter()->query(
+            '
             SELECT
               `termEntryId`, 
               `language`,
@@ -834,7 +845,6 @@ class editor_Models_Terminology_Models_AttributeModel extends editor_Models_Term
 
         // Foreach involved termEntryId and it's distinct info
         foreach ($infoByTermEntryIdA as $termEntryId => $distinct) {
-
             // Convert $distinct from
             // [['language' => 'en', 'distinct' => 'status1,status2'], ...]
             // to
@@ -847,18 +857,16 @@ class editor_Models_Terminology_Models_AttributeModel extends editor_Models_Term
             // Wrap that info into a more handy format
             $distinct = [
                 'entry' => join(',', array_unique($distinct)),
-                'language' => $distinct
+                'language' => $distinct,
             ];
 
             // Foreach attr within current $termEntryId
             foreach ($attrA[$termEntryId] as $attrId => $attr) {
-
                 // Set up readonly flag to be true by default
                 $readonly[$attrId] = true;
 
                 // If it is a draft attribute
                 if ($attr['isDraft']) {
-
                     // Setup readonly flag to be false
                     $readonly[$attrId] = false;
 
@@ -867,32 +875,35 @@ class editor_Models_Terminology_Models_AttributeModel extends editor_Models_Term
                 }
 
                 // Shortcuts
-                $level = $attr['level']; $language = $attr['language']; $termId = $attr['termId'];
+                $level = $attr['level'];
+                $language = $attr['language'];
+                $termId = $attr['termId'];
 
                 // Get list of distinct processStatus-values depending on level
-                     if ($level == 'term'    ) $_distinct = $processStatusA[$termId];
-                else if ($level == 'language') $_distinct = $distinct[$level][$language];
-                else if ($level == 'entry'   ) $_distinct = $distinct[$level];
+                if ($level == 'term') {
+                    $_distinct = $processStatusA[$termId];
+                } elseif ($level == 'language') {
+                    $_distinct = $distinct[$level][$language];
+                } elseif ($level == 'entry') {
+                    $_distinct = $distinct[$level];
+                }
 
                 // If distinct processStatus list consists of only 1 value, and it's 'unprocessed'
                 if ($_distinct == 'unprocessed') {
-
                     // If current user has propose-right, but has no review-right
-                    if ($canPropose && !$canReview) {
-
+                    if ($canPropose && ! $canReview) {
                         // If current user can delete own attrs, and current user is current attr creator
                         if ($createdBy && $attr['createdBy'] == $createdBy) {
                             $readonly[$attrId] = false;
                         }
 
-                    // Else if current user has review-right
-                    } else if ($canReview) {
+                        // Else if current user has review-right
+                    } elseif ($canReview) {
                         $readonly[$attrId] = false;
                     }
 
-                // Else if distinct processStatus list consists of only 1 value, and it's 'provisionallyProcessed'
-                } else if ($_distinct == 'provisionallyProcessed') {
-
+                    // Else if distinct processStatus list consists of only 1 value, and it's 'provisionallyProcessed'
+                } elseif ($_distinct == 'provisionallyProcessed') {
                     // If current user has finalize-right
                     if ($canFinalize) {
                         $readonly[$attrId] = false;
@@ -908,12 +919,11 @@ class editor_Models_Terminology_Models_AttributeModel extends editor_Models_Term
     /**
      * Get quantity of existing attributes having given $collectionId and $dataTypeId
      *
-     * @param int $collectionId
-     * @param int $dataTypeId
      * @return string
      * @throws Zend_Db_Statement_Exception
      */
-    public function qtyBy(int $collectionId, int $dataTypeId) {
+    public function qtyBy(int $collectionId, int $dataTypeId)
+    {
         return $this->db->getAdapter()->query('
             SELECT COUNT(`id`) FROM `terms_attributes` WHERE `collectionId` = ? AND `dataTypeId` = ?
         ', [$collectionId, $dataTypeId])->fetchColumn();
@@ -922,29 +932,28 @@ class editor_Models_Terminology_Models_AttributeModel extends editor_Models_Term
     /**
      * Delete existing attributes having given $collectionId and $dataTypeId
      *
-     * @param int $collectionId
-     * @param int $dataTypeId
      * @return string
      * @throws Zend_Db_Statement_Exception
      * @throws ZfExtended_Models_Entity_Exceptions_IntegrityConstraint
      * @throws ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey
      * @throws ZfExtended_Models_Entity_NotFoundException
      */
-    public function deleteBy(int $collectionId, int $dataTypeId) {
-
+    public function deleteBy(int $collectionId, int $dataTypeId)
+    {
         // Get ids
-        $idA =  $this->db->getAdapter()->query('
+        $idA = $this->db->getAdapter()->query('
             SELECT `id` FROM `terms_attributes` WHERE `collectionId` = ? AND `dataTypeId` = ?
         ', [$collectionId, $dataTypeId])->fetchAll(PDO::FETCH_COLUMN);
 
         // Foreach
         foreach ($idA as $id) {
-
             // Load
             $this->load($id);
 
             // Delete
-            $this->delete(['skipCheckIsLast' => true]);
+            $this->delete([
+                'skipCheckIsLast' => true,
+            ]);
         }
     }
 }
