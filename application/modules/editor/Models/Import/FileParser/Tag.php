@@ -195,8 +195,8 @@ class editor_Models_Import_FileParser_Tag
     public function renderTag(int $length = -1, string $title = null, string $cls = null): string
     {
         //lazy loading of the image tag renderers
-        if (is_string(self::$renderer[$this->type])) {
-            self::$renderer[$this->type] = ZfExtended_Factory::get(self::$renderer[$this->type]);
+        if (is_string(static::$renderer[$this->type])) {
+            static::$renderer[$this->type] = ZfExtended_Factory::get(static::$renderer[$this->type]);
         }
 
         $classes = [$this->parseSegmentGetStorageClass($this->originalContent, $this->xmlTags)];

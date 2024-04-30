@@ -215,8 +215,6 @@ class editor_Models_Segment_WordCount
      * Get count of the words in source field in the segment
      * All segment tags, and punctuation will be removed before the segment words are counted.
      * For easter asian languages, the grapheme count based on average grapheme per word will be calculated
-     *
-     * @return number|mixed
      */
     public function getSourceCount(): float|int
     {
@@ -227,7 +225,7 @@ class editor_Models_Segment_WordCount
 
             return $matches[0];
         });
-        $text = $this->utilityBroker->internalTag->restore($text);
+        $text = $this->utilityBroker->internalTag->restore($text, [editor_Models_Segment_Whitespace::WHITESPACE_TAGS]);
         $text = $this->contentProtector->unprotect($text, true);
         $text = $this->segment->stripTags($text);
         //average words in East Asian languages by language

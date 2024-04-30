@@ -29,7 +29,6 @@ END LICENSE AND COPYRIGHT
 use editor_Models_Import_FileParser_Xlf_LengthRestriction as XlfLengthRestriction;
 use editor_Models_Import_FileParser_Xlf_SurroundingTagRemover_Abstract as AbstractSurroundingTagRemover;
 use editor_Models_Import_FileParser_XmlParser as XmlParser;
-use MittagQI\Translate5\ContentProtection\NumberProtection\Tag\NumberTag;
 use MittagQI\Translate5\ContentProtection\NumberProtection\Tag\NumberTagRenderer;
 use MittagQI\Translate5\Task\Import\FileParser\Xlf\Comments;
 use MittagQI\Translate5\Task\Import\FileParser\Xlf\NamespaceRegistry;
@@ -638,11 +637,12 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
             } catch (Throwable $e) {
                 $msg = $e->getMessage() . "\n" . 'In trans-unit ' . print_r($opener['attributes']);
                 if ($e instanceof ZfExtended_Exception) {
-                    $e->setMessage($msg, 1);
+                    $e->setMessage($msg, true);
 
                     throw $e;
                 }
 
+                /* @phpstan-ignore-next-line */
                 throw new ZfExtended_Exception($msg, 0, $e);
             }
             //leaving a transunit means disable segment processing
@@ -966,7 +966,7 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
             }
 
             $this->contentProtector->filterTagsInChunks($sourceChunks, $targetChunks);
-            
+
             $this->surroundingTags->calculate($preserveWhitespace, $sourceChunks, $targetChunks, $this->xmlparser);
 
             $this->segmentData = [];

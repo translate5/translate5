@@ -88,7 +88,8 @@ class FloatProtectorTest extends TestCase
             0,
             '#,##0.###',
             false,
-            '#.##0,###'
+            '#.##0,###',
+            1
         );
         $targetLangDe = new editor_Models_Languages();
         $targetLangDe->setId(0);
@@ -108,7 +109,8 @@ class FloatProtectorTest extends TestCase
             0,
             '#,##0.###',
             false,
-            '#*##*#0&###'
+            '#*##*#0&###',
+            1
         );
 
         yield 'float with custom format' => [
@@ -125,7 +127,8 @@ class FloatProtectorTest extends TestCase
             0,
             '#,##0.###',
             false,
-            '#.#'
+            '#.#',
+            1
         );
 
         yield 'float with generic dot' => [
@@ -142,7 +145,8 @@ class FloatProtectorTest extends TestCase
             0,
             '#,##0.###',
             false,
-            '#·#'
+            '#·#',
+            1
         );
 
         yield 'float with generic middle dot' => [
@@ -163,7 +167,8 @@ class FloatProtectorTest extends TestCase
             0,
             '#,##0.###',
             false,
-            '#,##,##0.###'
+            '#,##,##0.###',
+            1
         );
 
         yield 'target lang hi_IN' => [
@@ -180,7 +185,8 @@ class FloatProtectorTest extends TestCase
             0,
             '#,##0.###',
             false,
-            '#.###.####0,###'
+            '#.###.####0,###',
+            1
         );
 
         yield 'target format #.###.####0,###' => [
@@ -197,7 +203,8 @@ class FloatProtectorTest extends TestCase
             0,
             null,
             true,
-            null
+            null,
+            1
         );
 
         yield 'date. keep as is' => [
@@ -225,7 +232,8 @@ class FloatProtectorTest extends TestCase
             0,
             '#,##0.###',
             false,
-            null
+            null,
+            1
         );
         $repo = $this->createConfiguredMock(ContentProtectionRepository::class, []);
 

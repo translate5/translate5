@@ -87,7 +87,8 @@ class IntegerProtectorTest extends TestCase
             0,
             null,
             false,
-            '#'
+            '#',
+            1
         );
         $targetLangDe = new editor_Models_Languages();
         $targetLangDe->setId(0);
@@ -111,7 +112,8 @@ class IntegerProtectorTest extends TestCase
             0,
             null,
             false,
-            '#.##.##0'
+            '#.##.##0',
+            1
         );
 
         yield 'target lang hi_IN' => [
@@ -128,7 +130,8 @@ class IntegerProtectorTest extends TestCase
             0,
             null,
             false,
-            '#,###,####0.###'
+            '#,###,####0.###',
+            1
         );
 
         yield 'target format #,###,####0.###' => [
@@ -145,7 +148,8 @@ class IntegerProtectorTest extends TestCase
             0,
             null,
             true,
-            null
+            null,
+            1
         );
 
         yield 'keep as is' => [

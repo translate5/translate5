@@ -784,7 +784,7 @@ class editor_Models_Import_FileParser_XmlParser
      * convenience method to get one attribute of the attributes array, returns the given default if not existent
      * @param array $attributes
      * @param string $attribute
-     * @param string $default
+     * @param mixed $default
      * @return mixed
      */
     public function getAttribute($attributes, $attribute, $default = false)
