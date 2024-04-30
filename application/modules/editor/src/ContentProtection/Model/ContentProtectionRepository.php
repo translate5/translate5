@@ -56,6 +56,7 @@ use editor_Models_LanguageResources_LanguageResource as LanguageResource;
 use editor_Models_LanguageResources_Languages as LRLanguages;
 use editor_Models_Languages as Languages;
 use editor_Services_Manager;
+use Iterator;
 use ZfExtended_Factory;
 
 class ContentProtectionRepository
@@ -80,9 +81,9 @@ class ContentProtectionRepository
     }
 
     /**
-     * @return iterable<ContentProtectionDto>
+     * @return Iterator<ContentProtectionDto>
      */
-    public function getAllForSource(Languages $sourceLang, Languages $targetLang, bool $useCache = true): \Iterator
+    public function getAllForSource(Languages $sourceLang, Languages $targetLang, bool $useCache = true): Iterator
     {
         $dbInputMapping = ZfExtended_Factory::get(InputMapping::class)->db;
         $dbOutputMapping = ZfExtended_Factory::get(OutputMapping::class)->db;
@@ -307,7 +308,7 @@ class ContentProtectionRepository
     }
 
     /**
-     * @return array{int, array{int, string}}
+     * @return array<int, array{int, string}>
      */
     public function getLanguageRulesHashMap(): array
     {
@@ -326,7 +327,7 @@ class ContentProtectionRepository
     }
 
     /**
-     * @return array<int, array{languages: array{source: int, target: int}, hash: string|null>
+     * @return array<int, array{languages: array{source: int, target: int}, hash: string|null}>
      */
     public function getLanguageResourceRulesHashMap(): array
     {
@@ -350,19 +351,21 @@ class ContentProtectionRepository
 
         $hashes = [];
 
+        /** @var array{id: int, specificData: string, sourceLang: string, targetLang: string} $row */
         foreach ($db->fetchAll($select) as $row) {
-            if (! isset($hashes[$row->id])) {
-                $hashes[$row->id] = [];
+            $id = $row['id'];
+            if (! isset($hashes[$id])) {
+                $hashes[$id] = [];
             }
 
-            $specificData = json_decode($row['specificData'], true);
+            $specificData = $row['specificData'] ? json_decode($row['specificData'], true) : [];
 
-            $hashes[$row->id]['languages'] = [
-                'source' => (int) $row->sourceLang,
-                'target' => (int) $row->targetLang,
+            $hashes[$id]['languages'] = [
+                'source' => (int) $row['sourceLang'],
+                'target' => (int) $row['targetLang'],
             ];
-            $hashes[$row->id]['hash'] = $specificData[LanguageResource::PROTECTION_HASH] ?? null;
-            $hashes[$row->id]['conversionStarted'] = $specificData[LanguageResource::PROTECTION_CONVERSION_STARTED] ?? null;
+            $hashes[$id]['hash'] = $specificData[LanguageResource::PROTECTION_HASH] ?? null;
+            $hashes[$id]['conversionStarted'] = $specificData[LanguageResource::PROTECTION_CONVERSION_STARTED] ?? null;
         }
 
         return $hashes;

@@ -33,6 +33,8 @@ END LICENSE AND COPYRIGHT
  */
 
 use editor_Models_Segment_InternalTag as InternalTag;
+use editor_Models_Segment_TagProtection as TagProtection;
+use editor_Models_SegmentField as SegmentField;
 use MittagQI\Translate5\ContentProtection\ContentProtector;
 
 /**
@@ -257,10 +259,10 @@ class editor_Models_Import_FileParser_Csv extends editor_Models_Import_FileParse
             //get type and editable state of the field
             if (! isset($csvSettings[$colHead]) || strlen($csvSettings[$colHead]) === 0) {
                 //if no column is configured, its a target
-                $type = editor_Models_SegmentField::TYPE_TARGET;
+                $type = SegmentField::TYPE_TARGET;
                 $editable = true;
             } elseif ($csvSettings[$colHead] == self::CONFIG_COLUMN_SOURCE) {
-                $type = editor_Models_SegmentField::TYPE_SOURCE;
+                $type = SegmentField::TYPE_SOURCE;
                 $editable = (bool) $this->task->getEnableSourceEditing();
             } elseif ($csvSettings[$colHead] == self::CONFIG_COLUMN_MID) {
                 $this->colOrder[self::CONFIG_COLUMN_MID] = $i++;
@@ -319,7 +321,7 @@ class editor_Models_Import_FileParser_Csv extends editor_Models_Import_FileParse
             }
 
             $field = $this->segmentFieldManager->getByName($name);
-            $isSource = $field->type == editor_Models_SegmentField::TYPE_SOURCE;
+            $isSource = $field->type === SegmentField::TYPE_SOURCE;
 
             if (empty($lineArr[$idx]) && $lineArr[$idx] !== "0") {
                 $original = '';
@@ -333,12 +335,12 @@ class editor_Models_Import_FileParser_Csv extends editor_Models_Import_FileParse
         }
 
         [$source, $target] = $this->contentProtector->filterTags(
-            $this->segmentData[editor_Models_SegmentField::TYPE_SOURCE]['original'],
-            $this->segmentData[editor_Models_SegmentField::TYPE_TARGET]['original']
+            $this->segmentData[SegmentField::TYPE_SOURCE]['original'],
+            $this->segmentData[SegmentField::TYPE_TARGET]['original']
         );
 
-        $this->segmentData[editor_Models_SegmentField::TYPE_SOURCE]['original'] = $this->convertSegmentToInternalTags($source);
-        $this->segmentData[editor_Models_SegmentField::TYPE_TARGET]['original'] = $this->convertSegmentToInternalTags($target);
+        $this->segmentData[SegmentField::TYPE_SOURCE]['original'] = $this->convertSegmentToInternalTags($source);
+        $this->segmentData[SegmentField::TYPE_TARGET]['original'] = $this->convertSegmentToInternalTags($target);
 
         //just create a segment attributes object with default values
         $this->createSegmentAttributes($this->_mid);
@@ -357,18 +359,11 @@ class editor_Models_Import_FileParser_Csv extends editor_Models_Import_FileParse
     private function convertSegmentToInternalTags(string $segment): string
     {
         $this->shortTagIdent = 1;
-        $segment = $this->contentProtector->convertToInternalTags($segment, $this->shortTagIdent);
-        $segment = $this->parseSegmentInsertPlaceholders($segment, InternalTag::REGEX_INTERNAL_TAGS);
 
-        return $this->parseSegmentReplacePlaceholders($segment);
+        return $this->contentProtector->convertToInternalTags($segment, $this->shortTagIdent);
     }
 
-    /**
-     * @param mixed $segment
-     * @param bool isSource
-     * @return string $segment
-     */
-    protected function parseSegment($segment, $isSource)
+    protected function parseSegment(string $segment, bool $isSource): string
     {
         //check, if $this->placeholderPrefix is present in segment - this must lead to error
         if (strpos($segment, $this->placeholderPrefix) !== false) {
@@ -392,6 +387,7 @@ class editor_Models_Import_FileParser_Csv extends editor_Models_Import_FileParse
         if ($this->config->runtimeOptions->import->fileparser->options->protectTags ?? false) {
             // because of the replaceRegularExpressionsAfterTagParsing we can only replace tags here but no whitespace so far!
             $segment = $this->utilities->tagProtection->protectTags($segment, false);
+            $segment = $this->parseSegmentInsertPlaceholders($segment, TagProtection::PROTECTED_TAG_REGEX);
         }
 
         // protect regExes after tag parsing
@@ -399,12 +395,14 @@ class editor_Models_Import_FileParser_Csv extends editor_Models_Import_FileParse
 
         // now all whitespace and remaining entities are encoded
         // if there are now internal tags added by the whitespace protection we have to protect them locally too
-        return $this->contentProtector->protect(
-            $segment,
-            $isSource,
-            $this->task->getSourceLang(),
-            $this->task->getTargetLang(),
-            ContentProtector::ENTITY_MODE_KEEP
+        return $this->parseSegmentReplacePlaceholders(
+            $this->contentProtector->protect(
+                $segment,
+                $isSource,
+                (int) $this->task->getSourceLang(),
+                (int) $this->task->getTargetLang(),
+                ContentProtector::ENTITY_MODE_KEEP
+            )
         );
     }
 

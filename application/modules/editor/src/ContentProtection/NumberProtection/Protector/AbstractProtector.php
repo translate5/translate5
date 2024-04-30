@@ -66,10 +66,6 @@ abstract class AbstractProtector implements NumberProtectorInterface
     ) {
     }
 
-    abstract public function validateFormat(string $format): bool;
-
-    abstract public function getFormatedExample(string $format): string;
-
     protected function tagFormat(): string
     {
         return str_replace(

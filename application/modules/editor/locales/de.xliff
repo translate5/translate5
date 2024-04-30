@@ -8686,9 +8686,9 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
                 <source>triton</source>
                 <target>Standard Layout (Triton)</target>
             </trans-unit>
-            <trans-unit id='RG9rdW1lbnRhdGlvbg=='>
-                <source>Dokumentation</source>
-                <target>Dokumentation</target>
+            <trans-unit id='U2NocmlmdGxpY2hlIERva3VtZW50YXRpb24='>
+                <source>Schriftliche Dokumentation</source>
+                <target>Schriftliche Dokumentation</target>
             </trans-unit>
             <trans-unit id='SW4gbmV1ZW0gQnJvd3Nlci1UYWIgw7ZmZm5lbg=='>
                 <source>In neuem Browser-Tab öffnen</source>

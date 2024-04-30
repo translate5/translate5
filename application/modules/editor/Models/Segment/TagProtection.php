@@ -31,6 +31,8 @@ END LICENSE AND COPYRIGHT
  */
 class editor_Models_Segment_TagProtection
 {
+    public const PROTECTED_TAG_REGEX = '#<protectedTag data-type="([^"]+)" data-id="(\d+)" data-content="([^"]+)"/>#';
+
     /**
      * @var array
      */
