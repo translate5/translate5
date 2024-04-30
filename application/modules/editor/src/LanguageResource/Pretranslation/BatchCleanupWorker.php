@@ -31,7 +31,6 @@ class BatchCleanupWorker extends editor_Models_Task_AbstractWorker
     {
         $resources = [];
 
-        /** @var TaskAssociation $taskAssociation */
         $taskAssociation = ZfExtended_Factory::get(TaskAssociation::class);
         $result = $taskAssociation->loadByTaskGuids($this->taskGuid);
 
@@ -39,7 +38,6 @@ class BatchCleanupWorker extends editor_Models_Task_AbstractWorker
             $resources = array_column($result, 'languageResourceId');
         }
 
-        /** @var TaskPivotAssociation $taskPivotAssociation */
         $taskPivotAssociation = ZfExtended_Factory::get(TaskPivotAssociation::class);
         $result = $taskPivotAssociation->loadTaskAssociated($this->taskGuid);
 
@@ -49,9 +47,11 @@ class BatchCleanupWorker extends editor_Models_Task_AbstractWorker
 
         $resources = array_unique($resources);
 
-        /** @var BatchResult $batchResult */
         $batchResult = ZfExtended_Factory::get(BatchResult::class);
-        $batchResult->deleteForLanguageresource($resources);
+        $batchResult->deleteForLanguageresource(
+            $resources,
+            $this->taskGuid
+        );
 
         return true;
     }

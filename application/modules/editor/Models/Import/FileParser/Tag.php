@@ -94,7 +94,8 @@ class editor_Models_Import_FileParser_Tag
     public string $originalContent;
 
     /**
-     * the text to be rendered as full text content of the tag in the GUI, defaults mostly to the encoded version of originalcontent, but finally depends on the XLF dialect
+     * the text to be rendered as full text content of the tag in the GUI, defaults mostly to the encoded
+     * version of originalcontent, but finally depends on the XLF dialect
      */
     public ?string $text = null;
 
@@ -134,7 +135,8 @@ class editor_Models_Import_FileParser_Tag
     /**
      * type of tag must be given on construction
      * @param int $type open,close,single see local constants
-     * @param bool $xmlTags defines if the given tags as originalContent are XMLish (so starting and ending with < and >)
+     * @param bool $xmlTags defines if the given tags as originalContent are XMLish
+     *                      (so starting and ending with < and >)
      */
     public function __construct(int $type = self::TYPE_SINGLE, bool $xmlTags = true)
     {
@@ -142,7 +144,12 @@ class editor_Models_Import_FileParser_Tag
         $this->xmlTags = $xmlTags;
     }
 
-    public function setSingle()
+    public function getType(): int
+    {
+        return $this->type;
+    }
+
+    public function setSingle(): void
     {
         $this->type = self::TYPE_SINGLE;
     }
@@ -255,8 +262,9 @@ class editor_Models_Import_FileParser_Tag
             if (! str_starts_with($tag, '<') || ! str_ends_with($tag, '>')) {
                 trigger_error('The Tag ' . $tag . ' has not the structure of a tag.', E_USER_ERROR);
             }
-            //we store the tag content without leading < and trailing >
-            //since we expect to cut of just two ascii characters no mb_ function is needed, the UTF8 content inbetween is untouched
+            // we store the tag content without leading < and trailing >
+            // since we expect to cut of just two ascii characters no mb_ function is needed,
+            // the UTF8 content inbetween is untouched
             $tag = substr($tag, 1, -1);
         }
 

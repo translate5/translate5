@@ -28,6 +28,7 @@ END LICENSE AND COPYRIGHT
 
 namespace MittagQI\Translate5\LanguageResource\Pretranslation;
 
+use editor_Models_Segment;
 use editor_Services_ServiceResult;
 use ZfExtended_Models_Entity_Abstract;
 
@@ -47,13 +48,13 @@ class BatchResult extends ZfExtended_Models_Entity_Abstract
 
     protected $validatorInstanceClass = 'MittagQI\Translate5\LanguageResource\Pretranslation\Validator\BatchResult';
 
-    /***
-     * Load the lates service result cache for segment and languageresource
-     * @param int $segmentId
+    /**
+     * Load the latest service result cache for segment, langauge resource and taskGuid
+     * @param string $segmentId
      * @param int $languageResource
      * @return editor_Services_ServiceResult
      */
-    public function getResults(int $segmentId, int $languageResource): editor_Services_ServiceResult
+    public function getResults(string $segmentId, int $languageResource): editor_Services_ServiceResult
     {
         $s = $this->db->select()
             ->where('segmentId = ?', $segmentId)
@@ -69,12 +70,30 @@ class BatchResult extends ZfExtended_Models_Entity_Abstract
         return unserialize($result['result']);
     }
 
-    /***
+    /**
+     * @throws \Zend_Db_Adapter_Exception
+     * @throws \Zend_Db_Table_Exception
+     */
+    public function saveResult(int $segmentId, int $languageResourceId, string $taskGuid, string $result): void
+    {
+        $adapter = $this->db->getAdapter();
+
+        $adapter->insert($this->db->info($this->db::NAME), [
+            'segmentId' => $segmentId,
+            'languageResource' => $languageResourceId,
+            'taskGuid' => $taskGuid,
+            'result' => $result,
+        ]);
+
+    }
+
+    /**
      * Delete all cached records for given language resources
      * @param array $languageResources
+     * @param string $taskGuid
      * @return int
      */
-    public function deleteForLanguageresource(array $languageResources)
+    public function deleteForLanguageresource(array $languageResources,string $taskGuid): int
     {
         if (empty($languageResources)) {
             return 0;
@@ -82,11 +101,12 @@ class BatchResult extends ZfExtended_Models_Entity_Abstract
 
         return $this->db->delete([
             'languageResource IN(?)' => $languageResources,
+            'taskGuid = ?' => $taskGuid,
         ]);
     }
 
-    /***
-     * Remove cache records older then one day
+    /**
+     * Remove cache records older than one day
      * @return int
      */
     public function deleteOlderRecords(): int

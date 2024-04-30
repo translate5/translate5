@@ -307,8 +307,15 @@ a.error:hover {
 }
 
 #languageSelector {
-    margin-top: -0.4EM;
     margin-right: 20px;
+    margin-top: 0;
+    position: relative;
+    top: -4px;
+}
+
+#helpButtonContainer {
+    margin-right: 30px;
+    cursor: pointer;
 }
 
 #languageSelector .ui-button {
