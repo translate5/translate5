@@ -123,6 +123,7 @@ class NumberProtectorTest extends TestCase
 
     public function testHasEntityToProtect(): void
     {
+        /** @var NumberProtectorInterface $processor */
         $processor = new class() implements NumberProtectorInterface {
             public static function getType(): string
             {
@@ -136,6 +137,16 @@ class NumberProtectorTest extends TestCase
                 ?editor_Models_Languages $targetLang
             ): string {
                 return 'test';
+            }
+
+            public function validateFormat(string $format): bool
+            {
+                return true;
+            }
+
+            public function getFormatedExample(string $format): string
+            {
+                return '';
             }
         };
         $numberRepository = $this->createConfiguredMock(ContentProtectionRepository::class, []);
@@ -163,7 +174,8 @@ class NumberProtectorTest extends TestCase
                 0,
                 '',
                 true,
-                null
+                null,
+                1
             );
         };
 
@@ -205,7 +217,8 @@ class NumberProtectorTest extends TestCase
                 0,
                 '',
                 false,
-                null
+                null,
+                1
             );
         };
 

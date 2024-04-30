@@ -70,6 +70,18 @@ class ContentProtectorTest extends editor_Test_UnitTest
 {
     protected function setUp(): void
     {
+        $inputMapping = ZfExtended_Factory::get(InputMapping::class);
+        foreach ($inputMapping->loadAll() as $item) {
+            $inputMapping->load($item['id']);
+            $inputMapping->delete();
+        }
+
+        $outputMapping = ZfExtended_Factory::get(OutputMapping::class);
+        foreach ($outputMapping->loadAll() as $item) {
+            $outputMapping->load($item['id']);
+            $outputMapping->delete();
+        }
+
         $crDate1 = ZfExtended_Factory::get(ContentRecognition::class);
         $crDate1->loadBy(DateProtector::getType(), 'default Y-m-d');
         $crDate1->setEnabled(true);

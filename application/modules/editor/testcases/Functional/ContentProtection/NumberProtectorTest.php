@@ -93,13 +93,13 @@ class NumberProtectorTest extends TestCase
         $contentRecognition2->save();
 
         $inputMapping = ZfExtended_Factory::get(InputMapping::class);
-        $inputMapping->setLanguageId($langEn->getId());
+        $inputMapping->setLanguageId((int) $langEn->getId());
         $inputMapping->setContentRecognitionId($contentRecognition1->getId());
         $inputMapping->setPriority(1000);
         $inputMapping->save();
 
         $outputMapping = ZfExtended_Factory::get(OutputMapping::class);
-        $outputMapping->setLanguageId($langDe->getId());
+        $outputMapping->setLanguageId((int) $langDe->getId());
         $outputMapping->setInputContentRecognitionId($contentRecognition1->getId());
         $outputMapping->setOutputContentRecognitionId($contentRecognition2->getId());
         $outputMapping->save();
@@ -144,13 +144,13 @@ class NumberProtectorTest extends TestCase
         $contentRecognition2->save();
 
         $inputMapping = ZfExtended_Factory::get(InputMapping::class);
-        $inputMapping->setLanguageId($langEn->getId());
+        $inputMapping->setLanguageId((int) $langEn->getId());
         $inputMapping->setContentRecognitionId($contentRecognition1->getId());
         $inputMapping->setPriority(1000);
         $inputMapping->save();
 
         $outputMapping = ZfExtended_Factory::get(OutputMapping::class);
-        $outputMapping->setLanguageId($langDe->getId());
+        $outputMapping->setLanguageId((int) $langDe->getId());
         $outputMapping->setInputContentRecognitionId($contentRecognition1->getId());
         $outputMapping->setOutputContentRecognitionId($contentRecognition2->getId());
         $outputMapping->save();
@@ -466,7 +466,7 @@ class NumberProtectorTest extends TestCase
 
         yield [
             'string' => 'string 1,234,567 string',
-            'expected' => 'string <number type="integer" name="default generic with comma" source="1,234,567" iso="1234567" target="1234567"/> string',
+            'expected' => 'string <number type="integer" name="default generic with comma separator" source="1,234,567" iso="1234567" target="1234567"/> string',
         ];
         yield [
             'string' => 'string 12,34,567 string',
@@ -698,6 +698,7 @@ class NumberProtectorTest extends TestCase
                     IntegerProtector::getType() => '#',
                     default => null
                 };
+                $formatData['priority'] = 1;
 
                 yield ContentProtectionDto::fromRow($formatData);
             }

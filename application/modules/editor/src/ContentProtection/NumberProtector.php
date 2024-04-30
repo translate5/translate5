@@ -62,12 +62,12 @@ use editor_Models_Languages;
 use MittagQI\Translate5\ContentProtection\Model\ContentProtectionDto;
 use MittagQI\Translate5\ContentProtection\Model\ContentProtectionRepository;
 use MittagQI\Translate5\ContentProtection\NumberProtection\NumberParsingException;
-use MittagQI\Translate5\ContentProtection\NumberProtection\Protector\AbstractProtector;
 use MittagQI\Translate5\ContentProtection\NumberProtection\Protector\DateProtector;
 use MittagQI\Translate5\ContentProtection\NumberProtection\Protector\FloatProtector;
 use MittagQI\Translate5\ContentProtection\NumberProtection\Protector\IntegerProtector;
 use MittagQI\Translate5\ContentProtection\NumberProtection\Protector\IPAddressProtector;
 use MittagQI\Translate5\ContentProtection\NumberProtection\Protector\MacAddressProtector;
+use MittagQI\Translate5\ContentProtection\NumberProtection\Protector\NumberProtectorInterface;
 use MittagQI\Translate5\ContentProtection\NumberProtection\Tag\NumberTag;
 use MittagQI\Translate5\Repository\LanguageRepository;
 use Zend_Registry;
@@ -79,7 +79,7 @@ class NumberProtector implements ProtectorInterface
     public const TAG_NAME = 'number';
 
     /**
-     * @var array<string, AbstractProtector>
+     * @var array<string, NumberProtectorInterface>
      */
     private array $protectors;
 
@@ -93,7 +93,7 @@ class NumberProtector implements ProtectorInterface
     private array $invalidRules = [];
 
     /**
-     * @param array<AbstractProtector> $protectors
+     * @param array<NumberProtectorInterface> $protectors
      */
     public function __construct(
         array $protectors,
