@@ -1590,7 +1590,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
 
     private function getOverflowSegmentNumber(string $error): int
     {
-        preg_match('/rc = \d+; segment #(\d+) wasn\'t imported/', $error, $matches);
+        preg_match('/rc = \d+; aciveSegment = (\d+)/', $error, $matches);
 
         if (! isset($matches[1])) {
             $this->logger->error(
