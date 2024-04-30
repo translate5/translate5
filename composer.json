@@ -107,6 +107,7 @@
       	"ext-fileinfo": "*",
       	"ext-curl": "*",
 		"ext-posix": "*",
+		"ext-intl": "*",
 		"ext-zlib": "*",
 		"phpunit/phpunit": "^9",
 		"shardj/zf1-future" : "dev-master",

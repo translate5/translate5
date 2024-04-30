@@ -26,6 +26,8 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\ContentProtection\ContentProtector;
+use MittagQI\Translate5\ContentProtection\NumberProtector;
 use MittagQI\Translate5\Task\TaskEventTrigger;
 
 /**
@@ -61,6 +63,8 @@ class editor_Models_Segment_Updater
      */
     private string $saveTimestamp;
 
+    protected ContentProtector $contentProtector;
+
     public function __construct(
         editor_Models_Task $task,
         private string $userGuid
@@ -68,6 +72,7 @@ class editor_Models_Segment_Updater
         $this->task = $task;
         $this->events = ZfExtended_Factory::get('ZfExtended_EventManager', [get_class($this)]);
         $this->utilities = ZfExtended_Factory::get('editor_Models_Segment_UtilityBroker');
+        $this->contentProtector = ContentProtector::create($this->utilities->whitespace);
     }
 
     /**
@@ -271,7 +276,7 @@ class editor_Models_Segment_Updater
      * Applies the import whitespace replacing to the edited user by the content
      * @param string $content the content to be sanitized, the value is modified directly via reference!
      */
-    public function sanitizeEditedContent(string &$content): bool
+    public function sanitizeEditedContent(string &$content, bool $isEditingTargetInFront = false): bool
     {
         $nbsp = json_decode('"\u00a0"');
 
@@ -289,9 +294,21 @@ class editor_Models_Segment_Updater
         //the following call splits the content at tag boundaries, and sanitizes the textNodes only
         // In the textnode additional / new protected characters (whitespace) is converted to internal tags and then removed
         // This is because the user is not allowed to add new internal tags by adding plain special characters directly (only via adding it as tag in the frontend)
-        $content = editor_Models_Segment_Utility::foreachSegmentTextNode($content, function ($text) {
-            return strip_tags($this->utilities->whitespace->protectWhitespace($text));
-        });
+        $content = editor_Models_Segment_Utility::foreachSegmentTextNode(
+            $content,
+            function ($text) use ($isEditingTargetInFront) {
+                return strip_tags(
+                    $this->contentProtector->protect(
+                        $text,
+                        ! $isEditingTargetInFront,
+                        $this->task->getSourceLang(),
+                        $this->task->getTargetLang(),
+                        ContentProtector::ENTITY_MODE_RESTORE,
+                        $isEditingTargetInFront ? NumberProtector::alias() : '',
+                    )
+                );
+            }
+        );
 
         //revoke the internaltag replacement
         $content = $this->utilities->internalTag->unprotect($content);

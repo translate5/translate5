@@ -32,6 +32,7 @@ END LICENSE AND COPYRIGHT
  * @version 1.0
  */
 
+use MittagQI\Translate5\ContentProtection\ContentProtector;
 use MittagQI\Translate5\Segment\TransUnitHash;
 use MittagQI\Translate5\Task\Import\SkeletonFile;
 
@@ -152,6 +153,8 @@ abstract class editor_Models_Export_FileParser
 
     protected SkeletonFile $skeletonFileInstance;
 
+    protected ContentProtector $contentProtector;
+
     protected ?editor_Models_Export_DiffTagger $_diffTagger;
 
     /**
@@ -176,6 +179,7 @@ abstract class editor_Models_Export_FileParser
         $this->translate = ZfExtended_Zendoverwrites_Translate::getInstance();
 
         $this->utilities = ZfExtended_Factory::get('editor_Models_Segment_UtilityBroker');
+        $this->contentProtector = ContentProtector::create($this->utilities->whitespace);
 
         $this->segmentFieldManager = ZfExtended_Factory::get('editor_Models_SegmentFieldManager');
         $this->segmentFieldManager->initFields($this->_taskGuid);
@@ -362,13 +366,18 @@ abstract class editor_Models_Export_FileParser
         //count length after removing removeTrackChanges and removeTermTags
         // so that the same remove must not be done again inside of textLength
         //also add additionalMrkLength to the segment length for final length calculation
-        $this->lastSegmentLength = $segment->textLengthByMeta($edited, $segmentMeta, $segment->getFileId()) + $segmentMeta->getAdditionalMrkLength();
+        $this->lastSegmentLength = $segment->textLengthByMeta(
+            $edited,
+            $segmentMeta,
+            $segment->getFileId(),
+            str_contains($field, editor_Models_SegmentField::TYPE_SOURCE)
+        ) + $segmentMeta->getAdditionalMrkLength();
 
         $edited = $this->parseSegment($edited);
         $edited = $this->revertNonBreakingSpaces($edited);
 
         if (! $this->options['diff']) {
-            return $this->unprotectContent($edited);
+            return $this->unprotectContent($edited, str_contains($field, editor_Models_SegmentField::TYPE_SOURCE));
         }
         $segmentOriginal = $segment->getFieldExport($field, $this->_task, false, false);
         // This removes all segment tags but the ones needed for export
@@ -395,7 +404,7 @@ abstract class editor_Models_Export_FileParser
         }
 
         // unprotectWhitespace must be done after diffing!
-        return $this->unprotectContent($result);
+        return $this->unprotectContent($result, str_contains($field, 'source'));
     }
 
     protected function getEditedSegment(?editor_Segment_Export $segmentExport): string
@@ -474,21 +483,21 @@ abstract class editor_Models_Export_FileParser
      * @param string $segment
      * @return string
      */
-    public function exportSingleSegmentContent($segment)
+    public function exportSingleSegmentContent($segment, bool $isSource)
     {
         //processing of term tags is done after using this method!
         $this->disableMqmExport = true;
         $segment = $this->parseSegment($segment);
         $segment = $this->revertNonBreakingSpaces($segment);
 
-        return $this->unprotectContent($segment);
+        return $this->unprotectContent($segment, $isSource);
     }
 
     /**
      * Some internal tags are standing for placeholder tags, this placeholder tags must also converted back
      */
-    protected function unprotectContent(string $segment): string
+    protected function unprotectContent(string $segment, bool $isSource): string
     {
-        return $this->utilities->whitespace->unprotectWhitespace($segment);
+        return $this->contentProtector->unprotect($segment, $isSource);
     }
 }

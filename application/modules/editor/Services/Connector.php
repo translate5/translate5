@@ -26,6 +26,10 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use editor_Models_Segment_UtilityBroker as UtilityBroker;
+use editor_Models_Segment_Whitespace as Whitespace;
+use MittagQI\Translate5\ContentProtection\ContentProtector;
+use MittagQI\Translate5\LanguageResource\Pretranslation\BatchResult;
 use MittagQI\Translate5\Segment\TagRepair\HtmlProcessor;
 
 /**
@@ -87,6 +91,13 @@ class editor_Services_Connector
      * @var boolean
      */
     protected $batchEnabled = false;
+
+    private ContentProtector $contentProtector;
+
+    public function __construct()
+    {
+        $this->contentProtector = ContentProtector::create(ZfExtended_Factory::get(Whitespace::class));
+    }
 
     /**
      * @throws editor_Services_Exceptions_NoService
@@ -211,7 +222,10 @@ class editor_Services_Connector
             $results = $serviceResult->getResult();
             if (count($results) > 0) {
                 // revert the internal and whitespace tags to the input format
-                $results[0]->target = $this->convertInternalTagsToMarkup($results[0]->target, $utilities);
+                $results[0]->target = $this->contentProtector->unprotect(
+                    $utilities->internalTag->restore($results[0]->target),
+                    false
+                );
                 $serviceResult->setResults($results);
             }
         } else {
@@ -231,27 +245,18 @@ class editor_Services_Connector
      * Protect markup with whitespace & tags to internal tags
      * this simplifies but still copies the logic of editor_Models_Import_FileParser_Csv::parseSegment
      */
-    private function convertMarkupToInternalTags(string $markup, editor_Models_Segment_UtilityBroker $utilities): string
+    private function convertMarkupToInternalTags(string $markup, UtilityBroker $utilities): string
     {
         $shortTagIdent = 1;
-        $markup = $utilities->tagProtection->protectTags($markup, false);
-        $markup = $utilities->whitespace->convertToInternalTags($markup, $shortTagIdent);
-        $markup = $utilities->whitespace->protectWhitespace($markup, $utilities->whitespace::ENTITY_MODE_OFF);
-        $markup = $utilities->whitespace->convertToInternalTags($markup, $shortTagIdent);
 
-        return $markup;
-    }
-
-    /**
-     * Revert markup with whitespace encoded to internal tags to it's original format
-     * this simplifies but still copies the logic of editor_Models_Export_FileParser::exportSingleSegmentContent
-     */
-    private function convertInternalTagsToMarkup(string $textWithTags, editor_Models_Segment_UtilityBroker $utilities): string
-    {
-        $textWithTags = $utilities->internalTag->restore($textWithTags);
-        $textWithTags = $utilities->whitespace->unprotectWhitespace($textWithTags);
-
-        return $textWithTags;
+        return $this->contentProtector->protectAndConvert(
+            $utilities->tagProtection->protectTags($markup, false),
+            true,
+            $this->adapter->getSourceLang(),
+            $this->adapter->getTargetLang(),
+            $shortTagIdent,
+            ContentProtector::ENTITY_MODE_OFF
+        );
     }
 
     /***
@@ -356,17 +361,20 @@ class editor_Services_Connector
         return in_array($this->getStatus($resource), $isValidFor);
     }
 
-    /***
-     * Load the lates service result cache for the given segment in the current language resource
+    /**
+     * Load the latest service result cache for the given segment in the current language resource
      * @param editor_Models_Segment $segment
      * @return editor_Services_ServiceResult
+     * @throws ReflectionException
      */
-    protected function getCachedResult(editor_Models_Segment $segment)
+    protected function getCachedResult(editor_Models_Segment $segment): editor_Services_ServiceResult
     {
-        $model = ZfExtended_Factory::get('MittagQI\Translate5\LanguageResource\Pretranslation\BatchResult');
+        $model = ZfExtended_Factory::get(BatchResult::class);
 
-        /* @var $model MittagQI\Translate5\LanguageResource\Pretranslation\BatchResult */
-        return $model->getResults($segment->getId(), $this->adapter->getLanguageResource()->getId());
+        return $model->getResults(
+            $segment->getId(),
+            $this->adapter->getLanguageResource()->getId()
+        );
     }
 
     /***

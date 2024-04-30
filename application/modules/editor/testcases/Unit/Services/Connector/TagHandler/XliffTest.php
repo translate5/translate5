@@ -58,7 +58,9 @@ class XliffTest extends \editor_Test_UnitTest
         $this->xliffUnderTest = new Xliff([
             'gTagPairing' => false,
         ]);
+        $this->xliffUnderTest->setLanguages(5, 6);
         $this->xliffUnderTestPaired = new Xliff();
+        $this->xliffUnderTestPaired->setLanguages(5, 6);
     }
 
     public function provideData(): array
@@ -208,8 +210,12 @@ class XliffTest extends \editor_Test_UnitTest
     /**
      * @dataProvider provideDataInputMap
      */
-    public function testInputTagMap(string $source, string $target, string $expectedSource, string $expectedTarget): void
-    {
+    public function testInputTagMap(
+        string $source,
+        string $target,
+        string $expectedSource,
+        string $expectedTarget
+    ): void {
         $source = $this->xliffUnderTest->prepareQuery($source);
         $this->xliffUnderTest->setInputTagMap($this->xliffUnderTest->getTagMap());
         $target = $this->xliffUnderTest->prepareQuery($target);

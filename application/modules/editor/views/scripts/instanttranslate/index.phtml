@@ -35,7 +35,7 @@ $devPreventInstantTranslate = FALSE;
 $version = '?v=' . $this->appVersion;
 
 $translate = ZfExtended_Zendoverwrites_Translate::getInstance();
-
+$user = ZfExtended_Authentication::getInstance()->getUser();
 // see View_Helper_LanguageSelector
 $session = new Zend_Session_Namespace();
 
@@ -84,10 +84,29 @@ $this->translations = array(
         'GroupShare' => $translate->_("GroupShare"),
     ],
     "languagesAreSame" => $translate->_("<b>Quellsprache ist die Zielsprache</b><br/>Quellsprache gleicht der Zielsprache, deswegen kann der eingegebene Text nicht übersetzt werden."),
+    "helpWindowTitle" => $translate->_("Einführung"),
+    "helpWindowCheckboxlabel" => $translate->_("Dieses Fenster nicht mehr automatisch anzeigen.")
 );
-$this->Php2JsVars()->set('logoutOnWindowClose', Zend_Registry::get('config')->runtimeOptions->logoutOnWindowClose);
+// Shortcut
+$rop = Zend_Registry::get('config')->runtimeOptions;
+$this->Php2JsVars()->set('logoutOnWindowClose', $rop->logoutOnWindowClose);
 $this->Php2JsVars()->set('languageresource.translatedStrings', $this->translations);
 $this->Php2JsVars()->set('allDbLanguages', $this->allDbLanguages);
+// Get user-level value for helpWindow's 'notAutoShow' stateful config, if exists
+$helpWindow = ZfExtended_Factory::get('editor_Models_UserConfig')->getCurrentValue(
+    $user->getUserGuid(),
+    "runtimeOptions.frontend.defaultState.helpWindow.instanttranslate"
+);
+
+// But if not - get system-level value for that config
+$helpWindow = json_decode($helpWindow ?? '', true)
+    ?? $rop->frontend->defaultState->helpWindow->instanttranslate->toArray();
+
+// Merge with other configs (which is 'loaderUrl' only at the moment)
+$helpWindow += $rop->frontend->helpWindow->instanttranslate->toArray();
+
+$helpWindow['loaderUrl'] = str_replace('{0}', 'itranslate', $helpWindow['loaderUrl']);
+$helpWindow['loaderUrl'] = str_replace('{1}', $user->getLocale(), $helpWindow['loaderUrl']);
 
 $languageSelector[] = '<form action="#" method="post" name="languageSelector" id="languageSelector" class="languageSelector">';
 $languageSelector[] = '<select id="locale">';
@@ -102,6 +121,40 @@ $languageSelector[] = '</form>';
     <img src="<?= $this->publicModulePath ?>/images/loading-spinner.gif"/>
 </div>
 
+<?php if ($helpWindow['loaderUrl']) {?>
+<div id="dialog" title="<?=$this->translations['helpWindowTitle']?>" style="padding: 0; display: none;">
+    <iframe src="<?=$helpWindow['loaderUrl']?>" width="100%" frameborder="0" height="630"></iframe>
+    <div>
+        <input type="checkbox" id="notAutoShow" <?php if ($helpWindow['notAutoShow']) echo "checked"; ?>/>
+        <label for="notAutoShow"><?php echo $this->translations['helpWindowCheckboxlabel']?></label>
+    </div>
+</div>
+<script>
+    // Initialize dialog
+    $("#dialog").dialog({
+        autoOpen: <?=$helpWindow['notAutoShow'] ? 'false' : 'true'?>,
+        modal: true,
+        width: 1024,
+        height: 720
+    });
+    $('#notAutoShow').change(function(){
+        var name = 'runtimeOptions.frontend.defaultState.helpWindow.instanttranslate',
+            userGuid = '<?php echo $user->getUserGuid()?>';
+        $.post({
+            url: '/editor/config/' + name,
+            method: 'PUT',
+            data: {
+                userGuid: userGuid,
+                data: JSON.stringify({
+                    value: JSON.stringify({notAutoShow: this.checked}),
+                    userGuid: userGuid,
+                    name: name
+                })
+            }
+        });
+    });
+</script>
+<?php }?>
 <div id="containerHeader">
     <div class="container container__instanttranslate container__instanttranslateheader">
         <?php
@@ -109,6 +162,10 @@ $languageSelector[] = '</form>';
         ?>
 
         <div class="buttonContainer">
+            <?php if ($helpWindow['loaderUrl'] ?? 0) {?>
+                <div id="helpButtonContainer"><a id="helpButton" onclick='$("#dialog").dialog("open")'>Help</a></div>
+            <?php }?>
+
             <?php
             //check if the user is allowed to access the term portal
             if ($this->isUserTermportalAllowed) {

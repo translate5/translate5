@@ -430,30 +430,34 @@ class editor_Models_TaskUserAssoc extends ZfExtended_Models_Entity_Abstract
      * Mainly needed for dealing with competitive users
      * @return boolean|array returns the deleted tuas as array or false if the tua list was modified by other users
      */
-    public function deleteOtherUsers(string $taskGuid, string $userGuid, string $role = null): array
+    public function deleteOtherUsers(string $taskGuid, string $userGuid, string $workflowStepName = null): bool|array
     {
         $delete = [
             'taskGuid = ?' => $taskGuid,
             'userGuid != ?' => $userGuid,
             'isPmOverride = ?' => 0,
         ];
-        if (! empty($role)) {
-            $delete['role = ?'] = $role;
+
+        if (! empty($workflowStepName)) {
+            $delete['workflowStepName = ?'] = $workflowStepName;
         }
 
         $s = $this->db->select();
         foreach ($delete as $sql => $value) {
             $s->where($sql, $value);
         }
+
         $otherTuas = $this->db->fetchAll($s)->toArray();
         $this->db->getAdapter()->beginTransaction();
         $deleted = $this->db->delete($delete);
+
         //something was changed, roll back the delete and return false
         if (count($otherTuas) !== $deleted) {
             $this->db->getAdapter()->rollBack();
 
             return false;
         }
+
         $this->db->getAdapter()->commit();
         $this->updateTask($taskGuid);
 

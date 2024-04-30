@@ -36,6 +36,8 @@ use MittagQI\Translate5\Test\Import\Config;
  */
 class MatchAnalysisTest extends editor_Test_ImportTest
 {
+    use \MittagQI\Translate5\Test\Api\AnalysisTrait;
+
     protected static array $requiredPlugins = [
         'editor_Plugins_Okapi_Init',
         'editor_Plugins_MatchAnalysis_Init',
@@ -172,37 +174,6 @@ class MatchAnalysisTest extends editor_Test_ImportTest
         //check for differences between the expected and the actual content
         $this->assertEquals($this->filterUngroupedAnalysis($expectedAnalysis), $this->filterUngroupedAnalysis($analysis), "The expected file and the data does not match for the '.$unitType.'-based not-grouped matchanalysis..");
     }
-
-    private function filterTaskAnalysis(array &$data): array
-    {
-        // remove the created timestamp since is not relevant for the test
-        foreach ($data as $a) {
-            unset($a->created,$a->id,$a->taskGuid,$a->segmentId,$a->errorCount);
-        }
-        usort($data, function ($a, $b) {
-            return strcmp($a->resourceName, $b->resourceName);
-        });
-
-        return $data;
-    }
-
-    private function filterUngroupedAnalysis(array &$data): array
-    {
-        // remove some unneeded columns
-        foreach ($data as $a) {
-            unset(
-                $a->id,
-                $a->taskGuid,
-                $a->analysisId,
-                $a->segmentId,
-                $a->languageResourceid,
-                $a->errorCount
-            );
-        }
-
-        return $data;
-    }
-
     public static function afterTests(): void
     {
         foreach (self::$changedConfigs as $c) {

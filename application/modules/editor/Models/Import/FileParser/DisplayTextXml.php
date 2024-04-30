@@ -26,11 +26,7 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-/** #@+
- * @author Marc Mittag
- * @package editor
- * @version 1.0
- */
+use MittagQI\Translate5\ContentProtection\ContentProtector;
 
 /**
  * Fileparsing for import of customer specific XML
@@ -380,8 +376,14 @@ The German and the English Comment tag of the string must be imported as comment
         $segment = $this->utilities->internalTag->protect($segment);
 
         //since there are no other tags we can just take the string and protect whitespace there (no tag protection needed!)
-        $segment = $this->utilities->whitespace->protectWhitespace($segment, $this->utilities->whitespace::ENTITY_MODE_OFF);
-        $segment = $this->utilities->whitespace->convertToInternalTags($segment, $this->shortTagIdent);
+        $segment = $this->contentProtector->protectAndConvert(
+            $segment,
+            true,
+            $this->task->getSourceLang(),
+            $this->task->getTargetLang(),
+            $this->shortTagIdent,
+            ContentProtector::ENTITY_MODE_OFF
+        );
 
         $segment = $this->utilities->internalTag->unprotect($segment);
 
@@ -435,7 +437,6 @@ The German and the English Comment tag of the string must be imported as comment
         $segmentAttributes->transunitHash = $transunitHash;
         $segmentAttributes->transunitId = $textId;
         $segmentAttributes->mrkMid = $textId;
-        $segmentAttributes->transunitId = $textId;
         $segmentAttributes->locked = $this->currentIsReadOnly;
         $segmentAttributes->editable = ! $this->currentIsReadOnly;
 
@@ -482,7 +483,6 @@ The German and the English Comment tag of the string must be imported as comment
         $tagObj = new editor_Models_Import_FileParser_Tag();
         $tagObj->originalContent = $chunk;
         $tagObj->tagNr = $this->shortTagIdent++;
-        ;
         $tagObj->id = $insetType;
 
         return $tagObj->renderTag($length);

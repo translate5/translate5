@@ -113,7 +113,11 @@ class editor_Models_Validator_Segment extends ZfExtended_Models_Validator_Abstra
             'max' => 1084,
         ]);
         $this->addValidator('workflowStepNr', 'int');
-        $this->addValidator('pretrans', 'inArray', [ZfExtended_Utils::getConstants('editor_Models_Segment', 'PRETRANS_')]);
+        $this->addValidator(
+            'pretrans',
+            'inArray',
+            [ZfExtended_Utils::getConstants('editor_Models_Segment', 'PRETRANS_')]
+        );
 
         $allowedValues = array_keys($config->runtimeOptions->segments->stateFlags->toArray());
         $allowedValues[] = 0; //adding "not set" state
@@ -183,7 +187,11 @@ class editor_Models_Validator_Segment extends ZfExtended_Models_Validator_Abstra
         /* @var $tagHelper editor_Models_Segment_InternalTag */
         $allLines = $tagHelper->getLinesAccordingToNewlineTags($value);
         if (count($allLines) > $meta['maxNumberOfLines']) {
-            $this->addMessage($field, 'segmentTooManyLines', 'There are ' . count($allLines) . ' lines in the segment, but only ' . $meta['maxNumberOfLines'] . ' lines are allowed.');
+            $this->addMessage(
+                $field,
+                'segmentTooManyLines',
+                'There are ' . count($allLines) . ' lines in the segment, but only ' . $meta['maxNumberOfLines'] . ' lines are allowed.'
+            );
             $isValid = false;
         }
 
@@ -193,7 +201,12 @@ class editor_Models_Validator_Segment extends ZfExtended_Models_Validator_Abstra
             $errorsMaxWidth = [];
             $errorsMinWidth = [];
             foreach ($allLines as $key => $line) {
-                $length = (int) $this->entity->textLengthByMeta($line, $this->entity->meta(), $this->entity->getFileId());
+                $length = (int) $this->entity->textLengthByMeta(
+                    $line,
+                    $this->entity->meta(),
+                    (int) $this->entity->getFileId(),
+                    str_contains($field, editor_Models_SegmentField::TYPE_SOURCE)
+                );
                 if ($checkMaxWidth && $length > $meta['maxWidth']) {
                     $errorsMaxWidth[] = ($key + 1) . ': ' . $length;
                 }
@@ -202,11 +215,19 @@ class editor_Models_Validator_Segment extends ZfExtended_Models_Validator_Abstra
                 }
             }
             if (! empty($errorsMinWidth)) {
-                $this->addMessage($field, 'segmentLinesTooShort', 'Not all lines in the segment match the given minimal length: ' . implode('; ', $errorsMinWidth));
+                $this->addMessage(
+                    $field,
+                    'segmentLinesTooShort',
+                    'Not all lines in the segment match the given minimal length: ' . implode('; ', $errorsMinWidth)
+                );
                 $isValid = false;
             }
             if (! empty($errorsMaxWidth)) {
-                $this->addMessage($field, 'segmentLinesTooLong', 'Not all lines in the segment match the given maximal length: ' . implode('; ', $errorsMaxWidth));
+                $this->addMessage(
+                    $field,
+                    'segmentLinesTooLong',
+                    'Not all lines in the segment match the given maximal length: ' . implode('; ', $errorsMaxWidth)
+                );
                 $isValid = false;
             }
         }
@@ -226,12 +247,15 @@ class editor_Models_Validator_Segment extends ZfExtended_Models_Validator_Abstra
         if (! property_exists($data, 'metaCache') || empty($data->metaCache)) {
             return true;
         }
+
         $meta = json_decode($data->metaCache, true);
         if (empty($meta['siblingData'])) {
             return true;
         }
 
-        $sizeUnit = empty($meta['sizeUnit']) ? editor_Models_Segment_PixelLength::SIZE_UNIT_XLF_DEFAULT : $meta['sizeUnit'];
+        $sizeUnit = empty($meta['sizeUnit'])
+            ? editor_Models_Segment_PixelLength::SIZE_UNIT_XLF_DEFAULT
+            : $meta['sizeUnit'];
         $isPixelBased = ($sizeUnit == editor_Models_Segment_PixelLength::SIZE_UNIT_FOR_PIXELMAPPING);
 
         $length = 0;
@@ -242,9 +266,15 @@ class editor_Models_Validator_Segment extends ZfExtended_Models_Validator_Abstra
             }
             if ($id == $this->entity->getId()) {
                 //if the found sibling is the segment itself, use the length of the value to be stored
-                $length += (int) $this->entity->textLengthByMeta($value, $this->entity->meta(), $this->entity->getFileId());
-                //normally, the length of one segment contains also the additionalMrkLength,
-                //for the current segment this is added below, the siblings in the next line contain their additionalMrk data already
+                $length += (int) $this->entity->textLengthByMeta(
+                    $value,
+                    $this->entity->meta(),
+                    (int) $this->entity->getFileId(),
+                    str_contains($field, editor_Models_SegmentField::TYPE_SOURCE)
+                );
+                // normally, the length of one segment contains also the additionalMrkLength,
+                // for the current segment this is added below,
+                // the siblings in the next line contain their additionalMrk data already
             } else {
                 //add the text length of desired field
                 $length += (int) $data['length'][$field];
@@ -262,12 +292,21 @@ class editor_Models_Validator_Segment extends ZfExtended_Models_Validator_Abstra
 
         $messageSizeUnit = ($isPixelBased) ? 'px' : '';
         if ($checkMinWidth && $length < $meta['minWidth']) {
-            $this->addMessage($field, 'segmentToShort', 'Transunit length is ' . $length . $messageSizeUnit . ' minWidth is ' . $meta['minWidth'] . $messageSizeUnit);
+            $this->addMessage(
+                $field,
+                'segmentToShort',
+                'Transunit length is ' . $length . $messageSizeUnit . ' minWidth is ' . $meta['minWidth'] . $messageSizeUnit
+            );
 
             return false;
         }
+
         if ($checkMaxWidth && $length > $meta['maxWidth']) {
-            $this->addMessage($field, 'segmentToLong', 'Transunit length is ' . $length . $messageSizeUnit . ' maxWidth is ' . $meta['maxWidth'] . $messageSizeUnit);
+            $this->addMessage(
+                $field,
+                'segmentToLong',
+                'Transunit length is ' . $length . $messageSizeUnit . ' maxWidth is ' . $meta['maxWidth'] . $messageSizeUnit
+            );
 
             return false;
         }

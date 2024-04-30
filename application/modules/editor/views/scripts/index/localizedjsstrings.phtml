@@ -503,8 +503,9 @@ Ext.define('Editor.controller.Localizer', {
             "editorUnfinishAllTask":  {title: "<?php echo $this->translate->_('Aufgabe für alle Nutzer wieder öffnen?');?>", msg: "<?php echo $this->translate->_('Wollen Sie die Aufgabe wirklich für alle Benutzer wieder öffnen?');?>"},
             "editorEndTask":          {title: "<?php echo $this->translate->_('Aufgabe endgültig beenden?');?>", msg: "<?php echo $this->translate->_('Wollen Sie die Aufgabe wirklich für alle Benutzer endgültig beenden?');?>"},
             "editorReopenTask":       {title: "<?php echo $this->translate->_('Beendete Aufgabe wieder öffnen?');?>", msg: "<?php echo $this->translate->_('Wollen Sie die beendete Aufgabe wirklich wieder öffnen?');?>"},
-            "editorDeleteTask":       {title: `<?php echo $this->translate->_('Aufgabe "{0}" komplett löschen?');?>`, msg: "<?php echo $this->translate->_('Wollen Sie die Aufgabe wirklich komplett und unwiderruflich löschen?');?>"}
-        }
+            "editorDeleteTask":       {title: `<?php echo $this->translate->_('Aufgabe "{0}" komplett löschen?');?>`, msg: "<?php echo $this->translate->_('Wollen Sie die Aufgabe wirklich komplett und unwiderruflich löschen?');?>"},
+            "editorImportTask":       {title: "<?= $this->translate->_('Bestätigen Sie den Aufgabenimport');?>", msg: "<?= $this->translate->_('Wollen Sie die Aufgabe wirklich komplett und unwiderruflich löschen?');?>"}
+    }
     });
 
     Ext.define("Editor.locale.de.view.admin.TaskGrid", {
@@ -652,7 +653,7 @@ Ext.define('Editor.controller.Localizer', {
         override: "Editor.view.help.HelpWindow",
         strings:{
         	cbDoNotShowAgainLabel: '<?php echo $this->translate->_('Dieses Fenster nicht mehr automatisch anzeigen.');?>',
-            documentationTitle: '<?php echo $this->translate->_('Dokumentation');?>'
+            documentationTitle: '<?php echo $this->translate->_('Schriftliche Dokumentation');?>'
         }
     });
 
@@ -1745,8 +1746,7 @@ Ext.define('Editor.controller.Localizer', {
             importing: '<?php echo $this->translate->_('Die Sprachressource {0} wird gerade importiert. Bitte warten Sie, bis der Import abgeschlossen ist.');?>',
             beingTrained: '<?php echo $this->translate->_('Die Sprachressource {0} wird gerade trainiert. Bitte warten Sie, bis das Training abgeschlossen ist.');?>',
             deletionForbidden: '<?php echo $this->translate->_('Sie sind nicht berechtigt, diese Sprachressource zu entfernen.');?>',
-            error: '<?php echo $this->translate->_('Fehler');?>'
-        }
+            error: '<?php echo $this->translate->_('Fehler');?>'}
     });
 
     Ext.define("Editor.locale.view.LanguageResources.AddTmWindow", {
@@ -1851,7 +1851,8 @@ Ext.define('Editor.controller.Localizer', {
             groupHeader: '<?php echo $this->translate->_('Ressource: {name}');?>',
             groupHeader: '<?php echo $this->translate->_('Ressource: {name}');?>',
             specificDataText: '<?php echo $this->translate->_('Zusätzliche Infos');?>',
-            pivotAsDefault: '<?php echo $this->translate->_('Standardmäßig als Pivot verwenden');?>'
+            pivotAsDefault: '<?php echo $this->translate->_('Standardmäßig als Pivot verwenden');?>',
+            tmNotConverted: '<?php echo $this->translate->_('Die Regeln für die Erkennung von Inhalten haben sich für diese Sprachressource geändert, sie sollte konvertiert werden.');?>'
         }
     });
 
@@ -2365,10 +2366,66 @@ Editor.data.l10n = {
         copy_and_close_btn: '<?= $this->translate->_('App-Token kopieren') ?>',
         token_created_message: '<?= $this->translate->_('Der Zugriffstoken wird nur einmal angezeigt. Sie werden nicht gespeichert und können nicht abgerufen werden. Stellen Sie sicher, dass Sie es an einem sicheren Ort aufbewahren.<br/><br/><b>{0}</b>') ?>'
     },
+    contentProtection: {
+        title: '<?= $this->translate->_('Nummernschutz') ?>',
+        confirm_deletion_title: '<?= $this->translate->_('Löschung bestätigen') ?>',
+        tm_not_converted: '<?= $this->translate->_('Die Regeln für die Erkennung von Inhalten haben sich für diese Sprachressource geändert, sie sollte konvertiert werden.');?>',
+        tm_conversion_in_progress: '<?= $this->translate->_('Konvertierung läuft') ?>',
+        convert_tms: '<?= $this->translate->_('Alle konvertieren') ?>',
+        show_only_not_converted: '<?= $this->translate->_('Nur nicht konvertiert anzeigen') ?>',
+        conversionStarted: '<?= $this->translate->_('Konvertierung gestarted'); ?>',
+        conversionConfirm: '<?= $this->translate->_('Konvertierung starten'); ?>',
+        conversionConfirmText: '<?= $this->translate->_('Warning: Conversion may lead to the loss of TM matches'); ?>',
+        contentRecognition: {
+            title: '<?= $this->translate->_('Nummernerkennung') ?>',
+            infobox: '<?= $this->translate->_('Content Recognition Rules tab info box') ?>',
+            create_title: '<?= $this->translate->_('Nummernerkennung erstellen') ?>',
+            confirm_deletion_message: '<?= $this->translate->_('Sind Sie sicher, dass Sie die Nummernerkennung löschen möchten?') ?>',
+            matchId: '<?= $this->translate->_('Geschützte Regex-Gruppe') ?>',
+            matchIdQTip: '<?= $this->translate->_('Protected regex group qtip') ?>',
+            formatExampleRender: '<?= $this->translate->_('Format-Rendering-Beispiel') ?>',
+            confirm_enable_title: '<?= $this->translate->_('Bestätigung erforderlich') ?>',
+            confirm_enable_message: '<?= $this->translate->_('Die Aktivierung/Deaktivierung von Regeln kann in neuen Projekten zum Verlust von 100%-Matches führen, wenn Sie die betroffenen Sprachressourcen nicht konvertieren.') ?>'
+        },
+        mapping: {
+            input: {
+                confirm_add_title: '<?= $this->translate->_('Bestätigen Sie die Regelaktivierung') ?>',
+                confirm_add_message: '<?= $this->translate->_('Das Aktivieren von Input-Regeln kann in neuen Projekten zum Verlust von 100%-Matches führen, wenn Sie die betroffenen Sprachressourcen nicht konvertieren.') ?>'
+            },
+            output: {
+                confirm_add_title: '<?= $this->translate->_('Bestätigen Sie die Regelaktivierung') ?>',
+                confirm_add_message: '<?= $this->translate->_('Das Aktivieren von Output-Regeln kann in neuen Projekten zum Verlust von 100%-Matches führen, wenn Sie die betroffenen Sprachressourcen nicht konvertieren.') ?>'
+            },
+            rule_name: '<?= $this->translate->_('Regelname') ?>',
+            rule_description: '<?= $this->translate->_('Regelbeschreibung') ?>',
+            input_rule_name: '<?= $this->translate->_('Name der Eingaberegel') ?>',
+            input_rule_description: '<?= $this->translate->_('Beschreibung der Eingaberegel') ?>',
+            input_title: '<?= $this->translate->_('Eingabezuordnung') ?>',
+            input_infobox: '<?= $this->translate->_('Active Input Rules tab info box') ?>',
+            output_rule_name: '<?= $this->translate->_('Name der Ausgaberegel') ?>',
+            output_rule_description: '<?= $this->translate->_('Beschreibung der Ausgaberegel') ?>',
+            output_title: '<?= $this->translate->_('Ausgabezuordnung') ?>',
+            output_infobox: '<?= $this->translate->_('Active Output Rules tab info box') ?>',
+            output_format: '<?= $this->translate->_('Ausgabeformat') ?>',
+            create_title: '<?= $this->translate->_('Zuordnung erstellen') ?>',
+            confirm_deletion_message: '<?= $this->translate->_('Sind Sie sicher, dass Sie die Zuordnung löschen möchten?') ?>'
+        }
+    },
     general: {
         useForSearch: '<?= $this->translate->_('Bei der Suche verwenden');?>',
         description: '<?= $this->translate->_('Beschreibung') ?>',
-        creation_date: '<?= $this->translate->_('Erstellungsdatum') ?>'
+        creation_date: '<?= $this->translate->_('Erstellungsdatum') ?>',
+        language: '<?= $this->translate->_('Sprache') ?>',
+        name: '<?= $this->translate->_('Name') ?>',
+        type: '<?= $this->translate->_('Typ');?>',
+        format: '<?= $this->translate->_('Format') ?>',
+        priority: '<?= $this->translate->_('Priorität') ?>',
+        keepAsIs: '<?= $this->translate->_('Unverändert übernehmen') ?>',
+        regex: '<?= $this->translate->_('Regulärer Ausdruck') ?>',
+        enabled: '<?= $this->translate->_('Aktiviert') ?>',
+        showDefault: '<?= $this->translate->_('Defaults anzeigen') ?>',
+        hideDefault: '<?= $this->translate->_('Defaults ausblenden') ?>',
+        showAll: '<?= $this->translate->_('Zeige alles') ?>'
     },
     helpButton: {
         tooltip: '<?= $this->translate->_('Tutorial-Videos aufrufen') ?>'

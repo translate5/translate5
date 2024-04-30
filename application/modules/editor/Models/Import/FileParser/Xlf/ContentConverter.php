@@ -26,6 +26,7 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\ContentProtection\ContentProtector;
 use MittagQI\Translate5\Segment\Tag\Placeable;
 use MittagQI\Translate5\Task\Import\FileParser\Xlf\Namespaces\AbstractNamespace as XlfNamespaces;
 
@@ -88,6 +89,10 @@ class editor_Models_Import_FileParser_Xlf_ContentConverter
 
     protected editor_Models_Import_FileParser_Xlf_ShortTagNumbers $shortTagNumbers;
 
+    private ContentProtector $contentProtector;
+
+    private bool $handleIsInSourceScope = true;
+
     /**
      * @param editor_Models_Task $task for debugging reasons only
      * @param string $filename for debugging reasons only
@@ -100,6 +105,8 @@ class editor_Models_Import_FileParser_Xlf_ContentConverter
 
         $this->utilities = ZfExtended_Factory::get('editor_Models_Segment_UtilityBroker');
         $this->utilities->whitespace->collectTagNumbers = true;
+
+        $this->contentProtector = ContentProtector::create($this->utilities->whitespace);
 
         $this->shortTagNumbers = ZfExtended_Factory::get('editor_Models_Import_FileParser_Xlf_ShortTagNumbers');
 
@@ -316,12 +323,13 @@ class editor_Models_Import_FileParser_Xlf_ContentConverter
         $this->result = [];
         $this->removeTags = false;
         $this->shortTagNumbers->init($source);
+        $this->handleIsInSourceScope = $source;
 
         if ($source) {
-            $this->utilities->whitespace->resetTagNumberMap();
+            $this->contentProtector->resetShortcutMap();
         }
         //on source we collect the tag numbers, on target we use them:
-        $this->utilities->whitespace->collectTagNumbers = $source;
+        $this->contentProtector->switchShortcutMapCollection($source);
 
         //get the flag just from outside, must not be parsed by inline element parser, since xml:space may occur only outside of inline content
         $this->preserveWhitespace = $preserveWhitespace;
@@ -333,8 +341,12 @@ class editor_Models_Import_FileParser_Xlf_ContentConverter
 
         if (! empty($this->result) && ! $this->preserveWhitespace) {
             $lastIdx = count($this->result) - 1;
-            $this->result[0] = ltrim($this->result[0]);
-            $this->result[$lastIdx] = rtrim($this->result[$lastIdx]);
+            if (is_string($this->result[0])) {
+                $this->result[0] = ltrim($this->result[0]);
+            }
+            if (is_string($this->result[$lastIdx])) {
+                $this->result[$lastIdx] = rtrim($this->result[$lastIdx]);
+            }
         }
 
         $this->shortTagNumbers->calculatePartnerAndType();
@@ -371,8 +383,6 @@ class editor_Models_Import_FileParser_Xlf_ContentConverter
         //we have to decode entities here, otherwise our generated XLF wont be valid
         // although the whitespace of the content may not be preserved here, if there remain multiple spaces or other space characters,
         // we have to protect them here
-
-        $wh = $this->utilities->whitespace;
         if ($this->protectTags) {
             //since we are in a XML file format, plain tags in the content are encoded, which we have to undo first
             //$text is here for example: Dies &lt;strong&gt;ist ein&lt;/strong&gt; Test. &amp;nbsp;
@@ -380,13 +390,27 @@ class editor_Models_Import_FileParser_Xlf_ContentConverter
             //$text is now: Dies <strong>ist ein</strong> Test. &nbsp;
 
             $text = $this->utilities->tagProtection->protectTags($text);
-            $text = $wh->protectWhitespace($text, $wh::ENTITY_MODE_OFF); //disable entity handling here, since already done in tagProtection
+
+            $text = $this->contentProtector->protect(
+                $text,
+                $this->handleIsInSourceScope,
+                $this->task->getSourceLang(),
+                $this->task->getTargetLang(),
+                ContentProtector::ENTITY_MODE_OFF
+            );
         } else {
-            $text = $wh->protectWhitespace($text);
+            $text = $this->contentProtector->protect(
+                $text,
+                $this->handleIsInSourceScope,
+                $this->task->getSourceLang(),
+                $this->task->getTargetLang()
+            );
         }
 
-        $xmlChunks = [];
-        $wh->convertToInternalTags($text, $this->shortTagNumbers->shortTagIdent, $xmlChunks);
+        $xmlChunks = $this->contentProtector->convertToInternalTagsInChunks(
+            $text,
+            $this->shortTagNumbers->shortTagIdent
+        );
         //to keep the generated tag objects we have to use the chunklist instead of the returned string
         array_push($this->result, ...$xmlChunks);
     }

@@ -32,6 +32,9 @@ END LICENSE AND COPYRIGHT
  * @version 1.0
  *
  */
+
+use MittagQI\Translate5\ContentProtection\ContentProtector;
+
 /**
  * protects the translate5 internal tags by removing for language resource processing
  */
@@ -40,12 +43,13 @@ class editor_Services_Connector_TagHandler_Remover extends editor_Services_Conne
     /**
      * protects the internal tags as xliff tags x,bx,ex and g pair
      */
-    public function prepareQuery(string $queryString): string
+    public function prepareQuery(string $queryString, bool $isSource = true): string
     {
+        $this->handleIsInSourceScope = $isSource;
         $this->realTagCount = 0;
 
         //1. whitespace preparation
-        $queryString = $this->restoreWhitespaceForQuery($queryString);
+        $queryString = $this->convertQueryContent($queryString, $isSource);
 
         //2. strip all tags and set real tag count
         return strip_tags($this->utilities->internalTag->replace($queryString, '', -1, $this->realTagCount));
@@ -57,5 +61,20 @@ class editor_Services_Connector_TagHandler_Remover extends editor_Services_Conne
     public function restoreInResult(string $resultString): string
     {
         return $this->importWhitespaceFromTagLessQuery($resultString);
+    }
+
+    protected function importWhitespaceFromTagLessQuery(string $text): string
+    {
+        return $this->contentProtector->convertToInternalTagsWithShortcutNumberMap(
+            $this->contentProtector->protect(
+                $text,
+                $this->handleIsInSourceScope,
+                $this->sourceLang,
+                $this->targetLang,
+                ContentProtector::ENTITY_MODE_KEEP
+            ),
+            $this->shortTagIdent,
+            $this->shortcutNumberMap
+        );
     }
 }

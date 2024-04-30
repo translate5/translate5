@@ -442,11 +442,10 @@ Ext.define('Editor.util.Util', {
                 return false;
             }
             // if the task is not reimportable, the export/import translator package is not available
-            if (!task.get('reimportable')){
+            if (!task.get('reimportable') || !task.isNotErrorImportPendingCustom()){
                 return false;
             }
-            // is allowed to edit a task
-            return Editor.app.authenticatedUser.isAllowed('editorEditTask',task) && task.isNotErrorImportPendingCustom();
+            return Editor.app.authenticatedUser.isAllowed('editorPackageExport',task);
         },
 
         /**

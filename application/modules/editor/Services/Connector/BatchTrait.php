@@ -26,6 +26,8 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\LanguageResource\Pretranslation\BatchResult;
+
 /**
  * Provides reusable batch functionality for LanguageResource Service Connectors
  * @see editor_Services_Connector_Abstract
@@ -227,7 +229,7 @@ trait editor_Services_Connector_BatchTrait
      * This is only template function. Override this in each connector if the connector supports batch
      * query requests.
      */
-    protected function handleBatchQuerys(array $batchQuery)
+    protected function handleBatchQuerys(array $batchQuery): void
     {
         $sourceLang = $this->getSourceLanguageCode();
         $targetLang = $this->getTargetLanguageCode();
@@ -255,14 +257,20 @@ trait editor_Services_Connector_BatchTrait
             //get the segment from the beginning of the cache
             //we assume that for each requested query string, we get one response back
             $query = array_shift($batchQuery);
-            $segmentId = $query['segment']->getId();
+
+            /* @var editor_Models_Segment $segment */
+            $segment = $query['segment'];
+
             $this->getQueryStringAndSetAsDefault($query['segment']);
             $this->tagHandler->setTagMap($query['tagMap']);
             $this->processBatchResult($segmentResults);
 
             $this->logForSegment($query['segment']);
 
-            $this->saveBatchResults($segmentId);
+            $this->saveBatchResults(
+                $segment->getId(),
+                $segment->getTaskGuid()
+            );
 
             //log the adapter usage for the batch query segment
             $this->logAdapterUsage($query['segment']);
@@ -297,13 +305,24 @@ trait editor_Services_Connector_BatchTrait
      */
     abstract protected function getResponseData(): mixed;
 
-    protected function saveBatchResults(int $segmentId)
+    /**
+     * @param int $segmentId
+     * @param string $taskGuid
+     * @return void
+     * @throws ReflectionException
+     * @throws Zend_Db_Adapter_Exception
+     * @throws Zend_Db_Table_Exception
+     */
+    protected function saveBatchResults(int $segmentId, string $taskGuid): void
     {
-        Zend_Db_Table::getDefaultAdapter()->insert('LEK_languageresources_batchresults', [
-            'languageResource' => $this->languageResource->getId(),
-            'segmentId' => $segmentId,
-            'result' => serialize($this->resultList),
-        ]);
+
+        $batchResult = ZfExtended_Factory::get(BatchResult::class);
+        $batchResult->saveResult(
+            $segmentId,
+            $this->languageResource->getId(),
+            $taskGuid,
+            $this->resultList->getSerialized()
+        );
     }
 
     /***

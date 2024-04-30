@@ -195,7 +195,7 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
                 'languageresourceresource', 'languageresourcetaskassoc', 'languageresourcetaskpivotassoc',
                 'languageresourceinstance', 'taskusertracking', 'term', 'attribute', 'termattribute', 'category',
                 'quality', 'userassocdefault', 'log', 'collectionattributedatatype', 'token',
-            ],
+                'contentprotectioncontentrecognition', 'contentprotectioninputmapping', 'contentprotectionoutputmapping',            ],
         ]);
         $this->front->getRouter()->addRoute('editorRestDefault', $restRoute);
 
@@ -593,6 +593,18 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
         );
         $this->front->getRouter()->addRoute('languageresources_languageresourceinstance_import', $queryRoute);
 
+        $this->front->getRouter()->addRoute(
+            'languageresources_languageresourceinstance_defaulttmneedsconversion',
+            new ZfExtended_Controller_RestLikeRoute(
+                'editor/languageresourceinstance/defaulttmneedsconversion',
+                [
+                    'module' => 'editor',
+                    'controller' => 'languageresourceinstance',
+                    'action' => 'defaulttmneedsconversion',
+                ]
+            )
+        );
+
         $queryRoute = new ZfExtended_Controller_RestLikeRoute(
             'editor/languageresourceinstance/:id/tasks',
             [
@@ -602,6 +614,26 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
             ]
         );
         $this->front->getRouter()->addRoute('languageresources_languageresourceinstance_tasks', $queryRoute);
+
+        $queryRoute = new ZfExtended_Controller_RestLikeRoute(
+            'editor/languageresourceinstance/:id/synchronizetm',
+            [
+                'module' => 'editor',
+                'controller' => 'languageresourceinstance',
+                'action' => 'synchronizetm',
+            ]
+        );
+        $this->front->getRouter()->addRoute('languageresources_languageresourceinstance_synchronizetm', $queryRoute);
+
+        $queryRoute = new ZfExtended_Controller_RestLikeRoute(
+            'editor/languageresourceinstance/synchronizetm/batch',
+            [
+                'module' => 'editor',
+                'controller' => 'languageresourceinstance',
+                'action' => 'synchronizetmbatch',
+            ]
+        );
+        $this->front->getRouter()->addRoute('languageresources_languageresourceinstance_synchronizetm_batch', $queryRoute);
 
         $queryRoute = new ZfExtended_Controller_RestLikeRoute(
             'editor/languageresourceresource/:resourceType/engines',
@@ -790,6 +822,44 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
             ]
         ));
 
+        $this->front->getRouter()->addRoute(
+            'contentprotection.outputMapping.nameCombo',
+            new ZfExtended_Controller_RestLikeRoute(
+                'editor/contentprotection/outputmapping/namecombo',
+                [
+                    'module' => 'editor',
+                    'controller' => 'contentprotectionoutputmapping',
+                    /** @see \editor_ContentprotectionoutputmappingController::namecomboAction */
+                    'action' => 'namecombo',
+                ]
+            )
+        );
+
+        $this->front->getRouter()->addRoute(
+            'contentprotection.contentrecognition.testformat',
+            new ZfExtended_Controller_RestLikeRoute(
+                'editor/contentprotection/contentrecognition/testformat',
+                [
+                    'module' => 'editor',
+                    'controller' => 'contentprotectioncontentrecognition',
+                    /** @see \editor_ContentprotectioncontentrecognitionController::testformatAction */
+                    'action' => 'testformat',
+                ]
+            )
+        );
+
+        $this->front->getRouter()->addRoute(
+            'contentprotection.inputMapping.nameCombo',
+            new ZfExtended_Controller_RestLikeRoute(
+                'editor/contentprotection/inputmapping/namecombo',
+                [
+                    'module' => 'editor',
+                    'controller' => 'contentprotectioninputmapping',
+                    /** @see \editor_ContentprotectioninputmappingController::namecomboAction */
+                    'action' => 'namecombo',
+                ]
+            )
+        );
         // special endpoint to provide configs for API-Tests. Must only be added when serving API-tests
         if (defined('APPLICATION_APITEST') && APPLICATION_APITEST) {
             $this->front->getRouter()->addRoute('editorConfigApiTest', new ZfExtended_Controller_RestLikeRoute(

@@ -239,12 +239,19 @@ class editor_Models_Import_Excel extends editor_Models_Excel_AbstractExImport
         //the history entry must be created before the original entity is modified
         $history = $t5Segment->getNewHistoryEntity();
         //update the segment
-        $updater = ZfExtended_Factory::get('editor_Models_Segment_Updater', [$this->task, $this->user->getUserGuid()]);
-        /* @var $updater editor_Models_Segment_Updater */
+        $updater = ZfExtended_Factory::get(
+            editor_Models_Segment_Updater::class,
+            [$this->task, $this->user->getUserGuid()]
+        );
 
-        if ($updater->sanitizeEditedContent($newContent)) {
-            $this->addSegmentError($t5Segment->getSegmentNrInTask(), 'Some non representable characters were removed from the segment (multiple white-spaces, tabs, line-breaks etc.)!');
+        if ($updater->sanitizeEditedContent($newContent, true)) {
+            $this->addSegmentError(
+                $t5Segment->getSegmentNrInTask(),
+                'Some non representable characters were removed from the segment'
+                . ' (multiple white-spaces, tabs, line-breaks etc.)!'
+            );
         }
+
         $t5Segment->setTargetEdit($newContent);
         $t5Segment->setUserGuid($this->user->getUserGuid());
         $t5Segment->setUserName($this->user->getUserName());
@@ -254,11 +261,17 @@ class editor_Models_Import_Excel extends editor_Models_Excel_AbstractExImport
     /**
      * checks the structure of the tags and logs error messages
      */
-    protected function checkTagStructure(string $newSegment, string $orgSegmentAsExcel, excelExImportSegmentContainer $segment)
-    {
+    protected function checkTagStructure(
+        string $newSegment,
+        string $orgSegmentAsExcel,
+        excelExImportSegmentContainer $segment
+    ) {
         // check structure of the new segment (from excel)
         if (! $this->tagStructureChecker->check($newSegment)) {
-            $this->addSegmentError($segment->nr, 'tags in segment are not well-structured. ' . $this->tagStructureChecker->getError());
+            $this->addSegmentError(
+                $segment->nr,
+                'tags in segment are not well-structured. ' . $this->tagStructureChecker->getError()
+            );
         }
         $countNewSegmentTags = $this->tagStructureChecker->getCount();
 
@@ -290,9 +303,15 @@ class editor_Models_Import_Excel extends editor_Models_Excel_AbstractExImport
             $isEditAllTasks = $isEditAllAllowed || $isUserPm;
             //if the user is allowe to load all, use the default loader
             if ($isEditAllTasks) {
-                $userTaskAssoc = editor_Models_Loaders_Taskuserassoc::loadByTaskForceWorkflowRole($this->user->getUserGuid(), $this->task);
+                $userTaskAssoc = editor_Models_Loaders_Taskuserassoc::loadByTaskForceWorkflowRole(
+                    $this->user->getUserGuid(),
+                    $this->task
+                );
             } else {
-                $userTaskAssoc = editor_Models_Loaders_Taskuserassoc::loadByTask($this->user->getUserGuid(), $this->task);
+                $userTaskAssoc = editor_Models_Loaders_Taskuserassoc::loadByTask(
+                    $this->user->getUserGuid(),
+                    $this->task
+                );
             }
             $isPmOverride = (bool) $userTaskAssoc->getIsPmOverride();
         } catch (ZfExtended_Models_Entity_NotFoundException $e) {

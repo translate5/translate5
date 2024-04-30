@@ -171,7 +171,6 @@ abstract class editor_TagSequence implements JsonSerializable
 
     /**
      * Holds the initially set markup for later logging
-     * @var string|null
      */
     private ?string $originalMarkup = null;
 
@@ -475,7 +474,7 @@ abstract class editor_TagSequence implements JsonSerializable
             // TS-1337: This error happend "in the wild". It can only happen with malformed Markup. We need more data for a proper investigation
             if ($nearest === null) {
                 $errorData = [];
-                if($this->originalMarkup !== null){
+                if ($this->originalMarkup !== null) {
                     $errorData['originalMarkup'] = $this->originalMarkup;
                 }
                 $errorData['holder'] = $holder->toJson();
