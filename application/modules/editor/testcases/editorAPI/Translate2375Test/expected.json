@@ -17,7 +17,9 @@
         "workflow": "default",
         "trackchangesShow": "1",
         "trackchangesShowAll": "1",
-        "trackchangesAcceptReject": "1"
+        "trackchangesAcceptReject": "1",
+        "segmentEditableCount": "8",
+        "segmentFinishCount": "0"
     },
     {
         "userGuid": "{00000000-0000-0000-C100-CCDDEE000003}",
@@ -37,7 +39,9 @@
         "workflow": "default",
         "trackchangesShow": "1",
         "trackchangesShowAll": "1",
-        "trackchangesAcceptReject": "1"
+        "trackchangesAcceptReject": "1",
+        "segmentEditableCount": "8",
+        "segmentFinishCount": "0"
     },
     {
         "userGuid": "{00000000-0000-0000-C100-CCDDEE000003}",
@@ -57,6 +61,8 @@
         "workflow": "default",
         "trackchangesShow": "1",
         "trackchangesShowAll": "1",
-        "trackchangesAcceptReject": "1"
+        "trackchangesAcceptReject": "1",
+        "segmentEditableCount": "8",
+        "segmentFinishCount": "0"
     }
 ]

@@ -266,13 +266,15 @@ Ext.define('Editor.view.comments.PanelViewController', {
             comments = me.getCommentsStore(),
             comment = comments.getById(rec.get('id')),
             response = op.getResponse(),
-            finishCount = false;
+            json = false, taskProgress = false, userProgress = false;
 
         try {
-            finishCount = Ext.decode(response.responseText).segmentFinishCount;
+            json = Ext.decode(response.responseText);
+            taskProgress = json.taskProgress;
+            userProgress = json.userProgress;
         }
         catch(e) {
-            finishCount = false;
+            json = false;
         }
 
         if(! segId) {
@@ -294,8 +296,8 @@ Ext.define('Editor.view.comments.PanelViewController', {
             comments.remove(comment);
         }
 
-        if(finishCount){
-            me.updateWorkflowProgress(Number(finishCount));
+        if(json){
+            me.updateWorkflowProgress(taskProgress, userProgress);
         }
 
         Editor.model.Segment.load(segId, {
@@ -386,9 +388,10 @@ Ext.define('Editor.view.comments.PanelViewController', {
 
     /**
      * TODO: make me with message bus
-     * @param finishCount
+     * @param {float} taskProgress
+     * @param {float} userProgress
      */
-    updateWorkflowProgress: function(finishCount) {
-        Editor.app.getController('Segments').updateSegmentFinishCountViewModel(finishCount);
+    updateWorkflowProgress: function(taskProgress, userProgress) {
+        Editor.app.getController('Segments').updateSegmentFinishCountViewModel(taskProgress, userProgress);
     }
 });

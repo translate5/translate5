@@ -272,13 +272,13 @@ Ext.define('Editor.util.TaskActions', {
         var me = this,
             initialState,
             app = Editor.app;
-        
+
         initialState = me.getInitialState(task, readonly);
         task.set('userState', initialState);
         app.mask(me.strings.taskOpening, task.get('taskName'));
         task.save({
             success: function(rec, op) {
-                me.onOpenTask(rec, initialState);
+                me.onOpenTask(rec, initialState, op);
             },
             failure: app.unmask
         });
@@ -311,14 +311,15 @@ Ext.define('Editor.util.TaskActions', {
      * Generic handler to be called on success handlers of task open calls
      * @param {Editor.models.Task} task
      * @param {String} initialState
+     * @param {Ext.data.operation.Update} operation
      */
-    onOpenTask: function(task, initialState) {
+    onOpenTask: function(task, initialState, operation) {
         var me = this,
             app = Editor.app,
             confirmed = !task.isUnconfirmed();
         if(task && initialState == task.USER_STATE_EDIT && task.get('userState') == task.USER_STATE_VIEW && confirmed) {
             Editor.MessageBox.addInfo(Ext.String.format(me.strings.forcedReadOnly, task.get('lockingUsername')));
         }
-        app.openEditor(task);
+        app.openEditor(task, operation);
     }
 });

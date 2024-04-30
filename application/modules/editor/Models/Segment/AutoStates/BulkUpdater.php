@@ -26,6 +26,8 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use editor_Models_Segment_AutoStates as AutoStates;
+
 class editor_Models_Segment_AutoStates_BulkUpdater
 {
     /**
@@ -73,7 +75,12 @@ class editor_Models_Segment_AutoStates_BulkUpdater
         //updates the view (if existing)
         $this->queryViewIfExists($sql_view, $bind);
         //updates LEK_segments directly
-        $this->db->getAdapter()->query($sql, $bind);
+        $affectedSegmentsQty = $this->db->getAdapter()->query($sql, $bind)->rowCount();
+        ZfExtended_Factory
+            ::get(editor_Models_TaskProgress::class)
+            ->adjustTaskEditableSegmentsCount(
+                $taskGuid, $affectedSegmentsQty, $oldState, $newState
+            );
         $this->db->getAdapter()->commit();
     }
 
@@ -85,7 +92,7 @@ class editor_Models_Segment_AutoStates_BulkUpdater
         $sfm = $this->segmentFieldManager;
         $sfm->initFields($taskGuid);
 
-        $bind = [editor_Models_Segment_AutoStates::NOT_TRANSLATED, $oldState, $taskGuid];
+        $bind = [AutoStates::NOT_TRANSLATED, $oldState, $taskGuid];
         $sql_tpl = $this->prepareSqlTpl($bind);
 
         $sql_view = sprintf($sql_tpl, $sfm->getView()->getName());
@@ -123,7 +130,12 @@ class editor_Models_Segment_AutoStates_BulkUpdater
         $subQuery .= "edited = '' and name in ('" . join("','", $affectedFieldNames) . "') group by segmentId)";
 
         $sql = sprintf($sql, $this->db->info($this->db::NAME), $subQuery, count($affectedFieldNames));
-        $this->db->getAdapter()->query($sql, $bind);
+        $affectedSegmentsQty = $this->db->getAdapter()->query($sql, $bind)->rowCount();
+        ZfExtended_Factory
+            ::get(editor_Models_TaskProgress::class)
+            ->adjustTaskEditableSegmentsCount(
+                $taskGuid, $affectedSegmentsQty, $oldState, AutoStates::NOT_TRANSLATED
+            );
         $this->db->getAdapter()->commit();
     }
 

@@ -115,7 +115,12 @@ class editor_Models_Segment_Updater
         $this->segment->updateIsTargetRepeated($this->segment->getTargetMd5(), $oldHash);
 
         //update the segment finish count for the current workflow step
-        $this->task->changeSegmentFinishCount($this->task, $this->segment->getAutoStateId(), $history->getAutoStateId());
+        ZfExtended_Factory::get(editor_Models_TaskProgress::class)->changeSegmentEditableAndFinishCount(
+            $this->task,
+            $this->segment->getAutoStateId(),
+            $history->getAutoStateId(),
+            $this->segment->getId()
+        );
 
         $this->qaAfterSegmentSaveOnSegmentUpdate();
     }
@@ -142,7 +147,12 @@ class editor_Models_Segment_Updater
         }
 
         //update the segment finish count for the current workflow step
-        $this->task->changeSegmentFinishCount($this->task, $this->segment->getAutoStateId(), $history->getAutoStateId());
+        ZfExtended_Factory::get(editor_Models_TaskProgress::class)->changeSegmentEditableAndFinishCount(
+            $this->task,
+            $this->segment->getAutoStateId(),
+            $history->getAutoStateId(),
+            $this->segment->getId()
+        );
 
         $this->qaAfterSegmentSaveOnSegmentUpdate();
     }

@@ -1,11 +1,10 @@
-<?php
-
+<?php 
 /*
 START LICENSE AND COPYRIGHT
 
  This file is part of translate5
 
- Copyright (c) 2013 - 2024 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
+ Copyright (c) 2013 - 2021 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
 
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
@@ -29,45 +28,50 @@ END LICENSE AND COPYRIGHT
 */
 
 /**
-  README: 415-TRANSLATE-3726-commenting-on-segment
- * Fix segment finish count for tasks
+ *
  */
 set_time_limit(0);
 
-// INFO: This migration script is disabled by default, because it operates over all tasks. In case someone needs
-// this fix, we can uncomment it and run it manually.
-return;
-defined('ZFEXTENDED_IS_WORKER_THREAD') || define('ZFEXTENDED_IS_WORKER_THREAD', true);
-
 //uncomment the following line, so that the file is not marked as processed:
-//$this->doNotSavePhpForDebugging = false;
+// $this->doNotSavePhpForDebugging = false;
 
-//should be not __FILE__ in the case of wanted restarts / renamings etc
+//should be not __FILE__ in the case of wanted restarts / renaming etc...
 // and must not be a constant since in installation the same named constant would we defined multiple times then
-$SCRIPT_IDENTIFIER = '415-TRANSLATE-3726-commenting-on-segment.php';
+$SCRIPT_IDENTIFIER = '416-TRANSLATE-2753-add-segmentEditableCount.php';
 
-/* @var $this ZfExtended_Models_Installer_DbUpdater */
+/** @var ZfExtended_Models_Installer_DbUpdater $this */
 
 /**
  * define database credential variables
  */
 $argc = count($argv);
-if (empty($this) || empty($argv) || $argc < 5 || $argc > 7) {
+if(empty($this) || empty($argv) || $argc < 5 || $argc > 7) {
     die("please dont call the script direct! Call it by using DBUpdater!\n\n");
 }
 
-$task = ZfExtended_Factory::get(editor_Models_Task::class);
-$progress = ZfExtended_Factory::get(editor_Models_TaskProgress::class);
-$db = $task->db;
-$s = $db->select()->from('task', ['*'])->where('state NOT IN(?)', [
+$tuaM          = ZfExtended_Factory::get(editor_Models_TaskUserAssoc::class);
+$taskM         = ZfExtended_Factory::get(editor_Models_Task::class);
+$taskProgressM = ZfExtended_Factory::get(editor_Models_TaskProgress::class);
+
+/** @var Zend_Db_Adapter_Pdo_Mysql $db */
+$db = $tuaM->db->getAdapter();
+
+// this is workaround just to be able to use the system user when we check the workflow bellow.
+defined('ZFEXTENDED_IS_WORKER_THREAD') || define('ZFEXTENDED_IS_WORKER_THREAD', true);
+
+// Task states to skip progress calculation for
+$skipStates = [
     editor_Models_Task::STATE_ERROR,
-    editor_Models_Task::STATE_END,
-    editor_Models_Task::STATE_IMPORT,
     editor_Models_Task::STATE_PROJECT,
-]);
-$allTasks = $task->loadAll();
-foreach ($allTasks as $t) {
-    $task->init($t);
-    // update the segment finish count
-    $progress->updateSegmentFinishCount($task);
+    editor_Models_Task::STATE_IMPORT
+];
+
+// Foreach task - recalculate values for segmentFinishCount and
+// segmentFinishCount fields for the task itself and it's associated users
+foreach ($taskM->loadAll() as $task) {
+    if (!in_array($task['state'], $skipStates)
+        && $task['workflowStepName'] !== editor_Workflow_Default::STEP_WORKFLOW_ENDED) {
+        $taskM->load($task['id']);
+        $taskProgressM->refreshProgress($taskM);
+    }
 }

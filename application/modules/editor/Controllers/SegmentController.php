@@ -363,12 +363,9 @@ class Editor_SegmentController extends ZfExtended_RestController
             $this->view->rows = $workflowAnonymize->anonymizeUserdata($this->entity->getTaskGuid(), $this->view->rows['userGuid'], $this->view->rows);
         }
 
-        //reload the task so the segment finish count is updated
-        $task->load($task->getId());
-
-        //set the segmentFinishCount so the frontend viewmodel is updated
-        //TODO: this should be updated from the websockets
-        $this->view->segmentFinishCount = $task->getSegmentFinishCount();
+        // Recalculate task progress and assign results into view so the frontend viewModel is updated
+        // TODO: this should be updated from the websockets
+        $this->appendTaskProgress($task);
     }
 
     /***
@@ -558,7 +555,9 @@ class Editor_SegmentController extends ZfExtended_RestController
         //TODO: this should be implemented via websokets
         //reload the task and get the lates segmentFinishCount
         $task->loadByTaskGuid($this->entity->getTaskGuid());
-        $this->view->segmentFinishCount = $task->getSegmentFinishCount();
+
+        // Recalculate task progress and assign results into view
+        $this->appendTaskProgress($task);
 
         $this->view->total = count($results);
     }
@@ -747,6 +746,9 @@ class Editor_SegmentController extends ZfExtended_RestController
 
         //update the already flushed object with the locked one
         $this->view->rows = $this->entity->getDataObject();
+
+        // Recalculate task progress and assign results into view
+        $this->appendTaskProgress();
     }
 
     /**
@@ -783,6 +785,9 @@ class Editor_SegmentController extends ZfExtended_RestController
             $this->entity,
         ]);
         $operations->toggleLockBatch($lock);
+
+        // Recalculate task progress and assign results into view
+        $this->appendTaskProgress();
     }
 
     public function unbookmarkBatch()
