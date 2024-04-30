@@ -7616,6 +7616,22 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
                 <source>Erlaubtes Synonym</source>
                 <target>Erlaubtes Synonym</target>
             </trans-unit>
+            <trans-unit id='RXJsYXVidGVz'>
+                <source>Erlaubtes</source>
+                <target>Erlaubtes</target>
+            </trans-unit>
+            <trans-unit id='Vm9yenVncw=='>
+                <source>Vorzugs</source>
+                <target>Vorzugs</target>
+            </trans-unit>
+            <trans-unit id='U3RhbmRhcmRpc2llcnQ='>
+                <source>Standardisiert</source>
+                <target>Standardisiert</target>
+            </trans-unit>
+            <trans-unit id='QW5kZXJl'>
+                <source>Andere</source>
+                <target>Andere</target>
+            </trans-unit>
             <trans-unit id='VmVyYm90ZW5lIEJlbmVubnVuZw=='>
                 <source>Verbotene Benennung</source>
                 <target>Verbotene Benennung</target>

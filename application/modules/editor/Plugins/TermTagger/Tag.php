@@ -25,7 +25,8 @@ START LICENSE AND COPYRIGHT
 
 END LICENSE AND COPYRIGHT
 */
-
+use editor_Plugins_TermTagger_QualityProvider as QualityProvider;
+use editor_Models_Terminology_Models_TermModel as TermModel;
 /**
  * Represents a termtagger segment tag
  */
@@ -49,28 +50,35 @@ class editor_Plugins_TermTagger_Tag extends editor_Segment_Tag
      */
     public static function getQualityState(array $cssClasses, bool $isSourceField): string
     {
+        // Get css classes as keys
+        $byKeys = array_fill_keys($cssClasses, true);
+
+        // If translation for a source term is not found in target
+        if ($isSourceField && ($byKeys[TermModel::TRANSSTAT_NOT_FOUND] ?? 0)) {
+
+            // Setup quality based on term status
+                 if ($byKeys[TermModel::STAT_ADMITTED]     ?? 0) return QualityProvider::NOT_FOUND_IN_TARGET_ADMITTED;
+            else if ($byKeys[TermModel::STAT_PREFERRED]    ?? 0) return QualityProvider::NOT_FOUND_IN_TARGET_PREFERRED;
+            else if ($byKeys[TermModel::STAT_STANDARDIZED] ?? 0) return QualityProvider::NOT_FOUND_IN_TARGET_STANDARDIZED;
+            else                                                 return QualityProvider::NOT_FOUND_IN_TARGET_OTHERS;
+        }
+
         foreach ($cssClasses as $cssClass) {
             switch ($cssClass) {
-                case editor_Models_Terminology_Models_TermModel::TRANSSTAT_NOT_FOUND:
+
+                case TermModel::TRANSSTAT_NOT_DEFINED:
                     if ($isSourceField) {
-                        return editor_Plugins_TermTagger_QualityProvider::NOT_FOUND_IN_TARGET;
+                        return QualityProvider::NOT_DEFINED_IN_TARGET;
                     }
 
                     break;
 
-                case editor_Models_Terminology_Models_TermModel::TRANSSTAT_NOT_DEFINED:
+                case TermModel::STAT_SUPERSEDED:
+                case TermModel::STAT_DEPRECATED:
                     if ($isSourceField) {
-                        return editor_Plugins_TermTagger_QualityProvider::NOT_DEFINED_IN_TARGET;
-                    }
-
-                    break;
-
-                case editor_Models_Terminology_Models_TermModel::STAT_SUPERSEDED:
-                case editor_Models_Terminology_Models_TermModel::STAT_DEPRECATED:
-                    if ($isSourceField) {
-                        return editor_Plugins_TermTagger_QualityProvider::FORBIDDEN_IN_SOURCE;
+                        return QualityProvider::FORBIDDEN_IN_SOURCE;
                     } else {
-                        return editor_Plugins_TermTagger_QualityProvider::FORBIDDEN_IN_TARGET;
+                        return QualityProvider::FORBIDDEN_IN_TARGET;
                     }
             }
         }

@@ -36,6 +36,10 @@ class SegmentWorkflowTest extends editor_Test_ImportTest
 {
     protected static bool $termtaggerRequired = true;
 
+    protected static array $requiredPlugins = [
+        'editor_Plugins_TermTagger_Bootstrap',
+    ];
+
     protected static array $forbiddenPlugins = [
         'editor_Plugins_ManualStatusCheck_Bootstrap',
     ];

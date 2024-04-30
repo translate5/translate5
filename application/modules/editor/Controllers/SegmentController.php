@@ -862,6 +862,7 @@ class Editor_SegmentController extends ZfExtended_RestController
         $data['termStatus'] = [
             'permitted' => $translate->_('erlaubte Benennung'),
             'forbidden' => $translate->_('verbotene Benennung'),
+            'standardized' => $translate->_('Standardisiert'),
             'preferred' => $translate->_('Vorzugsbenennung'),
             'unknown' => $translate->_('Unbekannter Term Status'),
         ];
