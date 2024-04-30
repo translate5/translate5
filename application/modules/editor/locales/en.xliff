@@ -6852,9 +6852,9 @@ The following task was imported with errors / warnings / notices. Please take ca
                 <source>triton</source>
                 <target>Default theme (Triton)</target>
             </trans-unit>
-            <trans-unit id='RG9rdW1lbnRhdGlvbg=='>
-                <source>Dokumentation</source>
-                <target>PDF documentation</target>
+            <trans-unit id='U2NocmlmdGxpY2hlIERva3VtZW50YXRpb24='>
+                <source>Schriftliche Dokumentation</source>
+                <target>Written documentation</target>
             </trans-unit>
             <trans-unit id='SW4gbmV1ZW0gQnJvd3Nlci1UYWIgw7ZmZm5lbg=='>
                 <source>In neuem Browser-Tab öffnen</source>
