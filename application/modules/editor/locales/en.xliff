@@ -5862,6 +5862,22 @@ The following task was imported with errors / warnings / notices. Please take ca
                 <source>Erlaubtes Synonym</source>
                 <target>Admitted synonym</target>
             </trans-unit>
+            <trans-unit id='RXJsYXVidGVz'>
+                <source>Erlaubtes</source>
+                <target>Admitted</target>
+            </trans-unit>
+            <trans-unit id='Vm9yenVncw=='>
+                <source>Vorzugs</source>
+                <target>Preferred</target>
+            </trans-unit>
+            <trans-unit id='U3RhbmRhcmRpc2llcnQ='>
+                <source>Standardisiert</source>
+                <target>Standardized</target>
+            </trans-unit>
+            <trans-unit id='QW5kZXJl'>
+                <source>Andere</source>
+                <target>Others</target>
+            </trans-unit>
             <trans-unit id='VmVyYm90ZW5lIEJlbmVubnVuZw=='>
                 <source>Verbotene Benennung</source>
                 <target>Forbidden designation</target>

@@ -41,7 +41,27 @@ class editor_Plugins_TermTagger_QualityProvider extends editor_Segment_Quality_P
     /**
      * @var string
      */
-    public const NOT_FOUND_IN_TARGET = 'not_found_in_target';
+    public const GROUP_NOT_FOUND_IN_TARGET = 'group-not_found_in_target';
+
+    /**
+     * @var string
+     */
+    public const NOT_FOUND_IN_TARGET_ADMITTED = 'not_found_in_target_admitted';
+
+    /**
+     * @var string
+     */
+    public const NOT_FOUND_IN_TARGET_PREFERRED = 'not_found_in_target_preferred';
+
+    /**
+     * @var string
+     */
+    public const NOT_FOUND_IN_TARGET_STANDARDIZED = 'not_found_in_target_standardized';
+
+    /**
+     * @var string
+     */
+    public const NOT_FOUND_IN_TARGET_OTHERS = 'not_found_in_target';
 
     /**
      * @var string
@@ -226,7 +246,11 @@ class editor_Plugins_TermTagger_QualityProvider extends editor_Segment_Quality_P
         ?editor_Models_Task $task
     ): ?string {
         return match ($category) {
-            self::NOT_FOUND_IN_TARGET => $translate->_('Nicht gefunden in Ziel'),
+            self::GROUP_NOT_FOUND_IN_TARGET => $translate->_('Nicht gefunden in Ziel'),
+            self::NOT_FOUND_IN_TARGET_ADMITTED => $translate->_('Erlaubtes'),
+            self::NOT_FOUND_IN_TARGET_PREFERRED => $translate->_('Vorzugs'),
+            self::NOT_FOUND_IN_TARGET_STANDARDIZED => $translate->_('Standardisiert'),
+            self::NOT_FOUND_IN_TARGET_OTHERS => $translate->_('Andere'),
             self::NOT_DEFINED_IN_TARGET => $translate->_('Nicht definiert in zielsprachl. Terminologie'),
             self::FORBIDDEN_IN_TARGET => $translate->_('Verboten in Ziel'),
             self::FORBIDDEN_IN_SOURCE => $translate->_('Verboten in Quelle'),
@@ -237,7 +261,12 @@ class editor_Plugins_TermTagger_QualityProvider extends editor_Segment_Quality_P
     public function getAllCategories(?editor_Models_Task $task): array
     {
         return [
-            self::NOT_FOUND_IN_TARGET,
+            self::GROUP_NOT_FOUND_IN_TARGET => [
+                self::NOT_FOUND_IN_TARGET_ADMITTED,
+                self::NOT_FOUND_IN_TARGET_PREFERRED,
+                self::NOT_FOUND_IN_TARGET_STANDARDIZED,
+                self::NOT_FOUND_IN_TARGET_OTHERS,
+            ],
             self::NOT_DEFINED_IN_TARGET,
             self::FORBIDDEN_IN_TARGET,
             self::FORBIDDEN_IN_SOURCE,

@@ -132,7 +132,7 @@ class editor_TaskController extends ZfExtended_RestController
             ],
             'segmentFinishCount' => [
                 'numeric' => 'percent',
-                'totalField' => 'segmentCount',
+                'totalField'=>'segmentEditableCount'
             ],
             'userState' => [
                 'list' => new ZfExtended_Models_Filter_Join('LEK_taskUserAssoc', 'state', 'taskGuid', 'taskGuid'),
@@ -248,6 +248,12 @@ class editor_TaskController extends ZfExtended_RestController
         } else {
             $this->view->rows = $this->loadAllForTaskOverview();
         }
+
+        // Load overall and users-specific progress for each task in $this->view->rows
+        ZfExtended_Factory
+            ::get(editor_Models_TaskProgress::class)
+            ->loadForRows($this->view->rows);
+
         $this->view->total = $this->totalCount;
     }
 
@@ -1092,6 +1098,9 @@ class editor_TaskController extends ZfExtended_RestController
             $segment = ZfExtended_Factory::get('editor_Models_Segment');
             $this->entity->setSegmentCount($segment->getTotalSegmentsCount($taskguid));
         }
+
+        // Recalculate task progress and assign results into view
+        $this->appendTaskProgress($this->entity);
 
         $this->entity->save();
         $obj = $this->entity->getDataObject();

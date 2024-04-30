@@ -1005,29 +1005,35 @@ Ext.define('Editor.view.admin.TaskGrid', {
             }
             value = value + '%';
             meta.tdAttr = 'data-qtip="' + value + '"';
-            return me.getCellProgressBarRenderData(value);
+            return me.getCellProgressBarRenderData(value, 13);
         }
 
-        if (!Ext.isNumeric(value) || value < 0) {
-            value = 0;
+        // Shortcuts
+        var tp = rec.get('taskProgress'),
+            up = rec.get('userProgress');
+
+        // Convert to percent
+        tp = Ext.util.Format.percent(tp);
+
+        // If current user is not assigned to current task (false)
+        // or is assigned but have no segments range defined (true)
+        // Render single progress bar just for task progress
+        if (up === false || up === true) {
+            return me.getCellProgressBarRenderData(tp, 13);
         }
 
-        if (value > 0 && !isImportProgress) {
-            value = value / rec.get('segmentCount');
-        }
-
-        value = Ext.util.Format.percent(value);
-
-        meta.tdAttr = 'data-qtip="' + value + '"';
-        return me.getCellProgressBarRenderData(value);
+        // Else convert to percent and render two progress bars for task and for user progress
+        up = Ext.util.Format.percent(up);
+        return me.getCellProgressBarRenderData(tp, 9) + me.getCellProgressBarRenderData(up, 9);
     },
 
     /***
-     * Return html for grid cell progress bar. The imput argument percent
+     * Return html for grid cell progress bar. The input argument percent
      * must contain percent value between 0% - 100%
      */
-    getCellProgressBarRenderData: function (percent) {
-        return '<div class="x-progress x-progress-default" style="height: 13px;">' +
+    getCellProgressBarRenderData: function (percent, height, qtip) {
+        return '<div class="x-progress x-progress-default" style="height: '
+            + (height || 13) + 'px;" data-qtip="' + percent + ' ' + (qtip || '') + '">' +
             '<div class="x-progress-bar x-progress-bar-default" style="width: ' + percent + '">' +
             '</div>' +
             '</div>';

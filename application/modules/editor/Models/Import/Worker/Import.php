@@ -187,18 +187,16 @@ class editor_Models_Import_Worker_Import
 
     /**
      * Calculates and sets the task metrics emptyTargets (bool), wordCount (int) and segmentCount(int)
+     * @throws Zend_Db_Select_Exception|ReflectionException
      */
     protected function calculateMetrics()
     {
         $taskGuid = $this->task->getTaskGuid();
 
-        $segment = ZfExtended_Factory::get('editor_Models_Segment');
-        /* @var $segment editor_Models_Segment */
+        $segment  = ZfExtended_Factory::get(editor_Models_Segment::class);
+        $progress = ZfExtended_Factory::get(editor_Models_TaskProgress::class);
+        $meta     = ZfExtended_Factory::get(editor_Models_Segment_Meta::class);
 
-        $meta = ZfExtended_Factory::get('editor_Models_Segment_Meta');
-        /* @var $meta editor_Models_Segment_Meta */
-
-        /* @var $segment editor_Models_Segment */
         $this->task->setEmptyTargets($segment->hasEmptyTargetsOnly($taskGuid));
 
         //we may set the tasks wordcount only to our calculated values if there was no count given either by API or by import formats
@@ -207,6 +205,7 @@ class editor_Models_Import_Worker_Import
         }
 
         $this->task->setSegmentCount($segment->getTotalSegmentsCount($taskGuid));
+        $progress->refreshProgress($this->task);
     }
 
     /**

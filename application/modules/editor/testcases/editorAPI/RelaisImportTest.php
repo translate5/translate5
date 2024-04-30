@@ -33,6 +33,13 @@ use MittagQI\Translate5\Test\Import\Config;
  */
 class RelaisImportTest extends editor_Test_JsonTest
 {
+
+    protected static bool $termtaggerRequired = true;
+
+    protected static array $requiredPlugins = [
+        'editor_Plugins_TermTagger_Bootstrap',
+    ];
+
     protected static array $forbiddenPlugins = [
         'editor_Plugins_LockSegmentsBasedOnConfig_Bootstrap',
         'editor_Plugins_NoMissingTargetTerminology_Bootstrap',

@@ -298,8 +298,9 @@ Ext.application({
      * opens the editor with the given Task
      * firing the adminViewportClosed event
      * @param {Editor.model.admin.Task} task
+     * @param {Ext.data.operation.Update} operation
      */
-    openEditor: function (task) {
+    openEditor: function (task, operation) {
         var me = this,
             languages = Ext.getStore('admin.Languages'),
             closeEvent;
@@ -345,7 +346,7 @@ Ext.application({
             */
             //enable logout split button
             //disable logout normal Button
-            me.fireEvent('editorViewportOpened', me, task);
+            me.fireEvent('editorViewportOpened', me, task, operation);
             Ext.getDoc().dom.title = me.windowTitle + ' - ' + task.getTaskName();
             me.getController('Fileorder').loadFileTree();//@todo bei ITL muss der load wiederum automatisch geschehen
         });

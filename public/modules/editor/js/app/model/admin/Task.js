@@ -115,6 +115,7 @@ Ext.define('Editor.model.admin.Task', {
         {name: 'notEditContent', type: 'boolean'},
         {name: 'usageMode', type: 'string'},
         {name: 'segmentCount', type: 'int', persist: false},
+        {name: 'segmentEditableCount', type: 'int', persist: false},
         {name: 'segmentFinishCount', type: 'int', persist: false},
         {name: 'diffExportUsable', type: 'boolean'},
         {name: 'description', type: 'string'},

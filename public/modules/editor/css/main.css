@@ -260,6 +260,26 @@ div.single + div {
     border-bottom: 0;
 }
 
+#change-alike-window div.transNotFound.standardizedTerm,
+.segment-tag-column.type-source div.x-grid-cell-inner div.transNotFound.standardizedTerm,
+.segment-tag-container.type-source div.transNotFound.standardizedTerm {
+    text-decoration-style: solid;
+    text-decoration-color: #a400df;
+    text-decoration-line: underline;
+    text-underline-offset: 4px;
+    border-bottom: 0;
+}
+
+#change-alike-window div.transNotFound.admittedTerm,
+.segment-tag-column.type-source div.x-grid-cell-inner div.transNotFound.admittedTerm,
+.segment-tag-container.type-source div.transNotFound.admittedTerm {
+    text-decoration-style: solid;
+    text-decoration-color: #EFD700;
+    text-decoration-line: underline;
+    text-underline-offset: 4px;
+    border-bottom: 0;
+}
+
 #change-alike-window div.transNotDefined,
 .segment-tag-column.type-source div.x-grid-cell-inner div.transNotDefined,
 .segment-tag-container.type-source div.transNotDefined {
@@ -1233,6 +1253,11 @@ dl {
 .x-form-item-default.x-item-disabled {
     -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=70)";
     opacity: 0.7;
+}
+
+.x-progress.half-height * {
+    line-height: 12px;
+    font-size: 12px;
 }
 
 div.internal-tag.number {

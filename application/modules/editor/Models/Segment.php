@@ -32,7 +32,7 @@ END LICENSE AND COPYRIGHT
  * @version 1.0
  *
  */
-
+use editor_Models_Segment_AutoStates as AutoStates;
 use MittagQI\Translate5\ContentProtection\ContentProtector;
 
 /**

@@ -62,11 +62,10 @@ if (! defined('ACL_ROLE_PM')) {
     define('ACL_ROLE_PM', 'pm');
 }
 
-$db = Zend_Db_Table::getDefaultAdapter();
-$task = ZfExtended_Factory::get('editor_Models_Task');
-/* @var $task editor_Models_Task */
-
-$segment = ZfExtended_Factory::get('editor_Models_Segment');
+$db       = Zend_Db_Table::getDefaultAdapter();
+$task     = ZfExtended_Factory::get(editor_Models_Task::class);
+$progress = ZfExtended_Factory::get(editor_Models_TaskProgress::class);
+$segment  = ZfExtended_Factory::get(editor_Models_Segment::class);
 
 /* @var $segment editor_Models_Segment */
 $s = $task->db->select()
@@ -83,7 +82,7 @@ foreach ($allTasks as $t) {
 
     error_log("Before: Task :[" . $task->getTaskGuid() . '] segmentFinishCount:' . $task->getSegmentFinishCount());
     //update the segment finish count
-    $task->updateSegmentFinishCount();
+    $progress->updateSegmentFinishCount($task);
 
     $task->load($task->getId());
     error_log("After: Task :[" . $task->getTaskGuid() . '] segmentFinishCount:' . $task->getSegmentFinishCount());

@@ -29,6 +29,7 @@ END LICENSE AND COPYRIGHT
 use MittagQI\Translate5\Acl\Rights;
 use MittagQI\Translate5\Task\FileTypeSupport;
 use MittagQI\ZfExtended\Session\SessionInternalUniqueId;
+use editor_Models_Segment_AutoStates as AutoStates;
 
 /**
  * Task Object Instance as needed in the application
@@ -95,6 +96,8 @@ use MittagQI\ZfExtended\Session\SessionInternalUniqueId;
  * @method void setUsageMode(string $usageMode)
  * @method string getSegmentCount()
  * @method void setSegmentCount(int $segmentCount)
+ * @method string getSegmentEditableCount()
+ * @method void setSegmentEditableCount(int $segmentEditableCount)
  * @method string getSegmentFinishCount()
  * @method void setSegmentFinishCount(int $segmentFinishCount)
  * @method void setTaskType(string $taskType)
@@ -669,7 +672,9 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract
         $this->db->update($data, [
             'taskGuid = ?' => $this->getTaskGuid(),
         ]);
-        $this->updateSegmentFinishCount();
+        ZfExtended_Factory
+            ::get(editor_Models_TaskProgress::class)
+            ->updateSegmentFinishCount($this);
     }
 
     /**
@@ -1297,70 +1302,31 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract
         return $aclInstance->isInAllowedRoles($rolesToCheck, Rights::ID, Rights::READ_ANONYMYZED_USERS);
     }
 
-    /***
-     * Update the segment finish count based on the task workflow step valid autostates
-     * @param editor_Models_Task $task
+    /**
+     * Get info to be further used to count finished segments per current task and per each user associated with that task
+     *
+     * @return array|null
      */
-    public function updateSegmentFinishCount()
+    public function getWorkflowEndedOrFinishedAutoStates() : ?array
     {
-        $workflow = $this->getTaskActiveWorkflow();
-        if (empty($workflow)) {
-            return;
+        // Get workflow, and return if got nothing
+        if (empty($workflow = $this->getTaskActiveWorkflow())) {
+            return null;
         }
-        $states = $this->getTaskRoleAutoStates() ?: [];
-        // include (b)locked autostate in total segments finish count because (b)locked segments can not be edited and therefore they should count as finished.
-        //TODO: with TRANSLATE-2753 this will be changed
-        $states[] = editor_Models_Segment_AutoStates::LOCKED;
-        $states[] = editor_Models_Segment_AutoStates::BLOCKED;
 
+        // Get states
+        $states = $this->getTaskRoleAutoStates() ?: [];
+
+        // Check if workflow is ended
         $isWorkflowEnded = $workflow->isEnded($this);
 
-        $adapted = $this->db->getAdapter();
-
-        if (! $isWorkflowEnded && ! $states) {
-            //if workflow is not ended, and we do not have any states to the current steps' role, we do not update anything
-            return;
+        // If workflow is not ended, and we do not have any states to the current steps' role, we do not update anything
+        if (!$isWorkflowEnded && !$states) {
+            return null;
         }
 
-        if ($isWorkflowEnded) {
-            //if workflow is ended, set the count to 100% (segmentFinishCount=segmentCount)
-            $expression = 'segmentCount';
-        } else {
-            //get the autostates for the valid task workflow states
-            $expression = '(SELECT COUNT(*) FROM LEK_segments WHERE autoStateId IN(' . implode(',', $states) . ') AND taskGuid=' . $adapted->quote($this->getTaskGuid()) . ')';
-        }
-        $this->db->update([
-            'segmentFinishCount' => new Zend_Db_Expr($expression),
-        ], [
-            'taskGuid=?' => $this->getTaskGuid(),
-        ]);
-    }
-
-    /***
-     * increment or decrement the segmentFinishCount value based on the given state logic
-     * @param editor_Models_Task $task
-     * @param int $newAutostate
-     * @param int $oldAutoState
-     */
-    public function changeSegmentFinishCount(editor_Models_Task $task, int $newAutostate, int $oldAutoState)
-    {
-        $stateRoles = $this->getTaskRoleAutoStates();
-        if (! $stateRoles) {
-            return;
-        }
-        $expression = '';
-        if (in_array($newAutostate, $stateRoles) && ! in_array($oldAutoState, $stateRoles)) {
-            $expression = 'segmentFinishCount + 1 ';
-        } elseif (in_array($oldAutoState, $stateRoles) && ! in_array($newAutostate, $stateRoles)) {
-            $expression = 'segmentFinishCount - 1 ';
-        } else {
-            return;
-        }
-        $this->db->update([
-            'segmentFinishCount' => new Zend_Db_Expr($expression),
-        ], [
-            'taskGuid=?' => $task->getTaskGuid(),
-        ]);
+        // Return $isWorkflowEnded flag and finished autoStates array
+        return [$isWorkflowEnded, $states];
     }
 
     /***
@@ -1369,7 +1335,7 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract
      *
      * @return boolean|boolean|multitype:string
      */
-    protected function getTaskRoleAutoStates()
+    public function getTaskRoleAutoStates()
     {
         try {
             $workflow = $this->getTaskActiveWorkflow();

@@ -130,29 +130,34 @@ $languageSelector[] = '</form>';
     </div>
 </div>
 <script>
-    // Initialize dialog
-    $("#dialog").dialog({
-        autoOpen: <?=$helpWindow['notAutoShow'] ? 'false' : 'true'?>,
-        modal: true,
-        width: 1024,
-        height: 720
-    });
-    $('#notAutoShow').change(function(){
-        var name = 'runtimeOptions.frontend.defaultState.helpWindow.instanttranslate',
-            userGuid = '<?php echo $user->getUserGuid()?>';
-        $.post({
-            url: '/editor/config/' + name,
-            method: 'PUT',
-            data: {
-                userGuid: userGuid,
-                data: JSON.stringify({
-                    value: JSON.stringify({notAutoShow: this.checked}),
-                    userGuid: userGuid,
-                    name: name
-                })
-            }
+
+    // If not shown within iframe
+    if (window.parent.location.hash !== '#itranslate') {
+
+        // Initialize dialog
+        $("#dialog").dialog({
+            autoOpen: <?=$helpWindow['notAutoShow'] ? 'false' : 'true'?>,
+            modal: true,
+            width: 1024,
+            height: 720
         });
-    });
+        $('#notAutoShow').change(function(){
+            var name = 'runtimeOptions.frontend.defaultState.helpWindow.instanttranslate',
+                userGuid = '<?php echo $user->getUserGuid()?>';
+            $.post({
+                url: '/editor/config/' + name,
+                method: 'PUT',
+                data: {
+                    userGuid: userGuid,
+                    data: JSON.stringify({
+                        value: JSON.stringify({notAutoShow: this.checked}),
+                        userGuid: userGuid,
+                        name: name
+                    })
+                }
+            });
+        });
+    }
 </script>
 <?php }?>
 <div id="containerHeader">
