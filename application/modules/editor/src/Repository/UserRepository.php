@@ -52,6 +52,7 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\Repository;
 
+use MittagQI\ZfExtended\Acl\Roles;
 use ZfExtended_Acl;
 use ZfExtended_Factory;
 use ZfExtended_Models_User;
@@ -68,16 +69,19 @@ class UserRepository
     /**
      * @return iterable<ZfExtended_Models_User>
      */
-    public function getPmList(): iterable
+    public function getPmList(bool $includePmlite = false): iterable
     {
-        $roles = join('|', $this->acl->getRolesWith('editor_task', 'all'));
-
         $userModel = ZfExtended_Factory::get(ZfExtended_Models_User::class);
-        $userModel->db->select()->where("CONCAT(',', `roles`, ',') REGEXP ',(?),'", $roles);
-        $users = $userModel->db->fetchAll();
+
+        $roles = [Roles::PM];
+        if ($includePmlite) {
+            $roles[] = Roles::PMLIGHT;
+        }
+
+        $users = ZfExtended_Factory::get(ZfExtended_Models_User::class)->loadAllByRole($roles);
 
         foreach ($users as $user) {
-            $userModel->init($user->toArray());
+            $userModel->init($user);
 
             yield clone $userModel;
         }

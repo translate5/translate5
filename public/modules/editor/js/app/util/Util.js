@@ -442,13 +442,37 @@ Ext.define('Editor.util.Util', {
                 return false;
             }
             // if the task is not reimportable, the export/import translator package is not available
-            if (!task.get('reimportable')){
+            if (!task.get('reimportable') || !task.isNotErrorImportPendingCustom()){
                 return false;
             }
-            // is allowed to edit a task
-            return Editor.app.authenticatedUser.isAllowed('editorEditTask',task) && task.isNotErrorImportPendingCustom();
+            return Editor.app.authenticatedUser.isAllowed('editorPackageExport',task);
+        },
+
+        /**
+         * Helper to guarantee an array of id's are all integers
+         * @param {string[]} values
+         * @returns {int[]}
+         */
+        integerizeArray: function(values){
+            var ints = [];
+            Ext.Array.each(values, function(id){
+                ints.push(parseInt(id));
+            });
+            return ints;
+        },
+
+        /**
+         * @param {string} value
+         * @returns {string}
+         */
+        removeLeadingTrailingCommas: function(value){
+            while(value.substring(0, 1) === ','){
+                value = value.substring(1);
+            }
+            while(value.substring(value.length - 1, value.length) === ','){
+                value = value.substring(0, value.length - 1);
+            }
+            return value;
         }
-
-
     }
 });

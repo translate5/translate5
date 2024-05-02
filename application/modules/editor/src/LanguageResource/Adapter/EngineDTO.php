@@ -30,6 +30,10 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\LanguageResource\Adapter;
 
+/**
+ * Represents a engine of a language-resource.
+ * The "engineName" prop normally equels the "name" but can be used to have a different display-name
+ */
 class EngineDTO
 {
     public function __construct(
@@ -39,7 +43,8 @@ class EngineDTO
         private ?string $sourceIso,
         private string $target,
         private ?string $targetIso,
-        private ?string $domainCode
+        private ?string $domainCode,
+        private ?string $engineName = null
     ) {
     }
 
@@ -53,6 +58,7 @@ class EngineDTO
             'target' => $this->target,
             'targetIso' => $this->targetIso,
             'domainCode' => $this->domainCode,
+            'engineName' => empty($this->engineName) ? $this->name : $this->engineName,
         ];
     }
 }

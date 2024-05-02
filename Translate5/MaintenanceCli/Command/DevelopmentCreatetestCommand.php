@@ -1,64 +1,65 @@
 <?php
 /*
  START LICENSE AND COPYRIGHT
- 
+
  This file is part of translate5
- 
+
  Copyright (c) 2013 - 2017 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
- 
+
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
- 
+
  This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
  as published by the Free Software Foundation and appearing in the file agpl3-license.txt
  included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
- 
+
  There is a plugin exception available for use with this release of translate5 for
  translate5: Please see http://www.translate5.net/plugin-exception.txt or
  plugin-exception.txt in the root folder of translate5.
- 
+
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
  http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
- 
+
  END LICENSE AND COPYRIGHT
  */
+
 namespace Translate5\MaintenanceCli\Command;
 
-use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\InputOption;
-use Symfony\Component\Console\Style\SymfonyStyle;
+use Symfony\Component\Console\Output\OutputInterface;
 
 class DevelopmentCreatetestCommand extends Translate5AbstractCommand
 {
     // the name of the command (the part after "bin/console")
     protected static $defaultName = 'dev:createtest';
-    
+
     protected function configure()
     {
         $this
         // the short description shown while running "php bin/console list"
-        ->setDescription('Development: Creates a new API test, gets the name (ISSUE-XXX) from the current branch.')
-        
+            ->setDescription('Development: Creates a new API test, gets the name (ISSUE-XXX) from the current branch.')
+
         // the full command description shown when running the command with
         // the "--help" option
-        ->setHelp('Creates a new API test, gets the name (ISSUE-XXX) from the current branch.');
+            ->setHelp('Creates a new API test, gets the name (ISSUE-XXX) from the current branch.');
 
         $this->addOption(
             'name',
             'N',
             InputOption::VALUE_REQUIRED,
-            'Force a name (must end with Test!) instead of getting it from the branch.');
+            'Force a name (must end with Test!) instead of getting it from the branch.'
+        );
 
         $this->addOption(
             'plugin',
             'p',
             InputOption::VALUE_REQUIRED,
-            'Create the test in the given Plugin (give the relative path to the plugin root!).');
+            'Create the test in the given Plugin (give the relative path to the plugin root!).'
+        );
     }
 
     /**
@@ -70,61 +71,62 @@ class DevelopmentCreatetestCommand extends Translate5AbstractCommand
     {
         $this->initInputOutput($input, $output);
         $this->initTranslate5();
-        
+
         $this->writeTitle('Create a new API test from skeleton');
 
-        if($plugin = $input->getOption('plugin')) {
-            $path = APPLICATION_ROOT.'/'.$plugin.'/tests';
-            if(!is_dir($path) && !mkdir($path)) {
-                $this->io->error('The given path does not exist or the "tests" folder could not be created: '.$path);
+        if ($plugin = $input->getOption('plugin')) {
+            $path = APPLICATION_ROOT . '/' . $plugin . '/tests';
+            if (! is_dir($path) && ! mkdir($path)) {
+                $this->io->error('The given path does not exist or the "tests" folder could not be created: ' . $path);
             }
-        }
-        else {
-            $path = APPLICATION_PATH.'/modules/editor/testcases/editorAPI';
+        } else {
+            $path = APPLICATION_PATH . '/modules/editor/testcases/editorAPI';
         }
 
-        if($name = $input->getOption('name')) {
+        if ($name = $input->getOption('name')) {
             $issue = $name;
-        }
-        else {
+        } else {
             $gitout = [];
-            exec('cd '.$path.'; git branch --show-current', $gitout);
-            if(empty($gitout)) {
+            exec('cd ' . $path . '; git branch --show-current', $gitout);
+            if (empty($gitout)) {
                 $this->io->error('git could not find local branch!');
+
                 return 1;
             }
-            
+
             $name = reset($gitout);
             $matches = [];
-            if(preg_match('/([A-Z][A-Z0-9]*)-([0-9]+)/', $name, $matches)) {
-                $issue = $matches[1].'-'.$matches[2];
-                $name = ucfirst(strtolower($matches[1])).$matches[2].'Test';
-            }
-            else{
+            if (preg_match('/([A-Z][A-Z0-9]*)-([0-9]+)/', $name, $matches)) {
+                $issue = $matches[1] . '-' . $matches[2];
+                $name = ucfirst(strtolower($matches[1])) . $matches[2] . 'Test';
+            } else {
                 $issue = $name = 'AnotherTest';
             }
         }
-        
-        $phpFile = $path.'/'.$name.'.php';
-        if(file_exists($phpFile)){
-            $this->io->error('Test '.$name.'.php does already exist!');
+
+        $phpFile = $path . '/' . $name . '.php';
+        if (file_exists($phpFile)) {
+            $this->io->error('Test ' . $name . '.php does already exist!');
+
             return 1;
         }
         $this->makeTestPhp($phpFile, $name, $issue);
         $this->makeTestFiles($path, $name, $issue);
-        
-        $this->io->success("Test created: \n  ".$phpFile);
+
+        $this->io->success("Test created: \n  " . $phpFile);
+
         return 0;
     }
-    
-    protected function makeTestPhp($file, $name, $issue) {
+
+    protected function makeTestPhp($file, $name, $issue)
+    {
         file_put_contents($file, '<?php
 /*
 START LICENSE AND COPYRIGHT
 
  This file is part of translate5
  
- Copyright (c) 2013 - '.date('Y').' Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
+ Copyright (c) 2013 - ' . date('Y') . ' Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
 
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
@@ -149,10 +151,10 @@ END LICENSE AND COPYRIGHT
 use MittagQI\Translate5\Test\Import\Config;
 
 /**
- * Testcase for '.$issue.' //TODO FOR TEST USAGE: add a description
+ * Testcase for ' . $issue . ' //TODO FOR TEST USAGE: add a description
  * For details see the issue.
  */
-class '.$name.' extends editor_Test_JsonTest {
+class ' . $name . ' extends editor_Test_JsonTest {
 
 //TODO FOR TEST USAGE: check plugin pre conditions
     protected static array $forbiddenPlugins = [
@@ -250,8 +252,8 @@ class '.$name.' extends editor_Test_JsonTest {
         $pathToZip = $path.\'export.zip\';
         $this->assertFileExists($pathToZip);
         
-        $exportFileName = \'export-'.$issue.'-de-en.xlf\';
-        $exportedFile = static::api()->getFileContentFromZipPath($pathToZip, \'/'.$issue.'-de-en.xlf\');
+        $exportFileName = \'export-' . $issue . '-de-en.xlf\';
+        $exportedFile = static::api()->getFileContentFromZipPath($pathToZip, \'/' . $issue . '-de-en.xlf\');
 // REMINDER FOR TEST USAGE:
 // This is the manual way to save files when the command-option -c (= capture) was set
         if(static::api()->isCapturing()){
@@ -259,20 +261,21 @@ class '.$name.' extends editor_Test_JsonTest {
         }
         $expectedResult = static::api()->getFileContent($exportFileName);
         
-        $this->assertEquals(rtrim($expectedResult), rtrim($exportedFile), \'Exported result does not equal to export-'.$issue.'-de-en.xlf\');
+        $this->assertEquals(rtrim($expectedResult), rtrim($exportedFile), \'Exported result does not equal to export-' . $issue . '-de-en.xlf\');
     }
 }
 ');
     }
-    
-    protected function makeTestFiles($path, $name, $issue) {
-        $testpath = $path.'/'.$name.'/';
-        $workfiles = $path.'/'.$name.'/testfiles/workfiles/';
+
+    protected function makeTestFiles($path, $name, $issue)
+    {
+        $testpath = $path . '/' . $name . '/';
+        $workfiles = $path . '/' . $name . '/testfiles/workfiles/';
         mkdir($workfiles, 0755, true);
-        
+
         //make a sample task-config.ini
-        file_put_contents($testpath.'testfiles/task-config.ini', "runtimeOptions.import.fileparser.options.protectTags = 0\n");
-        
+        file_put_contents($testpath . 'testfiles/task-config.ini', "runtimeOptions.import.fileparser.options.protectTags = 0\n");
+
         $xliff = <<<EOF
 <?xml version="1.0" encoding="UTF-8"?>
 <xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2" xmlns:okp="okapi-framework:xliff-extensions" xmlns:its="http://www.w3.org/2005/11/its" xmlns:itsxlf="http://www.w3.org/ns/its-xliff/" its:version="2.0">
@@ -288,9 +291,9 @@ class '.$name.' extends editor_Test_JsonTest {
 </xliff>
 EOF;
 
-        file_put_contents($workfiles.$issue.'-de-en.xlf', $xliff);
+        file_put_contents($workfiles . $issue . '-de-en.xlf', $xliff);
 
-$json = <<<EOF
+        $json = <<<EOF
 [
     {
         "segmentNrInTask": "1",
@@ -320,6 +323,5 @@ $json = <<<EOF
     }
 ]
 EOF;
-
     }
 }

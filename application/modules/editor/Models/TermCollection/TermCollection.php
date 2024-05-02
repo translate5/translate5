@@ -9,29 +9,27 @@ START LICENSE AND COPYRIGHT
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
  This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
- as published by the Free Software Foundation and appearing in the file agpl3-license.txt 
- included in the packaging of this file.  Please review the following information 
+ as published by the Free Software Foundation and appearing in the file agpl3-license.txt
+ included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
 
  There is a plugin exception available for use with this release of translate5 for
- translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or
  plugin-exception.txt in the root folder of translate5.
 
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
 
-class editor_Models_TermCollection_TermCollection extends editor_Models_LanguageResources_LanguageResource {
+class editor_Models_TermCollection_TermCollection extends editor_Models_LanguageResources_LanguageResource
+{
     /**
      * Import the tbx files in the term collection
-     * @param array $filePath
-     * @param array $params
-     * @return bool|null
      */
     public function importTbx(array $filePath, array $params): ?bool
     {
@@ -41,21 +39,22 @@ class editor_Models_TermCollection_TermCollection extends editor_Models_Language
         //import source (filesystem or crossApi)
         $import->importSource = $params['importSource'] ?? "";
         if (is_string($params['customerIds'])) {
-            $params['customerIds'] = explode(',',$params['customerIds']);
+            $params['customerIds'] = explode(',', $params['customerIds']);
         }
         $import->customerIds = $params['customerIds'];
         $import->loadUser($this->getUserGuid($params));
+
         return $import->parseTbxFile($filePath, $params['collectionId']);
     }
 
     private function getUserGuid(array $params): string
     {
-        if (array_key_exists('userGuid', $params) && !empty($params['userGuid'])) {
+        if (array_key_exists('userGuid', $params) && ! empty($params['userGuid'])) {
             return $params['userGuid'];
         }
 
         if (ZfExtended_Authentication::getInstance()->isAuthenticated()) {
-            return ZfExtended_Authentication::getInstance()->getUser()->getUserGuid();
+            return ZfExtended_Authentication::getInstance()->getUserGuid();
         }
 
         return ZfExtended_Models_User::SYSTEM_GUID;
@@ -63,9 +62,6 @@ class editor_Models_TermCollection_TermCollection extends editor_Models_Language
 
     /**
      * Create new term collection and return the id.
-     * @param string $name
-     * @param array $customers
-     * @return editor_Models_TermCollection_TermCollection
      */
     public function create(string $name, array $customers): editor_Models_TermCollection_TermCollection
     {
@@ -83,11 +79,10 @@ class editor_Models_TermCollection_TermCollection extends editor_Models_Language
         $this->setColor($service::DEFAULT_COLOR);
         $this->setResourceType(editor_Models_Segment_MatchRateType::TYPE_TERM_COLLECTION);
         $this->createLangResUuid();
-        $resourceId=$this->save();
-        
-        
-        if(!empty($customers)){
-            $customerAssoc=ZfExtended_Factory::get('editor_Models_LanguageResources_CustomerAssoc');
+        $resourceId = $this->save();
+
+        if (! empty($customers)) {
+            $customerAssoc = ZfExtended_Factory::get('editor_Models_LanguageResources_CustomerAssoc');
             /* @var $customerAssoc editor_Models_LanguageResources_CustomerAssoc */
             $customerAssoc->addAssocs($resourceId, $customers);
         }
@@ -107,18 +102,23 @@ class editor_Models_TermCollection_TermCollection extends editor_Models_Language
 
         $s = $this->db->select()
             ->setIntegrityCheck(false)
-            ->from(['lr'=>'LEK_languageresources'])
-            ->join(['ta'=>'LEK_languageresources_taskassoc'], 'ta.languageResourceId=lr.id', ['ta.taskGuid'])
-            ->where('ta.taskGuid=?',$taskGuid)
-            ->where('lr.serviceName=?',$service->getName());
+            ->from([
+                'lr' => 'LEK_languageresources',
+            ])
+            ->join([
+                'ta' => 'LEK_languageresources_taskassoc',
+            ], 'ta.languageResourceId=lr.id', ['ta.taskGuid'])
+            ->where('ta.taskGuid=?', $taskGuid)
+            ->where('lr.serviceName=?', $service->getName());
         $rows = $this->db->fetchAll($s)->toArray();
 
         if (empty($rows)) {
             return [];
         }
-        if($idsOnly) {
+        if ($idsOnly) {
             return array_column($rows, 'id');
         }
+
         return $rows;
     }
 
@@ -136,7 +136,6 @@ class editor_Models_TermCollection_TermCollection extends editor_Models_Language
      */
     public function getAttributesCountForCollection(int $collectionId): array
     {
-
         $query = "SELECT 
                         (SELECT count(DISTINCT id) FROM terms_term WHERE collectionId = ?) AS termsCount,
                         SUM(entry) AS termsEntryAtributeCount, SUM(language) languageAtributeCount, SUM(term) AS termsAtributeCount
@@ -191,9 +190,8 @@ class editor_Models_TermCollection_TermCollection extends editor_Models_Language
                         WHERE
                             collectionId = ?)) AS e;";
 
-        return $this->db->getAdapter()->query($query,[$collectionId,$collectionId,$collectionId])->fetchAll()[0] ?? [];
+        return $this->db->getAdapter()->query($query, [$collectionId, $collectionId, $collectionId])->fetchAll()[0] ?? [];
     }
-
 
     /***
      * Get all TermCollections ids assigned to the given customers.
@@ -207,18 +205,23 @@ class editor_Models_TermCollection_TermCollection extends editor_Models_Language
         /* @var $service editor_Services_TermCollection_Service */
         $serviceType = $service->getServiceNamespace();
         $s = $this->db->select()
-        ->setIntegrityCheck(false)
-        ->from(['lr' => 'LEK_languageresources'])
-        ->join(['ca' => 'LEK_languageresources_customerassoc'], 'ca.languageResourceId = lr.id',['ca.customerId as customerId'])
-        ->where('ca.customerId IN(?)',$customerIds)
-        ->where('lr.serviceType = ?',$serviceType)
-        ->group('lr.id');
+            ->setIntegrityCheck(false)
+            ->from([
+                'lr' => 'LEK_languageresources',
+            ])
+            ->join([
+                'ca' => 'LEK_languageresources_customerassoc',
+            ], 'ca.languageResourceId = lr.id', ['ca.customerId as customerId'])
+            ->where('ca.customerId IN(?)', $customerIds)
+            ->where('lr.serviceType = ?', $serviceType)
+            ->group('lr.id');
         $rows = $this->db->fetchAll($s)->toArray();
 
-        if (!empty($rows)) {
-            if($dict) {
+        if (! empty($rows)) {
+            if ($dict) {
                 return array_combine(array_column($rows, 'id'), array_column($rows, 'name'));
             }
+
             return array_column($rows, 'id');
         }
 
@@ -232,7 +235,7 @@ class editor_Models_TermCollection_TermCollection extends editor_Models_Language
      */
     public function addTermCollectionTaskAssoc($collectionId, string $taskGuid)
     {
-        $model=ZfExtended_Factory::get('MittagQI\Translate5\LanguageResource\TaskAssociation');
+        $model = ZfExtended_Factory::get('MittagQI\Translate5\LanguageResource\TaskAssociation');
         /* @var $model MittagQI\Translate5\LanguageResource\TaskAssociation */
         $model->setLanguageResourceId($collectionId);
         $model->setTaskGuid($taskGuid);
@@ -249,14 +252,14 @@ class editor_Models_TermCollection_TermCollection extends editor_Models_Language
     public function getLanguagesInTermCollections(array $collectionIds): array
     {
         $s = $this->db->select()
-        ->setIntegrityCheck(false)
-        ->from('LEK_languageresources_languages', ['LEK_languageresources_languages.sourceLang as id'])
-        ->join('LEK_languages', 'LEK_languages.id = LEK_languageresources_languages.sourceLang', ['LEK_languages.rfc5646','LEK_languages.iso3166Part1alpha2','LEK_languages.langName'])
-        ->where('LEK_languageresources_languages.languageResourceId IN(?)', $collectionIds)
-        ->group('LEK_languageresources_languages.sourceLang');
+            ->setIntegrityCheck(false)
+            ->from('LEK_languageresources_languages', ['LEK_languageresources_languages.sourceLang as id'])
+            ->join('LEK_languages', 'LEK_languages.id = LEK_languageresources_languages.sourceLang', ['LEK_languages.rfc5646', 'LEK_languages.iso3166Part1alpha2', 'LEK_languages.langName'])
+            ->where('LEK_languageresources_languages.languageResourceId IN(?)', $collectionIds)
+            ->group('LEK_languageresources_languages.sourceLang');
         $rows = $this->db->fetchAll($s)->toArray();
 
-        if (!empty($rows)) {
+        if (! empty($rows)) {
             return $rows;
         }
 
@@ -271,16 +274,16 @@ class editor_Models_TermCollection_TermCollection extends editor_Models_Language
     public function loadByName(string $name): ?array
     {
         $s = $this->db->select()
-        ->where('name=?',$name)
-        ->where('serviceName=?','TermCollection');
-        $result=$this->db->fetchRow($s);
+            ->where('name=?', $name)
+            ->where('serviceName=?', 'TermCollection');
+        $result = $this->db->fetchRow($s);
         if ($result) {
             return $result->toArray();
         }
 
         return $result;
     }
-    
+
     public function delete()
     {
         // remove the termcollection tbx files from the disk
@@ -300,7 +303,6 @@ class editor_Models_TermCollection_TermCollection extends editor_Models_Language
      * @param bool $dict if true return ids mapped to name, if false array of IDs only
      * @param array $clientIds if given, intersect the loaded collection IDs with the ones given as parameter
      * @param bool $termportal defines if we are in termportal or not
-     * @return array
      * @throws Zend_Db_Statement_Exception
      */
     public function getCollectionForAuthenticatedUser(bool $dict = false, array $clientIds = [], $termportal = false): array
@@ -309,13 +311,11 @@ class editor_Models_TermCollection_TermCollection extends editor_Models_Language
 
         if ($termportal && in_array('termPM_allClients', $user->getRoles())) {
             $customers = Zend_Db_Table_Abstract::getDefaultAdapter()->query('SELECT `id` FROM `LEK_customer`')->fetchAll(PDO::FETCH_COLUMN);
-        }
-        else {
+        } else {
             $customers = $user->getCustomersArray();
         }
 
-
-        if (!empty($clientIds)) {
+        if (! empty($clientIds)) {
             $customers = array_intersect($customers, $clientIds);
         }
 
@@ -336,7 +336,7 @@ class editor_Models_TermCollection_TermCollection extends editor_Models_Language
         /* @var $service editor_Services_TermCollection_Service */
         $serviceType = $service->getServiceNamespace();
         $s = $this->db->select()
-        ->where('serviceType = ?',$serviceType);
+            ->where('serviceType = ?', $serviceType);
 
         return $this->db->fetchAll($s)->toArray();
     }
@@ -350,9 +350,9 @@ class editor_Models_TermCollection_TermCollection extends editor_Models_Language
         $entities = [];
         $service = ZfExtended_Factory::get(editor_Services_TermCollection_Service::class);
 
-        $select = $this->db->select()->where('serviceType = ?',$service->getServiceNamespace());
+        $select = $this->db->select()->where('serviceType = ?', $service->getServiceNamespace());
 
-        foreach($this->db->fetchAll($select) as $row){
+        foreach ($this->db->fetchAll($select) as $row) {
             $entity = new static();
             $entity->initByRow($row);
             $entities[] = $entity;
@@ -360,7 +360,6 @@ class editor_Models_TermCollection_TermCollection extends editor_Models_Language
 
         return $entities;
     }
-
 
     /***
      * Get term translations (source/target) for given term collection and source/target language.
@@ -375,18 +374,17 @@ class editor_Models_TermCollection_TermCollection extends editor_Models_Language
         /** @var editor_Models_Languages $fuzzyModel */
         $fuzzyModel = ZfExtended_Factory::get('editor_Models_Languages');
 
-        $sourceLanguages = $fuzzyModel->getFuzzyLanguages($source,includeMajor: true);
-        $targetLanguages = $fuzzyModel->getFuzzyLanguages($target,includeMajor: true);
-
+        $sourceLanguages = $fuzzyModel->getFuzzyLanguages($source, includeMajor: true);
+        $targetLanguages = $fuzzyModel->getFuzzyLanguages($target, includeMajor: true);
 
         // get the configured term processing statuses which can be used
         $config = Zend_Registry::get('config');
         $processStatus = $config->runtimeOptions->terminology->usedTermProcessStatus->toArray();
-        if( empty($processStatus)){
-            $processStatus =  [editor_Models_Terminology_Models_TermModel::PROCESS_STATUS_FINALIZED];
+        if (empty($processStatus)) {
+            $processStatus = [editor_Models_Terminology_Models_TermModel::PROCESS_STATUS_FINALIZED];
         }
-        $processStatus = implode('","',$processStatus);
-        
+        $processStatus = implode('","', $processStatus);
+
         // This query will select translated terms from source to target langauge from each term entry
         // excluding the deprecated terms. The terms with preferredTerm status will have always priority against the
         // other terms. In case the term is not in preferredTerm status, the next most valuable status is admittedTerm.
@@ -401,7 +399,7 @@ class editor_Models_TermCollection_TermCollection extends editor_Models_Language
                         SELECT
                             ROW_NUMBER() OVER (
                                 PARTITION BY termEntryId 
-                                ORDER BY status = "'.editor_Models_Terminology_Models_TermModel::STAT_PREFERRED.'" DESC,status ="'.editor_Models_Terminology_Models_TermModel::STAT_ADMITTED.'" DESC,termEntryId ASC,id DESC
+                                ORDER BY status = "' . editor_Models_Terminology_Models_TermModel::STAT_PREFERRED . '" DESC,status ="' . editor_Models_Terminology_Models_TermModel::STAT_ADMITTED . '" DESC,termEntryId ASC,id DESC
                             ) AS virtual_id,
                             term,
                             id,
@@ -410,9 +408,9 @@ class editor_Models_TermCollection_TermCollection extends editor_Models_Language
                             languageId,
                             collectionId
                         FROM terms_term
-                        WHERE languageId IN('.implode(',',$sourceLanguages).')
-                        AND status != "'.editor_Models_Terminology_Models_TermModel::STAT_DEPRECATED.'"
-                        AND processStatus IN("'.$processStatus.'")
+                        WHERE languageId IN(' . implode(',', $sourceLanguages) . ')
+                        AND status != "' . editor_Models_Terminology_Models_TermModel::STAT_DEPRECATED . '"
+                        AND processStatus IN("' . $processStatus . '")
                     ) AS sorted_temp_table
                     GROUP BY sorted_temp_table.termEntryId) AS sourceTable
                     INNER JOIN (
@@ -423,7 +421,7 @@ class editor_Models_TermCollection_TermCollection extends editor_Models_Language
                         SELECT
                             ROW_NUMBER() OVER (
                                 PARTITION BY termEntryId 
-                                ORDER BY status = "'.editor_Models_Terminology_Models_TermModel::STAT_PREFERRED.'" DESC,status ="'.editor_Models_Terminology_Models_TermModel::STAT_ADMITTED.'" DESC,termEntryId ASC,id DESC
+                                ORDER BY status = "' . editor_Models_Terminology_Models_TermModel::STAT_PREFERRED . '" DESC,status ="' . editor_Models_Terminology_Models_TermModel::STAT_ADMITTED . '" DESC,termEntryId ASC,id DESC
                             ) AS virtual_id,
                             term,
                             id,
@@ -432,13 +430,13 @@ class editor_Models_TermCollection_TermCollection extends editor_Models_Language
                             languageId,
                             collectionId
                         FROM terms_term
-                        WHERE languageId IN('.implode(',',$targetLanguages).')
-                        AND status != "'.editor_Models_Terminology_Models_TermModel::STAT_DEPRECATED.'"
-                        AND processStatus IN("'.$processStatus.'")
+                        WHERE languageId IN(' . implode(',', $targetLanguages) . ')
+                        AND status != "' . editor_Models_Terminology_Models_TermModel::STAT_DEPRECATED . '"
+                        AND processStatus IN("' . $processStatus . '")
                     ) AS sorted_temp_table
                     GROUP BY sorted_temp_table.termEntryId
                     ) as targetTable ON sourceTable.termEntryId = targetTable.termEntryId
-                    WHERE sourceTable.collectionId = '.$collection.'
+                    WHERE sourceTable.collectionId = ' . $collection . '
                     AND sourceTable.id != targetTable.id
                     GROUP BY sourceTable.term;';
 
@@ -450,7 +448,8 @@ class editor_Models_TermCollection_TermCollection extends editor_Models_Language
      *
      * @param string $path
      */
-    protected function removeDirectoryRecursive(string $path){
+    protected function removeDirectoryRecursive(string $path)
+    {
         if (is_dir($path)) {
             ZfExtended_Utils::recursiveDelete($path);
         }
@@ -462,7 +461,7 @@ class editor_Models_TermCollection_TermCollection extends editor_Models_Language
      */
     public function removeCollectionDir(int $collectionId)
     {
-        $collectionPath = editor_Models_Import_TermListParser_Tbx::getFilesystemCollectionDir().'tc_'.$collectionId;
+        $collectionPath = editor_Models_Import_TermListParser_Tbx::getFilesystemCollectionDir() . 'tc_' . $collectionId;
         $this->removeDirectoryRecursive($collectionPath);
     }
 
@@ -486,12 +485,12 @@ class editor_Models_TermCollection_TermCollection extends editor_Models_Language
      */
     public function removeOldCollectionTbxFiles(int $collectionId, int $olderThan): void
     {
-        $collectionPath = editor_Models_Import_TermListParser_Tbx::getFilesystemCollectionDir().'tc_'.$collectionId;
+        $collectionPath = editor_Models_Import_TermListParser_Tbx::getFilesystemCollectionDir() . 'tc_' . $collectionId;
         if (is_dir($collectionPath)) {
             /* @var ZfExtended_Controller_Helper_Recursivedircleaner $recursiveDirCleaner */
             $recursiveDirCleaner = ZfExtended_Zendoverwrites_Controller_Action_HelperBroker::getStaticHelper(
                 'Recursivedircleaner'
-                );
+            );
             $recursiveDirCleaner->deleteOldFiles($collectionPath, $olderThan);
         }
     }
@@ -505,30 +504,25 @@ class editor_Models_TermCollection_TermCollection extends editor_Models_Language
      *            it's here just to indicate that qties can be increased or decreased depending on diff > 0 or < 0
      *      - Update attribute qty using SELECT COUNT(`id`) as no diff given
      *
-     * @param $collectionId
      * @param mixed $diff
-     * @param $diff
      */
-    public function updateStats(int $collectionId, $diff = false) {
-
+    public function updateStats(int $collectionId, $diff = false)
+    {
         // Foreach type
         foreach ([
             'termEntry' => 'terms_term_entry',
-            'term'      => 'terms_term',
-            'attribute' => 'terms_attributes'
+            'term' => 'terms_term',
+            'attribute' => 'terms_attributes',
         ] as $type => $table) {
-
             // If $diff arg is not an array, or is, but having no actual diff specified under $type key
-            if (!is_array($diff) || !isset($diff[$type])) {
-
+            if (! is_array($diff) || ! isset($diff[$type])) {
                 // Get qty
                 $qty = $this->db->getAdapter()->query('
                     SELECT COUNT(`id`) FROM `' . $table . '` WHERE `collectionId` = ?
                 ', $collectionId)->fetchColumn();
 
-            // Else
+                // Else
             } else {
-
                 // Set qty as an expression, that increases/decreases the existing value within json
                 $qty = 'IFNULL(JSON_EXTRACT(`specificData`, "$.' . $type . '"), 0) + (' . $diff[$type] . ')';
             }
@@ -549,19 +543,20 @@ class editor_Models_TermCollection_TermCollection extends editor_Models_Language
         //i($_, 'a');
     }
 
-    /**
-     * @param ZfExtended_Models_User $user
-     * @return array
-     */
-    public function getAccessibleCollectionIds(ZfExtended_Models_User $user): array {
+    public function getAccessibleCollectionIds(ZfExtended_Models_User $user): array
+    {
         $s = $this->db->select()
             ->distinct()
-            ->from(['lr' => 'LEK_languageresources'], ['id'])
+            ->from([
+                'lr' => 'LEK_languageresources',
+            ], ['id'])
             ->setIntegrityCheck(false)
-            ->join(['lr2c' => 'LEK_languageresources_customerassoc'], '`lr2c`.`languageResourceId` = `lr`.`id`', [])
+            ->join([
+                'lr2c' => 'LEK_languageresources_customerassoc',
+            ], '`lr2c`.`languageResourceId` = `lr`.`id`', [])
             ->where('`lr`.`resourceType` = ?', editor_Models_Segment_MatchRateType::TYPE_TERM_COLLECTION)
             ->where('customerId IN (?)', $user->getCustomersArray());
 
-        return array_column($this->db->fetchAll($s)->toArray(),'id');
+        return array_column($this->db->fetchAll($s)->toArray(), 'id');
     }
 }

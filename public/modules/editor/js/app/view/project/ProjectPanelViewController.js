@@ -67,7 +67,8 @@ Ext.define('Editor.view.project.ProjectPanelViewController', {
         },
         store: {
             '#project.Project':{
-                load:'onProjectStoreLoad'
+                load:'onProjectStoreLoad',
+                filterchange: 'onProjectStoreFilterChange'
             }
         }
     },
@@ -128,7 +129,7 @@ Ext.define('Editor.view.project.ProjectPanelViewController', {
 
 
     /***
-     * On Project Focus rute
+     * On Project Focus route
      */
     onProjectFocusRoute:function(id){
         var me=this;
@@ -136,7 +137,7 @@ Ext.define('Editor.view.project.ProjectPanelViewController', {
     },
 
     /***
-     * On ProjectTask rute
+     * On ProjectTask route
      */
     onProjectTaskFocusRoute:function(id,taskId){
         var me=this;
@@ -150,14 +151,13 @@ Ext.define('Editor.view.project.ProjectPanelViewController', {
      */
     focusProjectTask:function(store){
         var me=this,
-            rute=window.location.hash,
-            rute=rute.split('/'),
-            isFocus=(rute.length==4 && rute[3]=='focus'),
+            route = window.location.hash.split('/'),
+            isFocus=(route.length===4 && route[3]==='focus'),
             id=null,
             record=null;
 
         if(isFocus){
-            id=parseInt(rute[2]);
+            id=parseInt(route[2]);
             record=store.getById(parseInt(id));
         }
         if(!record){
@@ -298,6 +298,7 @@ Ext.define('Editor.view.project.ProjectPanelViewController', {
             if(store.getTotalCount() === 0){
                 if(!store.hasPendingLoad()) {
                     Editor.MessageBox.addInfo(me.strings.noProjectInFilter);
+                    me.reset();
                 }
                 return;
             }
@@ -395,7 +396,7 @@ Ext.define('Editor.view.project.ProjectPanelViewController', {
             params = {};
         //the record exist in the grid view
         if(index!=null){
-            return new Ext.Promise(function (resolve, reject) {
+            return new Ext.Promise(function (resolve) {
                 resolve(index);
             });
         }
@@ -469,8 +470,7 @@ Ext.define('Editor.view.project.ProjectPanelViewController', {
      */
     resetSelection:function(){
         var me=this,
-            projectTaskGrid = me.lookup('projectTaskGrid'),
-            projectGrid = me.lookup('projectGrid');
+            projectTaskGrid = me.lookup('projectTaskGrid');
 
         projectTaskGrid.getStore().removeAll(true);
         projectTaskGrid.view.refresh();
@@ -484,5 +484,24 @@ Ext.define('Editor.view.project.ProjectPanelViewController', {
      */
     reset:function(){
         this.resetSelection();
+    },
+
+    /**
+     * Project store filter change event handler
+     * @param store
+     */
+    onProjectStoreFilterChange: function(store) {
+        var me = this,
+            view = me.getView();
+
+
+        if(!view.isVisible()){
+            return;
+        }
+
+        if(store && store.getTotalCount() > 0){
+            // focus the correct project/task after the project filter is changed
+            me.focusProjectTask(store);
+        }
     }
 });

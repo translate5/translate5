@@ -53,7 +53,8 @@ Ext.define('Editor.view.admin.TaskAddWindowViewController', {
      */
     onCustomerChange: function (comboBox, customerId){
         var me = this,
-            pivotLanguageCombo = me.getView().down('#relaisLangaugeTaskUploadWizard');
+            pivotLanguageCombo = me.getView().down('#relaisLangaugeTaskUploadWizard'),
+            edit100PercentCheckBox = me.getView().down('[name=edit100PercentMatch]');
 
         if(! me.selectedCustomersConfigStore){
             me.selectedCustomersConfigStore = Ext.create('Editor.store.admin.CustomerConfig');
@@ -61,17 +62,39 @@ Ext.define('Editor.view.admin.TaskAddWindowViewController', {
 
         me.getView().mask();
 
+        /**
+         * https://jira.translate5.net/browse/TRANSLATE-3587
+         *
+         * Inside the above mask() call, tabindex-attributes of all tabbable children are set to '-1'
+         * to prevent them from being tabbable while mask is shown. This, however, happens only for
+         * children that are not disabled at the point of time where they are queried, and that is why
+         * setting tabindex=-1 for combobox#bconfId was skipped so focus jumped straight into there
+         * on Tab-key press as that combo is enabled back shortly while mask is still shown
+         *
+         * So, here we restore values of tabindex-attribute back to make sure fields are tabbable even
+         * despite the mask itself is not yet hidden so far due to we're waiting for the customer config
+         * store load callback
+         */
+        me.getView().el.restoreTabbableState();
+
         // reset the pivot langauge on each customer change
         pivotLanguageCombo.setValue(null);
 
         me.selectedCustomersConfigStore.loadByCustomerId(customerId,function (){
-            var view = me.getView();
+            let view = me.getView();
 
+            // Info: do any code processing in the callback only if the view exist.
             if(!view){
-                // the window is already closed. Do not process any customer change
+                // The window is already closed/destroyed. Do not process any customer change
                 return;
             }
 
+            let edit100PercentMatch = me.selectedCustomersConfigStore.getConfig('import.edit100PercentMatch');
+
+            if(edit100PercentCheckBox) {
+                edit100PercentCheckBox.setValue(edit100PercentMatch);
+            }
+            
             var config = me.selectedCustomersConfigStore.getConfig('project.defaultPivotLanguage'),
                 langId = config ? Ext.getStore('admin.Languages').getIdByRfc(config) : null;
 
@@ -82,7 +105,7 @@ Ext.define('Editor.view.admin.TaskAddWindowViewController', {
             }
 
             pivotLanguageCombo.setValue(langId);
-        })
+        });
     },
 
     /***

@@ -21,7 +21,7 @@ START LICENSE AND COPYRIGHT
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
@@ -31,20 +31,14 @@ namespace MittagQI\Translate5\Task\Export\Package\Source;
 use editor_Models_Export_Terminology_Tbx;
 use editor_Services_TermCollection_Service;
 use MittagQI\Translate5\LanguageResource\TaskAssociation;
-use MittagQI\Translate5\Task\Export\Package\ExportSource;
 use ZfExtended_Factory;
 use ZfExtended_Models_User;
 use ZfExtended_Models_Worker;
-use ZfExtended_Zendoverwrites_Controller_Action_HelperBroker;
 
 class Collection extends Base
 {
-
     protected string $fileName = 'tbx';
 
-    /**
-     * @return void
-     */
     public function validate(): void
     {
     }
@@ -59,22 +53,21 @@ class Collection extends Base
     {
         $params = $workerModel->getParameters();
 
-        $service=ZfExtended_Factory::get(editor_Services_TermCollection_Service::class);
+        $service = ZfExtended_Factory::get(editor_Services_TermCollection_Service::class);
         /** @var TaskAssociation $assoc */
         $assoc = ZfExtended_Factory::get(TaskAssociation::class);
 
         $user = ZfExtended_Factory::get(ZfExtended_Models_User::class);
         $user->loadByGuid($params['userGuid']);
 
-        $assocs = $assoc->loadAssocByServiceName($this->task->getTaskGuid(),$service->getName());
+        $assocs = $assoc->loadAssocByServiceName($this->task->getTaskGuid(), $service->getName());
 
         $export = ZfExtended_Factory::get(editor_Models_Export_Terminology_Tbx::class);
-        $export->setExportAsFile(true);
 
         foreach ($assocs as $item) {
-            $filePath = $this->getFolderPath().DIRECTORY_SEPARATOR.$item['languageResourceId'].'.tbx';
+            $filePath = $this->getFolderPath() . DIRECTORY_SEPARATOR . $item['languageResourceId'] . '.tbx';
             $export->setFile($filePath);
-            $export->exportCollectionById($item['languageResourceId'],$user->getUserName());
+            $export->exportCollectionById($item['languageResourceId'], $user->getUserName());
         }
     }
 }

@@ -244,15 +244,27 @@ Ext.define('Editor.view.segments.grid.Toolbar', {
                 },{
                     xtype: 'button',
                     glyph: 'f0c5@FontAwesome5FreeSolid',
-                    itemId: 'filterBtnRepeated',
+                    itemId: 'filterBtnRepeatedIncludeFirst',
                     bind: {
                         hidden: '{!taskHasDefaultLayout}',
                         tooltip: {
-                            text: '{l10n.segmentGrid.toolbar.showRepeatedSegments}',
+                            text: '{l10n.segmentGrid.toolbar.showRepeatedSegmentsIncludeFirst}',
                             showDelay: 0
                         }
                     },
-                    enableToggle: true,
+                    toggleGroup: 'repetitions'
+                },{
+                    xtype: 'button',
+                    glyph: 'f0c5@FontAwesome5FreeSolid',
+                    itemId: 'filterBtnRepeatedExcludeFirst',
+                    bind: {
+                        hidden: '{!taskHasDefaultLayout}',
+                        tooltip: {
+                            text: '{l10n.segmentGrid.toolbar.showRepeatedSegmentsExcludeFirst}',
+                            showDelay: 0
+                        }
+                    },
+                    toggleGroup: 'repetitions'
                 }, {
                     xtype: 'tbseparator',
                 }, {
@@ -596,7 +608,7 @@ Ext.define('Editor.view.segments.grid.Toolbar', {
                     itemId: 'specialChars',
                     hidden: !userCanModifyWhitespaceTags && !userCanInsertWhitespaceTags,
                     bind: {
-                        text: '{l10n.segmentGrid.toolbar.chars}',
+                        text: '{l10n.segmentGrid.toolbar.chars.menubtn}',
                         disabled: '{!isEditingSegment}',
                     },
                     menu: {
@@ -612,7 +624,7 @@ Ext.define('Editor.view.segments.grid.Toolbar', {
                 },{
                     xtype: 'button',
                     //FIXME let me come from a config:
-                    href: 'http://confluence.translate5.net/display/BUS/Editor+keyboard+shortcuts',
+                    href: me.getKeyboardShortcutUrl(),
                     hrefTarget: '_blank',
                     icon: Editor.data.moduleFolder + 'images/help.png',
                     bind: {
@@ -661,5 +673,12 @@ Ext.define('Editor.view.segments.grid.Toolbar', {
         };
 
         return config;
+    },
+
+    getKeyboardShortcutUrl: function(){
+        if(Editor.data.locale === 'en'){
+            return 'https://confluence.translate5.net/x/KIDoHQ';
+        }
+        return 'https://confluence.translate5.net/x/BgCVGQ';
     }
 });

@@ -23,7 +23,7 @@ START LICENSE AND COPYRIGHT
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
@@ -36,15 +36,14 @@ use editor_Models_TaskUsageLog;
 
 class TaskUsageLogger
 {
-    public function __construct(private editor_Models_TaskUsageLog $log)
-    {
+    public function __construct(
+        private editor_Models_TaskUsageLog $log
+    ) {
     }
 
     /**
      * Handle the task usage log for given entity. This will update the sum counter or insert new record
      * based on the unique key of `taskType`,`customerId`,`yearAndMonth`
-     *
-     * @param editor_Models_task $task
      */
     public function log(editor_Models_task $task): void
     {

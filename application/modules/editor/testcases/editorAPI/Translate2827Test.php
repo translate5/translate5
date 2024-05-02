@@ -3,7 +3,7 @@
 START LICENSE AND COPYRIGHT
 
  This file is part of translate5
- 
+
  Copyright (c) 2013 - 2022 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
 
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
@@ -13,15 +13,15 @@ START LICENSE AND COPYRIGHT
  included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
-  
+
  There is a plugin exception available for use with this release of translate5 for
  translate5: Please see http://www.translate5.net/plugin-exception.txt or
  plugin-exception.txt in the root folder of translate5.
-  
+
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
@@ -32,15 +32,15 @@ use MittagQI\Translate5\Test\Import\Config;
  * This test will create one task with pivot file where the workflow/pivot file-name matching is done until the first "."
  * ex: the pivot file with a name "test-aleks.de.xliff" will match the workflow file with a name "test-aleks.en.test.xliff"
  */
-class Translate2827Test extends editor_Test_JsonTest {
-
+class Translate2827Test extends editor_Test_JsonTest
+{
     protected static function setupImport(Config $config): void
     {
         $config
             ->addTask('de', 'es-ES', static::getTestCustomerId())
             ->addUploadFiles([
                 'import-project.de-es-ES.workfile.sdlxliff',
-                'import-project.de-mk-MK.pivot.sdlxliff'
+                'import-project.de-mk-MK.pivot.sdlxliff',
             ])
             ->addProperty('relaisLang', 'mk-MK')
             ->addProperty('importUpload_language', ['es-ES', 'mk-MK'])
@@ -50,7 +50,8 @@ class Translate2827Test extends editor_Test_JsonTest {
     /**
      * Create the task with pivot
      */
-    public function testImportProjectWithRelais(){
+    public function testImportProjectWithRelais()
+    {
         $projectTasks = static::getTask()->getProperty('projectTasks');
         $this->assertEquals(count($projectTasks), 1, 'No tasks where created.');
     }
@@ -58,13 +59,14 @@ class Translate2827Test extends editor_Test_JsonTest {
     /**
      * Check if the pivot content is as expected
      */
-    public function testRelaisContent() {
+    public function testRelaisContent()
+    {
         $task = static::api()->getTask();
         //open task for whole testcase
         static::api()->setTaskToEdit($task->id);
         //get segment list
         $segments = static::api()->getSegments();
-        $segments = array_map(function($segment){
+        $segments = array_map(function ($segment) {
             return $segment;
         }, $segments);
         $relais = array_column($segments, 'relais', 'segmentNrInTask');

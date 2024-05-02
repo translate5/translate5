@@ -21,7 +21,7 @@ START LICENSE AND COPYRIGHT
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
@@ -32,29 +32,24 @@ use editor_Models_LanguageResources_LanguageResource;
 use editor_Services_Manager;
 use editor_Services_OpenTM2_Service;
 use MittagQI\Translate5\LanguageResource\TaskAssociation;
-use MittagQI\Translate5\Task\Export\Package\ExportSource;
 use ZfExtended_Factory;
 use ZfExtended_Models_Worker;
 
 class Memory extends Base
 {
-
     protected string $fileName = 'tmx';
 
     public function validate(): void
     {
     }
 
-    /**
-     * @return void
-     */
     public function export(?ZfExtended_Models_Worker $workerModel): void
     {
-        $service=ZfExtended_Factory::get(editor_Services_OpenTM2_Service::class);
+        $service = ZfExtended_Factory::get(editor_Services_OpenTM2_Service::class);
         /** @var TaskAssociation $assoc */
         $assoc = ZfExtended_Factory::get(TaskAssociation::class);
 
-        $assocs = $assoc->loadAssocByServiceName($this->task->getTaskGuid(),$service->getName());
+        $assocs = $assoc->loadAssocByServiceName($this->task->getTaskGuid(), $service->getName());
 
         $serviceManager = ZfExtended_Factory::get(editor_Services_Manager::class);
 
@@ -63,10 +58,17 @@ class Memory extends Base
             $languageResource->load($assoc['languageResourceId']);
 
             $connector = $serviceManager->getConnector($languageResource);
-            $file = $connector->getTm($connector->getValidExportTypes()['TMX']);
 
-            $fullPath = $this->getFolderPath().DIRECTORY_SEPARATOR.$languageResource->getName().'.tmx';
-            file_put_contents($fullPath,$file);
+            if ($connector->exportsFile()) {
+                $file = $connector->export($connector->getValidExportTypes()['TMX']);
+                ['extension' => $extension] = pathinfo($file);
+                $fullPath = $this->getFolderPath() . DIRECTORY_SEPARATOR . $languageResource->getName() . $extension;
+                rename($file, $fullPath);
+            } else {
+                $file = $connector->getTm($connector->getValidExportTypes()['TMX']);
+                $fullPath = $this->getFolderPath() . DIRECTORY_SEPARATOR . $languageResource->getName() . '.tmx';
+                file_put_contents($fullPath, $file);
+            }
         }
     }
 }

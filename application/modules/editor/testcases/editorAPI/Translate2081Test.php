@@ -21,7 +21,7 @@ START LICENSE AND COPYRIGHT
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
@@ -30,13 +30,14 @@ END LICENSE AND COPYRIGHT
  * Create tmp customer and define auto assigned users
  * Create task with the tmp customer and matching workflow/source/target and validate if the user is auto assigned
  */
-class Translate2081Test extends editor_Test_JsonTest {
-
+class Translate2081Test extends editor_Test_JsonTest
+{
     protected static $sourceLangRfc = 'de';
+
     protected static $targetLangRfc = 'en';
 
     protected static array $requiredPlugins = [
-        'editor_Plugins_Okapi_Init'
+        'editor_Plugins_Okapi_Init',
     ];
 
     protected static bool $setupOwnCustomer = true;
@@ -47,18 +48,17 @@ class Translate2081Test extends editor_Test_JsonTest {
      */
     public function testAutoAssign(): void
     {
-
         $params = [
             'customerId' => static::$ownCustomer->id,
             'workflow' => 'default',
             'sourceLang' => static::$sourceLangRfc,
             'targetLang' => static::$targetLangRfc,
             'userGuid' => static::api()->getUserGuid('testtranslator'),
-            'workflowStepName' => 'translation'
+            'workflowStepName' => 'translation',
         ];
         $result = static::api()->postJson('editor/userassocdefault', $params);
         unset($result->id, $result->customerId);
-        if(static::api()->isCapturing()){
+        if (static::api()->isCapturing()) {
             file_put_contents(static::api()->getFile('assocResult.txt', null, false), json_encode($result, JSON_PRETTY_PRINT));
         }
         $expected = static::api()->getFileContent('assocResult.txt');
@@ -73,14 +73,15 @@ class Translate2081Test extends editor_Test_JsonTest {
         $config->import($task);
 
         // after the task is created/imported, check if the users are auto assigned.
-        $data = static::api()->getJson('editor/taskuserassoc',[
-            'filter' => '[{"operator":"eq","value":"' . $task->getTaskGuid() . '","property":"taskGuid"}]'
+        $data = static::api()->getJson('editor/taskuserassoc', [
+            'filter' => '[{"operator":"eq","value":"' . $task->getTaskGuid() . '","property":"taskGuid"}]',
         ]);
 
         // TODO FIXME: write a reusable Model for this !
         //filter out the non static data
-        $data = array_map(function($assoc){
+        $data = array_map(function ($assoc) {
             unset($assoc->id, $assoc->taskGuid, $assoc->usedInternalSessionUniqId, $assoc->staticAuthHash, $assoc->editable, $assoc->deletable, $assoc->assignmentDate);
+
             return $assoc;
         }, $data);
 

@@ -53,8 +53,11 @@ declare(strict_types=1);
 namespace MittagQI\Translate5\Task;
 
 use editor_Models_Task;
+use editor_Models_TaskUserAssoc;
 use editor_Workflow_Default;
 use MittagQI\Translate5\Repository\TaskRepository;
+use MittagQI\Translate5\Segment\QualityService;
+use ZfExtended_Models_Entity_Conflict;
 
 class TaskService
 {
@@ -87,5 +90,35 @@ class TaskService
     public function getProjectTaskList(int $projectId): iterable
     {
         yield from $this->taskRepository->getProjectTaskList($projectId);
+    }
+
+    public static function validateForTaskFinish(
+        string $state,
+        editor_Models_TaskUserAssoc $userTaskAssoc,
+        editor_Models_Task $task
+    ): void {
+        if ('beforeFinish' !== $state) {
+            return;
+        }
+
+        $qualityService = new QualityService();
+        $errorCategories = $qualityService->getErroredCriticalCategories($userTaskAssoc->getTaskGuid(), $userTaskAssoc);
+
+        if (empty($errorCategories)) {
+            return;
+        }
+
+        ZfExtended_Models_Entity_Conflict::addCodes([
+            'E1542' => QualityService::ERROR_MASSAGE_PLEASE_SOLVE_ERRORS,
+        ]);
+
+        throw ZfExtended_Models_Entity_Conflict::createResponse(
+            'E1542',
+            [QualityService::ERROR_MASSAGE_PLEASE_SOLVE_ERRORS],
+            [
+                'task' => $task,
+                'categories' => implode('</br>', $errorCategories),
+            ]
+        );
     }
 }

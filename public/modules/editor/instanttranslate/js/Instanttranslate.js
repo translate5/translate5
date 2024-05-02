@@ -279,13 +279,19 @@ function initGui(characterLimit, pretranslatedFiles, dateAsOf, disableInstantTra
 
     /* --------------- copy translation ----------------------------------------- */
     $('#translations').on('touchstart click','.copyable-copy',function(){
-        // we can not use text() because we need to turn <br/> into blanks
-        var textToCopy = markupToText($(this).closest('.copyable').find('.translation-result').html(), ' ');
+        // we can not use text() because we need to turn <br/> into new lines
+        var textToCopy = $(this).closest('.copyable').find('.translation-result').html();
+        // before removing the markups, convert the break tags to nexlines
+        textToCopy = breakToNewLines(textToCopy);
+        textToCopy = markupToText(textToCopy);
+
         // https://stackoverflow.com/a/33928558
         if (window.clipboardData && window.clipboardData.setData) {
             // IE specific code path to prevent textarea being shown while dialog is visible.
-            return clipboardData.setData("Text", textToCopy);
-        } else if (document.queryCommandSupported && document.queryCommandSupported("copy")) {
+            return window.clipboardData.clipboardData.setData("Text", textToCopy);
+        }
+
+        if (document.queryCommandSupported && document.queryCommandSupported("copy")) {
             var textarea = document.createElement("textarea");
             textarea.textContent = textToCopy;
             textarea.style.position = "fixed";  // Prevent scrolling to bottom of page in MS Edge.
@@ -328,6 +334,16 @@ function initGui(characterLimit, pretranslatedFiles, dateAsOf, disableInstantTra
         getDownloads();
         return false;
     });
+
+    // If the instant translation is not active, add alt + enter shortcut to run translation
+    if(instantTranslationIsActive === false){
+        $(document).bind('keydown', 'alt+enter', function(e) {
+            if (e.keyCode === 13 && e.altKey) {
+                $('#translationSubmit').click();
+            }
+        });
+    }
+
     // initially, we appear as text translation
     showSourceIsText();
     setAllowedFileTypes();
@@ -346,12 +362,19 @@ function initGui(characterLimit, pretranslatedFiles, dateAsOf, disableInstantTra
 /**
  * Removes all markup from a text and converts break-tags to the given string
  * @param {string} text
- * @param {string} breakTagReplacement
  * @returns {string}
  */
-function markupToText(text, breakTagReplacement){
-    text = text.replace(/<br\s*\/{0,1}>/ig, breakTagReplacement);
+function markupToText(text){
     return text.replace(/<\/{0,1}[a-zA-Z][^>]*\/{0,1}>/ig, '');
+}
+
+/**
+ * Converts break-tags to newlines for a given text
+ * @param text
+ * @returns {*}
+ */
+function breakToNewLines(text){
+    return  text.replace(/<br\s*\/{0,1}>/ig, '\n');
 }
 
 /**
@@ -1584,8 +1607,8 @@ function swapLanguages(){
     // renew the results, if there are any
     var results = $('div.translation-result');
     if(results.length > 0) {
-        // set the source textarea text, therfore markup must be removed and breaktags restored
         var text = unescapeHtml(results.first().html());
+        text = breakToNewLines(text);
         $('#sourceText').val(text);
     }
     $('#translations').hide();

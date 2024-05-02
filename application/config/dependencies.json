@@ -13,7 +13,7 @@
         {
             "name": "third-party-dependencies",
             "label": "Third Party Dependencies pulled in by PHP composer",
-            "url": "RELEASE:third-party-dependencies.zip",
+            "url": "RELEASE:third-party-dependencies-7.0.0.zip",
             "version": "-na-",
             "target": "vendor\/",
             "licenses": [

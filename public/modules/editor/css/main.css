@@ -132,19 +132,24 @@ div.single + div {
 .short-tag div span.full,
 .full-tag div span.short,
 .hide-tag div span.short,
-.hide-tag div span.full{display:none;}
+.hide-tag div span.full{ display:none; }
 
 /* special characters are always showing the fulltag, the same is done for the img tags in HtmlEditor.js */
 .short-tag div.internal-tag.char span.short,
 .short-tag div.internal-tag.tab span.short,
 .short-tag div.internal-tag.space span.short,
 .short-tag div.internal-tag.newline span.short,
-.short-tag div.internal-tag.nbsp span.short {display:none;}
+.short-tag div.internal-tag.nbsp span.short,
+.short-tag div.internal-tag.t5placeable span.short { display:none; }
 .short-tag div.internal-tag.char span.full,
 .short-tag div.internal-tag.tab span.full,
 .short-tag div.internal-tag.space span.full,
 .short-tag div.internal-tag.newline span.full,
-.short-tag div.internal-tag.nbsp span.full {display:inline;}
+.short-tag div.internal-tag.nbsp span.full,
+.short-tag div.internal-tag.t5placeable span.full { display:inline; }
+/* special styles for placeables */
+.segment-tag-column div.x-grid-cell-inner div.single.t5placeable { color:#000; white-space:nowrap; }
+.segment-tag-column div.x-grid-cell-inner div.single.t5placeable span.full { margin:0 2px; }
 
 #segment-grid span.term {
     text-decoration: underline;
@@ -253,6 +258,26 @@ div.single + div {
     border-bottom: 0;
 }
 
+#change-alike-window div.transNotFound.standardizedTerm,
+.segment-tag-column.type-source div.x-grid-cell-inner div.transNotFound.standardizedTerm,
+.segment-tag-container.type-source div.transNotFound.standardizedTerm {
+    text-decoration-style: solid;
+    text-decoration-color: #a400df;
+    text-decoration-line: underline;
+    text-underline-offset: 4px;
+    border-bottom: 0;
+}
+
+#change-alike-window div.transNotFound.admittedTerm,
+.segment-tag-column.type-source div.x-grid-cell-inner div.transNotFound.admittedTerm,
+.segment-tag-container.type-source div.transNotFound.admittedTerm {
+    text-decoration-style: solid;
+    text-decoration-color: #EFD700;
+    text-decoration-line: underline;
+    text-underline-offset: 4px;
+    border-bottom: 0;
+}
+
 #change-alike-window div.transNotDefined,
 .segment-tag-column.type-source div.x-grid-cell-inner div.transNotDefined,
 .segment-tag-container.type-source div.transNotDefined {
@@ -327,6 +352,7 @@ background-color: #EAF1FB;
 .app-msg .icon-status-warning {background-image: url("../images/error.png");}
 .app-msg .icon-status-notice {background-image: url("../images/information.png");}
 .app-msg .icon-status-ok {background-image: url("../images/tick.png");}
+.app-msg .x-fa.fa-close {position: absolute; right: 7px; top: 3px; color: #606060; cursor: pointer;}
 table.message-box-data .type {vertical-align: top;} 
 table.message-box-data .error {} 
 
@@ -757,14 +783,20 @@ a.x-btn span.task-confirmation {
 .ico-tm-export {background-image: url(../images/database_go.png);background-repeat:no-repeat;background-position:center;}
 .ico-tm-information {background-image: url(../images/information.png); background-repeat:no-repeat; background-position:50% 50%;}
 .ico-tm-show-more {background-image: url(../images/show_more.png); background-repeat:no-repeat; background-position:50% 50%;}
+.ico-tm-import.ico-mt-finetune {background-image: url(../images/book_finetune.png); background-repeat:no-repeat; background-position:50% 50%;}
+.ico-tm-import.ico-mt-processing {background-image: url(../images/book_processing.png); background-repeat:no-repeat; background-position:50% 50%;}
 .language-ressource-import .ico-tm-import {background-image: url(../images/book_add.png);background-repeat:no-repeat;background-position:center;}
 .language-ressource-export .ico-tm-download {background-image: url(../images/book_go.png);background-repeat:no-repeat;background-position:center;}
 .ico-tm-magnifier {background-image: url(../images/magnifier.png) !important;background-repeat:no-repeat;background-position:center;}
 .ico-tm-log {background-image: url(../images/information.png);background-repeat:no-repeat;background-position:center;}
+.ico-tm-specific {background-image: url(../images/processing.png); background-repeat:no-repeat; background-position:50% 50%;}
 /*
 .matchGrid .x-grid-item-selected .x-grid-item-over > div {background-image:url(../images/information.png); background-repeat:no-repeat; background-position:18px center;}
 */
-.matchGrid tr.match-state-loaded:hover td.info-icon > div {background-image:url(../images/information.png); background-repeat:no-repeat; background-position:85% 15%;}
+.matchGrid tr.match-state-loaded:hover td.info-icon > div,
+.matchGrid tr.match-state-loaded td.info-icon-shown > div {
+    background-image:url(../images/information.png); background-repeat:no-repeat; background-position:85% 15%;
+}
 
 /* Tm Overviw grid */
 .tmOverviewPanel .x-grid-header-ct .source-lang > div {background:url(../images/sourceLanguage.png) no-repeat 10px 9px;}
@@ -1014,15 +1046,21 @@ tr.x-grid-row.pointer > td[class*="x-grid-cell-gridcolumn-"]{
 }
 .x-fieldset.segmentQualities .quality .x-grid-cell-inner > div:first-child {
     line-height: 15px;
+    white-space: break-spaces;
+    display: inline;
 }
 .x-fieldset.segmentQualities .quality .x-grid-cell-inner > div:nth-child(2) {
     line-height: initial;
+    white-space: break-spaces;
+    font-weight: bold;
+    display: inline-block;
+}
+.x-fieldset.segmentQualities .quality .x-grid-cell-inner > div.no-content {
+    font-weight: unset;
 }
 .x-fieldset.segmentQualities .quality .x-grid-cell-inner > div:nth-child(2):before {
-    content: '- ';
-}
-.x-fieldset.segmentQualities .quality .x-grid-cell-inner > div:nth-child(2):after {
-    content: ' -';
+    font-weight: normal;
+    content: ' » ';
 }
 .t5falsePositivesGrid .fa {
     font-family: FontAwesome5FreeSolid;
@@ -1206,4 +1244,12 @@ dl {
 .x-fieldset.segmentQualities .x-panel-header {
     background: none;
     box-shadow: none;
+}
+.x-form-item-default.x-item-disabled {
+    -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=70)";
+    opacity: 0.7;
+}
+.x-progress.half-height * {
+    line-height: 12px;
+    font-size: 12px;
 }

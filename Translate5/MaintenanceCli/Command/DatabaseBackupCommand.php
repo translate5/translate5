@@ -1,28 +1,28 @@
 <?php
 /*
  START LICENSE AND COPYRIGHT
- 
+
  This file is part of translate5
- 
+
  Copyright (c) 2013 - 2017 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
- 
+
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
- 
+
  This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
  as published by the Free Software Foundation and appearing in the file agpl3-license.txt
  included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
- 
+
  There is a plugin exception available for use with this release of translate5 for
  translate5: Please see http://www.translate5.net/plugin-exception.txt or
  plugin-exception.txt in the root folder of translate5.
- 
+
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
  http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
- 
+
  END LICENSE AND COPYRIGHT
  */
 
@@ -33,8 +33,8 @@ use Ifsnop\Mysqldump\Mysqldump;
 use RuntimeException;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Output\OutputInterface;
 use Zend_Db_Adapter_Pdo_Mysql;
 use Zend_Exception;
 use Zend_Registry;
@@ -43,6 +43,7 @@ class DatabaseBackupCommand extends Translate5AbstractCommand
 {
     // the name of the command (the part after "bin/console")
     protected static $defaultName = 'database:backup';
+
     private bool $useGzip;
 
     protected function configure()
@@ -67,8 +68,6 @@ class DatabaseBackupCommand extends Translate5AbstractCommand
             mode: InputOption::VALUE_NONE,
             description: 'Sort by row count instead of size.'
         );
-
-
     }
 
     /**
@@ -79,7 +78,7 @@ class DatabaseBackupCommand extends Translate5AbstractCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $this->useGzip = (bool)$input->getOption('gzip');
+        $this->useGzip = (bool) $input->getOption('gzip');
         $this->initInputOutput($input, $output);
         $this->initTranslate5();
 
@@ -94,7 +93,8 @@ class DatabaseBackupCommand extends Translate5AbstractCommand
                 $params['username'],
                 $params['password'],
                 [
-                    'compress' => $this->useGzip ? Mysqldump::GZIPSTREAM : Mysqldump::NONE
+                    'compress' => $this->useGzip ? Mysqldump::GZIPSTREAM : Mysqldump::NONE,
+                    'default-character-set' => $params['charset'],
                 ]
             );
 
@@ -123,14 +123,16 @@ class DatabaseBackupCommand extends Translate5AbstractCommand
                 return parent::_dsn(); //make it public
             }
         };
+
         return $dsn->_dsn();
     }
 
     private function modifyNameSuffix(string $filename): string
     {
-        if ($this->useGzip && !str_ends_with($filename, '.gz')) {
+        if ($this->useGzip && ! str_ends_with($filename, '.gz')) {
             $filename .= '.gzip';
         }
+
         return $filename;
     }
 
@@ -143,14 +145,16 @@ class DatabaseBackupCommand extends Translate5AbstractCommand
             if (is_dir($givenTarget)) {
                 return $givenTarget . $file;
             }
+
             return $givenTarget;
         }
-        if (!is_dir($backupDir)) {
+        if (! is_dir($backupDir)) {
             @mkdir($backupDir);
         }
-        if (!is_writable($backupDir)) {
+        if (! is_writable($backupDir)) {
             throw new RuntimeException('Backup directory can not be created or is not writable: ' . $backupDir);
         }
+
         return $backupDir . $file;
     }
 }

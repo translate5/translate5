@@ -156,5 +156,59 @@
             "comment": "A test comment for segment 6",
             "isEditable": true
         }
+    ],
+    [
+        {
+            "userGuid": "{00000000-0000-0000-C100-CCDDEE000002}",
+            "userName": "lector test",
+            "comment": "A test comment for segment 7",
+            "isEditable": true
+        },
+        {
+            "userGuid": "xlf-note-imported",
+            "userName": "a user",
+            "comment": "annotates source column; priority: 3\nTest optional attributes",
+            "isEditable": false
+        },
+        {
+            "userGuid": "xlf-note-imported",
+            "userName": "no user",
+            "comment": "Test a comment",
+            "isEditable": false
+        }
+    ],
+    [
+        {
+            "userGuid": "{00000000-0000-0000-C100-CCDDEE000002}",
+            "userName": "lector test",
+            "comment": "A test comment for segment 8",
+            "isEditable": true
+        },
+        {
+            "userGuid": "across-imported",
+            "userName": "tester",
+            "comment": "Title: Imported Comment Title\nImported Comment Text",
+            "isEditable": false
+        }
+    ],
+    [
+        {
+            "userGuid": "{00000000-0000-0000-C100-CCDDEE000002}",
+            "userName": "lector test",
+            "comment": "A test comment for segment 9",
+            "isEditable": true
+        },
+        {
+            "userGuid": "xlf-note-imported",
+            "userName": "lector test",
+            "comment": "An imported comment",
+            "isEditable": false
+        },
+        {
+            "userGuid": "xlf-note-imported",
+            "userName": "no user",
+            "comment": "Test a comment",
+            "isEditable": false
+        }
     ]
 ]

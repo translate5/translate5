@@ -4,43 +4,43 @@
 START LICENSE AND COPYRIGHT
 
  This file is part of translate5
- 
+
  Copyright (c) 2013 - 2021 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
 
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
  This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
- as published by the Free Software Foundation and appearing in the file agpl3-license.txt 
- included in the packaging of this file.  Please review the following information 
+ as published by the Free Software Foundation and appearing in the file agpl3-license.txt
+ included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
-  
+
  There is a plugin exception available for use with this release of translate5 for
- translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or
  plugin-exception.txt in the root folder of translate5.
-  
+
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
 
 /**
-     * Since long strings are hard to maintain in JSON (all in one line, no line breaks)
-     * and no comments are possible in JSON, I decided to create a PHP based generator of
-     * the dependencies JSON. The same config structure is just build up in PHP and saved to disk as JSON in the end
-     *
-     * Assoc arrays are used instead of stdClass for better readability.
-     */
+ * Since long strings are hard to maintain in JSON (all in one line, no line breaks)
+ * and no comments are possible in JSON, I decided to create a PHP based generator of
+ * the dependencies JSON. The same config structure is just build up in PHP and saved to disk as JSON in the end
+ *
+ * Assoc arrays are used instead of stdClass for better readability.
+ */
 
 $dep = new stdClass();
 
 //the idea was to provide different channes, the problem is, how to choose the channel!
 // Conclusion: the default channel can come from the dep.json, but if the user wants another this must be configured elsewhere
 $dep->channels = [
-    "RELEASE" => "https://downloads.translate5.net/"
+    "RELEASE" => "https://downloads.translate5.net/",
 ];
 
 //The path to the md5hashtable which is used for comparing if a package was changed on server or not
@@ -53,7 +53,7 @@ $dep->versionfile = "RELEASE:version";
 $dep->application = [
     "name" => "translate5",
     "label" => "Translate5 - latest version",
-    "url" => "RELEASE:translate5.zip"
+    "url" => "RELEASE:translate5.zip",
 ];
 
 /*
@@ -61,48 +61,49 @@ $dep->application = [
  */
 
 $dep->dependencies = [[
-        "name" => "third-party-dependencies",               //used as internal name of the package / dependency
-        "label" => "Third Party Dependencies pulled in by PHP composer",    //shown as name to the user
-        "url" => "RELEASE:third-party-dependencies.zip",    //URL of the package to be downloaded
-        "version" => "-na-",                                // currently not used, just for the sake of completeness
-        "target" => "vendor/",                              //due to a bug in the downloader a target always must be given!
-                                                            // without a target the whole application is getting deleted!
-                                                            // that means we can provide only ZIP packages at the moment
-                                                            // with version 2.5.10 this is fixed, but lazy updaters will still have the problem!
-                                                            // so in near future target will be optional, and without a target
-                                                            // nothing will be unzipped, just downloaded
-        "licenses" => [[                                    // list of licenses to be confirmed for this package
-            //"uses" => "several dependent libraries",        // is parsed into license title and agreement
-            "usesFile"  => "docs/third-party-licenses/third-party-dependency-license-overview.txt", //loads the content from the given filename, and places the content in the "uses" variable
-            "relpath"   => "docs/third-party-licenses/third-party-dependency-licenses.md",
-            "title"     => "License agreement for third party dependencies pulled in by PHP composer. Dependencies to be pulled:",
-            "agreement" => '{USES}
+    "name" => "third-party-dependencies",               //used as internal name of the package / dependency
+    "label" => "Third Party Dependencies pulled in by PHP composer",    //shown as name to the user
+    "url" => "RELEASE:third-party-dependencies-7.0.0.zip",    //URL of the package to be downloaded
+    "version" => "-na-",                                // currently not used, just for the sake of completeness
+    "target" => "vendor/",                              //due to a bug in the downloader a target always must be given!
+    // without a target the whole application is getting deleted!
+    // that means we can provide only ZIP packages at the moment
+    // with version 2.5.10 this is fixed, but lazy updaters will still have the problem!
+    // so in near future target will be optional, and without a target
+    // nothing will be unzipped, just downloaded
+    "licenses" => [[
+        // list of licenses to be confirmed for this package
+        //"uses" => "several dependent libraries",        // is parsed into license title and agreement
+        "usesFile" => "docs/third-party-licenses/third-party-dependency-license-overview.txt", //loads the content from the given filename, and places the content in the "uses" variable
+        "relpath" => "docs/third-party-licenses/third-party-dependency-licenses.md",
+        "title" => "License agreement for third party dependencies pulled in by PHP composer. Dependencies to be pulled:",
+        "agreement" => '{USES}
 
   Please read the following license agreement and accept it for the third party dependencies.
                 
   {RELPATH}
                 
   You must accept the terms of this agreement for {LABEL} by typing "y" and <ENTER> before continuing with the installation.
-  If you type "y", the translate5 installer will download and install the dependencies for you.{SUFFIX}'
-                                                            // relpath file is checked for existence,
-                                                            //  then the path (not the content) parsed into license agreement
-            // agreement   optional, overwrites default agreement (defined in ZfExtended_Models_Installer_License)
-            // title       optional, overwrites default title (defined in ZfExtended_Models_Installer_License)
-        ]]
-    ],[
-        "name" => "termtagger",
-        "label" => "openTMS TermTagger",
-        "url" => "RELEASE:openTMStermTagger.zip",
-        "target" => "application/modules/editor/ThirdParty/XliffTermTagger/",
-        "licenses" => [[
-            "uses" => "the openTMS TermTagger",
-            "license" => "Apache License 2.0",
-            "relpath" => "docs/third-party-licenses/openTMStermTagger-license.txt"
-        ],[
-            "label" => "openTMS TermTagger libraries",
-            "license" => "CDDL 1.1",
-            "relpath" => "docs/third-party-licenses/CDDL-license.txt",
-            "agreement" => 'Grizzly project and others license agreement description:
+  If you type "y", the translate5 installer will download and install the dependencies for you.{SUFFIX}',
+        // relpath file is checked for existence,
+        //  then the path (not the content) parsed into license agreement
+        // agreement   optional, overwrites default agreement (defined in ZfExtended_Models_Installer_License)
+        // title       optional, overwrites default title (defined in ZfExtended_Models_Installer_License)
+    ]],
+], [
+    "name" => "termtagger", //DEPRECATED WITH DOCKER!
+    "label" => "openTMS TermTagger",
+    "url" => "RELEASE:openTMStermTagger.zip",
+    "target" => "application/modules/editor/ThirdParty/XliffTermTagger/",
+    "licenses" => [[
+        "uses" => "the openTMS TermTagger",
+        "license" => "Apache License 2.0",
+        "relpath" => "docs/third-party-licenses/openTMStermTagger-license.txt",
+    ], [
+        "label" => "openTMS TermTagger libraries",
+        "license" => "CDDL 1.1",
+        "relpath" => "docs/third-party-licenses/CDDL-license.txt",
+        "agreement" => 'Grizzly project and others license agreement description:
   Some of the libraries openTMS TermTagger builds on are licensed
   under the CDDL license. Please read the following license agreement
   and accept it for these libraries (like the Grizzly project and
@@ -114,20 +115,20 @@ $dep->dependencies = [[
 
   after installation. You must accept the terms of this agreement for
   these components by typing "y" before continuing with the
-  installation.'
-        ]]
-    ],[
-        "name" => "extjs-62",
-        "label" => "ExtJS (Version 6)",
-        "version" => "6.2.0",
-        "url" => "RELEASE:ext-6.2.0-gpl.zip",
-        "target" => "public/ext-6.2.0",
-        "licenses" => [[
-            "uses" => "ExtJS",
-            "license" => "GPL 3.0",
-            "relpath" => "docs/third-party-licenses/ExtJs6-license.txt"
-        ]]
-    ]
+  installation.',
+    ]],
+], [
+    "name" => "extjs-62",
+    "label" => "ExtJS (Version 6)",
+    "version" => "6.2.0",
+    "url" => "RELEASE:ext-6.2.0-gpl.zip",
+    "target" => "public/ext-6.2.0",
+    "licenses" => [[
+        "uses" => "ExtJS",
+        "license" => "GPL 3.0",
+        "relpath" => "docs/third-party-licenses/ExtJs6-license.txt",
+    ]],
+],
 ];
 
 $dep->post_install_copy = [

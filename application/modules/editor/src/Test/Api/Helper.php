@@ -21,56 +21,63 @@ START LICENSE AND COPYRIGHT
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
 
 namespace MittagQI\Translate5\Test\Api;
 
-use editor_Models_Config;
-use editor_Models_TaskConfig;
+use MittagQI\ZfExtended\Service\ConfigHelper;
 use Zend_Db_Statement_Exception;
-use ZfExtended_Factory;
+use Zend_Http_Client_Exception;
+use ZfExtended_Test_ApiHelper;
 
 /**
  * API Helper the provides general functions to test the translate5 API
  */
-final class Helper extends \ZfExtended_Test_ApiHelper
+final class Helper extends ZfExtended_Test_ApiHelper
 {
     /**
      * How many time the task status will be check while the task is importing.
      * @var integer
      */
-    const RELOAD_TASK_LIMIT = 100;
+    public const RELOAD_TASK_LIMIT = 100;
 
     /**
      * How many times the language reosurces status will be checked while the resource is importing
      * @var integer
      */
-    const RELOAD_RESOURCE_LIMIT = 40;
+    public const RELOAD_RESOURCE_LIMIT = 40;
 
     /**
      * Project taskType
      * @var string
      */
-    const INITIAL_TASKTYPE_PROJECT = 'project';
+    public const INITIAL_TASKTYPE_PROJECT = 'project';
 
     /**
      * Project task type
      * @var string
      */
-    const INITIAL_TASKTYPE_PROJECT_TASK = 'projectTask';
+    public const INITIAL_TASKTYPE_PROJECT_TASK = 'projectTask';
 
     /**
      * Customer-number of the test-customer
      */
-    const TEST_CUSTOMER_NUMBER = '123456789';
+    public const TEST_CUSTOMER_NUMBER = '123456789';
 
     /**
-     *
+     * Customer-number of the second test-customer
      */
-    const SEGMENT_DUPL_SAVE_CHECK = '<img src="data:image/gif;base64,R0lGODlhAQABAID/AMDAwAAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw==" class="duplicatesavecheck" data-segmentid="%s" data-fieldname="%s">';
+    public const TEST_CUSTOMER_NUMBER_1 = '1234567891';
+
+    /**
+     * Customer-number of the third test-customer
+     */
+    public const TEST_CUSTOMER_NUMBER_2 = '1234567892';
+
+    public const SEGMENT_DUPL_SAVE_CHECK = '<img src="data:image/gif;base64,R0lGODlhAQABAID/AMDAwAAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw==" class="duplicatesavecheck" data-segmentid="%s" data-fieldname="%s">';
 
     /**
      * stdObject with the values of the last imported task
@@ -86,25 +93,24 @@ final class Helper extends \ZfExtended_Test_ApiHelper
 
     /**
      * stdObject with the values of the test customer
-     * @var \stdClass
      */
     protected \stdClass $customer;
 
-    protected static array $testusers = array(
+    protected static array $testusers = [
         'testmanager' => '{00000000-0000-0000-C100-CCDDEE000001}',
         'testlector' => '{00000000-0000-0000-C100-CCDDEE000002}',
         'testtranslator' => '{00000000-0000-0000-C100-CCDDEE000003}',
         'testapiuser' => '{00000000-0000-0000-C100-CCDDEE000004}',
-        'testtermproposer' => '{00000000-0000-0000-C100-CCDDEE000005}'
-    );
+        'testtermproposer' => '{00000000-0000-0000-C100-CCDDEE000005}',
+        'testmanager2' => '{00000000-0000-0000-C100-CCDDEE000006}',
+        'testclientpm' => '{00000000-0000-0000-C100-CCDDEE000007}',
+    ];
 
     //region Import API
     /******************************************************* IMPORT API *******************************************************/
 
     /**
      * Adds a single file for upload
-     * @param string $path
-     * @param string $mime
      */
     public function addImportFile(string $path, string $mime = 'application/zip')
     {
@@ -125,10 +131,6 @@ final class Helper extends \ZfExtended_Test_ApiHelper
     /**
      * Adds directly data to be imported instead of providing a filepath
      * useful for creating CSV testdata direct in testcase
-     *
-     * @param string $data
-     * @param string $mime
-     * @param string $filename
      */
     public function addImportPlain(string $data, string $mime = 'application/csv', string $filename = 'apiTest.csv')
     {
@@ -136,19 +138,32 @@ final class Helper extends \ZfExtended_Test_ApiHelper
     }
 
     /**
-     * DO NOT USE IN CONCRETE API TESTS
-     * Check the task state. The test will fail when $failOnError = true and if the task is in state error or after RELOAD_TASK_LIMIT task state checks
-     * @param bool $failOnError
+     * DO NOT USE IN CONCRETE API TESTS. The test will fail when $failOnError = true and if the task is in state error or after RELOAD_TASK_LIMIT task state checks
+     * Check the task state when importing
      * @return boolean
      */
-    public function checkTaskStateLoop(bool $failOnError = true): bool
+    public function waitForCurrentTaskStateOpen(bool $failOnError = true): bool
+    {
+        return $this->waitForTaskState((int) $this->task->id, $this->task->state, 'open', $failOnError);
+    }
+
+    /**
+     * Check the task state. The test will fail when $failOnError = true and if the task is in state error or after RELOAD_TASK_LIMIT task state checks
+     *
+     * @throws Zend_Http_Client_Exception
+     */
+    public function waitForTaskState(int $taskId, string $currentState, string $stateToWaitFor = 'open', bool $failOnError = true): bool
     {
         $counter = 0;
         while (true) {
-            error_log('Task state check ' . $counter . '/' . self::RELOAD_TASK_LIMIT . ' state: ' . $this->task->state . ' [' . $this->testClass . ']');
-            $taskResult = $this->getJson('editor/task/' . $this->task->id);
-            if ($taskResult->state == 'open') {
-                $this->task = $taskResult;
+            error_log('Task state check ' . $counter . '/' . self::RELOAD_TASK_LIMIT . ' state: ' . $currentState . ' [' . $this->testClass . ']');
+
+            $taskResult = $this->getJson('editor/task/' . $taskId);
+            if ($taskResult->state == $stateToWaitFor) {
+                if (isset($this->task) && is_object($this->task) && (int) $this->task->id === $taskId) {
+                    $this->task = $taskResult;
+                }
+
                 return true;
             }
             if ($taskResult->state == 'unconfirmed') {
@@ -157,10 +172,11 @@ final class Helper extends \ZfExtended_Test_ApiHelper
             }
             if ($taskResult->state == 'error') {
                 if ($failOnError) {
-                    $lastErrors = (property_exists($taskResult, 'lastErrors') && !empty($taskResult->lastErrors)) ? $taskResult->lastErrors : [];
+                    $lastErrors = (property_exists($taskResult, 'lastErrors') && ! empty($taskResult->lastErrors)) ? $taskResult->lastErrors : [];
                     $addon = (count($lastErrors) > 0) ? ' and last errors:' . "\n " . join("\n ", array_column($lastErrors, 'message')) : '.';
                     $this->test::fail('Task Import stopped. Task has state error' . $addon);
                 }
+
                 return false;
             }
             //break after RELOAD_TASK_LIMIT reloads
@@ -168,6 +184,7 @@ final class Helper extends \ZfExtended_Test_ApiHelper
                 if ($failOnError) {
                     $this->test::fail('Task Import stopped. Task is not open after ' . self::RELOAD_TASK_LIMIT . ' task checks, but has state: ' . $taskResult->state);
                 }
+
                 return false;
             }
             $counter++;
@@ -178,26 +195,23 @@ final class Helper extends \ZfExtended_Test_ApiHelper
     /**
      * DO NOT USE IN CONCRETE API TESTS
      * Check the state of all project tasks. The test will fail when $failOnError = true and if one of the project task is in state error or after RELOAD_TASK_LIMIT task state checks
-     * @param bool $failOnError
-     * @return bool
      * @throws Exception
      */
-    public function checkProjectTasksStateLoop(bool $failOnError = true): bool
+    public function waitForCurrentProjectStateOpen(bool $failOnError = true): bool
     {
         $counter = 0;
         while (true) {
-
             //reload the project
             $this->reloadProjectTasks();
 
             $toCheck = count($this->projectTasks);
             //foreach project task check the state
             foreach ($this->projectTasks as $task) {
-
                 error_log('Project tasks state check ' . $counter . '/' . self::RELOAD_TASK_LIMIT . ', [ name:' . $task->taskName . '], [state: ' . $task->state . '] [' . $this->testClass . ']');
 
                 if ($task->state == 'open') {
                     $toCheck--;
+
                     continue;
                 }
                 if ($task->state == 'unconfirmed') {
@@ -209,6 +223,7 @@ final class Helper extends \ZfExtended_Test_ApiHelper
                     if ($failOnError) {
                         $this->test::fail('Task Import stopped. Task has state error.');
                     }
+
                     return false;
                 }
             }
@@ -222,6 +237,7 @@ final class Helper extends \ZfExtended_Test_ApiHelper
                 if ($failOnError) {
                     $this->test::fail('Project task import stopped. After ' . self::RELOAD_TASK_LIMIT . ' task state checks, all of the project task are not in state open.');
                 }
+
                 return false;
             }
             $counter++;
@@ -233,50 +249,66 @@ final class Helper extends \ZfExtended_Test_ApiHelper
     //region Task API
     /******************************************************* TASK API *******************************************************/
 
-
     /**
      * Imports a task and returns the requested data on success
-     * @param array $task
-     * @param bool $failOnError
-     * @param bool $waitForImport
      * @return array|\stdClass
      * @throws Exception
-     * @throws \Zend_Http_Client_Exception
+     * @throws Zend_Http_Client_Exception
      */
     public function importTask(array $task, bool $failOnError = true, bool $waitForImport = true)
     {
         $this->initTaskPostData($task);
-        $this->test::assertLogin('testmanager'); // make sure testmanager is logged in
-        $this->task = $this->postJson('editor/task', $task);
+
+        // prevent the allowed states to be reset with session requests
+        $allowedStatuses = $this->getAllowHttpStatusOnce();
+
+        // make sure testmanager or testclientpm is logged in
+        $this->test::assertLogins(['testmanager', 'testclientpm']);
+
+        $response = $this->postJson('editor/task', $task, expectedToFail: ! $failOnError);
+
+        if (is_object($response) && isset($response->error) && $failOnError === false) {
+            return $response;
+        }
+
+        $this->task = $response;
+
         // the project tasks will only be part of the first request
         $projectTasks = (property_exists($this->task, 'projectTasks')) ? $this->task->projectTasks : null;
+
+        // re add the collected allowed states after the task request is done
+        foreach ($allowedStatuses as $status) {
+            $this->allowHttpStatusOnce($status);
+        }
+
         $this->assertResponseStatus($this->getLastResponse(), 'Import');
-        if (!$waitForImport) {
+        if (! $waitForImport) {
             return $this->task;
         }
+
         if ($this->task->taskType == self::INITIAL_TASKTYPE_PROJECT) {
-            $this->checkProjectTasksStateLoop($failOnError);
+            $this->waitForCurrentProjectStateOpen($failOnError);
         } else {
-            $this->checkTaskStateLoop($failOnError);
+            $this->waitForCurrentTaskStateOpen($failOnError);
         }
-        if($projectTasks !== null){
-            $this->task->projectTasks = is_array($projectTasks) ? $projectTasks : [ $projectTasks ];
+        if ($projectTasks !== null) {
+            $this->task->projectTasks = is_array($projectTasks) ? $projectTasks : [$projectTasks];
         }
+
         return $this->task;
     }
 
     /**
      * Can be used to wait for an task import, that was initiated without autoStartImport
-     * @param \stdClass $task
      * @throws Exception
      */
     public function waitForTaskImported(\stdClass $task)
     {
         $this->task = $task;
         if ($task->taskType == self::INITIAL_TASKTYPE_PROJECT) {
-            $this->checkProjectTasksStateLoop();
+            $this->waitForCurrentProjectStateOpen();
         } else {
-            $this->checkTaskStateLoop();
+            $this->waitForCurrentTaskStateOpen();
         }
     }
 
@@ -300,9 +332,8 @@ final class Helper extends \ZfExtended_Test_ApiHelper
 
     /**
      * reloads the given or internally stored task
-     * @param int|null $taskId
      * @return array|\stdClass
-     * @throws \Zend_Http_Client_Exception
+     * @throws Zend_Http_Client_Exception
      */
     public function reloadTask(int $taskId = null)
     {
@@ -331,8 +362,6 @@ final class Helper extends \ZfExtended_Test_ApiHelper
 
     /**
      * Setter for $this->task
-     *
-     * @param $task
      */
     public function setTask($task)
     {
@@ -371,7 +400,6 @@ final class Helper extends \ZfExtended_Test_ApiHelper
 
     /**
      * @param int $taskId : if given, this task is taken, otherwise the current task
-     * @param string $userState
      * @return array|\stdClass
      */
     private function setTaskState(int $taskId, string $userState)
@@ -380,33 +408,33 @@ final class Helper extends \ZfExtended_Test_ApiHelper
             $taskId = $this->task->id;
         }
         if ($taskId > 0) {
-            return $this->putJson('editor/task/' . $taskId, array('userState' => $userState, 'id' => $taskId));
+            return $this->putJson('editor/task/' . $taskId, [
+                'userState' => $userState,
+                'id' => $taskId,
+            ]);
         }
+
         return $this->createResponseResult(null, 'No Task to set state for');
     }
 
     /**
-     * @param int $resourceId
-     * @param string $taskGuid
      * @return array|\stdClass
-     * @throws \Zend_Http_Client_Exception
+     * @throws Zend_Http_Client_Exception
      */
     public function addResourceTaskAssoc(int $resourceId, string $resourceName, string $taskGuid)
     {
         error_log('Languageresources assoc to task. ' . $resourceName . ' -> ' . $taskGuid);
+
         return $this->postJson(
             'editor/languageresourcetaskassoc',
             [
                 'languageResourceId' => $resourceId,
                 'taskGuid' => $taskGuid,
-                'segmentsUpdateable' => 0
-            ]);
-
+                'segmentsUpdateable' => 0,
+            ]
+        );
     }
 
-    /**
-     * @param array $task
-     */
     protected function initTaskPostData(array &$task)
     {
         $now = date('Y-m-d H:i:s');
@@ -416,11 +444,11 @@ final class Helper extends \ZfExtended_Test_ApiHelper
         if (empty($task['orderdate'])) {
             $task['orderdate'] = $now;
         }
-        if (!isset($task['wordCount'])) {
+        if (! isset($task['wordCount'])) {
             $task['wordCount'] = 666;
         }
         //currently all test tasks are started automatically, no test of the /editor/task/ID/import URL is implemented!
-        if (!isset($task['autoStartImport'])) {
+        if (! isset($task['autoStartImport'])) {
             $task['autoStartImport'] = 1;
         }
         $task['orderer'] = 'unittest'; // TODO FIXME: this should be solved with the available configs or defined props
@@ -431,7 +459,6 @@ final class Helper extends \ZfExtended_Test_ApiHelper
      * @param int $taskId : if given, this task is taken, otherwise the current task
      * @param string|null $loginName : if given, a login with this user is done before opening/deleting the task
      * @param string|null $loginName : only in conjunction with $loginName. If given, a login with this user is done before to open the task, deletion is done with the latter
-     * @param bool $isProjectTask
      */
     public function deleteTask(int $taskId = -1, string $loginName = null, string $loginNameToOpen = null, bool $isProjectTask = false)
     {
@@ -443,13 +470,13 @@ final class Helper extends \ZfExtended_Test_ApiHelper
             if ($isProjectTask) {
                 $this->login($loginName);
             } else {
-                if (!empty($loginName) && !empty($loginNameToOpen)) {
+                if (! empty($loginName) && ! empty($loginNameToOpen)) {
                     $this->login($loginNameToOpen);
-                } else if (!empty($loginName)) {
+                } elseif (! empty($loginName)) {
                     $this->login($loginName);
                 }
                 $this->setTaskToOpen($taskId);
-                if (!empty($loginName) && !empty($loginNameToOpen)) {
+                if (! empty($loginName) && ! empty($loginNameToOpen)) {
                     $this->login($loginName);
                 }
             }
@@ -478,35 +505,29 @@ final class Helper extends \ZfExtended_Test_ApiHelper
     /**
      * adds the given user to the given task
      * UGLY: these are lots of params, better working with config-objects
-     * @param string $taskGuid
-     * @param string $username
-     * @param string $state
-     * @param string $step
-     * @param array $params
      *
      * @return array|\stdClass
-     * @throws \Zend_Http_Client_Exception
+     * @throws Zend_Http_Client_Exception
      */
     public function addUserToTask(string $taskGuid, string $username, string $state = 'open', string $step = 'reviewing', array $params = [])
     {
         $this->test::assertFalse(empty(static::$testusers[$username]), 'Given testuser "' . $username . '" does not exist!');
-        $p = array(
+        $p = [
             "id" => 0,
             "taskGuid" => $taskGuid,
             "userGuid" => static::$testusers[$username],
             "state" => $state,
             "workflowStepName" => $step,
-        );
+        ];
         $p = array_merge($p, $params);
         $json = $this->postJson('editor/taskuserassoc', $p);
         $this->assertResponseStatus($this->getLastResponse(), 'User');
+
         return $json;
     }
 
     /**
      * Retrieves a userGuid from the setup test-users
-     * @param string $login
-     * @return string
      * @throws Exception
      */
     public function getUserGuid(string $login): string
@@ -514,7 +535,8 @@ final class Helper extends \ZfExtended_Test_ApiHelper
         if (array_key_exists($login, static::$testusers)) {
             return static::$testusers[$login];
         }
-        throw new Exception('User \''.$login.'\' is no valid test user.');
+
+        throw new Exception('User \'' . $login . '\' is no valid test user.');
     }
 
     //endregion
@@ -523,8 +545,6 @@ final class Helper extends \ZfExtended_Test_ApiHelper
 
     /**
      * Retrieves a ustomer by it's number
-     * @param string $customerNumber
-     * @return \stdClass|null
      */
     public function getCustomerByNumber(string $customerNumber): ?\stdClass
     {
@@ -534,13 +554,12 @@ final class Helper extends \ZfExtended_Test_ApiHelper
         if ($customerData && is_array($customerData) && count($customerData) > 0) {
             return $customerData[0];
         }
+
         return null;
     }
 
     /**
      * Adds a test customer
-     * @param string $customerName
-     * @param string|null $customerNumber
      * @return bool|mixed|\stdClass|null
      */
     public function addCustomer(string $customerName, string $customerNumber = null)
@@ -549,6 +568,7 @@ final class Helper extends \ZfExtended_Test_ApiHelper
         if ($customerNumber === null) {
             $customerNumber = uniqid($customerName);
         }
+
         return $this->postJson('editor/customer/', [
             'name' => $customerName,
             'number' => $customerNumber,
@@ -557,7 +577,6 @@ final class Helper extends \ZfExtended_Test_ApiHelper
 
     /**
      * deletes a customer
-     * @param int $customerId
      */
     public function deleteCustomer(int $customerId)
     {
@@ -570,64 +589,96 @@ final class Helper extends \ZfExtended_Test_ApiHelper
 
     /**
      * Retrieves the segments as JSON
-     * @param string|null $jsonFileName
-     * @param int $limit
-     * @param int $start
-     * @param int $page
      * @return \stdClass|array
      */
-    public function getSegments(string $jsonFileName = null, int $limit = 200, int $start = 0, int $page = 1)
+    public function getSegmentsRequest(string $jsonFileName = null, int $limit = 200, int $start = 0, int $page = 1)
     {
         $url = 'editor/segment?page=' . $page . '&start=' . $start . '&limit=' . $limit;
+
         return $this->fetchJson($url, 'GET', [], $jsonFileName, false);
     }
 
-    /**
-     * @param string|null $jsonFileName
-     * @param int $limit
-     * @param int $start
-     * @param int $page
-     * @return array
-     */
     public function getSegmentsWithBasicData(string $jsonFileName = null, int $limit = 200, int $start = 0, int $page = 1): array
     {
-        $segments = $this->getSegments($jsonFileName,$limit,$start,$page);
+        $segments = $this->getSegments($jsonFileName, $limit, $start, $page);
 
-        $fields = ['segmentNrInTask','mid','userGuid','editable',
-            'pretrans','matchRate','isRepeated','source','sourceMd5','sourceToSort',
-            'target','targetMd5','targetToSort','targetEdit','targetEditToSort','relais',
-            'relaisMd5','relaisToSort'];
+        $fields = ['segmentNrInTask', 'mid', 'userGuid', 'editable',
+            'pretrans', 'matchRate', 'isRepeated', 'source', 'sourceMd5', 'sourceToSort',
+            'target', 'targetMd5', 'targetToSort', 'targetEdit', 'targetEditToSort', 'relais',
+            'relaisMd5', 'relaisToSort'];
 
         $result = [];
-        foreach ($segments as $segment){
+        foreach ($segments as $segment) {
             $seg = (array) $segment;
             $tmp = [];
-            foreach ($fields as $field){
-                if( isset($seg[$field])){
+            foreach ($fields as $field) {
+                if (isset($seg[$field])) {
                     $tmp[$field] = $seg[$field];
                 }
             }
             $result[] = $tmp;
         }
+
         return $result;
+    }
+
+    /***
+     * Get all segments from jsonFile or from remote api with the option to provide which fields should be removed from
+     * the result list. By default, mid will be removed from the segments array because this field is
+     * not always the same.
+     *
+     * @param string|null $jsonFileName
+     * @param int $limit
+     * @param int $start
+     * @param int $page
+     * @param array $fieldsToExclude
+     * @return array
+     */
+    public function getSegments(
+        string $jsonFileName = null,
+        int $limit = 200,
+        int $start = 0,
+        int $page = 1,
+        array $fieldsToExclude = ['mid']
+    ): array {
+        $segments = $this->getSegmentsRequest($jsonFileName, $limit, $start, $page);
+
+        foreach ($segments as $segment) {
+            foreach ($fieldsToExclude as $field) {
+                if (is_array($segment) && array_key_exists($field, $segment)) {
+                    unset($segment[$field]);
+                }
+                if (is_object($segment) && property_exists($segment, $field)) {
+                    unset($segment->$field);
+                }
+            }
+        }
+
+        return $segments;
     }
 
     /**
      * Saves a segment / sends segment put
-     * @param int $segmentId
-     * @param string $editedTarget
-     * @param string|null $editedSource
-     * @param string|null $jsonFileName
-     * @param array $additionalPutData : may be used to send additional data. will overwrite programmatical values
-     * @param int $duration
-     * @return bool|\stdClass
+     * @param array $additionalPutData  may be used to send additional data. will overwrite programmatically values
+     * @param array $fieldsToExclude  segment field to be excluded in the results array. By default, the segment mid
+     *                                 is removed from the array because it is expected to be unique by a lot of tests.
+     *                                 With the new mid-implementation, the mid is also generated out of segment fileId,
+     *                                 and it is always different for each test run.
+     * @throws Zend_Http_Client_Exception
      */
-    public function saveSegment(int $segmentId, string $editedTarget = null, string $editedSource = null, string $jsonFileName = null, array $additionalPutData = [], int $duration = 666)
-    {
+    public function saveSegment(
+        int $segmentId,
+        string $editedTarget = null,
+        string $editedSource = null,
+        string $jsonFileName = null,
+        array $additionalPutData = [],
+        int $duration = 666,
+        array $fieldsToExclude = ['mid']
+    ): array|\stdClass {
         $data = [
             'id' => $segmentId,
             'autoStateId' => 999,
-            'durations' => []
+            'durations' => [],
         ];
         if ($editedSource !== null) {
             $data['sourceEdit'] = $editedSource . sprintf(self::SEGMENT_DUPL_SAVE_CHECK, $segmentId, 'sourceEdit');
@@ -640,7 +691,18 @@ final class Helper extends \ZfExtended_Test_ApiHelper
         foreach ($additionalPutData as $key => $value) {
             $data[$key] = $value;
         }
-        return $this->putJson('editor/segment/' . $segmentId, $data, $jsonFileName);
+        $result = $this->putJson('editor/segment/' . $segmentId, $data, $jsonFileName);
+
+        foreach ($fieldsToExclude as $field) {
+            if (is_array($result) && array_key_exists($field, $result)) {
+                unset($result[$field]);
+            }
+            if (is_object($result) && property_exists($result, $field)) {
+                unset($result->$field);
+            }
+        }
+
+        return $result;
     }
 
     //endregion
@@ -654,11 +716,11 @@ final class Helper extends \ZfExtended_Test_ApiHelper
      * @param bool $waitForImport
      * @param string $testDir
      * @return array|\stdClass
-     * @throws \Zend_Http_Client_Exception
+     * @throws Zend_Http_Client_Exception
      */
     public function addResource(array $params, string $fileName = null, bool $waitForImport = false, string $testDir = '')
     {
-        if (!empty($this->filesToAdd)) {
+        if (! empty($this->filesToAdd)) {
             throw new Exception('There are already some files added as pending request and not sent yet! Send them first to the server before calling addResource!');
         }
         //if filename is provided, set the file upload field
@@ -677,7 +739,7 @@ final class Helper extends \ZfExtended_Test_ApiHelper
 
         $result = $this->getJson('editor/languageresourceinstance/' . $resource->id);
 
-        if (!$waitForImport) {
+        if (! $waitForImport) {
             return $result;
         }
         error_log('Languageresources status check:' . $result->status);
@@ -697,6 +759,7 @@ final class Helper extends \ZfExtended_Test_ApiHelper
         }
 
         $this->test::assertEquals('available', $result->status, 'Resource import of ' . $resource->name . ' stopped. Resource state is:' . $result->status);
+
         return $result;
     }
 
@@ -709,12 +772,12 @@ final class Helper extends \ZfExtended_Test_ApiHelper
      * @param bool $waitForImport
      * @param string $testDir
      * @return array|\stdClass
-     * @throws \Zend_Http_Client_Exception
+     * @throws Zend_Http_Client_Exception
      * @throws Exception
      */
     public function reimportResource(int $resourceId, string $fileName, array $params, bool $waitForImport = true, string $testDir = '')
     {
-        if (!empty($this->filesToAdd)) {
+        if (! empty($this->filesToAdd)) {
             throw new Exception('There are already some files added as pending request and not sent yet! Send them first to the server before calling addResource!');
         }
 
@@ -734,7 +797,7 @@ final class Helper extends \ZfExtended_Test_ApiHelper
         $result = $this->getJson('editor/languageresourceinstance/' . $resource->id);
 
         // If we won't wait for import completed - just return result
-        if (!$waitForImport) {
+        if (! $waitForImport) {
             return $result;
         }
 
@@ -746,7 +809,6 @@ final class Helper extends \ZfExtended_Test_ApiHelper
 
         // Enter status-checking loop
         while ($result->status != 'available') {
-
             // If reimport status is error - break
             if ($result->status == 'error') {
                 break;
@@ -783,32 +845,26 @@ final class Helper extends \ZfExtended_Test_ApiHelper
 
     /**
      * tests the config names and values in the given associated array against the REST accessible application config
-     * If the given value to the config is null,
-     * the config value is just checked for existence and if the configured value is not empty
+     * If the given value to the config is null, the config value is just checked for existence,
+     * otherwise for equality
      */
-    public function testConfigs(array $configsToTest, ?string $taskGuid = null): void
+    public function testConfigs(array $configsToTest, string $taskGuid = null): void
     {
-        $config = ZfExtended_Factory::get(editor_Models_Config::class);
-        $taskConfig = ZfExtended_Factory::get(editor_Models_TaskConfig::class);
+        $origin = empty($taskGuid) ? 'instance config' : 'task config';
+        $foundConfigs = $this->getTestConfigs(array_keys($configsToTest), $taskGuid);
 
         foreach ($configsToTest as $name => $value) {
-            if (!str_starts_with($name, 'runtimeOptions.')) {
-                $name = 'runtimeOptions.' . $name;
-            }
-
-            $configValue = $taskGuid ? $taskConfig->getCurrentValue($taskGuid, $name) : $config->getCurrentValue($name);
-            $configPlace = $taskGuid ? 'task' : 'instance';
+            $configValue = array_key_exists($name, $foundConfigs) ? $foundConfigs[$name] : null;
 
             if (is_null($value)) {
                 $this->test::assertNotEmpty(
                     $configValue,
-                    "Config $name in $configPlace is empty but should be set with a value!"
+                    "Config $name in $origin is empty but should be set with a value!"
                 );
             } else {
-                $this->test::assertEquals(
-                    $value,
-                    $configValue,
-                    "Config $name in $configPlace config is not as expected: "
+                $this->test::assertTrue(
+                    ConfigHelper::isValueEqual($configValue, $value),
+                    "Config $name in $origin is not as expected!"
                 );
             }
         }
@@ -816,92 +872,91 @@ final class Helper extends \ZfExtended_Test_ApiHelper
 
     /**
      * Checks, if the passed configs are set / set to the wanted value
-     * @param array $configsToTest
-     * @return bool
+     * Hint: if the passed configs have null as value, they are only checked for existance, otherwise for equality
      * @throws Zend_Db_Statement_Exception
      */
     public function checkConfigs(array $configsToTest): bool
     {
-        $config = ZfExtended_Factory::get(editor_Models_Config::class);
-
+        $foundConfigs = $this->getTestConfigs(array_keys($configsToTest));
         foreach ($configsToTest as $name => $value) {
-            if (!str_starts_with($name, 'runtimeOptions.')) {
-                $name = 'runtimeOptions.' . $name;
-            }
-            $configValue = $config->getCurrentValue($name);
-            if (is_null($value) && (empty($configValue) && $configValue !== 0 && $configValue !== '0')) {
+            if (! array_key_exists($name, $foundConfigs)) {
                 return false;
-            } else if(!is_null($value) && $configValue !== $value){
+            }
+            if ($value === null && ConfigHelper::isValueEmpty($foundConfigs[$name])) {
+                error_log('Found config ' . $name . ' is empty but should have a non-empty value');
+
+                return false;
+            }
+            if ($value !== null && ! ConfigHelper::isValueEqual($foundConfigs[$name], $value)) {
+                error_log('Found config ' . $name . ' does not match the expected value!');
+
                 return false;
             }
         }
+
         return true;
     }
 
-    /***
-     * Get instance level config fro given config name. This function will not perform any asserts
-     * @param string $configName
-     * @return mixed|null
-     * @throws \Zend_Http_Client_Exception
+    /**
+     * Retrieves the configs from the special apitest-endpoint of the config-controller
+     * @throws Zend_Http_Client_Exception
      */
-    public function getConfig(string $configName){
-        $config = $this->getJson('editor/config');
-        if( empty($config)){
-            return null;
+    private function getTestConfigs(array $configNames, string $taskGuid = null): array
+    {
+        $params = [
+            'configs' => $configNames,
+        ];
+        if (! empty($taskGuid)) {
+            $params['taskGuid'] = $taskGuid;
         }
-        foreach ($config as $c){
-            if ($c->name === $configName){
-                return $c;
-            }
-        }
-        return null;
+        $foundConfigs = $this->getJson('editor/config/apitest', $params);
+
+        return json_decode(json_encode($foundConfigs), true);
     }
 
     /**
-     * Checks, if the passed configs are set
-     * @param string[] $configNames
-     * @return bool
-     * @throws \Zend_Http_Client_Exception
+     * Get configs like the frontend normally does
+     * Get instance level config fro given config name. This function will not perform any asserts
+     * @return mixed|null
+     * @throws Zend_Http_Client_Exception
      */
-    public function checkConfigsToBeSet(array $configNames): bool
+    public function getConfig(string $configName)
     {
-        $allSet = true;
-        foreach ($configNames as $name) {
-            if (!str_starts_with($name, 'runtimeOptions.')) {
-                $name = 'runtimeOptions.' . $name;
-            }
-            $config = $this->getJson('editor/config', [
-                'filter' => '[{"type":"string","value":"' . $name . '","property":"name","operator":"eq"}]',
-            ]);
-            if(count($config) !== 1 || empty($config[0]->value)){
-                $allSet = false;
+        $config = $this->getJson('editor/config');
+        if (empty($config)) {
+            return null;
+        }
+        foreach ($config as $c) {
+            if ($c->name === $configName) {
+                return $c;
             }
         }
-        return $allSet;
+
+        return null;
     }
 
     //endregion
 
     /**
      * @return mixed|\stdClass
-     * @throws \Zend_Http_Client_Exception
+     * @throws Zend_Http_Client_Exception
      */
     public function getLanguages()
     {
         $resp = $this->get('editor/language');
         $this->assertResponseStatus($resp, 'Languages');
+
         return $this->decodeJsonResponse($resp);
     }
 
     /**
      * removes random revIds from the given XML string of changes.xml files
-     * @param string $changesXml
-     * @return string
      */
     public function replaceChangesXmlContent(string $changesXml): string
     {
         $guid = htmlspecialchars($this->task->taskGuid);
         $changesXml = str_replace(' translate5:taskguid="' . $guid . '"', ' translate5:taskguid="TASKGUID"', $changesXml);
+
         return preg_replace('/sdl:revid="[^"]{36}"/', 'sdl:revid="replaced-for-testing"', $changesXml);
     }
 }

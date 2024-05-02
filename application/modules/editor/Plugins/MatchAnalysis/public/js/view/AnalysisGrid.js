@@ -69,7 +69,8 @@ Ext.define('Editor.plugins.MatchAnalysis.view.AnalysisGrid', {
         edit100PercentMatchDisabledMessage: '#UT#Gesperrte 100%-Matches sind nicht Teil der Analyse.',
         wordBased:"#UT#Wortbasiert",
         characterBased:"#UT#Zeichenbasiert",
-        basedOn:'#Basiert auf'
+        basedOn:'#Basiert auf',
+        hasErrors: '#UT#Bei der Analyse sind {0} Fehler in der Kommunikation mit den Sprachressourcen aufgetreten. <br />Die Analyse kann daher unvollständig sein. Bitte prüfen Sie die Ereignisse der Aufgabe und das System Log und erstellen ggf. die Analyse erneut.'
     },
 
     bind: {
@@ -94,6 +95,7 @@ Ext.define('Editor.plugins.MatchAnalysis.view.AnalysisGrid', {
                     bodyPadding: 10,
                     itemId: 'infoPanel',
                     cls: 'matchAnalysisInfoBox',
+                    height: 'auto',
                     tpl: [
                         '<tpl if="hasAnalysisData">',
                             '<span class="date"><span class="label">{strings.analysisDate}:</span> {created}</span>',
@@ -101,14 +103,26 @@ Ext.define('Editor.plugins.MatchAnalysis.view.AnalysisGrid', {
                             '<tpl if="!editFullMatch">',
                                 '<span class="editFullMatch">{strings.edit100PercentMatchDisabledMessage}</span>',
                             '</tpl>',
+                            '<tpl if="this.hasErrors(errorCount)">',
+                                '<span class="errors">{[this.getErrorMsg(values.strings.hasErrors, values.errorCount)]}</span>',
+                            '</tpl>',
                         '<tpl else>',
                             '{strings.noAnalysis}',
-                        '</tpl>'
+                        '</tpl>',
+                        {
+                            hasErrors: function(errorCount) {
+                                return errorCount > 0;
+                            },
+                            getErrorMsg: function(msg, errorCount) {
+                                return Ext.String.format(msg, errorCount);
+                            }
+                        }
                     ],
                     bbar:[{
                         xtype: 'combo',
                         name:'unitType',
                         itemId:'unitType',
+                        disabled: !Editor.app.authenticatedUser.isAllowed('pluginMatchAnalysisPricingPreset'),
                         editable : true,
                         typeAhead : true,
                         forceSelection : true,
@@ -157,6 +171,7 @@ Ext.define('Editor.plugins.MatchAnalysis.view.AnalysisGrid', {
                     dock: 'bottom',
                     ui: 'footer',
                     enableOverflow: true,
+                    border: '1 0 0 0',
                     defaultButtonUI: false,
                     items: [{
                         xtype: 'textfield',
@@ -233,8 +248,10 @@ Ext.define('Editor.plugins.MatchAnalysis.view.AnalysisGrid', {
             proxy.setExtraParams({
                 taskGuid: task.get('taskGuid')
             });
+            store.load();
+        } else {
+            store.removeAll();
         }
-        store.load();
     },
 
     getTooltip: function() {

@@ -317,8 +317,8 @@ Ext.define('Editor.view.segments.RowEditorColumnParts', {
 
         me.setColumnToEdit(me.context.column);
 
-        // TODO move to somewhere to avoid duplicates
-        let referenceField = Editor.data.task.get('emptyTargets') ? 'source' : 'target';
+        let referenceField = me.mainEditor.getReferenceField(record.get('target'), record.get('pretrans'));
+
         me.mainEditor.setValueAndMarkup(record.get(me.columnToEdit), record, me.columnToEdit, referenceField);
     },
     
@@ -332,7 +332,7 @@ Ext.define('Editor.view.segments.RowEditorColumnParts', {
             plug = me.editingPlugin,
             //der cleanInvisibleCharacters aufruf entfernt vom Editor automatisch hinzugefügte unsichtbare Zeichen, 
             //und verhindert so, dass der Record nicht als modified markiert wird, wenn am Inhalt eigentlich nichts verändert wurde
-            newValue = me.cleanInvisibleCharacters(me.mainEditor.getValueAndUnMarkup()),            
+            newValue = me.getValueForSaving(),
             title, msg, meta;
             
         //check, if the context delivers really the correct record, because through some issues in reallive data 
@@ -368,6 +368,11 @@ Ext.define('Editor.view.segments.RowEditorColumnParts', {
         record.endEdit();
         return true;
     },
+
+    getValueForSaving: function() {
+        return this.cleanInvisibleCharacters(this.mainEditor.getValueAndUnMarkup());
+    },
+
     /**
      * starts tracking the editing time for the given field
      */

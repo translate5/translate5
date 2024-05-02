@@ -21,7 +21,7 @@
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
- 		     http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
  END LICENSE AND COPYRIGHT
  */
@@ -30,15 +30,15 @@
  * Unpacks/Disassembles a bconf for the purpose of analysis
  * This does not write any files !
  */
-final class editor_Plugins_Okapi_Bconf_Analysis extends editor_Plugins_Okapi_Bconf_Parser_Bconf {
-
+final class editor_Plugins_Okapi_Bconf_Analysis extends editor_Plugins_Okapi_Bconf_Parser_Bconf
+{
     /**
-     * @param string $absoluteBconfPath
      * @throws Zend_Exception
      * @throws ZfExtended_Exception
      * @throws editor_Plugins_Okapi_Bconf_InvalidException
      */
-    public function __construct(string $absoluteBconfPath){
+    public function __construct(string $absoluteBconfPath)
+    {
         $this->folder = dirname($absoluteBconfPath);
         $this->bconfName = basename($absoluteBconfPath);
         $this->hasBconf = false;

@@ -32,6 +32,7 @@ Ext.define('Editor.view.admin.preferences.OverviewPanel', {
         'Editor.view.admin.preferences.OverviewPanelViewController',
         'Editor.view.admin.preferences.User',
         'Editor.view.admin.config.Grid',
+        'Editor.view.admin.token.TokenGrid',
         'Editor.view.admin.log.SystemGrid',
         'Editor.view.admin.system.StatusPanel'
     ],
@@ -106,6 +107,10 @@ Ext.define('Editor.view.admin.preferences.OverviewPanel', {
             configSections.push({
                 xtype: 'editorSystemStatus'
             });
+        }
+
+        if(user.isAllowed('tokenGrid')) {
+            configSections.push({xtype: 'TokenGrid'});
         }
 
         /**

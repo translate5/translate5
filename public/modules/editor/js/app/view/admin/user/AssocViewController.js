@@ -79,6 +79,11 @@ Ext.define('Editor.view.admin.user.AssocViewController', {
             },
             '#userGuid':{
                 change:'checkDuplicates'
+            },
+            // This selector will select all menuitems inside toolbar's overflow-menu
+            // so that click event is triggered on toolbar's corresponding item
+            'button[iconCls="x-toolbar-more-icon"] > menu > menuitem': {
+                click: 'onOverflowMenuItemClick'
             }
         },
         store:{
@@ -92,6 +97,15 @@ Ext.define('Editor.view.admin.user.AssocViewController', {
         deleteUserMessage: '#UT#Soll dieser Eintrag wirklich gelöscht werden?',
         deleteUserTitle: '#UT#Eintrag löschen?',
         assocSaved: '#UT#Benutzerzuweisung gespeichert'
+    },
+
+    onOverflowMenuItemClick: function(menuitem) {
+
+        // Shortcut to master component
+        var mc = menuitem.masterComponent;
+
+        // Fire click-event
+        mc.fireEvent('click');
     },
 
     onSaveAssocBtnClick : function(){

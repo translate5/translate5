@@ -21,7 +21,7 @@ START LICENSE AND COPYRIGHT
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
@@ -33,6 +33,7 @@ namespace MittagQI\Translate5\Cronjob;
 use Bootstrap;
 use editor_Workflow_Exception;
 use editor_Workflow_Manager;
+use MittagQI\Translate5\Logging\Rotation;
 use Zend_Application_Bootstrap_Exception as Zend_Application_Bootstrap_ExceptionAlias;
 use ZfExtended_Factory;
 use ZfExtended_Logger_Summary;
@@ -42,13 +43,14 @@ class Cronjobs
 {
     private static bool $running = false;
 
-    public function __construct(private Bootstrap $bootstrap, private CronEventTrigger $eventTrigger)
-    {
+    public function __construct(
+        private Bootstrap $bootstrap,
+        private CronEventTrigger $eventTrigger
+    ) {
     }
 
     /**
      * returns true if current request is executed in a cron job
-     * @return bool
      */
     public static function isRunning(): bool
     {
@@ -61,6 +63,7 @@ class Cronjobs
      */
     public function periodical(): void
     {
+        //FIXME exception handling here, encaps each "job" and log exception, otherwise it just bubbles to the CLI output
         self::$running = true;
         /* @var $gc ZfExtended_Resource_GarbageCollector */
         $gc = $this->bootstrap->getPluginResource(ZfExtended_Resource_GarbageCollector::class);
@@ -79,8 +82,8 @@ class Cronjobs
 
         //FIXME should come configurable from workflow action table
         // + additional receivers, independant from sys admin users
-        $summary = ZfExtended_Factory::get(ZfExtended_Logger_Summary::class);
-        $summary->sendSummaryToAdmins();
+        //$summary = ZfExtended_Factory::get(ZfExtended_Logger_Summary::class);
+        //$summary->sendSummaryToAdmins();
 
         $log = ZfExtended_Factory::get(\ZfExtended_Models_Log::class);
         $log->purgeOlderAs(\Zend_Registry::get('config')->runtimeOptions?->logger?->keepWeeks ?? 6);
@@ -93,15 +96,15 @@ class Cronjobs
     /**
      * Rotate logs
      */
-    public function rotateLogs() {
-
+    public function rotateLogs()
+    {
         // Rotate php log
-        \MittagQI\Translate5\Logging\Rotation::rotate('php.log');
+        Rotation::rotate('php.log');
+        Rotation::rotate('worker.log');
     }
 
     /**
      * call workflow action based on given name
-     * @param string $fn
      * @throws editor_Workflow_Exception
      */
     protected function doCronWorkflow(string $fn): void

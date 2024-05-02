@@ -21,24 +21,24 @@ START LICENSE AND COPYRIGHT
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
 
 /**
- * Class editor_Models_Terminology_Models_CollectionAttributeDataType
- *
- * @method integer getCollectionId() getCollectionId()
- * @method integer setCollectionId() setCollectionId(int $collectionId)
- * @method integer getDataTypeId() getDataTypeId()
- * @method integer setDataTypeId() setDataTypeId(int $dataTypeId)
- * @method integer getEnabled() getEnabled()
- * @method integer setEnabled() setEnabled(int $enabled)
+ * @method string getCollectionId()
+ * @method void setCollectionId(int $collectionId)
+ * @method string getDataTypeId()
+ * @method void setDataTypeId(int $dataTypeId)
+ * @method string getEnabled()
+ * @method void setEnabled(int $enabled)
  */
-class editor_Models_Terminology_Models_CollectionAttributeDataType extends ZfExtended_Models_Entity_Abstract {
+class editor_Models_Terminology_Models_CollectionAttributeDataType extends ZfExtended_Models_Entity_Abstract
+{
     protected $dbInstanceClass = 'editor_Models_Db_Terminology_CollectionAttributeDataType';
-    protected $validatorInstanceClass   = 'editor_Models_Validator_Term_CollectionAttributeDataType';
+
+    protected $validatorInstanceClass = 'editor_Models_Validator_Term_CollectionAttributeDataType';
 
     /***
      * Update the attribute data-type associations for the given term collection.
@@ -46,7 +46,8 @@ class editor_Models_Terminology_Models_CollectionAttributeDataType extends ZfExt
      *
      * @param int $collectionId
      */
-    public function updateCollectionAttributeAssoc(int $collectionId){
+    public function updateCollectionAttributeAssoc(int $collectionId)
+    {
         $this->db->getAdapter()->query("
             INSERT INTO `terms_collection_attribute_datatype` (collectionId,dataTypeId)
             (
@@ -62,12 +63,10 @@ class editor_Models_Terminology_Models_CollectionAttributeDataType extends ZfExt
     /**
      * Load record by given $collectionId and $dataTypeId
      *
-     * @param int $collectionId
-     * @param int $dataTypeId
      * @return $this
      */
-    public function loadBy(int $collectionId, int $dataTypeId) {
-
+    public function loadBy(int $collectionId, int $dataTypeId)
+    {
         // Fetch row by $collectionId and $dataTypeId
         $this->row = $this->db->fetchRow('`collectionId` = "' . $collectionId . '" AND `dataTypeId` = "' . $dataTypeId . '"');
 
@@ -78,11 +77,10 @@ class editor_Models_Terminology_Models_CollectionAttributeDataType extends ZfExt
     /**
      * Set `exists` flag and return model instance itself
      *
-     * @param bool $exists
      * @return $this
      */
-    public function setExists(bool $exists) {
-
+    public function setExists(bool $exists)
+    {
         // Call parent
         parent::setExists($exists);
 
@@ -91,40 +89,32 @@ class editor_Models_Terminology_Models_CollectionAttributeDataType extends ZfExt
     }
 
     /**
-     * @param int $collectionId
-     * @return array
      * @throws Zend_Db_Statement_Exception
      */
-    public function loadAllByCollectionId(int $collectionId) : array {
-
+    public function loadAllByCollectionId(int $collectionId): array
+    {
         // Fetch [dataTypeId => mappingInfo] pairs
         $data = $this->db->getAdapter()->query("
             SELECT `dataTypeId`, JSON_OBJECT('mappingId', `id`, 'enabled', `enabled`, 'exists', `exists`) 
             FROM `terms_collection_attribute_datatype` 
-            WHERE `collectionId` = ?"
-        , $collectionId)->fetchAll(PDO::FETCH_KEY_PAIR);
+            WHERE `collectionId` = ?", $collectionId)->fetchAll(PDO::FETCH_KEY_PAIR);
 
         // Json-decode mappingInfo
-        return array_map(function($value){
+        return array_map(function ($value) {
             return json_decode($value);
         }, $data);
     }
 
-    /**
-     * @param int $collectionId
-     */
-    public function onTermCollectionInsert(int $collectionId) : void {
+    public function onTermCollectionInsert(int $collectionId): void
+    {
         $this->db->getAdapter()->query("
             INSERT INTO `terms_collection_attribute_datatype` (`collectionId`, `dataTypeId`, `enabled`, `exists`) 
             SELECT ?, `id`, `isTbxBasic`, 0 FROM `terms_attributes_datatype`
         ", $collectionId);
     }
 
-    /**
-     * @param int $dataTypeId
-     * @param int $collectionId
-     */
-    public function onCustomDataTypeInsert(int $dataTypeId, int $collectionId) : void {
+    public function onCustomDataTypeInsert(int $dataTypeId, int $collectionId): void
+    {
         $this->db->getAdapter()->query("
             INSERT INTO `terms_collection_attribute_datatype` (`collectionId`, `dataTypeId`, `enabled`, `exists`) 
             SELECT `id`, ?, `id` = ?, 0 FROM `LEK_languageresources` WHERE `resourceType` = 'termcollection';

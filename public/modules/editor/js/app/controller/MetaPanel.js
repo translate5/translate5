@@ -112,6 +112,7 @@ Ext.define('Editor.controller.MetaPanel', {
      * A flag specifying our editing mode. can be: 'none', 'readonly', 'edit'
      */
     editingMode: 'none',
+
     /**
      * Gibt die RowEditing Instanz des Grids zurück
      * @returns Editor.view.segments.RowEditing
@@ -217,6 +218,11 @@ Ext.define('Editor.controller.MetaPanel', {
             bind: {
                 title: '{l10n.falsePositives.legend.float} <span class="x-fa fa-circle-xmark" title="{l10n.falsePositives.close}"></span>'
             },
+            listeners: {
+                boxready: function(cmp) {
+                    cmp.el.dom.setAttribute('data-qtip', Editor.data.l10n.falsePositives.window.tooltip);
+                }
+            },
             hide: function() {
                 delete me.segmentRightClickGrid;
                 this.destroy();
@@ -276,6 +282,9 @@ Ext.define('Editor.controller.MetaPanel', {
         me.hasQmQualities = Editor.app.getTaskConfig('autoQA.enableQm');
         me.record = record;
         // our component controllers are listening for the load event & create their views
+        if (me.hasQmQualities) {
+            me.getMetaQmPanel().createInactiveCheckBoxes();
+        }
         me.getQualitiesStore().load({
             params: {segmentId: segmentId}
         });
@@ -285,19 +294,80 @@ Ext.define('Editor.controller.MetaPanel', {
     /**
      * Starts the creation of the segment's quality related GUIs
      */
-    handleQualitiesLoaded: function (store, records) {
+    handleQualitiesLoaded: function (store, records, successful) {
         var me = this,
-            metaFalPosPanel = me.getMetaFalPosPanel();
+            metaFalPosPanel = me.getMetaFalPosPanel(),
+            grid = me.getSegmentGrid(),
+            ordered = [],
+            qidA = [];
 
-        // in case there is no meta panel, ignore the logic below
-        if(!metaFalPosPanel){
+        // In case there is no meta panel, or even no segment grid - ignore the logic below
+        if (!metaFalPosPanel || !grid || !successful) {
             return;
         }
 
-        metaFalPosPanel.loadFalsifiable(records);
+        // Get all the content-qualities (which can be spellcheck-qualities and termtagger-qualities)
+        // in the order they appear inside the segment
+        var row = grid.el?.down('[data-recordId="' + me.record.internalId + '"]');
+
+        /**
+         * Arrays of qualities ids in the order of appearance within the segment, grouped by segment ids
+         * {
+         *     "segmentId1": ["qid1", "qid2", "qid3"],
+         *     "segmentId2": ["qid4", "qid5", "qid6"],
+         *     ...
+         * }
+         */
+        grid.qualityIdABySegmentId = grid.qualityIdABySegmentId || {};
+
+        // If row, that qualities were loaded for - it available in the segment grid
+        if (row) {
+
+            // Match qualities ids within row's DOM node 'data-t5qid' attributes
+            var qidm = row.getHtml().matchAll(/data-t5qid="(?<id>[0-9]+)"/g), qid;
+
+            // Get array of matches for further use to be more handy
+            while (qid = qidm.next()) {
+                if (qid.value) {
+                    qidA.push(parseInt(qid.value.groups.id));
+                } else {
+                    break;
+                }
+            }
+
+            // Remember the order
+            grid.qualityIdABySegmentId[me.record.getId()] = qidA;
+
+            //
+            //console.log('qualities order picked from DOM', qidA);
+
+        // Else if not exists in DOM anymore but it was before so the order was saved
+        } else if (me.record.getId() in grid.qualityIdABySegmentId) {
+
+            // Pick from saved
+            qidA = grid.qualityIdABySegmentId[me.record.getId()];
+
+            //
+            //console.log('qualities order picked from saved', qidA);
+
+        // Else skip
+        } else return;
+
+
+        // Setup array of qualities, where we have spellcheck and termtagger qualities added
+        // in the order they appear in the current segment, and all other qualities are added afterwards
+        qidA.forEach(qid => records.forEach(record => { record.get('id') === qid && ordered.push(record) }));
+        records.forEach(record => { !~qidA.indexOf(record.get('id')) && ordered.push(record) });
+
+        /*var _1 = [], _2 = [];
+        ordered.forEach(q => _1.push(q.get('id')));
+        records.forEach(r => _2.push(r.get('id')));
+        console.log(qidA, _1, _2);*/
+
+        metaFalPosPanel.loadFalsifiable(ordered);
 
         var segmentId = this.record.get('id');
-        this.getMetaQmPanel().startEditing(records, segmentId, this.hasQmQualities);
+        this.getMetaQmPanel().createActiveCheckBoxes(ordered, segmentId, this.hasQmQualities);
     },
     /**
      * opens metapanel for readonly segments
@@ -326,7 +396,6 @@ Ext.define('Editor.controller.MetaPanel', {
      */
     saveEdit: function () {
         this.record.set('stateId', this.getMetaInfoForm().getValues().stateId);
-        this.getMetaQmPanel().endEditing(this.hasQmQualities, true);
         this.editingMode = 'none';
         this.toggleOnEdit(false);
     },
@@ -335,7 +404,6 @@ Ext.define('Editor.controller.MetaPanel', {
      * @hint metapanel
      */
     cancelEdit: function () {
-        this.getMetaQmPanel().endEditing(this.hasQmQualities, false);
         this.editingMode = 'none';
         this.toggleOnEdit(false);
     },

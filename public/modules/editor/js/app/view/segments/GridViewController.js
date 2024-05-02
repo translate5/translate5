@@ -36,7 +36,7 @@ Ext.define('Editor.view.segments.GridViewController', {
                 toggle:'onToggleTaskDesc'
             },
             '#segmentgrid': {
-                select:'onSegmentGridSelect',
+                select:'onSegmentGridSelect'
             }
         }
     },

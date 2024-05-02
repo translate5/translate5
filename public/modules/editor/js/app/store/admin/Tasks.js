@@ -37,5 +37,7 @@ Ext.define('Editor.store.admin.Tasks', {
   remoteSort: true,
   remoteFilter: true,
   autoLoad: false,
-  pageSize: 20
+  pageSize: 20,
+  statefulFilters: true,
+  trackStateChanges: true
 });

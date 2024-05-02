@@ -21,7 +21,7 @@ START LICENSE AND COPYRIGHT
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
@@ -36,21 +36,24 @@ END LICENSE AND COPYRIGHT
  * extends and modifies the original TBX importer, so that only missing Term entries ares imported
  * @deprecated
  */
-class editor_Models_Import_TermListParser_TbxReimportMissing extends editor_Models_Import_TermListParser_Tbx {
-
+class editor_Models_Import_TermListParser_TbxReimportMissing extends editor_Models_Import_TermListParser_Tbx
+{
     /**
      * Set all auto ID Generations to false, so that the ids are used from the already existing TBX
      * @var boolean
      */
     protected $autoIds = false;
-    protected $addTermEntryIds = false;
+
+    protected bool $addTermEntryIds = false;
+
     protected $addTigIds = false;
-    protected $addTermIds = false;
+
+    protected bool $addTermIds = false;
 
     /**
      * @var array
      */
-    protected $insertedMissing = array();
+    protected $insertedMissing = [];
 
     /**
      * @var integer
@@ -61,7 +64,8 @@ class editor_Models_Import_TermListParser_TbxReimportMissing extends editor_Mode
      * returns the inserted missing terms
      * @return array
      */
-    public function getInsertedMissing(){
+    public function getInsertedMissing()
+    {
         return $this->insertedMissing;
     }
 
@@ -69,11 +73,13 @@ class editor_Models_Import_TermListParser_TbxReimportMissing extends editor_Mode
      * returns the count of already existing terms
      * @return integer
      */
-    public function getAlreadyExistingTerms(){
+    public function getAlreadyExistingTerms()
+    {
         return $this->alreadyExistingTerms;
     }
 
-    public function importMissing(editor_Models_Task $task){
+    public function importMissing(editor_Models_Task $task)
+    {
         $this->term = ZfExtended_Factory::get('editor_Models_Terminology_Models_TermModel');
 
         try {
@@ -84,46 +90,48 @@ class editor_Models_Import_TermListParser_TbxReimportMissing extends editor_Mode
             $targetLang = ZfExtended_Factory::get('editor_Models_Languages');
             /* @var $sourceLang editor_Models_Languages */
             $targetLang->load($task->getTargetLang());
-        } catch(ZfExtended_Models_Entity_NotFoundException $e){
+        } catch (ZfExtended_Models_Entity_NotFoundException $e) {
             return false;
         }
 
         $tbx = new SplFileInfo(self::getTbxPath($task));
-        if(!$tbx->isReadable()) {
+        if (! $tbx->isReadable()) {
             return false;
         }
         $this->importOneTbx($tbx, $task, $sourceLang, $targetLang);
+
         return true;
     }
 
-    protected function saveTermEntityToDb() {
-        if(empty($this->termInsertBuffer)) {
+    protected function saveTermEntityToDb()
+    {
+        if (empty($this->termInsertBuffer)) {
             return null;
         }
-        $mids = array_map(function($term){
+        $mids = array_map(function ($term) {
             return $term['mid'];
-        },$this->termInsertBuffer);
+        }, $this->termInsertBuffer);
         $termDb = $this->term->db;
         $sql = $termDb->select()
-        ->where('taskGuid = ?', $this->task->getTaskGuid())
-        ->where('mid in (?)', $mids);
+            ->where('taskGuid = ?', $this->task->getTaskGuid())
+            ->where('mid in (?)', $mids);
 
         $foundMids = $termDb->fetchAll($sql)->toArray();
-        $foundMids = array_map(function($term){
+        $foundMids = array_map(function ($term) {
             return $term['mid'];
-        },$foundMids);
+        }, $foundMids);
 
-        $toInsert = array();
-        foreach($this->termInsertBuffer as $termToInsert) {
-            if(in_array($termToInsert['mid'], $foundMids)) {
+        $toInsert = [];
+        foreach ($this->termInsertBuffer as $termToInsert) {
+            if (in_array($termToInsert['mid'], $foundMids)) {
                 $this->alreadyExistingTerms++;
-            }
-            else {
+            } else {
                 $this->insertedMissing[] = $termToInsert;
                 $toInsert[] = $termToInsert;
             }
         }
         $this->termInsertBuffer = $toInsert;
+
         return parent::saveTermEntityToDb();
     }
 }

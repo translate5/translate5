@@ -21,7 +21,7 @@ START LICENSE AND COPYRIGHT
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
@@ -38,17 +38,12 @@ use Zend_Registry;
 use ZfExtended_Factory;
 use ZfExtended_Logger;
 
-/**
- *
- */
 class Factory
 {
-    /**
-     * @param editor_Models_Task $task
-     * @param SegmentFieldManager $segmentFieldManager
-     */
-    public function __construct(private editor_Models_Task $task, private SegmentFieldManager $segmentFieldManager)
-    {
+    public function __construct(
+        private editor_Models_Task $task,
+        private SegmentFieldManager $segmentFieldManager
+    ) {
     }
 
     /***
@@ -65,7 +60,10 @@ class Factory
         try {
             $parserClass = $this->lookupFileParserCls($file->getExtension(), $file);
         } catch (editor_Models_Import_FileParser_NoParserException $e) {
-            Zend_Registry::get('logger')->exception($e, ['level' => ZfExtended_Logger::LEVEL_WARN]);
+            Zend_Registry::get('logger')->exception($e, [
+                'level' => ZfExtended_Logger::LEVEL_WARN,
+            ]);
+
             return null;
         }
 
@@ -90,18 +88,16 @@ class Factory
             $file->getPathname(),
             $file->getBasename(),
             $fileId,
-            $this->task
+            $this->task,
         ]);
         /* @var FileParser $parser */
         $parser->setSegmentFieldManager($this->segmentFieldManager);
+
         return $parser;
     }
 
     /**
      * Looks for a suitable file parser and returns the corresponding file parser cls
-     * @param string $extension
-     * @param SplFileInfo $file
-     * @return string
      * @throws editor_Models_Import_FileParser_NoParserException
      */
     protected function lookupFileParserCls(string $extension, SplFileInfo $file): string
@@ -109,7 +105,7 @@ class Factory
         $errorMessages = [];
         $parserClass = $this->task->getFileTypeSupport()->hasSupportedParser($extension, $file, $errorMessages);
 
-        if (!is_null($parserClass)) {
+        if (! is_null($parserClass)) {
             return $parserClass;
         }
 

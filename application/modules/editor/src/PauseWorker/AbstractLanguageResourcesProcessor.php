@@ -30,10 +30,10 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\PauseWorker;
 
+use editor_Models_LanguageResources_LanguageResource as LanguageResource;
 use editor_Models_Task as Task;
 use editor_Services_Manager as Manager;
 use editor_Services_OpenTM2_Connector as OpenTm2Connector;
-use editor_Models_LanguageResources_LanguageResource as LanguageResource;
 use Exception;
 use MittagQI\Translate5\LanguageResource\Status as LanguageResourceStatus;
 use Throwable;
@@ -66,15 +66,14 @@ abstract class AbstractLanguageResourcesProcessor
                 /** @var OpenTm2Connector $connector */
                 $connector = $this->manager->getConnector(
                     $languageResource,
-                    (int)$task->getSourceLang(),
-                    (int)$task->getTargetLang(),
+                    (int) $task->getSourceLang(),
+                    (int) $task->getTargetLang(),
                     $task->getConfig()
                 );
 
-                if (LanguageResourceStatus::IMPORT === $connector->getStatus($resource)) {
+                if (LanguageResourceStatus::IMPORT === $connector->getStatus($resource, $languageResource)) {
                     return true;
                 }
-
             } catch (Exception $exception) {
                 // Do nothing here to make worker decide what to do with such language resource further
             }

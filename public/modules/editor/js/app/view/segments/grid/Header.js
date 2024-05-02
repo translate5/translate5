@@ -59,8 +59,19 @@ Ext.define('Editor.view.segments.grid.Header', {
     },
     initConfig: function(instanceConfig) {
         var me = this,
-            infoPanel = Ext.create('Editor.view.ApplicationInfoPanel'),
-            config = {
+            infoPanel = Ext.create('Editor.view.ApplicationInfoPanel');
+
+        // Setup a flag indicating whether current user is assigned to the task
+        var showUserSpecificProgress = false;
+        Editor.data.task.get('users').forEach(user => {
+            if (user.userGuid === Editor.data.app.user.userGuid) {
+                if (user.segmentrange) {
+                    return showUserSpecificProgress = true;
+                }
+            }
+        });
+
+        var config = {
                 padding:'8 8 8 8', // the default padding spreads up the height of the header
                 defaults: {
                     margin:'0 0 0 4'
@@ -77,22 +88,44 @@ Ext.define('Editor.view.segments.grid.Header', {
                     hideText: me.strings.hideDesc,
                     text: me.strings.hideDesc
                 },{
-                    xtype: 'helpButton'
+                    xtype: 'helpButton',
+                    bind: {
+                        tooltip: '{l10n.helpButton.tooltip}'
+                    }
                 },{
                     xtype: 'button',
                     itemId:'toolbarInfoButton',
                     icon: Editor.data.moduleFolder+'images/information-white.png',
                     tooltip: infoPanel.renderEditorText()
                 },{
-                    xtype: 'progressbar',
-                    itemId: 'segmentFinishCount',
-                    width:150,
-                    autoEl: {
-                        'data-qtip': me.strings.progressTooltip
-                    },
-                    bind:{
-                        value:'{segmentFinishCountPercent}'
-                    }
+                    xtype: 'container',
+                    layout: 'vbox',
+                    items: [{
+                        xtype: 'progressbar',
+                        itemId: 'segmentFinishCount',
+                        width: 150,
+                        height: showUserSpecificProgress ? 12 : 24,
+                        userCls: showUserSpecificProgress ? 'half-height' : '',
+                        autoEl: {
+                            'data-qtip': me.strings.progressTooltip
+                        },
+                        bind:{
+                            value: '{taskProgress}'
+                        }
+                    },{
+                        xtype: 'progressbar',
+                        itemId: 'segmentFinishCountForUser',
+                        width:150,
+                        height: 12,
+                        userCls: showUserSpecificProgress ? 'half-height' : '',
+                        hidden: !showUserSpecificProgress,
+                        //autoEl: {
+                        //    'data-qtip': me.strings.progressTooltip
+                        //},
+                        bind:{
+                            value: '{userProgress}',
+                        }
+                    }]
                 },{
                     xtype: 'button',
                     itemId: 'leaveTaskHeaderBtn',

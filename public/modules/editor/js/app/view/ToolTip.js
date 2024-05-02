@@ -59,15 +59,48 @@ Ext.define('Editor.view.ToolTip', {
 
     // Change content dynamically depending on which element triggered the show.
     onBeforeShow: function(tip) {
+
+        var me = this;
+
+        if (!tip || !tip.triggerElement || !Ext.fly(tip.triggerElement) || !Ext.fly(tip.triggerElement).up()) {
+            return false;
+        }
+
         var t = tip.triggerElement,
-            fly = Ext.fly(t); 
-        if(fly.hasCls('qmflag') || fly.hasCls('trackchanges') || fly.hasCls('internal-tag')) {
-            // Don't show multiple ToolTips that overlap, but collect data into one single ToolTip
-            return this.handleCollectedTooltip(t, tip);
+            fly = Ext.fly(t),
+            up = fly.up(),
+            qtip = me.getQtip(fly) || me.getQtip(up);
+
+        if (me.hasCustomTip(fly)) {
+            if (qtip) {
+                up.dom.setAttribute('data-qclass', 'hidden');
+                return me.handleCollectedTooltip(t, tip, qtip);
+            } else {
+                return me.handleCollectedTooltip(t, tip);
+            }
+        } else if (qtip) {
+            if (me.hasCustomTip(up)) {
+                fly.dom.setAttribute('data-qclass', 'hidden');
+                return me.handleCollectedTooltip(t.parentNode, tip, qtip);
+            } else {
+                tip.update(qtip);
+                return true;
+            }
         }
         return false;
     },
-    
+
+    hasCustomTip: function(el) {
+        return el.hasCls('qmflag') || el.hasCls('trackchanges') || el.hasCls('internal-tag');
+    },
+
+    getQtip: function(el) {
+        if(!el || !el.dom) {
+            return false;
+        }
+        return el.dom.getAttribute('data-qtip');
+    },
+
     constructor: function() {
         this.renderTo = Ext.getBody();
         this.callParent(arguments);
@@ -88,7 +121,7 @@ Ext.define('Editor.view.ToolTip', {
      * Collect data for"common" ToolTip.
      * First the node itself is checked, but (if necessary) be careful to check for parent or child-Nodes, too.
      */
-    handleCollectedTooltip: function(node, tip) {
+    handleCollectedTooltip: function(node, tip, appendText) {
         var me = this,
             fly = Ext.fly(node),
             result = '';
@@ -98,7 +131,7 @@ Ext.define('Editor.view.ToolTip', {
             result = me.getQmFlagData(node);
         } else {
             var allQmFlagNodes = node.getElementsByClassName('qmflag');
-            if (allQmFlagNodes.length == 1) {
+            if (allQmFlagNodes.length === 1) {
                 result = me.getQmFlagData(allQmFlagNodes[0]);
             } else {
                 // a) there is no qmFlag-Node
@@ -112,13 +145,23 @@ Ext.define('Editor.view.ToolTip', {
         } else if (node.parentNode && /(^|[\s])trackchanges([\s]|$)/.test(node.parentNode.className)) {
             result += me.getTrackChangesData(node.parentNode);
         }
-        
 
         //Workaround to show the titles of the img tags always in fulltag mode
-        if(fly.hasCls('internal-tag') && (fly.hasCls('tab')||fly.hasCls('space')||fly.hasCls('newline')||fly.hasCls('nbsp')||fly.hasCls('char'))) {
-            result = fly.down('span.short').getAttribute('title') + (result ? '<br>'+result : '');
-        };
-        tip.update(result);
+        if(fly.hasCls('internal-tag') && (fly.hasCls('tab')||fly.hasCls('space')||fly.hasCls('newline')||fly.hasCls('nbsp')||fly.hasCls('char')||fly.hasCls('t5placeable'))) {
+            var dom = fly.down('span.short');
+            result = dom ? dom.getAttribute('title').split('<').join('&lt;') + (result ? '<br>'+result : '') : null;
+        }
+
+        if(result){
+            result = result.replaceAll('<br>', ' ');
+
+            if (appendText) {
+                result += '<br><br>' + appendText;
+            }
+
+            tip.update(result);
+        }
+
         return !!result; //if there is no content for ttip, we return false to prevent the show of the tooltip
     },
     

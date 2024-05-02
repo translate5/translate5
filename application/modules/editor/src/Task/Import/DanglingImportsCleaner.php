@@ -53,12 +53,13 @@ declare(strict_types=1);
 namespace MittagQI\Translate5\Task\Import;
 
 use editor_Models_Task;
+use MittagQI\ZfExtended\Worker\Trigger\Factory as WorkerTriggerFactory;
+use ReflectionException;
 use Zend_Exception;
 use Zend_Registry;
 use ZfExtended_Factory;
 use ZfExtended_Models_Entity_NotFoundException;
 use ZfExtended_Models_Worker;
-use ZfExtended_Worker_TriggerByHttp;
 
 class DanglingImportsCleaner
 {
@@ -66,6 +67,7 @@ class DanglingImportsCleaner
      * Sets importing tasks to status error if the import was started more than 48
      * (default; configurable runtimeOptions.import.timeout) hours ago
      * @throws Zend_Exception
+     * @throws ReflectionException
      */
     public function cleanup(): void
     {
@@ -86,7 +88,7 @@ class DanglingImportsCleaner
             $task->init($data->toArray());
 
             //log the dangling task
-            $task->logger()->error('E1379', 'The task import was cancelled after {hours} hours.',[
+            $task->logger()->error('E1379', 'The task import was cancelled after {hours} hours.', [
                 'task' => $task,
                 'hours' => $hours,
             ]);
@@ -100,8 +102,12 @@ class DanglingImportsCleaner
                 $worker->defuncRemainingOfGroup([$finalStepWorker], true, true);
                 $worker->wakeupScheduled();
 
-                $trigger = ZfExtended_Factory::get(ZfExtended_Worker_TriggerByHttp::class);
-                $trigger->triggerWorker($worker->getId(), $worker->getHash());
+                WorkerTriggerFactory::create()->triggerWorker(
+                    (string) $worker->getId(),
+                    $worker->getHash(),
+                    $worker->getWorker(),
+                    $task->getTaskGuid()
+                );
             } catch (ZfExtended_Models_Entity_NotFoundException) {
                 //do nothing
             }

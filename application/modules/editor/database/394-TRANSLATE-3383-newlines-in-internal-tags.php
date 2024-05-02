@@ -22,7 +22,7 @@ START LICENSE AND COPYRIGHT
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
@@ -44,7 +44,7 @@ $SCRIPT_IDENTIFIER = '394-TRANSLATE-3383-newlines-in-internal-tags.php';
 
 class FixTranslate3383_ContentConverter
 {
-    const DEV_MODE = false;
+    public const DEV_MODE = false;
 
     private Zend_Db_Adapter_Abstract $db;
 
@@ -68,17 +68,12 @@ class FixTranslate3383_ContentConverter
             $counter++;
         }
         if ($counter > 0) {
-
             $this->output('Newlines in ' . $counter . ' segments had to be converted.');
         }
         // update the materialized views
         $this->updateMaterializedViews();
     }
 
-    /**
-     * @param array $row
-     * @return void
-     */
     private function processSegmentDataRow(array $row): void
     {
         // id, taskGuid, segmentId, mid, original, edited
@@ -86,7 +81,6 @@ class FixTranslate3383_ContentConverter
         $edited = $this->processSegmentField($row['edited']);
 
         if (self::DEV_MODE) {
-
             $msg = '';
             if (str_contains($original, '↵')) {
                 $msg .= "\n" . '  original: ' . $original;
@@ -100,7 +94,6 @@ class FixTranslate3383_ContentConverter
                     . '########################### ERROR ##########################'
                     . "\n"
                     . '  No Newlines converted in Segment ' . $row['id'] . '.'
-
                 );
             } else {
                 error_log(
@@ -109,9 +102,7 @@ class FixTranslate3383_ContentConverter
                     . $msg
                 );
             }
-
         } else {
-
             $this->segmentDataStmt->execute([
                 ':original' => $original,
                 ':edited' => $edited,
@@ -119,17 +110,13 @@ class FixTranslate3383_ContentConverter
             ]);
         }
         // memorize which segments were updated by task
-        if (!array_key_exists($row['taskGuid'], $this->updatedTasks)) {
+        if (! array_key_exists($row['taskGuid'], $this->updatedTasks)) {
             $this->updatedTasks[$row['taskGuid']] = [];
         }
         $this->updatedTasks[$row['taskGuid']][] = intval($row['segmentId']);
         usleep(10);
     }
 
-    /**
-     * @param string $segment
-     * @return string
-     */
     private function processSegmentField(?string $segment): string
     {
         return preg_replace_callback(
@@ -143,7 +130,6 @@ class FixTranslate3383_ContentConverter
 
     /**
      * Updates the affected materialized views
-     * @return void
      */
     private function updateMaterializedViews(): void
     {
@@ -151,48 +137,34 @@ class FixTranslate3383_ContentConverter
         $processsedSegments = 0;
 
         foreach ($this->updatedTasks as $taskGuid => $segmentIds) {
-
             try {
-
                 $segmentFieldManager = ZfExtended_Factory::get(editor_Models_SegmentFieldManager::class);
                 $segmentFieldManager->initFields($taskGuid);
                 $materializedView = $segmentFieldManager->getView();
 
                 if ($materializedView->exists()) {
-
                     foreach ($segmentIds as $segmentId) {
-
                         try {
-
                             $segment = ZfExtended_Factory::get(editor_Models_Segment::class);
                             $segment->load($segmentId);
                             $materializedView->updateSegment($segment);
                             $processsedSegments++;
                             usleep(10);
-
                         } catch (Throwable $e) {
-
                             $this->output('ERROR processing segment ' . $segmentId . ': ' . $e->getMessage());
                         }
                     }
                     $processsedTasks++;
                 }
-
             } catch (Throwable $e) {
-
                 $this->output('ERROR processing task ' . $taskGuid . ': ' . $e->getMessage());
             }
         }
         if ($processsedSegments > 0) {
-
             $this->output('Newlines in ' . $processsedSegments . ' segment-views in ' . $processsedTasks . ' tasks had to be adjusted.');
         }
     }
 
-    /**
-     * @param string $msg
-     * @return void
-     */
     private function output(string $msg): void
     {
         if (self::DEV_MODE) {
@@ -210,5 +182,3 @@ class FixTranslate3383_ContentConverter
 
 $fixer = new FixTranslate3383_ContentConverter();
 $fixer->run();
-
-

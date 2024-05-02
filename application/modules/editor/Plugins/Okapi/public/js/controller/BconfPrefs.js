@@ -81,6 +81,9 @@ Ext.define('Editor.plugins.Okapi.controller.BconfPrefs', {
                         }
                     }
                 }
+            },
+            '#adminTaskAddWindow wizardUploadGrid': {
+                validateWorkfile: 'onValidateImportWorkfile'
             }
         }
     },
@@ -88,12 +91,10 @@ Ext.define('Editor.plugins.Okapi.controller.BconfPrefs', {
         ref: 'preferencesOverviewPanel',
         selector: '#preferencesOverviewPanel'
     }],
-    /** @property {Editor.plugins.Okapi.view.BconfGrid} bconfPanel reference to our main view */
-    bconfPanel: null,
     // adds the Font-Prefs-Panel to the Overview Panel if the right is present
     addBconfToSettingsPanel: function(panel){
         if(Editor.app.authenticatedUser.isAllowed('pluginOkapiBconfPrefs')){
-            this.bconfPanel = panel.insert(2, {
+            panel.insert(2, {
                 xtype: 'okapiBconfGrid',
                 routePrefix: 'preferences/',
                 store: {
@@ -108,7 +109,9 @@ Ext.define('Editor.plugins.Okapi.controller.BconfPrefs', {
         }
     },
     addBconfToCustomerPanel: function(tabPanel){
-        if(Editor.app.authenticatedUser.isAllowed('pluginOkapiBconfPrefs')){
+        if(Editor.app.authenticatedUser.isAllowed('pluginOkapiBconfPrefs')
+            || Editor.app.authenticatedUser.isAllowed('pluginOkapiBconfCustomerPrefs')
+        ){
             // create filtered store from bconfStore & apply it to the grid's view-model
             var vm = tabPanel.up('[viewModel]').getViewModel();
             var vmStores = vm.storeInfo || {};
@@ -146,7 +149,10 @@ Ext.define('Editor.plugins.Okapi.controller.BconfPrefs', {
         }
     },
     addBconfComboToTaskMainCard: function(taskMainCard){
-        taskMainCard.down('#taskMainCardContainer').add({
+        var leftSide = taskMainCard.down('#taskMainCardContainer'),
+            insertAt = leftSide.query().length - leftSide.query('[isCustom]').length;
+
+        leftSide.insert(insertAt, {
             xtype: 'combobox',
             queryMode: 'local',
             forceSelection: true,
@@ -163,7 +169,35 @@ Ext.define('Editor.plugins.Okapi.controller.BconfPrefs', {
                 '</tpl></ul>'
             )
         });
+    },
+
+    /**
+     * Validates an added Import file from the Import Wizard
+     * If a bconf is selected, we request a special endpoint that checks, if the given extension is in the mapping
+     * This is a validation that reports only a positive result (as Okapi is not the only file-parser)
+     * @param {Editor.model.admin.projectWizard.File} record
+     * @param {Editor.view.admin.projectWizard.UploadGridViewController} viewController
+     */
+    onValidateImportWorkfile: function(record, viewController){
+        var bconfCombo = Ext.getCmp('taskImportBconfId'),
+            bconfVal = bconfCombo.getValue(),
+            bconfRecord = bconfVal ? bconfCombo.findRecordByValue(bconfVal) : null,
+            bconfId = bconfRecord ? bconfRecord.getId() : null;
+        if(bconfId){
+            Ext.Ajax.request({
+                url: Editor.data.restpath + 'plugins_okapi_bconf/filetypesupport',
+                async: false, // crucial: otherwise the result will not matter ...
+                params: {
+                    id: bconfId,
+                    extension: record.getExtension()
+                },
+                success: function(response){
+                    var responseData = Ext.JSON.decode(response.responseText);
+                    if(responseData.success && responseData.extension){
+                        record.importable = true;
+                    }
+                }
+            });
+        }
     }
-
-
 });

@@ -21,7 +21,7 @@ START LICENSE AND COPYRIGHT
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
@@ -31,12 +31,8 @@ namespace MittagQI\Translate5\Task;
 use editor_Models_Task;
 use Zend_Registry;
 
-/**
- *
- */
 class Lock
 {
-
     /***
      * Locking task for given stateId.
      * @param editor_Models_Task $task
@@ -46,11 +42,12 @@ class Lock
     {
         $log = Zend_Registry::get('logger')->cloneMe('editor.task');
 
-        if (!$task->lock(NOW_ISO, $lockId)) {
+        if (! $task->lock(NOW_ISO, $lockId)) {
             $log->debug('E0000', 'Task lock: task lock failed', [
                 'task' => $task,
-                'lockId' => $lockId
+                'lockId' => $lockId,
             ]);
+
             return false;
         }
 
@@ -58,8 +55,9 @@ class Lock
         $task->save();
         $log->debug('E0000', 'Task lock: task lock success', [
             'task' => $task,
-            'lockId' => $lockId
+            'lockId' => $lockId,
         ]);
+
         return true;
     }
 
@@ -72,19 +70,20 @@ class Lock
     {
         $log = Zend_Registry::get('logger')->cloneMe('editor.task');
 
-        if (!$task->unlock()) {
+        if (! $task->unlock()) {
             $log->debug('E0000', 'Task unlock: task unlock failed', [
                 'task' => $task,
-                'lockId' => $task->getState()
+                'lockId' => $task->getState(),
             ]);
+
             return false;
         }
         $task->setState(editor_Models_Task::STATE_OPEN);
         $task->save();
         $log->debug('E0000', 'Task unlock: task unlock success', [
-            'task' => $task
+            'task' => $task,
         ]);
+
         return true;
     }
-
 }

@@ -1,5 +1,5 @@
 {
-    "text": "{cf3fd4f7-3287-4f70-971a-f2465a4039b1}",
+    "text": "{e9ff0529-b4d4-4039-afe3-799f8c0f8213}",
     "children": [
         {
             "qid": -1,
@@ -8,7 +8,7 @@
             "qcomplete": true,
             "children": [
                 {
-                    "qid": "603",
+                    "qid": "15",
                     "qtype": "consistent",
                     "qcount": 3,
                     "qcomplete": true,
@@ -17,11 +17,14 @@
                     "qcountfp": 0,
                     "text": "Inconsistent source",
                     "qtooltip": "Finds segments with the same target, but different source (tags ignored)",
+                    "mustBeZeroErrors": false,
                     "leaf": true
                 }
             ],
             "qcategory": null,
             "qtooltip": "",
+            "qtooltipCriticalSuffix": "All errors of the following category should be solved OR set to “false positive”",
+            "mustBeZeroErrors": false,
             "qcountfp": 0,
             "text": "Consistency",
             "qtotal": 3,
@@ -34,6 +37,8 @@
             "qcomplete": true,
             "qcategory": null,
             "qtooltip": "Target only contains tags, spaces or punctuation, but source does not.",
+            "qtooltipCriticalSuffix": "All errors of the following category should be solved OR set to “false positive”",
+            "mustBeZeroErrors": false,
             "qcountfp": 0,
             "text": "Empty segments",
             "qtotal": 0,
@@ -46,7 +51,7 @@
             "qcomplete": true,
             "children": [
                 {
-                    "qid": "601",
+                    "qid": "13",
                     "qtype": "internal",
                     "qcount": 1,
                     "qcomplete": true,
@@ -55,11 +60,13 @@
                     "qcountfp": 0,
                     "text": "Internal tags have an incorrect structure",
                     "qtooltip": "",
+                    "mustBeZeroErrors": true,
+                    "qtooltipCriticalSuffix": "All errors of the following category should be solved OR set to “false positive”",
                     "leaf": true,
                     "qfaulty": true
                 },
                 {
-                    "qid": "602",
+                    "qid": "14",
                     "qtype": "internal",
                     "qcount": 1,
                     "qcomplete": true,
@@ -68,11 +75,14 @@
                     "qcountfp": 0,
                     "text": "Internal tags missing",
                     "qtooltip": "",
+                    "mustBeZeroErrors": false,
                     "leaf": true
                 }
             ],
             "qcategory": null,
             "qtooltip": "",
+            "qtooltipCriticalSuffix": "All errors of the following category should be solved OR set to “false positive”",
+            "mustBeZeroErrors": true,
             "qcountfp": 0,
             "text": "Internal tags",
             "qtotal": 2,
@@ -85,6 +95,8 @@
             "qcomplete": true,
             "qcategory": null,
             "qtooltip": "",
+            "qtooltipCriticalSuffix": "All errors of the following category should be solved OR set to “false positive”",
+            "mustBeZeroErrors": false,
             "qcountfp": 0,
             "text": "Length check",
             "qtotal": 0,
@@ -97,6 +109,8 @@
             "qcomplete": true,
             "qcategory": null,
             "qtooltip": "",
+            "qtooltipCriticalSuffix": "All errors of the following category should be solved OR set to “false positive”",
+            "mustBeZeroErrors": false,
             "qcountfp": 0,
             "text": "Manual QA (complete segment)",
             "qtotal": 0,
@@ -109,6 +123,8 @@
             "qcomplete": true,
             "qcategory": null,
             "qtooltip": "",
+            "qtooltipCriticalSuffix": "All errors of the following category should be solved OR set to “false positive”",
+            "mustBeZeroErrors": false,
             "qcountfp": 0,
             "text": "Manual QA (inside segment)",
             "qtotal": 0,
@@ -121,7 +137,7 @@
             "qcomplete": true,
             "children": [
                 {
-                    "qid": "600",
+                    "qid": "12",
                     "qtype": "numbers",
                     "qcount": 1,
                     "qcomplete": true,
@@ -130,11 +146,14 @@
                     "qcountfp": 0,
                     "text": "Numbers source ≠ target",
                     "qtooltip": "",
+                    "mustBeZeroErrors": false,
                     "leaf": true
                 }
             ],
             "qcategory": null,
             "qtooltip": "",
+            "qtooltipCriticalSuffix": "All errors of the following category should be solved OR set to “false positive”",
+            "mustBeZeroErrors": false,
             "qcountfp": 0,
             "text": "Numbers",
             "qtotal": 1,
@@ -147,7 +166,7 @@
             "qcomplete": true,
             "children": [
                 {
-                    "qid": "593",
+                    "qid": "5",
                     "qtype": "term",
                     "qcount": 2,
                     "qcomplete": true,
@@ -156,10 +175,11 @@
                     "qcountfp": 0,
                     "text": "Forbidden in target",
                     "qtooltip": "",
+                    "mustBeZeroErrors": false,
                     "leaf": true
                 },
                 {
-                    "qid": "589",
+                    "qid": "1",
                     "qtype": "term",
                     "qcount": 7,
                     "qcomplete": true,
@@ -168,23 +188,27 @@
                     "qcountfp": 0,
                     "text": "Not defined in target terminology",
                     "qtooltip": "",
+                    "mustBeZeroErrors": false,
                     "leaf": true
                 },
                 {
-                    "qid": "595",
+                    "qid": "7",
                     "qtype": "term",
                     "qcount": 1,
                     "qcomplete": true,
-                    "qcategory": "not_found_in_target",
+                    "qcategory": "not_found_in_target_preferred",
                     "qcatidx": "-1",
                     "qcountfp": 0,
-                    "text": "Not found in target",
+                    "text": "Preferred",
                     "qtooltip": "",
+                    "mustBeZeroErrors": false,
                     "leaf": true
                 }
             ],
             "qcategory": null,
             "qtooltip": "",
+            "qtooltipCriticalSuffix": "All errors of the following category should be solved OR set to “false positive”",
+            "mustBeZeroErrors": false,
             "qcountfp": 0,
             "text": "Terminology",
             "qtotal": 10,
@@ -197,6 +221,8 @@
             "qcomplete": true,
             "qcategory": null,
             "qtooltip": "",
+            "qtooltipCriticalSuffix": "All errors of the following category should be solved OR set to “false positive”",
+            "mustBeZeroErrors": false,
             "qcountfp": 0,
             "text": "Usage of TM-matches",
             "qtotal": 0,
@@ -209,6 +235,8 @@
             "qcomplete": true,
             "qcategory": null,
             "qtooltip": "",
+            "qtooltipCriticalSuffix": "All errors of the following category should be solved OR set to “false positive”",
+            "mustBeZeroErrors": false,
             "qcountfp": 0,
             "text": "White space at the beginning/end",
             "qtotal": 0,

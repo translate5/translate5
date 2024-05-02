@@ -80,23 +80,22 @@ abstract class AbstractRequest
     /**
      * Configured via inheritance
      */
-    const ENDPOINT = 'MUST BE DEFINED IN INHERITING CLASSES';
+    public const ENDPOINT = 'MUST BE DEFINED IN INHERITING CLASSES';
 
     /**
      * Configured via inheritance
      * If an entity-ID is configured, this can add additional pathes like /ENDPOINT/entityId/ENTITY_ENDPOINT
      */
-    const ENTITY_ENDPOINT = '';
+    public const ENTITY_ENDPOINT = '';
 
     /**
      * Configured via inheritance
      */
-    const METHOD = Zend_Http_Client::GET;
+    public const METHOD = Zend_Http_Client::GET;
 
     /**
      * Configured via inheritance
      * May holds additional configs for the request
-     * @var array
      */
     protected array $config = [];
 
@@ -104,14 +103,12 @@ abstract class AbstractRequest
      * Configured via inheritance
      * This Exception will be thrown in case of connection errors
      * It MUST inherit from ZfExtended_ErrorCodeException
-     * @var string
      */
     protected string $exceptionClass = editor_Services_Connector_Exception::class;
 
     /**
      * Configured via inheritance
      * If set, an exception will be thrown if the entityId is missing
-     * @var bool
      */
     protected bool $entityIdRequired = false;
 
@@ -120,14 +117,12 @@ abstract class AbstractRequest
      * If set, an Exception will be thrown if the result format does not match
      * The possible values are any|string|object|array
      * TODO FIXME: as soon as we use PHP 8.1 turn this into an Enum
-     * @var string
      */
     protected string $expectedDataFormat = 'any';
 
     /**
      * Optionally configured via inheritance
      * If set, an exception will be thrown if the result is empty
-     * @var bool
      */
     protected bool $allowEmptyResult = true;
 
@@ -136,8 +131,6 @@ abstract class AbstractRequest
      * Holds the params to be sent / being sent
      * Th predefine params, they can be given in this prop,
      * to ensure, params MUST be set when using the request, they can be added with a value of null. null as a param-value will lead to an exception (whereas the empty string or int 0 is allowed)
-     *
-     * @var array
      */
     protected array $params = [];
 
@@ -149,31 +142,24 @@ abstract class AbstractRequest
 
     /**
      * A suffix (typically an entity ID) that will be appended to the Endpoint
-     * @var string
      */
     protected string $entityId = '';
 
     /**
      * Holds the extra-data sent when an exception occurs
-     * @var array
      */
     protected array $extraData;
 
     /**
      * Holds a custom service name
-     * @var string
      */
     protected string $serviceName;
 
     /**
      * Holds the fetched result
-     * @var JsonResponse
      */
     protected JsonResponse $response;
 
-    /**
-     * @var bool
-     */
     protected bool $doDebug = false;
 
     /**
@@ -185,13 +171,14 @@ abstract class AbstractRequest
      * @param AbstractConnector $connector : The connector to fetch the request
      * @param bool $isInstantTranslate : May leads to different params when fetching the data or different exception handling
      */
-    public function __construct(protected AbstractConnector $connector, protected bool $isInstantTranslate = false)
-    {
+    public function __construct(
+        protected AbstractConnector $connector,
+        protected bool $isInstantTranslate = false
+    ) {
         $this->doDebug = ZfExtended_Debug::hasLevel('core', 'ServiceRequest');
     }
 
     /**
-     * @param mixed $entityId
      * @return $this
      * @throws ZfExtended_Exception
      */
@@ -201,24 +188,24 @@ abstract class AbstractRequest
         if (strlen($this->entityId) < 1) {
             throw new ZfExtended_Exception('Service-Request entityId cannot be empty if set');
         }
+
         return $this;
     }
 
     /**
      * Sets the data to be sent with the request. This will be sent as raw json encoded string
      * The data is expected to be unencoded
-     * @param mixed $data
      * @return $this
      */
     public function setData(mixed $data): AbstractRequest
     {
         $this->data = $data;
+
         return $this;
     }
 
     /**
      * Adds/Sets multiple params as assoc array
-     * @param array $params
      * @return $this
      * @throws ZfExtended_Exception
      */
@@ -227,13 +214,12 @@ abstract class AbstractRequest
         foreach ($params as $name => $value) {
             $this->addParam($name, $value);
         }
+
         return $this;
     }
 
     /**
      * Adds/Sets a single param
-     * @param string $name
-     * @param mixed $value
      * @return $this
      * @throws ZfExtended_Exception
      */
@@ -243,14 +229,13 @@ abstract class AbstractRequest
             throw new ZfExtended_Exception('Service-Request Parameters must not be null');
         }
         $this->params[$name] = $value;
+
         return $this;
     }
 
     /**
      * Fetches the request. After this call, a Response will be available, otherwise a non-processed exception is thrown
      * Can be called explicitly to provide a customized service-name and/or extra-data for potential exceptions
-     * @param string|null $serviceName
-     * @param array $extraData
      * @return $this
      * @throws Throwable
      * @throws ZfExtended_Exception
@@ -274,12 +259,14 @@ abstract class AbstractRequest
         // create client, request data, catch any exception & process it.
         // We also transform some legacy exceptions to proper connector exceptions
         $exception = null;
+        $debug = '';
+
         try {
             // crate client
             $client = $this->createClient();
             // add params
             $params = $this->createParams();
-            if (!empty($params)) {
+            if (! empty($params)) {
                 if (static::METHOD === Zend_Http_Client::POST) {
                     $client->setParameterPost($params);
                 } else {
@@ -290,76 +277,68 @@ abstract class AbstractRequest
                 $debug =
                     "\n----------\n"
                     . 'ServiceRequest by ' . get_class($this) . '::fetch to: ' . $client->getUri(true) . "\n    method: " . static::METHOD;
-                if (!empty($params)) {
+                if (! empty($params)) {
                     $debug .= "\n    params: ";
                     foreach ($params as $param => $value) {
                         $debug .= "\n        $param: " . (is_array($value) ? implode(', ', $value) : $value);
                     }
                 }
-                if (!empty($this->data)) {
+                if (! empty($this->data)) {
                     $debug .= "\n    data: " . json_encode($this->data, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
                 }
-                error_log($debug);
             }
             // request JSON
             $this->response = $client->requestJson(static::METHOD, $this->data);
-
         } catch (ZfExtended_Zendoverwrites_Http_Exception_Down $e) {
-
             // E1311 Could not connect to {service}: server not reachable
             $exception = $this->castException($e, 'E1311');
-
         } catch (ZfExtended_Zendoverwrites_Http_Exception_TimeOut $e) {
-
             //'E1312' => 'Could not connect to {service}: timeuse ZfExtended_Zendoverwrites_Http_Exception;out on connection to server',
             $exception = $this->castException($e, 'E1312');
-
         } catch (ZfExtended_Zendoverwrites_Http_Exception_NoResponse $e) {
             //'E1370' => 'Empty response from {service}'
             $exception = $this->castException($e, 'E1370');
-
         } catch (ZfExtended_Zendoverwrites_Http_Exception_InvalidResponse $e) {
-
             // E1537: Request to service {service}: Invalid response.
             $exception = $this->castException($e, 'E1537');
-
         } catch (ZfExtended_ErrorCodeException $e) {
             // any other Error-coded exception will be converted to "our" class
             $exception = $this->castException($e, $e->getErrorCode());
-
         } catch (Throwable $e) {
             // any unknow Exceptions will become a E1313 with the original message as error
             // only when no response was created this is likely a coding-error and we want to see the original exception
             $exception = isset($this->response) ? $this->castException($e, 'E1313', $e->getMessage()) : $e;
         }
         // No response: unrecoverable service error that can not be intercepted
-        if (!isset($this->response)) {
+        if (! isset($this->response)) {
             if ($this->doDebug) {
+                error_log($debug);
                 error_log("\n    FAILED WITHOUT RESPONSE: " . $this->traceException($exception));
                 error_log("\n==========\n");
             }
+
             throw $exception;
         }
         // response had error
-        if (!$exception && $this->response->hasError()) {
+        if (! $exception && $this->response->hasError()) {
             $exception = $this->createException('E1313');
         }
         // empty result
-        if (!$exception && !$this->allowEmptyResult && $this->response->isEmpty()) {
+        if (! $exception && ! $this->allowEmptyResult && $this->response->isEmpty()) {
             $exception = $this->createException('E1370');
         }
         // check response data type
-        if (!$exception && $this->expectedDataFormat !== 'any') {
-            if ($this->expectedDataFormat === 'object' && !$this->response->hasDataObject()) {
+        if (! $exception && $this->expectedDataFormat !== 'any') {
+            if ($this->expectedDataFormat === 'object' && ! $this->response->hasDataObject()) {
                 $exception = $this->createException('E1537', 'Response was no object');
-            } else if ($this->expectedDataFormat === 'array' && !$this->response->hasDataArray()) {
+            } elseif ($this->expectedDataFormat === 'array' && ! $this->response->hasDataArray()) {
                 $exception = $this->createException('E1537', 'Response was no array');
-            } else if ($this->expectedDataFormat === 'string' && !is_string($this->response->getData())) {
+            } elseif ($this->expectedDataFormat === 'string' && ! is_string($this->response->getData())) {
                 $exception = $this->createException('E1537', 'Response was no string');
             }
         }
         // additional validations of the result
-        if (!$exception) {
+        if (! $exception) {
             $exception = $this->validateResult();
         }
         // processing in extending classes. this may "absorbs" the exception maybe just created
@@ -367,13 +346,14 @@ abstract class AbstractRequest
             $exception = $this->interceptException($exception);
         }
         if ($this->doDebug) {
+            error_log($debug);
             if ($exception != null) {
                 error_log("\n    FAILED: " . $this->traceException($exception));
             }
-            if (!$this->response->hasData()) {
+            if (! $this->response->hasData()) {
                 error_log("\n    EMPTY RESPONSE!");
-            } else if ($this->response->hasDataObject() || $this->response->hasDataArray()) {
-                error_log("\n    RESPONSE:\n" . json_encode($this->response->getData(), JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_UNICODE));
+            } elseif ($this->response->hasDataObject() || $this->response->hasDataArray()) {
+                error_log("\n    RESPONSE:\n" . json_encode($this->response->getData(), JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
             } else {
                 $data = $this->response->getData();
                 error_log("\n    RESPONSE: " . (is_string($data) ? '"' . $data . '"' : strval($data)));
@@ -384,36 +364,36 @@ abstract class AbstractRequest
         if ($exception != null) {
             throw $exception;
         }
+
         return $this;
     }
 
     /**
      * Retrieves if a fetch was successful
      * Note, that this not neccessarily returned any data
-     * @return bool
      * @throws Throwable
      * @throws ZfExtended_Exception
      */
     final public function wasSuccessful(): bool
     {
         $this->_fetch();
-        return !$this->response->hasError();
+
+        return ! $this->response->hasError();
     }
 
     /**
      * Checks wether the response contained data
-     * @return bool
      * @throws Throwable
      * @throws ZfExtended_Exception
      */
     final public function hasResult(): bool
     {
         $this->_fetch();
+
         return $this->response->hasData();
     }
 
     /**
-     * @return mixed
      * @throws Throwable
      * @throws ZfExtended_Exception
      */
@@ -423,50 +403,50 @@ abstract class AbstractRequest
         if ($this->response->hasData()) {
             return $this->processResult($this->response->getData());
         }
+
         return null;
     }
 
     /**
-     * @return JsonResponse
      * @throws Throwable
      * @throws ZfExtended_Exception
      */
     final public function getResponse(): JsonResponse
     {
         $this->_fetch();
+
         return $this->response;
     }
 
     /**
      * Creates a client from our connector
-     * @return JsonClient
      * @throws Zend_Http_Client_Exception
      * @throws ZfExtended_Exception
      */
     protected function createClient(): JsonClient
     {
         $client = $this->connector->createClient($this->createEndpoint());
-        if (!empty($this->config)) {
+        if (! empty($this->config)) {
             $client->setConfig($this->config);
         }
+
         return $client;
     }
 
     /**
      * Creates the endpoint to instantiate the client with
-     * @return string
      */
     protected function createEndpoint(): string
     {
         if ($this->entityId !== '') {
             return ZfExtended_Utils::combinePathes('/', static::ENDPOINT, $this->entityId, static::ENTITY_ENDPOINT);
         }
+
         return (strlen(static::ENDPOINT) === 0) ? '' : ZfExtended_Utils::combinePathes('/', static::ENDPOINT);
     }
 
     /**
      * Creates the parameters, validates them against the existing that may need to be set
-     * @return array
      * @throws ZfExtended_Exception
      */
     protected function createParams(): array
@@ -475,16 +455,17 @@ abstract class AbstractRequest
         foreach ($this->params as $name => $value) {
             if ($value === null) {
                 // not set required params lead to an exception
-                throw $this->createException('E1536', null, ['paramname' => $name]);
+                throw $this->createException('E1536', null, [
+                    'paramname' => $name,
+                ]);
             }
         }
+
         return $this->params;
     }
 
     /**
      * Can be used to implement result transformations
-     * @param mixed $result
-     * @return mixed
      */
     protected function processResult(mixed $result): mixed
     {
@@ -495,7 +476,6 @@ abstract class AbstractRequest
      * can be used to additionally validate the result for further errors e.g. that are hidden in the JSON response
      * If an Exception should be thrown, it must be returned
      * For Inheritance low -> heigh, call the parent function first !
-     * @return ZfExtended_ErrorCodeException|null
      */
     protected function validateResult(): ?ZfExtended_ErrorCodeException
     {
@@ -506,8 +486,6 @@ abstract class AbstractRequest
      * Can be used to intercept any thrown exception if a response was received
      * The passed exception will be of the type defined in $this->exceptionClass !! This simply cannot be annotated nor typed ... so it is "at least" a ZfExtended_ErrorCodeException
      * If no exception shall be thrown (the exception should be intercepted), null has to be returned
-     * @param ZfExtended_ErrorCodeException $exception
-     * @return ZfExtended_ErrorCodeException|null
      */
     protected function interceptException(ZfExtended_ErrorCodeException $exception): ?ZfExtended_ErrorCodeException
     {
@@ -516,28 +494,29 @@ abstract class AbstractRequest
 
     /**
      * Helper to create an exception of our desired class
-     * @param string $ecode
-     * @param string|null $errorMessage
-     * @param array $extraData
-     * @return ZfExtended_ErrorCodeException
      */
-    final protected function createException(string $ecode, string $errorMessage = null, array $extraData = []): ZfExtended_ErrorCodeException
-    {
-        return new $this->exceptionClass($ecode, $this->createExtraData($errorMessage, $extraData));
+    final public function createException(
+        string $ecode,
+        string $errorMessage = null,
+        array $extraData = []
+    ): ZfExtended_ErrorCodeException {
+        $extraData = $this->createExtraData($errorMessage, $extraData);
+        $exception = new $this->exceptionClass($ecode, $extraData);
+        $exception->addExtraData($extraData);
+
+        return $exception;
     }
 
     /**
      * Helper to cast an exception to a different type / ecode
      * This will change Code & Message & add data for all Error-Coded Exceptions,
      * otherwise it creates a new ZfExtended_ErrorCodeException with the passed Throwable added as $previous
-     * @param Throwable $exception
-     * @param string $newErrorCode
-     * @param string|null $errorMessage
-     * @param array $extraData
-     * @return ZfExtended_ErrorCodeException
      */
-    final protected function castException(Throwable $exception, string $newEcode, string $errorMessage = null): ZfExtended_ErrorCodeException
-    {
+    final protected function castException(
+        Throwable $exception,
+        string $newEcode,
+        string $errorMessage = null
+    ): ZfExtended_ErrorCodeException {
         // do not cast for no reason
         if (get_class($exception) === $this->exceptionClass && $exception->getErrorCode() === $newEcode) {
             return $exception;
@@ -545,20 +524,26 @@ abstract class AbstractRequest
         // a "real" cast only if the thrown exception already is error-coded
         if (is_a($exception, ZfExtended_ErrorCodeException::class)) {
             /* @var ZfExtended_ErrorCodeException $exception */
-            // we merge the "current" extra-data over the "old" to have the chance to override stuff. Therefore we cannot use ->createException
+            // we merge the "current" extra-data over the "old" to have the chance to override stuff.
+            // Therefore, we cannot use ->createException
             $extraData = array_merge($exception->getErrors(), $this->createExtraData($errorMessage));
-            return new $this->exceptionClass($newEcode, $extraData);
+            $casted = new $this->exceptionClass($newEcode, $extraData);
+            $casted->addExtraData($extraData);
+
+            return $casted;
         }
         // make sure $previous always represents the first ...
         $previous = ($exception->getPrevious() === null) ? $exception : $exception->getPrevious();
-        return new $this->exceptionClass($newEcode, $this->createExtraData($errorMessage), $previous);
+
+        $extraData = $this->createExtraData($errorMessage);
+        $casted = new $this->exceptionClass($newEcode, $extraData, $previous);
+        $casted->addExtraData($extraData);
+
+        return $casted;
     }
 
     /**
      * Creates the extra-data to be included in any exception
-     * @param string|null $message
-     * @param array $extraData
-     * @return array
      */
     protected function createExtraData(string $message = null, array $extraData = []): array
     {
@@ -570,71 +555,70 @@ abstract class AbstractRequest
         if (isset($this->response)) {
             $extraData['error'] = $this->createResponseError($this->response);
         }
+
         return $extraData;
     }
 
     /**
      * Creates the error-object from the response
-     * @param JsonResponse $response
-     * @return stdClass
      */
     protected function createResponseError(JsonResponse $response): stdClass
     {
         if ($response->hasError()) {
             return $response->getError();
         }
+
         return $response->createError();
     }
 
     /**
      * Retrieves the service-name to be included in any Exception
-     * @return string
      */
     protected function getServiceName(): string
     {
         if (isset($this->serviceName)) {
             return $this->serviceName;
         }
+
         return $this->connector->getService()->getName();
     }
 
     /**
      * Used to fetch the request if not yet fetched explicitly
-     * @return void
      * @throws Throwable
      * @throws ZfExtended_Exception
      */
     private function _fetch(): void
     {
-        if (!$this->fetched) {
+        if (! $this->fetched) {
             $this->fetch();
         }
     }
 
     /**
      * Traces the passed exception for debug-output
-     * @param Throwable $exception
-     * @return string
      */
     private function traceException(Throwable $exception): string
     {
         if (is_a($exception, ZfExtended_ErrorCodeException::class)) {
             $trace = $exception->getErrorCode() . ' | ' . $exception->getMessage();
             $errors = $exception->getErrors();
-            if (!empty($errors)) {
+            if (! empty($errors)) {
                 foreach ($errors as $error => $value) {
                     $trace .= "\n        $error: ";
-                    if (!is_object($value)) {
+                    if (! is_object($value)) {
                         $trace .= strval($value);
-                    } else if ($value instanceof stdClass) {
+                    } elseif ($value instanceof stdClass) {
                         $trace .= json_encode($value, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
                     } else {
                         $trace .= '(Object) ' . get_class($value);
                     }
                 }
             }
+
             return $trace;
         }
+
         return $exception->getMessage();
     }
 }

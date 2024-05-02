@@ -61,15 +61,26 @@ use ZfExtended_Factory;
 class ImportEventTrigger
 {
     /* Our triggered Events, in the order they'll be triggered */
-    const IMPORT_WORKER_QUEUED = 'importWorkerQueued';
-    const BEFORE_IMPORT = 'beforeImport';
-    const BEFORE_PROCESS_UPLOADED_FILE = 'beforeProcessUploadedFile';
-    const AFTER_UPLOAD_PREPARATION = 'afterUploadPreparation';
-    const AFTER_PROJECT_UPLOAD_PREPARATION = 'afterProjectUploadPreparation';
-    const IMPORT_WORKER_STARTED = 'importWorkerStarted';
+    public const IMPORT_WORKER_QUEUED = 'importWorkerQueued';
+
+    public const BEFORE_IMPORT = 'beforeImport';
+
+    public const AFTER_UPLOAD_PREPARATION = 'afterUploadPreparation';
+
+    public const AFTER_PROJECT_UPLOAD_PREPARATION = 'afterProjectUploadPreparation';
+
+    public const IMPORT_WORKER_STARTED = 'importWorkerStarted';
+
     public const AFTER_IMPORT = 'afterImport';
+
     public const AFTER_IMPORT_ERROR = 'afterImportError';
 
+    public const INIT_TASK_META = 'initTaskMeta';
+
+    /**
+     * Cache for preventig tasks-meta events to be called twice for a task per request
+     */
+    private static array $metaTasks = [];
 
     private ZfExtended_EventManager $events;
 
@@ -88,12 +99,11 @@ class ImportEventTrigger
         editor_Models_Task $task,
         int $parentWorkerId,
         editor_Models_Import_Configuration $importConfig
-    ): void
-    {
+    ): void {
         $this->triggerEvent(self::AFTER_IMPORT, [
             'task' => $task,
             'parentWorkerId' => $parentWorkerId,
-            'importConfig' => $importConfig
+            'importConfig' => $importConfig,
         ]);
     }
 
@@ -105,12 +115,11 @@ class ImportEventTrigger
         editor_Models_Task $task,
         int $parentWorkerId,
         editor_Models_Import_Configuration $importConfig
-    ): void
-    {
+    ): void {
         $this->triggerEvent(self::AFTER_IMPORT_ERROR, [
             'task' => $task,
             'parentWorkerId' => $parentWorkerId,
-            'importConfig' => $importConfig
+            'importConfig' => $importConfig,
         ]);
     }
 
@@ -118,14 +127,14 @@ class ImportEventTrigger
     {
         $this->triggerEvent(self::IMPORT_WORKER_QUEUED, [
             'task' => $task,
-            'workerId' => $parentId
+            'workerId' => $parentId,
         ]);
     }
 
     public function triggerImportWorkerStarted(editor_Models_Task $task): void
     {
         $this->triggerEvent(self::IMPORT_WORKER_STARTED, [
-            'task' => $task
+            'task' => $task,
         ]);
     }
 
@@ -133,8 +142,7 @@ class ImportEventTrigger
         editor_Models_Task $task,
         editor_Models_Import_DataProvider_Abstract $dataProvider,
         array $data
-    ): void
-    {
+    ): void {
         $this->triggerEvent(self::AFTER_PROJECT_UPLOAD_PREPARATION, [
             'task' => $task,
             'dataProvider' => $dataProvider,
@@ -142,23 +150,29 @@ class ImportEventTrigger
         ]);
     }
 
-    public function triggerBeforeProcessUploadedFile(editor_Models_Task $task, array $data): void
+    /**
+     * Triggers the evaluation of task-meta params,
+     * which are used throughout the whole import-process and should be evaluated as early as possible
+     */
+    public function triggerTaskMetaEvent(editor_Models_Task $task, array $data): void
     {
-        $this->triggerEvent(self::BEFORE_PROCESS_UPLOADED_FILE, [
-            'task' => $task,
-            'meta' => $task->meta(),
-            'data' => $data,
-        ]);
+        if (! in_array($task->getTaskGuid(), self::$metaTasks)) {
+            self::$metaTasks[] = $task->getTaskGuid();
+            $this->triggerEvent(self::INIT_TASK_META, [
+                'task' => $task,
+                'meta' => $task->meta(),
+                'data' => $data,
+            ]);
+        }
     }
 
     public function triggerBeforeImport(
         editor_Models_Task $task,
         editor_Models_Import_Configuration $importConfig
-    ): void
-    {
+    ): void {
         $this->triggerEvent(self::BEFORE_IMPORT, [
             'task' => $task,
-            'importFolder' => $importConfig->importFolder
+            'importFolder' => $importConfig->importFolder,
         ]);
     }
 
@@ -166,19 +180,18 @@ class ImportEventTrigger
         editor_Models_Task $task,
         editor_Models_Import_DataProvider_Abstract $dataProvider,
         array $data
-    ): void
-    {
+    ): void {
         $this->triggerEvent(self::AFTER_UPLOAD_PREPARATION, [
             'task' => $task,
             'dataProvider' => $dataProvider,
-            'requestData' => $data
+            'requestData' => $data,
         ]);
     }
 
     private function triggerEvent(string $event, array $params): void
     {
-        if($this->doDebug){
-            error_log('IMPORT EVENT: ' .$event . ', task: ' . (array_key_exists('task', $params) ? $params['task']->getTaskGuid() : 'null'));
+        if ($this->doDebug) {
+            error_log('IMPORT EVENT: ' . $event . ', task: ' . (array_key_exists('task', $params) ? $params['task']->getTaskGuid() : 'null'));
         }
         $this->events->trigger($event, self::class, $params);
     }

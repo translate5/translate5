@@ -21,7 +21,7 @@ START LICENSE AND COPYRIGHT
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
@@ -29,68 +29,56 @@ END LICENSE AND COPYRIGHT
  * Collect the terms and the terms attributes from the tbx file and save them to the database
  */
 use editor_Models_Terminology_Models_CollectionAttributeDataType as CollectionAttributeDataType;
+
 class editor_Models_Terminology_Import_TbxFileImport
 {
-    const TBX_TIG = 'tig';
-    const TBX_TERM_ENTRY = 'termEntry';
-    const TBX_LANGSET = 'langSet';
+    public const TBX_TIG = 'tig';
 
-    /** @var $logger ZfExtended_Logger */
+    public const TBX_TERM_ENTRY = 'termEntry';
+
+    public const TBX_LANGSET = 'langSet';
+
     protected ZfExtended_Logger $logger;
 
-    /** @var Zend_Config */
     protected Zend_Config $config;
 
-    /** @var ZfExtended_Models_User */
     protected ZfExtended_Models_User $user;
 
-    /** @var editor_Models_Terminology_Models_AttributeDataType */
     protected editor_Models_Terminology_Models_AttributeDataType $attributeDataTypeModel;
 
-    /** @var editor_Models_Terminology_TbxObjects_DataType  */
-    protected editor_Models_Terminology_TbxObjects_DataType  $dataType;
+    protected editor_Models_Terminology_TbxObjects_DataType $dataType;
+
+    protected editor_Models_Terminology_Import_TbxBinaryDataImport $binaryImport;
 
     /**
-     * Images quantities
+     * Array of [ECODE => info] pairs, where info is an array of [qty => ..., msg => ...] with quantity to be incremented
+     * each time event with a given ECODE occurs. WARNING: for any ECODE, added as a key into this array events having such a
+     * ECODE won't be logged individually, but a single event will be logged only on tbx import completion, with quantity
+     * of occurrences as an extraData, so that extraData for each individual events is NOT preserved
      *
-     * @var array
+     * @var array|array[]
      */
-    protected $imageQty = [
-
-        /**
-         * Newly created images on disk
-         */
-        'created' => 0,
-
-        /**
-         * Recreated as having equal contentMd5Hash but missing on disk
-         */
-        'recreated' => 0,
-
-        /**
-         * Unchanged as having equal contentMd5Hash and existing on disk
-         */
-        'unchanged' => 0,
-
-        /**
-         * Sum of all above
-         */
-        'totalCount' => 0
+    protected array $eventQty = [
+        'E1472' => [
+            'qty' => 0,
+            'msg' => '',
+        ],
+        'E1446' => [
+            'qty' => 0,
+            'msg' => '',
+        ],
     ];
 
     /**
      * $tbxMap = segment names for different TBX standards
      * $this->tbxMap['tig'] = 'tig'; - or if 'ntig' element - $this->tbxMap['tig'] = 'ntig';
      * each possible segment for TBX standard must be defined and will be merged in translate5 standard!
-     * @var array
      */
     protected array $tbxMap;
 
     /**
      * Array to map any known values of transac and transacType to tbx-standard values,
      * for converting non-standard values into standard prior saving into database
-     *
-     * @var array
      */
     protected array $transacMap = [
         'origination' => 'origination',
@@ -115,61 +103,43 @@ class editor_Models_Terminology_Import_TbxFileImport
 
     /**
      * current term collection
-     * @var editor_Models_TermCollection_TermCollection
      */
     protected editor_Models_TermCollection_TermCollection $collection;
 
     /**
      * All available languages in Translate5
      * $languages['de_DE' => 4]
-     * @var array
      */
     protected array $languages;
 
     /**
      * Collected unknown languages
-     * @var array
      */
     protected array $unknownLanguages = [];
 
-    /** @var editor_Models_Terminology_TbxObjects_Langset|mixed  */
+    /**
+     * @var editor_Models_Terminology_TbxObjects_Langset|mixed
+     */
     protected editor_Models_Terminology_TbxObjects_Langset $langsetObject;
 
-    /**
-     * @var editor_Models_Terminology_BulkOperation_Attribute
-     */
     protected editor_Models_Terminology_BulkOperation_Attribute $bulkAttribute;
 
-    /**
-     * @var editor_Models_Terminology_BulkOperation_TransacGrp
-     */
     protected editor_Models_Terminology_BulkOperation_TransacGrp $bulkTransacGrp;
 
-    /**
-     * @var editor_Models_Terminology_BulkOperation_Term
-     */
     protected editor_Models_Terminology_BulkOperation_Term $bulkTerm;
 
-    /**
-     * @var editor_Models_Terminology_BulkOperation_RefObject
-     */
     protected editor_Models_Terminology_BulkOperation_RefObject $bulkRefObject;
 
     /**
      * In this class is the whole merge logic
-     * @var editor_Models_Terminology_BulkOperation_TermEntry
      */
     protected editor_Models_Terminology_BulkOperation_TermEntry $bulkTermEntry;
 
     /**
      * contains the whole term note status mapping
-     * @var editor_Models_Terminology_TermStatus
      */
     protected editor_Models_Terminology_TermStatus $termNoteStatus;
 
-    /**
-     * @var ZfExtended_EventManager
-     */
     protected ZfExtended_EventManager $events;
 
     /**
@@ -184,14 +154,15 @@ class editor_Models_Terminology_Import_TbxFileImport
      * editor_Models_Import_TermListParser_TbxFileImport constructor.
      * @throws Zend_Exception
      */
-    public function __construct() {
-        if(!defined('LIBXML_VERSION') || LIBXML_VERSION < '20620') {
+    public function __construct()
+    {
+        if (! defined('LIBXML_VERSION') || LIBXML_VERSION < '20620') {
             //Mindestversion siehe http://www.php.net/manual/de/xmlreader.readstring.php
             throw new Zend_Exception('LIBXML_VERSION must be at least 2.6.20 (or as integer 20620).');
         }
         $this->config = Zend_Registry::get('config');
         $this->logger = Zend_Registry::get('logger');
-        $this->events = ZfExtended_Factory::get('ZfExtended_EventManager', array(get_class($this)));
+        $this->events = ZfExtended_Factory::get('ZfExtended_EventManager', [get_class($this)]);
 
         $this->attributeDataTypeModel = ZfExtended_Factory::get('editor_Models_Terminology_Models_AttributeDataType');
 
@@ -210,16 +181,15 @@ class editor_Models_Terminology_Import_TbxFileImport
     /**
      * Import given TBX file and prepare Import arrays, if file can not be opened throw Zend_Exception.
      * returns the count of available term entries in the loaded file
-     * @param string $tbxFilePath
-     * @param editor_Models_TermCollection_TermCollection $collection
-     * @param ZfExtended_Models_User $user
-     * @param bool $mergeTerms
      * @throws Zend_Exception
      * @throws Exception
-     * @return int
      */
-    public function importXmlFile(string $tbxFilePath, editor_Models_TermCollection_TermCollection $collection, ZfExtended_Models_User $user, bool $mergeTerms): int
-    {
+    public function importXmlFile(
+        string $tbxFilePath,
+        editor_Models_TermCollection_TermCollection $collection,
+        ZfExtended_Models_User $user,
+        bool $mergeTerms
+    ): int {
         $this->collection = $collection;
         $this->mergeTerms = $mergeTerms;
         $this->tbxFilePath = $tbxFilePath;
@@ -229,23 +199,31 @@ class editor_Models_Terminology_Import_TbxFileImport
         //libxml_use_internal_errors(true)
         libxml_clear_errors();
         $xmlReader = (new class() extends XMLReader {
-            public function reopen(string $tbxFilePath) {
+            public function reopen(string $tbxFilePath)
+            {
                 $this->close();
                 $this->open($tbxFilePath, flags: LIBXML_PARSEHUGE);
             }
         });
 
-        if(!$xmlReader->open($tbxFilePath, flags: LIBXML_PARSEHUGE)) {
+        if (! $xmlReader->open($tbxFilePath, flags: LIBXML_PARSEHUGE)) {
             throw new Zend_Exception('TBX file can not be opened.');
         }
 
         $totalCount = $this->countTermEntries($xmlReader);
 
-        $xmlReader->reopen($tbxFilePath); //reset pointer to beginning
-        $this->processTermEntries($xmlReader, $totalCount);
+        // Setup binaryImport instance
+        $this->binaryImport = ZfExtended_Factory
+            ::get(editor_Models_Terminology_Import_TbxBinaryDataImport::class, [
+                $this->tbxFilePath,
+                $this->collection,
+            ]);
 
         $xmlReader->reopen($tbxFilePath); //reset pointer to beginning
         $this->processRefObjects($xmlReader);
+
+        $xmlReader->reopen($tbxFilePath); //reset pointer to beginning
+        $this->processTermEntries($xmlReader, $totalCount);
 
         $this->logUnknownLanguages();
 
@@ -265,91 +243,129 @@ class editor_Models_Terminology_Import_TbxFileImport
         // update the collection import statistics with the new counted totals
         $this->setCollectionImportStatistic();
 
+        $unknownStates = $this->termNoteStatus->getUnknownStates();
+        if (! empty($unknownStates)) {
+            $this->log('TBX Import: The TBX contains terms with unknown administrative / normative states. See details for a list of states.', 'E1360', [
+                'unknown' => $unknownStates,
+            ], 'warn');
+        }
+
+        // If some image definitions are missing
+        if ($definitions = $this->binaryImport->missingImages['definitions']) {
+            // Prepare msg
+            $msg = "TBX Import: Image definition is missing in back-matter for the figure-attribute's target";
+
+            // Do log
+            $this->log($msg, 'E1540', [
+                'forWhichTargets' => array_keys($definitions),
+            ], 'warn');
+        }
+
+        // If some image files are missing
+        if ($files = $this->binaryImport->missingImages['files']) {
+            // Prepare log msg
+            $msg = "TBX Import: Image file is missing in extracted zip-archive under the path given by xGraphic's target or figure's back-matter";
+
+            // Do log
+            $this->log($msg, 'E1544', [
+                'forWhichPaths' => array_keys($files),
+            ], 'warn');
+        }
+
+        // Foreach counted events
+        foreach ($this->eventQty as $ecode => $info) {
+            // If no occurences
+            if ($info['qty'] === 0) {
+                continue;
+            }
+
+            // Make sure below $this->log() call with do log instead of increment count
+            unset($this->eventQty[$ecode]);
+
+            // Do log
+            $this->log($info['msg'], $ecode, [
+                'occurrencesQty' => $info['qty'],
+            ], 'warn');
+        }
+
         $data = [
             'termEntries' => $this->bulkTermEntry->getStatistics(),
             'terms' => $this->bulkTerm->getStatistics(),
             'attributes' => $this->bulkAttribute->getStatistics(),
             'transacGroups' => $this->bulkTransacGrp->getStatistics(),
-            'images' => $this->imageQty,
+            'images' => $this->binaryImport->imageQty + [
+                'totalCount' => array_sum($this->binaryImport->imageQty),
+            ],
             'refObjects' => $this->bulkRefObject->getStatistics(),
             'collection' => $this->collection->getName(),
-            'maxMemUsed in MB' => round(memory_get_peak_usage() / 2**20),
+            'maxMemUsed in MB' => round(memory_get_peak_usage() / 2 ** 20),
         ];
         $this->log('Imported TBX data into collection {collection}', 'E1028', $data);
 
-        $unknownStates = $this->termNoteStatus->getUnknownStates();
-        if(!empty($unknownStates)) {
-            $this->log('TBX Import: The TBX contains terms with unknown administrative / normative states. See details for a list of states.', 'E1360', ['unknown' => $unknownStates], 'warn');
-        }
         return $totalCount;
     }
 
     /**
      * Prepare init array variables for merge procedure and check isset function.
-     * @param ZfExtended_Models_User $user
      * @throws Zend_Db_Statement_Exception
      */
     private function prepareImportArrays(ZfExtended_Models_User $user)
     {
-$memLog = function($msg) {
-    //error_log($msg.round(memory_get_usage()/2**20).' MB');
-};
+        $memLog = function ($msg) {
+            //error_log($msg.round(memory_get_usage()/2**20).' MB');
+        };
         $this->user = $user;
         $this->dataType->resetData();
-
 
         //TODO how to distinguish between TBX V2 (termEntry) and V3 (conceptEntry)?
         $this->tbxMap[$this::TBX_TERM_ENTRY] = $this::TBX_TERM_ENTRY; //for V3 set conceptEntry here (implement as subclass???)
         $this->tbxMap[$this::TBX_LANGSET] = 'langSet';
         $this->tbxMap[$this::TBX_TIG] = 'tig';
 
-$memLog('Start Loading Data:  ');
+        $memLog('Start Loading Data:  ');
         $languagesModel = ZfExtended_Factory::get('editor_Models_Languages')->getAvailableLanguages();
         foreach ($languagesModel as $language) {
             $this->languages[strtolower($language['value'])] = $language['id'];
         }
 
         // get custom attribute label text and prepare array to check if custom label text exist.
-$memLog('Loaded languages:    ');
+        $memLog('Loaded languages:    ');
         $this->dataType->loadData();
-$memLog('Loaded datatype:     ');
+        $memLog('Loaded datatype:     ');
 
         $this->bulkTermEntry->loadExisting($this->collection->getId());  //FIXME
-$memLog('Loaded term entries: ');
+        $memLog('Loaded term entries: ');
         $this->bulkTerm->loadExisting($this->collection->getId());
-$memLog('Loaded terms:        ');
+        $memLog('Loaded terms:        ');
     }
 
     /**
      * Counts the term entries in the loaded document
-     * @param XMLReader $xmlReader
-     * @return int
      */
-    private function countTermEntries(XMLReader $xmlReader): int {
+    private function countTermEntries(XMLReader $xmlReader): int
+    {
         // find first termEntry and count them from there
         while ($xmlReader->read() && $xmlReader->name !== $this->tbxMap[$this::TBX_TERM_ENTRY]);
         $totalCount = 0;
-        while ($xmlReader->name === $this->tbxMap[$this::TBX_TERM_ENTRY])
-        {
+        while ($xmlReader->name === $this->tbxMap[$this::TBX_TERM_ENTRY]) {
             $totalCount++;
             $xmlReader->next($this->tbxMap[$this::TBX_TERM_ENTRY]);
 
-            if($error = libxml_get_last_error()) {
+            if ($error = libxml_get_last_error()) {
                 // 'E1393' => 'TBX Import: The XML structure of the TBX file is invalid: {message}',
                 throw new editor_Models_Terminology_Import_Exception('E1393', get_object_vars($error));
             }
-
         }
+
         return $totalCount;
     }
 
     /**
      * processes the term entries found in the XML
-     * @param XMLReader $xmlReader
-     * @param int $totalCount
      * @throws Exception
      */
-    protected function processTermEntries(XMLReader $xmlReader, int $totalCount) {
+    protected function processTermEntries(XMLReader $xmlReader, int $totalCount)
+    {
         $importCount = 0;
         $progress = 0;
 
@@ -361,7 +377,6 @@ $memLog('Loaded terms:        ');
                 $parentEntry = $this->handleTermEntry($termEntryNode);
 
                 foreach ($termEntryNode->{$this->tbxMap[$this::TBX_LANGSET]} as $languageGroup) {
-
                     $parentLangSet = $this->handleLanguageGroup($languageGroup, $parentEntry);
                     if (is_null($parentLangSet)) {
                         continue;
@@ -375,10 +390,12 @@ $memLog('Loaded terms:        ');
 
                 //since we do not want to kill the worker table by updating the progress too often,
                 // we do that only 100 times per import, in other words once per percent
-                $newProgress = min(100, round(($importCount/$totalCount)*100));
-                if($newProgress > $progress) {
+                $newProgress = min(100, round(($importCount / $totalCount) * 100));
+                if ($newProgress > $progress) {
                     $progress = $newProgress;
-                    $this->events->trigger('afterTermEntrySave', $this, ['progress' => $progress / 100]); //we store the value as value between 0 and 1
+                    $this->events->trigger('afterTermEntrySave', $this, [
+                        'progress' => $progress / 100,
+                    ]); //we store the value as value between 0 and 1
                 }
             }
 
@@ -393,21 +410,17 @@ $memLog('Loaded terms:        ');
      * @throws editor_Models_Terminology_Import_Exception
      * @throws Exception
      */
-    protected function processRefObjects(XMLReader $xmlReader) {
+    protected function processRefObjects(XMLReader $xmlReader)
+    {
         $this->bulkRefObject = new editor_Models_Terminology_BulkOperation_RefObject();
         $this->bulkRefObject->loadExisting($this->collection->getId());
         while ($xmlReader->read() && $xmlReader->name !== 'refObjectList');
         while ($xmlReader->name === 'refObjectList') {
             $listType = $xmlReader->getAttribute('type');
             $node = new SimpleXMLElement($xmlReader->readOuterXML(), LIBXML_PARSEHUGE);
-            if($listType == 'binaryData') {
-                /** @var $binImport editor_Models_Terminology_Import_TbxBinaryDataImport */
-                $binImport = ZfExtended_Factory::get('editor_Models_Terminology_Import_TbxBinaryDataImport', [$this->tbxFilePath]);
-                foreach ($binImport->import($this->collection, $node) as $type => $qty) {
-                    $this->imageQty[$type] += $qty;
-                }
-            }
-            else {
+            if ($listType === 'binaryData') {
+                $this->binaryImport->import($node);
+            } else {
                 $this->importOtherRefObjects($node, $listType);
             }
             $xmlReader->next('refObjectList');
@@ -438,8 +451,6 @@ $memLog('Loaded terms:        ');
     /**
      * Iterate over the termEntry structure and call handler for each element.
      * There will be parsed all child elements and returns termEntry as object.
-     * @param SimpleXMLElement $termEntry
-     * @return editor_Models_Terminology_TbxObjects_TermEntry
      * @throws ZfExtended_ErrorCodeException
      */
     private function handleTermEntry(SimpleXMLElement $termEntry): editor_Models_Terminology_TbxObjects_TermEntry
@@ -456,15 +467,16 @@ $memLog('Loaded terms:        ');
             //collect and set the descrip attributes, and check if there is a definition
             $descrips = $this->setAttributeTypes($termEntry->descrip, $newEntry);
             /* @var editor_Models_Terminology_TbxObjects_Attribute $descrip */
-            foreach($descrips as $descrip) {
-                if($descrip->type == 'definition') {
+            foreach ($descrips as $descrip) {
+                if ($descrip->type == 'definition') {
                     $newEntry->definition = $descrip->value;
+
                     break;
                 }
             }
         }
 
-        $this->setDiscriptGrp($termEntry,$newEntry,'termEntry');
+        $this->setDiscriptGrp($termEntry, $newEntry, 'termEntry');
 
         if (isset($termEntry->transacGrp)) {
             foreach ($termEntry->transacGrp as $transacGrp) {
@@ -487,9 +499,6 @@ $memLog('Loaded terms:        ');
     /**
      * Iterate over the langSet structure and call handler for each element.
      * There will be parsed all child elements and returns langSet as object.
-     * @param SimpleXMLElement $languageGroup
-     * @param editor_Models_Terminology_TbxObjects_TermEntry $parentEntry
-     * @return editor_Models_Terminology_TbxObjects_Langset|null
      * @throws ZfExtended_ErrorCodeException
      */
     private function handleLanguageGroup(SimpleXMLElement $languageGroup, editor_Models_Terminology_TbxObjects_TermEntry $parentEntry): ?editor_Models_Terminology_TbxObjects_Langset
@@ -498,12 +507,13 @@ $memLog('Loaded terms:        ');
 
         if (empty($this->languages[$language])) {
             $this->unknownLanguages[$language] = $language;
+
             return null;
         }
 
         $this->tbxMap[$this::TBX_TIG] = $languageGroup->tig ? 'tig' : 'ntig';
         /** @var editor_Models_Terminology_TbxObjects_Langset $newLangSet */
-        $newLangSet = new $this->langsetObject;
+        $newLangSet = new $this->langsetObject();
         $newLangSet->setParent($parentEntry);
         $newLangSet->collectionId = $this->collection->getId();
         // since we do not save language sets to DB we have to load their guids from the terms, where they are saved
@@ -520,12 +530,19 @@ $memLog('Loaded terms:        ');
             foreach ($descrips as $descrip) {
                 if ($descrip->type == 'definition') {
                     $newLangSet->definition = $descrip->value;
+
                     break;
                 }
             }
         }
 
-        $this->setDiscriptGrp($languageGroup,$newLangSet,'langSet');
+        $this->setDiscriptGrp($languageGroup, $newLangSet, 'langSet');
+
+        if (isset($languageGroup->transacGrp)) {
+            foreach ($languageGroup->transacGrp as $transacGrp) {
+                $newLangSet->transacGrp = $this->setTransacAttributes($transacGrp, false, 'langSet', $newLangSet);
+            }
+        }
 
         if (isset($languageGroup->note)) {
             $this->setAttributeTypes($languageGroup->note, $newLangSet);
@@ -538,8 +555,6 @@ $memLog('Loaded terms:        ');
      * Iterate over the term structure and call handler for each element.
      * There will be parsed all child elements and returns term as object.
      * Elements - term, termNote, transacGrp, transacNote, admin
-     * @param SimpleXMLElement $tigElement
-     * @param editor_Models_Terminology_TbxObjects_Langset $parsedLangSet
      * @throws ZfExtended_ErrorCodeException
      */
     private function handleTermGroup(SimpleXMLElement $tigElement, editor_Models_Terminology_TbxObjects_Langset $parsedLangSet)
@@ -551,10 +566,10 @@ $memLog('Loaded terms:        ');
             $tig = $tigElement;
         }
 
-        $term = (string)$tig->term;
+        $term = (string) $tig->term;
 
         //if the term is empty, there is nothing to be processed - although if there are attributes.
-        if(editor_Models_Terminology_Models_TermModel::isEmptyTerm($term)) {
+        if (editor_Models_Terminology_Models_TermModel::isEmptyTerm($term)) {
             return;
         }
 
@@ -570,7 +585,8 @@ $memLog('Loaded terms:        ');
         $newTerm->languageId = $parsedLangSet->languageId;
         $newTerm->termEntryGuid = $newTerm->parentEntry->entryGuid;
         $newTerm->termEntryTbxId = $newTerm->parentEntry->termEntryTbxId;
-        $newTerm->term = trim($term);
+        // Remove all leading and trailing whitespaces and remove the non-breaking spaces
+        $newTerm->term = ZfExtended_Utils::cleanString($term);
         $newTerm->termTbxId = $this->getIdOrGenerate($tig->term);
         $newTerm->langSetGuid = $parsedLangSet->langSetGuid;
 
@@ -581,8 +597,7 @@ $memLog('Loaded terms:        ');
         //if there is a definition on languageLevel use that, if not check if there is one on entry level
         if (strtolower($parsedLangSet->descripType) === $newTerm::TERM_DEFINITION) {
             $newTerm->definition = $parsedLangSet->descrip;
-        }
-        elseif(!is_null($newTerm->definition) && !is_null($newTerm->parentEntry->definition)) {
+        } elseif (! is_null($newTerm->definition) && ! is_null($newTerm->parentEntry->definition)) {
             $newTerm->definition = $newTerm->parentEntry->definition;
         }
 
@@ -605,18 +620,18 @@ $memLog('Loaded terms:        ');
             $this->setAttributeTypes($tig->ref, $newTerm);
         }
         if (isset($tig->transacGrp)) {
-            foreach ($tig->transacGrp as $transac){
+            foreach ($tig->transacGrp as $transac) {
                 $this->setTransacAttributes($transac, false, 'tig', $newTerm);
             }
         }
-        $this->setDiscriptGrp($tig,$newTerm,'tig');
+        $this->setDiscriptGrp($tig, $newTerm, 'tig');
 
         $admnStatFound = false;
         $this->termNoteStatus->setTermStatusOnImport($newTerm, $this->bulkAttribute, $admnStatFound);
         $newTerm->processStatus = $this->getProcessStatus($newTerm->termNote);
 
         //if no termNote with administrativeStatus was found, we create one
-        if(!$admnStatFound) {
+        if (! $admnStatFound) {
             $newStatus = $this->termNoteStatus->getAdmnStatusFromTermStatus($newTerm->status);
             $newTerm->termNote[] = $this->createAndAddAttribute($newTerm, 'termNote', 'administrativeStatus', '', $newStatus);
         }
@@ -634,16 +649,17 @@ $memLog('Loaded terms:        ');
      * Check whether <termNote type="processStatus">-node exists within given <tig>-node,
      * and if no - add it, so that 'processStatus' attribute will be added in a way
      * like it would be defined by tbx-file
-     *
-     * @param $tig
      */
-    public function addProcessStatusNodeIfNotExists($tig) {
-
+    public function addProcessStatusNodeIfNotExists($tig)
+    {
         // If '<termNote type="processStatus">'-node already exists - return
-        if (isset($tig->termNote))
-            foreach ($tig->termNote as $termNote)
-                if ((string) $termNote->attributes()->{'type'} == 'processStatus')
+        if (isset($tig->termNote)) {
+            foreach ($tig->termNote as $termNote) {
+                if ((string) $termNote->attributes()->{'type'} == 'processStatus') {
                     return;
+                }
+            }
+        }
 
         // Get default processStatus
         $defaultProcessStatus = $this->config->runtimeOptions->tbx->defaultTermAttributeStatus;
@@ -658,10 +674,7 @@ $memLog('Loaded terms:        ');
     /**
      * Prepare all Elements for Attribute table
      * Elements - termNote, descrip, transacNote, admin, note
-     * @param SimpleXMLElement $element
      * @param editor_Models_Terminology_TbxObjects_Abstract $parentNode parent main TBX node
-     * @param bool $isDescripGrp
-     * @return array
      * @throws ZfExtended_ErrorCodeException
      * @throws editor_Models_Terminology_Import_Exception
      */
@@ -669,8 +682,7 @@ $memLog('Loaded terms:        ');
     {
         $attributes = [];
         /** @var SimpleXMLElement $value */
-        foreach ($element as $key => $value) {
-
+        foreach ($element as $elementName => $value) {
             // Get type
             $type = (string) $value->attributes()->{'type'};
 
@@ -678,21 +690,56 @@ $memLog('Loaded terms:        ');
             // Note: '0'-value of $type is also considered as empty
             // because it's a falsy value and proceeding with that may
             // lead to problems with the other parts of the application
-            if (!$type && $key !== 'note') {
-
+            if (! $type && $elementName !== 'note') {
                 // Skip that
                 continue;
+            }
+
+            // Get xml tag name
+            $target = (string) $value->attributes()->target;
+
+            // If elementName is xref and target-attr is a local path
+            if ($elementName === 'xref' && $type === 'xGraphic' && $this->targetIsLocalPath($target)) {
+                // Spoof $elementName and $type
+                $elementName = 'descrip';
+                $type = 'figure';
+
+                // Import from xGraphic or collect missing file's path
+                if ($this->binaryImport->importSingleImage($target) === false) {
+                    // Prepare log data
+                    $this->binaryImport->missingImages['files'][$target] = true;
+                }
+
+                // Setup flag indicating that we spoofed xGraphic with figure
+                $figureIsSpoof = true;
+
+                // Else
+            } else {
+                // Setup flag indicating that we haven't spoofed xGraphic with figure
+                $figureIsSpoof = false;
             }
 
             // Create attribute
             $attributes[] = $this->createAndAddAttribute(
                 $parentNode,
-                $key,
+                $elementName,
                 $type,
-                (string) $value->attributes()->{'target'},
+                $target,
                 (string) $value,
                 $isDescripGrp
             );
+
+            // If it's a figure-attribute
+            if ($elementName === 'descrip' && $type === 'figure' && ! $figureIsSpoof) {
+                // If there is no file behind
+                if (! isset($this->binaryImport->figureExists[$target])) {
+                    // Prepare log data
+                    $this->binaryImport->missingImages['definitions'][$target] = true;
+
+                    // Increment missing images counter
+                    $this->binaryImport->imageQty['missing']++;
+                }
+            }
         }
 
         return $attributes;
@@ -700,17 +747,11 @@ $memLog('Loaded terms:        ');
 
     /**
      * Creates a attribute TbxObject out of the given values, add its to the bulk list and returns it
-     * @param editor_Models_Terminology_TbxObjects_Abstract $parentNode
-     * @param string $elementName
-     * @param string $type
-     * @param string $target
-     * @param string $value
-     * @param bool $isDescripGrp
-     * @return editor_Models_Terminology_TbxObjects_Attribute
      * @throws ZfExtended_ErrorCodeException
      * @throws editor_Models_Terminology_Import_Exception
      */
-    protected function createAndAddAttribute(editor_Models_Terminology_TbxObjects_Abstract $parentNode, string $elementName, string $type, string $target, string $value, bool $isDescripGrp = false): editor_Models_Terminology_TbxObjects_Attribute {
+    protected function createAndAddAttribute(editor_Models_Terminology_TbxObjects_Abstract $parentNode, string $elementName, string $type, string $target, string $value, bool $isDescripGrp = false): editor_Models_Terminology_TbxObjects_Attribute
+    {
         /** @var editor_Models_Terminology_TbxObjects_Attribute $attribute */
         $attribute = $this->bulkAttribute->getNewImportObject();
         $attribute->setParent($parentNode);
@@ -738,7 +779,6 @@ $memLog('Loaded terms:        ');
 
         // If elementName was spoofed
         if (isset($attribute->wasElementName)) {
-
             // Prepare log msg
             $msg = 'TBX Import: Attribute has known type, but has elementName unexpected for that type so changed to expected one';
 
@@ -752,7 +792,6 @@ $memLog('Loaded terms:        ');
 
         // If level is unexpected
         if (isset($attribute->unexpectedLevel)) {
-
             // Update datatype's expected levels list
             $this->attributeDataTypeModel->load($labelId);
             $unexpected = $attribute->getLevel();
@@ -768,7 +807,7 @@ $memLog('Loaded terms:        ');
                 'type' => $attribute->type,
                 'unexpectedLevel' => $unexpected,
                 'wasExpectedLevels' => $wasExpected,
-                'nowExpectedLevels' => $nowExpected
+                'nowExpectedLevels' => $nowExpected,
             ], 'warn');
         }
 
@@ -779,7 +818,7 @@ $memLog('Loaded terms:        ');
             // Maintain collection<=>datatype mappings data
             ZfExtended_Factory
                 ::get(CollectionAttributeDataType::class)
-                ->onCustomDataTypeInsert($this->attributeDataTypeModel->getId(), $this->collection->getId());
+                    ->onCustomDataTypeInsert($this->attributeDataTypeModel->getId(), $this->collection->getId());
 
             // reload all dataTypes
             $this->dataType->loadData(true);
@@ -787,17 +826,15 @@ $memLog('Loaded terms:        ');
             $labelId = $this->dataType->getForAttribute($attribute);
         }
 
-        $attribute->dataTypeId = (int)$labelId;
+        $attribute->dataTypeId = (int) $labelId;
 
-        $attribute->isDescripGrp = (int)$isDescripGrp;
-
+        $attribute->isDescripGrp = (int) $isDescripGrp;
 
         // add the attribute to the global attributes collection
         $this->bulkAttribute->add($attribute);
 
         // If target was cleared due to unsupported for type
         if (isset($attribute->wasTarget)) {
-
             // Prepare log msg
             $msg = 'TBX Import: Attribute target was emptied as unsupported for that attribute type';
 
@@ -812,11 +849,7 @@ $memLog('Loaded terms:        ');
     }
 
     /**
-     * @param SimpleXMLElement $transacGrp
-     * @param bool $isDescripGrp
-     * @param string $elementName
      * @param editor_Models_Terminology_TbxObjects_Abstract $parentNode parent main TBX node
-     * @return array
      */
     private function setTransacAttributes(SimpleXMLElement $transacGrp, bool $isDescripGrp, string $elementName, editor_Models_Terminology_TbxObjects_Abstract $parentNode): array
     {
@@ -845,32 +878,37 @@ $memLog('Loaded terms:        ');
             $transacGrpObject->transac = $this->getTransacMappingIfExists((string) $transacGrp->transac);
 
             // If $elementName is 'tig'
-            if ($elementName == 'tig')
-                if (in_array($transacGrpObject->transac, ['origination', 'modification']))
+            if ($elementName == 'tig') {
+                if (in_array($transacGrpObject->transac, ['origination', 'modification'])) {
                     $replicateToTerm = $transacGrpObject->transac;
+                }
+            }
         }
         if (isset($transacGrp->date)) {
-            $transacGrpObject->date = ZfExtended_Utils::toMysqlDateTime((string)$transacGrp->date);
+            $transacGrpObject->date = ZfExtended_Utils::toMysqlDateTime((string) $transacGrp->date);
 
             // Replicate origination/modification date into term tbx(Created|Updated)At prop
-            if ($replicateToTerm)
+            if ($replicateToTerm) {
                 $parentNode->{$replicateToTerm == 'modification' ? 'tbxUpdatedAt' : 'tbxCreatedAt'}
                     = $transacGrpObject->date;
+            }
         }
         if (isset($transacGrp->transacNote)) {
-            $transacGrpObject->transacType = $this->getTransacMappingIfExists((string)$transacGrp->transacNote->attributes()->{'type'});
-            $transacGrpObject->target = (string)$transacGrp->transacNote->attributes()->{'target'};
-            $transacGrpObject->transacNote = trim((string)$transacGrp->transacNote);
+            $transacGrpObject->transacType = $this->getTransacMappingIfExists((string) $transacGrp->transacNote->attributes()->{'type'});
+            $transacGrpObject->target = (string) $transacGrp->transacNote->attributes()->{'target'};
+            $transacGrpObject->transacNote = trim((string) $transacGrp->transacNote);
 
             // Replicate origination/modification responsible person into term tbx(Created|Updated)By prop
-            if ($replicateToTerm && $transacGrpObject->transacType == 'responsibility')
+            if ($replicateToTerm && $transacGrpObject->transacType == 'responsibility') {
                 $parentNode->{$replicateToTerm == 'modification' ? 'tbxUpdatedBy' : 'tbxCreatedBy'}
                     = $this->getTransacPersonIdByName($transacGrpObject->transacNote);
+            }
         }
 
-        $transacGrpObject->isDescripGrp = (int)$isDescripGrp;
+        $transacGrpObject->isDescripGrp = (int) $isDescripGrp;
         $parsedTransacGrp[] = $transacGrpObject;
         $this->bulkTransacGrp->add($transacGrpObject);
+
         return $parsedTransacGrp;
     }
 
@@ -883,27 +921,26 @@ $memLog('Loaded terms:        ');
      * @param string $elementName
      * @throws ZfExtended_ErrorCodeException
      */
-    private function setDiscriptGrp(SimpleXMLElement $parent, editor_Models_Terminology_TbxObjects_Abstract $tbxObject, string $elementName){
-
+    private function setDiscriptGrp(SimpleXMLElement $parent, editor_Models_Terminology_TbxObjects_Abstract $tbxObject, string $elementName)
+    {
         // INFO: In TBX-Basic, the <descripGrp> element is used only to associate a source to a definition or to
         //a context. The following child elements are not supported: <descripNote>, <admin>,<adminGrp>, <note>, <ref>, and <xref>.
         foreach ($parent->descripGrp as $descripGrp) {
+            $this->setAttributeTypes($descripGrp->descrip, $tbxObject, true);
 
-            $this->setAttributeTypes($descripGrp->descrip, $tbxObject,true);
-
-            if($tbxObject instanceof editor_Models_Terminology_TbxObjects_Term || $tbxObject instanceof editor_Models_Terminology_TbxObjects_Langset) {
-                $tbxObject->descrip = (string)$descripGrp->descrip;
-                $tbxObject->descripTarget = (string)$descripGrp->descrip->attributes()->{'target'};
-                $tbxObject->descripType = (string)$descripGrp->descrip->attributes()->{'type'};
+            if ($tbxObject instanceof editor_Models_Terminology_TbxObjects_Term || $tbxObject instanceof editor_Models_Terminology_TbxObjects_Langset) {
+                $tbxObject->descrip = (string) $descripGrp->descrip;
+                $tbxObject->descripTarget = (string) $descripGrp->descrip->attributes()->{'target'};
+                $tbxObject->descripType = (string) $descripGrp->descrip->attributes()->{'type'};
             }
 
             $setEntryDefinition = $tbxObject instanceof editor_Models_Terminology_TbxObjects_TermEntry && is_null($tbxObject->definition);
-            $isDefinition = (string)$descripGrp->descrip->attributes()->{'type'} === 'definition';
-            if($setEntryDefinition && $isDefinition) {
-                $tbxObject->definition = (string)$descripGrp->descrip;
+            $isDefinition = (string) $descripGrp->descrip->attributes()->{'type'} === 'definition';
+            if ($setEntryDefinition && $isDefinition) {
+                $tbxObject->definition = (string) $descripGrp->descrip;
             }
 
-            $this->setAttributeTypes($descripGrp->admin, $tbxObject,true);
+            $this->setAttributeTypes($descripGrp->admin, $tbxObject, true);
 
             if (isset($descripGrp->transacGrp)) {
                 foreach ($descripGrp->transacGrp as $transac) {
@@ -914,7 +951,7 @@ $memLog('Loaded terms:        ');
             // INFO: if note appears on <descripGrp> level, import the note as normal attribute.
             // This kind of note is not supported by tbx basic
             if (isset($descripGrp->note)) {
-                $this->setAttributeTypes($descripGrp->note, $tbxObject,true);
+                $this->setAttributeTypes($descripGrp->note, $tbxObject, true);
             }
         }
     }
@@ -923,8 +960,6 @@ $memLog('Loaded terms:        ');
      * Get actual language from xmlElement.
      * We need to check if attribute is defined as lang or xml:lang,
      * if xml:lang we need to add parameter true, to define xml is prefix for given attribute.
-     * @param SimpleXMLElement $language
-     * @return string
      */
     private function getActualLanguageAttribute(SimpleXMLElement $language): string
     {
@@ -932,38 +967,32 @@ $memLog('Loaded terms:        ');
             return '';
         }
 
-        $type = (string)$language->attributes()->{'lang'} ? 'lang' : 'xml';
+        $type = (string) $language->attributes()->{'lang'} ? 'lang' : 'xml';
 
         if ($type === 'xml') {
-            $langSetLanguage = (string)$language->attributes($type, true)->{'lang'};
+            $langSetLanguage = (string) $language->attributes($type, true)->{'lang'};
         } else {
-            $langSetLanguage = (string)$language->attributes()->{$type};
+            $langSetLanguage = (string) $language->attributes()->{$type};
         }
 
         return $langSetLanguage;
     }
 
-    /**
-     * @param SimpleXMLElement $languageGroup
-     * @return string
-     */
     private function getNormalizedLanguage(SimpleXMLElement $languageGroup): string
     {
-        return strtolower(str_replace('_','-', $this->getActualLanguageAttribute($languageGroup)));
+        return strtolower(str_replace('_', '-', $this->getActualLanguageAttribute($languageGroup)));
     }
 
     /**
      * import the resp persons into the database
-     * @param SimpleXMLElement $refObjectList
-     * @param string $listType
      */
     private function importOtherRefObjects(SimpleXMLElement $refObjectList, string $listType)
     {
         foreach ($refObjectList as $refObject) {
             $data = [];
-            $key = (string)$refObject->attributes()->{'id'};
+            $key = (string) $refObject->attributes()->{'id'};
             foreach ($refObject->item as $item) {
-                $data[(string)$item->attributes()->{'type'}] = (string)$item;
+                $data[(string) $item->attributes()->{'type'}] = (string) $item;
             }
             $this->bulkRefObject->createOrUpdateRefObject($listType, $key, $data);
         }
@@ -974,11 +1003,13 @@ $memLog('Loaded terms:        ');
      */
     private function logUnknownLanguages()
     {
-        if(empty($this->unknownLanguages)) {
+        if (empty($this->unknownLanguages)) {
             return;
         }
         foreach ($this->unknownLanguages as $key => $language) {
-            $this->log('TBX Import: Unable to import terms due invalid Rfc5646 language code "{code}"', 'E1361', ['code' => $key], 'warn');
+            $this->log('TBX Import: Unable to import terms due invalid Rfc5646 language code "{code}"', 'E1361', [
+                'code' => $key,
+            ], 'warn');
         }
     }
 
@@ -986,14 +1017,11 @@ $memLog('Loaded terms:        ');
      * - $this->getIdOrGenerate($elementName, 'term')
      * this will return 'id' attribute as string from given element,
      * if element don't have 'id' attribute we will generate one.
-     *
-     * @param SimpleXMLElement $xmlElement
-     * @return string
      */
     private function getIdOrGenerate(SimpleXMLElement $xmlElement): string
     {
         if ($xmlElement->attributes()->{'id'}) {
-            return (string)$xmlElement->attributes()->{'id'};
+            return (string) $xmlElement->attributes()->{'id'};
         }
 
         return ZfExtended_Utils::uuid();
@@ -1001,8 +1029,6 @@ $memLog('Loaded terms:        ');
 
     /**
      * returns the translate5 termNote processStatus to the one given in TBX
-     * @param array $termNotes
-     * @return string
      */
     protected function getProcessStatus(array $termNotes): string
     {
@@ -1017,9 +1043,6 @@ $memLog('Loaded terms:        ');
         return $processStatus;
     }
 
-    /**
-     * @return string
-     */
     private function getGuid(): string
     {
         return ZfExtended_Utils::uuid();
@@ -1027,11 +1050,16 @@ $memLog('Loaded terms:        ');
 
     private function log($logMessage, $code = 'E1028', array $extra = [], $level = 'info')
     {
-        $extra['languageResource'] = $this->collection;
-        if (!empty($this->task)) {
-            $extra['task'] = $this->task;
+        if (array_key_exists($code, $this->eventQty)) {
+            $this->eventQty[$code]['qty']++;
+            $this->eventQty[$code]['msg'] = $logMessage;
+        } else {
+            $extra['languageResource'] = $this->collection;
+            if (! empty($this->task)) {
+                $extra['task'] = $this->task;
+            }
+            $this->logger->$level($code, $logMessage, $extra);
         }
-        $this->logger->$level($code, $logMessage, $extra);
     }
 
     /**
@@ -1048,7 +1076,8 @@ $memLog('Loaded terms:        ');
     /***
      * Update and save the counted collection import totals as specific data attribute
      */
-    protected function setCollectionImportStatistic(){
+    protected function setCollectionImportStatistic()
+    {
         $this->collection->updateStats($this->collection->getId());
     }
 
@@ -1056,28 +1085,33 @@ $memLog('Loaded terms:        ');
      * Get id of terms_transacgrp_person-record by $name from a lazy-loaded dictionary,
      * If no such record - it will be created in db, added into dictionary, and it's id returned
      *
-     * @param $name
      * @return int
      */
-    protected function getTransacPersonIdByName($name) {
-
+    protected function getTransacPersonIdByName($name)
+    {
         // Get current collectionId
         $collectionId = $this->collection->getId();
 
         // If person dictionary was not loaded so far
         // or there is no person with given $name in a dictionary yet
         // - load persons model
-        if ($this->transacgrpPersons === null || !isset($this->transacgrpPersons[$name]))
+        if ($this->transacgrpPersons === null || ! isset($this->transacgrpPersons[$name])) {
             $m = ZfExtended_Factory::get('editor_Models_Terminology_Models_TransacgrpPersonModel');
+        }
 
         // If person dictionary was not loaded so far - do load
-        if ($this->transacgrpPersons === null)
-            foreach ($m->loadByCollectionIds([$collectionId]) as $person)
+        if ($this->transacgrpPersons === null) {
+            foreach ($m->loadByCollectionIds([$collectionId]) as $person) {
                 $this->transacgrpPersons[$person['name']] = $person['id'];
+            }
+        }
 
         // If there is no person with given $name in a dictionary yet - add it
-        if (!isset($this->transacgrpPersons[$name])) {
-            $m->init(['collectionId' => $collectionId, 'name' => $name]);
+        if (! isset($this->transacgrpPersons[$name])) {
+            $m->init([
+                'collectionId' => $collectionId,
+                'name' => $name,
+            ]);
             $m->save();
             $this->transacgrpPersons[$name] = $m->getId();
         }
@@ -1090,10 +1124,48 @@ $memLog('Loaded terms:        ');
      * Get mapping for a $value, according to tbx-standard.
      * If no mapping exists - $value is returned
      *
-     * @param $value
      * @return string
      */
-    protected function getTransacMappingIfExists($value) {
+    protected function getTransacMappingIfExists($value)
+    {
         return $this->transacMap[$value] ?? $value;
+    }
+
+    /**
+     * Check whether given $target arg is a string that looks like a local path to a file
+     */
+    protected function targetIsLocalPath(string $target): bool
+    {
+        // If $target is empty - return false
+        if (! $target) {
+            return false;
+        }
+
+        // If $target contains double dots, double shashes, or backslash - return false
+        if (preg_match('~(\.\./|/\.\.|//|' . preg_quote('\\', '~') . ')~', $target)) {
+            return false;
+        }
+
+        // If $target contains any characters that are not in list - return false
+        //if (preg_match('~[^a-z0-9_\-/.äöüß ]~i', $target)) {
+        if (preg_match('~[^\p{L}\p{N}\s\p{Pd}_./\~!@#$%^&(),+\[\]{};\'`]~iu', $target)) {
+            return false;
+        }
+
+        // If $target starts with / - return false
+        if (preg_match('~^/~', $target)) {
+            return false;
+        }
+
+        // Get extension
+        $ext = pathinfo($target, PATHINFO_EXTENSION);
+
+        // If no extension or it's longer than 4 chars - return false
+        if (! $ext || strlen($ext) > 4) {
+            return false;
+        }
+
+        // Hm, seems like $target looks like local path
+        return true;
     }
 }

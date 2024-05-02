@@ -13,7 +13,6 @@
         "falsifiable": true,
         "content": "über Anschlüssen",
         "similarQty": 0,
-        "falsePositiveChanged": 0,
         "hasTag": true,
         "tagName": "img",
         "cssClass": "qmflag"
@@ -31,8 +30,7 @@
         "filterable": true,
         "falsifiable": true,
         "content": ",",
-        "similarQty": 6,
-        "falsePositiveChanged": 0,
+        "similarQty": 7,
         "hasTag": true,
         "tagName": "img",
         "cssClass": "qmflag"
@@ -50,8 +48,7 @@
         "filterable": true,
         "falsifiable": true,
         "content": "setpoint",
-        "similarQty": 1,
-        "falsePositiveChanged": 0,
+        "similarQty": 2,
         "hasTag": true,
         "tagName": "img",
         "cssClass": "qmflag"
@@ -69,8 +66,7 @@
         "filterable": true,
         "falsifiable": true,
         "content": "setpoint",
-        "similarQty": 1,
-        "falsePositiveChanged": 0,
+        "similarQty": 2,
         "hasTag": true,
         "tagName": "img",
         "cssClass": "qmflag"

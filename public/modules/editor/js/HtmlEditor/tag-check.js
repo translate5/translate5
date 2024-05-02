@@ -12,7 +12,33 @@ class TagCheck {
         let excessTags = [];
 
         for (let node of nodeList) {
-            let id = node.id.replace(new RegExp('^' + this.idPrefix), '');
+            if (node.parentNode && node.parentNode.nodeName.toLowerCase() === "del") {
+                // Ignore deleted nodes
+                continue;
+            }
+
+            // node id can have word locked followed by number, so we need to use negative lookbehind
+            const match = node.id.match(new RegExp(this.idPrefix + '([a-zA-Z]+)(\\d+)'));
+
+            if (!match) {
+                continue;
+            }
+
+            let type = match[1];
+
+            if (type.includes('locked')) {
+                type = type.replace('locked', '');
+            }
+
+            const number = parseInt(match[2], 10);
+            const id = type + number;
+            const originalId = match[1] + match[2];
+
+            let isQaTag = /qmflag/.test(node.className);
+
+            if (isQaTag) {
+                continue;
+            }
 
             let isWhitespaceTag = /whitespace/.test(node.className);
 
@@ -23,16 +49,17 @@ class TagCheck {
                 continue;
             }
 
-            if (!this.referenceTags.hasOwnProperty(id)) {
+            // data.nr can be prefixed by the word locked, so we need to remove that to get the number of the tag
+            if (!this.referenceTags[type].find(t => parseInt(t.data.nr.replace('locked', '')) === number)) {
                 if (isWhitespaceTag && this.isAllowedAddingWhitespaceTags()) {
                     continue;
                 }
 
-                excessTags.push(markupImagesCache[id]);
+                excessTags.push(markupImagesCache[originalId]);
             }
 
             if (foundIds.includes(id) && node.parentNode.nodeName.toLowerCase() !== "del") {
-                duplicatedTags.push(markupImagesCache[id]);
+                duplicatedTags.push(markupImagesCache[originalId]);
             } else {
                 if (node.parentNode.nodeName.toLowerCase() !== "del") {
                     foundIds.push(id);
@@ -41,13 +68,16 @@ class TagCheck {
         }
 
         let missingTags = [];
-        for (const [key, item] of Object.entries(this.referenceTags)) {
-            if (ignoreWhitespace && item.whitespaceTag) {
-                continue;
-            }
+        for (const [type, tags] of Object.entries(this.referenceTags)) {
+            for (const tag of tags) {
+                if (ignoreWhitespace && type === 'whitespace') {
+                    continue;
+                }
 
-            if (!foundIds.includes(key)) {
-                missingTags.push(item);
+                // Check if tag is deleted keeping in mind that data.nr can be prefixed by the word locked
+                if (!foundIds.includes(type + tag.data.nr.replace('locked', ''))) {
+                    missingTags.push(tag);
+                }
             }
         }
 
@@ -126,13 +156,9 @@ class TagCheck {
     }
 
     getReferenceTagAtIndex(type, index) {
-        let key = type + index;
-
-        if (this.referenceTags.hasOwnProperty(key)) {
-            return this.referenceTags[key];
-        }
-
-        return null;
+        return this.referenceTags[type].find(
+            t => parseInt(t.data.nr.replace('locked', '')) === parseInt(index)
+        ) || null;
     }
 
     getOpeningReferenceTagAtIndex(index) {

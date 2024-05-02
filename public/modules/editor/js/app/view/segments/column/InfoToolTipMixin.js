@@ -65,8 +65,9 @@ Ext.define('Editor.view.segments.column.InfoToolTipMixin', {
      * @return {String}
      */
     renderInfoQtip: function(record) {
-        var me = this,
-            data = [];
+        let me = this,
+            data = [],
+            meta = record.get('metaCache');
 
         if(!me.otherRenderers) {
             me.initOtherRenderers();
@@ -84,7 +85,7 @@ Ext.define('Editor.view.segments.column.InfoToolTipMixin', {
                 obj.value = record.get(id);
             }
 
-            if(id == 'comments'){
+            if(id === 'comments'){
                 //cleaning up comment add/edit icon
                 obj.value = obj.value.replace(/^<img class="(add|edit)"[^>]+>/, '');
             }
@@ -92,6 +93,16 @@ Ext.define('Editor.view.segments.column.InfoToolTipMixin', {
             data.push(obj);
         });
         data.push({name: 'MID', value: record.get('mid')});
+        data.push({name: 'DB ID', value: record.get('id')});
+        if (Ext.isObject(meta)) {
+            Ext.Object.each(meta, function (key, val) {
+                if (key === 'siblingData' && Ext.isObject(val)) {
+                    data.push({name: 'IDs of same TransUnit', value: Object.keys(val).join(', ')});
+                } else {
+                    data.push({name: Ext.String.capitalize(key), value: val});
+                }
+            })
+        }
         return Ext.String.htmlEncode(me.tableTpl.apply(data));
     }
 });

@@ -21,7 +21,7 @@ START LICENSE AND COPYRIGHT
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
@@ -36,26 +36,17 @@ class Filter
 {
     /**
      * Creates a filter to filter items to have a identical property
-     * @param string $propertyName
-     * @param string|int|float|bool $value: make sure the value is of the right type!
-     * @return Filter
      */
-    public static function createSingle(string $propertyName, mixed $value): Filter {
-        return new Filter($propertyName, $value, NULL);
+    public static function createSingle(string $propertyName, mixed $value): Filter
+    {
+        return new Filter($propertyName, $value, null);
     }
 
-    /**
-     * @param string $propertyName
-     * @param array $values
-     * @return Filter
-     */
-    public static function createMulti(string $propertyName, array $values): Filter {
-        return new Filter($propertyName, NULL, $values);
+    public static function createMulti(string $propertyName, array $values): Filter
+    {
+        return new Filter($propertyName, null, $values);
     }
 
-    /**
-     * @var string
-     */
     private string $prop;
 
     /**
@@ -63,12 +54,10 @@ class Filter
      */
     private mixed $val;
 
-    /**
-     * @var array|null
-     */
     private ?array $vals;
 
-    private function __construct(string $propertyName, $value=NULL, array $values=NULL){
+    private function __construct(string $propertyName, $value = null, array $values = null)
+    {
         $this->prop = $propertyName;
         $this->val = $value;
         $this->vals = $values;
@@ -77,40 +66,41 @@ class Filter
     /**
      * Checks if an item applies to a filter
      * @param mixed $item
-     * @return bool
      */
-    public function matches($item) : bool {
-        if(property_exists($item, $this->prop)){
+    public function matches($item): bool
+    {
+        if (property_exists($item, $this->prop)) {
             $p = $this->prop;
-            if($this->val === NULL){
+            if ($this->val === null) {
                 return in_array($item->$p, $this->vals);
             } else {
                 return ($item->$p === $this->val);
             }
         }
+
         return false;
     }
 
     /**
      * Filters a list of items
-     * @param array $items
-     * @return array
      */
-    public function apply(array $items) : array {
+    public function apply(array $items): array
+    {
         $results = [];
-        foreach($items as $item){
-            if($this->matches($item)){
+        foreach ($items as $item) {
+            if ($this->matches($item)) {
                 $results[] = $item;
             }
         }
+
         return $results;
     }
 
     /**
      * Just for debugging
-     * @return string
      */
-    public function __toString(): string {
-        return 'Filter: property: '.$this->prop.', '.(($this->val === NULL) ? 'values: ['.implode(',', $this->vals).']' : ', value: '.$this->val);
+    public function __toString(): string
+    {
+        return 'Filter: property: ' . $this->prop . ', ' . (($this->val === null) ? 'values: [' . implode(',', $this->vals) . ']' : ', value: ' . $this->val);
     }
 }

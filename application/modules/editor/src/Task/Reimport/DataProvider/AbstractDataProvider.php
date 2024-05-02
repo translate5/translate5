@@ -3,7 +3,7 @@
 START LICENSE AND COPYRIGHT
 
  This file is part of translate5
- 
+
  Copyright (c) 2013 - 2021 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
 
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
@@ -13,15 +13,15 @@ START LICENSE AND COPYRIGHT
  included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
-  
+
  There is a plugin exception available for use with this release of translate5 for
  translate5: Please see http://www.translate5.net/plugin-exception.txt or
  plugin-exception.txt in the root folder of translate5.
-  
+
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
@@ -46,12 +46,14 @@ abstract class AbstractDataProvider
     /**
      * Reimport upload file field
      */
-    const UPLOAD_FILE_FIELD = 'fileReimport';
+    public const UPLOAD_FILE_FIELD = 'fileReimport';
 
-    const TEMP_DIR = '_tempReimport';
+    public const TEMP_DIR = '_tempReimport';
 
-    public function __construct(protected editor_Models_Task $task, protected array $filesMetaData)
-    {
+    public function __construct(
+        protected editor_Models_Task $task,
+        protected array $filesMetaData
+    ) {
     }
 
     public static function getForCleanup(editor_Models_Task $task): static
@@ -60,6 +62,7 @@ abstract class AbstractDataProvider
     }
 
     abstract protected function handleUploads(array $uploadedFile): void;
+
     abstract protected function getValidFileExtensions(): array;
 
     public function getFiles(): array
@@ -73,7 +76,6 @@ abstract class AbstractDataProvider
     }
 
     /**
-     * @return void
      * @throws Exception
      * @throws Zend_Exception
      */
@@ -83,14 +85,14 @@ abstract class AbstractDataProvider
 
         if (empty($uploadFile)) {
             throw new Exception('E1429', [
-                'task' => $this->task
+                'task' => $this->task,
             ]);
         }
 
         $this->cleanup(); //clean up old re-imports
-        if (!$this->makeReimportTempDir()) {
+        if (! $this->makeReimportTempDir()) {
             throw new Exception('E1431', [
-                'task' => $this->task
+                'task' => $this->task,
             ]);
         }
 
@@ -113,14 +115,14 @@ abstract class AbstractDataProvider
         $file = $upload->getFileInfo(self::UPLOAD_FILE_FIELD);
         $file = reset($file); //we are only posting one file
 
-        if (empty($file) || !$upload->isUploaded(self::UPLOAD_FILE_FIELD)) {
+        if (empty($file) || ! $upload->isUploaded(self::UPLOAD_FILE_FIELD)) {
             throw new Exception('E1427', [
                 'task' => $this->task,
             ]);
         }
 
         // validators are ok ?
-        if (!$upload->isValid(self::UPLOAD_FILE_FIELD)) {
+        if (! $upload->isValid(self::UPLOAD_FILE_FIELD)) {
             throw new Exception('E1430', [
                 'task' => $this->task,
                 'file' => $file['name'],
@@ -134,7 +136,7 @@ abstract class AbstractDataProvider
     {
         $tempDir = $this->getTempDir();
         if ($tempDir->isDir()) {
-            ZfExtended_Utils::recursiveDelete((string)$tempDir);
+            ZfExtended_Utils::recursiveDelete((string) $tempDir);
         }
     }
 
@@ -149,7 +151,7 @@ abstract class AbstractDataProvider
         if ($tempDir->isDir()) {
             return true;
         }
-        return mkdir((string)$tempDir) && is_dir((string)$tempDir);
-    }
 
+        return mkdir((string) $tempDir) && is_dir((string) $tempDir);
+    }
 }

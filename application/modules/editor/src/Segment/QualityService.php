@@ -52,17 +52,19 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\Segment;
 
+use editor_ModelInstances;
 use editor_Models_Db_SegmentQuality;
-use editor_Models_Task;
-use editor_Segment_Internal_TagComparision;
+use editor_Models_TaskUserAssoc;
 use editor_Segment_Quality_Manager;
-use editor_Segment_Tag;
-use fExtended_Factory;
+use Generator;
 use Zend_Db;
 use ZfExtended_Factory;
 
 class QualityService
 {
+    public const ERROR_MASSAGE_PLEASE_SOLVE_ERRORS = 'Bitte lösen Sie alle Fehler der folgenden Kategorie ' .
+    'ODER setzen Sie sie auf “falscher Fehler”:<br/>{categories}';
+
     private editor_Segment_Quality_Manager $manager;
 
     public function __construct()
@@ -70,43 +72,85 @@ class QualityService
         $this->manager = editor_Segment_Quality_Manager::instance();
     }
 
-    public function taskHasCriticalErrors(string $taskGuid): bool
+    public function taskHasCriticalErrors(string $taskGuid, ?editor_Models_TaskUserAssoc $tua = null): bool
     {
-        $task = ZfExtended_Factory::get(editor_Models_Task::class);
-        $task->loadByTaskGuid($taskGuid);
+        return $this->criticalErrorsIterator($taskGuid, $tua)->valid();
+    }
 
-        $config = $task->getConfig();
+    /**
+     * @return string[]
+     */
+    public function getErroredCriticalCategories(string $taskGuid, ?editor_Models_TaskUserAssoc $tua = null): array
+    {
+        $categories = [];
+        foreach ($this->criticalErrorsIterator($taskGuid, $tua, true) as $error) {
+            $categories[] = $error['label'];
+        }
 
-        if (empty($config->runtimeOptions->autoQA->mustBeZeroErrorsQualities)) {
-            return false;
+        return $categories;
+    }
+
+    private function criticalErrorsIterator(
+        string $taskGuid,
+        ?editor_Models_TaskUserAssoc $tua,
+        bool $includeLabels = false
+    ): Generator {
+        $task = editor_ModelInstances::taskByGuid($taskGuid);
+        $taskConfig = $task->getConfig();
+
+        if (empty($taskConfig->runtimeOptions->autoQA->mustBeZeroErrorsQualities)) {
+            return [];
+        }
+
+        $labels = [];
+
+        if ($includeLabels) {
+            foreach ($this->manager->getActiveTypeToCategoryMap($task, $taskConfig) as $key => $label) {
+                $labels[$key] = $label;
+            }
         }
 
         $quality = ZfExtended_Factory::get(editor_Models_Db_SegmentQuality::class);
         $select = $quality->getAdapter()->select();
         $select
             ->from(
-                ['qualities' => $quality->getName()],
+                [
+                    'qualities' => $quality->getName(),
+                ],
                 [
                     'qualities.type',
                     'qualities.category',
                     'count(qualities.id) as total',
-                    'sum(qualities.falsePositive) as falsePositive'
+                    'sum(qualities.falsePositive) as falsePositive',
                 ]
             )
             // we need the editable prop for assigning structural faults of non-editable segments a virtual category
-            ->from(['segments' => 'LEK_segments'], 'segments.editable')
+            ->from([
+                'segments' => 'LEK_segments',
+            ], 'segments.editable')
             ->where('qualities.segmentId = segments.id')
             ->where('qualities.hidden = 0')
             // we want qualities from editable segments, only exception are structural internal tag errors
             // as usual, Zend Selects do not provide proper bracketing, so we're crating this manually here
-            ->where(
-                'segments.editable = 1 OR (
-                    qualities.type = \''. editor_Segment_Tag::TYPE_INTERNAL.'\'
-                    AND qualities.category = \''. editor_Segment_Internal_TagComparision::TAG_STRUCTURE_FAULTY.'\'
-                )'
-            )
+            ->where('segments.editable = 1')
             ->where('qualities.taskGuid = ?', $taskGuid)
             ->group(['qualities.type', 'qualities.category']);
+
+        if ($tua) {
+            $step = $tua->getWorkflowStepName();
+
+            if ($tua->isSegmentrangedTaskForStep($task, $step)) {
+                $assignedSegments = $tua->getAllAssignedSegmentsByUserAndStep(
+                    $task->getTaskGuid(),
+                    $tua->getUserGuid(),
+                    $step
+                );
+
+                if (! empty($assignedSegments)) {
+                    $select->where('segments.segmentNrInTask IN (?)', $assignedSegments);
+                }
+            }
+        }
 
         $stmt = $quality->getAdapter()->query($select);
 
@@ -115,10 +159,12 @@ class QualityService
                 $row['total'] > $row['falsePositive']
                 && $this->manager->mustBeZeroErrors($row['type'], $row['category'], $task)
             ) {
-                return true;
+                if ($includeLabels) {
+                    $row['label'] = $labels["{$row['type']}:{$row['category']}"];
+                }
+
+                yield $row;
             }
         }
-
-        return false;
     }
 }

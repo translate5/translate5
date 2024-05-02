@@ -1,4 +1,3 @@
-
 /*
 START LICENSE AND COPYRIGHT
 
@@ -37,154 +36,170 @@ END LICENSE AND COPYRIGHT
  * @extends Ext.app.Controller
  */
 Ext.define('Editor.controller.LanguageResourcesTaskassoc', {
-  extend : 'Ext.app.Controller',
-  views: ['Editor.view.LanguageResources.TaskAssocPanel'],
-  models: ['Editor.model.LanguageResources.TaskAssoc'],
-  stores:['Editor.store.LanguageResources.TaskAssocStore'],
-  strings: {
-      assocSave: '#UT#Eintrag gespeichert!',
-      assocDeleted: '#UT#Eintrag gelöscht!',
-      assocSaveError: '#UT#Fehler beim Speichern der Änderungen!'
-  },
-  refs: [{
-      ref: 'taskTabs',
-      selector: 'adminTaskTaskManagement > tabpanel'
-  },{
-      ref: 'grid',
-      selector: '#languageResourcesTaskAssocGrid'
-  },{
-      ref: 'taskManagement',
-      selector: 'adminTaskTaskManagement'
-  },{
-	  ref:'adminTaskAddWindow',
-	  selector: '#adminTaskAddWindow'
-  }],
-  
-  listen: {
-      controller: {
-          '#admin.TaskPreferences': {
-              'loadPreferences': 'handleLoadPreferences'
-          }
-      },
-      component: {
-          '#languageResourcesTaskAssocGrid checkcolumn[dataIndex="segmentsUpdateable"]': {
-              checkchange: 'handleSegmentsUpdateableChange'
-          },
-          '#languageResourcesTaskAssocGrid checkcolumn[dataIndex="checked"]': {
-              checkchange: 'handleCheckedChange'
-          }
-      }
-  },
-  
-  handleLoadPreferences: function(controller,task){
-      var me = this,
-          languageResourceparams = {
-              params: {
-                  filter: '[{"operator":"like","value":"'+task.get('taskGuid')+'","property":"taskGuid"}]'
-              }
-          };
-      //set the actual task
-      me.actualTask = task;
-      me.getLanguageResourcesTaskAssocGrid().getStore().removeAll();
-      me.getLanguageResourcesTaskAssocGrid().store.load(languageResourceparams);
-  },
-  
-  
-  /**
-   * uncheck segmentsUpdateable when uncheck whole row, restore segmentsUpdateable if recheck row
-   */
-  handleCheckedChange: function(column, rowIdx, checked,record){
-      var me = this,
-          oldValue = record.isModified('segmentsUpdateable') && record.getModified('segmentsUpdateable');
-      
-      record.set('segmentsUpdateable', checked && oldValue);
-      
-      me.saveRecord(record);
-  },
-  /**
-   * check row when segmentsUpdateable is checked
-   */
-  handleSegmentsUpdateableChange: function(column, rowIdx, checked,record) {
-      var me = this;
-      if(checked && !record.get('checked')) {
-          record.set('checked', true);
-      }
-      me.saveRecord(record);
-  },
-  
-  /**
-   * Save assoc record
-   */
-  saveRecord: function(record){
-      var me = this,
-          str = me.strings,
-          params = {},
-          method = 'DELETE',
-          url = Editor.data.restpath+'languageresourcetaskassoc',
-          checkedData = Ext.JSON.encode({
-              languageResourceId: record.get('languageResourceId'),
-              taskGuid: record.get('taskGuid'),
-              segmentsUpdateable: record.get('segmentsUpdateable')
-          });
+    extend: 'Ext.app.Controller',
+    views: ['Editor.view.LanguageResources.TaskAssocPanel'],
+    models: ['Editor.model.LanguageResources.TaskAssoc'],
+    stores: ['Editor.store.LanguageResources.TaskAssocStore'],
+    strings: {
+        assocSave: '#UT#Eintrag gespeichert!',
+        assocDeleted: '#UT#Eintrag gelöscht!',
+        assocSaveError: '#UT#Fehler beim Speichern der Änderungen!'
+    },
+    refs: [{
+        ref: 'taskTabs',
+        selector: 'adminTaskTaskManagement > tabpanel'
+    }, {
+        ref: 'grid',
+        selector: '#languageResourcesTaskAssocGrid'
+    }, {
+        ref: 'taskManagement',
+        selector: 'adminTaskTaskManagement'
+    }, {
+        ref: 'adminTaskAddWindow',
+        selector: '#adminTaskAddWindow'
+    }],
 
-      if(me.getTaskManagement()){
-          me.getTaskManagement().setLoading(true);
-      }
-      if(record.get('checked')) {
-          method = record.get('taskassocid') ? 'PUT' : 'POST';
-          params = {data: checkedData};
-      }
-      if(method != 'POST') {
-          url = url + '/'+record.get('taskassocid');
-      }
-      
-      Ext.Ajax.request({
-          url:url,
-          method: method,
-          params: params,
-          success: function(response){
-              if(record.data.checked){
-                  var resp = Ext.util.JSON.decode(response.responseText),
-                      newId = resp.rows['id'];
-                  record.set('taskassocid', newId);
-                  Editor.MessageBox.addSuccess(str.assocSave);
-              }
-              else {
-                  record.set('taskassocid', 0);
-                  Editor.MessageBox.addSuccess(str.assocDeleted);
-              }
-              record.commit();
-              me.hideLoadingMask();
+    listen: {
+        controller: {
+            '#admin.TaskPreferences': {
+                'loadPreferences': 'handleLoadPreferences'
+            }
+        },
 
-              //fire the event when all active requests are finished
-        	  me.fireEvent('taskAssocSavingFinished',record,me.getLanguageResourcesTaskAssocGrid().getStore());
-          },
-          failure: function(response){
-              Editor.app.getController('ServerException').handleException(response);
-              me.hideLoadingMask();
-          } 
-      });
-  },
-  
-  hideLoadingMask:function(){
-      var me=this;
-      if(!me.getTaskManagement()){
-          return;
-      }
-      var task = me.getTaskManagement().getCurrentTask();
-      me.getTaskManagement().setLoading(false);
-      task && task.load();
-  },
-  
-  /**
-   * Get the right language resources task assoc gid
-   */
-  getLanguageResourcesTaskAssocGrid:function(){
-	  var me=this,
-	  	addTaskWindow=me.getAdminTaskAddWindow();
-	  if(addTaskWindow){
-		  return addTaskWindow.down('#languageResourcesTaskAssocGrid');
-	  }
-	  return me.getTaskManagement().down('#languageResourcesTaskAssocGrid');
-  }
+        component: {
+            '#languageResourcesTaskAssocGrid checkcolumn[dataIndex="segmentsUpdateable"]': {
+                checkchange: 'handleSegmentsUpdateableChange'
+            },
+            '#languageResourcesTaskAssocGrid checkcolumn[dataIndex="checked"]': {
+                checkchange: 'handleCheckedChange'
+            }
+        },
+
+        messagebus: {
+            '#translate5 task': {
+                //INFO: the listener and the event handler are also defined in the ProjectGridViewController.
+                // To unify this we should use mixins, they are 2 different components and the scope is not the same.
+                triggerReload: 'onTriggerTaskReload'
+            }
+        }
+    },
+
+    onTriggerTaskReload: function () {
+        var grid = this.getGrid(),
+            store = grid && grid.getStore();
+        if(store){
+            store.reload();
+        }
+    },
+
+    handleLoadPreferences: function (controller, task) {
+        var me = this,
+            languageResourceparams = {
+                params: {
+                    filter: '[{"operator":"like","value":"' + task.get('taskGuid') + '","property":"taskGuid"}]'
+                }
+            };
+        //set the actual task
+        me.actualTask = task;
+        me.getLanguageResourcesTaskAssocGrid().getStore().removeAll();
+        me.getLanguageResourcesTaskAssocGrid().store.load(languageResourceparams);
+    },
+
+
+    /**
+     * uncheck segmentsUpdateable when uncheck whole row, restore segmentsUpdateable if recheck row
+     */
+    handleCheckedChange: function (column, rowIdx, checked, record) {
+        var me = this,
+            oldValue = record.isModified('segmentsUpdateable') && record.getModified('segmentsUpdateable');
+
+        record.set('segmentsUpdateable', checked && oldValue);
+
+        me.saveRecord(record);
+    },
+    /**
+     * check row when segmentsUpdateable is checked
+     */
+    handleSegmentsUpdateableChange: function (column, rowIdx, checked, record) {
+        var me = this;
+        if (checked && !record.get('checked')) {
+            record.set('checked', true);
+        }
+        me.saveRecord(record);
+    },
+
+    /**
+     * Save assoc record
+     */
+    saveRecord: function (record) {
+        var me = this,
+            str = me.strings,
+            params = {},
+            method = 'DELETE',
+            url = Editor.data.restpath + 'languageresourcetaskassoc',
+            checkedData = Ext.JSON.encode({
+                languageResourceId: record.get('languageResourceId'),
+                taskGuid: record.get('taskGuid'),
+                segmentsUpdateable: record.get('segmentsUpdateable')
+            });
+
+        if (me.getTaskManagement()) {
+            me.getTaskManagement().setLoading(true);
+        }
+        if (record.get('checked')) {
+            method = record.get('taskassocid') ? 'PUT' : 'POST';
+            params = {data: checkedData};
+        }
+        if (method != 'POST') {
+            url = url + '/' + record.get('taskassocid');
+        }
+
+        Ext.Ajax.request({
+            url: url,
+            method: method,
+            params: params,
+            success: function (response) {
+                if (record.data.checked) {
+                    var resp = Ext.util.JSON.decode(response.responseText),
+                        newId = resp.rows['id'];
+                    record.set('taskassocid', newId);
+                    Editor.MessageBox.addSuccess(str.assocSave);
+                } else {
+                    record.set('taskassocid', 0);
+                    Editor.MessageBox.addSuccess(str.assocDeleted);
+                }
+                record.commit();
+                me.hideLoadingMask();
+
+                //fire the event when all active requests are finished
+                me.fireEvent('taskAssocSavingFinished', record, me.getLanguageResourcesTaskAssocGrid().getStore());
+            },
+            failure: function (response) {
+                Editor.app.getController('ServerException').handleException(response);
+                me.hideLoadingMask();
+            }
+        });
+    },
+
+    hideLoadingMask: function () {
+        var me = this;
+        if (!me.getTaskManagement()) {
+            return;
+        }
+        var task = me.getTaskManagement().getCurrentTask();
+        me.getTaskManagement().setLoading(false);
+        task && task.load();
+    },
+
+    /**
+     * Get the right language resources task assoc gid
+     */
+    getLanguageResourcesTaskAssocGrid: function () {
+        var me = this,
+            addTaskWindow = me.getAdminTaskAddWindow();
+        if (addTaskWindow) {
+            return addTaskWindow.down('#languageResourcesTaskAssocGrid');
+        }
+        return me.getTaskManagement().down('#languageResourcesTaskAssocGrid');
+    }
 });

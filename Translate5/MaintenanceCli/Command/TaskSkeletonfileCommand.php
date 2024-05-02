@@ -1,40 +1,38 @@
 <?php
 /*
  START LICENSE AND COPYRIGHT
- 
+
  This file is part of translate5
- 
+
  Copyright (c) 2013 - 2017 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
- 
+
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
- 
+
  This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
  as published by the Free Software Foundation and appearing in the file agpl3-license.txt
  included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
- 
+
  There is a plugin exception available for use with this release of translate5 for
  translate5: Please see http://www.translate5.net/plugin-exception.txt or
  plugin-exception.txt in the root folder of translate5.
- 
+
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
  http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
- 
+
  END LICENSE AND COPYRIGHT
  */
+
 namespace Translate5\MaintenanceCli\Command;
 
+use MittagQI\Translate5\Task\Import\SkeletonFile;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Output\OutputInterface;
-use Translate5\MaintenanceCli\Output\TaskTable;
-use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Input\InputOption;
-use Symfony\Component\Console\Style\SymfonyStyle;
-use Symfony\Component\Console\Exception\RuntimeException;
+use Symfony\Component\Console\Output\OutputInterface;
 
 /**
  * List and show the content of a tasks import data skeleton file(s)
@@ -43,7 +41,7 @@ class TaskSkeletonfileCommand extends Translate5AbstractCommand
 {
     // the name of the command (the part after "bin/console")
     protected static $defaultName = 'task:skeletonfile';
-    
+
     protected function configure()
     {
         $this
@@ -76,8 +74,8 @@ class TaskSkeletonfileCommand extends Translate5AbstractCommand
             InputOption::VALUE_REQUIRED,
             'Dumps one raw file for redirecting on CLI, needs the fileid as argument'
         );
-
     }
+
     /**
      * Execute the command
      * {@inheritDoc}
@@ -88,49 +86,50 @@ class TaskSkeletonfileCommand extends Translate5AbstractCommand
         $this->initInputOutput($input, $output);
         $this->initTranslate5();
 
-        if(!$this->input->getOption('dump-one')) {
+        if (! $this->input->getOption('dump-one')) {
             $this->writeTitle('Task Skeletonfiles');
         }
 
         $task = new \editor_Models_Task();
         $id = $input->getArgument('identifier');
-        if(is_numeric($id)) {
+        if (is_numeric($id)) {
             $task->load($id);
-        }
-        else {
+        } else {
             $id = trim($id, '{}');
-            $task->loadByTaskGuid('{'.$id.'}');
+            $task->loadByTaskGuid('{' . $id . '}');
         }
-
 
         $fileTree = new \editor_Models_Foldertree();
         $files = $fileTree->getPaths($task->getTaskGuid(), $fileTree::TYPE_FILE);
 
-        if($this->input->getOption('list-files')) {
+        if ($this->input->getOption('list-files')) {
             $this->io->section('Available files');
             $data = [];
-            foreach($files as $fileId => $path) {
+            foreach ($files as $fileId => $path) {
                 $data[] = [$fileId, $path];
             }
             $this->io->table(['id', 'path'], $data);
+
             return 0;
         }
 
-        if($this->input->getOption('dump-all')) {
-            foreach($files as $fileId => $path) {
+        $skeletonFile = new SkeletonFile($task);
+        if ($this->input->getOption('dump-all')) {
+            foreach ($files as $fileId => $path) {
                 $file = new \editor_Models_File();
                 $file->load($fileId);
-                $this->io->section($fileId.': '.$path);
-                $skel = $file->loadSkeletonFromDisk($task);
+                $this->io->section($fileId . ': ' . $path);
+                $skel = $skeletonFile->loadFromDisk($file);
                 $this->io->write($skel);
             }
+
             return 0;
         }
 
-        if(!($fileId = $this->input->getOption('dump-one'))) {
+        if (! ($fileId = $this->input->getOption('dump-one'))) {
             $data = [];
-            foreach($files as $fileId => $path) {
-                $data[] = $fileId.': '.$path;
+            foreach ($files as $fileId => $path) {
+                $data[] = $fileId . ': ' . $path;
             }
             $fileId = $this->io->choice('Dump which file?', $data);
             $fileId = explode(':', $fileId)[0];
@@ -138,7 +137,8 @@ class TaskSkeletonfileCommand extends Translate5AbstractCommand
 
         $file = new \editor_Models_File();
         $file->load($fileId);
-        echo $file->loadSkeletonFromDisk($task);
+        echo $skeletonFile->loadFromDisk($file);
+
         return 0;
     }
 }

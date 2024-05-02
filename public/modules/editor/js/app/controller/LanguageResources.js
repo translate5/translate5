@@ -177,8 +177,18 @@ Ext.define('Editor.controller.LanguageResources', {
           me.setValueForEditor(matchRecord.get('target'));
           me.fireEvent('prepareCompleteReplace',matchRecord.get('target'),false); // if TrackChanges are activated, DEL- and INS-markups are added first and then setValueForEditor is applied from there (= again, but so what)
 
-          // TODO move to somewhere to avoid duplicates
-          let referenceField = Editor.data.task.get('emptyTargets') ? 'source' : 'target';
+          let referenceField = editor.mainEditor.getReferenceField(rec.get('target'), rec.get('pretrans'));
+
+          //we don't support the matchrate saving for tasks with alternatives:
+          if(task.get('defaultSegmentLayout')) {
+              rec.set('matchRate', matchrate);
+              rec.wasOriginalTargetUpdated = true;
+
+              //TODO how to implement a check if user modified the match afterwards to add the "interactive" flag?
+              rec.set('matchRateType', Editor.data.LanguageResources.matchrateTypeChangedState+';languageResourceid='+matchRecord.get('languageResourceid'));
+              me.getMatchrateDisplay().setRawValue(matchrate);
+          }
+
           editor.mainEditor.setValueAndMarkup(
               me.languageResourceValueForEditor,
               rec,
@@ -186,16 +196,6 @@ Ext.define('Editor.controller.LanguageResources', {
               referenceField,
               true
           );
-
-          //we don't support the matchrate saving for tasks with alternatives:
-          if(task.get('defaultSegmentLayout')) {
-              rec.set('matchRate', matchrate);
-              rec.wasOriginalTargetUpdated = true;
-              rec.set('target', matchRecord.get('target')); // when taking over a match we want the original target to be updated to the match/pretranslated value
-              //TODO how to implement a check if user modified the match afterwards to add the "interactive" flag?
-              rec.set('matchRateType', Editor.data.LanguageResources.matchrateTypeChangedState+';languageResourceid='+matchRecord.get('languageResourceid')); 
-              me.getMatchrateDisplay().setRawValue(matchrate);
-          }
       }
   },
   setValueForEditor: function(value) {

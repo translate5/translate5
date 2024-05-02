@@ -1,10 +1,11 @@
 {
 	"config" : {
 		"platform" : {
-			"php" : "8.0.15"
+			"php" : "8.1.23"
 		},
 		"allow-plugins": {
-			"wikimedia/composer-merge-plugin": true
+			"wikimedia/composer-merge-plugin": true,
+			"php-http/discovery": true
 		}
 	},
 	"autoload" : {
@@ -84,21 +85,29 @@
                                         "reference" : "1.13.0"
                                 }
                         }
-		}		
+		}, {
+			"_README" : "A fork of the openai-php/client OpenAI PHP Client to be able to deliver fixes more rapidly",
+			"type" : "git",
+			"url" : "https://github.com/translate5/openai-client/"
+		}
 	],
 	"require" : {
+		"ext-xml": "*",
 		"ext-simplexml": "*",
 		"ext-libxml": "*",
 		"ext-pdo": "*",
 		"ext-dom": "*",
 		"ext-mysqli": "*",
 		"ext-xmlreader": "*",
+		"ext-xmlwriter": "*",
 		"ext-sockets" : "*",
 		"ext-iconv" : "*",
+		"ext-soap" : "*",
       	"ext-zip": "*",
       	"ext-fileinfo": "*",
       	"ext-curl": "*",
 		"ext-posix": "*",
+		"ext-zlib": "*",
 		"phpunit/phpunit": "^9",
 		"shardj/zf1-future" : "dev-master",
 		"symfony/console" : "^5.0",
@@ -124,7 +133,8 @@
 		"symfony/yaml": "^6.0",
 		"symfony/lock": "^6.0",
 		"cesargb/php-log-rotation": "^2.7",
-		"ifsnop/mysqldump-php": "^v2.9"
+		"ifsnop/mysqldump-php": "^v2.9",
+		"http-interop/http-factory-guzzle": "^1.2"
     },
 	"extra" : {
 		"merge-plugin" : {
@@ -145,6 +155,7 @@
 		}
 	},
 	"scripts" : {
+		"phpstan" : "vendor/bin/phpstan",
 		"post-install-cmd" : "cghooks add --ignore-lock; cghooks update",
 		"post-update-cmd" : "cghooks update",
 		"pre-install-cmd" : "Translate5\\Installer\\HookIn::postPackageInstall"
@@ -166,6 +177,8 @@
 	"license" : "AGPL-3.0-only",
 	"require-dev" : {
 		"brainmaestro/composer-git-hooks" : "^2.8",
-		"symfony/var-dumper": "^6.0"
+		"symfony/var-dumper": "^6.0",
+		"phpstan/phpstan": "^1.10",
+		"symplify/easy-coding-standard": "^12.1"
 	}
 }

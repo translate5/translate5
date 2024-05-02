@@ -57,56 +57,71 @@ Ext.define('Editor.view.LanguageResources.TmWindowViewController', {
     labelTooltipInstance:null,
 
     /**
-     * Resource combo handler
+     * Resource combo handler.
+     * Info: the resource value can be also null!!
      */
-    onResourceChange:function(field,resource){
-        var me=this,
-            view=me.getView(),
-            serviceName=field.getSelection() && field.getSelection().get('serviceName'),
-            resourceType=field.getSelection() && field.getSelection().get('resourceType'),
+    onResourceChange: function (field, resource) {
+        let me = this,
+            view = me.getView(),
+            serviceName = field.getSelection() && field.getSelection().get('serviceName'),
+            resourceType = field.getSelection() && field.getSelection().get('resourceType'),
             engineBased = field.getSelection() && field.getSelection().get('engineBased'),
             helppage = field.getSelection() && field.getSelection().get('helppage'),
-            vm=view.getViewModel(),
-            engineCombo=view.down('#engine');
+            viewModel = view.getViewModel(),
+            engineCombo = view.down('#engine');
 
         if (!me.isValidService(serviceName, helppage)) {
             return false;
         }
-        
-        vm.set('serviceName',serviceName);
-        vm.set('resourceType',resourceType);
-        vm.set('engineBased', engineBased);
 
+        viewModel.set('serviceName', serviceName);
+        viewModel.set('resourceType', resourceType);
+        viewModel.set('resourceId', resource);
+        viewModel.set('engineBased', engineBased);
         // upload field has different tooltip and label based on the selected resource
         me.updateUploadFieldConfig();
+        let record = Ext.StoreManager.get('Editor.store.LanguageResources.Resources').getById(resource),
+            sourceField = view.down('combo[name="sourceLang"]'),
+            targetField = view.down('combo[name="targetLang"]');
 
-        let record = Ext.StoreManager.get('Editor.store.LanguageResources.Resources').getById(resource);
+        sourceField.suspendEvents();
+        sourceField.clearValue(null);
+        sourceField.resumeEvents();
 
-        if (me.isEngineBasedResource(record)) {
+        targetField.suspendEvents();
+        targetField.clearValue(null);
+        targetField.resumeEvents();
+
+        this.updateStrippingFramingTagsSupport();
+
+        if (record && me.isEngineBasedResource(record)) {
+            engineCombo.suspendEvents();
+            engineCombo.clearValue(null);
             engineCombo.getStore().clearFilter();
             engineCombo.getStore().setProxy({
                 type: 'ajax',
                 url: Editor.data.restpath + 'languageresourceresource/' + record.get('serviceName') + '/engines',
-                reader : {
+                reader: {
                     rootProperty: 'rows',
-                    type : 'json'
+                    type: 'json'
                 },
             });
             engineCombo.getStore().load();
-
-            return;
+            engineCombo.resumeEvents();
         }
 
-        //for non engine type resource load the resource languages
-        let sourceField=view.down('combo[name="sourceLang"]'),
-            targetField=view.down('combo[name="targetLang"]'),
-            sourceData = record ? record.get('sourceLanguages') : [],
+        // set the source and target languages for the selected resource
+        let sourceData = record ? record.get('sourceLanguages') : [],
             targetData = record ? record.get('targetLanguages') : [];
-            
+
         sourceField.getStore().loadRawData(sourceData);
         targetField.getStore().loadRawData(targetData);
     },
-    
+
+    onSelectFile: function (field, value) {
+        this.updateStrippingFramingTagsSupport();
+    },
+
     /**
      * Check if the selected service is valid to be used. If not, the user gets a message shown.
      * @returns boolean
@@ -126,52 +141,62 @@ Ext.define('Editor.view.LanguageResources.TmWindowViewController', {
     /**
      * Engine combo change handler
      */
-    onEngineComboChange:function(combo,newVal,oldVal,eOpts){
-        var me=this,
-            view=me.getView(),
-            selection=combo.getSelection(),
-            source=selection && selection.get('source'),
-            target=selection && selection.get('target'),
-            sourceField=view.down('combo[name="sourceLang"]'),
-            targetField=view.down('combo[name="targetLang"]'),
-            langStore=sourceField.getStore();
+    onEngineComboChange: function(combo, newVal, oldVal, eOpts){
+        var me = this,
+            view = me.getView(),
+            selection = combo.getSelection(),
+            source = selection && selection.get('source'),
+            target = selection && selection.get('target'),
+            sourceField = view.down('combo[name="sourceLang"]'),
+            targetField = view.down('combo[name="targetLang"]'),
+            langStore = sourceField.getStore();
 
         //reset the store on empty value
         if(!newVal){
             combo.getStore().clearFilter();
         }
 
-        //clean the languages selection on each engine change
-        //suspend the events (the change event)
-        sourceField.suspendEvents();
-        targetField.suspendEvents();
-        sourceField.clearValue(null);
-        targetField.clearValue(null);
-        
-        //get the selection source rfc value, and set the source language combo with it
-        if(source){
-            var sr=langStore.findRecord ('rfc5646', source,0,false,false,true);
-            if(sr){
-                sourceField.setSelection(sr);
+        //clean the languages selection on each engine change (Not if the cource/target are defined as wildcards ("*")
+
+        if(source !== '*') {
+
+            // first, suspend the events (the change event)
+            sourceField.suspendEvents();
+            sourceField.clearValue(null);
+
+            //get the selection source rfc value, and set the source language combo with it
+            if (source) {
+                var sr = langStore.findRecord('rfc5646', source, 0, false, false, true);
+                if (sr) {
+                    sourceField.setSelection(sr);
+                }
             }
+            // after, resume events
+            sourceField.resumeEvents();
         }
-        //get the selection target rfc value, and set the target language combo with it
-        if(target){
-            var sr=langStore.findRecord ('rfc5646', target,0,false,false,true);
-            if(sr){
-                targetField.setSelection(sr);
+
+        if(target !== '*') {
+
+            // first suspend the events (the change event)
+            targetField.suspendEvents();
+            targetField.clearValue(null);
+            //get the selection target rfc value, and set the target language combo with it
+            if (target) {
+                var tr = langStore.findRecord('rfc5646', target, 0, false, false, true);
+                if (tr) {
+                    targetField.setSelection(tr);
+                }
             }
+            // after, resume events
+            targetField.resumeEvents();
         }
-        sourceField.resumeEvents();
-        targetField.resumeEvents();
     },
 
     /**
      * Source and target language change handler
      */
-    onLanguageComboChange:function(){
-        var me=this;
-        me.filterEngines();
+    onLanguageComboChange: function(){
+        this.filterEngines();
     },
 
     onCustomersTagFieldChange:function(field,newValue){
@@ -201,22 +226,23 @@ Ext.define('Editor.view.LanguageResources.TmWindowViewController', {
      * Filter the engines store, when source or target language is selected
      */
     filterEngines:function(){
-        var me=this,
-            view=me.getView(),
-            engineComboField=view.down('combo[name="engines"]:visible(true)'),
+        var me = this,
+            view = me.getView(),
+            engineComboField = view.down('combo[name="engines"]:visible(true)'),
             engineComboStore,
+            selectedEngine,
             sourceLang,
             targetLang,
-            filterData=[];
+            filterData = [];
         
         if (engineComboField === null) {
             return;
         }
-        
-        engineComboStore=engineComboField.getStore();
-        sourceLang=view.down('combo[name="sourceLang"]').getSelection();
-        targetLang=view.down('combo[name="targetLang"]').getSelection();
-        
+        selectedEngine = engineComboField.getSelection();
+        engineComboStore = engineComboField.getStore();
+        sourceLang = view.down('combo[name="sourceLang"]').getSelection();
+        targetLang = view.down('combo[name="targetLang"]').getSelection();
+
         //clean the engine filters
         engineComboStore.clearFilter();
 
@@ -231,31 +257,42 @@ Ext.define('Editor.view.LanguageResources.TmWindowViewController', {
             }
         });
 
-        //clean the selected value in the sdl combo
         engineComboField.suspendEvents();
-        engineComboField.clearValue(null);
-        engineComboField.resumeEvents();
-        
+        //clean the selected value in the sdl combo if it does not comply with the currently selected languages
+        if(!(selectedEngine && (!sourceLang || selectedEngine.get('source') === '*') && (!targetLang || selectedEngine.get('target') === '*'))){
+            engineComboField.clearValue(null);
+        }
+
         //if source is selected, create source filter
         if(sourceLang){
             filterData.push({
-                property:'source',
-                value:sourceLang.get('rfc5646')
+                property: 'source',
+                value: sourceLang.get('rfc5646')
+            });
+            filterData.push({
+                property: 'source',
+                value: '*'
             });
         }
 
         //if target is selected, create target filter
         if(targetLang){
             filterData.push({
-                property:'target',
-                value:targetLang.get('rfc5646')
+                property: 'target',
+                value: targetLang.get('rfc5646')
+            });
+            filterData.push({
+                property: 'target',
+                value: '*'
             });
         }
 
         //apply the filters to the sdl language store
-        if(filterData.length>0){
-            engineComboStore.addFilter(filterData,true);
+        if(filterData.length > 0){
+            engineComboStore.addFilter(filterData, true);
         }
+
+        engineComboField.resumeEvents();
     },
 
     /**
@@ -301,5 +338,46 @@ Ext.define('Editor.view.LanguageResources.TmWindowViewController', {
         if (!record.data.creatable) {
             return false;
         }
+    },
+
+    updateStrippingFramingTagsSupport: function (skipExtensionCheck = false) {
+        const viewModel = this.getView().getViewModel(),
+            resourceType = Ext.StoreManager.get('Editor.store.LanguageResources.Resources').getById(viewModel.get('resourceId')),
+            uploadFileValue = this.getView().down('filefield[name="tmUpload"]').value,
+            stripFramingTagsField = this.getView().down('combo[name="stripFramingTags"]');
+
+        stripFramingTagsField.suspendEvents();
+        stripFramingTagsField.clearValue(null);
+        stripFramingTagsField.resumeEvents();
+
+        const stripFramingTagsConfig = resourceType ? resourceType.get('stripFramingTagsConfig') : [];
+
+        if (!Object.keys(stripFramingTagsConfig).length) {
+            viewModel.set('strippingFramingTagsSupported', false);
+
+            return;
+        }
+
+        const values = stripFramingTagsConfig['values'] ?? [];
+        stripFramingTagsField.getStore().loadRawData(values);
+
+        if (values.length > 0) {
+            stripFramingTagsField.setValue(values[0]);
+        }
+
+        const supportedByResource = resourceType.get('supportsStrippingFramingTags');
+
+        let supportedByExtension = skipExtensionCheck;
+        for (const extension of stripFramingTagsConfig['fileExtensions'] ?? []) {
+            if (uploadFileValue.endsWith(extension)) {
+                supportedByExtension = true;
+                break;
+            }
+        }
+
+        viewModel.set(
+            'strippingFramingTagsSupported',
+            supportedByResource && supportedByExtension
+        );
     },
 });

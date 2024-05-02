@@ -21,7 +21,7 @@
   @copyright  Marc Mittag, MittagQI - Quality Informatics
   @author     MittagQI - Quality Informatics
   @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
- 			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
  END LICENSE AND COPYRIGHT
  */
@@ -37,10 +37,10 @@ class FilteredIterator extends editor_Models_Segment_Iterator
     private ZfExtended_Models_Filter $filter;
 
     /**
-     * @param string $taskGuid
      * @param editor_Models_Segment $segment The segment instance with the already defined filters and fields etc
      */
-    public function __construct(string $taskGuid, editor_Models_Segment $segment) {
+    public function __construct(string $taskGuid, editor_Models_Segment $segment)
+    {
         $this->segment = $segment;
         $this->filter = $segment->getFilter();
         parent::__construct($taskGuid);
@@ -48,7 +48,7 @@ class FilteredIterator extends editor_Models_Segment_Iterator
 
     protected function initSegment(): void
     {
-        if( !is_null($this->segment)){
+        if (! is_null($this->segment)) {
             //segment is already set by constructor, just do additional things here
             $this->segment->filterAndSort($this->filter);
             $this->segment->setEnableWatchlistJoin();

@@ -21,7 +21,7 @@ START LICENSE AND COPYRIGHT
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
@@ -36,19 +36,11 @@ use MittagQI\Translate5\Test\Api\Helper;
 final class Config
 {
     private static int $counter = 0;
-    /**
-     * @var Helper
-     */
+
     private Helper $api;
 
-    /**
-     * @var string
-     */
     private string $testClass;
 
-    /**
-     * @var string
-     */
     private string $login;
 
     /**
@@ -67,13 +59,10 @@ final class Config
     private array $termCollections = [];
 
     /**
-     * @var Resource[]
+     * @var resource[]
      */
     private array $otherResources = [];
 
-    /**
-     * @var Operation|null
-     */
     private ?Operation $taskOperation = null;
 
     public function __construct(Helper $api, string $testClass, string $login)
@@ -140,7 +129,6 @@ final class Config
 
     /**
      * Helper to cleanup a resource. Will catch any exceptions and collects them as we want to cleanup as much as possible
-     * @param Resource $resource
      */
     private function cleanupResource(Resource $resource, array &$errors)
     {
@@ -156,11 +144,8 @@ final class Config
 
     /**
      * Adds a single Task with the given props. return can be used to chain further specs
-     * @param string|null $sourceLanguage
      * @param string|array|null $targetLanguage
-     * @param int $customerId
      * @param string|null $filePathInTestFolder : if set, the file is added as upload
-     * @return Task
      */
     public function addTask(string $sourceLanguage = null, $targetLanguage = null, int $customerId = -1, string $filePathInTestFolder = null): Task
     {
@@ -179,45 +164,47 @@ final class Config
             $task->addUploadFile($filePathInTestFolder);
         }
         $this->tasks[] = $task;
+
         return $task;
     }
 
     /**
      * @param string $type : see LanguageResource::XXX
-     * @param string|null $resourceFileName
-     * @param array|null $customerIds
-     * @param string|null $sourceLanguage
-     * @param string|null $targetLanguage
-     * @return LanguageResource
      * @throws Exception
      */
-    public function addLanguageResource(string $type, string $resourceFileName = null, int $customerId = -1, string $sourceLanguage = null, string $targetLanguage = null): LanguageResource
-    {
+    public function addLanguageResource(
+        string $type,
+        string $resourceFileName = null,
+        int $customerId = -1,
+        string $sourceLanguage = null,
+        string $targetLanguage = null
+    ): LanguageResource {
         $next = count($this->langResources);
         $resource = $this->createLanguageResource($type, $next);
 
         if ($resourceFileName !== null) {
             $resource->addUploadFile($resourceFileName);
         }
+
         if ($customerId > 0) {
             $resource->setProperty('customerIds', [$customerId]);
         }
+
         if ($sourceLanguage !== null && $resource->hasProperty('sourceLang')) {
             $resource->setProperty('sourceLang', $sourceLanguage);
         }
+
         if ($targetLanguage !== null && $resource->hasProperty('targetLang')) {
             $resource->setProperty('targetLang', $targetLanguage);
         }
+
         $this->langResources[] = $resource;
+
         return $resource;
     }
 
     /**
-     * @param string $tbxFile
      * @param array|int $customerIds
-     * @param string $userlogin
-     * @param bool $mergeTerms
-     * @return TermCollection
      * @throws Exception
      */
     public function addTermCollection(string $tbxFile, $customerIds, string $userlogin = 'testtermproposer', bool $mergeTerms = true): TermCollection
@@ -227,6 +214,7 @@ final class Config
         $termCollection->setProperty('customerIds', $customerIds);
         $termCollection->setProperty('mergeTerms', $mergeTerms);
         $this->termCollections[] = $termCollection;
+
         return $termCollection;
     }
 
@@ -234,22 +222,22 @@ final class Config
      * Queues a Pretranslation for the task
      * Note, that by default pretranslateTmAndTerm is active, the other options not
      * Will overwrite any already queued Operation
-     * @return Pretranslation
      */
     public function addPretranslation(): Pretranslation
     {
         $this->taskOperation = new Pretranslation($this->testClass, 0);
+
         return $this->taskOperation;
     }
 
     /**
      * Queues a Pivot batch-Pretranslation for the task
      * Will overwrite any already queued Operation
-     * @return PivotBatchPretranslation
      */
     public function addPivotBatchPretranslation(): PivotBatchPretranslation
     {
         $this->taskOperation = new PivotBatchPretranslation($this->testClass, 0);
+
         return $this->taskOperation;
     }
 
@@ -262,6 +250,7 @@ final class Config
             $bconf->customerId = $customerId;
         }
         $this->otherResources[] = $bconf;
+
         return $bconf;
     }
 
@@ -289,33 +278,22 @@ final class Config
         return $this->langResources;
     }
 
-    /**
-     * @return bool
-     */
     public function hasTaskOperation(): bool
     {
         return ($this->taskOperation !== null);
     }
 
-    /**
-     * @return bool
-     */
     public function hasLanguageResources(): bool
     {
         return (count($this->langResources) > 0);
     }
 
-    /**
-     * @return bool
-     */
     public function hasTasks(): bool
     {
         return (count($this->tasks) > 0);
     }
 
     /**
-     * @param int $index
-     * @return Task
      * @throws Exception
      */
     public function getTaskAt(int $index): Task
@@ -323,20 +301,15 @@ final class Config
         if (array_key_exists($index, $this->tasks)) {
             return $this->tasks[$index];
         }
+
         throw new Exception('No task with index "' . $index . '" present.');
     }
 
-    /**
-     * @return string
-     */
     public function getLogin(): string
     {
         return $this->login;
     }
 
-    /**
-     * @return bool
-     */
     public function hasTestlectorLogin(): bool
     {
         return $this->login === 'testlector';
@@ -345,7 +318,6 @@ final class Config
     /**
      * Can be used to add resources after the setup-phase of an test
      * Resources imported this way will be cleaned up automatically nevertheless
-     * @param Resource $resource
      */
     public function import(Resource $resource)
     {
@@ -353,9 +325,6 @@ final class Config
     }
 
     /**
-     * @param string $type
-     * @param int $nextIndex
-     * @return LanguageResource
      * @throws Exception
      */
     private function createLanguageResource(string $type, int $nextIndex): LanguageResource
@@ -381,6 +350,17 @@ final class Config
             case 'mstranslator':
                 return new MicrosoftTranslator($this->testClass, $nextIndex);
 
+            case LanguageResource::GOOGLE_TRANSLATE:
+                return new GoogleTranslate($this->testClass, $nextIndex);
+
+            case LanguageResource::OPEN_AI:
+                // TODO FIXME / UGLY: Using classes from Private Plugins ... how to solve ?
+                return new \MittagQI\Translate5\Plugins\OpenAI\Test\Import\OpenAI($this->testClass, $nextIndex);
+
+            case LanguageResource::TILDE_MT:
+                // TODO FIXME / UGLY: Using classes from Private Plugins ... how to solve ?
+                return new \MittagQI\Translate5\Plugins\TildeMT\Test\Import\TildeMt($this->testClass, $nextIndex);
+
             default:
                 throw new Exception('Unknown language-resource type "' . $type . '"');
         }
@@ -388,11 +368,11 @@ final class Config
 
     /**
      * Helper to create unique indices across the whole test-suite
-     * @return int
      */
     private function getUniqueIndex(): int
     {
         static::$counter++;
+
         return static::$counter;
     }
 }

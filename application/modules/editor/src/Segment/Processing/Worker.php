@@ -36,45 +36,39 @@ use ZfExtended_Logger;
 /**
  * A processing worker processes segments in a loop until no unprocessed segments are available for the task
  */
-abstract class Worker extends PooledServiceWorker
+abstract class Worker extends PooledServiceWorker implements ProgressInterface
 {
     /**
-     * @var ZfExtended_Logger
+     * Defines the number of segments after which the progress is reported
      */
+    public const PROGRESS_INTERVAL = 50;
+
     protected ZfExtended_Logger $logger;
 
-    /**
-     * @var Looper
-     */
     protected Looper $looper;
 
-    /**
-     * @var AbstractProcessor
-     */
     protected AbstractProcessor $processor;
 
-    /**
-     * @var string
-     */
     protected string $processingMode;
 
     /**
      * To avoid deadlocks it is attempted to fetch segments from the top or back in an alternating manner
-     * @var bool
      */
     protected bool $fromTheTop = true;
 
     /**
+     * Tracks how often the progress was reported
+     */
+    protected int $numReports = 0;
+
+    /**
      * Must be implemented to create the logger
      * This function is also used in a static context and must not use internal dependencies
-     * @param string $processingMode
-     * @return ZfExtended_Logger
      */
     abstract protected function createLogger(string $processingMode): ZfExtended_Logger;
 
     /**
      * Creates the Processor
-     * @return AbstractProcessor
      */
     abstract protected function createProcessor(): AbstractProcessor;
 
@@ -84,10 +78,7 @@ abstract class Worker extends PooledServiceWorker
      * - a positive integer causes the looping to continue and processing the remaining segments there might be
      * - "0" halts the looping/processing and causes the worker to finish without exception
      * - a negative integer leads to the passed exception being thrown ending the processing
-     * @param Exception $loopedProcessingException
      * @param State[] $problematicStates
-     * @param bool $isReprocessing
-     * @return int
      */
     protected function onLooperException(Exception $loopedProcessingException, array $problematicStates, bool $isReprocessing): int
     {
@@ -96,9 +87,8 @@ abstract class Worker extends PooledServiceWorker
 
     /**
      * @param array $parameters
-     * @return bool
      */
-    protected function validateParameters($parameters = [])
+    protected function validateParameters($parameters = []): bool
     {
         // required param defines the mode as defined in editor_Segment_Processing
         if (array_key_exists('processingMode', $parameters)) {
@@ -106,6 +96,7 @@ abstract class Worker extends PooledServiceWorker
         } else {
             return false;
         }
+
         return parent::validateParameters($parameters);
     }
 
@@ -119,9 +110,21 @@ abstract class Worker extends PooledServiceWorker
         if (parent::init($taskGuid, $parameters)) {
             // this ensures, that worker 0 ... 2 ... are fetching processing-states from the top while 1 ... 3 ... fetch from the back. In theory, this should make deadlocks less likely
             $this->fromTheTop = $this->workerIndex % 2 === 0;
+
             return true;
         }
+
         return false;
+    }
+
+    public function reportProcessed(int $numProcessed): void
+    {
+        // when the num of processed segments exceeds our next progress interval
+        // we report the achieved progress to our worker-model
+        if ($numProcessed > ($this->numReports + 1) * self::PROGRESS_INTERVAL) {
+            $this->updateProgress($this->looper->getProgress());
+            $this->numReports++;
+        }
     }
 
     protected function work()
@@ -132,23 +135,23 @@ abstract class Worker extends PooledServiceWorker
         }
         // special: some processors may decide not to process - usually because conditions not yet have been clear in queueing-phase
         // simply all workers with higher index will terminate then
-        if($this->processor->prepareWorkload($this->workerIndex)){
+        if ($this->processor->prepareWorkload($this->workerIndex)) {
             // loop through the segments to process
             $this->logger = $this->createLogger($this->processingMode);
-            $this->looper = new Looper($this->task, $this->processor);
+            $this->looper = new Looper($this, $this->task, $this->processor);
             $this->doLoop();
         } else {
             if ($this->doDebug) {
                 error_log('PooledService/Processing Worker: ' . get_class($this) . ' with index ' . $this->workerIndex . ' terminates because the processor ' . get_class($this->processor) . ' decided processing is not neccessary');
             }
         }
+
         return true;
     }
 
     /**
      * Sets all Segments in the batch, that are not of state processed, to the given state
      * @param State[] $problematicStates
-     * @param int $errorState
      */
     protected function setUnprocessedStates(array $problematicStates, int $errorState)
     {
@@ -163,7 +166,7 @@ abstract class Worker extends PooledServiceWorker
     private function doLoop()
     {
         $isFinished = false;
-        while (!$isFinished) {
+        while (! $isFinished) {
             try {
                 $isFinished = $this->looper->run($this->processingMode, $this->fromTheTop, $this->doDebug);
             } catch (Exception $processingException) {
@@ -172,9 +175,9 @@ abstract class Worker extends PooledServiceWorker
                 }
                 $flag = $this->onLooperException($processingException, $this->looper->getProcessedStates(), $this->looper->isReprocessingLoop());
                 if ($flag > 0) {
-                    // let the loop to continue processing the next segments and retrying the failed segment later on (if the exception-handling is correctly implemented)
+                    // let the loop continue processing the next segments and retrying the failed segment later on (if the exception-handling is correctly implemented)
                     $isFinished = false;
-                } else if ($flag === 0) {
+                } elseif ($flag === 0) {
                     // this finishes the loop and the whole processing without an exception
                     $isFinished = true;
                 } else {
@@ -183,17 +186,5 @@ abstract class Worker extends PooledServiceWorker
                 }
             }
         }
-    }
-
-    /**
-     * @return float
-     */
-    protected function calculateProgressDone(): float
-    {
-        // when no looper exists there seems no workload processing needed and we can return 100% ...
-        if(isset($this->looper)){
-            return $this->looper->getProgress();
-        }
-        return 1;
     }
 }

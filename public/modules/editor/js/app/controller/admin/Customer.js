@@ -86,9 +86,9 @@ Ext.define('Editor.controller.admin.Customer', {
     },
 
     strings:{
-        customerLabelText:'#UT#Kunden InstantTranslate &amp; TermPortal',
-        customerInfoIconTooltip:'#UT#Der Benutzer hat das Recht, die Sprachressourcen in InstantTranslate &amp; TermPortal zu nutzen, die denselben Kunden zugeordnet sind, denen der Benutzer hier zugeordnet ist.',
-        allCustomers:'#UT#Alle Kunden'
+        customerLabelText: '#UT#Zugewiesene Kunden (Betrifft Rollen PM, InstantTranslate und TermPortal)',
+        customerInfoIconTooltip: '#UT#Der Benutzer hat das Recht, die Sprachressourcen in InstantTranslate &amp; TermPortal zu nutzen, die denselben Kunden zugeordnet sind, denen der Benutzer hier zugeordnet ist.',
+        allCustomers: '#UT#Alle Kunden'
     },
     
     // Multitenancy
@@ -107,7 +107,7 @@ Ext.define('Editor.controller.admin.Customer', {
      */
     onHeadPanelAfterRender: function(toolbar) {
         //if we are in edit task mode, do not add the multitenancy button
-        if(Ext.ComponentQuery.query('#segmentgrid')[0] || !this.isCustomerOverviewAllowed()){
+        if(Ext.ComponentQuery.query('#segmentgrid')[0]){
             return;
         }
         // multitenancy: add the drop-down "Switch client"
@@ -118,15 +118,12 @@ Ext.define('Editor.controller.admin.Customer', {
      * Admin add window after render handler
      */
     onAdminUserAddWindowAfterRender:function(adminWindow){
-        if(!this.isCustomerOverviewAllowed()){
-            return;
-        }
-        var me=this,
-            loginFieldset=adminWindow.down('#loginDetailsFieldset');
+        var me = this,
+            loginFieldset = adminWindow.down('#loginDetailsFieldset');
 
         loginFieldset.add({
-            xtype:'customers',
-            fieldLabel:me.strings.customerLabelText
+            xtype: 'customers',
+            fieldLabel: me.strings.customerLabelText
         });
     },
 
@@ -134,10 +131,6 @@ Ext.define('Editor.controller.admin.Customer', {
      * On admin user grid before render handler.
      */
     onAdminUserGridBeforeRender:function(taskgrid){
-        if(!this.isCustomerOverviewAllowed()){
-            return;
-        }
-
         //insert the customer column in the user grid
         var me = this,
             grid = taskgrid.getView().grid,
@@ -164,10 +157,10 @@ Ext.define('Editor.controller.admin.Customer', {
                 if(!v || v.length === 0){
                     return '';
                 }
-                var v = v.replace(/(^,)|(,$)/g, ''),
-                    customersStore=Ext.StoreManager.get('customersStore');
-                v=v.split(',');
-                for(var i=0;i<v.length;i++){
+                var customersStore=Ext.StoreManager.get('customersStore');
+                v = v.replace(/(^,)|(,$)/g, '');
+                v = v.split(',');
+                for(var i=0; i<v.length; i++){
                     var tmpRec=customersStore.findRecord('id',v[i],0,false,false,true);
                     tmpRec && names.push(tmpRec.get('name'));
                 }
@@ -178,13 +171,6 @@ Ext.define('Editor.controller.admin.Customer', {
         //insert the column after the locale column
         grid.headerCt.insert((grid.down('gridcolumn[dataIndex=locale]').fullColumnIndex + 1), column);
         grid.getView().refresh();
-    },
-
-    /**
-     * Check if the user has a frontend right to see the customer overview 
-     */
-    isCustomerOverviewAllowed:function(){
-        return Editor.app.authenticatedUser.isAllowed('customerAdministration');
     },
 
     /**
@@ -424,9 +410,9 @@ Ext.define('Editor.controller.admin.Customer', {
         if(sorters && sorters.length > 0){
             sorters.clear();
         }
+        customerColumn = grid.columnManager.getHeaderByDataIndex(customerColumnName);
         if (val == '') {
             me.consoleLog('GRID ' + grid.getId() + ' remove customer-filter');
-            customerColumn = grid.columnManager.getHeaderByDataIndex(customerColumnName);
             if(!customerColumn){
                 //the column should not be rendered, remove the filter only from the store
                 //TODO: the users grid is not filtered
@@ -436,12 +422,17 @@ Ext.define('Editor.controller.admin.Customer', {
             }
         } else {
             me.consoleLog('GRID ' + grid.getId() + ' add customer-filter');
-            gridFilters.addFilters([{
-                type: 'customer',
-                dataIndex: customerColumnName,
-                property: customerColumnName,
-                value: val
-            }]);
+            if (!customerColumn) {
+                gridFilters.addFilters([{
+                    type: 'customer',
+                    dataIndex: customerColumnName,
+                    property: customerColumnName,
+                    value: val
+                }]);
+            } else {
+                customerColumn.filter.setValue(val);
+                customerColumn.filter.setActive(true);
+            }
         }
     },
     

@@ -21,25 +21,18 @@
   @copyright  Marc Mittag, MittagQI - Quality Informatics
   @author     MittagQI - Quality Informatics
   @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
- 			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
  END LICENSE AND COPYRIGHT
  */
 
 /**
- * Class editor_Plugins_MatchAnalysis_Export_ExportExcel
  * Export the match analyse result into Excel
  */
-class editor_Plugins_MatchAnalysis_Export_ExportExcel {
-
-    /**
-     * @var editor_Models_Task
-     */
+class editor_Plugins_MatchAnalysis_Export_ExportExcel
+{
     protected editor_Models_Task $task;
 
-    /**
-     * @var ZfExtended_Zendoverwrites_Translate
-     */
     protected ZfExtended_Zendoverwrites_Translate $translate;
 
     private array $fuzzyRanges;
@@ -49,7 +42,18 @@ class editor_Plugins_MatchAnalysis_Export_ExportExcel {
         $this->translate = ZfExtended_Zendoverwrites_Translate::getInstance();
     }
 
-    public function generateExcelAndProvideDownload(editor_Models_Task $task, $rows, $filename){
+    /**
+     * @param editor_Models_Task $task
+     * @param array $rows
+     * @param string $filename
+     * @return void
+     * @throws ReflectionException
+     * @throws Zend_Exception
+     * @throws ZfExtended_Models_Entity_NotFoundException
+     * @throws \PhpOffice\PhpSpreadsheet\Exception
+     */
+    public function generateExcelAndProvideDownload(editor_Models_Task $task, array $rows, string $filename): void
+    {
         $this->task = $task;
 
         // Set up ranges
@@ -68,22 +72,28 @@ class editor_Plugins_MatchAnalysis_Export_ExportExcel {
 
         $this->setLabels($spreadsheet);
 
-        $sumRowIndex = count($data)+2;
+        $sumRowIndex = count($data) + 2;
 
-        $sheet=$spreadsheet->getSpreadsheet()->getActiveSheet();
+        $sheet = $spreadsheet->getSpreadsheet()->getActiveSheet();
 
-        $sheet->setCellValue("A" .  $sumRowIndex     , $this->translate->_("Price adjustment"));
+        $sheet->setCellValue("A" . $sumRowIndex, $this->translate->_("Price adjustment"));
         $sheet->setCellValue("A" . ($sumRowIndex + 1), $this->translate->_("Final amount"));
+        $sheet->setCellValue("A" . ($sumRowIndex + 2), $this->translate->_("Quellsprache"));
+        $sheet->setCellValue("A" . ($sumRowIndex + 3), $this->translate->_("Zielsprache"));
+        $sheet->setCellValue("B" . ($sumRowIndex + 2), $task->getSourceLanguage()->getRfc5646());
+        $sheet->setCellValue("B" . ($sumRowIndex + 3), $task->getTargetLanguage()->getRfc5646());
 
-        $sheet->setCellValue("B" . $sumRowIndex      ,$ma->getPricing()['priceAdjustment']);
-        $sheet->setCellValue("B" . ($sumRowIndex + 1),$ma->getPricing()['priceAdjustment'] + end($rows)['unitCountTotal']);
-        $sheet->setCellValue("C" . $sumRowIndex      ,$ma->getPricing()['currency']);
-        $sheet->setCellValue("C" . ($sumRowIndex + 1),$ma->getPricing()['currency']);
+        $sheet->setCellValue("B" . $sumRowIndex, $ma->getPricing()['priceAdjustment']);
+        $sheet->setCellValue(
+            "B" . ($sumRowIndex + 1),
+            $ma->getPricing()['priceAdjustment'] + end($rows)['unitCountTotal']
+        );
+        $sheet->setCellValue("C" . $sumRowIndex, $ma->getPricing()['currency']);
+        $sheet->setCellValue("C" . ($sumRowIndex + 1), $ma->getPricing()['currency']);
 
         //set the cell autosize
-        $spreadsheet->simpleArrayToExcel($data,function($phpSpreadsheet){
+        $spreadsheet->simpleArrayToExcel($data, function ($phpSpreadsheet) {
             foreach ($phpSpreadsheet->getWorksheetIterator() as $worksheet) {
-
                 $phpSpreadsheet->setActiveSheetIndex($phpSpreadsheet->getIndex($worksheet));
 
                 $sheet = $phpSpreadsheet->getActiveSheet();
@@ -98,39 +108,46 @@ class editor_Plugins_MatchAnalysis_Export_ExportExcel {
     }
 
     /**
-     * @param $rows
+     * @param array $rows
+     * @return array
      * @throws Zend_Exception
      */
-    protected function prepareDataArray($rows)
+    protected function prepareDataArray(array $rows): array
     {
-        //add to all groups 'Group' sufix, php excel does not handle integer keys
+        //add to all groups 'Group' suffix, php excel does not handle integer keys
         $result = [];
-        foreach ($rows as $row){
-
+        foreach ($rows as $row) {
             //the order in the newRows array defines the result order in the spreadsheet
             $newRow = [
-                'resourceName' => empty($row['resourceName']) ? $this->translate->_("Repetitions") : $row['resourceName'],
-                'unitCountTotal' => $row['unitCountTotal']
+                'resourceName' => empty($row['resourceName']) ?
+                    $this->translate->_("Repetitions") : $row['resourceName'],
+                'unitCountTotal' => $row['unitCountTotal'],
             ];
 
             //loop over the fuzzy ranges and get the corresponding content
-            foreach($this->fuzzyRanges as $begin => $end) {
-                if(array_key_exists($begin, $row)) {
+            foreach ($this->fuzzyRanges as $begin => $end) {
+                if (array_key_exists($begin, $row)) {
                     //change the key to $key+Group, since the Excel export does not accept numerical keys
-                    $key = is_numeric($begin) ? $begin.'Group' : $begin;
+                    $key = is_numeric($begin) ? $begin . 'Group' : $begin;
                     $newRow[$key] = $row[$begin];
                 }
             }
 
             $newRow['internalFuzzy'] = $row['resourceName'] == 'Amount' ? '' : $row['internalFuzzy'];
-            $newRow['created']       = $row['resourceName'] == 'Amount' ? '' : $row['created'];
+            $newRow['created'] = $row['resourceName'] == 'Amount' ? '' : $row['created'];
 
             $result[] = $newRow;
         }
+
         return $result;
     }
 
-    protected function setLabels(ZfExtended_Models_Entity_ExcelExport $spreadsheet)
+    /**
+     * @param ZfExtended_Models_Entity_ExcelExport $spreadsheet
+     * @return void
+     * @throws Zend_Exception
+     */
+    protected function setLabels(ZfExtended_Models_Entity_ExcelExport $spreadsheet): void
     {
         $spreadsheet->setLabel('resourceName', $this->translate->_("Name"));
 
@@ -139,18 +156,15 @@ class editor_Plugins_MatchAnalysis_Export_ExportExcel {
         array_pop($beginners);
         $noMatchEnd = (int) end($beginners) - 1;
 
-        foreach($this->fuzzyRanges as $begin => $end) {
-            if($begin == 'noMatch') {
+        foreach ($this->fuzzyRanges as $begin => $end) {
+            if ($begin == 'noMatch') {
                 //just keep $begin as it is
-                $label = $noMatchEnd.'%-0%';
-            }
-            elseif($begin === (int) $end) { //must come after noMatch if, since on noMatch is begin == end too
+                $label = $noMatchEnd . '%-0%';
+            } elseif ($begin === (int) $end) { //must come after noMatch if, since on noMatch is begin == end too
                 //if the range is a single element range, some of the special texts may be used:
                 $label = $this->getSingleElementRangeLabel($begin);
                 $begin .= 'Group';
-            }
-
-            else{
+            } else {
                 //since matchrate groups are DESC from left to right, we use the labels also in that direction
                 $label = sprintf('%d%%-%d%%', $end, $begin);
                 $begin .= 'Group';
@@ -163,19 +177,19 @@ class editor_Plugins_MatchAnalysis_Export_ExportExcel {
         $spreadsheet->setLabel('internalFuzzy', $this->translate->_("Interner Fuzzy aktiv"));
     }
 
-    private function getSingleElementRangeLabel(int $match): string {
-        switch ($match) {
-            case 104:
-                return $this->translate->_("TermCollection Treffer (104%)");
-            case 103:
-                return $this->translate->_("Kontext Treffer (103%)");
-            case 102:
-                return $this->translate->_("Wiederholung (102%)");
-            case 101:
-                return $this->translate->_("Exact-exact Treffer (101%)");
-            default :
-                return sprintf('%d%%', $match);
-        }
+    /**
+     * @param int $match
+     * @return string
+     * @throws Zend_Exception
+     */
+    private function getSingleElementRangeLabel(int $match): string
+    {
+        return match ($match) {
+            104 => $this->translate->_("TermCollection Treffer (104%)"),
+            103 => $this->translate->_("Kontext Treffer (103%)"),
+            102 => $this->translate->_("Wiederholung (102%)"),
+            101 => $this->translate->_("Exact-exact Treffer (101%)"),
+            default => sprintf('%d%%', $match),
+        };
     }
 }
-

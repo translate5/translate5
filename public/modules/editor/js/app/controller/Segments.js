@@ -100,8 +100,11 @@ Ext.define('Editor.controller.Segments', {
         ref: 'watchListFilterBtn',
         selector: '#watchListFilterBtn'
     }, {
-        ref: 'filterBtnRepeated',
-        selector: '#filterBtnRepeated'
+        ref: 'filterBtnRepeatedIncludeFirst',
+        selector: '#filterBtnRepeatedIncludeFirst'
+    }, {
+        ref: 'filterBtnRepeatedExcludeFirst',
+        selector: '#filterBtnRepeatedExcludeFirst'
     }, {
         ref: 'segmentsToolbar',
         selector: 'segmentsToolbar'
@@ -136,7 +139,9 @@ Ext.define('Editor.controller.Segments', {
                 afterrender: 'gridAfterRender',
                 columnhide: 'handleColumnVisibility',
                 columnshow: 'handleColumnVisibility',
-                canceledit: 'handleCancelEdit'
+                canceledit: 'handleCancelEdit',
+                select:'onSegmentGridSelect'
+
             },
             '#fileorderTree': {
                 itemclick: 'handleFileClick'
@@ -150,8 +155,11 @@ Ext.define('Editor.controller.Segments', {
             'segmentsToolbar #watchListFilterBtn': {
                 click: 'watchListFilter'
             },
-            'segmentsToolbar #filterBtnRepeated': {
-                click: 'repeatedFilter'
+            'segmentsToolbar #filterBtnRepeatedIncludeFirst': {
+                click: 'repeatedFilterIncludeFirst'
+            },
+            'segmentsToolbar #filterBtnRepeatedExcludeFirst': {
+                click: 'repeatedFilterExcludeFirst'
             }
         },
         store: {
@@ -171,8 +179,18 @@ Ext.define('Editor.controller.Segments', {
         this.lastFileMapParams = null;
     },
 
-    onOpenEditorViewport: function (app, task) {
-        this.updateSegmentFinishCountViewModel(task);
+    /**
+     * @param {Editor.$application} app
+     * @param {Editor.model.admin.Task} task
+     * @param {Ext.data.operation.Update} operation
+     */
+    onOpenEditorViewport: function (app, task, operation) {
+
+        // Get response json
+        var json = operation.getResponse().responseJson;
+
+        // Update progress
+        this.updateSegmentFinishCountViewModel(json.taskProgress, json.userProgress);
     },
 
     /**
@@ -203,7 +221,7 @@ Ext.define('Editor.controller.Segments', {
      * @param {Integer} new segment count to be displayed
      */
     updateFilteredCountDisplay: function (newTotal) {
-        var me = this;
+        var me = this,
             resetFilterBtn = me.getResetFilterBtn();
 
         if (!resetFilterBtn){
@@ -331,7 +349,8 @@ Ext.define('Editor.controller.Segments', {
     },
 
     onToggleLockBtn: function () {
-        let grid = this.getSegmentGrid(),
+        let me = this,
+            grid = this.getSegmentGrid(),
             vm = grid.getViewModel(),
             ed = grid && grid.editingPlugin,
             segment = vm.get('selectedSegment'),
@@ -347,23 +366,47 @@ Ext.define('Editor.controller.Segments', {
         segment.proxy.appendId = false;
         segment.load({
             url: segment.proxy.url + '/' + segment.get('id') + '/' + operation + '/operation',
-            success: function (seg) {
+            success: function (seg, operation) {
                 vm.set('selectedSegment', seg);
+                var json = operation.getResponse().responseJson;
+                me.updateSegmentFinishCountViewModel(json.taskProgress, json.userProgress);
             }
         });
         segment.proxy.appendId = appendId;
     },
 
-    repeatedFilter: function (btn) {
+    repeatedFilterIncludeFirst: function (btn) {
         var me = this,
             grid = me.getSegmentGrid(),
-            column = grid.down('[dataIndex=isRepeated]');
+            column = grid.down('[dataIndex=isRepeated]'),
+            tbar = me.getSegmentsToolbar();
 
         if (column && column.filter) {
             if (btn.pressed) {
+                tbar.down('#filterBtnRepeatedExcludeFirst').toggle(false, false);
+                //1,2,3,4 contain in filter source only (1), target only (2), segments repeated in both (3), including first ones
+                column.filter.filter.setValue([1, 2, 3, 4]);
+                column.filter.active = false;
                 column.filter.setActive(true);
-                //1,2,3 contain in filter source only (1), target only (2), and segments repeatead in both (3)
+            } else {
+                column.filter.setActive(false);
+            }
+        }
+    },
+
+    repeatedFilterExcludeFirst: function (btn) {
+        var me = this,
+            grid = me.getSegmentGrid(),
+            column = grid.down('[dataIndex=isRepeated]'),
+            tbar = me.getSegmentsToolbar();
+
+        if (column && column.filter) {
+            if (btn.pressed) {
+                tbar.down('#filterBtnRepeatedIncludeFirst').toggle(false, false);
+                //1,2,3 contain in filter source only (1), target only (2), segments repeated in both (3), except first ones
                 column.filter.filter.setValue([1, 2, 3]);
+                column.filter.active = false;
+                column.filter.setActive(true);
             } else {
                 column.filter.setActive(false);
             }
@@ -405,16 +448,32 @@ Ext.define('Editor.controller.Segments', {
             tbar = me.getSegmentsToolbar(),
             watchListFound = false,
             isRepeatedFound = false,
-            params = {};
+            params = {},
+            isRepeatedValue,
+            includeFirst = false,
+            excludeFirst = false;
 
         filters.each(function (filter, index, len) {
             watchListFound = watchListFound || filter.getProperty() == 'isWatched';
             isRepeatedFound = isRepeatedFound || filter.getProperty() == 'isRepeated';
+            if (filter.getProperty() == 'isRepeated') {
+                isRepeatedValue = filter.getValue();
+            }
         });
 
         tbar.down('#watchListFilterBtn').toggle(watchListFound, false);
-        tbar.down('#filterBtnRepeated').toggle(isRepeatedFound, false);
 
+        // Setup values for includeFirst and includeFirst flags
+        if (isRepeatedFound) {
+            if (~isRepeatedValue.indexOf(1) || ~isRepeatedValue.indexOf(2) || ~isRepeatedValue.indexOf(3)) {
+                includeFirst = !!~isRepeatedValue.indexOf(4);
+                excludeFirst = !includeFirst;
+            }
+        }
+
+        // Toggle repetition-buttons based on those flags
+        tbar.down('#filterBtnRepeatedIncludeFirst').toggle(includeFirst, false);
+        tbar.down('#filterBtnRepeatedExcludeFirst').toggle(excludeFirst, false);
         params[proxy.getFilterParam()] = proxy.encodeFilters(store.getFilters().items);
 
         filters && me.styleResetFilterButton(filters);
@@ -664,13 +723,11 @@ Ext.define('Editor.controller.Segments', {
         //this bug also exist in extjs 6.2.0
         me.fireEvent('beforeSaveCall', record);
 
-        //get the segmentFinishCount parameter from the response
-        var response = operation.getResponse(),
-            decoded = response.responseText && Ext.JSON.decode(response.responseText),
-            segmentFinishCount = decoded && decoded.segmentFinishCount;
+        // Get response json
+        var json = operation.getResponse().responseJson;
 
-        //TODO: this should be implemented with websokets(when ready)
-        me.updateSegmentFinishCountViewModel(Ext.Number.from(segmentFinishCount, 0));
+        // Update progress
+        me.updateSegmentFinishCountViewModel(json.taskProgress, json.userProgress);
 
         //invoking change alike handling:
         if (me.fireEvent('saveComplete')) {
@@ -714,8 +771,7 @@ Ext.define('Editor.controller.Segments', {
      * On save alike sucess handler
      */
     onAlikesSaveSuccessHandler: function (data) {
-        var value = Ext.Number.from(data.segmentFinishCount, 0);
-        this.updateSegmentFinishCountViewModel(value);
+        this.updateSegmentFinishCountViewModel(data.taskProgress, data.userProgress);
     },
 
     /**
@@ -749,19 +805,24 @@ Ext.define('Editor.controller.Segments', {
     },
 
     /**
-     * Update the segmentFinishCount segments grid view model.
+     * Update the taskProgress and userProgress
+     *
+     * @param {float} taskProgress
+     * @param {float} userProgress
      */
-    updateSegmentFinishCountViewModel: function (record) {
+    updateSegmentFinishCountViewModel: function (taskProgress, userProgress) {
         var me = this,
             grid = me.getSegmentGrid(),
-            vm = grid && grid.getViewModel(),
-            value = Ext.isNumber(record) ? record : record.get('segmentFinishCount');
+            vm = grid && grid.getViewModel();
 
+        // If no vm is accessible - return
         if (!vm) {
             return;
         }
 
-        vm.set('segmentFinishCount', value);
+        // Update taskProgress and userProgress
+        vm.set('taskProgress', taskProgress);
+        vm.set('userProgress', userProgress);
     },
     /**
      * Handles the cancel edit of the segment grid
@@ -771,6 +832,16 @@ Ext.define('Editor.controller.Segments', {
     handleCancelEdit() {
         this.fireEvent('segmentEditCanceled', this);
     },
+
+    /**
+     * @param {Ext.selection.RowModel} rowmodel
+     * @param {Editor.model.Segment} segment
+     */
+    onSegmentGridSelect: function(rowmodel, segment) {
+        var viewPort = this.getViewport();
+        viewPort.getViewModel().set('selectedSegment', segment);
+    },
+
     /**
      * Listens to the filter panel controller and delegates it to our store and changes the view if the stored filter changed
      */

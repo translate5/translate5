@@ -59,7 +59,7 @@ Ext.define('Editor.view.LanguageResources.pivot.Assoc', {
     padding: 0,
     layout:'fit',
     store:[],
-
+    border: 0,
     task: null,
 
     bind: {
@@ -99,6 +99,7 @@ Ext.define('Editor.view.LanguageResources.pivot.Assoc', {
                 dock: 'bottom',
                 ui: 'footer',
                 defaultButtonUI: false,
+                border: '1 0 0 0',
                 items: [{
                     xtype: 'button',
                     itemId: 'startPivotPretranslation',

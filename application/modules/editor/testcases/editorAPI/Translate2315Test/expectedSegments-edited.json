@@ -1,7 +1,6 @@
 [
     {
         "segmentNrInTask": "1",
-        "mid": "NFDBB2FA9-tu1_1",
         "userGuid": "{00000000-0000-0000-C100-CCDDEE000001}",
         "userName": "manager test",
         "editable": "1",
@@ -29,7 +28,6 @@
     },
     {
         "segmentNrInTask": "2",
-        "mid": "NFDBB2FA9-tu2_2",
         "userGuid": "{00000000-0000-0000-C100-CCDDEE000001}",
         "userName": "manager test",
         "editable": "1",
@@ -57,7 +55,6 @@
     },
     {
         "segmentNrInTask": "3",
-        "mid": "NFDBB2FA9-tu3_3",
         "userGuid": "{00000000-0000-0000-C100-CCDDEE000001}",
         "userName": "manager test",
         "editable": "1",
@@ -85,7 +82,6 @@
     },
     {
         "segmentNrInTask": "4",
-        "mid": "NFDBB2FA9-tu4_4",
         "userGuid": "{00000000-0000-0000-C100-CCDDEE000001}",
         "userName": "manager test",
         "editable": "1",
@@ -113,7 +109,6 @@
     },
     {
         "segmentNrInTask": "5",
-        "mid": "NFDBB2FA9-tu5_5",
         "userGuid": "{00000000-0000-0000-C100-CCDDEE000002}",
         "userName": "lector test",
         "editable": "1",
@@ -141,7 +136,6 @@
     },
     {
         "segmentNrInTask": "6",
-        "mid": "NFDBB2FA9-tu6_6",
         "userGuid": "{00000000-0000-0000-C100-CCDDEE000002}",
         "userName": "lector test",
         "editable": "1",
@@ -169,7 +163,6 @@
     },
     {
         "segmentNrInTask": "7",
-        "mid": "NFDBB2FA9-tu7_7",
         "userGuid": "{00000000-0000-0000-C100-CCDDEE000002}",
         "userName": "lector test",
         "editable": "1",
@@ -197,7 +190,6 @@
     },
     {
         "segmentNrInTask": "8",
-        "mid": "NFDBB2FA9-tu8_8",
         "userGuid": "{00000000-0000-0000-C100-CCDDEE000002}",
         "userName": "lector test",
         "editable": "1",

@@ -21,14 +21,13 @@ START LICENSE AND COPYRIGHT
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
 
-/**
- *
- */
+use MittagQI\ZfExtended\MismatchException;
+
 class editor_AttributedatatypeController extends ZfExtended_RestController
 {
     /**
@@ -48,16 +47,14 @@ class editor_AttributedatatypeController extends ZfExtended_RestController
 
     /**
      * Collections, allowed for current user
-     *
-     * @var
      */
     protected $collectionIds = false;
 
     /**
      * @throws Zend_Session_Exception
      */
-    public function init() {
-
+    public function init()
+    {
         // Call parent
         parent::init();
 
@@ -73,18 +70,18 @@ class editor_AttributedatatypeController extends ZfExtended_RestController
         // Get ids of collections accessible to current user
         $collectionIds = ZfExtended_Factory
             ::get('editor_Models_TermCollection_TermCollection')
-            ->getCollectionForAuthenticatedUser();
+                ->getCollectionForAuthenticatedUser();
 
-        if(empty($collectionIds)) {
+        if (empty($collectionIds)) {
             throw new ZfExtended_NotFoundException('No collections found for current user!');
         }
 
         // Get possible attribs as dataTypeId => info pairs
         $attribs = ZfExtended_Factory
             ::get('editor_Models_Terminology_Models_AttributeDataType')
-            ->getLocalized($this->user()->getLocale(), $collectionIds);
+                ->getLocalized($this->user()->getLocale(), $collectionIds);
 
-        if(empty($attribs)) {
+        if (empty($attribs)) {
             throw new ZfExtended_NotFoundException('No attributes found!');
         }
 
@@ -92,49 +89,48 @@ class editor_AttributedatatypeController extends ZfExtended_RestController
         $this->view->assign($attribs);
     }
 
-    /**
-     *
-     */
-    public function getAction() {
+    public function getAction()
+    {
         throw new BadMethodCallException();
     }
 
     /**
      * Delete attribute
      *
-     * @throws ZfExtended_Mismatch
+     * @throws MismatchException
      */
-    public function deleteAction() {
+    public function deleteAction()
+    {
         throw new BadMethodCallException();
     }
 
     /**
      * Update attribute
      *
-     * @throws ZfExtended_Mismatch
+     * @throws MismatchException
      */
-    public function putAction() {
-
+    public function putAction()
+    {
         // Validate params and load entity
         $this->jcheck([
             'dataTypeId' => [
                 'req' => true,
                 'rex' => 'int11',
-                'key' => $this->entity
+                'key' => $this->entity,
             ],
             'locale' => [
                 'req' => true,
-                'fis' => 'en,de'
+                'fis' => 'en,de',
             ],
             'label' => [
-                'rex' => 'varchar255'
-            ]
+                'rex' => 'varchar255',
+            ],
         ]);
 
         // Shortcuts
         $locale = $this->getParam('locale');
         $custom = json_decode($this->entity->getL10nCustom(), true);
-        $customLabel  = $this->getParam('label');
+        $customLabel = $this->getParam('label');
         $systemLabel = json_decode($this->entity->getL10nSystem())->$locale;
 
         // Set label for current locale
@@ -147,6 +143,8 @@ class editor_AttributedatatypeController extends ZfExtended_RestController
         $this->entity->save();
 
         // Flush label
-        $this->view->assign(['label' => $customLabel ?: $systemLabel ?: $this->entity->getType()]);
+        $this->view->assign([
+            'label' => $customLabel ?: $systemLabel ?: $this->entity->getType(),
+        ]);
     }
 }

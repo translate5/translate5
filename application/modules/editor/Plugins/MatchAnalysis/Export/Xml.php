@@ -21,13 +21,12 @@
   @copyright  Marc Mittag, MittagQI - Quality Informatics
   @author     MittagQI - Quality Informatics
   @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
- 			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
  END LICENSE AND COPYRIGHT
  */
 
 /**
- * Class editor_Plugins_MatchAnalysis_Export_Xml
  * Export the match analyse result as XML
  */
 class editor_Plugins_MatchAnalysis_Export_Xml
@@ -37,7 +36,7 @@ class editor_Plugins_MatchAnalysis_Export_Xml
      * WARNING: the here listed order of the attributes is important (segments before words) otherwise plunet can not import the XML file
      * @var array
      */
-    const ATTRIBUTES = [
+    public const ATTRIBUTES = [
         'segments',
         'words',
         'characters',
@@ -48,14 +47,14 @@ class editor_Plugins_MatchAnalysis_Export_Xml
         'partialRecallWords',
         'edits',
         'adaptiveWords',
-        'baselineWords'
+        'baselineWords',
     ];
-    
+
     /**
      * List of analyse nodes
      * @var array
      */
-    const NODES = [
+    public const NODES = [
         'perfect',
         'inContextExact',
         'exact',
@@ -67,24 +66,19 @@ class editor_Plugins_MatchAnalysis_Export_Xml
         'newBaseline',
         'newLearnings',
         'fuzzy',
-        'internalFuzzy'
+        'internalFuzzy',
     ];
-    
+
     /**
      * defined fuzzy ranges
-     * @var array
      */
     protected array $fuzzyRanges = [];
 
     /**
      * Collection of analyse nodes to be rendered
-     * @var array
      */
     protected array $analyseNodes = [];
-    
-    /**
-     * @var SimpleXMLElement
-     */
+
     protected SimpleXMLElement $rootNode;
 
     /**
@@ -102,23 +96,20 @@ class editor_Plugins_MatchAnalysis_Export_Xml
     /**
      * @throws editor_Models_ConfigException
      */
-    public function __construct(editor_Models_Task $task, array $fuzzyRanges) {
-
+    public function __construct(editor_Models_Task $task, array $fuzzyRanges)
+    {
         $this->useInContextExact = $task->getConfig()->runtimeOptions->plugins->MatchAnalysis->xmlInContextUsage ?? false;
 
         //for XML export we may
         $this->fuzzyRanges = [];
-        foreach($fuzzyRanges as $begin => $end) {
-            if((int) $begin >= 100) {
+        foreach ($fuzzyRanges as $begin => $end) {
+            if ((int) $begin >= 100) {
                 continue;
             }
-            $this->fuzzyRanges[(string) $begin] = (string) min((int)$end, 99);
+            $this->fuzzyRanges[(string) $begin] = (string) min((int) $end, 99);
         }
     }
 
-    /**
-     * @param bool $isCharacterBased
-     */
     public function setIsCharacterBased(bool $isCharacterBased): void
     {
         $this->isCharacterBased = $isCharacterBased;
@@ -127,49 +118,44 @@ class editor_Plugins_MatchAnalysis_Export_Xml
     /**
      * adds empty fuzzy nodes
      */
-    protected function addEmptyFuzzyNodes() {
-        foreach($this->fuzzyRanges as $min => $max) {
-            $this->add('fuzzy', ['min' => $min, 'max' => $max]);
+    protected function addEmptyFuzzyNodes()
+    {
+        foreach ($this->fuzzyRanges as $min => $max) {
+            $this->add('fuzzy', [
+                'min' => $min,
+                'max' => $max,
+            ]);
         }
         //we use separate loops to sort all internal fuzzies below the fuzzies
-        foreach($this->fuzzyRanges as $min => $max) {
-            $this->add('internalFuzzy', ['min' => $min, 'max' => $max]);
+        foreach ($this->fuzzyRanges as $min => $max) {
+            $this->add('internalFuzzy', [
+                'min' => $min,
+                'max' => $max,
+            ]);
         }
     }
 
-    /**
-     * @param SimpleXMLElement $child
-     * @param $data
-     * @return SimpleXMLElement
-     */
     protected function addAttributes(SimpleXMLElement $child, $data): SimpleXMLElement
     {
-
         foreach (self::ATTRIBUTES as $attr) {
             $child->addAttribute($attr, '0');
             if ($attr == 'words' && $child->getName() == 'fuzzy') {
-                $attrib = (array)$child->attributes()->max;
+                $attrib = (array) $child->attributes()->max;
 
                 $child->addAttribute($attr, $data[$attrib[0]]);
             }
-
         }
 
         return $child;
     }
 
-    /**
-     * @param $rows
-     * @param $taskGuid
-     * @return SimpleXMLElement
-     */
     public function generateXML($rows, $taskGuid): SimpleXMLElement
     {
         $usedLanguageResources = [];
-        
+
         $hasInternalFuzzy = false;
 
-        unset ($this->fuzzyRanges['noMatch']);
+        unset($this->fuzzyRanges['noMatch']);
         $this->fuzzyRanges = array_reverse($this->fuzzyRanges, true);
 
         $this->addEmptyFuzzyNodes();
@@ -177,43 +163,41 @@ class editor_Plugins_MatchAnalysis_Export_Xml
         //llop over data and categorize it
         foreach ($rows as $row) {
             $isMt = $row['type'] == editor_Models_Segment_MatchRateType::TYPE_MT;
-            
+
             $isInternalFuzzy = $row['internalFuzzy'] == 1;
             $hasInternalFuzzy = $hasInternalFuzzy || $isInternalFuzzy;
-            if($isMt) {
+            if ($isMt) {
                 $this->add('new', $row);
-            }elseif($isInternalFuzzy && $this->isFuzzyRange($row)) {
+            } elseif ($isInternalFuzzy && $this->isFuzzyRange($row)) {
                 $this->add('internalFuzzy', $row); //→ min max kann intern ermittelt werden über die MatchRate
             }
             //crossFileRepeated are translate5s repetitions (which are represented by 102% matches)
-            elseif($row['matchRate'] == 102) {
+            elseif ($row['matchRate'] == 102) {
                 $this->add('crossFileRepeated', $row);
             }
             //perfect are 103%-Matches from translate5
-            elseif($row['matchRate'] == 103) {
+            elseif ($row['matchRate'] == 103) {
                 $this->add('perfect', $row);
             }
             //inContextExact are 101%-Matches from translate5 (if configured)
-            elseif($this->useInContextExact && $row['matchRate'] == 101) {
+            elseif ($this->useInContextExact && $row['matchRate'] == 101) {
                 $this->add('inContextExact', $row);
             }
             //exact are 100% and 101% and 104%-Matches from translate5, since Trados does not know our 101 and 104%-Matches
             // 101 may be configured to be used as inContextExact
-            elseif($row['matchRate'] >= 100) {
+            elseif ($row['matchRate'] >= 100) {
                 $this->add('exact', $row);
-            }
-            elseif($this->isFuzzyRange($row)) {
+            } elseif ($this->isFuzzyRange($row)) {
                 $this->add('fuzzy', $row); //→ min max kann intern ermittelt werden über die MatchRate
-            }
-            else {
+            } else {
                 //if not matching a fuzzy range, it is considered as new
                 $this->add('new', $row);
             }
-            
+
             //total is the overall sum
             $this->add('total', $row);
-            
-            if(!empty($row['languageResourceid'])){
+
+            if (! empty($row['languageResourceid'])) {
                 $usedLanguageResources[$row['languageResourceid']] = $row['name'];
             }
         }
@@ -221,7 +205,7 @@ class editor_Plugins_MatchAnalysis_Export_Xml
         $this->createRootNode();
         $taskInfo = $this->createTaskInfo($taskGuid);
 
-        foreach($usedLanguageResources as $resourceName) {
+        foreach ($usedLanguageResources as $resourceName) {
             $taskInfo->addChild('tm')->addAttribute('name', $resourceName);
         }
 
@@ -230,65 +214,65 @@ class editor_Plugins_MatchAnalysis_Export_Xml
 
         return $this->rootNode;
     }
-    
+
     /**
      * returns true if rows matchrate is in one of the defined fuzzy ranges,
      *   if yes add the min and max of the range to the row via reference
-     * @param array $row
      * @return boolean
      */
-    protected function isFuzzyRange(array &$row): bool {
-        foreach($this->fuzzyRanges as $min => $max) {
-            if($min <= $row['matchRate'] && $row['matchRate'] <= $max) {
+    protected function isFuzzyRange(array &$row): bool
+    {
+        foreach ($this->fuzzyRanges as $min => $max) {
+            if ($min <= $row['matchRate'] && $row['matchRate'] <= $max) {
                 $row['min'] = $min;
                 $row['max'] = $max;
+
                 return true;
             }
         }
+
         return false;
     }
-    
+
     /**
      * add / update a analyse node
-     * @param string $name
-     * @param array $row
      */
-    protected function add(string $name, array $row) {
+    protected function add(string $name, array $row)
+    {
         $isFuzzy = ($name == 'fuzzy' || $name == 'internalFuzzy');
         $idx = $name;
         $min = array_key_exists('min', $row) ? (int) $row['min'] : 0;
         $max = array_key_exists('max', $row) ? (int) $row['max'] : 0;
-        if($isFuzzy) {
-            $idx = $name.'_'.$min.'_'.$max;
+        if ($isFuzzy) {
+            $idx = $name . '_' . $min . '_' . $max;
         }
-        if(empty($this->analyseNodes[$idx])) {
-            if($isFuzzy) {
+        if (empty($this->analyseNodes[$idx])) {
+            if ($isFuzzy) {
                 //this empty adding of min/max here is only because of the sorting of the attributes, they should be at the beginning
                 $node = array_fill_keys(array_merge(['min', 'max'], self::ATTRIBUTES), 0);
-            }
-            else {
+            } else {
                 $node = array_fill_keys(self::ATTRIBUTES, 0);
             }
             $node['tagName'] = $name;
-        }
-        else {
+        } else {
             $node = $this->analyseNodes[$idx];
         }
-        if($isFuzzy) {
+        if ($isFuzzy) {
             $node['min'] = $min;
             $node['max'] = $max;
         }
         //summing up the currently available values
-        if(array_key_exists('segCount', $row)) {
+        if (array_key_exists('segCount', $row)) {
             $node['segments'] += $row['segCount'];
         }
-        if(array_key_exists('unitCount', $row)) {
+        if (array_key_exists('unitCount', $row)) {
             $node[$this->isCharacterBased ? 'characters' : 'words'] += $row['unitCount'];
         }
         $this->analyseNodes[$idx] = $node;
     }
-    
-    protected function createBatchTotalNode() {
+
+    protected function createBatchTotalNode()
+    {
         $batchTotal = $this->rootNode->addChild('batchTotal');
         $analyseNode = $batchTotal->addChild('analyse');
 
@@ -296,25 +280,24 @@ class editor_Plugins_MatchAnalysis_Export_Xml
         $orderedNodes = array_fill_keys(self::NODES, []);
 
         //copy now the collected data into the ordered list
-        foreach($this->analyseNodes as $nodeData) {
+        foreach ($this->analyseNodes as $nodeData) {
             $tag = $nodeData['tagName'];
-            unset ($nodeData['tagName']);
+            unset($nodeData['tagName']);
             $orderedNodes[$tag][] = $nodeData;
         }
 
         //out of the ordered list we create the XML nodes
-        foreach($orderedNodes as $nodeTag => $subNodeList) {
-            if(empty($subNodeList)) {
+        foreach ($orderedNodes as $nodeTag => $subNodeList) {
+            if (empty($subNodeList)) {
                 $node = $analyseNode->addChild($nodeTag);
-                foreach(self::ATTRIBUTES as $attribute) {
-                    $node->addAttribute($attribute, 0);
+                foreach (self::ATTRIBUTES as $attribute) {
+                    $node->addAttribute($attribute, '0');
                 }
-            }
-            else {
+            } else {
                 //subnode list count will only be > 1 for fuzzy and internalFuzzy, for all other there is exactly one node
-                foreach($subNodeList as $subNode) {
+                foreach ($subNodeList as $subNode) {
                     $node = $analyseNode->addChild($nodeTag);
-                    foreach($subNode as $attribute => $value) {
+                    foreach ($subNode as $attribute => $value) {
                         $node->addAttribute($attribute, $value);
                     }
                 }
@@ -324,51 +307,51 @@ class editor_Plugins_MatchAnalysis_Export_Xml
 
     /**
      * creates and returns the XML taskInfo Node
-     * @param string $taskGuid
-     * @return SimpleXMLElement
      */
-    protected function createTaskInfo(string $taskGuid): SimpleXMLElement {
+    protected function createTaskInfo(string $taskGuid): SimpleXMLElement
+    {
         $task = ZfExtended_Factory::get('editor_Models_Task');
         /* @var $task editor_Models_Task */
         $task->loadByTaskGuid($taskGuid);
-        
+
         $analysisAssoc = ZfExtended_Factory::get('editor_Plugins_MatchAnalysis_Models_TaskAssoc');
         /* @var $analysisAssoc editor_Plugins_MatchAnalysis_Models_TaskAssoc */
         $analysisAssoc = $analysisAssoc->loadNewestByTaskGuid($task->getTaskGuid());
-        
-        $to_time = strtotime( $analysisAssoc['created']);
-        
+
+        $to_time = strtotime($analysisAssoc['created']);
+
         $from_time = strtotime($analysisAssoc['finishedAt']);
         $difference = abs($to_time - $from_time); //seconds
-        
+
         $taskInfo = $this->rootNode->addChild('taskInfo');
         $taskInfo->addAttribute('taskId', $analysisAssoc['uuid']);
-        $taskInfo->addAttribute('runAt', date('Y-m-d H:i:s', strtotime( $analysisAssoc['created'])));
-        $taskInfo->addAttribute('runTime', $difference. ' seconds');
-        
+        $taskInfo->addAttribute('runAt', date('Y-m-d H:i:s', strtotime($analysisAssoc['created'])));
+        $taskInfo->addAttribute('runTime', $difference . ' seconds');
+
         $project = $taskInfo->addchild('project');
         $project->addAttribute('name', $task->getTaskName());
         $project->addAttribute('number', $task->getTaskGuid());
-        
-        $languagesModel=ZfExtended_Factory::get('editor_Models_Languages');
+
+        $languagesModel = ZfExtended_Factory::get('editor_Models_Languages');
         /* @var $languagesModel editor_Models_Languages */
         $languagesModel->load($task->getSourceLang());
-        
+
         $language = $taskInfo->addChild('language');
         $language->addAttribute('lcid', $languagesModel->getLcid());
         $language->addAttribute('name', $languagesModel->getLangName());
-        
+
         $customer = ZfExtended_Factory::get('editor_Models_Customer_Customer');
         /* @var $customer editor_Models_Customer_Customer */
         $customerData = $customer->loadByIds([$task->getCustomerId()]);
         $taskInfo->addChild('customer')->addAttribute('name', $customerData[0]['name']);
-        
+
         return $taskInfo;
     }
-    
-    protected function createSettings(SimpleXMLElement $taskInfo, bool $hasInternalFuzzy) {
+
+    protected function createSettings(SimpleXMLElement $taskInfo, bool $hasInternalFuzzy)
+    {
         $settings = $taskInfo->addChild('settings');
-        
+
         $settings->addAttribute('reportInternalFuzzyLeverage', $hasInternalFuzzy ? 'yes' : 'no');
         $settings->addAttribute('reportLockedSegmentsSeparately', 'no');
         $settings->addAttribute('reportCrossFileRepetitions', 'yes');
@@ -384,11 +367,12 @@ class editor_Plugins_MatchAnalysis_Export_Xml
         $settings->addAttribute('fullRecallSignificantWords', 'n/a');
         $settings->addAttribute('partialRecallSignificantWords', 'n/a');
     }
-    
+
     /**
      * creates the XML root node
      */
-    protected function createRootNode() {
+    protected function createRootNode()
+    {
         $this->rootNode = new SimpleXMLElement('<?xml version="1.0" encoding="UTF-8"?><task name="analyse"></task><!--
 This file was generated with translate5.
 - there are no file elements added, since translate5 does not support a file specific analysis right now
@@ -425,4 +409,3 @@ This file was generated with translate5.
 -->');
     }
 }
-

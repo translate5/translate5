@@ -102,7 +102,9 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.admin.PricingPreset', {
         }
     },
     addPresetToCustomerPanel: function(tabPanel) {
-        if(Editor.app.authenticatedUser.isAllowed('pluginMatchAnalysisPricingPreset')){
+        if(Editor.app.authenticatedUser.isAllowed('pluginMatchAnalysisPricingPreset')
+            || Editor.app.authenticatedUser.isAllowed('pluginMatchAnalysisCustomerPricingPreset')
+        ){
             // create filtered store from pricingPresetStore & apply it to the grid's view-model
             var vm = tabPanel.up('[viewModel]').getViewModel();
             var vmStores = vm.storeInfo || {};

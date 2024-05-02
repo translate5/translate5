@@ -31,7 +31,8 @@ Ext.define('Editor.view.admin.config.Grid', {
     requires: [
         'Editor.view.admin.config.GridViewModel',
         'Editor.view.admin.config.GridViewController',
-        'Editor.view.admin.config.type.SimpleMap'
+        'Editor.view.admin.config.type.SimpleMap',
+        'Editor.view.admin.config.type.FixedMap'
     ],
     controller: 'adminConfigGrid',
     viewModel:{
@@ -119,7 +120,7 @@ Ext.define('Editor.view.admin.config.Grid', {
         //publish this field so it is bindable
         extraParams: true
     },
-    
+    border: 0,
     /***
      * allow the store extra params to be configurable on grid level. This will enable flexible loads via binding
      * This function only expects and handles extraParams with valid taskGuid or customerId as parameter.
@@ -186,7 +187,8 @@ Ext.define('Editor.view.admin.config.Grid', {
                     startCollapsed: true,
                     groupHeaderTpl: '{name} ({rows.length})'
                 }],
-                columns: [{
+                columns: [
+                    {
                     xtype: 'gridcolumn',
                     dataIndex: 'id',
                     hidden:true,
@@ -283,16 +285,54 @@ Ext.define('Editor.view.admin.config.Grid', {
         }
         return me.callParent([config]);
     },
+
+    getDefaultsStore: function(defaults, translations) {
+        if(defaults.length === 0){
+            return [];
+        }
+
+        let defaultsData = [];
+
+        // If defaults list is a json-text
+        if (defaults.join(',').match('^{[^{}]*?}$')) {
+
+            // Decode json
+            let json = Ext.JSON.decode(defaults.join(','));
+
+            // Foreach prop inside json
+            for (let prop in json) {
+                defaultsData.push({
+                    "id" : prop,
+                    "value" : json[prop]
+                });
+            }
+
+            // Else
+        } else {
+            // check if there is translation for the default values
+            Ext.Array.each(defaults, function(name) {
+                defaultsData.push({
+                    "id" : name,
+                    "value" : translations[name] !== undefined ? translations[name] : name
+                });
+            });
+        }
+
+        return Ext.create('Ext.data.Store', {
+            fields: ['id', 'value'],
+            data : defaultsData
+        });
+    },
     
     /***
      * 
      */
     getEditorConfig:function(record){
-        var me=this,
+        var me= this,
             grid = me.up('grid'),
             defaults = record.get('defaults'),
             hasDefaults = defaults.length>0,
-            defaultsStore = [],
+            defaultsStore = grid.getDefaultsStore(defaults, grid.strings.configLocales),
             config={
                 xtype: 'textfield',
                 name: 'value',
@@ -302,39 +342,6 @@ Ext.define('Editor.view.admin.config.Grid', {
             return false; 
         }
 
-        if(hasDefaults){
-            var defaultsData = [];
-
-            // If defaults list is a json-text
-            if (defaults.join(',').match('^{[^{}]*?}$')) {
-
-                // Decode json
-                var json = Ext.JSON.decode(defaults.join(','));
-
-                // Foreach prop inside json
-                for (var prop in json) {
-                    defaultsData.push({
-                        "id" : prop,
-                        "value" : json[prop]
-                    });
-                };
-
-            // Else
-            } else {
-                // check if there is translation for the default values
-                Ext.Array.each(record.get('defaults'), function(name) {
-                    defaultsData.push({
-                        "id" : name,
-                        "value" : grid.strings.configLocales[name] !== undefined ? grid.strings.configLocales[name] : name
-                    });
-                });
-            }
-
-            defaultsStore = Ext.create('Ext.data.Store', {
-                fields: ['id', 'value'],
-                data : defaultsData
-            });
-        }
         switch(record.get('type')){
             case 'float':
             case 'int':
@@ -382,6 +389,7 @@ Ext.define('Editor.view.admin.config.Grid', {
                 break;
             case 'list':
             case 'regexlist':
+            case 'xpathlist':
                 config = {
                     xtype: 'tagfield',
                     name: 'value',
@@ -415,8 +423,9 @@ Ext.define('Editor.view.admin.config.Grid', {
      * Grid value cell renderer
      */
     getValueRenderer:function (value, metaData, record) {
-        var me=this,
+        let me=this,
             isValueChanged = record.get('default') !== value,
+            defaultsStore = me.getDefaultsStore(record.get('defaults'), me.strings.configLocales),
             returnValue = value;
            
         switch (record.get('type')) {
@@ -430,10 +439,26 @@ Ext.define('Editor.view.admin.config.Grid', {
                     returnValue = me.strings.configDeactiveColumn;
                 }
             break;
+            case 'list':
+                if(Ext.isArray(value)) {
+                    if(defaultsStore.isStore) {
+                        let result = [];
+                        Ext.Array.each(value, function(idx){
+                            let rec = defaultsStore.getById(idx);
+                            result.push(rec ? rec.get('value') : idx);
+                        });
+                        returnValue = result.join(', ');
+                    }
+                    else {
+                        returnValue = value.join(', ');
+                    }
+                }
+                break;
             case 'string':
                 if (record.get('defaults').join(',').match('^{[^{}]*?}$')) {
                     returnValue = Ext.JSON.decode(record.get('defaults').join(','))[value];
                 }
+            break;
             case 'map':
                 if(Ext.isObject(value)) {
                     returnValue = Ext.JSON.encode(value);

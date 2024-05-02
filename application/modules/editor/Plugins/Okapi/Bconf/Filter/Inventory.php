@@ -21,7 +21,7 @@
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
- 		     http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
  END LICENSE AND COPYRIGHT
  */
@@ -29,51 +29,44 @@
 /**
  * Class representing the static data for filter/fprm inventories
  */
-abstract class editor_Plugins_Okapi_Bconf_Filter_Inventory extends editor_Plugins_Okapi_Bconf_FileInventory {
-
-    /**
-     * @param stdClass $filterItem
-     * @return string
-     */
-    public function createFprmFilename(stdClass $filterItem) : string {
-        return $filterItem->type.'@'.$filterItem->id;
+abstract class editor_Plugins_Okapi_Bconf_Filter_Inventory extends editor_Plugins_Okapi_Bconf_FileInventory
+{
+    public function createFprmFilename(stdClass $filterItem): string
+    {
+        return $filterItem->type . '@' . $filterItem->id;
     }
 
-    /**
-     * @param stdClass $filterItem
-     * @return string
-     */
-    public function createFprmPath(stdClass $filterItem) : string {
-        return $this->getFolderPath().'/'.$this->createFprmFilename($filterItem).'.'.editor_Plugins_Okapi_Bconf_Filter_Entity::EXTENSION;
+    public function createFprmPath(stdClass $filterItem): string
+    {
+        return $this->getFolderPath() . '/' . $this->createFprmFilename($filterItem) . '.' . editor_Plugins_Okapi_Bconf_Filter_Entity::EXTENSION;
     }
 
     /**
      * Finds filters by type and id
-     * @param string|null $type
-     * @param string|null $id
      * @return stdClass[]
      */
-    public function findFilter(string $type=NULL, string $id=NULL) : array {
-        if($type === NULL && $id === NULL){
+    public function findFilter(string $type = null, string $id = null): array
+    {
+        if ($type === null && $id === null) {
             return [];
         }
         $result = [];
-        foreach($this->inventory as $item){
-            if(($item->type === $type || $type === NULL) && ($item->id === $id || $id === NULL)){
+        foreach ($this->inventory as $item) {
+            if (($item->type === $type || $type === null) && ($item->id === $id || $id === null)) {
                 $result[] = $item;
             }
         }
+
         return $result;
     }
 
     /**
      * Retrieves the rows for the frontend
-     * @param int $startIndex
-     * @return array
      */
-    public function getGridRows(int $startIndex=0) : array {
+    public function getGridRows(int $startIndex = 0): array
+    {
         $rows = [];
-        foreach($this->inventory as $item){
+        foreach ($this->inventory as $item) {
             $rows[] = [
                 'id' => $startIndex,
                 'okapiType' => $item->type,
@@ -84,10 +77,11 @@ abstract class editor_Plugins_Okapi_Bconf_Filter_Inventory extends editor_Plugin
                 'identifier' => editor_Plugins_Okapi_Bconf_Filters::createIdentifier($item->type, $item->id), // the identifier can act as a unique ID in the frontend, akapiType and okapiId are not unique
                 'editable' => $item->settings && editor_Plugins_Okapi_Bconf_Filters::hasGui($item->type),
                 'isCustom' => false,
-                'guiClass' => editor_Plugins_Okapi_Bconf_Filters::getGuiClass($item->type)
+                'guiClass' => editor_Plugins_Okapi_Bconf_Filters::getGuiClass($item->type),
             ];
             $startIndex++;
         }
+
         return $rows;
     }
 
@@ -96,14 +90,16 @@ abstract class editor_Plugins_Okapi_Bconf_Filter_Inventory extends editor_Plugin
      * Used in the API Test for the Bconf filters
      * @return bool
      */
-    public function validate(){
+    public function validate()
+    {
         $valid = true;
-        foreach($this->inventory as $filter){
-            if($filter->settings !== false && !file_exists($this->createFprmPath($filter))){
-                error_log('Okapi Filter Inventory '.get_class($this).': Missing FPRM file '.$this->createFprmPath($filter));
+        foreach ($this->inventory as $filter) {
+            if ($filter->settings !== false && ! file_exists($this->createFprmPath($filter))) {
+                error_log('Okapi Filter Inventory ' . get_class($this) . ': Missing FPRM file ' . $this->createFprmPath($filter));
                 $valid = false;
             }
         }
+
         return $valid;
     }
 }

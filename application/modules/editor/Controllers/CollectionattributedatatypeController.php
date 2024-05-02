@@ -21,14 +21,13 @@ START LICENSE AND COPYRIGHT
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
 
-/**
- *
- */
+use MittagQI\ZfExtended\MismatchException;
+
 class editor_CollectionattributedatatypeController extends ZfExtended_RestController
 {
     /**
@@ -48,40 +47,33 @@ class editor_CollectionattributedatatypeController extends ZfExtended_RestContro
 
     /**
      * Collections, allowed for current user
-     *
-     * @var
      */
     protected $collectionIds = false;
 
     /**
-     * @throws Zend_Session_Exception
-     * @throws ZfExtended_Mismatch
+     * @throws ReflectionException
      * @throws Zend_Db_Statement_Exception
+     * @throws MismatchException
      */
-    public function init() {
-
+    public function init()
+    {
         // Call parent
         parent::init();
 
         // If request contains json-encoded 'data'-param, decode it and append to request params
         $this->handleData();
 
-        // Pick session
-        $this->_session = (new Zend_Session_Namespace('user'))->data;
-
         // If current user has 'anyCollection'-right on 'editor_term'-resource, it means all collections are accessible
         // Else we should apply collectionsIds-restriction everywhere, so get accessible collections
         $this->collectionIds =
-            $this->isAllowed( 'editor_term', 'anyCollection')
-                ?: ZfExtended_Factory
-                    ::get(editor_Models_TermCollection_TermCollection::class)
-                    ->getAccessibleCollectionIds(editor_User::instance()->getModel());
+            $this->isAllowed('editor_term', 'anyCollection')
+                ?: ZfExtended_Factory::get(editor_Models_TermCollection_TermCollection::class)
+                    ->getAccessibleCollectionIds(ZfExtended_Authentication::getInstance()->getUser());
     }
 
     /**
-     *
      * @throws Zend_Db_Statement_Exception
-     * @throws ZfExtended_Mismatch
+     * @throws MismatchException
      */
     public function indexAction()
     {
@@ -91,42 +83,38 @@ class editor_CollectionattributedatatypeController extends ZfExtended_RestContro
                 'req' => true,                                                      // required
                 'rex' => 'int11',                                                   // regular expression preset key or raw expression
                 'key' => 'LEK_languageresources',                                   // points to existing record in a given db table
-            ]
+            ],
         ]);
 
         // If no or only certain collections are accessible - validate collection accessibility
-        if ($this->collectionIds !== true) $this->jcheck([
-            'collectionId' => [
-                'fis' => $this->collectionIds ?: 'invalid' // FIND_IN_SET
-            ],
-        ]);
+        if ($this->collectionIds !== true) {
+            $this->jcheck([
+                'collectionId' => [
+                    'fis' => $this->collectionIds ?: 'invalid', // FIND_IN_SET
+                ],
+            ]);
+        }
 
         // Get [dataTypeId => mappingInfo] pairs for each record, representing mapping
         // between certain attribute datatype and certain TermCollection
         $this->view->assign([
             'success' => true,
-            'mappingA' => $this->entity->loadAllByCollectionId($_['collectionId']['id'])
+            'mappingA' => $this->entity->loadAllByCollectionId($_['collectionId']['id']),
         ]);
     }
 
-    /**
-     *
-     */
-    public function getAction() {
+    public function getAction()
+    {
         throw new BadMethodCallException();
     }
 
-    /**
-     *
-     */
-    public function postAction() {
+    public function postAction()
+    {
         throw new BadMethodCallException();
     }
 
-    /**
-     *
-     */
-    public function deleteAction() {
+    public function deleteAction()
+    {
         throw new BadMethodCallException();
     }
 
@@ -134,13 +122,13 @@ class editor_CollectionattributedatatypeController extends ZfExtended_RestContro
      * Change mapping record
      *
      * @throws Zend_Db_Statement_Exception
-     * @throws ZfExtended_Mismatch
+     * @throws MismatchException
      * @throws ZfExtended_Models_Entity_Exceptions_IntegrityConstraint
      * @throws ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey
      * @throws ZfExtended_Models_Entity_NotFoundException
      */
-    public function putAction() {
-
+    public function putAction()
+    {
         // Validate mappingId-param
         $this->jcheck([
             'mappingId' => [
@@ -150,30 +138,35 @@ class editor_CollectionattributedatatypeController extends ZfExtended_RestContro
             ],
             'enabled' => [
                 'req' => true,
-                'rex' => 'bool'
-            ]
+                'rex' => 'bool',
+            ],
         ]);
 
         // If no or only certain collections are accessible - validate collection accessibility
-        if ($this->collectionIds !== true) $this->jcheck([
-            'collectionId' => [
-                'fis' => $this->collectionIds ?: 'invalid' // FIND_IN_SET
-            ],
-        ], $this->entity);
+        if ($this->collectionIds !== true) {
+            $this->jcheck([
+                'collectionId' => [
+                    'fis' => $this->collectionIds ?: 'invalid', // FIND_IN_SET
+                ],
+            ], $this->entity);
+        }
 
         // Load dataType-record
-        $dataTypeR = $this->jcheck(['dataTypeId' => ['key' => 'terms_attributes_datatype']], $this->entity)['dataTypeId'];
+        $dataTypeR = $this->jcheck([
+            'dataTypeId' => [
+                'key' => 'terms_attributes_datatype',
+            ],
+        ], $this->entity)['dataTypeId'];
 
         // Prevent disabling dataTypes having type = 'processStatus' or 'administrativeStatus'
         $this->jcheck([
             'type' => [
-                'dis' => 'processStatus,administrativeStatus'
-            ]
+                'dis' => 'processStatus,administrativeStatus',
+            ],
         ], $dataTypeR);
 
         // If datatype should be disabled
-        if (!$enabled = $this->getParam('enabled')) {
-
+        if (! $enabled = $this->getParam('enabled')) {
             // Get attribute model
             $attrM = ZfExtended_Factory::get('editor_Models_Terminology_Models_AttributeModel');
 
@@ -189,7 +182,6 @@ class editor_CollectionattributedatatypeController extends ZfExtended_RestContro
 
         // If user is going to disable datatype, proceed only after such operation is confirmed
         if ($enabled || $qty == 0 || $this->confirm($msg)) {
-
             // Update mapping's enabled-flag
             $this->entity->setEnabled($enabled);
 
@@ -197,8 +189,7 @@ class editor_CollectionattributedatatypeController extends ZfExtended_RestContro
             $this->entity->save();
 
             // If mapping's enabled-flag was set to false
-            if (!$this->entity->getEnabled()) {
-
+            if (! $this->entity->getEnabled()) {
                 // Delete all terms_attributes-records
                 $attrM->deleteBy($this->entity->getCollectionId(), $this->entity->getDataTypeId());
 

@@ -3,7 +3,7 @@
 START LICENSE AND COPYRIGHT
 
  This file is part of translate5
- 
+
  Copyright (c) 2013 - 2017 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
 
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
@@ -13,15 +13,15 @@ START LICENSE AND COPYRIGHT
  included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
-  
+
  There is a plugin exception available for use with this release of translate5 for
  translate5: Please see http://www.translate5.net/plugin-exception.txt or
  plugin-exception.txt in the root folder of translate5.
-  
+
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
@@ -30,196 +30,231 @@ namespace MittagQI\Translate5\Plugins\SpellCheck\Segment;
 
 use editor_Models_Segment;
 use editor_Models_Segment_Whitespace as Whitespace;
+use editor_Segment_FieldTags;
+use editor_Segment_Internal_Tag;
+use editor_Segment_Tag;
+use editor_TagSequence;
 use MittagQI\Translate5\Plugins\SpellCheck\Exception\DownException;
 use MittagQI\Translate5\Plugins\SpellCheck\Exception\MalfunctionException;
 use MittagQI\Translate5\Plugins\SpellCheck\Exception\RequestException;
 use MittagQI\Translate5\Plugins\SpellCheck\Exception\TimeOutException;
 use MittagQI\Translate5\Plugins\SpellCheck\LanguageTool\Adapter;
+use stdClass;
 use Zend_Exception;
+use ZfExtended_Exception;
 
 /**
- *
- * Checks the consistency of translations: Segments with an identical target but different sources or with identical sources but different targets
+ * Checks the consistency of translations: Segments with an identical target
+ * but different sources or with identical sources but different targets
  * This Check can only be done for all segments of a task at once
- *
  */
-class Check {
-
+class Check
+{
     // Css classes
-    const CSS_GROUP_GENERAL     = 't5general';
-    const CSS_GROUP_STYLE       = 't5style';
-    const CSS_GRAMMAR           = 't5grammar';
-    const CSS_MISSPELLING       = 't5misspelling';
-    const CSS_TYPOGRAPHICAL     = 't5typographical';
+    public const CSS_GROUP_GENERAL = 't5general';
+
+    public const CSS_GROUP_STYLE = 't5style';
+
+    public const CSS_GRAMMAR = 't5grammar';
+
+    public const CSS_MISSPELLING = 't5misspelling';
+
+    public const CSS_TYPOGRAPHICAL = 't5typographical';
 
     // General error types
-    const GROUP_GENERAL         = 'group-general';
-    const CHARACTERS            = 'characters';
-    const DUPLICATION           = 'duplication';
-    const INCONSISTENCY         = 'inconsistency';
-    const LEGAL                 = 'legal';
-    const UNCATEGORIZED         = 'uncategorized';
+    public const GROUP_GENERAL = 'group-general';
+
+    public const CHARACTERS = 'characters';
+
+    public const DUPLICATION = 'duplication';
+
+    public const INCONSISTENCY = 'inconsistency';
+
+    public const LEGAL = 'legal';
+
+    public const UNCATEGORIZED = 'uncategorized';
 
     // Style error types
-    const GROUP_STYLE             = 'group-style';
-    const REGISTER                = 'register';
-    const LOCALE_SPECIFIC_CONTENT = 'locale-specific-content';
-    const LOCALE_VIOLATION        = 'locale-violation';
-    const GENERAL_STYLE           = 'style';
-    const PATTERN_PROBLEM         = 'pattern-problem';
-    const WHITESPACE              = 'whitespace';
-    const TERMINOLOGY             = 'terminology';
-    const INTERNATIONALIZATION    = 'internationalization';
-    const NON_CONFORMANCE         = 'non-conformance';
+    public const GROUP_STYLE = 'group-style';
+
+    public const REGISTER = 'register';
+
+    public const LOCALE_SPECIFIC_CONTENT = 'locale-specific-content';
+
+    public const LOCALE_VIOLATION = 'locale-violation';
+
+    public const GENERAL_STYLE = 'style';
+
+    public const PATTERN_PROBLEM = 'pattern-problem';
+
+    public const WHITESPACE = 'whitespace';
+
+    public const TERMINOLOGY = 'terminology';
+
+    public const INTERNATIONALIZATION = 'internationalization';
+
+    public const NON_CONFORMANCE = 'non-conformance';
+
+    public const NUMBERS = 'numbers';
 
     // Remaining error types
-    const GRAMMAR         = 'grammar';
-    const MISSPELLING     = 'misspelling';
-    const TYPOGRAPHICAL   = 'typographical';
+    public const GRAMMAR = 'grammar';
+
+    public const MISSPELLING = 'misspelling';
+
+    public const TYPOGRAPHICAL = 'typographical';
 
     /**
      * Mappings for issueType-values provided by LanguageTool API response
-     *
-     * @var array
      */
-    public static $css = [
-
+    public static array $css = [
         // General
-        self::CHARACTERS            => self::CSS_GROUP_GENERAL,
-        self::DUPLICATION           => self::CSS_GROUP_GENERAL,
-        self::INCONSISTENCY         => self::CSS_GROUP_GENERAL,
-        self::LEGAL                 => self::CSS_GROUP_GENERAL,
-        self::UNCATEGORIZED         => self::CSS_GROUP_GENERAL,
+        self::CHARACTERS => self::CSS_GROUP_GENERAL,
+        self::DUPLICATION => self::CSS_GROUP_GENERAL,
+        self::INCONSISTENCY => self::CSS_GROUP_GENERAL,
+        self::LEGAL => self::CSS_GROUP_GENERAL,
+        self::UNCATEGORIZED => self::CSS_GROUP_GENERAL,
 
         // Style
-        self::REGISTER                => self::CSS_GROUP_STYLE,
+        self::REGISTER => self::CSS_GROUP_STYLE,
         self::LOCALE_SPECIFIC_CONTENT => self::CSS_GROUP_STYLE,
-        self::LOCALE_VIOLATION        => self::CSS_GROUP_STYLE,
-        self::GENERAL_STYLE           => self::CSS_GROUP_STYLE,
-        self::PATTERN_PROBLEM         => self::CSS_GROUP_STYLE,
-        self::WHITESPACE              => self::CSS_GROUP_STYLE,
-        self::TERMINOLOGY             => self::CSS_GROUP_STYLE,
-        self::INTERNATIONALIZATION    => self::CSS_GROUP_STYLE,
-        self::NON_CONFORMANCE         => self::CSS_GROUP_STYLE,
+        self::LOCALE_VIOLATION => self::CSS_GROUP_STYLE,
+        self::GENERAL_STYLE => self::CSS_GROUP_STYLE,
+        self::PATTERN_PROBLEM => self::CSS_GROUP_STYLE,
+        self::WHITESPACE => self::CSS_GROUP_STYLE,
+        self::TERMINOLOGY => self::CSS_GROUP_STYLE,
+        self::INTERNATIONALIZATION => self::CSS_GROUP_STYLE,
+        self::NON_CONFORMANCE => self::CSS_GROUP_STYLE,
+        self::NUMBERS => self::CSS_GROUP_STYLE,
 
         // Remaining
-        self::GRAMMAR       => self::CSS_GRAMMAR,
-        self::MISSPELLING   => self::CSS_MISSPELLING,
+        self::GRAMMAR => self::CSS_GRAMMAR,
+        self::MISSPELLING => self::CSS_MISSPELLING,
         self::TYPOGRAPHICAL => self::CSS_TYPOGRAPHICAL,
     ];
 
-    public static $map = [
-
+    public static array $map = [
         // General error types
-        'characters'            => self::CHARACTERS,
-        'duplication'           => self::DUPLICATION,
-        'inconsistency'         => self::INCONSISTENCY,
-        'legal'                 => self::LEGAL,
-        'uncategorized'         => self::UNCATEGORIZED,
+        'characters' => self::CHARACTERS,
+        'duplication' => self::DUPLICATION,
+        'inconsistency' => self::INCONSISTENCY,
+        'legal' => self::LEGAL,
+        'uncategorized' => self::UNCATEGORIZED,
 
         // Style error types
-        'register'                => self::REGISTER,
+        'register' => self::REGISTER,
         'locale-specific-content' => self::LOCALE_SPECIFIC_CONTENT,
-        'locale-violation'        => self::LOCALE_VIOLATION,
-        'style'                   => self::GENERAL_STYLE,
-        'pattern-problem'         => self::PATTERN_PROBLEM,
-        'whitespace'              => self::WHITESPACE,
-        'terminology'             => self::TERMINOLOGY,
-        'internationalization'    => self::INTERNATIONALIZATION,
-        'non-conformance'         => self::NON_CONFORMANCE,
+        'locale-violation' => self::LOCALE_VIOLATION,
+        'style' => self::GENERAL_STYLE,
+        'pattern-problem' => self::PATTERN_PROBLEM,
+        'whitespace' => self::WHITESPACE,
+        'terminology' => self::TERMINOLOGY,
+        'internationalization' => self::INTERNATIONALIZATION,
+        'non-conformance' => self::NON_CONFORMANCE,
+        'numbers' => self::NUMBERS,
 
         // Remaining error types
-        'grammar'                 => self::GRAMMAR,
-        'misspelling'             => self::MISSPELLING,
-        'typographical'           => self::TYPOGRAPHICAL,
+        'grammar' => self::GRAMMAR,
+        'misspelling' => self::MISSPELLING,
+        'typographical' => self::TYPOGRAPHICAL,
     ];
 
     /**
      * Qualities
-     *
-     * @var array
      */
-    private $states = [];
+    private array $states = [];
 
     /**
      * If we're in batch mode, this array will contain keys 'target' and 'result'
-     *
-     * @var array
      */
-    private static $batch = [];
+    private static array $batch = [];
 
     /**
-     * @param editor_Models_Segment $segment
-     * @param $targetField
-     * @param Adapter $adapter
-     * @param string $spellCheckLang
      * @throws Zend_Exception
      * @throws DownException
      * @throws MalfunctionException
      * @throws RequestException
      * @throws TimeOutException
      */
-    public function __construct(editor_Models_Segment $segment, $targetField, Adapter $adapter, string $spellCheckLang) {
-
+    public function __construct(
+        editor_Models_Segment $segment,
+        editor_Segment_FieldTags $target,
+        Adapter $adapter,
+        string $spellCheckLang
+    ) {
         // If we're in batch-mode
         if (self::$batch) {
-
             // If matches were detected for the current segment
             if ($matches = self::$batch['result'][$segment->getSegmentNrInTask()] ?? 0) {
-
                 // Prepare $data stdClass instance having those pre-detected matches
-                $data = new \stdClass();
+                $data = new stdClass();
                 $data->matches = $matches;
-
             } else {
                 return;
             }
 
-        // Else if we're not in batch-mode
+            // Else if we're not in batch-mode
         } else {
-
             // Prepare target
-            $target = self::prepareTarget($segment, $targetField);
+            $targetText = self::prepareTarget($segment, $target);
 
             // If empty target - return
-            if (strlen($target) === 0) {
+            if (strlen($targetText) === 0) {
                 return;
             }
 
             // Get LanguageTool response
-            $data = $adapter->getMatches($target, $spellCheckLang);
+            $data = $adapter->getMatches($targetText, $spellCheckLang);
         }
 
         // Foreach match given by LanguageTool API response
         foreach ($data->matches as $index => $match) {
-
             // If match's issueType is known to Translate5
             if ($category = self::$map[$match->rule->issueType] ?? 0) {
+                // IMPORTANT: if we have whitespace-errors when single internal tags are
+                // these single internal tags usually represent a variable or placeable (which
+                // must be terminated by whitespace). Therefor we ignore such errors
+                // QUIRK: technically it would be more correct to not send the double whitespace
+                // but this would require a far better data-model in the frontend
+                // ANOTHER QUIRK: sometimes these whitespace-errors are reported as "uncategorized"
+                if (($category === self::WHITESPACE || $category === self::UNCATEGORIZED)
+                    && $target->hasTypeAndClassBetweenIndices(
+                        editor_Segment_Tag::TYPE_INTERNAL,
+                        editor_Segment_Internal_Tag::CSS_CLASS_SINGLE,
+                        $match->offset,
+                        $match->offset + $match->length
+                    )) {
+                    continue;
+                }
 
                 // Convert into special data structure
-                $this->states[$category] []= (object) [
-                    'content'           => mb_substr(
-                        $match->context->text,
-                        $match->context->offset,
-                        $match->context->length),
-                    'matchIndex'        => $index,                                                       // Integer
-                    'range'             => [                                                             // Rangy bookmark
+                $this->states[$category][] = (object) [
+                    'content' => mb_substr($match->sentence, $match->offset, $match->length),
+                    'matchIndex' => $index,                                                 // Integer
+                    'range' => [
+                        // Text coordinates
                         'start' => $match->offset,
-                        'end'   => $match->offset + $match->context->length
+                        'end' => $match->offset + $match->context->length,
                     ],
-                    'message'           => $match->message,                                              // String
-                    'replacements'      => array_column($match->replacements ?? [], 'value'),            // Array
-                    'infoURLs'          => array_column($match->rule->urls   ?? [], 'value'),            // Array
-                    'cssClassErrorType' => self::$css[$category]                                         // String
+                    'message' => $match->message,                                                   // String
+                    'replacements' => array_column($match->replacements ?? [], 'value'), // Array
+                    'infoURLs' => array_column($match->rule->urls ?? [], 'value'), // Array
+                    'cssClassErrorType' => self::$css[$category],                                              // String
                 ];
 
-            // Else log that detected error is of a kind previously unknown to translate5 app
+                // Else log that detected error is of a kind previously unknown to translate5 app
             } else {
-                $segment->getTask()->logger('editor.task.autoqa')->warn('E1418', 'LanguageTool (which stands behind AutoQA Spell Check) detected an error of a kind previously unknown to translate5 app', [
-                    'lang' => $spellCheckLang,
-                    'text' => $target,
-                    'match' => $match
-                ]);
+                $segment->getTask()->logger('editor.task.autoqa')
+                    ->warn(
+                        'E1418',
+                        'LanguageTool (which stands behind AutoQA Spell Check)'
+                        . ' detected an error of a kind previously unknown to translate5 app',
+                        [
+                            'lang' => $spellCheckLang,
+                            'text' => $targetText ?? '',
+                            'match' => $match,
+                        ]
+                    );
             }
         }
     }
@@ -229,67 +264,63 @@ class Check {
      *
      * @return string[][]
      */
-    public function getStates(): array {
+    public function getStates(): array
+    {
         return $this->states;
     }
 
     /**
      * @return boolean
      */
-    public function hasStates(): bool {
+    public function hasStates(): bool
+    {
         return count($this->states) > 0;
     }
 
     /**
      * Clear batch-data
      */
-    public static function purgeBatch() {
+    public static function purgeBatch(): void
+    {
         self::$batch = [
             'target' => [],
-            'result' => []
+            'result' => [],
         ];
     }
 
     /**
      * Append the value of $segment's $targetField to the list of to be processed
      *
-     * @param editor_Models_Segment $segment
-     * @param string $targetField
+     * @throws ZfExtended_Exception
      */
-    public static function addBatchTarget(editor_Models_Segment $segment, string $targetField) {
-        self::$batch['target'][$segment->getSegmentNrInTask()] = self::prepareTarget($segment, $targetField);
+    public static function addBatchTarget(editor_Models_Segment $segment, editor_Segment_FieldTags $target): void
+    {
+        self::$batch['target'][$segment->getSegmentNrInTask()] = self::prepareTarget($segment, $target);
     }
 
     /**
      * Get value of $segment's $targetField applicable to be sent to LanguageTool
      *
-     * @param editor_Models_Segment $segment
-     * @param string $targetField
-     * @return string
+     * @throws ZfExtended_Exception
      */
-    public static function prepareTarget(editor_Models_Segment $segment, string $targetField) : string {
+    public static function prepareTarget(editor_Models_Segment $segment, editor_Segment_FieldTags $target): string
+    {
+        // Get target text with all tags being either stripped or
+        // replaced with their original contents (in case of whitespace)
+        $targetText = $target->renderReplaced(editor_TagSequence::MODE_ORIGINAL);
 
-        // Get target text, strip tags, replace htmlentities
-        $target = $segment->{'get' . ucfirst($targetField) . 'EditToSort'}();
-        $target = str_replace(['&lt;', '&gt;'], ['<', '>'], $target);
-
-        // Replace whitespace-placeholders with the actual characters they represent
-        $target = Whitespace::replaceLabelledCharacters($target);
-
+        // replace escaped entities: TODO FIXME: This will create trouble with text-indices !!
         // Return string applicable to be sent to LanguageTool
-        return $target;
+        return str_replace(['&lt;', '&gt;'], ['<', '>'], $targetText);
     }
 
     /**
-     * @param Adapter $adapter
-     * @param string $spellCheckLang
      * @throws DownException
-     * @throws MalfunctionException
      * @throws RequestException
      * @throws TimeOutException
      */
-    public static function runBatchAndSplitResults(Adapter $adapter, string $spellCheckLang) {
-
+    public static function runBatchAndSplitResults(Adapter $adapter, string $spellCheckLang): void
+    {
         // Separator
         $separator = Adapter::BATCH_SEPARATOR;
 
@@ -306,8 +337,7 @@ class Check {
         $segmentNrByIndex = array_keys(self::$batch['target']);
 
         // Foreach match given by LanguageTool API response
-        foreach ($data->matches as $index => $match) {
-
+        foreach ($data->matches as $match) {
             // Get text from the beginning and up to the reported word/phrase, inclusively
             $text = mb_substr($whole, 0, $match->offset + $match->length);
 
@@ -320,10 +350,10 @@ class Check {
             // Amend props for them to relate to certain segment only
             $match->context->text = explode($separator, $whole)[$segmentIdx];
             $match->context->offset -= $shiftOffsetBy;
-            $match->offset          -= $shiftOffsetBy;
+            $match->offset -= $shiftOffsetBy;
 
             // Append to the list of problems for the certain segment
-            self::$batch['result'][ $segmentNrByIndex[$segmentIdx] ] []= $match;
+            self::$batch['result'][$segmentNrByIndex[$segmentIdx]][] = $match;
         }
     }
 }

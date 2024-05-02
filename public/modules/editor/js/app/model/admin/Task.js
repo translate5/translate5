@@ -115,6 +115,7 @@ Ext.define('Editor.model.admin.Task', {
         {name: 'notEditContent', type: 'boolean'},
         {name: 'usageMode', type: 'string'},
         {name: 'segmentCount', type: 'int', persist: false},
+        {name: 'segmentEditableCount', type: 'int', persist: false},
         {name: 'segmentFinishCount', type: 'int', persist: false},
         {name: 'diffExportUsable', type: 'boolean'},
         {name: 'description', type: 'string'},
@@ -348,6 +349,20 @@ Ext.define('Editor.model.admin.Task', {
         }
         return !me.isEditable() || me.isFinished() || me.isWaiting() || me.isEnded() || isUnconfirmed;
     },
+
+    /**
+     * Get initial task user state
+     *
+     * @returns {string}
+     */
+    getInitUserState: function() {
+        var me = this;
+        if (me.isUnconfirmed() || me.isWaiting() || me.isFinished()) {
+            return me.USER_STATE_VIEW;
+        }
+        return me.USER_STATE_EDIT;
+    },
+
     /**
      * returns if task is ended
      * @returns {Boolean}

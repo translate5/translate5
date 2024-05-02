@@ -1,9 +1,11 @@
 [
     {
         "target": "Across Language Server",
+        "rawTarget": "Across Language Server",
         "matchrate": 101,
         "source": "Across Language Server",
         "languageResourceType": "tm",
-        "state": "loaded"
+        "state": "loaded",
+        "timestamp": "TEST_TIMESTAMP"
     }
 ]

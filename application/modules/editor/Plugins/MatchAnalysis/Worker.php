@@ -3,25 +3,25 @@
 START LICENSE AND COPYRIGHT
 
  This file is part of translate5
- 
+
  Copyright (c) 2013 - 2021 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
 
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
  This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
- as published by the Free Software Foundation and appearing in the file agpl3-license.txt 
- included in the packaging of this file.  Please review the following information 
+ as published by the Free Software Foundation and appearing in the file agpl3-license.txt
+ included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
-  
+
  There is a plugin exception available for use with this release of translate5 for
- translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or
  plugin-exception.txt in the root folder of translate5.
-  
+
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
@@ -43,27 +43,24 @@ class editor_Plugins_MatchAnalysis_Worker extends editor_Models_Task_AbstractWor
      * (non-PHPdoc)
      * @see ZfExtended_Worker_Abstract::validateParameters()
      */
-    protected function validateParameters($parameters = array())
+    protected function validateParameters($parameters = [])
     {
         $neededEntries = ['internalFuzzy', 'pretranslateMatchrate', 'pretranslateTmAndTerm', 'pretranslateMt', 'isTaskImport', 'pretranslate'];
         $foundEntries = array_keys($parameters);
         $keyDiff = array_diff($neededEntries, $foundEntries);
+
         //if there is not keyDiff all needed were found
         return empty($keyDiff);
     }
 
     /**
-     * {@inheritDoc}
      * @see ZfExtended_Worker_Abstract::work()
      */
     public function work()
     {
         try {
-            
             return $this->doWork();
-
         } catch (Throwable $e) {
-
             if (isset($this->analysis)) {
                 //clean after analysis exception
                 $this->analysis->clean();
@@ -75,23 +72,27 @@ class editor_Plugins_MatchAnalysis_Worker extends editor_Models_Task_AbstractWor
             ]);
             $this->log->exception($e, [
                 'extra' => [
-                    'task' => $this->task
+                    'task' => $this->task,
                 ],
             ]);
+
             return false;
         }
     }
 
-
     /**
      * @return boolean
+     * @throws ReflectionException
+     * @throws Zend_Db_Statement_Exception
+     * @throws ZfExtended_Models_Db_Exceptions_DeadLockHandler
+     * @throws ZfExtended_Models_Entity_Exceptions_IntegrityConstraint
+     * @throws ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey
      */
-    protected function doWork()
+    protected function doWork(): bool
     {
         $params = $this->workerModel->getParameters();
 
-        $analysisAssoc = ZfExtended_Factory::get('editor_Plugins_MatchAnalysis_Models_TaskAssoc');
-        /* @var $analysisAssoc editor_Plugins_MatchAnalysis_Models_TaskAssoc */
+        $analysisAssoc = ZfExtended_Factory::get(editor_Plugins_MatchAnalysis_Models_TaskAssoc::class);
         $analysisAssoc->setTaskGuid($this->task->getTaskGuid());
 
         //set flag for internal fuzzy usage
@@ -113,7 +114,6 @@ class editor_Plugins_MatchAnalysis_Worker extends editor_Models_Task_AbstractWor
         $this->analysis->setPretranslateTmAndTerm($params['pretranslateTmAndTerm']);
         $this->analysis->setBatchQuery($params['batchQuery']);
 
-
         $updateCounter = 0;
         $lastProgress = 0;
         $return = $this->analysis->analyseAndPretranslate(function ($progress) use (&$updateCounter, &$lastProgress) {
@@ -125,14 +125,15 @@ class editor_Plugins_MatchAnalysis_Worker extends editor_Models_Task_AbstractWor
             }
         });
 
-        if (!empty($lastProgress)) {
+        if (! empty($lastProgress)) {
             $this->updateProgress($lastProgress);
         }
 
         //setting null takes the current date from DB
-        $analysisAssoc->finishNow();
+        $analysisAssoc->finishNow($this->analysis->getErrorCount());
 
         $this->task->unlock();
+
         return $return;
     }
 

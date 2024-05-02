@@ -34,5 +34,4 @@ use MittagQI\Translate5\PauseWorker\PauseWorker;
 
 class PausePivotWorker extends PauseWorker
 {
-
 }

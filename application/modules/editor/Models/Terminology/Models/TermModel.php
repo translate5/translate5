@@ -21,86 +21,99 @@ START LICENSE AND COPYRIGHT
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
 /**
- * Class editor_Models_Terms_Term
  * Term Instance
  *
- * @method integer getId() getId()
- * @method void setId() setId(integer $id)
- * @method string getUpdatedBy() getUpdatedBy()
- * @method void setUpdatedBy() setUpdatedBy(int $userId)
- * @method string getUpdatedAt() getUpdatedAt()
- * @method void setUpdatedAt() setUpdatedAt(string $updatedAt)
- * @method integer getCollectionId() getCollectionId()
- * @method integer setCollectionId() setCollectionId(integer $collectionId)
- * @method integer getTermEntryId() getTermEntryId()
- * @method integer setTermEntryId() setTermEntryId(integer $termEntryId)
- * @method integer getLanguageId() getLanguageId()
- * @method integer setLanguageId() setLanguageId(integer $languageId)
- * @method string getLanguage() getLanguage()
- * @method string setLanguage() setLanguage(string $language)
- * @method string getTerm() getTerm()
- * @method string setTerm() setTerm(string $term)
- * @method string getProposal() getProposal()
- * @method void setProposal() setProposal(string $proposal)
- * @method string getStatus() getStatus()
- * @method string setStatus() setStatus(string $Status)
- * @method string getProcessStatus() getProcessStatus()
- * @method string setProcessStatus() setProcessStatus(string $processStatus)
- * @method string getDefinition() getDefinition()
- * @method string setDefinition() setDefinition(string $definition)
- * @method string getTermEntryTbxId() getTermEntryTbxId()
- * @method string setTermEntryTbxId() setTermEntryTbxId(string $termEntryTbxId)
- * @method string getTermTbxId() getTermTbxId()
- * @method string setTermTbxId() setTermTbxId(string $termTbxId)
- * @method string getTermEntryGuid() getTermEntryGuid()
- * @method string setTermEntryGuid() setTermEntryGuid(string $entryGuid)
- * @method string getLangSetGuid() getLangSetGuid()
- * @method string setLangSetGuid() setLangSetGuid(string $langSetGuid)
- * @method string getGuid() getGuid()
- * @method string setGuid() setGuid(string $guid)
- * @method integer getTbxCreatedBy() getTbxCreatedBy()
- * @method integer setTbxCreatedBy() setTbxCreatedBy(integer $personId)
- * @method integer getTbxCreatedAt() getTbxCreatedAt()
- * @method integer setTbxCreatedAt() setTbxCreatedAt(string $timestamp)
- * @method integer getTbxUpdatedBy() getTbxUpdatedBy()
- * @method integer setTbxUpdatedBy() setTbxUpdatedBy(integer $personId)
- * @method integer getTbxUpdatedAt() getTbxUpdatedAt()
- * @method integer setTbxUpdatedAt() setTbxUpdatedAt(string $timestamp)
+ * @method string getId()
+ * @method void setId(integer $id)
+ * @method string getUpdatedBy()
+ * @method void setUpdatedBy(int $userId)
+ * @method string getUpdatedAt()
+ * @method void setUpdatedAt(string $updatedAt)
+ * @method string getCollectionId()
+ * @method void setCollectionId(integer $collectionId)
+ * @method string getTermEntryId()
+ * @method void setTermEntryId(integer $termEntryId)
+ * @method string getLanguageId()
+ * @method void setLanguageId(integer $languageId)
+ * @method string getLanguage()
+ * @method void setLanguage(string $language)
+ * @method string getTerm()
+ * @method void setTerm(string $term)
+ * @method string getProposal()
+ * @method void setProposal(string $proposal)
+ * @method string getStatus()
+ * @method void setStatus(string $Status)
+ * @method string getProcessStatus()
+ * @method void setProcessStatus(string $processStatus)
+ * @method string getDefinition()
+ * @method void setDefinition(string $definition)
+ * @method string getTermEntryTbxId()
+ * @method void setTermEntryTbxId(string $termEntryTbxId)
+ * @method string getTermTbxId()
+ * @method void setTermTbxId(string $termTbxId)
+ * @method string getTermEntryGuid()
+ * @method void setTermEntryGuid(string $entryGuid)
+ * @method string getLangSetGuid()
+ * @method void setLangSetGuid(string $langSetGuid)
+ * @method string getGuid()
+ * @method void setGuid(string $guid)
+ * @method string getTbxCreatedBy()
+ * @method void setTbxCreatedBy(integer $personId)
+ * @method string getTbxCreatedAt()
+ * @method void setTbxCreatedAt(string $timestamp)
+ * @method string getTbxUpdatedBy()
+ * @method void setTbxUpdatedBy(integer $personId)
+ * @method string getTbxUpdatedAt()
+ * @method void setTbxUpdatedAt(string $timestamp)
  */
-class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminology_Models_Abstract {
+class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminology_Models_Abstract
+{
     protected $dbInstanceClass = 'editor_Models_Db_Terminology_Term';
+
     protected $validatorInstanceClass = 'editor_Models_Validator_Term_Term';
 
-    const PROCESS_STATUS_UNPROCESSED = 'unprocessed';
-    const PROCESS_STATUS_PROV_PROCESSED = 'provisionallyProcessed';
-    const PROCESS_STATUS_FINALIZED = 'finalized';
+    public const PROCESS_STATUS_UNPROCESSED = 'unprocessed';
 
-    const STAT_PREFERRED = 'preferredTerm';
-    const STAT_ADMITTED = 'admittedTerm';
-    const STAT_LEGAL = 'legalTerm';
-    const STAT_REGULATED = 'regulatedTerm';
-    const STAT_STANDARDIZED = 'standardizedTerm';
-    const STAT_DEPRECATED = 'deprecatedTerm';
-    const STAT_SUPERSEDED = 'supersededTerm';
-    const STAT_NOT_FOUND = 'STAT_NOT_FOUND'; //Dieser Status ist nicht im Konzept definiert, sondern wird nur intern verwendet!
+    public const PROCESS_STATUS_PROV_PROCESSED = 'provisionallyProcessed';
 
-    const TRANSSTAT_FOUND = 'transFound';
-    const TRANSSTAT_NOT_FOUND = 'transNotFound';
-    const TRANSSTAT_NOT_DEFINED ='transNotDefined';
+    public const PROCESS_STATUS_FINALIZED = 'finalized';
 
-    const CSS_TERM_IDENTIFIER = 'term';
+    public const STAT_PREFERRED = 'preferredTerm';
+
+    public const STAT_ADMITTED = 'admittedTerm';
+
+    public const STAT_LEGAL = 'legalTerm';
+
+    public const STAT_REGULATED = 'regulatedTerm';
+
+    public const STAT_STANDARDIZED = 'standardizedTerm';
+
+    public const STAT_DEPRECATED = 'deprecatedTerm';
+
+    public const STAT_SUPERSEDED = 'supersededTerm';
+
+    public const STAT_NOT_FOUND = 'STAT_NOT_FOUND'; //Dieser Status ist nicht im Konzept definiert, sondern wird nur intern verwendet!
+
+    public const TRANSSTAT_FOUND = 'transFound';
+
+    public const TRANSSTAT_NOT_FOUND = 'transNotFound';
+
+    public const TRANSSTAT_NOT_DEFINED = 'transNotDefined';
+
+    public const CSS_TERM_IDENTIFIER = 'term';
 
     /**
      * The above constants are needed in the application as list, since reflection usage is expensive we cache them here:
-     * @var array
      */
     protected static array $statusCache = [];
+
     protected static array $termEntryTbxIdCache = [];
+
     protected editor_Models_Segment_TermTag $tagHelper;
 
     protected array $statOrder = [
@@ -118,64 +131,54 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
      * If term's `processStatus` was changed to 'rejected',
      * normativeAuthorization-attribute is set to 'deprecatedTerm' (it's created if not existed so far)
      * so this property contains terms_attributes-record's data for that attribute
-     *
-     * @var array|null
      */
     protected ?array $normativeAuthorization = null;
 
     /**
      * Get normativeAuthorization-attribute's model instance if term's processStatus-prop was changed to 'rejected'
      *
-     * @return editor_Models_Terminology_Models_AttributeModel|null
      * @throws ZfExtended_Models_Entity_NotFoundException
      */
-    public function getNormativeAuthorizationIfTermWasRejected() : ?editor_Models_Terminology_Models_AttributeModel {
-
+    public function getNormativeAuthorizationIfTermWasRejected(): ?editor_Models_Terminology_Models_AttributeModel
+    {
         // If record data for that attribute was previously set
         if ($this->normativeAuthorization) {
-
             // Load and return model instance
             $na = ZfExtended_Factory::get(editor_Models_Terminology_Models_AttributeModel::class);
             $na->load($this->normativeAuthorization['id']);
+
             return $na;
         }
 
         return null;
     }
 
-    /**
-     * editor_Models_Terms_Term constructor.
-     */
-    public function __construct() {
+    public function __construct()
+    {
         parent::__construct();
         $this->tagHelper = ZfExtended_Factory::get('editor_Models_Segment_TermTag');
     }
 
     /**
      * return true if the given term should be considered as empty
-     * @param string|null $term
-     * @return bool
      */
     public static function isEmptyTerm(?string $term): bool
     {
-        if(is_null($term) || strlen($term) === 0) {
+        if (is_null($term) || strlen($term) === 0) {
             return true;
         }
+
         return (bool) preg_match('/^\s*$/', $term);
     }
 
-    /**
-     *
-     */
-    public function insert($misc = []) {
-
+    public function insert($misc = [])
+    {
         // If $misc['userName'] is given
         if (isset($misc['userName'])) {
-
             // Load or create person
             $person = ZfExtended_Factory
                 ::get('editor_Models_Terminology_Models_TransacgrpPersonModel')
-                ->loadOrCreateByName($misc['userName'], $this->getCollectionId());
+                    ->loadOrCreateByName($misc['userName'], $this->getCollectionId());
 
             // Use person id as tbxCreatedBy and tbxUpdatedBy
             $this->setTbxCreatedBy($by = $person->getId());
@@ -223,11 +226,14 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
 
         // If attributes should be copied from other term
         if ($misc['copyAttrsFromTermId'] ?? 0) {
-
             // Array of dataTypeIds to be ignored while copying attributes from other term
             $except = [$dataTypeIds['termNote#processStatus']];
-            if ($misc['note'] ?? 0) $except []= $dataTypeIds['note#'];
-            if ($this->getProcessStatus() == 'rejected') $except []= $dataTypeIds['termNote#administrativeStatus'];
+            if ($misc['note'] ?? 0) {
+                $except[] = $dataTypeIds['note#'];
+            }
+            if ($this->getProcessStatus() == 'rejected') {
+                $except[] = $dataTypeIds['termNote#administrativeStatus'];
+            }
 
             // Fetch attributes of existing term, except at least 'processStatus' attribute
             $attrA += $this->db->getAdapter()->query('
@@ -238,10 +244,12 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
         }
 
         // Foreach attribute to be INSERTed
-        foreach ($attrA as $attrI) $this->initAttr($attrI)->save();
+        foreach ($attrA as $attrI) {
+            $this->initAttr($attrI)->save();
+        }
 
         // Check whether there were no terms for this language previously within same termEntryId
-        $isTermForNewLanguage = !$this->db->getAdapter()->query('
+        $isTermForNewLanguage = ! $this->db->getAdapter()->query('
             SELECT `id` 
             FROM `terms_term` 
             WHERE TRUE 
@@ -252,7 +260,7 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
         ', [
             ':termEntryId' => $this->getTermEntryId(),
             ':languageId' => $this->getLanguageId(),
-            ':id' => $this->getId()
+            ':id' => $this->getId(),
         ])->fetchColumn();
 
         // Prepare transacgrp-props relevant for term-level
@@ -265,32 +273,37 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
 
         // Prepare transacgrp-props relevant for language-level
         // No props actually, but this allows us to cycle through $levelA
-        if ($isTermForNewLanguage) $levelA['language'] = ['elementName' => 'langSet'];
+        if ($isTermForNewLanguage) {
+            $levelA['language'] = [
+                'elementName' => 'langSet',
+            ];
+        }
 
         // Create 'origination' and 'modification' `terms_transacgroup`-entries for term-level (and language-level, if need)
-        foreach ($levelA as $byLevel) foreach (['origination', 'modification'] as $type) {
+        foreach ($levelA as $byLevel) {
+            foreach (['origination', 'modification'] as $type) {
+                // Create `terms_transacgrp` model instance
+                $t = ZfExtended_Factory::get('editor_Models_Terminology_Models_TransacgrpModel');
 
-            // Create `terms_transacgrp` model instance
-            $t = ZfExtended_Factory::get('editor_Models_Terminology_Models_TransacgrpModel');
+                // Setup data
+                $t->init($byLevel + [
+                    'elementName' => $byLevel['elementName'],
+                    'transac' => $type,
+                    'date' => date('Y-m-d H:i:s'),
+                    'transacNote' => $misc['userName'],
+                    'target' => $misc['userGuid'],
+                    'transacType' => 'responsibility',
+                    'language' => $this->getLanguage(),
+                    // 'attrLang' => $this->getLanguage(), // ?
+                    'collectionId' => $this->getCollectionId(),
+                    'termEntryId' => $this->getTermEntryId(),
+                    'termEntryGuid' => $this->getTermEntryGuid(),
+                    'guid' => ZfExtended_Utils::uuid(),
+                ]);
 
-            // Setup data
-            $t->init($byLevel + [
-                'elementName' => $byLevel['elementName'],
-                'transac' => $type,
-                'date' => date('Y-m-d H:i:s'),
-                'transacNote' => $misc['userName'],
-                'target' => $misc['userGuid'],
-                'transacType' => 'responsibility',
-                'language' => $this->getLanguage(),
-                // 'attrLang' => $this->getLanguage(), // ?
-                'collectionId' => $this->getCollectionId(),
-                'termEntryId' => $this->getTermEntryId(),
-                'termEntryGuid' => $this->getTermEntryGuid(),
-                'guid' => ZfExtended_Utils::uuid(),
-            ]);
-
-            // Save `terms_transacgrp` entry
-            $t->save();
+                // Save `terms_transacgrp` entry
+                $t->save();
+            }
         }
 
         // Basic clause for `language`-column to be used in UPDATE query to affect termEntry-level's 'modification'-record
@@ -298,7 +311,9 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
 
         // If there was at least one term defined for same language, then alter clause for `language`-combo
         // so that not only termEntry-level's 'modification'-record would be affected, but language-level's as well
-        if (!$isTermForNewLanguage) $language = '(' . $language . ' OR `language` = "' . $this->getLanguage() . '")';
+        if (! $isTermForNewLanguage) {
+            $language = '(' . $language . ' OR `language` = "' . $this->getLanguage() . '")';
+        }
 
         // Update 'modification'-record of termEntry-level (and language-level, if need)
         $this->db->getAdapter()->query('
@@ -325,29 +340,26 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
         return $termId;
     }
 
-    /**
-     *
-     */
-    public function updateCollectionLangs($event) {
-
+    public function updateCollectionLangs($event)
+    {
         // Query params
         $params = [$this->getCollectionId(), $this->getLanguageId()];
 
         // If $event is 'delete'
         if ($event == 'delete') {
-
             // Check whether deleted term was last having it's languageId within it's collectionId
-            $wasLast = !$this->db->getAdapter()->query('
+            $wasLast = ! $this->db->getAdapter()->query(
+                '
                 SELECT `id` 
                 FROM `terms_term` 
                 WHERE `collectionId` = ? AND `languageId` = ? 
                 LIMIT 1
-            ', $params
+            ',
+                $params
             )->fetchColumn();
 
             // If it was last term for it's language
             if ($wasLast) {
-
                 // Get info about
                 $languageA = $this->db->getAdapter()->query('
                     SELECT * FROM `LEK_languageresources_languages` WHERE `languageResourceId` = ? LIMIT 3
@@ -361,7 +373,6 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
 
                 // If there were only two `LEK_languageresources_languages`-records before DELETE-ion
                 if (count($languageA) == 2) {
-
                     // Get prop
                     $prop = $params[1] == $languageA[0]['sourceLang'] ? 'targetLang' : 'sourceLang';
 
@@ -378,9 +389,8 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
                 }
             }
 
-        // Else if $event is  'insert'
-        } else if ($event == 'insert') {
-
+            // Else if $event is  'insert'
+        } elseif ($event == 'insert') {
             // Get info
             $info = $this->db->getAdapter()->query('
                 SELECT * 
@@ -391,8 +401,7 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
             ', $params)->fetchAll();
 
             // If $info is an emty array, it means that INSERTed term was the first term in that collection
-            if (!$info) {
-
+            if (! $info) {
                 // So we insert single `LEK_languageresources_languages`-record having same source and target
                 $m = ZfExtended_Factory::get('editor_Models_LanguageResources_Languages');
                 $m->init([
@@ -404,9 +413,8 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
                 ]);
                 $m->save();
 
-            // Else if it was not the first term in that collection, but was the first term for that language
-            } else if ($info[0]['sourceLang'] != $this->getLanguage()) {
-
+                // Else if it was not the first term in that collection, but was the first term for that language
+            } elseif ($info[0]['sourceLang'] != $this->getLanguage()) {
                 // Get existing languages
                 $existingA = $this->db->getAdapter()->query('
                     SELECT DISTINCT `sourceLang`, `sourceLangCode` 
@@ -416,7 +424,6 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
 
                 // Foreach of existing languages
                 foreach ($existingA as $sourceLang => $sourceLangCode) {
-
                     // Insert using existing language as source and new language as target
                     $m = ZfExtended_Factory::get('editor_Models_LanguageResources_Languages');
                     $m->init([
@@ -442,9 +449,11 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
 
                 // Since we just inserted non-the-first term into collection,
                 // we need to remove `LEK_languageresources_languages`-record having same source and target
-                if (count($info) === 1) $this->db->getAdapter()->query('
+                if (count($info) === 1) {
+                    $this->db->getAdapter()->query('
                     DELETE FROM `LEK_languageresources_languages` WHERE `id` = ?
                 ', $info[0]['id'])->fetchAll(PDO::FETCH_KEY_PAIR);
+                }
             }
         }
     }
@@ -457,8 +466,10 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
      * @param array $misc
      * @return mixed
      */
-    public function update($misc = ['updateProcessStatusAttr' => true]) {
-
+    public function update($misc = [
+        'updateProcessStatusAttr' => true,
+    ])
+    {
         // Get original data
         $orig = $this->row->getCleanData();
 
@@ -467,9 +478,10 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
 
         // If current data is not equal to original data
         if ($this->toArray() != $orig) {
-
             // Prepare data for history record
-            $init = $orig; $init['termId'] = $orig['id']; unset($init['id']);
+            $init = $orig;
+            $init['termId'] = $orig['id'];
+            unset($init['id']);
 
             // Create history instance
             $history = ZfExtended_Factory::get('editor_Models_Term_History');
@@ -483,7 +495,6 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
 
         // If term's processStatus-prop was changed, and we should update processStatus-attr as well (yes, by default)
         if ($orig['processStatus'] != $this->getProcessStatus() && $misc['updateProcessStatusAttr']) {
-
             // If we should update processStatus-attribute, but we don't know it's `id` yet - detect it
             // else just pick that id from $misc['updateProcessStatusAttr']
             $attrId = $misc['updateProcessStatusAttr'] === true
@@ -501,17 +512,17 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
             $attr->update();
 
             // If processStatus became 'rejected'
-            if ($orig['processStatus'] != 'rejected' && $this->getProcessStatus() == 'rejected')
-
+            if ($orig['processStatus'] != 'rejected' && $this->getProcessStatus() == 'rejected') {
                 // Set 'normativeAuthorization' attribute to 'deprecatedTerm'
                 // If no such attribute yet exists - it will be created
                 $this->normativeAuthorization = $this
                     ->setAttr('normativeAuthorization', 'deprecatedTerm')
                     ->toArray();
+            }
         }
 
         // If $transacgrpData arg is given - update 'modification'-records of all levels
-        if (isset($misc['userName']))
+        if (isset($misc['userName'])) {
             $return = ZfExtended_Factory::get('editor_Models_Terminology_Models_TransacgrpModel')
                 ->affectLevels(
                     $misc['userName'],
@@ -520,33 +531,39 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
                     $this->getLanguage(),
                     $this->getId()
                 );
+        }
 
         // Return
         return $return ?? null;
     }
 
-    /**
-     *
-     */
-    public function delete() {
-
+    public function delete()
+    {
         // Backup collectionId and languageId
         $collectionId = $this->getCollectionId();
         $languageId = $this->getLanguageId();
 
         // Backup tbx(Created|Updated)By props
         $personIds = [];
-        if ($this->getTbxCreatedBy()) $personIds[$this->getTbxCreatedBy()] = true;
-        if ($this->getTbxUpdatedBy()) $personIds[$this->getTbxUpdatedBy()] = true;
+        if ($this->getTbxCreatedBy()) {
+            $personIds[$this->getTbxCreatedBy()] = true;
+        }
+        if ($this->getTbxUpdatedBy()) {
+            $personIds[$this->getTbxUpdatedBy()] = true;
+        }
         $personIds = array_keys($personIds);
+
+        $termData = $this->toArray();
 
         // Call parent
         parent::delete();
 
+        $this->logDeletedTerm($termData);
+
         // Drop terms_transacgrp_person-records if not used anymore
         ZfExtended_Factory
             ::get('editor_Models_Terminology_Models_TransacgrpPersonModel')
-            ->dropIfNotUsedAnymore($personIds);
+                ->dropIfNotUsedAnymore($personIds);
 
         // Restore collectionId and languageId
         $this->setCollectionId($collectionId);
@@ -561,8 +578,8 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
      *
      * @return editor_Models_Terminology_Models_AttributeModel
      */
-    public function initAttr($data = []) {
-
+    public function initAttr($data = [])
+    {
         /** @var editor_Models_Terminology_Models_AttributeModel $a */
         $a = ZfExtended_Factory::get('editor_Models_Terminology_Models_AttributeModel');
 
@@ -604,26 +621,26 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
      * Set term's attribute, found by dataTypeId, identified by $type arg
      * If no such attribute yet exists - it will be created
      *
-     * @param $type
-     * @param $value
      * @return editor_Models_Terminology_Models_AttributeModel|void
      * @throws Zend_Db_Statement_Exception
      */
-    public function setAttr($type, $value) {
-
+    public function setAttr($type, $value)
+    {
         // Get dataTypeId todo: throw exception if not found
-        if (!$dataTypeId = $this->db->getAdapter()->query('
+        if (! $dataTypeId = $this->db->getAdapter()->query('
             SELECT `id` FROM `terms_attributes_datatype` WHERE `type` = ? LIMIT 1
-        ', $type)->fetchColumn()) return;
+        ', $type)->fetchColumn()) {
+            return;
+        }
 
         // Try to find id of existing attribute having such $dataTypeId
         $attrId = $this->db->getAdapter()->query(
             'SELECT `id` FROM `terms_attributes` WHERE `termId` = ? AND `dataTypeId` = ? LIMIT 1',
-        [$this->getId(), $dataTypeId])->fetchColumn();
+            [$this->getId(), $dataTypeId]
+        )->fetchColumn();
 
         // If exists
         if ($attrId) {
-
             /** @var editor_Models_Terminology_Models_AttributeModel $a */
             $a = ZfExtended_Factory::get('editor_Models_Terminology_Models_AttributeModel');
 
@@ -637,11 +654,13 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
             // Update. Here we use update method for history record to be created
             $a->update();
 
-        // Else
+            // Else
         } else {
-
             /** @var editor_Models_Terminology_Models_AttributeModel $a */
-            $a = $this->initAttr(['dataTypeId' => $dataTypeId, 'type' => $type]);
+            $a = $this->initAttr([
+                'dataTypeId' => $dataTypeId,
+                'type' => $type,
+            ]);
 
             // Set value
             $a->setValue($value);
@@ -656,32 +675,30 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
 
     /**
      * returns a map CONSTNAME => value of all term status
-     * @return array
      */
-    static public function getAllStatus(): array
+    public static function getAllStatus(): array
     {
         self::initConstStatus();
 
         return self::$statusCache['status'];
     }
+
     /**
      * returns an array with groupId and term to a given mid
      * in old table was:
      * termEntryTbxId = groupId
      * termId = mid
      *
-     * @param string $termId
-     * @param array $collectionIds
      * @return array|Zend_Db_Table_Row_Abstract
      */
     public function getTermAndGroupIdToMid(string $termId, array $collectionIds): ?array
     {
-        if (!empty(self::$termEntryTbxIdCache[$termId])) {
+        if (! empty(self::$termEntryTbxIdCache[$termId])) {
             return self::$termEntryTbxIdCache[$termId];
         }
 
         $select = $this->db->select()
-            ->from($this->db, array('termEntryTbxId', 'term'))
+            ->from($this->db, ['termEntryTbxId', 'term'])
             ->where('collectionId IN(?)', $collectionIds)
             ->where('termTbxId = ?', $termId);
         $res = $this->db->fetchRow($select);
@@ -701,16 +718,16 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
      * @param array $processStatus
      * @return Zend_Db_Table_Rowset_Abstract|null
      */
-    public function loadSortedForExport(array $collectionIds,array $langs = [], array $processStatus = []): ?Zend_Db_Table_Rowset_Abstract
+    public function loadSortedForExport(array $collectionIds, array $langs = [], array $processStatus = []): ?Zend_Db_Table_Rowset_Abstract
     {
         $s = $this->db->select()
             ->where('collectionId IN(?)', $collectionIds);
 
-        if (!empty($langs)) {
+        if (! empty($langs)) {
             $s->where('languageId in (?)', $langs);
         }
 
-        if( !empty($processStatus)){
+        if (! empty($processStatus)) {
             $s->where('processStatus in (?)', $processStatus);
         }
 
@@ -726,7 +743,24 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
         return $data;
     }
 
-    public function searchTermByParams(array $params = [], &$total = null) {
+    /**
+     * Get array of termEntryIds where the given $term exists and have given $languageId and $collectionId,
+     *
+     * @throws Zend_Db_Statement_Exception
+     */
+    public function searchTermEntryIdsBy(int $collectionId, string $language, string $term): array
+    {
+        return $this->db->getAdapter()->query("
+            SELECT `termEntryId` 
+            FROM `terms_term` 
+            WHERE `collectionId` = $collectionId 
+              AND `language` = ?
+              AND ? IN (`term`, `proposal`) 
+        ", [$language, trim($term)])->fetchAll(PDO::FETCH_COLUMN);
+    }
+
+    public function searchTermByParams(array $params = [], &$total = null)
+    {
         /*if (!$params)
         $params = [
             'query' => 'bi*',
@@ -743,15 +777,15 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
 
         // If attr-filters are involved in search
         if ($params['attrs']) {
-
             // Get `id` => `rfc5646` pairs for all languages
             $codeByLangIdA = ZfExtended_Factory::get('editor_Models_Languages')
                 ->loadAllKeyValueCustom('id', 'rfc5646', true);
 
             // Prepare array of language code to be used in WHERE clause
             $codeA = [];
-            foreach (explode(',', $params['language']) as $langId)
-                $codeA []= $codeByLangIdA[$langId];
+            foreach (explode(',', $params['language']) as $langId) {
+                $codeA[] = $codeByLangIdA[$langId];
+            }
 
             // Get text-attributes datatype ids
             $textA = $this->db->getAdapter()
@@ -759,18 +793,20 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
                 ->fetchAll(PDO::FETCH_KEY_PAIR);
         }
 
-
         // Get the comma-separated list of termEntryIds and/or termIds matching attr-filters
         foreach ($params['attrs'] as $aDataTypeId => $aValue) {
-
             // Fuzzy search for text-attrs
-            if (isset($textA[$aDataTypeId])) $aValue = '*' . trim($aValue, '*?') . '*';
+            if (isset($textA[$aDataTypeId])) {
+                $aValue = '*' . trim($aValue, '*?') . '*';
+            }
 
             // If wildcards are used, convert them to the mysql syntax
             $expr = str_replace(['*', '?'], ['%', '_'], $aValue);
 
             // Prepare query param bindings
-            $bind = [':dataTypeId' => $aDataTypeId];
+            $bind = [
+                ':dataTypeId' => $aDataTypeId,
+            ];
 
             // Build WHERE clause
             $attrWHERE = ['`dataTypeId` = :dataTypeId'];
@@ -780,28 +816,30 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
 
             // If filter value is given
             if ($aValue) {
-
                 // Append to WHERE clause
-                $attrWHERE []= '`value`' . ($expr == $aValue ? ' = ' : ' LIKE ') . ':value';
+                $attrWHERE[] = '`value`' . ($expr == $aValue ? ' = ' : ' LIKE ') . ':value';
 
                 // Add bindings
-                $bind += [':value' => $expr];
+                $bind += [
+                    ':value' => $expr,
+                ];
             }
 
             // Mind previous query results to apply intersection
             if ($matched ?? 0) {
                 $or = [];
                 if ($matched['termEntryId'] ?? 0) {
-                    $or []= '`termEntryId` IN (' . join(',', $matched['termEntryId']) . ')';
+                    $or[] = '`termEntryId` IN (' . join(',', $matched['termEntryId']) . ')';
                 }
                 if ($matched['termId'] ?? 0) {
-                    $or []= '`termId` IN (' . join(',', $matched['termId']) . ')';
+                    $or[] = '`termId` IN (' . join(',', $matched['termId']) . ')';
                 }
-                $attrWHERE []= '(' . join(' OR ', $or) . ')';
+                $attrWHERE[] = '(' . join(' OR ', $or) . ')';
             }
 
             // Get termEntryIds and/or termIds of matched attributes
-            $matched = $this->db->getAdapter()->query('
+            $matched = $this->db->getAdapter()->query(
+                '
                 SELECT DISTINCT 
                   IF(`termId`, "termId", "termEntryId") AS `prop`, 
                   IF(`termId`, `termId`, `termEntryId`) AS `value`
@@ -811,8 +849,7 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
             )->fetchAll(PDO::FETCH_GROUP | PDO::FETCH_COLUMN);
 
             // If nothing found
-            if (!$matched) {
-
+            if (! $matched) {
                 // Setup &$total variable by reference, as 0
                 $total = 0;
 
@@ -830,7 +867,9 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
         // If we're not going to count $total -
         // it means we're in autocomplete mode,
         // so append wildcard if not already added
-        if ($total === false && !$allExcept) $keyword = rtrim($keyword, '%') . '%';
+        if ($total === false && ! $allExcept) {
+            $keyword = rtrim($keyword, '%') . '%';
+        }
 
         // Shared WHERE clause, that will be used for querying both terms and proposals tables
         $where = [
@@ -840,9 +879,9 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
 
         // Append clause for prosessStatus
         if ($params['processStatus']) {
-            $where []= '`t`.`processStatus` IN ("' . str_replace(',', '","', $params['processStatus']) . '")';
+            $where[] = '`t`.`processStatus` IN ("' . str_replace(',', '","', $params['processStatus']) . '")';
             if (preg_match('~unprocessed~', $params['processStatus'])) {
-                $where []= '(' . array_pop($where) . ' OR `t`.`proposal` != "")';
+                $where[] = '(' . array_pop($where) . ' OR `t`.`proposal` != "")';
             }
         }
 
@@ -850,24 +889,23 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
         if ($matched ?? 0) {
             $or = [];
             if ($matched['termEntryId'] ?? 0) {
-                $or []= '`t`.`termEntryId` IN (' . join(',', $matched['termEntryId']) . ')';
+                $or[] = '`t`.`termEntryId` IN (' . join(',', $matched['termEntryId']) . ')';
             }
             if ($matched['termId'] ?? 0) {
-                $or []= '`t`.`id` IN (' . join(',', $matched['termId']) . ')';
+                $or[] = '`t`.`id` IN (' . join(',', $matched['termId']) . ')';
             }
             array_unshift($where, '(' . join(' OR ', $or) . ')');
         }
 
         // If 'noTermDefinedFor' param is given
         if ($_ = (int) $params['noTermDefinedFor']) {
-
             // Respect it in FROM clause
             $noTermDefinedFor = sprintf(' LEFT JOIN `terms_term` AS `t2` ON (
                 `t`.`termEntryId` = `t2`.`termEntryId` AND `t2`.`languageId` = "%s"
             )', $_);
 
             // Respect it in WHERE clause
-            $where []= 'ISNULL(`t2`.`term`)';
+            $where[] = 'ISNULL(`t2`.`term`)';
         }
 
         // Data columns, that would be fetched by search SQL query
@@ -885,21 +923,24 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
         ';
 
         // Assume limit arg can be comma-separated string containing '<LIMIT>,<OFFSET>'
-        if (!$allExcept) list($limit, $offset) = explode(',', $params['limit']);
+        if (! $allExcept) {
+            list($limit, $offset) = explode(',', $params['limit']);
+        }
 
         // Cols that we're going to search in by default
         $cols = ['`t`.`term`', '`t`.`proposal`'];
 
         // If we should only search for `term`-column (e.g. `proposal`-column won't be involved)
         if ($params['processStatus']
-            && !in_array(self::PROCESS_STATUS_UNPROCESSED, editor_Utils::ar($params['processStatus']))) {
-
+            && ! in_array(self::PROCESS_STATUS_UNPROCESSED, editor_Utils::ar($params['processStatus']))) {
             // Drop proposal-col from $cols, so it won't be mentioned in $keywordWHERE
             array_pop($cols);
         }
 
         // Keyword WHERE clauses using LIKE
-        foreach ($cols as $col) $keywordWHERE []= sprintf('LOWER(%s) LIKE LOWER(:keyword) COLLATE utf8mb4_bin', $col);
+        foreach ($cols as $col) {
+            $keywordWHERE[] = sprintf('LOWER(%s) LIKE LOWER(:keyword) COLLATE utf8mb4_bin', $col);
+        }
 
         // Render keyword WHERE string
         $keywordWHERE = '(' . implode(' OR ', $keywordWHERE) . ')';
@@ -908,11 +949,12 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
         $against = trim(preg_replace('/[^\p{L}\p{N}_]+/u', ' ', $params['query'])) . '*';
 
         // Build match-against WHERE
-        $againstWHERE = ['words' => 'MATCH(' . implode(', ', $cols) . ') AGAINST(:against IN BOOLEAN MODE)'];
+        $againstWHERE = [
+            'words' => 'MATCH(' . implode(', ', $cols) . ') AGAINST(:against IN BOOLEAN MODE)',
+        ];
 
         // If $against contains spaces
         if (preg_match('~ ~', $against)) {
-
             // Prepare whole search phrase
             $phrase = '"' . trim($against, '*') . '"';
 
@@ -927,35 +969,42 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
         $bindParam = [];
 
         // Mind termEntryTbxId and termTbxId params
-        foreach (['termEntryTbxId', 'termTbxId'] as $prop)
+        foreach (['termEntryTbxId', 'termTbxId'] as $prop) {
             if (isset($params[$prop]) && $params[$prop]) {
                 $token = ':' . $prop;
-                $where []= '`t`.`' . $prop . '` LIKE CONCAT("%%", ' . $token . ', "%%")';
+                $where[] = '`t`.`' . $prop . '` LIKE CONCAT("%%", ' . $token . ', "%%")';
                 $bindParam[$token] = $params[$prop];
             }
+        }
 
         // Mind tbxCreatedBy and tbxUpdatedBy params
-        foreach (['tbxCreatedBy', 'tbxUpdatedBy'] as $prop)
-            if (isset($params[$prop]) && $params[$prop])
-                $where []= '`t`.`' . $prop . '` IN (' . $params[$prop] . ')';
+        foreach (['tbxCreatedBy', 'tbxUpdatedBy'] as $prop) {
+            if (isset($params[$prop]) && $params[$prop]) {
+                $where[] = '`t`.`' . $prop . '` IN (' . $params[$prop] . ')';
+            }
+        }
 
         // Respect tbx(Created|Updated)(At|Gt|Lt) params
         foreach (['tbxCreated', 'tbxUpdated'] as $prop) {
             $since = $params[$prop . 'Gt'] ?? false;
             $until = $params[$prop . 'Lt'] ?? false;
-            $at    = $params[$prop . 'At'] ?? false;
+            $at = $params[$prop . 'At'] ?? false;
             if ($at || $since || $until) {
-                if ($at) $cond = " = '$at'";
-                else if ($since && $until) $cond = "BETWEEN '$since' AND '$until'";
-                else if ($since) $cond = ">= '$since'";
-                else $cond = "<= '$until'";
-                $where []= 'DATE(`t`.`' . $prop . "At`) $cond";
+                if ($at) {
+                    $cond = " = '$at'";
+                } elseif ($since && $until) {
+                    $cond = "BETWEEN '$since' AND '$until'";
+                } elseif ($since) {
+                    $cond = ">= '$since'";
+                } else {
+                    $cond = "<= '$until'";
+                }
+                $where[] = 'DATE(`t`.`' . $prop . "At`) $cond";
             }
         }
 
         // If it's a non '*'-query (e.g. non 'any'-query)
-        if (!preg_match('~^\*+$~', $against)) {
-
+        if (! preg_match('~^\*+$~', $against)) {
             // Append :keyword param
             $bindParam[':keyword'] = $keyword;
 
@@ -963,11 +1012,12 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
             array_unshift($where, $keywordWHERE);
 
             // Check if wildcard prefix is NOT going to be used in LIKE(:keyword), and if so
-            if (!preg_match('~[%_][^\s]~', $keyword)) {
-
+            if (! preg_match('~[%_][^\s]~', $keyword)) {
                 // Add bindings
                 $bindParam[':against'] = $against;
-                if (count($againstWHERE) == 2) $bindParam[':phrase'] = $phrase;
+                if (count($againstWHERE) == 2) {
+                    $bindParam[':phrase'] = $phrase;
+                }
 
                 // Stringify againstWHERE clause(s)
                 $againstWHERE = '(' . join(' OR ', $againstWHERE) . ')';
@@ -980,7 +1030,7 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
 
         // Make sure some termIds will be excluded
         if ($allExcept && $params['except'] ?? 0) {
-            $where []= '`t`.`' . ($params['column'] ?? 'id') . '` NOT IN (' . $params['except'] . ')';
+            $where[] = '`t`.`' . ($params['column'] ?? 'id') . '` NOT IN (' . $params['except'] . ')';
         }
 
         // Term query template
@@ -993,7 +1043,6 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
 
         // If we have to calculate total
         if ($total === true) {
-
             // Render query for getting total count of results in terms-table
             $totalQuery = sprintf($termQueryTpl, 'COUNT(*)', $noTermDefinedFor ?? '', $keywordWHERE);
 
@@ -1005,7 +1054,9 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
         $termQuery = sprintf($termQueryTpl, $termQueryCol, $noTermDefinedFor ?? '', $keywordWHERE);
 
         // If we're not in allExcept-mode - append LIMIT clause
-        if (!$allExcept) $termQuery .= 'LIMIT ' . (int) $offset . ',' . (int) $limit;
+        if (! $allExcept) {
+            $termQuery .= 'LIMIT ' . (int) $offset . ',' . (int) $limit;
+        }
 
         // If we're on allExcept-mode - make sure ids will be fetched
         $fetchMode = $allExcept ? PDO::FETCH_COLUMN : null;
@@ -1022,16 +1073,13 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
      */
     public function isProposableAllowed(): bool
     {
-        $user = ZfExtended_Factory::get('ZfExtended_Models_User');
-        /* @var $user ZfExtended_Models_User */
-        return $user->hasRole('termProposer');
+        return ZfExtended_Authentication::getInstance()->hasUserRole('termProposer');
     }
 
     /**
      * returns a map CONSTNAME => value of all term process-status
-     * @return array
      */
-    static public function getAllProcessStatus(): array
+    public static function getAllProcessStatus(): array
     {
         self::initConstStatus();
 
@@ -1041,21 +1089,21 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
     /**
      * creates a internal list of the status constants
      */
-    static protected function initConstStatus()
+    protected static function initConstStatus()
     {
-        if (!empty(self::$statusCache)) {
+        if (! empty(self::$statusCache)) {
             return;
         }
 
         self::$statusCache = [
             'status' => [],
             'translation' => [],
-            'processStatus' => []
+            'processStatus' => [],
         ];
 
         $reflection = new ReflectionClass(__CLASS__);
         $constants = $reflection->getConstants();
-        foreach($constants as $key => $val) {
+        foreach ($constants as $key => $val) {
             if (strpos($key, 'STAT_') === 0) {
                 self::$statusCache['status'][$key] = $val;
             }
@@ -1086,21 +1134,22 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
             $s = $this->db->select()
                 ->where('term = ?', $term->text)
                 ->where('collectionId IN(?)', $collectionIds)
-                ->where('languageId IN (?)',$language);
+                ->where('languageId IN (?)', $language);
             $terms = $this->db->fetchAll($s);
 
             if ($terms->count() === 0) {
                 $nonExistingTerms[] = $term;
             }
         }
+
         return $nonExistingTerms;
     }
+
     /**
      * Returns the configured mapping of term-statuses
      * (= which statuses are allowed etc).
-     * @return array
      */
-    static public function getTermStatusMap(): array
+    public static function getTermStatusMap(): array
     {
         $config = Zend_Registry::get('config');
 
@@ -1139,15 +1188,14 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
         $excel->setLabel('lastEditor', $t->_('Letzter Bearbeiter'));
         $excel->setLabel('lastEditedDate', $t->_('Bearbeitungsdatum'));
 
-
-        $autosizeCells=function($phpExcel) use ($excel){
+        $autosizeCells = function ($phpExcel) use ($excel) {
             foreach ($phpExcel->getWorksheetIterator() as $worksheet) {
                 $phpExcel->setActiveSheetIndex($phpExcel->getIndex($worksheet));
                 $sheet = $phpExcel->getActiveSheet();
 
                 //the highes column based on the current row columns
-                $highestColumn='M';
-                foreach(range('A',$highestColumn) as $column) {
+                $highestColumn = 'M';
+                foreach (range('A', $highestColumn) as $column) {
                     $sheet->getColumnDimension($column)->setAutoSize(true);
                 }
 
@@ -1163,7 +1211,7 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
                     for ($row = 1; $row <= $highestRow; $row++) {
                         $cell = $worksheet->getCellByColumnAndRow($col, $row);
                         if (strpos($cell->getValue(), '<changemycolortag>') !== false) {
-                            $cell->setValue(str_replace('<changemycolortag>','', $cell->getValue()));
+                            $cell->setValue(str_replace('<changemycolortag>', '', $cell->getValue()));
                             $sheet->getStyle($cell->getCoordinate())->getFill()->setFillType('solid')->getStartColor()->setRGB('f9f25c');
                         }
                     }
@@ -1172,16 +1220,18 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
         };
 
         //if the path is provided, save the excel into the given path location
-        if (!empty($path)) {
+        if (! empty($path)) {
             $excel->loadArrayData($rows);
             $autosizeCells($excel->getSpreadsheet());
             $excel->saveToDisc($path);
+
             return;
         }
 
         //send the excel to browser download
-        $excel->simpleArrayToExcel($rows,$autosizeCells);
+        $excel->simpleArrayToExcel($rows, $autosizeCells);
     }
+
     /***
      * Update language assoc for given collections. The langages are merged from exsisting terms per collection.
      * @param array|null $collectionIds
@@ -1189,11 +1239,15 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
     public function updateAssocLanguages(array $collectionIds = null)
     {
         $s = $this->db->select()
-            ->from(['t' =>'terms_term'], ['t.languageId', 't.collectionId'])
-            ->join(['l' =>'LEK_languages'], 't.languageId = l.id', 'rfc5646');
+            ->from([
+                't' => 'terms_term',
+            ], ['t.languageId', 't.collectionId'])
+            ->join([
+                'l' => 'LEK_languages',
+            ], 't.languageId = l.id', 'rfc5646');
 
-        if (!empty($collectionIds)) {
-            $s->where('t.collectionId IN(?)',$collectionIds);
+        if (! empty($collectionIds)) {
+            $s->where('t.collectionId IN(?)', $collectionIds);
         }
 
         $s->group('t.collectionId')->group('t.languageId')->setIntegrityCheck(false);
@@ -1201,23 +1255,23 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
 
         $data = [];
         foreach ($ret as $lng) {
-            if (!isset($data[$lng['collectionId']])) {
+            if (! isset($data[$lng['collectionId']])) {
                 $data[$lng['collectionId']] = [];
             }
             array_push($data[$lng['collectionId']], $lng);
         }
 
         foreach ($data as $key => $value) {
-            $alreadyProcessed = array();
+            $alreadyProcessed = [];
             //the term collection contains terms with only one language
             $isSingleCombination = count($value) == 1;
             foreach ($value as $x) {
                 foreach ($value as $y) {
                     //keep track of what is already processed
-                    $combination = array($x['languageId'], $y['languageId']);
+                    $combination = [$x['languageId'], $y['languageId']];
 
                     //it is not the same number or single language combination and thay are not already processed
-                    if (($x['languageId'] === $y['languageId'] && !$isSingleCombination) || in_array($combination, $alreadyProcessed)) {
+                    if (($x['languageId'] === $y['languageId'] && ! $isSingleCombination) || in_array($combination, $alreadyProcessed)) {
                         continue;
                     }
                     //Add it to the list of what you've already processed
@@ -1229,9 +1283,11 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
 
                     $model->setSourceLang($x['languageId']);
                     $model->setSourceLangCode($x['rfc5646']);
+                    $model->setSourceLangName($x['langName']);
 
                     $model->setTargetLang($y['languageId']);
                     $model->setTargetLangCode($y['rfc5646']);
+                    $model->setTargetLangName($y['langName']);
 
                     $model->setLanguageResourceId($key);
                     $model->save();
@@ -1239,10 +1295,9 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
             }
         }
     }
+
     /**
      * exports all terms of all termCollections associated to the task in the task's languages.
-     * @param editor_Models_Task $task
-     * @return string
      * @throws editor_Models_Term_TbxCreationException
      */
     public function exportForTagging(editor_Models_Task $task): string
@@ -1258,7 +1313,7 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
             //No term collection assigned to task although tasks terminology flag is true.
             // This is normally not possible, since the terminology flag in the task is maintained on TC task assoc changes via API
             throw new editor_Models_Term_TbxCreationException('E1113', [
-                'task' => $task
+                'task' => $task,
             ]);
         }
 
@@ -1270,14 +1325,14 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
         if ($task->getRelaisLang() > 0) {
             $langs[] = $languageModel->getFuzzyLanguages($task->getRelaisLang(), includeMajor: true);
         }
-        $langs = array_unique(array_merge(... $langs));
+        $langs = array_unique(array_merge(...$langs));
 
         $statuses = $task->getConfig()->runtimeOptions->terminology->usedTermProcessStatus->toArray();
-        if( empty($statuses)){
-            $statuses =  [];
+        if (empty($statuses)) {
+            $statuses = [];
         }
         $data = $this->loadSortedForExport($collectionIds, $langs, $statuses);
-        if (!$data) {
+        if (! $data) {
             //The associated collections don't contain terms in the languages of the task.
             // Should not be, should be checked already on assignment of collection to task.
             // Colud happen when all terms of a language are removed from a TermCollection via term import after associating that term collection to a task.
@@ -1300,13 +1355,12 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
                 'languageIds' => $langs,
             ]);
         }
+
         return $result;
     }
 
     /**
      * Sortiert die Terme innerhalb der Termgruppen:
-     * @param array $termGroups
-     * @return array
      */
     public function sortTerms(array $termGroups): array
     {
@@ -1314,6 +1368,7 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
             usort($group, [$this, 'compareTerms']);
             $termGroups[$groupId] = $group;
         }
+
         return $termGroups;
     }
 
@@ -1324,18 +1379,14 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
      *  -- 3. Kriterium: In Ziel vorhanden (damit ist die Original-Ãœbersetzung gemeint, nicht die editierte Variante)
      *  -- 4. Kriterium: Alphanumerische Sortierung
      *  Zusammenhang Parameter und Return Values siehe usort $cmp_function
-     *
-     *  @param $term1
-     *  @param $term2
-     *  @return int
      */
     protected function compareTerms($term1, $term2): int
     {
         // return > 0 => t1 > t2
         // return = 0 => t1 = t2
         // return < 0 => t1 < t2
-        $term1 = is_array($term1) ? (object)$term1 : $term1;
-        $term2 = is_array($term2) ? (object)$term2 : $term2;
+        $term1 = is_array($term1) ? (object) $term1 : $term1;
+        $term2 = is_array($term2) ? (object) $term2 : $term2;
         $status = $this->compareTermStatus($term1->status, $term2->status);
 
         if ($status !== 0) {
@@ -1343,7 +1394,7 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
         }
 
         $isSource = 0;
-        if (isset($term1->isSource)){
+        if (isset($term1->isSource)) {
             $isSource = $this->compareTermLangUsage($term1->isSource, $term2->isSource);
         }
 
@@ -1354,11 +1405,9 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
         //Kriterium 4 - alphanumerische Sortierung:
         return strcmp(mb_strtolower($term1->term), mb_strtolower($term2->term));
     }
+
     /**
      * Vergleicht die Term Status
-     * @param string $status1
-     * @param string $status2
-     * @return int
      */
     protected function compareTermStatus(string $status1, string $status2): int
     {
@@ -1385,9 +1434,6 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
 
     /**
      * Vergleicht die Term auf Verwendung in Quell oder Zielspalte
-     * @param string $isSource1
-     * @param string $isSource2
-     * @return int
      */
     protected function compareTermLangUsage(string $isSource1, string $isSource2): int
     {
@@ -1414,11 +1460,13 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
         //get all terms in the collection older than the date
         $s = $this->db->select()
             ->setIntegrityCheck(false)
-            ->from(['t'=>'terms_term'],['t.id', 't.proposal'])
+            ->from([
+                't' => 'terms_term',
+            ], ['t.id', 't.proposal'])
             //->joinLeft(['p'=>'terms_proposal'],'p.termId=t.id ',['p.term','p.created','p.userGuid','p.userName'])
             ->where('t.updatedAt < ?', $olderThan)
-            ->where('t.collectionId in (?)',$collectionIds)
-            ->where('t.processStatus NOT IN (?)',self::PROCESS_STATUS_UNPROCESSED);
+            ->where('t.collectionId in (?)', $collectionIds)
+            ->where('t.processStatus NOT IN (?)', self::PROCESS_STATUS_UNPROCESSED);
         $result = $this->db->fetchAll($s)->toArray();
 
         if (empty($result)) {
@@ -1434,7 +1482,7 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
         //for each of the terms with the proposals, use the proposal value as the
         //new term value in the original term, after the original term is updated, remove
         //the proposal
-        foreach ($result as $key=>$res){
+        foreach ($result as $key => $res) {
             /*if (empty($res['term'])) {*/
             if (empty($res['proposal'])) {
                 continue;
@@ -1467,7 +1515,7 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
             $term->update([
                 'userName' => $session->userName, // transacGrp will be updated
                 'userGuid' => $session->userGuid, // transacGrp will be updated
-                'updateProcessStatusAttr' => true // processStatus-attr will be updated
+                'updateProcessStatusAttr' => true, // processStatus-attr will be updated
             ]);
             //$deleteProposals[] = $res['id'];
             unset($result[$key]);
@@ -1481,13 +1529,17 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
             ]);
         }*/
 
-        $result = array_column($result,'id');
+        $result = array_column($result, 'id');
         if (empty($result)) {
             return false;
         }
+
         //delete the collected old terms
-        return $this->db->delete(['id IN(?)' => $result])>0;
+        return $this->db->delete([
+            'id IN(?)' => $result,
+        ]) > 0;
     }
+
     /***
      * Load all term and attribute proposals, or if second parameter is given load only proposals younger as $youngerAs date within the given collection(s)
      * @param array $collectionIds
@@ -1501,7 +1553,7 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
         $adapter = $this->db->getAdapter();
         $bindParams = [];
         $termYoungerSql = $attrYoungerSql = '';
-        if (!empty($youngerAs)) {
+        if (! empty($youngerAs)) {
             $bindParams[] = $youngerAs;
             //$bindParams[] = $youngerAs;
             $termYoungerSql = ' AND t.updatedAt >=?';
@@ -1522,7 +1574,6 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
             'lastEditor' => 'zxc2',
             'lastEditedDate' => 'zxc2',
         ]];*/
-
 
         //Info: why collection ids is not in bindParams
         //binding multiple values to single param is not posible with $adapter->query . For more info see PDOStatement::execute
@@ -1550,12 +1601,12 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
                     null as 'attributeproposal-lastEditor'
                     FROM terms_term t
                     INNER JOIN LEK_languages l ON t.language = l.rfc5646
-                WHERE ".$adapter->quoteInto('t.collectionId IN(?)',$collectionIds)
-            .$termYoungerSql."
+                WHERE " . $adapter->quoteInto('t.collectionId IN(?)', $collectionIds)
+            . $termYoungerSql . "
                 AND (t.proposal IS NOT NULL or t.processStatus = 'unprocessed')
                 ORDER BY t.termEntryTbxId, t.term";
 
-        $termResult = $adapter->query($termSql,$bindParams)->fetchAll();
+        $termResult = $adapter->query($termSql, $bindParams)->fetchAll();
 
         $attributeSql = "SELECT
                         ta.id as 'attribute-id',
@@ -1586,36 +1637,43 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
                         LEFT OUTER JOIN terms_attributes_history tah ON (tah.attrId = ta.id AND tah.isCreatedLocally = 0)
                         LEFT OUTER JOIN terms_term t on ta.termId = t.id
                         LEFT OUTER JOIN LEK_languages l ON t.language = l.rfc5646
-                    WHERE ".$adapter->quoteInto('ta.collectionId IN(?)', $collectionIds).
-            $attrYoungerSql."
+                    WHERE " . $adapter->quoteInto('ta.collectionId IN(?)', $collectionIds) .
+            $attrYoungerSql . "
                     AND ta.isCreatedLocally = 1
                     ORDER BY ta.termEntryId, ta.termId";
 
-        $attributeResult = $adapter->query($attributeSql,$bindParams)->fetchAll();
+        $attributeResult = $adapter->query($attributeSql, $bindParams)->fetchAll();
 
         //merge term proposals with term attributes and term entry attributes proposals
         $resultArray = array_merge($termResult, $attributeResult);
 
         // Collect distinct editor-user ids
         $userIdA = [];
-        foreach ($resultArray as $idx => $item)
-            foreach ($item as $prop => $value)
-                if (preg_match('~-lastEditor$~', $prop))
-                    if ($userId = $resultArray[$idx][$prop])
+        foreach ($resultArray as $idx => $item) {
+            foreach ($item as $prop => $value) {
+                if (preg_match('~-lastEditor$~', $prop)) {
+                    if ($userId = $resultArray[$idx][$prop]) {
                         $userIdA[$userId] = true;
+                    }
+                }
+            }
+        }
 
         // Get user names by ids array
         $userNameA = $adapter->query('
             SELECT `id`, CONCAT(`firstName`, " ", `surName`) 
             FROM `Zf_users` 
-            WHERE `id` IN ('  . (implode(',', array_keys($userIdA)) ?: 0) . ')
+            WHERE `id` IN (' . (implode(',', array_keys($userIdA)) ?: 0) . ')
         ')->fetchAll(PDO::FETCH_KEY_PAIR);
 
         // Spoof user ids with user names
-        foreach ($resultArray as $idx => $item)
-            foreach ($item as $prop => $value)
-                if (preg_match('~-lastEditor$~', $prop) && $value)
+        foreach ($resultArray as $idx => $item) {
+            foreach ($item as $prop => $value) {
+                if (preg_match('~-lastEditor$~', $prop) && $value) {
                     $resultArray[$idx][$prop] = $userNameA[$value];
+                }
+            }
+        }
 
         if (empty($resultArray)) {
             return [];
@@ -1623,6 +1681,7 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
 
         return $this->groupProposalExportData($resultArray);
     }
+
     /***
      * Group the term and attribute proposal data for the export
      * @param array $data
@@ -1630,7 +1689,7 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
      */
     protected function groupProposalExportData(array $data): array
     {
-        usort($data, function($a, $b) {
+        usort($data, function ($a, $b) {
             $retval = $a['term-Id'] <=> $b['term-Id'];
             if ($retval == 0) {
                 $retval = $b['term-term'] <=> $a['term-term'];
@@ -1647,45 +1706,45 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
         foreach ($data as $row) {
             $tmpTerm['termEntryId'] = $row['term-termEntryId'];
             //if it is empty it is termEntryAttribute
-            if(empty($tmpTerm['termEntryId']) && !empty($row['attribute-termEntryId'])){
+            if (empty($tmpTerm['termEntryId']) && ! empty($row['attribute-termEntryId'])) {
                 $tmpTerm['termEntryId'] = $row['attribute-termEntryId'];
             }
             $tmpTerm['definition'] = $row['term-definition'];
             $tmpTerm['language'] = $row['term-language'];
             $tmpTerm['termId'] = $row['term-Id'];
-            $tmpTerm['term'] = $changeMyCollorTag.$row['term-term'];
+            $tmpTerm['term'] = $changeMyCollorTag . $row['term-term'];
             $tmpTerm['termProposal'] = '';
             $tmpTerm['processStatus'] = $row['term-processStatus'];
             $tmpTerm['attributeName'] = $row['attribute-name'];
             $tmpTerm['attribute'] = $row['attribute-value'];
             $tmpTerm['attributeProposal'] = '';
-            $tmpTerm['lastEditor'] = $changeMyCollorTag.$row['term-lastEditor'];
-            $tmpTerm['lastEditedDate'] = $changeMyCollorTag.$row['term-lastEditedDate'];
+            $tmpTerm['lastEditor'] = $changeMyCollorTag . $row['term-lastEditor'];
+            $tmpTerm['lastEditedDate'] = $changeMyCollorTag . $row['term-lastEditedDate'];
 
             //if the proposal exist, set the change color and last editor for the proposal
-            if(!empty($row['termproposal-term'])){
-                $tmpTerm['term'] = str_replace($changeMyCollorTag,'',$row['term-term']);
-                $tmpTerm['termProposal'] = $changeMyCollorTag.$row['termproposal-term'];
-                $tmpTerm['lastEditor'] = $changeMyCollorTag.$row['termproposal-lastEditor'];
-                $tmpTerm['lastEditedDate'] = $changeMyCollorTag.$row['termproposal-lastEditedDate'];
+            if (! empty($row['termproposal-term'])) {
+                $tmpTerm['term'] = str_replace($changeMyCollorTag, '', $row['term-term']);
+                $tmpTerm['termProposal'] = $changeMyCollorTag . $row['termproposal-term'];
+                $tmpTerm['lastEditor'] = $changeMyCollorTag . $row['termproposal-lastEditor'];
+                $tmpTerm['lastEditedDate'] = $changeMyCollorTag . $row['termproposal-lastEditedDate'];
             }
 
-            if(isset($row['attribute-isCreatedLocally']) && $row['attribute-isCreatedLocally']==1){
-                $tmpTerm['attribute'] = $changeMyCollorTag.$row['attribute-value'];
-                $tmpTerm['lastEditor'] = $changeMyCollorTag.$row['attribute-lastEditor'];
-                $tmpTerm['lastEditedDate'] = $changeMyCollorTag.$row['attribute-lastEditedDate'];
-                $tmpTerm['term'] = str_replace($changeMyCollorTag,'',$row['term-term']);
-                $tmpTerm['termProposal'] = str_replace($changeMyCollorTag,'',$row['termproposal-term']);
+            if (isset($row['attribute-isCreatedLocally']) && $row['attribute-isCreatedLocally'] == 1) {
+                $tmpTerm['attribute'] = $changeMyCollorTag . $row['attribute-value'];
+                $tmpTerm['lastEditor'] = $changeMyCollorTag . $row['attribute-lastEditor'];
+                $tmpTerm['lastEditedDate'] = $changeMyCollorTag . $row['attribute-lastEditedDate'];
+                $tmpTerm['term'] = str_replace($changeMyCollorTag, '', $row['term-term'] ?? '');
+                $tmpTerm['termProposal'] = str_replace($changeMyCollorTag, '', $row['termproposal-term'] ?? '');
             }
 
             //if the attribute proposal is set, set the change color and last editor for the attribute proposal
-            if(!empty($row['attributeproposal-value'])){
-                $tmpTerm['term'] = str_replace($changeMyCollorTag,'',$row['term-term']);
-                $tmpTerm['termProposal'] = str_replace($changeMyCollorTag,'',$row['termproposal-term']);
+            if (! empty($row['attributeproposal-value'])) {
+                $tmpTerm['term'] = str_replace($changeMyCollorTag, '', $row['term-term']);
+                $tmpTerm['termProposal'] = str_replace($changeMyCollorTag, '', $row['termproposal-term']);
                 $tmpTerm['attribute'] = $row['attribute-value'];
-                $tmpTerm['attributeProposal'] = $changeMyCollorTag.$row['attributeproposal-value'];
-                $tmpTerm['lastEditor'] = $changeMyCollorTag.$row['attributeproposal-lastEditor'];
-                $tmpTerm['lastEditedDate'] = $changeMyCollorTag.$row['attributeproposal-lastEditedDate'];
+                $tmpTerm['attributeProposal'] = $changeMyCollorTag . $row['attributeproposal-value'];
+                $tmpTerm['lastEditor'] = $changeMyCollorTag . $row['attributeproposal-lastEditor'];
+                $tmpTerm['lastEditedDate'] = $changeMyCollorTag . $row['attributeproposal-lastEditedDate'];
             }
             $returnResult[] = $tmpTerm;
             $tmpTerm = [];
@@ -1708,18 +1767,18 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
             ->where('termEntryId IN(?)', $entryIds);
         $return = $this->db->fetchAll($s)->toArray();
 
-        if(empty($return)){
+        if (empty($return)) {
             return [];
         }
 
         //group the definitions by termEntryId as a key
         $result = [];
         foreach ($return as $r) {
-            if (!isset($result[$r['termEntryId']])) {
+            if (! isset($result[$r['termEntryId']])) {
                 $result[$r['termEntryId']] = [];
             }
 
-            if (!in_array($r['definition'], $result[$r['termEntryId']]) && !empty($r['definition'])) {
+            if (! in_array($r['definition'], $result[$r['termEntryId']]) && ! empty($r['definition'])) {
                 $result[$r['termEntryId']][] = $r['definition'];
             }
         }
@@ -1729,38 +1788,32 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
 
     /**
      * Is the term a "preferred" term according to the given status?
-     * @param string $termStatus
      * @return boolean
      */
-    static public function isPreferredTerm(string $termStatus): bool
+    public static function isPreferredTerm(string $termStatus): bool
     {
         $termStatusMap = self::getTermStatusMap();
-        if (!array_key_exists($termStatus, $termStatusMap)) {
+        if (! array_key_exists($termStatus, $termStatusMap)) {
             return false;
         }
+
         return $termStatusMap[$termStatus] == 'preferred';
     }
+
     /**
      * Is the term a "permitted" term according to the given status?
-     * @param string $termStatus
      * @return boolean
      */
-    static public function isPermittedTerm(string $termStatus): bool
+    public static function isPermittedTerm(string $termStatus): bool
     {
         $termStatusMap = self::getTermStatusMap();
-        if (!array_key_exists($termStatus, $termStatusMap)) {
+        if (! array_key_exists($termStatus, $termStatusMap)) {
             return false;
         }
 
         return $termStatusMap[$termStatus] == 'permitted';
     }
 
-    /**
-     *
-     * @param string $termId
-     * @param array $collectionIds
-     * @return Zend_Db_Table_Row_Abstract | null
-     */
     public function loadByMid(string $termId, array $collectionIds): ?Zend_Db_Table_Row_Abstract
     {
         $s = $this->db->select(false);
@@ -1777,12 +1830,11 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
 
     /**
      * returns all term mids from given segment content (allows and returns also duplicated mids)
-     * @param string $seg
      * @return array values are the mids of the terms in the string
      */
     public function getTermMidsFromSegment(string $seg): array
     {
-        return array_map(function($item) {
+        return array_map(function ($item) {
             return $item['termId'];
         }, $this->getTermInfosFromSegment($seg));
     }
@@ -1790,8 +1842,6 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
     /**
      * Returns term-informations for a given group id
      *
-     * @param array $collectionIds
-     * @param string $termEntryTbxId
      * @param array $languageIds 1-dim array with languageIds|default empty array;
      *          if passed only terms with the passed languageIds are returned
      * @return array  2-dim array (get term of first row like return[0]['term'])
@@ -1803,7 +1853,7 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
             ->where('collectionId IN(?)', $collectionIds)
             ->where('termEntryTbxId = ?', $termEntryTbxId);
 
-        if (!empty($languageIds)) {
+        if (! empty($languageIds)) {
             $s->where('languageId in (?)', $languageIds);
         }
 
@@ -1813,31 +1863,28 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
     /**
      * Load [termTbxId => termEntryTbxId] pairs for terms having termTbxId given by $termTbxIds arg
      *
-     * @param array $termTbxIds
      * @return array
      */
-    public function loadTermEntryTbxIdsByTermTbxIds(array $termTbxIds) {
+    public function loadTermEntryTbxIdsByTermTbxIds(array $termTbxIds)
+    {
         return $this->db->getAdapter()->query('
             SELECT `termTbxId`, `termEntryTbxId` 
             FROM `terms_term` 
-            WHERE `termTbxId` IN ("'. join('","', $termTbxIds) . '")
+            WHERE `termTbxId` IN ("' . join('","', $termTbxIds) . '")
         ')->fetchAll(PDO::FETCH_KEY_PAIR);
     }
 
     /**
      * Find first homonym for the given $term, stored under any of termEntries
      * identified by $termEntryTbxIds arg, and having language from $languageIds list
-     *
-     * @param string $term
-     * @param array $termEntryTbxIds
-     * @param array $languageIds
      */
-    public function findHomonym(string $term, array $termEntryTbxIds, array $languageIds) {
+    public function findHomonym(string $term, array $termEntryTbxIds, array $languageIds)
+    {
         return $this->db->getAdapter()->query('
             SELECT `termTbxId` 
             FROM `terms_term` 
             WHERE 1
-              AND `termEntryTbxId` IN ("'. join('","', $termEntryTbxIds) . '") 
+              AND `termEntryTbxId` IN ("' . join('","', $termEntryTbxIds) . '") 
               AND `term` = ?
               AND `languageId` IN (' . join(',', $languageIds) . ')
               LIMIT 1
@@ -1846,21 +1893,18 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
 
     /**
      * Load distinct terms themselves, by their tbx ids
-     *
-     * @param array $termTbxIds
-     * @return array
      */
-    public function loadDistinctByTbxIds(array $termTbxIds) : array {
+    public function loadDistinctByTbxIds(array $termTbxIds): array
+    {
         return $this->db->getAdapter()->query('
             SELECT DISTINCT term 
             FROM `terms_term` 
-            WHERE `termTbxId` IN ("'. join('","', $termTbxIds) . '")
+            WHERE `termTbxId` IN ("' . join('","', $termTbxIds) . '")
         ')->fetchAll(PDO::FETCH_COLUMN);
     }
 
     /**
      * returns mids and term flags (css classes) found in a string
-     * @param string $seg
      * @return array 2D Array, first level are found terms, second level has key mid and key classes
      */
     public function getTermInfosFromSegment(string $seg): array
@@ -1875,20 +1919,22 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
      * @param string $olderThan
      * @return boolean
      */
-    public function removeProposalsOlderThan(array $collectionIds,string $olderThan){
-
+    public function removeProposalsOlderThan(array $collectionIds, string $olderThan)
+    {
         // Delete entries having processStatus=unprocessed
         $rowsCount = $this->db->delete([
             'updatedAt < ?' => $olderThan,
             'collectionId in (?)' => $collectionIds,
-            'processStatus = ?' => self::PROCESS_STATUS_UNPROCESSED
+            'processStatus = ?' => self::PROCESS_STATUS_UNPROCESSED,
         ]);
 
         // Setup `proposal` column to be empty string todo: history tables to be involved ?
-        return ($this->db->update(['proposal' => ''], [
+        return ($this->db->update([
+            'proposal' => '',
+        ], [
             'updatedAt < ?' => $olderThan,
             'collectionId in (?)' => $collectionIds,
-            'LENGTH(`proposal`) > ?' => 0
+            'LENGTH(`proposal`) > ?' => 0,
         ]) + $rowsCount) > 0;
 
         /*return ($this->db->delete([
@@ -1905,8 +1951,8 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
      * @return array
      * @throws Zend_Db_Statement_Exception
      */
-    public function getExportData($ids, $idsProp = 'termEntryId') {
-
+    public function getExportData($ids, $idsProp = 'termEntryId')
+    {
         // Build clause for termIds
         $where = $this->db->getAdapter()->quoteInto('`' . $idsProp . '` IN (?)', editor_Utils::ar($ids));
 
@@ -1924,8 +1970,8 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
      * @return bool|string
      * @throws Zend_Db_Statement_Exception
      */
-    public function isLast() {
-
+    public function isLast()
+    {
         // Get data, that will help to detect whether this term is the last in it's termEntry or language
         $isLast_data = $this->db->getAdapter()->query('
             SELECT `language`, COUNT(`id`) AS `termQty` 
@@ -1949,8 +1995,8 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
      * 3.`terms_transacgrp`-records
      * 4.`terms_attributes`-records
      */
-    public function preDeleteIfLast4Language() {
-
+    public function preDeleteIfLast4Language()
+    {
         // Delete `terms_images`-records and image-files found by those records
         editor_Models_Terminology_Models_AttributeModel
             ::deleteImages($this->getCollectionId(), $this->getTermEntryId(), $this->getLanguage());
@@ -1968,8 +2014,8 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
      * 2.`terms_term_entry`-record. Note: current terms_term-record will be deleted by ON DELETE CASCADE
      * @throws Zend_Db_Statement_Exception
      */
-    public function preDeleteIfLast4Entry() {
-
+    public function preDeleteIfLast4Entry()
+    {
         // Delete `terms_images`-records and image-files found by those records
         editor_Models_Terminology_Models_AttributeModel
             ::deleteImages($this->getCollectionId(), $this->getTermEntryId());
@@ -1983,18 +2029,12 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
     /**
      * Detach current term proposal into new term, with attributes replication,
      * and return newly created term data in a format, compatible with TermPortal siblings-panel
-     *
-     * @param string $processStatus
-     * @param int $userId
-     * @param string $userName
-     * @param string $userGuid
-     * @param int|null $processStatusAttrId
-     * @return array
      */
-    public function detachProposal(string &$processStatus, int $userId, string $userName, string $userGuid, int $processStatusAttrId = null): array {
-
+    public function detachProposal(string &$processStatus, int $userId, string $userName, string $userGuid, int $processStatusAttrId = null): array
+    {
         // Prepare the data to be used for init a new term based on current term's proposal
-        $init = $this->toArray(); unset($init['id'], $init['proposal']);
+        $init = $this->toArray();
+        unset($init['id'], $init['proposal']);
         $init['processStatus'] = $processStatus;
         $init['term'] = $this->getProposal();
         $init['guid'] = ZfExtended_Utils::uuid();
@@ -2007,23 +2047,29 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
         $p->insert([
             'userName' => $userName,
             'userGuid' => $userGuid,
-            'copyAttrsFromTermId' => $this->getId()
+            'copyAttrsFromTermId' => $this->getId(),
         ]);
 
         // If processStatus is 'rejected', it means that proposal for existing term was rejected,
         // so that we spoof $params['value'] with processStatus of existing term,
         // as it will be flushed within json response
-        if ($processStatus == 'rejected') $processStatus = $this->getProcessStatus();
+        if ($processStatus == 'rejected') {
+            $processStatus = $this->getProcessStatus();
+        }
 
         // Else if existing term's proposal is accepted, e.g. is 'provisionallyProcessed'
         // or 'finalized' - then, for existing term, setup `processStatus` = 'rejected'
         // Also, spoof $params['value'] for it to be 'rejected', as it will be flushed within json response
-        else $this->setProcessStatus($processStatus = 'rejected');
+        else {
+            $this->setProcessStatus($processStatus = 'rejected');
+        }
 
         // Remove proposal from existing term
         $this->setProposal('');
         $this->setUpdatedBy($userId);
-        $this->update(['updateProcessStatusAttr' => $processStatusAttrId ?? true]);
+        $this->update([
+            'updateProcessStatusAttr' => $processStatusAttrId ?? true,
+        ]);
 
         // Return new term data in format, compatible with TermPortal's siblings-panel store
         return [
@@ -2048,25 +2094,23 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
      *  - creating/updating normativeAuthorization-attr
      *  - updating collections stats
      *
-     * @param string $processStatus
-     * @param string $userId
-     * @param string $userName
-     * @param string $userGuid
-     * @param editor_Models_Terminology_Models_AttributeModel|null $processStatusAttr
      * @return array
      */
-    public function doProcessStatusChange(string $processStatus, string $userId, string $userName, string $userGuid,
-                                          editor_Models_Terminology_Models_AttributeModel $processStatusAttr = null) {
+    public function doProcessStatusChange(
+        string $processStatus,
+        string $userId,
+        string $userName,
+        string $userGuid,
+        editor_Models_Terminology_Models_AttributeModel $processStatusAttr = null
+    ) {
         // Return value
         $data = [];
 
         // If term, that we're going to change processStatus for - has a proposal
         if ($this->getProposal()) {
-
             // If new processStatus is 'rejected', 'provisionallyProcessed' or 'finalized'
             // - cut proposal from existing into separate term
             if ($processStatus != 'unprocessed') {
-
                 // Make sure newly created term's data to be flushed within json response,
                 // so it'll be possible to add record into siblings-panel grid's store
                 $data['inserted'] = $this->detachProposal(
@@ -2081,22 +2125,27 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
                 // it means that term processStatus was changed to 'rejected', so 'normativeAuthorization'
                 // attribute was set to 'deprecatedTerm', and in case if there was no such attribute previously
                 // we need to pass attr info to client side for new attr-field to be added into the attr-panel
-                if ($this->normativeAuthorization ?? 0)
+                if ($this->normativeAuthorization ?? 0) {
                     $data['normativeAuthorization'] = $this->_normativeAuthorization($userName);
+                }
 
                 // Update collection stats
                 ZfExtended_Factory
                     ::get('editor_Models_TermCollection_TermCollection')
-                    ->updateStats($this->getCollectionId(), ['termEntry' => 0, 'term' => 1]);
+                        ->updateStats($this->getCollectionId(), [
+                            'termEntry' => 0,
+                            'term' => 1,
+                        ]);
             }
 
-        // Else
+            // Else
         } else {
-
             // Update `processStatus` on `terms_term`-record
             $this->setProcessStatus($processStatus);
             $this->setUpdatedBy($userId);
-            $this->update(['updateProcessStatusAttr' => $processStatusAttr->getId()]);
+            $this->update([
+                'updateProcessStatusAttr' => $processStatusAttr->getId(),
+            ]);
 
             // If $this->normativeAuthorization was set by the above $this->update() call
             // it means that term processStatus was changed to 'rejected', so 'normativeAuthorization'
@@ -2108,11 +2157,11 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
                 // Increment collection stats 'attribute'-prop only
                 ZfExtended_Factory
                     ::get('editor_Models_TermCollection_TermCollection')
-                    ->updateStats($this->getCollectionId(), [
-                        'termEntry' => 0,
-                        'term' => 0,
-                        'attribute' => 1
-                    ]);
+                        ->updateStats($this->getCollectionId(), [
+                            'termEntry' => 0,
+                            'term' => 0,
+                            'attribute' => 1,
+                        ]);
             }
         }
 
@@ -2131,13 +2180,14 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
     }
 
     /**
-     * @param $userName
      * @return array|void
      */
-    protected function _normativeAuthorization($userName) {
-
+    protected function _normativeAuthorization($userName)
+    {
         // If no 'normativeAuthorization' prop is set - return
-        if (!$na = $this->normativeAuthorization ?? 0) return;
+        if (! $na = $this->normativeAuthorization ?? 0) {
+            return;
+        }
 
         // Else return attribute-info compatible with TermPortal {xtype: 'attrpanel'}
         return [
@@ -2153,18 +2203,16 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
     /**
      * Fetch attributes and transacgrps data for TermPortal right panels,
      * and image/figure-attributes for center panel
-     *
-     * @return array
      */
-    public function terminfo(): array {
-
+    public function terminfo(): array
+    {
         // Setup different `language`-column clauses to be used
         // for fetching attributes-data and fetching transacgrp-data
         // because we need to fetch image-attributes not only for right-panels
         // but also for center panel
         $cond = [
             'transacgrp' => '`language` = :language',
-            'attribute'  => '(`language` = :language OR (`type` = "figure" AND NOT ISNULL(`language`)))'
+            'attribute' => '(`language` = :language OR (`type` = "figure" AND NOT ISNULL(`language`)))',
         ];
 
         // Setup definition for level-column
@@ -2177,38 +2225,39 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
         $levelWHERE = implode(' AND ', [
             '`termEntryId` = :termEntryId',
             '(ISNULL(`language`) OR %s)',
-            '(ISNULL(`termId`)   OR `termId` = :termId)'
+            '(ISNULL(`termId`)   OR `termId` = :termId)',
         ]);
 
         // Params for binding to the attribute/transacgrp-fetching query
         $bind = [
             ':termEntryId' => $this->getTermEntryId(),
             ':language' => $this->getLanguage(),
-            ':termId' => $this->getId()
+            ':termId' => $this->getId(),
         ];
 
         // Get attributes grouped by level
         $attributeA = ZfExtended_Factory
             ::get('editor_Models_Terminology_Models_AttributeModel')
-            ->loadGroupedByLevel(
-                sprintf($levelColumnToBeGroupedBy, $cond['attribute']),
-                sprintf($levelWHERE, $cond['attribute']),
-                $bind
-            );
+                ->loadGroupedByLevel(
+                    sprintf($levelColumnToBeGroupedBy, $cond['attribute']),
+                    sprintf($levelWHERE, $cond['attribute']),
+                    $bind
+                );
 
         // Get `transacgrp` data grouped by level
         $transacgrpA = ZfExtended_Factory
             ::get('editor_Models_Terminology_Models_TransacgrpModel')
-            ->loadGroupedByLevel(
-                sprintf($levelColumnToBeGroupedBy, $cond['transacgrp']),
-                sprintf($levelWHERE, $cond['transacgrp']),
-                $bind
-            );
+                ->loadGroupedByLevel(
+                    sprintf($levelColumnToBeGroupedBy, $cond['transacgrp']),
+                    sprintf($levelWHERE, $cond['transacgrp']),
+                    $bind
+                );
 
         // Convert transacgrp-data
-        foreach (['entry', 'language', 'term'] as $level)
+        foreach (['entry', 'language', 'term'] as $level) {
             $transacgrpA[$level]
                 = array_column($transacgrpA[$level] ?? [], 'whowhen', 'transac');
+        }
 
         // Return attributes and transacgrps
         return [$attributeA, $transacgrpA];
@@ -2216,17 +2265,15 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
 
     /**
      * Fetch attributes and transacgrps data for TermPortal right panels
-     *
-     * @return array
      */
-    public function siblinginfo(): array {
-
+    public function siblinginfo(): array
+    {
         // Setup different entry-level clauses to be used
         // for fetching attributes-data and fetching transacgrp-data
         // because we need to fetch ref-attributes not only for
         // language- and term- levels, but for entry-level as well
         $cond = [
-            'attribute'  => '`termEntryId` = :termEntryId AND ISNULL(`language`) AND ISNULL(`termId`) AND `elementName` = "ref"',
+            'attribute' => '`termEntryId` = :termEntryId AND ISNULL(`language`) AND ISNULL(`termId`) AND `elementName` = "ref"',
             'transacgrp' => 'FALSE',
         ];
 
@@ -2238,40 +2285,41 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
 
         // Setup WHERE clauses for entry-, language- and term-level attributes
         $levelWHERE = '`termEntryId` = :termEntryId AND ((' . implode(') OR (', [
-            'entry'    => '%s',
+            'entry' => '%s',
             'language' => '`termEntryId` = :termEntryId AND `language` = :language AND ISNULL(`termId`)',
-            'term'     => '`termId` = :termId'
+            'term' => '`termId` = :termId',
         ]) . '))';
 
         // Params for binding to the attribute/transacgrp-fetching query
         $bind = [
             ':termEntryId' => $this->getTermEntryId(),
             ':language' => $this->getLanguage(),
-            ':termId' => $this->getId()
+            ':termId' => $this->getId(),
         ];
 
         // Get attributes grouped by level
         $attributeA = ZfExtended_Factory
             ::get('editor_Models_Terminology_Models_AttributeModel')
-            ->loadGroupedByLevel(
-                $levelColumnToBeGroupedBy,
-                sprintf($levelWHERE, $cond['attribute']),
-                $bind
-            );
+                ->loadGroupedByLevel(
+                    $levelColumnToBeGroupedBy,
+                    sprintf($levelWHERE, $cond['attribute']),
+                    $bind
+                );
 
         // Get transacgrps grouped by level
         $transacgrpA = ZfExtended_Factory
             ::get('editor_Models_Terminology_Models_TransacgrpModel')
-            ->loadGroupedByLevel(
-                $levelColumnToBeGroupedBy,
-                sprintf($levelWHERE, $cond['transacgrp']),
-                $bind
-            );
+                ->loadGroupedByLevel(
+                    $levelColumnToBeGroupedBy,
+                    sprintf($levelWHERE, $cond['transacgrp']),
+                    $bind
+                );
 
         // Convert transacgrp-data
-        foreach (['entry', 'language', 'term'] as $level)
+        foreach (['entry', 'language', 'term'] as $level) {
             $transacgrpA[$level]
                 = array_column($transacgrpA[$level] ?? [], 'whowhen', 'transac');
+        }
 
         // Return attributes and transacgrps
         return [$attributeA, $transacgrpA];
@@ -2283,8 +2331,8 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
      * @return string
      * @throws Zend_Db_Statement_Exception
      */
-    public function getClientName() {
-
+    public function getClientName()
+    {
         // Get `clientId` of a term collection
         $clientId = $this->db->getAdapter()->query(
             'SELECT `customerId` FROM `LEK_languageresources_customerassoc` WHERE `languageResourceId` = ?',
@@ -2300,13 +2348,10 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
      *   by current search language(s), and then
      *   by termportal languages
      *
-     * @param string $searchLangIds
-     * @param string $termPortalLangRfcs
-     * @return array
      * @throws Zend_Db_Statement_Exception
      */
-    public function getSiblingsOrderedBy(string $searchLangIds = '', string $termPortalLangRfcs = ''): array {
-
+    public function getSiblingsOrderedBy(string $searchLangIds = '', string $termPortalLangRfcs = ''): array
+    {
         // Bind params
         $bind = [
             ':termEntryId' => $this->getTermEntryId(),
@@ -2317,9 +2362,8 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
 
         // If we have current search term languages ids given
         if ($searchLangIds) {
-
             // Make sure this languages terms will be at the top
-            $order []= 'FIND_IN_SET(`languageId`, :searchLangIds) DESC';
+            $order[] = 'FIND_IN_SET(`languageId`, :searchLangIds) DESC';
 
             // Append binding
             $bind[':searchLangIds'] = join(',', array_reverse(explode(',', $searchLangIds)));
@@ -2327,9 +2371,8 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
 
         // If we have termportal languages given
         if ($termPortalLangRfcs) {
-
             // Setup secondary order clause
-            $order []= 'FIND_IN_SET(`language`, :termPortalLangRfcs)';
+            $order[] = 'FIND_IN_SET(`language`, :termPortalLangRfcs)';
 
             // Append binding
             $bind[':termPortalLangRfcs'] = $termPortalLangRfcs;
@@ -2339,7 +2382,8 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
         $order = join(', ', $order) ?: '`id`';
 
         // Get raw siblings
-        $siblings = $this->db->getAdapter()->query($sql = '
+        $siblings = $this->db->getAdapter()->query(
+            $sql = '
             SELECT 
               `id`, 
               `id`, 
@@ -2385,8 +2429,8 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
      * @return string
      * @throws Zend_Db_Statement_Exception
      */
-    public function getCreatedBy() {
-
+    public function getCreatedBy()
+    {
         // Try to find oldest value of `updatedBy`-prop in current term's history
         $oldest_updatedBy = $this->db->getAdapter()->query('
             SELECT `updatedBy` 
@@ -2403,11 +2447,11 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
     /**
      * Get ids of all terms having given $termEntryId
      *
-     * @param $termEntryId
      * @return array
      * @throws Zend_Db_Statement_Exception
      */
-    public function getIdsByTermEntryId($termEntryId) {
+    public function getIdsByTermEntryId($termEntryId)
+    {
         return $this->db->getAdapter()->query('
             SELECT `id` 
             FROM `terms_term`
@@ -2418,19 +2462,18 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
     /**
      * Get distinct languages of all terms having given $termEntryId
      *
-     * @param $termEntryId
-     * @param $certain
      * @return array
      * @throws Zend_Db_Statement_Exception
      */
-    public function getLanguagesByTermEntryId($termEntryId, $certain = false) {
-
+    public function getLanguagesByTermEntryId($termEntryId, $certain = false)
+    {
         // Query param binding
-        $bind = [':termEntryId' => $termEntryId];
+        $bind = [
+            ':termEntryId' => $termEntryId,
+        ];
 
         // If $certain arg is given
         if ($certain) {
-
             // Append binding
             $bind[':certain'] = $certain;
 
@@ -2442,21 +2485,19 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
         return $this->db->getAdapter()->query('
             SELECT DISTINCT `language` 
             FROM `terms_term`
-            WHERE `termEntryId` = :termEntryId' . $certain
-        , $bind)->fetchAll(PDO::FETCH_COLUMN);
+            WHERE `termEntryId` = :termEntryId' . $certain, $bind)->fetchAll(PDO::FETCH_COLUMN);
     }
 
     /**
      * Exclude values from $termIds, having $language-translations,
      * so the only ones which have no translation for given $language will be kept and returned
      *
-     * @param array $termIds
      * @param string $languageId
      * @return array
      * @throws Zend_Db_Statement_Exception
      */
-    public function havingNoTranslation(array $termIds, int $languageId) {
-
+    public function havingNoTranslation(array $termIds, int $languageId)
+    {
         // Build termIds-where clause
         $termIds = $this->db->getAdapter()->quoteInto('`t`.`id` IN (?)', $termIds);
 
@@ -2476,10 +2517,9 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
      * Get distinct values for columns, specified by $cols arg, for terms, identified by $termIds arg
      *
      * @param string $cols Comma-separated column names
-     * @param array $termIds
      */
-    public function distinctColsForTermIds(string $cols, array $termIds) {
-
+    public function distinctColsForTermIds(string $cols, array $termIds)
+    {
         // Build termIds-where clause
         $termIds = $this->db->getAdapter()->quoteInto('`id` IN (?)', $termIds);
 
@@ -2487,7 +2527,9 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
         $data = $this->db->getAdapter()->query('SELECT ' . $cols . ' FROM `terms_term` WHERE ' . $termIds)->fetchAll();
 
         // Collect distinct values for given $cols
-        foreach (explode(',', $cols) as $col) $distinct[$col] = array_unique(array_column($data, $col));
+        foreach (explode(',', $cols) as $col) {
+            $distinct[$col] = array_unique(array_column($data, $col));
+        }
 
         // Return collected
         return $distinct;
@@ -2497,10 +2539,12 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
      * Remove items from $termIdByAttrIdA, for which no proposals were detected,
      * so only the ones for which they were detected would be kept and returned
      */
-    public function detectProposals(array $termIdByAttrIdA) {
-
+    public function detectProposals(array $termIdByAttrIdA)
+    {
         // If first arg is empty array - return empty array
-        if (!$termIdByAttrIdA) return [];
+        if (! $termIdByAttrIdA) {
+            return [];
+        }
 
         // Build where clause for `id`-column
         $idWHERE = $this->db->getAdapter()->quoteInto('`id` IN (?)', array_unique($termIdByAttrIdA));
@@ -2516,12 +2560,97 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
 
         // Unset those items from $termIdByAttrIdA for which no proposals were detected
         foreach ($termIdByAttrIdA as $attrId => $termId) {
-            if (!isset($detected[$termId])) {
+            if (! isset($detected[$termId])) {
                 unset($termIdByAttrIdA[$attrId]);
             }
         }
 
         // Return
         return $termIdByAttrIdA;
+    }
+
+    /**
+     * Get the array of allowed values for processStatus-attribute according to current user's rights
+     *
+     * @param string $current Current status that we should base on
+     * @param bool $includeCurrent Include current status to the array of returned. This is useful when
+     *                             we need to prepare data for processStatus-combobox store
+     */
+    public static function getAllowedProcessStatuses(
+        string $current = 'unprocessed',
+        bool $includeCurrent = true
+    ): array {
+        // Define which old values can be changed to which new values
+        $allow = false;
+        $allowByRight = [
+            'review' => [
+                'unprocessed' => [
+                    'provisionallyProcessed' => true,
+                    'rejected' => true,
+                ],
+            ],
+            'finalize' => [
+                'provisionallyProcessed' => [
+                    'finalized' => true,
+                    'rejected' => true,
+                ],
+            ],
+            'propose' => [],
+            'anyStatus' => true, // any change allowed
+        ];
+
+        // Get auth
+        $auth = ZfExtended_Authentication::getInstance();
+
+        // Merge allowed
+        foreach ($allowByRight as $right => $info) {
+            if ($auth->isUserAllowed('editor_term', $right)) {
+                $allow = is_bool($info) || is_bool($allow)
+                    ? $info
+                    : $info + $allow;
+            }
+        }
+
+        // Prepare list of allowed values
+        $allowed = [];
+
+        // Include current status to the list
+        if ($includeCurrent) {
+            $allowed[$current] = $current;
+        }
+
+        // Append other allowed values
+        foreach (explode(',', 'unprocessed,provisionallyProcessed,finalized,rejected') as $possible) {
+            if ($allow === true || (is_array($allow[$current] ?? 0) && ($allow[$current][$possible] ?? 0))) {
+                $allowed[$possible] = $possible;
+            }
+        }
+
+        // Return as ordinary array rather than associative
+        return array_values($allowed);
+    }
+
+    /**
+     * Log deleted terms in the language resources log
+     * @throws ReflectionException
+     * @throws Zend_Exception
+     * @throws ZfExtended_Models_Entity_NotFoundException
+     */
+    private function logDeletedTerm(array $termData = [])
+    {
+        if (empty($termData) || empty($termData['collectionId'])) {
+            return;
+        }
+
+        $collection = ZfExtended_Factory::get(editor_Models_TermCollection_TermCollection::class);
+        $collection->load($termData['collectionId']);
+
+        $logger = Zend_Registry::get('logger')->cloneMe('editor.languageresource');
+
+        $logger->info('E1592', 'Deleted term: {name}', [
+            'name' => $termData['term'] ?? '',
+            'data' => $termData,
+            'languageResource' => $collection,
+        ]);
     }
 }

@@ -3,43 +3,40 @@
 START LICENSE AND COPYRIGHT
 
  This file is part of translate5
- 
+
  Copyright (c) 2013 - 2021 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
 
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
  This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
- as published by the Free Software Foundation and appearing in the file agpl3-license.txt 
- included in the packaging of this file.  Please review the following information 
+ as published by the Free Software Foundation and appearing in the file agpl3-license.txt
+ included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
-  
+
  There is a plugin exception available for use with this release of translate5 for
- translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or
  plugin-exception.txt in the root folder of translate5.
-  
+
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
 
-use MittagQI\Translate5\LanguageResource\TaskPivotAssociation;
 use MittagQI\ZfExtended\Worker\Queue;
 
-/**
- */
-class editor_LanguageresourcetaskpivotassocController extends ZfExtended_RestController {
-
+class editor_LanguageresourcetaskpivotassocController extends ZfExtended_RestController
+{
     protected $entityClass = 'MittagQI\Translate5\LanguageResource\TaskPivotAssociation';
 
     /**
      * @var MittagQI\Translate5\LanguageResource\TaskPivotAssociation;
      */
     protected $entity;
-    
+
     /**
      * ignoring ID field for POST Requests
      * @var array
@@ -59,25 +56,29 @@ class editor_LanguageresourcetaskpivotassocController extends ZfExtended_RestCon
      * (non-PHPdoc)
      * @see ZfExtended_RestController::indexAction()
      */
-    public function indexAction(){
+    public function indexAction()
+    {
         $taskGuid = $this->getParam('taskGuid');
-        if(empty($taskGuid)){
-            throw ZfExtended_UnprocessableEntity::createResponse('E1403',[
-                'taskGuid' => 'The taskGuid field is empty'
+        if (empty($taskGuid)) {
+            throw ZfExtended_UnprocessableEntity::createResponse('E1403', [
+                'taskGuid' => 'The taskGuid field is empty',
             ]);
         }
-        $this->view->rows =  $this->entity->loadAllAvailableForTask($taskGuid);
+        $this->view->rows = $this->entity->loadAllAvailableForTask(
+            $taskGuid,
+            ZfExtended_Factory::get('editor_Services_Manager')
+        );
     }
 
     public function putAction()
     {
         throw new BadMethodCallException('HTTP method PUT not allowed!');
     }
-    
-    public function pretranslationBatch(){
 
+    public function pretranslationBatch()
+    {
         $taskGuid = $this->getParam('taskGuid');
-        if(empty($taskGuid)){
+        if (empty($taskGuid)) {
             return;
         }
 
@@ -87,21 +88,22 @@ class editor_LanguageresourcetaskpivotassocController extends ZfExtended_RestCon
 
         $taskGuids = [$task->getTaskGuid()];
         //if the requested operation is from project, queue analysis for each project task
-        if($task->isProject()){
+        if ($task->isProject()) {
             $projects = ZfExtended_Factory::get('editor_Models_Task');
             /* @var editor_Models_Task $projects */
             $projects = $projects->loadProjectTasks($task->getProjectId(), true);
             $taskGuids = array_column($projects, 'taskGuid');
         }
 
-        foreach ($taskGuids as $taskGuid){
+        foreach ($taskGuids as $taskGuid) {
             $this->queuePivotWorker($taskGuid);
         }
 
-        if($task->isImporting() === false){
+        if ($task->isImporting() === false) {
             $wq = ZfExtended_Factory::get(Queue::class);
             $wq->trigger();
         }
+        $this->view->success = true;
     }
 
     /***
@@ -109,7 +111,8 @@ class editor_LanguageresourcetaskpivotassocController extends ZfExtended_RestCon
      * @param string $taskGuid
      * @throws Zend_Exception
      */
-    protected function queuePivotWorker(string $taskGuid) : void {
+    protected function queuePivotWorker(string $taskGuid): void
+    {
         /** @var \MittagQI\Translate5\LanguageResource\Pretranslation\PivotQueuer $queuer */
         $queuer = ZfExtended_Factory::get('\MittagQI\Translate5\LanguageResource\Pretranslation\PivotQueuer');
         $queuer->queuePivotWorker($taskGuid);
@@ -122,9 +125,10 @@ class editor_LanguageresourcetaskpivotassocController extends ZfExtended_RestCon
      * @param array $extra
      * @throws Zend_Exception
      */
-    protected function addWarn(editor_Models_Task $task,string $message,array $extra=[]) {
-        $extra['task']=$task;
+    protected function addWarn(editor_Models_Task $task, string $message, array $extra = [])
+    {
+        $extra['task'] = $task;
         $logger = Zend_Registry::get('logger')->cloneMe('plugin.matchanalysis');
-        $logger->warn('E1100',$message,$extra);
+        $logger->warn('E1100', $message, $extra);
     }
 }

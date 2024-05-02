@@ -21,7 +21,7 @@ START LICENSE AND COPYRIGHT
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
@@ -35,6 +35,7 @@ use editor_Models_Import_FileParser;
 use editor_Models_SegmentFieldManager;
 use editor_Models_Task;
 use MittagQI\Translate5\Task\Import\FileParser\Factory;
+use MittagQI\Translate5\Task\Reimport\DataProvider\FileDto;
 use MittagQI\Translate5\Task\Reimport\SegmentProcessor\Reimport;
 use SplFileInfo;
 use ZfExtended_Factory;
@@ -46,12 +47,12 @@ use ZfExtended_Models_User;
  */
 class ReimportFile
 {
+    private FileDto $fileDto;
 
-    private Reimport $segmentProcessor;
-
-    public function __construct(private editor_Models_Task $task, private ZfExtended_Models_User $user)
-    {
-
+    public function __construct(
+        private editor_Models_Task $task,
+        private ZfExtended_Models_User $user
+    ) {
     }
 
     /**
@@ -65,7 +66,7 @@ class ReimportFile
 
         $parserHelper = ZfExtended_Factory::get(Factory::class, [
             $this->task,
-            $segmentFieldManager
+            $segmentFieldManager,
         ]);
 
         $file = ZfExtended_Factory::get(editor_Models_File::class);
@@ -81,23 +82,21 @@ class ReimportFile
 
         $parser->setIsReimport();
 
-        $this->segmentProcessor = ZfExtended_Factory::get(Reimport::class, [
+        $segmentProcessor = ZfExtended_Factory::get(Reimport::class, [
             $this->task,
-            $segmentFieldManager,
-            $this->user
+            $this->user,
         ]);
-        $this->segmentProcessor->setSegmentFile($fileId, $parser->getFileName());
-        $this->segmentProcessor->setSaveTimestamp($segmentTimestamp);
 
-        $parser->addSegmentProcessor($this->segmentProcessor);
+        $segmentProcessor->setSegmentFile($fileId, $parser->getFileName());
+        $segmentProcessor->setSaveTimestamp($segmentTimestamp);
+        $segmentProcessor->setFileDto($this->fileDto);
+
+        $parser->addSegmentProcessor($segmentProcessor);
         $parser->parseFile();
     }
 
-    /**
-     * @return Reimport
-     */
-    public function getSegmentProcessor(): Reimport
+    public function setFileDto(FileDto $fileDto): void
     {
-        return $this->segmentProcessor;
+        $this->fileDto = $fileDto;
     }
 }

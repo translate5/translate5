@@ -3,7 +3,7 @@
 START LICENSE AND COPYRIGHT
 
  This file is part of translate5
- 
+
  Copyright (c) 2013 - 2021 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
 
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
@@ -13,15 +13,15 @@ START LICENSE AND COPYRIGHT
  included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
-  
+
  There is a plugin exception available for use with this release of translate5 for
  translate5: Please see http://www.translate5.net/plugin-exception.txt or
  plugin-exception.txt in the root folder of translate5.
-  
+
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
@@ -33,10 +33,11 @@ use editor_Models_Task as Task;
 use editor_Models_Task_AbstractWorker;
 use editor_Models_TaskUserAssoc;
 use JsonException;
+use MittagQI\Translate5\Acl\Rights;
 use MittagQI\Translate5\Task\Lock;
 use MittagQI\Translate5\Task\Reimport\DataProvider\AbstractDataProvider;
 use MittagQI\Translate5\Task\Reimport\DataProvider\FileDto;
-use MittagQI\Translate5\Task\Reimport\SegmentProcessor\ReimportSegmentErrors;
+use ReflectionException;
 use Zend_Acl_Exception;
 use Zend_Exception;
 use Zend_Registry;
@@ -52,26 +53,26 @@ use ZfExtended_Worker_Abstract;
  */
 class Worker extends editor_Models_Task_AbstractWorker
 {
-
     /**
      * context when applying the filters on the filenames of the already imported files in LEK_files
      */
-    const FILEFILTER_CONTEXT_EXISTING = 'REIMPORT_CHECK_EXISTING';
+    public const FILEFILTER_CONTEXT_EXISTING = 'REIMPORT_CHECK_EXISTING';
 
     /**
      * context when applying the filters on uploaded re-import files
      */
-    const FILEFILTER_CONTEXT_NEW = 'REIMPORT_CHECK_NEW';
+    public const FILEFILTER_CONTEXT_NEW = 'REIMPORT_CHECK_NEW';
 
     /**
      * (non-PHPdoc)
      * @see ZfExtended_Worker_Abstract::validateParameters()
      */
-    protected function validateParameters($parameters = array())
+    protected function validateParameters($parameters = [])
     {
         $neededEntries = ['files', 'userGuid', 'segmentTimestamp', 'dataProviderClass'];
         $foundEntries = array_keys($parameters);
         $keyDiff = array_diff($neededEntries, $foundEntries);
+
         //if there is not keyDiff all needed were found
         return empty($keyDiff);
     }
@@ -89,7 +90,6 @@ class Worker extends editor_Models_Task_AbstractWorker
      */
     public function work()
     {
-
         $params = $this->workerModel->getParameters();
 
         /** @var ZfExtended_Models_User $user */
@@ -106,7 +106,7 @@ class Worker extends editor_Models_Task_AbstractWorker
 
             $reimportFile = ZfExtended_Factory::get(ReimportFile::class, [
                 $this->task,
-                $user
+                $user,
             ]);
 
             foreach ($params['files'] as $fileId => $file) {
@@ -114,8 +114,8 @@ class Worker extends editor_Models_Task_AbstractWorker
                 if (is_null($file->reimportFile)) {
                     continue; //if there was no matching file, we can not process it
                 }
+                $reimportFile->setFileDto($file);
                 $reimportFile->import($fileId, $file->reimportFile, $params['segmentTimestamp']);
-                $this->logReimportedContent($reimportFile, $logger, $file);
             }
         } finally {
             //if it was a PM override, delete it again
@@ -131,24 +131,20 @@ class Worker extends editor_Models_Task_AbstractWorker
         return true;
     }
 
-
     /**
      * prepares the isPmOverride taskUserAssoc if needed!
-     * @param Task $task
-     * @param ZfExtended_Models_User $user
-     * @return editor_Models_TaskUserAssoc
      * @throws Zend_Acl_Exception
+     * @throws ReflectionException
      */
     protected function prepareTaskUserAssociation(Task $task, ZfExtended_Models_User $user): editor_Models_TaskUserAssoc
     {
         $userTaskAssoc = ZfExtended_Factory::get(editor_Models_TaskUserAssoc::class);
 
         try {
-
             $acl = ZfExtended_Acl::getInstance();
 
             $isUserPm = $task->getPmGuid() == $user->getUserGuid();
-            $isEditAllAllowed = $acl->isInAllowedRoles($user->getRoles(), 'backend', 'editAllTasks');
+            $isEditAllAllowed = $acl->isInAllowedRoles($user->getRoles(), Rights::ID, Rights::EDIT_ALL_TASKS);
             $isEditAllTasks = $isEditAllAllowed || $isUserPm;
 
             //if the user is allowed to load all, use the default loader
@@ -160,7 +156,6 @@ class Worker extends editor_Models_Task_AbstractWorker
 
             $userTaskAssoc->getIsPmOverride();
         } catch (ZfExtended_Models_Entity_NotFoundException) {
-
             $userTaskAssoc->setUserGuid($user->getUserGuid());
             $userTaskAssoc->setTaskGuid($task->getTaskGuid());
             $userTaskAssoc->setRole('');
@@ -168,7 +163,6 @@ class Worker extends editor_Models_Task_AbstractWorker
             $userTaskAssoc->setWorkflow($task->getWorkflow());
             $userTaskAssoc->setWorkflowStepName('');
             $userTaskAssoc->setIsPmOverride(true);
-
         }
 
         $userTaskAssoc->save();
@@ -189,55 +183,20 @@ class Worker extends editor_Models_Task_AbstractWorker
             $this->log->warn(
                 'E1475',
                 'Re-Import: No ImportArchive backup created: Import Archive does not exist or folder is not writeable',
-                ['task' => $task]
+                [
+                    'task' => $task,
+                ]
             );
         }
     }
 
-
     /**
      * Clean the temporary folders used for extracting zip archives.
-     * @param string $dataProviderClass
-     * @param Task $task
-     * @return void
      */
     private function cleanupImportFolder(string $dataProviderClass, Task $task): void
     {
         if (is_subclass_of($dataProviderClass, AbstractDataProvider::class)) {
             $dataProviderClass::getForCleanup($task)->cleanup();
-        }
-    }
-
-    /**
-     * @param ReimportFile $reimportFile
-     * @param $log
-     * @param FileDto $file
-     * @return void
-     * @throws JsonException
-     */
-    private function logReimportedContent(ReimportFile $reimportFile, $log, FileDto $file): void
-    {
-        $updatedSegments = $reimportFile->getSegmentProcessor()->getUpdatedSegments();
-        $log->info('E1440', 'Reimport for the file "{filename}" is finished. Total updated segments: {updateCount}.', [
-            'task' => $this->task,
-            'fileId' => $file->fileId,
-            'updateCount' => count($updatedSegments),
-            'segments' => implode(',', $updatedSegments),
-            'filename' => $file->filteredFilePath
-        ]);
-
-        foreach ($reimportFile->getSegmentProcessor()->getSegmentErrors() as $code => $codeErrors) {
-            $extra = [];
-            foreach ($codeErrors as $error) {
-                /* @var ReimportSegmentErrors $error */
-                $extra[] = $error->getData();
-            }
-            $log->warn($code, $codeErrors[0]->getMessage(), [
-                'task' => $this->task,
-                'fileId' => $file->fileId,
-                'filename' => $file->filteredFilePath,
-                'extra' => json_encode($extra, JSON_THROW_ON_ERROR)
-            ]);
         }
     }
 }

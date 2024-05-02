@@ -39,7 +39,7 @@ use ZfExtended_Factory;
 abstract class PauseWorker extends editor_Models_Task_AbstractWorker
 {
     public const PROCESSOR = 'processor';
-    
+
     protected function validateParameters($parameters = []): bool
     {
         return isset($parameters[self::PROCESSOR])
@@ -47,9 +47,6 @@ abstract class PauseWorker extends editor_Models_Task_AbstractWorker
             && in_array(PauseWorkerProcessorInterface::class, class_implements($parameters[self::PROCESSOR]), true);
     }
 
-    /**
-     * @return bool
-     */
     protected function work(): bool
     {
         $params = $this->workerModel->getParameters();
@@ -62,14 +59,14 @@ abstract class PauseWorker extends editor_Models_Task_AbstractWorker
         $elapsedTime = 0;
 
         while ($elapsedTime < $maxTime) {
-            if (!$processor->shouldWait($this->task)) {
+            if (! $processor->shouldWait($this->task)) {
                 break;
             }
 
-            $elapsedTime+= $sleepTime;
+            $elapsedTime += $sleepTime;
             sleep($sleepTime);
         }
-        
+
         return true;
     }
 }

@@ -37,14 +37,14 @@
           <count count-type="word count" unit="word">4</count>
         </count-group>
       </trans-unit>
-      <trans-unit id="7" translate="yes" tmgr:segstatus="XLATED" tmgr:matchinfo="AUTOSUBST" tmgr:matchratio="100">
+      <trans-unit id="7a" translate="yes" tmgr:segstatus="XLATED" tmgr:matchinfo="AUTOSUBST" tmgr:matchratio="100">
         <source>Test multiple    whitespaces and		tabs</source>
         <target state="translated">Teste mehrere     Leerzeichen und		Tabs - edited4</target>
         <count-group name="word count">
           <count count-type="word count" unit="word">3</count>
         </count-group>
       </trans-unit>
-      <trans-unit id="7" translate="yes" tmgr:segstatus="XLATED" tmgr:matchinfo="FUZZY" tmgr:matchratio="95">
+      <trans-unit id="7b" translate="yes" tmgr:segstatus="XLATED" tmgr:matchinfo="FUZZY" tmgr:matchratio="95">
         <source>Test that matchratio &lt; 100 is editable</source>
         <target state="translated">Teste dass eine matchratio &lt; 100 editierbar ist - edited5</target>
         <count-group name="word count">

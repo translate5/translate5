@@ -63,6 +63,23 @@ Ext.define('Editor.view.quality.FalsePositives', {
             bind: {
                 text: '{l10n.falsePositives.grid.falsePositive}'
             },
+            renderer: function(value, meta, record, rowIndex, colIndex, store, view) {
+                var me = this, cls = me.checkboxCls, tip = Ext.htmlEncode(Editor.data.l10n.falsePositives.grid.rowTip);
+
+                // Append checked style
+                if (value) {
+                    cls += ' ' + me.checkboxCheckedCls;
+                }
+
+                // Prepend keyboard shortcut
+                if (rowIndex < 10) {
+                    tip = 'Ctrl + Alt + ' + (rowIndex === 9 ? 0 : rowIndex + 1) + '. ' + tip;
+                }
+
+                return '<span data-qtip="' + tip + '" class="' + cls + '" role="' + me.checkboxAriaRole + '"' +
+                    (!me.ariaStaticRoles[me.checkboxAriaRole] ? ' tabIndex="0"' : '') +
+                    '></span>';
+            },
             listeners: {
                 checkchange: 'onFalsePositiveChanged',
             }
@@ -80,7 +97,7 @@ Ext.define('Editor.view.quality.FalsePositives', {
             text: '<span class="fa fa-magnifying-glass-arrow-right"></span>',
             width: 35,
             bind: {
-                tooltip: '{l10n.falsePositives.grid.similarQty.tooltip}'
+                tooltip: '{l10n.falsePositives.grid.similarQtyColTip}'
             },
             dataIndex: 'similarQty',
             padding: 0,
@@ -96,9 +113,8 @@ Ext.define('Editor.view.quality.FalsePositives', {
                 setUi: function(ui) {this.setUI(ui);},
                 bind: {
                     text: '{record.content ? record.similarQty : "-"}',
-                    disabled: '{record.similarQty == 0 || !record.falsePositiveChanged}',
-                    tooltip: '{l10n.falsePositives.grid.similarQty.button}',
-                    ui: '{record.similarQty == 0 || !record.falsePositiveChanged ? "default-toolbar-small" : "default"}'
+                    disabled: '{record.similarQty == 0}',
+                    ui: '{record.similarQty == 0 ? "default-toolbar-small" : "default"}'
                 },
                 handler: 'onFalsePositiveSpread'
             }

@@ -10,32 +10,32 @@
         <target>Dès , et le symbole <ph id="1" ax:element-id="0">&lt;sym&gt;&lt;/sym&gt;</ph> s'éteint.</target>
       </trans-unit>
       <trans-unit id="2" ax:state-name="Corrected" ax:state-id="183" ax:state-flags="4194304">
-        <source>Sobald  und das Symbol <ph id="1" ax:element-id="0">&lt;sym&gt;&lt;/sym&gt;</ph> erlischt<ph id="2" ax:element-id="0">&lt;sym&gt;&lt;/sym&gt;</ph>.</source>
-        <target>Dès , et le symbole <ph id="1" ax:element-id="0">&lt;sym&gt;&lt;/sym&gt;</ph> s'éteint<ph id="2" ax:element-id="0">&lt;sym&gt;&lt;/sym&gt;</ph>.</target>
+        <source>Sobald  und das Symbol <ph id="1" ax:element-id="0">&lt;sym&gt;&lt;/sym&gt;</ph> erlischt<ph id="2" ax:element-id="1">&lt;sym&gt;&lt;/sym&gt;</ph>.</source>
+        <target>Dès , et le symbole <ph id="1" ax:element-id="0">&lt;sym&gt;&lt;/sym&gt;</ph> s'éteint<ph id="2" ax:element-id="1">&lt;sym&gt;&lt;/sym&gt;</ph>.</target>
       </trans-unit>
       <trans-unit id="3" ax:state-name="Corrected" ax:state-id="183" ax:state-flags="4194304">
-        <source>Sobald <ph id="3" ax:element-id="0">&lt;sym&gt;&lt;/sym&gt;</ph>  und das Symbol <ph id="1" ax:element-id="0">&lt;sym&gt;&lt;/sym&gt;</ph> erlischt<ph id="2" ax:element-id="0">&lt;sym&gt;&lt;/sym&gt;</ph>.</source>
-        <target>Dès <ph id="3" ax:element-id="0">&lt;sym&gt;&lt;/sym&gt;</ph> , et le symbole <ph id="1" ax:element-id="0">&lt;sym&gt;&lt;/sym&gt;</ph> s'éteint<ph id="2" ax:element-id="0">&lt;sym&gt;&lt;/sym&gt;</ph>.</target>
+        <source>Sobald <ph id="3" ax:element-id="0">&lt;sym&gt;&lt;/sym&gt;</ph>  und das Symbol <ph id="1" ax:element-id="1">&lt;sym&gt;&lt;/sym&gt;</ph> erlischt<ph id="2" ax:element-id="2">&lt;sym&gt;&lt;/sym&gt;</ph>.</source>
+        <target>Dès <ph id="3" ax:element-id="0">&lt;sym&gt;&lt;/sym&gt;</ph> , et le symbole <ph id="1" ax:element-id="1">&lt;sym&gt;&lt;/sym&gt;</ph> s'éteint<ph id="2" ax:element-id="2">&lt;sym&gt;&lt;/sym&gt;</ph>.</target>
       </trans-unit>
       <trans-unit id="4" ax:state-name="Corrected" ax:state-id="183" ax:state-flags="4194304">
         <source>Sobald  und das Symbol <ph id="1" ax:element-id="0">&lt;sym&gt;&lt;/sym&gt;</ph> erlischt.</source>
         <target>Dès , et le symbole <ph id="1" ax:element-id="0">&lt;sym&gt;&lt;/sym&gt;</ph> s'éteint.</target>
       </trans-unit>
       <trans-unit id="5" ax:state-name="Corrected" ax:state-id="183" ax:state-flags="4194304">
-        <source>Sobald  und das Symbol <ph id="1" ax:element-id="0">&lt;sym&gt;&lt;/sym&gt;</ph> erlischt<ph id="2" ax:element-id="0">&lt;sym&gt;&lt;/sym&gt;</ph>.</source>
-        <target>Dès , et le symbole <ph id="1" ax:element-id="0">&lt;sym&gt;&lt;/sym&gt;</ph> s'éteint<ph id="2" ax:element-id="0">&lt;sym&gt;&lt;/sym&gt;</ph>.</target>
+        <source>Sobald  und das Symbol <ph id="1" ax:element-id="0">&lt;sym&gt;&lt;/sym&gt;</ph> erlischt<ph id="2" ax:element-id="1">&lt;sym&gt;&lt;/sym&gt;</ph>.</source>
+        <target>Dès , et le symbole <ph id="1" ax:element-id="0">&lt;sym&gt;&lt;/sym&gt;</ph> s'éteint<ph id="2" ax:element-id="1">&lt;sym&gt;&lt;/sym&gt;</ph>.</target>
       </trans-unit>
       <trans-unit id="6" ax:state-name="Corrected" ax:state-id="183" ax:state-flags="4194304">
-        <source>Sobald <ph id="3" ax:element-id="0">&lt;sym&gt;&lt;/sym&gt;</ph>  und das Symbol <ph id="1" ax:element-id="0">&lt;sym&gt;&lt;/sym&gt;</ph> erlischt<ph id="2" ax:element-id="0">&lt;sym&gt;&lt;/sym&gt;</ph>.</source>
-        <target>Dès <ph id="3" ax:element-id="0">&lt;sym&gt;&lt;/sym&gt;</ph> , et le symbole <ph id="1" ax:element-id="0">&lt;sym&gt;&lt;/sym&gt;</ph> s'éteint<ph id="2" ax:element-id="0">&lt;sym&gt;&lt;/sym&gt;</ph>.</target>
+        <source>Sobald <ph id="3" ax:element-id="0">&lt;sym&gt;&lt;/sym&gt;</ph>  und das Symbol <ph id="1" ax:element-id="1">&lt;sym&gt;&lt;/sym&gt;</ph> erlischt<ph id="2" ax:element-id="2">&lt;sym&gt;&lt;/sym&gt;</ph>.</source>
+        <target>Dès <ph id="3" ax:element-id="0">&lt;sym&gt;&lt;/sym&gt;</ph> , et le symbole <ph id="1" ax:element-id="1">&lt;sym&gt;&lt;/sym&gt;</ph> s'éteint<ph id="2" ax:element-id="2">&lt;sym&gt;&lt;/sym&gt;</ph>.</target>
       </trans-unit>
       <trans-unit id="7" ax:state-name="Corrected" ax:state-id="183" ax:state-flags="4194304">
-        <source>Sobald <ph id="3" ax:element-id="0">&lt;sym&gt;&lt;/sym&gt;</ph>  und das Symbol <ph id="1" ax:element-id="0">&lt;sym&gt;&lt;/sym&gt;</ph> erlischt<ph id="2" ax:element-id="0">&lt;sym&gt;&lt;/sym&gt;</ph>.</source>
-        <target>Dès <ph id="1" ax:element-id="0">&lt;sym&gt;&lt;/sym&gt;</ph> , et le symbole <ph id="3" ax:element-id="0">&lt;sym&gt;&lt;/sym&gt;</ph> s'éteint<ph id="2" ax:element-id="0">&lt;sym&gt;&lt;/sym&gt;</ph>.</target>
+        <source>Sobald <ph id="3" ax:element-id="0">&lt;sym&gt;&lt;/sym&gt;</ph>  und das Symbol <ph id="1" ax:element-id="1">&lt;sym&gt;&lt;/sym&gt;</ph> erlischt<ph id="2" ax:element-id="2">&lt;sym&gt;&lt;/sym&gt;</ph>.</source>
+        <target>Dès <ph id="1" ax:element-id="0">&lt;sym&gt;&lt;/sym&gt;</ph> , et le symbole <ph id="3" ax:element-id="1">&lt;sym&gt;&lt;/sym&gt;</ph> s'éteint<ph id="2" ax:element-id="2">&lt;sym&gt;&lt;/sym&gt;</ph>.</target>
       </trans-unit>
       <trans-unit id="8" ax:state-name="Corrected" ax:state-id="183" ax:state-flags="4194304">
-        <source>Sobald <ph id="3" ax:element-id="0">&lt;sym&gt;&lt;/sym&gt;</ph>  und das Symbol <ph id="1" ax:element-id="0">&lt;sym&gt;&lt;/sym&gt;</ph> erlischt<ph id="2" ax:element-id="0">&lt;sym&gt;&lt;/sym&gt;</ph>.</source>
-        <target>Dès <ph id="1" ax:element-id="0">&lt;sym&gt;&lt;/sym&gt;</ph> , et le symbole <ph id="3" ax:element-id="0">&lt;sym&gt;&lt;/sym&gt;</ph> s'éteint<ph id="2" ax:element-id="0">&lt;sym&gt;&lt;/sym&gt;</ph>.</target>
+        <source>Sobald <ph id="3" ax:element-id="0">&lt;sym&gt;&lt;/sym&gt;</ph>  und das Symbol <ph id="1" ax:element-id="1">&lt;sym&gt;&lt;/sym&gt;</ph> erlischt<ph id="2" ax:element-id="2">&lt;sym&gt;&lt;/sym&gt;</ph>.</source>
+        <target>Dès <ph id="1" ax:element-id="0">&lt;sym&gt;&lt;/sym&gt;</ph> , et le symbole <ph id="3" ax:element-id="1">&lt;sym&gt;&lt;/sym&gt;</ph> s'éteint<ph id="2" ax:element-id="2">&lt;sym&gt;&lt;/sym&gt;</ph>.</target>
       </trans-unit>
     </body>
   </file>

@@ -3,7 +3,7 @@
 START LICENSE AND COPYRIGHT
 
  This file is part of translate5
- 
+
  Copyright (c) 2013 - 2021 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
 
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
@@ -13,15 +13,15 @@ START LICENSE AND COPYRIGHT
  included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
-  
+
  There is a plugin exception available for use with this release of translate5 for
  translate5: Please see http://www.translate5.net/plugin-exception.txt or
  plugin-exception.txt in the root folder of translate5.
-  
+
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
@@ -48,13 +48,10 @@ use ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey;
 
 final class Service extends DockerServiceAbstract
 {
-
-    const HEALTH_CHECK_PATH = '/projects';
+    public const HEALTH_CHECK_PATH = '/projects';
 
     /**
      * Creates the corresponding key for a OKAPI-Url
-     * @param string $version
-     * @return string
      */
     public static function createServerKey(string $version): string
     {
@@ -72,6 +69,7 @@ final class Service extends DockerServiceAbstract
         if (empty($version)) {
             return 'okapi-longhorn';
         }
+
         return 'okapi-longhorn-' . editor_Utils::secureFilename(str_replace('.', '', $version));
     }
 
@@ -79,8 +77,6 @@ final class Service extends DockerServiceAbstract
      * Retrieves the OKAPI version. This API is only available since OKAPI 1.40.0
      * Older version will be keyed as before-140 (-> so only one server before 140 can be added - acceptable quirk)
      * A return-value of NULL points to a non-reachable url
-     * @param string $okapiUrl
-     * @return string|null
      */
     public static function fetchServerVersion(string $okapiUrl): ?string
     {
@@ -93,6 +89,7 @@ final class Service extends DockerServiceAbstract
                 if (property_exists($status, 'version')) {
                     return $status->version;
                 }
+
                 return 'before-140'; // case can not happen
             }
             $httpClient->setUri(rtrim($okapiUrl, '/') . self::HEALTH_CHECK_PATH);
@@ -100,6 +97,7 @@ final class Service extends DockerServiceAbstract
             if ($response->getStatus() === 200) {
                 return 'before-140'; // okapi-versions without /status endpoint must be 1.40.0 or lower ...
             }
+
             return null;
         } catch (Throwable) {
             return null;
@@ -110,13 +108,13 @@ final class Service extends DockerServiceAbstract
         'name' => 'runtimeOptions.plugins.Okapi.server',
         'type' => 'string',
         'url' => 'http://okapi.:8080', //path part with version is added automatically on locate call
-        'healthcheck' => self::HEALTH_CHECK_PATH
+        'healthcheck' => self::HEALTH_CHECK_PATH,
     ];
 
     protected array $testConfigs = [
         // this leads to the application-db configs being copied to the test-DB
         'runtimeOptions.plugins.Okapi.server' => null,
-        'runtimeOptions.plugins.Okapi.serverUsed' => null
+        'runtimeOptions.plugins.Okapi.serverUsed' => null,
     ];
 
     /**
@@ -130,29 +128,29 @@ final class Service extends DockerServiceAbstract
         $result = true;
         $services = $this->config->runtimeOptions->plugins->Okapi->server;
         $serviceUsed = $this->config->runtimeOptions->plugins->Okapi->serverUsed;
-        $url = (!empty($services) && !empty($serviceUsed)) ? ($services->$serviceUsed ?? null) : null;
+        $url = (! empty($services) && ! empty($serviceUsed)) ? ($services->$serviceUsed ?? null) : null;
         if (empty($url)) {
-            $this->errors[] = 'There is no URL configured for entry "'.$serviceUsed.'".';
+            $this->errors[] = 'There is no URL configured for entry "' . $serviceUsed . '".';
             $result = false;
         } else {
             $healthcheckUrl = rtrim($url, '/') . self::HEALTH_CHECK_PATH;
-            if (!$this->checkConfiguredHealthCheckUrl($healthcheckUrl, $url)) {
+            if (! $this->checkConfiguredHealthCheckUrl($healthcheckUrl, $url)) {
                 $this->errors[] = 'A request on "' . $healthcheckUrl .
-                    '" did not bring the expected status "200" for entry "'.$serviceUsed.'".';
+                    '" did not bring the expected status "200" for entry "' . $serviceUsed . '".';
                 $result = false;
             }
         }
         $this->checkOtherConfiguredServers($services, $serviceUsed, $result);
         if ($this->hasWarnings() || $this->hasErrors()) {
-            $this->badSummary[] = 'Use "t5 okapi:[list|purge|update]" commands to fix the okapi setup '.
+            $this->badSummary[] = 'Use "t5 okapi:[list|purge|update]" commands to fix the okapi setup ' .
                 'or setup the missing servers!';
         }
+
         return $result;
     }
 
     /**
      * Retrieves the default service URL. Keep in Mind, this is only the configured URL on system level!
-     * @return string|null
      */
     public function getServiceUrl(): ?string
     {
@@ -161,9 +159,6 @@ final class Service extends DockerServiceAbstract
 
     /**
      * Retrieves the configured okapi server URL, either the default or for the passed key
-     * @param string|null $serverToUse: if given, the server to use can be selected
-     * @param bool $throwExceptionOnError: if set to false, instead of throwing an exception "null" is returned
-     * @return string|null
      * @throws editor_Plugins_Okapi_Exception
      */
     public function getConfiguredServiceUrl(string $serverToUse = null, bool $throwExceptionOnError = true): ?string
@@ -171,44 +166,40 @@ final class Service extends DockerServiceAbstract
         $services = $this->config->runtimeOptions->plugins->Okapi->server; /* @var Zend_Config $services */
         $serviceUsed = (empty($serverToUse)) ? $this->config->runtimeOptions->plugins->Okapi->serverUsed : $serverToUse; /* @var ?string $serviceUsed */
 
-        if (!empty($services)) {
-            if (!empty($serviceUsed)) {
+        if (! empty($services)) {
+            if (! empty($serviceUsed)) {
                 if ($services->__isset($serviceUsed)) {
-                    if (!empty($services->$serviceUsed)) {
+                    if (! empty($services->$serviceUsed)) {
                         // we normalize the configured URL to have no slash at the end
                         return rtrim($services->$serviceUsed, '/');
-                    } else if ($throwExceptionOnError) {
+                    } elseif ($throwExceptionOnError) {
                         // configured value is empty
                         throw new editor_Plugins_Okapi_Exception('E1059');
                     }
-                } else if ($throwExceptionOnError) {
+                } elseif ($throwExceptionOnError) {
                     // configured value does not exist in the list
                     throw new editor_Plugins_Okapi_Exception('E1412', [
                         'servers' => $services,
-                        'serverUsed' => $serviceUsed
+                        'serverUsed' => $serviceUsed,
                     ]);
                 }
-            } else if ($throwExceptionOnError) {
+            } elseif ($throwExceptionOnError) {
                 // no service to use is set
                 throw new editor_Plugins_Okapi_Exception('E1411', [
-                    'serverUsed' => $serviceUsed
+                    'serverUsed' => $serviceUsed,
                 ]);
             }
-        } else if ($throwExceptionOnError) {
+        } elseif ($throwExceptionOnError) {
             // list of services is empty
             throw new editor_Plugins_Okapi_Exception('E1410');
         }
+
         return null;
     }
 
     /**
      * Differing from base version we check the existing configured URLs for validity and dismiss the ones not reachable
      * (non-PHPdoc)
-     * @param SymfonyStyle $io
-     * @param mixed $url
-     * @param bool $doSave
-     * @param array $config
-     * @return bool
      * @throws Zend_Http_Client_Exception
      * @throws JsonException
      * @throws Zend_Db_Statement_Exception
@@ -223,6 +214,7 @@ final class Service extends DockerServiceAbstract
         if (array_key_exists('remove', $config) && $config['remove'] === true) {
             $this->updateConfigurationConfig('runtimeOptions.plugins.Okapi.server', 'string', '', $doSave, $io);
             $this->updateConfigurationConfig('runtimeOptions.plugins.Okapi.serverUsed', 'string', '', $doSave, $io);
+
             return false;
         }
         if (empty($url)) {
@@ -253,22 +245,20 @@ final class Service extends DockerServiceAbstract
             }
 
             // if not set in the locate configuration we purge all unused servers
-            if(!array_key_exists('keepAll', $config) || !$config['keepAll']){
+            if (! array_key_exists('keepAll', $config) || ! $config['keepAll']) {
                 //purge the unused ones, sort by version so that latest is kept also unused
                 $okapiServerConfig->purge($okapiServerConfig->getSummary(), sortByVersion: true);
             }
 
             return true;
         }
+
         return false;
     }
 
     /**
      * Unfortunately we cannot fetch the version directly as older versions do not support the status.json
      * (non-PHPdoc)
-     * @param string $responseBody
-     * @param string $serviceUrl
-     * @return string|null
      * @see DockerServiceAbstract::findVersionInResponseBody()
      */
     protected function findVersionInResponseBody(string $responseBody, string $serviceUrl): ?string
@@ -276,10 +266,6 @@ final class Service extends DockerServiceAbstract
         return self::fetchServerVersion($serviceUrl);
     }
 
-    /**
-     * @param Zend_Config $services
-     * @param string $serviceUsed
-     */
     private function checkOtherConfiguredServers(Zend_Config $services, string $serviceUsed, bool $mainServiceSuccess)
     {
         foreach ($services as $name => $url) {
@@ -287,7 +273,8 @@ final class Service extends DockerServiceAbstract
                 continue;
             }
             if (empty($url)) {
-                $this->warnings[] = 'There is no URL configured for entry "'.$name.'.';
+                $this->warnings[] = 'There is no URL configured for entry "' . $name . '.';
+
                 continue;
             }
             $healthcheckUrl = rtrim($url, '/') . self::HEALTH_CHECK_PATH;
@@ -300,7 +287,7 @@ final class Service extends DockerServiceAbstract
                 }
             } else {
                 $this->warnings[] = 'A request on "' . $healthcheckUrl .
-                    '" did not bring the expected status "200" for entry "'.$name.'.';
+                    '" did not bring the expected status "200" for entry "' . $name . '.';
             }
         }
     }
@@ -309,8 +296,6 @@ final class Service extends DockerServiceAbstract
      * returns all translate5 supported Okapi versions provided by the queried jetty root URL
      * by default jetty delivers an error page providing all valid contexts (installed war files).
      *
-     * @param mixed $url
-     * @return array
      * @throws Zend_Uri_Exception
      */
     private function getOkapiVersions(mixed $url): array
@@ -318,6 +303,7 @@ final class Service extends DockerServiceAbstract
         $url = \Zend_Uri_Http::fromString($url);
         $url->setPath(''); //clean path if given to get okapi root server
         $result = [];
+
         try {
             $httpClient = ZfExtended_Factory::get(Zend_Http_Client::class);
             $httpClient->setUri($url);
@@ -326,29 +312,26 @@ final class Service extends DockerServiceAbstract
             if ($response->getStatus() === 404
                 && str_contains($response->getBody(), 'Contexts known to this server are:')
                 && preg_match_all('#href="/(okapi-longhorn-[^/]+)/#', $response->getBody(), $matches)) {
-                    foreach ($matches[1] as $match) {
-                        if (in_array($match, editor_Plugins_Okapi_Init::SUPPORTED_OKAPI_VERSION)) {
-                            $result[$match] = $url.'/'.$match.'/';
-                        }
+                foreach ($matches[1] as $match) {
+                    if (in_array($match, editor_Plugins_Okapi_Init::SUPPORTED_OKAPI_VERSION)) {
+                        $result[$match] = $url . '/' . $match . '/';
                     }
+                }
             }
         } catch (Throwable) {
             // do nothing here
         }
         ksort($result, SORT_NATURAL);
+
         return $result;
     }
 
-    /**
-     * @param mixed $url
-     * @return array
-     */
     private function getNewServers(mixed $url): array
     {
         $newServers = [];
-        if (!empty($this->config->runtimeOptions->plugins->Okapi->server)) {
+        if (! empty($this->config->runtimeOptions->plugins->Okapi->server)) {
             foreach ($this->config->runtimeOptions->plugins->Okapi->server as $name => $otherUrl) {
-                if (!empty($otherUrl)
+                if (! empty($otherUrl)
                     && $otherUrl != $url
                     && $this->checkConfiguredHealthCheckUrl(
                         rtrim($otherUrl, '/') . self::HEALTH_CHECK_PATH,
@@ -356,7 +339,7 @@ final class Service extends DockerServiceAbstract
                         false
                     )) {
                     // make sure, the server-key follows our required naming-scheme
-                    if (!in_array($name, editor_Plugins_Okapi_Init::SUPPORTED_OKAPI_VERSION)) {
+                    if (! in_array($name, editor_Plugins_Okapi_Init::SUPPORTED_OKAPI_VERSION)) {
                         $version = self::fetchServerVersion($otherUrl);
                         $newServers[self::createServerKey($version)] = $otherUrl;
                     } else {
@@ -365,23 +348,23 @@ final class Service extends DockerServiceAbstract
                 }
             }
         }
+
         return $newServers;
     }
 
     /**
      * re-add the version-less okapi-longhorn path for containers with only one okapi version
-     * @param string $url
-     * @return string
      * @throws Zend_Uri_Exception
      */
     private function singleOkapiInstanceFallback(string $url): string
     {
         $uri = \Zend_Uri_Http::fromString($url);
-        if (!str_contains($uri->getPath(), 'okapi-longhorn')) {
+        if (! str_contains($uri->getPath(), 'okapi-longhorn')) {
             // if just the okapi server was passed here, we assume a server with one okapi version installed,
             // so path to okapi itself must be added
             $uri->setPath('/okapi-longhorn');
         }
+
         return $uri->getUri();
     }
 }

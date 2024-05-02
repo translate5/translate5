@@ -21,7 +21,7 @@ START LICENSE AND COPYRIGHT
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
@@ -35,20 +35,16 @@ use ZfExtended_Factory;
 
 /**
  * Check and remove all package exports older than 1 days for all active tasks
- *
  */
 class Remover
 {
-
     /**
-     * @return void
      * @throws Zend_Exception
      */
     public function remove(): void
     {
-
         $data = $this->getData();
-        if(empty($data)){
+        if (empty($data)) {
             return;
         }
 
@@ -56,7 +52,7 @@ class Remover
 
         foreach ($data as $task) {
             $model->init($task);
-            $this->checkAndDelete($model->getAbsoluteTaskDataPath().DIRECTORY_SEPARATOR);
+            $this->checkAndDelete($model->getAbsoluteTaskDataPath() . DIRECTORY_SEPARATOR);
         }
     }
 
@@ -68,9 +64,8 @@ class Remover
      */
     private function checkAndDelete(string $dir): void
     {
-
         // Check if the directory exists and is readable
-        if (!is_dir($dir) || !is_readable($dir)) {
+        if (! is_dir($dir) || ! is_readable($dir)) {
             return;
         }
 
@@ -81,9 +76,8 @@ class Remover
         $removed = [];
         // Loop through each file in the directory
         foreach ($files as $file) {
-
             // Check if the file is a zip file and has the correct prefix
-            if (str_starts_with($file, Downloader::PACKAGE_EXPORT) && pathinfo($file, PATHINFO_EXTENSION) === 'zip') {
+            if (str_starts_with($file, editor_Models_Task::STATE_PACKAGE_EXPORT) && pathinfo($file, PATHINFO_EXTENSION) === 'zip') {
                 // Get the file's creation time
                 $file_time = filectime($dir . $file);
 
@@ -91,15 +85,15 @@ class Remover
                 if ($time - $file_time > 86400) {
                     // Attempt to delete the file
                     if (unlink($dir . $file)) {
-                        $removed[] = $dir.$file;
+                        $removed[] = $dir . $file;
                     }
                 }
             }
         }
-        if( !empty($removed)){
+        if (! empty($removed)) {
             $logger = Zend_Registry::get('logger');
-            $logger->info('E0000', 'Clean up of package exports older than 1 days',[
-                'removed' => implode(',',$removed)
+            $logger->info('E0000', 'Clean up of package exports older than 1 days', [
+                'removed' => implode(',', $removed),
             ]);
         }
     }
@@ -111,6 +105,7 @@ class Remover
     private function getData(): array
     {
         $task = ZfExtended_Factory::get(editor_Models_Task::class);
+
         return $task->getAllReimportable();
     }
 }

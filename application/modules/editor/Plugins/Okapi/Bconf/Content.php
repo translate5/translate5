@@ -21,7 +21,7 @@
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
- 		     http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
  END LICENSE AND COPYRIGHT
  */
@@ -30,8 +30,8 @@
  * Class representing the Content/TOC of a bconf
  * This generally is a JSON file that will not be embedded in the bconf but just acts as an inventory for all extracted files of the bconf
  */
-final class editor_Plugins_Okapi_Bconf_Content extends editor_Plugins_Okapi_Bconf_ResourceFile {
-
+final class editor_Plugins_Okapi_Bconf_Content extends editor_Plugins_Okapi_Bconf_ResourceFile
+{
     /*
     fixed structure of our contents
     {
@@ -54,43 +54,34 @@ final class editor_Plugins_Okapi_Bconf_Content extends editor_Plugins_Okapi_Bcon
     /**
      * @var string
      */
-    const FILE = 'content.json';
+    public const FILE = 'content.json';
+
     /**
      * we're dealing with a JSON file
-     * @var string
      */
     protected string $mime = 'application/json';
-    /**
-     * @var stdClass
-     */
+
     private stdClass $refs;
-    /**
-     * @var array
-     */
+
     private array $step = [];
-    /**
-     * @var array
-     */
+
     private array $fprm = [];
+
     /**
      * Marker for the bconf-entity for proper caching
-     * @var int
      */
     private int $bconfId;
 
     /**
-     * @param string $path
-     * @param string|null $content
-     * @param int $bconfId
-     * @param bool $doCreateEmpty
      * @throws ZfExtended_Exception
      */
-    public function __construct(string $path, string $content=NULL, int $bconfId=-1, bool $doCreateEmpty=false){
+    public function __construct(string $path, string $content = null, int $bconfId = -1, bool $doCreateEmpty = false)
+    {
         $this->path = $path;
         $this->bconfId = $bconfId;
         $this->doDebug = ZfExtended_Debug::hasLevel('plugin', 'OkapiBconfValidation');
-        if(!$doCreateEmpty){
-            if($content === NULL){
+        if (! $doCreateEmpty) {
+            if ($content === null) {
                 $this->parse(file_get_contents($path));
             } else {
                 $this->parse($content);
@@ -100,132 +91,129 @@ final class editor_Plugins_Okapi_Bconf_Content extends editor_Plugins_Okapi_Bcon
         }
     }
 
-    /**
-     * @return int
-     */
-    public function getBconfId() : int {
+    public function getBconfId(): int
+    {
         return $this->bconfId;
     }
 
     /**
      * Adds a filter-identifier and updates the content. Does not flush the related file !
-     * @param string $identifier
      */
-    public function addFilter(string $identifier){
+    public function addFilter(string $identifier)
+    {
         $this->fprm[] = $identifier;
     }
 
     /**
      * Removes a filter-identifier and updates the content. Does not flush the related file !
-     * @param string $identifier
      */
-    public function removeFilter(string $identifier){
-        $this->fprm = array_diff($this->fprm, [ $identifier ]);
+    public function removeFilter(string $identifier)
+    {
+        $this->fprm = array_diff($this->fprm, [$identifier]);
     }
 
     /**
      * Sets the filter-identifiers and updates the content. Does not flush the related file !
-     * @param array $identifiers
      */
-    public function setFilters(array $identifiers){
+    public function setFilters(array $identifiers)
+    {
         $this->fprm = $identifiers;
     }
 
     /**
-     * @param string $field
      * @return mixed
      * @throws ZfExtended_Exception
      */
-    public function getSrxFile(string $field) : string {
-        if($field === 'source'){
+    public function getSrxFile(string $field): string
+    {
+        if ($field === 'source') {
             return $this->refs->sourceSrxPath;
-        } else if($field === 'target'){
+        } elseif ($field === 'target') {
             return $this->refs->targetSrxPath;
         } else {
-            throw new ZfExtended_Exception('Invalid field "'.$field.'", must be "source" or "target"');
+            throw new ZfExtended_Exception('Invalid field "' . $field . '", must be "source" or "target"');
         }
     }
 
     /**
      * Sets the SRX-path and updates the content. Does not flush the related file !
-     * @param string $field
-     * @param string $file
      * @throws ZfExtended_Exception
      */
-    public function setSrxFile(string $field, string $file) {
-        if(pathinfo($file, PATHINFO_EXTENSION) !== editor_Plugins_Okapi_Bconf_Segmentation_Srx::EXTENSION){
-            throw new ZfExtended_Exception('A SRX file must have the file-extension "srx": '.$file);
+    public function setSrxFile(string $field, string $file)
+    {
+        if (pathinfo($file, PATHINFO_EXTENSION) !== editor_Plugins_Okapi_Bconf_Segmentation_Srx::EXTENSION) {
+            throw new ZfExtended_Exception('A SRX file must have the file-extension "srx": ' . $file);
         }
-        if($field === 'source'){
+        if ($field === 'source') {
             $this->refs->sourceSrxPath = $file;
-        } else if($field === 'target'){
+        } elseif ($field === 'target') {
             $this->refs->targetSrxPath = $file;
         } else {
-            throw new ZfExtended_Exception('Invalid field "'.$field.'", must be "source" or "target"');
+            throw new ZfExtended_Exception('Invalid field "' . $field . '", must be "source" or "target"');
         }
     }
 
     /**
      * Adds our steps and updates the content. Does not flush the related file !
-     * @param array $steps
      */
-    public function setSteps(array $steps){
+    public function setSteps(array $steps)
+    {
         $this->step = $steps;
     }
 
-    /**
-     * @return bool
-     */
-    public function hasIdenticalSourceAndTargetSrx() : bool {
+    public function hasIdenticalSourceAndTargetSrx(): bool
+    {
         return ($this->refs->sourceSrxPath === $this->refs->targetSrxPath);
     }
 
     /**
      * Validates a content.json
-     * @return bool
      */
-    public function validate(bool $forImport=false) : bool {
+    public function validate(bool $forImport = false): bool
+    {
         $errors = [];
-        if(!property_exists($this->refs, 'sourceSrxPath') || empty($this->refs->sourceSrxPath)){
+        if (! property_exists($this->refs, 'sourceSrxPath') || empty($this->refs->sourceSrxPath)) {
             $errors[] = 'no source SRX set';
         }
-        if(!property_exists($this->refs, 'targetSrxPath') || empty($this->refs->targetSrxPath)){
+        if (! property_exists($this->refs, 'targetSrxPath') || empty($this->refs->targetSrxPath)) {
             $errors[] = 'no target SRX set';
         }
-        if(count($this->step) < 1){
+        if (count($this->step) < 1) {
             $errors[] = 'no step found';
         }
-        if(count($errors) > 0){
-            $this->validationError = ucfirst(implode(', ', $errors)).'.';
+        if (count($errors) > 0) {
+            $this->validationError = ucfirst(implode(', ', $errors)) . '.';
+
             return false;
         }
+
         return true;
     }
 
     /**
-     * @param string $content
      * @throws ZfExtended_Exception
      */
-    private function parse(string $content){
-        if(empty($content)){
-            throw new ZfExtended_Exception('Invalid JSON content of '.self::FILE.': Empty content');
+    private function parse(string $content)
+    {
+        if (empty($content)) {
+            throw new ZfExtended_Exception('Invalid JSON content of ' . self::FILE . ': Empty content');
         }
         $json = json_decode($content);
-        if(empty($json) || !is_object($json) || !property_exists($json, 'refs') || !property_exists($json, 'fprm')){
-            throw new ZfExtended_Exception('Invalid JSON content of '.self::FILE.': Invalid structure');
+        if (empty($json) || ! is_object($json) || ! property_exists($json, 'refs') || ! property_exists($json, 'fprm')) {
+            throw new ZfExtended_Exception('Invalid JSON content of ' . self::FILE . ': Invalid structure');
         }
-        if(property_exists($json, 'step')){
+        if (property_exists($json, 'step')) {
             $this->step = $json->step;
         } else {
             // LEGACY FIX:
             // in the first revisions of the bconf-management, the steps have not been extracted ... we repair that by extracting them from the pipeline
             $this->step = $this->getLegacySteps();
         }
-        if(is_array($json->refs)){
+        if (is_array($json->refs)) {
             // LEGACY FIX:
             // in the first revisions of the bconf-management, the refs have been an array
-            if(count($json->refs) < 1){
-                throw new ZfExtended_Exception('Invalid JSON content of '.self::FILE.': Invalid structure, references missing');
+            if (count($json->refs) < 1) {
+                throw new ZfExtended_Exception('Invalid JSON content of ' . self::FILE . ': Invalid structure, references missing');
             }
             $this->refs = new stdClass();
             $this->refs->sourceSrxPath = $json->refs[0];
@@ -236,14 +224,13 @@ final class editor_Plugins_Okapi_Bconf_Content extends editor_Plugins_Okapi_Bcon
         $this->fprm = $json->fprm;
     }
 
-    /**
-     * @return string
-     */
-    public function getContent() : string {
+    public function getContent(): string
+    {
         $data = new stdClass();
         $data->refs = $this->refs;
         $data->step = $this->step;
         $data->fprm = $this->fprm;
+
         return json_encode($data, JSON_PRETTY_PRINT);
     }
 
@@ -255,6 +242,7 @@ final class editor_Plugins_Okapi_Bconf_Content extends editor_Plugins_Okapi_Bcon
     {
         $pipelinePath = dirname($this->getPath()) . '/' . editor_Plugins_Okapi_Bconf_Pipeline::FILE;
         $pipeline = new editor_Plugins_Okapi_Bconf_Pipeline($pipelinePath, null, $this->getBconfId());
+
         return $pipeline->getSteps();
     }
 }

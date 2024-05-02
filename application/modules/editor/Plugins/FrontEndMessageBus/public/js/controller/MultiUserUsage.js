@@ -44,9 +44,12 @@ Ext.define('Editor.plugins.FrontEndMessageBus.controller.MultiUserUsage', {
     refs: [{
         ref : 'segmentGrid',
         selector : '#segmentgrid'
+    },{
+        ref:'searchReplaceWindow',
+        selector:'#searchreplacetabpanel'
     }],
     strings: {
-        noConnection: '#UT#Keine Verbindung zum Server',
+        noConnection: '#UT#Sie haben Verbindungsprobleme zum Internet. <br />Bitte prüfen Sie die Stabilität Ihrer Internetverbindung. <br />Sollte diese Meldung dauerhaft zu sehen sein, kann es auch sein, <br />dass das Websocket-Protokoll wss:// in Ihrer Firewall blockiert ist.',
         noConnectionSeg: '#UT#Sie können kein Segment editieren, so lange keine Verbindung zum Server besteht.',
         inUseTitle: '#UT#Segment bereits in Bearbeitung',
         inUse: '#UT#Ein anderer Benutzer war schneller und hat im Moment das Segment zur Bearbeitung gesperrt.',
@@ -56,6 +59,7 @@ Ext.define('Editor.plugins.FrontEndMessageBus.controller.MultiUserUsage', {
         myself: '#UT#Ich',
         selectedBy: '#UT#Ausgewählt von'
     },
+
     listen: {
         messagebus: {
             '#translate5': {
@@ -101,6 +105,11 @@ Ext.define('Editor.plugins.FrontEndMessageBus.controller.MultiUserUsage', {
             }
         }
     },
+
+    listeners:{
+        taskOpenedOnReconnect:'onTaskOpenedOnReconnect'
+    },
+
     init: function(){
         var me = this,
             conf = Editor.data.plugins.FrontEndMessageBus,
@@ -120,11 +129,14 @@ Ext.define('Editor.plugins.FrontEndMessageBus.controller.MultiUserUsage', {
                 version: conf.clientVersion
             };
         }
-        
-        url.push(conf.socketServer.schema, '://');
-        url.push(conf.socketServer.httpHost || window.location.hostname);
-        url.push(':', conf.socketServer.port, conf.socketServer.route);
-        
+
+        var schema = location.protocol.match('https') ? 'wss' : 'ws',
+            host = conf.socketServer.httpHost || window.location.hostname,
+            port = conf.socketServer.port || (schema === 'wss' ? 443 : 80),
+            path = '/' + schema + conf.socketServer.route;
+
+        url.push(schema, '://', host, ':', port, path);
+
         Ext.Ajax.setDefaultHeaders(Ext.apply({
             'X-Translate5-MessageBus-ConnId': conf.connectionId
         }, Ext.Ajax.getDefaultHeaders()));
@@ -164,9 +176,12 @@ return; //FIXME prepare that socket server is only triggered for simultaneous us
      */
     onClose: function(bus){
         var me = this;
+
+        console.log('onClose called',new Date().toLocaleString());
+
         var task = new Ext.util.DelayedTask(function(){
             if(!me.bus.isReady()) {
-                Editor.app.viewport && Editor.app.viewport.mask(me.strings.noConnection + '<br>' + me.bus.getUrl());
+                Editor.app.maskViewport(me.strings.noConnection + '<br>' + me.bus.getUrl());
             }
         });
         task.delay(1000);
@@ -205,29 +220,36 @@ return; //FIXME prepare that socket server is only triggered for simultaneous us
             task.set('userState', task.get('userState'));
             task.save({
                 success: function() {
-                    Editor.app.viewport && Editor.app.viewport.unmask();
+                    Editor.app.unmaskViewport();
                     me.bus.send('task', 'openTask', [Editor.data.task.get('taskGuid')]);
+                    me.fireEvent('taskOpenedOnReconnect', Editor.data.task);
                 },
                 failure: function(record, op) {
-                    Editor.app.viewport && Editor.app.viewport.unmask();
+                    Editor.app.unmaskViewport();
                     Editor.app.getController('ServerException').handleFailedRequest(op.error.status, op.error.statusText, op.error.response);
                 }
             });
         }
         else {
-            Editor.app.viewport && Editor.app.viewport.unmask();
+            Editor.app.unmaskViewport();
         }
-        
+    },
+
+    onTaskOpenedOnReconnect: function(task) {
+        var me = this,
+            grid = me.getSegmentGrid(),
+            sel;
+
         if(grid && (sel = grid.getSelectionModel().getSelection()) && sel.length > 0) {
             me.clickSegment(null, sel[0]);
         }
-        
+
         if(grid && grid.editingPlugin.editing) {
             me.enterSegment(grid.editingPlugin, [grid.editingPlugin.context.record]);
-            //alikes GET is triggerd again in change alike controller 
+            //alikes GET is triggerd again in change alike controller
         }
-        
     },
+
     enterSegment: function(plugin, context) {
         var me = this,
             msg = me.strings,
@@ -571,6 +593,14 @@ return; //FIXME prepare that socket server is only triggered for simultaneous us
         }
         //reloads the currently opened task
         if(taskGuid && taskGuid == data.taskGuid) {
+
+            // in case the current task is not a task model, create it as a model and trigger the reload
+            if(!Editor.data.task.load){
+                // when the task is not model, the object contains id and the taskGuid in it
+                // Based on that, we can use it as init object for the new model
+                Editor.data.task = Ext.create('Editor.model.admin.Task', Editor.data.task);
+            }
+
             Editor.data.task.load();
         }
     },
@@ -605,10 +635,16 @@ return; //FIXME prepare that socket server is only triggered for simultaneous us
         if(!store || !me.onlineUsers) {
             return;
         }
+        var onlineQty = 0, srw = me.getSearchReplaceWindow();
         Ext.Object.each(me.onlineUsers.onlineInTask, function(key, val){
             var item = store.getById(key);
                 item && item.set('isOnline', val);
+            if (val) onlineQty ++;
         });
+
+        if (srw) {
+            srw.getViewModel().set('isOpenedByMoreThanOneUser', onlineQty > 1);
+        }
         store.commitChanges();
     }
 });

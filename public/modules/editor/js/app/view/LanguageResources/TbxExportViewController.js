@@ -33,18 +33,35 @@ END LICENSE AND COPYRIGHT
 Ext.define('Editor.view.LanguageResources.TbxExportViewController', {
     extend: 'Ext.app.ViewController',
     alias: 'controller.tbxexport',
-    
+
+	// Bind handler for exportImages-checkbox
+	control: {
+    	'checkbox[name=exportImages]': {
+    		change: 'exportImagesChange'
+		}
+	},
+
     /***
      * Export term and term attribute proposals for the given collection id.
      * All terms and attributes younger than the export date will be exported.
      */
-    exportTbx:function(tbxBasicOnly, exportImages, record) {
+    exportTbx:function(tbxBasicOnly, exportImages, exportImagesVia, record) {
     	var params = {},
 	    	url = Editor.data.restpath+'languageresourceinstance/tbxexport?';
+		params.collectionId = record.get('id');
+	  	params.tbxBasicOnly = tbxBasicOnly.getValue() ? 1 : 0;
+	  	params.exportImages = exportImages.getValue() ? exportImagesVia.getValue() : 0;
 		tbxBasicOnly.up('window').destroy();
-		params['collectionId'] = record.get('id');
-	  	params['tbxBasicOnly'] = tbxBasicOnly.getValue() ? 1 : 0;
-	  	params['exportImages'] = exportImages.getValue() ? 1 : 0;
 	  	window.open(url+Ext.urlEncode(params));
-    }
+    },
+
+	/**
+	 * Handler for exportImages-checkbox
+	 *
+	 * @param checkbox
+	 * @param checked
+	 */
+	exportImagesChange: function(checkbox, checked) {
+		checkbox.up().down('[name=exportImagesVia]').setDisabled(!checked);
+	}
 });

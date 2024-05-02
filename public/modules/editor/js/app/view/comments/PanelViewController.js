@@ -130,7 +130,7 @@ Ext.define('Editor.view.comments.PanelViewController', {
                 me.handleAddComment();
                 //enabling the collapsed form gives a visual misbehaviour, so enable it by a own flag on expand
                 if(op.wasSuccessful()) {
-                    me.handleCommentsChanged(rec, 'save'); //rec from outer scope is needed!
+                    me.handleCommentsChanged(rec, 'save', op); //rec from outer scope is needed!
                     return;
                 }
                 if(rec.phantom) {
@@ -206,7 +206,7 @@ Ext.define('Editor.view.comments.PanelViewController', {
                         });
                     }
                     if(op.wasSuccessful()) {
-                        me.handleCommentsChanged(rec, 'destroy'); //rec from outer scope is needed!
+                        me.handleCommentsChanged(rec, 'destroy', op); //rec from outer scope is needed!
                         return;
                     }
                     errorHandler.handleCallback.apply(errorHandler, arguments);
@@ -260,12 +260,23 @@ Ext.define('Editor.view.comments.PanelViewController', {
      * @param {Editor.model.Comment} rec
      * @param {String} type change type: 'save' or 'destroy'
     */
-    handleCommentsChanged: function(rec, type) {
-        var me = this, 
+    handleCommentsChanged: function(rec, type, op) {
+        var me = this,
             segId = rec && rec.get('segmentId'),
             comments = me.getCommentsStore(),
-            comment = comments.getById(rec.get('id'));
-        
+            comment = comments.getById(rec.get('id')),
+            response = op.getResponse(),
+            json = false, taskProgress = false, userProgress = false;
+
+        try {
+            json = Ext.decode(response.responseText);
+            taskProgress = json.taskProgress;
+            userProgress = json.userProgress;
+        }
+        catch(e) {
+            json = false;
+        }
+
         if(! segId) {
             return;
         }
@@ -284,7 +295,11 @@ Ext.define('Editor.view.comments.PanelViewController', {
         if(type == 'destroy' && comment && comment.get('id') == rec.get('id') && segId == me.loadedSegmentId) {
             comments.remove(comment);
         }
-        
+
+        if(json){
+            me.updateWorkflowProgress(taskProgress, userProgress);
+        }
+
         Editor.model.Segment.load(segId, {
             success: function(rec, op) {
                 var dis = me.getCommentDisplay(),
@@ -369,5 +384,14 @@ Ext.define('Editor.view.comments.PanelViewController', {
 
     getCommentContainer:function(){
         return Ext.ComponentQuery.query('#commentPanel #commentContainer')[0];
+    },
+
+    /**
+     * TODO: make me with message bus
+     * @param {float} taskProgress
+     * @param {float} userProgress
+     */
+    updateWorkflowProgress: function(taskProgress, userProgress) {
+        Editor.app.getController('Segments').updateSegmentFinishCountViewModel(taskProgress, userProgress);
     }
 });

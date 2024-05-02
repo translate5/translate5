@@ -21,7 +21,7 @@ START LICENSE AND COPYRIGHT
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
@@ -62,12 +62,16 @@ class ProjectWorkersService
         editor_Models_Import_Configuration $importConfig
     ): void {
         $taskGuid = $task->getTaskGuid();
-        $params = ['config' => $importConfig];
+        $params = [
+            'config' => $importConfig,
+        ];
 
         // Queue Import Worker first as it provides the parent ID
 
         $importWorker = ZfExtended_Factory::get(editor_Models_Import_Worker::class);
-        $importWorker->init($taskGuid, array_merge($params, [ 'dataProvider' => $dataProvider ]));
+        $importWorker->init($taskGuid, array_merge($params, [
+            'dataProvider' => $dataProvider,
+        ]));
         //prevent the importWorker to be started here.
         $parentId = $importWorker->queue(0, ZfExtended_Models_Worker::STATE_PREPARE, false);
 
@@ -89,12 +93,16 @@ class ProjectWorkersService
 
         $worker = ZfExtended_Factory::get(editor_Models_Import_Worker_SetTaskToOpen::class);
         // queuing this worker when task has errors make no sense, init checks this.
-        if ($worker->init($taskGuid, ['config' => $importConfig])) {
+        if ($worker->init($taskGuid, [
+            'config' => $importConfig,
+        ])) {
             $worker->queue($parentId, null, false);
         }
         // the worker finishing the import
         $worker = ZfExtended_Factory::get(editor_Models_Import_Worker_FinalStep::class);
-        if ($worker->init($taskGuid, ['config' => $importConfig])) {
+        if ($worker->init($taskGuid, [
+            'config' => $importConfig,
+        ])) {
             $worker->queue($parentId);
         }
     }
@@ -113,7 +121,6 @@ class ProjectWorkersService
                 ->getActiveByTask($task)
                 ->hookin()
                 ->doHandleProjectCreated($task);
-
         }
 
         // we fix all task-specific configs of the task for it's remaining lifetime
@@ -124,7 +131,6 @@ class ProjectWorkersService
 
         $model = ZfExtended_Factory::get(editor_Models_Task::class);
         foreach ($tasks as $t) {
-
             if (is_array($t)) {
                 $model->load($t['id']);
             } else {
@@ -137,8 +143,13 @@ class ProjectWorkersService
             }
 
             $workerModel = ZfExtended_Factory::get(ZfExtended_Models_Worker::class);
+
             try {
-                $workerModel->loadFirstOf(editor_Models_Import_Worker::class, $model->getTaskGuid());
+                $workerModel->loadFirstOf(
+                    editor_Models_Import_Worker::class,
+                    $model->getTaskGuid(),
+                    [ZfExtended_Models_Worker::STATE_PREPARE]
+                );
                 $worker = ZfExtended_Worker_Abstract::instanceByModel($workerModel);
                 $worker && $worker->schedulePrepared();
 

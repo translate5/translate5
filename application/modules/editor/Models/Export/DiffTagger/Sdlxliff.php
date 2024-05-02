@@ -3,25 +3,25 @@
 START LICENSE AND COPYRIGHT
 
  This file is part of translate5
- 
+
  Copyright (c) 2013 - 2021 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
 
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
  This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
- as published by the Free Software Foundation and appearing in the file agpl3-license.txt 
- included in the packaging of this file.  Please review the following information 
+ as published by the Free Software Foundation and appearing in the file agpl3-license.txt
+ included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
-  
+
  There is a plugin exception available for use with this release of translate5 for
- translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or
  plugin-exception.txt in the root folder of translate5.
-  
+
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
@@ -36,8 +36,8 @@ END LICENSE AND COPYRIGHT
  * Zeichnet Änderungen zwischen ursprünglichem target und dem edited-Feld sdlxliff-spezifisch aus
  */
 
-class editor_Models_Export_DiffTagger_Sdlxliff extends editor_Models_Export_DiffTagger {
-
+class editor_Models_Export_DiffTagger_Sdlxliff extends editor_Models_Export_DiffTagger
+{
     /**
      * @var string Regex which returns in the matches array of a preg_match the id and the type (closing or opening) of a g-tag
      */
@@ -46,16 +46,17 @@ class editor_Models_Export_DiffTagger_Sdlxliff extends editor_Models_Export_Diff
     /**
      * @var int
      */
-    protected $_diffResPartCount = NULL;
+    protected $_diffResPartCount = null;
 
     /**
      * @var string
      */
-    protected $_changeTimestamp = NULL;
+    protected $_changeTimestamp = null;
+
     /**
      * @var string
      */
-    protected $_userName = NULL;
+    protected $_userName = null;
 
     /**
      * zeichnet ein einzelnes Segment aus
@@ -66,9 +67,10 @@ class editor_Models_Export_DiffTagger_Sdlxliff extends editor_Models_Export_Diff
      * @param string $userName Benutzername des Lektors
      * @return string $edited mit diff-Syntax fertig ausgezeichnet
      */
-    public function diffSegment($target, $edited, $changeTimestamp, $userName) {
-        $escapedGTagsTarget = array();
-        $escapedGTagsEdited = array();
+    public function diffSegment($target, $edited, $changeTimestamp, $userName)
+    {
+        $escapedGTagsTarget = [];
+        $escapedGTagsEdited = [];
 
         $this->_changeTimestamp = $changeTimestamp;
         $this->_userName = $userName;
@@ -114,12 +116,14 @@ class editor_Models_Export_DiffTagger_Sdlxliff extends editor_Models_Export_Diff
                 $val = str_replace('>', ' sdl:end="false">', $val); //no trailing slash, because according to sdlxliff there is a closing g-tag inserted after the deletion-mrk-Tag to complete the opening tag
             }
         }
-        $diffRes = str_replace('g id="term___mrkTag___', 'g id="___mrkTag___', $diffRes);//remove the mark, that it had been a term-Tag, because we do not need it anymore
+        $diffRes = str_replace('g id="term___mrkTag___', 'g id="___mrkTag___', $diffRes); //remove the mark, that it had been a term-Tag, because we do not need it anymore
         $diffRes = preg_replace_callback('"<g id=\"___mrkTag___([^\"]+)\""', function ($match) {
-                return '<mrk '.pack('H*', $match[1]); }, $diffRes);
+            return '<mrk ' . pack('H*', $match[1]);
+        }, $diffRes);
         $diffRes = preg_replace('"</g id=\"___mrkTag___[^\"]+\""', '</mrk', $diffRes);
         $diffRes = preg_replace('"</g id=\"[^\"]+\""', '</g', $diffRes);
         $edited = implode('', $diffRes);
+
         return $this->restoreSingleGTags($edited, $escapedGTagsEdited);
     }
 
@@ -130,13 +134,16 @@ class editor_Models_Export_DiffTagger_Sdlxliff extends editor_Models_Export_Diff
      * @param array $escapedIds
      * @return array $segment
      */
-    protected function restoreSingleGTags($segment,$escapedIds){
-        foreach($escapedIds as $id){
-            $insId = mb_substr($id,0,  mb_strlen($id)-4);
-            $segment = preg_replace('"(<)x([^>]*id=)\"'.$id.'(\"[^>]*/>)"s','\\1g\\2"'.$insId.'\\3', $segment);
+    protected function restoreSingleGTags($segment, $escapedIds)
+    {
+        foreach ($escapedIds as $id) {
+            $insId = mb_substr($id, 0, mb_strlen($id) - 4);
+            $segment = preg_replace('"(<)x([^>]*id=)\"' . $id . '(\"[^>]*/>)"s', '\\1g\\2"' . $insId . '\\3', $segment);
         }
+
         return $segment;
     }
+
     /**
      * converts all single (self-closing) g-tags to a x-tag to work around problems in diff-tagging
      * must be used after tagBreakUp
@@ -145,17 +152,19 @@ class editor_Models_Export_DiffTagger_Sdlxliff extends editor_Models_Export_Diff
      * @param array $escapedIds
      * @return array $segment
      */
-    protected function escapeSingleGTags($segment,&$escapedIds){
+    protected function escapeSingleGTags($segment, &$escapedIds)
+    {
         $regex = '"(.*<)g([^>]*id=\")([^\"]*)(\"[^>]*/>.*)"s';
-        if(count(preg_grep($regex, $segment))==0){
+        if (count(preg_grep($regex, $segment)) == 0) {
             return $segment;
         }
-        foreach($segment as $part){
-            if(preg_match($regex, $part)){
-                $escapedIds[] = preg_replace($regex,'\\3_esc', $part);
+        foreach ($segment as $part) {
+            if (preg_match($regex, $part)) {
+                $escapedIds[] = preg_replace($regex, '\\3_esc', $part);
             }
         }
-        return preg_replace($regex,'\\1x\\2\\3_esc\\4', $segment);
+
+        return preg_replace($regex, '\\1x\\2\\3_esc\\4', $segment);
     }
 
     /**
@@ -166,19 +175,22 @@ class editor_Models_Export_DiffTagger_Sdlxliff extends editor_Models_Export_Diff
      * @param array $segment
      * @return array $segment
      */
-    protected function joinTerms($segment) {
+    protected function joinTerms($segment)
+    {
         $termStart = false;
         $count = count($segment);
         for ($i = 0; $i < $count; $i++) {
             if (strpos($segment[$i], '<g id="term___mrkTag___') !== false) {
                 $termStart = $segment[$i];
                 unset($segment[$i]);
+
                 continue;
             }
-            if(strpos($segment[$i], '<mrk ') !== false || //if there is another none-Terminology-mrk-Tag inside the term-Tag
+            if (strpos($segment[$i], '<mrk ') !== false || //if there is another none-Terminology-mrk-Tag inside the term-Tag
                 strpos($segment[$i], '</g id="term___mrkTag___') !== false) {
                 $segment[$i] = $termStart . $segment[$i];
                 $termStart = false;
+
                 continue;
             }
             if ($termStart) {
@@ -186,6 +198,7 @@ class editor_Models_Export_DiffTagger_Sdlxliff extends editor_Models_Export_Diff
                 unset($segment[$i]);
             }
         }
+
         return $segment;
     }
 
@@ -201,26 +214,28 @@ class editor_Models_Export_DiffTagger_Sdlxliff extends editor_Models_Export_Diff
      * 	$getGTagsInformation[tagId][diffKey]['closing']['added']=''
      *  $getGTagsInformation[tagId][diffKey]['closing']['deleted']=''
      */
-    protected function getGTagsInformation($diffRes) {
+    protected function getGTagsInformation($diffRes)
+    {
         $self = $this;
-        $getThem = function($getGTagsInformation, $parts, $key, $type)use($self) {
-                    foreach ($parts as $part) {
-                        $matches = array();
-                        if (preg_match($self->_findGTagsIdAndTypeRegex, $part, $matches) === 1) {//Termtags are always defined as being moved as a whole. Even if an internal tag inside the term has been moved
-                            if ($matches[1] === "") {
-                                $getGTagsInformation[$matches[2]][$key]['opening'][$type] = ''; //format: $getGTagsInformation[tagId][diffKey]['opening']['noChange']=''
-                            } else {
-                                $getGTagsInformation[$matches[2]][$key]['closing'][$type] = '';
-                            }
-                        }
+        $getThem = function ($getGTagsInformation, $parts, $key, $type) use ($self) {
+            foreach ($parts as $part) {
+                $matches = [];
+                if (preg_match($self->_findGTagsIdAndTypeRegex, $part, $matches) === 1) {//Termtags are always defined as being moved as a whole. Even if an internal tag inside the term has been moved
+                    if ($matches[1] === "") {
+                        $getGTagsInformation[$matches[2]][$key]['opening'][$type] = ''; //format: $getGTagsInformation[tagId][diffKey]['opening']['noChange']=''
+                    } else {
+                        $getGTagsInformation[$matches[2]][$key]['closing'][$type] = '';
                     }
-                    return $getGTagsInformation;
-                };
+                }
+            }
 
-        $getGTagsInformation = array();
+            return $getGTagsInformation;
+        };
+
+        $getGTagsInformation = [];
         foreach ($diffRes as $key => $val) {
             if (is_string($val)) {
-                $matches = array();
+                $matches = [];
                 if (preg_match($this->_findGTagsIdAndTypeRegex, $val, $matches) === 1) {//Termtags are always defined as being moved as a whole. Even if an internal tag inside the term has been moved
                     //there can only be one tag in a non-Termtag-diffPart, because of tagBreakUp and absence of a joined term-tag in this diffPart
                     if ($matches[1] === "") {
@@ -236,6 +251,7 @@ class editor_Models_Export_DiffTagger_Sdlxliff extends editor_Models_Export_Diff
                 throw new Zend_Exception('val has an not defined variable-type');
             }
         }
+
         return $getGTagsInformation;
     }
 
@@ -245,15 +261,16 @@ class editor_Models_Export_DiffTagger_Sdlxliff extends editor_Models_Export_Diff
      * @param array $getGTagsInformation structure as returned by function getGTagsInformation
      * @return array getGTagsToComplement same array-format like getGTagsInformation, but only the tagIds included, for which some of the tags have been changed and some have not
      */
-    protected function getGTagsToComplement($getGTagsInformation) {
-        $getGTagsToComplement = array();
+    protected function getGTagsToComplement($getGTagsInformation)
+    {
+        $getGTagsToComplement = [];
         foreach ($getGTagsInformation as $tagId => $val) {
-            $lastOpeningDeleted = NULL;
-            $lastClosingDeleted = NULL;
+            $lastOpeningDeleted = null;
+            $lastClosingDeleted = null;
             $deletedClosingCounter = 0;
             $deletedOpeningCounter = 0;
-            $addedOpening2Comp = array();
-            $addedClosing2Comp = array();
+            $addedOpening2Comp = [];
+            $addedClosing2Comp = [];
             $lastOpeningNoChangeDiffres = false;
             $lastOpeningDeletedDiffres = false;
             for ($i = 0; $i < $this->_diffResPartCount; $i++) {
@@ -262,8 +279,8 @@ class editor_Models_Export_DiffTagger_Sdlxliff extends editor_Models_Export_Diff
                         if (isset($val[$i]['opening']['deleted'])) {
                             $deletedOpeningCounter++;
                             if ($lastClosingDeleted === true) {//if last closing tag had been marked as deleted and had not already be matched with another opening tag to a pair, it matches with this one and will NOT be included in $getGTagsToComplement
-                                $lastClosingDeleted = NULL;
-                                $lastOpeningDeleted = NULL;
+                                $lastClosingDeleted = null;
+                                $lastOpeningDeleted = null;
                                 #echo 'deleted$lastClosingDeleted === true';
                             } elseif ($lastClosingDeleted === false) {//if last closing tag had been marked as NOT deleted and had not already be matched with another opening tag to a pair, it will be included in $getGTagsToComplement
                                 $getGTagsToComplement[$tagId][$i]['opening']['deleted'] = '';
@@ -273,8 +290,8 @@ class editor_Models_Export_DiffTagger_Sdlxliff extends editor_Models_Export_Diff
                                 }
                                 $getGTagsToComplement[$tagId][$lastClosingNoChangeDiffres]['closing']['noChange'] = '';
                                 $lastClosingNoChangeDiffres = false;
-                                $lastClosingDeleted = NULL;
-                                $lastOpeningDeleted = NULL;
+                                $lastClosingDeleted = null;
+                                $lastOpeningDeleted = null;
                                 $addedOpening2Comp[$deletedOpeningCounter] = ''; //mark which in the order of the opening tags has to be completed too
                                 #echo 'deleted$lastClosingDeleted === false';
                             } else {//there is not closing tag marked so far and not completed to a tag pair. Mark this opening tag as to be completed.
@@ -291,20 +308,20 @@ class editor_Models_Export_DiffTagger_Sdlxliff extends editor_Models_Export_Diff
                                 }
                                 $getGTagsToComplement[$tagId][$lastClosingDeletedDiffres]['closing']['deleted'] = '';
                                 $lastClosingDeletedDiffres = false;
-                                $lastClosingDeleted = NULL;
-                                $lastOpeningDeleted = NULL;
+                                $lastClosingDeleted = null;
+                                $lastOpeningDeleted = null;
                                 $addedClosing2Comp[$lastDeletedClosingCounter] = ''; //mark which in the order of the opening tags has to be completed too
                                 #echo 'noChange$lastClosingDeleted === true';
                             } elseif ($lastClosingDeleted === false) {//if last closing tag had been marked as NOT deleted and had not already be matched with another opening tag to a pair, it matches with this one and will NOT be included in $getGTagsToComplement
-                                $lastClosingDeleted = NULL;
-                                $lastOpeningDeleted = NULL;
+                                $lastClosingDeleted = null;
+                                $lastOpeningDeleted = null;
                                 #echo 'noChange$lastClosingDeleted === false';
                             } else {//there is not closing tag marked so far and not completed to a tag pair. Mark this opening tag as to be completed.
                                 $lastOpeningDeleted = false;
                                 $lastOpeningNoChangeDiffres = $i;
                                 #echo 'noChange$lastOpeningDeleted=false';
                             }
-                        } elseif (!isset($val[$i]['opening']['added'])) {
+                        } elseif (! isset($val[$i]['opening']['added'])) {
                             throw new Zend_Exception('opening had been wether deleted nor added nor noChange');
                         }
                     }
@@ -314,8 +331,8 @@ class editor_Models_Export_DiffTagger_Sdlxliff extends editor_Models_Export_Diff
                         if (isset($val[$i]['closing']['deleted'])) {
                             $deletedClosingCounter++;
                             if ($lastOpeningDeleted === true) {//if last opening tag had been marked as deleted and had not already be matched with another opening tag to a pair, it matches with this one and will NOT be included in $getGTagsToComplement
-                                $lastClosingDeleted = NULL;
-                                $lastOpeningDeleted = NULL;
+                                $lastClosingDeleted = null;
+                                $lastOpeningDeleted = null;
                                 #echo 'deleted$lastOpeningDeleted === true';
                             } elseif ($lastOpeningDeleted === false) {//if last opening tag had been marked as NOT deleted and had not already be matched with another opening tag to a pair, it will be included in $getGTagsToComplement
                                 $getGTagsToComplement[$tagId][$i]['closing']['deleted'] = '';
@@ -325,8 +342,8 @@ class editor_Models_Export_DiffTagger_Sdlxliff extends editor_Models_Export_Diff
                                 }
                                 $getGTagsToComplement[$tagId][$lastOpeningNoChangeDiffres]['opening']['noChange'] = '';
                                 $lastOpeningNoChangeDiffres = false;
-                                $lastClosingDeleted = NULL;
-                                $lastOpeningDeleted = NULL;
+                                $lastClosingDeleted = null;
+                                $lastOpeningDeleted = null;
                                 $addedClosing2Comp[$deletedClosingCounter] = ''; //mark which in the order of the opening tags has to be completed too
                                 #echo 'deleted$lastOpeningDeleted === false';
                             } else {//there is not opening tag marked so far and not completed to a tag pair. Mark this closing tag as to be completed.
@@ -344,25 +361,25 @@ class editor_Models_Export_DiffTagger_Sdlxliff extends editor_Models_Export_Diff
                                 }
                                 $getGTagsToComplement[$tagId][$lastOpeningDeletedDiffres]['opening']['deleted'] = '';
                                 $lastOpeningDeletedDiffres = false;
-                                $lastClosingDeleted = NULL;
-                                $lastOpeningDeleted = NULL;
+                                $lastClosingDeleted = null;
+                                $lastOpeningDeleted = null;
                                 $addedOpening2Comp[$lastDeletedOpeningCounter] = ''; //mark which in the order of the opening tags has to be completed too
                                 #echo 'noChange$lastOpeningDeleted === true';
                             } elseif ($lastOpeningDeleted === false) {//if last opening tag had been marked as NOT deleted and had not already be matched with another opening tag to a pair, it matches with this one and will NOT be included in $getGTagsToComplement
-                                $lastClosingDeleted = NULL;
-                                $lastOpeningDeleted = NULL;
+                                $lastClosingDeleted = null;
+                                $lastOpeningDeleted = null;
                                 #echo 'noChange$lastOpeningDeleted === false';
                             } else {//there is not opening tag marked so far and not completed to a tag pair. Mark this closing tag as to be completed.
                                 $lastClosingDeleted = false;
                                 $lastClosingNoChangeDiffres = $i;
                                 #echo 'noChange$lastClosingDeleted=false';
                             }
-                        } elseif (!isset($val[$i]['closing']['added'])) {
+                        } elseif (! isset($val[$i]['closing']['added'])) {
                             throw new Zend_Exception('closing had been wether deleted nor added nor noChange');
                         }
                     }
 
-                    if (!(isset($val[$i]['opening']) or isset($val[$i]['closing']))) {
+                    if (! (isset($val[$i]['opening']) or isset($val[$i]['closing']))) {
                         throw new Zend_Exception('wether opening nor closing had been defined');
                     }
                 }
@@ -399,6 +416,7 @@ class editor_Models_Export_DiffTagger_Sdlxliff extends editor_Models_Export_Diff
                 throw new Zend_Exception('not all added opening tags have been found for all deleted opening tags');
             }
         }
+
         return $getGTagsToComplement;
     }
 
@@ -409,11 +427,14 @@ class editor_Models_Export_DiffTagger_Sdlxliff extends editor_Models_Export_Diff
      * @param array $i Array('hinzugefügt')
      * @return string additions inclosed by '<mrk mtype="x-sdl-added" sdl:revid="'.$guid.'">'addition'</mrk>' or empty string if no Addition
      */
-    protected function markAddition($i) {
+    protected function markAddition($i)
+    {
         if (count($i) > 0) {
-            $openingEndFalseArr = array();
+            $openingEndFalseArr = [];
             foreach ($i as $key => &$val) {
-                if($val === '')continue;
+                if ($val === '') {
+                    continue;
+                }
                 if (preg_match($this->_findGTagsIdAndTypeRegex, $val, $matches) === 1 and
                         strpos($val, 'sdl:end') === false and
                         strpos($val, 'sdl:start') === false) {//a termtag is always only in a diff-part as a complete termtag. g-tags inside of it must also be complete, because terms with incomplete tags inside it do not get marked
@@ -423,7 +444,7 @@ class editor_Models_Export_DiffTagger_Sdlxliff extends editor_Models_Export_Diff
                         if (isset($openingEndFalseArr[$matches[2]])) {//if there is an opening tag with the same id, do not mark this one as start=false
                             array_pop($openingEndFalseArr[$matches[2]]);
                         } else {
-                            $val = str_replace(array('</g', '>'), array('<g', ' sdl:start="false" />'), $val);
+                            $val = str_replace(['</g', '>'], ['<g', ' sdl:start="false" />'], $val);
                         }
                     } else {
                         throw new Zend_Exception('tag had wether been an opening nor a closing g-Tag, but the pattern ' .
@@ -432,20 +453,24 @@ class editor_Models_Export_DiffTagger_Sdlxliff extends editor_Models_Export_Diff
                 }
             }
             foreach ($i as $key => &$val) {
-                if($val === '')continue;
+                if ($val === '') {
+                    continue;
+                }
                 if (preg_match($this->_findGTagsIdAndTypeRegex, $val, $matches) === 1 //a termtag is always only in a diff-part as a complete termtag. g-tags inside of it must also be complete, because terms with incomplete tags inside it do not get marked
                         and $matches[1] === '' and isset($openingEndFalseArr[$matches[2]][$key])) {
                     $val = str_replace('>', ' sdl:end="false" />', $val);
                 }
             }
             $addition = implode('', $i);
-            if($addition === '') {
+            if ($addition === '') {
                 return '';
             }
+
             return '<mrk mtype="x-sdl-added" sdl:revid="' .
                 $this->addRevision($this->_changeTimestamp, $this->_userName, true)
                     . '">' . $addition . '</mrk>';
         }
+
         return '';
     }
 
@@ -460,12 +485,15 @@ class editor_Models_Export_DiffTagger_Sdlxliff extends editor_Models_Export_Diff
      * @param int $diffKey
      * @return string deletions inclosed by <mrk mtype="x-sdl-deleted" sdl:revid="REVID">'deletions'</mrk>' )
      */
-    protected function markDeletion($d, $getGTagsToComplement, $diffKey) {
+    protected function markDeletion($d, $getGTagsToComplement, $diffKey)
+    {
         if (count($d) > 0) {
             $end = '</mrk>';
-            $openingEndFalseArr = array();
+            $openingEndFalseArr = [];
             foreach ($d as $key => &$val) {
-                if($val === '')continue;
+                if ($val === '') {
+                    continue;
+                }
                 if (preg_match($this->_findGTagsIdAndTypeRegex, $val, $matches) === 1 and
                         strpos($val, 'sdl:end') === false and
                         strpos($val, 'sdl:start') === false) {
@@ -476,15 +504,13 @@ class editor_Models_Export_DiffTagger_Sdlxliff extends editor_Models_Export_Diff
                             array_pop($openingEndFalseArr[$matches[2]]);
                         } else {
                             if (isset($getGTagsToComplement[$matches[2]][$diffKey]['closing']['deleted'])) {//if only the closing g-tag is deleted or moved
-                                if(strpos($val, '___mrkTag___') !== false){//if the tag had been a ___mrkTag___
+                                if (strpos($val, '___mrkTag___') !== false) {//if the tag had been a ___mrkTag___
                                     $end .= '</mrk>';
-                                }
-                                else{
+                                } else {
                                     $end .= '</g>';
                                 }
-
                             }
-                            $val = str_replace(array('</g', '>'), array('<g', ' sdl:start="false" />'), $val);
+                            $val = str_replace(['</g', '>'], ['<g', ' sdl:start="false" />'], $val);
                         }
                     } else {
                         throw new Zend_Exception('tag had wether been an opening nor a closing g-Tag, but the pattern ' .
@@ -493,7 +519,9 @@ class editor_Models_Export_DiffTagger_Sdlxliff extends editor_Models_Export_Diff
                 }
             }
             foreach ($d as $key => &$val) {
-                if($val === '')continue;
+                if ($val === '') {
+                    continue;
+                }
                 if (preg_match($this->_findGTagsIdAndTypeRegex, $val, $matches) === 1 //a termtag is always only in a diff-part as a complete termtag. g-tags inside of it must also be complete, because terms with incomplete tags inside it do not get marked
                         and $matches[1] === '' and isset($openingEndFalseArr[$matches[2]][$key])) {
                     if (isset($getGTagsToComplement[$matches[2]][$diffKey]['opening']['deleted'])) {//if only the open g-tag is deleted or moved, add in accordance with sdlxliff another opening g-Tag
@@ -503,13 +531,15 @@ class editor_Models_Export_DiffTagger_Sdlxliff extends editor_Models_Export_Diff
                 }
             }
             $deletion = implode('', $d);
-            if($deletion === ''){
+            if ($deletion === '') {
                 return '';
             }
+
             return '<mrk mtype="x-sdl-deleted" sdl:revid="' .
                 $this->addRevision($this->_changeTimestamp, $this->_userName, false) . '">' .
                     $deletion . $end;
         }
+
         return '';
     }
 
@@ -523,24 +553,25 @@ class editor_Models_Export_DiffTagger_Sdlxliff extends editor_Models_Export_Diff
      * @param array $segment
      * @return array $segment
      */
-    protected function replacePairMrkTags($segment) {
+    protected function replacePairMrkTags($segment)
+    {
         $count = count($segment);
         $open = 0;
-        $openIds = array();
+        $openIds = [];
         //parse nur die ungeraden Arrayelemente, denn dies sind die Tags
         for ($i = 1; $i < $count; $i++) {
             if (strpos($segment[$i], '<mrk ') !== false and strrpos($segment[$i], '/>') === false) {//strrpos($segment[$i], '/>')===false   kann entfallen, sobald keine vor dem 31.2.2013 importierten Projekte mehr in der DB sind
                 $open++;
-                $id = '___mrkTag___'.implode(',', unpack('H*', preg_replace('".*<mrk ([^>]*)>.*"', '\\1', $segment[$i])));
+                $id = '___mrkTag___' . implode(',', unpack('H*', preg_replace('".*<mrk ([^>]*)>.*"', '\\1', $segment[$i])));
                 if (strpos($segment[$i], 'mtype="x-term') !== false) {
-                    $id = 'term'.$id;
+                    $id = 'term' . $id;
                 }
-                $segment[$i] = '<g id="'.$id.'">';
+                $segment[$i] = '<g id="' . $id . '">';
                 $openIds[$open] = $id;
             } elseif (strpos($segment[$i], '</mrk>') !== false) {
-                if (!isset($openIds[$open])) {
+                if (! isset($openIds[$open])) {
                     //In this segment for one closing tag no corresponding opening tag exists - or the tagorder had been syntactically incorrect already before the import in the editor. Therefore it is not possible to create an export with sdl-change-marks in it. Try to export without change-marks. The Segment had been: "{segment}"
-                    throw new editor_Models_Export_DiffTagger_Exception('E1089',[
+                    throw new editor_Models_Export_DiffTagger_Exception('E1089', [
                         'segment' => implode('', $segment),
                     ]);
                 }
@@ -552,10 +583,11 @@ class editor_Models_Export_DiffTagger_Sdlxliff extends editor_Models_Export_Diff
         }
         if (count($openIds) > 0) {
             //The number of opening and closing g-Tags had not been the same!
-            throw new editor_Models_Export_DiffTagger_Exception('E1090',[
+            throw new editor_Models_Export_DiffTagger_Exception('E1090', [
                 'segment' => implode('', $segment),
             ]);
         }
+
         return $segment;
     }
 
@@ -569,19 +601,20 @@ class editor_Models_Export_DiffTagger_Sdlxliff extends editor_Models_Export_Diff
      * @param array $segment
      * @return array $segment
      */
-    protected function replacePairGTagsTarget($segment) {
+    protected function replacePairGTagsTarget($segment)
+    {
         $count = count($segment);
         $open = 0;
-        $openIds = array();
+        $openIds = [];
         //parse nur die ungeraden Arrayelemente, denn dies sind die Tags
         for ($i = 1; $i < $count; $i++) {
             if (strpos($segment[$i], '<g ') !== false and strrpos($segment[$i], '/>') === false) {//strrpos($segment[$i], '/>')===false   kann entfallen, sobald keine vor dem 31.2.2013 importierten Projekte mehr in der DB sind
                 $open++;
                 $openIds[$open] = preg_replace('".*<g[^>]*id=\"([^\"]+)\".*"', '\\1', $segment[$i]);
             } elseif (strpos($segment[$i], '</g>') !== false) {
-                if (!isset($openIds[$open])) {
+                if (! isset($openIds[$open])) {
                     //In this segment for one closing tag no corresponding opening tag exists - or the tagorder had been syntactically incorrect already before the import in the editor. Therefore it is not possible to create an export with sdl-change-marks in it. Try to export without change-marks.
-                    throw new editor_Models_Export_DiffTagger_Exception('E1091',[
+                    throw new editor_Models_Export_DiffTagger_Exception('E1091', [
                         'segment' => implode('', $segment),
                     ]);
                 }
@@ -593,10 +626,11 @@ class editor_Models_Export_DiffTagger_Sdlxliff extends editor_Models_Export_Diff
         }
         if (count($openIds) > 0) {
             //The number of opening and closing g-Tags had not been the same! The Segment had been: ' . implode('', $segment), E_USER_ERROR);
-            throw new editor_Models_Export_DiffTagger_Exception('E1092',[
+            throw new editor_Models_Export_DiffTagger_Exception('E1092', [
                 'segment' => implode('', $segment),
             ]);
         }
+
         return $segment;
     }
 
@@ -615,11 +649,12 @@ class editor_Models_Export_DiffTagger_Sdlxliff extends editor_Models_Export_Diff
      * @param array $segment
      * @return array $segment
      */
-    protected function replacePairGTagsEdited($segment) {
+    protected function replacePairGTagsEdited($segment)
+    {
         $count = count($segment);
         $open = 0;
-        $openIds = array();
-        $still2Mark = array();
+        $openIds = [];
+        $still2Mark = [];
         //parse nur die ungeraden Arrayelemente, denn dies sind die Tags
         for ($i = 1; $i < $count; $i++) {
             if (strpos($segment[$i], '<g ') !== false and strrpos($segment[$i], '/>') === false) {//strrpos($segment[$i], '/>')===false   kann entfallen, sobald keine vor dem 31.2.2013 importierten Projekte mehr in der DB sind
@@ -639,7 +674,7 @@ class editor_Models_Export_DiffTagger_Sdlxliff extends editor_Models_Export_Diff
         foreach ($still2Mark as $i => $val) {
             if (count($openIds) < 1) {
                 //The number of opening and closing g-Tags had not been the same!
-                throw new editor_Models_Export_DiffTagger_Exception('E1093',[
+                throw new editor_Models_Export_DiffTagger_Exception('E1093', [
                     'segment' => implode('', $segment),
                 ]);
             }
@@ -647,6 +682,7 @@ class editor_Models_Export_DiffTagger_Sdlxliff extends editor_Models_Export_Diff
             $segment[$i] = str_replace('</g', '</g id="' . $id . '"', $segment[$i]);
             $open--;
         }
+
         return $segment;
     }
 
@@ -661,18 +697,18 @@ class editor_Models_Export_DiffTagger_Sdlxliff extends editor_Models_Export_Diff
      * @param string $segment
      * @return array $segment
      */
-    protected  function tagBreakUp($segment){
-        return editor_Utils::tagBreakUp($segment,'/(<[^>]*>|&[^;]+;)/');
+    protected function tagBreakUp($segment)
+    {
+        return editor_Utils::tagBreakUp($segment, '/(<[^>]*>|&[^;]+;)/');
     }
 
     /**
      * wrapper function to be called by the testsuite in a worker to test an endless loop in the diff algorithm
-     * @param string|null $taskGuid
-     * @param array $params
      */
-    public function diffTestCall(?string $taskGuid, array $params) {
+    public function diffTestCall(?string $taskGuid, array $params)
+    {
         $result = $this->diffSegment($params['target'], $params['edited'], $params['date'], $params['name']);
-        if(preg_replace('/sdl:revid="[^"]+"/', 'sdl:revid="XXX"', $result) !== $params['result']) {
+        if (preg_replace('/sdl:revid="[^"]+"/', 'sdl:revid="XXX"', $result) !== $params['result']) {
             throw new Exception('The result is not as expected.');
         }
     }

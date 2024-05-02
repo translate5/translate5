@@ -21,7 +21,7 @@ START LICENSE AND COPYRIGHT
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
@@ -40,41 +40,61 @@ use Zend_Http_Client_Exception;
  */
 final class Task extends Resource
 {
-    const TASK_CONFIG_INI = 'task-config.ini';
+    public const TASK_CONFIG_INI = 'task-config.ini';
 
     public string $taskName;
+
     public string $sourceLang = 'en';
+
     public string|array $targetLang = 'de';
+
     public int $customerId;
+
     public bool $edit100PercentMatch = true;
+
     public bool $enableSourceEditing = false;
+
     public int $lockLocked = 1;
+
     public int $wordCount = 666;
+
     public int $autoStartImport = 1;
+
     public string $orderdate;
+
+    public string $foreignId;
+
+    public string $foreignName;
+
     private ?string $_uploadFolder = null;
+
     private ?array $_uploadFiles = null;
+
     private ?array $_uploadData = null;
+
     private ?array $_additionalUploadFiles = null;
+
     private ?array $_importUsers = null;
+
     private ?string $_usageMode = null;
+
     private array $_userAssocs = [];
+
     private ?string $_cleanupZip = null;
+
     private bool $_setToEditAfterImport = false;
+
     private bool $_waitForImported = true;
+
     private bool $_failOnError = true;
+
     /**
      * Defines the default-configs that will be applied for all task-imports
-     * @var array
      */
     private array $_importConfigs = [
 
     ];
 
-    /**
-     * @param string $testClass
-     * @param int $index
-     */
     public function __construct(string $testClass, int $index)
     {
         parent::__construct($testClass, $index);
@@ -92,19 +112,18 @@ final class Task extends Resource
     /**
      * Adds a folder in the test-dir that will be zipped for upload
      * The Upload can either be defined by file(s), by folder or by data
-     * @param string $folderInTestDir
      * @return $this
      */
     public function addUploadFolder(string $folderInTestDir): Task
     {
         $this->_uploadFolder = trim($folderInTestDir, '/');
+
         return $this;
     }
 
     /**
      * Adds a direct path to be uploaded which is expected to reside in the test-dir
      * The Upload can either be defined by file(s), by folder or by data
-     * @param string $filePath
      * @return $this
      */
     public function addUploadFile(string $filePath): Task
@@ -113,6 +132,7 @@ final class Task extends Resource
             $this->_uploadFiles = [];
         }
         $this->_uploadFiles[] = $filePath;
+
         return $this;
     }
 
@@ -127,28 +147,29 @@ final class Task extends Resource
         foreach ($filePathes as $path) {
             $this->addUploadFile($path);
         }
+
         return $this;
     }
 
     /**
      * Adds raw data to be uploaded as file
      * The Upload can either be defined by file(s), by folder or by data
-     * @param string $data
-     * @param string $mimeType
-     * @param string $fileName
      * @return $this
      */
     public function addUploadData(string $data, string $mimeType = 'application/csv', string $fileName = 'apiTest.csv'): Task
     {
-        $this->_uploadData = ['data' => $data, 'mime' => $mimeType, 'filename' => $fileName];
+        $this->_uploadData = [
+            'data' => $data,
+            'mime' => $mimeType,
+            'filename' => $fileName,
+        ];
+
         return $this;
     }
 
     /**
      * Adds an additional file to the task-import that has a differen param name (for name 'importUpload' use ->addUploadFile)
      * IMPORTANT: Can not be used with ZIP or FOLDER uploads!
-     * @param string $uploadName
-     * @param string $filePath
      * @return $this
      */
     public function addAdditionalUploadFile(string $uploadName, string $filePath): Task
@@ -156,7 +177,11 @@ final class Task extends Resource
         if ($this->_additionalUploadFiles === null) {
             $this->_additionalUploadFiles = [];
         }
-        $this->_additionalUploadFiles[] = ['name' => $uploadName, 'path' => $filePath];
+        $this->_additionalUploadFiles[] = [
+            'name' => $uploadName,
+            'path' => $filePath,
+        ];
+
         return $this;
     }
 
@@ -174,18 +199,24 @@ final class Task extends Resource
         if ($this->_importUsers === null) {
             $this->_importUsers = [];
         }
-        $this->_importUsers[] = ['name' => $userName, 'state' => $userState, 'step' => $workflowStep, 'params' => $params];
+        $this->_importUsers[] = [
+            'name' => $userName,
+            'state' => $userState,
+            'step' => $workflowStep,
+            'params' => $params,
+        ];
+
         return $this;
     }
 
     /**
      * Sets the task-usage mode during import
-     * @param string $usageMode
      * @return $this
      */
     public function setUsageMode(string $usageMode): Task
     {
         $this->_usageMode = $usageMode;
+
         return $this;
     }
 
@@ -193,40 +224,40 @@ final class Task extends Resource
      * Adds a needed configuration for the imported task
      * the "runtimeOptions" scope is automatically added if not given
      * Make sure, that the passed config-value contains parenthesises for Strings, e.g. '"/§[^%]*%/"'
-     * @param string $configName
      * @param mixed $configValue
      * @return $this
      */
     public function addTaskConfig(string $configName, string $configValue): Task
     {
-        if(!str_starts_with($configName, 'runtimeOptions.')){
-            $configName = 'runtimeOptions.'.ltrim($configName, '.');
+        if (! str_starts_with($configName, 'runtimeOptions.')) {
+            $configName = 'runtimeOptions.' . ltrim($configName, '.');
         }
         $this->_importConfigs[$configName] = $configValue;
+
         return $this;
     }
 
     /**
      * Adds a bconf-id to the task to be used when importing
-     * @param int $bconfId
      * @return $this
      */
     public function setImportBconfId(int $bconfId): Task
     {
         $this->bconfId = $bconfId;
+
         return $this;
     }
 
     /**
      * Removes an added configuration e.g. a default configuration (can not be used to remove configs from task-config.ini files!)
-     * @param string $configName
      * @return $this
      */
     public function removeTaskConfig(string $configName): Task
     {
-        if(array_key_exists($configName, $this->_importConfigs)){
+        if (array_key_exists($configName, $this->_importConfigs)) {
             unset($this->_importConfigs[$configName]);
         }
+
         return $this;
     }
 
@@ -236,6 +267,7 @@ final class Task extends Resource
     public function setToEditAfterImport(): Task
     {
         $this->_setToEditAfterImport = true;
+
         return $this;
     }
 
@@ -246,6 +278,7 @@ final class Task extends Resource
     public function setNotToFailOnError(): Task
     {
         $this->_failOnError = false;
+
         return $this;
     }
 
@@ -257,11 +290,11 @@ final class Task extends Resource
     public function setNotToWaitForImported(): Task
     {
         $this->_waitForImported = false;
+
         return $this;
     }
 
     /**
-     * @return string
      * @throws Exception
      */
     public function getTaskGuid(): string
@@ -270,7 +303,6 @@ final class Task extends Resource
     }
 
     /**
-     * @return string
      * @throws Exception
      */
     public function getTaskState(): string
@@ -280,7 +312,6 @@ final class Task extends Resource
 
     /**
      * Retrieves the task's data-directory
-     * @return string
      * @throws \MittagQI\Translate5\Test\Import\Exception
      */
     public function getDataDirectory(): string
@@ -290,7 +321,6 @@ final class Task extends Resource
 
     /**
      * Retrieves, if a task is a project. This can only be called, after the task was imported
-     * @return bool
      * @throws \MittagQI\Translate5\Test\Import\Exception
      */
     public function isProjectTask(): bool
@@ -299,8 +329,6 @@ final class Task extends Resource
     }
 
     /**
-     * @param Helper $api
-     * @param Config $config
      * @throws Exception
      * @throws \MittagQI\Translate5\Test\Import\Exception
      * @throws \Zend_Exception
@@ -320,21 +348,18 @@ final class Task extends Resource
         // prepare our resources
         $this->upload($api);
 
-        if (!$config->hasLanguageResources() && !$config->hasTaskOperation() && !$isMultiLanguage) {
-
+        if (! $config->hasLanguageResources() && ! $config->hasTaskOperation() && ! $isMultiLanguage) {
             // the simple case: task without resources & pretranslation
-            if (!$this->doImport($api, $this->_failOnError, $this->_waitForImported)) {
+            if (! $this->doImport($api, $this->_failOnError, $this->_waitForImported)) {
                 return;
             }
             // if we shall not wait, we have to skip user-assignments & task-state-setting
-            if (!$this->_waitForImported) {
+            if (! $this->_waitForImported) {
                 return;
             }
-
         } else {
-
             // TODO FIXME: check, if $this->_failOnError can not be used here, seems to be just a miscoding overtaken over the years ...
-            if (!$this->doImport($api, false, false)) {
+            if (! $this->doImport($api, false, false)) {
                 return;
             }
             // associate resources
@@ -353,7 +378,7 @@ final class Task extends Resource
                     ->import($api, $config);
             }
             // some tests want to hook in after the task-adding but before import starts
-            if (!$this->_waitForImported) {
+            if (! $this->_waitForImported) {
                 return;
             }
             // start the import
@@ -361,9 +386,9 @@ final class Task extends Resource
 
             // wait for the import to finish. TODO FIXME: is the manual evaluation of multilang-tasks neccessary ?
             if ($this->isProjectTask() || $isMultiLanguage) {
-                $api->checkProjectTasksStateLoop();
+                $api->waitForCurrentProjectStateOpen();
             } else {
-                $api->checkTaskStateLoop();
+                $api->waitForCurrentTaskStateOpen();
             }
         }
 
@@ -371,8 +396,10 @@ final class Task extends Resource
         $this->applyResult($api->getTask());
 
         // set usage-mode if setup
-        if($this->_usageMode !== null){
-            $api->putJson('editor/task/'.$this->getId(), array('usageMode' => $this->_usageMode));
+        if ($this->_usageMode !== null) {
+            $api->putJson('editor/task/' . $this->getId(), [
+                'usageMode' => $this->_usageMode,
+            ]);
         }
         // if testlector shall be loged in after setup, we add him to the task automatically
         if ($config->getLogin() === 'testlector') {
@@ -397,7 +424,6 @@ final class Task extends Resource
 
     /**
      * Reloads a task and fetches fresh props
-     * @param Helper $api
      * @return $this
      * @throws Exception
      * @throws \Zend_Http_Client_Exception
@@ -407,35 +433,33 @@ final class Task extends Resource
         $this->checkImported(' therefore the task cannot be reloaded.');
         $result = $api->getJson('editor/task/' . $this->getId());
         $this->applyResult($result);
+
         return $this;
     }
 
     /**
      * If the import was configured not to be waiting with ::setNotToWaitForImported this api can be used to wait afterwards ...
-     * @param Helper $api
      * @throws Exception
      */
     public function waitForImport(Helper $api)
     {
         if ($this->isProjectTask()) {
-            $api->checkProjectTasksStateLoop();
+            $api->waitForCurrentProjectStateOpen();
         } else {
-            $api->checkTaskStateLoop();
+            $api->waitForCurrentTaskStateOpen();
         }
         // TODO: we should rework the API not to cache the task-data but to return them
         $this->applyResult($api->getTask());
     }
 
     /**
-     * @param Helper $api
-     * @param Config $config
      * @throws \MittagQI\Translate5\Test\Import\Exception
      */
     public function cleanup(Helper $api, Config $config): void
     {
         $api->login('testmanager');
         // TODO FIXME: this is just neccessary because of quirks in the helper API ... see class comment
-        if($this->_failOnError){
+        if ($this->_failOnError) {
             $this->reload($api);
         }
         // remove on server
@@ -444,7 +468,7 @@ final class Task extends Resource
             $taskId = $this->getId();
             // project tasks or tasks in error/import state can not be opened
             // Note that it can not be guaranteed here, that the state of the task is persistent as there is a task-cache in the API still
-            if (!$this->isProjectTask() && $taskState !== 'error' && $taskState !== 'import') {
+            if (! $this->isProjectTask() && $taskState !== 'error' && $taskState !== 'import') {
                 $login = ($config->hasTestlectorLogin()) ? 'testlector' : 'testmanager';
                 $api->login($login);
                 $api->setTaskToOpen($taskId);
@@ -462,8 +486,6 @@ final class Task extends Resource
     /**
      * Retrieves a user-assoc created on import
      * This can only be called successfully after loading a task & assigning the user ...
-     * @param string $login
-     * @return \stdClass|null
      * @throws Exception
      */
     public function getUserAssoc(string $login): ?\stdClass
@@ -472,39 +494,36 @@ final class Task extends Resource
         if (array_key_exists($login, $this->_userAssocs)) {
             return $this->_userAssocs[$login];
         }
+
         return null;
     }
 
     /**
      * Sets the task to "finished" after import
-     * @param Helper $api
      * @return \stdClass
      * @throws Exception
      */
     public function setTaskToFinished(Helper $api): mixed
     {
         $this->checkImported(' therefore the task cannot be finished.');
+
         return $api->setTaskToFinished($this->getId());
     }
 
     /**
      * Sets the task to "edit" after import
-     * @param Helper $api
      * @return \stdClass
      * @throws Exception
      */
     public function setTaskToEdit(Helper $api): mixed
     {
         $this->checkImported(' therefore the task cannot be edited.');
+
         return $api->setTaskToEdit($this->getId());
     }
 
     /**
      * Imports and applies the result
-     * @param Helper $api
-     * @param bool $failOnError
-     * @param bool $waitTorImport
-     * @return bool
      * @throws \MittagQI\Translate5\Test\Api\Exception
      * @throws \Zend_Http_Client_Exception
      */
@@ -515,12 +534,12 @@ final class Task extends Resource
         if ($this->validateResult($result, $api)) {
             return true;
         }
+
         return false;
     }
 
     /**
      * Adds all our files before importing
-     * @param Helper $api
      * @throws \Zend_Exception
      */
     private function upload(Helper $api)
@@ -528,24 +547,25 @@ final class Task extends Resource
         if ($this->_uploadFolder !== null) {
             $this->_cleanupZip = $api->zipTestFiles($this->_uploadFolder);
             // add/change a task-config.ini if we have configs
-            if (count($this->_importConfigs) > 0){
+            if (count($this->_importConfigs) > 0) {
                 $this->setTaskConfigsInZip($this->_cleanupZip);
             }
             $api->addImportFile($this->_cleanupZip);
+
             return; // zip is a highlander-format ...
-        } else if ($this->_uploadFiles !== null) {
+        } elseif ($this->_uploadFiles !== null) {
             if (count($this->_uploadFiles) === 1) {
                 $mime = $this->evaluateMime($this->_uploadFiles[0]);
                 $file = $api->getFile($this->_uploadFiles[0]);
                 // add/change a task-config.ini if we have configs. We must use a temporary zip then to not overwrite the original ZIP
-                if ($mime === 'application/zip' && count($this->_importConfigs) > 0){
+                if ($mime === 'application/zip' && count($this->_importConfigs) > 0) {
                     $this->_cleanupZip = APPLICATION_DATA . '/tmp-' . basename($file);
                     copy($file, $this->_cleanupZip);
                     $this->setTaskConfigsInZip($this->_cleanupZip);
                     $file = $this->_cleanupZip;
                 }
                 $api->addImportFile($file, $mime);
-                if($mime === 'application/zip'){
+                if ($mime === 'application/zip') {
                     return; // zip is a highlander-format ...
                 }
             } else {
@@ -553,7 +573,7 @@ final class Task extends Resource
                     $api->addImportFiles($api->getFile($relPath), $this->evaluateMime($relPath));
                 }
             }
-        } else if ($this->_uploadData !== null) {
+        } elseif ($this->_uploadData !== null) {
             $api->addImportPlain($this->_uploadData['data'], $this->_uploadData['mime'], $this->_uploadData['filename']);
         } else {
             throw new Exception('The task to import has no files assigned');
@@ -573,11 +593,10 @@ final class Task extends Resource
 
     /**
      * mime detection for import files
-     * @param string $file
-     * @return string
      */
-    private function evaluateMime(string $file): string {
-        switch(pathinfo($file, PATHINFO_EXTENSION)){
+    private function evaluateMime(string $file): string
+    {
+        switch (pathinfo($file, PATHINFO_EXTENSION)) {
             case 'zip':
                 return 'application/zip';
             case 'csv':
@@ -586,7 +605,7 @@ final class Task extends Resource
             case 'xliff':
             case 'xlf':
             case 'xml':
-                 return 'application/xml';
+                return 'application/xml';
             default:
                 return 'text/plain';
         }
@@ -594,18 +613,18 @@ final class Task extends Resource
 
     /**
      * Adds or changes task-config.ini in a zip to enable adding configs via ::addTaskConfig for all upload formats
-     * @param string $zipPath
      * @throws Exception
      */
-    private function setTaskConfigsInZip(string $zipPath){
+    private function setTaskConfigsInZip(string $zipPath)
+    {
         $zip = new \ZipArchive();
-        if ($zip->open($zipPath) === true){
+        if ($zip->open($zipPath) === true) {
             // QUIRK: It seems normally a file in the top-level is found with /filename.extension but it seems it sometimes is found only without leading slash ?
-            $taskConfigContent = $zip->getFromName('/'.self::TASK_CONFIG_INI);
-            if($taskConfigContent === false){
+            $taskConfigContent = $zip->getFromName('/' . self::TASK_CONFIG_INI);
+            if ($taskConfigContent === false) {
                 $taskConfigContent = $zip->getFromName(self::TASK_CONFIG_INI);
             }
-            if($taskConfigContent !== false){
+            if ($taskConfigContent !== false) {
                 // there is already a task-config we have to overwrite
                 $taskConfig = new TaskConfigIni($taskConfigContent, $this->_importConfigs);
                 $zip->addFromString(self::TASK_CONFIG_INI, $taskConfig->getContents(), \ZipArchive::FL_OVERWRITE);
@@ -615,19 +634,18 @@ final class Task extends Resource
             }
             $zip->close();
         } else {
-            throw new Exception('Could not open zip \''.$zipPath.'\'');
+            throw new Exception('Could not open zip \'' . $zipPath . '\'');
         }
     }
 
     /**
-     * @param Helper $api
-     * @return void
      * @throws Exception
      * @throws Zend_Http_Client_Exception
      */
-    public function getAvaliableResources(Helper $api){
-        return $api->getJson('editor/languageresourcetaskassoc',[
-            'filter' => '[{"operator":"eq","value":"' . $this->getTaskGuid() . '","property":"taskGuid"}]'
+    public function getAvaliableResources(Helper $api): mixed
+    {
+        return $api->getJson('editor/languageresourcetaskassoc', [
+            'filter' => '[{"operator":"eq","value":"' . $this->getTaskGuid() . '","property":"taskGuid"}]',
         ]);
     }
 }

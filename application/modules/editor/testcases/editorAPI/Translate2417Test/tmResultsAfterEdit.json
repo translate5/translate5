@@ -1,9 +1,11 @@
 [
     {
         "target": "Aleks test tm update.",
+        "rawTarget": "Aleks test tm update.",
         "matchrate": 103,
         "source": "Across Language Server",
         "languageResourceType": "tm",
-        "state": "loaded"
+        "state": "loaded",
+        "timestamp": "TEST_TIMESTAMP"
     }
 ]

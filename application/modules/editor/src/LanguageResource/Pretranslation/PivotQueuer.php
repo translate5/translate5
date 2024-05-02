@@ -32,26 +32,32 @@ namespace MittagQI\Translate5\LanguageResource\Pretranslation;
 
 use editor_Models_Task;
 use editor_Task_Operation;
-use MittagQI\Translate5\PauseWorker\PauseWorker;
+use editor_Task_Operation_Exception;
 use MittagQI\Translate5\LanguageResource\TaskPivotAssociation;
+use MittagQI\Translate5\PauseWorker\PauseWorker;
+use ReflectionException;
+use Throwable;
 use Zend_Exception;
 use Zend_Registry;
 use ZfExtended_Authentication;
 use ZfExtended_EventManager;
+use ZfExtended_Exception;
 use ZfExtended_Factory;
+use ZfExtended_Models_Entity_NotFoundException;
 use ZfExtended_Models_User;
 use ZfExtended_Models_Worker;
+use ZfExtended_Worker_Behaviour_Default;
 
 /**
  * This will queue pivot pre-translation and batch(if needed) worker
  */
 class PivotQueuer
 {
-    /**
-     * @var ZfExtended_EventManager
-     */
     protected ZfExtended_EventManager $events;
 
+    /**
+     * @throws ReflectionException
+     */
     public function __construct()
     {
         $this->events = ZfExtended_Factory::get(
@@ -65,7 +71,11 @@ class PivotQueuer
      *
      * @param string $taskGuid
      *
-     * @throws Zend_Exception
+     * @throws ReflectionException
+     * @throws ZfExtended_Exception
+     * @throws Throwable
+     * @throws ZfExtended_Models_Entity_NotFoundException
+     * @throws editor_Task_Operation_Exception
      */
     public function queuePivotWorker(string $taskGuid): void
     {
@@ -82,26 +92,52 @@ class PivotQueuer
         if ($task->isImporting()) {
             //on import, we use the import worker as parentId
             $parentWorkerId = $this->fetchImportWorkerId($task->getTaskGuid());
+            // we do not set a worker-state, this is handled by the import-process
+            $this->doQueuePivotWorker($task, $assoc, $parentWorkerId, null);
         } else {
-            // crucial: add a different behaviour for the workers when performing an operation
-            $workerParameters['workerBehaviour'] = 'ZfExtended_Worker_Behaviour_Default';
             // this creates the operation start/finish workers
-            $parentWorkerId = editor_Task_Operation::create(
-                editor_Task_Operation::PIVOT_PRE_TRANSLATION,
-                $task
-            );
-        }
+            $operation = editor_Task_Operation::create(editor_Task_Operation::PIVOT_PRE_TRANSLATION, $task);
 
+            try {
+                $parentWorkerId = $operation->getWorkerId();
+                $workerState = ZfExtended_Models_Worker::STATE_PREPARE;
+                // add a different behaviour for the workers when performing an operation
+                $workerParameters = [
+                    'workerBehaviour' => ZfExtended_Worker_Behaviour_Default::class,
+                ];
+                // queue the worker
+                $this->doQueuePivotWorker($task, $assoc, $parentWorkerId, $workerState, $workerParameters);
+                // start operation
+                $operation->start();
+            } catch (Throwable $e) {
+                $operation->onQueueingError();
+
+                throw $e;
+            }
+        }
+    }
+
+    /**
+     * Queues the Pivot Worker
+     * @throws ReflectionException
+     * @throws ZfExtended_Exception
+     * @throws Zend_Exception
+     */
+    private function doQueuePivotWorker(
+        editor_Models_Task $task,
+        array $assoc,
+        int $parentWorkerId,
+        ?string $workerState,
+        array $workerParameters = []
+    ): void {
         $user = ZfExtended_Authentication::getInstance()->getUser();
 
         $workerParameters['userGuid'] = $user?->getUserGuid() ?? ZfExtended_Models_User::SYSTEM_GUID;
         $workerParameters['userName'] = $user?->getUserName() ?? ZfExtended_Models_User::SYSTEM_LOGIN;
 
-
         // enable batch query via config
         $workerParameters['batchQuery'] = $this->batchQueryEnabled();
         if ($workerParameters['batchQuery']) {
-
             // trigger event before the pivot pre-translation worker is queued
             $this->events->trigger(
                 'beforePivotPreTranslationQueue',
@@ -109,31 +145,30 @@ class PivotQueuer
                 [
                     'task' => $task,
                     'pivotAssociations' => $assoc,
-                    'parentWorkerId' => $parentWorkerId
+                    'parentWorkerId' => $parentWorkerId,
                 ]
             );
         }
 
-        /** @var PivotWorker $pivotWorker */
         $pivotWorker = ZfExtended_Factory::get(PivotWorker::class);
 
-        if (!$pivotWorker->init($taskGuid, $workerParameters)) {
-            $this->addWarn($task, 'Pivot pre-translation Error on worker init(). Worker could not be initialized');
-
-            return;
+        if (! $pivotWorker->init($task->getTaskGuid(), $workerParameters)) {
+            throw new ZfExtended_Exception(
+                'Pivot pre-translation Error on worker init(). Worker could not be initialized'
+            );
         }
 
         $worker = ZfExtended_Factory::get(PausePivotWorker::class);
-        $worker->init($task->getTaskGuid(), [PauseWorker::PROCESSOR => PausePivotProcessor::class]);
-        $worker->queue($parentWorkerId);
+        $worker->init($task->getTaskGuid(), [
+            PauseWorker::PROCESSOR => PausePivotProcessor::class,
+        ]);
+        $worker->queue($parentWorkerId, $workerState);
 
-        $pivotWorker->queue($parentWorkerId, null, false);
+        $pivotWorker->queue($parentWorkerId, $workerState, false);
     }
 
     /**
-     * @param string $taskGuid
-     *
-     * @return null|int
+     * @throws ReflectionException
      */
     private function fetchImportWorkerId(string $taskGuid): ?int
     {
@@ -146,7 +181,7 @@ class PivotQueuer
         );
 
         if (count($result) > 0) {
-            return (int)$result[0]['id'];
+            return (int) $result[0]['id'];
         }
 
         return 0;
@@ -168,8 +203,11 @@ class PivotQueuer
         $logger->warn('E1100', $message, $extra);
     }
 
+    /**
+     * @throws Zend_Exception
+     */
     private function batchQueryEnabled(): bool
     {
-        return (bool)Zend_Registry::get('config')->runtimeOptions->LanguageResources->Pretranslation->enableBatchQuery;
+        return (bool) Zend_Registry::get('config')->runtimeOptions->LanguageResources->Pretranslation->enableBatchQuery;
     }
 }

@@ -1,9 +1,9 @@
 <?php
 /*
  START LICENSE AND COPYRIGHT
- 
+
  This file is part of translate5
- 
+
  Copyright (c) 2013 - 2022 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
 
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
@@ -21,18 +21,17 @@
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
- 		     http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
- 
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+
  END LICENSE AND COPYRIGHT
  */
 
 use MittagQI\Translate5\Plugins\MatchAnalysis\Models\Pricing\Preset;
 use MittagQI\Translate5\Plugins\MatchAnalysis\Models\Pricing\PresetPrices;
-/**
- *
- */
-class editor_Plugins_MatchAnalysis_PricingpresetpricesController extends ZfExtended_RestController {
+use MittagQI\ZfExtended\MismatchException;
 
+class editor_Plugins_MatchAnalysis_PricingpresetpricesController extends ZfExtended_RestController
+{
     /**
      * Use trait
      */
@@ -57,10 +56,10 @@ class editor_Plugins_MatchAnalysis_PricingpresetpricesController extends ZfExten
 
     /**
      * @throws Zend_Db_Statement_Exception
-     * @throws ZfExtended_Mismatch
+     * @throws MismatchException
      */
-    public function init() {
-
+    public function init()
+    {
         // Call parent
         parent::init();
 
@@ -70,17 +69,17 @@ class editor_Plugins_MatchAnalysis_PricingpresetpricesController extends ZfExten
 
     /**
      * @throws Zend_Db_Statement_Exception
-     * @throws ZfExtended_Mismatch
+     * @throws MismatchException
      */
-    public function indexAction() {
-
+    public function indexAction()
+    {
         // Check presetId-param
         $_ = $this->jcheck([
             'presetId' => [
                 'req' => true,
                 'rex' => 'int11',
-                'key' => Preset::class
-            ]
+                'key' => Preset::class,
+            ],
         ]);
 
         // Get ranges dict and prices
@@ -89,7 +88,7 @@ class editor_Plugins_MatchAnalysis_PricingpresetpricesController extends ZfExten
 
         // Add to response
         $this->view->metaData = $cols;
-        $this->view->rows     = $rows;
+        $this->view->rows = $rows;
 
         // Get total
         $this->view->total = count($this->view->rows);
@@ -102,26 +101,24 @@ class editor_Plugins_MatchAnalysis_PricingpresetpricesController extends ZfExten
      * @throws ZfExtended_Models_Entity_Exceptions_IntegrityConstraint
      * @throws ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey
      */
-    public function cloneAction() {
-
+    public function cloneAction()
+    {
         // Check params
         try {
-
             // Check `match_analysis_pricing_preset_prices`-record we're going to clone - does exist
             $this->jcheck([
                 'priceId' => [
                     'req' => true,
                     'rex' => 'int11',
                     'key' => $this->entity,
-                ]
+                ],
             ]);
 
             // Get combinations
             $validPairs = $this->_validPairs($this->entity->getPresetId());
 
-        // Catch mismatch-exception
-        } catch (ZfExtended_Mismatch $e) {
-
+            // Catch mismatch-exception
+        } catch (MismatchException $e) {
             // Flush msg
             $this->jflush(false, $e->getMessage());
         }
@@ -130,7 +127,9 @@ class editor_Plugins_MatchAnalysis_PricingpresetpricesController extends ZfExten
         $append = $this->entity->cloneFor($validPairs);
 
         // Do clone
-        $this->jflush(true, ['append' => $append]);
+        $this->jflush(true, [
+            'append' => $append,
+        ]);
     }
 
     /**
@@ -139,26 +138,27 @@ class editor_Plugins_MatchAnalysis_PricingpresetpricesController extends ZfExten
      * means there are no records already existing for any of valid pairs and
      * pairs does not same $source and $target within one pair
      *
-     * @param $presetId
      * @return array
      * @throws Zend_Db_Statement_Exception
-     * @throws ZfExtended_Mismatch
+     * @throws MismatchException
      */
-    private function _validPairs($presetId) {
-
+    private function _validPairs($presetId)
+    {
         // Get array of all `match_analysis_pricing_preset_prices`-records for a given presetId
         $_ = $this->jcheck([
             'presetId' => [
                 'req' => true,
                 'rex' => 'int11',
                 'key' => 'match_analysis_pricing_preset_prices.presetId*',
-            ]
-        ], ['presetId' => $presetId]);
+            ],
+        ], [
+            'presetId' => $presetId,
+        ]);
 
         // Get all source and target language ids pairs from there
         $done = [];
         foreach ($_['presetId'] as $prices) {
-            $done []= "{$prices['sourceLanguageId']}-{$prices['targetLanguageId']}";
+            $done[] = "{$prices['sourceLanguageId']}-{$prices['targetLanguageId']}";
         }
 
         // Validate sourceLanguageIds and targetLanguageIds params
@@ -166,8 +166,8 @@ class editor_Plugins_MatchAnalysis_PricingpresetpricesController extends ZfExten
             'sourceLanguageIds,targetLanguageIds' => [
                 'req' => "true:Please specify at least one language",
                 'rex' => 'int11list',
-                'key' => 'LEK_languages+'
-            ]
+                'key' => 'LEK_languages+',
+            ],
         ]);
 
         // Get list of source and target language ids combinations for which clones are planned to be created
@@ -176,13 +176,13 @@ class editor_Plugins_MatchAnalysis_PricingpresetpricesController extends ZfExten
         foreach ($sourceLanguageIds as $sourceLanguageId) {
             foreach ($targetLanguageIds as $targetLanguageId) {
                 if ($sourceLanguageId != $targetLanguageId) {
-                    $plan []= "$sourceLanguageId-$targetLanguageId";
+                    $plan[] = "$sourceLanguageId-$targetLanguageId";
                 }
             }
         }
 
         // Deduct combinations for which prices-records already exist
-        if (!$todo = array_diff($plan, $done)) {
+        if (! $todo = array_diff($plan, $done)) {
             $this->jflush(false, 'Pricing-records already exist for all combinations of languages you specified');
         }
 
@@ -198,18 +198,17 @@ class editor_Plugins_MatchAnalysis_PricingpresetpricesController extends ZfExten
      * @throws ZfExtended_Models_Entity_Exceptions_IntegrityConstraint
      * @throws ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey
      */
-    public function postAction() {
-
+    public function postAction()
+    {
         // Check params
         try {
-
             // Check both params are pointing each to existing record
             $_ = $this->jcheck([
                 'presetId' => [
                     'req' => true,
                     'rex' => 'int11',
-                    'key' => Preset::class
-                ]
+                    'key' => Preset::class,
+                ],
             ]);
 
             // If this preset is system default
@@ -220,15 +219,13 @@ class editor_Plugins_MatchAnalysis_PricingpresetpricesController extends ZfExten
             // Get combinations
             $validPairs = $this->_validPairs($presetId = $_['presetId']->getId());
 
-        // Catch mismatch-exception
-        } catch (ZfExtended_Mismatch $e) {
-
+            // Catch mismatch-exception
+        } catch (MismatchException $e) {
             // Flush msg
             $this->jflush(false, $e->getMessage());
 
-        // Catch matchanalysis-exception
+            // Catch matchanalysis-exception
         } catch (editor_Plugins_MatchAnalysis_Exception $e) {
-
             // Log
             Zend_Registry::get('logger')
                 ->cloneMe('plugin.matchanalysis')
@@ -242,24 +239,26 @@ class editor_Plugins_MatchAnalysis_PricingpresetpricesController extends ZfExten
         $append = $this->entity->createFor($presetId, $validPairs);
 
         // Do clone
-        $this->jflush(true, ['append' => $append]);
+        $this->jflush(true, [
+            'append' => $append,
+        ]);
     }
 
     /**
      * Delete prices for certain language
      *
      * @throws Zend_Db_Statement_Exception
-     * @throws ZfExtended_Mismatch
+     * @throws MismatchException
      */
-    public function deleteAction() {
-
+    public function deleteAction()
+    {
         // Check preset exists, and if yes - load into $this->entity
         $this->jcheck([
             'pricesId' => [
                 'req' => true,
                 'rex' => 'int11',
-                'key' => $this->entity
-            ]
+                'key' => $this->entity,
+            ],
         ]);
 
         // Prompt client-side confirmation
@@ -275,11 +274,10 @@ class editor_Plugins_MatchAnalysis_PricingpresetpricesController extends ZfExten
     /**
      * Update entry's currency and/or prices
      */
-    public function putAction() {
-
+    public function putAction()
+    {
         // Check params
         try {
-
             // Check whether `match_analysis_pricing_preset_prices`-record we're going to amend - does exist
             $_ = $this->jcheck([
                 'pricesId' => [
@@ -289,11 +287,11 @@ class editor_Plugins_MatchAnalysis_PricingpresetpricesController extends ZfExten
                 ],
                 'currency' => [
                     'req' => $this->hasParam('currency'),
-                    'rex' => '~^[a-zA-Z0-9\$€£¥]{1,3}$~u'
+                    'rex' => '~^[a-zA-Z0-9\$€£¥]{1,3}$~u',
                 ],
                 'noMatch' => [
-                    'rex' => 'decimal154'
-                ]
+                    'rex' => 'decimal154',
+                ],
             ]);
 
             // Get all `match_analysis_pricing_preset_range`-records array for a preset
@@ -302,7 +300,7 @@ class editor_Plugins_MatchAnalysis_PricingpresetpricesController extends ZfExten
                     'req' => true,
                     'rex' => 'int11',
                     'key' => 'match_analysis_pricing_preset_range.presetId*',
-                ]
+                ],
             ], $this->entity);
 
             // Get ids of languages for which prices are already defined
@@ -313,15 +311,13 @@ class editor_Plugins_MatchAnalysis_PricingpresetpricesController extends ZfExten
 
             // Check prices
             foreach ($rangeIdA as $rangeId) {
-
                 // If request has such param
                 if ($this->hasParam($param = 'range' . $rangeId)) {
-
                     // Check param
                     $this->jcheck([
                         $param => [
-                            'rex' => 'decimal154'
-                        ]
+                            'rex' => 'decimal154',
+                        ],
                     ]);
 
                     // Overwrite value
@@ -338,9 +334,8 @@ class editor_Plugins_MatchAnalysis_PricingpresetpricesController extends ZfExten
                 $this->entity->setNoMatch($this->getParam('noMatch'));
             }
 
-        // Catch mismatch-exception
-        } catch (ZfExtended_Mismatch $e) {
-
+            // Catch mismatch-exception
+        } catch (MismatchException $e) {
             // Flush msg
             $this->jflush(false, $e->getMessage());
         }

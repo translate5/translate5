@@ -21,7 +21,7 @@
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
- 		     http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
  END LICENSE AND COPYRIGHT
  */
@@ -33,17 +33,16 @@ use MittagQI\ZfExtended\Controller\Response\Header;
  *
  * @property editor_Plugins_Okapi_Bconf_Entity $entity
  */
-class editor_Plugins_Okapi_BconfController extends ZfExtended_RestController {
-
+class editor_Plugins_Okapi_BconfController extends ZfExtended_RestController
+{
     /**
      * The param-name of the sent bconf
      * @var string
      */
-    const FILE_UPLOAD_NAME = 'bconffile';
+    public const FILE_UPLOAD_NAME = 'bconffile';
 
     /**
      * Should the data post/put param be decoded to associative array
-     * @var bool
      */
     protected bool $decodePutAssociative = true;
 
@@ -62,12 +61,13 @@ class editor_Plugins_Okapi_BconfController extends ZfExtended_RestController {
      * (non-PHPdoc)
      * @see ZfExtended_RestController::indexAction()
      */
-    public function indexAction() {
+    public function indexAction()
+    {
         $this->view->rows = $this->entity->getGridRows();
         $this->view->total = count($this->view->rows);
         // auto-import of default-bconf: when there are no rows we can assume the feature was just installed and the DB is empty
         // then we automatically add the system default bconf
-        if($this->view->total < 1){
+        if ($this->view->total < 1) {
             $this->entity->importDefaultWhenNeeded();
             $this->view->rows = $this->entity->getGridRows();
             $this->view->total = count($this->view->rows);
@@ -77,7 +77,8 @@ class editor_Plugins_Okapi_BconfController extends ZfExtended_RestController {
     /**
      * Overwritten to add the custom-extensions
      */
-    public function getAction(){
+    public function getAction()
+    {
         parent::getAction();
         $this->view->rows->customExtensions = $this->entity->findCustomFilterExtensions(); // needed to match the grids data model
     }
@@ -85,7 +86,8 @@ class editor_Plugins_Okapi_BconfController extends ZfExtended_RestController {
     /**
      * Export bconf
      */
-    public function downloadbconfAction() {
+    public function downloadbconfAction()
+    {
         $this->entityLoadAndRepack();
         Header::sendDownload(
             $this->entity->getDownloadFilename(),
@@ -97,9 +99,10 @@ class editor_Plugins_Okapi_BconfController extends ZfExtended_RestController {
         exit;
     }
 
-    public function uploadbconfAction() {
+    public function uploadbconfAction()
+    {
         $ret = new stdClass();
-        if(empty($_FILES)){
+        if (empty($_FILES)) {
             throw new ZfExtended_ErrorCodeException('E1212', [
                 'msg' => "No upload files were found. Please try again. If the error persists, please contact the support.",
             ]);
@@ -108,19 +111,19 @@ class editor_Plugins_Okapi_BconfController extends ZfExtended_RestController {
         $name = $this->getParam('name');
         $description = $this->getParam('description');
         $customerId = $this->getParam('customerId');
-        if($name == NULL){
+        if ($name == null) {
             $name = pathinfo($postFile['name'], PATHINFO_FILENAME);
         }
-        if($description == NULL){
+        if ($description == null) {
             $description = '';
         }
-        if($customerId != NULL){
+        if ($customerId != null) {
             $customerId = intval($customerId);
         }
         $bconf = new editor_Plugins_Okapi_Bconf_Entity();
         $bconf->import($postFile['tmp_name'], $name, $description, $customerId);
 
-        $this->view->success = !empty($bconf->getId());
+        $this->view->success = ! empty($bconf->getId());
         $this->view->id = $bconf->getId();
     }
 
@@ -131,15 +134,16 @@ class editor_Plugins_Okapi_BconfController extends ZfExtended_RestController {
      * @throws ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey
      * @throws editor_Plugins_Okapi_Exception
      */
-    public function cloneAction() {
+    public function cloneAction()
+    {
         $this->entityLoadAndRepack();
         $name = $this->getParam('name');
         $description = $this->getParam('description');
         $customerId = $this->getParam('customerId');
-        if($description == NULL){
+        if ($description == null) {
             $description = '';
         }
-        if($customerId != NULL){
+        if ($customerId != null) {
             $customerId = intval($customerId);
         }
         $clone = new editor_Plugins_Okapi_Bconf_Entity();
@@ -147,7 +151,7 @@ class editor_Plugins_Okapi_BconfController extends ZfExtended_RestController {
         $returnData = $clone->toArray();
         $returnData['customExtensions'] = $clone->findCustomFilterExtensions(); // needed to match the grids data model
 
-        foreach($returnData as $key => $val){
+        foreach ($returnData as $key => $val) {
             $this->view->$key = $val;
         }
     }
@@ -158,10 +162,11 @@ class editor_Plugins_Okapi_BconfController extends ZfExtended_RestController {
      * @throws ZfExtended_UnprocessableEntity
      * @throws editor_Plugins_Okapi_Exception
      */
-    public function downloadsrxAction() {
+    public function downloadsrxAction()
+    {
         $this->entityLoadAndRepack();
         $srx = $this->entity->getSrx($this->getParam('purpose'));
-        $downloadFilename = editor_Utils::filenameFromUserText($this->entity->getName(), false).'-'.$srx->getFile();
+        $downloadFilename = editor_Utils::filenameFromUserText($this->entity->getName(), false) . '-' . $srx->getFile();
         $srx->download($downloadFilename);
         exit;
     }
@@ -173,8 +178,9 @@ class editor_Plugins_Okapi_BconfController extends ZfExtended_RestController {
      * - the sent name is a real custom srx and we need to validate it & change the name
      * @throws editor_Plugins_Okapi_Exception|Zend_Exception
      */
-    public function uploadsrxAction() {
-        if(empty($_FILES)){
+    public function uploadsrxAction()
+    {
+        if (empty($_FILES)) {
             throw new editor_Plugins_Okapi_Exception('E1212', [
                 'msg' => "No upload files were found. Please try again. If the error persists, please contact the support.",
             ]);
@@ -191,15 +197,29 @@ class editor_Plugins_Okapi_BconfController extends ZfExtended_RestController {
      * @throws ZfExtended_Models_Entity_Exceptions_IntegrityConstraint
      * @throws ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey
      */
-    public function setdefaultAction(){
+    public function setdefaultAction()
+    {
         $this->entityLoad();
         $this->view->oldId = $this->entity->setAsDefaultBconf();
     }
 
     /**
+     * Helper to check if a Bconf supports a specific extension
+     */
+    public function filetypesupportAction()
+    {
+        $this->entityLoad();
+        $extension = $this->getParam('extension');
+        $this->view->success = false;
+        if (! empty($extension) && $this->entity->getExtensionMapping()->hasExtension(strtolower($extension))) {
+            $this->view->success = true;
+            $this->view->extension = strtolower($extension);
+        }
+    }
+
+    /**
      * Helper to load the entity and repack it if the bconf is outdated
      * This is needed to avoid outdated stuff leaving the system or being cloned
-     * @return void
      * @throws Zend_Db_Statement_Exception
      * @throws ZfExtended_Models_Entity_Exceptions_IntegrityConstraint
      * @throws ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey

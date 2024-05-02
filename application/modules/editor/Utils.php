@@ -3,33 +3,35 @@
 START LICENSE AND COPYRIGHT
 
  This file is part of translate5
- 
+
  Copyright (c) 2013 - 2021 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
 
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
  This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
- as published by the Free Software Foundation and appearing in the file agpl3-license.txt 
- included in the packaging of this file.  Please review the following information 
+ as published by the Free Software Foundation and appearing in the file agpl3-license.txt
+ included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
-  
+
  There is a plugin exception available for use with this release of translate5 for
- translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or
  plugin-exception.txt in the root folder of translate5.
-  
+
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
 
-/* 
- */
-class editor_Utils {
+use MittagQI\ZfExtended\MismatchException;
 
+/*
+ */
+class editor_Utils
+{
     /**
      * Regular expressions patterns for common usage
      *
@@ -94,8 +96,6 @@ class editor_Utils {
 
     /**
      * Array of prompt answers
-     *
-     * @var array
      */
     public static array $answer = [];
 
@@ -106,21 +106,101 @@ class editor_Utils {
      * @var array
      */
     private static $asciiMap = [
-        'Ä' => 'ae', 'Ü' => 'ue', 'Ö' => 'oe', 'ä' => 'ae', 'ü' => 'ue', 'ö' => 'oe', 'ß' => 'ss', 'Þ' => 'th', 'þ' => 'th', 'Ð' => 'dh', 'ð' => 'dh', 'Œ' => 'oe', 'œ' => 'oe', 'Æ' => 'ae', 'æ' => 'ae', 'µ' => 'u', 'Š' => 's', 'Ž' => 'z', 'š' => 's',
-        'ž' => 'z', 'Ÿ' => 'y', 'À' => 'a', 'Á' => 'a', 'Â' => 'a', 'Ã' => 'a', 'Å' => 'a', 'Ç' => 'c', 'Č' => 'c', 'È' => 'e', 'É' => 'e', 'Ê' => 'e', 'Ë' => 'e', 'Ì' => 'i', 'Í' => 'i', 'Î' => 'i', 'Ï' => 'i', 'Ñ' => 'n', 'Ò' => 'o', 'Ó' => 'o',
-        'Ô' => 'o', 'Õ' => 'o', 'Ø' => 'o', 'Ù' => 'u', 'Ú' => 'u', 'Û' => 'u', 'Ů' => 'u', 'Ý' => 'y', 'à' => 'a', 'á' => 'a', 'â' => 'a', 'ã' => 'a', 'å' => 'a', 'ç' => 'c', 'č' => 'c', 'è' => 'e', 'é' => 'e', 'ê' => 'e', 'ë' => 'e', 'ì' => 'i',
-        'í' => 'i', 'î' => 'i', 'ï' => 'i', 'ñ' => 'n', 'ò' => 'o', 'ó' => 'o', 'ô' => 'o', 'õ' => 'o', 'ø' => 'o', 'ù' => 'u', 'ů' => 'u', 'û' => 'u', 'û' => 'u', 'ý' => 'y', 'ÿ' => 'y',
-        '(' => '-', ')' => '-', '+' => 'plus', '&' => 'and', '#' => '-', '?' => '' ];
+        'Ä' => 'ae',
+        'Ü' => 'ue',
+        'Ö' => 'oe',
+        'ä' => 'ae',
+        'ü' => 'ue',
+        'ö' => 'oe',
+        'ß' => 'ss',
+        'Þ' => 'th',
+        'þ' => 'th',
+        'Ð' => 'dh',
+        'ð' => 'dh',
+        'Œ' => 'oe',
+        'œ' => 'oe',
+        'Æ' => 'ae',
+        'æ' => 'ae',
+        'µ' => 'u',
+        'Š' => 's',
+        'Ž' => 'z',
+        'š' => 's',
+        'ž' => 'z',
+        'Ÿ' => 'y',
+        'À' => 'a',
+        'Á' => 'a',
+        'Â' => 'a',
+        'Ã' => 'a',
+        'Å' => 'a',
+        'Ç' => 'c',
+        'Č' => 'c',
+        'È' => 'e',
+        'É' => 'e',
+        'Ê' => 'e',
+        'Ë' => 'e',
+        'Ì' => 'i',
+        'Í' => 'i',
+        'Î' => 'i',
+        'Ï' => 'i',
+        'Ñ' => 'n',
+        'Ò' => 'o',
+        'Ó' => 'o',
+        'Ô' => 'o',
+        'Õ' => 'o',
+        'Ø' => 'o',
+        'Ù' => 'u',
+        'Ú' => 'u',
+        'Û' => 'u',
+        'Ů' => 'u',
+        'Ý' => 'y',
+        'à' => 'a',
+        'á' => 'a',
+        'â' => 'a',
+        'ã' => 'a',
+        'å' => 'a',
+        'ç' => 'c',
+        'č' => 'c',
+        'è' => 'e',
+        'é' => 'e',
+        'ê' => 'e',
+        'ë' => 'e',
+        'ì' => 'i',
+        'í' => 'i',
+        'î' => 'i',
+        'ï' => 'i',
+        'ñ' => 'n',
+        'ò' => 'o',
+        'ó' => 'o',
+        'ô' => 'o',
+        'õ' => 'o',
+        'ø' => 'o',
+        'ù' => 'u',
+        'ů' => 'u',
+        'û' => 'u',
+        'û' => 'u',
+        'ý' => 'y',
+        'ÿ' => 'y',
+        '(' => '-',
+        ')' => '-',
+        '+' => 'plus',
+        '&' => 'and',
+        '#' => '-',
+        '?' => '',
+    ];
+
     /**
      * List of "funny" (unusual) whitespace characters in Hex-notation. These Characters usually are treated as normal whitespace and need to be replaced e.g. when segmenting the visual review files
      * @var array
      */
     private static $whitespaceChars = [
-        '\u0009', //Hex UTF-8 bytes or codepoint of horizontal tab 	
-        '\u000B', //Hex UTF-8 bytes or codepoint of vertical tab 
-        '\u000C', //Hex UTF-8 bytes or codepoint of page feed 
-        '\u0085', //Hex UTF-8 bytes or codepoint of control sign for next line 
-        '\u00A0', //Hex UTF-8 bytes or codepoint of protected space  
+        '\u0009', //Hex UTF-8 bytes or codepoint of horizontal tab
+        '\u000B', //Hex UTF-8 bytes or codepoint of vertical tab
+
+        '\u000C', //Hex UTF-8 bytes or codepoint of page feed
+
+        '\u0085', //Hex UTF-8 bytes or codepoint of control sign for next line
+
+        '\u00A0', //Hex UTF-8 bytes or codepoint of protected space
         '\u1680', //Hex UTF-8 bytes or codepoint of Ogam space  
         '\u180E', //Hex UTF-8 bytes or codepoint of mongol vocal divider ᠎
         '\u2028', //Hex UTF-8 bytes or codepoint of line separator
@@ -145,8 +225,9 @@ class editor_Utils {
         '\u200C', // ‌
         '\u200D', // ‍
         '\u200E', // ‎
-        '\u200F' // ‏
+        '\u200F', // ‏
     ];
+
     /**
      * List of Ligatures with their Ascii replacements in Hex-notation
      * See: https://en.wikipedia.org/wiki/Typographic_ligature#Ligatures_in_Unicode_.28Latin_alphabets.29
@@ -187,6 +268,7 @@ class editor_Utils {
         '\uA760' => 'VY', // Ꝡ
         '\uA761' => 'vy', // ꝡ
     ];
+
     /**
      * List of Digraphs with their Ascii replacements in Hex-notation
      * See https://en.wikipedia.org/wiki/Digraph_(orthography)#In_Unicode
@@ -208,40 +290,44 @@ class editor_Utils {
         '\u01CB' => 'Nj', // ǋ
         '\u01CC' => 'nj', // ǌ
     ];
+
     /**
      * Ascifies a string
      * The string may still contains UTF chars after the conversion, this is just a "first step" ...
      * @param string $name
      * @return string
      */
-    public static function asciify($name){
+    public static function asciify($name)
+    {
         $name = trim($name);
         $name = strtr($name, self::$asciiMap);
-        $name = preg_replace(array('/\s/', '/\.[\.]+/', '/[^\w_\.\-]/'), array('-', '.', ''), $name);
+        $name = preg_replace(['/\s/', '/\.[\.]+/', '/[^\w_\.\-]/'], ['-', '.', ''], $name);
+
         return trim(preg_replace('/[\-]+/i', '-', $name), '-');
     }
+
     /**
      * A replacement for escapeshellarg that does NOT do any locale-specific UTF-8 stripping
-     * 
+     *
      * escapeshellarg() adds single quotes around a string and quotes/escapes any existing single quotes allowing you to pass a string directly to a shell function and having it be treated as a single safe argument. This function should be used to escape individual arguments to shell functions coming from user input.
      * The shell functions include exec(), system() and the backtick operator.
      *
-     * On Windows, escapeshellarg() instead replaces percent signs, exclamation marks (delayed variable substitution) and double quotes with spaces and adds double quotes around the string. 
-     * Furthermore, each streak of consecutive backslashes (\) is escaped by one additional backslash. 
-     *
-     * @param string $command
-     * @return string
+     * On Windows, escapeshellarg() instead replaces percent signs, exclamation marks (delayed variable substitution) and double quotes with spaces and adds double quotes around the string.
+     * Furthermore, each streak of consecutive backslashes (\) is escaped by one additional backslash.
      */
-    public static function escapeshellarg(string $command) : string {
-        // Windows specific escaping: remove 
-        if(PHP_OS_FAMILY == 'Windows'){
+    public static function escapeshellarg(string $command): string
+    {
+        // Windows specific escaping: remove
+        if (PHP_OS_FAMILY == 'Windows') {
             // QUIRK: on windows the PHP implementation is used since I cannot test the result.
             // TODO/FIXME: Replicate Windows logic if neccessary / if the UTF-8 stripping happens on Windows too
             return escapeshellarg($command);
         }
+
         // UNIX specific escaping: only Ticks
-        return "'".implode("'\''", explode("'", $command))."'";
+        return "'" . implode("'\''", explode("'", $command)) . "'";
     }
+
     /**
      * Generates a websafe filename out of any string
      * This may includes the extension
@@ -251,7 +337,8 @@ class editor_Utils {
      * @param string $name
      * @return string
      */
-    public static function secureFilename($name, $forceLowercase=true){
+    public static function secureFilename($name, $forceLowercase = true)
+    {
         // first, some ASCII transformations, remove leading & trailing dots
         $name = trim(self::asciify($name), '.');
         // now replace any special chars and lowercase (if wanted)
@@ -259,23 +346,24 @@ class editor_Utils {
             preg_replace('/%[0-9a-z][0-9a-z]/', '', strtolower(urlencode($name)))
             : preg_replace('/%[0-9A-Za-z][0-9A-Za-z]/', '', urlencode($name));
         // replace multiple dashes with a single one
-        $name = preg_replace('/-{2,}/', '-',  $name);
+        $name = preg_replace('/-{2,}/', '-', $name);
+
         return $name;
     }
 
     /**
      * Helper to turn names/escriptions into usable, re-identifiable filenames
      * As an seperator either dashes "-" or underscores "_" are used
-     * @param $text
      * @param bool $useDashes
-     * @return string
      */
-    public static function filenameFromUserText($text, $useDashes=true) : string {
+    public static function filenameFromUserText($text, $useDashes = true): string
+    {
         $seperator = $useDashes ? '-' : '_';
         $replaceSeperator = $useDashes ? '_' : '-';
         $text = preg_replace('/\s+/', $seperator, $text);
         // normalize seperator, remove any dots to create proper filenames/extensions
         $text = str_replace($replaceSeperator, $seperator, str_replace('.', '', $text));
+
         return static::secureFilename($text);
     }
 
@@ -283,21 +371,20 @@ class editor_Utils {
      * Helper to turn upload filenames into usable, re-identifiable filenames
      * As an seperator either dashes "-" or underscores "_" are used
      * Filecopy-indices like (1) are removed
-     * @param $text
      * @param bool $useDashes
-     * @return string
      */
-    public static function filenameFromUploadName($uploadName, $useDashes=true) : string {
+    public static function filenameFromUploadName($uploadName, $useDashes = true): string
+    {
         $uploadName = preg_replace('/\([0-9]+\)/', '', $uploadName);
+
         return static::filenameFromUserText($uploadName, $useDashes);
     }
 
     /**
      * Checks, if a filename is secure
-     * @param string $fileName
-     * @return bool
      */
-    public static function isSecureFilename(string $fileName) : bool {
+    public static function isSecureFilename(string $fileName): bool
+    {
         return preg_match('/^[a-zA-Z0-9\-_][a-zA-Z0-9\-_\.]*[a-zA-Z0-9\-_]$/', $fileName);
     }
 
@@ -312,7 +399,7 @@ class editor_Utils {
      */
     public static function compareImportStyleFileName(string $file1, string $file2): bool
     {
-        return explode('.',$file1)[0] === explode('.',$file2)[0];
+        return explode('.', $file1)[0] === explode('.', $file2)[0];
     }
 
     /**
@@ -321,43 +408,70 @@ class editor_Utils {
      * @param string $replacement
      * @return string
      */
-    public static function normalizeWhitespace($text, $replacement=' '){
+    public static function normalizeWhitespace($text, $replacement = ' ')
+    {
         return preg_replace('/\s+/', $replacement, self::replaceFunnyWhitespace($text, $replacement));
     }
+
+    /**
+     * Turns all "programmers" quotes to typographical ones
+     */
+    public static function typographizeQuotes(string $text, string $languageIso5646 = null): string
+    {
+        $text = str_replace("'", '’', stripslashes($text));
+        $pStart = (substr($languageIso5646, 0, 2) === 'de') ? '„' : '“'; // adjustments for german text
+        $text = str_replace('"', $pStart, $text);
+        $text = str_replace($pStart . ' ', '” ', $text);
+        if (str_ends_with($text, $pStart)) {
+            return substr($text, 0, -1) . '”';
+        }
+
+        return $text;
+    }
+
     /**
      * Replaces all funny whitespace chars (characters representing whitespace that are no blanks " ") with the replacement (default: single blank)
      * @param string $text
      * @param string $replacement
      * @return string
      */
-    public static function replaceFunnyWhitespace($text, $replacement=' '){
-        foreach(self::$whitespaceChars as $wsc){
-            $text = str_replace(json_decode('"'.$wsc.'"'), $replacement, $text);
+    public static function replaceFunnyWhitespace($text, $replacement = ' ')
+    {
+        foreach (self::$whitespaceChars as $wsc) {
+            $text = str_replace(json_decode('"' . $wsc . '"'), $replacement, $text);
         }
+
         return $text;
     }
+
     /**
      * Replaces Ligatures with their ascii-representation in text
      * @param string $text
      * @return string
      */
-    public static function replaceLigatures($text){
-        foreach(self::$ligatures as $ligature => $replacement){
-            $text = str_replace(json_decode('"'.$ligature.'"'), $replacement, $text);
+    public static function replaceLigatures($text)
+    {
+        foreach (self::$ligatures as $ligature => $replacement) {
+            $text = str_replace(json_decode('"' . $ligature . '"'), $replacement, $text);
         }
+
         return $text;
     }
+
     /**
      * Replaces Digraphs with their ascii-representation in text
      * @param string $text
      * @return string
      */
-    public static function replaceDigraphs($text){
-        foreach(self::$digraphs as $digraph => $replacement){
-            $text = str_replace(json_decode('"'.$digraph.'"'), $replacement, $text);
+    public static function replaceDigraphs($text)
+    {
+        foreach (self::$digraphs as $digraph => $replacement) {
+            $text = str_replace(json_decode('"' . $digraph . '"'), $replacement, $text);
         }
+
         return $text;
     }
+
     /**
      * splits the text up into HTML tags / entities on one side and plain text on the other side
      * The order in the array is important for the following wordBreakUp, since there are HTML tags and entities ignored.
@@ -367,9 +481,11 @@ class editor_Utils {
      * @param string $text
      * @return array $text
      */
-    public static  function tagBreakUp($text,$tagRegex='/(<[^<>]*>|&[^;]+;)/'){
-        return preg_split($tagRegex, $text, flags:  PREG_SPLIT_DELIM_CAPTURE);
+    public static function tagBreakUp($text, $tagRegex = '/(<[^<>]*>|&[^;]+;)/')
+    {
+        return preg_split($tagRegex, $text, flags: PREG_SPLIT_DELIM_CAPTURE);
     }
+
     /**
      * Zerlegt die Wortteile des segment-Arrays anhand der Wortgrenzen in ein Array,
      * welches auch die Worttrenner als jeweils eigene Arrayelemente enthält
@@ -380,10 +496,11 @@ class editor_Utils {
      * @param array $segment
      * @return array $segment
      */
-    public static function wordBreakUp($segment){
+    public static function wordBreakUp($segment)
+    {
         $config = Zend_Registry::get('config');
         $regexWordBreak = $config->runtimeOptions->editor->export->wordBreakUpRegex;
-        
+
         //by adding the count($split) and the $i++ only the array entries containing text (no tags) are parsed
         //this implies that only tagBreakUp may be called before and
         // no other array structure manipulating method may be called between tagBreakUp and wordBreakUp!!!
@@ -392,14 +509,13 @@ class editor_Utils {
             array_splice($segment, $i, 1, $split);
             $i = $i + count($split);
         }
+
         return $segment;
     }
 
     /**
      * Turns "real" newlines to purely visual ones "↵"
      * Note, that this method changes the string!!
-     * @param string $text
-     * @return string
      */
     public static function visualizeNewlines(string $text): string
     {
@@ -407,6 +523,7 @@ class editor_Utils {
         $text = str_replace("\r\n", "\n", $text);
         // replace orphan carriage returns
         $text = str_replace("\r", "\n", $text);
+
         // visualize them
         return str_replace("\n", '↵', $text);
     }
@@ -415,19 +532,17 @@ class editor_Utils {
      * Ensures the definedfields are arrays in the given assoc data
      * This will convert a string to an array, an empty string to an empty array, a missing param to an empty array (set force to false to avoid this)
      * Note, that types other than array/string will also result in an empty array
-     * @param array $data
-     * @param array $fields
-     * @param bool $force
      */
-    public static function ensureFieldsAreArrays(array &$data, array $fields, bool $force=true){
-        foreach($fields as $field){
-            if(array_key_exists($field, $data)){
-                if(is_string($data[$field])){
+    public static function ensureFieldsAreArrays(array &$data, array $fields, bool $force = true)
+    {
+        foreach ($fields as $field) {
+            if (array_key_exists($field, $data)) {
+                if (is_string($data[$field])) {
                     $data[$field] = ($data[$field] === '') ? [] : [$data[$field]];
-                } else if(!is_array($data[$field])){
+                } elseif (! is_array($data[$field])) {
                     $data[$field] = [];
                 }
-            } else if($force){
+            } elseif ($force) {
                 $data[$field] = [];
             }
         }
@@ -454,7 +569,7 @@ class editor_Utils {
      *    ]);
      *
      * In most cases this method does not return any value, unless there are 'key', 'ext' or 'rex' == 'json' rules used for any of props.
-     * If any validation failed, the ZfExtended_Mismatch exception is thrown immediately.
+     * If any validation failed, an MismatchException exception is thrown immediately.
      * Currently supported rule names and their possible values are:
      *  'req' - Required. If rule value is truly - then prop value is required, e.g. should have non-zero length.
      *  'rex' - Regular expression. Prop value should match regular expression. Rule value can be raw expression
@@ -503,285 +618,280 @@ class editor_Utils {
      *          to return value under $_['propNameX'] mapping
      *
      * Todo: Add support for 'min' and 'max' rules, that would work for file sizes
-     * @param $ruleA
      * @param array|stdClass|ZfExtended_Models_Entity_Abstract $data Data to checked
      * @return array
+     * @throws MismatchException
+     * @throws ReflectionException
      * @throws Zend_Db_Statement_Exception
-     * @throws ZfExtended_Mismatch
      */
-    public static function jcheck($ruleA, $data) {
-
+    public static function jcheck($ruleA, $data)
+    {
         // Declare $rowA array
         $rowA = [];
 
         // If $data is an object
         if (is_object($data)) {
-
             // If $data arg is a model instance - convert it to array
-            if (is_subclass_of($data, 'ZfExtended_Models_Entity_Abstract')) $data = $data->toArray();
+            if (is_subclass_of($data, 'ZfExtended_Models_Entity_Abstract')) {
+                $data = $data->toArray();
+            }
 
             // Else if $data arg is an instance of stdClass - convert it to array as well
-            else if ($data instanceof stdClass) $data = (array) $data;
+            elseif ($data instanceof stdClass) {
+                $data = (array) $data;
+            }
         }
 
         // Foreach prop having mismatch rules
-        foreach ($ruleA as $props => $rule) foreach (self::ar($props) as $prop) {
+        foreach ($ruleA as $props => $rule) {
+            foreach (self::ar($props) as $prop) {
+                // Custom msg by rule-type
+                $msg = [];
 
-            // Custom msg by rule-type
-            $msg = [];
-
-            // Explicitly set up the rule-type keys for which not exist
-            foreach (['req', 'rex', 'ext', 'unq', 'key', 'fis', 'dis', 'min', 'max'] as $type)
-                if (!isset($rule[$type])) {
-                    $rule[$type] = '';
-                } else if (is_string($rule[$type])) {
-                    if (preg_match('~:~', $rule[$type])) {
-                        list ($rule[$type], $msg[$type]) = explode(':', $rule[$type], 2);
-                    } else {
-                        $msg[$type] = false;
+                // Explicitly set up the rule-type keys for which not exist
+                foreach (['req', 'rex', 'ext', 'unq', 'key', 'fis', 'dis', 'min', 'max'] as $type) {
+                    if (! isset($rule[$type])) {
+                        $rule[$type] = '';
+                    } elseif (is_string($rule[$type])) {
+                        if (preg_match('~:~', $rule[$type])) {
+                            list($rule[$type], $msg[$type]) = explode(':', $rule[$type], 2);
+                        } else {
+                            $msg[$type] = false;
+                        }
                     }
                 }
 
-            // Shortcut to $data[$prop]
-            $value = $data[$prop] ?? null;
+                // Shortcut to $data[$prop]
+                $value = $data[$prop] ?? null;
 
-            // Get meta
-            $meta = isset($data['_meta'][$prop]) ? $data['_meta'][$prop] : [];
+                // Get meta
+                $meta = isset($data['_meta'][$prop]) ? $data['_meta'][$prop] : [];
 
-            // Get label, or use $prop if label/meta is not given
-            $label = $meta['fieldLabel'] ?? $prop;
+                // Get label, or use $prop if label/meta is not given
+                $label = $meta['fieldLabel'] ?? $prop;
 
-            // If prop is required, but has empty/null/zero value - flush error
-            if (($rule['req'] || $rule['unq'])
-                && ((!is_array($value) && !strlen($value)) || (!$value && $rule['key']))) {
+                // If prop is required, but has empty/null/zero value - flush error
+                if (($rule['req'] || $rule['unq'])
+                    && ((! is_array($value) && ! strlen($value)) || (! $value && $rule['key']))) {
+                    // Prepare exception msg template args
+                    $args = [$label];
 
-                // Prepare exception msg template args
-                $args = [$label];
+                    // Append custom msg
+                    $args['custom'] = $msg['req'] ?? false;
 
-                // Append custom msg
-                $args['custom'] = $msg['req'] ?? false;
-
-                // Throw mismatch-exception
-                throw new ZfExtended_Mismatch('E2000', $args);
-            }
-
-            // If prop's value should match certain regular expression, but it does not - flush error
-            if ($rule['rex'] && strlen($value) && !self::rexm($rule['rex'], $value))
-                throw new ZfExtended_Mismatch('E2001', [$value, $label]);
-
-            // If file's extension should match certain regular expression, but it does not - flush error
-            if ($rule['ext']) {
-
-                // Get extension
-                $ext = strtolower(self::rexm('ext', $value['name'], 1));
-
-                // Check if rule is a regular expression, and not just one extension or comma-separated list of extensions
-                $rex = preg_match('~,~', $rule['ext']) || preg_match('~^[a-z0-9]+$~', $rule['ext']) ? false : true;
-
-                // If extension is allowed
-                if ($rex ? self::rexm($rule['ext'], $ext) : in_array($ext, self::ar($rule['ext']))) {
-
-                    // Pass file info into return value
-                    $rowA[$prop] = $value;
-
-                    // Append extension
-                    $rowA[$prop]['ext'] = $ext;
-
-                    // Append extension prepended with dot
-                    $rowA[$prop]['.ext'] = '.' . $ext;
+                    // Throw mismatch-exception
+                    throw new MismatchException('E2000', $args);
                 }
 
-                // Else throw an exception
-                else throw new ZfExtended_Mismatch('E2007', [$ext, $label]);
-            }
+                // If prop's value should match certain regular expression, but it does not - flush error
+                if ($rule['rex'] && $value !== null && strlen($value) && ! self::rexm($rule['rex'], $value)) {
+                    throw new MismatchException('E2001', [$value, $label]);
+                }
 
-            // If value should be a json-encoded expression, and it is - decode
-            if ($rule['rex'] == 'json') $rowA[$prop] = json_decode($value);
+                // If file's extension should match certain regular expression, but it does not - flush error
+                if ($rule['ext']) {
+                    // Get extension
+                    $ext = strtolower(self::rexm('ext', $value['name'], 1));
 
-            // If prop's value should be equal to some certain value, but it's not equal - flush error
-            if (array_key_exists('eql', $rule)
-                && $value != $rule['eql'])
-                throw new ZfExtended_Mismatch('E2003', [$rule['eql'], $value]);
+                    // Check if rule is a regular expression, and not just one extension or comma-separated list of extensions
+                    $rex = preg_match('~,~', $rule['ext']) || preg_match('~^[a-z0-9]+$~', $rule['ext']) ? false : true;
 
-            // If value should be in the list of allowed values, but it's not  - flush error
-            if ($rule['fis'] && $value) {
+                    // If extension is allowed
+                    if ($rex ? self::rexm($rule['ext'], $ext) : in_array($ext, self::ar($rule['ext']))) {
+                        // Pass file info into return value
+                        $rowA[$prop] = $value;
 
-                // Array of input values
-                $input = is_array($value) ? $value : explode(',', $value);
+                        // Append extension
+                        $rowA[$prop]['ext'] = $ext;
 
-                // Array of allowed values
-                $allowed = is_array($rule['fis']) ? $rule['fis'] : explode(',', $rule['fis']);
-
-                // If we deducted allowed values from input values, and the result is not empty
-                // it means that result contains those of input values that were not in array of allowed,
-                // so flush error
-                if ($restricted = array_diff($input, $allowed))
-                    throw new ZfExtended_Mismatch('E2004', [
-                        $restricted ? implode(',', $restricted) : $value,
-                        $label
-                    ]);
-            }
-
-            // If value should not be in the list of disabled values - flush error
-            if ($rule['dis'] && array_intersect(self::ar($value), self::ar($rule['dis']))) {
-
-                // Prepare exception msg template args
-                $args = [$value, $label];
-
-                // Append custom msg
-                $args['custom'] = $msg['dis'] ?? false;
-
-                // Throw mismatch-exception
-                throw new ZfExtended_Mismatch('E2005', $args);
-            }
-
-            // If prop's value should be an identifier of an existing database record
-            if ($rule['key'] && strlen($value) && $value != '0') {
-
-                // Setup invert flag, indicating that key-rule-check should be in inverted/negation mode
-                $invert = false;
-
-                // If the rule value is a string
-                if (is_string($rule['key'])) {
-
-                    // Get table name
-                    $table = preg_replace('/[\*\+]$/', '', $rule['key']);
-
-                    // Setup $isSingleRow as a flag indicating whether *_Row (single row) or *_Rowset should be fetched
-                    $isSingleRow = $table == $rule['key'];
-
-                    // Setup $allowNotFound-flag which can be only true if value of key-rule ends with '*'
-                    $allowNotFound = $isSingleRow ? false : preg_match('~\*$~', $rule['key']);
-
-                    // If exclamation sign is specified at the beginning of the rule value
-                    // it means invert flag should be set to true
-                    if ($invert = preg_match($rex = '~^!~', $rule['key'])) {
-
-                        // Trim that from table name
-                        $table = preg_replace($rex,'', $rule['key']);
+                        // Append extension prepended with dot
+                        $rowA[$prop]['.ext'] = '.' . $ext;
                     }
 
-                    // Get key's target table and column
-                    $target = explode('.', $table); $table = $target[0]; $column = $target[1] ?? 'id';
-
-                // Else if
-                } else {
-
-                    //
-                    $isSingleRow = true;
-
-                    //
-                    $table = $rule['key'];
+                    // Else throw an exception
+                    else {
+                        throw new MismatchException('E2007', [$ext, $label]);
+                    }
                 }
 
-                // If $rule['key'] arg is a class name (or an instance) of model, that is a subclass of ZfExtended_Models_Entity_Abstract
-                if (is_subclass_of($table, 'ZfExtended_Models_Entity_Abstract')) {
+                // If value should be a json-encoded expression, and it is - decode
+                if ($rule['rex'] == 'json') {
+                    $rowA[$prop] = ($value === null) ? null : json_decode($value);
+                }
 
-                    // If rule value is string
+                // If prop's value should be equal to some certain value, but it's not equal - flush error
+                if (array_key_exists('eql', $rule)
+                    && $value != $rule['eql']) {
+                    throw new MismatchException('E2003', [$rule['eql'], $value]);
+                }
+
+                // If value should be in the list of allowed values, but it's not  - flush error
+                if ($rule['fis'] && $value) {
+                    // Array of input values
+                    $input = is_array($value) ? $value : explode(',', $value);
+
+                    // Array of allowed values
+                    $allowed = is_array($rule['fis']) ? $rule['fis'] : explode(',', $rule['fis']);
+
+                    // If we deducted allowed values from input values, and the result is not empty
+                    // it means that result contains those of input values that were not in array of allowed,
+                    // so flush error
+                    if ($restricted = array_diff($input, $allowed)) {
+                        throw new MismatchException('E2004', [
+                            $restricted ? implode(',', $restricted) : $value,
+                            $label,
+                        ]);
+                    }
+                }
+
+                // If value should not be in the list of disabled values - flush error
+                if ($rule['dis'] && array_intersect(self::ar($value), self::ar($rule['dis']))) {
+                    // Prepare exception msg template args
+                    $args = [$value, $label];
+
+                    // Append custom msg
+                    $args['custom'] = $msg['dis'] ?? false;
+
+                    // Throw mismatch-exception
+                    throw new MismatchException('E2005', $args);
+                }
+
+                // If prop's value should be an identifier of an existing database record
+                if ($rule['key'] && strlen($value ?? '') && $value != '0') {
+                    // Setup invert flag, indicating that key-rule-check should be in inverted/negation mode
+                    $invert = false;
+
+                    // If the rule value is a string
                     if (is_string($rule['key'])) {
+                        // Get table name
+                        $table = preg_replace('/[\*\+]$/', '', $rule['key']);
 
-                        // Get model
-                        $m = ZfExtended_Factory::get($table);
+                        // Setup $isSingleRow as a flag indicating whether *_Row (single row) or *_Rowset should be fetched
+                        $isSingleRow = $table == $rule['key'];
 
-                        // If single row mode
-                        if ($isSingleRow) {
+                        // Setup $allowNotFound-flag which can be only true if value of key-rule ends with '*'
+                        $allowNotFound = $isSingleRow ? false : preg_match('~\*$~', $rule['key']);
 
-                            // Load row
-                            $m->loadRow("$column = ?", $value);
-
-                        // Else
-                        } else {
-                             // Not yet supported
+                        // If exclamation sign is specified at the beginning of the rule value
+                        // it means invert flag should be set to true
+                        if ($invert = preg_match($rex = '~^!~', $rule['key'])) {
+                            // Trim that from table name
+                            $table = preg_replace($rex, '', $rule['key']);
                         }
 
-                    // Else if rule value is a model instance
+                        // Get key's target table and column
+                        $target = explode('.', $table);
+                        $table = $target[0];
+                        $column = $target[1] ?? 'id';
+
+                        // Else if
                     } else {
+                        //
+                        $isSingleRow = true;
 
-                        // Get model
-                        $m = $rule['key'];
-
-                        // If single row mode
-                        if ($isSingleRow) {
-
-                            // Load row
-                            $m->load($value);
-
-                        // Else
-                        } else {
-                            // Not yet supported
-                        }
+                        //
+                        $table = $rule['key'];
                     }
 
-                    // Assign model into return value
-                    $rowA[$prop] = $m->getId() ? $m : false;
+                    // If $rule['key'] arg is a class name (or an instance) of model, that is a subclass of ZfExtended_Models_Entity_Abstract
+                    if (is_subclass_of($table, 'ZfExtended_Models_Entity_Abstract')) {
+                        // If rule value is string
+                        if (is_string($rule['key'])) {
+                            // Get model
+                            $m = ZfExtended_Factory::get($table);
 
-                // Else
-                } else {
+                            // If single row mode
+                            if ($isSingleRow) {
+                                // Load row
+                                $m->loadRow("$column = ?", $value);
 
-                    // Setup WHERE clause and method name to be used for fetching
-                    $where = $isSingleRow
-                        ? self::db()->quoteInto('`' . $column . '` = ?', $value)
-                        : self::db()->quoteInto('`' . $column . '` IN (?)', self::ar($value));
+                                // Else
+                            } else {
+                                // Not yet supported
+                            }
 
-                    // Prepare statement
-                    $stmt = self::db()->query('
+                            // Else if rule value is a model instance
+                        } else {
+                            // Get model
+                            $m = $rule['key'];
+
+                            // If single row mode
+                            if ($isSingleRow) {
+                                // Load row
+                                $m->load($value);
+
+                                // Else
+                            } else {
+                                // Not yet supported
+                            }
+                        }
+
+                        // Assign model into return value
+                        $rowA[$prop] = $m->getId() ? $m : false;
+
+                        // Else
+                    } else {
+                        // Setup WHERE clause and method name to be used for fetching
+                        $where = $isSingleRow
+                            ? self::db()->quoteInto('`' . $column . '` = ?', $value)
+                            : self::db()->quoteInto('`' . $column . '` IN (?)', self::ar($value));
+
+                        // Prepare statement
+                        $stmt = self::db()->query('
                         SELECT * 
                         FROM `' . $table . '` 
-                        WHERE ' . $where . self::rif($isSingleRow, '
+                        WHERE ' . $where . self::rif(
+                            $isSingleRow,
+                            '
                         LIMIT 1'
-                    ));
+                        ));
 
-                    // Fetch
-                    $rowA[$prop] = $isSingleRow ? $stmt->fetch() : $stmt->fetchAll();
-                }
-
-                // Prepare exception msg template args
-                $args = [is_string($rule['key']) ? $rule['key'] : get_class($rule['key']), $value];
-
-                // Append custom msg
-                $args['custom'] = $msg['key'] ?? false;
-
-                // If invert-flag is true
-                if ($invert) {
-
-                    // If non empty result
-                    if ($rowA[$prop]) {
-
-                        // Throw mismatch-exception
-                        throw new ZfExtended_Mismatch('E2008', $args);
+                        // Fetch
+                        $rowA[$prop] = $isSingleRow ? $stmt->fetch() : $stmt->fetchAll();
                     }
 
-                // Else
-                } else {
+                    // Prepare exception msg template args
+                    $args = [is_string($rule['key']) ? $rule['key'] : get_class($rule['key']), $value];
 
-                    // If no *_Row was fetched, or empty *_Rowset was fetched - flush error
-                    if (!$rowA[$prop] && !$allowNotFound) {
+                    // Append custom msg
+                    $args['custom'] = $msg['key'] ?? false;
 
-                        // Throw mismatch-exception
-                        throw new ZfExtended_Mismatch('E2002', $args);
+                    // If invert-flag is true
+                    if ($invert) {
+                        // If non empty result
+                        if ($rowA[$prop]) {
+                            // Throw mismatch-exception
+                            throw new MismatchException('E2008', $args);
+                        }
+
+                        // Else
+                    } else {
+                        // If no *_Row was fetched, or empty *_Rowset was fetched - flush error
+                        if (! $rowA[$prop] && ! $allowNotFound) {
+                            // Throw mismatch-exception
+                            throw new MismatchException('E2002', $args);
+                        }
                     }
                 }
+
+                // If min-rule is given, but value is less than it should bee
+                if (is_numeric($rule['min']) && $value < $rule['min']) {
+                    // Throw exception
+                    throw new MismatchException('E2009', [$value, $label, $rule['min']]);
+                }
+
+                // If max-rule is given, but value is greater than it should bee
+                if (is_numeric($rule['max']) && $value > $rule['max']) {
+                    // Throw exception
+                    throw new MismatchException('E2010', [$value, $label, $rule['max']]);
+                }
+
+                // If prop's value should be unique within the whole database table, but it's not - flush error
+                /*if ($rule['unq']
+                    && count($_ = explode('.', $rule['unq'])) == 2
+                    && ZfExtended_Factory::get($_[0])->fetchRow(['`' . $_[1] . '` = "' . $value . '"']))
+                    throw new MismatchException('E2006', [$value, $label]);*/
             }
-
-            // If min-rule is given, but value is less than it should bee
-            if (is_numeric($rule['min']) && $value < $rule['min']) {
-
-                // Throw exception
-                throw new ZfExtended_Mismatch('E2009', [$value, $label, $rule['min']]);
-            }
-
-            // If max-rule is given, but value is greater than it should bee
-            if (is_numeric($rule['max']) && $value > $rule['max']) {
-
-                // Throw exception
-                throw new ZfExtended_Mismatch('E2010', [$value, $label, $rule['max']]);
-            }
-
-            // If prop's value should be unique within the whole database table, but it's not - flush error
-            /*if ($rule['unq']
-                && count($_ = explode('.', $rule['unq'])) == 2
-                && ZfExtended_Factory::get($_[0])->fetchRow(['`' . $_[1] . '` = "' . $value . '"']))
-                throw new ZfExtended_Mismatch('E2006', [$value, $label]);*/
         }
 
         // Return *_Row objects, collected for props, that have 'key' rule
@@ -790,11 +900,9 @@ class editor_Utils {
 
     /**
      * Return regular expressions pattern, stored within $this->_rex property under $alias key
-     *
-     * @param $alias
-     * @return null
      */
-    public static function rex($alias){
+    public static function rex($alias)
+    {
         return $alias ? (self::$_rex[$alias] ?? null) : null;
     }
 
@@ -804,16 +912,16 @@ class editor_Utils {
      * expression.
      *
      * @static
-     * @param $rex
-     * @param $subject
      * @param null $sub If regular expression contains submask(s), $sub arg can be used as
      *                  a way to specify a submask index, that you need to pick the value at
      * @return array|null|string
      */
-    public static function rexm($rex, $subject, $sub = null){
-
+    public static function rexm($rex, $subject, $sub = null)
+    {
         // Check that self::$_rex array has a value under $rex key
-        if ($_ = self::rex($rex)) $rex = $_;
+        if ($_ = self::rex($rex)) {
+            $rex = $_;
+        }
 
         // Match
         preg_match($rex, $subject, $found);
@@ -830,43 +938,56 @@ class editor_Utils {
      * jflush(['success' => true, 'param1' => 'value1', 'param2' => 'value2']) -> {success: true, param1: "value1", param2: "value2"}
      * jflush(true, ['param1' => 'value1', 'param2' => 'value2']) -> {success: true, param1: "value1", param2: "value2"}
      *
-     * @param $success
      * @param mixed $msg1
      * @param mixed $msg2
-     * @param bool $die
      */
-    public static function jflush($success, $msg1 = null, $msg2 = null) {
-
+    public static function jflush($success, $msg1 = null, $msg2 = null)
+    {
         // Start building data for flushing
-        $flush = is_array($success) && array_key_exists('success', $success) ? $success : ['success' => $success];
+        $flush = is_array($success) && array_key_exists('success', $success) ? $success : [
+            'success' => $success,
+        ];
 
         // Deal with first data-argument
-        if (func_num_args() > 1 && func_get_arg(1) != null)
+        if (func_num_args() > 1 && func_get_arg(1) != null) {
             $mrg1 = is_object($msg1)
                 ? (in('toArray', get_class_methods($msg1)) ? $msg1->toArray() : (array) $msg1)
-                : (is_array($msg1) ? $msg1 : ['msg' => $msg1]);
+                : (is_array($msg1) ? $msg1 : [
+                    'msg' => $msg1,
+                ]);
+        }
 
         // Deal with second data-argument
-        if (func_num_args() > 2 && func_get_arg(2) != null)
+        if (func_num_args() > 2 && func_get_arg(2) != null) {
             $mrg2 = is_object($msg2)
                 ? (in('toArray', get_class_methods($msg2)) ? $msg2->toArray() : (array) $msg2)
-                : (is_array($msg2) ? $msg2 : ['msg' => $msg2]);
+                : (is_array($msg2) ? $msg2 : [
+                    'msg' => $msg2,
+                ]);
+        }
 
         // Merge the additional data to the $flush array
-        if (isset($mrg1)) $flush = array_merge($flush, $mrg1);
-        if (isset($mrg2)) $flush = array_merge($flush, $mrg2);
+        if (isset($mrg1)) {
+            $flush = array_merge($flush, $mrg1);
+        }
+        if (isset($mrg2)) {
+            $flush = array_merge($flush, $mrg2);
+        }
 
         // Send headers
-        if (!headers_sent()) {
-
+        if (! headers_sent()) {
             // Send '400 Bad Request' status code if user agent is not IE
-            if ($flush['success'] === false && !self::isIE()) header('HTTP/1.1 400 Bad Request');
+            if ($flush['success'] === false && ! self::isIE()) {
+                header('HTTP/1.1 400 Bad Request');
+            }
 
             // Send '200 OK' status code
-            if ($flush['success'] === true) header('HTTP/1.1 200 OK');
+            if ($flush['success'] === true) {
+                header('HTTP/1.1 200 OK');
+            }
 
             // Send content type
-            header('Content-Type: '. (self::isIE() ? 'text/plain' : 'application/json'));
+            header('Content-Type: ' . (self::isIE() ? 'text/plain' : 'application/json'));
         }
 
         // Flush json
@@ -882,16 +1003,24 @@ class editor_Utils {
      * @param string $msg
      * @param string $buttons
      */
-    public static function jconfirm($msg, $buttons = 'OKCANCEL') {
-
+    public static function jconfirm($msg, $buttons = 'OKCANCEL')
+    {
         // Start building data for flushing
-        $flush = ['confirm' => self::$answer ? count(self::$answer) + 1 : true, 'msg' => $msg, 'buttons' => $buttons];
+        $flush = [
+            'confirm' => self::$answer ? count(self::$answer) + 1 : true,
+            'msg' => $msg,
+            'buttons' => $buttons,
+        ];
 
         // Send content type header
-        if (!headers_sent()) header('Content-Type: '. (self::isIE() ? 'text/plain' : 'application/json'));
+        if (! headers_sent()) {
+            header('Content-Type: ' . (self::isIE() ? 'text/plain' : 'application/json'));
+        }
 
         // Here we send HTTP/1.1 400 Bad Request to prevent success handler from being fired
-        if (!headers_sent() && !self::isIE()) header('HTTP/1.1 400 Bad Request');
+        if (! headers_sent() && ! self::isIE()) {
+            header('HTTP/1.1 400 Bad Request');
+        }
 
         // Flush
         echo json_encode($flush);
@@ -904,17 +1033,17 @@ class editor_Utils {
      * Create correctly formatted path from many parts
      * Corrects any slashes to match the OS, won't remove a leading slash, and cleans up and multiple slashes in a row.
      * @see https://stackoverflow.com/a/7641174
-     * @param string ...$parts
-     * @return string
      */
-    public static function joinPath(string ...$parts): string {
+    public static function joinPath(string ...$parts): string
+    {
         return preg_replace('~[/\\\\]+~', DIRECTORY_SEPARATOR, implode(DIRECTORY_SEPARATOR, $parts));
     }
 
     /**
      * @return Zend_Db_Adapter_Abstract
      */
-    public static function db() {
+    public static function db()
+    {
         return Zend_Db_Table_Abstract::getDefaultAdapter();
     }
 
@@ -937,17 +1066,20 @@ class editor_Utils {
     EOD;
 
      *
-     * @param $text
+     * @param ?string $text
      * @return string
      */
-    public static function url2a($text) {
+    public static function url2a(?string $text)
+    {
+        // If $text arg is given as null - return empty string
+        if ($text === null) return '';
 
         // Regexps
         $rexProtocol = '(https?://)?';
-        $rexDomain   = '((?:[-a-zA-Z0-9а-яА-Я]{1,63}\.)+[-a-zA-Z0-9а-яА-Я]{2,63}|(?:[0-9]{1,3}\.){3}[0-9]{1,3})';
-        $rexPort     = '(:[0-9]{1,5})?';
-        $rexPath     = '(/[!$-/0-9:;=@_\':;!a-zA-Z\x7f-\xff]*?)?';
-        $rexQuery    = '(\?[!$-/0-9:;=@_\':;!a-zA-Z\x7f-\xff]+?)?';
+        $rexDomain = '((?:[-a-zA-Z0-9а-яА-Я]{1,63}\.)+[-a-zA-Z0-9а-яА-Я]{2,63}|(?:[0-9]{1,3}\.){3}[0-9]{1,3})';
+        $rexPort = '(:[0-9]{1,5})?';
+        $rexPath = '(/[!$-/0-9:;=@_\':;!a-zA-Z\x7f-\xff]*?)?';
+        $rexQuery = '(\?[!$-/0-9:;=@_\':;!a-zA-Z\x7f-\xff]+?)?';
         $rexFragment = '(#[!$-/0-9:;=@_\':;!a-zA-Z\x7f-\xff]+?)?';
 
         // Valid top-level domains
@@ -972,9 +1104,13 @@ class editor_Utils {
         $position = 0;
 
         // Split given $text by urls
-        while (preg_match("~$rexProtocol$rexDomain$rexPort$rexPath$rexQuery$rexFragment(?=[?.!,;:\"]?(\s|$))~u",
-            $text, $match, PREG_OFFSET_CAPTURE, $position)) {
-
+        while (preg_match(
+            "~$rexProtocol$rexDomain$rexPort$rexPath$rexQuery$rexFragment(?=[?.!,;:\"]?(\s|$))~u",
+            $text ?? '',
+            $match,
+            PREG_OFFSET_CAPTURE,
+            $position
+        )) {
             // Extract $url and $urlPosition from match
             [$url, $urlPosition] = $match[0];
 
@@ -983,15 +1119,14 @@ class editor_Utils {
 
             // Pick domain, port and path from matches
             $domain = $match[2][0];
-            $port   = $match[3][0];
-            $path   = $match[4][0];
+            $port = $match[3][0];
+            $path = $match[4][0];
 
             // Get top-level domain
             $tld = mb_strtolower(strrchr($domain, '.'), 'utf-8');
 
             // Check if the TLD is valid - or that $domain is an IP address.
             if (preg_match('{\.[0-9]{1,3}}', $tld) || isset($validTlds[$tld])) {
-
                 // Prepend http:// if no protocol specified
                 $completeUrl = $match[1][0] ? $url : 'http://' . $url;
 
@@ -999,14 +1134,16 @@ class editor_Utils {
                 printf('<a href="%s">%s</a>', htmlspecialchars($completeUrl), htmlspecialchars("$domain$port$path"));
 
                 // Else if not a valid URL.
-            } else print(htmlspecialchars($url));
+            } else {
+                print(htmlspecialchars($url));
+            }
 
             // Continue text parsing from after the URL.
             $position = $urlPosition + strlen($url);
         }
 
         // Print the remainder of the text.
-        print(htmlspecialchars(substr($text, $position)));
+        print(htmlspecialchars(substr($text ?? '', $position)));
 
         // Return
         return ob_get_clean();
@@ -1017,48 +1154,61 @@ class editor_Utils {
      *
      * @return bool
      */
-    public static function isIE() {
-        return !!preg_match('/(MSIE|Trident|rv:)/', $ua = $_SERVER['HTTP_USER_AGENT']) && !preg_match('~Firefox~', $ua);
+    public static function isIE()
+    {
+        return ! ! preg_match('/(MSIE|Trident|rv:)/', $ua = $_SERVER['HTTP_USER_AGENT']) && ! preg_match('~Firefox~', $ua);
     }
-
 
     /**
      * Comma-separated values to array converter
      *
-     * @param $items
      * @param $allowEmpty - If $items arg is an empty string, function will return an array containing that empty string
      *                      as a first item, rather than returning empty array
      * @return array
      */
-    public static function ar($items, $allowEmpty = false) {
-
+    public static function ar($items, $allowEmpty = false)
+    {
         // If $items arg is already an array - return it as is
-        if (is_array($items)) return $items;
+        if (is_array($items)) {
+            return $items;
+        }
 
         // Else if $items arg is strict null - return array containing that null as a first item
-        if ($items === null) return $allowEmpty ? array(null) : array();
+        if ($items === null) {
+            return $allowEmpty ? [null] : [];
+        }
 
         // Else if $items arg is a boolean value - return array containing that boolean value as a first item
-        if (is_bool($items)) return array($items);
+        if (is_bool($items)) {
+            return [$items];
+        }
 
         // Else if $items arg is an object we either return result of toArray() call on that object,
         // or return result, got by php's native '(array)' cast-prefix expression, depending whether
         // or not $items object has 'toArray()' method
-        if (is_object($items)) return in_array('toArray', get_class_methods($items)) ? $items->toArray(): (array) $items;
+        if (is_object($items)) {
+            return in_array('toArray', get_class_methods($items)) ? $items->toArray() : (array) $items;
+        }
 
         // Else we assume $items is a string and return an array by comma-exploding $items arg
         if (is_string($items)) {
-
             // If $items is an empty string - return empty array
-            if (!strlen($items) && !$allowEmpty) return array();
+            if (! strlen($items) && ! $allowEmpty) {
+                return [];
+            }
 
             // Explode $items arg by comma
             foreach ($items = explode(',', $items) as $i => $item) {
-
                 // Convert strings 'null', 'true' and 'false' items to their proper types
-                if ($item == 'null') $items[$i] = null;
-                if ($item == 'true') $items[$i] = true;
-                if ($item == 'false') $items[$i] = false;
+                if ($item == 'null') {
+                    $items[$i] = null;
+                }
+                if ($item == 'true') {
+                    $items[$i] = true;
+                }
+                if ($item == 'false') {
+                    $items[$i] = false;
+                }
             }
 
             // Return normalized $items
@@ -1066,7 +1216,7 @@ class editor_Utils {
         }
 
         // Else return array, containing $items arg as a single item
-        return array($items);
+        return [$items];
     }
 
     /**
@@ -1074,10 +1224,11 @@ class editor_Utils {
      *
      * @param mixed $if
      * @param string $then
-     * @param string $else
-     * @return string
+     * @param mixed $else
+     * @return mixed
      */
-    public static function rif($if, $then, $else = '') {
+    public static function rif($if, $then, mixed $else = '') : mixed
+    {
         return $if ? str_replace('$1', is_scalar($if) ? $if : '$1', $then) : $else;
     }
 
@@ -1088,98 +1239,63 @@ class editor_Utils {
      * @param mixed $daysToAdd
      * @return string
      */
-    public static function addBusinessDays(string $inputDate, $daysToAdd): string{
+    public static function addBusinessDays(string $inputDate, $daysToAdd): string
+    {
+        $daysDecimal = $daysToAdd - (int) $daysToAdd;
+        $secondsToAdd = $daysDecimal > 0 ? (' +' . (24 * $daysDecimal * 3600) . ' seconds') : '';
 
-        $daysDecimal = $daysToAdd - (int)$daysToAdd;
-        $secondsToAdd = $daysDecimal > 0 ? (' +'.(24*$daysDecimal*3600).' seconds') : '';
-
-        $inputDateChunks = explode(' ',$inputDate);
+        $inputDateChunks = explode(' ', $inputDate);
         // if no timestamp is provided for the inputDate, or the time is 00:00:00 -> use the current timestamp
-        if(count($inputDateChunks) === 1 || $inputDateChunks[1] === '00:00:00'){
+        if (count($inputDateChunks) === 1 || $inputDateChunks[1] === '00:00:00') {
             $dateAndTime = explode(" ", NOW_ISO);
-            $inputDate = date('Y-m-d',strtotime($inputDate)).' '.array_pop($dateAndTime);
+            $inputDate = date('Y-m-d', strtotime($inputDate)) . ' ' . array_pop($dateAndTime);
         }
 
         // add seconds if required
-        if(!empty($secondsToAdd)){
-            $inputDate = date ('Y-m-d H:i:s' , strtotime($inputDate.$secondsToAdd));
+        if (! empty($secondsToAdd)) {
+            $inputDate = date('Y-m-d H:i:s', strtotime($inputDate . $secondsToAdd));
         }
         // this must be done because the time is set to 00:00:00 when the date contains time in it
         // probably it is php bug
-        $inputDate = explode(' ',$inputDate);
+        $inputDate = explode(' ', $inputDate);
 
-        $weekdaysTemplate = $inputDate[0].' +'.((int)$daysToAdd).' Weekday';
-        return date ('Y-m-d' , strtotime($weekdaysTemplate)).' '.$inputDate[1];
+        $weekdaysTemplate = $inputDate[0] . ' +' . ((int) $daysToAdd) . ' Weekday';
+
+        return date('Y-m-d', strtotime($weekdaysTemplate)) . ' ' . $inputDate[1];
     }
-    /**
-     * 
-     * @param string $url
-     * @return string
-     */
-    public static function removeQueryString(string $url) : string {
-        if(strpos($url,'?') !== false) {
-            return explode('?',$url)[0];
+
+    public static function removeQueryString(string $url): string
+    {
+        if (strpos($url, '?') !== false) {
+            return explode('?', $url)[0];
         }
+
         return $url;
     }
-    /**
-     * 
-     * @param string $url
-     * @return string
-     */
-    public static function removeFragment(string $url) : string {
-        if(strpos($url,'#') !== false) {
-            return explode('#',$url)[0];
+
+    public static function removeFragment(string $url): string
+    {
+        if (strpos($url, '#') !== false) {
+            return explode('#', $url)[0];
         }
+
         return $url;
     }
+
     /**
      * Removes query-string & fragment from an URL
-     * @param string $url
-     * @return string
      */
-    public static function cleanUrl(string $url) : string {
-        return(self::removeQueryString(self::removeFragment($url)));
-    }
-    /**
-     * 
-     * @param string $url
-     * @return bool
-     */
-    public static function urlIsAccessible(string $url) : bool {
-        if(!empty($url)){
-            $opts = array(
-                'http' => array(
-                    'method' => 'HEAD'
-                )
-            );
-            $context = stream_context_create($opts);
-            $headers = get_headers($url, 0, $context);
-            $code = -1;
-            $matches = [];
-            if ($headers != false && count($headers) > 0) {
-                foreach($headers as $header){
-                    // grabs the last $header $code, in case of redirect(s):
-                    if(preg_match("/^HTTP.+\s(\d\d\d)\s/", $header, $matches)){
-                        $code = $matches[1];
-                    }
-                }
-            }
-            if($code >= 200 && $code <= 300){
-                return true;
-            }
-        }
-        return false;
+    public static function cleanUrl(string $url): string
+    {
+        return (self::removeQueryString(self::removeFragment($url)));
     }
 
     /**
      * Formats a duration
-     * @param int $startTime: expected in seconds
-     * @param int $endTime: expected in seconds
-     * @return string
      */
-    public static function formatDuration(int $startTime, int $endTime) : string {
-        return floor(($endTime - $startTime) / 60).' min '.(($endTime - $startTime) % 60).' sec';
+    public static function formatDuration(int $startTime, int $endTime): string
+    {
+        return floor(($endTime - $startTime) / 60) . ' min ' . (($endTime - $startTime) % 60) . ' sec';
     }
 
     /**
@@ -1189,18 +1305,19 @@ class editor_Utils {
      * @return ?mixed The value mapped to $key or null if none
      * @see https://stackoverflow.com/a/10898827
      */
-    public static function removeArrayKey(array &$arr, mixed $key) : mixed {
-        $val = NULL;
+    public static function removeArrayKey(array &$arr, mixed $key): mixed
+    {
+        $val = null;
         if (array_key_exists($key, $arr)) {
             $val = &$arr[$key];
             unset($arr[$key]);
         }
+
         return $val;
     }
 
     /**
      * initializes the test and demo user passwords
-     * @return void
      * @throws Zend_Db_Exception
      * @throws Zend_Exception
      */
@@ -1219,81 +1336,38 @@ class editor_Utils {
      */
     public static function emptySegment(?string $segmentText): bool
     {
-        if( ZfExtended_Utils::emptyString($segmentText)){
+        if (ZfExtended_Utils::emptyString($segmentText)) {
             return true;
         }
         /** @var editor_Models_Segment $segment */
         $segment = ZfExtended_Factory::get('editor_Models_Segment');
+
         return ZfExtended_Utils::emptyString($segment->stripTags($segmentText));
     }
 
-}
-
-class ZfExtended_Mismatch extends ZfExtended_ErrorCodeException {
-    use ZfExtended_ResponseExceptionTrait;
-
     /**
-     * @var integer
+     * Returns an array of all combination upper and lower case characters of string
+     * 'abc' => [['a', 'b', 'c'], ['a', 'B', 'c'], ..., ['A', 'B', 'C']]
+     * @return array<array<string>>
      */
-    protected $httpReturnCode = 400;
+    public static function generatePermutations(string $text): array
+    {
+        $permutations = [];
+        $chars = str_split($text);
 
-    /**
-     * By default we log that as INFO, if created as response then the level is set to DEBUG
-     *
-     * @var integer
-     */
-    protected $level = ZfExtended_Logger::LEVEL_INFO;
-
-    /**
-     * @var array
-     */
-    protected static $localErrorCodes = [
-        'E2000' => 'Param "{0}" - is not given',                                           // REQ
-        'E2001' => 'Value "{0}" of param "{1}" - is in invalid format',                    // REX
-        'E2002' => 'No object of type "{0}" was found by key "{1}"',                       // KEY
-        'E2003' => 'Wrong value',                                                          // EQL
-        'E2004' => 'Value "{0}" of param "{1}" - is not in the list of allowed values',    // FIS
-        'E2005' => 'Value "{0}" of param "{1}" - is in the list of disabled values',       // DIS
-        'E2006' => 'Value "{0}" of param "{1}" - is not unique. It should be unique.',     // UNQ
-        'E2007' => 'Extension "{0}" of file "{1}" - is not in the list of allowed values', // EXT
-        'E2008' => 'Object of type "{0}" already exists having key "{1}"',                 // KEY (negation)
-        'E2009' => 'Value "{0}" of param "{1}" should be minimum "{2}"',                   // MIN
-        'E2010' => 'Value "{0}" of param "{1}" should be maximum "{2}"',                   // MAX
-    ];
-
-    /**
-     * Overridden to use custom message if given
-     *
-     * ZfExtended_Mismatch constructor.
-     * @param $errorCode
-     * @param array $extra
-     * @param Exception|null $previous
-     */
-    public function __construct($errorCode, array $extra = [], Exception $previous = null) {
-
-        // Call parent
-        parent::__construct($errorCode, $extra, $previous);
-
-        // If custom message is given
-        if ($extra['custom'] ?? 0) {
-
-            // Get that
-            $msg = $extra['custom'];
-
-        // Else get default one
-        } else {
-            $msg = $this->getMessage();
+        // Count the number of possible permutations and loop over each group
+        for ($i = 0; $i < 2 ** strlen($text); $i++) {
+            // Loop over each letter [a,b,c] for each group and switch its case
+            for ($j = 0; $j < strlen($text); $j++) {
+                // isBitSet checks to see if this letter in this group has been checked before
+                // read more about it here: http://php.net/manual/en/language.operators.bitwise.php
+                $permutations[$i][] = ($i >> $j & 1) != 0
+                    ? strtoupper($chars[$j])
+                    : $chars[$j];
+            }
         }
 
-        // If message have placeholders like {0}, {1}, {2} etc
-        if (preg_match('~{([0-9])}~', $msg)) {
-
-            // Replace those with values from $extra arg
-            $msg = preg_replace_callback('~{([0-9])}~', fn($m) => $extra[$m[1]] ?? $m[1], $msg);
-        }
-
-        // Spoof msg
-        $this->setMessage($msg);
+        return $permutations;
     }
 }
 

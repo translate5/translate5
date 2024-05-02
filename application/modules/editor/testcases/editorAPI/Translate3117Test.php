@@ -3,7 +3,7 @@
 START LICENSE AND COPYRIGHT
 
  This file is part of translate5
- 
+
  Copyright (c) 2013 - 2023 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
 
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
@@ -13,20 +13,19 @@ START LICENSE AND COPYRIGHT
  included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
-  
+
  There is a plugin exception available for use with this release of translate5 for
  translate5: Please see http://www.translate5.net/plugin-exception.txt or
  plugin-exception.txt in the root folder of translate5.
-  
+
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
 
-use MittagQI\Translate5\Task\Export\Package\Downloader;
 use MittagQI\Translate5\Task\Reimport\DataProvider\ZipDataProvider;
 use MittagQI\Translate5\Test\Import\Config;
 use MittagQI\Translate5\Test\Import\Exception;
@@ -37,22 +36,22 @@ use MittagQI\Translate5\Test\Import\TermCollectionResource;
  * Task will be imported alongside termcollection an opentm2 memory.
  *
  */
-class Translate3117Test extends editor_Test_JsonTest {
-
+class Translate3117Test extends editor_Test_JsonTest
+{
     protected static array $forbiddenPlugins = [
     ];
 
     protected static array $requiredPlugins = [
-        'editor_Plugins_Okapi_Init'
+        'editor_Plugins_Okapi_Init',
     ];
 
     protected static array $requiredRuntimeOptions = [
         'import.xlf.preserveWhitespace' => 0,
-        'runtimeOptions.import.xlf.ignoreFramingTags' => 'all'
+        'import.xlf.ignoreFramingTags' => 'paired',
     ];
- 
+
     protected static bool $setupOwnCustomer = true;
-    
+
     protected static string $setupUserLogin = 'testmanager';
 
     /***
@@ -65,7 +64,7 @@ class Translate3117Test extends editor_Test_JsonTest {
         '3' => 'Translation for Segment Three',
         '4' => 'Bar',
         '5' => 'Gjb',
-        '6' => 'Guerr'
+        '6' => 'Guerr',
     ];
 
     /***
@@ -78,7 +77,7 @@ class Translate3117Test extends editor_Test_JsonTest {
         '3' => 'Translation for Segment Three',
         '4' => 'Bar reimport',
         '5' => 'Gjb reimport 2 segment',
-        '6' => 'Guerr reimport of the 3 segment.'
+        '6' => 'Guerr reimport of the 3 segment.',
     ];
 
     protected static TermCollectionResource $termCollection;
@@ -90,7 +89,7 @@ class Translate3117Test extends editor_Test_JsonTest {
         'workfiles/',
         'workfiles/Task-en-de.html.xlf',
         'workfiles/Level1/',
-        'workfiles/Level1/Task-en-de.html.xlf'
+        'workfiles/Level1/Task-en-de.html.xlf',
     ];
 
     /***
@@ -101,7 +100,6 @@ class Translate3117Test extends editor_Test_JsonTest {
 
     protected static function setupImport(Config $config): void
     {
-
         $ownCustomerId = static::$ownCustomer->id;
 
         self::$termCollection = $config
@@ -121,9 +119,9 @@ class Translate3117Test extends editor_Test_JsonTest {
         $importSegments = static::api()->getSegmentsWithBasicData();
 
         // validate the value on import
-        foreach ($importSegments as $segment){
+        foreach ($importSegments as $segment) {
             $expected = self::$segmentsOnImport[$segment['segmentNrInTask']];
-            self::assertEquals($expected,$segment['targetEditToSort'],'Segment does not match the expected import value');
+            self::assertEquals($expected, $segment['targetEditToSort'], 'Segment does not match the expected import value');
         }
 
         $task = static::api()->reloadTask();
@@ -133,7 +131,7 @@ class Translate3117Test extends editor_Test_JsonTest {
         static::api()->setTaskToOpen();
 
         static::api()->addFile(ZipDataProvider::UPLOAD_FILE_FIELD, static::api()->getFile('Reimport.zip'), 'application/data');
-        static::api()->post('editor/taskid/'.$taskId.'/file/package');
+        static::api()->post('editor/taskid/' . $taskId . '/file/package');
 
         static::api()->waitForTaskImported($task);
 
@@ -142,9 +140,9 @@ class Translate3117Test extends editor_Test_JsonTest {
         $reimportSegments = static::api()->getSegmentsWithBasicData();
 
         // validate the value on import
-        foreach ($reimportSegments as $segment){
+        foreach ($reimportSegments as $segment) {
             $expected = self::$segmentsOnReimport[$segment['segmentNrInTask']];
-            self::assertEquals($expected,$segment['targetEditToSort'],'Segment does not match the expected import value');
+            self::assertEquals($expected, $segment['targetEditToSort'], 'Segment does not match the expected import value');
         }
     }
 
@@ -152,26 +150,27 @@ class Translate3117Test extends editor_Test_JsonTest {
      * @throws Exception
      * @throws Zend_Http_Client_Exception
      */
-    public function testExportPackage(){
+    public function testExportPackage()
+    {
         static::api()->setTaskToOpen();
 
         $task = static::api()->getTask();
-        static::api()->get('editor/task/export/id/'.$task->id.'?format=package');
+        static::api()->get('editor/task/export/id/' . $task->id . '?format=package');
         $response = static::api()->getLastResponseDecodeed();
-        self::assertEmpty(isset($response->error),'There was an error on package export. Check the error log for more info.');
+        self::assertEmpty(isset($response->error), 'There was an error on package export. Check the error log for more info.');
 
         $workerId = $response->workerId;
 
-        $statusCheckRoute = 'editor/task/packagestatus?workerId='.$workerId;
+        $statusCheckRoute = 'editor/task/packagestatus?workerId=' . $workerId;
         static::api()->get($statusCheckRoute);
 
         $response = static::api()->getLastResponseDecodeed();
-        self::assertEmpty(isset($response->error),'There was an error on package export. Check the error log for more info.');
+        self::assertEmpty(isset($response->error), 'There was an error on package export. Check the error log for more info.');
 
         $fileAvailable = $response->file_available ?? '';
         $checkCount = 20;
-        while (empty($fileAvailable)){
-            if( $checkCount === 0){
+        while (empty($fileAvailable)) {
+            if ($checkCount === 0) {
                 self::markTestIncomplete('Package not available after maximum amount of status checks');
             }
 
@@ -179,13 +178,13 @@ class Translate3117Test extends editor_Test_JsonTest {
 
             static::api()->get($statusCheckRoute);
             $response = static::api()->getLastResponseDecodeed();
-            self::assertEmpty(isset($response->error),'There was an error on package export. Check the error log for more info.');
+            self::assertEmpty(isset($response->error), 'There was an error on package export. Check the error log for more info.');
 
             $fileAvailable = $response->file_available ?? '';
             $checkCount--;
         }
         $downloadLink = $response->download_link ?? '';
-        if(empty($downloadLink)){
+        if (empty($downloadLink)) {
             self::markTestIncomplete('No download link available in the package status response.');
         }
 
@@ -196,23 +195,22 @@ class Translate3117Test extends editor_Test_JsonTest {
         file_put_contents(self::$importArchive, $response->getBody());
 
         $zip = new ZipArchive();
-        self::assertEquals(true, $zip->open(self::$importArchive),'Unable to open the exported zip archive');
+        self::assertEquals(true, $zip->open(self::$importArchive), 'Unable to open the exported zip archive');
 
         // The term collection name is dynamic -> add to package structure the name to be checked for tbx
-        static::$exportPackageStructure[] = 'tbx/'.self::$termCollection->getId().'.tbx';
+        static::$exportPackageStructure[] = 'tbx/' . self::$termCollection->getId() . '.tbx';
 
         // reimport file is supported by the segment processor
         for ($idx = 0; $zipFile = $zip->statIndex($idx); $idx++) {
-            self::assertContains($zipFile['name'],static::$exportPackageStructure,'The export file structure is not as expected');
+            self::assertContains($zipFile['name'], static::$exportPackageStructure, 'The export file structure is not as expected');
         }
     }
 
     public static function afterTests(): void
     {
-        if(isset(self::$importArchive)){
+        if (isset(self::$importArchive)) {
             unlink(self::$importArchive);
         }
         parent::afterTests();
     }
-
 }

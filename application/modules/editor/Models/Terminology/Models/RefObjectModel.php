@@ -21,40 +21,41 @@ START LICENSE AND COPYRIGHT
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
 
 /**
- * Class editor_Models_Terminology_Models_Transacgrp
  * TermsTransacgrp Instance
  *
- * @method integer getId() getId()
- * @method void setId() setId(integer $id)
- * @method string getKey() getKey()
- * @method void setKey() setKey(string $key)
+ * @method string getId()
+ * @method void setId(integer $id)
+ * @method string getKey()
+ * @method void setKey(string $key)
  */
-class editor_Models_Terminology_Models_RefObjectModel extends editor_Models_Terminology_Models_Abstract {
+class editor_Models_Terminology_Models_RefObjectModel extends editor_Models_Terminology_Models_Abstract
+{
     protected $dbInstanceClass = 'editor_Models_Db_Terminology_RefObject';
 
-    public function setData(stdClass $data) {
+    public function setData(stdClass $data)
+    {
         $this->set('data', json_encode($data));
     }
 
-    public function getData(): string {
+    public function getData(): string
+    {
         return json_decode($this->get('data'));
     }
 
     /**
      * Get export data
      *
-     * @param int $collectionId
      * @return array
      * @throws Zend_Db_Statement_Exception
      */
-    public function getExportData(int $collectionId) {
-
+    public function getExportData(int $collectionId)
+    {
         // Get distinct transacgrp's targets (some of them may be userGuid-s)
         $targets = '"' . join('","', $this->db->getAdapter()->query('
             SELECT DISTINCT `target` FROM `terms_transacgrp` WHERE `collectionId` = ?        
@@ -70,13 +71,24 @@ class editor_Models_Terminology_Models_RefObjectModel extends editor_Models_Term
         ', $collectionId)->fetchAll(PDO::FETCH_GROUP);
 
         // Get respPerson-data logged during termportal usage (after tbx import)
-        $respPerson = $this->db->getAdapter()->query('
+        $userByGuidA = $this->db->getAdapter()->query('
             SELECT 
                `userGuid` AS `key`, 
-               JSON_OBJECT("fn", CONCAT(`firstName`, " ", `surName`), "email", `email`, "role", `roles`) AS `data` 
+               CONCAT(`firstName`, " ", `surName`) AS `fn`,
+               `email`,
+               `roles` AS `role` 
             FROM `Zf_users`
             WHERE `userGuid` IN (' . $targets . ')
-        ')->fetchAll();
+        ')->fetchAll(PDO::FETCH_UNIQUE);
+
+        // Re-structure to make tbx-exportable
+        $respPerson = [];
+        foreach ($userByGuidA as $key => $data) {
+            $respPerson[] = [
+                'key' => $key,
+                'data' => json_encode($data),
+            ];
+        }
 
         // Append data to the respPerson-list
         $refObjectListA['respPerson'] = array_merge($refObjectListA['respPerson'] ?? [], $respPerson);
@@ -88,12 +100,11 @@ class editor_Models_Terminology_Models_RefObjectModel extends editor_Models_Term
     /**
      * Get emails for excel export by collectionId
      *
-     * @param $collectionId
      * @return array
      * @throws Zend_Db_Statement_Exception
      */
-    public function getEmailsByCollectionId($collectionId) {
-
+    public function getEmailsByCollectionId($collectionId)
+    {
         // Fetch emails from `terms_ref_object` table
         $emails = $this->db->getAdapter()->query('
             SELECT `key`, JSON_UNQUOTE(JSON_EXTRACT(`data`, "$.email")) FROM `terms_ref_object` WHERE `collectionId` = ?

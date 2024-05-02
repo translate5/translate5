@@ -1,0 +1,18 @@
+[
+    {
+        "segmentNrInTask": "2",
+        "internalFuzzy": "0",
+        "matchRate": "70",
+        "wordCount": "1",
+        "characterCount": "3",
+        "type": "mt"
+    },
+    {
+        "segmentNrInTask": "4",
+        "internalFuzzy": "0",
+        "matchRate": "70",
+        "wordCount": "1",
+        "characterCount": "3",
+        "type": "mt"
+    }
+]

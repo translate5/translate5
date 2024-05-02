@@ -3,7 +3,7 @@
 START LICENSE AND COPYRIGHT
 
  This file is part of translate5
- 
+
  Copyright (c) 2013 - 2021 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
 
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
@@ -13,20 +13,20 @@ START LICENSE AND COPYRIGHT
  included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
-  
+
  There is a plugin exception available for use with this release of translate5 for
  translate5: Please see http://www.translate5.net/plugin-exception.txt or
  plugin-exception.txt in the root folder of translate5.
-  
+
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-exception
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
 
-
+use MittagQI\Translate5\LanguageResource\ReimportSegments;
 use MittagQI\Translate5\LanguageResource\TaskAssociation;
 use MittagQI\Translate5\Task\Current\Exception;
 use MittagQI\Translate5\Task\Current\NoAccessException;
@@ -37,12 +37,8 @@ use MittagQI\Translate5\Task\Reimport\DataProvider\ZipDataProvider;
 use MittagQI\Translate5\Task\Reimport\Worker;
 use MittagQI\Translate5\Task\TaskContextTrait;
 
-/**
- *
- */
 class editor_FileController extends ZfExtended_RestController
 {
-
     use TaskContextTrait;
 
     protected $entityClass = 'editor_Models_File';
@@ -95,11 +91,12 @@ class editor_FileController extends ZfExtended_RestController
      */
     public function postAction()
     {
-
         $fileId = $this->getParam('fileId');
 
         if (empty($fileId)) {
-            throw ZfExtended_UnprocessableEntity::createResponse('E1426', ['fileId' => 'missing field fileId']);
+            throw ZfExtended_UnprocessableEntity::createResponse('E1426', [
+                'fileId' => 'missing field fileId',
+            ]);
         }
 
         $this->taskReimport($fileId);
@@ -138,10 +135,10 @@ class editor_FileController extends ZfExtended_RestController
         try {
             $dataProvider->checkAndPrepare();
             $errors = $dataProvider->getCollectedErrors();
-            if (!empty($errors)) {
+            if (! empty($errors)) {
                 $this->log->warn('E1461', 'Reimport ZipDataProvider: One or more problems happened on mapping files from ZIP to task files. See details.', [
                     'task' => $task,
-                    'errors' => $errors
+                    'errors' => $errors,
                 ]);
             }
         } catch (\MittagQI\Translate5\Task\Reimport\Exception $e) {
@@ -155,11 +152,11 @@ class editor_FileController extends ZfExtended_RestController
         $worker = ZfExtended_Factory::get(Worker::class);
 
         // init worker and queue it
-        if (!$worker->init($task->getTaskGuid(), [
-            'files' => $dataProvider->getFiles(),// fileId => FileDto mapping
-            'userGuid' => ZfExtended_Authentication::getInstance()->getUser()->getUserGuid(),
+        if (! $worker->init($task->getTaskGuid(), [
+            'files' => $dataProvider->getFiles(), // fileId => FileDto mapping
+            'userGuid' => ZfExtended_Authentication::getInstance()->getUserGuid(),
             'segmentTimestamp' => NOW_ISO,
-            'dataProviderClass' => $dataProvider::class
+            'dataProviderClass' => $dataProvider::class,
         ])) {
             throw new ZfExtended_Exception('Task ReImport Error on worker init()');
         }
@@ -170,25 +167,33 @@ class editor_FileController extends ZfExtended_RestController
                 $worker->setBlocking();
             }
             $worker->queue();
-            if ($this->getParam('saveToMemory', false)) {
-                $this->queueUpdateTmWorkers();
-            }
+
+            $this->queueUpdateTmWorkers();
 
             $this->view->success = true;
         } catch (Throwable $exception) {
             Lock::taskUnlock($task);
             $dataProvider->cleanup();
-            throw  $exception;
+
+            throw $exception;
         }
     }
 
-    /***
-     * Queue tm update workers for the current task. Only the writable language resources will be updated
+    /**
+     * Queue tm update workers for the current task if configured. Only the writable language resources will be updated.
+     *
      * @throws Exception
      * @throws ZfExtended_Exception
+     * @throws ReflectionException|Zend_Db_Statement_Exception
      */
     protected function queueUpdateTmWorkers(): void
     {
+        $saveToMemory = $this->getCurrentTask()->getConfig()
+            ->runtimeOptions->task->package->reimport->saveToMemory ?? false;
+
+        if (empty($saveToMemory)) {
+            return;
+        }
 
         $assoc = ZfExtended_Factory::get(TaskAssociation::class);
 
@@ -201,9 +206,9 @@ class editor_FileController extends ZfExtended_RestController
             // init worker and queue it
             // Since it has to be done in a none worker request to have session access,
             // we have to insert the worker before the taskPost
-            if (!$worker->init($this->getCurrentTask()->getTaskGuid(), [
+            if (! $worker->init($this->getCurrentTask()->getTaskGuid(), [
                 'languageResourceId' => $resource['languageResourceId'],
-                'segmentFilter' => NOW_ISO
+                ReimportSegments::FILTER_TIMESTAMP => NOW_ISO,
             ])) {
                 throw new ZfExtended_Exception('LanguageResource ReImport Error on worker init()');
             }
@@ -237,6 +242,7 @@ class editor_FileController extends ZfExtended_RestController
                 $fileFilter->applyImportFilters($filePath, $fileId)
             );
         }
+
         return $filesMetaData;
     }
 }

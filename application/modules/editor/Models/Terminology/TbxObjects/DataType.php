@@ -21,12 +21,12 @@ START LICENSE AND COPYRIGHT
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
-class editor_Models_Terminology_TbxObjects_DataType {
-
+class editor_Models_Terminology_TbxObjects_DataType
+{
     /**
      * Collection of all data types, 0-indexed
      *
@@ -43,13 +43,11 @@ class editor_Models_Terminology_TbxObjects_DataType {
 
     /**
      * Load existing data types to be easy accessible for further use
-     *
-     * @param bool $reload
      */
-    public function loadData(bool $reload = false) {
-
+    public function loadData(bool $reload = false)
+    {
         // If datatypes are already loaded, and no reload should be done - return
-        if (!empty($this->data) && !$reload) {
+        if (! empty($this->data) && ! $reload) {
             return;
         }
 
@@ -62,7 +60,7 @@ class editor_Models_Terminology_TbxObjects_DataType {
         // As long as we rely on that `type` is unique for each record across whole datatypes-table,
         // here we set up additional `type`-indexed array of datatype-records to quicker check possibility
         foreach ($this->data as $item) {
-            $this->byType[ strtolower($item['type']) ] = $item;
+            $this->byType[strtolower($item['type'] ?? '')] = $item;
         }
     }
 
@@ -73,17 +71,14 @@ class editor_Models_Terminology_TbxObjects_DataType {
      * @return mixed|string
      * @throws ZfExtended_ErrorCodeException
      */
-    public function getForAttribute(editor_Models_Terminology_TbxObjects_Attribute $attribute){
-
+    public function getForAttribute(editor_Models_Terminology_TbxObjects_Attribute $attribute)
+    {
         // If node's type-attr is not empty
         if ($type = strtolower($attribute->type)) {
-
             // If matching datatype is found among existing ones by node's type-attr
             if ($item = $this->byType[$type] ?? 0) {
-
                 // If matching datatype's expected node name does not match actual node name
                 if ($item['label'] !== $attribute->elementName) {
-
                     // Backup node actual name
                     $attribute->wasElementName = $attribute->elementName;
 
@@ -93,7 +88,6 @@ class editor_Models_Terminology_TbxObjects_DataType {
 
                 // If matching datatype's expected levels-list does not contain actual level
                 if (strpos($item['level'], $attribute->getLevel()) === false) {
-
                     // Update levels list within preloaded datatypes dictionary
                     $this->byType[$type]['level'] = $item['level'] . ',' . $attribute->getLevel();
 
@@ -108,26 +102,25 @@ class editor_Models_Terminology_TbxObjects_DataType {
 
         $labelTypeMatches = [];
         foreach ($this->data as $data) {
-
             // if the label does not match the element name, continue with the search
-            if($data['label'] !== $attribute->elementName){
+            if ($data['label'] !== $attribute->elementName) {
                 continue;
             }
 
             // if the type is empty or if the type matches the attribute dataType, use this as valid label match
             // there are attributes without type defined (ex: note) and they are valid tbx basic
             // compare with lowercase to ignore case sensitive
-            if(ZfExtended_Utils::emptyString($data['type']) || (strtolower($data['type']) === strtolower($attribute->type))){
+            if (ZfExtended_Utils::emptyString($data['type']) || (strtolower($data['type']) === strtolower($attribute->type))) {
                 $labelTypeMatches[] = $data;
             }
         }
 
-        if(empty($labelTypeMatches)){
+        if (empty($labelTypeMatches)) {
             return '';
         }
 
-        foreach ($labelTypeMatches as $match){
-            if(in_array($attribute->getLevel(),explode(',',$match['level']))){
+        foreach ($labelTypeMatches as $match) {
+            if (in_array($attribute->getLevel(), explode(',', $match['level']))) {
                 return $match['id'];
             }
         }
@@ -138,7 +131,8 @@ class editor_Models_Terminology_TbxObjects_DataType {
     /***
      * Reset the current dataType collection array
      */
-    public function resetData(){
+    public function resetData()
+    {
         $this->data = $this->byType = [];
     }
 }

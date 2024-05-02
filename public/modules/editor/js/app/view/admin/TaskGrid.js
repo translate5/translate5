@@ -39,7 +39,7 @@ Ext.define('Editor.view.admin.TaskGrid', {
     controller: 'taskGrid',
     alias: 'widget.adminTaskGrid',
     itemId: 'adminTaskGrid',
-    stateId: 'adminTaskGrid',
+    stateId: 'editor.adminTaskGrid',
     stateful: true,
     cls: 'adminTaskGrid',
     title: '#UT#Aufgaben',
@@ -317,6 +317,7 @@ Ext.define('Editor.view.admin.TaskGrid', {
             userStates = ['open', 'waiting', 'finished', 'unconfirmed'],//TODO get me from backend
             stateFilterOrder = ['open', 'locked', 'end', 'unconfirmed', 'import', 'error'],
             relaisLanguages = Ext.Array.clone(Editor.data.languages),
+            customColumns = Editor.controller.admin.TaskCustomField.getGridColumnsFor('taskGrid'),
             addQtip = function (meta, text) {
                 meta.tdAttr = 'data-qtip="' + Ext.String.htmlEncode(text) + '"';
             },
@@ -355,6 +356,7 @@ Ext.define('Editor.view.admin.TaskGrid', {
 
         config = {
             title: me.title, //see EXT6UPD-9
+            tooltip: Editor.data.l10n.tasksGrid.tooltip,
             languageStore: Ext.StoreMgr.get('admin.Languages'),
             customerStore: Ext.StoreManager.get('customersStore'),
             columns: {
@@ -545,7 +547,13 @@ Ext.define('Editor.view.admin.TaskGrid', {
                             type: 'string'
                         },
                         tdCls: 'taskNr',
-                        text: me.text_cols.taskNr
+                        text: me.text_cols.taskNr,
+                        renderer: function(value, meta, rec) {
+                            if (!(rec.isErroneous() || rec.isImporting() || !rec.isOpenable() || rec.isCustomState())) {
+                                meta.tdAttr = 'data-qtip="' + Editor.data.l10n.tasksGrid.actionColumn.actionEdit + '"';
+                            }
+                            return value;
+                        }
                     }, {
                         xtype: 'numbercolumn',
                         width: 70,
@@ -666,7 +674,7 @@ Ext.define('Editor.view.admin.TaskGrid', {
                                 ret = v;
                             if (Editor.data.frontend.tasklist.pmMailTo) {
                                 tooltip = rec.get('pmMail');
-                                ret = '<a alt="' + tooltip + '" href="mailto:' + tooltip + '">' + v + '</a>';
+                                ret = '<a alt="' + tooltip + '" href="mailto:' + tooltip + '" target="_blank">' + v + '</a>';
                                 meta.tdAttr = 'data-qtip="' + tooltip + '"';
                             }
                             return ret;
@@ -739,7 +747,7 @@ Ext.define('Editor.view.admin.TaskGrid', {
                         },
                         tooltip: me.text_cols.enableSourceEditing,
                         text: me.text_cols.enableSourceEditing
-                    }]
+                    }].concat(customColumns)
             },
             dockedItems: [{
                 xtype: 'toolbar',
@@ -875,7 +883,7 @@ Ext.define('Editor.view.admin.TaskGrid', {
         });
     },
     onDestroy: function () {
-        if (this.tooltip) {
+        if (this.tooltip && this.tooltip.destroy) {
             this.tooltip.destroy();
         }
         this.callParent(arguments);
@@ -928,7 +936,13 @@ Ext.define('Editor.view.admin.TaskGrid', {
                     gridFilter.setActive(true);
                     break;
                 default :
-                    gridFilter.setValue(value);
+                    try {
+                        gridFilter.setValue(value);
+                    } catch (e) {
+                        console.log('Filter type ' + gridFilter.type);
+                        console.log('Filter dataIndex ' + gridFilter.dataIndex);
+                        throw e;
+                    }
                     break;
             }
         });
@@ -991,29 +1005,35 @@ Ext.define('Editor.view.admin.TaskGrid', {
             }
             value = value + '%';
             meta.tdAttr = 'data-qtip="' + value + '"';
-            return me.getCellProgressBarRenderData(value);
+            return me.getCellProgressBarRenderData(value, 13);
         }
 
-        if (!Ext.isNumeric(value) || value < 0) {
-            value = 0;
+        // Shortcuts
+        var tp = rec.get('taskProgress'),
+            up = rec.get('userProgress');
+
+        // Convert to percent
+        tp = Ext.util.Format.percent(tp);
+
+        // If current user is not assigned to current task (false)
+        // or is assigned but have no segments range defined (true)
+        // Render single progress bar just for task progress
+        if (up === false || up === true) {
+            return me.getCellProgressBarRenderData(tp, 13);
         }
 
-        if (value > 0 && !isImportProgress) {
-            value = value / rec.get('segmentCount');
-        }
-
-        value = Ext.util.Format.percent(value);
-
-        meta.tdAttr = 'data-qtip="' + value + '"';
-        return me.getCellProgressBarRenderData(value);
+        // Else convert to percent and render two progress bars for task and for user progress
+        up = Ext.util.Format.percent(up);
+        return me.getCellProgressBarRenderData(tp, 9) + me.getCellProgressBarRenderData(up, 9);
     },
 
     /***
-     * Return html for grid cell progress bar. The imput argument percent
+     * Return html for grid cell progress bar. The input argument percent
      * must contain percent value between 0% - 100%
      */
-    getCellProgressBarRenderData: function (percent) {
-        return '<div class="x-progress x-progress-default" style="height: 13px;">' +
+    getCellProgressBarRenderData: function (percent, height, qtip) {
+        return '<div class="x-progress x-progress-default" style="height: '
+            + (height || 13) + 'px;" data-qtip="' + percent + ' ' + (qtip || '') + '">' +
             '<div class="x-progress-bar x-progress-bar-default" style="width: ' + percent + '">' +
             '</div>' +
             '</div>';

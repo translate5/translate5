@@ -1,4 +1,9 @@
 <?php
+
+/**
+ * @deprecated Must be removed!
+ */
+
 /**
  * Performance detection. 'mt' mean 'microtime'
  * Returns the time between the previous and current calls of this function
@@ -19,17 +24,23 @@
  * )
  * Note: keys are prefixed with numeric indexes to be used for proper order of appearance in browser json response preview
  */
-$GLOBALS['mt'] = 0; function mt($stage = null){
+$GLOBALS['mt'] = 0;
+function mt($stage = null)
+{
     $m = microtime();
     list($mc, $s) = explode(' ', $m);
     $n = $s + $mc;
-        $ret = $n - $GLOBALS['mt'];
+    $ret = $n - $GLOBALS['mt'];
     $GLOBALS['mt'] = $n;
     settype($GLOBALS['_mt'], 'array');
     if ($stage !== false) {
-        if (!$stage || $stage === true) $GLOBALS['_mt'] [count($GLOBALS['_mt']) . ': true'] = $ret;
-        else $GLOBALS['_mt'][count($GLOBALS['_mt']) . ': ' . $stage] = $ret;
+        if (! $stage || $stage === true) {
+            $GLOBALS['_mt'][count($GLOBALS['_mt']) . ': true'] = $ret;
+        } else {
+            $GLOBALS['_mt'][count($GLOBALS['_mt']) . ': ' . $stage] = $ret;
+        }
     }
+
     return $stage === true ? $GLOBALS['_mt'] : $ret;
 } mt(false);
 
@@ -37,12 +48,13 @@ $GLOBALS['mt'] = 0; function mt($stage = null){
  * Displays formatted view of a given value
  *
  * @param mixed $value
- * @return null
  */
-function d($value) {
-
+function d($value)
+{
     // Wrap the $value with the '<pre>' tag, and write it to the output
-    echo '<pre>'; print_r($value); echo '</pre>';
+    echo '<pre>';
+    print_r($value);
+    echo '</pre>';
 }
 
 /**
@@ -54,33 +66,34 @@ function d($value) {
  *  i($_POST);
  *  i($_GET, 'a'); // 'a' is here for dump of $_GET to be appended to the $file instead of overwriting
  *
- * @param $value
  * @param string $mode This arg is a 2nd arg for fopen($filename, $mode) call and accepts same values
  * @param string $file
  */
-function i($value, $mode = 'w', $file = 'debug.txt') {
-
+function i($value, $mode = 'w', $file = 'debug.txt')
+{
     // Get the document root, with trimmed right trailing slash
-    $doc = rtrim($_SERVER['DOCUMENT_ROOT'], '\\/');
+    $doc = APPLICATION_ROOT . '/public';
 
     // Get the absolute path of a file, that will be used for writing data to
     $abs = $doc . '/' . $file;
 
     // If value is bool
-    if (is_bool($value)) {
-
+    if (is_bool($value) || is_null($value)) {
         // Use var_dump for dumping, as print_r() will give 1 or 0 instead of 'bool(true)' or 'bool(false)'
-        ob_start(); var_dump($value); $value = ob_get_clean();
+        ob_start();
+        var_dump($value);
+        $value = ob_get_clean();
 
-    // Else
+        // Else
     } else {
-
         // Use print_r() for dumping
         $value = print_r($value, true);
     }
 
     // Write the data
-    $fp = fopen($abs, $mode); fwrite($fp, $value . "\n"); fclose($fp);
+    $fp = fopen($abs, $mode);
+    fwrite($fp, $value . "\n");
+    fclose($fp);
 }
 
 /**
@@ -91,17 +104,14 @@ function i($value, $mode = 'w', $file = 'debug.txt') {
  * https://github.com/jakezatecky/array_group_by/blob/master/src/array_group_by.php
  *
  * @param array $arr     The array to be grouped.
- * @param mixed $key,... A set of keys to group by.
- *
- * @return array
  */
-function array_group_by(array $arr, $key) : array
+function array_group_by(array $arr, $key): array
 {
-    if (!is_string($key) && !is_int($key) && !is_float($key) && !is_callable($key)) {
+    if (! is_string($key) && ! is_int($key) && ! is_float($key) && ! is_callable($key)) {
         trigger_error('array_group_by(): The key should be a string, an integer, a float, or a function', E_USER_ERROR);
     }
 
-    $isFunction = !is_string($key) && is_callable($key);
+    $isFunction = ! is_string($key) && is_callable($key);
 
     // Load the new array, splitting by the target key
     $grouped = [];
@@ -110,7 +120,7 @@ function array_group_by(array $arr, $key) : array
 
         if ($isFunction) {
             $groupKey = $key($value);
-        } else if (is_object($value)) {
+        } elseif (is_object($value)) {
             $groupKey = $value->{$key};
         } else {
             $groupKey = $value[$key];
@@ -138,6 +148,10 @@ function array_group_by(array $arr, $key) : array
  *
  * @return string
  */
-function stack() {
-    ob_start(); debug_print_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS); return ob_get_clean();
+function stack()
+{
+    ob_start();
+    debug_print_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
+
+    return ob_get_clean();
 }

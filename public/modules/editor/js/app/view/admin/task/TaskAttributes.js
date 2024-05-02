@@ -68,6 +68,7 @@ Ext.define('Editor.view.admin.task.TaskAttributes', {
         disabled:'{!enablePanel}'
     },
     title: '#UT#Eigenschaften',
+    border: 0,
     initConfig: function(instanceConfig) {
         var me = this,
             config,
@@ -93,6 +94,7 @@ Ext.define('Editor.view.admin.task.TaskAttributes', {
                     enableOverflow: true,
                     defaultButtonUI: false,
                     ui: 'footer',
+                    border: '1 0 0 0',
                     items: [
                         {
                             xtype: 'tbfill'
@@ -122,7 +124,7 @@ Ext.define('Editor.view.admin.task.TaskAttributes', {
                                 click:'onSaveTaskAttributesClick'
                             },
                             text: me.strings.btnSave
-                        },
+                        }
                     ]
                 }
             ]
@@ -204,8 +206,12 @@ Ext.define('Editor.view.admin.task.TaskAttributes', {
         }));
         
         me.setUsageModeConfig(items);
-        
-        return items;
+
+        return items.concat(
+            Editor.controller.admin.TaskCustomField.getFormFieldsFor(
+                'projectWizard',
+                true
+            ));
     },
     applyIfNotAllowed: function(baseItem, right, overwrite) {
         if(Editor.app.authenticatedUser.isAllowed(right)) {

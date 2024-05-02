@@ -44,6 +44,11 @@ Ext.define('Editor.view.admin.task.reimport.ReimportViewController', {
                 click:'onImportTranslatorPackageClick'
             }
         },
+        store: {
+            '#projectTasks': {
+                load: 'onProjectTaskLoad'
+            }
+        },
         messagebus: {
             '#translate5 task': {
                 triggerReload: 'onTriggerTaskReload',
@@ -166,5 +171,21 @@ Ext.define('Editor.view.admin.task.reimport.ReimportViewController', {
         var win = Ext.widget('adminTaskReimportReimportZipWindow');
         win.loadRecord(me.getView().task);
         win.show();
+    },
+
+    /**
+     * Clear files reimport store if project has no tasks for some reason
+     *
+     * @param store
+     * @param records
+     * @param successful
+     */
+    onProjectTaskLoad: function(store, records, successful) {
+        if (successful === false) {
+            return;
+        }
+        if (!records.length) {
+            this.getView().getStore().loadData([]);
+        }
     }
 });

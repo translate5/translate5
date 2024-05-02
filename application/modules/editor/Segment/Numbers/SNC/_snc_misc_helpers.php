@@ -1,4 +1,5 @@
 <?php
+
 function sortByLength_desc($a, $b)
 {
     if (mb_strlen($a) == mb_strlen($b)) {
@@ -11,72 +12,204 @@ function sortByLength_desc($a, $b)
 function getSncLangData()
 {
     return [
-        'ar-SA' => ['decimal_separator' => 'Punkt'],
-        'az-Cyrl-AZ' => ['decimal_separator' => 'Komma'],
-        'az-Latn-AZ' => ['decimal_separator' => 'Komma'],
-        'be-BY' => ['decimal_separator' => 'Komma'],
-        'bg-BG' => ['decimal_separator' => 'Komma'],
-        'bs-Cyrl-BA' => ['decimal_separator' => 'Komma'],
-        'bs-Latn-BA' => ['decimal_separator' => 'Komma'],
-        'cs-CZ' => ['decimal_separator' => 'Komma'],
-        'da-DK' => ['decimal_separator' => 'Komma'],
-        'de-AT' => ['decimal_separator' => 'Komma'],
-        'de-DE' => ['decimal_separator' => 'Komma'],
-        'el-GR' => ['decimal_separator' => 'Komma'],
-        'en-AU' => ['decimal_separator' => 'Punkt'],
-        'en-CA' => ['decimal_separator' => 'Punkt'],
-        'en-GB' => ['decimal_separator' => 'Punkt'],
-        'en-IE' => ['decimal_separator' => 'Punkt'],
-        'en-US' => ['decimal_separator' => 'Punkt'],
-        'es-AR' => ['decimal_separator' => 'Komma'],
-        'es-ES' => ['decimal_separator' => 'Komma'],
-        'es-MX' => ['decimal_separator' => 'Punkt'],
-        'et-EE' => ['decimal_separator' => 'Komma'],
-        'fi-FI' => ['decimal_separator' => 'Komma'],
-        'fr-CH' => ['decimal_separator' => 'Komma'],
-        'fr-CA' => ['decimal_separator' => 'Komma'],
-        'fr-FR' => ['decimal_separator' => 'Komma'],
-        'he-IL' => ['decimal_separator' => 'Punkt'],
-        'hi-IN' => ['decimal_separator' => 'Punkt'],
-        'hr-HR' => ['decimal_separator' => 'Komma'],
-        'hu-HU' => ['decimal_separator' => 'Komma'],
-        'id-ID' => ['decimal_separator' => 'Komma'],
-        'is-IS' => ['decimal_separator' => 'Komma'],
-        'it-IT' => ['decimal_separator' => 'Komma'],
-        'ja-JP' => ['decimal_separator' => 'Punkt'],
-        'kk-KZ' => ['decimal_separator' => 'Komma'],
-        'ko-KR' => ['decimal_separator' => 'Punkt'],
-        'lt-LT' => ['decimal_separator' => 'Komma'],
-        'lv-LV' => ['decimal_separator' => 'Komma'],
-        'mk-MK' => ['decimal_separator' => 'Komma'],
-        'ms-MY' => ['decimal_separator' => 'Punkt'],
-        'nb-NO' => ['decimal_separator' => 'Komma'],
-        'nl-BE' => ['decimal_separator' => 'Komma'],
-        'nl-NL' => ['decimal_separator' => 'Komma'],
-        'nn-NO' => ['decimal_separator' => 'Komma'],
-        'pl-PL' => ['decimal_separator' => 'Komma'],
-        'pt-BR' => ['decimal_separator' => 'Komma'],
-        'pt-PT' => ['decimal_separator' => 'Komma'],
-        'ro-RO' => ['decimal_separator' => 'Komma'],
-        'ru-RU' => ['decimal_separator' => 'Komma'],
-        'sk-SK' => ['decimal_separator' => 'Komma'],
-        'sl-SI' => ['decimal_separator' => 'Komma'],
-        'sq-AL' => ['decimal_separator' => 'Komma'],
-        'sr-Cyrl-BA ' => ['decimal_separator' => 'Komma'],
-        'sr-Cyrl-CS ' => ['decimal_separator' => 'Komma'],
-        'sr-Cyrl-ME ' => ['decimal_separator' => 'Komma'],
-        'sr-Cyrl-RS ' => ['decimal_separator' => 'Komma'],
-        'sr-Latn-BA' => ['decimal_separator' => 'Komma'],
-        'sr-Latn-CS' => ['decimal_separator' => 'Komma'],
-        'sr-Latn-ME' => ['decimal_separator' => 'Komma'],
-        'sr-Latn-RS' => ['decimal_separator' => 'Komma'],
-        'sv-SE' => ['decimal_separator' => 'Komma'],
-        'th-TH' => ['decimal_separator' => 'Punkt'],
-        'tr-TR' => ['decimal_separator' => 'Komma'],
-        'uk-UA' => ['decimal_separator' => 'Komma'],
-        'vi-VN' => ['decimal_separator' => 'Komma'],
-        'zh-CN' => ['decimal_separator' => 'Punkt'],
-        'zh-TW' => ['decimal_separator' => 'Punkt'],
+        'ar-SA' => [
+            'decimal_separator' => 'Punkt',
+        ],
+        'az-Cyrl-AZ' => [
+            'decimal_separator' => 'Komma',
+        ],
+        'az-Latn-AZ' => [
+            'decimal_separator' => 'Komma',
+        ],
+        'be-BY' => [
+            'decimal_separator' => 'Komma',
+        ],
+        'bg-BG' => [
+            'decimal_separator' => 'Komma',
+        ],
+        'bs-Cyrl-BA' => [
+            'decimal_separator' => 'Komma',
+        ],
+        'bs-Latn-BA' => [
+            'decimal_separator' => 'Komma',
+        ],
+        'cs-CZ' => [
+            'decimal_separator' => 'Komma',
+        ],
+        'da-DK' => [
+            'decimal_separator' => 'Komma',
+        ],
+        'de-AT' => [
+            'decimal_separator' => 'Komma',
+        ],
+        'de-DE' => [
+            'decimal_separator' => 'Komma',
+        ],
+        'el-GR' => [
+            'decimal_separator' => 'Komma',
+        ],
+        'en-AU' => [
+            'decimal_separator' => 'Punkt',
+        ],
+        'en-CA' => [
+            'decimal_separator' => 'Punkt',
+        ],
+        'en-GB' => [
+            'decimal_separator' => 'Punkt',
+        ],
+        'en-IE' => [
+            'decimal_separator' => 'Punkt',
+        ],
+        'en-US' => [
+            'decimal_separator' => 'Punkt',
+        ],
+        'es-AR' => [
+            'decimal_separator' => 'Komma',
+        ],
+        'es-ES' => [
+            'decimal_separator' => 'Komma',
+        ],
+        'es-MX' => [
+            'decimal_separator' => 'Punkt',
+        ],
+        'et-EE' => [
+            'decimal_separator' => 'Komma',
+        ],
+        'fi-FI' => [
+            'decimal_separator' => 'Komma',
+        ],
+        'fr-CH' => [
+            'decimal_separator' => 'Komma',
+        ],
+        'fr-CA' => [
+            'decimal_separator' => 'Komma',
+        ],
+        'fr-FR' => [
+            'decimal_separator' => 'Komma',
+        ],
+        'he-IL' => [
+            'decimal_separator' => 'Punkt',
+        ],
+        'hi-IN' => [
+            'decimal_separator' => 'Punkt',
+        ],
+        'hr-HR' => [
+            'decimal_separator' => 'Komma',
+        ],
+        'hu-HU' => [
+            'decimal_separator' => 'Komma',
+        ],
+        'id-ID' => [
+            'decimal_separator' => 'Komma',
+        ],
+        'is-IS' => [
+            'decimal_separator' => 'Komma',
+        ],
+        'it-IT' => [
+            'decimal_separator' => 'Komma',
+        ],
+        'ja-JP' => [
+            'decimal_separator' => 'Punkt',
+        ],
+        'kk-KZ' => [
+            'decimal_separator' => 'Komma',
+        ],
+        'ko-KR' => [
+            'decimal_separator' => 'Punkt',
+        ],
+        'lt-LT' => [
+            'decimal_separator' => 'Komma',
+        ],
+        'lv-LV' => [
+            'decimal_separator' => 'Komma',
+        ],
+        'mk-MK' => [
+            'decimal_separator' => 'Komma',
+        ],
+        'ms-MY' => [
+            'decimal_separator' => 'Punkt',
+        ],
+        'nb-NO' => [
+            'decimal_separator' => 'Komma',
+        ],
+        'nl-BE' => [
+            'decimal_separator' => 'Komma',
+        ],
+        'nl-NL' => [
+            'decimal_separator' => 'Komma',
+        ],
+        'nn-NO' => [
+            'decimal_separator' => 'Komma',
+        ],
+        'pl-PL' => [
+            'decimal_separator' => 'Komma',
+        ],
+        'pt-BR' => [
+            'decimal_separator' => 'Komma',
+        ],
+        'pt-PT' => [
+            'decimal_separator' => 'Komma',
+        ],
+        'ro-RO' => [
+            'decimal_separator' => 'Komma',
+        ],
+        'ru-RU' => [
+            'decimal_separator' => 'Komma',
+        ],
+        'sk-SK' => [
+            'decimal_separator' => 'Komma',
+        ],
+        'sl-SI' => [
+            'decimal_separator' => 'Komma',
+        ],
+        'sq-AL' => [
+            'decimal_separator' => 'Komma',
+        ],
+        'sr-Cyrl-BA ' => [
+            'decimal_separator' => 'Komma',
+        ],
+        'sr-Cyrl-CS ' => [
+            'decimal_separator' => 'Komma',
+        ],
+        'sr-Cyrl-ME ' => [
+            'decimal_separator' => 'Komma',
+        ],
+        'sr-Cyrl-RS ' => [
+            'decimal_separator' => 'Komma',
+        ],
+        'sr-Latn-BA' => [
+            'decimal_separator' => 'Komma',
+        ],
+        'sr-Latn-CS' => [
+            'decimal_separator' => 'Komma',
+        ],
+        'sr-Latn-ME' => [
+            'decimal_separator' => 'Komma',
+        ],
+        'sr-Latn-RS' => [
+            'decimal_separator' => 'Komma',
+        ],
+        'sv-SE' => [
+            'decimal_separator' => 'Komma',
+        ],
+        'th-TH' => [
+            'decimal_separator' => 'Punkt',
+        ],
+        'tr-TR' => [
+            'decimal_separator' => 'Komma',
+        ],
+        'uk-UA' => [
+            'decimal_separator' => 'Komma',
+        ],
+        'vi-VN' => [
+            'decimal_separator' => 'Komma',
+        ],
+        'zh-CN' => [
+            'decimal_separator' => 'Punkt',
+        ],
+        'zh-TW' => [
+            'decimal_separator' => 'Punkt',
+        ],
     ];
 }
 
@@ -98,14 +231,13 @@ function skipChecksForMid($data, $kombi, $package, $file, $mid, $checkFunc, $snc
 
     if (true) {
         if ((isLocked_studio($data, $kombi, $package, $file, $mid)) &&
-            (!CHECK_LOCKED)) {
+            (! CHECK_LOCKED)) {
             if ($debug) {
                 echo "SKIP! mid: [$mid] isLocked_studio && !CHECK_LOCKED\nfile: $file\n\n";
             }
 
             return true;
         }
-
 
         if ((isPerfectMatch_studio($data, $kombi, $package, $file, $mid)) &&
             ($sncSettings['studio.skipMatches.perfectMatch']['master_value'] == true)) {
@@ -203,8 +335,8 @@ function isContextMatch_studio($data, $kombi, $package, $file, $mid)
 
 function is100PercentMatch_studio($data, $kombi, $package, $file, $mid)
 {
-    if ((!isPerfectMatch_studio($data, $kombi, $package, $file, $mid)) &&
-        (!isContextMatch_studio($data, $kombi, $package, $file, $mid)) &&
+    if ((! isPerfectMatch_studio($data, $kombi, $package, $file, $mid)) &&
+        (! isContextMatch_studio($data, $kombi, $package, $file, $mid)) &&
         (isset($data[$kombi][$package][$file]['segInfo'][$mid]['segDefs']['percent'])) &&
         ($data[$kombi][$package][$file]['segInfo'][$mid]['segDefs']['percent'] == 100) &&
         (isset($data[$kombi][$package][$file]['segInfo'][$mid]['segDefs']['origin'])) &&
@@ -220,7 +352,7 @@ function setCheckProps(&$checks, $checkProps)
     $checkFunc = $checkProps['checkFunc'];
     $checkType = $checkProps['checkType'];
 
-    if (!function_exists($checkFunc)) {
+    if (! function_exists($checkFunc)) {
         trigger_error("function $checkFunc als checkProps definiert, aber !function_exists", E_USER_ERROR);
     }
 
@@ -242,7 +374,7 @@ function setCheckSubProps(&$checks, $checkProps)
     $checkSubRule = $checkProps['checkSubRule'];
     $checkSubRule_EN = $checkProps['checkSubRule_EN'];
 
-    if (!function_exists($checkSubFunc)) {
+    if (! function_exists($checkSubFunc)) {
         trigger_error("function $checkSubFunc als checkProps definiert, aber !function_exists", E_USER_ERROR);
     }
 

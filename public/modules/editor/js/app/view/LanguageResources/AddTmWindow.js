@@ -49,7 +49,7 @@ Ext.define('Editor.view.LanguageResources.AddTmWindow', {
         add: '#UT#Sprachressource hinzufügen',
         resource: '#UT#Ressource',
         name: '#UT#Name',
-        file: '#UT#TM/TMX-Datei (optional)',
+        file: '#UT#ZIP/TM/TMX-Datei (optional)',
         importTmxType: '#UT#Bitte verwenden Sie eine TM oder TMX Datei!',
         categories: '#UT#Kategorien',
         color: '#UT#Farbe',
@@ -67,15 +67,17 @@ Ext.define('Editor.view.LanguageResources.AddTmWindow', {
         collectionUploadTooltip: '#UT#Erlaubte Dateiformate: TBX oder eine Zip-Datei, die eine oder mehrere TBX-Dateien enthält.',
         mergeTermsLabelTooltip: '#UT#Begriffe in der TBX werden immer zuerst nach ID mit bestehenden Einträgen in der TermCollection zusammengeführt. Wenn Terme zusammenführen angekreuzt ist und die ID in der TBX nicht in der TermCollection gefunden wird, wird gesucht, ob derselbe Begriff bereits in derselben Sprache existiert. Wenn ja, werden die gesamten Termeinträge zusammengeführt. Insbesondere bei einer TermCollection mit vielen Sprachen kann dies zu unerwünschten Ergebnissen führen.',
         pivotAsDefault:'#UT#Standardmäßig als Pivot verwenden',
-        pivotAsDefaultTooltip:'#UT#Standardmäßig als Pivot verwenden'
+        pivotAsDefaultTooltip:'#UT#Standardmäßig als Pivot verwenden',
+        stripFramingTags: '#UT#Umschließende Tags beim Import löschen',
+        stripFramingTagsTooltip: '#UT#Arbeitet analog zur Systemkonfiguration runtimeOptions.import.xlf.ignoreFramingTags, aber für TMX-Import. Sie entfernt alle (oder nur gepaarte) Tags vom Anfang und Ende eines importierten Segments, falls aktiviert. Die Systemkonfiguration sollte daher für denselben Kunden die gleiche Einstellung für zu importierende Aufgaben haben. Wenn Sie bestehende TMs konvertieren müssen, bitten Sie den translate5-Support um Hilfe.',
     },
-    height: 500,
-    width: 500,
+    height: 600,
+    width: 800,
     modal: true,
     layout: 'fit',
     autoScroll: true,
 
-    tmxRegex: /\.(tm|tmx)$/i,
+    tmxRegex: /\.(tm|tmx|zip)$/i,
     tbxRegex: /\.(tbx|zip)$/i,
 
     listeners: {
@@ -265,21 +267,48 @@ Ext.define('Editor.view.LanguageResources.AddTmWindow', {
                         fieldLabel: me.strings.file,
                         bind: {
                             fieldLabel: '{uploadLabel}'
+                        },
+                        listeners: {
+                            change: 'onSelectFile'
                         }
-                    }, {
-                        xtype: 'tagfield',
-                        name: 'categories',
-                        id: 'categories',
-                        store: Ext.create('Editor.store.Categories').load(),
-                        fieldLabel: me.strings.categories,
-                        disabled: true,
-                        typeAhead: true,
-                        valueField: 'id',
-                        displayField: 'customLabel',
-                        multiSelect: true,
-                        queryMode: 'local',
-                        encodeSubmitValue: true
-                    }]
+                    },
+                        {
+                            xtype: 'combo',
+                            itemId: 'stripFramingTags',
+                            name: 'stripFramingTags',
+                            fieldLabel: me.strings.stripFramingTags,
+                            store: new Ext.data.ArrayStore({
+                                fields: ['id', 'value'],
+                            }),
+                            queryMode: 'local',
+                            displayField: 'value',
+                            valueField: 'id',
+                            value: 'none',
+                            bind: {
+                                disabled: '{!isStrippingFramingTagsSupported}',
+                                hidden: '{!isStrippingFramingTagsSupported}'
+                            },
+                            labelClsExtra: 'lableInfoIcon',
+                            autoEl: {
+                                tag: 'div',
+                                'data-qtip': me.strings.stripFramingTagsTooltip
+                            }
+                        },
+                        {
+                            xtype: 'tagfield',
+                            name: 'categories',
+                            id: 'categories',
+                            store: Ext.create('Editor.store.Categories').load(),
+                            fieldLabel: me.strings.categories,
+                            disabled: true,
+                            typeAhead: true,
+                            valueField: 'id',
+                            displayField: 'customLabel',
+                            multiSelect: true,
+                            queryMode: 'local',
+                            encodeSubmitValue: true
+                        }
+                    ]
                 }],
                 dockedItems: [{
                     xtype: 'toolbar',

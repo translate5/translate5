@@ -21,50 +21,53 @@
   @copyright  Marc Mittag, MittagQI - Quality Informatics
   @author     MittagQI - Quality Informatics
   @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
- 			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
  END LICENSE AND COPYRIGHT
  */
 
+use MittagQI\Translate5\Acl\Rights;
 use MittagQI\Translate5\Cronjob\CronEventTrigger;
+use MittagQI\Translate5\LanguageResource\Pretranslation\BatchCleanupWorker;
 use MittagQI\Translate5\LanguageResource\Pretranslation\BatchResult;
 use MittagQI\Translate5\PauseWorker\PauseWorker;
-use MittagQI\Translate5\LanguageResource\Pretranslation\BatchCleanupWorker;
+use MittagQI\Translate5\Plugins\MatchAnalysis\Models\Pricing\Preset;
 use MittagQI\Translate5\Plugins\MatchAnalysis\PauseMatchAnalysisProcessor;
 use MittagQI\Translate5\Plugins\MatchAnalysis\PauseMatchAnalysisWorker;
 use MittagQI\Translate5\Task\Import\ImportEventTrigger;
-use MittagQI\Translate5\Plugins\MatchAnalysis\Models\Pricing\Preset;
 use MittagQI\ZfExtended\Worker\Queue;
 
 class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract
 {
     protected static string $description = 'Provides the match-analysis and pre-translation against language-resources.';
+
     protected static bool $enabledByDefault = true;
+
     protected static bool $activateForTests = true;
 
     /**
      * Contains the Plugin Path relativ to APPLICATION_PATH or absolut if not under APPLICATION_PATH
      * @var array
      */
-    protected $frontendControllers = array(
-        'pluginMatchAnalysisMatchAnalysis' => 'Editor.plugins.MatchAnalysis.controller.MatchAnalysis',
-        'pluginMatchAnalysisPricingPreset' => 'Editor.plugins.MatchAnalysis.controller.admin.PricingPreset'
-    );
+    protected $frontendControllers = [
+        Rights::PLUGIN_MATCH_ANALYSIS_MATCH_ANALYSIS => 'Editor.plugins.MatchAnalysis.controller.MatchAnalysis',
+        Rights::PLUGIN_MATCH_ANALYSIS_PRICING_PRESET => 'Editor.plugins.MatchAnalysis.controller.admin.PricingPreset',
+        Rights::PLUGIN_MATCH_ANALYSIS_CUSTOMER_PRICING_PRESET => 'Editor.plugins.MatchAnalysis.controller.admin.PricingPreset',
+    ];
 
     protected $localePath = 'locales';
 
-    /**
-     *
-     * @var array
-     */
-    protected $assocs = [];
+    protected array $assocs = [];
 
     /**
      * Langauge resources which are supporting batch query
      * @var editor_Models_LanguageResources_LanguageResource[]
      */
-    protected $batchAssocs = [];
+    protected array $batchAssocs = [];
 
+    /**
+     * @throws Zend_Acl_Exception
+     */
     public function getFrontendControllers(): array
     {
         return $this->getFrontendControllersFromAcl();
@@ -72,7 +75,6 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract
 
     /**
      * Initialize the plugn "Match Analysis"
-     * {@inheritDoc}
      * @see ZfExtended_Plugin_Abstract::init()
      */
     public function init()
@@ -124,8 +126,8 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract
         // Adds the pricingPresetId to the task-meta
         $this->eventManager->attach(
             ImportEventTrigger::class,
-            ImportEventTrigger::BEFORE_PROCESS_UPLOADED_FILE,
-            [$this, 'handleBeforeProcessUploadedFile']
+            ImportEventTrigger::INIT_TASK_META,
+            [$this, 'handleInitTaskMeta']
         );
 
         $this->eventManager->attach(
@@ -134,22 +136,23 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract
             [$this, 'handleCustomerAfterIndex']
         );
 
-        $config = Zend_Registry::get('config');
-        if ($config->runtimeOptions->plugins?->MatchAnalysis?->autoPretranslateOnTaskImport) {
-            $this->eventManager->attach(
-                ImportEventTrigger::class,
-                ImportEventTrigger::IMPORT_WORKER_STARTED,
-                [$this, 'handleImportWorkerQueued']
-            );
-        }
+        $this->eventManager->attach(
+            ImportEventTrigger::class,
+            ImportEventTrigger::IMPORT_WORKER_STARTED,
+            [$this, 'handleImportWorkerQueued']
+        );
     }
 
     /**
      * Hook that adds the pricingPresetId sent by the Import wizard to the task-meta
      *
-     * @param Zend_EventManager_Event $event
+     * @throws ReflectionException
+     * @throws Zend_Db_Statement_Exception
+     * @throws ZfExtended_Models_Entity_Exceptions_IntegrityConstraint
+     * @throws ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey
+     * @throws ZfExtended_Models_Entity_NotFoundException
      */
-    public function handleBeforeProcessUploadedFile(Zend_EventManager_Event $event): void
+    public function handleInitTaskMeta(Zend_EventManager_Event $event): void
     {
         /* @var $meta editor_Models_Task_Meta */
         $meta = $event->getParam('meta');
@@ -169,7 +172,7 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract
     /**
      * Add presetId and presetUnitType props to each row
      *
-     * @param Zend_EventManager_Event $event
+     * @throws ReflectionException
      * @throws ZfExtended_Models_Entity_NotFoundException
      */
     public function addPresetInfo(Zend_EventManager_Event $event): void
@@ -182,23 +185,12 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract
             return;
         }
 
-        // If current request has no filter-param - return
-        if (!$filter = $controller->getParam('filter')) {
-            return;
-        }
-
-        // If there is no projectId-filter among current request's filter-param - return
-        if (!in_array('projectId', array_column(json_decode($filter), 'property'))) {
-            return;
-        }
-
         // Get task and preset models
         $task = $event->getParam('entity');
         $preset = ZfExtended_Factory::get(Preset::class);
 
         // Foreach task inside the project
         foreach ($event->getParam('view')->rows as &$row) {
-
             // Load task
             $task->load($row['id']);
 
@@ -212,6 +204,14 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract
         }
     }
 
+    /**
+     * @throws ZfExtended_Models_Entity_NotFoundException
+     * @throws ZfExtended_Exception
+     * @throws ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey
+     * @throws Zend_Db_Statement_Exception
+     * @throws ZfExtended_Models_Entity_Exceptions_IntegrityConstraint
+     * @throws ReflectionException
+     */
     public function injectFrontendConfig(Zend_EventManager_Event $event): void
     {
         $view = $event->getParam('view');
@@ -235,6 +235,15 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract
         $view->pluginLocale()->add($this, 'views/localizedjsstrings.phtml');
     }
 
+    /**
+     * @throws ZfExtended_Models_Entity_NotFoundException
+     * @throws Zend_Exception
+     * @throws editor_Models_ConfigException
+     * @throws ZfExtended_Exception
+     * @throws Throwable
+     * @throws ReflectionException
+     * @throws editor_Task_Operation_Exception
+     */
     public function handleOnAnalysisOperation(Zend_EventManager_Event $event): void
     {
         //if the task is in import state -> queue the worker, do not pretranslate
@@ -246,6 +255,15 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract
         $this->handleOperation($task, $params);
     }
 
+    /**
+     * @throws ZfExtended_Models_Entity_NotFoundException
+     * @throws Zend_Exception
+     * @throws editor_Models_ConfigException
+     * @throws ZfExtended_Exception
+     * @throws Throwable
+     * @throws ReflectionException
+     * @throws editor_Task_Operation_Exception
+     */
     public function handleOnPretranslationOperation(Zend_EventManager_Event $event): void
     {
         // if the task is in import state -> queue the worker,
@@ -258,16 +276,31 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract
         $this->handleOperation($task, $params);
     }
 
+    /**
+     * @throws ZfExtended_Models_Entity_NotFoundException
+     * @throws Zend_Exception
+     * @throws editor_Models_ConfigException
+     * @throws ZfExtended_Exception
+     * @throws Throwable
+     * @throws ReflectionException
+     * @throws editor_Task_Operation_Exception
+     */
     public function handleImportWorkerQueued(Zend_EventManager_Event $event): void
     {
         /* @var editor_Models_Task $task */
         $task = $event->getParam('task');
-        $this->handleOperation($task, ['pretranslate' => true, 'isTaskImport' => true]);
+        $config = $task->getConfig();
+        if ($config->runtimeOptions->plugins?->MatchAnalysis?->autoPretranslateOnTaskImport) {
+            $this->handleOperation($task, [
+                'pretranslate' => true,
+                'isTaskImport' => true,
+            ]);
+        }
     }
 
-    /***
+    /**
      * Cron controller daily action
-     * @param Zend_EventManager_Event $event
+     * @throws ReflectionException
      */
     public function handleAfterDailyAction(Zend_EventManager_Event $event): void
     {
@@ -275,29 +308,33 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract
         $batchCache->deleteOlderRecords();
     }
 
-    /***
+    /**
      * Operation action handler. Run analysis and pretranslate if $pretranslate is true.
      *
-     * @param Zend_EventManager_Event $event
-     * @param bool $pretranslate
+     * @throws ReflectionException
+     * @throws Throwable
+     * @throws Zend_Exception
+     * @throws ZfExtended_Exception
+     * @throws ZfExtended_Models_Entity_NotFoundException
      * @throws editor_Models_ConfigException
+     * @throws editor_Task_Operation_Exception
      */
     protected function handleOperation(editor_Models_Task $task, array $params): void
     {
         $config = $task->getConfig();
 
         // set the defaults from config if not provided as params
-        if (!isset($params['internalFuzzy'])) {
+        if (! isset($params['internalFuzzy'])) {
             $params['internalFuzzy'] = $config->runtimeOptions->plugins->MatchAnalysis->internalFuzzyDefault;
         }
-        if (!isset($params['pretranslateTmAndTerm'])) {
+        if (! isset($params['pretranslateTmAndTerm'])) {
             $params['pretranslateTmAndTerm'] = $config->runtimeOptions
                 ->plugins->MatchAnalysis->pretranslateTmAndTermDefault;
         }
-        if (!isset($params['pretranslateMt'])) {
+        if (! isset($params['pretranslateMt'])) {
             $params['pretranslateMt'] = $config->runtimeOptions->plugins->MatchAnalysis->pretranslateMtDefault;
         }
-        if (!isset($params['pretranslateMatchrate'])) {
+        if (! isset($params['pretranslateMatchrate'])) {
             $params['pretranslateMatchrate'] = $config->runtimeOptions->plugins->MatchAnalysis->pretranslateMatchRate;
         }
 
@@ -327,10 +364,13 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract
         ZfExtended_Factory::get(Queue::class)->trigger();
     }
 
-    /***
+    /**
      * Add batch query worker for the resources used for pivot pre-translation before the pivot worker is queued
-     * @param Zend_EventManager_Event $event
-     * @return void
+     * @throws ReflectionException
+     * @throws Zend_Exception
+     * @throws ZfExtended_Exception
+     * @throws ZfExtended_Models_Entity_NotFoundException
+     * @throws editor_Models_ConfigException
      */
     public function handleBeforePivotPreTranslationQueue(Zend_EventManager_Event $event): void
     {
@@ -342,16 +382,16 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract
             $task->getTaskGuid(),
             $pivotAssociations
         );
-        if (!empty($batchResources)) {
+        if (! empty($batchResources)) {
             $this->queueBatchWorkersForPivot($task, $parentWorkerId, $batchResources);
         }
     }
 
     /**
      * For each batch supported connector queue one batch worker
-     * @param editor_Models_Task $task
-     * @param int $parentWorkerId
-     * @param array $batchResources
+     * @throws ReflectionException
+     * @throws Zend_Exception
+     * @throws ZfExtended_Models_Entity_NotFoundException
      */
     protected function queueBatchWorkersForPivot(
         editor_Models_Task $task,
@@ -359,9 +399,10 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract
         array $batchResources
     ): void {
         $workerParameters = [];
-        if (!$task->isImporting()) {
+        if (! $task->isImporting()) {
             $workerParameters['workerBehaviour'] = ZfExtended_Worker_Behaviour_Default::class;
         }
+        $workerState = ZfExtended_Models_Worker::STATE_SCHEDULED;
 
         /* @var editor_Models_LanguageResources_LanguageResource $languageResource */
         foreach ($batchResources as $languageResource) {
@@ -375,7 +416,7 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract
 
             $workerParameters['contentField'] = editor_Models_SegmentField::TYPE_RELAIS;
 
-            if (!$batchWorker->init($task->getTaskGuid(), $workerParameters)) {
+            if (! $batchWorker->init($task->getTaskGuid(), $workerParameters)) {
                 //we log that fact, queue nothing and rely on the normal match analysis processing
                 $this->addWarn(
                     $task,
@@ -387,16 +428,18 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract
             }
 
             //we may not trigger the queue here, just add the workers!
-            $workerId = $batchWorker->queue($parentWorkerId, null, false);
+            $workerId = $batchWorker->queue($parentWorkerId, $workerState, false);
 
-            $this->queueBatchCleanUpWorker($workerId, $task->getTaskGuid());
+            $this->queueBatchCleanUpWorker($workerId, $task->getTaskGuid(), $workerState);
         }
     }
 
-    /***
+    /**
      * Check if the given pivot associations can be used for batch pre-translation
-     * @param string $taskGuid
-     * @return array
+     * @throws ReflectionException
+     * @throws ZfExtended_Exception
+     * @throws ZfExtended_Models_Entity_NotFoundException
+     * @throws editor_Models_ConfigException
      */
     protected function getAvailableBatchResourceForPivotPreTranslation(string $taskGuid, array $assocs): array
     {
@@ -427,16 +470,21 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract
         return $batchAssocs;
     }
 
-    /***
+    /**
      * Queue the match analysis worker
      *
-     * @param string $taskGuid
-     * @param array $workerParameters
      * @return boolean
+     * @throws ReflectionException
+     * @throws Throwable
+     * @throws Zend_Exception
+     * @throws ZfExtended_Exception
+     * @throws ZfExtended_Models_Entity_NotFoundException
+     * @throws editor_Models_ConfigException
+     * @throws editor_Task_Operation_Exception
      */
     protected function queueAnalysis(string $taskGuid, array $workerParameters): bool
     {
-        if (!$this->hasAssoc($taskGuid)) {
+        if (! $this->hasAssoc($taskGuid)) {
             //you can not run analysis without resources to be associated to the task
             return false;
         }
@@ -459,7 +507,7 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract
         try {
             $queued = $this->finishQueueAnalysis($task, $valid, $workerParameters);
 
-            if (!$queued) {
+            if (! $queued) {
                 $task->unlock();
             }
 
@@ -471,78 +519,128 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract
         }
     }
 
+    /**
+     * @throws ZfExtended_Models_Entity_NotFoundException
+     * @throws Zend_Exception
+     * @throws ReflectionException
+     * @throws editor_Task_Operation_Exception
+     */
     private function finishQueueAnalysis(editor_Models_Task $task, array $valid, array $workerParameters): bool
     {
-        if ($task->isImporting()) {
-            //on import we use the import worker as parentId
-            $parentWorkerId = $this->fetchImportWorkerId($task->getTaskGuid());
-        } else {
-            // crucial: add a different behaviour for the workers when performig an operation
-            $workerParameters['workerBehaviour'] = ZfExtended_Worker_Behaviour_Default::class;
-            // this creates the operation start/finish workers
-            $parentWorkerId = editor_Task_Operation::create(editor_Task_Operation::MATCHANALYSIS, $task);
-        }
-
         if (empty($valid)) {
             $this->addWarn(
                 $task,
                 'MatchAnalysis Plug-In: No valid analysable language resources found.',
-                ['invalid' => print_r($this->assocs, 1)]
+                [
+                    'invalid' => print_r($this->assocs, 1),
+                ]
             );
 
             return false;
         }
 
-        $user = new Zend_Session_Namespace('user');
-        $workerParameters['userGuid'] = $user->data->userGuid;
-        $workerParameters['userName'] = $user->data->userName;
+        if ($task->isImporting()) {
+            //on import we use the import worker as parentId
+            $parentWorkerId = $this->fetchImportWorkerId($task->getTaskGuid());
+            //on import state scheduled is ok
+            $workerState = ZfExtended_Models_Worker::STATE_SCHEDULED;
 
-        //enable batch query via config
-        $workerParameters['batchQuery'] = (boolean)Zend_Registry::get('config')
-            ->runtimeOptions->LanguageResources->Pretranslation->enableBatchQuery;
-        if (!empty($this->batchAssocs) && $workerParameters['batchQuery']) {
-            $this->queueBatchWorkers($task, $workerParameters, $parentWorkerId);
-        }
+            $this->doQueueAnalysisWorkers($task, $parentWorkerId, $workerState, $workerParameters);
+        } else {
+            // this creates the operation start/finish workers
+            $operation = editor_Task_Operation::create(editor_Task_Operation::MATCHANALYSIS, $task);
 
-        $worker = ZfExtended_Factory::get(PauseMatchAnalysisWorker::class);
-        $worker->init($task->getTaskGuid(), [PauseWorker::PROCESSOR => PauseMatchAnalysisProcessor::class]);
-        $worker->queue($parentWorkerId);
+            try {
+                $parentWorkerId = $operation->getWorkerId();
+                //on operations we init with prepare, since the operation schedules the prepared ones
+                $workerState = ZfExtended_Models_Worker::STATE_PREPARE;
+                // add a different behaviour for the workers when performing an operation
+                $workerParameters['workerBehaviour'] = ZfExtended_Worker_Behaviour_Default::class;
 
-        // init worker and queue it
-        $worker = ZfExtended_Factory::get(editor_Plugins_MatchAnalysis_Worker::class);
+                $this->doQueueAnalysisWorkers($task, $parentWorkerId, $workerState, $workerParameters);
+                // and start operation
+                $operation->start();
+            } catch (Throwable $e) {
+                $operation->onQueueingError();
 
-        if (!$worker->init($task->getTaskGuid(), $workerParameters)) {
-            $this->addWarn($task, 'MatchAnalysis-Error on worker init(). Worker could not be initialized');
-
-            return false;
-        }
-
-        $worker->queue($parentWorkerId, null, false);
-
-        // if we are not importing we need to add the quality workers (which also include the termtagger)
-        if (!$task->isImporting()) {
-            editor_Segment_Quality_Manager::instance()->queueOperation(
-                editor_Segment_Processing::ANALYSIS,
-                $task,
-                $parentWorkerId
-            );
+                throw $e;
+            }
         }
 
         return true;
     }
 
     /**
-     * For each batch supported connector queue one batch worker
-     * @param editor_Models_Task $task
-     * @param array $eventParams
+     * Queues the Analysis and all other needed workers
+     * @return false|void
+     * @throws ReflectionException
+     * @throws Zend_Exception
+     * @throws ZfExtended_Models_Entity_NotFoundException
      */
-    protected function queueBatchWorkers(editor_Models_Task $task, array $eventParams, int $parentWorkerId)
-    {
-        $isPretranslateMt = (boolean)$eventParams['pretranslateMt'];
-        $isPretranslate = (boolean)$eventParams['pretranslate'];
+    private function doQueueAnalysisWorkers(
+        editor_Models_Task $task,
+        int $parentWorkerId,
+        ?string $workerState,
+        array $workerParameters = []
+    ) {
+        $workerParameters['userGuid'] = ZfExtended_Models_User::SYSTEM_GUID;
+        $workerParameters['userName'] = ZfExtended_Models_User::SYSTEM_LOGIN;
+        
+        if (ZfExtended_Authentication::getInstance()->getUser()) {
+            $workerParameters['userGuid'] = ZfExtended_Authentication::getInstance()->getUserGuid();
+            $workerParameters['userName'] = ZfExtended_Authentication::getInstance()->getUser()->getUserName();
+        }
+        
+        //enable batch query via config
+        $workerParameters['batchQuery'] = (bool) Zend_Registry::get('config')
+            ->runtimeOptions->LanguageResources->Pretranslation->enableBatchQuery;
+        if (! empty($this->batchAssocs) && $workerParameters['batchQuery']) {
+            $this->queueBatchWorkers($task, $workerParameters, $parentWorkerId, $workerState);
+        }
+
+        $worker = ZfExtended_Factory::get(PauseMatchAnalysisWorker::class);
+        $worker->init($task->getTaskGuid(), [
+            PauseWorker::PROCESSOR => PauseMatchAnalysisProcessor::class,
+        ]);
+        $worker->queue($parentWorkerId, $workerState);
+
+        // init worker and queue it
+        $worker = ZfExtended_Factory::get(editor_Plugins_MatchAnalysis_Worker::class);
+
+        if (! $worker->init($task->getTaskGuid(), $workerParameters)) {
+            throw new ZfExtended_Exception('MatchAnalysis-Error on worker init(). Worker could not be initialized');
+        }
+
+        $worker->queue($parentWorkerId, $workerState, false);
+
+        // if we are not importing we need to add the quality workers (which also include the termtagger)
+        if (! $task->isImporting()) {
+            editor_Segment_Quality_Manager::instance()->queueOperation(
+                editor_Segment_Processing::ANALYSIS,
+                $task,
+                $parentWorkerId,
+                ZfExtended_Models_Worker::STATE_PREPARE
+            );
+        }
+    }
+
+    /**
+     * For each batch supported connector queue one batch worker
+     * @throws ReflectionException
+     * @throws Zend_Exception
+     * @throws ZfExtended_Models_Entity_NotFoundException
+     */
+    protected function queueBatchWorkers(
+        editor_Models_Task $task,
+        array $eventParams,
+        int $parentWorkerId,
+        string $workerState
+    ): void {
+        $isPretranslateMt = (bool) $eventParams['pretranslateMt'];
+        $isPretranslate = (bool) $eventParams['pretranslate'];
         $workerParameters = [];
 
-        if (!$task->isImporting()) {
+        if (! $task->isImporting()) {
             $workerParameters['workerBehaviour'] = ZfExtended_Worker_Behaviour_Default::class;
         }
 
@@ -554,14 +652,14 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract
             //if the pretranslation is disabled(the current request is for analysis only),
             //do not use this resource for batch query. For analysis only, the results from the resource
             //are not relevant, since always the same matchrate is received
-            if ((!$isPretranslateMt || !$isPretranslate) && $languageRessource->isMt()) {
+            if ((! $isPretranslateMt || ! $isPretranslate) && $languageRessource->isMt()) {
                 continue;
             }
 
             $workerParameters['languageResourceId'] = $languageRessource->getId();
             $workerParameters['userGuid'] = $eventParams['userGuid'];
 
-            if (!$batchWorker->init($task->getTaskGuid(), $workerParameters)) {
+            if (! $batchWorker->init($task->getTaskGuid(), $workerParameters)) {
                 //we log that fact, queue nothing and rely on the normal match analysis processing
                 $this->addWarn($task, 'MatchAnalysis-Error on batchWorker init(). Worker could not be initialized');
 
@@ -569,52 +667,49 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract
             }
 
             //we may not trigger the queue here, just add the workers!
-            $workerId = $batchWorker->queue($parentWorkerId, null, false);
+            $workerId = $batchWorker->queue($parentWorkerId, $workerState, false);
 
-            $this->queueBatchCleanUpWorker($workerId, $task->getTaskGuid());
+            $this->queueBatchCleanUpWorker($workerId, $task->getTaskGuid(), $workerState);
         }
     }
 
     /**
-     *
-     * @param string $taskGuid
-     * @return NULL|int
+     * @throws ReflectionException
      */
-    private function fetchImportWorkerId(string $taskGuid): ?int
+    private function fetchImportWorkerId(string $taskGuid): int
     {
         $parent = ZfExtended_Factory::get(ZfExtended_Models_Worker::class);
-        $result = $parent->loadByState(
-            ZfExtended_Models_Worker::STATE_PREPARE,
-            'editor_Models_Import_Worker',
-            $taskGuid
-        );
 
-        if (count($result) > 0) {
-            return $result[0]['id'];
+        try {
+            $parent->loadFirstOf(editor_Models_Import_Worker::class, $taskGuid);
+
+            return (int) $parent->getId();
+        } catch (ZfExtended_Models_Entity_NotFoundException $e) {
+            return 0;
         }
-
-        return 0;
     }
 
-    /***
+    /**
      * Check if the given task has associated language resources
-     * @param string $taskGuid
      * @return boolean
+     * @throws ReflectionException
      */
-    protected function hasAssoc(string $taskGuid)
+    protected function hasAssoc(string $taskGuid): bool
     {
         $languageResources = ZfExtended_Factory::get(editor_Models_LanguageResources_LanguageResource::class);
         $this->assocs = $languageResources->loadByAssociatedTaskGuid($taskGuid);
 
-        return !empty($this->assocs);
+        return ! empty($this->assocs);
     }
 
-    /***
+    /**
      * Check if the current associated language resources can be used for analysis
-     * @param string $taskGuid
-     * @return array
+     * @throws ReflectionException
+     * @throws ZfExtended_Exception
+     * @throws ZfExtended_Models_Entity_NotFoundException
+     * @throws editor_Models_ConfigException
      */
-    protected function checkLanguageResources(string $taskGuid)
+    protected function checkLanguageResources(string $taskGuid): array
     {
         $task = ZfExtended_Factory::get(editor_Models_Task::class);
         $task->loadByTaskGuid($taskGuid);
@@ -643,28 +738,28 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract
             }
 
             //analysable language resource is found
-            if (!empty($resource) && $resource->getAnalysable()) {
+            if (! empty($resource) && $resource->getAnalysable()) {
                 $valid[] = $assoc;
             }
-
         }
 
         return $valid;
     }
 
-    /***
+    /**
      * Queue batch cleanup worker. This will clean the batch results after the batch results are used.
      *
-     * @param int $parent
-     * @param string $taskGuid
-     * @return void
+     * @throws ReflectionException
+     * @throws Zend_Exception
+     * @throws ZfExtended_Models_Entity_NotFoundException
      */
-    protected function queueBatchCleanUpWorker(int $parent, string $taskGuid): void
+    protected function queueBatchCleanUpWorker(int $parent, string $taskGuid, string $workerState): void
     {
         $batchCleanupWorker = ZfExtended_Factory::get(BatchCleanupWorker::class);
 
-        if (!$batchCleanupWorker->init($taskGuid, ['taskGuid' => $taskGuid])) {
-
+        if (! $batchCleanupWorker->init($taskGuid, [
+            'taskGuid' => $taskGuid,
+        ])) {
             $task = ZfExtended_Factory::get(editor_Models_Task::class);
             $task->loadByTaskGuid($taskGuid);
 
@@ -673,14 +768,15 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract
                 $task,
                 'MatchAnalysis-Error on BatchCleanupWorker init(). BatchCleanupWorker can not be initialized'
             );
+
             return;
         }
 
         //we may not trigger the queue here, just add the workers!
-        $batchCleanupWorker->queue($parent, null, false);
+        $batchCleanupWorker->queue($parent, $workerState, false);
     }
 
-    /***
+    /**
      * Reset the collected batch language resources
      */
     protected function resetBatchAssocs(): void
@@ -711,7 +807,7 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract
             [
                 'module' => 'editor',
                 'controller' => 'plugins_matchanalysis_matchanalysis',
-                'action' => 'export'
+                'action' => 'export',
             ]
         );
         $r->addRoute('plugins_matchanalysis_export', $exportAnalysis);
@@ -723,7 +819,7 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract
                 [
                     'module' => 'editor',
                     'controller' => 'plugins_matchanalysis_pricingpreset',
-                    'action' => 'clone'
+                    'action' => 'clone',
                 ]
             )
         );
@@ -735,7 +831,7 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract
                 [
                     'module' => 'editor',
                     'controller' => 'plugins_matchanalysis_pricingpreset',
-                    'action' => 'setdefault'
+                    'action' => 'setdefault',
                 ]
             )
         );
@@ -747,18 +843,15 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract
                 [
                     'module' => 'editor',
                     'controller' => 'plugins_matchanalysis_pricingpresetprices',
-                    'action' => 'clone'
+                    'action' => 'clone',
                 ]
             )
-
         );
     }
 
-    /***
+    /**
      * Log analysis warning
-     * @param string $taskGuid
-     * @param array $extra
-     * @param string $message
+     * @throws Zend_Exception
      */
     protected function addWarn(editor_Models_Task $task, string $message, array $extra = []): void
     {
@@ -768,7 +861,7 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract
     }
 
     /**
-     * @param Zend_EventManager_Event $event
+     * @throws ReflectionException
      * @see ZfExtended_RestController::afterActionEvent
      */
     public function handleCustomerAfterIndex(Zend_EventManager_Event $event): void
