@@ -9762,6 +9762,10 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
                 <source>Einführung</source>
                 <target>Einführung</target>
             </trans-unit>
+            <trans-unit id='RWluaWdlIFRyYW5zbGF0aW9uIE1lbW9yeXMsIGRpZSBhdWYgZGVyIEdydW5kbGFnZSBJaHJlciBTdGFuZGFyZGVpbnN0ZWxsdW5nZW4genVnZXdpZXNlbiB3ZXJkZW4sIHNpbmQgbm9jaCBuaWNodCBnZW3DpMOfIGRlbiBiZXN0ZWhlbmRlbiBSZWdlbG4gZsO8ciBkaWUgQ29udGVudCBQcm90ZWN0aW9uIGtvbnZlcnRpZXJ0LiBTaWUgc29sbHRlbiBzaWUgaW4gZGVyIFNwcmFjaHJlc3NvdXJjZW52ZXJ3YWx0dW5nIGtvbnZlcnRpZXJlbiwgYmV2b3IgU2llIHNpZSB2ZXJ3ZW5kZW4uCk3DtmNodGVuIFNpZSBkZW4gQXVmZ2FiZW5pbXBvcnQgYWJicmVjaGVuPw=='>
+                <source>Einige Translation Memorys, die auf der Grundlage Ihrer Standardeinstellungen zugewiesen werden, sind noch nicht gemäß den bestehenden Regeln für die Content Protection konvertiert. Sie sollten sie in der Sprachressourcenverwaltung konvertieren, bevor Sie sie verwenden.<br/>Möchten Sie den Aufgabenimport abbrechen?</source>
+                <target>Einige Translation Memorys, die auf der Grundlage Ihrer Standardeinstellungen zugewiesen werden, sind noch nicht gemäß den bestehenden Regeln für die Content Protection konvertiert. Sie sollten sie in der Sprachressourcenverwaltung konvertieren, bevor Sie sie verwenden.<br/>Möchten Sie den Aufgabenimport abbrechen?</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>
