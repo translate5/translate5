@@ -29,5 +29,17 @@ Ext.define('TMMaintenance.model.Segment', {
             type: 'json',
             writeAllFields: true,
         },
+    },
+
+    save: function(options) {
+        // Check if the record is considered new
+        // phantom is true if the record has not been saved to the server yet
+        if (this.phantom) {
+            this.getProxy().setActionMethods({create: 'POST'});
+        } else {
+            this.getProxy().setActionMethods({update: 'PUT'});
+        }
+
+        this.callParent([options]);
     }
 });

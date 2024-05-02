@@ -123,7 +123,7 @@ Ext.define('Ext.translate5.Editor', {
         editor.editing.view.document.on(
             'clipboardInput',
             (evt, data) => {
-                console.log('Past from clipboard');
+                console.log('Paste from clipboard');
 
                 // Prevent the default listener from being executed.
                 // evt.stop();

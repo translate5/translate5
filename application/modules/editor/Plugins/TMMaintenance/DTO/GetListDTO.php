@@ -11,7 +11,7 @@ class GetListDTO
     public function __construct(
         private int $tmId,
         private int $limit,
-        private ?string $offset,
+        private string $offset,
         private string $searchCriteria,
         private string $searchField
     ) {
@@ -22,7 +22,7 @@ class GetListDTO
         return new self(
             (int)$request->getParam('tm'),
             (int)$request->getParam('limit'),
-            $request->getParam('offset'),
+            (string)$request->getParam('offset'),
             $request->getParam('searchCriteria'),
             $request->getParam('searchField')
         );

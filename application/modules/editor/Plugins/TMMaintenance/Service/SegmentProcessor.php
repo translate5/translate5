@@ -11,6 +11,7 @@ use editor_Services_Connector_TagHandler_Abstract;
 use editor_Services_Manager;
 use editor_Services_OpenTM2_HttpApi;
 use JetBrains\PhpStorm\ArrayShape;
+use MittagQI\Translate5\Plugins\TMMaintenance\DTO\CreateDTO;
 use MittagQI\Translate5\Plugins\TMMaintenance\DTO\DeleteDTO;
 use MittagQI\Translate5\Plugins\TMMaintenance\DTO\GetListDTO;
 use MittagQI\Translate5\Plugins\TMMaintenance\DTO\UpdateDTO;
@@ -40,7 +41,7 @@ class SegmentProcessor
         return array_shift($data);
     }
 
-    #[ArrayShape(['items' => "array", 'metaData' => "array"])]
+    #[ArrayShape(['items' => 'array', 'metaData' => 'array'])]
     public function getList(GetListDTO $dto): array
     {
         $tmId = $dto->getTmId();
@@ -89,6 +90,19 @@ class SegmentProcessor
             'items' => array_merge(...$result),
             'metaData' => ['offset' => $offset],
         ];
+    }
+
+    public function create(CreateDTO $dto): int
+    {
+        $whitespace = $this->getWhitespace();
+        $api = $this->getApi($dto->getTm());
+        try {
+            $api->updateEntry($whitespace->unprotectWhitespace($dto->getSource()), $whitespace->unprotectWhitespace($dto->getTarget()));
+        } catch (\Exception $e) {
+            // TODO error
+        }
+
+        return 1;
     }
 
     public function update(UpdateDTO $dto): void
@@ -148,7 +162,6 @@ class SegmentProcessor
 
     private function getOpenTM2Connector(int $languageResourceId): editor_Services_Connector
     {
-        /** @var editor_Models_LanguageResources_LanguageResource $languageResource */
         $languageResource = ZfExtended_Factory::get(editor_Models_LanguageResources_LanguageResource::class);
         $languageResource->load($languageResourceId);
 

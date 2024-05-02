@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use MittagQI\Translate5\Plugins\TMMaintenance\DTO\CreateDTO;
 use MittagQI\Translate5\Plugins\TMMaintenance\DTO\DeleteDTO;
 use MittagQI\Translate5\Plugins\TMMaintenance\DTO\GetListDTO;
 use MittagQI\Translate5\Plugins\TMMaintenance\DTO\UpdateDTO;
@@ -70,16 +71,15 @@ class Editor_Plugins_Tmmaintenance_ApiController extends ZfExtended_RestControll
         );
     }
 
-    // TODO this is never called
     public function postAction(): void
     {
+        $this->getSegmentsProcessor()->create(CreateDTO::fromRequest($this->getRequest()));
         $this->assignView([]);
     }
 
     public function putAction(): void
     {
-        $dto = UpdateDTO::fromRequest($this->getRequest());
-        $this->getSegmentsProcessor()->update($dto);
+        $this->getSegmentsProcessor()->update(UpdateDTO::fromRequest($this->getRequest()));
 //        $data = $this->getSegmentsProcessor()->getOne($dto->getId());
         $this->assignView([Json::decode($this->getRequest()?->getParam('data'))]);
     }

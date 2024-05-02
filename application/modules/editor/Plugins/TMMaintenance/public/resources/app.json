@@ -23,7 +23,7 @@
     /**
      * The relative path to the application's markup file (html, jsp, asp, etc.).
      */
-    "indexHtmlPath": "index.html",
+    "indexHtmlPath": "index.php",
 
     /**
      * Comma-separated string with the paths of directories or files to search. Any classes
@@ -388,6 +388,8 @@
 
     "output": {
         "base": "${workspace.build.dir}/${build.environment}/${app.name}",
+        "page": "../index.php",
+//        "manifest": "../${build.id}.json",
         "appCache": {
             "enable": false
         }

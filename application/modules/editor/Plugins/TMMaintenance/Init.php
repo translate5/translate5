@@ -72,7 +72,6 @@ class editor_Plugins_TMMaintenance_Init extends ZfExtended_Plugin_Abstract
         $router = $frontController->getRouter();
 
         if (null === $router) {
-            // TODO do something
             throw new \Error('No router');
         }
 

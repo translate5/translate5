@@ -499,7 +499,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
 
             $results[] = $result->results;
             $resultsCount += count($result->results);
-            $resultList->setNextOffset($id . ':' . $result->NewSearchPosition);
+            $resultList->setNextOffset($id . ':' . $id . ':' . $result->NewSearchPosition);
 
             // if we get enough results then response them
             if (self::CONCORDANCE_SEARCH_NUM_RESULTS <= $resultsCount) {
@@ -518,7 +518,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
         //$found->{$field}
         //[NextSearchPosition] =>
         foreach ($results as $result) {
-            $this->resultList->addResult(
+            $resultList->addResult(
                 $this->highlight(
                     $searchString,
                     $this->tagHandler->restoreInResult($result->target),
@@ -534,7 +534,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
                     $field === 'source'
                 )
             );
-            $this->resultList->setRawContent($result->source, $result->target);
+            $resultList->setRawContent($result->source, $result->target);
         }
 
         return $resultList;
