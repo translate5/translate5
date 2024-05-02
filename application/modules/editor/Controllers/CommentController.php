@@ -197,11 +197,10 @@ class Editor_CommentController extends ZfExtended_RestController
 
         $task = ZfExtended_Factory::get(editor_Models_Task::class);
         $task->loadByTaskGuid($taskGuid);
-        $task->changeSegmentFinishCount($task, $newAutoState, $oldAutoState);
-
-        $task->loadByTaskGuid($taskGuid);
         // TODO: make me with message bus
-        $this->view->segmentFinishCount = $task->getSegmentFinishCount();
+
+        // Recalculate task progress and assign results into view
+        $this->appendTaskProgress($task);
     }
 
     //getting a single comment is actually unnecessary

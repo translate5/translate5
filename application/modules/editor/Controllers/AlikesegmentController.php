@@ -279,14 +279,13 @@ class Editor_AlikesegmentController extends ZfExtended_RestController
         //numerisches Array für korrekten JSON Export
         $this->view->rows = array_values($result);
 
-        //TODO: change to websocket
-        //the alike segment save does not use the segment saver
-        //the segment finish count needs to be updated after the allike segments save
-        $task->updateSegmentFinishCount();
-        //reload the task
-        $task->load($task->getId());
-        $this->view->segmentFinishCount = $task->getSegmentFinishCount();
+        // Recalculate task progress and assign results into view
+        // The alike segment save does not use the segment saver
+        // The segment finish  count needs to be updated after the allike segments save
+        // TODO: change to websocket
+        $this->appendTaskProgress($task);
 
+        // Get total
         $this->view->total = count($result);
 
         // Update qualities for cases when we need full list of task's segments to be analysed for quality detection

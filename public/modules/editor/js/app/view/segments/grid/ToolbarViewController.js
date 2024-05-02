@@ -85,7 +85,13 @@ Ext.define('Editor.view.segments.grid.ToolbarViewController', {
             params: params,
             timeout: 240000,
             scope: me,
-            success: function(){
+            success: function(xhr){
+                if (opName.match('lock')) {
+                    var json = xhr.responseJson;
+                    Editor.app.getController('Segments').updateSegmentFinishCountViewModel(
+                        json.taskProgress, json.userProgress
+                    );
+                }
                 grid.store.load({
                     callback: function(){
                         let selSeg = grid.getViewModel().get('selectedSegment'),

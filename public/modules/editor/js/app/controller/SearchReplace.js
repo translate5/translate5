@@ -975,7 +975,7 @@ Ext.define('Editor.controller.SearchReplace', {
                 
                 //TODO: this should be implemented via websokets
                 //update the segment finish count view model
-            	me.updateSegmentsFinishCount(Ext.Number.from(responseData.segmentFinishCount,0));
+            	me.updateSegmentsFinishCount(responseData);
                 
                 var replacedSegments = responseData.rows,
                     message=responseData.message,
@@ -1754,8 +1754,8 @@ Ext.define('Editor.controller.SearchReplace', {
     /***
      * update the segments finish count view model after replace all
      */
-    updateSegmentsFinishCount:function(value){
-    	Editor.app.getController('Segments').updateSegmentFinishCountViewModel(value);
+    updateSegmentsFinishCount:function(json){
+    	Editor.app.getController('Segments').updateSegmentFinishCountViewModel(json.taskProgress, json.userProgress);
     },
 
     /***

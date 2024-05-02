@@ -172,6 +172,16 @@ class editor_Models_Segment_AutoStates
     ];
 
     /**
+     * Segments having those states are skipped during counting editable and finished segments
+     *
+     * @var int[]
+     */
+    public static $nonEditableStates = [
+        self::BLOCKED,
+        self::LOCKED
+    ];
+
+    /**
      * Segment autostates ids for blocked segments
      * TODO: after implementing TRANSLATE-3710, change this to constant
      * @var array|int[]

@@ -160,4 +160,29 @@ trait TaskContextTrait
             throw new NoAccessException();
         }
     }
+
+    /**
+     * Recalculate task progress and assign results into view
+     *
+     * @param editor_Models_Task|null $task
+     * @throws Current\Exception
+     * @throws ZfExtended_Models_Entity_NotFoundException
+     * @throws \ReflectionException
+     * @throws \Zend_Db_Statement_Exception
+     * @throws \ZfExtended_Models_Entity_Exceptions_IntegrityConstraint
+     * @throws \ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey
+     */
+    public function appendTaskProgress(?editor_Models_Task $task = null) : void {
+
+        // Get taskProgress model instance
+        $progressM = ZfExtended_Factory::get(\editor_Models_TaskProgress::class);
+
+        // If $task arg is not given - pick from getCurrentTask() call
+        $task ??= $this->getCurrentTask();
+
+        // Refresh progress and assign into view
+        $this->view->assign(
+            $progressM->refreshProgress($task, ZfExtended_Authentication::getInstance()->getUserGuid())
+        );
+    }
 }
