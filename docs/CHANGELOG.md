@@ -12,6 +12,18 @@ All updates are (downwards) compatible! If not this is listed in the important r
 
 
 
+
+## [7.4.1] - 2024-05-03
+
+### Important Notes:
+ 
+
+
+### Bugfixes
+**[TRANSLATE-3917](https://jira.translate5.net/browse/TRANSLATE-3917): Editor general - UI error when confirming task** <br>
+Fix for UI error when user confirms job.
+
+
 ## [7.4.0] - 2024-04-30
 
 ### Important Notes:
