@@ -1024,7 +1024,10 @@ Ext.define('Editor.view.admin.TaskGrid', {
 
         // Else convert to percent and render two progress bars for task and for user progress
         up = Ext.util.Format.percent(up);
-        return me.getCellProgressBarRenderData(tp, 9) + me.getCellProgressBarRenderData(up, 9);
+        return [
+            me.getCellProgressBarRenderData(tp, 9, Editor.data.l10n.tasksGrid.progress.taskProgress + ':'),
+            me.getCellProgressBarRenderData(up, 9, Editor.data.l10n.tasksGrid.progress.userProgress + ':')
+        ].join('');
     },
 
     /***
@@ -1033,7 +1036,7 @@ Ext.define('Editor.view.admin.TaskGrid', {
      */
     getCellProgressBarRenderData: function (percent, height, qtip) {
         return '<div class="x-progress x-progress-default" style="height: '
-            + (height || 13) + 'px;" data-qtip="' + percent + ' ' + (qtip || '') + '">' +
+            + (height || 13) + 'px;" data-qtip="' + (qtip ? qtip + ' ' : '') + percent + '">' +
             '<div class="x-progress-bar x-progress-bar-default" style="width: ' + percent + '">' +
             '</div>' +
             '</div>';

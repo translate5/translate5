@@ -106,10 +106,8 @@ Ext.define('Editor.view.segments.grid.Header', {
                         width: 150,
                         height: showUserSpecificProgress ? 12 : 24,
                         userCls: showUserSpecificProgress ? 'half-height' : '',
-                        autoEl: {
-                            'data-qtip': me.strings.progressTooltip
-                        },
-                        bind:{
+                        bind: {
+                            tooltip: '{l10n.tasksGrid.progress.taskProgress}: {taskProgressPercent}',
                             value: '{taskProgress}'
                         }
                     },{
@@ -119,10 +117,8 @@ Ext.define('Editor.view.segments.grid.Header', {
                         height: 12,
                         userCls: showUserSpecificProgress ? 'half-height' : '',
                         hidden: !showUserSpecificProgress,
-                        //autoEl: {
-                        //    'data-qtip': me.strings.progressTooltip
-                        //},
-                        bind:{
+                        bind: {
+                            tooltip: '{l10n.tasksGrid.progress.userProgress}: {userProgressPercent}',
                             value: '{userProgress}',
                         }
                     }]

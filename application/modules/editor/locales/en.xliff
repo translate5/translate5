@@ -9916,6 +9916,14 @@ E-Mail: service@MittagQI.com</pre>
                 <source>Sind Sie sicher, dass Sie dieses benutzerdefinierte Feld löschen möchten?</source>
                 <target>Are you sure you want to delete this custom field?</target>
             </trans-unit>
+            <trans-unit id='QWxsZXMgw7xiZXIgRm9ydHNjaHJpdHQ='>
+                <source>Alles über Fortschritt</source>
+                <target>All over progress</target>
+            </trans-unit>
+            <trans-unit id='UGVyc8O2bmxpY2hlciBGb3J0c2Nocml0dA=='>
+                <source>Persönlicher Fortschritt</source>
+                <target>Personal progress</target>
+            </trans-unit>
             <trans-unit id='Qml0dGUgZGVua2VuIFNpZSBkYXJhbiwgZGFzcyBhbGxlIFZlcndlbmR1bmdlbiBkaWVzZXIgT3B0aW9uIChmYWxscyB2b3JoYW5kZW4pIGVudGZlcm50IHdlcmRlbiwgd2VubiBzaWUgaW4gZWluZW0gZGVyIGJlc3RlaGVuZGVuIFByb2pla3RlL0F1ZmdhYmVuIGVyZsO8bGx0IHdlcmRlbi4gRm9ydGZhaHJlbj8='>
                 <source>Bitte denken Sie daran, dass alle Verwendungen dieser Option (falls vorhanden) entfernt werden, wenn sie in einem der bestehenden Projekte/Aufgaben erfüllt werden. Fortfahren?</source>
                 <target>Please keep in mind that all the usages (if any) of this option will be removed if met in any of existing projects/tasks. Proceed?</target>

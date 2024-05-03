@@ -35,8 +35,8 @@ Ext.define('Editor.view.segments.GridViewModel', {
         userProgress: false
     },
     formulas: {
-        taskDescription: function(){
-            return Editor.data.task.get('description');
-        }
+        taskDescription: () => Editor.data.task.get('description'),
+        taskProgressPercent: get => Math.round(get('taskProgress') * 100) + '%',
+        userProgressPercent: get => Math.round(get('userProgress') * 100) + '%'
     }
 });

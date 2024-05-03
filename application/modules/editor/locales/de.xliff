@@ -9742,6 +9742,14 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
                 <source>Sind Sie sicher, dass Sie dieses benutzerdefinierte Feld löschen möchten?</source>
                 <target>Sind Sie sicher, dass Sie dieses benutzerdefinierte Feld löschen möchten?</target>
             </trans-unit>
+            <trans-unit id='QWxsZXMgw7xiZXIgRm9ydHNjaHJpdHQ='>
+                <source>Alles über Fortschritt</source>
+                <target>Alles über Fortschritt</target>
+            </trans-unit>
+            <trans-unit id='UGVyc8O2bmxpY2hlciBGb3J0c2Nocml0dA=='>
+                <source>Persönlicher Fortschritt</source>
+                <target>Persönlicher Fortschritt</target>
+            </trans-unit>
             <trans-unit id='Qml0dGUgZGVua2VuIFNpZSBkYXJhbiwgZGFzcyBhbGxlIFZlcndlbmR1bmdlbiBkaWVzZXIgT3B0aW9uIChmYWxscyB2b3JoYW5kZW4pIGVudGZlcm50IHdlcmRlbiwgd2VubiBzaWUgaW4gZWluZW0gZGVyIGJlc3RlaGVuZGVuIFByb2pla3RlL0F1ZmdhYmVuIGVyZsO8bGx0IHdlcmRlbi4gRm9ydGZhaHJlbj8='>
                 <source>Bitte denken Sie daran, dass alle Verwendungen dieser Option (falls vorhanden) entfernt werden, wenn sie in einem der bestehenden Projekte/Aufgaben erfüllt werden. Fortfahren?</source>
                 <target>Bitte denken Sie daran, dass alle Verwendungen dieser Option (falls vorhanden) entfernt werden, wenn sie in einem der bestehenden Projekte/Aufgaben erfüllt werden. Fortfahren?</target>
