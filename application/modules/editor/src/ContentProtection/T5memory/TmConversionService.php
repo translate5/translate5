@@ -125,6 +125,17 @@ class TmConversionService
         ['languages' => $languages, 'hash' => $hash] = $this->languageResourceRulesHashMap[$languageResourceId];
 
         if (! isset($this->languageRulesHashMap[$languages['source']][$languages['target']])) {
+            $lrLanguage = ZfExtended_Factory::get(\editor_Models_LanguageResources_Languages::class);
+
+            foreach ($lrLanguage->loadByLanguageResourceId($languageResourceId) as $languagePair) {
+                $sourceLang = $this->languageRepository->find((int) $languagePair['sourceLang']);
+                $targetLang = $this->languageRepository->find((int) $languagePair['targetLang']);
+
+                if ($this->contentProtectionRepository->hasActiveRules($sourceLang, $targetLang)) {
+                    return false;
+                }
+            }
+
             return null === $hash;
         }
 
