@@ -31,7 +31,8 @@ Ext.define('TMMaintenance.view.main.ToolbarController', {
         let me = this;
         // Setup default ajax headers
         Ext.Ajax.setDefaultHeaders({
-            'Accept': 'application/json'
+            'Accept': 'application/json',
+            'csrfToken': window.csrfToken,
         });
 
         Ext.Ajax.request({

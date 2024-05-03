@@ -16,6 +16,16 @@ Ext.application({
     // The name of the initial view to create.
     mainView: 'TMMaintenance.view.main.Main',
 
+    init: function () {
+        //enable json in our REST interface
+        Ext.Ajax.setDefaultHeaders({
+            'Accept': 'application/json',
+            'CsrfToken': window.csrfToken
+        });
+
+        this.callParent(arguments);
+    },
+
     /**
      * Launch
      */
