@@ -35,17 +35,11 @@ class editor_Plugins_TMMaintenance_Init extends ZfExtended_Plugin_Abstract
 {
     protected static string $description = 'Provides a functionality of managing t5memory TM';
 
-    /**
-     * {@inheritdoc}
-     */
     protected $frontendControllers = array(
         'pluginTMMaintenanceTMMaintenance' => 'Editor.plugins.TMMaintenance.app.controller.TMMaintenance'
     );
 
-    /**
-     * {@inheritdoc}
-     */
-    public function init()
+    public function init(): void
     {
         $this->addController('TmmaintenanceController');
         $this->addController('ApiController');
@@ -53,7 +47,7 @@ class editor_Plugins_TMMaintenance_Init extends ZfExtended_Plugin_Abstract
         $this->initRoutes();
     }
 
-    private function initApplet()
+    private function initApplet(): void
     {
         // Register the plugin as an applet
         Dispatcher::getInstance()->registerApplet('tmmaintenance', new class extends AppletAbstract {
@@ -65,7 +59,7 @@ class editor_Plugins_TMMaintenance_Init extends ZfExtended_Plugin_Abstract
     /**
      * defines all URL routes of this plug-in
      */
-    protected function initRoutes()
+    protected function initRoutes(): void
     {
         /* @var $frontController Zend_Controller_Front */
         $frontController = Zend_Registry::get('frontController');
