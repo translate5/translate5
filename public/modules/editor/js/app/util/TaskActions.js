@@ -223,11 +223,11 @@ Ext.define('Editor.util.TaskActions', {
     confirm: function(callback) {
         var me = this,
             initialState = Editor.data.task.USER_STATE_EDIT, //confirm request should go to edit mode if possible
-            innerCallback = function(task, app, strings){
+            innerCallback = function(task, app, strings, op){
                 //call given callback
                 callback(task, app, strings);
                 //call additional callback for confirmation
-                me.onOpenTask(task, initialState);
+                me.onOpenTask(task, initialState, op);
             };
             
         if(me.isEditing()) {
@@ -259,8 +259,8 @@ Ext.define('Editor.util.TaskActions', {
         app.mask(maskingText, task.get('taskName'));
         task.set(data);
         task.save({
-            success: function(rec) {
-                callback(task, app, me.strings);
+            success: function(rec, op) {
+                callback(task, app, me.strings, op);
             },
             callback: function(rec, op) {
                 Editor.MessageBox.addByOperation(op);
