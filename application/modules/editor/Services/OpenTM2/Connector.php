@@ -1759,6 +1759,11 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
 
     private function exportAllAsArchive(array $memories, string $mime): string
     {
+        header('HTTP/1.0 403 Forbidden');
+        echo "<pre>The TM binary export is currently blocked for technical reasons.\n";
+        echo 'Der TM-Binary-Export ist augenblicklich aus technischen Gründen gesperrt.</pre>';
+        exit;
+
         $exportDir = APPLICATION_PATH . '/../data/TMExport/';
         $tmpDir = $exportDir . $this->languageResource->getId() . '_' . uniqid() . '/';
         @mkdir($tmpDir, recursive: true);
