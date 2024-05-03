@@ -84,7 +84,7 @@ class ContentProtectionDto
             (int) $row['matchId'],
             $row['format'],
             (bool) $row['keepAsIs'],
-            $row['outputFormat'],
+            $row['outputFormat'] ?? null,
             (int) $row['priority'],
         );
     }

@@ -124,12 +124,8 @@ class TmConversionService
 
         ['languages' => $languages, 'hash' => $hash] = $this->languageResourceRulesHashMap[$languageResourceId];
 
-        if (! isset($this->languageRulesHashMap[$languages['source']])) {
-            return false;
-        }
-
         if (! isset($this->languageRulesHashMap[$languages['source']][$languages['target']])) {
-            return false;
+            return null === $hash;
         }
 
         return $this->languageRulesHashMap[$languages['source']][$languages['target']] === $hash;

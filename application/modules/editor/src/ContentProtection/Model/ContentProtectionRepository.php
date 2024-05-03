@@ -85,6 +85,8 @@ class ContentProtectionRepository
      */
     public function getAllForSource(Languages $sourceLang, Languages $targetLang, bool $useCache = true): Iterator
     {
+        $cacheKey = "{$sourceLang->getId()}:{$targetLang->getId()}";
+
         $dbInputMapping = ZfExtended_Factory::get(InputMapping::class)->db;
         $dbOutputMapping = ZfExtended_Factory::get(OutputMapping::class)->db;
         $dbContentRecognition = ZfExtended_Factory::get(ContentRecognition::class)->db;
@@ -107,6 +109,30 @@ class ContentProtectionRepository
             $targetIds[] = (int) $major->getId();
         }
 
+        $keepAsIsSelect = $dbInputMapping->select()
+            ->setIntegrityCheck(false)
+            ->from([
+                'inputMapping' => $dbInputMapping->info($dbInputMapping::NAME),
+            ], ['priority'])
+            ->join(
+                [
+                    'recognition' => $contentRecognitionTable,
+                ],
+                'recognition.id = inputMapping.contentRecognitionId',
+                ['recognition.*']
+            )
+            ->where('inputMapping.languageId IN (?)', $sourceIds)
+            ->where('recognition.enabled = true')
+            ->where('recognition.keepAsIs = true')
+            ->order('priority desc')
+        ;
+
+        $keepAsIsRows = [];
+
+        if ($useCache && ! isset($this->sourceContentProtections[$cacheKey])) {
+            $keepAsIsRows = $dbInputMapping->fetchAll($keepAsIsSelect)->toArray();
+        }
+
         $select = $dbInputMapping->select()
             ->setIntegrityCheck(false)
             ->from([
@@ -119,7 +145,7 @@ class ContentProtectionRepository
                 'recognition.id = inputMapping.contentRecognitionId',
                 ['recognition.*']
             )
-            ->joinLeft(
+            ->join(
                 [
                     'outputMapping' => $dbOutputMapping->info($dbOutputMapping::NAME),
                 ],
@@ -127,7 +153,7 @@ class ContentProtectionRepository
                 AND outputMapping.inputContentRecognitionId = inputMapping.contentRecognitionId',
                 []
             )
-            ->joinLeft(
+            ->join(
                 [
                     'outputRecognition' => $contentRecognitionTable,
                 ],
@@ -137,22 +163,25 @@ class ContentProtectionRepository
             )
             ->where('inputMapping.languageId IN (?)', $sourceIds)
             ->where('recognition.enabled = true')
+            ->where('recognition.keepAsIs = false')
             ->order('priority desc')
         ;
 
         if ($useCache) {
-            $key = "{$sourceLang->getId()}:{$targetLang->getId()}";
-            if (! isset($this->sourceContentProtections[$key])) {
-                $this->sourceContentProtections[$key] = $dbInputMapping->fetchAll($select);
+            if (! isset($this->sourceContentProtections[$cacheKey])) {
+                $this->sourceContentProtections[$cacheKey] = array_merge(
+                    $keepAsIsRows,
+                    $dbInputMapping->fetchAll($select)->toArray()
+                );
             }
 
-            $rows = $this->sourceContentProtections[$key];
+            $rows = $this->sourceContentProtections[$cacheKey];
         } else {
             $rows = $dbInputMapping->fetchAll($select);
         }
 
         foreach ($rows as $formatData) {
-            yield ContentProtectionDto::fromRow($formatData->toArray());
+            yield ContentProtectionDto::fromRow($formatData);
         }
     }
 
