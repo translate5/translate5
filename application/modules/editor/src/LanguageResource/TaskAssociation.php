@@ -28,6 +28,8 @@ END LICENSE AND COPYRIGHT
 
 namespace MittagQI\Translate5\LanguageResource;
 
+use editor_Services_Manager;
+use MittagQI\Translate5\ContentProtection\T5memory\TmConversionService;
 use Zend_Db_Expr;
 use Zend_Db_Table_Row_Abstract;
 use ZfExtended_Exception;
@@ -222,8 +224,8 @@ class TaskAssociation extends AssociationAbstract
      */
     public function getAssocTasksWithResources($taskGuid)
     {
-        $serviceManager = ZfExtended_Factory::get('editor_Services_Manager');
-        /* @var $serviceManager editor_Services_Manager */
+        $serviceManager = ZfExtended_Factory::get(editor_Services_Manager::class);
+        $tmConversionService = TmConversionService::create();
 
         $resources = [];
 
@@ -248,6 +250,16 @@ class TaskAssociation extends AssociationAbstract
             if (! empty($resource)) {
                 $languageresource = array_merge($languageresource, $resource->getMetaData());
                 $languageresource['serviceName'] = $serviceManager->getUiNameByType($languageresource['serviceType']);
+
+                if (editor_Services_Manager::SERVICE_OPENTM2 === $languageresource['serviceType']) {
+                    $languageresource['tmNeedsConversion'] = ! $tmConversionService->isTmConverted(
+                        $languageresource['languageResourceId']
+                    );
+                    $languageresource['tmConversionInProgress'] = $tmConversionService->isConversionInProgress(
+                        $languageresource['languageResourceId']
+                    );
+                }
+
                 $available[] = $languageresource;
             }
         }

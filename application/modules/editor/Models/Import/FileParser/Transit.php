@@ -217,12 +217,16 @@ class editor_Models_Import_FileParser_Transit extends editor_Models_Import_FileP
         $sourceName = $this->segmentFieldManager->getFirstSourceName();
         $targetName = $this->segmentFieldManager->getFirstTargetName();
 
-        $this->segmentData[$sourceName] = [
-            'original' => $this->parseSegment($transUnit['source'], true),
-        ];
+        [$parsedSource, $parsedTarget] = $this->contentProtector->filterTags(
+            $this->parseSegment($transUnit['source'], true),
+            $this->parseSegment($transUnit['target'], false)
+        );
 
+        $this->segmentData[$sourceName] = [
+            'original' => $parsedSource,
+        ];
         $this->segmentData[$targetName] = [
-            'original' => $this->parseSegment($transUnit['target'], false),
+            'original' => $parsedTarget,
         ];
     }
 
@@ -247,8 +251,13 @@ class editor_Models_Import_FileParser_Transit extends editor_Models_Import_FileP
      */
     protected function parseSegment($segment, $isSource)
     {
-        $segment = editor_Models_Segment_Utility::foreachSegmentTextNode($segment, function ($text) {
-            return $this->utilities->whitespace->protectWhitespace($text);
+        $segment = editor_Models_Segment_Utility::foreachSegmentTextNode($segment, function ($text) use ($isSource) {
+            return $this->contentProtector->protect(
+                $text,
+                $isSource,
+                $this->task->getSourceLang(),
+                $this->task->getTargetLang()
+            );
         });
         if (strpos($segment, '<') === false) {
             return $segment;
@@ -258,7 +267,7 @@ class editor_Models_Import_FileParser_Transit extends editor_Models_Import_FileP
 
         $segment = $this->parseTags($segment);
 
-        $segment = $this->utilities->whitespace->convertToInternalTags($segment, $this->shortTagIdent);
+        $segment = $this->contentProtector->convertToInternalTags($segment, $this->shortTagIdent);
         $this->checkForUndefinedTags($segment);
 
         return $segment;

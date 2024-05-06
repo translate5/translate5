@@ -176,5 +176,7 @@ Ext.define('Editor.view.LanguageResources.services.Default', {
         return function(v, meta, rec) {
             return v;
         };
-    }
+    },
+    getConversionIconClass: record => 'x-hidden-display',
+    getConversionIconTip: record => null
 });

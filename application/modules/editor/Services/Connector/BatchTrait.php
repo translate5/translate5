@@ -258,8 +258,8 @@ trait editor_Services_Connector_BatchTrait
             //we assume that for each requested query string, we get one response back
             $query = array_shift($batchQuery);
 
-            $segment = $query['segment'];
             /* @var editor_Models_Segment $segment */
+            $segment = $query['segment'];
 
             $this->getQueryStringAndSetAsDefault($query['segment']);
             $this->tagHandler->setTagMap($query['tagMap']);

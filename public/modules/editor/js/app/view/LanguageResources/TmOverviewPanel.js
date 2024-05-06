@@ -83,8 +83,9 @@ Ext.define('Editor.view.LanguageResources.TmOverviewPanel', {
         writeAsDefault: '#UT#Schreibrechte standardmäßig',
         taskassocgridcell: '#UT#Zugewiesene Aufgaben',
         groupHeader: '#UT#Ressource: {name}',
-        specificDataText: '#UT#Zusätzliche Infos',
-        pivotAsDefault: '#UT#Standardmäßig als Pivot verwenden'
+        specificDataText:'#UT#Zusätzliche Infos',
+        pivotAsDefault:'#UT#Standardmäßig als Pivot verwenden',
+        tmNotConverted: '#UT#TM Not Converted',
     },
     cls: 'tmOverviewPanel',
     height: '100%',
@@ -166,8 +167,14 @@ Ext.define('Editor.view.LanguageResources.TmOverviewPanel', {
                     text: me.strings.name
                 },{
                     xtype: 'actioncolumn',
-                    width: 120,
+                    width: 140,
                     items: [{
+                        getTip: (v, meta, rec) => service(rec).getConversionIconTip(rec),
+                        getClass: (v, meta, rec) => service(rec).getConversionIconClass(rec),
+                        hidden: true,
+                        isDisabled: (view, rowIndex, colIndex, item, record) =>
+                            item.hidden = !record.get('tmNeedsConversion')
+                    },{
                         tooltip: me.strings.edit,
                         action: 'edit',
                         iconCls: 'ico-tm-edit',
@@ -400,6 +407,26 @@ Ext.define('Editor.view.LanguageResources.TmOverviewPanel', {
                         text: me.strings.addResource,
                         tooltip: Editor.data.l10n.languageResources.create,
                         hidden: canNotAddLangresource,
+                    },
+                    {
+                        xtype: 'button',
+                        iconCls: 'x-fa fa-filter',
+                        id: 'showConvertedFilter',
+                        bind: {
+                            text: '{l10n.contentProtection.show_only_not_converted}'
+                        },
+                        enableToggle: true,
+                        toggleHandler: 'onShowOnlyNotConverted'
+                    },
+                    {
+                        xtype: 'button',
+                        iconCls: 'x-fa fa-exchange',
+                        itemId: 'btnConvertTms',
+                        bind: {
+                            text: '{l10n.contentProtection.convert_tms}'
+                        },
+                        handler: 'onConvertTms',
+                        hidden: true
                     }]
                 }]
       };
@@ -619,7 +646,7 @@ Ext.define('Editor.view.LanguageResources.TmOverviewPanel', {
      * @param record
      * @returns {string}
      */
-    specificDataRenderer: function(value, meta) {
+    specificDataRenderer: function(value, meta, record) {
         if(!Ext.isEmpty(value)){
             meta.tdCls = 'gridColumnInfoIconTooltipCenter';
         }

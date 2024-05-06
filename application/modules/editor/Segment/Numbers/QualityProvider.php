@@ -64,6 +64,7 @@ class editor_Segment_Numbers_QualityProvider extends editor_Segment_Quality_Prov
      * Check segment against quality
      *
      * {@inheritDoc}
+     * @throws ReflectionException
      * @see editor_Segment_Quality_Provider::processSegment()
      */
     public function processSegment(editor_Models_Task $task, Zend_Config $qualityConfig, editor_Segment_Tags $tags, string $processingMode): editor_Segment_Tags
@@ -83,8 +84,8 @@ class editor_Segment_Numbers_QualityProvider extends editor_Segment_Quality_Prov
             // Get segment shortcut
             $segment = $tags->getSegment();
 
-            // Distinct states
-            $states = [];
+            // Get segment source shortcut
+            $source = $tags->getSource();
 
             // Include snc lib
             include_once APPLICATION_PATH . '/modules/editor/Segment/Numbers/SNC/snc_main.php';
@@ -94,7 +95,7 @@ class editor_Segment_Numbers_QualityProvider extends editor_Segment_Quality_Prov
                 // If the target is empty, we do not need to check
                 if (! $target->isEmpty()) {
                     // Do check
-                    $check = new editor_Segment_Numbers_Check($task, $target->getField(), $segment);
+                    $check = new editor_Segment_Numbers_Check($task, $segment, $source, $target);
 
                     // Get error cases grouped by category
                     foreach ($check->getStates() as $category => $cases) {
