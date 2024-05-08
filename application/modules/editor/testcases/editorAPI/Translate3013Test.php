@@ -160,7 +160,7 @@ class Translate3013Test extends \editor_Test_ApiTest
         $delete = static::api()->delete('editor/attribute', [
             'attrId' => $attr1Id,
         ]);
-        $this->assertObjectHasAttribute('updated', $delete, 'Something went wrong on attempt to DELETE 1st attribute-record having new dataTypeId');
+        $this->assertObjectHasProperty('updated', $delete, 'Something went wrong on attempt to DELETE 1st attribute-record having new dataTypeId');
 
         // - refresh mapping-record and check it's exists-prop is still 1
         $mapping = $this->getMapping(self::$collection2Id, $dataTypeId);
@@ -182,7 +182,7 @@ class Translate3013Test extends \editor_Test_ApiTest
         $delete = static::api()->delete('editor/attribute', [
             'attrId' => $attr2Id,
         ]);
-        $this->assertObjectHasAttribute('updated', $delete, 'Something went wrong on attempt to DELETE 2nd attribute-record having new dataTypeId');
+        $this->assertObjectHasProperty('updated', $delete, 'Something went wrong on attempt to DELETE 2nd attribute-record having new dataTypeId');
 
         // - refresh mapping-record and check it's exists prop became 0
         $mapping = $this->getMapping(self::$collection2Id, $dataTypeId);
@@ -230,7 +230,7 @@ class Translate3013Test extends \editor_Test_ApiTest
             'limit' => 10,
         ]);
         $this->assertIsObject($resp, 'Invalid response search response. ');
-        $this->assertObjectHasAttribute('data', $resp, 'Response has no data-prop. ');
+        $this->assertObjectHasProperty('data', $resp, 'Response has no data-prop. ');
         $this->assertIsArray($resp->data, '$resp->data is not an array. ');
         $this->assertEquals(0, count($resp->data), 'Results qty should be ' . 0 . ', but ' . count($resp->data) . ' got instead. ');
 
@@ -245,7 +245,7 @@ class Translate3013Test extends \editor_Test_ApiTest
             'limit' => 1,
         ]);
         $this->assertIsObject($termsearch, 'Invalid response search response. ');
-        $this->assertObjectHasAttribute('data', $termsearch, 'Response has no data-prop. ');
+        $this->assertObjectHasProperty('data', $termsearch, 'Response has no data-prop. ');
         $this->assertIsArray($termsearch->data, '$resp->data is not an array. ');
         $this->assertEquals(1, count($termsearch->data), 'Results qty should be ' . 1 . ', but ' . count($termsearch->data) . ' got instead. ');
 

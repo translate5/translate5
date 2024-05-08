@@ -66,6 +66,12 @@ class SessionImpersonateCommand extends Translate5AbstractCommand
             InputOption::VALUE_REQUIRED,
             'Give a segment ID only to generate a URL pointing directly to that segment.'
         );
+
+        $this->addOption(
+            name: 'segment-nr',
+            mode: InputOption::VALUE_REQUIRED,
+            description: 'Give a segment-nr complementing the given task.'
+        );
     }
 
     /**
@@ -117,6 +123,7 @@ class SessionImpersonateCommand extends Translate5AbstractCommand
         $token = '?sessionToken=' . $token;
         $url = $this->translate5->getHostname() . '/editor';
         $segmentId = $this->input->getOption('segment-id');
+        $segmentNr = $this->input->getOption('segment-nr');
         $taskId = $this->input->getArgument('task');
 
         if (! empty($segmentId) && ! empty($taskId)) {
@@ -131,6 +138,7 @@ class SessionImpersonateCommand extends Translate5AbstractCommand
             $segment = \ZfExtended_Factory::get(\editor_Models_Segment::class);
             $segment->load($segmentId);
             $taskId = $segment->getTaskGuid();
+            $segmentNr = $segment->getSegmentNrInTask();
         }
 
         $task = \ZfExtended_Factory::get(\editor_Models_Task::class);
@@ -144,10 +152,10 @@ class SessionImpersonateCommand extends Translate5AbstractCommand
 
         $url .= '/taskid/' . $task->getId() . $token;
 
-        if (empty($segment)) {
+        if (empty($segmentNr)) {
             return $url;
         }
 
-        return $url . '#task/' . $task->getId() . '/' . $segment->getSegmentNrInTask() . '/edit';
+        return $url . '#task/' . $task->getId() . '/' . $segmentNr . '/edit';
     }
 }

@@ -41,6 +41,7 @@ use Translate5\MaintenanceCli\Command\{
     CachePurgeCommand,
     ChangelogCommand,
     ConfigCommand,
+    ContentProtectionLanguageRulesHashesRefreshCommand,
     CronCommand,
     DatabaseBackupCommand,
     DatabaseStatCommand,
@@ -81,6 +82,7 @@ use Translate5\MaintenanceCli\Command\{
     ServiceCheckCommand,
     ServicePingCommand,
     SessionImpersonateCommand,
+    SessionSupportCommand,
     StatusCommand,
     SystemCheckCommand,
     SystemMailtestCommand,
@@ -155,6 +157,7 @@ $commands = [
     new ServiceCheckCommand(),
     new ServicePingCommand(),
     new SessionImpersonateCommand(),
+    new SessionSupportCommand(),
     new StatusCommand(),
     new SystemCheckCommand(),
     new SystemMailtestCommand(),
@@ -182,6 +185,7 @@ $commands = [
     new WorkflowCloneCommand(),
     new WorkflowListCommand(),
     new WorkflowStepCommand(),
+    new ContentProtectionLanguageRulesHashesRefreshCommand(),
 ];
 
 // integrate Plugin-specific CLI commands

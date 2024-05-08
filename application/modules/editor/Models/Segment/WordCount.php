@@ -26,18 +26,25 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use editor_Models_Segment_InternalTag as InternalTag;
+use MittagQI\Translate5\ContentProtection\ContentProtector;
+use MittagQI\Translate5\ContentProtection\NumberProtector;
+use MittagQI\Translate5\Segment\Tag\Placeable;
+
 /**
  * Count the word in segment text
  */
 class editor_Models_Segment_WordCount
 {
-    /***
+    private const INTERNAL_TAGS_NOT_TO_COUNT = [NumberProtector::TAG_NAME, Placeable::MARKER_CLASS, 'char'];
+
+    /**
      * Segment entity
      * @var editor_Models_Segment
      */
     protected $segment;
 
-    /***
+    /**
      * List of non-word characters (empty spaces)
      * This list is the practical implementation of the https://www.xtm.cloud/manuals/gmx-v/GMX-V-2.0.html#Words standard.
      * @var array
@@ -72,72 +79,45 @@ class editor_Models_Segment_WordCount
         '0000feff',
     ];
 
-    /***
+    /**
      * Rfc language code for the segment
      * @var string
      */
     protected $rfcLanguage;
 
     /**
-     * @var editor_Models_Segment_InternalTag
-     */
-    protected $internalTag;
-
-    /**
-     * @var editor_Models_Segment_Whitespace
-     */
-    protected $whitespaceHelper;
-
-    /***
      * The segment query string
      * @var string
      */
     protected $queryString;
 
-    /***
+    /**
      * Dummy connector used to get the qeury string
      * @var editor_Services_OpenTM2_Connector
      */
     protected $connector;
 
-    /***
+    /**
      * Regex used for word break
      * @var string
      */
     protected $regexWordBreak;
 
+    protected ContentProtector $contentProtector;
+
+    protected editor_Models_Segment_UtilityBroker $utilityBroker;
+
     public function __construct($rfcLanguage = "")
     {
         $this->rfcLanguage = $rfcLanguage;
-        $this->internalTag = ZfExtended_Factory::get('editor_Models_Segment_InternalTag');
-        $this->whitespaceHelper = ZfExtended_Factory::get('editor_Models_Segment_Whitespace');
-        $this->connector = ZfExtended_Factory::get('editor_Services_OpenTM2_Connector');
+        $this->utilityBroker = ZfExtended_Factory::get(editor_Models_Segment_UtilityBroker::class);
+        $this->connector = ZfExtended_Factory::get(editor_Services_OpenTM2_Connector::class);
         $config = Zend_Registry::get('config');
         $this->regexWordBreak = $config->runtimeOptions->editor->export->wordBreakUpRegex;
+        $this->contentProtector = ContentProtector::create($this->utilityBroker->whitespace);
     }
 
     /**
-     * Convert a string into an array of decimal Unicode code points.
-     *
-     * @param $string   [string] The string to convert to codepoints
-     * @param $encoding [string] The encoding of $string
-     *
-     * @return [array] Array of decimal codepoints for every character of $string
-     */
-    protected function toCodePoint($string, $encoding)
-    {
-        $utf32 = mb_convert_encoding($string, 'UTF-32', $encoding);
-        $length = mb_strlen($utf32, 'UTF-32');
-        $result = [];
-
-        for ($i = 0; $i < $length; ++$i) {
-            $result[] = bin2hex(mb_substr($utf32, $i, 1, 'UTF-32'));
-        }
-
-        return $result;
-    }
-
-    /***
      * Approximate word count based on averages of characters per word (East Asian languages by language)
      *
      * @param string $text
@@ -151,7 +131,7 @@ class editor_Models_Segment_WordCount
         return round($count / $average);
     }
 
-    /***
+    /**
      * Return number of words in text
      * @param string $text
      * @return number
@@ -231,18 +211,22 @@ class editor_Models_Segment_WordCount
         $this->queryString = $this->connector->getQueryString($this->segment);
     }
 
-    /***
+    /**
      * Get count of the words in source field in the segment
      * All segment tags, and punctuation will be removed before the segment words are counted.
      * For easter asian languages, the grapheme count based on average grapheme per word will be calculated
-     *
-     * @return number|mixed
      */
-    public function getSourceCount()
+    public function getSourceCount(): float|int
     {
-        //replace white space tags with real white space, before clean all teh tags
-        $text = $this->internalTag->restore($this->queryString, true);
-        $text = $this->whitespaceHelper->unprotectWhitespace($text);
+        $text = $this->utilityBroker->internalTag->replace($this->queryString, function ($matches) {
+            if (in_array($matches[InternalTag::TAG_TYPE_MATCH_ID], self::INTERNAL_TAGS_NOT_TO_COUNT, true)) {
+                return '';
+            }
+
+            return $matches[0];
+        });
+        $text = $this->utilityBroker->internalTag->restore($text, [editor_Models_Segment_Whitespace::WHITESPACE_TAGS]);
+        $text = $this->contentProtector->unprotect($text, true);
         $text = $this->segment->stripTags($text);
         //average words in East Asian languages by language
         //Chinese (all forms): 2.8
@@ -269,7 +253,5 @@ class editor_Models_Segment_WordCount
             default:
                 return $this->getWordsCount($text);
         }
-
-        return 0;
     }
 }

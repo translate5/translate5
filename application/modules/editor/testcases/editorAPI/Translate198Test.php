@@ -52,7 +52,7 @@ class Translate198Test extends editor_Test_JsonTest
 
         //open task for editing. This should not produce any error
         $result = static::api()->setTaskToEdit($task1->id);
-        self::assertObjectNotHasAttribute('error', $result, (property_exists($result, 'error') ? $result->error : ''));
+        self::assertObjectNotHasProperty('error', $result, (property_exists($result, 'error') ? $result->error : ''));
         static::api()->setTask($task1);
 
         $jsonFileName = 'segments-task1.json';
@@ -63,7 +63,7 @@ class Translate198Test extends editor_Test_JsonTest
 
         //open the secound task with the same user. This should not be posible
         $result = static::api()->setTaskToEdit($task2->id);
-        self::assertObjectNotHasAttribute('error', $result, (property_exists($result, 'error') ? $result->error : ''));
+        self::assertObjectNotHasProperty('error', $result, (property_exists($result, 'error') ? $result->error : ''));
         static::api()->setTask($task2);
 
         $jsonFileName = 'segments-task2.json';

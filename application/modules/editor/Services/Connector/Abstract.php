@@ -196,18 +196,43 @@ abstract class editor_Services_Connector_Abstract
         //error_log($method." LanguageResource ".$this->languageResource->getName().' - '.$this->languageResource->getServiceName().$msg);
     }
 
+    public function getSourceLang(): int
+    {
+        return $this->sourceLang;
+    }
+
+    public function getTargetLang(): int
+    {
+        return $this->targetLang;
+    }
+
     /**
      * Link this Connector Instance to the given LanguageResource and its resource, in the given language combination
      * @param int $sourceLang language id
      * @param int $targetLang language id
      */
-    public function connectTo(editor_Models_LanguageResources_LanguageResource $languageResource, $sourceLang, $targetLang)
-    {
+    public function connectTo(
+        editor_Models_LanguageResources_LanguageResource $languageResource,
+        $sourceLang,
+        $targetLang
+    ) {
         $this->resource = $languageResource->getResource();
         $this->languageResource = $languageResource;
         $this->resultList->setLanguageResource($languageResource);
         $this->setServiceLanguages($sourceLang, $targetLang);
-        $this->logger = $this->logger->cloneMe('editor.languageresource.' . strtolower($this->resource->getService()) . '.connector');
+
+        if ($languageResource->getId() !== null) {
+            $this->languageResource->sourceLangCode = $this->languageResource->getSourceLangCode();
+            $this->languageResource->targetLangCode = $this->languageResource->getTargetLangCode();
+        }
+
+        $this->tagHandler->setLanguages(
+            (int) ($sourceLang ?: $languageResource->getSourceLang()),
+            (int) ($targetLang ?: $languageResource->getSourceLang())
+        );
+        $this->logger = $this->logger->cloneMe(
+            'editor.languageresource.' . strtolower($this->resource->getService()) . '.connector'
+        );
     }
 
     /**

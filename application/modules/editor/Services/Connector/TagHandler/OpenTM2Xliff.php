@@ -32,6 +32,7 @@ END LICENSE AND COPYRIGHT
  * @version 1.0
  *
  */
+
 /**
  * protects the translate5 internal tags as XLIFF for language resource processing,
  * - for OpenTM2 communication we convert line breaks to <ph type="lb"/> tags for better matching
@@ -45,10 +46,15 @@ class editor_Services_Connector_TagHandler_OpenTM2Xliff extends editor_Services_
     /**
      * @see editor_Services_Connector_TagHandler_Xliff::prepareQuery()
      */
-    public function prepareQuery(string $queryString): string
+    public function prepareQuery(string $queryString, bool $isSource = true): string
     {
+        $this->handleIsInSourceScope = $isSource;
         $queryString = parent::prepareQuery($queryString);
-        $queryString = str_replace(['<x id="', '<ex id="', '<bx id="'], ['<x mid="', '<ex mid="', '<bx mid="'], $queryString);
+        $queryString = str_replace(
+            ['<x id="', '<ex id="', '<bx id="'],
+            ['<x mid="', '<ex mid="', '<bx mid="'],
+            $queryString
+        );
 
         return str_replace(["\r\n", "\n", "\r"], '<ph type="lb"/>', $queryString);
     }
@@ -56,8 +62,11 @@ class editor_Services_Connector_TagHandler_OpenTM2Xliff extends editor_Services_
     /**
      * @see editor_Services_Connector_TagHandler_Xliff::restoreInResult()
      */
-    public function restoreInResult(string $resultString): ?string
-    {
+    public function restoreInResult(
+        string $resultString,
+        bool $isSource = true,
+        bool $unprotectContent = false
+    ): ?string {
         return parent::restoreInResult(str_replace([
             '<x mid="',
             '<bx mid="',

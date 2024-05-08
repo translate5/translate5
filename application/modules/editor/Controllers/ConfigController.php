@@ -369,7 +369,8 @@ class editor_ConfigController extends ZfExtended_RestController
         }
 
         if (! empty($taskGuid)) {
-            return array_values($this->entity->mergeTaskValues($taskGuid));
+            $configs = $this->entity->mergeTaskValues($taskGuid);
+            return $this->blacklistConfig($configs);
         }
 
         $customerId = $this->getParam('customerId');
@@ -378,10 +379,37 @@ class editor_ConfigController extends ZfExtended_RestController
             if (! is_numeric($customerId)) {
                 return [];
             }
-
-            return array_values($this->entity->mergeCustomerValues($customerId));
+            $configs = $this->entity->mergeCustomerValues($customerId);
+            return $this->blacklistConfig($configs);
         }
 
         return array_values($this->entity->mergeInstanceValue());
+    }
+
+    /**
+     * Blacklist configs which should not be visible by some user roles
+     * TODO: this will be fixed in a ACL way with the next release. Now we do simple workaround for the problem
+     */
+    public function blacklistConfig(array $configs): array
+    {
+
+        $userRoles = ZfExtended_Authentication::getInstance()->getUserRoles();
+        if(in_array('admin', $userRoles) ||
+            in_array('pm', $userRoles) ||
+            in_array('systemadmin', $userRoles))
+        {
+            return array_values($configs);
+        }
+
+        $blacklisted = [
+            'runtimeOptions.plugins.DeepL.authkey',
+            'runtimeOptions.plugins.AcrossHotfolder.filesystemConfig'
+        ];
+        foreach ($blacklisted as $blacklist) {
+            if (isset($configs[$blacklist])) {
+                unset($configs[$blacklist]);
+            }
+        }
+        return array_values($configs);
     }
 }

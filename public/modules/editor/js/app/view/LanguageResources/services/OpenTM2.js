@@ -78,5 +78,27 @@ Ext.define('Editor.view.LanguageResources.services.OpenTM2', {
     		return false;
     	}
     	return this.download;
+    },
+    getConversionIconClass: (record) => {
+        if (!record.get('tmNeedsConversion')) {
+            return 'x-hidden-display';
+        }
+
+        if (record.get('tmNeedsConversion') && record.get('tmConversionInProgress')) {
+            return 'ico-tm-converseTm-inProgress';
+        }
+
+        return 'ico-tm-converseTm';
+    },
+    getConversionIconTip: (record) => {
+        if (!record.get('tmNeedsConversion')) {
+            return null;
+        }
+
+        if (record.get('tmNeedsConversion') && record.get('tmConversionInProgress')) {
+            return Editor.data.l10n.contentProtection.tm_conversion_in_progress;
+        }
+
+        return Editor.data.l10n.contentProtection.tm_not_converted;
     }
 });

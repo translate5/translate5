@@ -56,6 +56,18 @@ class OkapiPurgeCommand extends Translate5AbstractCommand
             mode: InputOption::VALUE_NONE,
             description: 'Delete also the latest entry if unused'
         );
+
+        $this->addOption(
+            name: 'only-offline',
+            mode: InputOption::VALUE_NONE,
+            description: 'Purges only the entries being offline, gnores "no-keep" and "keep" options'
+        );
+
+        $this->addOption(
+            name: 'sort',
+            mode: InputOption::VALUE_NONE,
+            description: 'Sort the entries by version'
+        );
     }
 
     /**
@@ -73,10 +85,14 @@ class OkapiPurgeCommand extends Translate5AbstractCommand
 
         $keep = $this->input->getArgument('keep');
         $keepLast = ! $this->input->getOption('no-keep');
+        $sort = $this->input->getOption('sort');
+        $onlyOffline = $this->input->getOption('only-offline');
 
         $config = new ConfigMaintenance();
         $summary = $config->getSummary();
-        $serverList = $config->purge($summary, $keep, keepLast: $keepLast);
+        $serverList = $onlyOffline ?
+            $config->purgeOffline($sort) :
+            $config->purge($summary, $keep, $sort, $keepLast);
 
         foreach ($summary as $name => $data) {
             if (empty($serverList[$name])) {

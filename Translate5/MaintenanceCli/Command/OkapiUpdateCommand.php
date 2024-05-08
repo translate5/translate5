@@ -34,6 +34,7 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Question\ChoiceQuestion;
 use Zend_Exception;
 
 class OkapiUpdateCommand extends Translate5AbstractCommand
@@ -60,6 +61,13 @@ If no name is given, use the last one from the configured server list.');
             'By default custom configurations for customers are not changed.
             With that option they are removed completely.'
         );
+
+        $this->addOption(
+            'select',
+            's',
+            InputOption::VALUE_NONE,
+            'The value to set can be chosen out of the existing entries, a given name will be ignored.'
+        );
     }
 
     /**
@@ -78,8 +86,13 @@ If no name is given, use the last one from the configured server list.');
         $name = $this->input->getArgument('name');
         $config = new ConfigMaintenance();
         $serverNames = array_keys($config->getServerList());
+        $doSelect = $this->input->getOption('select');
 
-        if (empty($name)) {
+        if ($doSelect){
+            $question ='Please choose one of the following OKAPI versions:';
+            $askName = new ChoiceQuestion($question, $serverNames, null);
+            $name = $this->io->askQuestion($askName);
+        } else if (empty($name)) {
             $name = end($serverNames);
         } elseif (! in_array($name, $serverNames)) {
             throw new LogicException('Given okapi server name "' . $name . '" does not exist! ');

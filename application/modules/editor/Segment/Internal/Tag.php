@@ -26,10 +26,10 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\ContentProtection\NumberProtector;
 use MittagQI\Translate5\Segment\Tag\Placeable;
 use MittagQI\Translate5\Tools\Markup;
 use PHPHtmlParser\Dom\Node\AbstractNode;
-use PHPHtmlParser\Dom\Node\HtmlNode;
 
 /**
  * Represents an Internal tag
@@ -324,6 +324,11 @@ final class editor_Segment_Internal_Tag extends editor_Segment_Tag
         return ($this->isSingle() && $this->hasClass(Placeable::MARKER_CLASS));
     }
 
+    public function isNumber(): bool
+    {
+        return $this->isSingle() && $this->hasClass(NumberProtector::TAG_NAME);
+    }
+
     /**
      * Retrieves the original index of the internal tag within the segment
      * @return int
@@ -535,6 +540,14 @@ final class editor_Segment_Internal_Tag extends editor_Segment_Tag
             return " ";
         } elseif ($this->isSpace()) {
             return ' ';
+        } elseif ($this->isNumber()) {
+            // Here dash-characters is used as it does not result in spellcheck-error
+            // Initially, the idea was to use dash-character sequence of the same length
+            // as protected number (e.g. '5,600' => '-----'), but the way of how number-tags
+            // are processed during offsets calculation for spellcheck highlighting in browser
+            // works in a way that assumes that a fixed-length placeholder should be used, see
+            // controller/SegmentQualitiesBase.js:applyCustomMatches(), so just '---' is used here and there
+            return '---';
         }
 
         return '';
