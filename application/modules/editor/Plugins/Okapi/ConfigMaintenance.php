@@ -32,10 +32,13 @@ namespace MittagQI\Translate5\Plugins\Okapi;
 use editor_Models_Config;
 use editor_Models_Customer_CustomerConfig;
 use editor_Models_TaskConfig;
+use editor_Plugins_Okapi_Init;
 use ReflectionException;
 use Zend_Db_Statement_Exception;
 use Zend_Exception;
 use Zend_Registry;
+use Zend_Uri_Exception;
+use ZfExtended_Exception;
 use ZfExtended_Factory as Factory;
 use ZfExtended_Models_Entity_Exceptions_IntegrityConstraint;
 use ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey;
@@ -80,6 +83,31 @@ class ConfigMaintenance
         $this->updateServerUsedDefaults($servers);
 
         return $oldValue;
+    }
+
+    /**
+     * Adds all servers behind a Jetty-url (or replaces them if the version exists)
+     * @param string $url: the potential jetty-url
+     * @return array: The list of added servers
+     * @throws ReflectionException
+     * @throws Zend_Db_Statement_Exception
+     * @throws ZfExtended_Exception
+     * @throws ZfExtended_Models_Entity_Exceptions_IntegrityConstraint
+     * @throws ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey
+     * @throws Zend_Uri_Exception
+     */
+    public function addJettyUrl(string $url): array
+    {
+        $service = editor_Plugins_Okapi_Init::createService(Service::ID);
+        $addedServers = $service->findOkapiVersions($url);
+
+        if(!empty($addedServers)){
+            $serverList = array_merge($service->getAllServers(), $addedServers);
+            $this->setServerList($serverList);
+            $this->cleanUpNotUsed($serverList);
+        }
+
+        return $addedServers;
     }
 
     private function fromJson(string $json): ?array
@@ -241,6 +269,7 @@ class ConfigMaintenance
      * Purges the unused okapi config entries. Keeps either the latest one (by version) or the one given by name
      * @param array $summary the current summary of configured Okapi instances
      * @param string|null $nameToKeep if omitted keep the latest one (by version)
+     * @param bool $sortByVersion
      * @return array returns the serverlist to be used after purging
      * @throws ReflectionException
      * @throws Zend_Db_Statement_Exception
@@ -276,6 +305,29 @@ class ConfigMaintenance
                 return ($data['taskUsageCount'] ?? 0) > 0 && !empty($data['url']);
             })
         );
+
+        $this->setServerList($serverList);
+        $this->cleanUpNotUsed($serverList);
+
+        return $serverList;
+    }
+
+    /**
+     * Removes all unavailable entries from the currently configured server list
+     * @throws ReflectionException
+     * @throws Zend_Db_Statement_Exception
+     * @throws ZfExtended_Models_Entity_Exceptions_IntegrityConstraint
+     * @throws ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey
+     * @throws ZfExtended_Exception
+     */
+    public function purgeOffline(bool $sortByVersion = false): array
+    {
+        $service = editor_Plugins_Okapi_Init::createService(Service::ID);
+        $serverList = $service->getOnlineServers();
+
+        if ($sortByVersion) {
+            ksort($serverList, SORT_NATURAL);
+        }
 
         $this->setServerList($serverList);
         $this->cleanUpNotUsed($serverList);

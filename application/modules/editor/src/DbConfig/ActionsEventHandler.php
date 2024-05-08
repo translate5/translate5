@@ -56,6 +56,7 @@ use editor_Models_Customer_Customer;
 use editor_Models_Task;
 use editor_Segment_Quality_Manager;
 use MittagQI\Translate5\Repository\UserRepository;
+use MittagQI\ZfExtended\Acl\Roles;
 use Zend_Config;
 use Zend_Controller_Request_Abstract;
 use Zend_EventManager_Event;
@@ -71,20 +72,23 @@ class ActionsEventHandler
         $this->userRepository = new UserRepository();
     }
 
-    public function addDefaultPMUsersOnPutAction(string $configName, bool $includePmlite = false): callable
+    public function addDefaultPMUsersOnPutAction(string $configName, array $includeRoles = [Roles::PM]): callable
     {
-        return function (Zend_EventManager_Event $event) use ($configName, $includePmlite) {
+        return function (Zend_EventManager_Event $event) use ($configName, $includeRoles) {
             if ($event->getParam('request')->getParam('id') != $configName) {
                 return;
             }
 
-            $event->getParam('view')->rows['defaults'] = $this->getPmUsers($includePmlite);
+            $event->getParam('view')->rows['defaults'] = $this->getPmUsers(
+                $includeRoles,
+                $this->getCustomerIdFromEvent($event)
+            );
         };
     }
 
-    public function addDefaultPMUsersOnIndexAction(string $configName, bool $includePmlite = false): callable
+    public function addDefaultPMUsersOnIndexAction(string $configName, array $includeRoles = [Roles::PM]): callable
     {
-        return function (Zend_EventManager_Event $event) use ($configName, $includePmlite) {
+        return function (Zend_EventManager_Event $event) use ($configName, $includeRoles) {
             if (! $rows = $event->getParam('view')->rows ?? []) {
                 return;
             }
@@ -92,8 +96,24 @@ class ActionsEventHandler
             // Config index
             $index = array_search($configName, array_column($rows, 'name'));
 
-            $event->getParam('view')->rows[$index]['defaults'] = $this->getPmUsers($includePmlite);
+            $event->getParam('view')->rows[$index]['defaults'] = $this->getPmUsers(
+                $includeRoles,
+                $this->getCustomerIdFromEvent($event)
+            );
         };
+    }
+
+    private function getCustomerIdFromEvent(Zend_EventManager_Event $event): ?int
+    {
+        /** @var Zend_Controller_Request_Abstract $request */
+        $request = $event->getParam('request');
+        $requestParams = $request->getParams();
+
+        if (isset($requestParams['customerId'])) {
+            return (int) $requestParams['customerId'];
+        }
+
+        return null;
     }
 
     public function addDefaultsForNonZeroQualityErrorsSettingOnIndexAction(): callable
@@ -172,10 +192,10 @@ class ActionsEventHandler
         return Zend_Registry::get('config');
     }
 
-    private function getPmUsers(bool $includePmlite): string
+    private function getPmUsers(array $roles, ?int $customerInContext = null): string
     {
         $defaults = [];
-        foreach ($this->userRepository->getPmList($includePmlite) as $pm) {
+        foreach ($this->userRepository->getPmList($roles, $customerInContext) as $pm) {
             $defaults[$pm->getId()] = sprintf(
                 '%s %s (%s)',
                 $pm->getFirstName(),

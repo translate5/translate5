@@ -180,9 +180,9 @@ class Translate2991Test extends \editor_Test_JsonTest
         $json = static::api()->delete('editor/plugins_matchanalysis_pricingpresetrange', $data = [
             'rangeIds' => join(',', $rangeIdA = array_column($this->ranges['created'], 'id')),
         ]);
-        $this->assertObjectHasAttribute('success', $json, 'Response json does not have success-prop');
+        $this->assertObjectHasProperty('success', $json, 'Response json does not have success-prop');
         $this->assertTrue($json->success, 'Response json->success is NOT true');
-        $this->assertObjectHasAttribute('deleted', $json, 'Response json does not have deleted-prop');
+        $this->assertObjectHasProperty('deleted', $json, 'Response json does not have deleted-prop');
         $this->assertIsArray($json->deleted, 'Response json->deleted is NOT an array');
         $this->assertCount(count($rangeIdA), $json->deleted, 'Wrong count of deleted ranges');
         $this->ranges['created'] = [];
@@ -306,7 +306,7 @@ class Translate2991Test extends \editor_Test_JsonTest
             ]),
         ], null, false);
         $this->assertIsObject($json, 'Response is not object');
-        $this->assertObjectHasAttribute('pricingPresetId', $json, 'Response object has now pricingPresetId-prop');
+        $this->assertObjectHasProperty('pricingPresetId', $json, 'Response object has now pricingPresetId-prop');
         $this->assertEquals($data['pricingPresetId'], $json->pricingPresetId, 'Pricing preset id was not updated for the task');
 
         // Change created preset's unitType back to 'word'
