@@ -193,7 +193,7 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
             $task,
         ]);
         //diff export for this task can be used
-        $this->task->setDiffExportUsable(1);
+        $this->task->setDiffExportUsable(true);
         //here would be the right place to set the import map,
         // since our values base on sdlxliff values,
         // nothing has to be done here at the moment
@@ -560,6 +560,17 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
                 if (strlen(trim(strip_tags($source))) === 0 && strlen(trim(strip_tags($target))) === 0) {
                     return null;
                 }
+
+                $sdlxliffConfig = $this->config->runtimeOptions->import?->sdlxliff;
+                // trimming all whitespaces including unicode whitespaces (e.g. non-breaking space)
+                $sourceHasContent = mb_strlen(strip_tags(preg_replace('/\s+/u', '', $source))) !== 0;
+
+                if ($sourceHasContent && $sdlxliffConfig?->cleanUpTargetOnSourceWithContentAndTagWhitespaceOnlyTarget) {
+                    $emptyTarget = mb_strlen(strip_tags(preg_replace('/\s+/u', '', $target))) === 0;
+
+                    $target = $emptyTarget ? '' : $target;
+                }
+
                 $numSegmentsInTransUnit++;
                 $sourceName = $this->segmentFieldManager->getFirstSourceName();
                 $targetName = $this->segmentFieldManager->getFirstTargetName();
@@ -802,8 +813,8 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
             return $this->contentProtector->protect(
                 $text,
                 $isSource,
-                $this->task->getSourceLang(),
-                $this->task->getTargetLang()
+                (int) $this->task->getSourceLang(),
+                (int) $this->task->getTargetLang()
             );
         });
         if (strpos($segment, '<') === false) {
