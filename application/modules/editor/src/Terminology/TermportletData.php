@@ -94,17 +94,17 @@ class TermportletData
         ];
 
         // Arrays to indicate termEntries having at least one term used in source/target
-        $used = ['source' => [], 'target' => []];
+        $used = [
+            'source' => [],
+            'target' => []
+        ];
 
         // Foreach termEntry
         foreach($this->result['termGroups'] as $termEntryId => $termA) {
-
             // Foreach term inside termEntry
             foreach ($termA as $term) {
-
                 // If it's a term used in source or target
                 if ($term->used) {
-
                     // Setup a flag indicating this termEntry has at least one such term
                     $used[$term->isSource ? 'source' : 'target'][$termEntryId] = true;
                 }
@@ -115,13 +115,12 @@ class TermportletData
         $unusedTarget = [];
 
         // Foreach termEntry having at least one term used in source
-        foreach($this->result['termGroups'] as $termEntryId => $termA) {
+        foreach ($this->result['termGroups'] as $termEntryId => $termA) {
             if (isset($used['source'][$termEntryId])) {
-
                 // Collect unused target terms in a way that will allow us to swap used-flag from one term to another
                 foreach ($termA as $idx => $term) {
-                    if (!$term->isSource && !$term->used) {
-                        $unusedTarget[$termEntryId] [$term->term] = $idx;
+                    if (! $term->isSource && ! $term->used) {
+                        $unusedTarget[$termEntryId][$term->term] = $idx;
                     }
                 }
             }
@@ -129,19 +128,18 @@ class TermportletData
 
         // Foreach termEntry that has term(s) used in target, but has no term(s) used in source
         foreach ($this->result['termGroups'] as $termEntryId_was => $termA) {
-            if ( ! isset($used['source'][$termEntryId_was])
+            if (! isset($used['source'][$termEntryId_was])
                 || isset($used['target'][$termEntryId_was])) {
-
                 // Foreach term used in target
                 foreach ($termA as $idx_was => $term) {
-                    if (!$term->isSource && $term->used) {
-
+                    if (! $term->isSource && $term->used) {
                         // Check whether we have homonym (in some termEntry having term(s) used in source)
                         // If yes - mark it as used instead of current term
                         foreach ($unusedTarget as $termEntryId_now => $termA) {
                             if (is_int($idx_now = $termA[$term->term] ?? false)) {
                                 $this->result['termGroups'][$termEntryId_was][$idx_was]->used = false;
                                 $this->result['termGroups'][$termEntryId_now][$idx_now]->used = true;
+
                                 break;
                             }
                         }
@@ -482,8 +480,8 @@ class TermportletData
     private function initializeLanguages(): void
     {
         $languages = ZfExtended_Factory::get(editor_Models_Languages::class);
-        $this->sourceLangs = $languages->getFuzzyLanguages($this->task->getSourceLang(), includeMajor: true);
-        $this->targetLangs = $languages->getFuzzyLanguages($this->task->getTargetLang(), includeMajor: true);
+        $this->sourceLangs = $languages->getFuzzyLanguages((int) $this->task->getSourceLang(), includeMajor: true);
+        $this->targetLangs = $languages->getFuzzyLanguages((int) $this->task->getTargetLang(), includeMajor: true);
 
         //combine all used languages from task
         $this->allUsedLanguageIds = array_unique(array_merge($this->sourceLangs, $this->targetLangs));
