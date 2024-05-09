@@ -96,11 +96,11 @@ class TermportletData
         // Arrays to indicate termEntries having at least one term used in source/target
         $used = [
             'source' => [],
-            'target' => []
+            'target' => [],
         ];
 
         // Foreach termEntry
-        foreach($this->result['termGroups'] as $termEntryId => $termA) {
+        foreach ($this->result['termGroups'] as $termEntryId => $termA) {
             // Foreach term inside termEntry
             foreach ($termA as $term) {
                 // If it's a term used in source or target
