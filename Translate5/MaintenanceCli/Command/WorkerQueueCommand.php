@@ -30,7 +30,10 @@ namespace Translate5\MaintenanceCli\Command;
 
 use MittagQI\ZfExtended\Worker\Queue;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use ZfExtended_Factory;
+use ZfExtended_Models_Worker;
 
 class WorkerQueueCommand extends Translate5AbstractCommand
 {
@@ -40,12 +43,21 @@ class WorkerQueueCommand extends Translate5AbstractCommand
     protected function configure()
     {
         $this
-        // the short description shown while running "php bin/console list"
-            ->setDescription('Triggers the worker queue - may be necessary after an apache restart or maintenance mode.')
+            // the short description shown while running "php bin/console list"
+            ->setDescription(
+                'Triggers the worker queue - may be necessary after an apache restart or maintenance mode.'
+            )
 
-        // the full command description shown when running the command with
-        // the "--help" option
+            // the full command description shown when running the command with
+            // the "--help" option
             ->setHelp('Triggers the next runnable worker to be executed');
+
+        $this->addOption(
+            'wakeup',
+            'w',
+            InputOption::VALUE_NONE,
+            'Wakeup scheduled workers before triggering the queue'
+        );
     }
 
     /**
@@ -60,13 +72,18 @@ class WorkerQueueCommand extends Translate5AbstractCommand
 
         $this->writeTitle('trigger worker queue');
 
-        $workerQueue = \ZfExtended_Factory::get(Queue::class);
+        $worker = ZfExtended_Factory::get(ZfExtended_Models_Worker::class);
+
+        if ($this->input->getOption('wakeup')) {
+            $this->io->text('wakeup workers...');
+            $worker->wakeupScheduled();
+            sleep(2);
+        }
+
+        $workerQueue = ZfExtended_Factory::get(Queue::class);
         $workerQueue->process();
         $this->io->text('scheduling workers...');
         sleep(4);
-
-        $worker = \ZfExtended_Factory::get('ZfExtended_Models_Worker');
-        /* @var $worker \ZfExtended_Models_Worker */
 
         $allWorker = $worker->loadByState($worker::STATE_PREPARE);
         if (empty($allWorker)) {
