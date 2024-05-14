@@ -46,6 +46,8 @@ class editor_Plugins_Okapi_Worker extends editor_Models_Task_AbstractWorker
      */
     public const ORIGINAL_FILE = 'original-%s.%s';
 
+    private bool $hadEmptyTargets = false;
+
     /**
      * Api for accessing the saved Manifest file from other contexts
      * @param string $absoluteTaskDataPath
@@ -144,8 +146,8 @@ class editor_Plugins_Okapi_Worker extends editor_Models_Task_AbstractWorker
         $language = ZfExtended_Factory::get('editor_Models_Languages');
         /* @var $language editor_Models_Languages */
 
-        $sourceLang = $language->loadLangRfc5646($this->task->getSourceLang());
-        $targetLang = $language->loadLangRfc5646($this->task->getTargetLang());
+        $sourceLang = $language->loadLangRfc5646((int) $this->task->getSourceLang());
+        $targetLang = $language->loadLangRfc5646((int) $this->task->getTargetLang());
 
         try {
             $taskConfig = $this->task->getConfig();
@@ -211,8 +213,8 @@ class editor_Plugins_Okapi_Worker extends editor_Models_Task_AbstractWorker
 
         $language = ZfExtended_Factory::get(editor_Models_Languages::class);
 
-        $sourceLang = $language->loadLangRfc5646($this->task->getSourceLang());
-        $targetLang = $language->loadLangRfc5646($this->task->getTargetLang());
+        $sourceLang = $language->loadLangRfc5646((int) $this->task->getSourceLang());
+        $targetLang = $language->loadLangRfc5646((int) $this->task->getTargetLang());
         $result = false;
 
         try {
@@ -224,7 +226,7 @@ class editor_Plugins_Okapi_Worker extends editor_Models_Task_AbstractWorker
             $api->uploadInputFile('manifest.rkm', $manifestFile);
             $originalFile = $this->findOriginalFile($fileId);
             $api->uploadOriginalFile($originalFile, new SplFileInfo($this->getDataDir() . '/' . $originalFile));
-            $this->xliffExportPreValidation($workFile, $fileId);
+            $this->xliffExportPreValidation($workFile);
 
             //if a file with source in empty targets exists, take that for okapi reconvertion
             $workfile2 = new SplFileInfo($workFile . editor_Models_Export_FileParser_Xlf::SOURCE_TO_EMPTY_TARGET_SUFFIX);
@@ -257,6 +259,8 @@ class editor_Plugins_Okapi_Worker extends editor_Models_Task_AbstractWorker
             $result = true;
         } catch (Exception $e) {
             $event = $this->handleException($e, $workFile, $fileId, false);
+            $this->logEmptyTargets($fileId, $workFile);
+
             if (file_exists($workFile)) {
                 //we add the XLF file suffix, since the workfile is now still a XLF file.
                 rename($workFile, $workFile . $api::OUTPUT_FILE_EXTENSION);
@@ -319,18 +323,10 @@ See task event log for more details.' . "\n\n" . (is_null($event) ? $e->getMessa
     /**
      * Does some validation of the XLIFF file to improve debugging
      */
-    protected function xliffExportPreValidation(SplFileInfo $workFile, $fileId)
+    protected function xliffExportPreValidation(SplFileInfo $workFile): void
     {
         $content = file_get_contents($workFile);
-
-        if (preg_match('#<target[^>]*/>#', $content)) {
-            // in case of an exception we just ignore that file, log it, and proceed with the import/export
-            $this->logger->warn('E1150', 'Okapi Plug-In: The exported XLIFF {file} contains empty targets, the Okapi process will probably fail then.', [
-                'task' => $this->task,
-                'fileId' => $fileId,
-                'file' => basename($workFile),
-            ]);
-        }
+        $this->hadEmptyTargets = (bool) preg_match('#<target[^>]*/>#', $content);
     }
 
     /**
@@ -444,5 +440,21 @@ See task event log for more details.' . "\n\n" . (is_null($event) ? $e->getMessa
         }
 
         return $plugin;
+    }
+
+    private function logEmptyTargets(mixed $fileId, SplFileInfo $workFile): void
+    {
+        if ($this->hadEmptyTargets) {
+            $this->logger->warn(
+                'E1150',
+                'Okapi Plug-In: The exported XLIFF {file} contains empty targets,'
+                . ' the Okapi process probably failed due that.',
+                [
+                    'task' => $this->task,
+                    'fileId' => $fileId,
+                    'file' => basename($workFile),
+                ]
+            );
+        }
     }
 }
