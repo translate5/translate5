@@ -97,6 +97,7 @@ class ChangeAlikeTranslate683Test extends editor_Test_JsonTest
         $config
             ->addTask('de', 'en', -1, 'TRANSLATE-683-de-en.csv')
             ->addAdditionalUploadFile('importTbx', 'TRANSLATE-683-de-en.tbx')
+            ->addTaskConfig('runtimeOptions.import.fileparser.csv.active', '1')
             ->setProperty('enableSourceEditing', static::$useSourceEditing)
             ->setToEditAfterImport();
     }

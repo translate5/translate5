@@ -60,6 +60,7 @@ class QualityNumbersCheckTest extends editor_Test_JsonTest
             $config
                 ->addTask($lang[1], $lang[2])
                 ->addUploadFile('testfiles/' . $taskName . '.csv')
+                ->addTaskConfig('runtimeOptions.import.fileparser.csv.active', '1')
                 ->addTaskConfig('runtimeOptions.autoQA.enableSegmentSpellCheck', '0')
                 ->setToEditAfterImport()
         );

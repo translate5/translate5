@@ -165,7 +165,7 @@ class editor_ConfigController extends ZfExtended_RestController
                 if ($task->isProject()) {
                     //if the current change is for project, load all task project, and set
                     //this config for all project tasks
-                    $projectTasks = $task->loadProjectTasks($task->getProjectId(), true);
+                    $projectTasks = $task->loadProjectTasks((int) $task->getProjectId(), true);
                     $projectTasks = array_column($projectTasks, 'taskGuid');
                 }
                 foreach ($projectTasks as $projectTask) {
@@ -370,6 +370,7 @@ class editor_ConfigController extends ZfExtended_RestController
 
         if (! empty($taskGuid)) {
             $configs = $this->entity->mergeTaskValues($taskGuid);
+
             return $this->blacklistConfig($configs);
         }
 
@@ -379,7 +380,8 @@ class editor_ConfigController extends ZfExtended_RestController
             if (! is_numeric($customerId)) {
                 return [];
             }
-            $configs = $this->entity->mergeCustomerValues($customerId);
+            $configs = $this->entity->mergeCustomerValues((int) $customerId);
+
             return $this->blacklistConfig($configs);
         }
 
@@ -392,24 +394,23 @@ class editor_ConfigController extends ZfExtended_RestController
      */
     public function blacklistConfig(array $configs): array
     {
-
         $userRoles = ZfExtended_Authentication::getInstance()->getUserRoles();
-        if(in_array('admin', $userRoles) ||
+        if (in_array('admin', $userRoles) ||
             in_array('pm', $userRoles) ||
-            in_array('systemadmin', $userRoles))
-        {
+            in_array('systemadmin', $userRoles)) {
             return array_values($configs);
         }
 
         $blacklisted = [
             'runtimeOptions.plugins.DeepL.authkey',
-            'runtimeOptions.plugins.AcrossHotfolder.filesystemConfig'
+            'runtimeOptions.plugins.AcrossHotfolder.filesystemConfig',
         ];
         foreach ($blacklisted as $blacklist) {
             if (isset($configs[$blacklist])) {
                 unset($configs[$blacklist]);
             }
         }
+
         return array_values($configs);
     }
 }

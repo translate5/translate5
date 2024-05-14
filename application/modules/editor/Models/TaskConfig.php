@@ -53,9 +53,13 @@ class editor_Models_TaskConfig extends ZfExtended_Models_Entity_Abstract
      *  Return all task specific configs for the given task guid.
      *  For all configs for which there is not task specific overwrite, the overwrite for the task client will be used as a value.
      *  For all configs for which there is no task customer specific overwrite, the instance-level config value will be used
+     *
      * @param string $taskGuid
-     * @throws editor_Models_ConfigException
      * @return Zend_Config
+     * @throws ReflectionException
+     * @throws Zend_Exception
+     * @throws ZfExtended_Models_Entity_NotFoundException
+     * @throws editor_Models_ConfigException
      */
     public function getTaskConfig(string $taskGuid)
     {
@@ -68,8 +72,7 @@ class editor_Models_TaskConfig extends ZfExtended_Models_Entity_Abstract
         // retrieves all DB Configs for the task, already overwritten by level
         $configModel = $this->getTaskConfigModel($taskGuid);
 
-        $configOperator = ZfExtended_Factory::get('ZfExtended_Resource_DbConfig');
-        /* @var $configOperator ZfExtended_Resource_DbConfig */
+        $configOperator = ZfExtended_Factory::get(ZfExtended_Resource_DbConfig::class);
         $configOperator->initDbOptionsTree($configModel);
 
         $taskConfig = new Zend_Config($configOperator->getDbOptionTree());
@@ -82,16 +85,18 @@ class editor_Models_TaskConfig extends ZfExtended_Models_Entity_Abstract
 
     /**
      * Internal API to fetch the raw task's config from DB
+     *
      * @return array
+     * @throws ReflectionException
+     * @throws Zend_Exception
+     * @throws ZfExtended_Models_Entity_NotFoundException
      */
     private function getTaskConfigModel(string $taskGuid)
     {
-        $configModel = ZfExtended_Factory::get('editor_Models_Config');
-        /* @var $configModel editor_Models_Config */
+        $configModel = ZfExtended_Factory::get(editor_Models_Config::class);
 
         //fetch all config from DB
-        $dbConfig = ZfExtended_Factory::get('ZfExtended_Models_Config');
-        /* @var $dbConfig ZfExtended_Models_Config */
+        $dbConfig = ZfExtended_Factory::get(ZfExtended_Models_Config::class);
         $base = $configModel->mergeIniValues($dbConfig->loadAll());
 
         //for merge set config name as array key
