@@ -626,7 +626,8 @@ class Editor_SegmentController extends ZfExtended_RestController
             if (! in_array($key, $fieldnames)) {
                 continue;
             }
-            $sanitized = $updater->sanitizeEditedContent($data) || $sanitized;
+
+            $sanitized = $updater->sanitizeEditedContent($data, 'targetEdit' === $key) || $sanitized;
             $this->data->{$key} = $data;
         }
         if ($sanitized) {
@@ -731,6 +732,9 @@ class Editor_SegmentController extends ZfExtended_RestController
     {
         $acl = $lock ? Rights::LOCK_SEGMENT_OPERATION : Rights::UNLOCK_SEGMENT_OPERATION;
 
+        // Shortcut
+        $task = $this->getCurrentTask();
+
         //the amount of new ACL rules would be huge to handle that lock/unlock Batch/Operations with
         // ordinary controller right handling since currently role editor has access to all methods here.
         // So its easier to double access to that functions for PM users then
@@ -739,10 +743,21 @@ class Editor_SegmentController extends ZfExtended_RestController
 
         /* @var Operations $operations */
         $operations = ZfExtended_Factory::get('\MittagQI\Translate5\Segment\Operations', [
-            $this->getCurrentTask()->getTaskGuid(),
+            $task->getTaskGuid(),
             $this->entity,
         ]);
+
+        // Do preparations for cases when we need full list of task's segments to be analysed for quality detection
+        // Currently it is used only for consistency-check to detect consistency qualities BEFORE segment is updated,
+        // so that it would be possible to do the same AFTER segment is updated, calculate the difference and insert/delete
+        // qualities on segments where needed
+        editor_Segment_Quality_Manager::instance()->preProcessTask($task, editor_Segment_Processing::ALIKE);
+
+        // Toggle lock
         $operations->toggleLockOperation($lock);
+
+        // Update qualities for cases when we need full list of task's segments to be analysed for quality detection
+        editor_Segment_Quality_Manager::instance()->postProcessTask($task, editor_Segment_Processing::ALIKE);
 
         //update the already flushed object with the locked one
         $this->view->rows = $this->entity->getDataObject();
@@ -776,15 +791,30 @@ class Editor_SegmentController extends ZfExtended_RestController
     public function lockBatch(bool $lock = true)
     {
         $acl = $lock ? Rights::LOCK_SEGMENT_BATCH : Rights::UNLOCK_SEGMENT_BATCH;
+
+        // Shortcut
+        $task = $this->getCurrentTask();
+
         $this->checkAccess(Rights::ID, $acl, __CLASS__ . '::' . ($lock ? __FUNCTION__ : 'unlockBatch'));
         $this->applyQualityFilter();
 
         /* @var Operations $operations */
         $operations = ZfExtended_Factory::get('\MittagQI\Translate5\Segment\Operations', [
-            $this->getCurrentTask()->getTaskGuid(),
+            $task->getTaskGuid(),
             $this->entity,
         ]);
+
+        // Do preparations for cases when we need full list of task's segments to be analysed for quality detection
+        // Currently it is used only for consistency-check to detect consistency qualities BEFORE segment is updated,
+        // so that it would be possible to do the same AFTER segment is updated, calculate the difference and insert/delete
+        // qualities on segments where needed
+        editor_Segment_Quality_Manager::instance()->preProcessTask($task, editor_Segment_Processing::ALIKE);
+
+        // Batch-lock/unlock
         $operations->toggleLockBatch($lock);
+
+        // Update qualities for cases when we need full list of task's segments to be analysed for quality detection
+        editor_Segment_Quality_Manager::instance()->postProcessTask($task, editor_Segment_Processing::ALIKE);
 
         // Recalculate task progress and assign results into view
         $this->appendTaskProgress();

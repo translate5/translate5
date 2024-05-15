@@ -26,12 +26,14 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\ContentProtection\T5memory\TmConversionService;
 use MittagQI\Translate5\LanguageResource\CleanupAssociation\Customer;
 use MittagQI\Translate5\LanguageResource\ReimportSegments;
 use MittagQI\Translate5\LanguageResource\Status as LanguageResourceStatus;
 use MittagQI\Translate5\LanguageResource\TaskAssociation;
 use MittagQI\Translate5\LanguageResource\TaskPivotAssociation;
 use MittagQI\Translate5\Task\Current\NoAccessException;
+use MittagQI\Translate5\Task\Import\TaskDefaults;
 use MittagQI\Translate5\Task\TaskContextTrait;
 use MittagQI\ZfExtended\Controller\Response\Header;
 
@@ -114,8 +116,7 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         //add custom filters
         $this->handleFilterCustom();
 
-        $this->view->rows = $this->entity->loadAllByServices();
-        $this->view->total = $this->entity->getTotalCount();
+        $rows = $this->entity->loadAllByServices();
 
         $serviceManager = ZfExtended_Factory::get(editor_Services_Manager::class);
         $resources = [];
@@ -129,7 +130,7 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
             return $resources[$id];
         };
 
-        $languageResourcesIds = array_column($this->view->rows, 'id');
+        $languageResourcesIds = array_column($rows, 'id');
         $this->prepareTaskInfo($languageResourcesIds);
 
         $eventLogger = ZfExtended_Factory::get(editor_Models_Logger_LanguageResources::class);
@@ -147,12 +148,34 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         $languages = $languages->loadResourceIdsGrouped();
         $translate = ZfExtended_Zendoverwrites_Translate::getInstance();
 
-        foreach ($this->view->rows as &$lrData) {
+        $tmConversionService = TmConversionService::create();
+
+        $filterTmNeedsConversion = $this->getParam('filterTmNeedsConversion', false);
+
+        foreach ($rows as $rowId => &$lrData) {
             $resource = $getResource($lrData['serviceType'], $lrData['resourceId']);
             /* @var editor_Models_LanguageResources_Resource $resource */
             if (! empty($resource)) {
                 $lrData = array_merge($lrData, $resource->getMetaData());
             }
+
+            $id = $lrData['id'];
+            $lrData['serviceName'] = $serviceManager->getUiNameByType($lrData['serviceType']);
+
+            $lrData['tmNeedsConversion'] = false;
+            $lrData['tmConversionInProgress'] = false;
+
+            if (editor_Services_Manager::SERVICE_OPENTM2 === $lrData['serviceType']) {
+                $lrData['tmNeedsConversion'] = ! $tmConversionService->isTmConverted($id);
+                $lrData['tmConversionInProgress'] = $tmConversionService->isConversionInProgress($id);
+            }
+
+            if ($filterTmNeedsConversion && ! $lrData['tmNeedsConversion']) {
+                unset($rows[$rowId]);
+
+                continue;
+            }
+
             // translate the "specificDta" field for the frontend and store the unserialized data
             $specificData = $this->prepareSpecificData($lrData, true);
             $languageResourceInstance = ZfExtended_Factory::get(editor_Models_LanguageResources_LanguageResource::class);
@@ -170,8 +193,6 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
                 }
             }
 
-            $id = $lrData['id'];
-            $lrData['serviceName'] = $serviceManager->getUiNameByType($lrData['serviceType']);
             //add customer assocs
             $lrData['customerIds'] = $this->getCustassoc($custAssoc, 'customerId', $id);
             $lrData['customerUseAsDefaultIds'] = $this->getCustassocByIndex($custAssoc, 'useAsDefault', $id);
@@ -188,6 +209,73 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
             }
             $lrData['categories'] = $categoryLabels;
             $lrData['eventsCount'] = isset($eventLoggerGroupped[$id]) ? (int) $eventLoggerGroupped[$id] : 0;
+        }
+
+        $this->view->rows = array_values($rows);
+        $this->view->total = count($rows);
+    }
+
+    public function defaulttmneedsconversionAction(): void
+    {
+        $postData = $this->getAllParams();
+        $tmConversionService = TmConversionService::create();
+
+        $customerAssoc = ZfExtended_Factory::get(editor_Models_LanguageResources_CustomerAssoc::class);
+
+        $data = $customerAssoc->loadByCustomerIdsUseAsDefault([$postData['customerId']]);
+
+        $defaults = new TaskDefaults();
+
+        $iterator = $defaults->findMatchingAssocData($postData['sourceId'], $postData['targetId'], $data);
+
+        $has = false;
+        foreach ($iterator as $data) {
+            if (! $tmConversionService->isTmConverted($data['languageResourceId'])) {
+                $has = true;
+
+                break;
+            }
+        }
+
+        $this->view->result = [
+            'hasLangResThatNeedsConversion' => $has,
+        ];
+        $this->view->success = true;
+    }
+
+    public function synchronizetmAction(): void
+    {
+        $postData = $this->getAllParams();
+        $tmConversionService = TmConversionService::create();
+
+        $this->view->success = true;
+
+        if (
+            $tmConversionService->isTmConverted($postData['id'])
+            || $tmConversionService->isConversionInProgress($postData['id'])
+        ) {
+            return;
+        }
+
+        $tmConversionService->startConversion($postData['id']);
+    }
+
+    public function synchronizetmbatchAction(): void
+    {
+        $postData = $this->getAllParams();
+        $tmConversionService = TmConversionService::create();
+
+        $this->view->success = true;
+
+        foreach ($postData['data'] as $resource) {
+            if (
+                $tmConversionService->isTmConverted((int) $resource)
+                || $tmConversionService->isConversionInProgress((int) $resource)
+            ) {
+                continue;
+            }
+
+            $tmConversionService->startConversion((int) $resource);
         }
     }
 
@@ -798,6 +886,10 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
             $this->entity->save();
         }
 
+        if (editor_Services_Manager::SERVICE_OPENTM2 === $this->entity->getServiceType()) {
+            TmConversionService::create()->setRulesHash($this->entity, $sourceLangId, $targetLangId);
+        }
+
         $this->view->rows = $this->entity->getDataObject();
         $this->view->success = true;
     }
@@ -1399,10 +1491,21 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
             $result = $this->markDiff($segment, $result, $connector);
         }
 
+        $tmConversionService = TmConversionService::create();
+
         $this->view->segmentId = $segment->getId(); //return the segmentId back, just for reference
         $this->view->languageResourceId = $this->entity->getId();
         $this->view->resourceType = $this->entity->getResourceType();
         $this->view->rows = $result->getResult();
+        if (editor_Services_Manager::SERVICE_OPENTM2 === $this->entity->getServiceType()) {
+            $this->view->tmNeedsConversion = ! $tmConversionService->isTmConverted($languageResourceId);
+            $this->view->tmConversionInProgress = $tmConversionService->isConversionInProgress($languageResourceId);
+
+            foreach ($this->view->rows as &$row) {
+                $row->tmNeedsConversion = $this->view->tmNeedsConversion;
+                $row->tmConversionInProgress = $this->view->tmConversionInProgress;
+            }
+        }
         $this->view->total = count($this->view->rows);
     }
 

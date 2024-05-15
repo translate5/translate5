@@ -42,7 +42,8 @@ Ext.define('Editor.view.quality.FilterPanelController', {
         controller: {
             '#Segments': {
                 segmentEditSaved: 'onSegmentSaved',
-                segmentEditCanceled: 'onSegmentCanceled'
+                segmentEditCanceled: 'onSegmentCanceled',
+                segmentLockToggled: 'onSegmentLockToggled'
             }
         },
         store: {
@@ -118,17 +119,25 @@ Ext.define('Editor.view.quality.FilterPanelController', {
      * Called on saving of segments (incl. alikes). We refresh our store then without updating the filtered grid if we are visible /show qualities
      */
     onSegmentSaved: function(){
-        if(this.panelShown){
-            // the "segmentEditSaved" event it seems does not cover the time e.g. the checking of the segment state needs in conjunction with language resources that must be requested.
-            // generally this event seem to fire BEFORE all processing of all edited segment save related operations have finished
-            // this is just a very dirty attempt to cover this, obiously we have a race-condition. The good thing is, it' will result in a outdated view only on errors
-            var me = this;
-            me.delayedChange = new Ext.util.DelayedTask(function(){
-                me.refreshFilteredStore();
-            });
-            me.delayedChange.delay(250);
-        }
+        if (this.panelShown) this.refreshQualitiesPanel(250);
     },
+
+    /**
+     * Refresh qualities panel with a given delay in milliseconds
+     *
+     * @param delay
+     */
+    refreshQualitiesPanel: function(delay) {
+        // the "segmentEditSaved" event it seems does not cover the time e.g. the checking of the segment state needs in conjunction with language resources that must be requested.
+        // generally this event seem to fire BEFORE all processing of all edited segment save related operations have finished
+        // this is just a very dirty attempt to cover this, obiously we have a race-condition. The good thing is, it' will result in a outdated view only on errors
+        var me = this;
+        me.delayedChange = new Ext.util.DelayedTask(function () {
+            me.refreshFilteredStore();
+        });
+        me.delayedChange.delay(delay);
+    },
+
     /**
      * Called on a canceled segment edit
      */
@@ -138,6 +147,13 @@ Ext.define('Editor.view.quality.FilterPanelController', {
             this.refreshFilteredStore();
         }
     },
+    /**
+     * Called when lock is toggled
+     */
+    onSegmentLockToggled: function(isBatch){
+        if (this.panelShown) this.refreshQualitiesPanel(250);
+    },
+
     /**
      * Prevents an item being checked when it has no qualities
      */

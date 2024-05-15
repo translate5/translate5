@@ -26,6 +26,8 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\ContentProtection\NumberProtection\Tag\NumberTag;
+
 /**
  * calculates and removes leading and trailing paired and special single tags
  * removing means: the tags are not imported, they are added directly to the skeleton file and are not changeable therefore
@@ -117,8 +119,9 @@ class editor_Models_Import_FileParser_Xlf_SurroundingTagRemover_All extends edit
             //inc internal start shift count
             $isEmptyString = is_string($sourceChunk) && strlen($sourceChunk) === 0;
             $isTag = ($sourceChunk ?? null) instanceof editor_Models_Import_FileParser_Tag;
+            $isTrimableTag = ! $isTag || ! ($sourceChunk instanceof NumberTag);
             $isWhitespace = (preg_match('#^\s+$#', $sourceChunk ?? ''));
-            $toBeTrimmed = $isWhitespace || $isTag || $isEmptyString;
+            $toBeTrimmed = ($isWhitespace || $isTag || $isEmptyString) && $isTrimableTag;
             if ($toBeTrimmed) {
                 $trimmed[] = $sourceChunk;
             }

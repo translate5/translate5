@@ -107,6 +107,7 @@
       	"ext-fileinfo": "*",
       	"ext-curl": "*",
 		"ext-posix": "*",
+		"ext-intl": "*",
 		"ext-zlib": "*",
 		"phpunit/phpunit": "^9",
 		"shardj/zf1-future" : "dev-master",
@@ -134,7 +135,8 @@
 		"symfony/lock": "^6.0",
 		"cesargb/php-log-rotation": "^2.7",
 		"ifsnop/mysqldump-php": "^v2.9",
-		"http-interop/http-factory-guzzle": "^1.2"
+		"http-interop/http-factory-guzzle": "^1.2",
+		"microsoft/microsoft-graph": "^2.6.0"
     },
 	"extra" : {
 		"merge-plugin" : {

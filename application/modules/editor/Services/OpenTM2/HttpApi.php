@@ -615,16 +615,22 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
 
         // Normally the ReturnValue is 0 if there is no error.
         // Also 10010 and 10011 are valid ReturnValue values
+        // TODO remove ReturnValue as it is not supported anymore in T5Memory
         $returnValueError = ! empty($this->result->ReturnValue)
             && ! in_array((int) $this->result->ReturnValue, [10010, 10011, 0]);
 
+        $errorMsg = $this->result->ErrorMsg
+            ?? $this->result->importErrorMsg
+            ?? $this->result->reorganizeErrorMsg
+            ?? null;
+
         //For some errors this is not true, then only a ErrorMsg is set, but return value is 0,
-        if ($returnValueError || ! empty($this->result->ErrorMsg)) {
+        if ($returnValueError || ! empty($errorMsg)) {
             $this->error = new stdClass();
             $this->error->method = $this->httpMethod;
             $this->error->url = $this->http->getUri(true);
             $this->error->code = 'Error Nr. ' . ($this->result->ReturnValue ?? '');
-            $this->error->error = $this->result->ErrorMsg;
+            $this->error->error = $errorMsg;
         }
 
         return empty($this->error);

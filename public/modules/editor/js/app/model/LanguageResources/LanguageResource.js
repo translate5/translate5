@@ -65,7 +65,9 @@ Ext.define('Editor.model.LanguageResources.LanguageResource', {
         {name: 'serviceType', type: 'string'},
         {name: 'searchable', type: 'boolean'},
         {name: 'writeSource', type: 'boolean'},
-        {name: 'useAsGlossarySource', critical: true}
+        {name: 'useAsGlossarySource', critical: true},
+        {name: 'tmNeedsConversion', type: 'boolean'},
+        {name: 'tmConversionInProgress', type: 'boolean'}
     ],
     idProperty: 'id',
 

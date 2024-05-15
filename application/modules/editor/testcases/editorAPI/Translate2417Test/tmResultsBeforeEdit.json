@@ -6,6 +6,8 @@
         "source": "Across Language Server",
         "languageResourceType": "tm",
         "state": "loaded",
-        "timestamp": "TEST_TIMESTAMP"
+        "timestamp": "TEST_TIMESTAMP",
+        "tmNeedsConversion": false,
+        "tmConversionInProgress": false
     }
 ]

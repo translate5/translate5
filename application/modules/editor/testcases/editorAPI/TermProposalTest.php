@@ -288,7 +288,7 @@ class TermProposalTest extends \editor_Test_ApiTest
         foreach ([
             'locale', 'right', 'permission', 'activeItem', 'l10n', 'filterWindow', 'filterPanel', 'lang',
             'langInclSubs', 'flag', 'langAll', 'language', 'cfg', 'itranslateQuery', 'time'] as $prop) {
-            $this->assertObjectHasAttribute($prop, self::$setup, 'Termportal setup data has no ' . $prop . '-property');
+            $this->assertObjectHasProperty($prop, self::$setup, 'Termportal setup data has no ' . $prop . '-property');
         }
 
         // [21] call siblinginfo to get attributes for Term1
@@ -299,7 +299,7 @@ class TermProposalTest extends \editor_Test_ApiTest
 
         // Check props presence
         foreach (['entry', 'language', 'term'] as $prop) {
-            $this->assertObjectHasAttribute($prop, $siblinginfo, 'Sibling info data has no ' . $prop . '-property');
+            $this->assertObjectHasProperty($prop, $siblinginfo, 'Sibling info data has no ' . $prop . '-property');
         }
 
         // Check ref-attr is there
@@ -360,7 +360,7 @@ class TermProposalTest extends \editor_Test_ApiTest
             'attrId' => $figurecreate->inserted->id,
         ]);
         $this->assertIsObject($figuredelete, 'Unable to delete the image-attr');
-        $this->assertObjectHasAttribute('updated', $figuredelete, 'Image-attr deletion response does not contain "updated" prop');
+        $this->assertObjectHasProperty('updated', $figuredelete, 'Image-attr deletion response does not contain "updated" prop');
         $result = static::api()->getRaw($src);
         $this->assertTrue(static::api()->isJsonResultError($result), 'Image-attr deleted but image-file still exists at ' . $src);
 
@@ -369,7 +369,7 @@ class TermProposalTest extends \editor_Test_ApiTest
             'termId' => $rejected->inserted->id,
         ]);
         $this->assertIsObject($rejecteddelete, 'Unable to delete rejected term');
-        $this->assertObjectHasAttribute('isLast', $rejecteddelete, 'Rejected term deletion response does not have isLast prop');
+        $this->assertObjectHasProperty('isLast', $rejecteddelete, 'Rejected term deletion response does not have isLast prop');
         $this->assertFalse($rejecteddelete->isLast, 'Deleted term should have not been the last - neither among its language nor among its termEntry');
 
         // [25] delete note-attr for Term1
@@ -378,14 +378,14 @@ class TermProposalTest extends \editor_Test_ApiTest
             'attrId' => $attrId_note,
         ]);
         $this->assertIsObject($notedelete, 'Unable to delete note-attr');
-        $this->assertObjectHasAttribute('updated', $notedelete, 'Unable to delete note-attr');
+        $this->assertObjectHasProperty('updated', $notedelete, 'Unable to delete note-attr');
 
         // [26] delete Term2 (having language=en)    [isLast=language]
         $Term2_delete = static::api()->delete('editor/term', [
             'termId' => $Term2->termId,
         ]);
         $this->assertIsObject($Term2_delete, 'Unable to delete Term2 (having language=en) [isLast=language]');
-        $this->assertObjectHasAttribute('isLast', $Term2_delete, 'Term2 deletion response does not have isLast prop');
+        $this->assertObjectHasProperty('isLast', $Term2_delete, 'Term2 deletion response does not have isLast prop');
         $this->assertEquals($Term2_delete->isLast, 'language', 'Deleted term should be the last among its language');
 
         // [27] delete Term1 (having language=de-DE) [isLast=termEntry]
@@ -393,7 +393,7 @@ class TermProposalTest extends \editor_Test_ApiTest
             'termId' => $Term1->termId,
         ]);
         $this->assertIsObject($Term1_delete, 'Unable to delete Term2 (having language=en) [isLast=language]');
-        $this->assertObjectHasAttribute('isLast', $Term1_delete, 'Term2 deletion response does not have isLast prop');
+        $this->assertObjectHasProperty('isLast', $Term1_delete, 'Term2 deletion response does not have isLast prop');
         $this->assertEquals($Term1_delete->isLast, 'entry', 'Deleted term should be the last among its termEntry');
 
         // [28] Rename the note-attr label
@@ -404,7 +404,7 @@ class TermProposalTest extends \editor_Test_ApiTest
             'label' => $currentLabel . '-amended',
         ]);
         $this->assertIsObject($labeledit, 'Unable to edit note-attr label');
-        $this->assertObjectHasAttribute('label', $labeledit, 'Note-attr editing response has no label-prop');
+        $this->assertObjectHasProperty('label', $labeledit, 'Note-attr editing response has no label-prop');
 
         // Restore old label back
         $labeledit = static::api()->putJson('editor/attributedatatype', [
@@ -413,7 +413,7 @@ class TermProposalTest extends \editor_Test_ApiTest
             'label' => $currentLabel,
         ]);
         $this->assertIsObject($labeledit, 'Unable to revert note-attr label back');
-        $this->assertObjectHasAttribute('label', $labeledit, 'Note-attr reverting back response has no label-prop');
+        $this->assertObjectHasProperty('label', $labeledit, 'Note-attr reverting back response has no label-prop');
     }
 
     public static function afterTests(): void
@@ -450,7 +450,7 @@ class TermProposalTest extends \editor_Test_ApiTest
 
         // Do checks
         $this->assertIsObject($resp, 'Invalid response. ' . $query);
-        $this->assertObjectHasAttribute('data', $resp, 'Response has no data-prop. ' . $query);
+        $this->assertObjectHasProperty('data', $resp, 'Response has no data-prop. ' . $query);
         $this->assertIsArray($resp->data, '$resp->data is not an array. ' . $query);
         $this->assertEquals($qty, count($resp->data), 'Results qty should be ' . $qty . ', but ' . count($resp->data) . ' got instead. ' . $query);
     }
@@ -555,9 +555,9 @@ class TermProposalTest extends \editor_Test_ApiTest
 
         // Do checks
         $this->assertIsObject($resp, 'Invalid response. ' . $query);
-        $this->assertObjectHasAttribute('inserted', $resp, 'Response has no inserted-prop. ' . $query);
+        $this->assertObjectHasProperty('inserted', $resp, 'Response has no inserted-prop. ' . $query);
         $this->assertIsObject($resp->inserted, '$resp->inserted is not an object. ' . $query);
-        $this->assertObjectHasAttribute('id', $resp->inserted, '$resp->inserted has no id-prop. ' . $query);
+        $this->assertObjectHasProperty('id', $resp->inserted, '$resp->inserted has no id-prop. ' . $query);
         $factQty = $resp->inserted->id ? count(explode(',', $resp->inserted->id)) : 0;
         $this->assertEquals($planQty, $factQty, 'Inserted attrs qty should be ' . $planQty . ', but ' . $factQty . ' got instead. ' . $query);
 
@@ -566,7 +566,7 @@ class TermProposalTest extends \editor_Test_ApiTest
 
         // If $existingPlanQty arg is given and is > 0
         if ($existingPlanQty) {
-            $this->assertObjectHasAttribute('existing', $resp, 'Response has no existing-prop. ' . $query);
+            $this->assertObjectHasProperty('existing', $resp, 'Response has no existing-prop. ' . $query);
             $this->assertIsObject($resp->existing, 'Response has no existing-prop. ' . $query);
             $existingFact = (array) $resp->existing;
             $existingFactQty = count($existingFact);
@@ -575,7 +575,7 @@ class TermProposalTest extends \editor_Test_ApiTest
 
             // Else assert that there is no existing-prop in $resp
         } else {
-            $this->assertObjectNotHasAttribute('existing', $resp, 'Response should have no existing-prop. ' . $query);
+            $this->assertObjectNotHasProperty('existing', $resp, 'Response should have no existing-prop. ' . $query);
         }
 
         // Remember ids of inserted attrs
@@ -603,11 +603,11 @@ class TermProposalTest extends \editor_Test_ApiTest
         // Do checks
         $this->assertIsObject($resp, 'Invalid response. ' . $query);
         if ($postParams['dataType'] == 'figure') {
-            $this->assertObjectHasAttribute('src', $resp, 'Response has no src-prop. ' . $query);
+            $this->assertObjectHasProperty('src', $resp, 'Response has no src-prop. ' . $query);
             $this->assertIsString($resp->src, '$resp->src is not string. ' . $query);
             $this->assertNotEmpty($resp->src, '$resp->src is empty. ' . $query);
         } else {
-            $this->assertObjectHasAttribute('success', $resp, 'Response has no success-prop. ' . $query);
+            $this->assertObjectHasProperty('success', $resp, 'Response has no success-prop. ' . $query);
             $this->assertIsBool($resp->success, '$resp->success is not bool. ' . $query);
             $this->assertEquals(true, $resp->success, '$resp->success is not true. ' . $query);
         }
@@ -624,7 +624,7 @@ class TermProposalTest extends \editor_Test_ApiTest
             ]);
 
             // Check $resp
-            $this->assertObjectHasAttribute('success', $resp, 'Attr batch-save: response has no success-prop. ' . $query);
+            $this->assertObjectHasProperty('success', $resp, 'Attr batch-save: response has no success-prop. ' . $query);
             $this->assertIsBool($resp->success, 'Attr batch-save: $resp->success is not bool. ' . $query);
             $this->assertEquals(true, $resp->success, 'Attr batch-save: $resp->success is not true. ' . $query);
 
@@ -634,7 +634,7 @@ class TermProposalTest extends \editor_Test_ApiTest
                 'attrId' => $insertedIds,
             ]);
             $this->assertIsObject($resp, 'Attrs batch-deletion response is not an object');
-            $this->assertObjectHasAttribute('updated', $resp, 'Note-attr deletion response does not contain "updated" prop');
+            $this->assertObjectHasProperty('updated', $resp, 'Note-attr deletion response does not contain "updated" prop');
         }
     }
 }

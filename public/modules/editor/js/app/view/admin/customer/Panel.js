@@ -129,7 +129,8 @@ Ext.define('Editor.view.admin.customer.Panel', {
                                 ptype: 'gridfilters'
                             }
                         ],
-                        columns: [{
+                        columns: [
+                            {
                                 xtype: 'gridcolumn',
                                 dataIndex: 'id',
                                 text: 'Id',
@@ -181,7 +182,8 @@ Ext.define('Editor.view.admin.customer.Panel', {
                                 }
                             }
                         ]
-                    },{
+                    },
+                    {
                         xtype: 'tabpanel',
                         flex: 0.7,
                         region: 'east',

@@ -208,12 +208,14 @@ class editor_Models_Config extends ZfExtended_Models_Config
      *
      * @param string $taskGuid
      * @param array $dbResults
+     * @param bool $excludeMaps
      * @return array
+     * @throws ReflectionException
+     * @throws ZfExtended_Models_Entity_NotFoundException
      */
     public function mergeTaskValues(string $taskGuid, array $dbResults = [], bool $excludeMaps = true): array
     {
-        $task = ZfExtended_Factory::get('editor_Models_Task');
-        /* @var $task editor_Models_Task */
+        $task = ZfExtended_Factory::get(editor_Models_Task::class);
         $task->loadByTaskGuid($taskGuid);
         $taskState = $task->getState();
 
@@ -225,7 +227,7 @@ class editor_Models_Config extends ZfExtended_Models_Config
         //and used as base value in task config window
         //configs with customer level will be marked as readonly on the frontend
         $customerBase = $this->mergeCustomerValues(
-            $task->getCustomerId(),
+            (int) $task->getCustomerId(),
             $dbResults,
             self::CUSTOMER_CONFIG_LEVELS,
             $excludeMaps
@@ -291,12 +293,14 @@ class editor_Models_Config extends ZfExtended_Models_Config
      *
      * @param array $dbResults
      * @return array
+     * @throws ReflectionException
+     * @throws ZfExtended_ErrorCodeException
+     * @throws ZfExtended_Models_Entity_NotFoundException
      */
     public function mergeInstanceValue(array $dbResults = []): array
     {
         if (empty($dbResults)) {
-            $user = ZfExtended_Factory::get('ZfExtended_Models_User');
-            /* @var $user ZfExtended_Models_User */
+            $user = ZfExtended_Factory::get(ZfExtended_Models_User::class);
             $user->load(ZfExtended_Authentication::getInstance()->getUserId());
             //get all application config level for the user
             $levels = [];

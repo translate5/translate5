@@ -95,8 +95,8 @@ class BasicSegmentEditingTest extends editor_Test_JsonTest
             $this->assertEmpty($segment->comments);
             $this->assertEquals(0, $segment->workflowStepNr);
             $this->assertEmpty($segment->workflowStep);
-            $this->assertObjectNotHasAttribute('sourceEdit', $segment);
-            $this->assertObjectNotHasAttribute('sourceEditToSort', $segment);
+            $this->assertObjectNotHasProperty('sourceEdit', $segment);
+            $this->assertObjectNotHasProperty('sourceEditToSort', $segment);
         }
 
         $firstSegment = $segments[0];

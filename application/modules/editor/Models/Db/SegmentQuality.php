@@ -114,24 +114,39 @@ final class editor_Models_Db_SegmentQuality extends Zend_Db_Table_Abstract
                 'qualities' => $table->getName(),
             ], 'qualities.segmentId')
             ->where('qualities.taskGuid = ?', $taskGuid);
+
         // if the state has no editable restriction this means, that the editable restriction must be applied here but not for internal tag faults
         if (! $state->hasEditableRestriction()) {
-            $faultyType = "'" . editor_Segment_Tag::TYPE_INTERNAL . "'";
-            $faultyCat = "'" . editor_Segment_Internal_TagComparision::TAG_STRUCTURE_FAULTY . "'";
-            $select
-                ->from([
-                    'segments' => 'LEK_segments',
-                ], [])
-                ->where('qualities.segmentId = segments.id');
+            // Shortcuts
+            $internal = editor_Segment_Tag::TYPE_INTERNAL;
+            $faulty = editor_Segment_Internal_TagComparision::TAG_STRUCTURE_FAULTY;
+            $consistent = editor_Segment_Consistent_QualityProvider::qualityType();
+
+            // Query chunks
+            $isTagFaulty = "(qualities.type = '$internal' AND qualities.category = '$faulty')";
+            $isNotConsistent = "qualities.type = '$consistent'";
+            $isEditable = "segments.editable = 1";
+            $isNotEditable = "segments.editable = 0";
+            $isTagFaultyOrNotConsistent = "($isTagFaulty OR $isNotConsistent)";
+
+            $select->from([
+                'segments' => 'LEK_segments',
+            ], [])->where('qualities.segmentId = segments.id');
+
             // here it's where it get's really finnicky: we have to evaluate the editable-category only, if it can't be applied in editor_Models_Filter_SegmentSpecific
             // that means, we do have other categories apart of the non-editable faulty tags, but that may also includes the editable faulty-tags
             if ($state->hasCategoryEditableInternalTagFaults()) {
-                $select->where('(segments.editable = 1 OR (qualities.type = ' . $faultyType . ' AND qualities.category = ' . $faultyCat . '))');
+                if ($state->hasNonBlockedRestriction()) {
+                    $select->where("($isEditable OR $isTagFaultyOrNotConsistent)");
+                } else {
+                    $select->where("($isEditable OR $isTagFaulty)");
+                }
             } else {
-                $select->where(
-                    '((segments.editable = 1 AND NOT (qualities.type = ' . $faultyType . ' AND qualities.category = ' . $faultyCat . ')) '
-                    . 'OR (segments.editable = 0 AND qualities.type = ' . $faultyType . ' AND qualities.category = ' . $faultyCat . '))'
-                );
+                if ($state->hasNonBlockedRestriction()) {
+                    $select->where("(($isEditable AND NOT $isTagFaulty) OR ($isNotEditable AND $isTagFaultyOrNotConsistent))");
+                } else {
+                    $select->where("(($isEditable AND NOT $isTagFaulty) OR ($isNotEditable AND $isTagFaulty))");
+                }
             }
         }
         if ($state->hasCheckedCategoriesByType()) {
@@ -308,6 +323,12 @@ final class editor_Models_Db_SegmentQuality extends Zend_Db_Table_Abstract
         ?string $field = null
     ): iterable {
         $select = $this->getAdapter()->select();
+
+        // Shortcuts
+        $internal = editor_Segment_Tag::TYPE_INTERNAL;
+        $faulty = editor_Segment_Internal_TagComparision::TAG_STRUCTURE_FAULTY;
+        $consistent = editor_Segment_Consistent_QualityProvider::qualityType();
+
         $select
             ->from([
                 'qualities' => $this->getName(),
@@ -320,12 +341,11 @@ final class editor_Models_Db_SegmentQuality extends Zend_Db_Table_Abstract
             ->where('qualities.hidden = 0')
             // we want qualities from editable segments, only exception are structural internal tag errors
             // as usual, Zend Selects do not provide proper bracketing, so we're crating this manually here
-            ->where(
-                'segments.editable = 1 OR (
-                    qualities.type = \'' . editor_Segment_Tag::TYPE_INTERNAL . '\'
-                    AND qualities.category = \'' . editor_Segment_Internal_TagComparision::TAG_STRUCTURE_FAULTY . '\'
-                )'
-            );
+            ->where("segments.editable = 1 OR (
+                (qualities.type = '$internal' AND qualities.category = '$faulty')
+                OR
+                (qualities.type = '$consistent')
+            )");
 
         if (null !== $segmentNrRestriction) {
             if (! empty($segmentNrRestriction)) {

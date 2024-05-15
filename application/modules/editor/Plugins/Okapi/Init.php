@@ -43,6 +43,8 @@ use MittagQI\Translate5\Task\Import\ImportEventTrigger;
  * runtimeOptions.debug.plugin.OkapiKeepIntermediateFiles => All the files that are created in the various processing steps are kept
  *
  * for documentation of the BCONF management, see editor_Plugins_Okapi_Bconf_Entity
+ *
+ * @method static Service createService(string $serviceName, Zend_Config $config = null)
  */
 class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract
 {

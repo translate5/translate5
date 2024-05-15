@@ -56,6 +56,10 @@ class editor_Models_LanguageResources_LanguageResource extends ZfExtended_Models
 {
     use editor_Models_Entity_SpecificDataTrait;
 
+    public const PROTECTION_HASH = 'protection_hash';
+
+    public const PROTECTION_CONVERSION_STARTED = 'conversionStarted';
+
     private const SPECIFIC_DATA_STATUS = 'status';
 
     /***

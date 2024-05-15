@@ -78,8 +78,19 @@ class editor_Models_Filter_SegmentSpecific extends ZfExtended_Models_Filter_ExtJ
                 $this->addFilter($filter);
             }
         }
-        // normally, quality filtering filters for editable segments
-        if ($requestState->hasEditableRestriction()) {
+        // If current filters contain categories of type 'consistent'
+        // make sure blocked segments are excluded
+        if ($requestState->hasNonBlockedRestriction()) {
+            $filter = new stdClass();
+            $filter->field = 'autoStateId';
+            $filter->type = 'notInList';
+            $filter->comparison = 'notInList';
+            $filter->value = [editor_Models_Segment_AutoStates::BLOCKED];
+            $this->addFilter($filter);
+
+            // Else if current filters does NOT contain category 'internal_tag_structure_faulty_noneditable'
+            // make sure non-editable segments are excluded
+        } elseif ($requestState->hasEditableRestriction()) {
             $filter = new stdClass();
             $filter->field = 'editable';
             $filter->type = 'numeric';
