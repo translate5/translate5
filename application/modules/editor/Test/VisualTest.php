@@ -128,4 +128,19 @@ abstract class editor_Test_VisualTest extends editor_Test_JsonTest
         $filesList = $this->getVisualFilesJson($fileToCompare);
         $this->assertModelsEqualsObjects('VisualSourceFile', static::api()->getFileContent($fileToCompare), $filesList, $message);
     }
+
+    /**
+     * Checks if a resource in the visual rootfolder of a task exists
+     * @param string $subPath: a sub-path or filename that is expected to exist in the visual folder, e.g. "images/someimage.jpg"
+     * @param string $message
+     * @return void
+     * @throws \MittagQI\Translate5\Test\Import\Exception
+     */
+    protected function assertVisualResourceExists(string $subPath, string $message = '')
+    {
+        $filePath = static::getTask()->getDataDirectory()
+            . editor_Plugins_VisualReview_Source_Files::FOLDER_REVIEW_DEPRICATED
+            . '/' . ltrim($subPath, '/');
+        $this->assertFileExists($filePath, $message);
+    }
 }
