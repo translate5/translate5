@@ -221,7 +221,7 @@ class ReimportSegments
 
         $assoc->loadByTaskGuidAndTm(
             $this->task->getTaskGuid(),
-            $this->languageResource->getId()
+            (int) $this->languageResource->getId()
         );
 
         // check if the current language resources is updatable before updating
