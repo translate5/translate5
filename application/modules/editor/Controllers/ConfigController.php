@@ -26,6 +26,7 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\Configuration\ConfigLoader;
 use MittagQI\ZfExtended\Acl\ConfigLevelResource;
 use MittagQI\ZfExtended\Service\ConfigHelper;
 
@@ -165,7 +166,7 @@ class editor_ConfigController extends ZfExtended_RestController
                 if ($task->isProject()) {
                     //if the current change is for project, load all task project, and set
                     //this config for all project tasks
-                    $projectTasks = $task->loadProjectTasks($task->getProjectId(), true);
+                    $projectTasks = $task->loadProjectTasks((int) $task->getProjectId(), true);
                     $projectTasks = array_column($projectTasks, 'taskGuid');
                 }
                 foreach ($projectTasks as $projectTask) {
@@ -331,7 +332,7 @@ class editor_ConfigController extends ZfExtended_RestController
             }
 
             //if the current request is for project, all project task should be in state import, if not, throw exception
-            $projectTasks = $task->loadProjectTasks($task->getId(), true);
+            $projectTasks = $task->loadProjectTasks((int) $task->getId(), true);
 
             foreach ($projectTasks as $projectTask) {
                 if ($projectTask['state'] != $task::STATE_IMPORT) {
@@ -343,73 +344,40 @@ class editor_ConfigController extends ZfExtended_RestController
         }
     }
 
-    /***
-     * Load config base on the requested params.
-     * When taskGuid exist in the requested params -> load task specific config
-     * When customerId exist in the requested params -> load customer specific config
-     * When userGuid exist in the requested params -> load user specific config
-     * When no param is provided -> load what the current user is allowed to load
-     *
-     * @return array
+    /**
+     *  Load config base on the requested params.
+     *  When taskGuid exist in the requested params -> load task specific config
+     *  When customerId exist in the requested params -> load customer specific config
+     *  When userGuid exist in the requested params -> load user specific config
+     *  When no param is provided -> load what the current user is allowed to load
+     * @throws editor_Models_ConfigException
      */
     protected function loadConfig(): array
     {
+        $configLoader = new ConfigLoader($this->entity, true);
+
         $userGuid = $this->getParam('userGuid');
         $taskGuid = $this->getParam('taskGuid');
 
         if (! empty($userGuid)) {
             editor_Models_Config::checkUserGuid($userGuid);
 
-            $taskConfig = [];
-            if (! empty($taskGuid)) {
-                $taskConfig = $this->entity->mergeTaskValues($taskGuid, [], false);
-            }
-
-            return array_values($this->entity->mergeUserValues($userGuid, $taskConfig));
+            return $configLoader->loadUserConfig($userGuid, $taskGuid);
         }
 
         if (! empty($taskGuid)) {
-            $configs = $this->entity->mergeTaskValues($taskGuid);
-            return $this->blacklistConfig($configs);
+            return $configLoader->loadTaskConfig($taskGuid);
         }
 
         $customerId = $this->getParam('customerId');
         if (! empty($customerId)) {
-            //ignore invalid customer ids
             if (! is_numeric($customerId)) {
                 return [];
             }
-            $configs = $this->entity->mergeCustomerValues($customerId);
-            return $this->blacklistConfig($configs);
+
+            return $configLoader->loadCustomerConfig((int) $customerId);
         }
 
-        return array_values($this->entity->mergeInstanceValue());
-    }
-
-    /**
-     * Blacklist configs which should not be visible by some user roles
-     * TODO: this will be fixed in a ACL way with the next release. Now we do simple workaround for the problem
-     */
-    public function blacklistConfig(array $configs): array
-    {
-
-        $userRoles = ZfExtended_Authentication::getInstance()->getUserRoles();
-        if(in_array('admin', $userRoles) ||
-            in_array('pm', $userRoles) ||
-            in_array('systemadmin', $userRoles))
-        {
-            return array_values($configs);
-        }
-
-        $blacklisted = [
-            'runtimeOptions.plugins.DeepL.authkey',
-            'runtimeOptions.plugins.AcrossHotfolder.filesystemConfig'
-        ];
-        foreach ($blacklisted as $blacklist) {
-            if (isset($configs[$blacklist])) {
-                unset($configs[$blacklist]);
-            }
-        }
-        return array_values($configs);
+        return $configLoader->loadInstanceConfig();
     }
 }
