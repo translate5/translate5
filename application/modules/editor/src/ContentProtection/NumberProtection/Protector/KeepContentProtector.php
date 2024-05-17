@@ -52,63 +52,20 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\ContentProtection\NumberProtection\Protector;
 
-use editor_Models_Languages;
-use LogicException;
-use MittagQI\Translate5\ContentProtection\Model\ContentProtectionDto;
-use MittagQI\Translate5\ContentProtection\Model\ContentProtectionRepository;
-use MittagQI\Translate5\ContentProtection\NumberProtection\NumberParsingException;
-use MittagQI\Translate5\ContentProtection\NumberProtector;
-
-abstract class AbstractProtector implements NumberProtectorInterface
+class KeepContentProtector extends AbstractProtector
 {
-    public function __construct(
-        protected ContentProtectionRepository $formatRepository,
-    ) {
-    }
-
-    protected function tagFormat(): string
+    public static function getType(): string
     {
-        return str_replace(
-            ':tag',
-            NumberProtector::TAG_NAME,
-            '<:tag type="%s" name="%s" source="%s" iso="%s" target="%s"/>'
-        );
+        return 'keep-content';
     }
 
-    public function protect(
-        string $number,
-        ContentProtectionDto $protectionDto,
-        editor_Models_Languages $sourceLang,
-        editor_Models_Languages $targetLang,
-    ): string {
-        if (! $protectionDto->keepAsIs && empty($protectionDto->outputFormat)) {
-            throw new LogicException(
-                sprintf(
-                    'Input rule of type "%s" and name "%s" does not have appropriate output rule',
-                    $protectionDto->type,
-                    $protectionDto->name
-                )
-            );
-        }
-
-        return $this->composeNumberTag($number, $protectionDto, $targetLang);
+    public function validateFormat(string $format): bool
+    {
+        return true;
     }
 
-    /**
-     * @throws NumberParsingException
-     */
-    protected function composeNumberTag(
-        string $number,
-        ContentProtectionDto $protectionDto,
-        editor_Models_Languages $targetLang,
-    ): string {
-        return sprintf(
-            $this->tagFormat(),
-            static::getType(),
-            htmlspecialchars($protectionDto->name),
-            $number,
-            $number,
-            $number
-        );
+    public function getFormatedExample(string $format): string
+    {
+        return '/some example content/';
     }
 }

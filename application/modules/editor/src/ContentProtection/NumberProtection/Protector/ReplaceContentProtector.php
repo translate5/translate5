@@ -53,62 +53,43 @@ declare(strict_types=1);
 namespace MittagQI\Translate5\ContentProtection\NumberProtection\Protector;
 
 use editor_Models_Languages;
-use LogicException;
 use MittagQI\Translate5\ContentProtection\Model\ContentProtectionDto;
-use MittagQI\Translate5\ContentProtection\Model\ContentProtectionRepository;
-use MittagQI\Translate5\ContentProtection\NumberProtection\NumberParsingException;
-use MittagQI\Translate5\ContentProtection\NumberProtector;
 
-abstract class AbstractProtector implements NumberProtectorInterface
+class ReplaceContentProtector extends AbstractProtector
 {
-    public function __construct(
-        protected ContentProtectionRepository $formatRepository,
-    ) {
-    }
-
-    protected function tagFormat(): string
+    public static function getType(): string
     {
-        return str_replace(
-            ':tag',
-            NumberProtector::TAG_NAME,
-            '<:tag type="%s" name="%s" source="%s" iso="%s" target="%s"/>'
-        );
+        return 'replace-content';
     }
 
-    public function protect(
-        string $number,
-        ContentProtectionDto $protectionDto,
-        editor_Models_Languages $sourceLang,
-        editor_Models_Languages $targetLang,
-    ): string {
-        if (! $protectionDto->keepAsIs && empty($protectionDto->outputFormat)) {
-            throw new LogicException(
-                sprintf(
-                    'Input rule of type "%s" and name "%s" does not have appropriate output rule',
-                    $protectionDto->type,
-                    $protectionDto->name
-                )
-            );
-        }
-
-        return $this->composeNumberTag($number, $protectionDto, $targetLang);
+    public function validateFormat(string $format): bool
+    {
+        return true;
     }
 
-    /**
-     * @throws NumberParsingException
-     */
+    public function getFormatedExample(string $format): string
+    {
+        return '';
+    }
+
     protected function composeNumberTag(
         string $number,
         ContentProtectionDto $protectionDto,
         editor_Models_Languages $targetLang,
     ): string {
+        $formats = [
+            $protectionDto->format,
+            $protectionDto->outputFormat,
+        ];
+        sort($formats);
+
         return sprintf(
             $this->tagFormat(),
-            static::getType(),
+            self::getType(),
             htmlspecialchars($protectionDto->name),
             $number,
-            $number,
-            $number
+            implode(':', $formats),
+            $protectionDto->outputFormat,
         );
     }
 }

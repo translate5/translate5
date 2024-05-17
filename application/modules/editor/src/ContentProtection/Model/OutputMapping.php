@@ -74,13 +74,18 @@ class OutputMapping extends ZfExtended_Models_Entity_Abstract
 
     protected $validatorInstanceClass = OutputMappingValidator::class;
 
+    /**
+     * @var OutputMappingValidator
+     */
+    protected $validator;
+
     public function loadBy(int $langId, int $inputContentRecognitionId): ?Zend_Db_Table_Row_Abstract
     {
         $s = $this->db->select();
         $s->where('languageId = ?', $langId)->where('inputContentRecognitionId = ?', $inputContentRecognitionId);
 
         $this->row = $this->db->fetchRow($s);
-        if (empty($this->row)) {
+        if (null === $this->row) {
             $this->notFound("#by languageId, inputContentRecognitionId", "$langId, $inputContentRecognitionId");
         }
 
@@ -108,7 +113,7 @@ class OutputMapping extends ZfExtended_Models_Entity_Abstract
                     'outputRecognition' => $recognitionTable,
                 ],
                 'outputRecognition.id = mapping.outputContentRecognitionId',
-                ['name as outputName', 'description as outputDescription']
+                ['name as outputName', 'description as outputDescription', 'enabled as ruleEnabled']
             );
 
         return $this->loadFilterdCustom($s);

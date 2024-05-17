@@ -1,8 +1,8 @@
 <?php
 /*
 START LICENSE AND COPYRIGHT
- Copyright (c) 2013 - 2022 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
- Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
+ Copyright (c) 2013 - 2022 Marc Mittag; MittagQI - Quality Informatics; All rights reserved.
+ Contact: http://www.MittagQI.com/ / service (ATT) MittagQI.com
 
  This file is part of a paid plug-in for translate5.
 
@@ -41,74 +41,47 @@ START LICENSE AND COPYRIGHT
  root folder of translate5. This plug-in exception allows using GPLv3 for translate5 plug-ins,
  although translate5 core is licensed under AGPLv3.
 
- @copyright  Marc Mittag, MittagQI - Quality Informatics
- @author     MittagQI - Quality Informatics
- @license    GNU GENERAL PUBLIC LICENSE version 3 with plugin-execption
-             http://www.gnu.org/licenses/gpl.html
-             http://www.translate5.net/plugin-exception.txt
+ @copyright Marc Mittag, MittagQI - Quality Informatics
+ @author   MittagQI - Quality Informatics
+ @license  GNU GENERAL PUBLIC LICENSE version 3 with plugin-execption
+       http://www.gnu.org/licenses/gpl.html
+       http://www.translate5.net/plugin-exception.txt
 END LICENSE AND COPYRIGHT
 */
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\ContentProtection\NumberProtection\Protector;
+namespace MittagQI\Translate5\Test\Unit\ContentProtection\NumberProtection;
 
-use editor_Models_Languages;
-use LogicException;
 use MittagQI\Translate5\ContentProtection\Model\ContentProtectionDto;
 use MittagQI\Translate5\ContentProtection\Model\ContentProtectionRepository;
-use MittagQI\Translate5\ContentProtection\NumberProtection\NumberParsingException;
-use MittagQI\Translate5\ContentProtection\NumberProtector;
+use MittagQI\Translate5\ContentProtection\NumberProtection\Protector\ReplaceContentProtector;
+use PHPUnit\Framework\TestCase;
 
-abstract class AbstractProtector implements NumberProtectorInterface
+class ReplaceContentProtectorTest extends TestCase
 {
-    public function __construct(
-        protected ContentProtectionRepository $formatRepository,
-    ) {
-    }
-
-    protected function tagFormat(): string
+    public function testProtectDefaultFormats(): void
     {
-        return str_replace(
-            ':tag',
-            NumberProtector::TAG_NAME,
-            '<:tag type="%s" name="%s" source="%s" iso="%s" target="%s"/>'
+        $sourceLang = new \editor_Models_Languages();
+        $sourceLang->setId(5);
+        $sourceLang->setRfc5646('en');
+        $targetLang = new \editor_Models_Languages();
+        $targetLang->setId(6);
+        $targetLang->setRfc5646('de');
+        $repo = $this->createConfiguredMock(ContentProtectionRepository::class, []);
+        $sourceFormat = new ContentProtectionDto(
+            'ip-address',
+            'test-default',
+            '',
+            0,
+            'some text',
+            true,
+            'output text',
+            1
         );
-    }
 
-    public function protect(
-        string $number,
-        ContentProtectionDto $protectionDto,
-        editor_Models_Languages $sourceLang,
-        editor_Models_Languages $targetLang,
-    ): string {
-        if (! $protectionDto->keepAsIs && empty($protectionDto->outputFormat)) {
-            throw new LogicException(
-                sprintf(
-                    'Input rule of type "%s" and name "%s" does not have appropriate output rule',
-                    $protectionDto->type,
-                    $protectionDto->name
-                )
-            );
-        }
-
-        return $this->composeNumberTag($number, $protectionDto, $targetLang);
-    }
-
-    /**
-     * @throws NumberParsingException
-     */
-    protected function composeNumberTag(
-        string $number,
-        ContentProtectionDto $protectionDto,
-        editor_Models_Languages $targetLang,
-    ): string {
-        return sprintf(
-            $this->tagFormat(),
-            static::getType(),
-            htmlspecialchars($protectionDto->name),
-            $number,
-            $number,
-            $number
+        self::assertSame(
+            '<number type="replace-content" name="test-default" source="some text" iso="output text:some text" target="output text"/>',
+            (new ReplaceContentProtector($repo))->protect('some text', $sourceFormat, $sourceLang, $targetLang)
         );
     }
 }
