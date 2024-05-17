@@ -131,29 +131,45 @@ class editor_Segment_Consistent_Check
         // Set group_concat_max_len to be ~ 4GB
         $db->query('SET @@session.group_concat_max_len = 4294967295');
 
+        // Shortcut to (b)locked autoStates
+        $blocked = editor_Models_Segment_AutoStates::BLOCKED;
+        $locked = editor_Models_Segment_AutoStates::LOCKED;
+
         // Foreach target field
         foreach ($targetA as $targetI) {
             // Col names
-            $col['target'] = $targetI . 'EditToSort';
-            $col['source'] = $task->getEnableSourceEditing() ? 'sourceEditToSort' : 'sourceToSort';
+            $target = $targetI . 'EditToSort';
+            $source = $task->getEnableSourceEditing() ? 'sourceEditToSort' : 'sourceToSort';
 
             // Get ids of segments having inconsistent targets
-            $result['target'][$targetI] = $db->query('
-                SELECT GROUP_CONCAT(`segmentNrInTask`) AS `ids`
-                FROM `' . $this->mvName . '` 
-                WHERE `' . $col['target'] . '` != "" AND `' . $col['source'] . '` != ""
-                GROUP BY BINARY `' . $col['source'] . '`
-                HAVING COUNT(DISTINCT BINARY `' . $col['target'] . '`) > 1
-            ')->fetchAll(PDO::FETCH_COLUMN);
+            $result['target'][$targetI] = $db->query("
+                SELECT 
+                  GROUP_CONCAT(`segmentNrInTask`) AS `nrs`,
+                  MAX(DISTINCT `editable`) AS `atLeastOneEditable`,
+                  MAX(DISTINCT `autoStateId` = $locked) AS `atLeastOneLocked`
+                FROM `$this->mvName` 
+                WHERE `$target` != '' 
+                  AND `$source` != ''
+                  AND `autoStateId` != '$blocked'
+                GROUP BY BINARY `$source`
+                HAVING COUNT(DISTINCT BINARY `$target`) > 1
+                   AND (`atLeastOneLocked` = 0 OR `atLeastOneEditable` = 1)
+            ")->fetchAll(PDO::FETCH_COLUMN);
 
             // Get ids of segments having inconsistent sources
-            $result['source'][$targetI] = $db->query('
-                SELECT GROUP_CONCAT(`segmentNrInTask`) AS `ids`
-                FROM `' . $this->mvName . '` 
-                WHERE `' . $col['source'] . '` != "" AND `' . $col['target'] . '` != "" 
-                GROUP BY BINARY `' . $col['target'] . '`
-                HAVING COUNT(DISTINCT BINARY `' . $col['source'] . '`) > 1        
-            ')->fetchAll(PDO::FETCH_COLUMN);
+            $result['source'][$targetI] = $db->query("
+                SELECT 
+                  GROUP_CONCAT(`segmentNrInTask`) AS `nrs`, 
+                  MAX(DISTINCT `editable`) AS `atLeastOneEditable`,
+                  MAX(DISTINCT `autoStateId` = $locked) AS `atLeastOneLocked`
+                FROM `$this->mvName` 
+                WHERE `$source` != '' 
+                  AND `$target` != ''
+                  AND `autoStateId` != '$blocked'
+                GROUP BY BINARY `$target`
+                HAVING COUNT(DISTINCT BINARY `$source`) > 1  
+                   AND (`atLeastOneLocked` = 0 OR `atLeastOneEditable` = 1)
+            ")->fetchAll(PDO::FETCH_COLUMN);
         }
 
         // Return

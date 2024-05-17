@@ -31,7 +31,7 @@ namespace MittagQI\Translate5\T5Memory\Enum;
 
 enum StripFramingTags: string
 {
-    case None = 'none';
-    case All = 'all';
-    case Paired = 'paired';
+    case None = 'saveAll';
+    case All = 'skipAll';
+    case Paired = 'skipPaired';
 }

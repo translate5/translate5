@@ -370,6 +370,7 @@ Ext.define('Editor.controller.Segments', {
                 vm.set('selectedSegment', seg);
                 var json = operation.getResponse().responseJson;
                 me.updateSegmentFinishCountViewModel(json.taskProgress, json.userProgress);
+                me.fireEvent('segmentLockToggled', false);
             }
         });
         segment.proxy.appendId = appendId;

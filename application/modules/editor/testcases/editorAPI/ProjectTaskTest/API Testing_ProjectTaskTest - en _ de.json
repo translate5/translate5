@@ -1612,7 +1612,7 @@
         "fileOrder": "0",
         "workflowStepNr": "0",
         "workflowStep": null,
-        "isRepeated": "1",
+        "isRepeated": "0",
         "sourceMd5": "d18c3539c68d1d8d0dcebe3aca58ece1",
         "sourceToSort": "Now you have Apache 2.x.NN available under /usr/local/apache2, configured with loadable module support and the standard MPM prefork.",
         "targetMd5": "7a1a27857381cdeca0abedb960144fce",

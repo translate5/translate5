@@ -57,12 +57,15 @@ class Translate3054Test extends \editor_Test_JsonTest
     protected static function setupImport(Config $config): void
     {
         // Create TermCollection and import tbx-file there
-        static::$tc = $config->addLanguageResource('termcollection', 'testfiles/import.tbx', static::getTestCustomerId());
-        static::$tc->setProperty('name', 'TC test');
+        static::$tc = $config
+            ->addLanguageResource('termcollection', 'testfiles/import.tbx', static::getTestCustomerId())
+            ->setProperty('name', 'TC test');
 
         // Create task and import csv-file there
-        static::$task = $config->addTask('de', 'en', static::getTestCustomerId(), 'testfiles/import.csv');
-        static::$task->setToEditAfterImport();
+        static::$task = $config
+            ->addTask('de', 'en', static::getTestCustomerId(), 'testfiles/import.csv')
+            ->addTaskConfig('runtimeOptions.import.fileparser.csv.active', '1')
+            ->setToEditAfterImport();
     }
 
     /***

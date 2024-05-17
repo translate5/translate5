@@ -26,15 +26,15 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use editor_Models_Segment_AutoStates as AutoStates;
 use MittagQI\Translate5\Acl\Rights;
 use MittagQI\Translate5\Task\FileTypeSupport;
 use MittagQI\ZfExtended\Session\SessionInternalUniqueId;
-use editor_Models_Segment_AutoStates as AutoStates;
 
 /**
  * Task Object Instance as needed in the application
  * @method string getId()
- * @method void setId(int $id)
+ * @method void setId(string|int $id)
  * @method string getTaskGuid()
  * @method void setTaskGuid(string $guid)
  * @method string getTaskNr()
@@ -48,15 +48,15 @@ use editor_Models_Segment_AutoStates as AutoStates;
  * @method string getDescription()
  * @method void setDescription(string $description)
  * @method string getSourceLang()
- * @method void setSourceLang(int $id)
+ * @method void setSourceLang(string|int $id)
  * @method string getTargetLang()
- * @method void setTargetLang(int $id)
+ * @method void setTargetLang(string|int $id)
  * @method string getRelaisLang()
- * @method void setRelaisLang(int $id)
- * @method string getLockedInternalSessionUniqId()
- * @method void setLockedInternalSessionUniqId(string $id)
- * @method string getLocked()
- * @method string getLockingUser()
+ * @method void setRelaisLang(string|int $id)
+ * @method null|string getLockedInternalSessionUniqId()
+ * @method void setLockedInternalSessionUniqId(?string $id)
+ * @method null|string getLocked()
+ * @method null|string getLockingUser()
  * @method void setLockingUser(string $guid)
  * @method string getPmGuid()
  * @method void setPmGuid(string $guid)
@@ -67,46 +67,46 @@ use editor_Models_Segment_AutoStates as AutoStates;
  * @method string getWorkflow()
  * @method void setWorkflow(string $workflow)
  * @method string getWorkflowStep()
- * @method void setWorkflowStep(int $stepNr)
+ * @method void setWorkflowStep(string|int $stepNr)
  * @method string getWorkflowStepName()
  * @method string getWordCount()
- * @method void setWordCount(int $wordcount)
- * @method string getOrderdate()
- * @method void setOrderdate(string $datetime)
- * @method string getEnddate()
- * @method void setEnddate(string $datetime)
+ * @method void setWordCount(string|int $wordcount)
+ * @method null|string getOrderdate()
+ * @method void setOrderdate(?string $datetime)
+ * @method null|string getEnddate()
+ * @method void setEnddate(?string $datetime)
  * @method string getReferenceFiles()
- * @method void setReferenceFiles(bool $flag)
+ * @method void setReferenceFiles(string|int $flag)
  * @method string getEnableSourceEditing()
- * @method void setEnableSourceEditing(bool $flag)
+ * @method void setEnableSourceEditing(string|int $flag)
  * @method string getEdit100PercentMatch()
- * @method void setEdit100PercentMatch(bool $flag)
+ * @method void setEdit100PercentMatch(string|int $flag)
  * @method string getLockLocked()
- * @method void setLockLocked(bool $flag)
- * @method string getQmSubsegmentFlags() get Original Flags from DB
- * @method void setQmSubsegmentFlags(string $flags) set Original Flags in DB
+ * @method void setLockLocked(string|int $flag)
+ * @method null|string getQmSubsegmentFlags() get Original Flags from DB
+ * @method void setQmSubsegmentFlags(?string $flags) set Original Flags in DB
  * @method void delete() see editor_Models_Task_Remover for complete task removal
  * @method string getEmptyTargets()
  * @method void setEmptyTargets(bool $emptyTargets)
- * @method string getImportAppVersion()
- * @method void setImportAppVersion(string $version)
- * @method string getCustomerId()
- * @method void setCustomerId(int $customerId)
+ * @method null|string getImportAppVersion()
+ * @method void setImportAppVersion(?string $version)
+ * @method null|string getCustomerId()
+ * @method void setCustomerId(string|int|null $customerId)
  * @method string getUsageMode()
  * @method void setUsageMode(string $usageMode)
  * @method string getSegmentCount()
- * @method void setSegmentCount(int $segmentCount)
+ * @method void setSegmentCount(string|int $segmentCount)
  * @method string getSegmentEditableCount()
- * @method void setSegmentEditableCount(int $segmentEditableCount)
+ * @method void setSegmentEditableCount(string|int $segmentEditableCount)
  * @method string getSegmentFinishCount()
- * @method void setSegmentFinishCount(int $segmentFinishCount)
+ * @method void setSegmentFinishCount(string|int $segmentFinishCount)
  * @method void setTaskType(string $taskType)
- * @method string getProjectId()
- * @method void setProjectId(int $projectId)
+ * @method null|string getProjectId()
+ * @method void setProjectId(string|int|null $projectId)
  * @method string getDiffExportUsable()
- * @method void setDiffExportUsable(bool $flag)
+ * @method void setDiffExportUsable(string|int $flag)
  * @method string getReimportable()
- * @method void setReimportable(bool $reimportable)
+ * @method void setReimportable(string|int $reimportable)
  * @method string getCreated()
  */
 class editor_Models_Task extends ZfExtended_Models_Entity_Abstract
@@ -184,7 +184,7 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract
 
     /**
      * A Cache for the evaluation of similar languages
-     * @var int[][]
+     * @var editor_Models_Languages[]
      */
     protected $languageCache = [];
 
@@ -220,6 +220,9 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract
      *
      * @param bool $disableCache : disable the config cache. Load always fresh config from the db
      * @return Zend_Config
+     * @throws ReflectionException
+     * @throws Zend_Exception
+     * @throws ZfExtended_Models_Entity_NotFoundException
      * @throws editor_Models_ConfigException
      */
     public function getConfig(bool $disableCache = false)
@@ -233,13 +236,15 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract
     }
 
     /**
-     * access customer instances in a cached way
+     * Access customer instances in a cached way
+     *
+     * @throws ReflectionException
+     * @throws ZfExtended_Models_Entity_NotFoundException
      */
     protected function _getCachedCustomer(int $id): editor_Models_Customer_Customer
     {
         if (empty(self::$customerCache[$id])) {
-            $customer = ZfExtended_Factory::get('editor_Models_Customer_Customer');
-            /* @var $customer editor_Models_Customer_Customer */
+            $customer = ZfExtended_Factory::get(editor_Models_Customer_Customer::class);
             $customer->load($id);
             self::$customerCache[$id] = $customer;
         }
@@ -390,7 +395,7 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract
      * if $loadAll is true, load all tasks, user infos joined only where possible,
      *   if false only the associated tasks
      * @param bool $loadAll
-     * @return number
+     * @return int
      */
     public function getTotalCountByUserAssoc(string $userGuid, $loadAll = false)
     {
@@ -561,9 +566,8 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract
     /**
      * returns the relative path to the persistent data directory of the given or loaded taskguid
      * @param string $taskGuid optional, if not given use the taskguid of internal loaded task
-     * @return string
      */
-    public function getRelativeTaskDataPath($taskGuid = null)
+    public function getRelativeTaskDataPath($taskGuid = null): string
     {
         if (empty($taskGuid)) {
             $taskGuid = $this->getTaskGuid();
@@ -575,9 +579,8 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract
 
     /**
      * returns the absolute path to the task data directory
-     * @return SplFileInfo
      */
-    public function getAbsoluteTaskDataPath()
+    public function getAbsoluteTaskDataPath(): string
     {
         if (empty($this->taskDataPath)) {
             $taskDataRel = $this->getRelativeTaskDataPath();
@@ -674,7 +677,7 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract
         ]);
         ZfExtended_Factory
             ::get(editor_Models_TaskProgress::class)
-            ->updateSegmentFinishCount($this);
+                ->updateSegmentFinishCount($this);
     }
 
     /**
@@ -691,20 +694,18 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract
 
     /**
      * Convenience API
-     * @return boolean
      */
     public function isTranslation(): bool
     {
-        return $this->getEmptyTargets();
+        return (int) $this->getEmptyTargets() === 1;
     }
 
     /**
      * Convenience API
-     * @return boolean
      */
     public function isReview(): bool
     {
-        return ! $this->getEmptyTargets();
+        return (int) $this->getEmptyTargets() !== 1;
     }
 
     /**
@@ -746,7 +747,7 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract
      */
     public function getSourceLanguage(): editor_Models_Languages
     {
-        return $this->getCachedLanguage($this->getSourceLang());
+        return $this->getCachedLanguage((int) $this->getSourceLang());
     }
 
     /**
@@ -755,7 +756,7 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract
      */
     public function getTargetLanguage(): editor_Models_Languages
     {
-        return $this->getCachedLanguage($this->getTargetLang());
+        return $this->getCachedLanguage((int) $this->getTargetLang());
     }
 
     /**
@@ -1304,13 +1305,12 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract
 
     /**
      * Get info to be further used to count finished segments per current task and per each user associated with that task
-     *
-     * @return array|null
      */
-    public function getWorkflowEndedOrFinishedAutoStates() : ?array
+    public function getWorkflowEndedOrFinishedAutoStates(): ?array
     {
         // Get workflow, and return if got nothing
-        if (empty($workflow = $this->getTaskActiveWorkflow())) {
+        $workflow = $this->getTaskActiveWorkflow();
+        if (empty($workflow)) {
             return null;
         }
 
@@ -1321,7 +1321,7 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract
         $isWorkflowEnded = $workflow->isEnded($this);
 
         // If workflow is not ended, and we do not have any states to the current steps' role, we do not update anything
-        if (!$isWorkflowEnded && !$states) {
+        if (! $isWorkflowEnded && ! $states) {
             return null;
         }
 
@@ -1333,7 +1333,7 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract
      * FIXME move this function into a workflow scope
      * Get all autostate ids for the active tasks workflow
      *
-     * @return boolean|boolean|multitype:string
+     * @return string[]|bool
      */
     public function getTaskRoleAutoStates()
     {

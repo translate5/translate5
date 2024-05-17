@@ -33,7 +33,6 @@ use MittagQI\Translate5\Test\Import\Config;
  */
 class RelaisImportTest extends editor_Test_JsonTest
 {
-
     protected static bool $termtaggerRequired = true;
 
     protected static array $requiredPlugins = [
@@ -50,6 +49,7 @@ class RelaisImportTest extends editor_Test_JsonTest
         $config
             ->addTask('de', 'en')
             ->addUploadFolder('testfiles')
+            ->addTaskConfig('runtimeOptions.import.fileparser.csv.active', '1')
             ->addProperty('relaisLang', 'it')
             ->setToEditAfterImport();
     }

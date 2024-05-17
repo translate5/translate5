@@ -49,6 +49,7 @@ class Translate1804Test extends editor_Test_JsonTest
         $config
             ->addTask('en', 'de')
             ->addUploadFolder('testfiles')
+            ->addTaskConfig('runtimeOptions.import.fileparser.csv.active', '1')
             ->setToEditAfterImport();
     }
 
