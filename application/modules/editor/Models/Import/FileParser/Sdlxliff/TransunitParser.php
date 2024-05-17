@@ -98,11 +98,6 @@ class editor_Models_Import_FileParser_Sdlxliff_TransunitParser
     protected $maskedSourceChunks = [];
 
     /**
-     * @var Zend_Config
-     */
-    protected $config;
-
-    /**
      * Transuntit ID
      * @var string
      */
@@ -111,21 +106,16 @@ class editor_Models_Import_FileParser_Sdlxliff_TransunitParser
     private editor_Models_TaskUserTracking $taskUserTracking;
 
     /**
-     * @var array<int, array{id: string, taskOpenerNumber: string}>
+     * @param array<string, array{id: string, taskOpenerNumber: string}> $authorToTrackChangeIdAndNr
      */
-    private array $authorToTrackChangeIdAndNr = [];
-
-    private bool $isTrackChangesActive;
-
     public function __construct(
-        Zend_Config $config,
-        private editor_Models_Task $task
+        private Zend_Config $config,
+        private editor_Models_Task $task,
+        private bool $isTrackChangesActive,
+        private array $authorToTrackChangeIdAndNr = []
     ) {
-        $this->config = $config;
         $this->xmlparser = ZfExtended_Factory::get('editor_Models_Import_FileParser_XmlParser');
         $this->taskUserTracking = ZfExtended_Factory::get(editor_Models_TaskUserTracking::class);
-        //$this->isTrackChangesActive = Zend_Registry::get('PluginManager')->isActive('TrackChanges');
-        $this->isTrackChangesActive = false;
     }
 
     protected function init()
@@ -374,6 +364,23 @@ class editor_Models_Import_FileParser_Sdlxliff_TransunitParser
     private function registerTrackChangesHandler(array $revIdToUserDataMap)
     {
         if ($this->isTrackChangesActive) {
+            $this->xmlparser->registerElement(
+                'trans-unit g[sdl:end=false]',
+                closer: function ($tag, $key, $opener) {
+                    if (! $opener['isSingle']) {
+                        $this->xmlparser->replaceChunk($key, '');
+                    }
+                }
+            );
+            $this->xmlparser->registerElement(
+                'trans-unit g[sdl:start=false]',
+                closer: function ($tag, $key, $opener) {
+                    if (! $opener['isSingle']) {
+                        $this->xmlparser->replaceChunk($opener['openerKey'], '');
+                    }
+                }
+            );
+
             //replace track changes mrk with our tags
             $this->xmlparser->registerElement(
                 'trans-unit mrk[mtype=x-sdl-added]',
@@ -429,20 +436,18 @@ class editor_Models_Import_FileParser_Sdlxliff_TransunitParser
             );
         }
 
+        $nodeName = $ins ? TrackChangeTag::NODE_NAME_INS : TrackChangeTag::NODE_NAME_DEL;
+
         $trackChangeTag = new TrackChangeTag();
         $trackChangeTag->userColorNr = $this->authorToTrackChangeIdAndNr[$author]['taskOpenerNumber'];
         $trackChangeTag->userTrackingId = $this->authorToTrackChangeIdAndNr[$author]['id'];
         $trackChangeTag->attributeWorkflowstep = $authorData['workflowStep'];
 
         $this->xmlparser->replaceChunk(
-            $opener['openerKey'] + 1,
-            $trackChangeTag->createTrackChangesNode(
-                $ins ? TrackChangeTag::NODE_NAME_INS : TrackChangeTag::NODE_NAME_DEL,
-                $this->xmlparser->getRange($opener['openerKey'] + 1, $key - 1, true),
-                $authorData['date']
-            ),
+            $opener['openerKey'],
+            $trackChangeTag->createTrackChangeNodeOpener($nodeName, $authorData['date'])
         );
-        $this->xmlparser->replaceChunk($key, '');
+        $this->xmlparser->replaceChunk($key, "</$nodeName>");
     }
 
     /**

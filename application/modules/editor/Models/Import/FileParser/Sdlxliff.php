@@ -72,13 +72,12 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
     public const USERGUID = 'sdlxliff-imported';
 
     /**
-     * @var array mappt alle Tag-Referenzen im Header der sdlxliff-Datei innerhalb von
-     *      <tag-defs><tag></tag></tag-defs> auf die Tags in Segmenten des sdlxliff
-     *      die auf sie verweisen. Die Referenz ist gemäß der sdlxliff-Logik
-     *      immer der firstchild von tag
-     *      wird auch zur Prüfung verwendet, ob in dem Segmenten oder im Header
-     *      Tagnamen verwendet werden, die von diesem sdlxliff-Fileparser nicht
-     *      berücksichtigt werden
+     * @var array maps all tag references in the header of the sdlxliff file within
+     *      <tag-defs><tag></tag></tag-defs> to the tags in segments of the sdlxliff
+     *      that reference them. The reference is always the first child of tag
+     *      according to the sdlxliff logic.
+     *      Also used to check whether tag names are used in the segments or in the header
+     *      that are not considered by this sdlxliff file parser.
      */
     protected $_tagDefMapping = [
         'bpt' => 'g',
@@ -167,6 +166,11 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
     private bool $isTrackChangesPluginActive;
 
     /**
+     * @var array<string, int>
+     */
+    private array $tagIdShortTagIdentMap = [];
+
+    /**
      * (non-PHPdoc)
      * @see editor_Models_Import_FileParser::getFileExtensions()
      */
@@ -182,18 +186,18 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
     {
         parent::__construct($path, $fileName, $fileId, $task);
 
-        //$this->isTrackChangesPluginActive = Zend_Registry::get('PluginManager')->isActive('TrackChanges');
-        $this->isTrackChangesPluginActive = false;
+        $this->isTrackChangesPluginActive = Zend_Registry::get('PluginManager')->isActive('TrackChanges');
         $this->checkForSdlChangeMarker();
         $this->prepareTagMapping();
         $this->readCxtMetaDefinitions();
         $this->logger = Zend_Registry::get('logger')->cloneMe('editor.import.fileparser.sdlxliff');
-        $this->transunitParser = ZfExtended_Factory::get(TransunitParser::class, [
+        $this->transunitParser = new TransunitParser(
             $this->config,
             $task,
-        ]);
+            $this->isTrackChangesPluginActive
+        );
         //diff export for this task can be used
-        $this->task->setDiffExportUsable(1);
+        $this->task->setDiffExportUsable(true);
         //here would be the right place to set the import map,
         // since our values base on sdlxliff values,
         // nothing has to be done here at the moment
@@ -427,9 +431,15 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
     /**
      * sets the origin system name in the attributes
      */
-    protected function setPreviousOriginSystemName(editor_Models_Import_FileParser_SegmentAttributes $attributes, string $originSystemName)
-    {
-        $attributes->customMetaAttributes[$this->matchRateType::DATA_PREVIOUS_NAME] = str_replace(';', '_', $originSystemName);
+    protected function setPreviousOriginSystemName(
+        editor_Models_Import_FileParser_SegmentAttributes $attributes,
+        string $originSystemName
+    ) {
+        $attributes->customMetaAttributes[$this->matchRateType::DATA_PREVIOUS_NAME] = str_replace(
+            ';',
+            '_',
+            $originSystemName
+        );
     }
 
     /**
@@ -802,8 +812,8 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
             return $this->contentProtector->protect(
                 $text,
                 $isSource,
-                $this->task->getSourceLang(),
-                $this->task->getTargetLang()
+                (int) $this->task->getSourceLang(),
+                (int) $this->task->getTargetLang()
             );
         });
         if (strpos($segment, '<') === false) {
@@ -867,7 +877,7 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
      */
     protected function parseLeftTag($data)
     {
-        $tag = &$data->segment[$data->i];
+        $tag = $data->segment[$data->i];
         $tagName = preg_replace('"<([^ ]*).*>"', '\\1', $tag);
 
         if (in_array($tagName, ['ins', 'del'], true)) {
@@ -878,7 +888,12 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
 
         $this->verifyTagName($tagName, $data);
         $tagId = $this->parseSegmentGetTagId($tag, $tagName);
-        $shortTagIdent = $data->j;
+
+        if (! isset($this->tagIdShortTagIdentMap[$tagId])) {
+            $this->tagIdShortTagIdentMap[$tagId] = $data->j++;
+        }
+
+        $shortTagIdent = $this->tagIdShortTagIdentMap[$tagId];
 
         if (strpos($tagId, 'locked') !== false) {
             //The opening tag $tagName contains a non valid tagId according to our reverse engineering
@@ -891,19 +906,23 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
             ]);
         }
 
-        $data->openTags[$data->openCounter]['tagName'] = $tagName;
-        $data->openTags[$data->openCounter]['tagId'] = $tagId;
-        $data->openTags[$data->openCounter]['nr'] = $data->j;
+        // if the tag is a start=false tag - that is phantom tag opener
+        // we do not replace it with a tag for the editor
+        if (strpos($tag, 'sdl:start="false"') === false) {
+            $data->openTags[$data->openCounter]['tagName'] = $tagName;
+            $data->openTags[$data->openCounter]['tagId'] = $tagId;
+            $data->openTags[$data->openCounter]['nr'] = $shortTagIdent;
 
-        //ersetzte gegen Tag für die Anzeige
-        $tagObj = new editor_Models_Import_FileParser_Tag(editor_Models_Import_FileParser_Tag::TYPE_OPEN);
-        $tagObj->originalContent = $tag;
-        $tagObj->tagNr = $shortTagIdent;
-        $tagObj->id = $tagId;
-        $tagObj->text = $this->encodeTagsForDisplay($this->_tagMapping[$tagId]['text']);
-        $tag = $tagObj->renderTag();
-
-        $data->j++;
+            //ersetzte gegen Tag für die Anzeige
+            $tagObj = new editor_Models_Import_FileParser_Tag(editor_Models_Import_FileParser_Tag::TYPE_OPEN);
+            $tagObj->originalContent = $tag;
+            $tagObj->tagNr = $shortTagIdent;
+            $tagObj->id = $tagId;
+            $tagObj->text = $this->encodeTagsForDisplay($this->_tagMapping[$tagId]['text']);
+            $data->segment[$data->i] = $tagObj->renderTag();
+        } else {
+            $data->segment[$data->i] = '';
+        }
 
         return $data;
     }
@@ -921,7 +940,9 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
             return $data;
         }
 
-        if (empty($data->openTags[$data->openCounter])) {
+        $isTrackChangeClosing = strpos($tagName, 'sdl:start="false"');
+
+        if (empty($data->openTags[$data->openCounter]) && ! $isTrackChangeClosing) {
             //Found a closing tag without an opening one!
             throw new editor_Models_Import_FileParser_Sdlxliff_Exception('E1002', [
                 'task' => $this->task,
@@ -930,7 +951,9 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
                 'data' => $data,
             ]);
         }
-        $openTag = $data->openTags[$data->openCounter];
+
+        $openTag = $isTrackChangeClosing ? $this->getOpenTag($tagName, $data) : $data->openTags[$data->openCounter];
+
         $mappedTag = $this->_tagMapping[$openTag['tagId']];
 
         //generate the html tag for the editor
@@ -941,9 +964,30 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
         $tagObj->text = $this->encodeTagsForDisplay($mappedTag['eptText']);
         $data->segment[$data->i] = $tagObj->renderTag();
 
-        $data->openCounter--;
+        if (! empty($data->openTags[$data->openCounter])) {
+            $data->openCounter--;
+        }
 
         return $data;
+    }
+
+    private function getOpenTag(string $tagName, object $data): array
+    {
+        preg_match('#id="(\d+)"#', $tagName, $matches);
+        $tagId = $matches[1];
+
+        foreach ($data->openTags as $openTag) {
+            if ($openTag['tagId'] === $tagId) {
+                return $openTag;
+            }
+        }
+
+        throw new editor_Models_Import_FileParser_Sdlxliff_Exception('E1002', [
+            'task' => $this->task,
+            'filename' => $this->_fileName,
+            'mid' => $this->_mid,
+            'data' => $data,
+        ]);
     }
 
     /**
@@ -954,33 +998,50 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
      */
     protected function parseSingleTag($data)
     {
-        $tag = &$data->segment[$data->i];
+        $tag = $data->segment[$data->i];
         $tagName = preg_replace('"<([^/ ]*).*>"', '\\1', $tag);
 
         if ($this->contentProtector->hasTagsToConvert($tag)) {
             //tag trait is working with shortTagIdent internally, so we have to feed it here
             $this->shortTagIdent = $data->j++;
-            $tag = $this->contentProtector->convertToInternalTags($tag, $this->shortTagIdent);
+            $data->segment[$data->i] = $this->contentProtector->convertToInternalTags($tag, $this->shortTagIdent);
 
             return $data;
         }
 
         $this->verifyTagName($tagName, $data);
         $tagId = $this->parseSegmentGetTagId($tag, $tagName);
-        $shortTagIdent = $data->j;
+
+        if (! isset($this->tagIdShortTagIdentMap[$tagId])) {
+            $this->tagIdShortTagIdentMap[$tagId] = $data->j++;
+        }
+
+        $shortTagIdent = $this->tagIdShortTagIdentMap[$tagId];
 
         if (strpos($tagId, 'locked') !== false) {
             $this->setLockedTagContent($tag, $tagId);
             $shortTagIdent = 'locked' . $data->j;
         }
 
+        if (strpos($tag, 'sdl:end="false"') !== false) {
+            $data->openTags[$data->openCounter]['tagName'] = $tagName;
+            $data->openTags[$data->openCounter]['tagId'] = $tagId;
+            $data->openTags[$data->openCounter]['nr'] = $shortTagIdent;
+        }
+
+        $tagType = match (true) {
+            str_contains($tag, 'sdl:end="false"') => editor_Models_Import_FileParser_Tag::TYPE_OPEN,
+            str_contains($tag, 'sdl:start="false"') => editor_Models_Import_FileParser_Tag::TYPE_CLOSE,
+            default => editor_Models_Import_FileParser_Tag::TYPE_SINGLE,
+        };
+
         //generate the html tag for the editor
-        $tagObj = new editor_Models_Import_FileParser_Tag();
+        $tagObj = new editor_Models_Import_FileParser_Tag($tagType);
         $tagObj->originalContent = $tag;
         $tagObj->tagNr = $shortTagIdent;
         $tagObj->id = $tagId;
         $tagObj->text = $this->encodeTagsForDisplay($this->_tagMapping[$tagId]['text']);
-        $tag = $tagObj->renderTag();
+        $data->segment[$data->i] = $tagObj->renderTag();
 
         $data->j++;
 
