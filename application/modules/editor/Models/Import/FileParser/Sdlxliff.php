@@ -193,7 +193,7 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
             $task,
         ]);
         //diff export for this task can be used
-        $this->task->setDiffExportUsable(true);
+        $this->task->setDiffExportUsable(1);
         //here would be the right place to set the import map,
         // since our values base on sdlxliff values,
         // nothing has to be done here at the moment
