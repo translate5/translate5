@@ -26,6 +26,7 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\Configuration\ConfigLoader;
 use MittagQI\ZfExtended\Acl\ConfigLevelResource;
 use MittagQI\ZfExtended\Service\ConfigHelper;
 
@@ -331,7 +332,7 @@ class editor_ConfigController extends ZfExtended_RestController
             }
 
             //if the current request is for project, all project task should be in state import, if not, throw exception
-            $projectTasks = $task->loadProjectTasks($task->getId(), true);
+            $projectTasks = $task->loadProjectTasks((int) $task->getId(), true);
 
             foreach ($projectTasks as $projectTask) {
                 if ($projectTask['state'] != $task::STATE_IMPORT) {
@@ -343,28 +344,28 @@ class editor_ConfigController extends ZfExtended_RestController
         }
     }
 
-    /***
-     * Load config base on the requested params.
-     * When taskGuid exist in the requested params -> load task specific config
-     * When customerId exist in the requested params -> load customer specific config
-     * When userGuid exist in the requested params -> load user specific config
-     * When no param is provided -> load what the current user is allowed to load
-     *
-     * @return array
+    /**
+     *  Load config base on the requested params.
+     *  When taskGuid exist in the requested params -> load task specific config
+     *  When customerId exist in the requested params -> load customer specific config
+     *  When userGuid exist in the requested params -> load user specific config
+     *  When no param is provided -> load what the current user is allowed to load
+     * @throws editor_Models_ConfigException
      */
     protected function loadConfig(): array
     {
+        $configLoader = new ConfigLoader($this->entity, true);
+
         $userGuid = $this->getParam('userGuid');
         $taskGuid = $this->getParam('taskGuid');
 
         if (! empty($userGuid)) {
             editor_Models_Config::checkUserGuid($userGuid);
 
-            $taskConfig = [];
-            if (! empty($taskGuid)) {
-                $taskConfig = $this->entity->mergeTaskValues($taskGuid, [], false);
-            }
+            return $configLoader->loadUserConfig($userGuid, $taskGuid);
+        }
 
+        if (! empty($taskGuid)) {
             return array_values($this->entity->mergeUserValues($userGuid, $taskConfig));
         }
 
@@ -376,7 +377,6 @@ class editor_ConfigController extends ZfExtended_RestController
 
         $customerId = $this->getParam('customerId');
         if (! empty($customerId)) {
-            //ignore invalid customer ids
             if (! is_numeric($customerId)) {
                 return [];
             }
