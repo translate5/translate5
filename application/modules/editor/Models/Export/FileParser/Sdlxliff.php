@@ -26,6 +26,9 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use editor_Models_Segment as Segment;
+use editor_Models_Segment_AutoStates as AutoStates;
+use editor_Models_Segment_MatchRateType as MatchRateType;
 use editor_Models_Export_FileParser_Sdlxliff_TrackChangesFormatter as TrackChangesFormatter;
 
 /**
@@ -183,6 +186,82 @@ class editor_Models_Export_FileParser_Sdlxliff extends editor_Models_Export_File
         }
 
         return '';
+    }
+
+    protected function writeBySegmentMetadata(array $file, int $i): array
+    {
+        $file = $this->writeMatchRate($file, $i);
+
+        return $this->writeSegmentDraftState($file, $i);
+    }
+
+    protected function writeSegmentDraftState(array $file, int $i)
+    {
+        // if match-rate is 0 - segment was not pre-translated, do not generate the percent tag
+        if ($this->_segmentEntity->getMatchRate() < 1) {
+            return $file;
+        }
+
+        if (Segment::PRETRANS_INITIAL !== (int) $this->_segmentEntity->getPretrans()) {
+            return $file;
+        }
+
+        if (AutoStates::PRETRANSLATED !== (int) $this->_segmentEntity->getAutoStateId()) {
+            return $file;
+        }
+
+        if (! MatchRateType::isTypePretranslated($this->_segmentEntity->getMatchRateType())) {
+            return $file;
+        }
+
+        $matchRateType = explode(';', $this->_segmentEntity->getMatchRateType());
+
+        $mid = $this->_segmentEntity->getMid();
+        $segPart = &$file[$i + 1];
+        //example string
+        //<sdl:seg-defs><sdl:seg id="16" conf="Translated" origin="tm" origin-system="Bosch_Ruoff_de-DE-en-US" percent="100"
+        if (preg_match('#<sdl:seg[^>]* id="' . $mid . '"[^>]*conf="\w+"#', $segPart) === 1) {
+            //if conf attribute is already defined
+            $segPart = preg_replace(
+                '#(<sdl:seg[^>]* id="' . $mid . '"[^>]*conf=)"\w+"#',
+                '\\1"Draft"',
+                $segPart
+            );
+        } else {
+            $segPart = preg_replace('#(<sdl:seg[^>]* id="' . $mid . '" *)#', '\\1conf="Draft" ', $segPart);
+        }
+
+        if (preg_match('#<sdl:seg[^>]* id="' . $mid . '"[^>]*origin="\w+"#', $segPart) === 1) {
+            //if origin attribute is already defined
+            $segPart = preg_replace(
+                '#(<sdl:seg[^>]* id="' . $mid . '"[^>]*origin=)"\w+"#',
+                '\\1"' . $matchRateType[1] . '"',
+                $segPart
+            );
+        } else {
+            $segPart = preg_replace(
+                '#(<sdl:seg[^>]* id="' . $mid . '" *)#',
+                '\\1origin="' . $matchRateType[1] . '" ',
+                $segPart
+            );
+        }
+
+        if (preg_match('#<sdl:seg[^>]* id="' . $mid . '"[^>]*origin-system="\w+"#', $segPart) === 1) {
+            //if origin-system attribute is already defined
+            $segPart = preg_replace(
+                '#(<sdl:seg[^>]* id="' . $mid . '"[^>]*origin-system=)"\w+"#',
+                '\\1"' . $matchRateType[2] . '"',
+                $segPart
+            );
+        } else {
+            $segPart = preg_replace(
+                '#(<sdl:seg[^>]* id="' . $mid . '" *)#',
+                '\\1origin-system="' . $matchRateType[2] . '" ',
+                $segPart
+            );
+        }
+
+        return $file;
     }
 
     /**
