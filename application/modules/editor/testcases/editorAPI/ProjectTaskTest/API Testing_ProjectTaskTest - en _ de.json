@@ -1,6 +1,6 @@
 [
     {
-        "source": "This file is <div class=\"term preferredTerm exact transNotFound\" title=\"\">a</div> based on <div class=\"term preferredTerm exact transNotFound\" title=\"\">a</div> part of the php-online-Documentation. It's translation is done by <div class=\"term preferredTerm exact transNotFound\" title=\"\">a</div> pretranslation based on <div class=\"term preferredTerm exact transNotFound\" title=\"\">a</div> very fast winalign-Project and is not at all state of the translation art. It's only purpose is the generation of demo-data for translate5.",
+        "source": "This file is <div class=\"term preferredTerm exact transNotFound better-translate-with-preferredTerm\" title=\"\">a</div> based on <div class=\"term preferredTerm exact transNotFound better-translate-with-preferredTerm\" title=\"\">a</div> part of the php-online-Documentation. It's translation is done by <div class=\"term preferredTerm exact transNotFound better-translate-with-preferredTerm\" title=\"\">a</div> pretranslation based on <div class=\"term preferredTerm exact transNotFound better-translate-with-preferredTerm\" title=\"\">a</div> very fast winalign-Project and is not at all state of the translation art. It's only purpose is the generation of demo-data for translate5.",
         "sourceEdit": null,
         "target": "Diese Datei ist Teil der php-online-Dokumentation. Ihre Übersetzung ist durch eine Vorübersetzung entstanden, die auf einem sehr schnell durchgeführten winalign-Project basiert und in keiner Art und Weise dem State of the Art eines Übersetzungsprojekts entspricht. Sein einziger Zweck ist die Erzeugung von Demo-Daten für translate5. ",
         "targetEdit": "Diese Datei ist Teil der php-online-Dokumentation. Ihre Übersetzung ist durch eine Vorübersetzung entstanden, die auf einem sehr schnell durchgeführten winalign-Project basiert und in keiner Art und Weise dem State of the Art eines Übersetzungsprojekts entspricht. Sein einziger Zweck ist die Erzeugung von Demo-Daten für translate5. ",
@@ -1015,7 +1015,7 @@
         "isFirstofFile": null
     },
     {
-        "source": "We do not recommend using <div class=\"term preferredTerm exact transNotFound\" title=\"\">a</div> threaded MPM in production with <div class=\"term preferredTerm exact transNotDefined\" title=\"\">Apache</div> 2.",
+        "source": "We do not recommend using <div class=\"term preferredTerm exact transNotFound better-translate-with-preferredTerm\" title=\"\">a</div> threaded MPM in production with <div class=\"term preferredTerm exact transNotDefined\" title=\"\">Apache</div> 2.",
         "sourceEdit": null,
         "target": "",
         "targetEdit": "",
@@ -1073,7 +1073,7 @@
         "isFirstofFile": null
     },
     {
-        "source": "For information on why, read the related FAQ entry on using <div class=\"open 672069643d2231333822 internal-tag ownttip\"><span class=\"short\" title=\"&lt;a href=&quot;faq.installation.php#faq.installation.apache2&quot; class=&quot;link&quot;&gt;\">&lt;1&gt;</span><span class=\"full\" data-originalid=\"138\" data-length=\"-1\">&lt;a href=&quot;faq.installation.php#faq.installation.apache2&quot; class=&quot;link&quot;&gt;</span></div>Apache2 with <div class=\"term preferredTerm exact transNotFound\" title=\"\">a</div> threaded MPM<div class=\"close 2f67 internal-tag ownttip\"><span class=\"short\" title=\"&lt;/a&gt;\">&lt;/1&gt;</span><span class=\"full\" data-originalid=\"138\" data-length=\"-1\">&lt;/a&gt;</span></div>",
+        "source": "For information on why, read the related FAQ entry on using <div class=\"open 672069643d2231333822 internal-tag ownttip\"><span class=\"short\" title=\"&lt;a href=&quot;faq.installation.php#faq.installation.apache2&quot; class=&quot;link&quot;&gt;\">&lt;1&gt;</span><span class=\"full\" data-originalid=\"138\" data-length=\"-1\">&lt;a href=&quot;faq.installation.php#faq.installation.apache2&quot; class=&quot;link&quot;&gt;</span></div>Apache2 with <div class=\"term preferredTerm exact transNotFound better-translate-with-preferredTerm\" title=\"\">a</div> threaded MPM<div class=\"close 2f67 internal-tag ownttip\"><span class=\"short\" title=\"&lt;/a&gt;\">&lt;/1&gt;</span><span class=\"full\" data-originalid=\"138\" data-length=\"-1\">&lt;/a&gt;</span></div>",
         "sourceEdit": null,
         "target": "Verwenden Sie stattdessen das <div class=\"term supersededTerm lowercase\" title=\"\">Prefork</div> MPM, welches der Standard-MPM für Apace 2.0 und 2.2 ist.",
         "targetEdit": "Verwenden Sie stattdessen das <div class=\"term supersededTerm lowercase\" title=\"\">Prefork</div> MPM, welches der Standard-MPM für Apace 2.0 und 2.2 ist.",
@@ -1612,7 +1612,7 @@
         "fileOrder": "0",
         "workflowStepNr": "0",
         "workflowStep": null,
-        "isRepeated": "1",
+        "isRepeated": "0",
         "sourceMd5": "d18c3539c68d1d8d0dcebe3aca58ece1",
         "sourceToSort": "Now you have Apache 2.x.NN available under /usr/local/apache2, configured with loadable module support and the standard MPM prefork.",
         "targetMd5": "7a1a27857381cdeca0abedb960144fce",

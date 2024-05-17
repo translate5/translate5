@@ -122,7 +122,7 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
             $tmData = $tmxRepairer->convert($tmData);
         }
         $data->tmxData = base64_encode($tmData);
-        $data->stripFramingTags = $stripFramingTags->value;
+        $data->framingTags = $stripFramingTags->value;
 
         $http = $this->getHttpWithMemory('POST', $tmName, '/import');
         $http->setConfig([

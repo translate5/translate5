@@ -69,7 +69,7 @@ class ChangeAlikeTranslate683Test extends editor_Test_JsonTest
      * @var array
      */
     protected $toCompareSource = [
-        'sourceBeforeEdit' => 'Ich wiederhole mich in der <div title="" class="term preferredTerm exact transNotFound">Quelle</div>',
+        'sourceBeforeEdit' => 'Ich wiederhole mich in der <div title="" class="term preferredTerm exact transNotFound better-translate-with-preferredTerm">Quelle</div>',
         'targetBeforeEdit' => 'I repeat <div title="" class="term preferredTerm exact">me</div> in the spring',
         'sourceAfterEdit' => 'Ich wiederhole mich in der <div title="" class="term preferredTerm exact transFound">Quelle</div>',
         'targetEditAfterEdit' => 'I repeat <div title="" class="term preferredTerm exact">me</div> in the <div title="" class="term preferredTerm exact">source</div>',
@@ -80,14 +80,14 @@ class ChangeAlikeTranslate683Test extends editor_Test_JsonTest
      * @var array
      */
     protected $toCompareTarget = [
-        'sourceBeforeEdit5' => 'Ich wiederhole mich im <div title="" class="term preferredTerm exact transNotFound">Zieltext</div>',
+        'sourceBeforeEdit5' => 'Ich wiederhole mich im <div title="" class="term preferredTerm exact transNotFound better-translate-with-preferredTerm">Zieltext</div>',
         'targetBeforeEdit' => 'I repeat <div title="" class="term preferredTerm exact">me</div> in the destinationtext',
         'targetBeforeEdit6' => 'I repeat <div title="" class="term preferredTerm exact">me</div> in the <div title="" class="term preferredTerm exact">targettext</div>',
 
         'sourceAfterEdit4' => 'Ich wiederhole mich im Targettext',
         'sourceAfterEdit6' => 'Ich wiederhole mich im <div title="" class="term preferredTerm exact transFound">Zieltext</div>',
         'sourceAfterEdit5' => 'Ich wiederhole mich im <div title="" class="term preferredTerm exact transFound">Zieltext</div>',
-        'sourceAfterEdit7' => 'Ich wiederhole mich im <div title="" class="term preferredTerm exact transFound">Zieltext</div> und bin in der <div title="" class="term preferredTerm exact transNotFound">Quelle</div> <div title="" class="term preferredTerm exact transNotDefined">unterschiedlich</div>',
+        'sourceAfterEdit7' => 'Ich wiederhole mich im <div title="" class="term preferredTerm exact transFound">Zieltext</div> und bin in der <div title="" class="term preferredTerm exact transNotFound better-translate-with-preferredTerm">Quelle</div> <div title="" class="term preferredTerm exact transNotDefined">unterschiedlich</div>',
 
         'targetAfterEdit' => 'I repeat <div title="" class="term preferredTerm exact">me</div> in the <div title="" class="term preferredTerm exact">targettext</div>',
     ];

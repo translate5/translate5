@@ -49,7 +49,7 @@
         "targetEditToSort": "",
         "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"maxNumberOfLines\":null,\"sizeUnit\":\"\",\"font\":\"\",\"fontSize\":0,\"additionalUnitLength\":0,\"additionalMrkLength\":0,\"siblingData\":{\"fakeSegId_2\":{\"nr\":\"2\",\"length\":{\"targetEdit\":0}}}}",
         "isWatched": false,
-        "isRepeated": 3
+        "isRepeated": 1
     },
     {
         "segmentNrInTask": "3",
@@ -101,7 +101,7 @@
         "targetEditToSort": "",
         "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"maxNumberOfLines\":null,\"sizeUnit\":\"\",\"font\":\"\",\"fontSize\":0,\"additionalUnitLength\":0,\"additionalMrkLength\":0,\"siblingData\":{\"fakeSegId_4\":{\"nr\":\"4\",\"length\":{\"targetEdit\":0}}}}",
         "isWatched": false,
-        "isRepeated": 3
+        "isRepeated": 1
     },
     {
         "segmentNrInTask": "5",
@@ -153,7 +153,7 @@
         "targetEditToSort": "",
         "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"maxNumberOfLines\":null,\"sizeUnit\":\"\",\"font\":\"\",\"fontSize\":0,\"additionalUnitLength\":0,\"additionalMrkLength\":0,\"siblingData\":{\"fakeSegId_6\":{\"nr\":\"6\",\"length\":{\"targetEdit\":0}}}}",
         "isWatched": false,
-        "isRepeated": 3
+        "isRepeated": 1
     },
     {
         "segmentNrInTask": "7",
@@ -205,6 +205,6 @@
         "targetEditToSort": "",
         "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"maxNumberOfLines\":null,\"sizeUnit\":\"\",\"font\":\"\",\"fontSize\":0,\"additionalUnitLength\":0,\"additionalMrkLength\":0,\"siblingData\":{\"fakeSegId_8\":{\"nr\":\"8\",\"length\":{\"targetEdit\":0}}}}",
         "isWatched": false,
-        "isRepeated": 3
+        "isRepeated": 1
     }
 ]
