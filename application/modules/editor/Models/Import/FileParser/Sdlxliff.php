@@ -570,6 +570,17 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
                 if (strlen(trim(strip_tags($source))) === 0 && strlen(trim(strip_tags($target))) === 0) {
                     return null;
                 }
+
+                $sdlxliffConfig = $this->config->runtimeOptions->import?->sdlxliff;
+                // trimming all whitespaces including unicode whitespaces (e.g. non-breaking space)
+                $sourceHasContent = mb_strlen(strip_tags(preg_replace('/\s+/u', '', $source))) !== 0;
+
+                if ($sourceHasContent && $sdlxliffConfig?->cleanUpTargetOnSourceWithContentAndTagWhitespaceOnlyTarget) {
+                    $emptyTarget = mb_strlen(strip_tags(preg_replace('/\s+/u', '', $target))) === 0;
+
+                    $target = $emptyTarget ? '' : $target;
+                }
+
                 $numSegmentsInTransUnit++;
                 $sourceName = $this->segmentFieldManager->getFirstSourceName();
                 $targetName = $this->segmentFieldManager->getFirstTargetName();
