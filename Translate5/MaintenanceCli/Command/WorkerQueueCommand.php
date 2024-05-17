@@ -81,7 +81,15 @@ class WorkerQueueCommand extends Translate5AbstractCommand
         }
 
         $workerQueue = ZfExtended_Factory::get(Queue::class);
-        $workerQueue->process();
+        if ($workerQueue->lockAcquire()) {
+            $foundWorkers = $workerQueue->process();
+            while ($foundWorkers) {
+                sleep(1);
+                $foundWorkers = $workerQueue->process();
+            }
+            $workerQueue->lockRelease();
+        }
+
         $this->io->text('scheduling workers...');
         sleep(4);
 

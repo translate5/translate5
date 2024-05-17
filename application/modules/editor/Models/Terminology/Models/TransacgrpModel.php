@@ -69,8 +69,16 @@ class editor_Models_Terminology_Models_TransacgrpModel extends editor_Models_Ter
     protected $dbInstanceClass = 'editor_Models_Db_Terminology_Transacgrp';
 
     /**
-     * @param null $language
-     * @param null $termId
+     * @param string $userName
+     * @param string $userGuid
+     * @param string|int $termEntryId
+     * @param ?string $language
+     * @param null|int|string $termId
+     * @return string
+     * @throws ReflectionException
+     * @throws Zend_Db_Statement_Exception
+     * @throws ZfExtended_Models_Entity_Exceptions_IntegrityConstraint
+     * @throws ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey
      */
     public function affectLevels($userName, $userGuid, $termEntryId, $language = null, $termId = null)
     {
@@ -125,6 +133,9 @@ class editor_Models_Terminology_Models_TransacgrpModel extends editor_Models_Ter
             'language' => 2,
             'entry' => 1,
         ];
+
+        // Define variables
+        $termUpdate = $person = $source = null;
 
         // If $level is 'term'
         if ($level == 'term') {

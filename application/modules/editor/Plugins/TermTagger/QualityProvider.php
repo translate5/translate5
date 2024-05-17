@@ -262,10 +262,10 @@ class editor_Plugins_TermTagger_QualityProvider extends editor_Segment_Quality_P
     {
         return [
             self::GROUP_NOT_FOUND_IN_TARGET => [
-                self::NOT_FOUND_IN_TARGET_ADMITTED,
-                self::NOT_FOUND_IN_TARGET_PREFERRED,
                 self::NOT_FOUND_IN_TARGET_STANDARDIZED,
+                self::NOT_FOUND_IN_TARGET_PREFERRED,
                 self::NOT_FOUND_IN_TARGET_OTHERS,
+                self::NOT_FOUND_IN_TARGET_ADMITTED,
             ],
             self::NOT_DEFINED_IN_TARGET,
             self::FORBIDDEN_IN_TARGET,

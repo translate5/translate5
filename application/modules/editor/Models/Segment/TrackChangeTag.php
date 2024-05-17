@@ -33,7 +33,8 @@ END LICENSE AND COPYRIGHT
  *
  * @method string protect() protect(string $segment) protects the DEL tags of one segment
  * @method string unprotect() unprotect(string $segment) unprotects / restores the DEL tags
- * @method string replace() replace(string $segment, Closure|string $replacer, int $limit = -1, int &$count = null) replaces DEL tags with either the callback or the given scalar
+ * @method string replace() replace(string $segment, Closure|string $replacer, int $limit = -1, int &$count = null)
+ *     replaces DEL tags with either the callback or the given scalar
  */
 class editor_Models_Segment_TrackChangeTag extends editor_Models_Segment_TagAbstract
 {
@@ -50,8 +51,8 @@ class editor_Models_Segment_TrackChangeTag extends editor_Models_Segment_TagAbst
     public const REGEX_INS = '/<\/?ins[^>]*>/i';
 
     /**
-     * FIXME currently used only at one place, refactor so that this class provides a function to achieve the same stuff as currently done in ReplaceMatchesSegment.php
-     * del protected tag regex
+     * FIXME currently used only at one place, refactor so that this class provides a function to achieve the same
+     * stuff as currently done in ReplaceMatchesSegment.php del protected tag regex
      * @var string
      */
     public const REGEX_PROTECTED_DEL = '/<segment:del[^>]+((id="([^"]*)"[^>]))[^>]*>/';
@@ -142,6 +143,11 @@ class editor_Models_Segment_TrackChangeTag extends editor_Models_Segment_TagAbst
      */
     public function createTrackChangesNode($nodeName, $nodeText, ?DateTime $dateTime = null): string
     {
+        return $this->createTrackChangeNodeOpener($nodeName, $dateTime) . $nodeText . '</' . $nodeName . '>';
+    }
+
+    public function createTrackChangeNodeOpener(string $nodeName, ?DateTime $dateTime = null): string
+    {
         $node = [];
         $node[] = '<' . $nodeName;
         $node[] = 'class="' . $this->getTrackChangesCss($nodeName) . '"';
@@ -158,7 +164,7 @@ class editor_Models_Segment_TrackChangeTag extends editor_Models_Segment_TagAbst
         // timestamp af the change:
         $node[] = self::ATTRIBUTE_TIMESTAMP . '="' . ($dateTime ? $dateTime->format('c') : date("c")) . '"';
 
-        $node[] = '>' . $nodeText . '</' . $nodeName . '>';
+        $node[] = '>';
 
         return implode(' ', $node);
     }
@@ -181,7 +187,8 @@ class editor_Models_Segment_TrackChangeTag extends editor_Models_Segment_TagAbst
 
     /**
      * removes TrackChanges-Tags:
-     * - INS => markup-Tag ONLY is removed (doing this first is important in order to catch the spaces in the next step:)
+     * - INS => markup-Tag ONLY is removed (doing this first is important in order to catch the spaces in the next
+     * step:)
      * - DEL => avoid multiple space after removing a deleted word with one or more space at both sides
      * - DEL => markup-Tag AND content inbetween is removed
      */
@@ -196,7 +203,8 @@ class editor_Models_Segment_TrackChangeTag extends editor_Models_Segment_TagAbst
     }
 
     /**
-     * This function returns a list of used track change tags inside text in a canonical comparable format, since comparing bare tags is due different structure not possible
+     * This function returns a list of used track change tags inside text in a canonical comparable format, since
+     * comparing bare tags is due different structure not possible
      */
     public function getUsedTagInfo(string $segment): array
     {

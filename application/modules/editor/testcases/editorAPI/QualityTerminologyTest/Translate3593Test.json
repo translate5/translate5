@@ -1,8 +1,8 @@
 {
     "qid": -1,
     "qtype": "root",
-    "qcount": 7,
-    "qtotal": 7,
+    "qcount": 30,
+    "qtotal": 30,
     "qcategory": null,
     "qcomplete": true,
     "expanded": true,
@@ -13,7 +13,7 @@
         {
             "qid": -1,
             "qtype": "consistent",
-            "qcount": 0,
+            "qcount": 3,
             "qcomplete": true,
             "children": [
                 {
@@ -30,11 +30,12 @@
                     "checked": false
                 },
                 {
-                    "qid": -1,
+                    "qid": "28",
                     "qtype": "consistent",
-                    "qcount": 0,
+                    "qcount": 3,
                     "qcomplete": true,
                     "qcategory": "target",
+                    "qcatidx": "-1",
                     "qcountfp": 0,
                     "text": "Inconsistent target",
                     "qtooltip": "Finds segments with the same source, but different target (tags ignored)",
@@ -49,14 +50,14 @@
             "mustBeZeroErrors": false,
             "qcountfp": 0,
             "text": "Consistency",
-            "qtotal": 0,
-            "expanded": false,
+            "qtotal": 3,
+            "expanded": true,
             "checked": false
         },
         {
             "qid": -1,
             "qtype": "empty",
-            "qcount": 0,
+            "qcount": 5,
             "qcomplete": true,
             "qcategory": null,
             "qtooltip": "Target only contains tags, spaces or punctuation, but source does not.",
@@ -64,7 +65,7 @@
             "mustBeZeroErrors": false,
             "qcountfp": 0,
             "text": "Empty segments",
-            "qtotal": 0,
+            "qtotal": 5,
             "leaf": true,
             "checked": false
         },
@@ -155,7 +156,7 @@
         {
             "qid": -1,
             "qtype": "spellcheck",
-            "qcount": 0,
+            "qcount": 15,
             "qcomplete": true,
             "children": [
                 {
@@ -172,11 +173,12 @@
                     "checked": false
                 },
                 {
-                    "qid": -1,
+                    "qid": "8",
                     "qtype": "spellcheck",
-                    "qcount": 0,
+                    "qcount": 15,
                     "qcomplete": true,
                     "qcategory": "misspelling",
+                    "qcatidx": "-1",
                     "qcountfp": 0,
                     "text": "Spelling",
                     "qtooltip": "The text contains a misspelling.",
@@ -429,8 +431,8 @@
             "mustBeZeroErrors": false,
             "qcountfp": 0,
             "text": "LanguageTool",
-            "qtotal": 0,
-            "expanded": false,
+            "qtotal": 15,
+            "expanded": true,
             "checked": false
         },
         {
@@ -859,16 +861,15 @@
         {
             "qid": -1,
             "qtype": "numbers",
-            "qcount": 2,
+            "qcount": 0,
             "qcomplete": true,
             "children": [
                 {
-                    "qid": "6",
+                    "qid": -1,
                     "qtype": "numbers",
-                    "qcount": 2,
+                    "qcount": 0,
                     "qcomplete": true,
                     "qcategory": "num1",
-                    "qcatidx": "-1",
                     "qcountfp": 0,
                     "text": "Numbers source ≠ target",
                     "qtooltip": "",
@@ -1039,22 +1040,23 @@
             "mustBeZeroErrors": false,
             "qcountfp": 0,
             "text": "Numbers",
-            "qtotal": 2,
-            "expanded": true,
+            "qtotal": 0,
+            "expanded": false,
             "checked": false
         },
         {
             "qid": -1,
             "qtype": "term",
-            "qcount": 5,
+            "qcount": 7,
             "qcomplete": true,
             "children": [
                 {
-                    "qid": -1,
+                    "qid": "5",
                     "qtype": "term",
-                    "qcount": 0,
+                    "qcount": 1,
                     "qcomplete": true,
                     "qcategory": "forbidden_in_source",
+                    "qcatidx": "-1",
                     "qcountfp": 0,
                     "text": "Forbidden in source",
                     "qtooltip": "",
@@ -1091,18 +1093,18 @@
                 {
                     "qid": -1,
                     "qtype": "term",
-                    "qcount": 5,
+                    "qcount": 6,
                     "qcomplete": true,
                     "children": [
                         {
                             "qid": "1",
                             "qtype": "term",
-                            "qcount": 1,
+                            "qcount": 3,
                             "qcomplete": true,
-                            "qcategory": "not_found_in_target_admitted",
+                            "qcategory": "not_found_in_target_standardized",
                             "qcatidx": "-1",
                             "qcountfp": 0,
-                            "text": "Admitted",
+                            "text": "Standardized",
                             "qtooltip": "",
                             "mustBeZeroErrors": false,
                             "leaf": true,
@@ -1127,10 +1129,10 @@
                             "qtype": "term",
                             "qcount": 1,
                             "qcomplete": true,
-                            "qcategory": "not_found_in_target_standardized",
+                            "qcategory": "not_found_in_target",
                             "qcatidx": "-1",
                             "qcountfp": 0,
-                            "text": "Standardized",
+                            "text": "Others",
                             "qtooltip": "",
                             "mustBeZeroErrors": false,
                             "leaf": true,
@@ -1139,12 +1141,12 @@
                         {
                             "qid": "4",
                             "qtype": "term",
-                            "qcount": 2,
+                            "qcount": 1,
                             "qcomplete": true,
-                            "qcategory": "not_found_in_target",
+                            "qcategory": "not_found_in_target_admitted",
                             "qcatidx": "-1",
                             "qcountfp": 0,
-                            "text": "Others",
+                            "text": "Admitted",
                             "qtooltip": "",
                             "mustBeZeroErrors": false,
                             "leaf": true,
@@ -1166,7 +1168,7 @@
             "mustBeZeroErrors": false,
             "qcountfp": 0,
             "text": "Terminology",
-            "qtotal": 5,
+            "qtotal": 7,
             "expanded": true,
             "checked": false
         },

@@ -1,7 +1,7 @@
 [
     {
-        "id": "1267",
-        "segmentId": "610",
+        "id": "23",
+        "segmentId": "10",
         "field": "target",
         "type": "mqm",
         "category": "mqm_2",
@@ -12,7 +12,7 @@
         "filterable": true,
         "falsifiable": true,
         "content": "Fahrtensysteme",
-        "similarQty": 0,
+        "similarQty": 1,
         "hasTag": true,
         "tagName": "img",
         "cssClass": "qmflag"
