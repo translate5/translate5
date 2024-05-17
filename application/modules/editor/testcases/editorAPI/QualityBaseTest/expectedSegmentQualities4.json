@@ -1,7 +1,7 @@
 [
     {
-        "id": "1258",
-        "segmentId": "605",
+        "id": "14",
+        "segmentId": "5",
         "field": "target",
         "type": "mqm",
         "category": "mqm_3",
@@ -12,14 +12,14 @@
         "filterable": true,
         "falsifiable": true,
         "content": "betretenen",
-        "similarQty": 0,
+        "similarQty": 1,
         "hasTag": true,
         "tagName": "img",
         "cssClass": "qmflag"
     },
     {
-        "id": "1257",
-        "segmentId": "605",
+        "id": "13",
+        "segmentId": "5",
         "field": "target",
         "type": "mqm",
         "category": "mqm_2",
@@ -30,7 +30,7 @@
         "filterable": true,
         "falsifiable": true,
         "content": "gelagerten",
-        "similarQty": 0,
+        "similarQty": 1,
         "hasTag": true,
         "tagName": "img",
         "cssClass": "qmflag"

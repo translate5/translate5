@@ -77,8 +77,8 @@ class RecalcTransFound
         $this->termModel = ZfExtended_Factory::get(editor_Models_Terminology_Models_TermModel::class);
 
         $lang = ZfExtended_Factory::get(editor_Models_Languages::class);
-        $this->targetFuzzyLanguages = $lang->getFuzzyLanguages($this->task->getTargetLang(), 'id', true);
-        $this->sourceFuzzyLanguages = $lang->getFuzzyLanguages($this->task->getSourceLang(), 'id', true);
+        $this->targetFuzzyLanguages = $lang->getFuzzyLanguages((int) $this->task->getTargetLang(), 'id', true);
+        $this->sourceFuzzyLanguages = $lang->getFuzzyLanguages((int) $this->task->getSourceLang(), 'id', true);
 
         // Lazy load collectionIds defined for current task
         $this->collectionIds = $this->collectionIds ?? ZfExtended_Factory::get(editor_Models_TermCollection_TermCollection::class)
@@ -109,8 +109,11 @@ class RecalcTransFound
      * Get translation status mark for source term having tbxId given by $srcId arg,
      * or for source term's homonym, identified by termEntryTbxId still given by $srcId but with `true` as value of 2nd arg
      */
-    protected function getMarkByTbxId(string $srcId, bool $isHomonym = false): string
+    protected function getMarkByTbxId(string $srcId, bool $isHomonym = false, &$thisTransStatus = null): string
     {
+        // Clear
+        $thisTransStatus = null;
+
         // If $isHomonym arg is true, it means that $srcId arg contains termEntryTbxId of a homonym term for some source term
         // so that we set up $src variable for it to be an array containing termEntryTbxId-key for it to be possible to use for
         // finding translations. We do that to avoid excessive SQL-query as the only thing we need for homonym term is it's
@@ -135,6 +138,9 @@ class RecalcTransFound
         } elseif ($transTermId = array_values(array_intersect($transIdA, $this->trgIdA))[0] ?? 0) {
             // Remove first found tbxId from $trgIdA
             unset($this->trgIdA[array_search($transTermId, $this->trgIdA)]);
+
+            // Setup status of a found translation
+            $thisTransStatus = $this->trans[$src['termEntryTbxId']][$transTermId]['status'];
 
             // Setup 'transFound'-class
             return 'transFound';
@@ -166,24 +172,24 @@ class RecalcTransFound
 
         // Get `termEntryTbxId` and `term` for each term tbx id detected in source and/or target
         $this->exists = $db->query("
-            SELECT `termTbxId`, `termEntryTbxId`, `term` 
+            SELECT `termTbxId`, `termEntryTbxId`, `term`, `status` 
             FROM `terms_term` 
-            WHERE 1
-             AND `termTbxId` IN ('" . join("','", $tbxIdA) . "')
-             AND `collectionId` IN (" . join(',', $this->collectionIds) . ")
-             AND `processStatus` = 'finalized'
+            WHERE `termTbxId` IN ('" . join("','", $tbxIdA) . "')
+              AND `collectionId` IN (" . join(',', $this->collectionIds) . ")
+              AND `processStatus` = 'finalized'
             LIMIT " . count($tbxIdA) . "             
         ")->fetchAll(PDO::FETCH_UNIQUE);
 
         // Get all terms (from source and target), grouped by their termEntryTbxId
         $this->termsByEntry = $db->query("
-            SELECT `termEntryTbxId`, `termEntryTbxId`, `term`, `termTbxId`, `languageId`
+            SELECT `termEntryTbxId`, `termEntryTbxId`, `term`, `termTbxId`, `languageId`, `status`
             FROM `terms_term`
-            WHERE 1
-              AND `termEntryTbxId` IN ('" . join("','", array_column($this->exists, 'termEntryTbxId')) . "')
+            WHERE `termEntryTbxId` IN ('" . join("','", array_column($this->exists, 'termEntryTbxId')) . "')
               AND `collectionId`   IN (" . join(',', $this->collectionIds) . ")
               AND `languageId`     IN (" . join(',', $fuzzy) . ")
               AND `processStatus` = 'finalized'
+            ORDER BY FIND_IN_SET(`status`, 'preferredTerm,standardizedTerm') DESC, 
+              `status` = 'admittedTerm' ASC  
         ")->fetchAll(PDO::FETCH_GROUP);
 
         // Foreach source term
@@ -196,7 +202,10 @@ class RecalcTransFound
             // Pick translations for target fuzzy languages
             foreach ($this->termsByEntry[$src['termEntryTbxId']] as $term) {
                 if (in_array($term['languageId'], $this->targetFuzzyLanguages)) {
-                    $this->trans[$src['termEntryTbxId']][$term['termTbxId']] = $term['term'];
+                    $this->trans[$src['termEntryTbxId']][$term['termTbxId']] = [
+                        'term' => $term['term'],
+                        'status' => $term['status'],
+                    ];
                 }
             }
 
@@ -221,7 +230,10 @@ class RecalcTransFound
                 if (! isset($this->trans[$termEntryId])) {
                     foreach ($this->termsByEntry[$termEntryId] as $term) {
                         if (in_array($term['languageId'], $this->targetFuzzyLanguages)) {
-                            $this->trans[$termEntryId][$term['termTbxId']] = $term['term'];
+                            $this->trans[$termEntryId][$term['termTbxId']] = [
+                                'term' => $term['term'],
+                                'status' => $term['status'],
+                            ];
                         }
                     }
                 }
@@ -231,7 +243,10 @@ class RecalcTransFound
         // Collect target terms texts
         foreach ($this->trgIdA as $trgId) {
             if ($text = $this->exists[$trgId]['term'] ?? 0) {
-                $this->trgTextA[] = $text;
+                $this->trgTextA[] = [
+                    'text' => $text,
+                    'status' => $this->exists[$trgId]['status'],
+                ];
             }
         }
     }
@@ -273,7 +288,7 @@ class RecalcTransFound
 
         // Get [termTbxId => [mark1, mark2, ...]] pairs for all terms detected in segment source text
         // As you can see at the line above it can be, for example, 3 occurrences of the same term
-        // in segment source, and only 2 translations for tha term in segment target, so that would mean
+        // in segment source, and only 2 translations for that term in segment target, so that would mean
         // translations for first two - are found, but for the 3rd one - not found.
         // So 'mark1, mark2, ...' above are to indicate status for each occurrence of a term in segment source
         $markA = $this->getMarkBySrcIdA($srcIdA);
@@ -298,26 +313,24 @@ class RecalcTransFound
         // Foreach source term tbx id
         foreach ($srcIdA as $srcId) {
             // Get css class
-            $value = $this->getMarkByTbxId($srcId);
+            $value = $this->getMarkByTbxId($srcId, false, $thisTransStatus);
+
+            // Better target term will be here, if applicable
+            $bestTransStatus = '';
 
             // If translation was found or such source term does not exists in db at all
-            if ($value == 'transFound' || ! isset($this->exists[$srcId])) {
-                // Append mark for current occurrence of term tag
-                $mark[$srcId][] = $value;
+            if ($value === 'transFound' || ! isset($this->exists[$srcId])) {
+                // Do nothing here
 
-                // Keep the mark we have for current source term and goto next source term
-                continue;
-            }
-
-            // If source term has homonyms among target terms' termEntries
-            if ($this->homonym[$srcId] ?? 0) {
+                // Else if source term has homonyms among target terms' termEntries
+            } elseif ($this->homonym[$srcId] ?? 0) {
                 // Foreach homonym
                 foreach ($this->homonym[$srcId] as $termEntryId) {
                     // Get mark for homonym
-                    $value = $this->getMarkByTbxId($termEntryId, true);
+                    $value = $this->getMarkByTbxId($termEntryId, true, $thisTransStatus);
 
                     // If it's 'transFound' - stop homonym walkthrough
-                    if ($value == 'transFound') {
+                    if ($value === 'transFound') {
                         break;
                     }
                 }
@@ -333,17 +346,63 @@ class RecalcTransFound
                     $value = 'transNotDefined';
 
                     // Else if at least one of target terms is a translation for the current source term
-                } elseif ($transText = array_intersect($transTextA, $this->trgTextA)[0] ?? 0) {
-                    // Remove first found term text from $transTextA
-                    unset($this->trgTextA[array_search($transText, $this->trgTextA)]);
+                } elseif ($transText = array_intersect(
+                    array_column($transTextA, 'term'),
+                    array_column($this->trgTextA, 'text')
+                )[0] ?? 0) {
+                    // Get it's index within $this->trgTextA
+                    $idx = array_search($transText, array_column($this->trgTextA, 'text'));
 
                     // Setup 'transFound'-class
                     $value = 'transFound';
+
+                    // Setup status of a found translation
+                    $thisTransStatus = $this->trgTextA[$idx]['status'];
+
+                    // Remove first found term text from $trgTextA
+                    unset($this->trgTextA[$idx]);
+
+                    // Else if translation for term in segment source is not found in segment target but we have
+                    // translations in terminology db - indicate that with status of best or the only one term we have in db
+                } else {
+                    // Setup
+                    $bestTransStatus = $transTextA[0]['status'];
+                }
+            }
+
+            // If translation was found
+            if ($value === 'transFound') {
+                // Get the best target term we have in current termEntry
+                $firstA = [array_values($this->trans[$this->exists[$srcId]['termEntryTbxId']])[0]];
+
+                // Append the best target term we have in each homonym termEntry
+                foreach ($this->homonym[$srcId] ?? [] as $termEntryId) {
+                    $firstA[] = array_values($this->trans[$termEntryId])[0];
+                }
+
+                // Wrap $firstA into an array to mame it compatible with further TermModel->sortTerms()
+                $firstA = [$firstA];
+                $firstA = $this->termModel->sortTerms($firstA);
+                $firstA = $firstA[0];
+
+                // Get status of first translation, which is the best translation we have in terminology db
+                $firstAmongFirst = $firstA[0]['status'];
+
+                // If used translation is not the best one
+                if ($thisTransStatus !== $firstAmongFirst) {
+                    // Spoof the $value to indicate that the best translation is not found
+                    $value = 'transNotFound';
+
+                    // Indicate the status of the best translation
+                    $bestTransStatus = $firstAmongFirst;
                 }
             }
 
             // Append mark for current occurrence of term tag
-            $mark[$srcId][] = $value;
+            $mark[$srcId][] = [
+                'presenceStatus' => $value,
+                'bestTransStatus' => $bestTransStatus,
+            ];
         }
 
         // Return marks for all terms within current segment source text
@@ -388,8 +447,28 @@ class RecalcTransFound
                 $replace = str_replace('<div', '<div class=""', $replace);
             }
 
-            // Append $mark to class list
-            return preg_replace('~( class="[^"]*)"~', '$1 ' . $values[$idx++] . '"', $replace);
+            // Prepare css classes whitespace-separated list to be inserted
+            // 1.Class name under index 'presenceStatus' can be:
+            // - 'transNotFound'
+            // - 'transNotDefined'
+            // - 'transFound'
+            // 2.Class name under index 'bestTransStatus' exists in cases when we have better translation
+            //   than current or missing translation, and can be:
+            // - 'standardizedTerm'
+            // - 'preferredTerm'
+            // - 'admittedTerm'
+            // - '' (empty string), if we don't have translation-terms with above statuses in terminology db
+            // Here we setup a prefix to distinguish between source term statuses and statuses of best possible translations
+            $insert = $values[$idx]['presenceStatus'] . \editor_Utils::rif(
+                $values[$idx]['bestTransStatus'],
+                ' ' . \editor_Plugins_TermTagger_Tag::BEST_TRANS_STATUS_PREFIX . '$1'
+            );
+
+            // Increment same term occurrences counter
+            $idx++;
+
+            // Append $insert to class list
+            return preg_replace('~( class="[^"]*)"~', '$1 ' . $insert . '"', $replace);
         }, $source);
     }
 }

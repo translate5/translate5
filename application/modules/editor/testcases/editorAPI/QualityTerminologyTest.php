@@ -62,7 +62,7 @@ class QualityTerminologyTest extends editor_Test_JsonTest
     {
         // Get segments and check their quantity
         $segmentQuantity = count(static::api()->getSegments(null, 10));
-        static::assertEquals(5, $segmentQuantity, 'Not enough segments in the imported task');
+        static::assertEquals(8, $segmentQuantity, 'Not enough segments in the imported task');
         $testName = 'Translate3593Test';
 
         // Check qualities
