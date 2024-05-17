@@ -235,7 +235,7 @@ class ReimportSegments
 
         foreach ($segments as $segment) {
             if ($segment->hasEmptySource() || $segment->hasEmptyTarget()) {
-                return;
+                continue;
             }
 
             try {
