@@ -46,14 +46,15 @@ class QualityTerminologyTest extends editor_Test_JsonTest
         $testName = 'Translate3593Test';
 
         $config
-            ->addLanguageResource('termcollection', "testfiles/$testName.tbx", $customerId)
+            ->addLanguageResource('termcollection', 'testfiles/' . $testName . '.tbx', $customerId)
             ->setProperty('name', $testName);
 
         $config->addPretranslation();
 
         $config
-            ->addTask('en', 'de', $customerId, "testfiles/$testName.csv")
-            ->setProperty('taskName', "API Testing::$testName")
+            ->addTask('en', 'de', $customerId, 'testfiles/' . $testName . '.csv')
+            ->addTaskConfig('runtimeOptions.import.fileparser.csv.active', '1')
+            ->setProperty('taskName', 'API Testing::' . $testName)
             ->setToEditAfterImport();
     }
 

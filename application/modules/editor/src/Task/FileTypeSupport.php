@@ -64,8 +64,10 @@ use editor_Models_Import_FileParser_Xml;
 use editor_Models_Import_UploadProcessor;
 use editor_Models_Task;
 use SplFileInfo;
+use Zend_Registry as Registry;
 use ZfExtended_EventManager;
 use ZfExtended_Factory;
+use ZfExtended_Models_Entity_NotFoundException;
 
 /**
  * Centralizes the evaluation of which file-types (extensions) can be handled/parsed by translate5
@@ -86,7 +88,9 @@ final class FileTypeSupport
     public static function defaultInstance(): FileTypeSupport
     {
         if (! array_key_exists('DEFAULT', self::$_instances)) {
-            self::$_instances['DEFAULT'] = new FileTypeSupport();
+            // usage of internal CSV file-parser is configurable
+            $useCoreCsvParser = Registry::get('config')->runtimeOptions->import->fileparser->csv->active ?? false;
+            self::$_instances['DEFAULT'] = new FileTypeSupport($useCoreCsvParser);
             // event to let plugins and other providers register their filetypes
             self::$events = ZfExtended_Factory::get(ZfExtended_EventManager::class, [self::class]);
             self::$events->trigger('registerSupportedFileTypes', self::$_instances['DEFAULT'], [
@@ -104,7 +108,22 @@ final class FileTypeSupport
     {
         $taskIdentifier = trim($task->getTaskGuid(), '{}');
         if (! array_key_exists($taskIdentifier, self::$_instances)) {
-            self::$_instances[$taskIdentifier] = new FileTypeSupport();
+            // usage of internal CSV file-parser is configurable (System, Customer & Import level)
+            // QUIRK: there may be no task-config yet (first steps of import-wizard),
+            // expect either a not yet saved task-entity or no task-config yet
+            $useCoreCsvParser = Registry::get('config')->runtimeOptions->import->fileparser?->csv?->active ?? false;
+
+            // try to fetch only, if the task-entity was saved
+            if (null !== $task->getId()) {
+                try {
+                    $config = $task->getConfig();
+                    $useCoreCsvParser = $config->runtimeOptions->import->fileparser->csv->active ?? false;
+                } catch (ZfExtended_Models_Entity_NotFoundException) {
+                    // nothing needs to be done here ...
+                }
+            }
+
+            self::$_instances[$taskIdentifier] = new FileTypeSupport($useCoreCsvParser);
             // event to let plugins and other providers register their filetypes
             self::$events = ZfExtended_Factory::get(ZfExtended_EventManager::class, [self::class]);
             self::$events->trigger('registerSupportedFileTypes', self::$_instances[$taskIdentifier], [
@@ -123,10 +142,7 @@ final class FileTypeSupport
 
     private static ZfExtended_EventManager $events;
 
-    private static array $coreExtensionsWithParser;
-
     private array $coreParsers = [
-        editor_Models_Import_FileParser_Csv::class,
         editor_Models_Import_FileParser_DisplayTextXml::class,
         editor_Models_Import_FileParser_Sdlxliff::class,
         editor_Models_Import_FileParser_Testcase::class,
@@ -157,22 +173,23 @@ final class FileTypeSupport
      */
     private array $pluginData = [];
 
-    private function __construct()
+    private function __construct(bool $useCoreCsvParser = false)
     {
-        // registers the core fileparsers - if not already done by another instance
-        if (isset(self::$coreExtensionsWithParser)) {
-            $this->extensionsWithParser = self::$coreExtensionsWithParser;
-        } else {
-            $this->registerCoreFileParsers();
-            self::$coreExtensionsWithParser = $this->extensionsWithParser;
+        // enable core csv-parser if configured
+        if ($useCoreCsvParser) {
+            $this->coreParsers[] = editor_Models_Import_FileParser_Csv::class;
         }
+
+        // now register the core fileparsers
+        $this->registerCoreFileParsers();
+
         //ZIP is not provided by a specific fileparser, but is supported by the core as container format
         $this->register(editor_Models_Import_UploadProcessor::TYPE_ZIP, self::SCOPE_CORE);
     }
 
     /**
      * Registers the given file type to be handleable by translate5, but without a concrete parser
-     *  due multiple pre-processing steps, this filetype is probably preprocessed and converted before giving finally to the FileParsers
+     * due multiple pre-processing steps, this filetype is probably preprocessed and converted before giving finally to the FileParsers
      */
     public function register(string $extension, string $scope): void
     {

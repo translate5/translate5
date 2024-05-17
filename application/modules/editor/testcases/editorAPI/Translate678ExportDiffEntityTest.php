@@ -51,6 +51,7 @@ class Translate678ExportDiffEntityTest extends editor_Test_ImportTest
     {
         $config
             ->addTask('en', 'de', -1, 'apiTest.csv')
+            ->addTaskConfig('runtimeOptions.import.fileparser.csv.active', '1')
             ->setToEditAfterImport();
     }
 
