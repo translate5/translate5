@@ -232,6 +232,8 @@ class NumberProtectorTest extends TestCase
         yield from $this->macsProvider();
         yield from $this->looksLikeMacAddress();
         yield from $this->trickyCasesProvider();
+        yield from $this->keepContentProvider();
+        yield from $this->replaceContentProvider();
     }
 
     public function datesProvider(): iterable
@@ -618,6 +620,22 @@ class NumberProtectorTest extends TestCase
         ];
     }
 
+    public function keepContentProvider(): iterable
+    {
+        yield [
+            'string' => 'string KEEP TEXT string',
+            'expected' => 'string <number type="keep-content" name="default" source="KEEP TEXT" iso="KEEP TEXT" target="KEEP TEXT"/> string',
+        ];
+    }
+
+    public function replaceContentProvider(): iterable
+    {
+        yield [
+            'string' => 'string REPLACE TEXT string',
+            'expected' => 'string <number type="replace-content" name="default" source="REPLACE TEXT" iso="OTHER TEXT:REPLACE TEXT" target="OTHER TEXT"/> string',
+        ];
+    }
+
     public function trickyCasesProvider(): iterable
     {
         yield [
@@ -702,12 +720,35 @@ class NumberProtectorTest extends TestCase
 
                 yield ContentProtectionDto::fromRow($formatData);
             }
+
+            yield new ContentProtectionDto(
+                'keep-content',
+                'default',
+                '/KEEP TEXT/',
+                0,
+                null,
+                true,
+                null,
+                0
+            );
+
+            yield new ContentProtectionDto(
+                'replace-content',
+                'default',
+                '/REPLACE TEXT/',
+                0,
+                'REPLACE TEXT',
+                true,
+                'OTHER TEXT',
+                0
+            );
         };
 
         $numberRepository = $this->createConfiguredMock(
             ContentProtectionRepository::class,
             [
                 'getAllForSource' => $getAll($select),
+                'hasActiveTextRules' => true,
             ]
         );
 

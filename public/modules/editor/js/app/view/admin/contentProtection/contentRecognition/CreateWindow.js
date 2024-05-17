@@ -84,6 +84,10 @@ Ext.define('Editor.view.admin.contentProtection.contentRecognition.CreateWindow'
                                     type: 'ip-address'
                                 },{
                                     type: 'mac-address'
+                                }, {
+                                    type: 'keep-content'
+                                }, {
+                                    type: 'replace-content'
                                 }]
                             },
                             listeners: {
@@ -94,11 +98,11 @@ Ext.define('Editor.view.admin.contentProtection.contentRecognition.CreateWindow'
                                     formatFld.hide();
                                     keepAsIsFld.hide();
 
-                                    if (['date', 'float', 'integer'].includes(newValue)) {
+                                    if (['date', 'float', 'integer', 'replace-content'].includes(newValue)) {
                                         formatFld.show();
                                     }
 
-                                    if (!['ip-address', 'mac-address'].includes(newValue)) {
+                                    if (!['ip-address', 'mac-address', 'keep-content', 'replace-content'].includes(newValue)) {
                                         keepAsIsFld.show();
                                     }
                                 }

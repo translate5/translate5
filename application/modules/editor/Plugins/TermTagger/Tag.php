@@ -25,8 +25,9 @@ START LICENSE AND COPYRIGHT
 
 END LICENSE AND COPYRIGHT
 */
-use editor_Plugins_TermTagger_QualityProvider as QualityProvider;
 use editor_Models_Terminology_Models_TermModel as TermModel;
+use editor_Plugins_TermTagger_QualityProvider as QualityProvider;
+
 /**
  * Represents a termtagger segment tag
  */
@@ -37,6 +38,13 @@ class editor_Plugins_TermTagger_Tag extends editor_Segment_Tag
      * @var string
      */
     public const TYPE = 'term';
+
+    /**
+     * Prefix for statuses of best target terms we have in terminology db
+     * to be used instead of current or missing target terms in segment target
+     * to distinguish between source term statuses and their best translations statuses
+     */
+    public const BEST_TRANS_STATUS_PREFIX = 'better-translate-with-';
 
     /**
      * Our related term-id
@@ -55,17 +63,23 @@ class editor_Plugins_TermTagger_Tag extends editor_Segment_Tag
 
         // If translation for a source term is not found in target
         if ($isSourceField && ($byKeys[TermModel::TRANSSTAT_NOT_FOUND] ?? 0)) {
+            // Setup a prefix to distinguish between source term statuses and statuses of best possible translations
+            $pfx = self::BEST_TRANS_STATUS_PREFIX;
 
             // Setup quality based on term status
-                 if ($byKeys[TermModel::STAT_ADMITTED]     ?? 0) return QualityProvider::NOT_FOUND_IN_TARGET_ADMITTED;
-            else if ($byKeys[TermModel::STAT_PREFERRED]    ?? 0) return QualityProvider::NOT_FOUND_IN_TARGET_PREFERRED;
-            else if ($byKeys[TermModel::STAT_STANDARDIZED] ?? 0) return QualityProvider::NOT_FOUND_IN_TARGET_STANDARDIZED;
-            else                                                 return QualityProvider::NOT_FOUND_IN_TARGET_OTHERS;
+            if ($byKeys[$pfx . TermModel::STAT_ADMITTED] ?? 0) {
+                return QualityProvider::NOT_FOUND_IN_TARGET_ADMITTED;
+            } elseif ($byKeys[$pfx . TermModel::STAT_PREFERRED] ?? 0) {
+                return QualityProvider::NOT_FOUND_IN_TARGET_PREFERRED;
+            } elseif ($byKeys[$pfx . TermModel::STAT_STANDARDIZED] ?? 0) {
+                return QualityProvider::NOT_FOUND_IN_TARGET_STANDARDIZED;
+            } else {
+                return QualityProvider::NOT_FOUND_IN_TARGET_OTHERS;
+            }
         }
 
         foreach ($cssClasses as $cssClass) {
             switch ($cssClass) {
-
                 case TermModel::TRANSSTAT_NOT_DEFINED:
                     if ($isSourceField) {
                         return QualityProvider::NOT_DEFINED_IN_TARGET;

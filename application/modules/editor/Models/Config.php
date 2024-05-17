@@ -221,6 +221,7 @@ class editor_Models_Config extends ZfExtended_Models_Config
     /**
      * Load all task specific config with customer specific base. The base customer is the task customer.
      * The result array keys are set from the config name.
+     *
      * @throws ZfExtended_Models_Entity_NotFoundException|ReflectionException
      */
     public function mergeTaskValues(
@@ -309,12 +310,14 @@ class editor_Models_Config extends ZfExtended_Models_Config
      *
      * @param array $dbResults
      * @return array
+     * @throws ReflectionException
+     * @throws ZfExtended_ErrorCodeException
+     * @throws ZfExtended_Models_Entity_NotFoundException
      */
     public function mergeInstanceValue(array $dbResults = [], bool $accessRestricted = false): array
     {
         if (empty($dbResults)) {
-            $user = ZfExtended_Factory::get('ZfExtended_Models_User');
-            /* @var $user ZfExtended_Models_User */
+            $user = ZfExtended_Factory::get(ZfExtended_Models_User::class);
             $user->load(ZfExtended_Authentication::getInstance()->getUserId());
             //get all application config level for the user
             $levels = [];

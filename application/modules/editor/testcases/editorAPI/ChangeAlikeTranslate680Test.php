@@ -194,6 +194,7 @@ class ChangeAlikeTranslate680Test extends editor_Test_JsonTest
             ->addTask('en', 'de')
             ->setProperty('enableSourceEditing', static::$useSourceEditing)
             ->addUploadData(static::createImportArray(static::$dummyData))
+            ->addTaskConfig('runtimeOptions.import.fileparser.csv.active', '1')
             ->addTaskConfig('runtimeOptions.import.fileparser.options.protectTags', '1')
             ->setToEditAfterImport();
     }

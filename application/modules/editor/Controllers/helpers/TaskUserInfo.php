@@ -233,7 +233,7 @@ class Editor_Controller_Helper_TaskUserInfo extends Zend_Controller_Action_Helpe
         }
         if (! empty($row['userTracking'])) {
             foreach ($row['userTracking'] as &$rowTrack) {
-                $rowTrack = $this->workflowAnonymize->anonymizeUserdata($taskGuid, $rowTrack['userGuid'], $rowTrack);
+                $rowTrack = $this->workflowAnonymize->anonymizeUserdata($taskGuid, $rowTrack['userGuid'] ?? '', $rowTrack);
             }
         }
         if (! empty($row['users'])) {

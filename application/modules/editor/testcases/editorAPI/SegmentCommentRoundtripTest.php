@@ -44,6 +44,7 @@ class SegmentCommentRoundtripTest extends editor_Test_JsonTest
 
     protected static function setupImport(Config $config): void
     {
+        Zend_Registry::get('PluginManager')->setActive('TrackChanges', false);
         $config
             ->addTask('en', 'de')
             ->addUploadFolder('testfiles')

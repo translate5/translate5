@@ -87,10 +87,9 @@ Ext.define('Editor.view.segments.grid.ToolbarViewController', {
             scope: me,
             success: function(xhr){
                 if (opName.match('lock')) {
-                    var json = xhr.responseJson;
-                    Editor.app.getController('Segments').updateSegmentFinishCountViewModel(
-                        json.taskProgress, json.userProgress
-                    );
+                    var json = xhr.responseJson, segmentsCtrl = Editor.app.getController('Segments');
+                    segmentsCtrl.updateSegmentFinishCountViewModel(json.taskProgress, json.userProgress);
+                    segmentsCtrl.fireEvent('segmentLockToggled', true);
                 }
                 grid.store.load({
                     callback: function(){

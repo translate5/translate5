@@ -84,6 +84,10 @@ Ext.define('Editor.view.admin.contentProtection.inputMapping.CreateWindow', {
                                     type: 'ip-address'
                                 },{
                                     type: 'mac-address'
+                                }, {
+                                    type: 'keep-content'
+                                }, {
+                                    type: 'replace-content'
                                 }]
                             },
                             listeners: {

@@ -86,8 +86,8 @@ abstract class editor_Models_Export_DiffTagger
     /**
      * zeichnet ein einzelnes Segment aus
      *
-     * @param array $target bereits in die Ursprungssyntax zurückgebautes target-Segment
-     * @param array $edited bereits in die Ursprungssyntax zurückgebautes editiertes target-Segment (edited-Spalte)
+     * @param string $target bereits in die Ursprungssyntax zurückgebautes target-Segment
+     * @param string $edited bereits in die Ursprungssyntax zurückgebautes editiertes target-Segment (edited-Spalte)
      * @param string $changeTimestamp Zeitpunkt der letzten Änderung des Segments
      * @param string $userName Benutzername des Lektors
      * @return string $edited mit diff-Syntax fertig ausgezeichnet

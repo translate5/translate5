@@ -74,8 +74,11 @@ class editor_Models_SegmentQuality extends ZfExtended_Models_Entity_Abstract
     /**
      * Fetch spell check data for given segments ids
      */
-    public function getSpellCheckData(array $segmentIds)
+    public function getSpellCheckData(array $segmentIds): array
     {
+        if (empty($segmentIds)) {
+            return [];
+        }
         // Get spell check data
         $_data = $this->db->getAdapter()->query('
             SELECT 
@@ -87,12 +90,13 @@ class editor_Models_SegmentQuality extends ZfExtended_Models_Entity_Abstract
               JSON_EXTRACT(`additionalData`, "$.matchIndex") AS `matchIndex`
             FROM `LEK_segment_quality` 
             WHERE 1
-              AND `segmentId` IN (' . join(',', $segmentIds ?: [0]) . ')
+              AND `segmentId` IN (' . join(',', $segmentIds) . ')
               AND `type` = "spellcheck"
             ORDER BY `segmentId`, `field`, `matchIndex`
         ')->fetchAll();
 
         // Group by `segmentId` and `field`
+        $data = [];
         foreach ($_data as $_item) {
             $additionalData = json_decode($_item['additionalData']);
             $additionalData->id = (int) $_item['id'];
@@ -107,7 +111,7 @@ class editor_Models_SegmentQuality extends ZfExtended_Models_Entity_Abstract
         }
 
         // Return spell check data
-        return $data ?? [];
+        return $data;
     }
 
     /**

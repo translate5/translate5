@@ -33,7 +33,6 @@ use MittagQI\Translate5\Test\Import\Config;
  */
 class RelaisImportTest extends editor_Test_JsonTest
 {
-
     protected static bool $termtaggerRequired = true;
 
     protected static array $requiredPlugins = [
@@ -50,6 +49,7 @@ class RelaisImportTest extends editor_Test_JsonTest
         $config
             ->addTask('de', 'en')
             ->addUploadFolder('testfiles')
+            ->addTaskConfig('runtimeOptions.import.fileparser.csv.active', '1')
             ->addProperty('relaisLang', 'it')
             ->setToEditAfterImport();
     }
@@ -104,7 +104,7 @@ class RelaisImportTest extends editor_Test_JsonTest
         $this->assertEquals($expected, $relais, 'Relais columns not filled as expected!');
 
         //the following checks are only to ensure that the imported content contains terminology
-        $targetSource = 'Das ist eine rotes <div title="" class="term standardizedTerm lowercase transFound" data-tbxid="term_06_1_de_1_00013">Haus</div>';
+        $targetSource = 'Das ist eine rotes <div title="" class="term standardizedTerm lowercase transNotFound better-translate-with-standardizedTerm" data-tbxid="term_06_1_de_1_00013">Haus</div>';
         $this->assertFieldTextEquals($targetSource, $segments[0]['source'], 'Imported Source is not as expected!');
         $targetEdit = 'This is <div title="" class="term preferredTerm exact" data-tbxid="term_03_1_en_1_00006">a</div> red <div title="" class="term preferredTerm exact" data-tbxid="term_05_1_en_1_00011a">house</div>';
         $this->assertFieldTextEquals($targetEdit, $segments[0]['targetEdit'], 'Imported Target is not as expected!');
