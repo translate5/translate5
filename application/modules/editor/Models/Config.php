@@ -221,6 +221,7 @@ class editor_Models_Config extends ZfExtended_Models_Config
     /**
      * Load all task specific config with customer specific base. The base customer is the task customer.
      * The result array keys are set from the config name.
+     *
      * @throws ZfExtended_Models_Entity_NotFoundException|ReflectionException
      */
     public function mergeTaskValues(

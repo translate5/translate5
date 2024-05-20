@@ -139,6 +139,10 @@ class TmConversionService
             return null === $hash;
         }
 
+        if (null === $hash) {
+            $hash = md5('');
+        }
+
         return $this->languageRulesHashMap[$languages['source']][$languages['target']] === $hash;
     }
 

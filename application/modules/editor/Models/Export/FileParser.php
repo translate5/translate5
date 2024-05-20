@@ -264,7 +264,7 @@ abstract class editor_Models_Export_FileParser
 
             $file[$i] = $this->getSegmentContent($matches[1], $field);
 
-            $file = $this->writeMatchRate($file, $i);
+            $file = $this->writeBySegmentMetadata($file, $i);
 
             if ($this->config->runtimeOptions->editor->export->exportComments) {
                 $file[$i] = $this->injectComments($matches[1], $file[$i], $field);
@@ -301,11 +301,16 @@ abstract class editor_Models_Export_FileParser
      * for overwriting purposes only
      * @param array $file that contains file as array as splitted by parse function
      * @param int $i position of current segment in the file array
-     * @return string
+     * @return array
      */
     protected function writeMatchRate(array $file, int $i)
     {
         return $file;
+    }
+
+    protected function writeBySegmentMetadata(array $file, int $i): array
+    {
+        return $this->writeMatchRate($file, $i);
     }
 
     /**
@@ -369,9 +374,9 @@ abstract class editor_Models_Export_FileParser
         $this->lastSegmentLength = $segment->textLengthByMeta(
             $edited,
             $segmentMeta,
-            $segment->getFileId(),
+            (int) $segment->getFileId(),
             str_contains($field, editor_Models_SegmentField::TYPE_SOURCE)
-        ) + $segmentMeta->getAdditionalMrkLength();
+        ) + (int) $segmentMeta->getAdditionalMrkLength();
 
         $edited = $this->parseSegment($edited);
         $edited = $this->revertNonBreakingSpaces($edited);

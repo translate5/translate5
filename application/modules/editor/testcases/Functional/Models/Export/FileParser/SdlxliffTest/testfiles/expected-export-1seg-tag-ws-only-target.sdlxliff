@@ -1,0 +1,1638 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xliff xmlns:sdl="http://sdl.com/FileTypes/SdlXliff/1.0" xmlns="urn:oasis:names:tc:xliff:document:1.2" version="1.2"
+       sdl:version="1.0">
+    <doc-info xmlns="http://sdl.com/FileTypes/SdlXliff/1.0">
+        <rep-defs>
+            <rep-def id="FDJ9ZMQ6eGAkkR9GQKFLCA+b8q8=">
+                <entry tu="56d24786-72c4-4d6d-95ed-2334d79a49c4" seg="1"/>
+                <entry tu="92ee0382-dea4-428a-86ce-cfe3cc10a049" seg="3"/>
+                <entry tu="eafd837e-9bfc-4683-bd7c-0e4ce454ecf2" seg="6"/>
+            </rep-def>
+            <rep-def id="F+KtvotZXwMiLdgQQhumlMucL24=">
+                <entry tu="d5df43d6-c28d-4b16-89e0-e2858fc11339" seg="2"/>
+                <entry tu="e650d016-06e5-4830-b6ab-f8d6920ca337" seg="4"/>
+                <entry tu="0bc73b81-d46a-42d7-b346-07271047fc33" seg="7"/>
+            </rep-def>
+            <rep-def id="K0Kw834JrnjytIJxQjik2di6NGo=">
+                <entry tu="5a5ae329-5d33-4bd7-99f0-daf574eeca97" seg="10"/>
+                <entry tu="7a3af9be-93ae-43a0-a03a-4847c65dd6ae" seg="11"/>
+                <entry tu="99b55856-a461-43bb-a98a-6c85c3c27939" seg="12"/>
+            </rep-def>
+            <rep-def id="ZKNHMH5LuAF92E/fVnyDSe2YmOA=">
+                <entry tu="d38b6441-b925-40dd-8324-e81a49f6bc04" seg="31"/>
+                <entry tu="7fc7b087-e84b-4c55-b519-e4fbdb209c23" seg="46"/>
+            </rep-def>
+        </rep-defs>
+        <rev-defs>
+            <rev-def id="3f9ef39b-6491-4b5b-9b21-19b211f76ef5" author="Beate  Broghammer " date="02/26/2024 17:00:16"/>
+            <rev-def id="96eb2aa1-3908-4fbd-a3a4-f86cbda8aaa4" type="Delete" author="Beate  Broghammer "
+                     date="02/26/2024 17:00:16"/>
+            <rev-def id="a3e88f26-497a-4228-b09c-d5a2cc92db46" author="Beate  Broghammer " date="02/26/2024 17:00:16"/>
+            <rev-def id="acb3a6ea-e82e-4d12-8816-a8cddb866de6" type="Delete" author="Beate  Broghammer "
+                     date="02/26/2024 17:00:16"/>
+            <rev-def id="e7f0a0b3-e28a-415b-a3bc-88f0ee2c965e" author="Beate  Broghammer " date="02/26/2024 17:00:16"/>
+            <rev-def id="df7fc57e-1559-42f4-ac6c-a20651356dd5" type="Delete" author="Beate  Broghammer "
+                     date="02/26/2024 17:00:16"/>
+            <rev-def id="f0d0b7f3-38ae-4ae3-bcf7-fdbf48cefaec" author="Beate  Broghammer " date="02/26/2024 17:00:16"/>
+            <rev-def id="1a2fce73-68a6-4089-9127-c4ad85c959a7" type="Delete" author="Beate  Broghammer "
+                     date="02/26/2024 17:00:16"/>
+            <rev-def id="eddaae7a-bff0-4bef-b85c-2e10f42df791" author="Beate  Broghammer " date="02/26/2024 17:00:16"/>
+            <rev-def id="562e05e7-3151-45cd-9590-5dbfa52d99c3" type="Delete" author="Beate  Broghammer "
+                     date="02/26/2024 17:00:16"/>
+            <rev-def id="7609c31c-de5f-42a9-b880-7cf048da0dd7" author="translate5" date="03/12/2024 15:44:07"/>
+            <rev-def id="7d999e52-8709-41d4-96cc-54dd60f27d62" author="translate5" date="03/12/2024 15:43:39"/>
+            <rev-def id="7facf155-2992-4d6e-adfc-5b0b2a7bc066" type="Delete" author="Beate  Broghammer "
+                     date="02/26/2024 16:55:30"/>
+            <rev-def id="c1ff33c9-0dfd-42b8-8345-4ae2034b9aa5" author="Beate  Broghammer " date="02/26/2024 16:55:30"/>
+            <rev-def id="9e548d78-1a49-4ed0-a9df-127cf4151740" type="Delete" author="Beate  Broghammer "
+                     date="02/26/2024 16:55:30"/>
+            <rev-def id="6b12a6a8-2378-4d89-bccb-02520ff4c717" author="translate5" date="03/12/2024 15:43:44"/>
+            <rev-def id="4a71f4f5-5253-4294-a9e3-5c44bb7078e6" type="Delete" author="Beate  Broghammer "
+                     date="02/26/2024 16:55:30"/>
+            <rev-def id="279de9e7-5636-417f-a6e8-c4b92dbf3306" author="translate5" date="03/12/2024 15:45:12"/>
+            <rev-def id="4476c4c0-dc1e-4c31-bdf4-a519fc572c72" type="Delete" author="translate5"
+                     date="03/12/2024 15:45:06"/>
+            <rev-def id="3fbc905d-e5e1-4bdc-9450-e5112640ce90" type="Delete" author="translate5"
+                     date="03/12/2024 15:45:25"/>
+            <rev-def id="f0bc5254-3271-4260-b50a-eb8b8b8b7642" author="translate5" date="03/12/2024 15:45:27"/>
+            <rev-def id="88f25986-290d-46cb-9921-d5e98eddd424" type="Delete" author="Beate  Broghammer "
+                     date="02/26/2024 15:00:23"/>
+            <rev-def id="ebcedece-58c4-4bbd-9b3e-0cbeae847b4b" author="Beate  Broghammer " date="02/26/2024 15:00:23"/>
+            <rev-def id="25cdf394-0d77-4e84-85d1-a22b0df8963b" type="Delete" author="Beate  Broghammer "
+                     date="02/26/2024 15:00:23"/>
+            <rev-def id="1bce6672-7095-4d99-a250-0076394bfdb7" author="Beate  Broghammer " date="02/26/2024 15:01:03"/>
+            <rev-def id="94bc20d2-2053-43f8-bd2c-5082947f00e4" type="Delete" author="Beate  Broghammer "
+                     date="02/26/2024 15:01:03"/>
+            <rev-def id="0678ec91-a02f-4a1a-8924-8c2df26f84be" author="translate5" date="03/12/2024 15:46:51"/>
+            <rev-def id="0e3007b6-5aea-47f8-b99d-57317c3fed9e" type="Delete" author="translate5"
+                     date="03/12/2024 15:46:51"/>
+        </rev-defs>
+        <cmt-defs>
+            <cmt-def id="da363102-dca6-4a9e-aa70-667f91b8d030">
+                <Comments>
+                    <Comment severity="Low" user="translate5" date="2024-03-12T15:46:00.8133772+00:00" version="1.0">and
+                        a comment for Sasha!
+                    </Comment>
+                </Comments>
+            </cmt-def>
+            <cmt-def id="d3b9eec9-688e-4b1d-82eb-a9942dd688f9">
+                <Comments>
+                    <Comment severity="Low" user="translate5" date="2024-03-12T15:46:34.1152902+00:00" version="1.0">and
+                        another comment for Sasha
+                    </Comment>
+                </Comments>
+            </cmt-def>
+        </cmt-defs>
+    </doc-info>
+    <file original="\\ONEWORD-PNA01\PLUNET\order\O-2400668\trados\en-US\49-157-13_AXO_Magazin_2024_EN_10_eder_umschlag_ToTrans.idml"
+          datatype="x-sdlfilterframework2" source-language="en-US" target-language="de-DE">
+        <header>
+            <reference>
+                <internal-file form="base64">
+                    UEsDBBQAAAAIAAVnUFjPYiCzK1MBAFpaAQARAAAAaXd1bjRhaXkuZXlmLmlkbWyMeVVUG1wTbVuk
+                    OBR3ikOxosEp7k5xCE6x4C4pxUpxKG4tFGjx4u6uBYo7AQIE90ACl37/y71v9+GslZW1MnP2zJnZ
+                    eyZaqiioxM+eYTx7RvpBy3DUJyGa49mzZ//O01fPXBxcbL383Wwt3dycHawtvRxcQTw+IBtuSxtX
+                    K1tuB5CNraeDPYjLwcbFmcvN0trJ0t72fwZfYGD8Z3APU4dUjuDZs186z57hPhn83w9cLN24/Vyc
+                </internal-file>
+            </reference>
+            <sdl:ref-files>
+                <sdl:ref-file uid="0" id="http://www.sdl.com/Sdl.FileTypeSupport.Filters.Idml/OriginalFile"
+                              name="1ndofncr.o0n.idml"
+                              o-path="\\ONEWORD-PNA01\PLUNET\order\O-2400668\trados\en-US\49-157-13_AXO_Magazin_2024_EN_10_eder_umschlag_ToTrans.idml"
+                              date="02/16/2024 12:56:10" descr="Original file before conversion."
+                              expected-use="Generation"/>
+            </sdl:ref-files>
+            <file-info xmlns="http://sdl.com/FileTypes/SdlXliff/1.0">
+                <value key="SDL:FileId">edce5922-59e0-461e-a719-958337a58bf2</value>
+                <value key="SDL:CreationDate">02/16/2024 15:29:26</value>
+                <value key="SDL:OriginalFilePath">
+                    \\ONEWORD-PNA01\PLUNET\order\O-2400668\trados\en-US\49-157-13_AXO_Magazin_2024_EN_10_eder_umschlag_ToTrans.idml
+                </value>
+                <value key="SDL:FileTypeDllVersion">1.9.9.0</value>
+                <value key="SDL:QuickInsertsList">
+                    qBold;qItalic;qUnderline;qSubscript;qSuperscript;qSmallCaps;qNoBold;qNoItalic;qNoUnderline;qNoSuperscript;qNoSubscript;qNoSmallCaps
+                </value>
+                <value key="ProcessFileInfo">Partial</value>
+                <value key="DisplayHiddenConditionalText">False</value>
+                <value key="SkipTrackingKerningInformation">False</value>
+                <value key="DisplayFootnoteOption">False</value>
+                <value key="SDL:AutoClonedFlagSupported">True</value>
+                <value key="FirstPageId">u738c7</value>
+                <value key="ParagraphTextDirections"></value>
+                <sniff-info>
+                    <detected-source-lang detection-level="Guess" lang="en-US"/>
+                </sniff-info>
+            </file-info>
+            <sdl:filetype-info>
+                <sdl:filetype-id>IDML v 1.0.0.0</sdl:filetype-id>
+            </sdl:filetype-info>
+            <fmt-defs xmlns="http://sdl.com/FileTypes/SdlXliff/1.0">
+                <fmt-def id="1">
+                    <value key="FontSize">7.8</value>
+                    <value key="FontName">FuturaTOT</value>
+                    <value key="TextColor">White</value>
+                </fmt-def>
+                <fmt-def id="2">
+                    <value key="TextColor">Black</value>
+                </fmt-def>
+                <fmt-def id="3">
+                    <value key="FontSize">8</value>
+                    <value key="FontName">FuturaTOTLig</value>
+                    <value key="TextColor">White</value>
+                </fmt-def>
+                <fmt-def id="4">
+                    <value key="FontSize">11</value>
+                    <value key="FontName">FuturaTOTMed</value>
+                    <value key="TextColor">Black</value>
+                </fmt-def>
+                <fmt-def id="5">
+                    <value key="FontSize">9</value>
+                    <value key="FontName">FuturaTOTMed</value>
+                    <value key="TextColor">179, 139, 111</value>
+                </fmt-def>
+                <fmt-def id="6">
+                    <value key="FontSize">11</value>
+                    <value key="FontName">FuturaTOTMed</value>
+                    <value key="TextColor">White</value>
+                </fmt-def>
+                <fmt-def id="7">
+                    <value key="FontSize">13</value>
+                    <value key="TextColor">Black</value>
+                </fmt-def>
+                <fmt-def id="8">
+                    <value key="FontSize">9</value>
+                    <value key="FontName">FuturaTOT</value>
+                    <value key="TextColor">Black</value>
+                </fmt-def>
+                <fmt-def id="9">
+                    <value key="FontSize">13</value>
+                    <value key="FontName">FuturaTOT</value>
+                </fmt-def>
+                <fmt-def id="10">
+                    <value key="FontSize">15</value>
+                </fmt-def>
+                <fmt-def id="11">
+                    <value key="FontSize">11</value>
+                    <value key="TextColor">Black</value>
+                </fmt-def>
+                <fmt-def id="12">
+                    <value key="FontSize">11</value>
+                    <value key="FontName">FuturaTOT</value>
+                    <value key="TextColor">Black</value>
+                </fmt-def>
+                <fmt-def id="13">
+                    <value key="FontSize">7.8</value>
+                    <value key="FontName">FuturaTOT</value>
+                    <value key="TextColor">Black</value>
+                </fmt-def>
+                <fmt-def id="14">
+                    <value key="TextColor">White</value>
+                </fmt-def>
+                <fmt-def id="15">
+                    <value key="FontSize">7</value>
+                    <value key="FontName">FuturaTOTMed</value>
+                    <value key="TextColor">White</value>
+                </fmt-def>
+                <fmt-def id="16">
+                    <value key="FontSize">9</value>
+                    <value key="FontName">FuturaTOT</value>
+                    <value key="TextColor">White</value>
+                </fmt-def>
+                <fmt-def id="17">
+                    <value key="FontSize">7.8</value>
+                    <value key="FontName">FuturaTOT</value>
+                    <value key="TextColor">179, 139, 111</value>
+                </fmt-def>
+                <fmt-def id="18">
+                    <value key="FontSize">8</value>
+                    <value key="TextColor">Black</value>
+                </fmt-def>
+                <fmt-def id="19">
+                    <value key="FontSize">9</value>
+                    <value key="FontName">FuturaTOT</value>
+                </fmt-def>
+                <fmt-def id="20">
+                    <value key="FontSize">7</value>
+                    <value key="FontName">FuturaTOTMed</value>
+                    <value key="TextColor">Black</value>
+                </fmt-def>
+                <fmt-def id="21">
+                    <value key="FontSize">7</value>
+                    <value key="TextColor">Black</value>
+                </fmt-def>
+                <fmt-def id="22">
+                    <value key="FontSize">7</value>
+                    <value key="FontName">FuturaTOTMed</value>
+                    <value key="TextColor">179, 139, 111</value>
+                </fmt-def>
+                <fmt-def id="23">
+                    <value key="FontSize">6</value>
+                    <value key="FontName">FuturaTOT</value>
+                    <value key="TextColor">White</value>
+                </fmt-def>
+            </fmt-defs>
+            <cxt-defs xmlns="http://sdl.com/FileTypes/SdlXliff/1.0">
+                <cxt-def id="1" type="Querverweisformat" code="XRF" name="Querverweisformat"
+                         descr="Querverweisformat-Baustein" color="SkyBlue">
+                    <props>
+                        <value key="id">u9e</value>
+                    </props>
+                </cxt-def>
+                <cxt-def id="2" type="Querverweisformate" code="XRS" name="Querverweisformate"
+                         descr="Liste mit Querverweisformaten" color="DeepSkyBlue"/>
+                <cxt-def id="3" type="Querverweisformat" code="XRF" name="Querverweisformat"
+                         descr="Querverweisformat-Baustein" color="SkyBlue">
+                    <props>
+                        <value key="id">u9f</value>
+                    </props>
+                </cxt-def>
+                <cxt-def id="4" type="Querverweisformat" code="XRF" name="Querverweisformat"
+                         descr="Querverweisformat-Baustein" color="SkyBlue">
+                    <props>
+                        <value key="id">ua0</value>
+                    </props>
+                </cxt-def>
+                <cxt-def id="5" type="Querverweisformat" code="XRF" name="Querverweisformat"
+                         descr="Querverweisformat-Baustein" color="SkyBlue">
+                    <props>
+                        <value key="id">ua1</value>
+                    </props>
+                </cxt-def>
+                <cxt-def id="6" type="Querverweisformat" code="XRF" name="Querverweisformat"
+                         descr="Querverweisformat-Baustein" color="SkyBlue">
+                    <props>
+                        <value key="id">ua2</value>
+                    </props>
+                </cxt-def>
+                <cxt-def id="7" type="Querverweisformat" code="XRF" name="Querverweisformat"
+                         descr="Querverweisformat-Baustein" color="SkyBlue">
+                    <props>
+                        <value key="id">ua3</value>
+                    </props>
+                </cxt-def>
+                <cxt-def id="8" type="Querverweisformat" code="XRF" name="Querverweisformat"
+                         descr="Querverweisformat-Baustein" color="SkyBlue">
+                    <props>
+                        <value key="id">ua4</value>
+                    </props>
+                </cxt-def>
+                <cxt-def id="9" type="Querverweisformat" code="XRF" name="Querverweisformat"
+                         descr="Querverweisformat-Baustein" color="SkyBlue">
+                    <props>
+                        <value key="id">ua5</value>
+                    </props>
+                </cxt-def>
+                <cxt-def id="10" type="Querverweisformat" code="XRF" name="Querverweisformat"
+                         descr="Querverweisformat-Baustein" color="SkyBlue">
+                    <props>
+                        <value key="id">ua6</value>
+                    </props>
+                </cxt-def>
+                <cxt-def id="11" type="sdl:table-of-contents-entry"/>
+                <cxt-def id="12" type="sdl:section">
+                    <props>
+                        <value key="id">ud4</value>
+                    </props>
+                </cxt-def>
+                <cxt-def id="13" type="x-tm-length-info" purpose="Match">
+                    <props>
+                        <value key="length_type">chars</value>
+                        <value key="length_max_value">8</value>
+                    </props>
+                </cxt-def>
+                <cxt-def id="14" type="sdl:section">
+                    <props>
+                        <value key="id">u73a65</value>
+                    </props>
+                </cxt-def>
+                <cxt-def id="15" type="sdl:section">
+                    <props>
+                        <value key="id">u73a8a</value>
+                    </props>
+                </cxt-def>
+                <cxt-def id="16" type="sdl:spread"/>
+                <cxt-def id="17" type="sdl:paragraph">
+                    <fmt id="1"/>
+                    <props>
+                        <value key="uniqueid">u73ae4_1</value>
+                        <value key="node">&lt;CharacterStyleRange AppliedCharacterStyle=&quot;CharacterStyle/$ID/[No
+                            character style]&quot;&gt;
+                        </value>
+                    </props>
+                </cxt-def>
+                <cxt-def id="18" type="sdl:paragraph">
+                    <fmt id="3"/>
+                    <props>
+                        <value key="uniqueid">u7394f_1</value>
+                        <value key="node">&lt;CharacterStyleRange AppliedCharacterStyle=&quot;CharacterStyle/AXOR_pos_Produktbeschreibung&quot;&gt;</value>
+                    </props>
+                </cxt-def>
+                <cxt-def id="19" type="sdl:paragraph">
+                    <fmt id="5"/>
+                    <props>
+                        <value key="uniqueid">u73966_1</value>
+                        <value key="node">&lt;CharacterStyleRange AppliedCharacterStyle=&quot;CharacterStyle/$ID/[No
+                            character style]&quot;&gt;
+                        </value>
+                    </props>
+                </cxt-def>
+                <cxt-def id="20" type="sdl:paragraph">
+                    <fmt id="6"/>
+                    <props>
+                        <value key="uniqueid">u73930_1</value>
+                        <value key="node">&lt;CharacterStyleRange AppliedCharacterStyle=&quot;CharacterStyle/Weiß&quot;&gt;</value>
+                    </props>
+                </cxt-def>
+                <cxt-def id="21" type="sdl:paragraph">
+                    <fmt id="6"/>
+                    <props>
+                        <value key="uniqueid">u73bf0_1</value>
+                        <value key="node">&lt;CharacterStyleRange AppliedCharacterStyle=&quot;CharacterStyle/Weiß&quot;&gt;</value>
+                    </props>
+                </cxt-def>
+                <cxt-def id="22" type="sdl:paragraph">
+                    <fmt id="5"/>
+                    <props>
+                        <value key="uniqueid">u738d4_1</value>
+                        <value key="node">&lt;CharacterStyleRange AppliedCharacterStyle=&quot;CharacterStyle/$ID/[No
+                            character style]&quot;&gt;
+                        </value>
+                    </props>
+                </cxt-def>
+                <cxt-def id="23" type="sdl:paragraph">
+                    <fmt id="12"/>
+                    <props>
+                        <value key="uniqueid">u73a8d_1</value>
+                        <value key="node">&lt;CharacterStyleRange AppliedCharacterStyle=&quot;CharacterStyle/Copy_11pt&quot;&gt;</value>
+                        <value key="ContextDefaultCode">P</value>
+                    </props>
+                </cxt-def>
+                <cxt-def id="24" type="sdl:paragraph">
+                    <fmt id="13"/>
+                    <props>
+                        <value key="uniqueid">u72dce_1</value>
+                        <value key="node">&lt;CharacterStyleRange AppliedCharacterStyle=&quot;CharacterStyle/Caption&quot;&gt;</value>
+                    </props>
+                </cxt-def>
+                <cxt-def id="25" type="sdl:paragraph">
+                    <fmt id="15"/>
+                    <props>
+                        <value key="uniqueid">u73b95_1</value>
+                        <value key="node">&lt;CharacterStyleRange AppliedCharacterStyle=&quot;CharacterStyle/$ID/[No
+                            character style]&quot;&gt;
+                        </value>
+                    </props>
+                </cxt-def>
+                <cxt-def id="26" type="sdl:paragraph">
+                    <fmt id="16"/>
+                    <props>
+                        <value key="uniqueid">u73b95_2</value>
+                        <value key="node">&lt;CharacterStyleRange AppliedCharacterStyle=&quot;CharacterStyle/$ID/[No
+                            character style]&quot;&gt;
+                        </value>
+                    </props>
+                </cxt-def>
+                <cxt-def id="27" type="sdl:paragraph">
+                    <fmt id="17"/>
+                    <props>
+                        <value key="uniqueid">u73b95_3</value>
+                        <value key="node">&lt;CharacterStyleRange AppliedCharacterStyle=&quot;CharacterStyle/$ID/[No
+                            character style]&quot;&gt;
+                        </value>
+                    </props>
+                </cxt-def>
+                <cxt-def id="28" type="sdl:paragraph">
+                    <fmt id="15"/>
+                    <props>
+                        <value key="uniqueid">u73b95_4</value>
+                        <value key="node">&lt;CharacterStyleRange AppliedCharacterStyle=&quot;CharacterStyle/$ID/[No
+                            character style]&quot;&gt;
+                        </value>
+                    </props>
+                </cxt-def>
+                <cxt-def id="29" type="sdl:paragraph">
+                    <fmt id="16"/>
+                    <props>
+                        <value key="uniqueid">u73b95_5</value>
+                        <value key="node">&lt;CharacterStyleRange AppliedCharacterStyle=&quot;CharacterStyle/$ID/[No
+                            character style]&quot;&gt;
+                        </value>
+                    </props>
+                </cxt-def>
+                <cxt-def id="30" type="sdl:paragraph">
+                    <fmt id="15"/>
+                    <props>
+                        <value key="uniqueid">u73b95_6</value>
+                        <value key="node">&lt;CharacterStyleRange AppliedCharacterStyle=&quot;CharacterStyle/$ID/[No
+                            character style]&quot;&gt;
+                        </value>
+                    </props>
+                </cxt-def>
+                <cxt-def id="31" type="sdl:paragraph">
+                    <fmt id="16"/>
+                    <props>
+                        <value key="uniqueid">u73b95_7</value>
+                        <value key="node">&lt;CharacterStyleRange AppliedCharacterStyle=&quot;CharacterStyle/$ID/[No
+                            character style]&quot;&gt;
+                        </value>
+                    </props>
+                </cxt-def>
+                <cxt-def id="32" type="sdl:paragraph">
+                    <fmt id="15"/>
+                    <props>
+                        <value key="uniqueid">u73b95_8</value>
+                        <value key="node">&lt;CharacterStyleRange AppliedCharacterStyle=&quot;CharacterStyle/$ID/[No
+                            character style]&quot;&gt;
+                        </value>
+                    </props>
+                </cxt-def>
+                <cxt-def id="33" type="sdl:paragraph">
+                    <fmt id="16"/>
+                    <props>
+                        <value key="uniqueid">u73b95_9</value>
+                        <value key="node">&lt;CharacterStyleRange AppliedCharacterStyle=&quot;CharacterStyle/$ID/[No
+                            character style]&quot;&gt;
+                        </value>
+                    </props>
+                </cxt-def>
+                <cxt-def id="34" type="sdl:paragraph">
+                    <fmt id="15"/>
+                    <props>
+                        <value key="uniqueid">u73b95_10</value>
+                        <value key="node">&lt;CharacterStyleRange AppliedCharacterStyle=&quot;CharacterStyle/$ID/[No
+                            character style]&quot;&gt;
+                        </value>
+                    </props>
+                </cxt-def>
+                <cxt-def id="35" type="sdl:paragraph">
+                    <fmt id="15"/>
+                    <props>
+                        <value key="uniqueid">u73b95_11</value>
+                        <value key="node">&lt;CharacterStyleRange AppliedCharacterStyle=&quot;CharacterStyle/$ID/[No
+                            character style]&quot;&gt;
+                        </value>
+                    </props>
+                </cxt-def>
+                <cxt-def id="36" type="sdl:paragraph">
+                    <fmt id="17"/>
+                    <props>
+                        <value key="uniqueid">u73b95_12</value>
+                        <value key="node">&lt;CharacterStyleRange AppliedCharacterStyle=&quot;CharacterStyle/$ID/[No
+                            character style]&quot;&gt;
+                        </value>
+                    </props>
+                </cxt-def>
+                <cxt-def id="37" type="sdl:paragraph">
+                    <fmt id="15"/>
+                    <props>
+                        <value key="uniqueid">u73b95_13</value>
+                        <value key="node">&lt;CharacterStyleRange AppliedCharacterStyle=&quot;CharacterStyle/$ID/[No
+                            character style]&quot;&gt;
+                        </value>
+                    </props>
+                </cxt-def>
+                <cxt-def id="38" type="sdl:paragraph">
+                    <fmt id="17"/>
+                    <props>
+                        <value key="uniqueid">u73b95_14</value>
+                        <value key="node">&lt;CharacterStyleRange AppliedCharacterStyle=&quot;CharacterStyle/$ID/[No
+                            character style]&quot;&gt;
+                        </value>
+                    </props>
+                </cxt-def>
+                <cxt-def id="39" type="sdl:paragraph">
+                    <fmt id="16"/>
+                    <props>
+                        <value key="uniqueid">u73b95_15</value>
+                        <value key="node">&lt;CharacterStyleRange AppliedCharacterStyle=&quot;CharacterStyle/$ID/[No
+                            character style]&quot;&gt;
+                        </value>
+                    </props>
+                </cxt-def>
+                <cxt-def id="40" type="sdl:paragraph">
+                    <fmt id="17"/>
+                    <props>
+                        <value key="uniqueid">u73b95_16</value>
+                        <value key="node">&lt;CharacterStyleRange AppliedCharacterStyle=&quot;CharacterStyle/$ID/[No
+                            character style]&quot;&gt;
+                        </value>
+                    </props>
+                </cxt-def>
+                <cxt-def id="41" type="sdl:paragraph">
+                    <fmt id="15"/>
+                    <props>
+                        <value key="uniqueid">u73b95_17</value>
+                        <value key="node">&lt;CharacterStyleRange AppliedCharacterStyle=&quot;CharacterStyle/$ID/[No
+                            character style]&quot;&gt;
+                        </value>
+                    </props>
+                </cxt-def>
+                <cxt-def id="42" type="sdl:paragraph">
+                    <fmt id="16"/>
+                    <props>
+                        <value key="uniqueid">u73b95_18</value>
+                        <value key="node">&lt;CharacterStyleRange AppliedCharacterStyle=&quot;CharacterStyle/$ID/[No
+                            character style]&quot;&gt;
+                        </value>
+                    </props>
+                </cxt-def>
+                <cxt-def id="43" type="sdl:paragraph">
+                    <fmt id="15"/>
+                    <props>
+                        <value key="uniqueid">u73b95_19</value>
+                        <value key="node">&lt;CharacterStyleRange AppliedCharacterStyle=&quot;CharacterStyle/$ID/[No
+                            character style]&quot;&gt;
+                        </value>
+                    </props>
+                </cxt-def>
+                <cxt-def id="44" type="sdl:paragraph">
+                    <fmt id="16"/>
+                    <props>
+                        <value key="uniqueid">u73b95_20</value>
+                        <value key="node">&lt;CharacterStyleRange AppliedCharacterStyle=&quot;CharacterStyle/$ID/[No
+                            character style]&quot;&gt;
+                        </value>
+                    </props>
+                </cxt-def>
+                <cxt-def id="45" type="sdl:paragraph">
+                    <fmt id="17"/>
+                    <props>
+                        <value key="uniqueid">u73b95_21</value>
+                        <value key="node">&lt;CharacterStyleRange AppliedCharacterStyle=&quot;CharacterStyle/$ID/[No
+                            character style]&quot;&gt;
+                        </value>
+                    </props>
+                </cxt-def>
+                <cxt-def id="46" type="sdl:paragraph">
+                    <fmt id="15"/>
+                    <props>
+                        <value key="uniqueid">u73b95_22</value>
+                        <value key="node">&lt;CharacterStyleRange AppliedCharacterStyle=&quot;CharacterStyle/$ID/[No
+                            character style]&quot;&gt;
+                        </value>
+                    </props>
+                </cxt-def>
+                <cxt-def id="47" type="sdl:paragraph">
+                    <fmt id="16"/>
+                    <props>
+                        <value key="uniqueid">u73b95_23</value>
+                        <value key="node">&lt;CharacterStyleRange AppliedCharacterStyle=&quot;CharacterStyle/$ID/[No
+                            character style]&quot;&gt;
+                        </value>
+                    </props>
+                </cxt-def>
+                <cxt-def id="48" type="sdl:paragraph">
+                    <fmt id="22"/>
+                    <props>
+                        <value key="uniqueid">u73b7e_1</value>
+                        <value key="node">&lt;CharacterStyleRange AppliedCharacterStyle=&quot;CharacterStyle/$ID/[No
+                            character style]&quot;&gt;
+                        </value>
+                    </props>
+                </cxt-def>
+                <cxt-def id="49" type="sdl:paragraph">
+                    <fmt id="23"/>
+                    <props>
+                        <value key="uniqueid">u73bac_1</value>
+                        <value key="node">&lt;CharacterStyleRange AppliedCharacterStyle=&quot;CharacterStyle/$ID/[No
+                            character style]&quot;&gt;
+                        </value>
+                    </props>
+                </cxt-def>
+                <cxt-def id="50" type="Titel" code="IDX" name="Titel" descr="Index-Überschrift" color="">
+                    <props>
+                        <value key="node">Index-Überschrift</value>
+                    </props>
+                </cxt-def>
+            </cxt-defs>
+            <node-defs xmlns="http://sdl.com/FileTypes/SdlXliff/1.0">
+                <node-def id="1">
+                    <cxt id="2"/>
+                </node-def>
+                <node-def id="2">
+                    <cxt id="16"/>
+                </node-def>
+                <node-def id="3" parent="2">
+                    <cxt id="23"/>
+                </node-def>
+            </node-defs>
+            <tag-defs xmlns="http://sdl.com/FileTypes/SdlXliff/1.0">
+                <tag id="20">
+                    <bpt name="prefix" word-end="false">&lt;prefix&gt;</bpt>
+                    <ept name="prefix" word-end="false">&lt;/prefix&gt;</ept>
+                </tag>
+                <tag id="21">
+                    <bpt name="prefix" word-end="false">&lt;prefix&gt;</bpt>
+                    <ept name="prefix" word-end="false">&lt;/prefix&gt;</ept>
+                </tag>
+                <tag id="22">
+                    <bpt name="prefix" word-end="false">&lt;prefix&gt;</bpt>
+                    <ept name="prefix" word-end="false">&lt;/prefix&gt;</ept>
+                </tag>
+                <tag id="25">
+                    <bpt name="cf" word-end="false">&lt;cf nfa=&quot;true&quot;&gt;</bpt>
+                    <bpt-props>
+                        <value key="node">&lt;CharacterStyleRange AppliedCharacterStyle=&quot;CharacterStyle/$ID/[No
+                            character style]&quot; FillColor=&quot;Color/Black&quot;&gt;
+                        </value>
+                        <value key="SDL:AutoCloned">True</value>
+                    </bpt-props>
+                    <ept name="cf" word-end="false">&lt;/cf&gt;</ept>
+                    <fmt id="2"/>
+                </tag>
+                <tag id="29">
+                    <bpt name="AXOR_pos_Produktbeschreibung" word-end="false">&lt;cf size=&quot;11&quot; font=&quot;FuturaTOTMed&quot;
+                        case=&quot;Normal&quot; nfa=&quot;true&quot;&gt;
+                    </bpt>
+                    <bpt-props>
+                        <value key="node">&lt;CharacterStyleRange AppliedCharacterStyle=&quot;CharacterStyle/AXOR_pos_Produktbeschreibung&quot;
+                            FillColor=&quot;Color/Black&quot; PointSize=&quot;11&quot; Tracking=&quot;0&quot;
+                            Capitalization=&quot;Normal&quot; StrokeColor=&quot;Swatch/None&quot; OverprintFill=&quot;true&quot;
+                            GradientFillAngle=&quot;180&quot; GradientFillLength=&quot;470.55118110946796&quot;
+                            GradientFillStart=&quot;470.55118110946796 90.75000000000001&quot;&gt;
+                        </value>
+                        <value key="property">&lt;Properties&gt;
+                            &lt;Leading type=&quot;unit&quot;&gt;13&lt;/Leading&gt;
+                            &lt;AppliedFont type=&quot;string&quot;&gt;FuturaTOTMed&lt;/AppliedFont&gt;
+                            &lt;/Properties&gt;
+                        </value>
+                    </bpt-props>
+                    <ept name="AXOR_pos_Produktbeschreibung" word-end="false">&lt;/cf&gt;</ept>
+                    <fmt id="4"/>
+                </tag>
+                <tag id="30">
+                    <bpt name="AXOR_pos_Produktbeschreibung" word-end="false">&lt;cf size=&quot;11&quot; font=&quot;FuturaTOTMed&quot;
+                        case=&quot;Normal&quot; nfa=&quot;true&quot;&gt;
+                    </bpt>
+                    <bpt-props>
+                        <value key="node">&lt;CharacterStyleRange AppliedCharacterStyle=&quot;CharacterStyle/AXOR_pos_Produktbeschreibung&quot;
+                            FillColor=&quot;Color/Black&quot; PointSize=&quot;11&quot; Tracking=&quot;90&quot;
+                            Capitalization=&quot;Normal&quot; StrokeColor=&quot;Swatch/None&quot; OverprintFill=&quot;true&quot;
+                            GradientFillAngle=&quot;180&quot; GradientFillLength=&quot;470.55118110946796&quot;
+                            GradientFillStart=&quot;470.55118110946796 90.75000000000001&quot;&gt;
+                        </value>
+                        <value key="property">&lt;Properties&gt;
+                            &lt;Leading type=&quot;unit&quot;&gt;13&lt;/Leading&gt;
+                            &lt;AppliedFont type=&quot;string&quot;&gt;FuturaTOTMed&lt;/AppliedFont&gt;
+                            &lt;/Properties&gt;
+                        </value>
+                        <value key="SDL:AutoCloned">True</value>
+                    </bpt-props>
+                    <ept name="AXOR_pos_Produktbeschreibung" word-end="false">&lt;/cf&gt;</ept>
+                    <fmt id="4"/>
+                </tag>
+                <tag id="32">
+                    <bpt name="AXOR_pos_Produktbeschreibung" word-end="false">&lt;cf size=&quot;11&quot; font=&quot;FuturaTOTMed&quot;
+                        case=&quot;Normal&quot; nfa=&quot;true&quot;&gt;
+                    </bpt>
+                    <bpt-props>
+                        <value key="node">&lt;CharacterStyleRange AppliedCharacterStyle=&quot;CharacterStyle/AXOR_pos_Produktbeschreibung&quot;
+                            FillColor=&quot;Color/Black&quot; PointSize=&quot;11&quot; Tracking=&quot;10&quot;
+                            Capitalization=&quot;Normal&quot; StrokeColor=&quot;Swatch/None&quot; OverprintFill=&quot;true&quot;
+                            GradientFillAngle=&quot;180&quot; GradientFillLength=&quot;470.55118110946796&quot;
+                            GradientFillStart=&quot;470.55118110946796 90.75000000000001&quot;&gt;
+                        </value>
+                        <value key="property">&lt;Properties&gt;
+                            &lt;Leading type=&quot;unit&quot;&gt;11.5&lt;/Leading&gt;
+                            &lt;AppliedFont type=&quot;string&quot;&gt;FuturaTOTMed&lt;/AppliedFont&gt;
+                            &lt;/Properties&gt;
+                        </value>
+                    </bpt-props>
+                    <ept name="AXOR_pos_Produktbeschreibung" word-end="false">&lt;/cf&gt;</ept>
+                    <fmt id="4"/>
+                </tag>
+                <tag id="34">
+                    <bpt name="AXOR_pos_Produktbeschreibung" word-end="false">&lt;cf nfa=&quot;true&quot;&gt;</bpt>
+                    <bpt-props>
+                        <value key="node">&lt;CharacterStyleRange AppliedCharacterStyle=&quot;CharacterStyle/AXOR_pos_Produktbeschreibung&quot;
+                            FillColor=&quot;Color/Black&quot; PointSize=&quot;11&quot; Tracking=&quot;0&quot;
+                            BaselineShift=&quot;-1&quot; Capitalization=&quot;Normal&quot; StrokeColor=&quot;Swatch/None&quot;
+                            OverprintFill=&quot;true&quot; GradientFillAngle=&quot;180&quot; GradientFillLength=&quot;470.55118110946796&quot;
+                            GradientFillStart=&quot;470.55118110946796 90.75000000000001&quot;&gt;
+                        </value>
+                        <value key="property">&lt;Properties&gt;
+                            &lt;Leading type=&quot;unit&quot;&gt;11.5&lt;/Leading&gt;
+                            &lt;AppliedFont type=&quot;string&quot;&gt;FuturaTOTMed&lt;/AppliedFont&gt;
+                            &lt;/Properties&gt;
+                        </value>
+                    </bpt-props>
+                    <ept name="AXOR_pos_Produktbeschreibung" word-end="false">&lt;/cf&gt;</ept>
+                </tag>
+                <tag id="33">
+                    <bpt name="AXOR_pos_Produktbeschreibung" word-end="false">&lt;cf size=&quot;11&quot; font=&quot;FuturaTOTMed&quot;
+                        case=&quot;Normal&quot; nfa=&quot;true&quot;&gt;
+                    </bpt>
+                    <bpt-props>
+                        <value key="node">&lt;CharacterStyleRange AppliedCharacterStyle=&quot;CharacterStyle/AXOR_pos_Produktbeschreibung&quot;
+                            FillColor=&quot;Color/Black&quot; PointSize=&quot;11&quot; Tracking=&quot;0&quot;
+                            Capitalization=&quot;Normal&quot; StrokeColor=&quot;Swatch/None&quot; OverprintFill=&quot;true&quot;
+                            GradientFillAngle=&quot;180&quot; GradientFillLength=&quot;470.55118110946796&quot;
+                            GradientFillStart=&quot;470.55118110946796 90.75000000000001&quot;&gt;
+                        </value>
+                        <value key="property">&lt;Properties&gt;
+                            &lt;Leading type=&quot;unit&quot;&gt;11.5&lt;/Leading&gt;
+                            &lt;AppliedFont type=&quot;string&quot;&gt;FuturaTOTMed&lt;/AppliedFont&gt;
+                            &lt;/Properties&gt;
+                        </value>
+                    </bpt-props>
+                    <ept name="AXOR_pos_Produktbeschreibung" word-end="false">&lt;/cf&gt;</ept>
+                    <fmt id="4"/>
+                </tag>
+                <tag id="37">
+                    <bpt name="cf" word-end="false">&lt;cf nfa=&quot;true&quot;&gt;</bpt>
+                    <bpt-props>
+                        <value key="node">&lt;CharacterStyleRange AppliedCharacterStyle=&quot;CharacterStyle/$ID/[No
+                            character style]&quot; FillColor=&quot;Color/Black&quot; OverprintFill=&quot;true&quot;&gt;
+                        </value>
+                    </bpt-props>
+                    <ept name="cf" word-end="false">&lt;/cf&gt;</ept>
+                    <fmt id="2"/>
+                </tag>
+                <tag id="40">
+                    <bpt name="Weiß" word-end="false">&lt;cf size=&quot;13&quot; case=&quot;Normal&quot; nfa=&quot;true&quot;&gt;</bpt>
+                    <bpt-props>
+                        <value key="node">&lt;CharacterStyleRange AppliedCharacterStyle=&quot;CharacterStyle/Weiß&quot;
+                            FillColor=&quot;Color/Black&quot; PointSize=&quot;13&quot; Tracking=&quot;0&quot;
+                            Capitalization=&quot;Normal&quot; OverprintFill=&quot;true&quot;&gt;
+                        </value>
+                        <value key="property">&lt;Properties&gt;
+                            &lt;Leading type=&quot;unit&quot;&gt;19&lt;/Leading&gt;
+                            &lt;/Properties&gt;
+                        </value>
+                    </bpt-props>
+                    <ept name="Weiß" word-end="false">&lt;/cf&gt;</ept>
+                    <fmt id="7"/>
+                </tag>
+                <tag id="41">
+                    <bpt name="Weiß" word-end="false">&lt;cf size=&quot;9&quot; font=&quot;FuturaTOT&quot; case=&quot;Normal&quot;
+                        nfa=&quot;true&quot;&gt;
+                    </bpt>
+                    <bpt-props>
+                        <value key="node">&lt;CharacterStyleRange AppliedCharacterStyle=&quot;CharacterStyle/Weiß&quot;
+                            FillColor=&quot;Color/Black&quot; PointSize=&quot;9&quot; Tracking=&quot;0&quot;
+                            Capitalization=&quot;Normal&quot; OverprintFill=&quot;true&quot;&gt;
+                        </value>
+                        <value key="property">&lt;Properties&gt;
+                            &lt;Leading type=&quot;unit&quot;&gt;19&lt;/Leading&gt;
+                            &lt;AppliedFont type=&quot;string&quot;&gt;FuturaTOT&lt;/AppliedFont&gt;
+                            &lt;/Properties&gt;
+                        </value>
+                        <value key="SDL:AutoCloned">True</value>
+                    </bpt-props>
+                    <ept name="Weiß" word-end="false">&lt;/cf&gt;</ept>
+                    <fmt id="8"/>
+                </tag>
+                <tag id="43">
+                    <bpt name="Weiß" word-end="false">&lt;cf size=&quot;13&quot; case=&quot;Normal&quot; nfa=&quot;true&quot;&gt;</bpt>
+                    <bpt-props>
+                        <value key="node">&lt;CharacterStyleRange AppliedCharacterStyle=&quot;CharacterStyle/Weiß&quot;
+                            FillColor=&quot;Color/Black&quot; PointSize=&quot;13&quot; Tracking=&quot;0&quot;
+                            Capitalization=&quot;Normal&quot; OverprintFill=&quot;true&quot;&gt;
+                        </value>
+                        <value key="property">&lt;Properties&gt;
+                            &lt;Leading type=&quot;unit&quot;&gt;19&lt;/Leading&gt;
+                            &lt;/Properties&gt;
+                        </value>
+                    </bpt-props>
+                    <ept name="Weiß" word-end="false">&lt;/cf&gt;</ept>
+                    <fmt id="7"/>
+                </tag>
+                <tag id="44">
+                    <bpt name="Weiß" word-end="false">&lt;cf size=&quot;9&quot; font=&quot;FuturaTOT&quot; case=&quot;Normal&quot;
+                        nfa=&quot;true&quot;&gt;
+                    </bpt>
+                    <bpt-props>
+                        <value key="node">&lt;CharacterStyleRange AppliedCharacterStyle=&quot;CharacterStyle/Weiß&quot;
+                            FillColor=&quot;Color/Black&quot; PointSize=&quot;9&quot; Tracking=&quot;0&quot;
+                            Capitalization=&quot;Normal&quot; OverprintFill=&quot;true&quot;&gt;
+                        </value>
+                        <value key="property">&lt;Properties&gt;
+                            &lt;Leading type=&quot;unit&quot;&gt;19&lt;/Leading&gt;
+                            &lt;AppliedFont type=&quot;string&quot;&gt;FuturaTOT&lt;/AppliedFont&gt;
+                            &lt;/Properties&gt;
+                        </value>
+                    </bpt-props>
+                    <ept name="Weiß" word-end="false">&lt;/cf&gt;</ept>
+                    <fmt id="8"/>
+                </tag>
+                <tag id="45">
+                    <bpt name="Weiß" word-end="false">&lt;cf size=&quot;13&quot; case=&quot;Normal&quot; nfa=&quot;true&quot;&gt;</bpt>
+                    <bpt-props>
+                        <value key="node">&lt;CharacterStyleRange AppliedCharacterStyle=&quot;CharacterStyle/Weiß&quot;
+                            FillColor=&quot;Color/Black&quot; PointSize=&quot;13&quot; Tracking=&quot;0&quot;
+                            Capitalization=&quot;Normal&quot; OverprintFill=&quot;true&quot;&gt;
+                        </value>
+                        <value key="property">&lt;Properties&gt;
+                            &lt;Leading type=&quot;unit&quot;&gt;19&lt;/Leading&gt;
+                            &lt;/Properties&gt;
+                        </value>
+                    </bpt-props>
+                    <ept name="Weiß" word-end="false">&lt;/cf&gt;</ept>
+                    <fmt id="7"/>
+                </tag>
+                <tag id="46">
+                    <bpt name="Weiß" word-end="false">&lt;cf size=&quot;9&quot; font=&quot;FuturaTOT&quot; case=&quot;Normal&quot;
+                        nfa=&quot;true&quot;&gt;
+                    </bpt>
+                    <bpt-props>
+                        <value key="node">&lt;CharacterStyleRange AppliedCharacterStyle=&quot;CharacterStyle/Weiß&quot;
+                            FillColor=&quot;Color/Black&quot; PointSize=&quot;9&quot; Tracking=&quot;0&quot;
+                            Capitalization=&quot;Normal&quot; OverprintFill=&quot;true&quot;&gt;
+                        </value>
+                        <value key="property">&lt;Properties&gt;
+                            &lt;Leading type=&quot;unit&quot;&gt;19&lt;/Leading&gt;
+                            &lt;AppliedFont type=&quot;string&quot;&gt;FuturaTOT&lt;/AppliedFont&gt;
+                            &lt;/Properties&gt;
+                        </value>
+                    </bpt-props>
+                    <ept name="Weiß" word-end="false">&lt;/cf&gt;</ept>
+                    <fmt id="8"/>
+                </tag>
+                <tag id="49">
+                    <bpt name="Weiß" word-end="false">&lt;cf size=&quot;13&quot; font=&quot;FuturaTOT&quot; case=&quot;Normal&quot;
+                        nfa=&quot;true&quot;&gt;
+                    </bpt>
+                    <bpt-props>
+                        <value key="node">&lt;CharacterStyleRange AppliedCharacterStyle=&quot;CharacterStyle/Weiß&quot;
+                            PointSize=&quot;13&quot; Tracking=&quot;0&quot; Capitalization=&quot;Normal&quot;&gt;
+                        </value>
+                        <value key="property">&lt;Properties&gt;
+                            &lt;Leading type=&quot;unit&quot;&gt;17&lt;/Leading&gt;
+                            &lt;AppliedFont type=&quot;string&quot;&gt;FuturaTOT&lt;/AppliedFont&gt;
+                            &lt;/Properties&gt;
+                        </value>
+                        <value key="SDL:AutoCloned">True</value>
+                    </bpt-props>
+                    <ept name="Weiß" word-end="false">&lt;/cf&gt;</ept>
+                    <fmt id="9"/>
+                </tag>
+                <tag id="51">
+                    <bpt name="Weiß" word-end="false">&lt;cf size=&quot;15&quot; case=&quot;Normal&quot; nfa=&quot;true&quot;&gt;</bpt>
+                    <bpt-props>
+                        <value key="node">&lt;CharacterStyleRange AppliedCharacterStyle=&quot;CharacterStyle/Weiß&quot;
+                            PointSize=&quot;15&quot; Tracking=&quot;0&quot; Capitalization=&quot;Normal&quot;&gt;
+                        </value>
+                        <value key="property">&lt;Properties&gt;
+                            &lt;Leading type=&quot;unit&quot;&gt;16&lt;/Leading&gt;
+                            &lt;/Properties&gt;
+                        </value>
+                    </bpt-props>
+                    <ept name="Weiß" word-end="false">&lt;/cf&gt;</ept>
+                    <fmt id="10"/>
+                </tag>
+                <tag id="54">
+                    <bpt name="cf" word-end="false">&lt;cf size=&quot;11&quot; nfa=&quot;true&quot;&gt;</bpt>
+                    <bpt-props>
+                        <value key="node">&lt;CharacterStyleRange AppliedCharacterStyle=&quot;CharacterStyle/$ID/[No
+                            character style]&quot; FillColor=&quot;Color/Black&quot; PointSize=&quot;11&quot;
+                            OverprintFill=&quot;true&quot;&gt;
+                        </value>
+                    </bpt-props>
+                    <ept name="cf" word-end="false">&lt;/cf&gt;</ept>
+                    <fmt id="11"/>
+                </tag>
+                <tag id="74">
+                    <bpt name="Caption" word-end="false">&lt;cf nfa=&quot;true&quot;&gt;</bpt>
+                    <bpt-props>
+                        <value key="node">&lt;CharacterStyleRange AppliedCharacterStyle=&quot;CharacterStyle/Caption&quot;
+                            FillColor=&quot;Color/Paper&quot;&gt;
+                        </value>
+                    </bpt-props>
+                    <ept name="Caption" word-end="false">&lt;/cf&gt;</ept>
+                    <fmt id="14"/>
+                </tag>
+                <tag id="77">
+                    <bpt name="cf" word-end="false">&lt;cf nfa=&quot;true&quot;&gt;</bpt>
+                    <bpt-props>
+                        <value key="node">&lt;CharacterStyleRange AppliedCharacterStyle=&quot;CharacterStyle/$ID/[No
+                            character style]&quot; FillColor=&quot;Color/Black&quot;&gt;
+                        </value>
+                        <value key="SDL:AutoCloned">True</value>
+                    </bpt-props>
+                    <ept name="cf" word-end="false">&lt;/cf&gt;</ept>
+                    <fmt id="2"/>
+                </tag>
+                <tag id="79">
+                    <bpt name="cf" word-end="false">&lt;cf nfa=&quot;true&quot;&gt;</bpt>
+                    <bpt-props>
+                        <value key="node">&lt;CharacterStyleRange AppliedCharacterStyle=&quot;CharacterStyle/$ID/[No
+                            character style]&quot; FillColor=&quot;Color/Black&quot;&gt;
+                        </value>
+                        <value key="SDL:AutoCloned">True</value>
+                    </bpt-props>
+                    <ept name="cf" word-end="false">&lt;/cf&gt;</ept>
+                    <fmt id="2"/>
+                </tag>
+                <tag id="81">
+                    <bpt name="cf" word-end="false">&lt;cf size=&quot;8&quot; nfa=&quot;true&quot;&gt;</bpt>
+                    <bpt-props>
+                        <value key="node">&lt;CharacterStyleRange AppliedCharacterStyle=&quot;CharacterStyle/$ID/[No
+                            character style]&quot; FillColor=&quot;Color/Black&quot; PointSize=&quot;8&quot;&gt;
+                        </value>
+                        <value key="SDL:AutoCloned">True</value>
+                    </bpt-props>
+                    <ept name="cf" word-end="false">&lt;/cf&gt;</ept>
+                    <fmt id="18"/>
+                </tag>
+                <tag id="83">
+                    <bpt name="cf" word-end="false">&lt;cf nfa=&quot;true&quot;&gt;</bpt>
+                    <bpt-props>
+                        <value key="node">&lt;CharacterStyleRange AppliedCharacterStyle=&quot;CharacterStyle/$ID/[No
+                            character style]&quot; FillColor=&quot;Color/Black&quot;&gt;
+                        </value>
+                        <value key="SDL:AutoCloned">True</value>
+                    </bpt-props>
+                    <ept name="cf" word-end="false">&lt;/cf&gt;</ept>
+                    <fmt id="2"/>
+                </tag>
+                <tag id="85">
+                    <bpt name="cf" word-end="false">&lt;cf nfa=&quot;true&quot;&gt;</bpt>
+                    <bpt-props>
+                        <value key="node">&lt;CharacterStyleRange AppliedCharacterStyle=&quot;CharacterStyle/$ID/[No
+                            character style]&quot; FillColor=&quot;Color/Black&quot;&gt;
+                        </value>
+                        <value key="SDL:AutoCloned">True</value>
+                    </bpt-props>
+                    <ept name="cf" word-end="false">&lt;/cf&gt;</ept>
+                    <fmt id="2"/>
+                </tag>
+                <tag id="88">
+                    <bpt name="cf" word-end="false">&lt;cf nfa=&quot;true&quot;&gt;</bpt>
+                    <bpt-props>
+                        <value key="node">&lt;CharacterStyleRange AppliedCharacterStyle=&quot;CharacterStyle/$ID/[No
+                            character style]&quot; FillColor=&quot;Color/Black&quot;&gt;
+                        </value>
+                        <value key="SDL:AutoCloned">True</value>
+                    </bpt-props>
+                    <ept name="cf" word-end="false">&lt;/cf&gt;</ept>
+                    <fmt id="2"/>
+                </tag>
+                <tag id="90">
+                    <bpt name="cf" word-end="false">&lt;cf nfa=&quot;true&quot;&gt;</bpt>
+                    <bpt-props>
+                        <value key="node">&lt;CharacterStyleRange AppliedCharacterStyle=&quot;CharacterStyle/$ID/[No
+                            character style]&quot; FillColor=&quot;Color/Black&quot;&gt;
+                        </value>
+                        <value key="SDL:AutoCloned">True</value>
+                    </bpt-props>
+                    <ept name="cf" word-end="false">&lt;/cf&gt;</ept>
+                    <fmt id="2"/>
+                </tag>
+                <tag id="93">
+                    <bpt name="cf" word-end="false">&lt;cf nfa=&quot;true&quot;&gt;</bpt>
+                    <bpt-props>
+                        <value key="node">&lt;CharacterStyleRange AppliedCharacterStyle=&quot;CharacterStyle/$ID/[No
+                            character style]&quot; FillColor=&quot;Color/Black&quot;&gt;
+                        </value>
+                        <value key="SDL:AutoCloned">True</value>
+                    </bpt-props>
+                    <ept name="cf" word-end="false">&lt;/cf&gt;</ept>
+                    <fmt id="2"/>
+                </tag>
+                <tag id="95">
+                    <bpt name="cf" word-end="false">&lt;cf nfa=&quot;true&quot;&gt;</bpt>
+                    <bpt-props>
+                        <value key="node">&lt;CharacterStyleRange AppliedCharacterStyle=&quot;CharacterStyle/$ID/[No
+                            character style]&quot; FillColor=&quot;Color/Black&quot;&gt;
+                        </value>
+                        <value key="SDL:AutoCloned">True</value>
+                    </bpt-props>
+                    <ept name="cf" word-end="false">&lt;/cf&gt;</ept>
+                    <fmt id="2"/>
+                </tag>
+                <tag id="100">
+                    <bpt name="cf" word-end="false">&lt;cf nfa=&quot;true&quot;&gt;</bpt>
+                    <bpt-props>
+                        <value key="node">&lt;CharacterStyleRange AppliedCharacterStyle=&quot;CharacterStyle/$ID/[No
+                            character style]&quot; FillColor=&quot;Color/Black&quot;&gt;
+                        </value>
+                        <value key="SDL:AutoCloned">True</value>
+                    </bpt-props>
+                    <ept name="cf" word-end="false">&lt;/cf&gt;</ept>
+                    <fmt id="2"/>
+                </tag>
+                <tag id="103">
+                    <bpt name="cf" word-end="false">&lt;cf size=&quot;9&quot; font=&quot;FuturaTOT&quot; case=&quot;Normal&quot;
+                        nfa=&quot;true&quot;&gt;
+                    </bpt>
+                    <bpt-props>
+                        <value key="node">&lt;CharacterStyleRange AppliedCharacterStyle=&quot;CharacterStyle/$ID/[No
+                            character style]&quot; FillColor=&quot;Color/Black&quot; PointSize=&quot;9&quot;
+                            Capitalization=&quot;Normal&quot; GradientFillLength=&quot;268.52416638242516&quot;
+                            GradientFillStart=&quot;0 416.207763671875&quot;&gt;
+                        </value>
+                        <value key="property">&lt;Properties&gt;
+                            &lt;Leading type=&quot;unit&quot;&gt;10.5&lt;/Leading&gt;
+                            &lt;AppliedFont type=&quot;string&quot;&gt;FuturaTOT&lt;/AppliedFont&gt;
+                            &lt;/Properties&gt;
+                        </value>
+                        <value key="SDL:AutoCloned">True</value>
+                    </bpt-props>
+                    <ept name="cf" word-end="false">&lt;/cf&gt;</ept>
+                    <fmt id="19"/>
+                </tag>
+                <tag id="102">
+                    <bpt name="cf" word-end="false">&lt;cf nfa=&quot;true&quot;&gt;</bpt>
+                    <bpt-props>
+                        <value key="node">&lt;CharacterStyleRange AppliedCharacterStyle=&quot;CharacterStyle/$ID/[No
+                            character style]&quot; FillColor=&quot;Color/Black&quot;&gt;
+                        </value>
+                        <value key="SDL:AutoCloned">True</value>
+                    </bpt-props>
+                    <ept name="cf" word-end="false">&lt;/cf&gt;</ept>
+                    <fmt id="2"/>
+                </tag>
+                <tag id="105">
+                    <bpt name="cf" word-end="false">&lt;cf size=&quot;8&quot; nfa=&quot;true&quot;&gt;</bpt>
+                    <bpt-props>
+                        <value key="node">&lt;CharacterStyleRange AppliedCharacterStyle=&quot;CharacterStyle/$ID/[No
+                            character style]&quot; FillColor=&quot;Color/Black&quot; PointSize=&quot;8&quot;&gt;
+                        </value>
+                        <value key="SDL:AutoCloned">True</value>
+                    </bpt-props>
+                    <ept name="cf" word-end="false">&lt;/cf&gt;</ept>
+                    <fmt id="18"/>
+                </tag>
+                <tag id="108">
+                    <bpt name="cf" word-end="false">&lt;cf nfa=&quot;true&quot;&gt;</bpt>
+                    <bpt-props>
+                        <value key="node">&lt;CharacterStyleRange AppliedCharacterStyle=&quot;CharacterStyle/$ID/[No
+                            character style]&quot; FillColor=&quot;Color/Black&quot;&gt;
+                        </value>
+                        <value key="SDL:AutoCloned">True</value>
+                    </bpt-props>
+                    <ept name="cf" word-end="false">&lt;/cf&gt;</ept>
+                    <fmt id="2"/>
+                </tag>
+                <tag id="110">
+                    <bpt name="cf" word-end="false">&lt;cf nfa=&quot;true&quot;&gt;</bpt>
+                    <bpt-props>
+                        <value key="node">&lt;CharacterStyleRange AppliedCharacterStyle=&quot;CharacterStyle/$ID/[No
+                            character style]&quot; FillColor=&quot;Color/Black&quot;&gt;
+                        </value>
+                        <value key="SDL:AutoCloned">True</value>
+                    </bpt-props>
+                    <ept name="cf" word-end="false">&lt;/cf&gt;</ept>
+                    <fmt id="2"/>
+                </tag>
+                <tag id="112">
+                    <bpt name="cf" word-end="false">&lt;cf size=&quot;7&quot; font=&quot;FuturaTOTMed&quot; case=&quot;AllCaps&quot;
+                        nfa=&quot;true&quot;&gt;
+                    </bpt>
+                    <bpt-props>
+                        <value key="node">&lt;CharacterStyleRange AppliedCharacterStyle=&quot;CharacterStyle/$ID/[No
+                            character style]&quot; FillColor=&quot;Color/Black&quot; PointSize=&quot;7&quot; Tracking=&quot;300&quot;
+                            Capitalization=&quot;AllCaps&quot; GradientFillLength=&quot;-1&quot; GradientFillStart=&quot;0
+                            0&quot;&gt;
+                        </value>
+                        <value key="property">&lt;Properties&gt;
+                            &lt;AppliedFont type=&quot;string&quot;&gt;FuturaTOTMed&lt;/AppliedFont&gt;
+                            &lt;/Properties&gt;
+                        </value>
+                    </bpt-props>
+                    <ept name="cf" word-end="false">&lt;/cf&gt;</ept>
+                    <fmt id="20"/>
+                </tag>
+                <tag id="113">
+                    <bpt name="cf" word-end="false">&lt;cf size=&quot;7&quot; nfa=&quot;true&quot;&gt;</bpt>
+                    <bpt-props>
+                        <value key="node">&lt;CharacterStyleRange AppliedCharacterStyle=&quot;CharacterStyle/$ID/[No
+                            character style]&quot; FillColor=&quot;Color/Black&quot; PointSize=&quot;7&quot; Tracking=&quot;300&quot;&gt;
+                        </value>
+                        <value key="SDL:AutoCloned">True</value>
+                    </bpt-props>
+                    <ept name="cf" word-end="false">&lt;/cf&gt;</ept>
+                    <fmt id="21"/>
+                </tag>
+                <tag id="115">
+                    <bpt name="cf" word-end="false">&lt;cf nfa=&quot;true&quot;&gt;</bpt>
+                    <bpt-props>
+                        <value key="node">&lt;CharacterStyleRange AppliedCharacterStyle=&quot;CharacterStyle/$ID/[No
+                            character style]&quot; FillColor=&quot;Color/Black&quot;&gt;
+                        </value>
+                        <value key="SDL:AutoCloned">True</value>
+                    </bpt-props>
+                    <ept name="cf" word-end="false">&lt;/cf&gt;</ept>
+                    <fmt id="2"/>
+                </tag>
+                <tag id="119">
+                    <bpt name="cf" word-end="false">&lt;cf size=&quot;8&quot; nfa=&quot;true&quot;&gt;</bpt>
+                    <bpt-props>
+                        <value key="node">&lt;CharacterStyleRange AppliedCharacterStyle=&quot;CharacterStyle/$ID/[No
+                            character style]&quot; FillColor=&quot;Color/Black&quot; PointSize=&quot;8&quot;&gt;
+                        </value>
+                        <value key="SDL:AutoCloned">True</value>
+                    </bpt-props>
+                    <ept name="cf" word-end="false">&lt;/cf&gt;</ept>
+                    <fmt id="18"/>
+                </tag>
+                <tag id="121">
+                    <bpt name="cf" word-end="false">&lt;cf nfa=&quot;true&quot;&gt;</bpt>
+                    <bpt-props>
+                        <value key="node">&lt;CharacterStyleRange AppliedCharacterStyle=&quot;CharacterStyle/$ID/[No
+                            character style]&quot; FillColor=&quot;Color/Black&quot;&gt;
+                        </value>
+                        <value key="SDL:AutoCloned">True</value>
+                    </bpt-props>
+                    <ept name="cf" word-end="false">&lt;/cf&gt;</ept>
+                    <fmt id="2"/>
+                </tag>
+                <tag id="123">
+                    <bpt name="cf" word-end="false">&lt;cf nfa=&quot;true&quot;&gt;</bpt>
+                    <bpt-props>
+                        <value key="node">&lt;CharacterStyleRange AppliedCharacterStyle=&quot;CharacterStyle/$ID/[No
+                            character style]&quot; FillColor=&quot;Color/Black&quot;&gt;
+                        </value>
+                        <value key="SDL:AutoCloned">True</value>
+                    </bpt-props>
+                    <ept name="cf" word-end="false">&lt;/cf&gt;</ept>
+                    <fmt id="2"/>
+                </tag>
+                <tag id="126">
+                    <bpt name="cf" word-end="false">&lt;cf nfa=&quot;true&quot;&gt;</bpt>
+                    <bpt-props>
+                        <value key="node">&lt;CharacterStyleRange AppliedCharacterStyle=&quot;CharacterStyle/$ID/[No
+                            character style]&quot; FillColor=&quot;Color/Black&quot;&gt;
+                        </value>
+                        <value key="SDL:AutoCloned">True</value>
+                    </bpt-props>
+                    <ept name="cf" word-end="false">&lt;/cf&gt;</ept>
+                    <fmt id="2"/>
+                </tag>
+                <tag id="128">
+                    <bpt name="cf" word-end="false">&lt;cf nfa=&quot;true&quot;&gt;</bpt>
+                    <bpt-props>
+                        <value key="node">&lt;CharacterStyleRange AppliedCharacterStyle=&quot;CharacterStyle/$ID/[No
+                            character style]&quot; FillColor=&quot;Color/Black&quot;&gt;
+                        </value>
+                        <value key="SDL:AutoCloned">True</value>
+                    </bpt-props>
+                    <ept name="cf" word-end="false">&lt;/cf&gt;</ept>
+                    <fmt id="2"/>
+                </tag>
+                <tag id="130">
+                    <bpt name="cf" word-end="false">&lt;cf size=&quot;8&quot; nfa=&quot;true&quot;&gt;</bpt>
+                    <bpt-props>
+                        <value key="node">&lt;CharacterStyleRange AppliedCharacterStyle=&quot;CharacterStyle/$ID/[No
+                            character style]&quot; FillColor=&quot;Color/Black&quot; PointSize=&quot;8&quot;&gt;
+                        </value>
+                        <value key="SDL:AutoCloned">True</value>
+                    </bpt-props>
+                    <ept name="cf" word-end="false">&lt;/cf&gt;</ept>
+                    <fmt id="18"/>
+                </tag>
+                <tag id="132">
+                    <bpt name="cf" word-end="false">&lt;cf nfa=&quot;true&quot;&gt;</bpt>
+                    <bpt-props>
+                        <value key="node">&lt;CharacterStyleRange AppliedCharacterStyle=&quot;CharacterStyle/$ID/[No
+                            character style]&quot; FillColor=&quot;Color/Black&quot;&gt;
+                        </value>
+                        <value key="SDL:AutoCloned">True</value>
+                    </bpt-props>
+                    <ept name="cf" word-end="false">&lt;/cf&gt;</ept>
+                    <fmt id="2"/>
+                </tag>
+                <tag id="134">
+                    <bpt name="cf" word-end="false">&lt;cf nfa=&quot;true&quot;&gt;</bpt>
+                    <bpt-props>
+                        <value key="node">&lt;CharacterStyleRange AppliedCharacterStyle=&quot;CharacterStyle/$ID/[No
+                            character style]&quot; FillColor=&quot;Color/Black&quot;&gt;
+                        </value>
+                    </bpt-props>
+                    <ept name="cf" word-end="false">&lt;/cf&gt;</ept>
+                    <fmt id="2"/>
+                </tag>
+                <tag id="137">
+                    <bpt name="cf" word-end="false">&lt;cf nfa=&quot;true&quot;&gt;</bpt>
+                    <bpt-props>
+                        <value key="node">&lt;CharacterStyleRange AppliedCharacterStyle=&quot;CharacterStyle/$ID/[No
+                            character style]&quot; FillColor=&quot;Color/Black&quot; FillTint=&quot;-1&quot;&gt;
+                        </value>
+                    </bpt-props>
+                    <ept name="cf" word-end="false">&lt;/cf&gt;</ept>
+                    <fmt id="2"/>
+                </tag>
+                <tag id="140">
+                    <bpt name="cf" word-end="false">&lt;cf nfa=&quot;true&quot;&gt;</bpt>
+                    <bpt-props>
+                        <value key="node">&lt;CharacterStyleRange AppliedCharacterStyle=&quot;CharacterStyle/$ID/[No
+                            character style]&quot; FillColor=&quot;Color/Black&quot;&gt;
+                        </value>
+                    </bpt-props>
+                    <ept name="cf" word-end="false">&lt;/cf&gt;</ept>
+                    <fmt id="2"/>
+                </tag>
+                <tag id="0">
+                    <ph name="&lt;fullPara/&gt;" word-end="false" seg-hint="IncludeWithText">&lt;format type=&quot;&amp;lt;fullPara/&amp;gt;&quot;/&gt;</ph>
+                    <props>
+                        <value key="node">&lt;BuildingBlock Self=&quot;u9eBuildingBlock1&quot; BlockType=&quot;FullParagraphBuildingBlock&quot;
+                            AppliedCharacterStyle=&quot;n&quot; CustomText=&quot;$ID/&quot; AppliedDelimiter=&quot;$ID/&quot;
+                            IncludeDelimiter=&quot;false&quot;/&gt;
+                        </value>
+                    </props>
+                </tag>
+                <tag id="1">
+                    <ph name="&lt;pageNum/&gt;" word-end="false" seg-hint="IncludeWithText">&lt;format type=&quot;&amp;lt;pageNum/&amp;gt;&quot;/&gt;</ph>
+                    <props>
+                        <value key="node">&lt;BuildingBlock Self=&quot;u9eBuildingBlock3&quot; BlockType=&quot;PageNumberBuildingBlock&quot;
+                            AppliedCharacterStyle=&quot;n&quot; CustomText=&quot;$ID/&quot; AppliedDelimiter=&quot;$ID/&quot;
+                            IncludeDelimiter=&quot;false&quot;/&gt;
+                        </value>
+                    </props>
+                </tag>
+                <tag id="2">
+                    <ph name="&lt;fullPara/&gt;" word-end="false" seg-hint="IncludeWithText">&lt;format type=&quot;&amp;lt;fullPara/&amp;gt;&quot;/&gt;</ph>
+                    <props>
+                        <value key="node">&lt;BuildingBlock Self=&quot;u9fBuildingBlock1&quot; BlockType=&quot;FullParagraphBuildingBlock&quot;
+                            AppliedCharacterStyle=&quot;n&quot; CustomText=&quot;$ID/&quot; AppliedDelimiter=&quot;$ID/&quot;
+                            IncludeDelimiter=&quot;false&quot;/&gt;
+                        </value>
+                    </props>
+                </tag>
+                <tag id="3">
+                    <ph name="&lt;paraText/&gt;" word-end="false" seg-hint="IncludeWithText">&lt;format type=&quot;&amp;lt;paraText/&amp;gt;&quot;/&gt;</ph>
+                    <props>
+                        <value key="node">&lt;BuildingBlock Self=&quot;ua0BuildingBlock1&quot; BlockType=&quot;ParagraphTextBuildingBlock&quot;
+                            AppliedCharacterStyle=&quot;n&quot; CustomText=&quot;$ID/&quot; AppliedDelimiter=&quot;$ID/&quot;
+                            IncludeDelimiter=&quot;false&quot;/&gt;
+                        </value>
+                    </props>
+                </tag>
+                <tag id="4">
+                    <ph name="&lt;pageNum/&gt;" word-end="false" seg-hint="IncludeWithText">&lt;format type=&quot;&amp;lt;pageNum/&amp;gt;&quot;/&gt;</ph>
+                    <props>
+                        <value key="node">&lt;BuildingBlock Self=&quot;ua0BuildingBlock3&quot; BlockType=&quot;PageNumberBuildingBlock&quot;
+                            AppliedCharacterStyle=&quot;n&quot; CustomText=&quot;$ID/&quot; AppliedDelimiter=&quot;$ID/&quot;
+                            IncludeDelimiter=&quot;false&quot;/&gt;
+                        </value>
+                    </props>
+                </tag>
+                <tag id="5">
+                    <ph name="&lt;paraText/&gt;" word-end="false" seg-hint="IncludeWithText">&lt;format type=&quot;&amp;lt;paraText/&amp;gt;&quot;/&gt;</ph>
+                    <props>
+                        <value key="node">&lt;BuildingBlock Self=&quot;ua1BuildingBlock1&quot; BlockType=&quot;ParagraphTextBuildingBlock&quot;
+                            AppliedCharacterStyle=&quot;n&quot; CustomText=&quot;$ID/&quot; AppliedDelimiter=&quot;$ID/&quot;
+                            IncludeDelimiter=&quot;false&quot;/&gt;
+                        </value>
+                    </props>
+                </tag>
+                <tag id="6">
+                    <ph name="&lt;paraNum/&gt;" word-end="false" seg-hint="IncludeWithText">&lt;format type=&quot;&amp;lt;paraNum/&amp;gt;&quot;/&gt;</ph>
+                    <props>
+                        <value key="node">&lt;BuildingBlock Self=&quot;ua2BuildingBlock0&quot; BlockType=&quot;ParagraphNumberBuildingBlock&quot;
+                            AppliedCharacterStyle=&quot;n&quot; CustomText=&quot;$ID/&quot; AppliedDelimiter=&quot;$ID/&quot;
+                            IncludeDelimiter=&quot;false&quot;/&gt;
+                        </value>
+                    </props>
+                </tag>
+                <tag id="7">
+                    <ph name="&lt;pageNum/&gt;" word-end="false" seg-hint="IncludeWithText">&lt;format type=&quot;&amp;lt;pageNum/&amp;gt;&quot;/&gt;</ph>
+                    <props>
+                        <value key="node">&lt;BuildingBlock Self=&quot;ua2BuildingBlock2&quot; BlockType=&quot;PageNumberBuildingBlock&quot;
+                            AppliedCharacterStyle=&quot;n&quot; CustomText=&quot;$ID/&quot; AppliedDelimiter=&quot;$ID/&quot;
+                            IncludeDelimiter=&quot;false&quot;/&gt;
+                        </value>
+                    </props>
+                </tag>
+                <tag id="8">
+                    <ph name="&lt;paraNum/&gt;" word-end="false" seg-hint="IncludeWithText">&lt;format type=&quot;&amp;lt;paraNum/&amp;gt;&quot;/&gt;</ph>
+                    <props>
+                        <value key="node">&lt;BuildingBlock Self=&quot;ua3BuildingBlock0&quot; BlockType=&quot;ParagraphNumberBuildingBlock&quot;
+                            AppliedCharacterStyle=&quot;n&quot; CustomText=&quot;$ID/&quot; AppliedDelimiter=&quot;$ID/&quot;
+                            IncludeDelimiter=&quot;false&quot;/&gt;
+                        </value>
+                    </props>
+                </tag>
+                <tag id="9">
+                    <ph name="&lt;txtAnchrName/&gt;" word-end="false" seg-hint="IncludeWithText">&lt;format type=&quot;&amp;lt;txtAnchrName/&amp;gt;&quot;/&gt;</ph>
+                    <props>
+                        <value key="node">&lt;BuildingBlock Self=&quot;ua4BuildingBlock1&quot; BlockType=&quot;BookmarkNameBuildingBlock&quot;
+                            AppliedCharacterStyle=&quot;n&quot; CustomText=&quot;$ID/&quot; AppliedDelimiter=&quot;$ID/&quot;
+                            IncludeDelimiter=&quot;false&quot;/&gt;
+                        </value>
+                    </props>
+                </tag>
+                <tag id="10">
+                    <ph name="&lt;pageNum/&gt;" word-end="false" seg-hint="IncludeWithText">&lt;format type=&quot;&amp;lt;pageNum/&amp;gt;&quot;/&gt;</ph>
+                    <props>
+                        <value key="node">&lt;BuildingBlock Self=&quot;ua4BuildingBlock3&quot; BlockType=&quot;PageNumberBuildingBlock&quot;
+                            AppliedCharacterStyle=&quot;n&quot; CustomText=&quot;$ID/&quot; AppliedDelimiter=&quot;$ID/&quot;
+                            IncludeDelimiter=&quot;false&quot;/&gt;
+                        </value>
+                    </props>
+                </tag>
+                <tag id="11">
+                    <ph name="&lt;txtAnchrName/&gt;" word-end="false" seg-hint="IncludeWithText">&lt;format type=&quot;&amp;lt;txtAnchrName/&amp;gt;&quot;/&gt;</ph>
+                    <props>
+                        <value key="node">&lt;BuildingBlock Self=&quot;ua5BuildingBlock1&quot; BlockType=&quot;BookmarkNameBuildingBlock&quot;
+                            AppliedCharacterStyle=&quot;n&quot; CustomText=&quot;$ID/&quot; AppliedDelimiter=&quot;$ID/&quot;
+                            IncludeDelimiter=&quot;false&quot;/&gt;
+                        </value>
+                    </props>
+                </tag>
+                <tag id="12">
+                    <ph name="&lt;pageNum/&gt;" word-end="false" seg-hint="IncludeWithText">&lt;format type=&quot;&amp;lt;pageNum/&amp;gt;&quot;/&gt;</ph>
+                    <props>
+                        <value key="node">&lt;BuildingBlock Self=&quot;ua6BuildingBlock1&quot; BlockType=&quot;PageNumberBuildingBlock&quot;
+                            AppliedCharacterStyle=&quot;n&quot; CustomText=&quot;$ID/&quot; AppliedDelimiter=&quot;$ID/&quot;
+                            IncludeDelimiter=&quot;false&quot;/&gt;
+                        </value>
+                    </props>
+                </tag>
+                <tag id="58">
+                    <ph name="EmptyParagraph" word-end="false" seg-hint="IncludeWithText">&lt;EmptyParagraph value=&quot;true&quot;/&gt;</ph>
+                    <props>
+                        <value key="uniqueid">u73a8d_1</value>
+                        <value key="node">&lt;CharacterStyleRange AppliedCharacterStyle=&quot;CharacterStyle/Copy_11pt&quot;&gt;</value>
+                    </props>
+                </tag>
+                <tag id="13">
+                    <st name="fileinfo">&lt;fileinfo&gt;</st>
+                    <props>
+                        <value key="readfromdesignmap">False</value>
+                    </props>
+                </tag>
+                <tag id="14">
+                    <st name="description">&lt;description&gt;</st>
+                </tag>
+                <tag id="15">
+                    <st name="description">&lt;/description&gt;</st>
+                </tag>
+                <tag id="16">
+                    <st name="fileinfo">&lt;/fileinfo&gt;</st>
+                </tag>
+                <tag id="17">
+                    <st name="toctitle">&lt;toctitle id=&quot;TOCStyle/$ID/DefaultTOCStyleName&quot; name=&quot;$ID/DefaultTOCStyleName&quot;
+                        parastyle=&quot;ParagraphStyle/$ID/[No paragraph style]&quot;&gt;
+                    </st>
+                    <props>
+                        <value key="uniqueid">TOCStyle/$ID/DefaultTOCStyleName</value>
+                    </props>
+                </tag>
+                <tag id="18">
+                    <st name="toctitle">&lt;/toctitle&gt;</st>
+                </tag>
+                <tag id="19">
+                    <st name="sections">&lt;sections&gt;</st>
+                </tag>
+                <tag id="23">
+                    <st name="sections">&lt;/sections&gt;</st>
+                </tag>
+                <tag id="24">
+                    <st name="story">&lt;story id=&quot;u73ae4&quot;&gt;</st>
+                </tag>
+                <tag id="26">
+                    <st name="br">&lt;br type=&quot;br&quot;/&gt;</st>
+                </tag>
+                <tag id="27">
+                    <st name="story">&lt;/story&gt;</st>
+                </tag>
+                <tag id="28">
+                    <st name="story">&lt;story id=&quot;u7394f&quot;&gt;</st>
+                </tag>
+                <tag id="31">
+                    <st name="br">&lt;br type=&quot;br&quot;/&gt;</st>
+                </tag>
+                <tag id="35">
+                    <st name="story">&lt;/story&gt;</st>
+                </tag>
+                <tag id="36">
+                    <st name="story">&lt;story id=&quot;u73966&quot;&gt;</st>
+                </tag>
+                <tag id="38">
+                    <st name="story">&lt;/story&gt;</st>
+                </tag>
+                <tag id="39">
+                    <st name="story">&lt;story id=&quot;u73930&quot;&gt;</st>
+                </tag>
+                <tag id="42">
+                    <st name="br">&lt;br type=&quot;br&quot;/&gt;</st>
+                </tag>
+                <tag id="47">
+                    <st name="story">&lt;/story&gt;</st>
+                </tag>
+                <tag id="48">
+                    <st name="story">&lt;story id=&quot;u73bf0&quot;&gt;</st>
+                </tag>
+                <tag id="50">
+                    <st name="br">&lt;br type=&quot;br&quot;/&gt;</st>
+                </tag>
+                <tag id="52">
+                    <st name="story">&lt;/story&gt;</st>
+                </tag>
+                <tag id="53">
+                    <st name="story">&lt;story id=&quot;u738d4&quot;&gt;</st>
+                </tag>
+                <tag id="55">
+                    <st name="story">&lt;/story&gt;</st>
+                </tag>
+                <tag id="56">
+                    <st name="group">&lt;group id=&quot;u73944&quot;&gt;</st>
+                </tag>
+                <tag id="57">
+                    <st name="story">&lt;story id=&quot;u73a8d&quot;&gt;</st>
+                </tag>
+                <tag id="59">
+                    <st name="story">&lt;/story&gt;</st>
+                </tag>
+                <tag id="60">
+                    <st name="polygon">&lt;polygon id=&quot;u73946&quot;&gt;</st>
+                </tag>
+                <tag id="61">
+                    <st name="polygon">&lt;/polygon&gt;</st>
+                </tag>
+                <tag id="62">
+                    <st name="polygon">&lt;polygon id=&quot;u73947&quot;&gt;</st>
+                </tag>
+                <tag id="63">
+                    <st name="polygon">&lt;/polygon&gt;</st>
+                </tag>
+                <tag id="64">
+                    <st name="polygon">&lt;polygon id=&quot;u73948&quot;&gt;</st>
+                </tag>
+                <tag id="65">
+                    <st name="polygon">&lt;/polygon&gt;</st>
+                </tag>
+                <tag id="66">
+                    <st name="polygon">&lt;polygon id=&quot;u73949&quot;&gt;</st>
+                </tag>
+                <tag id="67">
+                    <st name="polygon">&lt;/polygon&gt;</st>
+                </tag>
+                <tag id="68">
+                    <st name="polygon">&lt;polygon id=&quot;u7394a&quot;&gt;</st>
+                </tag>
+                <tag id="69">
+                    <st name="polygon">&lt;/polygon&gt;</st>
+                </tag>
+                <tag id="70">
+                    <st name="polygon">&lt;polygon id=&quot;u7394b&quot;&gt;</st>
+                </tag>
+                <tag id="71">
+                    <st name="polygon">&lt;/polygon&gt;</st>
+                </tag>
+                <tag id="72">
+                    <st name="group">&lt;/group&gt;</st>
+                </tag>
+                <tag id="73">
+                    <st name="story">&lt;story id=&quot;u72dce&quot;&gt;</st>
+                </tag>
+                <tag id="75">
+                    <st name="story">&lt;/story&gt;</st>
+                </tag>
+                <tag id="76">
+                    <st name="story">&lt;story id=&quot;u73b95&quot;&gt;</st>
+                </tag>
+                <tag id="78">
+                    <st name="br">&lt;br type=&quot;br&quot;/&gt;</st>
+                </tag>
+                <tag id="80">
+                    <st name="br">&lt;br type=&quot;br&quot;/&gt;</st>
+                </tag>
+                <tag id="82">
+                    <st name="br">&lt;br type=&quot;br&quot;/&gt;</st>
+                </tag>
+                <tag id="84">
+                    <st name="br">&lt;br type=&quot;br&quot;/&gt;</st>
+                </tag>
+                <tag id="86">
+                    <st name="br">&lt;br type=&quot;br&quot;/&gt;</st>
+                </tag>
+                <tag id="87">
+                    <st name="br">&lt;br type=&quot;br&quot;/&gt;</st>
+                </tag>
+                <tag id="89">
+                    <st name="br">&lt;br type=&quot;br&quot;/&gt;</st>
+                </tag>
+                <tag id="91">
+                    <st name="br">&lt;br type=&quot;br&quot;/&gt;</st>
+                </tag>
+                <tag id="92">
+                    <st name="br">&lt;br type=&quot;br&quot;/&gt;</st>
+                </tag>
+                <tag id="94">
+                    <st name="br">&lt;br type=&quot;br&quot;/&gt;</st>
+                </tag>
+                <tag id="96">
+                    <st name="br">&lt;br type=&quot;br&quot;/&gt;</st>
+                </tag>
+                <tag id="97">
+                    <st name="br">&lt;br type=&quot;br&quot;/&gt;</st>
+                </tag>
+                <tag id="98">
+                    <st name="br">&lt;br type=&quot;br&quot;/&gt;</st>
+                </tag>
+                <tag id="99">
+                    <st name="br">&lt;br type=&quot;br&quot;/&gt;</st>
+                </tag>
+                <tag id="101">
+                    <st name="br">&lt;br type=&quot;br&quot;/&gt;</st>
+                </tag>
+                <tag id="104">
+                    <st name="br">&lt;br type=&quot;br&quot;/&gt;</st>
+                </tag>
+                <tag id="106">
+                    <st name="br">&lt;br type=&quot;br&quot;/&gt;</st>
+                </tag>
+                <tag id="107">
+                    <st name="br">&lt;br type=&quot;br&quot;/&gt;</st>
+                </tag>
+                <tag id="109">
+                    <st name="br">&lt;br type=&quot;br&quot;/&gt;</st>
+                </tag>
+                <tag id="111">
+                    <st name="br">&lt;br type=&quot;br&quot;/&gt;</st>
+                </tag>
+                <tag id="114">
+                    <st name="br">&lt;br type=&quot;br&quot;/&gt;</st>
+                </tag>
+                <tag id="116">
+                    <st name="br">&lt;br type=&quot;br&quot;/&gt;</st>
+                </tag>
+                <tag id="117">
+                    <st name="br">&lt;br type=&quot;br&quot;/&gt;</st>
+                </tag>
+                <tag id="118">
+                    <st name="br">&lt;br type=&quot;br&quot;/&gt;</st>
+                </tag>
+                <tag id="120">
+                    <st name="br">&lt;br type=&quot;br&quot;/&gt;</st>
+                </tag>
+                <tag id="122">
+                    <st name="br">&lt;br type=&quot;br&quot;/&gt;</st>
+                </tag>
+                <tag id="124">
+                    <st name="br">&lt;br type=&quot;br&quot;/&gt;</st>
+                </tag>
+                <tag id="125">
+                    <st name="br">&lt;br type=&quot;br&quot;/&gt;</st>
+                </tag>
+                <tag id="127">
+                    <st name="br">&lt;br type=&quot;br&quot;/&gt;</st>
+                </tag>
+                <tag id="129">
+                    <st name="br">&lt;br type=&quot;br&quot;/&gt;</st>
+                </tag>
+                <tag id="131">
+                    <st name="br">&lt;br type=&quot;br&quot;/&gt;</st>
+                </tag>
+                <tag id="133">
+                    <st name="br">&lt;br type=&quot;br&quot;/&gt;</st>
+                </tag>
+                <tag id="135">
+                    <st name="story">&lt;/story&gt;</st>
+                </tag>
+                <tag id="136">
+                    <st name="story">&lt;story id=&quot;u73b7e&quot;&gt;</st>
+                </tag>
+                <tag id="138">
+                    <st name="story">&lt;/story&gt;</st>
+                </tag>
+                <tag id="139">
+                    <st name="story">&lt;story id=&quot;u73bac&quot;&gt;</st>
+                </tag>
+                <tag id="141">
+                    <st name="story">&lt;/story&gt;</st>
+                </tag>
+            </tag-defs>
+        </header>
+        <body>
+            <group>
+                <sdl:cxts>
+                    <sdl:cxt id="20"/>
+                    <sdl:cxt id="16"/>
+                    <sdl:node id="2"/>
+                </sdl:cxts>
+                <trans-unit id="18e7cece-6a25-4ee5-b9ce-01c5b19b1552">
+                    <source><g id="41"/><g id="43">Product novelties</g><g id="44">Explore the latest, cutting-edge design developments of AXOR</g><g id="45">Experiences</g><g id="46">Inspiring insights into living spaces and hotels with AXOR worldwide</g></source>
+                    <seg-source><g id="41"/><mrk mtype="seg" mid="19"><g id="43">Product novelties</g><g id="44">Explore the latest, cutting-edge design developments of AXOR</g><g id="45">Experiences</g><g id="46">Inspiring insights into living spaces and hotels with AXOR worldwide</g></mrk></seg-source>
+                    <target><g id="41"/><mrk mtype="seg" mid="19">
+                            <g id="43">Produktneuheiten</g> 
+                            <g id="44">Entdecken Sie die neuesten, topaktuellen Designentwicklungen von AXOR </g>
+                            <g id="45">Erlebnisse</g>
+                            <g id="46">Inspirierende Einblicke in Lebensräume und Hotels mit AXOR weltweit</g>
+                         jnjbj
+</mrk></target>
+                    <sdl:seg-defs>
+                        <sdl:seg id="19"  origin-system="DeepL - EN-DE" percent="70" conf="Draft" origin="mt">
+                            <sdl:prev-origin origin="source">
+                                <sdl:prev-origin/>
+                                <sdl:value key="SegmentIdentityHash">0uBHxELNqYoe4o7PkFqdKEAWsBU=</sdl:value>
+                                <sdl:value key="created_by">DESKTOP-JT9LC2K\Hendrik Büro</sdl:value>
+                                <sdl:value key="created_on">02/19/2024 15:28:37</sdl:value>
+                                <sdl:value key="last_modified_by">DESKTOP-JT9LC2K\Hendrik Büro</sdl:value>
+                                <sdl:value key="modified_on">02/19/2024 15:28:37</sdl:value>
+                            </sdl:prev-origin>
+                            <sdl:value key="SegmentIdentityHash">0uBHxELNqYoe4o7PkFqdKEAWsBU=</sdl:value>
+                            <sdl:value key="created_by">DESKTOP-JT9LC2K\Hendrik Büro</sdl:value>
+                            <sdl:value key="created_on">02/19/2024 15:30:14</sdl:value>
+                            <sdl:value key="last_modified_by">WindowsForTrado\translate5</sdl:value>
+                            <sdl:value key="modified_on">03/12/2024 15:42:32</sdl:value>
+                            <sdl:value key="SDL:OriginalTranslationHash">-1296649140</sdl:value>
+                        </sdl:seg>
+                    </sdl:seg-defs>
+                </trans-unit>
+            </group>
+        </body>
+    </file>
+</xliff>

@@ -48,8 +48,21 @@ class editor_ContentprotectionoutputmappingController extends ZfExtended_RestCon
 
     public function indexAction(): void
     {
-        /** @var array{id: int, languageId: int, type: string, name: string, description: string, format: string}[] */
         $this->view->rows = $this->entity->loadAllForFrontEnd();
+        /**
+         * @var array{
+         *     id: int,
+         *     languageId: int,
+         *     type: string,
+         *     name: string,
+         *     description: string,
+         *     format: string,
+         *     ruleEnabled: int
+         *  } $row
+         */
+        foreach ($this->view->rows as &$row) {
+            $row['ruleEnabled'] = boolval($row['ruleEnabled']);
+        }
         $this->view->total = $this->entity->getTotalCount();
     }
 

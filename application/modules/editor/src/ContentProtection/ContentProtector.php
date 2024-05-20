@@ -98,12 +98,18 @@ class ContentProtector
 
     public function validateFormat(string $type, string $format): bool
     {
-        return $this->protectors[NumberProtector::alias()]->validateFormat($type, $format);
+        /** @var NumberProtector $numberProtector */
+        $numberProtector = $this->protectors[NumberProtector::alias()];
+
+        return $numberProtector->validateFormat($type, $format);
     }
 
     public function getFormatedExample(string $type, string $format): string
     {
-        return $this->protectors[NumberProtector::alias()]->getFormatedExample($type, $format);
+        /** @var NumberProtector $numberProtector */
+        $numberProtector = $this->protectors[NumberProtector::alias()];
+
+        return $numberProtector->getFormatedExample($type, $format);
     }
 
     public static function create(Whitespace $whitespace): self
@@ -178,7 +184,7 @@ class ContentProtector
                 continue;
             }
 
-            if ($protector->hasEntityToProtect($text, $isSource ? $sourceLang : $targetLang)) {
+            if ($protector->hasEntityToProtect($text, $sourceLang)) {
                 $text = $protector->protect($text, $isSource, $sourceLang, $targetLang);
             }
         }

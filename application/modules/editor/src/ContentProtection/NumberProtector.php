@@ -66,8 +66,10 @@ use MittagQI\Translate5\ContentProtection\NumberProtection\Protector\DateProtect
 use MittagQI\Translate5\ContentProtection\NumberProtection\Protector\FloatProtector;
 use MittagQI\Translate5\ContentProtection\NumberProtection\Protector\IntegerProtector;
 use MittagQI\Translate5\ContentProtection\NumberProtection\Protector\IPAddressProtector;
+use MittagQI\Translate5\ContentProtection\NumberProtection\Protector\KeepContentProtector;
 use MittagQI\Translate5\ContentProtection\NumberProtection\Protector\MacAddressProtector;
 use MittagQI\Translate5\ContentProtection\NumberProtection\Protector\NumberProtectorInterface;
+use MittagQI\Translate5\ContentProtection\NumberProtection\Protector\ReplaceContentProtector;
 use MittagQI\Translate5\ContentProtection\NumberProtection\Tag\NumberTag;
 use MittagQI\Translate5\Repository\LanguageRepository;
 use Zend_Registry;
@@ -93,6 +95,11 @@ class NumberProtector implements ProtectorInterface
     private array $invalidRules = [];
 
     /**
+     * @var array<int, bool>
+     */
+    private array $hasTextRules = [];
+
+    /**
      * @param array<NumberProtectorInterface> $protectors
      */
     public function __construct(
@@ -114,6 +121,28 @@ class NumberProtector implements ProtectorInterface
     public function getFormatedExample(string $type, string $format): string
     {
         return $this->protectors[$type]->getFormatedExample($format);
+    }
+
+    /**
+     * @return string[]
+     */
+    public static function keepAsIsTypes(): array
+    {
+        return [
+            MacAddressProtector::getType(),
+            IPAddressProtector::getType(),
+            KeepContentProtector::getType(),
+        ];
+    }
+
+    /**
+     * @return string[]
+     */
+    public static function nonKeepAsIsTypes(): array
+    {
+        return [
+            ReplaceContentProtector::getType(),
+        ];
     }
 
     public static function alias(): string
@@ -143,6 +172,8 @@ class NumberProtector implements ProtectorInterface
                 new IntegerProtector($numberRepository),
                 new IPAddressProtector($numberRepository),
                 new MacAddressProtector($numberRepository),
+                new KeepContentProtector($numberRepository),
+                new ReplaceContentProtector($numberRepository),
             ],
             $numberRepository,
             new LanguageRepository(),
@@ -174,7 +205,19 @@ class NumberProtector implements ProtectorInterface
 
     public function hasEntityToProtect(string $textNode, int $sourceLang = null): bool
     {
-        return (bool) preg_match('/(\d|[[:xdigit:]][-:]+)/u', $textNode);
+        $has = (bool) preg_match('/(\d|[[:xdigit:]][-:]+)/u', $textNode);
+
+        if ($has) {
+            return true;
+        }
+
+        if (! array_key_exists($sourceLang, $this->hasTextRules)) {
+            $this->hasTextRules[$sourceLang] = $this->numberRepository->hasActiveTextRules(
+                $sourceLang ? $this->languageRepository->find($sourceLang) : null
+            );
+        }
+
+        return $this->hasTextRules[$sourceLang];
     }
 
     public function hasTagsToConvert(string $textNode): bool
@@ -236,6 +279,10 @@ class NumberProtector implements ProtectorInterface
 
     public function protect(string $textNode, bool $isSource, int $sourceLangId, int $targetLangId): string
     {
+        if (empty($textNode)) {
+            return $textNode;
+        }
+
         // Reset document else it will be compromised between method calls
         $this->document = new DOMDocument();
         $sourceLang = $sourceLangId ? $this->languageRepository->find($sourceLangId) : null;
@@ -247,7 +294,7 @@ class NumberProtector implements ProtectorInterface
 
         $this->loadXML("<node>$textNode</node>");
 
-        if (! $this->hasEntityToProtect($this->document->textContent)) {
+        if (! $this->hasEntityToProtect($this->document->textContent, $sourceLangId)) {
             return $textNode;
         }
 

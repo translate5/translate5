@@ -29,8 +29,7 @@ END LICENSE AND COPYRIGHT
 use editor_Models_Segment_Whitespace as Whitespace;
 use MittagQI\Translate5\ContentProtection\ContentProtector;
 use MittagQI\Translate5\ContentProtection\Model\ContentRecognition;
-use MittagQI\Translate5\ContentProtection\NumberProtection\Protector\IPAddressProtector;
-use MittagQI\Translate5\ContentProtection\NumberProtection\Protector\MacAddressProtector;
+use MittagQI\Translate5\ContentProtection\NumberProtector;
 use MittagQI\Translate5\ContentProtection\T5memory\RecalculateRulesHashWorker;
 
 /**
@@ -51,6 +50,7 @@ class editor_ContentprotectioncontentrecognitionController extends ZfExtended_Re
 
     public function indexAction()
     {
+        $data = [];
         foreach ($this->entity->loadAll() as $row) {
             $this->fixRowTypes($row);
             $data[] = $row;
@@ -67,9 +67,9 @@ class editor_ContentprotectioncontentrecognitionController extends ZfExtended_Re
          *     isDefault: bool,
          *     keepAsIs: bool,
          *     rowEnabled: bool
-         * } $rows
+         * } $data
          */
-        $this->view->rows = $data;
+        $this->view->rows = $data; // @phpstan-ignore-line
         $this->view->total = $this->entity->getTotalCount();
     }
 
@@ -93,8 +93,11 @@ class editor_ContentprotectioncontentrecognitionController extends ZfExtended_Re
     {
         $row = (array) $row;
         $row['keepAsIs'] = boolval($row['keepAsIs']);
-        if (in_array($row['type'], [MacAddressProtector::getType(), IPAddressProtector::getType()])) {
+        if (in_array($row['type'], NumberProtector::keepAsIsTypes())) {
             $row['keepAsIs'] = true;
+        }
+        if (in_array($row['type'], NumberProtector::nonKeepAsIsTypes())) {
+            $row['keepAsIs'] = false;
         }
         $row['rowEnabled'] = boolval($row['enabled']);
         unset($row['enabled']);
@@ -123,8 +126,12 @@ class editor_ContentprotectioncontentrecognitionController extends ZfExtended_Re
     protected function setDataInEntity(array $fields = null, $mode = self::SET_DATA_BLACKLIST)
     {
         parent::setDataInEntity($fields, $mode);
-        if (in_array($this->entity->getType(), [MacAddressProtector::getType(), IPAddressProtector::getType()])) {
+        if (in_array($this->entity->getType(), NumberProtector::keepAsIsTypes())) {
             $this->entity->setKeepAsIs(true);
+        }
+
+        if (in_array($this->entity->getType(), NumberProtector::nonKeepAsIsTypes())) {
+            $this->entity->setKeepAsIs(false);
         }
     }
 
@@ -139,6 +146,7 @@ class editor_ContentprotectioncontentrecognitionController extends ZfExtended_Re
         $protector = ContentProtector::create(ZfExtended_Factory::get(Whitespace::class));
 
         if (empty($request->get('type')) || empty($request->getParam('ruleFormat'))) {
+            // @phpstan-ignore-next-line
             $this->view->rows = [
                 'example' => '',
             ];
@@ -146,6 +154,7 @@ class editor_ContentprotectioncontentrecognitionController extends ZfExtended_Re
             return;
         }
 
+        // @phpstan-ignore-next-line
         $this->view->rows = [
             'example' => $protector->getFormatedExample($request->get('type'), $request->getParam('ruleFormat')),
         ];

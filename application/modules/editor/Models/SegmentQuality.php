@@ -76,7 +76,7 @@ class editor_Models_SegmentQuality extends ZfExtended_Models_Entity_Abstract
      */
     public function getSpellCheckData(array $segmentIds): array
     {
-        if(empty($segmentIds)){
+        if (empty($segmentIds)) {
             return [];
         }
         // Get spell check data
