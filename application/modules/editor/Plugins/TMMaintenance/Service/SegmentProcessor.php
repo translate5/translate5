@@ -6,10 +6,7 @@ namespace MittagQI\Translate5\Plugins\TMMaintenance\Service;
 
 use editor_Models_LanguageResources_LanguageResource;
 use editor_Models_Segment_Whitespace;
-use editor_Services_Connector;
-use editor_Services_Connector_TagHandler_Abstract;
-use editor_Services_Manager;
-use editor_Services_OpenTM2_HttpApi;
+use editor_Services_OpenTM2_Connector as Connector;
 use JetBrains\PhpStorm\ArrayShape;
 use MittagQI\Translate5\Plugins\TMMaintenance\DTO\CreateDTO;
 use MittagQI\Translate5\Plugins\TMMaintenance\DTO\DeleteDTO;
@@ -17,64 +14,35 @@ use MittagQI\Translate5\Plugins\TMMaintenance\DTO\GetListDTO;
 use MittagQI\Translate5\Plugins\TMMaintenance\DTO\UpdateDTO;
 use ZfExtended_Factory;
 
-class SegmentProcessor
+final class SegmentProcessor
 {
-    private editor_Models_Segment_Whitespace $whitespace;
-
-    public function __construct()
+    #[ArrayShape([
+        'items' => 'array',
+        'metaData' => 'array',
+    ])]
+    public function getList(GetListDTO $updateDto): array
     {
-        $this->whitespace = ZfExtended_Factory::get(editor_Models_Segment_Whitespace::class);
-    }
-
-    // TODO rework this after id is implemented on t5memory side
-    public function getOne(string $id): array
-    {
-        $idParts = explode('_', $id);
-        $tmId = array_shift($idParts);
-        $searchCriteria = $this->getWhitespace()->unprotectWhitespace(urldecode(array_shift($idParts)));
-
-        $connector = $this->getOpenTM2Connector((int)$tmId);
-        $resultList = $connector->search($searchCriteria);
-        $data = $resultList->getResult();
-        $data = $this->reformatData($data, (int)$tmId);
-
-        return array_shift($data);
-    }
-
-    #[ArrayShape(['items' => 'array', 'metaData' => 'array'])]
-    public function getList(GetListDTO $dto): array
-    {
-        $tmId = $dto->getTmId();
-
-        $connector = $this->getOpenTM2Connector($tmId);
-
+        $connector = $this->getOpenTM2Connector($updateDto->tmId);
         $totalAmount = 0;
-        $limit = $dto->getLimit();
+        $limit = $updateDto->limit;
         $result = [];
-        $offset = $dto->getOffset();
-
-        // > TODO remove once id on tm side is implemented
-        $fakeIdIndex = 1;
-        // < TODO remove once id on tm side is implemented
+        $offset = $updateDto->offset;
 
         while ($totalAmount < $limit) {
             $resultList = $connector->search(
-                $dto->getSearchCriteria(),
-                $dto->getSearchField(),
+                $updateDto->searchCriteria,
+                $updateDto->searchField,
                 $offset
             );
 
             $data = $resultList->getResult();
-            $data = $this->reformatData($data, $tmId);
-            $data = $this->replaceSymbols($data);
+            $data = $this->reformatData($data);
 
-            // > TODO remove once id on tm side is implemented
-            $data = array_map(static function (array $item) use ($tmId, &$fakeIdIndex) {
-                $item['id'] = $tmId . '_' . urlencode($item['rawSource']) . '_' . ++$fakeIdIndex;
+            $data = array_map(static function (array $item) use ($updateDto) {
+                $item['id'] = $updateDto->tmId . ':' . $item['metaData']['internalKey'];
 
                 return $item;
             }, $data);
-            // < TODO remove once id on tm side is implemented
 
             $offset = $resultList->getNextOffset();
 
@@ -88,47 +56,57 @@ class SegmentProcessor
 
         return [
             'items' => array_merge(...$result),
-            'metaData' => ['offset' => $offset],
+            'metaData' => [
+                'offset' => $offset,
+            ],
         ];
     }
 
-    public function create(CreateDTO $dto): int
+    public function create(CreateDTO $createDto): void
     {
-        $whitespace = $this->getWhitespace();
-        $api = $this->getApi($dto->getTm());
-        try {
-            $api->updateEntry($whitespace->unprotectWhitespace($dto->getSource()), $whitespace->unprotectWhitespace($dto->getTarget()));
-        } catch (\Exception $e) {
-            // TODO error
-        }
-
-        return 1;
+        $connector = $this->getOpenTM2Connector($createDto->tmId);
+        $connector->createSegment(
+            $createDto->source,
+            $createDto->target,
+            $createDto->documentName,
+            $createDto->author,
+            (new \DateTimeImmutable())->getTimestamp(),
+            $createDto->context
+        );
     }
 
-    public function update(UpdateDTO $dto): void
+    public function update(UpdateDTO $updateDto): void
     {
-        $whitespace = $this->getWhitespace();
-        $api = $this->getApi($dto->getTm());
-        try {
-            $api->updateEntry($dto->getSource(), $whitespace->unprotectWhitespace($dto->getTarget()));
-        } catch (\Exception $e) {
-            // TODO error
-        }
+        [$tmId, $id, $recordKey, $targetKey] = explode(':', $updateDto->id);
+
+        $connector = $this->getOpenTM2Connector($updateDto->tmId);
+        $connector->updateSegment(
+            (int) $id,
+            $recordKey,
+            $targetKey,
+            $updateDto->source,
+            $updateDto->target,
+            $updateDto->documentName,
+            $updateDto->author,
+            (new \DateTimeImmutable($updateDto->timestamp))->getTimestamp(),
+            $updateDto->context
+        );
     }
 
-    public function deleteAction(DeleteDTO $dto): void
+    public function delete(DeleteDTO $deleteDto): void
     {
-        $whitespace = $this->getWhitespace();
-        $api = $this->getApi($dto->getTm());
-        $api->deleteEntry($dto->getSource(), $whitespace->unprotectWhitespace($dto->getTarget()));
+        [$tmId, $id, $recordKey, $targetKey] = explode(':', $deleteDto->id);
+
+        $connector = $this->getOpenTM2Connector((int) $tmId);
+        $connector->deleteEntry((int) $id, $recordKey, $targetKey);
     }
 
-    private function reformatData(array $data, int $tmId): array
+    private function reformatData(array $data): array
     {
         $result = [];
 
         foreach ($data as $item) {
-            $item = (array)$item;
+            $item = (array) $item;
             $metadata = [];
 
             foreach ($item['metaData'] as $metadataum) {
@@ -136,7 +114,6 @@ class SegmentProcessor
             }
 
             $item['metaData'] = $metadata;
-            $item['tm'] = $tmId;
 
             $result[] = $item;
         }
@@ -144,60 +121,36 @@ class SegmentProcessor
         return $result;
     }
 
-    private function replaceSymbols(array $data): array
-    {
-        $whitespace = $this->getWhitespace();
-        $result = [];
-
-        foreach ($data as $item) {
-            foreach (['source', 'target', 'rawTarget'] as $field) {
-                $item[$field] = $whitespace->protectWhitespace($item[$field], editor_Models_Segment_Whitespace::ENTITY_MODE_OFF);
-            }
-
-            $result[] = $item;
-        }
-
-        return $result;
-    }
-
-    private function getOpenTM2Connector(int $languageResourceId): editor_Services_Connector
+    private function getOpenTM2Connector(int $languageResourceId): Connector
     {
         $languageResource = ZfExtended_Factory::get(editor_Models_LanguageResources_LanguageResource::class);
         $languageResource->load($languageResourceId);
 
         //TODO move to class
-        ZfExtended_Factory::addOverwrite('editor_Services_Connector_TagHandler_Xliff', new class extends editor_Services_Connector_TagHandler_Abstract {
-            public function prepareQuery(string $queryString, int $segmentId = -1): string
-            {
-                return $queryString;
-            }
+        ZfExtended_Factory::addOverwrite('editor_Services_Connector_TagHandler_Xliff', new class() extends \editor_Services_Connector_TagHandler_Xliff {
+            //            public function prepareQuery(string $queryString, int $segmentId = -1): string
+            //            {
+            //                return $queryString;
+            //            }
 
-            public function restoreInResult(string $resultString, int $segmentId = -1): ?string
+            public function restoreInResult(string $resultString, bool $isSource = true): ?string
             {
-                return $resultString;
+                $restoredResult = parent::restoreInResult($resultString);
+
+                $pattern = '/<div class="([^"]*)\bignoreInEditor\b([^"]*)">/';
+                $replacement = '<div class="$1$2">';
+                // Normalize spaces in the class attribute
+                $replacement = preg_replace('/\s+/', ' ', $replacement);
+                // Replace ignoreInEditor class
+                $updatedHtml = preg_replace($pattern, $replacement, $restoredResult);
+
+                return preg_replace('/\s+/', ' ', $updatedHtml);
             }
         });
 
-        /** @var editor_Services_Manager $manager */
-        $manager = ZfExtended_Factory::get(editor_Services_Manager::class);
+        $connector = new Connector();
+        $connector->connectTo($languageResource, $languageResource->getSourceLang(), $languageResource->getTargetLang());
 
-        return $manager->getConnector($languageResource);
-    }
-
-    private function getApi(int $languageResourceId): editor_Services_OpenTM2_HttpApi
-    {
-        /** @var editor_Models_LanguageResources_LanguageResource $languageResource */
-        $languageResource = ZfExtended_Factory::get(editor_Models_LanguageResources_LanguageResource::class);
-        $languageResource->load($languageResourceId);
-
-        $api = ZfExtended_Factory::get(editor_Services_OpenTM2_HttpApi::class);
-        $api->setLanguageResource($languageResource);
-
-        return $api;
-    }
-
-    private function getWhitespace(): editor_Models_Segment_Whitespace
-    {
-        return $this->whitespace;
+        return $connector;
     }
 }

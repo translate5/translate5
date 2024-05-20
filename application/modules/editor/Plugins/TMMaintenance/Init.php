@@ -21,7 +21,7 @@ START LICENSE AND COPYRIGHT
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
@@ -35,9 +35,9 @@ class editor_Plugins_TMMaintenance_Init extends ZfExtended_Plugin_Abstract
 {
     protected static string $description = 'Provides a functionality of managing t5memory TM';
 
-    protected $frontendControllers = array(
-        'pluginTMMaintenanceTMMaintenance' => 'Editor.plugins.TMMaintenance.app.controller.TMMaintenance'
-    );
+    protected $frontendControllers = [
+        'pluginTMMaintenanceTMMaintenance' => 'Editor.plugins.TMMaintenance.app.controller.TMMaintenance',
+    ];
 
     public function init(): void
     {
@@ -50,7 +50,7 @@ class editor_Plugins_TMMaintenance_Init extends ZfExtended_Plugin_Abstract
     private function initApplet(): void
     {
         // Register the plugin as an applet
-        Dispatcher::getInstance()->registerApplet('tmmaintenance', new class extends AppletAbstract {
+        Dispatcher::getInstance()->registerApplet('tmmaintenance', new class() extends AppletAbstract {
             protected string $urlPathPart = '/editor/tmmaintenance';
             protected string $initialPage = 'tmMaintenance';
         });
@@ -81,14 +81,14 @@ class editor_Plugins_TMMaintenance_Init extends ZfExtended_Plugin_Abstract
         $route = new ZfExtended_Controller_RestLikeRoute('editor/plugins_tmmaintenance_api/locale/list', [
             'module' => 'editor',
             'controller' => 'plugins_tmmaintenance_api',
-            'action' => 'locales'
+            'action' => 'locales',
         ]);
         $router->addRoute('plugins_tmmaintenance_locales', $route);
 
         $route = new ZfExtended_Controller_RestLikeRoute('editor/plugins_tmmaintenance_api/tm/list', [
             'module' => 'editor',
             'controller' => 'plugins_tmmaintenance_api',
-            'action' => 'tms'
+            'action' => 'tms',
         ]);
         $router->addRoute('plugins_tmmaintenance_tms', $route);
     }

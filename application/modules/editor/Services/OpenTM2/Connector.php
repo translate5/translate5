@@ -93,7 +93,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
     public function connectTo(
         LanguageResource $languageResource,
         $sourceLang,
-        $targetLang
+        $targetLang,
     ): void {
         $this->api = ZfExtended_Factory::get('editor_Services_OpenTM2_HttpApi');
         $this->api->setLanguageResource($languageResource);
@@ -327,7 +327,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
         editor_Models_Segment $segment,
         bool $recheckOnUpdate = self::DO_NOT_RECHECK_ON_UPDATE,
         bool $rescheduleUpdateOnError = self::DO_NOT_RESCHEDULE_UPDATE_ON_ERROR,
-        bool $useSegmentTimestamp = self::DO_NOT_USE_SEGMENT_TIMESTAMP
+        bool $useSegmentTimestamp = self::DO_NOT_USE_SEGMENT_TIMESTAMP,
     ): void {
         $tmName = $this->getWritableMemory();
 
@@ -347,14 +347,19 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
         $this->tagHandler->setInputTagMap($this->tagHandler->getTagMap());
         $target = $this->tagHandler->prepareQuery($segment->getTargetEdit(), false);
 
+        $timestamp = $useSegmentTimestamp
+            ? $this->api->getDate($segment->getTimestamp())
+            : $this->api->getNowDate();
+
         $successful = $this->api->update(
             $source,
             $target,
-            $segment,
+            $segment->getUserName(),
+            $segment->getMid(),
+            $timestamp,
             $fileName,
             $tmName,
             ! $this->isInternalFuzzy,
-            $useSegmentTimestamp
         );
 
         if ($successful) {
@@ -369,7 +374,16 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
             $this->addReorganizeWarning($segment->getTask());
             $this->reorganizeTm($tmName);
 
-            $successful = $this->api->update($source, $target, $segment, $fileName, $tmName, ! $this->isInternalFuzzy);
+            $successful = $this->api->update(
+                $source,
+                $target,
+                $segment->getUserName(),
+                $segment->getMid(),
+                $timestamp,
+                $fileName,
+                $tmName,
+                ! $this->isInternalFuzzy
+            );
 
             if ($successful) {
                 $this->checkUpdatedSegment($segment, $recheckOnUpdate);
@@ -383,7 +397,16 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
             $newName = $this->api->createEmptyMemory($newName, $this->languageResource->getSourceLangCode());
             $this->addMemoryToLanguageResource($newName);
 
-            $successful = $this->api->update($source, $target, $segment, $fileName, $tmName, ! $this->isInternalFuzzy);
+            $successful = $this->api->update(
+                $source,
+                $target,
+                $segment->getUserName(),
+                $segment->getMid(),
+                $timestamp,
+                $fileName,
+                $tmName,
+                ! $this->isInternalFuzzy
+            );
 
             if ($successful) {
                 $this->checkUpdatedSegment($segment, $recheckOnUpdate);
@@ -408,6 +431,115 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
             $tmName = $this->getWritableMemory();
         }
         $this->api->updateText($source, $target, $tmName);
+    }
+
+    /**
+     * Create a segment in t5memory
+     */
+    public function createSegment(
+        string $source,
+        string $target,
+        string $userName,
+        string $context,
+        int $timestamp,
+        string $fileName,
+    ): void {
+        $source = $this->tagHandler->prepareQuery($source);
+        $this->tagHandler->setInputTagMap($this->tagHandler->getTagMap());
+        $target = $this->tagHandler->prepareQuery($target, false);
+        $memoryName = $this->getWritableMemory();
+        $time = $this->api->getDate($timestamp);
+
+        $this->updateSegmentInMemory(
+            $source,
+            $target,
+            $userName,
+            $context,
+            $time,
+            $fileName,
+            $memoryName,
+        );
+    }
+
+    /**
+     * Update method was designed to work with editor_Models_Segment context
+     * so this method was added to be able to update a memory entry without an editor_Models_Segment
+     */
+    public function updateSegment(
+        int $memoryId,
+        string $segmentRecordKey,
+        string $segmentTargetKey,
+        string $source,
+        string $target,
+        string $userName,
+        string $context,
+        int $timestamp,
+        string $fileName,
+    ): void {
+        $this->deleteEntry($memoryId, $segmentRecordKey, $segmentTargetKey);
+
+        $source = $this->tagHandler->prepareQuery($source);
+        $this->tagHandler->setInputTagMap($this->tagHandler->getTagMap());
+        $target = $this->tagHandler->prepareQuery($target, false);
+        $memoryName = $this->getMemoryNameById($memoryId);
+        $time = $this->api->getDate($timestamp);
+
+        $this->updateSegmentInMemory(
+            $source,
+            $target,
+            $userName,
+            $context,
+            $time,
+            $fileName,
+            $memoryName,
+        );
+    }
+
+    private function updateSegmentInMemory(
+        $source,
+        $target,
+        $userName,
+        $context,
+        $time,
+        $fileName,
+        $memoryName,
+    ): bool {
+        $successful = $this->api->update($source, $target, $userName, $context, $time, $fileName, $memoryName);
+
+        if ($successful) {
+            return $successful;
+        }
+
+        $apiError = $this->api->getError();
+        if ($this->isMemoryOverflown($apiError)) {
+            $this->addOverflowWarning();
+
+            $currentWritableMemoryName = $this->getWritableMemory();
+            if ($memoryName === $currentWritableMemoryName) {
+                $newName = $this->generateNextMemoryName($this->languageResource);
+                $newName = $this->api->createEmptyMemory($newName, $this->languageResource->getSourceLangCode());
+                $this->addMemoryToLanguageResource($newName);
+            } else {
+                $newName = $currentWritableMemoryName;
+            }
+
+            return $this->updateSegmentInMemory($source, $target, $userName, $context, $time, $fileName, $newName);
+        }
+
+        if ($this->needsReorganizing($apiError, $memoryName)) {
+            $this->addReorganizeWarning();
+            $this->reorganizeTm($memoryName);
+
+            return $this->updateSegmentInMemory($source, $target, $userName, $context, $time, $fileName, $memoryName);
+        }
+
+        return $successful;
+    }
+
+    public function deleteEntry(int $memoryId, string $recordKey, string $targetKey): void
+    {
+        $memoryName = $this->getMemoryNameById($memoryId);
+        $this->api->deleteEntry($memoryName, $recordKey, $targetKey);
     }
 
     /**
@@ -444,12 +576,13 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
     private function getMetaData(object $found): array
     {
         $nameToShow = [
-            "documentName",
-            "matchType",
-            "author",
-            "timestamp",
-            "context",
-            "additionalInfo",
+            'documentName',
+            'matchType',
+            'author',
+            'timestamp',
+            'context',
+            'additionalInfo',
+            'internalKey',
         ];
         $result = [];
 
@@ -539,9 +672,18 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
                 continue;
             }
 
-            $results[] = $result->results;
+            $data = array_map(
+                static function ($item) use ($id) {
+                    $item->internalKey = $id . ':' . $item->internalKey;
+
+                    return $item;
+                },
+                $result->results
+            );
+            $results[] = $data;
             $resultsCount += count($result->results);
-            $resultList->setNextOffset($id . ':' . $id . ':' . $result->NewSearchPosition);
+            $resultList->setNextOffset($result->NewSearchPosition ? ($id . ':' . $result->NewSearchPosition) : null);
+
 
             // if we get enough results then response them
             if (self::CONCORDANCE_SEARCH_NUM_RESULTS <= $resultsCount) {
@@ -561,18 +703,12 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
         //[NextSearchPosition] =>
         $searchString = $this->conversionService->convertT5MemoryTagToContent($searchString);
         foreach ($results as $result) {
-            $resultList->addResult($this->highlight(
-                $searchString,
+            $resultList->addResult(
                 $this->tagHandler->restoreInResult($result->target, $isSource),
-                $field === 'target'
-            ));
-            $resultList->setSource(
-                $this->highlight(
-                    $searchString,
-                    $this->tagHandler->restoreInResult($result->source, $isSource),
-                    $isSource
-                )
+                0,
+                $this->getMetaData($result)
             );
+            $resultList->setSource($this->tagHandler->restoreInResult($result->source, $isSource), $isSource);
             $resultList->setRawContent($result->source, $result->target);
         }
 
@@ -595,10 +731,6 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
         return $this->queryTm($searchString, $dummySegment, 'source');
     }
 
-    /**
-     * (non-PHPdoc)
-     * @see editor_Services_Connector_FilebasedAbstract::delete()
-     */
     public function delete(): void
     {
         $successfullyDeleted = true;
@@ -688,7 +820,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
     public function getStatus(
         editor_Models_LanguageResources_Resource $resource,
         LanguageResource $languageResource = null,
-        ?string $tmName = null
+        ?string $tmName = null,
     ): string {
         $this->lastStatusInfo = '';
 
@@ -1380,7 +1512,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
     private function queryTm(
         string $queryString,
         editor_Models_Segment $segment,
-        string $fileName
+        string $fileName,
     ): editor_Services_ServiceResult {
         $resultList = new editor_Services_ServiceResult();
         $resultList->setLanguageResource($this->languageResource);
@@ -1480,6 +1612,22 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
         ]);
     }
 
+    public function getMemoryNameById(int $memoryId): ?string
+    {
+        $memories = $this->languageResource->getSpecificData('memories', parseAsArray: true);
+
+        foreach ($memories as $memory) {
+            if ($memory['id'] === $memoryId) {
+                return $memory['filename'];
+            }
+        }
+
+        // TODO add error code
+        throw new editor_Services_Connector_Exception('E1564', [
+            'name' => $this->languageResource->getName(),
+        ]);
+    }
+
     private function hasMemories(LanguageResource $languageResource): bool
     {
         return ! empty($languageResource->getSpecificData('memories', parseAsArray: true));
@@ -1504,7 +1652,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
     private function importTmxIntoMemory(
         string $fileContent,
         string $tmName,
-        StripFramingTags $stripFramingTags
+        StripFramingTags $stripFramingTags,
     ): bool {
         $successful = false;
 

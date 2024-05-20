@@ -77,7 +77,7 @@ Ext.define('TMMaintenance.view.main.SearchForm', {
             items: [
                 {
                     xtype: 'textfield',
-                    required: true,
+                    required: false,
                     name: 'searchCriteria',
                     label: 'Search criteria',
                     disabled: '{!disabled}',

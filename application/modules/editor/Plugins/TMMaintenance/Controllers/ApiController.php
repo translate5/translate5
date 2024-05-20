@@ -27,7 +27,7 @@ class Editor_Plugins_Tmmaintenance_ApiController extends ZfExtended_RestControll
     public function localesAction(): void
     {
         $data = [
-            'locale' => $this->resolveLocale()
+            'locale' => $this->resolveLocale(),
         ];
 
         $data['l10n'] = $this->readLocalization();
@@ -37,15 +37,17 @@ class Editor_Plugins_Tmmaintenance_ApiController extends ZfExtended_RestControll
 
     public function tmsAction(): void
     {
-        /** @var editor_Models_LanguageResources_LanguageResource $model */
         $model = ZfExtended_Factory::get(editor_Models_LanguageResources_LanguageResource::class);
 
         //get all resources for the customers of the user by language combination
-        $resources = $model->loadByUserCustomerAssocs([], [], [], ['editor_Services_OpenTM2']);
+        $resources = $model->loadByUserCustomerAssocs([], [], [], [editor_Services_Manager::SERVICE_OPENTM2]);
 
         $tms = array_map(
             static function (array $resource): array {
-                return ['name' => $resource['name'], 'value' => $resource['id']];
+                return [
+                    'name' => $resource['name'],
+                    'value' => $resource['id'],
+                ];
             },
             $resources
         );
@@ -53,19 +55,8 @@ class Editor_Plugins_Tmmaintenance_ApiController extends ZfExtended_RestControll
         $this->assignView($tms);
     }
 
-    public function getAction(): void
+    public function indexAction(): void
     {
-        // TODO seems to be not needed
-//        $segmentId = $this->getRequest()?->getParam('segments');
-//
-//        if (null !== $segmentId) {
-//            $this->assignView([
-//                $this->getSegmentsProcessor()->getOne($segmentId),
-//            ]);
-//
-//            return;
-//        }
-
         $this->assignView(
             $this->getSegmentsProcessor()->getList(GetListDTO::fromRequest($this->getRequest()))
         );
@@ -80,14 +71,13 @@ class Editor_Plugins_Tmmaintenance_ApiController extends ZfExtended_RestControll
     public function putAction(): void
     {
         $this->getSegmentsProcessor()->update(UpdateDTO::fromRequest($this->getRequest()));
-//        $data = $this->getSegmentsProcessor()->getOne($dto->getId());
-        $this->assignView([Json::decode($this->getRequest()?->getParam('data'))]);
+        $this->assignView([Json::decode($this->getRequest()->getParam('data'))]);
     }
 
     public function deleteAction(): void
     {
         $dto = DeleteDTO::fromRequest($this->getRequest());
-        $this->getSegmentsProcessor()->deleteAction($dto);
+        $this->getSegmentsProcessor()->delete($dto);
 
         $this->assignView([]);
     }
@@ -96,7 +86,7 @@ class Editor_Plugins_Tmmaintenance_ApiController extends ZfExtended_RestControll
 
     private function getSegmentsProcessor(): SegmentProcessor
     {
-        return ZfExtended_Factory::get(SegmentProcessor::class);
+        return new SegmentProcessor();
     }
 
     private function readLocalization(): array
@@ -104,6 +94,7 @@ class Editor_Plugins_Tmmaintenance_ApiController extends ZfExtended_RestControll
         $data = [];
 
         $fileContent = file_get_contents(__DIR__ . '/../locales/' . $this->session->data->locale . '.json');
+
         try {
             $data = Json::decode($fileContent);
         } catch (JsonException $exception) {
@@ -115,7 +106,7 @@ class Editor_Plugins_Tmmaintenance_ApiController extends ZfExtended_RestControll
 
     private function resolveLocale(): string
     {
-        $requestedLocale = (string)$this->getParam('locale');
+        $requestedLocale = (string) $this->getParam('locale');
 
         // TODO get locales from globally defined
         if ($this->getParam('locale')

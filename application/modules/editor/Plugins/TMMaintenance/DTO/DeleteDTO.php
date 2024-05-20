@@ -9,12 +9,8 @@ use Zend_Controller_Request_Abstract as Request;
 
 class DeleteDTO
 {
-    // TODO All properties except id will be removed after id is implemented on t5memory side
     public function __construct(
-        private string $id,
-        private int    $tm,
-        private string $source,
-        private string $target
+        public readonly string $id
     ) {
     }
 
@@ -22,31 +18,6 @@ class DeleteDTO
     {
         $data = Json::decode($request->getParam('data'));
 
-        return new self(
-            $data['id'],
-            (int)$data['tm'],
-            $data['rawSource'],
-            $data['rawTarget']
-        );
-    }
-
-    public function getId(): string
-    {
-        return $this->id;
-    }
-
-    public function getTm(): int
-    {
-        return $this->tm;
-    }
-
-    public function getSource(): string
-    {
-        return $this->source;
-    }
-
-    public function getTarget(): string
-    {
-        return $this->target;
+        return new self($data['id']);
     }
 }

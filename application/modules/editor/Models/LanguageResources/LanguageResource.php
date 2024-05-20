@@ -31,7 +31,7 @@ use editor_Models_Terminology_Models_CollectionAttributeDataType as CollectionAt
 /**
  * Languageresources Entity Object
  *
- * @method string getId()
+ * @method int|null getId()
  * @method void setId(int $id)
  * @method string getLangResUuid()
  * @method void setLangResUuid(string $guid)
@@ -300,12 +300,16 @@ class editor_Models_LanguageResources_LanguageResource extends ZfExtended_Models
         $select = $this->db
             ->select()
             ->from(
-                ['lr' => 'LEK_languageresources'],
+                [
+                    'lr' => 'LEK_languageresources',
+                ],
                 ['lr.id', 'lr.name', 'lr.serviceName', 'lr.resourceType', 'lr.specificData']
             )
             ->setIntegrityCheck(false)
             ->joinLeft(
-                ['lla' => 'LEK_languageresources_languages'],
+                [
+                    'lla' => 'LEK_languageresources_languages',
+                ],
                 'lr.id = lla.languageResourceId',
                 ['sourceLangCode', 'targetLangCode']
             );

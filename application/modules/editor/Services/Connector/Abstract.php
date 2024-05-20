@@ -386,21 +386,6 @@ abstract class editor_Services_Connector_Abstract
     }
 
     /**
-     * (For concordance search:) Highlight the searchString in the found source/target.
-     * @param string $searchString
-     * @param string $haystack
-     * @param bool $doit
-     */
-    protected function highlight($searchString, $haystack, $doit)
-    {
-        if (! $doit) {
-            return $haystack;
-        }
-
-        return preg_replace('/(' . preg_quote($searchString, '/') . ')/i', '<span class="highlight">\1</span>', $haystack);
-    }
-
-    /**
      * makes a tm / mt / file concordance search
      * @param string $field
      * @return editor_Services_ServiceResult

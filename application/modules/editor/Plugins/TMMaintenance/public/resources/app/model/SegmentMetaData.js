@@ -8,5 +8,6 @@ Ext.define('TMMaintenance.model.SegmentMetaData', {
         'timestamp',
         'context',
         'additionalInfo',
+        'internalKey',
     ],
 });

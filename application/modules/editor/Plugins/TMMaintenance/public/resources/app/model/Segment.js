@@ -3,7 +3,6 @@ Ext.define('TMMaintenance.model.Segment', {
 
     fields: [
         'id',
-        'tm',
         'languageResourceType',
         'languageResourceid',
         'matchrate',
@@ -15,14 +14,14 @@ Ext.define('TMMaintenance.model.Segment', {
     ],
 
     hasOne: {
-        model: 'SegmentMetaData',
+        model: 'TMMaintenance.model.SegmentMetaData',
         name: 'metaData',
-        associationKey: 'metaData'
+        associationKey: 'data.metaData'
     },
 
     proxy: {
         type: 'rest',
-        url: '/editor/plugins_tmmaintenance_api/segments',
+        url: '/editor/plugins_tmmaintenance_api',
         writer: {
             encode: true,
             rootProperty: 'data',

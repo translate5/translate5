@@ -10,12 +10,12 @@ Ext.define('TMMaintenance.view.main.CreateForm', {
         {
             required: true,
             label: 'Source text',
-            name: 'rawSource',
+            name: 'source',
         },
         {
             required: true,
             label: 'Target text',
-            name: 'rawTarget',
+            name: 'target',
         },
     ],
 

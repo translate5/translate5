@@ -31,10 +31,16 @@ Ext.define('TMMaintenance.view.main.List', {
         {
             text: 'Source text',
             dataIndex: 'source',
-            minWidth: 200,
+            minWidth: 300,
+            editable: true,
             sortable: false,
             cell: {
                 encodeHtml: false,
+            },
+            editor: {
+                xtype: 't5editor',
+                dataIndex: 'source',
+                editingDataIndex: 'source',
             },
             renderer: 'sourceTargetRenderer',
         },
@@ -51,7 +57,7 @@ Ext.define('TMMaintenance.view.main.List', {
             editor: {
                 xtype: 't5editor',
                 dataIndex: 'target',
-                editingDataIndex: 'rawTarget',
+                editingDataIndex: 'target',
             },
             renderer: 'sourceTargetRenderer',
         },

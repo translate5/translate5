@@ -7,28 +7,28 @@ Ext.define('TMMaintenance.view.main.MainController', {
     gridList: null,
 
     init: function() {
-        let me = this;
-
         const keymap = {
-            'escape':           [Ext.event.Event.ESC,   this.cancelEditing],
-            'f2':               [Ext.event.Event.F2,    this.startEditing],
-            'ctrl+s':           [Ext.event.Event.S,     this.saveCurrent,               {ctrl: true}],
-            'ctrl+enter':       [Ext.event.Event.ENTER, this.saveCurrentGoToNext,       {ctrl: true, shift: false}],
-            'ctrl+shift+enter': [Ext.event.Event.ENTER, this.saveCurrentGoToPrevious,   {ctrl: true, shift: true}],
-            'ctrl+alt+up':      [Ext.event.Event.UP,    this.goToPrevious,              {ctrl: true, alt: true}],
-            'ctrl+alt+down':    [Ext.event.Event.DOWN,  this.goToNext,                  {ctrl: true, alt: true}],
+            'escape': [Ext.event.Event.ESC, this.cancelEditing],
+            'f2': [Ext.event.Event.F2, this.startEditing],
+            'ctrl+s': [Ext.event.Event.S, this.saveCurrent, {ctrl: true, alt: false}],
+            'ctrl+enter': [Ext.event.Event.ENTER, this.saveCurrentGoToNext, {ctrl: true, shift: false}],
+            'ctrl+shift+enter': [Ext.event.Event.ENTER, this.saveCurrentGoToPrevious, {ctrl: true, shift: true}],
+            'ctrl+alt+up': [Ext.event.Event.UP, this.goToPrevious, {ctrl: true, alt: true}],
+            'ctrl+alt+down': [Ext.event.Event.DOWN, this.goToNext, {ctrl: true, alt: true}],
         };
 
         let bindings = [];
 
-        Ext.Object.each(keymap, function (key, item) {
-            item
-            bindings.push(Ext.applyIf(item[2] || {}, {
-                key: item[0],
-                handler: item[1],
-                scope: item[3] || me,
-            }));
-        });
+        for (const [key, item] of Object.entries(keymap)) {
+            bindings.push({
+                ...(item[2] || {}),
+                ...{
+                    key: item[0],
+                    handler: item[1],
+                    scope: item[3] || this,
+                }
+            });
+        }
 
         new Ext.util.KeyMap({
             target: this.getListGrid().element,
@@ -63,14 +63,14 @@ Ext.define('TMMaintenance.view.main.MainController', {
     },
 
     sourceTargetRenderer: function (value, record, cell) {
-        let tagHelper = Ext.create('TMMaintenance.helper.Tag');
-        let result = tagHelper.transform(value);
-
         if (this.getSearchForm().getSearchFieldValue() !== cell) {
-            return result;
+            return value;
         }
 
-        return tagHelper.highlight(result, this.getSearchForm().getSearchCriteriaValue());
+        const root = RichTextEditor.stringToDom(value);
+        this.highlight(root, this.getSearchForm().getSearchCriteriaValue());
+
+        return root.innerHTML;
     },
 
     onCreatePress: function () {
@@ -148,14 +148,19 @@ Ext.define('TMMaintenance.view.main.MainController', {
         editingPlugin.getActiveEditor().cancelEdit();
     },
 
-    saveCurrent: function() {
+    saveCurrent: function(keyCode, event) {
         let editingPlugin = this.getEditingPlugin();
 
         if (!editingPlugin.editing) {
             return;
         }
 
+        event.preventDefault();
+        event.stopPropagation();
+
         editingPlugin.getActiveEditor().completeEdit();
+
+        return false;
     },
 
     saveCurrentGoToNext: function () {
@@ -272,4 +277,26 @@ Ext.define('TMMaintenance.view.main.MainController', {
             editor.focus();
         }, 200);
     },
+
+    highlight: function (root, textToHighlight) {
+        const highlightSpan = `<span class="highlight" style="background-color: yellow;">$&</span>`;
+        const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, null, false);
+        const textNodes = [];
+        let node;
+
+        // Collect text nodes
+        while (node = walker.nextNode()) {
+            textNodes.push(node);
+        }
+
+        // Modify text nodes
+        textNodes.forEach(node => {
+            const regex = new RegExp(textToHighlight, 'gi'); // Word boundary regex to match whole words only
+            if (regex.test(node.nodeValue)) {
+                const newNode = document.createElement('span');
+                newNode.innerHTML = node.nodeValue.replace(regex, highlightSpan);
+                node.parentNode.replaceChild(newNode, node);
+            }
+        });
+    }
 });

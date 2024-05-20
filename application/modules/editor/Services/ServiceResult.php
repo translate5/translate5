@@ -158,7 +158,6 @@ class editor_Services_ServiceResult
 
     /**
      * Return serialized object
-     * @return string
      */
     public function getSerialized(): string
     {

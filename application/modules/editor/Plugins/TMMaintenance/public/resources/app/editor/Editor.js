@@ -19,14 +19,15 @@ Ext.define('Ext.translate5.Editor', {
     },
 
     onBeforeComplete: function () {
-        if (!this.validateTagsOrdering(this.getData())) {
-            Ext.Msg.show({
-                title: 'Validation error',
-                message: 'Some of the tags used in the segment are in the wrong order',
-            });
-
-            return false;
-        }
+        // TODO validate tags ordering
+        // if (!this.validateTagsOrdering(this.getData())) {
+        //     Ext.Msg.show({
+        //         title: 'Validation error',
+        //         message: 'Some of the tags used in the segment are in the wrong order',
+        //     });
+        //
+        //     return false;
+        // }
 
         return true;
     },
@@ -47,57 +48,62 @@ Ext.define('Ext.translate5.Editor', {
 
         let data = this.getData();
 
-        let tagHelper = Ext.create('TMMaintenance.helper.Tag');
-        data = tagHelper.reverseTransform(data);
-
-        if (location.record.get(this.config.editingDataIndex) === data) {
+        if (location.record.get(this.config.editingDataIndex) === data.data) {
             return result;
         }
 
         location.record.set('isSaving', true);
-        location.record.set(this.config.dataIndex, data);
-        location.record.set(this.config.editingDataIndex, data);
+        location.record.set(this.config.dataIndex, data.data);
+        location.record.set(this.config.editingDataIndex, data.data);
         location.record.save({
             success: function () {
                 location.record.set('isSaving', false);
+                location.view.refresh();
+                this.currentEditingRecord = null;
             },
             error: function () {
+                debugger;
                 // TODO show error
                 location.record.set('isSaving', false);
             }
         });
 
-        location.view.refresh();
-
-        this.currentEditingRecord = null;
-
         return result;
     },
 
     beforeEdit: function () {
-        let me = this;
-        let location = me.getLocation();
-        let tagHelper = Ext.create('TMMaintenance.helper.Tag');
-        let value = tagHelper.transform(location.record.get(this.config.editingDataIndex));
+        const location = this.getLocation();
+
         this.currentEditingRecord = location.record;
         location.record.set('isEditing', true);
 
-        if (null !== me.editor) {
-            me.editor.setData(value);
+        const value = location.record.get(this.config.editingDataIndex);
+
+        if (this.editor) {
+            this.setData(value);
 
             return;
         }
 
-        Editor.create(document.querySelector('#' + me.getField().inputElement.id))
-            .then((newEditor) => {
-                me.editor = newEditor;
-                me.editor.setData(value);
+        const element = document.querySelector('#' + this.getField().inputElement.id);
+        const TagsModeProvider = class {
+            isFullTagMode() {
+                return false;
+            }
+        }
 
-                me.addListeners(me.editor);
-            })
-            .catch(error => {
-                console.error(error);
-            });
+        new RichTextEditor.EditorWrapper(
+            element,
+            new TagsModeProvider(),
+            true,
+            true
+        ).then((editor) => {
+            this.editor = editor;
+
+            this.setData(value);
+
+            return editor;
+        });
     },
 
     onFocusLeave: function () {
@@ -108,64 +114,11 @@ Ext.define('Ext.translate5.Editor', {
         return this.editor;
     },
 
-    addListeners: function (editor) {
-        editor.editing.view.document.on(
-            'enter',
-            (evt, data) => {
-                //change enter to shift+enter to prevent ckeditor from inserting a new p tag
-                this.editor.execute('shiftEnter');
-                //Cancel existing event
-                data.preventDefault();
-                evt.stop();
-            }
-        );
-
-        editor.editing.view.document.on(
-            'clipboardInput',
-            (evt, data) => {
-                console.log('Paste from clipboard');
-
-                // Prevent the default listener from being executed.
-                // evt.stop();
-            }
-        );
-    },
-
-    validateTagsOrdering: function (data) {
-        let dom = document.createElement('html');
-        dom.innerHTML = data;
-
-        let isTagsOrderingRight = true;
-        let tags = [];
-        dom.getElementsByTagName('body')[0].childNodes.forEach(function (node) {
-            if (undefined === node.dataset) {
-                return;
-            }
-
-            if (undefined === node.dataset.tagType || 'single' === node.dataset.tagType) {
-                return;
-            }
-
-            if ('open' === node.dataset.tagType) {
-                tags.push(node.dataset.tagId);
-
-                return;
-            }
-
-            if (node.dataset.tagId !== tags[tags.length - 1]) {
-                isTagsOrderingRight = false;
-            }
-
-            tags.pop();
-        });
-
-        return isTagsOrderingRight && tags.length === 0;
-    },
-
     getData: function () {
-        let dom = document.createElement('html');
-        dom.innerHTML = this.editor.getData();
+        return this.editor.getDataT5Format();
+    },
 
-        return dom.getElementsByTagName('p')[0].innerHTML;
+    setData: function (data) {
+        this.editor.setDataT5Format(data, data);
     },
 });

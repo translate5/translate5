@@ -7,8 +7,7 @@ Ext.define('TMMaintenance.store.Segment', {
 
     proxy: {
         type: 'ajax',
-        // TODO change to relative url
-        url: '/editor/plugins_tmmaintenance_api/segments',
+        url: '/editor/plugins_tmmaintenance_api',
         reader: {
             type: 'json',
             rootProperty: 'items',

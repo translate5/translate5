@@ -31,7 +31,14 @@ Ext.define('TMMaintenance.view.main.SearchFormController', {
         this.getViewModel().set('selectedTm', values.tm);
         store.load({
             params: values,
-            callback: function(records, operation) {
+            callback: function(records, operation, success) {
+                if (!success) {
+                    // TODO show error
+                    console.log('Error loading store');
+
+                    return;
+                }
+
                 let offset = operation.getProxy().getReader().metaData.offset;
 
                 me.getViewModel().set('lastOffset', offset);

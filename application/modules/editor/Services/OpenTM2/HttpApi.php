@@ -421,11 +421,12 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
     public function update(
         string $source,
         string $target,
-        editor_Models_Segment $segment,
+        string $userName,
+        string $context,
+        string $timestamp,
         string $filename,
         string $tmName,
         bool $save2disk = true,
-        bool $useSegmentTimestamp = false
     ): bool {
         $this->error = null;
 
@@ -436,14 +437,10 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
             return false;
         }
 
-        $timestamp = $useSegmentTimestamp
-            ? (new DateTimeImmutable($segment->getTimestamp()))->format(self::DATE_FORMAT)
-            : $this->nowDate();
-
         $json->documentName = $filename; // 101 doc match
-        $json->author = $segment->getUserName();
+        $json->author = $userName;
         $json->timeStamp = $timestamp;
-        $json->context = $segment->getMid(); //INFO: this is segment stuff
+        $json->context = $context; //INFO: this is segment stuff
         // t5memory does not understand boolean parameters, so we have to convert them to 0/1
         $json->save2disk = $save2disk ? '1' : '0';
 
@@ -477,44 +474,14 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
         return $this->processResponse($http->request());
     }
 
-    /**
-     * @throws Zend_Http_Client_Exception
-     * @throws JsonException
-     * @throws Exception
-     */
-    public function updateEntry(string $source, string $target): array
+    public function deleteEntry(string $tmName, string $recordKey, string $targetKey): bool
     {
         $request = [
-            'sourceLang' => $this->fixLanguages->key($this->languageResource->getSourceLangCode()),
-            'targetLang' => $this->fixLanguages->key($this->languageResource->getTargetLangCode()),
-            'source' => $source,
-            'target' => $target,
-            'markupTable' => self::MARKUP_TABLE,
+            'recordKey' => $recordKey,
+            'targetKey' => $targetKey,
         ];
 
-        $http = $this->getHttpWithMemory('POST', 'entry');
-        $http->setRawData($this->jsonEncode($request), self::REQUEST_ENCTYPE);
-
-        $success = $this->processResponse($http->request());
-
-        if (!$success) {
-            throw new Exception();
-        }
-
-        return (array)$this->response;
-    }
-
-    public function deleteEntry(string $source, string $target): bool
-    {
-        $request = [
-            'sourceLang' => $this->fixLanguages->key($this->languageResource->getSourceLangCode()),
-            'targetLang' => $this->fixLanguages->key($this->languageResource->getTargetLangCode()),
-            'source' => $source,
-            'target' => $target,
-            'markupTable' => self::MARKUP_TABLE,
-        ];
-
-        $http = $this->getHttpWithMemory('POST', 'entrydelete');
+        $http = $this->getHttpWithMemory('POST', $tmName, 'entrydelete');
         $http->setRawData($this->jsonEncode($request), self::REQUEST_ENCTYPE);
 
         return $this->processResponse($http->request());
@@ -588,7 +555,7 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
         $json->markupTable = self::MARKUP_TABLE; //fixed markup table for our XLIFF subset
         $json->sourceLang = $this->fixLanguages->key($this->languageResource->getSourceLangCode());
         $json->targetLang = $this->fixLanguages->key($this->languageResource->getTargetLangCode());
-        $json->timeStamp = $this->nowDate();
+        $json->timeStamp = $this->getNowDate();
 
         return $json;
     }
@@ -639,9 +606,14 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
     /**
      * returns the current time stamp in the expected format for OpenTM2
      */
-    protected function nowDate()
+    public function getNowDate(): string
     {
         return gmdate(self::DATE_FORMAT);
+    }
+
+    public function getDate(int $timestamp): string
+    {
+        return gmdate(self::DATE_FORMAT, $timestamp);
     }
 
     /**

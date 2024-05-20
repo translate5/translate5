@@ -113,7 +113,7 @@
          *      +-----------------+
          */
         "etc": [
-            "sass/etc/all.scss"
+            "sass/styles.scss"
         ],
 
         /**

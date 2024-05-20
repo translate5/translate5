@@ -10,10 +10,14 @@ use Zend_Controller_Request_Abstract as Request;
 class UpdateDTO
 {
     public function __construct(
-        private string $id,
-        private int    $tm,
-        private string $source,
-        private string $target
+        public readonly string $id,
+        public readonly int $tmId,
+        public readonly string $source,
+        public readonly string $target,
+        public readonly string $documentName,
+        public readonly string $author,
+        public readonly string $timestamp,
+        public readonly string $context,
     ) {
     }
 
@@ -23,29 +27,13 @@ class UpdateDTO
 
         return new self(
             $data['id'],
-            (int)$data['tm'],
-            $data['rawSource'],
-            $data['rawTarget']
+            (int) $data['languageResourceid'],
+            $data['source'],
+            $data['target'],
+            $data['metaData']['documentName'],
+            $data['metaData']['author'],
+            $data['metaData']['timestamp'],
+            $data['metaData']['context'],
         );
-    }
-
-    public function getId(): string
-    {
-        return $this->id;
-    }
-
-    public function getTm(): int
-    {
-        return $this->tm;
-    }
-
-    public function getSource(): string
-    {
-        return $this->source;
-    }
-
-    public function getTarget(): string
-    {
-        return $this->target;
     }
 }
