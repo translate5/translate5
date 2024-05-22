@@ -213,35 +213,29 @@ class Editor_Controller_Helper_TaskUserInfo extends Zend_Controller_Action_Helpe
     {
         $taskGuid = $row['taskGuid'];
 
-        if (array_key_exists($taskGuid, $this->cachedUserTracking))
-        {
+        if (array_key_exists($taskGuid, $this->cachedUserTracking)) {
             $row['userTracking'] = $this->cachedUserTracking[$taskGuid];
-        } else
-        {
+        } else {
             $row['userTracking'] = $this->userTracking->getByTaskGuid($taskGuid);
         }
 
-        if ($this->task->getTaskGuid() != $taskGuid)
-        {
+        if ($this->task->getTaskGuid() != $taskGuid) {
             $this->task->init($row);
         }
 
-        if (! $this->task->anonymizeUsers())
-        {
+        if (! $this->task->anonymizeUsers()) {
             return;
         }
 
         /* @var $workflowAnonymize editor_Workflow_Anonymize */
-        if (! empty($row['lockingUser']))
-        {
+        if (! empty($row['lockingUser'])) {
             $row = $this->workflowAnonymize->anonymizeUserdata(
                 $taskGuid,
                 $row['lockingUser'],
                 $row
             );
         }
-        if (! empty($row['userTracking']))
-        {
+        if (! empty($row['userTracking'])) {
             foreach ($row['userTracking'] as &$rowTrack)
             {
                 $rowTrack = $this->workflowAnonymize->anonymizeUserdata(
@@ -251,8 +245,7 @@ class Editor_Controller_Helper_TaskUserInfo extends Zend_Controller_Action_Helpe
                 );
             }
         }
-        if (! empty($row['users']))
-        {
+        if (! empty($row['users'])) {
             foreach ($row['users'] as &$rowUser) {
                 $rowUser = $this->workflowAnonymize->anonymizeUserdata(
                     $taskGuid,
