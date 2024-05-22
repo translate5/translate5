@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace MittagQI\Translate5\Plugins\TMMaintenance\Service;
 
 use editor_Models_LanguageResources_LanguageResource;
-use editor_Models_Segment_Whitespace;
 use editor_Services_OpenTM2_Connector as Connector;
 use JetBrains\PhpStorm\ArrayShape;
 use MittagQI\Translate5\Plugins\TMMaintenance\DTO\CreateDTO;

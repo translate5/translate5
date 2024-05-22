@@ -684,7 +684,6 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
             $resultsCount += count($result->results);
             $resultList->setNextOffset($result->NewSearchPosition ? ($id . ':' . $result->NewSearchPosition) : null);
 
-
             // if we get enough results then response them
             if (self::CONCORDANCE_SEARCH_NUM_RESULTS <= $resultsCount) {
                 break;
@@ -701,14 +700,13 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
 
         //$found->{$field}
         //[NextSearchPosition] =>
-        $searchString = $this->conversionService->convertT5MemoryTagToContent($searchString);
         foreach ($results as $result) {
             $resultList->addResult(
                 $this->tagHandler->restoreInResult($result->target, $isSource),
                 0,
                 $this->getMetaData($result)
             );
-            $resultList->setSource($this->tagHandler->restoreInResult($result->source, $isSource), $isSource);
+            $resultList->setSource($this->tagHandler->restoreInResult($result->source, $isSource));
             $resultList->setRawContent($result->source, $result->target);
         }
 

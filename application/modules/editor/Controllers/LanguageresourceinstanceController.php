@@ -548,7 +548,6 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
 
             //for each results, get the assoc field
             $resids = array_column($result, $assocField);
-            ;
 
             $resids = array_unique($resids);
 

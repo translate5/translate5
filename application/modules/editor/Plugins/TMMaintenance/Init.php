@@ -52,6 +52,7 @@ class editor_Plugins_TMMaintenance_Init extends ZfExtended_Plugin_Abstract
         // Register the plugin as an applet
         Dispatcher::getInstance()->registerApplet('tmmaintenance', new class() extends AppletAbstract {
             protected string $urlPathPart = '/editor/tmmaintenance';
+
             protected string $initialPage = 'tmMaintenance';
         });
     }

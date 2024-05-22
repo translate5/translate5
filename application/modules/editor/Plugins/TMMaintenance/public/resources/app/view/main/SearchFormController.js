@@ -8,10 +8,8 @@ Ext.define('TMMaintenance.view.main.SearchFormController', {
         },
     },
 
-    onTMChange: function () {
-        let values = this.getView().getValues();
-        let viewModel = this.getViewModel();
-        viewModel.set('disabled', null === values.tm || null === values.searchField);
+    onSelectTmPress: function () {
+        this.getView().up('app-main').down('#selectTmDialog').show();
     },
 
     onSearchFieldChange: function () {
@@ -24,9 +22,9 @@ Ext.define('TMMaintenance.view.main.SearchFormController', {
             return;
         }
 
-        let values = this.getView().getValues();
-        let store = Ext.getCmp('mainlist').store;
-        let me = this;
+        const values = this.getView().getValues();
+        const store = Ext.getCmp('mainlist').store;
+        const me = this;
 
         this.getViewModel().set('selectedTm', values.tm);
         store.load({
@@ -50,34 +48,25 @@ Ext.define('TMMaintenance.view.main.SearchFormController', {
     },
 
     onApplicationLoad: function () {
-        let me = this;
-        // Setup default ajax headers
-        Ext.Ajax.setDefaultHeaders({
-            'Accept': 'application/json',
-            'csrfToken': window.csrfToken,
-        });
+        const store = Ext.ComponentQuery.query('#selecttm')[0].store;
+        const me = this;
 
-        Ext.Ajax.request({
-            url: '/editor/plugins_tmmaintenance_api/tm/list',
-            async: false,
-            method: 'GET',
-            success: function (xhr) {
-                let data = Ext.JSON.decode(xhr.responseText, true);
+        store.load({
+            callback: (records, operation, success) => {
+                if (!success) {
+                    // TODO show error
+                    console.log('Error loading store');
 
-                if (!(data)) {
-                    // TODO show an error
                     return;
                 }
 
-                me.getViewModel().setData({tms: data});
                 me.getView().setValues(me.parseUrlParams());
-
                 Ext.defer(function () {
                     if (!me.getView().down('[name=search]').isDisabled()) {
                         me.getView().down('[name=search]').buttonElement.dom.click();
                     }
                 }, 500);
-            }
+            },
         });
     },
 
@@ -130,8 +119,13 @@ Ext.define('TMMaintenance.view.main.SearchFormController', {
      * @returns {string[]}
      */
     getTmValues: function () {
-        return this.getViewModel().getData().tms.map(function (item) {
-            return item.value;
+        return Ext.ComponentQuery.query('#selecttm')[0].store.getData().items.map(function (item) {
+            return item.id;
         });
     },
+
+    getTmNameById: function (id) {
+        const tm = Ext.ComponentQuery.query('#selecttm')[0].store.getById(id);
+        return tm ? tm.data.name : null;
+    }
 });

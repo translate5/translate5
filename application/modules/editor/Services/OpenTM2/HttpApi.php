@@ -35,7 +35,9 @@ use MittagQI\Translate5\T5Memory\Enum\StripFramingTags;
 class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiAbstract
 {
     private const DATE_FORMAT = 'Ymd\THis\Z';
+
     private const MARKUP_TABLE = 'OTMXUXLF';
+
     private const REQUEST_ENCTYPE = 'application/json; charset=utf-8';
 
     public const MAX_STR_LENGTH = 2048;

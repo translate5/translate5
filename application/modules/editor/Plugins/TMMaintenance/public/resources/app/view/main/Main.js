@@ -6,6 +6,7 @@ Ext.define('TMMaintenance.view.main.Main', {
         'TMMaintenance.view.main.Toolbar',
         'TMMaintenance.view.main.SearchForm',
         'TMMaintenance.view.main.List',
+        'TMMaintenance.view.main.SelectTmDialog',
         'Ext.Dialog',
     ],
 
@@ -44,6 +45,9 @@ Ext.define('TMMaintenance.view.main.Main', {
                     shadow: true,
                 },
             ],
+        },
+        {
+            xtype: 'selectTmDialog',
         },
     ],
 });
