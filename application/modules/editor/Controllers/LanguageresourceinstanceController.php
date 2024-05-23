@@ -477,7 +477,7 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
 
     /***
      * Handle custom filtering in source,target,taskList and customerIds.
-     * The filters are extended so thay can filter using string values.
+     * The filters are extended so they can filter using string values.
      * TODO: can this be moved/implemented as assoc fiter ?
      */
     protected function handleFilterCustom()
@@ -505,7 +505,7 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
 
             //search the model for the given search string
             $m = ZfExtended_Factory::get($model);
-            $result = $m->search($searchValue, [$field]);
+            $result = $m->search($searchValue ?? '', [$field]);
 
             //collect the found $fields in the searched model
             $ids = array_column($result, $field);
@@ -547,9 +547,8 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
                 return;
             }
 
-            //for each results, get the assoc field
+            //for each result, get the assoc field
             $resids = array_column($result, $assocField);
-            ;
 
             $resids = array_unique($resids);
 

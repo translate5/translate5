@@ -48,7 +48,9 @@ class SessionSupportCommand extends Translate5AbstractCommand
 
             // the full command description shown when running the command with
             // the "--help" option
-            ->setHelp('Generates a new session for the support-user, optionally parses a given link/url for task & segment-nr.');
+            ->setHelp(
+                'Generates a new session for the support-user, optionally parses a given link/url for task & segment-nr.'
+            );
 
         $this->addArgument('path', InputArgument::OPTIONAL, 'An URL or path to fetch task/segment-nr from.');
     }
@@ -58,33 +60,50 @@ class SessionSupportCommand extends Translate5AbstractCommand
         $commandData = [
             // the command name is passed as first argument
             'command' => 'auth:impersonate',
-            'login' => 'mittagqi'
+            'login' => 'mittagqi',
         ];
-        $path = $input->getArgument('path'); // sth. like http://translate5.local/editor/taskid/2023/#task/2023/37/edit
+
+        // URL-formats covered here:
+        // http://translate5.local/editor/#project/2173/2174/focus
+        // http://translate5.local/editor/#task/2172/filter
+        // http://translate5.local/editor/taskid/2180/#task/2180/1/edit
+
+        $path = $input->getArgument('path');
         $taskId = null;
+        $segmentNr = null;
 
         // parse task-id & segment-id out of the passed link/path
-        if (!empty($path) && str_contains($path, 'editor/')) {
-            if (str_contains($path, '/editor/')) {
-                $parts = explode('/editor/', $path);
-                $path = $parts[1];
+        if (! empty($path) && str_contains($path, 'editor/')) {
+            $path = rtrim($path, '/');
+            if (
+                (str_contains($path, '#task/') && str_ends_with($path, '/filter')) ||
+                (str_contains($path, '#project/') && str_ends_with($path, '/focus'))
+            ) {
+                $taskId = $this->getNumericUrlPart($path, 1);
+            } elseif (str_contains($path, '#task/') && str_ends_with($path, '/edit')) {
+                $taskId = $this->getNumericUrlPart($path, 2);
+                $segmentNr = $this->getNumericUrlPart($path, 1);
             }
-            $parts = explode('/', str_replace('//', '/', $path));
-            $numParts = count($parts);
-            for ($i = 0; $i < $numParts; $i++) {
+        }
 
-                if ($parts[$i] === 'taskid' && $numParts > $i + 1 && is_numeric($parts[$i + 1])) {
-
-                    $taskId = $parts[$i + 1];
-                    $commandData['task'] = $taskId;
-
-                } else if ($taskId !== null && $parts[$i] === 'edit' && $i > 0 && is_numeric($parts[$i - 1])) {
-
-                    $commandData['--segment-nr'] = $parts[$i - 1];
-                }
+        if (! empty($taskId)) {
+            $commandData['task'] = $taskId;
+            if (! empty($segmentNr)) {
+                $commandData['--segment-nr'] = $segmentNr;
             }
         }
 
         return $this->getApplication()->doRun(new ArrayInput($commandData), $output);
+    }
+
+    private function getNumericUrlPart(string $path, int $offsetFromBehind): ?string
+    {
+        $parts = explode('/', trim(preg_replace('~/+~', '/', $path), '/'));
+        $idx = count($parts) - 1 - $offsetFromBehind;
+        if ($idx >= 0 && preg_match('~[0-9]+~', $parts[$idx]) !== false) {
+            return $parts[$idx];
+        }
+
+        return null;
     }
 }
