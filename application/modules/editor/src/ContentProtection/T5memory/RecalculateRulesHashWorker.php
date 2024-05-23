@@ -41,6 +41,7 @@ use MittagQI\Translate5\ContentProtection\Model\OutputMapping;
 use MittagQI\Translate5\Repository\LanguageRepository;
 use Zend_Db_Table_Select;
 use ZfExtended_Factory;
+use ZfExtended_Models_Entity_NotFoundException;
 use ZfExtended_Worker_Abstract;
 
 /**
@@ -147,10 +148,15 @@ class RecalculateRulesHashWorker extends ZfExtended_Worker_Abstract
             }
 
             $major = ZfExtended_Factory::get(Languages::class);
-            $major->loadByRfc5646($langModel->getMajorRfc5646());
 
-            if (in_array($major->getId(), $langs)) {
-                $this->updateHashesFor($pair['sourceLang'], $pair['targetLang']);
+            try {
+                $major->loadByRfc5646($langModel->getMajorRfc5646());
+
+                if (in_array($major->getId(), $langs)) {
+                    $this->updateHashesFor($pair['sourceLang'], $pair['targetLang']);
+                }
+            } catch (ZfExtended_Models_Entity_NotFoundException) {
+                // no major lang in DB
             }
         }
     }

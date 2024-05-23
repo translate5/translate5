@@ -209,7 +209,7 @@ class Editor_Controller_Helper_TaskUserInfo extends Zend_Controller_Action_Helpe
     /**
      * Applies the user anonymising rules to the data where it is needed
      */
-    protected function handleUserTracking(array &$row)
+    protected function handleUserTracking(array &$row): void
     {
         $taskGuid = $row['taskGuid'];
 
@@ -229,16 +229,28 @@ class Editor_Controller_Helper_TaskUserInfo extends Zend_Controller_Action_Helpe
 
         /* @var $workflowAnonymize editor_Workflow_Anonymize */
         if (! empty($row['lockingUser'])) {
-            $row = $this->workflowAnonymize->anonymizeUserdata($taskGuid, $row['lockingUser'], $row);
+            $row = $this->workflowAnonymize->anonymizeUserdata(
+                $taskGuid,
+                $row['lockingUser'],
+                $row
+            );
         }
         if (! empty($row['userTracking'])) {
             foreach ($row['userTracking'] as &$rowTrack) {
-                $rowTrack = $this->workflowAnonymize->anonymizeUserdata($taskGuid, $rowTrack['userGuid'] ?? '', $rowTrack);
+                $rowTrack = $this->workflowAnonymize->anonymizeUserdata(
+                    $taskGuid,
+                    $rowTrack['userGuid'] ?? '',
+                    $rowTrack
+                );
             }
         }
         if (! empty($row['users'])) {
             foreach ($row['users'] as &$rowUser) {
-                $rowUser = $this->workflowAnonymize->anonymizeUserdata($taskGuid, $rowUser['userGuid'], $rowUser);
+                $rowUser = $this->workflowAnonymize->anonymizeUserdata(
+                    $taskGuid,
+                    $rowUser['userGuid'],
+                    $rowUser
+                );
             }
         }
     }
