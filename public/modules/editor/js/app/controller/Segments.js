@@ -293,6 +293,15 @@ Ext.define('Editor.controller.Segments', {
     },
 
     /**
+     * Retrieves the edited column currently being edited (usually "targetEdit" or "sourceEdit")
+     * @returns {null|string}
+     */
+    getColumnToEdit: function(){
+        var grid = this.getSegmentGrid();
+        return (grid && grid.editingPlugin) ? grid.editingPlugin.editor.columnToEdit : null;
+    },
+
+    /**
      * reset grid filter and sort, grid will be reloaded and scrolled to top
      */
     clearSortAndFilter: function () {
@@ -694,7 +703,7 @@ Ext.define('Editor.controller.Segments', {
         //for later usage in ChangeAlike Handling and the saved record
         me.fireEvent('afterSaveCall', function () {
             me.saveChainEnd(record);
-        }, record);
+        }, record, ed.editor.columnToEdit);
     },
     /**
      * callback of saving a segment record
@@ -722,7 +731,7 @@ Ext.define('Editor.controller.Segments', {
         //the 'saveComplete' event is subscribed in 'ChangeAlike' controller, and it is disabled if the manual processing is disabled
         //we are not able to use the event listener priority because of the extjs bug : https://www.sencha.com/forum/showthread.php?305085-Observable-listener-priority-does-not-work
         //this bug also exist in extjs 6.2.0
-        me.fireEvent('beforeSaveCall', record);
+        me.fireEvent('beforeSaveCall', record, this.getColumnToEdit());
 
         // Get response json
         var json = operation.getResponse().responseJson;
