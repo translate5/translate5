@@ -372,8 +372,12 @@ class RecalcTransFound
 
             // If translation was found
             if ($value === 'transFound') {
-                // Get the best target term we have in current termEntry
-                $firstA = [array_values($this->trans[$this->exists[$srcId]['termEntryTbxId']])[0]];
+                // Get the best target term we have in current termEntry, if we have at least one
+                if (isset($this->trans[$this->exists[$srcId]['termEntryTbxId']])) {
+                    $firstA = [array_values($this->trans[$this->exists[$srcId]['termEntryTbxId']])[0]];
+                } else {
+                    $firstA = [];
+                }
 
                 // Append the best target term we have in each homonym termEntry
                 foreach ($this->homonym[$srcId] ?? [] as $termEntryId) {
