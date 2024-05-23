@@ -392,6 +392,7 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
             $this->view->rows->{$key} = $v;
         }
 
+        // @phpstan-ignore-next-line
         $this->view->rows->serviceName = $serviceManager->getUiNameByType($this->view->rows->serviceType);
 
         $eventLogger = ZfExtended_Factory::get('editor_Models_Logger_LanguageResources');
@@ -410,8 +411,8 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         /* @var $languages editor_Models_LanguageResources_Languages */
         $languages = $languages->loadResourceIdsGrouped($this->entity->getId());
 
-        $this->view->rows->sourceLang = $this->getLanguage($languages, 'sourceLang', $this->entity->getId());
-        $this->view->rows->targetLang = $this->getLanguage($languages, 'targetLang', $this->entity->getId());
+        $this->view->rows->sourceLang = $this->getLanguage($languages, 'sourceLang', (int) $this->entity->getId());
+        $this->view->rows->targetLang = $this->getLanguage($languages, 'targetLang', (int) $this->entity->getId());
 
         $this->prepareSpecificData($this->view->rows, false);
     }
@@ -476,7 +477,7 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
 
     /***
      * Handle custom filtering in source,target,taskList and customerIds.
-     * The filters are extended so thay can filter using string values.
+     * The filters are extended so they can filter using string values.
      * TODO: can this be moved/implemented as assoc fiter ?
      */
     protected function handleFilterCustom()
@@ -504,7 +505,7 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
 
             //search the model for the given search string
             $m = ZfExtended_Factory::get($model);
-            $result = $m->search($searchValue, [$field]);
+            $result = $m->search($searchValue ?? '', [$field]);
 
             //collect the found $fields in the searched model
             $ids = array_column($result, $field);
@@ -546,9 +547,8 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
                 return;
             }
 
-            //for each results, get the assoc field
+            //for each result, get the assoc field
             $resids = array_column($result, $assocField);
-            ;
 
             $resids = array_unique($resids);
 
@@ -841,7 +841,7 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
 
         /* @var editor_Models_LanguageResources_CustomerAssoc $customerAssoc */
         try {
-            $customerAssoc->saveAssocRequest($this->entity->getId(), $this->data);
+            $customerAssoc->saveAssocRequest((int) $this->entity->getId(), $this->data);
         } catch (ZfExtended_Models_Entity_Exceptions_IntegrityConstraint $e) {
             $this->entity->delete();
 
@@ -914,7 +914,7 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
             }
 
             $customerAssoc = ZfExtended_Factory::get('editor_Models_LanguageResources_CustomerAssoc');
-            $customerAssoc->updateAssocRequest($this->entity->getId(), $this->data);
+            $customerAssoc->updateAssocRequest((int) $this->entity->getId(), $this->data);
 
             $this->addAssocData();
         }
@@ -1582,7 +1582,7 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         /* @var $manager editor_Services_Manager */
         $task = $this->getCurrentTask();
 
-        return $manager->getConnector($this->entity, $task->getSourceLang(), $task->getTargetLang(), $task->getConfig());
+        return $manager->getConnector($this->entity, (int) $task->getSourceLang(), (int) $task->getTargetLang(), $task->getConfig());
     }
 
     /***
