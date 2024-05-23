@@ -181,7 +181,8 @@ Ext.define('Editor.view.admin.contentProtection.inputMapping.Grid', {
                 filter: {
                     type: 'string',
                     phpMode: false
-                }
+                },
+                renderer: v => Ext.String.htmlEncode(v)
             },
             {
                 xtype: 'gridcolumn',
@@ -193,7 +194,8 @@ Ext.define('Editor.view.admin.contentProtection.inputMapping.Grid', {
                 filter: {
                     type: 'string',
                     phpMode: false
-                }
+                },
+                renderer: v => Ext.String.htmlEncode(v)
             },
             {
                 xtype: 'gridcolumn',

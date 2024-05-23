@@ -36,6 +36,7 @@ use MittagQI\Translate5\Task\Current\NoAccessException;
 use MittagQI\Translate5\Task\Import\TaskDefaults;
 use MittagQI\Translate5\Task\TaskContextTrait;
 use MittagQI\ZfExtended\Controller\Response\Header;
+use ZfExtended_Sanitizer as Sanitizer;
 
 /***
  * Language resource controller
@@ -392,6 +393,7 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
             $this->view->rows->{$key} = $v;
         }
 
+        /** @phpstan-ignore-next-line */
         $this->view->rows->serviceName = $serviceManager->getUiNameByType($this->view->rows->serviceType);
 
         $eventLogger = ZfExtended_Factory::get('editor_Models_Logger_LanguageResources');
@@ -406,12 +408,11 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         $this->view->rows->status = $connector->getStatus($this->entity->getResource(), $this->entity);
         $this->view->rows->statusInfo = $t->_($connector->getLastStatusInfo());
 
-        $languages = ZfExtended_Factory::get('editor_Models_LanguageResources_Languages');
-        /* @var $languages editor_Models_LanguageResources_Languages */
+        $languages = ZfExtended_Factory::get(editor_Models_LanguageResources_Languages::class);
         $languages = $languages->loadResourceIdsGrouped($this->entity->getId());
 
-        $this->view->rows->sourceLang = $this->getLanguage($languages, 'sourceLang', $this->entity->getId());
-        $this->view->rows->targetLang = $this->getLanguage($languages, 'targetLang', $this->entity->getId());
+        $this->view->rows->sourceLang = $this->getLanguage($languages, 'sourceLang', (int) $this->entity->getId());
+        $this->view->rows->targetLang = $this->getLanguage($languages, 'targetLang', (int) $this->entity->getId());
 
         $this->prepareSpecificData($this->view->rows, false);
     }
@@ -841,7 +842,7 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
 
         /* @var editor_Models_LanguageResources_CustomerAssoc $customerAssoc */
         try {
-            $customerAssoc->saveAssocRequest($this->entity->getId(), $this->data);
+            $customerAssoc->saveAssocRequest((int) $this->entity->getId(), $this->data);
         } catch (ZfExtended_Models_Entity_Exceptions_IntegrityConstraint $e) {
             $this->entity->delete();
 
@@ -914,7 +915,7 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
             }
 
             $customerAssoc = ZfExtended_Factory::get('editor_Models_LanguageResources_CustomerAssoc');
-            $customerAssoc->updateAssocRequest($this->entity->getId(), $this->data);
+            $customerAssoc->updateAssocRequest((int) $this->entity->getId(), $this->data);
 
             $this->addAssocData();
         }
@@ -1582,7 +1583,12 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         /* @var $manager editor_Services_Manager */
         $task = $this->getCurrentTask();
 
-        return $manager->getConnector($this->entity, $task->getSourceLang(), $task->getTargetLang(), $task->getConfig());
+        return $manager->getConnector(
+            $this->entity,
+            (int) $task->getSourceLang(),
+            (int) $task->getTargetLang(),
+            $task->getConfig()
+        );
     }
 
     /***
@@ -1686,17 +1692,21 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
     /**
      * Transforms the specificData for the frontend
      * updates the value in the passed object or array and returns the deserialized specificData
-     * @param array|stdClass $resourceData
      * @throws Zend_Exception
      * @throws Zend_Json_Exception
      * @throws ZfExtended_Exception
      */
-    protected function prepareSpecificData(mixed &$resourceData, bool $isArray): array
+    protected function prepareSpecificData(array|stdClass &$resourceData, bool $isArray): array
     {
         if (($isArray && ! array_key_exists('specificData', $resourceData))
             || (! $isArray && ! property_exists($resourceData, 'specificData'))) {
             return [];
         }
+
+        if (! $isArray && ! property_exists($resourceData, 'specificData')) {
+            return [];
+        }
+
         $specificData = $isArray ? $resourceData['specificData'] : $resourceData->specificData;
         $specificData = empty($specificData) ? null : Zend_Json::decode($specificData);
 
@@ -1704,8 +1714,10 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
             $returnData = [];
             $specificData = null;
         } else {
-            $returnData = $specificData;
-            $specificData = Zend_Json::encode($specificData);
+            $returnData = is_array($specificData)
+                ? Sanitizer::escapeHtmlRecursive($specificData)
+                : Sanitizer::escapeHtmlInObject($specificData);
+            $specificData = Zend_Json::encode($returnData);
         }
 
         if ($isArray) {
@@ -1751,7 +1763,8 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
     // additional API needed to process client-restricted usage of the controller
 
     /**
-     * Fixes the current customer associations for client-restricted PMs: They may send assocs that do not contain the currently set assocs for customers they cannot see
+     * Fixes the current customer associations for client-restricted PMs:
+     * They may send assocs that do not contain the currently set assocs for customers they cannot see
      */
     private function transformClientRestrictedCustomerAssocs(): void
     {
@@ -1791,8 +1804,12 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
     /**
      * Adjusts a single Association that needs to be  potentially fixed if the user is only allowed to remove certain clients
      */
-    private function adjustClientRestrictedCustomerAssoc(string $paramName, array $originalValue, array $allowedCustomerIs, bool $doDebug): void
-    {
+    private function adjustClientRestrictedCustomerAssoc(
+        string $paramName,
+        array $originalValue,
+        array $allowedCustomerIs,
+        bool $doDebug
+    ): void {
         // evaluate the ids the client-restricted user is not allowed to change
         $notAllowedIds = array_values(array_diff($originalValue, $allowedCustomerIs));
 

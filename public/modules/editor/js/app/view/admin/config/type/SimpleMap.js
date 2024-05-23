@@ -74,7 +74,7 @@ Ext.define('Editor.view.admin.config.type.SimpleMap', {
                     res.push(key + '-' + item);
                 }
             });
-            return res.join('; ');
+            return Ext.String.htmlEncode(res.join('; '))
         }
     },
     initConfig: function (instanceConfig) {
@@ -157,7 +157,8 @@ Ext.define('Editor.view.admin.config.type.SimpleMap', {
                         xtype: 'textfield',
                         itemId: 'value',
                         maxLength: instanceConfig.valueMaxLength
-                    }
+                    },
+                    renderer: v => Ext.String.htmlEncode(v)
                 }],
                 store: Ext.create('Ext.data.ArrayStore', {
                     data: data,

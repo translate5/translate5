@@ -567,7 +567,8 @@ Ext.define('Editor.plugins.MatchAnalysis.view.admin.pricing.PresetGridController
 
     editableCellRenderer: function(value, metaData, record, rowIndex, colIndex, store, view) {
         this.setEditableCellHint(view, record, metaData);
-        return value;
+
+        return Ext.String.htmlEncode(value);
     },
 
     editablePriceAdjustmentCellRenderer: function(value, metaData, record, rowIndex, colIndex, store, view) {

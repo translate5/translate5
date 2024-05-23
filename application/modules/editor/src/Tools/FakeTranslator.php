@@ -29,6 +29,7 @@ END LICENSE AND COPYRIGHT
 namespace MittagQI\Translate5\Tools;
 
 use joshtronic\LoremIpsum;
+use MittagQI\ZfExtended\Tools\Markup;
 
 final class FakeTranslator
 {

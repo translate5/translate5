@@ -225,7 +225,7 @@ Ext.define('Editor.view.admin.task.TaskAttributes', {
         }
         var customersStore = Ext.StoreManager.get('customersStore'),
             customer = customersStore && customersStore.getById(val);
-        return customer ? customer.get('name') : '';
+        return customer ? Ext.String.htmlEncode(customer.get('name')) : '';
     },
     /**
      * Adds the usage mode radio box to the items list if allowed
