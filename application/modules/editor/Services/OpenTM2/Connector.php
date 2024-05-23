@@ -34,6 +34,7 @@ use MittagQI\Translate5\LanguageResource\Adapter\Exception\RescheduleUpdateNeede
 use MittagQI\Translate5\LanguageResource\Adapter\UpdatableAdapterInterface;
 use MittagQI\Translate5\LanguageResource\Status as LanguageResourceStatus;
 use MittagQI\Translate5\Service\T5Memory;
+use MittagQI\Translate5\T5Memory\DTO\SearchDTO;
 use MittagQI\Translate5\T5Memory\Enum\StripFramingTags;
 
 /**
@@ -606,8 +607,12 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
      *
      * {@inheritDoc}
      */
-    public function search(string $searchString, $field = 'source', $offset = null): editor_Services_ServiceResult
-    {
+    public function search(
+        string $searchString,
+        $field = 'source',
+        $offset = null,
+        SearchDTO $searchDTO = null
+    ): editor_Services_ServiceResult {
         $offsetTmId = null;
         $tmOffset = null;
 
@@ -647,14 +652,22 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
                 continue;
             }
 
-            $numResults = self::CONCORDANCE_SEARCH_NUM_RESULTS - $resultsCount;
 
-            $successful = $this->api->search($searchString, $tmName, $field, $tmOffset, $numResults);
+            if (null === $searchDTO) {
+                $numResults = self::CONCORDANCE_SEARCH_NUM_RESULTS - $resultsCount;
+                $successful = $this->api->concordanceSearch($searchString, $tmName, $field, $tmOffset, $numResults);
+            } else {
+                $successful = $this->api->search($tmName, $tmOffset, 200, $searchDTO);
+            }
 
             if (! $successful && $this->needsReorganizing($this->api->getError(), $tmName)) {
                 $this->addReorganizeWarning();
                 $this->reorganizeTm($tmName);
-                $successful = $this->api->search($searchString, $tmName, $field, $tmOffset, $numResults);
+                if (null === $searchDTO) {
+                    $successful = $this->api->concordanceSearch($searchString, $tmName, $field, $tmOffset, $numResults);
+                } else {
+                    $successful = $this->api->search($tmName, $tmOffset, 200, $searchDTO);
+                }
             }
 
             if (! $successful) {
@@ -711,6 +724,11 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
         }
 
         return $resultList;
+    }
+
+    public function searchNew()
+    {
+
     }
 
     /***

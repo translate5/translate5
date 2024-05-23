@@ -11,6 +11,7 @@ use MittagQI\Translate5\Plugins\TMMaintenance\DTO\CreateDTO;
 use MittagQI\Translate5\Plugins\TMMaintenance\DTO\DeleteDTO;
 use MittagQI\Translate5\Plugins\TMMaintenance\DTO\GetListDTO;
 use MittagQI\Translate5\Plugins\TMMaintenance\DTO\UpdateDTO;
+use MittagQI\Translate5\T5Memory\DTO\SearchDTO;
 use ZfExtended_Factory;
 
 final class SegmentProcessor
@@ -19,26 +20,27 @@ final class SegmentProcessor
         'items' => 'array',
         'metaData' => 'array',
     ])]
-    public function getList(GetListDTO $updateDto): array
+    public function getList(GetListDTO $getListDto): array
     {
-        $connector = $this->getOpenTM2Connector($updateDto->tmId);
+        $connector = $this->getOpenTM2Connector($getListDto->tmId);
         $totalAmount = 0;
-        $limit = $updateDto->limit;
+        $limit = $getListDto->limit;
         $result = [];
-        $offset = $updateDto->offset;
+        $offset = $getListDto->offset;
 
         while ($totalAmount < $limit) {
             $resultList = $connector->search(
-                $updateDto->searchCriteria,
-                $updateDto->searchField,
-                $offset
+                '',
+                '',
+                $offset,
+                $this->getSearchDto($getListDto)
             );
 
             $data = $resultList->getResult();
             $data = $this->reformatData($data);
 
-            $data = array_map(static function (array $item) use ($updateDto) {
-                $item['id'] = $updateDto->tmId . ':' . $item['metaData']['internalKey'];
+            $data = array_map(static function (array $item) use ($getListDto) {
+                $item['id'] = $getListDto->tmId . ':' . $item['metaData']['internalKey'];
 
                 return $item;
             }, $data);
@@ -151,5 +153,32 @@ final class SegmentProcessor
         $connector->connectTo($languageResource, $languageResource->getSourceLang(), $languageResource->getTargetLang());
 
         return $connector;
+    }
+
+    private function getSearchDto(GetListDTO $getListDto)
+    {
+        $data = $getListDto->toArray();
+
+        $data['sourceMode'] = $this->parseMode($data['sourceMode']);
+        $data['targetMode'] = $this->parseMode($data['targetMode']);
+        $data['authorMode'] = $this->parseMode($data['authorMode']);
+        $data['additionalInfoMode'] = $this->parseMode($data['additionalInfoMode']);
+        $data['documentMode'] = $this->parseMode($data['documentMode']);
+        $data['contextMode'] = $this->parseMode($data['contextMode']);
+
+        $data['creationDateFrom'] = (new \DateTime($data['creationDateFrom'] ?: '1970-01-01'))->getTimestamp();
+        $data['creationDateTo'] = (new \DateTime($data['creationDateTo'] ?: 'tomorrow'))->getTimestamp();
+
+        return SearchDTO::fromArray($data);
+    }
+
+    private function parseMode(?string $mode)
+    {
+        return match ($mode) {
+            'contains' => 'contains',
+            'concordance' => 'concordance',
+            'exact' => 'exact',
+            default => 'contains',
+        };
     }
 }

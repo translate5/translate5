@@ -90,20 +90,15 @@ Ext.define('TMMaintenance.view.main.SearchFormController', {
      * @returns {{searchField: (string|null), searchCriteria: (string|null), tm: (string|null)}}
      */
     parseUrlParams: function () {
-        const urlParams = window.location.hash.slice(1).split('/');
-
-        return {
-            tm: urlParams[0] !== undefined ? urlParams[0] : null,
-            searchField: urlParams[1] !== undefined ? urlParams[1] : null,
-            searchCriteria: urlParams[2] !== undefined ? decodeURI(urlParams[2]) : null,
-        };
+        debugger;
+        return this.stringToObject(window.location.hash.slice(1));
     },
 
     /**
      * @param {Object} values
      */
     updateUrl: function (values) {
-        window.location.hash = values.tm + '/' + values.searchField + '/' + encodeURI(values.searchCriteria);
+        window.location.hash = this.objectToStringEncoded(values);
     },
 
     /**
@@ -127,5 +122,38 @@ Ext.define('TMMaintenance.view.main.SearchFormController', {
     getTmNameById: function (id) {
         const tm = Ext.ComponentQuery.query('#selecttm')[0].store.getById(id);
         return tm ? tm.data.name : null;
-    }
+    },
+
+    objectToStringEncoded: function (object) {
+        const keyValuePairs = Object.entries(object).map(
+            ([key, value]) => {
+                if (value instanceof Date) {
+                    value = value.toISOString();
+                }
+
+                return `${encodeURIComponent(key)}=${encodeURIComponent(value ?? '')}`;
+            }
+        );
+
+        return keyValuePairs.join('/');
+    },
+
+    stringToObject: function (str) {
+        const object = {};
+        const dateFields = ['creationDateFrom', 'creationDateTo'];
+
+        str.split('/').forEach(pair => {
+            const [key, value] = pair.split('=');
+            const decodedKey = decodeURIComponent(key);
+            const decodedValue = decodeURIComponent(value);
+
+            if (dateFields.includes(decodedKey) && decodedValue !== '') {
+                object[decodedKey] = new Date(decodedValue);
+            } else {
+                object[decodedKey] = decodedValue;
+            }
+        });
+
+        return object;
+    },
 });

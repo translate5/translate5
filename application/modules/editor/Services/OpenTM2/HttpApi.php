@@ -27,6 +27,7 @@ END LICENSE AND COPYRIGHT
 */
 
 use MittagQI\Translate5\Service\T5Memory;
+use MittagQI\Translate5\T5Memory\DTO\SearchDTO;
 use MittagQI\Translate5\T5Memory\Enum\StripFramingTags;
 
 /**
@@ -387,7 +388,7 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
      * Note: Provide the returned search position NewSearchPosition as SearchPosition on
      * subsequenet calls to do a sequential search of the memory.
      */
-    public function search(
+    public function concordanceSearch(
         string $queryString,
         string $tmName,
         string $field,
@@ -407,6 +408,36 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
         $data->numResults = $numResults;
         $data->msSearchAfterNumResults = 250;
         $http = $this->getHttpWithMemory('POST', $tmName, 'concordancesearch');
+        $http->setRawData($this->jsonEncode($data), self::REQUEST_ENCTYPE);
+
+        return $this->processResponse($http->request());
+    }
+
+    public function search(
+        string $tmName,
+        ?int $searchPosition,
+        int $numResults,
+        SearchDTO $searchDTO
+    ): bool {
+        $data = [
+            'source'=> $searchDTO->source,
+            'sourceSearchMode'=> $searchDTO->sourceMode,
+            'target'=> $searchDTO->target,
+            'targetSearchMode'=> $searchDTO->targetMode,
+            'document'=> $searchDTO->document,
+            'documentSearchMode'=>$searchDTO->documentMode,
+            'author'=> $searchDTO->author,
+            'authorSearchMode'=> $searchDTO->authorMode,
+            'addInfo'=>$searchDTO->additionalInfo,
+            'addInfoSearchMode'=>$searchDTO->additionalInfoMode,
+            'context'=>$searchDTO->context,
+            'contextSearchMode'=>$searchDTO->contextMode,
+            'timestampSpanStart' => $this->getDate($searchDTO->creationDateFrom),
+            'timestampSpanEnd' => $this->getDate($searchDTO->creationDateTo),
+            'searchPosition'=> (string)$searchPosition,
+            'numResults'=> $numResults
+        ];
+        $http = $this->getHttpWithMemory('POST', $tmName, '/search');
         $http->setRawData($this->jsonEncode($data), self::REQUEST_ENCTYPE);
 
         return $this->processResponse($http->request());

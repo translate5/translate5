@@ -22,11 +22,9 @@ Ext.define('TMMaintenance.view.main.MainController', {
         for (const [key, item] of Object.entries(keymap)) {
             bindings.push({
                 ...(item[2] || {}),
-                ...{
-                    key: item[0],
-                    handler: item[1],
-                    scope: item[3] || this,
-                }
+                key: item[0],
+                handler: item[1],
+                scope: item[3] || this,
             });
         }
 
@@ -47,9 +45,7 @@ Ext.define('TMMaintenance.view.main.MainController', {
 
         store.load({
             params: {
-                tm: values.tm,
-                searchField: values.searchField,
-                searchCriteria: values.searchCriteria,
+                ...values,
                 offset: this.getViewModel().get('lastOffset'),
             },
             addRecords: true,
@@ -63,12 +59,14 @@ Ext.define('TMMaintenance.view.main.MainController', {
     },
 
     sourceTargetRenderer: function (value, record, cell) {
-        if (this.getSearchForm().getSearchFieldValue() !== cell) {
+        const entered = this.getSearchForm().getValues()[cell];
+
+        if (entered !== '') {
             return value;
         }
 
         const root = RichTextEditor.stringToDom(value);
-        this.highlight(root, this.getSearchForm().getSearchCriteriaValue());
+        this.highlight(root, entered);
 
         return root.innerHTML;
     },
@@ -155,8 +153,10 @@ Ext.define('TMMaintenance.view.main.MainController', {
             return;
         }
 
-        event.preventDefault();
-        event.stopPropagation();
+        if (event && !event.record) {
+            event.preventDefault();
+            event.stopPropagation();
+        }
 
         editingPlugin.getActiveEditor().completeEdit();
 

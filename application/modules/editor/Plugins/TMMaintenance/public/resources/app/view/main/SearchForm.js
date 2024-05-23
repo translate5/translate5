@@ -6,7 +6,8 @@ Ext.define('TMMaintenance.view.main.SearchForm', {
     requires: [
         'Ext.layout.HBox',
         'TMMaintenance.store.TM',
-        'TMMaintenance.view.main.SelectTm'
+        'TMMaintenance.view.main.SelectTm',
+        'TMMaintenance.view.fields.ModeCombo',
     ],
 
     autoSize: true,
@@ -15,6 +16,10 @@ Ext.define('TMMaintenance.view.main.SearchForm', {
         {
             xtype: 'panel',
             layout: 'hbox',
+            flex: 1,
+            defaults: {
+                margin: '0 20 0 0'
+            },
             items: [
                 {
                     xtype: 'container',
@@ -30,7 +35,7 @@ Ext.define('TMMaintenance.view.main.SearchForm', {
                                 change: function (field, newValue) {
                                     const form = this.up('searchform');
                                     const selectedName = form.getController().getTmNameById(newValue);
-                                    form.down('#tmInfo').setHtml('Selected TM: ' + (selectedName ? selectedName : 'Not selected'));
+                                    form.down('#tmName').setValue(selectedName ? selectedName : '');
                                 },
                             },
                             bind: '{selectedTm}',
@@ -41,19 +46,47 @@ Ext.define('TMMaintenance.view.main.SearchForm', {
                             },
                         },
                         {
-                            xtype: 'component',
-                            itemId: 'tmInfo',
-                            html: 'Selected TM: Not selected',
-                            style: 'margin-top: 1rem;',
+                            xtype: 'textfield',
+                            itemId: 'tmName',
+                            editable: false,
+                            clearable: false,
+                            label: 'TM',
+                            listeners: {
+                                click: 'onSelectTmPress',
+                            },
                         },
                         {
                             xtype: 'button',
                             name: 'selectTm',
-                            text: 'Select TM',
+                            iconCls: 'x-fa fa-search',
                             handler: 'onSelectTmPress',
                         },
                     ],
                 },
+                {
+                    xtype: 'textfield',
+                    required: false,
+                    name: 'source',
+                    label: 'Source',
+                    flex: 1,
+                    disabled: '{!selectedTm}',
+                    bind: {
+                        disabled: '{!selectedTm}',
+                    },
+                },
+                TMMaintenance.view.fields.ModeCombo.create('sourceMode'),
+                {
+                    xtype: 'textfield',
+                    required: false,
+                    name: 'target',
+                    label: 'Target',
+                    flex: 1,
+                    disabled: '{!selectedTm}',
+                    bind: {
+                        disabled: '{!selectedTm}',
+                    },
+                },
+                TMMaintenance.view.fields.ModeCombo.create('targetMode'),
             ],
         },
         {
@@ -61,61 +94,76 @@ Ext.define('TMMaintenance.view.main.SearchForm', {
             layout: 'hbox',
             flex: 1,
             defaults: {
-                margin: '0 10 0 0'
+                margin: '0 20 0 0'
             },
             items: [
-                {
-                    xtype: 'combobox',
-                    name: 'searchField',
-                    label: 'Search in',
-                    options: [
-                        {
-                            text: 'Source',
-                            value: 'source',
-                        },
-                        {
-                            text: 'Target',
-                            value: 'target',
-                        },
-                    ],
-                    listeners: {
-                        change: 'onSearchFieldChange',
-                    },
-                    userCls: 'field',
-                    width: 100,
-                    validators: {
-                        type: 'controller',
-                        fn: 'validateSearchField',
-                    },
-                },
-                {
-                    xtype: 'textfield',
-                    required: false,
-                    name: 'searchCriteria',
-                    label: 'Seaarch text',
-                    disabled: '{!selectedTm}',
-                    bind: {
-                        disabled: '{disabled}',
-                    },
-                },
                 {
                     xtype: 'textfield',
                     required: false,
                     name: 'author',
                     label: 'Author',
+                    flex: 1,
                     disabled: '{!selectedTm}',
                     bind: {
-                        disabled: '{disabled}',
+                        disabled: '{!selectedTm}',
                     },
                 },
+                TMMaintenance.view.fields.ModeCombo.create('authorMode'),
+                {
+                    xtype: 'textfield',
+                    required: false,
+                    name: 'additionalInfo',
+                    label: 'Additional info',
+                    flex: 1,
+                    disabled: '{!selectedTm}',
+                    bind: {
+                        disabled: '{!selectedTm}',
+                    },
+                },
+                TMMaintenance.view.fields.ModeCombo.create('additionalInfoMode'),
+                {
+                    xtype: 'textfield',
+                    required: false,
+                    name: 'document',
+                    label: 'Document',
+                    flex: 1,
+                    disabled: '{!selectedTm}',
+                    bind: {
+                        disabled: '{!selectedTm}',
+                    },
+                },
+                TMMaintenance.view.fields.ModeCombo.create('documentMode'),
+            ],
+        },
+        {
+            xtype: 'panel',
+            layout: 'hbox',
+            flex: 1,
+            defaults: {
+                margin: '0 20 0 0'
+            },
+            items: [
+                // {
+                //     xtype: 'textfield',
+                //     required: false,
+                //     name: 'context',
+                //     label: 'Context',
+                //     flex: 1,
+                //     disabled: '{!selectedTm}',
+                //     bind: {
+                //         disabled: '{!selectedTm}',
+                //     },
+                // },
+                // TMMaintenance.view.fields.ModeCombo.create('contextMode'),
                 {
                     xtype: 'datepickerfield',
                     required: false,
                     name: 'creationDateFrom',
                     label: 'Creation date after',
+                    flex: 1,
                     disabled: '{!selectedTm}',
                     bind: {
-                        disabled: '{disabled}',
+                        disabled: '{!selectedTm}',
                     },
                 },
                 {
@@ -123,32 +171,25 @@ Ext.define('TMMaintenance.view.main.SearchForm', {
                     required: false,
                     name: 'creationDateTo',
                     label: 'Creation date before',
+                    flex: 1,
                     disabled: '{!selectedTm}',
                     bind: {
-                        disabled: '{disabled}',
+                        disabled: '{!selectedTm}',
                     },
                 },
                 {
                     xtype: 'button',
                     name: 'search',
-                    // iconCls: 'x-fa fa-search',
                     text: 'Search',
+                    flex: 1,
                     handler: 'onSearchPress',
                     formBind: true,
                     disabled: '{!selectedTm}',
                     bind: {
-                        disabled: '{disabled}',
+                        disabled: '{!selectedTm}',
                     },
                 },
-            ],
+            ]
         },
     ],
-
-    getSearchCriteriaValue: function () {
-        return this.getValues().searchCriteria;
-    },
-
-    getSearchFieldValue: function () {
-        return this.getValues().searchField;
-    },
 })

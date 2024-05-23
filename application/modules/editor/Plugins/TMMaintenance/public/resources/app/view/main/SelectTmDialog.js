@@ -2,7 +2,6 @@ Ext.define('TMMaintenance.view.main.SelectTmDialog', {
     extend: 'Ext.Dialog',
     xtype: 'selectTmDialog',
     itemId: 'selectTmDialog',
-    title: 'Select TM',
     maximizable: true,
     bodyPadding: 20,
     centered: true,
@@ -15,7 +14,9 @@ Ext.define('TMMaintenance.view.main.SelectTmDialog', {
     buttons: [
         {
             text: 'Close',
-            handler: () => Ext.ComponentQuery.query('#selectTmDialog')[0].hide(),
+            handler: () => {
+                Ext.ComponentQuery.query('#selectTmDialog')[0].hide();
+            },
         },
     ]
 });

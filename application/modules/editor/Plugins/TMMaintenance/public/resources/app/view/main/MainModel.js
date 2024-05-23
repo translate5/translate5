@@ -8,5 +8,6 @@ Ext.define('TMMaintenance.view.main.MainModel', {
         selectedTm: null,
         lastOffset: null,
         hasMoreRecords: false,
+        l10n: {},
     },
 });

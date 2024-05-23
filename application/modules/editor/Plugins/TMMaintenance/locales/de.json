@@ -3,5 +3,12 @@
   "localeStore": [
     { "locale": "en", "name": "Englisch" },
     { "locale": "de", "name": "Deutsch"  }
-  ]
+  ],
+  "selectTm": {
+    "title": "Select TM",
+    "name": "Name",
+    "sourceLanguage": "Quellsprache",
+    "targetLanguage": "Zielsprache",
+    "select": "Select"
+  }
 }

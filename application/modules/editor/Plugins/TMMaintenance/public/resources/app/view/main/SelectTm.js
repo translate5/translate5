@@ -8,30 +8,41 @@ Ext.define('TMMaintenance.view.main.SelectTm', {
     plugins: {
         gridfilters: true,
     },
-    title: 'Select TM',
+    bind: {
+        title: '{l10n.selectTm.title}',
+    },
     minHeight: 400,
     layout: 'fit',
 
     columns: [
         {
-            text: 'Name',
             dataIndex: 'name',
+            bind: {
+                text: '{l10n.selectTm.name}',
+                hidden: '{!l10n.selectTm.name}',
+            },
             minWidth: 200,
             filter: {
                 type: 'string'
             },
         },
         {
-            text: 'Source Language',
             dataIndex: 'sourceLanguage',
+            bind: {
+                text: '{l10n.selectTm.sourceLanguage}',
+                hidden: '{!l10n.selectTm.sourceLanguage}',
+            },
             width: 100,
             filter: {
                 type: 'string'
             },
         },
         {
-            text: 'Target Language',
             dataIndex: 'targetLanguage',
+            bind: {
+                text: '{l10n.selectTm.targetLanguage}',
+                hidden: '{!l10n.selectTm.targetLanguage}',
+            },
             width: 100,
             filter: {
                 type: 'string'
@@ -43,7 +54,10 @@ Ext.define('TMMaintenance.view.main.SelectTm', {
                 xtype: 'widgetcell',
                 widget: {
                     xtype: 'button',
-                    text: 'Select',
+                    bind: {
+                        text: '{l10n.selectTm.select}',
+                        hidden: '{!l10n.selectTm.select}',
+                    },
                     handler: 'onTmSelect',
                 }
             }

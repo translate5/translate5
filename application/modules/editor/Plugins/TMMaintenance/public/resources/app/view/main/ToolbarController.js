@@ -19,7 +19,7 @@ Ext.define('TMMaintenance.view.main.ToolbarController', {
     onLocaleChange: function (comboBox, newLocale) {
         console.log(newLocale);
 
-        this.loadData();
+        this.loadData(newLocale);
     },
 
     onLogoutButtonClick: function () {
@@ -27,7 +27,7 @@ Ext.define('TMMaintenance.view.main.ToolbarController', {
     },
 
     // TODO add chosen locale
-    loadData: function () {
+    loadData: function (newLocale = null) {
         let me = this;
         // Setup default ajax headers
         Ext.Ajax.setDefaultHeaders({
@@ -35,8 +35,13 @@ Ext.define('TMMaintenance.view.main.ToolbarController', {
             'csrfToken': window.csrfToken,
         });
 
+        let url = '/editor/plugins_tmmaintenance_api/locale/list';
+        if (newLocale) {
+            url += '?locale=' + newLocale
+        }
+
         Ext.Ajax.request({
-            url: '/editor/plugins_tmmaintenance_api/locale/list',
+            url: url,
             async: false,
             method: 'GET',
             success: function (xhr) {
