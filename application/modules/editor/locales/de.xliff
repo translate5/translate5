@@ -9774,6 +9774,10 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
                 <source>Einige Translation Memorys, die auf der Grundlage Ihrer Standardeinstellungen zugewiesen werden, sind noch nicht gemäß den bestehenden Regeln für die Content Protection konvertiert. Sie sollten sie in der Sprachressourcenverwaltung konvertieren, bevor Sie sie verwenden.<br/>Möchten Sie den Aufgabenimport abbrechen?</source>
                 <target>Einige Translation Memorys, die auf der Grundlage Ihrer Standardeinstellungen zugewiesen werden, sind noch nicht gemäß den bestehenden Regeln für die Content Protection konvertiert. Sie sollten sie in der Sprachressourcenverwaltung konvertieren, bevor Sie sie verwenden.<br/>Möchten Sie den Aufgabenimport abbrechen?</target>
             </trans-unit>
+            <trans-unit id='TG9rYWxlbiBCZW51dHplciBtaXQgRGF0ZW4gYXVzIGRlbSBTU08gUHJvdmlkZXIgYWt0dWFsaXNpZXJlbiAoUm9sbGVuLCBHZXNjaGxlY2h0LCBTcHJhY2hlKQ=='>
+                <source>Lokalen Benutzer mit Daten aus dem SSO Provider aktualisieren (Rollen, Geschlecht, Sprache)</source>
+                <target>Lokalen Benutzer mit Daten aus dem SSO Provider aktualisieren (Rollen, Geschlecht, Sprache)</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

@@ -96,5 +96,7 @@ class editor_Models_Validator_Customer extends ZfExtended_Models_Validator_Abstr
         ]);
 
         $this->addValidator('openIdRedirectCheckbox', 'int');
+
+        $this->addValidator('openIdSyncUserData', 'int');
     }
 }

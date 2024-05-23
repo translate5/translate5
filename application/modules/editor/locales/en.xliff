@@ -9948,6 +9948,10 @@ E-Mail: service@MittagQI.com</pre>
                 <source>Einige Translation Memorys, die auf der Grundlage Ihrer Standardeinstellungen zugewiesen werden, sind noch nicht gemäß den bestehenden Regeln für die Content Protection konvertiert. Sie sollten sie in der Sprachressourcenverwaltung konvertieren, bevor Sie sie verwenden.<br/>Möchten Sie den Aufgabenimport abbrechen?</source>
                 <target>Some translation memories that are assigned based on your default settings are not yet converted according to the existing Content Protection rules. You should convert them in Language Resource Management before using them.<br/>Do you want to cancel the task import?</target>
             </trans-unit>
+            <trans-unit id='TG9rYWxlbiBCZW51dHplciBtaXQgRGF0ZW4gYXVzIGRlbSBTU08gUHJvdmlkZXIgYWt0dWFsaXNpZXJlbiAoUm9sbGVuLCBHZXNjaGxlY2h0LCBTcHJhY2hlKQ=='>
+                <source>Lokalen Benutzer mit Daten aus dem SSO Provider aktualisieren (Rollen, Geschlecht, Sprache)</source>
+                <target>Update locale user with data from the SSO provider (roles, gender, locale)</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>
