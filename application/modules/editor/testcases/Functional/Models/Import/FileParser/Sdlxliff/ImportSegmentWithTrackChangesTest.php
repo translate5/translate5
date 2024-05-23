@@ -1,6 +1,6 @@
 <?php
 
-namespace MittagQI\Translate5\Test\Functional\Models\Import\FileParser;
+namespace MittagQI\Translate5\Test\Functional\Models\Import\FileParser\Sdlxliff;
 
 use editor_Models_File;
 use editor_Models_Import_FileParser;
@@ -12,7 +12,7 @@ use Zend_Registry;
 use ZfExtended_Factory;
 use ZfExtended_Utils;
 
-class SdlxliffTest extends editor_Test_UnitTest
+class ImportSegmentWithTrackChangesTest extends editor_Test_UnitTest
 {
     private editor_Models_Task $task;
 
@@ -65,7 +65,7 @@ class SdlxliffTest extends editor_Test_UnitTest
     /**
      * @dataProvider expectedSegmentsProvider
      */
-    public function testImportSegmentWithTrackChanges(string $expectedTarget): void
+    public function test(string $expectedTarget): void
     {
         $db = \Zend_Db_Table::getDefaultAdapter();
         $trackingTable = ZfExtended_Factory::get(editor_Models_TaskUserTracking::class)->db;
@@ -89,8 +89,8 @@ class SdlxliffTest extends editor_Test_UnitTest
         $segmentFieldManager = \editor_Models_SegmentFieldManager::getForTaskGuid($this->task->getTaskGuid());
 
         $parser = new Sdlxliff(
-            __DIR__ . '/testfiles/formatierte-Datei.odt.sdlxliff',
-            'formatierte-Datei.odt.sdlxliff',
+            __DIR__ . '/testfiles/ImportSegmentWithTrackChangesTest.sdlxliff',
+            'ImportSegmentWithTrackChangesTest.sdlxliff',
             (int) $this->file->getId(),
             $this->task,
         );
@@ -99,7 +99,7 @@ class SdlxliffTest extends editor_Test_UnitTest
         $sp = new class($this->task, $expectedTarget) extends \editor_Models_Import_SegmentProcessor {
             public function __construct(
                 editor_Models_Task $task,
-                private string $expectedTarget
+                private string $expectedTarget,
             ) {
                 parent::__construct($task);
             }
@@ -107,7 +107,7 @@ class SdlxliffTest extends editor_Test_UnitTest
             public function process(editor_Models_Import_FileParser $parser)
             {
                 $fields = $parser->getFieldContents();
-                SdlxliffTest::assertSame($this->expectedTarget, $fields['target']['original']);
+                ImportSegmentWithTrackChangesTest::assertSame($this->expectedTarget, $fields['target']['original']);
 
                 return false;
             }
