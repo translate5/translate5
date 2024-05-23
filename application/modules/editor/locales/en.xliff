@@ -6836,9 +6836,9 @@ The following task was imported with errors / warnings / notices. Please take ca
                 <source>1. Lektorat (technisch)</source>
                 <target>1st revision - technical</target>
             </trans-unit>
-            <trans-unit id='Mi4gTGVrdG9yYXQgKHNwcmFjaGxpY2gp'>
-                <source>2. Lektorat (sprachlich)</source>
-                <target>2nd revision - language</target>
+            <trans-unit id='Mi4gTGVrdG9yYXQgKHNwcmFjaGxpY2gsIG1pdCBiZWFyYmVpdGJhcmVuIDEwMCUgVHJlZmZlcm4p'>
+                <source>2. Lektorat (sprachlich, mit bearbeitbaren 100% Treffern)</source>
+                <target>2nd revision - language with editable 100% matches</target>
             </trans-unit>
             <trans-unit id='Mi4gTGVrdG9yYXQgKHRlY2huaXNjaCk='>
                 <source>2. Lektorat (technisch)</source>
