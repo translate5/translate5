@@ -33,6 +33,7 @@ END LICENSE AND COPYRIGHT
  */
 
 use MittagQI\Translate5\Service\SystemCheck;
+use Models_SystemRequirement_Modules_Configuration as SysReqConfiguration;
 
 /**
  * Stellt Methoden bereit, die translate5 grundsätzlich als Stand Alone-Anwendung verfügbar machen
@@ -106,7 +107,11 @@ class IndexController extends ZfExtended_Controllers_Action
         // system check - without services! → boil error if anything wrong
         $validator = new ZfExtended_Models_SystemRequirement_Validator(false);
         $results = $validator->validate(ignoredModules: [SystemCheck::CHECK_NAME]);
-        foreach ($results as $oneResult) {
+        foreach ($results as $type => $oneResult) {
+            if ($this->isMaintenanceWarningOnly($type, $oneResult)) {
+                continue;
+            }
+
             if ($oneResult->hasError() || $oneResult->hasWarning()) {
                 $this->view->monitoringHttpCode = 500;
                 $this->view->monitoringMessage = 'system status has errors or warnings';
@@ -116,7 +121,9 @@ class IndexController extends ZfExtended_Controllers_Action
                     ->warn(
                         'E1602',
                         'Monitoring not successful: {reason}',
-                        ['reason' => $this->view->monitoringMessage]
+                        [
+                            'reason' => $this->view->monitoringMessage,
+                        ]
                     );
 
                 return;
@@ -143,5 +150,13 @@ class IndexController extends ZfExtended_Controllers_Action
             return;
         }
         parent::displayMaintenance();
+    }
+
+    private function isMaintenanceWarningOnly(string $type, ZfExtended_Models_SystemRequirement_Result $oneResult): bool
+    {
+        return $type == SysReqConfiguration::RESULT_ID
+            && ! $oneResult->hasError()
+            && count($oneResult->warning) === 1
+            && reset($oneResult->warning) === SysReqConfiguration::MAINTENANCE_WARNING;
     }
 }

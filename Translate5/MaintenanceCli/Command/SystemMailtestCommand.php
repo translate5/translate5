@@ -100,12 +100,15 @@ class SystemMailtestCommand extends Translate5AbstractCommand
 
         $mail = new \ZfExtended_Mailer('utf-8');
         $mail->setSubject('Translate5 test E-Mail - from ' . $config->runtimeOptions->server->name);
-        $mail->setBodyText(join("\n", [
+        $body = [
             'This is a test e-mail to check if the',
             'mail configuration of translate5 is working.',
             'Check mail source code to check the used servers.',
             'Tested instance: ' . $this->translate5->getHostname(),
-        ]));
+        ];
+        $mail->setBodyText(join("\n", $body));
+        $body[] = '<b>HTML Test - I should be bold!</b>';
+        $mail->setBodyHtml(join("<br>\n", $body));
         $mail->addTo($email);
         $mail->send();
         if (is_null($mail->getLastError())) {
