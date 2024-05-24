@@ -100,18 +100,14 @@ class editor_Models_Import_FileParser_Xlf_ShortTagNumbers
             if (!is_null($tag->rid) && array_key_exists('rid-' . $tag->rid, $tagsById)) {
                 // tag has an rid and there is already a tag with rid
                 $this->setAsPartners($tag, $tagsById['rid-' . $tag->rid]);
+            } elseif (is_null($tag->rid) && !$tag->isSingle() && array_key_exists('id-' . $tag->id, $tagsById)) {
+                // we may apply id based matching only if no rid based partner was found (and the tag has no rid)
+                // and on open/close tags, since the id of single tags may be duplicated
+                $this->setAsPartners($tag, $tagsById['id-' . $tag->id]);
+            } elseif (!is_null($tag->rid)) {
+                $tagsById['rid-' . $tag->rid] = $tag;
             } else {
-                if (is_null($tag->rid) && !$tag->isSingle() && array_key_exists('id-' . $tag->id, $tagsById)) {
-                    // we may apply id based matching only if no rid based partner was found (and the tag has no rid)
-                    // and on open/close tags, since the id of single tags may be duplicated
-                    $this->setAsPartners($tag, $tagsById['id-' . $tag->id]);
-                } else {
-                    if (!is_null($tag->rid)) {
-                        $tagsById['rid-' . $tag->rid] = $tag;
-                    } else {
-                        $tagsById['id-' . $tag->id] = $tag;
-                    }
-                }
+                $tagsById['id-' . $tag->id] = $tag;
             }
         }
 
