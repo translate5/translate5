@@ -95,6 +95,7 @@ Ext.define('Editor.view.admin.contentProtection.outputMapping.GridController', {
 
     editableCellRenderer: function(value, metaData, record, rowIndex, colIndex, store, view) {
         this.setEditableCellHint(view, record, metaData);
-        return value;
+
+        return Ext.String.htmlEncode(value);
     }
 });

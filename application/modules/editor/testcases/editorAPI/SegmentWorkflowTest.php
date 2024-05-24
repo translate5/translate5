@@ -26,6 +26,8 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use editor_Models_Segment_AutoStates as AutoStates;
+use editor_Workflow_Default as DefaultWorkflow;
 use MittagQI\Translate5\Test\Import\Config;
 
 /**
@@ -34,6 +36,12 @@ use MittagQI\Translate5\Test\Import\Config;
  */
 class SegmentWorkflowTest extends editor_Test_ImportTest
 {
+    public const WORKFLOW_COMPLEX = 'complex';
+
+    public const USER_REVIEWER = 'testlector';
+
+    public const USER_TRANSLATOR = 'testtranslator';
+
     protected static bool $termtaggerRequired = true;
 
     protected static array $requiredPlugins = [
@@ -46,42 +54,85 @@ class SegmentWorkflowTest extends editor_Test_ImportTest
 
     protected static array $requiredRuntimeOptions = [
         'editor.notification.saveXmlToFile' => 1,
+        'runtimeOptions.import.edit100PercentMatch' => 0,
     ];
 
+    /**
+     * @throws \MittagQI\Translate5\Test\Import\Exception
+     */
     protected static function setupImport(Config $config): void
     {
         $config
             ->addTask('en', 'de', -1, 'simple-en-de.zip')
-            ->addUser('testlector')
-            ->addUser('testtranslator', 'waiting', 'translatorCheck')
-            ->setProperty('taskName', static::NAME_PREFIX . 'SegmentWorkflowTest'); // TODO FIXME: we better generate data independent from resource-names ...
+            ->addUser(self::USER_TRANSLATOR, workflowStep: 'firsttranslation')
+            ->addUser(self::USER_REVIEWER, DefaultWorkflow::STATE_WAITING, 'review1stlanguage')
+            ->addUser(self::USER_TRANSLATOR, DefaultWorkflow::STATE_WAITING, 'review2ndlanguage')
+            ->setProperty('edit100PercentMatch', 0)
+            ->setProperty('workflow', self::WORKFLOW_COMPLEX)
+            ->setProperty('taskName', static::NAME_PREFIX . 'SegmentWorkflowTest');
     }
 
-    public function testTranslator()
+    public function testSegmentLocking(): void
     {
-        //Implement tests for the new role translator and workflowstep translating!
-        $this->markTestIncomplete("Implement tests for the new role translator and workflowstep translating!");
+        static::api()->waitForCurrentTaskStateOpen();
+
+        $this->assertEquals(
+            self::WORKFLOW_COMPLEX,
+            static::api()->getTask()->workflow,
+            'Task workflow is not as expected'
+        );
     }
 
     /**
-     * edits some segments as lector, finish then the task
-     * - checks for correct changes.xliff
-     * - checks if task is open for translator and finished for lector
-     * - modifies also segments with special characters to test encoding in changes.xml
+     * @depends testSegmentLocking
+     * @throws Zend_Http_Client_Exception
      */
-    public function testWorkflowFinishAsLector()
+    public function testWorkflowSetup()
     {
-        //check that testtranslator is waiting
-        static::api()->login('testtranslator');
-        $this->assertEquals('waiting', static::api()->reloadTask()->userState);
+        //check that USER_REVIEWER (in review1stlanguage) is waiting
+        static::api()->login(self::USER_REVIEWER);
+        $task = static::api()->reloadTask();
+        $this->assertEquals(DefaultWorkflow::STATE_WAITING, $task->userState);
 
-        //check that testlector is open
-        static::api()->login('testlector');
-        $this->assertEquals('open', static::api()->reloadTask()->userState);
+        //workflowstep is still the initial one
+        $this->assertEquals('firsttranslation', $task->workflowStepName);
 
-        $task = static::api()->getTask();
+        //check that USER_TRANSLATOR is open (for translation)
+        static::api()->login(self::USER_TRANSLATOR);
+        $this->assertEquals(DefaultWorkflow::STATE_OPEN, static::api()->reloadTask()->userState);
+
+        //USER_TRANSLATOR finish step translation
+        static::api()->setTaskToEdit();
+        $segments = static::api()->getSegments();
+
+        //add missing translation by translator
+        static::api()->saveSegment($segments[6]->id, 'Apache 2.x  auf Unix-Systemen');
+        static::api()->setTaskToFinished();
+        static::api()->setTaskToOpen();
+
+        // workflow step changed now
+        $this->assertEquals('review1stlanguage', static::api()->reloadTask()->workflowStepName);
+
+        //USER_TRANSLATOR is now in waiting
+        $this->assertEquals(DefaultWorkflow::STATE_FINISH, static::api()->reloadTask()->userState);
+
+        //check that USER_REVIEWER (in review1stlanguage) is now open
+        static::api()->login(self::USER_REVIEWER);
+        $task = static::api()->reloadTask();
+        $this->assertEquals(DefaultWorkflow::STATE_OPEN, $task->userState);
+    }
+
+    /**
+     * edits some segments as reviewer, finish then the task
+     * modifies also segments with special characters to test encoding in changes.xml
+     *
+     * @depends testWorkflowSetup
+     * @throws Zend_Http_Client_Exception
+     */
+    public function testReviewAndFinish(): void
+    {
         //open task for whole testcase
-        static::api()->setTaskToEdit($task->id);
+        static::api()->setTaskToEdit();
 
         //get segment list
         $segments = static::api()->getSegments();
@@ -92,14 +143,21 @@ class SegmentWorkflowTest extends editor_Test_ImportTest
         $segToTest = $segments[2];
         static::api()->saveSegment($segToTest->id, 'PHP Handbuch');
 
+        //assert segment is locked in step review1stlanguage
+        $this->assertEquals(AutoStates::LOCKED, $segments[3]->autoStateId, 'Segment is not locked for Reviewer.');
+
         //the segment is reviewed, increment the finish count
         $segmentFinishCount++;
 
         $segToTest = $segments[6];
         $nbsp = json_decode('"\u00a0"');
-        //the first "\u00a0 " (incl. the trailing whitespace) will be replaced by the content sanitizer to a single whitespace
+        //the first "\u00a0 " (incl. the trailing whitespace) will be replaced by
+        // the content sanitizer to a single whitespace
         //the second single "\u00a0" must result in a single whitespace
-        static::api()->saveSegment($segToTest->id, 'Apache' . $nbsp . ' 2.x' . $nbsp . 'auf' . $nbsp . $nbsp . 'Unix-Systemen');
+        static::api()->saveSegment(
+            $segToTest->id,
+            'Apache' . $nbsp . ' 2.x' . $nbsp . 'auf' . $nbsp . $nbsp . 'Unix-Systemen'
+        );
 
         //the segment is reviewed, increment the finish count
         $segmentFinishCount++;
@@ -107,7 +165,11 @@ class SegmentWorkflowTest extends editor_Test_ImportTest
         //edit a segment with special characters
         $segToTest = $segments[4];
         //multiple normal spaces should also be converted to single spaces
-        static::api()->saveSegment($segToTest->id, "Installation auf   Unix-Systemen &amp; Umlaut Test äöü &lt; &lt;ichbinkeintag&gt; - bearbeitet durch den Testcode");
+        static::api()->saveSegment(
+            $segToTest->id,
+            "Installation auf   Unix-Systemen &amp; Umlaut Test äöü &lt; &lt;ichbinkeintag&gt; "
+            . "- bearbeitet durch den Testcode"
+        );
 
         //the segment is reviewed, increment the finish count
         $segmentFinishCount++;
@@ -118,41 +180,105 @@ class SegmentWorkflowTest extends editor_Test_ImportTest
         $workflowStepNr = array_map(function ($item) {
             return $item->workflowStepNr;
         }, $segments);
-        $this->assertEquals(['0', '0', '1', '0', '1', '0', '1'], $workflowStepNr);
+        $this->assertEquals(['0', '0', '2', '0', '2', '0', '2'], $workflowStepNr);
 
         //bulk check of all autoStateId fields
         $workflowStep = array_map(function ($item) {
             return $item->workflowStep;
         }, $segments);
-        $this->assertEquals(['', '', 'reviewing', '', 'reviewing', '', 'reviewing'], $workflowStep);
+
+        $this->assertEquals(
+            ['', '', 'review1stlanguage', '', 'review1stlanguage', '', 'review1stlanguage'],
+            $workflowStep
+        );
 
         //reloat the task and test the current workflow progress
         $reloadProgresTask = static::api()->reloadTask();
+
         //check if the local segmentFinishCount is the same as the calculated one for the task
-        $this->assertEquals($segmentFinishCount, $reloadProgresTask->segmentFinishCount, 'The segment finish count is not the same as the calculated one for the task!');
+        $this->assertEquals(
+            $segmentFinishCount,
+            $reloadProgresTask->segmentFinishCount,
+            'The segment finish count is not the same as the calculated one for the task!'
+        );
 
         //finishing the task
-        $res = static::api()->setTaskToFinished($task->id);
+        static::api()->setTaskToFinished();
         $this->assertEquals('finished', static::api()->reloadTask()->userState);
+        $this->assertEquals(
+            'review2ndlanguage',
+            static::api()->getTask()->workflowStepName,
+            'Workflow Step is not as expected'
+        );
 
+        //FIXME waiting for autoQA (triggered implicit by workflow on finish above) must be implemented!
+        sleep(5);
+
+        static::api()->waitForCurrentTaskStateOpen();
+        static::api()->setTaskToOpen();
+    }
+
+    /**
+     * checks for correct changes.xliff contents
+     * checks if task is open for translator in step review2ndlanguage and finished for reviewer
+     *
+     * @depends testReviewAndFinish
+     * @throws Zend_Http_Client_Exception
+     */
+    public function testChangesXliffAfterReview(): void
+    {
         //get the changes file
         $path = static::api()->getTaskDataDirectory();
         $foundChangeFiles = glob($path . 'changes*.xliff');
-        $this->assertNotEmpty($foundChangeFiles, 'No changes*.xliff file was written for taskGuid: ' . $task->taskGuid);
+        $this->assertNotEmpty(
+            $foundChangeFiles,
+            'No changes*.xliff file was written for taskGuid: ' . static::api()->getTask()->taskGuid
+        );
         $foundChangeFile = end($foundChangeFiles);
         $this->assertFileExists($foundChangeFile);
 
         //no direct file assert equals possible here, since our diff format contains random sdl:revids
         //this revids has to be replaced before assertEqual
-        $approvalFileContent = static::api()->replaceChangesXmlContent(static::api()->getFileContent('testWorkflowFinishAsLector-assert-equal.xliff'));
+        $approvalFileContent = static::api()->replaceChangesXmlContent(
+            static::api()->getFileContent('testWorkflowFinishAsLector-assert-equal.xliff')
+        );
+
         $toCheck = static::api()->replaceChangesXmlContent(file_get_contents($foundChangeFile));
         $this->assertXmlStringEqualsXmlString($approvalFileContent, $toCheck);
 
         //check that task is finished for lector now
         $this->assertEquals('finished', static::api()->reloadTask()->userState);
+    }
 
+    /**
+     * @throws Zend_Http_Client_Exception
+     * @depends testChangesXliffAfterReview
+     */
+    public function testSecondReviewStep(): void
+    {
         //check that task is open for translator now
-        static::api()->login('testtranslator');
+        static::api()->login(self::USER_TRANSLATOR);
         $this->assertEquals('open', static::api()->reloadTask()->userState);
+
+        static::api()->setTaskToEdit();
+        $segments = static::api()->getSegments();
+
+        //assert segment is not locked anymore (by editor_Workflow_Actions::changeEdit100PercentMatch workflow usage)
+        $this->assertEquals(AutoStates::PRETRANSLATED, $segments[3]->autoStateId, 'Autostate is not as expected');
+
+        $this->assertSegment(
+            'Installation and <div class="term preferredTerm exact transFound" title="" data-tbxid="X">'
+                . 'Configuration</div>',
+            $segments[3]->source
+        );
+        $this->assertSegment(
+            'Installation und <div class="term preferredTerm exact" title="" data-tbxid="X">Konfiguration</div>',
+            $segments[3]->targetEdit
+        );
+    }
+
+    protected function assertSegment($expected, $actual): void
+    {
+        $this->assertEquals($expected, preg_replace('#data-tbxid="[0-9a-f-]{36}"#', 'data-tbxid="X"', $actual));
     }
 }

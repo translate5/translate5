@@ -29,6 +29,7 @@ END LICENSE AND COPYRIGHT
 use MittagQI\Translate5\Task\Current\NoAccessException;
 use MittagQI\Translate5\Task\TaskContextTrait;
 use MittagQI\ZfExtended\Controller\Response\Header;
+use ZfExtended_Sanitizer as Sanitizer;
 
 class Editor_ReferencefileController extends ZfExtended_RestController
 {
@@ -160,7 +161,18 @@ class Editor_ReferencefileController extends ZfExtended_RestController
         //by passing output handling, output is already JSON
         $contextSwitch = $this->getHelper('ContextSwitch');
         $contextSwitch->setAutoSerialization(false);
-        $this->getResponse()->setBody($this->entity->getReferenceTreeAsJson());
+
+        $tree = $this->entity->getReferenceTreeAsJson();
+
+        $this->getResponse()->setBody(
+            empty($tree)
+                ? $tree
+                : json_encode(
+                    Sanitizer::escapeHtmlRecursive(
+                        json_decode($tree, true)
+                    )
+                )
+        );
     }
 
     public function putAction()

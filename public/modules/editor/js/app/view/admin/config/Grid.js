@@ -426,7 +426,7 @@ Ext.define('Editor.view.admin.config.Grid', {
         let me=this,
             isValueChanged = record.get('default') !== value,
             defaultsStore = me.getDefaultsStore(record.get('defaults'), me.strings.configLocales),
-            returnValue = value;
+            returnValue = Ext.String.htmlEncode(value);
            
         switch (record.get('type')) {
             case 'boolean': // bool

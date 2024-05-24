@@ -32,7 +32,7 @@ use DOMDocument;
 use DOMNode;
 use DOMXPath;
 use editor_Models_Import_FileParser_Tag as FileParserTag;
-use MittagQI\Translate5\Tools\Markup;
+use MittagQI\ZfExtended\Tools\Markup;
 use Throwable;
 
 final class Placeable

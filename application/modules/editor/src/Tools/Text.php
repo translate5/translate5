@@ -32,7 +32,7 @@ class Text
 {
     /**
      * Check if a text can be seen as translatable. This is the case, if it contains at least one letter
-     * Note, that purenumbers are not seen as translatable
+     * Note, that pure numbers are not seen as translatable
      */
     public static function seemsTranslatable(?string $text): bool
     {

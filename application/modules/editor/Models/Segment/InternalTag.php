@@ -27,6 +27,7 @@ END LICENSE AND COPYRIGHT
 */
 
 use MittagQI\Translate5\ContentProtection\NumberProtector;
+use MittagQI\ZfExtended\Tools\Markup;
 
 /**
  * Segment Internal Tag Helper Class
@@ -43,7 +44,7 @@ class editor_Models_Segment_InternalTag extends editor_Models_Segment_TagAbstrac
      * match 3: the original id
      * match 4: the rest of the generated id
      *
-     * @var string
+     * @var int
      */
     public const TAG_TYPE_MATCH_ID = 3;
 
@@ -232,7 +233,6 @@ class editor_Models_Segment_InternalTag extends editor_Models_Segment_TagAbstrac
      * @param array $tagsToRestore optional, if not empty - only provided tags list will be rostored
      * @param int &$highestTagNr if provided, it will be filled with the highest short tag number of all tags in $segment
      * @param array $shortcutNumberMap if provided, it will be filled with a 2d map of replaced entities and their used tag numbers
-     * @return mixed
      */
     public function restore(
         string $segment,
@@ -324,7 +324,7 @@ class editor_Models_Segment_InternalTag extends editor_Models_Segment_TagAbstrac
         $this->ridMap = [];
         $result = $this->replace($segment, function ($match) use (&$newid, &$replaceMap) {
             //strict XML content: convert <tag>&lt;foo></tag> to <tag>&lt;foo&gt;</tag>
-            $match[0] = MittagQI\Translate5\Tools\Markup::escape($match[0]);
+            $match[0] = Markup::escape($match[0]);
 
             // use already existing xlf tags from given inputTagMap
             if (! empty($this->inputTagMap) && $foundInputTag = array_search($match[0], $this->inputTagMap, true)) {
@@ -870,6 +870,6 @@ class editor_Models_Segment_InternalTag extends editor_Models_Segment_TagAbstrac
      */
     public function setInputTagMap(array $tagMap): void
     {
-        $this->inputTagMap = array_map([MittagQI\Translate5\Tools\Markup::class, 'escape'], $tagMap);
+        $this->inputTagMap = array_map([Markup::class, 'escape'], $tagMap);
     }
 }

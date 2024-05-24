@@ -76,19 +76,22 @@ class editor_Models_SegmentQuality extends ZfExtended_Models_Entity_Abstract
      */
     public function getSpellCheckData(array $segmentIds): array
     {
+        $segmentIds = array_filter($segmentIds);
+
         if (empty($segmentIds)) {
             return [];
         }
+
         // Get spell check data
         $_data = $this->db->getAdapter()->query('
-            SELECT 
-              `id`,     
-              `segmentId`, 
+            SELECT
+              `id`,
+              `segmentId`,
               `field`,
-              `falsePositive`,     
-              `additionalData`, 
+              `falsePositive`,
+              `additionalData`,
               JSON_EXTRACT(`additionalData`, "$.matchIndex") AS `matchIndex`
-            FROM `LEK_segment_quality` 
+            FROM `LEK_segment_quality`
             WHERE 1
               AND `segmentId` IN (' . join(',', $segmentIds) . ')
               AND `type` = "spellcheck"
@@ -119,20 +122,27 @@ class editor_Models_SegmentQuality extends ZfExtended_Models_Entity_Abstract
      */
     public function getTermTaggerData(array $segmentIds): array
     {
+        $segmentIds = array_filter($segmentIds);
+
+        if (empty($segmentIds)) {
+            return [];
+        }
+
         // Get spell check data
         $_data = $this->db->getAdapter()->query('
-            SELECT 
-              `id`,     
-              `segmentId`, 
+            SELECT
+              `id`,
+              `segmentId`,
               `field`,
               `falsePositive`
-            FROM `LEK_segment_quality` 
+            FROM `LEK_segment_quality`
             WHERE 1
-              AND `segmentId` IN (' . join(',', $segmentIds ?: [0]) . ')
+              AND `segmentId` IN (' . join(',', $segmentIds) . ')
               AND `type` = "term"
             ORDER BY `segmentId`, `field`, `startIndex`
         ')->fetchAll();
 
+        $data = [];
         // Group by `segmentId` and `field`
         foreach ($_data as $_item) {
             $data[$_item['segmentId']][$_item['field']][] = [
@@ -148,7 +158,7 @@ class editor_Models_SegmentQuality extends ZfExtended_Models_Entity_Abstract
         }
 
         // Return spell check data
-        return $data ?? [];
+        return $data;
     }
 
     /**

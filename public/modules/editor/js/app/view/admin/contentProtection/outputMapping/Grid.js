@@ -178,7 +178,8 @@ Ext.define('Editor.view.admin.contentProtection.outputMapping.Grid', {
                 filter: {
                     type: 'string',
                     phpMode: false
-                }
+                },
+                renderer: v => Ext.String.htmlEncode(v)
             },
             {
                 xtype: 'gridcolumn',
@@ -190,7 +191,8 @@ Ext.define('Editor.view.admin.contentProtection.outputMapping.Grid', {
                 filter: {
                     type: 'string',
                     phpMode: false
-                }
+                },
+                renderer: v => Ext.String.htmlEncode(v)
             },
             {
                 xtype: 'gridcolumn',
@@ -202,7 +204,8 @@ Ext.define('Editor.view.admin.contentProtection.outputMapping.Grid', {
                 filter: {
                     type: 'string',
                     phpMode: false
-                }
+                },
+                renderer: v => Ext.String.htmlEncode(v)
             },
             {
                 xtype: 'gridcolumn',
@@ -214,7 +217,8 @@ Ext.define('Editor.view.admin.contentProtection.outputMapping.Grid', {
                 filter: {
                     type: 'string',
                     phpMode: false
-                }
+                },
+                renderer: v => Ext.String.htmlEncode(v)
             },
             {
                 xtype: 'actioncolumn',

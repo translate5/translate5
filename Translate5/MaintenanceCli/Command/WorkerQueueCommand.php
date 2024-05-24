@@ -91,6 +91,11 @@ class WorkerQueueCommand extends Translate5AbstractCommand
         }
 
         $this->io->text('scheduling workers...');
+
+        if ($this->isPorcelain) {
+            return self::SUCCESS;
+        }
+
         sleep(4);
 
         $allWorker = $worker->loadByState($worker::STATE_PREPARE);

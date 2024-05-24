@@ -42,6 +42,7 @@ Ext.define('Editor.model.admin.Customer', {
         {type: 'string', name: 'openIdClientSecret', validations: [{type: 'presence'}, {type: 'length', max: 1024}]},
         {type: 'string', name: 'openIdRedirectLabel', validations: [{type: 'presence'}, {type: 'length', max: 1024}]},
         {type: 'auto', name: 'openIdRedirectCheckbox', serialize: function(value){return value ? '1' : '0';}},
+        {type: 'auto', name: 'openIdSyncUserData', serialize: function(value){return value ? '1' : '0';}},
         {
             name: 'isDefaultCustomer',
             calculate: function (data) {

@@ -28,7 +28,7 @@ END LICENSE AND COPYRIGHT
 
 use MittagQI\Translate5\Segment\TagRepair\Tag;
 use MittagQI\Translate5\Segment\TagRepair\Tags;
-use MittagQI\Translate5\Tools\Markup;
+use MittagQI\ZfExtended\Tools\Markup;
 
 /**
  * Several "classic" PHPUnit tests to check the general tag repair (not to mix up with the internal tags repair)

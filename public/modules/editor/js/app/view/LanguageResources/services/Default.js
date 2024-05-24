@@ -174,7 +174,11 @@ Ext.define('Editor.view.LanguageResources.services.Default', {
      */
     getNameRenderer: function() {
         return function(v, meta, rec) {
-            return v;
+            if (v == null) {
+                return '';
+            }
+
+            return Ext.String.htmlEncode(v);
         };
     },
     getConversionIconClass: record => 'x-hidden-display',

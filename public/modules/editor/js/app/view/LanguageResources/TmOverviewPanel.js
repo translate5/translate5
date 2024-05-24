@@ -522,7 +522,7 @@ Ext.define('Editor.view.LanguageResources.TmOverviewPanel', {
     createSpecificDataRow: function(key, serviceName, value){
         return '<tr><td>' +
             this.localizeSpecificDataKey(key, serviceName) +
-            ': </td><td>' + value + '</td></tr>';
+            ': </td><td>' + Ext.String.htmlEncode(value) + '</td></tr>';
     },
 
     /**

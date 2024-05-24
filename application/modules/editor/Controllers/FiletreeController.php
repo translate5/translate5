@@ -30,6 +30,7 @@ use MittagQI\Translate5\Acl\Rights;
 use MittagQI\Translate5\Task\Current\Exception;
 use MittagQI\Translate5\Task\Current\NoAccessException;
 use MittagQI\Translate5\Task\TaskContextTrait;
+use ZfExtended_Sanitizer as Sanitizer;
 
 class Editor_FiletreeController extends ZfExtended_RestController
 {
@@ -65,7 +66,18 @@ class Editor_FiletreeController extends ZfExtended_RestController
         //by passing output handling, output is already JSON
         $contextSwitch = $this->getHelper('ContextSwitch');
         $contextSwitch->setAutoSerialization(false);
-        $this->getResponse()->setBody($this->entity->getTreeAsJson());
+
+        $tree = $this->entity->getTreeAsJson();
+
+        $this->getResponse()->setBody(
+            empty($tree)
+                ? $tree
+                : json_encode(
+                    Sanitizer::escapeHtmlRecursive(
+                        json_decode($tree, true)
+                    )
+                )
+        );
     }
 
     /***
@@ -97,8 +109,8 @@ class Editor_FiletreeController extends ZfExtended_RestController
 
         try {
             $this->entity->loadByTaskGuid($task->getTaskGuid());
-            $this->view->rows = $this->entity->getTreeForStore();
-        } catch (ZfExtended_Models_Entity_NotFoundException $e) {
+            $this->view->rows = Sanitizer::escapeHtmlRecursive($this->entity->getTreeForStore());
+        } catch (ZfExtended_Models_Entity_NotFoundException) {
             // INFO: no need for exception here because this can be requested during the import, and in
             // that point of time, there are no files yet
             $this->view->message = 'No files where found for this taskGuid';
@@ -126,7 +138,7 @@ class Editor_FiletreeController extends ZfExtended_RestController
         $mover->moveNode((int) $data->id, (int) $data->parentId, (int) $data->index);
         $this->entity->syncTreeToFiles();
         $this->syncSegmentFileOrder($taskGuid);
-        $this->view->data = $mover->getById((int) $data->id);
+        $this->view->data = Sanitizer::escapeHtmlInObject($mover->getById((int) $data->id));
     }
 
     /**

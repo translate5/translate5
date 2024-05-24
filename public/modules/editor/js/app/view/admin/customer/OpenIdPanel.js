@@ -235,6 +235,14 @@ Ext.define('Editor.view.admin.customer.OpenIdPanel', {
                         change: 'onOpenIdRedirectCheckboxChange',
                         scope:me
                     }
+                },{
+                    xtype: 'checkbox',
+                    boxLabel: Editor.data.l10n.clients.openIdConnect.openIdSyncUserData,
+                    name: 'openIdSyncUserData',
+                    itemId: 'openIdSyncUserData',
+                    bind:{
+                        value:'{record.openIdSyncUserData}'
+                    }
                 }]
             };
         if (instanceConfig) {

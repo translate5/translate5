@@ -94,7 +94,7 @@ use MittagQI\ZfExtended\Session\SessionInternalUniqueId;
  * @method void setCustomerId(string|int|null $customerId)
  * @method string getUsageMode()
  * @method void setUsageMode(string $usageMode)
- * @method string getSegmentCount()
+ * @method string|null getSegmentCount()
  * @method void setSegmentCount(string|int $segmentCount)
  * @method string getSegmentEditableCount()
  * @method void setSegmentEditableCount(string|int $segmentEditableCount)

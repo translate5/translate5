@@ -59,7 +59,7 @@ Ext.define('Editor.model.admin.task.CustomField', {
     },
     fields: [{
         name: 'id',
-        type: 'int',
+        type: 'int'
     },/* {
         name: 'customerId',
         type: 'int',

@@ -165,7 +165,8 @@ Ext.define('Editor.view.admin.TaskAddWindow', {
                                     maxLength: 255,
                                     allowBlank: false,
                                     toolTip: me.strings.taskNameTip,
-                                    fieldLabel: me.strings.taskNameLabel
+                                    fieldLabel: me.strings.taskNameLabel,
+                                    renderer: (value) => Ext.String.htmlEncode(value)
                                 },{
                                     xtype: 'textfield',
                                     maxLength: 120,
@@ -175,7 +176,8 @@ Ext.define('Editor.view.admin.TaskAddWindow', {
                                     xtype: 'textarea',
                                     maxLength: 500,
                                     name: 'description',
-                                    fieldLabel: me.strings.description
+                                    fieldLabel: me.strings.description,
+                                    renderer: (value) => Ext.String.htmlEncode(value)
                                 },{
                                     xtype: 'datefield',
                                     name: 'orderdate',
