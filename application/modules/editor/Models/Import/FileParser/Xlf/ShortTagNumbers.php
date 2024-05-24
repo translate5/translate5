@@ -94,32 +94,24 @@ class editor_Models_Import_FileParser_Xlf_ShortTagNumbers
      */
     public function calculatePartnerAndType()
     {
-        $tagsById = [];
         //first loop to find the partners by rid, or if not given by id
+        $tagsById = [];
         foreach ($this->allTags as $tag) {
-            $partner = null;
-            if (! is_null($tag->rid)) {
-                if (empty($tagsById['rid-' . $tag->rid])) {
-                    $tagsById['rid-' . $tag->rid] = $tag;
+            if (!is_null($tag->rid) && array_key_exists('rid-' . $tag->rid, $tagsById)) {
+                // tag has an rid and there is already a tag with rid
+                $this->setAsPartners($tag, $tagsById['rid-' . $tag->rid]);
+            } else {
+                if (is_null($tag->rid) && !$tag->isSingle() && array_key_exists('id-' . $tag->id, $tagsById)) {
+                    // we may apply id based matching only if no rid based partner was found (and the tag has no rid)
+                    // and on open/close tags, since the id of single tags may be duplicated
+                    $this->setAsPartners($tag, $tagsById['id-' . $tag->id]);
                 } else {
-                    //if we have the same rid already, this is the partner
-                    $partner = $tagsById['rid-' . $tag->rid];
+                    if (!is_null($tag->rid)) {
+                        $tagsById['rid-' . $tag->rid] = $tag;
+                    } else {
+                        $tagsById['id-' . $tag->id] = $tag;
+                    }
                 }
-            }
-            if (empty($tagsById['id-' . $tag->getId()])) {
-                $tagsById['id-' . $tag->getId()] = $tag;
-            }
-            // we may apply id based matching only if no rid based partner was found
-            // and on open/close tags, since the id of single tags may be duplicated
-            elseif (is_null($partner) && ! $tag->isSingle()) {
-                //if we have found no partner by rid we use the partner by id
-                $partner = $tagsById['id-' . $tag->getId()];
-            }
-
-            //if we have a partner: link each other
-            if (! is_null($partner)) {
-                $tag->partner = $partner;
-                $partner->partner = $tag; // the enemy of my enemy is my friend ;)
             }
         }
 
@@ -161,6 +153,14 @@ class editor_Models_Import_FileParser_Xlf_ShortTagNumbers
 
             $tag->renderTag();
         }
+    }
+
+    /**
+     * Small helper to join partners
+     */
+    private function setAsPartners(editor_Models_Import_FileParser_Tag $tag, editor_Models_Import_FileParser_Tag $partner){
+        $tag->partner = $partner;
+        $partner->partner = $tag;
     }
 
     /**
