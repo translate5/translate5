@@ -356,6 +356,48 @@ final class editor_Segment_Internal_Tag extends editor_Segment_Tag
     }
 
     /**
+     * Retrieves the potential rid-attripute of the underlying bpt/ept tag in case of a paired tag
+     * @return int
+     */
+    public function getUnderlyingRid(): int
+    {
+        if ($this->shortTag != null && ($this->isOpening() || $this->isClosing())) {
+
+            return $this->findIntAttribInTitle($this->shortTag->getAttribute('title'), 'rid');
+        }
+
+        return -1;
+    }
+
+    public function getUnderlyingId(): int
+    {
+        if ($this->shortTag != null) {
+
+            return $this->findIntAttribInTitle($this->shortTag->getAttribute('title'), 'id');
+        }
+
+        return -1;
+    }
+
+    /**
+     * Internal parser to find stuff in theencapsulated tag
+     */
+    private function findIntAttribInTitle(string $title, string $attributeName): int
+    {
+        if (!empty($title)) {
+            $title = str_replace('&quot;', '"', $title);
+            $pattern = '~ ' . $attributeName . '\s*=\s*"([0-9]+)"~';
+            $matches = [];
+            if (preg_match($pattern, $title, $matches) === 1 && count($matches) === 2) {
+
+                return (int) $matches[1];
+            }
+        }
+
+        return -1;
+    }
+
+    /**
      * @return int
      */
     public function getContentLength()
