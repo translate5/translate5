@@ -344,6 +344,25 @@ final class editor_Segment_Internal_Tag extends editor_Segment_Tag
     }
 
     /**
+     * Sets the tag-index of the inner short-tag
+     * IMPORTANT: only meant e.g. for repair-scripts. The tag-index is set in the import
+     * and must not be changed thereafter
+     */
+    public function setTagIndex(int $index): void
+    {
+        if ($this->shortTag != null) {
+            if ($this->isOpening()) {
+                $html = '&lt;' . $index . '&gt;';
+            } elseif ($this->isClosing()) {
+                $html = '&lt;/' . $index . '&gt;';
+            } else {
+                $html = '&lt;' . $index . '/&gt;';
+            }
+            $this->shortTag->setInnerHTML($html);
+        }
+    }
+
+    /**
      * @return string|null
      */
     public function getOriginalId()
@@ -357,12 +376,10 @@ final class editor_Segment_Internal_Tag extends editor_Segment_Tag
 
     /**
      * Retrieves the potential rid-attripute of the underlying bpt/ept tag in case of a paired tag
-     * @return int
      */
     public function getUnderlyingRid(): int
     {
         if ($this->shortTag != null && ($this->isOpening() || $this->isClosing())) {
-
             return $this->findIntAttribInTitle($this->shortTag->getAttribute('title'), 'rid');
         }
 
@@ -372,7 +389,6 @@ final class editor_Segment_Internal_Tag extends editor_Segment_Tag
     public function getUnderlyingId(): int
     {
         if ($this->shortTag != null) {
-
             return $this->findIntAttribInTitle($this->shortTag->getAttribute('title'), 'id');
         }
 
@@ -384,12 +400,11 @@ final class editor_Segment_Internal_Tag extends editor_Segment_Tag
      */
     private function findIntAttribInTitle(string $title, string $attributeName): int
     {
-        if (!empty($title)) {
+        if (! empty($title)) {
             $title = str_replace('&quot;', '"', $title);
             $pattern = '~ ' . $attributeName . '\s*=\s*"([0-9]+)"~';
             $matches = [];
             if (preg_match($pattern, $title, $matches) === 1 && count($matches) === 2) {
-
                 return (int) $matches[1];
             }
         }

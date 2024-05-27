@@ -27,49 +27,103 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-
 //uncomment the following line, so that the file is not marked as processed:
 $this->doNotSavePhpForDebugging = false;
 
 $SCRIPT_IDENTIFIER = '428-TRANSLATE-3967-fix-rid-paired-tags.php';
 
+/**
+ * Fixes TRANSLATE-3967
+ * The nature of the Problem leads to paired tags matched by RID not being matched and the opener
+ * having an segment-index of another internal tag
+ */
 class TagsPairedByRidFixer
 {
+    /**
+     * When debugging, additional output is generated and nothing changed in the DB
+     */
+    public const DO_DEBUG = false;
 
     public function fix()
     {
         // first, gather all id's of potentially affected segments
         $segmentIds = $this->getAffectedSegmentIds();
         $fixedIds = [];
-        error_log('AFFECTED SEGMENTS: ' . implode(', ', $segmentIds)); // TODO REMOVE
+        $fixedTaskIds = [];
+
+        if (self::DO_DEBUG) {
+            error_log('AFFECTED SEGMENTS: ' . implode(', ', $segmentIds));
+        }
 
         // now fix the tags, segment by segment
         foreach ($segmentIds as $id) {
             try {
                 $segment = ZfExtended_Factory::get(editor_Models_Segment::class);
                 $segment->load($id);
+                $task = editor_ModelInstances::taskByGuid($segment->getTaskGuid());
 
                 // we only care for source & target ... multitarget segments are not in use currently
-                $faults = 0;
-                $faults += $this->checkSegmentField($segment, 'source', 'source');
-                $faults += $this->checkSegmentField($segment, 'sourceEdit', 'source');
-                $faults += $this->checkSegmentField($segment, 'target', 'target');
-                $faults += $this->checkSegmentField($segment, 'targetEdit', 'target');
+                $faults = $sourceFaults = 0;
+                $faults += $this->checkSegmentField($task, $segment, 'source', 'source');
+                $faults += $this->checkSegmentField($task, $segment, 'sourceEdit', 'source');
+                $sourceFaults = $faults;
+                $faults += $this->checkSegmentField($task, $segment, 'target', 'target');
+                $faults += $this->checkSegmentField($task, $segment, 'targetEdit', 'target');
 
                 // if we had faults, save segment
                 if ($faults > 0) {
-                    $segment->save();
+                    // reset quality entries for faulty structure
+                    $fields = [];
+                    if ($sourceFaults > 0) {
+                        $fields[] = 'source';
+                    }
+                    if ($faults > $sourceFaults) {
+                        $fields[] = 'target';
+                    }
+                    $qualitySql =
+                        "DELETE FROM `LEK_segment_quality`"
+                        . " WHERE `segmentId` = " . $segment->getId()
+                        . " AND `field` " . (
+                            count($fields) === 1 ?
+                                " = '" . $fields[0] . "'"
+                                : " IN '" . implode("','", $fields) . "'"
+                        )
+                        . " AND `category` = 'internal_tag_structure_faulty'"
+                        . " AND `type` = 'internal'";
+
+                    if (self::DO_DEBUG) {
+                        error_log('SAVE SEGMENT: ' . $segment->getId() . ' in task ' . $task->getId());
+                        error_log('REMOVE QUALITY: ' . $qualitySql);
+                    } else {
+                        // save the segment and remove quality entries
+                        $segment->save();
+                        $task->db->getAdapter()->query($qualitySql);
+                    }
+
                     $fixedIds[] = $id;
+                    if (! in_array($task->getId(), $fixedTaskIds)) {
+                        $fixedTaskIds[] = $task->getId();
+                    }
                 }
             } catch (Throwable $e) {
-                error_log('TRANSLATE-3967: ERROR, could not fix segment ' . $id . ': ' . $e->getMessage());
+                try {
+                    $taskGuid = $segment->getTaskGuid();
+                } catch (Throwable) {
+                    $taskGuid = 'UNKNOWN';
+                }
+                error_log(
+                    'TRANSLATE-3967: ERROR, could not fix segment ' . $id . ' in task ' . $taskGuid . ': '
+                    . $e->getMessage()
+                );
             }
         }
 
         if (count($fixedIds) > 0) {
             error_log(
-                'TRANSLATE-3967: Fixed  ' . count($fixedIds) . ' segments:'
-                . "\n" . implode(', ', $fixedIds)
+                'TRANSLATE-3967' . "\n"
+                . ' Fixed  ' . count($fixedIds) . ' segments in ' . count($fixedTaskIds) . '.tasks:'
+                . "\n segments: " . implode(', ', $fixedIds)
+                . "\n tasks: " . implode(', ', $fixedTaskIds)
             );
         }
     }
@@ -90,13 +144,11 @@ class TagsPairedByRidFixer
     /**
      * Fixes the given field on the given segment. Returns 1, if field needed to be fixed, otherwise 0
      */
-    private function checkSegmentField(editor_Models_Segment $segment, string $field, string $dataName): int
+    private function checkSegmentField(editor_Models_Task $task, editor_Models_Segment $segment, string $field, string $dataName): int
     {
         $markup = $segment->get($field);
-        if (!empty($markup)) {
-
+        if (! empty($markup)) {
             // create field-tags
-            $task = editor_ModelInstances::taskByGuid($segment->getTaskGuid());
             $fieldTags = new editor_Segment_FieldTags(
                 $task,
                 (int) $segment->getId(),
@@ -107,7 +159,7 @@ class TagsPairedByRidFixer
 
             // create fixed markup
             $markupFixed = $this->fixSegmentField($fieldTags, $dataName);
-            if (!empty($markupFixed)) {
+            if (! empty($markupFixed)) {
                 $segment->set($field, $markupFixed);
 
                 return 1;
@@ -118,33 +170,81 @@ class TagsPairedByRidFixer
     }
 
     /**
-     * Retrieves the fixed Markup or null, if nothing to fix
+     * Retrieves the fixed Markup or null, if nothing needs to be fixed
      */
     private function fixSegmentField(editor_Segment_FieldTags $fieldTags, string $dataName): ?string
     {
         $internalTags = $fieldTags->getByType(editor_Segment_Tag::TYPE_INTERNAL);
-        if(count($internalTags) > 0){
+        if (count($internalTags) > 0) {
             $allIndices = [];
+            $ridTags = []; // nested array of tags with RID
             $lowestIndex = -1;
-            foreach($internalTags as $tag){ /* @var editor_Segment_Internal_Tag $tag */
+            $changed = false;
+            foreach ($internalTags as $tag) {
+                /* @var editor_Segment_Internal_Tag $tag */
                 $tag->_rid = $tag->getUnderlyingRid();
                 $tag->_id = $tag->getUnderlyingId();
                 $tagIndex = $tag->getTagIndex();
                 $allIndices[] = $allIndices;
-                if($tagIndex > -1 && ($lowestIndex === -1 || $tagIndex < $lowestIndex)){
+                if ($tagIndex > -1 && ($lowestIndex === -1 || $tagIndex < $lowestIndex)) {
                     $lowestIndex = $tagIndex;
                 }
+                if ($tag->_rid > -1) {
+                    if (! array_key_exists($tag->_rid, $ridTags)) {
+                        $ridTags[$tag->_rid] = [];
+                    }
+                    $ridTags[$tag->_rid][] = $tag;
+                }
             }
+            if (! empty($ridTags)) {
+                // fix tag-indices for all tag-pairs where it is not properly set
+                foreach ($ridTags as $rid => $tagPair) {
+                    /* @var editor_Segment_Internal_Tag[] $tagPair */
+                    if (count($tagPair) !== 2) {
+                        throw new Exception('FAULTY STRUCTURE: ' . count($tagPair) . ' segment(s) for RID ' . $rid);
+                    }
+                    if ($tagPair[0]->getTagIndex() === -1 || $tagPair[1]->getTagIndex() === -1) {
+                        throw new Exception(
+                            'FAULTY STRUCTURE: Internal tag(s) with missing tag-index (short-tag-number)'
+                        );
+                    }
+                    if (
+                        $tagPair[0]->isSingle() ||
+                        $tagPair[1]->isSingle() ||
+                        ($tagPair[0]->isOpening() && ! $tagPair[1]->isClosing()) ||
+                        ($tagPair[0]->isClosing() && ! $tagPair[1]->isOpening())
+                    ) {
+                        throw new Exception(
+                            'FAULTY STRUCTURE: Paired internal tag(s) are actually not opening/closing '
+                        );
+                    }
+                    if ($tagPair[0]->getTagIndex() !== $tagPair[1]->getTagIndex()) {
+                        // FIX FAULTY PAIRED TAG
+                        $before = $tagPair[0]->getShortTagMarkup() . ' ... ' . $tagPair[1]->getShortTagMarkup();
+                        if ($tagPair[0]->isOpening()) {
+                            $tagPair[0]->setTagIndex($tagPair[1]->getTagIndex());
+                        } else {
+                            $tagPair[1]->setTagIndex($tagPair[0]->getTagIndex());
+                        }
+                        $changed = true;
 
+                        if (self::DO_DEBUG) {
+                            $after = $tagPair[0]->getShortTagMarkup() . ' ... ' . $tagPair[1]->getShortTagMarkup();
+                            error_log(
+                                'FIXED internal tag paired by RID ' . $rid . ' from "' . $before . '" to "' . $after . '"'
+                            );
+                        }
+                    }
+                }
+            }
+            if ($changed) {
+                return $fieldTags->render();
+            }
         }
+
         return null;
     }
 }
 
 $fixer = new TagsPairedByRidFixer();
 $fixer->fix();
-
-
-
-
-
