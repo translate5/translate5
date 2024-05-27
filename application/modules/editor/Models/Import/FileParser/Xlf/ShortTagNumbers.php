@@ -97,14 +97,14 @@ class editor_Models_Import_FileParser_Xlf_ShortTagNumbers
         //first loop to find the partners by rid, or if not given by id
         $tagsById = [];
         foreach ($this->allTags as $tag) {
-            if (!is_null($tag->rid) && array_key_exists('rid-' . $tag->rid, $tagsById)) {
+            if (! is_null($tag->rid) && array_key_exists('rid-' . $tag->rid, $tagsById)) {
                 // tag has an rid and there is already a tag with rid
                 $this->setAsPartners($tag, $tagsById['rid-' . $tag->rid]);
-            } elseif (is_null($tag->rid) && !$tag->isSingle() && array_key_exists('id-' . $tag->id, $tagsById)) {
+            } elseif (is_null($tag->rid) && ! $tag->isSingle() && array_key_exists('id-' . $tag->id, $tagsById)) {
                 // we may apply id based matching only if no rid based partner was found (and the tag has no rid)
                 // and on open/close tags, since the id of single tags may be duplicated
                 $this->setAsPartners($tag, $tagsById['id-' . $tag->id]);
-            } elseif (!is_null($tag->rid)) {
+            } elseif (! is_null($tag->rid)) {
                 $tagsById['rid-' . $tag->rid] = $tag;
             } else {
                 $tagsById['id-' . $tag->id] = $tag;
@@ -154,7 +154,8 @@ class editor_Models_Import_FileParser_Xlf_ShortTagNumbers
     /**
      * Small helper to join partners
      */
-    private function setAsPartners(editor_Models_Import_FileParser_Tag $tag, editor_Models_Import_FileParser_Tag $partner){
+    private function setAsPartners(editor_Models_Import_FileParser_Tag $tag, editor_Models_Import_FileParser_Tag $partner)
+    {
         $tag->partner = $partner;
         $partner->partner = $tag;
     }
