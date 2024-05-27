@@ -13,7 +13,10 @@ Ext.define('TMMaintenance.view.main.SelectTmDialog', {
     ],
     buttons: [
         {
-            text: 'Close',
+            bind: {
+                text: '{l10n.selectTm.close}',
+                hidden: '{!l10n.selectTm.close}',
+            },
             handler: () => {
                 Ext.ComponentQuery.query('#selectTmDialog')[0].hide();
             },

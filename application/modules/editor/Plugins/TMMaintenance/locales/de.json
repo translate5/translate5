@@ -4,11 +4,51 @@
     { "locale": "en", "name": "Englisch" },
     { "locale": "de", "name": "Deutsch"  }
   ],
+  "modeStore": [
+    {
+      "name": "",
+      "value": "contains"
+    },
+    {
+      "name": "",
+      "value": "concordance"
+    },
+    {
+      "name": "",
+      "value": "exact"
+    }
+  ],
   "selectTm": {
-    "title": "Select TM",
+    "title": "",
     "name": "Name",
     "sourceLanguage": "Quellsprache",
     "targetLanguage": "Zielsprache",
-    "select": "Select"
+    "select": "",
+    "close": ""
+  },
+  "searchForm": {
+    "tm": "",
+    "mode": "",
+    "source": "",
+    "target": "",
+    "author": "",
+    "additionalInfo": "",
+    "document": "",
+    "creationDateFrom": "",
+    "creationDateTo": "",
+    "search": "",
+    "deleteAll": "Alle löschen",
+    "deleteAllTooltip": "Alle Segmente die zu den aktuellen Sucheinstellungen passen, werden gelöscht"
+  },
+  "createForm": {
+    "sourceText": "",
+    "targetText": "",
+    "save": "",
+    "cancel": ""
+  },
+  "deleteBatch": {
+    "close": "",
+    "proceed": "",
+    "warningText": "ACHTUNG: Alle Segmente der aktuellen Sucheinstellungen werden gelöscht. Wollen Sie wirklich löschen?"
   }
 }

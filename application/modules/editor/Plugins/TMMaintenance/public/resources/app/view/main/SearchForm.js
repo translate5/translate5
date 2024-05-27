@@ -12,6 +12,15 @@ Ext.define('TMMaintenance.view.main.SearchForm', {
 
     autoSize: true,
 
+    listeners: {
+        change: {
+            delegate: 'field',
+            fn: function(field, newValue, oldValue) {
+                field.up('app-main').getViewModel().set('hasRecords', false);
+            }
+        }
+    },
+
     items: [
         {
             xtype: 'panel',
@@ -50,7 +59,10 @@ Ext.define('TMMaintenance.view.main.SearchForm', {
                             itemId: 'tmName',
                             editable: false,
                             clearable: false,
-                            label: 'TM',
+                            bind: {
+                                label: '{l10n.searchForm.tm}',
+                                hidden: '{!l10n.searchForm.tm}',
+                            },
                             listeners: {
                                 click: 'onSelectTmPress',
                             },
@@ -67,11 +79,12 @@ Ext.define('TMMaintenance.view.main.SearchForm', {
                     xtype: 'textfield',
                     required: false,
                     name: 'source',
-                    label: 'Source',
                     flex: 1,
                     disabled: '{!selectedTm}',
                     bind: {
                         disabled: '{!selectedTm}',
+                        label: '{l10n.searchForm.source}',
+                        hidden: '{!l10n.searchForm.source}',
                     },
                 },
                 TMMaintenance.view.fields.ModeCombo.create('sourceMode'),
@@ -79,11 +92,12 @@ Ext.define('TMMaintenance.view.main.SearchForm', {
                     xtype: 'textfield',
                     required: false,
                     name: 'target',
-                    label: 'Target',
                     flex: 1,
                     disabled: '{!selectedTm}',
                     bind: {
                         disabled: '{!selectedTm}',
+                        label: '{l10n.searchForm.target}',
+                        hidden: '{!l10n.searchForm.target}',
                     },
                 },
                 TMMaintenance.view.fields.ModeCombo.create('targetMode'),
@@ -101,11 +115,12 @@ Ext.define('TMMaintenance.view.main.SearchForm', {
                     xtype: 'textfield',
                     required: false,
                     name: 'author',
-                    label: 'Author',
                     flex: 1,
                     disabled: '{!selectedTm}',
                     bind: {
                         disabled: '{!selectedTm}',
+                        label: '{l10n.searchForm.author}',
+                        hidden: '{!l10n.searchForm.author}',
                     },
                 },
                 TMMaintenance.view.fields.ModeCombo.create('authorMode'),
@@ -113,11 +128,12 @@ Ext.define('TMMaintenance.view.main.SearchForm', {
                     xtype: 'textfield',
                     required: false,
                     name: 'additionalInfo',
-                    label: 'Additional info',
                     flex: 1,
                     disabled: '{!selectedTm}',
                     bind: {
                         disabled: '{!selectedTm}',
+                        label: '{l10n.searchForm.additionalInfo}',
+                        hidden: '{!l10n.searchForm.additionalInfo}',
                     },
                 },
                 TMMaintenance.view.fields.ModeCombo.create('additionalInfoMode'),
@@ -125,11 +141,12 @@ Ext.define('TMMaintenance.view.main.SearchForm', {
                     xtype: 'textfield',
                     required: false,
                     name: 'document',
-                    label: 'Document',
                     flex: 1,
                     disabled: '{!selectedTm}',
                     bind: {
                         disabled: '{!selectedTm}',
+                        label: '{l10n.searchForm.document}',
+                        hidden: '{!l10n.searchForm.document}',
                     },
                 },
                 TMMaintenance.view.fields.ModeCombo.create('documentMode'),
@@ -159,34 +176,51 @@ Ext.define('TMMaintenance.view.main.SearchForm', {
                     xtype: 'datepickerfield',
                     required: false,
                     name: 'creationDateFrom',
-                    label: 'Creation date after',
                     flex: 1,
                     disabled: '{!selectedTm}',
                     bind: {
                         disabled: '{!selectedTm}',
+                        label: '{l10n.searchForm.creationDateFrom}',
+                        hidden: '{!l10n.searchForm.creationDateFrom}',
                     },
                 },
                 {
                     xtype: 'datepickerfield',
                     required: false,
                     name: 'creationDateTo',
-                    label: 'Creation date before',
                     flex: 1,
                     disabled: '{!selectedTm}',
                     bind: {
                         disabled: '{!selectedTm}',
+                        label: '{l10n.searchForm.creationDateTo}',
+                        hidden: '{!l10n.searchForm.creationDateTo}',
                     },
                 },
                 {
                     xtype: 'button',
                     name: 'search',
-                    text: 'Search',
                     flex: 1,
                     handler: 'onSearchPress',
                     formBind: true,
                     disabled: '{!selectedTm}',
                     bind: {
                         disabled: '{!selectedTm}',
+                        text: '{l10n.searchForm.search}',
+                        hidden: '{!l10n.searchForm.search}',
+                    },
+                },
+                {
+                    xtype: 'button',
+                    name: 'deleteBatch',
+                    flex: 1,
+                    handler: 'onDeleteBatchPress',
+                    formBind: true,
+                    tooltip: '{l10n.searchForm.deleteAll}',
+                    disabled: true,
+                    bind: {
+                        disabled: '{!hasRecords}',
+                        text: '{l10n.searchForm.deleteAll}',
+                        hidden: '{!l10n.searchForm.deleteAll}',
                     },
                 },
             ]

@@ -29,9 +29,9 @@ class GetListDTO
     ) {
     }
 
-    public static function fromRequest(Request $request): self
+    public static function fromRequest(Request $request): static
     {
-        return new self(
+        return new static(
             (int) $request->getParam('tm'),
             (int) $request->getParam('limit'),
             (string) $request->getParam('offset'),

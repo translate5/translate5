@@ -54,9 +54,10 @@ Ext.define('TMMaintenance.view.main.ToolbarController', {
 
                 me.getViewModel().setData(data);
 
-                // me.down('[reference=locale]').skipChangeHandler = true;
-                // me.down('[reference=locale]').setValue(data.locale + '');
-                // delete me.down('[reference=locale]').skipChangeHandler;
+                const localeField = me.getView().down('[reference=locale]');
+                localeField.skipChangeHandler = true;
+                localeField.setValue(data.locale + '');
+                delete localeField.skipChangeHandler;
             }
         })
     },

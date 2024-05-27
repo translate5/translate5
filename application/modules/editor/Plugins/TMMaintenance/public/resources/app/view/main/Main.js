@@ -7,6 +7,7 @@ Ext.define('TMMaintenance.view.main.Main', {
         'TMMaintenance.view.main.SearchForm',
         'TMMaintenance.view.main.List',
         'TMMaintenance.view.main.SelectTmDialog',
+        'TMMaintenance.view.main.DeleteBatchDialog',
         'Ext.Dialog',
     ],
 
@@ -48,6 +49,9 @@ Ext.define('TMMaintenance.view.main.Main', {
         },
         {
             xtype: 'selectTmDialog',
+        },
+        {
+            xtype: 'deleteBatchDialog',
         },
     ],
 });

@@ -12,6 +12,10 @@ Ext.define('TMMaintenance.view.main.SearchFormController', {
         this.getView().up('app-main').down('#selectTmDialog').show();
     },
 
+    onDeleteBatchPress: function () {
+        this.getView().up('app-main').down('#deleteBatchDialog').show();
+    },
+
     onSearchFieldChange: function () {
         let values = this.getView().getValues();
         this.getViewModel().set('disabled', null === values.tm || null === values.searchField);
@@ -40,6 +44,7 @@ Ext.define('TMMaintenance.view.main.SearchFormController', {
                 let offset = operation.getProxy().getReader().metaData.offset;
 
                 me.getViewModel().set('lastOffset', offset);
+                me.getViewModel().set('hasRecords', records.length > 0);
                 me.getViewModel().set('hasMoreRecords', null !== offset);
             },
         });
@@ -70,6 +75,24 @@ Ext.define('TMMaintenance.view.main.SearchFormController', {
         });
     },
 
+    onDeleteBatch: function () {
+        const me = this;
+
+        Ext.Ajax.request({
+            url: '/editor/plugins_tmmaintenance_api/delete-batch/',
+            params: this.getView().getValues(),
+            async: false,
+            method: 'POST',
+            success: function (xhr) {
+                me.getView().up('app-main').down('#deleteBatchDialog').hide();
+            },
+            error: function (xhr) {
+                console.log('Error deleting batch');
+                console.log(xhr);
+            }
+        })
+    },
+
     /**
      * @param {string} value
      * @returns {boolean|string}
@@ -87,10 +110,9 @@ Ext.define('TMMaintenance.view.main.SearchFormController', {
     },
 
     /**
-     * @returns {{searchField: (string|null), searchCriteria: (string|null), tm: (string|null)}}
+     * @returns {Object}
      */
     parseUrlParams: function () {
-        debugger;
         return this.stringToObject(window.location.hash.slice(1));
     },
 

@@ -413,31 +413,17 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
         return $this->processResponse($http->request());
     }
 
-    public function search(
-        string $tmName,
-        ?int $searchPosition,
-        int $numResults,
-        SearchDTO $searchDTO
-    ): bool {
-        $data = [
-            'source'=> $searchDTO->source,
-            'sourceSearchMode'=> $searchDTO->sourceMode,
-            'target'=> $searchDTO->target,
-            'targetSearchMode'=> $searchDTO->targetMode,
-            'document'=> $searchDTO->document,
-            'documentSearchMode'=>$searchDTO->documentMode,
-            'author'=> $searchDTO->author,
-            'authorSearchMode'=> $searchDTO->authorMode,
-            'addInfo'=>$searchDTO->additionalInfo,
-            'addInfoSearchMode'=>$searchDTO->additionalInfoMode,
-            'context'=>$searchDTO->context,
-            'contextSearchMode'=>$searchDTO->contextMode,
-            'timestampSpanStart' => $this->getDate($searchDTO->creationDateFrom),
-            'timestampSpanEnd' => $this->getDate($searchDTO->creationDateTo),
-            'searchPosition'=> (string)$searchPosition,
-            'numResults'=> $numResults
-        ];
+    public function search(string $tmName, ?int $searchPosition, ?int $numResults, SearchDTO $searchDTO): bool {
+        $data = $this->getSearchData($searchDTO, $searchPosition, $numResults);
         $http = $this->getHttpWithMemory('POST', $tmName, '/search');
+        $http->setRawData($this->jsonEncode($data), self::REQUEST_ENCTYPE);
+
+        return $this->processResponse($http->request());
+    }
+
+    public function deleteBatch(string $tmName, SearchDTO $searchDTO): bool {
+        $data = $this->getSearchData($searchDTO);
+        $http = $this->getHttpWithMemory('POST', $tmName, '/entriesdelete');
         $http->setRawData($this->jsonEncode($data), self::REQUEST_ENCTYPE);
 
         return $this->processResponse($http->request());
@@ -591,6 +577,29 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
         $json->timeStamp = $this->getNowDate();
 
         return $json;
+    }
+
+    private function getSearchData(SearchDTO $searchDTO, ?int $searchPosition = null, ?int $numResults = null): array {
+        $caseInsensitive = ', CASEINSENSETIVE';
+
+        return [
+            'source'=> $searchDTO->source,
+            'sourceSearchMode'=> $searchDTO->sourceMode . $caseInsensitive,
+            'target'=> $searchDTO->target,
+            'targetSearchMode'=> $searchDTO->targetMode . $caseInsensitive,
+            'document'=> $searchDTO->document,
+            'documentSearchMode'=>$searchDTO->documentMode . $caseInsensitive,
+            'author'=> $searchDTO->author,
+            'authorSearchMode'=> $searchDTO->authorMode . $caseInsensitive,
+            'addInfo'=>$searchDTO->additionalInfo,
+            'addInfoSearchMode'=>$searchDTO->additionalInfoMode . $caseInsensitive,
+            'context'=>$searchDTO->context,
+            'contextSearchMode'=>$searchDTO->contextMode . $caseInsensitive,
+            'timestampSpanStart' => $this->getDate($searchDTO->creationDateFrom),
+            'timestampSpanEnd' => $this->getDate($searchDTO->creationDateTo),
+            'searchPosition'=> (string)$searchPosition,
+            'numResults'=> $numResults
+        ];
     }
 
     /**

@@ -48,9 +48,9 @@ class SearchDTO
     ) {
     }
 
-    public static function fromArray(array $data): self
+    public static function fromArray(array $data): static
     {
-        return new self(
+        return new static(
             $data['source'],
             $data['sourceMode'],
             $data['target'],

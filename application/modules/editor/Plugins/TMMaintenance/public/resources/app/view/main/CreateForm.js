@@ -9,24 +9,36 @@ Ext.define('TMMaintenance.view.main.CreateForm', {
     items: [
         {
             required: true,
-            label: 'Source text',
             name: 'source',
+            bind: {
+                label: '{l10n.createForm.sourceText}',
+                hidden: '{!l10n.createForm.sourceText}',
+            },
         },
         {
             required: true,
-            label: 'Target text',
             name: 'target',
+            bind: {
+                label: '{l10n.createForm.targetText}',
+                hidden: '{!l10n.createForm.targetText}',
+            },
         },
     ],
 
     buttons: [
         {
-            text: 'Save',
-            handler: 'onSavePress'
+            handler: 'onSavePress',
+            bind: {
+                text: '{l10n.createForm.save}',
+                hidden: '{!l10n.createForm.save}',
+            },
         },
         {
-            text: 'Cancel',
-            handler: 'onCancelPress'
+            handler: 'onCancelPress',
+            bind: {
+                text: '{l10n.createForm.cancel}',
+                hidden: '{!l10n.createForm.cancel}',
+            },
         },
     ]
 })

@@ -34,6 +34,7 @@ use MittagQI\Translate5\LanguageResource\Adapter\Exception\RescheduleUpdateNeede
 use MittagQI\Translate5\LanguageResource\Adapter\UpdatableAdapterInterface;
 use MittagQI\Translate5\LanguageResource\Status as LanguageResourceStatus;
 use MittagQI\Translate5\Service\T5Memory;
+use MittagQI\Translate5\T5Memory\DTO\DeleteBatchDTO;
 use MittagQI\Translate5\T5Memory\DTO\SearchDTO;
 use MittagQI\Translate5\T5Memory\Enum\StripFramingTags;
 
@@ -543,6 +544,34 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
         $this->api->deleteEntry($memoryName, $recordKey, $targetKey);
     }
 
+    public function deleteBatch(DeleteBatchDTO $deleteDto): bool
+    {
+        $memories = $this->languageResource->getSpecificData('memories', parseAsArray: true);
+
+        usort($memories, fn ($m1, $m2) => $m1['id'] <=> $m2['id']);
+
+        foreach ($memories as ['filename' => $tmName]) {
+            if ($this->isReorganizingAtTheMoment($tmName)) {
+                continue;
+            }
+
+            $successful = $this->api->deleteBatch($tmName, $deleteDto);
+
+            if (! $successful && $this->needsReorganizing($this->api->getError(), $tmName)) {
+                $this->addReorganizeWarning();
+                $this->reorganizeTm($tmName);
+
+                $successful = $this->api->deleteBatch($tmName, $deleteDto);
+            }
+
+            if (! $successful) {
+                $this->logger->exception($this->getBadGatewayException($tmName));
+            }
+        }
+
+        return true;
+    }
+
     /**
      * Fuzzy search
      *
@@ -724,11 +753,6 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
         }
 
         return $resultList;
-    }
-
-    public function searchNew()
-    {
-
     }
 
     /***
@@ -1310,8 +1334,8 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
 
         $reorganized = $this->api->reorganizeTm($tmName);
 
-        if ($version === self::VERSION_0_5) {
-            $reorganized = $this->waitReorganizeFinished();
+        if ($version !== self::VERSION_0_4) {
+            $reorganized = $this->waitReorganizeFinished($tmName);
         }
 
         if (! $this->isInternalFuzzy()) {
@@ -1386,13 +1410,13 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
         );
     }
 
-    private function waitReorganizeFinished(): bool
+    private function waitReorganizeFinished(?string $tmName = null): bool
     {
         $elapsedTime = 0;
         $sleepTime = 5;
 
         while ($elapsedTime < self::REORGANIZE_WAIT_TIME_SECONDS) {
-            if (! $this->isReorganizingAtTheMoment()) {
+            if (! $this->isReorganizingAtTheMoment($tmName)) {
                 return true;
             }
 

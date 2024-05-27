@@ -1,14 +1,60 @@
 {
-  "logout":"Logout",
+  "logout": "Logout",
   "localeStore": [
-    { "locale": "en", "name": "English" },
-    { "locale": "de", "name": "German"  }
+    {
+      "locale": "en",
+      "name": "English"
+    },
+    {
+      "locale": "de",
+      "name": "German"
+    }
+  ],
+  "modeStore": [
+    {
+      "name": "Contains",
+      "value": "contains"
+    },
+    {
+      "name": "Concordance",
+      "value": "concordance"
+    },
+    {
+      "name": "Exact",
+      "value": "exact"
+    }
   ],
   "selectTm": {
     "title": "Select TM",
     "name": "Name",
     "sourceLanguage": "Source language",
     "targetLanguage": "Target language",
-    "select": "Select"
+    "select": "Select",
+    "close": "Close"
+  },
+  "searchForm": {
+    "tm": "TM",
+    "mode": "Mode",
+    "source": "Source",
+    "target": "Target",
+    "author": "Author",
+    "additionalInfo": "Additional info",
+    "document": "Document",
+    "creationDateFrom": "Creation date after",
+    "creationDateTo": "Creation date before",
+    "search": "Search",
+    "deleteAll": "Delete all",
+    "deleteAllTooltip": "All segments that match the current search settings are deleted"
+  },
+  "createForm": {
+    "sourceText": "Source text",
+    "targetText": "Target text",
+    "save": "Save",
+    "cancel": "Cancel"
+  },
+  "deleteBatch": {
+    "close": "Close",
+    "proceed": "Proceed",
+    "warningText": "All segments of the current search settings will be deleted. Are you sure you want to delete?"
   }
 }

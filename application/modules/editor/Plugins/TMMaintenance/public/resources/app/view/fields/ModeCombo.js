@@ -6,17 +6,15 @@ Ext.define('TMMaintenance.view.fields.ModeCombo', {
             xtype: 'combobox',
             required: false,
             name: name,
-            label: 'Mode',
             disabled: '{!selectedTm}',
             maxWidth: 100,
             bind: {
                 disabled: '{!selectedTm}',
+                label: '{l10n.searchForm.tm}',
+                hidden: '{!l10n.selectTm.tm}',
+                store: '{l10n.modeStore}',
             },
-            store: [
-                {name: 'Contains', value: 'contains'},
-                {name: 'Concordance', value: 'concordance'},
-                {name: 'Exact', value: 'exact'}
-            ],
+            store: [],
             queryMode: 'local',
             displayField: 'name',
             valueField: 'value',
