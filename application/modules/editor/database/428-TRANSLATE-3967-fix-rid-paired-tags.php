@@ -188,7 +188,7 @@ class TagsPairedByRidFixer
             $lowestIndex = -1;
             $changed = false;
             foreach ($internalTags as $tag) {
-                /* @var editor_Segment_Internal_Tag $tag */
+                /** @var editor_Segment_Internal_Tag $tag */
                 $tag->_rid = $tag->getUnderlyingRid();
                 $tag->_id = $tag->getUnderlyingId();
                 $tagIndex = $tag->getTagIndex();
@@ -206,7 +206,7 @@ class TagsPairedByRidFixer
             if (! empty($ridTags)) {
                 // fix tag-indices for all tag-pairs where it is not properly set
                 foreach ($ridTags as $rid => $tagPair) {
-                    /* @var editor_Segment_Internal_Tag[] $tagPair */
+                    /** @var editor_Segment_Internal_Tag[] $tagPair */
                     if (count($tagPair) !== 2) {
                         throw new Exception('FAULTY STRUCTURE: ' . count($tagPair) . ' segment(s) for RID ' . $rid);
                     }
