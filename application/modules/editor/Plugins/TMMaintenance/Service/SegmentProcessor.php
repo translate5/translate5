@@ -137,8 +137,8 @@ final class SegmentProcessor
         $languageResource->load($languageResourceId);
 
         ZfExtended_Factory::addOverwrite(
-            'editor_Services_Connector_TagHandler_Xliff',
-            new class() extends \editor_Services_Connector_TagHandler_Xliff {
+            \editor_Services_Connector_TagHandler_T5MemoryXliff::class,
+            new class() extends \editor_Services_Connector_TagHandler_T5MemoryXliff {
                 public function restoreInResult(string $resultString, bool $isSource = true): ?string
                 {
                     $restoredResult = parent::restoreInResult($resultString);
