@@ -28,14 +28,17 @@ END LICENSE AND COPYRIGHT
 
 use editor_Models_LanguageResources_LanguageResource as LanguageResource;
 use editor_Models_Task as Task;
+use GuzzleHttp\Client;
 use MittagQI\Translate5\ContentProtection\T5memory\T5NTagSchemaFixFilter;
 use MittagQI\Translate5\ContentProtection\T5memory\TmConversionService;
 use MittagQI\Translate5\LanguageResource\Adapter\Exception\RescheduleUpdateNeededException;
 use MittagQI\Translate5\LanguageResource\Adapter\UpdatableAdapterInterface;
 use MittagQI\Translate5\LanguageResource\Status as LanguageResourceStatus;
-use MittagQI\Translate5\Service\T5Memory;
+use MittagQI\Translate5\T5Memory\Api\VersionFetchingApi;
 use MittagQI\Translate5\T5Memory\Enum\StripFramingTags;
 use MittagQI\Translate5\T5Memory\PersistenceService;
+use PharIo\Version\GreaterThanOrEqualToVersionConstraint;
+use PharIo\Version\Version;
 
 /**
  * T5memory / OpenTM2 Connector
@@ -79,6 +82,8 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
 
     private TmConversionService $conversionService;
 
+    private VersionFetchingApi $versionFetchingApi;
+
     private PersistenceService $persistenceService;
 
     public function __construct()
@@ -91,6 +96,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
         ZfExtended_Logger::addDuplicatesByEcode('E1333', 'E1306', 'E1314');
 
         $this->conversionService = TmConversionService::create();
+        $this->versionFetchingApi = new VersionFetchingApi(new Client());
         $this->persistenceService = new PersistenceService();
 
         parent::__construct();
@@ -174,7 +180,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
         }
 
         //initial upload is a TM file
-        if (self::VERSION_0_6 === $this->getT5MemoryVersion()) {
+        if ($this->isVersionSufficient(self::VERSION_0_6)) {
             $tmName = $this->api->createMemoryWithFile($name, $sourceLang, $fileinfo['tmp_name']);
         } else {
             $tmName = $this->api->createMemory($name, $sourceLang, file_get_contents($fileinfo['tmp_name']));
@@ -730,7 +736,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
         }
 
         // TODO remove after fully migrated to t5memory v0.5.x
-        if ($this->getT5MemoryVersion() === self::VERSION_0_4 && $this->isReorganizingAtTheMoment($name)) {
+        if (! $this->isVersionSufficient(self::VERSION_0_5) && $this->isReorganizingAtTheMoment($name)) {
             // Status import to prevent any other queries to TM to be performed
             return LanguageResourceStatus::IMPORT;
         }
@@ -1113,8 +1119,6 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
 
     private const REORGANIZE_WAIT_TIME_SECONDS = 60;
 
-    private const VERSION_0_4 = '0.4';
-
     private const VERSION_0_5 = '0.5';
 
     private function needsReorganizing(stdClass $error, string $tmName): bool
@@ -1168,11 +1172,9 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
             $this->languageResource->save();
         }
 
-        $version = $this->getT5MemoryVersion();
-
         $reorganized = $this->api->reorganizeTm($tmName);
 
-        if ($version === self::VERSION_0_5) {
+        if ($this->isVersionSufficient(self::VERSION_0_5)) {
             $reorganized = $this->waitReorganizeFinished();
         }
 
@@ -1191,7 +1193,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
     {
         $this->resetReorganizingIfNeeded();
 
-        if ($this->getT5MemoryVersion() === self::VERSION_0_5) {
+        if ($this->isVersionSufficient(self::VERSION_0_5)) {
             return $this->getStatus(
                 $this->resource,
                 tmName: $tmName
@@ -1203,7 +1205,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
 
     public function isReorganizeFailed(?string $tmName = null): bool
     {
-        if ($this->getT5MemoryVersion() === self::VERSION_0_5) {
+        if ($this->isVersionSufficient(self::VERSION_0_5)) {
             return $this->getStatus(
                 $this->resource,
                 tmName: $tmName
@@ -1301,12 +1303,17 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
         $languageResource->save();
     }
 
+    private function isVersionSufficient(string $version): bool
+    {
+        $constraint = new GreaterThanOrEqualToVersionConstraint($version, new Version($version));
+
+        return $constraint->complies(new Version($this->getT5MemoryVersion()));
+    }
+
     private function getT5MemoryVersion(): string
     {
-        $defaultVersion = self::VERSION_0_4;
-
         if (! $this->languageResource || $this->api->isOpentm2()) {
-            return $defaultVersion;
+            return VersionFetchingApi::FALLBACK_VERSION;
         }
 
         $version = $this->languageResource->getSpecificData('version', true);
@@ -1318,15 +1325,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
             return $version['version'];
         }
 
-        $success = $this->api->resources();
-
-        if (! $success) {
-            return $defaultVersion;
-        }
-
-        $resources = $this->api->getResult();
-
-        $version = str_starts_with($resources->Version ?? '', self::VERSION_0_5) ? self::VERSION_0_5 : self::VERSION_0_4;
+        $version = $this->versionFetchingApi->version($this->languageResource->getResource()->getUrl());
 
         if (! $this->isInternalFuzzy()) {
             // TODO In editor_Services_Manager::visitAllAssociatedTms language resource is initialized
@@ -1501,7 +1500,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
         $successful = false;
 
         try {
-            if (self::VERSION_0_6 === $this->getT5MemoryVersion()) {
+            if ($this->isVersionSufficient(self::VERSION_0_6)) {
                 $successful = $this->api->importMemoryAsFile($importFilename, $tmName, $stripFramingTags);
             } else {
                 $successful = $this->api->importMemory(file_get_contents($importFilename), $tmName, $stripFramingTags);
