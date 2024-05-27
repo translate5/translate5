@@ -12,8 +12,8 @@ use MittagQI\Translate5\Plugins\TMMaintenance\DTO\DeleteBatchDTO;
 use MittagQI\Translate5\Plugins\TMMaintenance\DTO\DeleteDTO;
 use MittagQI\Translate5\Plugins\TMMaintenance\DTO\GetListDTO;
 use MittagQI\Translate5\Plugins\TMMaintenance\DTO\UpdateDTO;
-use MittagQI\Translate5\T5Memory\DTO\SearchDTO as T5SearchDTO;
 use MittagQI\Translate5\T5Memory\DTO\DeleteBatchDTO as T5DeleteBatchDTO;
+use MittagQI\Translate5\T5Memory\DTO\SearchDTO as T5SearchDTO;
 use ZfExtended_Factory;
 
 final class SegmentProcessor

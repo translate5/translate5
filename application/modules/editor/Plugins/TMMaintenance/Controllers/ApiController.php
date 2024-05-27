@@ -81,7 +81,9 @@ class Editor_Plugins_Tmmaintenance_ApiController extends ZfExtended_RestControll
             $resources
         );
 
-        $this->assignView(['items' => $tms]);
+        $this->assignView([
+            'items' => $tms,
+        ]);
     }
 
     public function indexAction(): void
@@ -128,12 +130,16 @@ class Editor_Plugins_Tmmaintenance_ApiController extends ZfExtended_RestControll
     {
         $data = [];
 
-        $fileContent = file_get_contents(__DIR__ . '/../locales/' . $this->session->data->locale . '.json');
+        $fileContent = file_get_contents(sprintf(
+            '%s/../locales/%s.json',
+            __DIR__,
+            isset($this->session->data) ? $this->session->data->locale : 'en'
+        ));
 
         try {
             $data = Json::decode($fileContent);
         } catch (JsonException $exception) {
-            // TODO do something
+            trigger_error('Error decoding JSON file: ' . $exception->getMessage(), E_USER_WARNING);
         }
 
         return $data;
@@ -143,14 +149,14 @@ class Editor_Plugins_Tmmaintenance_ApiController extends ZfExtended_RestControll
     {
         $requestedLocale = (string) $this->getParam('locale');
 
-        // TODO get locales from globally defined
         if ($this->getParam('locale')
             && in_array($requestedLocale, ['en', 'de'], true)
+            && isset($this->session->data)
         ) {
             $this->session->data->locale = $requestedLocale;
         }
 
-        return $this->session->data->locale;
+        return $this->session->data->locale ?? $requestedLocale;
     }
 
     private function assignView(array $data): void
