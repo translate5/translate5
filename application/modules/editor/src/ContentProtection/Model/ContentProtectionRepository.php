@@ -62,6 +62,7 @@ use MittagQI\Translate5\ContentProtection\NumberProtection\Protector\ReplaceCont
 use Zend_Db_Table_Abstract;
 use Zend_Db_Table_Select;
 use ZfExtended_Factory;
+use ZfExtended_Models_Entity_NotFoundException;
 
 class ContentProtectionRepository
 {
@@ -82,10 +83,9 @@ class ContentProtectionRepository
 
         $sourceIds = [(int) $sourceLang->getId()];
 
-        if ($sourceLang->getMajorRfc5646() !== $sourceLang->getRfc5646()) {
-            $major = ZfExtended_Factory::get(Languages::class);
-            $major->loadByRfc5646($sourceLang->getMajorRfc5646());
+        $major = $this->findMajorLanguage($sourceLang);
 
+        if ($sourceLang->getMajorRfc5646() !== $sourceLang->getRfc5646() && null !== $major) {
             $sourceIds[] = (int) $major->getId();
         }
 
@@ -134,17 +134,15 @@ class ContentProtectionRepository
         $sourceIds = [(int) $sourceLang->getId()];
         $targetIds = [(int) $targetLang->getId()];
 
-        if ($sourceLang->getMajorRfc5646() !== $sourceLang->getRfc5646()) {
-            $major = ZfExtended_Factory::get(Languages::class);
-            $major->loadByRfc5646($sourceLang->getMajorRfc5646());
+        $major = $this->findMajorLanguage($sourceLang);
 
+        if ($sourceLang->getMajorRfc5646() !== $sourceLang->getRfc5646() && null !== $major) {
             $sourceIds[] = (int) $major->getId();
         }
 
-        if ($targetLang->getMajorRfc5646() !== $targetLang->getRfc5646()) {
-            $major = ZfExtended_Factory::get(Languages::class);
-            $major->loadByRfc5646($targetLang->getMajorRfc5646());
+        $major = $this->findMajorLanguage($targetLang);
 
+        if ($targetLang->getMajorRfc5646() !== $targetLang->getRfc5646() && null !== $major) {
             $targetIds[] = (int) $major->getId();
         }
 
@@ -205,17 +203,15 @@ class ContentProtectionRepository
         $sourceIds = [$sourceLang->getId()];
         $targetIds = [$targetLang->getId()];
 
-        if ($sourceLang->getMajorRfc5646() !== $sourceLang->getRfc5646()) {
-            $major = ZfExtended_Factory::get(Languages::class);
-            $major->loadByRfc5646($sourceLang->getMajorRfc5646());
+        $major = $this->findMajorLanguage($sourceLang);
 
+        if ($sourceLang->getMajorRfc5646() !== $sourceLang->getRfc5646() && null !== $major) {
             $sourceIds[] = $major->getId();
         }
 
-        if ($targetLang->getMajorRfc5646() !== $targetLang->getRfc5646()) {
-            $major = ZfExtended_Factory::get(Languages::class);
-            $major->loadByRfc5646($targetLang->getMajorRfc5646());
+        $major = $this->findMajorLanguage($targetLang);
 
+        if ($targetLang->getMajorRfc5646() !== $targetLang->getRfc5646() && null !== $major) {
             $targetIds[] = $major->getId();
         }
 
@@ -440,5 +436,18 @@ class ContentProtectionRepository
             ->where('recognition.enabled = true')
             ->where('recognition.keepAsIs = true')
             ->order('priority desc');
+    }
+
+    private function findMajorLanguage(Languages $lang): ?Languages
+    {
+        $major = ZfExtended_Factory::get(Languages::class);
+
+        try {
+            $major->loadByRfc5646($lang->getMajorRfc5646());
+
+            return $major;
+        } catch (ZfExtended_Models_Entity_NotFoundException) {
+            return null;
+        }
     }
 }

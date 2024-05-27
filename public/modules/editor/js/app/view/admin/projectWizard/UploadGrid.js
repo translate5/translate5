@@ -165,7 +165,8 @@ Ext.define('Editor.view.admin.projectWizard.UploadGrid', {
                     xtype: 'gridcolumn',
                     dataIndex: 'name',
                     flex: 1,
-                    text: me.strings.file
+                    text: me.strings.file,
+                    renderer: (value) => Ext.String.htmlEncode(value)
                 },{
                     xtype: 'gridcolumn',
                     width: 90,

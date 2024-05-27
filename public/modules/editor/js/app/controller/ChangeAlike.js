@@ -80,6 +80,7 @@ Ext.define('Editor.controller.ChangeAlike', {
   window: null,
   alikeSegmentsUrl: '',
   actualRecord: null,
+  actualColumnToEdit: null,
   timeTracking: null,
   isDisabled: false,
   callbackToSaveChain: Ext.emptyFn,
@@ -255,10 +256,12 @@ Ext.define('Editor.controller.ChangeAlike', {
    * is invoked by the save chain, directly after starting the save request of the segment
    * @param {Function} finalCallback to return to save chain
    */
-  onAfterSaveCall: function(finalCallback, record) {
+  onAfterSaveCall: function(finalCallback, record, columnToEdit) {
+
 	  var me = this;
 	  me.callbackToSaveChain = finalCallback;
 	  me.actualRecord = record;
+      me.actualColumnToEdit = columnToEdit;
 	  me.saveIsRunning = true;
 
       Editor.app.getController('JsLogger').addLogEntryToLogger('ChangeAlike::onAfterSaveCall set record id: '+record.get('id'));
@@ -522,7 +525,7 @@ Ext.define('Editor.controller.ChangeAlike', {
     }
 
     //TODO: change to websocket
-    me.fireEvent('alikesSaveSuccess',data);
+    me.fireEvent('alikesSaveSuccess', data, me.actualColumnToEdit);
   },
   /**
    * Die übriggebliebenen IDs in der Pending Liste wurden auf dem Server nicht erfolgreich gespeichert, 

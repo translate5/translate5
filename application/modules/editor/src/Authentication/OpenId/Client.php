@@ -30,7 +30,6 @@ use Jumbojett\OpenIDConnectClientException;
 use ReflectionException;
 use stdClass;
 use Zend_Controller_Request_Abstract;
-use Zend_Controller_Request_Http;
 use Zend_Db_Statement_Exception;
 use Zend_Exception;
 use Zend_Registry;
@@ -45,62 +44,44 @@ use ZfExtended_Utils;
 
 class Client
 {
-    /***
-     *
-     * @var Zend_Controller_Request_Http
-     */
-    protected Zend_Controller_Request_Http $request;
-
-    /***
+    /**
      * Current customer used in the request domain
-     * @var editor_Models_Customer_Customer
      */
     protected editor_Models_Customer_Customer $customer;
 
-    /***
+    /**
      * Open id client instance
-     * @var OpenIDConnectClient
      */
     protected OpenIDConnectClient $openIdClient;
 
-    /***
-     * @var
-     */
     protected mixed $config;
 
-    /***
+    /**
      * User verified openid claims
-     *
-     * @var stdClass
      */
-    protected $openIdUserClaims;
+    protected ?stdClass $openIdUserClaims;
 
-    /***
-     * Additional user information from the openid enpoind
-     * @var stdClass
+    /**
+     * Additional user information from the openid end-point
      */
-    protected $openIdUserInfo;
+    protected ?stdClass $openIdUserInfo;
 
     protected ZfExtended_Logger $log;
 
-    public function __construct(Zend_Controller_Request_Abstract $request)
-    {
+    public function __construct(
+        private Zend_Controller_Request_Abstract $request
+    ) {
         $this->openIdClient = new OpenIDConnectClient();
         $this->config = Zend_Registry::get('config');
-        $this->setRequest($request);
-        $this->initOpenIdData();
         $this->log = Zend_Registry::get('logger')->cloneMe('core.openidconnect');
+
+        $this->initOpenIdData();
     }
 
-    public function setRequest(Zend_Controller_Request_Abstract $request)
-    {
-        $this->request = $request;
-    }
-
-    /***
+    /**
      * Init openid required data from the request and session.
      */
-    protected function initOpenIdData()
+    protected function initOpenIdData(): void
     {
         $this->initCustomerFromDomain();
         //if the openid fields for the customer are not set, stop the init
@@ -173,70 +154,73 @@ class Client
         $this->openIdClient->signOut($accessToken, $redirect);
     }
 
-    /***
+    /**
      * Create user from the OAuth verified user claims
-     * FIXME should be renamed to createOrMergeUser
-     * @return NULL|ZfExtended_Models_User
      */
-    public function createUser(): ?ZfExtended_Models_User
+    public function createOrMergeUser(): ?ZfExtended_Models_User
     {
         $emailClaims = $this->getEmailClaim();
         $user = $this->initOrLoadUser($emailClaims);
 
+        $isNewUser = empty($user->getId());
+        // update the user claims only if the user is new or the customer is configured to update the user claims
+        $updateUserClaims = $this->customer->getOpenIdSyncUserData() || $isNewUser;
         //down here update user with data from SSO
         $user->setEmail($emailClaims);
         $user->setFirstName($this->getOpenIdUserData('given_name'));
         $user->setSurName($this->getOpenIdUserData('family_name'));
+        $user->setEditable(true);
+        $user->setCustomers(',' . $this->handleCustomer() . ',');
 
-        //the gender is required in translate5, and in the response can be empty or larger than 1 character
-        $gender = ! empty($this->getOpenIdUserData('gender', false)) ? substr($this->getOpenIdUserData('gender'), 0, 1) : 'n';
-        $user->setGender($gender);
+        // The update for those fields for existing users can be configured in the customer overview as separate flag
+        if ($updateUserClaims) {
+            //the gender is required in translate5, and in the response can be empty or larger than 1 character
+            $gender = ! empty($this->getOpenIdUserData('gender', false)) ? substr($this->getOpenIdUserData('gender'), 0, 1) : 'n';
+            $user->setGender($gender);
 
-        $user->setEditable(1);
+            //find the default locale from the config
+            $localeConfig = $this->config->runtimeOptions->translation;
+            $appLocale = ! empty($localeConfig->applicationLocale) ? $localeConfig->applicationLocale : null;
+            $fallbackLocale = ! empty($localeConfig->fallbackLocale) ? $localeConfig->fallbackLocale : null;
+            $defaultLocale = empty($appLocale) ? (empty($fallbackLocale) ? 'en' : $fallbackLocale) : $appLocale;
 
-        //find the default locale from the config
-        $localeConfig = $this->config->runtimeOptions->translation;
-        $appLocale = ! empty($localeConfig->applicationLocale) ? $localeConfig->applicationLocale : null;
-        $fallbackLocale = ! empty($localeConfig->fallbackLocale) ? $localeConfig->fallbackLocale : null;
+            $claimLocale = $this->getOpenIdUserData('locale', false);
 
-        $defaultLocale = empty($appLocale) ? (empty($fallbackLocale) ? 'en' : $fallbackLocale) : $appLocale;
+            //if the claim locale is empty, use the default user locale
+            if (empty($claimLocale)) {
+                $claimLocale = $defaultLocale;
+            } else {
+                $claimLocale = explode('-', $claimLocale);
+                $claimLocale = $claimLocale[0];
+            }
+            $user->setLocale($claimLocale);
 
-        $claimLocale = $this->getOpenIdUserData('locale', false);
-
-        //if the claim locale is empty, use the default user locale
-        if (empty($claimLocale)) {
-            $claimLocale = $defaultLocale;
-        } else {
-            $claimLocale = explode('-', $claimLocale);
-            $claimLocale = $claimLocale[0];
+            // Find and set the roles depending on the openid server config, this can be defined as 'roles' or 'role'
+            // and it can exist either in the verified claims or in the user info
+            $roles = $this->getOpenIdUserData('roles', false);
+            if (empty($roles)) {
+                $roles = $this->getOpenIdUserData('role', false);
+            }
+            if (empty($roles)) {
+                $this->log->info('E1174', 'No roles are provided by the OpenID Server to translate5. The default roles that are set in the configuration for the customer are used.');
+            }
+            $user->setRoles($this->mergeUserRoles($roles));
         }
-        $user->setLocale($claimLocale);
-
-        $customerId = $this->handleCustomer();
-        $user->setCustomers(',' . $customerId . ',');
-
-        //find and set the roles depending on the openid server config, this can be defined as roles or role
-        //and it can exist either in the verified claims or in the user info
-        $roles = $this->getOpenIdUserData('roles', false);
-        if (empty($roles)) {
-            $roles = $this->getOpenIdUserData('role', false);
-        }
-        if (empty($roles)) {
-            $this->log->info('E1174', 'No roles are provided by the OpenID Server to translate5. The default roles that are set in the configuration for the customer are used.');
-        }
-        $user->setRoles($this->mergeUserRoles($roles));
 
         return $user->save() > 0 ? $user : null;
     }
 
     /**
      * Inits either an empty user with SSO data, or loads an existing one to be updated with the SSO data
-     * @param string $emailClaims
+     *
+     * @throws ReflectionException
+     * @throws Zend_Db_Statement_Exception
+     * @throws ZfExtended_Models_Entity_Exceptions_IntegrityConstraint
+     * @throws ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey
      */
-    protected function initOrLoadUser($emailClaims): ZfExtended_Models_User
+    protected function initOrLoadUser(?string $emailClaims): ZfExtended_Models_User
     {
-        $user = ZfExtended_Factory::get('ZfExtended_Models_User');
-        /* @var $user ZfExtended_Models_User */
+        $user = ZfExtended_Factory::get(ZfExtended_Models_User::class);
 
         $issuer = $this->getOpenIdUserData('iss');
         $subject = $this->getOpenIdUserData('sub');
@@ -432,7 +416,11 @@ class Client
      */
     protected function getBaseUrl(): string
     {
-        return $_SERVER['HTTP_HOST'] . $this->request->getBaseUrl() . '/';
+        if ($this->request instanceof \Zend_Controller_Request_Http) {
+            return $_SERVER['HTTP_HOST'] . $this->request->getBaseUrl() . '/';
+        }
+
+        return $_SERVER['HTTP_HOST'];
     }
 
     /***

@@ -171,7 +171,8 @@ class editor_Workflow_Actions extends editor_Workflow_Actions_Abstract
     }
 
     /***
-     * Checks the deadine dates of a task assoc, if it is overdued, it'll be finished for all lectors, triggers normal workflow handlers if needed.
+     * Checks the deadine dates of a task assoc, if it is overdued, it'll be finished for all lectors, triggers normal
+     * workflow handlers if needed.
      */
     public function finishOverduedTaskUserAssoc()
     {
@@ -227,7 +228,8 @@ class editor_Workflow_Actions extends editor_Workflow_Actions_Abstract
      *              → the target filename for the task, may contain any field from the task meta json in the exported
      *                file + the magic filed {time} which gives the current time stamp
      *          "other options for filesystem": "just place here too"
-     *              → See again FlysystemFactory for the needed options, just to be placed directly in the options object
+     *              → See again FlysystemFactory for the needed options, just to be placed directly in the options
+     * object
      *       }
      */
     public function deleteOldEndedTasks()
@@ -318,6 +320,22 @@ class editor_Workflow_Actions extends editor_Workflow_Actions_Abstract
                 'code' => $response->getStatus(),
                 'result' => $response->getBody(),
             ]);
+        }
+    }
+
+    /**
+     * If no parameter edit100PercentMatch is given, defaults to true
+     * @throws ReflectionException
+     * @throws editor_Models_Segment_Exception
+     */
+    public function changeEdit100PercentMatch(): void
+    {
+        $edit100PercentMatch = (bool) ($this->config->parameters->edit100PercentMatch ?? true);
+        $bulkUpdater = ZfExtended_Factory::get(editor_Models_Segment_AutoStates_BulkUpdater::class);
+        $bulkUpdater->updateSegmentsEdit100PercentMatch($this->config->task, $edit100PercentMatch);
+        if ($edit100PercentMatch) {
+            //trigger auto QA, since the now editable segments might be without QA information
+            editor_Segment_Quality_Manager::autoqaOperation($this->config->task);
         }
     }
 }

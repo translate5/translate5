@@ -150,7 +150,8 @@ class LoginController extends ZfExtended_Controllers_Login
             $redirectTo = '';
         }
 
-        ZfExtended_Session::updateSession(true, true, $user->getId());
+        $userId = empty($user->getId()) ? null : (int) $user->getId();
+        ZfExtended_Session::updateSession(true, true, $userId);
 
         // re-add the redirectTo value from above after the updateSession is called. This must be done because the
         // update session can remove this value and the user will not be redirected to the "clicked" edit task link/hash
@@ -228,7 +229,7 @@ class LoginController extends ZfExtended_Controllers_Login
                 //    $userSession->data->idToken = $this->_request->getParam('id_token');
                 //}
                 //create the user in the translate5 system or update if the user already exist
-                $user = $oidc->createUser();
+                $user = $oidc->createOrMergeUser();
                 if (! $user) {
                     return;
                 }

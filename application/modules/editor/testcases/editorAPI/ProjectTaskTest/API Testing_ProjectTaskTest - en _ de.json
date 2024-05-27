@@ -1200,7 +1200,7 @@
         "isFirstofFile": null
     },
     {
-        "source": "The most recent version of <div class=\"term preferredTerm exact transNotDefined\" title=\"\">Apache</div> HTTP Server may be obtained from <div class=\"open 672069643d2231343622 internal-tag ownttip\"><span class=\"short\" title=\"&lt;a href=&quot;http://httpd.apache.org/&quot; class=&quot;link external&quot;&gt;\">&lt;1&gt;</span><span class=\"full\" data-originalid=\"146\" data-length=\"-1\">&lt;a href=&quot;http://httpd.apache.org/&quot; class=&quot;link external&quot;&gt;</span></div><div class=\"single 782069643d22313437222f internal-tag ownttip\"><span class=\"short\" title=\"&amp;raquo;\">&lt;2/&gt;</span><span class=\"full\" data-originalid=\"147\" data-length=\"-1\">&amp;raquo;</span></div><div class=\"single 636861722074733d226332613022206c656e6774683d2231222f nbsp internal-tag ownttip\"><span class=\"short\" title=\"&lt;4/&gt;: No-Break Space (NBSP)\">&lt;4/&gt;</span><span class=\"full\" data-originalid=\"char\" data-length=\"1\">⎵</span></div><div class=\"term preferredTerm exact transNotDefined\" title=\"\">Apache</div> download site<div class=\"close 2f67 internal-tag ownttip\"><span class=\"short\" title=\"&lt;/a&gt;\">&lt;/1&gt;</span><span class=\"full\" data-originalid=\"146\" data-length=\"-1\">&lt;/a&gt;</span></div>, and <div class=\"term preferredTerm exact transNotFound\" title=\"\">a</div> fitting PHP version from the above mentioned places.",
+        "source": "The most recent version of <div class=\"term preferredTerm exact transNotDefined\" title=\"\">Apache</div> HTTP Server may be obtained from <div class=\"open 672069643d2231343622 internal-tag ownttip\"><span class=\"short\" title=\"&lt;a href=&quot;http://httpd.apache.org/&quot; class=&quot;link external&quot;&gt;\">&lt;1&gt;</span><span class=\"full\" data-originalid=\"146\" data-length=\"-1\">&lt;a href=&quot;http://httpd.apache.org/&quot; class=&quot;link external&quot;&gt;</span></div><div class=\"single 782069643d22313437222f internal-tag ownttip\"><span class=\"short\" title=\"&amp;raquo;\">&lt;2/&gt;</span><span class=\"full\" data-originalid=\"147\" data-length=\"-1\">&amp;raquo;</span></div><div class=\"single 636861722074733d226332613022206c656e6774683d2231222f nbsp internal-tag ownttip\"><span class=\"short\" title=\"&lt;4/&gt;: No-Break Space (NBSP)\">&lt;4/&gt;</span><span class=\"full\" data-originalid=\"char\" data-length=\"1\">⎵</span></div><div class=\"term preferredTerm exact transNotDefined\" title=\"\">Apache</div> download site<div class=\"close 2f67 internal-tag ownttip\"><span class=\"short\" title=\"&lt;/a&gt;\">&lt;/1&gt;</span><span class=\"full\" data-originalid=\"146\" data-length=\"-1\">&lt;/a&gt;</span></div>, and <div class=\"term preferredTerm exact transNotFound better-translate-with-preferredTerm\" title=\"\">a</div> fitting PHP version from the above mentioned places.",
         "sourceEdit": null,
         "target": "",
         "targetEdit": "",
@@ -1860,7 +1860,7 @@
         "isFirstofFile": null
     },
     {
-        "source": "Run ./configure --help for <div class=\"term preferredTerm exact transNotFound\" title=\"\">a</div> list of available options.",
+        "source": "Run ./configure --help for <div class=\"term preferredTerm exact transNotFound better-translate-with-preferredTerm\" title=\"\">a</div> list of available options.",
         "sourceEdit": null,
         "target": "Rufen Sie ./configure --help auf, um eine Liste der verfügbaren Optionen zu erhalten.",
         "targetEdit": "Rufen Sie ./configure --help auf, um eine Liste der verfügbaren Optionen zu erhalten.",
@@ -1890,7 +1890,7 @@
         "isFirstofFile": null
     },
     {
-        "source": "In our example we'll do <div class=\"term preferredTerm exact transNotFound\" title=\"\">a</div> simple configure with <div class=\"term preferredTerm exact transNotDefined\" title=\"\">Apache</div> 2 and MySQL support.",
+        "source": "In our example we'll do <div class=\"term preferredTerm exact transNotFound better-translate-with-preferredTerm\" title=\"\">a</div> simple configure with <div class=\"term preferredTerm exact transNotDefined\" title=\"\">Apache</div> 2 and MySQL support.",
         "sourceEdit": null,
         "target": "In unserem Beispiel werden wir eine einfache Konfiguration mit Unterstützung für Apache 2",
         "targetEdit": "In unserem Beispiel werden wir eine einfache Konfiguration mit Unterstützung für Apache 2",
@@ -2070,7 +2070,7 @@
         "isFirstofFile": null
     },
     {
-        "source": "<div class=\"term preferredTerm lowercase transNotFound\" title=\"\">A</div> recompile of <div class=\"term preferredTerm exact transNotDefined\" title=\"\">Apache</div> is not needed.",
+        "source": "<div class=\"term preferredTerm lowercase transNotFound better-translate-with-preferredTerm\" title=\"\">A</div> recompile of <div class=\"term preferredTerm exact transNotDefined\" title=\"\">Apache</div> is not needed.",
         "sourceEdit": null,
         "target": "Eine erneute Kompilierung von Apache ist nicht notwendig.",
         "targetEdit": "Eine erneute Kompilierung von Apache ist nicht notwendig.",
@@ -2700,7 +2700,7 @@
         "isFirstofFile": null
     },
     {
-        "source": "mod_rewrite may be used To allow any arbitrary .php file to be displayed as syntax-highlighted source code, without having to rename or copy it to <div class=\"term preferredTerm exact transNotFound\" title=\"\">a</div> .phps file:",
+        "source": "mod_rewrite may be used To allow any arbitrary .php file to be displayed as syntax-highlighted source code, without having to rename or copy it to <div class=\"term preferredTerm exact transNotFound better-translate-with-preferredTerm\" title=\"\">a</div> .phps file:",
         "sourceEdit": null,
         "target": "Oder wenn wir erlauben wollen, dass .php, .php2, .php3, .php4, .php5, .php6 und .phtml und sonst nichts als PHP interpretiert werden, könnten wird",
         "targetEdit": "Oder wenn wir erlauben wollen, dass .php, .php2, .php3, .php4, .php5, .php6 und .phtml und sonst nichts als PHP interpretiert werden, könnten wird",
@@ -2910,7 +2910,7 @@
         "isFirstofFile": null
     },
     {
-        "source": "Following the steps above you will have <div class=\"term preferredTerm exact transNotFound\" title=\"\">a</div> running Apache2 web server with support for PHP as <div class=\"term preferredTerm exact transNotFound\" title=\"\">a</div> <div class=\"open 672069643d2233323422 internal-tag ownttip\"><span class=\"short\" title=\"&lt;em&gt;\">&lt;1&gt;</span><span class=\"full\" data-originalid=\"324\" data-length=\"-1\">&lt;em&gt;</span></div>SAPI<div class=\"close 2f67 internal-tag ownttip\"><span class=\"short\" title=\"&lt;/em&gt;\">&lt;/1&gt;</span><span class=\"full\" data-originalid=\"324\" data-length=\"-1\">&lt;/em&gt;</span></div> module.",
+        "source": "Following the steps above you will have <div class=\"term preferredTerm exact transNotFound better-translate-with-preferredTerm\" title=\"\">a</div> running Apache2 web server with support for PHP as <div class=\"term preferredTerm exact transNotFound better-translate-with-preferredTerm\" title=\"\">a</div> <div class=\"open 672069643d2233323422 internal-tag ownttip\"><span class=\"short\" title=\"&lt;em&gt;\">&lt;1&gt;</span><span class=\"full\" data-originalid=\"324\" data-length=\"-1\">&lt;em&gt;</span></div>SAPI<div class=\"close 2f67 internal-tag ownttip\"><span class=\"short\" title=\"&lt;/em&gt;\">&lt;/1&gt;</span><span class=\"full\" data-originalid=\"324\" data-length=\"-1\">&lt;/em&gt;</span></div> module.",
         "sourceEdit": null,
         "target": "Verwenden Sie die übliche Prozedur, um den Apache Server zu starten, z.B.: /usr/local/apache2/bin/apachectl start",
         "targetEdit": "Verwenden Sie die übliche Prozedur, um den Apache Server zu starten, z.B.: /usr/local/apache2/bin/apachectl start",
@@ -3090,7 +3090,7 @@
         "isFirstofFile": null
     },
     {
-        "source": "This should not be undertaken without being aware of the consequences of this decision, and having at least <div class=\"term preferredTerm exact transNotFound\" title=\"\">a</div> fair understanding of the implications.",
+        "source": "This should not be undertaken without being aware of the consequences of this decision, and having at least <div class=\"term preferredTerm exact transNotFound better-translate-with-preferredTerm\" title=\"\">a</div> fair understanding of the implications.",
         "sourceEdit": null,
         "target": "",
         "targetEdit": "",
@@ -3120,7 +3120,7 @@
         "isFirstofFile": null
     },
     {
-        "source": "The <div class=\"term preferredTerm exact transNotDefined\" title=\"\">Apache</div> documentation regarding <div class=\"open 672069643d2233333822 internal-tag ownttip\"><span class=\"short\" title=\"&lt;a href=&quot;http://httpd.apache.org/docs/current/mpm.html&quot; class=&quot;link external&quot;&gt;\">&lt;1&gt;</span><span class=\"full\" data-originalid=\"338\" data-length=\"-1\">&lt;a href=&quot;http://httpd.apache.org/docs/current/mpm.html&quot; class=&quot;link external&quot;&gt;</span></div><div class=\"single 782069643d22333339222f internal-tag ownttip\"><span class=\"short\" title=\"&amp;raquo;\">&lt;2/&gt;</span><span class=\"full\" data-originalid=\"339\" data-length=\"-1\">&amp;raquo;</span></div><div class=\"single 636861722074733d226332613022206c656e6774683d2231222f nbsp internal-tag ownttip\"><span class=\"short\" title=\"&lt;4/&gt;: No-Break Space (NBSP)\">&lt;4/&gt;</span><span class=\"full\" data-originalid=\"char\" data-length=\"1\">⎵</span></div><div class=\"term admittedTerm stemmed transNotDefined\" title=\"\">MPM-Modules</div><div class=\"close 2f67 internal-tag ownttip\"><span class=\"short\" title=\"&lt;/a&gt;\">&lt;/1&gt;</span><span class=\"full\" data-originalid=\"338\" data-length=\"-1\">&lt;/a&gt;</span></div> discusses MPMs in <div class=\"term preferredTerm exact transNotFound\" title=\"\">a</div> great deal more detail.",
+        "source": "The <div class=\"term preferredTerm exact transNotDefined\" title=\"\">Apache</div> documentation regarding <div class=\"open 672069643d2233333822 internal-tag ownttip\"><span class=\"short\" title=\"&lt;a href=&quot;http://httpd.apache.org/docs/current/mpm.html&quot; class=&quot;link external&quot;&gt;\">&lt;1&gt;</span><span class=\"full\" data-originalid=\"338\" data-length=\"-1\">&lt;a href=&quot;http://httpd.apache.org/docs/current/mpm.html&quot; class=&quot;link external&quot;&gt;</span></div><div class=\"single 782069643d22333339222f internal-tag ownttip\"><span class=\"short\" title=\"&amp;raquo;\">&lt;2/&gt;</span><span class=\"full\" data-originalid=\"339\" data-length=\"-1\">&amp;raquo;</span></div><div class=\"single 636861722074733d226332613022206c656e6774683d2231222f nbsp internal-tag ownttip\"><span class=\"short\" title=\"&lt;4/&gt;: No-Break Space (NBSP)\">&lt;4/&gt;</span><span class=\"full\" data-originalid=\"char\" data-length=\"1\">⎵</span></div><div class=\"term admittedTerm stemmed transNotDefined\" title=\"\">MPM-Modules</div><div class=\"close 2f67 internal-tag ownttip\"><span class=\"short\" title=\"&lt;/a&gt;\">&lt;/1&gt;</span><span class=\"full\" data-originalid=\"338\" data-length=\"-1\">&lt;/a&gt;</span></div> discusses MPMs in <div class=\"term preferredTerm exact transNotFound better-translate-with-preferredTerm\" title=\"\">a</div> great deal more detail.",
         "sourceEdit": null,
         "target": "",
         "targetEdit": "",
@@ -3240,7 +3240,7 @@
         "isFirstofFile": null
     },
     {
-        "source": "To build <div class=\"term preferredTerm exact transNotFound\" title=\"\">a</div> multithreaded version of <div class=\"term preferredTerm exact transNotDefined\" title=\"\">Apache</div>, the target system must support threads.",
+        "source": "To build <div class=\"term preferredTerm exact transNotFound better-translate-with-preferredTerm\" title=\"\">a</div> multithreaded version of <div class=\"term preferredTerm exact transNotDefined\" title=\"\">Apache</div>, the target system must support threads.",
         "sourceEdit": null,
         "target": "Um eine Multithreaded Version von Apache zu erzeugen, muss Ihr System Threads unterstützen.",
         "targetEdit": "Um eine Multithreaded Version von Apache zu erzeugen, muss Ihr System Threads unterstützen.",

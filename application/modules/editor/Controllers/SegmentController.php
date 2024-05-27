@@ -127,7 +127,8 @@ class Editor_SegmentController extends ZfExtended_RestController
 
         if ($handleSegmentranges || $handleAnonymizeUsers) {
             foreach ($this->view->rows as &$row) {
-                if ($handleSegmentranges && $row['editable']) { // a segment that is not editable already must stay not editable!
+                // a segment that is not editable already must stay not editable!
+                if ($handleSegmentranges && $row['editable']) {
                     $row['editable'] = in_array($row['segmentNrInTask'], $assignedSegments);
                 }
                 if ($handleAnonymizeUsers) {
@@ -177,7 +178,8 @@ class Editor_SegmentController extends ZfExtended_RestController
     }
 
     /**
-     * returns the index (position) of the requested segment (by segmentId) in the filtered segment list (as it would be given by indexAction)
+     * returns the index (position) of the requested segment (by segmentId)
+     * in the filtered segment list (as it would be given by indexAction)
      * if index is null, that means the segment is not given in the filtered list
      * FIXME: this function uses the segmentNrInTask and NOT the segmentId as normal. How to solve this???
      * Background: in the frontend (visual review) we dont have the segmentId, we only have the segmentNrInTask
@@ -353,15 +355,22 @@ class Editor_SegmentController extends ZfExtended_RestController
         /* @var $updater editor_Models_Segment_Updater */
         $updater->update($this->entity, $history);
 
-        // To always have a consistent view-model, we convert the stdClass to an assoc array, no matter if anonymization is required or not
-        $this->view->rows = json_decode(json_encode($this->entity->getDataObject()), true);
+        // To always have a consistent view-model, we convert the stdClass to an assoc array,
+        // no matter if anonymization is required or not
+        $rows = json_decode(json_encode($this->entity->getDataObject()), true);
 
         // anonymize users for view? (e.g. comments etc in segment-grid-mouseovers)
         if ($task->anonymizeUsers()) {
             $workflowAnonymize = ZfExtended_Factory::get('editor_Workflow_Anonymize');
             /* @var $workflowAnonymize editor_Workflow_Anonymize */
-            $this->view->rows = $workflowAnonymize->anonymizeUserdata($this->entity->getTaskGuid(), $this->view->rows['userGuid'], $this->view->rows);
+            $rows = $workflowAnonymize->anonymizeUserdata(
+                $this->entity->getTaskGuid(),
+                $rows['userGuid'],
+                $rows
+            );
         }
+
+        $this->view->rows = $rows;
 
         // Recalculate task progress and assign results into view so the frontend viewModel is updated
         // TODO: this should be updated from the websockets
@@ -415,10 +424,8 @@ class Editor_SegmentController extends ZfExtended_RestController
      */
     public function isOpenedByMoreThanOneUser(string $taskGuid): bool
     {
-        // Get usage records
         $usedBy = ZfExtended_Factory::get(editor_Models_TaskUserAssoc::class)->loadUsed($taskGuid);
 
-        // Return flag indicating whether there are more than one such a record
         return count($usedBy) > 1;
     }
 
@@ -446,7 +453,6 @@ class Editor_SegmentController extends ZfExtended_RestController
             ]);
         }
 
-        //check if the required search parameters are in the request
         $this->checkRequiredSearchParameters($parameters);
         $parameters['searchField'] = htmlentities($parameters['searchField'], ENT_XML1);
         $parameters['replaceField'] = htmlentities($parameters['replaceField'], ENT_XML1);
@@ -477,6 +483,7 @@ class Editor_SegmentController extends ZfExtended_RestController
 
             return;
         }
+
         $resultsCount = count($results);
         foreach ($results as $idx => $result) {
             $replace = ZfExtended_Factory::get('editor_Models_SearchAndReplace_ReplaceMatchesSegment', [
@@ -565,9 +572,8 @@ class Editor_SegmentController extends ZfExtended_RestController
     /**
      * checks if current put makes sense to save
      * @param array $fieldnames allowed fieldnames to be saved
-     * @return boolean
      */
-    protected function checkPlausibilityOfPut($fieldnames)
+    protected function checkPlausibilityOfPut($fieldnames): void
     {
         $error = [];
         foreach ($this->data as $key => $value) {
@@ -578,6 +584,7 @@ class Editor_SegmentController extends ZfExtended_RestController
             //search for the img tag, get the data and remove it
             $regex = '#<img[^>]+class="duplicatesavecheck"[^>]+data-segmentid="([0-9]+)" data-fieldname="([^"]+)"[^>]*>#';
             $match = [];
+
             if (! preg_match($regex, $value, $match)) {
                 continue;
             }
@@ -590,6 +597,7 @@ class Editor_SegmentController extends ZfExtended_RestController
                 ];
             }
         }
+
         if (empty($error)) {
             return;
         }
@@ -630,6 +638,7 @@ class Editor_SegmentController extends ZfExtended_RestController
             $sanitized = $updater->sanitizeEditedContent($data, 'targetEdit' === $key) || $sanitized;
             $this->data->{$key} = $data;
         }
+
         if ($sanitized) {
             $this->restMessages->addWarning('Aus dem Segment wurden nicht darstellbare Zeichen entfernt (mehrere Leerzeichen, Tabulatoren, Zeilenumbrüche etc.)!');
         }
@@ -657,8 +666,10 @@ class Editor_SegmentController extends ZfExtended_RestController
             $authUserGuid = ZfExtended_Authentication::getInstance()->getUserGuid();
             $tua = editor_Models_Loaders_Taskuserassoc::loadByTask($authUserGuid, $task);
             $step = $tua->getWorkflowStepName();
+
             if ($tua->isSegmentrangedTaskForStep($task, $step)) {
                 $assignedSegments = $tua->getAllAssignedSegmentsByUserAndStep($task->getTaskGuid(), $authUserGuid, $step);
+
                 if (! in_array($this->entity->getSegmentNrInTask(), $assignedSegments)) {
                     $isTaskGuidAndEditable = false;
                 }
@@ -681,6 +692,7 @@ class Editor_SegmentController extends ZfExtended_RestController
         $task = ZfExtended_Factory::get('editor_Models_Task');
         /* @var $task editor_Models_Task */
         $task->loadByTaskGuid($this->entity->getTaskGuid());
+
         if ($task->getState() === $task::STATE_UNCONFIRMED) {
             //nach außen so tun als ob das gewünschte Entity nicht gefunden wurde
             throw new ZfExtended_Models_Entity_NoAccessException('Task is not confirmed so no segment can be edited! Task: ' . $task->getTaskGuid());
@@ -707,7 +719,8 @@ class Editor_SegmentController extends ZfExtended_RestController
             $editable = in_array($this->entity->getSegmentNrInTask(), $handleSegmentranges);
             $this->entity->setEditable($editable);
         }
-        $this->view->rows = $this->entity->getDataObject();
+
+        $this->view->rows = (array) $this->entity->getDataObject();
     }
 
     public function deleteAction()
@@ -1067,7 +1080,7 @@ class Editor_SegmentController extends ZfExtended_RestController
 
         try {
             $tua = editor_Models_Loaders_Taskuserassoc::loadByTaskGuidForceWorkflowRole($authUserGuid, $taskGuid);
-        } catch (ZfExtended_Models_Entity_NotFoundException $e) {
+        } catch (ZfExtended_Models_Entity_NotFoundException) {
         }
 
         if (empty($tua)) {

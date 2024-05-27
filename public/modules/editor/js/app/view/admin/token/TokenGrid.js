@@ -146,7 +146,7 @@ Ext.define('Editor.view.admin.token.TokenGrid', {
                         const username = Editor.model.admin.User.getLongUserName(user);
                         userFilter.push([user.getUserGuid(), username]);
 
-                        return username;
+                        return Ext.String.htmlEncode(username);
                     }
 
                     userFilter.push([v, v]);

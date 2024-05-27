@@ -13,6 +13,93 @@ All updates are (downwards) compatible! If not this is listed in the important r
 
 
 
+
+## [7.5.0] - 2024-05-17
+
+### Important Notes:
+#### [TRANSLATE-3896](https://jira.translate5.net/browse/TRANSLATE-3896)
+OKAPI now is the default CSV-parser
+ 
+
+
+### Added
+**[TRANSLATE-3534](https://jira.translate5.net/browse/TRANSLATE-3534): Import/Export, TrackChanges - TrackChanges sdlxliff round-trip** <br>
+Accept track changes sdlxliff markup on import and transform it to translate5 syntax.
+Propagate translate5 track changes to sdlxliff file on export
+
+
+### Changed
+**[TRANSLATE-3931](https://jira.translate5.net/browse/TRANSLATE-3931): ConnectWorldserver, Import/Export - Optionally remove content from sdlxliff target segments, that contain only tags and/or whitespace** <br>
+7.5.0: Add possibility to optionally remove content from sdlxliff target segments, that contain only tags and/or whitespace 
+
+**[TRANSLATE-3923](https://jira.translate5.net/browse/TRANSLATE-3923): Auto-QA - "Not found in target" category according to target term** <br>
+Quality errors in 'Not found in target' category group now count cases when best possible translations of source terms are not found in segment target
+
+**[TRANSLATE-3914](https://jira.translate5.net/browse/TRANSLATE-3914): VisualReview / VisualTranslation - Change visual wget test data location** <br>
+Change internas of the wget test.
+
+**[TRANSLATE-3905](https://jira.translate5.net/browse/TRANSLATE-3905): InstantTranslate - Improve API usage to provide file content as normal POST parameter** <br>
+Improve the instanttranslate API to enable filepretranslations also via plain POST requests.
+
+**[TRANSLATE-3896](https://jira.translate5.net/browse/TRANSLATE-3896): Import/Export - Use Okapi for CSV files by default** <br>
+OKAPI now is the default Parser for CSV files and the translate5 internal parser has to be enabled in the config if it shall be used instead
+
+**[TRANSLATE-3537](https://jira.translate5.net/browse/TRANSLATE-3537): Import/Export - Process comments from xliff 1.2 files** <br>
+7.5.0: Change export config label and description
+6.8.0: XLF comments placed in note tags are now also imported and exported as task comments. The behavior is configurable.
+
+
+### Bugfixes
+**[TRANSLATE-3949](https://jira.translate5.net/browse/TRANSLATE-3949): t5memory - Reimport segments does not work as expected** <br>
+Fix reimport task into t5memory
+
+**[TRANSLATE-3948](https://jira.translate5.net/browse/TRANSLATE-3948): Import/Export - FIX: pmlight cannot import tasks** <br>
+FIX: pm-light role could not import tasks due to insufficient rights
+
+**[TRANSLATE-3937](https://jira.translate5.net/browse/TRANSLATE-3937): Import/Export - Matchrate calculated wrong on import** <br>
+Fixed match rate calculation on importing xlf files containing alt-trans nodes
+
+**[TRANSLATE-3935](https://jira.translate5.net/browse/TRANSLATE-3935): Import/Export - SQL query runs into timeout with large file with many repetitions** <br>
+Fix for deadlock problem when syncing repetitions.
+
+**[TRANSLATE-3934](https://jira.translate5.net/browse/TRANSLATE-3934): Import/Export - hotfolder project export: warning for empty segments** <br>
+The warning E1150 if okapi export had empty targets is now logged only if there was an error on exporting via Okapi.
+
+**[TRANSLATE-3930](https://jira.translate5.net/browse/TRANSLATE-3930): t5memory - Fix stripFramingTags parameter in request to t5memory** <br>
+Fixed passing "strip framing tags" value to t5memory
+
+**[TRANSLATE-3926](https://jira.translate5.net/browse/TRANSLATE-3926): GroupShare integration - Fix GroupShare connector in order to work with translate5 7.4.0 and 7.4.1** <br>
+GroupShare plug-in was not compatible to latest version 7.4.0 and 7.4.1
+
+**[TRANSLATE-3921](https://jira.translate5.net/browse/TRANSLATE-3921): t5memory - Disable direct t5memory TM download due data disclosure** <br>
+Disabled t5memory download TM functionality due a data disclosure - the TM file did contain the filenames of other opened TM files at the same time.
+
+**[TRANSLATE-3920](https://jira.translate5.net/browse/TRANSLATE-3920): User Management - Hotfolder projects make Client PM selectable as default** <br>
+Hotfolder plugin: Add clientPm role to PM list in settings
+
+**[TRANSLATE-3911](https://jira.translate5.net/browse/TRANSLATE-3911): Configuration - Hotfolder settings passwort and DeepL API key readable when write protected** <br>
+Configs visibility can be restricted based on a user roles.
+
+**[TRANSLATE-3907](https://jira.translate5.net/browse/TRANSLATE-3907): Hotfolder Import - Hotfolder Bug fixes** <br>
+Hotfolder plugin: use PM over-written on client level
+
+**[TRANSLATE-3882](https://jira.translate5.net/browse/TRANSLATE-3882): Export - Export of Project Fails due to XML Parser Problems** <br>
+FIX: BUG with XML-Parser during Export
+
+**[TRANSLATE-3869](https://jira.translate5.net/browse/TRANSLATE-3869): Import/Export - trackChanges for sdlxliff should only be contained in Changes-Export** <br>
+Fix: Export sdlxliff without track changes no longer produce revision tags
+
+**[TRANSLATE-3749](https://jira.translate5.net/browse/TRANSLATE-3749): Auto-QA - QA consistency wrong results** <br>
+FIX: Evaluation of QA errors/problems did not respect locked segments. Now locked segments will not count for QA problems
+
+**[TRANSLATE-3713](https://jira.translate5.net/browse/TRANSLATE-3713): TermTagger integration, usability editor - Wrong target term high-lighted in right column of the editor** <br>
+Improved target terms usage highlighting in right-side Termportlet
+
+**[TRANSLATE-2500](https://jira.translate5.net/browse/TRANSLATE-2500): Main back-end mechanisms (Worker, Logging, etc.) - Worker Architecture: Solving Problems with Deadlocks and related Locking/Mutex Quirks** <br>
+7.5.0 Improved the setRunning condition to reduce duplicated worker runs
+5.2.2 Improved the internal worker handling regarding DB dead locks and a small opportunity that workers run twice.
+
+
 ## [7.4.1] - 2024-05-03
 
 ### Important Notes:

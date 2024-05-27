@@ -381,7 +381,6 @@ Ext.define('Editor.view.admin.TaskGrid', {
                     filter: {
                         type: 'numeric'
                     },
-                    text: 'id',
                     text: me.text_cols.id
                 },{
                     text: me.text_cols.taskActions,
@@ -537,7 +536,8 @@ Ext.define('Editor.view.admin.TaskGrid', {
                         filter: {
                             type: 'string'
                         },
-                        text: me.text_cols.taskName
+                        text: me.text_cols.taskName,
+                        renderer: v => Ext.String.htmlEncode(v)
                     }, {
                         xtype: 'gridcolumn',
                         width: 110,
@@ -670,8 +670,8 @@ Ext.define('Editor.view.admin.TaskGrid', {
                             type: 'string'
                         },
                         renderer: function (v, meta, rec) {
-                            var tooltip = v,
-                                ret = v;
+                            var tooltip = Ext.String.htmlEncode(v),
+                                ret = Ext.String.htmlEncode(v);
                             if (Editor.data.frontend.tasklist.pmMailTo) {
                                 tooltip = rec.get('pmMail');
                                 ret = '<a alt="' + tooltip + '" href="mailto:' + tooltip + '" target="_blank">' + v + '</a>';
