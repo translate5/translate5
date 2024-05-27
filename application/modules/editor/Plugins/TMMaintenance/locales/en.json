@@ -47,6 +47,7 @@
     "deleteAllTooltip": "All segments that match the current search settings are deleted"
   },
   "createForm": {
+    "title": "Create new",
     "sourceText": "Source text",
     "targetText": "Target text",
     "save": "Save",
@@ -56,5 +57,20 @@
     "close": "Close",
     "proceed": "Proceed",
     "warningText": "All segments of the current search settings will be deleted. Are you sure you want to delete?"
+  },
+  "list" : {
+    "title": "Segments",
+    "columns": {
+      "sourceText": "Source text",
+      "targetText": "Target text",
+      "author": "Author",
+      "additionalInfo": "Additional info",
+      "document": "Document",
+      "creationDate": "Creation date",
+      "actions": "Actions"
+    },
+    "edit": "Edit",
+    "delete": "Delete",
+    "create": "Create"
   }
 }

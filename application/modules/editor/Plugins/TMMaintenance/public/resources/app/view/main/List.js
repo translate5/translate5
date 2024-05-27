@@ -11,7 +11,9 @@ Ext.define('TMMaintenance.view.main.List', {
         'TMMaintenance.view.main.CreateForm',
     ],
 
-    title: 'Segments',
+    bind: {
+        title: '{l10n.list.title}',
+    },
 
     controller: 'main',
     store: {
@@ -29,13 +31,16 @@ Ext.define('TMMaintenance.view.main.List', {
 
     columns: [
         {
-            text: 'Source text',
             dataIndex: 'source',
             minWidth: 300,
             editable: true,
             sortable: false,
             cell: {
                 encodeHtml: false,
+            },
+            bind: {
+                text: '{l10n.list.columns.sourceText}',
+                hidden: '{!l10n.list.columns.sourceText}',
             },
             editor: {
                 xtype: 't5editor',
@@ -45,7 +50,6 @@ Ext.define('TMMaintenance.view.main.List', {
             renderer: 'sourceTargetRenderer',
         },
         {
-            text: 'Target text',
             dataIndex: 'target',
             minWidth: 300,
             editable: true,
@@ -53,6 +57,10 @@ Ext.define('TMMaintenance.view.main.List', {
             cell: {
                 encodeHtml: false,
                 height: 100,
+            },
+            bind: {
+                text: '{l10n.list.columns.targetText}',
+                hidden: '{!l10n.list.columns.targetText}',
             },
             editor: {
                 xtype: 't5editor',
@@ -62,7 +70,10 @@ Ext.define('TMMaintenance.view.main.List', {
             renderer: 'sourceTargetRenderer',
         },
         {
-            text: 'Actions',
+            bind: {
+                text: '{l10n.list.columns.sourceText}',
+                hidden: '{!l10n.list.columns.sourceText}',
+            },
             cell: {
                 userCls: 'editor-tools',
                 tools: {
@@ -71,6 +82,7 @@ Ext.define('TMMaintenance.view.main.List', {
                         handler: 'onEditPress',
                         bind: {
                             hidden: '{record.isEditing}',
+                            tooltip: '{l10n.list.edit}',
                         },
                     },
                     delete: {
@@ -78,6 +90,7 @@ Ext.define('TMMaintenance.view.main.List', {
                         handler: 'onDeletePress',
                         bind: {
                             hidden: '{record.isEditing}',
+                            tooltip: '{l10n.list.delete}',
                         },
                     },
                     spinner: {
@@ -133,24 +146,36 @@ Ext.define('TMMaintenance.view.main.List', {
             },
         },
         {
-            text: 'Author',
             tpl: '{metaData.author}',
             xtype: 'templatecolumn',
+            bind: {
+                text: '{l10n.list.columns.author}',
+                hidden: '{!l10n.list.columns.author}',
+            },
         },
         {
-            text: 'Creation date',
             tpl: '{metaData.timestamp}',
             xtype: 'templatecolumn',
+            bind: {
+                text: '{l10n.list.columns.creationDate}',
+                hidden: '{!l10n.list.columns.creationDate}',
+            },
         },
         {
-            text: 'Document name',
             tpl: '{metaData.documentName}',
             xtype: 'templatecolumn',
+            bind: {
+                text: '{l10n.list.columns.document}',
+                hidden: '{!l10n.list.columns.document}',
+            },
         },
         {
-            text: 'Additional info',
             tpl: '{metaData.additionalInfo}',
             xtype: 'templatecolumn',
+            bind: {
+                text: '{l10n.list.columns.additionalInfo}',
+                hidden: '{!l10n.list.columns.additionalInfo}',
+            },
         },
     ],
 
@@ -160,11 +185,12 @@ Ext.define('TMMaintenance.view.main.List', {
             {
                 xtype: 'button',
                 align: 'right',
-                text: 'Create',
                 handler: 'onCreatePress',
                 disabled: '{disabled}',
                 bind: {
                     disabled: '{!selectedTm}',
+                    text: '{l10n.list.create}',
+                    hidden: '{!l10n.list.create}',
                 },
             },
         ],
@@ -186,7 +212,6 @@ Ext.define('TMMaintenance.view.main.List', {
 
     dialog: {
         xtype: 'dialog',
-        title: 'Create new',
         closable: false,
         defaultFocus: '#ok',
         maximizable: true,

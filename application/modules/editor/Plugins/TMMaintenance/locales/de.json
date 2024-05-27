@@ -1,8 +1,14 @@
 {
   "logout": "Abmelden",
   "localeStore": [
-    { "locale": "en", "name": "Englisch" },
-    { "locale": "de", "name": "Deutsch"  }
+    {
+      "locale": "en",
+      "name": "Englisch"
+    },
+    {
+      "locale": "de",
+      "name": "Deutsch"
+    }
   ],
   "modeStore": [
     {
@@ -41,6 +47,7 @@
     "deleteAllTooltip": "Alle Segmente die zu den aktuellen Sucheinstellungen passen, werden gelöscht"
   },
   "createForm": {
+  "title": "Create new",
     "sourceText": "",
     "targetText": "",
     "save": "",
@@ -50,5 +57,20 @@
     "close": "",
     "proceed": "",
     "warningText": "ACHTUNG: Alle Segmente der aktuellen Sucheinstellungen werden gelöscht. Wollen Sie wirklich löschen?"
+  },
+  "list" : {
+    "title": "",
+    "columns": {
+      "sourceText": "",
+      "targetText": "",
+      "author": "",
+      "additionalInfo": "",
+      "document": "",
+      "creationDate": "",
+      "actions": ""
+    },
+    "edit": "",
+    "delete": "",
+    "create": ""
   }
 }
