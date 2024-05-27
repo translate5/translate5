@@ -35,6 +35,7 @@ use MittagQI\Translate5\LanguageResource\Adapter\UpdatableAdapterInterface;
 use MittagQI\Translate5\LanguageResource\Status as LanguageResourceStatus;
 use MittagQI\Translate5\Service\T5Memory;
 use MittagQI\Translate5\T5Memory\Enum\StripFramingTags;
+use MittagQI\Translate5\T5Memory\PersistenceService;
 
 /**
  * T5memory / OpenTM2 Connector
@@ -78,6 +79,8 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
 
     private TmConversionService $conversionService;
 
+    private PersistenceService $persistenceService;
+
     public function __construct()
     {
         editor_Services_Connector_Exception::addCodes([
@@ -88,6 +91,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
         ZfExtended_Logger::addDuplicatesByEcode('E1333', 'E1306', 'E1314');
 
         $this->conversionService = TmConversionService::create();
+        $this->persistenceService = new PersistenceService();
 
         parent::__construct();
     }
@@ -95,7 +99,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
     public function connectTo(
         LanguageResource $languageResource,
         $sourceLang,
-        $targetLang
+        $targetLang,
     ): void {
         $this->api = ZfExtended_Factory::get('editor_Services_OpenTM2_HttpApi');
         $this->api->setLanguageResource($languageResource);
@@ -290,7 +294,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
 
             $result = $result && $this->importTmxIntoMemory(
                 $importFilename,
-                $params['tmName'] ?? $this->getWritableMemory(),
+                $params['tmName'] ?? $this->persistenceService->getWritableMemory($this->languageResource),
                 $this->getStripFramingTagsValue($params)
             );
 
@@ -320,7 +324,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
     public function getTm($mime, string $tmName = '')
     {
         if (empty($tmName)) {
-            $tmName = $this->getWritableMemory();
+            $tmName = $this->persistenceService->getWritableMemory($this->languageResource);
         }
 
         if ($this->api->get($mime, $tmName)) {
@@ -334,9 +338,9 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
         editor_Models_Segment $segment,
         bool $recheckOnUpdate = self::DO_NOT_RECHECK_ON_UPDATE,
         bool $rescheduleUpdateOnError = self::DO_NOT_RESCHEDULE_UPDATE_ON_ERROR,
-        bool $useSegmentTimestamp = self::DO_NOT_USE_SEGMENT_TIMESTAMP
+        bool $useSegmentTimestamp = self::DO_NOT_USE_SEGMENT_TIMESTAMP,
     ): void {
-        $tmName = $this->getWritableMemory();
+        $tmName = $this->persistenceService->getWritableMemory($this->languageResource);
 
         if ($this->isReorganizingAtTheMoment($tmName)) {
             if ($rescheduleUpdateOnError) {
@@ -412,7 +416,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
     public function updateTranslation(string $source, string $target, string $tmName = '')
     {
         if (empty($tmName)) {
-            $tmName = $this->getWritableMemory();
+            $tmName = $this->persistenceService->getWritableMemory($this->languageResource);
         }
         $this->api->updateText($source, $target, $tmName);
     }
@@ -694,7 +698,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
     public function getStatus(
         editor_Models_LanguageResources_Resource $resource,
         LanguageResource $languageResource = null,
-        ?string $tmName = null
+        ?string $tmName = null,
     ): string {
         $this->lastStatusInfo = '';
 
@@ -717,7 +721,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
             return LanguageResourceStatus::IMPORT;
         }
 
-        $name = $tmName ?: $this->getWritableMemory();
+        $name = $tmName ?: $this->persistenceService->getWritableMemory($this->languageResource);
 
         if (empty($name)) {
             $this->lastStatusInfo = 'The internal stored filename is invalid';
@@ -1151,7 +1155,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
     public function reorganizeTm(?string $tmName = null): bool
     {
         if (null === $tmName) {
-            $tmName = $this->getWritableMemory();
+            $tmName = $this->persistenceService->getWritableMemory($this->languageResource);
         }
 
         if (! $this->isInternalFuzzy()) {
@@ -1386,7 +1390,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
     private function queryTm(
         string $queryString,
         editor_Models_Segment $segment,
-        string $fileName
+        string $fileName,
     ): editor_Services_ServiceResult {
         $resultList = new editor_Services_ServiceResult();
         $resultList->setLanguageResource($this->languageResource);
@@ -1471,24 +1475,6 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
         }
 
         return $resultList;
-    }
-
-    private function getWritableMemory(): string
-    {
-        foreach ($this->languageResource->getSpecificData('memories', parseAsArray: true) as $memory) {
-            if (! $memory['readonly']) {
-                return $memory['filename'];
-            }
-        }
-
-        throw new editor_Services_Connector_Exception('E1564', [
-            'name' => $this->languageResource->getName(),
-        ]);
-    }
-
-    private function hasMemories(LanguageResource $languageResource): bool
-    {
-        return ! empty($languageResource->getSpecificData('memories', parseAsArray: true));
     }
 
     private function isMemoryOverflown(?object $error): bool
