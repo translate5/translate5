@@ -44,7 +44,7 @@ class TagsPairedByRidFixer
     /**
      * When debugging, additional output is generated and nothing changed in the DB
      */
-    public const DO_DEBUG = true;
+    public const DO_DEBUG = false;
 
     public function fix()
     {
@@ -162,15 +162,14 @@ class TagsPairedByRidFixer
             // create fixed markup
             $markupFixed = $this->fixSegmentField($fieldTags, $dataName);
             if (! empty($markupFixed)) {
+                if (self::DO_DEBUG) {
+                    error_log('FIXED SEGMENT ' . $segment->getId() . ":");
+                    error_log(' BEFORE: ' . $this->debugSegmentMarkup($markup));
+                    error_log('  AFTER: ' . $this->debugSegmentMarkup($markupFixed));
+                }
                 $segment->set($field, $markupFixed);
 
                 return 1;
-            }
-
-            if(self::DO_DEBUG){
-                error_log('FIXED SEGMENT ' . $segment->getId() . ":\n");
-                error_log(' BEFORE: ' . $this->debugSegmentMarkup($markup));
-                error_log(' AFTER: ' . $this->debugSegmentMarkup($markupFixed));
             }
         }
 
@@ -253,12 +252,16 @@ class TagsPairedByRidFixer
         return null;
     }
 
+    /**
+     * Helper to check the results when debugging
+     */
     private function debugSegmentMarkup(string $html): string
     {
-        // <div class="open internal-tag ownttip"><span class="short" title="TEST">&lt;1&gt;</span><span class="full" data-originalid="123" data-length="-1">TEST</span></div>
-        return preg_replace_callback('#<div\s*class="(open|close|single)[^"]*"\s*.*?(?!</div>)<span[^>]*>([^<]+)</span><span[^>]*data-originalid="([^"]*).*?(?!</div>).</div>#s', function ($matches) {
-            error_log('****************** MARCHES:' . print_r($matches, true));
-            return '';
+        $pattern = '#<div\s*class="(open|close|single)[^"]*"\s*.*?(?!</div>)<span[^>]*>([^<]+)</span>'
+            . '<span[^>]*data-originalid="([^"]*).*?(?!</div>).</div>#s';
+
+        return preg_replace_callback($pattern, function ($matches) {
+            return html_entity_decode($matches[2]);
         }, $html);
     }
 }
