@@ -35,7 +35,9 @@ $SCRIPT_IDENTIFIER = '428-TRANSLATE-3967-fix-rid-paired-tags.php';
 /**
  * Fixes TRANSLATE-3967
  * The nature of the Problem leads to paired tags matched by RID not being matched and the opener
- * having an segment-index of another internal tag
+ * having an segment-index of the internal tag indexed before.
+ * It seems the tag-index of the closer tag is correctly evaluated and the fix is just, to set the opener-index
+ * according the closer index and remove the tag-fault
  */
 class TagsPairedByRidFixer
 {
