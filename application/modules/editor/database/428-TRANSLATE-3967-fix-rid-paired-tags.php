@@ -44,7 +44,7 @@ class TagsPairedByRidFixer
     /**
      * When debugging, additional output is generated and nothing changed in the DB
      */
-    public const DO_DEBUG = false;
+    public const DO_DEBUG = true;
 
     public function fix()
     {
@@ -166,6 +166,12 @@ class TagsPairedByRidFixer
 
                 return 1;
             }
+
+            if(self::DO_DEBUG){
+                error_log('FIXED SEGMENT ' . $segment->getId() . ":\n");
+                error_log(' BEFORE: ' . $this->debugSegmentMarkup($markup));
+                error_log(' AFTER: ' . $this->debugSegmentMarkup($markupFixed));
+            }
         }
 
         return 0;
@@ -245,6 +251,15 @@ class TagsPairedByRidFixer
         }
 
         return null;
+    }
+
+    private function debugSegmentMarkup(string $html): string
+    {
+        // <div class="open internal-tag ownttip"><span class="short" title="TEST">&lt;1&gt;</span><span class="full" data-originalid="123" data-length="-1">TEST</span></div>
+        return preg_replace_callback('#<div\s*class="(open|close|single)[^"]*"\s*.*?(?!</div>)<span[^>]*>([^<]+)</span><span[^>]*data-originalid="([^"]*).*?(?!</div>).</div>#s', function ($matches) {
+            error_log('****************** MARCHES:' . print_r($matches, true));
+            return '';
+        }, $html);
     }
 }
 
