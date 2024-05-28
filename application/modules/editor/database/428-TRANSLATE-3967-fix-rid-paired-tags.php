@@ -135,9 +135,10 @@ class TagsPairedByRidFixer
         $db = ZfExtended_Factory::get(editor_Models_Db_SegmentData::class);
         $query =
             "SELECT DISTINCT `LEK_segment_data`.`segmentId` FROM `LEK_segment_data`, `LEK_segments`"
-            . " WHERE (`original` LIKE '%rid=&quot;%' OR `original` LIKE '%rid=\"%' OR `edited` LIKE '%rid=&quot;%' OR `edited` LIKE '%rid=\"%')" // "rid" attribute is in segment source or target
+            . " WHERE (`original` LIKE '%ax:element-id%' OR `edited` LIKE '%ax:element-id%')" // we generally need across-namespaced id's for the BUG to show up ...
+            . " AND (`original` LIKE '%rid=&quot;%' OR `original` LIKE '%rid=\"%' OR `edited` LIKE '%rid=&quot;%' OR `edited` LIKE '%rid=\"%')" // ... and an "rid" attribute (in souce or target)
             . " AND `LEK_segment_data`.`segmentId` = `LEK_segments`.`id`" // join with segments
-            . " AND `LEK_segments`.`timestamp` > '2024-04-30 00:00:00'" // earliest release day of 7.4.0
+            . " AND `LEK_segments`.`timestamp` > '2024-01-01 00:00:00'" // just a real-world restriction, unclear, when the problem really started
             . " ORDER BY `LEK_segment_data`.`segmentId` ASC";
 
         return $db->getAdapter()->fetchCol($query);
