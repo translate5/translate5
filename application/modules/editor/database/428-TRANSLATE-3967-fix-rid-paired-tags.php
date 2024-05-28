@@ -46,15 +46,60 @@ class TagsPairedByRidFixer
      */
     public const DO_DEBUG = false;
 
+    public const TASKS_STEP = 10;
+
+    private Zend_Db_Adapter_Abstract $db;
+
+    public function __construct()
+    {
+        $this->db = Zend_Db_Table::getDefaultAdapter();
+    }
+
     public function fix()
     {
-        // first, gather all id's of potentially affected segments
-        $segmentIds = $this->getAffectedSegmentIds();
+        $this->processMonthTasks($this->getTasksForMonths('01', '02'), '01');
+        $this->processMonthTasks($this->getTasksForMonths('02', '03'), '02');
+        $this->processMonthTasks($this->getTasksForMonths('03', '04'), '03');
+        $this->processMonthTasks($this->getTasksForMonths('04', '05'), '04');
+        $this->processMonthTasks($this->getTasksForMonths('05'), '05');
+    }
+
+    private function processMonthTasks(array $taskGuids, string $month)
+    {
+        if (self::DO_DEBUG) {
+            error_log('Processing ' . count($taskGuids) . ' tasks for month 2024-' . $month);
+        }
+
+        $tasks = [];
+        $amount = 0;
+        foreach($taskGuids as $guid){
+            $tasks[] = $guid;
+            $amount++;
+            if($amount === self::TASKS_STEP){
+                $this->processTasks($tasks, $month);
+                $tasks = [];
+                $amount = 0;
+            }
+        }
+        if($amount > 0){
+            $this->processTasks($tasks, $month);
+        }
+    }
+
+    private function processTasks(array $taskGuids, string $month)
+    {
+        // first, gather all id's of potentially affected segments for the given tasks
+        $segmentIds = $this->getAffectedSegmentIdsForTasks($taskGuids);
+
+        if(count($segmentIds) === 0){
+            return;
+        }
+
         $fixedIds = [];
         $fixedTaskIds = [];
 
         if (self::DO_DEBUG) {
-            error_log('AFFECTED SEGMENTS: ' . implode(', ', $segmentIds));
+            error_log('AFFECTED SEGMENTS: ' . implode(', ', $segmentIds) . ' in ' . $month);
         }
 
         // now fix the tags, segment by segment
@@ -86,9 +131,9 @@ class TagsPairedByRidFixer
                         "DELETE FROM `LEK_segment_quality`"
                         . " WHERE `segmentId` = " . $segment->getId()
                         . " AND `field` " . (
-                            count($fields) === 1 ?
-                                " = '" . $fields[0] . "'"
-                                : " IN '" . implode("','", $fields) . "'"
+                        count($fields) === 1 ?
+                            " = '" . $fields[0] . "'"
+                            : " IN '" . implode("','", $fields) . "'"
                         )
                         . " AND `category` = 'internal_tag_structure_faulty'"
                         . " AND `type` = 'internal'";
@@ -103,7 +148,7 @@ class TagsPairedByRidFixer
                     }
 
                     $fixedIds[] = $id;
-                    if (! in_array($task->getId(), $fixedTaskIds)) {
+                    if (!in_array($task->getId(), $fixedTaskIds)) {
                         $fixedTaskIds[] = $task->getId();
                     }
                 }
@@ -130,31 +175,48 @@ class TagsPairedByRidFixer
         }
     }
 
-    private function getAffectedSegmentIds(): array
+    private function getTasksForMonths(string $start, string $end = null): array
     {
-        $db = ZfExtended_Factory::get(editor_Models_Db_SegmentData::class);
         $query =
-            "SELECT DISTINCT `LEK_segment_data`.`segmentId` FROM `LEK_segment_data`, `LEK_segments`"
-            . " WHERE (`original` LIKE '%ax:element-id%' OR `edited` LIKE '%ax:element-id%')" // we generally need across-namespaced id's for the BUG to show up ...
+            "SELECT DISTINCT `LEK_task`.`taskGuid` FROM `LEK_files`, `LEK_task`"
+            . " WHERE `LEK_files`.`fileParser` = 'editor_Models_Import_FileParser_Xlf'"
+            . " AND `LEK_files`.`taskGuid` = `LEK_task`.taskGuid AND `LEK_task`.`taskType` != 'project'"
+            . " AND `LEK_task`.`created` >= '2024-" . $start . "-01 00:00:00'";
+        if($end !== null){
+            $query .= " AND `LEK_task`.`created` < '2024-" . $end . "-01 00:00:00'";
+        }
+        $query .= " ORDER BY `LEK_task`.`id` ASC";
+
+        return $this->db->fetchCol($query);
+    }
+
+    private function getAffectedSegmentIdsForTasks(array $taskGuids): array
+    {
+        $query =
+            "SELECT `segmentId` FROM `LEK_segment_data`"
+            . " WHERE `taskGuid` IN ('" . implode("','", $taskGuids) . "')"
+            . " AND (`original` LIKE '%ax:element-id%' OR `edited` LIKE '%ax:element-id%')" // we generally need across-namespaced id's for the BUG to show up ...
             . " AND (`original` LIKE '%rid=&quot;%' OR `original` LIKE '%rid=\"%' OR `edited` LIKE '%rid=&quot;%' OR `edited` LIKE '%rid=\"%')" // ... and an "rid" attribute (in souce or target)
-            . " AND `LEK_segment_data`.`segmentId` = `LEK_segments`.`id`" // join with segments
-            . " AND `LEK_segments`.`timestamp` > '2024-01-01 00:00:00'" // just a real-world restriction, unclear, when the problem really started
             . " ORDER BY `LEK_segment_data`.`segmentId` ASC";
 
-        return $db->getAdapter()->fetchCol($query);
+        return $this->db->fetchCol($query);
     }
 
     /**
      * Fixes the given field on the given segment. Returns 1, if field needed to be fixed, otherwise 0
      */
-    private function checkSegmentField(editor_Models_Task $task, editor_Models_Segment $segment, string $field, string $dataName): int
-    {
+    private function checkSegmentField(
+        editor_Models_Task $task,
+        editor_Models_Segment $segment,
+        string $field,
+        string $dataName,
+    ): int {
         $markup = $segment->get($field);
-        if (! empty($markup)) {
+        if (!empty($markup)) {
             // create field-tags
             $fieldTags = new editor_Segment_FieldTags(
                 $task,
-                (int) $segment->getId(),
+                (int)$segment->getId(),
                 $markup,
                 $dataName,
                 $field
@@ -162,7 +224,7 @@ class TagsPairedByRidFixer
 
             // create fixed markup
             $markupFixed = $this->fixSegmentField($fieldTags, $dataName);
-            if (! empty($markupFixed)) {
+            if (!empty($markupFixed)) {
                 if (self::DO_DEBUG) {
                     error_log('FIXED SEGMENT ' . $segment->getId() . ":");
                     error_log(' BEFORE: ' . $this->debugSegmentMarkup($markup));
@@ -198,13 +260,13 @@ class TagsPairedByRidFixer
                     $lowestIndex = $tagIndex;
                 }
                 if ($tag->_rid > -1) {
-                    if (! array_key_exists($tag->_rid, $ridTags)) {
+                    if (!array_key_exists($tag->_rid, $ridTags)) {
                         $ridTags[$tag->_rid] = [];
                     }
                     $ridTags[$tag->_rid][] = $tag;
                 }
             }
-            if (! empty($ridTags)) {
+            if (!empty($ridTags)) {
                 // fix tag-indices for all tag-pairs where it is not properly set
                 foreach ($ridTags as $rid => $tagPair) {
                     /** @var editor_Segment_Internal_Tag[] $tagPair */
@@ -219,8 +281,8 @@ class TagsPairedByRidFixer
                     if (
                         $tagPair[0]->isSingle() ||
                         $tagPair[1]->isSingle() ||
-                        ($tagPair[0]->isOpening() && ! $tagPair[1]->isClosing()) ||
-                        ($tagPair[0]->isClosing() && ! $tagPair[1]->isOpening())
+                        ($tagPair[0]->isOpening() && !$tagPair[1]->isClosing()) ||
+                        ($tagPair[0]->isClosing() && !$tagPair[1]->isOpening())
                     ) {
                         throw new Exception(
                             'FAULTY STRUCTURE: Paired internal tag(s) are actually not opening/closing '
