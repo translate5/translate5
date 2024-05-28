@@ -170,5 +170,13 @@ SEGMENT,
                 '<rev-def id="3" author="user3" date="04/24/2024 18:19:09" />',
             ],
         ];
+
+        yield 'segment with track changes and html entities in text' => [
+            'segment' => 'some &quot; <del class="trackchanges ownttip deleted" data-usertrackingid="1" data-usercssnr="usernr1" data-workflowstep="default4" data-timestamp="2024-04-24T18:18:50+00:00">text</del> &quot; with &gt; html &lt; enitites',
+            'expected' => 'some &quot; <mrk mtype="x-sdl-deleted" sdl:revid="1">text</mrk> &quot; with &gt; html &lt; enitites',
+            'expectedRevisions' => [
+                '<rev-def id="1" type="Delete" author="user1" date="04/24/2024 18:18:50" />',
+            ],
+        ];
     }
 }

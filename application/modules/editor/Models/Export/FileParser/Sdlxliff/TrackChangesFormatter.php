@@ -58,7 +58,11 @@ class editor_Models_Export_FileParser_Sdlxliff_TrackChangesFormatter
         libxml_use_internal_errors(true);
 
         $dom = new \DOMDocument();
-        $dom->loadXML("<body>$segment</body>", LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
+        $dom->loadXML(
+            // protect existing html entities
+            preg_replace('/&(\w{2,8});/', '**\1**', "<body>$segment</body>"),
+            LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD
+        );
         $dom->encoding = 'utf-8';
 
         $tagNodeList = [];
@@ -254,10 +258,15 @@ class editor_Models_Export_FileParser_Sdlxliff_TrackChangesFormatter
             $node->remove();
         }
 
-        return str_replace(
-            ['<body>', '</body>'],
-            '',
-            $this->internalTag->restore(html_entity_decode($dom->saveXML($body)))
+        // restore protected html entities
+        return preg_replace(
+            '/\*\*(\w{2,8})\*\*/',
+            '&\1;',
+            str_replace(
+                ['<body>', '</body>'],
+                '',
+                $this->internalTag->restore(html_entity_decode($dom->saveXML($body)))
+            )
         );
     }
 }
