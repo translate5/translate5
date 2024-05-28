@@ -28,7 +28,7 @@ END LICENSE AND COPYRIGHT
 */
 
 //uncomment the following line, so that the file is not marked as processed:
-/ $this->doNotSavePhpForDebugging = false;
+// $this->doNotSavePhpForDebugging = false;
 
 $SCRIPT_IDENTIFIER = '428-TRANSLATE-3967-fix-rid-paired-tags.php';
 
