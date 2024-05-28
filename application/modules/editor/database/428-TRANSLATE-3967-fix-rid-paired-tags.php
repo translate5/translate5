@@ -74,16 +74,16 @@ class TagsPairedByRidFixer
 
         $tasks = [];
         $amount = 0;
-        foreach($taskGuids as $guid){
+        foreach ($taskGuids as $guid) {
             $tasks[] = $guid;
             $amount++;
-            if($amount === self::TASKS_STEP){
+            if ($amount === self::TASKS_STEP) {
                 $this->processTasks($tasks, $month);
                 $tasks = [];
                 $amount = 0;
             }
         }
-        if($amount > 0){
+        if ($amount > 0) {
             $this->processTasks($tasks, $month);
         }
     }
@@ -93,7 +93,7 @@ class TagsPairedByRidFixer
         // first, gather all id's of potentially affected segments for the given tasks
         $segmentIds = $this->getAffectedSegmentIdsForTasks($taskGuids);
 
-        if(count($segmentIds) === 0){
+        if (count($segmentIds) === 0) {
             return;
         }
 
@@ -133,9 +133,9 @@ class TagsPairedByRidFixer
                         "DELETE FROM `LEK_segment_quality`"
                         . " WHERE `segmentId` = " . $segment->getId()
                         . " AND `field` " . (
-                        count($fields) === 1 ?
-                            " = '" . $fields[0] . "'"
-                            : " IN '" . implode("','", $fields) . "'"
+                            count($fields) === 1 ?
+                                " = '" . $fields[0] . "'"
+                                : " IN '" . implode("','", $fields) . "'"
                         )
                         . " AND `category` = 'internal_tag_structure_faulty'"
                         . " AND `type` = 'internal'";
@@ -150,7 +150,7 @@ class TagsPairedByRidFixer
                     }
 
                     $fixedIds[] = $id;
-                    if (!in_array($task->getId(), $fixedTaskIds)) {
+                    if (! in_array($task->getId(), $fixedTaskIds)) {
                         $fixedTaskIds[] = $task->getId();
                     }
                 }
@@ -184,7 +184,7 @@ class TagsPairedByRidFixer
             . " WHERE `LEK_files`.`fileParser` = 'editor_Models_Import_FileParser_Xlf'"
             . " AND `LEK_files`.`taskGuid` = `LEK_task`.taskGuid AND `LEK_task`.`taskType` != 'project'"
             . " AND `LEK_task`.`created` >= '2024-" . $start . "-01 00:00:00'";
-        if($end !== null){
+        if ($end !== null) {
             $query .= " AND `LEK_task`.`created` < '2024-" . $end . "-01 00:00:00'";
         }
         $query .= " ORDER BY `LEK_task`.`id` ASC";
@@ -214,11 +214,11 @@ class TagsPairedByRidFixer
         string $dataName
     ): int {
         $markup = $segment->get($dataName);
-        if (!empty($markup)) {
+        if (! empty($markup)) {
             // create field-tags
             $fieldTags = new editor_Segment_FieldTags(
                 $task,
-                (int)$segment->getId(),
+                (int) $segment->getId(),
                 $markup,
                 $field,
                 $dataName
@@ -226,7 +226,7 @@ class TagsPairedByRidFixer
 
             // create fixed markup
             $markupFixed = $this->fixSegmentField($fieldTags, $field);
-            if (!empty($markupFixed)) {
+            if (! empty($markupFixed)) {
                 if (self::DO_DEBUG) {
                     error_log('FIXED SEGMENT ' . $segment->getId() . ":");
                     error_log(' BEFORE: ' . $this->debugSegmentMarkup($markup));
@@ -247,7 +247,7 @@ class TagsPairedByRidFixer
     private function fixSegmentField(editor_Segment_FieldTags $fieldTags, string $field): ?string
     {
         $internalTags = $fieldTags->getByType(editor_Segment_Tag::TYPE_INTERNAL);
-        if($field === 'source'){
+        if ($field === 'source') {
             $this->idMap = [];
         }
         if (count($internalTags) > 0) {
@@ -263,9 +263,9 @@ class TagsPairedByRidFixer
                 $tagIndex = $tag->getTagIndex();
                 // we may need the tag-indices of paired tags of the source for finding indices in the target
 
-                if($tag->isSingle() || $tag->_rid === -1){
+                if ($tag->isSingle() || $tag->_rid === -1) {
                     $usedIndices[] = $tagIndex;
-                } elseif($field === 'source' && !$tag->isSingle() && $tag->_rid > -1){
+                } elseif ($field === 'source' && ! $tag->isSingle() && $tag->_rid > -1) {
                     $this->idMap[$tag->_id] = $tagIndex;
                 }
                 if ($tagIndex > -1 && ($lowestIndex === -1 || $tagIndex < $lowestIndex)) {
@@ -275,13 +275,13 @@ class TagsPairedByRidFixer
                     $highestIndex = $tagIndex;
                 }
                 if ($tag->_rid > -1) {
-                    if (!array_key_exists($tag->_rid, $ridTags)) {
+                    if (! array_key_exists($tag->_rid, $ridTags)) {
                         $ridTags[$tag->_rid] = [];
                     }
                     $ridTags[$tag->_rid][] = $tag;
                 }
             }
-            if (!empty($ridTags)) {
+            if (! empty($ridTags)) {
                 // fix tag-indices for all tag-pairs where it is not properly set
                 foreach ($ridTags as $rid => $tagPair) {
                     /** @var editor_Segment_Internal_Tag[] $tagPair */
@@ -297,8 +297,8 @@ class TagsPairedByRidFixer
                     if (
                         $tagPair[0]->isSingle() ||
                         $tagPair[1]->isSingle() ||
-                        ($tagPair[0]->isOpening() && !$tagPair[1]->isClosing()) ||
-                        ($tagPair[0]->isClosing() && !$tagPair[1]->isOpening())
+                        ($tagPair[0]->isOpening() && ! $tagPair[1]->isClosing()) ||
+                        ($tagPair[0]->isClosing() && ! $tagPair[1]->isOpening())
                     ) {
                         throw new Exception(
                             'FAULTY STRUCTURE: Paired internal tag(s) are actually not opening/closing '
@@ -308,12 +308,12 @@ class TagsPairedByRidFixer
                     $index1 = $tagPair[1]->getTagIndex();
                     $sourceIndex = -1;
                     // in case of a target-field we check for a source-index by id
-                    if($field === 'target'){
+                    if ($field === 'target') {
                         $tagId = ($tagPair[0]->isOpening()) ? $tagPair[1]->_id : $tagPair[0]->_id;
                         $sourceIndex = (array_key_exists($tagId, $this->idMap) &&
-                            !in_array($this->idMap[$tagId], $usedIndices)) ? $this->idMap[$tagId] : -1;
+                            ! in_array($this->idMap[$tagId], $usedIndices)) ? $this->idMap[$tagId] : -1;
                     }
-                     // the usual case are differeing tag-indices but some framing-tags also have a wrong target index compared to source
+                    // the usual case are differeing tag-indices but some framing-tags also have a wrong target index compared to source
                     if ($index0 !== $index1 ||
                         in_array($index0, $usedIndices) ||
                         ($sourceIndex > 0 && $index0 != $sourceIndex)
