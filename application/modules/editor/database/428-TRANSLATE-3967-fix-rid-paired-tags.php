@@ -286,7 +286,8 @@ class TagsPairedByRidFixer
                 foreach ($ridTags as $rid => $tagPair) {
                     /** @var editor_Segment_Internal_Tag[] $tagPair */
                     if (count($tagPair) !== 2) {
-                        throw new Exception('FAULTY STRUCTURE: ' . count($tagPair) . ' segment(s) for RID ' . $rid);
+                        throw new Exception('FAULTY STRUCTURE: ' . count($tagPair)
+                            . ' segment(s) for RID ' . $rid);
                     }
                     if ($tagPair[0]->getTagIndex() === -1 || $tagPair[1]->getTagIndex() === -1) {
                         throw new Exception(
@@ -305,19 +306,25 @@ class TagsPairedByRidFixer
                     }
                     $index0 = $tagPair[0]->getTagIndex();
                     $index1 = $tagPair[1]->getTagIndex();
-                    // the usual case are differeing tag-indices but some framing-tags also have a wrong index
-                    if ($index0 !== $index1 || in_array($index0, $usedIndices)) {
+                    $sourceIndex = -1;
+                    if($field === 'target'){
+                        $tagId = ($tagPair[0]->isOpening()) ?
+                            $tagPair[1]->getUnderlyingId() : $tagPair[0]->getUnderlyingId();
+                        $sourceIndex = (array_key_exists($tagId, $this->idMap) &&
+                            !in_array($this->idMap[$tagId], $usedIndices)) ? $this->idMap[$tagId] : -1;
+                    }
+                     // the usual case are differeing tag-indices but some framing-tags also have a wrong target index compared to source
+                    if ($index0 !== $index1 ||
+                        in_array($index0, $usedIndices) ||
+                        ($sourceIndex > 0 && $index0 != $sourceIndex)
+                    ) {
                         // FIX FAULTY PAIRED TAG
                         $before = $tagPair[0]->getShortTagMarkup() . ' ... ' . $tagPair[1]->getShortTagMarkup();
                         // usually the closer-tag has the correct tag-index/short-tag-nr
                         $repairIndex = ($tagPair[0]->isOpening()) ? $index1 : $index0;
-                        $repairId = ($tagPair[0]->isOpening()) ? $tagPair[1]->getUnderlyingId() : $tagPair[0]->getUnderlyingId();
-                        // in case of a target, we try to match against the source-segment
-                        if ($field === 'target' && array_key_exists($repairId, $this->idMap) && !in_array(
-                                $this->idMap[$repairId],
-                                $usedIndices
-                            )) {
-                            $repairIndex = $this->idMap[$repairId];
+                        // in case we found a source-index and it does not collide, we take it
+                        if ($sourceIndex > 0) {
+                            $repairIndex = $sourceIndex;
                         }
                         // in case the closer-index is already in use we generate a new one.
                         // this would create problems between source and target ... but all known cases have that only in target
@@ -333,7 +340,8 @@ class TagsPairedByRidFixer
                         if (self::DO_DEBUG) {
                             $after = $tagPair[0]->getShortTagMarkup() . ' ... ' . $tagPair[1]->getShortTagMarkup();
                             error_log(
-                                'FIXED internal tag paired by RID ' . $rid . ' from "' . $before . '" to "' . $after . '"'
+                                'FIXED internal tag paired by RID ' . $rid
+                                . ' from "' . $before . '" to "' . $after . '"'
                             );
                         }
                     }
