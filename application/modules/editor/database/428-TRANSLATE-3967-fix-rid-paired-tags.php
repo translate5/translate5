@@ -28,7 +28,7 @@ END LICENSE AND COPYRIGHT
 */
 
 //uncomment the following line, so that the file is not marked as processed:
-// $this->doNotSavePhpForDebugging = false;
+/ $this->doNotSavePhpForDebugging = false;
 
 $SCRIPT_IDENTIFIER = '428-TRANSLATE-3967-fix-rid-paired-tags.php';
 
@@ -193,7 +193,7 @@ class TagsPairedByRidFixer
     private function getAffectedSegmentIdsForTasks(array $taskGuids): array
     {
         $query =
-            "SELECT `segmentId` FROM `LEK_segment_data`"
+            "SELECT DISTINCT `segmentId` FROM `LEK_segment_data`"
             . " WHERE `taskGuid` IN ('" . implode("','", $taskGuids) . "')"
             . " AND (`original` LIKE '%ax:element-id%' OR `edited` LIKE '%ax:element-id%')" // we generally need across-namespaced id's for the BUG to show up ...
             . " AND (`original` LIKE '%rid=&quot;%' OR `original` LIKE '%rid=\"%' OR `edited` LIKE '%rid=&quot;%' OR `edited` LIKE '%rid=\"%')" // ... and an "rid" attribute (in souce or target)
