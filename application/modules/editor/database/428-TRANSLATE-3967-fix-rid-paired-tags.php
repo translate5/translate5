@@ -261,13 +261,15 @@ class TagsPairedByRidFixer
                 $tag->_rid = $tag->getUnderlyingRid();
                 $tag->_id = $tag->getUnderlyingId();
                 $tagIndex = $tag->getTagIndex();
-                // we may need the tag-indices of paired tags of the source for finding indices in the target
-
+                // single tags will create the map of used tag-indices
                 if ($tag->isSingle() || $tag->_rid === -1) {
                     $usedIndices[] = $tagIndex;
-                } elseif ($field === 'source' && ! $tag->isSingle() && $tag->_rid > -1) {
+                }
+                // we will need the tag-indices of paired tags of the source for finding indices in the target
+                elseif ($field === 'source' && ! $tag->isSingle() && $tag->_rid > -1) {
                     $this->idMap[$tag->_id] = $tagIndex;
                 }
+                // lowest & highest index
                 if ($tagIndex > -1 && ($lowestIndex === -1 || $tagIndex < $lowestIndex)) {
                     $lowestIndex = $tagIndex;
                 }
@@ -282,9 +284,10 @@ class TagsPairedByRidFixer
                 }
             }
             if (! empty($ridTags)) {
-                // fix tag-indices for all tag-pairs where it is not properly set
+                // fix tag-indices for all rid-matched tag-pairs where they are not properly set
                 foreach ($ridTags as $rid => $tagPair) {
                     /** @var editor_Segment_Internal_Tag[] $tagPair */
+                    // check unfixable anomalies
                     if (count($tagPair) !== 2) {
                         throw new Exception('FAULTY STRUCTURE: ' . count($tagPair)
                             . ' segment(s) for RID ' . $rid);
@@ -304,30 +307,33 @@ class TagsPairedByRidFixer
                             'FAULTY STRUCTURE: Paired internal tag(s) are actually not opening/closing '
                         );
                     }
+                    // check fixable problems
                     $index0 = $tagPair[0]->getTagIndex();
                     $index1 = $tagPair[1]->getTagIndex();
                     $sourceIndex = -1;
-                    // in case of a target-field we check for a source-index by id
+                    // in case of a target-field we search for a source-index by id
                     if ($field === 'target') {
                         $tagId = ($tagPair[0]->isOpening()) ? $tagPair[1]->_id : $tagPair[0]->_id;
                         $sourceIndex = (array_key_exists($tagId, $this->idMap) &&
                             ! in_array($this->idMap[$tagId], $usedIndices)) ? $this->idMap[$tagId] : -1;
                     }
-                    // the usual case are differeing tag-indices but some framing-tags also have a wrong target index compared to source
+                    // the usual case are differeing tag-indices, where in most cases (but not all!) the closer-index
+                    // represents the tag-index/short-tag-nr to use
+                    // some framing-tags also have a wrong target index compared to the source
                     if ($index0 !== $index1 ||
                         in_array($index0, $usedIndices) ||
                         ($sourceIndex > 0 && $index0 != $sourceIndex)
                     ) {
-                        // FIX FAULTY PAIRED TAG
+                        // the paired tag is faulty
                         $before = $tagPair[0]->getShortTagMarkup() . ' ... ' . $tagPair[1]->getShortTagMarkup();
                         // usually the closer-tag has the correct tag-index/short-tag-nr
                         $repairIndex = ($tagPair[0]->isOpening()) ? $index1 : $index0;
-                        // in case we found a source-index and it does not collide, we take it
+                        // in case we found a matching source-index in a target, we take it
                         if ($sourceIndex > 0) {
                             $repairIndex = $sourceIndex;
                         }
                         // in case the closer-index is already in use we generate a new one.
-                        // this would create problems between source and target ... but all known cases have that only in target
+                        // this may creates a non-sequential numbering what is irrelevant
                         elseif (in_array($repairIndex, $usedIndices)) {
                             $highestIndex++;
                             $repairIndex = $highestIndex;
