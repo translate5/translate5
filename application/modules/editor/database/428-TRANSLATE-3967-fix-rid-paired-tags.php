@@ -307,9 +307,9 @@ class TagsPairedByRidFixer
                     $index0 = $tagPair[0]->getTagIndex();
                     $index1 = $tagPair[1]->getTagIndex();
                     $sourceIndex = -1;
+                    // in case of a target-field we check for a source-index by id
                     if($field === 'target'){
-                        $tagId = ($tagPair[0]->isOpening()) ?
-                            $tagPair[1]->getUnderlyingId() : $tagPair[0]->getUnderlyingId();
+                        $tagId = ($tagPair[0]->isOpening()) ? $tagPair[1]->_id : $tagPair[0]->_id;
                         $sourceIndex = (array_key_exists($tagId, $this->idMap) &&
                             !in_array($this->idMap[$tagId], $usedIndices)) ? $this->idMap[$tagId] : -1;
                     }
