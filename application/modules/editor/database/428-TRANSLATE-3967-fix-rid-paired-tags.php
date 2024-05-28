@@ -50,6 +50,8 @@ class TagsPairedByRidFixer
 
     private Zend_Db_Adapter_Abstract $db;
 
+    private array $idMap;
+
     public function __construct()
     {
         $this->db = Zend_Db_Table::getDefaultAdapter();
@@ -208,8 +210,8 @@ class TagsPairedByRidFixer
     private function checkSegmentField(
         editor_Models_Task $task,
         editor_Models_Segment $segment,
-        string $field,
         string $dataName,
+        string $field,
     ): int {
         $markup = $segment->get($field);
         if (!empty($markup)) {
@@ -218,19 +220,19 @@ class TagsPairedByRidFixer
                 $task,
                 (int)$segment->getId(),
                 $markup,
-                $dataName,
-                $field
+                $field,
+                $dataName
             );
 
             // create fixed markup
-            $markupFixed = $this->fixSegmentField($fieldTags, $dataName);
+            $markupFixed = $this->fixSegmentField($fieldTags, $field);
             if (!empty($markupFixed)) {
                 if (self::DO_DEBUG) {
                     error_log('FIXED SEGMENT ' . $segment->getId() . ":");
                     error_log(' BEFORE: ' . $this->debugSegmentMarkup($markup));
                     error_log('  AFTER: ' . $this->debugSegmentMarkup($markupFixed));
                 }
-                $segment->set($field, $markupFixed);
+                $segment->set($dataName, $markupFixed);
 
                 return 1;
             }
@@ -242,9 +244,12 @@ class TagsPairedByRidFixer
     /**
      * Retrieves the fixed Markup or null, if nothing needs to be fixed
      */
-    private function fixSegmentField(editor_Segment_FieldTags $fieldTags, string $dataName): ?string
+    private function fixSegmentField(editor_Segment_FieldTags $fieldTags, string $field): ?string
     {
         $internalTags = $fieldTags->getByType(editor_Segment_Tag::TYPE_INTERNAL);
+        if($field === 'source'){
+            $this->idMap = [];
+        }
         if (count($internalTags) > 0) {
             $usedIndices = [];
             $ridTags = []; // nested array of tags with RID
@@ -256,10 +261,13 @@ class TagsPairedByRidFixer
                 $tag->_rid = $tag->getUnderlyingRid();
                 $tag->_id = $tag->getUnderlyingId();
                 $tagIndex = $tag->getTagIndex();
-                
+                // we may need the tag-indices of paired tags of the source for finding indices in the target
+                if($field === 'source' && !$tag->isSingle() && $tag->_rid > -1){
+                    $this->idMap[$tag->_id] = $tagIndex;
+                }
                 if($tag->isSingle() || $tag->_rid === -1){
                     $usedIndices[] = $tagIndex;
-                }                
+                }
                 if ($tagIndex > -1 && ($lowestIndex === -1 || $tagIndex < $lowestIndex)) {
                     $lowestIndex = $tagIndex;
                 }
@@ -295,14 +303,25 @@ class TagsPairedByRidFixer
                             'FAULTY STRUCTURE: Paired internal tag(s) are actually not opening/closing '
                         );
                     }
-                    if ($tagPair[0]->getTagIndex() !== $tagPair[1]->getTagIndex()) {
+                    $index0 = $tagPair[0]->getTagIndex();
+                    $index1 = $tagPair[1]->getTagIndex();
+                    // the usual case are differeing tag-indices but some framing-tags also have a wrong index
+                    if ($index0 !== $index1 || in_array($index0, $usedIndices)) {
                         // FIX FAULTY PAIRED TAG
                         $before = $tagPair[0]->getShortTagMarkup() . ' ... ' . $tagPair[1]->getShortTagMarkup();
                         // usually the closer-tag has the correct tag-index/short-tag-nr
-                        $repairIndex = ($tagPair[0]->isOpening()) ? $tagPair[1]->getTagIndex() : $tagPair[0]->getTagIndex();
+                        $repairIndex = ($tagPair[0]->isOpening()) ? $index1 : $index0;
+                        $repairId = ($tagPair[0]->isOpening()) ? $tagPair[1]->getUnderlyingId() : $tagPair[0]->getUnderlyingId();
+                        // in case of a target, we try to match against the source-segment
+                        if ($field === 'target' && array_key_exists($repairId, $this->idMap) && !in_array(
+                                $this->idMap[$repairId],
+                                $usedIndices
+                            )) {
+                            $repairIndex = $this->idMap[$repairId];
+                        }
                         // in case the closer-index is already in use we generate a new one.
                         // this would create problems between source and target ... but all known cases have that only in target
-                        if(in_array($repairIndex, $usedIndices)){
+                        elseif (in_array($repairIndex, $usedIndices)) {
                             $highestIndex++;
                             $repairIndex = $highestIndex;
                             $usedIndices[] = $highestIndex;
