@@ -246,18 +246,25 @@ class TagsPairedByRidFixer
     {
         $internalTags = $fieldTags->getByType(editor_Segment_Tag::TYPE_INTERNAL);
         if (count($internalTags) > 0) {
-            $allIndices = [];
+            $usedIndices = [];
             $ridTags = []; // nested array of tags with RID
             $lowestIndex = -1;
+            $highestIndex = -1;
             $changed = false;
             foreach ($internalTags as $tag) {
                 /** @var editor_Segment_Internal_Tag $tag */
                 $tag->_rid = $tag->getUnderlyingRid();
                 $tag->_id = $tag->getUnderlyingId();
                 $tagIndex = $tag->getTagIndex();
-                $allIndices[] = $allIndices;
+                
+                if($tag->isSingle() || $tag->_rid === -1){
+                    $usedIndices[] = $tagIndex;
+                }                
                 if ($tagIndex > -1 && ($lowestIndex === -1 || $tagIndex < $lowestIndex)) {
                     $lowestIndex = $tagIndex;
+                }
+                if ($tagIndex > -1 && ($highestIndex === -1 || $tagIndex > $highestIndex)) {
+                    $highestIndex = $tagIndex;
                 }
                 if ($tag->_rid > -1) {
                     if (!array_key_exists($tag->_rid, $ridTags)) {
@@ -291,11 +298,17 @@ class TagsPairedByRidFixer
                     if ($tagPair[0]->getTagIndex() !== $tagPair[1]->getTagIndex()) {
                         // FIX FAULTY PAIRED TAG
                         $before = $tagPair[0]->getShortTagMarkup() . ' ... ' . $tagPair[1]->getShortTagMarkup();
-                        if ($tagPair[0]->isOpening()) {
-                            $tagPair[0]->setTagIndex($tagPair[1]->getTagIndex());
-                        } else {
-                            $tagPair[1]->setTagIndex($tagPair[0]->getTagIndex());
+                        // usually the closer-tag has the correct tag-index/short-tag-nr
+                        $repairIndex = ($tagPair[0]->isOpening()) ? $tagPair[1]->getTagIndex() : $tagPair[0]->getTagIndex();
+                        // in case the closer-index is already in use we generate a new one.
+                        // this would create problems between source and target ... but all known cases have that only in target
+                        if(in_array($repairIndex, $usedIndices)){
+                            $highestIndex++;
+                            $repairIndex = $highestIndex;
+                            $usedIndices[] = $highestIndex;
                         }
+                        $tagPair[0]->setTagIndex($repairIndex);
+                        $tagPair[1]->setTagIndex($repairIndex);
                         $changed = true;
 
                         if (self::DO_DEBUG) {
