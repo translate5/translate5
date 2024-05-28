@@ -114,10 +114,10 @@ class TagsPairedByRidFixer
                 // we only care for source & target ... multitarget segments are not in use currently
                 $faults = $sourceFaults = 0;
                 $faults += $this->checkSegmentField($task, $segment, 'source', 'source');
-                $faults += $this->checkSegmentField($task, $segment, 'sourceEdit', 'source');
+                $faults += $this->checkSegmentField($task, $segment, 'source', 'sourceEdit');
                 $sourceFaults = $faults;
                 $faults += $this->checkSegmentField($task, $segment, 'target', 'target');
-                $faults += $this->checkSegmentField($task, $segment, 'targetEdit', 'target');
+                $faults += $this->checkSegmentField($task, $segment, 'target', 'targetEdit');
 
                 // if we had faults, save segment
                 if ($faults > 0) {
@@ -210,10 +210,10 @@ class TagsPairedByRidFixer
     private function checkSegmentField(
         editor_Models_Task $task,
         editor_Models_Segment $segment,
-        string $dataName,
         string $field,
+        string $dataName
     ): int {
-        $markup = $segment->get($field);
+        $markup = $segment->get($dataName);
         if (!empty($markup)) {
             // create field-tags
             $fieldTags = new editor_Segment_FieldTags(
@@ -262,11 +262,11 @@ class TagsPairedByRidFixer
                 $tag->_id = $tag->getUnderlyingId();
                 $tagIndex = $tag->getTagIndex();
                 // we may need the tag-indices of paired tags of the source for finding indices in the target
-                if($field === 'source' && !$tag->isSingle() && $tag->_rid > -1){
-                    $this->idMap[$tag->_id] = $tagIndex;
-                }
+
                 if($tag->isSingle() || $tag->_rid === -1){
                     $usedIndices[] = $tagIndex;
+                } elseif($field === 'source' && !$tag->isSingle() && $tag->_rid > -1){
+                    $this->idMap[$tag->_id] = $tagIndex;
                 }
                 if ($tagIndex > -1 && ($lowestIndex === -1 || $tagIndex < $lowestIndex)) {
                     $lowestIndex = $tagIndex;
