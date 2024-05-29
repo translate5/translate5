@@ -26,6 +26,8 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use GuzzleHttp\Client;
+use GuzzleHttp\Exception\RequestException;
 use MittagQI\Translate5\Service\T5Memory;
 use MittagQI\Translate5\T5Memory\Enum\StripFramingTags;
 
@@ -129,6 +131,103 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
         $http->setRawData($this->jsonEncode($data), 'application/json; charset=utf-8');
 
         return $this->processResponse($http->request());
+    }
+
+    public function createMemoryWithFile(string $memory, string $sourceLanguage, string $filePath): ?string
+    {
+        $data = new stdClass();
+        $data->name = $this->addTmPrefix($memory);
+        $data->sourceLang = $this->fixLanguages->key($sourceLanguage);
+
+        $result = $this->sendStreamRequest(
+            rtrim($this->resource->getUrl(), '/') . '/create',
+            $this->getStreamFromFile($filePath),
+            basename($filePath),
+            $data
+        );
+
+        return $result ? $data->name : null;
+    }
+
+    public function importMemoryAsFile(string $filePath, string $tmName, StripFramingTags $stripFramingTags): bool
+    {
+        return $this->sendStreamRequest(
+            rtrim($this->resource->getUrl(), '/') . '/' . $tmName . '/import-file',
+            $this->getStreamFromFile($filePath),
+            basename($filePath),
+            [
+                'framingTags' => $stripFramingTags->value,
+            ]
+        );
+    }
+
+    /**
+     * @throws RuntimeException
+     * @return resource
+     */
+    private function getStreamFromFile(string $filePath)
+    {
+        $stream = fopen($filePath, 'r');
+
+        if (false === $stream) {
+            throw new RuntimeException('Could not open file: ' . $filePath);
+        }
+
+        stream_filter_append($stream, 'zlib.deflate', STREAM_FILTER_READ, [
+            "window" => 30,
+        ]);
+
+        return $stream;
+    }
+
+    private function sendStreamRequest(string $uri, $stream, string $filename, array|object $data = null): bool
+    {
+        $client = new Client();
+        $multipart = [
+            [
+                'name' => 'file',
+                'contents' => $stream,
+                'filename' => $filename,
+            ],
+        ];
+
+        if (null !== $data) {
+            $multipart[] = [
+                'name' => 'data',
+                'contents' => json_encode($data),
+                'headers' => [
+                    'Content-Type' => 'application/json',
+                ],
+            ];
+        }
+
+        try {
+            $response = $client->post($uri, [
+                'multipart' => $multipart,
+            ]);
+
+            return $this->processResponse(
+                new Zend_Http_Response(
+                    $response->getStatusCode(),
+                    $response->getHeaders(),
+                    $response->getBody()->getContents()
+                )
+            );
+        } catch (RequestException $e) {
+            if ($e->hasResponse()) {
+                $response = $e->getResponse();
+
+                return $this->processResponse(
+                    new Zend_Http_Response(
+                        $response->getStatusCode(),
+                        $response->getHeaders(),
+                        $response->getBody()->getContents()
+                    )
+                );
+            }
+
+            throw $e;
+        }
     }
 
     /**
@@ -255,7 +354,8 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
     }
 
     /**
-     * checks the status of a language resource (if set), or just of the server (if no concrete language resource is given)
+     * checks the status of a language resource (if set), or just of the server (if no concrete language resource is
+     * given)
      * @return boolean
      */
     public function status(?string $tmName): bool
@@ -387,7 +487,7 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
         string $tmName,
         string $field,
         int $searchPosition = null,
-        int $numResults = 20
+        int $numResults = 20,
     ): bool {
         if ($this->isToLong($queryString)) {
             $this->result = json_decode('{"results":[]}');
@@ -422,7 +522,7 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
         string $filename,
         string $tmName,
         bool $save2disk = true,
-        bool $useSegmentTimestamp = false
+        bool $useSegmentTimestamp = false,
     ): bool {
         $this->error = null;
 

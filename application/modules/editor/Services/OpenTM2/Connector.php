@@ -45,6 +45,8 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
 {
     private const CONCORDANCE_SEARCH_NUM_RESULTS = 20;
 
+    private const VERSION_0_6 = '0.6';
+
     /**
      * Connector
      * @var editor_Services_OpenTM2_HttpApi
@@ -168,7 +170,12 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
         }
 
         //initial upload is a TM file
-        $tmName = $this->api->createMemory($name, $sourceLang, file_get_contents($fileinfo['tmp_name']));
+        if (self::VERSION_0_6 === $this->getT5MemoryVersion()) {
+            $tmName = $this->api->createMemoryWithFile($name, $sourceLang, $fileinfo['tmp_name']);
+        } else {
+            $tmName = $this->api->createMemory($name, $sourceLang, file_get_contents($fileinfo['tmp_name']));
+        }
+
         if ($tmName) {
             $this->addMemoryToLanguageResource($tmName);
 
@@ -282,7 +289,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
             }
 
             $result = $result && $this->importTmxIntoMemory(
-                file_get_contents($importFilename),
+                $importFilename,
                 $params['tmName'] ?? $this->getWritableMemory(),
                 $this->getStripFramingTagsValue($params)
             );
@@ -1501,14 +1508,18 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
     }
 
     private function importTmxIntoMemory(
-        string $fileContent,
+        string $importFilename,
         string $tmName,
         StripFramingTags $stripFramingTags
     ): bool {
         $successful = false;
 
         try {
-            $successful = $this->api->importMemory($fileContent, $tmName, $stripFramingTags);
+            if (self::VERSION_0_6 === $this->getT5MemoryVersion()) {
+                $successful = $this->api->importMemoryAsFile($importFilename, $tmName, $stripFramingTags);
+            } else {
+                $successful = $this->api->importMemory(file_get_contents($importFilename), $tmName, $stripFramingTags);
+            }
 
             if (! $successful) {
                 $this->logger->error('E1303', 'OpenTM2: could not add TMX data to TM', [
@@ -1541,34 +1552,30 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
             $this->addMemoryToLanguageResource($newName);
 
             // Filter TMX data from already imported segments
-            $fileContent = $this->cutOffTmx(
-                $fileContent,
-                $this->getOverflowSegmentNumber($error->error)
-            );
+            $this->cutOffTmx($importFilename, $this->getOverflowSegmentNumber($error->error));
 
             // Import further
-            return $this->importTmxIntoMemory($fileContent, $newName, $stripFramingTags);
+            return $this->importTmxIntoMemory($importFilename, $newName, $stripFramingTags);
         }
 
         return $successful;
     }
 
-    private function cutOffTmx(string $tmxData, int $segmentToStartFrom): string
+    private function cutOffTmx(string $importFilename, int $segmentToStartFrom): void
     {
         $doc = new DOMDocument();
-        $doc->loadXML($tmxData);
+        $doc->load($importFilename);
 
         if (! $doc->hasChildNodes()) {
             $error = libxml_get_last_error();
 
-            // TODO vice-versa?
-            if (str_contains($error->message, 'labelled UTF-16 but has UTF-8') !== false) {
-                $tmxData = preg_replace('/encoding="UTF-16"/', 'encoding="UTF-8"', $tmxData, 1);
-                $doc->loadXML($tmxData);
+            if (false !== $error) {
+                throw new RuntimeException(
+                    'Error while loading TMX file: ' . $error->message,
+                    $error->code
+                );
             }
         }
-
-        unset($tmxData);
 
         // Create an XPath to query the document
         $xpath = new DOMXPath($doc);
@@ -1580,10 +1587,8 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
         for ($i = 0; $i < $segmentToStartFrom; $i++) {
             $tuNodes->item($i)->parentNode->removeChild($tuNodes->item($i));
         }
-        unset($tuNodes);
 
-        // Save the modified TMX data to a new variable
-        return $doc->saveXML();
+        $doc->save($importFilename);
     }
 
     private function getOverflowSegmentNumber(string $error): int
@@ -1763,7 +1768,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
         echo "<pre>The TM binary export is currently blocked for technical reasons.\n";
         echo 'Der TM-Binary-Export ist augenblicklich aus technischen Gründen gesperrt.</pre>';
         exit;
-        
+
         $exportDir = APPLICATION_PATH . '/../data/TMExport/';
         $tmpDir = $exportDir . $this->languageResource->getId() . '_' . uniqid() . '/';
         @mkdir($tmpDir, recursive: true);
