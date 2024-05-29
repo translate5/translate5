@@ -15,6 +15,27 @@ All updates are (downwards) compatible! If not this is listed in the important r
 
 
 
+
+## [7.6.1] - 2024-05-29
+
+### Important Notes:
+ 
+
+
+### Bugfixes
+**[TRANSLATE-3970](https://jira.translate5.net/browse/TRANSLATE-3970): Import/Export - XLIFF import: tags paired by RID are not paired anymore FIX-script** <br>
+Added CLI command to fix TRANSLATE-3967
+
+**[TRANSLATE-3969](https://jira.translate5.net/browse/TRANSLATE-3969): Editor general - comments in task are shown as {content:nl2br:htmlEncode}** <br>
+Fix comment escaping in task view
+
+**[TRANSLATE-3967](https://jira.translate5.net/browse/TRANSLATE-3967): Import/Export - XLIFF import: tags paired by RID are not paired anymore** <br>
+FIX: pbt/ept tag pairs connected by RID may could not be paired anymore in T5 when singular-tags with conflicting namespaced id's are present
+
+**[TRANSLATE-3957](https://jira.translate5.net/browse/TRANSLATE-3957): Import/Export - SDLXLIFF diff export struggles when there are entities in the raw content** <br>
+SDLXLIFF diff export does not export XML entities correctly
+
+
 ## [7.6.0] - 2024-05-24
 
 ### Important Notes:
