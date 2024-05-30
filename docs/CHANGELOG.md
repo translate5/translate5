@@ -14,6 +14,60 @@ All updates are (downwards) compatible! If not this is listed in the important r
 
 
 
+
+## [7.6.0] - 2024-05-24
+
+### Important Notes:
+#### [TRANSLATE-3852](https://jira.translate5.net/browse/TRANSLATE-3852)
+Complex workflow step 2nd revision changed: when entering this step all locked 100% matches are opened for editing and auto QA is re-triggered.
+ 
+
+
+### Added
+**[TRANSLATE-3852](https://jira.translate5.net/browse/TRANSLATE-3852): Workflows - Workflow step "Revision language with editable 100% matches"** <br>
+Complex workflow step 2nd revision renamed to "2nd revision language with editable 100% matches" and action added to unlock 100% matches for editing and trigger auto QA in this step.
+
+**[TRANSLATE-3850](https://jira.translate5.net/browse/TRANSLATE-3850): OpenId Connect - SSO via OpenID: Define if IDP should be able to remove rights** <br>
+New client flag added for OpenId configured IDP. It can enable or disable updating of user roles, gender and locale from the IDP user claims.
+
+
+### Changed
+**[TRANSLATE-3964](https://jira.translate5.net/browse/TRANSLATE-3964): Import/Export - Prevent PXSS in filenames** <br>
+Fixed XSS issues in filenames
+
+**[TRANSLATE-3960](https://jira.translate5.net/browse/TRANSLATE-3960): Editor general - Test PXSS in all input fields of the application** <br>
+Security: fixed some remaining PXSS issues.
+
+
+### Bugfixes
+**[TRANSLATE-3965](https://jira.translate5.net/browse/TRANSLATE-3965): Package Ex and Re-Import - Missing dot in TMX file names in translator package** <br>
+In translator packages the TMX files are generated with the dot before the TMX file extension. This is fixed now.
+
+**[TRANSLATE-3959](https://jira.translate5.net/browse/TRANSLATE-3959): Editor general - Languages filters: search with no value leads to an error** <br>
+Fixes problem when filtering languages with no value in language resources overview 
+
+**[TRANSLATE-3956](https://jira.translate5.net/browse/TRANSLATE-3956): TermTagger integration - Backend error on recalculation of the transFound transNotFound and transNotDefined** <br>
+FIXED: problem popping when only translations are found but that's homonym ones
+
+**[TRANSLATE-3955](https://jira.translate5.net/browse/TRANSLATE-3955): Content Protection - Task creation fails on sublanguage if main languages was deleted** <br>
+Fix: Task creation fails on sublanguage if main languages was deleted
+
+**[TRANSLATE-3954](https://jira.translate5.net/browse/TRANSLATE-3954): Editor general - Missing instant translate auto set role for admins** <br>
+Added missing auto-set roles for admin users.
+
+**[TRANSLATE-3951](https://jira.translate5.net/browse/TRANSLATE-3951): Editor general - Missing userGuid in user tracking table** <br>
+Fix for error when empty user entire exist in user tracking table.
+
+**[TRANSLATE-3950](https://jira.translate5.net/browse/TRANSLATE-3950): ConnectWorldserver, Import/Export - Add missing tests to TRANSLATE-3931** <br>
+Add missing tests to TRANSLATE-3931
+
+**[TRANSLATE-3683](https://jira.translate5.net/browse/TRANSLATE-3683): VisualReview / VisualTranslation - when source segment is edited it will be shown in target visual** <br>
+FIX: The WYSYWIG Visual now only reflects changes on the (first) target and not e.g. an editable source
+
+**[TRANSLATE-3621](https://jira.translate5.net/browse/TRANSLATE-3621): VisualReview / VisualTranslation - If first repetition is selected, all repetitions are highlightes green** <br>
+Improvement: When the Visual has more repetitions of a certain segment then the grid, these additional repetitions (on the end of the visual) are nowassociated with the last repetition in the grid instead of the first
+
+
 ## [7.5.0] - 2024-05-17
 
 ### Important Notes:
