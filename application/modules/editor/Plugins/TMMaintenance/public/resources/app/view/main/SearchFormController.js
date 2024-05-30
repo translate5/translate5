@@ -85,6 +85,7 @@ Ext.define('TMMaintenance.view.main.SearchFormController', {
             method: 'POST',
             success: function (xhr) {
                 me.getView().up('app-main').down('#deleteBatchDialog').hide();
+                me.getView().down('[name=search]').buttonElement.dom.click();
             },
             error: function (xhr) {
                 console.log('Error deleting batch');
