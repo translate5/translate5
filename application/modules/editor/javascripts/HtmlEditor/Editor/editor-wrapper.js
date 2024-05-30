@@ -28,6 +28,8 @@ export default class EditorWrapper {
 
     #isProcessingDrop = false;
     #isProcessingPaste = false;
+    #isProcessingCut = false;
+    #lastKeyPressed = null;
 
     #userCanModifyWhitespaceTags;
     #userCanInsertWhitespaceTags;
@@ -186,6 +188,20 @@ export default class EditorWrapper {
         }
 
         this._asyncModifiers[event].push(modifier);
+    }
+
+    /**
+     * Returns current selection in an editor
+     *
+     * @returns {{start: (*|number), end: (*|number)}}
+     */
+    getSelection() {
+        const selection = this._editor.model.document.selection.getFirstRange();
+
+        return {
+            start: selection.start.path[1] ?? 0,
+            end: selection.end.path[1] ?? 0,
+        };
     }
 
     /**
@@ -458,6 +474,12 @@ export default class EditorWrapper {
         viewDocument.on('drop', (event, data) => {
             this.#onDrop(event, data, editor);
         });
+        viewDocument.on('keydown', (event, data) => {
+            this.#onKeyDown(event, data, editor);
+        });
+        viewDocument.on('clipboardOutput', (event, data) => {
+            this.#onClipboardOutput(event, data, editor);
+        });
 
         const modelDocument = editor.model.document;
         modelDocument.on('change:data', (event, data) => {
@@ -482,13 +504,15 @@ export default class EditorWrapper {
             return;
         }
 
-        if (!data.isTyping && !this.#isProcessingDrop && !this.#isProcessingPaste) {
+        if (!data.isTyping && !this.#isProcessingDrop && !this.#isProcessingPaste && !this.#isProcessingCut) {
             return;
         }
 
-        // Immediately reset the flag to prevent multiple calls
+        // Immediately reset the flags to prevent multiple calls
         this.#isProcessingDrop = false;
         this.#isProcessingPaste = false;
+        const lastKeyPressed = this.#lastKeyPressed;
+        this.#lastKeyPressed = null;
 
         const actions = [];
 
@@ -520,28 +544,33 @@ export default class EditorWrapper {
             const path = operation.position?.path || operation.sourcePosition?.path;
 
             if (path && path[1] !== undefined) {
-                actions.push(this.#createActionFromOperation(operation));
+                actions.push(this.#createActionFromOperation(operation, lastKeyPressed));
             }
         });
 
         this.#runModifiers(actions);
     }
 
-    #createActionFromOperation(operation) {
+    #createActionFromOperation(operation, lastKeyPressed) {
         const position = operation.position?.path[1] || operation.sourcePosition?.path[1];
 
         if (operation.type === 'remove') {
             const content = this.#getDeletedContent(operation);
 
-            return {type: EditorWrapper.ACTION_TYPE.REMOVE, content, position, correction: 0};
+            return {type: EditorWrapper.ACTION_TYPE.REMOVE, content, position, correction: 0, lastKeyPressed};
         }
 
         let content = operation.nodes?.getNode(0).data || '';
-        // Use Unicode for non-breaking space
+        // Use Unicode for non-breaking space for further processing
+        // ckeditor mixes spaces, so need to manually replace them
         content = content === ' ' ? '\u00A0' : content;
         const correction = content.length;
 
-        return {type: EditorWrapper.ACTION_TYPE.INSERT, content, position, correction};
+        return {type: EditorWrapper.ACTION_TYPE.INSERT, content, position, correction, lastKeyPressed};
+    }
+
+    #onClipboardOutput(event, data, editor) {
+        this.#isProcessingCut = data.method === 'cut';
     }
 
     #onDocumentChange(event, data, editor) {
@@ -555,18 +584,11 @@ export default class EditorWrapper {
             return;
         }
 
-        // const content = editor.data.processor.toView('Hello world');
-        // editor.plugins.get('Clipboard').insertContent(content, data);
-
         this.#isProcessingPaste = true;
-
-        // Prevent the default listener from being executed.
-        // event.stop();
     }
 
-    #onInputTransformation(event, data, editor)
-    {
-        const content =  data.content;
+    #onInputTransformation(event, data, editor) {
+        const content = data.content;
         Object.assign(content, DocumentFragment);
         const cleaned = this.#cleanupDataOnInsertOrDrop(content.toHTMLString());
         data.content = editor.data.htmlProcessor.toView(cleaned);
@@ -583,6 +605,10 @@ export default class EditorWrapper {
         event.stop();
         editor.execute('shiftEnter');
         editor.editing.view.scrollToTheSelection();
+    }
+
+    #onKeyDown(event, data, editor) {
+        this.#lastKeyPressed = data.domEvent.code;
     }
 
     // endregion
@@ -670,7 +696,7 @@ export default class EditorWrapper {
         let forceUpdate = false;
 
         for (const modifier of this._modifiers[EditorWrapper.EDITOR_EVENTS.DATA_CHANGED]) {
-            // TODO use position
+            // TODO position can be modified by modifier, need to pass it to the next one
             [text, position, forceUpdate] = modifier(text, actions);
         }
 
@@ -748,5 +774,6 @@ export default class EditorWrapper {
 
         return this.dataTransformer.transformPartial(cleaned.childNodes);
     }
+
     //endregion
 }
