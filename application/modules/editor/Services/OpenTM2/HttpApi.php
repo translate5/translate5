@@ -140,7 +140,7 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
         $data->sourceLang = $this->fixLanguages->key($sourceLanguage);
 
         $result = $this->sendStreamRequest(
-            rtrim($this->resource->getUrl(), '/') . '/create',
+            rtrim($this->resource->getUrl(), '/') . '/',
             $this->getStreamFromFile($filePath),
             basename($filePath),
             $data
