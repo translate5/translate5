@@ -16,11 +16,7 @@
       "value": "contains"
     },
     {
-      "name": "Concordance",
-      "value": "concordance"
-    },
-    {
-      "name": "Exact",
+      "name": "Match full segment",
       "value": "exact"
     }
   ],
@@ -39,7 +35,7 @@
     "target": "Target",
     "author": "Author",
     "additionalInfo": "Additional info",
-    "document": "Document",
+    "document": "Document name",
     "creationDateFrom": "Creation date after",
     "creationDateTo": "Creation date before",
     "search": "Search",
@@ -56,7 +52,7 @@
   "deleteBatch": {
     "close": "Close",
     "proceed": "Proceed",
-    "warningText": "All segments of the current search settings will be deleted. Are you sure you want to delete?"
+    "warningText": "All segments that can be found with the current search settings will be deleted. Better abort the process?"
   },
   "list" : {
     "title": "Segments",
