@@ -32,31 +32,17 @@ class editor_Models_Export_FileParser_Sdlxliff_RepairLockedReferences
 
         // collect all source tags which(grouped by tag id which actually is the target transunit id) are pointing to locked transunit
         $xmlparser->registerElement(
-            'trans-unit seg-source x[xid^=lockTU_]',
+            'trans-unit x[xid^=lockTU_]',
             function ($tag, $attr, $key) use (&$lockedReferences) {
                 if (! isset($lockedReferences[$attr['xid']])) {
                     $reference = new editor_Models_Export_FileParser_Sdlxliff_LockedReferencesDTO();
                     $lockedReferences[$attr['xid']] = $reference;
+                    $reference->sourceId = $attr['xid'];
                 } else {
                     $reference = $lockedReferences[$attr['xid']];
+                    $reference->targetId = $attr['xid'];
+                    $reference->targetChunkId = $key;
                 }
-                $reference->sourceId = $attr['xid'];
-            }
-        );
-
-        // collect all target tags which(grouped by tag id which actually is the target transunit id) are pointing to locked transunit
-        $xmlparser->registerElement(
-            'trans-unit target x[xid^=lockTU_]',
-            function ($targetTag, $targetAttr, $targetKey) use (&$lockedReferences) {
-                if (! isset($lockedReferences[$targetAttr['xid']])) {
-                    $reference = new editor_Models_Export_FileParser_Sdlxliff_LockedReferencesDTO();
-                    $lockedReferences[$targetAttr['xid']] = $reference;
-                } else {
-                    $reference = $lockedReferences[$targetAttr['xid']];
-                }
-
-                $reference->targetId = $targetAttr['xid'];
-                $reference->targetChunkId = $targetKey;
             }
         );
 
