@@ -33,6 +33,9 @@ $youtubeUrl = $translate->_("{TermPortalYoutubeVideoGuideUrl}");
 //The content can be found in the de.xliff and en.xliff locales files for the default module.
 ?>
 <style>body {margin: 0}</style>
+<link rel="stylesheet" href="/modules/editor/instanttranslate/css/instanttranslate.css?v=development">
 <iframe name="youtubevideoframe" width="100%" height="70%" src="<?php echo $youtubeUrl; ?>"
 frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"allowfullscreen></iframe>
+<div class="container" style="color: var(--color-grey_11)">
 <?php echo $translate->_("{TermPortalYoutubeVideoGuideDescriptionContent}"); ?>
+</div>
