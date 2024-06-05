@@ -434,6 +434,12 @@ class T5MemoryMigrationCommand extends Translate5AbstractCommand
             $languageResource->getTargetLang()
         );
 
+        $status = $connector->getStatus($connector->getResource());
+
+        if ($status !== LanguageResourceStatus::AVAILABLE) {
+            throw new RuntimeException(sprintf('Language resource has status \'%s\'', $status));
+        }
+
         $filename = $connector->export($type);
         rename($filename, $filenameWithPath);
 
