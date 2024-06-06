@@ -31,6 +31,9 @@ use editor_Models_Terminology_Models_CollectionAttributeDataType as CollectionAt
 /**
  * Languageresources Entity Object
  *
+ * @property string $sourceLangCode
+ * @property string $targetLangCode
+ *
  * @method int|null getId()
  * @method void setId(int $id)
  * @method string getLangResUuid()
@@ -256,7 +259,7 @@ class editor_Models_LanguageResources_LanguageResource extends ZfExtended_Models
     public function getByServicenamesAndLanguages(
         array $serviceNames,
         int $sourceLangId,
-        int $targetLangId,
+        int $targetLangId
     ): array {
         $select = $this->createGetByXyzSelect($sourceLangId, $targetLangId);
 
@@ -274,7 +277,7 @@ class editor_Models_LanguageResources_LanguageResource extends ZfExtended_Models
      */
     public function getByLanguages(
         int $sourceLangId,
-        int $targetLangId,
+        int $targetLangId
     ): array {
         $select = $this->createGetByXyzSelect($sourceLangId, $targetLangId);
 
@@ -290,7 +293,7 @@ class editor_Models_LanguageResources_LanguageResource extends ZfExtended_Models
      */
     protected function createGetByXyzSelect(
         int $sourceLangId,
-        int $targetLangId,
+        int $targetLangId
     ): Zend_Db_Table_Select {
         // first, evaluate the fuzzy languages
         $languages = ZfExtended_Factory::get(editor_Models_Languages::class);
@@ -706,14 +709,14 @@ class editor_Models_LanguageResources_LanguageResource extends ZfExtended_Models
             throw new ZfExtended_ValidateException('Missing field name.');
         }
 
-        if ($this->getId() === null) {
+        if (! $this->getId()) {
             throw new ZfExtended_ValidateException('Entity id is not set.');
         }
 
         if (! isset($this->cachedLanguages) || count($this->cachedLanguages) === 0 || $this->cachedLanguages[0]['id'] != $this->getId()) {
             $model = ZfExtended_Factory::get(editor_Models_LanguageResources_Languages::class);
             //load the existing languages from the languageresource languages table
-            $this->cachedLanguages = $model->loadByLanguageResourceId($this->getId());
+            $this->cachedLanguages = $model->loadByLanguageResourceId((int) $this->getId());
         }
         if (count($this->cachedLanguages) === 1) {
             return $this->cachedLanguages[0][$fieldName];
@@ -878,7 +881,7 @@ class editor_Models_LanguageResources_LanguageResource extends ZfExtended_Models
             // Create [collectionId <=> dataTypeId] mappings set
             ZfExtended_Factory
                 ::get(CollectionAttributeDataType::class)
-                    ->onTermCollectionInsert($this->getId());
+                    ->onTermCollectionInsert((int) $this->getId());
         }
     }
 

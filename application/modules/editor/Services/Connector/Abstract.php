@@ -254,7 +254,7 @@ abstract class editor_Services_Connector_Abstract
         $languages = ZfExtended_Factory::get(editor_Models_LanguageResources_Languages::class);
 
         // load only the required languages
-        $langaugepair = $languages->loadFilteredPairs($this->languageResource->getId(), $sourceFuzzy, $targetFuzzy);
+        $langaugepair = $languages->loadFilteredPairs((int) $this->languageResource->getId(), $sourceFuzzy, $targetFuzzy);
 
         // if only 1 language combination is available for the langauge resource, use it.
         if (count($langaugepair) === 1) {

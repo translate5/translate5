@@ -332,27 +332,37 @@ Ext.define('Editor.view.LanguageResources.SearchGridViewController', {
         this.lastActiveField = field;
     },
 
-    highlight: function (source, search) {
-        let tagsRe = /<[^>]*>/gm;
-        let tagsProtect = '\x0f';
-        let matches = source.match(tagsRe);
+    /**
+     * Highlight text in a string - wrap the text to highlight in a span with a class of 'highlight'
+     *
+     * @param {String} value
+     * @param {String} textToHighlight
+     *
+     * @returns {String}
+     */
+    highlight: function (value, textToHighlight) {
+        const root = RichTextEditor.stringToDom(value);
 
-        if (null === matches) {
-            return source;
+        const highlightSpan = `<span class="highlight">$&</span>`;
+        const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, null, false);
+        const textNodes = [];
+        let node;
+
+        // Collect text nodes
+        while (node = walker.nextNode()) {
+            textNodes.push(node);
         }
 
-        let result = source.replace(tagsRe, tagsProtect);
-        let searchRegexp = new RegExp(search, 'gi');
-
-        result = result.replace(searchRegexp, function (item) {
-            return '<span class="highlight">' + item + '</span>';
-        }, this);
-
-        // restore protected tags
-        matches.forEach(function (match) {
-            result = result.replace(tagsProtect, match);
+        // Modify text nodes
+        textNodes.forEach(node => {
+            const regex = new RegExp(textToHighlight, 'gi'); // Word boundary regex to match whole words only
+            if (regex.test(node.nodeValue)) {
+                const newNode = document.createElement('span');
+                newNode.innerHTML = node.nodeValue.replace(regex, highlightSpan);
+                node.parentNode.replaceChild(newNode, node);
+            }
         });
 
-        return result;
+        return root.innerHTML;
     },
 });

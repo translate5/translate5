@@ -595,7 +595,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
      */
     protected function getFileName(editor_Models_Segment $segment): string
     {
-        return editor_ModelInstances::file($segment->getFileId())->getFileName();
+        return editor_ModelInstances::file((int) $segment->getFileId())->getFileName();
     }
 
     /**
@@ -740,16 +740,9 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
             return $resultList;
         }
 
-        //$found->{$field}
-        //[NextSearchPosition] =>
         foreach ($results as $result) {
-            $resultList->addResult(
-                $this->tagHandler->restoreInResult($result->target, $isSource),
-                0,
-                $this->getMetaData($result)
-            );
+            $resultList->addResult($this->tagHandler->restoreInResult($result->target, $isSource));
             $resultList->setSource($this->tagHandler->restoreInResult($result->source, $isSource));
-            $resultList->setRawContent($result->source, $result->target);
         }
 
         return $resultList;
@@ -1668,11 +1661,6 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
         ]);
     }
 
-    private function hasMemories(LanguageResource $languageResource): bool
-    {
-        return ! empty($languageResource->getSpecificData('memories', parseAsArray: true));
-    }
-
     private function isMemoryOverflown(?object $error): bool
     {
         if (null === $error) {
@@ -1718,7 +1706,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
         }
 
         $this->waitForImportFinish($tmName);
-        $status = $this->getStatus($this->languageResource->getResource(), $this->languageResource, $tmName, true);
+        $status = $this->getStatus($this->languageResource->getResource(), $this->languageResource, $tmName);
 
         $error = $this->api->getError();
         // In case we've got memory overflow error we need to create another memory and import further
@@ -1953,6 +1941,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
         echo 'Der TM-Binary-Export ist augenblicklich aus technischen Gründen gesperrt.</pre>';
         exit;
 
+        // @phpstan-ignore-next-line
         $exportDir = APPLICATION_PATH . '/../data/TMExport/';
         $tmpDir = $exportDir . $this->languageResource->getId() . '_' . uniqid() . '/';
         @mkdir($tmpDir, recursive: true);

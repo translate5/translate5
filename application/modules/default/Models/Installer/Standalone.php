@@ -604,7 +604,7 @@ class Models_Installer_Standalone
         $warnings = $dbupdater->getWarnings();
         if (! empty($warnings)) {
             $this->log('There were the following warnings: ');
-            $this->log(join(PHP_EOL), $warnings);
+            $this->log(join(PHP_EOL, $warnings));
         }
     }
 

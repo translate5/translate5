@@ -85,6 +85,12 @@ class editor_Models_Segment_InternalTag extends editor_Models_Segment_TagAbstrac
      */
     private array $inputTagMap;
 
+    private ?editor_ImageTag_Left $leftTag = null;
+
+    private ?editor_ImageTag_Right $rightTag = null;
+
+    private ?editor_ImageTag_Single $singleTag = null;
+
     public function __construct($replacerTemplate = null)
     {
         $this->replacerRegex = self::REGEX_INTERNAL_TAGS;
@@ -705,15 +711,15 @@ class editor_Models_Segment_InternalTag extends editor_Models_Segment_TagAbstrac
      * For visual reasons in the GUI we have to add them as "additional tags", but such tags may not be saved to the DB then.
      * @return string the generated tag as string
      */
-    public function makeAdditionalHtmlTag(int $shortTag)
+    public function makeAdditionalHtmlTag(int $shortTag, string $type = 'single'): string
     {
-        if (empty($this->singleTag)) {
-            //lazy and anonymous instantiation, since only needed here
-            $this->singleTag = ZfExtended_Factory::get('editor_ImageTag_Single');
-        }
+        $tag = match ($type) {
+            'open' => empty($this->leftTag) ? $this->leftTag = ZfExtended_Factory::get(editor_ImageTag_Left::class) : $this->leftTag,
+            'close' => empty($this->rightTag) ? $this->rightTag = ZfExtended_Factory::get(editor_ImageTag_Right::class) : $this->rightTag,
+            default => empty($this->singleTag) ? $this->singleTag = ZfExtended_Factory::get(editor_ImageTag_Single::class) : $this->singleTag,
+        };
 
-        /* @var $this ->singleTag editor_ImageTag_Single */
-        return $this->singleTag->getHtmlTag([
+        return $tag?->getHtmlTag([
             'class' => self::IGNORE_CLASS,
             'text' => '&lt;AdditionalTagFromTM/&gt;',
             'id' => self::IGNORE_ID_PREFIX . $shortTag,
