@@ -106,7 +106,7 @@ class TaskImportCommand extends Translate5AbstractCommand
         if (! $taskName) {
             $this->io->error('Please provide not empty Task name');
 
-            return 1;
+            return self::FAILURE;
         }
 
         $path = $input->getArgument('path');
@@ -114,7 +114,7 @@ class TaskImportCommand extends Translate5AbstractCommand
         if (! file_exists($path)) {
             $this->io->error(sprintf('File "%s" does not exists', $path));
 
-            return 1;
+            return self::FAILURE;
         }
 
         $pmId = trim($input->getOption('pm'));
@@ -122,7 +122,7 @@ class TaskImportCommand extends Translate5AbstractCommand
         if (! $pmId) {
             $this->io->error('Please provide valid PM GUID / login / id');
 
-            return 1;
+            return self::FAILURE;
         }
 
         try {
@@ -138,7 +138,7 @@ class TaskImportCommand extends Translate5AbstractCommand
         } catch (ZfExtended_Models_Entity_NotFoundException) {
             $this->io->error('Provided PM does not exists');
 
-            return 1;
+            return self::FAILURE;
         }
 
         $customerNumber = trim($input->getOption('customer'));
@@ -149,9 +149,9 @@ class TaskImportCommand extends Translate5AbstractCommand
                 $customer->loadByNumber($customerNumber);
             } catch (ZfExtended_Models_Entity_NotFoundException) {
                 $this->io->error('Provided Customer does not exists');
-            }
 
-            return 1;
+                return self::FAILURE;
+            }
         } else {
             $customer->loadByDefaultCustomer();
         }
@@ -169,7 +169,7 @@ class TaskImportCommand extends Translate5AbstractCommand
         } catch (ZfExtended_Models_Entity_NotFoundException) {
             $this->io->error('Provided workflow does not exists');
 
-            return 1;
+            return self::FAILURE;
         }
 
         $worker = new \editor_Models_Import_CliImportWorker();
@@ -181,7 +181,7 @@ class TaskImportCommand extends Translate5AbstractCommand
 
         $this->io->success('Import queued');
 
-        return 0;
+        return self::SUCCESS;
     }
 
     private function getLangIds(array $rfcs): array

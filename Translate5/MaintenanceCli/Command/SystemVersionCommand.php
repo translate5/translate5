@@ -28,52 +28,35 @@
 
 namespace Translate5\MaintenanceCli\Command;
 
-use MittagQI\Translate5\Task\Lock;
-use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use ZfExtended_Utils;
 
-//FIXME https://github.com/bamarni/symfony-console-autocomplete
-
-class TaskUnlockCommand extends TaskInfoCommand
+class SystemVersionCommand extends Translate5AbstractCommand
 {
     // the name of the command (the part after "bin/console")
-    protected static $defaultName = 'task:unlock';
+    protected static $defaultName = 'system:version';
 
     protected function configure()
     {
+        $this->setAliases(['version']);
+
         $this
             // the short description shown while running "php bin/console list"
-            ->setDescription('Unlocks a locked task.')
+            ->setDescription('Prints the translate5 version.')
 
             // the full command description shown when running the command with
             // the "--help" option
-            ->setHelp('Unlocks a locked task - ensure that you know what you are doing when using that command!');
-
-        $this->addArgument('taskId', InputArgument::REQUIRED, 'Just the numeric task ID.');
+            ->setHelp('Prints the translate5 version.');
     }
 
-    /**
-     * Execute the command
-     * {@inheritDoc}
-     * @see \Symfony\Component\Console\Command\Command::execute()
-     */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $this->initInputOutput($input, $output);
         $this->initTranslate5();
 
-        $task = new \editor_Models_Task();
-        $task->load($input->getArgument('taskId'));
-        $this->writeTask($task);
+        $this->io->success('Translate5 version: ' . ZfExtended_Utils::getAppVersion());
 
-        Lock::taskUnlock($task);
-        // force state to open (recover error state!)
-        $task->setState($task::STATE_OPEN);
-        $task->save();
-
-        $this->io->success('Task unlocked');
-
-        return self::SUCCESS;
+        return static::SUCCESS;
     }
 }

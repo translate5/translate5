@@ -105,8 +105,6 @@ class DanglingImportsCleaner
                 WorkerTriggerFactory::create()->triggerWorker(
                     (string) $worker->getId(),
                     $worker->getHash(),
-                    $worker->getWorker(),
-                    $task->getTaskGuid()
                 );
             } catch (ZfExtended_Models_Entity_NotFoundException) {
                 //do nothing

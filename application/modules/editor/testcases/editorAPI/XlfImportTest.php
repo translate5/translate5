@@ -98,6 +98,15 @@ class XlfImportTest extends editor_Test_JsonTest
         $jsonFileName = 'expectedSegments.json';
         $segments = static::api()->getSegments($jsonFileName, 47);
         $this->assertSegmentsEqualsJsonFile($jsonFileName, $segments, 'Imported segments are not as expected!');
+
+        //get segment list of the 11-across-rid-matched.xlf import and check the segments to test the tag-indexing/short-tag-nrs
+        $jsonFileName = 'expectedSegmentsRidMatched.json';
+        $segments = static::api()->getSegments($jsonFileName, 9, 137);
+        $this->assertSegmentsEqualsJsonFile(
+            $jsonFileName,
+            $segments,
+            'Imported RID-matched segments are not as expected!'
+        );
     }
 
     /**
@@ -107,8 +116,12 @@ class XlfImportTest extends editor_Test_JsonTest
     public function testPreserveWhitespace()
     {
         $jsonFileName = 'expectedSegmentsPreserveWhitespace.json';
-        $segments = static::api()->getSegments($jsonFileName, 200, 47);
-        $this->assertSegmentsEqualsJsonFile('expectedSegmentsPreserveWhitespace.json', $segments, 'Imported segments are not as expected!');
+        $segments = static::api()->getSegments($jsonFileName, 90, 47);
+        $this->assertSegmentsEqualsJsonFile(
+            'expectedSegmentsPreserveWhitespace.json',
+            $segments,
+            'Imported segments are not as expected!'
+        );
     }
 
     /**
@@ -167,8 +180,16 @@ class XlfImportTest extends editor_Test_JsonTest
             if (in_array($segToEdit->segmentNrInTask, [84, 85, 86])) {
                 static::api()->allowHttpStatusOnce(422);
                 $result = (array) static::api()->saveSegment($segToEdit->id, $content . ' - edited');
-                $this->assertEquals(422, $result['httpStatus'], 'Segment [' . $segToEdit->segmentNrInTask . '] is returning wrong HTTP Status.');
-                $this->assertEquals('The data of the saved segment is not valid. The segment content is either to long or to short.', $result['errorMessage'], 'Segment [' . $segToEdit->segmentNrInTask . '] is returning wrong or no error.');
+                $this->assertEquals(
+                    422,
+                    $result['httpStatus'],
+                    'Segment [' . $segToEdit->segmentNrInTask . '] is returning wrong HTTP Status.'
+                );
+                $this->assertEquals(
+                    'The data of the saved segment is not valid. The segment content is either to long or to short.',
+                    $result['errorMessage'],
+                    'Segment [' . $segToEdit->segmentNrInTask . '] is returning wrong or no error.'
+                );
             } else {
                 static::api()->saveSegment($segToEdit->id, $content . ' - edited');
             }
@@ -180,12 +201,17 @@ class XlfImportTest extends editor_Test_JsonTest
          */
 
         $jsonFileName = 'expectedSegmentsPreserveWhitespaceAfterEdit.json';
-        $segments = static::api()->getSegments($jsonFileName, 200, 47);
+        $segments = static::api()->getSegments($jsonFileName, 90, 47);
         $this->assertSegmentsEqualsJsonFile($jsonFileName, $segments, 'Edited segments are not as expected!');
 
         $task = static::api()->getTask();
         //start task export
-        $this->checkExport($task, 'editor/task/export/id/' . $task->id, '01-ibm-opentm2.xlf', 'ibm-opentm2-export-normal.xlf');
+        $this->checkExport(
+            $task,
+            'editor/task/export/id/' . $task->id,
+            '01-ibm-opentm2.xlf',
+            'ibm-opentm2-export-normal.xlf'
+        );
         //start task export with diff
         // diff export will be disabled for XLF!
     }
@@ -198,7 +224,12 @@ class XlfImportTest extends editor_Test_JsonTest
     {
         $task = static::api()->getTask();
         //start task export
-        $this->checkExport($task, 'editor/task/export/id/' . $task->id, '04-segmentation.xlf', 'export-segmentation.xlf');
+        $this->checkExport(
+            $task,
+            'editor/task/export/id/' . $task->id,
+            '04-segmentation.xlf',
+            'export-segmentation.xlf'
+        );
     }
 
     /**
@@ -212,6 +243,18 @@ class XlfImportTest extends editor_Test_JsonTest
         $this->checkExport($task, 'editor/task/export/id/' . $task->id, '03-across.xlf', 'export-across.xlf');
     }
 
+    public function testAcrossRidMatchedXlf()
+    {
+        $task = static::api()->getTask();
+        //start task export
+        $this->checkExport(
+            $task,
+            'editor/task/export/id/' . $task->id,
+            '11-across-rid-matched.xlf',
+            'export-across-rid-matched.xlf'
+        );
+    }
+
     /**
      * check if the whitespace between mrk tags on the import are also exported again
      * @depends testSegmentEditing
@@ -220,7 +263,12 @@ class XlfImportTest extends editor_Test_JsonTest
     {
         $task = static::api()->getTask();
         //start task export
-        $this->checkExport($task, 'editor/task/export/id/' . $task->id, '02-preserveWhitespace.xlf', 'preserveWhitespace-exporttest.xlf');
+        $this->checkExport(
+            $task,
+            'editor/task/export/id/' . $task->id,
+            '02-preserveWhitespace.xlf',
+            'preserveWhitespace-exporttest.xlf'
+        );
     }
 
     /**
@@ -231,9 +279,24 @@ class XlfImportTest extends editor_Test_JsonTest
     {
         $task = static::api()->getTask();
         //start task export
-        $this->checkExport($task, 'editor/task/export/id/' . $task->id, '05-Translate1971-de-en.xlf', 'Translate1971-exporttest.xlf');
-        $this->checkExport($task, 'editor/task/export/id/' . $task->id, '06-Translate2525-de-en.xlf', 'Translate2525-exporttest.xlf');
-        $this->checkExport($task, 'editor/task/export/id/' . $task->id, '09-Translate2786-en-de.xlf', 'Translate2786-exporttest.xlf');
+        $this->checkExport(
+            $task,
+            'editor/task/export/id/' . $task->id,
+            '05-Translate1971-de-en.xlf',
+            'Translate1971-exporttest.xlf'
+        );
+        $this->checkExport(
+            $task,
+            'editor/task/export/id/' . $task->id,
+            '06-Translate2525-de-en.xlf',
+            'Translate2525-exporttest.xlf'
+        );
+        $this->checkExport(
+            $task,
+            'editor/task/export/id/' . $task->id,
+            '09-Translate2786-en-de.xlf',
+            'Translate2786-exporttest.xlf'
+        );
     }
 
     /**
@@ -259,7 +322,11 @@ class XlfImportTest extends editor_Test_JsonTest
 
         //compare it
         $expectedResult = static::api()->getFileContent($fileToCompare);
-        $this->assertEquals(rtrim($expectedResult), rtrim($exportedFile), 'Exported result does not equal to ' . $fileToCompare);
+        $this->assertEquals(
+            rtrim($expectedResult),
+            rtrim($exportedFile),
+            'Exported result does not equal to ' . $fileToCompare
+        );
     }
 
     /**
@@ -268,6 +335,9 @@ class XlfImportTest extends editor_Test_JsonTest
      */
     public function testPreserveAllWhitespace()
     {
-        $this->markTestIncomplete('Could not be tested due missing task template functionality to set the preserve config to true.');
+        $this->markTestIncomplete(
+            'Could not be tested due missing task template functionality to set the preserve config to true.'
+            . ' TODO FIXME: We have these capabilities, use ->addTaskConfig for the import-config OR create a second test ...'
+        );
     }
 }
