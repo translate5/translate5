@@ -540,7 +540,7 @@ Ext.define('Editor.view.segments.HtmlEditor', {
                 return;
             }
 
-            if (item.tagName == 'IMG' && !me.tagsCheck.isDuplicateSaveTag(item)) {
+            if (item.tagName === 'IMG' && !me.tagsCheck.isDuplicateSaveTag(item)) {
                 me.result.push(me.imgNodeToString(item, true));
                 return;
             }
@@ -563,12 +563,12 @@ Ext.define('Editor.view.segments.HtmlEditor', {
             }
 
             //some tags are marked as to be igored in the editor, so we ignore them
-            if (item.tagName == 'DIV' && /(^|[\s])ignoreInEditor([\s]|$)/.test(item.className)) {
+            if (item.tagName === 'DIV' && /(^|[\s])ignoreInEditor([\s]|$)/.test(item.className)) {
                 return;
             }
 
             //if we copy and paste content there could be other divs, so we allow only internal-tag divs:
-            if (item.tagName != 'DIV' || !/(^|[\s])internal-tag([\s]|$)/.test(item.className)) {
+            if (item.tagName !== 'DIV' || !/(^|[\s])internal-tag([\s]|$)/.test(item.className)) {
                 return;
             }
 
@@ -648,9 +648,9 @@ Ext.define('Editor.view.segments.HtmlEditor', {
                     data.text = data.target ? data.target : data.source;
                 }
                 me.measure(data);
-                data.path = me.getSvg(data.text, data.fullWidth, data.placeableTag);
+                data.path = me.getSvg(data.text, data.fullWidth);
             } else {
-                data.path = me.getSvg(data.shortTag, data.shortWidth, false);
+                data.path = me.getSvg(data.shortTag, data.shortWidth);
             }
 
             me.result.push(me.applyTemplate('internalimg', data));
@@ -658,7 +658,7 @@ Ext.define('Editor.view.segments.HtmlEditor', {
         });
     },
 
-    getSvg: function (text, width, isPlaceable) {
+    getSvg: function (text, width) {
         var prefix = 'data:image/svg+xml;charset=utf-8,',
             svg = '',
             //cell = Ext.fly(this.up('segmentroweditor').context.row).select('.segment-tag-column .x-grid-cell-inner').first(),
@@ -693,7 +693,7 @@ Ext.define('Editor.view.segments.HtmlEditor', {
         divItem = Ext.fly(item);
         spanFull = divItem.down('span.full');
         spanShort = divItem.down('span.short');
-        data.text = spanFull.dom.innerHTML.replace(/"/g, '&quot;');
+        data.text = spanFull.dom.innerHTML.replace(/"/g, '&quot;').replace(new RegExp(Editor.TRANSTILDE, "g"), ' ');
         data.fullTag = data.text;
         data.id = spanFull.getAttribute('data-originalid');
         data.qualityId = me.getElementsQualityId(divItem);
@@ -1028,8 +1028,8 @@ Ext.define('Editor.view.segments.HtmlEditor', {
                         useFull = (tagData.data.whitespaceTag || tagData.data.placeableTag);
                         text = useFull ? tagData.data.fullTag : tagData.data.shortTag;
                         width = useFull ? tagData.data.fullWidth : tagData.data.shortWidth;
-                        affectedTags += '<img src="' + me.getSvg(text, width, tagData.data.placeableTag) + '"> ';
-                        //msg += '<img src="'+me.getSvg(text, width, tagData.data.placeableTag)+'"> ';
+                        affectedTags += '<img src="' + me.getSvg(text, width) + '"> ';
+                        //msg += '<img src="'+me.getSvg(text, width)+'"> ';
                     }
 
                     msg = Ext.String.format(msg, affectedTags);
@@ -1226,13 +1226,12 @@ Ext.define('Editor.view.segments.HtmlEditor', {
                 if (target === 'fullPath' || markupImage.whitespaceTag || markupImage.placeableTag) {
                     item.src = me.getSvg(
                         Ext.String.htmlDecode(markupImage.fullTag),
-                        markupImage.fullWidth, markupImage.placeableTag
+                        markupImage.fullWidth
                     );
                 } else {
                     item.src = me.getSvg(
                         Ext.String.htmlDecode(markupImage.shortTag),
-                        markupImage.shortWidth,
-                        false
+                        markupImage.shortWidth
                     );
                 }
             }
