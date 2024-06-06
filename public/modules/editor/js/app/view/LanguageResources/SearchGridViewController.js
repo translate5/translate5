@@ -341,7 +341,7 @@ Ext.define('Editor.view.LanguageResources.SearchGridViewController', {
      * @returns {String}
      */
     highlight: function (value, textToHighlight) {
-        const root = RichTextEditor.stringToDom(value);
+        const root = this.stringToDom(value);
 
         const highlightSpan = `<span class="highlight">$&</span>`;
         const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, null, false);
@@ -365,4 +365,42 @@ Ext.define('Editor.view.LanguageResources.SearchGridViewController', {
 
         return root.innerHTML;
     },
+
+    /**
+     * TODO This method should be removed when Richtexteditor refactoring is merged
+     * Convert a template string into HTML DOM nodes
+     * @param  {String} str The template string
+     * @return {Node}       The template HTML
+     */
+    stringToDom: function(str) {
+        const support = (function () {
+            if (!window.DOMParser) {
+                return false;
+            }
+
+            let parser = new DOMParser();
+
+            try {
+                parser.parseFromString('x', 'text/html');
+            } catch (error) {
+                return false;
+            }
+
+            return true;
+        })();
+
+        // If DOMParser is supported, use it
+        if (support) {
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(str, 'text/html');
+
+            return doc.body;
+        }
+
+        // Otherwise, fallback to old-school method
+        let dom = document.createElement('div');
+        dom.innerHTML = str;
+
+        return dom;
+    }
 });
