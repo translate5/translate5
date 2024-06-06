@@ -26,6 +26,8 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\Task\Worker\Behaviour;
+
 /**
  * Extends the default worker with task specific additions, basically if the task is on state error, then the worker should set to defunc.
  * All other functionality reacting on the worker run is encapsulated in the behaviour classes
@@ -44,10 +46,10 @@ abstract class editor_Models_Task_AbstractWorker extends ZfExtended_Worker_Abstr
      * → all actions to handle worker in task import context are triggered
      * @var string
      */
-    protected $behaviourClass = 'editor_Models_Import_Worker_Behaviour';
+    protected $behaviourClass = Behaviour::class;
 
     /**
-     * @var editor_Models_Import_Worker_Behaviour
+     * @var Behaviour
      */
     protected $behaviour;
 

@@ -39,10 +39,15 @@ use editor_Models_Import_Worker_SetTaskToOpen;
 use editor_Models_Task;
 use editor_Models_TaskConfig;
 use editor_Workflow_Manager;
+use MittagQI\ZfExtended\Worker\Trigger\Factory as WorkerTriggerFactory;
+use ReflectionException;
+use Zend_Db_Statement_Exception;
+use Zend_Exception;
 use ZfExtended_Factory;
+use ZfExtended_Models_Entity_Exceptions_IntegrityConstraint;
+use ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey;
 use ZfExtended_Models_Entity_NotFoundException;
 use ZfExtended_Models_Worker;
-use ZfExtended_Worker_Abstract;
 
 class ProjectWorkersService
 {
@@ -55,6 +60,11 @@ class ProjectWorkersService
 
     /**
      * add and run all the needed import workers
+     * @throws ZfExtended_Models_Entity_NotFoundException
+     * @throws ReflectionException
+     * @throws Zend_Db_Statement_Exception
+     * @throws ZfExtended_Models_Entity_Exceptions_IntegrityConstraint
+     * @throws ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey
      */
     public function queueImportWorkers(
         editor_Models_Task $task,
@@ -109,8 +119,11 @@ class ProjectWorkersService
 
     /**
      * starts the workers of the current or given task
+     * @throws ReflectionException
+     * @throws ZfExtended_Models_Entity_NotFoundException
+     * @throws Zend_Exception
      */
-    public function startImportWorkers(editor_Models_Task $task)
+    public function startImportWorkers(editor_Models_Task $task): void
     {
         $tasks = [$task];
         //if it is a project, start the import workers for each sub-task
@@ -150,13 +163,17 @@ class ProjectWorkersService
                     $model->getTaskGuid(),
                     [ZfExtended_Models_Worker::STATE_PREPARE]
                 );
-                $worker = ZfExtended_Worker_Abstract::instanceByModel($workerModel);
-                $worker && $worker->schedulePrepared();
+
+                //set the prepared worker to scheduled and set them to waiting where possible
+                $workerModel->schedulePrepared();
 
                 $this->eventTrigger->triggerImportWorkerStarted($model);
             } catch (ZfExtended_Models_Entity_NotFoundException) {
                 //if there is no worker, nothing can be done
             }
         }
+
+        //finally trigger the worker queue
+        WorkerTriggerFactory::create()->triggerQueue();
     }
 }

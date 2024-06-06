@@ -33,7 +33,6 @@ require_once 'vendor/autoload.php';
 const TRANSLATE5_CLI = true;
 
 use Symfony\Component\Console\Application;
-use Translate5\MaintenanceCli\Command\SegmentHistoryCommand;
 use Translate5\MaintenanceCli\Command\{
     AuthTokenCommand,
     AuthTokenDeleteCommand,
@@ -79,6 +78,7 @@ use Translate5\MaintenanceCli\Command\{
     PluginListCommand,
     ReleaseNotesCommand,
     RoleListCommand,
+    SegmentHistoryCommand,
     ServiceAutodiscoveryCommand,
     ServiceCheckCommand,
     ServicePingCommand,
@@ -116,6 +116,7 @@ use Translate5\MaintenanceCli\Command\{
     WorkerCleanCommand,
     WorkerListCommand,
     WorkerQueueCommand,
+    WorkerRerunCommand,
     WorkerRunCommand,
     WorkflowCloneCommand,
     WorkflowListCommand,
@@ -185,6 +186,7 @@ $commands = [
     new WorkerCleanCommand(),
     new WorkerListCommand(),
     new WorkerQueueCommand(),
+    new WorkerRerunCommand(),
     new WorkerRunCommand(),
     new WorkflowCloneCommand(),
     new WorkflowListCommand(),
