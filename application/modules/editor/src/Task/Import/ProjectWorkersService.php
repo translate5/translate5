@@ -106,14 +106,14 @@ class ProjectWorkersService
         if ($worker->init($taskGuid, [
             'config' => $importConfig,
         ])) {
-            $worker->queue($parentId, null, false);
+            $worker->queue($parentId, ZfExtended_Models_Worker::STATE_PREPARE, false);
         }
         // the worker finishing the import
         $worker = ZfExtended_Factory::get(editor_Models_Import_Worker_FinalStep::class);
         if ($worker->init($taskGuid, [
             'config' => $importConfig,
         ])) {
-            $worker->queue($parentId);
+            $worker->queue($parentId, ZfExtended_Models_Worker::STATE_PREPARE);
         }
     }
 
