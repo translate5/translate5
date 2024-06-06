@@ -681,7 +681,6 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
                 continue;
             }
 
-
             if (null === $searchDTO) {
                 $numResults = self::CONCORDANCE_SEARCH_NUM_RESULTS - $resultsCount;
                 $successful = $this->api->concordanceSearch($searchString, $tmName, $field, $tmOffset, $numResults);
