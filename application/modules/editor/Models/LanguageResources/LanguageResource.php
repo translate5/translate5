@@ -31,6 +31,9 @@ use editor_Models_Terminology_Models_CollectionAttributeDataType as CollectionAt
 /**
  * Languageresources Entity Object
  *
+ * @property string $sourceLangCode
+ * @property string $targetLangCode
+ *
  * @method string getId()
  * @method void setId(int $id)
  * @method string getLangResUuid()
@@ -225,12 +228,12 @@ class editor_Models_LanguageResources_LanguageResource extends ZfExtended_Models
                 return [];
             }
         }
-        
+
         $select = $this->createGetByXyzSelect($sourceLangId, $targetLangId);
-        
+
         // type restriction
         ZfExtended_Utils::addArrayCondition($select, $types, 'lr.resourceType');
-        
+
         // client restriction - if we have one
         if ($clientIds !== null) {
             $select
@@ -246,84 +249,81 @@ class editor_Models_LanguageResources_LanguageResource extends ZfExtended_Models
 
         return $this->db->fetchAll($select)->toArray();
     }
-    
+
     /**
      * Fetches language-resources of the specified service-names that have the given language-codes
      * The language-codes either must be identical (default) or are searched by similarity (primary language equals)
-     * @param array $serviceNames
-     * @param int $sourceLangId
-     * @param int $targetLangId
-     * @return array
      * @throws ReflectionException
      * @throws Zend_Cache_Exception
      */
     public function getByServicenamesAndLanguages(
         array $serviceNames,
-        int   $sourceLangId,
-        int   $targetLangId): array
-    {
+        int $sourceLangId,
+        int $targetLangId
+    ): array {
         $select = $this->createGetByXyzSelect($sourceLangId, $targetLangId);
-        
+
         // servicename restriction
         ZfExtended_Utils::addArrayCondition($select, $serviceNames, 'lr.serviceName');
-        
+
         return $this->db->fetchAll($select)->toArray();
     }
-    
+
     /**
      * Fetches all language-resources that have the given language-codes
      * The language-codes either must be identical (default) or are searched by similarity (primary language equals)
-     * @param int $sourceLangId
-     * @param int $targetLangId
-     * @return array
      * @throws ReflectionException
      * @throws Zend_Cache_Exception
      */
     public function getByLanguages(
-        int   $sourceLangId,
-        int   $targetLangId): array
-    {
+        int $sourceLangId,
+        int $targetLangId
+    ): array {
         $select = $this->createGetByXyzSelect($sourceLangId, $targetLangId);
-        
+
         return $this->db->fetchAll($select)->toArray();
-    }    /**
+    }
+
+    /**
      * get a database select statement to search for language-resources
      * that are able to handle the submitted source- and target-languages.
      *
-     * @param int $sourceLangId
-     * @param int $targetLangId
-     * @return Zend_Db_Table_Select
      * @throws ReflectionException
      * @throws Zend_Cache_Exception
      */
     protected function createGetByXyzSelect(
-        int   $sourceLangId,
-        int   $targetLangId) : Zend_Db_Table_Select
-    {
+        int $sourceLangId,
+        int $targetLangId
+    ): Zend_Db_Table_Select {
         // first, evaluate the fuzzy languages
         $languages = ZfExtended_Factory::get(editor_Models_Languages::class);
         $sourceLanguageIds = $languages->getFuzzyLanguages($sourceLangId, 'id', true);
         $targetLanguageIds = $languages->getFuzzyLanguages($targetLangId, 'id', true);
-        
+
         $select = $this->db
             ->select()
             ->from(
-                ['lr' => 'LEK_languageresources'],
+                [
+                    'lr' => 'LEK_languageresources',
+                ],
                 ['lr.id', 'lr.name', 'lr.serviceName', 'lr.resourceType', 'lr.specificData']
             )
             ->setIntegrityCheck(false)
             ->joinLeft(
-                ['lla' => 'LEK_languageresources_languages'],
+                [
+                    'lla' => 'LEK_languageresources_languages',
+                ],
                 'lr.id = lla.languageResourceId',
                 ['sourceLangCode', 'targetLangCode']
             );
-        
+
         // add language restriction to select-statement
         ZfExtended_Utils::addArrayCondition($select, $sourceLanguageIds, 'lla.sourceLang');
         ZfExtended_Utils::addArrayCondition($select, $targetLanguageIds, 'lla.targetLang');
-        
+
         return $select;
     }
+
     public function getByResourceId(string $resourceId): array
     {
         $s = $this->db
@@ -701,14 +701,14 @@ class editor_Models_LanguageResources_LanguageResource extends ZfExtended_Models
             throw new ZfExtended_ValidateException('Missing field name.');
         }
 
-        if ($this->getId() === null) {
+        if (! $this->getId()) {
             throw new ZfExtended_ValidateException('Entity id is not set.');
         }
 
         if (! isset($this->cachedLanguages) || count($this->cachedLanguages) === 0 || $this->cachedLanguages[0]['id'] != $this->getId()) {
             $model = ZfExtended_Factory::get(editor_Models_LanguageResources_Languages::class);
             //load the existing languages from the languageresource languages table
-            $this->cachedLanguages = $model->loadByLanguageResourceId($this->getId());
+            $this->cachedLanguages = $model->loadByLanguageResourceId((int) $this->getId());
         }
         if (count($this->cachedLanguages) === 1) {
             return $this->cachedLanguages[0][$fieldName];
@@ -873,7 +873,7 @@ class editor_Models_LanguageResources_LanguageResource extends ZfExtended_Models
             // Create [collectionId <=> dataTypeId] mappings set
             ZfExtended_Factory
                 ::get(CollectionAttributeDataType::class)
-                    ->onTermCollectionInsert($this->getId());
+                    ->onTermCollectionInsert((int) $this->getId());
         }
     }
 
