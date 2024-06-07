@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xliff xmlns:sdl="http://sdl.com/FileTypes/SdlXliff/1.0" xmlns="urn:oasis:names:tc:xliff:document:1.2" version="1.2"
+       sdl:version="1.0">
+    <file original="aleks_test_file.xml" datatype="x-sdlfilterframework2" source-language="fr-FR"
+          target-language="en-GB">
+        <body>
+            <trans-unit translate="no" id="c604f459-124f-441d-9494-2532379f42c1">
+                <source>
+                    <x id="0"/>
+                    <x id="1"/>
+                </source>
+            </trans-unit>
+            <trans-unit id="da320e97-57c7-404a-a83f-5c4d90413522">
+                <source>
+                    <x id="2"/>
+                </source>
+                <seg-source>
+                    <x id="2"/>
+                </seg-source>
+                <target>
+                    <x id="2"/>
+                </target>
+            </trans-unit>
+            <trans-unit id="lockTU_805f9607-e4dc-458e-b8af-ca929d780846" translate="no" sdl:locktype="Manual">
+                <source>
+                    <g id="703">Marque</g>
+                </source>
+            </trans-unit>
+            <trans-unit id="lockTU_5c1cb971-ee35-44a8-8e22-0069ccc44470" translate="no" sdl:locktype="Manual">
+                <source>
+                    <g id="703">Marque</g>
+                </source>
+            </trans-unit>
+            <trans-unit id="lockTU_d6bd8325-aee9-4207-af71-cf98d9d27246" translate="no" sdl:locktype="Manual">
+                <source>
+                    <g id="703">Marque</g>
+                </source>
+            </trans-unit>
+            <trans-unit id="7a78cdff-42f6-4707-a73a-8174dd33c637">
+                <source>(**) Correcteur de dévers passif pour injecteurs à patins<x id="locked67" xid="lockTU_d6bd8325-aee9-4207-af71-cf98d9d27246"/>uniquement.</source>
+                <seg-source>
+                    <mrk mtype="seg" mid="90">(**) Correcteur de dévers passif pour injecteurs à patins<x id="locked68" xid="lockTU_5c1cb971-ee35-44a8-8e22-0069ccc44470"/>uniquement.</mrk>
+                </seg-source>
+                <target>
+                    <mrk mtype="seg" mid="90">(**)<x id="locked69" xid="lockTU_805f9607-e4dc-458e-b8af-ca929d780846"/>Passive tilt corrector for trailing shoes only.</mrk>
+                </target>
+                <sdl:seg-defs>
+                    <sdl:seg id="90" conf="Translated" origin="tm" origin-system="Samson Agro SASU" percent="100"
+                             struct-match="true" text-match="SourceAndTarget">
+                        <sdl:value key="created_by">rka</sdl:value>
+                        <sdl:value key="created_on">10/31/2021 09:46:45</sdl:value>
+                        <sdl:value key="modified_on">05/15/2024 15:03:01</sdl:value>
+                        <sdl:value key="last_modified_by">RNK-LAPTOP\rosal</sdl:value>
+                        <sdl:value key="SDL:OriginalTranslationHash">-1863620798</sdl:value>
+                        <sdl:value key="SegmentIdentityHash">28q8dhy3497aw26C8R1s6WkeIHY=</sdl:value>
+                    </sdl:seg>
+                </sdl:seg-defs>
+            </trans-unit>
+            <trans-unit translate="no" id="b1590601-2897-461c-9e3b-a45173c2ab81">
+                <source>
+                    <x id="704"/>
+                    <x id="705"/>
+                </source>
+            </trans-unit>
+        </body>
+    </file>
+</xliff>
