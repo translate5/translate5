@@ -70,7 +70,7 @@ class Translate3966Test extends editor_Test_JsonTest
         $segments = static::api()->getSegments();
         $segToEdit = $segments[0];
 
-        //swap < and >
+        // move the locked tag from place to another in the segment with track changes
         $editedData = '(**)<del class="trackchanges ownttip deleted" data-usertrackingid="1731" data-usercssnr="usernr1" data-workflowstep="no workflow1" data-timestamp="2024-06-07T08:53:01+02:00"><div class="single 782069643d226c6f636b6564363922207869643d226c6f636b54555f38303566393630372d653464632d343538652d623861662d636139323964373830383436222f internal-tag ownttip"><span title="\u21b5                    &lt;g id=&quot;703&quot;&gt;Marque&lt;/g&gt;\u21b5" class="short">&lt;locked2/&gt;</span><span data-originalid="locked69" data-length="-1" class="full">\u21b5                    &lt;g id=&quot;703&quot;&gt;Marque&lt;/g&gt;\u21b5               ~@#!WS~</span></div></del>Passive tilt corrector for trailing shoes<ins class="trackchanges ownttip" data-usertrackingid="1731" data-usercssnr="usernr1" data-workflowstep="no workflow1" data-timestamp="2024-06-07T08:53:05+02:00"> <div class="single 782069643d226c6f636b6564363922207869643d226c6f636b54555f38303566393630372d653464632d343538652d623861662d636139323964373830383436222f internal-tag ownttip"><span title="\u21b5                    &lt;g id=&quot;703&quot;&gt;Marque&lt;/g&gt;\u21b5" class="short">&lt;locked2/&gt;</span><span data-originalid="locked69" data-length="-1" class="full">\u21b5                    &lt;g id=&quot;703&quot;&gt;Marque&lt;/g&gt;\u21b5               ~@#!WS~</span></div></ins> only.';
         static::api()->saveSegment($segToEdit->id, $editedData);
     }
