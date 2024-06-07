@@ -1604,11 +1604,11 @@
                     <sdl:node id="2"/>
                 </sdl:cxts>
                 <trans-unit id="18e7cece-6a25-4ee5-b9ce-01c5b19b1552">
-                    <source><g id="41"/><g id="43">Product novelties</g><g id="44">Explore the latest, cutting-edge design developments of AXOR</g><g id="45">Experiences</g><g id="46">Inspiring insights into living spaces and hotels with AXOR worldwide</g></source>
-                    <seg-source><g id="41"/><mrk mtype="seg" mid="19"><g id="43">Product novelties</g><g id="44">Explore the latest, cutting-edge design developments of AXOR</g><g id="45">Experiences</g><g id="46">Inspiring insights into living spaces and hotels with AXOR worldwide</g></mrk></seg-source>
-                    <target><g id="41"/><mrk mtype="seg" mid="19"><lekTargetSeg id="SEGMENT_ID" field="target" /></mrk></target>
+                    <source>Source text 1. Source text 2. Source text 3.</source>
+                    <seg-source><mrk mtype="seg" mid="19">Source text 1.</mrk><mrk mtype="seg" mid="20">Source text 2.</mrk><mrk mtype="seg" mid="21">Source text 3.</mrk></seg-source>
+                    <target><mrk mtype="seg" mid="19">Target text 1.</mrk><mrk mtype="seg" mid="20">Target text 2.</mrk><mrk mtype="seg" mid="21">Target text 3.</mrk></target>
                     <sdl:seg-defs>
-                        <sdl:seg id="19" conf="Draft" origin="interactive">
+                        <sdl:seg id="19"  origin-system="DeepL - EN-DE" conf="Draft" percent="70" origin="mt">
                             <sdl:prev-origin origin="source">
                                 <sdl:prev-origin/>
                                 <sdl:value key="SegmentIdentityHash">0uBHxELNqYoe4o7PkFqdKEAWsBU=</sdl:value>
@@ -1624,6 +1624,8 @@
                             <sdl:value key="modified_on">03/12/2024 15:42:32</sdl:value>
                             <sdl:value key="SDL:OriginalTranslationHash">-1296649140</sdl:value>
                         </sdl:seg>
+                        <sdl:seg id="20"  origin-system="DeepL - EN-DE" conf="Draft" percent="75" origin="mt" />
+                        <sdl:seg id="21"  origin-system="DeepL - EN-DE" origin="mt" conf="Draft" percent="80" />
                     </sdl:seg-defs>
                 </trans-unit>
             </group>

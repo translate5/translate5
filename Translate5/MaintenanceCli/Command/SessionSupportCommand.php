@@ -49,7 +49,7 @@ class SessionSupportCommand extends Translate5AbstractCommand
             // the full command description shown when running the command with
             // the "--help" option
             ->setHelp(
-                'Generates a new session for the support-user, optionally parses a given link/url for task & segment-nr.'
+                'Generates a new session for the support-user, optionally parses a given link/url/task-id for task & segment-nr.'
             );
 
         $this->addArgument('path', InputArgument::OPTIONAL, 'An URL or path to fetch task/segment-nr from.');
@@ -84,6 +84,8 @@ class SessionSupportCommand extends Translate5AbstractCommand
                 $taskId = $this->getNumericUrlPart($path, 2);
                 $segmentNr = $this->getNumericUrlPart($path, 1);
             }
+        } elseif (! empty($path) && preg_match('~[0-9]+~', $path) !== false) {
+            $taskId = $path;
         }
 
         if (! empty($taskId)) {

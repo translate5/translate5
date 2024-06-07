@@ -50,6 +50,8 @@ abstract class editor_Test_ApiTest extends TestCase
 
     private static ?stdClass $_appState = null;
 
+    private static int $lastWorkerId = 0;
+
     /**
      * Holds the plugins temporarily activated for a test
      */
@@ -121,6 +123,34 @@ abstract class editor_Test_ApiTest extends TestCase
     final public static function getAppState(): stdClass
     {
         return static::$_appState;
+    }
+
+    /**
+     * @param int $timeout in seconds for all other states (how long might the worker be scheduled/waiting/running)
+     */
+    final public function waitForWorker(
+        string $class,
+        ?\stdClass $task = null,
+        array $waitForStates = [\ZfExtended_Models_Worker::STATE_DONE],
+        array $failStates = [\ZfExtended_Models_Worker::STATE_DEFUNCT],
+        int $timeout = 100,
+    ): void {
+        for ($counter = 0; $counter < $timeout; $counter++) {
+            sleep(1);
+            $foundWorkes = DbHelper::getLastWorkers(self::$lastWorkerId, $class, $task->taskGuid ?? null);
+            foreach ($foundWorkes as $worker) {
+                if (in_array($worker['state'], $waitForStates)) {
+                    return;
+                }
+                if (in_array($worker['state'], $failStates)) {
+                    $this->fail('Worker defunct: ID: ' . $worker['id'] . ' ' . $worker['worker']);
+                }
+            }
+            if ($counter % 5 == 0) {
+                error_log('Worker state check ' . $counter . '/' . $timeout . ' [' . __CLASS__ . ']');
+            }
+        }
+        $this->fail('Worker not added/finished in ' . $timeout . 'seconds: ' . $class);
     }
 
     /**
@@ -387,6 +417,8 @@ abstract class editor_Test_ApiTest extends TestCase
             // makes sure the test customer is present in the DB and exposes it's id
             static::assertTestCustomers();
         }
+
+        self::$lastWorkerId = DbHelper::getLastWorkerId();
     }
 
     /**

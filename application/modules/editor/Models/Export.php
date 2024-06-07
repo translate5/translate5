@@ -181,6 +181,11 @@ class editor_Models_Export
 
         /* @var editor_Models_Import_FileParser $importFileParser */
         $importFileParser = $file->getFileParser();
+
+        if (empty($importFileParser) || ! class_exists($importFileParser)) {
+            return null;
+        }
+
         $exportParser = $importFileParser::getExportClass();
 
         if (empty($exportParser) || ! class_exists($exportParser)) {

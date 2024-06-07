@@ -124,7 +124,7 @@ abstract class editor_Test_JsonTest extends editor_Test_ImportTest
                 throw $lastException;
             }
         } else {
-            $this->assertEquals($numSegments, $numExpectations, $message . ' [Number of segments does not match the expectations]');
+            $this->assertEquals($numExpectations, $numSegments, $message . ' [Number of segments does not match the expectations]');
         }
     }
 

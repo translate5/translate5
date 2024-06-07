@@ -82,6 +82,9 @@ Ext.define('Editor.util.Node', {
             node = childNode.parentNode,
             rangeForChildnode = rangy.createRange(),
             splittedNodes;
+        if(! node.parentNode) {
+            return;
+        }
         // Set range....
         rangeForChildnode.setStartBefore(childNode);
         // ... take out the childNode ...
