@@ -30,7 +30,7 @@ class editor_Models_Export_FileParser_Sdlxliff_RepairLockedReferences
 
         $lockedReferences = [];
 
-        // collect all source tags which(grouped by tag id which actually is the target transunit id) are pointing to locked transunit
+        // Collect all duplicate transunit x tag pairs matched by same xid
         $xmlparser->registerElement(
             'trans-unit x[xid^=lockTU_]',
             function ($tag, $attr, $key) use (&$lockedReferences) {
@@ -59,7 +59,8 @@ class editor_Models_Export_FileParser_Sdlxliff_RepairLockedReferences
             }
         );
 
-        // filter out the tag pairs where the target tu ids are not equal
+        // at the end of the body tag, remove all collected references which are not valid anymore.
+        // Not valid are the one which do not have any duplicate apir
         $xmlparser->registerElement('body', closer: function ($tag, $key, $opener) use (&$lockedReferences) {
             foreach ($lockedReferences as $key => $lockedTuId) {
                 if (! $lockedTuId->match()) {
