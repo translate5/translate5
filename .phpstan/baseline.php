@@ -1063,12 +1063,12 @@ $ignoreErrors[] = [
 ];
 $ignoreErrors[] = [
 	'message' => '#^Access to an undefined property Zend_Controller_Action_HelperBroker\\:\\:\\$layout\\.$#',
-	'count' => 6,
+	'count' => 7,
 	'path' => __DIR__ . '/../application/modules/editor/Controllers/IndexController.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Access to an undefined property Zend_Controller_Action_HelperBroker\\:\\:\\$viewRenderer\\.$#',
-	'count' => 1,
+	'count' => 2,
 	'path' => __DIR__ . '/../application/modules/editor/Controllers/IndexController.php',
 ];
 $ignoreErrors[] = [

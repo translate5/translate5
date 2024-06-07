@@ -359,6 +359,9 @@ class Models_Installer_Standalone
             ]);
             $this->dbCredentials = $conf->resources->db->params->toArray();
             date_default_timezone_set($this->options['timezone']);
+            if ($this->recreateDb && ($this->options['forceRecreateDb'] ?? false)) {
+                $this->recreateDatabase();
+            }
         } else {
             $this->boostrapInstallationIni();
             if ($this->recreateDb) {

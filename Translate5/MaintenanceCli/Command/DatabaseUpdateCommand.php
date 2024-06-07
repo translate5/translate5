@@ -28,10 +28,12 @@
 
 namespace Translate5\MaintenanceCli\Command;
 
+use ReflectionException;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use Zend_Exception;
 
 class DatabaseUpdateCommand extends Translate5AbstractCommand
 {
@@ -76,13 +78,31 @@ class DatabaseUpdateCommand extends Translate5AbstractCommand
             'assume-imported',
             null,
             InputOption::VALUE_NONE,
-            'WARNING: Instead of importing the selected file it is just marked as imported without applying the content to the DB!'
+            'WARNING: Instead of importing the selected file it is just '
+                . 'marked as imported without applying the content to the DB!'
+        );
+
+        $this->addOption(
+            'list-all-installed',
+            'l',
+            InputOption::VALUE_NONE,
+            'Just list all installed DB files, does not import anything.'
+        );
+
+        $this->addOption(
+            'remove-imported',
+            null,
+            InputOption::VALUE_REQUIRED,
+            'DANGER: removes an entry from the dbversion table, identified by hash. Use only if you know what you do'
         );
     }
 
     /**
      * Execute the command
      * {@inheritDoc}
+     * @return int
+     * @throws ReflectionException
+     * @throws Zend_Exception
      * @see \Symfony\Component\Console\Command\Command::execute()
      */
     protected function execute(InputInterface $input, OutputInterface $output)
@@ -93,6 +113,32 @@ class DatabaseUpdateCommand extends Translate5AbstractCommand
         $this->writeTitle('database management');
 
         $dbupdater = \ZfExtended_Factory::get(\ZfExtended_Models_Installer_DbUpdater::class, [true]);
+
+        if ($remove = $this->input->getOption('remove-imported')) {
+            $dbversion = \ZfExtended_Factory::get(\ZfExtended_Models_Db_DbVersion::class);
+            $found = $dbversion->fetchRow($dbversion->select()->where('md5 = ?', $remove));
+
+            if (empty($found)) {
+                $this->io->error('No DB entry found for hash ' . $remove);
+
+                return self::FAILURE;
+            }
+
+            $this->writeAssoc($found->toArray());
+            if ($this->io->confirm(
+                'Do you really want to delete the above DB alter entry from the dbversion table?'
+            )) {
+                $found->delete();
+            }
+
+            return self::SUCCESS;
+        }
+
+        if ($this->input->getOption('list-all-installed')) {
+            $this->renderListTable();
+
+            return self::SUCCESS;
+        }
 
         //print on develop machines the configured sqlPaths and in the Browser GUI
         $usedPaths = $dbupdater->calculateChanges();
@@ -245,5 +291,20 @@ class DatabaseUpdateCommand extends Translate5AbstractCommand
         }
 
         return 0;
+    }
+
+    /**
+     * @throws ReflectionException
+     */
+    private function renderListTable(): void
+    {
+        $dbversion = \ZfExtended_Factory::get(\ZfExtended_Models_Db_DbVersion::class);
+        $installed = $dbversion->fetchAll()->toArray();
+        $table = $this->io->createTable();
+        $table->setHeaders(['id', 'origin', 'filename', 'md5', 'appVersion', 'created']);
+        foreach ($installed as $inst) {
+            $table->addRow($inst);
+        }
+        $table->render();
     }
 }

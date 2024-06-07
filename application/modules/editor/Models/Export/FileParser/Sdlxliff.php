@@ -217,13 +217,14 @@ class editor_Models_Export_FileParser_Sdlxliff extends editor_Models_Export_File
         $matchRateType = explode(';', $this->_segmentEntity->getMatchRateType());
 
         $mid = $this->_segmentEntity->getMid();
-        $segPart = &$file[$i + 1];
+        $segPart = &$file[$this->getSegDefsPartKey($file, $i, $mid)];
+
         //example string
         //<sdl:seg-defs><sdl:seg id="16" conf="Translated" origin="tm" origin-system="Bosch_Ruoff_de-DE-en-US" percent="100"
-        if (preg_match('#<sdl:seg[^>]* id="' . $mid . '"[^>]*conf="\w+"#', $segPart) === 1) {
+        if (preg_match('#<sdl:seg[^>]* id="' . $mid . '"[^>]*conf=".+"#U', $segPart) === 1) {
             //if conf attribute is already defined
             $segPart = preg_replace(
-                '#(<sdl:seg[^>]* id="' . $mid . '"[^>]*conf=)"\w+"#',
+                '#(<sdl:seg[^>]* id="' . $mid . '"[^>]*conf=)".+"#U',
                 '\\1"Draft"',
                 $segPart
             );
@@ -231,10 +232,10 @@ class editor_Models_Export_FileParser_Sdlxliff extends editor_Models_Export_File
             $segPart = preg_replace('#(<sdl:seg[^>]* id="' . $mid . '" *)#', '\\1conf="Draft" ', $segPart);
         }
 
-        if (preg_match('#<sdl:seg[^>]* id="' . $mid . '"[^>]*origin="\w+"#', $segPart) === 1) {
+        if (preg_match('#<sdl:seg[^>]* id="' . $mid . '"[^>]*origin=".+"#U', $segPart) === 1) {
             //if origin attribute is already defined
             $segPart = preg_replace(
-                '#(<sdl:seg[^>]* id="' . $mid . '"[^>]*origin=)"\w+"#',
+                '#(<sdl:seg[^>]* id="' . $mid . '"[^>]*origin=)".+"#U',
                 '\\1"' . $matchRateType[1] . '"',
                 $segPart
             );
@@ -246,10 +247,10 @@ class editor_Models_Export_FileParser_Sdlxliff extends editor_Models_Export_File
             );
         }
 
-        if (preg_match('#<sdl:seg[^>]* id="' . $mid . '"[^>]*origin-system="\w+"#', $segPart) === 1) {
+        if (preg_match('#<sdl:seg[^>]* id="' . $mid . '"[^>]*origin-system="+"#U', $segPart) === 1) {
             //if origin-system attribute is already defined
             $segPart = preg_replace(
-                '#(<sdl:seg[^>]* id="' . $mid . '"[^>]*origin-system=)"\w+"#',
+                '#(<sdl:seg[^>]* id="' . $mid . '"[^>]*origin-system=)".+"#U',
                 '\\1"' . $matchRateType[2] . '"',
                 $segPart
             );
@@ -262,6 +263,19 @@ class editor_Models_Export_FileParser_Sdlxliff extends editor_Models_Export_File
         }
 
         return $file;
+    }
+
+    private function getSegDefsPartKey(array $file, int $i, string $mid): int
+    {
+        for ($j = $i + 1; $j < count($file); $j++) {
+            $segPart = $file[$j];
+
+            if (preg_match('#<sdl:seg[^>]* id="' . $mid . '"[^>]*#U', $segPart) === 1) {
+                return $j;
+            }
+        }
+
+        return $i;
     }
 
     /**
@@ -279,7 +293,7 @@ class editor_Models_Export_FileParser_Sdlxliff extends editor_Models_Export_File
         }
 
         $mid = $this->_segmentEntity->getMid();
-        $segPart = &$file[$i + 1];
+        $segPart = &$file[$this->getSegDefsPartKey($file, $i, $mid)];
         //example string
         //<sdl:seg-defs><sdl:seg id="16" conf="Translated" origin="tm" origin-system="Bosch_Ruoff_de-DE-en-US" percent="100"
         if (preg_match('#<sdl:seg[^>]* id="' . $mid . '"[^>]*percent="\d+"#', $segPart) === 1) {

@@ -26,15 +26,9 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-/**#@+
- * @author Marc Mittag
- * @package editor
- * @version 1.0
- *
- */
-
 /**
- * Foldertree Object Instanz wie in der Applikation benötigt
+ * @method string getTaskGuid()
+ * @method void setTaskGuid(string $taskGuid)
  */
 class editor_Models_Foldertree extends ZfExtended_Models_Entity_Abstract
 {
