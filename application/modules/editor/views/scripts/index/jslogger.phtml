@@ -65,6 +65,30 @@ END LICENSE AND COPYRIGHT
                 showErrorDialog : {
                     titleText: 'Submit translate5 crash report'
                 },
+                onErrorLogged: function(result, data) {
+                    let decodedResult = null, logData = {};
+                    try {
+                        decodedResult = Ext.decode(result, true);
+                        logData.link = decodedResult.link;
+                        logData.status = decodedResult.status;
+                    } catch (e) {
+                        logData.link = 'Could not parse rootcause result: ' + e.message;
+                    }
+
+                    logData.localDate = data.localDate;
+                    logData.href = data.href;
+                    logData.errorMessage = data.msg;
+                    logData.userMessage = data.user?.message;
+                    logData.userName = data.user?.name;
+                    logData.browser = data.browser + ' (' + data.browserVersion + ') on ' + data.os;
+                    logData.location = data.file + ' (' + data.line + ') in ' + data.functionName;
+
+                    Ext.Ajax.request({
+                        url: Editor.data.restpath + 'index/logrootcause',
+                        method: 'post',
+                        params: logData
+                    });
+                },
                 maxNbrOfReportedErrors : 1,
                 version : "<?php echo $this->appVersion; ?>",
                 frameworkVersion : "ExtJS <?php echo $this->extJsVersion; ?>"

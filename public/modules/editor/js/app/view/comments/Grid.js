@@ -55,13 +55,19 @@ Ext.define('Editor.view.comments.Grid', {
     
     me.commentTpl = new Ext.XTemplate([
        '<div class="comment">',
-       '<span class="content">{content:nl2br}</span>',  //nl2br format methode anwenden!
+       '<span class="content">{[this.formatContent(values.content)]}</span>',
        '<span class="author">{author}</span> - ',
        '<span class="created">{created}</span>',
        '<tpl if="isMod">',
            ' <span class="modified">({label} {modified})</span>',
        '</tpl>',
-       '</div>'
+       '</div>',
+       {
+           formatContent: function(content) {
+           // Chain the nl2br and htmlEncode functions
+               return Ext.util.Format.nl2br(Ext.util.Format.htmlEncode(content));
+           }
+       }
     ]);
     
     config = {

@@ -26,6 +26,8 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use editor_Segment_Internal_TagComparision as TagComparision;
+use editor_Segment_Tag as Tag;
 use MittagQI\Translate5\Acl\Rights;
 
 /**
@@ -68,24 +70,30 @@ class editor_Models_Quality_RequestState
 
     /**
      * The current user restriction
-     * @var string
      */
-    private $userGuid = null;
+    private ?string $userGuid = null;
 
     /**
-     * @var int
+     * Editable-only restriction
      */
-    private $editableRestriction = null;
+    private ?int $editableRestriction = null;
 
     /**
-     * @var array
+     * 'Non blocked'-only restriction
      */
-    private $segmentIdsRestriction = null;
+    private ?int $nonBlockedRestriction = null;
 
     /**
+     * 'Certain segments'-only restriction
+     */
+    private ?array $segmentIdsRestriction = null;
+
+    /**
+     * Flag indicating whether quality category 'internal_tag_structure_faulty' is mentioned within current filters
+     *
      * @var boolean
      */
-    private $hasEditableFaults = false;
+    private bool $hasEditableFaults = false;
 
     public function __construct(string $requestValue = null, editor_Models_Task $task)
     {
@@ -122,9 +130,17 @@ class editor_Models_Quality_RequestState
                         if (! array_key_exists($type, $this->catsByType)) {
                             $this->catsByType[$type] = [];
                         }
-                        if ($type == editor_Segment_Tag::TYPE_INTERNAL && ($category == editor_Segment_Internal_TagComparision::TAG_STRUCTURE_FAULTY || $category == editor_Segment_Internal_TagComparision::TAG_STRUCTURE_FAULTY_NONEDITABLE)) {
-                            $this->catsByType[$type][] = editor_Segment_Internal_TagComparision::TAG_STRUCTURE_FAULTY;
-                            if ($category == editor_Segment_Internal_TagComparision::TAG_STRUCTURE_FAULTY) {
+                        if ($type === editor_Segment_Consistent_QualityProvider::qualityType()) {
+                            $this->nonBlockedRestriction = 1;
+                        }
+                        if ($type == Tag::TYPE_INTERNAL && in_array(
+                            $category,
+                            [
+                                TagComparision::TAG_STRUCTURE_FAULTY,
+                                TagComparision::TAG_STRUCTURE_FAULTY_NONEDITABLE]
+                        )) {
+                            $this->catsByType[$type][] = TagComparision::TAG_STRUCTURE_FAULTY;
+                            if ($category == TagComparision::TAG_STRUCTURE_FAULTY) {
                                 $this->hasEditableFaults = true;
                                 $hasOtherCats = true;
                             } else {
@@ -138,9 +154,9 @@ class editor_Models_Quality_RequestState
                 }
                 // prevent the potential duplication of the TAG_STRUCTURE_FAULTY category and evaluate the needed editable restriction
                 if ($hasNonEditableFaults) {
-                    $this->catsByType[editor_Segment_Tag::TYPE_INTERNAL] = array_unique($this->catsByType[editor_Segment_Tag::TYPE_INTERNAL]);
+                    $this->catsByType[Tag::TYPE_INTERNAL] = array_unique($this->catsByType[Tag::TYPE_INTERNAL]);
                     $this->editableRestriction = ($hasOtherCats) ? null : 0;
-                } else {
+                } elseif (! $this->nonBlockedRestriction) {
                     $this->editableRestriction = 1;
                 }
             }
@@ -258,6 +274,16 @@ class editor_Models_Quality_RequestState
         $this->createSegmentFilters();
 
         return ($this->editableRestriction !== null);
+    }
+
+    /**
+     * Retrieves, if the shown segments should be restricted to non-blocked segments in the main segment filter
+     */
+    public function hasNonBlockedRestriction(): bool
+    {
+        $this->createSegmentFilters();
+
+        return ($this->nonBlockedRestriction !== null);
     }
 
     public function getEditableRestriction(): ?int

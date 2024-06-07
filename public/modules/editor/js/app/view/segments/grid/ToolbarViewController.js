@@ -85,7 +85,12 @@ Ext.define('Editor.view.segments.grid.ToolbarViewController', {
             params: params,
             timeout: 240000,
             scope: me,
-            success: function(){
+            success: function(xhr){
+                if (opName.match('lock')) {
+                    var json = xhr.responseJson, segmentsCtrl = Editor.app.getController('Segments');
+                    segmentsCtrl.updateSegmentFinishCountViewModel(json.taskProgress, json.userProgress);
+                    segmentsCtrl.fireEvent('segmentLockToggled', true);
+                }
                 grid.store.load({
                     callback: function(){
                         let selSeg = grid.getViewModel().get('selectedSegment'),

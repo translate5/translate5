@@ -66,6 +66,8 @@ final class Task extends Resource
 
     public string $foreignName;
 
+    public string $workflow = 'default';
+
     private ?string $_uploadFolder = null;
 
     private ?array $_uploadFiles = null;

@@ -29,7 +29,6 @@ END LICENSE AND COPYRIGHT
 use editor_Models_Import_FileParser_Xlf_LengthRestriction as XlfLengthRestriction;
 use editor_Models_Import_FileParser_Xlf_SurroundingTagRemover_Abstract as AbstractSurroundingTagRemover;
 use editor_Models_Import_FileParser_XmlParser as XmlParser;
-use MittagQI\Translate5\ContentProtection\NumberProtection\Tag\NumberTag;
 use MittagQI\Translate5\ContentProtection\NumberProtection\Tag\NumberTagRenderer;
 use MittagQI\Translate5\Task\Import\FileParser\Xlf\Comments;
 use MittagQI\Translate5\Task\Import\FileParser\Xlf\NamespaceRegistry;
@@ -364,11 +363,45 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
             }
         );
 
-        $this->xmlparser->registerElement('trans-unit alt-trans', function ($tag, $attributes) {
+        $this->xmlparser->registerElement('trans-unit alt-trans target', null, function ($tag, $key, $opener) {
+            $attributes = $this->xmlparser->getParent('alt-trans')['attributes'] ?? [];
             $mid = $this->xmlparser->getAttribute($attributes, 'mid', 0); //defaulting to 0 for transunits without mrks
             $matchRate = $this->xmlparser->getAttribute($attributes, 'match-quality', false);
-            if ($matchRate !== false) {
-                $this->matchRate[$mid] = (int) trim($matchRate, '% '); //removing the percent sign
+
+            if ($matchRate === false) {
+                return;
+            }
+
+            // If the match rate is not set yet, we set it here to the first found value
+            // to make it work as it worked before the adding target comparison below
+            if (! isset($this->matchRate[$mid])) {
+                $this->matchRate[$mid] = $matchRate;
+            }
+
+            if (empty($this->currentTarget)) {
+                return;
+            }
+
+            $matchRate = (int) trim($matchRate, '% ');
+            $currentTarget = current($this->currentTarget);
+            $targetContent = implode(
+                '',
+                $this->xmlparser->getChunks(
+                    $currentTarget['opener'] + 1, // we don't need to opening tag
+                    $currentTarget['closer'] - $currentTarget['opener'] - 1 // we don't need the closing tag
+                )
+            );
+            $altTransTarget = implode(
+                '',
+                $this->xmlparser->getChunks(
+                    $opener['openerKey'] + 1, // we don't need to opening tag
+                    $key - $opener['openerKey'] - 1 // we don't need the closing tag
+                )
+            );
+
+            // Only update the match rate if the target content is the same as the alt
+            if ($targetContent === $altTransTarget) {
+                $this->matchRate[$mid] = $matchRate;
             }
         });
     }
@@ -638,11 +671,12 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
             } catch (Throwable $e) {
                 $msg = $e->getMessage() . "\n" . 'In trans-unit ' . print_r($opener['attributes']);
                 if ($e instanceof ZfExtended_Exception) {
-                    $e->setMessage($msg, 1);
+                    $e->setMessage($msg, true);
 
                     throw $e;
                 }
 
+                /* @phpstan-ignore-next-line */
                 throw new ZfExtended_Exception($msg, 0, $e);
             }
             //leaving a transunit means disable segment processing
@@ -966,7 +1000,7 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
             }
 
             $this->contentProtector->filterTagsInChunks($sourceChunks, $targetChunks);
-            
+
             $this->surroundingTags->calculate($preserveWhitespace, $sourceChunks, $targetChunks, $this->xmlparser);
 
             $this->segmentData = [];

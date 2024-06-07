@@ -179,8 +179,18 @@ Ext.define('Editor.controller.Segments', {
         this.lastFileMapParams = null;
     },
 
-    onOpenEditorViewport: function (app, task) {
-        this.updateSegmentFinishCountViewModel(task);
+    /**
+     * @param {Editor.$application} app
+     * @param {Editor.model.admin.Task} task
+     * @param {Ext.data.operation.Update} operation
+     */
+    onOpenEditorViewport: function (app, task, operation) {
+
+        // Get response json
+        var json = operation.getResponse().responseJson;
+
+        // Update progress
+        this.updateSegmentFinishCountViewModel(json.taskProgress, json.userProgress);
     },
 
     /**
@@ -283,6 +293,15 @@ Ext.define('Editor.controller.Segments', {
     },
 
     /**
+     * Retrieves the edited column currently being edited (usually "targetEdit" or "sourceEdit")
+     * @returns {null|string}
+     */
+    getColumnToEdit: function(){
+        var grid = this.getSegmentGrid();
+        return (grid && grid.editingPlugin) ? grid.editingPlugin.editor.columnToEdit : null;
+    },
+
+    /**
      * reset grid filter and sort, grid will be reloaded and scrolled to top
      */
     clearSortAndFilter: function () {
@@ -339,7 +358,8 @@ Ext.define('Editor.controller.Segments', {
     },
 
     onToggleLockBtn: function () {
-        let grid = this.getSegmentGrid(),
+        let me = this,
+            grid = this.getSegmentGrid(),
             vm = grid.getViewModel(),
             ed = grid && grid.editingPlugin,
             segment = vm.get('selectedSegment'),
@@ -355,8 +375,11 @@ Ext.define('Editor.controller.Segments', {
         segment.proxy.appendId = false;
         segment.load({
             url: segment.proxy.url + '/' + segment.get('id') + '/' + operation + '/operation',
-            success: function (seg) {
+            success: function (seg, operation) {
                 vm.set('selectedSegment', seg);
+                var json = operation.getResponse().responseJson;
+                me.updateSegmentFinishCountViewModel(json.taskProgress, json.userProgress);
+                me.fireEvent('segmentLockToggled', false);
             }
         });
         segment.proxy.appendId = appendId;
@@ -680,7 +703,7 @@ Ext.define('Editor.controller.Segments', {
         //for later usage in ChangeAlike Handling and the saved record
         me.fireEvent('afterSaveCall', function () {
             me.saveChainEnd(record);
-        }, record);
+        }, record, ed.editor.columnToEdit);
     },
     /**
      * callback of saving a segment record
@@ -708,15 +731,13 @@ Ext.define('Editor.controller.Segments', {
         //the 'saveComplete' event is subscribed in 'ChangeAlike' controller, and it is disabled if the manual processing is disabled
         //we are not able to use the event listener priority because of the extjs bug : https://www.sencha.com/forum/showthread.php?305085-Observable-listener-priority-does-not-work
         //this bug also exist in extjs 6.2.0
-        me.fireEvent('beforeSaveCall', record);
+        me.fireEvent('beforeSaveCall', record, this.getColumnToEdit());
 
-        //get the segmentFinishCount parameter from the response
-        var response = operation.getResponse(),
-            decoded = response.responseText && Ext.JSON.decode(response.responseText),
-            segmentFinishCount = decoded && decoded.segmentFinishCount;
+        // Get response json
+        var json = operation.getResponse().responseJson;
 
-        //TODO: this should be implemented with websokets(when ready)
-        me.updateSegmentFinishCountViewModel(Ext.Number.from(segmentFinishCount, 0));
+        // Update progress
+        me.updateSegmentFinishCountViewModel(json.taskProgress, json.userProgress);
 
         //invoking change alike handling:
         if (me.fireEvent('saveComplete')) {
@@ -760,8 +781,7 @@ Ext.define('Editor.controller.Segments', {
      * On save alike sucess handler
      */
     onAlikesSaveSuccessHandler: function (data) {
-        var value = Ext.Number.from(data.segmentFinishCount, 0);
-        this.updateSegmentFinishCountViewModel(value);
+        this.updateSegmentFinishCountViewModel(data.taskProgress, data.userProgress);
     },
 
     /**
@@ -795,19 +815,24 @@ Ext.define('Editor.controller.Segments', {
     },
 
     /**
-     * Update the segmentFinishCount segments grid view model.
+     * Update the taskProgress and userProgress
+     *
+     * @param {float} taskProgress
+     * @param {float} userProgress
      */
-    updateSegmentFinishCountViewModel: function (record) {
+    updateSegmentFinishCountViewModel: function (taskProgress, userProgress) {
         var me = this,
             grid = me.getSegmentGrid(),
-            vm = grid && grid.getViewModel(),
-            value = Ext.isNumber(record) ? record : record.get('segmentFinishCount');
+            vm = grid && grid.getViewModel();
 
+        // If no vm is accessible - return
         if (!vm) {
             return;
         }
 
-        vm.set('segmentFinishCount', value);
+        // Update taskProgress and userProgress
+        vm.set('taskProgress', taskProgress);
+        vm.set('userProgress', userProgress);
     },
     /**
      * Handles the cancel edit of the segment grid

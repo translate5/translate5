@@ -40,12 +40,16 @@ class Models_SystemRequirement_Modules_Configuration extends ZfExtended_Models_S
 {
     public const MEMCACHE_ID = 'Models_SystemRequirement_Modules_Configuration::checkServerName';
 
+    public const MAINTENANCE_WARNING = 'Checked instance URL is in maintenance mode, test can not be done!';
+
+    public const RESULT_ID = 'configuration';
+
     /**
      * @see ZfExtended_Models_SystemRequirement_Modules_Abstract::validate()
      */
     public function validate(): ZfExtended_Models_SystemRequirement_Result
     {
-        $this->result->id = 'configuration';
+        $this->result->id = self::RESULT_ID;
         $this->result->name = 'Configuration';
 
         $this->checkServerName();
@@ -79,7 +83,7 @@ class Models_SystemRequirement_Modules_Configuration extends ZfExtended_Models_S
         }
 
         if (str_contains($curlErrorWorker, '503 Service Unavailable')) {
-            $this->result->warning[] = 'Checked instance URL is in maintenance mode, test can not be done!';
+            $this->result->warning[] = self::MAINTENANCE_WARNING;
 
             return;
         }

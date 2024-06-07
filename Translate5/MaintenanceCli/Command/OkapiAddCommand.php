@@ -31,6 +31,7 @@ namespace Translate5\MaintenanceCli\Command;
 use MittagQI\Translate5\Plugins\Okapi\ConfigMaintenance;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Zend_Exception;
 
@@ -57,6 +58,12 @@ class OkapiAddCommand extends Translate5AbstractCommand
             'The name of the new Okapi instance, defaults to the path part which contains the version.
             If a same named entry exists, the URL is updated.'
         );
+
+        $this->addOption(
+            name: 'detect-versions',
+            mode: InputOption::VALUE_NONE,
+            description: 'It is attempted to find and add all versions behind the given url, which is expected to be a jetty root URL'
+        );
     }
 
     /**
@@ -74,6 +81,7 @@ class OkapiAddCommand extends Translate5AbstractCommand
 
         $url = $this->input->getArgument('url');
         $name = $this->input->getArgument('name');
+        $detectVersions = $this->input->getOption('detect-versions');
 
         if (empty($name)) {
             $name = basename($url);
@@ -83,11 +91,27 @@ class OkapiAddCommand extends Translate5AbstractCommand
         if (! $config->isPluginActive()) {
             $this->io->warning('Plugin Okapi is disabled - the config changes are still applied!');
         }
-        $oldValue = $config->addServer($url, $name);
-        if (empty($oldValue)) {
-            $this->io->success('Added ' . $name . ' with ' . $url);
+
+        if($detectVersions){
+
+            $addedUrls = $config->addJettyUrl($url);
+
+            if(empty($addedUrls)){
+                $this->io->error('No OKAPI versions detected behind ' . $url);
+            } else {
+                foreach($addedUrls as $name => $url){
+                    $this->io->success('Added/Updated ' . $name . ' with ' . $url);
+                }
+            }
+
         } else {
-            $this->io->warning('Reset ' . $name . ' from ' . $oldValue . ' to ' . $url);
+
+            $oldValue = $config->addServer($url, $name);
+            if (empty($oldValue)) {
+                $this->io->success('Added ' . $name . ' with ' . $url);
+            } else {
+                $this->io->warning('Reset ' . $name . ' from ' . $oldValue . ' to ' . $url);
+            }
         }
 
         return self::SUCCESS;

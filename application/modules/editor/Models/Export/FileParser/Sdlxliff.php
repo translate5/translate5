@@ -26,11 +26,10 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-/** #@+
- * @author Marc Mittag
- * @package editor
- * @version 1.0
- */
+use editor_Models_Segment as Segment;
+use editor_Models_Segment_AutoStates as AutoStates;
+use editor_Models_Segment_MatchRateType as MatchRateType;
+use editor_Models_Export_FileParser_Sdlxliff_TrackChangesFormatter as TrackChangesFormatter;
 
 /**
  * Parsed mit editor_Models_Import_FileParser_Sdlxliff geparste Dateien für den Export
@@ -44,21 +43,13 @@ class editor_Models_Export_FileParser_Sdlxliff extends editor_Models_Export_File
 
     private array $revisions = [];
 
-    private editor_Models_Import_FileParser_XmlParser $xmlParser;
+    private ?TrackChangesFormatter $trackChangesFormatter = null;
 
     public function __construct(editor_Models_Task $task, int $fileId, string $path, array $options = [])
     {
-        //$this->isTrackChangesPluginActive = Zend_Registry::get('PluginManager')->isActive('TrackChanges');
-        $this->isTrackChangesPluginActive = false;
+        $this->isTrackChangesPluginActive = Zend_Registry::get('PluginManager')->isActive('TrackChanges');
         parent::__construct($task, $fileId, $path, $options);
 
-        $this->xmlParser = new editor_Models_Import_FileParser_XmlParser();
-
-        $this->registerTrackChangesMarkupTransform($task);
-    }
-
-    private function registerTrackChangesMarkupTransform(editor_Models_Task $task): void
-    {
         if (! $this->isTrackChangesPluginActive) {
             return;
         }
@@ -68,34 +59,7 @@ class editor_Models_Export_FileParser_Sdlxliff extends editor_Models_Export_File
             'userName',
             'id'
         );
-        $this->xmlParser->registerElement(
-            'ins, del',
-            fn ($tag, $attr, $key) => $this->xmlParser->replaceChunk($key, ''),
-            function (string $tag, int $key, array $opener) use ($trackChangeIdToUserName): void {
-                $attrs = $opener['attributes'];
-                $uuid = ZfExtended_Utils::uuid();
-                $ins = 'ins' === $opener['tag'];
-
-                $revTag = sprintf(
-                    '<rev-def id="%s"%s author="%s" date="%s" />',
-                    $uuid,
-                    $ins ? '' : ' type="Delete"',
-                    $trackChangeIdToUserName[$attrs['data-usertrackingid']],
-                    DateTime::createFromFormat('Y-m-d\TH:i:sO', $attrs['data-timestamp'])->format('m/d/Y H:i:s')
-                );
-
-                $this->revisions[] = $revTag;
-
-                $mrk = sprintf(
-                    '<mrk mtype="x-sdl-%s" sdl:revid="%s">%s</mrk>',
-                    $ins ? 'added' : 'deleted',
-                    $uuid,
-                    $this->xmlParser->getRange($opener['openerKey'] + 1, $key - 1, true)
-                );
-                $this->xmlParser->replaceChunk($opener['openerKey'] + 1, $mrk);
-                $this->xmlParser->replaceChunk($key, '');
-            }
-        );
+        $this->trackChangesFormatter = new TrackChangesFormatter($trackChangeIdToUserName);
     }
 
     protected function classNameDifftagger(): ?editor_Models_Export_DiffTagger
@@ -121,7 +85,7 @@ class editor_Models_Export_FileParser_Sdlxliff extends editor_Models_Export_File
         $segment = preg_replace('"<img[^>]*>"', '', $segment);
 
         if ($this->isTrackChangesPluginActive) {
-            return $this->xmlParser->parse(parent::parseSegment($segment));
+            return $this->trackChangesFormatter->toSdlxliffFormat($segment, $this->revisions);
         }
 
         return parent::parseSegment($segment);
@@ -224,6 +188,96 @@ class editor_Models_Export_FileParser_Sdlxliff extends editor_Models_Export_File
         return '';
     }
 
+    protected function writeBySegmentMetadata(array $file, int $i): array
+    {
+        $file = $this->writeMatchRate($file, $i);
+
+        return $this->writeSegmentDraftState($file, $i);
+    }
+
+    protected function writeSegmentDraftState(array $file, int $i)
+    {
+        // if match-rate is 0 - segment was not pre-translated, do not generate the percent tag
+        if ($this->_segmentEntity->getMatchRate() < 1) {
+            return $file;
+        }
+
+        if (Segment::PRETRANS_INITIAL !== (int) $this->_segmentEntity->getPretrans()) {
+            return $file;
+        }
+
+        if (AutoStates::PRETRANSLATED !== (int) $this->_segmentEntity->getAutoStateId()) {
+            return $file;
+        }
+
+        if (! MatchRateType::isTypePretranslated($this->_segmentEntity->getMatchRateType())) {
+            return $file;
+        }
+
+        $matchRateType = explode(';', $this->_segmentEntity->getMatchRateType());
+
+        $mid = $this->_segmentEntity->getMid();
+        $segPart = &$file[$this->getSegDefsPartKey($file, $i, $mid)];
+
+        //example string
+        //<sdl:seg-defs><sdl:seg id="16" conf="Translated" origin="tm" origin-system="Bosch_Ruoff_de-DE-en-US" percent="100"
+        if (preg_match('#<sdl:seg[^>]* id="' . $mid . '"[^>]*conf=".+"#U', $segPart) === 1) {
+            //if conf attribute is already defined
+            $segPart = preg_replace(
+                '#(<sdl:seg[^>]* id="' . $mid . '"[^>]*conf=)".+"#U',
+                '\\1"Draft"',
+                $segPart
+            );
+        } else {
+            $segPart = preg_replace('#(<sdl:seg[^>]* id="' . $mid . '" *)#', '\\1conf="Draft" ', $segPart);
+        }
+
+        if (preg_match('#<sdl:seg[^>]* id="' . $mid . '"[^>]*origin=".+"#U', $segPart) === 1) {
+            //if origin attribute is already defined
+            $segPart = preg_replace(
+                '#(<sdl:seg[^>]* id="' . $mid . '"[^>]*origin=)".+"#U',
+                '\\1"' . $matchRateType[1] . '"',
+                $segPart
+            );
+        } else {
+            $segPart = preg_replace(
+                '#(<sdl:seg[^>]* id="' . $mid . '" *)#',
+                '\\1origin="' . $matchRateType[1] . '" ',
+                $segPart
+            );
+        }
+
+        if (preg_match('#<sdl:seg[^>]* id="' . $mid . '"[^>]*origin-system="+"#U', $segPart) === 1) {
+            //if origin-system attribute is already defined
+            $segPart = preg_replace(
+                '#(<sdl:seg[^>]* id="' . $mid . '"[^>]*origin-system=)".+"#U',
+                '\\1"' . $matchRateType[2] . '"',
+                $segPart
+            );
+        } else {
+            $segPart = preg_replace(
+                '#(<sdl:seg[^>]* id="' . $mid . '" *)#',
+                '\\1origin-system="' . $matchRateType[2] . '" ',
+                $segPart
+            );
+        }
+
+        return $file;
+    }
+
+    private function getSegDefsPartKey(array $file, int $i, string $mid): int
+    {
+        for ($j = $i + 1; $j < count($file); $j++) {
+            $segPart = $file[$j];
+
+            if (preg_match('#<sdl:seg[^>]* id="' . $mid . '"[^>]*#U', $segPart) === 1) {
+                return $j;
+            }
+        }
+
+        return $i;
+    }
+
     /**
      * dedicated to write the match-Rate to the right position in the target format
      * @param array $file that contains file as array as splitted by parse function
@@ -239,7 +293,7 @@ class editor_Models_Export_FileParser_Sdlxliff extends editor_Models_Export_File
         }
 
         $mid = $this->_segmentEntity->getMid();
-        $segPart = &$file[$i + 1];
+        $segPart = &$file[$this->getSegDefsPartKey($file, $i, $mid)];
         //example string
         //<sdl:seg-defs><sdl:seg id="16" conf="Translated" origin="tm" origin-system="Bosch_Ruoff_de-DE-en-US" percent="100"
         if (preg_match('#<sdl:seg[^>]* id="' . $mid . '"[^>]*percent="\d+"#', $segPart) === 1) {
@@ -265,6 +319,10 @@ class editor_Models_Export_FileParser_Sdlxliff extends editor_Models_Export_File
         $this->injectRevisions();
         $this->injectCommentsHead();
         $this->fixLockSegmentTags();
+
+        if ($this->isTrackChangesPluginActive) {
+            return $this->utilities->internalTag->restore($this->_exportFile);
+        }
 
         return $this->_exportFile;
     }

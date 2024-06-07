@@ -69,21 +69,26 @@ class UserRepository
     /**
      * @return iterable<ZfExtended_Models_User>
      */
-    public function getPmList(bool $includePmlite = false): iterable
+    public function getPmList(array $roles, ?int $customerInContext = null): iterable
     {
         $userModel = ZfExtended_Factory::get(ZfExtended_Models_User::class);
-
-        $roles = [Roles::PM];
-        if ($includePmlite) {
-            $roles[] = Roles::PMLIGHT;
-        }
 
         $users = ZfExtended_Factory::get(ZfExtended_Models_User::class)->loadAllByRole($roles);
 
         foreach ($users as $user) {
             $userModel->init($user);
 
-            yield clone $userModel;
+            $roles = $userModel->getRoles();
+
+            if (in_array(Roles::PM, $roles)) {
+                yield clone $userModel;
+
+                continue;
+            }
+
+            if ($customerInContext !== null && in_array($customerInContext, $userModel->getCustomersArray())) {
+                yield clone $userModel;
+            }
         }
     }
 }

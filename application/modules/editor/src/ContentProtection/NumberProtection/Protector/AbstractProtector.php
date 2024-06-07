@@ -62,13 +62,9 @@ use MittagQI\Translate5\ContentProtection\NumberProtector;
 abstract class AbstractProtector implements NumberProtectorInterface
 {
     public function __construct(
-        protected ContentProtectionRepository $formatRepository
+        protected ContentProtectionRepository $formatRepository,
     ) {
     }
-
-    abstract public function validateFormat(string $format): bool;
-
-    abstract public function getFormatedExample(string $format): string;
 
     protected function tagFormat(): string
     {
@@ -83,7 +79,7 @@ abstract class AbstractProtector implements NumberProtectorInterface
         string $number,
         ContentProtectionDto $protectionDto,
         editor_Models_Languages $sourceLang,
-        editor_Models_Languages $targetLang
+        editor_Models_Languages $targetLang,
     ): string {
         if (! $protectionDto->keepAsIs && empty($protectionDto->outputFormat)) {
             throw new LogicException(
@@ -104,7 +100,7 @@ abstract class AbstractProtector implements NumberProtectorInterface
     protected function composeNumberTag(
         string $number,
         ContentProtectionDto $protectionDto,
-        editor_Models_Languages $targetLang
+        editor_Models_Languages $targetLang,
     ): string {
         return sprintf(
             $this->tagFormat(),

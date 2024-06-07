@@ -117,4 +117,26 @@ final class DbHelper
         $worker = ZfExtended_Factory::get(ZfExtended_Models_Worker::class);
         $worker->db->delete('1 = 1');
     }
+
+    public static function getLastWorkerId(): int
+    {
+        $worker = ZfExtended_Factory::get(ZfExtended_Models_Worker::class);
+        $s = $worker->db->select()->from($worker->db, ['id'])->order('id DESC')->limit(1);
+        $row = $worker->db->fetchRow($s);
+
+        return $row['id'] ?? 0;
+    }
+
+    public static function getLastWorkers(int $sinceId, string $workerClass, ?string $taskGuid): array
+    {
+        $worker = ZfExtended_Factory::get(ZfExtended_Models_Worker::class);
+        $s = $worker->db->select()
+            ->where('id > ?', $sinceId)
+            ->where('worker = ?', $workerClass);
+        if ($taskGuid !== null) {
+            $s->where('taskGuid = ?', $taskGuid);
+        }
+
+        return $worker->db->fetchAll($s)->toArray();
+    }
 }

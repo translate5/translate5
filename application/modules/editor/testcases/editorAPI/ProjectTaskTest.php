@@ -47,6 +47,10 @@ class ProjectTaskTest extends editor_Test_JsonTest
         'editor_Plugins_TermTagger_Bootstrap',
     ];
 
+    protected static array $requiredRuntimeOptions = [
+        'autoQA.autoStartOnImport' => 1,
+    ];
+
     protected static bool $setupOwnCustomer = true;
 
     protected static function setupImport(Config $config): void
@@ -57,6 +61,7 @@ class ProjectTaskTest extends editor_Test_JsonTest
             ->addDefaultCustomerId($ownCustomerId);
         $config->addTask(static::$sourceLangRfc, static::$targetLangRfc, $ownCustomerId)
             ->addUploadFolder('testfiles')
+            ->addTaskConfig('runtimeOptions.autoQA.autoStartOnImport', '1')
             ->setProperty('edit100PercentMatch', 0)
             ->setProperty('taskName', static::NAME_PREFIX . 'ProjectTaskTest'); // TODO FIXME: we better generate data independent from resource-names ...
     }
@@ -118,7 +123,12 @@ class ProjectTaskTest extends editor_Test_JsonTest
         $fileName = str_replace(['/', '::'], '_', $task->taskName . '.json');
         $segments = static::api()->getSegments($fileName);
         // compare segments (this API will strip/adjust segment contents)
-        $this->assertSegmentsEqualsJsonFile($fileName, $segments, 'Imported segments are not as expected in ' . basename($fileName) . '!');
+        $this->assertSegmentsEqualsJsonFile(
+            fileToCompare: $fileName,
+            segments: $segments,
+            message: 'Imported segments are not as expected in ' . basename($fileName) . '!',
+            stopOnFirstFailedDiff: false
+        );
 
         // close the task for editing
         static::api()->setTaskToOpen($task->id);

@@ -35,10 +35,6 @@ use MittagQI\Translate5\Test\Import\Config;
  */
 class QualityBaseTest extends editor_Test_JsonTest
 {
-    protected static array $forbiddenPlugins = [
-        editor_Plugins_Translate24_Init::class,
-    ];
-
     protected static array $requiredRuntimeOptions = [
         'autoQA.enableInternalTagCheck' => 1,
         'autoQA.enableEdited100MatchCheck' => 1,
@@ -58,6 +54,7 @@ class QualityBaseTest extends editor_Test_JsonTest
     {
         $config
             ->addTask('en', 'de', -1, 'csv-with-mqm-en-de.zip')
+            ->addTaskConfig('runtimeOptions.import.fileparser.csv.active', '1')
             // IMPORTANT: we disable the spellcheck qualities as these highly depend on the version. They are only tested with the explicit spellcheck-test
             ->addTaskConfig('runtimeOptions.autoQA.enableSegmentSpellCheck', '0')
             ->setToEditAfterImport();

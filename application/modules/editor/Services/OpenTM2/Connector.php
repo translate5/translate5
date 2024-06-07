@@ -706,9 +706,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
         }
 
         // let's check the internal state before calling API for status as import worker might not have run yet
-        if (! $this->hasMemories($this->languageResource)
-            && $this->languageResource->getStatus() === LanguageResourceStatus::IMPORT
-        ) {
+        if ($this->languageResource->getStatus() === LanguageResourceStatus::IMPORT) {
             return LanguageResourceStatus::IMPORT;
         }
 
@@ -813,7 +811,10 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
 
                     case 'error':
                     case 'failed':
-                        $lastStatusInfo = $apiResponse->ErrorMsg;
+                        $lastStatusInfo = $apiResponse->ErrorMsg
+                            ?? $apiResponse->importErrorMsg
+                            ?? $apiResponse->reorganizeErrorMsg
+                            ?? 'Unknown error';
                         $result = LanguageResourceStatus::ERROR;
 
                         break;
@@ -1483,8 +1484,12 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
         return ! empty($languageResource->getSpecificData('memories', parseAsArray: true));
     }
 
-    private function isMemoryOverflown(object $error): bool
+    private function isMemoryOverflown(?object $error): bool
     {
+        if (null === $error) {
+            return false;
+        }
+
         $errorCodes = explode(
             ',',
             $this->config->runtimeOptions->LanguageResources->t5memory->memoryOverflowErrorCodes
@@ -1583,7 +1588,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
 
     private function getOverflowSegmentNumber(string $error): int
     {
-        preg_match('/rc = \d+; segment #(\d+) wasn\'t imported/', $error, $matches);
+        preg_match('/rc = \d+; aciveSegment = (\d+)/', $error, $matches);
 
         if (! isset($matches[1])) {
             $this->logger->error(
@@ -1754,6 +1759,11 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
 
     private function exportAllAsArchive(array $memories, string $mime): string
     {
+        header('HTTP/1.0 403 Forbidden');
+        echo "<pre>The TM binary export is currently blocked for technical reasons.\n";
+        echo 'Der TM-Binary-Export ist augenblicklich aus technischen Gründen gesperrt.</pre>';
+        exit;
+        
         $exportDir = APPLICATION_PATH . '/../data/TMExport/';
         $tmpDir = $exportDir . $this->languageResource->getId() . '_' . uniqid() . '/';
         @mkdir($tmpDir, recursive: true);

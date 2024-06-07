@@ -117,14 +117,14 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
     protected editor_Models_Segment_TermTag $tagHelper;
 
     protected array $statOrder = [
-        self::STAT_PREFERRED => 1,
-        self::STAT_ADMITTED => 2,
-        self::STAT_LEGAL => 2,
-        self::STAT_REGULATED => 2,
-        self::STAT_STANDARDIZED => 2,
+        self::STAT_STANDARDIZED => 1,
+        self::STAT_PREFERRED => 2,
+        self::STAT_LEGAL => 3,
+        self::STAT_REGULATED => 3,
         self::STAT_DEPRECATED => 3,
         self::STAT_SUPERSEDED => 3,
-        self::STAT_NOT_FOUND => 99,
+        self::STAT_NOT_FOUND => 3,
+        self::STAT_ADMITTED => 99,
     ];
 
     /**
@@ -181,7 +181,8 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
                     ->loadOrCreateByName($misc['userName'], $this->getCollectionId());
 
             // Use person id as tbxCreatedBy and tbxUpdatedBy
-            $this->setTbxCreatedBy($by = $person->getId());
+            $by = (int) $person->getId();
+            $this->setTbxCreatedBy($by);
             $this->setTbxUpdatedBy($by);
         }
 
@@ -507,7 +508,7 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
             $attr = ZfExtended_Factory::get('editor_Models_Terminology_Models_AttributeModel');
             $attr->load($attrId);
             $attr->setValue($this->getProcessStatus());
-            $attr->setUpdatedBy($this->getUpdatedBy());
+            $attr->setUpdatedBy((int) $this->getUpdatedBy());
             $attr->setIsCreatedLocally(1);
             $attr->update();
 
@@ -540,8 +541,8 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
     public function delete()
     {
         // Backup collectionId and languageId
-        $collectionId = $this->getCollectionId();
-        $languageId = $this->getLanguageId();
+        $collectionId = (int) $this->getCollectionId();
+        $languageId = (int) $this->getLanguageId();
 
         // Backup tbx(Created|Updated)By props
         $personIds = [];
@@ -634,7 +635,7 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
         }
 
         // Try to find id of existing attribute having such $dataTypeId
-        $attrId = $this->db->getAdapter()->query(
+        $attrId = (int) $this->db->getAdapter()->query(
             'SELECT `id` FROM `terms_attributes` WHERE `termId` = ? AND `dataTypeId` = ? LIMIT 1',
             [$this->getId(), $dataTypeId]
         )->fetchColumn();
@@ -1319,11 +1320,11 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
 
         //get source and target language fuzzies
         $langs = [
-            $languageModel->getFuzzyLanguages($task->getSourceLang(), includeMajor: true),
-            $languageModel->getFuzzyLanguages($task->getTargetLang(), includeMajor: true),
+            $languageModel->getFuzzyLanguages((int) $task->getSourceLang(), includeMajor: true),
+            $languageModel->getFuzzyLanguages((int) $task->getTargetLang(), includeMajor: true),
         ];
         if ($task->getRelaisLang() > 0) {
-            $langs[] = $languageModel->getFuzzyLanguages($task->getRelaisLang(), includeMajor: true);
+            $langs[] = $languageModel->getFuzzyLanguages((int) $task->getRelaisLang(), includeMajor: true);
         }
         $langs = array_unique(array_merge(...$langs));
 
@@ -1999,7 +2000,7 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
     {
         // Delete `terms_images`-records and image-files found by those records
         editor_Models_Terminology_Models_AttributeModel
-            ::deleteImages($this->getCollectionId(), $this->getTermEntryId(), $this->getLanguage());
+            ::deleteImages((int) $this->getCollectionId(), (int) $this->getTermEntryId(), $this->getLanguage());
 
         // Delete `terms_transacgrp`- and `terms_attributes`- records for language-level and term-level
         $where = '`termEntryId` = ? AND `language` = ? AND `termId` IS NULL';
@@ -2018,11 +2019,11 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
     {
         // Delete `terms_images`-records and image-files found by those records
         editor_Models_Terminology_Models_AttributeModel
-            ::deleteImages($this->getCollectionId(), $this->getTermEntryId());
+            ::deleteImages((int) $this->getCollectionId(), (int) $this->getTermEntryId());
 
         /** @var editor_Models_Terminology_Models_TermEntryModel $termEntry */
         $termEntry = ZfExtended_Factory::get('editor_Models_Terminology_Models_TermEntryModel');
-        $termEntry->load($this->getTermEntryId());
+        $termEntry->load((int) $this->getTermEntryId());
         $termEntry->delete();
     }
 
@@ -2098,7 +2099,7 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
      */
     public function doProcessStatusChange(
         string $processStatus,
-        string $userId,
+        string|int $userId,
         string $userName,
         string $userGuid,
         editor_Models_Terminology_Models_AttributeModel $processStatusAttr = null
@@ -2118,7 +2119,7 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
                     $userId,
                     $userName,
                     $userGuid,
-                    $processStatusAttr->getId()
+                    (int) $processStatusAttr->getId()
                 );
 
                 // If $this->normativeAuthorization was set by the above $this->detachProposal() -> $this->update() call
@@ -2132,7 +2133,7 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
                 // Update collection stats
                 ZfExtended_Factory
                     ::get('editor_Models_TermCollection_TermCollection')
-                        ->updateStats($this->getCollectionId(), [
+                        ->updateStats((int) $this->getCollectionId(), [
                             'termEntry' => 0,
                             'term' => 1,
                         ]);
@@ -2157,7 +2158,7 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
                 // Increment collection stats 'attribute'-prop only
                 ZfExtended_Factory
                     ::get('editor_Models_TermCollection_TermCollection')
-                        ->updateStats($this->getCollectionId(), [
+                        ->updateStats((int) $this->getCollectionId(), [
                             'termEntry' => 0,
                             'term' => 0,
                             'attribute' => 1,

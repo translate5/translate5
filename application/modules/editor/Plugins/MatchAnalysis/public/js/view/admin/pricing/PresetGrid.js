@@ -103,9 +103,9 @@ Ext.define('Editor.plugins.MatchAnalysis.view.admin.pricing.PresetGrid', {
             },
             {
                 xtype: 'tbspacer',
-                flex: 1.6,
-            },
-        ],
+                flex: 1.6
+            }
+        ]
     }],
     viewConfig: {
         enableTextSelection: true,

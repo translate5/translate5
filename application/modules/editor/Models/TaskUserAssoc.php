@@ -46,6 +46,8 @@ use MittagQI\ZfExtended\Session\SessionInternalUniqueId;
  * @method string getWorkflowStepName()
  * @method string getWorkflow()
  * @method string getSegmentrange()
+ * @method string getSegmentEditableCount()
+ * @method string getSegmentFinishCount()
  * @method string getUsedState()
  * @method string getUsedInternalSessionUniqId()
  * @method string getIsPmOverride()
@@ -65,6 +67,8 @@ use MittagQI\ZfExtended\Session\SessionInternalUniqueId;
  * @method void setWorkflowStepName(string $step)
  * @method void setWorkflow(string $workflow)
  * @method void setSegmentrange(string $segmentrange)
+ * @method void setSegmentEditableCount(int $segmentEditableCount)
+ * @method void setSegmentFinishCount(int $segmentFinishCount)
  * @method void setUsedState(string $state)
  * @method void setUsedInternalSessionUniqId(string $sessionId)
  * @method void setIsPmOverride(bool $isPmOverride)
@@ -864,5 +868,24 @@ class editor_Models_TaskUserAssoc extends ZfExtended_Models_Entity_Abstract
         unset($tua->usedInternalSessionUniqId);
 
         return $tua;
+    }
+
+    /**
+     * Check whether segmentrange-prop is modified, and if yes - recount editable and finished segments
+     *
+     * @throws ReflectionException
+     * @throws Zend_Db_Statement_Exception
+     * @throws ZfExtended_Models_Entity_NotFoundException
+     */
+    public function onBeforeSave() : void
+    {
+        // If segmentrange-prop is modified or it's new assoc-record
+        if ($this->isModified('segmentrange') || !$this->getId()) {
+
+            // Recount values for segmentEditableCount and segmentFinishCount fields
+            ZfExtended_Factory
+                ::get(editor_Models_TaskProgress::class)
+                ->recountEditableAndFinished($this);
+        }
     }
 }

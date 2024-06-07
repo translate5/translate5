@@ -95,14 +95,23 @@ Ext.define('Editor.view.LanguageResources.services.TermCollection', {
      */
     getNameRenderer: function() {
         var ttip = this.openTermPortal;
+
         return function(v, meta, rec) {
+            if (v !== null) {
+                v = Ext.String.htmlEncode(v);
+            }
+
             var ctrl = Editor.app.getController('Termportal'),
-                //since we are in a termcollection (so term specific) we do that call not via event, but directly on termportal controller:
+                // since we are in a termcollection (so term specific) we do that call not via event,
+                // but directly on termportal controller:
                 url = ctrl && ctrl.urlToTermPortal(rec);
-            if(url) {
+
+            if (url) {
                 meta.tdAttr = 'data-qtip="'+ttip+'"';
+
                 return '<a href="'+url+'" target="termportalandinstanttranslate">' + v + '</a>';
             }
+
             return v;
         }
     }

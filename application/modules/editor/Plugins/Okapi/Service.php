@@ -48,6 +48,8 @@ use ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey;
 
 final class Service extends DockerServiceAbstract
 {
+    public const ID = 'okapi';
+
     public const HEALTH_CHECK_PATH = '/projects';
 
     /**
@@ -221,11 +223,11 @@ final class Service extends DockerServiceAbstract
             $url = $this->configurationConfig['url'];
         }
         if ($this->checkPotentialServiceUrl($this->getName(), $url, $io)) {
-            // validate existing entries, dismiss those not available
-            $newServers = $this->getNewServers($url);
+            // validate existing entries, dismiss those not available or on the same base-url as the given one
+            $newServers = $this->getOtherServers(str_replace('.:', ':', $url));
             // add new entry by its version as name-suffix (note: we will overwrite other entries like
             // 'okapi-longhorn-xxx' without further notice) ... we use a scheme that is common on the existing instances
-            $foundVersions = $this->getOkapiVersions($url);
+            $foundVersions = $this->findOkapiVersions($url);
 
             if (empty($foundVersions)) {
                 $url = $this->singleOkapiInstanceFallback($url);
@@ -257,6 +259,31 @@ final class Service extends DockerServiceAbstract
     }
 
     /**
+     * Retrieves a list of the currently AVAILABLE configured servers
+     * The array-keys will be the proper cleaned versions as defined in ::getServerkey
+     */
+    public function getOnlineServers(): array
+    {
+        // get online-filtered list of current entries
+        return $this->getOtherServers('INVALID');
+    }
+
+    /**
+     * Retrieves the list of all configured servers
+     */
+    public function getAllServers(): array
+    {
+        $servers = [];
+        foreach ($this->config->runtimeOptions->plugins->Okapi->server as $name => $url) {
+            if (! empty($url)) {
+                $servers[$name] = $url;
+            }
+        }
+
+        return $servers;
+    }
+
+    /**
      * Unfortunately we cannot fetch the version directly as older versions do not support the status.json
      * (non-PHPdoc)
      * @see DockerServiceAbstract::findVersionInResponseBody()
@@ -266,7 +293,7 @@ final class Service extends DockerServiceAbstract
         return self::fetchServerVersion($serviceUrl);
     }
 
-    private function checkOtherConfiguredServers(Zend_Config $services, string $serviceUsed, bool $mainServiceSuccess)
+    private function checkOtherConfiguredServers(Zend_Config $services, string $serviceUsed, bool $mainServiceSuccess): void
     {
         foreach ($services as $name => $url) {
             if ($name === $serviceUsed) {
@@ -294,11 +321,11 @@ final class Service extends DockerServiceAbstract
 
     /**
      * returns all translate5 supported Okapi versions provided by the queried jetty root URL
-     * by default jetty delivers an error page providing all valid contexts (installed war files).
+     * by default jetty delivers an error page providing all valid contexts (installed .war-files).
      *
      * @throws Zend_Uri_Exception
      */
-    private function getOkapiVersions(mixed $url): array
+    public function findOkapiVersions(mixed $url): array
     {
         $url = \Zend_Uri_Http::fromString($url);
         $url->setPath(''); //clean path if given to get okapi root server
@@ -326,13 +353,18 @@ final class Service extends DockerServiceAbstract
         return $result;
     }
 
-    private function getNewServers(mixed $url): array
+    /**
+     * Retrieves the existing currently configured servers, that do not start with the given (base) URL
+     * @param mixed $url
+     * @return array
+     */
+    private function getOtherServers(mixed $url): array
     {
         $newServers = [];
         if (! empty($this->config->runtimeOptions->plugins->Okapi->server)) {
             foreach ($this->config->runtimeOptions->plugins->Okapi->server as $name => $otherUrl) {
                 if (! empty($otherUrl)
-                    && $otherUrl != $url
+                    && !str_starts_with($otherUrl, $url)
                     && $this->checkConfiguredHealthCheckUrl(
                         rtrim($otherUrl, '/') . self::HEALTH_CHECK_PATH,
                         $otherUrl,

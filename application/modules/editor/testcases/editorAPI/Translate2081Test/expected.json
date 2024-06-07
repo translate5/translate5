@@ -16,6 +16,8 @@
         "parentIds": null,
         "trackchangesShow": "1",
         "trackchangesShowAll": "1",
-        "trackchangesAcceptReject": "1"
+        "trackchangesAcceptReject": "1",
+        "segmentEditableCount": "1",
+        "segmentFinishCount": "0"
     }
 ]

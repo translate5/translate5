@@ -57,6 +57,7 @@ if (empty($this) || empty($argv) || $argc < 5 || $argc > 7) {
 }
 
 $task = ZfExtended_Factory::get(editor_Models_Task::class);
+$progress = ZfExtended_Factory::get(editor_Models_TaskProgress::class);
 $db = $task->db;
 $s = $db->select()->from('task', ['*'])->where('state NOT IN(?)', [
     editor_Models_Task::STATE_ERROR,
@@ -68,5 +69,5 @@ $allTasks = $task->loadAll();
 foreach ($allTasks as $t) {
     $task->init($t);
     // update the segment finish count
-    $task->updateSegmentFinishCount();
+    $progress->updateSegmentFinishCount($task);
 }

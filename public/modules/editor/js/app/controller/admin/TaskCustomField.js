@@ -50,13 +50,14 @@ Ext.define('Editor.controller.admin.TaskCustomField', {
 
                 // Primary config
                 column = {
-                    text      : locale in labelL10n ? labelL10n[locale] : field.label,
+                    text      : Ext.String.htmlEncode(locale in labelL10n ? labelL10n[locale] : field.label),
                     xtype     : 'gridcolumn',
                     dataIndex : 'customField' + field.id,
                     stateId   : 'customField' + field.id,
                     filter    : {
                         type: 'string'
-                    }
+                    },
+                    renderer  : v => Ext.String.htmlEncode(v)
                 };
 
                 // If it's a checkbox or combobox
@@ -93,7 +94,7 @@ Ext.define('Editor.controller.admin.TaskCustomField', {
                         column.renderer = function (value, _1, _2, _3, colIndex, _4, view) {
                             var selectedOption = view.getHeaderCt().getHeaderAtIndex(colIndex).comboboxData[value];
                             if(!selectedOption){
-                                return value;
+                                return Ext.String.htmlEncode(value);
                             }
                             return selectedOption[Editor.data.locale];
                         };
@@ -125,15 +126,13 @@ Ext.define('Editor.controller.admin.TaskCustomField', {
             Editor.data.editor.task.customFields.forEach(field => {
 
                 // If field should not be shown in current formType - skip
-                if (!field.placesToShow.match(formType))
-                {
+                if (!field.placesToShow.match(formType)) {
                     return;
                 }
 
                 // If field should be shown in project wizard, but it's
                 // a readonly-field - skip, as it does not have any value at this step
-                if (formType === 'projectWizard' && field.mode === 'readonly')
-                {
+                if (formType === 'projectWizard' && field.mode === 'readonly') {
                     return;
                 }
 
@@ -143,8 +142,8 @@ Ext.define('Editor.controller.admin.TaskCustomField', {
 
                 // Start config
                 config = {
-                    fieldLabel: locale in labelL10n ? labelL10n[locale] : field.label,
-                    tooltip   : locale in tooltipL10n ? tooltipL10n[locale] : field.tooltip,
+                    fieldLabel: Ext.String.htmlEncode(locale in labelL10n ? labelL10n[locale] : field.label),
+                    tooltip   : Ext.String.htmlEncode(locale in tooltipL10n ? tooltipL10n[locale] : field.tooltip),
                     xtype     : field.type,
                     name      : 'customField' + field.id,
                     itemId    : 'customField' + field.id,

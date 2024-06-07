@@ -26,7 +26,7 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-use MittagQI\Translate5\Task\Reimport\DataProvider\ZipDataProvider;
+use MittagQI\Translate5\Task\Reimport\DataProvider\AbstractDataProvider;
 use MittagQI\Translate5\Test\Import\Config;
 use MittagQI\Translate5\Test\Import\Exception;
 use MittagQI\Translate5\Test\Import\TermCollectionResource;
@@ -130,10 +130,14 @@ class Translate3117Test extends editor_Test_JsonTest
 
         static::api()->setTaskToOpen();
 
-        static::api()->addFile(ZipDataProvider::UPLOAD_FILE_FIELD, static::api()->getFile('Reimport.zip'), 'application/data');
+        static::api()->addFile(
+            AbstractDataProvider::UPLOAD_FILE_FIELD,
+            static::api()->getFile('Reimport.zip'),
+            'application/data'
+        );
         static::api()->post('editor/taskid/' . $taskId . '/file/package');
 
-        static::api()->waitForTaskImported($task);
+        $this->waitForWorker(\MittagQI\Translate5\Task\Reimport\Worker::class);
 
         static::api()->setTaskToEdit();
 

@@ -54,6 +54,7 @@ declare(strict_types=1);
 namespace MittagQI\Translate5\DbConfig\Type\CoreTypes;
 
 use editor_Models_Config;
+use MittagQI\ZfExtended\Acl\Roles;
 use ZfExtended_DbConfig_Type_CoreTypes;
 use ZfExtended_Factory;
 use ZfExtended_Models_User;
@@ -66,7 +67,8 @@ class DefaultPmType extends ZfExtended_DbConfig_Type_CoreTypes
     public function isValidInDefaults(editor_Models_Config $config, string $value): bool
     {
         // Get user ids, having all-right on editor_task-resource
-        $defaults = ZfExtended_Factory::get(ZfExtended_Models_User::class)->loadAllByRole([ACL_ROLE_PM]);
+        $defaults = ZfExtended_Factory::get(ZfExtended_Models_User::class)
+            ->loadAllByRole([Roles::PM, Roles::PMLIGHT, Roles::CLIENTPM]);
 
         // Check value is in those ids
         return empty($value) || in_array($value, array_column($defaults, 'id'));

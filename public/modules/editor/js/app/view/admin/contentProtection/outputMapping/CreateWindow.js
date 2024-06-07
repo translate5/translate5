@@ -81,6 +81,8 @@ Ext.define('Editor.view.admin.contentProtection.outputMapping.CreateWindow', {
                                     type: 'float'
                                 },{
                                     type: 'integer'
+                                }, {
+                                    type: 'replace-content'
                                 }]
                             },
                             listeners: {

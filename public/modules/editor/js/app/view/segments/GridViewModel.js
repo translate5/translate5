@@ -31,19 +31,12 @@ Ext.define('Editor.view.segments.GridViewModel', {
     alias: 'viewmodel.segmentsGrid',
     data: {
         isEditingSegment: false,
-        segmentFinishCount: null
+        taskProgress: 0,
+        userProgress: false
     },
     formulas: {
-        taskDescription: function(){
-            return Editor.data.task.get('description');
-        },
-        segmentFinishCountPercent:function(get){
-        	var value=get('segmentFinishCount'),
-        		totalCount=Editor.data.task.get('segmentCount');
-        	if(value>0 && totalCount>0){
-    			value=value/totalCount;
-    		}
-    		return value;
-        }
+        taskDescription: () => Editor.data.task.get('description'),
+        taskProgressPercent: get => Math.round(get('taskProgress') * 100) + '%',
+        userProgressPercent: get => Math.round(get('userProgress') * 100) + '%'
     }
 });

@@ -95,14 +95,14 @@ class BasicSegmentEditingTest extends editor_Test_JsonTest
             $this->assertEmpty($segment->comments);
             $this->assertEquals(0, $segment->workflowStepNr);
             $this->assertEmpty($segment->workflowStep);
-            $this->assertObjectNotHasAttribute('sourceEdit', $segment);
-            $this->assertObjectNotHasAttribute('sourceEditToSort', $segment);
+            $this->assertObjectNotHasProperty('sourceEdit', $segment);
+            $this->assertObjectNotHasProperty('sourceEditToSort', $segment);
         }
 
         $firstSegment = $segments[0];
         $this->assertEquals(1, $firstSegment->segmentNrInTask);
         $this->assertEquals(1, $firstSegment->mid);
-        $this->assertFieldTextEquals('This file is <div title="" class="term preferredTerm exact transNotFound">a</div> based on <div title="" class="term preferredTerm exact transNotFound">a</div> part of the php-online-Documentation. It\'s translation is done by <div title="" class="term preferredTerm exact transNotFound">a</div> pretranslation based on <div title="" class="term preferredTerm exact transNotFound">a</div> very fast winalign-Project and is not at all state of the translation art. It\'s only purpose is the generation of demo-data for translate5.', $firstSegment->source);
+        $this->assertFieldTextEquals('This file is <div title="" class="term preferredTerm exact transNotFound better-translate-with-preferredTerm">a</div> based on <div title="" class="term preferredTerm exact transNotFound better-translate-with-preferredTerm">a</div> part of the php-online-Documentation. It\'s translation is done by <div title="" class="term preferredTerm exact transNotFound better-translate-with-preferredTerm">a</div> pretranslation based on <div title="" class="term preferredTerm exact transNotFound better-translate-with-preferredTerm">a</div> very fast winalign-Project and is not at all state of the translation art. It\'s only purpose is the generation of demo-data for translate5.', $firstSegment->source);
         $this->assertEquals('da37e24323d2953c3b48c82cd6e50d71', $firstSegment->sourceMd5);
         $this->assertEquals("This file is a based on a part of the php-online-Documentation. It's translation is done by a pretranslation based on a very fast winalign-Project and is not at all state of the translation art. It's only purpose is the generation of demo-data for translate5.", $firstSegment->sourceToSort);
         $this->assertFieldTextEquals('Diese Datei ist Teil der php-online-Dokumentation. Ihre Übersetzung ist durch eine Vorübersetzung entstanden, die auf einem sehr schnell durchgeführten winalign-Project basiert und in keiner Art und Weise dem State of the Art eines Übersetzungsprojekts entspricht. Sein einziger Zweck ist die Erzeugung von Demo-Daten für translate5. ', $firstSegment->target);

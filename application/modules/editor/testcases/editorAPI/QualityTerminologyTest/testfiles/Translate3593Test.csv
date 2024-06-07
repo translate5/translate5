@@ -1,0 +1,9 @@
+id,source,target
+1,Some phrase having term1-en,
+2,Some phrase having term2-en,
+3,Some phrase having term3-en,
+4,Some phrase having term4-en,
+5,Some phrase having term5-en,
+6,Some phrase having term1-en,Some phrase having term1-de-standardized
+7,Some phrase having term1-en,Some phrase having term1-de-preferred
+8,Some phrase having term1-en,Some phrase having term1-de-other-legal

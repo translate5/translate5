@@ -1937,3 +1937,11 @@ Ext.override(Ext.dom.Element, {
         }
     },
 });
+/**
+ * Overridden to make binding for tooltip-prop to be supported
+ */
+Ext.override(Ext.ProgressBar, {
+    setTooltip: function(tooltip) {
+        this.el.dom.setAttribute('data-qtip', tooltip);
+    }
+});

@@ -69,4 +69,8 @@ interface NumberProtectorInterface
         editor_Models_Languages $sourceLang,
         editor_Models_Languages $targetLang
     ): string;
+
+    public function validateFormat(string $format): bool;
+
+    public function getFormatedExample(string $format): string;
 }

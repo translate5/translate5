@@ -168,7 +168,7 @@ class TaskInfoCommand extends Translate5AbstractCommand
             'Languages' => ($languages[$task->getSourceLang()] ?? '-na-') . ' => '
                 . ($languages[$task->getTargetLang()] ?? '-na-')
                 . ($task->getRelaisLang() ? (' Pivot: ' . $languages[$task->getRelaisLang()] ?? '-na-') : ''),
-            'Segment progress' => $task->getSegmentFinishCount() . ' / ' . $task->getSegmentCount(),
+            'Segment progress' => $task->getSegmentFinishCount() . ' / ' . $task->getSegmentEditableCount(),
             'Data Dir' => $task->getAbsoluteTaskDataPath(),
         ];
         $this->writeAssoc($data);

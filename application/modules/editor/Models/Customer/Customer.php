@@ -29,7 +29,7 @@ END LICENSE AND COPYRIGHT
 /**
  * Customer Entity Objekt
  *
- * @method string getId()
+ * @method int getId()
  * @method void setId(int $id)
  *
  * @method string getName()
@@ -68,8 +68,11 @@ END LICENSE AND COPYRIGHT
  * @method string getOpenIdRedirectLabel()
  * @method void setOpenIdRedirectLabel(string $openIdRedirectLabel)
  *
- * @method string getOpenIdRedirectCheckbox()
+ * @method int getOpenIdRedirectCheckbox()
  * @method void setOpenIdRedirectCheckbox(integer $openIdRedirectCheckbox)
+ *
+ * @method int getOpenIdSyncUserData()
+ * @method void setOpenIdSyncUserData(integer $openIdSyncUserData)
  */
 class editor_Models_Customer_Customer extends ZfExtended_Models_Entity_Abstract
 {
@@ -92,8 +95,7 @@ class editor_Models_Customer_Customer extends ZfExtended_Models_Entity_Abstract
     {
         $customerId = $this->getId();
         parent::delete();
-        $logger = ZfExtended_Factory::get('editor_Models_LanguageResources_UsageLogger');
-        /* @var $logger editor_Models_LanguageResources_UsageLogger */
+        $logger = ZfExtended_Factory::get(editor_Models_LanguageResources_UsageLogger::class);
         //remove the log data for the deleted customer
         $logger->deleteByCustomer($customerId);
     }
@@ -105,9 +107,8 @@ class editor_Models_Customer_Customer extends ZfExtended_Models_Entity_Abstract
      */
     public function getConfig()
     {
-        $customerConfig = ZfExtended_Factory::get('editor_Models_Customer_CustomerConfig');
+        $customerConfig = ZfExtended_Factory::get(editor_Models_Customer_CustomerConfig::class);
 
-        /* @var $customerConfig editor_Models_Customer_CustomerConfig */
         return $customerConfig->getCustomerConfig($this->getId());
     }
 
@@ -247,8 +248,7 @@ class editor_Models_Customer_Customer extends ZfExtended_Models_Entity_Abstract
      */
     public function meta(bool $reinit = false)
     {
-        /** @var editor_Models_Customer_Meta $meta */
-        $meta = $this->meta ?? $this->meta = ZfExtended_Factory::get('editor_Models_Customer_Meta');
+        $meta = $this->meta ?? $this->meta = ZfExtended_Factory::get(editor_Models_Customer_Meta::class);
         $customerId = $this->getId();
         if ($meta->getCustomerId() != $customerId || $reinit) {
             try {
@@ -265,11 +265,10 @@ class editor_Models_Customer_Customer extends ZfExtended_Models_Entity_Abstract
 
     /***
      * Is the customer the default customer?
-     * @return boolean
      */
-    public function isDefaultCustomer()
+    public function isDefaultCustomer(): bool
     {
-        return ($this->getNumber() == self::DEFAULTCUSTOMER_NUMBER);
+        return $this->getNumber() == self::DEFAULTCUSTOMER_NUMBER;
     }
 
     /**

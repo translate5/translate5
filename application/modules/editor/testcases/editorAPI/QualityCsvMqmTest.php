@@ -95,8 +95,10 @@ class QualityCsvMqmTest extends editor_Test_JsonTest
 
     protected static function setupImport(Config $config): void
     {
-        $config->addTask('en', 'de')
-            ->addUploadData("id,source,target\n" . '1,"source not needed here","' . self::CSV_TARGET . '"' . "\n" . '2,"zeile 2","row 2"');
+        $config
+            ->addTask('en', 'de')
+            ->addUploadData("id,source,target\n" . '1,"source not needed here","' . self::CSV_TARGET . '"' . "\n" . '2,"zeile 2","row 2"')
+            ->addTaskConfig('runtimeOptions.import.fileparser.csv.active', '1');
     }
 
     /**

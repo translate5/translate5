@@ -5862,6 +5862,22 @@ The following task was imported with errors / warnings / notices. Please take ca
                 <source>Erlaubtes Synonym</source>
                 <target>Admitted synonym</target>
             </trans-unit>
+            <trans-unit id='RXJsYXVidGVz'>
+                <source>Erlaubtes</source>
+                <target>Admitted</target>
+            </trans-unit>
+            <trans-unit id='Vm9yenVncw=='>
+                <source>Vorzugs</source>
+                <target>Preferred</target>
+            </trans-unit>
+            <trans-unit id='U3RhbmRhcmRpc2llcnQ='>
+                <source>Standardisiert</source>
+                <target>Standardized</target>
+            </trans-unit>
+            <trans-unit id='QW5kZXJl'>
+                <source>Andere</source>
+                <target>Others</target>
+            </trans-unit>
             <trans-unit id='VmVyYm90ZW5lIEJlbmVubnVuZw=='>
                 <source>Verbotene Benennung</source>
                 <target>Forbidden designation</target>
@@ -6820,9 +6836,9 @@ The following task was imported with errors / warnings / notices. Please take ca
                 <source>1. Lektorat (technisch)</source>
                 <target>1st revision - technical</target>
             </trans-unit>
-            <trans-unit id='Mi4gTGVrdG9yYXQgKHNwcmFjaGxpY2gp'>
-                <source>2. Lektorat (sprachlich)</source>
-                <target>2nd revision - language</target>
+            <trans-unit id='Mi4gTGVrdG9yYXQgKHNwcmFjaGxpY2gsIG1pdCBiZWFyYmVpdGJhcmVuIDEwMCUgVHJlZmZlcm4p'>
+                <source>2. Lektorat (sprachlich, mit bearbeitbaren 100% Treffern)</source>
+                <target>2nd revision - language with editable 100% matches</target>
             </trans-unit>
             <trans-unit id='Mi4gTGVrdG9yYXQgKHRlY2huaXNjaCk='>
                 <source>2. Lektorat (technisch)</source>
@@ -6852,9 +6868,9 @@ The following task was imported with errors / warnings / notices. Please take ca
                 <source>triton</source>
                 <target>Default theme (Triton)</target>
             </trans-unit>
-            <trans-unit id='RG9rdW1lbnRhdGlvbg=='>
-                <source>Dokumentation</source>
-                <target>PDF documentation</target>
+            <trans-unit id='U2NocmlmdGxpY2hlIERva3VtZW50YXRpb24='>
+                <source>Schriftliche Dokumentation</source>
+                <target>Written documentation</target>
             </trans-unit>
             <trans-unit id='SW4gbmV1ZW0gQnJvd3Nlci1UYWIgw7ZmZm5lbg=='>
                 <source>In neuem Browser-Tab öffnen</source>
@@ -9900,6 +9916,14 @@ E-Mail: service@MittagQI.com</pre>
                 <source>Sind Sie sicher, dass Sie dieses benutzerdefinierte Feld löschen möchten?</source>
                 <target>Are you sure you want to delete this custom field?</target>
             </trans-unit>
+            <trans-unit id='QWxsZXMgw7xiZXIgRm9ydHNjaHJpdHQ='>
+                <source>Alles über Fortschritt</source>
+                <target>All over progress</target>
+            </trans-unit>
+            <trans-unit id='UGVyc8O2bmxpY2hlciBGb3J0c2Nocml0dA=='>
+                <source>Persönlicher Fortschritt</source>
+                <target>Personal progress</target>
+            </trans-unit>
             <trans-unit id='Qml0dGUgZGVua2VuIFNpZSBkYXJhbiwgZGFzcyBhbGxlIFZlcndlbmR1bmdlbiBkaWVzZXIgT3B0aW9uIChmYWxscyB2b3JoYW5kZW4pIGVudGZlcm50IHdlcmRlbiwgd2VubiBzaWUgaW4gZWluZW0gZGVyIGJlc3RlaGVuZGVuIFByb2pla3RlL0F1ZmdhYmVuIGVyZsO8bGx0IHdlcmRlbi4gRm9ydGZhaHJlbj8='>
                 <source>Bitte denken Sie daran, dass alle Verwendungen dieser Option (falls vorhanden) entfernt werden, wenn sie in einem der bestehenden Projekte/Aufgaben erfüllt werden. Fortfahren?</source>
                 <target>Please keep in mind that all the usages (if any) of this option will be removed if met in any of existing projects/tasks. Proceed?</target>
@@ -9919,6 +9943,14 @@ E-Mail: service@MittagQI.com</pre>
             <trans-unit id='RWluZsO8aHJ1bmc='>
                 <source>Einführung</source>
                 <target>Introduction</target>
+            </trans-unit>
+            <trans-unit id='RWluaWdlIFRyYW5zbGF0aW9uIE1lbW9yeXMsIGRpZSBhdWYgZGVyIEdydW5kbGFnZSBJaHJlciBTdGFuZGFyZGVpbnN0ZWxsdW5nZW4genVnZXdpZXNlbiB3ZXJkZW4sIHNpbmQgbm9jaCBuaWNodCBnZW3DpMOfIGRlbiBiZXN0ZWhlbmRlbiBSZWdlbG4gZsO8ciBkaWUgQ29udGVudCBQcm90ZWN0aW9uIGtvbnZlcnRpZXJ0LiBTaWUgc29sbHRlbiBzaWUgaW4gZGVyIFNwcmFjaHJlc3NvdXJjZW52ZXJ3YWx0dW5nIGtvbnZlcnRpZXJlbiwgYmV2b3IgU2llIHNpZSB2ZXJ3ZW5kZW4uPGJyLz5Nw7ZjaHRlbiBTaWUgZGVuIEF1ZmdhYmVuaW1wb3J0IGFiYnJlY2hlbj8='>
+                <source>Einige Translation Memorys, die auf der Grundlage Ihrer Standardeinstellungen zugewiesen werden, sind noch nicht gemäß den bestehenden Regeln für die Content Protection konvertiert. Sie sollten sie in der Sprachressourcenverwaltung konvertieren, bevor Sie sie verwenden.<br/>Möchten Sie den Aufgabenimport abbrechen?</source>
+                <target>Some translation memories that are assigned based on your default settings are not yet converted according to the existing Content Protection rules. You should convert them in Language Resource Management before using them.<br/>Do you want to cancel the task import?</target>
+            </trans-unit>
+            <trans-unit id='TG9rYWxlbiBCZW51dHplciBtaXQgRGF0ZW4gYXVzIGRlbSBTU08gUHJvdmlkZXIgYWt0dWFsaXNpZXJlbiAoUm9sbGVuLCBHZXNjaGxlY2h0LCBTcHJhY2hlKQ=='>
+                <source>Lokalen Benutzer mit Daten aus dem SSO Provider aktualisieren (Rollen, Geschlecht, Sprache)</source>
+                <target>Update locale user with data from the SSO provider (roles, gender, locale)</target>
             </trans-unit>
         </body>
     </file>

@@ -93,13 +93,13 @@ class NumberProtectorTest extends TestCase
         $contentRecognition2->save();
 
         $inputMapping = ZfExtended_Factory::get(InputMapping::class);
-        $inputMapping->setLanguageId($langEn->getId());
+        $inputMapping->setLanguageId((int) $langEn->getId());
         $inputMapping->setContentRecognitionId($contentRecognition1->getId());
         $inputMapping->setPriority(1000);
         $inputMapping->save();
 
         $outputMapping = ZfExtended_Factory::get(OutputMapping::class);
-        $outputMapping->setLanguageId($langDe->getId());
+        $outputMapping->setLanguageId((int) $langDe->getId());
         $outputMapping->setInputContentRecognitionId($contentRecognition1->getId());
         $outputMapping->setOutputContentRecognitionId($contentRecognition2->getId());
         $outputMapping->save();
@@ -144,13 +144,13 @@ class NumberProtectorTest extends TestCase
         $contentRecognition2->save();
 
         $inputMapping = ZfExtended_Factory::get(InputMapping::class);
-        $inputMapping->setLanguageId($langEn->getId());
+        $inputMapping->setLanguageId((int) $langEn->getId());
         $inputMapping->setContentRecognitionId($contentRecognition1->getId());
         $inputMapping->setPriority(1000);
         $inputMapping->save();
 
         $outputMapping = ZfExtended_Factory::get(OutputMapping::class);
-        $outputMapping->setLanguageId($langDe->getId());
+        $outputMapping->setLanguageId((int) $langDe->getId());
         $outputMapping->setInputContentRecognitionId($contentRecognition1->getId());
         $outputMapping->setOutputContentRecognitionId($contentRecognition2->getId());
         $outputMapping->save();
@@ -232,6 +232,8 @@ class NumberProtectorTest extends TestCase
         yield from $this->macsProvider();
         yield from $this->looksLikeMacAddress();
         yield from $this->trickyCasesProvider();
+        yield from $this->keepContentProvider();
+        yield from $this->replaceContentProvider();
     }
 
     public function datesProvider(): iterable
@@ -466,7 +468,7 @@ class NumberProtectorTest extends TestCase
 
         yield [
             'string' => 'string 1,234,567 string',
-            'expected' => 'string <number type="integer" name="default generic with comma" source="1,234,567" iso="1234567" target="1234567"/> string',
+            'expected' => 'string <number type="integer" name="default generic with comma separator" source="1,234,567" iso="1234567" target="1234567"/> string',
         ];
         yield [
             'string' => 'string 12,34,567 string',
@@ -618,6 +620,22 @@ class NumberProtectorTest extends TestCase
         ];
     }
 
+    public function keepContentProvider(): iterable
+    {
+        yield [
+            'string' => 'string KEEP TEXT string',
+            'expected' => 'string <number type="keep-content" name="default" source="KEEP TEXT" iso="KEEP TEXT" target="KEEP TEXT"/> string',
+        ];
+    }
+
+    public function replaceContentProvider(): iterable
+    {
+        yield [
+            'string' => 'string REPLACE TEXT string',
+            'expected' => 'string <number type="replace-content" name="default" source="REPLACE TEXT" iso="OTHER TEXT:REPLACE TEXT" target="OTHER TEXT"/> string',
+        ];
+    }
+
     public function trickyCasesProvider(): iterable
     {
         yield [
@@ -698,15 +716,39 @@ class NumberProtectorTest extends TestCase
                     IntegerProtector::getType() => '#',
                     default => null
                 };
+                $formatData['priority'] = 1;
 
                 yield ContentProtectionDto::fromRow($formatData);
             }
+
+            yield new ContentProtectionDto(
+                'keep-content',
+                'default',
+                '/KEEP TEXT/',
+                0,
+                null,
+                true,
+                null,
+                0
+            );
+
+            yield new ContentProtectionDto(
+                'replace-content',
+                'default',
+                '/REPLACE TEXT/',
+                0,
+                'REPLACE TEXT',
+                true,
+                'OTHER TEXT',
+                0
+            );
         };
 
         $numberRepository = $this->createConfiguredMock(
             ContentProtectionRepository::class,
             [
                 'getAllForSource' => $getAll($select),
+                'hasActiveTextRules' => true,
             ]
         );
 

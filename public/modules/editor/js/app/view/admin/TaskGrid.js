@@ -381,7 +381,6 @@ Ext.define('Editor.view.admin.TaskGrid', {
                     filter: {
                         type: 'numeric'
                     },
-                    text: 'id',
                     text: me.text_cols.id
                 },{
                     text: me.text_cols.taskActions,
@@ -537,7 +536,8 @@ Ext.define('Editor.view.admin.TaskGrid', {
                         filter: {
                             type: 'string'
                         },
-                        text: me.text_cols.taskName
+                        text: me.text_cols.taskName,
+                        renderer: v => Ext.String.htmlEncode(v)
                     }, {
                         xtype: 'gridcolumn',
                         width: 110,
@@ -670,8 +670,8 @@ Ext.define('Editor.view.admin.TaskGrid', {
                             type: 'string'
                         },
                         renderer: function (v, meta, rec) {
-                            var tooltip = v,
-                                ret = v;
+                            var tooltip = Ext.String.htmlEncode(v),
+                                ret = Ext.String.htmlEncode(v);
                             if (Editor.data.frontend.tasklist.pmMailTo) {
                                 tooltip = rec.get('pmMail');
                                 ret = '<a alt="' + tooltip + '" href="mailto:' + tooltip + '" target="_blank">' + v + '</a>';
@@ -1005,29 +1005,38 @@ Ext.define('Editor.view.admin.TaskGrid', {
             }
             value = value + '%';
             meta.tdAttr = 'data-qtip="' + value + '"';
-            return me.getCellProgressBarRenderData(value);
+            return me.getCellProgressBarRenderData(value, 13);
         }
 
-        if (!Ext.isNumeric(value) || value < 0) {
-            value = 0;
+        // Shortcuts
+        var tp = rec.get('taskProgress'),
+            up = rec.get('userProgress');
+
+        // Convert to percent
+        tp = Ext.util.Format.percent(tp);
+
+        // If current user is not assigned to current task (false)
+        // or is assigned but have no segments range defined (true)
+        // Render single progress bar just for task progress
+        if (up === false || up === true) {
+            return me.getCellProgressBarRenderData(tp, 13);
         }
 
-        if (value > 0 && !isImportProgress) {
-            value = value / rec.get('segmentCount');
-        }
-
-        value = Ext.util.Format.percent(value);
-
-        meta.tdAttr = 'data-qtip="' + value + '"';
-        return me.getCellProgressBarRenderData(value);
+        // Else convert to percent and render two progress bars for task and for user progress
+        up = Ext.util.Format.percent(up);
+        return [
+            me.getCellProgressBarRenderData(tp, 9, Editor.data.l10n.tasksGrid.progress.taskProgress + ':'),
+            me.getCellProgressBarRenderData(up, 9, Editor.data.l10n.tasksGrid.progress.userProgress + ':')
+        ].join('');
     },
 
     /***
-     * Return html for grid cell progress bar. The imput argument percent
+     * Return html for grid cell progress bar. The input argument percent
      * must contain percent value between 0% - 100%
      */
-    getCellProgressBarRenderData: function (percent) {
-        return '<div class="x-progress x-progress-default" style="height: 13px;">' +
+    getCellProgressBarRenderData: function (percent, height, qtip) {
+        return '<div class="x-progress x-progress-default" style="height: '
+            + (height || 13) + 'px;" data-qtip="' + (qtip ? qtip + ' ' : '') + percent + '">' +
             '<div class="x-progress-bar x-progress-bar-default" style="width: ' + percent + '">' +
             '</div>' +
             '</div>';

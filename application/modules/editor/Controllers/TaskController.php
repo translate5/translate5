@@ -132,7 +132,7 @@ class editor_TaskController extends ZfExtended_RestController
             ],
             'segmentFinishCount' => [
                 'numeric' => 'percent',
-                'totalField' => 'segmentCount',
+                'totalField' => 'segmentEditableCount',
             ],
             'userState' => [
                 'list' => new ZfExtended_Models_Filter_Join('LEK_taskUserAssoc', 'state', 'taskGuid', 'taskGuid'),
@@ -248,6 +248,12 @@ class editor_TaskController extends ZfExtended_RestController
         } else {
             $this->view->rows = $this->loadAllForTaskOverview();
         }
+
+        // Load overall and users-specific progress for each task in $this->view->rows
+        ZfExtended_Factory
+            ::get(editor_Models_TaskProgress::class)
+                ->loadForRows($this->view->rows);
+
         $this->view->total = $this->totalCount;
     }
 
@@ -612,8 +618,10 @@ class editor_TaskController extends ZfExtended_RestController
         // set the usageMode from config if not set
         $this->entity->setUsageMode($this->data['usageMode'] ?? $c->runtimeOptions->import->initialTaskUsageMode);
 
-        //init workflow id for the task, based on customer or general config as fallback
-        $this->entity->setWorkflow($c->runtimeOptions->workflow->initialWorkflow);
+        //init workflow id for the task, based on given value, customer or general config as fallback
+        if (! array_key_exists('workflow', $this->data)) {
+            $this->entity->setWorkflow($c->runtimeOptions->workflow->initialWorkflow);
+        }
 
         $this->entity->setEdit100PercentMatch(
             (int) ($this->data['edit100PercentMatch'] ?? $c->runtimeOptions->import->edit100PercentMatch)
@@ -656,7 +664,7 @@ class editor_TaskController extends ZfExtended_RestController
         $this->entity->save();
 
         //reload because entityVersion could be changed somewhere
-        $this->entity->load($this->entity->getId());
+        $this->entity->load((int) $this->entity->getId());
 
         if ($this->data['autoStartImport']) {
             $this->workersHandler->startImportWorkers($this->entity);
@@ -949,7 +957,7 @@ class editor_TaskController extends ZfExtended_RestController
             $cloner->cloneDependencies();
             $this->workersHandler->startImportWorkers($this->entity);
             //reload because entityVersion could be changed somewhere
-            $this->entity->load($this->entity->getId());
+            $this->entity->load((int) $this->entity->getId());
             $this->log->request();
             $this->view->success = true;
             $this->view->rows = $this->entity->getDataObject();
@@ -1088,10 +1096,13 @@ class editor_TaskController extends ZfExtended_RestController
         }
 
         //if the totals segment count is not set, update it before the entity is saved
-        if ($this->entity->getSegmentCount() === null || $this->entity->getSegmentCount() < 1) {
-            $segment = ZfExtended_Factory::get('editor_Models_Segment');
+        if ($this->entity->getSegmentCount() < 1) {
+            $segment = ZfExtended_Factory::get(editor_Models_Segment::class);
             $this->entity->setSegmentCount($segment->getTotalSegmentsCount($taskguid));
         }
+
+        // Recalculate task progress and assign results into view
+        $this->appendTaskProgress($this->entity);
 
         $this->entity->save();
         $obj = $this->entity->getDataObject();
@@ -1672,7 +1683,7 @@ class editor_TaskController extends ZfExtended_RestController
 
         $context = $this->_helper->getHelper('contextSwitch')->getCurrentContext() ?? '';
 
-        if($context === 'package'){
+        if ($context === 'package') {
             $this->assertTranslatorPackageAllowed();
         }
 
@@ -2151,7 +2162,7 @@ class editor_TaskController extends ZfExtended_RestController
         if ($taskEntity->isProject()) {
             $model = ZfExtended_Factory::get('editor_Models_Task');
             /* @var $model editor_Models_Task */
-            $tasks = $model->loadProjectTasks($this->entity->getProjectId(), true);
+            $tasks = $model->loadProjectTasks((int) $this->entity->getProjectId(), true);
             // if it is project, load all project tasks, and check the state for each one of them
             foreach ($tasks as $projectTask) {
                 $model->init($projectTask);

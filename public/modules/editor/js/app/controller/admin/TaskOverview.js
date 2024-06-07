@@ -318,7 +318,7 @@ Ext.define('Editor.controller.admin.TaskOverview', {
                             me.confirmStrings.editorImportTask.title,
                             me.confirmStrings.editorImportTask.msg,
                             btn => {
-                                if (btn === 'yes') {
+                                if (btn !== 'yes') {
                                     startImport(task);
                                 }
                             });

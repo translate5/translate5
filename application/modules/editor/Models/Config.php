@@ -26,6 +26,8 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\ZfExtended\Acl\ConfigRestrictionResource;
+
 /**
  * TODO: config validator. It needs to check if the field is requeired or not
  */
@@ -101,21 +103,35 @@ class editor_Models_Config extends ZfExtended_Models_Config
         }
     }
 
-    /***
+    /**
      * Load configs fron the database by given level
-     * @param mixed $level
      * @param array $excludeType config types to be excluded, expect a typeClass is set!
-     * @throws ZfExtended_ErrorCodeException
-     * @return array[]
+     * @throws Zend_Exception
      */
-    protected function loadByLevel($level, array $excludeType = [])
+    protected function loadByLevel(mixed $level, array $excludeType = [], bool $accessRestricted = false): array
     {
         if (! is_array($level)) {
             $level = [$level];
         }
+
         $s = $this->db->select()
-            ->from('Zf_configuration', ['Zf_configuration.*', new Zend_Db_Expr($this->db->getAdapter()->quote(self::CONFIG_SOURCE_DB) . ' as origin')])
+            ->from(
+                'Zf_configuration',
+                ['Zf_configuration.*',
+                    new Zend_Db_Expr($this->db->getAdapter()->quote(self::CONFIG_SOURCE_DB) . ' as origin')]
+            )
             ->where('level & ? > 0', array_sum($level));
+
+        if ($accessRestricted) {
+            $user = ZfExtended_Authentication::getInstance()->getUser();
+            $acl = ZfExtended_Acl::getInstance();
+            $restrictionLevels = $acl->getRightsToRolesAndResource(
+                $user->getRoles(),
+                ConfigRestrictionResource::ID
+            );
+            $s->where('accessRestriction IN(?)', $restrictionLevels);
+        }
+
         if (! empty($excludeType)) {
             $s->where('(type NOT IN(?)', $excludeType);
             $s->orWhere('typeClass IS NOT NULL)');
@@ -185,10 +201,10 @@ class editor_Models_Config extends ZfExtended_Models_Config
      * overrides the DB config values from the user config
      * The result array keys are set from the config name.
      */
-    public function mergeUserValues(string $userGuid, array $dbResults = []): array
+    public function mergeUserValues(string $userGuid, array $dbResults = [], bool $accessRestricted = false): array
     {
         if (empty($dbResults)) {
-            $dbResults = $this->loadByLevel(self::CONFIG_LEVEL_USER);
+            $dbResults = $this->loadByLevel(self::CONFIG_LEVEL_USER, accessRestricted: $accessRestricted);
         }
         array_walk($dbResults, function (&$r) use ($userGuid) {
             $r['userGuid'] = $userGuid;
@@ -202,33 +218,34 @@ class editor_Models_Config extends ZfExtended_Models_Config
         return $this->mergeConfig($userResults, $dbResults, self::CONFIG_SOURCE_USER);
     }
 
-    /***
+    /**
      * Load all task specific config with customer specific base. The base customer is the task customer.
      * The result array keys are set from the config name.
      *
-     * @param string $taskGuid
-     * @param array $dbResults
-     * @return array
+     * @throws ZfExtended_Models_Entity_NotFoundException|ReflectionException
      */
-    public function mergeTaskValues(string $taskGuid, array $dbResults = [], bool $excludeMaps = true): array
-    {
-        $task = ZfExtended_Factory::get('editor_Models_Task');
-        /* @var $task editor_Models_Task */
+    public function mergeTaskValues(
+        string $taskGuid,
+        array $dbResults = [],
+        bool $excludeMaps = true,
+        bool $accessRestricted = false
+    ): array {
+        $task = ZfExtended_Factory::get(editor_Models_Task::class);
         $task->loadByTaskGuid($taskGuid);
-        $taskState = $task->getState();
 
         //when the task is not with state import or project, change for task config and task import config is allowed
-        $isImportDisabled = ! in_array($taskState, [$task::STATE_IMPORT, $task::STATE_PROJECT]);
+        $isImportDisabled = ! in_array($task->getState(), [$task::STATE_IMPORT, $task::STATE_PROJECT]);
 
         //load the task customer config as config base for this task
         //on customer level, we can override task specific config. With this, those overrides will be loaded
         //and used as base value in task config window
         //configs with customer level will be marked as readonly on the frontend
         $customerBase = $this->mergeCustomerValues(
-            $task->getCustomerId(),
+            (int) $task->getCustomerId(),
             $dbResults,
             self::CUSTOMER_CONFIG_LEVELS,
-            $excludeMaps
+            $excludeMaps,
+            $accessRestricted,
         );
         array_walk($customerBase, function (&$r) use ($taskGuid, $isImportDisabled) {
             $r['taskGuid'] = $taskGuid;
@@ -262,7 +279,8 @@ class editor_Models_Config extends ZfExtended_Models_Config
         int $customerId,
         array $dbResults = [],
         array $level = self::CUSTOMER_CONFIG_LEVELS,
-        bool $excludeMaps = true
+        bool $excludeMaps = true,
+        bool $accessRestricted = false,
     ): array {
         if (empty($dbResults)) {
             //include task levels so we can set the baase values for task config
@@ -270,7 +288,8 @@ class editor_Models_Config extends ZfExtended_Models_Config
             //is available for now
             $dbResults = $this->loadByLevel(
                 $level,
-                $excludeMaps ? [ZfExtended_DbConfig_Type_CoreTypes::TYPE_MAP] : []
+                $excludeMaps ? [ZfExtended_DbConfig_Type_CoreTypes::TYPE_MAP] : [],
+                $accessRestricted
             );
         }
         array_walk($dbResults, function (&$r) use ($customerId) {
@@ -291,12 +310,14 @@ class editor_Models_Config extends ZfExtended_Models_Config
      *
      * @param array $dbResults
      * @return array
+     * @throws ReflectionException
+     * @throws ZfExtended_ErrorCodeException
+     * @throws ZfExtended_Models_Entity_NotFoundException
      */
-    public function mergeInstanceValue(array $dbResults = []): array
+    public function mergeInstanceValue(array $dbResults = [], bool $accessRestricted = false): array
     {
         if (empty($dbResults)) {
-            $user = ZfExtended_Factory::get('ZfExtended_Models_User');
-            /* @var $user ZfExtended_Models_User */
+            $user = ZfExtended_Factory::get(ZfExtended_Models_User::class);
             $user->load(ZfExtended_Authentication::getInstance()->getUserId());
             //get all application config level for the user
             $levels = [];
@@ -310,7 +331,7 @@ class editor_Models_Config extends ZfExtended_Models_Config
             $levels = array_unique($levels);
             // do not load all map config types (usualy default state) since no config editor for the frontend
             // is available for all types
-            $dbResults = $this->loadByLevel($levels, [ZfExtended_DbConfig_Type_CoreTypes::TYPE_MAP]);
+            $dbResults = $this->loadByLevel($levels, [ZfExtended_DbConfig_Type_CoreTypes::TYPE_MAP], $accessRestricted);
         }
 
         return $this->mergeConfig([], $dbResults, self::CONFIG_LEVEL_SYSTEM);
