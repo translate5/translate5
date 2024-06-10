@@ -350,7 +350,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
         $target = $this->tagHandler->prepareQuery($segment->getTargetEdit(), false);
 
         $timestamp = $useSegmentTimestamp
-            ? $this->api->getDate($segment->getTimestamp())
+            ? $this->api->getDate((int) $segment->getTimestamp())
             : $this->api->getNowDate();
 
         $successful = $this->api->update(
@@ -692,6 +692,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
                 $this->addReorganizeWarning();
                 $this->reorganizeTm($tmName);
                 if (null === $searchDTO) {
+                    $numResults = self::CONCORDANCE_SEARCH_NUM_RESULTS - $resultsCount;
                     $successful = $this->api->concordanceSearch($searchString, $tmName, $field, $tmOffset, $numResults);
                 } else {
                     $successful = $this->api->search($tmName, $tmOffset, 200, $searchDTO);

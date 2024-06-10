@@ -30,7 +30,7 @@ namespace MittagQI\Translate5\T5Memory\DTO;
 
 class SearchDTO
 {
-    public function __construct(
+    final public function __construct(
         public readonly string $source,
         public readonly string $sourceMode,
         public readonly string $target,

@@ -8,7 +8,7 @@ use Zend_Controller_Request_Abstract as Request;
 
 class GetListDTO
 {
-    public function __construct(
+    final public function __construct(
         public readonly int $tmId,
         public readonly int $limit,
         public readonly string $offset,

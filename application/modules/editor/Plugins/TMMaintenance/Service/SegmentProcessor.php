@@ -5,23 +5,27 @@ declare(strict_types=1);
 namespace MittagQI\Translate5\Plugins\TMMaintenance\Service;
 
 use editor_Models_LanguageResources_LanguageResource;
+use editor_Services_Connector_Exception;
 use editor_Services_OpenTM2_Connector as Connector;
-use JetBrains\PhpStorm\ArrayShape;
 use MittagQI\Translate5\Plugins\TMMaintenance\DTO\CreateDTO;
 use MittagQI\Translate5\Plugins\TMMaintenance\DTO\DeleteBatchDTO;
 use MittagQI\Translate5\Plugins\TMMaintenance\DTO\DeleteDTO;
 use MittagQI\Translate5\Plugins\TMMaintenance\DTO\GetListDTO;
 use MittagQI\Translate5\Plugins\TMMaintenance\DTO\UpdateDTO;
+use MittagQI\Translate5\Plugins\TMMaintenance\Overwrites\T5MemoryXliff;
 use MittagQI\Translate5\T5Memory\DTO\DeleteBatchDTO as T5DeleteBatchDTO;
 use MittagQI\Translate5\T5Memory\DTO\SearchDTO as T5SearchDTO;
 use ZfExtended_Factory;
 
 final class SegmentProcessor
 {
-    #[ArrayShape([
-        'items' => 'array',
-        'metaData' => 'array',
-    ])]
+    /**
+     * @param GetListDTO $getListDto
+     *
+     * @return array{items: array, metaData: array}
+     *
+     * @throws editor_Services_Connector_Exception
+     */
     public function getList(GetListDTO $getListDto): array
     {
         $connector = $this->getOpenTM2Connector($getListDto->tmId);
@@ -138,21 +142,7 @@ final class SegmentProcessor
 
         ZfExtended_Factory::addOverwrite(
             \editor_Services_Connector_TagHandler_T5MemoryXliff::class,
-            new class() extends \editor_Services_Connector_TagHandler_T5MemoryXliff {
-                public function restoreInResult(string $resultString, bool $isSource = true): ?string
-                {
-                    $restoredResult = parent::restoreInResult($resultString);
-
-                    $pattern = '/<div class="([^"]*)\bignoreInEditor\b([^"]*)">/';
-                    $replacement = '<div class="$1$2">';
-                    // Normalize spaces in the class attribute
-                    $replacement = preg_replace('/\s+/', ' ', $replacement);
-                    // Replace ignoreInEditor class
-                    $updatedHtml = preg_replace($pattern, $replacement, $restoredResult);
-
-                    return preg_replace('/\s+/', ' ', $updatedHtml);
-                }
-            }
+            T5MemoryXliff::class
         );
 
         $connector = new Connector();
