@@ -9,9 +9,8 @@ use RuntimeException;
 
 class CorruptResponseBodyException extends RuntimeException implements ResponseException
 {
-    public const ERROR_CODE = 101;
     public function __construct(RuntimeException $contentException)
     {
-        parent::__construct('Unable to get Content from response body', self::ERROR_CODE, $contentException);
+        parent::__construct('Unable to get Content from response body', previous: $contentException);
     }
 }

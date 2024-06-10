@@ -23,14 +23,14 @@ class ResourcesResponse
      * @throws InvalidJsonInResponseBodyException
      * @throws InvalidResponseStructureException
      */
-    public static function fromPsrResponse(ResponseInterface $response): self
+    public static function fromResponse(ResponseInterface $response): self
     {
         try {
             $content = $response->getBody()->getContents();
             $body = Utils::jsonDecode($content, true);
 
             if (! isset($body['Version'])) {
-                throw new InvalidResponseStructureException('Version', $content);
+                throw InvalidResponseStructureException::invalidBody('Version', $content);
             }
 
             return new self($body['Version']);

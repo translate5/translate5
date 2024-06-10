@@ -37,8 +37,8 @@ use MittagQI\Translate5\LanguageResource\Status as LanguageResourceStatus;
 use MittagQI\Translate5\T5Memory\Api\VersionFetchingApi;
 use MittagQI\Translate5\T5Memory\Enum\StripFramingTags;
 use MittagQI\Translate5\T5Memory\PersistenceService;
-use PharIo\Version\GreaterThanOrEqualToVersionConstraint;
-use PharIo\Version\Version;
+use MittagQI\Translate5\T5Memory\T5memoryExportService;
+use MittagQI\Translate5\T5Memory\VersionService;
 
 /**
  * T5memory / OpenTM2 Connector
@@ -82,9 +82,11 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
 
     private TmConversionService $conversionService;
 
-    private VersionFetchingApi $versionFetchingApi;
+    private VersionService $versionService;
 
     private PersistenceService $persistenceService;
+
+    private Client $httpClient;
 
     public function __construct()
     {
@@ -96,8 +98,9 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
         ZfExtended_Logger::addDuplicatesByEcode('E1333', 'E1306', 'E1314');
 
         $this->conversionService = TmConversionService::create();
-        $this->versionFetchingApi = new VersionFetchingApi(new Client());
         $this->persistenceService = new PersistenceService();
+        $this->httpClient = new Client();
+        $this->versionService = new VersionService(new VersionFetchingApi($this->httpClient));
 
         parent::__construct();
     }
@@ -180,7 +183,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
         }
 
         //initial upload is a TM file
-        if ($this->isVersionSufficient(self::VERSION_0_6)) {
+        if ($this->versionService->isLRVersionGreaterThan(self::VERSION_0_6, $this->languageResource)) {
             $tmName = $this->api->createMemoryWithFile($name, $sourceLang, $fileinfo['tmp_name']);
         } else {
             $tmName = $this->api->createMemory($name, $sourceLang, file_get_contents($fileinfo['tmp_name']));
@@ -736,7 +739,10 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
         }
 
         // TODO remove after fully migrated to t5memory v0.5.x
-        if (! $this->isVersionSufficient(self::VERSION_0_5) && $this->isReorganizingAtTheMoment($name)) {
+        if (
+            ! $this->versionService->isLRVersionGreaterThan(self::VERSION_0_5, $this->languageResource)
+            && $this->isReorganizingAtTheMoment($name)
+        ) {
             // Status import to prevent any other queries to TM to be performed
             return LanguageResourceStatus::IMPORT;
         }
@@ -914,29 +920,27 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
      */
     public function initForFuzzyAnalysis($analysisId)
     {
-        $mime = 'TM';
+        $ext = 'TM';
         $validExportTypes = $this->getValidExportTypes();
 
-        if (empty($validExportTypes[$mime])) {
-            throw new ZfExtended_NotFoundException('Can not download in format ' . $mime);
+        if (empty($validExportTypes[$ext])) {
+            throw new ZfExtended_NotFoundException('Can not download in format ' . $ext);
         }
 
         $memories = $this->languageResource->getSpecificData('memories', parseAsArray: true);
         $fuzzyMemories = [];
 
+        $this->versionService->setInternalFuzzy(true);
+
         foreach ($memories as ['filename' => $memory, 'readonly' => $readonly]) {
             $fuzzyFileName = $this->renderFuzzyLanguageResourceName($memory, $analysisId);
             $this->api->setResource($this->languageResource->getResource());
 
-            // TODO T5MEMORY: remove when OpenTM2 is out of production
-            if ($this->api->isOpenTM2()) {
-                $data = $this->getTm($validExportTypes[$mime], $memory);
-                $this->api->createMemory($fuzzyFileName, $this->languageResource->getSourceLangCode(), $data);
-            } else {
+            if (! $this->versionService->isLRVersionGreaterThan(self::VERSION_0_5, $this->languageResource)) {
                 // HOTFIX for t5memory BUG:
                 // After a clone call the clone might is corrupt, if the cloned TM has (recent) updates
                 // an export of the cloned memory before seems to heal that (either as TM or TMX)
-                $this->getTm($validExportTypes[$mime], $memory);
+                $this->api->get($validExportTypes[$ext], $memory);
                 sleep(1);
                 $this->api->cloneMemory($fuzzyFileName, $memory);
                 sleep(1);
@@ -1174,7 +1178,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
 
         $reorganized = $this->api->reorganizeTm($tmName);
 
-        if ($this->isVersionSufficient(self::VERSION_0_5)) {
+        if ($this->versionService->isLRVersionGreaterThan(self::VERSION_0_5, $this->languageResource)) {
             $reorganized = $this->waitReorganizeFinished();
         }
 
@@ -1193,7 +1197,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
     {
         $this->resetReorganizingIfNeeded();
 
-        if ($this->isVersionSufficient(self::VERSION_0_5)) {
+        if ($this->versionService->isLRVersionGreaterThan(self::VERSION_0_5, $this->languageResource)) {
             return $this->getStatus(
                 $this->resource,
                 tmName: $tmName
@@ -1205,7 +1209,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
 
     public function isReorganizeFailed(?string $tmName = null): bool
     {
-        if ($this->isVersionSufficient(self::VERSION_0_5)) {
+        if ($this->versionService->isLRVersionGreaterThan(self::VERSION_0_5, $this->languageResource)) {
             return $this->getStatus(
                 $this->resource,
                 tmName: $tmName
@@ -1301,45 +1305,6 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
         $languageResource->refresh();
         $languageResource->removeSpecificData(self::REORGANIZE_ATTEMPTS);
         $languageResource->save();
-    }
-
-    private function isVersionSufficient(string $version): bool
-    {
-        $constraint = new GreaterThanOrEqualToVersionConstraint($version, new Version($version));
-
-        return $constraint->complies(new Version($this->getT5MemoryVersion()));
-    }
-
-    private function getT5MemoryVersion(): string
-    {
-        if (! $this->languageResource || $this->api->isOpentm2()) {
-            return VersionFetchingApi::FALLBACK_VERSION;
-        }
-
-        $version = $this->languageResource->getSpecificData('version', true);
-
-        if (isset($version['version'], $version['lastSynced'])
-            && null !== $version
-            && (new DateTime($version['lastSynced']))->modify('+30 minutes') > new DateTime()
-        ) {
-            return $version['version'];
-        }
-
-        $version = $this->versionFetchingApi->version($this->languageResource->getResource()->getUrl());
-
-        if (! $this->isInternalFuzzy()) {
-            // TODO In editor_Services_Manager::visitAllAssociatedTms language resource is initialized
-            // without refreshing from DB, which leads th that here it is tried to be inserted as new one
-            // so refreshing it here. Need to check if we can do this in editor_Services_Manager::visitAllAssociatedTms
-            $this->languageResource->refresh();
-            $this->languageResource->addSpecificData('version', [
-                'version' => $version,
-                'lastSynced' => date(DateTimeInterface::RFC3339),
-            ]);
-            $this->languageResource->save();
-        }
-
-        return $version;
     }
 
     /**
@@ -1495,12 +1460,12 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
     private function importTmxIntoMemory(
         string $importFilename,
         string $tmName,
-        StripFramingTags $stripFramingTags
+        StripFramingTags $stripFramingTags,
     ): bool {
         $successful = false;
 
         try {
-            if ($this->isVersionSufficient(self::VERSION_0_6)) {
+            if ($this->versionService->isLRVersionGreaterThan(self::VERSION_0_6, $this->languageResource)) {
                 $successful = $this->api->importMemoryAsFile($importFilename, $tmName, $stripFramingTags);
             } else {
                 $successful = $this->api->importMemory(file_get_contents($importFilename), $tmName, $stripFramingTags);

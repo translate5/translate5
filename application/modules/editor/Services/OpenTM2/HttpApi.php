@@ -214,20 +214,27 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
                 )
             );
         } catch (RequestException $e) {
-            if ($e->hasResponse()) {
-                $response = $e->getResponse();
-
-                return $this->processResponse(
-                    new Zend_Http_Response(
-                        $response->getStatusCode(),
-                        $response->getHeaders(),
-                        $response->getBody()->getContents()
-                    )
-                );
-            }
-
-            throw $e;
+            return $this->processPsrRequestException($e);
         }
+    }
+
+    private function processPsrRequestException(RequestException $e): bool
+    {
+        if ($e->hasResponse()) {
+            $response = $e->getResponse();
+            $this->http = ZfExtended_Factory::get('Zend_Http_Client');
+            $this->http->setUri((string) $e->getRequest()->getUri());
+
+            return $this->processResponse(
+                new Zend_Http_Response(
+                    $response->getStatusCode(),
+                    $response->getHeaders(),
+                    $response->getBody()->getContents()
+                )
+            );
+        }
+
+        throw $e;
     }
 
     /**

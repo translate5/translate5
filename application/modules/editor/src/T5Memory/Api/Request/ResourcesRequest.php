@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\T5Memory\Api\Requset;
+namespace MittagQI\Translate5\T5Memory\Api\Request;
 
 use GuzzleHttp\Psr7\Request;
 
 class ResourcesRequest extends Request
 {
-    public function __construct($baseUrl)
+    public function __construct(string $baseUrl)
     {
         parent::__construct(
             'GET',

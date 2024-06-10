@@ -6,14 +6,12 @@ namespace MittagQI\Translate5\T5Memory\Api;
 
 use MittagQI\Translate5\T5Memory\Api\Contract\HasVersion;
 use MittagQI\Translate5\T5Memory\Api\Contract\ResponseException;
-use MittagQI\Translate5\T5Memory\Api\Requset\ResourcesRequest;
+use MittagQI\Translate5\T5Memory\Api\Request\ResourcesRequest;
 use MittagQI\Translate5\T5Memory\Api\Response\ResourcesResponse;
 use Psr\Http\Client\ClientInterface;
 
 class VersionFetchingApi implements HasVersion
 {
-    public const FALLBACK_VERSION = '0.4';
-
     public function __construct(private ClientInterface $client)
     {
     }
@@ -23,7 +21,7 @@ class VersionFetchingApi implements HasVersion
         $response = $this->client->sendRequest(new ResourcesRequest($baseUrl));
 
         try {
-            return ResourcesResponse::fromPsrResponse($response)->version;
+            return ResourcesResponse::fromResponse($response)->version;
         } catch (ResponseException $exception) {
             if ($suppressExceptions) {
                 return self::FALLBACK_VERSION;
