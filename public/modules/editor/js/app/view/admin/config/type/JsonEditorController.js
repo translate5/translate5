@@ -52,7 +52,6 @@ Ext.define('Editor.view.admin.config.type.JsonEditorController', {
         var win = this.getView();
 
         try {
-            // validate if the text area value is valid json. If yes set the value to the record
             var value = Ext.decode(this.getView().down('textarea').getValue());
             this.record.set('value', value);
 
