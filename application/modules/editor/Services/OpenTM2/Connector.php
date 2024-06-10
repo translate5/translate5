@@ -741,7 +741,11 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
         }
 
         foreach ($results as $result) {
-            $resultList->addResult($this->tagHandler->restoreInResult($result->target, $isSource));
+            $resultList->addResult(
+                $this->tagHandler->restoreInResult($result->target, $isSource),
+                0,
+                $this->getMetaData($result)
+            );
             $resultList->setSource($this->tagHandler->restoreInResult($result->source, $isSource));
         }
 
