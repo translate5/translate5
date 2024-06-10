@@ -50,8 +50,8 @@
     "cancel": "Abbrechen"
   },
   "deleteBatch": {
-    "close": "Schließen",
-    "proceed": "Weiter",
+    "no": "Ja",
+    "yes": "Nein",
     "warningText": "ACHTUNG: Alle Segmente, die mit den aktuellen Sucheinstellungen gefunden werden, werden gelöscht. Wollen Sie lieber abbrechen?"
   },
   "list" : {

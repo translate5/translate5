@@ -61,7 +61,7 @@ Ext.define('TMMaintenance.view.main.MainController', {
     sourceTargetRenderer: function (value, record, cell) {
         const entered = this.getSearchForm().getValues()[cell];
 
-        if (entered !== '') {
+        if (entered === '') {
             return value;
         }
 

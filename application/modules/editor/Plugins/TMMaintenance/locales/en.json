@@ -50,8 +50,8 @@
     "cancel": "Cancel"
   },
   "deleteBatch": {
-    "close": "Close",
-    "proceed": "Proceed",
+    "no": "No",
+    "yes": "Yes",
     "warningText": "All segments that can be found with the current search settings will be deleted. Better abort the process?"
   },
   "list" : {

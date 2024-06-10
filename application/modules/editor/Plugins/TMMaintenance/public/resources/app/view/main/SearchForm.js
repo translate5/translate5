@@ -215,12 +215,12 @@ Ext.define('TMMaintenance.view.main.SearchForm', {
                     flex: 1,
                     handler: 'onDeleteBatchPress',
                     formBind: true,
-                    tooltip: '{l10n.searchForm.deleteAll}',
                     disabled: true,
                     bind: {
                         disabled: '{!hasRecords}',
                         text: '{l10n.searchForm.deleteAll}',
                         hidden: '{!l10n.searchForm.deleteAll}',
+                        tooltip: '{l10n.searchForm.deleteAllTooltip}',
                     },
                 },
             ]
