@@ -34,8 +34,6 @@ use ZfExtended_DbConfig_Type_CoreTypes;
  * */
 class JsonEditorType extends ZfExtended_DbConfig_Type_CoreTypes
 {
-    /**
-     */
     public function getGuiViewCls(): ?string
     {
         return 'Editor.view.admin.config.type.JsonEditor';
