@@ -217,6 +217,27 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
     /**
      * @throws Zend_Exception
      */
+    public function logrootcauseAction(): void
+    {
+        $this->_helper->layout->disableLayout();
+        $this->_helper->viewRenderer->setNoRender();
+
+        $extra = $this->getAllParams();
+
+        try {
+            if ($this->isTaskProvided()) {
+                $this->initCurrentTask(false);
+                $extra['task'] = $this->getCurrentTask();
+            }
+        } catch (\MittagQI\Translate5\Task\Current\Exception) {
+            //then add nothing
+        }
+        Zend_Registry::get('logger')->warn('E1606', 'Rootcause logged: {link}', $extra);
+    }
+
+    /**
+     * @throws Zend_Exception
+     */
     protected function checkForUpdates(string $currentVersion)
     {
         if ($currentVersion == ZfExtended_Utils::VERSION_DEVELOPMENT) {

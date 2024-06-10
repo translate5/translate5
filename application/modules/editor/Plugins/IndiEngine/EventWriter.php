@@ -225,6 +225,11 @@ class EventWriter extends ZfExtended_Logger_Writer_Database
         // Call parent
         parent::write($event);
 
+        // If this event is a duplicate - return
+        if ($this->getDuplicateCount($event) > 0) {
+            return;
+        }
+
         // Proceed only if postingMode is 'realtime'
         if ($this->config->postingMode !== 'realtime') {
             return;
