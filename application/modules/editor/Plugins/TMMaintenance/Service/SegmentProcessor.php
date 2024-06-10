@@ -20,8 +20,6 @@ use ZfExtended_Factory;
 final class SegmentProcessor
 {
     /**
-     * @param GetListDTO $getListDto
-     *
      * @return array{items: array, metaData: array}
      *
      * @throws editor_Services_Connector_Exception

@@ -43,8 +43,12 @@ class Editor_TmmaintenanceController extends ZfExtended_Controllers_Action
         /** @var Zend_Controller_Action_Helper_ViewRenderer $helper */
         $helper = $this->_helper->getHelper('viewRenderer');
         $helper->setNoRender();
-        $this->view->addScriptPath(APPLICATION_ROOT . '/application/modules/editor/Plugins/TMMaintenance/public/resources/');
-        $this->view->assign(['csrfToken' => CsrfProtection::getInstance()->getToken()]);
+        $this->view->addScriptPath(
+            APPLICATION_ROOT . '/application/modules/editor/Plugins/TMMaintenance/public/resources/'
+        );
+        $this->view->assign([
+            'csrfToken' => CsrfProtection::getInstance()->getToken(),
+        ]);
 
         echo $this->view->render('index.php');
     }

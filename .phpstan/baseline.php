@@ -21022,5 +21022,15 @@ $ignoreErrors[] = [
 	'count' => 1,
 	'path' => __DIR__ . '/../library/ZfExtended/TemplateBasedMail',
 ];
+$ignoreErrors[] = [
+    'message' => '#^Constant APPLICATION_RUNDIR not found\\.$#',
+    'count' => 3,
+    'path' => __DIR__ . '/../application/modules/editor/Plugins/TMMaintenance/public/resources/index.php',
+];
+$ignoreErrors[] = [
+    'message' => '#^Variable \\$this might not be defined\\.$#',
+    'count' => 1,
+    'path' => __DIR__ . '/../application/modules/editor/Plugins/TMMaintenance/public/resources/index.php',
+];
 
 return ['parameters' => ['ignoreErrors' => $ignoreErrors]];
