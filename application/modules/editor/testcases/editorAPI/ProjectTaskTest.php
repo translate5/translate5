@@ -27,8 +27,6 @@ END LICENSE AND COPYRIGHT
 */
 
 use MittagQI\Translate5\Test\Import\Config;
-use MittagQI\Translate5\Test\Model\AbstractModel;
-use PHPUnit\Framework\ExpectationFailedException;
 
 /***
  * 1. Create project with 4 project tasks.
@@ -125,46 +123,14 @@ class ProjectTaskTest extends editor_Test_JsonTest
         $fileName = str_replace(['/', '::'], '_', $task->taskName . '.json');
         $segments = static::api()->getSegments($fileName);
         // compare segments (this API will strip/adjust segment contents)
-        $this->assertSegmentsEqualsJsonFile($fileName, $segments, 'Imported segments are not as expected in ' . basename($fileName) . '!');
+        $this->assertSegmentsEqualsJsonFile(
+            fileToCompare: $fileName,
+            segments: $segments,
+            message: 'Imported segments are not as expected in ' . basename($fileName) . '!',
+            stopOnFirstFailedDiff: false
+        );
 
         // close the task for editing
         static::api()->setTaskToOpen($task->id);
-    }
-
-    /**
-     * Compares an array of segments with a file (which must contain those segments as json-array)
-     * @param stdClass[] $segments
-     */
-    public function assertSegmentsEqualsJsonFile(string $fileToCompare, array $segments, string $message = '', bool $keepComments = true, bool $useOkapiHtmlSanitization = false)
-    {
-        if (static::api()->isCapturing()) {
-            // TODO FIXME: why do we save the comparable data here but not the original/fetched data ? This is against the concept which implies the raw data will end up in the stored files
-            foreach ($segments as $idx => $segment) {
-                $model = AbstractModel::create($segment, 'segment');
-                $segments[$idx] = $model->getComparableData();
-            }
-            // on capturing we disable assert existence
-            static::api()->captureData($fileToCompare, $segments, true);
-        }
-        $expectations = static::api()->getFileContent($fileToCompare);
-        $numSegments = count($segments);
-        $numExpectations = count($expectations);
-        if ($numSegments === $numExpectations) {
-            $lastException = null;
-            for ($i = 0; $i < $numSegments; $i++) {
-                try {
-                    $msg = (empty($message)) ? '' : $message . ' [Segment ' . ($i + 1) . ']';
-                    $this->assertSegmentEqualsObject($expectations[$i], $segments[$i], $msg, $keepComments, $useOkapiHtmlSanitization);
-                } catch (ExpectationFailedException $e) {
-                    print_r([$msg, $e->getComparisonFailure()->getDiff()]);
-                    $lastException = $e;
-                }
-            }
-            if ($lastException) {
-                throw $lastException;
-            }
-        } else {
-            $this->assertEquals($numSegments, $numExpectations, $message . ' [Number of segments does not match the expectations]');
-        }
     }
 }

@@ -480,8 +480,6 @@ the format is:
      */
     protected function showDetail(array $row)
     {
-        $row['file'] = null;
-        $row['line'] = null;
         $out = [
             '         <info>id:</> ' . (string) $row['id'],
             '      <info>level:</> ' . (string) self::LEVELS[$row['level']],

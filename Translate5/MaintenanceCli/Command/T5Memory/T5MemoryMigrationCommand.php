@@ -434,6 +434,12 @@ class T5MemoryMigrationCommand extends Translate5AbstractCommand
             $languageResource->getTargetLang()
         );
 
+        $status = $connector->getStatus($connector->getResource());
+
+        if ($status !== LanguageResourceStatus::AVAILABLE) {
+            throw new RuntimeException(sprintf('Language resource has status \'%s\'', $status));
+        }
+
         $filename = $connector->export($type);
         rename($filename, $filenameWithPath);
 
@@ -609,13 +615,13 @@ class T5MemoryMigrationCommand extends Translate5AbstractCommand
         $resourceLanguages->setSourceLangCode($languageResource->getSourceLangCode());
         $resourceLanguages->setTargetLang($languageResource->getTargetLang());
         $resourceLanguages->setTargetLangCode($languageResource->getTargetLangCode());
-        $resourceLanguages->setLanguageResourceId($newLanguageResource->getId());
+        $resourceLanguages->setLanguageResourceId((int) $newLanguageResource->getId());
         $resourceLanguages->save();
 
         foreach ($languageResource->getCustomers() as $customerId) {
             $customerAssoc = ZfExtended_Factory::get(LanguageResourcesCustomerAssoc::class);
             $customerAssoc->setCustomerId($customerId);
-            $customerAssoc->setLanguageResourceId($newLanguageResource->getId());
+            $customerAssoc->setLanguageResourceId((int) $newLanguageResource->getId());
             $customerAssoc->save();
         }
 

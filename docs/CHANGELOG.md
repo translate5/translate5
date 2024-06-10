@@ -15,6 +15,88 @@ All updates are (downwards) compatible! If not this is listed in the important r
 
 
 
+
+
+## [7.6.2] - 2024-06-07
+
+### Important Notes:
+#### [TRANSLATE-3983](https://jira.translate5.net/browse/TRANSLATE-3983)
+The workers are now called as individual process instead http requests by default.
+ 
+
+
+### Changed
+**[TRANSLATE-3985](https://jira.translate5.net/browse/TRANSLATE-3985): t5memory - Add check for language resource status before migration** <br>
+Added checking language resource status before starting migration.
+
+**[TRANSLATE-3983](https://jira.translate5.net/browse/TRANSLATE-3983): Main back-end mechanisms (Worker, Logging, etc.) - Use process based workers by default** <br>
+The config runtimeOptions.worker.triggerType is changed now from http to process by default.
+
+**[TRANSLATE-3981](https://jira.translate5.net/browse/TRANSLATE-3981): Installation & Update - Installation is not working anymore** <br>
+FIXED: problem with installation
+
+**[TRANSLATE-3978](https://jira.translate5.net/browse/TRANSLATE-3978): InstantTranslate - Change font in InstantTranslate help window** <br>
+Set up font name, size and color in InstanstTranslate and TermPortal help windows
+
+
+### Bugfixes
+**[TRANSLATE-3993](https://jira.translate5.net/browse/TRANSLATE-3993): Main back-end mechanisms (Worker, Logging, etc.) - Final task import workers are initialized with the wrong status** <br>
+In seldom circumstances the import produces tasks with no segments imported due wrong order called workers.
+
+**[TRANSLATE-3992](https://jira.translate5.net/browse/TRANSLATE-3992): Test framework - wait for worker instead task status** <br>
+Improvements Test-API: functionality to wait for workers to be finished
+
+**[TRANSLATE-3989](https://jira.translate5.net/browse/TRANSLATE-3989): MatchAnalysis & Pretranslation - OpenAI: Non-trained Models cannot be used for batch-translation** <br>
+FIX: Non-trained OpenAI Models failed when used for batch-translation (task-import)
+
+**[TRANSLATE-3988](https://jira.translate5.net/browse/TRANSLATE-3988): TrackChanges - UI Crash on opening or saving a segment with track changes** <br>
+Some weird cascading track-changes tags lead to a crash of the segment editor on startup / segment save.
+
+**[TRANSLATE-3986](https://jira.translate5.net/browse/TRANSLATE-3986): Import/Export - Export not possible when okapi import had errors** <br>
+Fix an issue which prevents task export when some files of the task could not be imported with Okapi.
+
+**[TRANSLATE-3982](https://jira.translate5.net/browse/TRANSLATE-3982): Editor general - Transtilde may seep into internal tags** <br>
+FIX: Special string may ends up in the segments content in the Richtext-Editor with Placeables
+
+**[TRANSLATE-3979](https://jira.translate5.net/browse/TRANSLATE-3979): Editor general - Users with no roles can not be deleted via UI** <br>
+Fixes problem where users with no roles cannot be removed via UI.
+
+**[TRANSLATE-3977](https://jira.translate5.net/browse/TRANSLATE-3977): Main back-end mechanisms (Worker, Logging, etc.) - Error: Typed property ZfExtended_Logger_Writer_Database::$insertedData must not be accessed before initialization** <br>
+FIXED: flooding the log due to unhandled duplicates
+
+**[TRANSLATE-3976](https://jira.translate5.net/browse/TRANSLATE-3976): Export - Multi segment target in SDLXLIFF handled incorrectly on export** <br>
+Fix export of sdlxliff: provide draft config field, matchrate and related fields in multi-segment target
+
+**[TRANSLATE-3972](https://jira.translate5.net/browse/TRANSLATE-3972): Import/Export - XLIFF import: tags paired by RID are not paired anymore: TESTS** <br>
+Added tests to check pairing of ept/bpt by RID on import of xliff
+
+**[TRANSLATE-3968](https://jira.translate5.net/browse/TRANSLATE-3968): API, Authentication - Internal API not usable with application tokens** <br>
+Functionality which is using the Internal API is not usable with application tokens.
+
+**[TRANSLATE-3966](https://jira.translate5.net/browse/TRANSLATE-3966): Import/Export - Ensure that SDLXLIFF changemarks and locked segments are working well together** <br>
+The SDLXLIFF export of changemarks applied to locked tags may lead to invalid SDLXLIFF.
+
+
+## [7.6.1] - 2024-05-29
+
+### Important Notes:
+ 
+
+
+### Bugfixes
+**[TRANSLATE-3970](https://jira.translate5.net/browse/TRANSLATE-3970): Import/Export - XLIFF import: tags paired by RID are not paired anymore FIX-script** <br>
+Added CLI command to fix TRANSLATE-3967
+
+**[TRANSLATE-3969](https://jira.translate5.net/browse/TRANSLATE-3969): Editor general - comments in task are shown as {content:nl2br:htmlEncode}** <br>
+Fix comment escaping in task view
+
+**[TRANSLATE-3967](https://jira.translate5.net/browse/TRANSLATE-3967): Import/Export - XLIFF import: tags paired by RID are not paired anymore** <br>
+FIX: pbt/ept tag pairs connected by RID may could not be paired anymore in T5 when singular-tags with conflicting namespaced id's are present
+
+**[TRANSLATE-3957](https://jira.translate5.net/browse/TRANSLATE-3957): Import/Export - SDLXLIFF diff export struggles when there are entities in the raw content** <br>
+SDLXLIFF diff export does not export XML entities correctly
+
+
 ## [7.6.0] - 2024-05-24
 
 ### Important Notes:
