@@ -600,6 +600,7 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
             'contextSearchMode' => $searchDTO->contextMode . $caseInsensitive,
             'timestampSpanStart' => $this->getDate($searchDTO->creationDateFrom),
             'timestampSpanEnd' => $this->getDate($searchDTO->creationDateTo),
+            'onlyCountSegments' => $searchDTO->onlyCount ? '1' : '0',
             'searchPosition' => (string) $searchPosition,
             'numResults' => $numResults,
         ];

@@ -45,6 +45,7 @@ class SearchDTO
         public readonly string $documentMode,
         public readonly string $context,
         public readonly string $contextMode,
+        public readonly bool $onlyCount,
     ) {
     }
 
@@ -65,6 +66,7 @@ class SearchDTO
             $data['documentMode'],
             $data['context'],
             $data['contextMode'],
+            $data['onlyCount'],
         );
     }
 }

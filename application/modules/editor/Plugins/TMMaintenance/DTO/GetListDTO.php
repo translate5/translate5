@@ -52,6 +52,7 @@ class GetListDTO
         public readonly string $documentMode,
         public readonly string $context,
         public readonly string $contextMode,
+        public readonly bool $onlyCount,
     ) {
     }
 
@@ -75,6 +76,7 @@ class GetListDTO
             (string) $request->getParam('documentMode'),
             (string) $request->getParam('context'),
             (string) $request->getParam('contextMode'),
+            (bool) $request->getParam('onlyCount', false),
         );
     }
 
@@ -98,6 +100,7 @@ class GetListDTO
             'documentMode' => $this->documentMode,
             'context' => $this->context,
             'contextMode' => $this->contextMode,
+            'onlyCount' => $this->onlyCount,
         ];
     }
 }

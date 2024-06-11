@@ -45,11 +45,12 @@ Ext.define('TMMaintenance.view.main.SearchFormController', {
                     return;
                 }
 
-                let offset = operation.getProxy().getReader().metaData.offset;
+                const offset = operation.getProxy().getReader().metaData.offset;
 
                 me.getViewModel().set('lastOffset', offset);
                 me.getViewModel().set('hasRecords', records.length > 0);
                 me.getViewModel().set('hasMoreRecords', null !== offset);
+                me.readTotalAmount();
             },
         });
 
@@ -101,7 +102,30 @@ Ext.define('TMMaintenance.view.main.SearchFormController', {
                 console.log('Error deleting batch');
                 console.log(xhr);
             }
-        })
+        });
+    },
+
+    readTotalAmount: function () {
+        const me = this;
+
+        Ext.Ajax.request({
+            url: '/editor/plugins_tmmaintenance_api/read-amount/',
+            params: {...this.getView().getValues(), onlyCount: true},
+            async: false,
+            method: 'POST',
+            success: function (xhr) {
+                const data = JSON.parse(xhr.responseText);
+                console.log(data);
+            },
+            error: function (xhr) {
+                console.log('Error reading total amount');
+                console.log(xhr);
+            },
+            failure: function (xhr) {
+                console.log('Error reading total amount');
+                console.log(xhr);
+            }
+        });
     },
 
     /**

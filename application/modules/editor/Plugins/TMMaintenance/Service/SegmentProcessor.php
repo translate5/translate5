@@ -94,6 +94,14 @@ final class SegmentProcessor
         ];
     }
 
+    public function countResults(GetListDTO $getListDTO): int
+    {
+        $connector = $this->getOpenTM2Connector($getListDTO->tmId);
+        $searchDto = $this->getSearchDto($getListDTO);
+
+        return $connector->countSegments($searchDto);
+    }
+
     public function create(CreateDTO $createDto): void
     {
         $connector = $this->getOpenTM2Connector($createDto->tmId);

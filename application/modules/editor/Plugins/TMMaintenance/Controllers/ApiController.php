@@ -94,7 +94,6 @@ class Editor_Plugins_Tmmaintenance_ApiController extends ZfExtended_RestControll
     public function postAction(): void
     {
         $this->getSegmentsProcessor()->create(CreateDTO::fromRequest($this->getRequest()));
-        $this->assignView([]);
     }
 
     public function putAction(): void
@@ -107,16 +106,18 @@ class Editor_Plugins_Tmmaintenance_ApiController extends ZfExtended_RestControll
     {
         $dto = DeleteDTO::fromRequest($this->getRequest());
         $this->getSegmentsProcessor()->delete($dto);
-
-        $this->assignView([]);
     }
 
     public function deletebatchAction(): void
     {
         $dto = DeleteBatchDTO::fromRequest($this->getRequest());
         $this->getSegmentsProcessor()->deleteBatch($dto);
+    }
 
-        $this->assignView([]);
+    public function readamountAction()
+    {
+        $dto = GetListDTO::fromRequest($this->getRequest());
+        echo json_encode(['totalAmount' => $this->getSegmentsProcessor()->countResults($dto)], JSON_THROW_ON_ERROR);
     }
 
     #endregion Actions

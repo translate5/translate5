@@ -752,6 +752,28 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
         return $resultList;
     }
 
+    public function countSegments(SearchDTO $searchDTO): int
+    {
+        $amount = 0;
+        $memories = $this->languageResource->getSpecificData('memories', parseAsArray: true);
+        usort($memories, fn ($m1, $m2) => $m1['id'] <=> $m2['id']);
+
+        foreach ($memories as ['filename' => $tmName]) {
+            $successful = $this->api->search($tmName, 0, 0, $searchDTO);
+
+            if (! $successful) {
+                $this->logger->exception($this->getBadGatewayException($tmName));
+
+                continue;
+            }
+
+            $result = $this->api->getResult();
+            $amount += $result->NumOfFoundSegments;
+        }
+
+        return $amount;
+    }
+
     /***
      * Search the resource for available translation. Where the source text is in
      * resource source language and the received results are in the resource target language
