@@ -287,8 +287,7 @@ Ext.define('TMMaintenance.view.main.MainController', {
         editingPlugin.startEdit(record, grid.down('[dataIndex=target]'));
 
         Ext.defer(function () {
-            let editor = editingPlugin.getActiveEditor().getEditor();
-            editor.focus();
+            editingPlugin.getActiveEditor().focus();
         }, 200);
     },
 

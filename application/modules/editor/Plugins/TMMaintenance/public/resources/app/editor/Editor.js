@@ -81,9 +81,10 @@ Ext.define('Ext.translate5.Editor', {
         location.record.set('isEditing', true);
 
         const value = location.record.get(this.config.editingDataIndex);
+        const referenceData = location.record.get('source');
 
         if (this.editor) {
-            this.setData(value);
+            this.setData(value, referenceData);
 
             return;
         }
@@ -103,7 +104,7 @@ Ext.define('Ext.translate5.Editor', {
         ).then((editor) => {
             this.editor = editor;
 
-            this.setData(value);
+            this.setData(value, referenceData);
 
             return editor;
         });
@@ -121,7 +122,7 @@ Ext.define('Ext.translate5.Editor', {
         return this.editor.getDataT5Format();
     },
 
-    setData: function (data) {
-        this.editor.setDataT5Format(data, data);
+    setData: function (data, referenceData) {
+        this.editor.setDataT5Format(data, referenceData);
     },
 });
