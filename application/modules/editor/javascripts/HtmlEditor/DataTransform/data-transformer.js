@@ -114,9 +114,9 @@ export default class DataTransformer {
                         break;
 
                     case TagsConversion.TYPE.WHITESPACE:
-                        if (!this._tagCheck._isAllowedAddingWhitespaceTags()) {
-                            node = this.#getWhitespaceReferenceTagAtIndex(tagNumber);
-                        } else {
+                        node = this.#getWhitespaceReferenceTagAtIndex(tagNumber);
+
+                        if (!node && this._tagCheck._isAllowedAddingWhitespaceTags()) {
                             node = new Node(item, this._tagsConversion.transform(item));
                         }
 
@@ -228,6 +228,6 @@ export default class DataTransformer {
     }
 
     #getWhitespaceReferenceTagAtIndex(index) {
-        return this.#getReferenceTagAtIndex(TagsConversion.TYPE.SINGLE, index);
+        return this.#getReferenceTagAtIndex(TagsConversion.TYPE.WHITESPACE, index);
     }
 }

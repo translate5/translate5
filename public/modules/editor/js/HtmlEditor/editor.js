@@ -198,9 +198,9 @@ class DataTransformer {
                         break;
 
                     case _TagsTransform_tags_conversion__WEBPACK_IMPORTED_MODULE_1__["default"].TYPE.WHITESPACE:
-                        if (!this._tagCheck._isAllowedAddingWhitespaceTags()) {
-                            node = this.#getWhitespaceReferenceTagAtIndex(tagNumber);
-                        } else {
+                        node = this.#getWhitespaceReferenceTagAtIndex(tagNumber);
+
+                        if (!node && this._tagCheck._isAllowedAddingWhitespaceTags()) {
                             node = new _node__WEBPACK_IMPORTED_MODULE_0__["default"](item, this._tagsConversion.transform(item));
                         }
 
@@ -312,7 +312,7 @@ class DataTransformer {
     }
 
     #getWhitespaceReferenceTagAtIndex(index) {
-        return this.#getReferenceTagAtIndex(_TagsTransform_tags_conversion__WEBPACK_IMPORTED_MODULE_1__["default"].TYPE.SINGLE, index);
+        return this.#getReferenceTagAtIndex(_TagsTransform_tags_conversion__WEBPACK_IMPORTED_MODULE_1__["default"].TYPE.WHITESPACE, index);
     }
 }
 
