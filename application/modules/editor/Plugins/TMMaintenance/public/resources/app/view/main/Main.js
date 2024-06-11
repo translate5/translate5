@@ -8,6 +8,7 @@ Ext.define('TMMaintenance.view.main.Main', {
         'TMMaintenance.view.main.List',
         'TMMaintenance.view.main.SelectTmDialog',
         'TMMaintenance.view.main.DeleteBatchDialog',
+        'TMMaintenance.view.main.ErrorDialog',
         'Ext.Dialog',
     ],
 
@@ -52,6 +53,9 @@ Ext.define('TMMaintenance.view.main.Main', {
         },
         {
             xtype: 'deleteBatchDialog',
+        },
+        {
+            xtype: 'errorDialog',
         },
     ],
 });

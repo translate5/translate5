@@ -2,6 +2,8 @@ Ext.define('TMMaintenance.view.main.SearchFormController', {
     extend: 'Ext.app.ViewController',
     alias: 'controller.searchform',
 
+    mixins: ['TMMaintenance.mixin.ErrorMessage'],
+
     listen: {
         global: {
             onApplicationLoad: 'onApplicationLoad',
@@ -30,12 +32,14 @@ Ext.define('TMMaintenance.view.main.SearchFormController', {
         const store = Ext.getCmp('mainlist').store;
         const me = this;
 
+        store.removeAll();
+
         this.getViewModel().set('selectedTm', values.tm);
         store.load({
             params: values,
             callback: function(records, operation, success) {
                 if (!success) {
-                    // TODO show error
+                    me.showServerError(operation.getError());
                     console.log('Error loading store');
 
                     return;
@@ -59,7 +63,7 @@ Ext.define('TMMaintenance.view.main.SearchFormController', {
         store.load({
             callback: (records, operation, success) => {
                 if (!success) {
-                    // TODO show error
+                    me.showServerError(operation.getError());
                     console.log('Error loading store');
 
                     return;
@@ -88,6 +92,12 @@ Ext.define('TMMaintenance.view.main.SearchFormController', {
                 me.getView().down('[name=search]').buttonElement.dom.click();
             },
             error: function (xhr) {
+                me.showServerError(JSON.parse(xhr.responseText));
+                console.log('Error deleting batch');
+                console.log(xhr);
+            },
+            failure: function (xhr) {
+                me.showServerError(JSON.parse(xhr.responseText));
                 console.log('Error deleting batch');
                 console.log(xhr);
             }

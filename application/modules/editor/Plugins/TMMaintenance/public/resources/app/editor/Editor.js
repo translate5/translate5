@@ -61,9 +61,12 @@ Ext.define('Ext.translate5.Editor', {
                 location.view.refresh();
                 this.currentEditingRecord = null;
             },
-            error: function () {
-                debugger;
-                // TODO show error
+            error: function (record, operation) {
+                Ext.ComponentQuery.query('app-main')[0].getController().showServerError(operation.getError());
+                location.record.set('isSaving', false);
+            },
+            failure: function (record, operation) {
+                Ext.ComponentQuery.query('app-main')[0].getController().showServerError(operation.getError());
                 location.record.set('isSaving', false);
             }
         });

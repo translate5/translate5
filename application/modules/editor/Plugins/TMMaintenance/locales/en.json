@@ -68,5 +68,17 @@
     "edit": "Edit",
     "delete": "Delete",
     "create": "Create"
+  },
+  "error": {
+    "title": "An error occurred",
+    "couldNotProcessRequest": "Error whilst saving or reading data. Please contact our support team!",
+    "close": "Close",
+    "responseFromServer": "Response from server: "
+  },
+  "deleteSegment": {
+    "title": "Delete segment",
+    "text": "Do you really want to delete this segment?",
+    "yes": "Yes",
+    "no": "No"
   }
 }

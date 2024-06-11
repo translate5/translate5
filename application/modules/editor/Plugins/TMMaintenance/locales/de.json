@@ -68,5 +68,17 @@
     "edit": "Bearbeiten",
     "delete": "Löschen",
     "create": "Neu anlegen"
+  },
+  "error": {
+    "title": "Es ist ein Fehler aufgetreten!",
+    "couldNotProcessRequest": "Fehler beim Speichern oder beim Auslesen von Daten. Bitte wenden Sie sich an unseren Support!",
+    "close": "Schließen",
+    "responseFromServer": "Meldung vom Server: "
+  },
+  "deleteSegment": {
+    "title": "Löschen",
+    "text": "Wollen Sie das Segment wirklich löschen?",
+    "yes": "Ja",
+    "no": "Nein"
   }
 }

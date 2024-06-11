@@ -6,6 +6,8 @@ Ext.define('TMMaintenance.view.main.MainController', {
     searchForm: null,
     gridList: null,
 
+    mixins: ['TMMaintenance.mixin.ErrorMessage'],
+
     init: function() {
         const keymap = {
             'escape': [Ext.event.Event.ESC, this.cancelEditing],
@@ -49,7 +51,14 @@ Ext.define('TMMaintenance.view.main.MainController', {
                 offset: this.getViewModel().get('lastOffset'),
             },
             addRecords: true,
-            callback: function(records, operation) {
+            callback: function(records, operation, success) {
+                if (!success) {
+                    me.showServerError(operation.getError());
+                    console.log('Error loading store');
+
+                    return;
+                }
+
                 let offset = operation.getProxy().getReader().metaData.offset;
 
                 me.getViewModel().set('lastOffset', offset);
@@ -93,9 +102,11 @@ Ext.define('TMMaintenance.view.main.MainController', {
      * @param {Ext.dataview.Location} gridLocation
      */
     onDeletePress: function (grid, gridLocation) {
+        const l10n = this.getViewModel().data.l10n;
+
         Ext.Msg.confirm(
-            'Confirm',
-            'Do you really want to delete a segment?',
+            l10n.deleteSegment.title,
+            l10n.deleteSegment.text,
             (buttonPressed) => {
                 if ('no' === buttonPressed) {
                     return;
@@ -105,7 +116,10 @@ Ext.define('TMMaintenance.view.main.MainController', {
                 gridLocation.record.erase({
                     success: () => {
                         // TODO what to do here?
-                    }
+                    },
+                    failure: (record, operation) => {
+                        this.showServerError(operation.getError());
+                    },
                 });
             },
             this
