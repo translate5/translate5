@@ -117,7 +117,9 @@ class Editor_Plugins_Tmmaintenance_ApiController extends ZfExtended_RestControll
     public function readamountAction()
     {
         $dto = GetListDTO::fromRequest($this->getRequest());
-        echo json_encode(['totalAmount' => $this->getSegmentsProcessor()->countResults($dto)], JSON_THROW_ON_ERROR);
+        echo json_encode([
+            'totalAmount' => $this->getSegmentsProcessor()->countResults($dto),
+        ], JSON_THROW_ON_ERROR);
     }
 
     #endregion Actions
