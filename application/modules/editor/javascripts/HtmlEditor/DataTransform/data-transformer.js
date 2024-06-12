@@ -116,7 +116,7 @@ export default class DataTransformer {
                     case TagsConversion.TYPE.WHITESPACE:
                         node = this.#getWhitespaceReferenceTagAtIndex(tagNumber);
 
-                        if (!node && this._tagCheck._isAllowedAddingWhitespaceTags()) {
+                        if (!node && this._tagCheck.isAllowedAddingWhitespaceTags()) {
                             node = new Node(item, this._tagsConversion.transform(item));
                         }
 

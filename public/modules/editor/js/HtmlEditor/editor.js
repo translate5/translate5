@@ -200,7 +200,7 @@ class DataTransformer {
                     case _TagsTransform_tags_conversion__WEBPACK_IMPORTED_MODULE_1__["default"].TYPE.WHITESPACE:
                         node = this.#getWhitespaceReferenceTagAtIndex(tagNumber);
 
-                        if (!node && this._tagCheck._isAllowedAddingWhitespaceTags()) {
+                        if (!node && this._tagCheck.isAllowedAddingWhitespaceTags()) {
                             node = new _node__WEBPACK_IMPORTED_MODULE_0__["default"](item, this._tagsConversion.transform(item));
                         }
 
@@ -1439,18 +1439,23 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "default": () => (/* binding */ CheckResult)
 /* harmony export */ });
 class CheckResult {
-    constructor(missingTags, duplicatedTags, excessTags) {
-        this.missingTags = missingTags;
-        this.duplicatedTags = duplicatedTags;
-        this.excessTags = excessTags;
-        this.tagsOrderCorrect = true;
+    #missingTags;
+    #duplicatedTags;
+    #excessTags;
+    #tagsOrderCorrect;
+
+    constructor(missingTags, duplicatedTags, excessTags, tagsOrderCorrect) {
+        this.#missingTags = missingTags;
+        this.#duplicatedTags = duplicatedTags;
+        this.#excessTags = excessTags;
+        this.#tagsOrderCorrect = tagsOrderCorrect;
     }
 
     isSuccessful() {
-        return this.missingTags.length === 0
-            && this.duplicatedTags.length === 0
-            && this.excessTags.length === 0
-            && this.tagsOrderCorrect === true;
+        return this.#missingTags.length === 0
+            && this.#duplicatedTags.length === 0
+            && this.#excessTags.length === 0
+            && this.#tagsOrderCorrect === true;
     }
 }
 
@@ -1767,123 +1772,103 @@ class TagCheck {
      * @param {HTMLElement} node
      */
     checkTags(node) {
-        let nodeList = node.getElementsByTagName('img');
+        const tags = node.getElementsByTagName('img');
 
-        this._fixDuplicateImgIds(nodeList);
-        let checkResult = this._checkContentTags(nodeList);
-
-        this._removeOrphanedTags(nodeList);
+        this.#fixDuplicateImgIds(tags);
+        const checkResult = this.#validateTags(tags);
+        this.#removeOrphanedTags(tags);
 
         if (!checkResult.isSuccessful()) {
             console.log('Check result is not successful');
             console.log(checkResult);
-
-            // Save anyway mode
-            // this.disableErrorCheck
-            //no more checks if missing tags found
-            return checkResult;
         }
-
-        checkResult.tagsOrderCorrect = this._checkTagOrder(nodeList);
-        console.log('Tags order correct: ' + checkResult.tagsOrderCorrect);
 
         return checkResult;
     }
 
-    _checkContentTags(nodeList) {
-        let foundIds = [],
-            ignoreWhitespace = this._shouldIgnoreWhitespaceTags();
+    #validateTags(tags) {
+        const _this = this;
 
-        let duplicatedTags = [];
-        let excessTags = [];
+        // Extract tags from HTML
+        const tagList = Array.from(tags)
+            // Filter out deleted tags and tags with the qmflag class as we don't need to check them
+            .filter(tag => !this.#isDeletedTag(tag) || /qmflag/.test(tag.className));
 
-        for (let node of nodeList) {
-            let matches = node.id.match(/\d+$/);
-            let id = matches ? matches[0] : null;
+        const ignoreWhitespace = this.#shouldIgnoreWhitespaceTags();
+        const tagStack = [];
+        const seenTags = new Set();
+        const errors = {
+            missingTags: [],
+            excessTags: [],
+            duplicatedTags: [],
+            wrongNesting: []
+        };
 
-            let isQaTag = /qmflag/.test(node.className);
+        for (const tag of tagList) {
+            const tagType = _this.tagsConversion.getInternalTagType(tag);
+            const tagId = _this.tagsConversion.getInternalTagNumber(tag);
 
-            if (isQaTag) {
-                continue;
-            }
-
-            let tagType = this.tagsConversion.getInternalTagType(node);
             let isWhitespaceTag = tagType === _tags_conversion__WEBPACK_IMPORTED_MODULE_0__["default"].TYPE.WHITESPACE;
 
             //ignore whitespace and nodes without ids
-            if ((isWhitespaceTag && ignoreWhitespace) || null === id) {
+            if ((isWhitespaceTag && ignoreWhitespace) || null === tagId) {
                 continue;
             }
 
-            if (!this.referenceTags[tagType][id]) {
-                if (isWhitespaceTag && this._isAllowedAddingWhitespaceTags()) {
-                    continue;
-                }
-
-                excessTags.push(node);
-            }
-
-            if (foundIds.includes(tagType + id) && node.parentNode.nodeName.toLowerCase() !== "del") {
-                duplicatedTags.push(node);
+            const tagKey = `${tagType}-${tagId}`;
+            if (seenTags.has(tagKey)) {
+                errors.duplicatedTags.push(tag);
             } else {
-                if (node.parentNode.nodeName.toLowerCase() !== "del") {
-                    foundIds.push(tagType + id);
+                seenTags.add(tagKey);
+            }
+
+            if (!this.referenceTags[tagType][tagId]) {
+                if (isWhitespaceTag && this.isAllowedAddingWhitespaceTags()) {
+                    continue;
+                }
+
+                errors.excessTags.push(tag);
+            }
+
+            if (tag.type === 'open') {
+                tagStack.push(tagId);
+            } else if (tagType === 'close') {
+                if (tagStack.length === 0 || tagStack.pop() !== tagId) {
+                    errors.wrongNesting.push(tag);
                 }
             }
         }
 
-        let missingTags = [];
-        for (const [type, items] of Object.entries(this.referenceTags)) {
-            if (ignoreWhitespace && type === _tags_conversion__WEBPACK_IMPORTED_MODULE_0__["default"].TYPE.WHITESPACE) {
+        // Ensure no unclosed tags remain
+        if (tagStack.length > 0) {
+            errors.wrongNesting.push(...tagStack);
+        }
+
+        for (const [referenceTagType, referenceTags] of Object.entries(this.referenceTags)) {
+            if (ignoreWhitespace && referenceTagType === _tags_conversion__WEBPACK_IMPORTED_MODULE_0__["default"].TYPE.WHITESPACE) {
                 continue;
             }
 
-            for (const [id, item] of Object.entries(items)) {
-                if (!foundIds.includes(type + id)) {
-                    missingTags.push(item._transformed);
+            for (const [referenceTagId, referenceTag] of Object.entries(referenceTags)) {
+                if (!seenTags.has(`${referenceTagType}-${referenceTagId}`)) {
+                    errors.missingTags.push(referenceTag._transformed);
                 }
             }
         }
 
-        return new _check_result__WEBPACK_IMPORTED_MODULE_1__["default"](missingTags, duplicatedTags, excessTags);
-    }
-
-    _checkTagOrder(nodeList) {
-        let open = {},
-            clean = true;
-
-        for (let img of nodeList) {
-            // crucial: for the tag-order, we only have to check tags that are not already deleted
-            if (!this._isDeletedTag(img)) {
-                if (_tags_conversion__WEBPACK_IMPORTED_MODULE_0__["default"].isDuplicateSaveTag(img) || /^remove/.test(img.id) || /(-single|-whitespace)/.test(img.id)) {
-                    //ignore tags marked to remove
-                    continue;
-                }
-
-                if (/open/.test(img.id)) {
-                    open[img.id] = true;
-
-                    continue;
-                }
-
-                let replaced = img.id.replace(/close/, 'open');
-
-                if (!open[replaced]) {
-                    clean = false;
-
-                    break;
-                }
-            }
-        }
-
-        return clean;
+        return new _check_result__WEBPACK_IMPORTED_MODULE_1__["default"](
+            errors.missingTags,
+            errors.duplicatedTags,
+            errors.excessTags,
+            errors.wrongNesting.length === 0
+        );
     }
 
     /**
      * Checks if a tag is inside a del-tag and thus can be regarded as a deleted tag
      * @param {Node} node
      */
-    _isDeletedTag(node) {
+    #isDeletedTag(node) {
         while (node.parentElement && node.parentElement.tagName.toLowerCase() !== 'body') {
             if (node.parentElement.tagName.toLowerCase() === 'del') {
                 return true;
@@ -1898,21 +1883,22 @@ class TagCheck {
     /**
      * @returns {Boolean}
      */
-    _shouldIgnoreWhitespaceTags() {
+    #shouldIgnoreWhitespaceTags() {
         return this.#userCanModifyWhitespaceTags;
     }
 
     /**
      * @returns {boolean}
      */
-    _isAllowedAddingWhitespaceTags() {
+    isAllowedAddingWhitespaceTags() {
         return this.#userCanInsertWhitespaceTags;
     }
 
     /**
      * Fixes duplicate img ids in the opened editor on unmarkup (MQM tags)
      * Works with <img> tags with the following specifications:
-     * IMG needs an id Attribute. Assuming that the id contains the strings "-open" or "-close". The rest of the id string is identical.
+     * IMG needs an id Attribute. Assuming that the id contains the strings "-open" or "-close".
+     * The rest of the id string is identical.
      * Needs also an attribute "data-t5qid" which is containing the plain ID of the tag pair.
      * If a duplicated img tag is found, the "123" of the id will be replaced with a generated Ext.id()
      *
@@ -1933,9 +1919,9 @@ class TagCheck {
      * after fixing:
      * This [X 1]is[/X 1] the [X 2]testtext[/X 2].
      *
-     * @param {HTMLCollection} nodeList
+     * @param {HTMLCollection} tags
      */
-    _fixDuplicateImgIds(nodeList) {
+    #fixDuplicateImgIds(tags) {
         let ids = {},
             stackList = {},
             updateId = function (img, newQid, oldQid) {
@@ -1943,7 +1929,7 @@ class TagCheck {
                 img.setAttribute('data-t5qid', newQid);
             };
 
-        for (let img of nodeList) {
+        for (let img of tags) {
             let newQid,
                 oldQid = _tags_conversion__WEBPACK_IMPORTED_MODULE_0__["default"].getElementsQualityId(img),
                 id = img.id,
@@ -1995,7 +1981,7 @@ class TagCheck {
      *
      * @param {HTMLCollection} nodeList
      */
-    _removeOrphanedTags(nodeList) {
+    #removeOrphanedTags(nodeList) {
         let openers = {},
             closers = {},
             hasRemoves = false;
