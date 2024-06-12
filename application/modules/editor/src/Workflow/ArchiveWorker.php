@@ -172,14 +172,14 @@ class ArchiveWorker extends ZfExtended_Worker_Abstract
 
         /** @var editor_Models_Languages $language */
         $language = ZfExtended_Factory::get('editor_Models_Languages');
-        $language->load($this->task->getSourceLang());
+        $language->load((int) $this->task->getSourceLang());
         $json->sourceLangRfc5646 = $language->getRfc5646();
-        $language->load($this->task->getTargetLang());
+        $language->load((int) $this->task->getTargetLang());
         $json->targetLangRfc5646 = $language->getRfc5646();
 
         /** @var editor_Models_Customer_Customer $customer */
         $customer = ZfExtended_Factory::get('editor_Models_Customer_Customer');
-        $customer->load($this->task->getCustomerId());
+        $customer->load((int) $this->task->getCustomerId());
         $json->customerName = $customer->getName();
         $json->customerNumber = $customer->getNumber();
 
@@ -225,8 +225,12 @@ class ArchiveWorker extends ZfExtended_Worker_Abstract
      */
     protected function addDir(ZipArchive $zip, string $filename, string $localname = '')
     {
-        $zip->addEmptyDir($localname);
         $iter = new RecursiveDirectoryIterator($filename, FilesystemIterator::SKIP_DOTS);
+
+        if ($localname !== '') {
+            $zip->addEmptyDir($localname);
+            $localname = rtrim($localname, '/') . '/';
+        }
 
         foreach ($iter as $fileinfo) {
             if (! $fileinfo->isFile() && ! $fileinfo->isDir()) {
@@ -234,13 +238,9 @@ class ArchiveWorker extends ZfExtended_Worker_Abstract
             }
 
             if ($fileinfo->isFile()) {
-                $zip->addFile($fileinfo->getPathname(), $localname . '/' . $fileinfo->getFilename());
+                $zip->addFile($fileinfo->getPathname(), $localname . $fileinfo->getFilename());
             } else {
-                $newLocalName = $fileinfo->getFilename();
-                if ($localname !== '') {
-                    $newLocalName = $localname . '/' . $newLocalName;
-                }
-                $this->addDir($zip, $fileinfo->getPathname(), $newLocalName);
+                $this->addDir($zip, $fileinfo->getPathname(), $localname . $fileinfo->getFilename());
             }
         }
     }
