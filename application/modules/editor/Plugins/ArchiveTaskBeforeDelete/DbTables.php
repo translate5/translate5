@@ -74,6 +74,7 @@ class editor_Plugins_ArchiveTaskBeforeDelete_DbTables
         'LEK_match_analysis_taskassoc' => 'taskGuid',
         'LEK_okapi_bconf' => false,
         'LEK_okapi_bconf_filter' => false,
+        'LEK_openai_finetunejob' => false,
         'LEK_pixel_mapping' => false,
         'LEK_plugin_segmentstatistic_terms' => 'taskGuid',
         'LEK_plugin_segmentstatistics' => 'taskGuid',
@@ -129,19 +130,6 @@ class editor_Plugins_ArchiveTaskBeforeDelete_DbTables
         'LEK_content_protection_output_mapping' => false,
         'LEK_content_protection_language_rules_hash' => false,
     ];
-
-    /**
-     * @throws Zend_Exception
-     */
-    public function __construct()
-    {
-        $pluginmanager = Zend_Registry::get('PluginManager');
-        /* @var ZfExtended_Plugin_Manager $pluginmanager */
-
-        if (! is_null($pluginmanager->get('OpenAI'))) {
-            $this->tables['LEK_openai_finetunejob'] = false;
-        }
-    }
 
     /**
      * This method is intended to be called directly from CLI, in the build scripts of translate5.

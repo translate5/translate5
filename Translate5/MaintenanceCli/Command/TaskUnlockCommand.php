@@ -66,7 +66,12 @@ class TaskUnlockCommand extends TaskInfoCommand
         $task = new \editor_Models_Task();
         $task->load($input->getArgument('taskId'));
         $this->writeTask($task);
+
         Lock::taskUnlock($task);
+        // force state to open (recover error state!)
+        $task->setState($task::STATE_OPEN);
+        $task->save();
+
         $this->io->success('Task unlocked');
 
         return self::SUCCESS;

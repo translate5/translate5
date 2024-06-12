@@ -29,9 +29,10 @@
 namespace Translate5\MaintenanceCli\Command;
 
 use MittagQI\ZfExtended\Worker\Queue;
+use ReflectionException;
 use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use Zend_Exception;
 use ZfExtended_Factory;
 use ZfExtended_Models_Worker;
 
@@ -51,18 +52,14 @@ class WorkerQueueCommand extends Translate5AbstractCommand
             // the full command description shown when running the command with
             // the "--help" option
             ->setHelp('Triggers the next runnable worker to be executed');
-
-        $this->addOption(
-            'wakeup',
-            'w',
-            InputOption::VALUE_NONE,
-            'Wakeup scheduled workers before triggering the queue'
-        );
     }
 
     /**
      * Execute the command
      * {@inheritDoc}
+     * @return int
+     * @throws ReflectionException
+     * @throws Zend_Exception
      * @see \Symfony\Component\Console\Command\Command::execute()
      */
     protected function execute(InputInterface $input, OutputInterface $output)
@@ -74,13 +71,8 @@ class WorkerQueueCommand extends Translate5AbstractCommand
 
         $worker = ZfExtended_Factory::get(ZfExtended_Models_Worker::class);
 
-        if ($this->input->getOption('wakeup')) {
-            $this->io->text('wakeup workers...');
-            $worker->wakeupScheduled();
-            sleep(2);
-        }
-
         $workerQueue = ZfExtended_Factory::get(Queue::class);
+
         if ($workerQueue->lockAcquire()) {
             $foundWorkers = $workerQueue->process();
             while ($foundWorkers) {

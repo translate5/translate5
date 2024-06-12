@@ -85,17 +85,6 @@ final class editor_Segment_Internal_ContentTag extends editor_Tag implements Jso
      */
     private $tagIndex = -1;
 
-    private function setInnerHTML(string $html)
-    {
-        $this->innerHTML = $html;
-        if ($this->isShort()) {
-            $matches = [];
-            if (preg_match(self::PATTERN_INDEX, $this->innerHTML, $matches)) {
-                $this->tagIndex = intval($matches[1]);
-            }
-        }
-    }
-
     /**
      * Evaluates if we are a short internal content tag
      * @return boolean
@@ -146,6 +135,17 @@ final class editor_Segment_Internal_ContentTag extends editor_Tag implements Jso
     public function renderChildren(array $skippedTypes = null): string
     {
         return $this->innerHTML;
+    }
+
+    public function setInnerHTML(string $html): void
+    {
+        $this->innerHTML = $html;
+        if ($this->isShort()) {
+            $matches = [];
+            if (preg_match(self::PATTERN_INDEX, $this->innerHTML, $matches)) {
+                $this->tagIndex = intval($matches[1]);
+            }
+        }
     }
 
     /**

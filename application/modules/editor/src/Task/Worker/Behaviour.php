@@ -26,39 +26,53 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+namespace MittagQI\Translate5\Task\Worker;
+
+use editor_Models_Task;
+use Zend_Db_Exception;
+use Zend_Exception;
+use Zend_Registry;
+use ZfExtended_Logger;
+use ZfExtended_Models_Db_Exceptions_DeadLockHandler;
+use ZfExtended_Models_Worker;
+use ZfExtended_Worker_Behaviour_Default;
+
 /**
  * Contains the Import Worker (the scheduling parts)
  * The import process itself is encapsulated in editor_Models_Import_Worker_Import
  */
-class editor_Models_Import_Worker_Behaviour extends ZfExtended_Worker_Behaviour_Default
+class Behaviour extends ZfExtended_Worker_Behaviour_Default
 {
-    /**
-     * @var editor_Models_Task
-     */
-    protected $task;
+    protected editor_Models_Task $task;
 
     public function __construct()
     {
-        //in import worker behaviour isMaintenanceScheduled is by default on and does not start anymore 60 minutes before maintenance
+        //in import worker behaviour isMaintenanceScheduled is by default on
+        // and does not start anymore 60 minutes before maintenance
         $this->config['isMaintenanceScheduled'] = 60;
     }
 
     /**
      * set the taask instance internally
      */
-    public function setTask(editor_Models_Task $task)
+    public function setTask(editor_Models_Task $task): void
     {
         $this->task = $task;
     }
 
     /**
+     * @throws Zend_Db_Exception
+     * @throws Zend_Exception
+     * @throws ZfExtended_Models_Db_Exceptions_DeadLockHandler
      * @see ZfExtended_Worker_Behaviour_Default::checkParentDefunc()
      */
     public function checkParentDefunc(): bool
     {
         $parentsOk = parent::checkParentDefunc();
         if (! $parentsOk) {
-            $this->task->setErroneous();
+            if ($this->task->isImporting()) {
+                $this->task->setErroneous();
+            }
             $this->defuncRemainingOfGroup();
         }
 
@@ -68,40 +82,49 @@ class editor_Models_Import_Worker_Behaviour extends ZfExtended_Worker_Behaviour_
     /**
      * defuncing the tasks import worker group
      * (no default behaviour, provided by this class)
+     * @throws Zend_Db_Exception
+     * @throws Zend_Exception
+     * @throws ZfExtended_Models_Db_Exceptions_DeadLockHandler
      */
-    public function defuncRemainingOfGroup()
+    public function defuncRemainingOfGroup(): void
     {
         //final step must run in any case, so we exclude it here
         $this->workerModel->defuncRemainingOfGroup(['editor_Models_Import_Worker_FinalStep']);
-        $this->wakeUpAndStartNextWorkers($this->workerModel);
+        $this->wakeUpAndStartNextWorkers();
     }
 
     /**
      * basicly sets the task to be imported to state error when a fatal error happens after the work method
+     * @throws Zend_Exception
      */
-    public function registerShutdown()
+    public function registerShutdown(): void
     {
-        register_shutdown_function(function ($task, $worker) {
+        register_shutdown_function(function (editor_Models_Task $task = null, ZfExtended_Models_Worker $worker = null) {
             $error = error_get_last();
-            if (! is_null($error) && ($error['type'] & FATAL_ERRORS_TO_HANDLE)) {
-                /* @var $task editor_Models_Task */
-                if (! is_null($task) && $task->isImporting()) {
-                    // should only set to error if task was really on import
+            if (is_null($error) || ! ($error['type'] & FATAL_ERRORS_TO_HANDLE)) {
+                return;
+            }
+            if (! is_null($task)) {
+                // should only set to error if task was really on import
+                if ($task->isImporting()) {
                     $task->setErroneous();
-                    if (Zend_Registry::isRegistered('logger')) {
+                }
+                if (Zend_Registry::isRegistered('logger')) {
+                    try {
                         $logger = Zend_Registry::get('logger');
-                        /* @var $logger ZfExtended_Logger */
+                        /* @var ZfExtended_Logger $logger */
                         $logger->error('E1027', 'Fatal system error on task usage - check system log!', [
                             'task' => $task,
                         ]);
+                    } catch (Zend_Exception $e) {
+                        error_log((string) $e);
                     }
                 }
-                if (! is_null($worker)) {
-                    /* @var $worker ZfExtended_Models_Worker */
-                    $worker->defuncRemainingOfGroup(['editor_Models_Import_Worker_FinalStep']);
-                    $worker->setState($worker::STATE_DEFUNCT);
-                    $worker->save();
-                }
+            }
+            if (! is_null($worker)) {
+                $worker->defuncRemainingOfGroup(['editor_Models_Import_Worker_FinalStep']);
+                $worker->setState($worker::STATE_DEFUNCT);
+                $worker->save();
             }
         }, $this->task, $this->workerModel);
     }

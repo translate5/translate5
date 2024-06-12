@@ -33,7 +33,6 @@ require_once 'vendor/autoload.php';
 const TRANSLATE5_CLI = true;
 
 use Symfony\Component\Console\Application;
-use Translate5\MaintenanceCli\Command\SegmentHistoryCommand;
 use Translate5\MaintenanceCli\Command\{
     AuthTokenCommand,
     AuthTokenDeleteCommand,
@@ -73,11 +72,13 @@ use Translate5\MaintenanceCli\Command\{
     OkapiPurgeCommand,
     OkapiUpdateCommand,
     PatchApplyCommand,
+    PatchScriptCommand,
     PluginDisableCommand,
     PluginEnableCommand,
     PluginListCommand,
     ReleaseNotesCommand,
     RoleListCommand,
+    SegmentHistoryCommand,
     ServiceAutodiscoveryCommand,
     ServiceCheckCommand,
     ServicePingCommand,
@@ -86,6 +87,7 @@ use Translate5\MaintenanceCli\Command\{
     StatusCommand,
     SystemCheckCommand,
     SystemMailtestCommand,
+    SystemVersionCommand,
     T5Memory\T5MemoryDeleteTmCommand,
     T5Memory\T5MemoryMigrationCommand,
     T5Memory\T5MemoryReimportTaskCommand,
@@ -114,6 +116,7 @@ use Translate5\MaintenanceCli\Command\{
     WorkerCleanCommand,
     WorkerListCommand,
     WorkerQueueCommand,
+    WorkerRerunCommand,
     WorkerRunCommand,
     WorkflowCloneCommand,
     WorkflowListCommand,
@@ -148,6 +151,7 @@ $commands = [
     new OkapiUpdateCommand(),
     new OkapiCleanBconfsCommand(),
     new PatchApplyCommand(),
+    new PatchScriptCommand(),
     new PluginDisableCommand(),
     new PluginEnableCommand(),
     new PluginListCommand(),
@@ -161,6 +165,7 @@ $commands = [
     new StatusCommand(),
     new SystemCheckCommand(),
     new SystemMailtestCommand(),
+    new SystemVersionCommand(),
     new TaskCleanCommand(),
     new TaskInfoCommand(),
     new TaskImportCommand(),
@@ -181,6 +186,7 @@ $commands = [
     new WorkerCleanCommand(),
     new WorkerListCommand(),
     new WorkerQueueCommand(),
+    new WorkerRerunCommand(),
     new WorkerRunCommand(),
     new WorkflowCloneCommand(),
     new WorkflowListCommand(),
