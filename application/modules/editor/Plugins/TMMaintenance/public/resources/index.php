@@ -8,9 +8,9 @@
     <title>TMMaintenance</title>
 
     <?php
-        /* @var $config Zend_Config */
-        $config = Zend_Registry::get('config');
-        $rundir = defined('APPLICATION_RUNDIR') ? APPLICATION_RUNDIR : '';
+    /* @var $config Zend_Config */
+    $config = Zend_Registry::get('config');
+    $rundir = defined('APPLICATION_RUNDIR') ? APPLICATION_RUNDIR : '';
     ?>
 
     <base href="<?php echo $rundir ?>/editor/plugins/resources/TMMaintenance/">

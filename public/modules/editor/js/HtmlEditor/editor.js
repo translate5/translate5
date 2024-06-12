@@ -1830,9 +1830,9 @@ class TagCheck {
                 errors.excessTags.push(tag);
             }
 
-            if (tag.type === 'open') {
+            if (tagType === _tags_conversion__WEBPACK_IMPORTED_MODULE_0__["default"].TYPE.OPEN) {
                 tagStack.push(tagId);
-            } else if (tagType === 'close') {
+            } else if (tagType === _tags_conversion__WEBPACK_IMPORTED_MODULE_0__["default"].TYPE.CLOSE) {
                 if (tagStack.length === 0 || tagStack.pop() !== tagId) {
                     errors.wrongNesting.push(tag);
                 }
