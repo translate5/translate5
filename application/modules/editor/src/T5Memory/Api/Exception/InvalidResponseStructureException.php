@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\T5Memory\Api\Exception;
 
-use InvalidArgumentException;
+use Exception;
 use MittagQI\Translate5\T5Memory\Api\Contract\ResponseException;
 
-class InvalidResponseStructureException extends InvalidArgumentException implements ResponseException
+class InvalidResponseStructureException extends Exception implements ResponseException
 {
     public static function invalidBody(string $expectedFieldPath, string $responseBody): self
     {

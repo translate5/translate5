@@ -29,13 +29,16 @@ END LICENSE AND COPYRIGHT
 use editor_Models_LanguageResources_LanguageResource as LanguageResource;
 use editor_Models_Task as Task;
 use GuzzleHttp\Client;
-use MittagQI\Translate5\ContentProtection\T5memory\T5NTagSchemaFixFilter;
 use MittagQI\Translate5\ContentProtection\T5memory\TmConversionService;
 use MittagQI\Translate5\LanguageResource\Adapter\Exception\RescheduleUpdateNeededException;
+use MittagQI\Translate5\LanguageResource\Adapter\Export\ExportAdapterInterface;
+use MittagQI\Translate5\LanguageResource\Adapter\Export\ExportTmFileExtension;
 use MittagQI\Translate5\LanguageResource\Adapter\UpdatableAdapterInterface;
 use MittagQI\Translate5\LanguageResource\Status as LanguageResourceStatus;
+use MittagQI\Translate5\T5Memory\Api\VersionedApiFactory;
 use MittagQI\Translate5\T5Memory\Api\VersionFetchingApi;
 use MittagQI\Translate5\T5Memory\Enum\StripFramingTags;
+use MittagQI\Translate5\T5Memory\ExportService;
 use MittagQI\Translate5\T5Memory\PersistenceService;
 use MittagQI\Translate5\T5Memory\VersionService;
 
@@ -44,7 +47,7 @@ use MittagQI\Translate5\T5Memory\VersionService;
  *
  * IMPORTANT: see the doc/comments in MittagQI\Translate5\Service\T5Memory
  */
-class editor_Services_OpenTM2_Connector extends editor_Services_Connector_FilebasedAbstract implements UpdatableAdapterInterface
+class editor_Services_OpenTM2_Connector extends editor_Services_Connector_FilebasedAbstract implements UpdatableAdapterInterface, ExportAdapterInterface
 {
     private const CONCORDANCE_SEARCH_NUM_RESULTS = 20;
 
@@ -85,6 +88,8 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
 
     private PersistenceService $persistenceService;
 
+    private ExportService $exportService;
+
     private Client $httpClient;
 
     public function __construct()
@@ -96,12 +101,18 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
 
         ZfExtended_Logger::addDuplicatesByEcode('E1333', 'E1306', 'E1314');
 
+        parent::__construct();
+
         $this->conversionService = TmConversionService::create();
         $this->persistenceService = new PersistenceService();
         $this->httpClient = new Client();
         $this->versionService = new VersionService(new VersionFetchingApi($this->httpClient));
-
-        parent::__construct();
+        $this->exportService = new ExportService(
+            $this->logger,
+            $this->versionService,
+            $this->conversionService,
+            new VersionedApiFactory($this->httpClient),
+        );
     }
 
     public function connectTo(
@@ -323,23 +334,21 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
 
     public function getValidExportTypes(): array
     {
-        return [
-            'TM' => 'application/zip',
-            'TMX' => 'application/xml',
-        ];
+        return ExportTmFileExtension::getValidExportTypes();
     }
 
-    public function getTm($mime, string $tmName = '')
+    public function getTm($mime)
     {
-        if (empty($tmName)) {
-            $tmName = $this->persistenceService->getWritableMemory($this->languageResource);
+        $file = $this->exportService->export(
+            $this->languageResource,
+            ExportTmFileExtension::fromMimeType($mime)
+        );
+
+        if (null === $file) {
+            return '';
         }
 
-        if ($this->api->get($mime, $tmName)) {
-            return $this->api->getResult();
-        }
-
-        $this->throwBadGateway();
+        return file_get_contents($file);
     }
 
     public function update(
@@ -1586,163 +1595,15 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
         return preg_replace($pattern, '_next-' . ($currentMax + 1), $memories[0]['filename']);
     }
 
-    // region export TM
-    // TODO change to interface method
-    public function exportsFile(): bool
+    public function export(string $mime): ?string
     {
         $memories = $this->languageResource->getSpecificData('memories', parseAsArray: true);
 
-        return count($memories) >= 1;
-    }
-
-    // TODO Move to a separate class(es) during refactoring
-    public function export(string $mime): string
-    {
-        $memories = $this->languageResource->getSpecificData('memories', parseAsArray: true);
-
-        usort($memories, fn ($m1, $m2) => $m1['id'] <=> $m2['id']);
-
-        if ($mime === $this->getValidExportTypes()['TMX']) {
-            return $this->exportAllAsOneTmx($memories, $mime);
-        }
-
-        return $this->exportAllAsArchive($memories, $mime);
-    }
-
-    private function exportAllAsOneTmx(array $memories, string $mime): string
-    {
-        $exportDir = APPLICATION_PATH . '/../data/TMExport/';
-        @mkdir($exportDir, recursive: true);
-        $resultFilename = $exportDir . $this->languageResource->getId() . '_' . uniqid() . '.tmx';
-        $writer = new XMLWriter();
-        $writer->openURI($resultFilename);
-        $writer->startDocument('1.0', 'UTF-8');
-        $writer->setIndent(true);
-
-        stream_filter_register('fix-t5n-tag', T5NTagSchemaFixFilter::class);
-
-        $writtenElements = 0;
-
-        foreach ($memories as $memoryNumber => $memory) {
-            $filename = $exportDir . $memory['filename'] . '_' . uniqid() . '.tmx';
-
-            try {
-                file_put_contents(
-                    $filename,
-                    $this->getTm($mime, $memory['filename'])
-                );
-            } catch (editor_Services_Connector_Exception $e) {
-                $this->logger->exception($e);
-
-                continue;
-            }
-
-            $stream = "php://filter/read=fix-t5n-tag/resource=$filename";
-            $reader = new XMLReader();
-            $reader->open($stream);
-
-            while ($reader->read()) {
-                if ($reader->nodeType == XMLReader::ELEMENT && $reader->name == 'tu') {
-                    $writtenElements++;
-                    $writer->writeRaw($this->conversionService->convertT5MemoryTagToContent($reader->readOuterXML()));
-                    $writtenElements++;
-                }
-
-                // Further code is only applicable for the first file
-                if ($memoryNumber > 0) {
-                    continue;
-                }
-
-                if ($reader->nodeType == XMLReader::ELEMENT && $reader->name == 'header') {
-                    $writer->writeRaw($reader->readOuterXML());
-                }
-
-                if (! in_array($reader->name, ['tmx', 'body'])) {
-                    continue;
-                }
-
-                if ($reader->nodeType == XMLReader::ELEMENT) {
-                    $writer->startElement($reader->name);
-
-                    if ($reader->hasAttributes) {
-                        while ($reader->moveToNextAttribute()) {
-                            $writer->writeAttribute($reader->name, $reader->value);
-                        }
-                    }
-
-                    if ($reader->isEmptyElement) {
-                        $writer->endElement();
-                    }
-                }
-            }
-
-            $reader->close();
-
-            unlink($filename);
-
-            if ($memoryNumber < count($memories) - 1) {
-                $writer->writeComment('Next file');
-            }
-        }
-
-        $writer->flush();
-
-        if (0 !== $writtenElements) {
-            // Finalizing document with $writer->endDocument() adds closing tags for all bpt-ept tags
-            // so add body and tmx closing tags manually
-            file_put_contents($resultFilename, PHP_EOL . '</body>', FILE_APPEND);
-        }
-
-        file_put_contents($resultFilename, PHP_EOL . '</tmx>', FILE_APPEND);
-
-        return $resultFilename;
-    }
-
-    private function exportAllAsArchive(array $memories, string $mime): string
-    {
-        header('HTTP/1.0 403 Forbidden');
-        echo "<pre>The TM binary export is currently blocked for technical reasons.\n";
-        echo 'Der TM-Binary-Export ist augenblicklich aus technischen Gründen gesperrt.</pre>';
-        exit;
-
-        // @phpstan-ignore-next-line
-        $exportDir = APPLICATION_PATH . '/../data/TMExport/';
-        $tmpDir = $exportDir . $this->languageResource->getId() . '_' . uniqid() . '/';
-        @mkdir($tmpDir, recursive: true);
-
-        foreach ($memories as $index => $memory) {
-            file_put_contents($tmpDir . ($index + 1) . '.tm', $this->getTm($mime, $memory['filename']));
-        }
-
-        $zipFileName = $exportDir . $this->languageResource->getId() . '_' . uniqid() . '.zip';
-        $zip = new ZipArchive();
-        $zip->open($zipFileName, ZipArchive::CREATE | ZipArchive::OVERWRITE);
-        $files = new RecursiveIteratorIterator(
-            new RecursiveDirectoryIterator($tmpDir),
-            RecursiveIteratorIterator::LEAVES_ONLY
+        return $this->exportService->export(
+            $this->languageResource,
+            ExportTmFileExtension::fromMimeType($mime, count($memories) > 1)
         );
-
-        foreach ($files as $file) {
-            if (! $file->isDir()) {
-                $filePath = $file->getRealPath();
-                $relativePath = basename($filePath);
-
-                $zip->addFile($filePath, $relativePath);
-            }
-        }
-
-        $zip->close();
-
-        foreach ($files as $file) {
-            if (! $file->isDir() && is_file($file->getRealPath())) {
-                unlink($file->getRealPath());
-            }
-        }
-        rmdir($tmpDir);
-
-        return $zipFileName;
     }
-    // endregion export TM
 
     /**
      * Check if segment was updated properly

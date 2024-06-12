@@ -29,6 +29,8 @@ END LICENSE AND COPYRIGHT
 use editor_Models_Segment_UtilityBroker as UtilityBroker;
 use editor_Models_Segment_Whitespace as Whitespace;
 use MittagQI\Translate5\ContentProtection\ContentProtector;
+use MittagQI\Translate5\LanguageResource\Adapter\Export\ExportAdapterInterface;
+use MittagQI\Translate5\LanguageResource\Adapter\Export\ExportTmFileExtension;
 use MittagQI\Translate5\LanguageResource\Pretranslation\BatchResult;
 use MittagQI\Translate5\Segment\TagRepair\HtmlProcessor;
 
@@ -48,7 +50,7 @@ use MittagQI\Translate5\Segment\TagRepair\HtmlProcessor;
  * @method boolean addAdditionalTm(array $fileinfo = null, array $params = null) editor_Services_Connector_Abstract::addAdditionalTm()
  * @method void setConfig(Zend_Config $config) editor_Services_Connector_Abstract::setConfig(Zend_Config $config)
  */
-class editor_Services_Connector
+class editor_Services_Connector implements ExportAdapterInterface
 {
     /***
      * The request source when language resources is used is InstantTranslate
@@ -363,8 +365,6 @@ class editor_Services_Connector
 
     /**
      * Load the latest service result cache for the given segment in the current language resource
-     * @param editor_Models_Segment $segment
-     * @return editor_Services_ServiceResult
      * @throws ReflectionException
      */
     protected function getCachedResult(editor_Models_Segment $segment): editor_Services_ServiceResult
@@ -425,15 +425,23 @@ class editor_Services_Connector
         $this->adapter->setContentField($contentField);
     }
 
-    /**
-     * Shows if connector can export tm as a file, not a string
-     */
-    public function exportsFile(): bool
+    public function export(string $mime): ?string
     {
-        if (method_exists($this->adapter, 'exportsFile')) {
-            return $this->adapter->exportsFile();
+        if ($this->adapter instanceof ExportAdapterInterface) {
+            return $this->adapter->export($mime);
         }
 
-        return false;
+        $filename = APPLICATION_PATH
+            . '/../data/TMExport/'
+            . sprintf(
+                '%s_%s.%s',
+                $this->languageResource->getId(),
+                uniqid(),
+                ExportTmFileExtension::fromMimeType($mime)->value
+            );
+
+        file_put_contents($filename, $this->adapter->getTm($mime));
+
+        return $filename;
     }
 }
