@@ -1439,23 +1439,18 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "default": () => (/* binding */ CheckResult)
 /* harmony export */ });
 class CheckResult {
-    #missingTags;
-    #duplicatedTags;
-    #excessTags;
-    #tagsOrderCorrect;
-
     constructor(missingTags, duplicatedTags, excessTags, tagsOrderCorrect) {
-        this.#missingTags = missingTags;
-        this.#duplicatedTags = duplicatedTags;
-        this.#excessTags = excessTags;
-        this.#tagsOrderCorrect = tagsOrderCorrect;
+        this.missingTags = missingTags;
+        this.duplicatedTags = duplicatedTags;
+        this.excessTags = excessTags;
+        this.tagsOrderCorrect = tagsOrderCorrect;
     }
 
     isSuccessful() {
-        return this.#missingTags.length === 0
-            && this.#duplicatedTags.length === 0
-            && this.#excessTags.length === 0
-            && this.#tagsOrderCorrect === true;
+        return this.missingTags.length === 0
+            && this.duplicatedTags.length === 0
+            && this.excessTags.length === 0
+            && this.tagsOrderCorrect === true;
     }
 }
 
