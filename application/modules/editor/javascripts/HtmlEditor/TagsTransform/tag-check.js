@@ -81,9 +81,9 @@ export default class TagCheck {
                 errors.excessTags.push(tag);
             }
 
-            if (tag.type === 'open') {
+            if (tagType === TagsConversion.TYPE.OPEN) {
                 tagStack.push(tagId);
-            } else if (tagType === 'close') {
+            } else if (tagType === TagsConversion.TYPE.CLOSE) {
                 if (tagStack.length === 0 || tagStack.pop() !== tagId) {
                     errors.wrongNesting.push(tag);
                 }
