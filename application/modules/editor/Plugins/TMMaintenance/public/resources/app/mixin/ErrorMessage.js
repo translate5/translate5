@@ -9,12 +9,14 @@ Ext.define('TMMaintenance.mixin.ErrorMessage', {
         }
 
         const l10n = this.getViewModel().data.l10n;
+        const errorText = l10n.error.couldNotProcessRequest +
+            (serverError ? ('<br>' + l10n.error.responseFromServer + serverError) : '');
+        this.showGeneralError(errorText);
+    },
 
+    showGeneralError: function (error) {
         const dialog = Ext.ComponentQuery.query('#errorDialog')[0];
-        dialog.setHtml(
-            l10n.error.couldNotProcessRequest +
-            (serverError ? ('<br>' + l10n.error.responseFromServer + serverError) : '')
-        );
+        dialog.setHtml(error);
         dialog.show();
     }
 });

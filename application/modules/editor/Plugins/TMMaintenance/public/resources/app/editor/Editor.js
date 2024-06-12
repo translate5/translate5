@@ -19,15 +19,13 @@ Ext.define('Ext.translate5.Editor', {
     },
 
     onBeforeComplete: function () {
-        // TODO validate tags ordering
-        // if (!this.validateTagsOrdering(this.getData())) {
-        //     Ext.Msg.show({
-        //         title: 'Validation error',
-        //         message: 'Some of the tags used in the segment are in the wrong order',
-        //     });
-        //
-        //     return false;
-        // }
+        const data = this.getData();
+
+        if (!data.checkResult.isSuccessful()) {
+            Ext.ComponentQuery.query('app-main')[0].getController().showGeneralError('Check tags');
+
+            return false;
+        }
 
         return true;
     },
@@ -46,7 +44,7 @@ Ext.define('Ext.translate5.Editor', {
             return result;
         }
 
-        let data = this.getData();
+        const data = this.getData();
 
         if (location.record.get(this.config.editingDataIndex) === data.data) {
             return result;
