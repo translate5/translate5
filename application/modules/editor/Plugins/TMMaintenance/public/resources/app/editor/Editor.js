@@ -20,9 +20,11 @@ Ext.define('Ext.translate5.Editor', {
 
     onBeforeComplete: function () {
         const data = this.getData();
+        const controller = Ext.ComponentQuery.query('app-main')[0].getController();
+        const l10n = controller.getViewModel().data.l10n;
 
-        if (!data.checkResult.isSuccessful()) {
-            Ext.ComponentQuery.query('app-main')[0].getController().showGeneralError('Check tags');
+        if (!data.checkResult.tagsOrderCorrect) {
+            controller.showGeneralError(l10n.error.wrongTagsOrdering);
 
             return false;
         }

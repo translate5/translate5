@@ -73,7 +73,8 @@
     "title": "An error occurred",
     "couldNotProcessRequest": "Error whilst saving or reading data. Please contact our support team!",
     "close": "Close",
-    "responseFromServer": "Response from server: "
+    "responseFromServer": "Response from server: ",
+    "wrongTagsOrdering": "Some of the tags used in the segment are in the wrong order (closing tag before opening tag or missing corresponding tag). Please correct the segment and try again."
   },
   "deleteSegment": {
     "title": "Delete segment",
