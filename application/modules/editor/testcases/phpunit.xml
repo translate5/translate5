@@ -69,6 +69,7 @@
     </testsuite>
     <testsuite name="auth">
       <file>editorAPI/Translate3108Test.php</file>
+      <file>editorAPI/Translate3048Test.php</file>
       <file>editorAPI/SessionApiTest.php</file>
       <file>editorAPI/ClientPmTest.php</file>
     </testsuite>
