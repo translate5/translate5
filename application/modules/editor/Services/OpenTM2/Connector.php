@@ -37,7 +37,6 @@ use MittagQI\Translate5\LanguageResource\Status as LanguageResourceStatus;
 use MittagQI\Translate5\T5Memory\Api\VersionFetchingApi;
 use MittagQI\Translate5\T5Memory\Enum\StripFramingTags;
 use MittagQI\Translate5\T5Memory\PersistenceService;
-use MittagQI\Translate5\T5Memory\T5memoryExportService;
 use MittagQI\Translate5\T5Memory\VersionService;
 
 /**

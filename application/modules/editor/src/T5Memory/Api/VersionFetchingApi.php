@@ -12,8 +12,9 @@ use Psr\Http\Client\ClientInterface;
 
 class VersionFetchingApi implements HasVersion
 {
-    public function __construct(private ClientInterface $client)
-    {
+    public function __construct(
+        private ClientInterface $client
+    ) {
     }
 
     public function version(string $baseUrl, bool $suppressExceptions = true): string

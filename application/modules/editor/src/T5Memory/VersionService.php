@@ -15,8 +15,9 @@ class VersionService
 {
     private bool $isInternalFuzzy = false;
 
-    public function __construct(private HasVersion $versionFetchingApi)
-    {
+    public function __construct(
+        private HasVersion $versionFetchingApi
+    ) {
     }
 
     public function isLRVersionGreaterThan(string $version, ?LanguageResource $languageResource): bool

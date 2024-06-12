@@ -14,8 +14,9 @@ use RuntimeException;
 
 class ResourcesResponse
 {
-    public function __construct(public readonly string $version)
-    {
+    public function __construct(
+        public readonly string $version
+    ) {
     }
 
     /**
