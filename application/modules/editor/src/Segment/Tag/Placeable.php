@@ -50,9 +50,11 @@ final class Placeable
      */
     public static function detect(string $markup, array $xpathes, FileParserTag $tag): void
     {
-        $content = self::xpathSearch($markup, $xpathes);
-        if ($content !== null) {
-            $tag->placeable = new Placeable($content);
+        if (! empty($markup)) {  // we can use empty since even "0" is not markup
+            $content = self::xpathSearch($markup, $xpathes);
+            if ($content !== null) {
+                $tag->placeable = new Placeable($content);
+            }
         }
     }
 
@@ -61,7 +63,7 @@ final class Placeable
      */
     public static function contains(string $segment): bool
     {
-        return preg_match(self::DETECTION_REGEX, $segment) === 1;
+        return ! empty($segment) && preg_match(self::DETECTION_REGEX, $segment) === 1;
     }
 
     /**
@@ -117,29 +119,34 @@ final class Placeable
         try {
             // generate DOM document with proper XML doctype avoiding UTF-8 quirks
             $doc = new DOMDocument();
-            $doc->loadXML(self::DOCTYPE . self::convertContent($markup));
-            // create a XPath to query with
-            $domXpath = new DOMXpath($doc);
+            // we suppress warnings ... very often the passed markup is no valid markup by design
+            if ($doc->loadXML(
+                self::DOCTYPE . self::convertContent($markup),
+                LIBXML_NOWARNING | LIBXML_NOERROR
+            )) {
+                // create a XPath to query with
+                $domXpath = new DOMXpath($doc);
 
-            foreach ($xpathes as $xpath) {
-                $nodes = $domXpath->query(self::convertXpath($xpath));
-                if ($nodes !== false && $nodes->count() > 0) {
-                    // Ease-of-Use: When users target a node and not it's children, they usually want the contents !
-                    // this is a debatable enhancement
-                    if ($nodes->count() === 1
-                        && ! str_ends_with($xpath, 'node()')
-                        && ! str_ends_with($xpath, 'text()')
-                        && ! str_ends_with($xpath, '::*')
-                        && $nodes[0]->childNodes->count() > 0) {
-                        $nodes = $nodes[0]->childNodes;
+                foreach ($xpathes as $xpath) {
+                    $nodes = $domXpath->query(self::convertXpath($xpath));
+                    if ($nodes !== false && $nodes->count() > 0) {
+                        // Ease-of-Use: When users target a node and not it's children, they usually want the contents !
+                        // this is a debatable enhancement
+                        if ($nodes->count() === 1
+                            && ! str_ends_with($xpath, 'node()')
+                            && ! str_ends_with($xpath, 'text()')
+                            && ! str_ends_with($xpath, '::*')
+                            && $nodes[0]->childNodes->count() > 0) {
+                            $nodes = $nodes[0]->childNodes;
+                        }
+
+                        $markup = '';
+                        foreach ($nodes as $node) {
+                            $markup .= self::renderDomNode($node);
+                        }
+
+                        return $markup;
                     }
-
-                    $markup = '';
-                    foreach ($nodes as $node) {
-                        $markup .= self::renderDomNode($node);
-                    }
-
-                    return $markup;
                 }
             }
         } catch (Throwable $e) {

@@ -236,11 +236,9 @@ class editor_Plugins_ArchiveTaskBeforeDelete_DbTables
     }
 
     /**
-     * returns an array with table names and
-     * @param string $taskGuid
-     * @return multitype:string mixed
+     * returns an array with table names and commands
      */
-    public function getArchiveListFor($taskGuid)
+    public function getArchiveListFor(string $taskGuid): array
     {
         $result = [];
         $replaceTaskGuid = function ($whatToDo) use ($taskGuid) {
