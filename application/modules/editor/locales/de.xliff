@@ -9778,6 +9778,10 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
                 <source>Lokalen Benutzer mit Daten aus dem SSO Provider aktualisieren (Rollen, Geschlecht, Sprache)</source>
                 <target>Lokalen Benutzer mit Daten aus dem SSO Provider aktualisieren (Rollen, Geschlecht, Sprache)</target>
             </trans-unit>
+            <trans-unit id="YWxsb3dfZG93bmxvYWRfcG9wdXBfYWxlcnQ=">
+                <source>allow_download_popup_alert</source>
+                <target>Bitte erlauben Sie Popups für diese Seite, um die Datei automatisch herunterzuladen.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

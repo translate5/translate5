@@ -9952,6 +9952,10 @@ E-Mail: service@MittagQI.com</pre>
                 <source>Lokalen Benutzer mit Daten aus dem SSO Provider aktualisieren (Rollen, Geschlecht, Sprache)</source>
                 <target>Update locale user with data from the SSO provider (roles, gender, locale)</target>
             </trans-unit>
+            <trans-unit id="YWxsb3dfZG93bmxvYWRfcG9wdXBfYWxlcnQ=">
+                <source>allow_download_popup_alert</source>
+                <target>Please allow popups for this site to automatically download the file.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

@@ -121,15 +121,26 @@ $translate = ZfExtended_Zendoverwrites_Translate::getInstance();
                     return;
                 }
 
-                document.querySelector('.loading').classList.add('hidden');
-                document.querySelector('.export-running-message').classList.add('hidden');
-                document.querySelector('.result').classList.remove('hidden');
+                const downloadLink = apiUrl + '&filename=' + data.filename;
 
-                const downloadLink = document.querySelector('.download');
-                downloadLink.href = apiUrl + '&filename=' + data.filename;
-                downloadLink.classList.remove('hidden');
-                downloadLink.target='_blank';
-                downloadLink.addEventListener('click', () => window.close());
+                const newWindow = window.open(downloadLink);
+
+                if (newWindow) {
+                    window.close();
+                } else {
+                    // If the popup was blocked, show an alert to the user
+                    alert("<?= $translate->_('allow_download_popup_alert'); ?>");
+
+                    document.querySelector('.loading').classList.add('hidden');
+                    document.querySelector('.export-running-message').classList.add('hidden');
+                    document.querySelector('.result').classList.remove('hidden');
+
+                    const anchor = document.querySelector('.download');
+                    anchor.href = downloadLink;
+                    anchor.classList.remove('hidden');
+                    anchor.target = '_blank';
+                    anchor.addEventListener('click', () => window.close());
+                }
             })
             .catch(error => {
                 document.querySelector('.loading').classList.add('hidden');
