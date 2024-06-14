@@ -276,8 +276,18 @@ Ext.define('Editor.view.segments.HtmlEditor', {
             data.value = '&#8203;';
         }
 
+        var wasUndefined = false;
+        if (data.value === undefined) {
+            wasUndefined = true;
+            console.log('data.value was undefined for field: ' + fieldName);
+        }
+
         // gives plugin a chance to pre-process the markup to set. We want to keep the value manipulatable, so we create a temp obj.
         me.fireEvent('beforeSetValueAndMarkup', data);
+
+        if (data.value === undefined && !wasUndefined) {
+            console.log('data.value became undefined for field: ' + fieldName);
+        }
 
         me.currentSegment = data.segment;
 
