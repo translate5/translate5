@@ -115,6 +115,10 @@ class Translate2491Test extends editor_Test_JsonTest
         // Re-import into termcollection
         static::api()->get('editor/task/export/id/' . $task->id . '?format=transfer');
 
+        // Wait until tbx import completes
+        // todo: introduce something like static::api()->waitForTbxImported()
+        sleep(30);
+
         // [10] search for the term attributes
         $terminfo = static::api()->postJson('editor/plugins_termportal_data/terminfo', [
             'termId' => $termsearch->data[0]->id,
