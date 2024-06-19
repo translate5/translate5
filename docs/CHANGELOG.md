@@ -17,6 +17,35 @@ All updates are (downwards) compatible! If not this is listed in the important r
 
 
 
+
+## [7.6.3] - 2024-06-10
+
+### Important Notes:
+ 
+
+
+### Added
+**[TRANSLATE-4000](https://jira.translate5.net/browse/TRANSLATE-4000): Editor general - Simple json editor for UI configs** <br>
+New simple json editor in the UI for map configs.
+
+
+### Changed
+**[TRANSLATE-3923](https://jira.translate5.net/browse/TRANSLATE-3923): Auto-QA - "Not found in target" category according to target term** <br>
+translate5 - 7.5.0: Quality errors in 'Not found in target' category group now count cases when best possible translations of source terms are not found in segment target
+translate5 - 7.6.3: Improve tests
+
+
+### Bugfixes
+**[TRANSLATE-3998](https://jira.translate5.net/browse/TRANSLATE-3998): Export - Wrong date values in excel export** <br>
+Fixed wrong dates in excel export when the date time is 00:00:00
+
+**[TRANSLATE-2500](https://jira.translate5.net/browse/TRANSLATE-2500): Main back-end mechanisms (Worker, Logging, etc.) - Worker Architecture: Solving Problems with Deadlocks and related Locking/Mutex Quirks** <br>
+5.2.2 Improved the internal worker handling regarding DB dead locks and a small opportunity that workers run twice.
+7.5.0 Improved the setRunning condition to reduce duplicated worker runs
+7.6.3 Improved worker queue for large project imports
+
+
+
 ## [7.6.2] - 2024-06-07
 
 ### Important Notes:
