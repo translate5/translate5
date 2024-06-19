@@ -328,7 +328,7 @@ class editor_Tag
             return null;
         }
         $node = $dom->firstChild();
-        if (is_a($node, 'PHPHtmlParser\Dom\Node\HtmlNode')) {
+        if (is_a($node, HtmlNode::class)) {
             return static::fromHtmlNode($node);
         }
         if ($node->isTextNode() && ! \ZfExtended_Utils::emptyString($node->text())) {
@@ -353,7 +353,7 @@ class editor_Tag
      */
     protected static function fromNode(AbstractNode $node)
     {
-        if (is_a($node, 'PHPHtmlParser\Dom\Node\HtmlNode')) {
+        if (is_a($node, HtmlNode::class)) {
             return static::fromHtmlNode($node);
         }
         if ($node->isTextNode() && ! \ZfExtended_Utils::emptyString($node->text())) {

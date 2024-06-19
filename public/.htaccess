@@ -34,7 +34,11 @@ RewriteCond %{REQUEST_METHOD} OPTIONS
 RewriteRule ^(.*)$ $1 [E=preflight:1,L,R=204]
 
 # Add trailing slash on editor
-RewriteRule ^((.*/)?editor)$ /$1/ [L,R]
+RewriteCond %{HTTP:X-Forwarded-Proto} =https
+RewriteRule ^((.*/)?editor)$ https://%{HTTP_HOST}/$1/ [L,R=301]
+
+RewriteCond %{HTTP:X-Forwarded-Proto} !=https
+RewriteRule ^((.*/)?editor)$ http://%{HTTP_HOST}/$1/ [L,R=301]
 
 # integrate as sysadmin page - dangereous on multi hosting envs!
 RewriteCond %{REQUEST_URI} !=/server-status

@@ -38,6 +38,7 @@ use ZfExtended_Factory;
 use ZfExtended_Logger;
 use ZfExtended_Models_Entity_Conflict;
 use ZfExtended_Models_Entity_NotFoundException;
+use ZfExtended_Models_Worker as Worker;
 
 /**
  * Task related functions for "old" tasks to be archived / deleted, used in the scope of workflow actions and notifications
@@ -113,7 +114,7 @@ class ArchiveTaskActions
         }
 
         $removedTasks = [];
-        //foreach task task, check the deletable, and delete it
+        //foreach task, check the deletable, and delete it
         foreach ($this->tasks as $task) {
             if (! $task->isErroneous()) {
                 $task->checkStateAllowsActions();
@@ -173,12 +174,14 @@ class ArchiveTaskActions
                 'exportToFolder' => $exportFolderRoot,
                 'options' => $this->triggerConfig->parameters,
             ]);
-            $parentWorkerId = $worker->queue(startNext: false);
+            $parentWorkerId = $worker->queue(state: Worker::STATE_PREPARE, startNext: false);
 
             /** @var editor_Models_Export_Worker $worker */
             $worker = ZfExtended_Factory::get('editor_Models_Export_Worker');
             $worker->initFolderExport($task, false, $exportFolderExport);
-            $worker->queue($parentWorkerId);
+            $worker->queue($parentWorkerId, Worker::STATE_PREPARE, false);
+
+            $worker->schedulePrepared();
         }
     }
 }
