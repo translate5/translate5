@@ -369,8 +369,13 @@ class editor_TaskController extends ZfExtended_RestController
     {
         $rows = $this->loadAll();
 
+        $isT5Connect = $this->entity->getFilter()->hasFilter('foreignName', $foundFilter)
+            && $foundFilter?->value === 't5Connect';
+
         //if we have no paging parameters, we omit all additional data gathering to improve performace!
-        if ($this->getParam('limit', 0) === 0 && ! $this->getParam('filter', false)) {
+        if ($this->getParam('limit', 0) === 0
+            && ! $this->getParam('filter', false)
+            || $isT5Connect) {
             return $rows;
         }
 
