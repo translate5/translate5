@@ -71,8 +71,8 @@ class editor_Models_Export_DiffTagger_Csv extends editor_Models_Export_DiffTagge
         $targetArr = $this->tagBreakUp($target);
         $editedArr = $this->tagBreakUp($edited);
 
-        $targetArr = $this->wordBreakUp($targetArr);
-        $editedArr = $this->wordBreakUp($editedArr);
+        $targetArr = $this->wordBreakUp($targetArr, true);
+        $editedArr = $this->wordBreakUp($editedArr, true);
 
         $diff = ZfExtended_Factory::get('ZfExtended_Diff');
         /* @var $diff ZfExtended_Diff */
