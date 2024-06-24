@@ -588,7 +588,7 @@ Ext.define('Editor.view.segments.Grid', {
 
     /**
      * Searches the proper column-index for a content-field ("source", "target", "targetEdit", ...)
-     * This index is the index of the visible column ... what a crazy data-model is ExtJS using here
+     * This index is the index of the visible column ... what a crazy data-model is ExtJS using there 
      * TODO FIXME: this searches internal and private props, but I found no other way to achieve this
      * @param {string} field
      * @returns {int}
@@ -600,7 +600,7 @@ Ext.define('Editor.view.segments.Grid', {
                 return i;
             }
         }
-        console.log('Could not find column "' + field + '" in the segments grid columns');
+        console.log('Could not find column "' + field + '" in the segment-grid columns');
         return -1;
     },
 
