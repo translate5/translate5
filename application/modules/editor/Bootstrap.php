@@ -195,7 +195,9 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
                 'languageresourceresource', 'languageresourcetaskassoc', 'languageresourcetaskpivotassoc',
                 'languageresourceinstance', 'taskusertracking', 'term', 'attribute', 'termattribute', 'category',
                 'quality', 'userassocdefault', 'log', 'collectionattributedatatype', 'token',
-                'contentprotectioncontentrecognition', 'contentprotectioninputmapping', 'contentprotectionoutputmapping',            ],
+                'contentprotectioncontentrecognition', 'contentprotectioninputmapping', 'contentprotectionoutputmapping',
+                'languageresourcesyncassoc',
+            ],
         ]);
         $this->front->getRouter()->addRoute('editorRestDefault', $restRoute);
 
@@ -541,8 +543,33 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
         $this->front->getRouter()->addRoute('lastusedapp', $lastusedapp);
 
         # Language resources rutes start
-        //WARNING: Order of the route definition is important!
+        // WARNING: Order of the route definition is important!
         // the catchall like download route must be defined before the more specific query/search routes!
+
+        $this->front->getRouter()->addRoute(
+            'languageresources_languageresourcesync_availableforconnection',
+            new ZfExtended_Controller_RestLikeRoute(
+                'editor/languageresourcesync/:id/available-for-connection',
+                [
+                    'module' => 'editor',
+                    'controller' => 'languageresourcesync',
+                    'action' => 'availableforconnection',
+                ]
+            )
+        );
+
+        $this->front->getRouter()->addRoute(
+            'languageresources_languageresourcesync_connectavailable',
+            new ZfExtended_Controller_RestLikeRoute(
+                'editor/languageresourcesync/:id/connect-available',
+                [
+                    'module' => 'editor',
+                    'controller' => 'languageresourcesync',
+                    'action' => 'connectavailable',
+                ]
+            )
+        );
+
         $queryRoute = new ZfExtended_Controller_RestLikeRoute(
             'editor/languageresourceinstance/:id/:type',
             [

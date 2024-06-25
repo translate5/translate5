@@ -182,5 +182,6 @@ Ext.define('Editor.view.LanguageResources.services.Default', {
         };
     },
     getConversionIconClass: record => 'x-hidden-display',
+    getConversionIconTip: record => null,
     getConversionIconTip: record => null
 });

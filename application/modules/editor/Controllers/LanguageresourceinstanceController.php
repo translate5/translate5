@@ -28,6 +28,7 @@ END LICENSE AND COPYRIGHT
 
 use MittagQI\Translate5\ContentProtection\T5memory\TmConversionService;
 use MittagQI\Translate5\LanguageResource\CleanupAssociation\Customer;
+use MittagQI\Translate5\LanguageResource\CrossSynchronization\SyncConnectionService;
 use MittagQI\Translate5\LanguageResource\ReimportSegments;
 use MittagQI\Translate5\LanguageResource\Status as LanguageResourceStatus;
 use MittagQI\Translate5\LanguageResource\TaskAssociation;
@@ -122,6 +123,7 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
 
         $serviceManager = ZfExtended_Factory::get(editor_Services_Manager::class);
         $resources = [];
+        $synchronizableServiceTypes = $serviceManager->getSynchronizableServiceTypes();
 
         $getResource = function (string $serviceType, string $id) use ($resources, $serviceManager) {
             if (! empty($resources[$id])) {
@@ -163,6 +165,7 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
 
             $id = $lrData['id'];
             $lrData['serviceName'] = $serviceManager->getUiNameByType($lrData['serviceType']);
+            $lrData['synchronizableService'] = in_array($lrData['serviceType'], $synchronizableServiceTypes, true);
 
             $lrData['tmNeedsConversion'] = false;
             $lrData['tmConversionInProgress'] = false;

@@ -36,11 +36,13 @@ END LICENSE AND COPYRIGHT
 use MittagQI\Translate5\LanguageResource\Adapter\Exception\RescheduleUpdateNeededException;
 use MittagQI\Translate5\LanguageResource\Adapter\Exception\SegmentUpdateException;
 use MittagQI\Translate5\LanguageResource\Adapter\UpdatableAdapterInterface;
+use MittagQI\Translate5\LanguageResource\CrossSynchronization\SyncConnectionService;
 
 /**
  * LanguageResource Service Manager
  * TODO all services classes should be located somewhere under language resources
- * Not needed to be instanced as singleton since registered connectors were stored internally in a static member variable
+ * Not needed to be instanced as singleton since registered connectors were stored internally in a static member
+ * variable
  */
 class editor_Services_Manager
 {
@@ -102,6 +104,35 @@ class editor_Services_Manager
     public function getAll()
     {
         return self::$registeredServices;
+    }
+
+    /**
+     * @throws ZfExtended_Exception
+     */
+    public function getService(string $serviceType): editor_Services_ServiceAbstract
+    {
+        $this->checkService($serviceType);
+
+        return ZfExtended_Factory::get($this->getServiceClassName($serviceType));
+    }
+
+    /**
+     * @return string[]
+     */
+    public function getSynchronizableServiceTypes(): array
+    {
+        $synchronizableServiceTypes = [];
+        foreach ($this->getAll() as $serviceType) {
+            $service = $this->getService($serviceType);
+
+            if (! $service instanceof SyncConnectionService) {
+                continue;
+            }
+
+            $synchronizableServiceTypes[] = $serviceType;
+        }
+
+        return $synchronizableServiceTypes;
     }
 
     public function getAllUiNames(): array
@@ -359,7 +390,7 @@ class editor_Services_Manager
             function (
                 Exception $e,
                 editor_Models_LanguageResources_LanguageResource $languageResource,
-                ZfExtended_Logger_Event $event
+                ZfExtended_Logger_Event $event,
             ): void {
                 self::reportTMUpdateError(null, $event->message, $event->eventCode);
             }

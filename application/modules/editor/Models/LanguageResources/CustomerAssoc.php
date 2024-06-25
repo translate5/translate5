@@ -51,6 +51,11 @@ class editor_Models_LanguageResources_CustomerAssoc extends ZfExtended_Models_En
 
     protected $validatorInstanceClass = 'editor_Models_Validator_LanguageResources_CustomerAssoc';
 
+    public function hydrate(array|Zend_Db_Table_Row_Abstract $data): void
+    {
+        $this->row = is_array($data) ? $this->db->createRow($data) : $data;
+    }
+
     /***
      * Save customer assoc from the request parameters for the given language resource.
      * A language resource that is saved must have at least one customer assigned

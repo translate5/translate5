@@ -175,6 +175,12 @@ Ext.define('Editor.view.LanguageResources.TmOverviewPanel', {
                         isDisabled: (view, rowIndex, colIndex, item, record) =>
                             item.hidden = !record.get('tmNeedsConversion')
                     },{
+                        tooltip: 'my super tooltip to change',
+                        iconCls: 'ico-tm-sync',
+                        hidden: true,
+                        isDisabled: (view, rowIndex, colIndex, item, record) =>
+                            item.hidden = ! record.get('synchronizableService')
+                    },{
                         tooltip: me.strings.edit,
                         action: 'edit',
                         iconCls: 'ico-tm-edit',

@@ -44,6 +44,7 @@ Ext.define('Editor.controller.TmOverview', {
         'Editor.view.LanguageResources.EditTmWindow',
         'Editor.view.LanguageResources.TaskGridWindow',
         'Editor.view.LanguageResources.ImportCollectionWindow',
+        'Editor.view.LanguageResources.SyncAssocWindow',
         'Editor.view.LanguageResources.log.LogWindow',
         'Editor.view.LanguageResources.ProposalExport',
         'Editor.view.LanguageResources.TbxExport',
@@ -489,8 +490,17 @@ Ext.define('Editor.controller.TmOverview', {
                 case 'converseTm':
                     me.handleTmConversion(view, cell, col, newRecord);
                     break;
+                case 'sync':
+                    me.handleLanguageResourceSync(view, cell, col, newRecord);
+                    break;
             }
         });
+    },
+
+    handleLanguageResourceSync: function (view, cell, cellIdx, rec) {
+        Ext.widget('languageResourceSyncAssocWindow', {
+            languageResource: rec
+        }).show();
     },
 
     handleTmConversion: function (view, cell, cellIdx, rec) {
