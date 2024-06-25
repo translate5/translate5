@@ -8,7 +8,7 @@ options:
 definitions:
   services:
     docker:
-      memory: 7128
+      memory: 14256
 
 pipelines:
   pull-requests:
@@ -72,7 +72,7 @@ pipelines:
 
       # Clone docker-repo and run all things from there
       - step:
-          size: 2x
+          size: 4x
           script:
             - git clone https://$GIT_USER:$GIT_TOKEN@bitbucket.org/mittagqi/docker.git
             - cd docker && ./bitbucket/test-script.sh
