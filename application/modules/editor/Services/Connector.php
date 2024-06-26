@@ -363,8 +363,6 @@ class editor_Services_Connector
 
     /**
      * Load the latest service result cache for the given segment in the current language resource
-     * @param editor_Models_Segment $segment
-     * @return editor_Services_ServiceResult
      * @throws ReflectionException
      */
     protected function getCachedResult(editor_Models_Segment $segment): editor_Services_ServiceResult

@@ -32,7 +32,9 @@ namespace MittagQI\Translate5\LanguageResource;
 
 class ReimportSegmentsResult
 {
-    public function __construct(public readonly int $successfulSegments, public readonly int $failedSegments)
-    {
+    public function __construct(
+        public readonly int $successfulSegments,
+        public readonly int $failedSegments
+    ) {
     }
 }
