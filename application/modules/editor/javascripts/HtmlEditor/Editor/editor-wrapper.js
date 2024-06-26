@@ -629,7 +629,8 @@ export default class EditorWrapper {
 
     #createDeletedElement(change) {
         const data = change.data || null;
-        const attributes = change.getAttributes().toArray();
+        const iterator = change.getAttributes();
+        const attributes = Array.from(iterator);
 
         // simple text has no attributes, so adding early return
         if (attributes.length === 0) {
