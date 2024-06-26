@@ -103,7 +103,7 @@ class ReimportSegments
         ];
         $segments = $this->getSegmentIterator($task, $filters);
 
-        $this->updateSegments(
+        $result = $this->updateSegments(
             $segments,
             $params[self::USE_SEGMENT_TIMESTAMP] ?? UpdatableAdapterInterface::DO_NOT_USE_SEGMENT_TIMESTAMP
         );
@@ -115,6 +115,8 @@ class ReimportSegments
             [
                 'taskId' => $this->task->getId(),
                 'tmId' => $this->languageResource->getId(),
+                'successfulSegments' => $result->successfulSegments,
+                'failedSegments' => $result->failedSegments,
             ]
         );
 
@@ -210,11 +212,11 @@ class ReimportSegments
     private function updateSegments(
         editor_Models_Segment_Iterator $segments,
         bool $useSegmentTimestamp
-    ): void {
+    ): ReimportSegmentsResult {
         // in case of filtered segments, the initialization of the segments
         // iterator can result with no segments found for the applied filter
         if ($segments->isEmpty()) {
-            return;
+            return new ReimportSegmentsResult(0, 0);
         }
 
         $assoc = ZfExtended_Factory::get(TaskAssociation::class);
@@ -226,26 +228,32 @@ class ReimportSegments
 
         // check if the current language resources is updatable before updating
         if (empty($assoc->getSegmentsUpdateable())) {
-            return;
+            return new ReimportSegmentsResult(0, 0);
         }
 
         $manager = ZfExtended_Factory::get(editor_Services_Manager::class);
 
         $connector = $manager->getConnector($this->languageResource, null, null, $this->task->getConfig());
 
+        $successfulSegments = 0;
+        $failedSegments = 0;
         foreach ($segments as $segment) {
             if ($segment->hasEmptySource() || $segment->hasEmptyTarget()) {
                 continue;
             }
 
             try {
-                $connector->update($segment, useSegmentTimestamp: $useSegmentTimestamp);
+                $success = $connector->update($segment, useSegmentTimestamp: $useSegmentTimestamp);
             } catch (\ZfExtended_Zendoverwrites_Http_Exception|\editor_Services_Connector_Exception) {
                 // if the TM is not available (due service restart or whatever)
                 // we just wait some time and try it again once.
                 sleep(30);
-                $connector->update($segment);
+                $success = $connector->update($segment);
             }
+
+            $success ? $successfulSegments++ : $failedSegments++;
         }
+
+        return new ReimportSegmentsResult($successfulSegments, $failedSegments);
     }
 }

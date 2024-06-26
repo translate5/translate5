@@ -328,7 +328,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
         bool $recheckOnUpdate = self::DO_NOT_RECHECK_ON_UPDATE,
         bool $rescheduleUpdateOnError = self::DO_NOT_RESCHEDULE_UPDATE_ON_ERROR,
         bool $useSegmentTimestamp = self::DO_NOT_USE_SEGMENT_TIMESTAMP
-    ): void {
+    ): bool {
         $tmName = $this->getWritableMemory();
 
         if ($this->isReorganizingAtTheMoment($tmName)) {
@@ -360,7 +360,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
         if ($successful) {
             $this->checkUpdatedSegment($segment, $recheckOnUpdate);
 
-            return;
+            return true;
         }
 
         $apiError = $this->api->getError();
@@ -374,7 +374,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
             if ($successful) {
                 $this->checkUpdatedSegment($segment, $recheckOnUpdate);
 
-                return;
+                return true;
             }
         } elseif ($this->isMemoryOverflown($apiError)) {
             $this->addOverflowWarning($segment->getTask());
@@ -388,7 +388,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
             if ($successful) {
                 $this->checkUpdatedSegment($segment, $recheckOnUpdate);
 
-                return;
+                return true;
             }
         }
 
@@ -400,6 +400,8 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
             'segment' => $segment,
             'apiError' => $apiError,
         ]);
+
+        return false;
     }
 
     public function updateTranslation(string $source, string $target, string $tmName = '')

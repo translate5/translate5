@@ -40,7 +40,7 @@ use MittagQI\Translate5\Segment\TagRepair\HtmlProcessor;
  * @method editor_Services_ServiceResult query(editor_Models_Segment $segment)
  * @method editor_Services_ServiceResult search(string $searchString, $field = 'source', $offset = null)
  * @method editor_Services_ServiceResult translate(string $searchString)
- * @method void update(editor_Models_Segment $segment, $recheckOnUpdate = false, $rescheduleOnError = false) editor_Services_Connector_Abstract::update()
+ * @method bool update(editor_Models_Segment $segment, $recheckOnUpdate = false, $rescheduleOnError = false) editor_Services_Connector_Abstract::update()
  * @method string getStatus(editor_Models_LanguageResources_Resource $resource, editor_Models_LanguageResources_LanguageResource $languageResource = null) returns the LanguageResource status
  * @method string getLastStatusInfo() returns the last store status info from the last getStatus call
  * @method string getTm($mime, string $tmName = '') editor_Services_Connector_FilebasedAbstract::getTm()
