@@ -368,7 +368,6 @@ a.error:hover {
 
 .switchSourceTarget {
     display: inline-block;
-    width: auto;
     position: absolute;
     width: 40px;
     height: 40px;
@@ -380,7 +379,7 @@ a.error:hover {
 }
 
 @media (max-width: 640px) {
-    .switchSourceTarget {right: 0px;}
+    .switchSourceTarget {right: 0;}
     #sourceLocale-button {width: calc(100% - 60px);}
 }
 
@@ -408,6 +407,7 @@ a.error:hover {
     background-color: transparent;
     font-size: var(--font-size-big);
     line-height: 1.4;
+    outline: none;
 }
 
 .countedCharacters {
