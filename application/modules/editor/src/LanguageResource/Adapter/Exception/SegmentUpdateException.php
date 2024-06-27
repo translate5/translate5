@@ -32,5 +32,4 @@ namespace MittagQI\Translate5\LanguageResource\Adapter\Exception;
 
 class SegmentUpdateException extends \Exception
 {
-
 }
