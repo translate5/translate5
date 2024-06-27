@@ -31,6 +31,7 @@ use editor_Models_Task as Task;
 use MittagQI\Translate5\ContentProtection\T5memory\T5NTagSchemaFixFilter;
 use MittagQI\Translate5\ContentProtection\T5memory\TmConversionService;
 use MittagQI\Translate5\LanguageResource\Adapter\Exception\RescheduleUpdateNeededException;
+use MittagQI\Translate5\LanguageResource\Adapter\Exception\SegmentUpdateException;
 use MittagQI\Translate5\LanguageResource\Adapter\UpdatableAdapterInterface;
 use MittagQI\Translate5\LanguageResource\Status as LanguageResourceStatus;
 use MittagQI\Translate5\Service\T5Memory;
@@ -328,7 +329,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
         bool $recheckOnUpdate = self::DO_NOT_RECHECK_ON_UPDATE,
         bool $rescheduleUpdateOnError = self::DO_NOT_RESCHEDULE_UPDATE_ON_ERROR,
         bool $useSegmentTimestamp = self::DO_NOT_USE_SEGMENT_TIMESTAMP
-    ): bool {
+    ): void {
         $tmName = $this->getWritableMemory();
 
         if ($this->isReorganizingAtTheMoment($tmName)) {
@@ -360,7 +361,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
         if ($successful) {
             $this->checkUpdatedSegment($segment, $recheckOnUpdate);
 
-            return true;
+            return;
         }
 
         $apiError = $this->api->getError();
@@ -374,7 +375,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
             if ($successful) {
                 $this->checkUpdatedSegment($segment, $recheckOnUpdate);
 
-                return true;
+                return;
             }
         } elseif ($this->isMemoryOverflown($apiError)) {
             $this->addOverflowWarning($segment->getTask());
@@ -388,7 +389,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
             if ($successful) {
                 $this->checkUpdatedSegment($segment, $recheckOnUpdate);
 
-                return true;
+                return;
             }
         }
 
@@ -401,7 +402,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
             'apiError' => $apiError,
         ]);
 
-        return false;
+        throw new SegmentUpdateException();
     }
 
     public function updateTranslation(string $source, string $target, string $tmName = '')

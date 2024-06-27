@@ -26,6 +26,8 @@
  END LICENSE AND COPYRIGHT
  */
 
+use MittagQI\Translate5\LanguageResource\Adapter\Exception\SegmentUpdateException;
+
 /**
  * After importing a task a match analysis will be created based on the assigned TM based MatchRessources.
  * To get the analysis results, each segment is send to the assigned MatchRessources. For each queried Sprachressource the received best match rate is stored in a separate DB table.
@@ -419,12 +421,22 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
             // Checking for matchrate >= 100 is for edge case when segments have the same-same source but different
             // source md5hash so they are not a repetitions. Updating the segment in this case would lead to omitting
             // translation for other segments with the same-same source, but different source md5hash
-            if ($bestMatchRateResult !== null && $bestMatchRateResult->matchrate < 100 &&
-                $this->internalFuzzy && $connector->isInternalFuzzy()) {
+            if (
+                $bestMatchRateResult !== null
+                && $bestMatchRateResult->matchrate < 100
+                && $this->internalFuzzy
+                && $connector->isInternalFuzzy()
+            ) {
                 $origTarget = $segment->getTargetEdit();
                 $dummyTargetText = self::renderDummyTargetText($segment->getTaskGuid());
                 $segment->setTargetEdit($dummyTargetText);
-                $connector->update($segment);
+
+                try {
+                    $connector->update($segment);
+                } catch (SegmentUpdateException) {
+                    // Ignore the error here as we don't care about the result
+                }
+
                 $segment->setTargetEdit($origTarget);
             }
         }

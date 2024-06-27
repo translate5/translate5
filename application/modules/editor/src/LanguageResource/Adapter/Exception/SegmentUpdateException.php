@@ -28,28 +28,9 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\LanguageResource\Adapter;
+namespace MittagQI\Translate5\LanguageResource\Adapter\Exception;
 
-use editor_Models_Segment as SegmentModel;
-
-interface UpdatableAdapterInterface
+class SegmentUpdateException extends \Exception
 {
-    public const RECHECK_ON_UPDATE = true;
 
-    public const DO_NOT_RECHECK_ON_UPDATE = false;
-
-    public const RESCHEDULE_UPDATE_ON_ERROR = true;
-
-    public const DO_NOT_RESCHEDULE_UPDATE_ON_ERROR = false;
-
-    public const USE_SEGMENT_TIMESTAMP = true;
-
-    public const DO_NOT_USE_SEGMENT_TIMESTAMP = false;
-
-    public function update(
-        SegmentModel $segment,
-        bool $recheckOnUpdate = self::DO_NOT_RECHECK_ON_UPDATE,
-        bool $rescheduleUpdateOnError = self::DO_NOT_RESCHEDULE_UPDATE_ON_ERROR,
-        bool $useSegmentTimestamp = self::DO_NOT_USE_SEGMENT_TIMESTAMP,
-    ): void;
 }
