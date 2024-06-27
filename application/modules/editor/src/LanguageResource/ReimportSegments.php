@@ -115,8 +115,8 @@ class ReimportSegments
             [
                 'taskId' => $this->task->getId(),
                 'tmId' => $this->languageResource->getId(),
-                'successfulSegments' => $result->successfulSegments,
-                'failedSegments' => $result->failedSegments,
+                'successfulSegments' => $result->successfulSegmentsAmount,
+                'failedSegments' => $result->failedSegmentIds,
             ]
         );
 
@@ -216,7 +216,7 @@ class ReimportSegments
         // in case of filtered segments, the initialization of the segments
         // iterator can result with no segments found for the applied filter
         if ($segments->isEmpty()) {
-            return new ReimportSegmentsResult(0, 0);
+            return new ReimportSegmentsResult(0, []);
         }
 
         $assoc = ZfExtended_Factory::get(TaskAssociation::class);
@@ -228,15 +228,15 @@ class ReimportSegments
 
         // check if the current language resources is updatable before updating
         if (empty($assoc->getSegmentsUpdateable())) {
-            return new ReimportSegmentsResult(0, 0);
+            return new ReimportSegmentsResult(0, []);
         }
 
         $manager = ZfExtended_Factory::get(editor_Services_Manager::class);
 
         $connector = $manager->getConnector($this->languageResource, null, null, $this->task->getConfig());
 
-        $successfulSegments = 0;
-        $failedSegments = 0;
+        $successfulSegmentsAmount = 0;
+        $failedSegmentsIds = [];
         foreach ($segments as $segment) {
             if ($segment->hasEmptySource() || $segment->hasEmptyTarget()) {
                 continue;
@@ -251,9 +251,9 @@ class ReimportSegments
                 $success = $connector->update($segment);
             }
 
-            $success ? $successfulSegments++ : $failedSegments++;
+            $success ? $successfulSegmentsAmount++ : $failedSegmentsIds[] = (int) $segment->getId();
         }
 
-        return new ReimportSegmentsResult($successfulSegments, $failedSegments);
+        return new ReimportSegmentsResult($successfulSegmentsAmount, $failedSegmentsIds);
     }
 }
