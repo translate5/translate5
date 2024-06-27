@@ -97,14 +97,14 @@ abstract class AbstractConnector
 
     protected AbstractAuthenticatedService $service;
 
-    protected string $url;
+    protected ?string $url;
 
     /**
      * may holds additional props to configure the JsonClient
      */
     protected array $httpClientConfig = [];
 
-    public function __construct(AbstractAuthenticatedService $service, string $url = null)
+    public function __construct(AbstractAuthenticatedService $service, ?string $url = null)
     {
         $this->service = $service;
         $this->url = $url ?? $service->getServiceUrl();
