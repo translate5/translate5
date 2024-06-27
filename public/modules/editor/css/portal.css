@@ -407,7 +407,6 @@ a.error:hover {
     background-color: transparent;
     font-size: var(--font-size-big);
     line-height: 1.4;
-    outline: none;
 }
 
 .countedCharacters {
