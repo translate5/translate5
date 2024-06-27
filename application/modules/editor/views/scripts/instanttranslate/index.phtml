@@ -34,6 +34,9 @@ $devPreventInstantTranslate = FALSE;
 /* @var $this Zend_View */
 $version = '?v=' . $this->appVersion;
 
+// specific instanttranslate styles
+$this->headLink()->prependStylesheet(APPLICATION_RUNDIR . '/editor/plugins/resources/InstantTranslate/css/instanttranslate.css' . $version);
+
 $translate = ZfExtended_Zendoverwrites_Translate::getInstance();
 $user = ZfExtended_Authentication::getInstance()->getUser();
 // see View_Helper_LanguageSelector
@@ -43,49 +46,47 @@ $availableTranslations = $translate->getAvailableTranslations();
 asort($availableTranslations);
 $languageSelector = [];
 
-//translated strings
+//translated strings // TODO FIXME: cleanup, lots of them are outdated!
 $this->translations = array(
-    "clearText" => $translate->_("Text zurücksetzen"),
-    "copy" => $translate->_("Kopieren"),
-    "enterText" => $translate->_("Geben Sie Text ein"),
-    "serverErrorMsg500" => $translate->_("Die Anfrage führte zu einem Fehler im angefragten Dienst."),
-    "noResultsFound" => $translate->_("<b>Keine Ergebnisse gefunden</b><br/>Für Ihre Suche gibt es keine Einträge in der Terminologie und dem Translation Memory und für die gewählte Sprachkombination steht keine maschinelle Übersetzung zur Verfügung."),
-    "translate" => $translate->_("Übersetzen"),
-    "orTranslateFile" => $translate->_("oder lassen Sie ein Dokument übersetzen"),
-    "orTranslateText" => $translate->_("oder lassen Sie Text übersetzen, den Sie eingeben."),
-    "turnOffInstantTranslation" => $translate->_("InstantTranslate deaktivieren"),
-    "turnOnInstantTranslation" => $translate->_("InstantTranslate aktivieren"),
-    "uploadFile" => $translate->_("Laden Sie eine Datei hoch"),
-    "uploadFileNotFound" => $translate->_("Bitte wählen Sie eine Datei aus."),
-    "notAllowed" => $translate->_("nicht erlaubt"),
-    "openInTermPortal" => $translate->_("Term im TermPortal öffnen"),
-    "attentionFuzzyMatch" => $translate->_("Achtung! FuzzyMatch ({0})"),
-    "attentionFuzzyMatch" => $translate->_('Achtung! Fuzzy Match ({0}%) - die Quelle im Translation Memory unterscheidet sich von Ihrer Anfrage. Die Unterschiede sind mit einem grauen Hintergrund gekennzeichnet.'),
-    "differenceIsHighlighted" => $translate->_("Quellsegment zum TM-Match: Unterschied zu Ihrer Texteingabe hervorgehoben"),
-    "selectLanguages" => $translate->_("Bitte wählen Sie eine Sprachkombination für die Übersetzung."),
-    "noLanguageResource" => $translate->_("Für diese Sprachkombination steht keine Sprachressource zur Verfügung."),
-    "translationsForLabel" => $translate->_("Übersetzungen für"),
-    "termProposalIconTooltip" => $translate->_("Als neuen Term im TermPortal vorschlagen"),
-    "availableUntil" => $translate->_("verfügbar bis"),
-    "error" => $translate->_("Fehler"),
-    "noDownloadAfterError" => $translate->_("Beim Übersetzen der Datei ist ein Fehler aufgetreten; ein Download steht nicht zur Verfügung."),
-    "noDownloadWhileImport" => $translate->_("Während die automatische Übersetzung läuft, steht die Datei noch nicht zum Download zur Verfügung."),
-    "noDownloadNotTranslated" => $translate->_("Beim Übersetzen der Datei ist ein Fehler aufgetreten; ein Download steht nicht zur Verfügung."),
-    "pretranslatedFiles" => $translate->_("Vorübersetzte Dateien"),
-    "refresh" => $translate->_("Aktualisieren"),
-    "state" => $translate->_("Status"),
-    "asOf" => $translate->_("Stand:"),
-    "translationBasedOn" => $translate->_("Übersetzt unter Verwendung von:"),
-    "singleResultBestMatchrateTooltip" => $translate->_("Für jeden Satz wurde das beste verfügbare Translation-Memory-Match verwendet (100% oder besser). Wenn keine 100%ige Übereinstimmung im Translation Memory gefunden wurde, wird die maschinelle Übersetzung verwendet."),
-    "errorOccurredDuringTranslation" => $translate->_("Ein oder mehrere Fehler traten während der Übersetzung auf"),
-    "languageresourceNames" => [
-        'TermCollection' => $translate->_("TermCollection"),
-        'OpenTM2' => $translate->_("OpenTM2"),
-        'GroupShare' => $translate->_("GroupShare"),
+    'clearText' => $translate->_('Text zurücksetzen'),
+    'copy' => $translate->_('Kopieren'),
+    'enterText' => $translate->_('Geben Sie Text ein'),
+    'serverErrorMsg500' => $translate->_('Die Anfrage führte zu einem Fehler im angefragten Dienst.'),
+    'noResultsFound' => $translate->_('<b>Keine Ergebnisse gefunden</b><br/>Für Ihre Suche gibt es keine Einträge in der Terminologie und dem Translation Memory und für die gewählte Sprachkombination steht keine maschinelle Übersetzung zur Verfügung.'),
+    'translate' => $translate->_('Übersetzen'),
+    'orTranslateFile' => $translate->_('oder lassen Sie ein Dokument übersetzen'),
+    'orTranslateText' => $translate->_('oder lassen Sie Text übersetzen, den Sie eingeben.'),
+    'turnOffInstantTranslation' => $translate->_('InstantTranslate deaktivieren'),
+    'uploadFile' => $translate->_('Laden Sie eine Datei hoch'),
+    'uploadFileNotFound' => $translate->_('Bitte wählen Sie eine Datei aus.'),
+    'notAllowed' => $translate->_('nicht erlaubt'),
+    'openInTermPortal' => $translate->_('Term im TermPortal öffnen'),
+    'attentionFuzzyMatch' => $translate->_('Achtung! Fuzzy Match ({0}%) - die Quelle im Translation Memory unterscheidet sich von Ihrer Anfrage. Die Unterschiede sind mit einem grauen Hintergrund gekennzeichnet.'),
+    'differenceIsHighlighted' => $translate->_('Quellsegment zum TM-Match: Unterschied zu Ihrer Texteingabe hervorgehoben'),
+    'selectLanguages' => $translate->_('Bitte wählen Sie eine Sprachkombination für die Übersetzung.'),
+    'noLanguageResource' => $translate->_('Für diese Sprachkombination steht keine Sprachressource zur Verfügung.'),
+    'translationsForLabel' => $translate->_('Übersetzungen für'),
+    'termProposalIconTooltip' => $translate->_('Als neuen Term im TermPortal vorschlagen'),
+    'availableUntil' => $translate->_('verfügbar bis'),
+    'error' => $translate->_('Fehler'),
+    'noDownloadAfterError' => $translate->_('Beim Übersetzen der Datei ist ein Fehler aufgetreten; ein Download steht nicht zur Verfügung.'),
+    'noDownloadWhileImport' => $translate->_('Während die automatische Übersetzung läuft, steht die Datei noch nicht zum Download zur Verfügung.'),
+    'noDownloadNotTranslated' => $translate->_('Beim Übersetzen der Datei ist ein Fehler aufgetreten; ein Download steht nicht zur Verfügung.'),
+    'pretranslatedFiles' => $translate->_('Vorübersetzte Dateien'),
+    'refresh' => $translate->_('Aktualisieren'),
+    'state' => $translate->_('Status'),
+    'asOf' => $translate->_('Stand:'),
+    'translationBasedOn' => $translate->_('Übersetzt unter Verwendung von:'),
+    'singleResultBestMatchrateTooltip' => $translate->_('Für jeden Satz wurde das beste verfügbare Translation-Memory-Match verwendet (100% oder besser). Wenn keine 100%ige Übereinstimmung im Translation Memory gefunden wurde, wird die maschinelle Übersetzung verwendet.'),
+    'errorOccurredDuringTranslation' => $translate->_('Ein oder mehrere Fehler traten während der Übersetzung auf'),
+    'languageresourceNames' => [
+        'TermCollection' => $translate->_('TermCollection'),
+        'OpenTM2' => $translate->_('OpenTM2'),
+        'GroupShare' => $translate->_('GroupShare'),
     ],
-    "languagesAreSame" => $translate->_("<b>Quellsprache ist die Zielsprache</b><br/>Quellsprache gleicht der Zielsprache, deswegen kann der eingegebene Text nicht übersetzt werden."),
-    "helpWindowTitle" => $translate->_("Einführung"),
-    "helpWindowCheckboxlabel" => $translate->_("Dieses Fenster nicht mehr automatisch anzeigen.")
+    'languagesAreSame' => $translate->_('<b>Quellsprache ist die Zielsprache</b><br/>Quellsprache gleicht der Zielsprache, deswegen kann der eingegebene Text nicht übersetzt werden.'),
+    'helpWindowTitle' => $translate->_('Einführung'),
+    'helpWindowCheckboxlabel' => $translate->_('Dieses Fenster nicht mehr automatisch anzeigen.')
 );
 // Shortcut
 $rop = Zend_Registry::get('config')->runtimeOptions;
@@ -95,7 +96,7 @@ $this->Php2JsVars()->set('allDbLanguages', $this->allDbLanguages);
 // Get user-level value for helpWindow's 'notAutoShow' stateful config, if exists
 $helpWindow = ZfExtended_Factory::get('editor_Models_UserConfig')->getCurrentValue(
     $user->getUserGuid(),
-    "runtimeOptions.frontend.defaultState.helpWindow.instanttranslate"
+    'runtimeOptions.frontend.defaultState.helpWindow.instanttranslate'
 );
 
 // But if not - get system-level value for that config
@@ -390,7 +391,7 @@ $languageSelector[] = '</form>';
 </div>
 <script src="<?= APPLICATION_RUNDIR ?>/modules/editor/apps/js/ErrorHandler.js<?= $version ?>"></script>
 <script src="<?= APPLICATION_RUNDIR ?>/modules/editor/js/shared.js<?php echo $version ?>"></script>
-<script src="<?= APPLICATION_RUNDIR ?>/modules/editor/instanttranslate/js/Instanttranslate.js<?= $version ?>"></script>
+<script src="<?= APPLICATION_RUNDIR ?>/editor/plugins/resources/InstantTranslate/js/instanttranslate.js<?= $version ?>"></script>
 <script type="text/javascript">
 
     $(document).ready(function () {
