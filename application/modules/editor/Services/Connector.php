@@ -40,7 +40,7 @@ use MittagQI\Translate5\Segment\TagRepair\HtmlProcessor;
  * @method editor_Services_ServiceResult query(editor_Models_Segment $segment)
  * @method editor_Services_ServiceResult search(string $searchString, $field = 'source', $offset = null)
  * @method editor_Services_ServiceResult translate(string $searchString)
- * @method void update(editor_Models_Segment $segment, $recheckOnUpdate = false, $rescheduleOnError = false) editor_Services_Connector_Abstract::update()
+ * @method void update(editor_Models_Segment $segment, bool $recheckOnUpdate = false, bool $rescheduleOnError = false, bool $useSegmentTimestamp = false) editor_Services_Connector_Abstract::update()
  * @method string getStatus(editor_Models_LanguageResources_Resource $resource, editor_Models_LanguageResources_LanguageResource $languageResource = null) returns the LanguageResource status
  * @method string getLastStatusInfo() returns the last store status info from the last getStatus call
  * @method string getTm($mime, string $tmName = '') editor_Services_Connector_FilebasedAbstract::getTm()
@@ -363,8 +363,6 @@ class editor_Services_Connector
 
     /**
      * Load the latest service result cache for the given segment in the current language resource
-     * @param editor_Models_Segment $segment
-     * @return editor_Services_ServiceResult
      * @throws ReflectionException
      */
     protected function getCachedResult(editor_Models_Segment $segment): editor_Services_ServiceResult
