@@ -5496,7 +5496,7 @@ The following task was imported with errors / warnings / notices. Please take ca
             </trans-unit>
             <trans-unit id='QXVmZ2FiZW4gZsO8ciBkYXMgUHJvamVrdDoge3Byb2plY3RTZWxlY3Rpb24udGFza05hbWV9'>
                 <source>Aufgaben für das Projekt: {projectSelection.taskName}</source>
-                <target>Tasks for the project: {projectSelection.taskName}</target>
+                <target>Tasks for the project: {projectSelectionTaskName}</target>
             </trans-unit>
             <trans-unit id='enVyIEF1ZmdhYmUgc3ByaW5nZW4='>
                 <source>zur Aufgabe springen</source>

@@ -99,10 +99,10 @@ Ext.define('Editor.view.LanguageResources.MatchGrid', {
 				'{title} <br/>',
 				'<table class="languageresource-meta-data">',
 				'<tpl for="metaData">',
-				'<tr><th>{name}</th><td>{value}</td></tr>',
+				'<tr><th>{[Ext.String.htmlEncode(values.name)]}</th><td>{[Ext.String.htmlEncode(values.value)]}</td></tr>',
 				'</tpl>',
 				'</table>',
-				'<br /> {ctrl} - {idx}: {takeMsg}'
+				'<br /> {ctrl} - {idx}: {[Ext.String.htmlEncode(values.takeMsg)]}'
 			),
         segField = Editor.model.segment.Field,
 	    config = {
@@ -162,7 +162,8 @@ Ext.define('Editor.view.LanguageResources.MatchGrid', {
 	          cellWrap: true,
 			  tdCls: 'x-selectable segment-tag-column source '+segField.getDirectionCls('source'),
 	          dataIndex: 'source',
-	          text: me.strings.source
+	          text: me.strings.source,
+              renderer: v => Ext.String.htmlEncode(v)
 	      },{
 	          xtype: 'gridcolumn',
 	          flex: 5,
@@ -172,7 +173,8 @@ Ext.define('Editor.view.LanguageResources.MatchGrid', {
 	          cellWrap: true,
 			  tdCls: 'x-selectable segment-tag-column target '+segField.getDirectionCls('target'),
 	          dataIndex: 'target',
-	          text: me.strings.target
+	          text: me.strings.target,
+              renderer: v => Ext.String.htmlEncode(v)
 	      },{
 	          xtype: 'gridcolumn',
 	          flex: 3,
@@ -182,7 +184,7 @@ Ext.define('Editor.view.LanguageResources.MatchGrid', {
 	          tdCls: 'matchrate',
 	          renderer: function(matchrate, meta, record) {
 				  var str = me.assocStore.findRecord('languageResourceId',record.get('languageResourceid'),0,false,true,true),
-				  name = str.get('name')+' ('+str.get('serviceName')+')';
+				  name = Ext.String.htmlEncode(str.get('name'))+' ('+str.get('serviceName')+')';
 	              meta.tdAttr += 'data-qtip="' + name + "<br/>"+ me.getMatchrateTooltip(matchrate)+'"';
 				  meta.tdCls  = meta.tdCls  + ' info-icon';
 	              meta.tdAttr += 'bgcolor="' + str.get('color') + '"';

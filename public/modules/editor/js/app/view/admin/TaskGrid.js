@@ -225,7 +225,7 @@ Ext.define('Editor.view.admin.TaskGrid', {
         var customer = record.get('customerName');
         if (customer) {
             md.tdAttr = 'data-qtip="' + customer + ' (id: ' + val + ')"';
-            return customer;
+            return Ext.String.htmlEncode(customer);
         }
         return this.strings.notFound;
     },
@@ -259,7 +259,7 @@ Ext.define('Editor.view.admin.TaskGrid', {
             '<tpl for="users">',
             '<tr>',
             '<td class="">{#}</td>',
-            '<td class="">{userName}</td>',
+            '<td class="">{[Ext.String.htmlEncode(values.userName)]}</td>',
             '<td class="">{[this.getRole(parent, values)]}</td>',
             '<td class="">{[this.getState(parent, values)]}</td>',
             '<td class="">{[Ext.util.Format.date(values.assignmentDate,Editor.DATE_TIME_LOCALIZED_FORMAT)]}</td>',
@@ -325,7 +325,7 @@ Ext.define('Editor.view.admin.TaskGrid', {
                 me.strings.lockedMultiUser,
                 '<br>',
                 '<tpl for=".">',
-                '{userName} ({login})<br>',
+                '{[Ext.String.htmlEncode(values.userName)]} ({[Ext.String.htmlEncode(values.login)]})<br>',
                 '</tpl>'
             );
         multiUserTpl.compile();

@@ -417,11 +417,12 @@ Ext.define('Editor.model.admin.Task', {
      * @return {String}
      */
     getTaskName: function () {
-        var nr = this.get('taskNr');
+        var nr = this.get('taskNr'),
+            taskName = Ext.String.htmlEncode(this.get('taskName'))
         if (nr) {
-            return this.get('taskName') + ' (' + nr + ')';
+            return taskName + ' (' + nr + ')';
         }
-        return this.get('taskName');
+        return taskName;
     },
 
     /**

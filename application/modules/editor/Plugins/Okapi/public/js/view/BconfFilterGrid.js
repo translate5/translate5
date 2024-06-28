@@ -277,7 +277,7 @@ Ext.define('Editor.plugins.Okapi.view.BconfFilterGrid', {
      */
     editableColumnRenderer: function(value, metadata) {
         metadata.tdAttr = 'data-qtip="' + this.strings.editTextsRowTip + '"';
-        return value;
+        return Ext.String.htmlEncode(value);
     },
     /**
      *
@@ -289,7 +289,7 @@ Ext.define('Editor.plugins.Okapi.view.BconfFilterGrid', {
         if(value){
             metadata.tdAttr = 'data-qtip="' + value.replace('"', '“').replace("'", '‘') + '"';
         }
-        return value;
+        return Ext.String.htmlEncode(value);
     },
     /**
      *
@@ -304,7 +304,7 @@ Ext.define('Editor.plugins.Okapi.view.BconfFilterGrid', {
             // this mimics rainbow-behaviour
             return record.get('okapiType') + '@copy-of-' + record.get('okapiId');
         }
-        return value;
+        return Ext.String.htmlEncode(value);
     },
     /**
      * @returns {string}

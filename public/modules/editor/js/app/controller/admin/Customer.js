@@ -162,7 +162,7 @@ Ext.define('Editor.controller.admin.Customer', {
                 v = v.split(',');
                 for(var i=0; i<v.length; i++){
                     var tmpRec=customersStore.findRecord('id',v[i],0,false,false,true);
-                    tmpRec && names.push(tmpRec.get('name'));
+                    tmpRec && names.push(Ext.String.htmlEncode(tmpRec.get('name')));
                 }
                 
                 return names.join(',');

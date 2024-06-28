@@ -63,5 +63,10 @@ Ext.define('Editor.view.project.ProjectPanelViewModel', {
                 value : '{projectSelection.projectId}'
             }
         }
+    },
+    formulas: {
+        projectSelectionTaskName: function(get) {
+            return Ext.String.htmlEncode(get('projectSelection.taskName'));
+        }
     }
 });

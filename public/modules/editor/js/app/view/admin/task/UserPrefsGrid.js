@@ -137,7 +137,7 @@ Ext.define('Editor.view.admin.task.UserPrefsGrid', {
                                 result.push(field.get('label'));
                                 visible++;
                             } else {
-                                result.push('<strike>'+field.get('label')+'</strike>');
+                                result.push('<s>'+field.get('label')+'</s>');
                             }
                         });
                         

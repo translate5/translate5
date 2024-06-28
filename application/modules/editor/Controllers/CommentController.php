@@ -75,10 +75,6 @@ class Editor_CommentController extends ZfExtended_RestController
         $taskGuid = $this->getCurrentTask()->getTaskGuid();
         $segmentId = (int) $this->_getParam('segmentId');
         $this->view->rows = $this->entity->loadBySegmentId($segmentId, $taskGuid);
-        foreach ($this->view->rows as &$row) {
-            // TODO FIXME: this should not be neccessary ... may is resolved in TRANSLATE-3960 ?
-            $row['comment'] = Markup::escapeAllQuotes($row['comment']);
-        }
         $this->view->total = count($this->view->rows);
 
         // anonymize users for view?

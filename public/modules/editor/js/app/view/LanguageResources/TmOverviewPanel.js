@@ -146,7 +146,7 @@ Ext.define('Editor.view.LanguageResources.TmOverviewPanel', {
                         var store = Ext.getStore('Editor.store.LanguageResources.Resources'),
                             resource = store.getById(rec.get('resourceId'));
                         if(resource) {
-                            meta.tdAttr = 'data-qtip="'+resource.get('name')+'"';
+                            meta.tdAttr = 'data-qtip="' + Ext.String.htmlEncode(resource.get('name')) + '"';
                         }
                         return v;
                     },
@@ -383,10 +383,10 @@ Ext.define('Editor.view.LanguageResources.TmOverviewPanel', {
                         }
                         else {
                             for(i = 0;i<v.length;i++){
-                                tasks.push(v[i]);
+                                tasks.push(Ext.String.htmlEncode(v[i]));
                             }
                         }
-                        meta.tdAttr = 'data-qtip="'+Ext.String.htmlEncode(tasks.join('<br />•••••••••••<br />'))+'"';
+                        meta.tdAttr = 'data-qtip="'+tasks.join('<br />•••••••••••<br />')+'"';
                         return v.length;
                     }
                 }],
@@ -598,9 +598,9 @@ Ext.define('Editor.view.LanguageResources.TmOverviewPanel', {
                 return;
             }
             if(addCustomerNumber){
-                names.push('['+rec.get('number')+'] '+rec.get('name'));
+                names.push('['+rec.get('number')+'] ' + Ext.String.htmlEncode(rec.get('name')));
             }else{
-                names.push(rec.get('name'));
+                names.push(Ext.String.htmlEncode(rec.get('name')));
             }
         });
         return names;

@@ -7266,7 +7266,7 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
             </trans-unit>
             <trans-unit id='QXVmZ2FiZW4gZsO8ciBkYXMgUHJvamVrdDoge3Byb2plY3RTZWxlY3Rpb24udGFza05hbWV9'>
                 <source>Aufgaben für das Projekt: {projectSelection.taskName}</source>
-                <target>Aufgaben für das Projekt: {projectSelection.taskName}</target>
+                <target>Aufgaben für das Projekt: {projectSelectionTaskName}</target>
             </trans-unit>
             <trans-unit id='enVyIEF1ZmdhYmUgc3ByaW5nZW4='>
                 <source>zur Aufgabe springen</source>

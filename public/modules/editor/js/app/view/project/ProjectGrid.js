@@ -110,7 +110,8 @@ Ext.define('Editor.view.project.ProjectGrid', {
                     text: Editor.data.l10n.projectGrid.text_cols.taskName,
                     bind: {
                         text: '{l10n.projectGrid.text_cols.taskName}'
-                    }
+                    },
+                    renderer: v => Ext.String.htmlEncode(v)
         		},{
         			xtype: 'gridcolumn',
                     width: 135,
@@ -133,13 +134,15 @@ Ext.define('Editor.view.project.ProjectGrid', {
                         type: 'string'
                     },
                     renderer: function(v, meta,rec) {
-                  	  var tooltip=v,
-                  	  	  ret=v;
-                  	  if(Editor.data.frontend.tasklist.pmMailTo){
-                  		  tooltip=rec.get('pmMail');
-                  		  ret='<a alt="'+tooltip+'" href="mailto:'+tooltip+'" target="_blank">'+v+'</a>';
-                  		  meta.tdAttr = 'data-qtip="'+tooltip+'"';
-                  	  }
+                        var tooltip = Ext.String.htmlEncode(v),
+                            ret = Ext.String.htmlEncode(v);
+
+                        if (Editor.data.frontend.tasklist.pmMailTo) {
+                            tooltip = Ext.String.htmlEncode(rec.get('pmMail'));
+                            ret = '<a alt="'+tooltip+'" href="mailto:'+tooltip+'" target="_blank">' + ret + '</a>';
+                            meta.tdAttr = 'data-qtip="'+tooltip+'"';
+                        }
+
                         return ret;
                     },
                     text: Editor.data.l10n.projectGrid.text_cols.pmGuid,
@@ -189,7 +192,8 @@ Ext.define('Editor.view.project.ProjectGrid', {
                     text: Editor.data.l10n.projectGrid.text_cols.description,
                     bind: {
                         text: '{l10n.projectGrid.text_cols.description}'
-                    }
+                    },
+                    renderer: v => Ext.String.htmlEncode(v)
         		},{
                     xtype: 'datecolumn',
                     width: 100,
@@ -288,11 +292,14 @@ Ext.define('Editor.view.project.ProjectGrid', {
      * @returns {String}
      */
     customerRenderer: function(val, md, record) {
-        var customer = record.get('customerName');
-        if(customer){
+        var customer = Ext.String.htmlEncode(record.get('customerName'));
+
+        if (customer) {
             md.tdAttr = 'data-qtip="' + customer + ' (id: ' + val + ')"';
+
             return customer;
         }
+
         return Editor.data.l10n.projectGrid.strings.notFound;
     },
     
