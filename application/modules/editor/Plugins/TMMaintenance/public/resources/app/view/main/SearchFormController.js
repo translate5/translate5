@@ -30,18 +30,21 @@ Ext.define('TMMaintenance.view.main.SearchFormController', {
 
         this.getView().up('app-main').controller.cancelEditing();
 
+        const mainList = Ext.getCmp('mainlist');
+        const strings = this.getStrings();
+        mainList.setTitle(strings.title + ' - ' + strings.totalAmount +' ' + strings.calculating);
+
         const values = this.getView().getValues();
-        const store = Ext.getCmp('mainlist').store;
-        const me = this;
+        const store = mainList.store;
 
         store.removeAll();
 
         this.getViewModel().set('selectedTm', values.tm);
         store.load({
             params: values,
-            callback: function(records, operation, success) {
+            callback: (records, operation, success) => {
                 if (!success) {
-                    me.showServerError(operation.getError());
+                    this.showServerError(operation.getError());
                     console.log('Error loading store');
 
                     return;
@@ -49,10 +52,10 @@ Ext.define('TMMaintenance.view.main.SearchFormController', {
 
                 const offset = operation.getProxy().getReader().metaData.offset;
 
-                me.getViewModel().set('lastOffset', offset);
-                me.getViewModel().set('hasRecords', records.length > 0);
-                me.getViewModel().set('hasMoreRecords', null !== offset);
-                me.readTotalAmount();
+                this.getViewModel().set('lastOffset', offset);
+                this.getViewModel().set('hasRecords', records.length > 0);
+                this.getViewModel().set('hasMoreRecords', null !== offset);
+                this.readTotalAmount();
             },
         });
 
@@ -108,22 +111,21 @@ Ext.define('TMMaintenance.view.main.SearchFormController', {
     },
 
     readTotalAmount: function () {
-        const me = this;
-
         Ext.Ajax.request({
             url: '/editor/plugins_tmmaintenance_api/read-amount/',
             params: {...this.getView().getValues(), onlyCount: true},
-            async: false,
+            async: true,
             method: 'POST',
-            success: function (xhr) {
+            success: (xhr) => {
                 const data = JSON.parse(xhr.responseText);
-                console.log(data);
+                const strings = this.getStrings();
+                Ext.getCmp('mainlist').setTitle(strings.title + ' - ' + strings.totalAmount + ' ' + data.totalAmount);
             },
-            error: function (xhr) {
+            error: (xhr) => {
                 console.log('Error reading total amount');
                 console.log(xhr);
             },
-            failure: function (xhr) {
+            failure: (xhr) => {
                 console.log('Error reading total amount');
                 console.log(xhr);
             }
@@ -215,4 +217,8 @@ Ext.define('TMMaintenance.view.main.SearchFormController', {
 
         return object;
     },
+
+    getStrings: function () {
+        return this.getViewModel().get('l10n').list;
+    }
 });

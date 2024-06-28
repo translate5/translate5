@@ -26,7 +26,6 @@ Ext.define('TMMaintenance.view.main.List', {
 
     itemConfig: {
         viewModel: true,
-        // minHeight: 100,
     },
     variableHeights: true,
 

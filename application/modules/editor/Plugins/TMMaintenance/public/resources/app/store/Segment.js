@@ -13,6 +13,4 @@ Ext.define('TMMaintenance.store.Segment', {
             rootProperty: 'items',
         },
     },
-    // TODO Lower value was added for testing, increase to 20 after development is done
-    pageSize: 5,
 });

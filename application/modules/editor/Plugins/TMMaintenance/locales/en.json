@@ -67,6 +67,8 @@
   },
   "list" : {
     "title": "Segments",
+    "totalAmount": "Total found segments: ",
+    "calculating": "calculating...",
     "columns": {
       "sourceText": "Source text",
       "targetText": "Target text",
