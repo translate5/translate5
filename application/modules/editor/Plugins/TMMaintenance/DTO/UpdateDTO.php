@@ -41,8 +41,6 @@ class UpdateDTO
         public readonly string $source,
         public readonly string $target,
         public readonly string $documentName,
-        public readonly string $author,
-        public readonly string $timestamp,
         public readonly string $context,
     ) {
     }
@@ -57,8 +55,6 @@ class UpdateDTO
             $data['source'],
             $data['target'],
             $data['metaData']['documentName'],
-            $data['metaData']['author'],
-            $data['metaData']['timestamp'],
             $data['metaData']['context'],
         );
     }

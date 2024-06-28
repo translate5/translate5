@@ -26,13 +26,15 @@ Ext.define('TMMaintenance.view.main.List', {
 
     itemConfig: {
         viewModel: true,
-        minHeight: 100,
+        // minHeight: 100,
     },
+    variableHeights: true,
 
     columns: [
         {
             dataIndex: 'source',
             minWidth: 300,
+            flex: 1,
             editable: true,
             sortable: false,
             cell: {
@@ -40,7 +42,6 @@ Ext.define('TMMaintenance.view.main.List', {
             },
             bind: {
                 text: '{l10n.list.columns.sourceText}',
-                hidden: '{!l10n.list.columns.sourceText}',
             },
             editor: {
                 xtype: 't5editor',
@@ -48,10 +49,12 @@ Ext.define('TMMaintenance.view.main.List', {
                 editingDataIndex: 'source',
             },
             renderer: 'sourceTargetRenderer',
+            groupable: false,
         },
         {
             dataIndex: 'target',
             minWidth: 300,
+            flex: 1,
             editable: true,
             sortable: false,
             cell: {
@@ -60,7 +63,6 @@ Ext.define('TMMaintenance.view.main.List', {
             },
             bind: {
                 text: '{l10n.list.columns.targetText}',
-                hidden: '{!l10n.list.columns.targetText}',
             },
             editor: {
                 xtype: 't5editor',
@@ -68,23 +70,15 @@ Ext.define('TMMaintenance.view.main.List', {
                 editingDataIndex: 'target',
             },
             renderer: 'sourceTargetRenderer',
+            groupable: false,
         },
         {
             bind: {
-                text: '{l10n.list.columns.sourceText}',
-                hidden: '{!l10n.list.columns.sourceText}',
+                text: '{l10n.list.columns.actions}',
             },
             cell: {
                 userCls: 'editor-tools',
                 tools: {
-                    edit: {
-                        iconCls: 'x-fa fa-pen',
-                        handler: 'onEditPress',
-                        bind: {
-                            hidden: '{record.isEditing}',
-                            tooltip: '{l10n.list.edit}',
-                        },
-                    },
                     delete: {
                         iconCls: 'x-fa fa-trash-alt',
                         handler: 'onDeletePress',
@@ -105,6 +99,7 @@ Ext.define('TMMaintenance.view.main.List', {
                         handler: 'saveCurrent',
                         bind: {
                             hidden: '{!record.isEditing}',
+                            tooltip: '{l10n.list.save}',
                         },
                     },
                     cancel: {
@@ -112,6 +107,7 @@ Ext.define('TMMaintenance.view.main.List', {
                         handler: 'cancelEditing',
                         bind: {
                             hidden: '{!record.isEditing}',
+                            tooltip: '{l10n.list.cancel}',
                         },
                     },
                     saveGoNext: {
@@ -119,6 +115,7 @@ Ext.define('TMMaintenance.view.main.List', {
                         handler: 'saveCurrentGoToPrevious',
                         bind: {
                             hidden: '{!record.isEditing}',
+                            tooltip: '{l10n.list.saveGoToPrevious}',
                         },
                     },
                     saveGoPrevious: {
@@ -126,6 +123,7 @@ Ext.define('TMMaintenance.view.main.List', {
                         handler: 'saveCurrentGoToNext',
                         bind: {
                             hidden: '{!record.isEditing}',
+                            tooltip: '{l10n.list.saveGoToNext}',
                         },
                     },
                     cancelGoNext: {
@@ -133,6 +131,7 @@ Ext.define('TMMaintenance.view.main.List', {
                         handler: 'goToPrevious',
                         bind: {
                             hidden: '{!record.isEditing}',
+                            tooltip: '{l10n.list.closeGoToPrevious}',
                         },
                     },
                     cancelGoPrevious: {
@@ -140,6 +139,7 @@ Ext.define('TMMaintenance.view.main.List', {
                         handler: 'goToNext',
                         bind: {
                             hidden: '{!record.isEditing}',
+                            tooltip: '{l10n.list.closeGoToNext}',
                         },
                     },
                 },
@@ -148,34 +148,40 @@ Ext.define('TMMaintenance.view.main.List', {
         {
             tpl: '{metaData.author}',
             xtype: 'templatecolumn',
+            flex: 1,
             bind: {
                 text: '{l10n.list.columns.author}',
-                hidden: '{!l10n.list.columns.author}',
             },
+            groupable: false,
         },
         {
             tpl: '{metaData.timestamp}',
             xtype: 'templatecolumn',
+            width: 180,
             bind: {
                 text: '{l10n.list.columns.creationDate}',
-                hidden: '{!l10n.list.columns.creationDate}',
             },
+            groupable: false,
         },
         {
             tpl: '{metaData.documentName}',
             xtype: 'templatecolumn',
+            flex: 1,
+            hidden: true,
             bind: {
                 text: '{l10n.list.columns.document}',
-                hidden: '{!l10n.list.columns.document}',
             },
+            groupable: false,
         },
         {
             tpl: '{metaData.additionalInfo}',
             xtype: 'templatecolumn',
+            flex: 1,
+            hidden: true,
             bind: {
                 text: '{l10n.list.columns.additionalInfo}',
-                hidden: '{!l10n.list.columns.additionalInfo}',
             },
+            groupable: false,
         },
     ],
 

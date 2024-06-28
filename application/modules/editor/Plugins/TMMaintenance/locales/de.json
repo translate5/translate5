@@ -25,6 +25,7 @@
     "name": "Name",
     "sourceLanguage": "Quellsprache",
     "targetLanguage": "Zielsprache",
+    "clients": "Kunden",
     "select": "Auswählen",
     "close": "Schließen"
   },
@@ -67,7 +68,13 @@
     },
     "edit": "Bearbeiten",
     "delete": "Löschen",
-    "create": "Neu anlegen"
+    "create": "Neu anlegen",
+    "save": "Speichern (STRG+S)",
+    "cancel": "Abbrechen (ESC)",
+    "saveGoToPrevious": "Speichern und vorheriges bearbeitbares Segment öffnen (STRG + ALT + SHIFT + ENTER)",
+    "saveGoToNext": "Speichern und nächstes bearbeitbares Segment öffnen (STRG + ALT + ENTER)",
+    "closeGoToPrevious": "Nicht speichern und vorheriges bearbeitbares Segment öffnen (STRG + ALT + ↑)",
+    "closeGoToNext": "Nicht speichern und nächstes bearbeitbares Segment öffnen (STRG + ALT + ↓)"
   },
   "error": {
     "title": "Es ist ein Fehler aufgetreten!",

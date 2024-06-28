@@ -5,6 +5,9 @@ Ext.define('TMMaintenance.view.main.SelectTmDialog', {
     maximizable: true,
     bodyPadding: 20,
     centered: true,
+    maximizeAnimation: false,
+    restoreAnimation: false,
+    layout: 'fit',
     items: [
         {
             xtype: 'selecttm',

@@ -28,12 +28,14 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
+use MittagQI\Translate5\Acl\Roles;
 use MittagQI\Translate5\Plugins\TMMaintenance\DTO\CreateDTO;
 use MittagQI\Translate5\Plugins\TMMaintenance\DTO\DeleteBatchDTO;
 use MittagQI\Translate5\Plugins\TMMaintenance\DTO\DeleteDTO;
 use MittagQI\Translate5\Plugins\TMMaintenance\DTO\GetListDTO;
 use MittagQI\Translate5\Plugins\TMMaintenance\DTO\UpdateDTO;
 use MittagQI\Translate5\Plugins\TMMaintenance\Helper\Json;
+use MittagQI\Translate5\Plugins\TMMaintenance\Repository\LanguageResourceRepository;
 use MittagQI\Translate5\Plugins\TMMaintenance\Service\SegmentProcessor;
 
 class Editor_Plugins_Tmmaintenance_ApiController extends ZfExtended_RestController
@@ -64,10 +66,19 @@ class Editor_Plugins_Tmmaintenance_ApiController extends ZfExtended_RestControll
 
     public function tmsAction(): void
     {
-        $model = ZfExtended_Factory::get(editor_Models_LanguageResources_LanguageResource::class);
+        $user = ZfExtended_Authentication::getInstance()->getUser();
+        if (!$user) {
+            return;
+        }
 
-        //get all resources for the customers of the user by language combination
-        $resources = $model->loadByUserCustomerAssocs([], [], [], [editor_Services_Manager::SERVICE_OPENTM2]);
+        $repository = new LanguageResourceRepository();
+
+        if (in_array(Roles::TM_MAINTENANCE_ALL_CLIENTS, $user->getRoles(), true)) {
+            $resources = $repository->getT5MemoryType();
+        } else {
+            $customers = $user->getCustomersArray();
+            $resources = $repository->getT5MemoryTypeFilteredByCustomers(...$customers);
+        }
 
         $tms = array_map(
             static function (array $resource): array {
@@ -76,6 +87,7 @@ class Editor_Plugins_Tmmaintenance_ApiController extends ZfExtended_RestControll
                     'name' => $resource['name'],
                     'sourceLanguage' => $resource['sourceLangCode'],
                     'targetLanguage' => $resource['targetLangCode'],
+                    'clients' => $resource['customers'],
                 ];
             },
             $resources
@@ -133,11 +145,13 @@ class Editor_Plugins_Tmmaintenance_ApiController extends ZfExtended_RestControll
     {
         $data = [];
 
-        $fileContent = file_get_contents(sprintf(
-            '%s/../locales/%s.json',
-            __DIR__,
-            isset($this->session->data) ? $this->session->data->locale : 'en'
-        ));
+        $fileContent = file_get_contents(
+            sprintf(
+                '%s/../locales/%s.json',
+                __DIR__,
+                isset($this->session->data) ? $this->session->data->locale : 'en'
+            )
+        );
 
         try {
             $data = Json::decode($fileContent);
@@ -150,7 +164,7 @@ class Editor_Plugins_Tmmaintenance_ApiController extends ZfExtended_RestControll
 
     private function resolveLocale(): string
     {
-        $requestedLocale = (string) $this->getParam('locale');
+        $requestedLocale = (string)$this->getParam('locale');
 
         if ($this->getParam('locale')
             && in_array($requestedLocale, ['en', 'de'], true)

@@ -41,7 +41,6 @@ class CreateDTO
         public readonly string $source,
         public readonly string $target,
         public readonly string $documentName,
-        public readonly string $author,
         public readonly string $context,
     ) {
     }
@@ -55,7 +54,6 @@ class CreateDTO
             $data['source'],
             $data['target'],
             'none',
-            ZfExtended_Authentication::getInstance()->getUser()->getUserName(),
             'none',
         );
     }

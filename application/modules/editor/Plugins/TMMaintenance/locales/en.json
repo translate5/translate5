@@ -25,6 +25,7 @@
     "name": "Name",
     "sourceLanguage": "Source language",
     "targetLanguage": "Target language",
+    "clients": "Clients",
     "select": "Select",
     "close": "Close"
   },
@@ -67,7 +68,13 @@
     },
     "edit": "Edit",
     "delete": "Delete",
-    "create": "Create"
+    "create": "Create",
+    "save": "Save (CTRL+S)",
+    "cancel": "Cancel (ESC)",
+    "saveGoToPrevious": "Save and open previous editable segment (CTRL + ALT + SHIFT + ENTER)",
+    "saveGoToNext": "Save and open next editable segment (CTRL + ALT + ENTER)",
+    "closeGoToPrevious": "Don't save and open previous editable segment (CTRL + ALT + ↑)",
+    "closeGoToNext": "Don't save and open next editable segment (CTRL + ALT + ↓)"
   },
   "error": {
     "title": "An error occurred",

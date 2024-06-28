@@ -6728,6 +6728,14 @@ The following task was imported with errors / warnings / notices. Please take ca
                 <source>Pmlight</source>
                 <target>PM Light</target>
             </trans-unit>
+            <trans-unit id='VE1NYWludGVuYW5jZQ=='>
+                <source>TMMaintenance</source>
+                <target>TM Maintenance (selected clients)</target>
+            </trans-unit>
+            <trans-unit id='VE1NYWludGVuYW5jZV9hbGxDbGllbnRz'>
+                <source>TMMaintenance_allClients</source>
+                <target>TM Maintenance (all clients)</target>
+            </trans-unit>
             <trans-unit id='RWRpdG9yLW9ubHktb3ZlcnJpZGU='>
                 <source>Editor-only-override</source>
                 <target>Enable task overview (Only in editor-only-mode)</target>

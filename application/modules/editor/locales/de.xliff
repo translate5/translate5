@@ -6729,6 +6729,14 @@ ein anderer Benutzer hat im Projektportal {portalLink} die Verantwortung für di
                 <source>% abgeschlossen durch zugewiesene Benutzer im aktuellen Workflowschritt</source>
                 <target>% abgeschlossen durch zugewiesene Benutzer im aktuellen Workflowschritt</target>
             </trans-unit>
+            <trans-unit id='VGVybVBN'>
+                <source>TMMaintenance</source>
+                <target>TM Maintenance (ausgewählte Kunden)</target>
+            </trans-unit>
+            <trans-unit id='VGVybVBNX2FsbENsaWVudHM'>
+                <source>TMMaintenance_allClients</source>
+                <target>TM Maintenance (alle Kunden)</target>
+            </trans-unit>
             <trans-unit id='QWt0dWVsbGVyIFdvcmtmbG93LVNjaHJpdHQ='>
                 <source>Aktueller Workflow-Schritt</source>
                 <target>Aktueller Workflow-Schritt</target>

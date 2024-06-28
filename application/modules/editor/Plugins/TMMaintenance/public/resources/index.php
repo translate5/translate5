@@ -29,7 +29,10 @@
         window.csrfToken = '<?php echo isset($this) ? $this->csrfToken : ''; ?>';
     </script>
 
-    <script id="microloader" data-app="c6b88c3f-c52d-48ab-b369-15896285f643" type="text/javascript" src="<?php echo $rundir; ?>/modules/editor/js/HtmlEditor/editor.js"></script>
+    <script id="microloader"
+            data-app="c6b88c3f-c52d-48ab-b369-15896285f643"
+            type="text/javascript"
+            src="<?php echo $rundir; ?>/modules/editor/js/HtmlEditor/editor.js?<?php echo ZfExtended_Utils::getAppVersion(); ?>"></script>
     <!-- The line below must be kept intact for Sencha Cmd to build your application -->
     <script id="microloader" type="text/javascript" src="bootstrap.js"></script>
 </head>

@@ -19,34 +19,46 @@ Ext.define('TMMaintenance.view.main.SelectTm', {
             dataIndex: 'name',
             bind: {
                 text: '{l10n.selectTm.name}',
-                hidden: '{!l10n.selectTm.name}',
             },
             minWidth: 200,
+            flex: 1,
             filter: {
                 type: 'string'
             },
+            groupable: false,
         },
         {
             dataIndex: 'sourceLanguage',
             bind: {
                 text: '{l10n.selectTm.sourceLanguage}',
-                hidden: '{!l10n.selectTm.sourceLanguage}',
             },
             width: 100,
             filter: {
                 type: 'string'
             },
+            groupable: false,
         },
         {
             dataIndex: 'targetLanguage',
             bind: {
                 text: '{l10n.selectTm.targetLanguage}',
-                hidden: '{!l10n.selectTm.targetLanguage}',
             },
             width: 100,
             filter: {
                 type: 'string'
             },
+            groupable: false,
+        },
+        {
+            dataIndex: 'clients',
+            bind: {
+                text: '{l10n.selectTm.clients}',
+            },
+            width: 100,
+            filter: {
+                type: 'string'
+            },
+            groupable: false,
         },
         {
             menuDisabled: true,
@@ -56,7 +68,6 @@ Ext.define('TMMaintenance.view.main.SelectTm', {
                     xtype: 'button',
                     bind: {
                         text: '{l10n.selectTm.select}',
-                        hidden: '{!l10n.selectTm.select}',
                     },
                     handler: 'onTmSelect',
                 }

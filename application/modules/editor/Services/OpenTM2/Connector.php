@@ -498,13 +498,13 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
     }
 
     private function updateSegmentInMemory(
-        $source,
-        $target,
-        $userName,
-        $context,
-        $time,
-        $fileName,
-        $memoryName,
+        string $source,
+        string $target,
+        string $userName,
+        string $context,
+        string $time,
+        string $fileName,
+        string $memoryName,
     ): bool {
         $successful = $this->api->update($source, $target, $userName, $context, $time, $fileName, $memoryName);
 

@@ -108,10 +108,10 @@ final class SegmentProcessor
         $connector->createSegment(
             $createDto->source,
             $createDto->target,
-            $createDto->documentName,
-            $createDto->author,
+            \ZfExtended_Authentication::getInstance()->getUser()?->getUserName(),
+            $createDto->context,
             (new \DateTimeImmutable())->getTimestamp(),
-            $createDto->context
+            $createDto->documentName,
         );
     }
 
@@ -126,10 +126,10 @@ final class SegmentProcessor
             $targetKey,
             $updateDto->source,
             $updateDto->target,
+            \ZfExtended_Authentication::getInstance()->getUser()?->getUserName(),
+            $updateDto->context,
+            (new \DateTimeImmutable())->getTimestamp(),
             $updateDto->documentName,
-            $updateDto->author,
-            (new \DateTimeImmutable($updateDto->timestamp))->getTimestamp(),
-            $updateDto->context
         );
     }
 
