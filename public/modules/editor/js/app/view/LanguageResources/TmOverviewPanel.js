@@ -146,7 +146,8 @@ Ext.define('Editor.view.LanguageResources.TmOverviewPanel', {
                         var store = Ext.getStore('Editor.store.LanguageResources.Resources'),
                             resource = store.getById(rec.get('resourceId'));
                         if(resource) {
-                            meta.tdAttr = 'data-qtip="' + Ext.String.htmlEncode(resource.get('name')) + '"';
+                            const resourceName = xt.String.htmlEncode(Ext.String.htmlEncode(resource.get('name')));
+                            meta.tdAttr = 'data-qtip="' + resourceName + '"';
                         }
                         return v;
                     },
@@ -383,7 +384,8 @@ Ext.define('Editor.view.LanguageResources.TmOverviewPanel', {
                         }
                         else {
                             for(i = 0;i<v.length;i++){
-                                tasks.push(Ext.String.htmlEncode(v[i]));
+                                const taskName = Ext.String.htmlEncode(Ext.String.htmlEncode(v[i]))
+                                tasks.push(taskName);
                             }
                         }
                         meta.tdAttr = 'data-qtip="'+tasks.join('<br />•••••••••••<br />')+'"';
@@ -566,7 +568,7 @@ Ext.define('Editor.view.LanguageResources.TmOverviewPanel', {
         if(!value || value.length<1){
             return '';
         }
-        meta.tdAttr = 'data-qtip="'+this.getCustomersNames(value,true).join('</br>')+'"';
+        meta.tdAttr = 'data-qtip="'+this.getCustomersNames(value,true, true).join('</br>')+'"';
         return value.length;
     },
 
@@ -584,7 +586,7 @@ Ext.define('Editor.view.LanguageResources.TmOverviewPanel', {
      * Get customer names by customer id.
      * When addCustomerNumber is true, the customer number will be concatenate to the result in format [customerNumber] customerName
      */
-    getCustomersNames:function(customerIds, addCustomerNumber){
+    getCustomersNames:function(customerIds, addCustomerNumber, forQtip = false){
         if(!customerIds || customerIds.length<1){
             return '';
         }
@@ -594,15 +596,23 @@ Ext.define('Editor.view.LanguageResources.TmOverviewPanel', {
         
         Ext.Array.each(customerIds, function(id) {
             var rec = customerStore.getById(id);
-            if(!rec) {
+            if (! rec) {
                 return;
             }
-            if(addCustomerNumber){
-                names.push('['+rec.get('number')+'] ' + Ext.String.htmlEncode(rec.get('name')));
-            }else{
-                names.push(Ext.String.htmlEncode(rec.get('name')));
+
+            let name = Ext.String.htmlEncode(rec.get('name'));
+
+            if (forQtip) {
+                name = Ext.String.htmlEncode(name);
+            }
+
+            if (addCustomerNumber) {
+                names.push('['+rec.get('number')+'] ' + name);
+            } else {
+                names.push(name);
             }
         });
+
         return names;
     },
 

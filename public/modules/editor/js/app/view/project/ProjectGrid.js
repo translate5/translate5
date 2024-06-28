@@ -140,7 +140,7 @@ Ext.define('Editor.view.project.ProjectGrid', {
                         if (Editor.data.frontend.tasklist.pmMailTo) {
                             tooltip = Ext.String.htmlEncode(rec.get('pmMail'));
                             ret = '<a alt="'+tooltip+'" href="mailto:'+tooltip+'" target="_blank">' + ret + '</a>';
-                            meta.tdAttr = 'data-qtip="'+tooltip+'"';
+                            meta.tdAttr = 'data-qtip="'+Ext.String.htmlEncode(tooltip)+'"';
                         }
 
                         return ret;
@@ -295,7 +295,7 @@ Ext.define('Editor.view.project.ProjectGrid', {
         var customer = Ext.String.htmlEncode(record.get('customerName'));
 
         if (customer) {
-            md.tdAttr = 'data-qtip="' + customer + ' (id: ' + val + ')"';
+            md.tdAttr = 'data-qtip="' + Ext.String.htmlEncode(customer) + ' (id: ' + val + ')"';
 
             return customer;
         }

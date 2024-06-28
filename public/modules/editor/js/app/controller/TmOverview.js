@@ -631,8 +631,9 @@ Ext.define('Editor.controller.TmOverview', {
                 }
                 for (i = 0; i < v.length; i++) {
                     languageResource = v[i];
-                    strservices.push(Ext.String.htmlEncode(languageResource.name) + ' (' + languageResource.serviceName + ')');
-                    //meta.tdAttr = 'data-qtip="'+languageResource.name+' ('+languageResource.serviceName+')<br/>"';
+                    // Double escape to prevent XSS in qtip
+                    const lrName = Ext.String.htmlEncode(Ext.String.htmlEncode(languageResource.name));
+                    strservices.push(lrName + ' (' + languageResource.serviceName + ')');
                 }
                 meta.tdAttr = 'data-qtip="' + strservices.join('<br />') + '"';
                 return v.length;

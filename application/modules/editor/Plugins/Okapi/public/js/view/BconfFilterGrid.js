@@ -286,10 +286,16 @@ Ext.define('Editor.plugins.Okapi.view.BconfFilterGrid', {
      * @returns {String}
      */
     tooltippedColumnRenderer: function(value, metadata) {
-        if(value){
-            metadata.tdAttr = 'data-qtip="' + value.replace('"', '“').replace("'", '‘') + '"';
+        if (value) {
+            value = value.replace('"', '“').replace("'", '‘');
+            value = Ext.String.htmlEncode(value);
+
+            metadata.tdAttr = 'data-qtip="' + Ext.String.htmlEncode(value) + '"';
+
+            return value;
         }
-        return Ext.String.htmlEncode(value);
+
+        return '';
     },
     /**
      *
@@ -299,7 +305,7 @@ Ext.define('Editor.plugins.Okapi.view.BconfFilterGrid', {
      * @returns {String}
      */
     identifierColumnRenderer: function(value, metadata, record) {
-        metadata.tdAttr = 'data-qtip="' + value + '"';
+        metadata.tdAttr = 'data-qtip="' + Ext.String.htmlEncode(Ext.String.htmlEncode(value)) + '"';
         if(value === 'NEW@FILTER'){
             // this mimics rainbow-behaviour
             return record.get('okapiType') + '@copy-of-' + record.get('okapiId');

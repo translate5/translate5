@@ -152,11 +152,13 @@ Ext.define('Editor.plugins.Okapi.view.BconfGrid', {
                 dataIndex: 'customExtensions',
                 stateId: 'customExtensions',
                 renderer: function(value, metadata){
-                    value = value.join(', ');
-                    if(value){
-                        metadata.tdAttr = 'data-qtip="' + value + '"';
+                    value = Ext.String.htmlEncode(value.join(', '));
+
+                    if (value) {
+                        metadata.tdAttr = 'data-qtip="' + Ext.String.htmlEncode(value) + '"';
                     }
-                    return Ext.String.htmlEncode(value);
+
+                    return value;
                 },
                 text: me.text_cols.extensions,
                 tooltip: me.text_cols.extensionsTooltip
