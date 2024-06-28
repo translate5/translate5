@@ -53,8 +53,8 @@ class CreateDTO
             (int) $data['tm'],
             $data['source'],
             $data['target'],
-            'none',
-            'none',
+            'TM Maintenance',
+            'TM Maintenance',
         );
     }
 }
