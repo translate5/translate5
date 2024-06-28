@@ -28,6 +28,8 @@ Ext.define('TMMaintenance.view.main.SearchFormController', {
             return;
         }
 
+        this.getView().up('app-main').controller.cancelEditing();
+
         const values = this.getView().getValues();
         const store = Ext.getCmp('mainlist').store;
         const me = this;
