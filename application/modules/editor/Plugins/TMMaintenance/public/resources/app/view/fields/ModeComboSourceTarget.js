@@ -1,4 +1,4 @@
-Ext.define('TMMaintenance.view.fields.ModeCombo', {
+Ext.define('TMMaintenance.view.fields.ModeComboSourceTarget', {
     singleton: true,
 
     create: function(name) {
@@ -12,7 +12,7 @@ Ext.define('TMMaintenance.view.fields.ModeCombo', {
                 disabled: '{!selectedTm}',
                 label: '{l10n.searchForm.tm}',
                 hidden: '{!l10n.selectTm.tm}',
-                store: '{l10n.modeCombo}',
+                store: '{l10n.modeComboSourceTarget}',
             },
             store: [],
             queryMode: 'local',

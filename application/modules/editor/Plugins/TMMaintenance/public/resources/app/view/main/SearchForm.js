@@ -8,6 +8,7 @@ Ext.define('TMMaintenance.view.main.SearchForm', {
         'TMMaintenance.store.TM',
         'TMMaintenance.view.main.SelectTm',
         'TMMaintenance.view.fields.ModeCombo',
+        'TMMaintenance.view.fields.ModeComboSourceTarget',
     ],
 
     autoSize: true,
@@ -87,7 +88,7 @@ Ext.define('TMMaintenance.view.main.SearchForm', {
                         hidden: '{!l10n.searchForm.source}',
                     },
                 },
-                TMMaintenance.view.fields.ModeCombo.create('sourceMode'),
+                TMMaintenance.view.fields.ModeComboSourceTarget.create('sourceMode'),
                 {
                     xtype: 'textfield',
                     required: false,
@@ -100,7 +101,7 @@ Ext.define('TMMaintenance.view.main.SearchForm', {
                         hidden: '{!l10n.searchForm.target}',
                     },
                 },
-                TMMaintenance.view.fields.ModeCombo.create('targetMode'),
+                TMMaintenance.view.fields.ModeComboSourceTarget.create('targetMode'),
             ],
         },
         {

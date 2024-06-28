@@ -10,7 +10,17 @@
       "name": "German"
     }
   ],
-  "modeStore": [
+  "modeCombo": [
+    {
+      "name": "Contains",
+      "value": "contains"
+    },
+    {
+      "name": "Exact match",
+      "value": "exact"
+    }
+  ],
+  "modeComboSourceTarget": [
     {
       "name": "Contains",
       "value": "contains"
