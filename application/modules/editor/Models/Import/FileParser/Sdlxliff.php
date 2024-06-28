@@ -171,6 +171,11 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
     private array $tagIdShortTagIdentMap = [];
 
     /**
+     * @var array<string, true>
+     */
+    private array $quickInsertsList = [];
+
+    /**
      * (non-PHPdoc)
      * @see editor_Models_Import_FileParser::getFileExtensions()
      */
@@ -197,7 +202,7 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
             $this->isTrackChangesPluginActive
         );
         //diff export for this task can be used
-        $this->task->setDiffExportUsable(true);
+        $this->task->setDiffExportUsable(1);
         //here would be the right place to set the import map,
         // since our values base on sdlxliff values,
         // nothing has to be done here at the moment
@@ -283,6 +288,7 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
         $this->_origFile = str_replace(['<bin-unit', '</bin-unit>'], ['<group bin-unit ', '/bin-unit</group>'], $this->_origFile);
         $this->extractComments();
         $this->processRevDefs();
+        $this->extractQuickInsertsList();
         //gibt die Verschachtelungstiefe der <group>-Tags an
         $groupLevel = 0;
         //array, in dem die Verschachtelungstiefe der Group-Tags in Relation zu ihrer
@@ -365,6 +371,16 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
         }
         $this->skeletonFile = implode('<group', $groups);
         $this->skeletonFile = str_replace(['<group bin-unit ', '/bin-unit</group>'], ['<bin-unit', '</bin-unit>'], $this->skeletonFile);
+    }
+
+    private function extractQuickInsertsList(): void
+    {
+        $regex = '#<value key="SDL:QuickInsertsList">\s*(.+)\s*</value>#Um';
+
+        if (preg_match($regex, $this->_origFile, $matches)) {
+            $quickInsertsList = explode(';q', trim($matches[1], 'q '));
+            $this->quickInsertsList = array_combine($quickInsertsList, array_fill(0, count($quickInsertsList), true));
+        }
     }
 
     /**
@@ -900,6 +916,22 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
         $this->verifyTagName($tagName, $data);
         $tagId = $this->parseSegmentGetTagId($tag, $tagName);
 
+        if (! is_numeric($tagId) && ! isset($this->quickInsertsList[$tagId])) {
+            throw new editor_Models_Import_FileParser_Sdlxliff_Exception('E1609', [
+                'tagname' => $tagId,
+                'filename' => $this->_fileName ?: 'not provided',
+                'task' => $this->task,
+            ]);
+        }
+
+        if (isset($this->quickInsertsList[$tagId])) {
+            $formatName = $tagId;
+            $tagId .= $data->i;
+            $this->_tagMapping[$tagId]['originalId'] = $formatName;
+            $this->_tagMapping[$tagId]['text'] = $formatName;
+            $this->_tagMapping[$tagId]['eptText'] = $formatName;
+        }
+
         if (! isset($this->tagIdShortTagIdentMap[$tagId])) {
             $this->tagIdShortTagIdentMap[$tagId] = $data->j++;
         }
@@ -928,7 +960,7 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
             $tagObj = new editor_Models_Import_FileParser_Tag(editor_Models_Import_FileParser_Tag::TYPE_OPEN);
             $tagObj->originalContent = $tag;
             $tagObj->tagNr = $shortTagIdent;
-            $tagObj->id = $tagId;
+            $tagObj->id = $this->_tagMapping[$tagId]['originalId'] ?? $tagId;
             $tagObj->text = $this->encodeTagsForDisplay($this->_tagMapping[$tagId]['text']);
             $data->segment[$data->i] = $tagObj->renderTag();
         } else {
@@ -971,7 +1003,7 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
         $tagObj = new editor_Models_Import_FileParser_Tag(editor_Models_Import_FileParser_Tag::TYPE_CLOSE);
         $tagObj->originalContent = $data->segment[$data->i];
         $tagObj->tagNr = $openTag['nr'];
-        $tagObj->id = $openTag['tagId'];
+        $tagObj->id = $mappedTag['originalId'] ?? $openTag['tagId'];
         $tagObj->text = $this->encodeTagsForDisplay($mappedTag['eptText']);
         $data->segment[$data->i] = $tagObj->renderTag();
 
