@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xliff xmlns:sdl="http://sdl.com/FileTypes/SdlXliff/1.0" xmlns="urn:oasis:names:tc:xliff:document:1.2" version="1.2"
+       sdl:version="1.0">
+    <doc-info xmlns="http://sdl.com/FileTypes/SdlXliff/1.0">
+        <cmt-defs>
+            <cmt-def id="da363102-dca6-4a9e-aa70-667f91b8d030">
+                <Comments>
+                    <Comment severity="Low" user="translate5" date="2024-03-12T15:46:00.8133772+00:00" version="1.0">and a comment for Sasha!</Comment>
+                </Comments>
+            </cmt-def>
+        </cmt-defs>
+    </doc-info>
+    <file original="\\ONEWORD-PNA01\PLUNET\order\O-2400668\trados\en-US\49-157-13_AXO_Magazin_2024_EN_10_eder_umschlag_ToTrans.idml"
+          datatype="x-sdlfilterframework2" source-language="en-US" target-language="de-DE">
+        <header>
+            <reference>
+                <internal-file form="base64">
+                    UEsDBBQAAAAIAAVnUFjPYiCzK1MBAFpaAQARAAAAaXd1bjRhaXkuZXlmLmlkbWyMeVVUG1wTbVuk
+                </internal-file>
+            </reference>
+            <sdl:ref-files>
+                <sdl:ref-file uid="0" id="http://www.sdl.com/Sdl.FileTypeSupport.Filters.Idml/OriginalFile"
+                              name="1ndofncr.o0n.idml"
+                              o-path="\\ONEWORD-PNA01\PLUNET\order\O-2400668\trados\en-US\49-157-13_AXO_Magazin_2024_EN_10_eder_umschlag_ToTrans.idml"
+                              date="02/16/2024 12:56:10" descr="Original file before conversion."
+                              expected-use="Generation"/>
+            </sdl:ref-files>
+            <file-info xmlns="http://sdl.com/FileTypes/SdlXliff/1.0">
+                <value key="SDL:FileId">edce5922-59e0-461e-a719-958337a58bf2</value>
+                <value key="SDL:CreationDate">02/16/2024 15:29:26</value>
+                <value key="SDL:OriginalFilePath">
+                    \\ONEWORD-PNA01\PLUNET\order\O-2400668\trados\en-US\49-157-13_AXO_Magazin_2024_EN_10_eder_umschlag_ToTrans.idml
+                </value>
+                <value key="SDL:FileTypeDllVersion">1.9.9.0</value>
+                <value key="SDL:QuickInsertsList">
+                    qBold;qItalic;qUnderline;qSubscript;qSuperscript;qSmallCaps;qNoBold;qNoItalic;qNoUnderline;qNoSuperscript;qNoSubscript;qNoSmallCaps
+                </value>
+                <value key="ProcessFileInfo">Partial</value>
+                <value key="DisplayHiddenConditionalText">False</value>
+                <value key="SkipTrackingKerningInformation">False</value>
+                <value key="DisplayFootnoteOption">False</value>
+                <value key="SDL:AutoClonedFlagSupported">True</value>
+                <value key="FirstPageId">u738c7</value>
+                <value key="ParagraphTextDirections"></value>
+                <sniff-info>
+                    <detected-source-lang detection-level="Guess" lang="en-US"/>
+                </sniff-info>
+            </file-info>
+            <sdl:filetype-info>
+                <sdl:filetype-id>IDML v 1.0.0.0</sdl:filetype-id>
+            </sdl:filetype-info>
+            <cxt-defs xmlns="http://sdl.com/FileTypes/SdlXliff/1.0">
+                <cxt-def id="2" type="Querverweisformate" code="XRS" name="Querverweisformate" descr="Liste mit Querverweisformaten" color="DeepSkyBlue"/>
+            </cxt-defs>
+        </header>
+        <body>
+            <group>
+                <sdl:cxts>
+                    <sdl:node id="2"/>
+                </sdl:cxts>
+                <trans-unit id="18e7cece-6a25-4ee5-b9ce-01c5b19b1552">
+                    <source><g id="Bold">Source text 1.</g> <g id="Bold">Source text 2.</g> <g id="SmallCaps">Source text 3.</g></source>
+                    <seg-source><mrk mtype="seg" mid="1"><g id="Bold">Source text 1.</g> <g id="Bold">Source text 2.</g> <g id="SmallCaps">Source text 3.</g></mrk></seg-source>
+                    <sdl:seg-defs>
+                        <sdl:seg id="1" />
+                    </sdl:seg-defs>
+                </trans-unit>
+            </group>
+        </body>
+    </file>
+</xliff>
