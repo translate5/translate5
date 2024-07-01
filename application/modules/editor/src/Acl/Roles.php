@@ -51,6 +51,8 @@ final class Roles extends BaseRoles
 
     public const TERMPM = 'termPM';
 
+    public const TERMSEARCH = 'termSearch';
+
     public const TERMCUSTOMERSEARCH = 'termCustomerSearch';
 
     public const TERMFINALIZER = 'termFinalizer';
@@ -58,8 +60,6 @@ final class Roles extends BaseRoles
     public const TERMPROPOSER = 'termProposer';
 
     public const TERMREVIEWER = 'termReviewer';
-
-    public const TERMSEARCH = 'termSearch';
 
     /* subroles for the client-pm */
     public const CLIENTPM_PROJECTS = 'clientpm_projects';
