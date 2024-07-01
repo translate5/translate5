@@ -1461,4 +1461,13 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract
 
         return $this->db->fetchAll($s)->toArray();
     }
+
+    /**
+     * Check whether task is going to use 3rd party termtagging
+     *
+     * @return bool
+     */
+    public function hasThirdPartyTermTagging(): bool {
+        return !! json_decode($this->getForeignId())?->glossaryClientId;
+    }
 }
