@@ -300,10 +300,10 @@ class editor_TermController extends ZfExtended_RestController
                     // Unset to prevent duplicates
                     unset($result['sourceLang']);
 
-                    // Else flush failure
-                } else {
-                    $this->jflush(false, $this->_translate->_(
-                        'Begriff existiert bereits in der ausgewählten TermCollection'
+                    // Else flush a message to indicate confirmation is needed to proceed
+                } else if ($this->getParam('answer') !== 'yes'){
+                    $this->confirm($this->_translate->_(
+                        'Der Begriff existiert bereits in einem anderen Eintrag.<br />Möchten Sie ihn wirklich in die Begriffssammlung aufnehmen?'
                     ));
                 }
 
