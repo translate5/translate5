@@ -164,7 +164,7 @@ class editor_TermController extends ZfExtended_RestController
         // Update
         ZfExtended_Factory
             ::get('editor_Models_TermCollection_TermCollection')
-                ->updateStats($this->entity->getCollectionId(), $diff);
+                ->updateStats((int) $this->entity->getCollectionId(), $diff);
 
         // Flush params so that GUI to be redirected to that newly created term
         $this->view->assign([
@@ -301,7 +301,7 @@ class editor_TermController extends ZfExtended_RestController
                     unset($result['sourceLang']);
 
                     // Else flush a message to indicate confirmation is needed to proceed
-                } else if ($this->getParam('answer') !== 'yes'){
+                } elseif ($this->getParam('answer') !== 'yes') {
                     $this->confirm($this->_translate->_(
                         'Der Begriff existiert bereits in einem anderen Eintrag.<br />Möchten Sie ihn wirklich in die Begriffssammlung aufnehmen?'
                     ));
@@ -447,7 +447,7 @@ class editor_TermController extends ZfExtended_RestController
 
         // Update proposal
         $this->entity->setProposal(trim($params['proposal'] ?? ''));
-        $this->entity->setUpdatedBy($this->user()->getId());
+        $this->entity->setUpdatedBy((int) $this->user()->getId());
 
         // Save, and pass params required to update `terms_transacgrp`-records of type 'modification' for all 3 levels
         $updated = $this->entity->update([
@@ -509,7 +509,7 @@ class editor_TermController extends ZfExtended_RestController
         $data['isLast'] = $this->entity->isLast();
 
         // Backup props
-        $collectionId = $this->entity->getCollectionId();
+        $collectionId = (int) $this->entity->getCollectionId();
         $termEntryId = $this->entity->getTermEntryId();
         $language = $this->entity->getLanguage();
 
@@ -753,6 +753,6 @@ class editor_TermController extends ZfExtended_RestController
         // Load history and assign to response
         $this->view->history = ZfExtended_Factory
             ::get(editor_Models_Term_History::class)
-                ->getByTermId($this->entity->getId());
+                ->getByTermId((int) $this->entity->getId());
     }
 }
