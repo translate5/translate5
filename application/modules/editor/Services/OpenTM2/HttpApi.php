@@ -174,9 +174,9 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
         }
 
         // Uncomment when compression is implemented in the API
-//        stream_filter_append($stream, 'zlib.deflate', STREAM_FILTER_READ, [
-//            "window" => 30,
-//        ]);
+        //        stream_filter_append($stream, 'zlib.deflate', STREAM_FILTER_READ, [
+        //            "window" => 30,
+        //        ]);
 
         return $stream;
     }
