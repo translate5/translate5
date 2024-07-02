@@ -26,10 +26,10 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use editor_Models_Export_FileParser_Sdlxliff_TrackChangesFormatter as TrackChangesFormatter;
 use editor_Models_Segment as Segment;
 use editor_Models_Segment_AutoStates as AutoStates;
 use editor_Models_Segment_MatchRateType as MatchRateType;
-use editor_Models_Export_FileParser_Sdlxliff_TrackChangesFormatter as TrackChangesFormatter;
 
 /**
  * Parsed mit editor_Models_Import_FileParser_Sdlxliff geparste Dateien für den Export
@@ -84,11 +84,24 @@ class editor_Models_Export_FileParser_Sdlxliff extends editor_Models_Export_File
     {
         $segment = preg_replace('"<img[^>]*>"', '', $segment);
 
+        $segment = strip_tags($segment) === $segment
+            ? $this->ensureStringEscaped($segment)
+            : preg_replace_callback(
+                '/>([^<]+)</',
+                fn ($matches) => '>' . $this->ensureStringEscaped($matches[1]) . '<',
+                $segment
+            );
+
         if ($this->isTrackChangesPluginActive) {
             return $this->trackChangesFormatter->toSdlxliffFormat($segment, $this->revisions);
         }
 
         return parent::parseSegment($segment);
+    }
+
+    private function ensureStringEscaped(string $text): string
+    {
+        return htmlspecialchars(html_entity_decode($text), ENT_QUOTES | ENT_XML1);
     }
 
     /**

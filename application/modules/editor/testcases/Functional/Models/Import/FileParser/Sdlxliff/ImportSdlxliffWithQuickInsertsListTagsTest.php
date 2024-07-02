@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\Test\Functional\Models\Export\FileParser\Sdlxliff;
+namespace MittagQI\Translate5\Test\Functional\Models\Import\FileParser\Sdlxliff;
 
 use editor_Models_File;
 use editor_Models_Import_FileParser;
