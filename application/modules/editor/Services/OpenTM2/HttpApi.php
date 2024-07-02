@@ -152,7 +152,7 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
     public function importMemoryAsFile(string $filePath, string $tmName, StripFramingTags $stripFramingTags): bool
     {
         return $this->sendStreamRequest(
-            rtrim($this->resource->getUrl(), '/') . '/' . $tmName . '/import-file',
+            rtrim($this->resource->getUrl(), '/') . '/' . $tmName . '/importtmx',
             $this->getStreamFromFile($filePath),
             basename($filePath),
             [
@@ -173,9 +173,10 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
             throw new RuntimeException('Could not open file: ' . $filePath);
         }
 
-        stream_filter_append($stream, 'zlib.deflate', STREAM_FILTER_READ, [
-            "window" => 30,
-        ]);
+        // Uncomment when compression is implemented in the API
+//        stream_filter_append($stream, 'zlib.deflate', STREAM_FILTER_READ, [
+//            "window" => 30,
+//        ]);
 
         return $stream;
     }
@@ -183,17 +184,11 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
     private function sendStreamRequest(string $uri, $stream, string $filename, array|object $data = null): bool
     {
         $client = new Client();
-        $multipart = [
-            [
-                'name' => 'file',
-                'contents' => $stream,
-                'filename' => $filename,
-            ],
-        ];
+        $multipart = [];
 
         if (null !== $data) {
             $multipart[] = [
-                'name' => 'data',
+                'name' => 'json_data',
                 'contents' => json_encode($data),
                 'headers' => [
                     'Content-Type' => 'application/json',
@@ -201,10 +196,19 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
             ];
         }
 
+        $multipart[] = [
+            'name' => 'file',
+            'contents' => $stream,
+            'filename' => $filename,
+        ];
+
         try {
             $response = $client->post($uri, [
                 'multipart' => $multipart,
             ]);
+
+            // trigger this method to set http (yes! :( ) so that self::processResponse can get uri from it.
+            $this->getHttp($uri);
 
             return $this->processResponse(
                 new Zend_Http_Response(
