@@ -43,7 +43,7 @@ $config = Zend_Registry::get('config');
 
 $version = '?v='.$this->appVersion;
 
-$this->headLink()->prependStylesheet(APPLICATION_RUNDIR.'/modules/editor/instanttranslate/css/instanttranslate.css'.$version);
+$this->headLink()->prependStylesheet(APPLICATION_RUNDIR . '/modules/editor/css/portal.css' . $version);
 
 $jqueryPath = APPLICATION_RUNDIR.'/js/jquery-ui';
 $this->headLink()->prependStylesheet($jqueryPath.'/jquery-ui.min.css'.$version);

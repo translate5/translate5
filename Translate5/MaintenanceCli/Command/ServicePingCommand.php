@@ -147,11 +147,15 @@ class ServicePingCommand extends Translate5AbstractCommand
         foreach ($ips as $ip) {
             $result = '';
             $error = '';
-            if ($this->checkService($ip, $port, $result, $error)) {
+            if ($this->checkHttpService($ip, $port, $result, $error)) {
                 $success = true; //at least one must be available to return succcess
-                $table->addRow([$ip, $port, '<info>Yes</info>', $error]);
+                $table->addRow([$ip, $port, '<info>Yes (HTTP call)</info>', $error]);
             } else {
-                $table->addRow([$ip, $port, '<error>No</error>', $error]);
+                if ($this->checkPort($ip, $port, $error)) {
+                    $table->addRow([$ip, $port, '<info>Yes (port open)</info>', $error]);
+                } else {
+                    $table->addRow([$ip, $port, '<error>No</error>', $error]);
+                }
             }
         }
 
@@ -162,7 +166,7 @@ class ServicePingCommand extends Translate5AbstractCommand
             $error = '';
             $this->io->writeln('');
             $this->io->section('SSL Check');
-            if ($this->checkService('https://' . $host, $port, $result, $error)) {
+            if ($this->checkHttpService('https://' . $host, $port, $result, $error)) {
                 $this->io->success('SSL seems to be OK: ' . $error);
             } else {
                 $this->io->error('SSL Problems: ' . $error);
@@ -173,7 +177,7 @@ class ServicePingCommand extends Translate5AbstractCommand
         return $success ? self::SUCCESS : self::FAILURE;
     }
 
-    private function checkService(string $ip, int $port, string &$result, string &$error): bool
+    private function checkHttpService(string $ip, int $port, string &$result, string &$error): bool
     {
         $error = '';
         $curl = curl_init();
@@ -195,5 +199,20 @@ class ServicePingCommand extends Translate5AbstractCommand
         }
 
         return true;
+    }
+
+    private function checkPort(string $ip, int $port, string &$error): bool
+    {
+        $error = '';
+        $connection = @fsockopen($ip, $port, $error_code, $error_message, 0.5);
+        if (is_resource($connection)) {
+            fclose($connection);
+
+            return true;
+        } else {
+            $error = $error_code . ': ' . $error_message;
+
+            return false;
+        }
     }
 }

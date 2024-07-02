@@ -177,6 +177,7 @@ class editor_Models_Export_FileParser_Sdlxliff_TrackChangesFormatter
                     'tagName' => $tagName,
                     'restored' => $restoredTag,
                     'type' => $tagInfo[1], // single|open|close
+                    'deleted' => $deletionMark,
                 ];
 
                 // if we have both opening and closing tag pair we can replace them
@@ -232,7 +233,7 @@ class editor_Models_Export_FileParser_Sdlxliff_TrackChangesFormatter
                     $node->append($dom->createTextNode(sprintf('</%s>', $changedTagNode['tagName'])));
                 }
 
-                if (! isset($removedOpenerCreatedPhantoms[$changedTagNode['originalid']])) {
+                if ($changedTagNode['deleted'] && ! isset($removedOpenerCreatedPhantoms[$changedTagNode['originalid']])) {
                     $removedOpenerCreatedPhantoms[$changedTagNode['originalid']] = true;
                     $nodesToPrependAtNextStep[] = sprintf(
                         '<%s id="%s" sdl:start="false">',

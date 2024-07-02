@@ -182,9 +182,9 @@ class editor_Segment_Length_Check
     /**
      * Evaluates the error-states for a lines based length restriction
      */
-    private function evaluateLinesLength(editor_Segment_Length_Restriction $restriction)
+    private function evaluateLinesLength(editor_Segment_Length_Restriction $restriction): void
     {
-        $lines = $this->fieldTags->getFieldTextLines(true);
+        $lines = $this->fieldTags->getFieldTextLines();
         $numLines = count($lines);
         if ($numLines > $restriction->maxNumLines) {
             $this->states[] = self::TOO_MANY_LINES;
@@ -192,11 +192,11 @@ class editor_Segment_Length_Check
         if ($restriction->isLengthRestricted()) {
             $lengthOverall = 0;
             foreach ($lines as $line) {
-                $length = (int) $this->segment->textLengthByMeta(
+                $length = $this->segment->textLengthByMeta(
                     $line,
                     $this->segmentMeta,
-                    $this->segment->getFileId(),
-                    str_contains($field, editor_Models_SegmentField::TYPE_SOURCE)
+                    (int) $this->segment->getFileId(),
+                    str_contains($this->fieldTags->getDataField(), editor_Models_SegmentField::TYPE_SOURCE)
                 );
                 $lengthOverall += $length;
                 if ($restriction->maxLength > 0 && $length > $restriction->maxLength && ! in_array(self::TOO_LONG, $this->states)) {
