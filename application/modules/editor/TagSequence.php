@@ -481,9 +481,9 @@ abstract class editor_TagSequence implements JsonSerializable
                 $errorData['container'] = $container->toJson();
                 $errorData['tag'] = $tag->toJson();
 
-                $errorData = $this->logError('E1343', 'Rendering TagSequence tags led to a invalid tag structure that could not be processed', $errorData);
+                $errorData = $this->logError('E1610', 'Rendering TagSequence tags led to a invalid tag structure that could not be processed', $errorData);
 
-                throw new editor_Models_Segment_Exception('E1343', $errorData);
+                throw new editor_Models_Segment_Exception('E1610', $errorData);
             }
             $nearest->addChild($tag);
             $container = $tag;

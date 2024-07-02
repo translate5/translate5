@@ -51,6 +51,8 @@ final class Roles extends BaseRoles
 
     public const TERMPM = 'termPM';
 
+    public const TERMSEARCH = 'termSearch';
+
     public const TERMCUSTOMERSEARCH = 'termCustomerSearch';
 
     public const TERMFINALIZER = 'termFinalizer';
