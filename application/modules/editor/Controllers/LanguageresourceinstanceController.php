@@ -1638,7 +1638,7 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
 
             $res->source = $decodeHtmlSpecial($res->source);
 
-            $res->source = $diffTagger->diffSegment($queryString, $res->source, null, null);
+            $res->source = $diffTagger->diffSegment($queryString, $res->source, null, null, true);
             $res->source = $this->unprotectTags($res->source, array_merge($tags, $queryStringTags));
         }
 
