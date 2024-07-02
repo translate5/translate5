@@ -1,6 +1,6 @@
 <?php
 
-namespace MittagQI\Translate5\Test\Functional\Models\Export\FileParser;
+namespace MittagQI\Translate5\Test\Functional\Models\Export\FileParser\Sdlxliff;
 
 use editor_Models_File;
 use editor_Models_Import_FileParser_Sdlxliff;
@@ -25,7 +25,7 @@ class SdlxliffMarkPreTranslatedSegmentAsDraftOnExportTest extends editor_Test_Un
     {
         parent::setUp();
 
-        $this->taskDataPath = __DIR__ . '/SdlxliffMarkPreTranslatedSegmentAsDraftOnExportTest/testfiles/';
+        $this->taskDataPath = __DIR__ . '/testfiles/SdlxliffMarkPreTranslatedSegmentAsDraftOnExportTest/';
 
         $customer = ZfExtended_Factory::get(\editor_Models_Customer_Customer::class);
         $customer->loadByDefaultCustomer();
