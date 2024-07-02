@@ -95,34 +95,7 @@ For Details see https://fonts.google.com/attribution
     --font-size-small: 12px;
 }
 
-/* --------------- global resets --------------- */
-
-.instantTranslate h1,
-.instantTranslate h2,
-.instantTranslate h3,
-.instantTranslate h4,
-.instantTranslate h5,
-.instantTranslate h6,
-.instantTranslate p {
-    padding: 0;
-    margin: 0;
-    font-size: 100%;
-}
-.instantTranslate  *:focus {
-    outline: none;
-}
-
-.instantTranslate a {text-decoration: none; color: var(--color-grey_07);}
-.instantTranslate a:hover {color: var(--color-blue_05);}
-
-.instantTranslate .ui-tooltip {
-    font-size: var(--font-size-normal);
-    border-radius: 2px;
-    box-shadow: none;
-    border-color: var(--color-grey_11);
-    background-color: var(--color-grey_11);
-    color: #FFFFFF;
-}
+/* --------------- global styles --------------- */
 
 .arrow {
     width: 70px;
@@ -157,8 +130,6 @@ For Details see https://fonts.google.com/attribution
     bottom: -20px;
     top: auto;
 }
-
-/* --------------- global sets --------------- */
 
 .font-size-big {font-size: var(--font-size-big) !important;}
 .font-size-medium {font-size: var(--font-size-medium) !important;}
@@ -246,11 +217,6 @@ a.error:hover {
     filter: brightness(0.7);
 }
 
-.container__instanttranslate {
-    max-width: 1160px;
-    margin: 0 auto;
-}
-
 /* --------------- boxes --------------- */
 
 .box {
@@ -285,11 +251,6 @@ a.error:hover {
     border-bottom: 2px solid var(--color-grey_03);
     color: var(--color-grey_07);
     text-transform: uppercase;
-}
-.container__instanttranslateheader {
-    display: flex;
-    align-items: center;
-    padding: 0 10px;
 }
 #logo {
     flex: 0 0 180px;
@@ -342,8 +303,8 @@ a.error:hover {
     color: var(--color-blue_05);
 }
 
-
 /* --------------- source selector (text or file) --------------- */
+
 .sourceSelector {
     text-align: center;
     color: var(--color-grey_07);
@@ -380,20 +341,6 @@ a.error:hover {
 
 .ui-menu .ui-state-focus, .ui-menu .ui-state-active {margin: 0;}
 
-.container__instanttranslatebody .ui-selectmenu-button.ui-button {
-    width: 100%;
-    border-radius: 0;
-    border-color: var(--color-blue_03);
-    padding: 20px var(--padding-big) 16px var(--padding-big);
-    background-color: var(--color-blue_01);
-    color: var(--color-grey_09);
-    font-size: var(--font-size-big);
-}
-.container__instanttranslatebody .ui-selectmenu-button.ui-selectmenu-button-open {
-    background-color: transparent;
-    border-bottom-width: 0;
-}
-
 .ui-widget.localesSelectList {
     border-top-width: 0;
     border-color: var(--color-blue_03);
@@ -421,7 +368,6 @@ a.error:hover {
 
 .switchSourceTarget {
     display: inline-block;
-    width: auto;
     position: absolute;
     width: 40px;
     height: 40px;
@@ -433,7 +379,7 @@ a.error:hover {
 }
 
 @media (max-width: 640px) {
-    .switchSourceTarget {right: 0px;}
+    .switchSourceTarget {right: 0;}
     #sourceLocale-button {width: calc(100% - 60px);}
 }
 
@@ -606,7 +552,6 @@ a.error:hover {
     margin-left: 5px;
     margin-bottom: -4px;
 }
-
 
 /* --------------- target --------------- */
 

@@ -32,6 +32,7 @@ use GuzzleHttp\Client;
 use MittagQI\Translate5\ContentProtection\T5memory\T5NTagSchemaFixFilter;
 use MittagQI\Translate5\ContentProtection\T5memory\TmConversionService;
 use MittagQI\Translate5\LanguageResource\Adapter\Exception\RescheduleUpdateNeededException;
+use MittagQI\Translate5\LanguageResource\Adapter\Exception\SegmentUpdateException;
 use MittagQI\Translate5\LanguageResource\Adapter\UpdatableAdapterInterface;
 use MittagQI\Translate5\LanguageResource\Status as LanguageResourceStatus;
 use MittagQI\Translate5\T5Memory\Api\VersionFetchingApi;
@@ -419,6 +420,8 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
             'segment' => $segment,
             'apiError' => $apiError,
         ]);
+
+        throw new SegmentUpdateException();
     }
 
     public function updateTranslation(string $source, string $target, string $tmName = '')

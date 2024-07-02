@@ -100,15 +100,20 @@ abstract class AbstractConnector
     protected string $url;
 
     /**
-     * may holds additional props to configure the JsonClient
+     * may hold additional props to configure the JsonClient
      */
     protected array $httpClientConfig = [];
 
     public function __construct(AbstractAuthenticatedService $service, string $url = null)
     {
         $this->service = $service;
-        $this->url = $url ?? $service->getServiceUrl();
-        $this->url = rtrim($this->url, '/');
+        $url ??= $service->getServiceUrl();
+
+        if ($url === null) {
+            throw new ZfExtended_Exception(get_class($this) . ' cannot be instaniated without a proper service-url');
+        }
+
+        $this->url = rtrim($url, '/');
     }
 
     /**

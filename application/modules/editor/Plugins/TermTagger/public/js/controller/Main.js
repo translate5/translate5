@@ -34,7 +34,7 @@ Ext.define('Editor.plugins.TermTagger.controller.Main', {
 
     listen: {
         component: {
-            '#metapanel #metaTermPanel': {
+            '#metapanel termPortalTermPortlet': {
                 afterrender: 'initMetaTermHandler'
             },
             '#segmentgrid': {
@@ -49,7 +49,7 @@ Ext.define('Editor.plugins.TermTagger.controller.Main', {
 
     refs: [ {
         ref: 'metaTermPanel',
-        selector: '#metapanel #metaTermPanel'
+        selector: '#metapanel termPortalTermPortlet'
     }, {
         ref: 'segmentMeta',
         selector: '#metapanel segmentsMetapanel'

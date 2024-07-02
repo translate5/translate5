@@ -55,7 +55,7 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract
      * This must be increased each time, a git-based fprm or srx is changed
      * @var int
      */
-    public const BCONF_VERSION_INDEX = 7;
+    public const BCONF_VERSION_INDEX = 8;
 
     /**
      * The filename of the system default import bconf
@@ -119,7 +119,7 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract
         }
         $meta = $task->meta(true); // TODO FIXME: why reinit ?
 
-        return self::getImportBconfById($task, $meta->getBconfId());
+        return self::getImportBconfById($task, (int) $meta->getBconfId());
     }
 
     /**
@@ -178,7 +178,7 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract
     private static function getImportBconfById(editor_Models_Task $task, int $bconfId = null, bool $addWarning = false, string $orderer = null): editor_Plugins_Okapi_Bconf_Entity
     {
         // this may be called multiple times when processing the import upload, so we better cache it
-        if (! empty($bconfId) && isset(static::$cachedBconf) && static::$cachedBconf->getId() === $bconfId) {
+        if (! empty($bconfId) && isset(static::$cachedBconf) && (int) static::$cachedBconf->getId() === $bconfId) {
             return static::$cachedBconf;
         }
         $bconf = new editor_Plugins_Okapi_Bconf_Entity();
@@ -192,7 +192,7 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract
                     'bconfFile' => 'No bconf-id was set for task meta',
                 ]);
             }
-            $bconf = $bconf->getDefaultBconf($task->getCustomerId());
+            $bconf = $bconf->getDefaultBconf((int) $task->getCustomerId());
         } else {
             $bconf->load($bconfId);
         }

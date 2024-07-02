@@ -44,5 +44,6 @@ class editor_Models_Import_FileParser_Sdlxliff_Exception extends editor_Models_I
         'E1009' => 'The source and target segment count does not match in transunit: "{transunit}".',
         'E1010' => 'The tag "{tagname}" was used in the segment but is not defined in the "_tagDefMapping" list!',
         'E1323' => 'The transUnit contains sdl:cxt tags, but we assume that tags only in the group tag!',
+        'E1609' => 'The format tag "{tagname}" is not defined in the "SDL:QuickInsertsList"',
     ];
 }

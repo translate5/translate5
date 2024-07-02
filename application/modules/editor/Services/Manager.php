@@ -34,6 +34,7 @@ END LICENSE AND COPYRIGHT
  */
 
 use MittagQI\Translate5\LanguageResource\Adapter\Exception\RescheduleUpdateNeededException;
+use MittagQI\Translate5\LanguageResource\Adapter\Exception\SegmentUpdateException;
 use MittagQI\Translate5\LanguageResource\Adapter\UpdatableAdapterInterface;
 
 /**
@@ -344,11 +345,15 @@ class editor_Services_Manager
             $task,
             function (editor_Services_Connector $connector, $languageResource, $assoc) use ($segment): void {
                 if (! empty($assoc['segmentsUpdateable'])) {
-                    $connector->update(
-                        $segment,
-                        UpdatableAdapterInterface::RECHECK_ON_UPDATE,
-                        UpdatableAdapterInterface::RESCHEDULE_UPDATE_ON_ERROR
-                    );
+                    try {
+                        $connector->update(
+                            $segment,
+                            UpdatableAdapterInterface::RECHECK_ON_UPDATE,
+                            UpdatableAdapterInterface::RESCHEDULE_UPDATE_ON_ERROR
+                        );
+                    } catch (SegmentUpdateException) {
+                        // Ignore the error here as we don't care about the result
+                    }
                 }
             },
             function (
