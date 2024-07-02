@@ -26,22 +26,16 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-/**
- * General exception in segment processing.
- */
-class editor_Models_Segment_Exception extends ZfExtended_ErrorCodeException
-{
-    /**
-     * @var string
-     */
-    protected $domain = 'editor.segment';
+declare(strict_types=1);
 
-    protected static $localErrorCodes = [
-        //Pixel Length codes:
-        'E1081' => 'Textlength by pixel failed; most probably data about the pixelWidth is missing: fontFamily: "{fontFamily} fontSize: "{fontSize}" character: "{char} ({charCode})".',
-        'E1082' => 'Segment length calculation: missing pixel width for several characters.',
-        'E1155' => 'Unable to save the segment. The segment model tried to save to the materialized view directly.',
-        'E1343' => 'Setting the FieldTags tags by text led to a changed text-content presumably because the encoded tags have been improperly processed',
-        'E1610' => 'Rendering TagSequence tags led to a invalid tag structure that could not be processed',
-    ];
+namespace MittagQI\Translate5\LanguageResource;
+
+class ReimportSegmentsResult
+{
+    public function __construct(
+        public readonly int $emptySegmentsAmount,
+        public readonly int $successfulSegmentsAmount,
+        public readonly array $failedSegmentIds
+    ) {
+    }
 }

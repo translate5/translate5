@@ -266,6 +266,11 @@ END LICENSE AND COPYRIGHT
     {
         $s = (int) strtotime($end) - strtotime($start);
 
-        return sprintf(' %02d:%02d:%02d', $s / 3600, $s / 60 % 60, $s % 60) . ' (' . $s . ')';
+        return sprintf(
+            ' %02d:%02d:%02d',
+            $s / 3600,
+            round($s / 60) % 60,
+            $s % 60
+        ) . ' (' . $s . ')';
     }
 }
