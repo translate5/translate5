@@ -944,7 +944,7 @@ Ext.define('Editor.controller.admin.TaskOverview', {
     editorDeleteTask: function(task) {
         var me = this,
             app = Editor.app,
-            store = task.stor,
+            store = task.store,
             taskName = task.getTaskName();
 
         app.mask(Ext.String.format(me.strings.taskDestroy, taskName), taskName);
