@@ -549,22 +549,27 @@ Ext.define('Editor.view.segments.Grid', {
      * @param {String} failureEventName - event to fire when segmentNrInTask's index cannot be found in the grid
      * @param {Function} afterFocusCallback - to be called when segment is focused
      */
-    focusSegment: function(segmentNrInTask, forEditing = false, failureEventName = '', afterFocusCallback = Ext.emptyFn) {
+    focusSegment: function (segmentNrInTask, forEditing = false, failureEventName = '', afterFocusCallback = Ext.emptyFn) {
         let me = this,
             segIsInFocusConfig = {},
             segmentIndex;
 
-        if(!segmentNrInTask){
+        if (!segmentNrInTask) {
             return;
         }
 
-        segIsInFocusConfig.callback = segIsInFocusConfig.notScrollCallback = function(){
+        segIsInFocusConfig.callback = segIsInFocusConfig.notScrollCallback = function () {
             // the ->scrollTo function will not focus a non-editable segment, meaning the selection may stays in an older state
             // to detect this, scrollTo adds the record it scrolled to and potentially selects, so we only can edit, if the scrolled record matches the selected
-            if(forEditing && me.selection && (me.selection === segIsInFocusConfig.record)) {
-                me.editingPlugin.startEdit(me.selection, null, me.editingPlugin.self.STARTEDIT_SCROLLUNDER);
-                if(me.editingPlugin.editor){
-                    me.editingPlugin.editor.reposition();
+            if (forEditing && me.selection && (me.selection === segIsInFocusConfig.record)) {
+                // CRUCIAL: we have to set a proper column-index for the startEdit
+                // otherwise the editing-context's "field"-property is wrongly initialized (will always be column 0)
+                let colIndex = me.getColumnIndexForContentField('targetEdit');
+                if (colIndex > -1) {
+                    me.editingPlugin.startEdit(me.selection, colIndex, me.editingPlugin.self.STARTEDIT_SCROLLUNDER);
+                    if (me.editingPlugin.editor) {
+                        me.editingPlugin.editor.reposition();
+                    }
                 }
             }
             afterFocusCallback();
@@ -572,14 +577,33 @@ Ext.define('Editor.view.segments.Grid', {
         segmentNrInTask = parseInt(segmentNrInTask);
         segmentIndex = me.getStore().findBy(rec => rec.data.segmentNrInTask === segmentNrInTask); // direct access here for fastest lookup
 
-        if(segmentIndex >= 0) {
+        if (segmentIndex >= 0) {
             me.scrollTo(segmentIndex, segIsInFocusConfig);
         } else {
-            me.searchPosition(segmentNrInTask, failureEventName).then(function(index) {
+            me.searchPosition(segmentNrInTask, failureEventName).then(function (index) {
                 me.scrollTo(index, segIsInFocusConfig);
             });
         }
     },
+
+    /**
+     * Searches the proper column-index for a content-field ("source", "target", "targetEdit", ...)
+     * This index is the index of the visible column ... what a crazy data-model is ExtJS using there 
+     * TODO FIXME: this searches internal and private props, but I found no other way to achieve this
+     * @param {string} field
+     * @returns {int}
+     */
+    getColumnIndexForContentField: function (field) {
+        let i, columns = this.getVisibleColumns();
+        for (i = 0; i < columns.length; i++) {
+            if (columns[i].config && (columns[i].config.dataIndex === field)) {
+                return i;
+            }
+        }
+        console.log('Could not find column "' + field + '" in the segment-grid columns');
+        return -1;
+    },
+
     /**
      * UnFocus any focussed segment in the grid
      */
