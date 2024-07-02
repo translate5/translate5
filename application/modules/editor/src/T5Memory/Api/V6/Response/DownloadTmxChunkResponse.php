@@ -21,12 +21,12 @@ class DownloadTmxChunkResponse
      * @throws CorruptResponseBodyException
      * @throws InvalidResponseStructureException
      */
-    public static function fromResponse(ResponseInterface $response): self
+    public static function fromResponse(ResponseInterface $response, ?string $startFromInternalKey): self
     {
         $nextInternalKeyHeader = $response->getHeader('NextInternalKey');
         $nextInternalKey = null;
 
-        if (! empty($nextInternalKeyHeader)) {
+        if (! empty($nextInternalKeyHeader) && $nextInternalKeyHeader[0] !== $startFromInternalKey) {
             $nextInternalKey = $nextInternalKeyHeader[0];
 
             if (! preg_match('/\d+:\d+/', $nextInternalKey)) {

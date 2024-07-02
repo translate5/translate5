@@ -80,7 +80,7 @@ class VersionedApi extends AbstractVersionedApi
 
         $this->throwExceptionOnNotSuccessfulResponse($response, $request);
 
-        return DownloadTmxChunkResponse::fromResponse($response);
+        return DownloadTmxChunkResponse::fromResponse($response, $startFromInternalKey);
     }
 
     protected static function supportedVersion(): VersionConstraint
