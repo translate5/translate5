@@ -19,6 +19,57 @@ All updates are (downwards) compatible! If not this is listed in the important r
 
 
 
+
+## [7.6.5] - 2024-07-02
+
+### Important Notes:
+ 
+
+
+### Added
+**[TRANSLATE-3593](https://jira.translate5.net/browse/TRANSLATE-3593): Auto-QA, TermTagger integration - Split 'Terminology > Not found in target' AutoQA-category into 4 categories** <br>
+translate5 - 7.4.0: 'Terminology > Not found in target' quality is now split into 4 sub-categories
+translate5 - 7.6.5:  Additional improvements 
+
+
+### Changed
+**[TRANSLATE-4037](https://jira.translate5.net/browse/TRANSLATE-4037): LanguageResources, t5memory - On resaving segments to TM: Log segmentnumber in task** <br>
+On reimporting segments to the t5memory failed segment ids are now added to the log record.
+
+**[TRANSLATE-4035](https://jira.translate5.net/browse/TRANSLATE-4035): ConnectWorldserver - Plugin ConnectWorldserver: Cache for expensive function getAllUsers()** <br>
+To speed things up, the result of a once loaded list is cached inside Translate5. Default timeout for this cache is 1 hour (60 minutes) and is be configurable by a Translate5 config.
+
+!!! a once given timeout can not be shortend. This means: if cache is stored with timeout 60 it will be used for 60 minutes. !!!
+
+**[TRANSLATE-4033](https://jira.translate5.net/browse/TRANSLATE-4033): InstantTranslate - InstantTranslate:TM minimum match rate overwritable on client level** <br>
+Enables clients overwrite for match.rate border config in instant translate.
+
+**[TRANSLATE-4027](https://jira.translate5.net/browse/TRANSLATE-4027): Auto-QA, TermTagger integration - Restore client-side termtagging for old tasks** <br>
+TermTagging ability on client-side is now restored in order to be able to work with old tasks and to provide some transition period of time needed for the end users
+
+**[TRANSLATE-3995](https://jira.translate5.net/browse/TRANSLATE-3995): file format settings - Remove not so useful rule from t5 default SRX** <br>
+Enhancement: Remove Rule from t5 default file-format settings that tried to segment malformed sentences "A sentence.The next sentence." but did more harm than good
+
+
+### Bugfixes
+**[TRANSLATE-4049](https://jira.translate5.net/browse/TRANSLATE-4049): Export - Html entities not escaped on sdlxliff export** <br>
+Fix: Escape html entities on sdlxliff export
+
+**[TRANSLATE-4038](https://jira.translate5.net/browse/TRANSLATE-4038): InstantTranslate - HOTFIX: InstantTranslate GUI may leads to request-buildup on the backend** <br>
+FIX: InstantTranslate may cause request-buildups in the backend degrading performance significantly. The fix changes the way InstantTranslate works:
+* An instant translation request is only sent after the request before returned.
+* If the system is too slow for "instant" translation (or too many Languageresources are assigned to the current customer) Instant translate will switch back to manual mode with a "translate" button
+
+**[TRANSLATE-4021](https://jira.translate5.net/browse/TRANSLATE-4021): VisualReview / VisualTranslation - Visual does not reflect changes in the WYSIWYG with freshly imported translation tasks** <br>
+FIX: Visual does not reflect changes in the WYSIWYG with freshly imported translation tasks
+
+**[TRANSLATE-3971](https://jira.translate5.net/browse/TRANSLATE-3971): Import/Export - SDLXLIFF internal tags with "textual" IDs** <br>
+SDLXLIFF: Fixed processing of format tags from QuickInsertsList
+
+**[TRANSLATE-3714](https://jira.translate5.net/browse/TRANSLATE-3714): Editor general, usability editor - Summarize diffs in fuzzy match results** <br>
+FIXED: problem with diff appearance in fuzzy match panel
+
+
 ## [7.6.4] - 2024-06-19
 
 ### Important Notes:
