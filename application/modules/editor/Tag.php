@@ -26,6 +26,7 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\ZfExtended\Tools\Markup;
 use PHPHtmlParser\Dom;
 use PHPHtmlParser\Dom\Node\AbstractNode;
 use PHPHtmlParser\Dom\Node\HtmlNode;
@@ -41,15 +42,6 @@ use PHPHtmlParser\Options;
  */
 class editor_Tag
 {
-    /**
-     * If set to true, PHP DOM is used to parse Markup, otherwise PHPHtmlParser
-     * This affects the handling of double quotes, since PHPHtmlParser leaves them untouched while PHP DOM escapes them
-     * Currently, we can not activate this as some of the TESTs (which are real-world testdata taken from "testfiles-terminology.zip") will not pass
-     * See SegmentTagsTest and editor_Tag::convertDOMText
-     * @var boolean
-     */
-    public const USE_PHP_DOM = false;
-
     /**
      * Escapes an CDATA attribute-value according to the HTML-Spec
      * @param string $text
@@ -311,7 +303,7 @@ class editor_Tag
      */
     public static function unparse($html)
     {
-        if (static::USE_PHP_DOM) {
+        if (Markup::useStrictEscaping()) {
             // implementation using PHP DOM
             $dom = new ZfExtended_Dom();
             $node = $dom->loadUnicodeElement($html);
@@ -336,14 +328,6 @@ class editor_Tag
         }
 
         return null;
-    }
-
-    /**
-     * If the PHP DOM parser is used, all text-contents will be converted with this method
-     */
-    public static function convertDOMText(string $text): string
-    {
-        return htmlspecialchars($text, ENT_XML1, null, false);
     }
 
     /**
@@ -405,7 +389,7 @@ class editor_Tag
                 $child = $node->childNodes->item($i);
                 if ($child->nodeType == XML_TEXT_NODE) {
                     // CRUCIAL: the nodeValue always is escaped Markup!
-                    $tag->addText(editor_Tag::convertDOMText($child->nodeValue));
+                    $tag->addText(Markup::escapeText($child->nodeValue));
                 } elseif ($child->nodeType == XML_ELEMENT_NODE) {
                     $tag->addChild(static::fromDomElement($child));
                 }
