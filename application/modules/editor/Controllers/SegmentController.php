@@ -71,15 +71,35 @@ class Editor_SegmentController extends ZfExtended_RestController
     {
         parent::preDispatch();
         $this->initCurrentTask();
+
+        $this->validateFilters();
+
         $sfm = $this->initSegmentFieldManager($this->getCurrentTask()->getTaskGuid());
+
         //overwrite sortColMap
-        $this->_sortColMap = $sfm->getSortColMap();
+        $this->_sortColMap =  $sfm->getSortColMap();
         $this->entity->setEnableWatchlistJoin();
         $filter = $this->entity->getFilter();
         /* @var $filter editor_Models_Filter_SegmentSpecific */
         //update sortColMap and filterTypeMap in filter instance
         $filter->setMappings($this->_sortColMap, $this->_filterTypeMap);
         $filter->setSegmentFields(array_keys($this->_sortColMap));
+    }
+
+    private function validateFilters(): void
+    {
+
+        $sfm = $this->initSegmentFieldManager($this->getCurrentTask()->getTaskGuid());
+
+        $segmentFilterValidator = new \MittagQI\Translate5\Segment\SegmentFilterAndSortValidator(
+            new \MittagQI\ZfExtended\Models\Filter\FilterValidator(),
+            $this->entity
+        );
+
+        $segmentFilterValidator->validateAndRemoveInvalide(
+            $sfm->getView()->getFields(),
+            $sfm->getSortColMap()
+        );
     }
 
     /**

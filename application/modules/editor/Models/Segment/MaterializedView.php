@@ -101,6 +101,13 @@ class editor_Models_Segment_MaterializedView
         $this->checkMvFillState();
     }
 
+    public function getFields(): array
+    {
+        $db = Zend_Db_Table::getDefaultAdapter();
+        $metadata = $db->describeTable($this->getName());
+        return array_keys($metadata);
+    }
+
     /**
      * ensure that a taskGuid is set
      * @throws LogicException
@@ -269,7 +276,8 @@ class editor_Models_Segment_MaterializedView
     }
 
     /**
-     * creates a reusable SQL fragment for updating the mat view metaCache field for a whole task or a given groupId/transunitHash (including fileId)
+     * creates a reusable SQL fragment for updating the mat view metaCache field for a whole task or a given
+     * groupId/transunitHash (including fileId)
      * @return string
      */
     protected function buildMetaCacheSql($segmentId = null)
