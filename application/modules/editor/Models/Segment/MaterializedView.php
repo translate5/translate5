@@ -105,6 +105,7 @@ class editor_Models_Segment_MaterializedView
     {
         $db = Zend_Db_Table::getDefaultAdapter();
         $metadata = $db->describeTable($this->getName());
+
         return array_keys($metadata);
     }
 

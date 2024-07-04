@@ -77,7 +77,7 @@ class Editor_SegmentController extends ZfExtended_RestController
         $sfm = $this->initSegmentFieldManager($this->getCurrentTask()->getTaskGuid());
 
         //overwrite sortColMap
-        $this->_sortColMap =  $sfm->getSortColMap();
+        $this->_sortColMap = $sfm->getSortColMap();
         $this->entity->setEnableWatchlistJoin();
         $filter = $this->entity->getFilter();
         /* @var $filter editor_Models_Filter_SegmentSpecific */
@@ -88,7 +88,6 @@ class Editor_SegmentController extends ZfExtended_RestController
 
     private function validateFilters(): void
     {
-
         $sfm = $this->initSegmentFieldManager($this->getCurrentTask()->getTaskGuid());
 
         $segmentFilterValidator = new \MittagQI\Translate5\Segment\SegmentFilterAndSortValidator(
