@@ -26,15 +26,10 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-use editor_Models_Customer_Customer as Customer;
-use editor_Models_LanguageResources_CustomerAssoc as LanguageResourceCustomers;
-use editor_Models_LanguageResources_LanguageResource as LanguageResource;
-use editor_Models_LanguageResources_Languages as LanguageResourceLanguages;
 use MittagQI\Translate5\LanguageResource\CrossSynchronization\CrossLanguageResourceSynchronizationService;
 use MittagQI\Translate5\LanguageResource\CrossSynchronization\CrossSynchronizationConnection;
-use MittagQI\Translate5\LanguageResource\CrossSynchronization\SyncConnectionService;
+use MittagQI\Translate5\LanguageResource\CrossSynchronization\CrossSynchronizationConnectionRepository;
 use MittagQI\Translate5\LanguageResource\LanguageResourceRepository;
-use MittagQI\Translate5\LanguageResource\TaskAssociation;
 
 /**
  * Controller for the LanguageResources Associations
@@ -71,38 +66,19 @@ class editor_LanguageresourcesyncassocController extends ZfExtended_RestControll
     {
         $languageResourceId = $this->getRequest()->getParam('languageResource');
 
-        $db = $this->entity->db;
+        $repo = new CrossSynchronizationConnectionRepository();
 
-        $lrTable = ZfExtended_Factory::get(LanguageResource::class)->db->info($db::NAME);
+        $rows = [];
 
-        $select = $db->select()
-            ->setIntegrityCheck(false)
-            ->from(
-                ['LanguageResourceSync' => $db->info($db::NAME)],
-                ['id', 'sourceLanguageResourceId', 'targetLanguageResourceId']
-            )
-            ->join(
-                [
-                    'LanguageResourceSource' => $lrTable,
-                ],
-                'LanguageResourceSync.sourceLanguageResourceId = LanguageResourceSource.id',
-                ["CONCAT(LanguageResourceSource.serviceName, ': ', LanguageResourceSource.name) as sourceLanguageResourceName"]
-            )
-            ->join(
-                [
-                    'LanguageResourceTarget' => $lrTable,
-                ],
-                'LanguageResourceSync.targetLanguageResourceId = LanguageResourceTarget.id',
-                ["CONCAT(LanguageResourceTarget.serviceName, ': ', LanguageResourceTarget.name) as targetLanguageResourceName"]
-            );
-
-        if ($languageResourceId) {
-            $select
-                ->where('LanguageResourceSync.sourceLanguageResourceId = ?', $languageResourceId)
-                ->orWhere('LanguageResourceSync.targetLanguageResourceId = ?', $languageResourceId);
+        foreach ($repo->getAllConnectionsRenderData($languageResourceId) as $row) {
+            $rows[] = [
+                'id' => $row['id'],
+                'sourceLanguageResourceId' => $row['sourceLanguageResourceId'],
+                'targetLanguageResourceId' => $row['targetLanguageResourceId'],
+                'sourceLanguageResourceName' => $row['sourceName'] . ': ' . $row['sourceName'],
+                'targetLanguageResourceName' => $row['targetServiceName'] . ': ' . $row['targetName'],
+            ];
         }
-
-        $rows = $db->fetchAll($select)->toArray();
 
         $this->view->rows = $rows;
         $this->view->total = count($rows);
@@ -134,34 +110,5 @@ class editor_LanguageresourcesyncassocController extends ZfExtended_RestControll
         } catch (ZfExtended_Models_Entity_NotFoundException $e) {
             //do nothing since it was already deleted, and thats ok since user tried to delete it
         }
-    }
-
-    /***
-     * Fire after post/delete special event with language resources service name in it.
-     * The event and the service name will be separated with #
-     * ex: afterPost#OpenTM2
-     *     afterDelete#TermCollection
-     *
-     * @param string $action
-     * @param TaskAssociation $entity
-     * @return editor_Models_LanguageResources_LanguageResource
-     */
-    protected function fireAfterAssocChangeEvent(
-        $action,
-        TaskAssociation $entity,
-    ): editor_Models_LanguageResources_LanguageResource {
-        $lr = ZfExtended_Factory::get('editor_Models_LanguageResources_LanguageResource');
-        /* @var $lr editor_Models_LanguageResources_LanguageResource */
-        $lr->load($entity->getLanguageResourceId());
-
-        //fire event with name of the saved language resource service name
-        //separate with # so it is more clear that is is not regular after/before action event
-        //ex: afterPost#OpenTM2
-        $eventName = "after" . ucfirst($action) . '#' . $lr->getServiceName();
-        $this->events->trigger($eventName, $this, [
-            'entity' => $entity,
-        ]);
-
-        return $lr;
     }
 }

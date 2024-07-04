@@ -31,7 +31,7 @@ class CrossLanguageResourceSynchronizationService
 
     public function createConnection(
         LanguageResource $source,
-        LanguageResource $target
+        LanguageResource $target,
     ): CrossSynchronizationConnection {
         $connection = ZfExtended_Factory::get(CrossSynchronizationConnection::class);
         $connection->setSourceLanguageResourceId((int) $source->getId());
@@ -58,7 +58,7 @@ class CrossLanguageResourceSynchronizationService
         LanguageResource $source,
         LanguagePair $languagePair,
         ?int $customerId,
-        SynchronizationType $synchronizationType
+        SynchronizationType $synchronizationType,
     ): Generator {
         $service = $this->getSyncConnectionService($source->getServiceType());
 
@@ -144,7 +144,8 @@ class CrossLanguageResourceSynchronizationService
             ->where('LanguageResourceLanguages.sourceLang IN (?)', (array) $source->getSourceLang())
             ->where('LanguageResourceLanguages.targetLang IN (?)', (array) $source->getTargetLang())
             ->where('LanguageResourceCustomers.customerId IN (?)', $source->getCustomers())
-            ->where('LanguageResources.serviceName IN (?)', array_keys($services));
+            ->where('LanguageResources.serviceName IN (?)', array_keys($services))
+            ->order('LanguageResources.serviceName');
 
         $result = [];
         foreach ($db->fetchAll($select)->toArray() as $row) {

@@ -26,6 +26,7 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\LanguageResource\CustomerAssoc\CustomerAssocService;
 use MittagQI\Translate5\LanguageResource\TaskAssociation;
 
 /**#@+
@@ -184,7 +185,9 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_Me
 
         //create term collection for the task and customer
         //the term collection will be created with autoCreateOnImport flag
-        $this->termCollection->create("Term Collection for " . $this->task->getTaskName(), $this->customerIds);
+        $collection = $this->termCollection->create("Term Collection for " . $this->task->getTaskName());
+
+        CustomerAssocService::create()->associateCustomers((int) $collection->getId(), $this->customerIds);
 
         //add termcollection to task assoc
         $this->termCollection->addTermCollectionTaskAssoc($this->termCollection->getId(), $task->getTaskGuid());

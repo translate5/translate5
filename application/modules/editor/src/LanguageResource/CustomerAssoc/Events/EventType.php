@@ -1,6 +1,4 @@
 <?php
-
-declare(strict_types=1);
 /*
 START LICENSE AND COPYRIGHT
 
@@ -28,31 +26,13 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-namespace MittagQI\Translate5\LanguageResource\CrossSynchronization;
+declare(strict_types=1);
 
-use Zend_Db_Table_Row_Abstract;
-use ZfExtended_Models_Entity_Abstract;
+namespace MittagQI\Translate5\LanguageResource\CustomerAssoc\Events;
 
-/**
- * @method string getId()
- * @method void setId(int $id)
- * @method string getSourceLanguageResourceId()
- * @method void setSourceLanguageResourceId(int $id)
- * @method string getSourceType()
- * @method void setSourceType(string $type)
- * @method string getTargetLanguageResourceId()
- * @method void setTargetLanguageResourceId(int $id)
- * @method string getTargetType()
- * @method void setTargetType(string $type)
- */
-class CrossSynchronizationConnection extends ZfExtended_Models_Entity_Abstract
+enum EventType: string
 {
-    protected $dbInstanceClass = Db\CrossSynchronizationConnection::class;
+    case AssociationCreated = 'languageResource.customerAssoc.association.created';
 
-    protected $validatorInstanceClass = Validator\CrossLanguageResourceSynchronization::class;
-
-    public function hydrate(array|Zend_Db_Table_Row_Abstract $data): void
-    {
-        $this->row = is_array($data) ? $this->db->createRow($data) : $data;
-    }
+    case AssociationDeleted = 'languageResource.customerAssoc.association.deleted';
 }

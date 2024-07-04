@@ -29,6 +29,8 @@ END LICENSE AND COPYRIGHT
 use MittagQI\Translate5\ContentProtection\T5memory\TmConversionService;
 use MittagQI\Translate5\LanguageResource\CleanupAssociation\Customer;
 use MittagQI\Translate5\LanguageResource\CrossSynchronization\SyncConnectionService;
+use MittagQI\Translate5\LanguageResource\CustomerAssoc\CustomerAssocService;
+use MittagQI\Translate5\LanguageResource\CustomerAssoc\DTO\AssociationFormValues;
 use MittagQI\Translate5\LanguageResource\ReimportSegments;
 use MittagQI\Translate5\LanguageResource\Status as LanguageResourceStatus;
 use MittagQI\Translate5\LanguageResource\TaskAssociation;
@@ -840,12 +842,13 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         // especially tests are not respecting the array format ...
         editor_Utils::ensureFieldsAreArrays($this->data, ['customerIds', 'customerUseAsDefaultIds', 'customerWriteAsDefaultIds', 'customerPivotAsDefaultIds']);
 
-        //check and save customer assoc db entry
-        $customerAssoc = ZfExtended_Factory::get('editor_Models_LanguageResources_CustomerAssoc');
-
-        /* @var editor_Models_LanguageResources_CustomerAssoc $customerAssoc */
         try {
-            $customerAssoc->saveAssocRequest((int) $this->entity->getId(), $this->data);
+            CustomerAssocService::create()->updateAssociations(
+                AssociationFormValues::fromArray(
+                    (int) $this->entity->getId(),
+                    $this->data
+                )
+            );
         } catch (ZfExtended_Models_Entity_Exceptions_IntegrityConstraint $e) {
             $this->entity->delete();
 
@@ -924,8 +927,12 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
                 $this->checkOrCleanCustomerAssociation(true, $this->getDataField('customerIds') ?? []);
             }
 
-            $customerAssoc = ZfExtended_Factory::get('editor_Models_LanguageResources_CustomerAssoc');
-            $customerAssoc->updateAssocRequest((int) $this->entity->getId(), $this->data);
+            CustomerAssocService::create()->updateAssociations(
+                AssociationFormValues::fromArray(
+                    (int) $this->entity->getId(),
+                    $this->data
+                )
+            );
 
             $this->addAssocData();
         }

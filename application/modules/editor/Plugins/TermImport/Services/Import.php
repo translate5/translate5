@@ -29,6 +29,7 @@ use editor_Models_Customer_Customer as Customer;
 use editor_Models_LanguageResources_CustomerAssoc as CustomerAssoc;
 use editor_Models_TermCollection_TermCollection as TermCollection;
 use editor_Models_Terminology_Models_TermModel as Term;
+use MittagQI\Translate5\LanguageResource\CustomerAssoc\CustomerAssocService;
 use MittagQI\Translate5\Plugins\TermImport\DTO\InstructionsDTO;
 use MittagQI\Translate5\Plugins\TermImport\Exception\TermImportException;
 use MittagQI\Translate5\Plugins\TermImport\Service\LoggerService;
@@ -150,10 +151,14 @@ class editor_Plugins_TermImport_Services_Import
      */
     protected $returnMessage = [];
 
+    private CustomerAssocService $customerAssocService;
+
     public function __construct()
     {
         //init profiling
         $this->logProfiling();
+
+        $this->customerAssocService = CustomerAssocService::create();
     }
 
     /***
@@ -414,7 +419,7 @@ class editor_Plugins_TermImport_Services_Import
         $customer = ZfExtended_Factory::get('editor_Models_Customer_Customer');
         /* @var $customer editor_Models_Customer_Customer */
         $customer->loadByNumber($customerNumber);
-        $customerId = $customer->getId();
+        $customerId = (int) $customer->getId();
 
         $model = ZfExtended_Factory::get('editor_Models_TermCollection_TermCollection');
         /* @var $model editor_Models_TermCollection_TermCollection */
@@ -432,7 +437,7 @@ class editor_Plugins_TermImport_Services_Import
             if (! in_array($customerId, $customers)) {
                 $customers[] = $customerId;
                 //add the customer to the assoc table for the term collection
-                $customerAssoc->addAssocs($tc['id'], [$customerId]);
+                $this->customerAssocService->associate((int) $tc['id'], $customerId);
             }
 
             return [
@@ -444,7 +449,9 @@ class editor_Plugins_TermImport_Services_Import
         }
 
         //create new term collection/language resource
-        $collection = $model->create($collectionName, [$customerId]);
+        $collection = $model->create($collectionName);
+
+        $this->customerAssocService->associate((int) $collection->getId(), $customerId);
 
         return [
             'collectionId' => $collection->getId(),
@@ -568,7 +575,7 @@ class editor_Plugins_TermImport_Services_Import
         /* @var $customer Customer */
         $customer = ZfExtended_Factory::get(Customer::class);
         $customer->loadByNumber($customerNumber);
-        $customerId = $customer->getId();
+        $customerId = (int) $customer->getId();
 
         /* @var $termCollection TermCollection */
         $termCollection = ZfExtended_Factory::get(TermCollection::class);
@@ -584,15 +591,17 @@ class editor_Plugins_TermImport_Services_Import
             // Add [termCollection <=> customer] assoc, if need
             if (! in_array($customerId, $customers)) {
                 $customers[] = $customerId;
-                $customerAssoc->addAssocs($termCollectionI['id'], [$customerId]);
+                $this->customerAssocService->associate((int) $termCollectionI['id'], $customerId);
             }
 
             // Else
         } else {
             // Create new term collection/language resource
             $termCollectionI = $termCollection
-                ->create($termCollectionName, $customers = [$customerId])
+                ->create($termCollectionName)
                 ->toArray();
+
+            $this->customerAssocService->associate((int) $termCollectionI['id'], $customerId);
         }
 
         // Return param for tbx import

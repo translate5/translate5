@@ -30,53 +30,17 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\LanguageResource;
 
-use editor_Models_LanguageResources_CustomerAssoc as CustomerAssoc;
+use editor_Models_Customer_Customer as Customer;
 use ZfExtended_Factory;
 use ZfExtended_Models_Entity_NotFoundException;
 
-class LanguageResourceCustomerAssocRepository
+class CustomerRepository
 {
     /**
      * @throws ZfExtended_Models_Entity_NotFoundException
      */
-    public function getByLanguageResourceAndCustomer(int $languageResourceId, int $customerId): CustomerAssoc
+    public function getDefaultCustomer(): Customer
     {
-        $customerAssoc = ZfExtended_Factory::get(CustomerAssoc::class);
-
-        $select = $customerAssoc->db
-            ->select()
-            ->where('languageResourceId = ?', $languageResourceId)
-            ->where('customerId = ?', $customerId)
-        ;
-
-        $row = $customerAssoc->db->fetchRow($select);
-
-        if (null === $row) {
-            throw new ZfExtended_Models_Entity_NotFoundException(
-                sprintf(
-                    'LanguageResourceCustomerAssoc with `languageResourceId` = %s and `customerId` = %s not found',
-                    $languageResourceId,
-                    $customerId
-                )
-            );
-        }
-
-        $customerAssoc->hydrate($row);
-
-        return $customerAssoc;
-    }
-
-    /**
-     * @return iterable<CustomerAssoc>
-     */
-    public function getByLanguageResource(int $languageResourceId): iterable
-    {
-        $customerAssoc = ZfExtended_Factory::get(CustomerAssoc::class);
-
-        foreach ($customerAssoc->loadByLanguageResourceId($languageResourceId) as $row) {
-            $customerAssoc->hydrate($row);
-
-            yield clone $customerAssoc;
-        }
+        return ZfExtended_Factory::get(Customer::class)->loadByDefaultCustomer();
     }
 }

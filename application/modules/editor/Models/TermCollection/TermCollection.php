@@ -63,7 +63,7 @@ class editor_Models_TermCollection_TermCollection extends editor_Models_Language
     /**
      * Create new term collection and return the id.
      */
-    public function create(string $name, array $customers): editor_Models_TermCollection_TermCollection
+    public function create(string $name): editor_Models_TermCollection_TermCollection
     {
         $this->setName($name);
 
@@ -79,13 +79,7 @@ class editor_Models_TermCollection_TermCollection extends editor_Models_Language
         $this->setColor($service::DEFAULT_COLOR);
         $this->setResourceType(editor_Models_Segment_MatchRateType::TYPE_TERM_COLLECTION);
         $this->createLangResUuid();
-        $resourceId = $this->save();
-
-        if (! empty($customers)) {
-            $customerAssoc = ZfExtended_Factory::get('editor_Models_LanguageResources_CustomerAssoc');
-            /* @var $customerAssoc editor_Models_LanguageResources_CustomerAssoc */
-            $customerAssoc->addAssocs($resourceId, $customers);
-        }
+        $this->save();
 
         return $this;
     }

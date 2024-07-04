@@ -26,6 +26,8 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\LanguageResource\CustomerAssoc\CustomerAssocService;
+
 /***
  *
  */
@@ -59,8 +61,11 @@ class editor_TermcollectionController extends ZfExtended_RestController
 
         if ($this->validate()) {
             $customerIds = explode(',', $this->data->customerIds);
-            $collection = $this->entity->create($this->data->name, $customerIds);
-            $this->entity->setId($collection->getId());
+            $collection = $this->entity->create($this->data->name);
+
+            CustomerAssocService::create()->associateCustomers((int) $collection->getId(), $customerIds);
+
+            $this->entity->setId((int) $collection->getId());
             $this->view->rows = $this->entity->getDataObject();
         }
     }

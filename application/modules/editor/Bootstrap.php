@@ -32,6 +32,7 @@ use MittagQI\Translate5\Acl\TaskCustomField;
 use MittagQI\Translate5\Applet\AppletAbstract;
 use MittagQI\Translate5\Applet\Dispatcher;
 use MittagQI\Translate5\DbConfig\ActionsEventHandler;
+use MittagQI\Translate5\LanguageResource\CrossSynchronization\Events\EventListener;
 use MittagQI\Translate5\Segment\UpdateLanguageResourcesWorker;
 use MittagQI\Translate5\Service\SystemCheck;
 use MittagQI\Translate5\Task\Import\DanglingImportsCleaner;
@@ -61,6 +62,8 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
         //Binding the worker clean up to the after import event, since import
         // is currently the main use case for workers
         $eventManager = Zend_EventManager_StaticEventManager::getInstance();
+
+        EventListener::create($eventManager)->attachAll();
 
         $cleanUp = function () {
             // first clean up jobs

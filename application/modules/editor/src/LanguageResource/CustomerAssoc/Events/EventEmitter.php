@@ -28,10 +28,9 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\LanguageResource\CrossSynchronization\Events;
+namespace MittagQI\Translate5\LanguageResource\CustomerAssoc\Events;
 
 use editor_Models_LanguageResources_CustomerAssoc as Association;
-use MittagQI\Translate5\LanguageResource\CrossSynchronization\CrossSynchronizationConnection;
 use ZfExtended_EventManager;
 use ZfExtended_Factory;
 
@@ -47,37 +46,17 @@ class EventEmitter
         return new self(ZfExtended_Factory::get(ZfExtended_EventManager::class, [self::class]));
     }
 
-    public function triggerConnectionCreatedEvent(CrossSynchronizationConnection $connection): void
+    public function triggerAssociationCreatedEvent(Association $assoc): void
     {
-        $this->eventManager->trigger(EventType::ConnectionCreated->value, argv: [
-            'connection' => $connection,
+        $this->eventManager->trigger(EventType::AssociationCreated->value, argv: [
+            'association' => $assoc,
         ]);
     }
 
-    public function triggerConnectionDeleted(CrossSynchronizationConnection $deletedConnection): void
+    public function triggerAssociationDeleted(Association $assoc): void
     {
-        $this->eventManager->trigger(EventType::ConnectionDeleted->value, argv: [
-            'deletedConnection' => $deletedConnection,
-        ]);
-    }
-
-    public function triggerNewCustomerAssociatedWithConnectionEvent(
-        CrossSynchronizationConnection $connection,
-        Association $association
-    ): void {
-        $this->eventManager->trigger(EventType::NewCustomerAssociatedWithConnection->value, argv: [
-            'connection' => $connection,
-            'association' => $association,
-        ]);
-    }
-
-    public function triggerCustomerWasSeparatedFromConnectionEvent(
-        CrossSynchronizationConnection $connection,
-        Association $deletedAssociation
-    ): void {
-        $this->eventManager->trigger(EventType::CustomerWasSeparatedFromConnection->value, argv: [
-            'connection' => $connection,
-            'deletedAssociation' => $deletedAssociation,
+        $this->eventManager->trigger(EventType::AssociationDeleted->value, argv: [
+            'deletedAssociation' => $assoc,
         ]);
     }
 }

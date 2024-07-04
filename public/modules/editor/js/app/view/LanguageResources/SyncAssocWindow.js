@@ -70,9 +70,10 @@ Ext.define('Editor.view.LanguageResources.SyncAssocWindow', {
                 },
                 {
                     xtype: 'button',
-                    glyph: 'f2f1@FontAwesome5FreeSolid',
-                    text: 'Add',
-                    handler: 'onAddAssociation'
+                    glyph: 'f0c1@FontAwesome5FreeSolid',
+                    text: 'Connect',
+                    handler: 'onAddAssociation',
+                    margin: '5 0',
                 },
                 {
                     xtype: 'tbspacer',
@@ -80,8 +81,9 @@ Ext.define('Editor.view.LanguageResources.SyncAssocWindow', {
                 },
                 {
                     xtype: 'button',
-                    text: 'Connect to all available resources',
-                    handler: 'onConnectToAllAvailableResources'
+                    text: 'Connect all available',
+                    handler: 'onConnectToAllAvailableResources',
+                    margin: '5 0',
                 }
             ]
         },
@@ -93,8 +95,18 @@ Ext.define('Editor.view.LanguageResources.SyncAssocWindow', {
                 type: 'LanguageResources.SyncAssoc'
             },
             columns: [
-                { text: 'Source Language Resource', dataIndex: 'sourceLanguageResourceName', flex: 1 },
-                { text: 'Target Language Resource', dataIndex: 'targetLanguageResourceName', flex: 1 },
+                {
+                    text: 'Source Language Resource',
+                    dataIndex: 'sourceLanguageResourceName',
+                    flex: 1,
+                    renderer: v => Ext.String.htmlEncode(v)
+                },
+                {
+                    text: 'Target Language Resource',
+                    dataIndex: 'targetLanguageResourceName',
+                    flex: 1,
+                    renderer: v => Ext.String.htmlEncode(v)
+                },
                 {
                     xtype: 'actioncolumn',
                     width: 50,
