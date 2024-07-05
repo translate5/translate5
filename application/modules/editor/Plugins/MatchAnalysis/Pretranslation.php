@@ -61,9 +61,7 @@ class editor_Plugins_MatchAnalysis_Pretranslation
     protected $userName;
 
     /***
-     * Collection of assigned languageResource resources types where key is languageResourceid and resource type is the value
-     *
-     * @var array
+     * @var array<int, editor_Models_LanguageResources_LanguageResource>
      */
     protected $resources = [];
 
@@ -99,7 +97,7 @@ class editor_Plugins_MatchAnalysis_Pretranslation
      * Collection of assigned resources to the task
      * @var array
      */
-    protected $connectors = [];
+    private $connectors = [];
 
     /***
      * Pretranslation mt connectors(the mt resources associated to a task)
@@ -140,6 +138,46 @@ class editor_Plugins_MatchAnalysis_Pretranslation
     public static function renderDummyTargetText($taskGuid)
     {
         return "translate5-unique-id[" . $taskGuid . "]";
+    }
+
+    protected function addConnector(int $languageResourceid, editor_Services_Connector $connector)
+    {
+        if (! isset($this->connectors[$languageResourceid])) {
+            $this->connectors[$languageResourceid] = [];
+        }
+
+        $this->connectors[$languageResourceid][] = $connector;
+    }
+
+    /**
+     * @return iterable<int, editor_Services_Connector>
+     */
+    protected function getConnectorsIterator(): iterable
+    {
+        foreach ($this->connectors as $languageResourceId => $connectors) {
+            foreach ($connectors as $connector) {
+                yield $languageResourceId => $connector;
+            }
+        }
+    }
+
+    protected function hasConnectors(): bool
+    {
+        return ! empty($this->connectors);
+    }
+
+    protected function emptyConnectors(): void
+    {
+        $this->connectors = [];
+    }
+
+    private function getFirstConnector(int $languageResourceId): ?editor_Services_Connector
+    {
+        if (! isset($this->connectors[$languageResourceId])) {
+            return null;
+        }
+
+        return $this->connectors[$languageResourceId][0];
     }
 
     /**
@@ -233,12 +271,12 @@ class editor_Plugins_MatchAnalysis_Pretranslation
         $segment->setMatchRateType((string) $matchrateType);
 
         $segment->setAutoStateId($this->autoStates->calculatePretranslationState($segment->isEditable()));
-        //a segment is only pretranslated if it contains content
+        //a segment is only pre-translated if it contains content
         $segment->setPretrans($hasText ? $segment::PRETRANS_INITIAL : $segment::PRETRANS_NOTDONE);
 
         //check if the result is valid for log
-        if ($this->isResourceLogValid($languageResource, $segment->getMatchRate())) {
-            $this->connectors[$languageResourceid]->logAdapterUsage($segment, $isRepetition);
+        if ($this->isResourceLogValid($languageResource, (int) $segment->getMatchRate())) {
+            $this->getFirstConnector($languageResourceid)?->logAdapterUsage($segment, $isRepetition);
         }
 
         $segment->set($segmentField, $targetResult); //use sfm->getFirstTargetName here
@@ -275,33 +313,6 @@ class editor_Plugins_MatchAnalysis_Pretranslation
             'languageResourceId' => $languageResourceid,
             'result' => $result,
         ]);
-    }
-
-    /***
-     * Init the task user assocition if exist. If not a default record will be initialized
-     * @return editor_Models_TaskUserAssoc
-     */
-    protected function initUsertTaskAssoc()
-    {
-        if ($this->userTaskAssoc) {
-            return $this->userTaskAssoc;
-        }
-
-        try {
-            $this->userTaskAssoc = editor_Models_Loaders_Taskuserassoc::loadByTaskForceWorkflowRole($this->userGuid, $this->task);
-        } catch (ZfExtended_Models_Entity_NotFoundException $e) {
-            $this->userTaskAssoc = ZfExtended_Factory::get('editor_Models_TaskUserAssoc');
-            $this->userTaskAssoc->setUserGuid($this->userGuid);
-            $this->userTaskAssoc->setTaskGuid($this->task->getTaskGuid());
-            $this->userTaskAssoc->setWorkflow($this->task->getWorkflow());
-            $this->userTaskAssoc->setWorkflowStepName('');
-            $this->userTaskAssoc->setRole('');
-            $this->userTaskAssoc->setState('');
-            $this->userTaskAssoc->setIsPmOverride(true);
-            $this->userTaskAssoc->setUsedInternalSessionUniqId(null);
-            $this->userTaskAssoc->setUsedState(null);
-            $this->userTaskAssoc->setState(editor_Workflow_Default::STATE_EDIT);
-        }
     }
 
     /***

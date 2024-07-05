@@ -646,9 +646,8 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
                 $this->addConnector((int) $languageResource->getId(), $connector);
 
                 if ($this->internalFuzzy) {
-                    $this->addInternalFuzzyConnector($languageResource);
+                    $this->addConnector((int) $languageResource->getId(), $this->initFuzzyConnector($connector));
                 }
-
             } catch (Exception $e) {
                 //FIXME this try catch should not be needed anymore, after refactoring of December 2020
 
@@ -657,27 +656,22 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
         }
     }
 
-    private function addInternalFuzzyConnector(LanguageResource $languageResource): void
+    private function initFuzzyConnector(editor_Services_Connector $connector): editor_Services_Connector
     {
         try {
-            $this->addConnector(
-                (int) $languageResource->getId(),
-                $this->getInternalFuzzyConnector($languageResource)
-            );
-        } catch (editor_Services_Exceptions_NoConnector) {
-            // if the internal fuzzy connector not exist,
-            // we ignore it and continue with only normal connector
+            $fuzzyConnector = $connector->initForFuzzyAnalysis($this->analysisId);
         } catch (Exception $e) {
+            $fuzzyConnector = clone $connector;
+            //the whole connector must be invalidated and the problem must be logged.
+            $fuzzyConnector->disable();
             $this->log->exception($e);
-            $this->log->error(
-                'E1371',
-                'Internal Fuzzy language resource could not be created. Check log for previous errors.',
-                [
-                    'task' => $this->task,
-                    'languageResource' => $languageResource,
-                ]
-            );
+            $this->log->error('E1371', 'Internal Fuzzy language resource could not be created. Check log for previous errors.', [
+                'task' => $this->task,
+                'languageResource' => $connector->getLanguageResource(),
+            ]);
         }
+
+        return $fuzzyConnector;
     }
 
     private function handleConnectorCreationException(Exception $e, LanguageResource $languageResource): void
@@ -718,25 +712,6 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
             $this->task->getSourceLang(),
             $this->task->getTargetLang(),
             $this->task->getConfig()
-        );
-
-        // set the analysis running user to the connector
-        $connector->setWorkerUserGuid($this->userGuid);
-
-        return $connector;
-    }
-
-    /**
-     * @throws editor_Services_Exceptions_NoConnector
-     */
-    private function getInternalFuzzyConnector(LanguageResource $languageResource): editor_Services_Connector
-    {
-        $connector = $this->manager->getInternalFuzzyConnector(
-            $languageResource,
-            $this->task->getSourceLang(),
-            $this->task->getTargetLang(),
-            $this->task->getConfig(),
-            $this->analysisId
         );
 
         // set the analysis running user to the connector
