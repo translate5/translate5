@@ -26,12 +26,15 @@
  END LICENSE AND COPYRIGHT
  */
 
+use editor_Models_LanguageResources_LanguageResource as LanguageResource;
 use MittagQI\Translate5\LanguageResource\Adapter\Exception\SegmentUpdateException;
+use MittagQI\Translate5\LanguageResource\Status;
 
 /**
  * After importing a task a match analysis will be created based on the assigned TM based MatchRessources.
- * To get the analysis results, each segment is send to the assigned MatchRessources. For each queried Sprachressource the received best match rate is stored in a separate DB table.
- * Out of this table all desired analysis are calculated.
+ * To get the analysis results, each segment is send to the assigned MatchRessources. For each queried Sprachressource
+ * the received best match rate is stored in a separate DB table. Out of this table all desired analysis are
+ * calculated.
  */
 class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis_Pretranslation
 {
@@ -82,6 +85,8 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
      */
     protected $repetitionUpdater;
 
+    private editor_Services_Manager $manager;
+
     /**
      * @param integer $analysisId
      */
@@ -90,13 +95,17 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
         $this->task = $task;
         $this->analysisId = $analysisId;
         $this->sfm = editor_Models_SegmentFieldManager::getForTaskGuid($task->getTaskGuid());
+        $this->manager = ZfExtended_Factory::get(editor_Services_Manager::class);
+
         parent::__construct($analysisId);
     }
 
     /**
-     * Query the language resource service for each segment, calculate the best match rate, and save the match analysis model
+     * Query the language resource service for each segment, calculate the best match rate, and save the match analysis
+     * model
      *
-     * @param Closure|null $progressCallback : call to update the workerModel progress. It expects progress as argument (progress = 100 / task segment count)
+     * @param Closure|null $progressCallback : call to update the workerModel progress. It expects progress as argument
+     *     (progress = 100 / task segment count)
      * @return boolean
      */
     public function analyseAndPretranslate(Closure $progressCallback = null): bool
@@ -109,7 +118,7 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
 
         $this->initConnectors();
 
-        if (empty($this->connectors)) {
+        if (empty($this->hasConnectors())) {
             return false;
         }
         $this->initRepetitions();
@@ -314,8 +323,8 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
     }
 
     /**
-     * Get best result (best matchrate) for the segment. If $saveAnalysis is provided, for each best match rate for the tm,
-     * one analysis will be saved
+     * Get best result (best matchrate) for the segment. If $saveAnalysis is provided, for each best match rate for the
+     * tm, one analysis will be saved
      */
     protected function getBestResult(editor_Models_Segment $segment, bool $saveAnalysis = true): ?stdClass
     {
@@ -323,7 +332,7 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
         $bestMatchRate = null;
 
         //query the segment for each assigned tm
-        foreach ($this->connectors as $languageResourceid => $connector) {
+        foreach ($this->getConnectorsIterator() as $languageResourceid => $connector) {
             /* @var $connector editor_Services_Connector */
 
             if ($this->isDisabledDueErrors($connector, $languageResourceid)) {
@@ -445,14 +454,11 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
 
     /**
      * Checks how many errors the connector has produced. If too much, disable it.
-     * @param mixed $connector
-     * @param integer $id
-     * @return boolean
      */
-    protected function isDisabledDueErrors($connector, $id)
+    protected function isDisabledDueErrors(editor_Services_Connector $connector, int $id): bool
     {
         //check if the connector itself is disabled
-        if ($this->connectors[$id]->isDisabled()) {
+        if ($connector->isDisabled()) {
             return true;
         }
 
@@ -460,14 +466,18 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
             return false;
         }
 
-        $langRes = $connector->getLanguageResource();
-        $this->log->warn('E1101', 'Disabled Language Resource {name} ({service}) for analysing and pretranslation due too much errors.', [
-            'task' => $this->task,
-            'languageResource' => $langRes,
-            'name' => $langRes->getName(),
-            'service' => $langRes->getServiceName(),
-        ]);
-        $this->connectors[$id]->disable();
+        $connector->disable();
+
+        $this->log->warn(
+            'E1101',
+            'Disabled Language Resource {name} ({service}) for analysing and pretranslation due too much errors.',
+            [
+                'task' => $this->task,
+                'languageResource' => $this->resources[$id],
+                'name' => $this->resources[$id]->getName(),
+                'service' => $this->resources[$id]->getServiceName(),
+            ]
+        );
 
         return true;
     }
@@ -574,136 +584,177 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
         $this->repetitionMasterSegments = [];
     }
 
-    /***
-     * Init the languageResource connectiors
-     *
-     * @return array
-     */
-    protected function initConnectors()
+    protected function initConnectors(): void
     {
-        $languageResources = ZfExtended_Factory::get('editor_Models_LanguageResources_LanguageResource');
-        /* @var $languageResources editor_Models_LanguageResources_LanguageResource */
-        $assocs = $languageResources->loadByAssociatedTaskGuid($this->task->getTaskGuid());
+        $languageResources = ZfExtended_Factory::get(LanguageResource::class);
+        $languageResourceIds = array_column(
+            $languageResources->loadByAssociatedTaskGuid($this->task->getTaskGuid()),
+            'id'
+        );
 
-        $availableConnectorStatus = [
-            editor_Services_Connector_Abstract::STATUS_AVAILABLE,
-            //NOT_LOADED must be also considered as AVAILABLE, since OpenTM2 Tms are basically not loaded and therefore we can not decide if they are usable or not
-            editor_Services_Connector_FilebasedAbstract::STATUS_NOT_LOADED,
-        ];
-
-        if (empty($assocs)) {
-            return [];
+        if (empty($languageResourceIds)) {
+            return;
         }
 
-        foreach ($assocs as $assoc) {
-            $languageresource = ZfExtended_Factory::get('editor_Models_LanguageResources_LanguageResource');
-            /* @var $languageresource editor_Models_LanguageResources_LanguageResource */
+        $availableConnectorStatus = [
+            Status::AVAILABLE,
+            // NOT_LOADED must be also considered as AVAILABLE,
+            // since OpenTM2 Tms are basically not loaded and therefore we can not decide if they are usable or not
+            Status::NOT_LOADED,
+        ];
 
-            $languageresource->load($assoc['id']);
+        foreach ($languageResourceIds as $languageResourceId) {
+            $languageResource = ZfExtended_Factory::get(LanguageResource::class);
+            $languageResource->load((int) $languageResourceId);
 
-            $manager = ZfExtended_Factory::get('editor_Services_Manager');
-            /* @var $manager editor_Services_Manager */
-            $resource = $manager->getResource($languageresource);
-
-            $connector = null;
-
-            try {
-                $connector = $manager->getConnector($languageresource, $this->task->getSourceLang(), $this->task->getTargetLang(), $this->task->getConfig());
-
-                // set the analysis running user to the connector
-                $connector->setWorkerUserGuid($this->userGuid);
-
-                //throw a warning if the language resource is not available
-                $status = $connector->getStatus($resource, $languageresource);
-                if (! in_array($status, $availableConnectorStatus)) {
-                    $this->log->warn('E1239', 'MatchAnalysis Plug-In: Language resource "{name}" has status "{status}" and is not available for match analysis and pre-translations.', [
-                        'task' => $this->task,
-                        'name' => $languageresource->getName(),
-                        'status' => $status,
-                        'moreInfo' => $connector->getLastStatusInfo(),
-                        'languageResource' => $languageresource,
-                    ]);
-
-                    continue;
-                }
-                //collect the mt resource, so it can be used for pretranslations if needed
-                //collect only if it has matchrate >= of the current set pretranslationMatchrate
-                if ($resource->getType() == editor_Models_Segment_MatchRateType::TYPE_MT) {
-                    $this->mtConnectors[] = $connector;
-                }
-                //store the languageResource
-                $this->resources[$languageresource->getId()] = $languageresource;
-            } catch (Exception $e) {
-                //FIXME this try catch should not be needed anymore, after refactoring of December 2020
-
-                $errors = [];
-                //if the exception is of type ZfExtended_ErrorCodeException, get the additional exception info, and log it
-                if ($e instanceof ZfExtended_ErrorCodeException) {
-                    $errors = $e->getErrors() ?? [];
-                }
-                $this->log->warn('E1102', 'Unable to use connector from Language Resource "{name}". Error was: "{msg}".', array_merge([
-                    'task' => $this->task,
-                    'name' => $languageresource->getName(),
-                    'msg' => $e->getMessage(),
-                    'languageResource' => $languageresource,
-                ], $errors));
-                $this->log->exception($e, [
-                    'level' => $this->log::LEVEL_WARN,
-                    'domain' => $this->log->getDomain(),
-                    'extra' => [
-                        'task' => $this->task,
-                    ],
-                ]);
-
-                continue;
-            }
+            $resource = $this->manager->getResource($languageResource);
 
             //ignore non analysable resources
             if (! $resource->getAnalysable()) {
                 continue;
             }
 
-            $this->connectors[$assoc['id']] = [];
+            //store the languageResource
+            $this->resources[$languageResource->getId()] = $languageResource;
 
-            //if internal fuzzy is active and the connector supports the internal fuzzy calculation, get the fuzzy connector
-            if ($this->internalFuzzy) {
-                $this->connectors[$assoc['id']] = $this->initFuzzyConnector($connector);
-            } else {
-                $this->connectors[$assoc['id']] = $connector;
+            try {
+                $connector = $this->getConnector($languageResource);
+
+                $status = $connector->getStatus($resource, $languageResource);
+
+                if (! in_array($status, $availableConnectorStatus)) {
+                    $this->log->warn(
+                        'E1239',
+                        'MatchAnalysis Plug-In: Language resource "{name}" has status "{status}" and is not available for match analysis and pre-translations.',
+                        [
+                            'task' => $this->task,
+                            'name' => $languageResource->getName(),
+                            'status' => $status,
+                            'moreInfo' => $connector->getLastStatusInfo(),
+                            'languageResource' => $languageResource,
+                        ]
+                    );
+
+                    continue;
+                }
+
+                // collect the mt resource, so it can be used for pre-translations if needed
+                if ($resource->getType() == editor_Models_Segment_MatchRateType::TYPE_MT) {
+                    $this->mtConnectors[] = $connector;
+                }
+
+                $this->addConnector((int) $languageResource->getId(), $connector);
+
+                if ($this->internalFuzzy) {
+                    $this->addInternalFuzzyConnector($languageResource);
+                }
+
+            } catch (Exception $e) {
+                //FIXME this try catch should not be needed anymore, after refactoring of December 2020
+
+                $this->handleConnectorCreationException($e, $languageResource);
             }
         }
-
-        return $this->connectors;
     }
 
-    protected function initFuzzyConnector(editor_Services_Connector $connector): editor_Services_Connector
+    private function addInternalFuzzyConnector(LanguageResource $languageResource): void
     {
         try {
-            $fuzzyConnector = $connector->initForFuzzyAnalysis($this->analysisId);
+            $this->addConnector(
+                (int) $languageResource->getId(),
+                $this->getInternalFuzzyConnector($languageResource)
+            );
+        } catch (editor_Services_Exceptions_NoConnector) {
+            // if the internal fuzzy connector not exist,
+            // we ignore it and continue with only normal connector
         } catch (Exception $e) {
-            $fuzzyConnector = clone $connector;
-            //the whole connector must be invalidated and the problem must be logged.
-            $fuzzyConnector->disable();
             $this->log->exception($e);
-            $this->log->error('E1371', 'Internal Fuzzy language resource could not be created. Check log for previous errors.', [
-                'task' => $this->task,
-                'languageResource' => $connector->getLanguageResource(),
-            ]);
+            $this->log->error(
+                'E1371',
+                'Internal Fuzzy language resource could not be created. Check log for previous errors.',
+                [
+                    'task' => $this->task,
+                    'languageResource' => $languageResource,
+                ]
+            );
+        }
+    }
+
+    private function handleConnectorCreationException(Exception $e, LanguageResource $languageResource): void
+    {
+        $errors = [];
+        //if the exception is of type ZfExtended_ErrorCodeException, get the additional exception info, and log it
+        if ($e instanceof ZfExtended_ErrorCodeException) {
+            $errors = $e->getErrors() ?? [];
         }
 
-        return $fuzzyConnector;
+        $this->log->warn(
+            'E1102',
+            'Unable to use connector from Language Resource "{name}". Error was: "{msg}".',
+            array_merge(
+                [
+                    'task' => $this->task,
+                    'name' => $languageResource->getName(),
+                    'msg' => $e->getMessage(),
+                    'languageResource' => $languageResource,
+                ],
+                $errors
+            )
+        );
+
+        $this->log->exception($e, [
+            'level' => $this->log::LEVEL_WARN,
+            'domain' => $this->log->getDomain(),
+            'extra' => [
+                'task' => $this->task,
+            ],
+        ]);
+    }
+
+    private function getConnector(LanguageResource $languageResource): editor_Services_Connector
+    {
+        $connector = $this->manager->getConnector(
+            $languageResource,
+            $this->task->getSourceLang(),
+            $this->task->getTargetLang(),
+            $this->task->getConfig()
+        );
+
+        // set the analysis running user to the connector
+        $connector->setWorkerUserGuid($this->userGuid);
+
+        return $connector;
+    }
+
+    /**
+     * @throws editor_Services_Exceptions_NoConnector
+     */
+    private function getInternalFuzzyConnector(LanguageResource $languageResource): editor_Services_Connector
+    {
+        $connector = $this->manager->getInternalFuzzyConnector(
+            $languageResource,
+            $this->task->getSourceLang(),
+            $this->task->getTargetLang(),
+            $this->task->getConfig(),
+            $this->analysisId
+        );
+
+        // set the analysis running user to the connector
+        $connector->setWorkerUserGuid($this->userGuid);
+
+        return $connector;
     }
 
     /***
-     * Remove fuzzy resources from the opentm2
+     * Remove fuzzy resources from the TMs
      */
-    protected function removeFuzzyResources()
+    protected function removeFuzzyResources(): void
     {
-        if (empty($this->connectors)) {
+        if (! $this->hasConnectors()) {
             return;
         }
 
-        foreach ($this->connectors as $connector) {
+        foreach ($this->getConnectorsIterator() as $connector) {
             if ($connector->isInternalFuzzy()) {
                 $connector->delete();
             }
@@ -713,11 +764,10 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
     /***
      * Remove not required analysis object and data
      */
-    public function clean()
+    public function clean(): void
     {
-        //remove fuzzy languageResource from opentm2
         $this->removeFuzzyResources();
-        $this->connectors = null;
+        $this->emptyConnectors();
     }
 
     /**
