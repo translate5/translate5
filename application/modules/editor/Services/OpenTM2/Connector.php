@@ -187,8 +187,11 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
      * Updates the filename of the language resource instance with the filename coming from the TM system
      * @throws Zend_Exception
      */
-    protected function addMemoryToLanguageResource(LanguageResource $languageResource, string $tmName): void
-    {
+    protected function addMemoryToLanguageResource(
+        LanguageResource $languageResource,
+        string $tmName,
+        bool $isInternalFuzzy = false
+    ): void {
         $prefix = Zend_Registry::get('config')->runtimeOptions->LanguageResources->opentm2->tmprefix;
         if (! empty($prefix)) {
             //remove the prefix from being stored into the TM
@@ -213,7 +216,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
 
         $languageResource->addSpecificData('memories', $memories);
 
-        if (! $this->isInternalFuzzy()) {
+        if (! $isInternalFuzzy) {
             //saving it here makes the TM available even when the TMX import was crashed
             $languageResource->save();
         }
@@ -907,9 +910,9 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
         $fuzzyLanguageResource->addSpecificData('memories', null);
 
         $this->api->setResource($fuzzyLanguageResource->getResource());
-        $this->api->createMemory($fuzzyLanguageResourceName, $this->languageResource->getSourceLangCode(), null);
+        $this->api->createEmptyMemory($fuzzyLanguageResourceName, $this->languageResource->getSourceLangCode());
 
-        $this->addMemoryToLanguageResource($fuzzyLanguageResource, $fuzzyLanguageResourceName);
+        $this->addMemoryToLanguageResource($fuzzyLanguageResource, $fuzzyLanguageResourceName, true);
 
         //INFO: The resources logging requires resource with valid id.
         //$fuzzyLanguageResource->setId(null);

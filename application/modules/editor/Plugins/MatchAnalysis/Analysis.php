@@ -88,6 +88,12 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
     private editor_Services_Manager $manager;
 
     /**
+     * Language resource -> Connector
+     * @var array<int, editor_Services_Connector>
+     */
+    private array $internalFuzzyConnectorMap = [];
+
+    /**
      * @param integer $analysisId
      */
     public function __construct(editor_Models_Task $task, $analysisId)
@@ -332,10 +338,8 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
         $bestMatchRate = null;
 
         //query the segment for each assigned tm
-        foreach ($this->getConnectorsIterator() as $languageResourceid => $connector) {
-            /* @var $connector editor_Services_Connector */
-
-            if ($this->isDisabledDueErrors($connector, $languageResourceid)) {
+        foreach ($this->getConnectorsIterator() as $languageResourceId => $connector) {
+            if ($this->isDisabledDueErrors($connector, $languageResourceId)) {
                 continue;
             }
 
@@ -345,12 +349,12 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
             }
 
             $connector->resetResultList();
-            $isMtResource = $this->resources[$languageResourceid]->getResourceType() == editor_Models_Segment_MatchRateType::TYPE_MT;
+            $isMtResource = $this->resources[$languageResourceId]->getResourceType() == editor_Models_Segment_MatchRateType::TYPE_MT;
 
             try {
                 $matches = $this->getMatches($connector, $segment, $isMtResource);
             } catch (Exception $e) {
-                $this->handleConnectionError($e, $languageResourceid);
+                $this->handleConnectionError($e, $languageResourceId);
                 // in case of an error we produce an empty result container for that query and log the error so that the analysis can proceed
                 $matches = ZfExtended_Factory::get('editor_Services_ServiceResult');
             }
@@ -401,13 +405,13 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
                     && ! $isMtResource
                 ) {
                     $bestMatchRateResult = $match;
-                    $bestMatchRateResult->internalLanguageResourceid = $languageResourceid;
+                    $bestMatchRateResult->internalLanguageResourceid = $languageResourceId;
                 }
             }
 
             //no match rate is found in the languageResource result
             if ($matchRateInternal->matchrate == null) {
-                $saveAnalysis && $this->saveAnalysis($segment, 0, $languageResourceid);
+                $saveAnalysis && $this->saveAnalysis($segment, 0, $languageResourceId);
                 $matches->resetResult();
 
                 continue;
@@ -420,7 +424,7 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
             }
 
             //save the match analyses if needed
-            $saveAnalysis && $this->saveAnalysis($segment, $matchRateInternal, $languageResourceid);
+            $saveAnalysis && $this->saveAnalysis($segment, $matchRateInternal, $languageResourceId);
 
             //reset the result collection
             $matches->resetResult();
@@ -433,14 +437,16 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
                 $bestMatchRateResult !== null
                 && $bestMatchRateResult->matchrate < 100
                 && $this->internalFuzzy
-                && $connector->isInternalFuzzy()
+                // only segments matched in real TM should be saved in FuzzyTM
+                && ! $connector->isInternalFuzzy()
+                && isset($this->internalFuzzyConnectorMap[$languageResourceId])
             ) {
                 $origTarget = $segment->getTargetEdit();
                 $dummyTargetText = self::renderDummyTargetText($segment->getTaskGuid());
                 $segment->setTargetEdit($dummyTargetText);
 
                 try {
-                    $connector->update($segment);
+                    $this->internalFuzzyConnectorMap[$languageResourceId]->update($segment);
                 } catch (SegmentUpdateException) {
                     // Ignore the error here as we don't care about the result
                 }
@@ -646,7 +652,10 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
                 $this->addConnector((int) $languageResource->getId(), $connector);
 
                 if ($this->internalFuzzy) {
-                    $this->addConnector((int) $languageResource->getId(), $this->initFuzzyConnector($connector));
+                    $fuzzyConnector = $this->initFuzzyConnector($connector);
+
+                    $this->addConnector((int) $languageResource->getId(), $fuzzyConnector);
+                    $this->internalFuzzyConnectorMap[(int) $languageResource->getId()] = $fuzzyConnector;
                 }
             } catch (Exception $e) {
                 //FIXME this try catch should not be needed anymore, after refactoring of December 2020
