@@ -26,6 +26,8 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\ZfExtended\Tools\Markup;
+
 /**
  * Represents an MQM tag
  * this tag "really" represents two image tags wrapping the content
@@ -374,7 +376,7 @@ final class editor_Segment_Mqm_Tag extends editor_Segment_Tag
         if (preg_match(self::PATTERN_INDEX, $src, $matches)) {
             $this->categoryIndex = intval($matches[1]);
         }
-        $this->comment = htmlspecialchars_decode($this->getData('comment'));
+        $this->comment = Markup::unescapeAllQuotes($this->getData('comment'));
 
         return true;
     }

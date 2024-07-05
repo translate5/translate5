@@ -38,62 +38,11 @@ use PHPHtmlParser\Options;
  * It in some kinds is a simpler & easier seriazable version of DOMElement or PHPHtmlParser\Dom
  * The classname-attribute has an own datamodel that resembles it's array nature
  * Expects all string values to be UTF-8 encoded
- * All Attribute-values will be unescaped when setting and rendered escaped that means the internal data is always unescaped
+ * All Attribute-values will be unescaped when setting and rendered escaped that means the internal data is always
+ * unescaped
  */
 class editor_Tag
 {
-    /**
-     * Escapes an CDATA attribute-value according to the HTML-Spec
-     * @param string $text
-     */
-    public static function escapeAttribute($text): string
-    {
-        return static::escapeHTML($text);
-    }
-
-    /**
-     * Unscapes an CDATA attribute-value according to the HTML-Spec, replaces all tabs & newlines with blanks
-     * NOTE that not all HTML attributes are CDATA and thus the using code is responsible not to produce illegal attributes
-     * @param string $text
-     */
-    public static function unescapeAttribute($text): string
-    {
-        if (\ZfExtended_Utils::emptyString($text)) {
-            return '';
-        }
-        $text = str_replace(["\r\n", "\n", "\r", "\t"], ' ', $text);
-
-        return static::unescapeHTML($text);
-    }
-
-    /**
-     * Escapes Markup according to the HTML-Spec
-     * All attributes will be saved with their unescaped values to avoid double-encodings & the like
-     * @param string $text
-     */
-    public static function escapeHTML($text): string
-    {
-        if (\ZfExtended_Utils::emptyString($text)) {
-            return '';
-        }
-
-        return str_replace(['&', '"', '<', '>'], ['&amp;', '&quot;', '&lt;', '&gt;'], $text);
-    }
-
-    /**
-     * Unscapes Markup according to the HTML-Spec
-     * All attributes will be saved with their unescaped values to avoid double-encodings & the like
-     * @param string $text
-     */
-    public static function unescapeHTML($text): string
-    {
-        if (\ZfExtended_Utils::emptyString($text)) {
-            return '';
-        }
-
-        return str_replace(['&quot;', '&lt;', '&gt;', '&amp;'], ['"', '<', '>', '&'], $text);
-    }
-
     /**
      * Enodes our attributes (hashtable) to a json-capable structure
      * @param string[] $attribs
@@ -196,15 +145,17 @@ class editor_Tag
     public static function createAttribute($name, $value = ''): string
     {
         // attribs that do not need to be included when empty
-        if ((\ZfExtended_Utils::emptyString($value) || trim($value) == '') && ($name == 'style' || $name == 'id' || $name == 'class' || substr($name, 0, 2) == 'on')) {
+        if ((Markup::isEmpty($value) || trim($value) === '') &&
+            ($name == 'style' || $name == 'id' || $name == 'class' || substr($name, 0, 2) == 'on')) {
             return '';
         }
         // name-only attribs
-        if ($name == 'controls' || $name == 'autoplay' || $name == 'allowfullscreen' || $name == 'loop' || $name == 'muted' || $name == 'novalidate' || $name == 'playsinline') {
+        if ($name == 'controls' || $name == 'autoplay' || $name == 'allowfullscreen' || $name == 'loop' ||
+            $name == 'muted' || $name == 'novalidate' || $name == 'playsinline') {
             return ' ' . $name;
         }
 
-        return ' ' . $name . '="' . static::escapeAttribute($value) . '"';
+        return ' ' . $name . '="' . Markup::escapeForAttribute($value) . '"';
     }
 
     /**
@@ -297,7 +248,8 @@ class editor_Tag
     }
 
     /**
-     * Unparses an HTML-String to an editor_Tag. If pure text is passed, a text-node will be returned. If markup with multiple tags is returned, only the first tag is returned
+     * Unparses an HTML-String to an editor_Tag. If pure text is passed, a text-node will be returned. If markup with
+     * multiple tags is returned, only the first tag is returned
      * @param string $html
      * @return editor_Tag|null
      */
@@ -402,10 +354,27 @@ class editor_Tag
     /**
      * @var array
      */
-    protected static $singularTypes = ['img', 'input', 'br', 'hr', 'wbr', 'area', 'col', 'embed', 'keygen', 'link', 'meta', 'param', 'source', 'track', 'command']; // TODO: not complete !
+    protected static $singularTypes = [
+        'img',
+        'input',
+        'br',
+        'hr',
+        'wbr',
+        'area',
+        'col',
+        'embed',
+        'keygen',
+        'link',
+        'meta',
+        'param',
+        'source',
+        'track',
+        'command',
+    ]; // TODO: not complete !
 
     /**
-     * QUIRK: The blank before the space is against the HTML-Spec and superflous BUT termtagger does double img-tags if they do not have a blank before the trailing slash ...
+     * QUIRK: The blank before the space is against the HTML-Spec and superflous BUT termtagger does double img-tags if
+     * they do not have a blank before the trailing slash ...
      * @var string
      */
     protected static $selfClosingMarker = ' /';
@@ -453,8 +422,8 @@ class editor_Tag
 
     /**
      * Adds a child-node. Returns the success of the action
-     * @throws Exception
      * @return boolean
+     * @throws Exception
      */
     public function addChild(editor_Tag $child): bool
     {
@@ -768,13 +737,14 @@ class editor_Tag
         if ($name == 'class') {
             return $this->setClasses($val);
         }
-        $this->attribs[$name] = static::unescapeAttribute(trim($val));
+        $this->attribs[$name] = Markup::unescapeFromAttribute(trim($val));
 
         return $this;
     }
 
     /**
-     * Sets an attribute with the given name to the RAW given value without escaping. An existing attribute will be overwritten
+     * Sets an attribute with the given name to the RAW given value without escaping. An existing attribute will be
+     * overwritten
      * @param string $name
      * @param string $val
      */
@@ -811,7 +781,7 @@ class editor_Tag
         if ($name == '') {
             return $this;
         }
-        $this->attribs['data-' . $name] = static::unescapeAttribute(trim($val));
+        $this->attribs['data-' . $name] = Markup::unescapeFromAttribute(trim($val));
 
         return $this;
     }
@@ -827,7 +797,8 @@ class editor_Tag
     }
 
     /**
-     * Adds an Event-Handler to the tag. The handler-names are added the jquery-style without the "on", eg "click" or "change"
+     * Adds an Event-Handler to the tag. The handler-names are added the jquery-style without the "on", eg "click" or
+     * "change"
      * @param string $name
      * @param string $jsCall
      */
@@ -853,10 +824,10 @@ class editor_Tag
         }
         if (array_key_exists($name, $this->attribs)) {
             if ($val != null) {
-                $this->attribs[$name] .= ' ' . static::unescapeAttribute(trim($val));
+                $this->attribs[$name] .= ' ' . Markup::unescapeFromAttribute(trim($val));
             }
         } else {
-            $this->attribs[$name] = ($val == null) ? '' : static::unescapeAttribute(trim($val));
+            $this->attribs[$name] = ($val == null) ? '' : Markup::unescapeFromAttribute(trim($val));
         }
 
         return $this;
@@ -883,7 +854,7 @@ class editor_Tag
     public function getAttribute($name)
     {
         if (array_key_exists($name, $this->attribs)) {
-            return static::escapeAttribute($this->attribs[$name]);
+            return Markup::escapeForAttribute($this->attribs[$name]);
         }
 
         return null;
@@ -1000,8 +971,8 @@ class editor_Tag
     }
 
     /**
-     * Tags are seen as equal if they have the same node-name, the same classes & the same attributes (apart from data-attributes if set)
-     * The data-attributes and the children of the tag will not count for comparision
+     * Tags are seen as equal if they have the same node-name, the same classes & the same attributes (apart from
+     * data-attributes if set) The data-attributes and the children of the tag will not count for comparision
      */
     public function isEqual(editor_Tag $tag, bool $withDataAttribs = true): bool
     {
@@ -1009,7 +980,9 @@ class editor_Tag
             return false;
         }
         foreach ($this->attribs as $key => $val) {
-            if (($withDataAttribs || substr($key, 0, 5) != 'data-') && (! $tag->hasAttribute($key) || $tag->getUnescapedAttribute($key) != $val)) {
+            if (($withDataAttribs || substr($key, 0, 5) != 'data-') && (! $tag->hasAttribute(
+                $key
+            ) || $tag->getUnescapedAttribute($key) != $val)) {
                 return false;
             }
         }
@@ -1065,7 +1038,8 @@ class editor_Tag
 
     /**
      * Helper to create a basic cloned object (with empty props)
-     * This can be used in overwriting classes to create the matching class instance with the suitable constructor arguments
+     * This can be used in overwriting classes to create the matching class instance with the suitable constructor
+     * arguments
      * @return editor_Tag
      */
     protected function createBaseClone()

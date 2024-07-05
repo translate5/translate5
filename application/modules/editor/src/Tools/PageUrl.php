@@ -72,6 +72,8 @@ final class PageUrl
 
     private string $original;
 
+    private int $statusCode;
+
     public function __construct(
         private ?string $url,
         private bool $removeFragment = true
@@ -128,10 +130,10 @@ final class PageUrl
             return 'Invalid URL “' . $this->original . '”' . $closing;
         }
         if (! $this->found) {
-            return 'The url “' . $this->original . '” could not be found' . $closing;
+            return 'The URL “' . $this->original . '” could not be found' . $closing;
         }
         if (! $this->accessible) {
-            return 'The url “' . $this->original . '” is not accessible' . $closing;
+            return 'The URL “' . $this->original . '” is not accessible - HTTP-status ' . $this->statusCode . $closing;
         }
 
         return null;
@@ -201,9 +203,9 @@ final class PageUrl
             if ($this->url === null) {
                 $this->found = false;
             } else {
-                $code = intval(curl_getinfo($ch, CURLINFO_RESPONSE_CODE));
-                $this->accessible = ($code >= 200 && $code < 300);
-                if ($code === 404 || $code === 410) {
+                $this->statusCode = intval(curl_getinfo($ch, CURLINFO_RESPONSE_CODE));
+                $this->accessible = ($this->statusCode >= 200 && $this->statusCode < 300);
+                if ($this->statusCode === 404 || $this->statusCode === 410) {
                     $this->found = false;
                 }
             }
