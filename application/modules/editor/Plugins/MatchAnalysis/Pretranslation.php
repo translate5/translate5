@@ -31,6 +31,7 @@ class editor_Plugins_MatchAnalysis_Pretranslation
     use ZfExtended_Logger_DebugTrait;
 
     private const FUZZY_CONNECTOR_KEY = 'fuzzy';
+
     private const GENERAL_CONNECTOR_KEY = 'general';
 
     /***
