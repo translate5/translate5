@@ -111,11 +111,11 @@ Ext.define('Editor.view.segments.SpecialCharacters', {
      * @param items
      */
     addSpecialCharactersButtonConfig: function (specialCharacters,items){
-        var specialCharactersJosn = Ext.JSON.decode(specialCharacters,true),
+        var decoded = Ext.JSON.decode(specialCharacters,true),
             targetLang = Editor.data.task && Ext.getStore('admin.Languages').getById(Editor.data.task.get('targetLang'));
 
         // get the configured values only for the matching task-target language
-        if(!specialCharactersJosn || !targetLang){
+        if(!decoded || !targetLang){
             return;
         }
         var matches =  Editor.util.Util.getFuzzyLanguagesForCode(targetLang.get('rfc5646'));
@@ -123,15 +123,25 @@ Ext.define('Editor.view.segments.SpecialCharacters', {
         // in case there are characters defined for all languages using the all key, add them to the matches
         matches.push('all');
 
+        // To keep track of added values
+        let addedValues = new Set();
+
         Ext.Array.each(matches, function(rec) {
-            if(specialCharactersJosn[rec] !== undefined){
-                Ext.Array.each(specialCharactersJosn[rec], function(r) {
-                    items.push({
-                        xtype:'specialCharactersButton',
-                        text: r.visualized,
-                        value: Editor.util.Util.toUnicodeCodePointEscape(r.unicode),
-                        tooltip: Editor.data.l10n.segmentGrid.toolbar.chars[r.unicode]
-                    });
+            if(decoded[rec] !== undefined){
+                Ext.Array.each(decoded[rec], function(r) {
+
+                    var value = Editor.util.Util.toUnicodeCodePointEscape(r.unicode);
+
+                    if (!addedValues.has(value)) {
+                        items.push({
+                            xtype:'specialCharactersButton',
+                            text: r.visualized,
+                            value: Editor.util.Util.toUnicodeCodePointEscape(r.unicode),
+                            tooltip: Editor.data.l10n.segmentGrid.toolbar.chars[r.unicode]
+                        });
+
+                        addedValues.add(value);
+                    }
                 });
             }
         });
