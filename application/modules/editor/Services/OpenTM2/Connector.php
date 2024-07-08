@@ -906,11 +906,10 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
                 $data = $this->getTm($validExportTypes[$mime], $memory);
                 $this->api->createMemory($fuzzyFileName, $this->languageResource->getSourceLangCode(), $data);
             } else {
-                // HOTFIX for t5memory BUG:
-                // After a clone call the clone might is corrupt, if the cloned TM has (recent) updates
-                // an export of the cloned memory before seems to heal that (either as TM or TMX)
-                $this->getTm($validExportTypes[$mime], $memory);
-                sleep(1);
+                //CRUCIAL: before cloning an export was done in order to dump the TM to the disk.
+                // this was removed now since was producing a big performance bottle neck.
+                // Cloning will be removed with TRANSLATE-3836 // a separate savetodisk endpoint per TM will be created
+                // since needed anyway
                 $this->api->cloneMemory($fuzzyFileName, $memory);
                 sleep(1);
             }

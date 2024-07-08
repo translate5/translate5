@@ -101,6 +101,7 @@ class PluginListCommand extends Translate5AbstractCommand
         foreach ($plugins as $plugin => $cls) {
             $desc = $cls::getDescription();
             $type = $cls::getType();
+            /* @var \ZfExtended_Plugin_Abstract $cls */
             $enabledByDefault = $cls::isEnabledByDefault() ? '<options=bold>on</>' : 'off';
             switch ($type) {
                 case \ZfExtended_Plugin_Abstract::TYPE_CLIENT_SPECIFIC:
