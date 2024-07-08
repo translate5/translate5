@@ -27,6 +27,7 @@ END LICENSE AND COPYRIGHT
 */
 
 use editor_Models_Segment_TrackChangeTag as TrackChangeTag;
+use MittagQI\ZfExtended\Tools\Markup;
 
 /**#@+
  * @author Marc Mittag
@@ -105,6 +106,8 @@ class editor_Models_Import_FileParser_Sdlxliff_TransunitParser
 
     private editor_Models_TaskUserTracking $taskUserTracking;
 
+    private bool $useStrictEscaping;
+
     /**
      * @param array<string, array{id: string, taskOpenerNumber: string}> $authorToTrackChangeIdAndNr
      */
@@ -114,8 +117,10 @@ class editor_Models_Import_FileParser_Sdlxliff_TransunitParser
         private bool $isTrackChangesActive,
         private array $authorToTrackChangeIdAndNr = []
     ) {
-        $this->xmlparser = ZfExtended_Factory::get('editor_Models_Import_FileParser_XmlParser');
+        $this->xmlparser = ZfExtended_Factory::get(editor_Models_Import_FileParser_XmlParser::class);
         $this->taskUserTracking = ZfExtended_Factory::get(editor_Models_TaskUserTracking::class);
+        // experimental config: strict escaping for the import stream
+        $this->useStrictEscaping = $task->getConfig()->runtimeOptions->segment->useStrictEscaping;
     }
 
     protected function init()
@@ -302,7 +307,7 @@ class editor_Models_Import_FileParser_Sdlxliff_TransunitParser
             //reset the other content counter when we enter a segment
             $mid = $this->xmlparser->getAttribute($opener['attributes'], 'mid');
             $this->targetMrkChunkIndex[$mid] = [$opener['openerKey'], $key];
-            $this->targetMrkContent[$mid] = $this->xmlparser->getRange($opener['openerKey'] + 1, $key - 1, true);
+            $this->targetMrkContent[$mid] = $this->getXmlParserRange($opener['openerKey'] + 1, $key - 1);
             foreach ($this->comments as $key => $comment) {
                 //we have to find out if the comment was for the whole segment or only a part of it
                 if (count($comment['text']) == $this->countOtherContent) {
@@ -323,7 +328,7 @@ class editor_Models_Import_FileParser_Sdlxliff_TransunitParser
                 $mid = $this->xmlparser->getAttribute($opener['attributes'], 'mid');
                 $this->sourceEmptyMrkTags[$mid] = $this->xmlparser->getChunk($opener['openerKey'])
                     . $this->xmlparser->getChunk($key);
-                $this->sourceMrkContent[$mid] = $this->xmlparser->getRange($opener['openerKey'] + 1, $key - 1, true);
+                $this->sourceMrkContent[$mid] = $this->getXmlParserRange($opener['openerKey'] + 1, $key - 1);
                 $this->countOtherContent = 0; //we have to reset the otherContent counter on the end of each seg mrk
             }
         );
@@ -334,9 +339,9 @@ class editor_Models_Import_FileParser_Sdlxliff_TransunitParser
         //
         //      <trans-unit id="193e8534-644c-461d-af1a-18439f614428">
         //          <source>Startdatum muss vor dem Enddatum liegen</source>
-        //              <seg-source>
-        //                  <mrk mtype="seg" mid="792">Startdatum muss vor dem Enddatum liegen</mrk>
-        //              </seg-source>
+        //          <seg-source>
+        //              <mrk mtype="seg" mid="792">Startdatum muss vor dem Enddatum liegen</mrk>
+        //          </seg-source>
         //          <target>
         //              <mrk mtype="seg" mid="792">La fecha de inicio debe ser anterior a la fecha de finalización</mrk>
         //          </target>
@@ -356,6 +361,20 @@ class editor_Models_Import_FileParser_Sdlxliff_TransunitParser
                 'field' => editor_Models_Import_FileParser_Sdlxliff::TRANS_UNIT,
             ];
         });
+    }
+
+    /**
+     * Retrieves a range as string from the XML-parser. If configured, the content (not the tags!) will be escaped
+     */
+    public function getXmlParserRange(int $startOffset, int $endOffset): string
+    {
+        $rangeContent = $this->xmlparser->getRange($startOffset, $endOffset, true);
+        // experimental feature: Strict escaping for the segment input stream
+        if ($this->useStrictEscaping) {
+            return Markup::escape($rangeContent);
+        }
+
+        return $rangeContent;
     }
 
     /**

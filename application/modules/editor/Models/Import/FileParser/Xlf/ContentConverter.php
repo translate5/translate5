@@ -29,6 +29,7 @@ END LICENSE AND COPYRIGHT
 use MittagQI\Translate5\ContentProtection\ContentProtector;
 use MittagQI\Translate5\Segment\Tag\Placeable;
 use MittagQI\Translate5\Task\Import\FileParser\Xlf\Namespaces\AbstractNamespace as XlfNamespaces;
+use MittagQI\ZfExtended\Tools\Markup;
 
 /**
  * Converts XLF segment content chunks into translate5 internal segment content string
@@ -93,6 +94,8 @@ class editor_Models_Import_FileParser_Xlf_ContentConverter
 
     private bool $handleIsInSourceScope = true;
 
+    private bool $useStrictEscaping;
+
     /**
      * @param editor_Models_Task $task for debugging reasons only
      * @param string $filename for debugging reasons only
@@ -103,16 +106,16 @@ class editor_Models_Import_FileParser_Xlf_ContentConverter
         $this->task = $task;
         $this->filename = $filename;
 
-        $this->utilities = ZfExtended_Factory::get('editor_Models_Segment_UtilityBroker');
+        $this->utilities = ZfExtended_Factory::get(editor_Models_Segment_UtilityBroker::class);
         $this->utilities->whitespace->collectTagNumbers = true;
 
         $this->contentProtector = ContentProtector::create($this->utilities->whitespace);
 
-        $this->shortTagNumbers = ZfExtended_Factory::get('editor_Models_Import_FileParser_Xlf_ShortTagNumbers');
+        $this->shortTagNumbers = ZfExtended_Factory::get(editor_Models_Import_FileParser_Xlf_ShortTagNumbers::class);
 
         $this->useTagContentOnlyNamespace = $this->namespaces->useTagContentOnly();
 
-        $this->xmlparser = ZfExtended_Factory::get('editor_Models_Import_FileParser_XmlParser');
+        $this->xmlparser = ZfExtended_Factory::get(editor_Models_Import_FileParser_XmlParser::class);
         $this->xmlparser->registerElement('mrk', function ($tag, $attributes) {
             if ($this->xmlparser->getAttribute($attributes, 'mtype') === 'seg') {
                 $this->inMrk = true;
@@ -175,6 +178,8 @@ class editor_Models_Import_FileParser_Xlf_ContentConverter
         $this->protectTags = $config->runtimeOptions->import->fileparser->options->protectTags ?? false;
         $this->placeablesXpathes = $config->runtimeOptions->import->xlf->placeablesXpathes->toArray();
         $this->findPlaceables = count($this->placeablesXpathes) > 0;
+        // experimental config: strict escaping for the import stream
+        $this->useStrictEscaping = $config->runtimeOptions->segment->useStrictEscaping;
     }
 
     /**
@@ -320,6 +325,15 @@ class editor_Models_Import_FileParser_Xlf_ContentConverter
      */
     public function convert(array|string $chunks, bool $source, bool $preserveWhitespace = false): array
     {
+        // experimental feature: Strict escaping for the segment input stream
+        if ($this->useStrictEscaping) {
+            if (is_array($chunks)) {
+                $chunks = $this->escapeChunks($chunks);
+            } else {
+                $chunks = $this->escapeChunks([$chunks])[0];
+            }
+        }
+
         $this->result = [];
         $this->removeTags = false;
         $this->shortTagNumbers->init($source);
@@ -352,6 +366,26 @@ class editor_Models_Import_FileParser_Xlf_ContentConverter
         $this->shortTagNumbers->calculatePartnerAndType();
 
         return $this->result;
+    }
+
+    /**
+     * Escapes the chunks of the file-parser input stream. These chunks are either tags or textual content
+     * @param string[] $chunks
+     * @return string[]
+     */
+    private function escapeChunks(array $chunks): array
+    {
+        $escaped = [];
+        foreach ($chunks as $chunk) {
+            // we escape every chunk, that is not
+            if (! empty($chunk) && substr(trim($chunk), 0, 1) !== '<') {
+                $escaped[] = Markup::escapeText($chunk);
+            } else {
+                $escaped[] = $chunk;
+            }
+        }
+
+        return $escaped;
     }
 
     /**
@@ -394,16 +428,16 @@ class editor_Models_Import_FileParser_Xlf_ContentConverter
             $text = $this->contentProtector->protect(
                 $text,
                 $this->handleIsInSourceScope,
-                $this->task->getSourceLang(),
-                $this->task->getTargetLang(),
+                (int) $this->task->getSourceLang(),
+                (int) $this->task->getTargetLang(),
                 ContentProtector::ENTITY_MODE_OFF
             );
         } else {
             $text = $this->contentProtector->protect(
                 $text,
                 $this->handleIsInSourceScope,
-                $this->task->getSourceLang(),
-                $this->task->getTargetLang()
+                (int) $this->task->getSourceLang(),
+                (int) $this->task->getTargetLang()
             );
         }
 
