@@ -120,7 +120,7 @@ class editor_Models_Import_FileParser_Sdlxliff_TransunitParser
         $this->xmlparser = ZfExtended_Factory::get(editor_Models_Import_FileParser_XmlParser::class);
         $this->taskUserTracking = ZfExtended_Factory::get(editor_Models_TaskUserTracking::class);
         // experimental config: strict escaping for the import stream
-        $this->useStrictEscaping = $task->getConfig()->runtimeOptions->segment->useStrictEscaping;
+        $this->useStrictEscaping = $config->runtimeOptions->segment->useStrictEscaping;
     }
 
     protected function init()

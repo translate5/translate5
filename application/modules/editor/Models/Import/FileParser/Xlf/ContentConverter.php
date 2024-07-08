@@ -377,9 +377,9 @@ class editor_Models_Import_FileParser_Xlf_ContentConverter
     {
         $escaped = [];
         foreach ($chunks as $chunk) {
-            // we escape every chunk, that is not
-            if (! empty($chunk) && substr(trim($chunk), 0, 1) !== '<') {
-                $escaped[] = Markup::escapeText($chunk);
+            // we escape every chunk, that is not empty or a pure tag
+            if (! empty($chunk) && strip_tags($chunk) !== '') {
+                $escaped[] = Markup::escape($chunk);
             } else {
                 $escaped[] = $chunk;
             }
