@@ -354,7 +354,7 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
             try {
                 $matches = $this->getMatches($connector, $segment, $isMtResource);
             } catch (Exception $e) {
-                $this->handleConnectionError($e, $languageResourceId);
+                $this->handleConnectionError($e, (int) $languageResourceId, $connector->isInternalFuzzy());
                 // in case of an error we produce an empty result container for that query and log the error so that the analysis can proceed
                 $matches = ZfExtended_Factory::get('editor_Services_ServiceResult');
             }
@@ -468,20 +468,23 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
             return true;
         }
 
-        if (! isset($this->connectorErrorCount[$id]) || $this->connectorErrorCount[$id] <= self::MAX_ERROR_PER_CONNECTOR) {
+        $key = $this->getErrorCountKey($id, $connector->isInternalFuzzy());
+
+        if (! isset($this->connectorErrorCount[$key]) || $this->connectorErrorCount[$key] <= self::MAX_ERROR_PER_CONNECTOR) {
             return false;
         }
 
         $connector->disable();
 
+        $langRes = $connector->getLanguageResource();
         $this->log->warn(
             'E1101',
             'Disabled Language Resource {name} ({service}) for analysing and pretranslation due too much errors.',
             [
                 'task' => $this->task,
-                'languageResource' => $this->resources[$id],
-                'name' => $this->resources[$id]->getName(),
-                'service' => $this->resources[$id]->getServiceName(),
+                'languageResource' => $langRes,
+                'name' => $langRes->getName(),
+                'service' => $langRes->getServiceName(),
             ]
         );
 
@@ -490,19 +493,25 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
 
     /**
      * Log and count the connection error
-     * @param int $id
      */
-    protected function handleConnectionError(Exception $e, $id)
+    protected function handleConnectionError(Exception $e, int $id, bool $isInternalFuzzy): void
     {
         $this->log->exception($e, [
             'level' => $this->log::LEVEL_WARN,
             'domain' => $this->log->getDomain(),
             'extra' => [
+                'isInternalFuzzy' => $isInternalFuzzy,
                 'task' => $this->task,
             ],
         ]);
-        settype($this->connectorErrorCount[$id], 'integer');
-        $this->connectorErrorCount[$id]++;
+        $key = $this->getErrorCountKey($id, $isInternalFuzzy);
+        settype($this->connectorErrorCount[$key], 'integer');
+        $this->connectorErrorCount[$key]++;
+    }
+
+    private function getErrorCountKey(int $id, bool $isInternalFuzzy): string
+    {
+        return ($isInternalFuzzy ? 'internalFuzzy' : 'normal') . ':' . $id;
     }
 
     /**
