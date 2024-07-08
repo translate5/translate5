@@ -3,7 +3,7 @@
 START LICENSE AND COPYRIGHT
 
  This file is part of translate5
- 
+
  Copyright (c) 2013 - 2024 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
 
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
@@ -13,20 +13,21 @@ START LICENSE AND COPYRIGHT
  included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
-  
+
  There is a plugin exception available for use with this release of translate5 for
  translate5: Please see http://www.translate5.net/plugin-exception.txt or
  plugin-exception.txt in the root folder of translate5.
-  
+
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
 
 use MittagQI\Translate5\Test\Import\Config;
+use MittagQI\Translate5\Test\JsonTestAbstract;
 
 /**
  * This will test if the blocked segments which are containing repetitions are included in the analysis results.
@@ -35,15 +36,14 @@ use MittagQI\Translate5\Test\Import\Config;
  *  segment 2 is not blocked segment but it is repetition of segment 1
  *  segment 3 is blocked segmnet
  *  segment 4 is not blocked segment but it is repetition of segment 3
- *
  */
-class Translate3833Test extends editor_Test_JsonTest
+class Translate3833Test extends JsonTestAbstract
 {
     use \MittagQI\Translate5\Test\Api\AnalysisTrait;
 
     protected static array $requiredPlugins = [
         'editor_Plugins_MatchAnalysis_Init',
-        'editor_Plugins_ZDemoMT_Init'
+        'editor_Plugins_ZDemoMT_Init',
     ];
 
     protected static bool $setupOwnCustomer = false;
@@ -68,7 +68,6 @@ class Translate3833Test extends editor_Test_JsonTest
 
     public function testImport()
     {
-
         $jsonFileName = 'analysis-results.json';
 
         $analysis = static::api()->getJson('editor/plugins_matchanalysis_matchanalysis', [
@@ -76,7 +75,8 @@ class Translate3833Test extends editor_Test_JsonTest
             'notGrouped' => static::api()->getTask()->taskGuid,
         ], $jsonFileName);
 
-        $this->assertNotEmpty($analysis,
+        $this->assertNotEmpty(
+            $analysis,
             'No results found for the matchanalysis.'
         );
 

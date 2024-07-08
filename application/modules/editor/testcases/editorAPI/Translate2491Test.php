@@ -26,10 +26,12 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\Test\JsonTestAbstract;
+
 /**
  * Testcase for TRANSLATE-2540
  */
-class Translate2491Test extends editor_Test_JsonTest
+class Translate2491Test extends JsonTestAbstract
 {
     public function testTermsTransfer()
     {
@@ -96,7 +98,7 @@ class Translate2491Test extends editor_Test_JsonTest
 
         // Mimic a task-import
         $task = $transfer->step1->rows->projectTasks[0];
-        static::api()->waitForTaskImported($task);
+        $task = static::api()->waitForTaskImported($task);
 
         // Open task for whole testcase
         static::api()->setTaskToEdit($task->id);

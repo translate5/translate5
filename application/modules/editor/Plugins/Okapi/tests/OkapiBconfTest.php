@@ -29,12 +29,13 @@ END LICENSE AND COPYRIGHT
 use MittagQI\Translate5\Plugins\Okapi\Service;
 use MittagQI\Translate5\Test\Import\Bconf;
 use MittagQI\Translate5\Test\Import\Config;
+use MittagQI\Translate5\Test\JsonTestAbstract;
 
 /**
  * Testcase for TRANSLATE-2266 Custom file filter configuration with GUI / BCONF Management
  * For details see the issue.
  */
-class OkapiBconfTest extends editor_Test_JsonTest
+class OkapiBconfTest extends JsonTestAbstract
 {
     protected static array $requiredPlugins = [
         'editor_Plugins_Okapi_Init',
@@ -172,7 +173,7 @@ class OkapiBconfTest extends editor_Test_JsonTest
         self::assertFileExists($newSystemBconf->getPath(), $autoImportFailureMsg . " Version Auto Update failed. File '$newBconfFile' does not exist.");
 
         // Reset to initial system bconf, delete  newly imported
-        $newSystemBconfId = $newSystemBconf->getId();
+        $newSystemBconfId = (int) $newSystemBconf->getId();
         $newSystemBconfDir = $newSystemBconf->getDataDirectory();
         $newSystemBconf->setName('ToDelete-' . time() . rand());
         $newSystemBconf->save();

@@ -5,10 +5,10 @@ namespace MittagQI\Translate5\Test\Unit\Models\Import\FileParser\Sdlxliff;
 use DateTime;
 use editor_Models_Import_FileParser_Sdlxliff_TransunitParser as TransunitParser;
 use editor_Models_Task;
-use editor_Test_UnitTest;
+use MittagQI\Translate5\Test\UnitTestAbstract;
 use Zend_Config;
 
-class TransunitParserTest extends editor_Test_UnitTest
+class TransunitParserTest extends UnitTestAbstract
 {
     private ?string $savedTimezone = null;
 

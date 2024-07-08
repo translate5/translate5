@@ -27,11 +27,12 @@ END LICENSE AND COPYRIGHT
 */
 
 use MittagQI\Translate5\Test\Import\Config;
+use MittagQI\Translate5\Test\JsonTestAbstract;
 
 /**
  * ExcelExandImportTest.php imports a simple task, checks export of excel and reimport then
  */
-class ExcelExandImportTest extends editor_Test_JsonTest
+class ExcelExandImportTest extends JsonTestAbstract
 {
     /**
      * @var string contains the file name to the downloaded excel

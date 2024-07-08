@@ -27,12 +27,13 @@ END LICENSE AND COPYRIGHT
 */
 
 use MittagQI\Translate5\Test\Import\Config;
+use MittagQI\Translate5\Test\JsonTestAbstract;
 
 /***
  * Test if the analysis and pre-translation field pretranslateMatchrate will be automatically set from the
  * config runtimeOptions.plugins.MatchAnalysis.pretranslateMatchRate
  */
-class Translate3069Test extends editor_Test_JsonTest
+class Translate3069Test extends JsonTestAbstract
 {
     protected static array $forbiddenPlugins = [
     ];

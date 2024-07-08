@@ -26,12 +26,18 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+namespace MittagQI\Translate5\Test;
+
+use editor_Segment_FieldTags;
+use editor_Segment_Tag;
+use editor_TagSequence;
+
 /**
  * Abstraction layer for performing API tests which involve comparing Segment Texts.
  * This solves the problem, that Tags in segment text are enriched with quality-id's in some cases that contain auto-increment id's and thus have to be stripped
  * Also, the attributes in tags may be in a different order because historically there have been different attribute orders for differen tags
  */
-abstract class editor_Test_SegmentTagsTest extends editor_Test_MockedTaskTest
+abstract class SegmentTagsTestAbstract extends MockedTaskTestAbstract
 {
     /* Segment Tags helpers to easily create tests for segment tags */
 

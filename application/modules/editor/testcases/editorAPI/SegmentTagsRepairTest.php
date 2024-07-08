@@ -26,10 +26,12 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\Test\SegmentTagsTestAbstract;
+
 /**
  * Several "classic" PHPUnit tests to check the TagRepair which detects faulty structures and fixes them by removing or restructuring the internal tags
  */
-class SegmentTagsRepairTest extends editor_Test_SegmentTagsTest
+class SegmentTagsRepairTest extends SegmentTagsTestAbstract
 {
     /**
      * Some Internal Tags to create Tests with

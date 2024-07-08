@@ -27,12 +27,13 @@ END LICENSE AND COPYRIGHT
 */
 
 use MittagQI\Translate5\Test\Import\Config;
+use MittagQI\Translate5\Test\JsonTestAbstract;
 
 /**
  * CsvMqmTest tests the correct export MQM Tags.
  *   Especially the cases of overlapping and misordered MQM tags
  */
-class QualityCsvMqmTest extends editor_Test_JsonTest
+class QualityCsvMqmTest extends JsonTestAbstract
 {
     public const CSV_TARGET = 'target is coming from test edit';
 

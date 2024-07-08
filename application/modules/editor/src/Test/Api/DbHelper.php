@@ -28,6 +28,7 @@ END LICENSE AND COPYRIGHT
 
 namespace MittagQI\Translate5\Test\Api;
 
+use MittagQI\Translate5\Test\ApiTestAbstract;
 use stdClass;
 use Throwable;
 use Zend_Registry;
@@ -37,8 +38,9 @@ use ZfExtended_Plugin_Manager;
 
 /**
  * This class implements all direct calls to the DB the tests run on during the tests
- * Directly accessing the DB when in API-test generally is unwanted as this potentially causes trouble with file-writes, entity-versions, etc.
- * On the other hand, endpoints to cleanup workes or activate/deactivate plugins are a potential security problem we should avoid
+ * Directly accessing the DB when in API-test generally is unwanted as this potentially causes trouble with
+ * file-writes, entity-versions, etc. On the other hand, endpoints to cleanup workes or activate/deactivate plugins are
+ * a potential security problem we should avoid
  */
 final class DbHelper
 {
@@ -84,8 +86,11 @@ final class DbHelper
     /**
      * Checks the workers a test leaves in the DB for active ones. Cleans that up according the given params
      */
-    public static function cleanupWorkers(bool $forceRemoval = false, bool $preventRemoval = false, bool $addRemainingWorkerTypes = false): stdClass
-    {
+    public static function cleanupWorkers(
+        bool $forceRemoval = false,
+        bool $preventRemoval = false,
+        bool $addRemainingWorkerTypes = false,
+    ): stdClass {
         $result = new stdClass();
         $result->cleanupNeccessary = false;
         $worker = ZfExtended_Factory::get(ZfExtended_Models_Worker::class);
@@ -127,16 +132,78 @@ final class DbHelper
         return $row['id'] ?? 0;
     }
 
-    public static function getLastWorkers(int $sinceId, string $workerClass, ?string $taskGuid): array
+    public static function getLastWorkers(int $sinceId, string $workerClass, array $taskGuids = []): array
     {
         $worker = ZfExtended_Factory::get(ZfExtended_Models_Worker::class);
         $s = $worker->db->select()
             ->where('id > ?', $sinceId)
             ->where('worker = ?', $workerClass);
-        if ($taskGuid !== null) {
-            $s->where('taskGuid = ?', $taskGuid);
+        if (count($taskGuids) > 0) {
+            $s->where('taskGuid IN (?)', $taskGuids);
         }
 
         return $worker->db->fetchAll($s)->toArray();
+    }
+
+    /**
+     * This function waits for one anonymous or 1 to n known workers (identified by taskGuid) to complete
+     * @param ApiTestAbstract $test The Currently running test
+     * @param string $class The worker-class to check. CRUCIAL: these must be "highlander"-workers that have only a
+     *     single instance per run
+     * @param array $taskGuids If given can identify one or multiple tasks identifying the worker. In this case the
+     *     waiting lasts, until ALL identified workers are finished
+     * @param bool $failOnError defines, if the test shall fail if the worker fails
+     * @param int $timeout The max. runtime of the waiting
+     * @param array $waitForStates The state we need to wait fore, usually DONE
+     * @param array $failStates The state we break & fail, usually DEFUNCT
+     */
+    public static function waitForWorkers(
+        ApiTestAbstract $test,
+        string $class,
+        array $taskGuids = [],
+        bool $failOnError = true,
+        int $timeout = 100,
+        array $waitForStates = [ZfExtended_Models_Worker::STATE_DONE],
+        array $failStates = [ZfExtended_Models_Worker::STATE_DEFUNCT],
+    ): void {
+        error_log("waitForWorkers: " . get_class($test) . " / $class / $failOnError / $timeout");
+
+        $numTaskGuids = count($taskGuids);
+        for ($counter = 0; $counter < $timeout; $counter++) {
+            sleep(1);
+            $foundWorkes = self::getLastWorkers($test::getLastWorkerId(), $class, $taskGuids);
+            $numFinished = 0;
+            $numNotAsExpected = 0;
+            foreach ($foundWorkes as $worker) {
+                if (in_array($worker['state'], $waitForStates)) {
+                    $numFinished++;
+                } else {
+                    $numNotAsExpected++;
+                }
+                if (in_array($worker['state'], $failStates)) {
+                    if ($failOnError) {
+                        $test->fail('Worker defunct: ID: ' . $worker['id'] . ' ' . $worker['worker']);
+                    }
+
+                    return;
+                }
+            }
+            // when there were no workers found that are not as expected ... but they are less than taskGuids
+            // that means, done-workers may have already been cleaned up
+            if ($numNotAsExpected === 0 && $numFinished < $numTaskGuids) {
+                error_log('All found workers are in the expected state'
+                    . ' but we could not find workers for allen given task-guids');
+
+                return;
+            }
+            // we finish when all "known" workers are finished or a single "any" worker of the type is finished ...
+            if (($numTaskGuids > 0 && $numTaskGuids === $numFinished) || ($numTaskGuids === 0 && $numFinished === 1)) {
+                return;
+            }
+            if ($counter % 5 == 0) {
+                error_log('Worker state check ' . $counter . '/' . $timeout . ' [' . get_class($test) . ']');
+            }
+        }
+        $test->fail('Worker not added/finished in ' . $timeout . ' seconds: ' . $class);
     }
 }

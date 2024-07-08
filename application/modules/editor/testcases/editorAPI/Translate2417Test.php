@@ -28,12 +28,13 @@ END LICENSE AND COPYRIGHT
 
 use MittagQI\Translate5\Test\Import\Config;
 use MittagQI\Translate5\Test\Import\LanguageResource;
+use MittagQI\Translate5\Test\JsonTestAbstract;
 
 /***
  * This test will test the customerWriteAsDefaultIds flag in the languageresources-customer assoc.
  * The used tm memory is OpenTm2.
  */
-class Translate2417Test extends editor_Test_JsonTest
+class Translate2417Test extends JsonTestAbstract
 {
     protected static array $requiredPlugins = [
         'editor_Plugins_Okapi_Init',

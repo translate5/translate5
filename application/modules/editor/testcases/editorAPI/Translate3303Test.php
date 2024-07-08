@@ -27,12 +27,13 @@ END LICENSE AND COPYRIGHT
 */
 
 use MittagQI\Translate5\Test\Import\Config;
+use MittagQI\Translate5\Test\JsonTestAbstract;
 
 /**
  * Test to validate if sub segments are imported and can be edited. Also validate if the edited content of the sub
  * segments is contained in the export
  */
-class Translate3303Test extends editor_Test_JsonTest
+class Translate3303Test extends JsonTestAbstract
 {
     protected static function setupImport(Config $config): void
     {

@@ -28,6 +28,7 @@ END LICENSE AND COPYRIGHT
 
 use MittagQI\Translate5\Segment\TagRepair\Tag;
 use MittagQI\Translate5\Segment\TagRepair\Tags;
+use MittagQI\Translate5\Test\MockedTaskTestAbstract;
 use MittagQI\ZfExtended\Tools\Markup;
 
 /**
@@ -35,7 +36,7 @@ use MittagQI\ZfExtended\Tools\Markup;
  * When creating test-data notice, that if a "<" shall be used in the markup it must be followed by a " "
  * TODO FIXME: The ::replaceRequestTags to transform the translated request is not able to transform all kinds of tag-combinations
  */
-class TagsRepairTest extends editor_Test_MockedTaskTest
+class TagsRepairTest extends MockedTaskTestAbstract
 {
     /**
      * Some Internal Tags to create Tests with

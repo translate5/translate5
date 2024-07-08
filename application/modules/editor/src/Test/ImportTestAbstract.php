@@ -26,13 +26,16 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+namespace MittagQI\Translate5\Test;
+
 use MittagQI\Translate5\Test\Import\Config;
+use MittagQI\Translate5\Test\Import\Exception;
 use MittagQI\Translate5\Test\Import\Task;
 
 /**
  * Base Class for all API Tests that are importing tasks & resources
  */
-abstract class editor_Test_ImportTest extends editor_Test_ApiTest
+abstract class ImportTestAbstract extends ApiTestAbstract
 {
     private static ?Config $_config = null;
 
@@ -49,25 +52,25 @@ abstract class editor_Test_ImportTest extends editor_Test_ApiTest
      */
     protected static function getConfig(): Config
     {
-        return static::$_config;
+        return self::$_config;
     }
 
     /**
      * Retrieves the imported task (if eactly one was setup)
-     * @throws \MittagQI\Translate5\Test\Import\Exception
+     * @throws Exception
      */
     protected static function getTask(): Task
     {
-        return static::$_config->getTaskAt(0);
+        return self::$_config->getTaskAt(0);
     }
 
     /**
      * Convenience-API to get the task with the given index
-     * @throws \MittagQI\Translate5\Test\Import\Exception
+     * @throws Exception
      */
     protected static function getTaskAt(int $index): Task
     {
-        return static::$_config->getTaskAt($index);
+        return self::$_config->getTaskAt($index);
     }
 
     /**
@@ -75,7 +78,7 @@ abstract class editor_Test_ImportTest extends editor_Test_ApiTest
      */
     protected static function testSpecificInit()
     {
-        static::$_config = null;
+        self::$_config = null;
     }
 
     /**
@@ -85,9 +88,9 @@ abstract class editor_Test_ImportTest extends editor_Test_ApiTest
     final protected static function testSpecificSetup()
     {
         // evaluate & process the import-setup
-        static::$_config = new Config(static::api(), static::class, static::getTestLogin());
-        static::setupImport(static::$_config);
-        static::$_config->setup();
+        self::$_config = new Config(static::api(), static::class, static::getTestLogin());
+        static::setupImport(self::$_config);
+        self::$_config->setup();
     }
 
     /**
@@ -97,9 +100,9 @@ abstract class editor_Test_ImportTest extends editor_Test_ApiTest
     final protected static function testSpecificTeardown(bool $doCleanup)
     {
         // when early problems in the test-setup occurred, the config might not even was created
-        if ($doCleanup && static::$_config) {
+        if ($doCleanup && self::$_config) {
             // teardown the configured stuff
-            static::$_config->teardown();
+            self::$_config->teardown();
         }
     }
 }

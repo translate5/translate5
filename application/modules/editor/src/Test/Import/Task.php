@@ -29,6 +29,7 @@ END LICENSE AND COPYRIGHT
 namespace MittagQI\Translate5\Test\Import;
 
 use MittagQI\Translate5\Test\Api\Helper;
+use MittagQI\Translate5\Test\ApiTestAbstract;
 use Zend_Http_Client_Exception;
 
 /**
@@ -108,7 +109,7 @@ final class Task extends Resource
 
     protected function createName(string $testClass, int $resourceIndex): string
     {
-        return \editor_Test_ApiTest::NAME_PREFIX . parent::createName($testClass, $resourceIndex);
+        return ApiTestAbstract::NAME_PREFIX . parent::createName($testClass, $resourceIndex);
     }
 
     /**
@@ -307,9 +308,37 @@ final class Task extends Resource
     /**
      * @throws Exception
      */
+    public function getTaskType(): string
+    {
+        return strval($this->getProperty('taskType'));
+    }
+
+    /**
+     * @throws Exception
+     */
     public function getTaskState(): string
     {
         return strval($this->getProperty('state'));
+    }
+
+    /**
+     * @throws Exception
+     */
+    public function getProjectId(): int
+    {
+        return (int) $this->getProperty('projectId');
+    }
+
+    /**
+     * @throws Exception
+     */
+    public function getProjectTasks(): ?array
+    {
+        if ($this->isProjectTask()) {
+            return $this->getProperty('projectTasks');
+        }
+
+        return null;
     }
 
     /**
@@ -327,7 +356,7 @@ final class Task extends Resource
      */
     public function isProjectTask(): bool
     {
-        return $this->getProperty('taskType') == Helper::INITIAL_TASKTYPE_PROJECT;
+        return $this->getTaskType() === Helper::INITIAL_TASKTYPE_PROJECT;
     }
 
     /**
@@ -352,16 +381,17 @@ final class Task extends Resource
 
         if (! $config->hasLanguageResources() && ! $config->hasTaskOperation() && ! $isMultiLanguage) {
             // the simple case: task without resources & pretranslation
-            if (! $this->doImport($api, $this->_failOnError, $this->_waitForImported)) {
+            if (! $this->doCreateTask($api, $this->_failOnError, $this->_waitForImported)) {
                 return;
             }
             // if we shall not wait, we have to skip user-assignments & task-state-setting
             if (! $this->_waitForImported) {
                 return;
             }
+            $this->applyResult($api->getTask());
         } else {
             // TODO FIXME: check, if $this->_failOnError can not be used here, seems to be just a miscoding overtaken over the years ...
-            if (! $this->doImport($api, false, false)) {
+            if (! $this->doCreateTask($api, false, false)) {
                 return;
             }
             // associate resources
@@ -383,19 +413,9 @@ final class Task extends Resource
             if (! $this->_waitForImported) {
                 return;
             }
-            // start the import
-            $api->getJson('editor/task/' . $this->getId() . '/import');
-
-            // wait for the import to finish. TODO FIXME: is the manual evaluation of multilang-tasks neccessary ?
-            if ($this->isProjectTask() || $isMultiLanguage) {
-                $api->waitForCurrentProjectStateOpen();
-            } else {
-                $api->waitForCurrentTaskStateOpen();
-            }
+            // start the import and await the result
+            $this->startAndWaitForImport($api);
         }
-
-        // TODO: we should rework the API not to cache the task-data but to return them
-        $this->applyResult($api->getTask());
 
         // set usage-mode if setup
         if ($this->_usageMode !== null) {
@@ -443,15 +463,12 @@ final class Task extends Resource
      * If the import was configured not to be waiting with ::setNotToWaitForImported this api can be used to wait afterwards ...
      * @throws Exception
      */
-    public function waitForImport(Helper $api)
+    public function startAndWaitForImport(Helper $api)
     {
-        if ($this->isProjectTask()) {
-            $api->waitForCurrentProjectStateOpen();
-        } else {
-            $api->waitForCurrentTaskStateOpen();
-        }
-        // TODO: we should rework the API not to cache the task-data but to return them
-        $this->applyResult($api->getTask());
+        // trigger import
+        $api->getJson('editor/task/' . $this->getId() . '/import');
+        // wait for setToOpen worker
+        $this->applyResult($api->waitForTaskImported($this, $this->_failOnError));
     }
 
     /**
@@ -529,10 +546,10 @@ final class Task extends Resource
      * @throws \MittagQI\Translate5\Test\Api\Exception
      * @throws \Zend_Http_Client_Exception
      */
-    private function doImport(Helper $api, bool $failOnError, bool $waitTorImport): bool
+    private function doCreateTask(Helper $api, bool $failOnError, bool $waitTorImport): bool
     {
         $this->autoStartImport = $waitTorImport ? 1 : 0;
-        $result = $api->importTask($this->getRequestParams(), $failOnError, $waitTorImport);
+        $result = $api->createTask($this->getRequestParams(), $failOnError, $waitTorImport);
         if ($this->validateResult($result, $api)) {
             return true;
         }

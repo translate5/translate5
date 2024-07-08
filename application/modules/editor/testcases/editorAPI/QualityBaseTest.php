@@ -28,12 +28,13 @@ END LICENSE AND COPYRIGHT
 
 use MittagQI\Translate5\Test\Filter;
 use MittagQI\Translate5\Test\Import\Config;
+use MittagQI\Translate5\Test\JsonTestAbstract;
 
 /**
  * Testcase for all endpoints of the AutoQA feature
  * One Problem that might occur is, that the text's (usually text-prop) of the quality models in fact are translated strings that obviously can change. One solution would be, to not compare those props
  */
-class QualityBaseTest extends editor_Test_JsonTest
+class QualityBaseTest extends JsonTestAbstract
 {
     protected static array $requiredRuntimeOptions = [
         'autoQA.enableInternalTagCheck' => 1,

@@ -7,12 +7,12 @@ use editor_Models_Import_FileParser;
 use editor_Models_Import_FileParser_Sdlxliff as Sdlxliff;
 use editor_Models_Task;
 use editor_Models_TaskUserTracking;
-use editor_Test_UnitTest;
+use MittagQI\Translate5\Test\UnitTestAbstract;
 use Zend_Registry;
 use ZfExtended_Factory;
 use ZfExtended_Utils;
 
-class ImportSegmentWithTrackChangesTest extends editor_Test_UnitTest
+class ImportSegmentWithTrackChangesTest extends UnitTestAbstract
 {
     private editor_Models_Task $task;
 

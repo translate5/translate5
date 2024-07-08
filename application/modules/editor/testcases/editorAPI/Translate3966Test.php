@@ -27,6 +27,7 @@ END LICENSE AND COPYRIGHT
 */
 
 use MittagQI\Translate5\Test\Import\Config;
+use MittagQI\Translate5\Test\JsonTestAbstract;
 
 /**
  * This will test the export of sdlxliff files when locked x tags are moved within segment. When moving segment from one
@@ -37,7 +38,7 @@ use MittagQI\Translate5\Test\Import\Config;
  * This test will not validate the values of the newly created id, as they are dynamic. This test will only validate the
  * number of newly create transunits.
  */
-class Translate3966Test extends editor_Test_JsonTest
+class Translate3966Test extends JsonTestAbstract
 {
     protected static array $forbiddenPlugins = [
         editor_Plugins_TrackChanges_Init::class,
