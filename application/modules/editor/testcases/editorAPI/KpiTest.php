@@ -27,12 +27,13 @@ END LICENSE AND COPYRIGHT
 */
 
 use MittagQI\Translate5\Test\Import\Config;
+use MittagQI\Translate5\Test\ImportTestAbstract;
 
 /**
  * KpiTest imports three simple tasks, sets some KPI-relevant dates, exports some of the tasks,
  * and then checks if the KPIs (Key Performance Indicators) get calculated as expected.
  */
-class KpiTest extends editor_Test_ImportTest
+class KpiTest extends ImportTestAbstract
 {
     public const KPI_REVIEWER = 'averageProcessingTimeReviewer';
 

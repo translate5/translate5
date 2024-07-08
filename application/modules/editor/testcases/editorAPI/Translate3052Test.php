@@ -28,8 +28,9 @@ END LICENSE AND COPYRIGHT
 
 use MittagQI\Translate5\Test\Import\Config;
 use MittagQI\Translate5\Test\Import\LanguageResource;
+use MittagQI\Translate5\Test\JsonTestAbstract;
 
-class Translate3052Test extends editor_Test_JsonTest
+class Translate3052Test extends JsonTestAbstract
 {
     protected static array $requiredPlugins = [
         'editor_Plugins_ZDemoMT_Init',

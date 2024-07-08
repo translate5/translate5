@@ -30,13 +30,14 @@ use MittagQI\Translate5\Task\Reimport\DataProvider\AbstractDataProvider;
 use MittagQI\Translate5\Test\Import\Config;
 use MittagQI\Translate5\Test\Import\Exception;
 use MittagQI\Translate5\Test\Import\TermCollectionResource;
+use MittagQI\Translate5\Test\JsonTestAbstract;
 
 /***
  * Test the reimport and package export features.
  * Task will be imported alongside termcollection an opentm2 memory.
  *
  */
-class Translate3117Test extends editor_Test_JsonTest
+class Translate3117Test extends JsonTestAbstract
 {
     protected static array $forbiddenPlugins = [
     ];
@@ -137,7 +138,7 @@ class Translate3117Test extends editor_Test_JsonTest
         );
         static::api()->post('editor/taskid/' . $taskId . '/file/package');
 
-        $this->waitForWorker(\MittagQI\Translate5\Task\Reimport\Worker::class);
+        $this->waitForWorker(\MittagQI\Translate5\Task\Reimport\Worker::class, $task);
 
         static::api()->setTaskToEdit();
 

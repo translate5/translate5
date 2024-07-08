@@ -28,12 +28,13 @@ END LICENSE AND COPYRIGHT
 
 use MittagQI\Translate5\Segment\TransUnitHash;
 use MittagQI\Translate5\Test\Import\Config;
+use MittagQI\Translate5\Test\JsonTestAbstract;
 
 /**
  * BasicSegmentEditingTest imports a simple task, checks imported values,
  * edits segments and checks then the edited ones again on correct content
  */
-class XlfImportTest extends editor_Test_JsonTest
+class XlfImportTest extends JsonTestAbstract
 {
     protected static array $forbiddenPlugins = [
         'editor_Plugins_LockSegmentsBasedOnConfig_Bootstrap',

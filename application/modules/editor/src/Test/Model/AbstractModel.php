@@ -29,6 +29,7 @@ END LICENSE AND COPYRIGHT
 namespace MittagQI\Translate5\Test\Model;
 
 use MittagQI\Translate5\Test\Filter;
+use MittagQI\Translate5\Test\JsonTestAbstract;
 use MittagQI\Translate5\Test\Sanitizer;
 
 /**
@@ -290,7 +291,7 @@ abstract class AbstractModel
      * Compares the Model with test data for the passed testcase
      * @param Filter|null $treeFilter : If given, a passed tree data will be filtered according to the passed filter
      */
-    public function compare(\editor_Test_JsonTest $testCase, \stdClass $expected, string $message = '', Filter $treeFilter = null)
+    public function compare(JsonTestAbstract $testCase, \stdClass $expected, string $message = '', Filter $treeFilter = null)
     {
         $this->compareExpectation($testCase, $expected, $message, $treeFilter);
     }
@@ -299,7 +300,7 @@ abstract class AbstractModel
      * Since test-models can act as expectation or actual data we provide both directions of comparision (a test-model is expected to represent real API data though)
      * @param Filter|null $treeFilter : If given, a passed tree data will be filtered according to the passed filter
      */
-    public function compareExpectation(\editor_Test_JsonTest $testCase, \stdClass $expected, string $message = '', Filter $treeFilter = null)
+    public function compareExpectation(JsonTestAbstract $testCase, \stdClass $expected, string $message = '', Filter $treeFilter = null)
     {
         $testCase->assertEquals($this->copy($expected, $treeFilter), $this->copy($this->_data, $treeFilter), $message);
     }
@@ -308,7 +309,7 @@ abstract class AbstractModel
      * Since test-models can act as expectation or actual data we provide both directions of comparision (a test-model is expected to represent real API data though)
      * @param Filter|null $treeFilter : If given, a passed tree data will be filtered according to the passed filter
      */
-    public function compareActual(\editor_Test_JsonTest $testCase, \stdClass $actual, string $message = '', Filter $treeFilter = null)
+    public function compareActual(JsonTestAbstract $testCase, \stdClass $actual, string $message = '', Filter $treeFilter = null)
     {
         $testCase->assertEquals($this->copy($this->_data, $treeFilter), $this->copy($actual, $treeFilter), $message);
     }

@@ -28,12 +28,13 @@ END LICENSE AND COPYRIGHT
 */
 
 use MittagQI\Translate5\Test\Api\Helper;
+use MittagQI\Translate5\Test\ApiTestAbstract;
 
 /**
  * Test for the CSRF Protection
  * Generally all Tests test this feature so here more the error-cases are tested
  */
-class Translate3048Test extends editor_Test_ApiTest
+class Translate3048Test extends ApiTestAbstract
 {
     private static string $apitestToken;
 

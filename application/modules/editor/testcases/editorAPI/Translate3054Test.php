@@ -29,11 +29,12 @@ END LICENSE AND COPYRIGHT
 use MittagQI\Translate5\Test\Import\Config;
 use MittagQI\Translate5\Test\Import\LanguageResource;
 use MittagQI\Translate5\Test\Import\Task;
+use MittagQI\Translate5\Test\JsonTestAbstract;
 
 /**
  * Check batch-setting falsePositive-flag for a similar qualities across whole task
  */
-class Translate3054Test extends \editor_Test_JsonTest
+class Translate3054Test extends JsonTestAbstract
 {
     protected static ?LanguageResource $tc = null;
 

@@ -26,10 +26,12 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\Test\SegmentTagsTestAbstract;
+
 /**
  * Several "classic" PHPUnit tests to check the OOP Tag-Parsing API againsted selected test data
  */
-class SegmentTagsTest extends editor_Test_SegmentTagsTest
+class SegmentTagsTest extends SegmentTagsTestAbstract
 {
     public function testUnicodeTag()
     {

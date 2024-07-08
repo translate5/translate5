@@ -27,12 +27,13 @@ END LICENSE AND COPYRIGHT
 */
 
 use MittagQI\Translate5\Test\Import\Config;
+use MittagQI\Translate5\Test\JsonTestAbstract;
 
 /***
  * This will create a task, resource and customer and assign the resource by default as pivot resource.
  * Based on runtimeOptions.import.autoStartPivotTranslations , the pivot pre-translation will be auto queue
  */
-class Translate3077Test extends editor_Test_JsonTest
+class Translate3077Test extends JsonTestAbstract
 {
     protected static array $requiredPlugins = [
         'editor_Plugins_DeepL_Init',

@@ -27,12 +27,13 @@ END LICENSE AND COPYRIGHT
 */
 
 use MittagQI\Translate5\Test\Import\Config;
+use MittagQI\Translate5\Test\JsonTestAbstract;
 
 /***
  * Test if empty files do not crash the import. Files which can not produce segments should not crash the import.
  * The task should be imported without errors but with no segments
  */
-class Translate3186Test extends editor_Test_JsonTest
+class Translate3186Test extends JsonTestAbstract
 {
     protected static array $requiredPlugins = [
         'editor_Plugins_Okapi_Init',

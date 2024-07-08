@@ -28,11 +28,12 @@ END LICENSE AND COPYRIGHT
 
 use MittagQI\Translate5\Test\Filter;
 use MittagQI\Translate5\Test\Import\Config;
+use MittagQI\Translate5\Test\JsonTestAbstract;
 
 /**
  * Testcase for TRANSLATE-3593
  */
-class QualityTerminologyTest extends editor_Test_JsonTest
+class QualityTerminologyTest extends JsonTestAbstract
 {
     protected static bool $termtaggerRequired = true;
 

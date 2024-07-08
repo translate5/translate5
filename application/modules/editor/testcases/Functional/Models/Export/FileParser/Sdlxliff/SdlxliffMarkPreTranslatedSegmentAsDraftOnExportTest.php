@@ -8,12 +8,12 @@ use editor_Models_Segment as Segment;
 use editor_Models_Segment_AutoStates as AutoStates;
 use editor_Models_Segment_MatchRateType as MatchRateType;
 use editor_Models_Task;
-use editor_Test_UnitTest;
 use MittagQI\Translate5\Task\Import\SkeletonFile;
+use MittagQI\Translate5\Test\UnitTestAbstract;
 use ZfExtended_Factory;
 use ZfExtended_Utils;
 
-class SdlxliffMarkPreTranslatedSegmentAsDraftOnExportTest extends editor_Test_UnitTest
+class SdlxliffMarkPreTranslatedSegmentAsDraftOnExportTest extends UnitTestAbstract
 {
     private editor_Models_Task $task;
 
