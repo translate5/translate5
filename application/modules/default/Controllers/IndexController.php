@@ -91,7 +91,7 @@ class IndexController extends ZfExtended_Controllers_Action
         $maintenance = ZfExtended_Factory::get(ZfExtended_Models_Installer_Maintenance::class);
 
         $monitoringConfig = $conf->runtimeOptions->maintenance->monitoring;
-        $isBackup = str_contains($maintenance->status()->message, $monitoringConfig->backupMessage);
+        $isBackup = str_contains($maintenance->status()->message ?? '', $monitoringConfig->backupMessage);
 
         $this->view->monitoringMessage = 'All Ok';
 
@@ -123,6 +123,8 @@ class IndexController extends ZfExtended_Controllers_Action
                         'Monitoring not successful: {reason}',
                         [
                             'reason' => $this->view->monitoringMessage,
+                            'error' => $oneResult->error,
+                            'warning' => $oneResult->warning,
                         ]
                     );
 
