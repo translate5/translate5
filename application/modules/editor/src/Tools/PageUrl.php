@@ -62,6 +62,12 @@ final class PageUrl
 {
     public const MAX_REDIRECTS = 3;
 
+    private ?string $url;
+
+    private string $original;
+
+    private bool $removeFragment;
+
     private bool $valid = true;
 
     private bool $fragment = false;
@@ -70,17 +76,14 @@ final class PageUrl
 
     private bool $accessible = true;
 
-    private string $original;
-
     private int $statusCode;
 
-    public function __construct(
-        private ?string $url,
-        private bool $removeFragment = true
-    ) {
+    public function __construct(string $url, bool $removeFragment = true)
+    {
+        $this->url = $this->original = $url;
+        $this->removeFragment = $removeFragment;
         $this->clean();
         $this->follow();
-        $this->original = $url;
         if ($this->hasError()) {
             $this->url = null;
         }
@@ -198,8 +201,9 @@ final class PageUrl
             $this->found = false;
         } else {
             $effectiveUrl = curl_getinfo($ch, CURLINFO_EFFECTIVE_URL);
+            /** @phpstan-ignore-next-line */
             $this->url = ($effectiveUrl === false) ? null : $effectiveUrl;
-
+            /** @phpstan-ignore-next-line */
             if ($this->url === null) {
                 $this->found = false;
             } else {

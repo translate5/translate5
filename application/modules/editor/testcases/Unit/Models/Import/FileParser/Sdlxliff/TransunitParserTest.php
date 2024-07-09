@@ -96,7 +96,7 @@ TU;
                 ],
                 'segment' => [
                     'useStrictEscaping' => false,
-                ]
+                ],
             ],
         ]);
         $parser = new TransunitParser($config, $task, true, $authorToTrackChangeIdAndNr);
