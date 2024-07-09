@@ -358,19 +358,18 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
             $useSegmentTimestamp
         );
 
+        $dataSent = [
+            'source' => $source,
+            'target' => $target,
+            'userName' => $segment->getUserName(),
+            'context' => $segment->getMid(),
+            // TODO fix this after TMMaintenance is merged
+//            'timestamp' => $timestamp,
+            'fileName' => $fileName,
+        ];
+
         if ($successful) {
-            $this->checkUpdateResponse(
-                [
-                    'source' => $source,
-                    'target' => $target,
-                    'userName' => $segment->getUserName(),
-                    'context' => $segment->getMid(),
-                    // TODO fix this after TMMaintenance is merged
-//                    'timestamp' => $timestamp,
-                    'fileName' => $fileName,
-                ],
-                $this->api->getResult(),
-            );
+            $this->checkUpdateResponse($dataSent, $this->api->getResult());
             $this->checkUpdatedSegment($segment, $recheckOnUpdate);
 
             return;
@@ -385,6 +384,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
             $successful = $this->api->update($source, $target, $segment, $fileName, $tmName, ! $this->isInternalFuzzy);
 
             if ($successful) {
+                $this->checkUpdateResponse($dataSent, $this->api->getResult());
                 $this->checkUpdatedSegment($segment, $recheckOnUpdate);
 
                 return;
@@ -399,6 +399,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
             $successful = $this->api->update($source, $target, $segment, $fileName, $tmName, ! $this->isInternalFuzzy);
 
             if ($successful) {
+                $this->checkUpdateResponse($dataSent, $this->api->getResult());
                 $this->checkUpdatedSegment($segment, $recheckOnUpdate);
 
                 return;
