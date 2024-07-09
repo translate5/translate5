@@ -364,7 +364,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
             'userName' => $segment->getUserName(),
             'context' => $segment->getMid(),
             // TODO fix this after TMMaintenance is merged
-//            'timestamp' => $timestamp,
+            // 'timestamp' => $timestamp,
             'fileName' => $fileName,
         ];
 
