@@ -27,11 +27,12 @@ END LICENSE AND COPYRIGHT
 */
 
 use MittagQI\Translate5\Test\Import\Config;
+use MittagQI\Translate5\Test\JsonTestAbstract;
 
 /**
  * Testcase for TRANSLATE-1475 Merging of term tagger result and track changes content leads to several errors
  */
-class Translate1475Test extends editor_Test_JsonTest
+class Translate1475Test extends JsonTestAbstract
 {
     protected static bool $termtaggerRequired = true;
 

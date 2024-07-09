@@ -28,12 +28,13 @@ END LICENSE AND COPYRIGHT
 
 use MittagQI\Translate5\Test\Import\Config;
 use MittagQI\Translate5\Test\Import\LanguageResource;
+use MittagQI\Translate5\Test\JsonTestAbstract;
 
 /**
  * Testcase for TRANSLATE-2756 - basically a match analysis and pretranslation test regarding repetitions and internal fuzzies
  * For details see the issue.
  */
-class Translate2756Test extends editor_Test_JsonTest
+class Translate2756Test extends JsonTestAbstract
 {
     protected static array $forbiddenPlugins = [
         'editor_Plugins_LockSegmentsBasedOnConfig_Bootstrap',

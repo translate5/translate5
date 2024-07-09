@@ -27,12 +27,13 @@ END LICENSE AND COPYRIGHT
 */
 
 use MittagQI\Translate5\Test\Import\Config;
+use MittagQI\Translate5\Test\JsonTestAbstract;
 
 /**
  * Testcase for TRANSLATE-2567 TagProtection can not deal with line breaks in HTML attributes
  * For details see the issue.
  */
-class Translate2567Test extends editor_Test_JsonTest
+class Translate2567Test extends JsonTestAbstract
 {
     protected static array $forbiddenPlugins = [
         'editor_Plugins_LockSegmentsBasedOnConfig_Bootstrap',

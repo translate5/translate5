@@ -32,7 +32,7 @@ http://translate5-URL/editor/test/termtagger?filter=stemm
   compared with the expectedOutput > source and expectedOutput > target
 
 - The comparision will be done by the assertion specified in the type-attribute of the assertion-tag in the testcase-file.
-  This assertion has to be defined in editor_Test_Termtagger as methods assertionnameSource and assertionnameTarget, where as "assertionname stands for the content of the attribute. Term-IDs are ignored by the Tests. That means, if the Term-ID does not
+  This assertion has to be defined in TermtaggerTestAbstract as methods assertionnameSource and assertionnameTarget, where as "assertionname stands for the content of the attribute. Term-IDs are ignored by the Tests. That means, if the Term-ID does not
 match, the test passes anyway.
 
 - the results for each .testcase-file will be displayed as browser output

@@ -27,6 +27,7 @@ END LICENSE AND COPYRIGHT
 */
 
 use MittagQI\Translate5\Test\Import\Config;
+use MittagQI\Translate5\Test\ImportTestAbstract;
 
 /**
  * Translate682Test imports a simple task, where the segments contain htmlentities
@@ -35,7 +36,7 @@ use MittagQI\Translate5\Test\Import\Config;
  * See therefore:
  * TRANSLATE-678
  */
-class Translate682Test extends editor_Test_ImportTest
+class Translate682Test extends ImportTestAbstract
 {
     protected static bool $termtaggerRequired = true;
 

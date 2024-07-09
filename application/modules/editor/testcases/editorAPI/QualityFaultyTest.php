@@ -28,12 +28,13 @@ END LICENSE AND COPYRIGHT
 
 use MittagQI\Translate5\Test\Filter;
 use MittagQI\Translate5\Test\Import\Config;
+use MittagQI\Translate5\Test\JsonTestAbstract;
 
 /**
  * Testcase for the AutoQA feature
  * Tests the special case, an internal tag has a faulty HTML structure (opening/closing tags in wrong order, internal tags interleaving)
  */
-class QualityFaultyTest extends editor_Test_JsonTest
+class QualityFaultyTest extends JsonTestAbstract
 {
     protected static array $requiredRuntimeOptions = [
         'autoQA.enableInternalTagCheck' => 1,

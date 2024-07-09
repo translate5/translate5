@@ -26,12 +26,14 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\Test\JsonTestAbstract;
+
 /***
  * This test will create and write content into instant translate memory. The content which is saved to the tm, will be
  * additionally validate with instant-translate search functionality
  *
  */
-class Translate2483Test extends editor_Test_JsonTest
+class Translate2483Test extends JsonTestAbstract
 {
     /***
      * String which will be saved as source in the instant-translate memory

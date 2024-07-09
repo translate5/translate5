@@ -27,12 +27,13 @@ END LICENSE AND COPYRIGHT
 */
 
 use MittagQI\Translate5\Test\Import\Config;
+use MittagQI\Translate5\Test\ImportTestAbstract;
 
 /**
  * Test word count of a task when edit100PercentMatch enabled/disabled.
  * This will also test the analysis results when the task edit100PercentMatch is enabled/disabled
  */
-class Translate2428Test extends editor_Test_ImportTest
+class Translate2428Test extends ImportTestAbstract
 {
     protected static array $requiredPlugins = [
         'editor_Plugins_Okapi_Init',

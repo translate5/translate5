@@ -27,11 +27,12 @@ END LICENSE AND COPYRIGHT
 */
 
 use MittagQI\Translate5\Test\Import\Config;
+use MittagQI\Translate5\Test\JsonTestAbstract;
 
 /**
  * Testcase for TRANSLATE-1804 Segments containing only 0 are not imported
  */
-class Translate1804Test extends editor_Test_JsonTest
+class Translate1804Test extends JsonTestAbstract
 {
     protected static array $forbiddenPlugins = [
         'editor_Plugins_LockSegmentsBasedOnConfig_Bootstrap',

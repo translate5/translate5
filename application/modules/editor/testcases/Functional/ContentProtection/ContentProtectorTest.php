@@ -55,7 +55,6 @@ namespace MittagQI\Translate5\Test\Functional\ContentProtection;
 use editor_Models_Import_FileParser_Tag as Tag;
 use editor_Models_Import_FileParser_WhitespaceTag;
 use editor_Models_Segment_Whitespace as Whitespace;
-use editor_Test_UnitTest;
 use MittagQI\Translate5\ContentProtection\ContentProtector;
 use MittagQI\Translate5\ContentProtection\Model\ContentRecognition;
 use MittagQI\Translate5\ContentProtection\Model\InputMapping;
@@ -64,9 +63,10 @@ use MittagQI\Translate5\ContentProtection\NumberProtection\Protector\DateProtect
 use MittagQI\Translate5\ContentProtection\NumberProtection\Protector\FloatProtector;
 use MittagQI\Translate5\ContentProtection\NumberProtection\Protector\IntegerProtector;
 use MittagQI\Translate5\ContentProtection\NumberProtection\Tag\NumberTag;
+use MittagQI\Translate5\Test\UnitTestAbstract;
 use ZfExtended_Factory;
 
-class ContentProtectorTest extends editor_Test_UnitTest
+class ContentProtectorTest extends UnitTestAbstract
 {
     protected function setUp(): void
     {

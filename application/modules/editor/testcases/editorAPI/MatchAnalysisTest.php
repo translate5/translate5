@@ -27,6 +27,7 @@
  */
 
 use MittagQI\Translate5\Test\Import\Config;
+use MittagQI\Translate5\Test\ImportTestAbstract;
 
 /**
  * Match analysis tests.
@@ -34,7 +35,7 @@ use MittagQI\Translate5\Test\Import\Config;
  * The valid test results are counted by hand.
  * For more info about the segment results check the Analysis test result Info.ods document in the test folder
  */
-class MatchAnalysisTest extends editor_Test_ImportTest
+class MatchAnalysisTest extends ImportTestAbstract
 {
     use \MittagQI\Translate5\Test\Api\AnalysisTrait;
 
@@ -174,6 +175,7 @@ class MatchAnalysisTest extends editor_Test_ImportTest
         //check for differences between the expected and the actual content
         $this->assertEquals($this->filterUngroupedAnalysis($expectedAnalysis), $this->filterUngroupedAnalysis($analysis), "The expected file and the data does not match for the '.$unitType.'-based not-grouped matchanalysis..");
     }
+
     public static function afterTests(): void
     {
         foreach (self::$changedConfigs as $c) {

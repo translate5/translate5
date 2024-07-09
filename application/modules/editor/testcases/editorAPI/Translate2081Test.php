@@ -26,11 +26,13 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\Test\JsonTestAbstract;
+
 /***
  * Create tmp customer and define auto assigned users
  * Create task with the tmp customer and matching workflow/source/target and validate if the user is auto assigned
  */
-class Translate2081Test extends editor_Test_JsonTest
+class Translate2081Test extends JsonTestAbstract
 {
     protected static $sourceLangRfc = 'de';
 

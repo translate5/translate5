@@ -27,6 +27,7 @@ END LICENSE AND COPYRIGHT
 */
 
 use MittagQI\Translate5\Test\Import\Config;
+use MittagQI\Translate5\Test\JsonTestAbstract;
 
 /**
  * ChangeAlikeTranslate683Test imports a simple task, checks and checks the ChangeAlike Behaviour in combination
@@ -49,7 +50,7 @@ use MittagQI\Translate5\Test\Import\Config;
  *   - Segments to be changed with the repetition editor are getting the edited target and the edited source and the autostates of the master segment
  *   - In Source Original the transFound states are recalculated
  */
-class ChangeAlikeTranslate683Test extends editor_Test_JsonTest
+class ChangeAlikeTranslate683Test extends JsonTestAbstract
 {
     protected static bool $termtaggerRequired = true;
 

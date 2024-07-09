@@ -27,11 +27,12 @@ END LICENSE AND COPYRIGHT
 */
 
 use MittagQI\Translate5\Test\Import\Config;
+use MittagQI\Translate5\Test\ImportTestAbstract;
 
 /**
  * Test the task joined filters
  */
-class TaskFilterTest extends editor_Test_ImportTest
+class TaskFilterTest extends ImportTestAbstract
 {
     protected static bool $termtaggerRequired = true;
 

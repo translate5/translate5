@@ -26,11 +26,13 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\Test\SegmentTagsTestAbstract;
+
 /**
  * Several "classic" PHPUnit tests to check the FieldTags Cloning without TrackChanges tags
  * TODO: create test with additional quality-tags e.g. MQM
  */
-class SegmentTagsCloneTest extends editor_Test_SegmentTagsTest
+class SegmentTagsCloneTest extends SegmentTagsTestAbstract
 {
     /**
      * Some Internal Tags to create Tests with

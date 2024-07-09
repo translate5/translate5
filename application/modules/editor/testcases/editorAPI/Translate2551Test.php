@@ -27,8 +27,9 @@ END LICENSE AND COPYRIGHT
 */
 
 use MittagQI\Translate5\Test\Import\Config;
+use MittagQI\Translate5\Test\JsonTestAbstract;
 
-class Translate2551Test extends editor_Test_JsonTest
+class Translate2551Test extends JsonTestAbstract
 {
     protected static array $requiredPlugins = [
         'editor_Plugins_Okapi_Init',
@@ -49,7 +50,8 @@ class Translate2551Test extends editor_Test_JsonTest
      */
     public function testFileReimport()
     {
-        $route = '/editor/taskid/' . $this->getTask()->getId() . '/file/';
+        $task = static::getTask();
+        $route = '/editor/taskid/' . $task->getId() . '/file/';
 
         $this->api()->get($route);
 
@@ -57,7 +59,7 @@ class Translate2551Test extends editor_Test_JsonTest
 
         self::assertNotEmpty($files, 'No files found for the uploaded task.');
 
-        $files = $files[0]; // the firs file will be replaced
+        $files = $files[0]; // the files file will be replaced
 
         $file = 'reimport.xliff';
         static::api()->addFile('fileReimport', static::api()->getFile($file), "application/xml");
@@ -66,8 +68,8 @@ class Translate2551Test extends editor_Test_JsonTest
             'fileId' => $files->id,
         ], null, false, true);
 
-        sleep(1);
-        static::api()->waitForCurrentTaskStateOpen();
+        // wait for reimport worker
+        $this->waitForWorker(MittagQI\Translate5\Task\Reimport\Worker::class, $task);
 
         self::api()->setTaskToEdit();
         $segmentsActual = static::api()->getSegmentsWithBasicData();
@@ -89,7 +91,7 @@ class Translate2551Test extends editor_Test_JsonTest
      */
     public function compareSegments(array $actual, array $expected): void
     {
-        $segmentTagger = ZfExtended_Factory::get('editor_Models_Segment_InternalTag');
+        $segmentTagger = ZfExtended_Factory::get(editor_Models_Segment_InternalTag::class);
         $actualFiltered = [];
 
         foreach ($actual as $a) {

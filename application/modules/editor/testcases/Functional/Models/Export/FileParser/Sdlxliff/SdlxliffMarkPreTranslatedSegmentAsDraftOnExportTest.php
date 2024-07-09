@@ -1,6 +1,6 @@
 <?php
 
-namespace MittagQI\Translate5\Test\Functional\Models\Export\FileParser;
+namespace MittagQI\Translate5\Test\Functional\Models\Export\FileParser\Sdlxliff;
 
 use editor_Models_File;
 use editor_Models_Import_FileParser_Sdlxliff;
@@ -8,12 +8,12 @@ use editor_Models_Segment as Segment;
 use editor_Models_Segment_AutoStates as AutoStates;
 use editor_Models_Segment_MatchRateType as MatchRateType;
 use editor_Models_Task;
-use editor_Test_UnitTest;
 use MittagQI\Translate5\Task\Import\SkeletonFile;
+use MittagQI\Translate5\Test\UnitTestAbstract;
 use ZfExtended_Factory;
 use ZfExtended_Utils;
 
-class SdlxliffMarkPreTranslatedSegmentAsDraftOnExportTest extends editor_Test_UnitTest
+class SdlxliffMarkPreTranslatedSegmentAsDraftOnExportTest extends UnitTestAbstract
 {
     private editor_Models_Task $task;
 
@@ -25,7 +25,7 @@ class SdlxliffMarkPreTranslatedSegmentAsDraftOnExportTest extends editor_Test_Un
     {
         parent::setUp();
 
-        $this->taskDataPath = __DIR__ . '/SdlxliffMarkPreTranslatedSegmentAsDraftOnExportTest/testfiles/';
+        $this->taskDataPath = __DIR__ . '/testfiles/SdlxliffMarkPreTranslatedSegmentAsDraftOnExportTest/';
 
         $customer = ZfExtended_Factory::get(\editor_Models_Customer_Customer::class);
         $customer->loadByDefaultCustomer();

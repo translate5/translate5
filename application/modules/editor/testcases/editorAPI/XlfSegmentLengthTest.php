@@ -27,12 +27,13 @@ END LICENSE AND COPYRIGHT
 */
 
 use MittagQI\Translate5\Test\Import\Config;
+use MittagQI\Translate5\Test\JsonTestAbstract;
 
 /**
  * XlfSegmentLengthTest imports a simple task and checks imported values about the segment lengths
  * edits segments and checks then the edited ones again on correct content
  */
-class XlfSegmentLengthTest extends editor_Test_JsonTest
+class XlfSegmentLengthTest extends JsonTestAbstract
 {
     protected static array $forbiddenPlugins = [
         'editor_Plugins_LockSegmentsBasedOnConfig_Bootstrap',

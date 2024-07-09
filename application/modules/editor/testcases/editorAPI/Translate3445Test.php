@@ -29,12 +29,13 @@ END LICENSE AND COPYRIGHT
 use MittagQI\Translate5\Test\Import\Config;
 use MittagQI\Translate5\Test\Import\Exception;
 use MittagQI\Translate5\Test\Import\LanguageResource;
+use MittagQI\Translate5\Test\JsonTestAbstract;
 
 /**
  * Test if google translator as language resources works. This will create single segment task and pre-translate it
  * with google translator language resource.
  */
-class Translate3445Test extends editor_Test_JsonTest
+class Translate3445Test extends JsonTestAbstract
 {
     protected static bool $skipIfOptionsMissing = true;
 

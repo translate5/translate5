@@ -27,12 +27,13 @@ END LICENSE AND COPYRIGHT
 */
 
 use MittagQI\Translate5\Test\Import\Config;
+use MittagQI\Translate5\Test\JsonTestAbstract;
 
 /***
  * This test will create one task with pivot file where the workflow/pivot file-name matching is done until the first "."
  * ex: the pivot file with a name "test-aleks.de.xliff" will match the workflow file with a name "test-aleks.en.test.xliff"
  */
-class Translate2827Test extends editor_Test_JsonTest
+class Translate2827Test extends JsonTestAbstract
 {
     protected static function setupImport(Config $config): void
     {

@@ -27,11 +27,12 @@ END LICENSE AND COPYRIGHT
 */
 
 use MittagQI\Translate5\Test\Import\Config;
+use MittagQI\Translate5\Test\JsonTestAbstract;
 
 /**
  * Test for customFields feature in task
  */
-class Translate3483Test extends editor_Test_JsonTest
+class Translate3483Test extends JsonTestAbstract
 {
     public const EDITOR_TASKCUSTOMFIELD_ROUTE = 'editor/taskcustomfield/';
 

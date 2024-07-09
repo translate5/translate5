@@ -102,11 +102,12 @@ abstract class editor_Models_Export_DiffTagger
      *   (aber nur weil tagBreakUp davor aufgerufen wurde und sonst das array nicht in der Struktur verändert wurde)
      *
      * @param array $segment
+     * @param bool $concatDelim
      * @return array $segment
      */
-    protected function wordBreakUp($segment)
+    protected function wordBreakUp($segment, $concatDelim = false) : array
     {
-        return editor_Utils::wordBreakUp($segment);
+        return editor_Utils::wordBreakUp($segment, $concatDelim);
     }
 
     /**

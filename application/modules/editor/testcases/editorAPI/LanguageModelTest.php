@@ -26,11 +26,13 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\Test\UnitTestAbstract;
+
 /**
  * Unit Tests for Language Class
  * Should be extended as needed
  */
-class LanguageModelTest extends editor_Test_UnitTest
+class LanguageModelTest extends UnitTestAbstract
 {
     /**
      * Testcase for "TRANSLATE-2939: Fix language matching on term tagging" to test language fuzzy logic.
@@ -63,11 +65,11 @@ class LanguageModelTest extends editor_Test_UnitTest
         static::assertEquals('1031', $languageDESUB->getLcid(), 'LCID not as expected after loading');
 
         //load the rfc fuzzy values for the loaded german
-        static::assertEquals($allGermanRFCs, $languageDE->getFuzzyLanguages($languageDE->getId(), 'rfc5646', true), 'Should return all german languages!');
-        static::assertEquals($allGermanRFCs, $languageDE->getFuzzyLanguages($languageDE->getId(), 'rfc5646', false), 'Should return all german languages!');
+        static::assertEquals($allGermanRFCs, $languageDE->getFuzzyLanguages((int) $languageDE->getId(), 'rfc5646', true), 'Should return all german languages!');
+        static::assertEquals($allGermanRFCs, $languageDE->getFuzzyLanguages((int) $languageDE->getId(), 'rfc5646', false), 'Should return all german languages!');
 
-        static::assertEquals(['de-DE', 'de'], $languageDESUB->getFuzzyLanguages($languageDESUB->getId(), 'rfc5646', true), 'Fuzzies for de-DE (including major) should be de and de-DE only');
+        static::assertEquals(['de-DE', 'de'], $languageDESUB->getFuzzyLanguages((int) $languageDESUB->getId(), 'rfc5646', true), 'Fuzzies for de-DE (including major) should be de and de-DE only');
         //ta
-        static::assertEquals(['de-DE'], $languageDESUB->getFuzzyLanguages($languageDESUB->getId(), 'rfc5646', false), 'Fuzzies for de-DE (excluding major) should be de-DE only');
+        static::assertEquals(['de-DE'], $languageDESUB->getFuzzyLanguages((int) $languageDESUB->getId(), 'rfc5646', false), 'Fuzzies for de-DE (excluding major) should be de-DE only');
     }
 }

@@ -26,19 +26,25 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+namespace MittagQI\Translate5\Test;
+
+use editor_Plugins_VisualReview_Init;
+use editor_Plugins_VisualReview_Source_Files;
+use stdClass;
+
 /**
  * Extends the main Test Class for some convenience methods regarding the Visual Plugin
  * This Class Expects one Task to be setup & imported !
  */
-abstract class editor_Test_VisualTest extends editor_Test_JsonTest
+abstract class VisualTestAbstract extends JsonTestAbstract
 {
     protected static array $requiredPlugins = [
-        'editor_Plugins_VisualReview_Init',
+        editor_Plugins_VisualReview_Init::class,
     ];
 
     /**
      * Retrieves the visual files structure as json
-     * @return mixed
+     * @return array|stdClass
      */
     protected function getVisualFilesJson(string $jsonFileName)
     {
@@ -85,7 +91,7 @@ abstract class editor_Test_VisualTest extends editor_Test_JsonTest
             $html = strip_tags($html);
         }
         if (empty($html)) {
-            $this->assertTrue(! empty($html), $message . ' [File ' . $this->getVisualHtmlFileName($isSplitFile, $index) . ' was not found or had no contents]');
+            $this->fail($message . ' [File ' . $this->getVisualHtmlFileName($isSplitFile, $index) . ' was not found or had no contents]');
         } else {
             $this->assertTrue(str_contains($html, $text), $message . ' [File ' . $this->getVisualHtmlFileName($isSplitFile, $index) . ' did not contain "' . $text . '"]');
         }
@@ -101,7 +107,7 @@ abstract class editor_Test_VisualTest extends editor_Test_JsonTest
             $html = strip_tags($html);
         }
         if (empty($html)) {
-            $this->assertTrue(! empty($html), $message . ' [File ' . $this->getVisualHtmlFileName($isSplitFile, $index) . ' was not found or had no contents]');
+            $this->fail($message . ' [File ' . $this->getVisualHtmlFileName($isSplitFile, $index) . ' was not found or had no contents]');
         } else {
             $this->assertFalse(str_contains($html, $text), $message . ' [File ' . $this->getVisualHtmlFileName($isSplitFile, $index) . ' did not contain "' . $text . '"]');
         }
@@ -114,7 +120,7 @@ abstract class editor_Test_VisualTest extends editor_Test_JsonTest
     {
         $html = $this->getVisualHtmlFile($isSplitFile, $index);
         if (empty($html)) {
-            $this->assertTrue(! empty($html), $message . ' [File ' . $this->getVisualHtmlFileName($isSplitFile, $index) . ' was not found or had no contents]');
+            $this->fail($message . ' [File ' . $this->getVisualHtmlFileName($isSplitFile, $index) . ' was not found or had no contents]');
         } else {
             $this->assertTrue((preg_match($pattern, $html) === 1), $message . ' [File ' . $this->getVisualHtmlFileName($isSplitFile, $index) . ' did not match "' . $pattern . '"]');
         }

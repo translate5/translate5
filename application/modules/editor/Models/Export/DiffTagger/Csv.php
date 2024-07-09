@@ -64,15 +64,16 @@ class editor_Models_Export_DiffTagger_Csv extends editor_Models_Export_DiffTagge
      * @param string $edited bereits in die Ursprungssyntax zurückgebautes editiertes target-Segment (edited-Spalte)
      * @param string $changeTimestamp Zeitpunkt der letzten Änderung des Segments
      * @param string $userName Benutzername des Lektors
+     * @param bool $concatDelim Benutzername des Lektors
      * @return string $edited mit diff-Syntax fertig ausgezeichnet
      */
-    public function diffSegment($target, $edited, $changeTimestamp, $userName)
+    public function diffSegment($target, $edited, $changeTimestamp, $userName, $concatDelim = false) : string
     {
         $targetArr = $this->tagBreakUp($target);
         $editedArr = $this->tagBreakUp($edited);
 
-        $targetArr = $this->wordBreakUp($targetArr);
-        $editedArr = $this->wordBreakUp($editedArr);
+        $targetArr = $this->wordBreakUp($targetArr, $concatDelim);
+        $editedArr = $this->wordBreakUp($editedArr, $concatDelim);
 
         $diff = ZfExtended_Factory::get('ZfExtended_Diff');
         /* @var $diff ZfExtended_Diff */
