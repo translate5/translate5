@@ -324,7 +324,8 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
         $this->throwBadGateway();
     }
 
-    public function update(editor_Models_Segment $segment, array $options = []): void {
+    public function update(editor_Models_Segment $segment, array $options = []): void
+    {
         $tmName = $this->getWritableMemory();
 
         if ($this->isReorganizingAtTheMoment($tmName)) {

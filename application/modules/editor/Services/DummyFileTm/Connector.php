@@ -128,7 +128,8 @@ class editor_Services_DummyFileTm_Connector extends editor_Services_Connector_Fi
         return join("\n", $result);
     }
 
-    public function update(editor_Models_Segment $segment, array $options = []): void {
+    public function update(editor_Models_Segment $segment, array $options = []): void
+    {
         $source = $this->tagHandler->prepareQuery($this->getQueryString($segment));
         $target = $this->tagHandler->prepareQuery($segment->getTargetEdit());
 
