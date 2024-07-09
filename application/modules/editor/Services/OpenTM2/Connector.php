@@ -324,16 +324,11 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
         $this->throwBadGateway();
     }
 
-    public function update(
-        editor_Models_Segment $segment,
-        bool $recheckOnUpdate = self::DO_NOT_RECHECK_ON_UPDATE,
-        bool $rescheduleUpdateOnError = self::DO_NOT_RESCHEDULE_UPDATE_ON_ERROR,
-        bool $useSegmentTimestamp = self::DO_NOT_USE_SEGMENT_TIMESTAMP
-    ): void {
+    public function update(editor_Models_Segment $segment, array $options = []): void {
         $tmName = $this->getWritableMemory();
 
         if ($this->isReorganizingAtTheMoment($tmName)) {
-            if ($rescheduleUpdateOnError) {
+            if ($options[UpdatableAdapterInterface::RESCHEDULE_UPDATE_ON_ERROR] ?? false) {
                 throw new RescheduleUpdateNeededException();
             }
 
@@ -347,6 +342,9 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
         $source = $this->tagHandler->prepareQuery($this->getQueryString($segment));
         $this->tagHandler->setInputTagMap($this->tagHandler->getTagMap());
         $target = $this->tagHandler->prepareQuery($segment->getTargetEdit(), false);
+        $saveToDisk = $options[UpdatableAdapterInterface::SAVE_TO_DISK] ?? true;
+        $saveToDisk = $saveToDisk && ! $this->isInternalFuzzy;
+        $useSegmentTimestamp = $options[UpdatableAdapterInterface::USE_SEGMENT_TIMESTAMP] ?? false;
 
         $successful = $this->api->update(
             $source,
@@ -354,12 +352,14 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
             $segment,
             $fileName,
             $tmName,
-            ! $this->isInternalFuzzy,
+            $saveToDisk,
             $useSegmentTimestamp
         );
 
+        $recheckOnUpdate = $options[UpdatableAdapterInterface::RECHECK_ON_UPDATE] ?? false;
+
         if ($successful) {
-            $this->checkUpdatedSegment($segment, $recheckOnUpdate);
+            $this->checkUpdatedSegmentIfNeeded($segment, $recheckOnUpdate);
 
             return;
         }
@@ -370,10 +370,18 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
             $this->addReorganizeWarning($segment->getTask());
             $this->reorganizeTm($tmName);
 
-            $successful = $this->api->update($source, $target, $segment, $fileName, $tmName, ! $this->isInternalFuzzy);
+            $successful = $this->api->update(
+                $source,
+                $target,
+                $segment,
+                $fileName,
+                $tmName,
+                $saveToDisk,
+                $useSegmentTimestamp
+            );
 
             if ($successful) {
-                $this->checkUpdatedSegment($segment, $recheckOnUpdate);
+                $this->checkUpdatedSegmentIfNeeded($segment, $recheckOnUpdate);
 
                 return;
             }
@@ -384,10 +392,18 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
             $newName = $this->api->createEmptyMemory($newName, $this->languageResource->getSourceLangCode());
             $this->addMemoryToLanguageResource($newName);
 
-            $successful = $this->api->update($source, $target, $segment, $fileName, $tmName, ! $this->isInternalFuzzy);
+            $successful = $this->api->update(
+                $source,
+                $target,
+                $segment,
+                $fileName,
+                $tmName,
+                $saveToDisk,
+                $useSegmentTimestamp
+            );
 
             if ($successful) {
-                $this->checkUpdatedSegment($segment, $recheckOnUpdate);
+                $this->checkUpdatedSegmentIfNeeded($segment, $recheckOnUpdate);
 
                 return;
             }
@@ -1788,11 +1804,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
     }
     // endregion export TM
 
-    /**
-     * Check if segment was updated properly
-     * and if not - add a log record for that for debug purposes
-     */
-    private function checkUpdatedSegment(editor_Models_Segment $segment, bool $recheckOnUpdate): void
+    private function checkUpdatedSegmentIfNeeded(editor_Models_Segment $segment, bool $recheckOnUpdate): void
     {
         if (! in_array(
             $this->getResource()->getUrl(),
@@ -1805,6 +1817,15 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
             return;
         }
 
+        $this->checkUpdatedSegment($segment);
+    }
+
+    /**
+     * Check if segment was updated properly
+     * and if not - add a log record for that for debug purposes
+     */
+    public function checkUpdatedSegment(editor_Models_Segment $segment): void
+    {
         $targetSent = $this->tagHandler->prepareQuery($segment->getTargetEdit(), false);
 
         $result = $this->query($segment);
