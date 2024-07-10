@@ -31,7 +31,7 @@ Ext.define('Editor.plugins.TMMaintenance.app.controller.TMMaintenance', {
             xtype: 'tab',
             closable: false,
             itemId: 'btnTMMaintenance',
-            glyph: 'xf002@FontAwesome5FreeSolid',
+            glyph: 'xf7d9@FontAwesome5FreeSolid',
             text: _this.strings.TMMaintenance
         });
     },
