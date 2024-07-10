@@ -53,11 +53,10 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
      */
     protected $pretranslate = false;
 
-    /***
+    /**
      * Flag if internal fuzzy will be calculated
-     * @var string
      */
-    protected $internalFuzzy = false;
+    protected bool $internalFuzzy = false;
 
     protected $connectorErrorCount = [];
 
@@ -527,7 +526,7 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
             $this->internalFuzzy
             // only segments matched in real TM should be saved in FuzzyTM
             && ! $connector->isInternalFuzzy()
-            && isset($this->internalFuzzyConnectorMap[$languageResourceId])
+            && array_key_exists($languageResourceId, $this->internalFuzzyConnectorMap)
         ) {
             $origTarget = $segment->getTargetEdit();
             $dummyTargetText = self::renderDummyTargetText($segment->getTaskGuid());
@@ -665,7 +664,7 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
                 if ($this->internalFuzzy && ! in_array($languageResource->getServiceType(), $fuzzyConnectorCreated)) {
                     $fuzzyConnector = $this->initFuzzyConnector($connector);
 
-                    if(! $fuzzyConnector->isDisabled()) {
+                    if (! $fuzzyConnector->isDisabled()) {
                         $fuzzyConnectorCreated[] = $languageResource->getServiceType();
                     }
 
@@ -782,7 +781,7 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
         $this->pretranslate = $pretranslate;
     }
 
-    public function setInternalFuzzy($internalFuzzy)
+    public function setInternalFuzzy(bool $internalFuzzy): void
     {
         $this->internalFuzzy = $internalFuzzy;
     }

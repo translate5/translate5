@@ -227,8 +227,8 @@ class editor_Plugins_MatchAnalysis_Models_MatchAnalysis extends ZfExtended_Model
         // Get pricing
         $this->pricing = Factory::get(PresetPrices::class)->getPricesFor(
             $presetId,
-            $task->getSourceLang(),
-            $task->getTargetLang()
+            (int) $task->getSourceLang(),
+            (int) $task->getTargetLang()
         );
 
         ksort($ranges);
@@ -267,7 +267,6 @@ class editor_Plugins_MatchAnalysis_Models_MatchAnalysis extends ZfExtended_Model
         //init the language reources group array
         $groupedResults = $this->initResultArray($analysisAssoc);
         foreach ($results as $res) {
-
             //the key will be languageResource->ServiceType + fuzzy flag (ex: "OpenTm2 memoryfuzzy")
             //because for the internal fuzzy additional row is displayed
             if ($res['internalFuzzy'] == '1') {
@@ -395,10 +394,10 @@ class editor_Plugins_MatchAnalysis_Models_MatchAnalysis extends ZfExtended_Model
             foreach ($fuzzyTypes as $type => $name) {
                 $initGroups = $initGroups + $initRow(
                     $this->getFuzzyName($type),
-                        sprintf(ZfExtended_Zendoverwrites_Translate::getInstance()->_('Interne Fuzzys (%s)'), $name),
+                    sprintf(ZfExtended_Zendoverwrites_Translate::getInstance()->_('Interne Fuzzys (%s)'), $name),
                     '',
                     editor_Models_Segment_MatchRateType::TYPE_TM
-                    );
+                );
             }
         }
 
@@ -408,7 +407,8 @@ class editor_Plugins_MatchAnalysis_Models_MatchAnalysis extends ZfExtended_Model
         return $initGroups;
     }
 
-    private function getFuzzyName(string $type): string {
+    private function getFuzzyName(string $type): string
+    {
         return $type . '-fuzzy';
     }
 
