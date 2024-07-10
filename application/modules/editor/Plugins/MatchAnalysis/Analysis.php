@@ -648,12 +648,14 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
                     continue;
                 }
 
+                $this->addConnector((int) $languageResource->getId(), $connector);
+
                 // collect the mt resource, so it can be used for pre-translations if needed
                 if ($resource->getType() == editor_Models_Segment_MatchRateType::TYPE_MT) {
                     $this->mtConnectors[] = $connector;
-                }
 
-                $this->addConnector((int) $languageResource->getId(), $connector);
+                    continue;
+                }
 
                 $resourceId = $languageResource->getResourceId();
 
