@@ -77,7 +77,6 @@ class MarkupTest extends TestCase
         $expected = 'Das <t5:mrk-import t5:mid="&gt;&gt;&gt;"/> <g ctype="underlined" equiv-text=\'&lt;run1&gt;\' id="\'&gt;&gt;\'"> und &lt;&gt; noch <g ctype="&gt;complete&gt;" _no-exit=\'"&gt;&gt;&gt;"\'> </g><t5:mrk-import mid="/&gt;/mrk-1&gt;"/></g> ist &lt;= 17 <t5:smth-else _t5:_kp=\'/&gt;/&gt;\'/> toll!</g>';
         self::assertEquals($expected, Markup::escapeForImport($markup));
 
-
         $markup = 'Das <g:u u:ctype="underlined" equiv-text="&lt;run1>" id="1"> x >= y && z <= 13 </g:u> ist <g ctype="cdata"><![CDATA[Unescaped: "\'&<>]]></g> </g>toll!';
         // check pre-escaping (only attribute-values)
         $expected = 'Das <g:u u:ctype="underlined" equiv-text="&lt;run1&gt;" id="1"> x >= y && z <= 13 </g:u> ist <g ctype="cdata"><![CDATA[Unescaped: "\'&<>]]></g> </g>toll!';
