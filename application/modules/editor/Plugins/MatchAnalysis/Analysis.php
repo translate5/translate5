@@ -651,9 +651,11 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
                 $this->addConnector((int) $languageResource->getId(), $connector);
 
                 // collect the mt resource, so it can be used for pre-translations if needed
-                if ($resource->getType() == editor_Models_Segment_MatchRateType::TYPE_MT) {
+                if ($languageResource->isMt()) {
                     $this->mtConnectors[] = $connector;
+                }
 
+                if (! $resource->supportsInternalFuzzy()) {
                     continue;
                 }
 
