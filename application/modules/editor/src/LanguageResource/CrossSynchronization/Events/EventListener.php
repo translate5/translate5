@@ -68,7 +68,7 @@ class EventListener
         );
     }
 
-    private function triggerCustomerAddedToConnectionEvents(Zend_EventManager_Event $event): void
+    public function triggerCustomerAddedToConnectionEvents(Zend_EventManager_Event $event): void
     {
         /** @var editor_Models_LanguageResources_CustomerAssoc $association */
         $association = $event->getParam('association');
@@ -83,7 +83,7 @@ class EventListener
         }
     }
 
-    private function triggerCustomerWasSeparatedFromConnectionEvents(Zend_EventManager_Event $event): void
+    public function triggerCustomerWasSeparatedFromConnectionEvents(Zend_EventManager_Event $event): void
     {
         /** @var editor_Models_LanguageResources_CustomerAssoc $association */
         $association = $event->getParam('deletedAssociation');
