@@ -87,7 +87,7 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
     private editor_Services_Manager $manager;
 
     /**
-     * Language resource -> Connector
+     * Resource ID -> Connector
      * @var array<string, editor_Services_Connector>
      */
     private array $internalFuzzyConnectorMap = [];
