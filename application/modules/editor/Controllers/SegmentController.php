@@ -95,7 +95,7 @@ class Editor_SegmentController extends ZfExtended_RestController
             $this->entity
         );
 
-        $segmentFilterValidator->validateAndRemoveInvalide(
+        $segmentFilterValidator->validateAndRemoveInvalid(
             $sfm->getView()->getFields(),
             $sfm->getSortColMap()
         );

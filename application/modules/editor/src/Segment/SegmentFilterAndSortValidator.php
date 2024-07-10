@@ -17,7 +17,7 @@ class SegmentFilterAndSortValidator
     ) {
     }
 
-    public function validateAndRemoveInvalide(array $allowedTableFields, array $mappedFields): void
+    public function validateAndRemoveInvalid(array $allowedTableFields, array $mappedFields): void
     {
         $filters = $this->entity->getFilter()->getFilters();
         $sorters = $this->entity->getFilter()->getSort();

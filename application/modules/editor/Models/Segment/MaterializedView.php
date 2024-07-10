@@ -103,10 +103,20 @@ class editor_Models_Segment_MaterializedView
 
     public function getFields(): array
     {
-        $db = Zend_Db_Table::getDefaultAdapter();
-        $metadata = $db->describeTable($this->getName());
+        if(empty($this->taskGuid))
+        {
+            return [];
+        }
 
-        return array_keys($metadata);
+        $segmentDb = ZfExtended_Factory::get(editor_Models_Segment::class)->db;
+
+        $sfm = editor_Models_SegmentFieldManager::getForTaskGuid($this->taskGuid);
+        $dataFields = $sfm->walkFields(function ($name,$k,$v){
+            return $name.$k;
+        });
+        $defaultColumns = $segmentDb->info($segmentDb::COLS);
+
+        return array_merge($defaultColumns,$dataFields);
     }
 
     /**
