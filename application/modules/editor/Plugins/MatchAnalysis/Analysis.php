@@ -428,31 +428,6 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
 
             //reset the result collection
             $matches->resetResult();
-
-            // Mark the segment as fuzzy match in the TM
-            // Checking for matchrate >= 100 is for edge case when segments have the same-same source but different
-            // source md5hash so they are not a repetitions. Updating the segment in this case would lead to omitting
-            // translation for other segments with the same-same source, but different source md5hash
-            if (
-                $bestMatchRateResult !== null
-                && $bestMatchRateResult->matchrate < 100
-                && $this->internalFuzzy
-                // only segments matched in real TM should be saved in FuzzyTM
-                && ! $connector->isInternalFuzzy()
-                && isset($this->internalFuzzyConnectorMap[$languageResourceId])
-            ) {
-                $origTarget = $segment->getTargetEdit();
-                $dummyTargetText = self::renderDummyTargetText($segment->getTaskGuid());
-                $segment->setTargetEdit($dummyTargetText);
-
-                try {
-                    $this->internalFuzzyConnectorMap[$languageResourceId]->update($segment);
-                } catch (SegmentUpdateException) {
-                    // Ignore the error here as we don't care about the result
-                }
-
-                $segment->setTargetEdit($origTarget);
-            }
         }
 
         return $bestMatchRateResult;
@@ -543,6 +518,30 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
         // if the current resource type is not MT, query the tm or termcollection
         $matches = $connector->query($segment);
 
+        // Mark the segment as fuzzy match in the TM
+        // Checking for matchrate >= 100 is for edge case when segments have the same-same source but different
+        // source md5hash so they are not a repetitions. Updating the segment in this case would lead to omitting
+        // translation for other segments with the same-same source, but different source md5hash
+        $languageResourceId = $connector->getLanguageResource()->getId();
+        if (
+            $this->internalFuzzy
+            // only segments matched in real TM should be saved in FuzzyTM
+            && ! $connector->isInternalFuzzy()
+            && isset($this->internalFuzzyConnectorMap[$languageResourceId])
+        ) {
+            $origTarget = $segment->getTargetEdit();
+            $dummyTargetText = self::renderDummyTargetText($segment->getTaskGuid());
+            $segment->setTargetEdit($dummyTargetText);
+
+            try {
+                $this->internalFuzzyConnectorMap[$languageResourceId]->update($segment);
+            } catch (SegmentUpdateException) {
+                // Ignore the error here as we don't care about the result
+            }
+
+            $segment->setTargetEdit($origTarget);
+        }
+
         return $matches;
     }
 
@@ -618,6 +617,9 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
             Status::NOT_LOADED,
         ];
 
+        // we need only one fuzzy connector per type
+        $fuzzyConnectorCreated = [];
+
         foreach ($languageResourceIds as $languageResourceId) {
             $languageResource = ZfExtended_Factory::get(LanguageResource::class);
             $languageResource->load((int) $languageResourceId);
@@ -660,8 +662,12 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
 
                 $this->addConnector((int) $languageResource->getId(), $connector);
 
-                if ($this->internalFuzzy) {
+                if ($this->internalFuzzy && ! in_array($languageResource->getServiceType(), $fuzzyConnectorCreated)) {
                     $fuzzyConnector = $this->initFuzzyConnector($connector);
+
+                    if(! $fuzzyConnector->isDisabled()) {
+                        $fuzzyConnectorCreated[] = $languageResource->getServiceType();
+                    }
 
                     $this->addConnector((int) $languageResource->getId(), $fuzzyConnector);
                     $this->internalFuzzyConnectorMap[(int) $languageResource->getId()] = $fuzzyConnector;

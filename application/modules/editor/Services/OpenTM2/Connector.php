@@ -618,7 +618,8 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
 
         $resp = $this->api->getResponse();
 
-        if ($resp->getStatus() == 404) {
+        if ($resp->getStatus() == 404
+            || $resp->getStatus() == 500 && str_contains($resp->getBody(), 'not found(error 48)')) {
             $onSuccess && $onSuccess();
 
             // if the result was a 404, then there is nothing to delete,

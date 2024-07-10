@@ -267,9 +267,15 @@ class editor_Plugins_MatchAnalysis_Models_MatchAnalysis extends ZfExtended_Model
         //init the language reources group array
         $groupedResults = $this->initResultArray($analysisAssoc);
         foreach ($results as $res) {
-            //the key will be languageResourceId + fuzzy flag (ex: "OpenTm2 memoryfuzzy")
+
+            //the key will be languageResource->ServiceType + fuzzy flag (ex: "OpenTm2 memoryfuzzy")
             //because for the internal fuzzy additional row is displayed
-            $rowKey = $res['languageResourceid'] . ($res['internalFuzzy'] == '1' ? 'fuzzy' : '');
+            if ($res['internalFuzzy'] == '1') {
+                $lr = $this->getLanguageResourceCached((int) $res['languageResourceid']);
+                $rowKey = $this->getFuzzyName($lr->getServiceType());
+            } else {
+                $rowKey = $res['languageResourceid'];
+            }
 
             //results found in group
             $resultFound = false;
@@ -364,8 +370,12 @@ class editor_Plugins_MatchAnalysis_Models_MatchAnalysis extends ZfExtended_Model
         /* @var $task editor_Models_Task */
         $task->loadByTaskGuid($analysisData['taskGuid']);
 
+        $fuzzyTypes = [];
         foreach ($langResTaskAssocs as $res) {
             $lr = $this->getLanguageResourceCached($res['languageResourceId']);
+            if ($isInternalFuzzy && $lr->getResourceType() == editor_Models_Segment_MatchRateType::TYPE_TM) {
+                $fuzzyTypes[$lr->getServiceType()] = $lr->getServiceName();
+            }
 
             //if the languageresource was deleted, we can not add additional data here
             if (empty($lr)) {
@@ -376,18 +386,30 @@ class editor_Plugins_MatchAnalysis_Models_MatchAnalysis extends ZfExtended_Model
 
             //init the group
             $initGroups = $initGroups + $initRow($lr->getId(), $lr->getName(), $lr->getColor(), $lr->getResourceType());
+        }
 
-            //if internal fuzzy is activated, and the langage resource is of type tm, add aditional internal fuzzy row
-            if ($isInternalFuzzy && $lr->getResourceType() == editor_Models_Segment_MatchRateType::TYPE_TM) {
-                //the key will be languageResourceId + fuzzy flag (ex: "OpenTm2 memoryfuzzy")
-                //for each internal fuzzy, additional row is displayed
-                $initGroups = $initGroups + $initRow(($lr->getId() . 'fuzzy'), ($lr->getName() . ' - internal Fuzzies'), $lr->getColor(), $lr->getResourceType());
+        if ($isInternalFuzzy) {
+            //the key will be languageResourceId + fuzzy flag (ex: "OpenTm2 memoryfuzzy")
+            //for each internal fuzzy, additional row is displayed
+            //init the internal fuzzies
+            foreach ($fuzzyTypes as $type => $name) {
+                $initGroups = $initGroups + $initRow(
+                    $this->getFuzzyName($type),
+                        sprintf(ZfExtended_Zendoverwrites_Translate::getInstance()->_('Interne Fuzzys (%s)'), $name),
+                    '',
+                    editor_Models_Segment_MatchRateType::TYPE_TM
+                    );
             }
         }
+
         //init the repetition
         $initGroups = $initGroups + $initRow(0, "", "", editor_Models_Segment_MatchRateType::TYPE_AUTO_PROPAGATED);
 
         return $initGroups;
+    }
+
+    private function getFuzzyName(string $type): string {
+        return $type . '-fuzzy';
     }
 
     /**

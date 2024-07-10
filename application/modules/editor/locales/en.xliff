@@ -4286,6 +4286,10 @@ A task was associated to you in the task-portal {portalLink}.
                 <source>Interner Fuzzy aktiv</source>
                 <target>Internal fuzzy active</target>
             </trans-unit>
+            <trans-unit id='SW50ZXJuZSBGdXp6eXMgKCVzKQ=='>
+                <source>Interne Fuzzys (%s)</source>
+                <target>Internal fuzzies (%s)</target>
+            </trans-unit>
             <trans-unit id='RXJzdGVsbHVuZ3NkYXR1bQ=='>
                 <source>Erstellungsdatum</source>
                 <target>Creation date</target>
