@@ -358,7 +358,18 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
             $useSegmentTimestamp
         );
 
+        $dataSent = [
+            'source' => $source,
+            'target' => $target,
+            'userName' => $segment->getUserName(),
+            'context' => $segment->getMid(),
+            // TODO fix this after TMMaintenance is merged
+            // 'timestamp' => $timestamp,
+            'fileName' => $fileName,
+        ];
+
         if ($successful) {
+            $this->checkUpdateResponse($dataSent, $this->api->getResult());
             $this->checkUpdatedSegment($segment, $recheckOnUpdate);
 
             return;
@@ -373,6 +384,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
             $successful = $this->api->update($source, $target, $segment, $fileName, $tmName, ! $this->isInternalFuzzy);
 
             if ($successful) {
+                $this->checkUpdateResponse($dataSent, $this->api->getResult());
                 $this->checkUpdatedSegment($segment, $recheckOnUpdate);
 
                 return;
@@ -387,6 +399,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
             $successful = $this->api->update($source, $target, $segment, $fileName, $tmName, ! $this->isInternalFuzzy);
 
             if ($successful) {
+                $this->checkUpdateResponse($dataSent, $this->api->getResult());
                 $this->checkUpdatedSegment($segment, $recheckOnUpdate);
 
                 return;
@@ -906,11 +919,10 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
                 $data = $this->getTm($validExportTypes[$mime], $memory);
                 $this->api->createMemory($fuzzyFileName, $this->languageResource->getSourceLangCode(), $data);
             } else {
-                // HOTFIX for t5memory BUG:
-                // After a clone call the clone might is corrupt, if the cloned TM has (recent) updates
-                // an export of the cloned memory before seems to heal that (either as TM or TMX)
-                $this->getTm($validExportTypes[$mime], $memory);
-                sleep(1);
+                //CRUCIAL: before cloning an export was done in order to dump the TM to the disk.
+                // this was removed now since was producing a big performance bottle neck.
+                // Cloning will be removed with TRANSLATE-3836 // a separate savetodisk endpoint per TM will be created
+                // since needed anyway
                 $this->api->cloneMemory($fuzzyFileName, $memory);
                 sleep(1);
             }
@@ -1787,6 +1799,29 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
         return $zipFileName;
     }
     // endregion export TM
+
+    private function checkUpdateResponse(array $request, object $response): void
+    {
+        $match =
+            $request['source'] === $response->source
+            && $request['target'] === $response->target
+            && mb_strtoupper($request['userName']) === $response->author
+            && $request['context'] === $response->context
+//            && $request['timestamp'] === $response->timestamp
+            && $request['fileName'] === $response->documentName;
+
+        if (! $match) {
+            $this->logger->error(
+                'E1586',
+                'Sent data does not match the response from t5memory in update call.',
+                [
+                    'languageResource' => $this->languageResource,
+                    'request' => $request,
+                    'response' => json_encode($response, JSON_PRETTY_PRINT),
+                ]
+            );
+        }
+    }
 
     /**
      * Check if segment was updated properly
