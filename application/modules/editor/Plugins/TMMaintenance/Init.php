@@ -30,17 +30,20 @@ declare(strict_types=1);
 
 use MittagQI\Translate5\Applet\AppletAbstract;
 use MittagQI\Translate5\Applet\Dispatcher;
+use MittagQI\Translate5\Plugins\TMMaintenance\AclResource;
+use MittagQI\ZfExtended\Acl\ResourceManager as ACLResourceManager;
 
 class editor_Plugins_TMMaintenance_Init extends ZfExtended_Plugin_Abstract
 {
     protected static string $description = 'Provides a functionality of managing t5memory TM';
 
     protected $frontendControllers = [
-        'pluginTMMaintenanceTMMaintenance' => 'Editor.plugins.TMMaintenance.app.controller.TMMaintenance',
+        AclResource::PLUGIN_TM_MAINTENANCE => 'Editor.plugins.TMMaintenance.app.controller.TMMaintenance',
     ];
 
     public function init(): void
     {
+        ACLResourceManager::registerResource(AclResource::class);
         $this->addController('TmmaintenanceController');
         $this->addController('ApiController');
         $this->initApplet();
