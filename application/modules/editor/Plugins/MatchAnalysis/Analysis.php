@@ -88,7 +88,7 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
 
     /**
      * Language resource -> Connector
-     * @var array<int, editor_Services_Connector>
+     * @var array<string, editor_Services_Connector>
      */
     private array $internalFuzzyConnectorMap = [];
 
@@ -140,6 +140,8 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
 
             //get the best match rate, respecting repetitions
             $bestMatchRateResult = $this->calculateMatchrate($segment);
+
+            $this->saveSegmentToInternalFuzzyTm($segment);
 
             if (! $this->pretranslate) {
                 //report progress update
@@ -348,12 +350,12 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
             }
 
             $connector->resetResultList();
-            $isMtResource = $this->resources[$languageResourceId]->getResourceType() == editor_Models_Segment_MatchRateType::TYPE_MT;
+            $isMtResource = $this->resources[$languageResourceId]->isMt();
 
             try {
                 $matches = $this->getMatches($connector, $segment, $isMtResource);
             } catch (Exception $e) {
-                $this->handleConnectionError($e, (int) $languageResourceId, $connector->isInternalFuzzy());
+                $this->handleConnectionError($e, $languageResourceId, $connector->isInternalFuzzy());
                 // in case of an error we produce an empty result container for that query and log the error so that the analysis can proceed
                 $matches = ZfExtended_Factory::get('editor_Services_ServiceResult');
             }
@@ -494,54 +496,49 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
      */
     protected function getMatches(editor_Services_Connector $connector, editor_Models_Segment $segment, $isMtResource)
     {
-        if ($isMtResource) {
-            //the resource is of type mt, so we do not need to query the mt for results, since we will receive always the default MT defined matchrate
-            //the mt resource only will be searched when pretranslating
-
-            //get the query string from the segment
-            $queryString = $connector->getQueryString($segment);
-
-            $internalTag = ZfExtended_Factory::get('editor_Models_Segment_InternalTag');
-            /* @var $internalTag editor_Models_Segment_InternalTag */
-            $queryString = $internalTag->toXliffPaired($queryString, true);
-            $matches = ZfExtended_Factory::get('editor_Services_ServiceResult', [
-                $queryString,
-            ]);
-            /* @var $dummyResult editor_Services_ServiceResult */
-            $matches->setLanguageResource($connector->getLanguageResource());
-            $matches->addResult('', $connector->getDefaultMatchRate());
-
-            return $matches;
+        if (! $isMtResource) {
+            return $connector->query($segment);
         }
 
-        // if the current resource type is not MT, query the tm or termcollection
-        $matches = $connector->query($segment);
+        //the resource is of type mt, so we do not need to query the mt for results, since we will receive always the default MT defined matchrate
+        //the mt resource only will be searched when pretranslating
 
-        // Mark the segment as fuzzy match in the TM
-        // Checking for matchrate >= 100 is for edge case when segments have the same-same source but different
-        // source md5hash so they are not a repetitions. Updating the segment in this case would lead to omitting
-        // translation for other segments with the same-same source, but different source md5hash
-        $languageResourceId = $connector->getLanguageResource()->getId();
-        if (
-            $this->internalFuzzy
-            // only segments matched in real TM should be saved in FuzzyTM
-            && ! $connector->isInternalFuzzy()
-            && array_key_exists($languageResourceId, $this->internalFuzzyConnectorMap)
-        ) {
+        //get the query string from the segment
+        $queryString = $connector->getQueryString($segment);
+
+        $internalTag = new editor_Models_Segment_InternalTag();
+        $queryString = $internalTag->toXliffPaired($queryString);
+
+        $matches = new editor_Services_ServiceResult($queryString);
+        $matches->setLanguageResource($connector->getLanguageResource());
+        $matches->addResult('', $connector->getDefaultMatchRate());
+
+        return $matches;
+    }
+
+    private function saveSegmentToInternalFuzzyTm(editor_Models_Segment $segment): void
+    {
+        if (! $this->internalFuzzy) {
+            return;
+        }
+
+        foreach ($this->internalFuzzyConnectorMap as $internalFuzzyConnector) {
+            if ($internalFuzzyConnector->isDisabled()) {
+                continue;
+            }
+
             $origTarget = $segment->getTargetEdit();
             $dummyTargetText = self::renderDummyTargetText($segment->getTaskGuid());
             $segment->setTargetEdit($dummyTargetText);
 
             try {
-                $this->internalFuzzyConnectorMap[$languageResourceId]->update($segment);
+                $internalFuzzyConnector->update($segment);
             } catch (SegmentUpdateException) {
                 // Ignore the error here as we don't care about the result
             }
 
             $segment->setTargetEdit($origTarget);
         }
-
-        return $matches;
     }
 
     /***
@@ -616,9 +613,6 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
             Status::NOT_LOADED,
         ];
 
-        // we need only one fuzzy connector per type
-        $fuzzyConnectorCreated = [];
-
         foreach ($languageResourceIds as $languageResourceId) {
             $languageResource = ZfExtended_Factory::get(LanguageResource::class);
             $languageResource->load((int) $languageResourceId);
@@ -631,7 +625,7 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
             }
 
             //store the languageResource
-            $this->resources[$languageResource->getId()] = $languageResource;
+            $this->resources[(int) $languageResource->getId()] = $languageResource;
 
             try {
                 $connector = $this->getConnector($languageResource);
@@ -661,15 +655,18 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
 
                 $this->addConnector((int) $languageResource->getId(), $connector);
 
-                if ($this->internalFuzzy && ! in_array($languageResource->getServiceType(), $fuzzyConnectorCreated)) {
+                $resourceId = $languageResource->getResourceId();
+
+                // we need only one fuzzy connector per resource
+                if ($this->internalFuzzy && ! isset($this->internalFuzzyConnectorMap[$resourceId])) {
                     $fuzzyConnector = $this->initFuzzyConnector($connector);
 
-                    if (! $fuzzyConnector->isDisabled()) {
-                        $fuzzyConnectorCreated[] = $languageResource->getServiceType();
+                    if ($fuzzyConnector->isDisabled()) {
+                        continue;
                     }
 
                     $this->addConnector((int) $languageResource->getId(), $fuzzyConnector);
-                    $this->internalFuzzyConnectorMap[(int) $languageResource->getId()] = $fuzzyConnector;
+                    $this->internalFuzzyConnectorMap[$resourceId] = $fuzzyConnector;
                 }
             } catch (Exception $e) {
                 //FIXME this try catch should not be needed anymore, after refactoring of December 2020

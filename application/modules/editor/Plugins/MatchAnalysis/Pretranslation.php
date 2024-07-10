@@ -30,10 +30,6 @@ class editor_Plugins_MatchAnalysis_Pretranslation
 {
     use ZfExtended_Logger_DebugTrait;
 
-    private const FUZZY_CONNECTOR_KEY = 'fuzzy';
-
-    private const GENERAL_CONNECTOR_KEY = 'general';
-
     /***
      *
      * @var editor_Models_Task
@@ -150,9 +146,7 @@ class editor_Plugins_MatchAnalysis_Pretranslation
             $this->connectors[$languageResourceid] = [];
         }
 
-        $key = $connector->isInternalFuzzy() ? self::FUZZY_CONNECTOR_KEY : self::GENERAL_CONNECTOR_KEY;
-
-        $this->connectors[$languageResourceid][$key] = $connector;
+        $this->connectors[$languageResourceid][] = $connector;
     }
 
     /**
@@ -161,15 +155,9 @@ class editor_Plugins_MatchAnalysis_Pretranslation
     protected function getConnectorsIterator(): iterable
     {
         foreach ($this->connectors as $languageResourceId => $connectors) {
-            // Fuzzy connectors should be used first
-            // Else in analysis fuzzy target will be saved into fuzzy TM right away
-            // After that if we make query to fuzzy TM we will get 100 match from it
-            // and no actual matches will be given in result
-            if (isset($connectors[self::FUZZY_CONNECTOR_KEY])) {
-                yield $languageResourceId => $connectors[self::FUZZY_CONNECTOR_KEY];
+            foreach ($connectors as $connector) {
+                yield $languageResourceId => $connector;
             }
-
-            yield $languageResourceId => $connectors[self::GENERAL_CONNECTOR_KEY];
         }
     }
 

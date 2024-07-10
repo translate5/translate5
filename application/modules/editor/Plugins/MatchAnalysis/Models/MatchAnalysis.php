@@ -271,7 +271,7 @@ class editor_Plugins_MatchAnalysis_Models_MatchAnalysis extends ZfExtended_Model
             //because for the internal fuzzy additional row is displayed
             if ($res['internalFuzzy'] == '1') {
                 $lr = $this->getLanguageResourceCached((int) $res['languageResourceid']);
-                $rowKey = $this->getFuzzyName($lr->getServiceType());
+                $rowKey = $this->getFuzzyName($lr->getResourceId());
             } else {
                 $rowKey = $res['languageResourceid'];
             }
@@ -373,7 +373,7 @@ class editor_Plugins_MatchAnalysis_Models_MatchAnalysis extends ZfExtended_Model
         foreach ($langResTaskAssocs as $res) {
             $lr = $this->getLanguageResourceCached($res['languageResourceId']);
             if ($isInternalFuzzy && $lr->getResourceType() == editor_Models_Segment_MatchRateType::TYPE_TM) {
-                $fuzzyTypes[$lr->getServiceType()] = $lr->getServiceName();
+                $fuzzyTypes[$lr->getResourceId()] = $lr->getServiceName();
             }
 
             //if the languageresource was deleted, we can not add additional data here
@@ -388,13 +388,17 @@ class editor_Plugins_MatchAnalysis_Models_MatchAnalysis extends ZfExtended_Model
         }
 
         if ($isInternalFuzzy) {
+            $translate = ZfExtended_Zendoverwrites_Translate::getInstance();
             //the key will be languageResourceId + fuzzy flag (ex: "OpenTm2 memoryfuzzy")
             //for each internal fuzzy, additional row is displayed
             //init the internal fuzzies
-            foreach ($fuzzyTypes as $type => $name) {
+            foreach ($fuzzyTypes as $resourceId => $name) {
+                $parts = explode('_', $resourceId);
+                $resourceNumber = array_pop($parts);
+
                 $initGroups = $initGroups + $initRow(
-                    $this->getFuzzyName($type),
-                    sprintf(ZfExtended_Zendoverwrites_Translate::getInstance()->_('Interne Fuzzys (%s)'), $name),
+                    $this->getFuzzyName($resourceId),
+                    sprintf($translate->_('Interne Fuzzys (%s)'), "$name $resourceNumber"),
                     '',
                     editor_Models_Segment_MatchRateType::TYPE_TM
                 );
@@ -407,9 +411,9 @@ class editor_Plugins_MatchAnalysis_Models_MatchAnalysis extends ZfExtended_Model
         return $initGroups;
     }
 
-    private function getFuzzyName(string $type): string
+    private function getFuzzyName(string $resourceId): string
     {
-        return $type . '-fuzzy';
+        return 'Fuzzy ' . $resourceId;
     }
 
     /**
