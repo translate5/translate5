@@ -646,18 +646,20 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
         SearchDTO $searchDTO = null
     ): editor_Services_ServiceResult {
         $offsetTmId = null;
+        $recordKey = null;
+        $targetKey = null;
         $tmOffset = null;
 
         if (null !== $offset) {
-            @[$offsetTmId, $tmOffset] = explode(':', (string) $offset);
+            @[$offsetTmId, $recordKey, $targetKey] = explode(':', (string) $offset);
         }
 
-        if ('' !== $offsetTmId && null === $tmOffset) {
+        if ('' !== $offsetTmId && null === $recordKey && null === $targetKey) {
             throw new editor_Services_Connector_Exception('E1565', compact('offset'));
         }
 
-        if (null !== $tmOffset) {
-            $tmOffset = (int) $tmOffset;
+        if (null !== $recordKey && null !== $targetKey) {
+            $tmOffset = $recordKey . ':' . $targetKey;
         }
 
         $isSource = $field === 'source';
@@ -688,7 +690,8 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
                 $numResults = self::CONCORDANCE_SEARCH_NUM_RESULTS - $resultsCount;
                 $successful = $this->api->concordanceSearch($searchString, $tmName, $field, $tmOffset, $numResults);
             } else {
-                $successful = $this->api->search($tmName, $tmOffset, 200, $searchDTO);
+                $numResults = self::CONCORDANCE_SEARCH_NUM_RESULTS * 10 - $resultsCount;
+                $successful = $this->api->search($tmName, $tmOffset, $numResults, $searchDTO);
             }
 
             if (! $successful && $this->needsReorganizing($this->api->getError(), $tmName)) {

@@ -392,7 +392,7 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
         string $queryString,
         string $tmName,
         string $field,
-        int $searchPosition = null,
+        string $searchPosition = null,
         int $numResults = 20
     ): bool {
         if ($this->isToLong($queryString)) {
@@ -413,7 +413,7 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
         return $this->processResponse($http->request());
     }
 
-    public function search(string $tmName, ?int $searchPosition, ?int $numResults, SearchDTO $searchDTO): bool
+    public function search(string $tmName, ?string $searchPosition, ?int $numResults, SearchDTO $searchDTO): bool
     {
         $data = $this->getSearchData($searchDTO, $searchPosition, $numResults);
         $http = $this->getHttpWithMemory('POST', $tmName, '/search');
@@ -581,23 +581,23 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
         return $json;
     }
 
-    private function getSearchData(SearchDTO $searchDTO, ?int $searchPosition = null, ?int $numResults = null): array
+    private function getSearchData(SearchDTO $searchDTO, ?string $searchPosition = null, ?int $numResults = null): array
     {
-        $caseInsensitive = ', CASEINSENSETIVE';
+        $searchOptions = ', CASEINSENSETIVE';
 
         return [
             'source' => $searchDTO->source,
-            'sourceSearchMode' => $searchDTO->sourceMode . $caseInsensitive,
+            'sourceSearchMode' => $searchDTO->sourceMode . $searchOptions,
             'target' => $searchDTO->target,
-            'targetSearchMode' => $searchDTO->targetMode . $caseInsensitive,
+            'targetSearchMode' => $searchDTO->targetMode . $searchOptions,
             'document' => $searchDTO->document,
-            'documentSearchMode' => $searchDTO->documentMode . $caseInsensitive,
+            'documentSearchMode' => $searchDTO->documentMode . $searchOptions,
             'author' => $searchDTO->author,
-            'authorSearchMode' => $searchDTO->authorMode . $caseInsensitive,
+            'authorSearchMode' => $searchDTO->authorMode . $searchOptions,
             'addInfo' => $searchDTO->additionalInfo,
-            'addInfoSearchMode' => $searchDTO->additionalInfoMode . $caseInsensitive,
+            'addInfoSearchMode' => $searchDTO->additionalInfoMode . $searchOptions,
             'context' => $searchDTO->context,
-            'contextSearchMode' => $searchDTO->contextMode . $caseInsensitive,
+            'contextSearchMode' => $searchDTO->contextMode . $searchOptions,
             'timestampSpanStart' => $this->getDate($searchDTO->creationDateFrom),
             'timestampSpanEnd' => $this->getDate($searchDTO->creationDateTo),
             'onlyCountSegments' => $searchDTO->onlyCount ? '1' : '0',
