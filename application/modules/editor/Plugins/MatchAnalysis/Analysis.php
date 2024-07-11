@@ -87,12 +87,6 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
     private editor_Services_Manager $manager;
 
     /**
-     * Resource ID -> Connector
-     * @var array<string, editor_Services_Connector>
-     */
-    private array $internalFuzzyConnectorMap = [];
-
-    /**
      * @param integer $analysisId
      */
     public function __construct(editor_Models_Task $task, $analysisId)
@@ -538,7 +532,7 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
             return;
         }
 
-        foreach ($this->internalFuzzyConnectorMap as $internalFuzzyConnector) {
+        foreach ($this->getInternalFuzzyConnectorsIterator() as $internalFuzzyConnector) {
             if ($internalFuzzyConnector->isDisabled()) {
                 continue;
             }
@@ -675,18 +669,15 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
                     continue;
                 }
 
-                $resourceId = $languageResource->getResourceId();
-
                 // we need only one fuzzy connector per resource
-                if ($this->internalFuzzy && ! isset($this->internalFuzzyConnectorMap[$resourceId])) {
+                if ($this->internalFuzzy && ! $this->internalFuzzyConnectorSet($languageResource)) {
                     $fuzzyConnector = $this->initFuzzyConnector($connector);
 
                     if ($fuzzyConnector->isDisabled()) {
                         continue;
                     }
 
-                    $this->addConnector((int) $languageResource->getId(), $fuzzyConnector);
-                    $this->internalFuzzyConnectorMap[$resourceId] = $fuzzyConnector;
+                    $this->addInternalFuzzyConnector($languageResource, $fuzzyConnector);
                 }
             } catch (Exception $e) {
                 //FIXME this try catch should not be needed anymore, after refactoring of December 2020
