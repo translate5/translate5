@@ -34,7 +34,6 @@ use MittagQI\Translate5\LanguageResource\Adapter\Exception\RescheduleUpdateNeede
 use MittagQI\Translate5\LanguageResource\Adapter\Exception\SegmentUpdateException;
 use MittagQI\Translate5\LanguageResource\Adapter\UpdatableAdapterInterface;
 use MittagQI\Translate5\LanguageResource\Status as LanguageResourceStatus;
-use MittagQI\Translate5\Service\T5Memory;
 use MittagQI\Translate5\T5Memory\Enum\StripFramingTags;
 
 /**
@@ -123,7 +122,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
 
         //to ensure that we get unique TMs Names although of the above stripped content,
         // we add the LanguageResource ID and a prefix which can be configured per each translate5 instance
-        $name = 'ID' . $this->languageResource->getId() . '-' . $this->filterName($this->languageResource->getName());
+        $name = $this->generateTmFilename($this->languageResource);
 
         if (isset($params['createNewMemory'])) {
             $name = $this->generateNextMemoryName($this->languageResource);
@@ -147,7 +146,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
             $tmName = $this->api->createEmptyMemory($name, $sourceLang);
 
             if (null !== $tmName) {
-                $this->addMemoryToLanguageResource($tmName);
+                $this->addMemoryToLanguageResource($this->languageResource, $tmName);
 
                 //if initial upload is a TMX file, we have to import it.
                 if ($tmxUpload) {
@@ -171,7 +170,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
         //initial upload is a TM file
         $tmName = $this->api->createMemory($name, $sourceLang, file_get_contents($fileinfo['tmp_name']));
         if ($tmName) {
-            $this->addMemoryToLanguageResource($tmName);
+            $this->addMemoryToLanguageResource($this->languageResource, $tmName);
 
             return true;
         }
@@ -188,15 +187,18 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
      * Updates the filename of the language resource instance with the filename coming from the TM system
      * @throws Zend_Exception
      */
-    private function addMemoryToLanguageResource(string $tmName): void
-    {
+    protected function addMemoryToLanguageResource(
+        LanguageResource $languageResource,
+        string $tmName,
+        bool $isInternalFuzzy = false
+    ): void {
         $prefix = Zend_Registry::get('config')->runtimeOptions->LanguageResources->opentm2->tmprefix;
         if (! empty($prefix)) {
             //remove the prefix from being stored into the TM
             $tmName = str_replace('^' . $prefix . '-', '', '^' . $tmName);
         }
 
-        $memories = $this->languageResource->getSpecificData('memories', parseAsArray: true) ?? [];
+        $memories = $languageResource->getSpecificData('memories', parseAsArray: true) ?? [];
 
         usort($memories, fn ($m1, $m2) => $m1['id'] <=> $m2['id']);
 
@@ -212,9 +214,12 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
             'readonly' => false,
         ];
 
-        $this->languageResource->addSpecificData('memories', $memories);
-        //saving it here makes the TM available even when the TMX import was crashed
-        $this->languageResource->save();
+        $languageResource->addSpecificData('memories', $memories);
+
+        if (! $isInternalFuzzy) {
+            //saving it here makes the TM available even when the TMX import was crashed
+            $languageResource->save();
+        }
     }
 
     /**
@@ -354,7 +359,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
             $segment,
             $fileName,
             $tmName,
-            ! $this->isInternalFuzzy,
+            ! $this->isInternalFuzzy(),
             $useSegmentTimestamp
         );
 
@@ -370,7 +375,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
             $this->addReorganizeWarning($segment->getTask());
             $this->reorganizeTm($tmName);
 
-            $successful = $this->api->update($source, $target, $segment, $fileName, $tmName, ! $this->isInternalFuzzy);
+            $successful = $this->api->update($source, $target, $segment, $fileName, $tmName, ! $this->isInternalFuzzy());
 
             if ($successful) {
                 $this->checkUpdatedSegment($segment, $recheckOnUpdate);
@@ -382,9 +387,9 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
 
             $newName = $this->generateNextMemoryName($this->languageResource);
             $newName = $this->api->createEmptyMemory($newName, $this->languageResource->getSourceLangCode());
-            $this->addMemoryToLanguageResource($newName);
+            $this->addMemoryToLanguageResource($this->languageResource, $newName);
 
-            $successful = $this->api->update($source, $target, $segment, $fileName, $tmName, ! $this->isInternalFuzzy);
+            $successful = $this->api->update($source, $target, $segment, $fileName, $tmName, ! $this->isInternalFuzzy());
 
             if ($successful) {
                 $this->checkUpdatedSegment($segment, $recheckOnUpdate);
@@ -613,7 +618,8 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
 
         $resp = $this->api->getResponse();
 
-        if ($resp->getStatus() == 404) {
+        if ($resp->getStatus() == 404
+            || $resp->getStatus() == 500 && str_contains($resp->getBody(), 'not found(error 48)')) {
             $onSuccess && $onSuccess();
 
             // if the result was a 404, then there is nothing to delete,
@@ -894,32 +900,6 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
             throw new ZfExtended_NotFoundException('Can not download in format ' . $mime);
         }
 
-        $memories = $this->languageResource->getSpecificData('memories', parseAsArray: true);
-        $fuzzyMemories = [];
-
-        foreach ($memories as ['filename' => $memory, 'readonly' => $readonly]) {
-            $fuzzyFileName = $this->renderFuzzyLanguageResourceName($memory, $analysisId);
-            $this->api->setResource($this->languageResource->getResource());
-
-            // TODO T5MEMORY: remove when OpenTM2 is out of production
-            if ($this->api->isOpenTM2()) {
-                $data = $this->getTm($validExportTypes[$mime], $memory);
-                $this->api->createMemory($fuzzyFileName, $this->languageResource->getSourceLangCode(), $data);
-            } else {
-                //CRUCIAL: before cloning an export was done in order to dump the TM to the disk.
-                // this was removed now since was producing a big performance bottle neck.
-                // Cloning will be removed with TRANSLATE-3836 // a separate savetodisk endpoint per TM will be created
-                // since needed anyway
-                $this->api->cloneMemory($fuzzyFileName, $memory);
-                sleep(1);
-            }
-
-            $fuzzyMemories[] = [
-                'filename' => $fuzzyFileName,
-                'readonly' => $readonly,
-            ];
-        }
-
         $fuzzyLanguageResource = clone $this->languageResource;
 
         //visualized name:
@@ -928,7 +908,17 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
             $analysisId
         );
         $fuzzyLanguageResource->setName($fuzzyLanguageResourceName);
-        $fuzzyLanguageResource->addSpecificData('memories', $fuzzyMemories);
+        $fuzzyLanguageResource->addSpecificData('memories', null);
+
+        $this->api->setResource($fuzzyLanguageResource->getResource());
+
+        $newTmFileName = $this->api->createEmptyMemory(
+            $this->generateTmFilename($fuzzyLanguageResource),
+            $this->languageResource->getSourceLangCode()
+        );
+
+        $this->addMemoryToLanguageResource($fuzzyLanguageResource, $newTmFileName, true);
+
         //INFO: The resources logging requires resource with valid id.
         //$fuzzyLanguageResource->setId(null);
 
@@ -1522,7 +1512,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
 
             $newName = $this->generateNextMemoryName($this->languageResource);
             $newName = $this->api->createEmptyMemory($newName, $this->languageResource->getSourceLangCode());
-            $this->addMemoryToLanguageResource($newName);
+            $this->addMemoryToLanguageResource($this->languageResource, $newName);
 
             // Filter TMX data from already imported segments
             $fileContent = $this->cutOffTmx(
@@ -1864,5 +1854,10 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
     private function getStripFramingTagsValue(array $params): StripFramingTags
     {
         return StripFramingTags::tryFrom($params['stripFramingTags'] ?? '') ?? StripFramingTags::None;
+    }
+
+    private function generateTmFilename(editor_Models_LanguageResources_LanguageResource $languageResource): string
+    {
+        return 'ID' . $languageResource->getId() . '-' . $this->filterName($languageResource->getName());
     }
 }
