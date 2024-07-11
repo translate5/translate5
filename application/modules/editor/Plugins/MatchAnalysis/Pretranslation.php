@@ -200,13 +200,9 @@ class editor_Plugins_MatchAnalysis_Pretranslation
         $this->connectors = [];
     }
 
-    private function getFirstConnector(int $languageResourceId): ?Connector
+    private function getConnector(int $languageResourceId): ?Connector
     {
-        if (! isset($this->connectors[$languageResourceId])) {
-            return null;
-        }
-
-        return $this->connectors[$languageResourceId][0];
+        return $this->connectors[$languageResourceId] ?? null;
     }
 
     /**
@@ -305,7 +301,7 @@ class editor_Plugins_MatchAnalysis_Pretranslation
 
         //check if the result is valid for log
         if ($this->isResourceLogValid($languageResource, (int) $segment->getMatchRate())) {
-            $this->getFirstConnector($languageResourceid)?->logAdapterUsage($segment, $isRepetition);
+            $this->getConnector($languageResourceid)?->logAdapterUsage($segment, $isRepetition);
         }
 
         $segment->set($segmentField, $targetResult); //use sfm->getFirstTargetName here
