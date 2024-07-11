@@ -26,10 +26,13 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+namespace MittagQI\Translate5\Test\Unit\Segment;
+
 use MittagQI\Translate5\Segment\TagRepair\Tag;
 use MittagQI\Translate5\Segment\TagRepair\Tags;
 use MittagQI\Translate5\Test\MockedTaskTestAbstract;
 use MittagQI\ZfExtended\Tools\Markup;
+use ZfExtended_Exception;
 
 /**
  * Several "classic" PHPUnit tests to check the general tag repair (not to mix up with the internal tags repair)
@@ -38,6 +41,8 @@ use MittagQI\ZfExtended\Tools\Markup;
  */
 class TagsRepairTest extends MockedTaskTestAbstract
 {
+    public const DO_DEBUG = false;
+
     /**
      * Some Internal Tags to create Tests with
      */
@@ -422,7 +427,7 @@ class TagsRepairTest extends MockedTaskTestAbstract
         $actual = $tags->recreateTags($translated);
 
         // debugging
-        if (false) {
+        if (self::DO_DEBUG) {
             error_log('===================' . "\n");
             error_log('ORIGINAL:' . "\n" . $originalMarkup . "\n");
             error_log('TRANSLATED:' . "\n" . $translatedMarkup . "\n");
@@ -457,7 +462,7 @@ class TagsRepairTest extends MockedTaskTestAbstract
         }
         $actual = $tags->recreateTags($request);
         // debugging
-        if (false) {
+        if (self::DO_DEBUG) {
             error_log('===================' . "\n");
             error_log('ORIGINAL:' . "\n" . $this->revertInternalTags($originalMarkup) . "\n");
             error_log('REQUEST:' . "\n" . $request . "\n");
@@ -470,7 +475,7 @@ class TagsRepairTest extends MockedTaskTestAbstract
             $strippedRequest = Markup::strip($request);
             $actual = $tags->recreateTags($strippedRequest);
             // debugging
-            if (false) {
+            if (self::DO_DEBUG) {
                 error_log('===================' . "\n");
                 error_log('ORIGINAL:' . "\n" . $this->revertInternalTags($originalMarkup) . "\n");
                 error_log('REQUEST:' . "\n" . $strippedRequest . "\n");
