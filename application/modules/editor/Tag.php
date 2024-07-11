@@ -51,7 +51,7 @@ class editor_Tag
      * @var boolean
      */
     public const USE_DOM_DOCUMENT = false;
-    
+
     /**
      * Enodes our attributes (hashtable) to a json-capable structure
      * @param string[] $attribs
