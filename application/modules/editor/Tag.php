@@ -51,6 +51,7 @@ class editor_Tag
      * @var boolean
      */
     public const USE_DOM_DOCUMENT = false;
+    
     /**
      * Enodes our attributes (hashtable) to a json-capable structure
      * @param string[] $attribs
@@ -263,6 +264,7 @@ class editor_Tag
      */
     public static function unparse($html)
     {
+        /** @phpstan-ignore-next-line */
         if (self::USE_DOM_DOCUMENT) {
             // implementation using PHP DOM
             $dom = new ZfExtended_Dom();
