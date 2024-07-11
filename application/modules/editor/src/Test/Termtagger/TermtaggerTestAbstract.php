@@ -26,10 +26,19 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+namespace MittagQI\Translate5\Test\Termtagger;
+
+use editor_Models_Languages;
+use editor_Models_Task;
+use MittagQI\Translate5\Test\UnitTestAbstract;
+use SplFileInfo;
+use Zend_Db_Table_Row_Abstract;
+use ZfExtended_Factory;
+
 /**
  * OUTDATED base implementation for testing the Termtagger
  */
-abstract class editor_Test_Termtagger_Abstract extends \editor_Test_UnitTest
+abstract class TermtaggerTestAbstract extends UnitTestAbstract
 {
     public static $parentTestFolderRelativePath = 'application/modules/editor/testcases';
 
@@ -136,12 +145,12 @@ abstract class editor_Test_Termtagger_Abstract extends \editor_Test_UnitTest
     protected static $targetTagged;
 
     /**
-     * @var editor_Models_Languages
+     * @var Zend_Db_Table_Row_Abstract
      */
     protected static $sourceLangEntity;
 
     /**
-     * @var editor_Models_Languages
+     * @var Zend_Db_Table_Row_Abstract
      */
     protected static $targetLangEntity;
 

@@ -26,15 +26,22 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+namespace MittagQI\Translate5\Test;
+
 use MittagQI\Translate5\Test\Api\DbHelper;
 use MittagQI\Translate5\Test\Api\Helper;
+use MittagQI\Translate5\Test\Import\Task;
 use PHPUnit\Framework\TestCase;
+use stdClass;
+use Throwable;
+use Zend_Http_Client_Exception;
+use ZfExtended_Exception;
 
 /**
  * Base Class for all API Tests
  * For tests importing tasks, use TaskImportTest
  */
-abstract class editor_Test_ApiTest extends TestCase
+abstract class ApiTestAbstract extends TestCase
 {
     /**
      * To distinguish UNIT / API tests
@@ -58,12 +65,11 @@ abstract class editor_Test_ApiTest extends TestCase
     private static array $_addedPlugins = [];
 
     /**
-     * @var int
+     * Holds the ids of the test-customers
      */
     private static array $_testCustomers = [];
 
     /**
-     * @var
      * Special Option to check for the Termtagger Plugin and that all configured termtaggers are running
      */
     protected static bool $termtaggerRequired = false;
@@ -82,8 +88,9 @@ abstract class editor_Test_ApiTest extends TestCase
 
     /**
      * Holds an array of configs that must have the given value to run the test
-     * Can be provided like [ 'autoQA.enableInternalTagCheck' => 1, ... ], "runtimeOptions." will be added automatically if not present
-     * These will be checked automatically in the test setup BEFORE tasks are imported (so don't check configs set by task-config files)
+     * Can be provided like [ 'autoQA.enableInternalTagCheck' => 1, ... ], "runtimeOptions." will be added
+     * automatically if not present These will be checked automatically in the test setup BEFORE tasks are imported
+     * (so don't check configs set by task-config files)
      */
     protected static array $requiredRuntimeOptions = [];
 
@@ -100,7 +107,8 @@ abstract class editor_Test_ApiTest extends TestCase
     protected static string $setupUserLogin = 'testmanager';
 
     /**
-     * If set, a test-specific customer will be created on test-setup and removed on teardown. The customer will be accessible via ::$ownCustomer
+     * If set, a test-specific customer will be created on test-setup and removed on teardown. The customer will be
+     * accessible via ::$ownCustomer
      */
     protected static bool $setupOwnCustomer = false;
 
@@ -114,7 +122,7 @@ abstract class editor_Test_ApiTest extends TestCase
      */
     public static function api(): Helper
     {
-        return static::$_api;
+        return self::$_api;
     }
 
     /**
@@ -122,39 +130,17 @@ abstract class editor_Test_ApiTest extends TestCase
      */
     final public static function getAppState(): stdClass
     {
-        return static::$_appState;
+        return self::$_appState;
+    }
+
+    final public static function getLastWorkerId(): int
+    {
+        return self::$lastWorkerId;
     }
 
     /**
-     * @param int $timeout in seconds for all other states (how long might the worker be scheduled/waiting/running)
-     */
-    final public function waitForWorker(
-        string $class,
-        ?\stdClass $task = null,
-        array $waitForStates = [\ZfExtended_Models_Worker::STATE_DONE],
-        array $failStates = [\ZfExtended_Models_Worker::STATE_DEFUNCT],
-        int $timeout = 100,
-    ): void {
-        for ($counter = 0; $counter < $timeout; $counter++) {
-            sleep(1);
-            $foundWorkes = DbHelper::getLastWorkers(self::$lastWorkerId, $class, $task->taskGuid ?? null);
-            foreach ($foundWorkes as $worker) {
-                if (in_array($worker['state'], $waitForStates)) {
-                    return;
-                }
-                if (in_array($worker['state'], $failStates)) {
-                    $this->fail('Worker defunct: ID: ' . $worker['id'] . ' ' . $worker['worker']);
-                }
-            }
-            if ($counter % 5 == 0) {
-                error_log('Worker state check ' . $counter . '/' . $timeout . ' [' . __CLASS__ . ']');
-            }
-        }
-        $this->fail('Worker not added/finished in ' . $timeout . 'seconds: ' . $class);
-    }
-
-    /**
-     * Retrieves the id of the general test-customer, by default the first one but customer 2 and 3 can be retrieved by providing "1" or "2" as indexes
+     * Retrieves the id of the general test-customer, by default the first one but customer 2 and 3 can be retrieved by
+     * providing "1" or "2" as indexes
      */
     final public static function getTestCustomerId(int $index = 0): int
     {
@@ -162,7 +148,7 @@ abstract class editor_Test_ApiTest extends TestCase
             throw new ZfExtended_Exception('getTestCustomerId supports only indexes 0,1,2');
         }
 
-        return static::$_testCustomers[$index];
+        return self::$_testCustomers[$index];
     }
 
     /**
@@ -242,7 +228,11 @@ abstract class editor_Test_ApiTest extends TestCase
     {
         $json = static::api()->getJson('editor/session/' . Helper::getAuthCookie());
         static::assertTrue(is_object($json), 'User "' . Helper::getAuthLogin() . '" is not authenticated!');
-        static::assertEquals('authenticated', $json->state, 'User "' . Helper::getAuthLogin() . '" is not authenticated!');
+        static::assertEquals(
+            'authenticated',
+            $json->state,
+            'User "' . Helper::getAuthLogin() . '" is not authenticated!'
+        );
         static::assertTrue(in_array($json->user->login, $logins), 'Logged in user is not ' . implode(' or ', $logins));
 
         return $json;
@@ -263,7 +253,8 @@ abstract class editor_Test_ApiTest extends TestCase
      * TODO FIXME:
      * - the capture-param is a unneccessary dependency and can be evaluated directly in the method
      * - whitespace-normalization shoud be done on capturing, not on testing
-     * @param bool $capture here can be passed the isCapturing parameter from outside if it is a test not extending JsonTest
+     * @param bool $capture here can be passed the isCapturing parameter from outside if it is a test not extending
+     *     JsonTest
      */
     public function assertFileContents(string $fileName, string $actual, string $message = null, bool $capture = false)
     {
@@ -300,25 +291,28 @@ abstract class editor_Test_ApiTest extends TestCase
             static::testSpecificInit();
 
             // each test gets an own api-object, the instance of the current test is for code-completion and does not hurt, since the constructor does nothing
-            static::$_api = new Helper(static::class, new static());
+            /** @phpstan-ignore-next-line */
+            self::$_api = new Helper(static::class, new static());
 
             // this runs only once with the first API-Test
-            if (static::$_appState === null) {
-                self::testRunSetup(static::$_api);
+            if (self::$_appState === null) {
+                self::testRunSetup(self::$_api);
             }
 
-            if (static::$_api->isTestSkipped()) {
+            if (self::$_api->isTestSkipped()) {
                 // skip test when --skip option demanded to do so
                 static::markTestSkipped('Skipped test "' . static::class . '" as requested.');
             } elseif (static::$skipIfOptionsMissing && ! static::api()->checkConfigs(static::$requiredRuntimeOptions)) {
                 // skip test when configs/runtimeOptions are missing
-                static::markTestSkipped('Skipped test "' . static::class . '" because neccessary configs are not set or missing.');
+                static::markTestSkipped(
+                    'Skipped test "' . static::class . '" because neccessary configs are not set or missing.'
+                );
             } else {
                 // make sure the setup always happens as testmanager
                 static::api()->login('testmanager');
 
                 // checks for the plugin & config dependencies that have been defined for this test
-                static::assertAppState();
+                self::assertAppState();
 
                 // add a test-customer if setup-option set
                 if (static::$setupOwnCustomer) {
@@ -328,7 +322,7 @@ abstract class editor_Test_ApiTest extends TestCase
                 static::testSpecificSetup();
 
                 // log the user in that is setup as the needed test-user. Asserts the success if pretests shall not be skipped
-                if (static::api()->login(static::$setupUserLogin) && ! static::$_api->doSkipPretests()) {
+                if (static::api()->login(static::$setupUserLogin) && ! self::$_api->doSkipPretests()) {
                     static::assertLogin(static::$setupUserLogin);
                 }
                 // this can be used in concrete tests as replacement for setUpBeforeClass()
@@ -355,7 +349,7 @@ abstract class editor_Test_ApiTest extends TestCase
         try {
             // this can be used in concrete tests as replacement for tearDownAfterClass()
             static::afterTests();
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             $errors[] = $e->getMessage();
         }
 
@@ -374,12 +368,12 @@ abstract class editor_Test_ApiTest extends TestCase
                 $errors[] = $e->getMessage();
             }
         }
-        if (count(static::$_addedPlugins) > 0) {
-            if (! DbHelper::deactivatePlugins(static::$_addedPlugins)) {
+        if (count(self::$_addedPlugins) > 0) {
+            if (! DbHelper::deactivatePlugins(self::$_addedPlugins)) {
                 $errors[] = 'One or more of the following neccessary Plugins could not be deactivated: \''
-                    . implode("', '", static::$_addedPlugins) . "'";
+                    . implode("', '", self::$_addedPlugins) . "'";
             }
-            static::$_addedPlugins = [];
+            self::$_addedPlugins = [];
         }
         // as a final step., we check if the test left workers in the DB
         // for single running tests or if no cleanup is wanted, we do not remove the workers after test has run
@@ -389,7 +383,7 @@ abstract class editor_Test_ApiTest extends TestCase
             $task = static::api()->getTask();
             $errors[] = 'The test left running, waiting, scheduled or crashed worker\'s in the DB:' . PHP_EOL
                 . implode(PHP_EOL, $state->remainingWorkers) . PHP_EOL;
-            $errors[] = 'The current task is:' . ($task ? $task->taskGuid : 'none');
+            $errors[] = 'The current task is:' . ($task?->taskGuid ?? 'none');
         }
         if (! empty($errors)) {
             static::fail(implode(PHP_EOL, $errors));
@@ -405,17 +399,17 @@ abstract class editor_Test_ApiTest extends TestCase
         // for dev-purposes it may be unwanted to have all the environment-tests before running the test
         // this reduces the requests to a single request on the app-state and an initial login
         if ($api->doSkipPretests()) {
-            static::$_appState = $api->getJson('editor/index/applicationstate');
-            unset(static::$_appState->worker);
+            self::$_appState = $api->getJson('editor/index/applicationstate');
+            unset(self::$_appState->worker);
         } else {
             // cleanup before running the suite/test: removes any existing workers from the db
             DbHelper::removeWorkers();
             // evaluates the application state and checks basic prequesites
-            static::evaluateAppState($api);
+            self::evaluateAppState($api);
             // makes sure all test users are present in the DB & correctly configured
-            static::assertNeededUsers();
+            self::assertNeededUsers();
             // makes sure the test customer is present in the DB and exposes it's id
-            static::assertTestCustomers();
+            self::assertTestCustomers();
         }
 
         self::$lastWorkerId = DbHelper::getLastWorkerId();
@@ -459,7 +453,7 @@ abstract class editor_Test_ApiTest extends TestCase
             die(implode("\n", $errors) . "\nTerminating API-tests\n\n");
         }
         unset($state->worker); // worker state is not persistent ...
-        static::$_appState = $state;
+        self::$_appState = $state;
     }
 
     /**
@@ -471,8 +465,14 @@ abstract class editor_Test_ApiTest extends TestCase
         $state = static::getAppState();
         // check for termtagger
         if (static::$termtaggerRequired) {
-            static::assertFalse(empty($state->termtagger), 'Termtagger Plugin not active!');
-            static::assertTrue($state->termtagger->runningAll, 'Some configured termtaggers are not running: ' . print_r($state->termtagger->running, 1));
+            static::assertFalse(
+                empty($state->termtagger),
+                'Termtagger Plugin not active!'
+            );
+            static::assertTrue(
+                $state->termtagger->runningAll,
+                'Some configured termtaggers are not running: ' . print_r($state->termtagger->running, true)
+            );
         }
 
         if (count(static::$forbiddenPlugins) > 0 && ! DbHelper::deactivatePlugins(static::$forbiddenPlugins)) {
@@ -487,13 +487,18 @@ abstract class editor_Test_ApiTest extends TestCase
         // evaluate the plugins whitelist
         foreach (static::$requiredPlugins as $plugin) {
             if (! in_array($plugin, $state->pluginsLoaded)) {
-                static::$_addedPlugins[] = $plugin;
+                self::$_addedPlugins[] = $plugin;
             }
         }
         // try to activate plugins that are needed but not loaded
-        if (count(static::$_addedPlugins) > 0) {
-            if (! DbHelper::activatePlugins(static::$_addedPlugins)) {
-                static::fail('One or more of the following neccessary Plugins could not be activated: \'' . implode("', '", static::$_addedPlugins) . "'");
+        if (count(self::$_addedPlugins) > 0) {
+            if (! DbHelper::activatePlugins(self::$_addedPlugins)) {
+                static::fail(
+                    'One or more of the following neccessary Plugins could not be activated: \'' . implode(
+                        "', '",
+                        self::$_addedPlugins
+                    ) . "'"
+                );
             }
         }
         // test the required runtimeOptions (these must already be checked if static::$skipIfOptionsMissing is set ...)
@@ -503,8 +508,8 @@ abstract class editor_Test_ApiTest extends TestCase
     }
 
     /**
-     * Asserts that a default set of test users is available (provided by testdata.sql not imported by install-and-update kit!)
-     * This is done only once per test-run
+     * Asserts that a default set of test users is available (provided by testdata.sql not imported by
+     * install-and-update kit!) This is done only once per test-run
      */
     private static function assertNeededUsers()
     {
@@ -543,13 +548,24 @@ abstract class editor_Test_ApiTest extends TestCase
      */
     private static function assertTestCustomers()
     {
-        $customerNumbers = [Helper::TEST_CUSTOMER_NUMBER, Helper::TEST_CUSTOMER_NUMBER_1, Helper::TEST_CUSTOMER_NUMBER_2];
+        $customerNumbers = [
+            Helper::TEST_CUSTOMER_NUMBER,
+            Helper::TEST_CUSTOMER_NUMBER_1,
+            Helper::TEST_CUSTOMER_NUMBER_2,
+        ];
         foreach ($customerNumbers as $index => $customerNumber) {
             $customer = static::api()->getCustomerByNumber($customerNumber);
-            static::assertIsObject($customer, 'Unable to load test customer. No test customer was found for customer-number: ' . $customerNumber);
+            static::assertIsObject(
+                $customer,
+                'Unable to load test customer. No test customer was found for customer-number: ' . $customerNumber
+            );
             $response = static::api()->getLastResponse();
-            static::assertEquals(200, $response->getStatus(), 'Load test customer request does not respond HTTP 200! Body was: ' . $response->getBody());
-            static::$_testCustomers[$index] = $customer->id;
+            static::assertEquals(
+                200,
+                $response->getStatus(),
+                'Load test customer request does not respond HTTP 200! Body was: ' . $response->getBody()
+            );
+            self::$_testCustomers[$index] = $customer->id;
         }
     }
 
@@ -567,5 +583,18 @@ abstract class editor_Test_ApiTest extends TestCase
     private static function logTestEnd(): void
     {
         error_log('Finished test: ' . static::class . ' | ' . date("Y-m-d H:i:s"));
+    }
+
+    /**
+     * Waits for the given worker optionally identified by task to be finished
+     * @param int $timeout in seconds for all other states (how long might the worker be scheduled/waiting/running)
+     */
+    final public function waitForWorker(
+        string $class,
+        Task|stdClass $task = null,
+        int $timeout = 100,
+    ): void {
+        $taskGuids = ($task === null || empty($task?->taskGuid)) ? [] : [$task->taskGuid];
+        DbHelper::waitForWorkers($this, $class, $taskGuids, true, $timeout);
     }
 }

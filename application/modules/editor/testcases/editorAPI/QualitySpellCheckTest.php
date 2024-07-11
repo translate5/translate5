@@ -27,11 +27,12 @@ END LICENSE AND COPYRIGHT
 */
 
 use MittagQI\Translate5\Test\Filter;
+use MittagQI\Translate5\Test\JsonTestAbstract;
 
 /**
  * Testcase for TRANSLATE-2538
  */
-class QualitySpellCheckTest extends editor_Test_JsonTest
+class QualitySpellCheckTest extends JsonTestAbstract
 {
     protected static array $requiredPlugins = [
         'editor_Plugins_SpellCheck_Init',

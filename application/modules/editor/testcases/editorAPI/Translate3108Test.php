@@ -27,11 +27,12 @@ END LICENSE AND COPYRIGHT
 */
 
 use MittagQI\Translate5\Test\Api\Helper;
+use MittagQI\Translate5\Test\ImportTestAbstract;
 
 /***
  * Application token authentication
  */
-class Translate3108Test extends editor_Test_ImportTest
+class Translate3108Test extends ImportTestAbstract
 {
     private const USER_TESTMANAGER = 'testmanager';
 

@@ -29,12 +29,13 @@ END LICENSE AND COPYRIGHT
 use editor_Models_Segment_AutoStates as AutoStates;
 use editor_Workflow_Default as DefaultWorkflow;
 use MittagQI\Translate5\Test\Import\Config;
+use MittagQI\Translate5\Test\ImportTestAbstract;
 
 /**
  * SegmentWorkflowTest imports a test task, adds workflow users, edits segments and finishes then the task.
  * The produced changes.xml and the workflow steps of the segments are checked.
  */
-class SegmentWorkflowTest extends editor_Test_ImportTest
+class SegmentWorkflowTest extends ImportTestAbstract
 {
     public const WORKFLOW_COMPLEX = 'complex';
 
@@ -74,8 +75,6 @@ class SegmentWorkflowTest extends editor_Test_ImportTest
 
     public function testSegmentLocking(): void
     {
-        static::api()->waitForCurrentTaskStateOpen();
-
         $this->assertEquals(
             self::WORKFLOW_COMPLEX,
             static::api()->getTask()->workflow,
@@ -202,19 +201,18 @@ class SegmentWorkflowTest extends editor_Test_ImportTest
             'The segment finish count is not the same as the calculated one for the task!'
         );
 
-        //finishing the task
+        //finishing the task - triggers an autoQA
         static::api()->setTaskToFinished();
-        $this->assertEquals('finished', static::api()->reloadTask()->userState);
+
+        $task = static::api()->reloadTask();
+        $this->assertEquals('finished', $task->userState);
         $this->assertEquals(
             'review2ndlanguage',
-            static::api()->getTask()->workflowStepName,
+            $task->workflowStepName,
             'Workflow Step is not as expected'
         );
-
-        //FIXME waiting for autoQA (triggered implicit by workflow on finish above) must be implemented!
-        sleep(5);
-
-        static::api()->waitForCurrentTaskStateOpen();
+        // waiting for autoQA (triggered implicit by workflow on finish above)
+        $this->waitForWorker(editor_Task_Operation_FinishingWorker::class, $task);
         static::api()->setTaskToOpen();
     }
 

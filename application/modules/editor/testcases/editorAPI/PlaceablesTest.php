@@ -28,11 +28,12 @@ END LICENSE AND COPYRIGHT
 
 use MittagQI\Translate5\Segment\Tag\Placeable;
 use MittagQI\Translate5\Test\Import\Config;
+use MittagQI\Translate5\Test\JsonTestAbstract;
 
 /**
  * Tests the Import of Placeables
  */
-class PlaceablesTest extends editor_Test_JsonTest
+class PlaceablesTest extends JsonTestAbstract
 {
     public const EXPECTED_NUM_PLACEABLES = 5;
 

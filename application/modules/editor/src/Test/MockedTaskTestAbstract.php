@@ -26,10 +26,16 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+namespace MittagQI\Translate5\Test;
+
+use editor_Models_Task;
+use ZfExtended_Factory;
+use ZfExtended_Utils;
+
 /**
  * Abstraction layer for performing Unit tests which need to work with a mocked task
  */
-abstract class editor_Test_MockedTaskTest extends editor_Test_UnitTest
+abstract class MockedTaskTestAbstract extends UnitTestAbstract
 {
     /**
      * @var editor_Models_Task
@@ -42,11 +48,10 @@ abstract class editor_Test_MockedTaskTest extends editor_Test_UnitTest
     protected function getTestTask(): editor_Models_Task
     {
         if (static::$testTask == null) {
-            $task = ZfExtended_Factory::get('editor_Models_Task');
-            /* @var $task editor_Models_Task */
+            $task = ZfExtended_Factory::get(editor_Models_Task::class);
             $task->setId(1234);
             $task->setEntityVersion(280);
-            $task->setTaskGuid('{c56eadf5-ca66-43ae-931f-a09ff22643ab}');
+            $task->setTaskGuid(ZfExtended_Utils::uuid());
             $task->setTaskName('UNIT_TEST_TASK');
             $task->setForeignName('');
             $task->setSourceLang(5);

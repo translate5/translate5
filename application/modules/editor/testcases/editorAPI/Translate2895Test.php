@@ -26,11 +26,13 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\Test\UnitTestAbstract;
+
 /**
  * Testcase for TRANSLATE-2895 tests the boundary / framing tag removing in the XLF import
  * For details see the issue.
  */
-class Translate2895Test extends \editor_Test_UnitTest
+class Translate2895Test extends UnitTestAbstract
 {
     private static editor_Models_Import_FileParser_XmlParser $xmlParser;
 

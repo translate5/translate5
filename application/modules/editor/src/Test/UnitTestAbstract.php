@@ -26,13 +26,18 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+namespace MittagQI\Translate5\Test;
+
 use PHPUnit\Framework\TestCase;
+use Throwable;
+use Zend_Config;
+use Zend_Registry;
 
 /**
  * Base Class for all Unit Tests
  * Adds capabilities to save/resore the global Zend_Config to enable overwriting the config for a test
  */
-abstract class editor_Test_UnitTest extends TestCase
+abstract class UnitTestAbstract extends TestCase
 {
     public const TYPE = 'unit';
 
@@ -41,10 +46,10 @@ abstract class editor_Test_UnitTest extends TestCase
     final public static function setUpBeforeClass(): void
     {
         try {
-            static::$_config = Zend_Registry::get('config');
+            self::$_config = Zend_Registry::get('config');
             static::beforeTests();
         } catch (Throwable $e) {
-            Zend_Registry::set('config', static::$_config);
+            Zend_Registry::set('config', self::$_config);
             static::afterTests();
 
             throw $e;
@@ -53,7 +58,7 @@ abstract class editor_Test_UnitTest extends TestCase
 
     final public static function tearDownAfterClass(): void
     {
-        Zend_Registry::set('config', static::$_config);
+        Zend_Registry::set('config', self::$_config);
         static::afterTests();
     }
 

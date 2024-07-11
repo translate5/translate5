@@ -27,11 +27,12 @@ END LICENSE AND COPYRIGHT
 */
 
 use MittagQI\Translate5\Test\Import\Config;
+use MittagQI\Translate5\Test\JsonTestAbstract;
 
 /**
  * This test is using IntantTranslate POSTed data for filepretranslation input
  */
-class Translate3905Test extends editor_Test_JsonTest
+class Translate3905Test extends JsonTestAbstract
 {
     public const SOURCE_LANG = 'de';
 

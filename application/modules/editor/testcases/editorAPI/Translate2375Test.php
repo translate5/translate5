@@ -27,6 +27,7 @@ END LICENSE AND COPYRIGHT
 */
 
 use MittagQI\Translate5\Test\Import\Config;
+use MittagQI\Translate5\Test\ImportTestAbstract;
 
 /**
  * Test the default deadline date. For each workflow role (this tests only the default workflow),
@@ -42,7 +43,7 @@ use MittagQI\Translate5\Test\Import\Config;
  * 3. assign user via api, set deadline date to default-date
  * 4. load all user assocs and check the expected results
  */
-class Translate2375Test extends editor_Test_ImportTest
+class Translate2375Test extends ImportTestAbstract
 {
     protected static $fixedDate = '2020-11-21 18:01:00';
 

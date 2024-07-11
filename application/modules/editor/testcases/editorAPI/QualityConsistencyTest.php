@@ -28,11 +28,12 @@ END LICENSE AND COPYRIGHT
 
 use MittagQI\Translate5\Test\Filter;
 use MittagQI\Translate5\Test\Import\Config;
+use MittagQI\Translate5\Test\JsonTestAbstract;
 
 /**
  * Testcase for 'TRANSLATE-2537: AutoQA: Check inconsistent translations'
  */
-class QualityConsistencyTest extends editor_Test_JsonTest
+class QualityConsistencyTest extends JsonTestAbstract
 {
     /**
      * @var array

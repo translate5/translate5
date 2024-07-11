@@ -27,12 +27,13 @@ END LICENSE AND COPYRIGHT
 */
 
 use MittagQI\Translate5\Test\Import\Config;
+use MittagQI\Translate5\Test\ImportTestAbstract;
 
 /**
  * BasicSegmentEditingTest imports a simple task, checks imported values,
  * edits segments and checks then the edited ones again on correct content
  */
-class Translate1841Test extends editor_Test_ImportTest
+class Translate1841Test extends ImportTestAbstract
 {
     protected static array $forbiddenPlugins = [
         'editor_Plugins_LockSegmentsBasedOnConfig_Bootstrap',

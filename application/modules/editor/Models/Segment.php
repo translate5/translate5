@@ -53,11 +53,11 @@ use MittagQI\Translate5\ContentProtection\ContentProtector;
  * @method string getTaskGuid()
  * @method void setTaskGuid(string $guid)
  * @method string getTimestamp()
- * @method void setTimestamp(int $timestamp)
+ * @method void setTimestamp(string $timestamp)
  * @method string getEditable()
  * @method void setEditable(bool $editable)
  * @method string getPretrans()
- * @method void setPretrans(bool $pretrans)
+ * @method void setPretrans(int $pretrans)
  * @method string getMatchRate()
  * @method void setMatchRate(int $matchrate)
  * @method string getMatchRateType()
@@ -1966,7 +1966,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract
             throw new Zend_Exception("For using the editor_Models_Validator_Segment Validator a taskGuid must be set in the segment!");
         }
         $this->segmentFieldManager->initFields($taskGuid);
-        if (empty($this->validator)) {
+        if (null === $this->validator) {
             $this->validator = ZfExtended_Factory::get($this->validatorInstanceClass, [$this->segmentFieldManager, $this]);
         }
     }

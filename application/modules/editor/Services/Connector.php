@@ -47,6 +47,33 @@ use MittagQI\Translate5\Segment\TagRepair\HtmlProcessor;
  * @method boolean addTm(array $fileInfo = null,array $params=null) editor_Services_Connector_Abstract::addTm()
  * @method boolean addAdditionalTm(array $fileinfo = null, array $params = null) editor_Services_Connector_Abstract::addAdditionalTm()
  * @method void setConfig(Zend_Config $config) editor_Services_Connector_Abstract::setConfig(Zend_Config $config)
+ *
+ * @see editor_Services_UsageLogerTrait::logAdapterUsage()
+ * @method void logAdapterUsage(mixed $querySource, bool $isSegmentRepetition = false)
+ *
+ * @see editor_Services_UsageLogerTrait::setWorkerUserGuid()
+ * @method void setWorkerUserGuid(string $workerUserGuid = null)
+ *
+ * @see editor_Services_Connector_Abstract::getLanguageResource()
+ * @method editor_Models_LanguageResources_LanguageResource getLanguageResource()
+ *
+ * @see editor_Services_Connector_Abstract::resetResultList()
+ * @method array resetResultList()
+ *
+ * @see editor_Services_Connector_Abstract::isBatchQuery()
+ * @method bool isBatchQuery()
+ *
+ * @see editor_Services_Connector_Abstract::isDisabled()
+ * @method bool isDisabled()
+ *
+ * @see editor_Services_Connector_Abstract::disable()
+ * @method void disable()
+ *
+ * @see editor_Services_Connector_Abstract::delete()
+ * @method void delete()
+ *
+ * @see editor_Services_Connector_Abstract::isInternalFuzzy()
+ * @method bool isInternalFuzzy()
  */
 class editor_Services_Connector
 {
