@@ -371,7 +371,7 @@ class editor_Models_Import_FileParser_Sdlxliff_TransunitParser
         $rangeContent = $this->xmlparser->getRange($startOffset, $endOffset, true);
         // experimental feature: Strict escaping for the segment input stream
         if ($this->useStrictEscaping) {
-            return Markup::escapeStrict($rangeContent);
+            return Markup::escapeImport($rangeContent);
         }
 
         return $rangeContent;
