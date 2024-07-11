@@ -122,7 +122,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
 
         //to ensure that we get unique TMs Names although of the above stripped content,
         // we add the LanguageResource ID and a prefix which can be configured per each translate5 instance
-        $name = 'ID' . $this->languageResource->getId() . '-' . $this->filterName($this->languageResource->getName());
+        $name = $this->generateTmFilename($this->languageResource);
 
         if (isset($params['createNewMemory'])) {
             $name = $this->generateNextMemoryName($this->languageResource);
@@ -911,9 +911,13 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
         $fuzzyLanguageResource->addSpecificData('memories', null);
 
         $this->api->setResource($fuzzyLanguageResource->getResource());
-        $this->api->createEmptyMemory($fuzzyLanguageResourceName, $this->languageResource->getSourceLangCode());
 
-        $this->addMemoryToLanguageResource($fuzzyLanguageResource, $fuzzyLanguageResourceName, true);
+        $newTmFileName = $this->api->createEmptyMemory(
+            $this->generateTmFilename($fuzzyLanguageResource),
+            $this->languageResource->getSourceLangCode()
+        );
+
+        $this->addMemoryToLanguageResource($fuzzyLanguageResource, $newTmFileName, true);
 
         //INFO: The resources logging requires resource with valid id.
         //$fuzzyLanguageResource->setId(null);
@@ -1850,5 +1854,10 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
     private function getStripFramingTagsValue(array $params): StripFramingTags
     {
         return StripFramingTags::tryFrom($params['stripFramingTags'] ?? '') ?? StripFramingTags::None;
+    }
+
+    private function generateTmFilename(editor_Models_LanguageResources_LanguageResource $languageResource): string
+    {
+        return 'ID' . $languageResource->getId() . '-' . $this->filterName($languageResource->getName());
     }
 }

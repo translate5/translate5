@@ -150,5 +150,45 @@
         "wordCount": "17",
         "characterCount": "120",
         "type": "auto-propagated"
+    },
+    {
+        "segmentNrInTask": "11",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "10",
+        "characterCount": "52",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "11",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "10",
+        "characterCount": "52",
+        "type": "termcollection"
+    },
+    {
+        "segmentNrInTask": "12",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "10",
+        "characterCount": "54",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "12",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "10",
+        "characterCount": "54",
+        "type": "termcollection"
+    },
+    {
+        "segmentNrInTask": "12",
+        "internalFuzzy": "1",
+        "matchRate": "90",
+        "wordCount": "10",
+        "characterCount": "54",
+        "type": "tm"
     }
 ]
