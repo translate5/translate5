@@ -50,4 +50,9 @@ class editor_Services_OpenTM2_Resource extends editor_Models_LanguageResources_R
             self::STRIP_FRAMING_TAGS_FILE_EXTENSIONS => ['.tmx'],
         ];
     }
+
+    public function supportsInternalFuzzy(): bool
+    {
+        return true;
+    }
 }

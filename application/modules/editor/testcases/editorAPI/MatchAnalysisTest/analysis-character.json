@@ -18,17 +18,17 @@
         "noMatch": 0
     },
     {
-        "resourceName": "MatchAnalysisTest_TM - internal Fuzzies",
-        "resourceColor": null,
+        "resourceName": "Internal fuzzies (OpenTM2 1)",
+        "resourceColor": "",
         "resourceType": "tm",
         "internalFuzzy": "Yes",
-        "unitCountTotal": 38,
+        "unitCountTotal": 92,
         "104": 0,
         "103": 0,
         "102": 0,
         "101": 0,
         "100": 0,
-        "90": 19,
+        "90": 73,
         "80": 19,
         "70": 0,
         "60": 0,
@@ -40,7 +40,7 @@
         "resourceColor": null,
         "resourceType": "termcollection",
         "internalFuzzy": "Yes",
-        "unitCountTotal": 19,
+        "unitCountTotal": 71,
         "104": 19,
         "103": 0,
         "102": 0,
@@ -51,7 +51,7 @@
         "70": 0,
         "60": 0,
         "50": 0,
-        "noMatch": 0
+        "noMatch": 52
     },
     {
         "resourceName": "",
@@ -76,17 +76,17 @@
         "resourceColor": "",
         "resourceType": "",
         "internalFuzzy": "",
-        "unitCountTotal": 719,
+        "unitCountTotal": 825,
         "104": 19,
         "103": 0,
         "102": 268,
         "101": 120,
         "100": 0,
-        "90": 293,
+        "90": 347,
         "80": 19,
         "70": 0,
         "60": 0,
         "50": 0,
-        "noMatch": 0
+        "noMatch": 52
     }
 ]

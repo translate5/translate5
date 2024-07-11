@@ -5905,6 +5905,10 @@ Im Projektportal {portalLink} wurde die Aufgabe
                 <source>Interner Fuzzy aktiv</source>
                 <target>Interner Fuzzy aktiv</target>
             </trans-unit>
+            <trans-unit id='SW50ZXJuZSBGdXp6eXMgKCVzKQ=='>
+                <source>Interne Fuzzys (%s)</source>
+                <target>Interne Fuzzys (%s)</target>
+            </trans-unit>
             <trans-unit id='RXJzdGVsbHVuZ3NkYXR1bQ=='>
                 <source>Erstellungsdatum</source>
                 <target>Erstellungsdatum</target>
