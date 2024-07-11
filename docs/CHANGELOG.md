@@ -20,6 +20,71 @@ All updates are (downwards) compatible! If not this is listed in the important r
 
 
 
+
+## [7.6.6] - 2024-07-11
+
+### Important Notes:
+#### [TRANSLATE-4053](https://jira.translate5.net/browse/TRANSLATE-4053)
+Strict escaping of all XML-based Imports is now the default. This also means, that exports are strictly escaped!
+ 
+
+
+### Added
+**[TRANSLATE-3850](https://jira.translate5.net/browse/TRANSLATE-3850): OpenId Connect - SSO via OpenID: Define if IDP should be able to remove rights** <br>
+translate5 - 7.6.6: Customer will be updated or not based on this config
+translate5 - 7.6.0: New client flag added for OpenId configured IDP. It can enable or disable updating of user roles, gender and locale from the IDP user claims.
+
+**[TRANSLATE-3494](https://jira.translate5.net/browse/TRANSLATE-3494): TermPortal - Check for duplicates in same language when saving new term** <br>
+Confirmation prompt is now shown on attempt to add a target term (via text selection within opened segment editor) that already exists in the destination TermCollection
+
+
+### Changed
+**[TRANSLATE-4070](https://jira.translate5.net/browse/TRANSLATE-4070): ConnectWorldserver - Plugin Connect WorldServer: disable TM-Update on re-import** <br>
+Worldserver TM will not be updated on tasks re-import.
+
+**[TRANSLATE-4069](https://jira.translate5.net/browse/TRANSLATE-4069): t5memory - Add comparing sent and received data during update request to t5memory** <br>
+When updating the segment it is now checked if the received data equals what we expect
+
+**[TRANSLATE-4065](https://jira.translate5.net/browse/TRANSLATE-4065): MatchAnalysis & Pretranslation - Use empty TM for internal fuzzy** <br>
+Use empty TM to save internal fuzzy results instead cloning the current one
+
+
+**[TRANSLATE-3975](https://jira.translate5.net/browse/TRANSLATE-3975): t5memory - Improve concordance search tags recognition** <br>
+Tags recognition in concordance search panel changed to reflect actual tags ordering
+
+
+### Bugfixes
+**[TRANSLATE-4059](https://jira.translate5.net/browse/TRANSLATE-4059): Editor general - Remove character duplicates from special characters** <br>
+Fixes duplicate buttons in special character list.
+
+**[TRANSLATE-4055](https://jira.translate5.net/browse/TRANSLATE-4055): LanguageResources - OpenAI Plugin: Exception not reported to the Frontend** <br>
+FIX: Errors in TMs may not be reported to the Frontend when used within OpenAI training
+
+**[TRANSLATE-4053](https://jira.translate5.net/browse/TRANSLATE-4053): Import/Export - Switch to strict escaping for XML formats** <br>
+Switch to strict escaping for all XML-based import formats (XLF, XLIFF, SDLXLIFF). This can be turned off by configuration if neccessary. Strict escaping means, that ">" generally is escaped in any textual content.
+
+**[TRANSLATE-4047](https://jira.translate5.net/browse/TRANSLATE-4047): Editor general - Stored SegmentGrid sort on sourceEdit column leads to errors in task without editable source** <br>
+Fix problem where filtering and sorting with invalid column names leads to UI error.
+
+**[TRANSLATE-4044](https://jira.translate5.net/browse/TRANSLATE-4044): Import/Export - typo in error message for file upload** <br>
+FIXED: small typo in VisualReview file upload error message
+
+**[TRANSLATE-4034](https://jira.translate5.net/browse/TRANSLATE-4034): VisualReview / VisualTranslation - Improve visual symlink creation for very rare cases of parallel access** <br>
+Suppress error-msg for visual symlink creation in the very rare case of paralell access
+
+**[TRANSLATE-3997](https://jira.translate5.net/browse/TRANSLATE-3997): file format settings - segmentation improvements in default srx** <br>
+FIX: File Format Settings: Rule to break after a Colon followed by a Uppercase word worked only in German in the translate5 default SRX
+
+**[TRANSLATE-3991](https://jira.translate5.net/browse/TRANSLATE-3991): Task Management - FIX Table Archiever, FIX worker-trigger "Process" for Tests and reduce warnings** <br>
+FIX: Table Archiever may ran into errors when plugins not installed/active
+
+**[TRANSLATE-3720](https://jira.translate5.net/browse/TRANSLATE-3720): TermPortal, usability termportal - Enhance termportal attribute display usability** <br>
+Improve term portal UI for attribute
+
+**[TRANSLATE-2979](https://jira.translate5.net/browse/TRANSLATE-2979): LanguageResources - Concordance search highlighting may destroy rendered tags.** <br>
+FIX When using the concordance search the content of tags can also be searched - not leading to defect tags in the rendered output anymore.
+
+
 ## [7.6.5] - 2024-07-02
 
 ### Important Notes:
