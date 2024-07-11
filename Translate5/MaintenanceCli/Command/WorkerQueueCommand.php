@@ -31,6 +31,7 @@ namespace Translate5\MaintenanceCli\Command;
 use MittagQI\ZfExtended\Worker\Queue;
 use ReflectionException;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Zend_Exception;
 use ZfExtended_Factory;
@@ -52,6 +53,20 @@ class WorkerQueueCommand extends Translate5AbstractCommand
             // the full command description shown when running the command with
             // the "--help" option
             ->setHelp('Triggers the next runnable worker to be executed');
+
+        // during API-tests the test-flag is set via option
+        $this->addOption(
+            'test',
+            't',
+            InputOption::VALUE_NONE,
+            'Use the test-database to trigger workers during API-tests.'
+        );
+        $this->addOption(
+            'apptest',
+            null,
+            InputOption::VALUE_NONE,
+            'Use the test-database to run a worker during API-tests.'
+        );
     }
 
     /**
@@ -65,7 +80,19 @@ class WorkerQueueCommand extends Translate5AbstractCommand
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $this->initInputOutput($input, $output);
-        $this->initTranslate5AppOrTest();
+
+        if ($this->input->getOption('test')) {
+            // no choice in case test-environment is forced
+            $this->initTranslate5('test');
+        } elseif ($this->input->getOption('apptest')) {
+            // also the apptest has an own mode - in lack of having an origin
+            $this->initTranslate5('apptest');
+        } elseif ($this->isPorcelain) {
+            // also no choice for porcelain calls
+            $this->initTranslate5();
+        } else {
+            $this->initTranslate5AppOrTest();
+        }
 
         $this->writeTitle('trigger worker queue');
 

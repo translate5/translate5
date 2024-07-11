@@ -26,10 +26,12 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\Test\SegmentTagsTestAbstract;
+
 /**
  * Several "classic" PHPUnit tests to check the TagComparision which detects faulty structures and added/removed internal tags
  */
-class SegmentTagsComparisionTest extends editor_Test_SegmentTagsTest
+class SegmentTagsComparisionTest extends SegmentTagsTestAbstract
 {
     /**
      * Some Internal Tags to create Tests with

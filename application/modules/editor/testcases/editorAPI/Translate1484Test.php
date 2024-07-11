@@ -27,12 +27,13 @@ END LICENSE AND COPYRIGHT
 */
 
 use MittagQI\Translate5\Test\Import\Config;
+use MittagQI\Translate5\Test\JsonTestAbstract;
 
 /**
  * This test class will create test task and pretranslate it with ZDemoMT and OpenTm2 TM
  * Then the export result from the logg will be compared against the expected result.
  */
-class Translate1484Test extends editor_Test_JsonTest
+class Translate1484Test extends JsonTestAbstract
 {
     protected static array $requiredPlugins = [
         'editor_Plugins_Okapi_Init',

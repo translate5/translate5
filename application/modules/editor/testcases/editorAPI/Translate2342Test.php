@@ -28,12 +28,13 @@ END LICENSE AND COPYRIGHT
 
 use MittagQI\Translate5\Test\Api\DbHelper;
 use MittagQI\Translate5\Test\Import\Config;
+use MittagQI\Translate5\Test\ImportTestAbstract;
 
 /***
  * Test the import progress feature. This will only test the progress report before the import is triggered
  * and the report progress after the import.
  */
-class Translate2342Test extends editor_Test_ImportTest
+class Translate2342Test extends ImportTestAbstract
 {
     protected static array $forbiddenPlugins = [
         'editor_Plugins_SegmentStatistics_Bootstrap',
@@ -69,21 +70,19 @@ class Translate2342Test extends editor_Test_ImportTest
 
     public function testImportAndProgress()
     {
-        $taskId = static::getTask()->getId();
-        $taskGuid = static::getTask()->getTaskGuid();
+        $task = static::getTask();
         // now test the queued worker progress before and after the import.
         $result = static::api()->getJson('editor/task/importprogress', [
-            'taskGuid' => $taskGuid,
+            'taskGuid' => $task->getTaskGuid(),
         ]);
         $result = $result->progress ?? null;
         $this->assertNotEmpty($result->progress ?? null, 'No results found for the import progress.');
 
         // run the import workers and check wait for task import
-        static::api()->getJson('editor/task/' . $taskId . '/import');
-        static::api()->waitForCurrentTaskStateOpen();
+        $task->startAndWaitForImport(static::api());
 
         $result = static::api()->getJson('editor/task/importprogress', [
-            'taskGuid' => $taskGuid,
+            'taskGuid' => $task->getTaskGuid(),
         ]);
         $result = $result->progress ?? null;
         $this->assertNotEmpty($result->progress ?? null, 'No results found for the import progress.');

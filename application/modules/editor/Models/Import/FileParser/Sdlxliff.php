@@ -592,8 +592,8 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
                 $sourceHasContent = mb_strlen(strip_tags(preg_replace('/\s+/u', '', $source))) !== 0;
 
                 if ($sourceHasContent && $sdlxliffConfig?->cleanUpTargetOnSourceWithContentAndTagWhitespaceOnlyTarget) {
-                    $emptyTarget = mb_strlen(strip_tags(preg_replace('/\s+/u', '', $target))) === 0;
-
+                    $emptyTarget = $target === null ||
+                        mb_strlen(strip_tags(preg_replace('/\s+/u', '', $target))) === 0;
                     $target = $emptyTarget ? '' : $target;
                 }
 

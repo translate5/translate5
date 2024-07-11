@@ -27,11 +27,12 @@ END LICENSE AND COPYRIGHT
 */
 
 use MittagQI\Translate5\Test\Filter;
+use MittagQI\Translate5\Test\JsonTestAbstract;
 
 /**
  * Testcase for TRANSLATE-2540
  */
-class QualityNumbersCheckTest extends editor_Test_JsonTest
+class QualityNumbersCheckTest extends JsonTestAbstract
 {
     public function testTask0()
     {

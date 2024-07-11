@@ -8,11 +8,11 @@ use editor_Models_File;
 use editor_Models_Import_FileParser;
 use editor_Models_Import_FileParser_Sdlxliff as Sdlxliff;
 use editor_Models_Task;
-use editor_Test_UnitTest;
+use MittagQI\Translate5\Test\UnitTestAbstract;
 use ZfExtended_Factory;
 use ZfExtended_Utils;
 
-class ImportSdlxliffWithQuickInsertsListTagsTest extends editor_Test_UnitTest
+class ImportSdlxliffWithQuickInsertsListTagsTest extends UnitTestAbstract
 {
     private editor_Models_Task $task;
 

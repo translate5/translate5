@@ -26,11 +26,13 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\Test\UnitTestAbstract;
+
 /**
  * Testcase for TRANSLATE-2691 SDLXLIFF diff export fails with old version of diff library and the here used content in an endless loop
  * For details see the issue.
  */
-class Translate2691Test extends \editor_Test_UnitTest
+class Translate2691Test extends UnitTestAbstract
 {
     /**
      * Testing segment values directly after import

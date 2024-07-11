@@ -37,8 +37,9 @@ END LICENSE AND COPYRIGHT
  */
 use MittagQI\Translate5\Test\Import\Config;
 use MittagQI\Translate5\Test\Import\LanguageResource;
+use MittagQI\Translate5\Test\JsonTestAbstract;
 
-class ZTranslate2763Test extends editor_Test_JsonTest
+class ZTranslate2763Test extends JsonTestAbstract
 {
     protected static ?LanguageResource $tc = null;
 

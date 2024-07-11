@@ -363,7 +363,18 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
             $useSegmentTimestamp
         );
 
+        $dataSent = [
+            'source' => $source,
+            'target' => $target,
+            'userName' => $segment->getUserName(),
+            'context' => $segment->getMid(),
+            // TODO fix this after TMMaintenance is merged
+            // 'timestamp' => $timestamp,
+            'fileName' => $fileName,
+        ];
+
         if ($successful) {
+            $this->checkUpdateResponse($dataSent, $this->api->getResult());
             $this->checkUpdatedSegment($segment, $recheckOnUpdate);
 
             return;
@@ -378,6 +389,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
             $successful = $this->api->update($source, $target, $segment, $fileName, $tmName, ! $this->isInternalFuzzy());
 
             if ($successful) {
+                $this->checkUpdateResponse($dataSent, $this->api->getResult());
                 $this->checkUpdatedSegment($segment, $recheckOnUpdate);
 
                 return;
@@ -392,6 +404,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
             $successful = $this->api->update($source, $target, $segment, $fileName, $tmName, ! $this->isInternalFuzzy());
 
             if ($successful) {
+                $this->checkUpdateResponse($dataSent, $this->api->getResult());
                 $this->checkUpdatedSegment($segment, $recheckOnUpdate);
 
                 return;
@@ -1776,6 +1789,29 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
         return $zipFileName;
     }
     // endregion export TM
+
+    private function checkUpdateResponse(array $request, object $response): void
+    {
+        $match =
+            $request['source'] === $response->source
+            && $request['target'] === $response->target
+            && mb_strtoupper($request['userName']) === $response->author
+            && $request['context'] === $response->context
+//            && $request['timestamp'] === $response->timestamp
+            && $request['fileName'] === $response->documentName;
+
+        if (! $match) {
+            $this->logger->error(
+                'E1586',
+                'Sent data does not match the response from t5memory in update call.',
+                [
+                    'languageResource' => $this->languageResource,
+                    'request' => $request,
+                    'response' => json_encode($response, JSON_PRETTY_PRINT),
+                ]
+            );
+        }
+    }
 
     /**
      * Check if segment was updated properly

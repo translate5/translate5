@@ -26,10 +26,12 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\Test\ApiTestAbstract;
+
 /**
  * Empty dummy test to test the surrounding test framework
  */
-class DummyTest extends editor_Test_ApiTest
+class DummyTest extends ApiTestAbstract
 {
     public function testEntityVersionOnChangingUsers()
     {

@@ -26,10 +26,11 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-use MittagQI\Translate5\Test\Filter;
+namespace MittagQI\Translate5\Test;
+
 use MittagQI\Translate5\Test\Model\AbstractModel;
-use MittagQI\Translate5\Test\Sanitizer;
 use PHPUnit\Framework\ExpectationFailedException;
+use stdClass;
 
 /**
  * Abstraction layer for API tests comparing REST-Data with stored JSON files
@@ -37,7 +38,7 @@ use PHPUnit\Framework\ExpectationFailedException;
  * This solves problems with autoincrement values & other dynamic data
  * See AbstractModel & descendants
  */
-abstract class editor_Test_JsonTest extends editor_Test_ImportTest
+abstract class JsonTestAbstract extends ImportTestAbstract
 {
     /* Segment model specific API */
 
@@ -46,7 +47,7 @@ abstract class editor_Test_JsonTest extends editor_Test_ImportTest
      */
     public function assertFieldTextEquals(string $expected, string $actual, string $message = '')
     {
-        return $this->assertEquals(
+        $this->assertEquals(
             Sanitizer::fieldtext($expected),
             Sanitizer::fieldtext($actual),
             $message
@@ -106,6 +107,7 @@ abstract class editor_Test_JsonTest extends editor_Test_ImportTest
         $expectations = static::api()->getFileContent($fileToCompare);
         $numSegments = count($segments);
         $numExpectations = count($expectations);
+        $errorDiffs = [];
         if ($numSegments === $numExpectations) {
             $lastException = null;
             for ($i = 0; $i < $numSegments; $i++) {
@@ -117,11 +119,14 @@ abstract class editor_Test_JsonTest extends editor_Test_ImportTest
                     if ($stopOnFirstFailedDiff) {
                         break;
                     }
-                    print_r([$msg, $e->getComparisonFailure()->getDiff()]);
+                    // collect faulty segments
+                    $errorDiffs[] = '[Segment ' . ($i + 1) . "]\n" . $e->getComparisonFailure()->getDiff();
                 }
             }
-            if ($lastException) {
-                throw $lastException;
+            // report all faulty segments at once
+            if (count($errorDiffs) > 0) {
+                $failure = ($message === '') ? $lastException->toString() : $message;
+                $this->fail($failure . " =====\n" . implode(" -----\n", $errorDiffs));
             }
         } else {
             $this->assertEquals($numExpectations, $numSegments, $message . ' [Number of segments does not match the expectations]');
@@ -166,6 +171,7 @@ abstract class editor_Test_JsonTest extends editor_Test_ImportTest
             for ($i = 0; $i < $numComments; $i++) {
                 $msg = (empty($message)) ? '' : $message . ' [Segment ' . ($i + 1) . ']';
                 // the comments per segment are an array again ...
+                /** @var array $segmentComments */
                 $segmentComments = $comments[$i];
                 $segmentExpectations = $expectations[$i];
                 $numSegmentComments = count($segmentComments);

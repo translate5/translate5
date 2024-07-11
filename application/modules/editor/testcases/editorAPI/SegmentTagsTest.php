@@ -26,10 +26,12 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\Test\SegmentTagsTestAbstract;
+
 /**
  * Several "classic" PHPUnit tests to check the OOP Tag-Parsing API againsted selected test data
  */
-class SegmentTagsTest extends editor_Test_SegmentTagsTest
+class SegmentTagsTest extends SegmentTagsTestAbstract
 {
     public function testUnicodeTag()
     {
@@ -59,6 +61,15 @@ class SegmentTagsTest extends editor_Test_SegmentTagsTest
             $result .= $dom->saveHTML($element);
         }
         $this->assertEquals($expected, $result);
+    }
+
+    public function testDoubleEncodedTag()
+    {
+        $expected = '<span class="short" title="&lt;ph name=&amp;quot;ParagraphNumber&amp;quot;/&gt;" data-smth="&lt;ph name=&amp;quot;ParagraphNumber&amp;quot;/&gt;"> Some &amp;amp; thing</span>';
+        $dom = new ZfExtended_Dom();
+        $element = $dom->loadUnicodeElement($expected);
+        $result = $dom->saveHTML($element);
+        $this->assertEquals($result, $expected);
     }
 
     public function testSimpleTag()

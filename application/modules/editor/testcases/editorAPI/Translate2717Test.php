@@ -26,6 +26,8 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\Test\JsonTestAbstract;
+
 /**+
  * This test will:
  * - create 2 temporary customers
@@ -33,7 +35,7 @@ END LICENSE AND COPYRIGHT
  * - insert user defaults for source customer, copy the values to target, compare the values between them
  * - remove the temporary customers
  */
-class Translate2717Test extends editor_Test_JsonTest
+class Translate2717Test extends JsonTestAbstract
 {
     public static $sourceCustomerId;
 

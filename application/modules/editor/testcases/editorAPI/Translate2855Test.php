@@ -27,6 +27,7 @@ END LICENSE AND COPYRIGHT
 */
 
 use MittagQI\Translate5\Test\Import\Config;
+use MittagQI\Translate5\Test\JsonTestAbstract;
 
 /***
  * This is a test for the pivot pre-translation feature.
@@ -38,7 +39,7 @@ use MittagQI\Translate5\Test\Import\Config;
  *   - create new task (with only 3 segments) asn assign the MT ZDemoMT resource
  *   - check if for all 3 task segments the pivot is pre-translated
  */
-class Translate2855Test extends editor_Test_JsonTest
+class Translate2855Test extends JsonTestAbstract
 {
     protected static array $requiredPlugins = [
         'editor_Plugins_Okapi_Init',

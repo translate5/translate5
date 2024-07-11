@@ -9496,9 +9496,9 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
                 <source>Beide Benennungen bereits vorhanden in ausgewählter TermCollection.</source>
                 <target>Beide Benennungen bereits vorhanden in ausgewählter TermCollection.</target>
             </trans-unit>
-            <trans-unit id='QmVncmlmZiBleGlzdGllcnQgYmVyZWl0cyBpbiBkZXIgYXVzZ2V3w6RobHRlbiBUZXJtQ29sbGVjdGlvbg=='>
-                <source>Begriff existiert bereits in der ausgewählten TermCollection</source>
-                <target>Begriff existiert bereits in der ausgewählten TermCollection</target>
+            <trans-unit id='RGVyIEJlZ3JpZmYgZXhpc3RpZXJ0IGJlcmVpdHMgaW4gZWluZW0gYW5kZXJlbkVpbnRyYWcuPGJyIC8+TcO2Y2h0ZW4gU2llIGlobiB3aXJrbGljaCBpbiBkaWUgQmVncmlmZnNzYW1tbHVuZyBhdWZuZWhtZW4/'>
+                <source>Der Begriff existiert bereits in einem anderen Eintrag.<br />Möchten Sie ihn wirklich in die Begriffssammlung aufnehmen?</source>
+                <target>Der Begriff existiert bereits in einem anderen Eintrag.<br />Möchten Sie ihn wirklich in die Begriffssammlung aufnehmen?</target>
             </trans-unit>
             <trans-unit id="R2VzY2jDvHR6dGUgUmVnZXgtR3J1cHBl">
                 <source>Geschützte Regex-Gruppe</source>

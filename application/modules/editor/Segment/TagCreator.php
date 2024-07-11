@@ -139,7 +139,7 @@ final class editor_Segment_TagCreator
     /**
      * Tries to evaluate an Internal tag out of a given Dom Element
      * This is an alternative implementation using PHP DOM
-     * see editor_Tag::USE_PHP_DOM
+     * see Markup::useStrictEscaping
      * @return editor_Segment_Tag
      */
     public function fromDomElement(DOMElement $element, int $startIndex = 0)

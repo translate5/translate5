@@ -26,7 +26,9 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-class TbxSpecialcharsTest extends \editor_Test_ApiTest
+use MittagQI\Translate5\Test\ApiTestAbstract;
+
+class TbxSpecialcharsTest extends ApiTestAbstract
 {
     /***
      * The current active collection

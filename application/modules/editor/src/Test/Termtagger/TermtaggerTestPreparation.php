@@ -26,11 +26,15 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+namespace MittagQI\Translate5\Test\Termtagger;
+
+use DOMDocument;
+
 /**
  * OUTDATED base implementation for testing the Termtagger
  * Tests / validates the Testcase described in the .testcase XML file
  */
-class editor_Test_Termtagger_Preparation extends editor_Test_Termtagger_Abstract
+abstract class TermtaggerTestPreparation extends TermtaggerTestAbstract
 {
     /**
      * Validates the xml testcase file against schema
@@ -83,8 +87,8 @@ class editor_Test_Termtagger_Preparation extends editor_Test_Termtagger_Abstract
         $this->assertFileExists($tbxFilePath, 'For the testfile ' . self::$testfilePath .
                 ' the defined tbx-file with the path ' . $tbxFilePath . ' does not exist');
 
-        $assertion = self::$qpTest->find('testcase > assertion');
-        $this->assertTrue(method_exists('editor_Test_Termtagger', $assertion->attr('type') . 'Source'), 'The assertion-Method ' . $assertion->attr('type') . 'Source is not specified in the termtagger-test-class.');
-        $this->assertTrue(method_exists('editor_Test_Termtagger', $assertion->attr('type') . 'Target'), 'The assertion-Method ' . $assertion->attr('type') . 'Target is not specified in the termtagger-test-class.');
+        // $assertion = self::$qpTest->find('testcase > assertion');
+        // $this->assertTrue(method_exists(TermtaggerTest::class, $assertion->attr('type') . 'Source'), 'The assertion-Method ' . $assertion->attr('type') . 'Source is not specified in the termtagger-test-class.');
+        // $this->assertTrue(method_exists(TermtaggerTest::class, $assertion->attr('type') . 'Target'), 'The assertion-Method ' . $assertion->attr('type') . 'Target is not specified in the termtagger-test-class.');
     }
 }

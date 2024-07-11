@@ -27,6 +27,7 @@ END LICENSE AND COPYRIGHT
 */
 
 use MittagQI\Translate5\Test\Import\Config;
+use MittagQI\Translate5\Test\JsonTestAbstract;
 
 /**
  * This test covers if the repetition editor can deal with tags inside of segments.
@@ -38,7 +39,7 @@ use MittagQI\Translate5\Test\Import\Config;
  *   Tag Content and position does not matter, only the tag count must be
  *   equal in the segments (and the text of course) to be recognized as repetition.
  */
-class ChangeAlikeTranslate680Test extends editor_Test_JsonTest
+class ChangeAlikeTranslate680Test extends JsonTestAbstract
 {
     /**
      * the strings to be compared on testing change alike source matching

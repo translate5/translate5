@@ -26,13 +26,15 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\Test\ApiTestAbstract;
+
 /**
  * Test the tbx import into the term collection with multiple tbx files with modified and new terms.
  * TODO: Since the tbx export does not provide the tbx file with term entry attributes and term attributes
  *       the test can not relay on tbx content test.
  *       When in the tbx export result the attributes are include this can be changed
  */
-class TbxImportApiTest extends \editor_Test_ApiTest
+class TbxImportApiTest extends ApiTestAbstract
 {
     /***
      * Test the tbx import.

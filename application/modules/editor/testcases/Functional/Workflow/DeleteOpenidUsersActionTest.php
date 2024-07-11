@@ -30,7 +30,7 @@ declare(strict_types=1);
 namespace MittagQI\Translate5\Test\Functional\Workflow;
 
 use DateTime;
-use editor_Test_UnitTest;
+use MittagQI\Translate5\Test\UnitTestAbstract;
 use MittagQI\Translate5\Workflow\DeleteOpenidUsersAction;
 use stdClass;
 use Zend_Registry;
@@ -40,7 +40,7 @@ use ZfExtended_Models_LoginLog;
 use ZfExtended_Models_User;
 use ZfExtended_Utils;
 
-class DeleteOpenidUsersActionTest extends editor_Test_UnitTest
+class DeleteOpenidUsersActionTest extends UnitTestAbstract
 {
     private const USER_LOGIN = 'DeleteOpenidUsersActionTest';
 

@@ -26,10 +26,12 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\Test\SegmentTagsTestAbstract;
+
 /**
  * Several "classic" PHPUnit tests to check the OOP Tag-Parsing API againsted selected test data in regard of overlapping tags
  */
-class SegmentTagsOverlapTest extends editor_Test_SegmentTagsTest
+class SegmentTagsOverlapTest extends SegmentTagsTestAbstract
 {
     // tags 1 - 3 are mqm tags, 4 - 7 term tags, 8 - 9 internal tags
     private $open1 = '<img class="open critical qmflag ownttip qmflag-1" data-t5qid="111" data-comment="" src="/modules/editor/images/imageTags/qmsubsegment-1-left.png" />';

@@ -28,11 +28,12 @@ END LICENSE AND COPYRIGHT
 
 use MittagQI\Translate5\Test\Api\Helper;
 use MittagQI\Translate5\Test\Import\Config;
+use MittagQI\Translate5\Test\ImportTestAbstract;
 
 /**
  * Tests the User Auth API
  */
-class SessionApiTest extends editor_Test_ImportTest
+class SessionApiTest extends ImportTestAbstract
 {
     protected static function setupImport(Config $config): void
     {
