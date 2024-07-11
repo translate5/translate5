@@ -17,7 +17,7 @@
     },
     {
         "segmentNrInTask": "2",
-        "internalFuzzy": "1",
+        "internalFuzzy": "0",
         "matchRate": "80",
         "wordCount": "4",
         "characterCount": "19",
@@ -32,9 +32,17 @@
         "type": "termcollection"
     },
     {
-        "segmentNrInTask": "3",
+        "segmentNrInTask": "2",
         "internalFuzzy": "1",
-        "matchRate": "97",
+        "matchRate": "80",
+        "wordCount": "4",
+        "characterCount": "19",
+        "type": "tm"
+    },
+    {
+        "segmentNrInTask": "3",
+        "internalFuzzy": "0",
+        "matchRate": "80",
         "wordCount": "4",
         "characterCount": "19",
         "type": "tm"
@@ -46,6 +54,14 @@
         "wordCount": "4",
         "characterCount": "19",
         "type": "termcollection"
+    },
+    {
+        "segmentNrInTask": "3",
+        "internalFuzzy": "1",
+        "matchRate": "97",
+        "wordCount": "4",
+        "characterCount": "19",
+        "type": "tm"
     },
     {
         "segmentNrInTask": "4",
