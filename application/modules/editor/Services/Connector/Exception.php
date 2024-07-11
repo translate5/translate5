@@ -54,6 +54,8 @@ class editor_Services_Connector_Exception extends ZfExtended_BadGatewayErrorCode
         'E1564' => 't5memory: Language Resource [{name}] has no writable memory in list',
         'E1565' => 'Invalid offset provided. Should be: tmId:offset',
         'E1586' => 'Segment appeared to be not saved to TM properly',
+        'E1611' => 't5memory: Requested segment not found. Probably it was deleted.',
+        'E1612' => 't5memory: Found segment id differs from the requested one, probably it was deleted meanwhile.',
     ];
 
     protected function setDuplication()

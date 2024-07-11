@@ -34,9 +34,15 @@ Ext.define('TMMaintenance.view.main.List', {
             xtype: 'rownumberer'
         },
         {
-            tpl: '{metaData.internalKey}',
+            dataIndex: 'id',
             xtype: 'templatecolumn',
             text: 'ID',
+            hidden: true,
+        },
+        {
+            tpl: '{metaData.internalKey}',
+            xtype: 'templatecolumn',
+            text: 'Internal key',
             hidden: true,
         },
         {

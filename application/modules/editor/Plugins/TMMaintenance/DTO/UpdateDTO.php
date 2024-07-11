@@ -36,7 +36,8 @@ use Zend_Controller_Request_Abstract as Request;
 class UpdateDTO
 {
     public function __construct(
-        public readonly string $id,
+        public readonly int $id,
+        public readonly string $internalKey,
         public readonly int $tmId,
         public readonly string $source,
         public readonly string $target,
@@ -50,7 +51,8 @@ class UpdateDTO
         $data = Json::decode($request->getParam('data'));
 
         return new self(
-            $data['id'],
+            (int) $data['id'],
+            $data['internalKey'],
             (int) $data['languageResourceid'],
             $data['source'],
             $data['target'],

@@ -36,7 +36,8 @@ use Zend_Controller_Request_Abstract as Request;
 class DeleteDTO
 {
     public function __construct(
-        public readonly string $id
+        public readonly int $id,
+        public readonly string $internalKey
     ) {
     }
 
@@ -44,6 +45,6 @@ class DeleteDTO
     {
         $data = Json::decode($request->getParam('data'));
 
-        return new self($data['id']);
+        return new self($data['id'], $data['internalKey']);
     }
 }

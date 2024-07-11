@@ -472,8 +472,9 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
      */
     public function updateSegment(
         int $memoryId,
-        string $segmentRecordKey,
-        string $segmentTargetKey,
+        int $segmentId,
+        int $segmentRecordKey,
+        int $segmentTargetKey,
         string $source,
         string $target,
         string $userName,
@@ -481,12 +482,34 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
         int $timestamp,
         string $fileName,
     ): void {
-        $this->deleteEntry($memoryId, $segmentRecordKey, $segmentTargetKey);
+        $memoryName = $this->getMemoryNameById($memoryId);
+        $successful = $this->api->getEntry($memoryName, $segmentRecordKey, $segmentTargetKey);
+
+        if (! $successful) {
+            $this->logger->error('E1611', 'Requested segment not found', [
+                'languageResource' => $this->languageResource,
+            ]);
+            throw new editor_Services_Connector_Exception('E1611');
+        }
+
+        $result = $this->api->getResult();
+
+        if ($segmentId !== $result->segmentId) {
+            $this->logger->error(
+                'E1612',
+                'Found segment id differs from the requested one, probably it was deleted meanwhile',
+                [
+                    'languageResource' => $this->languageResource,
+                ]
+            );
+            throw new editor_Services_Connector_Exception('E1612');
+        }
+
+        $this->deleteEntry($memoryId, $segmentId, $segmentRecordKey, $segmentTargetKey);
 
         $source = $this->tagHandler->prepareQuery($source);
         $this->tagHandler->setInputTagMap($this->tagHandler->getTagMap());
         $target = $this->tagHandler->prepareQuery($target, false);
-        $memoryName = $this->getMemoryNameById($memoryId);
         $time = $this->api->getDate($timestamp);
 
         $this->updateSegmentInMemory(
@@ -508,11 +531,11 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
         string $time,
         string $fileName,
         string $memoryName,
-    ): bool {
+    ): void {
         $successful = $this->api->update($source, $target, $userName, $context, $time, $fileName, $memoryName);
 
         if ($successful) {
-            return $successful;
+            return;
         }
 
         $apiError = $this->api->getError();
@@ -528,23 +551,41 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
                 $newName = $currentWritableMemoryName;
             }
 
-            return $this->updateSegmentInMemory($source, $target, $userName, $context, $time, $fileName, $newName);
+            $successful = $this->api->update($source, $target, $userName, $context, $time, $fileName, $newName);
         }
 
         if ($this->needsReorganizing($apiError, $memoryName)) {
             $this->addReorganizeWarning();
             $this->reorganizeTm($memoryName);
 
-            return $this->updateSegmentInMemory($source, $target, $userName, $context, $time, $fileName, $memoryName);
+            $successful = $this->api->update($source, $target, $userName, $context, $time, $fileName, $memoryName);
         }
 
-        return $successful;
+        if (!$successful) {
+            $apiError = $this->api->getError() ?? $apiError;
+            $this->logger->error('E1306', 'Failed to save segment to TM', [
+                'languageResource' => $this->languageResource,
+                'apiError' => $apiError,
+            ]);
+            throw new editor_Services_Connector_Exception('E1306');
+        }
     }
 
-    public function deleteEntry(int $memoryId, string $recordKey, string $targetKey): void
+    public function deleteEntry(int $memoryId, int $segmentId, int $recordKey, int $targetKey): void
     {
         $memoryName = $this->getMemoryNameById($memoryId);
-        $this->api->deleteEntry($memoryName, $recordKey, $targetKey);
+        $successful = $this->api->deleteEntry($memoryName, $segmentId, $recordKey, $targetKey);
+
+        if (!$successful) {
+            $this->logger->error('E1306', 'Failed to delete segment from memory', [
+                'languageResource' => $this->languageResource,
+                'apiError' => $this->api->getError(),
+            ]);
+            throw new editor_Services_Connector_Exception('E1306', [
+                'languageResource' => $this->languageResource,
+                'error' => 'Failed to delete segment from memory',
+            ]);
+        }
     }
 
     public function deleteBatch(DeleteBatchDTO $deleteDto): bool
@@ -609,6 +650,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
     private function getMetaData(object $found): array
     {
         $nameToShow = [
+            'segmentId',
             'documentName',
             'matchType',
             'author',

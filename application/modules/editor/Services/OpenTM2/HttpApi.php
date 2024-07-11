@@ -260,7 +260,8 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
     }
 
     /**
-     * checks the status of a language resource (if set), or just of the server (if no concrete language resource is given)
+     * checks the status of a language resource (if set), or just of the server (if no concrete language resource is
+     * given)
      * @return boolean
      */
     public function status(?string $tmName): bool
@@ -393,7 +394,7 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
         string $tmName,
         string $field,
         string $searchPosition = null,
-        int $numResults = 20
+        int $numResults = 20,
     ): bool {
         if ($this->isToLong($queryString)) {
             $this->result = json_decode('{"results":[]}');
@@ -495,14 +496,28 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
         return $this->processResponse($http->request());
     }
 
-    public function deleteEntry(string $tmName, string $recordKey, string $targetKey): bool
+    public function deleteEntry(string $tmName, int $segmentId, int $recordKey, int $targetKey): bool
+    {
+        $request = [
+            'recordKey' => $recordKey,
+            'targetKey' => $targetKey,
+            'segmentId' => $segmentId,
+        ];
+
+        $http = $this->getHttpWithMemory('POST', $tmName, 'entrydelete');
+        $http->setRawData($this->jsonEncode($request), self::REQUEST_ENCTYPE);
+
+        return $this->processResponse($http->request());
+    }
+
+    public function getEntry(string $tmName, int $recordKey, int $targetKey): bool
     {
         $request = [
             'recordKey' => $recordKey,
             'targetKey' => $targetKey,
         ];
 
-        $http = $this->getHttpWithMemory('POST', $tmName, 'entrydelete');
+        $http = $this->getHttpWithMemory('POST', $tmName, 'getentry');
         $http->setRawData($this->jsonEncode($request), self::REQUEST_ENCTYPE);
 
         return $this->processResponse($http->request());

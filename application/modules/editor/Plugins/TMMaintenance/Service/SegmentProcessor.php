@@ -71,7 +71,8 @@ final class SegmentProcessor
             $data = $this->reformatData($data);
 
             $data = array_map(static function (array $item) use ($getListDto) {
-                $item['id'] = $getListDto->tmId . ':' . $item['metaData']['internalKey'];
+                $item['internalKey'] = $getListDto->tmId . ':' . $item['metaData']['internalKey'];
+                $item['id'] = $item['metaData']['segmentId'];
 
                 return $item;
             }, $data);
@@ -117,13 +118,14 @@ final class SegmentProcessor
 
     public function update(UpdateDTO $updateDto): void
     {
-        [$tmId, $id, $recordKey, $targetKey] = explode(':', $updateDto->id);
+        [$tmId, $memoryId, $recordKey, $targetKey] = explode(':', $updateDto->internalKey);
 
         $connector = $this->getOpenTM2Connector($updateDto->tmId);
         $connector->updateSegment(
-            (int) $id,
-            $recordKey,
-            $targetKey,
+            (int) $memoryId,
+            $updateDto->id,
+            (int) $recordKey,
+            (int) $targetKey,
             $updateDto->source,
             $updateDto->target,
             \ZfExtended_Authentication::getInstance()->getUser()?->getUserName(),
@@ -135,10 +137,10 @@ final class SegmentProcessor
 
     public function delete(DeleteDTO $deleteDto): void
     {
-        [$tmId, $id, $recordKey, $targetKey] = explode(':', $deleteDto->id);
+        [$tmId, $memoryId, $recordKey, $targetKey] = explode(':', $deleteDto->internalKey);
 
         $connector = $this->getOpenTM2Connector((int) $tmId);
-        $connector->deleteEntry((int) $id, $recordKey, $targetKey);
+        $connector->deleteEntry((int) $memoryId, $deleteDto->id, (int) $recordKey, (int) $targetKey);
     }
 
     public function deleteBatch(DeleteBatchDTO $deleteBatchDto): void
