@@ -26,6 +26,9 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use editor_Models_LanguageResources_LanguageResource as LanguageResource;
+use editor_Services_Connector as Connector;
+
 class editor_Plugins_MatchAnalysis_Pretranslation
 {
     use ZfExtended_Logger_DebugTrait;
@@ -61,7 +64,7 @@ class editor_Plugins_MatchAnalysis_Pretranslation
     protected $userName;
 
     /***
-     * @var array<int, editor_Models_LanguageResources_LanguageResource>
+     * @var array<int, LanguageResource>
      */
     protected $resources = [];
 
@@ -95,9 +98,15 @@ class editor_Plugins_MatchAnalysis_Pretranslation
 
     /***
      * Collection of assigned resources to the task
-     * @var array<int, editor_Services_Connector[]>
+     * @var array<int, Connector>
      */
     private $connectors = [];
+
+    /**
+     * [Resource ID => [LR ID => Connector]]
+     * @var array<string, array<int, Connector>>
+     */
+    private array $internalFuzzyConnectorMap = [];
 
     /***
      * Pretranslation mt connectors(the mt resources associated to a task)
@@ -140,24 +149,44 @@ class editor_Plugins_MatchAnalysis_Pretranslation
         return "translate5-unique-id[" . $taskGuid . "]";
     }
 
-    protected function addConnector(int $languageResourceid, editor_Services_Connector $connector)
+    protected function internalFuzzyConnectorSet(LanguageResource $languageResource): bool
     {
-        if (! isset($this->connectors[$languageResourceid])) {
-            $this->connectors[$languageResourceid] = [];
-        }
+        return isset($this->internalFuzzyConnectorMap[$languageResource->getResourceId()]);
+    }
 
-        $this->connectors[$languageResourceid][] = $connector;
+    protected function addInternalFuzzyConnector(LanguageResource $lr, Connector $connector): void
+    {
+        $this->internalFuzzyConnectorMap[$lr->getResourceId()] = [(int) $lr->getId() => $connector];
     }
 
     /**
-     * @return iterable<int, editor_Services_Connector>
+     * @return iterable<int, Connector>
+     */
+    protected function getInternalFuzzyConnectorsIterator(): iterable
+    {
+        foreach ($this->internalFuzzyConnectorMap as $connectorTuple) {
+            foreach ($connectorTuple as $lrId => $connector) {
+                yield $lrId => $connector;
+            }
+        }
+    }
+
+    protected function addConnector(int $languageResourceId, Connector $connector)
+    {
+        $this->connectors[$languageResourceId] = $connector;
+    }
+
+    /**
+     * @return iterable<int, Connector>
      */
     protected function getConnectorsIterator(): iterable
     {
-        foreach ($this->connectors as $languageResourceId => $connectors) {
-            foreach ($connectors as $connector) {
-                yield $languageResourceId => $connector;
-            }
+        foreach ($this->connectors as $languageResourceId => $connector) {
+            yield $languageResourceId => $connector;
+        }
+
+        foreach ($this->getInternalFuzzyConnectorsIterator() as $languageResourceId => $connector) {
+            yield $languageResourceId => $connector;
         }
     }
 
@@ -171,7 +200,7 @@ class editor_Plugins_MatchAnalysis_Pretranslation
         $this->connectors = [];
     }
 
-    private function getFirstConnector(int $languageResourceId): ?editor_Services_Connector
+    private function getFirstConnector(int $languageResourceId): ?Connector
     {
         if (! isset($this->connectors[$languageResourceId])) {
             return null;
@@ -224,7 +253,7 @@ class editor_Plugins_MatchAnalysis_Pretranslation
 
         //set the type
         $languageResource = $this->resources[$languageResourceid];
-        /* @var $languageResource editor_Models_LanguageResources_LanguageResource */
+        /* @var $languageResource LanguageResource */
 
         //just to display the TM name too, we add it here to the type
         $type = $languageResource->getServiceName() . ' - ' . $languageResource->getName();
@@ -360,7 +389,7 @@ class editor_Plugins_MatchAnalysis_Pretranslation
             return false;
         }
         $lr = $this->resources[$languageResourceId];
-        /* @var $lr editor_Models_LanguageResources_LanguageResource */
+        /* @var $lr LanguageResource */
         $tcs = ZfExtended_Factory::get('editor_Services_TermCollection_Service');
 
         /* @var $tcs editor_Services_TermCollection_Service */
@@ -370,11 +399,11 @@ class editor_Plugins_MatchAnalysis_Pretranslation
     /***
      * Should the current language resources result with matchrate be logged in the languageresources ussage log table
      *
-     * @param editor_Models_LanguageResources_LanguageResource $languageResource
+     * @param LanguageResource $languageResource
      * @param int $matchRate
      * @return boolean
      */
-    protected function isResourceLogValid(editor_Models_LanguageResources_LanguageResource $languageResource, int $matchRate)
+    protected function isResourceLogValid(LanguageResource $languageResource, int $matchRate)
     {
         //check if it is tm or tc, an if the matchrate is >= 100
         return ($languageResource->isTm() || $languageResource->isTc()) && $matchRate >= editor_Services_Connector_FilebasedAbstract::EXACT_MATCH_VALUE;
