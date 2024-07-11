@@ -45,6 +45,7 @@ class CrossLanguageResourceSynchronizationService
         private editor_Services_Manager $serviceManager,
         private EventEmitter $eventEmitter,
         private LanguageResourceRepository $languageResourceRepository,
+        private CrossSynchronizationConnectionRepository $connectionRepository,
     ) {
         $this->logger = \Zend_Registry::get('logger')->cloneMe('editor.languageresource.synchronization');
     }
@@ -54,7 +55,8 @@ class CrossLanguageResourceSynchronizationService
         return new self(
             new editor_Services_Manager(),
             EventEmitter::create(),
-            new LanguageResourceRepository()
+            new LanguageResourceRepository(),
+            new CrossSynchronizationConnectionRepository(),
         );
     }
 
@@ -90,6 +92,13 @@ class CrossLanguageResourceSynchronizationService
         $this->eventEmitter->triggerConnectionCreatedEvent($connection);
 
         return $connection;
+    }
+
+    public function deleteRelatedConnections(LanguageResource $languageResource): void
+    {
+        foreach ($this->connectionRepository->getAllConnections((int) $languageResource->getId()) as $connection) {
+            $this->deleteConnection($connection);
+        }
     }
 
     public function deleteConnection(CrossSynchronizationConnection $connection): void

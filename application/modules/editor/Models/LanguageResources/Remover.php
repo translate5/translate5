@@ -33,6 +33,7 @@ END LICENSE AND COPYRIGHT
 
 use MittagQI\Translate5\LanguageResource\CleanupAssociation\Customer as CustomerAssocCleanup;
 use MittagQI\Translate5\LanguageResource\CleanupAssociation\Task as TaskAssocCleanup;
+use MittagQI\Translate5\LanguageResource\CrossSynchronization\CrossLanguageResourceSynchronizationService;
 
 class editor_Models_LanguageResources_Remover
 {
@@ -41,12 +42,15 @@ class editor_Models_LanguageResources_Remover
      */
     protected $entity;
 
+    private CrossLanguageResourceSynchronizationService $crossLanguageResourceSynchronizationService;
+
     /**
      * Sets the languageresource to be removed from system
      */
     public function __construct(editor_Models_LanguageResources_LanguageResource $languageResource)
     {
         $this->entity = $languageResource;
+        $this->crossLanguageResourceSynchronizationService = CrossLanguageResourceSynchronizationService::create();
     }
 
     /**
@@ -76,6 +80,9 @@ class editor_Models_LanguageResources_Remover
             // TODO CHECK: A languageResourcesRemover should remove the resource with all existing assocs and a check must take the existing assocs into account, correct ??
             $customersLeft = ($forced) ? [] : $this->entity->getCustomers();
             $this->checkOrCleanAssociations($forced, $customersLeft);
+
+            $this->crossLanguageResourceSynchronizationService->deleteRelatedConnections($this->entity);
+
             //delete the entity in the DB
             $this->entity->delete();
             // prevent nonsens
