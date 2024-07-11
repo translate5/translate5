@@ -156,7 +156,9 @@ class editor_Plugins_MatchAnalysis_Pretranslation
 
     protected function addInternalFuzzyConnector(LanguageResource $lr, Connector $connector): void
     {
-        $this->internalFuzzyConnectorMap[$lr->getResourceId()] = [(int) $lr->getId() => $connector];
+        $this->internalFuzzyConnectorMap[$lr->getResourceId()] = [
+            (int) $lr->getId() => $connector,
+        ];
     }
 
     /**

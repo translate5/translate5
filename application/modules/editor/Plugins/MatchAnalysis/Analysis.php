@@ -419,7 +419,7 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
             //no match rate is found in the languageResource result
             if ($bestResultCurrentConnector->matchrate == null) {
                 //store 0 matchrate results only for non-internal fuzzy TMs
-                if(! $connector->isInternalFuzzy()) {
+                if (! $connector->isInternalFuzzy()) {
                     $saveAnalysis && $this->saveAnalysis($segment, 0, $languageResourceId);
                 }
                 $matches->resetResult();

@@ -179,13 +179,14 @@ class MatchAnalysisTest extends editor_Test_ImportTest
         //check for differences between the expected and the actual content
 
         //file_put_contents(static::api()->getFile($jsonFileName, null, false), json_encode($this->filterUngroupedAnalysis($analysis), JSON_PRETTY_PRINT));
-        
+
         $this->assertEquals(
             $this->filterUngroupedAnalysis($expectedAnalysis),
             $this->filterUngroupedAnalysis($analysis),
-            'The expected file and the data does not match for the '.$unitType.'-based not-grouped matchanalysis..'
+            'The expected file and the data does not match for the ' . $unitType . '-based not-grouped matchanalysis..'
         );
     }
+
     public static function afterTests(): void
     {
         foreach (self::$changedConfigs as $c) {
