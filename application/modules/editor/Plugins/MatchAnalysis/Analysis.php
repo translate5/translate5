@@ -362,18 +362,18 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
 
             $matchResults = $matches->getResult();
 
-            $matchRateInternal = new stdClass();
-            $matchRateInternal->matchrate = null;
+            $bestResultCurrentConnector = new stdClass();
+            $bestResultCurrentConnector->matchrate = null;
             //for each match, find the best match rate, and save it
             foreach ($matchResults as $match) {
                 $isTermCollection = $match->languageResourceType == editor_Models_Segment_MatchRateType::TYPE_TERM_COLLECTION;
-                if ($matchRateInternal->matchrate > $match->matchrate) {
+                if ($bestResultCurrentConnector->matchrate > $match->matchrate) {
                     continue;
                 }
 
-                // If the matchrate is the same, we only check for a new best match if it is from a termcollection
-                // or if the match has a newer timestamp
-                if ($matchRateInternal->matchrate == $match->matchrate && ! $isTermCollection) {
+                //If the matchrate is the same between matches from one connector,
+                // we only check for a new best match if it is from a termcollection
+                if ($bestResultCurrentConnector->matchrate == $match->matchrate && ! $isTermCollection) {
                     continue;
                 }
 
@@ -396,14 +396,26 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
                     }
                 }
 
-                $matchRateInternal = $match;
-                //store best match rate results(do not compare agains the mt results)
+                $bestResultCurrentConnector = $match;
+
+                //store best match rate results
+                $currentIsBetter = $bestResultCurrentConnector->matchrate > $bestMatchRate;
+
                 // if match of another TM has the same >=100 matchrate, use the newer one
-                if (($matchRateInternal->matchrate > $bestMatchRate
-                        || $matchRateInternal->matchrate === $bestMatchRate
-                        && $bestMatchRate >= 100
-                        && $match->timestamp > $bestMatchRateResult->timestamp)
-                    && ! $isMtResource
+                $current100MatchIsNewer = $bestResultCurrentConnector->matchrate === $bestMatchRate
+                    && $bestMatchRate >= 100
+                    && $match->timestamp > $bestMatchRateResult->timestamp;
+
+                // if we have the same fuzzy rate, the one from an internal fuzzy is the better one
+                $internalFuzzyIsBetter = $bestResultCurrentConnector->matchrate === $bestMatchRate
+                    && $bestMatchRate < 100
+                    && $connector->isInternalFuzzy();
+                //CRUCIAL: very ugly: this is ensured in the analysis grouping due the fact that the fuzzy connector
+                // is the last connector used and the result is added to the end,
+                // and analysis entries with the same matchrate the later one (higher id) is used.
+
+                // but do not compare agains the mt results
+                if (($currentIsBetter || $current100MatchIsNewer || $internalFuzzyIsBetter) && ! $isMtResource
                 ) {
                     $bestMatchRateResult = $match;
                     $bestMatchRateResult->internalLanguageResourceid = $languageResourceId;
@@ -411,21 +423,24 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
             }
 
             //no match rate is found in the languageResource result
-            if ($matchRateInternal->matchrate == null) {
-                $saveAnalysis && $this->saveAnalysis($segment, 0, $languageResourceId);
+            if ($bestResultCurrentConnector->matchrate == null) {
+                //store 0 matchrate results only for non-internal fuzzy TMs
+                if(! $connector->isInternalFuzzy()) {
+                    $saveAnalysis && $this->saveAnalysis($segment, 0, $languageResourceId);
+                }
                 $matches->resetResult();
 
                 continue;
             }
 
-            //$matchRateInternal contains always the highest matchrate from $matchResults
-            //update the bestmatchrate if $matchRateInternal contains highest matchrate
-            if ($matchRateInternal->matchrate > $bestMatchRate) {
-                $bestMatchRate = $matchRateInternal->matchrate;
+            //$bestResultCurrentConnector contains always the highest matchrate from $matchResults
+            //update the bestmatchrate if $bestResultCurrentConnector contains highest matchrate
+            if ($bestResultCurrentConnector->matchrate > $bestMatchRate) {
+                $bestMatchRate = $bestResultCurrentConnector->matchrate;
             }
 
             //save the match analyses if needed
-            $saveAnalysis && $this->saveAnalysis($segment, $matchRateInternal, $languageResourceId);
+            $saveAnalysis && $this->saveAnalysis($segment, $bestResultCurrentConnector, $languageResourceId);
 
             //reset the result collection
             $matches->resetResult();
@@ -446,7 +461,8 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
 
         $key = $this->getErrorCountKey($id, $connector->isInternalFuzzy());
 
-        if (! isset($this->connectorErrorCount[$key]) || $this->connectorErrorCount[$key] <= self::MAX_ERROR_PER_CONNECTOR) {
+        if (! isset($this->connectorErrorCount[$key])
+            || $this->connectorErrorCount[$key] <= self::MAX_ERROR_PER_CONNECTOR) {
             return false;
         }
 
