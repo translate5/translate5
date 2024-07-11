@@ -565,7 +565,7 @@ abstract class editor_TagSequence implements JsonSerializable
      */
     protected function unparseHtml(string $html): editor_Segment_Tag
     {
-        if (Markup::useStrictEscaping()) {
+        if (editor_Tag::USE_DOM_DOCUMENT) {
             // implementation using PHP DOM
             $dom = new ZfExtended_Dom();
             // to make things easier we add a wrapper to hold all tags and only use it's children
@@ -649,7 +649,7 @@ abstract class editor_TagSequence implements JsonSerializable
     /**
      * Creates a nested structure of Internal tags & text-nodes recursively out of a DOMElement structure
      * This is an alternative implementation using PHP DOM
-     * see Markup::useStrictEscaping()
+     * see editor_Tag::USE_DOM_DOCUMENT
      * @return editor_Segment_Tag
      */
     protected function fromDomElement(DOMElement $element, int $startIndex)

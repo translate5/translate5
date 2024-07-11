@@ -44,6 +44,14 @@ use PHPHtmlParser\Options;
 class editor_Tag
 {
     /**
+     * If set to true, PHP DOM is used to parse Markup, otherwise PHPHtmlParser
+     * This affects the handling of escaping, since PHPHtmlParser leaves the escaping untouched
+     * but DOMDocument strictly escapes all attributes and contents
+     * Also, DOMDocument turns all double-escaped entities in attributes to single-escaped (why is that?)
+     * @var boolean
+     */
+    public const USE_DOM_DOCUMENT = false;
+    /**
      * Enodes our attributes (hashtable) to a json-capable structure
      * @param string[] $attribs
      * @return array[][]
@@ -255,7 +263,7 @@ class editor_Tag
      */
     public static function unparse($html)
     {
-        if (Markup::useStrictEscaping()) {
+        if (self::USE_DOM_DOCUMENT) {
             // implementation using PHP DOM
             $dom = new ZfExtended_Dom();
             $node = $dom->loadUnicodeElement($html);
