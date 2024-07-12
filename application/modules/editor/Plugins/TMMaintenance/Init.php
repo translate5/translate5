@@ -94,7 +94,7 @@ class editor_Plugins_TMMaintenance_Init extends ZfExtended_Plugin_Abstract
             'controller' => 'plugins_tmmaintenance_api',
             'action' => 'readAmount',
         ]);
-        $router->addRoute('plugins_tmmaintenance_delete_batch', $route);
+        $router->addRoute('plugins_tmmaintenance_read_amount', $route);
 
         $route = new ZfExtended_Controller_RestLikeRoute('editor/plugins_tmmaintenance_api/locale/list', [
             'module' => 'editor',
