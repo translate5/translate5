@@ -67,7 +67,10 @@ Ext.define('TMMaintenance.view.main.MainController', {
         });
     },
 
-    sourceTargetRenderer: function (value, record, cell) {
+    sourceTargetRenderer: function (value, record, cell, gridcell, gridcolumn) {
+        gridcell.element.dom.removeAttribute('data-qoverflow');
+        gridcell.element.dom.childNodes[0].removeAttribute('data-qoverflow');
+
         const entered = this.getSearchForm().getValues()[cell];
 
         if (entered === '') {
