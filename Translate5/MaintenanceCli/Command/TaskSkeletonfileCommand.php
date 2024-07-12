@@ -74,6 +74,13 @@ class TaskSkeletonfileCommand extends Translate5AbstractCommand
             InputOption::VALUE_REQUIRED,
             'Dumps one raw file for redirecting on CLI, needs the fileid as argument'
         );
+
+        $this->addOption(
+            'save-all',
+            's',
+            InputOption::VALUE_NONE,
+            'Unpacks all files to the source-directory with additional extension ".xliff"'
+        );
     }
 
     /**
@@ -113,17 +120,27 @@ class TaskSkeletonfileCommand extends Translate5AbstractCommand
             return 0;
         }
 
+        $dumpAll = $this->input->getOption('dump-all');
+        $saveAll = $this->input->getOption('save-all');
+
         $skeletonFile = new SkeletonFile($task);
-        if ($this->input->getOption('dump-all')) {
+        if ($dumpAll || $saveAll) {
             foreach ($files as $fileId => $path) {
                 $file = new \editor_Models_File();
                 $file->load($fileId);
-                $this->io->section($fileId . ': ' . $path);
+
                 $skel = $skeletonFile->loadFromDisk($file);
-                $this->io->write($skel);
+                if ($dumpAll) {
+                    $this->io->section($fileId . ': ' . $path);
+                    $this->io->write($skel);
+                } else {
+                    $tmpName = $skeletonFile->getSkeletonPath($file) . '.xliff';
+                    @file_put_contents($tmpName, $skel);
+                    $this->io->success('saved file ' . $fileId . ' as ' . basename($tmpName));
+                }
             }
 
-            return 0;
+            return static::SUCCESS;
         }
 
         if (! ($fileId = $this->input->getOption('dump-one'))) {
@@ -139,6 +156,6 @@ class TaskSkeletonfileCommand extends Translate5AbstractCommand
         $file->load($fileId);
         echo $skeletonFile->loadFromDisk($file);
 
-        return 0;
+        return static::SUCCESS;
     }
 }
