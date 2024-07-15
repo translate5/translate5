@@ -6640,9 +6640,9 @@ The following task was imported with errors / warnings / notices. Please take ca
                 <source>Der Benutzer hat das Recht, die Sprachressourcen in InstantTranslate &amp; TermPortal zu nutzen, die denselben Kunden zugeordnet sind, denen der Benutzer hier zugeordnet ist.</source>
                 <target>User has the right to use those language resources in InstantTranslate &amp; TermPortal, that are assigned to the same clients, as the user is assigned to here.</target>
             </trans-unit>
-            <trans-unit id='WnVnZXdpZXNlbmUgS3VuZGVuIChCZXRyaWZmdCBSb2xsZW4gUE0sIEluc3RhbnRUcmFuc2xhdGUgdW5kIFRlcm1Qb3J0YWwp'>
-                <source>Zugewiesene Kunden (Betrifft Rollen PM, InstantTranslate und TermPortal)</source>
-                <target>Assigned clients (affect roles PM, InstantTranslate and TermPortal-roles)</target>
+            <trans-unit id='WnVnZXdpZXNlbmUgS3VuZGVuIChCZXRyaWZmdCBSb2xsZW4gUE0sIEluc3RhbnRUcmFuc2xhdGUsIFRNIE1haW50ZW5hbmNlIHVuZCBUZXJtUG9ydGFsKQ'>
+                <source>Zugewiesene Kunden (Betrifft Rollen PM, InstantTranslate, TM Maintenance und TermPortal)</source>
+                <target>Assigned clients (affect roles PM, InstantTranslate, TM Maintenance and TermPortal-roles)</target>
             </trans-unit>
             <trans-unit id='WnVnw6RuZ2xpY2hlIE1hbmFnZW1lbnTDvGJlcnNpY2h0ZW4gZsO8ciBSb2xsZSBQTQ=='>
                 <source>Zugängliche Managementübersichten für Rolle PM</source>
