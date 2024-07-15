@@ -10,7 +10,7 @@ Ext.define('TMMaintenance.view.main.SearchForm', {
         'TMMaintenance.view.fields.ModeCombo',
         'TMMaintenance.view.fields.ModeComboSourceTarget',
     ],
-
+    padding: '15 15 0 15',
     autoSize: true,
 
     listeners: {
@@ -25,16 +25,27 @@ Ext.define('TMMaintenance.view.main.SearchForm', {
     items: [
         {
             xtype: 'panel',
-            layout: 'hbox',
-            flex: 1,
-            defaults: {
-                margin: '0 20 0 0'
+            margin: '0 0 15 0',
+            responsiveConfig: {
+                'width >= 500': {
+                    layout: 'hbox'
+                },
+                'width < 500': {
+                    layout: 'vbox'
+                }
             },
             items: [
                 {
-                    xtype: 'container',
-                    autoSize: true,
-                    flex: 1,
+                    xtype: 'panel',
+                    responsiveConfig: {
+                        'width >= 500': {
+                            width: 'calc(80% - 15px)',
+                            margin: '0 15 0 0'
+                        },
+                        'width < 500': {
+                            width: '100%'
+                        }
+                    },
                     layout: 'hbox',
                     items: [
                         {
@@ -58,6 +69,7 @@ Ext.define('TMMaintenance.view.main.SearchForm', {
                         {
                             xtype: 'textfield',
                             itemId: 'tmName',
+                            flex: 1,
                             editable: false,
                             clearable: false,
                             bind: {
@@ -71,37 +83,51 @@ Ext.define('TMMaintenance.view.main.SearchForm', {
                         {
                             xtype: 'button',
                             name: 'selectTm',
-                            iconCls: 'x-fa fa-search',
+                            iconCls: 'x-fa fa-folder-open',
                             handler: 'onSelectTmPress',
                         },
                     ],
                 },
                 {
-                    xtype: 'textfield',
-                    required: false,
-                    name: 'source',
-                    flex: 1,
-                    disabled: '{!selectedTm}',
-                    bind: {
-                        disabled: '{!selectedTm}',
-                        label: '{l10n.searchForm.source}',
-                        hidden: '{!l10n.searchForm.source}',
+                    xtype: 'panel',
+                    layout: 'hbox',
+                    responsiveConfig: {
+                        'width >= 500': {
+                            width: '20%',
+                            margin: '0 15 0 0'
+                        },
+                        'width < 500': {
+                            width: '100%'
+                        }
                     },
-                },
-                TMMaintenance.view.fields.ModeComboSourceTarget.create('sourceMode'),
-                {
-                    xtype: 'textfield',
-                    required: false,
-                    name: 'target',
-                    flex: 1,
-                    disabled: '{!selectedTm}',
-                    bind: {
-                        disabled: '{!selectedTm}',
-                        label: '{l10n.searchForm.target}',
-                        hidden: '{!l10n.searchForm.target}',
+                    defaults: {
+                        width: '50%'
                     },
-                },
-                TMMaintenance.view.fields.ModeComboSourceTarget.create('targetMode'),
+                    items: [{
+                        xtype: 'button',
+                        name: 'search',
+                        handler: 'onSearchPress',
+                        formBind: true,
+                        disabled: '{!selectedTm}',
+                        bind: {
+                            disabled: '{!selectedTm}',
+                            text: '{l10n.searchForm.search}',
+                            hidden: '{!l10n.searchForm.search}',
+                        },
+                    }, {
+                        xtype: 'button',
+                        name: 'deleteBatch',
+                        handler: 'onDeleteBatchPress',
+                        formBind: true,
+                        disabled: true,
+                        bind: {
+                            disabled: '{!hasRecords}',
+                            text: '{l10n.searchForm.deleteAll}',
+                            hidden: '{!l10n.searchForm.deleteAll}',
+                            tooltip: '{l10n.searchForm.deleteAllTooltip}',
+                        },
+                    }]
+                }
             ],
         },
         {
@@ -109,87 +135,53 @@ Ext.define('TMMaintenance.view.main.SearchForm', {
             layout: 'hbox',
             flex: 1,
             defaults: {
-                margin: '0 20 0 0'
+                margin: '0 15 15 0'
             },
             items: [
                 {
-                    xtype: 'textfield',
-                    required: false,
-                    name: 'author',
-                    flex: 1,
-                    disabled: '{!selectedTm}',
-                    bind: {
-                        disabled: '{!selectedTm}',
-                        label: '{l10n.searchForm.author}',
-                        hidden: '{!l10n.searchForm.author}',
-                    },
+                    xtype: 'container',
+                    layout: 'hbox',
+                    width: 'calc(40% - 15px)',
+                    items: [
+                        TMMaintenance.view.fields.ModeComboSourceTarget.create('sourceMode', 'source'),
+                        {
+                            xtype: 'textfield',
+                            required: false,
+                            name: 'source',
+                            flex: 1,
+                            disabled: '{!selectedTm}',
+                            bind: {
+                                disabled: '{!selectedTm}',
+                                hidden: '{!l10n.searchForm.source}',
+                            },
+                        },
+                    ]
                 },
-                TMMaintenance.view.fields.ModeCombo.create('authorMode'),
                 {
-                    xtype: 'textfield',
-                    required: false,
-                    name: 'additionalInfo',
-                    flex: 1,
-                    disabled: '{!selectedTm}',
-                    bind: {
-                        disabled: '{!selectedTm}',
-                        label: '{l10n.searchForm.additionalInfo}',
-                        hidden: '{!l10n.searchForm.additionalInfo}',
-                    },
-                },
-                TMMaintenance.view.fields.ModeCombo.create('additionalInfoMode'),
-                {
-                    xtype: 'textfield',
-                    required: false,
-                    name: 'document',
-                    flex: 1,
-                    disabled: '{!selectedTm}',
-                    bind: {
-                        disabled: '{!selectedTm}',
-                        label: '{l10n.searchForm.document}',
-                        hidden: '{!l10n.searchForm.document}',
-                    },
-                },
-                TMMaintenance.view.fields.ModeCombo.create('documentMode'),
-            ],
-        },
-        {
-            xtype: 'panel',
-            layout: 'hbox',
-            flex: 1,
-            defaults: {
-                margin: '0 20 0 0'
-            },
-            items: [
-                // {
-                //     xtype: 'textfield',
-                //     required: false,
-                //     name: 'context',
-                //     label: 'Context',
-                //     flex: 1,
-                //     disabled: '{!selectedTm}',
-                //     bind: {
-                //         disabled: '{!selectedTm}',
-                //     },
-                // },
-                // TMMaintenance.view.fields.ModeCombo.create('contextMode'),
-                {
-                    xtype: 'datepickerfield',
-                    required: false,
-                    name: 'creationDateFrom',
-                    flex: 1,
-                    disabled: '{!selectedTm}',
-                    bind: {
-                        disabled: '{!selectedTm}',
-                        label: '{l10n.searchForm.creationDateFrom}',
-                        hidden: '{!l10n.searchForm.creationDateFrom}',
-                    },
+                    xtype: 'container',
+                    layout: 'hbox',
+                    width: 'calc(40% - 15px)',
+                    items: [
+                        TMMaintenance.view.fields.ModeCombo.create('authorMode', 'author'),
+                        {
+                            xtype: 'textfield',
+                            required: false,
+                            name: 'author',
+                            flex: 1,
+                            disabled: '{!selectedTm}',
+                            bind: {
+                                disabled: '{!selectedTm}',
+                                hidden: '{!l10n.searchForm.author}',
+                            },
+                        },
+                    ]
                 },
                 {
                     xtype: 'datepickerfield',
                     required: false,
                     name: 'creationDateTo',
-                    flex: 1,
+                    labelWidth: '50%',
+                    width: '20%',
                     disabled: '{!selectedTm}',
                     bind: {
                         disabled: '{!selectedTm}',
@@ -197,34 +189,68 @@ Ext.define('TMMaintenance.view.main.SearchForm', {
                         hidden: '{!l10n.searchForm.creationDateTo}',
                     },
                 },
+            ],
+        },
+        {
+            xtype: 'panel',
+            layout: 'hbox',
+            width: '100%',
+            defaults: {
+                margin: '0 15 15 0'
+            },
+            items: [
                 {
-                    xtype: 'button',
-                    name: 'search',
-                    flex: 1,
-                    handler: 'onSearchPress',
-                    formBind: true,
+                    xtype: 'container',
+                    layout: 'hbox',
+                    width: 'calc(40% - 15px)',
+                    items: [
+                        TMMaintenance.view.fields.ModeComboSourceTarget.create('targetMode', 'target'),
+                        {
+                            xtype: 'textfield',
+                            required: false,
+                            name: 'target',
+                            flex: 1,
+                            disabled: '{!selectedTm}',
+                            bind: {
+                                disabled: '{!selectedTm}',
+                                hidden: '{!l10n.searchForm.target}',
+                            },
+                        },
+                    ]
+                },
+                {
+                    xtype: 'container',
+                    layout: 'hbox',
+                    width: 'calc(40% - 15px)',
+                    items: [
+                        TMMaintenance.view.fields.ModeCombo.create('documentMode', 'document'),
+                        {
+                            xtype: 'textfield',
+                            required: false,
+                            name: 'document',
+                            flex: 1,
+                            disabled: '{!selectedTm}',
+                            bind: {
+                                disabled: '{!selectedTm}',
+                                hidden: '{!l10n.searchForm.document}',
+                            },
+                        },
+                    ]
+                },
+                {
+                    xtype: 'datepickerfield',
+                    required: false,
+                    name: 'creationDateFrom',
+                    labelWidth: '50%',
+                    width: '20%',
                     disabled: '{!selectedTm}',
                     bind: {
                         disabled: '{!selectedTm}',
-                        text: '{l10n.searchForm.search}',
-                        hidden: '{!l10n.searchForm.search}',
+                        label: '{l10n.searchForm.creationDateFrom}',
+                        hidden: '{!l10n.searchForm.creationDateFrom}',
                     },
                 },
-                {
-                    xtype: 'button',
-                    name: 'deleteBatch',
-                    flex: 1,
-                    handler: 'onDeleteBatchPress',
-                    formBind: true,
-                    disabled: true,
-                    bind: {
-                        disabled: '{!hasRecords}',
-                        text: '{l10n.searchForm.deleteAll}',
-                        hidden: '{!l10n.searchForm.deleteAll}',
-                        tooltip: '{l10n.searchForm.deleteAllTooltip}',
-                    },
-                },
-            ]
+            ],
         },
     ],
 })
