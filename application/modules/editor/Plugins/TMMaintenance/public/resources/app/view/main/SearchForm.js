@@ -12,7 +12,9 @@ Ext.define('TMMaintenance.view.main.SearchForm', {
     ],
     padding: '15 15 0 15',
     autoSize: true,
-
+    keyMap: {
+        ENTER: 'onSearchPress'
+    },
     listeners: {
         change: {
             delegate: 'field',
