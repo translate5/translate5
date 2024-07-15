@@ -139,7 +139,7 @@ class SegmentTagsTest extends SegmentTagsTestAbstract
             ->addOnEvent('click', "window.open('page');")
             ->addAttribute('rel', 'something')
             ->setData('some-name', 'some "data"')
-            ->setData('other-name', 12345);
+            ->setData('other-name', '12345');
         $result = $segmentTag->toJson();
         $expected = '{"type":"any","name":"div","category":"test","startIndex":6,"endIndex":11,"order":-1,"parentOrder":-1,"classes":["zclass","aclass","bclass"],"attribs":[{"name":"onclick","value":"window.open(\'page\');"},{"name":"rel","value":"something"},{"name":"data-some-name","value":"some \"data\""},{"name":"data-other-name","value":"12345"}]}';
         $this->assertEquals($expected, $result);

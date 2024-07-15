@@ -356,7 +356,7 @@ class editor_Segment_Tag extends editor_Tag implements JsonSerializable
 
     public function setQualityId(int $qualityId): static
     {
-        $this->setData(static::DATA_NAME_QUALITYID, strval($qualityId));
+        $this->setData(static::DATA_NAME_QUALITYID, (string) $qualityId);
 
         return $this;
     }

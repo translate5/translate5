@@ -426,7 +426,7 @@ class TagsRepairTest extends MockedTaskTestAbstract
         $translated = $this->replaceRequestTags($translatedMarkup, $originalMarkup, $request);
         $actual = $tags->recreateTags($translated);
 
-        // debugging
+        // debugging @phpstan-ignore-next-line
         if (self::DO_DEBUG) {
             error_log('===================' . "\n");
             error_log('ORIGINAL:' . "\n" . $originalMarkup . "\n");
@@ -461,7 +461,7 @@ class TagsRepairTest extends MockedTaskTestAbstract
             $request = $this->replaceRequestTags($translatedMarkup, $unreplacedOriginal, $request);
         }
         $actual = $tags->recreateTags($request);
-        // debugging
+        // debugging @phpstan-ignore-next-line
         if (self::DO_DEBUG) {
             error_log('===================' . "\n");
             error_log('ORIGINAL:' . "\n" . $this->revertInternalTags($originalMarkup) . "\n");
@@ -474,7 +474,7 @@ class TagsRepairTest extends MockedTaskTestAbstract
         if ($expectedStripped != 'NO') {
             $strippedRequest = Markup::strip($request);
             $actual = $tags->recreateTags($strippedRequest);
-            // debugging
+            // debugging @phpstan-ignore-next-line
             if (self::DO_DEBUG) {
                 error_log('===================' . "\n");
                 error_log('ORIGINAL:' . "\n" . $this->revertInternalTags($originalMarkup) . "\n");

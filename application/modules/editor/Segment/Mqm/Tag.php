@@ -116,8 +116,8 @@ final class editor_Segment_Mqm_Tag extends editor_Segment_Tag
             ->addClass(self::CSS_CLASS)
             ->addClass(editor_Segment_Tag::CSS_CLASS_TOOLTIP)
             ->addClass($posClass)
-            ->addClass(self::CSS_CLASS . '-' . strval($categoryIndex))
-            ->setData(editor_Segment_Tag::DATA_NAME_QUALITYID, $qualityId)
+            ->addClass(self::CSS_CLASS . '-' . $categoryIndex)
+            ->setData(editor_Segment_Tag::DATA_NAME_QUALITYID, (string) $qualityId)
             ->setData('comment', $comment);
 
         return $tag->render();

@@ -404,7 +404,7 @@ use MittagQI\Translate5\Test\SegmentTagsTestAbstract;
         $result = preg_replace_callback('~' . $search . '~', function ($matches) use ($count, $replace) {
             $count++;
 
-            return str_replace('{X}', $count, $replace);
+            return str_replace('{X}', (string) $count, $replace);
         }, $markup);
 
         return $result;
