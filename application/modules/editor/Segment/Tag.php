@@ -32,8 +32,7 @@ END LICENSE AND COPYRIGHT
  * Generally internal tags must be used with start & end indice relative to the segment texts.
  * Keep in mind that start & end-index work just like counting chars or the substr API in php, the tag starts BEFORE the start index and ends BEFORE the index of the end index, if you want to cover the whole segment the indices are 0 and mb_strlen($segment)
  * To identify the Types of Internal tags a general API editor_Segment_TagCreator is provided
- *
- * @method editor_Segment_Tag clone(bool $withDataAttribs, bool $withId)
+ * @phpstan-consistent-constructor
  */
 class editor_Segment_Tag extends editor_Tag implements JsonSerializable
 {
@@ -88,7 +87,7 @@ class editor_Segment_Tag extends editor_Tag implements JsonSerializable
             $data = json_decode($jsonString);
 
             return editor_Segment_TagCreator::instance()->fromJsonData($data);
-        } catch (Exception $e) {
+        } catch (Throwable) {
             throw new Exception('Could not deserialize editor_Segment_Tag from JSON String ' . $jsonString);
         }
     }
@@ -113,7 +112,7 @@ class editor_Segment_Tag extends editor_Tag implements JsonSerializable
      * Creates a new instance of the Tag.
      * For Segment-tags always use ::createNew for creating a fresh instance with the neccessary props set (identification-class, nade-name), never use ::create()
      */
-    public static function createNew(int $startIndex = 0, int $endIndex = 0, string $category = ''): editor_Segment_Tag
+    public static function createNew(int $startIndex = 0, int $endIndex = 0, string $category = ''): static
     {
         $tag = new static($startIndex, $endIndex, $category);
         $tag->addClass($tag->getIdentificationClass());
@@ -133,109 +132,93 @@ class editor_Segment_Tag extends editor_Tag implements JsonSerializable
 
     /**
      * @deprecated: do not use with segment tags
-     * @param string $tagName
      * @throws Exception
      */
-    public static function create($tagName): editor_Tag
+    public static function create(string $tagName): editor_Tag
     {
         throw new Exception('Direct instantiation via ::create is not appropriate, use ::createNew instead');
     }
 
     /**
      * The type of Internal tag (e.g, QC for Quality Control), to be set via inheritance
-     * @var string
      */
-    protected static $type = null;
+    protected static ?string $type = null;
 
     /**
      * The node name for the internal tag. This is set as a static property here instead of setting it dynamicly as in editor_Tag
-     * @var string
      */
-    protected static $nodeName = null;
+    protected static ?string $nodeName = null;
 
     /**
      * Defines the identifying class name for the tag, that all tags of this type must have
-     * @var string
      */
-    protected static $identificationClass = null;
+    protected static ?string $identificationClass = null;
 
     /**
      * For compatibility with old code/concepts some quality tags may not use the global date-attribute for the quality ID
-     * @var string
      */
-    protected static $historicDataNameQid = null;
+    protected static ?string $historicDataNameQid = null;
 
     /**
      * The start character Index of the Tag in relation to the segment's text
      * The opening tag will be rendered BEFORE this char
-     * @var int
      */
-    public $startIndex = 0;
+    public int $startIndex = 0;
 
     /**
      * The end character Index of the Tag in relation to the segment's text.
      * The closing tag will be rendered BEFORE this char
-     * @var int
      */
-    public $endIndex = 0;
+    public int $endIndex = 0;
 
     /**
      * This saves the order of the tag as found on creation. This is e.g. crucial for multiple singular tags beside each other or singular tags on the start or end of the covered markup that are directly beside tags with content
-     * @var int
      */
-    public $order = -1;
+    public int $order = -1;
 
     /**
      * This saves the order of the parent tag as found on creation (if there is a parent tag). This is e.g. crucial for singular tags contained in other tags or to specify the nesting if tags have identical start & end indices
-     * @var int
      */
-    public $parentOrder = -1;
+    public int $parentOrder = -1;
 
     /**
      * Set by editor_TagSequence to indicate that the Tag spans the complete segment text
-     * @var bool
      */
-    public $isFullLength;
+    public bool $isFullLength = false;
 
     /**
      * Set by editor_TagSequence to indicate that the Tag was deleted at some time in the segment's history (is in a del-tag)
-     * @var bool
      */
-    public $wasDeleted;
+    public bool $wasDeleted = false;
 
     /**
      * Set by editor_TagSequence to indicate that the Tag was inserted at some time in the segment's history (is in an ins-tag)
-     * @var bool
      */
-    public $wasInserted;
+    public bool $wasInserted = false;
 
     /**
      * References the field the Tag belongs to
      * This property is only set, if the tag is part of a FieldTags container and will not be serialized !
-     * @var string
      */
-    public $field = null;
+    public ?string $field = null;
 
     /**
      * References the text content of the tag.
      * This property is only set, if the tag is part of a FieldTags container and will not be serialized !
      * This prop NEVER can be used to change segments in the DB or the like, it has only informative character and is used for internal comparisions
-     * @var string
      */
-    public $content = '';
+    public string $content = '';
 
     /**
      * Only needed in the rendering process
-     * @var array
      */
-    public $cuts = [];
+    public array $cuts = [];
 
     /**
      * The category of tag we have, a further specification of type
      * might not be used by all internal tags
-     * @var string
      */
-    protected $category = '';
+    protected string $category = '';
 
     /**
      * The Constructor parameters must not be changed in extending classes, otherwise the ::fromJson API will fail !
@@ -266,23 +249,14 @@ class editor_Segment_Tag extends editor_Tag implements JsonSerializable
         return $this->renderStart() . $this->renderChildren($skippedTypes) . $this->renderEnd();
     }
 
-    /**
-     * @return string
-     */
-    public function toJson()
+    public function toJson(): false|string
     {
         return json_encode($this->jsonSerialize(), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
     }
 
-    /**
-     * @see editor_Tag::createBaseClone()
-     * @return editor_Segment_Tag
-     */
-    protected function createBaseClone()
+    protected function createBaseClone(): static
     {
-        $className = get_class($this);
-
-        return new $className($this->startIndex, $this->endIndex, $this->category);
+        return new static($this->startIndex, $this->endIndex, $this->category);
     }
 
     /**
@@ -335,9 +309,8 @@ class editor_Segment_Tag extends editor_Tag implements JsonSerializable
     /**
      * Sets the category
      * NOTE: any connection between classes and categories must be coded in the inheriting class
-     * @return string
      */
-    public function setCategory(string $category): editor_Segment_Tag
+    public function setCategory(string $category): static
     {
         $this->category = $category;
 
@@ -381,7 +354,7 @@ class editor_Segment_Tag extends editor_Tag implements JsonSerializable
         return -1;
     }
 
-    public function setQualityId(int $qualityId): editor_Segment_Tag
+    public function setQualityId(int $qualityId): static
     {
         $this->setData(static::DATA_NAME_QUALITYID, strval($qualityId));
 
@@ -426,7 +399,6 @@ class editor_Segment_Tag extends editor_Tag implements JsonSerializable
      * Identifies a tag by a quality entry from the DB
      * This is needed only for the persistance of the falsePositive flag, all other props will be re-evaluated anyway
      * NOTE: this default implementation checks for the position in the segment OR the content of the tag. Note, that this implementation hypothetically can produce false results when qualities with the same content exist multiple times in the segment
-     * @return boolean
      */
     public function isQualityEqual(editor_Models_Db_SegmentQualityRow $quality): bool
     {
@@ -435,7 +407,6 @@ class editor_Segment_Tag extends editor_Tag implements JsonSerializable
 
     /**
      * Checks if type & category are equal between us and a quality entry from DB
-     * @return boolean
      */
     protected function isQualityGenerallyEqual(editor_Models_Db_SegmentQualityRow $quality): bool
     {
@@ -445,7 +416,6 @@ class editor_Segment_Tag extends editor_Tag implements JsonSerializable
     /**
      * Checks, if the quality content is equal. The base implementation compares the position in the segment or the content/text in the tag (comparing the tag content-hashes)
      * This default implementation is not very specific (using text-position) and may leads to confusion of tags of the same type & category
-     * @return boolean
      */
     protected function isQualityContentEqual(editor_Models_Db_SegmentQualityRow $quality): bool
     {
@@ -472,7 +442,7 @@ class editor_Segment_Tag extends editor_Tag implements JsonSerializable
         return 0;
     }
 
-    public function setFalsePositive(int $falsePositive = 1): editor_Segment_Tag
+    public function setFalsePositive(int $falsePositive = 1): static
     {
         if ($falsePositive == 1) {
             $this->addClass(static::CSS_CLASS_FALSEPOSITIVE);
@@ -483,7 +453,7 @@ class editor_Segment_Tag extends editor_Tag implements JsonSerializable
         return $this;
     }
 
-    public function jsonSerialize(): mixed
+    public function jsonSerialize(): stdClass
     {
         $data = new stdClass();
         $data->type = static::$type;
@@ -500,7 +470,7 @@ class editor_Segment_Tag extends editor_Tag implements JsonSerializable
         return $data;
     }
 
-    public function jsonUnserialize(stdClass $data)
+    public function jsonUnserialize(stdClass $data): void
     {
         $this->category = $data->category;
         $this->startIndex = $data->startIndex;
@@ -515,14 +485,14 @@ class editor_Segment_Tag extends editor_Tag implements JsonSerializable
     /**
      * Use in inheriting classes for further serialization
      */
-    protected function furtherSerialize(stdClass $data)
+    protected function furtherSerialize(stdClass $data): void
     {
     }
 
     /**
      * Use in inheriting classes for further unserialization
      */
-    protected function furtherUnserialize(stdClass $data)
+    protected function furtherUnserialize(stdClass $data): void
     {
     }
 
@@ -573,7 +543,7 @@ class editor_Segment_Tag extends editor_Tag implements JsonSerializable
      * It can be used to log stuff, throw exceptions, etc.
      * API is used after the consolidation phase only
      */
-    public function onConsolidationRemoval()
+    public function onConsolidationRemoval(): void
     {
     }
 
@@ -617,7 +587,6 @@ class editor_Segment_Tag extends editor_Tag implements JsonSerializable
     /**
      * Checks, if this segment tag can contain the passed segment tag
      * API is used in the rendering process only
-     * @return boolean
      */
     public function canContain(editor_Segment_Tag $tag): bool
     {
@@ -654,7 +623,7 @@ class editor_Segment_Tag extends editor_Tag implements JsonSerializable
     /**
      * For rendering all tags are cloned and the orders need to be cloned as well
      */
-    public function cloneOrder(editor_Segment_Tag $from)
+    public function cloneOrder(editor_Segment_Tag $from): void
     {
         $this->order = $from->order;
         $this->parentOrder = $from->parentOrder;
@@ -663,9 +632,8 @@ class editor_Segment_Tag extends editor_Tag implements JsonSerializable
     /**
      * Clones the tag to create the rendering model
      * API is used in the rendering phase only
-     * @return editor_Segment_Tag
      */
-    public function cloneForRendering()
+    public function cloneForRendering(): static
     {
         $clone = $this->clone(true);
         $clone->cloneOrder($this);
@@ -677,7 +645,7 @@ class editor_Segment_Tag extends editor_Tag implements JsonSerializable
      * Adds our rendering clone to the rendering queue
      * API is used in the rendering phase only
      */
-    public function addRenderingClone(array &$renderingQueue)
+    public function addRenderingClone(array &$renderingQueue): void
     {
         $renderingQueue[] = $this->cloneForRendering();
     }
@@ -687,7 +655,7 @@ class editor_Segment_Tag extends editor_Tag implements JsonSerializable
      * CRUCIAL: at this point only editor_Segment_Tag must be added as children !
      * API is used in the rendering process only
      */
-    public function addSegmentText(editor_TagSequence $tags)
+    public function addSegmentText(editor_TagSequence $tags): void
     {
         if ($this->startIndex < $this->endIndex) {
             if ($this->hasChildren()) {
@@ -722,7 +690,7 @@ class editor_Segment_Tag extends editor_Tag implements JsonSerializable
     /**
      * Adds us and all our children to the segment tags
      */
-    public function sequence(editor_TagSequence $tags, int $parentOrder)
+    public function sequence(editor_TagSequence $tags, int $parentOrder): void
     {
         $tags->addTag($this, -1, $parentOrder);
         $this->sequenceChildren($tags, $this->order);
@@ -731,7 +699,7 @@ class editor_Segment_Tag extends editor_Tag implements JsonSerializable
     /**
      * Adds all our children to the segment tags
      */
-    public function sequenceChildren(editor_TagSequence $tags, int $parentOrder = -1)
+    public function sequenceChildren(editor_TagSequence $tags, int $parentOrder = -1): void
     {
         if ($this->hasChildren()) {
             foreach ($this->children as $child) {
@@ -746,7 +714,7 @@ class editor_Segment_Tag extends editor_Tag implements JsonSerializable
     /**
      * This API finishes the Field Tags generation. It is the final step and finishing work can be made here, e.g. the evaluation of task specific data
      */
-    public function finalize(editor_TagSequence $tags, editor_Models_task $task)
+    public function finalize(editor_TagSequence $tags, editor_Models_task $task): void
     {
     }
 
@@ -754,9 +722,8 @@ class editor_Segment_Tag extends editor_Tag implements JsonSerializable
 
     /**
      * Debug output
-     * @return string
      */
-    public function debug()
+    public function debug(): string
     {
         $debug = '';
         $newline = "\n";
