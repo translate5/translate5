@@ -28,4 +28,10 @@
 INSERT INTO `Zf_acl_rules`
     (`module`, `role`, `resource`, `right`) VALUES
     ('editor', 'admin', 'auto_set_role', 'TMMaintenance'),
-    ('editor', 'admin', 'auto_set_role', 'TMMaintenance_allClients');
+    ('editor', 'admin', 'auto_set_role', 'TMMaintenance_allClients'),
+    ('editor', 'TMMaintenance', 'initial_page', 'tmMaintenance'),
+    ('editor', 'TMMaintenance_allClients', 'initial_page', 'tmMaintenance'),
+    ('editor', 'systemadmin', 'setaclrole', 'TMMaintenance'),
+    ('editor', 'systemadmin', 'setaclrole', 'TMMaintenance_allClients'),
+    ('editor', 'systemadmin', 'auto_set_role', 'TMMaintenance'),
+    ('editor', 'systemadmin', 'auto_set_role', 'TMMaintenance_allClients');
