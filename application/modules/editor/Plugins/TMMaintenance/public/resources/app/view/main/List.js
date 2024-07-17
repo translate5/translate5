@@ -38,12 +38,14 @@ Ext.define('TMMaintenance.view.main.List', {
             xtype: 'templatecolumn',
             text: 'ID',
             hidden: true,
+            groupable: false,
         },
         {
             tpl: '{metaData.internalKey}',
             xtype: 'templatecolumn',
             text: 'Internal key',
             hidden: true,
+            groupable: false,
         },
         {
             dataIndex: 'source',
