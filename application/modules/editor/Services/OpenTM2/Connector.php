@@ -751,8 +751,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
                 $numResults = self::CONCORDANCE_SEARCH_NUM_RESULTS - $resultsCount;
                 $successful = $this->api->concordanceSearch($searchString, $tmName, $field, $tmOffset, $numResults);
             } else {
-                $numResults = self::CONCORDANCE_SEARCH_NUM_RESULTS * 10 - $resultsCount;
-                $successful = $this->api->search($tmName, $tmOffset, $numResults, $searchDTO);
+                $successful = $this->api->search($tmName, $tmOffset, 1, $searchDTO);
             }
 
             if (! $successful && $this->needsReorganizing($this->api->getError(), $tmName)) {
@@ -762,7 +761,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
                     $numResults = self::CONCORDANCE_SEARCH_NUM_RESULTS - $resultsCount;
                     $successful = $this->api->concordanceSearch($searchString, $tmName, $field, $tmOffset, $numResults);
                 } else {
-                    $successful = $this->api->search($tmName, $tmOffset, 200, $searchDTO);
+                    $successful = $this->api->search($tmName, $tmOffset, 1, $searchDTO);
                 }
             }
 
