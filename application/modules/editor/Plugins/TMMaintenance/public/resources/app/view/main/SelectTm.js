@@ -2,14 +2,13 @@ Ext.define('TMMaintenance.view.main.SelectTm', {
     extend: 'Ext.grid.Grid',
     xtype: 'selecttm',
     controller: 'selecttm',
-    store: {
-        type: 'tm',
-    },
+    store: [],
     plugins: {
         gridfilters: true,
     },
     bind: {
         title: '{l10n.selectTm.title}',
+        store: '{tms}',
     },
     minHeight: 400,
     layout: 'fit',

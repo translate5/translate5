@@ -205,12 +205,11 @@ final class SegmentProcessor
 
     private function transformSearchData(array $data): array
     {
-        $data['sourceMode'] = $this->parseMode($data['sourceMode']);
-        $data['targetMode'] = $this->parseMode($data['targetMode']);
-        $data['authorMode'] = $this->parseMode($data['authorMode']);
-        $data['additionalInfoMode'] = $this->parseMode($data['additionalInfoMode']);
-        $data['documentMode'] = $this->parseMode($data['documentMode']);
-        $data['contextMode'] = $this->parseMode($data['contextMode']);
+        $modes = ['sourceMode', 'targetMode', 'authorMode', 'additionalInfoMode', 'documentMode', 'contextMode'];
+
+        foreach ($modes as $mode) {
+            $data[$mode] = $this->parseMode($data[$mode]);
+        }
 
         $data['creationDateFrom'] = (new \DateTime($data['creationDateFrom'] ?: '1970-01-01'))->getTimestamp();
         $data['creationDateTo'] = (new \DateTime($data['creationDateTo'] ?: 'tomorrow'))->getTimestamp();

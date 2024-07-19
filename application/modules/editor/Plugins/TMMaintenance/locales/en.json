@@ -51,7 +51,9 @@
     "creationDateTo": "Creation date before",
     "search": "Search",
     "deleteAll": "Delete all",
-    "deleteAllTooltip": "All segments that match the current search settings are deleted"
+    "deleteAllTooltip": "All segments that match the current search settings are deleted",
+    "sourceLanguage": "Source language",
+    "targetLanguage": "Target language"
   },
   "createForm": {
     "title": "Create new",
@@ -76,7 +78,9 @@
       "additionalInfo": "Additional info",
       "document": "Document",
       "creationDate": "Creation date",
-      "actions": "Actions"
+      "actions": "Actions",
+      "sourceLanguage": "Source language",
+      "targetLanguage": "Target language"
     },
     "edit": "Edit",
     "delete": "Delete",

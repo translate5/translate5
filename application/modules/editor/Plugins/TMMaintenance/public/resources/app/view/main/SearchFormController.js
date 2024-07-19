@@ -63,26 +63,19 @@ Ext.define('TMMaintenance.view.main.SearchFormController', {
     },
 
     onApplicationLoad: function () {
-        const store = Ext.ComponentQuery.query('#selecttm')[0].store;
-        const me = this;
+        const urlParams = this.parseUrlParams();
 
-        store.load({
-            callback: (records, operation, success) => {
-                if (!success) {
-                    me.showServerError(operation.getError());
-                    console.log('Error loading store');
+        if (!!urlParams.tm) {
+            this.getViewModel().set('selectedTm', urlParams.tm);
+        }
 
-                    return;
-                }
+        Ext.defer(() => {
+            this.getView().setValues(urlParams);
 
-                me.getView().setValues(me.parseUrlParams());
-                Ext.defer(function () {
-                    if (!me.getView().down('[name=search]').isDisabled()) {
-                        me.getView().down('[name=search]').buttonElement.dom.click();
-                    }
-                }, 500);
-            },
-        });
+            if (!this.getView().down('[name=search]').isDisabled()) {
+                this.getView().down('[name=search]').buttonElement.dom.click();
+            }
+        }, 500);
     },
 
     onDeleteBatch: function () {
@@ -145,7 +138,7 @@ Ext.define('TMMaintenance.view.main.SearchFormController', {
      * @returns {boolean|string}
      */
     validateTmField: function (value) {
-        return this.getTmValues().includes(value) ? true : 'Invalid value';
+        return this.getTmValues().includes(value.toString()) ? true : 'Invalid value';
     },
 
     /**

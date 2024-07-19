@@ -15,7 +15,6 @@ Ext.define('TMMaintenance.view.main.List', {
         title: '{l10n.list.title}',
     },
 
-    controller: 'main',
     store: {
         type: 'segment',
     },
@@ -160,6 +159,24 @@ Ext.define('TMMaintenance.view.main.List', {
                     },
                 },
             },
+        },
+        {
+            tpl: '{metaData.sourceLang}',
+            xtype: 'templatecolumn',
+            flex: 1,
+            bind: {
+                text: '{l10n.list.columns.sourceLanguage}',
+            },
+            groupable: false,
+        },
+        {
+            tpl: '{metaData.targetLang}',
+            xtype: 'templatecolumn',
+            flex: 1,
+            bind: {
+                text: '{l10n.list.columns.targetLanguage}',
+            },
+            groupable: false,
         },
         {
             tpl: '{metaData.author}',

@@ -42,6 +42,8 @@ class GetListDTO
         public readonly string $sourceMode,
         public readonly string $target,
         public readonly string $targetMode,
+        public readonly string $sourceLanguage,
+        public readonly string $targetLanguage,
         public readonly string $author,
         public readonly string $authorMode,
         public readonly string $creationDateFrom,
@@ -66,6 +68,8 @@ class GetListDTO
             (string) $request->getParam('sourceMode'),
             (string) $request->getParam('target'),
             (string) $request->getParam('targetMode'),
+            (string) $request->getParam('sourceLanguage'),
+            (string) $request->getParam('targetLanguage'),
             (string) $request->getParam('author'),
             (string) $request->getParam('authorMode'),
             (string) $request->getParam('creationDateFrom'),
@@ -80,7 +84,7 @@ class GetListDTO
         );
     }
 
-    public function toArray()
+    public function toArray(): array
     {
         return [
             'tmId' => $this->tmId,
@@ -90,6 +94,8 @@ class GetListDTO
             'sourceMode' => $this->sourceMode,
             'target' => $this->target,
             'targetMode' => $this->targetMode,
+            'sourceLanguage' => $this->sourceLanguage,
+            'targetLanguage' => $this->targetLanguage,
             'author' => $this->author,
             'authorMode' => $this->authorMode,
             'creationDateFrom' => $this->creationDateFrom,

@@ -677,6 +677,8 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
             'context',
             'additionalInfo',
             'internalKey',
+            'sourceLang',
+            'targetLang',
         ];
         $result = [];
 

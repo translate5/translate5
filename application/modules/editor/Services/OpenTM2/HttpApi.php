@@ -605,6 +605,8 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
             'sourceSearchMode' => $searchDTO->sourceMode . $searchOptions,
             'target' => $searchDTO->target,
             'targetSearchMode' => $searchDTO->targetMode . $searchOptions,
+            'sourceLang' => $searchDTO->sourceLanguage,
+            'targetLang' => $searchDTO->targetLanguage,
             'document' => $searchDTO->document,
             'documentSearchMode' => $searchDTO->documentMode . $searchOptions,
             'author' => $searchDTO->author,

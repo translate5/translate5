@@ -71,7 +71,12 @@ class editor_Models_LanguageResources_LanguagesMapper
             if (isset($this->languageCollection[$lowerCode])) {
                 $lang = $this->languageCollection[$lowerCode];
                 $name = $this->translate->_($lang['langName']);
-                $result[$name] = [$lang['id'], $name . ' (' . $code . ')', $lang['rtl'], $code];
+                $result[$name] = [
+                    'id' => $lang['id'],
+                    'name' => $name . ' (' . $code . ')',
+                    'rtl' => $lang['rtl'],
+                    'code' => $code
+                ];
 
                 continue;
             }
@@ -86,7 +91,12 @@ class editor_Models_LanguageResources_LanguagesMapper
             }
             $lang = $this->languageCollection[$lowerCode];
             $name = $this->translate->_($lang['langName']);
-            $result[$name] = [$lang['id'], $name . ' (' . $code . ')', $lang['rtl'], $code];
+            $result[$name] = [
+                'id' => $lang['id'],
+                'name' => $name . ' (' . $code . ')',
+                'rtl' => $lang['rtl'],
+                'code' => $code
+            ];
         }
         ksort($result); //sort by name of language
 

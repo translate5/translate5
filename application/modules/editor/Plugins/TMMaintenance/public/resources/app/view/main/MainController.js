@@ -8,6 +8,12 @@ Ext.define('TMMaintenance.view.main.MainController', {
 
     mixins: ['TMMaintenance.mixin.ErrorMessage'],
 
+    listen: {
+        global: {
+            onApplicationLoad: 'onApplicationLoad'
+        }
+    },
+
     init: function() {
         const keymap = {
             'escape': [Ext.event.Event.ESC, this.cancelEditing],
@@ -33,6 +39,45 @@ Ext.define('TMMaintenance.view.main.MainController', {
         new Ext.util.KeyMap({
             target: this.getListGrid().element,
             binding: bindings,
+        });
+    },
+
+    onApplicationLoad: function () {
+        this.loadData();
+    },
+
+    loadData: function (newLocale = null) {
+        let me = this;
+        // Setup default ajax headers
+        Ext.Ajax.setDefaultHeaders({
+            'Accept': 'application/json',
+            'csrfToken': window.csrfToken,
+        });
+
+        let url = '/editor/plugins_tmmaintenance_api/locale/list';
+        if (newLocale) {
+            url += '?locale=' + newLocale
+        }
+
+        Ext.Ajax.request({
+            url: url,
+            async: false,
+            method: 'GET',
+            success: function (xhr) {
+                let data = Ext.JSON.decode(xhr.responseText, true);
+
+                if (!(data)) {
+                    // TODO show an error
+                    return;
+                }
+
+                me.getViewModel().setData(data);
+
+                const localeField = me.getView().down('[reference=locale]');
+                localeField.skipChangeHandler = true;
+                localeField.setValue(data.locale + '');
+                delete localeField.skipChangeHandler;
+            }
         });
     },
 

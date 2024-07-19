@@ -51,7 +51,9 @@
     "creationDateTo": "Angelegt vor",
     "search": "Suche",
     "deleteAll": "Alle löschen",
-    "deleteAllTooltip": "Alle Segmente, die zu den aktuellen Sucheinstellungen passen, werden gelöscht"
+    "deleteAllTooltip": "Alle Segmente, die zu den aktuellen Sucheinstellungen passen, werden gelöscht",
+    "sourceLanguage": "Quellsprache",
+    "targetLanguage": "Zielsprache"
   },
   "createForm": {
     "title": "Neues erstellen",
@@ -76,7 +78,9 @@
       "additionalInfo": "Zusätzliche Info",
       "document": "Dokumentname",
       "creationDate": "Erstellungsdatum",
-      "actions": "Aktionen"
+      "actions": "Aktionen",
+      "sourceLanguage": "Quellsprache",
+      "targetLanguage": "Zielsprache"
     },
     "edit": "Bearbeiten",
     "delete": "Löschen",

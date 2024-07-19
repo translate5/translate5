@@ -5,7 +5,6 @@ Ext.define('TMMaintenance.view.main.SearchForm', {
 
     requires: [
         'Ext.layout.HBox',
-        'TMMaintenance.store.TM',
         'TMMaintenance.view.main.SelectTm',
         'TMMaintenance.view.fields.ModeCombo',
         'TMMaintenance.view.fields.ModeComboSourceTarget',
@@ -41,7 +40,7 @@ Ext.define('TMMaintenance.view.main.SearchForm', {
                     xtype: 'panel',
                     responsiveConfig: {
                         'width >= 500': {
-                            width: 'calc(80% - 15px)',
+                            width: 'calc(50% - 15px)',
                             margin: '0 15 0 0'
                         },
                         'width < 500': {
@@ -95,6 +94,58 @@ Ext.define('TMMaintenance.view.main.SearchForm', {
                     layout: 'hbox',
                     responsiveConfig: {
                         'width >= 500': {
+                            width: '30%',
+                            margin: '0 15 0 0'
+                        },
+                        'width < 500': {
+                            width: '100%'
+                        }
+                    },
+                    defaults: {
+                        width: '50%'
+                    },
+                    items: [
+                        {
+                            xtype: 'combobox',
+                            required: false,
+                            name: 'sourceLanguage',
+                            displayField: 'name',
+                            valueField: 'code',
+                            style: 'margin-right: 5px',
+                            store: [],
+                            flex: 1,
+                            disabled: '{!selectedTm}',
+                            bind: {
+                                disabled: '{!selectedTm}',
+                                hidden: '{!l10n.searchForm.target}',
+                                store: '{languages}',
+                                label: '{l10n.searchForm.sourceLanguage}'
+                            },
+                        },
+                        {
+                            xtype: 'combobox',
+                            required: false,
+                            name: 'targetLanguage',
+                            label: 'Target language',
+                            displayField: 'name',
+                            valueField: 'code',
+                            store: [],
+                            flex: 1,
+                            disabled: '{!selectedTm}',
+                            bind: {
+                                disabled: '{!selectedTm}',
+                                hidden: '{!l10n.searchForm.target}',
+                                store: '{languages}',
+                                label: '{l10n.searchForm.targetLanguage}'
+                            },
+                        },
+                    ]
+                },
+                {
+                    xtype: 'panel',
+                    layout: 'hbox',
+                    responsiveConfig: {
+                        'width >= 500': {
                             width: '20%',
                             margin: '0 15 0 0'
                         },
@@ -105,30 +156,33 @@ Ext.define('TMMaintenance.view.main.SearchForm', {
                     defaults: {
                         width: '50%'
                     },
-                    items: [{
-                        xtype: 'button',
-                        name: 'search',
-                        handler: 'onSearchPress',
-                        formBind: true,
-                        disabled: '{!selectedTm}',
-                        bind: {
+                    items: [
+                        {
+                            xtype: 'button',
+                            name: 'search',
+                            handler: 'onSearchPress',
+                            formBind: true,
                             disabled: '{!selectedTm}',
-                            text: '{l10n.searchForm.search}',
-                            hidden: '{!l10n.searchForm.search}',
+                            bind: {
+                                disabled: '{!selectedTm}',
+                                text: '{l10n.searchForm.search}',
+                                hidden: '{!l10n.searchForm.search}',
+                            },
                         },
-                    }, {
-                        xtype: 'button',
-                        name: 'deleteBatch',
-                        handler: 'onDeleteBatchPress',
-                        formBind: true,
-                        disabled: true,
-                        bind: {
-                            disabled: '{!hasRecords}',
-                            text: '{l10n.searchForm.deleteAll}',
-                            hidden: '{!l10n.searchForm.deleteAll}',
-                            tooltip: '{l10n.searchForm.deleteAllTooltip}',
-                        },
-                    }]
+                        {
+                            xtype: 'button',
+                            name: 'deleteBatch',
+                            handler: 'onDeleteBatchPress',
+                            formBind: true,
+                            disabled: true,
+                            bind: {
+                                disabled: '{!hasRecords}',
+                                text: '{l10n.searchForm.deleteAll}',
+                                hidden: '{!l10n.searchForm.deleteAll}',
+                                tooltip: '{l10n.searchForm.deleteAllTooltip}',
+                            },
+                        }
+                    ]
                 }
             ],
         },

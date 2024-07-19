@@ -57,15 +57,9 @@ class Editor_Plugins_Tmmaintenance_ApiController extends ZfExtended_RestControll
     {
         $data = [
             'locale' => $this->resolveLocale(),
+            'l10n' => $this->readLocalization(),
         ];
 
-        $data['l10n'] = $this->readLocalization();
-
-        $this->assignView($data);
-    }
-
-    public function tmsAction(): void
-    {
         $user = ZfExtended_Authentication::getInstance()->getUser();
         if (!$user) {
             return;
@@ -74,13 +68,13 @@ class Editor_Plugins_Tmmaintenance_ApiController extends ZfExtended_RestControll
         $repository = new LanguageResourceRepository();
 
         if (in_array(Roles::TM_MAINTENANCE_ALL_CLIENTS, $user->getRoles(), true)) {
-            $resources = $repository->getT5MemoryType();
+            $languageResources = $repository->getT5MemoryType();
         } else {
             $customers = $user->getCustomersArray();
-            $resources = $repository->getT5MemoryTypeFilteredByCustomers(...$customers);
+            $languageResources = $repository->getT5MemoryTypeFilteredByCustomers(...$customers);
         }
 
-        $tms = array_map(
+        $data['tms'] = array_map(
             static function (array $resource): array {
                 return [
                     'id' => $resource['id'],
@@ -90,12 +84,15 @@ class Editor_Plugins_Tmmaintenance_ApiController extends ZfExtended_RestControll
                     'clients' => $resource['customers'],
                 ];
             },
-            $resources
+            $languageResources
         );
 
-        $this->assignView([
-            'items' => $tms,
-        ]);
+        $model = ZfExtended_Factory::get(editor_Models_Languages::class);
+        $languages = $model->loadAllKeyValueCustom('id', 'rfc5646');
+        $mapper = ZfExtended_Factory::get(editor_Models_LanguageResources_LanguagesMapper::class);
+        $data['languages'] = $mapper->map($languages);
+
+        $this->assignView($data);
     }
 
     public function indexAction(): void
