@@ -27,6 +27,7 @@ END LICENSE AND COPYRIGHT
 */
 
 use MittagQI\Translate5\Task\Worker\Behaviour;
+use MittagQI\ZfExtended\Worker\Exception\MaxDelaysException;
 
 /**
  * Extends the default worker with task specific additions, basically if the task is on state error, then the worker should set to defunc.
@@ -157,5 +158,63 @@ abstract class editor_Models_Task_AbstractWorker extends ZfExtended_Worker_Abstr
     public function getTask(): editor_Models_Task
     {
         return $this->task;
+    }
+
+    /**
+     * For a task-worker, we add capabilities to skip a worker in case it is part of a sub-operation
+     */
+    protected function onTooManyDelays(string $serviceName, string $workerName = null): void
+    {
+        $exception = new MaxDelaysException('E1613', [
+            'worker' => $workerName ?? get_class($this),
+            'service' => $serviceName,
+            'task' => $this->task,
+        ]);
+        // if we are configured to skip the worker on failure we do so
+        if ($this->canSkipMaxDelayedOperation() && $this->doSkipMaxDelayedOperation()) {
+            // ... but we log the mishap
+            $this->log->exception($exception, [
+                'level' => $this->log::LEVEL_WARN,
+            ]);
+            // and may clean-up some stuff (e.g. remove other workers of the operation)
+            $this->onSkipMaxDelayedOperation($serviceName);
+
+            if ($this->setDone()) {
+                $this->stopExecution('Worker skipped');
+            } else {
+                $this->stopExecution('Skipping worker failed');
+            }
+        } else {
+            throw $exception;
+        }
+    }
+
+    /**
+     * Future Enhancement:
+     * If a service is unavailable for a workload, that can be repeated after import and
+     * the configuration to do so is active, that part of the import is skipped.
+     * To make that possible, 2 things have to apply:
+     * - the config "worker.skipFiledOperationsOnImport" must be set for the task (this is checked in the calling code!)
+     * - usually a "mechanic" to skip the whole sub-operation has to be added. This should be implemented in ::onSkipMaxDelayedOperation
+     */
+    protected function canSkipMaxDelayedOperation(): bool
+    {
+        return false;
+    }
+
+    /**
+     * Evaluates if skipping of operations is active for the current task
+     * @throws editor_Models_ConfigException
+     */
+    protected function doSkipMaxDelayedOperation(): bool
+    {
+        $config = $this->task->getConfig();
+
+        return $config->runtimeOptions->worker->skipFailedOperationsOnImport;
+    }
+
+    protected function onSkipMaxDelayedOperation(string $serviceName): void
+    {
+        // can be implemented in inheriting classes
     }
 }
