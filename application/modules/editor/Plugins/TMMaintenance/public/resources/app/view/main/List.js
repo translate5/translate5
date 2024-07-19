@@ -143,6 +143,7 @@ Ext.define('TMMaintenance.view.main.List', {
                     },
                     cancelGoNext: {
                         iconCls: 'icon close-go-previous',
+                        style: 'filter: grayscale(100%);',
                         handler: 'goToPrevious',
                         bind: {
                             hidden: '{!record.isEditing}',
@@ -151,6 +152,7 @@ Ext.define('TMMaintenance.view.main.List', {
                     },
                     cancelGoPrevious: {
                         iconCls: 'icon close-go-next',
+                        style: 'filter: grayscale(100%);',
                         handler: 'goToNext',
                         bind: {
                             hidden: '{!record.isEditing}',
