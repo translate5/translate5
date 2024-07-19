@@ -756,9 +756,13 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
                 $successful = $this->api->search($tmName, $tmOffset, 1, $searchDTO);
             }
 
-            if (! $successful && $this->needsReorganizing($this->api->getError(), $tmName)) {
+            if (
+                (! $successful && $this->needsReorganizing($this->api->getError(), $tmName))
+                || ! $this->areSegmentIdsGenerated($tmName)
+            ) {
                 $this->addReorganizeWarning();
                 $this->reorganizeTm($tmName);
+
                 if (null === $searchDTO) {
                     $numResults = self::CONCORDANCE_SEARCH_NUM_RESULTS - $resultsCount;
                     $successful = $this->api->concordanceSearch($searchString, $tmName, $field, $tmOffset, $numResults);
@@ -2163,5 +2167,18 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
     private function generateTmFilename(editor_Models_LanguageResources_LanguageResource $languageResource): string
     {
         return 'ID' . $languageResource->getId() . '-' . $this->filterName($languageResource->getName());
+    }
+
+    private function areSegmentIdsGenerated(string $tmName): bool
+    {
+        $successful = $this->api->status($tmName);
+
+        if (! $successful) {
+            return false;
+        }
+
+        $result = $this->api->getResult();
+
+        return isset($result->segmentIndex) && $result->segmentIndex > 0;
     }
 }
