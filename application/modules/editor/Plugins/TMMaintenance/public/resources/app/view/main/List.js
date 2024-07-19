@@ -110,7 +110,7 @@ Ext.define('TMMaintenance.view.main.List', {
                         tooltip: 'Saving. Please wait a while.',
                     },
                     save: {
-                        iconCls: 'icon save',
+                        iconCls: 'x-fa fa-check',
                         handler: 'saveCurrent',
                         bind: {
                             hidden: '{!record.isEditing}',
@@ -118,7 +118,7 @@ Ext.define('TMMaintenance.view.main.List', {
                         },
                     },
                     cancel: {
-                        iconCls: 'icon cancel',
+                        iconCls: 'x-fa fa-times',
                         handler: 'cancelEditing',
                         bind: {
                             hidden: '{!record.isEditing}',
@@ -126,7 +126,7 @@ Ext.define('TMMaintenance.view.main.List', {
                         },
                     },
                     saveGoNext: {
-                        iconCls: 'icon save-go-previous',
+                        iconCls: 'x-fa fa-arrow-up',
                         handler: 'saveCurrentGoToPrevious',
                         bind: {
                             hidden: '{!record.isEditing}',
@@ -134,7 +134,7 @@ Ext.define('TMMaintenance.view.main.List', {
                         },
                     },
                     saveGoPrevious: {
-                        iconCls: 'icon save-go-next',
+                        iconCls: 'x-fa fa-arrow-down',
                         handler: 'saveCurrentGoToNext',
                         bind: {
                             hidden: '{!record.isEditing}',
