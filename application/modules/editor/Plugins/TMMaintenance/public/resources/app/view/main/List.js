@@ -243,7 +243,8 @@ Ext.define('TMMaintenance.view.main.List', {
                 let threshold = Math.ceil(maxPosition * 0.1);
 
                 if (this.getPosition().y + threshold >= maxPosition) {
-                    this.component.getController().onContainerScrollEnd(arguments);
+                    const controller = Ext.ComponentQuery.query('app-main')[0].getController();
+                    controller.onContainerScrollEnd(arguments);
                 }
             },
         },

@@ -30,8 +30,14 @@ END LICENSE AND COPYRIGHT
  * @extends Ext.data.Store
  */
 Ext.define('Editor.store.admin.Languages', {
-    extend: 'Ext.data.ArrayStore',
-    fields: ['id', 'label', {name: 'rtl', type: 'boolean'}, 'rfc5646', 'iso3166Part1alpha2'],
+    extend: 'Ext.data.JsonStore',
+    fields: [
+        {name: 'id', type: 'int'},
+        {name: 'label', type: 'string'},
+        {name: 'rtl', type: 'boolean'},
+        {name: 'rfc5646', type: 'string'},
+        {name: 'iso3166Part1alpha2', type: 'string'}
+    ],
     alias: 'store.languagestore',
     data: Editor.data.languages,
 

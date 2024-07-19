@@ -73,9 +73,9 @@ class editor_Models_LanguageResources_LanguagesMapper
                 $name = $this->translate->_($lang['langName']);
                 $result[$name] = [
                     'id' => $lang['id'],
-                    'name' => $name . ' (' . $code . ')',
+                    'label' => $name . ' (' . $code . ')',
                     'rtl' => $lang['rtl'],
-                    'code' => $code
+                    'rfc5646' => $code
                 ];
 
                 continue;
@@ -93,9 +93,9 @@ class editor_Models_LanguageResources_LanguagesMapper
             $name = $this->translate->_($lang['langName']);
             $result[$name] = [
                 'id' => $lang['id'],
-                'name' => $name . ' (' . $code . ')',
+                'label' => $name . ' (' . $code . ')',
                 'rtl' => $lang['rtl'],
-                'code' => $code
+                'rfc5646' => $code
             ];
         }
         ksort($result); //sort by name of language
