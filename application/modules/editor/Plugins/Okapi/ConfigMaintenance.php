@@ -139,6 +139,15 @@ class ConfigMaintenance
     }
 
     /**
+     * Retrieves the currently configured OKAPI version
+     */
+    public function getServerUsed(): string
+    {
+        $this->config->loadByName(self::CONFIG_SERVER_USED);
+        return (string) $this->config->getValue();
+    }
+
+    /**
      * Update server used config defaults when new server is added (runtimeOptions.plugins.Okapi.server)
      * @throws Zend_Db_Statement_Exception
      * @throws ZfExtended_Models_Entity_Exceptions_IntegrityConstraint
