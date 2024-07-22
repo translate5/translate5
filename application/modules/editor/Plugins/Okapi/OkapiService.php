@@ -32,6 +32,7 @@ use editor_Plugins_Okapi_Init;
 use editor_Utils;
 use JsonException;
 use MittagQI\Translate5\Service\DockerServiceAbstract;
+use ReflectionException;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Throwable;
 use Zend_Config;
@@ -51,6 +52,11 @@ final class OkapiService extends DockerServiceAbstract
     public const ID = 'okapi';
 
     public const HEALTH_CHECK_PATH = '/projects';
+
+    /**
+     * Request timeout for general api requests
+     */
+    public const REQUEST_TIMEOUT_SECONDS = 360;
 
     /**
      * Creates the corresponding key for a OKAPI-Url
@@ -157,21 +163,21 @@ final class OkapiService extends DockerServiceAbstract
      */
     public function getServiceUrl(): ?string
     {
-        return $this->getConfiguredServiceUrl(null, false);
+        return $this->getConfiguredServiceUrl(false);
     }
 
     /**
      * Retrieves the configured okapi server URL, either the default or for the passed key
      * @throws OkapiException
      */
-    public function getConfiguredServiceUrl(string $serverToUse = null, bool $throwExceptionOnError = true): ?string
+    public function getConfiguredServiceUrl(bool $throwExceptionOnError = true): ?string
     {
         /** @var Zend_Config $services */
         $services = $this->config->runtimeOptions->plugins->Okapi->server;
         /** @var ?string $serviceUsed */
-        $serviceUsed = (empty($serverToUse)) ? $this->config->runtimeOptions->plugins->Okapi->serverUsed : $serverToUse;
+        $serviceUsed = $this->config->runtimeOptions->plugins->Okapi->serverUsed;
 
-        if (! empty($services)) {
+        if (! empty($services)) { // @phpstan-ignore-line
             if (! empty($serviceUsed)) {
                 if ($services->__isset($serviceUsed)) {
                     if (! empty($services->$serviceUsed)) {
@@ -203,8 +209,34 @@ final class OkapiService extends DockerServiceAbstract
     }
 
     /**
+     * Creates a Zend-Http-client for the given endpoint
+     * The base-url will be the configured one for the config the service was instantiated with
+     * if the given url starts with the service base-url this will be resolved
+     * @throws OkapiException
+     * @throws ReflectionException
+     * @throws Zend_Http_Client_Exception
+     */
+    public function createClient(string $endpoint = ''): Zend_Http_Client
+    {
+        $http = ZfExtended_Factory::get(Zend_Http_Client::class);
+        if (str_starts_with($endpoint, 'http://') || str_starts_with($endpoint, 'https://')) {
+            $http->setUri($endpoint);
+        } else {
+            $http->setUri(
+                rtrim($this->getConfiguredServiceUrl(), '/')
+                . '/'
+                . ltrim($endpoint, '/')
+            );
+        }
+        $http->setConfig([
+            'timeout' => self::REQUEST_TIMEOUT_SECONDS,
+        ]);
+
+        return $http;
+    }
+
+    /**
      * Differing from base version we check the existing configured URLs for validity and dismiss the ones not reachable
-     * (non-PHPdoc)
      * @throws Zend_Http_Client_Exception
      * @throws JsonException
      * @throws Zend_Db_Statement_Exception
@@ -361,8 +393,6 @@ final class OkapiService extends DockerServiceAbstract
 
     /**
      * Retrieves the existing currently configured servers, that do not start with the given (base) URL
-     * @param mixed $url
-     * @return array
      */
     private function getOtherServers(mixed $url): array
     {
@@ -370,7 +400,7 @@ final class OkapiService extends DockerServiceAbstract
         if (! empty($this->config->runtimeOptions->plugins->Okapi->server)) {
             foreach ($this->config->runtimeOptions->plugins->Okapi->server as $name => $otherUrl) {
                 if (! empty($otherUrl)
-                    && !str_starts_with($otherUrl, $url)
+                    && ! str_starts_with($otherUrl, $url)
                     && $this->checkConfiguredHealthCheckUrl(
                         rtrim($otherUrl, '/') . self::HEALTH_CHECK_PATH,
                         $otherUrl,

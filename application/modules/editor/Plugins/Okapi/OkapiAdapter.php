@@ -35,13 +35,11 @@ use SplFileInfo;
 use Throwable;
 use Zend_Config;
 use Zend_Exception;
-use Zend_Http_Client;
 use Zend_Http_Client_Exception;
 use Zend_Http_Response;
 use Zend_Registry;
 use ZfExtended_BadGateway;
 use ZfExtended_Exception;
-use ZfExtended_Factory;
 
 /**
  * Upload/download file to okapi server, and converting it to xlf
@@ -49,13 +47,6 @@ use ZfExtended_Factory;
  */
 final class OkapiAdapter
 {
-    /**
-     * Request timeout for the api
-     *
-     * @var integer
-     */
-    public const REQUEST_TIMEOUT_SECONDS = 360;
-
     /**
      * The file extenssion of the converted file
      *
@@ -79,81 +70,34 @@ final class OkapiAdapter
     private ?string $projectUrl;
 
     /**
-     * Server to use (what can be configured on task & customer level)
-     */
-    private ?string $serverToUse;
-
-    /**
      * The OKAPI service
      */
     private OkapiService $service;
 
     /**
+     * Creates an OkapiAdapter for the given configuration
+     * (system config is usedwhen not given)
      * @throws Zend_Exception
      * @throws ZfExtended_Exception
      */
     public function __construct(Zend_Config $config = null)
     {
-        if($config === null){
+        if ($config === null) {
             $config = Zend_Registry::get('config'); /** var Zend_Config $config */
         }
-        $this->serverToUse = $config->runtimeOptions->plugins->Okapi->serverUsed;
         $this->service = editor_Plugins_Okapi_Init::createService(OkapiService::ID, $config);
     }
 
     /**
-     * Get the okapi api url from the configured servers and server used
+     * Creates a new project that files can be uploaded to
      * @throws OkapiException
-     */
-    public function getApiUrl(): string
-    {
-        return $this->service->getConfiguredServiceUrl($this->serverToUse) . '/';
-    }
-
-    /**
-     * Create the http object, set the authentication and set the url
-     * @throws ReflectionException
-     * @throws Zend_Http_Client_Exception
-     */
-    private function getHttpClient(string $url): Zend_Http_Client
-    {
-        $http = ZfExtended_Factory::get(Zend_Http_Client::class);
-        $http->setUri($url);
-        $http->setConfig([
-            'timeout' => self::REQUEST_TIMEOUT_SECONDS,
-        ]);
-
-        return $http;
-    }
-
-    /**
-     * Check for the status of the response. If the status is different than 200 or 201,
-     * ZfExtended_BadGateway exception is thrown.
-     * Also the function checks for the invalid decoded json.
-     *
-     * @throws ZfExtended_BadGateway
-     */
-    private function processResponse(Zend_Http_Response $response): string
-    {
-        $validStates = [200, 201, 401];
-
-        //check for HTTP State (REST errors)
-        if (! in_array($response->getStatus(), $validStates)) {
-            throw new ZfExtended_BadGateway("HTTP Status was not 200/201/401 body: " . $response->getBody(), 500);
-        }
-
-        return $response->getBody();
-    }
-
-    /**
      * @throws ReflectionException
      * @throws Zend_Http_Client_Exception
      * @throws ZfExtended_BadGateway
-     * @throws OkapiException
      */
     public function createProject(): void
     {
-        $http = $this->getHttpClient($this->getApiUrl() . 'projects/new');
+        $http = $this->service->createClient('/projects/new');
         $response = $http->request('POST');
         $this->processResponse($response);
         $url = $response->getHeader('Location');
@@ -162,6 +106,7 @@ final class OkapiAdapter
 
     /**
      * Remove the project from Okapi server.
+     * @throws OkapiException
      * @throws ReflectionException
      * @throws Zend_Http_Client_Exception
      * @throws ZfExtended_BadGateway
@@ -171,16 +116,17 @@ final class OkapiAdapter
         if (empty($this->projectUrl)) {
             return;
         }
-        $http = $this->getHttpClient($this->projectUrl);
+        $http = $this->service->createClient($this->projectUrl);
         $response = $http->request('DELETE');
         $this->processResponse($response);
     }
 
     /**
+     * Uploads a bconf to the current project
+     * @throws OkapiException
      * @throws ReflectionException
      * @throws Zend_Http_Client_Exception
      * @throws ZfExtended_BadGateway
-     * @throws OkapiException
      */
     public function uploadOkapiConfig(string $bconfPath, bool $forImport): void
     {
@@ -191,8 +137,7 @@ final class OkapiAdapter
             ]);
         }
         // $bconfPath = '/var/www/translate5/application/modules/editor/Plugins/Okapi/data/okapi_default_import.bconf';
-        $url = $this->projectUrl . '/batchConfiguration';
-        $http = $this->getHttpClient($url);
+        $http = $this->service->createClient($this->projectUrl . '/batchConfiguration');
         $http->setFileUpload($bconfPath, 'batchConfiguration');
         $response = $http->request('POST');
 
@@ -220,7 +165,7 @@ final class OkapiAdapter
     }
 
     /**
-     * Upload the source file(the file which will be converted)
+     * Upload the source file (the file which will be converted)
      * @param string $fileName file name to be used in okapi
      * @param SplFileInfo $realFilePath path to the file to be uploaded
      * @throws ReflectionException
@@ -259,28 +204,6 @@ final class OkapiAdapter
     }
 
     /**
-     * Upload the source file(the file which will be converted)
-     * @throws ReflectionException
-     * @throws Zend_Http_Client_Exception
-     * @throws ZfExtended_BadGateway
-     */
-    protected function uploadFile(string $fileName, SplFileInfo $realFilePath, string $type): void
-    {
-        //PUT http://{host}/okapi-longhorn/projects/1/inputFiles/help.html
-        //Ex.: Uploads a file that will have the name 'help.html'
-
-        if (! empty($type)) {
-            //add the upload type to the URL
-            $fileName = $type . '/' . $fileName;
-        }
-        $url = $this->projectUrl . '/inputFiles/' . $fileName;
-        $http = $this->getHttpClient($url);
-        $http->setFileUpload($realFilePath, 'inputFile');
-        $response = $http->request('PUT');
-        $this->processResponse($response);
-    }
-
-    /**
      * Run the file conversion. For each uploaded files converted file will be created
      * @throws ReflectionException
      * @throws Zend_Http_Client_Exception
@@ -288,15 +211,14 @@ final class OkapiAdapter
      */
     public function executeTask(string $source, string $target): void
     {
-        $url = $this->projectUrl . '/tasks/execute/' . $source . '/' . $target;
-        $http = $this->getHttpClient($url);
+        $http = $this->service->createClient($this->projectUrl . '/tasks/execute/' . $source . '/' . $target);
         $response = $http->request('POST');
         $this->processResponse($response);
     }
 
     /**
-     * Checks the default configured /system level) Okapi Service
-     * TODO FIXME: this should be implemented in MittagQI\Translate5\Plugins\Okapi\OkapiConnector ...
+     * Checks the configured Okapi Service
+     * @throws OkapiException
      */
     public function ping(): string
     {
@@ -306,10 +228,11 @@ final class OkapiAdapter
         }
 
         try {
-            $http = $this->getHttpClient($url);
+            $http = $this->service->createClient();
+            //for ping just 15 seconds
             $http->setConfig([
                 'timeout' => 15,
-            ]); //for ping just 15 seconds
+            ]);
             $response = $http->request('GET');
             $this->processResponse($response);
         } catch (Throwable) {
@@ -321,6 +244,7 @@ final class OkapiAdapter
 
     /**
      * Download the converted file from okapi, and save the file on the disk.
+     * @throws OkapiException
      * @throws ReflectionException
      * @throws Zend_Http_Client_Exception
      * @throws ZfExtended_BadGateway
@@ -328,15 +252,17 @@ final class OkapiAdapter
     public function downloadFile(string $fileName, string $manifestFile, SplFileInfo $dataDir): string
     {
         $downloadedFile = $dataDir . '/' . $fileName . self::OUTPUT_FILE_EXTENSION;
-        $url = $this->projectUrl . '/outputFiles/pack1/work/' . $fileName . self::OUTPUT_FILE_EXTENSION;
-        $http = $this->getHttpClient($url);
+        $http = $this->service->createClient(
+            $this->projectUrl
+            . '/outputFiles/pack1/work/'
+            . $fileName . self::OUTPUT_FILE_EXTENSION
+        );
         $response = $http->request('GET');
         $responseFile = $this->processResponse($response);
         file_put_contents($downloadedFile, $responseFile);
 
         //additionaly we save the manifest.rkm file to the disk, needed for export
-        $url = $this->projectUrl . '/outputFiles/pack1/manifest.rkm';
-        $http = $this->getHttpClient($url);
+        $http = $this->service->createClient($this->projectUrl . '/outputFiles/pack1/manifest.rkm');
         $response = $http->request('GET');
         file_put_contents($dataDir . '/' . $manifestFile, $this->processResponse($response));
 
@@ -346,14 +272,55 @@ final class OkapiAdapter
     /**
      * Download the converted file from okapi, and save the file on the disk.
      * @param string $fileName filename in okapi to get the file
+     * @throws OkapiException
      * @throws ReflectionException
      * @throws Zend_Http_Client_Exception
      * @throws ZfExtended_BadGateway
      */
     public function downloadMergedFile(string $fileName, SplFileInfo $targetFile): void
     {
-        $http = $this->getHttpClient($this->projectUrl . '/outputFiles/' . $fileName);
+        $http = $this->service->createClient($this->projectUrl . '/outputFiles/' . $fileName);
         $response = $http->request('GET');
         file_put_contents($targetFile, $this->processResponse($response));
+    }
+
+    /**
+     * Upload a file to the current project
+     * @throws ReflectionException
+     * @throws Zend_Http_Client_Exception
+     * @throws ZfExtended_BadGateway
+     */
+    private function uploadFile(string $fileName, SplFileInfo $realFilePath, string $type): void
+    {
+        //PUT http://{host}/okapi-longhorn/projects/1/inputFiles/help.html
+        //Ex.: Uploads a file that will have the name 'help.html'
+
+        if (! empty($type)) {
+            //add the upload type to the URL
+            $fileName = $type . '/' . $fileName;
+        }
+        $http = $this->service->createClient($this->projectUrl . '/inputFiles/' . $fileName);
+        $http->setFileUpload($realFilePath, 'inputFile');
+        $response = $http->request('PUT');
+        $this->processResponse($response);
+    }
+
+    /**
+     * Check for the status of the response. If the status is different than 200 or 201,
+     * ZfExtended_BadGateway exception is thrown.
+     * Also the function checks for the invalid decoded json.
+     *
+     * @throws ZfExtended_BadGateway
+     */
+    private function processResponse(Zend_Http_Response $response): string
+    {
+        $validStates = [200, 201, 401];
+
+        //check for HTTP State (REST errors)
+        if (! in_array($response->getStatus(), $validStates)) {
+            throw new ZfExtended_BadGateway("HTTP Status was not 200/201/401 body: " . $response->getBody(), 500);
+        }
+
+        return $response->getBody();
     }
 }

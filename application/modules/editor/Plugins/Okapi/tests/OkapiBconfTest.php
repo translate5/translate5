@@ -67,7 +67,7 @@ class OkapiBconfTest extends JsonTestAbstract
         $service = editor_Plugins_Okapi_Init::createService(OkapiService::ID, $conf);
 
         self::assertNotEmpty($okapiConf->dataDir, 'runtimeOptions.plugins.Okapi.dataDir not set');
-        self::assertNotEmpty($service->getConfiguredServiceUrl($okapiConf->serverToUse, false), 'runtimeOptions.plugins.Okapi.api.url not set');
+        self::assertNotEmpty($service->getConfiguredServiceUrl(false), 'runtimeOptions.plugins.Okapi.api.url not set');
 
         $t5defaultImportBconf = editor_Utils::joinPath(editor_Plugins_Okapi_Init::getDataDir(), editor_Plugins_Okapi_Init::BCONF_SYSDEFAULT_IMPORT);
         self::assertFileExists(
