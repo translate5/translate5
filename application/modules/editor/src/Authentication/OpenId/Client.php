@@ -522,8 +522,8 @@ class Client
             'openid' => [
                 'customerId' => $this->getCustomer()->getId(),
                 'customerName' => $this->getCustomer()->getName(),
-                'userInfo' => $this->openIdUserInfo,
-                'userClaims' => $this->openIdUserClaims,
+                'userInfo' => $this->openIdUserInfo ?? '',
+                'userClaims' => $this->openIdUserClaims ?? '',
             ],
         ];
     }
