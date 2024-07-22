@@ -3,7 +3,8 @@ Ext.define('TMMaintenance.view.main.Toolbar', {
     xtype: 'maintoolbar',
 
     controller: 'toolbar',
-
+    height: 70,
+    padding: '0 20 0 0',
     requires: [
         'Ext.Button',
         'Ext.Img',

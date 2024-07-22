@@ -83,6 +83,8 @@
       "targetLanguage": "Zielsprache"
     },
     "edit": "Bearbeiten",
+    "editSource": "Bearbeiten Quelle",
+    "editTarget": "Bearbeiten Ziel",
     "delete": "Löschen",
     "create": "Neu anlegen",
     "save": "Speichern (STRG+S)",

@@ -7,7 +7,7 @@ Ext.define('TMMaintenance.view.fields.ModeCombo', {
             required: false,
             name: name,
             disabled: '{!selectedTm}',
-            labelWidth: 120,
+            labelWidth: 130,
             bind: {
                 disabled: '{!selectedTm}',
                 label: '{l10n.searchForm.'+label+'}',

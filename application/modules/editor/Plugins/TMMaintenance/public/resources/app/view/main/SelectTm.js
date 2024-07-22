@@ -74,4 +74,7 @@ Ext.define('TMMaintenance.view.main.SelectTm', {
         },
     ],
     emptyText: 'No records available',
+    listeners: {
+        childdoubletap: 'onTmDoubleTap'
+    }
 });

@@ -21,6 +21,7 @@ Ext.define('TMMaintenance.view.main.Main', {
             xtype: 'maintoolbar',
             docked: 'top',
             userCls: 'mb-20 toolbar',
+            shadow: true
         },
         {
             xtype: 'panel',

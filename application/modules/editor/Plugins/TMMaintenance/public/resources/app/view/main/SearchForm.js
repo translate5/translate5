@@ -40,7 +40,7 @@ Ext.define('TMMaintenance.view.main.SearchForm', {
                     xtype: 'panel',
                     responsiveConfig: {
                         'width >= 500': {
-                            width: 'calc(50% - 15px)',
+                            width: 'calc(40% - 15px)',
                             margin: '0 15 0 0'
                         },
                         'width < 500': {
@@ -79,6 +79,7 @@ Ext.define('TMMaintenance.view.main.SearchForm', {
                             },
                             listeners: {
                                 click: 'onSelectTmPress',
+                                focus: 'onSelectTmPress',
                             },
                         },
                         {
@@ -94,7 +95,7 @@ Ext.define('TMMaintenance.view.main.SearchForm', {
                     layout: 'hbox',
                     responsiveConfig: {
                         'width >= 500': {
-                            width: '30%',
+                            width: 'calc(40% - 15px)',
                             margin: '0 15 0 0'
                         },
                         'width < 500': {
@@ -102,6 +103,7 @@ Ext.define('TMMaintenance.view.main.SearchForm', {
                         }
                     },
                     defaults: {
+                        labelWidth: 130,
                         width: '50%'
                     },
                     items: [
@@ -111,7 +113,7 @@ Ext.define('TMMaintenance.view.main.SearchForm', {
                             name: 'sourceLanguage',
                             displayField: 'label',
                             valueField: 'rfc5646',
-                            style: 'margin-right: 5px',
+                            margin: '0 15 0 0',
                             store: [],
                             flex: 1,
                             disabled: '{!selectedTm}',

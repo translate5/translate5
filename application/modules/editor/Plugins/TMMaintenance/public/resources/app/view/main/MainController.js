@@ -182,7 +182,15 @@ Ext.define('TMMaintenance.view.main.MainController', {
         this.startEdit(gridLocation.record);
     },
 
-    startEditing: function () {
+    onEditSource: function(grid, gridLocation) {
+        this.startEdit(gridLocation.record, 'source');
+    },
+
+    onEditTarget: function(grid, gridLocation) {
+        this.startEdit(gridLocation.record, 'target');
+    },
+
+    startEditing: function (column) {
         let editingPlugin = this.getEditingPlugin();
 
         if (editingPlugin.editing) {
@@ -195,7 +203,7 @@ Ext.define('TMMaintenance.view.main.MainController', {
             return;
         }
 
-        this.startEdit(grid.getLastSelected());
+        this.startEdit(grid.getLastSelected(), column);
     },
 
     cancelEditing: function () {
@@ -328,11 +336,12 @@ Ext.define('TMMaintenance.view.main.MainController', {
         return this.getListGrid().getPlugin('cellediting');
     },
 
-    startEdit: function (record) {
+    startEdit: function (record, column) {
         let grid = this.getListGrid();
         let editingPlugin = this.getEditingPlugin();
+        column = column || 'target';
 
-        editingPlugin.startEdit(record, grid.down('[dataIndex=target]'));
+        editingPlugin.startEdit(record, grid.down('[dataIndex=' + column + ']'));
 
         Ext.defer(function () {
             editingPlugin.getActiveEditor().focus();

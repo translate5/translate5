@@ -83,6 +83,8 @@
       "targetLanguage": "Target language"
     },
     "edit": "Edit",
+    "editSource": "Edit source",
+    "editTarget": "Edit target",
     "delete": "Delete",
     "create": "Create",
     "save": "Save (CTRL+S)",

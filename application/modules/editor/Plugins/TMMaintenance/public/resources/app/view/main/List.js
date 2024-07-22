@@ -20,7 +20,9 @@ Ext.define('TMMaintenance.view.main.List', {
     },
 
     plugins: {
-        cellediting: true,
+        cellediting: {
+            triggerEvent: 'tap'
+        },
     },
 
     itemConfig: {
@@ -101,6 +103,22 @@ Ext.define('TMMaintenance.view.main.List', {
                             hidden: '{record.isEditing}',
                             tooltip: '{l10n.list.delete}',
                         },
+                    },
+                    editSource: {
+                        iconCls: 'x-fa fi-pencil',
+                        handler: 'onEditSource',
+                        bind: {
+                            hidden: '{record.isEditing}',
+                            tooltip: '{l10n.list.editSource}',
+                        }
+                    },
+                    editTarget: {
+                        iconCls: 'x-fa fa-edit',
+                        handler: 'onEditTarget',
+                        bind: {
+                            hidden: '{record.isEditing}',
+                            tooltip: '{l10n.list.editTarget}',
+                        }
                     },
                     spinner: {
                         iconCls: 'icon loading',
