@@ -28,6 +28,7 @@ END LICENSE AND COPYRIGHT
 
 use MittagQI\Translate5\Plugins\Okapi\Bconf\BconfEntity;
 use MittagQI\Translate5\Plugins\Okapi\OkapiException;
+use MittagQI\Translate5\Plugins\Okapi\OkapiService;
 use MittagQI\Translate5\Test\Import\Bconf;
 use MittagQI\Translate5\Test\Import\Config;
 use MittagQI\Translate5\Test\JsonTestAbstract;
@@ -63,7 +64,7 @@ class OkapiBconfTest extends JsonTestAbstract
     {
         $conf = Zend_Registry::get('config');
         $okapiConf = $conf->runtimeOptions->plugins->Okapi;
-        $service = editor_Plugins_Okapi_Init::createService('okapi', $conf);
+        $service = editor_Plugins_Okapi_Init::createService(OkapiService::ID, $conf);
 
         self::assertNotEmpty($okapiConf->dataDir, 'runtimeOptions.plugins.Okapi.dataDir not set');
         self::assertNotEmpty($service->getConfiguredServiceUrl($okapiConf->serverToUse, false), 'runtimeOptions.plugins.Okapi.api.url not set');

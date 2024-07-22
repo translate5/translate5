@@ -98,7 +98,7 @@ final class OkapiAdapter
             $config = Zend_Registry::get('config'); /** var Zend_Config $config */
         }
         $this->serverToUse = $config->runtimeOptions->plugins->Okapi->serverUsed;
-        $this->service = editor_Plugins_Okapi_Init::createService('okapi', $config);
+        $this->service = editor_Plugins_Okapi_Init::createService(OkapiService::ID, $config);
     }
 
     /**
