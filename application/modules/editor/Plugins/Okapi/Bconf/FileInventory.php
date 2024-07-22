@@ -26,10 +26,15 @@
  END LICENSE AND COPYRIGHT
  */
 
+namespace MittagQI\Translate5\Plugins\Okapi\Bconf;
+
+use editor_Plugins_Okapi_Init;
+use stdClass;
+
 /**
  * Class representing the static dta of a filebase inventory with a JSON inventory-file
  */
-abstract class editor_Plugins_Okapi_Bconf_FileInventory
+abstract class FileInventory
 {
     /**
      * Relative to the static data-dir
@@ -51,19 +56,11 @@ abstract class editor_Plugins_Okapi_Bconf_FileInventory
         $this->inventory = json_decode(file_get_contents($this->getFilePath()));
     }
 
-    /**
-     * @throws editor_Models_ConfigException
-     * @throws editor_Plugins_Okapi_Exception
-     */
     public function getFolderPath(): string
     {
         return editor_Plugins_Okapi_Init::getDataDir() . $this->inventoryFolder;
     }
 
-    /**
-     * @throws editor_Models_ConfigException
-     * @throws editor_Plugins_Okapi_Exception
-     */
     public function getFilePath(): string
     {
         return editor_Plugins_Okapi_Init::getDataDir() . $this->inventoryFile;
@@ -80,7 +77,6 @@ abstract class editor_Plugins_Okapi_Bconf_FileInventory
 
     /**
      * Checks if all linked files of the inventory are present
-     * @return bool
      */
-    abstract public function validate();
+    abstract public function validate(): bool;
 }

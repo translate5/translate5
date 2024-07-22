@@ -26,7 +26,8 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-use MittagQI\Translate5\Plugins\Okapi\Service;
+use MittagQI\Translate5\Plugins\Okapi\Bconf\BconfEntity;
+use MittagQI\Translate5\Plugins\Okapi\OkapiException;
 use MittagQI\Translate5\Test\Import\Bconf;
 use MittagQI\Translate5\Test\Import\Config;
 use MittagQI\Translate5\Test\JsonTestAbstract;
@@ -38,12 +39,12 @@ use MittagQI\Translate5\Test\JsonTestAbstract;
 class OkapiBconfTest extends JsonTestAbstract
 {
     protected static array $requiredPlugins = [
-        'editor_Plugins_Okapi_Init',
+        editor_Plugins_Okapi_Init::class,
     ];
 
     private static Bconf $testBconf;
 
-    private static editor_Plugins_Okapi_Bconf_Entity $bconf;
+    private static BconfEntity $bconf;
 
     /**
      * Just imports a bconf to test with
@@ -62,7 +63,6 @@ class OkapiBconfTest extends JsonTestAbstract
     {
         $conf = Zend_Registry::get('config');
         $okapiConf = $conf->runtimeOptions->plugins->Okapi;
-        /* @var Service $service */
         $service = editor_Plugins_Okapi_Init::createService('okapi', $conf);
 
         self::assertNotEmpty($okapiConf->dataDir, 'runtimeOptions.plugins.Okapi.dataDir not set');
@@ -74,7 +74,7 @@ class OkapiBconfTest extends JsonTestAbstract
             "File '$t5defaultImportBconf' missing. As the Translate5 provided default import .bconf file for Okapi Task Imports it must exist!"
         );
 
-        static::$bconf = new editor_Plugins_Okapi_Bconf_Entity();
+        static::$bconf = new BconfEntity();
         static::$bconf->load(static::$testBconf->getId());
         static::assertStringStartsWith('TestBconfMinimal', static::$bconf->getName(), 'Imported bconf\'s name is not like ' . 'TestBconfMinimal' . ' but ' . static::$bconf->getName());
 
@@ -128,13 +128,11 @@ class OkapiBconfTest extends JsonTestAbstract
     {
         if (! self::isMasterTest()) {
             self::markTestSkipped('runs only in master test to not mess with important default bconf.');
-
-            return;
         }
         $bconf = static::$bconf;
         $bconf->importDefaultWhenNeeded();
 
-        $systemBconf = new editor_Plugins_Okapi_Bconf_Entity();
+        $systemBconf = new BconfEntity();
         $systemBconf->loadRow('name = ? ', editor_Plugins_Okapi_Init::BCONF_SYSDEFAULT_IMPORT_NAME);
         $systemBconf->setName('NotSystemBconfAnymore-' . time() . rand()); // Unmark as system bconf
         $systemBconf->save();
@@ -146,7 +144,7 @@ class OkapiBconfTest extends JsonTestAbstract
 
         $autoImportFailureMsg = 'AutoImport of missing system bconf failed.';
         self::assertEquals($total + 1, $newTotal, $autoImportFailureMsg . ' Totalcount not increased');
-        $newSystemBconf = new editor_Plugins_Okapi_Bconf_Entity();
+        $newSystemBconf = new BconfEntity();
         $expectedName = editor_Plugins_Okapi_Init::BCONF_SYSDEFAULT_IMPORT_NAME;
         $newSystemBconf->loadRow('name = ?', $expectedName);
         self::assertEquals($expectedName, $newSystemBconf->getName(), $autoImportFailureMsg . " No record name matches '$expectedName'");
@@ -174,7 +172,6 @@ class OkapiBconfTest extends JsonTestAbstract
 
         // Reset to initial system bconf, delete  newly imported
         $newSystemBconfId = (int) $newSystemBconf->getId();
-        $newSystemBconfDir = $newSystemBconf->getDataDirectory();
         $newSystemBconf->setName('ToDelete-' . time() . rand());
         $newSystemBconf->save();
         $systemBconf->setName(editor_Plugins_Okapi_Init::BCONF_SYSDEFAULT_IMPORT_NAME);
@@ -182,8 +179,9 @@ class OkapiBconfTest extends JsonTestAbstract
 
         try {
             $newSystemBconf->delete();
-        } catch (ZfExtended_NoAccessException $e) {
+        } catch (ZfExtended_NoAccessException) {
         }
+
         $e = null;
 
         try {
@@ -249,7 +247,7 @@ class OkapiBconfTest extends JsonTestAbstract
      */
     public function test60_InvalidFiles()
     {
-        $bconf = new editor_Plugins_Okapi_Bconf_Entity();
+        $bconf = new BconfEntity();
         $testDir = null;
 
         try {
@@ -271,7 +269,7 @@ class OkapiBconfTest extends JsonTestAbstract
 
                 try {
                     $bconf->unpack(static::api()->getFile("invalid/$file"));
-                } catch (ZfExtended_UnprocessableEntity|editor_Plugins_Okapi_Exception $e) {
+                } catch (ZfExtended_UnprocessableEntity|OkapiException $e) {
                     self::assertNotNull($e, "Did not reject invalid/$file with ZfExtended_UnprocessableEntity.");
                 }
             }

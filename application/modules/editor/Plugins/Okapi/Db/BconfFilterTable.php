@@ -1,6 +1,6 @@
 <?php
 /*
-START LICENSE AND COPYRIGHT
+ START LICENSE AND COPYRIGHT
 
  This file is part of translate5
 
@@ -23,17 +23,16 @@ START LICENSE AND COPYRIGHT
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
              http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
-END LICENSE AND COPYRIGHT
-*/
-
-/**
- * Okapi Exception that is used to detect a packing/unpacking exception
- * This is just a "marker" Exception
+ END LICENSE AND COPYRIGHT
  */
-class editor_Plugins_Okapi_Bconf_InvalidException extends ZfExtended_Exception
+
+namespace MittagQI\Translate5\Plugins\Okapi\Db;
+
+use Zend_Db_Table_Abstract;
+
+class BconfFilterTable extends Zend_Db_Table_Abstract
 {
-    /**
-     * @var string
-     */
-    protected $domain = 'plugin.okapi.bconf';
+    protected $_name = 'LEK_okapi_bconf_filter';
+
+    public $_primary = 'id';
 }

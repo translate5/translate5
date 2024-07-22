@@ -26,27 +26,44 @@
  END LICENSE AND COPYRIGHT
  */
 
+namespace MittagQI\Translate5\Plugins\Okapi\Bconf;
+
+use editor_Models_ConfigException;
+use editor_Plugins_Okapi_Init;
+use MittagQI\Translate5\Plugins\Okapi\Bconf\Filter\OkapiFilterInventory;
+use MittagQI\Translate5\Plugins\Okapi\Bconf\Filter\T5FilterInventory;
+use MittagQI\Translate5\Plugins\Okapi\OkapiException;
+use stdClass;
+use ZfExtended_Exception;
+
 /**
  * Class representing the Filters a bconf can have
  * These consist of okapi default-filters, translate5-adjusted filters and the user customized filters from the database
  *
  * There are 3 different sources for FPRMs in a BCONF:
- * - User customized FPRM: will have a database-entry (for name, description & mime) and also exist as file in the BCONFs component folder
- * - translate5 adjusted FPRM: Will exist in the folder /translate5/application/modules/editor/Plugins/Okapi/data/fprm/translate5 with the inventory-file translate5/application/modules/editor/Plugins/Okapi/data/fprm/translate5-filters.json
- * - OKAPI default adjusted FPRM: Will exist in the folder /translate5/application/modules/editor/Plugins/Okapi/data/fprm/okapi with the inventory-file translate5/application/modules/editor/Plugins/Okapi/data/fprm/okapi-filters.json
- * When compiling/packing a bconf, the customized, translate5 adjusted and okapi-default FPRMs will all be embedded into the packed BCONF-file depending on which filters are referenced in the BCONFs extension-mapping
- * On unpacking, the okapi-default files will be reverted to non-embedded, see editor_Plugins_Okapi_Bconf_ExtensionMapping
+ * - User customized FPRM: will have a database-entry (for name, description & mime) and also exist as file in the
+ *   BCONFs component folder
+ * - translate5 adjusted FPRM: Will exist in the folder .../Plugins/Okapi/data/fprm/translate5
+ *   with the inventory-file .../Plugins/Okapi/data/fprm/translate5-filters.json
+ * - OKAPI default adjusted FPRM: Will exist in the folder .../Plugins/Okapi/data/fprm/okapi
+ *   with the inventory-file .../Plugins/Okapi/data/fprm/okapi-filters.json
+ * When compiling/packing a bconf, the customized, translate5 adjusted and okapi-default FPRMs will all be embedded
+ * into the packed BCONF-file depending on which filters are referenced in the BCONFs extension-mapping
+ * On unpacking, the okapi-default files will be reverted to non-embedded, see ExtensionMapping
  *
  * This class also defines the filters/FPRMs, the frontend has a editing-GUI for, ::GUIS
- * Generally, an editor relates to an OKAPI-type. The OKAPI-ids like "okf_xml-AndroidStrings" reference the base type "okf_xml" with certain settings.
- * Each frontend-editable okapi-type must have an entry here; all non x-properties types must also have one or more extensions defined, which relate to a testfile in translate5/application/modules/editor/Plugins/Okapi/data/testfiles/
- * The referenced Class must exist in the ExtJS FPRM-editor directory translate5/application/modules/editor/Plugins/Okapi/public/js/view/fprm/
- * Note, that non X-Properties FPRMs cannot be validated other than testing it with a concrete testfile and therefore all non X-Prperties editors must have a testfile
+ * Generally, an editor relates to an OKAPI-type. The OKAPI-ids like "okf_xml-AndroidStrings" reference the
+ * base type "okf_xml" with certain settings. Each frontend-editable okapi-type must have an entry here;
+ * all non x-properties types must also have one or more extensions defined,
+ * which relate to a testfile in .../Plugins/Okapi/data/testfiles/
+ * The referenced Class must exist in the ExtJS FPRM-editor directory .../Plugins/Okapi/public/js/view/fprm/
+ * Note, that non X-Properties FPRMs cannot be validated other than testing it with a concrete testfile and therefore
+ * all non X-Prperties editors must have a testfile.
  * Note, that multiple filter-types may have the same Frontend
  *
- * see also editor_Plugins_Okapi_Bconf_Filter_Fprm for more documentation
+ * see also Filter\Fprm for more documentation
  */
-class editor_Plugins_Okapi_Bconf_Filters
+class Filters
 {
     /**
      * General seperator in the OKAPI filter naming scheme
@@ -56,8 +73,9 @@ class editor_Plugins_Okapi_Bconf_Filters
 
     /**
      * All Filters that have a GUI must be defined here
-     * Each filter must define extensions that can be tested alongside the filter. These files must exist in /application/modules/editor/Plugins/Okapi/data/$self::TESTFILE_FOLDER just as described with TESTABLE_EXTENSIONS
-     * @var string[]
+     * Each filter must define extensions that can be tested alongside the filter.
+     * These files must exist in .../Plugins/Okapi/data/$self::TESTFILE_FOLDER just as described with TESTABLE_EXTENSIONS
+     * @var array
      */
     public const GUIS = [
         'okf_html' => [
@@ -96,17 +114,33 @@ class editor_Plugins_Okapi_Bconf_Filters
 
     /**
      * A list of file-extensions, that validation files exist for.
-     * These files reside in /application/modules/editor/Plugins/Okapi/data/$self::TESTFILE_FOLDER and are all called "test.$EXTENSION"
+     * These files reside in .../Plugins/Okapi/data/$self::TESTFILE_FOLDER and are all called "test.$EXTENSION"
      * For each extension here a file must exist, the language is expected to be be english / en
      */
-    public const TESTABLE_EXTENSIONS = ['txt', 'xml', 'strings', 'csv', 'htm', 'html', 'sdlxliff', 'docx', 'odp', 'ods', 'odt', 'pptx', 'tbx', 'xlsx', 'idml'];
+    public const TESTABLE_EXTENSIONS = [
+        'txt',
+        'xml',
+        'strings',
+        'csv',
+        'htm',
+        'html',
+        'sdlxliff',
+        'docx',
+        'odp',
+        'ods',
+        'odt',
+        'pptx',
+        'tbx',
+        'xlsx',
+        'idml',
+    ];
 
     /**
      * @var string
      */
     public const TESTFILE_FOLDER = 'testfiles';
 
-    private static ?editor_Plugins_Okapi_Bconf_Filters $_instance = null;
+    private static ?Filters $_instance = null;
 
     /**
      * Evaluates if a filter has aExtJS GUI to be edited with
@@ -135,7 +169,8 @@ class editor_Plugins_Okapi_Bconf_Filters
     }
 
     /**
-     * Evaluates, if the identifier represents an okapi default identifier (an identier that does not point to a fprm embedded in the bconf)
+     * Evaluates, if the identifier represents an okapi default identifier
+     * (an identier that does not point to a fprm embedded in the bconf)
      */
     public static function isOkapiDefaultIdentifier(string $identifier): bool
     {
@@ -143,7 +178,8 @@ class editor_Plugins_Okapi_Bconf_Filters
     }
 
     /**
-     * Retrieves the non-embedded counterpart for an embedded okapi-default identifier, eg. "okf_plaintext_regex_paragraphs" for "okf_plaintext@okf_plaintext_regex_paragraphs"
+     * Retrieves the non-embedded counterpart for an embedded okapi-default identifier,
+     * eg. "okf_plaintext_regex_paragraphs" for "okf_plaintext@okf_plaintext_regex_paragraphs"
      * @throws ZfExtended_Exception
      */
     public static function createOkapiDefaultIdentifier(string $identifier): ?string
@@ -165,7 +201,7 @@ class editor_Plugins_Okapi_Bconf_Filters
     public static function parseIdentifier(string $identifier): stdClass
     {
         $parts = explode('@', $identifier);
-        if (count($parts) !== 2 || substr($parts[0], 0, 4) !== 'okf_') {
+        if (count($parts) !== 2 || ! str_starts_with($parts[0], 'okf_')) {
             throw new ZfExtended_Exception('OKAPI FPRM identifier ' . $identifier . ' is not valid');
         }
         $result = new stdClass();
@@ -193,31 +229,29 @@ class editor_Plugins_Okapi_Bconf_Filters
 
     /**
      * Creates the path of a testfile in the testfile-folder
-     * @throws editor_Models_ConfigException
-     * @throws editor_Plugins_Okapi_Exception
      */
     public static function createTestfilePath(string $testFile): string
     {
         return editor_Plugins_Okapi_Init::getDataDir() . self::TESTFILE_FOLDER . '/' . $testFile;
     }
 
-    public static function instance(): editor_Plugins_Okapi_Bconf_Filters
+    public static function instance(): Filters
     {
         if (self::$_instance == null) {
-            self::$_instance = new editor_Plugins_Okapi_Bconf_Filters();
+            self::$_instance = new Filters();
         }
 
         return self::$_instance;
     }
 
-    private editor_Plugins_Okapi_Bconf_Filter_Okapi $okapiFilters;
+    private OkapiFilterInventory $okapiFilters;
 
-    private editor_Plugins_Okapi_Bconf_Filter_Translate5 $translate5Filters;
+    private T5FilterInventory $translate5Filters;
 
     protected function __construct()
     {
-        $this->okapiFilters = editor_Plugins_Okapi_Bconf_Filter_Okapi::instance();
-        $this->translate5Filters = editor_Plugins_Okapi_Bconf_Filter_Translate5::instance();
+        $this->okapiFilters = OkapiFilterInventory::instance();
+        $this->translate5Filters = T5FilterInventory::instance();
     }
 
     public function isValidOkapiDefaultFilter(string $identifier): bool
@@ -244,12 +278,12 @@ class editor_Plugins_Okapi_Bconf_Filters
     }
 
     /**
-     * Checks, whether the $identifier is a default identifier, either OKAPI default, OKAPI embedded default or translate5 adjusted default
-     * @throws ZfExtended_Exception
+     * Checks, whether the $identifier is a default identifier, either OKAPI default,
+     * OKAPI embedded default or translate5 adjusted default
      */
     public function isEmbeddedDefaultFilter(string $type, string $id): bool
     {
-        if (editor_Plugins_Okapi_Bconf_Filter_Translate5::isTranslate5Id($id)) {
+        if (T5FilterInventory::isTranslate5Id($id)) {
             return $this->isEmbeddedTranslate5Filter($type, $id);
         } else {
             return $this->isEmbeddedOkapiDefaultFilter($type, $id);
@@ -271,13 +305,14 @@ class editor_Plugins_Okapi_Bconf_Filters
     }
 
     /**
-     * Finds the fprm path for an OKAPI default filter
-     * Note that this might actually return a tranlate5 adjusted filter in case it is a replacing filter
-     * This API will return NULL for a filter that could not be found and false for filters that do not support a settings file
-     * @return string|null|bool
+     * Finds the fprm path for an OKAPI default filter.
+     * Note that this might actually return a tranlate5 adjusted filter in case it is a replacing filter.
+     * This API will return NULL for a filter that could not be found and false for filters that do not support settings
      * @throws ZfExtended_Exception
+     * @throws editor_Models_ConfigException
+     * @throws OkapiException
      */
-    public function getOkapiDefaultFilterPathById($filterId)
+    public function getOkapiDefaultFilterPathById($filterId): string|null|bool
     {
         // first, search if there is a replacing filter
         $filters = $this->translate5Filters->findOkapiDefaultReplacingFilter($filterId);
@@ -309,7 +344,9 @@ class editor_Plugins_Okapi_Bconf_Filters
     {
         $filters = $this->translate5Filters->findFilter($type, $id);
         if (count($filters) > 1) {
-            throw new ZfExtended_Exception('Translate5 filter identifier ' . $type . self::IDENTIFIER_SEPERATOR . $id . ' is ambigous!');
+            throw new ZfExtended_Exception(
+                'Translate5 filter identifier ' . $type . self::IDENTIFIER_SEPERATOR . $id . ' is ambigous!'
+            );
         } elseif (count($filters) === 1) {
             return $this->translate5Filters->createFprmPath($filters[0]);
         }
@@ -347,7 +384,8 @@ class editor_Plugins_Okapi_Bconf_Filters
         $folder = editor_Plugins_Okapi_Init::getDataDir() . self::TESTFILE_FOLDER;
         foreach ($extensions as $extension) {
             if (! file_exists($folder . '/test.' . $extension)) {
-                error_log('Okapi Filter Testfile ' . get_class($this) . ': Missing filter testfile test.' . $extension . ' in ' . $folder);
+                error_log('Okapi Filter Testfile ' . get_class($this) . ':'
+                    . ' Missing filter testfile test.' . $extension . ' in ' . $folder);
                 $valid = false;
             }
         }

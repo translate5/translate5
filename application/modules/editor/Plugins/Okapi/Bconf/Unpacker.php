@@ -26,13 +26,18 @@
  END LICENSE AND COPYRIGHT
  */
 
+namespace MittagQI\Translate5\Plugins\Okapi\Bconf;
+
+use MittagQI\Translate5\Plugins\Okapi\Bconf\Parser\BconfParser;
+use ZfExtended_Debug;
+
 /**
  * Unpacks/Disassembles a bconf
  * This will create the necessary parts/files of the passed bconf when processing
  */
-final class editor_Plugins_Okapi_Bconf_Unpacker extends editor_Plugins_Okapi_Bconf_Parser_Bconf
+final class Unpacker extends BconfParser
 {
-    public function __construct(editor_Plugins_Okapi_Bconf_Entity $bconf)
+    public function __construct(BconfEntity $bconf)
     {
         $this->bconf = $bconf;
         $this->folder = $this->bconf->getDataDirectory();

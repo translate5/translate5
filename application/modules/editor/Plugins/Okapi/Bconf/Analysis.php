@@ -26,16 +26,23 @@
  END LICENSE AND COPYRIGHT
  */
 
+namespace MittagQI\Translate5\Plugins\Okapi\Bconf;
+
+use MittagQI\Translate5\Plugins\Okapi\Bconf\Parser\BconfParser;
+use Zend_Exception;
+use ZfExtended_Debug;
+use ZfExtended_Exception;
+
 /**
  * Unpacks/Disassembles a bconf for the purpose of analysis
  * This does not write any files !
  */
-final class editor_Plugins_Okapi_Bconf_Analysis extends editor_Plugins_Okapi_Bconf_Parser_Bconf
+final class Analysis extends BconfParser
 {
     /**
      * @throws Zend_Exception
      * @throws ZfExtended_Exception
-     * @throws editor_Plugins_Okapi_Bconf_InvalidException
+     * @throws BconfInvalidException
      */
     public function __construct(string $absoluteBconfPath)
     {

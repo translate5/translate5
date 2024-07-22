@@ -26,11 +26,19 @@
  END LICENSE AND COPYRIGHT
  */
 
+namespace MittagQI\Translate5\Plugins\Okapi\Bconf\Segmentation;
+
+use editor_Models_ConfigException;
+use editor_Plugins_Okapi_Init;
+use MittagQI\Translate5\Plugins\Okapi\Bconf\FileInventory;
+use MittagQI\Translate5\Plugins\Okapi\OkapiException;
+use stdClass;
+
 /**
  * Class representing the static data for the translate5 specific SRX files
  * The repository will keep a list of all versioned SRX-files from version 1 on
  */
-final class editor_Plugins_Okapi_Bconf_Segmentation_Translate5 extends editor_Plugins_Okapi_Bconf_FileInventory
+final class T5SrxInventory extends FileInventory
 {
     /*
      * A srx-entry has the following structure:
@@ -43,15 +51,15 @@ final class editor_Plugins_Okapi_Bconf_Segmentation_Translate5 extends editor_Pl
     }
      */
 
-    private static ?editor_Plugins_Okapi_Bconf_Segmentation_Translate5 $_instance = null;
+    private static ?T5SrxInventory $_instance = null;
 
     /**
      * Classic Singleton
      */
-    public static function instance(): editor_Plugins_Okapi_Bconf_Segmentation_Translate5
+    public static function instance(): T5SrxInventory
     {
         if (self::$_instance == null) {
-            self::$_instance = new editor_Plugins_Okapi_Bconf_Segmentation_Translate5();
+            self::$_instance = new T5SrxInventory();
         }
 
         return self::$_instance;
@@ -85,7 +93,6 @@ final class editor_Plugins_Okapi_Bconf_Segmentation_Translate5 extends editor_Pl
      */
     public function findByHash(string $hash): ?stdClass
     {
-        $result = [];
         foreach ($this->inventory as $index => $item) {
             if ($item->sourceHash === $hash || $item->targetHash === $hash) {
                 return $item;
@@ -100,7 +107,6 @@ final class editor_Plugins_Okapi_Bconf_Segmentation_Translate5 extends editor_Pl
      */
     public function findByVersion(int $version): ?stdClass
     {
-        $result = [];
         foreach ($this->inventory as $index => $item) {
             if ($item->version <= $version) {
                 return $item;
@@ -113,7 +119,7 @@ final class editor_Plugins_Okapi_Bconf_Segmentation_Translate5 extends editor_Pl
     /**
      * Creates the patj for the source/target srx
      * @throws editor_Models_ConfigException
-     * @throws editor_Plugins_Okapi_Exception
+     * @throws OkapiException
      */
     public function createSrxPath(stdClass $srxItem, string $field = 'source'): string
     {
@@ -123,29 +129,33 @@ final class editor_Plugins_Okapi_Bconf_Segmentation_Translate5 extends editor_Pl
     /**
      * Checks if all SRX files of the inventory are present
      * Used in the API Test for the Bconf filters
-     * @return bool
+     * @throws editor_Models_ConfigException
+     * @throws OkapiException
      */
-    public function validate()
+    public function validate(): bool
     {
         $valid = true;
-        $lastVersion = null;
         foreach ($this->inventory as $index => $srxFile) {
             $sourceSrx = $this->createSrxPath($srxFile, 'source');
             $targetSrx = $this->createSrxPath($srxFile, 'target');
             if (! file_exists($sourceSrx)) {
-                error_log('Okapi Segmentation Inventory ' . get_class($this) . ': Missing SRX file ' . $sourceSrx);
+                error_log('Okapi Segmentation Inventory ' . get_class($this) . ':'
+                    . ' Missing SRX file ' . $sourceSrx);
                 $valid = false;
             }
             if ($sourceSrx != $targetSrx && ! file_exists($targetSrx)) {
-                error_log('Okapi Segmentation Inventory ' . get_class($this) . ': Missing SRX file ' . $targetSrx);
+                error_log('Okapi Segmentation Inventory ' . get_class($this) . ':'
+                    . ' Missing SRX file ' . $targetSrx);
                 $valid = false;
             }
-            if ($lastVersion !== null && $srxFile->version >= $lastVersion) {
-                error_log('Okapi Segmentation Inventory ' . get_class($this) . ': Wrong Version in item ' . ($index - 1));
+            if ((int) $srxFile->version > editor_Plugins_Okapi_Init::BCONF_VERSION_INDEX) {
+                error_log('Okapi Segmentation Inventory ' . get_class($this) . ':'
+                    . ' Wrong Version in item ' . ($index - 1));
                 $valid = false;
             }
             if (strlen($srxFile->sourceHash) !== 32 || strlen($srxFile->targetHash) !== 32) {
-                error_log('Okapi Segmentation Inventory ' . get_class($this) . ': Wrong Hashes in item ' . $index);
+                error_log('Okapi Segmentation Inventory ' . get_class($this) . ':'
+                    . ' Wrong Hashes in item ' . $index);
                 $valid = false;
             }
         }

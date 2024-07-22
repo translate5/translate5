@@ -98,7 +98,7 @@ class ConfigMaintenance
      */
     public function addJettyUrl(string $url): array
     {
-        $service = editor_Plugins_Okapi_Init::createService(Service::ID);
+        $service = editor_Plugins_Okapi_Init::createService(OkapiService::ID);
         $addedServers = $service->findOkapiVersions($url);
 
         if(!empty($addedServers)){
@@ -331,7 +331,7 @@ class ConfigMaintenance
      */
     public function purgeOffline(bool $sortByVersion = false): array
     {
-        $service = editor_Plugins_Okapi_Init::createService(Service::ID);
+        $service = editor_Plugins_Okapi_Init::createService(OkapiService::ID);
         $serverList = $service->getOnlineServers();
 
         if ($sortByVersion) {

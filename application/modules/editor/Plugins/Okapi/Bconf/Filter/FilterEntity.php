@@ -26,11 +26,28 @@
  END LICENSE AND COPYRIGHT
  */
 
+namespace MittagQI\Translate5\Plugins\Okapi\Bconf\Filter;
+
+use editor_Utils;
+use MittagQI\Translate5\Plugins\Okapi\Bconf\BconfEntity;
+use MittagQI\Translate5\Plugins\Okapi\Bconf\Filters;
+use MittagQI\Translate5\Plugins\Okapi\Db\BconfFilterTable;
+use MittagQI\Translate5\Plugins\Okapi\Db\Validator\BconfFilterValidator;
+use MittagQI\Translate5\Plugins\Okapi\OkapiException;
+use stdClass;
+use Zend_Db_Table_Abstract;
+use Zend_Db_Table_Exception;
+use Zend_Exception;
+use ZfExtended_Debug;
+use ZfExtended_Exception;
+use ZfExtended_Models_Entity_Abstract;
+use ZfExtended_Models_Entity_NotFoundException;
+
 /**
  * Okapi Bconf Filter Entity Object
  *
  * Represent a single customized FPRM file that has been customized by the user.
- * see editor_Plugins_Okapi_Bconf_Filters and editor_Plugins_Okapi_Bconf_Filter_Fprm for more documentation
+ * see Filters and Fprm for more documentation
  *
  * @method string getId()
  * @method void setId(int $id)
@@ -49,7 +66,7 @@
  * @method string getHash()
  * @method void setHash(string $hash)
  */
-class editor_Plugins_Okapi_Bconf_Filter_Entity extends ZfExtended_Models_Entity_Abstract
+final class FilterEntity extends ZfExtended_Models_Entity_Abstract
 {
     /**
      * @var string
@@ -68,34 +85,40 @@ class editor_Plugins_Okapi_Bconf_Filter_Entity extends ZfExtended_Models_Entity_
      * @throws Zend_Exception
      * @throws ZfExtended_Exception
      * @throws ZfExtended_Models_Entity_NotFoundException
-     * @throws editor_Plugins_Okapi_Exception
+     * @throws \ReflectionException
+     * @throws OkapiException
      */
-    public static function preProcessNewEntry(int $bconfId, string $okapiType, string $okapiId, string $filterName): stdClass
-    {
-        $bconf = new editor_Plugins_Okapi_Bconf_Entity();
+    public static function preProcessNewEntry(
+        int $bconfId,
+        string $okapiType,
+        string $okapiId,
+        string $filterName,
+    ): stdClass {
+        $bconf = new BconfEntity();
         $bconf->load($bconfId);
         // we need the old identifier to copy the fprm
-        $oldIdentifier = editor_Plugins_Okapi_Bconf_Filters::createIdentifier($okapiType, $okapiId);
-        $newOkapiId = editor_Plugins_Okapi_Bconf_Filter_Entity::createOkapiId($bconf, $filterName, $okapiType);
-        $newIdentifier = editor_Plugins_Okapi_Bconf_Filters::createIdentifier($okapiType, $newOkapiId);
+        $oldIdentifier = Filters::createIdentifier($okapiType, $okapiId);
+        $newOkapiId = FilterEntity::createOkapiId($bconf, $filterName, $okapiType);
+        $newIdentifier = Filters::createIdentifier($okapiType, $newOkapiId);
         // retrieves the filepath of the fprm to copy
         $sourcePath = $bconf->createPath(self::createFileFromIdentifier($oldIdentifier));
-        if (editor_Plugins_Okapi_Bconf_Filters::instance()->isEmbeddedOkapiDefaultFilter($okapiType, $okapiId)) {
-            $sourcePath = editor_Plugins_Okapi_Bconf_Filters::instance()->getOkapiDefaultFilterPathById($okapiId);
-        } elseif (editor_Plugins_Okapi_Bconf_Filters::instance()->isEmbeddedTranslate5Filter($okapiType, $okapiId)) {
-            $sourcePath = editor_Plugins_Okapi_Bconf_Filters::instance()->getTranslate5FilterPath($okapiType, $okapiId);
+        if (Filters::instance()->isEmbeddedOkapiDefaultFilter($okapiType, $okapiId)) {
+            $sourcePath = Filters::instance()->getOkapiDefaultFilterPathById($okapiId);
+        } elseif (Filters::instance()->isEmbeddedTranslate5Filter($okapiType, $okapiId)) {
+            $sourcePath = Filters::instance()->getTranslate5FilterPath($okapiType, $okapiId);
         } elseif (! file_exists($sourcePath)) {
-            throw new editor_Plugins_Okapi_Exception('E1409', [
+            throw new OkapiException('E1409', [
                 'filterfile' => $sourcePath,
                 'details' => 'The file was not found in ' . ltrim($bconf->createPath(''), '/'),
             ]);
         }
         $targetPath = $bconf->createPath(self::createFileFromIdentifier($newIdentifier));
         copy($sourcePath, $targetPath);
-        $fprm = new editor_Plugins_Okapi_Bconf_Filter_Fprm($targetPath);
+        $fprm = new Fprm($targetPath);
         // DEBUG
         if (ZfExtended_Debug::hasLevel('plugin', 'OkapiBconfProcessing')) {
-            error_log('BCONF FILTER: created new identifier "' . $newIdentifier . '" and copied FPRM-file for bconf-filter "' . $filterName . '" for bconf ' . $bconf->getId());
+            error_log('BCONF FILTER: created new identifier "' . $newIdentifier
+                . '" and copied FPRM-file for bconf-filter "' . $filterName . '" for bconf ' . $bconf->getId());
         }
         // generate return data
         $newData = new stdClass();
@@ -111,9 +134,10 @@ class editor_Plugins_Okapi_Bconf_Filter_Entity extends ZfExtended_Models_Entity_
      * Generates the okapi-id for a new custom filter
      * @throws Zend_Exception
      * @throws ZfExtended_Models_Entity_NotFoundException
-     * @throws editor_Plugins_Okapi_Exception
+     * @throws \ReflectionException
+     * @throws OkapiException
      */
-    public static function createOkapiId(editor_Plugins_Okapi_Bconf_Entity $bconf, string $name, string $okapiType): string
+    public static function createOkapiId(BconfEntity $bconf, string $name, string $okapiType): string
     {
         $baseId = $bconf->getCustomFilterProviderId() . '-' . editor_Utils::filenameFromUserText($name, false);
         if (strlen($baseId) > (self::MAX_IDENTIFIER_LENGTH - 2)) {
@@ -122,7 +146,7 @@ class editor_Plugins_Okapi_Bconf_Filter_Entity extends ZfExtended_Models_Entity_
         $okapiId = $baseId;
         $dir = $bconf->getDataDirectory() . '/';
         $count = 0;
-        while (file_exists($dir . editor_Plugins_Okapi_Bconf_Filters::createIdentifier($okapiType, $okapiId) . '.' . self::EXTENSION)) {
+        while (file_exists($dir . Filters::createIdentifier($okapiType, $okapiId) . '.' . self::EXTENSION)) {
             $count++;
             $okapiId = $baseId . '-' . $count;
         }
@@ -135,21 +159,21 @@ class editor_Plugins_Okapi_Bconf_Filter_Entity extends ZfExtended_Models_Entity_
         return $identifier . '.' . self::EXTENSION;
     }
 
-    protected $dbInstanceClass = 'editor_Plugins_Okapi_Db_BconfFilter';
+    protected $dbInstanceClass = BconfFilterTable::class;
 
-    protected $validatorInstanceClass = 'editor_Plugins_Okapi_Db_Validator_BconfFilter';
+    protected $validatorInstanceClass = BconfFilterValidator::class;
 
-    private ?editor_Plugins_Okapi_Bconf_Entity $bconf = null;
+    private ?BconfEntity $bconf = null;
 
     /**
      * @throws ZfExtended_Models_Entity_NotFoundException
      */
-    public function getRelatedBconf(): editor_Plugins_Okapi_Bconf_Entity
+    public function getRelatedBconf(): BconfEntity
     {
         // use cached bconf only with identical ID
         if ($this->bconf === null || $this->bconf->getId() != $this->getBconfId()) {
-            $this->bconf = new editor_Plugins_Okapi_Bconf_Entity();
-            $this->bconf->load($this->getBconfId());
+            $this->bconf = new BconfEntity();
+            $this->bconf->load((int) $this->getBconfId());
         }
 
         return $this->bconf;
@@ -160,7 +184,7 @@ class editor_Plugins_Okapi_Bconf_Filter_Entity extends ZfExtended_Models_Entity_
      */
     public function getIdentifier(): string
     {
-        return editor_Plugins_Okapi_Bconf_Filters::createIdentifier($this->getOkapiType(), $this->getOkapiId());
+        return Filters::createIdentifier($this->getOkapiType(), $this->getOkapiId());
     }
 
     /**
@@ -174,7 +198,7 @@ class editor_Plugins_Okapi_Bconf_Filter_Entity extends ZfExtended_Models_Entity_
     /**
      * Retrieves the server-path to our related fprm
      * @throws ZfExtended_Models_Entity_NotFoundException
-     * @throws editor_Plugins_Okapi_Exception
+     * @throws OkapiException
      */
     public function getPath(): string
     {
@@ -184,16 +208,19 @@ class editor_Plugins_Okapi_Bconf_Filter_Entity extends ZfExtended_Models_Entity_
     /**
      * @throws ZfExtended_Exception
      * @throws ZfExtended_Models_Entity_NotFoundException
-     * @throws editor_Plugins_Okapi_Exception
+     * @throws OkapiException
      */
-    public function getFprm(): editor_Plugins_Okapi_Bconf_Filter_Fprm
+    public function getFprm(): Fprm
     {
-        return new editor_Plugins_Okapi_Bconf_Filter_Fprm($this->getPath());
+        return new Fprm($this->getPath());
     }
 
     /**
      * Retrieves our related file-extensions
      * Note, that this fetches the related bconf from DB, reda the extensions-mapping & parses it
+     * @throws ZfExtended_Exception
+     * @throws ZfExtended_Models_Entity_NotFoundException
+     * @throws OkapiException
      */
     public function getMappedExtensions(): array
     {
@@ -220,10 +247,10 @@ class editor_Plugins_Okapi_Bconf_Filter_Entity extends ZfExtended_Models_Entity_
         foreach ($this->getRowsByBconfId($bconfId) as $row) {
             unset($row['hash']);
             // the identifier can act as a unique ID in the frontend, akapiType and okapiId are not unique
-            $row['identifier'] = editor_Plugins_Okapi_Bconf_Filters::createIdentifier($row['okapiType'], $row['okapiId']);
-            $row['editable'] = editor_Plugins_Okapi_Bconf_Filters::hasGui($row['okapiType']);
+            $row['identifier'] = Filters::createIdentifier($row['okapiType'], $row['okapiId']);
+            $row['editable'] = Filters::hasGui($row['okapiType']);
             $row['isCustom'] = true;
-            $row['guiClass'] = editor_Plugins_Okapi_Bconf_Filters::getGuiClass($row['okapiType']);
+            $row['guiClass'] = Filters::getGuiClass($row['okapiType']);
             $rows[] = $row;
         }
 
@@ -259,7 +286,9 @@ class editor_Plugins_Okapi_Bconf_Filter_Entity extends ZfExtended_Models_Entity_
      */
     public function getHighestId(): int
     {
-        return intval($this->db->getAdapter()->fetchOne('SELECT MAX(id) FROM ' . $this->db->info(Zend_Db_Table_Abstract::NAME)));
+        return intval($this->db->getAdapter()->fetchOne(
+            'SELECT MAX(id) FROM ' . $this->db->info(Zend_Db_Table_Abstract::NAME)
+        ));
     }
 
     /**
@@ -270,7 +299,7 @@ class editor_Plugins_Okapi_Bconf_Filter_Entity extends ZfExtended_Models_Entity_
     {
         $identifiers = [];
         foreach ($this->getRowsByBconfId($bconfId) as $rowData) {
-            $identifiers[] = editor_Plugins_Okapi_Bconf_Filters::createIdentifier($rowData['okapiType'], $rowData['okapiId']);
+            $identifiers[] = Filters::createIdentifier($rowData['okapiType'], $rowData['okapiId']);
         }
 
         return $identifiers;

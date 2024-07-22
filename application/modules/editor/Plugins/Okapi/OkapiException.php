@@ -26,10 +26,11 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-/**
- * Okapi Exception
- */
-class editor_Plugins_Okapi_Exception extends ZfExtended_ErrorCodeException
+namespace MittagQI\Translate5\Plugins\Okapi;
+
+use ZfExtended_ErrorCodeException;
+
+class OkapiException extends ZfExtended_ErrorCodeException
 {
     /**
      * @var string

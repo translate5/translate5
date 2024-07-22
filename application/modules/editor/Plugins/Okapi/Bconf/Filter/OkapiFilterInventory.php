@@ -26,10 +26,15 @@
  END LICENSE AND COPYRIGHT
  */
 
+namespace MittagQI\Translate5\Plugins\Okapi\Bconf\Filter;
+
+use MittagQI\Translate5\Plugins\Okapi\Bconf\Filters;
+use ZfExtended_BadMethodCallException;
+
 /**
  * Class representing the static data for all okapi default filters a bconf can have
  */
-final class editor_Plugins_Okapi_Bconf_Filter_Okapi extends editor_Plugins_Okapi_Bconf_Filter_Inventory
+final class OkapiFilterInventory extends FilterInventory
 {
     /*
      * A filter-entry has the following structure:
@@ -44,16 +49,19 @@ final class editor_Plugins_Okapi_Bconf_Filter_Okapi extends editor_Plugins_Okapi
     },
      */
 
-    private static ?editor_Plugins_Okapi_Bconf_Filter_Okapi $_instance = null;
+    private static ?OkapiFilterInventory $_instance = null;
 
     /**
      * Validates a default-identifier (a mapping-identifier pointing to an okapi-default and not a fprm-file)
+     * @throws ZfExtended_BadMethodCallException
      */
     public static function isValidDefaultIdentifier(string $identifier): bool
     {
         // avoid nonsense
-        if (str_contains($identifier, editor_Plugins_Okapi_Bconf_Filters::IDENTIFIER_SEPERATOR)) {
-            throw new ZfExtended_BadMethodCallException('editor_Plugins_Okapi_Bconf_Filter_Okapi::isValidDefaultIdentifier can only check Okapi default filters that do not point to a fprm file');
+        if (str_contains($identifier, Filters::IDENTIFIER_SEPERATOR)) {
+            throw new ZfExtended_BadMethodCallException(
+                'OkapiFilterInventory::isValidDefaultIdentifier can only check Okapi default filters that do not point to a fprm file'
+            );
         }
         if (count(self::instance()->findFilter(null, $identifier)) > 0) {
             return true;
@@ -86,17 +94,18 @@ final class editor_Plugins_Okapi_Bconf_Filter_Okapi extends editor_Plugins_Okapi
             return $result[0]->mime;
         }
 
-        // the mime type has only informative character. Therefore we use a generic default in case of not being able to evaluate it
+        // the mime type has only informative character,
+        // therefore we use a generic default in case of not being able to evaluate it
         return 'text/plain';
     }
 
     /**
      * Classic Singleton
      */
-    public static function instance(): editor_Plugins_Okapi_Bconf_Filter_Okapi
+    public static function instance(): OkapiFilterInventory
     {
         if (self::$_instance == null) {
-            self::$_instance = new editor_Plugins_Okapi_Bconf_Filter_Okapi();
+            self::$_instance = new OkapiFilterInventory();
         }
 
         return self::$_instance;

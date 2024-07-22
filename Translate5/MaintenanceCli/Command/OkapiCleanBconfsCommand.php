@@ -29,9 +29,9 @@
 namespace Translate5\MaintenanceCli\Command;
 
 use editor_Models_Task_Meta;
-use editor_Plugins_Okapi_Bconf_Entity;
-use editor_Plugins_Okapi_Bconf_Filter_Entity;
 use editor_Plugins_Okapi_Init;
+use MittagQI\Translate5\Plugins\Okapi\Bconf\BconfEntity;
+use MittagQI\Translate5\Plugins\Okapi\Bconf\Filter\FilterEntity;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -60,11 +60,19 @@ class OkapiCleanBconfsCommand extends Translate5AbstractCommand
 
     /**
      * Execute the command
-     * {@inheritDoc}
      * @throws Zend_Exception
-     * @see \Symfony\Component\Console\Command\Command::execute()
+     * @throws \ReflectionException
+     * @throws \Zend_Db_Statement_Exception
+     * @throws \Zend_Db_Table_Row_Exception
+     * @throws \ZfExtended_Exception
+     * @throws \ZfExtended_Models_Entity_Exceptions_IntegrityConstraint
+     * @throws \ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey
+     * @throws \ZfExtended_NoAccessException
+     * @throws \ZfExtended_UnprocessableEntity
+     * @throws \editor_Models_ConfigException
+     * @throws \MittagQI\Translate5\Plugins\Okapi\OkapiException
      */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $this->initInputOutput($input, $output);
         $this->initTranslate5AppOrTest();
@@ -72,8 +80,8 @@ class OkapiCleanBconfsCommand extends Translate5AbstractCommand
         $this->writeTitle('Clean invalid bconfs and orphaned data');
 
         $doDelete = $this->input->getOption('delete');
-        $bconfEntity = new editor_Plugins_Okapi_Bconf_Entity();
-        $bconfFilterEntity = new editor_Plugins_Okapi_Bconf_Filter_Entity();
+        $bconfEntity = new BconfEntity();
+        $bconfFilterEntity = new FilterEntity();
         $userDataDir = $bconfEntity::getUserDataDir();
         $allGood = true;
 

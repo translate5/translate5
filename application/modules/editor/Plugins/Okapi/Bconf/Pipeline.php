@@ -26,7 +26,14 @@
  END LICENSE AND COPYRIGHT
  */
 
+namespace MittagQI\Translate5\Plugins\Okapi\Bconf;
+
+use MittagQI\Translate5\Plugins\Okapi\Bconf\Parser\PropertiesParser;
+use MittagQI\Translate5\Plugins\Okapi\Bconf\Segmentation\Srx;
 use MittagQI\ZfExtended\MismatchException;
+use SimpleXMLElement;
+use ZfExtended_Exception;
+use ZfExtended_NotFoundException;
 
 /**
  * Class representing the pipeline of a BCONF
@@ -34,7 +41,7 @@ use MittagQI\ZfExtended\MismatchException;
  * For validation, we analyse the content as XML and properties
  * To manipulate the SRX-pathes, we replace the strings as it is to complicated to imlement a XML/Properties bridge
  */
-final class editor_Plugins_Okapi_Bconf_Pipeline extends editor_Plugins_Okapi_Bconf_ResourceFile
+final class Pipeline extends ResourceFile
 {
     /*
      * A typical pipline file looks like this:
@@ -129,14 +136,18 @@ writerOptions.escapeGT.b=false
      */
     public function setSrxFile(string $field, string $file)
     {
-        if (pathinfo($file, PATHINFO_EXTENSION) !== editor_Plugins_Okapi_Bconf_Segmentation_Srx::EXTENSION) {
+        if (pathinfo($file, PATHINFO_EXTENSION) !== Srx::EXTENSION) {
             throw new ZfExtended_Exception('A SRX file must have the file-extension "srx": ' . $file);
         }
         if ($field === 'source') {
-            $this->content = preg_replace('~sourceSrxPath\s*=\s*' . pathinfo($this->sourceSrxPath, PATHINFO_FILENAME) . '~', 'sourceSrxPath=' . pathinfo($file, PATHINFO_FILENAME), $this->content);
+            $this->content =
+                preg_replace('~sourceSrxPath\s*=\s*' . pathinfo($this->sourceSrxPath, PATHINFO_FILENAME)
+                    . '~', 'sourceSrxPath=' . pathinfo($file, PATHINFO_FILENAME), $this->content);
             $this->sourceSrxPath = $file;
         } elseif ($field === 'target') {
-            $this->content = preg_replace('~targetSrxPath\s*=\s*' . pathinfo($this->targetSrxPath, PATHINFO_FILENAME) . '~', 'targetSrxPath=' . pathinfo($file, PATHINFO_FILENAME), $this->content);
+            $this->content =
+                preg_replace('~targetSrxPath\s*=\s*' . pathinfo($this->targetSrxPath, PATHINFO_FILENAME)
+                    . '~', 'targetSrxPath=' . pathinfo($file, PATHINFO_FILENAME), $this->content);
             $this->targetSrxPath = $file;
         } else {
             throw new MismatchException('E2004', [$field, 'field']);
@@ -170,7 +181,11 @@ writerOptions.escapeGT.b=false
         return true;
     }
 
-    private function parse(string $content)
+    /**
+     * @throws ZfExtended_Exception
+     * @throws ZfExtended_NotFoundException
+     */
+    private function parse(string $content): void
     {
         $pipeline = simplexml_load_string($content);
         if (! $pipeline) {
@@ -194,12 +209,14 @@ writerOptions.escapeGT.b=false
                 if ($lastPart === 'SegmentationStep') {
                     $hasSegmentationStep = true;
                     $propsContent = $step->__toString();
-                    $props = new editor_Plugins_Okapi_Bconf_Parser_Properties($propsContent);
+                    $props = new PropertiesParser($propsContent);
                     if (! $props->isValid()) {
                         $this->errors[] = 'invalid Segmentation step (' . $props->getErrorString(', ') . ')';
                     } else {
-                        $this->sourceSrxPath = ($props->has('sourceSrxPath')) ? basename($props->get('sourceSrxPath')) : null;
-                        $this->targetSrxPath = ($props->has('targetSrxPath')) ? basename($props->get('targetSrxPath')) : null;
+                        $this->sourceSrxPath =
+                            ($props->has('sourceSrxPath')) ? basename($props->get('sourceSrxPath')) : null;
+                        $this->targetSrxPath =
+                            ($props->has('targetSrxPath')) ? basename($props->get('targetSrxPath')) : null;
                     }
                 }
             }
@@ -210,7 +227,7 @@ writerOptions.escapeGT.b=false
         if (! $hasSegmentationStep) {
             $this->errors[] = 'the pipeline has no segmentation step';
         }
-        if (empty($this->sourceSrxPath) || empty($this->targetSrxPath) || pathinfo($this->sourceSrxPath, PATHINFO_EXTENSION) != editor_Plugins_Okapi_Bconf_Segmentation_Srx::EXTENSION || pathinfo($this->targetSrxPath, PATHINFO_EXTENSION) != editor_Plugins_Okapi_Bconf_Segmentation_Srx::EXTENSION) {
+        if (empty($this->sourceSrxPath) || empty($this->targetSrxPath) || pathinfo($this->sourceSrxPath, PATHINFO_EXTENSION) != Srx::EXTENSION || pathinfo($this->targetSrxPath, PATHINFO_EXTENSION) != Srx::EXTENSION) {
             $this->errors[] = 'the pipeline had no or invalid entries for the source or target segmentation srx file';
         } else {
             // we will remove any path from the SRX-Files to normalize the value (it usually contains the rainbow workspace path)

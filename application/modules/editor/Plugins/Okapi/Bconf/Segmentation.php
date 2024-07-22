@@ -26,33 +26,45 @@
  END LICENSE AND COPYRIGHT
  */
 
+namespace MittagQI\Translate5\Plugins\Okapi\Bconf;
+
+use editor_Models_ConfigException;
+use editor_Utils;
+use MittagQI\Translate5\Plugins\Okapi\OkapiException;
+use MittagQI\Translate5\Plugins\Okapi\Bconf\Segmentation\Srx;
+use MittagQI\Translate5\Plugins\Okapi\Bconf\Segmentation\T5SrxInventory;
 use MittagQI\ZfExtended\MismatchException;
+use stdClass;
+use ZfExtended_Debug;
+use ZfExtended_Exception;
 
 /**
- * Class processing SRX files on import and repacking outdated bconfs, also the upload/processing of SRX files is covered here
+ * Class processing SRX files on import and repacking outdated bconfs,
+ * also the upload/processing of SRX files is covered here
  *
- *  Updating / Identifying translate5 adjusted SRX files:
- * translate 5 holds a set of adjusted SRX files, they are stored in translate5/application/modules/editor/Plugins/Okapi/data/srx/translate5/
- * When a bconf is packed, it will be checked, if the referenced SRX is a translate5 default SRX, in this case, the most recent version is taken/updated
+ * Updating / Identifying translate5 adjusted SRX files:
+ * translate 5 holds a set of adjusted SRX files, they are stored in .../Plugins/Okapi/data/srx/translate5/
+ * When a bconf is packed, it will be checked, if the referenced SRX is a translate5 default SRX, in this case,
+ * the most recent version is taken/updated.
  * This comparision is done by md5 hashing of the SRX file, there is no database-based data as with FPRMs
  *
- * Validating SRX files
+ * Validating SRX files:
  * Since we currently cannot validate the rules in a SRX file we validate a SRX by using the packed BCONF against a testfile.
- * This is done with editor_Plugins_Okapi_Bconf_Validation
+ * This is done with Bconf\Validation
  */
-final class editor_Plugins_Okapi_Bconf_Segmentation
+final class Segmentation
 {
     public const NAME_MAXLENGTH = 25;
 
-    private static ?editor_Plugins_Okapi_Bconf_Segmentation $_instance = null;
+    private static ?Segmentation $_instance = null;
 
     /**
      * Classic Singleton
      */
-    public static function instance(): editor_Plugins_Okapi_Bconf_Segmentation
+    public static function instance(): Segmentation
     {
         if (self::$_instance == null) {
-            self::$_instance = new editor_Plugins_Okapi_Bconf_Segmentation();
+            self::$_instance = new Segmentation();
         }
 
         return self::$_instance;
@@ -60,12 +72,12 @@ final class editor_Plugins_Okapi_Bconf_Segmentation
 
     private bool $doDebug;
 
-    private editor_Plugins_Okapi_Bconf_Segmentation_Translate5 $t5segmentation;
+    private T5SrxInventory $t5inventory;
 
     private function __construct()
     {
         $this->doDebug = ZfExtended_Debug::hasLevel('plugin', 'OkapiBconfProcessing');
-        $this->t5segmentation = editor_Plugins_Okapi_Bconf_Segmentation_Translate5::instance();
+        $this->t5inventory = T5SrxInventory::instance();
     }
 
     /**
@@ -73,9 +85,9 @@ final class editor_Plugins_Okapi_Bconf_Segmentation
      * Triggered by unpacking a bconf
      * @throws ZfExtended_Exception
      * @throws editor_Models_ConfigException
-     * @throws editor_Plugins_Okapi_Exception
+     * @throws OkapiException
      */
-    public function onUnpack(editor_Plugins_Okapi_Bconf_Pipeline $pipeline, string $folderPath)
+    public function onUnpack(Pipeline $pipeline, string $folderPath): void
     {
         $this->updateSrx($folderPath . '/' . $pipeline->getSrxFile('source'), 'unpack');
         // we only need to process the target if it is not identical to the source (what is the default structure9
@@ -87,18 +99,26 @@ final class editor_Plugins_Okapi_Bconf_Segmentation
     /**
      * Updates a SRX to the current version in an re-packing action
      * Triggered by re-packing an outdated bconf
+     * @throws ZfExtended_Exception
+     * @throws editor_Models_ConfigException
+     * @throws OkapiException
      */
-    public function onRepack(string $path)
+    public function onRepack(string $path): void
     {
         $this->updateSrx($path, 'repack');
     }
 
     /**
      * Processes an SRX upload. This action has a lot of challenges:
-     * - The sent SRX is a (maybe outdated) T5 default SRX and needs to be updated. The naming then will be the default name
+     * - The sent SRX is a (maybe outdated) T5 default SRX and needs to be updated. The naming then will be the default
      * - the sent name is a real custom srx and we need to validate it & change the name in the related files
+     * @throws MismatchException
+     * @throws ZfExtended_Exception
+     * @throws \Zend_Exception
+     * @throws \ZfExtended_UnprocessableEntity
+     * @throws OkapiException
      */
-    public function processUpload(editor_Plugins_Okapi_Bconf_Entity $bconf, string $field, string $uploadPath, string $uploadName)
+    public function processUpload(BconfEntity $bconf, string $field, string $uploadPath, string $uploadName): void
     {
         if ($field !== 'source' && $field !== 'target') {
             throw new MismatchException('E2004', [$field, 'field']);
@@ -114,29 +134,35 @@ final class editor_Plugins_Okapi_Bconf_Segmentation
         $srx->setContent(file_get_contents($uploadPath));
         if ($srx->validate()) {
             // if the SRX is a translate5 default SRX, we need no further validation
-            if ($this->isDefaultSrx($srx)) { // the isDefaultSrx call will update the content to the current revision if it is a default SRX
+            if ($this->isDefaultSrx($srx)) {
+                // the isDefaultSrx call will update the content to the current revision if it is a default SRX
                 // DEBUG
                 if ($this->doDebug) {
-                    error_log('SRX UPLOAD: The sent ' . $field . '-SRX ' . $uploadName . ' is a translate5 default SRX');
+                    error_log('SRX UPLOAD: The sent ' . $field . '-SRX ' . $uploadName
+                        . ' is a translate5 default SRX');
                 }
                 // if both srx's are identical, we copy the name/path over
                 if ($srx->getHash() === $otherSrx->getHash()) {
                     $srx->setPath($otherSrx->getPath());
                     // DEBUG
                     if ($this->doDebug) {
-                        error_log('SRX UPLOAD: The sent default ' . $field . '-SRX matches the other SRX and thus the files will be identical');
+                        error_log('SRX UPLOAD: The sent default ' . $field
+                            . '-SRX matches the other SRX and thus the files will be identical');
                     }
                 } else {
-                    $fileName = 'languages-' . $field . '.' . editor_Plugins_Okapi_Bconf_Segmentation_Srx::EXTENSION;
+                    $fileName = 'languages-' . $field . '.' . Srx::EXTENSION;
                     $srx->setPath($bconf->createPath($fileName));
-                    if ($otherSrx->getPath() === $srx->getPath()) { // the almost impossible case: the target srx is called "languages-source" (or vice versa)
-                        $fileName = 'languages-' . $otherField . '.' . editor_Plugins_Okapi_Bconf_Segmentation_Srx::EXTENSION;
+                    if ($otherSrx->getPath() === $srx->getPath()) {
+                        // the almost impossible case: the target srx is called "languages-source" (or vice versa)
+                        $fileName = 'languages-' . $otherField . '.' . Srx::EXTENSION;
                         $otherSrx->setPath($bconf->createPath($fileName));
                         $otherSrx->flush();
                     }
                     // DEBUG
                     if ($this->doDebug) {
-                        error_log('SRX UPLOAD: The sent default SRX is unique in the bconf. The new names are as follows: ' . $field . ': ' . $srx->getFile() . ', ' . $otherField . ': ' . $otherSrx->getFile());
+                        error_log('SRX UPLOAD: The sent default SRX is unique in the bconf.'
+                            . 'The new names are as follows: ' . $field . ': ' . $srx->getFile() . ', '
+                            . $otherField . ': ' . $otherSrx->getFile());
                     }
                 }
                 $srx->flush();
@@ -150,19 +176,23 @@ final class editor_Plugins_Okapi_Bconf_Segmentation
                 $srx->setPath($bconf->createPath($customFile));
                 // DEBUG
                 if ($this->doDebug) {
-                    error_log('SRX UPLOAD: The sent ' . $field . '-SRX ' . $uploadName . ' is a customized SRX and the filename will be ' . $customFile);
+                    error_log('SRX UPLOAD: The sent ' . $field . '-SRX ' . $uploadName
+                        . ' is a customized SRX and the filename will be ' . $customFile);
                 }
 
-                if ($otherSrx->getPath() === $srx->getPath()) { // another almost impossible case: custom name equals the other srx
-                    $customFile = pathinfo($customFile, PATHINFO_FILENAME) . '-' . $field . '.' . editor_Plugins_Okapi_Bconf_Segmentation_Srx::EXTENSION; // so we put not much effort into this ...
+                if ($otherSrx->getPath() === $srx->getPath()) {
+                    // another almost impossible case: custom name equals the other srx
+                    $customFile = pathinfo($customFile, PATHINFO_FILENAME) . '-' . $field . '.' . Srx::EXTENSION;
                     $srx->setPath($bconf->createPath($customFile));
                     // DEBUG
                     if ($this->doDebug) {
-                        error_log('SRX UPLOAD: The ' . $field . '-SRX new filename needs to be adjusted to ' . $customFile . ' because it matches the ' . $otherField . '-SRX');
+                        error_log('SRX UPLOAD: The ' . $field . '-SRX new filename needs to be adjusted to '
+                            . $customFile . ' because it matches the ' . $otherField . '-SRX');
                     }
                 }
                 // create backups
-                if ($srxOriginalPath !== $otherSrxOriginalPath) { // when pathes are identical the other SRX is our backup
+                if ($srxOriginalPath !== $otherSrxOriginalPath) {
+                    // when pathes are identical the other SRX is our backup
                     rename($srxOriginalPath, $srxOriginalPath . '.bu');
                 }
                 rename($pipeline->getPath(), $pipeline->getPath() . '.bu');
@@ -178,11 +208,13 @@ final class editor_Plugins_Okapi_Bconf_Segmentation
                 if ($bconfValidationError !== null) {
                     // DEBUG
                     if ($this->doDebug) {
-                        error_log('SRX UPLOAD FAILED: Validation of ' . $field . '-SRX unsuccessful. Validation-error: ' . $bconfValidationError);
+                        error_log('SRX UPLOAD FAILED: Validation of ' . $field
+                            . '-SRX unsuccessful. Validation-error: ' . $bconfValidationError);
                     }
                     // restore backups
                     unlink($srx->getPath());
-                    if ($srxOriginalPath !== $otherSrxOriginalPath) { // when pathes are identical the other SRX is our backup
+                    if ($srxOriginalPath !== $otherSrxOriginalPath) {
+                        // when pathes are identical the other SRX is our backup
                         rename($srxOriginalPath . '.bu', $srxOriginalPath);
                     }
                     unlink($pipeline->getPath());
@@ -192,7 +224,7 @@ final class editor_Plugins_Okapi_Bconf_Segmentation
                     $bconf->pack();
                     $bconf->invalidateCaches(); // invalidate the cached files, we changed the underlying files ...
 
-                    throw new editor_Plugins_Okapi_Exception('E1390', [
+                    throw new OkapiException('E1390', [
                         'filename' => $uploadName,
                         'details' => $bconfValidationError,
                     ]);
@@ -202,7 +234,8 @@ final class editor_Plugins_Okapi_Bconf_Segmentation
                         error_log('SRX UPLOAD: Validation of ' . $field . '-SRX successful');
                     }
                     // cleanup: remove backup files
-                    if ($srxOriginalPath !== $otherSrxOriginalPath) { // when pathes are identical the other SRX is our backup
+                    if ($srxOriginalPath !== $otherSrxOriginalPath) {
+                        // when pathes are identical the other SRX is our backup
                         unlink($srxOriginalPath . '.bu');
                     }
                     unlink($pipeline->getPath() . '.bu');
@@ -210,7 +243,7 @@ final class editor_Plugins_Okapi_Bconf_Segmentation
                 }
             }
         } else {
-            throw new editor_Plugins_Okapi_Exception('E1390', [
+            throw new OkapiException('E1390', [
                 'filename' => $uploadName,
                 'details' => $srx->getValidationError(),
             ]);
@@ -219,8 +252,10 @@ final class editor_Plugins_Okapi_Bconf_Segmentation
 
     /**
      * Evaluates, if the passed SRX is a default SRX. If so, the SRXs content is updated to the new version
+     * @throws editor_Models_ConfigException
+     * @throws OkapiException
      */
-    public function isDefaultSrx(editor_Plugins_Okapi_Bconf_Segmentation_Srx $srx)
+    public function isDefaultSrx(Srx $srx): bool
     {
         $data = $this->findCurrentReplacementData($srx->getHash());
         if ($data->path == null || ! $data->match) {
@@ -229,7 +264,8 @@ final class editor_Plugins_Okapi_Bconf_Segmentation
         if ($data->update) {
             // DEBUG
             if ($this->doDebug) {
-                error_log('SRX SEGMENTATION: updated default SRX ' . $srx->getFile() . ' to the current version ' . basename($data->path));
+                error_log('SRX SEGMENTATION: updated default SRX ' . $srx->getFile()
+                    . ' to the current version ' . basename($data->path));
             }
             $srx->setContent(file_get_contents($data->path));
         }
@@ -240,15 +276,15 @@ final class editor_Plugins_Okapi_Bconf_Segmentation
     /**
      * @throws ZfExtended_Exception
      * @throws editor_Models_ConfigException
-     * @throws editor_Plugins_Okapi_Exception
+     * @throws OkapiException
      */
-    private function updateSrx(string $path, string $action)
+    private function updateSrx(string $path, string $action): void
     {
         $content = file_get_contents($path);
         if ($content === false) {
             throw new ZfExtended_Exception('Can not read SRX file from path ' . $path);
         }
-        $hash = editor_Plugins_Okapi_Bconf_ResourceFile::createHash($content);
+        $hash = ResourceFile::createHash($content);
         $data = $this->findCurrentReplacementData($hash);
         if ($data->path != null && $data->match && $data->update) {
             // simple overwrite in the file-system
@@ -256,12 +292,14 @@ final class editor_Plugins_Okapi_Bconf_Segmentation
             copy($data->path, $path);
             // DEBUG
             if ($this->doDebug) {
-                error_log('SRX SEGMENTATION: ' . $action . ': updated ' . basename($path) . ' to the current version ' . basename($data->path));
+                error_log('SRX SEGMENTATION: ' . $action . ': updated ' . basename($path)
+                    . ' to the current version ' . basename($data->path));
             }
         } else {
             // DEBUG
             if ($this->doDebug) {
-                error_log('SRX SEGMENTATION: ' . $action . ': no need to update ' . basename($path) . ', its either custom or current');
+                error_log('SRX SEGMENTATION: ' . $action . ': no need to update ' . basename($path)
+                    . ', its either custom or current');
             }
         }
     }
@@ -270,7 +308,7 @@ final class editor_Plugins_Okapi_Bconf_Segmentation
      * Finds the current SRX to replace the one with the passed hash
      * Returns no path either if the passed hash is actual or if it was not found
      * @throws editor_Models_ConfigException
-     * @throws editor_Plugins_Okapi_Exception
+     * @throws OkapiException
      */
     private function findCurrentReplacementData(string $hash): stdClass
     {
@@ -278,14 +316,14 @@ final class editor_Plugins_Okapi_Bconf_Segmentation
         $data->match = false;
         $data->update = false;
         $data->path = null;
-        $matchingItem = $this->t5segmentation->findByHash($hash);
+        $matchingItem = $this->t5inventory->findByHash($hash);
         if ($matchingItem != null) {
             $data->match = true;
-            $currentItem = $this->t5segmentation->findCurrent();
+            $currentItem = $this->t5inventory->findCurrent();
             if ($currentItem->version > $matchingItem->version) {
                 $data->update = true;
                 $data->field = ($matchingItem->sourceHash === $hash) ? 'source' : 'target';
-                $data->path = $this->t5segmentation->createSrxPath($currentItem, $data->field);
+                $data->path = $this->t5inventory->createSrxPath($currentItem, $data->field);
             }
         }
 
@@ -313,20 +351,20 @@ final class editor_Plugins_Okapi_Bconf_Segmentation
             $newName = 'languages-' . $field;
         }
 
-        return $newName . '.' . editor_Plugins_Okapi_Bconf_Segmentation_Srx::EXTENSION;
+        return $newName . '.' . Srx::EXTENSION;
     }
 
     /**
      * @throws ZfExtended_Exception
      */
     private function updateSrxInFiles(
-        editor_Plugins_Okapi_Bconf_Pipeline $pipeline,
-        editor_Plugins_Okapi_Bconf_Content $content,
+        Pipeline $pipeline,
+        Content $content,
         string $field,
-        editor_Plugins_Okapi_Bconf_Segmentation_Srx $srx,
+        Srx $srx,
         string $otherField,
-        editor_Plugins_Okapi_Bconf_Segmentation_Srx $otherSrx
-    ) {
+        Srx $otherSrx
+    ): void {
         $pipeline->setSrxFile($field, $srx->getFile());
         $pipeline->setSrxFile($otherField, $otherSrx->getFile());
         $pipeline->flush();

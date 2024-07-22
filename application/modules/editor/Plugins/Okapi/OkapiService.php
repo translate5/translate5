@@ -28,7 +28,6 @@ END LICENSE AND COPYRIGHT
 
 namespace MittagQI\Translate5\Plugins\Okapi;
 
-use editor_Plugins_Okapi_Exception;
 use editor_Plugins_Okapi_Init;
 use editor_Utils;
 use JsonException;
@@ -41,12 +40,13 @@ use Zend_Exception;
 use Zend_Http_Client;
 use Zend_Http_Client_Exception;
 use Zend_Uri_Exception;
+use Zend_Uri_Http;
 use ZfExtended_Exception;
 use ZfExtended_Factory;
 use ZfExtended_Models_Entity_Exceptions_IntegrityConstraint;
 use ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey;
 
-final class Service extends DockerServiceAbstract
+final class OkapiService extends DockerServiceAbstract
 {
     public const ID = 'okapi';
 
@@ -153,6 +153,7 @@ final class Service extends DockerServiceAbstract
 
     /**
      * Retrieves the default service URL. Keep in Mind, this is only the configured URL on system level!
+     * @throws OkapiException
      */
     public function getServiceUrl(): ?string
     {
@@ -161,12 +162,14 @@ final class Service extends DockerServiceAbstract
 
     /**
      * Retrieves the configured okapi server URL, either the default or for the passed key
-     * @throws editor_Plugins_Okapi_Exception
+     * @throws OkapiException
      */
     public function getConfiguredServiceUrl(string $serverToUse = null, bool $throwExceptionOnError = true): ?string
     {
-        $services = $this->config->runtimeOptions->plugins->Okapi->server; /* @var Zend_Config $services */
-        $serviceUsed = (empty($serverToUse)) ? $this->config->runtimeOptions->plugins->Okapi->serverUsed : $serverToUse; /* @var ?string $serviceUsed */
+        /** @var Zend_Config $services */
+        $services = $this->config->runtimeOptions->plugins->Okapi->server;
+        /** @var ?string $serviceUsed */
+        $serviceUsed = (empty($serverToUse)) ? $this->config->runtimeOptions->plugins->Okapi->serverUsed : $serverToUse;
 
         if (! empty($services)) {
             if (! empty($serviceUsed)) {
@@ -176,24 +179,24 @@ final class Service extends DockerServiceAbstract
                         return rtrim($services->$serviceUsed, '/');
                     } elseif ($throwExceptionOnError) {
                         // configured value is empty
-                        throw new editor_Plugins_Okapi_Exception('E1059');
+                        throw new OkapiException('E1059');
                     }
                 } elseif ($throwExceptionOnError) {
                     // configured value does not exist in the list
-                    throw new editor_Plugins_Okapi_Exception('E1412', [
+                    throw new OkapiException('E1412', [
                         'servers' => $services,
                         'serverUsed' => $serviceUsed,
                     ]);
                 }
             } elseif ($throwExceptionOnError) {
                 // no service to use is set
-                throw new editor_Plugins_Okapi_Exception('E1411', [
+                throw new OkapiException('E1411', [
                     'serverUsed' => $serviceUsed,
                 ]);
             }
         } elseif ($throwExceptionOnError) {
             // list of services is empty
-            throw new editor_Plugins_Okapi_Exception('E1410');
+            throw new OkapiException('E1410');
         }
 
         return null;
@@ -293,8 +296,11 @@ final class Service extends DockerServiceAbstract
         return self::fetchServerVersion($serviceUrl);
     }
 
-    private function checkOtherConfiguredServers(Zend_Config $services, string $serviceUsed, bool $mainServiceSuccess): void
-    {
+    private function checkOtherConfiguredServers(
+        Zend_Config $services,
+        string $serviceUsed,
+        bool $mainServiceSuccess,
+    ): void {
         foreach ($services as $name => $url) {
             if ($name === $serviceUsed) {
                 continue;
@@ -327,7 +333,7 @@ final class Service extends DockerServiceAbstract
      */
     public function findOkapiVersions(mixed $url): array
     {
-        $url = \Zend_Uri_Http::fromString($url);
+        $url = Zend_Uri_Http::fromString($url);
         $url->setPath(''); //clean path if given to get okapi root server
         $result = [];
 
@@ -390,7 +396,7 @@ final class Service extends DockerServiceAbstract
      */
     private function singleOkapiInstanceFallback(string $url): string
     {
-        $uri = \Zend_Uri_Http::fromString($url);
+        $uri = Zend_Uri_Http::fromString($url);
         if (! str_contains($uri->getPath(), 'okapi-longhorn')) {
             // if just the okapi server was passed here, we assume a server with one okapi version installed,
             // so path to okapi itself must be added

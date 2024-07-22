@@ -26,10 +26,12 @@
  END LICENSE AND COPYRIGHT
  */
 
+namespace MittagQI\Translate5\Plugins\Okapi\Bconf\Parser;
+
 /**
  * Class providing base functionality to parse an Extension-Mapping extracted from a bconf
  */
-class editor_Plugins_Okapi_Bconf_Parser_ExtensionMapping
+class ExtensionMappingParser
 {
     /**
      * @var string

@@ -49,7 +49,7 @@ if (empty($this) || empty($argv) || $argc < 5 || $argc > 7) {
     die("please dont call the script direct! Call it by using DBUpdater!\n\n");
 }
 
-if (! class_exists('editor_Plugins_Okapi_Bconf_Entity')) {
+if (! class_exists('editor_Plugins_Okapi_Init')) {
     return;
 }
 
@@ -71,7 +71,7 @@ try {
 }
 
 try {
-    $rootDir = editor_Plugins_Okapi_Bconf_Entity::getUserDataDir();
+    $rootDir = \MittagQI\Translate5\Plugins\Okapi\Bconf\BconfEntity::getUserDataDir();
     $directories = scandir($rootDir);
     foreach ($directories as $dir) {
         if (in_array($dir, ['.', '..'])) {
@@ -82,7 +82,7 @@ try {
             error_log('DELETED editorOkapiDir/' . $dir);
         }
     }
-} catch (editor_Plugins_Okapi_Exception $e) {
+} catch (\MittagQI\Translate5\Plugins\Okapi\OkapiException $e) {
     //do nothing here
 }
 

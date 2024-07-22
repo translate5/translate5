@@ -26,22 +26,37 @@
  END LICENSE AND COPYRIGHT
  */
 
+use MittagQI\Translate5\Plugins\Okapi\Bconf\BconfEntity;
+use MittagQI\Translate5\Plugins\Okapi\Bconf\BconfInvalidException;
+use MittagQI\Translate5\Plugins\Okapi\Bconf\Filter\FilterEntity;
+use MittagQI\Translate5\Plugins\Okapi\Bconf\Filter\Fprm;
+use MittagQI\Translate5\Plugins\Okapi\Bconf\Filter\FprmValidation;
+use MittagQI\Translate5\Plugins\Okapi\OkapiException;
+
 /**
  * REST Endpoint Controller to serve a Bconfs Filter List for the Bconf-Management in the Preferences
  *
- * @property editor_Plugins_Okapi_Bconf_Filter_Entity $entity
+ * @property FilterEntity $entity
  */
 class editor_Plugins_Okapi_BconfFilterController extends ZfExtended_RestController
 {
-    protected $entityClass = 'editor_Plugins_Okapi_Bconf_Filter_Entity';
+    protected $entityClass = FilterEntity::class;
 
     /**
      * This also transfers the Extension-Mapping and the default Extensions to the frontend via metaData
-     * @throws editor_Plugins_Okapi_Exception
+     *
+     * @throws Zend_Db_Statement_Exception
+     * @throws Zend_Exception
+     * @throws ZfExtended_Exception
+     * @throws ZfExtended_Models_Entity_Exceptions_IntegrityConstraint
+     * @throws ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey
+     * @throws ZfExtended_Models_Entity_NotFoundException
+     * @throws editor_Models_ConfigException
+     * @throws OkapiException
      */
-    public function indexAction()
+    public function indexAction(): void
     {
-        $bconf = new editor_Plugins_Okapi_Bconf_Entity();
+        $bconf = new BconfEntity();
         $bconf->load($this->getParam('bconfId'));
 
         // add the grid data
@@ -49,6 +64,7 @@ class editor_Plugins_Okapi_BconfFilterController extends ZfExtended_RestControll
         $this->view->total = count($this->view->rows);
 
         // the extension mapping is sent as meta-data
+        // @phpstan-ignore-next-line
         if (! $this->view?->metaData) {
             $this->view->metaData = new stdClass();
         }
@@ -58,11 +74,14 @@ class editor_Plugins_Okapi_BconfFilterController extends ZfExtended_RestControll
 
     /**
      * Adjusted to additionally process the extension mapping
+     *
+     * @throws BconfInvalidException
+     * @throws Throwable
      * @throws ZfExtended_Exception
      * @throws ZfExtended_Models_Entity_NotFoundException
-     * @throws editor_Plugins_Okapi_Exception
+     * @throws OkapiException
      */
-    public function postAction()
+    public function postAction(): void
     {
         parent::postAction();
         // extensions have been sent as put-data
@@ -79,11 +98,14 @@ class editor_Plugins_Okapi_BconfFilterController extends ZfExtended_RestControll
 
     /**
      * Adjusted to additionally process the extension mapping
+     *
+     * @throws BconfInvalidException
+     * @throws Throwable
      * @throws ZfExtended_Exception
      * @throws ZfExtended_Models_Entity_NotFoundException
-     * @throws editor_Plugins_Okapi_Exception
+     * @throws OkapiException
      */
-    public function putAction()
+    public function putAction(): void
     {
         parent::putAction();
         // extensions have been sent as put-data
@@ -100,11 +122,14 @@ class editor_Plugins_Okapi_BconfFilterController extends ZfExtended_RestControll
 
     /**
      * Adjusted to additionally process the extension mapping
+     *
+     * @throws BconfInvalidException
+     * @throws Throwable
      * @throws ZfExtended_Exception
      * @throws ZfExtended_Models_Entity_NotFoundException
-     * @throws editor_Plugins_Okapi_Exception
+     * @throws OkapiException
      */
-    public function deleteAction()
+    public function deleteAction(): void
     {
         $this->entityLoad();
         $bconf = $this->entity->getRelatedBconf();
@@ -121,9 +146,9 @@ class editor_Plugins_Okapi_BconfFilterController extends ZfExtended_RestControll
     /**
      * @throws ZfExtended_Exception
      * @throws ZfExtended_Models_Entity_NotFoundException
-     * @throws editor_Plugins_Okapi_Exception
+     * @throws OkapiException
      */
-    public function getfprmAction()
+    public function getfprmAction(): void
     {
         $this->entityLoad();
         $fprm = $this->entity->getFprm();
@@ -136,24 +161,28 @@ class editor_Plugins_Okapi_BconfFilterController extends ZfExtended_RestControll
     }
 
     /**
+     * @throws BconfInvalidException
+     * @throws Throwable
+     * @throws Zend_Db_Statement_Exception
      * @throws ZfExtended_Exception
+     * @throws ZfExtended_Models_Entity_Exceptions_IntegrityConstraint
+     * @throws ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey
      * @throws ZfExtended_Models_Entity_NotFoundException
-     * @throws ZfExtended_UnprocessableEntity
-     * @throws editor_Plugins_Okapi_Exception
+     * @throws OkapiException
      */
-    public function savefprmAction()
+    public function savefprmAction(): void
     {
         $this->entityLoad();
         // create a fprm from the sent raw content
-        $fprm = new editor_Plugins_Okapi_Bconf_Filter_Fprm(
+        $fprm = new Fprm(
             $this->entity->getPath(),
             $this->getRequest()->getRawBody()
         );
         $validationError = null;
         if ($fprm->validate()) {
             // only x-properties based fprms can be properly tested by parsing the content. the others need a validation by using them in longhorn
-            if ($fprm->getType() != editor_Plugins_Okapi_Bconf_Filter_Fprm::TYPE_XPROPERTIES) {
-                $okapiValidation = new editor_Plugins_Okapi_Bconf_Filter_FprmValidation($this->entity->getRelatedBconf(), $fprm);
+            if ($fprm->getType() != Fprm::TYPE_XPROPERTIES) {
+                $okapiValidation = new FprmValidation($this->entity->getRelatedBconf(), $fprm);
                 // this
                 if ($okapiValidation->validate()) {
                     // update/pack the hash, flushing of bconf & fprm is already done by the validator
@@ -172,10 +201,10 @@ class editor_Plugins_Okapi_BconfFilterController extends ZfExtended_RestControll
         } else {
             // this can normally only happen if the implementation of a filter-frontend generated faulty data.
             // Only with YAML or XML currently this is a user-error, as both are edited as a whole in a big textfield
-            if ($fprm->getType() == editor_Plugins_Okapi_Bconf_Filter_Fprm::TYPE_YAML || $fprm->getType() == editor_Plugins_Okapi_Bconf_Filter_Fprm::TYPE_XML) {
+            if ($fprm->getType() == Fprm::TYPE_YAML || $fprm->getType() == Fprm::TYPE_XML) {
                 $validationError = $fprm->getValidationError();
             } else {
-                throw new editor_Plugins_Okapi_Exception('E1409', [
+                throw new OkapiException('E1409', [
                     'details' => $fprm->getValidationError(),
                     'filterfile' => $this->entity->getFile(),
                     'bconfId' => $this->entity->getBconfId(),
@@ -193,15 +222,21 @@ class editor_Plugins_Okapi_BconfFilterController extends ZfExtended_RestControll
 
     /**
      * Overwritten for additional processing on postAction
+     *
+     * @throws ReflectionException
+     * @throws Zend_Exception
+     * @throws ZfExtended_Exception
+     * @throws ZfExtended_Models_Entity_NotFoundException
+     * @throws OkapiException
      */
-    protected function decodePutData()
+    protected function decodePutData(): void
     {
         // crucial: new entries are sent with a temp identifier 'NEW@FILTER' which needs to be turned to a valid custom identifier and id
         // this represents a clone-operation and the original identifier can be restored from the (cloned) okapiType / okapiId
         parent::decodePutData();
         if ($this->data->identifier === 'NEW@FILTER') {
             // we need to copy the FPRM-file and generate the new identifier (returns Object with properties okapiId | identifier | path | hash
-            $newData = editor_Plugins_Okapi_Bconf_Filter_Entity::preProcessNewEntry(
+            $newData = FilterEntity::preProcessNewEntry(
                 intval($this->data->bconfId),
                 $this->data->okapiType,
                 $this->data->okapiId,

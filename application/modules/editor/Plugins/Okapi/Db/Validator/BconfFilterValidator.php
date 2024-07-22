@@ -26,24 +26,43 @@
  END LICENSE AND COPYRIGHT
  */
 
-class editor_Plugins_Okapi_Db_Validator_Bconf extends ZfExtended_Models_Validator_Abstract
+namespace MittagQI\Translate5\Plugins\Okapi\Db\Validator;
+
+use ZfExtended_Models_Validator_Abstract;
+
+class BconfFilterValidator extends ZfExtended_Models_Validator_Abstract
 {
     /**
-     * Validators for Okapi Bconf Entity
+     * Validators for Okapi Bconf Filter Entity
+     * @throws \Zend_Exception
      */
     protected function defineValidators()
     {
         $this->addValidator('id', 'int');
-        $this->addValidator('isDefault', 'boolean');
-        $this->addValidator('customerId', 'int');
-        $this->addValidator('name', 'stringLength', [
+        $this->addValidator('bconfId', 'int');
+        $this->addValidator('okapiType', 'stringLength', [
             'min' => 1,
             'max' => 50,
         ]);
-        $this->addValidator('description', 'stringLength', [
+        $this->addValidator('okapiId', 'stringLength', [
             'min' => 1,
             'max' => 255,
         ]);
-        $this->addValidator('versionIdx', 'int');
+        $this->addValidator('mimeType', 'stringLength', [
+            'min' => 0,
+            'max' => 50,
+        ]);
+        $this->addValidator('name', 'stringLength', [
+            'min' => 1,
+            'max' => 100,
+        ]);
+        $this->addValidator('description', 'stringLength', [
+            'min' => 0,
+            'max' => 255,
+        ]);
+        $this->addValidator('hash', 'stringLength', [
+            'min' => 32,
+            'max' => 32,
+        ]);
     }
 }

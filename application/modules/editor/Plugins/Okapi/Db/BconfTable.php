@@ -1,6 +1,6 @@
 <?php
 /*
- START LICENSE AND COPYRIGHT
+START LICENSE AND COPYRIGHT
 
  This file is part of translate5
 
@@ -23,41 +23,16 @@
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
              http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
- END LICENSE AND COPYRIGHT
- */
+END LICENSE AND COPYRIGHT
+*/
 
-class editor_Plugins_Okapi_Db_Validator_BconfFilter extends ZfExtended_Models_Validator_Abstract
+namespace MittagQI\Translate5\Plugins\Okapi\Db;
+
+use Zend_Db_Table_Abstract;
+
+class BconfTable extends Zend_Db_Table_Abstract
 {
-    /**
-     * Validators for Okapi Bconf Filter Entity
-     */
-    protected function defineValidators()
-    {
-        $this->addValidator('id', 'int');
-        $this->addValidator('bconfId', 'int');
-        $this->addValidator('okapiType', 'stringLength', [
-            'min' => 1,
-            'max' => 50,
-        ]);
-        $this->addValidator('okapiId', 'stringLength', [
-            'min' => 1,
-            'max' => 255,
-        ]);
-        $this->addValidator('mimeType', 'stringLength', [
-            'min' => 0,
-            'max' => 50,
-        ]);
-        $this->addValidator('name', 'stringLength', [
-            'min' => 1,
-            'max' => 100,
-        ]);
-        $this->addValidator('description', 'stringLength', [
-            'min' => 0,
-            'max' => 255,
-        ]);
-        $this->addValidator('hash', 'stringLength', [
-            'min' => 32,
-            'max' => 32,
-        ]);
-    }
+    protected $_name = 'LEK_okapi_bconf';
+
+    public $_primary = 'id';
 }

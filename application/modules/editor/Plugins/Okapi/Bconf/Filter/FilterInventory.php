@@ -26,19 +26,31 @@
  END LICENSE AND COPYRIGHT
  */
 
+namespace MittagQI\Translate5\Plugins\Okapi\Bconf\Filter;
+
+use editor_Models_ConfigException;
+use MittagQI\Translate5\Plugins\Okapi\Bconf\FileInventory;
+use MittagQI\Translate5\Plugins\Okapi\Bconf\Filters;
+use MittagQI\Translate5\Plugins\Okapi\OkapiException;
+use stdClass;
+
 /**
  * Class representing the static data for filter/fprm inventories
  */
-abstract class editor_Plugins_Okapi_Bconf_Filter_Inventory extends editor_Plugins_Okapi_Bconf_FileInventory
+abstract class FilterInventory extends FileInventory
 {
     public function createFprmFilename(stdClass $filterItem): string
     {
         return $filterItem->type . '@' . $filterItem->id;
     }
 
+    /**
+     * @throws editor_Models_ConfigException
+     * @throws OkapiException
+     */
     public function createFprmPath(stdClass $filterItem): string
     {
-        return $this->getFolderPath() . '/' . $this->createFprmFilename($filterItem) . '.' . editor_Plugins_Okapi_Bconf_Filter_Entity::EXTENSION;
+        return $this->getFolderPath() . '/' . $this->createFprmFilename($filterItem) . '.' . FilterEntity::EXTENSION;
     }
 
     /**
@@ -74,10 +86,11 @@ abstract class editor_Plugins_Okapi_Bconf_Filter_Inventory extends editor_Plugin
                 'name' => $item->name,
                 'description' => $item->description,
                 'mimeType' => $item->mime,
-                'identifier' => editor_Plugins_Okapi_Bconf_Filters::createIdentifier($item->type, $item->id), // the identifier can act as a unique ID in the frontend, akapiType and okapiId are not unique
-                'editable' => $item->settings && editor_Plugins_Okapi_Bconf_Filters::hasGui($item->type),
+                // the identifier can act as a unique ID in the frontend, akapiType and okapiId are not unique
+                'identifier' => Filters::createIdentifier($item->type, $item->id),
+                'editable' => $item->settings && Filters::hasGui($item->type),
                 'isCustom' => false,
-                'guiClass' => editor_Plugins_Okapi_Bconf_Filters::getGuiClass($item->type),
+                'guiClass' => Filters::getGuiClass($item->type),
             ];
             $startIndex++;
         }
@@ -88,14 +101,16 @@ abstract class editor_Plugins_Okapi_Bconf_Filter_Inventory extends editor_Plugin
     /**
      * Checks if all FPRM files of the inventory are present
      * Used in the API Test for the Bconf filters
-     * @return bool
+     * @throws editor_Models_ConfigException
+     * @throws OkapiException
      */
-    public function validate()
+    public function validate(): bool
     {
         $valid = true;
         foreach ($this->inventory as $filter) {
             if ($filter->settings !== false && ! file_exists($this->createFprmPath($filter))) {
-                error_log('Okapi Filter Inventory ' . get_class($this) . ': Missing FPRM file ' . $this->createFprmPath($filter));
+                error_log('Okapi Filter Inventory ' . get_class($this) . ': Missing FPRM file '
+                    . $this->createFprmPath($filter));
                 $valid = false;
             }
         }

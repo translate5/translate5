@@ -26,12 +26,24 @@
  END LICENSE AND COPYRIGHT
  */
 
+namespace MittagQI\Translate5\Plugins\Okapi\Bconf;
+
+use editor_Models_ConfigException;
+use editor_Plugins_Okapi_Worker;
+use MittagQI\Translate5\Plugins\Okapi\OkapiAdapter;
+use MittagQI\Translate5\Plugins\Okapi\OkapiException;
+use ReflectionException;
+use SplFileInfo;
+use Throwable;
+use ZfExtended_Debug;
+use ZfExtended_Exception;
+
 /**
  * This class processes an example file to validate a bconf
- * Therefore testfiles for all supported editor_Plugins_Okapi_Bconf_Filters::TESTABLE_EXTENSIONS exist in data/testfiles
+ * Therefore testfiles for all supported Filters::TESTABLE_EXTENSIONS exist in data/testfiles
  * Be aware, that not all BCONFs can be validated this way
  */
-class editor_Plugins_Okapi_Bconf_Validation
+class BconfValidation
 {
     /**
      * Used for testing/validating bconfs
@@ -45,10 +57,7 @@ class editor_Plugins_Okapi_Bconf_Validation
      */
     public const TARGET_LANGUAGE = 'de';
 
-    /**
-     * @var string
-     */
-    protected editor_Plugins_Okapi_Bconf_Entity $bconf;
+    protected BconfEntity $bconf;
 
     protected bool $valid = true;
 
@@ -58,7 +67,7 @@ class editor_Plugins_Okapi_Bconf_Validation
 
     protected bool $doDebug;
 
-    public function __construct(editor_Plugins_Okapi_Bconf_Entity $bconf)
+    public function __construct(BconfEntity $bconf)
     {
         $this->bconf = $bconf;
         $this->doDebug = ZfExtended_Debug::hasLevel('plugin', 'OkapiBconfValidation');
@@ -67,7 +76,9 @@ class editor_Plugins_Okapi_Bconf_Validation
     /**
      * Validates the bconf by processing an okapi project with it
      * @throws ZfExtended_Exception
-     * @throws editor_Plugins_Okapi_Exception
+     * @throws ReflectionException
+     * @throws editor_Models_ConfigException
+     * @throws OkapiException
      */
     public function validate(): bool
     {
@@ -105,13 +116,13 @@ class editor_Plugins_Okapi_Bconf_Validation
     /**
      * @throws ZfExtended_Exception
      * @throws editor_Models_ConfigException
-     * @throws editor_Plugins_Okapi_Exception
+     * @throws OkapiException
      */
     protected function getTestFilePath(): ?string
     {
-        foreach (editor_Plugins_Okapi_Bconf_Filters::TESTABLE_EXTENSIONS as $extension) {
+        foreach (Filters::TESTABLE_EXTENSIONS as $extension) {
             if ($this->bconf->hasSupportFor($extension)) {
-                return editor_Plugins_Okapi_Bconf_Filters::createTestfilePath('test.' . $extension);
+                return Filters::createTestfilePath('test.' . $extension);
             }
         }
 
@@ -127,21 +138,19 @@ class editor_Plugins_Okapi_Bconf_Validation
     }
 
     /**
-     * @return bool
+     * @throws ReflectionException
+     * @throws OkapiException
      */
-    protected function process(string $testfilePath)
+    protected function process(string $testfilePath): bool
     {
-        $testDir = editor_Plugins_Okapi_Bconf_Entity::getUserDataDir() . '/tmp';
+        $testDir = BconfEntity::getUserDataDir() . '/tmp';
         if (! is_dir($testDir)) {
             @mkdir($testDir, 0777, true);
         }
-        $dir = dirname($testfilePath);
         $manifestFile = sprintf(editor_Plugins_Okapi_Worker::MANIFEST_FILE, 'test');
         $testfile = basename($testfilePath);
-        /* @var $api editor_Plugins_Okapi_Connector */
-        $api = ZfExtended_Factory::get('editor_Plugins_Okapi_Connector');
+        $api = new OkapiAdapter();
 
-        /* @var $language editor_Models_Languages */
         try {
             $api->createProject();
             $api->uploadOkapiConfig($this->bconf->getPath(), true);
@@ -151,8 +160,9 @@ class editor_Plugins_Okapi_Bconf_Validation
             // cleanup downloaded files
             unlink($convertedFile);
             unlink($testDir . '/' . $manifestFile);
-        } catch (Exception $e) {
-            $this->validationError = 'Failed to convert ' . $testfile . ' for import with OKAPI [' . $e->getMessage() . ']';
+        } catch (Throwable $e) {
+            $this->validationError =
+                'Failed to convert ' . $testfile . ' for import with OKAPI [' . $e->getMessage() . ']';
             // DEBUG
             if ($this->doDebug) {
                 error_log('BCONF VALIDATION ERROR: ' . $this->validationError);

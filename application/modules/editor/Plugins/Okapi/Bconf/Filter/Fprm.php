@@ -26,28 +26,41 @@
  END LICENSE AND COPYRIGHT
  */
 
+namespace MittagQI\Translate5\Plugins\Okapi\Bconf\Filter;
+
+use MittagQI\Translate5\Plugins\Okapi\Bconf\Filters;
+use MittagQI\Translate5\Plugins\Okapi\Bconf\Parser\PropertiesParser;
+use MittagQI\Translate5\Plugins\Okapi\Bconf\ResourceFile;
+use stdClass;
 use Symfony\Component\Yaml\Exception\ParseException;
 use Symfony\Component\Yaml\Yaml;
+use Zend_Session_Namespace;
+use ZfExtended_Debug;
+use ZfExtended_Dom;
+use ZfExtended_Exception;
+use ZfExtended_Zendoverwrites_Translate;
 
 /**
  * Class representing a fprm file
  * There are generally four types of FPRM settings:
- * - properties: Java properties text/x-properties (key-value pairs seperated by "=", these always start with "#v1", e.g. okf_html
+ * - properties: Java properties text/x-properties (key-value pairs seperated by "=", these always start with "#v1",
+ *   e.g. okf_html
  * - xml: xml-based, which always start with "<?xml", e.g. okf_xml
  * - yaml: indented hierarchy of properties, e.g. okf_html
  * - plain: a special format, only used for "okf_wiki", which seems to be JSON-like (without quotes).
  *
  * X-Properties Validation:
- * X-Properties are validated against their counterparts OKAPI defaults (translate5/application/modules/editor/Plugins/Okapi/data/fprm/okapi/).
- * In this process, it is ensured, that all properties are of the right type and missing properties will be complemented by taking over the values from the OKAPI default
+ * X-Properties are validated against their counterparts OKAPI defaults (...Plugins/Okapi/data/fprm/okapi/).
+ * In this process, it is ensured, that all properties are of the right type and missing properties will be
+ * complemented by taking over the values from the OKAPI default
  *
  * XML/YAML/PLAIN Validation:
  * All other FPRM types are validated, by processing a testfile against the packed BCONF with the changed filter.
- * When this test is not successful, all changes made for packing & using the BCONF have to be reverted, see editor_Plugins_Okapi_Bconf_Filter_FprmValidation
+ * When this test is not successful, all changes made for packing & using the BCONF have to be reverted, see FprmValidation
  *
- * general documentation about filters, see editor_Plugins_Okapi_Bconf_Filters
+ * general documentation about filters, see Filters
  */
-final class editor_Plugins_Okapi_Bconf_Filter_Fprm extends editor_Plugins_Okapi_Bconf_ResourceFile
+final class Fprm extends ResourceFile
 {
     /**
      * @var string
@@ -76,7 +89,8 @@ final class editor_Plugins_Okapi_Bconf_Filter_Fprm extends editor_Plugins_Okapi_
     public const YAML_TYPES = ['okf_html', 'okf_xmlstream', 'okf_doxygen'];
 
     /**
-     * What kind of data 'okf_wiki' contains is really strange, it seems to be "JSON without quotes". Currently we cannot validate it ...
+     * What kind of data 'okf_wiki' contains is really strange, it seems to be "JSON without quotes"
+     * Currently we cannot validate it ...
      * @var array
      */
     public const PLAIN_TYPES = ['okf_wiki'];
@@ -106,20 +120,24 @@ final class editor_Plugins_Okapi_Bconf_Filter_Fprm extends editor_Plugins_Okapi_
         return $this->type;
     }
 
+    /**
+     * @throws ZfExtended_Exception
+     */
     public function getOkapiType(): string
     {
-        $idata = editor_Plugins_Okapi_Bconf_Filters::parseIdentifier($this->getIdentifier());
+        $idata = Filters::parseIdentifier($this->getIdentifier());
 
         return $idata->type;
     }
 
     public function getIdentifier(): string
     {
-        return editor_Plugins_Okapi_Bconf_Filters::createIdentifierFromPath($this->path);
+        return Filters::createIdentifierFromPath($this->path);
     }
 
     /**
      * Validates a FPRM based on it's type
+     * @throws ZfExtended_Exception
      */
     public function validate(bool $forImport = false): bool
     {
@@ -133,7 +151,8 @@ final class editor_Plugins_Okapi_Bconf_Filter_Fprm extends editor_Plugins_Okapi_
             }
             // DEBUG
             if ($this->doDebug) {
-                error_log('FPRM FILE ' . basename($this->path) . ' of type ' . $this->type . ' is invalid: could not parse XML');
+                error_log('FPRM FILE ' . basename($this->path) . ' of type '
+                    . $this->type . ' is invalid: could not parse XML');
             }
             $this->validationError = 'Invalid XML';
 
@@ -141,11 +160,12 @@ final class editor_Plugins_Okapi_Bconf_Filter_Fprm extends editor_Plugins_Okapi_
         }
         if ($this->type == self::TYPE_YAML) {
             try {
-                $result = Yaml::parse($this->content);
+                Yaml::parse($this->content);
             } catch (ParseException $exception) {
                 // DEBUG
                 if ($this->doDebug) {
-                    error_log('FPRM FILE ' . basename($this->path) . ' of type ' . $this->type . ' is invalid: could not parse YAML');
+                    error_log('FPRM FILE ' . basename($this->path) . ' of type '
+                        . $this->type . ' is invalid: could not parse YAML');
                 }
                 $this->validationError = 'Invalid YAML: ' . $exception->getMessage();
 
@@ -155,13 +175,14 @@ final class editor_Plugins_Okapi_Bconf_Filter_Fprm extends editor_Plugins_Okapi_
             return true;
         }
         if ($this->type == self::TYPE_XPROPERTIES) {
-            $propsValidation = new editor_Plugins_Okapi_Bconf_Filter_PropertiesValidation($this->path, $this->content);
+            $propsValidation = new PropertiesValidation($this->path, $this->content);
             if ($propsValidation->validate($forImport)) {
                 // if our content was missing some values, we "inherit" them by the default FPRMs
                 if ($propsValidation->hasToBeRepaired()) {
                     // DEBUG
                     if ($this->doDebug || ZfExtended_Debug::hasLevel('plugin', 'OkapiBconfProcessing')) {
-                        error_log('FPRM processing: properties based filter ' . $this->getIdentifier() . ' was missing some values that have been complemented');
+                        error_log('FPRM processing: properties based filter ' . $this->getIdentifier()
+                            . ' was missing some values that have been complemented');
                     }
                     $this->content = $propsValidation->getContent();
                 } elseif ($this->doDebug) {
@@ -173,7 +194,8 @@ final class editor_Plugins_Okapi_Bconf_Filter_Fprm extends editor_Plugins_Okapi_
             }
             // DEBUG
             if ($this->doDebug) {
-                error_log('FPRM FILE ' . basename($this->path) . ' of type ' . $this->type . ' is invalid');
+                error_log('FPRM FILE ' . basename($this->path) . ' of type ' . $this->type
+                    . ' is invalid');
             }
             $this->validationError = 'Invalid x-properties: ' . "\n" . $propsValidation->getValidationError();
 
@@ -185,7 +207,8 @@ final class editor_Plugins_Okapi_Bconf_Filter_Fprm extends editor_Plugins_Okapi_
         }
         // DEBUG
         if ($this->doDebug) {
-            error_log('FPRM FILE ' . basename($this->path) . ' of type ' . $this->type . ' is invalid: No content found');
+            error_log('FPRM FILE ' . basename($this->path) . ' of type ' . $this->type
+                . ' is invalid: No content found');
         }
         $this->validationError = 'No content found';
 
@@ -194,12 +217,11 @@ final class editor_Plugins_Okapi_Bconf_Filter_Fprm extends editor_Plugins_Okapi_
 
     /**
      * Creates the transformed data for the frontend
-     * @return array|stdClass
      */
-    public function crateTransformedData()
+    public function crateTransformedData(): array|stdClass
     {
         if ($this->type === self::TYPE_XPROPERTIES) {
-            $parser = new editor_Plugins_Okapi_Bconf_Parser_Properties($this->content);
+            $parser = new PropertiesParser($this->content);
 
             return $parser->getJson();
         } elseif ($this->type === self::TYPE_XML) {
@@ -216,22 +238,29 @@ final class editor_Plugins_Okapi_Bconf_Filter_Fprm extends editor_Plugins_Okapi_
      * Retrieves the FPRM GUI translations for the current type.
      * The convention is, that translationsare stored as JSON-files in /modules/editor/Plugins/Okapi/locales/
      * with the naming-scheme "$okapiType.$locale.json"
+     * @throws ZfExtended_Exception
      */
     public function crateTranslationData(): array
     {
         $translate = ZfExtended_Zendoverwrites_Translate::getInstance();
         $translationsDir = APPLICATION_PATH . '/modules/editor/Plugins/Okapi/locales/';
         $json = null;
-        $guiName = strtolower(editor_Plugins_Okapi_Bconf_Filters::getGuiClass($this->getOkapiType(), false));
+        $guiName = strtolower(Filters::getGuiClass($this->getOkapiType(), false));
         if (! empty($guiName)) {
             // FPRM editor localzation in user's langage if available
             $userLocale = (new Zend_Session_Namespace('user'))->data?->locale;
-            if ($userLocale && file_exists($translationsDir . $guiName . '.' . $userLocale . '.json')) {
-                $json = file_get_contents($translationsDir . $guiName . '.' . $userLocale . '.json');
-            } elseif (file_exists($translationsDir . $guiName . '.' . $translate->getSourceCodeLocale() . '.json')) {
-                $json = file_get_contents($translationsDir . $guiName . '.' . $translate->getSourceCodeLocale() . '.json');
-            } elseif (file_exists($translationsDir . $guiName . '.' . self::DEFAULT_GUI_LANGUAGE . '.json')) {
-                $json = file_get_contents($translationsDir . $guiName . '.' . self::DEFAULT_GUI_LANGUAGE . '.json');
+            $userLocaleFile = ($userLocale) ? $translationsDir . $guiName . '.' . $userLocale . '.json' : null;
+            // otherwise FPRM editor localzation in source code locale
+            $codeLocaleFile = $translationsDir . $guiName . '.' . $translate->getSourceCodeLocale() . '.json';
+            // or in the default locale as fallback
+            $defaultLocaleFile = $translationsDir . $guiName . '.' . self::DEFAULT_GUI_LANGUAGE . '.json';
+
+            if ($userLocaleFile && file_exists($userLocaleFile)) {
+                $json = file_get_contents($userLocaleFile);
+            } elseif (file_exists($codeLocaleFile)) {
+                $json = file_get_contents($codeLocaleFile);
+            } elseif (file_exists($defaultLocaleFile)) {
+                $json = file_get_contents($defaultLocaleFile);
             }
         }
         if (! empty($json)) {
@@ -246,11 +275,12 @@ final class editor_Plugins_Okapi_Bconf_Filter_Fprm extends editor_Plugins_Okapi_
 
     /**
      * Some GUIs have static data (e.g. dropdown values) that will also be added to the /getfprm endpoint
+     * @throws ZfExtended_Exception
      */
     public function createGuiData(): stdClass
     {
         $guiDataDir = APPLICATION_PATH . '/modules/editor/Plugins/Okapi/data/fprm/gui/';
-        $guiName = strtolower(editor_Plugins_Okapi_Bconf_Filters::getGuiClass($this->getOkapiType(), false));
+        $guiName = strtolower(Filters::getGuiClass($this->getOkapiType(), false));
         if (! empty($guiName)) {
             if (file_exists($guiDataDir . $guiName . '.json')) {
                 $json = file_get_contents($guiDataDir . $guiName . '.json');
@@ -264,8 +294,9 @@ final class editor_Plugins_Okapi_Bconf_Filter_Fprm extends editor_Plugins_Okapi_
 
     /**
      * Evaluates the type of FPRM we have
+     * @throws ZfExtended_Exception
      */
-    private function evaluateType()
+    private function evaluateType(): void
     {
         if (mb_substr(ltrim($this->content), 0, 3) === "#v1") {
             $this->type = self::TYPE_XPROPERTIES;

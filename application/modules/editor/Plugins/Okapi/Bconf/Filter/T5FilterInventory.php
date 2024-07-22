@@ -26,11 +26,13 @@
  END LICENSE AND COPYRIGHT
  */
 
+namespace MittagQI\Translate5\Plugins\Okapi\Bconf\Filter;
+
 /**
  * Class representing the static data for all translate5 specific filters
  * Note that the "replaceId" prop is specific to this inventory and needs to point to a valid id in okapi-filters.json
  */
-final class editor_Plugins_Okapi_Bconf_Filter_Translate5 extends editor_Plugins_Okapi_Bconf_Filter_Inventory
+final class T5FilterInventory extends FilterInventory
 {
     /*
      * A filter-entry has the following structure:
@@ -45,15 +47,15 @@ final class editor_Plugins_Okapi_Bconf_Filter_Translate5 extends editor_Plugins_
     },
      */
 
-    private static ?editor_Plugins_Okapi_Bconf_Filter_Translate5 $_instance = null;
+    private static ?T5FilterInventory $_instance = null;
 
     /**
      * Classic Singleton
      */
-    public static function instance(): editor_Plugins_Okapi_Bconf_Filter_Translate5
+    public static function instance(): T5FilterInventory
     {
         if (self::$_instance == null) {
-            self::$_instance = new editor_Plugins_Okapi_Bconf_Filter_Translate5();
+            self::$_instance = new T5FilterInventory();
         }
 
         return self::$_instance;
@@ -61,7 +63,7 @@ final class editor_Plugins_Okapi_Bconf_Filter_Translate5 extends editor_Plugins_
 
     public static function isTranslate5Id(string $id): bool
     {
-        return (strlen($id) > 9 && substr($id, 0, 10) === 'translate5');
+        return (strlen($id) > 9 && str_starts_with($id, 'translate5'));
     }
 
     /**
@@ -84,7 +86,7 @@ final class editor_Plugins_Okapi_Bconf_Filter_Translate5 extends editor_Plugins_
     }
 
     /**
-     * Retrieves an Translate5 adjusted filter that replaces an OKAPI default filter
+     * Retrieves a Translate5 adjusted filter that replaces an OKAPI default filter
      */
     public function findOkapiDefaultReplacingFilter(string $filterId): array
     {

@@ -26,24 +26,49 @@
  END LICENSE AND COPYRIGHT
  */
 
+namespace MittagQI\Translate5\Plugins\Okapi\Bconf;
+
+use MittagQI\Translate5\Plugins\Okapi\Bconf\Filter\FilterEntity;
+use MittagQI\Translate5\Plugins\Okapi\Bconf\Filter\Fprm;
+use MittagQI\Translate5\Plugins\Okapi\Bconf\Filter\OkapiFilterInventory;
+use MittagQI\Translate5\Plugins\Okapi\Bconf\Filter\T5FilterInventory;
+use MittagQI\Translate5\Plugins\Okapi\Bconf\Parser\ExtensionMappingParser;
+use MittagQI\Translate5\Plugins\Okapi\OkapiException;
+use Zend_Exception;
+use Zend_Registry;
+use ZfExtended_Debug;
+use ZfExtended_Exception;
+use ZfExtended_Logger;
+use ZfExtended_Models_Entity_NotFoundException;
+
 /**
  * Class representing the Extension mapping of an Bconf
  * It is able to parse the extension-mapping from file, build an internal model, manipulate it and write it back to file
- * Also the mapping for the actual bconf-file can be retrieved where the okapi-default entries are actually mapped to the mapping files
- * The processing when unpacking bconfs is also implemented here, including writing the extracted custom fprms to the DB and file-system
+ * Also the mapping for the actual bconf-file can be retrieved where the okapi-default entries are
+ * actually mapped to the mapping files. The processing when unpacking bconfs is also implemented here,
+ * including writing the extracted custom fprms to the DB and file-system.
  * The extension mapping is always stored as a filein a BCONFs file-repository with the name "extensions-mapping.txt"
  *
  * There are 4 types of filter-identifiers in a bconf:
- * OKAPI defaults: Identifiers like "okf_xml-AndroidStrings"; These names represent bconf-id's as used in Rainbow and Longhorn
- * OKAPI embedded defaults: Identifiers like "okf_xml@okf_xml-AndroidStrings"; These names have the formal bconf-type @ bconf-id. The id's are the ones used as OKAPI defaults.
- * translate5 adjusted defaults: Identifiers like "okf_xml@translate5-AndroidStrings"; Here the okapi-id always is "translate5" or srtarts with "translate5-"
- * User customized filters: Identifiers like "okf_xml@worldtranslation-my_special_setting"; Here the okapi-id has a special format: [ customerName or domain ] + "-" + [ websafe bconf name ]
+ * OKAPI defaults:
+ *     Identifiers like "okf_xml-AndroidStrings"; These names represent bconf-id's as used in Rainbow and Longhorn
+ * OKAPI embedded defaults:
+ *     Identifiers like "okf_xml@okf_xml-AndroidStrings"; These names have the formal bconf-type @ bconf-id.
+ *     The id's are the ones used as OKAPI defaults.
+ * translate5 adjusted defaults:
+ *     Identifiers like "okf_xml@translate5-AndroidStrings"; Here the okapi-id always is "translate5"
+ *     or srtarts with "translate5-"
+ * User customized filters:
+ *     Identifiers like "okf_xml@worldtranslation-my_special_setting"; Here the okapi-id has a special
+ *     format: [ customerName or domain ] + "-" + [ websafe bconf name ]
  *
- * When packing BCONFs, the Okapi default filters will all be embedded into the BCONF to ensure maximal compatibility over time and between different Okapi-Versions
- * When unpacking BCONFs, that have embedded OKAPI defaults, the OKAPI embedded default identifiers will be reverted to simple OKAPI defaults
- * Only user customized filters will actually have FPRM-files in the BCONF's file store, all other types will always be taken from the git-based stores in translate5/application/modules/editor/Plugins/Okapi/data/fprm/
+ * When packing BCONFs, the Okapi default filters will all be embedded into the BCONF to ensure maximal compatibility
+ * over time and between different Okapi-Versions. When unpacking BCONFs, that have embedded OKAPI defaults,
+ * the OKAPI embedded default identifiers will be reverted to simple OKAPI defaults. Only user customized filters will
+ * actually have FPRM-files in the BCONF's file store, all other types will always be taken from the git-based stores
+ * in translate5/application/modules/editor/Plugins/Okapi/data/fprm/
  */
-final class editor_Plugins_Okapi_Bconf_ExtensionMapping extends editor_Plugins_Okapi_Bconf_Parser_ExtensionMapping
+final class ExtensionMapping extends ExtensionMappingParser
 {
     /**
      * The filename an extension mapping generally has
@@ -57,25 +82,35 @@ final class editor_Plugins_Okapi_Bconf_ExtensionMapping extends editor_Plugins_O
      * Processes an embedded filter (fprm) when unpacking a bconf. The following cases can occur / are processed:
      * - an okapi-default filter is embedded => stays as it is
      * - an invalid okapi-default filter is embedded: simply is removed & warning written
-     * - an embedded okapi-default filter is imported (e.g. by reimporting a bconf generated with T5): will be rewritten to a non-embedded default filter
-     * - an embedded translate5 adjusted filter is imported: will be part of the extension-mapping but not saved to the file-system
-     * - a custom embedded filter is imported: Will be saved to the file-system & written as custom filter to the DB. Existing custom filters are searched by hash for a name & description
+     * - an embedded okapi-default filter is imported (e.g. by reimporting a bconf generated with T5):
+     *   will be rewritten to a non-embedded default filter
+     * - an embedded translate5 adjusted filter is imported: will be part of the extension-mapping
+     *   but not saved to the file-system
+     * - a custom embedded filter is imported: Will be saved to the file-system & written as custom filter to the DB.
+     *   Existing custom filters are searched by hash for a name & description
      * if true is returned, the fprm needs to be saved to the bconfs data dir
      *
      * @throws Zend_Exception
      * @throws ZfExtended_Exception
      */
-    public static function processUnpackedFilter(editor_Plugins_Okapi_Bconf_Entity $bconf, string $identifier, string $unpackedContent, array &$replacementMap, array &$customFilters): bool
-    {
+    public static function processUnpackedFilter(
+        BconfEntity $bconf,
+        string $identifier,
+        string $unpackedContent,
+        array &$replacementMap,
+        array &$customFilters,
+    ): bool {
         $doDebug = ZfExtended_Debug::hasLevel('plugin', 'OkapiExtensionMapping');
         // default-identifiers do not need to be embedded, we just check them
-        if (editor_Plugins_Okapi_Bconf_Filters::isOkapiDefaultIdentifier($identifier)) {
-            // a non-embedded default-identifier that does not point to a valid OKAPI default filter will be removed & a warning written
-            if (! editor_Plugins_Okapi_Bconf_Filters::instance()->isValidOkapiDefaultFilter($identifier)) {
+        if (Filters::isOkapiDefaultIdentifier($identifier)) {
+            // a non-embedded default-identifier that does not point to a valid OKAPI default filter will be removed
+            // and a warning written
+            if (! Filters::instance()->isValidOkapiDefaultFilter($identifier)) {
                 $replacementMap[$identifier] = self::INVALID_IDENTIFIER;
                 self::getLogger()->warn(
                     'E1407',
-                    'Okapi Plug-In: The extension mapping of the bconf "{bconf}" contains an invalid filter identifier "{identifier}" which has been removed',
+                    'Okapi Plug-In: The extension mapping of the bconf "{bconf}" contains an invalid filter'
+                    . ' identifier "{identifier}" which has been removed',
                     [
                         'bconf' => $bconf->getName(),
                         'bconfId' => $bconf->getId(),
@@ -84,31 +119,34 @@ final class editor_Plugins_Okapi_Bconf_ExtensionMapping extends editor_Plugins_O
                 );
                 // DEBUG
                 if ($doDebug) {
-                    error_log('ExtensionMapping processUnpackedFilter: okapi default identifier ' . $identifier . ' is invalid');
+                    error_log('ExtensionMapping processUnpackedFilter: okapi default identifier '
+                        . $identifier . ' is invalid');
                 }
             }
         } else {
             // process all identifiers pointing to a file
-            $idata = editor_Plugins_Okapi_Bconf_Filters::parseIdentifier($identifier);
-            if (editor_Plugins_Okapi_Bconf_Filters::instance()->isEmbeddedDefaultFilter($idata->type, $idata->id)) {
+            $idata = Filters::parseIdentifier($identifier);
+            if (Filters::instance()->isEmbeddedDefaultFilter($idata->type, $idata->id)) {
                 // when we import a embedded okapi default filter we map it to a non-embedded okapi default filter
-                if (editor_Plugins_Okapi_Bconf_Filters::instance()->isEmbeddedOkapiDefaultFilter($idata->type, $idata->id)) {
+                if (Filters::instance()->isEmbeddedOkapiDefaultFilter($idata->type, $idata->id)) {
                     $replacementMap[$identifier] = $idata->id;
                     // DEBUG
                     if ($doDebug) {
-                        error_log('ExtensionMapping processUnpackedFilter: replace ' . $identifier . ' with ' . $idata->id);
+                        error_log('ExtensionMapping processUnpackedFilter: replace ' . $identifier
+                            . ' with ' . $idata->id);
                     }
                 }
             } else {
                 // "real" custom filters, check if they have a supported type
-                if (editor_Plugins_Okapi_Bconf_Filter_Okapi::isValidType($idata->type)) {
+                if (OkapiFilterInventory::isValidType($idata->type)) {
                     // DEBUG
                     if ($doDebug) {
-                        error_log('ExtensionMapping processUnpackedFilter: custom filter with identifier ' . $identifier . ' will be embedded');
+                        error_log('ExtensionMapping processUnpackedFilter: custom filter with identifier '
+                            . $identifier . ' will be embedded');
                     }
                     // add a custom filter to the filesys & map (that later is flushed to the DB)
-                    $fprmPath = $bconf->createPath(editor_Plugins_Okapi_Bconf_Filter_Entity::createFileFromIdentifier($identifier));
-                    $fprm = new editor_Plugins_Okapi_Bconf_Filter_Fprm($fprmPath, $unpackedContent);
+                    $fprmPath = $bconf->createPath(FilterEntity::createFileFromIdentifier($identifier));
+                    $fprm = new Fprm($fprmPath, $unpackedContent);
                     if ($fprm->validate(true)) {
                         $fprm->flush();
                         $customFilters[$identifier] = $fprm->getHash();
@@ -121,7 +159,8 @@ final class editor_Plugins_Okapi_Bconf_ExtensionMapping extends editor_Plugins_O
                     $replacementMap[$identifier] = self::INVALID_IDENTIFIER;
                     self::getLogger()->warn(
                         'E1407',
-                        'Okapi Plug-In: The extension mapping of the bconf "{bconf}" contains an invalid filter identifier "{identifier}" which has been removed',
+                        'Okapi Plug-In: The extension mapping of the bconf "{bconf}" contains an invalid filter'
+                        . ' identifier "{identifier}" which has been removed',
                         [
                             'bconf' => $bconf->getName(),
                             'bconfId' => $bconf->getId(),
@@ -130,7 +169,8 @@ final class editor_Plugins_Okapi_Bconf_ExtensionMapping extends editor_Plugins_O
                     );
                     // DEBUG
                     if ($doDebug) {
-                        error_log('ExtensionMapping processUnpackedFilter: custom filter with identifier ' . $identifier . ' is invalid');
+                        error_log('ExtensionMapping processUnpackedFilter: custom filter with identifier '
+                            . $identifier . ' is invalid');
                     }
                 }
             }
@@ -179,13 +219,13 @@ final class editor_Plugins_Okapi_Bconf_ExtensionMapping extends editor_Plugins_O
 
     private bool $doDebug;
 
-    private editor_Plugins_Okapi_Bconf_Entity $bconf;
+    private BconfEntity $bconf;
 
     /**
      * @throws ZfExtended_Exception
-     * @throws editor_Plugins_Okapi_Exception
+     * @throws OkapiException
      */
-    public function __construct(editor_Plugins_Okapi_Bconf_Entity $bconf, ?array $unpackedLines = null, ?array $replacementMap = null)
+    public function __construct(BconfEntity $bconf, ?array $unpackedLines = null, ?array $replacementMap = null)
     {
         $this->path = $bconf->getExtensionMappingPath();
         $this->dir = rtrim(dirname($this->path), '/');
@@ -195,7 +235,8 @@ final class editor_Plugins_Okapi_Bconf_ExtensionMapping extends editor_Plugins_O
         if (is_array($unpackedLines) && is_array($replacementMap)) {
             // DEBUG
             if ($this->doDebug) {
-                error_log('ExtensionMapping construct by content:' . "\n" . print_r($unpackedLines, 1) . "\n" . ' replacementMap:' . "\n" . print_r($replacementMap, 1));
+                error_log('ExtensionMapping construct by content:' . "\n" . print_r($unpackedLines, 1)
+                    . "\n" . ' replacementMap:' . "\n" . print_r($replacementMap, 1));
             }
             // importing an unpacked bconf
             $this->unpackContent($unpackedLines, $replacementMap);
@@ -210,11 +251,13 @@ final class editor_Plugins_Okapi_Bconf_ExtensionMapping extends editor_Plugins_O
                 $content = file_get_contents($this->path);
             }
             if (empty($content)) {
-                throw new ZfExtended_Exception('editor_Plugins_Okapi_Bconf_ExtensionMapping can only be instantiated for an existing extension-mapping file (' . $this->path . ')');
+                throw new ZfExtended_Exception(
+                    'ExtensionMapping can only be instantiated for an existing extension-mapping file (' . $this->path . ')'
+                );
             }
             $this->parseContent($content);
             if (! $this->hasEntries()) {
-                throw new editor_Plugins_Okapi_Exception('E1405', [
+                throw new OkapiException('E1405', [
                     'bconf' => $bconf->getName(),
                     'bconfId' => $bconf->getId(),
                 ]);
@@ -232,12 +275,13 @@ final class editor_Plugins_Okapi_Bconf_ExtensionMapping extends editor_Plugins_O
      */
     public function getBconfId(): int
     {
-        return $this->bconf->getId();
+        return (int) $this->bconf->getId();
     }
 
     /**
      * Generates the frontend-model for the extension mapping, where identifier => extensions
-     * The non-embedded default identifiers like 'okf_xml-AndroidStrings' will be turned to embedded ones like 'okf_xml@okf_xml-AndroidStrings'
+     * The non-embedded default identifiers like 'okf_xml-AndroidStrings' will be turned to embedded ones like
+     * 'okf_xml@okf_xml-AndroidStrings'
      */
     public function getIdentifierMap(): array
     {
@@ -252,13 +296,14 @@ final class editor_Plugins_Okapi_Bconf_ExtensionMapping extends editor_Plugins_O
         // generate Frontend data model
         $jsonData = [];
         foreach ($items as $identifier => $extensions) {
-            if (editor_Plugins_Okapi_Bconf_Filters::isOkapiDefaultIdentifier($identifier)) {
-                $okapiType = editor_Plugins_Okapi_Bconf_Filters::instance()->getOkapiDefaultFilterTypeById($identifier);
+            if (Filters::isOkapiDefaultIdentifier($identifier)) {
+                $okapiType = Filters::instance()->getOkapiDefaultFilterTypeById($identifier);
                 if ($okapiType === null) {
                     // theoretically this can not happen
-                    error_log('INVALID non-embedded okapi default filter entry in extension mapping ' . $this->path . ' for bconf ' . $this->bconf->getId());
+                    error_log('INVALID non-embedded okapi default filter entry in extension mapping '
+                        . $this->path . ' for bconf ' . $this->bconf->getId());
                 } else {
-                    $jsonData[editor_Plugins_Okapi_Bconf_Filters::createIdentifier($okapiType, $identifier)] = $extensions;
+                    $jsonData[Filters::createIdentifier($okapiType, $identifier)] = $extensions;
                 }
             } else {
                 $jsonData[$identifier] = $extensions;
@@ -280,7 +325,7 @@ final class editor_Plugins_Okapi_Bconf_ExtensionMapping extends editor_Plugins_O
     public function findExtensionsForFilter(string $identifier): array
     {
         // this api is agnostic to passed embedded okapi default filters
-        $defaultIdentifier = editor_Plugins_Okapi_Bconf_Filters::createOkapiDefaultIdentifier($identifier);
+        $defaultIdentifier = Filters::createOkapiDefaultIdentifier($identifier);
         $extensions = [];
         foreach ($this->map as $extension => $filter) {
             if ($filter === $identifier || ($defaultIdentifier !== null && $filter === $defaultIdentifier)) {
@@ -298,7 +343,7 @@ final class editor_Plugins_Okapi_Bconf_ExtensionMapping extends editor_Plugins_O
     {
         $customIdentifiers = [];
         foreach ($this->map as $extension => $filter) {
-            if (editor_Plugins_Okapi_Bconf_Filters::instance()->isCustomFilter($filter)) {
+            if (Filters::instance()->isCustomFilter($filter)) {
                 $customIdentifiers[$filter] = true;
             }
         }
@@ -312,7 +357,7 @@ final class editor_Plugins_Okapi_Bconf_ExtensionMapping extends editor_Plugins_O
      * Removes extensions from the mapping and flushes the map if changed
      * Also updates the related content-file
      * @throws ZfExtended_Exception
-     * @throws editor_Plugins_Okapi_Exception
+     * @throws OkapiException
      */
     public function removeExtensions(array $extensions): bool
     {
@@ -336,7 +381,8 @@ final class editor_Plugins_Okapi_Bconf_ExtensionMapping extends editor_Plugins_O
             $this->updateBconfContent();
             // DEBUG
             if ($this->doDebug) {
-                error_log('ExtensionMapping removeExtensions: [ ' . implode(', ', $extensions) . ' ] have been removed' . "\n" . print_r($this->map, 1));
+                error_log('ExtensionMapping removeExtensions: [ ' . implode(', ', $extensions)
+                    . ' ] have been removed' . "\n" . print_r($this->map, 1));
             }
         }
 
@@ -347,15 +393,16 @@ final class editor_Plugins_Okapi_Bconf_ExtensionMapping extends editor_Plugins_O
      * Removes a filter from the mapping and deletes the corresponding fprm-file anf flushes the map if changed
      * Also updates the related content-file
      * @throws ZfExtended_Exception
-     * @throws editor_Plugins_Okapi_Exception
+     * @throws OkapiException
      */
     public function removeFilter(string $identifier): bool
     {
         // this api is agnostic to passed embedded okapi default filters
-        $defaultIdentifier = editor_Plugins_Okapi_Bconf_Filters::createOkapiDefaultIdentifier($identifier);
+        $defaultIdentifier = Filters::createOkapiDefaultIdentifier($identifier);
         // DEBUG
         if ($this->doDebug) {
-            error_log('ExtensionMapping removeFilter: ' . $identifier . ($defaultIdentifier ? ' || ' . $defaultIdentifier : ''));
+            error_log('ExtensionMapping removeFilter: ' . $identifier
+                . ($defaultIdentifier ? ' || ' . $defaultIdentifier : ''));
         }
 
         $newMap = [];
@@ -369,14 +416,15 @@ final class editor_Plugins_Okapi_Bconf_ExtensionMapping extends editor_Plugins_O
         }
         if ($removed) {
             $this->map = $newMap;
-            if (file_exists($this->dir . '/' . $identifier . '.' . editor_Plugins_Okapi_Bconf_Filter_Entity::EXTENSION)) {
-                @unlink($this->dir . '/' . $identifier . '.' . editor_Plugins_Okapi_Bconf_Filter_Entity::EXTENSION);
+            if (file_exists($this->dir . '/' . $identifier . '.' . FilterEntity::EXTENSION)) {
+                @unlink($this->dir . '/' . $identifier . '.' . FilterEntity::EXTENSION);
             }
             $this->flush();
             $this->updateBconfContent();
             // DEBUG
             if ($this->doDebug) {
-                error_log('ExtensionMapping removeFilter: ' . $identifier . ' has been removed' . "\n" . print_r($this->map, 1));
+                error_log('ExtensionMapping removeFilter: ' . $identifier . ' has been removed' . "\n"
+                    . print_r($this->map, true));
             }
         }
 
@@ -391,7 +439,7 @@ final class editor_Plugins_Okapi_Bconf_ExtensionMapping extends editor_Plugins_O
      */
     public function complementTranslate5Extensions(): bool
     {
-        $translate5Mapping = editor_Plugins_Okapi_Bconf_Filter_Translate5::instance()->getExtensionMappingEntries();
+        $translate5Mapping = T5FilterInventory::instance()->getExtensionMappingEntries();
         // DEBUG
         if ($this->doDebug) {
             error_log('ExtensionMapping syncTranslate5Extensions: ' . print_r($translate5Mapping, true));
@@ -409,7 +457,8 @@ final class editor_Plugins_Okapi_Bconf_ExtensionMapping extends editor_Plugins_O
             $this->updateBconfContent();
             // DEBUG
             if ($this->doDebug) {
-                error_log('ExtensionMapping syncTranslate5Extensions: mapping has been changed: ' . "\n" . print_r($this->map, 1));
+                error_log('ExtensionMapping syncTranslate5Extensions: mapping has been changed: ' . "\n"
+                    . print_r($this->map, true));
             }
         }
 
@@ -425,7 +474,8 @@ final class editor_Plugins_Okapi_Bconf_ExtensionMapping extends editor_Plugins_O
     {
         // DEBUG
         if ($this->doDebug) {
-            error_log('ExtensionMapping addFilter: ' . $identifier . ', extensions: [ ' . implode(', ', $extensions) . ' ]');
+            error_log('ExtensionMapping addFilter: ' . $identifier . ', extensions: [ '
+                . implode(', ', $extensions) . ' ]');
         }
 
         // we simply use the change API, but it seems resonable to have an explicit add function
@@ -440,10 +490,12 @@ final class editor_Plugins_Okapi_Bconf_ExtensionMapping extends editor_Plugins_O
     public function changeFilter(string $identifier, array $extensions): bool
     {
         // this api is agnostic to passed embedded okapi default filters
-        $defaultIdentifier = editor_Plugins_Okapi_Bconf_Filters::createOkapiDefaultIdentifier($identifier);
+        $defaultIdentifier = Filters::createOkapiDefaultIdentifier($identifier);
         // DEBUG
         if ($this->doDebug) {
-            error_log('ExtensionMapping changeFilter: ' . $identifier . ($defaultIdentifier ? ' || ' . $defaultIdentifier : '') . ', extensions: [ ' . implode(', ', $extensions) . ' ]');
+            error_log('ExtensionMapping changeFilter: ' . $identifier
+                . ($defaultIdentifier ? ' || ' . $defaultIdentifier : '')
+                . ', extensions: [ ' . implode(', ', $extensions) . ' ]');
         }
 
         $newMap = [];
@@ -473,7 +525,8 @@ final class editor_Plugins_Okapi_Bconf_ExtensionMapping extends editor_Plugins_O
             }
             $changed = true;
         }
-        // we must capture the case where different extensions of the same amount have been set, this cannot be evaluated with the logic above
+        // we must capture the case where different extensions of the same amount have been set,
+        // this cannot be evaluated with the logic above
         if (! $changed) {
             $changed = (count(array_diff($extBefore, $extensions)) !== 0);
         }
@@ -483,7 +536,9 @@ final class editor_Plugins_Okapi_Bconf_ExtensionMapping extends editor_Plugins_O
             $this->updateBconfContent();
             // DEBUG
             if ($this->doDebug) {
-                error_log('ExtensionMapping changeFilter: ' . $identifier . ' with extensions [ ' . implode(', ', $extensions) . ' ] has been changed: ' . "\n" . print_r($this->map, 1));
+                error_log('ExtensionMapping changeFilter: ' . $identifier . ' with extensions [ '
+                    . implode(', ', $extensions) . ' ] has been changed: '
+                    . "\n" . print_r($this->map, 1));
             }
         }
 
@@ -493,27 +548,26 @@ final class editor_Plugins_Okapi_Bconf_ExtensionMapping extends editor_Plugins_O
     /**
      * re-scans an existing bconf and brings the database in-sync with the filesystem
      * This is to support the initial rollout
-     * @throws Zend_Db_Statement_Exception
-     * @throws ZfExtended_BadMethodCallException
      * @throws ZfExtended_Exception
-     * @throws ZfExtended_Models_Entity_Exceptions_IntegrityConstraint
-     * @throws ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey
      * @throws ZfExtended_Models_Entity_NotFoundException
-     * @throws editor_Plugins_Okapi_Exception
+     * @throws \Zend_Db_Statement_Exception
+     * @throws \ZfExtended_Models_Entity_Exceptions_IntegrityConstraint
+     * @throws \ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey
+     * @throws OkapiException
      */
-    public function rescanFilters()
+    public function rescanFilters(): void
     {
         // DEBUG
         if ($this->doDebug) {
             error_log('ExtensionMapping rescanFilters');
         }
         // evaluate existing filters from db
-        $bconfFilter = new editor_Plugins_Okapi_Bconf_Filter_Entity();
+        $bconfFilter = new FilterEntity();
         $existingFilters = [];
         $existingNames = [];
         $allFilters = [];
-        foreach ($bconfFilter->getRowsByBconfId($this->bconf->getId()) as $filterData) {
-            $identifier = editor_Plugins_Okapi_Bconf_Filters::createIdentifier($filterData['okapiType'], $filterData['okapiId']);
+        foreach ($bconfFilter->getRowsByBconfId((int) $this->bconf->getId()) as $filterData) {
+            $identifier = Filters::createIdentifier($filterData['okapiType'], $filterData['okapiId']);
             $existingFilters[$identifier] = $filterData['id'];
             $existingNames[] = $filterData['name'];
         }
@@ -521,9 +575,9 @@ final class editor_Plugins_Okapi_Bconf_ExtensionMapping extends editor_Plugins_O
         $dir = $this->bconf->getDataDirectory();
         $filterFiles = glob($dir . '/*.fprm');
         foreach ($filterFiles as $filterFile) {
-            $identifier = editor_Plugins_Okapi_Bconf_Filters::createIdentifierFromPath($filterFile);
-            $idata = editor_Plugins_Okapi_Bconf_Filters::parseIdentifier($identifier);
-            if (editor_Plugins_Okapi_Bconf_Filters::instance()->isEmbeddedDefaultFilter($idata->type, $idata->id)) {
+            $identifier = Filters::createIdentifierFromPath($filterFile);
+            $idata = Filters::parseIdentifier($identifier);
+            if (Filters::instance()->isEmbeddedDefaultFilter($idata->type, $idata->id)) {
                 // translate5 and okapi filters must not be in the custom filter dir
                 @unlink($filterFile);
                 // DEBUG
@@ -533,7 +587,7 @@ final class editor_Plugins_Okapi_Bconf_ExtensionMapping extends editor_Plugins_O
             } else {
                 // if a filter is not in the DB we must do so
                 if (! array_key_exists($identifier, $existingFilters)) {
-                    $fprm = new editor_Plugins_Okapi_Bconf_Filter_Fprm($filterFile);
+                    $fprm = new Fprm($filterFile);
                     $this->flushFilterToDatabase($identifier, $fprm->getHash(), $existingNames);
                     // DEBUG
                     if ($this->doDebug) {
@@ -550,7 +604,8 @@ final class editor_Plugins_Okapi_Bconf_ExtensionMapping extends editor_Plugins_O
                 $bconfFilter->delete();
                 // DEBUG
                 if ($this->doDebug) {
-                    error_log('ExtensionMapping rescanFilters: deleted non-existing filter ' . $identifier . ' from database');
+                    error_log('ExtensionMapping rescanFilters: deleted non-existing filter '
+                        . $identifier . ' from database');
                 }
             }
         }
@@ -560,32 +615,33 @@ final class editor_Plugins_Okapi_Bconf_ExtensionMapping extends editor_Plugins_O
         $content->flush();
         // DEBUG
         if ($this->doDebug) {
-            error_log('ExtensionMapping rescanFilters: The bconf "' . $this->bconf->getName() . '" has ' . count($allFilters) . ' custom filters: [ ' . implode(', ', $allFilters) . ' ]');
+            error_log('ExtensionMapping rescanFilters: The bconf "' . $this->bconf->getName() . '" has '
+                . count($allFilters) . ' custom filters: [ ' . implode(', ', $allFilters) . ' ]');
         }
     }
 
     /**
      * Adds afilter to the database
-     * @throws Zend_Db_Statement_Exception
-     * @throws ZfExtended_BadMethodCallException
      * @throws ZfExtended_Exception
-     * @throws ZfExtended_Models_Entity_Exceptions_IntegrityConstraint
-     * @throws ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey
+     * @throws \Zend_Db_Statement_Exception
+     * @throws \ZfExtended_Models_Entity_Exceptions_IntegrityConstraint
+     * @throws \ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey
+     * @throws ZfExtended_Models_Entity_NotFoundException
      */
-    private function flushFilterToDatabase(string $identifier, string $hash, array &$usedNames)
+    private function flushFilterToDatabase(string $identifier, string $hash, array &$usedNames): void
     {
         // evaluate name & description from a filter that already exists in the DB
-        $idata = editor_Plugins_Okapi_Bconf_Filters::parseIdentifier($identifier);
-        $hashedEntity = new editor_Plugins_Okapi_Bconf_Filter_Entity();
+        $idata = Filters::parseIdentifier($identifier);
+        $hashedEntity = new FilterEntity();
 
         try {
             $hashedEntity->loadByTypeAndHash($idata->type, $hash);
             $name = $hashedEntity->getName();
             $description = $hashedEntity->getDescription();
-        } catch (ZfExtended_Models_Entity_NotFoundException $e) {
-            // revert secure filename to a somewhat human readable name, remove trailing counters like '-4'
+        } catch (ZfExtended_Models_Entity_NotFoundException) {
+            // revert secure filename to a somewhat human-readable name, remove trailing counters like '-4'
             $name = preg_replace('/\-[0-9]+$/', '', $idata->id);
-            // revert secure filename to a somewhat human readable name
+            // revert secure filename to a somewhat human-readable name
             $name = ucfirst(str_replace('_', ' ', $name));
             if ($name == '') { // just to be sure ...
                 $name = $idata->id;
@@ -609,7 +665,8 @@ final class editor_Plugins_Okapi_Bconf_ExtensionMapping extends editor_Plugins_O
         $usedNames[] = $name;
         // DEBUG
         if ($this->doDebug) {
-            error_log('ExtensionMapping flushFilterToDatabase: added ' . $identifier . ', "' . $name . '" to database');
+            error_log('ExtensionMapping flushFilterToDatabase: added ' . $identifier . ', "'
+                . $name . '" to database');
         }
     }
 
@@ -623,14 +680,15 @@ final class editor_Plugins_Okapi_Bconf_ExtensionMapping extends editor_Plugins_O
 
     /**
      * saves the passed filters ('identifier' => 'hash') to the database
-     * This is the follow-up to processUnpackedFilter, in a bconf, the filters are encoded before the mapping-file so the processing is "in the wrong direction"
-     * @throws Zend_Db_Statement_Exception
-     * @throws ZfExtended_BadMethodCallException
+     * This is the follow-up to processUnpackedFilter, in a bconf, the filters are encoded before the mapping-file
+     * so the processing is "in the wrong direction"
      * @throws ZfExtended_Exception
-     * @throws ZfExtended_Models_Entity_Exceptions_IntegrityConstraint
-     * @throws ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey
+     * @throws ZfExtended_Models_Entity_NotFoundException
+     * @throws \Zend_Db_Statement_Exception
+     * @throws \ZfExtended_Models_Entity_Exceptions_IntegrityConstraint
+     * @throws \ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey
      */
-    public function flushUnpacked(array $customFilters)
+    public function flushUnpacked(array $customFilters): void
     {
         $usedNames = [];
         foreach ($customFilters as $identifier => $hash) {
@@ -642,7 +700,7 @@ final class editor_Plugins_Okapi_Bconf_ExtensionMapping extends editor_Plugins_O
     /**
      * Retrieves the mapping to write to a packed bconf
      * @throws ZfExtended_Exception
-     * @throws editor_Plugins_Okapi_Exception
+     * @throws OkapiException
      */
     public function getMapForPacking(array $addedCustomIdentifiers): array
     {
@@ -654,7 +712,7 @@ final class editor_Plugins_Okapi_Bconf_ExtensionMapping extends editor_Plugins_O
     /**
      * Retrieves the additional fprm files that need to be additionally injected (apart from the custom ones) into a packed BCONF
      * @throws ZfExtended_Exception
-     * @throws editor_Plugins_Okapi_Exception
+     * @throws OkapiException
      */
     public function getOkapiDefaultFprmsForPacking(array $addedCustomIdentifiers): array
     {
@@ -664,32 +722,36 @@ final class editor_Plugins_Okapi_Bconf_ExtensionMapping extends editor_Plugins_O
     }
 
     /**
-     * Validates the extenion-mapping. Checks, there are only valid identifiers and the custom identifiers exist in the DB and the filesystem
+     * Validates the extenion-mapping. Checks, there are only valid identifiers
+     * and the custom identifiers exist in the DB and the filesystem
      * @throws ZfExtended_Exception
-     * @throws editor_Plugins_Okapi_Exception
+     * @throws OkapiException
      */
     public function validate(): bool
     {
         $this->validationErrors = [];
-        $filters = editor_Plugins_Okapi_Bconf_Filters::instance();
+        $filters = Filters::instance();
         $customFiltersFromDB = $this->bconf->findCustomFilterIdentifiers(); // thr custom identifiers in the DB
         foreach ($this->getAllFilters() as $identifier) {
-            if (editor_Plugins_Okapi_Bconf_Filters::isOkapiDefaultIdentifier($identifier)) {
+            if (Filters::isOkapiDefaultIdentifier($identifier)) {
                 if (! $filters->isValidOkapiDefaultFilter($identifier)) {
                     $this->validationErrors[] = 'Invalid OKAPI default filter "' . $identifier . '"';
                 }
             } else {
-                $idata = editor_Plugins_Okapi_Bconf_Filters::parseIdentifier($identifier);
+                $idata = Filters::parseIdentifier($identifier);
                 if ($filters->isEmbeddedOkapiDefaultFilter($idata->type, $idata->id)) {
-                    $this->validationErrors[] = 'Embedded OKAPI default filter "' . $identifier . '" not allowed in extension-mapping';
+                    $this->validationErrors[] =
+                        'Embedded OKAPI default filter "' . $identifier . '" not allowed in extension-mapping';
                 } elseif (! $filters->isEmbeddedTranslate5Filter($idata->type, $idata->id)) {
                     // custom filter, must exist in database & file-system
                     if (! in_array($identifier, $customFiltersFromDB)) {
-                        $this->validationErrors[] = 'Embedded custom filter "' . $identifier . '" not found in the database';
+                        $this->validationErrors[] =
+                            'Embedded custom filter "' . $identifier . '" not found in the database';
                     }
-                    $fprmPath = $this->bconf->createPath(editor_Plugins_Okapi_Bconf_Filter_Entity::createFileFromIdentifier($identifier));
+                    $fprmPath = $this->bconf->createPath(FilterEntity::createFileFromIdentifier($identifier));
                     if (! file_exists($fprmPath)) {
-                        $this->validationErrors[] = 'Embedded custom filter "' . $identifier . '" not found in the bconfs files';
+                        $this->validationErrors[] =
+                            'Embedded custom filter "' . $identifier . '" not found in the bconfs files';
                     }
                 }
             }
@@ -736,24 +798,25 @@ final class editor_Plugins_Okapi_Bconf_ExtensionMapping extends editor_Plugins_O
     /**
      * Transforms our map to what really should be in an packed bconf
      * @throws ZfExtended_Exception
-     * @throws editor_Plugins_Okapi_Exception
+     * @throws OkapiException
      */
     private function preparePacking(array $addedCustomIdentifiers)
     {
         // DEBUG
         if ($this->doDebug) {
-            error_log('ExtensionMapping preparePacking: addedCustomIdentifiers: [ ' . implode(', ', $addedCustomIdentifiers) . ' ]');
+            error_log('ExtensionMapping preparePacking: addedCustomIdentifiers: [ '
+                . implode(', ', $addedCustomIdentifiers) . ' ]');
         }
 
         if ($this->mapToPack == null) {
             $this->mapToPack = [];
             $this->fprmsToPack = [];
             foreach ($this->map as $extension => $identifier) {
-                if (editor_Plugins_Okapi_Bconf_Filters::isOkapiDefaultIdentifier($identifier)) {
+                if (Filters::isOkapiDefaultIdentifier($identifier)) {
                     // or it is a okapi default identifier which then needs to be added as explicit fprm
-                    $path = editor_Plugins_Okapi_Bconf_Filters::instance()->getOkapiDefaultFilterPathById($identifier);
+                    $path = Filters::instance()->getOkapiDefaultFilterPathById($identifier);
                     if ($path === null) {
-                        throw new editor_Plugins_Okapi_Exception('E1406', [
+                        throw new OkapiException('E1406', [
                             'bconf' => $this->bconf->getName(),
                             'bconfId' => $this->bconf->getId(),
                             'identifier' => $identifier,
@@ -762,42 +825,47 @@ final class editor_Plugins_Okapi_Bconf_ExtensionMapping extends editor_Plugins_O
                         $this->mapToPack[] = ['.' . $extension, $identifier];
                         // DEBUG
                         if ($this->doDebug) {
-                            error_log('ExtensionMapping preparePacking: add non embedded default filter ' . $identifier . ' for ' . $extension);
+                            error_log('ExtensionMapping preparePacking: add non embedded default filter '
+                                . $identifier . ' for ' . $extension);
                         }
                     } else {
-                        $identifier = editor_Plugins_Okapi_Bconf_Filters::createIdentifierFromPath($path);
+                        $identifier = Filters::createIdentifierFromPath($path);
                         $this->fprmsToPack[$identifier] = $path;
                         $this->mapToPack[] = ['.' . $extension, $identifier];
                         // DEBUG
                         if ($this->doDebug) {
-                            error_log('ExtensionMapping preparePacking: add embedded default filter ' . $identifier . ' for ' . $extension);
+                            error_log('ExtensionMapping preparePacking: add embedded default filter '
+                                . $identifier . ' for ' . $extension);
                         }
                     }
                 } else {
                     if (in_array($identifier, $addedCustomIdentifiers)) {
-                        // either the identifier is a custom filter and therefore must be part of the already added custom filters
+                        // either the identifier is a custom filter and therefore must be part
+                        // of the already added custom filters
                         $this->mapToPack[] = ['.' . $extension, $identifier];
                         // DEBUG
                         if ($this->doDebug) {
-                            error_log('ExtensionMapping preparePacking: add custom filter ' . $identifier . ' for ' . $extension);
+                            error_log('ExtensionMapping preparePacking: add custom filter '
+                                . $identifier . ' for ' . $extension);
                         }
                     } else {
                         // otherwise the entry must be a translate5 asjusted bconf or invalid
-                        $idata = editor_Plugins_Okapi_Bconf_Filters::parseIdentifier($identifier);
-                        $path = editor_Plugins_Okapi_Bconf_Filters::instance()->getTranslate5FilterPath($idata->type, $idata->id);
+                        $idata = Filters::parseIdentifier($identifier);
+                        $path = Filters::instance()->getTranslate5FilterPath($idata->type, $idata->id);
                         if (empty($path)) {
-                            throw new editor_Plugins_Okapi_Exception('E1406', [
+                            throw new OkapiException('E1406', [
                                 'bconf' => $this->bconf->getName(),
                                 'bconfId' => $this->bconf->getId(),
                                 'identifier' => $identifier,
                             ]);
                         } else {
-                            $identifier = editor_Plugins_Okapi_Bconf_Filters::createIdentifierFromPath($path);
+                            $identifier = Filters::createIdentifierFromPath($path);
                             $this->fprmsToPack[$identifier] = $path;
                             $this->mapToPack[] = ['.' . $extension, $identifier];
                             // DEBUG
                             if ($this->doDebug) {
-                                error_log('ExtensionMapping preparePacking: add embedded translate5 filter ' . $identifier . ' for ' . $extension);
+                                error_log('ExtensionMapping preparePacking: add embedded translate5 filter '
+                                    . $identifier . ' for ' . $extension);
                             }
                         }
                     }
@@ -809,7 +877,7 @@ final class editor_Plugins_Okapi_Bconf_ExtensionMapping extends editor_Plugins_O
     /**
      * Updates the content-inventory, which is always done alongside the extension-mapping
      * @throws ZfExtended_Exception
-     * @throws editor_Plugins_Okapi_Exception
+     * @throws OkapiException
      */
     private function updateBconfContent()
     {

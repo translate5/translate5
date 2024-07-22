@@ -26,6 +26,12 @@
  END LICENSE AND COPYRIGHT
  */
 
+namespace MittagQI\Translate5\Plugins\Okapi\Bconf\Parser;
+
+use stdClass;
+use ZfExtended_Exception;
+use ZfExtended_NotFoundException;
+
 /**
  * Class Parsing the Properties-files used in the okapi eco-system
  * Note, that this parser might not parse all of the possible features of a properties file
@@ -46,7 +52,8 @@
  * net.sf.okapi.common.StringParameters
  * net.sf.okapi.common.BaseParameters
  */
-final class editor_Plugins_Okapi_Bconf_Parser_Properties
+
+final class PropertiesParser
 {
     private array $map = [];
 
@@ -112,7 +119,7 @@ final class editor_Plugins_Okapi_Bconf_Parser_Properties
      */
     public function getDataId($propName): string
     {
-        if (strlen($propName) > 2 && (substr($propName, -2) === '.i' || substr($propName, -2) === '.b')) {
+        if (strlen($propName) > 2 && (str_ends_with($propName, '.i') || str_ends_with($propName, '.b'))) {
             $propName = substr($propName, 0, -2);
         }
 
@@ -125,10 +132,9 @@ final class editor_Plugins_Okapi_Bconf_Parser_Properties
     }
 
     /**
-     * @return string|bool|int
      * @throws ZfExtended_NotFoundException
      */
-    public function get(string $propName)
+    public function get(string $propName): string|bool|int
     {
         if ($this->has($propName)) {
             return $this->map[$propName];
@@ -138,11 +144,10 @@ final class editor_Plugins_Okapi_Bconf_Parser_Properties
     }
 
     /**
-     * @param string|bool|int $value
      * @throws ZfExtended_Exception
      * @throws ZfExtended_NotFoundException
      */
-    public function set(string $propName, $value)
+    public function set(string $propName, string|bool|int $value): void
     {
         if ($this->has($propName) && $this->validateProp($propName, $value)) {
             $this->map[$propName] = $value;
@@ -152,10 +157,9 @@ final class editor_Plugins_Okapi_Bconf_Parser_Properties
     }
 
     /**
-     * @param string|bool|int $value
      * @throws ZfExtended_Exception
      */
-    public function add(string $propName, $value)
+    public function add(string $propName, string|bool|int $value): void
     {
         if (! $this->has($propName) && $this->validateProp($propName, $value)) {
             $this->map[$propName] = $value;
@@ -165,9 +169,9 @@ final class editor_Plugins_Okapi_Bconf_Parser_Properties
     }
 
     /**
-     * Removes an property
+     * Removes a property
      */
-    public function remove(string $propName)
+    public function remove(string $propName): void
     {
         if ($this->has($propName)) {
             unset($this->map[$propName]);
@@ -197,7 +201,8 @@ final class editor_Plugins_Okapi_Bconf_Parser_Properties
 
     /**
      * Retrieves our contents as a json-object adjusted for the frontend
-     * This means, the type-hints (".b", ".i") will be removed from the property-names & the '.' is replaced by '_' in the remaining name
+     * This means, the type-hints (".b", ".i") will be removed from the property-names and
+     * the '.' is replaced by '_' in the remaining name
      */
     public function getJson(): stdClass
     {
@@ -213,7 +218,7 @@ final class editor_Plugins_Okapi_Bconf_Parser_Properties
     /**
      * Applies data in the format of our getJson-API back
      */
-    public function setFromJson(stdClass $json)
+    public function setFromJson(stdClass $json): void
     {
         foreach ($this->map as $key => $val) {
             $jsonKey = $this->getDataId($key);
@@ -227,7 +232,7 @@ final class editor_Plugins_Okapi_Bconf_Parser_Properties
      * Parses a content-string and validates the lines for correct data-types.
      * and creates a map of the parsed contents
      */
-    private function parse(string $content)
+    private function parse(string $content): void
     {
         $content = rtrim(str_replace("\r", '', $content)); // for robustness
         $lines = explode("\n", $content);
@@ -235,7 +240,7 @@ final class editor_Plugins_Okapi_Bconf_Parser_Properties
             $this->errors[] = 'Invalid version header "' . rtrim($lines[0]) . '"';
         }
         foreach ($lines as $line) {
-            if (! empty($line) && substr($line, 0, 1) != '#') {
+            if (! empty($line) && ! str_starts_with($line, '#')) {
                 $pos = strpos($line, '=');
                 if ($pos !== false && $pos > 0) {
                     $varName = trim(substr($line, 0, $pos));
@@ -274,9 +279,8 @@ final class editor_Plugins_Okapi_Bconf_Parser_Properties
     /**
      * Escapes a String for usage in a properties-file
      * See net.sf.okapi.common.ParametersString
-     * @return array|string|string[]
      */
-    private function escape(string $value)
+    private function escape(string $value): string
     {
         return str_replace(["\r", "\n"], ["$0d$", "$0a$"], $value);
     }
@@ -284,22 +288,23 @@ final class editor_Plugins_Okapi_Bconf_Parser_Properties
     /**
      * Unscapes a String for usage in a properties-file
      * See net.sf.okapi.common.ParametersString
-     * @return array|string|string[]
      */
-    private function unescape(string $value)
+    private function unescape(string $value): string
     {
         return str_replace(["$0d$", "$0a$"], ["\r", "\n"], $value);
     }
 
     /**
      * Validates, the value type matches the variable name
-     * @param string|bool|int $value
      * @throws ZfExtended_Exception
      */
-    private function validateProp(string $propName, $value): bool
+    private function validateProp(string $propName, string|bool|int $value): bool
     {
         $type = $this->getDataType($propName);
-        if (($type === 'boolean' && ! is_bool($value)) || ($type === 'integer' && ! is_int($value)) || ($type === 'string' && ! is_string($value))) {
+        if (($type === 'boolean' && ! is_bool($value)) ||
+            ($type === 'integer' && ! is_int($value)) ||
+            ($type === 'string' && ! is_string($value))
+        ) {
             throw new ZfExtended_Exception('Property ' . $propName . ' is not of the right type ' . $type);
         }
 

@@ -26,13 +26,28 @@
  END LICENSE AND COPYRIGHT
  */
 
-use MittagQI\Translate5\Plugins\Okapi\Service;
+namespace MittagQI\Translate5\Plugins\Okapi;
+
+use editor_Plugins_Okapi_Init;
+use MittagQI\Translate5\Plugins\Okapi\Bconf\BconfEntity;
+use ReflectionException;
+use SplFileInfo;
+use Throwable;
+use Zend_Config;
+use Zend_Exception;
+use Zend_Http_Client;
+use Zend_Http_Client_Exception;
+use Zend_Http_Response;
+use Zend_Registry;
+use ZfExtended_BadGateway;
+use ZfExtended_Exception;
+use ZfExtended_Factory;
 
 /**
  * Upload/download file to okapi server, and converting it to xlf
  * One Connector Instance can contain one Okapi Project
  */
-class editor_Plugins_Okapi_Connector
+final class OkapiAdapter
 {
     /**
      * Request timeout for the api
@@ -60,9 +75,8 @@ class editor_Plugins_Okapi_Connector
 
     /**
      * The url for the current  active project
-     * @var string
      */
-    private $projectUrl;
+    private ?string $projectUrl;
 
     /**
      * Server to use (what can be configured on task & customer level)
@@ -72,20 +86,24 @@ class editor_Plugins_Okapi_Connector
     /**
      * The OKAPI service
      */
-    private Service $service;
+    private OkapiService $service;
 
     /**
      * @throws Zend_Exception
+     * @throws ZfExtended_Exception
      */
     public function __construct(Zend_Config $config = null)
     {
-        $this->serverToUse = is_null($config) ? Zend_Registry::get('config')->runtimeOptions->plugins->Okapi->serverUsed : $config->runtimeOptions->plugins->Okapi->serverUsed;
+        if($config === null){
+            $config = Zend_Registry::get('config'); /** var Zend_Config $config */
+        }
+        $this->serverToUse = $config->runtimeOptions->plugins->Okapi->serverUsed;
         $this->service = editor_Plugins_Okapi_Init::createService('okapi');
     }
 
     /**
      * Get the okapi api url from the configured servers and server used
-     * @throws editor_Plugins_Okapi_Exception
+     * @throws OkapiException
      */
     public function getApiUrl(): string
     {
@@ -94,14 +112,12 @@ class editor_Plugins_Okapi_Connector
 
     /**
      * Create the http object, set the authentication and set the url
-     *
-     * @param string $url
-     * @return Zend_Http_Client
+     * @throws ReflectionException
+     * @throws Zend_Http_Client_Exception
      */
-    private function getHttpClient($url)
+    private function getHttpClient(string $url): Zend_Http_Client
     {
-        $http = ZfExtended_Factory::get('Zend_Http_Client');
-        /* @var $http Zend_Http_Client */
+        $http = ZfExtended_Factory::get(Zend_Http_Client::class);
         $http->setUri($url);
         $http->setConfig([
             'timeout' => self::REQUEST_TIMEOUT_SECONDS,
@@ -116,10 +132,8 @@ class editor_Plugins_Okapi_Connector
      * Also the function checks for the invalid decoded json.
      *
      * @throws ZfExtended_BadGateway
-     * @throws ZfExtended_Exception
-     * @return stdClass|string
      */
-    private function processResponse(Zend_Http_Response $response)
+    private function processResponse(Zend_Http_Response $response): string
     {
         $validStates = [200, 201, 401];
 
@@ -132,9 +146,12 @@ class editor_Plugins_Okapi_Connector
     }
 
     /**
-     * Create the project on Okapi server.
+     * @throws ReflectionException
+     * @throws Zend_Http_Client_Exception
+     * @throws ZfExtended_BadGateway
+     * @throws OkapiException
      */
-    public function createProject()
+    public function createProject(): void
     {
         $http = $this->getHttpClient($this->getApiUrl() . 'projects/new');
         $response = $http->request('POST');
@@ -145,28 +162,31 @@ class editor_Plugins_Okapi_Connector
 
     /**
      * Remove the project from Okapi server.
+     * @throws ReflectionException
+     * @throws Zend_Http_Client_Exception
+     * @throws ZfExtended_BadGateway
      */
-    public function removeProject()
+    public function removeProject(): void
     {
         if (empty($this->projectUrl)) {
             return;
-        };
+        }
         $http = $this->getHttpClient($this->projectUrl);
         $response = $http->request('DELETE');
         $this->processResponse($response);
     }
 
     /**
+     * @throws ReflectionException
      * @throws Zend_Http_Client_Exception
      * @throws ZfExtended_BadGateway
-     * @throws ZfExtended_Exception
-     * @throws editor_Plugins_Okapi_Exception
+     * @throws OkapiException
      */
-    public function uploadOkapiConfig(string $bconfPath, bool $forImport)
+    public function uploadOkapiConfig(string $bconfPath, bool $forImport): void
     {
         if (empty($bconfPath) || ! file_exists($bconfPath)) {
             // 'Okapi Plug-In: Bconf not given or not found: {bconfFile}',
-            throw new editor_Plugins_Okapi_Exception('E1055', [
+            throw new OkapiException('E1055', [
                 'bconfFile' => $bconfPath,
             ]);
         }
@@ -184,7 +204,7 @@ class editor_Plugins_Okapi_Connector
             if ($forImport) {
                 try {
                     $bconfId = (int) basename(dirname($bconfPath));
-                    $bconf = new editor_Plugins_Okapi_Bconf_Entity();
+                    $bconf = new BconfEntity();
                     $bconf->load($bconfId);
                     $bconfName = $bconf->getName();
                     $e->setMessage($msg . " \n" . 'Import-bconf used was \'' . $bconfName . '\' (id ' . $bconfId . ')');
@@ -203,8 +223,11 @@ class editor_Plugins_Okapi_Connector
      * Upload the source file(the file which will be converted)
      * @param string $fileName file name to be used in okapi
      * @param SplFileInfo $realFilePath path to the file to be uploaded
+     * @throws ReflectionException
+     * @throws Zend_Http_Client_Exception
+     * @throws ZfExtended_BadGateway
      */
-    public function uploadInputFile($fileName, SplFileInfo $realFilePath)
+    public function uploadInputFile(string $fileName, SplFileInfo $realFilePath): void
     {
         $this->uploadFile($fileName, $realFilePath, self::INPUT_TYPE_DEFAULT);
     }
@@ -213,8 +236,11 @@ class editor_Plugins_Okapi_Connector
      * Upload the original file for merging the XLF data into
      * @param string $fileName file name to be used in okapi
      * @param SplFileInfo $realFilePath path to the file to be uploaded
+     * @throws ReflectionException
+     * @throws Zend_Http_Client_Exception
+     * @throws ZfExtended_BadGateway
      */
-    public function uploadOriginalFile($fileName, SplFileInfo $realFilePath)
+    public function uploadOriginalFile(string $fileName, SplFileInfo $realFilePath): void
     {
         $this->uploadFile($fileName, $realFilePath, self::INPUT_TYPE_ORIGINAL);
     }
@@ -223,18 +249,22 @@ class editor_Plugins_Okapi_Connector
      * Upload the work file (XLF) to be merged into the original file
      * @param string $fileName file name to be used in okapi
      * @param SplFileInfo $realFilePath path to the file to be uploaded
+     * @throws ReflectionException
+     * @throws Zend_Http_Client_Exception
+     * @throws ZfExtended_BadGateway
      */
-    public function uploadWorkFile($fileName, SplFileInfo $realFilePath)
+    public function uploadWorkFile(string $fileName, SplFileInfo $realFilePath): void
     {
         $this->uploadFile($fileName, $realFilePath, self::INPUT_TYPE_WORK);
     }
 
     /**
      * Upload the source file(the file which will be converted)
-     * @param string $fileName
-     * @param string $type
+     * @throws ReflectionException
+     * @throws Zend_Http_Client_Exception
+     * @throws ZfExtended_BadGateway
      */
-    protected function uploadFile($fileName, SplFileInfo $realFilePath, $type)
+    protected function uploadFile(string $fileName, SplFileInfo $realFilePath, string $type): void
     {
         //PUT http://{host}/okapi-longhorn/projects/1/inputFiles/help.html
         //Ex.: Uploads a file that will have the name 'help.html'
@@ -252,8 +282,11 @@ class editor_Plugins_Okapi_Connector
 
     /**
      * Run the file conversion. For each uploaded files converted file will be created
+     * @throws ReflectionException
+     * @throws Zend_Http_Client_Exception
+     * @throws ZfExtended_BadGateway
      */
-    public function executeTask($source, $target)
+    public function executeTask(string $source, string $target): void
     {
         $url = $this->projectUrl . '/tasks/execute/' . $source . '/' . $target;
         $http = $this->getHttpClient($url);
@@ -263,9 +296,9 @@ class editor_Plugins_Okapi_Connector
 
     /**
      * Checks the default configured /system level) Okapi Service
-     * TODO FIXME: this should be implemented in MittagQI\Translate5\Plugins\Okapi\Service ...
+     * TODO FIXME: this should be implemented in MittagQI\Translate5\Plugins\Okapi\OkapiAdapter ...
      */
-    public function ping()
+    public function ping(): string
     {
         $url = $this->service->getServiceUrl();
         if (empty($url)) {
@@ -279,7 +312,7 @@ class editor_Plugins_Okapi_Connector
             ]); //for ping just 15 seconds
             $response = $http->request('GET');
             $this->processResponse($response);
-        } catch (Exception $e) {
+        } catch (Throwable) {
             return 'Okapi ' . $url . ' DOWN!';
         }
 
@@ -288,11 +321,11 @@ class editor_Plugins_Okapi_Connector
 
     /**
      * Download the converted file from okapi, and save the file on the disk.
-     * @param string $fileName
-     * @param string $manifestFile
-     * @return string the path to the downloaded data file
+     * @throws ReflectionException
+     * @throws Zend_Http_Client_Exception
+     * @throws ZfExtended_BadGateway
      */
-    public function downloadFile($fileName, $manifestFile, SplFileInfo $dataDir)
+    public function downloadFile(string $fileName, string $manifestFile, SplFileInfo $dataDir): string
     {
         $downloadedFile = $dataDir . '/' . $fileName . self::OUTPUT_FILE_EXTENSION;
         $url = $this->projectUrl . '/outputFiles/pack1/work/' . $fileName . self::OUTPUT_FILE_EXTENSION;
@@ -313,8 +346,11 @@ class editor_Plugins_Okapi_Connector
     /**
      * Download the converted file from okapi, and save the file on the disk.
      * @param string $fileName filename in okapi to get the file
+     * @throws ReflectionException
+     * @throws Zend_Http_Client_Exception
+     * @throws ZfExtended_BadGateway
      */
-    public function downloadMergedFile($fileName, SplFileInfo $targetFile)
+    public function downloadMergedFile(string $fileName, SplFileInfo $targetFile): void
     {
         $http = $this->getHttpClient($this->projectUrl . '/outputFiles/' . $fileName);
         $response = $http->request('GET');

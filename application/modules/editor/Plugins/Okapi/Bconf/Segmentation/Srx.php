@@ -26,12 +26,18 @@
  END LICENSE AND COPYRIGHT
  */
 
+namespace MittagQI\Translate5\Plugins\Okapi\Bconf\Segmentation;
+
+use MittagQI\Translate5\Plugins\Okapi\Bconf\ResourceFile;
+use ZfExtended_Dom;
+use ZfExtended_Exception;
+
 /**
  * Class representing a SRX file
  * A SRX is an xml with a defined structure containing nodes with language specific RegEx rules
- * for more documentation, see editor_Plugins_Okapi_Bconf_Segmentation
+ * for more documentation, see Segmentation
  */
-final class editor_Plugins_Okapi_Bconf_Segmentation_Srx extends editor_Plugins_Okapi_Bconf_ResourceFile
+final class Srx extends ResourceFile
 {
     public const EXTENSION = 'srx';
 
@@ -43,10 +49,9 @@ final class editor_Plugins_Okapi_Bconf_Segmentation_Srx extends editor_Plugins_O
     /**
      * Create and return self instance using SYSTEM_TARGET_SRX as path
      *
-     * @return editor_Plugins_Okapi_Bconf_Segmentation_Srx
      * @throws ZfExtended_Exception
      */
-    public static function createSystemTargetSrx()
+    public static function createSystemTargetSrx(): Srx
     {
         return new self(APPLICATION_ROOT . self::SYSTEM_TARGET_SRX);
     }
@@ -88,7 +93,7 @@ final class editor_Plugins_Okapi_Bconf_Segmentation_Srx extends editor_Plugins_O
     /**
      * Updates the contents of a SRX
      */
-    public function setContent(string $content)
+    public function setContent(string $content): void
     {
         $this->content = $content;
     }
@@ -96,7 +101,7 @@ final class editor_Plugins_Okapi_Bconf_Segmentation_Srx extends editor_Plugins_O
     /**
      * Updates our path
      */
-    public function setPath(string $path)
+    public function setPath(string $path): void
     {
         $this->path = $path;
     }
@@ -213,27 +218,5 @@ final class editor_Plugins_Okapi_Bconf_Segmentation_Srx extends editor_Plugins_O
 
         // Use basic splitting
         return explode('<delimiter/>', $text);
-    }
-
-    /**
-     * Convert capturing groups to non-capturing groups, if any in the given $regex
-     *
-     * @return array|string|string[]|null
-     */
-    private function disableCapturingGroups(string $regex)
-    {
-        // No slash before
-        $nsb = '(?<!\\\)';
-
-        // Other regex shortcuts
-        $since = preg_quote('(', '~');
-        $until = preg_quote(')', '~');
-        $inner = '.*?';
-
-        // Regex to find capturing groups inside $regex, if any
-        $capturingGroup = "~$nsb($since)($inner)$nsb($until)~";
-
-        // Insert '?:' after group's opening '(', to make that group to be non-capturing
-        return preg_replace($capturingGroup, '$1?:$2$3', $regex);
     }
 }

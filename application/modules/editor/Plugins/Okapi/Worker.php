@@ -26,6 +26,9 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\Plugins\Okapi\OkapiAdapter;
+use MittagQI\Translate5\Plugins\Okapi\OkapiException;
+
 class editor_Plugins_Okapi_Worker extends editor_Models_Task_AbstractWorker
 {
     public const TYPE_IMPORT = 'import';
@@ -50,52 +53,41 @@ class editor_Plugins_Okapi_Worker extends editor_Models_Task_AbstractWorker
 
     /**
      * Api for accessing the saved Manifest file from other contexts
-     * @param string $absoluteTaskDataPath
-     * @param string $fileId
-     * @return string
      */
-    public static function createManifestFilePath($absoluteTaskDataPath, $fileId)
+    public static function createManifestFilePath(string $absoluteTaskDataPath, int $fileId): string
     {
-        return $absoluteTaskDataPath . '/' . self::OKAPI_REL_DATA_DIR . '/' . sprintf(self::MANIFEST_FILE, $fileId);
+        return $absoluteTaskDataPath . '/'
+            . self::OKAPI_REL_DATA_DIR . '/'
+            . sprintf(self::MANIFEST_FILE, $fileId);
     }
 
     /**
      * Api for accessing the saved original file from other contexts
-     * @param string $absoluteTaskDataPath
-     * @param string $fileId
-     * @param string $extension
-     * @return string
      */
-    public static function createOriginalFilePath($absoluteTaskDataPath, $fileId, $extension)
+    public static function createOriginalFilePath(string $absoluteTaskDataPath, int $fileId, string $extension): string
     {
-        return $absoluteTaskDataPath . '/' . self::OKAPI_REL_DATA_DIR . '/' . sprintf(self::ORIGINAL_FILE, $fileId, $extension);
+        return $absoluteTaskDataPath . '/'
+            . self::OKAPI_REL_DATA_DIR . '/'
+            . sprintf(self::ORIGINAL_FILE, $fileId, $extension);
     }
 
     /**
      * Api for accessing the saved  converted file from other contexts
-     * @param string $absoluteTaskDataPath
-     * @param string $fileId
-     * @param string $extension
-     * @return string
      */
-    public static function createConvertedFilePath($absoluteTaskDataPath, $fileId, $extension)
+    public static function createConvertedFilePath(string $absoluteTaskDataPath, int $fileId, string $extension): string
     {
-        return self::createOriginalFilePath($absoluteTaskDataPath, $fileId, $extension) . editor_Plugins_Okapi_Connector::OUTPUT_FILE_EXTENSION;
+        return self::createOriginalFilePath($absoluteTaskDataPath, $fileId, $extension)
+            . OkapiAdapter::OUTPUT_FILE_EXTENSION;
     }
 
-    /**
-     * @var ZfExtended_Logger
-     */
-    protected $logger;
+    protected ZfExtended_Logger $logger;
 
-    /**
-     * (non-PHPdoc)
-     * @see ZfExtended_Worker_Abstract::validateParameters()
-     */
     protected function validateParameters($parameters = [])
     {
         if (empty($parameters['type'])
-                || ! ($parameters['type'] == self::TYPE_IMPORT || $parameters['type'] == self::TYPE_EXPORT)) {
+                || ! ($parameters['type'] == self::TYPE_IMPORT
+                || $parameters['type'] == self::TYPE_EXPORT)
+        ) {
             return false;
         }
 
@@ -116,7 +108,14 @@ class editor_Plugins_Okapi_Worker extends editor_Models_Task_AbstractWorker
     }
 
     /**
-     * @see ZfExtended_Worker_Abstract::work()
+     * @throws OkapiException
+     * @throws ReflectionException
+     * @throws Zend_Exception
+     * @throws Zend_Http_Client_Exception
+     * @throws ZfExtended_BadGateway
+     * @throws ZfExtended_Exception
+     * @throws ZfExtended_Models_Entity_NotFoundException
+     * @throws editor_Models_ConfigException
      */
     public function work()
     {
@@ -131,41 +130,46 @@ class editor_Plugins_Okapi_Worker extends editor_Models_Task_AbstractWorker
 
     /**
      * Uploads one file to Okapi to convert it to an XLIFF file importable by translate5
+     * @throws OkapiException
+     * @throws ReflectionException
+     * @throws Zend_Exception
+     * @throws Zend_Http_Client_Exception
+     * @throws ZfExtended_BadGateway
      */
-    protected function doImport()
+    protected function doImport(): bool
     {
         $params = $this->workerModel->getParameters();
 
         $file = new SplFileInfo($params['file']);
         $suffix = $file->getExtension();
-        $fileId = $params['fileId'];
+        $fileId = (int) $params['fileId'];
         $fileName = sprintf(self::ORIGINAL_FILE, $fileId, $suffix);
         $manifestFile = $this->getManifestFile($fileId);
         $okapiDataDir = $this->getDataDir();
 
-        $language = ZfExtended_Factory::get('editor_Models_Languages');
-        /* @var $language editor_Models_Languages */
-
+        $language = ZfExtended_Factory::get(editor_Models_Languages::class);
         $sourceLang = $language->loadLangRfc5646((int) $this->task->getSourceLang());
         $targetLang = $language->loadLangRfc5646((int) $this->task->getTargetLang());
 
         try {
             $taskConfig = $this->task->getConfig();
-            $api = ZfExtended_Factory::get('editor_Plugins_Okapi_Connector', [
-                $taskConfig,
-            ]);
+            $api = new OkapiAdapter($taskConfig);
             $okapiConfig = $taskConfig->runtimeOptions->plugins->Okapi;
             $serverUsed = $okapiConfig->serverUsed ?? 'not set';
-            $this->logger->info('E1444', 'Okapi Plug-In: File "{fileName}" (id: {fileId}) was imported with Okapi "{okapi}"', [
-                'task' => $this->task,
-                'okapi' => $serverUsed,
-                'fileId' => $fileId,
-                'fileName' => $file->getBasename(),
-                'okapiUrl' => $okapiConfig->server?->$serverUsed ?? 'server used not found',
-                'usedBconf' => $params['bconfName'],
-            ], ['tasklog', 'ecode']);
+            $this->logger->info(
+                'E1444',
+                'Okapi Plug-In: File "{fileName}" (id: {fileId}) was imported with Okapi "{okapi}"',
+                [
+                    'task' => $this->task,
+                    'okapi' => $serverUsed,
+                    'fileId' => $fileId,
+                    'fileName' => $file->getBasename(),
+                    'okapiUrl' => $okapiConfig->server?->$serverUsed ?? 'server used not found',
+                    'usedBconf' => $params['bconfName'],
+                ],
+                ['tasklog', 'ecode']
+            );
 
-            /* @var $api editor_Plugins_Okapi_Connector */
             $api->createProject();
             // upload the BCONF set by worker-params
             $api->uploadOkapiConfig($params['bconfFilePath'], true);
@@ -181,35 +185,48 @@ class editor_Plugins_Okapi_Worker extends editor_Models_Task_AbstractWorker
             copy($convertedFile, $file . $api::OUTPUT_FILE_EXTENSION);
 
             //add okapi export file filter for that file
-            $fileFilter = ZfExtended_Factory::get('editor_Models_File_FilterManager');
-            /* @var $fileFilter editor_Models_File_FilterManager */
-            $fileFilter->addFilter($fileFilter::TYPE_IMPORT, $this->taskGuid, $fileId, 'editor_Plugins_Okapi_FileFilter');
-            $fileFilter->addFilter($fileFilter::TYPE_EXPORT, $this->taskGuid, $fileId, 'editor_Plugins_Okapi_FileFilter');
+            $fileFilter = ZfExtended_Factory::get(editor_Models_File_FilterManager::class);
+            $fileFilter->addFilter(
+                $fileFilter::TYPE_IMPORT,
+                $this->taskGuid,
+                $fileId,
+                editor_Plugins_Okapi_FileFilter::class
+            );
+            $fileFilter->addFilter(
+                $fileFilter::TYPE_EXPORT,
+                $this->taskGuid,
+                $fileId,
+                editor_Plugins_Okapi_FileFilter::class
+            );
         } catch (Exception $e) {
             $this->handleException($e, $file, $fileId, true);
         } finally {
-            $api && $api->removeProject();
+            $api->removeProject();
         }
 
         return true;
     }
 
     /**
-     * @return boolean
+     * @throws OkapiException
+     * @throws ReflectionException
+     * @throws Zend_Exception
+     * @throws Zend_Http_Client_Exception
+     * @throws ZfExtended_BadGateway
+     * @throws ZfExtended_Exception
+     * @throws ZfExtended_Models_Entity_NotFoundException
      * @throws editor_Models_ConfigException
-     * @throws editor_Plugins_Okapi_Exception
      */
     protected function doExport(): bool
     {
         $params = $this->workerModel->getParameters();
-        $fileId = $params['fileId'];
+        $fileId = (int) $params['fileId'];
         $workFile = new SplFileInfo($params['file']);
 
         $manifestFile = new SplFileInfo($this->getDataDir() . '/' . $this->getManifestFile($fileId));
 
         $taskConfig = $this->task->getConfig();
-
-        $api = ZfExtended_Factory::get(editor_Plugins_Okapi_Connector::class, [$taskConfig]);
+        $api = new OkapiAdapter($taskConfig);
 
         $language = ZfExtended_Factory::get(editor_Models_Languages::class);
 
@@ -281,12 +298,16 @@ See task event log for more details.' . "\n\n" . (is_null($event) ? $e->getMessa
 
     /**
      * Logs the occured exception
-     * @param integer $fileId
-     * @param boolean $import true on import, false on export
+     * @param bool $import true on import, false on export
      * @return ZfExtended_Logger_Event|null the resulting event of the thrown exception
+     * @throws Zend_Exception
      */
-    protected function handleException(Exception $e, SplFileInfo $file, $fileId, bool $import): ?ZfExtended_Logger_Event
-    {
+    protected function handleException(
+        Exception $e,
+        SplFileInfo $file,
+        int $fileId,
+        bool $import,
+    ): ?ZfExtended_Logger_Event {
         $event = $this->logger->exception($e, [
             'extra' => [
                 'task' => $this->task,
@@ -331,32 +352,30 @@ See task event log for more details.' . "\n\n" . (is_null($event) ? $e->getMessa
 
     /**
      * returns the manifest.rkm file for a stored file
-     * @param int $fileId
-     * @return string
      */
-    protected function getManifestFile($fileId)
+    protected function getManifestFile(int $fileId): string
     {
         return sprintf(self::MANIFEST_FILE, $fileId);
     }
 
     /**
      * returns the original file for a stored file (stored in the okapi data dir)
-     * @param int $fileId
-     * @return string
+     * @throws OkapiException
      */
-    protected function findOriginalFile($fileId)
+    protected function findOriginalFile(int $fileId): ?string
     {
         $regex = '/' . sprintf(self::ORIGINAL_FILE, $fileId . '\\', '.*$/');
         $files = preg_grep($regex, scandir($this->getDataDir()));
 
-        return reset($files);
+        return (count($files) > 0) ? $files[0] : null;
     }
 
     /**
      * copy the original files from review folder to the referenceFiles folder,
      * keep original file and directory structure
+     * @throws Zend_Exception
      */
-    protected function copyOriginalAsReference()
+    protected function copyOriginalAsReference(): void
     {
         if (! $this->isAttachOriginalAsReference()) {
             return;
@@ -385,7 +404,7 @@ See task event log for more details.' . "\n\n" . (is_null($event) ? $e->getMessa
 
     /**
      * returns the path to the okapi data dir
-     * @throws editor_Plugins_Okapi_Exception
+     * @throws OkapiException
      */
     protected function getDataDir(): SplFileInfo
     {
@@ -395,7 +414,7 @@ See task event log for more details.' . "\n\n" . (is_null($event) ? $e->getMessa
         }
         if (! $okapiDataDir->isWritable()) {
             //Okapi Plug-In: Data dir not writeable
-            throw new editor_Plugins_Okapi_Exception('E1057', [
+            throw new OkapiException('E1057', [
                 'okapiDataDir' => $okapiDataDir,
             ]);
         }
@@ -428,7 +447,7 @@ See task event log for more details.' . "\n\n" . (is_null($event) ? $e->getMessa
     /**
      * @throws Zend_Exception
      * @throws ZfExtended_Plugin_Exception
-     * @throws editor_Plugins_Okapi_Exception
+     * @throws OkapiException
      */
     private function getOkapiPlugin(): editor_Plugins_Okapi_Init
     {
@@ -436,7 +455,7 @@ See task event log for more details.' . "\n\n" . (is_null($event) ? $e->getMessa
         /* @var $pm ZfExtended_Plugin_Manager */
         $pluginName = $pm::getPluginNameByClass(get_class($this));
         if (! $pm->isActive($pluginName) || is_null($plugin = $pm->get($pluginName))) {
-            throw new editor_Plugins_Okapi_Exception('E1474');
+            throw new OkapiException('E1474');
         }
 
         return $plugin;
