@@ -98,7 +98,7 @@ final class OkapiAdapter
             $config = Zend_Registry::get('config'); /** var Zend_Config $config */
         }
         $this->serverToUse = $config->runtimeOptions->plugins->Okapi->serverUsed;
-        $this->service = editor_Plugins_Okapi_Init::createService('okapi');
+        $this->service = editor_Plugins_Okapi_Init::createService('okapi', $config);
     }
 
     /**
@@ -296,7 +296,7 @@ final class OkapiAdapter
 
     /**
      * Checks the default configured /system level) Okapi Service
-     * TODO FIXME: this should be implemented in MittagQI\Translate5\Plugins\Okapi\OkapiAdapter ...
+     * TODO FIXME: this should be implemented in MittagQI\Translate5\Plugins\Okapi\OkapiConnector ...
      */
     public function ping(): string
     {
