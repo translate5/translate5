@@ -36,7 +36,7 @@
  * Special tag used only in the Length-Check Code. Do not use anywhere else
  * Represents a <br/>-tag
  */
-class editor_Segment_NewlineTag extends editor_Segment_AnyTag
+final class editor_Segment_NewlineTag extends editor_Segment_AnyTag
 {
     /**
      * The rendered Markup of a Newline tag.
@@ -55,18 +55,7 @@ class editor_Segment_NewlineTag extends editor_Segment_AnyTag
     }
 
     /**
-     * @see editor_Tag::createBaseClone()
-     * @return editor_Segment_AnyTag
-     */
-    protected function createBaseClone()
-    {
-        return new editor_Segment_NewlineTag($this->startIndex, $this->endIndex, $this->category, $this->name);
-    }
-
-    /**
      * We want a defined Markup
-     * {@inheritDoc}
-     * @see editor_Segment_Tag::render()
      */
     public function render(array $skippedTypes = null): string
     {
