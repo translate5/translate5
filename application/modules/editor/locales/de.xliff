@@ -5869,9 +5869,9 @@ Im Projektportal {portalLink} wurde die Aufgabe
                 <source>Unterschied zu Quellsegment</source>
                 <target>Unterschied zu Quellsegment</target>
             </trans-unit>
-            <trans-unit id='RGllc2UgUmVzc291cmNlIHdpcmQgZW50ZmVybnQ='>
-                <source>Diese Ressource wird entfernt</source>
-                <target>Diese Ressource wird entfernt</target>
+            <trans-unit id='RGllc2UgU3ByYWNocmVzc291cmNlIHd1cmRlIGVudGZlcm50IChJRDogJXMp'>
+                <source>Diese Sprachressource wurde entfernt (ID: %s)</source>
+                <target>Diese Sprachressource wurde entfernt (ID: %s)</target>
             </trans-unit>
             <trans-unit id='VHJlZmZlcmFuYWx5c2U='>
                 <source>Trefferanalyse</source>
@@ -9781,6 +9781,10 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
             <trans-unit id='TG9rYWxlbiBCZW51dHplciBtaXQgRGF0ZW4gYXVzIGRlbSBTU08gUHJvdmlkZXIgYWt0dWFsaXNpZXJlbiAoUm9sbGVuLCBHZXNjaGxlY2h0LCBTcHJhY2hlKQ=='>
                 <source>Lokalen Benutzer mit Daten aus dem SSO Provider aktualisieren (Rollen, Geschlecht, Sprache)</source>
                 <target>Lokalen Benutzer mit Daten aus dem SSO Provider aktualisieren (Rollen, Geschlecht, Sprache)</target>
+            </trans-unit>
+            <trans-unit id='U2VydmVyIGbDvHIgZGVuIGFuZ2VmcmFndGVuIERpZW5zdCBpc3QgbmljaHQgZXJyZWljaGJhci4='>
+                <source>Server für den angefragten Dienst ist nicht erreichbar.</source>
+                <target>Server für den angefragten Dienst ist nicht erreichbar.</target>
             </trans-unit>
         </body>
     </file>

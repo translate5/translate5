@@ -67,7 +67,7 @@ $config = Zend_Registry::get('config');
         echo $this->headLink();
     ?>
 </head>
-<body class="loading">
+<body class="loading theme-<?php echo $this->userTheme;?>">
     <div class="loading">
         <?php echo $this->translate->_('translate5 wird geladen:');?>
         <div id="loading-indicator-text"></div>

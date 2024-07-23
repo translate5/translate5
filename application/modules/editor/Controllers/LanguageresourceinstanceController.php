@@ -1198,10 +1198,19 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
      */
     protected function handleInitialFileUpload(editor_Services_Manager $manager)
     {
+        $config = $this->getSingleCustomerOrDefaultConfig();
         $connector = $manager->getConnector(
             $this->entity,
-            config: $this->getSingleCustomerOrDefaultConfig()
+            config: $config
         );
+
+        if (! $connector->ping($this->entity->getResource(), $config)) {
+            throw ZfExtended_UnprocessableEntity::createResponse(
+                'E1282',
+                ['Server für den angefragten Dienst ist nicht erreichbar.']
+            );
+        }
+
         /* @var $connector editor_Services_Connector */
 
         $importInfo = $this->handleFileUpload($connector);
