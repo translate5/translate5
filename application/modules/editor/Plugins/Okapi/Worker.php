@@ -28,6 +28,7 @@ END LICENSE AND COPYRIGHT
 
 use MittagQI\Translate5\Plugins\Okapi\OkapiAdapter;
 use MittagQI\Translate5\Plugins\Okapi\OkapiException;
+use MittagQI\Translate5\Plugins\Okapi\Export\ManifestFixer;
 
 class editor_Plugins_Okapi_Worker extends editor_Models_Task_AbstractWorker
 {
@@ -223,13 +224,15 @@ class editor_Plugins_Okapi_Worker extends editor_Models_Task_AbstractWorker
         $fileId = (int) $params['fileId'];
         $workFile = new SplFileInfo($params['file']);
 
-        $manifestFile = new SplFileInfo($this->getDataDir() . '/' . $this->getManifestFile($fileId));
+        $manifestPath = $this->getDataDir() . '/' . $this->getManifestFile($fileId);
+        // TRANSLATE-4080 fix a potentially problematic manifest resulting from using a customized subfilter
+        ManifestFixer::checkAndFix($manifestPath);
+        $manifestFile = new SplFileInfo($manifestPath);
 
         $taskConfig = $this->task->getConfig();
         $api = new OkapiAdapter($taskConfig);
 
         $language = ZfExtended_Factory::get(editor_Models_Languages::class);
-
         $sourceLang = $language->loadLangRfc5646((int) $this->task->getSourceLang());
         $targetLang = $language->loadLangRfc5646((int) $this->task->getTargetLang());
         $result = false;
@@ -285,8 +288,9 @@ class editor_Plugins_Okapi_Worker extends editor_Models_Task_AbstractWorker
             //add an export-error file, pointing into the right direction
             file_put_contents(
                 dirname($workFile) . '/export-error.txt',
-                basename($workFile) . ': could not be exported due errors in Okapi.
-See task event log for more details.' . "\n\n" . (is_null($event) ? $e->getMessage() : $event->oneLine()),
+                basename($workFile) .
+                    ': could not be exported due errors in Okapi. See task event log for more details.' .
+                    "\n\n" . (is_null($event) ? $e->getMessage() : $event->oneLine()),
                 FILE_APPEND
             );
         } finally {
