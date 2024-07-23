@@ -362,12 +362,20 @@ See task event log for more details.' . "\n\n" . (is_null($event) ? $e->getMessa
      * returns the original file for a stored file (stored in the okapi data dir)
      * @throws OkapiException
      */
-    protected function findOriginalFile(int $fileId): ?string
+    protected function findOriginalFile(int $fileId): string
     {
         $regex = '/' . sprintf(self::ORIGINAL_FILE, $fileId . '\\', '.*$/');
         $files = preg_grep($regex, scandir($this->getDataDir()));
+        $file = reset($files);
+        if ($file === false) {
+            throw new OkapiException('E1058', [
+                'message' => 'Original file could not be found',
+                'file' => sprintf(self::ORIGINAL_FILE, $fileId, '*'),
+                'task' => $this->task,
+            ]);
+        }
 
-        return (count($files) > 0) ? $files[0] : null;
+        return (string) $file;
     }
 
     /**
