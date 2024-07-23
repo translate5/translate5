@@ -5869,9 +5869,9 @@ Im Projektportal {portalLink} wurde die Aufgabe
                 <source>Unterschied zu Quellsegment</source>
                 <target>Unterschied zu Quellsegment</target>
             </trans-unit>
-            <trans-unit id='RGllc2UgUmVzc291cmNlIHdpcmQgZW50ZmVybnQ='>
-                <source>Diese Ressource wird entfernt</source>
-                <target>Diese Ressource wird entfernt</target>
+            <trans-unit id='RGllc2UgU3ByYWNocmVzc291cmNlIHd1cmRlIGVudGZlcm50IChJRDogJXMp'>
+                <source>Diese Sprachressource wurde entfernt (ID: %s)</source>
+                <target>Diese Sprachressource wurde entfernt (ID: %s)</target>
             </trans-unit>
             <trans-unit id='VHJlZmZlcmFuYWx5c2U='>
                 <source>Trefferanalyse</source>
