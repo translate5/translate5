@@ -29,9 +29,7 @@ END LICENSE AND COPYRIGHT
 use MittagQI\Translate5\Integration\FileBasedInterface;
 use MittagQI\Translate5\Terminology\SearchCollection;
 
-class editor_Services_TermCollection_Connector
-    extends editor_Services_Connector_Abstract
-    implements FileBasedInterface
+class editor_Services_TermCollection_Connector extends editor_Services_Connector_Abstract implements FileBasedInterface
 {
     /**
      * If the query for the term had tags, the match rate must be less then 100% so that the user has to fix the tags

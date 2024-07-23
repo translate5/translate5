@@ -94,7 +94,7 @@ final class Roles extends BaseRoles
         self::ERP,
         self::PRODUCTION,
         self::TM_MAINTENANCE,
-        self::TM_MAINTENANCE_ALL_CLIENTS
+        self::TM_MAINTENANCE_ALL_CLIENTS,
     ];
 
     /**

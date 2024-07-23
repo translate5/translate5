@@ -42,9 +42,7 @@ use MittagQI\Translate5\T5Memory\Enum\StripFramingTags;
  *
  * IMPORTANT: see the doc/comments in MittagQI\Translate5\Service\T5Memory
  */
-class editor_Services_OpenTM2_Connector
-    extends editor_Services_Connector_Abstract
-    implements UpdatableAdapterInterface, FileBasedInterface
+class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstract implements UpdatableAdapterInterface, FileBasedInterface
 {
     private const CONCORDANCE_SEARCH_NUM_RESULTS = 20;
 

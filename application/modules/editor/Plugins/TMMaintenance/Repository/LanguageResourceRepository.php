@@ -68,7 +68,7 @@ class LanguageResourceRepository
         return $this->db->select()
             ->from(
                 [
-                    'tm' => 'LEK_languageresources'
+                    'tm' => 'LEK_languageresources',
                 ],
                 ['tm.*']
             )

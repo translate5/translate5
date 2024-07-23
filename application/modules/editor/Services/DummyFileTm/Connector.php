@@ -46,9 +46,7 @@ use MittagQI\Translate5\LanguageResource\Adapter\UpdatableAdapterInterface;
  * This should be the CSV defaults.
  * The first column must be an id, the second the source and the theird column the target values. Other columns are ignored.
  */
-class editor_Services_DummyFileTm_Connector
-    extends editor_Services_Connector_Abstract
-    implements UpdatableAdapterInterface, FileBasedInterface
+class editor_Services_DummyFileTm_Connector extends editor_Services_Connector_Abstract implements UpdatableAdapterInterface, FileBasedInterface
 {
     /**
      * Paging information for search requests

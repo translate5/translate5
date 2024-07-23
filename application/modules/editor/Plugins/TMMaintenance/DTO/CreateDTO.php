@@ -32,7 +32,6 @@ namespace MittagQI\Translate5\Plugins\TMMaintenance\DTO;
 
 use MittagQI\Translate5\Plugins\TMMaintenance\Helper\Json;
 use Zend_Controller_Request_Abstract as Request;
-use ZfExtended_Authentication;
 
 class CreateDTO
 {

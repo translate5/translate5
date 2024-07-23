@@ -61,7 +61,7 @@ class Editor_Plugins_Tmmaintenance_ApiController extends ZfExtended_RestControll
         ];
 
         $user = ZfExtended_Authentication::getInstance()->getUser();
-        if (!$user) {
+        if (! $user) {
             return;
         }
 
@@ -161,7 +161,7 @@ class Editor_Plugins_Tmmaintenance_ApiController extends ZfExtended_RestControll
 
     private function resolveLocale(): string
     {
-        $requestedLocale = (string)$this->getParam('locale');
+        $requestedLocale = (string) $this->getParam('locale');
 
         if ($this->getParam('locale')
             && in_array($requestedLocale, ['en', 'de'], true)

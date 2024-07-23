@@ -32,20 +32,18 @@ namespace MittagQI\Translate5\Plugins\TMMaintenance\Service;
 
 use editor_Models_LanguageResources_LanguageResource as LanguageResource;
 use editor_Models_Task as Task;
+use editor_Services_OpenTM2_Connector as OpenTM2Connector;
 use MittagQI\Translate5\LanguageResource\Adapter\UpdatableAdapterInterface;
 use MittagQI\Translate5\LanguageResource\Status as LanguageResourceStatus;
 use MittagQI\Translate5\T5Memory\DTO\DeleteBatchDTO;
 use MittagQI\Translate5\T5Memory\DTO\SearchDTO;
-use editor_Services_OpenTM2_Connector as OpenTM2Connector;
 
 /**
  * T5memory / OpenTM2 Connector
  *
  * IMPORTANT: see the doc/comments in MittagQI\Translate5\Service\T5Memory
  */
-class MaintenanceService
-    extends \editor_Services_Connector_Abstract
-    implements UpdatableAdapterInterface
+class MaintenanceService extends \editor_Services_Connector_Abstract implements UpdatableAdapterInterface
 {
     private \editor_Services_OpenTM2_HttpApi $api;
 
@@ -193,6 +191,7 @@ class MaintenanceService
             $this->logger->error('E1611', 'Requested segment not found', [
                 'languageResource' => $this->languageResource,
             ]);
+
             throw new \editor_Services_Connector_Exception('E1611');
         }
 
@@ -206,6 +205,7 @@ class MaintenanceService
                     'languageResource' => $this->languageResource,
                 ]
             );
+
             throw new \editor_Services_Connector_Exception('E1612');
         }
 
@@ -265,12 +265,13 @@ class MaintenanceService
             $successful = $this->api->update($source, $target, $userName, $context, $time, $fileName, $memoryName);
         }
 
-        if (!$successful) {
+        if (! $successful) {
             $apiError = $this->api->getError() ?? $apiError;
             $this->logger->error('E1306', 'Failed to save segment to TM', [
                 'languageResource' => $this->languageResource,
                 'apiError' => $apiError,
             ]);
+
             throw new \editor_Services_Connector_Exception('E1306');
         }
     }
@@ -280,11 +281,12 @@ class MaintenanceService
         $memoryName = $this->getMemoryNameById($memoryId);
         $successful = $this->api->deleteEntry($memoryName, $segmentId, $recordKey, $targetKey);
 
-        if (!$successful) {
+        if (! $successful) {
             $this->logger->error('E1306', 'Failed to delete segment from memory', [
                 'languageResource' => $this->languageResource,
                 'apiError' => $this->api->getError(),
             ]);
+
             throw new \editor_Services_Connector_Exception('E1306', [
                 'languageResource' => $this->languageResource,
                 'error' => 'Failed to delete segment from memory',
@@ -896,5 +898,4 @@ class MaintenanceService
 
         return isset($result->segmentIndex) && $result->segmentIndex > 0;
     }
-
 }

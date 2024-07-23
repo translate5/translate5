@@ -75,7 +75,7 @@ class editor_Models_LanguageResources_LanguagesMapper
                     'id' => $lang['id'],
                     'label' => $name . ' (' . $code . ')',
                     'rtl' => $lang['rtl'],
-                    'rfc5646' => $code
+                    'rfc5646' => $code,
                 ];
 
                 continue;
@@ -95,7 +95,7 @@ class editor_Models_LanguageResources_LanguagesMapper
                 'id' => $lang['id'],
                 'label' => $name . ' (' . $code . ')',
                 'rtl' => $lang['rtl'],
-                'rfc5646' => $code
+                'rfc5646' => $code,
             ];
         }
         ksort($result); //sort by name of language
