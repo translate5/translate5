@@ -9782,6 +9782,10 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
                 <source>Lokalen Benutzer mit Daten aus dem SSO Provider aktualisieren (Rollen, Geschlecht, Sprache)</source>
                 <target>Lokalen Benutzer mit Daten aus dem SSO Provider aktualisieren (Rollen, Geschlecht, Sprache)</target>
             </trans-unit>
+            <trans-unit id='U2VydmVyIGbDvHIgZGVuIGFuZ2VmcmFndGVuIERpZW5zdCBpc3QgbmljaHQgZXJyZWljaGJhci4='>
+                <source>Server für den angefragten Dienst ist nicht erreichbar.</source>
+                <target>Server für den angefragten Dienst ist nicht erreichbar.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>
