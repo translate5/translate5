@@ -30,12 +30,11 @@ use editor_Models_LanguageResources_LanguageResource as LanguageResource;
 use editor_Models_Task as Task;
 use MittagQI\Translate5\ContentProtection\T5memory\T5NTagSchemaFixFilter;
 use MittagQI\Translate5\ContentProtection\T5memory\TmConversionService;
+use MittagQI\Translate5\Integration\FileBasedInterface;
 use MittagQI\Translate5\LanguageResource\Adapter\Exception\RescheduleUpdateNeededException;
 use MittagQI\Translate5\LanguageResource\Adapter\Exception\SegmentUpdateException;
 use MittagQI\Translate5\LanguageResource\Adapter\UpdatableAdapterInterface;
 use MittagQI\Translate5\LanguageResource\Status as LanguageResourceStatus;
-use MittagQI\Translate5\T5Memory\DTO\DeleteBatchDTO;
-use MittagQI\Translate5\T5Memory\DTO\SearchDTO;
 use MittagQI\Translate5\T5Memory\Enum\StripFramingTags;
 
 /**
@@ -43,7 +42,9 @@ use MittagQI\Translate5\T5Memory\Enum\StripFramingTags;
  *
  * IMPORTANT: see the doc/comments in MittagQI\Translate5\Service\T5Memory
  */
-class editor_Services_OpenTM2_Connector extends editor_Services_Connector_FilebasedAbstract implements UpdatableAdapterInterface
+class editor_Services_OpenTM2_Connector
+    extends editor_Services_Connector_Abstract
+    implements UpdatableAdapterInterface, FileBasedInterface
 {
     private const CONCORDANCE_SEARCH_NUM_RESULTS = 20;
 
@@ -368,7 +369,6 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
             $fileName,
             $tmName,
             ! $this->isInternalFuzzy(),
-            $useSegmentTimestamp
         );
 
         $dataSent = [
@@ -458,184 +458,6 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
     }
 
     /**
-     * Create a segment in t5memory
-     */
-    public function createSegment(
-        string $source,
-        string $target,
-        string $userName,
-        string $context,
-        int $timestamp,
-        string $fileName,
-    ): void {
-        $source = $this->tagHandler->prepareQuery($source);
-        $this->tagHandler->setInputTagMap($this->tagHandler->getTagMap());
-        $target = $this->tagHandler->prepareQuery($target, false);
-        $memoryName = $this->getWritableMemory();
-        $time = $this->api->getDate($timestamp);
-
-        $this->updateSegmentInMemory(
-            $source,
-            $target,
-            $userName,
-            $context,
-            $time,
-            $fileName,
-            $memoryName,
-        );
-    }
-
-    /**
-     * Update method was designed to work with editor_Models_Segment context
-     * so this method was added to be able to update a memory entry without an editor_Models_Segment
-     */
-    public function updateSegment(
-        int $memoryId,
-        int $segmentId,
-        int $segmentRecordKey,
-        int $segmentTargetKey,
-        string $source,
-        string $target,
-        string $userName,
-        string $context,
-        int $timestamp,
-        string $fileName,
-    ): void {
-        $memoryName = $this->getMemoryNameById($memoryId);
-        $successful = $this->api->getEntry($memoryName, $segmentRecordKey, $segmentTargetKey);
-
-        if (! $successful) {
-            $this->logger->error('E1611', 'Requested segment not found', [
-                'languageResource' => $this->languageResource,
-            ]);
-            throw new editor_Services_Connector_Exception('E1611');
-        }
-
-        $result = $this->api->getResult();
-
-        if ($segmentId !== $result->segmentId) {
-            $this->logger->error(
-                'E1612',
-                'Found segment id differs from the requested one, probably it was deleted meanwhile',
-                [
-                    'languageResource' => $this->languageResource,
-                ]
-            );
-            throw new editor_Services_Connector_Exception('E1612');
-        }
-
-        $this->deleteEntry($memoryId, $segmentId, $segmentRecordKey, $segmentTargetKey);
-
-        $source = $this->tagHandler->prepareQuery($source);
-        $this->tagHandler->setInputTagMap($this->tagHandler->getTagMap());
-        $target = $this->tagHandler->prepareQuery($target, false);
-        $time = $this->api->getDate($timestamp);
-
-        $this->updateSegmentInMemory(
-            $source,
-            $target,
-            $userName,
-            $context,
-            $time,
-            $fileName,
-            $memoryName,
-        );
-    }
-
-    private function updateSegmentInMemory(
-        string $source,
-        string $target,
-        string $userName,
-        string $context,
-        string $time,
-        string $fileName,
-        string $memoryName,
-    ): void {
-        $successful = $this->api->update($source, $target, $userName, $context, $time, $fileName, $memoryName);
-
-        if ($successful) {
-            return;
-        }
-
-        $apiError = $this->api->getError();
-        if ($this->isMemoryOverflown($apiError)) {
-            $this->addOverflowWarning();
-
-            $currentWritableMemoryName = $this->getWritableMemory();
-            if ($memoryName === $currentWritableMemoryName) {
-                $newName = $this->generateNextMemoryName($this->languageResource);
-                $newName = $this->api->createEmptyMemory($newName, $this->languageResource->getSourceLangCode());
-                $this->addMemoryToLanguageResource($newName);
-            } else {
-                $newName = $currentWritableMemoryName;
-            }
-
-            $successful = $this->api->update($source, $target, $userName, $context, $time, $fileName, $newName);
-        }
-
-        if ($this->needsReorganizing($apiError, $memoryName)) {
-            $this->addReorganizeWarning();
-            $this->reorganizeTm($memoryName);
-
-            $successful = $this->api->update($source, $target, $userName, $context, $time, $fileName, $memoryName);
-        }
-
-        if (!$successful) {
-            $apiError = $this->api->getError() ?? $apiError;
-            $this->logger->error('E1306', 'Failed to save segment to TM', [
-                'languageResource' => $this->languageResource,
-                'apiError' => $apiError,
-            ]);
-            throw new editor_Services_Connector_Exception('E1306');
-        }
-    }
-
-    public function deleteEntry(int $memoryId, int $segmentId, int $recordKey, int $targetKey): void
-    {
-        $memoryName = $this->getMemoryNameById($memoryId);
-        $successful = $this->api->deleteEntry($memoryName, $segmentId, $recordKey, $targetKey);
-
-        if (!$successful) {
-            $this->logger->error('E1306', 'Failed to delete segment from memory', [
-                'languageResource' => $this->languageResource,
-                'apiError' => $this->api->getError(),
-            ]);
-            throw new editor_Services_Connector_Exception('E1306', [
-                'languageResource' => $this->languageResource,
-                'error' => 'Failed to delete segment from memory',
-            ]);
-        }
-    }
-
-    public function deleteBatch(DeleteBatchDTO $deleteDto): bool
-    {
-        $memories = $this->languageResource->getSpecificData('memories', parseAsArray: true);
-
-        usort($memories, fn ($m1, $m2) => $m1['id'] <=> $m2['id']);
-
-        foreach ($memories as ['filename' => $tmName]) {
-            if ($this->isReorganizingAtTheMoment($tmName)) {
-                continue;
-            }
-
-            $successful = $this->api->deleteBatch($tmName, $deleteDto);
-
-            if (! $successful && $this->needsReorganizing($this->api->getError(), $tmName)) {
-                $this->addReorganizeWarning();
-                $this->reorganizeTm($tmName);
-
-                $successful = $this->api->deleteBatch($tmName, $deleteDto);
-            }
-
-            if (! $successful) {
-                $this->logger->exception($this->getBadGatewayException($tmName));
-            }
-        }
-
-        return true;
-    }
-
-    /**
      * Fuzzy search
      *
      * {@inheritDoc}
@@ -702,27 +524,21 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
      *
      * {@inheritDoc}
      */
-    public function search(
-        string $searchString,
-        $field = 'source',
-        $offset = null,
-        SearchDTO $searchDTO = null
-    ): editor_Services_ServiceResult {
+    public function search(string $searchString, $field = 'source', $offset = null): editor_Services_ServiceResult
+    {
         $offsetTmId = null;
-        $recordKey = null;
-        $targetKey = null;
         $tmOffset = null;
 
         if (null !== $offset) {
-            @[$offsetTmId, $recordKey, $targetKey] = explode(':', (string) $offset);
+            @[$offsetTmId, $tmOffset] = explode(':', (string) $offset);
         }
 
-        if ('' !== $offsetTmId && null === $recordKey && null === $targetKey) {
+        if ('' !== $offsetTmId && null === $tmOffset) {
             throw new editor_Services_Connector_Exception('E1565', compact('offset'));
         }
 
-        if (null !== $recordKey && null !== $targetKey) {
-            $tmOffset = $recordKey . ':' . $targetKey;
+        if (null !== $tmOffset) {
+            $tmOffset = (int) $tmOffset;
         }
 
         $isSource = $field === 'source';
@@ -749,28 +565,14 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
                 continue;
             }
 
-            $segmentIdsGenerated = $this->areSegmentIdsGenerated($tmName);
+            $numResults = self::CONCORDANCE_SEARCH_NUM_RESULTS - $resultsCount;
 
-            if (null === $searchDTO) {
-                $numResults = self::CONCORDANCE_SEARCH_NUM_RESULTS - $resultsCount;
-                $successful = $this->api->concordanceSearch($searchString, $tmName, $field, $tmOffset, $numResults);
-            } else {
-                $successful = $this->api->search($tmName, $tmOffset, 1, $searchDTO);
-            }
+            $successful = $this->api->concordanceSearch($searchString, $tmName, $field, $tmOffset, $numResults);
 
-            if (
-                (! $successful && $this->needsReorganizing($this->api->getError(), $tmName))
-                || ! $segmentIdsGenerated
-            ) {
+            if (! $successful && $this->needsReorganizing($this->api->getError(), $tmName)) {
                 $this->addReorganizeWarning();
                 $this->reorganizeTm($tmName);
-
-                if (null === $searchDTO) {
-                    $numResults = self::CONCORDANCE_SEARCH_NUM_RESULTS - $resultsCount;
-                    $successful = $this->api->concordanceSearch($searchString, $tmName, $field, $tmOffset, $numResults);
-                } else {
-                    $successful = $this->api->search($tmName, $tmOffset, 1, $searchDTO);
-                }
+                $successful = $this->api->concordanceSearch($searchString, $tmName, $field, $tmOffset, $numResults);
             }
 
             if (! $successful) {
@@ -788,17 +590,9 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
                 continue;
             }
 
-            $data = array_map(
-                static function ($item) use ($id) {
-                    $item->internalKey = $id . ':' . $item->internalKey;
-
-                    return $item;
-                },
-                $result->results
-            );
-            $results[] = $data;
+            $results[] = $result->results;
             $resultsCount += count($result->results);
-            $resultList->setNextOffset($result->NewSearchPosition ? ($id . ':' . $result->NewSearchPosition) : null);
+            $resultList->setNextOffset($id . ':' . $result->NewSearchPosition);
 
             // if we get enough results then response them
             if (self::CONCORDANCE_SEARCH_NUM_RESULTS <= $resultsCount) {
@@ -815,37 +609,11 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
         }
 
         foreach ($results as $result) {
-            $resultList->addResult(
-                $this->tagHandler->restoreInResult($result->target, $isSource),
-                0,
-                $this->getMetaData($result)
-            );
+            $resultList->addResult($this->tagHandler->restoreInResult($result->target, $isSource));
             $resultList->setSource($this->tagHandler->restoreInResult($result->source, $isSource));
         }
 
         return $resultList;
-    }
-
-    public function countSegments(SearchDTO $searchDTO): int
-    {
-        $amount = 0;
-        $memories = $this->languageResource->getSpecificData('memories', parseAsArray: true);
-        usort($memories, fn ($m1, $m2) => $m1['id'] <=> $m2['id']);
-
-        foreach ($memories as ['filename' => $tmName]) {
-            $successful = $this->api->search($tmName, 0, 0, $searchDTO);
-
-            if (! $successful) {
-                $this->logger->exception($this->getBadGatewayException($tmName));
-
-                continue;
-            }
-
-            $result = $this->api->getResult();
-            $amount += $result->NumOfFoundSegments;
-        }
-
-        return $amount;
     }
 
     /***
@@ -1729,22 +1497,6 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
         ]);
     }
 
-    public function getMemoryNameById(int $memoryId): ?string
-    {
-        $memories = $this->languageResource->getSpecificData('memories', parseAsArray: true);
-
-        foreach ($memories as $memory) {
-            if ($memory['id'] === $memoryId) {
-                return $memory['filename'];
-            }
-        }
-
-        // TODO add error code
-        throw new editor_Services_Connector_Exception('E1564', [
-            'name' => $this->languageResource->getName(),
-        ]);
-    }
-
     private function isMemoryOverflown(?object $error): bool
     {
         if (null === $error) {
@@ -2169,18 +1921,5 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
     private function generateTmFilename(editor_Models_LanguageResources_LanguageResource $languageResource): string
     {
         return 'ID' . $languageResource->getId() . '-' . $this->filterName($languageResource->getName());
-    }
-
-    private function areSegmentIdsGenerated(string $tmName): bool
-    {
-        $successful = $this->api->status($tmName);
-
-        if (! $successful) {
-            return false;
-        }
-
-        $result = $this->api->getResult();
-
-        return isset($result->segmentIndex) && $result->segmentIndex > 0;
     }
 }

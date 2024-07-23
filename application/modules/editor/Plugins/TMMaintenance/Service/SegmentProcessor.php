@@ -32,7 +32,6 @@ namespace MittagQI\Translate5\Plugins\TMMaintenance\Service;
 
 use editor_Models_LanguageResources_LanguageResource;
 use editor_Services_Connector_Exception;
-use editor_Services_OpenTM2_Connector as Connector;
 use MittagQI\Translate5\Plugins\TMMaintenance\DTO\CreateDTO;
 use MittagQI\Translate5\Plugins\TMMaintenance\DTO\DeleteBatchDTO;
 use MittagQI\Translate5\Plugins\TMMaintenance\DTO\DeleteDTO;
@@ -169,7 +168,7 @@ final class SegmentProcessor
         return $result;
     }
 
-    private function getOpenTM2Connector(int $languageResourceId): Connector
+    private function getOpenTM2Connector(int $languageResourceId): MaintenanceService
     {
         $languageResource = ZfExtended_Factory::get(editor_Models_LanguageResources_LanguageResource::class);
         $languageResource->load($languageResourceId);
@@ -179,8 +178,12 @@ final class SegmentProcessor
             T5MemoryXliff::class
         );
 
-        $connector = new Connector();
-        $connector->connectTo($languageResource, $languageResource->getSourceLang(), $languageResource->getTargetLang());
+        $connector = new MaintenanceService();
+        $connector->connectTo(
+            $languageResource,
+            $languageResource->getSourceLang(),
+            $languageResource->getTargetLang()
+        );
 
         return $connector;
     }
@@ -217,10 +220,9 @@ final class SegmentProcessor
         return $data;
     }
 
-    private function parseMode(?string $mode)
+    private function parseMode(?string $mode): string
     {
         return match ($mode) {
-            'contains' => 'contains',
             'concordance' => 'concordance',
             'exact' => 'exact',
             default => 'contains',
