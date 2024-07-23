@@ -40,6 +40,7 @@ Ext.define('TMMaintenance.view.main.SearchFormController', {
         store.removeAll();
 
         this.getViewModel().set('selectedTm', values.tm);
+        this.getViewModel().set('lastOffset', null);
         this.loadPageByChunks(20,1, false, true);
         this.updateUrl(values);
     },
