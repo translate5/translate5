@@ -84,6 +84,13 @@ class MaintenanceService extends \editor_Services_Connector_Abstract implements 
         $this->api = \ZfExtended_Factory::get('editor_Services_OpenTM2_HttpApi');
         $this->api->setLanguageResource($languageResource);
 
+        $this->tagHandler = \ZfExtended_Factory::get(
+            \editor_Services_Connector_TagHandler_T5MemoryXliff::class,
+            [[
+                'gTagPairing' => false,
+            ]]
+        );
+
         parent::connectTo($languageResource, $sourceLang, $targetLang);
     }
 
@@ -636,7 +643,7 @@ class MaintenanceService extends \editor_Services_Connector_Abstract implements 
     {
         $this->resetReorganizingIfNeeded();
 
-        if ($this->getT5MemoryVersion() === self::VERSION_0_5) {
+        if ($this->getT5MemoryVersion() !== self::VERSION_0_4) {
             return $this->getStatus(
                 $this->resource,
                 tmName: $tmName
@@ -644,18 +651,6 @@ class MaintenanceService extends \editor_Services_Connector_Abstract implements 
         }
 
         return $this->languageResource->getStatus() === LanguageResourceStatus::REORGANIZE_IN_PROGRESS;
-    }
-
-    public function isReorganizeFailed(?string $tmName = null): bool
-    {
-        if ($this->getT5MemoryVersion() === self::VERSION_0_5) {
-            return $this->getStatus(
-                $this->resource,
-                tmName: $tmName
-            ) === LanguageResourceStatus::REORGANIZE_FAILED;
-        }
-
-        return $this->languageResource->getStatus() === LanguageResourceStatus::REORGANIZE_FAILED;
     }
 
     private function addReorganizeWarning(Task $task = null): void
@@ -819,7 +814,7 @@ class MaintenanceService extends \editor_Services_Connector_Abstract implements 
     private function setReorganizeStatusInProgress(LanguageResource $languageResource): void
     {
         $languageResource->setStatus(LanguageResourceStatus::REORGANIZE_IN_PROGRESS);
-        $languageResource->addSpecificData(self::REORGANIZE_STARTED_AT, date(DateTimeInterface::RFC3339));
+        $languageResource->addSpecificData(self::REORGANIZE_STARTED_AT, date(\DateTimeInterface::RFC3339));
     }
     #endregion Reorganize TM
 

@@ -39,7 +39,7 @@ abstract class editor_Services_Connector_HttpApiAbstract
     protected $resource;
 
     /**
-     * @var stdClass|string
+     * @var object{results: array, NewSearchPosition: string}
      */
     protected $result;
 

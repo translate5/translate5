@@ -374,8 +374,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
             'target' => $target,
             'userName' => $segment->getUserName(),
             'context' => $segment->getMid(),
-            // TODO fix this after TMMaintenance is merged
-            // 'timestamp' => $timestamp,
+            'timestamp' => $timestamp,
             'fileName' => $fileName,
         ];
 
@@ -1196,11 +1195,10 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
     {
         $this->resetReorganizingIfNeeded();
 
-        if ($this->getT5MemoryVersion() === self::VERSION_0_5) {
-            return $this->getStatus(
-                $this->resource,
-                tmName: $tmName
-            ) === LanguageResourceStatus::REORGANIZE_IN_PROGRESS;
+        if ($this->getT5MemoryVersion() !== self::VERSION_0_4) {
+            $status = $this->getStatus($this->resource, tmName: $tmName);
+
+            return $status === LanguageResourceStatus::REORGANIZE_IN_PROGRESS;
         }
 
         return $this->languageResource->getStatus() === LanguageResourceStatus::REORGANIZE_IN_PROGRESS;
@@ -1208,7 +1206,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
 
     public function isReorganizeFailed(?string $tmName = null): bool
     {
-        if ($this->getT5MemoryVersion() === self::VERSION_0_5) {
+        if ($this->getT5MemoryVersion() !== self::VERSION_0_4) {
             return $this->getStatus(
                 $this->resource,
                 tmName: $tmName
