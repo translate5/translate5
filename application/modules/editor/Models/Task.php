@@ -108,6 +108,7 @@ use MittagQI\ZfExtended\Session\SessionInternalUniqueId;
  * @method string getReimportable()
  * @method void setReimportable(string|int $reimportable)
  * @method string getCreated()
+ * @method string getModified()
  */
 class editor_Models_Task extends ZfExtended_Models_Entity_Abstract
 {

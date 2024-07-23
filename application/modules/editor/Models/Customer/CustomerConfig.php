@@ -136,4 +136,12 @@ class editor_Models_Customer_CustomerConfig extends ZfExtended_Models_Entity_Abs
         // Get max and return
         return $customMax ? max($default, $customMax) : $default;
     }
+
+    public function loadByName(string $name): array
+    {
+        $s = $this->db->select();
+        $s->where('`name` = ?', $name);
+
+        return $this->db->fetchAll($s)->toArray();
+    }
 }

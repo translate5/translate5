@@ -79,7 +79,7 @@ Ext.define('Editor.view.quality.FilterPanelController', {
      * When the view is collapsed we unload store to be clean
      */
     onCollapse: function(){
-        this.unloadStore(false);
+        this.panelShown = false;
     },
     /**
      * When the view is unloaded we unload store to be clean
