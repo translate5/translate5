@@ -9956,6 +9956,10 @@ E-Mail: service@MittagQI.com</pre>
                 <source>Lokalen Benutzer mit Daten aus dem SSO Provider aktualisieren (Rollen, Geschlecht, Sprache)</source>
                 <target>Update locale user with data from the SSO provider (roles, gender, locale)</target>
             </trans-unit>
+            <trans-unit id='U2VydmVyIGbDvHIgZGVuIGFuZ2VmcmFndGVuIERpZW5zdCBpc3QgbmljaHQgZXJyZWljaGJhci4='>
+                <source>Server für den angefragten Dienst ist nicht erreichbar.</source>
+                <target>Server for the queried service is not reachable.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>
