@@ -34,9 +34,12 @@ use Bootstrap;
 use editor_Workflow_Exception;
 use editor_Workflow_Manager;
 use MittagQI\Translate5\Logging\Rotation;
+use ReflectionException;
 use Zend_Application_Bootstrap_Exception as Zend_Application_Bootstrap_ExceptionAlias;
+use Zend_Exception;
+use Zend_Registry;
 use ZfExtended_Factory;
-use ZfExtended_Logger_Summary;
+use ZfExtended_Models_Log;
 use ZfExtended_Resource_GarbageCollector;
 
 class Cronjobs
@@ -44,8 +47,8 @@ class Cronjobs
     private static bool $running = false;
 
     public function __construct(
-        private Bootstrap $bootstrap,
-        private CronEventTrigger $eventTrigger
+        private readonly Bootstrap $bootstrap,
+        private readonly CronEventTrigger $eventTrigger
     ) {
     }
 
@@ -58,8 +61,10 @@ class Cronjobs
     }
 
     /**
-     * @throws editor_Workflow_Exception
      * @throws Zend_Application_Bootstrap_ExceptionAlias
+     * @throws ReflectionException
+     * @throws Zend_Exception
+     * @throws editor_Workflow_Exception
      */
     public function periodical(): void
     {
@@ -70,9 +75,12 @@ class Cronjobs
         $gc->cleanUp($gc::ORIGIN_CRON);
         $this->doCronWorkflow('doCronPeriodical');
         $this->eventTrigger->triggerPeriodical();
+        $this->logCall(CronEventTrigger::PERIODICAL);
     }
 
     /**
+     * @throws ReflectionException
+     * @throws Zend_Exception
      * @throws editor_Workflow_Exception
      */
     public function daily(): void
@@ -85,18 +93,33 @@ class Cronjobs
         //$summary = ZfExtended_Factory::get(ZfExtended_Logger_Summary::class);
         //$summary->sendSummaryToAdmins();
 
-        $log = ZfExtended_Factory::get(\ZfExtended_Models_Log::class);
-        $log->purgeOlderAs(\Zend_Registry::get('config')->runtimeOptions?->logger?->keepWeeks ?? 6);
+        $log = ZfExtended_Factory::get(ZfExtended_Models_Log::class);
+        $log->purgeOlderAs(Zend_Registry::get('config')->runtimeOptions?->logger?->keepWeeks ?? 6);
         $this->eventTrigger->triggerDaily();
 
         // Rotate logs
         $this->rotateLogs();
+        $this->logCall(CronEventTrigger::DAILY);
+    }
+
+    /**
+     * @throws Zend_Exception
+     */
+    private function logCall(string $type): void
+    {
+        Zend_Registry::get('logger')->cloneMe('core.cron')->info(
+            'E1615',
+            'Cron Jobs called: {type}',
+            [
+                'type' => $type,
+            ]
+        );
     }
 
     /**
      * Rotate logs
      */
-    public function rotateLogs()
+    public function rotateLogs(): void
     {
         // Rotate php log
         Rotation::rotate('php.log');
@@ -106,6 +129,7 @@ class Cronjobs
     /**
      * call workflow action based on given name
      * @throws editor_Workflow_Exception
+     * @throws ReflectionException
      */
     protected function doCronWorkflow(string $fn): void
     {

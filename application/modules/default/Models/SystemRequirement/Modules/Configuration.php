@@ -26,13 +26,6 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-/**#@+
- * @author Marc Mittag
- * @package portal
- * @version 2.0
- *
- */
-
 /**
  * Contains checks for fundamental configuration values
  */
@@ -45,6 +38,7 @@ class Models_SystemRequirement_Modules_Configuration extends ZfExtended_Models_S
     public const RESULT_ID = 'configuration';
 
     /**
+     * @throws Zend_Exception
      * @see ZfExtended_Models_SystemRequirement_Modules_Abstract::validate()
      */
     public function validate(): ZfExtended_Models_SystemRequirement_Result
@@ -54,6 +48,7 @@ class Models_SystemRequirement_Modules_Configuration extends ZfExtended_Models_S
 
         $this->checkServerName();
         $this->checkServerAccessibility();
+        $this->checkCrons();
 
         // TODO how to test APPLICATION_RUNDIR??? (not easy since configured in apache)
         return $this->result;
@@ -161,7 +156,10 @@ class Models_SystemRequirement_Modules_Configuration extends ZfExtended_Models_S
         return $result;
     }
 
-    private function checkServerName()
+    /**
+     * @throws Zend_Exception
+     */
+    private function checkServerName(): void
     {
         $config = Zend_Registry::get('config');
         $configuredHost = $config->runtimeOptions->server->name;
@@ -171,6 +169,32 @@ class Models_SystemRequirement_Modules_Configuration extends ZfExtended_Models_S
                 PHP_EOL . 'and differs to the configured APP_HOST in your docker environment: ' . $apphost;
             $this->result->badSummary[] = 'Usually APP_HOST was changed after installation, so please call: ' .
                 ' t5 config runtimeOptions.server.name "' . $apphost . '"';
+        }
+    }
+
+    private function checkCrons(): void
+    {
+        $db = new ZfExtended_Models_Db_ErrorLog();
+        $daily = $db->fetchAll($db->select()
+            ->where('created >= DATE_SUB(CURDATE(), INTERVAL 3 DAY)')
+            ->where('level = 8')
+            ->where('domain = "core.cron"')
+            ->where('extra like "%daily%"')
+            ->where('eventCode = "E1615"'));
+
+        if ($daily->count() === 0) {
+            $this->result->error[] = 'No daily cron jobs found in the log entries of the last 3 days';
+        }
+
+        $periodical = $db->fetchAll($db->select()
+            ->where('created >= DATE_SUB(NOW(), INTERVAL 12 HOUR)')
+            ->where('level = 8')
+            ->where('domain = "core.cron"')
+            ->where('extra like "%periodical%"')
+            ->where('eventCode = "E1615"'));
+
+        if ($periodical->count() === 0) {
+            $this->result->error[] = 'No periodical cron jobs found in the log entries of the last 12 hours';
         }
     }
 }
