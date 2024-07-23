@@ -28,6 +28,9 @@
 
 namespace MittagQI\Translate5\Plugins\Okapi\Export;
 
+use editor_Plugins_Okapi_Exception;
+use ZfExtended_Debug;
+
 /**
  * This class implements a temporary fix to solve problems with Okapi
  * failing to export filters with customized subfilters
@@ -40,6 +43,11 @@ final class ManifestFixer
 
     public const SUBFILTER_PATTERN = '~global_cdata_subfilter\s*:\s*okf_[a-z0-9]+@\S*~';
 
+    private static array $replaced;
+
+    /**
+     * @throws editor_Plugins_Okapi_Exception
+     */
     public static function checkAndFix(string $manifestPath): void
     {
         $content = @file_get_contents($manifestPath);
@@ -56,13 +64,30 @@ final class ManifestFixer
                     // replace subfilter in settings
                     $settings = preg_replace_callback(self::SUBFILTER_PATTERN, function ($matches) {
                         $parts = explode('@', $matches[0]);
+                        self::$replaced = [$matches[0], $parts[0]]; // just for debugging
 
                         return $parts[0];
                     }, $settings);
                     // replace base64 encoded tweaked settings
                     $content = str_replace($encoded, base64_encode($settings), $content);
-                    // ... and save tweaked manifest
-                    file_put_contents($manifestPath, $content);
+                    // backup original manifest for reference if configured
+                    if (ZfExtended_Debug::hasLevel('plugin', 'OkapiKeepIntermediateFiles')) {
+                        copy($manifestPath, $manifestPath . '.original');
+                    }
+                    // save tweaked manifest
+                    if (file_put_contents($manifestPath, $content) === false) {
+                        throw new editor_Plugins_Okapi_Exception('E1057', [
+                            'okapiDataDir' => dirname($manifestPath),
+                        ]);
+                    }
+                    // debug the action if configured
+                    if (ZfExtended_Debug::hasLevel('plugin', 'OkapiBconfProcessing')) {
+                        error_log(
+                            'Adjusted manifest-file "' . $manifestPath
+                            . '" to replace custom subfilter "' . self::$replaced[0] . '" with base filter "'
+                            . self::$replaced[1] . '"'
+                        );
+                    }
                 }
             }
         }
