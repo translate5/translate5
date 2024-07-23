@@ -190,6 +190,7 @@ Ext.define('Editor.view.quality.FilterPanelController', {
 
         root.expand();
         view.afterLoad();
+        view.setHidden(!root.firstChild.hasChildNodes());
         me.delayedChange = new Ext.util.DelayedTask(function(){
             me.delayedChange = null;
             me.updateFilter(true);
