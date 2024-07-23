@@ -12,6 +12,7 @@ Ext.define('TMMaintenance.view.main.SelectTm', {
     },
     minHeight: 400,
     layout: 'fit',
+    variableHeights: true,
 
     columns: [
         {

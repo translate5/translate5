@@ -1565,7 +1565,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
 
         $resources = $this->api->getResult();
 
-        $version = str_starts_with($resources->Version ?? '', self::VERSION_0_5) ? self::VERSION_0_5 : self::VERSION_0_4;
+        $version = str_starts_with($resources->Version ?? '', self::VERSION_0_4) ? self::VERSION_0_4 : self::VERSION_0_5;
 
         if (! $this->isInternalFuzzy()) {
             // TODO In editor_Services_Manager::visitAllAssociatedTms language resource is initialized
