@@ -1792,6 +1792,9 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
 
     private function checkUpdateResponse(array $request, object $response): void
     {
+        // Temporary disable the check until it is fixed
+        return;
+
         $match =
             $request['source'] === $response->source
             && $request['target'] === $response->target

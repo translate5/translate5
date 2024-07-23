@@ -79,7 +79,7 @@ Ext.define('Editor.view.quality.FilterPanelController', {
      * When the view is collapsed we unload store to be clean
      */
     onCollapse: function(){
-        this.unloadStore(false);
+        this.panelShown = false;
     },
     /**
      * When the view is unloaded we unload store to be clean
@@ -190,6 +190,7 @@ Ext.define('Editor.view.quality.FilterPanelController', {
 
         root.expand();
         view.afterLoad();
+        view.setHidden(!root.firstChild.hasChildNodes());
         me.delayedChange = new Ext.util.DelayedTask(function(){
             me.delayedChange = null;
             me.updateFilter(true);
