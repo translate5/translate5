@@ -269,9 +269,10 @@ class editor_Plugins_MatchAnalysis_Models_MatchAnalysis extends ZfExtended_Model
         foreach ($results as $res) {
             //the key will be languageResource->ServiceType + fuzzy flag (ex: "OpenTm2 memoryfuzzy")
             //because for the internal fuzzy additional row is displayed
-            if ($res['internalFuzzy'] == '1') {
+            $isInternalFuzzy = $res['internalFuzzy'] == '1';
+            if ($isInternalFuzzy) {
                 $lr = $this->getLanguageResourceCached((int) $res['languageResourceid']);
-                $rowKey = $this->getFuzzyName($lr->getResourceId());
+                $rowKey = $this->getFuzzyName($lr?->getResourceId() ?? 'deleted ressource');
             } else {
                 $rowKey = $res['languageResourceid'];
             }
@@ -286,9 +287,15 @@ class editor_Plugins_MatchAnalysis_Models_MatchAnalysis extends ZfExtended_Model
             //check on which border group this result belongs to
             foreach ($this->fuzzyRanges as $begin => $end) {
                 //check if the language resource is not initialized by group initializer
-                if (! isset($groupedResults[$rowKey]) && $res['languageResourceid'] > 0) {
+                if (! isset($groupedResults[$rowKey]['resourceName']) && $res['languageResourceid'] > 0) {
                     //the resource is removed for the assoc, but the analysis stays
-                    $groupedResults[$rowKey]['resourceName'] = $translate->_("Diese Ressource wird entfernt");
+                    $newName = $translate->_('Diese Sprachressource wurde entfernt (ID: %s)');
+                    $groupedResults[$rowKey]['resourceName'] = sprintf(
+                        $newName,
+                        $isInternalFuzzy
+                            ? $this->getFuzzyName($res['languageResourceid'])
+                            : $res['languageResourceid']
+                    );
                     $groupedResults[$rowKey]['resourceColor'] = "";
                 }
 
