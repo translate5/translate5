@@ -40,25 +40,7 @@ Ext.define('TMMaintenance.view.main.SearchFormController', {
         store.removeAll();
 
         this.getViewModel().set('selectedTm', values.tm);
-        store.load({
-            params: values,
-            callback: (records, operation, success) => {
-                if (!success) {
-                    this.showServerError(operation.getError());
-                    console.log('Error loading store');
-
-                    return;
-                }
-
-                const offset = operation.getProxy().getReader().metaData.offset;
-
-                this.getViewModel().set('lastOffset', offset);
-                this.getViewModel().set('hasRecords', records.length > 0);
-                this.getViewModel().set('hasMoreRecords', null !== offset);
-                this.readTotalAmount();
-            },
-        });
-
+        this.loadPageByChunks(20,1, false, true);
         this.updateUrl(values);
     },
 
@@ -214,4 +196,6 @@ Ext.define('TMMaintenance.view.main.SearchFormController', {
     getStrings: function () {
         return this.getViewModel().get('l10n').list;
     }
+}, function() {
+    this.borrow(TMMaintenance.view.main.MainController, ['loadPageByChunks']);
 });

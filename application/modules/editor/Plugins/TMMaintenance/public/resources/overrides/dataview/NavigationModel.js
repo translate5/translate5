@@ -117,7 +117,6 @@ Ext.define('TMMaintenance.override.dataview.NavigationModel', {
             scroller, child, record, itemContainer, childFloatStyle, locationView;
 
         if (location == null) {
-            console.log('was no location');
             return me.clearLocation();
         }
 

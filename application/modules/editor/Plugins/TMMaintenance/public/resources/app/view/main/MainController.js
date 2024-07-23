@@ -86,28 +86,53 @@ Ext.define('TMMaintenance.view.main.MainController', {
             return;
         }
 
-        let values = Ext.getCmp('searchform').getValues();
-        let store = Ext.getCmp('mainlist').store;
-        let me = this;
+        this.loadPageByChunks(20,1, true, true);
+    },
+
+    loadPageByChunks: function(pageSize, chunkSize, append, abortPrev) {
+        let me = this,
+            store = Ext.getCmp('mainlist').getStore(),
+            values = Ext.ComponentQuery.query('searchform').pop().getValues(),
+            offset = me.getViewModel().get('lastOffset');
+
+        if (abortPrev || !append) {
+            me.loadedQty = 0;
+        }
+
+        if (abortPrev) {
+            store.getProxy().abortByPurpose = true;
+            store.getProxy().abort();
+        }
 
         store.load({
-            params: {
-                ...values,
-                offset: this.getViewModel().get('lastOffset'),
-            },
-            addRecords: true,
-            callback: function(records, operation, success) {
+            params: {...values, offset: offset},
+            limit: chunkSize,
+            addRecords: append,
+            callback: (records, operation, success) => {
                 if (!success) {
-                    me.showServerError(operation.getError());
-                    console.log('Error loading store');
+
+                    if (operation.getError().statusText !== 'transaction aborted' || !operation.getProxy().abortByPurpose) {
+                        me.showServerError(operation.getError());
+                    }
+                    if (operation.getProxy().abortByPurpose) {
+                        delete operation.getProxy().abortByPurpose;
+                    }
 
                     return;
                 }
 
-                let offset = operation.getProxy().getReader().metaData.offset;
+                const offset = operation.getProxy().getReader().metaData.offset;
+                me.loadedQty ++;
 
                 me.getViewModel().set('lastOffset', offset);
                 me.getViewModel().set('hasMoreRecords', null !== offset);
+                if (!append) {
+                    me.getViewModel().set('hasRecords', records.length > 0);
+                    me.readTotalAmount();
+                }
+                if (null !== offset && me.loadedQty < pageSize) {
+                    me.loadPageByChunks(pageSize, chunkSize,true);
+                }
             },
         });
     },

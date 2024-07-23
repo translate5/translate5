@@ -29,10 +29,11 @@ Ext.define('TMMaintenance.view.main.List', {
         viewModel: true,
     },
     variableHeights: true,
-
+    loadingText: '',
     columns: [
         {
-            xtype: 'rownumberer'
+            xtype: 'rownumberer',
+            width: 40
         },
         {
             dataIndex: 'id',
