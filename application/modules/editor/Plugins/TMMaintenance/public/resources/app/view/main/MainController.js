@@ -54,7 +54,7 @@ Ext.define('TMMaintenance.view.main.MainController', {
             'csrfToken': window.csrfToken,
         });
 
-        let url = '/editor/plugins_tmmaintenance_api/locale/list';
+        let url = '/editor/plugins_tmmaintenance_api/data';
         if (newLocale) {
             url += '?locale=' + newLocale
         }

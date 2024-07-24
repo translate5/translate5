@@ -53,7 +53,7 @@ class Editor_Plugins_Tmmaintenance_ApiController extends ZfExtended_RestControll
 
     #region Actions
 
-    public function localesAction(): void
+    public function dataAction(): void
     {
         $data = [
             'locale' => $this->resolveLocale(),

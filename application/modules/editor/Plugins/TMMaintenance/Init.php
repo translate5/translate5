@@ -96,18 +96,11 @@ class editor_Plugins_TMMaintenance_Init extends ZfExtended_Plugin_Abstract
         ]);
         $router->addRoute('plugins_tmmaintenance_read_amount', $route);
 
-        $route = new ZfExtended_Controller_RestLikeRoute('editor/plugins_tmmaintenance_api/locale/list', [
+        $route = new ZfExtended_Controller_RestLikeRoute('editor/plugins_tmmaintenance_api/data/*', [
             'module' => 'editor',
             'controller' => 'plugins_tmmaintenance_api',
-            'action' => 'locales',
+            'action' => 'data',
         ]);
         $router->addRoute('plugins_tmmaintenance_locales', $route);
-
-        $route = new ZfExtended_Controller_RestLikeRoute('editor/plugins_tmmaintenance_api/tm/list', [
-            'module' => 'editor',
-            'controller' => 'plugins_tmmaintenance_api',
-            'action' => 'tms',
-        ]);
-        $router->addRoute('plugins_tmmaintenance_tms', $route);
     }
 }
