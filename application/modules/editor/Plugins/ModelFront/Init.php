@@ -228,9 +228,9 @@ class editor_Plugins_ModelFront_Init extends ZfExtended_Plugin_Abstract
             $taskGuid
         );
 
-        $parentWorkerId = null;
+        $parentWorkerId = 0;
         if (! empty($result)) {
-            $parentWorkerId = $result[0]['id'];
+            $parentWorkerId = (int) $result[0]['id'];
         }
 
         $worker->queue($parentWorkerId);

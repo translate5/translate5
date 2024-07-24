@@ -283,10 +283,7 @@ abstract class Worker extends editor_Models_Task_AbstractWorker
     /**
      * Queueing a pooled service worker usually queues several workers at once
      * UGLY: The param $startNext has a ambigous meaning here: more like "startAsManyAsThereAreFreeResources"
-     * This is defined by the
-     * @param int $parentId
-     * @param null $state
-     * @param bool $startNext
+     *
      * @throws Zend_Exception
      * @throws ZfExtended_Exception
      * @throws \ReflectionException
@@ -295,7 +292,7 @@ abstract class Worker extends editor_Models_Task_AbstractWorker
      * @throws \ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey
      * @throws \ZfExtended_Models_Entity_NotFoundException
      */
-    public function queue($parentId = 0, $state = null, $startNext = true): int
+    public function queue(int $parentId = 0, string $state = null, bool $startNext = true): int
     {
         if ($startNext) {
             $this->checkIsInitCalled();
