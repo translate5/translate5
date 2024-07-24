@@ -26,6 +26,7 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use editor_Segment_Internal_ContentTag as ContentTag;
 use MittagQI\Translate5\ContentProtection\NumberProtector;
 use MittagQI\Translate5\Segment\Tag\Placeable;
 use MittagQI\ZfExtended\Tools\Markup;
@@ -36,8 +37,6 @@ use PHPHtmlParser\Dom\Node\HtmlNode;
  * Represents an Internal tag
  * Example <div class="single 123 internal-tag ownttip"><span title="&lt;ph ax:element-id=&quot;0&quot;&gt;&amp;lt;variable linkid=&quot;123&quot; name=&quot;1002&quot;&amp;gt;Geräte, Detailmaß A&amp;lt;/variable&amp;gt;&lt;/ph&gt;" class="short">&lt;1/&gt;</span><span data-originalid="6f18ea87a8e0306f7c809cb4f06842eb" data-length="-1" class="full">&lt;ph id=&quot;1&quot; ax:element-id=&quot;0&quot;&gt;&amp;lt;variable linkid=&quot;123&quot; name=&quot;1002&quot;&amp;gt;Geräte Detailmaß A&amp;lt;/variable&amp;gt;&lt;/ph&gt;</span></div>
  * The inner Content Tags are stored as special Tags editor_Segment_Internal_ContentTag
- *
- * @method editor_Segment_Internal_Tag createBaseClone()
  */
 final class editor_Segment_Internal_Tag extends editor_Segment_Tag
 {
@@ -107,15 +106,15 @@ final class editor_Segment_Internal_Tag extends editor_Segment_Tag
      */
     public const CSS_CLASS_CHAR = 'char';
 
-    protected static $type = editor_Segment_Tag::TYPE_INTERNAL;
+    protected static ?string $type = editor_Segment_Tag::TYPE_INTERNAL;
 
-    protected static $nodeName = 'div';
+    protected static ?string $nodeName = 'div';
 
-    protected static $identificationClass = self::CSS_CLASS;
+    protected static ?string $identificationClass = self::CSS_CLASS;
 
-    public $_idx;
+    public int $_idx;
 
-    public $_sidx;
+    public int $_sidx;
 
     /**
      * Replaces all Internal Tags in a segment-text
@@ -136,9 +135,8 @@ final class editor_Segment_Internal_Tag extends editor_Segment_Tag
     /**
      * Provides validating a list of DOMchildren to be the inner elements of a proper internal tag
      * This API is only needed where it is not known, if we deal with translate5 segment text or common markup (e.g. via InstantTranslate)
-     * @return bool
      */
-    public static function domElementChildrenAreInternalTagChildren(\DOMNodeList $domChildren = null)
+    public static function domElementChildrenAreInternalTagChildren(DOMNodeList $domChildren = null): bool
     {
         if ($domChildren === null || $domChildren->count() != 2) {
             return false;
@@ -160,7 +158,7 @@ final class editor_Segment_Internal_Tag extends editor_Segment_Tag
      * This API is only needed where it is not known, if we deal with translate5 segment text or common markup (e.g. via InstantTranslate)
      * @param AbstractNode[]|null $htmlChildren
      */
-    public static function htmlNodeChildrenAreInternalTagChildren(array $htmlChildren = null)
+    public static function htmlNodeChildrenAreInternalTagChildren(array $htmlChildren = null): bool
     {
         if ($htmlChildren === null || count($htmlChildren) != 2) {
             return false;
@@ -185,30 +183,23 @@ final class editor_Segment_Internal_Tag extends editor_Segment_Tag
     }
 
     /**
-     * @var editor_Segment_Internal_ContentTag[]
+     * @var ContentTag[]
      */
-    private $contentTags = null;
+    private ?array $contentTags = null;
 
-    /**
-     * @var editor_Segment_Internal_ContentTag
-     */
-    private $shortTag = null;
+    private ?ContentTag $shortTag = null;
 
-    /**
-     * @var editor_Segment_Internal_ContentTag
-     */
-    private $fullTag = null;
+    private ?ContentTag $fullTag = null;
 
     /**
      * Prop is needed for the tag-comparision and tag-repair and represents the counterpart
-     * @var editor_Segment_Internal_Tag
      */
-    public $counterpart = null;
+    public ?editor_Segment_Internal_Tag $counterpart = null;
 
     /**
      * API needed for cloning
      */
-    private function addContentTag(editor_Segment_Internal_ContentTag $tag)
+    private function addContentTag(ContentTag $tag): void
     {
         if ($this->contentTags === null) {
             $this->contentTags = [];
@@ -332,9 +323,8 @@ final class editor_Segment_Internal_Tag extends editor_Segment_Tag
 
     /**
      * Retrieves the original index of the internal tag within the segment
-     * @return int
      */
-    public function getTagIndex()
+    public function getTagIndex(): int
     {
         if ($this->shortTag != null) {
             return $this->shortTag->getTagIndex();
@@ -362,10 +352,7 @@ final class editor_Segment_Internal_Tag extends editor_Segment_Tag
         }
     }
 
-    /**
-     * @return string|null
-     */
-    public function getOriginalId()
+    public function getOriginalId(): ?string
     {
         if ($this->fullTag != null && $this->fullTag->hasData('originalid')) {
             return $this->fullTag->getData('originalid');
@@ -396,7 +383,7 @@ final class editor_Segment_Internal_Tag extends editor_Segment_Tag
     }
 
     /**
-     * Internal parser to find stuff in theencapsulated tag
+     * Internal parser to find stuff in the encapsulated tag
      */
     private function findIntAttribInTitle(string $title, string $attributeName): int
     {
@@ -412,13 +399,10 @@ final class editor_Segment_Internal_Tag extends editor_Segment_Tag
         return -1;
     }
 
-    /**
-     * @return int
-     */
-    public function getContentLength()
+    public function getContentLength(): int
     {
         if ($this->fullTag != null && $this->fullTag->hasData('length')) {
-            return $this->fullTag->getData('length');
+            return (int) $this->fullTag->getData('length');
         }
 
         return 0;
@@ -426,9 +410,8 @@ final class editor_Segment_Internal_Tag extends editor_Segment_Tag
 
     /**
      * Retrieves a hash that can be used to compare tags
-     * @return string
      */
-    public function getComparisionHash()
+    public function getComparisionHash(): string
     {
         // we use our visual representation like "</6>" as key to compare tags
         if ($this->shortTag != null) {
@@ -450,8 +433,6 @@ final class editor_Segment_Internal_Tag extends editor_Segment_Tag
 
     /**
      * As soon as our internal spans are added we act as singular tags
-     * {@inheritDoc}
-     * @see editor_Tag::isSingular()
      */
     public function isSingular(): bool
     {
@@ -460,8 +441,6 @@ final class editor_Segment_Internal_Tag extends editor_Segment_Tag
 
     /**
      * Internal tags must not be splitted nor joined !
-     * {@inheritDoc}
-     * @see editor_Segment_Tag::isSplitable()
      */
     public function isSplitable(): bool
     {
@@ -470,8 +449,6 @@ final class editor_Segment_Internal_Tag extends editor_Segment_Tag
 
     /**
      * Internal tags are only equal when their content is equal as well
-     * {@inheritDoc}
-     * @see editor_Tag::isEqual()
      */
     public function isEqual(editor_Tag $tag, bool $withDataAttribs = true): bool
     {
@@ -484,37 +461,30 @@ final class editor_Segment_Internal_Tag extends editor_Segment_Tag
 
     /**
      * Must be overwritten to ensure, the internal tag does add it's text nor text-length to the field-tags
-     * {@inheritDoc}
-     * @see editor_Tag::getText()
      */
-    public function getText()
+    public function getText(): string
     {
         return '';
     }
 
     /**
      * Must be overwritten to ensure, the internal tag does add it's text nor text-length to the field-tags
-     * {@inheritDoc}
-     * @see editor_Tag::getTextLength()
      */
-    public function getTextLength()
+    public function getTextLength(): int
     {
         return 0;
     }
 
     /**
      * The length as defined by the data-attribute
-     * @return int
      */
-    public function getDataLength()
+    public function getDataLength(): int
     {
         return ($this->hasData('length')) ? intval($this->getData('length')) : 1;
     }
 
     /**
      * Must be overwritten to ensure, the internal tag does add it's text nor text-length to the field-tags
-     * {@inheritDoc}
-     * @see editor_Tag::getLastChildsTextLength()
      */
     public function getLastChildsTextLength(): int
     {
@@ -523,8 +493,6 @@ final class editor_Segment_Internal_Tag extends editor_Segment_Tag
 
     /**
      * This renders our inner HTML
-     * {@inheritDoc}
-     * @see editor_Tag::renderChildren()
      */
     public function renderChildren(array $skippedTypes = null): string
     {
@@ -613,8 +581,6 @@ final class editor_Segment_Internal_Tag extends editor_Segment_Tag
 
     /**
      * Needs to be overwritten to ignore the singular-prop when rendering
-     * {@inheritDoc}
-     * @see editor_Tag::renderStart()
      */
     protected function renderStart(bool $withDataAttribs = true): string
     {
@@ -623,8 +589,6 @@ final class editor_Segment_Internal_Tag extends editor_Segment_Tag
 
     /**
      * Needs to be overwritten to ignore the singular-prop when rendering
-     * {@inheritDoc}
-     * @see editor_Tag::renderEnd()
      */
     protected function renderEnd(): string
     {
@@ -633,34 +597,27 @@ final class editor_Segment_Internal_Tag extends editor_Segment_Tag
 
     /**
      * We do not add children to the tags-container but we build our inner tags from the tags-structure
-     * {@inheritDoc}
-     * @see editor_Segment_Tag::sequenceChildren()
      */
-    public function sequenceChildren(editor_TagSequence $tags, int $parentOrder = -1)
+    public function sequenceChildren(editor_TagSequence $tags, int $parentOrder = -1): void
     {
         if ($this->hasChildren()) {
             foreach ($this->children as $child) {
-                $this->addContentTag(editor_Segment_Internal_ContentTag::fromTag($child));
+                $this->addContentTag(ContentTag::fromTag($child));
             }
         }
     }
 
     /**
      * Handled internally
-     * {@inheritDoc}
-     * @see editor_Segment_Tag::addSegmentText()
      */
-    public function addSegmentText(editor_TagSequence $tags)
+    public function addSegmentText(editor_TagSequence $tags): void
     {
         if ($this->startIndex < $this->endIndex) {
             $this->addText($tags->getTextPart($this->startIndex, $this->endIndex));
         }
     }
 
-    /**
-     * @return editor_Segment_Internal_Tag
-     */
-    public function clone(bool $withDataAttribs = false, bool $withId = false)
+    public function clone(bool $withDataAttribs = false, bool $withId = false): static
     {
         $clone = parent::clone($withDataAttribs, $withId);
         /* @var $clone editor_Segment_Internal_Tag */
@@ -671,7 +628,7 @@ final class editor_Segment_Internal_Tag extends editor_Segment_Tag
         return $clone;
     }
 
-    protected function furtherSerialize(stdClass $data)
+    protected function furtherSerialize(stdClass $data): void
     {
         $data->contentTags = [];
         foreach ($this->contentTags as $contentTag) {
@@ -679,11 +636,11 @@ final class editor_Segment_Internal_Tag extends editor_Segment_Tag
         }
     }
 
-    protected function furtherUnserialize(stdClass $data)
+    protected function furtherUnserialize(stdClass $data): void
     {
         if (property_exists($data, 'contentTags')) {
             foreach ($data->contentTags as $data) {
-                $this->addContentTag(editor_Segment_Internal_ContentTag::fromJsonData($data));
+                $this->addContentTag(ContentTag::fromJsonData($data));
             }
         }
     }

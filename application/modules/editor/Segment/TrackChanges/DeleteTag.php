@@ -29,27 +29,21 @@ END LICENSE AND COPYRIGHT
 /**
  * Represents a TrackChanges Delete Tag like <del class="trackchanges ownttip deleted"> ... </del>
  */
-class editor_Segment_TrackChanges_DeleteTag extends editor_Segment_Tag
+final class editor_Segment_TrackChanges_DeleteTag extends editor_Segment_Tag
 {
     public const CSS_CLASS = 'trackchanges';
 
-    protected static $type = editor_Segment_Tag::TYPE_TRACKCHANGES;
+    protected static ?string $type = editor_Segment_Tag::TYPE_TRACKCHANGES;
 
-    protected static $nodeName = 'del';
+    protected static ?string $nodeName = 'del';
 
-    protected static $identificationClass = self::CSS_CLASS;
+    protected static ?string $identificationClass = self::CSS_CLASS;
 
-    /**
-     * @return boolean
-     */
     public function isDeleteTag(): bool
     {
         return true;
     }
 
-    /**
-     * @return boolean
-     */
     public function isInsertTag(): bool
     {
         return false;
