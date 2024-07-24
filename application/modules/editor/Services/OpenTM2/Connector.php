@@ -525,17 +525,19 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
     {
         $offsetTmId = null;
         $tmOffset = null;
+        $recordKey = null;
+        $targetKey = null;
 
         if (null !== $offset) {
-            @[$offsetTmId, $tmOffset] = explode(':', (string) $offset);
+            @[$offsetTmId, $recordKey, $targetKey] = explode(':', (string) $offset);
         }
 
-        if ('' !== $offsetTmId && null === $tmOffset) {
+        if ('' !== $offsetTmId && null === $recordKey && null === $targetKey) {
             throw new editor_Services_Connector_Exception('E1565', compact('offset'));
         }
 
-        if (null !== $tmOffset) {
-            $tmOffset = (int) $tmOffset;
+        if (null !== $recordKey && null !== $targetKey) {
+            $tmOffset = $recordKey . ':' . $targetKey;
         }
 
         $isSource = $field === 'source';
@@ -589,7 +591,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
 
             $results[] = $result->results;
             $resultsCount += count($result->results);
-            $resultList->setNextOffset($id . ':' . $result->NewSearchPosition);
+            $resultList->setNextOffset($result->NewSearchPosition ? $id . ':' . $result->NewSearchPosition : null);
 
             // if we get enough results then response them
             if (self::CONCORDANCE_SEARCH_NUM_RESULTS <= $resultsCount) {
@@ -1815,27 +1817,25 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
     private function checkUpdateResponse(array $request, object $response): void
     {
         // Temporary disable the check until it is fixed
-        return;
-
-        $match =
-            $request['source'] === $response->source
-            && $request['target'] === $response->target
-            && mb_strtoupper($request['userName']) === $response->author
-            && $request['context'] === $response->context
-//            && $request['timestamp'] === $response->timestamp
-            && $request['fileName'] === $response->documentName;
-
-        if (! $match) {
-            $this->logger->error(
-                'E1586',
-                'Sent data does not match the response from t5memory in update call.',
-                [
-                    'languageResource' => $this->languageResource,
-                    'request' => $request,
-                    'response' => json_encode($response, JSON_PRETTY_PRINT),
-                ]
-            );
-        }
+        //        $match =
+        //            $request['source'] === $response->source
+        //            && $request['target'] === $response->target
+        //            && mb_strtoupper($request['userName']) === $response->author
+        //            && $request['context'] === $response->context
+        ////            && $request['timestamp'] === $response->timestamp
+        //            && $request['fileName'] === $response->documentName;
+        //
+        //        if (! $match) {
+        //            $this->logger->error(
+        //                'E1586',
+        //                'Sent data does not match the response from t5memory in update call.',
+        //                [
+        //                    'languageResource' => $this->languageResource,
+        //                    'request' => $request,
+        //                    'response' => json_encode($response, JSON_PRETTY_PRINT),
+        //                ]
+        //            );
+        //        }
     }
 
     /**
