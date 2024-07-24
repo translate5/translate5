@@ -363,6 +363,7 @@ class MaintenanceService extends \editor_Services_Connector_Abstract implements 
             $resultList->setNextOffset($result->NewSearchPosition ? ($id . ':' . $result->NewSearchPosition) : null);
 
             // if we get enough results then response them
+            /** @var int $resultsCount */
             if (self::CONCORDANCE_SEARCH_NUM_RESULTS <= $resultsCount) {
                 break;
             }

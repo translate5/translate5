@@ -335,9 +335,6 @@ class editor_Services_TermCollection_Connector extends editor_Services_Connector
         return $newFileInfo;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function getValidFiletypes()
     {
         return [
@@ -346,9 +343,6 @@ class editor_Services_TermCollection_Connector extends editor_Services_Connector
         ];
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function getValidExportTypes()
     {
         return [

@@ -75,9 +75,6 @@ class editor_Services_DummyFileTm_Connector extends editor_Services_Connector_Ab
         parent::__construct();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function addTm(array $fileinfo = null, array $params = null)
     {
         if (empty($fileinfo)) {
@@ -104,9 +101,6 @@ class editor_Services_DummyFileTm_Connector extends editor_Services_Connector_Ab
         //TODO
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function getTm($mime)
     {
         $target = strtolower($this->languageResource->getTargetLangCode());
@@ -159,9 +153,6 @@ class editor_Services_DummyFileTm_Connector extends editor_Services_Connector_Ab
         $row->save();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function query(editor_Models_Segment $segment)
     {
         $queryString = $this->getQueryStringAndSetAsDefault($segment);
@@ -169,9 +160,6 @@ class editor_Services_DummyFileTm_Connector extends editor_Services_Connector_Ab
         return $this->loopData($this->tagHandler->prepareQuery($queryString));
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function search(string $searchString, $field = 'source', $offset = null)
     {
         $this->searchCount = 0;
@@ -262,9 +250,6 @@ class editor_Services_DummyFileTm_Connector extends editor_Services_Connector_Ab
         $this->searchCount++;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function delete()
     {
         $where = [
@@ -277,9 +262,6 @@ class editor_Services_DummyFileTm_Connector extends editor_Services_Connector_Ab
         $this->db->delete($where);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function getValidFiletypes()
     {
         return [
@@ -287,9 +269,6 @@ class editor_Services_DummyFileTm_Connector extends editor_Services_Connector_Ab
         ];
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function getValidExportTypes()
     {
         return [

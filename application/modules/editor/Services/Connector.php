@@ -397,7 +397,7 @@ class editor_Services_Connector
         $model = ZfExtended_Factory::get(BatchResult::class);
 
         return $model->getResults(
-            $segment->getId(),
+            (string) $segment->getId(),
             $this->adapter->getLanguageResource()->getId()
         );
     }

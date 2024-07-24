@@ -14,10 +14,10 @@ use editor_Models_Task;
 use editor_Models_Terminology_Models_TermModel;
 use editor_Services_Connector;
 use editor_Services_Connector_Abstract;
-use MittagQI\Translate5\Integration\FileBasedInterface;
 use editor_Services_Manager;
 use editor_Services_ServiceResult;
 use Exception;
+use MittagQI\Translate5\Integration\FileBasedInterface;
 use MittagQI\Translate5\LanguageResource\TaskPivotAssociation;
 use stdClass;
 use Zend_Db_Statement_Exception;
@@ -123,7 +123,12 @@ class Pivot
             $connector = null;
 
             try {
-                $connector = $manager->getConnector($languageresource, $this->task->getSourceLang(), $this->task->getRelaisLang(), $this->task->getConfig());
+                $connector = $manager->getConnector(
+                    $languageresource,
+                    (int) $this->task->getSourceLang(),
+                    (int) $this->task->getRelaisLang(),
+                    $this->task->getConfig()
+                );
 
                 // set the analysis running user to the connector
                 $connector->setWorkerUserGuid($this->userGuid);
@@ -208,7 +213,7 @@ class Pivot
             $segmentCounter++;
 
             //progress to update
-            $progress = $segmentCounter / $this->task->getSegmentCount();
+            $progress = $segmentCounter / (int) $this->task->getSegmentCount();
 
             // ignore the segments with relais content
             if (! empty($segment->get('relais'))) {
@@ -463,7 +468,7 @@ class Pivot
             $relaisResult = $segment->getSource();
         }
         //check if the result is valid for log
-        if ($this->isResourceLogValid($languageResource, $segment->getMatchRate())) {
+        if ($this->isResourceLogValid($languageResource, (int) $segment->getMatchRate())) {
             $this->connectors[$languageResourceid]->logAdapterUsage($segment, false);
         }
 
