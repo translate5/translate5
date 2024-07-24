@@ -39,12 +39,12 @@ use MittagQI\Translate5\T5Memory\DTO\DeleteBatchDTO;
 use MittagQI\Translate5\T5Memory\DTO\SearchDTO;
 
 /**
- * T5memory / OpenTM2 Connector
- *
- * IMPORTANT: see the doc/comments in MittagQI\Translate5\Service\T5Memory
+ * This is a temporary service partially copying functionality from the OpenTM2Connector
  */
 class MaintenanceService extends \editor_Services_Connector_Abstract implements UpdatableAdapterInterface
 {
+    private const CONCORDANCE_SEARCH_NUM_RESULTS = 1;
+
     private \editor_Services_OpenTM2_HttpApi $api;
 
     /**
@@ -427,7 +427,7 @@ class MaintenanceService extends \editor_Services_Connector_Abstract implements 
             }
 
             $segmentIdsGenerated = $this->areSegmentIdsGenerated($tmName);
-            $successful = $this->api->search($tmName, $tmOffset, 1, $searchDTO);
+            $successful = $this->api->search($tmName, $tmOffset, self::CONCORDANCE_SEARCH_NUM_RESULTS, $searchDTO);
 
             if (
                 ! $segmentIdsGenerated
@@ -436,7 +436,7 @@ class MaintenanceService extends \editor_Services_Connector_Abstract implements 
                 $this->addReorganizeWarning();
                 $this->reorganizeTm($tmName);
 
-                $successful = $this->api->search($tmName, $tmOffset, 1, $searchDTO);
+                $successful = $this->api->search($tmName, $tmOffset, self::CONCORDANCE_SEARCH_NUM_RESULTS, $searchDTO);
             }
 
             if (! $successful) {
@@ -464,13 +464,13 @@ class MaintenanceService extends \editor_Services_Connector_Abstract implements 
                 $result->results
             );
             $results[] = $data;
-            //            $resultsCount += count($result->results);
+            $resultsCount += count($result->results);
             $resultList->setNextOffset($result->NewSearchPosition ? ($id . ':' . $result->NewSearchPosition) : null);
 
-            //            // if we get enough results then response them
-            //            if (1 <= $resultsCount) {
-            break;
-            //            }
+            // if we get enough results then response them
+            if (self::CONCORDANCE_SEARCH_NUM_RESULTS <= $resultsCount) {
+                break;
+            }
         }
 
         $results = array_merge(...$results);
