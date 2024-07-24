@@ -1809,25 +1809,25 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
     private function checkUpdateResponse(array $request, object $response): void
     {
         // Temporary disable the check until it is fixed
-//        $match =
-//            $request['source'] === $response->source
-//            && $request['target'] === $response->target
-//            && mb_strtoupper($request['userName']) === $response->author
-//            && $request['context'] === $response->context
-////            && $request['timestamp'] === $response->timestamp
-//            && $request['fileName'] === $response->documentName;
-//
-//        if (! $match) {
-//            $this->logger->error(
-//                'E1586',
-//                'Sent data does not match the response from t5memory in update call.',
-//                [
-//                    'languageResource' => $this->languageResource,
-//                    'request' => $request,
-//                    'response' => json_encode($response, JSON_PRETTY_PRINT),
-//                ]
-//            );
-//        }
+        //        $match =
+        //            $request['source'] === $response->source
+        //            && $request['target'] === $response->target
+        //            && mb_strtoupper($request['userName']) === $response->author
+        //            && $request['context'] === $response->context
+        ////            && $request['timestamp'] === $response->timestamp
+        //            && $request['fileName'] === $response->documentName;
+        //
+        //        if (! $match) {
+        //            $this->logger->error(
+        //                'E1586',
+        //                'Sent data does not match the response from t5memory in update call.',
+        //                [
+        //                    'languageResource' => $this->languageResource,
+        //                    'request' => $request,
+        //                    'response' => json_encode($response, JSON_PRETTY_PRINT),
+        //                ]
+        //            );
+        //        }
     }
 
     private function checkUpdatedSegmentIfNeeded(editor_Models_Segment $segment, bool $recheckOnUpdate): void
