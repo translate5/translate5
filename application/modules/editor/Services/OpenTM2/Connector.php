@@ -115,7 +115,6 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
 
     /**
      * @throws Zend_Exception
-     * @see editor_Services_Connector_FilebasedAbstract::addTm()
      */
     public function addTm(array $fileinfo = null, array $params = null): bool
     {

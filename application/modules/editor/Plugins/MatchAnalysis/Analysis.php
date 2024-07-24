@@ -27,6 +27,7 @@
  */
 
 use editor_Models_LanguageResources_LanguageResource as LanguageResource;
+use MittagQI\Translate5\Integration\FileBasedInterface;
 use MittagQI\Translate5\LanguageResource\Adapter\Exception\SegmentUpdateException;
 use MittagQI\Translate5\LanguageResource\Status;
 
@@ -279,7 +280,7 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
         // or the one stored for the repetition could be from a MT. So recalc here always.
         $bestResult = $this->getBestResult($segment, false);
         // we take only 102% if the master was lesser
-        $repetitionRate = max(($bestResult->matchrate ?? 0), editor_Services_Connector_FilebasedAbstract::REPETITION_MATCH_VALUE);
+        $repetitionRate = max(($bestResult->matchrate ?? 0), FileBasedInterface::REPETITION_MATCH_VALUE);
         //save the repetition analysis with either 102% or 103% matchrate
         $this->saveAnalysis($segment, $repetitionRate, 0);
 

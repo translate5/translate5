@@ -54,9 +54,6 @@ class editor_Services_TermCollection_Connector extends editor_Services_Connector
         $this->targetLang = $targetLang;
     }
 
-    /**
-     * @see editor_Services_Connector_FilebasedAbstract::addTm()
-     */
     public function addTm(array $fileinfo = null, array $params = null): bool
     {
         if (empty($fileinfo)) {
@@ -339,7 +336,7 @@ class editor_Services_TermCollection_Connector extends editor_Services_Connector
     }
 
     /**
-     * @see editor_Services_Connector_FilebasedAbstract::getValidFiletypes()
+     * {@inheritDoc}
      */
     public function getValidFiletypes()
     {
@@ -350,7 +347,7 @@ class editor_Services_TermCollection_Connector extends editor_Services_Connector
     }
 
     /**
-     * @see editor_Services_Connector_FilebasedAbstract::getValidExportTypes()
+     * {@inheritDoc}
      */
     public function getValidExportTypes()
     {
@@ -363,7 +360,6 @@ class editor_Services_TermCollection_Connector extends editor_Services_Connector
      * Add/parce tbx file to the exsisting termcollection
      *
      * {@inheritDoc}
-     * @see editor_Services_Connector_FilebasedAbstract::addAdditionalTm()
      */
     public function addAdditionalTm(array $fileinfo = null, array $params = null)
     {

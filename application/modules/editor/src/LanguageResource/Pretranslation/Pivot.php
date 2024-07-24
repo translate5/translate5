@@ -14,7 +14,7 @@ use editor_Models_Task;
 use editor_Models_Terminology_Models_TermModel;
 use editor_Services_Connector;
 use editor_Services_Connector_Abstract;
-use editor_Services_Connector_FilebasedAbstract;
+use MittagQI\Translate5\Integration\FileBasedInterface;
 use editor_Services_Manager;
 use editor_Services_ServiceResult;
 use Exception;
@@ -560,7 +560,8 @@ class Pivot
     protected function isResourceLogValid(editor_Models_LanguageResources_LanguageResource $languageResource, int $matchRate): bool
     {
         //check if it is tm or tc, an if the matchrate is >= 100
-        return ($languageResource->isTm() || $languageResource->isTc()) && $matchRate >= editor_Services_Connector_FilebasedAbstract::EXACT_MATCH_VALUE;
+        return ($languageResource->isTm() || $languageResource->isTc())
+            && $matchRate >= FileBasedInterface::EXACT_MATCH_VALUE;
     }
 
     /***

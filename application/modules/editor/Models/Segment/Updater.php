@@ -28,6 +28,7 @@ END LICENSE AND COPYRIGHT
 
 use MittagQI\Translate5\ContentProtection\ContentProtector;
 use MittagQI\Translate5\ContentProtection\NumberProtector;
+use MittagQI\Translate5\Integration\FileBasedInterface;
 use MittagQI\Translate5\Task\TaskEventTrigger;
 
 /**
@@ -277,7 +278,10 @@ class editor_Models_Segment_Updater
         $segment->setMatchRateType((string) $matchrateType);
 
         //if it is tm or term collection and the matchrate is >=100, log the usage
-        if (($languageresource->isTm() || $languageresource->isTc()) && $segment->getMatchRate() >= editor_Services_Connector_FilebasedAbstract::EXACT_MATCH_VALUE) {
+        if (
+            ($languageresource->isTm() || $languageresource->isTc())
+            && $segment->getMatchRate() >= FileBasedInterface::EXACT_MATCH_VALUE
+        ) {
             $this->logAdapterUsageOnSegmentEdit($languageresource);
         }
     }

@@ -94,45 +94,6 @@ class MaintenanceService extends \editor_Services_Connector_Abstract implements 
         parent::connectTo($languageResource, $sourceLang, $targetLang);
     }
 
-    /**
-     * Updates the filename of the language resource instance with the filename coming from the TM system
-     * @throws \Zend_Exception
-     */
-    protected function addMemoryToLanguageResource(
-        LanguageResource $languageResource,
-        string $tmName,
-        bool $isInternalFuzzy = false
-    ): void {
-        $prefix = \Zend_Registry::get('config')->runtimeOptions->LanguageResources->opentm2->tmprefix;
-        if (! empty($prefix)) {
-            //remove the prefix from being stored into the TM
-            $tmName = str_replace('^' . $prefix . '-', '', '^' . $tmName);
-        }
-
-        $memories = $languageResource->getSpecificData('memories', parseAsArray: true) ?? [];
-
-        usort($memories, fn ($m1, $m2) => $m1['id'] <=> $m2['id']);
-
-        $id = 0;
-        foreach ($memories as &$memory) {
-            $memory['id'] = $id++;
-            $memory['readonly'] = true;
-        }
-
-        $memories[] = [
-            'id' => $id,
-            'filename' => $tmName,
-            'readonly' => false,
-        ];
-
-        $languageResource->addSpecificData('memories', $memories);
-
-        if (! $isInternalFuzzy) {
-            //saving it here makes the TM available even when the TMX import was crashed
-            $languageResource->save();
-        }
-    }
-
     public function update(
         \editor_Models_Segment $segment,
         bool $recheckOnUpdate = self::DO_NOT_RECHECK_ON_UPDATE,
@@ -387,6 +348,12 @@ class MaintenanceService extends \editor_Services_Connector_Abstract implements 
         $offset = null,
         SearchDTO $searchDTO = null
     ): \editor_Services_ServiceResult {
+
+        throw new \editor_Services_Connector_Exception('E1306', [
+            'languageResource' => $this->languageResource,
+            'error' => 'Memory is not reachable',
+        ]);
+
         $offsetTmId = null;
         $recordKey = null;
         $targetKey = null;
@@ -523,7 +490,46 @@ class MaintenanceService extends \editor_Services_Connector_Abstract implements 
      */
     public function translate(string $searchString)
     {
-        return $searchString;
+        // TODO not used
+    }
+
+    /**
+     * Updates the filename of the language resource instance with the filename coming from the TM system
+     * @throws \Zend_Exception
+     */
+    protected function addMemoryToLanguageResource(
+        LanguageResource $languageResource,
+        string $tmName,
+        bool $isInternalFuzzy = false
+    ): void {
+        $prefix = \Zend_Registry::get('config')->runtimeOptions->LanguageResources->opentm2->tmprefix;
+        if (! empty($prefix)) {
+            //remove the prefix from being stored into the TM
+            $tmName = str_replace('^' . $prefix . '-', '', '^' . $tmName);
+        }
+
+        $memories = $languageResource->getSpecificData('memories', parseAsArray: true) ?? [];
+
+        usort($memories, fn ($m1, $m2) => $m1['id'] <=> $m2['id']);
+
+        $id = 0;
+        foreach ($memories as &$memory) {
+            $memory['id'] = $id++;
+            $memory['readonly'] = true;
+        }
+
+        $memories[] = [
+            'id' => $id,
+            'filename' => $tmName,
+            'readonly' => false,
+        ];
+
+        $languageResource->addSpecificData('memories', $memories);
+
+        if (! $isInternalFuzzy) {
+            //saving it here makes the TM available even when the TMX import was crashed
+            $languageResource->save();
+        }
     }
 
     private function getBadGatewayException(string $tmName = ''): \editor_Services_Connector_Exception

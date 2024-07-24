@@ -26,6 +26,7 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\Integration\FileBasedInterface;
 use MittagQI\Translate5\Task\Current\NoAccessException;
 use MittagQI\Translate5\Task\TaskContextTrait;
 
@@ -208,7 +209,7 @@ class Editor_AlikesegmentController extends ZfExtended_RestController
                 $entity->setWorkflowStepNr($this->entity->getWorkflowStepNr());
 
                 $newMatchRate = $task->isTranslation()
-                    ? editor_Services_Connector_FilebasedAbstract::REPETITION_MATCH_VALUE
+                    ? FileBasedInterface::REPETITION_MATCH_VALUE
                     : $this->entity->getMatchRate();
 
                 // First occurrence should always keep its initial match rate
@@ -216,7 +217,7 @@ class Editor_AlikesegmentController extends ZfExtended_RestController
                 if ($id !== $firstAmongRepeated) {
                     $entity->setMatchRate(max(
                         $newMatchRate,
-                        editor_Services_Connector_FilebasedAbstract::REPETITION_MATCH_VALUE
+                        FileBasedInterface::REPETITION_MATCH_VALUE
                     ));
                 }
                 $entity->setMatchRateType($this->entity->getMatchRateType());

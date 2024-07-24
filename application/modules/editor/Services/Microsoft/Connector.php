@@ -72,9 +72,6 @@ class editor_Services_Microsoft_Connector extends editor_Services_Connector_Abst
         ZfExtended_Logger::addDuplicatesByMessage('E1345', 'E1346');
     }
 
-    /**
-     * @see editor_Services_Connector_FilebasedAbstract::connectTo()
-     */
     public function connectTo(editor_Models_LanguageResources_LanguageResource $languageResource, $sourceLang, $targetLang)
     {
         parent::connectTo($languageResource, $sourceLang, $targetLang);

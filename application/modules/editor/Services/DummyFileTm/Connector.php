@@ -76,8 +76,7 @@ class editor_Services_DummyFileTm_Connector extends editor_Services_Connector_Ab
     }
 
     /**
-     * (non-PHPdoc)
-     * @see editor_Services_Connector_FilebasedAbstract::addTm()
+     * {@inheritDoc}
      */
     public function addTm(array $fileinfo = null, array $params = null)
     {
@@ -106,8 +105,7 @@ class editor_Services_DummyFileTm_Connector extends editor_Services_Connector_Ab
     }
 
     /**
-     * (non-PHPdoc)
-     * @see editor_Services_Connector_FilebasedAbstract::getTm()
+     * {@inheritDoc}
      */
     public function getTm($mime)
     {
@@ -162,8 +160,7 @@ class editor_Services_DummyFileTm_Connector extends editor_Services_Connector_Ab
     }
 
     /**
-     * (non-PHPdoc)
-     * @see editor_Services_Connector_FilebasedAbstract::query()
+     * {@inheritDoc}
      */
     public function query(editor_Models_Segment $segment)
     {
@@ -173,8 +170,7 @@ class editor_Services_DummyFileTm_Connector extends editor_Services_Connector_Ab
     }
 
     /**
-     * (non-PHPdoc)
-     * @see editor_Services_Connector_FilebasedAbstract::search()
+     * {@inheritDoc}
      */
     public function search(string $searchString, $field = 'source', $offset = null)
     {
@@ -267,8 +263,7 @@ class editor_Services_DummyFileTm_Connector extends editor_Services_Connector_Ab
     }
 
     /**
-     * (non-PHPdoc)
-     * @see editor_Services_Connector_FilebasedAbstract::delete()
+     * {@inheritDoc}
      */
     public function delete()
     {
@@ -283,7 +278,7 @@ class editor_Services_DummyFileTm_Connector extends editor_Services_Connector_Ab
     }
 
     /**
-     * @see editor_Services_Connector_FilebasedAbstract::getValidFiletypes()
+     * {@inheritDoc}
      */
     public function getValidFiletypes()
     {
@@ -293,7 +288,7 @@ class editor_Services_DummyFileTm_Connector extends editor_Services_Connector_Ab
     }
 
     /**
-     * @see editor_Services_Connector_FilebasedAbstract::getValidFiletypeForExport()
+     * {@inheritDoc}
      */
     public function getValidExportTypes()
     {
