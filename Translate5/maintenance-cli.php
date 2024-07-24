@@ -196,7 +196,7 @@ $commands = [
 
 // integrate Plugin-specific CLI commands
 foreach (glob(getcwd() . '/application/modules/editor/Plugins/*/CLI/*Command.php') as $pluginCommandFile) {
-    $pluginCommandFileSplitt = explode(DIRECTORY_SEPARATOR, $pluginCommandFile);
+    $pluginCommandFileSplitt = explode('/', preg_replace('~(^[A-Z]:)?\\\\~', '/', $pluginCommandFile));
 
     $pluginName = $pluginCommandFileSplitt[(array_key_last($pluginCommandFileSplitt) - 2)];
     $commandName = pathinfo($pluginCommandFile, PATHINFO_FILENAME);
