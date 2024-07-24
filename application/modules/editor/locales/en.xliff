@@ -4246,9 +4246,9 @@ A task was associated to you in the task-portal {portalLink}.
                 <source>Unterschied zu Quellsegment</source>
                 <target>Diff to source</target>
             </trans-unit>
-            <trans-unit id='RGllc2UgUmVzc291cmNlIHdpcmQgZW50ZmVybnQ='>
-                <source>Diese Ressource wird entfernt</source>
-                <target>This resource is removed</target>
+            <trans-unit id='RGllc2UgU3ByYWNocmVzc291cmNlIHd1cmRlIGVudGZlcm50IChJRDogJXMp'>
+                <source>Diese Sprachressource wurde entfernt (ID: %s)</source>
+                <target>This language resource was removed (ID: %s)</target>
             </trans-unit>
             <trans-unit id='V2llZGVyaG9sdW5nIG51ciBhdXRvbWF0aXNjaCBlcnNldHplbiBiencuIEVyc2V0enVuZyBkZXIgV2llZGVyaG9sdW5nIHZvcnNjaGxhZ2VuLCB3ZW5uIFppZWwgbGVlciBpc3Q='>
                 <source>Wiederholung nur automatisch ersetzen bzw. Ersetzung der Wiederholung vorschlagen, wenn Ziel leer ist</source>
@@ -9963,6 +9963,10 @@ E-Mail: service@MittagQI.com</pre>
             <trans-unit id='TG9rYWxlbiBCZW51dHplciBtaXQgRGF0ZW4gYXVzIGRlbSBTU08gUHJvdmlkZXIgYWt0dWFsaXNpZXJlbiAoUm9sbGVuLCBHZXNjaGxlY2h0LCBTcHJhY2hlKQ=='>
                 <source>Lokalen Benutzer mit Daten aus dem SSO Provider aktualisieren (Rollen, Geschlecht, Sprache)</source>
                 <target>Update locale user with data from the SSO provider (roles, gender, locale)</target>
+            </trans-unit>
+            <trans-unit id='U2VydmVyIGbDvHIgZGVuIGFuZ2VmcmFndGVuIERpZW5zdCBpc3QgbmljaHQgZXJyZWljaGJhci4='>
+                <source>Server für den angefragten Dienst ist nicht erreichbar.</source>
+                <target>Server for the queried service is not reachable.</target>
             </trans-unit>
         </body>
     </file>

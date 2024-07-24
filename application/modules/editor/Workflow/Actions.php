@@ -27,6 +27,7 @@ END LICENSE AND COPYRIGHT
 */
 
 use MittagQI\Translate5\Task\Export\Package\Remover;
+use MittagQI\Translate5\Workflow\ArchiveConfigDTO;
 use MittagQI\Translate5\Workflow\ArchiveTaskActions;
 
 /**
@@ -235,8 +236,8 @@ class editor_Workflow_Actions extends editor_Workflow_Actions_Abstract
     public function deleteOldEndedTasks()
     {
         /** @var ArchiveTaskActions $taskActions */
-        $taskActions = ZfExtended_Factory::get('\MittagQI\Translate5\Workflow\ArchiveTaskActions', [
-            $this->config,
+        $taskActions = ZfExtended_Factory::get(ArchiveTaskActions::class, [
+            ArchiveConfigDTO::fromObject($this->config->parameters),
         ]);
         $params = $this->config->parameters;
         if (empty($params->filesystem) && empty($params->targetPath)) {
