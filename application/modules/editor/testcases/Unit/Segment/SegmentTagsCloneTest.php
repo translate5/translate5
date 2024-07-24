@@ -26,13 +26,18 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+namespace MittagQI\Translate5\Test\Unit\Segment;
+
+use editor_Models_Segment_TrackChangeTag;
+use editor_Segment_FieldTags;
+use editor_Segment_NewlineTag;
+use editor_Segment_Tag;
 use MittagQI\Translate5\Test\SegmentTagsTestAbstract;
 
 /**
  * Several "classic" PHPUnit tests to check the FieldTags Cloning without TrackChanges tags
  * TODO: create test with additional quality-tags e.g. MQM
- */
-class SegmentTagsCloneTest extends SegmentTagsTestAbstract
+ */ class SegmentTagsCloneTest extends SegmentTagsTestAbstract
 {
     /**
      * Some Internal Tags to create Tests with
@@ -399,7 +404,7 @@ class SegmentTagsCloneTest extends SegmentTagsTestAbstract
         $result = preg_replace_callback('~' . $search . '~', function ($matches) use ($count, $replace) {
             $count++;
 
-            return str_replace('{X}', $count, $replace);
+            return str_replace('{X}', (string) $count, $replace);
         }, $markup);
 
         return $result;

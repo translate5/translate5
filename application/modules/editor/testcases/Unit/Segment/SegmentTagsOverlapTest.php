@@ -26,6 +26,11 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+namespace MittagQI\Translate5\Test\Unit\Segment;
+
+use editor_Plugins_TermTagger_Tag;
+use editor_Segment_FieldTags;
+use editor_Segment_Tag;
 use MittagQI\Translate5\Test\SegmentTagsTestAbstract;
 
 /**

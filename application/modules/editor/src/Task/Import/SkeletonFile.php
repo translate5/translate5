@@ -90,7 +90,7 @@ class SkeletonFile
     /**
      * Returns tha ABSOLUTE path to the skeleton file
      */
-    private function getSkeletonPath(File $file): string
+    public function getSkeletonPath(File $file): string
     {
         return $this->task->getAbsoluteTaskDataPath() . sprintf(self::SKELETON_PATH, $file->getId());
     }
