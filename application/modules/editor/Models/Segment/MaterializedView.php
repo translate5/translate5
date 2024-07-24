@@ -101,6 +101,23 @@ class editor_Models_Segment_MaterializedView
         $this->checkMvFillState();
     }
 
+    public function getFields(): array
+    {
+        if (empty($this->taskGuid)) {
+            return [];
+        }
+
+        $segmentDb = ZfExtended_Factory::get(editor_Models_Segment::class)->db;
+
+        $sfm = editor_Models_SegmentFieldManager::getForTaskGuid($this->taskGuid);
+        $dataFields = $sfm->walkFields(function ($name, $k, $v) {
+            return $name . $k;
+        });
+        $defaultColumns = $segmentDb->info($segmentDb::COLS);
+
+        return array_merge($defaultColumns, $dataFields);
+    }
+
     /**
      * ensure that a taskGuid is set
      * @throws LogicException
@@ -269,7 +286,8 @@ class editor_Models_Segment_MaterializedView
     }
 
     /**
-     * creates a reusable SQL fragment for updating the mat view metaCache field for a whole task or a given groupId/transunitHash (including fileId)
+     * creates a reusable SQL fragment for updating the mat view metaCache field for a whole task or a given
+     * groupId/transunitHash (including fileId)
      * @return string
      */
     protected function buildMetaCacheSql($segmentId = null)

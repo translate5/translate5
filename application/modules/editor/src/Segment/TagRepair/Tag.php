@@ -28,6 +28,8 @@ END LICENSE AND COPYRIGHT
 
 namespace MittagQI\Translate5\Segment\TagRepair;
 
+use MittagQI\ZfExtended\Tools\Markup;
+
 /**
  * Abstraction for a "repair tag" used with the automatic tag repair
  * This Tag is able to evaluate & store additional information about the tags position regarding words in the text, it can represent any kind of tag
@@ -66,8 +68,7 @@ class Tag extends \editor_Segment_Tag
     public static function replaceComments(string $markup): string
     {
         return preg_replace_callback(static::COMMENTS_REPLACE_REGEX, function ($matches) {
-            // crucial: since we are turning the comment into "normal" markup we have to make sure, markup in comments is protected which is also neccessary to make this a proper attribute
-            return '<' . self::COMMENT_NODE_NAME . ' comment="' . htmlspecialchars($matches[1], ENT_COMPAT, null, true) . '" />';
+            return '<' . self::COMMENT_NODE_NAME . ' comment="' . Markup::escapeForAttribute($matches[1]) . '" />';
         }, $markup);
     }
 
@@ -194,9 +195,9 @@ class Tag extends \editor_Segment_Tag
     public function addAttribute($name, $val = null): Tag
     {
         // crucial: comment tags must have the unescaped value as comment-text (stored in the ::replaceComments prop)
-        if ($this->isComment() && $name === 'comment') {
-            // we have to revert the escaping applied in Tags::replaceComments
-            $this->afterStartMarkup = htmlspecialchars_decode($val, ENT_COMPAT);
+        if ($val !== null && $this->isComment() && $name === 'comment') {
+            // we have to revert the escaping applied in ::replaceComments
+            $this->afterStartMarkup = Markup::unescapeFromAttribute($val);
         }
         parent::addAttribute($name, $val);
 
@@ -224,7 +225,6 @@ class Tag extends \editor_Segment_Tag
         $this->numWordsBefore = 0;
         $this->numWordsAfter = 0;
         $this->numWordsBeforeParent = -1;
-        $this->numWordsAfterParent = -1;
         $this->numWordsAfterParent = -1;
         $this->isBeforeWhitespace = false;
         $this->parentTagIdx = -1;

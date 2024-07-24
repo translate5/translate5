@@ -33,11 +33,22 @@ abstract class editor_Workflow_Default_AbstractHandler
 {
     protected editor_Workflow_Actions_Config $config;
 
+    protected ?ZfExtended_EventManager $events;
+
     /**
      * executes desired handler/trigger action
      * @return string|null returns the trigger name
      */
     abstract public function execute(editor_Workflow_Actions_Config $actionConfig): ?string;
+
+    /**
+     * we want to use events inside any WorkflowActionHandler
+     * @throws ReflectionException
+     */
+    public function __construct()
+    {
+        $this->events = ZfExtended_Factory::get(ZfExtended_EventManager::class, [get_class($this)]);
+    }
 
     /**
      * calls the actions configured to the trigger with given role and state
@@ -58,10 +69,14 @@ abstract class editor_Workflow_Default_AbstractHandler
      * @uses editor_Workflow_Actions::segmentsSetUntouchedState()
      * @uses editor_Workflow_Actions::setDefaultDeadlineDate()
      */
-    protected function callActions(editor_Workflow_Actions_Config $config, $step = null, $role = null, $state = null)
+    protected function callActions(editor_Workflow_Actions_Config $config, $step = null, $role = null, $state = null): void
     {
-        $actions = ZfExtended_Factory::get('editor_Models_Workflow_Action');
-        /* @var $actions editor_Models_Workflow_Action */
+        $actions = ZfExtended_Factory::get(editor_Models_Workflow_Action::class);
+        if (is_null($actions)) {
+            // @TODO: may some notification or error should be thrown
+            return;
+        }
+
         $debugData = [
             'trigger' => $config->trigger,
             'step' => $step,
@@ -90,6 +105,14 @@ abstract class editor_Workflow_Default_AbstractHandler
             } else {
                 call_user_func([$instance, $method], $config->parameters);
             }
+        }
+
+        // Trigger afterWorkflowCallAction-event
+        if ($this->events) {
+            $this->events->trigger('afterWorkflowCallAction', $this, [
+                'entity' => $this,
+                'task' => $this->config->task,
+            ]);
         }
     }
 

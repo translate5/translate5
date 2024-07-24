@@ -63,6 +63,15 @@ class SegmentTagsTest extends SegmentTagsTestAbstract
         $this->assertEquals($expected, $result);
     }
 
+    public function testDoubleEncodedTag()
+    {
+        $expected = '<span class="short" title="&lt;ph name=&amp;quot;ParagraphNumber&amp;quot;/&gt;" data-smth="&lt;ph name=&amp;quot;ParagraphNumber&amp;quot;/&gt;"> Some &amp;amp; thing</span>';
+        $dom = new ZfExtended_Dom();
+        $element = $dom->loadUnicodeElement($expected);
+        $result = $dom->saveHTML($element);
+        $this->assertEquals($result, $expected);
+    }
+
     public function testSimpleTag()
     {
         $expected = '<a href="http://www.google.de" target="blank" data-test="42"><span>Link Text</span> <img class="upfront link-img" src="/some/icon.svg" /></a>';

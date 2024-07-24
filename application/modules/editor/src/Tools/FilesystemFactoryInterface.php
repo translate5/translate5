@@ -26,33 +26,9 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-declare(strict_types=1);
+namespace MittagQI\Translate5\Tools;
 
-use MittagQI\Translate5\T5Memory\Enum\StripFramingTags;
-
-class editor_Services_OpenTM2_Resource extends editor_Models_LanguageResources_Resource
+interface FilesystemFactoryInterface
 {
-    public function __construct(string $id, string $name, string $url)
-    {
-        parent::__construct($id, $name, $url);
-
-        $this->supportsStrippingFramingTags = true;
-    }
-
-    public function getStrippingFramingTagsConfig(): array
-    {
-        return [
-            self::STRIP_FRAMING_TAGS_VALUES => [
-                [StripFramingTags::None->value, 'Entfernt keine'],
-                [StripFramingTags::All->value, 'Alle'],
-                [StripFramingTags::Paired->value, 'Tagpaare'],
-            ],
-            self::STRIP_FRAMING_TAGS_FILE_EXTENSIONS => ['.tmx'],
-        ];
-    }
-
-    public function supportsInternalFuzzy(): bool
-    {
-        return true;
-    }
+    public static function isValidFilesystemConfig(?object $config): bool;
 }

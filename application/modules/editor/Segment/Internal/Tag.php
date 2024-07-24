@@ -432,7 +432,7 @@ final class editor_Segment_Internal_Tag extends editor_Segment_Tag
     {
         // we use our visual representation like "</6>" as key to compare tags
         if ($this->shortTag != null) {
-            return htmlspecialchars_decode($this->shortTag->getText());
+            return Markup::unescapeAllQuotes($this->shortTag->getText());
         }
 
         return md5($this->render());
@@ -443,7 +443,7 @@ final class editor_Segment_Internal_Tag extends editor_Segment_Tag
      */
     public function getShortTagMarkup(): string
     {
-        return htmlspecialchars_decode($this->shortTag->getText());
+        return Markup::unescapeAllQuotes($this->shortTag->getText());
     }
 
     /* *************************************** Overwritten Tag API *************************************** */

@@ -288,6 +288,8 @@ Ext.define('Editor.plugins.MatchAnalysis.view.AnalysisGrid', {
                     return me.strings.repetitions;
                 } else if (value === 'summary' || value === 'amount') {
                     return vm.get('l10n.MatchAnalysis.analysisWindow.' + value) + ':';
+                } else if (!record.get('resourceColor')) {
+                    return value;
                 }
                 return '<div style="float: left; width: 15px; height: 15px;margin-right:5px; border: 1px solid rgba(0, 0, 0, .2);background: #' + record.get('resourceColor') + ';"></div>' + value;
             },

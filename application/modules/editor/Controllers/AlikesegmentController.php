@@ -138,6 +138,12 @@ class Editor_AlikesegmentController extends ZfExtended_RestController
         editor_Segment_Quality_Manager::instance()->preProcessTask($task, editor_Segment_Processing::ALIKE);
 
         $alikeCount = count($ids);
+
+        // Detect first repetition, which can be edited segment itself
+        $repeatedIncludingEdited = array_merge($ids, [$editedSegmentId]);
+        sort($repeatedIncludingEdited, SORT_NUMERIC);
+        $firstAmongRepeated = $repeatedIncludingEdited[0];
+
         foreach ($ids as $id) {
             $id = (int) $id;
 
@@ -201,11 +207,17 @@ class Editor_AlikesegmentController extends ZfExtended_RestController
                 $entity->setWorkflowStep($this->entity->getWorkflowStep());
                 $entity->setWorkflowStepNr($this->entity->getWorkflowStepNr());
 
-                //a used repetition has always the 102% matchrate
-                if ($task->isTranslation()) {
-                    $entity->setMatchRate(editor_Services_Connector_FilebasedAbstract::REPETITION_MATCH_VALUE);
-                } else {
-                    $entity->setMatchRate($this->entity->getMatchRate());
+                $newMatchRate = $task->isTranslation()
+                    ? editor_Services_Connector_FilebasedAbstract::REPETITION_MATCH_VALUE
+                    : $this->entity->getMatchRate();
+
+                // First occurrence should always keep its initial match rate
+                // All the other occurrences should get 102% or stay higher
+                if ($id !== $firstAmongRepeated) {
+                    $entity->setMatchRate(max(
+                        $newMatchRate,
+                        editor_Services_Connector_FilebasedAbstract::REPETITION_MATCH_VALUE
+                    ));
                 }
                 $entity->setMatchRateType($this->entity->getMatchRateType());
 

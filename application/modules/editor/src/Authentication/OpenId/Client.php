@@ -170,10 +170,10 @@ class Client
         $user->setFirstName($this->getOpenIdUserData('given_name'));
         $user->setSurName($this->getOpenIdUserData('family_name'));
         $user->setEditable(true);
-        $user->setCustomers(',' . $this->handleCustomer() . ',');
 
-        // The update for those fields for existing users can be configured in the customer overview as separate flag
         if ($updateUserClaims) {
+            $user->setCustomers(',' . $this->handleCustomer() . ',');
+
             //the gender is required in translate5, and in the response can be empty or larger than 1 character
             $gender = ! empty($this->getOpenIdUserData('gender', false)) ? substr($this->getOpenIdUserData('gender'), 0, 1) : 'n';
             $user->setGender($gender);
@@ -522,8 +522,8 @@ class Client
             'openid' => [
                 'customerId' => $this->getCustomer()->getId(),
                 'customerName' => $this->getCustomer()->getName(),
-                'userInfo' => $this->openIdUserInfo,
-                'userClaims' => $this->openIdUserClaims,
+                'userInfo' => $this->openIdUserInfo ?? '',
+                'userClaims' => $this->openIdUserClaims ?? '',
             ],
         ];
     }

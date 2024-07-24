@@ -39,7 +39,7 @@ use editor_TagSequence;
  */
 abstract class SegmentTagsTestAbstract extends MockedTaskTestAbstract
 {
-    /* Segment Tags helpers to easily create tests for segment tags */
+    /* abstract helper-classs to easily create tests for segment tags */
 
     protected function createTags(): editor_Segment_FieldTags
     {
@@ -132,5 +132,18 @@ abstract class SegmentTagsTestAbstract extends MockedTaskTestAbstract
         $expectedJSON = $tags->toJson();
         $jsonTags = editor_Segment_FieldTags::fromJson($this->getTestTask(), $expectedJSON);
         $this->assertEquals($expectedJSON, $jsonTags->toJson());
+    }
+
+    /**
+     * Reverts double-encoding of the base XML entities
+     * Currently unused
+     */
+    protected function unescapeDoubleEscaped(string $text): string
+    {
+        foreach (['lt', 'gt', 'quot', 'apos', 'amp'] as $entity) {
+            $text = str_replace('&amp;' . $entity . ';', '&' . $entity . ';', $text);
+        }
+
+        return $text;
     }
 }
