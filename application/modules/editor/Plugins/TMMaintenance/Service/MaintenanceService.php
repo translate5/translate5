@@ -448,6 +448,7 @@ class MaintenanceService extends \editor_Services_Connector_Abstract implements 
             // In case we have at least one successful search, we reset the reorganize attempts
             $this->resetReorganizeAttempts($this->languageResource);
 
+            /** @var ?object{results: array, NewSearchPosition: string} $result */
             $result = $this->api->getResult();
 
             if (empty($result) || empty($result->results)) {
@@ -463,13 +464,13 @@ class MaintenanceService extends \editor_Services_Connector_Abstract implements 
                 $result->results
             );
             $results[] = $data;
-            $resultsCount += count($result->results);
+//            $resultsCount += count($result->results);
             $resultList->setNextOffset($result->NewSearchPosition ? ($id . ':' . $result->NewSearchPosition) : null);
 
-            // if we get enough results then response them
-            if (1 <= $resultsCount) {
-                break;
-            }
+//            // if we get enough results then response them
+//            if (1 <= $resultsCount) {
+            break;
+//            }
         }
 
         $results = array_merge(...$results);
