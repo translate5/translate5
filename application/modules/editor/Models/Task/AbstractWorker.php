@@ -127,11 +127,6 @@ abstract class editor_Models_Task_AbstractWorker extends ZfExtended_Worker_Abstr
         }
 
         //if it is an ordinary error, we log that additionaly to the task log.
-        $logger = ZfExtended_Factory::get('ZfExtended_Logger', [[
-            'writer' => [
-                'tasklog' => Zend_Registry::get('config')->resources->ZfExtended_Resource_Logger->writer->tasklog,
-            ],
-        ]]);
         $logger = Zend_Registry::get('logger');
         /* @var $logger ZfExtended_Logger */
         $logger->exception($workException, [
