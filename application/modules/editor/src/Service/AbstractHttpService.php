@@ -55,6 +55,11 @@ abstract class AbstractHttpService extends ServiceAbstract
     protected array $configurationConfig;
 
     /**
+     * Cache for the ::getNumIpsForUrl functionality
+     */
+    private array $hostsByHost = [];
+
+    /**
      * Retrieves an ID for the service to use for all database-purposes where the service must be identified uniquely
      * To have this seperate from ->getName() is purely for future developments
      */
@@ -136,7 +141,13 @@ abstract class AbstractHttpService extends ServiceAbstract
     public function getNumIpsForUrl(string $serviceUrl): int
     {
         $host = rtrim(parse_url($serviceUrl, PHP_URL_HOST), '.') . '.';
-        $hosts = gethostbynamel($host);
+        // we cache the result for reduceing requests
+        if (array_key_exists($host, $this->hostsByHost)) {
+            $hosts = $this->hostsByHost;
+        } else {
+            $hosts = gethostbynamel($host);
+            $this->hostsByHost[$host] = $hosts;
+        }
 
         // QUIRK: for now, we return 1 if gethostbynamel() does not detect anything ... TODO FIXME: Throw Exception ?
         return (empty($hosts)) ? 1 : count($hosts);
@@ -157,6 +168,16 @@ abstract class AbstractHttpService extends ServiceAbstract
         Services::saveServiceDownList($this->getServiceId(), $downList);
 
         return (count($downList) >= count($allServices));
+    }
+
+    /**
+     * Retrieves, if the service is marked down in the Services memcache
+     */
+    public function isServiceUrlDown(string $serviceUrl): bool
+    {
+        $downList = Services::getServiceDownList($this->getServiceId());
+
+        return in_array($serviceUrl, $downList);
     }
 
     /**

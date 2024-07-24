@@ -34,9 +34,8 @@ class editor_Models_Import_Worker_FinalStep extends ZfExtended_Worker_Abstract
 {
     /**
      * Defines the behaviour class to be used for this worker
-     * @var string
      */
-    protected $behaviourClass = 'editor_Models_Import_Worker_FinalStepBehaviour';
+    protected string $behaviourClass = editor_Models_Import_Worker_FinalStepBehaviour::class;
 
     /**
      * (non-PHPdoc)

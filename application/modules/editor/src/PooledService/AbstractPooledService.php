@@ -56,30 +56,19 @@ abstract class AbstractPooledService extends DockerServiceAbstract implements Po
     protected array $importConfigurationConfig;
 
     /**
-     * Retrieves one of our Pools
-     * The URLs will be filtered for services that are marked as DOWN via the global services mem-cache
      * @throws ZfExtended_Exception
      */
     public function getPooledServiceUrls(string $pool): array
     {
-        switch ($pool) {
-            case 'default':
-                return $this->filterDownedServiceUrls($this->getDefaultServiceUrls());
-
-            case 'gui':
-                return $this->filterDownedServiceUrls($this->getGuiServiceUrls());
-
-            case 'import':
-                return $this->filterDownedServiceUrls($this->getImportServiceUrls());
-
-            default:
-                throw new ZfExtended_Exception('PooledService::getPooledServiceUrls: pool must be: default | gui | import');
+        // in case we have a load-balanced pool we must not use the down-list
+        if (! $this->isPoolLoadBalanced($pool)) {
+            return $this->filterDownedServiceUrls($this->getPoolUrls($pool));
         }
+
+        return $this->getPoolUrls($pool);
     }
 
     /**
-     * Retrieves a random url out of one of our Pools
-     * The URLs will be filtered for services that are marked as DOWN via the global services mem-cache
      * @throws ZfExtended_Exception
      */
     public function getPooledServiceUrl(string $pool): ?string
@@ -98,9 +87,14 @@ abstract class AbstractPooledService extends DockerServiceAbstract implements Po
      * Special API for pooled services with a single URL for one pool:
      * This also is expected to represent a load-balancing and for a single URL maybe multiple workers are queued
      */
-    public function hasLoadBalancingBehindSingularPool(string $pool): bool
+    public function isPoolLoadBalanced(string $pool): bool
     {
-        return true;
+        $urls = $this->getPoolUrls($pool);
+        if (count($urls) === 1) {
+            return ($this->getNumIpsForUrl($urls[0]) > 1);
+        }
+
+        return false;
     }
 
     /**
@@ -344,6 +338,26 @@ abstract class AbstractPooledService extends DockerServiceAbstract implements Po
     }
 
     /**
+     * @throws ZfExtended_Exception
+     */
+    private function getPoolUrls(string $pool): array
+    {
+        switch ($pool) {
+            case 'default':
+                return $this->getDefaultServiceUrls();
+
+            case 'gui':
+                return $this->getGuiServiceUrls();
+
+            case 'import':
+                return $this->getImportServiceUrls();
+
+            default:
+                throw new ZfExtended_Exception('PooledService: pool must be: default | gui | import');
+        }
+    }
+
+    /**
      * Will exclude service-urls, that have been marked as "down" via the global services mem-cache
      */
     private function filterDownedServiceUrls(array $serviceUrls): array
@@ -358,7 +372,7 @@ abstract class AbstractPooledService extends DockerServiceAbstract implements Po
         array &$urlPool,
         string $type,
         string $potentialHost,
-        string $port,
+        int $port,
         string $path
     ): bool {
         if ($this->isDnsSet($potentialHost, $port)) {

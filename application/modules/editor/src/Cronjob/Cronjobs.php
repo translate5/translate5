@@ -65,9 +65,13 @@ class Cronjobs
     {
         //FIXME exception handling here, encaps each "job" and log exception, otherwise it just bubbles to the CLI output
         self::$running = true;
+        // Worker Garbage Collection
         /* @var $gc ZfExtended_Resource_GarbageCollector */
         $gc = $this->bootstrap->getPluginResource(ZfExtended_Resource_GarbageCollector::class);
         $gc->cleanUp($gc::ORIGIN_CRON);
+        // Worker Delayed Scheduling
+
+
         $this->doCronWorkflow('doCronPeriodical');
         $this->eventTrigger->triggerPeriodical();
     }

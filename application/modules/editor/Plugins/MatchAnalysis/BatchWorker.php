@@ -32,8 +32,6 @@ END LICENSE AND COPYRIGHT
  */
 class editor_Plugins_MatchAnalysis_BatchWorker extends editor_Models_Task_AbstractWorker
 {
-    protected ZfExtended_Logger $log;
-
     public function __construct()
     {
         parent::__construct();
@@ -83,8 +81,12 @@ class editor_Plugins_MatchAnalysis_BatchWorker extends editor_Models_Task_Abstra
             $targetLang = $task->getRelaisLang();
         }
 
-        $connector = $manager->getConnector($languageResource, $task->getSourceLang(), $targetLang, $task->getConfig());
-        /* @var editor_Services_Connector $connector */
+        $connector = $manager->getConnector(
+            $languageResource,
+            (int) $task->getSourceLang(),
+            (int) $targetLang,
+            $task->getConfig()
+        );
 
         // set the worker user for the connector. This is required for the resource usage log
         $connector->setWorkerUserGuid($params['userGuid']);

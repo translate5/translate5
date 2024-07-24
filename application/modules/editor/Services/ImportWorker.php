@@ -38,19 +38,28 @@ class editor_Services_ImportWorker extends ZfExtended_Worker_Abstract
      */
     protected $languageResource;
 
-    public function init($taskGuid = null, $parameters = [])
+    public function onInit(array $parameters): bool
     {
-        $this->behaviour->setConfig([
-            'isMaintenanceScheduled' => 60,
-        ]);
-        $init = parent::init($taskGuid, $parameters);
+        if(parent::onInit($parameters)){
+            // we have to react on maintenance
+            $this->behaviour->setConfig([
+                'isMaintenanceScheduled' => 60,
+            ]);
+            // wire the progress-handling
+            $workerModel = $this->workerModel;
+            Zend_EventManager_StaticEventManager::getInstance()->attach(
+                'editor_Models_Terminology_Import_TbxFileImport',
+                'afterTermEntrySave',
+                function (Zend_EventManager_Event $event) use ($workerModel) {
+                    $workerModel->updateProgress($event->getParam('progress'));
+                },
+                0
+            );
 
-        $workerModel = $this->workerModel;
-        Zend_EventManager_StaticEventManager::getInstance()->attach('editor_Models_Terminology_Import_TbxFileImport', 'afterTermEntrySave', function (Zend_EventManager_Event $event) use ($workerModel) {
-            $workerModel->updateProgress($event->getParam('progress'));
-        }, 0);
+            return true;
+        }
 
-        return $init;
+        return false;
     }
 
     /**

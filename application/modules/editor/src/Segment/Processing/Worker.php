@@ -100,15 +100,12 @@ abstract class Worker extends PooledServiceWorker implements ProgressInterface
         return parent::validateParameters($parameters);
     }
 
-    /**
-     * @param null $taskGuid
-     * @param array $parameters
-     * @return bool
-     */
-    public function init($taskGuid = null, $parameters = [])
+    public function onInit(array $parameters): bool
     {
-        if (parent::init($taskGuid, $parameters)) {
-            // this ensures, that worker 0 ... 2 ... are fetching processing-states from the top while 1 ... 3 ... fetch from the back. In theory, this should make deadlocks less likely
+        if (parent::onInit($parameters)) {
+            // this ensures, that worker 0 ... 2 ... are fetching processing-states from the top
+            // while 1 ... 3 ... fetch from the back.
+            //In theory, this should make deadlocks less likely
             $this->fromTheTop = $this->workerIndex % 2 === 0;
 
             return true;

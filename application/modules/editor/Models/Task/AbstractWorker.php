@@ -34,35 +34,32 @@ use MittagQI\ZfExtended\Worker\Exception\MaxDelaysException;
  * All other functionality reacting on the worker run is encapsulated in the behaviour classes
  *
  * The task based worker, is able to load a different behaviour, depending on a non mandatory worker parameter workerBehaviour.
+ *
+ * @property Behaviour $behaviour
  */
 abstract class editor_Models_Task_AbstractWorker extends ZfExtended_Worker_Abstract implements editor_Models_Task_WorkerProgressInterface
 {
-    /**
-     * @var editor_Models_Task
-     */
-    protected $task;
+    protected editor_Models_Task $task;
 
     /**
      * By default we use the import worker behaviour here
      * → all actions to handle worker in task import context are triggered
-     * @var string
      */
-    protected $behaviourClass = Behaviour::class;
+    protected string $behaviourClass = Behaviour::class;
 
     /**
-     * @var Behaviour
-     */
-    protected $behaviour;
-
-    /**
+     * TODO FIXME: can't we use onInit & make function final in base-class ?
      * @throws ZfExtended_Models_Entity_NotFoundException
      * @throws ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey
      * @throws Zend_Db_Statement_Exception
      * @throws ZfExtended_Models_Entity_Exceptions_IntegrityConstraint
      * @throws ReflectionException
      */
-    public function init($taskGuid = null, $parameters = [])
+    final public function init(string $taskGuid = null, array $parameters = []): bool
     {
+        if($taskGuid === null){
+            throw new ZfExtended_Exception('No task-worker without taskGuid ...');
+        }
         $this->task = ZfExtended_Factory::get(editor_Models_Task::class);
         $this->task->loadByTaskGuid($taskGuid);
         $this->initBehaviour($parameters['workerBehaviour'] ?? null);
@@ -70,11 +67,11 @@ abstract class editor_Models_Task_AbstractWorker extends ZfExtended_Worker_Abstr
             return parent::init($taskGuid, $parameters);
         }
 
-        //we set the worker to defunct when task has errors
-        $wm = $this->workerModel;
-        if (isset($wm)) {
-            $wm->setState($wm::STATE_DEFUNCT);
-            $wm->save();
+        // we set the worker to defunct when the related task has errors
+        // TODO FIXME: This is mostly not the case since parent::init was not called. Is that wanted ??
+        if (isset($this->workerModel)) {
+            $this->workerModel->setState($this->workerModel::STATE_DEFUNCT);
+            $this->workerModel->save();
             //wake up remaining - if any
             $this->wakeUpAndStartNextWorkers();
         }
@@ -84,7 +81,7 @@ abstract class editor_Models_Task_AbstractWorker extends ZfExtended_Worker_Abstr
         return false;
     }
 
-    protected function initBehaviour(string $behaviourClass = null)
+    private function initBehaviour(string $behaviourClass = null)
     {
         if (! empty($behaviourClass) && $behaviourClass !== $this->behaviourClass) {
             $newBehaviour = ZfExtended_Factory::get($behaviourClass);
@@ -105,8 +102,7 @@ abstract class editor_Models_Task_AbstractWorker extends ZfExtended_Worker_Abstr
      */
     protected function onProgressUpdated(float $progress)
     {
-        /** @var editor_Models_Task_WorkerProgress $progress */
-        $progress = ZfExtended_Factory::get('editor_Models_Task_WorkerProgress');
+        $progress = ZfExtended_Factory::get(editor_Models_Task_WorkerProgress::class);
         $progress->updateProgress($this->task, $progress, $this->workerModel);
     }
 
@@ -126,7 +122,6 @@ abstract class editor_Models_Task_AbstractWorker extends ZfExtended_Worker_Abstr
 
             return;
         }
-
         //if it is an ordinary error, we log that additionaly to the task log.
         $logger = ZfExtended_Factory::get('ZfExtended_Logger', [[
             'writer' => [
@@ -163,7 +158,7 @@ abstract class editor_Models_Task_AbstractWorker extends ZfExtended_Worker_Abstr
     /**
      * For a task-worker, we add capabilities to skip a worker in case it is part of a sub-operation
      */
-    protected function onTooManyDelays(string $serviceName, string $workerName = null): void
+    protected function onTooManyDelays(string $serviceName, string $workerName = null): bool
     {
         $exception = new MaxDelaysException('E1613', [
             'worker' => $workerName ?? get_class($this),
@@ -178,12 +173,11 @@ abstract class editor_Models_Task_AbstractWorker extends ZfExtended_Worker_Abstr
             ]);
             // and may clean-up some stuff (e.g. remove other workers of the operation)
             $this->onSkipMaxDelayedOperation($serviceName);
+            // set the worker to done
+            $this->setDone();
 
-            if ($this->setDone()) {
-                $this->stopExecution('Worker skipped');
-            } else {
-                $this->stopExecution('Skipping worker failed');
-            }
+            // a positive result ius returned to end the worker normally
+            return true;
         } else {
             throw $exception;
         }

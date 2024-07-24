@@ -102,22 +102,22 @@ class editor_Plugins_Okapi_Worker extends editor_Models_Task_AbstractWorker
         return true;
     }
 
-    public function init($taskGuid = null, $parameters = [])
+    public function onInit(array $parameters): bool
     {
-        $result = parent::init($taskGuid, $parameters);
-        if ($result && $parameters['type'] === self::TYPE_EXPORT) {
-            //on export we just use normal maintenance check, not the extended one for imports
-            $this->behaviour->setConfig([
-                'isMaintenanceScheduled' => true,
-            ]);
+        if (parent::onInit($parameters)) {
+            if ($parameters['type'] === self::TYPE_EXPORT) {
+                // on export we just use normal maintenance check, not the extended one for imports
+                $this->behaviour->setConfig([
+                    'isMaintenanceScheduled' => true,
+                ]);
+            }
+
+            return true;
         }
 
-        return $result;
+        return false;
     }
 
-    /**
-     * @see ZfExtended_Worker_Abstract::work()
-     */
     public function work()
     {
         $this->logger = Zend_Registry::get('logger')->cloneMe('plugin.okapi');

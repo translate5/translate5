@@ -105,7 +105,7 @@ class Worker extends ProcessingWorker
             if ($isReprocessing) {
                 $this->setUnprocessedStates($problematicStates, State::UNPROCESSABLE);
                 // log if it did not work in the second attempt
-                $this->logException($loopedProcessingException);
+                $this->logTaskException($loopedProcessingException);
             } else {
                 $this->setUnprocessedStates($problematicStates, State::REPROCESS);
             }
@@ -115,17 +115,15 @@ class Worker extends ProcessingWorker
         }
         // a Down Exception will be created if all services are down to create an import error. If other URLs are still up, we simply end the worker without further notice
         if ($loopedProcessingException instanceof DownException) {
-            // we log only, if the last service is down ...
-            if ($this->setServiceUrlDown()) {
-                $this->logException($loopedProcessingException);
-            }
+            // when languagetool is down, the behaviour depends on if we are a load-balanced service or not
+            $this->onServiceDown($loopedProcessingException);
 
             // this will terminate the processing
             return 0;
         }
         // unknown exceptions will terminate the processing
         if ($loopedProcessingException instanceof AbstractException) {
-            $this->logException($loopedProcessingException);
+            $this->logTaskException($loopedProcessingException);
 
             return 0;
         }
@@ -145,13 +143,13 @@ class Worker extends ProcessingWorker
     /**
      * Logs an task-error out of the exception
      */
-    private function logException(AbstractException $exception)
+    protected function logTaskException(Exception $exception): void
     {
-        $exception->addExtraData([
-            'task' => $this->task,
-        ]);
         $this->logger->exception($exception, [
             'domain' => Configuration::getLoggerDomain($this->processingMode),
+            'extra' => [
+                'task' => $this->task,
+            ],
         ]);
     }
 }
