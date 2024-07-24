@@ -232,6 +232,7 @@ abstract class Worker extends editor_Models_Task_AbstractWorker
                         // the resource-name for the worker model
                         'resource' => $serviceId . ucfirst($this->resourcePool),
                         // the slot that represents a "virtualized" url and not the real URL anymore as with other workers
+                        // TODO DELAYED WORKERS: was it really wanted, that the slot is identical in case of load-balanced workers ?
                         'slot' => $slotName . $i,
                         // the actual URL (saved in the worker-params)
                         'url' => ($i < $numUrls) ? $serviceUrls[$i] : (($numUrls > 1) ? $serviceUrls[random_int(0, $numUrls - 1)] : $serviceUrls[0]),
