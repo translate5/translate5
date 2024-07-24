@@ -27,7 +27,6 @@ END LICENSE AND COPYRIGHT
 */
 
 use MittagQI\Translate5\Task\Worker\Behaviour;
-use MittagQI\ZfExtended\Worker\Exception\MaxDelaysException;
 
 /**
  * Extends the default worker with task specific additions, basically if the task is on state error, then the worker should set to defunc.
