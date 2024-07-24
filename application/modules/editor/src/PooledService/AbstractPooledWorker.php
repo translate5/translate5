@@ -46,7 +46,7 @@ use ZfExtended_Factory;
  * Then the amount of workers to queue is evaluated on the fly by getting the IP-Adresses the configured host has
  * the URL of the service is not the slot anymore but a seperate worker-param "serviceUrl"
  */
-abstract class Worker extends editor_Models_Task_AbstractWorker
+abstract class AbstractPooledWorker extends editor_Models_Task_AbstractWorker
 {
     protected string $resourcePool = 'import';
 
@@ -240,7 +240,7 @@ abstract class Worker extends editor_Models_Task_AbstractWorker
                 }
             }
             if ($this->doDebug) {
-                error_log('PooledService Worker::initSlots(): number of Workers: ' . $this->maxParallel . ' / slots: ' . print_r($this->slots, true));
+                error_log('AbstractPooledWorker::initSlots(): number of Workers: ' . $this->maxParallel . ' / slots: ' . print_r($this->slots, true));
             }
         }
     }
@@ -325,7 +325,7 @@ abstract class Worker extends editor_Models_Task_AbstractWorker
                     $myselfQueued = true;
 
                     if ($this->doDebug) {
-                        error_log('Queued PooledService Worker: ' . get_class($this) . ', primary');
+                        error_log('Queued AbstractPooledWorker: ' . get_class($this) . ', primary');
                     }
                 }
                 $params['workerIndex']++;
@@ -337,7 +337,7 @@ abstract class Worker extends editor_Models_Task_AbstractWorker
         }
 
         if ($this->doDebug) {
-            error_log('Queued PooledService Worker: ' . get_class($this) . ', secondary');
+            error_log('Queued AbstractPooledWorker: ' . get_class($this) . ', secondary');
         }
 
         return parent::queue($parentId, $state, false);

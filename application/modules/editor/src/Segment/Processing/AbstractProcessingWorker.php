@@ -29,14 +29,14 @@
 namespace MittagQI\Translate5\Segment\Processing;
 
 use Exception;
-use MittagQI\Translate5\PooledService\Worker as PooledServiceWorker;
+use MittagQI\Translate5\PooledService\AbstractPooledWorker;
 use MittagQI\Translate5\Segment\AbstractProcessor;
 use ZfExtended_Logger;
 
 /**
  * A processing worker processes segments in a loop until no unprocessed segments are available for the task
  */
-abstract class Worker extends PooledServiceWorker implements ProgressInterface
+abstract class AbstractProcessingWorker extends AbstractPooledWorker implements ProgressInterface
 {
     /**
      * Defines the number of segments after which the progress is reported
@@ -125,7 +125,7 @@ abstract class Worker extends PooledServiceWorker implements ProgressInterface
     {
         $this->processor = $this->createProcessor();
         if ($this->doDebug) {
-            error_log('PooledService/Processing Worker: ' . get_class($this) . '|' . $this->workerModel->getSlot() . ': work for ' . $this->processingMode . ' using slot ' . $this->workerModel->getSlot() . ' with processor ' . get_class($this->processor));
+            error_log('AbstractProcessingWorker: ' . get_class($this) . '|' . $this->workerModel->getSlot() . ': work for ' . $this->processingMode . ' using slot ' . $this->workerModel->getSlot() . ' with processor ' . get_class($this->processor));
         }
         // special: some processors may decide not to process - usually because conditions not yet have been clear in queueing-phase
         // simply all workers with higher index will terminate then
@@ -136,7 +136,7 @@ abstract class Worker extends PooledServiceWorker implements ProgressInterface
             $this->doLoop();
         } else {
             if ($this->doDebug) {
-                error_log('PooledService/Processing Worker: ' . get_class($this) . ' with index ' . $this->workerIndex . ' terminates because the processor ' . get_class($this->processor) . ' decided processing is not neccessary');
+                error_log('AbstractProcessingWorker: ' . get_class($this) . ' with index ' . $this->workerIndex . ' terminates because the processor ' . get_class($this->processor) . ' decided processing is not neccessary');
             }
         }
 
@@ -165,7 +165,7 @@ abstract class Worker extends PooledServiceWorker implements ProgressInterface
                 $isFinished = $this->looper->run($this->processingMode, $this->fromTheTop, $this->doDebug);
             } catch (Exception $processingException) {
                 if ($this->doDebug) {
-                    error_log('PooledService/Processing Worker: ' . get_class($this) . '|' . $this->workerModel->getSlot() . ': Loop exception: ' . $processingException->getMessage());
+                    error_log('AbstractProcessingWorker: ' . get_class($this) . '|' . $this->workerModel->getSlot() . ': Loop exception: ' . $processingException->getMessage());
                 }
                 $flag = $this->onLooperException($processingException, $this->looper->getProcessedStates(), $this->looper->isReprocessingLoop());
                 if ($flag > 0) {

@@ -39,7 +39,7 @@ use MittagQI\Translate5\Plugins\SpellCheck\LanguageTool\Service;
 use MittagQI\Translate5\Plugins\SpellCheck\Segment\Configuration;
 use MittagQI\Translate5\Plugins\SpellCheck\Segment\Processor;
 use MittagQI\Translate5\Segment\Processing\State;
-use MittagQI\Translate5\Segment\Processing\Worker as ProcessingWorker;
+use MittagQI\Translate5\Segment\Processing\AbstractProcessingWorker;
 use Zend_Exception;
 use Zend_Registry;
 use ZfExtended_Exception;
@@ -52,7 +52,7 @@ use ZfExtended_Logger;
  * @property Service $service;
  * @property Processor $processor;
  */
-class Worker extends ProcessingWorker
+class Worker extends AbstractProcessingWorker
 {
     /**
      * @throws ZfExtended_Exception
