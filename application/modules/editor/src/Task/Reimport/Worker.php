@@ -63,11 +63,7 @@ class Worker extends editor_Models_Task_AbstractWorker
      */
     public const FILEFILTER_CONTEXT_NEW = 'REIMPORT_CHECK_NEW';
 
-    /**
-     * (non-PHPdoc)
-     * @see ZfExtended_Worker_Abstract::validateParameters()
-     */
-    protected function validateParameters($parameters = [])
+    protected function validateParameters(array $parameters): bool
     {
         $neededEntries = ['files', 'userGuid', 'segmentTimestamp', 'dataProviderClass'];
         $foundEntries = array_keys($parameters);
@@ -77,26 +73,12 @@ class Worker extends editor_Models_Task_AbstractWorker
         return empty($keyDiff);
     }
 
-    /**
-     * (non-PHPdoc)
-     * @return true
-     * @throws Exception
-     * @throws JsonException
-     * @throws Zend_Acl_Exception
-     * @throws ZfExtended_Models_Entity_Conflict
-     * @throws ZfExtended_Models_Entity_NotFoundException
-     * @throws Zend_Exception
-     * @see ZfExtended_Worker_Abstract::work()
-     */
-    public function work()
+    public function work(): bool
     {
         $params = $this->workerModel->getParameters();
 
-        /** @var ZfExtended_Models_User $user */
-        $user = ZfExtended_Factory::get('ZfExtended_Models_User');
+        $user = ZfExtended_Factory::get(ZfExtended_Models_User::class);
         $user->loadByGuid($params['userGuid']);
-
-        $logger = Zend_Registry::get('logger')->cloneMe('editor.task.reimport');
 
         //contains the TUA which is used to alter the segments
         $tua = $this->prepareTaskUserAssociation($this->task, $user);

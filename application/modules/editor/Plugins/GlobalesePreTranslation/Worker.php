@@ -66,11 +66,7 @@ class editor_Plugins_GlobalesePreTranslation_Worker extends editor_Models_Task_A
         editor_Models_Converter_SegmentsToXliff::CONFIG_ADD_TERMINOLOGY => false,
     ];
 
-    /**
-     * (non-PHPdoc)
-     * @see ZfExtended_Worker_Abstract::validateParameters()
-     */
-    protected function validateParameters($parameters = [])
+    protected function validateParameters(array $parameters): bool
     {
         if (empty($parameters['group']) || empty($parameters['engine']) || empty($parameters['apiUsername']) || empty($parameters['apiKey'])) {
             return false;
@@ -79,10 +75,7 @@ class editor_Plugins_GlobalesePreTranslation_Worker extends editor_Models_Task_A
         return true;
     }
 
-    /**
-     * @see ZfExtended_Worker_Abstract::work()
-     */
-    public function work()
+    public function work(): bool
     {
         //then you can access $this->parameters with your data
 

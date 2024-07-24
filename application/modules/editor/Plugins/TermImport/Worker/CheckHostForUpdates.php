@@ -69,7 +69,7 @@ class CheckHostForUpdates extends ZfExtended_Worker_Abstract
         $this->plugin = new TermImport(new FilesystemFactory(new LoggerService()));
     }
 
-    protected function validateParameters($parameters = []): bool
+    protected function validateParameters(array $parameters): bool
     {
         if (empty($parameters['filesystemKey'])) {
             return false;
@@ -80,7 +80,7 @@ class CheckHostForUpdates extends ZfExtended_Worker_Abstract
         return true;
     }
 
-    protected function work()
+    protected function work(): bool
     {
         $this->plugin->checkFilesystem($this->filesystemKey);
         return true;

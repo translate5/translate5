@@ -83,16 +83,7 @@ class editor_Plugins_Okapi_Worker extends editor_Models_Task_AbstractWorker
         return self::createOriginalFilePath($absoluteTaskDataPath, $fileId, $extension) . editor_Plugins_Okapi_Connector::OUTPUT_FILE_EXTENSION;
     }
 
-    /**
-     * @var ZfExtended_Logger
-     */
-    protected $logger;
-
-    /**
-     * (non-PHPdoc)
-     * @see ZfExtended_Worker_Abstract::validateParameters()
-     */
-    protected function validateParameters($parameters = [])
+    protected function validateParameters(array $parameters): bool
     {
         if (empty($parameters['type'])
                 || ! ($parameters['type'] == self::TYPE_IMPORT || $parameters['type'] == self::TYPE_EXPORT)) {
@@ -118,7 +109,7 @@ class editor_Plugins_Okapi_Worker extends editor_Models_Task_AbstractWorker
         return false;
     }
 
-    public function work()
+    public function work(): bool
     {
         $this->logger = Zend_Registry::get('logger')->cloneMe('plugin.okapi');
         $params = $this->workerModel->getParameters();
@@ -132,7 +123,7 @@ class editor_Plugins_Okapi_Worker extends editor_Models_Task_AbstractWorker
     /**
      * Uploads one file to Okapi to convert it to an XLIFF file importable by translate5
      */
-    protected function doImport()
+    protected function doImport(): bool
     {
         $params = $this->workerModel->getParameters();
 

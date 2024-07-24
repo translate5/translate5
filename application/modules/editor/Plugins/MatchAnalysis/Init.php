@@ -678,7 +678,7 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract
      */
     private function fetchImportWorkerId(string $taskGuid): int
     {
-        $parent = ZfExtended_Factory::get(ZfExtended_Models_Worker::class);
+        $parent = new ZfExtended_Models_Worker();
 
         try {
             $parent->loadFirstOf(editor_Models_Import_Worker::class, $taskGuid);

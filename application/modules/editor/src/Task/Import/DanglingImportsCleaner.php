@@ -73,7 +73,7 @@ class DanglingImportsCleaner
     {
         $task = ZfExtended_Factory::get(editor_Models_Task::class);
 
-        $worker = ZfExtended_Factory::get(ZfExtended_Models_Worker::class);
+        $worker = new ZfExtended_Models_Worker();
 
         $config = Zend_Registry::get('config');
         $hours = (int) ($config->runtimeOptions->import->timeout ?? 48);

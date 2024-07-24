@@ -7,11 +7,7 @@ use ZfExtended_Factory;
 
 class PivotWorker extends editor_Models_Task_AbstractWorker
 {
-    /***
-     * @param $parameters
-     * @return bool
-     */
-    protected function validateParameters($parameters = []): bool
+    protected function validateParameters(array $parameters): bool
     {
         $neededEntries = ['userGuid', 'userName'];
         $foundEntries = array_keys($parameters);
@@ -21,7 +17,7 @@ class PivotWorker extends editor_Models_Task_AbstractWorker
         return empty($keyDiff);
     }
 
-    protected function work()
+    protected function work(): bool
     {
         try {
             // lock the task dedicated for pivot pre-translation

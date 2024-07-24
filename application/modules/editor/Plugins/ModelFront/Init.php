@@ -221,7 +221,7 @@ class editor_Plugins_ModelFront_Init extends ZfExtended_Plugin_Abstract
 
             return;
         }
-        $parent = ZfExtended_Factory::get(ZfExtended_Models_Worker::class);
+        $parent = new ZfExtended_Models_Worker();
         $result = $parent->loadByState(
             ZfExtended_Models_Worker::STATE_PREPARE,
             editor_Plugins_MatchAnalysis_Worker::class,

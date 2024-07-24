@@ -2204,7 +2204,7 @@ class editor_TaskController extends ZfExtended_RestController
             unset($this->data->entityVersion);
         }
 
-        $worker = ZfExtended_Factory::get(ZfExtended_Models_Worker::class);
+        $worker = new ZfExtended_Models_Worker();
 
         try {
             $worker->loadFirstOf(editor_Models_Import_Worker::class, $this->entity->getTaskGuid());

@@ -85,7 +85,7 @@ class RecalculateRulesHashWorker extends ZfExtended_Worker_Abstract
         $this->lrPairs = $this->getLangPairInT5MemoryLRs();
     }
 
-    protected function validateParameters($parameters = [])
+    protected function validateParameters(array $parameters): bool
     {
         if (array_key_exists('direction', $parameters)) {
             $this->direction = (int) $parameters['direction'];
@@ -102,7 +102,7 @@ class RecalculateRulesHashWorker extends ZfExtended_Worker_Abstract
         return true;
     }
 
-    protected function work()
+    protected function work(): bool
     {
         if (null !== $this->recognitionId) {
             $this->recalculateForRecognition($this->recognitionId);

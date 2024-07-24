@@ -38,19 +38,12 @@ class editor_Plugins_MatchAnalysis_BatchWorker extends editor_Models_Task_Abstra
         $this->log = Zend_Registry::get('logger')->cloneMe('plugin.matchanalysis');
     }
 
-    /**
-     * (non-PHPdoc)
-     * @see ZfExtended_Worker_Abstract::validateParameters()
-     */
-    protected function validateParameters($parameters = [])
+    protected function validateParameters(array $parameters): bool
     {
         return ! empty($parameters['languageResourceId']);
     }
 
-    /**
-     * @see ZfExtended_Worker_Abstract::work()
-     */
-    public function work()
+    public function work(): bool
     {
         $params = $this->workerModel->getParameters();
 

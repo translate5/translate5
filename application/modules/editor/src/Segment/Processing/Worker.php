@@ -85,10 +85,7 @@ abstract class Worker extends PooledServiceWorker implements ProgressInterface
         return -1;
     }
 
-    /**
-     * @param array $parameters
-     */
-    protected function validateParameters($parameters = []): bool
+    protected function validateParameters(array $parameters): bool
     {
         // required param defines the mode as defined in editor_Segment_Processing
         if (array_key_exists('processingMode', $parameters)) {
@@ -124,7 +121,7 @@ abstract class Worker extends PooledServiceWorker implements ProgressInterface
         }
     }
 
-    protected function work()
+    protected function work(): bool
     {
         $this->processor = $this->createProcessor();
         if ($this->doDebug) {

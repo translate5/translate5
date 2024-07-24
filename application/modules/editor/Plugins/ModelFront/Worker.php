@@ -28,19 +28,12 @@ END LICENSE AND COPYRIGHT
 
 class editor_Plugins_ModelFront_Worker extends ZfExtended_Worker_Abstract
 {
-    /**
-     * (non-PHPdoc)
-     * @see ZfExtended_Worker_Abstract::validateParameters()
-     */
-    protected function validateParameters($parameters = [])
+    protected function validateParameters(array $parameters): bool
     {
         return true;
     }
 
-    /**
-     * @see ZfExtended_Worker_Abstract::work()
-     */
-    public function work()
+    public function work(): bool
     {
         //TODO:
         //with https://jira.translate5.net/browse/TRANSLATE-1643 implementation and when we get

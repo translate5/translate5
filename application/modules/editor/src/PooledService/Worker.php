@@ -255,9 +255,8 @@ abstract class Worker extends editor_Models_Task_AbstractWorker
 
     /**
      * HINT: this function will not check the serviceUrl Param as it is set programmatically in the queue-method
-     * @param array $parameters
      */
-    protected function validateParameters($parameters = []): bool
+    protected function validateParameters(array $parameters): bool
     {
         if ($this->isPooled && array_key_exists('resourcePool', $parameters) && $this->service->isValidPool($parameters['resourcePool'])) {
             $this->resourcePool = $parameters['resourcePool'];

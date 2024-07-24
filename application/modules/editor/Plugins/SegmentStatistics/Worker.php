@@ -71,12 +71,7 @@ class editor_Plugins_SegmentStatistics_Worker extends editor_Models_Task_Abstrac
         $this->stat = ZfExtended_Factory::get('editor_Plugins_SegmentStatistics_Models_Statistics');
     }
 
-    /**
-     * (non-PHPdoc)
-     * @param array $parameters
-     * @see ZfExtended_Worker_Abstract::validateParameters()
-     */
-    protected function validateParameters($parameters = []): bool
+    protected function validateParameters(array $parameters): bool
     {
         if (empty($parameters['type'])) {
             error_log('Missing Parameter "type" in ' . __CLASS__);
@@ -87,11 +82,7 @@ class editor_Plugins_SegmentStatistics_Worker extends editor_Models_Task_Abstrac
         return true;
     }
 
-    /**
-     * (non-PHPdoc)
-     * @see ZfExtended_Worker_Abstract::work()
-     */
-    public function work()
+    public function work(): bool
     {
         $this->task->createMaterializedView();
         $data = ZfExtended_Factory::get('editor_Models_Segment_Iterator', [$this->taskGuid]);

@@ -81,7 +81,7 @@ abstract class editor_Models_Task_AbstractWorker extends ZfExtended_Worker_Abstr
         return false;
     }
 
-    private function initBehaviour(string $behaviourClass = null)
+    private function initBehaviour(string $behaviourClass = null): void
     {
         if (! empty($behaviourClass) && $behaviourClass !== $this->behaviourClass) {
             $newBehaviour = ZfExtended_Factory::get($behaviourClass);
@@ -100,7 +100,7 @@ abstract class editor_Models_Task_AbstractWorker extends ZfExtended_Worker_Abstr
      * Triggers the update progress event for tasks
      * updateProgress event trigger - can be overriden (disabled) per Worker
      */
-    protected function onProgressUpdated(float $progress)
+    protected function onProgressUpdated(float $progress): void
     {
         $progress = ZfExtended_Factory::get(editor_Models_Task_WorkerProgress::class);
         $progress->updateProgress($this->task, $progress, $this->workerModel);
@@ -111,7 +111,7 @@ abstract class editor_Models_Task_AbstractWorker extends ZfExtended_Worker_Abstr
      * {@inheritDoc}
      * @see ZfExtended_Worker_Abstract::handleWorkerException()
      */
-    protected function handleWorkerException(Throwable $workException)
+    protected function handleWorkerException(Throwable $workException): void
     {
         parent::handleWorkerException($workException);
         //just add the task if it is a error code exception

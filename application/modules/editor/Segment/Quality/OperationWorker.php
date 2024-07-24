@@ -35,7 +35,7 @@ class editor_Segment_Quality_OperationWorker extends editor_Models_Task_Abstract
      */
     private $processingMode;
 
-    protected function validateParameters($parameters = [])
+    protected function validateParameters(array $parameters): bool
     {
         // required param steers the way the segments are processed: either directly or via the LEK_segment_tags
         if (array_key_exists('processingMode', $parameters)) {
@@ -47,7 +47,7 @@ class editor_Segment_Quality_OperationWorker extends editor_Models_Task_Abstract
         return false;
     }
 
-    protected function work()
+    protected function work(): bool
     {
         // if not importing, we have to lock the task
         if ($this->processingMode != editor_Segment_Processing::IMPORT && ! $this->task->lock(NOW_ISO, editor_Task_Operation::AUTOQA)) {

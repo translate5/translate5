@@ -38,7 +38,7 @@ class editor_Segment_Quality_OperationFinishingWorker extends editor_Models_Task
      */
     private $processingMode;
 
-    protected function validateParameters($parameters = [])
+    protected function validateParameters(array $parameters): bool
     {
         // required param steers the way the segments are processed: either directly or via the LEK_segment_tags
         if (array_key_exists('processingMode', $parameters)) {
@@ -50,7 +50,7 @@ class editor_Segment_Quality_OperationFinishingWorker extends editor_Models_Task
         return false;
     }
 
-    protected function work()
+    protected function work(): bool
     {
         // write the segments back to the segments model
         editor_Segment_Quality_Manager::instance()->finishOperation($this->processingMode, $this->task);

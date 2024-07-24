@@ -62,11 +62,7 @@ class editor_Services_ImportWorker extends ZfExtended_Worker_Abstract
         return false;
     }
 
-    /**
-     * (non-PHPdoc)
-     * @see ZfExtended_Worker_Abstract::validateParameters()
-     */
-    protected function validateParameters($parameters = [])
+    protected function validateParameters(array $parameters): bool
     {
         if (empty($parameters['languageResourceId'])) {
             return false;
@@ -75,19 +71,15 @@ class editor_Services_ImportWorker extends ZfExtended_Worker_Abstract
         return true;
     }
 
-    /**
-     * @see ZfExtended_Worker_Abstract::work()
-     */
-    public function work()
+    public function work(): bool
     {
         return $this->doImport();
     }
 
     /**
      * Import languaeg resources file from the upload file
-     * @return boolean
      */
-    protected function doImport()
+    protected function doImport(): bool
     {
         $params = $this->workerModel->getParameters();
 

@@ -149,8 +149,7 @@ class editor_Plugins_GlobalesePreTranslation_GlobaleseController extends ZfExten
         }
 
         //find the parent worker
-        $parent = ZfExtended_Factory::get('ZfExtended_Models_Worker');
-        /* @var $parent ZfExtended_Models_Worker */
+        $parent = new ZfExtended_Models_Worker();
         $result = $parent->loadByState(ZfExtended_Models_Worker::STATE_PREPARE, 'editor_Models_Import_Worker', $task->getTaskGuid());
         $parentWorkerId = null;
         if (! empty($result)) {
