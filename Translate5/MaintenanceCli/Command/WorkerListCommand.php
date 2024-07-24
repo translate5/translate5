@@ -34,7 +34,6 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Zend_Exception;
-use ZfExtended_Factory;
 use ZfExtended_Models_Entity_NotFoundException;
 use ZfExtended_Models_Worker;
 
@@ -90,8 +89,7 @@ class WorkerListCommand extends Translate5AbstractCommand
 
         $this->writeTitle('worker list');
 
-        $worker = ZfExtended_Factory::get('ZfExtended_Models_Worker');
-        /* @var $worker ZfExtended_Models_Worker */
+        $worker = new ZfExtended_Models_Worker();
 
         if ($id = $this->input->getArgument('workerId')) {
             $worker->load($id);
