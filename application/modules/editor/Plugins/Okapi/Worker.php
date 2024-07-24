@@ -26,6 +26,9 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use editor_Plugins_Okapi_Connector as Connector;
+use MittagQI\Translate5\Plugins\Okapi\Export\ManifestFixer;
+
 class editor_Plugins_Okapi_Worker extends editor_Models_Task_AbstractWorker
 {
     public const TYPE_IMPORT = 'import';
@@ -50,37 +53,26 @@ class editor_Plugins_Okapi_Worker extends editor_Models_Task_AbstractWorker
 
     /**
      * Api for accessing the saved Manifest file from other contexts
-     * @param string $absoluteTaskDataPath
-     * @param string $fileId
-     * @return string
      */
-    public static function createManifestFilePath($absoluteTaskDataPath, $fileId)
+    public static function createManifestFilePath(string $absoluteTaskDataPath, string $fileId): string
     {
         return $absoluteTaskDataPath . '/' . self::OKAPI_REL_DATA_DIR . '/' . sprintf(self::MANIFEST_FILE, $fileId);
     }
 
     /**
      * Api for accessing the saved original file from other contexts
-     * @param string $absoluteTaskDataPath
-     * @param string $fileId
-     * @param string $extension
-     * @return string
      */
-    public static function createOriginalFilePath($absoluteTaskDataPath, $fileId, $extension)
+    public static function createOriginalFilePath(string $absoluteTaskDataPath, string $fileId, string $extension): string
     {
         return $absoluteTaskDataPath . '/' . self::OKAPI_REL_DATA_DIR . '/' . sprintf(self::ORIGINAL_FILE, $fileId, $extension);
     }
 
     /**
      * Api for accessing the saved  converted file from other contexts
-     * @param string $absoluteTaskDataPath
-     * @param string $fileId
-     * @param string $extension
-     * @return string
      */
-    public static function createConvertedFilePath($absoluteTaskDataPath, $fileId, $extension)
+    public static function createConvertedFilePath(string $absoluteTaskDataPath, string $fileId, string $extension): string
     {
-        return self::createOriginalFilePath($absoluteTaskDataPath, $fileId, $extension) . editor_Plugins_Okapi_Connector::OUTPUT_FILE_EXTENSION;
+        return self::createOriginalFilePath($absoluteTaskDataPath, $fileId, $extension) . Connector::OUTPUT_FILE_EXTENSION;
     }
 
     protected function validateParameters(array $parameters): bool
@@ -134,29 +126,31 @@ class editor_Plugins_Okapi_Worker extends editor_Models_Task_AbstractWorker
         $manifestFile = $this->getManifestFile($fileId);
         $okapiDataDir = $this->getDataDir();
 
-        $language = ZfExtended_Factory::get('editor_Models_Languages');
-        /* @var $language editor_Models_Languages */
-
+        $language = ZfExtended_Factory::get(editor_Models_Languages::class);
         $sourceLang = $language->loadLangRfc5646((int) $this->task->getSourceLang());
         $targetLang = $language->loadLangRfc5646((int) $this->task->getTargetLang());
 
         try {
             $taskConfig = $this->task->getConfig();
-            $api = ZfExtended_Factory::get('editor_Plugins_Okapi_Connector', [
-                $taskConfig,
-            ]);
+            $api = ZfExtended_Factory::get(Connector::class, [$taskConfig]);
             $okapiConfig = $taskConfig->runtimeOptions->plugins->Okapi;
             $serverUsed = $okapiConfig->serverUsed ?? 'not set';
-            $this->logger->info('E1444', 'Okapi Plug-In: File "{fileName}" (id: {fileId}) was imported with Okapi "{okapi}"', [
-                'task' => $this->task,
-                'okapi' => $serverUsed,
-                'fileId' => $fileId,
-                'fileName' => $file->getBasename(),
-                'okapiUrl' => $okapiConfig->server?->$serverUsed ?? 'server used not found',
-                'usedBconf' => $params['bconfName'],
-            ], ['tasklog', 'ecode']);
-
-            /* @var $api editor_Plugins_Okapi_Connector */
+            $this->logger->info(
+                'E1444',
+                'Okapi Plug-In: File "{fileName}" (id: {fileId}) was imported with Okapi "{okapi}"',
+                [
+                    'task' => $this->task,
+                    'okapi' => $serverUsed,
+                    'fileId' => $fileId,
+                    'fileName' => $file->getBasename(),
+                    'okapiUrl' => $okapiConfig->server?->$serverUsed ?? 'server used not found',
+                    'usedBconf' => $params['bconfName'],
+                ],
+                [
+                    'tasklog',
+                    'ecode',
+                ]
+            );
             $api->createProject();
             // upload the BCONF set by worker-params
             $api->uploadOkapiConfig($params['bconfFilePath'], true);
@@ -172,10 +166,19 @@ class editor_Plugins_Okapi_Worker extends editor_Models_Task_AbstractWorker
             copy($convertedFile, $file . $api::OUTPUT_FILE_EXTENSION);
 
             //add okapi export file filter for that file
-            $fileFilter = ZfExtended_Factory::get('editor_Models_File_FilterManager');
-            /* @var $fileFilter editor_Models_File_FilterManager */
-            $fileFilter->addFilter($fileFilter::TYPE_IMPORT, $this->taskGuid, $fileId, 'editor_Plugins_Okapi_FileFilter');
-            $fileFilter->addFilter($fileFilter::TYPE_EXPORT, $this->taskGuid, $fileId, 'editor_Plugins_Okapi_FileFilter');
+            $fileFilter = ZfExtended_Factory::get(editor_Models_File_FilterManager::class);
+            $fileFilter->addFilter(
+                $fileFilter::TYPE_IMPORT,
+                $this->taskGuid,
+                $fileId,
+                editor_Plugins_Okapi_FileFilter::class
+            );
+            $fileFilter->addFilter(
+                $fileFilter::TYPE_EXPORT,
+                $this->taskGuid,
+                $fileId,
+                editor_Plugins_Okapi_FileFilter::class
+            );
         } catch (Exception $e) {
             $this->handleException($e, $file, $fileId, true);
         } finally {
@@ -186,7 +189,6 @@ class editor_Plugins_Okapi_Worker extends editor_Models_Task_AbstractWorker
     }
 
     /**
-     * @return boolean
      * @throws editor_Models_ConfigException
      * @throws editor_Plugins_Okapi_Exception
      */
@@ -196,14 +198,15 @@ class editor_Plugins_Okapi_Worker extends editor_Models_Task_AbstractWorker
         $fileId = $params['fileId'];
         $workFile = new SplFileInfo($params['file']);
 
-        $manifestFile = new SplFileInfo($this->getDataDir() . '/' . $this->getManifestFile($fileId));
+        $manifestPath = $this->getDataDir() . '/' . $this->getManifestFile($fileId);
+        // TRANSLATE-4080 fix a potentially problematic manifest resulting from using a customized subfilter
+        ManifestFixer::checkAndFix($manifestPath);
+        $manifestFile = new SplFileInfo($manifestPath);
 
         $taskConfig = $this->task->getConfig();
-
-        $api = ZfExtended_Factory::get(editor_Plugins_Okapi_Connector::class, [$taskConfig]);
+        $api = ZfExtended_Factory::get(Connector::class, [$taskConfig]);
 
         $language = ZfExtended_Factory::get(editor_Models_Languages::class);
-
         $sourceLang = $language->loadLangRfc5646((int) $this->task->getSourceLang());
         $targetLang = $language->loadLangRfc5646((int) $this->task->getTargetLang());
         $result = false;
@@ -259,8 +262,9 @@ class editor_Plugins_Okapi_Worker extends editor_Models_Task_AbstractWorker
             //add an export-error file, pointing into the right direction
             file_put_contents(
                 dirname($workFile) . '/export-error.txt',
-                basename($workFile) . ': could not be exported due errors in Okapi.
-See task event log for more details.' . "\n\n" . (is_null($event) ? $e->getMessage() : $event->oneLine()),
+                basename($workFile) .
+                    ': could not be exported due errors in Okapi. See task event log for more details.' .
+                    "\n\n" . (is_null($event) ? $e->getMessage() : $event->oneLine()),
                 FILE_APPEND
             );
         } finally {
