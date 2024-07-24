@@ -38,26 +38,33 @@ use League\Flysystem\FilesystemException;
 use League\Flysystem\MountManager;
 use MittagQI\Translate5\Tools\FlysystemFactory;
 use RecursiveDirectoryIterator;
+use ReflectionException;
 use stdClass;
+use Zend_Db_Statement_Exception;
 use ZfExtended_Factory;
+use ZfExtended_Models_Entity_Exceptions_IntegrityConstraint;
+use ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey;
 use ZfExtended_Models_Entity_NotFoundException;
 use ZfExtended_Utils;
 use ZfExtended_Worker_Abstract;
 use ZipArchive;
+use const NOW_ISO;
 
 /**
- * Worker to archive a task as XLF2, saves it to the destination given in the config and optionally removes the task (enabled by default)
+ * Worker to archive a task as XLF2, saves it to the destination given in the config
+ * and optionally removes the task (enabled by default)
  */
 class ArchiveWorker extends ZfExtended_Worker_Abstract
 {
     private editor_Models_Task $task;
 
     /**
-     * @throws ZfExtended_Models_Entity_NotFoundException
-     * @throws \ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey
-     * @throws \Zend_Db_Statement_Exception
-     * @throws \ZfExtended_Models_Entity_Exceptions_IntegrityConstraint
      * @throws ArchiveException
+     * @throws ReflectionException
+     * @throws Zend_Db_Statement_Exception
+     * @throws ZfExtended_Models_Entity_Exceptions_IntegrityConstraint
+     * @throws ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey
+     * @throws ZfExtended_Models_Entity_NotFoundException
      */
     public function work()
     {
@@ -86,13 +93,21 @@ class ArchiveWorker extends ZfExtended_Worker_Abstract
             $this->workerModel->save();
 
             $remover = ZfExtended_Factory::get('editor_Models_Task_Remover', [$this->task]);
-            $remover->remove();
-            $this->log->info('E1402', 'Task successfully removed (with backup before). ID: {id} {name}', [
-                'id' => $taskJson->id,
-                'name' => $taskJson->taskName,
-                'targetPath' => $targetFile,
-                'guid' => $taskJson->taskGuid,
-            ]);
+            $dryRun = 'KEPT - DRYRUN; ';
+            if (! $parameters['keepTasks']) {
+                $remover->remove();
+                $dryRun = '';
+            }
+            $this->log->info(
+                'E1402',
+                'Task successfully removed (' . $dryRun . 'with backup before). ID: {id} {name}',
+                [
+                    'id' => $taskJson->id,
+                    'name' => $taskJson->taskName,
+                    'targetPath' => $targetFile,
+                    'guid' => $taskJson->taskGuid,
+                ]
+            );
 
             return true;
         } catch (FilesystemException $e) {
@@ -113,7 +128,7 @@ class ArchiveWorker extends ZfExtended_Worker_Abstract
         return preg_replace_callback('#{([a-zA-Z0-9_-]+)}#', function ($matches) use ($taskJson, $charsToProtect) {
             $var = $matches[1];
             if ($var === 'time') {
-                return \NOW_ISO;
+                return NOW_ISO;
             }
 
             return str_replace($charsToProtect, '-', $taskJson->$var ?? $var);
@@ -122,6 +137,7 @@ class ArchiveWorker extends ZfExtended_Worker_Abstract
 
     /**
      * Exports the task as XLIFF V2
+     * @throws ReflectionException
      */
     protected function exportXlf2(string $path): void
     {
@@ -131,7 +147,10 @@ class ArchiveWorker extends ZfExtended_Worker_Abstract
             editor_Models_Converter_SegmentsToXliff2::CONFIG_ADD_QM => true,
         ];
         /** @var editor_Models_Converter_SegmentsToXliff2 $xliffConverter */
-        $xliffConverter = ZfExtended_Factory::get('editor_Models_Converter_SegmentsToXliff2', [$xliffConf, $this->task->getWorkflowStepName()]);
+        $xliffConverter = ZfExtended_Factory::get(
+            editor_Models_Converter_SegmentsToXliff2::class,
+            [$xliffConf, $this->task->getWorkflowStepName()]
+        );
 
         $filename = $path . '/export-xlf2.xliff';
         file_put_contents($filename, $xliffConverter->export($this->task));
@@ -143,7 +162,9 @@ class ArchiveWorker extends ZfExtended_Worker_Abstract
      */
     protected function validateParameters($parameters = [])
     {
-        if (empty($parameters['exportToFolder']) || (! is_dir($parameters['exportToFolder']) || ! is_writable($parameters['exportToFolder']))) {
+        if (empty($parameters['exportToFolder'])
+            || (! is_dir($parameters['exportToFolder'])
+            || ! is_writable($parameters['exportToFolder']))) {
             $this->log->error('E0000', 'Export folder not found or not write able: ' . $parameters['exportToFolder']);
 
             return false;
@@ -165,21 +186,22 @@ class ArchiveWorker extends ZfExtended_Worker_Abstract
     /**
      * exports the tasks data object as json file
      * @throws ZfExtended_Models_Entity_NotFoundException
+     * @throws ReflectionException
      */
     private function exportTaskMetaData(string $path): stdClass
     {
         $json = $this->task->getDataObject();
 
         /** @var editor_Models_Languages $language */
-        $language = ZfExtended_Factory::get('editor_Models_Languages');
-        $language->load($this->task->getSourceLang());
+        $language = ZfExtended_Factory::get(editor_Models_Languages::class);
+        $language->load((int) $this->task->getSourceLang());
         $json->sourceLangRfc5646 = $language->getRfc5646();
-        $language->load($this->task->getTargetLang());
+        $language->load((int) $this->task->getTargetLang());
         $json->targetLangRfc5646 = $language->getRfc5646();
 
         /** @var editor_Models_Customer_Customer $customer */
         $customer = ZfExtended_Factory::get('editor_Models_Customer_Customer');
-        $customer->load($this->task->getCustomerId());
+        $customer->load((int) $this->task->getCustomerId());
         $json->customerName = $customer->getName();
         $json->customerNumber = $customer->getNumber();
 
@@ -223,10 +245,14 @@ class ArchiveWorker extends ZfExtended_Worker_Abstract
      * @param string $filename filepath to be added
      * @param string $localname local file name in ZIP
      */
-    protected function addDir(ZipArchive $zip, string $filename, string $localname = '')
+    protected function addDir(ZipArchive $zip, string $filename, string $localname = ''): void
     {
-        $zip->addEmptyDir($localname);
         $iter = new RecursiveDirectoryIterator($filename, FilesystemIterator::SKIP_DOTS);
+
+        if ($localname !== '') {
+            $zip->addEmptyDir($localname);
+            $localname = rtrim($localname, '/') . '/';
+        }
 
         foreach ($iter as $fileinfo) {
             if (! $fileinfo->isFile() && ! $fileinfo->isDir()) {
@@ -234,13 +260,9 @@ class ArchiveWorker extends ZfExtended_Worker_Abstract
             }
 
             if ($fileinfo->isFile()) {
-                $zip->addFile($fileinfo->getPathname(), $localname . '/' . $fileinfo->getFilename());
+                $zip->addFile($fileinfo->getPathname(), $localname . $fileinfo->getFilename());
             } else {
-                $newLocalName = $fileinfo->getFilename();
-                if ($localname !== '') {
-                    $newLocalName = $localname . '/' . $newLocalName;
-                }
-                $this->addDir($zip, $fileinfo->getPathname(), $newLocalName);
+                $this->addDir($zip, $fileinfo->getPathname(), $localname . $fileinfo->getFilename());
             }
         }
     }

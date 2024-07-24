@@ -36,6 +36,7 @@ use editor_Models_Segment_AutoStates as AutoStates;
 use editor_Models_Segment_Iterator;
 use editor_Models_Task as Task;
 use editor_Services_Manager;
+use MittagQI\Translate5\LanguageResource\Adapter\Exception\SegmentUpdateException;
 use MittagQI\Translate5\LanguageResource\Adapter\UpdatableAdapterInterface;
 use MittagQI\Translate5\Segment\FilteredIterator;
 use ReflectionException;
@@ -103,20 +104,29 @@ class ReimportSegments
         ];
         $segments = $this->getSegmentIterator($task, $filters);
 
-        $this->updateSegments(
+        $result = $this->updateSegments(
             $segments,
             $params[self::USE_SEGMENT_TIMESTAMP] ?? UpdatableAdapterInterface::DO_NOT_USE_SEGMENT_TIMESTAMP
         );
 
         $this->reopenTask();
-        $this->getLogger()->info(
-            'E0000',
-            'Task {taskId} re-imported successfully into the desired TM {tmId}',
-            [
-                'taskId' => $this->task->getId(),
-                'tmId' => $this->languageResource->getId(),
-            ]
-        );
+
+        $message = 'No segments for reimport';
+        $params = [
+            'taskId' => $this->task->getId(),
+            'tmId' => $this->languageResource->getId(),
+        ];
+
+        if ($result !== null) {
+            $message = 'Task {taskId} re-imported successfully into the desired TM {tmId}';
+            $params = array_merge($params, [
+                'emptySegments' => $result->emptySegmentsAmount,
+                'successfulSegments' => $result->successfulSegmentsAmount,
+                'failedSegments' => $result->failedSegmentIds,
+            ]);
+        }
+
+        $this->getLogger()->info('E0000', $message, $params);
 
         return true;
     }
@@ -210,11 +220,11 @@ class ReimportSegments
     private function updateSegments(
         editor_Models_Segment_Iterator $segments,
         bool $useSegmentTimestamp
-    ): void {
+    ): ?ReimportSegmentsResult {
         // in case of filtered segments, the initialization of the segments
         // iterator can result with no segments found for the applied filter
         if ($segments->isEmpty()) {
-            return;
+            return null;
         }
 
         $assoc = ZfExtended_Factory::get(TaskAssociation::class);
@@ -226,26 +236,41 @@ class ReimportSegments
 
         // check if the current language resources is updatable before updating
         if (empty($assoc->getSegmentsUpdateable())) {
-            return;
+            return null;
         }
 
         $manager = ZfExtended_Factory::get(editor_Services_Manager::class);
 
         $connector = $manager->getConnector($this->languageResource, null, null, $this->task->getConfig());
 
+        $emptySegmentsAmount = 0;
+        $successfulSegmentsAmount = 0;
+        $failedSegmentsIds = [];
         foreach ($segments as $segment) {
             if ($segment->hasEmptySource() || $segment->hasEmptyTarget()) {
+                $emptySegmentsAmount++;
+
                 continue;
             }
 
             try {
-                $connector->update($segment, useSegmentTimestamp: $useSegmentTimestamp);
-            } catch (\ZfExtended_Zendoverwrites_Http_Exception|\editor_Services_Connector_Exception) {
-                // if the TM is not available (due service restart or whatever)
-                // we just wait some time and try it again once.
-                sleep(30);
-                $connector->update($segment);
+                try {
+                    $connector->update($segment, useSegmentTimestamp: $useSegmentTimestamp);
+                } catch (\ZfExtended_Zendoverwrites_Http_Exception|\editor_Services_Connector_Exception) {
+                    // if the TM is not available (due service restart or whatever)
+                    // we just wait some time and try it again once.
+                    sleep(30);
+                    $connector->update($segment, useSegmentTimestamp: $useSegmentTimestamp);
+                }
+            } catch (SegmentUpdateException) {
+                $failedSegmentsIds[] = (int) $segment->getId();
+
+                continue;
             }
+
+            $successfulSegmentsAmount++;
         }
+
+        return new ReimportSegmentsResult($emptySegmentsAmount, $successfulSegmentsAmount, $failedSegmentsIds);
     }
 }

@@ -72,12 +72,24 @@ class Application
         $_SERVER['REQUEST_URI'] = '/editor/index';
         $_SERVER['SERVER_NAME'] = 'localhost';
         $_SERVER['HTTP_HOST'] = 'localhost';
+
+        // when a test-environment is wanted we need to add the 'APPLICATION_APITEST' as no Origin-header is given with CLI
+        // this is e.g. needed for the worker-trigger "process" to properly function with workers making api-requests
+        if ($applicationEnvironment === 'test' || $applicationEnvironment === 'apptest') {
+            defined('APPLICATION_APITEST') || define('APPLICATION_APITEST', true);
+            // the "virtual" apptest environment only triggers the APITEST-flag and does not trigger a DB-switch
+            // this reflects the origin-header logic in ZfExtended_BaseIndex
+            if ($applicationEnvironment === 'apptest') {
+                $applicationEnvironment = 'application';
+            }
+        }
+
         defined('APPLICATION_PATH') || define('APPLICATION_PATH', $cwd . DIRECTORY_SEPARATOR . 'application');
         defined('APPLICATION_ENV') || define('APPLICATION_ENV', $applicationEnvironment);
 
         require_once 'Zend/Session.php';
-        \Zend_Session::$_unitTestEnabled = ! self::$startSession;
         require_once 'library/ZfExtended/BaseIndex.php';
+        \Zend_Session::$_unitTestEnabled = ! self::$startSession;
         \ZfExtended_BaseIndex::$addMaintenanceConfig = true;
         $index = \ZfExtended_BaseIndex::getInstance();
         $index->initApplication()->bootstrap();

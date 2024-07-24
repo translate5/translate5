@@ -27,13 +27,14 @@ END LICENSE AND COPYRIGHT
 */
 
 use MittagQI\Translate5\Test\Import\Config;
+use MittagQI\Translate5\Test\JsonTestAbstract;
 
 /**
  * CsvEncodingTest imports a CSV with several special characters
  * The test task will be edited and exported. The generated changes.xml and
  * exported file will then be checked for correct encoded content.
  */
-class CsvEncodingTest extends editor_Test_JsonTest
+class CsvEncodingTest extends JsonTestAbstract
 {
     protected static bool $termtaggerRequired = true;
 

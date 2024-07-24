@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xliff xmlns:sdl="http://sdl.com/FileTypes/SdlXliff/1.0" xmlns="urn:oasis:names:tc:xliff:document:1.2" version="1.2"
+       sdl:version="1.0">
+    <doc-info xmlns="http://sdl.com/FileTypes/SdlXliff/1.0">
+    </doc-info>
+    <file original="\\ONEWORD-PNA01\PLUNET\order\O-2400668\trados\en-US\49-157-13_AXO_Magazin_2024_EN_10_eder_umschlag_ToTrans.idml"
+          datatype="x-sdlfilterframework2" source-language="en-US" target-language="de-DE">
+        <header>
+            <reference>
+                <internal-file form="base64">
+                    UEsDBBQAAAAIAAVnUFjPYiCzK1MBAFpaAQARAAAAaXd1bjRhaXkuZXlmLmlkbWyMeVVUG1wTbVuk
+                    OBR3ikOxosEp7k5xCE6x4C4pxUpxKG4tFGjx4u6uBYo7AQIE90ACl37/y71v9+GslZW1MnP2zJnZ
+                </internal-file>
+            </reference>
+            <sdl:ref-files>
+                <sdl:ref-file uid="0" id="http://www.sdl.com/Sdl.FileTypeSupport.Filters.Idml/OriginalFile"
+                              name="1ndofncr.o0n.idml"
+                              o-path="\\ONEWORD-PNA01\PLUNET\order\O-2400668\trados\en-US\49-157-13_AXO_Magazin_2024_EN_10_eder_umschlag_ToTrans.idml"
+                              date="02/16/2024 12:56:10" descr="Original file before conversion."
+                              expected-use="Generation"/>
+            </sdl:ref-files>
+            <file-info xmlns="http://sdl.com/FileTypes/SdlXliff/1.0">
+                <value key="SDL:FileId">edce5922-59e0-461e-a719-958337a58bf2</value>
+                <value key="SDL:CreationDate">02/16/2024 15:29:26</value>
+                <value key="SDL:OriginalFilePath">
+                    \\ONEWORD-PNA01\PLUNET\order\O-2400668\trados\en-US\49-157-13_AXO_Magazin_2024_EN_10_eder_umschlag_ToTrans.idml
+                </value>
+                <value key="SDL:FileTypeDllVersion">1.9.9.0</value>
+                <value key="SDL:QuickInsertsList">
+                    qBold;qItalic;qUnderline;qSubscript;qSuperscript;qSmallCaps;qNoBold;qNoItalic;qNoUnderline;qNoSuperscript;qNoSubscript;qNoSmallCaps
+                </value>
+                <value key="ProcessFileInfo">Partial</value>
+                <value key="DisplayHiddenConditionalText">False</value>
+                <value key="SkipTrackingKerningInformation">False</value>
+                <value key="DisplayFootnoteOption">False</value>
+                <value key="SDL:AutoClonedFlagSupported">True</value>
+                <value key="FirstPageId">u738c7</value>
+                <value key="ParagraphTextDirections"></value>
+                <sniff-info>
+                    <detected-source-lang detection-level="Guess" lang="en-US"/>
+                </sniff-info>
+            </file-info>
+            <sdl:filetype-info>
+                <sdl:filetype-id>IDML v 1.0.0.0</sdl:filetype-id>
+            </sdl:filetype-info>
+            <fmt-defs xmlns="http://sdl.com/FileTypes/SdlXliff/1.0">
+                <fmt-def id="1">
+                    <value key="FontSize">7.8</value>
+                    <value key="FontName">FuturaTOT</value>
+                    <value key="TextColor">White</value>
+                </fmt-def>
+            </fmt-defs>
+            <cxt-defs xmlns="http://sdl.com/FileTypes/SdlXliff/1.0">
+                <cxt-def id="1" type="Querverweisformat" code="XRF" name="Querverweisformat"
+                         descr="Querverweisformat-Baustein" color="SkyBlue">
+                    <props>
+                        <value key="id">u9e</value>
+                    </props>
+                </cxt-def>
+            </cxt-defs>
+            <node-defs xmlns="http://sdl.com/FileTypes/SdlXliff/1.0">
+                <node-def id="1">
+                    <cxt id="2"/>
+                </node-def>
+                <node-def id="2">
+                    <cxt id="16"/>
+                </node-def>
+                <node-def id="3" parent="2">
+                    <cxt id="23"/>
+                </node-def>
+            </node-defs>
+            <tag-defs xmlns="http://sdl.com/FileTypes/SdlXliff/1.0">
+                <tag id="39">
+                    <st name="story">&lt;story id=&quot;u73930&quot;&gt;</st>
+                </tag>
+                <tag id="42">
+                    <st name="br">&lt;br type=&quot;br&quot;/&gt;</st>
+                </tag>
+                <tag id="47">
+                    <st name="story">&lt;/story&gt;</st>
+                </tag>
+                <tag id="48">
+                    <st name="story">&lt;story id=&quot;u73bf0&quot;&gt;</st>
+                </tag>
+            </tag-defs>
+        </header>
+        <body>
+            <group>
+                <sdl:cxts>
+                    <sdl:cxt id="291"/>
+                    <sdl:cxt id="285"/>
+                </sdl:cxts>
+                <trans-unit id="be659cad-c1ad-4141-a489-04e0374b9e53">
+                    <source><b>http://www.google.de/url?sa=i&amp;rct=j&amp;q=&amp;esrc=s</b></source>
+                    <seg-source>
+                        <mrk mtype="seg" mid="19"><b>http://www.google.de/url?sa=i&amp;rct=j&amp;q=&amp;esrc=s</b></mrk>
+                    </seg-source>
+                    <target>
+                        <mrk mtype="seg" mid="19"><lekTargetSeg id="SEGMENT_ID_1" field="target" /></mrk>
+                    </target>
+                    <sdl:seg-defs>
+                        <sdl:seg id="19" origin="unknown"/>
+                    </sdl:seg-defs>
+                </trans-unit>
+            </group>
+        </body>
+    </file>
+</xliff>

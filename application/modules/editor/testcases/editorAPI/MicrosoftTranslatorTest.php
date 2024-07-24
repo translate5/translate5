@@ -28,11 +28,12 @@ END LICENSE AND COPYRIGHT
 
 use MittagQI\Translate5\Test\Import\Config;
 use MittagQI\Translate5\Test\Import\LanguageResource;
+use MittagQI\Translate5\Test\ImportTestAbstract;
 
 /**
  * Test microsoft translator api for dictionary,normal and segmentation search
  */
-class MicrosoftTranslatorTest extends editor_Test_ImportTest
+class MicrosoftTranslatorTest extends ImportTestAbstract
 {
     protected static LanguageResource $microsoftTranslator;
 

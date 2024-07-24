@@ -214,6 +214,7 @@ Ext.define('Editor.controller.ServerException', {
                 }
                 Ext.Msg.alert(str.title, statusText);
                 return;
+
             //@todo remove this specific 405 handler with TRANSLATE-94
             case 405: //Method Not Allowed: the used HTTP Method is not allowed
                 var req = response.request,
@@ -233,6 +234,7 @@ Ext.define('Editor.controller.ServerException', {
                 }
                 Ext.Msg.alert(str.title, text+tpl.apply([status, statusText]));
                 return;
+
             case 403: //Forbidden: authenticated, but not allowed to see the specific resource 
             case 404: //Not Found: Resource does not exist
                 if(str[_status+'_'+action]) {
@@ -240,6 +242,7 @@ Ext.define('Editor.controller.ServerException', {
                 }
                 Editor.MessageBox.addError(appendServerMsg(str[_status]), errorCode);
                 return;
+
             case 401: //Unauthorized → redirect to login
                 Ext.MessageBox.show({
                     title: str["401_title"],
@@ -251,6 +254,7 @@ Ext.define('Editor.controller.ServerException', {
                     icon: Ext.MessageBox.WARNING
                 });
                 return;
+
             case 423:
                 let msg423 = 'No access on job anymore';
                 if (response.request && response.request.options && response.request.options.url) {
@@ -260,20 +264,17 @@ Ext.define('Editor.controller.ServerException', {
                 Editor.MessageBox.addError(appendServerMsg(str['403']));
                 jslogger && jslogger.logException(new Error(msg423));
                 return;
-            case 409:
-                //Conflict: show message from server
-            case 422:
-                //422 unprocessable entity: normally the errors are shown via form.markInvalid.
+
+            case 409: //Conflict: show message from server
+            case 422: // unprocessable entity: normally the errors are shown via form.markInvalid.
                 // If not, we add up the error message with info from the payload
                 var errorsToUse;
                 if(json.errorMessage && json.errorsTranslated) {
                     Ext.Logger.warn('Original Error (a translated version was shown to the user): ' + json.errorMessage);
                     errorsToUse = json.errorsTranslated;
-                }
-                else if(json.errorMessage && json.errors) {
+                } else if(json.errorMessage && json.errors) {
                     errorsToUse = json.errors;
-                }
-                else {
+                } else {
                     Editor.MessageBox.addError(appendServerMsg(str["409"]), errorCode);
                     return;
                 }
@@ -288,13 +289,17 @@ Ext.define('Editor.controller.ServerException', {
                 });
                 Editor.MessageBox.addError(str["409"]+'<ul><li>'+json.errorMessage.join('</li><li>')+'</li></ul>', errorCode);
                 return;
+
             case 406: //Not Acceptable: show message from server
-                Editor.MessageBox.addError(getServerMsg(), errorCode);
             case 502: //Bad Gateway → the real error is coming from a requested third party system
+                Editor.MessageBox.addError(getServerMsg(), errorCode);
                 Ext.Array.each(json.errors, function(item){
+                    // TODO FIXME: by doing this in a loop, only the last is shown
+                    //  This also overwrites the "main" messages above. Is that wanted ??
                     Editor.MessageBox.getInstance().showDirectError(item.msg, item.data, errorCode);
                 });
                 return;
+
             case 503:
                 Ext.MessageBox.show({
                      title: str["503_title"],

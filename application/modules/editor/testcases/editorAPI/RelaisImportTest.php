@@ -27,11 +27,12 @@ END LICENSE AND COPYRIGHT
 */
 
 use MittagQI\Translate5\Test\Import\Config;
+use MittagQI\Translate5\Test\JsonTestAbstract;
 
 /**
  * Tests if Relais Files are imported correctly, inclusive our alignment checks
  */
-class RelaisImportTest extends editor_Test_JsonTest
+class RelaisImportTest extends JsonTestAbstract
 {
     protected static bool $termtaggerRequired = true;
 

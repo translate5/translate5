@@ -29,6 +29,7 @@ use MittagQI\Translate5\Cronjob\CronEventTrigger;
 use MittagQI\Translate5\Plugins\TermImport\Service\Filesystem\FilesystemFactory;
 use MittagQI\Translate5\Plugins\TermImport\Service\LoggerService;
 use MittagQI\Translate5\Plugins\TermImport\TermImport;
+use Translate5\MaintenanceCli\Command\FilesystemExternalCheckCommand;
 
 /***
  * This plug-in is used for automatically exports TBX files from the filesystem and Across and imports them to translate5.
@@ -55,6 +56,17 @@ class editor_Plugins_TermImport_Init extends ZfExtended_Plugin_Abstract
             CronEventTrigger::PERIODICAL,
             [$this, 'checkFilesystemsForUpdates']
         );
+
+        $this->eventManager->attach(
+            FilesystemExternalCheckCommand::class,
+            FilesystemExternalCheckCommand::EVENT_CHECK,
+            [$this, 'handleConfigCheck']
+        );
+    }
+
+    public function handleConfigCheck(): array
+    {
+        return [$this->pluginName, FilesystemFactory::class, FilesystemFactory::FILESYSTEM_CONFIG_NAME];
     }
 
     /**

@@ -40,13 +40,40 @@ use MittagQI\Translate5\Segment\TagRepair\HtmlProcessor;
  * @method editor_Services_ServiceResult query(editor_Models_Segment $segment)
  * @method editor_Services_ServiceResult search(string $searchString, $field = 'source', $offset = null)
  * @method editor_Services_ServiceResult translate(string $searchString)
- * @method void update(editor_Models_Segment $segment, $recheckOnUpdate = false, $rescheduleOnError = false) editor_Services_Connector_Abstract::update()
+ * @method void update(editor_Models_Segment $segment, bool $recheckOnUpdate = false, bool $rescheduleOnError = false, bool $useSegmentTimestamp = false) editor_Services_Connector_Abstract::update()
  * @method string getStatus(editor_Models_LanguageResources_Resource $resource, editor_Models_LanguageResources_LanguageResource $languageResource = null) returns the LanguageResource status
  * @method string getLastStatusInfo() returns the last store status info from the last getStatus call
  * @method string getTm($mime, string $tmName = '') editor_Services_Connector_FilebasedAbstract::getTm()
  * @method boolean addTm(array $fileInfo = null,array $params=null) editor_Services_Connector_Abstract::addTm()
  * @method boolean addAdditionalTm(array $fileinfo = null, array $params = null) editor_Services_Connector_Abstract::addAdditionalTm()
  * @method void setConfig(Zend_Config $config) editor_Services_Connector_Abstract::setConfig(Zend_Config $config)
+ *
+ * @see editor_Services_UsageLogerTrait::logAdapterUsage()
+ * @method void logAdapterUsage(mixed $querySource, bool $isSegmentRepetition = false)
+ *
+ * @see editor_Services_UsageLogerTrait::setWorkerUserGuid()
+ * @method void setWorkerUserGuid(string $workerUserGuid = null)
+ *
+ * @see editor_Services_Connector_Abstract::getLanguageResource()
+ * @method editor_Models_LanguageResources_LanguageResource getLanguageResource()
+ *
+ * @see editor_Services_Connector_Abstract::resetResultList()
+ * @method array resetResultList()
+ *
+ * @see editor_Services_Connector_Abstract::isBatchQuery()
+ * @method bool isBatchQuery()
+ *
+ * @see editor_Services_Connector_Abstract::isDisabled()
+ * @method bool isDisabled()
+ *
+ * @see editor_Services_Connector_Abstract::disable()
+ * @method void disable()
+ *
+ * @see editor_Services_Connector_Abstract::delete()
+ * @method void delete()
+ *
+ * @see editor_Services_Connector_Abstract::isInternalFuzzy()
+ * @method bool isInternalFuzzy()
  */
 class editor_Services_Connector
 {
@@ -363,8 +390,6 @@ class editor_Services_Connector
 
     /**
      * Load the latest service result cache for the given segment in the current language resource
-     * @param editor_Models_Segment $segment
-     * @return editor_Services_ServiceResult
      * @throws ReflectionException
      */
     protected function getCachedResult(editor_Models_Segment $segment): editor_Services_ServiceResult

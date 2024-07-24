@@ -27,8 +27,9 @@ END LICENSE AND COPYRIGHT
 */
 
 use MittagQI\Translate5\Test\Import\Config;
+use MittagQI\Translate5\Test\ImportTestAbstract;
 
-class TrackChangesTest extends editor_Test_ImportTest
+class TrackChangesTest extends ImportTestAbstract
 {
     protected static $expectedCsvResult;
 

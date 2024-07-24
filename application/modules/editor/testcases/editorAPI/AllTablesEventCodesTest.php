@@ -26,10 +26,12 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\Test\UnitTestAbstract;
+
 /**
  * Tests the User Auth API
  */
-class AllTablesEventCodesTest extends \editor_Test_UnitTest
+class AllTablesEventCodesTest extends UnitTestAbstract
 {
     protected static $appRoot;
 

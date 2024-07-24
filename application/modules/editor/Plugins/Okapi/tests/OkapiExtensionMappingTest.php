@@ -28,12 +28,13 @@ END LICENSE AND COPYRIGHT
 
 use MittagQI\Translate5\Test\Import\Bconf;
 use MittagQI\Translate5\Test\Import\Config;
+use MittagQI\Translate5\Test\JsonTestAbstract;
 
 /**
  * Test for Bconfs defining new file-extensions, either via an uploaded bconf or as embedded bconf in the ZIP
  * This test imlicitly also tests the FIGMA file-filter / fprm
  */
-class OkapiExtensionMappingTest extends editor_Test_JsonTest
+class OkapiExtensionMappingTest extends JsonTestAbstract
 {
     private static Bconf $testBconf;
 

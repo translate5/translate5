@@ -121,7 +121,7 @@ class SessionImpersonateCommand extends Translate5AbstractCommand
     protected function makeUrlPath(string $token): string
     {
         $token = '?sessionToken=' . $token;
-        $url = $this->translate5->getHostname() . '/editor';
+        $url = $this->translate5->getHostname() . '/editor/';
         $segmentId = $this->input->getOption('segment-id');
         $segmentNr = $this->input->getOption('segment-nr');
         $taskId = $this->input->getArgument('task');
@@ -150,7 +150,7 @@ class SessionImpersonateCommand extends Translate5AbstractCommand
             $task->loadByTaskGuid($taskId);
         }
 
-        $url .= '/taskid/' . $task->getId() . $token;
+        $url .= 'taskid/' . $task->getId() . $token;
 
         if (empty($segmentNr)) {
             return $url;

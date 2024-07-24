@@ -27,12 +27,13 @@ END LICENSE AND COPYRIGHT
 */
 
 use MittagQI\Translate5\Test\Import\Config;
+use MittagQI\Translate5\Test\JsonTestAbstract;
 
 /**+
  * Create project with 2 tasks using importUpload_language and importUpload_type api endpoints.
  * On the backend side, the editor_Models_Import_DataProvider_Project data provider will be used to generate the file structure for the uploaded files.
  */
-class Translate2080Test extends editor_Test_JsonTest
+class Translate2080Test extends JsonTestAbstract
 {
     protected static function setupImport(Config $config): void
     {

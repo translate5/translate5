@@ -26,6 +26,8 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\ZfExtended\Tools\Markup;
+
 /**
  * Represents an MQM tag
  * this tag "really" represents two image tags wrapping the content
@@ -35,9 +37,6 @@ END LICENSE AND COPYRIGHT
  * TEMPLATE: <img class="%1$s qmflag ownttip %2$s qmflag-%3$d" data-t5qid="%4$d" data-comment="%5$s" src="%6$s" />
  * this tag is represented by two image-tags in the markup which will be paired to a single tag in the unparsing process
  * In the rendering phase an instance will be cloned and act's as two seperate single image tags again !
- *
- * @method editor_Segment_Mqm_Tag createBaseClone()
- * @method editor_Segment_Mqm_Tag cloneForRendering()
  */
 final class editor_Segment_Mqm_Tag extends editor_Segment_Tag
 {
@@ -71,32 +70,25 @@ final class editor_Segment_Mqm_Tag extends editor_Segment_Tag
      */
     public static function createCategoryVal(int $categoryIndex): string
     {
-        return editor_Segment_Tag::TYPE_MQM . '_' . strval($categoryIndex);
+        return editor_Segment_Tag::TYPE_MQM . '_' . $categoryIndex;
     }
 
-    protected static $type = editor_Segment_Tag::TYPE_MQM;
+    protected static ?string $type = editor_Segment_Tag::TYPE_MQM;
 
-    protected static $nodeName = 'img';
+    protected static ?string $nodeName = 'img';
 
-    protected static $identificationClass = self::CSS_CLASS;
+    protected static ?string $identificationClass = self::CSS_CLASS;
 
     /**
      * COMPATIBILITY: historically, the quality-id was encoded as data-t5qid
-     * @var string
      */
-    protected static $historicDataNameQid = 'seq';
+    protected static ?string $historicDataNameQid = 'seq';
 
-    /**
-     * @var string
-     */
-    private static $imgSrcTemplate = null;
+    private static ?string $imgSrcTemplate = null;
 
-    /**
-     * @return string
-     */
-    private static function createImageSrcTemplate()
+    private static function createImageSrcTemplate(): string
     {
-        if (self::$imgSrcTemplate == null) {
+        if (self::$imgSrcTemplate === null) {
             $conf = Zend_Registry::get('config');
             self::$imgSrcTemplate = APPLICATION_RUNDIR . '/' . $conf->runtimeOptions->dir->tagImagesBasePath . '/' . self::IMAGE_SRC;
         }
@@ -111,10 +103,8 @@ final class editor_Segment_Mqm_Tag extends editor_Segment_Tag
 
     /**
      * Renders a basic MQM tag out of the given properties
-     *
-     * @param int|string $qualityId
      */
-    public static function renderTag($qualityId, bool $isOpen, int $categoryIndex, string $severity, string $comment): string
+    public static function renderTag(int|string $qualityId, bool $isOpen, int $categoryIndex, string $severity, string $comment): string
     {
         // we follow the original code here
         // <img class="%1$s qmflag ownttip %2$s qmflag-%3$d" data-t5qid="%4$d" data-comment="%5$s" src="%6$s" />
@@ -126,45 +116,31 @@ final class editor_Segment_Mqm_Tag extends editor_Segment_Tag
             ->addClass(self::CSS_CLASS)
             ->addClass(editor_Segment_Tag::CSS_CLASS_TOOLTIP)
             ->addClass($posClass)
-            ->addClass(self::CSS_CLASS . '-' . strval($categoryIndex))
-            ->setData(editor_Segment_Tag::DATA_NAME_QUALITYID, $qualityId)
+            ->addClass(self::CSS_CLASS . '-' . $categoryIndex)
+            ->setData(editor_Segment_Tag::DATA_NAME_QUALITYID, (string) $qualityId)
             ->setData('comment', $comment);
 
         return $tag->render();
     }
 
-    /**
-     * @var bool
-     */
-    private $paired = false;
+    private bool $paired = false;
 
     /**
      * This flag will be set in the rendering-phase, then we act as a single image tag !
      * Can be NULL | left | right
-     * @var string
      */
-    private $rendering = null;
+    private ?string $rendering = null;
 
-    /**
-     * @var int
-     */
-    private $categoryIndex = -1;
+    private int $categoryIndex = -1;
 
-    /**
-     * @var string
-     */
-    private $severity = '';
+    private string $severity = '';
 
-    /**
-     * @var string
-     */
-    private $comment = '';
+    private string $comment = '';
 
     /**
      * Holds the order of our closer in the phase of serialization
-     * @var int
      */
-    public $rightOrder = -1;
+    public int $rightOrder = -1;
 
     public function getCategoryIndex(): int
     {
@@ -182,9 +158,7 @@ final class editor_Segment_Mqm_Tag extends editor_Segment_Tag
     }
 
     /**
-     * MQM tags can not be Splitted as they are explicitly allowed to overlap
-     * {@inheritDoc}
-     * @see editor_Segment_Tag::isSplitable()
+     * MQM tags can not be splitted as they are explicitly allowed to overlap
      */
     public function isSplitable(): bool
     {
@@ -208,7 +182,7 @@ final class editor_Segment_Mqm_Tag extends editor_Segment_Tag
         return self::createCategoryVal($this->categoryIndex);
     }
 
-    public function setCategory(string $category): editor_Segment_Tag
+    public function setCategory(string $category): static
     {
         // we do not want to have this API used with MQM Tags
         throw new ZfExtended_Exception('Calling setCategory on a MQM Tag is forbidden since the category is represented by the category index. use setCategoryIndex instead!');
@@ -224,9 +198,8 @@ final class editor_Segment_Mqm_Tag extends editor_Segment_Tag
 
     /**
      * Special API to set the rendering props in the rendering phase
-     * @return editor_Segment_Mqm_Tag
      */
-    private function setRendering(string $renderingMode, int $order, int $parentOrder)
+    private function setRendering(string $renderingMode, int $order, int $parentOrder): static
     {
         $this->rendering = $renderingMode;
         $this->paired = false; // crucial to avoid nonsense in the rendering model
@@ -245,10 +218,8 @@ final class editor_Segment_Mqm_Tag extends editor_Segment_Tag
      * Overwritten to add two clones acting as image tags instead of a single Tag.
      * That's the main "trick" why MQM-tags are handled as mates but as independent tags when rendering leading to overlaps being rendered as such
      * The nesting of the MQM tags already was corrected in the consolidation phase by manipulating order & right order
-     * {@inheritDoc}
-     * @see editor_Segment_Tag::addRenderingClone()
      */
-    public function addRenderingClone(array &$renderingQueue)
+    public function addRenderingClone(array &$renderingQueue): void
     {
         $renderingQueue[] = $this->cloneForRendering()->setRendering('left', $this->order, -1);
         $renderingQueue[] = $this->cloneForRendering()->setRendering('right', $this->rightOrder, -1);
@@ -256,8 +227,6 @@ final class editor_Segment_Mqm_Tag extends editor_Segment_Tag
 
     /**
      * Overwritten since we act as a single image tag in the rendering phase
-     * {@inheritDoc}
-     * @see editor_Segment_Tag::render()
      */
     public function render(array $skippedTypes = null): string
     {
@@ -273,8 +242,6 @@ final class editor_Segment_Mqm_Tag extends editor_Segment_Tag
 
     /**
      * Normally not used, but who knows if we are ever rendered outside the rendering phase
-     * {@inheritDoc}
-     * @see editor_Tag::renderStart()
      */
     protected function renderStart(bool $withDataAttribs = true): string
     {
@@ -287,8 +254,6 @@ final class editor_Segment_Mqm_Tag extends editor_Segment_Tag
 
     /**
      * Normally not used, but who knows if we are ever rendered outside the rendering phase
-     * {@inheritDoc}
-     * @see editor_Tag::renderStart()
      */
     protected function renderEnd(): string
     {
@@ -299,12 +264,10 @@ final class editor_Segment_Mqm_Tag extends editor_Segment_Tag
         return parent::renderEnd();
     }
 
-    /**
-     * @param boolean $isOpener
-     */
     private function renderImageTag(bool $isOpener): string
     {
-        $tag = $this->cloneProps(editor_Tag::img(), true);
+        $tag = editor_Tag::img();
+        $this->cloneProps($tag, true);
         $position = ($isOpener) ? 'left' : 'right';
         $className = ($isOpener) ? self::CSS_CLASS_OPEN : self::CSS_CLASS_CLOSE;
         $tag->setSource(self::createImageSrc($this->categoryIndex, $position));
@@ -337,7 +300,7 @@ final class editor_Segment_Mqm_Tag extends editor_Segment_Tag
         return (! $this->paired || $this->startIndex == $this->endIndex || $this->categoryIndex == -1);
     }
 
-    public function onConsolidationRemoval()
+    public function onConsolidationRemoval(): void
     {
         // we don't want exceptions on empty mqm tags (which do not make sense but also are no real error and will be removed silently) or on unit tests
         if ($this->startIndex == $this->endIndex || defined('APPLICATION_UNITTEST')) {
@@ -374,21 +337,18 @@ final class editor_Segment_Mqm_Tag extends editor_Segment_Tag
         if (preg_match(self::PATTERN_INDEX, $src, $matches)) {
             $this->categoryIndex = intval($matches[1]);
         }
-        $this->comment = htmlspecialchars_decode($this->getData('comment'));
+        $this->comment = Markup::unescapeAllQuotes($this->getData('comment'));
 
         return true;
     }
 
-    public function finalize(editor_TagSequence $tags, editor_Models_task $task)
+    public function finalize(editor_TagSequence $tags, editor_Models_task $task): void
     {
         // finds our severity in our cclasses via the tasks MQM configuration
         $this->severity = editor_Segment_Mqm_Configuration::instance($task)->findMqmSeverity($this->classes, '');
     }
 
-    /**
-     * @return editor_Segment_Mqm_Tag|editor_Segment_Tag
-     */
-    public function clone(bool $withDataAttribs = false, bool $withId = false)
+    public function clone(bool $withDataAttribs = false, bool $withId = false): static
     {
         $clone = parent::clone($withDataAttribs, $withId);
         /* @var $clone editor_Segment_Mqm_Tag */
@@ -399,7 +359,7 @@ final class editor_Segment_Mqm_Tag extends editor_Segment_Tag
         return $clone;
     }
 
-    protected function furtherSerialize(stdClass $data)
+    protected function furtherSerialize(stdClass $data): void
     {
         $data->paired = $this->paired;
         $data->categoryIndex = $this->categoryIndex;
@@ -408,7 +368,7 @@ final class editor_Segment_Mqm_Tag extends editor_Segment_Tag
         $data->rightOrder = $this->rightOrder;
     }
 
-    protected function furtherUnserialize(stdClass $data)
+    protected function furtherUnserialize(stdClass $data): void
     {
         $this->paired = $data->paired;
         $this->categoryIndex = $data->categoryIndex;

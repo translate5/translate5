@@ -27,12 +27,13 @@ END LICENSE AND COPYRIGHT
 */
 
 use MittagQI\Translate5\Test\Import\Config;
+use MittagQI\Translate5\Test\ImportTestAbstract;
 
 /**
  * SegmentsToUsersTest imports a test task, adds users with the same workflow-role and assigns segments to them.
  * It then checks if they are allowed to edit segments accordingly.
  */
-class SegmentsToUsersTest extends editor_Test_ImportTest
+class SegmentsToUsersTest extends ImportTestAbstract
 {
     public const STEP = 'translation';
 

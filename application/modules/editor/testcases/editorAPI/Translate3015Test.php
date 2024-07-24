@@ -26,6 +26,8 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\Test\JsonTestAbstract;
+
 /***
  * Test the merging of the same attributes at 1.
  * On entry level, there are 2 attributes which will be merged as 1:
@@ -37,7 +39,7 @@ END LICENSE AND COPYRIGHT
  *      <termNote type="geographicalUsage">USA</termNote>
  *
  */
-class Translate3015Test extends editor_Test_JsonTest
+class Translate3015Test extends JsonTestAbstract
 {
     public function testTbxImport()
     {

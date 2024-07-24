@@ -28,6 +28,7 @@ END LICENSE AND COPYRIGHT
 
 use MittagQI\Translate5\Task\Current\NoAccessException;
 use MittagQI\Translate5\Task\TaskContextTrait;
+use MittagQI\ZfExtended\Tools\Markup;
 
 class Editor_CommentController extends ZfExtended_RestController
 {
@@ -75,7 +76,8 @@ class Editor_CommentController extends ZfExtended_RestController
         $segmentId = (int) $this->_getParam('segmentId');
         $this->view->rows = $this->entity->loadBySegmentId($segmentId, $taskGuid);
         foreach ($this->view->rows as &$row) {
-            $row['comment'] = htmlspecialchars($row['comment']);
+            // TODO FIXME: this should not be neccessary ... may is resolved in TRANSLATE-3960 ?
+            $row['comment'] = Markup::escapeAllQuotes($row['comment']);
         }
         $this->view->total = count($this->view->rows);
 

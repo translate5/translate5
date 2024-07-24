@@ -138,6 +138,7 @@ Ext.define('Editor.view.LanguageResources.SearchGridViewController', {
         me.lastSearch.field = field;
         //needed when searching only one languageResource, otherwise a falsy value
         me.lastSearch.languageResourceid = languageResourceid;
+        me.resultsCounter = 0;
         me.search();
         me.clearTextField(field);
     },
@@ -152,6 +153,7 @@ Ext.define('Editor.view.LanguageResources.SearchGridViewController', {
         if(me.executedRequests.getCount() > 0) {
             return;
         }
+        me.resultsCounter = 0;
         me.search(true);
     },
     /**
@@ -226,7 +228,7 @@ Ext.define('Editor.view.LanguageResources.SearchGridViewController', {
         if(this.executedRequests.getCount() > 0) {
             return;
         }
-        if(view.getHeight() >= view.el.dom.scrollHeight) {
+        if(this.resultsCounter < 20) {
             this.search(true);
         }
     },
@@ -236,6 +238,7 @@ Ext.define('Editor.view.LanguageResources.SearchGridViewController', {
 
         if(resp.rows && resp.rows.length){            
             me.offset.add(languageResourceid, resp.nextOffset);
+            me.resultsCounter += resp.rows.length;
             me.loadDataIntoGrid(resp);
             return;
         }
@@ -330,5 +333,77 @@ Ext.define('Editor.view.LanguageResources.SearchGridViewController', {
      */
     setLastActiveField: function (field){
         this.lastActiveField = field;
+    },
+
+    /**
+     * Highlight text in a string - wrap the text to highlight in a span with a class of 'highlight'
+     *
+     * @param {String} value
+     * @param {String} textToHighlight
+     *
+     * @returns {String}
+     */
+    highlight: function (value, textToHighlight) {
+        const root = this.stringToDom(value);
+
+        const highlightSpan = `<span class="highlight">$&</span>`;
+        const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, null, false);
+        const textNodes = [];
+        let node;
+
+        // Collect text nodes
+        while (node = walker.nextNode()) {
+            textNodes.push(node);
+        }
+
+        // Modify text nodes
+        textNodes.forEach(node => {
+            const regex = new RegExp(textToHighlight, 'gi'); // Word boundary regex to match whole words only
+            if (regex.test(node.nodeValue)) {
+                const newNode = document.createElement('span');
+                newNode.innerHTML = node.nodeValue.replace(regex, highlightSpan);
+                node.parentNode.replaceChild(newNode, node);
+            }
+        });
+
+        return root.innerHTML;
+    },
+
+    /**
+     * TODO This method should be removed when Richtexteditor refactoring is merged
+     * Convert a template string into HTML DOM nodes
+     * @param  {String} str The template string
+     * @return {Node}       The template HTML
+     */
+    stringToDom: function(str) {
+        const support = (function () {
+            if (!window.DOMParser) {
+                return false;
+            }
+
+            let parser = new DOMParser();
+
+            try {
+                parser.parseFromString('x', 'text/html');
+            } catch (error) {
+                return false;
+            }
+
+            return true;
+        })();
+
+        // If DOMParser is supported, use it
+        if (support) {
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(str, 'text/html');
+
+            return doc.body;
+        }
+
+        // Otherwise, fallback to old-school method
+        let dom = document.createElement('div');
+        dom.innerHTML = str;
+
+        return dom;
     }
 });

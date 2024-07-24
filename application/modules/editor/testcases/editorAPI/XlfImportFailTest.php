@@ -27,11 +27,12 @@ END LICENSE AND COPYRIGHT
 */
 
 use MittagQI\Translate5\Test\Import\Config;
+use MittagQI\Translate5\Test\ImportTestAbstract;
 
 /**
  * Checks if mrk segmentation errors and missing tag ids surround sub tags are stopping the import
  */
-class XlfImportFailTest extends editor_Test_ImportTest
+class XlfImportFailTest extends ImportTestAbstract
 {
     protected static array $forbiddenPlugins = [
         'editor_Plugins_LockSegmentsBasedOnConfig_Bootstrap',

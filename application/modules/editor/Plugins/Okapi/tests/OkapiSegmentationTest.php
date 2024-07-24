@@ -26,11 +26,12 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 use editor_Plugins_Okapi_Bconf_Segmentation_Srx as Srx;
+use MittagQI\Translate5\Test\UnitTestAbstract;
 
 /**
  * Test whether srx-based text segmentation works as expected
  */
-class OkapiSegmentationTest extends editor_Test_UnitTest
+class OkapiSegmentationTest extends UnitTestAbstract
 {
     protected static string $sourceLangRfc = 'de';
 

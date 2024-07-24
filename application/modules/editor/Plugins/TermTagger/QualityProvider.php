@@ -104,6 +104,11 @@ class editor_Plugins_TermTagger_QualityProvider extends editor_Segment_Quality_P
 
     public function addWorker(editor_Models_Task $task, int $parentWorkerId, string $processingMode, array $workerParams = [])
     {
+        // If 3rd party termtagging is going to be used - return
+        if ($task->hasThirdPartyTermTagging()) {
+            return;
+        }
+
         // if source & target language is similar, we simply do nothing, since the termtagger would crash in this case, see TRANSLATE-2373
         if ($task->isSourceAndTargetLanguageSimilar()) {
             return;
@@ -175,6 +180,11 @@ class editor_Plugins_TermTagger_QualityProvider extends editor_Segment_Quality_P
 
     public function finalizeOperation(editor_Models_Task $task, string $processingMode, array $processingResult)
     {
+        // If 3rd party termtagging is going to be used - return
+        if ($task->hasThirdPartyTermTagging()) {
+            return;
+        }
+
         // disable when source/target language similar, see TRANSLATE-2373, also nothing to report when terminology was removed
         if ($task->isSourceAndTargetLanguageSimilar() || ! $task->getTerminologie()) {
             return;
@@ -192,6 +202,11 @@ class editor_Plugins_TermTagger_QualityProvider extends editor_Segment_Quality_P
 
     public function processSegment(editor_Models_Task $task, Zend_Config $qualityConfig, editor_Segment_Tags $tags, string $processingMode): editor_Segment_Tags
     {
+        // If 3rd party termtagging is going to be used - return
+        if ($task->hasThirdPartyTermTagging()) {
+            return $tags;
+        }
+
         // disable when source/target language similar, see TRANSLATE-2373
         if ($task->isSourceAndTargetLanguageSimilar()) {
             return $tags;

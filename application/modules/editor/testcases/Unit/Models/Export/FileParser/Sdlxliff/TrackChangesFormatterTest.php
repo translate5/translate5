@@ -178,5 +178,16 @@ SEGMENT,
                 '<rev-def id="1" type="Delete" author="user1" date="04/24/2024 18:18:50" />',
             ],
         ];
+
+        yield 'Segment from real world 1' => [
+            'segment' => <<<SEGMENT
+<ins class="trackchanges ownttip" data-usertrackingid="1" data-usercssnr="usernr1" data-workflowstep="reviewing2" data-timestamp="2024-06-13T08:10:38+02:00"><div class="open 672069643d2236313622 internal-tag ownttip"><span class="short" title="&lt;CharacterStyleRange AppliedCharacterStyle=&quot;CharacterStyle/\$ID/[No character style]&quot;&gt;">&lt;1&gt;</span><span class="full" data-originalid="616" data-length="-1">&lt;CharacterStyleRange AppliedCharacterStyle=&quot;CharacterStyle/\$ID/[No character style]&quot;&gt;</span></div></ins><div class="open 672069643d2236313722 internal-tag ownttip"><span class="short" title="&lt;Content&gt;">&lt;2&gt;</span><span class="full" data-originalid="617" data-length="-1">&lt;Content&gt;</span></div>Shorts e.s.iconic<div class="close 2f67 internal-tag ownttip"><span class="short" title="&lt;/Content&gt;">&lt;/2&gt;</span><span class="full" data-originalid="617" data-length="-1">&lt;/Content&gt;</span></div><ins class="trackchanges ownttip" data-usertrackingid="1" data-usercssnr="usernr1" data-workflowstep="reviewing2" data-timestamp="2024-06-13T08:10:46+02:00"><div class="close 2f67 internal-tag ownttip"><span class="short" title="&lt;/CharacterStyleRange&gt;">&lt;/1&gt;</span><span class="full" data-originalid="616" data-length="-1">&lt;/CharacterStyleRange&gt;</span></div><div class="single 672069643d22363138222f internal-tag ownttip"><span class="short" title="&lt;CharacterStyleRange AppliedCharacterStyle=&quot;CharacterStyle/wco Bold&quot;&gt;">&lt;3/&gt;</span><span class="full" data-originalid="618" data-length="-1">&lt;CharacterStyleRange AppliedCharacterStyle=&quot;CharacterStyle/wco Bold&quot;&gt;</span></div></ins>
+SEGMENT,
+            'expected' => '<mrk mtype="x-sdl-added" sdl:revid="1"><g id="616" sdl:end="false"></g></mrk><g id="617">Shorts e.s.iconic</g><mrk mtype="x-sdl-added" sdl:revid="2"><g id="616" sdl:start="false"/><g id="618"/></mrk>',
+            'expectedRevisions' => [
+                '<rev-def id="1" author="user1" date="06/13/2024 08:10:38" />',
+                '<rev-def id="2" author="user1" date="06/13/2024 08:10:46" />',
+            ],
+        ];
     }
 }

@@ -26,13 +26,14 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\Test\JsonTestAbstract;
 use PHPUnit\Framework\AssertionFailedError as AssertionFailedErrorAlias;
 
 /**
  * Creates combobox and checkbox fields and try to create task once with non-existing value for those fields and once
  * with the correct one. In the first case it is expected the creation of task to fail.
  */
-class Translate3483TestFail extends editor_Test_JsonTest
+class Translate3483TestFail extends JsonTestAbstract
 {
     protected static array $forbiddenPlugins = [
     ];
@@ -95,6 +96,7 @@ class Translate3483TestFail extends editor_Test_JsonTest
                 'customField' . $field->id,
                 'NotExistingValue'
             );
+            /** @phpstan-ignore-next-line */
         } catch (AssertionFailedErrorAlias $e) {
             if (str_contains($e->getMessage(), 'NotExistingValue') === false) {
                 self::api()->delete('editor/taskcustomfield/' . $field->id);

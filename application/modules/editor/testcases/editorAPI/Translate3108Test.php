@@ -27,23 +27,41 @@ END LICENSE AND COPYRIGHT
 */
 
 use MittagQI\Translate5\Test\Api\Helper;
+use MittagQI\Translate5\Test\ImportTestAbstract;
 
 /***
  * Application token authentication
  */
-class Translate3108Test extends editor_Test_ImportTest
+class Translate3108Test extends ImportTestAbstract
 {
+    private const USER_TESTMANAGER = 'testmanager';
+
+    private const EDITOR_TASK_URL = 'editor/task/';
+
     private static ?ZfExtended_Auth_Token_Entity $authTokenEntity = null;
 
     private static string $appToken;
 
+    private static string $csrfTokenCache;
+
+    /**
+     * @throws ZfExtended_Models_Entity_NotFoundException
+     * @throws ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey
+     * @throws Zend_Db_Statement_Exception
+     * @throws Zend_Exception
+     * @throws ZfExtended_Models_Entity_Exceptions_IntegrityConstraint
+     * @throws ReflectionException
+     */
     public static function beforeTests(): void
     {
         // Create a temporary app-token for the test
         static::$authTokenEntity = ZfExtended_Factory::get('ZfExtended_Auth_Token_Entity');
-        static::$appToken = static::$authTokenEntity->create('testmanager');
+        static::$appToken = self::$authTokenEntity->create(self::USER_TESTMANAGER);
     }
 
+    /**
+     * @throws Zend_Http_Client_Exception
+     */
     public function testTokenAuthentication()
     {
         // this will remove and reset the cookie
@@ -51,13 +69,43 @@ class Translate3108Test extends editor_Test_ImportTest
 
         Helper::setApplicationToken(static::$appToken);
 
-        static::api()->getJson('editor/task/');
+        static::api()->getJson(self::EDITOR_TASK_URL);
         $response = static::api()->getLastResponse();
         self::assertContains($response->getStatus(), [200], 'Error on authentication with app token');
         // the access-control header should be present ... why is camel-case name changed by the server ?
         self::assertStringContainsString('access-control-allow-origin: *', strtolower($response->getHeadersAsString()));
     }
 
+    /**
+     * Tests the login with token as password then using the created session for further requests
+     * @throws Zend_Http_Client_Exception
+     */
+    public function testTokenLoginViaApi()
+    {
+        // this will remove and reset the cookie
+        self::api()->logout();
+
+        $response = static::api()->postJson('editor/session', [
+            'login' => self::USER_TESTMANAGER,
+            'passwd' => static::$appToken,
+        ]);
+
+        // see https://confluence.translate5.net/display/TAD/Session
+        $sessionId = $response->sessionId;
+
+        Helper::unsetApplicationToken();
+        Helper::setAuthentication($sessionId, 'testmanager');
+        self::$csrfTokenCache = Helper::getCsrfToken();
+        Helper::setCsrfToken(); //CRUCIAL: unset CSRF token since we want to mimic a plain API request
+
+        static::api()->getJson(self::EDITOR_TASK_URL);
+        $response = static::api()->getLastResponse();
+        self::assertContains($response->getStatus(), [200], 'Error on authentication with app token');
+    }
+
+    /**
+     * @throws Zend_Http_Client_Exception
+     */
     public function testInvalidTokenAuthentication()
     {
         // this will remove and reset the cookie
@@ -66,9 +114,13 @@ class Translate3108Test extends editor_Test_ImportTest
         // set invalid token and test it again. Now the authentication should fail and not be possible
         Helper::setApplicationToken('Invalid_token');
 
-        static::api()->getJson('editor/task/', expectedToFail: true);
+        static::api()->getJson(self::EDITOR_TASK_URL, expectedToFail: true);
         $response = static::api()->getLastResponse();
-        self::assertNotContains($response->getStatus(), [200], 'Something is wrong, authentication with invalid app-token is possible!');
+        self::assertNotContains(
+            $response->getStatus(),
+            [200],
+            'Something is wrong, authentication with invalid app-token is possible!'
+        );
     }
 
     public function testTokenImport()
@@ -76,7 +128,7 @@ class Translate3108Test extends editor_Test_ImportTest
         // this will remove and reset the cookie
         self::api()->logout();
 
-        Helper::setApplicationToken(static::$appToken);
+        Helper::setApplicationToken(self::$appToken);
 
         // import task
         $config = static::getConfig();
@@ -88,6 +140,7 @@ class Translate3108Test extends editor_Test_ImportTest
 
     public static function afterTests(): void
     {
+        Helper::setCsrfToken(self::$csrfTokenCache);
         static::$authTokenEntity->delete();
         Helper::unsetApplicationToken();
     }

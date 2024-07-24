@@ -16,6 +16,248 @@ All updates are (downwards) compatible! If not this is listed in the important r
 
 
 
+
+
+
+
+
+## [7.6.6] - 2024-07-11
+
+### Important Notes:
+#### [TRANSLATE-4053](https://jira.translate5.net/browse/TRANSLATE-4053)
+Strict escaping of all XML-based Imports is now the default. This also means, that exports are strictly escaped!
+ 
+
+
+### Added
+**[TRANSLATE-3850](https://jira.translate5.net/browse/TRANSLATE-3850): OpenId Connect - SSO via OpenID: Define if IDP should be able to remove rights** <br>
+translate5 - 7.6.6: Customer will be updated or not based on this config
+translate5 - 7.6.0: New client flag added for OpenId configured IDP. It can enable or disable updating of user roles, gender and locale from the IDP user claims.
+
+**[TRANSLATE-3494](https://jira.translate5.net/browse/TRANSLATE-3494): TermPortal - Check for duplicates in same language when saving new term** <br>
+Confirmation prompt is now shown on attempt to add a target term (via text selection within opened segment editor) that already exists in the destination TermCollection
+
+
+### Changed
+**[TRANSLATE-4070](https://jira.translate5.net/browse/TRANSLATE-4070): ConnectWorldserver - Plugin Connect WorldServer: disable TM-Update on re-import** <br>
+Worldserver TM will not be updated on tasks re-import.
+
+**[TRANSLATE-4069](https://jira.translate5.net/browse/TRANSLATE-4069): t5memory - Add comparing sent and received data during update request to t5memory** <br>
+When updating the segment it is now checked if the received data equals what we expect
+
+**[TRANSLATE-4065](https://jira.translate5.net/browse/TRANSLATE-4065): MatchAnalysis & Pretranslation - Use empty TM for internal fuzzy** <br>
+Use empty TM to save internal fuzzy results instead cloning the current one
+
+
+**[TRANSLATE-3975](https://jira.translate5.net/browse/TRANSLATE-3975): t5memory - Improve concordance search tags recognition** <br>
+Tags recognition in concordance search panel changed to reflect actual tags ordering
+
+
+### Bugfixes
+**[TRANSLATE-4059](https://jira.translate5.net/browse/TRANSLATE-4059): Editor general - Remove character duplicates from special characters** <br>
+Fixes duplicate buttons in special character list.
+
+**[TRANSLATE-4055](https://jira.translate5.net/browse/TRANSLATE-4055): LanguageResources - OpenAI Plugin: Exception not reported to the Frontend** <br>
+FIX: Errors in TMs may not be reported to the Frontend when used within OpenAI training
+
+**[TRANSLATE-4053](https://jira.translate5.net/browse/TRANSLATE-4053): Import/Export - Switch to strict escaping for XML formats** <br>
+Switch to strict escaping for all XML-based import formats (XLF, XLIFF, SDLXLIFF). This can be turned off by configuration if neccessary. Strict escaping means, that ">" generally is escaped in any textual content.
+
+**[TRANSLATE-4047](https://jira.translate5.net/browse/TRANSLATE-4047): Editor general - Stored SegmentGrid sort on sourceEdit column leads to errors in task without editable source** <br>
+Fix problem where filtering and sorting with invalid column names leads to UI error.
+
+**[TRANSLATE-4044](https://jira.translate5.net/browse/TRANSLATE-4044): Import/Export - typo in error message for file upload** <br>
+FIXED: small typo in VisualReview file upload error message
+
+**[TRANSLATE-4034](https://jira.translate5.net/browse/TRANSLATE-4034): VisualReview / VisualTranslation - Improve visual symlink creation for very rare cases of parallel access** <br>
+Suppress error-msg for visual symlink creation in the very rare case of paralell access
+
+**[TRANSLATE-3997](https://jira.translate5.net/browse/TRANSLATE-3997): file format settings - segmentation improvements in default srx** <br>
+FIX: File Format Settings: Rule to break after a Colon followed by a Uppercase word worked only in German in the translate5 default SRX
+
+**[TRANSLATE-3991](https://jira.translate5.net/browse/TRANSLATE-3991): Task Management - FIX Table Archiever, FIX worker-trigger "Process" for Tests and reduce warnings** <br>
+FIX: Table Archiever may ran into errors when plugins not installed/active
+
+**[TRANSLATE-3720](https://jira.translate5.net/browse/TRANSLATE-3720): TermPortal, usability termportal - Enhance termportal attribute display usability** <br>
+Improve term portal UI for attribute
+
+**[TRANSLATE-2979](https://jira.translate5.net/browse/TRANSLATE-2979): LanguageResources - Concordance search highlighting may destroy rendered tags.** <br>
+FIX When using the concordance search the content of tags can also be searched - not leading to defect tags in the rendered output anymore.
+
+
+## [7.6.5] - 2024-07-02
+
+### Important Notes:
+ 
+
+
+### Added
+**[TRANSLATE-3593](https://jira.translate5.net/browse/TRANSLATE-3593): Auto-QA, TermTagger integration - Split 'Terminology > Not found in target' AutoQA-category into 4 categories** <br>
+translate5 - 7.4.0: 'Terminology > Not found in target' quality is now split into 4 sub-categories
+translate5 - 7.6.5:  Additional improvements 
+
+
+### Changed
+**[TRANSLATE-4037](https://jira.translate5.net/browse/TRANSLATE-4037): LanguageResources, t5memory - On resaving segments to TM: Log segmentnumber in task** <br>
+On reimporting segments to the t5memory failed segment ids are now added to the log record.
+
+**[TRANSLATE-4035](https://jira.translate5.net/browse/TRANSLATE-4035): ConnectWorldserver - Plugin ConnectWorldserver: Cache for expensive function getAllUsers()** <br>
+To speed things up, the result of a once loaded list is cached inside Translate5. Default timeout for this cache is 1 hour (60 minutes) and is be configurable by a Translate5 config.
+
+!!! a once given timeout can not be shortend. This means: if cache is stored with timeout 60 it will be used for 60 minutes. !!!
+
+**[TRANSLATE-4033](https://jira.translate5.net/browse/TRANSLATE-4033): InstantTranslate - InstantTranslate:TM minimum match rate overwritable on client level** <br>
+Enables clients overwrite for match.rate border config in instant translate.
+
+**[TRANSLATE-4027](https://jira.translate5.net/browse/TRANSLATE-4027): Auto-QA, TermTagger integration - Restore client-side termtagging for old tasks** <br>
+TermTagging ability on client-side is now restored in order to be able to work with old tasks and to provide some transition period of time needed for the end users
+
+**[TRANSLATE-3995](https://jira.translate5.net/browse/TRANSLATE-3995): file format settings - Remove not so useful rule from t5 default SRX** <br>
+Enhancement: Remove Rule from t5 default file-format settings that tried to segment malformed sentences "A sentence.The next sentence." but did more harm than good
+
+
+### Bugfixes
+**[TRANSLATE-4049](https://jira.translate5.net/browse/TRANSLATE-4049): Export - Html entities not escaped on sdlxliff export** <br>
+Fix: Escape html entities on sdlxliff export
+
+**[TRANSLATE-4038](https://jira.translate5.net/browse/TRANSLATE-4038): InstantTranslate - HOTFIX: InstantTranslate GUI may leads to request-buildup on the backend** <br>
+FIX: InstantTranslate may cause request-buildups in the backend degrading performance significantly. The fix changes the way InstantTranslate works:
+* An instant translation request is only sent after the request before returned.
+* If the system is too slow for "instant" translation (or too many Languageresources are assigned to the current customer) Instant translate will switch back to manual mode with a "translate" button
+
+**[TRANSLATE-4021](https://jira.translate5.net/browse/TRANSLATE-4021): VisualReview / VisualTranslation - Visual does not reflect changes in the WYSIWYG with freshly imported translation tasks** <br>
+FIX: Visual does not reflect changes in the WYSIWYG with freshly imported translation tasks
+
+**[TRANSLATE-3971](https://jira.translate5.net/browse/TRANSLATE-3971): Import/Export - SDLXLIFF internal tags with "textual" IDs** <br>
+SDLXLIFF: Fixed processing of format tags from QuickInsertsList
+
+**[TRANSLATE-3714](https://jira.translate5.net/browse/TRANSLATE-3714): Editor general, usability editor - Summarize diffs in fuzzy match results** <br>
+FIXED: problem with diff appearance in fuzzy match panel
+
+
+## [7.6.4] - 2024-06-19
+
+### Important Notes:
+ 
+
+
+### Changed
+**[TRANSLATE-4015](https://jira.translate5.net/browse/TRANSLATE-4015): Export - Error on export of SDLXLIFF with inserted tag** <br>
+Fix: SDLXLIFF track-changes export of inserted tag
+
+**[TRANSLATE-4003](https://jira.translate5.net/browse/TRANSLATE-4003): Okapi integration - Okapi server config only on system level** <br>
+The Okapi server config is changed to system level, so that it can only be changed via CLI interface and not anymore over the UI config.
+
+
+### Bugfixes
+**[TRANSLATE-4012](https://jira.translate5.net/browse/TRANSLATE-4012): Editor general - RootCause: Cannot read properties of undefined (reading 'replace')** <br>
+translate-7.6.4: Implement logging to better trace this problem.
+
+**[TRANSLATE-4004](https://jira.translate5.net/browse/TRANSLATE-4004): Installation & Update - switching http https context on using sessionTokens** <br>
+When accessing /editor instead /editor/ a redirect to http was made also in https context which might break translate5 integration scenarios 
+
+**[TRANSLATE-4001](https://jira.translate5.net/browse/TRANSLATE-4001): Workflows - ArchiveTaskActions may be stuck on old tasks and loose data** <br>
+ArchiveTaskActions does not archive tasks if there are old tasks in state error and workflowstep filter is used.
+
+**[TRANSLATE-3999](https://jira.translate5.net/browse/TRANSLATE-3999): Auto-QA - Line length evaluation in Length check fires warnings** <br>
+Fix: Line length evaluation in Length check fires warnings
+
+**[TRANSLATE-3968](https://jira.translate5.net/browse/TRANSLATE-3968): API, Authentication - Internal API not usable with application tokens** <br>
+7.6.4: Fix for sessions created via API token
+7.6.2: Functionality which is using the Internal API is not usable with application tokens.
+
+**[TRANSLATE-3924](https://jira.translate5.net/browse/TRANSLATE-3924): TermPortal - TermTranslation terms do not appear in TermCollection** <br>
+FIXED: problem with reimport translated term back to termcollection
+
+
+## [7.6.3] - 2024-06-10
+
+### Important Notes:
+ 
+
+
+### Added
+**[TRANSLATE-4000](https://jira.translate5.net/browse/TRANSLATE-4000): Editor general - Simple json editor for UI configs** <br>
+New simple json editor in the UI for map configs.
+
+
+### Changed
+**[TRANSLATE-3923](https://jira.translate5.net/browse/TRANSLATE-3923): Auto-QA - "Not found in target" category according to target term** <br>
+translate5 - 7.5.0: Quality errors in 'Not found in target' category group now count cases when best possible translations of source terms are not found in segment target
+translate5 - 7.6.3: Improve tests
+
+
+### Bugfixes
+**[TRANSLATE-3998](https://jira.translate5.net/browse/TRANSLATE-3998): Export - Wrong date values in excel export** <br>
+Fixed wrong dates in excel export when the date time is 00:00:00
+
+**[TRANSLATE-2500](https://jira.translate5.net/browse/TRANSLATE-2500): Main back-end mechanisms (Worker, Logging, etc.) - Worker Architecture: Solving Problems with Deadlocks and related Locking/Mutex Quirks** <br>
+5.2.2 Improved the internal worker handling regarding DB dead locks and a small opportunity that workers run twice.
+7.5.0 Improved the setRunning condition to reduce duplicated worker runs
+7.6.3 Improved worker queue for large project imports
+
+
+
+## [7.6.2] - 2024-06-07
+
+### Important Notes:
+#### [TRANSLATE-3983](https://jira.translate5.net/browse/TRANSLATE-3983)
+The workers are now called as individual process instead http requests by default.
+ 
+
+
+### Changed
+**[TRANSLATE-3985](https://jira.translate5.net/browse/TRANSLATE-3985): t5memory - Add check for language resource status before migration** <br>
+Added checking language resource status before starting migration.
+
+**[TRANSLATE-3983](https://jira.translate5.net/browse/TRANSLATE-3983): Main back-end mechanisms (Worker, Logging, etc.) - Use process based workers by default** <br>
+The config runtimeOptions.worker.triggerType is changed now from http to process by default.
+
+**[TRANSLATE-3981](https://jira.translate5.net/browse/TRANSLATE-3981): Installation & Update - Installation is not working anymore** <br>
+FIXED: problem with installation
+
+**[TRANSLATE-3978](https://jira.translate5.net/browse/TRANSLATE-3978): InstantTranslate - Change font in InstantTranslate help window** <br>
+Set up font name, size and color in InstanstTranslate and TermPortal help windows
+
+
+### Bugfixes
+**[TRANSLATE-3993](https://jira.translate5.net/browse/TRANSLATE-3993): Main back-end mechanisms (Worker, Logging, etc.) - Final task import workers are initialized with the wrong status** <br>
+In seldom circumstances the import produces tasks with no segments imported due wrong order called workers.
+
+**[TRANSLATE-3992](https://jira.translate5.net/browse/TRANSLATE-3992): Test framework - wait for worker instead task status** <br>
+Improvements Test-API: functionality to wait for workers to be finished
+
+**[TRANSLATE-3989](https://jira.translate5.net/browse/TRANSLATE-3989): MatchAnalysis & Pretranslation - OpenAI: Non-trained Models cannot be used for batch-translation** <br>
+FIX: Non-trained OpenAI Models failed when used for batch-translation (task-import)
+
+**[TRANSLATE-3988](https://jira.translate5.net/browse/TRANSLATE-3988): TrackChanges - UI Crash on opening or saving a segment with track changes** <br>
+Some weird cascading track-changes tags lead to a crash of the segment editor on startup / segment save.
+
+**[TRANSLATE-3986](https://jira.translate5.net/browse/TRANSLATE-3986): Import/Export - Export not possible when okapi import had errors** <br>
+Fix an issue which prevents task export when some files of the task could not be imported with Okapi.
+
+**[TRANSLATE-3982](https://jira.translate5.net/browse/TRANSLATE-3982): Editor general - Transtilde may seep into internal tags** <br>
+FIX: Special string may ends up in the segments content in the Richtext-Editor with Placeables
+
+**[TRANSLATE-3979](https://jira.translate5.net/browse/TRANSLATE-3979): Editor general - Users with no roles can not be deleted via UI** <br>
+Fixes problem where users with no roles cannot be removed via UI.
+
+**[TRANSLATE-3977](https://jira.translate5.net/browse/TRANSLATE-3977): Main back-end mechanisms (Worker, Logging, etc.) - Error: Typed property ZfExtended_Logger_Writer_Database::$insertedData must not be accessed before initialization** <br>
+FIXED: flooding the log due to unhandled duplicates
+
+**[TRANSLATE-3976](https://jira.translate5.net/browse/TRANSLATE-3976): Export - Multi segment target in SDLXLIFF handled incorrectly on export** <br>
+Fix export of sdlxliff: provide draft config field, matchrate and related fields in multi-segment target
+
+**[TRANSLATE-3972](https://jira.translate5.net/browse/TRANSLATE-3972): Import/Export - XLIFF import: tags paired by RID are not paired anymore: TESTS** <br>
+Added tests to check pairing of ept/bpt by RID on import of xliff
+
+**[TRANSLATE-3968](https://jira.translate5.net/browse/TRANSLATE-3968): API, Authentication - Internal API not usable with application tokens** <br>
+Functionality which is using the Internal API is not usable with application tokens.
+
+**[TRANSLATE-3966](https://jira.translate5.net/browse/TRANSLATE-3966): Import/Export - Ensure that SDLXLIFF changemarks and locked segments are working well together** <br>
+The SDLXLIFF export of changemarks applied to locked tags may lead to invalid SDLXLIFF.
+
+
 ## [7.6.1] - 2024-05-29
 
 ### Important Notes:

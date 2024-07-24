@@ -108,6 +108,7 @@ use MittagQI\ZfExtended\Session\SessionInternalUniqueId;
  * @method string getReimportable()
  * @method void setReimportable(string|int $reimportable)
  * @method string getCreated()
+ * @method string getModified()
  */
 class editor_Models_Task extends ZfExtended_Models_Entity_Abstract
 {
@@ -1460,5 +1461,13 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract
             ->where('taskType IN (?)', editor_Task_Type::getInstance()->getNonInternalTaskTypes());
 
         return $this->db->fetchAll($s)->toArray();
+    }
+
+    /**
+     * Check whether task is going to use 3rd party termtagging
+     */
+    public function hasThirdPartyTermTagging(): bool
+    {
+        return ! ! json_decode($this->getForeignId())?->glossaryClientId;
     }
 }

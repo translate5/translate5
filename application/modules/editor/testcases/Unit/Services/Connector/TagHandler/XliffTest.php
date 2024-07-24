@@ -31,12 +31,13 @@ declare(strict_types=1);
 namespace MittagQI\Translate5\Test\Unit\Services\Connector\TagHandler;
 
 use editor_Services_Connector_TagHandler_Xliff as Xliff;
+use MittagQI\Translate5\Test\UnitTestAbstract;
 
 /**
  * Testcase for TRANSLATE-2895 tests the boundary / framing tag removing in the XLF import
  * For details see the issue.
  */
-class XliffTest extends \editor_Test_UnitTest
+class XliffTest extends UnitTestAbstract
 {
     private const TAGS = [
         '<1>' => '<div class="open 1234 internal-tag ownttip"><span class="short" title="<Variable>&quot;&gt;&lt;1&gt;</span><span class="full" data-originalid="8" data-length="-1">&lt;Variable&gt;</span></div>',
@@ -65,14 +66,15 @@ class XliffTest extends \editor_Test_UnitTest
 
     public function provideData(): array
     {
-        return [[
-            'queriesToTest' => 'plain text',
-            'expectedQueries' => 'plain text',
-            'expectedQueriesPaired' => 'plain text',
-            'resultsToQueries' => 'plain text translated',
-            'restoredResults' => 'plain text translated',
-            'restoredResultsPaired' => 'plain text translated',
-        ],
+        return [
+            [
+                'queriesToTest' => 'plain text',
+                'expectedQueries' => 'plain text',
+                'expectedQueriesPaired' => 'plain text',
+                'resultsToQueries' => 'plain text translated',
+                'restoredResults' => 'plain text translated',
+                'restoredResultsPaired' => 'plain text translated',
+            ],
             [
                 'queriesToTest' => 'plain text',
                 'expectedQueries' => 'plain text',
@@ -87,8 +89,8 @@ class XliffTest extends \editor_Test_UnitTest
                 'expectedQueries' => '<bx id="1" rid="1"/>Δ<ex id="2" rid="1"/>H = 1.00<x id="3"/>m text.',
                 'expectedQueriesPaired' => '<g id="1">Δ</g>H = 1.00<x id="3"/>m text.',
                 'resultsToQueries' => '<bx id="1" rid="1"/>Δ<ex id="2" rid="1"/><bpt id="6" rid="4"/>H = 1,00 m translatedtext.<ept id="7" rid="5"/>',
-                'restoredResults' => '<div class="open 6270742069643d2231223e266c743b636f6e74656e742d312667743b3c2f627074 internal-tag ownttip"><span class="short" title="&lt;content-1&gt;">&lt;1&gt;</span><span class="full" data-originalid="1" data-length="-1">&lt;content-1&gt;</span></div>Δ<div class="close 6570742069643d2231223e266c743b2f636f6e74656e742d312667743b3c2f657074 internal-tag ownttip"><span class="short" title="&lt;/content-1&gt;">&lt;/1&gt;</span><span class="full" data-originalid="1" data-length="-1">&lt;/content-1&gt;</span></div><div class="single ignoreInEditor internal-tag ownttip"><span title="&lt;AdditionalTagFromTM/&gt;" class="short">&lt;4/&gt;</span><span data-originalid="toignore-4" data-length="-1" class="full">&lt;AdditionalTagFromTM/&gt;</span></div>H = 1,00<div class="single 636861722074733d2265323830383922206c656e6774683d2231222f char internal-tag ownttip"><span title="&lt;3/&gt;: Thin Space" class="short">&lt;3/&gt;</span><span data-originalid="char" data-length="1" class="full">□</span></div>m translatedtext.<div class="single ignoreInEditor internal-tag ownttip"><span title="&lt;AdditionalTagFromTM/&gt;" class="short">&lt;5/&gt;</span><span data-originalid="toignore-5" data-length="-1" class="full">&lt;AdditionalTagFromTM/&gt;</span></div>',
-                'restoredResultsPaired' => '<div class="open 6270742069643d2231223e266c743b636f6e74656e742d312667743b3c2f627074 internal-tag ownttip"><span class="short" title="&lt;content-1&gt;">&lt;1&gt;</span><span class="full" data-originalid="1" data-length="-1">&lt;content-1&gt;</span></div>Δ<div class="close 6570742069643d2231223e266c743b2f636f6e74656e742d312667743b3c2f657074 internal-tag ownttip"><span class="short" title="&lt;/content-1&gt;">&lt;/1&gt;</span><span class="full" data-originalid="1" data-length="-1">&lt;/content-1&gt;</span></div><div class="single ignoreInEditor internal-tag ownttip"><span title="&lt;AdditionalTagFromTM/&gt;" class="short">&lt;4/&gt;</span><span data-originalid="toignore-4" data-length="-1" class="full">&lt;AdditionalTagFromTM/&gt;</span></div>H = 1,00<div class="single 636861722074733d2265323830383922206c656e6774683d2231222f char internal-tag ownttip"><span title="&lt;3/&gt;: Thin Space" class="short">&lt;3/&gt;</span><span data-originalid="char" data-length="1" class="full">□</span></div>m translatedtext.<div class="single ignoreInEditor internal-tag ownttip"><span title="&lt;AdditionalTagFromTM/&gt;" class="short">&lt;5/&gt;</span><span data-originalid="toignore-5" data-length="-1" class="full">&lt;AdditionalTagFromTM/&gt;</span></div>',
+                'restoredResults' => '<div class="open 6270742069643d2231223e266c743b636f6e74656e742d312667743b3c2f627074 internal-tag ownttip"><span class="short" title="&lt;content-1&gt;">&lt;1&gt;</span><span class="full" data-originalid="1" data-length="-1">&lt;content-1&gt;</span></div>Δ<div class="close 6570742069643d2231223e266c743b2f636f6e74656e742d312667743b3c2f657074 internal-tag ownttip"><span class="short" title="&lt;/content-1&gt;">&lt;/1&gt;</span><span class="full" data-originalid="1" data-length="-1">&lt;/content-1&gt;</span></div><div class="open ignoreInEditor internal-tag ownttip"><span title="&lt;AdditionalTagFromTM/&gt;" class="short">&lt;4&gt;</span><span data-originalid="toignore-4" data-length="-1" class="full">&lt;AdditionalTagFromTM/&gt;</span></div>H = 1,00<div class="single 636861722074733d2265323830383922206c656e6774683d2231222f char internal-tag ownttip"><span title="&lt;3/&gt;: Thin Space" class="short">&lt;3/&gt;</span><span data-originalid="char" data-length="1" class="full">□</span></div>m translatedtext.<div class="close ignoreInEditor internal-tag ownttip"><span title="&lt;AdditionalTagFromTM/&gt;" class="short">&lt;/5&gt;</span><span data-originalid="toignore-5" data-length="-1" class="full">&lt;AdditionalTagFromTM/&gt;</span></div>',
+                'restoredResultsPaired' => '<div class="open 6270742069643d2231223e266c743b636f6e74656e742d312667743b3c2f627074 internal-tag ownttip"><span class="short" title="&lt;content-1&gt;">&lt;1&gt;</span><span class="full" data-originalid="1" data-length="-1">&lt;content-1&gt;</span></div>Δ<div class="close 6570742069643d2231223e266c743b2f636f6e74656e742d312667743b3c2f657074 internal-tag ownttip"><span class="short" title="&lt;/content-1&gt;">&lt;/1&gt;</span><span class="full" data-originalid="1" data-length="-1">&lt;/content-1&gt;</span></div><div class="open ignoreInEditor internal-tag ownttip"><span title="&lt;AdditionalTagFromTM/&gt;" class="short">&lt;4&gt;</span><span data-originalid="toignore-4" data-length="-1" class="full">&lt;AdditionalTagFromTM/&gt;</span></div>H = 1,00<div class="single 636861722074733d2265323830383922206c656e6774683d2231222f char internal-tag ownttip"><span title="&lt;3/&gt;: Thin Space" class="short">&lt;3/&gt;</span><span data-originalid="char" data-length="1" class="full">□</span></div>m translatedtext.<div class="close ignoreInEditor internal-tag ownttip"><span title="&lt;AdditionalTagFromTM/&gt;" class="short">&lt;/5&gt;</span><span data-originalid="toignore-5" data-length="-1" class="full">&lt;AdditionalTagFromTM/&gt;</span></div>',
             ],
             [
                 'queriesToTest' => 'Test <1><2/>to the <3><4/></3> Text.</1>',
@@ -105,7 +107,8 @@ class XliffTest extends \editor_Test_UnitTest
                 'resultsToQueries' => 'Test <bx id="4" rid="2"/><x id="2"/><ex id="6" rid="2"/>to the <bx id="1" rid="1"/><x id="5"/><ex id="3" rid="1"/> Text.',
                 'restoredResults' => 'Test <3><2/></3>to the <1><4/></1> Text.',
                 'restoredResultsPaired' => 'Test <3><2/></3>to the <1><4/></1> Text.',
-            ]];
+            ],
+        ];
     }
 
     /**

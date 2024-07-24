@@ -69,20 +69,33 @@ class editor_Services_Connector_TagHandler_Xliff extends editor_Services_Connect
             function ($tag, $key, $opener) {
                 switch ($tag) {
                     case 'bpt':
-                        $tag = '<bx';
+                        $replace = '<bx';
 
                         break;
                     case 'ept':
-                        $tag = '<ex';
+                        $replace = '<ex';
 
                         break;
                     default:
-                        $tag = '<x';
+                        $replace = '<x';
 
                         break;
                 }
-                $this->xmlparserUnusableTags->replaceChunk($opener['openerKey'], '', $opener['isSingle'] ? 1 : ($key - $opener['openerKey'] + 1));
-                $this->xmlparserUnusableTags->replaceChunk($opener['openerKey'], $tag . ' mid="additional-' . ($this->additionalTagCount++) . '" />');
+                $this->xmlparserUnusableTags->replaceChunk(
+                    $opener['openerKey'],
+                    '',
+                    $opener['isSingle'] ? 1 : ($key - $opener['openerKey'] + 1)
+                );
+
+                $replace .= ' mid="additional-' . ($this->additionalTagCount++);
+
+                if ($tag === 'bpt' || $tag === 'ept') {
+                    $replace .= '" rid="' . ($opener['attributes']['i'] ?? $this->additionalTagCount);
+                }
+
+                $replace .= '" />';
+
+                $this->xmlparserUnusableTags->replaceChunk($opener['openerKey'], $replace);
             }
         );
     }
@@ -181,12 +194,28 @@ class editor_Services_Connector_TagHandler_Xliff extends editor_Services_Connect
     {
         $addedTags = false;
         $shortTagNr = $mapCount;
+        $replaceMap = [];
 
-        $result = preg_replace_callback('#<(x|ex|bx|g|/g)[^>]*>#', function () use (&$shortTagNr, &$addedTags) {
-            $addedTags = true;
+        $result = preg_replace_callback(
+            '#<(x|ex|bx|g|\/g)([^>]*rid="(\d+)")?[^>]*>#',
+            function (array $matches) use (&$shortTagNr, &$addedTags, &$replaceMap) {
+                $addedTags = true;
+                $type = $matches[1] === 'bx' ? 'open' : ($matches[1] === 'ex' ? 'close' : 'single');
 
-            return $this->utilities->internalTag->makeAdditionalHtmlTag(++$shortTagNr);
-        }, $segment);
+                if (isset($matches[3])) {
+                    if (! isset($replaceMap[$matches[3]])) {
+                        $replaceMap[$matches[3]] = ++$shortTagNr;
+                    }
+
+                    $number = $replaceMap[$matches[3]];
+                } else {
+                    $number = ++$shortTagNr;
+                }
+
+                return $this->utilities->internalTag->makeAdditionalHtmlTag($number, $type);
+            },
+            $segment
+        );
 
         if ($addedTags) {
             // FOR NOW WE DO NOT LOG THIS AT IT UNNECCESSARILY FILLS THE LOG WITH THOUSANDS OF ENTRIES IN SOME TASKS

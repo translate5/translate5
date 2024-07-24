@@ -27,6 +27,7 @@ END LICENSE AND COPYRIGHT
 */
 
 use MittagQI\Translate5\Test\Import\Config;
+use MittagQI\Translate5\Test\JsonTestAbstract;
 
 /***
  * 1. Create project with 4 project tasks.
@@ -35,7 +36,7 @@ use MittagQI\Translate5\Test\Import\Config;
  * 4. Compare the segment content after term tagging for each project task.
  *
  */
-class ProjectTaskTest extends editor_Test_JsonTest
+class ProjectTaskTest extends JsonTestAbstract
 {
     protected static $sourceLangRfc = 'en';
 
