@@ -32,7 +32,7 @@ namespace MittagQI\Translate5\Plugins\TMMaintenance\Service;
 
 use editor_Models_LanguageResources_LanguageResource as LanguageResource;
 use editor_Models_Task as Task;
-use editor_Services_OpenTM2_Connector as OpenTM2Connector;
+use editor_Services_OpenTM2_Connector as T5MemoryConnector;
 use MittagQI\Translate5\LanguageResource\Adapter\UpdatableAdapterInterface;
 use MittagQI\Translate5\LanguageResource\Status as LanguageResourceStatus;
 use MittagQI\Translate5\T5Memory\DTO\DeleteBatchDTO;
@@ -64,15 +64,20 @@ class MaintenanceService extends \editor_Services_Connector_Abstract implements 
      */
     protected $internalTagSupport = true;
 
+    private T5MemoryConnector $t5MemoryConnector;
+
     public function __construct()
     {
         \editor_Services_Connector_Exception::addCodes([
             'E1314' => 'The queried OpenTM2 TM "{tm}" is corrupt and must be reorganized before usage!',
             'E1333' => 'The queried OpenTM2 server has to many open TMs!',
+            'E1306' => 'Could not save segment to TM',
+            'E1377' => 'Unable to use the memory because of the memory status: {status}',
+            'E1616' => 'T5Memory server version serving the selected memory is not supported',
         ]);
 
         \ZfExtended_Logger::addDuplicatesByEcode('E1333', 'E1306', 'E1314');
-
+        $this->t5MemoryConnector = new T5MemoryConnector();
         parent::__construct();
     }
 
@@ -90,7 +95,7 @@ class MaintenanceService extends \editor_Services_Connector_Abstract implements 
                 'gTagPairing' => false,
             ]]
         );
-
+        $this->t5MemoryConnector->connectTo($languageResource, $sourceLang, $targetLang);
         parent::connectTo($languageResource, $sourceLang, $targetLang);
     }
 
@@ -119,11 +124,15 @@ class MaintenanceService extends \editor_Services_Connector_Abstract implements 
         int $timestamp,
         string $fileName,
     ): void {
+        $this->assertVersionFits();
+
         $source = $this->tagHandler->prepareQuery($source);
         $this->tagHandler->setInputTagMap($this->tagHandler->getTagMap());
         $target = $this->tagHandler->prepareQuery($target, false);
         $memoryName = $this->getWritableMemory();
         $time = $this->api->getDate($timestamp);
+
+        $this->assertMemoryAvailable($memoryName);
 
         $this->updateSegmentInMemory(
             $source,
@@ -152,7 +161,12 @@ class MaintenanceService extends \editor_Services_Connector_Abstract implements 
         int $timestamp,
         string $fileName,
     ): void {
+        $this->assertVersionFits();
+
         $memoryName = $this->getMemoryNameById($memoryId);
+
+        $this->assertMemoryAvailable($memoryName);
+
         $successful = $this->api->getEntry($memoryName, $segmentRecordKey, $segmentTargetKey);
 
         if (! $successful) {
@@ -195,58 +209,14 @@ class MaintenanceService extends \editor_Services_Connector_Abstract implements 
         );
     }
 
-    private function updateSegmentInMemory(
-        string $source,
-        string $target,
-        string $userName,
-        string $context,
-        string $time,
-        string $fileName,
-        string $memoryName,
-    ): void {
-        $successful = $this->api->update($source, $target, $userName, $context, $time, $fileName, $memoryName);
-
-        if ($successful) {
-            return;
-        }
-
-        $apiError = $this->api->getError();
-        if ($this->isMemoryOverflown($apiError)) {
-            $this->addOverflowWarning();
-
-            $currentWritableMemoryName = $this->getWritableMemory();
-            if ($memoryName === $currentWritableMemoryName) {
-                $newName = $this->generateNextMemoryName($this->languageResource);
-                $newName = $this->api->createEmptyMemory($newName, $this->languageResource->getSourceLangCode());
-                $this->addMemoryToLanguageResource($this->languageResource, $newName);
-            } else {
-                $newName = $currentWritableMemoryName;
-            }
-
-            $successful = $this->api->update($source, $target, $userName, $context, $time, $fileName, $newName);
-        }
-
-        if ($this->needsReorganizing($apiError, $memoryName)) {
-            $this->addReorganizeWarning();
-            $this->reorganizeTm($memoryName);
-
-            $successful = $this->api->update($source, $target, $userName, $context, $time, $fileName, $memoryName);
-        }
-
-        if (! $successful) {
-            $apiError = $this->api->getError() ?? $apiError;
-            $this->logger->error('E1306', 'Failed to save segment to TM', [
-                'languageResource' => $this->languageResource,
-                'apiError' => $apiError,
-            ]);
-
-            throw new \editor_Services_Connector_Exception('E1306');
-        }
-    }
-
     public function deleteEntry(int $memoryId, int $segmentId, int $recordKey, int $targetKey): void
     {
+        $this->assertVersionFits();
+
         $memoryName = $this->getMemoryNameById($memoryId);
+
+        $this->assertMemoryAvailable($memoryName);
+
         $successful = $this->api->deleteEntry($memoryName, $segmentId, $recordKey, $targetKey);
 
         if (! $successful) {
@@ -264,14 +234,14 @@ class MaintenanceService extends \editor_Services_Connector_Abstract implements 
 
     public function deleteBatch(DeleteBatchDTO $deleteDto): bool
     {
+        $this->assertVersionFits();
+
         $memories = $this->languageResource->getSpecificData('memories', parseAsArray: true);
 
         usort($memories, fn ($m1, $m2) => $m1['id'] <=> $m2['id']);
 
         foreach ($memories as ['filename' => $tmName]) {
-            if ($this->isReorganizingAtTheMoment($tmName)) {
-                continue;
-            }
+            $this->assertMemoryAvailable($tmName);
 
             $successful = $this->api->deleteBatch($tmName, $deleteDto);
 
@@ -302,42 +272,6 @@ class MaintenanceService extends \editor_Services_Connector_Abstract implements 
     }
 
     /**
-     * Helper function to get the metadata which should be shown in the GUI out of a single result
-     *
-     * @return \stdClass[]
-     */
-    private function getMetaData(object $found): array
-    {
-        $nameToShow = [
-            'segmentId',
-            'documentName',
-            'matchType',
-            'author',
-            'timestamp',
-            'context',
-            'additionalInfo',
-            'internalKey',
-            'sourceLang',
-            'targetLang',
-        ];
-        $result = [];
-
-        foreach ($nameToShow as $name) {
-            if (property_exists($found, $name)) {
-                $item = new \stdClass();
-                $item->name = $name;
-                $item->value = $found->{$name};
-                if ($name === 'timestamp') {
-                    $item->value = date('Y-m-d H:i:s T', strtotime($item->value));
-                }
-                $result[] = $item;
-            }
-        }
-
-        return $result;
-    }
-
-    /**
      * Concordance search
      *
      * {@inheritDoc}
@@ -348,11 +282,7 @@ class MaintenanceService extends \editor_Services_Connector_Abstract implements 
         $offset = null,
         SearchDTO $searchDTO = null
     ): \editor_Services_ServiceResult {
-
-        throw new \editor_Services_Connector_Exception('E1306', [
-            'languageResource' => $this->languageResource,
-            'error' => 'Memory is not reachable',
-        ]);
+        $this->assertVersionFits();
 
         $offsetTmId = null;
         $recordKey = null;
@@ -389,9 +319,7 @@ class MaintenanceService extends \editor_Services_Connector_Abstract implements 
                 continue;
             }
 
-            if ($this->isReorganizingAtTheMoment($tmName)) {
-                continue;
-            }
+            $this->assertMemoryAvailable($tmName);
 
             $segmentIdsGenerated = $this->areSegmentIdsGenerated($tmName);
             $successful = $this->api->search($tmName, $tmOffset, self::CONCORDANCE_SEARCH_NUM_RESULTS, $searchDTO);
@@ -462,11 +390,15 @@ class MaintenanceService extends \editor_Services_Connector_Abstract implements 
 
     public function countSegments(SearchDTO $searchDTO): int
     {
+        $this->assertVersionFits();
+
         $amount = 0;
         $memories = $this->languageResource->getSpecificData('memories', parseAsArray: true);
         usort($memories, fn ($m1, $m2) => $m1['id'] <=> $m2['id']);
 
         foreach ($memories as ['filename' => $tmName]) {
+            $this->assertMemoryAvailable($tmName);
+
             $successful = $this->api->search($tmName, '', 0, $searchDTO);
 
             if (! $successful) {
@@ -493,14 +425,106 @@ class MaintenanceService extends \editor_Services_Connector_Abstract implements 
         // TODO not used
     }
 
+    public function getStatus(
+        \editor_Models_LanguageResources_Resource $resource,
+        LanguageResource $languageResource = null,
+        ?string $tmName = null,
+    ): string {
+        return $this->t5MemoryConnector->getStatus($resource, $languageResource, $tmName);
+    }
+
+    private function updateSegmentInMemory(
+        string $source,
+        string $target,
+        string $userName,
+        string $context,
+        string $time,
+        string $fileName,
+        string $memoryName,
+    ): void {
+        $successful = $this->api->update($source, $target, $userName, $context, $time, $fileName, $memoryName);
+
+        if ($successful) {
+            return;
+        }
+
+        $apiError = $this->api->getError();
+        if ($this->isMemoryOverflown($apiError)) {
+            $this->addOverflowWarning();
+
+            $currentWritableMemoryName = $this->getWritableMemory();
+            if ($memoryName === $currentWritableMemoryName) {
+                $newName = $this->generateNextMemoryName($this->languageResource);
+                $newName = $this->api->createEmptyMemory($newName, $this->languageResource->getSourceLangCode());
+                $this->addMemoryToLanguageResource($this->languageResource, $newName);
+            } else {
+                $newName = $currentWritableMemoryName;
+            }
+
+            $successful = $this->api->update($source, $target, $userName, $context, $time, $fileName, $newName);
+        }
+
+        if ($this->needsReorganizing($apiError, $memoryName)) {
+            $this->addReorganizeWarning();
+            $this->reorganizeTm($memoryName);
+
+            $successful = $this->api->update($source, $target, $userName, $context, $time, $fileName, $memoryName);
+        }
+
+        if (! $successful) {
+            $apiError = $this->api->getError() ?? $apiError;
+            $this->logger->error('E1306', 'Failed to save segment to TM', [
+                'languageResource' => $this->languageResource,
+                'apiError' => $apiError,
+            ]);
+
+            throw new \editor_Services_Connector_Exception('E1306');
+        }
+    }
+
+    /**
+     * Helper function to get the metadata which should be shown in the GUI out of a single result
+     *
+     * @return \stdClass[]
+     */
+    private function getMetaData(object $found): array
+    {
+        $nameToShow = [
+            'segmentId',
+            'documentName',
+            'matchType',
+            'author',
+            'timestamp',
+            'context',
+            'additionalInfo',
+            'internalKey',
+            'sourceLang',
+            'targetLang',
+        ];
+        $result = [];
+
+        foreach ($nameToShow as $name) {
+            if (property_exists($found, $name)) {
+                $item = new \stdClass();
+                $item->name = $name;
+                $item->value = $found->{$name};
+                if ($name === 'timestamp') {
+                    $item->value = date('Y-m-d H:i:s T', strtotime($item->value));
+                }
+                $result[] = $item;
+            }
+        }
+
+        return $result;
+    }
+
     /**
      * Updates the filename of the language resource instance with the filename coming from the TM system
      * @throws \Zend_Exception
      */
-    protected function addMemoryToLanguageResource(
+    private function addMemoryToLanguageResource(
         LanguageResource $languageResource,
         string $tmName,
-        bool $isInternalFuzzy = false
     ): void {
         $prefix = \Zend_Registry::get('config')->runtimeOptions->LanguageResources->opentm2->tmprefix;
         if (! empty($prefix)) {
@@ -525,11 +549,8 @@ class MaintenanceService extends \editor_Services_Connector_Abstract implements 
         ];
 
         $languageResource->addSpecificData('memories', $memories);
-
-        if (! $isInternalFuzzy) {
-            //saving it here makes the TM available even when the TMX import was crashed
-            $languageResource->save();
-        }
+        //saving it here makes the TM available even when the TMX import was crashed
+        $languageResource->save();
     }
 
     private function getBadGatewayException(string $tmName = ''): \editor_Services_Connector_Exception
@@ -554,14 +575,6 @@ class MaintenanceService extends \editor_Services_Connector_Abstract implements 
         return new \editor_Services_Connector_Exception($ecode, $data);
     }
 
-    public function getStatus(
-        \editor_Models_LanguageResources_Resource $resource,
-        LanguageResource $languageResource = null,
-        ?string $tmName = null,
-    ): string {
-        return (new OpenTM2Connector())->getStatus($resource, $languageResource, $tmName);
-    }
-
     #region Reorganize TM
     // Need to move this region to a dedicated class while refactoring connector
     private const REORGANIZE_ATTEMPTS = 'reorganize_attempts';
@@ -576,12 +589,10 @@ class MaintenanceService extends \editor_Services_Connector_Abstract implements 
 
     private const VERSION_0_5 = '0.5';
 
+    private const VERSION_0_6 = '0.6';
+
     private function needsReorganizing(\stdClass $error, string $tmName): bool
     {
-        if ($this->api->isOpentm2()) {
-            return false;
-        }
-
         $errorCodes = explode(
             ',',
             $this->config->runtimeOptions->LanguageResources->t5memory->reorganizeErrorCodes
@@ -617,15 +628,10 @@ class MaintenanceService extends \editor_Services_Connector_Abstract implements 
             $tmName = $this->getWritableMemory();
         }
 
-        if (! $this->isInternalFuzzy()) {
-            // TODO In editor_Services_Manager::visitAllAssociatedTms language resource is initialized
-            // without refreshing from DB, which leads th that here it is tried to be inserted as new one
-            // so refreshing it here. Need to check if we can do this in editor_Services_Manager::visitAllAssociatedTms
-            $this->languageResource->refresh();
-            $this->increaseReorganizeAttempts($this->languageResource);
-            $this->setReorganizeStatusInProgress($this->languageResource);
-            $this->languageResource->save();
-        }
+        $this->languageResource->refresh();
+        $this->increaseReorganizeAttempts($this->languageResource);
+        $this->setReorganizeStatusInProgress($this->languageResource);
+        $this->languageResource->save();
 
         $version = $this->getT5MemoryVersion();
 
@@ -635,13 +641,11 @@ class MaintenanceService extends \editor_Services_Connector_Abstract implements 
             $reorganized = $this->waitReorganizeFinished($tmName);
         }
 
-        if (! $this->isInternalFuzzy()) {
-            $this->languageResource->setStatus(
-                $reorganized ? LanguageResourceStatus::AVAILABLE : LanguageResourceStatus::REORGANIZE_FAILED
-            );
+        $this->languageResource->setStatus(
+            $reorganized ? LanguageResourceStatus::AVAILABLE : LanguageResourceStatus::REORGANIZE_FAILED
+        );
 
-            $this->languageResource->save();
-        }
+        $this->languageResource->save();
 
         return $reorganized;
     }
@@ -651,10 +655,9 @@ class MaintenanceService extends \editor_Services_Connector_Abstract implements 
         $this->resetReorganizingIfNeeded();
 
         if ($this->getT5MemoryVersion() !== self::VERSION_0_4) {
-            return $this->getStatus(
-                $this->resource,
-                tmName: $tmName
-            ) === LanguageResourceStatus::REORGANIZE_IN_PROGRESS;
+            $status = $this->getStatus($this->resource, tmName: $tmName);
+
+            return $status === LanguageResourceStatus::REORGANIZE_IN_PROGRESS;
         }
 
         return $this->languageResource->getStatus() === LanguageResourceStatus::REORGANIZE_IN_PROGRESS;
@@ -734,10 +737,6 @@ class MaintenanceService extends \editor_Services_Connector_Abstract implements 
 
     private function resetReorganizeAttempts(LanguageResource $languageResource): void
     {
-        if ($this->isInternalFuzzy()) {
-            return;
-        }
-
         if ($languageResource->getSpecificData(self::REORGANIZE_ATTEMPTS) === null) {
             return;
         }
@@ -750,44 +749,19 @@ class MaintenanceService extends \editor_Services_Connector_Abstract implements 
 
     private function getT5MemoryVersion(): string
     {
-        $defaultVersion = self::VERSION_0_4;
-
-        if (! $this->languageResource || $this->api->isOpentm2()) {
-            return $defaultVersion;
-        }
-
-        $version = $this->languageResource->getSpecificData('version', true);
-
-        if (isset($version['version'], $version['lastSynced'])
-            && null !== $version
-            && (new \DateTime($version['lastSynced']))->modify('+30 minutes') > new \DateTime()
-        ) {
-            return $version['version'];
-        }
-
         $success = $this->api->resources();
 
         if (! $success) {
-            return $defaultVersion;
+            return self::VERSION_0_4;
         }
 
         $resources = $this->api->getResult();
 
-        $version = str_starts_with($resources->Version ?? '', self::VERSION_0_5) ? self::VERSION_0_5 : self::VERSION_0_4;
-
-        if (! $this->isInternalFuzzy()) {
-            // TODO In editor_Services_Manager::visitAllAssociatedTms language resource is initialized
-            // without refreshing from DB, which leads th that here it is tried to be inserted as new one
-            // so refreshing it here. Need to check if we can do this in editor_Services_Manager::visitAllAssociatedTms
-            $this->languageResource->refresh();
-            $this->languageResource->addSpecificData('version', [
-                'version' => $version,
-                'lastSynced' => date(\DateTimeInterface::RFC3339),
-            ]);
-            $this->languageResource->save();
-        }
-
-        return $version;
+        return match (true) {
+            str_starts_with($resources->Version ?? '', self::VERSION_0_5) => self::VERSION_0_5,
+            str_starts_with($resources->Version ?? '', self::VERSION_0_6) => self::VERSION_0_6,
+            default => self::VERSION_0_4,
+        };
     }
 
     /**
@@ -797,7 +771,7 @@ class MaintenanceService extends \editor_Services_Connector_Abstract implements 
     {
         $reorganizeStartedAt = $this->languageResource->getSpecificData(self::REORGANIZE_STARTED_AT);
 
-        if (null === $reorganizeStartedAt || $this->isInternalFuzzy()) {
+        if (null === $reorganizeStartedAt) {
             return;
         }
 
@@ -838,7 +812,7 @@ class MaintenanceService extends \editor_Services_Connector_Abstract implements 
         ]);
     }
 
-    public function getMemoryNameById(int $memoryId): ?string
+    private function getMemoryNameById(int $memoryId): ?string
     {
         $memories = $this->languageResource->getSpecificData('memories', parseAsArray: true);
 
@@ -899,5 +873,29 @@ class MaintenanceService extends \editor_Services_Connector_Abstract implements 
         $result = $this->api->getResult();
 
         return isset($result->segmentIndex) && $result->segmentIndex > 0;
+    }
+
+    private function assertMemoryAvailable(string $memoryName): void
+    {
+        $status = $this->getStatus($this->resource, $this->languageResource, $memoryName);
+
+        if ($status !== LanguageResourceStatus::AVAILABLE) {
+            throw new \editor_Services_Connector_Exception('E1377', [
+                'languageResource' => $this->languageResource,
+                'status' => 'importing',
+            ]);
+        }
+    }
+
+    private function assertVersionFits(): void
+    {
+        $version = $this->getT5MemoryVersion();
+
+        // TODO fix when export is merged
+        if ($version !== self::VERSION_0_6) {
+            throw new \editor_Services_Connector_Exception('E1616', [
+                'languageResource' => $this->languageResource,
+            ]);
+        }
     }
 }
