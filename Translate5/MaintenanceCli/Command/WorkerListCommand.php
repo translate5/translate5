@@ -136,11 +136,12 @@ class WorkerListCommand extends Translate5AbstractCommand
             }
 
             if ($isSummary && $workerRow['state'] !== $worker::STATE_RUNNING) {
-                $idx = $workerRow['worker'].'#'.$workerRow['state'];
-                if (!array_key_exists($idx, $summary)) {
+                $idx = $workerRow['worker'] . '#' . $workerRow['state'];
+                if (! array_key_exists($idx, $summary)) {
                     $summary[$idx] = 0;
                 }
                 $summary[$idx]++;
+
                 continue;
             }
 
