@@ -189,7 +189,7 @@ class editor_Plugins_SegmentStatistics_Worker extends editor_Models_Task_Abstrac
         $stat->setFieldName($field->name); //always the name without "Edit"!
         $stat->setFieldType($field->type);
         $stat->setType($this->type);
-        $stat->setFileId($segment->getFileId());
+        $stat->setFileId((int) $segment->getFileId());
         $stat->setCharCount($segment->textLengthByChar($segmentContent));
         $stat->setWordCount($segment->wordCount($segmentContent));
         $stat->setTermNotFound(array_sum($termCount['notFound']));

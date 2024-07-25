@@ -50,12 +50,18 @@ class editor_Segment_Quality_OperationWorker extends editor_Models_Task_Abstract
     protected function work(): bool
     {
         // if not importing, we have to lock the task
-        if ($this->processingMode != editor_Segment_Processing::IMPORT && ! $this->task->lock(NOW_ISO, editor_Task_Operation::AUTOQA)) {
+        if ($this->processingMode != editor_Segment_Processing::IMPORT &&
+            ! $this->task->lock(NOW_ISO, editor_Task_Operation::AUTOQA)
+        ) {
             return false;
         }
 
         // add the dependant workers
-        editor_Segment_Quality_Manager::instance()->prepareOperation($this->processingMode, $this->task, $this->workerModel->getId());
+        editor_Segment_Quality_Manager::instance()->prepareOperation(
+            $this->processingMode,
+            $this->task,
+            (int) $this->workerModel->getId()
+        );
 
         return true;
     }

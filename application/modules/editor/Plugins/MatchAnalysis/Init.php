@@ -348,7 +348,7 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract
         //if the requested operation is from project, queue analysis for each project task
         if ($task->isProject()) {
             $taskmodel = ZfExtended_Factory::get(editor_Models_Task::class);
-            $projects = $taskmodel->loadProjectTasks($task->getProjectId(), true);
+            $projects = $taskmodel->loadProjectTasks((int) $task->getProjectId(), true);
             $taskGuids = array_column($projects, 'taskGuid');
         }
 
@@ -456,8 +456,8 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract
 
             $connector = $manager->getConnector(
                 $languageResource,
-                $task->getSourceLang(),
-                $task->getRelaisLang(),
+                (int) $task->getSourceLang(),
+                (int) $task->getRelaisLang(),
                 $task->getConfig()
             );
             /* @var $connector editor_Services_Connector */
@@ -727,8 +727,8 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract
 
             $connector = $manager->getConnector(
                 $languageresource,
-                $task->getSourceLang(),
-                $task->getTargetLang(),
+                (int) $task->getSourceLang(),
+                (int) $task->getTargetLang(),
                 $task->getConfig()
             );
             /* @var $connector editor_Services_Connector */
