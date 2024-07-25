@@ -153,8 +153,8 @@ Ext.define('TMMaintenance.view.main.MainController', {
         return root.innerHTML;
     },
 
-    onCreatePress: function () {
-        let view = this.getView();
+    onCreatePress: function (button) {
+        let view = button.up('mainlist');
         let dialog = this.getViewModel().get('dialog');
 
         if (!dialog) {

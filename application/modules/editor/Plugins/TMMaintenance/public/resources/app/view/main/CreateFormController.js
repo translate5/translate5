@@ -16,7 +16,10 @@ Ext.define('TMMaintenance.view.main.CreateFormController', {
         record.save({
             success: () => {
                 this.getView().up('app-main').controller.hideForm();
-            }
+            },
+            failure: (record, operation) => {
+                this.getView().up('app-main').controller.showServerError(operation.getError());
+            },
         });
 
         // record.getStore().add(record);
