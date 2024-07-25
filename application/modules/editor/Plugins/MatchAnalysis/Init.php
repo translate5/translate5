@@ -585,12 +585,12 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract
     ) {
         $workerParameters['userGuid'] = ZfExtended_Models_User::SYSTEM_GUID;
         $workerParameters['userName'] = ZfExtended_Models_User::SYSTEM_LOGIN;
-        
+
         if (ZfExtended_Authentication::getInstance()->getUser()) {
             $workerParameters['userGuid'] = ZfExtended_Authentication::getInstance()->getUserGuid();
             $workerParameters['userName'] = ZfExtended_Authentication::getInstance()->getUser()->getUserName();
         }
-        
+
         //enable batch query via config
         $workerParameters['batchQuery'] = (bool) Zend_Registry::get('config')
             ->runtimeOptions->LanguageResources->Pretranslation->enableBatchQuery;

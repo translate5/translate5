@@ -83,6 +83,7 @@ class CheckHostForUpdates extends ZfExtended_Worker_Abstract
     protected function work(): bool
     {
         $this->plugin->checkFilesystem($this->filesystemKey);
+
         return true;
     }
 }

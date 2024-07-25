@@ -40,7 +40,7 @@ class editor_Services_ImportWorker extends ZfExtended_Worker_Abstract
 
     public function onInit(array $parameters): bool
     {
-        if(parent::onInit($parameters)){
+        if (parent::onInit($parameters)) {
             // we have to react on maintenance
             $this->behaviour->setConfig([
                 'isMaintenanceScheduled' => 60,

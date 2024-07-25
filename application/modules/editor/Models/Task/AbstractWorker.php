@@ -56,7 +56,7 @@ abstract class editor_Models_Task_AbstractWorker extends ZfExtended_Worker_Abstr
      */
     final public function init(string $taskGuid = null, array $parameters = []): bool
     {
-        if($taskGuid === null){
+        if ($taskGuid === null) {
             throw new ZfExtended_Exception('No task-worker without taskGuid ...');
         }
         $this->task = ZfExtended_Factory::get(editor_Models_Task::class);

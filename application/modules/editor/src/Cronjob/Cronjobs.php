@@ -108,7 +108,7 @@ class Cronjobs
      */
     private function logCall(string $type): void
     {
-        if(ZfExtended_Debug::hasLevel('core', 'Cronjobs')){
+        if (ZfExtended_Debug::hasLevel('core', 'Cronjobs')) {
             error_log('Cron Job called: ' . $type);
         }
         Zend_Registry::get('logger')->cloneMe('core.cron')->info(

@@ -32,21 +32,18 @@ use editor_Models_Loaders_Taskuserassoc as JobLoader;
 use editor_Models_Task as Task;
 use editor_Models_Task_AbstractWorker;
 use editor_Models_TaskUserAssoc;
-use JsonException;
 use MittagQI\Translate5\Acl\Rights;
 use MittagQI\Translate5\Task\Lock;
 use MittagQI\Translate5\Task\Reimport\DataProvider\AbstractDataProvider;
 use MittagQI\Translate5\Task\Reimport\DataProvider\FileDto;
 use ReflectionException;
+use Throwable;
 use Zend_Acl_Exception;
-use Zend_Exception;
 use Zend_Registry;
 use ZfExtended_Acl;
 use ZfExtended_Factory;
-use ZfExtended_Models_Entity_Conflict;
 use ZfExtended_Models_Entity_NotFoundException;
 use ZfExtended_Models_User;
-use ZfExtended_Worker_Abstract;
 
 /**
  * Contains the Task Reimport Worker
@@ -99,7 +96,7 @@ class Worker extends editor_Models_Task_AbstractWorker
                 $reimportFile->setFileDto($file);
                 $reimportFile->import($fileId, $file->reimportFile, $params['segmentTimestamp']);
             }
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             Zend_Registry::get('logger')->exception($e);
         } finally {
             //if it was a PM override, delete it again
