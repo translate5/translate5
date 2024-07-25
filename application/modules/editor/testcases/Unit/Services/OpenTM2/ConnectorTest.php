@@ -55,78 +55,91 @@ class ConnectorTest extends TestCase
                 'status' => 'not found',
                 'tmxImportStatus' => null,
                 'importTime' => null,
+                'reorganizeStatus' => null,
                 'expectedResult' => LanguageResourceStatus::ERROR,
             ],
             'Available' => [
                 'status' => 'available',
                 'tmxImportStatus' => null,
                 'importTime' => null,
+                'reorganizeStatus' => null,
                 'expectedResult' => LanguageResourceStatus::AVAILABLE,
             ],
             'Available just loaded' => [
                 'status' => 'open',
                 'tmxImportStatus' => null,
                 'importTime' => null,
+                'reorganizeStatus' => null,
                 'expectedResult' => LanguageResourceStatus::AVAILABLE,
             ],
             'Additional file import not finished' => [
                 'status' => "open",
                 'tmxImportStatus' => "available",
                 'importTime' => "not finished",
+                'reorganizeStatus' => null,
                 'expectedResult' => LanguageResourceStatus::IMPORT,
             ],
             'Primary file import not finished' => [
                 'status' => "open",
                 'tmxImportStatus' => "import",
                 'importTime' => null,
+                'reorganizeStatus' => null,
                 'expectedResult' => LanguageResourceStatus::IMPORT,
             ],
             'Import finished successfully' => [
                 'status' => "open",
                 'tmxImportStatus' => "available",
                 'importTime' => 'finished',
+                'reorganizeStatus' => null,
                 'expectedResult' => LanguageResourceStatus::AVAILABLE,
             ],
             'Import finished with error' => [
                 'status' => "open",
                 'tmxImportStatus' => "error",
                 'importTime' => null,
+                'reorganizeStatus' => null,
                 'expectedResult' => LanguageResourceStatus::ERROR,
             ],
             'Import failed' => [
                 'status' => "open",
                 'tmxImportStatus' => "failed",
                 'importTime' => null,
+                'reorganizeStatus' => null,
                 'expectedResult' => LanguageResourceStatus::ERROR,
             ],
             'Unknown status' => [
                 'status' => bin2hex(random_bytes(10)),
                 'tmxImportStatus' => null,
                 'importTime' => null,
+                'reorganizeStatus' => null,
                 'expectedResult' => LanguageResourceStatus::UNKNOWN,
             ],
             'Unknown tmxImportStatus' => [
                 'status' => 'open',
                 'tmxImportStatus' => bin2hex(random_bytes(10)),
                 'importTime' => null,
+                'reorganizeStatus' => null,
                 'expectedResult' => LanguageResourceStatus::UNKNOWN,
             ],
             'Reorganize in progress' => [
-                'status' => 'reorganize',
+                'status' => 'open',
                 'tmxImportStatus' => null,
                 'importTime' => null,
+                'reorganizeStatus' => 'reorganize',
                 'expectedResult' => LanguageResourceStatus::REORGANIZE_IN_PROGRESS,
             ],
             'Reorganize failed' => [
-                'status' => 'reorganize failed',
+                'status' => 'open',
                 'tmxImportStatus' => null,
                 'importTime' => null,
+                'reorganizeStatus' => 'reorganize failed',
                 'expectedResult' => LanguageResourceStatus::REORGANIZE_FAILED,
             ],
             'Empty tmxImportStatus' => [
                 'status' => 'open',
                 'tmxImportStatus' => null,
                 'importTime' => null,
+                'reorganizeStatus' => null,
                 'expectedResult' => LanguageResourceStatus::AVAILABLE,
             ],
         ];
@@ -139,6 +152,7 @@ class ConnectorTest extends TestCase
         string $status,
         ?string $tmxImportStatus,
         ?string $importTime,
+        ?string $reorganizeStatus,
         string $expectedResult,
     ): void {
         $apiResponse = new stdClass();
@@ -151,12 +165,16 @@ class ConnectorTest extends TestCase
             $apiResponse->tmxImportStatus = $tmxImportStatus;
         }
 
-        if (null !== $tmxImportStatus) {
+        if (null !== $importTime) {
             $apiResponse->importTime = $importTime;
         }
 
-        $myClass = new Connector();
-        $result = $myClass->processImportStatus($apiResponse);
+        if (null !== $reorganizeStatus) {
+            $apiResponse->reorganizeStatus = $reorganizeStatus;
+        }
+
+        $connector = new Connector();
+        $result = $connector->processImportStatus($apiResponse);
 
         $this->assertEquals($expectedResult, $result);
     }

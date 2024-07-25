@@ -797,6 +797,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
     {
         $status = $apiResponse ? ($apiResponse->status ?? '') : '';
         $tmxImportStatus = $apiResponse ? ($apiResponse->tmxImportStatus ?? '') : '';
+        $reorganizeStatus = $apiResponse ? ($apiResponse->reorganizeStatus ?? '') : '';
 
         $lastStatusInfo = '';
         $result = LanguageResourceStatus::UNKNOWN;
@@ -809,7 +810,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
 
                 break;
 
-                // TM exists on a disk, but not loaded into memory
+            // TM exists on a disk, but not loaded into memory
             case 'available':
                 $result = LanguageResourceStatus::AVAILABLE;
 
@@ -856,15 +857,20 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
                         break;
                 }
 
-                break;
+                switch ($reorganizeStatus) {
+                    case 'reorganize':
+                        $result = LanguageResourceStatus::REORGANIZE_IN_PROGRESS;
 
-            case 'reorganize':
-                $result = LanguageResourceStatus::REORGANIZE_IN_PROGRESS;
+                        break;
 
-                break;
+                    case 'reorganize failed':
+                        $result = LanguageResourceStatus::REORGANIZE_FAILED;
 
-            case 'reorganize failed':
-                $result = LanguageResourceStatus::REORGANIZE_FAILED;
+                        break;
+
+                    default:
+                        break;
+                }
 
                 break;
 
