@@ -49,9 +49,9 @@ END LICENSE AND COPYRIGHT
 
 class editor_Models_LanguageResources_UsageSumLogger extends ZfExtended_Models_Entity_Abstract
 {
-    protected $dbInstanceClass = "editor_Models_Db_LanguageResources_UsageSumLogger";
+    protected $dbInstanceClass = editor_Models_Db_LanguageResources_UsageSumLogger::class;
 
-    protected $validatorInstanceClass = "editor_Models_Validator_LanguageResources_UsageSumLogger";
+    protected $validatorInstanceClass = editor_Models_Validator_LanguageResources_UsageSumLogger::class;
 
     /***
      * Load resource resources and year month summary log data
