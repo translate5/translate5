@@ -75,6 +75,8 @@ class editor_Plugins_Okapi_Worker extends editor_Models_Task_AbstractWorker
         return self::createOriginalFilePath($absoluteTaskDataPath, $fileId, $extension) . Connector::OUTPUT_FILE_EXTENSION;
     }
 
+    protected ZfExtended_Logger $logger;
+
     protected function validateParameters(array $parameters): bool
     {
         if (empty($parameters['type'])
