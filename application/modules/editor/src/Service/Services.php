@@ -37,6 +37,7 @@ use Zend_Config;
 use Zend_Exception;
 use Zend_Registry;
 use ZfExtended_Cache_MySQLMemoryBackend;
+use ZfExtended_Debug;
 use ZfExtended_Exception;
 use ZfExtended_Factory;
 use ZfExtended_Plugin_Exception;
@@ -44,6 +45,11 @@ use ZfExtended_Plugin_Manager;
 
 final class Services
 {
+    /**
+     * The lifetime of cashing a service-state (24 hours)
+     */
+    public const STATE_LIFETIME = 86400;
+
     private static ?Zend_Cache_Core $memCache = null;
 
     /**
@@ -192,7 +198,7 @@ final class Services
      * @throws ZfExtended_Exception
      * @throws Zend_Exception
      */
-    public static function addServiceChecksAsSystemChecks(array &$results, bool $loadPlugins = false)
+    public static function addServiceChecksAsSystemChecks(array &$results, bool $loadPlugins = false): void
     {
         $services = self::getAllServices(Zend_Registry::get('config'), $loadPlugins);
         foreach ($services as $serviceName => $service) {
@@ -209,9 +215,12 @@ final class Services
     {
         try {
             $list = self::getMemCache()->load($serviceId . 'DownList');
+            self::log('Retrieved service-down-list for "' . $serviceId . '": ' . print_r($list, true));
 
             return (is_array($list)) ? $list : [];
         } catch (Throwable) {
+            self::log('Failed to get service-down-list for "' . $serviceId . '"');
+
             return [];
         }
     }
@@ -219,22 +228,82 @@ final class Services
     /**
      * Saves the down-list for a service
      */
-    public static function saveServiceDownList(string $serviceId, array $offlineUrls)
+    public static function saveServiceDownList(string $serviceId, array $list): void
     {
         try {
-            self::getMemCache()->save($offlineUrls, $serviceId . 'DownList');
+            self::getMemCache()->save($list, $serviceId . 'DownList');
+            self::log('Saved service-down-list for "' . $serviceId . '": ' . print_r($list, true));
         } catch (Throwable) {
+            self::log('Failed to save service-down-list for "' . $serviceId . '"');
         }
     }
 
     /**
      * disables the given service URL via memcache.
      */
-    public static function setServiceDown(string $serviceId, string $serviceUrl)
+    public static function setServiceDown(string $serviceId, string $serviceUrl): void
     {
         $list = self::getServiceDownList($serviceId);
         $list[] = $serviceUrl;
         self::saveServiceDownList($serviceId, $list);
+    }
+
+    /**
+     * Saves a state for the given service, usually the load-balancing state
+     * The sate is valid for the lifetime defined in our STATE_LIFETIME
+     * Make sure to only save states, that will not affect functionality when outdated
+     * This API is tailored to save the load-balancing state
+     * The sate must have no "t5liftime"-prop
+     */
+    public static function saveServiceState(string $serviceId, array $state): void
+    {
+        try {
+            $state['t5liftime'] = self::STATE_LIFETIME + time();
+            self::getMemCache()->save($state, $serviceId . 'State');
+            self::log('Saved service-sate for "' . $serviceId . '": ' . print_r($state, true));
+        } catch (Throwable) {
+            self::log('Failed to save service-state for "' . $serviceId . '"');
+        }
+    }
+
+    /**
+     * Retrieves a saved state of the service
+     * Note, that this will retrieve an empty state when the lifetime of the state is exceeded
+     */
+    public static function getServiceState(string $serviceId): array
+    {
+        try {
+            $state = self::getMemCache()->load($serviceId . 'State');
+            if (is_array($state) &&
+                array_key_exists('t5liftime', $state) &&
+                (int) $state['t5liftime'] > time()
+            ) {
+                self::log('Retrieved service-state for "' . $serviceId . '": ' . print_r($state, true));
+                unset($state['t5liftime']);
+
+                return $state;
+            }
+
+            if (is_array($state) && array_key_exists('t5liftime', $state)) {
+                self::log('Retrieved outdated service-state for "' . $serviceId . '": ' . print_r($state, true));
+            }
+
+            return [];
+        } catch (Throwable) {
+            self::log('Failed to get service-state for "' . $serviceId . '"');
+
+            return [];
+        }
+    }
+
+    public static function invalidateServiceState(string $serviceId): void
+    {
+        try {
+            self::getMemCache()->remove($serviceId . 'State');
+            self::log('Invalidate service-state for "' . $serviceId . '"');
+        } catch (Throwable) {
+            self::log('Failed to invalidate service-state for "' . $serviceId . '"');
+        }
     }
 
     /**
@@ -249,5 +318,12 @@ final class Services
         }
 
         return self::$memCache;
+    }
+
+    private static function log(string $msg): void
+    {
+        if (ZfExtended_Debug::hasLevel('core', 'Services')) {
+            error_log($msg);
+        }
     }
 }

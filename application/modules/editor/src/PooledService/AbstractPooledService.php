@@ -84,17 +84,48 @@ abstract class AbstractPooledService extends DockerServiceAbstract implements Po
     }
 
     /**
-     * Special API for pooled services with a single URL for one pool:
-     * This also is expected to represent a load-balancing and for a single URL maybe multiple workers are queued
+     * Special API for pooled services with a single URL for one pool
+     * It retrieves, if behind the given single URL multiple servers are hidden
+     * This information is cached for the time defined in Services::STATE_LIFETIME
+     * for not having to evaluate that with every request
      */
     public function isPoolLoadBalanced(string $pool): bool
     {
         $urls = $this->getPoolUrls($pool);
         if (count($urls) === 1) {
-            return ($this->getNumIpsForUrl($urls[0]) > 1);
+            $url = $urls[0];
+            $state = Services::getServiceState($this->getServiceId());
+            if (! array_key_exists($url, $state)) {
+                // when there is no cached key we evaluate & cache it
+                $state = $this->saveServiceState();
+            }
+
+            return ((int) $state[$url] > 1);
         }
 
         return false;
+    }
+
+    /**
+     * Saves our load-balancing state to the services-memcache
+     */
+    private function saveServiceState(): array
+    {
+        $state = [];
+        $pools = [
+            $this->getGuiServiceUrls(),
+            $this->getImportServiceUrls(),
+            $this->getDefaultServiceUrls(),
+        ];
+        foreach ($pools as $urls) {
+            // only single url pools can be load-balanced
+            if (count($urls) === 1 && ! array_key_exists($urls[0], $state)) {
+                $state[$urls[0]] = $this->getNumIpsForUrl($urls[0]);
+            }
+        }
+        Services::saveServiceState($this->getServiceId(), $state);
+
+        return $state;
     }
 
     /**
@@ -133,8 +164,11 @@ abstract class AbstractPooledService extends DockerServiceAbstract implements Po
                 $downServices[] = $url;
             }
         }
+        // we only save services to the down list, if the service is not load-balanced
+        // Note, that this is regarded as such, if only one of the single pool-urls is load-balanced ...
+        $isLoadBalanced = ($this->isPoolLoadBalanced('default') || $this->isPoolLoadBalanced('gui'));
         // save the down-list
-        if ($saveStateToMemCache) {
+        if (! $isLoadBalanced && $saveStateToMemCache) {
             Services::saveServiceDownList($this->getServiceId(), $downServices);
         }
 
@@ -308,6 +342,8 @@ abstract class AbstractPooledService extends DockerServiceAbstract implements Po
         $this->updateConfigurationConfig($this->configurationConfig['name'], $this->configurationConfig['type'], $pooledUrls['default'], $doSave, $io);
         $this->updateConfigurationConfig($this->guiConfigurationConfig['name'], $this->guiConfigurationConfig['type'], $pooledUrls['gui'], $doSave, $io);
         $this->updateConfigurationConfig($this->importConfigurationConfig['name'], $this->importConfigurationConfig['type'], $pooledUrls['import'], $doSave, $io);
+        // invalidate any cached state's
+        Services::invalidateServiceState($this->getServiceId());
     }
 
     /**
@@ -342,19 +378,12 @@ abstract class AbstractPooledService extends DockerServiceAbstract implements Po
      */
     private function getPoolUrls(string $pool): array
     {
-        switch ($pool) {
-            case 'default':
-                return $this->getDefaultServiceUrls();
-
-            case 'gui':
-                return $this->getGuiServiceUrls();
-
-            case 'import':
-                return $this->getImportServiceUrls();
-
-            default:
-                throw new ZfExtended_Exception('PooledService: pool must be: default | gui | import');
-        }
+        return match ($pool) {
+            'default' => $this->getDefaultServiceUrls(),
+            'gui' => $this->getGuiServiceUrls(),
+            'import' => $this->getImportServiceUrls(),
+            default => throw new ZfExtended_Exception('PooledService: pool must be: default | gui | import')
+        };
     }
 
     /**

@@ -38,6 +38,7 @@ use ReflectionException;
 use Zend_Application_Bootstrap_Exception as Zend_Application_Bootstrap_ExceptionAlias;
 use Zend_Exception;
 use Zend_Registry;
+use ZfExtended_Debug;
 use ZfExtended_Factory;
 use ZfExtended_Models_Log;
 use ZfExtended_Resource_GarbageCollector;
@@ -107,6 +108,9 @@ class Cronjobs
      */
     private function logCall(string $type): void
     {
+        if(ZfExtended_Debug::hasLevel('core', 'Cronjobs')){
+            error_log('Cron Job called: ' . $type);
+        }
         Zend_Registry::get('logger')->cloneMe('core.cron')->info(
             'E1615',
             'Cron Jobs called: {type}',

@@ -40,11 +40,12 @@ use ZfExtended_Factory;
 
 /**
  * Extends the import worker to work with pooled services tailored for processing segments
- * The Worker will be instantiated as many times as the service has max parallel configured or a single service-url has IPs or as many url's are configured for the pool
- * Then each of these workers will process the segments in a loop until no unprocessed segments are available anymore
- * The worker normally operates with pooled services or services, that are setup as such (see MittagQI\Translate5\PooledService\AbstractPooledService::isPooled)
- * Then the amount of workers to queue is evaluated on the fly by getting the IP-Adresses the configured host has
- * the URL of the service is not the slot anymore but a seperate worker-param "serviceUrl"
+ * The Worker will be instantiated as many times as the service has max parallel configured or a single service-url has
+ * IPs or as many url's are configured for the pool Then each of these workers will process the segments in a loop
+ * until no unprocessed segments are available anymore The worker normally operates with pooled services or services,
+ * that are setup as such (see MittagQI\Translate5\PooledService\AbstractPooledService::isPooled) Then the amount of
+ * workers to queue is evaluated on the fly by getting the IP-Adresses the configured host has the URL of the service
+ * is not the slot anymore but a seperate worker-param "serviceUrl"
  */
 abstract class AbstractPooledWorker extends editor_Models_Task_AbstractWorker
 {
@@ -68,13 +69,13 @@ abstract class AbstractPooledWorker extends editor_Models_Task_AbstractWorker
 
     protected int $workerIndex = 0;
 
+    protected int $workerCount = 1;
+
     protected string $serviceUrl;
 
     protected array $calculatedSlot;
 
     protected PooledServiceInterface $service;
-
-    protected bool $doDebug = false;
 
     public function __construct()
     {
@@ -83,7 +84,7 @@ abstract class AbstractPooledWorker extends editor_Models_Task_AbstractWorker
         // pooled services need to have their pool respected
         $this->isPooled = $this->service->isPooled();
         // debugging generally is tailored to what workers are working when
-        $this->doDebug = ZfExtended_Debug::hasLevel('core', 'ServiceWorkers');
+        $this->doDebug = $this->doDebug || ZfExtended_Debug::hasLevel('core', 'ServiceWorkers');
     }
 
     /**
@@ -232,15 +233,19 @@ abstract class AbstractPooledWorker extends editor_Models_Task_AbstractWorker
                         // the resource-name for the worker model
                         'resource' => $serviceId . ucfirst($this->resourcePool),
                         // the slot that represents a "virtualized" url and not the real URL anymore as with other workers
-                        // TODO DELAYED WORKERS: was it really wanted, that the slot is identical in case of load-balanced workers ?
-                        'slot' => $slotName . $i,
+                        // TODO DELAYED WORKERS: was it really neccessary, that the slot is identical in case of load-balanced workers ?
+                        'slot' => $slotName . ($isLoadBalanced ? '' : $i),
                         // the actual URL (saved in the worker-params)
-                        'url' => ($i < $numUrls) ? $serviceUrls[$i] : (($numUrls > 1) ? $serviceUrls[random_int(0, $numUrls - 1)] : $serviceUrls[0]),
+                        'url' => ($i < $numUrls) ? $serviceUrls[$i] :
+                            (($numUrls > 1) ? $serviceUrls[random_int(0, $numUrls - 1)] : $serviceUrls[0]),
                     ];
                 }
             }
             if ($this->doDebug) {
-                error_log('AbstractPooledWorker::initSlots(): number of Workers: ' . $this->maxParallel . ' / slots: ' . print_r($this->slots, true));
+                error_log(
+                    'AbstractPooledWorker::initSlots(): number of Workers: '
+                    . $this->maxParallel . ' / slots: ' . print_r($this->slots, true)
+                );
             }
         }
     }
@@ -259,11 +264,16 @@ abstract class AbstractPooledWorker extends editor_Models_Task_AbstractWorker
      */
     protected function validateParameters(array $parameters): bool
     {
-        if ($this->isPooled && array_key_exists('resourcePool', $parameters) && $this->service->isValidPool($parameters['resourcePool'])) {
+        if ($this->isPooled && array_key_exists('resourcePool', $parameters) && $this->service->isValidPool(
+            $parameters['resourcePool']
+        )) {
             $this->resourcePool = $parameters['resourcePool'];
         }
         if (array_key_exists('workerIndex', $parameters)) {
             $this->workerIndex = (int) $parameters['workerIndex'];
+        }
+        if (array_key_exists('workerCount', $parameters)) {
+            $this->workerCount = (int) $parameters['workerCount'];
         }
         // we cannot check this param as it is not present in the initial init but will be added programmatically
         if (array_key_exists('serviceUrl', $parameters)) {
@@ -271,6 +281,23 @@ abstract class AbstractPooledWorker extends editor_Models_Task_AbstractWorker
         }
 
         return true;
+    }
+
+    public function onInit(array $parameters): bool
+    {
+        if (parent::onInit($parameters)) {
+            // if there is more than one worker working on the same workload
+            // our behaviour must reflect this
+            if ($this->workerCount > 1) {
+                $this->behaviour->setConfig([
+                    'isMultiInstance' => true,
+                ]);
+            }
+
+            return true;
+        }
+
+        return false;
     }
 
     /**
@@ -304,6 +331,7 @@ abstract class AbstractPooledWorker extends editor_Models_Task_AbstractWorker
 
             $params = $this->workerModel->getParameters();
             $params['workerIndex'] = 0;
+            $params['workerCount'] = count($this->slots);
             $myselfQueued = false;
 
             foreach ($this->slots as $slot) {

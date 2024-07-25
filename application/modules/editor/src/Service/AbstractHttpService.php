@@ -135,8 +135,9 @@ abstract class AbstractHttpService extends ServiceAbstract
     }
 
     /**
-     * Returns the number of IP adresses behind an URL
+     * Returns the number of IP adresses behind a URL (or 1 as the default - evebn if the service is not reachable!)
      * This can be used to detect the available services behind a horizontally scaled URL
+     * The result is cached for the lifetime for the service-instance
      */
     public function getNumIpsForUrl(string $serviceUrl): int
     {
@@ -147,6 +148,10 @@ abstract class AbstractHttpService extends ServiceAbstract
         } else {
             $hosts = gethostbynamel($host);
             $this->hostsByHost[$host] = $hosts;
+
+            if (static::doDebug()) {
+                error_log(static::class . '::getNumIpsForUrl: ' . $host . ': ' . print_r($hosts, true));
+            }
         }
 
         // QUIRK: for now, we return 1 if gethostbynamel() does not detect anything ... TODO FIXME: Throw Exception ?
