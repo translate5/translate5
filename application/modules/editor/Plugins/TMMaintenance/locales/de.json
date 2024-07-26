@@ -70,9 +70,9 @@
   },
   "list" : {
     "title": "Segmente",
-    "totalAmount": "Total found segments: ",
-    "calculating": "calculating...",
-    "saving": "Saving. Please wait a while.",
+    "totalAmount": "Gesamtzahl der gefundenen Segmente: ",
+    "calculating": "Wird berechnet...",
+    "saving": "Speichert, bitte warten.",
     "columns": {
       "sourceText": "Quelle",
       "targetText": "Ziel",

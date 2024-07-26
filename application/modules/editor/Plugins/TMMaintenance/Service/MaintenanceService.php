@@ -72,7 +72,7 @@ class MaintenanceService extends \editor_Services_Connector_Abstract implements 
             'E1314' => 'The queried OpenTM2 TM "{tm}" is corrupt and must be reorganized before usage!',
             'E1333' => 'The queried OpenTM2 server has to many open TMs!',
             'E1306' => 'Could not save segment to TM',
-            'E1377' => 'Unable to use the memory because of the memory status: {status}',
+            'E1377' => 'Memory status: {status}. Please try again in a while.',
             'E1616' => 'T5Memory server version serving the selected memory is not supported',
             'E1611' => 't5memory: Requested segment not found. Probably it was deleted.',
             'E1612' => 't5memory: Found segment id differs from the requested one, ' .

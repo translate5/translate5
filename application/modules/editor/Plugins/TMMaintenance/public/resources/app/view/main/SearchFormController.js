@@ -63,6 +63,7 @@ Ext.define('TMMaintenance.view.main.SearchFormController', {
 
     onDeleteBatch: function () {
         const me = this;
+        me.getView().up('app-main').down('#deleteBatchDialog');
 
         Ext.Ajax.request({
             url: '/editor/plugins_tmmaintenance_api/delete-batch/',
@@ -71,7 +72,6 @@ Ext.define('TMMaintenance.view.main.SearchFormController', {
             method: 'POST',
             success: function (xhr) {
                 me.getView().up('app-main').down('#deleteBatchDialog').hide();
-                me.getView().down('[name=search]').buttonElement.dom.click();
             },
             error: function (xhr) {
                 me.showServerError(JSON.parse(xhr.responseText));
