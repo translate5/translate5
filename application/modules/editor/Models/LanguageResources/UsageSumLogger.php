@@ -104,10 +104,10 @@ class editor_Models_LanguageResources_UsageSumLogger extends ZfExtended_Models_E
 
         $languageResource = ZfExtended_Factory::get('editor_Models_LanguageResources_LanguageResource');
         /* @var $languageResource editor_Models_LanguageResources_LanguageResource */
-        $languageResource->load($log->getLanguageResourceId());
+        $languageResource->load((int) $log->getLanguageResourceId());
 
-        //TODO: make sence ? check me with the task definition
-        $characterPerCustomer = round($log->getTranslatedCharacterCount() / count($customers));
+        //TODO: make sense ? check me with the task definition
+        $characterPerCustomer = round((int) $log->getTranslatedCharacterCount() / count($customers));
         $this->setTotalCharacters($characterPerCustomer);
 
         $this->setLangageResourceId($log->getLanguageResourceId()); //part of the unique key
