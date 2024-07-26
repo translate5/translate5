@@ -37,7 +37,8 @@
     "targetLanguage": "Zielsprache",
     "clients": "Kunden",
     "select": "Auswählen",
-    "close": "Schließen"
+    "close": "Schließen",
+    "emptyText" : "Keine Datensätze verfügbar"
   },
   "searchForm": {
     "tm": "TM",
@@ -71,6 +72,7 @@
     "title": "Segmente",
     "totalAmount": "Total found segments: ",
     "calculating": "calculating...",
+    "saving": "Saving. Please wait a while.",
     "columns": {
       "sourceText": "Quelle",
       "targetText": "Ziel",

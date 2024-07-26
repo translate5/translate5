@@ -9,6 +9,7 @@ Ext.define('TMMaintenance.view.main.SelectTm', {
     bind: {
         title: '{l10n.selectTm.title}',
         store: '{tms}',
+        emptyText: '{l10n.selectTm.emptyText}',
     },
     minHeight: 400,
     layout: 'fit',
@@ -74,7 +75,6 @@ Ext.define('TMMaintenance.view.main.SelectTm', {
             }
         },
     ],
-    emptyText: 'No records available',
     listeners: {
         childdoubletap: 'onTmDoubleTap'
     }

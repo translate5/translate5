@@ -125,8 +125,8 @@ Ext.define('TMMaintenance.view.main.List', {
                         iconCls: 'icon loading',
                         bind: {
                             hidden: '{!record.isSaving}',
+                            tooltip: '{l10n.list.saving}',
                         },
-                        tooltip: 'Saving. Please wait a while.',
                     },
                     save: {
                         iconCls: 'x-fa fa-check',
