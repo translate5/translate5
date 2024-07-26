@@ -135,6 +135,13 @@ class ConnectorTest extends TestCase
                 'reorganizeStatus' => 'reorganize failed',
                 'expectedResult' => LanguageResourceStatus::REORGANIZE_FAILED,
             ],
+            'Reorganize finished' => [
+                'status' => 'open',
+                'tmxImportStatus' => null,
+                'importTime' => null,
+                'reorganizeStatus' => 'available',
+                'expectedResult' => LanguageResourceStatus::AVAILABLE,
+            ],
             'Empty tmxImportStatus' => [
                 'status' => 'open',
                 'tmxImportStatus' => null,
