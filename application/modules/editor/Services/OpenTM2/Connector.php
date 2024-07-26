@@ -44,7 +44,7 @@ use MittagQI\Translate5\T5Memory\Enum\StripFramingTags;
  */
 class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstract implements UpdatableAdapterInterface, FileBasedInterface
 {
-    private const CONCORDANCE_SEARCH_NUM_RESULTS = 20;
+    private const CONCORDANCE_SEARCH_NUM_RESULTS = 1;
 
     /**
      * Connector

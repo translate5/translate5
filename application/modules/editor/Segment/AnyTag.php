@@ -30,15 +30,13 @@ END LICENSE AND COPYRIGHT
  * Abstraction for an Internal tag of variable type. This usually covers Tags, that are no real internal tags or even markup of other source
  * The main use for this class is for testing purposes
  * In "real life" there should be no unknown segment tags and we could add error logging here to detect such mishaps
- *
- * @method editor_Segment_AnyTag clone(bool $withDataAttribs=false, bool $withId=false)
- * @method editor_Segment_AnyTag cloneProps(editor_Tag $tag, bool $withDataAttribs=false, bool $withId=false)
+ * @phpstan-consistent-constructor
  */
 class editor_Segment_AnyTag extends editor_Segment_Tag
 {
-    protected static $type = editor_Segment_Tag::TYPE_ANY;
+    protected static ?string $type = editor_Segment_Tag::TYPE_ANY;
 
-    protected static $identificationClass = editor_Segment_Tag::TYPE_ANY;
+    protected static ?string $identificationClass = editor_Segment_Tag::TYPE_ANY;
 
     public function __construct(int $startIndex, int $endIndex, string $category = '', string $nodeName = 'span')
     {
@@ -49,19 +47,13 @@ class editor_Segment_AnyTag extends editor_Segment_Tag
         $this->singular = in_array($nodeName, static::$singularTypes);
     }
 
-    /**
-     * @see editor_Tag::createBaseClone()
-     * @return editor_Segment_AnyTag
-     */
-    protected function createBaseClone()
+    protected function createBaseClone(): static
     {
-        return new editor_Segment_AnyTag($this->startIndex, $this->endIndex, $this->category, $this->name);
+        return new static($this->startIndex, $this->endIndex, $this->category, $this->name);
     }
 
     /**
      * ANY Internal tags shall not be be consolidated
-     * {@inheritDoc}
-     * @see editor_Segment_Tag::isEqualType()
      */
     public function isEqualType(editor_Tag $tag): bool
     {
@@ -70,8 +62,6 @@ class editor_Segment_AnyTag extends editor_Segment_Tag
 
     /**
      * We do not want "ANY" tags to be skipped
-     * {@inheritDoc}
-     * @see editor_Segment_Tag::render()
      */
     public function render(array $skippedTypes = null): string
     {

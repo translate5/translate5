@@ -28,7 +28,14 @@ END LICENSE AND COPYRIGHT
 
 namespace MittagQI\Translate5\Segment\TagRepair;
 
+use DOMNodeList;
+use editor_Segment_Internal_Tag;
 use editor_TagSequence;
+use Exception;
+use PHPHtmlParser\Dom\Node\HtmlNode;
+use PHPHtmlParser\DTO\Tag\AttributeDTO;
+use Throwable;
+use ZfExtended_Exception;
 
 /**
  * General Extension to use te FieldTags Model for a general Tag-Repair (not specific for internal or xliff tags)
@@ -88,7 +95,7 @@ class Tags extends editor_TagSequence
     /**
      * Creates a new tag-repair for the given markup
      * The given markup must be syntactically valid markup !
-     * @throws \ZfExtended_Exception
+     * @throws ZfExtended_Exception
      */
     public function __construct(string $markup, bool $preserveComments = false)
     {
@@ -117,7 +124,7 @@ class Tags extends editor_TagSequence
 
     /**
      * Provides the returned html from request and in return get's the fixed and re-applied markup
-     * @throws \ZfExtended_Exception
+     * @throws ZfExtended_Exception
      */
     public function recreateTags(string $html): string
     {
@@ -134,7 +141,7 @@ class Tags extends editor_TagSequence
             // reset captured errors
             if (self::DO_DEBUG && count($this->capturedErrors) > 0) {
                 error_log('RENDEREING RepairTags CREATED ERRORS:' . "\n");
-                error_log('VISUALIZED MARKUP: ' . \editor_Segment_Internal_Tag::visualizeTags($rendered) . "\n");
+                error_log('VISUALIZED MARKUP: ' . editor_Segment_Internal_Tag::visualizeTags($rendered) . "\n");
                 // TODO FIXME: create an API in ZfExtended_ErrorCodeException for this
                 foreach ($this->capturedErrors as $exception) {
                     $extraLog = '';
@@ -152,7 +159,7 @@ class Tags extends editor_TagSequence
             }
 
             return $rendered;
-        } catch (\Exception $e) {
+        } catch (Throwable) {
             // reset captured errors
             $this->captureErrors = false;
             if (self::DO_DEBUG && count($this->capturedErrors) > 0) {
@@ -237,13 +244,13 @@ class Tags extends editor_TagSequence
                             $tag->endIndex = $textLength;
                         }
                     }
-                } catch (\Exception $e) {
+                } catch (Throwable) {
                     // we simply ignore an unparsable tag, what can we do ?
                     error_log('Segment/TagRepair/Tags: could not evaluate the request-tag ' . $part);
                 }
             } else {
                 // a text
-                $text .= strval(strip_tags($part));
+                $text .= strip_tags(strval($part));
                 $textLength = mb_strlen($text);
             }
         }
@@ -429,9 +436,9 @@ class Tags extends editor_TagSequence
 
     /**
      * Unparses Segment markup into FieldTags
-     * @throws \Exception
+     * @throws Exception
      */
-    public function unparse(string $html)
+    public function unparse(string $html): void
     {
         // decompose html into a wrapping tag
         $wrapper = $this->unparseHtml($html);
@@ -484,7 +491,7 @@ class Tags extends editor_TagSequence
     /**
      * @throws \stringEncode\Exception
      */
-    protected function createFromHtmlNode(\PHPHtmlParser\Dom\Node\HtmlNode $node, int $startIndex, array $children = null): \editor_Segment_Tag
+    protected function createFromHtmlNode(HtmlNode $node, int $startIndex, array $children = null): \editor_Segment_Tag
     {
         $classNames = [];
         $attributes = [];
@@ -501,7 +508,7 @@ class Tags extends editor_TagSequence
         return $this->createRepairTag($classNames, $attributes, $domTag->name(), $startIndex, null, $children);
     }
 
-    protected function createFromDomElement(\DOMElement $element, int $startIndex, \DOMNodeList $children = null): \editor_Segment_Tag
+    protected function createFromDomElement(\DOMElement $element, int $startIndex, DOMNodeList $children = null): \editor_Segment_Tag
     {
         $classNames = [];
         $attributes = [];
@@ -518,12 +525,12 @@ class Tags extends editor_TagSequence
         return $this->createRepairTag($classNames, $attributes, $element->nodeName, $startIndex, $children, null);
     }
 
-    private function createRepairTag(array $classNames, array $attributes, string $nodeName, int $startIndex, \DOMNodeList $domChildren = null, array $htmlChildren = null): Tag
+    private function createRepairTag(array $classNames, array $attributes, string $nodeName, int $startIndex, DOMNodeList $domChildren = null, array $htmlChildren = null): Tag
     {
         // InternalTag needs special processing to prevent them to be manipulated and to pair the open/close-pairs
         // Since we may deal with user-generated markup here, we not only rely on the class but also inspect the children to avoid quirks
-        if (in_array(\editor_Segment_Internal_Tag::CSS_CLASS, $classNames) && \editor_Segment_Internal_Tag::hasNodeName($nodeName)
-                && (\editor_Segment_Internal_Tag::domElementChildrenAreInternalTagChildren($domChildren) || \editor_Segment_Internal_Tag::htmlNodeChildrenAreInternalTagChildren($htmlChildren))) {
+        if (in_array(editor_Segment_Internal_Tag::CSS_CLASS, $classNames) && editor_Segment_Internal_Tag::hasNodeName($nodeName)
+                && (editor_Segment_Internal_Tag::domElementChildrenAreInternalTagChildren($domChildren) || editor_Segment_Internal_Tag::htmlNodeChildrenAreInternalTagChildren($htmlChildren))) {
             $tag = new InternalTag($startIndex, 0, '', $nodeName, $this->tagIdxCount);
         } else {
             $tag = new Tag($startIndex, 0, '', $nodeName, $this->tagIdxCount);

@@ -27,26 +27,20 @@ END LICENSE AND COPYRIGHT
 */
 
 /**
- * represents a HTML TextNode as PHP-Object
+ * represents an HTML TextNode as PHP-Object
  * A text node has an empty Node-name and will render only it's text content
  * The Text-Content will not be escaped or unescped within this class so it must already be escaped if escaped content shall be rendered
  *
- * @method editor_TextNode clone(boolean $withDataAttribs, bool $withId)
- * @method editor_TextNode cloneProps(editor_Tag $tag, bool $withDataAttribs, bool $withId)
+ * @method editor_TextNode clone(bool $withDataAttribs=false, bool $withId=false)
+ * @method editor_TextNode cloneProps(editor_Tag $tag, bool $withDataAttribs=false, bool $withId=false)
  */
 final class editor_TextNode extends editor_Tag
 {
     public const NODE_NAME = '_TEXT_';
 
-    /**
-     * @var string
-     */
-    private $text = '';
+    private string $text = '';
 
-    /**
-     * @param string $text
-     */
-    public function __construct($text)
+    public function __construct(string $text)
     {
         if (! editor_Tag::isNodeText($text)) {
             throw new Exception('A text-node must have a non-empty text');
@@ -62,12 +56,12 @@ final class editor_TextNode extends editor_Tag
         return true;
     }
 
-    public function getText()
+    public function getText(): string
     {
         return $this->text;
     }
 
-    public function getTextLength()
+    public function getTextLength(): int
     {
         return mb_strlen($this->text);
     }
@@ -93,22 +87,22 @@ final class editor_TextNode extends editor_Tag
         return false;
     }
 
-    public function addClass($classname): editor_Tag
+    public function addClass(string $classname): static
     {
         throw new Exception('Text nodes can not have classes');
     }
 
-    public function setAttribute($name, $val): editor_Tag
+    public function setAttribute(string $name, ?string $val): static
     {
         throw new Exception('Text nodes can not have attributes');
     }
 
-    public function setData($name, $val): editor_Tag
+    public function setData(string $name, ?string $val): static
     {
         throw new Exception('Text nodes can not have data attributes');
     }
 
-    public function addAttribute($name, $val = null): editor_Tag
+    public function addAttribute(string $name, string $val = null): static
     {
         throw new Exception('Text nodes can not have attributes');
     }
@@ -124,16 +118,12 @@ final class editor_TextNode extends editor_Tag
 
     public function isEmpty(): bool
     {
-        return ($this->text !== null && $this->text !== '');
+        return ($this->text === '');
     }
 
-    /**
-     * @see editor_Tag::createBaseClone()
-     * @return editor_TextNode
-     */
-    protected function createBaseClone()
+    protected function createBaseClone(): static
     {
-        return editor_Tag::createText($this->text);
+        return new self($this->text);
     }
 
     public function render(array $skippedTypes = null): string
@@ -175,7 +165,7 @@ final class editor_TextNode extends editor_Tag
         return $data;
     }
 
-    public function unserialize(stdClass $data)
+    public function unserialize(stdClass $data): static
     {
         $this->text = $data->text;
 

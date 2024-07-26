@@ -26,7 +26,13 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+namespace MittagQI\Translate5\Test\Unit\Segment;
+
+use editor_Segment_AnyTag;
+use editor_Segment_Internal_Tag;
+use editor_Tag;
 use MittagQI\Translate5\Test\SegmentTagsTestAbstract;
+use ZfExtended_Dom;
 
 /**
  * Several "classic" PHPUnit tests to check the OOP Tag-Parsing API againsted selected test data
@@ -38,7 +44,7 @@ class SegmentTagsTest extends SegmentTagsTestAbstract
         $expected = '<div><p>イリノイ州シカゴにて、アイルランド系の家庭に、</p></div>';
         $dom = new ZfExtended_Dom();
         $element = $dom->loadUnicodeElement($expected);
-        $result = $dom->saveHTML($element);
+        $result = $dom->saveXML($element);
         $this->assertEquals($result, $expected);
     }
 
@@ -47,7 +53,7 @@ class SegmentTagsTest extends SegmentTagsTestAbstract
         $expected = '<div><p>イリノイ州シカゴにて、アイルランド系の家庭に、</p></div>';
         $dom = new ZfExtended_Dom();
         $element = $dom->loadUnicodeElement('  Hello! ' . $expected . ', something else, ...');
-        $result = $dom->saveHTML($element);
+        $result = $dom->saveXML($element);
         $this->assertEquals($expected, $result);
     }
 
@@ -58,8 +64,27 @@ class SegmentTagsTest extends SegmentTagsTestAbstract
         $elements = $dom->loadUnicodeMarkup($expected);
         $result = '';
         foreach ($elements as $element) {
-            $result .= $dom->saveHTML($element);
+            $result .= $dom->saveXML($element);
         }
+        $this->assertEquals($expected, $result);
+    }
+
+    public function testNonStrictEncodedTag()
+    {
+        $markup = '<span class="short" title="&lt;ph name=&quot;ParagraphNumber&quot;/>" data-smth="&lt;ph name=&quot;ParagraphNumber&quot;/>"> Some & thing</span>';
+        $expected = '<span class="short" title="&lt;ph name=&quot;ParagraphNumber&quot;/&gt;" data-smth="&lt;ph name=&quot;ParagraphNumber&quot;/&gt;"> Some &amp; thing</span>';
+        $dom = new ZfExtended_Dom();
+        $element = $dom->loadUnicodeElement($markup);
+        $result = $dom->saveXML($element);
+        $this->assertEquals($expected, $result);
+    }
+
+    public function testSingleEncodedTag()
+    {
+        $expected = '<span class="short" title="&lt;ph name=&quot;ParagraphNumber&quot;/&gt;" data-smth="&lt;ph name=&quot;ParagraphNumber&quot;/&gt;"> Some &amp; thing</span>';
+        $dom = new ZfExtended_Dom();
+        $element = $dom->loadUnicodeElement($expected);
+        $result = $dom->saveXML($element);
         $this->assertEquals($expected, $result);
     }
 
@@ -68,8 +93,8 @@ class SegmentTagsTest extends SegmentTagsTestAbstract
         $expected = '<span class="short" title="&lt;ph name=&amp;quot;ParagraphNumber&amp;quot;/&gt;" data-smth="&lt;ph name=&amp;quot;ParagraphNumber&amp;quot;/&gt;"> Some &amp;amp; thing</span>';
         $dom = new ZfExtended_Dom();
         $element = $dom->loadUnicodeElement($expected);
-        $result = $dom->saveHTML($element);
-        $this->assertEquals($result, $expected);
+        $result = $dom->saveXML($element);
+        $this->assertEquals($expected, $result);
     }
 
     public function testSimpleTag()
@@ -77,7 +102,7 @@ class SegmentTagsTest extends SegmentTagsTestAbstract
         $expected = '<a href="http://www.google.de" target="blank" data-test="42"><span>Link Text</span> <img class="upfront link-img" src="/some/icon.svg" /></a>';
         $tag = editor_Tag::unparse($expected);
         $result = $tag->render();
-        $this->assertEquals($result, $expected);
+        $this->assertEquals($expected, $result);
     }
 
     public function testTagWithAttributes()
@@ -93,7 +118,7 @@ class SegmentTagsTest extends SegmentTagsTestAbstract
         $expected = '<div class="zzz 12wer www aaa sss">Some Content</div>';
         $tag = editor_Tag::unparse($expected);
         $result = $tag->render();
-        $this->assertEquals($result, $expected);
+        $this->assertEquals($expected, $result);
         $tag2 = editor_Tag::unparse($expected);
         $this->assertTrue($tag2->isEqual($tag));
     }
@@ -114,7 +139,7 @@ class SegmentTagsTest extends SegmentTagsTestAbstract
             ->addOnEvent('click', "window.open('page');")
             ->addAttribute('rel', 'something')
             ->setData('some-name', 'some "data"')
-            ->setData('other-name', 12345);
+            ->setData('other-name', '12345');
         $result = $segmentTag->toJson();
         $expected = '{"type":"any","name":"div","category":"test","startIndex":6,"endIndex":11,"order":-1,"parentOrder":-1,"classes":["zclass","aclass","bclass"],"attribs":[{"name":"onclick","value":"window.open(\'page\');"},{"name":"rel","value":"something"},{"name":"data-some-name","value":"some \"data\""},{"name":"data-other-name","value":"12345"}]}';
         $this->assertEquals($expected, $result);
