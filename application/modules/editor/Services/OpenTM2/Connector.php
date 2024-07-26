@@ -810,7 +810,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
 
                 break;
 
-            // TM exists on a disk, but not loaded into memory
+                // TM exists on a disk, but not loaded into memory
             case 'available':
                 $result = LanguageResourceStatus::AVAILABLE;
 
