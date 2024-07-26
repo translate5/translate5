@@ -30,6 +30,7 @@ use editor_Models_LanguageResources_LanguageResource as LanguageResource;
 use editor_Models_Task as Task;
 use MittagQI\Translate5\ContentProtection\T5memory\T5NTagSchemaFixFilter;
 use MittagQI\Translate5\ContentProtection\T5memory\TmConversionService;
+use MittagQI\Translate5\Integration\FileBasedInterface;
 use MittagQI\Translate5\LanguageResource\Adapter\Exception\RescheduleUpdateNeededException;
 use MittagQI\Translate5\LanguageResource\Adapter\Exception\SegmentUpdateException;
 use MittagQI\Translate5\LanguageResource\Adapter\UpdatableAdapterInterface;
@@ -41,7 +42,7 @@ use MittagQI\Translate5\T5Memory\Enum\StripFramingTags;
  *
  * IMPORTANT: see the doc/comments in MittagQI\Translate5\Service\T5Memory
  */
-class editor_Services_OpenTM2_Connector extends editor_Services_Connector_FilebasedAbstract implements UpdatableAdapterInterface
+class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstract implements UpdatableAdapterInterface, FileBasedInterface
 {
     private const CONCORDANCE_SEARCH_NUM_RESULTS = 1;
 
@@ -93,7 +94,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
     public function connectTo(
         LanguageResource $languageResource,
         $sourceLang,
-        $targetLang
+        $targetLang,
     ): void {
         $this->api = ZfExtended_Factory::get('editor_Services_OpenTM2_HttpApi');
         $this->api->setLanguageResource($languageResource);
@@ -114,7 +115,6 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
 
     /**
      * @throws Zend_Exception
-     * @see editor_Services_Connector_FilebasedAbstract::addTm()
      */
     public function addTm(array $fileinfo = null, array $params = null): bool
     {
@@ -333,7 +333,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
         editor_Models_Segment $segment,
         bool $recheckOnUpdate = self::DO_NOT_RECHECK_ON_UPDATE,
         bool $rescheduleUpdateOnError = self::DO_NOT_RESCHEDULE_UPDATE_ON_ERROR,
-        bool $useSegmentTimestamp = self::DO_NOT_USE_SEGMENT_TIMESTAMP
+        bool $useSegmentTimestamp = self::DO_NOT_USE_SEGMENT_TIMESTAMP,
     ): void {
         $tmName = $this->getWritableMemory();
 
@@ -353,14 +353,19 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
         $this->tagHandler->setInputTagMap($this->tagHandler->getTagMap());
         $target = $this->tagHandler->prepareQuery($segment->getTargetEdit(), false);
 
+        $timestamp = $useSegmentTimestamp
+            ? $this->api->getDate((int) $segment->getTimestamp())
+            : $this->api->getNowDate();
+
         $successful = $this->api->update(
             $source,
             $target,
-            $segment,
+            $segment->getUserName(),
+            $segment->getMid(),
+            $timestamp,
             $fileName,
             $tmName,
             ! $this->isInternalFuzzy(),
-            $useSegmentTimestamp
         );
 
         $dataSent = [
@@ -368,8 +373,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
             'target' => $target,
             'userName' => $segment->getUserName(),
             'context' => $segment->getMid(),
-            // TODO fix this after TMMaintenance is merged
-            // 'timestamp' => $timestamp,
+            'timestamp' => $timestamp,
             'fileName' => $fileName,
         ];
 
@@ -386,7 +390,16 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
             $this->addReorganizeWarning($segment->getTask());
             $this->reorganizeTm($tmName);
 
-            $successful = $this->api->update($source, $target, $segment, $fileName, $tmName, ! $this->isInternalFuzzy());
+            $successful = $this->api->update(
+                $source,
+                $target,
+                $segment->getUserName(),
+                $segment->getMid(),
+                $timestamp,
+                $fileName,
+                $tmName,
+                ! $this->isInternalFuzzy()
+            );
 
             if ($successful) {
                 $this->checkUpdateResponse($dataSent, $this->api->getResult());
@@ -401,7 +414,16 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
             $newName = $this->api->createEmptyMemory($newName, $this->languageResource->getSourceLangCode());
             $this->addMemoryToLanguageResource($this->languageResource, $newName);
 
-            $successful = $this->api->update($source, $target, $segment, $fileName, $tmName, ! $this->isInternalFuzzy());
+            $successful = $this->api->update(
+                $source,
+                $target,
+                $segment->getUserName(),
+                $segment->getMid(),
+                $timestamp,
+                $fileName,
+                $tmName,
+                ! $this->isInternalFuzzy()
+            );
 
             if ($successful) {
                 $this->checkUpdateResponse($dataSent, $this->api->getResult());
@@ -465,12 +487,16 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
     private function getMetaData(object $found): array
     {
         $nameToShow = [
-            "documentName",
-            "matchType",
-            "author",
-            "timestamp",
-            "context",
-            "additionalInfo",
+            'segmentId',
+            'documentName',
+            'matchType',
+            'author',
+            'timestamp',
+            'context',
+            'additionalInfo',
+            'internalKey',
+            'sourceLang',
+            'targetLang',
         ];
         $result = [];
 
@@ -498,17 +524,19 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
     {
         $offsetTmId = null;
         $tmOffset = null;
+        $recordKey = null;
+        $targetKey = null;
 
         if (null !== $offset) {
-            @[$offsetTmId, $tmOffset] = explode(':', (string) $offset);
+            @[$offsetTmId, $recordKey, $targetKey] = explode(':', (string) $offset);
         }
 
-        if ('' !== $offsetTmId && null === $tmOffset) {
+        if ('' !== $offsetTmId && null === $recordKey && null === $targetKey) {
             throw new editor_Services_Connector_Exception('E1565', compact('offset'));
         }
 
-        if (null !== $tmOffset) {
-            $tmOffset = (int) $tmOffset;
+        if (null !== $recordKey && null !== $targetKey) {
+            $tmOffset = $recordKey . ':' . $targetKey;
         }
 
         $isSource = $field === 'source';
@@ -537,12 +565,12 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
 
             $numResults = self::CONCORDANCE_SEARCH_NUM_RESULTS - $resultsCount;
 
-            $successful = $this->api->search($searchString, $tmName, $field, $tmOffset, $numResults);
+            $successful = $this->api->concordanceSearch($searchString, $tmName, $field, $tmOffset, $numResults);
 
             if (! $successful && $this->needsReorganizing($this->api->getError(), $tmName)) {
                 $this->addReorganizeWarning();
                 $this->reorganizeTm($tmName);
-                $successful = $this->api->search($searchString, $tmName, $field, $tmOffset, $numResults);
+                $successful = $this->api->concordanceSearch($searchString, $tmName, $field, $tmOffset, $numResults);
             }
 
             if (! $successful) {
@@ -562,7 +590,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
 
             $results[] = $result->results;
             $resultsCount += count($result->results);
-            $resultList->setNextOffset($id . ':' . $result->NewSearchPosition);
+            $resultList->setNextOffset($result->NewSearchPosition ? $id . ':' . $result->NewSearchPosition : null);
 
             // if we get enough results then response them
             if (self::CONCORDANCE_SEARCH_NUM_RESULTS <= $resultsCount) {
@@ -602,10 +630,6 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
         return $this->queryTm($searchString, $dummySegment, 'source');
     }
 
-    /**
-     * (non-PHPdoc)
-     * @see editor_Services_Connector_FilebasedAbstract::delete()
-     */
     public function delete(): void
     {
         $successfullyDeleted = true;
@@ -696,7 +720,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
     public function getStatus(
         editor_Models_LanguageResources_Resource $resource,
         LanguageResource $languageResource = null,
-        ?string $tmName = null
+        ?string $tmName = null,
     ): string {
         $this->lastStatusInfo = '';
 
@@ -773,6 +797,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
     {
         $status = $apiResponse ? ($apiResponse->status ?? '') : '';
         $tmxImportStatus = $apiResponse ? ($apiResponse->tmxImportStatus ?? '') : '';
+        $reorganizeStatus = $apiResponse ? ($apiResponse->reorganizeStatus ?? '') : '';
 
         $lastStatusInfo = '';
         $result = LanguageResourceStatus::UNKNOWN;
@@ -832,15 +857,20 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
                         break;
                 }
 
-                break;
+                switch ($reorganizeStatus) {
+                    case 'reorganize':
+                        $result = LanguageResourceStatus::REORGANIZE_IN_PROGRESS;
 
-            case 'reorganize':
-                $result = LanguageResourceStatus::REORGANIZE_IN_PROGRESS;
+                        break;
 
-                break;
+                    case 'reorganize failed':
+                        $result = LanguageResourceStatus::REORGANIZE_FAILED;
 
-            case 'reorganize failed':
-                $result = LanguageResourceStatus::REORGANIZE_FAILED;
+                        break;
+
+                    default:
+                        break;
+                }
 
                 break;
 
@@ -1153,8 +1183,8 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
 
         $reorganized = $this->api->reorganizeTm($tmName);
 
-        if ($version === self::VERSION_0_5) {
-            $reorganized = $this->waitReorganizeFinished();
+        if ($version !== self::VERSION_0_4) {
+            $reorganized = $this->waitReorganizeFinished($tmName);
         }
 
         if (! $this->isInternalFuzzy()) {
@@ -1172,11 +1202,10 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
     {
         $this->resetReorganizingIfNeeded();
 
-        if ($this->getT5MemoryVersion() === self::VERSION_0_5) {
-            return $this->getStatus(
-                $this->resource,
-                tmName: $tmName
-            ) === LanguageResourceStatus::REORGANIZE_IN_PROGRESS;
+        if ($this->getT5MemoryVersion() !== self::VERSION_0_4) {
+            $status = $this->getStatus($this->resource, tmName: $tmName);
+
+            return $status === LanguageResourceStatus::REORGANIZE_IN_PROGRESS;
         }
 
         return $this->languageResource->getStatus() === LanguageResourceStatus::REORGANIZE_IN_PROGRESS;
@@ -1184,7 +1213,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
 
     public function isReorganizeFailed(?string $tmName = null): bool
     {
-        if ($this->getT5MemoryVersion() === self::VERSION_0_5) {
+        if ($this->getT5MemoryVersion() !== self::VERSION_0_4) {
             return $this->getStatus(
                 $this->resource,
                 tmName: $tmName
@@ -1229,13 +1258,13 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
         );
     }
 
-    private function waitReorganizeFinished(): bool
+    private function waitReorganizeFinished(?string $tmName = null): bool
     {
         $elapsedTime = 0;
         $sleepTime = 5;
 
         while ($elapsedTime < self::REORGANIZE_WAIT_TIME_SECONDS) {
-            if (! $this->isReorganizingAtTheMoment()) {
+            if (! $this->isReorganizingAtTheMoment($tmName)) {
                 return true;
             }
 
@@ -1307,7 +1336,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
 
         $resources = $this->api->getResult();
 
-        $version = str_starts_with($resources->Version ?? '', self::VERSION_0_5) ? self::VERSION_0_5 : self::VERSION_0_4;
+        $version = str_starts_with($resources->Version ?? '', self::VERSION_0_4) ? self::VERSION_0_4 : self::VERSION_0_5;
 
         if (! $this->isInternalFuzzy()) {
             // TODO In editor_Services_Manager::visitAllAssociatedTms language resource is initialized
@@ -1371,7 +1400,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
     private function queryTm(
         string $queryString,
         editor_Models_Segment $segment,
-        string $fileName
+        string $fileName,
     ): editor_Services_ServiceResult {
         $resultList = new editor_Services_ServiceResult();
         $resultList->setLanguageResource($this->languageResource);
@@ -1490,7 +1519,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
     private function importTmxIntoMemory(
         string $fileContent,
         string $tmName,
-        StripFramingTags $stripFramingTags
+        StripFramingTags $stripFramingTags,
     ): bool {
         $successful = false;
 
@@ -1793,27 +1822,25 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
     private function checkUpdateResponse(array $request, object $response): void
     {
         // Temporary disable the check until it is fixed
-        return;
-
-        $match =
-            $request['source'] === $response->source
-            && $request['target'] === $response->target
-            && mb_strtoupper($request['userName']) === $response->author
-            && $request['context'] === $response->context
-//            && $request['timestamp'] === $response->timestamp
-            && $request['fileName'] === $response->documentName;
-
-        if (! $match) {
-            $this->logger->error(
-                'E1586',
-                'Sent data does not match the response from t5memory in update call.',
-                [
-                    'languageResource' => $this->languageResource,
-                    'request' => $request,
-                    'response' => json_encode($response, JSON_PRETTY_PRINT),
-                ]
-            );
-        }
+        //        $match =
+        //            $request['source'] === $response->source
+        //            && $request['target'] === $response->target
+        //            && mb_strtoupper($request['userName']) === $response->author
+        //            && $request['context'] === $response->context
+        ////            && $request['timestamp'] === $response->timestamp
+        //            && $request['fileName'] === $response->documentName;
+        //
+        //        if (! $match) {
+        //            $this->logger->error(
+        //                'E1586',
+        //                'Sent data does not match the response from t5memory in update call.',
+        //                [
+        //                    'languageResource' => $this->languageResource,
+        //                    'request' => $request,
+        //                    'response' => json_encode($response, JSON_PRETTY_PRINT),
+        //                ]
+        //            );
+        //        }
     }
 
     /**

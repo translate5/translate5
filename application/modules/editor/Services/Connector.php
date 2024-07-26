@@ -43,7 +43,7 @@ use MittagQI\Translate5\Segment\TagRepair\HtmlProcessor;
  * @method void update(editor_Models_Segment $segment, bool $recheckOnUpdate = false, bool $rescheduleOnError = false, bool $useSegmentTimestamp = false) editor_Services_Connector_Abstract::update()
  * @method string getStatus(editor_Models_LanguageResources_Resource $resource, editor_Models_LanguageResources_LanguageResource $languageResource = null) returns the LanguageResource status
  * @method string getLastStatusInfo() returns the last store status info from the last getStatus call
- * @method string getTm($mime, string $tmName = '') editor_Services_Connector_FilebasedAbstract::getTm()
+ * @method string getTm($mime, string $tmName = '') FileBasedInterface::getTm()
  * @method boolean addTm(array $fileInfo = null,array $params=null) editor_Services_Connector_Abstract::addTm()
  * @method boolean addAdditionalTm(array $fileinfo = null, array $params = null) editor_Services_Connector_Abstract::addAdditionalTm()
  * @method void setConfig(Zend_Config $config) editor_Services_Connector_Abstract::setConfig(Zend_Config $config)
@@ -397,7 +397,7 @@ class editor_Services_Connector
         $model = ZfExtended_Factory::get(BatchResult::class);
 
         return $model->getResults(
-            $segment->getId(),
+            (string) $segment->getId(),
             $this->adapter->getLanguageResource()->getId()
         );
     }

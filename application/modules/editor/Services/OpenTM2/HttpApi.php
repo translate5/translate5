@@ -27,6 +27,7 @@ END LICENSE AND COPYRIGHT
 */
 
 use MittagQI\Translate5\Service\T5Memory;
+use MittagQI\Translate5\T5Memory\DTO\SearchDTO;
 use MittagQI\Translate5\T5Memory\Enum\StripFramingTags;
 
 /**
@@ -35,6 +36,10 @@ use MittagQI\Translate5\T5Memory\Enum\StripFramingTags;
 class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiAbstract
 {
     private const DATE_FORMAT = 'Ymd\THis\Z';
+
+    private const MARKUP_TABLE = 'OTMXUXLF';
+
+    private const REQUEST_ENCTYPE = 'application/json; charset=utf-8';
 
     public const MAX_STR_LENGTH = 2048;
 
@@ -69,7 +74,7 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
         $data->sourceLang = $this->fixLanguages->key($sourceLanguage);
 
         $http = $this->getHttp('POST');
-        $http->setRawData($this->jsonEncode($data), 'application/json; charset=utf-8');
+        $http->setRawData($this->jsonEncode($data), self::REQUEST_ENCTYPE);
 
         if ($this->processResponse($http->request())) {
             return $data->name;
@@ -93,7 +98,7 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
         $http->setConfig([
             'timeout' => $this->createTimeout(1200),
         ]);
-        $http->setRawData($this->jsonEncode($data), 'application/json; charset=utf-8');
+        $http->setRawData($this->jsonEncode($data), self::REQUEST_ENCTYPE);
 
         if ($this->processResponse($http->request())) {
             return $data->name;
@@ -126,7 +131,7 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
         $http->setConfig([
             'timeout' => $this->createTimeout(1200),
         ]);
-        $http->setRawData($this->jsonEncode($data), 'application/json; charset=utf-8');
+        $http->setRawData($this->jsonEncode($data), self::REQUEST_ENCTYPE);
 
         return $this->processResponse($http->request());
     }
@@ -165,7 +170,7 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
         $this->http->setMethod($method);
         $this->httpMethod = $method;
         $this->http->setHeaders('Accept-charset', 'UTF-8');
-        $this->http->setHeaders('Accept', 'application/json; charset=utf-8');
+        $this->http->setHeaders('Accept', self::REQUEST_ENCTYPE);
         $this->http->setConfig([
             'timeout' => $this->createTimeout(30),
         ]);
@@ -255,7 +260,8 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
     }
 
     /**
-     * checks the status of a language resource (if set), or just of the server (if no concrete language resource is given)
+     * checks the status of a language resource (if set), or just of the server (if no concrete language resource is
+     * given)
      * @return boolean
      */
     public function status(?string $tmName): bool
@@ -302,6 +308,7 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
 
         $json->sourceLang = $this->fixLanguages->key($this->languageResource->getSourceLangCode());
         $json->targetLang = $this->fixLanguages->key($this->languageResource->getTargetLangCode());
+        $json->markupTable = self::MARKUP_TABLE;
 
         if ($this->isToLong($queryString)) {
             $this->result = json_decode('{"ReturnValue":0,"ErrorMsg":"","NumOfFoundProposals":0}');
@@ -320,7 +327,7 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
         // so we take only the single filename at the moment
         $json->documentName = $filename;
 
-        $json->markupTable = 'OTMXUXLF'; //NEEDED otherwise t5memory crashes
+        $json->markupTable = self::MARKUP_TABLE; //NEEDED otherwise t5memory crashes
         $json->context = $segment->getMid(); // here MID (context was designed for dialog keys/numbers on translateable strings software)
 
         $http = $this->getHttpWithMemory('POST', $tmName, 'fuzzysearch');
@@ -339,7 +346,7 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
             //en-UK request first
             $jsonEnUk = clone $json;
             $jsonEnUk->targetLang = 'en-UK';
-            $http->setRawData($this->jsonEncode($jsonEnUk), 'application/json; charset=utf-8');
+            $http->setRawData($this->jsonEncode($jsonEnUk), self::REQUEST_ENCTYPE);
             $resultsUK = [];
             $resultUK = $this->processResponse($http->request());
             if ($resultUK) {
@@ -352,7 +359,7 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
             }
 
             //en-GB request
-            $http->setRawData($this->jsonEncode($json), 'application/json; charset=utf-8');
+            $http->setRawData($this->jsonEncode($json), self::REQUEST_ENCTYPE);
             $resultGB = $this->processResponse($http->request());
 
             if ($resultUK && $resultsUK->NumOfFoundProposals > 0) {
@@ -369,7 +376,7 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
             return $resultGB || $resultUK;
         }
 
-        $http->setRawData($this->jsonEncode($json), 'application/json; charset=utf-8');
+        $http->setRawData($this->jsonEncode($json), self::REQUEST_ENCTYPE);
 
         return $this->processResponse($http->request());
     }
@@ -382,12 +389,12 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
      * Note: Provide the returned search position NewSearchPosition as SearchPosition on
      * subsequenet calls to do a sequential search of the memory.
      */
-    public function search(
+    public function concordanceSearch(
         string $queryString,
         string $tmName,
         string $field,
-        int $searchPosition = null,
-        int $numResults = 20
+        string $searchPosition = null,
+        int $numResults = 20,
     ): bool {
         if ($this->isToLong($queryString)) {
             $this->result = json_decode('{"results":[]}');
@@ -402,7 +409,25 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
         $data->numResults = $numResults;
         $data->msSearchAfterNumResults = 250;
         $http = $this->getHttpWithMemory('POST', $tmName, 'concordancesearch');
-        $http->setRawData($this->jsonEncode($data), 'application/json; charset=utf-8');
+        $http->setRawData($this->jsonEncode($data), self::REQUEST_ENCTYPE);
+
+        return $this->processResponse($http->request());
+    }
+
+    public function search(string $tmName, ?string $searchPosition, ?int $numResults, SearchDTO $searchDTO): bool
+    {
+        $data = $this->getSearchData($searchDTO, $searchPosition, $numResults);
+        $http = $this->getHttpWithMemory('POST', $tmName, '/search');
+        $http->setRawData($this->jsonEncode($data), self::REQUEST_ENCTYPE);
+
+        return $this->processResponse($http->request());
+    }
+
+    public function deleteBatch(string $tmName, SearchDTO $searchDTO): bool
+    {
+        $data = $this->getSearchData($searchDTO);
+        $http = $this->getHttpWithMemory('POST', $tmName, '/entriesdelete');
+        $http->setRawData($this->jsonEncode($data), self::REQUEST_ENCTYPE);
 
         return $this->processResponse($http->request());
     }
@@ -418,11 +443,12 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
     public function update(
         string $source,
         string $target,
-        editor_Models_Segment $segment,
+        string $userName,
+        string $context,
+        string $timestamp,
         string $filename,
         string $tmName,
         bool $save2disk = true,
-        bool $useSegmentTimestamp = false
     ): bool {
         $this->error = null;
 
@@ -433,18 +459,14 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
             return false;
         }
 
-        $timestamp = $useSegmentTimestamp
-            ? (new DateTimeImmutable($segment->getTimestamp()))->format(self::DATE_FORMAT)
-            : $this->nowDate();
-
         $json->documentName = $filename; // 101 doc match
-        $json->author = $segment->getUserName();
+        $json->author = $userName;
         $json->timeStamp = $timestamp;
-        $json->context = $segment->getMid(); //INFO: this is segment stuff
+        $json->context = $context; //INFO: this is segment stuff
         // t5memory does not understand boolean parameters, so we have to convert them to 0/1
         $json->save2disk = $save2disk ? '1' : '0';
 
-        $http->setRawData($this->jsonEncode($json), 'application/json; charset=utf-8');
+        $http->setRawData($this->jsonEncode($json), self::REQUEST_ENCTYPE);
 
         return $this->processResponse($http->request());
     }
@@ -469,7 +491,34 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
         $json->context = '';
         $json->addInfo = $json->documentName;
 
-        $http->setRawData($this->jsonEncode($json), 'application/json; charset=utf-8');
+        $http->setRawData($this->jsonEncode($json), self::REQUEST_ENCTYPE);
+
+        return $this->processResponse($http->request());
+    }
+
+    public function deleteEntry(string $tmName, int $segmentId, int $recordKey, int $targetKey): bool
+    {
+        $request = [
+            'recordKey' => $recordKey,
+            'targetKey' => $targetKey,
+            'segmentId' => $segmentId,
+        ];
+
+        $http = $this->getHttpWithMemory('POST', $tmName, 'entrydelete');
+        $http->setRawData($this->jsonEncode($request), self::REQUEST_ENCTYPE);
+
+        return $this->processResponse($http->request());
+    }
+
+    public function getEntry(string $tmName, int $recordKey, int $targetKey): bool
+    {
+        $request = [
+            'recordKey' => $recordKey,
+            'targetKey' => $targetKey,
+        ];
+
+        $http = $this->getHttpWithMemory('POST', $tmName, 'getentry');
+        $http->setRawData($this->jsonEncode($request), self::REQUEST_ENCTYPE);
 
         return $this->processResponse($http->request());
     }
@@ -539,12 +588,39 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
         $json->source = $source;
         $json->target = $target;
         $json->type = "Manual";
-        $json->markupTable = "OTMXUXLF"; //fixed markup table for our XLIFF subset
+        $json->markupTable = self::MARKUP_TABLE; //fixed markup table for our XLIFF subset
         $json->sourceLang = $this->fixLanguages->key($this->languageResource->getSourceLangCode());
         $json->targetLang = $this->fixLanguages->key($this->languageResource->getTargetLangCode());
-        $json->timeStamp = $this->nowDate();
+        $json->timeStamp = $this->getNowDate();
 
         return $json;
+    }
+
+    private function getSearchData(SearchDTO $searchDTO, ?string $searchPosition = null, ?int $numResults = null): array
+    {
+        $searchOptions = ', CASEINSENSETIVE';
+
+        return [
+            'source' => $searchDTO->source,
+            'sourceSearchMode' => $searchDTO->sourceMode . $searchOptions,
+            'target' => $searchDTO->target,
+            'targetSearchMode' => $searchDTO->targetMode . $searchOptions,
+            'sourceLang' => $searchDTO->sourceLanguage,
+            'targetLang' => $searchDTO->targetLanguage,
+            'document' => $searchDTO->document,
+            'documentSearchMode' => $searchDTO->documentMode . $searchOptions,
+            'author' => $searchDTO->author,
+            'authorSearchMode' => $searchDTO->authorMode . $searchOptions,
+            'addInfo' => $searchDTO->additionalInfo,
+            'addInfoSearchMode' => $searchDTO->additionalInfoMode . $searchOptions,
+            'context' => $searchDTO->context,
+            'contextSearchMode' => $searchDTO->contextMode . $searchOptions,
+            'timestampSpanStart' => $this->getDate($searchDTO->creationDateFrom),
+            'timestampSpanEnd' => $this->getDate($searchDTO->creationDateTo),
+            'onlyCountSegments' => $searchDTO->onlyCount ? '1' : '0',
+            'searchPosition' => (string) $searchPosition,
+            'numResults' => $numResults,
+        ];
     }
 
     /**
@@ -593,9 +669,14 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
     /**
      * returns the current time stamp in the expected format for OpenTM2
      */
-    protected function nowDate()
+    public function getNowDate(): string
     {
         return gmdate(self::DATE_FORMAT);
+    }
+
+    public function getDate(int $timestamp): string
+    {
+        return gmdate(self::DATE_FORMAT, $timestamp);
     }
 
     /**
