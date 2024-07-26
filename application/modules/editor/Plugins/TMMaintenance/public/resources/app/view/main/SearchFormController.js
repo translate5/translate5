@@ -10,6 +10,30 @@ Ext.define('TMMaintenance.view.main.SearchFormController', {
         },
     },
 
+    filterSourceLanguage: function (candidateRecord) {
+        const value = Ext.ComponentQuery.query('searchform')[0].getValues().sourceLanguage;
+
+        if (!value) {
+            return true;
+        }
+
+        return candidateRecord.get('label').toLowerCase().includes(
+            value.toLowerCase()
+        );
+    },
+
+    filterTargetLanguage: function (candidateRecord) {
+        const value = Ext.ComponentQuery.query('searchform')[0].getValues().targetLanguage;
+
+        if (!value) {
+            return true;
+        }
+
+        return candidateRecord.get('label').toLowerCase().includes(
+            value.toLowerCase()
+        );
+    },
+
     onSelectTmPress: function () {
         this.getView().up('app-main').down('#selectTmDialog').show();
     },
@@ -63,7 +87,8 @@ Ext.define('TMMaintenance.view.main.SearchFormController', {
 
     onDeleteBatch: function () {
         const me = this;
-        me.getView().up('app-main').down('#deleteBatchDialog');
+        const dialog = me.getView().up('app-main').down('#deleteBatchDialog');
+        dialog.mask();
 
         Ext.Ajax.request({
             url: '/editor/plugins_tmmaintenance_api/delete-batch/',
@@ -71,14 +96,20 @@ Ext.define('TMMaintenance.view.main.SearchFormController', {
             async: false,
             method: 'POST',
             success: function (xhr) {
-                me.getView().up('app-main').down('#deleteBatchDialog').hide();
+                const mainList = Ext.getCmp('mainlist');
+                mainList.setTitle(me.getStrings().title);
+                mainList.store.removeAll();
+                dialog.unmask();
+                dialog.hide();
             },
             error: function (xhr) {
+                dialog.hide();
                 me.showServerError(JSON.parse(xhr.responseText));
                 console.log('Error deleting batch');
                 console.log(xhr);
             },
             failure: function (xhr) {
+                dialog.hide();
                 me.showServerError(JSON.parse(xhr.responseText));
                 console.log('Error deleting batch');
                 console.log(xhr);
