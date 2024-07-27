@@ -38,7 +38,7 @@ END LICENSE AND COPYRIGHT
 Ext.define('Editor.model.LanguageResources.SyncAssoc', {
     extend: 'Ext.data.Model',
     fields: [
-        {name: 'id', type: 'int'},
+        {name: 'id', type: 'string'},
         {name: 'sourceLanguageResourceId', type: 'int'},
         {name: 'sourceLanguageResourceName', type: 'string'},
         {name: 'targetLanguageResourceId', type: 'int'},
@@ -47,7 +47,7 @@ Ext.define('Editor.model.LanguageResources.SyncAssoc', {
     idProperty: 'id',
     proxy: {
         type: 'rest',
-        url: Editor.data.restpath + 'languageresourcesyncassoc',
+        url: Editor.data.restpath + 'languageresourcesyncconnection',
         reader: {
             rootProperty: 'rows',
             type: 'json'

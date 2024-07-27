@@ -29,6 +29,7 @@ END LICENSE AND COPYRIGHT
 use editor_Models_Segment_UtilityBroker as UtilityBroker;
 use editor_Models_Segment_Whitespace as Whitespace;
 use MittagQI\Translate5\ContentProtection\ContentProtector;
+use MittagQI\Translate5\Integration\FileBasedInterface;
 use MittagQI\Translate5\LanguageResource\Pretranslation\BatchResult;
 use MittagQI\Translate5\Segment\TagRepair\HtmlProcessor;
 
@@ -74,6 +75,9 @@ use MittagQI\Translate5\Segment\TagRepair\HtmlProcessor;
  *
  * @see editor_Services_Connector_Abstract::isInternalFuzzy()
  * @method bool isInternalFuzzy()
+ *
+ * @see editor_Services_Connector_Abstract::setCustomerId
+ * @method void setCustomerId(int $customerId)
  */
 class editor_Services_Connector
 {
@@ -135,12 +139,21 @@ class editor_Services_Connector
         $this->adapter->connectTo($languageResource, $sourceLang, $targetLang);
     }
 
+    public function getValidExportTypes(): array
+    {
+        if ($this->adapter instanceof FileBasedInterface) {
+            return $this->adapter->getValidExportTypes();
+        }
+
+        return [];
+    }
+
     /**
      * Connects to a given resource only, for requests not using a concrete language resource (ping calls for example)
      */
     protected function connectToResourceOnly(
         editor_Models_LanguageResources_Resource $resource,
-        ?Zend_Config $config = null
+        ?Zend_Config $config = null,
     ): void {
         if (method_exists($resource, 'getConnector')) {
             $connector = $resource->getConnector();
@@ -460,5 +473,14 @@ class editor_Services_Connector
         }
 
         return false;
+    }
+
+    public function export(string $mime): string
+    {
+        if (method_exists($this->adapter, 'export')) {
+            return $this->adapter->export($mime);
+        }
+
+        return '';
     }
 }

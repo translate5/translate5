@@ -34,6 +34,7 @@ END LICENSE AND COPYRIGHT
 use MittagQI\Translate5\LanguageResource\CleanupAssociation\Customer as CustomerAssocCleanup;
 use MittagQI\Translate5\LanguageResource\CleanupAssociation\Task as TaskAssocCleanup;
 use MittagQI\Translate5\LanguageResource\CrossSynchronization\CrossLanguageResourceSynchronizationService;
+use MittagQI\Translate5\LanguageResource\CustomerAssoc\CustomerAssocService;
 
 class editor_Models_LanguageResources_Remover
 {
@@ -44,6 +45,8 @@ class editor_Models_LanguageResources_Remover
 
     private CrossLanguageResourceSynchronizationService $crossLanguageResourceSynchronizationService;
 
+    private CustomerAssocService $customerAssocService;
+
     /**
      * Sets the languageresource to be removed from system
      */
@@ -51,6 +54,7 @@ class editor_Models_LanguageResources_Remover
     {
         $this->entity = $languageResource;
         $this->crossLanguageResourceSynchronizationService = CrossLanguageResourceSynchronizationService::create();
+        $this->customerAssocService = CustomerAssocService::create();
     }
 
     /**
@@ -81,7 +85,8 @@ class editor_Models_LanguageResources_Remover
             $customersLeft = ($forced) ? [] : $this->entity->getCustomers();
             $this->checkOrCleanAssociations($forced, $customersLeft);
 
-            $this->crossLanguageResourceSynchronizationService->deleteRelatedConnections($this->entity);
+            $this->crossLanguageResourceSynchronizationService->deleteRelatedConnections((int) $this->entity->getId());
+            $this->customerAssocService->separateByLanguageResource((int) $this->entity->getId());
 
             //delete the entity in the DB
             $this->entity->delete();

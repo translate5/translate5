@@ -580,6 +580,7 @@ class editor_Plugins_TermImport_Services_Import
         /* @var $termCollection TermCollection */
         $termCollection = ZfExtended_Factory::get(TermCollection::class);
         $termCollectionI = $termCollection->loadByName($termCollectionName);
+        $customers = [];
 
         // If the term collection exists
         if ($termCollectionI) {

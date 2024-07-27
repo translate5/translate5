@@ -30,7 +30,9 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\LanguageResource;
 
+use editor_Models_LanguageResources_CustomerAssoc as CustomerAssoc;
 use editor_Models_LanguageResources_LanguageResource as LanguageResource;
+use editor_Models_LanguageResources_Languages as LanguageResourceLanguages;
 use ZfExtended_Factory;
 use ZfExtended_Models_Entity_NotFoundException;
 
@@ -47,30 +49,116 @@ class LanguageResourceRepository
         return $languageResource;
     }
 
+    public function save(LanguageResource $lr): void
+    {
+        $lr->save();
+    }
+
     /**
      * @return iterable<LanguageResource>
      */
-    public function getRelatedByLanguageCombinationsAndCustomers(
-        LanguageResource $languageResource,
-        ?string $serviceName = null
-    ): iterable {
-        $adapter = $languageResource->db->getAdapter();
+    public function getRelatedByLanguageCombinationsAndCustomers(LanguageResource $source): iterable
+    {
+        $db = $source->db;
 
-        $sql = 'SELECT distinct (lr.id) as lr_id FROM LEK_languageresources lr
-                INNER JOIN LEK_languageresources_languages ll ON lr.id = ll.languageResourceId
-                INNER JOIN LEK_languageresources_customerassoc ca ON lr.id = ca.languageResourceId
-                WHERE (
-                    ll.sourceLang IN (' . implode(',', (array) $languageResource->getSourceLang()) . ')
-                    OR ll.targetLang IN (' . implode(',', (array) $languageResource->getTargetLang()) . ')
-                )
-                AND ca.customerId IN (' . implode(',', $languageResource->getCustomers()) . ')';
+        $lrLangTable = ZfExtended_Factory::get(LanguageResourceLanguages::class)->db->info($db::NAME);
+        $lrCustomerTable = ZfExtended_Factory::get(CustomerAssoc::class)->db->info($db::NAME);
 
-        if ($serviceName) {
-            $sql .= ' AND lr.serviceName = ' . $adapter->quote($serviceName);
+        $lrsWithSameCustomersSelect = $db->select()
+            ->setIntegrityCheck(false)
+            ->from(
+                [
+                    'LanguageResources' => $db->info($db::NAME),
+                ],
+            )
+            ->join(
+                [
+                    'LanguageResourceLanguages' => $lrLangTable,
+                ],
+                'LanguageResourceLanguages.languageResourceId = LanguageResources.id',
+                []
+            )
+            ->join(
+                [
+                    'CustomerAssoc' => $lrCustomerTable,
+                ],
+                'CustomerAssoc.languageResourceId = LanguageResources.id',
+                []
+            )
+            ->where('LanguageResourceLanguages.sourceLang IN (?)', (array) $source->getSourceLang())
+            ->where('LanguageResourceLanguages.targetLang IN (?)', (array) $source->getTargetLang())
+            ->where('CustomerAssoc.customerId IN (?)', $source->getCustomers())
+            ->order('LanguageResources.serviceName');
+
+        $languageResource = ZfExtended_Factory::get(LanguageResource::class);
+
+        foreach ($db->fetchAll($lrsWithSameCustomersSelect)->toArray() as $row) {
+            $languageResource->hydrate($row);
+
+            yield clone $languageResource;
+        }
+    }
+
+    public function languageResourceWithServiceNameAndCustomerIdExists(string $serviceName, int ...$customerIds): bool
+    {
+        $languageResource = ZfExtended_Factory::get(LanguageResource::class);
+        $db = $languageResource->db;
+
+        $lrCustomerTable = ZfExtended_Factory::get(CustomerAssoc::class)->db->info($db::NAME);
+
+        $select = $db->select()
+            ->setIntegrityCheck(false)
+            ->from(
+                [
+                    'LanguageResources' => $db->info($db::NAME),
+                ],
+            )
+            ->join(
+                [
+                    'CustomerAssoc' => $lrCustomerTable,
+                ],
+                'CustomerAssoc.languageResourceId = LanguageResources.id',
+                []
+            )
+            ->where('CustomerAssoc.customerId IN (?)', $customerIds)
+            ->where('LanguageResources.serviceName = ?', $serviceName)
+            ->limit(1);
+
+        return ! empty($db->fetchRow($select)?->toArray());
+    }
+
+    public function findOneByServiceNameAndCustomerId(string $serviceName, int $customerId): ?LanguageResource
+    {
+        $languageResource = ZfExtended_Factory::get(LanguageResource::class);
+        $db = $languageResource->db;
+
+        $lrCustomerTable = ZfExtended_Factory::get(CustomerAssoc::class)->db->info($db::NAME);
+
+        $select = $db->select()
+            ->setIntegrityCheck(false)
+            ->from(
+                [
+                    'LanguageResources' => $db->info($db::NAME),
+                ],
+            )
+            ->join(
+                [
+                    'CustomerAssoc' => $lrCustomerTable,
+                ],
+                'CustomerAssoc.languageResourceId = LanguageResources.id',
+                []
+            )
+            ->where('CustomerAssoc.customerId = ?', $customerId)
+            ->where('LanguageResources.serviceName = ?', $serviceName);
+
+        $row = $db->fetchRow($select);
+
+        if (empty($row?->toArray())) {
+            return null;
         }
 
-        foreach ($adapter->query($sql)->fetchAll() as $row) {
-            yield $this->get((int) $row['lr_id']);
-        }
+        $languageResource->hydrate($row);
+
+        return $languageResource;
     }
 }

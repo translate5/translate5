@@ -30,7 +30,7 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\LanguageResource\CrossSynchronization\Events;
 
-use editor_Models_LanguageResources_CustomerAssoc as Association;
+use editor_Models_LanguageResources_LanguageResource as LanguageResource;
 use MittagQI\Translate5\LanguageResource\CrossSynchronization\CrossSynchronizationConnection;
 use ZfExtended_EventManager;
 use ZfExtended_Factory;
@@ -49,35 +49,22 @@ class EventEmitter
 
     public function triggerConnectionCreatedEvent(CrossSynchronizationConnection $connection): void
     {
-        $this->eventManager->trigger(EventType::ConnectionCreated->value, argv: [
-            'connection' => $connection,
+        $this->eventManager->trigger(ConnectionCreatedEvent::class, argv: [
+            'event' => new ConnectionCreatedEvent($connection),
         ]);
     }
 
     public function triggerConnectionDeleted(CrossSynchronizationConnection $deletedConnection): void
     {
-        $this->eventManager->trigger(EventType::ConnectionDeleted->value, argv: [
-            'deletedConnection' => $deletedConnection,
+        $this->eventManager->trigger(ConnectionDeletedEvent::class, argv: [
+            'event' => new ConnectionDeletedEvent($deletedConnection),
         ]);
     }
 
-    public function triggerNewCustomerAssociatedWithConnectionEvent(
-        CrossSynchronizationConnection $connection,
-        Association $association
-    ): void {
-        $this->eventManager->trigger(EventType::NewCustomerAssociatedWithConnection->value, argv: [
-            'connection' => $connection,
-            'association' => $association,
-        ]);
-    }
-
-    public function triggerCustomerWasSeparatedFromConnectionEvent(
-        CrossSynchronizationConnection $connection,
-        Association $deletedAssociation
-    ): void {
-        $this->eventManager->trigger(EventType::CustomerWasSeparatedFromConnection->value, argv: [
-            'connection' => $connection,
-            'deletedAssociation' => $deletedAssociation,
+    public function triggerLanguageResourcesConnected(LanguageResource $source, LanguageResource $target): void
+    {
+        $this->eventManager->trigger(LanguageResourcesConnectedEvent::class, argv: [
+            'event' => new LanguageResourcesConnectedEvent($source, $target),
         ]);
     }
 }

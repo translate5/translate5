@@ -28,11 +28,15 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\LanguageResource\CustomerAssoc\Events;
+namespace MittagQI\Translate5\LanguageResource\CrossSynchronization\Dto;
 
-enum EventType: string
+use editor_Models_LanguageResources_LanguageResource as LanguageResource;
+
+final class LanguageResourcePair
 {
-    case AssociationCreated = 'languageResource.customerAssoc.association.created';
-
-    case AssociationDeleted = 'languageResource.customerAssoc.association.deleted';
+    public function __construct(
+        public readonly LanguageResource $source,
+        public readonly LanguageResource $target,
+    ) {
+    }
 }

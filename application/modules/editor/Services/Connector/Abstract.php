@@ -128,7 +128,8 @@ abstract class editor_Services_Connector_Abstract
     protected $resource;
 
     /**
-     * Using Remover Tag Handler class as default. If needed other, set the class here in the concrete implementation class
+     * Using Remover Tag Handler class as default. If needed other, set the class here in the concrete implementation
+     * class
      * @var string
      */
     protected $tagHandlerClass = 'editor_Services_Connector_TagHandler_Remover';
@@ -170,10 +171,13 @@ abstract class editor_Services_Connector_Abstract
     protected $htmlTagSupport = false;
 
     /**
-     *  Is the connector generally able to support Internal Tags in the ->translate() API; see ::canTranslateInternalTags
+     *  Is the connector generally able to support Internal Tags in the ->translate() API; see
+     * ::canTranslateInternalTags
      * @var bool
      */
     protected $internalTagSupport = false;
+
+    private ?int $customerId = null;
 
     /**
      * initialises the internal result list
@@ -214,7 +218,7 @@ abstract class editor_Services_Connector_Abstract
     public function connectTo(
         editor_Models_LanguageResources_LanguageResource $languageResource,
         $sourceLang,
-        $targetLang
+        $targetLang,
     ) {
         $this->resource = $languageResource->getResource();
         $this->languageResource = $languageResource;
@@ -288,7 +292,8 @@ abstract class editor_Services_Connector_Abstract
     }
 
     /**
-     * Sets the internal stored resource, needed for connections without a concrete language resource (pinging for example)
+     * Sets the internal stored resource, needed for connections without a concrete language resource (pinging for
+     * example)
      */
     public function setResource(editor_Models_LanguageResources_Resource $resource)
     {
@@ -401,7 +406,7 @@ abstract class editor_Services_Connector_Abstract
      */
     abstract public function getStatus(
         editor_Models_LanguageResources_Resource $resource,
-        editor_Models_LanguageResources_LanguageResource $languageResource = null
+        editor_Models_LanguageResources_LanguageResource $languageResource = null,
     ): string;
 
     /**
@@ -503,7 +508,8 @@ abstract class editor_Services_Connector_Abstract
     }
 
     /**
-     * By default batch queries are not supported. The according editor_Services_Connector_BatchTrait trait must be used in the connector in order to enable batch queries.
+     * By default batch queries are not supported. The according editor_Services_Connector_BatchTrait trait must be
+     * used in the connector in order to enable batch queries.
      * @return boolean
      */
     public function isBatchQuery(): bool
@@ -529,6 +535,16 @@ abstract class editor_Services_Connector_Abstract
         ], $this->logger->getDomain());
     }
 
+    public function setCustomerId(int $customerId): void
+    {
+        $this->customerId = $customerId;
+    }
+
+    protected function getCustomerId(): ?int
+    {
+        return $this->customerId;
+    }
+
     public function setConfig(Zend_Config $config)
     {
         $this->config = $config;
@@ -551,10 +567,10 @@ abstract class editor_Services_Connector_Abstract
 
     /**
      * @return bool
-     * Retrieves, if the connector supports handling of HTML tags in the ->translate() API which then will not be stripped
-     * This API currently is only used by InstantTranslate and will perform an automatic tag-repair
-     * Be aware that the markup is expected to be valid !
-     * The general capabilities for this (e.g. when pretranslating) are configured via the tag-handler
+     * Retrieves, if the connector supports handling of HTML tags in the ->translate() API which then will not be
+     *     stripped This API currently is only used by InstantTranslate and will perform an automatic tag-repair Be
+     *     aware that the markup is expected to be valid ! The general capabilities for this (e.g. when pretranslating)
+     *     are configured via the tag-handler
      */
     public function canTranslateHtmlTags(): bool
     {
@@ -563,8 +579,8 @@ abstract class editor_Services_Connector_Abstract
 
     /**
      * @return bool
-     * Retrieves, if the connector supports handling of Internal tags in the ->translate() API which then will not be stripped
-     * This API currently is only used by InstantTranslate
+     * Retrieves, if the connector supports handling of Internal tags in the ->translate() API which then will not be
+     *     stripped This API currently is only used by InstantTranslate
      */
     public function canTranslateInternalTags(): bool
     {

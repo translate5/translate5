@@ -44,6 +44,9 @@ END LICENSE AND COPYRIGHT
  *
  * @method string getPivotAsDefault()
  * @method void setPivotAsDefault(bool $pivotAsDefault)
+ *
+ * @method string getLanguageResourceServiceName()
+ * @method void setLanguageResourceServiceName(string $serviceName)
  */
 class editor_Models_LanguageResources_CustomerAssoc extends ZfExtended_Models_Entity_Abstract
 {

@@ -77,4 +77,16 @@ class LanguageRepository
             return null;
         }
     }
+
+    public function findByRfc5646(string $rfc): ?editor_Models_Languages
+    {
+        try {
+            $language = \ZfExtended_Factory::get(editor_Models_Languages::class);
+            $language->loadByRfc5646($rfc);
+
+            return $language;
+        } catch (ZfExtended_Models_Entity_NotFoundException) {
+            return null;
+        }
+    }
 }

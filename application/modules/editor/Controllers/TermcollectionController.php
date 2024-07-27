@@ -142,7 +142,7 @@ class editor_TermcollectionController extends ZfExtended_RestController
         $languages = ZfExtended_Factory::get('editor_Models_Languages');
         /* @var $languages editor_Models_Languages */
         $languages->loadByRfc5646($lang);
-        $langs = $languages->getFuzzyLanguages($languages->getId());
+        $langs = $languages->getFuzzyLanguages((int) $languages->getId());
 
         $termCollection = ZfExtended_Factory::get('editor_Models_TermCollection_TermCollection');
         /* @var $termCollection editor_Models_TermCollection_TermCollection */

@@ -234,7 +234,7 @@ class editor_Models_TermCollection_TermCollection extends editor_Models_Language
         $model->setLanguageResourceId($collectionId);
         $model->setTaskGuid($taskGuid);
         $model->setSegmentsUpdateable(false);
-        $model->setAutoCreatedOnImport(true);
+        $model->setAutoCreatedOnImport(1);
         $model->save();
     }
 

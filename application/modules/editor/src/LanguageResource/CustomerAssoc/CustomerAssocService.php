@@ -31,18 +31,23 @@ declare(strict_types=1);
 namespace MittagQI\Translate5\LanguageResource\CustomerAssoc;
 
 use editor_Models_LanguageResources_CustomerAssoc as Association;
+use editor_Models_LanguageResources_LanguageResource as LanguageResource;
+use MittagQI\Translate5\Customer\CustomerRepository;
 use MittagQI\Translate5\LanguageResource\CustomerAssoc\DTO\AssociationFormValues;
 use MittagQI\Translate5\LanguageResource\CustomerAssoc\Events\EventEmitter;
-use MittagQI\Translate5\LanguageResource\CustomerRepository;
+use MittagQI\Translate5\LanguageResource\LanguageResourceRepository;
 use ZfExtended_Factory;
 use ZfExtended_Models_Entity_NotFoundException;
 
 class CustomerAssocService
 {
+    private array $cachedLanguageResources = [];
+
     public function __construct(
         private EventEmitter $eventEmitter,
         private CustomerAssocRepository $assocRepository,
         private CustomerRepository $customerRepository,
+        private LanguageResourceRepository $languageResourceRepository,
     ) {
     }
 
@@ -52,6 +57,7 @@ class CustomerAssocService
             EventEmitter::create(),
             new CustomerAssocRepository(),
             new CustomerRepository(),
+            new LanguageResourceRepository(),
         );
     }
 
@@ -95,13 +101,17 @@ class CustomerAssocService
         bool $writeAsDefault = false,
         bool $pivotAsDefault = false,
     ): Association {
+        $languageResource = $this->getLanguageResource($languageResourceId);
+
         $model = ZfExtended_Factory::get(Association::class);
-        $model->setLanguageResourceId($languageResourceId);
+        $model->setLanguageResourceId((int) $languageResource->getId());
+        $model->setLanguageResourceServiceName($languageResource->getServiceName());
         $model->setCustomerId($customerId);
         $model->setUseAsDefault($useAsDefault);
         $model->setWriteAsDefault($writeAsDefault);
         $model->setPivotAsDefault($pivotAsDefault);
-        $model->save();
+
+        $this->assocRepository->save($model);
 
         $this->eventEmitter->triggerAssociationCreatedEvent($model);
 
@@ -115,6 +125,20 @@ class CustomerAssocService
     {
         foreach ($customerIds as $customerId) {
             $this->associate($languageResourceId, (int) $customerId);
+        }
+    }
+
+    public function separateByCustomer(int $customerId): void
+    {
+        foreach ($this->assocRepository->getByCustomer($customerId) as $assoc) {
+            $this->delete($assoc);
+        }
+    }
+
+    public function separateByLanguageResource(int $languageResourceId): void
+    {
+        foreach ($this->assocRepository->getByLanguageResource($languageResourceId) as $assoc) {
+            $this->delete($assoc);
         }
     }
 
@@ -133,8 +157,17 @@ class CustomerAssocService
     {
         $clone = clone $assoc;
 
-        $assoc->delete();
+        $this->assocRepository->delete($assoc);
 
         $this->eventEmitter->triggerAssociationDeleted($clone);
+    }
+
+    private function getLanguageResource(int $languageResourceId): LanguageResource
+    {
+        if (! isset($this->cachedLanguageResources[$languageResourceId])) {
+            $this->cachedLanguageResources[$languageResourceId] = $this->languageResourceRepository->get($languageResourceId);
+        }
+
+        return $this->cachedLanguageResources[$languageResourceId];
     }
 }

@@ -28,19 +28,15 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\LanguageResource;
+namespace MittagQI\Translate5\LanguageResource\CrossSynchronization\Events;
 
-use editor_Models_Customer_Customer as Customer;
-use ZfExtended_Factory;
-use ZfExtended_Models_Entity_NotFoundException;
+use editor_Models_LanguageResources_LanguageResource as LanguageResource;
 
-class CustomerRepository
+final class LanguageResourcesConnectedEvent
 {
-    /**
-     * @throws ZfExtended_Models_Entity_NotFoundException
-     */
-    public function getDefaultCustomer(): Customer
-    {
-        return ZfExtended_Factory::get(Customer::class)->loadByDefaultCustomer();
+    public function __construct(
+        public readonly LanguageResource $source,
+        public readonly LanguageResource $target,
+    ) {
     }
 }

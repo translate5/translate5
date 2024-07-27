@@ -14,7 +14,8 @@ class LanguagePair
         public readonly int $targetId,
         public readonly string $sourceCode,
         public readonly string $targetCode,
-    ) {}
+    ) {
+    }
 
     public static function fromLanguageResource(LanguageResource $languageResource): self
     {

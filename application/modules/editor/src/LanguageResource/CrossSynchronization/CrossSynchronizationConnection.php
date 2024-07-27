@@ -44,6 +44,8 @@ use ZfExtended_Models_Entity_Abstract;
  * @method void setTargetLanguageResourceId(int $id)
  * @method string getTargetType()
  * @method void setTargetType(string $type)
+ * @method string getCustomerId()
+ * @method void setCustomerId(int $customerId)
  */
 class CrossSynchronizationConnection extends ZfExtended_Models_Entity_Abstract
 {

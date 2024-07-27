@@ -26,9 +26,9 @@
 -- */
 
 INSERT INTO `Zf_acl_rules` (`module`, `role`, `resource`, `right`) VALUES
-('editor', 'clientpm', 'editor_languageresourcesyncassoc', 'all'),
-('editor', 'pm', 'editor_languageresourcesyncassoc', 'all'),
-('editor', 'pmlight', 'editor_languageresourcesyncassoc', 'all'),
+('editor', 'clientpm', 'editor_languageresourcesyncconnection', 'all'),
+('editor', 'pm', 'editor_languageresourcesyncconnection', 'all'),
+('editor', 'pmlight', 'editor_languageresourcesyncconnection', 'all'),
 ('editor', 'clientpm', 'editor_languageresourcesync', 'all'),
 ('editor', 'pm', 'editor_languageresourcesync', 'all'),
 ('editor', 'pmlight', 'editor_languageresourcesync', 'all')

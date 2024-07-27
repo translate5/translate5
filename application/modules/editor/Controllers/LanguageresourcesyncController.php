@@ -28,6 +28,7 @@ END LICENSE AND COPYRIGHT
 
 use editor_Models_LanguageResources_LanguageResource as LanguageResource;
 use MittagQI\Translate5\LanguageResource\CrossSynchronization\CrossLanguageResourceSynchronizationService;
+use MittagQI\Translate5\LanguageResource\CrossSynchronization\SynchronisationDirigent;
 
 /**
  * Controller for the LanguageResources Associations
@@ -66,12 +67,10 @@ class editor_LanguageresourcesyncController extends ZfExtended_RestController
         $this->view->total = count($lrs);
     }
 
-    public function connectavailableAction(): void
+    public function queuesynchronizeallAction(): void
     {
         $this->entityLoad();
 
-        $resourceSynchronizationService = CrossLanguageResourceSynchronizationService::create();
-
-        $resourceSynchronizationService->connectAllAvailable($this->entity);
+        SynchronisationDirigent::create()->queueSynchronizationWhere($this->entity);
     }
 }

@@ -30,24 +30,33 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\LanguageResource\CrossSynchronization;
 
-use editor_Models_LanguageResources_CustomerAssoc as LanguageResourceCustomers;
+use editor_Models_LanguageResources_CustomerAssoc as CustomerAssoc;
 use editor_Models_LanguageResources_LanguageResource as LanguageResource;
-use editor_Models_LanguageResources_Languages as LanguageResourceLanguages;
 use editor_Services_Manager;
 use Generator;
+use MittagQI\Translate5\LanguageResource\CrossSynchronization\Dto\LanguageResourcePair;
 use MittagQI\Translate5\LanguageResource\CrossSynchronization\Events\EventEmitter;
 use MittagQI\Translate5\LanguageResource\LanguageResourceRepository;
-use ZfExtended_Factory;
+use ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey;
 
 class CrossLanguageResourceSynchronizationService
 {
+    /**
+     * @var array<int, LanguageResource>
+     */
+    private array $cachedLanguageResources = [];
+
+    /**
+     * @var array<string, SynchronisationInterface>
+     */
+    private array $cachedSyncIntegration = [];
+
     public function __construct(
         private editor_Services_Manager $serviceManager,
         private EventEmitter $eventEmitter,
         private LanguageResourceRepository $languageResourceRepository,
         private CrossSynchronizationConnectionRepository $connectionRepository,
     ) {
-        $this->logger = \Zend_Registry::get('logger')->cloneMe('editor.languageresource.synchronization');
     }
 
     public static function create(): self
@@ -60,43 +69,49 @@ class CrossLanguageResourceSynchronizationService
         );
     }
 
-    public function isConnectionCustomer(int $customerId, CrossSynchronizationConnection $connection): bool
+    /**
+     * @return iterable<LanguageResourcePair>
+     */
+    public function getConnectedPairsByAssoc(CustomerAssoc $assoc): iterable
     {
-        $source = $this->languageResourceRepository->get((int) $connection->getSourceLanguageResourceId());
-
-        if (! in_array("$customerId", $source->getCustomers(), true)) {
-            return false;
+        foreach ($this->connectionRepository->getConnectedPairsByAssoc($assoc) as $pair) {
+            yield new LanguageResourcePair(
+                $this->getCachedLanguageResource($pair['sourceId']),
+                $this->getCachedLanguageResource($pair['targetId']),
+            );
         }
+    }
 
-        $target = $this->languageResourceRepository->get((int) $connection->getTargetLanguageResourceId());
-
-        if (! in_array("$customerId", $target->getCustomers(), true)) {
-            return false;
-        }
-
-        return true;
+    public function pairHasConnection(int $sourceId, int $targetId): bool
+    {
+        return $this->connectionRepository->hasConnectionsForPair($sourceId, $targetId);
     }
 
     public function createConnection(
         LanguageResource $source,
         LanguageResource $target,
+        int $customerId,
     ): CrossSynchronizationConnection {
-        $connection = ZfExtended_Factory::get(CrossSynchronizationConnection::class);
-        $connection->setSourceLanguageResourceId((int) $source->getId());
-        $connection->setSourceType($source->getResource()->getService());
-        $connection->setTargetLanguageResourceId((int) $target->getId());
-        $connection->setTargetType($target->getResource()->getService());
-
-        $connection->save();
+        $connection = $this->connectionRepository->createConnection($source, $target, $customerId);
 
         $this->eventEmitter->triggerConnectionCreatedEvent($connection);
 
         return $connection;
     }
 
-    public function deleteRelatedConnections(LanguageResource $languageResource): void
+    public function deleteRelatedConnections(?int $languageResourceId = null, ?int $customerId = null): void
     {
-        foreach ($this->connectionRepository->getAllConnections((int) $languageResource->getId()) as $connection) {
+        foreach ($this->connectionRepository->getConnectionsFor($languageResourceId, $customerId) as $connection) {
+            $this->deleteConnection($connection);
+        }
+    }
+
+    public function deleteConnections(LanguageResource $source, LanguageResource $target): void
+    {
+        $connections = $this->connectionRepository
+            ->getConnectionsForPair((int) $source->getId(), (int) $target->getId());
+
+        foreach ($connections as $connection) {
             $this->deleteConnection($connection);
         }
     }
@@ -104,24 +119,27 @@ class CrossLanguageResourceSynchronizationService
     public function deleteConnection(CrossSynchronizationConnection $connection): void
     {
         $clone = clone $connection;
-        $connection->delete();
+        $this->connectionRepository->deleteConnection($connection);
 
         $this->eventEmitter->triggerConnectionDeleted($clone);
     }
 
+    /**
+     * @return Generator<array{source: string, target: string}|null>
+     */
     public function getSyncData(
         LanguageResource $source,
         LanguagePair $languagePair,
-        ?int $customerId,
-        SynchronizationType $synchronizationType,
+        SynchronisationType $synchronizationType,
+        ?int $customerId = null,
     ): Generator {
-        $service = $this->getSyncConnectionService($source->getServiceType());
+        $integration = $this->getSyncIntegration($source->getServiceType());
 
-        if (null === $service) {
-            yield from [];
+        if (null === $integration) {
+            return yield from [];
         }
 
-        yield from $service->getSyncData($source, $languagePair, $customerId, $synchronizationType);
+        return yield from $integration->getSyncData($source, $languagePair, $synchronizationType, $customerId);
     }
 
     /**
@@ -129,87 +147,45 @@ class CrossLanguageResourceSynchronizationService
      */
     public function getAvailableForConnectionLanguageResources(LanguageResource $source): array
     {
-        $sourceService = $this->getSyncConnectionService($source->getServiceType());
+        $sourceIntegration = $this->getSyncIntegration($source->getServiceType());
 
-        if (null === $sourceService) {
+        if (null === $sourceIntegration || empty($source->getSourceLang()) || empty($source->getTargetLang())) {
             return [];
         }
 
-        if (empty($source->getSourceLang()) || empty($source->getTargetLang())) {
+        if (! $this->hasTargetSyncIntegration($sourceIntegration)) {
             return [];
         }
 
-        $db = $source->db;
+        $allExistingTargets = $this->connectionRepository->getAllTargetLanguageResourceIds();
+        $connections = $this->connectionRepository->getConnectionsWhereSource((int) $source->getId());
 
-        $lrLangTable = ZfExtended_Factory::get(LanguageResourceLanguages::class)->db->info($db::NAME);
-        $lrCustomerTable = ZfExtended_Factory::get(LanguageResourceCustomers::class)->db->info($db::NAME);
+        $alreadyConnectedResources = [];
 
-        /**
-         * @var array<string, SyncConnectionService> $services
-         */
-        $services = [];
-
-        foreach ($this->serviceManager->getAll() as $serviceType) {
-            $targetService = $this->getSyncConnectionService($serviceType);
-
-            if (null === $targetService) {
-                continue;
-            }
-
-            foreach ($sourceService->syncSourceOf() as $syncType) {
-                if (in_array($syncType, $targetService->syncTargetFor())) {
-                    $services[$targetService->getName()] = $targetService;
-                }
-            }
+        foreach ($connections as $connection) {
+            $alreadyConnectedResources[(int) $connection->getTargetLanguageResourceId()] = true;
         }
-
-        $syncModel = ZfExtended_Factory::get(CrossSynchronizationConnection::class);
-        $existingConnectionTargetsSelect = $syncModel->db
-            ->select()
-            ->from(
-                $syncModel->db->info($syncModel->db::NAME),
-                ['distinct(targetLanguageResourceId) as targetId']
-            );
-
-        $existingTargets = array_column(
-            $syncModel->db->fetchAll($existingConnectionTargetsSelect)->toArray(),
-            'targetId'
-        );
-
-        $select = $db->select()
-            ->setIntegrityCheck(false)
-            ->from(
-                ['LanguageResources' => $db->info($db::NAME)],
-                ['id', 'name', 'serviceName']
-            )
-            ->join(
-                [
-                    'LanguageResourceLanguages' => $lrLangTable,
-                ],
-                'LanguageResourceLanguages.languageResourceId = LanguageResources.id',
-                []
-            )
-            ->join(
-                [
-                    'LanguageResourceCustomers' => $lrCustomerTable,
-                ],
-                'LanguageResourceCustomers.languageResourceId = LanguageResources.id',
-                []
-            )
-            ->where('LanguageResourceLanguages.sourceLang IN (?)', (array) $source->getSourceLang())
-            ->where('LanguageResourceLanguages.targetLang IN (?)', (array) $source->getTargetLang())
-            ->where('LanguageResourceCustomers.customerId IN (?)', $source->getCustomers())
-            ->where('LanguageResources.serviceName IN (?)', array_keys($services))
-            ->order('LanguageResources.serviceName');
 
         $result = [];
-        foreach ($db->fetchAll($select)->toArray() as $row) {
-            if (in_array($row['id'], $existingTargets) && $services[$row['serviceName']]->isOneToOne()) {
+        foreach ($this->languageResourceRepository->getRelatedByLanguageCombinationsAndCustomers($source) as $lr) {
+            $targetIntegration = $this->getSyncIntegration($lr->getServiceType());
+
+            if (null === $targetIntegration) {
                 continue;
             }
 
-            $lr = ZfExtended_Factory::get(LanguageResource::class);
-            $lr->load($row['id']);
+            if (! $this->syncIntegrationIsSourceForTarget($sourceIntegration, $targetIntegration)) {
+                continue;
+            }
+
+            if (isset($alreadyConnectedResources[(int) $lr->getId()])) {
+                continue;
+            }
+
+            if (in_array((int) $lr->getId(), $allExistingTargets) && $targetIntegration->isOneToOne()) {
+                // we can't connect to Language Resource with ono-to-one type if it is already have connection
+                continue;
+            }
 
             $result[] = $lr;
         }
@@ -217,34 +193,69 @@ class CrossLanguageResourceSynchronizationService
         return $result;
     }
 
-    public function connectAllAvailable(LanguageResource $source): void
+    public function connect(LanguageResource $source, LanguageResource $target): void
     {
-        $sourceCustomers = $source->getCustomers();
+        foreach ($source->getCustomers() as $customer) {
+            if (! in_array($customer, $target->getCustomers())) {
+                continue;
+            }
 
-        $targets = $this->getAvailableForConnectionLanguageResources($source);
-
-        foreach ($targets as $target) {
-            foreach ($target->getCustomers() as $customerId) {
-                if (! in_array($customerId, $sourceCustomers)) {
-                    continue;
-                }
-
-                $this->createConnection($source, $target);
-
-                // Connection is unique for [source - target] regardless of customer
-                continue 2;
+            try {
+                $this->createConnection($source, $target, (int) $customer);
+            } catch (ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey) {
+                // connection already exists
             }
         }
+
+        $this->eventEmitter->triggerLanguageResourcesConnected($source, $target);
     }
 
-    private function getSyncConnectionService(string $serviceType): ?SyncConnectionService
+    private function getSyncIntegration(string $serviceType): ?SynchronisationInterface
     {
-        $service = $this->serviceManager->getService($serviceType);
-
-        if (! $service instanceof SyncConnectionService) {
-            return null;
+        if (! isset($this->cachedSyncIntegration[$serviceType])) {
+            $this->cachedSyncIntegration[$serviceType] = $this->serviceManager
+                ->getSynchronisationService($serviceType);
         }
 
-        return $service;
+        return $this->cachedSyncIntegration[$serviceType];
+    }
+
+    private function hasTargetSyncIntegration(SynchronisationInterface $sourceIntegration): bool
+    {
+        foreach ($this->serviceManager->getAll() as $serviceType) {
+            $targetIntegration = $this->getSyncIntegration($serviceType);
+
+            if (null === $targetIntegration) {
+                continue;
+            }
+
+            if ($this->syncIntegrationIsSourceForTarget($sourceIntegration, $targetIntegration)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private function syncIntegrationIsSourceForTarget(
+        SynchronisationInterface $sourceIntegration,
+        SynchronisationInterface $targetIntegration
+    ): bool {
+        foreach ($sourceIntegration->syncSourceOf() as $syncType) {
+            if (in_array($syncType, $targetIntegration->syncTargetFor())) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private function getCachedLanguageResource(int $id): LanguageResource
+    {
+        if (! isset($this->cachedLanguageResources[$id])) {
+            $this->cachedLanguageResources[$id] = $this->languageResourceRepository->get($id);
+        }
+
+        return $this->cachedLanguageResources[$id];
     }
 }

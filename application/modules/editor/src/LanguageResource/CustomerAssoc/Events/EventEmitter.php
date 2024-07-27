@@ -48,15 +48,15 @@ class EventEmitter
 
     public function triggerAssociationCreatedEvent(Association $assoc): void
     {
-        $this->eventManager->trigger(EventType::AssociationCreated->value, argv: [
-            'association' => $assoc,
+        $this->eventManager->trigger(AssociationCreatedEvent::class, argv: [
+            'event' => new AssociationCreatedEvent($assoc),
         ]);
     }
 
     public function triggerAssociationDeleted(Association $assoc): void
     {
-        $this->eventManager->trigger(EventType::AssociationDeleted->value, argv: [
-            'deletedAssociation' => $assoc,
+        $this->eventManager->trigger(AssociationDeletedEvent::class, argv: [
+            'event' => new AssociationDeletedEvent($assoc),
         ]);
     }
 }

@@ -36,6 +36,16 @@ use ZfExtended_Models_Entity_NotFoundException;
 
 class CustomerAssocRepository
 {
+    public function delete(CustomerAssoc $assoc): void
+    {
+        $assoc->delete();
+    }
+
+    public function save(CustomerAssoc $assoc): void
+    {
+        $assoc->save();
+    }
+
     /**
      * @throws ZfExtended_Models_Entity_NotFoundException
      */
@@ -85,6 +95,22 @@ class CustomerAssocRepository
         $customerAssoc = ZfExtended_Factory::get(CustomerAssoc::class);
 
         foreach ($customerAssoc->loadByLanguageResourceId($languageResourceId) as $row) {
+            $customerAssoc->hydrate($row);
+
+            yield clone $customerAssoc;
+        }
+    }
+
+    /**
+     * @return iterable<CustomerAssoc>
+     */
+    public function getByCustomer(int $customerId): iterable
+    {
+        $customerAssoc = ZfExtended_Factory::get(CustomerAssoc::class);
+        $s = $customerAssoc->db->select();
+        $s->where('customerId = ?', $customerId);
+
+        foreach ($customerAssoc->db->fetchAll($s)->toArray() as $row) {
             $customerAssoc->hydrate($row);
 
             yield clone $customerAssoc;

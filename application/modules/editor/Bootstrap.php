@@ -199,7 +199,7 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
                 'languageresourceinstance', 'taskusertracking', 'term', 'attribute', 'termattribute', 'category',
                 'quality', 'userassocdefault', 'log', 'collectionattributedatatype', 'token',
                 'contentprotectioncontentrecognition', 'contentprotectioninputmapping', 'contentprotectionoutputmapping',
-                'languageresourcesyncassoc',
+                'languageresourcesyncconnection',
             ],
         ]);
         $this->front->getRouter()->addRoute('editorRestDefault', $restRoute);
@@ -562,13 +562,25 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
         );
 
         $this->front->getRouter()->addRoute(
-            'languageresources_languageresourcesync_connectavailable',
+            'languageresources_languageresourcesync_queue_synchronize_all',
             new ZfExtended_Controller_RestLikeRoute(
-                'editor/languageresourcesync/:id/connect-available',
+                'editor/languageresourcesync/:id/queue-synchronize-all',
                 [
                     'module' => 'editor',
                     'controller' => 'languageresourcesync',
-                    'action' => 'connectavailable',
+                    'action' => 'queuesynchronizeall',
+                ]
+            )
+        );
+
+        $this->front->getRouter()->addRoute(
+            'languageresources_languageresourcesyncconnection_queue_synchronize',
+            new ZfExtended_Controller_RestLikeRoute(
+                'editor/languageresourcesyncconnection/:id/queue-synchronize',
+                [
+                    'module' => 'editor',
+                    'controller' => 'languageresourcesyncconnection',
+                    'action' => 'queuesynchronize',
                 ]
             )
         );

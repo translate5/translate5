@@ -28,15 +28,28 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\LanguageResource\CrossSynchronization\Events;
+namespace MittagQI\Translate5\Customer\Events;
 
-enum EventType: string
+use editor_Models_Customer_Customer as Customer;
+use ZfExtended_EventManager;
+use ZfExtended_Factory;
+
+class EventEmitter
 {
-    case ConnectionCreated = 'languageResource.synchronization.connection.created';
+    public function __construct(
+        private ZfExtended_EventManager $eventManager,
+    ) {
+    }
 
-    case ConnectionDeleted = 'languageResource.synchronization.connection.deleted';
+    public static function create(): self
+    {
+        return new self(ZfExtended_Factory::get(ZfExtended_EventManager::class, [self::class]));
+    }
 
-    case NewCustomerAssociatedWithConnection = 'languageResource.synchronization.customer.associated';
-
-    case CustomerWasSeparatedFromConnection = 'languageResource.synchronization.customer.separated';
+    public function triggerCustomerDeletedEvent(Customer $customer): void
+    {
+        $this->eventManager->trigger(CustomerDeletedEvent::class, argv: [
+            'event' => new CustomerDeletedEvent($customer),
+        ]);
+    }
 }

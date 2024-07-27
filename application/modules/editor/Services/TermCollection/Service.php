@@ -26,15 +26,11 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-use editor_Models_LanguageResources_LanguageResource as LanguageResource;
-use MittagQI\Translate5\LanguageResource\CrossSynchronization\CrossSynchronizationConnection;
-use MittagQI\Translate5\LanguageResource\CrossSynchronization\SyncConnectionService;
-use MittagQI\Translate5\LanguageResource\CrossSynchronization\LanguagePair;
-use MittagQI\Translate5\LanguageResource\CrossSynchronization\SynchronizationType;
-use MittagQI\Translate5\Terminology\TermCollectionRepository;
-use MittagQI\Translate5\Tools\CharCleanup;
+use MittagQI\Translate5\LanguageResource\CrossSynchronization\SynchronisationInterface;
+use MittagQI\Translate5\LanguageResource\CrossSynchronization\SynchronizableIntegration;
+use MittagQI\Translate5\Terminology\CrossSynchronization\SynchronisationService;
 
-class editor_Services_TermCollection_Service extends editor_Services_ServiceAbstract implements SyncConnectionService
+class editor_Services_TermCollection_Service extends editor_Services_ServiceAbstract implements SynchronizableIntegration
 {
     public const DEFAULT_COLOR = '19737d';
 
@@ -45,67 +41,6 @@ class editor_Services_TermCollection_Service extends editor_Services_ServiceAbst
     protected static $helpPage = "https://confluence.translate5.net/display/TAD/Term+Collection";
 
     protected $resourceClass = 'editor_Services_TermCollection_Resource';
-
-    private TermCollectionRepository $termCollectionRepository;
-
-    public function __construct()
-    {
-        parent::__construct();
-
-        $this->termCollectionRepository = new TermCollectionRepository();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function syncSourceOf(): array
-    {
-        return [SynchronizationType::Glossary];
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function syncTargetFor(): array
-    {
-        return [];
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function getSyncData(
-        LanguageResource $languageResource,
-        LanguagePair $languagePair,
-        ?int $customerId,
-        SynchronizationType $synchronizationType
-    ): Generator {
-        $terms = $this->termCollectionRepository
-            ->getTermTranslationsForLanguageCombo(
-                (int) $languageResource->getId(),
-                $languagePair->sourceId,
-                $languagePair->targetId
-            );
-
-        foreach ($terms as $item) {
-            $item['source'] = CharCleanup::cleanTermForMT($item['source']);
-            $item['target'] = CharCleanup::cleanTermForMT($item['target']);
-
-            if (empty($item['source']) || empty($item['target'])) {
-                continue;
-            }
-
-            yield [
-                'source' => $item['source'],
-                'target' => $item['target'],
-            ];
-        }
-    }
-
-    public function isOneToOne(): bool
-    {
-        return false;
-    }
 
     /**
      * @see editor_Services_ServiceAbstract::isConfigured()
@@ -130,5 +65,10 @@ class editor_Services_TermCollection_Service extends editor_Services_ServiceAbst
     public function getName()
     {
         return 'TermCollection';
+    }
+
+    public function getSynchronisationService(): SynchronisationInterface
+    {
+        return SynchronisationService::create();
     }
 }

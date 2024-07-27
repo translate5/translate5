@@ -25,7 +25,6 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-// app/view/AssociationWindow.js
 Ext.define('Editor.view.LanguageResources.SyncAssocWindow', {
     extend: 'Ext.window.Window',
     alias: 'widget.languageResourceSyncAssocWindow',
@@ -35,45 +34,58 @@ Ext.define('Editor.view.LanguageResources.SyncAssocWindow', {
         'Editor.store.LanguageResources.SyncAssocStore'
     ],
     xtype: 'associationwindow',
-    title: 'Manage Associations',
+    title: Editor.data.l10n.crossLanguageResourceSynchronization.confirmSynchonisation,
     width: 600,
     height: 400,
-    // layout: 'fit',
     modal: true,
 
     items: [
         {
-            xtype: 'form',
-            reference: 'associationForm',
-            bodyPadding: 10,
+            xtype: 'container',
+            region: 'north',
+            height: 'auto',
             layout: {
                 type: 'hbox',
             },
-            hidden: true,
-            defaults: {
-                margin: '0 15 0 0',
-            },
             items: [
                 {
-                    xtype: 'combo',
-                    fieldLabel: 'Target Language Resource',
-                    name: 'targetLanguageResourceId',
-                    store: {
-                        xtype: 'store',
-                        fields: ['id', 'name'],
-                        data: [] // Initially empty, will be set dynamically
+                    xtype: 'form',
+                    reference: 'associationForm',
+                    bodyPadding: 10,
+                    layout: {
+                        type: 'hbox',
                     },
-                    queryMode: 'local',
-                    displayField: 'name',
-                    valueField: 'id',
-                    allowBlank: false
+                    hidden: true,
+                    defaults: {
+                        margin: '0 15 0 0',
+                    },
+                    items: [
+                        {
+                            xtype: 'combo',
+                            fieldLabel: Editor.data.l10n.crossLanguageResourceSynchronization.targetLanguageResource,
+                            name: 'targetLanguageResourceId',
+                            store: {
+                                xtype: 'store',
+                                fields: ['id', 'name'],
+                                data: [] // Initially empty, will be set dynamically
+                            },
+                            queryMode: 'local',
+                            displayField: 'name',
+                            valueField: 'id',
+                            allowBlank: false
+                        },
+                        {
+                            xtype: 'button',
+                            glyph: 'f0c1@FontAwesome5FreeSolid',
+                            text: 'Connect',
+                            handler: 'onAddAssociation',
+                            margin: '5 0',
+                        }
+                    ]
                 },
                 {
-                    xtype: 'button',
-                    glyph: 'f0c1@FontAwesome5FreeSolid',
-                    text: 'Connect',
-                    handler: 'onAddAssociation',
-                    margin: '5 0',
+                    xtype: 'editorAdminTaskUserPrefsForm',
+                    hidden: true
                 },
                 {
                     xtype: 'tbspacer',
@@ -81,9 +93,12 @@ Ext.define('Editor.view.LanguageResources.SyncAssocWindow', {
                 },
                 {
                     xtype: 'button',
-                    text: 'Connect all available',
-                    handler: 'onConnectToAllAvailableResources',
-                    margin: '5 0',
+                    hidden: true,
+                    glyph: 'f021@FontAwesome5FreeSolid',
+                    reference: 'queueSynchronizeAll',
+                    text: Editor.data.l10n.crossLanguageResourceSynchronization.queueSynchronyzeAll,
+                    handler: 'queueSynchronizeAll',
+                    margin: 15,
                 }
             ]
         },
@@ -96,16 +111,31 @@ Ext.define('Editor.view.LanguageResources.SyncAssocWindow', {
             },
             columns: [
                 {
-                    text: 'Source Language Resource',
+                    text: Editor.data.l10n.crossLanguageResourceSynchronization.sourceLanguageResource,
                     dataIndex: 'sourceLanguageResourceName',
                     flex: 1,
                     renderer: v => Ext.String.htmlEncode(v)
                 },
                 {
-                    text: 'Target Language Resource',
+                    text: Editor.data.l10n.crossLanguageResourceSynchronization.targetLanguageResource,
                     dataIndex: 'targetLanguageResourceName',
                     flex: 1,
                     renderer: v => Ext.String.htmlEncode(v)
+                },
+                {
+                    text: Editor.data.l10n.crossLanguageResourceSynchronization.customers,
+                    dataIndex: 'customers',
+                    flex: 1,
+                    renderer: function (v, meta) {
+                        let customers = [];
+                        for (let c of v) {
+                            // double escape because of Ext tooltip bug
+                            customers.push(Ext.String.htmlEncode(Ext.String.htmlEncode(c)))
+                        }
+                        meta.tdAttr = 'data-qtip="' + customers.join('<br />') + '"';
+
+                        return v.length;
+                    }
                 },
                 {
                     xtype: 'actioncolumn',
@@ -113,8 +143,13 @@ Ext.define('Editor.view.LanguageResources.SyncAssocWindow', {
                     items: [
                         {
                             iconCls: 'x-fa fa-trash',
-                            tooltip: 'Delete',
-                            handler: 'onDeleteAssociation'
+                            tooltip: Editor.data.l10n.crossLanguageResourceSynchronization.deleteTooltip,
+                            handler: 'onDeleteConnection'
+                        },
+                        {
+                            iconCls: 'x-fa fa-refresh',
+                            tooltip: Editor.data.l10n.crossLanguageResourceSynchronization.queueSynchronizationTooltip,
+                            handler: 'onSynchronizeConnection'
                         }
                     ],
                     flex: 0.5
@@ -131,17 +166,33 @@ Ext.define('Editor.view.LanguageResources.SyncAssocWindow', {
             grid.getStore().load({
                 params: {
                     languageResource: this.getView().languageResource.get('id')
+                },
+                callback: (records, operation, success) => {
+                    if (! success) {
+                        return;
+                    }
+
+                    if (records.length === 0) {
+                        return;
+                    }
+
+                    this.lookupReference('queueSynchronizeAll').show();
                 }
             });
 
-            var combo = this.lookupReference('associationForm').down('combo[name=targetLanguageResourceId]');
+            this.updateForm();
+        },
+
+        updateForm: function() {
+            const form = this.lookupReference('associationForm');
+
+            var combo = form.down('combo[name=targetLanguageResourceId]');
             var store = combo.getStore();
 
             Ext.Ajax.request({
                 url: Editor.data.restpath + 'languageresourcesync/' + this.getView().languageResource.get('id') + '/available-for-connection',
                 method: 'GET',
                 success: response => {
-                    const form = this.lookupReference('associationForm');
                     form.hide();
                     const data = Ext.decode(response.responseText);
 
@@ -151,53 +202,100 @@ Ext.define('Editor.view.LanguageResources.SyncAssocWindow', {
                     }
                 },
                 failure: function() {
-                    Ext.Msg.alert('Error', 'Failed to load data for Target Language Resource.');
+                    Ext.Msg.alert(
+                        'Error',
+                        Editor.data.l10n.crossLanguageResourceSynchronization.failedToLoadDataForTargetLanguageResource
+                    );
                 }
             });
         },
 
-        onDeleteAssociation: function(view, rowIndex, colIndex, item, e, record) {
-            record.erase({
-                success: function() {
+        onDeleteConnection: function(view, rowIndex, colIndex, item, e, record) {
+            const callback = (btn) => btn === 'yes' && record.erase({
+                success: () => {
                     view.getStore().remove(record);
+                    this.updateForm();
                 }
             });
+
+            Ext.MessageBox.confirm(
+                Editor.data.l10n.crossLanguageResourceSynchronization.confirm_deletion_title,
+                Editor.data.l10n.crossLanguageResourceSynchronization.confirm_deletion_message,
+                callback
+            );
+        },
+
+        onSynchronizeConnection: function(view, rowIndex, colIndex, item, e, record) {
+            const callback = (btn) => btn === 'yes' && Ext.Ajax.request({
+                url: Editor.data.restpath + 'languageresourcesyncconnection/' + record.get('id') + '/queue-synchronize',
+                method: 'POST',
+                success: response => {
+                    Ext.Msg.alert(
+                        Editor.data.l10n.crossLanguageResourceSynchronization.tooltip,
+                        Editor.data.l10n.crossLanguageResourceSynchronization.synchronisationQueued
+                    );
+                },
+                failure: function() {
+                    Ext.Msg.alert('Error', Editor.data.l10n.crossLanguageResourceSynchronization.failedToQueue);
+                }
+            });
+
+            Ext.MessageBox.confirm(
+                Editor.data.l10n.crossLanguageResourceSynchronization.tooltip,
+                Editor.data.l10n.crossLanguageResourceSynchronization.confirmSynchonisation,
+                callback
+            );
         },
 
         onAddAssociation: function(button) {
-            var form = button.up('form').getForm();
+            const form = button.up('form').getForm();
             if (form.isValid()) {
-                var association = Ext.create('Editor.model.LanguageResources.SyncAssoc', form.getValues());
-                association.set('sourceLanguageResourceId', this.getView().languageResource.get('id'));
+                const
+                    association = Ext.create('Editor.model.LanguageResources.SyncAssoc', form.getValues()),
+                    lrId = this.getView().languageResource.get('id')
+                ;
+
+                association.set('sourceLanguageResourceId', lrId);
                 association.save({
-                    success: function() {
-                        button.up('window').down('grid').getStore().load();
+                    success: () => {
+                        const
+                            store = button.up('window').down('grid').getStore(),
+                            url = Editor.model.LanguageResources.SyncAssoc.proxy.url + '?languageResource=' + lrId
+                        store.load({url: url});
+                        this.updateForm();
                     }
                 });
             }
         },
 
-        onConnectToAllAvailableResources: function(button) {
-            Ext.Ajax.request({
-                url: Editor.data.restpath + 'languageresourcesync/' + this.getView().languageResource.get('id') + '/connect-available',
+        queueSynchronizeAll: function(button) {
+            const callback = (btn) => btn === 'yes' && Ext.Ajax.request({
+                url: Editor.data.restpath + 'languageresourcesync/' + this.getView().languageResource.get('id') + '/queue-synchronize-all',
                 method: 'POST',
                 success: response => {
-                    button.up('window').down('grid').getStore().load();
+                    Ext.Msg.alert(
+                        Editor.data.l10n.crossLanguageResourceSynchronization.tooltip,
+                        Editor.data.l10n.crossLanguageResourceSynchronization.synchronisationQueued
+                    );
                 },
                 failure: function() {
-                    Ext.Msg.alert('Error', 'Failed to connect to all available resources.');
+                    Ext.Msg.alert('Error', Editor.data.l10n.crossLanguageResourceSynchronization.failedToQueue);
                 }
             });
+
+            Ext.MessageBox.confirm(
+                Editor.data.l10n.crossLanguageResourceSynchronization.tooltip,
+                Editor.data.l10n.crossLanguageResourceSynchronization.confirmSynchonisation,
+                callback
+            );
         }
     },
-    loadRecord: function (record) {
-        let tasks = this.getViewModel().getStore('associations'),
-            proxy = Editor.model.LanguageResources.SyncAssoc.proxy,
-            url = proxy.url;
+    loadRecord: function(record) {
+        let associations = this.getViewModel().getStore('associations'),
+            url = Editor.model.LanguageResources.SyncAssoc.proxy.url + '?languageResource=' + record.get('id');
 
         this.getViewModel().set('record', record);
 
-        url += '?sourceLanguageResource=' + record.get('id');
-        tasks.load({url: url});
+        associations.load({url: url});
     }
 });

@@ -31,10 +31,12 @@ CREATE TABLE `LEK_cross_language_resource_synchronization_connection` (
     `sourceType` varchar(255) NOT NULL,
     `targetLanguageResourceId` int NOT NULL,
     `targetType` varchar(255) NOT NULL,
+    `customerId` int NOT NULL,
     PRIMARY KEY (`id`),
-    UNIQUE KEY `languageResourcePair` (`sourceLanguageResourceId`, `targetLanguageResourceId`),
-    FOREIGN KEY (`sourceLanguageResourceId`) REFERENCES `LEK_languageresources` (`id`) ON DELETE CASCADE,
-    FOREIGN KEY (`targetLanguageResourceId`) REFERENCES `LEK_languageresources` (`id`) ON DELETE CASCADE
+    UNIQUE KEY `languageResourcePair` (`sourceLanguageResourceId`, `targetLanguageResourceId`, `customerId`),
+    FOREIGN KEY (`sourceLanguageResourceId`) REFERENCES `LEK_languageresources` (`id`) ON DELETE RESTRICT,
+    FOREIGN KEY (`targetLanguageResourceId`) REFERENCES `LEK_languageresources` (`id`) ON DELETE RESTRICT,
+    FOREIGN KEY (`customerId`) REFERENCES `LEK_customer` (`id`) ON DELETE RESTRICT
 );
 
 
