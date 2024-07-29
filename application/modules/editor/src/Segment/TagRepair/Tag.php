@@ -28,17 +28,22 @@ END LICENSE AND COPYRIGHT
 
 namespace MittagQI\Translate5\Segment\TagRepair;
 
+use editor_Segment_Tag;
+use editor_Tag;
+use editor_TagSequence;
+use MittagQI\ZfExtended\Tools\Markup;
+use stdClass;
+
 /**
  * Abstraction for a "repair tag" used with the automatic tag repair
  * This Tag is able to evaluate & store additional information about the tags position regarding words in the text, it can represent any kind of tag
  * this information then is used to restore lost or incomplete tags
  * it has capabilities to be rendered as a "request" tag (that will be sent to the service); these request tag render two image-tags instead of an opening & closing tag to increase the chances to be able to restore incomplete tags
  *
- * @method Tag clone(bool $withDataAttribs=false, bool $withId=false)
- * @method Tag cloneProps(\editor_Tag $tag, bool $withDataAttribs=false, bool $withId=false)
  * @property Tag|\editor_TextNode[] $children
+ * @phpstan-consistent-constructor
  */
-class Tag extends \editor_Segment_Tag
+class Tag extends editor_Segment_Tag
 {
     /**
      * @var string
@@ -66,8 +71,7 @@ class Tag extends \editor_Segment_Tag
     public static function replaceComments(string $markup): string
     {
         return preg_replace_callback(static::COMMENTS_REPLACE_REGEX, function ($matches) {
-            // crucial: since we are turning the comment into "normal" markup we have to make sure, markup in comments is protected which is also neccessary to make this a proper attribute
-            return '<' . self::COMMENT_NODE_NAME . ' comment="' . htmlspecialchars($matches[1], ENT_COMPAT, null, true) . '" />';
+            return '<' . self::COMMENT_NODE_NAME . ' comment="' . Markup::escapeForAttribute($matches[1]) . '" />';
         }, $markup);
     }
 
@@ -83,9 +87,9 @@ class Tag extends \editor_Segment_Tag
      * We need to expand the singular tags to cover the xliff tags
      * @var string[]
      */
-    protected static $singularTypes = ['img', 'input', 'br', 'hr', 'wbr', 'area', 'col', 'embed', 'keygen', 'link', 'meta', 'param', 'source', 'track', 'command', 'x', 'bx', 'ex', self::COMMENT_NODE_NAME];
+    protected static array $singularTypes = ['img', 'input', 'br', 'hr', 'wbr', 'area', 'col', 'embed', 'keygen', 'link', 'meta', 'param', 'source', 'track', 'command', 'x', 'bx', 'ex', self::COMMENT_NODE_NAME];
 
-    protected static $type = 'repair';
+    protected static ?string $type = 'repair';
 
     /**
      * A unique ID that will re-identify the after the request returned and when recreating the original state
@@ -167,18 +171,14 @@ class Tag extends \editor_Segment_Tag
     /**
      * Must only be used in the pre pairing phase to manipulate the repair index for paired internal tags ...
      */
-    public function setRepairIndex(int $idx)
+    public function setRepairIndex(int $idx): void
     {
         $this->repairIdx = $idx;
     }
 
-    /**
-     * @see \editor_Tag::createBaseClone()
-     * @return Tag
-     */
-    protected function createBaseClone()
+    protected function createBaseClone(): static
     {
-        return new Tag($this->startIndex, $this->endIndex, $this->category, $this->name);
+        return new static($this->startIndex, $this->endIndex, $this->category, $this->name);
     }
 
     /**
@@ -186,17 +186,17 @@ class Tag extends \editor_Segment_Tag
      * {@inheritDoc}
      * @see editor_Segment_Tag::isEqualType()
      */
-    public function isEqualType(\editor_Tag $tag): bool
+    public function isEqualType(editor_Tag $tag): bool
     {
         return false;
     }
 
-    public function addAttribute($name, $val = null): Tag
+    public function addAttribute($name, $val = null): static
     {
         // crucial: comment tags must have the unescaped value as comment-text (stored in the ::replaceComments prop)
-        if ($this->isComment() && $name === 'comment') {
-            // we have to revert the escaping applied in Tags::replaceComments
-            $this->afterStartMarkup = htmlspecialchars_decode($val, ENT_COMPAT);
+        if ($val !== null && $this->isComment() && $name === 'comment') {
+            // we have to revert the escaping applied in ::replaceComments
+            $this->afterStartMarkup = Markup::unescapeFromAttribute($val);
         }
         parent::addAttribute($name, $val);
 
@@ -205,9 +205,8 @@ class Tag extends \editor_Segment_Tag
 
     /**
      * Repair tags that represent an comment will act specially, e.g. render a comment instead of tags
-     * @return bool
      */
-    protected function isComment()
+    protected function isComment(): bool
     {
         return ($this->name === self::COMMENT_NODE_NAME);
     }
@@ -224,7 +223,6 @@ class Tag extends \editor_Segment_Tag
         $this->numWordsBefore = 0;
         $this->numWordsAfter = 0;
         $this->numWordsBeforeParent = -1;
-        $this->numWordsAfterParent = -1;
         $this->numWordsAfterParent = -1;
         $this->isBeforeWhitespace = false;
         $this->parentTagIdx = -1;
@@ -256,7 +254,7 @@ class Tag extends \editor_Segment_Tag
     /**
      * unsets our text positions
      */
-    public function invalidatePosition()
+    public function invalidatePosition(): void
     {
         $this->startIndex = -1;
         $this->endIndex = -1;
@@ -277,7 +275,7 @@ class Tag extends \editor_Segment_Tag
     /**
      * Recreates the tag position for a full, non-singular tag
      */
-    public function reEvaluateTagPosition(Tags $tags, int $textLength, float $wordRatio, float $textRatio)
+    public function reEvaluateTagPosition(Tags $tags, int $textLength, float $wordRatio, float $textRatio): void
     {
         // both positions could be restored
         if ($this->startIndex >= 0 && $this->endIndex >= 0) {
@@ -372,7 +370,7 @@ class Tag extends \editor_Segment_Tag
     /**
      * Recreates the tag position for a singular tag
      */
-    public function reEvaluateSingularTagPosition(Tags $tags, int $textLength, float $wordRatio, float $textRatio)
+    public function reEvaluateSingularTagPosition(Tags $tags, int $textLength, float $wordRatio, float $textRatio): void
     {
         if ($this->startIndex < 0) {
             // our position can not be found
@@ -409,7 +407,7 @@ class Tag extends \editor_Segment_Tag
 
     /* sequencing API */
 
-    public function sequence(\editor_TagSequence $tags, int $parentOrder)
+    public function sequence(editor_TagSequence $tags, int $parentOrder): void
     {
         $this->prepareSequencing();
         parent::sequence($tags, $parentOrder);
@@ -419,7 +417,7 @@ class Tag extends \editor_Segment_Tag
      * This Method is called before the tag is sequenced when unparsing
      * We then add any tags at the end or start of our children to the start / end markup
      */
-    public function prepareSequencing()
+    public function prepareSequencing(): void
     {
         if ($this->hasChildren()) {
             // we mark all nodes from the start & from the end, that have no text before/after them as lateral
@@ -487,6 +485,7 @@ class Tag extends \editor_Segment_Tag
                 if ($child->isText()) {
                     $html .= $child->render();
                 } else {
+                    /** @var Tag $child */
                     $html .= $child->renderForRequest();
                 }
             }
@@ -515,14 +514,14 @@ class Tag extends \editor_Segment_Tag
     /**
      * This API is called before consolidation and before rendering for request
      */
-    public function preparePairing()
+    public function preparePairing(): void
     {
     }
 
     /**
      * This API is called before consolidation and before rendering for request
      */
-    public function prePairWith(Tag $tag)
+    public function prePairWith(Tag $tag): void
     {
     }
 
@@ -542,7 +541,7 @@ class Tag extends \editor_Segment_Tag
         return $this->beforeEndMarkup . parent::renderEnd();
     }
 
-    public function cloneForRendering()
+    public function cloneForRendering(): static
     {
         $clone = $this->clone(true, true);
         $clone->cloneOrder($this);
@@ -551,7 +550,7 @@ class Tag extends \editor_Segment_Tag
         return $clone;
     }
 
-    protected function setInnerMarkup(string $afterStartMarkup, string $beforeEndMarkup)
+    protected function setInnerMarkup(string $afterStartMarkup, string $beforeEndMarkup): void
     {
         $this->afterStartMarkup = $afterStartMarkup;
         $this->beforeEndMarkup = $beforeEndMarkup;
@@ -562,7 +561,7 @@ class Tag extends \editor_Segment_Tag
     /**
      * Use in inheriting classes for further serialization
      */
-    protected function furtherSerialize(\stdClass $data)
+    protected function furtherSerialize(stdClass $data): void
     {
         $data->repairIdx = $this->repairIdx;
         $data->afterStartMarkup = $this->afterStartMarkup;
@@ -572,7 +571,7 @@ class Tag extends \editor_Segment_Tag
     /**
      * Use in inheriting classes for further unserialization
      */
-    protected function furtherUnserialize(\stdClass $data)
+    protected function furtherUnserialize(stdClass $data): void
     {
         $this->repairIdx = intval($data->repairIdx);
         $this->afterStartMarkup = $data->afterStartMarkup;

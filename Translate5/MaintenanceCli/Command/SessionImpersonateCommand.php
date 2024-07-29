@@ -150,7 +150,7 @@ class SessionImpersonateCommand extends Translate5AbstractCommand
             $task->loadByTaskGuid($taskId);
         }
 
-        $url .= '/taskid/' . $task->getId() . $token;
+        $url .= 'taskid/' . $task->getId() . $token;
 
         if (empty($segmentNr)) {
             return $url;

@@ -29,6 +29,7 @@ END LICENSE AND COPYRIGHT
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\RequestException;
 use MittagQI\Translate5\Service\T5Memory;
+use MittagQI\Translate5\T5Memory\DTO\SearchDTO;
 use MittagQI\Translate5\T5Memory\Enum\StripFramingTags;
 
 /**
@@ -38,6 +39,10 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
 {
     private const DATE_FORMAT = 'Ymd\THis\Z';
 
+    private const MARKUP_TABLE = 'OTMXUXLF';
+
+    private const REQUEST_ENCTYPE = 'application/json; charset=utf-8';
+
     public const MAX_STR_LENGTH = 2048;
 
     /**
@@ -45,19 +50,12 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
      */
     protected $languageResource;
 
-    /**
-     * @var editor_Services_OpenTM2_FixLanguageCodes
-     */
-    protected $fixLanguages;
-
-    /**
-     * @var bool true if the used resource is T5Memory, false for OpenTM2
-     */
-    protected bool $isT5Memory = false;
+    protected editor_Services_OpenTM2_FixLanguageCodes $fixLanguages;
 
     public function __construct()
     {
-        $this->fixLanguages = ZfExtended_Factory::get('editor_Services_OpenTM2_FixLanguageCodes');
+        $this->fixLanguages = new editor_Services_OpenTM2_FixLanguageCodes();
+        $this->fixLanguages->setDisabled(true);
     }
 
     /**
@@ -71,7 +69,7 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
         $data->sourceLang = $this->fixLanguages->key($sourceLanguage);
 
         $http = $this->getHttp('POST');
-        $http->setRawData($this->jsonEncode($data), 'application/json; charset=utf-8');
+        $http->setRawData($this->jsonEncode($data), self::REQUEST_ENCTYPE);
 
         if ($this->processResponse($http->request())) {
             return $data->name;
@@ -95,7 +93,7 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
         $http->setConfig([
             'timeout' => $this->createTimeout(1200),
         ]);
-        $http->setRawData($this->jsonEncode($data), 'application/json; charset=utf-8');
+        $http->setRawData($this->jsonEncode($data), self::REQUEST_ENCTYPE);
 
         if ($this->processResponse($http->request())) {
             return $data->name;
@@ -114,13 +112,6 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
 
         $data = new stdClass();
 
-        // TODO T5MEMORY: remove when OpenTM2 is out of production
-        if ($this->isOpenTM2()) {
-            $tmData = $this->fixLanguages->tmxOnUpload($tmData);
-            /* @var $tmxRepairer editor_Services_OpenTM2_FixImportParser */
-            $tmxRepairer = ZfExtended_Factory::get('editor_Services_OpenTM2_FixImportParser');
-            $tmData = $tmxRepairer->convert($tmData);
-        }
         $data->tmxData = base64_encode($tmData);
         $data->framingTags = $stripFramingTags->value;
 
@@ -128,7 +119,7 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
         $http->setConfig([
             'timeout' => $this->createTimeout(1200),
         ]);
-        $http->setRawData($this->jsonEncode($data), 'application/json; charset=utf-8');
+        $http->setRawData($this->jsonEncode($data), self::REQUEST_ENCTYPE);
 
         return $this->processResponse($http->request());
     }
@@ -152,7 +143,7 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
     public function importMemoryAsFile(string $filePath, string $tmName, StripFramingTags $stripFramingTags): bool
     {
         return $this->sendStreamRequest(
-            rtrim($this->resource->getUrl(), '/') . '/' . $tmName . '/import-file',
+            rtrim($this->resource->getUrl(), '/') . '/' . $tmName . '/importtmx',
             $this->getStreamFromFile($filePath),
             basename($filePath),
             [
@@ -173,9 +164,10 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
             throw new RuntimeException('Could not open file: ' . $filePath);
         }
 
-        stream_filter_append($stream, 'zlib.deflate', STREAM_FILTER_READ, [
-            "window" => 30,
-        ]);
+        // Uncomment when compression is implemented in the API
+        //        stream_filter_append($stream, 'zlib.deflate', STREAM_FILTER_READ, [
+        //            "window" => 30,
+        //        ]);
 
         return $stream;
     }
@@ -183,17 +175,11 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
     private function sendStreamRequest(string $uri, $stream, string $filename, array|object $data = null): bool
     {
         $client = new Client();
-        $multipart = [
-            [
-                'name' => 'file',
-                'contents' => $stream,
-                'filename' => $filename,
-            ],
-        ];
+        $multipart = [];
 
         if (null !== $data) {
             $multipart[] = [
-                'name' => 'data',
+                'name' => 'json_data',
                 'contents' => json_encode($data),
                 'headers' => [
                     'Content-Type' => 'application/json',
@@ -201,10 +187,19 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
             ];
         }
 
+        $multipart[] = [
+            'name' => 'file',
+            'contents' => $stream,
+            'filename' => $filename,
+        ];
+
         try {
             $response = $client->post($uri, [
                 'multipart' => $multipart,
             ]);
+
+            // trigger this method to set http (yes! :( ) so that self::processResponse can get uri from it.
+            $this->getHttp($uri);
 
             return $this->processResponse(
                 new Zend_Http_Response(
@@ -271,7 +266,7 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
         $this->http->setMethod($method);
         $this->httpMethod = $method;
         $this->http->setHeaders('Accept-charset', 'UTF-8');
-        $this->http->setHeaders('Accept', 'application/json; charset=utf-8');
+        $this->http->setHeaders('Accept', self::REQUEST_ENCTYPE);
         $this->http->setConfig([
             'timeout' => $this->createTimeout(30),
         ]);
@@ -326,38 +321,13 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
             if ($mime == "application/xml") {
                 $targetLang = $this->languageResource->getTargetLangCode();
                 $sourceLang = $this->languageResource->getSourceLangCode();
-                $this->result = $this->fixInvalidOpenTM2XML($this->fixLanguages->tmxOnDownload($sourceLang, $targetLang, $this->result));
+                $this->result = $this->fixLanguages->tmxOnDownload($sourceLang, $targetLang, $this->result);
             }
 
             return true;
         }
 
         return $this->processResponse($response);
-    }
-
-    /**
-     * repairs the TMX from OpenTM2 regarding encoded entities and newlines
-     * @throws Zend_Exception
-     */
-    protected function fixInvalidOpenTM2XML(string $tmxData): string
-    {
-        if ($this->isT5Memory) {
-            return $tmxData;
-        }
-
-        /** @var editor_Services_OpenTM2_FixExport $fix */
-        $fix = ZfExtended_Factory::get('editor_Services_OpenTM2_FixExport');
-        $result = $fix->convert($tmxData);
-        if ($fix->getChangeCount() > 0 || $fix->getNewLineCount() > 0) {
-            $logger = Zend_Registry::get('logger');
-            $logger->warn('E1554', 'TMX Export: Entities in {changeCount} text parts repaired (see raw php error log), {newLineCount} new line tags restored.', [
-                'languageResource' => $this->languageResource,
-                'changeCount' => $fix->getChangeCount(),
-                'newLineCount' => $fix->getNewLineCount(),
-            ]);
-        }
-
-        return $result;
     }
 
     /**
@@ -409,6 +379,7 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
 
         $json->sourceLang = $this->fixLanguages->key($this->languageResource->getSourceLangCode());
         $json->targetLang = $this->fixLanguages->key($this->languageResource->getTargetLangCode());
+        $json->markupTable = self::MARKUP_TABLE;
 
         if ($this->isToLong($queryString)) {
             $this->result = json_decode('{"ReturnValue":0,"ErrorMsg":"","NumOfFoundProposals":0}');
@@ -427,56 +398,12 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
         // so we take only the single filename at the moment
         $json->documentName = $filename;
 
-        $json->markupTable = 'OTMXUXLF'; //NEEDED otherwise t5memory crashes
+        $json->markupTable = self::MARKUP_TABLE; //NEEDED otherwise t5memory crashes
         $json->context = $segment->getMid(); // here MID (context was designed for dialog keys/numbers on translateable strings software)
 
         $http = $this->getHttpWithMemory('POST', $tmName, 'fuzzysearch');
 
-        // TODO T5MEMORY: remove when OpenTM2 is out of production
-        if ($this->isOpenTM2() && strtolower($json->targetLang) === 'en-gb') {
-            // TODO REMOVE THIS WHOLE IF AFTER ABOLISHING OPENTM2
-            //between 06.2022 v5.7.4 and 9.2022 v5.7.10 all en-GB segments were stored as en-UK into OpenTM2
-            // with v5.7.10 this was fixed, but now all en-UK results must be fetched separately
-            // and merged into the result
-            // - this is only relevant for targetLanguages = en-GB, source language is not compared on search
-            //   on export this will lead to empty xml:lang fields, which is fixed in FixLanguagesCodes
-            // - only on saving en-UK as source, the source lang is empty string on export and ?? in answer,
-            //   the export is fixed in FixLanguagesCodes, the latter one does not hurt
-
-            //en-UK request first
-            $jsonEnUk = clone $json;
-            $jsonEnUk->targetLang = 'en-UK';
-            $http->setRawData($this->jsonEncode($jsonEnUk), 'application/json; charset=utf-8');
-            $resultsUK = [];
-            $resultUK = $this->processResponse($http->request());
-            if ($resultUK) {
-                $resultsUK = clone $this->result;
-                if (! empty($resultsUK->results)) {
-                    foreach ($resultsUK->results as $oneResult) {
-                        $oneResult->targetLang = 'en-GB'; //en-UK is stored as ?? and must be changed
-                    }
-                }
-            }
-
-            //en-GB request
-            $http->setRawData($this->jsonEncode($json), 'application/json; charset=utf-8');
-            $resultGB = $this->processResponse($http->request());
-
-            if ($resultUK && $resultsUK->NumOfFoundProposals > 0) {
-                //if no GB results found or there was an error, we use just the UK entries
-                if (! $resultGB || $this->result->NumOfFoundProposals === 0) {
-                    $this->result = $resultsUK;
-                } //merge the results
-                else {
-                    $this->result->NumOfFoundProposals += $resultsUK->NumOfFoundProposals;
-                    $this->result->results = array_merge($this->result->results, $resultsUK->results);
-                }
-            }
-
-            return $resultGB || $resultUK;
-        }
-
-        $http->setRawData($this->jsonEncode($json), 'application/json; charset=utf-8');
+        $http->setRawData($this->jsonEncode($json), self::REQUEST_ENCTYPE);
 
         return $this->processResponse($http->request());
     }
@@ -489,11 +416,11 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
      * Note: Provide the returned search position NewSearchPosition as SearchPosition on
      * subsequenet calls to do a sequential search of the memory.
      */
-    public function search(
+    public function concordanceSearch(
         string $queryString,
         string $tmName,
         string $field,
-        int $searchPosition = null,
+        string $searchPosition = null,
         int $numResults = 20,
     ): bool {
         if ($this->isToLong($queryString)) {
@@ -509,7 +436,25 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
         $data->numResults = $numResults;
         $data->msSearchAfterNumResults = 250;
         $http = $this->getHttpWithMemory('POST', $tmName, 'concordancesearch');
-        $http->setRawData($this->jsonEncode($data), 'application/json; charset=utf-8');
+        $http->setRawData($this->jsonEncode($data), self::REQUEST_ENCTYPE);
+
+        return $this->processResponse($http->request());
+    }
+
+    public function search(string $tmName, ?string $searchPosition, ?int $numResults, SearchDTO $searchDTO): bool
+    {
+        $data = $this->getSearchData($searchDTO, $searchPosition, $numResults);
+        $http = $this->getHttpWithMemory('POST', $tmName, '/search');
+        $http->setRawData($this->jsonEncode($data), self::REQUEST_ENCTYPE);
+
+        return $this->processResponse($http->request());
+    }
+
+    public function deleteBatch(string $tmName, SearchDTO $searchDTO): bool
+    {
+        $data = $this->getSearchData($searchDTO);
+        $http = $this->getHttpWithMemory('POST', $tmName, '/entriesdelete');
+        $http->setRawData($this->jsonEncode($data), self::REQUEST_ENCTYPE);
 
         return $this->processResponse($http->request());
     }
@@ -525,11 +470,12 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
     public function update(
         string $source,
         string $target,
-        editor_Models_Segment $segment,
+        string $userName,
+        string $context,
+        string $timestamp,
         string $filename,
         string $tmName,
         bool $save2disk = true,
-        bool $useSegmentTimestamp = false,
     ): bool {
         $this->error = null;
 
@@ -540,18 +486,14 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
             return false;
         }
 
-        $timestamp = $useSegmentTimestamp
-            ? (new DateTimeImmutable($segment->getTimestamp()))->format(self::DATE_FORMAT)
-            : $this->nowDate();
-
         $json->documentName = $filename; // 101 doc match
-        $json->author = $segment->getUserName();
+        $json->author = $userName;
         $json->timeStamp = $timestamp;
-        $json->context = $segment->getMid(); //INFO: this is segment stuff
+        $json->context = $context; //INFO: this is segment stuff
         // t5memory does not understand boolean parameters, so we have to convert them to 0/1
         $json->save2disk = $save2disk ? '1' : '0';
 
-        $http->setRawData($this->jsonEncode($json), 'application/json; charset=utf-8');
+        $http->setRawData($this->jsonEncode($json), self::REQUEST_ENCTYPE);
 
         return $this->processResponse($http->request());
     }
@@ -576,7 +518,34 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
         $json->context = '';
         $json->addInfo = $json->documentName;
 
-        $http->setRawData($this->jsonEncode($json), 'application/json; charset=utf-8');
+        $http->setRawData($this->jsonEncode($json), self::REQUEST_ENCTYPE);
+
+        return $this->processResponse($http->request());
+    }
+
+    public function deleteEntry(string $tmName, int $segmentId, int $recordKey, int $targetKey): bool
+    {
+        $request = [
+            'recordKey' => $recordKey,
+            'targetKey' => $targetKey,
+            'segmentId' => $segmentId,
+        ];
+
+        $http = $this->getHttpWithMemory('POST', $tmName, 'entrydelete');
+        $http->setRawData($this->jsonEncode($request), self::REQUEST_ENCTYPE);
+
+        return $this->processResponse($http->request());
+    }
+
+    public function getEntry(string $tmName, int $recordKey, int $targetKey): bool
+    {
+        $request = [
+            'recordKey' => $recordKey,
+            'targetKey' => $targetKey,
+        ];
+
+        $http = $this->getHttpWithMemory('POST', $tmName, 'getentry');
+        $http->setRawData($this->jsonEncode($request), self::REQUEST_ENCTYPE);
 
         return $this->processResponse($http->request());
     }
@@ -646,12 +615,39 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
         $json->source = $source;
         $json->target = $target;
         $json->type = "Manual";
-        $json->markupTable = "OTMXUXLF"; //fixed markup table for our XLIFF subset
+        $json->markupTable = self::MARKUP_TABLE; //fixed markup table for our XLIFF subset
         $json->sourceLang = $this->fixLanguages->key($this->languageResource->getSourceLangCode());
         $json->targetLang = $this->fixLanguages->key($this->languageResource->getTargetLangCode());
-        $json->timeStamp = $this->nowDate();
+        $json->timeStamp = $this->getNowDate();
 
         return $json;
+    }
+
+    private function getSearchData(SearchDTO $searchDTO, ?string $searchPosition = null, ?int $numResults = null): array
+    {
+        $searchOptions = ', CASEINSENSETIVE';
+
+        return [
+            'source' => $searchDTO->source,
+            'sourceSearchMode' => $searchDTO->sourceMode . $searchOptions,
+            'target' => $searchDTO->target,
+            'targetSearchMode' => $searchDTO->targetMode . $searchOptions,
+            'sourceLang' => $searchDTO->sourceLanguage,
+            'targetLang' => $searchDTO->targetLanguage,
+            'document' => $searchDTO->document,
+            'documentSearchMode' => $searchDTO->documentMode . $searchOptions,
+            'author' => $searchDTO->author,
+            'authorSearchMode' => $searchDTO->authorMode . $searchOptions,
+            'addInfo' => $searchDTO->additionalInfo,
+            'addInfoSearchMode' => $searchDTO->additionalInfoMode . $searchOptions,
+            'context' => $searchDTO->context,
+            'contextSearchMode' => $searchDTO->contextMode . $searchOptions,
+            'timestampSpanStart' => $this->getDate($searchDTO->creationDateFrom),
+            'timestampSpanEnd' => $this->getDate($searchDTO->creationDateTo),
+            'onlyCountSegments' => $searchDTO->onlyCount ? '1' : '0',
+            'searchPosition' => (string) $searchPosition,
+            'numResults' => $numResults,
+        ];
     }
 
     /**
@@ -700,9 +696,14 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
     /**
      * returns the current time stamp in the expected format for OpenTM2
      */
-    protected function nowDate()
+    public function getNowDate(): string
     {
         return gmdate(self::DATE_FORMAT);
+    }
+
+    public function getDate(int $timestamp): string
+    {
+        return gmdate(self::DATE_FORMAT, $timestamp);
     }
 
     /**
@@ -717,23 +718,6 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
     public function getLanguageResource()
     {
         return $this->languageResource;
-    }
-
-    public function setResource(editor_Models_LanguageResources_Resource $resource)
-    {
-        parent::setResource($resource);
-        $this->isT5Memory = ! str_contains($resource->getUrl(), '/otmmemoryservice');
-        $this->fixLanguages->setDisabled($this->isT5Memory);
-    }
-
-    /**
-     * returns true if the target system is OpenTM2, false if isT5Memory
-     * @deprecated check all usages and remove them if OpenTM2 is replaced with t5memory
-     * TODO T5MEMORY: remove when OpenTM2 is out of production
-     */
-    public function isOpenTM2(): bool
-    {
-        return ! $this->isT5Memory;
     }
 
     /**
@@ -764,16 +748,10 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
      */
     private function jsonEncode($data): string
     {
-        $flags = JSON_THROW_ON_ERROR;
-
-        // TODO T5MEMORY: remove when OpenTM2 is out of production
-        if (! $this->isOpenTM2()) {
-            $flags = JSON_THROW_ON_ERROR | JSON_PRETTY_PRINT;
-        }
-
-        // Due to error in proxygen library in t5memory json closing brace should follow a new line symbol (should be "\n}" instead of "}"),
+        // Due to error in proxygen library in t5memory:
+        // json closing brace should follow a new line symbol (should be "\n}" instead of "}"),
         // otherwise such a json won't be parsed correctly
-        return json_encode($data, $flags);
+        return json_encode($data, JSON_THROW_ON_ERROR | JSON_PRETTY_PRINT);
     }
 
     /**
@@ -782,10 +760,6 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
      */
     private function createTimeout(int $seconds): int
     {
-        if ($this->isT5Memory) {
-            return T5Memory::REQUEST_TIMEOUT + $seconds;
-        } else {
-            return $seconds;
-        }
+        return T5Memory::REQUEST_TIMEOUT + $seconds;
     }
 }

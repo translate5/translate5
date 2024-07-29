@@ -31,12 +31,13 @@ declare(strict_types=1);
 namespace MittagQI\Translate5\Test\Unit\Services\Connector\TagHandler;
 
 use editor_Services_Connector_TagHandler_Xliff as Xliff;
+use MittagQI\Translate5\Test\UnitTestAbstract;
 
 /**
  * Testcase for TRANSLATE-2895 tests the boundary / framing tag removing in the XLF import
  * For details see the issue.
  */
-class XliffTest extends \editor_Test_UnitTest
+class XliffTest extends UnitTestAbstract
 {
     private const TAGS = [
         '<1>' => '<div class="open 1234 internal-tag ownttip"><span class="short" title="<Variable>&quot;&gt;&lt;1&gt;</span><span class="full" data-originalid="8" data-length="-1">&lt;Variable&gt;</span></div>',

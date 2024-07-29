@@ -1,0 +1,112 @@
+{
+  "logout": "Logout",
+  "localeStore": [
+    {
+      "locale": "en",
+      "name": "English"
+    },
+    {
+      "locale": "de",
+      "name": "German"
+    }
+  ],
+  "modeCombo": [
+    {
+      "name": "Contains",
+      "value": "contains"
+    },
+    {
+      "name": "Exact match",
+      "value": "exact"
+    }
+  ],
+  "modeComboSourceTarget": [
+    {
+      "name": "Contains",
+      "value": "contains"
+    },
+    {
+      "name": "Match full segment",
+      "value": "exact"
+    }
+  ],
+  "selectTm": {
+    "title": "Select TM",
+    "name": "Name",
+    "sourceLanguage": "Source language",
+    "targetLanguage": "Target language",
+    "clients": "Clients",
+    "select": "Select",
+    "close": "Close",
+    "emptyText" : "No records available"
+  },
+  "searchForm": {
+    "tm": "TM",
+    "mode": "Mode",
+    "source": "Source",
+    "target": "Target",
+    "author": "Author",
+    "additionalInfo": "Additional info",
+    "document": "Document name",
+    "creationDateFrom": "Creation date after",
+    "creationDateTo": "Creation date before",
+    "search": "Search",
+    "deleteAll": "Delete all",
+    "deleteAllTooltip": "All segments that match the current search settings are deleted",
+    "sourceLanguage": "Source language",
+    "targetLanguage": "Target language"
+  },
+  "createForm": {
+    "title": "Create new",
+    "sourceText": "Source text",
+    "targetText": "Target text",
+    "save": "Save",
+    "cancel": "Cancel"
+  },
+  "deleteBatch": {
+    "no": "No",
+    "yes": "Yes",
+    "warningText": "All segments that can be found with the current search settings will be deleted. Better abort the process?"
+  },
+  "list" : {
+    "title": "Segments",
+    "totalAmount": "Total found segments: ",
+    "calculating": "calculating...",
+    "saving": "Saving. Please wait a while.",
+    "columns": {
+      "sourceText": "Source text",
+      "targetText": "Target text",
+      "author": "Author",
+      "additionalInfo": "Additional info",
+      "document": "Document",
+      "creationDate": "Creation date",
+      "actions": "Actions",
+      "sourceLanguage": "Source language",
+      "targetLanguage": "Target language"
+    },
+    "edit": "Edit",
+    "editSource": "Edit source",
+    "editTarget": "Edit target",
+    "delete": "Delete",
+    "create": "Create",
+    "save": "Save (CTRL+S)",
+    "cancel": "Cancel (ESC)",
+    "saveGoToPrevious": "Save and open previous editable segment (CTRL + ALT + SHIFT + ENTER)",
+    "saveGoToNext": "Save and open next editable segment (CTRL + ALT + ENTER)",
+    "closeGoToPrevious": "Don't save and open previous editable segment (CTRL + ALT + ↑)",
+    "closeGoToNext": "Don't save and open next editable segment (CTRL + ALT + ↓)"
+  },
+  "error": {
+    "title": "An error occurred",
+    "couldNotProcessRequest": "Error whilst saving or reading data. Please contact our support team!",
+    "close": "Close",
+    "responseFromServer": "Response from server: ",
+    "wrongTagsOrdering": "Some of the tags used in the segment are in the wrong order (closing tag before opening tag or missing corresponding tag). Please correct the segment and try again."
+  },
+  "deleteSegment": {
+    "title": "Delete segment",
+    "text": "Do you really want to delete this segment?",
+    "yes": "Yes",
+    "no": "No"
+  }
+}

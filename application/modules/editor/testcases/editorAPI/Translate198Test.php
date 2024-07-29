@@ -27,11 +27,12 @@ END LICENSE AND COPYRIGHT
 */
 
 use MittagQI\Translate5\Test\Import\Config;
+use MittagQI\Translate5\Test\JsonTestAbstract;
 
 /**
  * This will import 2 tasks, and it will test the functionality if the user is able to open 2 different task at the same time.
  */
-class Translate198Test extends editor_Test_JsonTest
+class Translate198Test extends JsonTestAbstract
 {
     protected static bool $setupOwnCustomer = true;
 

@@ -28,6 +28,10 @@ END LICENSE AND COPYRIGHT
 
 namespace MittagQI\Translate5\Segment\TagRepair;
 
+use editor_Segment_Internal_ContentTag;
+use editor_Segment_Internal_Tag;
+use editor_Segment_Tag;
+
 /**
  * Abstraction for an Internal "repair tag" used with the automatic tag repair
  * This Tag is able to evaluate & store additional information about the tags position regarding words in the text, it represents an internal tag
@@ -36,9 +40,9 @@ namespace MittagQI\Translate5\Segment\TagRepair;
  * In the pairing phase, the opener/closing tags will even be joined to a full tag back again to ensure, the repairing creates valid internal tags and thus turn back to full tags but one hierarchy level higher
  * the essential part of the prepare pairing phase is, that paired internal tags need to transfere the repair-index to the closing tag as otherwise they would render a wrong repair-index for the request markup
  */
-class InternalTag extends Tag
+final class InternalTag extends Tag
 {
-    protected static $type = \editor_Segment_Tag::TYPE_INTERNAL;
+    protected static ?string $type = editor_Segment_Tag::TYPE_INTERNAL;
 
     /**
      * Internal flag that tells us, if we have already been requested and thus turned our internal tags to afterStart/beforeEndMarkup and we can be paired
@@ -55,20 +59,16 @@ class InternalTag extends Tag
      */
     private int $tagIndex = -1;
 
+    public int $rightOrder = -1;
+
     /**
      * retrieves the internal tag index
-     * @return int
      */
-    public function getTagIndex()
+    public function getTagIndex(): int
     {
         return $this->tagIndex;
     }
 
-    /**
-     * As soon as our internal spans are added we act as singular tags
-     * {@inheritDoc}
-     * @see \editor_Tag::isSingular()
-     */
     public function isSingular(): bool
     {
         if ($this->wasPrepared) {
@@ -80,8 +80,6 @@ class InternalTag extends Tag
 
     /**
      * Internal tags must not be splitted nor joined !
-     * {@inheritDoc}
-     * @see \editor_Segment_Tag::isSplitable()
      */
     public function isSplitable(): bool
     {
@@ -90,41 +88,26 @@ class InternalTag extends Tag
 
     /**
      * Must be overwritten to ensure, the internal tag does add it's text nor text-length to the field-tags
-     * {@inheritDoc}
-     * @see \editor_Tag::getText()
      */
-    public function getText()
+    public function getText(): string
     {
         return '';
     }
 
     /**
      * Must be overwritten to ensure, the internal tag does add it's text nor text-length to the field-tags
-     * {@inheritDoc}
-     * @see \editor_Tag::getTextLength()
      */
-    public function getTextLength()
+    public function getTextLength(): int
     {
         return 0;
     }
 
     /**
      * Must be overwritten to ensure, the internal tag does add it's text nor text-length to the field-tags
-     * {@inheritDoc}
-     * @see \editor_Tag::getLastChildsTextLength()
      */
     public function getLastChildsTextLength(): int
     {
         return 0;
-    }
-
-    /**
-     * @see \editor_Tag::createBaseClone()
-     * @return InternalTag|Tag
-     */
-    protected function createBaseClone()
-    {
-        return new InternalTag($this->startIndex, $this->endIndex, $this->category, $this->name);
     }
 
     /* Consolidation API */
@@ -142,14 +125,14 @@ class InternalTag extends Tag
      * It de-objectifies our children as afterStart markup and evaluates the internal tagIndex
      * In case this tag is no real internal-tag (but has the class, what theoretically can happen for any markup, our contents then would not be translated
      */
-    public function preparePairing()
+    public function preparePairing(): void
     {
         // prepare our children
         if ($this->hasChildren()) {
             foreach ($this->children as $child) {
                 // extract our tag-index from our short content tag
-                if ($child->hasClass(\editor_Segment_Internal_ContentTag::CSS_CLASS_SHORT)) {
-                    $contentTag = \editor_Segment_Internal_ContentTag::fromTag($child);
+                if ($child->hasClass(editor_Segment_Internal_ContentTag::CSS_CLASS_SHORT)) {
+                    $contentTag = editor_Segment_Internal_ContentTag::fromTag($child);
                     $this->tagIndex = $contentTag->getTagIndex();
                 }
                 $this->afterStartMarkup .= $child->render();
@@ -162,9 +145,9 @@ class InternalTag extends Tag
     /**
      * This API is called before consolidation and before rendering for request
      */
-    public function prePairWith(Tag $tag)
+    public function prePairWith(Tag $tag): void
     {
-        if (is_a($tag, 'MittagQI\Translate5\Segment\TagRepair\InternalTag') && $this->tagIndex == $tag->getTagIndex()) {
+        if (is_a($tag, InternalTag::class) && $this->tagIndex == $tag->getTagIndex()) {
             // In case we found our pairing counterpart we must set it's tag index to ours to ensure, the request is rendered with proper indexes
             $tag->setRepairIndex($this->repairIdx);
         }
@@ -183,7 +166,7 @@ class InternalTag extends Tag
      */
     public function isPairedOpener(): bool
     {
-        return ($this->tagIndex > -1 && $this->hasClass(\editor_Segment_Internal_Tag::CSS_CLASS_OPEN));
+        return ($this->tagIndex > -1 && $this->hasClass(editor_Segment_Internal_Tag::CSS_CLASS_OPEN));
     }
 
     /**
@@ -191,18 +174,16 @@ class InternalTag extends Tag
      */
     public function isPairedCloser(): bool
     {
-        return ($this->tagIndex > -1 && $this->hasClass(\editor_Segment_Internal_Tag::CSS_CLASS_CLOSE));
+        return ($this->tagIndex > -1 && $this->hasClass(editor_Segment_Internal_Tag::CSS_CLASS_CLOSE));
     }
 
     /**
      * The passed $tag is a tag if the same type and is a paired closer
      * This is the place where a un-paired internal tag changes to a full paired one
-     * {@inheritDoc}
-     * @see editor_Segment_Tag::pairWith()
      */
-    public function pairWith(\editor_Segment_Tag $tag): bool
+    public function pairWith(editor_Segment_Tag $tag): bool
     {
-        if (is_a($tag, 'MittagQI\Translate5\Segment\TagRepair\InternalTag') && $this->tagIndex == $tag->getTagIndex()) {
+        if (is_a($tag, InternalTag::class) && $this->tagIndex == $tag->getTagIndex()) {
             $this->paired = true;
             $this->endIndex = $tag->startIndex;
             $this->rightOrder = $tag->order;

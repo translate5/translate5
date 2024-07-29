@@ -494,9 +494,10 @@ class editor_Utils
      *   (aber nur weil tagBreakUp davor aufgerufen wurde und sonst das array nicht in der Struktur verändert wurde)
      *
      * @param array $segment
+     * @param bool $concatDelim
      * @return array $segment
      */
-    public static function wordBreakUp($segment)
+    public static function wordBreakUp($segment, $concatDelim = false) : array
     {
         $config = Zend_Registry::get('config');
         $regexWordBreak = $config->runtimeOptions->editor->export->wordBreakUpRegex;
@@ -506,6 +507,37 @@ class editor_Utils
         // no other array structure manipulating method may be called between tagBreakUp and wordBreakUp!!!
         for ($i = 0; $i < count($segment); $i++) {
             $split = preg_split($regexWordBreak, $segment[$i], flags: PREG_SPLIT_NO_EMPTY | PREG_SPLIT_DELIM_CAPTURE);
+
+            // If delimiters should be concatenated with their left-side chunks
+            if ($concatDelim) {
+
+                // Initialize an empty array to hold the result
+                $result = [];
+
+                // Loop through the parts and concatenate delimiters
+                for ($j = 0; $j < count($split); $j++) {
+                    // If the current part is a non-word character (delimiter), concatenate it with the previous part
+                    if (preg_match($regexWordBreak, $split[$j])) {
+                        // Append the concatenated result to the result array
+                        if (isset($split[$j-1])) {
+                            $last = array_pop($result);
+                            $last .= $split[$j];
+                            array_push($result, $last);
+                            // Skip the next part since it has been concatenated
+                        } else {
+                            // If there's no next part, just add the delimiter
+                            $result[] = $split[$j];
+                        }
+                    } else {
+                        // If the current part is not a delimiter, just add it to the result
+                        $result[] = $split[$j];
+                    }
+                }
+
+                // Spoof $split with $result
+                $split = $result;
+            }
+
             array_splice($segment, $i, 1, $split);
             $i = $i + count($split);
         }

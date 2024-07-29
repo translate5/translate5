@@ -346,7 +346,7 @@ class editor_Models_LanguageResources_Resource
     public function getInitialStatus(
         ?array $specificData,
         int $languageResourceId,
-        ZfExtended_Zendoverwrites_Translate $translate
+        ZfExtended_Zendoverwrites_Translate $translate,
     ): array {
         return [
             'status' => LanguageResourceStatus::NOTCHECKED,
@@ -372,5 +372,10 @@ class editor_Models_LanguageResources_Resource
     public function getStrippingFramingTagsConfig(): array
     {
         return [];
+    }
+
+    public function supportsInternalFuzzy(): bool
+    {
+        return false;
     }
 }

@@ -27,8 +27,9 @@ END LICENSE AND COPYRIGHT
 */
 use MittagQI\Translate5\Test\Import\Config;
 use MittagQI\Translate5\Test\Import\LanguageResource;
+use MittagQI\Translate5\Test\JsonTestAbstract;
 
-class Translate2991Test extends \editor_Test_JsonTest
+class Translate2991Test extends JsonTestAbstract
 {
     /**
      * Id of a preset that was created during test run

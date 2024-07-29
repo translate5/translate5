@@ -68,6 +68,10 @@ Ext.define('Editor.view.MaintenancePanel', {
         );
         // If maintenance is over, destroy this panel
         Ext.Ajax.on('requestcomplete',function(owner, response, options){
+
+            // If getAllResponseHeaders is not a function, it means maintenance is not really over
+            if (!Ext.isFunction(response.getAllResponseHeaders)) return;
+            
             var data = response.getAllResponseHeaders();
             data.date = data['x-translate5-shownotice'];
     		data.msg  = data['x-translate5-maintenance-message'];

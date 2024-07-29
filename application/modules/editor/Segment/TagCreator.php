@@ -37,26 +37,17 @@ use PHPHtmlParser\DTO\Tag\AttributeDTO;
  */
 final class editor_Segment_TagCreator
 {
-    /**
-     * @var editor_Segment_TagCreator
-     */
-    private static $_instance = null;
+    private static ?editor_Segment_TagCreator $_instance = null;
 
-    /**
-     * @var editor_Segment_TagProviderInterface[]
-     */
-    private static $_provider = [];
+    private static array $_provider = [];
 
-    /**
-     * @var boolean
-     */
-    private static $_locked = false;
+    private static bool $_locked = false;
 
     /**
      * Adds a Provider for Tags
      * @throws ZfExtended_Exception
      */
-    public static function registerProvider(editor_Segment_TagProviderInterface $provider)
+    public static function registerProvider(editor_Segment_TagProviderInterface $provider): void
     {
         if (self::$_locked) {
             throw new ZfExtended_Exception('Registering Segment Tag Providers after app bootstrapping is not allowed.');
@@ -64,10 +55,7 @@ final class editor_Segment_TagCreator
         self::$_provider[$provider->getTagType()] = $provider;
     }
 
-    /**
-     * @return editor_Segment_TagCreator
-     */
-    public static function instance()
+    public static function instance(): editor_Segment_TagCreator
     {
         if (self::$_instance == null) {
             self::$_instance = new editor_Segment_TagCreator();
@@ -87,12 +75,11 @@ final class editor_Segment_TagCreator
      * The default is a 'editor_Segment_AnyTag' representing an uncategorized internal tag
      * NOTE: This API does not care about the children contained in the tag nor the text-length
      * @throws Exception
-     * @return editor_Segment_Tag
      */
-    public function fromJsonData(stdClass $data)
+    public function fromJsonData(stdClass $data): editor_Segment_Tag
     {
         try {
-            $tag = $this->evaluate($data->type, $data->name, $data->classes, $data->attribs, $data->startIndex, $data->endIndex);
+            $tag = $this->evaluate($data->type, $data->name, $data->classes, $data->attribs, $data->startIndex);
             $tag->jsonUnserialize($data);
 
             return $tag;
@@ -106,9 +93,8 @@ final class editor_Segment_TagCreator
      * To make this happen all available Internal Tag Identifiers must be registered with this class
      * The default is a 'editor_Segment_AnyTag' representing an uncategorized internal tag
      * NOTE: This API does not care about the children contained in the tag nor the text-length
-     * @return editor_Segment_Tag
      */
-    public function fromHtmlNode(HtmlNode $node, int $startIndex = 0)
+    public function fromHtmlNode(HtmlNode $node, int $startIndex = 0): editor_Segment_Tag
     {
         $classNames = [];
         $attributes = [];
@@ -139,10 +125,9 @@ final class editor_Segment_TagCreator
     /**
      * Tries to evaluate an Internal tag out of a given Dom Element
      * This is an alternative implementation using PHP DOM
-     * see editor_Tag::USE_PHP_DOM
-     * @return editor_Segment_Tag
+     * see Markup::useStrictEscaping
      */
-    public function fromDomElement(DOMElement $element, int $startIndex = 0)
+    public function fromDomElement(DOMElement $element, int $startIndex = 0): editor_Segment_Tag
     {
         $classNames = [];
         $attributes = [];
@@ -174,9 +159,8 @@ final class editor_Segment_TagCreator
      * The central API to identify the needed Tag class by classnames and attributes
      * @param string[] $classNames
      * @param string[] $attributes
-     * @return editor_Segment_Tag
      */
-    private function evaluate(string $type, string $nodeName, array $classNames, array $attributes, int $startIndex)
+    private function evaluate(string $type, string $nodeName, array $classNames, array $attributes, int $startIndex): editor_Segment_Tag
     {
         // check for Internal tags. This must be done in any case since the Internal TagCheck (as quality provider) can be disabled via config
         if ((editor_Segment_Internal_Tag::isType($type) || in_array(editor_Segment_Internal_Tag::CSS_CLASS, $classNames)) && editor_Segment_Internal_Tag::hasNodeName($nodeName)) {
@@ -194,8 +178,8 @@ final class editor_Segment_TagCreator
             return new editor_Segment_Mqm_Tag($startIndex, $startIndex);
         }
         // let our providers find a tag
-        foreach (static::$_provider as $type => $tagProvider) {
-            if ($tagProvider->isSegmentTag($type, $nodeName, $classNames, $attributes)) {
+        foreach (self::$_provider as $providerType => $tagProvider) {
+            if ($tagProvider->isSegmentTag($providerType, $nodeName, $classNames, $attributes)) {
                 return $tagProvider->createSegmentTag($startIndex, $startIndex, $nodeName, $classNames);
             }
         }

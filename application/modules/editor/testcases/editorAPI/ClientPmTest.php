@@ -27,13 +27,24 @@ END LICENSE AND COPYRIGHT
 */
 
 use MittagQI\Translate5\Test\Import\LanguageResource;
+use MittagQI\Translate5\Test\ImportTestAbstract;
 
 /**
  * Tests the Client PM role / multitenancy
  */
-class ClientPmTest extends editor_Test_ImportTest
+class ClientPmTest extends ImportTestAbstract
 {
     private static int $newUserId = -1;
+
+    private static int $numTasksBefore = 0;
+
+    public static function beforeTests(): void
+    {
+        // the test often fails because tests before left tasks in the DB
+        // too overcome this, we evaluate the number of tasks before testing.
+        // this is just to avoid false positive errors in the suite ...
+        self::$numTasksBefore = count(static::api()->getJson('editor/task'));
+    }
 
     /**
      * This tests if the project-view is restricted to the tasks bound to the clientpm and unrestricted for a pm
@@ -43,7 +54,7 @@ class ClientPmTest extends editor_Test_ImportTest
         // import the needed tasks
         $config = static::getConfig();
         // import one task with the testmanager as owner and the base customer
-        $task0 = $config->addTask('en', 'de', static::getTestCustomerId(), '3-segments-en-de.zip')
+        $task0 = $config->addTask('en', 'de', static::getTestCustomerId(0), '3-segments-en-de.zip')
             ->setProperty('foreignId', '1');
         $config->import($task0);
         // import one task with the testclientpm as owner and customer 1
@@ -54,7 +65,9 @@ class ClientPmTest extends editor_Test_ImportTest
         // the pm should see both tasks
         static::api()->login('testmanager');
         $tasks = static::api()->getJson('editor/task');
-        static::assertCount(2, $tasks);
+
+        // take number of tasks at the beginning into account
+        static::assertCount(2 + self::$numTasksBefore, $tasks);
 
         // ... while the clientpm only can see the one bound to him
         static::api()->login('testclientpm');

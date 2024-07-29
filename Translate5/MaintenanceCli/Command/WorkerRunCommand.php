@@ -30,6 +30,7 @@ namespace Translate5\MaintenanceCli\Command;
 
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Throwable;
 use Zend_Exception;
@@ -55,14 +56,30 @@ class WorkerRunCommand extends Translate5AbstractCommand
 
             // the full command description shown when running the command with
             // the "--help" option
-            ->setHelp('Give the worker ID as argument to run it. ' .
+            ->setHelp(
+                'Give the worker ID as argument to run it. ' .
                 'Must be in state waiting.' .
-                'Is used for process based worker start up.');
+                'Is used for process based worker start up.'
+            );
 
         $this->addArgument(
             'id',
             InputArgument::REQUIRED,
             'The worker ID to be started.'
+        );
+
+        // during API-tests the test-flag is set via option
+        $this->addOption(
+            'test',
+            null,
+            InputOption::VALUE_NONE,
+            'Use the test-database to run a worker during API-tests.'
+        );
+        $this->addOption(
+            'apptest',
+            null,
+            InputOption::VALUE_NONE,
+            'Use the test-database to run a worker during API-tests.'
         );
     }
 
@@ -75,8 +92,19 @@ class WorkerRunCommand extends Translate5AbstractCommand
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $this->initInputOutput($input, $output);
-        //$this->initTranslate5AppOrTest();
-        $this->initTranslate5(); //woher wissen die worker ob sie als test laufen?
+
+        if ($this->input->getOption('test')) {
+            // no choice in case test-environment is forced
+            $this->initTranslate5('test');
+        } elseif ($this->input->getOption('apptest')) {
+            // also the apptest has an own mode - in lack of having an origin
+            $this->initTranslate5('apptest');
+        } elseif ($this->isPorcelain) {
+            // also no choice for porcelain calls
+            $this->initTranslate5();
+        } else {
+            $this->initTranslate5AppOrTest();
+        }
 
         //if maintenance is near, we disallow starting workers
         if (ZfExtended_Models_Installer_Maintenance::isLoginLock()) {

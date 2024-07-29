@@ -4246,9 +4246,9 @@ A task was associated to you in the task-portal {portalLink}.
                 <source>Unterschied zu Quellsegment</source>
                 <target>Diff to source</target>
             </trans-unit>
-            <trans-unit id='RGllc2UgUmVzc291cmNlIHdpcmQgZW50ZmVybnQ='>
-                <source>Diese Ressource wird entfernt</source>
-                <target>This resource is removed</target>
+            <trans-unit id='RGllc2UgU3ByYWNocmVzc291cmNlIHd1cmRlIGVudGZlcm50IChJRDogJXMp'>
+                <source>Diese Sprachressource wurde entfernt (ID: %s)</source>
+                <target>This language resource was removed (ID: %s)</target>
             </trans-unit>
             <trans-unit id='V2llZGVyaG9sdW5nIG51ciBhdXRvbWF0aXNjaCBlcnNldHplbiBiencuIEVyc2V0enVuZyBkZXIgV2llZGVyaG9sdW5nIHZvcnNjaGxhZ2VuLCB3ZW5uIFppZWwgbGVlciBpc3Q='>
                 <source>Wiederholung nur automatisch ersetzen bzw. Ersetzung der Wiederholung vorschlagen, wenn Ziel leer ist</source>
@@ -4285,6 +4285,10 @@ A task was associated to you in the task-portal {portalLink}.
             <trans-unit id='SW50ZXJuZXIgRnV6enkgYWt0aXY='>
                 <source>Interner Fuzzy aktiv</source>
                 <target>Internal fuzzy active</target>
+            </trans-unit>
+            <trans-unit id='SW50ZXJuZSBGdXp6eXMgKCVzKQ=='>
+                <source>Interne Fuzzys (%s)</source>
+                <target>Internal fuzzies (%s)</target>
             </trans-unit>
             <trans-unit id='RXJzdGVsbHVuZ3NkYXR1bQ=='>
                 <source>Erstellungsdatum</source>
@@ -6636,9 +6640,9 @@ The following task was imported with errors / warnings / notices. Please take ca
                 <source>Der Benutzer hat das Recht, die Sprachressourcen in InstantTranslate &amp; TermPortal zu nutzen, die denselben Kunden zugeordnet sind, denen der Benutzer hier zugeordnet ist.</source>
                 <target>User has the right to use those language resources in InstantTranslate &amp; TermPortal, that are assigned to the same clients, as the user is assigned to here.</target>
             </trans-unit>
-            <trans-unit id='WnVnZXdpZXNlbmUgS3VuZGVuIChCZXRyaWZmdCBSb2xsZW4gUE0sIEluc3RhbnRUcmFuc2xhdGUgdW5kIFRlcm1Qb3J0YWwp'>
-                <source>Zugewiesene Kunden (Betrifft Rollen PM, InstantTranslate und TermPortal)</source>
-                <target>Assigned clients (affect roles PM, InstantTranslate and TermPortal-roles)</target>
+            <trans-unit id='WnVnZXdpZXNlbmUgS3VuZGVuIChCZXRyaWZmdCBSb2xsZW4gUE0sIEluc3RhbnRUcmFuc2xhdGUsIFRNIE1haW50ZW5hbmNlIHVuZCBUZXJtUG9ydGFsKQ'>
+                <source>Zugewiesene Kunden (Betrifft Rollen PM, InstantTranslate, TM Maintenance und TermPortal)</source>
+                <target>Assigned clients (affect roles PM, InstantTranslate, TM Maintenance and TermPortal-roles)</target>
             </trans-unit>
             <trans-unit id='WnVnw6RuZ2xpY2hlIE1hbmFnZW1lbnTDvGJlcnNpY2h0ZW4gZsO8ciBSb2xsZSBQTQ=='>
                 <source>Zugängliche Managementübersichten für Rolle PM</source>
@@ -6727,6 +6731,14 @@ The following task was imported with errors / warnings / notices. Please take ca
             <trans-unit id='UG1saWdodA=='>
                 <source>Pmlight</source>
                 <target>PM Light</target>
+            </trans-unit>
+            <trans-unit id='VE1NYWludGVuYW5jZQ=='>
+                <source>TMMaintenance</source>
+                <target>TM Maintenance (selected clients)</target>
+            </trans-unit>
+            <trans-unit id='VE1NYWludGVuYW5jZV9hbGxDbGllbnRz'>
+                <source>TMMaintenance_allClients</source>
+                <target>TM Maintenance (all clients)</target>
             </trans-unit>
             <trans-unit id='RWRpdG9yLW9ubHktb3ZlcnJpZGU='>
                 <source>Editor-only-override</source>
@@ -9665,9 +9677,9 @@ E-Mail: service@MittagQI.com</pre>
                 <source>Beide Benennungen bereits vorhanden in ausgewählter TermCollection.</source>
                 <target>Both terms are already existing within selected term collection</target>
             </trans-unit>
-            <trans-unit id='QmVncmlmZiBleGlzdGllcnQgYmVyZWl0cyBpbiBkZXIgYXVzZ2V3w6RobHRlbiBUZXJtQ29sbGVjdGlvbg=='>
-                <source>Begriff existiert bereits in der ausgewählten TermCollection</source>
-                <target>Term already exists in selected TermCollection</target>
+            <trans-unit id='RGVyIEJlZ3JpZmYgZXhpc3RpZXJ0IGJlcmVpdHMgaW4gZWluZW0gYW5kZXJlbkVpbnRyYWcuPGJyIC8+TcO2Y2h0ZW4gU2llIGlobiB3aXJrbGljaCBpbiBkaWUgQmVncmlmZnNzYW1tbHVuZyBhdWZuZWhtZW4/'>
+                <source>Der Begriff existiert bereits in einem anderenEintrag.<br />Möchten Sie ihn wirklich in die Begriffssammlung aufnehmen?</source>
+                <target>The term already exists in another entry.<br />Do you really want to add it to the term collection?</target>
             </trans-unit>
             <trans-unit id="R2VzY2jDvHR6dGUgUmVnZXgtR3J1cHBl">
                 <source>Geschützte Regex-Gruppe</source>
@@ -9955,6 +9967,10 @@ E-Mail: service@MittagQI.com</pre>
             <trans-unit id="YWxsb3dfZG93bmxvYWRfcG9wdXBfYWxlcnQ=">
                 <source>allow_download_popup_alert</source>
                 <target>Please allow popups for this site to automatically download the file.</target>
+            </trans-unit>
+            <trans-unit id='U2VydmVyIGbDvHIgZGVuIGFuZ2VmcmFndGVuIERpZW5zdCBpc3QgbmljaHQgZXJyZWljaGJhci4='>
+                <source>Server für den angefragten Dienst ist nicht erreichbar.</source>
+                <target>Server for the queried service is not reachable.</target>
             </trans-unit>
         </body>
     </file>

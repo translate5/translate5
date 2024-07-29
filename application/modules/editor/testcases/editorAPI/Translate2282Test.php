@@ -27,13 +27,14 @@ END LICENSE AND COPYRIGHT
 */
 
 use MittagQI\Translate5\Test\Import\Config;
+use MittagQI\Translate5\Test\JsonTestAbstract;
 
 /**
  * Testcase for TRANSLATE-2282 Mixing XLF id and rid values led to wrong tag numbering
  * also tests now TRANSLATE-2658 Wrong tag numbering between source and target in imported MemoQ XLF files
  * For details see the issue.
  */
-class Translate2282Test extends editor_Test_JsonTest
+class Translate2282Test extends JsonTestAbstract
 {
     protected static array $forbiddenPlugins = [
         'editor_Plugins_LockSegmentsBasedOnConfig_Bootstrap',
