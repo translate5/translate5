@@ -79,6 +79,25 @@ class editor_TermcollectionController extends ZfExtended_RestController
         unset($this->data->langResUuid, $this->data->specificId);
     }
 
+    public function deleteAction()
+    {
+        $this->entityLoad();
+
+        $this->processClientReferenceVersion();
+
+        try {
+            $remover = ZfExtended_Factory::get(editor_Models_LanguageResources_Remover::class, [$this->entity]);
+            $remover->remove(true);
+        } catch (ZfExtended_Models_Entity_Exceptions_IntegrityConstraint) {
+            //if there are associated tasks we can not delete the language resource
+            ZfExtended_Models_Entity_Conflict::addCodes([
+                'E1158' => 'A Language Resources cannot be deleted as long as tasks are assigned to this Language Resource.',
+            ], 'editor.languageresources');
+
+            throw new ZfExtended_Models_Entity_Conflict('E1158');
+        }
+    }
+
     /***
      * Info: function incomplete!
      * Only used in a test at the moment!
