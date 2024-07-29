@@ -88,4 +88,16 @@ class editor_Models_Workflow_Action extends ZfExtended_Models_Entity_Abstract
 
         return $this->db->fetchAll($s)->toArray();
     }
+
+    public function loadByAction(string $actionClass, string $action): array
+    {
+        $actionClass = ltrim($actionClass, '\\');
+        $s = $this->db->select();
+        $s->where('`actionClass` = ?', $actionClass);
+        $s->where('`action` = ?', $action);
+        $s->order('position');
+        $s->order('id');
+
+        return $this->db->fetchAll($s)->toArray();
+    }
 }

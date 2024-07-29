@@ -26,7 +26,9 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-class Translate3013Test extends \editor_Test_ApiTest
+use MittagQI\Translate5\Test\ApiTestAbstract;
+
+class Translate3013Test extends ApiTestAbstract
 {
     /***
      * First collection ID

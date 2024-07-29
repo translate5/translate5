@@ -117,6 +117,8 @@ class Worker extends editor_Models_Task_AbstractWorker
                 $reimportFile->setFileDto($file);
                 $reimportFile->import($fileId, $file->reimportFile, $params['segmentTimestamp']);
             }
+        } catch (\Throwable $e) {
+            Zend_Registry::get('logger')->exception($e);
         } finally {
             //if it was a PM override, delete it again
             if ($tua->getIsPmOverride()) {

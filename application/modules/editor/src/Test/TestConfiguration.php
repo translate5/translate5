@@ -72,7 +72,6 @@ final class TestConfiguration
      */
     public const CONFIGS = [
         /* Configs that need to be of fixed value */
-
         'runtimeOptions.customers.anonymizeUsers' => 1,
         'runtimeOptions.editor.notification.userListColumns' => '["surName","firstName","email","role","state","deadlineDate"]',
         'runtimeOptions.import.enableSourceEditing' => 1,

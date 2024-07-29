@@ -26,6 +26,10 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use editor_Models_LanguageResources_LanguageResource as LanguageResource;
+use editor_Services_Connector as Connector;
+use MittagQI\Translate5\Integration\FileBasedInterface;
+
 class editor_Plugins_MatchAnalysis_Pretranslation
 {
     use ZfExtended_Logger_DebugTrait;
@@ -61,9 +65,7 @@ class editor_Plugins_MatchAnalysis_Pretranslation
     protected $userName;
 
     /***
-     * Collection of assigned languageResource resources types where key is languageResourceid and resource type is the value
-     *
-     * @var array
+     * @var array<int, LanguageResource>
      */
     protected $resources = [];
 
@@ -97,9 +99,15 @@ class editor_Plugins_MatchAnalysis_Pretranslation
 
     /***
      * Collection of assigned resources to the task
-     * @var array
+     * @var array<int, Connector>
      */
-    protected $connectors = [];
+    private $connectors = [];
+
+    /**
+     * [Resource ID => [LR ID => Connector]]
+     * @var array<string, array<int, Connector>>
+     */
+    private array $internalFuzzyConnectorMap = [];
 
     /***
      * Pretranslation mt connectors(the mt resources associated to a task)
@@ -140,6 +148,64 @@ class editor_Plugins_MatchAnalysis_Pretranslation
     public static function renderDummyTargetText($taskGuid)
     {
         return "translate5-unique-id[" . $taskGuid . "]";
+    }
+
+    protected function internalFuzzyConnectorSet(LanguageResource $languageResource): bool
+    {
+        return isset($this->internalFuzzyConnectorMap[$languageResource->getResourceId()]);
+    }
+
+    protected function addInternalFuzzyConnector(LanguageResource $lr, Connector $connector): void
+    {
+        $this->internalFuzzyConnectorMap[$lr->getResourceId()] = [
+            (int) $lr->getId() => $connector,
+        ];
+    }
+
+    /**
+     * @return iterable<int, Connector>
+     */
+    protected function getInternalFuzzyConnectorsIterator(): iterable
+    {
+        foreach ($this->internalFuzzyConnectorMap as $connectorTuple) {
+            foreach ($connectorTuple as $lrId => $connector) {
+                yield $lrId => $connector;
+            }
+        }
+    }
+
+    protected function addConnector(int $languageResourceId, Connector $connector)
+    {
+        $this->connectors[$languageResourceId] = $connector;
+    }
+
+    /**
+     * @return iterable<int, Connector>
+     */
+    protected function getConnectorsIterator(): iterable
+    {
+        foreach ($this->connectors as $languageResourceId => $connector) {
+            yield $languageResourceId => $connector;
+        }
+
+        foreach ($this->getInternalFuzzyConnectorsIterator() as $languageResourceId => $connector) {
+            yield $languageResourceId => $connector;
+        }
+    }
+
+    protected function hasConnectors(): bool
+    {
+        return ! empty($this->connectors);
+    }
+
+    protected function emptyConnectors(): void
+    {
+        $this->connectors = [];
+    }
+
+    private function getConnector(int $languageResourceId): ?Connector
+    {
+        return $this->connectors[$languageResourceId] ?? null;
     }
 
     /**
@@ -186,7 +252,7 @@ class editor_Plugins_MatchAnalysis_Pretranslation
 
         //set the type
         $languageResource = $this->resources[$languageResourceid];
-        /* @var $languageResource editor_Models_LanguageResources_LanguageResource */
+        /* @var $languageResource LanguageResource */
 
         //just to display the TM name too, we add it here to the type
         $type = $languageResource->getServiceName() . ' - ' . $languageResource->getName();
@@ -224,7 +290,7 @@ class editor_Plugins_MatchAnalysis_Pretranslation
             //if the source contains no text but tags only, we set the target to the source directly
             // and the segment is not editable
             $targetResult = $segment->getSource();
-            $segment->setMatchRate(editor_Services_Connector_FilebasedAbstract::CONTEXT_MATCH_VALUE);
+            $segment->setMatchRate(FileBasedInterface::CONTEXT_MATCH_VALUE);
             $matchType[] = $matchrateType::TYPE_SOURCE;
             $segment->setEditable(false);
         }
@@ -233,12 +299,12 @@ class editor_Plugins_MatchAnalysis_Pretranslation
         $segment->setMatchRateType((string) $matchrateType);
 
         $segment->setAutoStateId($this->autoStates->calculatePretranslationState($segment->isEditable()));
-        //a segment is only pretranslated if it contains content
+        //a segment is only pre-translated if it contains content
         $segment->setPretrans($hasText ? $segment::PRETRANS_INITIAL : $segment::PRETRANS_NOTDONE);
 
         //check if the result is valid for log
-        if ($this->isResourceLogValid($languageResource, $segment->getMatchRate())) {
-            $this->connectors[$languageResourceid]->logAdapterUsage($segment, $isRepetition);
+        if ($this->isResourceLogValid($languageResource, (int) $segment->getMatchRate())) {
+            $this->getConnector($languageResourceid)?->logAdapterUsage($segment, $isRepetition);
         }
 
         $segment->set($segmentField, $targetResult); //use sfm->getFirstTargetName here
@@ -275,33 +341,6 @@ class editor_Plugins_MatchAnalysis_Pretranslation
             'languageResourceId' => $languageResourceid,
             'result' => $result,
         ]);
-    }
-
-    /***
-     * Init the task user assocition if exist. If not a default record will be initialized
-     * @return editor_Models_TaskUserAssoc
-     */
-    protected function initUsertTaskAssoc()
-    {
-        if ($this->userTaskAssoc) {
-            return $this->userTaskAssoc;
-        }
-
-        try {
-            $this->userTaskAssoc = editor_Models_Loaders_Taskuserassoc::loadByTaskForceWorkflowRole($this->userGuid, $this->task);
-        } catch (ZfExtended_Models_Entity_NotFoundException $e) {
-            $this->userTaskAssoc = ZfExtended_Factory::get('editor_Models_TaskUserAssoc');
-            $this->userTaskAssoc->setUserGuid($this->userGuid);
-            $this->userTaskAssoc->setTaskGuid($this->task->getTaskGuid());
-            $this->userTaskAssoc->setWorkflow($this->task->getWorkflow());
-            $this->userTaskAssoc->setWorkflowStepName('');
-            $this->userTaskAssoc->setRole('');
-            $this->userTaskAssoc->setState('');
-            $this->userTaskAssoc->setIsPmOverride(true);
-            $this->userTaskAssoc->setUsedInternalSessionUniqId(null);
-            $this->userTaskAssoc->setUsedState(null);
-            $this->userTaskAssoc->setState(editor_Workflow_Default::STATE_EDIT);
-        }
     }
 
     /***
@@ -349,7 +388,7 @@ class editor_Plugins_MatchAnalysis_Pretranslation
             return false;
         }
         $lr = $this->resources[$languageResourceId];
-        /* @var $lr editor_Models_LanguageResources_LanguageResource */
+        /* @var $lr LanguageResource */
         $tcs = ZfExtended_Factory::get('editor_Services_TermCollection_Service');
 
         /* @var $tcs editor_Services_TermCollection_Service */
@@ -359,14 +398,15 @@ class editor_Plugins_MatchAnalysis_Pretranslation
     /***
      * Should the current language resources result with matchrate be logged in the languageresources ussage log table
      *
-     * @param editor_Models_LanguageResources_LanguageResource $languageResource
+     * @param LanguageResource $languageResource
      * @param int $matchRate
      * @return boolean
      */
-    protected function isResourceLogValid(editor_Models_LanguageResources_LanguageResource $languageResource, int $matchRate)
+    protected function isResourceLogValid(LanguageResource $languageResource, int $matchRate)
     {
         //check if it is tm or tc, an if the matchrate is >= 100
-        return ($languageResource->isTm() || $languageResource->isTc()) && $matchRate >= editor_Services_Connector_FilebasedAbstract::EXACT_MATCH_VALUE;
+        return ($languageResource->isTm() || $languageResource->isTc())
+            && $matchRate >= FileBasedInterface::EXACT_MATCH_VALUE;
     }
 
     /***

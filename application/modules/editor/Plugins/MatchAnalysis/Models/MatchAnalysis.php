@@ -25,6 +25,8 @@
 
  END LICENSE AND COPYRIGHT
  */
+
+use MittagQI\Translate5\Integration\FileBasedInterface;
 use MittagQI\Translate5\Plugins\MatchAnalysis\Models\Pricing\PresetPrices;
 use MittagQI\Translate5\Plugins\MatchAnalysis\Models\Pricing\PresetRange;
 use ZfExtended_Factory as Factory;
@@ -227,8 +229,8 @@ class editor_Plugins_MatchAnalysis_Models_MatchAnalysis extends ZfExtended_Model
         // Get pricing
         $this->pricing = Factory::get(PresetPrices::class)->getPricesFor(
             $presetId,
-            $task->getSourceLang(),
-            $task->getTargetLang()
+            (int) $task->getSourceLang(),
+            (int) $task->getTargetLang()
         );
 
         ksort($ranges);
@@ -267,9 +269,15 @@ class editor_Plugins_MatchAnalysis_Models_MatchAnalysis extends ZfExtended_Model
         //init the language reources group array
         $groupedResults = $this->initResultArray($analysisAssoc);
         foreach ($results as $res) {
-            //the key will be languageResourceId + fuzzy flag (ex: "OpenTm2 memoryfuzzy")
+            //the key will be languageResource->ServiceType + fuzzy flag (ex: "OpenTm2 memoryfuzzy")
             //because for the internal fuzzy additional row is displayed
-            $rowKey = $res['languageResourceid'] . ($res['internalFuzzy'] == '1' ? 'fuzzy' : '');
+            $isInternalFuzzy = $res['internalFuzzy'] == '1';
+            if ($isInternalFuzzy) {
+                $lr = $this->getLanguageResourceCached((int) $res['languageResourceid']);
+                $rowKey = $this->getFuzzyName($lr?->getResourceId() ?? 'deleted ressource');
+            } else {
+                $rowKey = $res['languageResourceid'];
+            }
 
             //results found in group
             $resultFound = false;
@@ -281,9 +289,15 @@ class editor_Plugins_MatchAnalysis_Models_MatchAnalysis extends ZfExtended_Model
             //check on which border group this result belongs to
             foreach ($this->fuzzyRanges as $begin => $end) {
                 //check if the language resource is not initialized by group initializer
-                if (! isset($groupedResults[$rowKey]) && $res['languageResourceid'] > 0) {
+                if (! isset($groupedResults[$rowKey]['resourceName']) && $res['languageResourceid'] > 0) {
                     //the resource is removed for the assoc, but the analysis stays
-                    $groupedResults[$rowKey]['resourceName'] = $translate->_("Diese Ressource wird entfernt");
+                    $newName = $translate->_('Diese Sprachressource wurde entfernt (ID: %s)');
+                    $groupedResults[$rowKey]['resourceName'] = sprintf(
+                        $newName,
+                        $isInternalFuzzy
+                            ? $this->getFuzzyName($res['languageResourceid'])
+                            : $res['languageResourceid']
+                    );
                     $groupedResults[$rowKey]['resourceColor'] = "";
                 }
 
@@ -364,8 +378,12 @@ class editor_Plugins_MatchAnalysis_Models_MatchAnalysis extends ZfExtended_Model
         /* @var $task editor_Models_Task */
         $task->loadByTaskGuid($analysisData['taskGuid']);
 
+        $fuzzyTypes = [];
         foreach ($langResTaskAssocs as $res) {
             $lr = $this->getLanguageResourceCached($res['languageResourceId']);
+            if ($isInternalFuzzy && $lr->getResourceType() == editor_Models_Segment_MatchRateType::TYPE_TM) {
+                $fuzzyTypes[$lr->getResourceId()] = $lr->getServiceName();
+            }
 
             //if the languageresource was deleted, we can not add additional data here
             if (empty($lr)) {
@@ -376,18 +394,35 @@ class editor_Plugins_MatchAnalysis_Models_MatchAnalysis extends ZfExtended_Model
 
             //init the group
             $initGroups = $initGroups + $initRow($lr->getId(), $lr->getName(), $lr->getColor(), $lr->getResourceType());
+        }
 
-            //if internal fuzzy is activated, and the langage resource is of type tm, add aditional internal fuzzy row
-            if ($isInternalFuzzy && $lr->getResourceType() == editor_Models_Segment_MatchRateType::TYPE_TM) {
-                //the key will be languageResourceId + fuzzy flag (ex: "OpenTm2 memoryfuzzy")
-                //for each internal fuzzy, additional row is displayed
-                $initGroups = $initGroups + $initRow(($lr->getId() . 'fuzzy'), ($lr->getName() . ' - internal Fuzzies'), $lr->getColor(), $lr->getResourceType());
+        if ($isInternalFuzzy) {
+            $translate = ZfExtended_Zendoverwrites_Translate::getInstance();
+            //the key will be languageResourceId + fuzzy flag (ex: "OpenTm2 memoryfuzzy")
+            //for each internal fuzzy, additional row is displayed
+            //init the internal fuzzies
+            foreach ($fuzzyTypes as $resourceId => $name) {
+                $parts = explode('_', $resourceId);
+                $resourceNumber = array_pop($parts);
+
+                $initGroups = $initGroups + $initRow(
+                    $this->getFuzzyName($resourceId),
+                    sprintf($translate->_('Interne Fuzzys (%s)'), "$name $resourceNumber"),
+                    '',
+                    editor_Models_Segment_MatchRateType::TYPE_TM
+                );
             }
         }
+
         //init the repetition
         $initGroups = $initGroups + $initRow(0, "", "", editor_Models_Segment_MatchRateType::TYPE_AUTO_PROPAGATED);
 
         return $initGroups;
+    }
+
+    private function getFuzzyName(string $resourceId): string
+    {
+        return 'Fuzzy ' . $resourceId;
     }
 
     /**
@@ -398,7 +433,7 @@ class editor_Plugins_MatchAnalysis_Models_MatchAnalysis extends ZfExtended_Model
         foreach ($data as $idx => $row) {
             $id = (int) $row['languageResourceid'];
             $lr = $this->getLanguageResourceCached($id);
-            if ($id === 0 && $row['matchRate'] == editor_Services_Connector_FilebasedAbstract::REPETITION_MATCH_VALUE) {
+            if ($id === 0 && $row['matchRate'] == FileBasedInterface::REPETITION_MATCH_VALUE) {
                 $data[$idx]['type'] = editor_Models_Segment_MatchRateType::TYPE_AUTO_PROPAGATED;
                 $data[$idx]['name'] = 'repetition';
             } elseif (empty($lr)) {

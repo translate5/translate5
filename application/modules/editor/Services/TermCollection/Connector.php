@@ -26,9 +26,10 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\Integration\FileBasedInterface;
 use MittagQI\Translate5\Terminology\SearchCollection;
 
-class editor_Services_TermCollection_Connector extends editor_Services_Connector_FilebasedAbstract
+class editor_Services_TermCollection_Connector extends editor_Services_Connector_Abstract implements FileBasedInterface
 {
     /**
      * If the query for the term had tags, the match rate must be less then 100% so that the user has to fix the tags
@@ -53,9 +54,6 @@ class editor_Services_TermCollection_Connector extends editor_Services_Connector
         $this->targetLang = $targetLang;
     }
 
-    /**
-     * @see editor_Services_Connector_FilebasedAbstract::addTm()
-     */
     public function addTm(array $fileinfo = null, array $params = null): bool
     {
         if (empty($fileinfo)) {
@@ -79,7 +77,7 @@ class editor_Services_TermCollection_Connector extends editor_Services_Connector
         $import->loadUser($userGuid);
 
         //import the term collection
-        if (! $import->parseTbxFile($fileinfo, $this->languageResource->getId())) {
+        if (! $import->parseTbxFile($fileinfo, (string) $this->languageResource->getId())) {
             $this->logger->error('E1321', 'Term Collection Import: Errors on parsing the TBX, the file could not be imported or contains no term entries.');
 
             return false;
@@ -337,9 +335,6 @@ class editor_Services_TermCollection_Connector extends editor_Services_Connector
         return $newFileInfo;
     }
 
-    /**
-     * @see editor_Services_Connector_FilebasedAbstract::getValidFiletypes()
-     */
     public function getValidFiletypes()
     {
         return [
@@ -348,9 +343,6 @@ class editor_Services_TermCollection_Connector extends editor_Services_Connector
         ];
     }
 
-    /**
-     * @see editor_Services_Connector_FilebasedAbstract::getValidExportTypes()
-     */
     public function getValidExportTypes()
     {
         return [
@@ -362,7 +354,6 @@ class editor_Services_TermCollection_Connector extends editor_Services_Connector
      * Add/parce tbx file to the exsisting termcollection
      *
      * {@inheritDoc}
-     * @see editor_Services_Connector_FilebasedAbstract::addAdditionalTm()
      */
     public function addAdditionalTm(array $fileinfo = null, array $params = null)
     {
@@ -371,5 +362,11 @@ class editor_Services_TermCollection_Connector extends editor_Services_Connector
 
     public function getTm($mime)
     {
+    }
+
+    public function delete()
+    {
+        //to be implemented if needed
+        $this->log(__METHOD__);
     }
 }

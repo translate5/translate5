@@ -36,6 +36,7 @@ use MittagQI\Translate5\Task\Current\NoAccessException;
 use MittagQI\Translate5\Task\Import\TaskDefaults;
 use MittagQI\Translate5\Task\TaskContextTrait;
 use MittagQI\ZfExtended\Controller\Response\Header;
+use MittagQI\ZfExtended\Worker\Trigger\Factory as WorkerTriggerFactory;
 use ZfExtended_Sanitizer as Sanitizer;
 
 /***
@@ -875,7 +876,14 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         }
 
         if ($resource->getFilebased()) {
-            $this->handleInitialFileUpload($manager);
+            try {
+                $this->handleInitialFileUpload($manager);
+            } catch (ZfExtended_ErrorCodeException $e) {
+                $this->entity->delete();
+
+                throw $e;
+            }
+
             //when there are errors, we cannot set it to true
             if (! $this->validateUpload()) {
                 $this->entity->delete();
@@ -1197,10 +1205,19 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
      */
     protected function handleInitialFileUpload(editor_Services_Manager $manager)
     {
+        $config = $this->getSingleCustomerOrDefaultConfig();
         $connector = $manager->getConnector(
             $this->entity,
-            config: $this->getSingleCustomerOrDefaultConfig()
+            config: $config
         );
+
+        if (! $connector->ping($this->entity->getResource(), $config)) {
+            throw ZfExtended_UnprocessableEntity::createResponse(
+                'E1282',
+                ['Server für den angefragten Dienst ist nicht erreichbar.']
+            );
+        }
+
         /* @var $connector editor_Services_Connector */
 
         $importInfo = $this->handleFileUpload($connector);
@@ -1348,8 +1365,7 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
      */
     protected function queueServiceImportWorker(array $importInfo, bool $addNew)
     {
-        $worker = ZfExtended_Factory::get('editor_Services_ImportWorker');
-        /* @var $worker editor_Services_ImportWorker */
+        $worker = ZfExtended_Factory::get(editor_Services_ImportWorker::class);
 
         $params = $this->getAllParams();
         $params['languageResourceId'] = $this->entity->getId();
@@ -1374,13 +1390,17 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         $this->entity->setStatus(LanguageResourceStatus::IMPORT);
         $this->entity->save();
 
-        $workerId = $worker->queue();
+        // we add in state scheduled to give event-subscripers the chance to add their workers
+        $workerId = $worker->queue(0, ZfExtended_Models_Worker::STATE_SCHEDULED, false);
 
         $this->events->trigger('serviceImportWorkerQueued', argv: [
             'entity' => $this->entity,
             'workerId' => $workerId,
             'params' => $this->getAllParams(),
         ]);
+
+        //finally trigger the worker queue
+        WorkerTriggerFactory::create()->triggerQueue();
     }
 
     /***
@@ -1638,7 +1658,7 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
 
             $res->source = $decodeHtmlSpecial($res->source);
 
-            $res->source = $diffTagger->diffSegment($queryString, $res->source, null, null);
+            $res->source = $diffTagger->diffSegment($queryString, $res->source, null, null, true);
             $res->source = $this->unprotectTags($res->source, array_merge($tags, $queryStringTags));
         }
 

@@ -28,13 +28,14 @@ END LICENSE AND COPYRIGHT
 
 use MittagQI\Translate5\Test\Import\Bconf;
 use MittagQI\Translate5\Test\Import\Config;
+use MittagQI\Translate5\Test\JsonTestAbstract;
 
 /**
  * Testcase for the Custom file filter configuration with GUI / BCONF Management
  * This Test currently has uncommented parts due to the phenomenon, the target-srx is not respected on some systems and OKAPI always uses the source-SRX for segmentation
  * TODE FIXME: seperate the unit-test part and make a pure unit-test out of it ...
  */
-class OkapiBconfFilterTest extends editor_Test_JsonTest
+class OkapiBconfFilterTest extends JsonTestAbstract
 {
     protected static array $requiredPlugins = [
         'editor_Plugins_Okapi_Init',
@@ -167,11 +168,19 @@ class OkapiBconfFilterTest extends editor_Test_JsonTest
     {
         // invalid Pipeline
         $invalidPipeline = static::api()->getFileContent('pipeline-invalid.pln');
-        $pipeline = new editor_Plugins_Okapi_Bconf_Pipeline(static::$bconf->getPipelinePath(), $invalidPipeline, static::$bconf->getId());
+        $pipeline = new editor_Plugins_Okapi_Bconf_Pipeline(
+            static::$bconf->getPipelinePath(),
+            $invalidPipeline,
+            (int) static::$bconf->getId()
+        );
         $this->_createResourceFileTest($pipeline, false, ['invalid integer value', 'trimSrcLeadingWS.i=INVALID']);
         // invalid Content
         $invalidContent = file_get_contents(static::api()->getFile('content-invalid.json'));
-        $content = new editor_Plugins_Okapi_Bconf_Content(static::$bconf->getContentPath(), $invalidContent, static::$bconf->getId());
+        $content = new editor_Plugins_Okapi_Bconf_Content(
+            static::$bconf->getContentPath(),
+            $invalidContent,
+            (int) static::$bconf->getId()
+        );
         $this->_createResourceFileTest($content, false, ['no source SRX set', 'no step found']);
     }
 
@@ -182,15 +191,19 @@ class OkapiBconfFilterTest extends editor_Test_JsonTest
     public function test70_UploadSrx()
     {
         $result = $this->_uploadResourceFile('languages-changed.srx', 'editor/plugins_okapi_bconf/uploadsrx', 'srx', [
-            'id' => static::$bconf->getId(),
+            'id' => (int) static::$bconf->getId(),
             'purpose' => 'source',
         ]);
         self::assertEquals(true, $result->success, 'Failed to upload changed SRX "languages-changed.srx" as new source SRX');
         // check update in pipeline
-        $pipeline = new editor_Plugins_Okapi_Bconf_Pipeline(static::$bconf->getPipelinePath(), null, static::$bconf->getId());
+        $pipeline = new editor_Plugins_Okapi_Bconf_Pipeline(
+            static::$bconf->getPipelinePath(),
+            null,
+            (int) static::$bconf->getId()
+        );
         self::assertEquals('languages-changed.srx', $pipeline->getSrxFile('source'), 'Failed to change pipeline.pln for updated source SRX "languages-changed.srx"');
         // check update in content
-        $content = new editor_Plugins_Okapi_Bconf_Content(static::$bconf->getContentPath(), null, static::$bconf->getId());
+        $content = new editor_Plugins_Okapi_Bconf_Content(static::$bconf->getContentPath(), null, (int) static::$bconf->getId());
         self::assertEquals('languages-changed.srx', $content->getSrxFile('source'), 'Failed to change content.json for updated source SRX "languages-changed.srx"');
 
         try {

@@ -26,13 +26,15 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\Test\ApiTestAbstract;
+
 /**
  * Test if the autoset of the defaults for the okapiBconfDefaultName export config works.
  * When making an editor/config request, the okapi plugin will check for .bconf files in the
  * okapi data directory and those files will be set as defaults option for runtimeOptions.plugins.Okapi.export.okapiBconfDefaultName configs.
  * INFO: when new .bconf file is added there, the config should be also added
  */
-class OkapiExportTest extends editor_Test_ApiTest
+class OkapiExportTest extends ApiTestAbstract
 {
     protected static array $requiredPlugins = [
         'editor_Plugins_Okapi_Init',

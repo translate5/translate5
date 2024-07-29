@@ -38,7 +38,7 @@ use MittagQI\Translate5\ContentProtection\ContentProtector;
 /**
  * Segment Entity Object
  *
- * @method string getId()
+ * @method int getId()
  * @method void setId(int $id)
  * @method string getSegmentNrInTask()
  * @method void setSegmentNrInTask(int $nr)
@@ -53,16 +53,16 @@ use MittagQI\Translate5\ContentProtection\ContentProtector;
  * @method string getTaskGuid()
  * @method void setTaskGuid(string $guid)
  * @method string getTimestamp()
- * @method void setTimestamp(int $timestamp)
+ * @method void setTimestamp(string $timestamp)
  * @method string getEditable()
  * @method void setEditable(bool $editable)
  * @method string getPretrans()
- * @method void setPretrans(bool $pretrans)
+ * @method void setPretrans(int $pretrans)
  * @method string getMatchRate()
  * @method void setMatchRate(int $matchrate)
  * @method string getMatchRateType()
- * @method string getStateId()
- * @method void setStateId(int $id)
+ * @method string|null getStateId()
+ * @method void setStateId(int|null $id)
  * @method string getAutoStateId()
  * @method void setAutoStateId(int $id)
  * @method string getFileOrder()
@@ -1966,7 +1966,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract
             throw new Zend_Exception("For using the editor_Models_Validator_Segment Validator a taskGuid must be set in the segment!");
         }
         $this->segmentFieldManager->initFields($taskGuid);
-        if (empty($this->validator)) {
+        if (null === $this->validator) {
             $this->validator = ZfExtended_Factory::get($this->validatorInstanceClass, [$this->segmentFieldManager, $this]);
         }
     }

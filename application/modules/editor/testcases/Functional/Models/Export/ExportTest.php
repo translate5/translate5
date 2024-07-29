@@ -9,8 +9,8 @@ use editor_Models_Foldertree;
 use editor_Models_Import_FileParser_Xlf;
 use editor_Models_Logger_Task;
 use editor_Models_Task;
-use editor_Test_UnitTest;
 use MittagQI\Translate5\Task\Import\SkeletonFile;
+use MittagQI\Translate5\Test\UnitTestAbstract;
 use ReflectionException;
 use Zend_Db_Statement_Exception;
 use Zend_Exception;
@@ -21,7 +21,7 @@ use ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey;
 use ZfExtended_Models_Entity_NotFoundException;
 use ZfExtended_Utils;
 
-class ExportTest extends editor_Test_UnitTest
+class ExportTest extends UnitTestAbstract
 {
     private ?editor_Models_Task $task;
 

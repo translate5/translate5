@@ -58,12 +58,13 @@ use League\Flysystem\FilesystemOperationFailed;
 use League\Flysystem\MountManager;
 use MittagQI\Translate5\Plugins\TermImport\Exception\TermImportException;
 use MittagQI\Translate5\Plugins\TermImport\Service\LoggerService;
+use MittagQI\Translate5\Tools\FilesystemFactoryInterface;
 use MittagQI\Translate5\Tools\FlysystemFactory;
 use stdClass;
 use Zend_Registry;
 use ZfExtended_Factory as Factory;
 
-class FilesystemFactory
+class FilesystemFactory implements FilesystemFactoryInterface
 {
     public const DEFAULT_HOST_LABEL = 'default';
 

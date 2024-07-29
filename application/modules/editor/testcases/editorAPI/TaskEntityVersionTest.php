@@ -27,11 +27,12 @@ END LICENSE AND COPYRIGHT
 */
 
 use MittagQI\Translate5\Test\Import\Config;
+use MittagQI\Translate5\Test\ImportTestAbstract;
 
 /**
  * TaskEntityVersionTest is currently incomplete, just created as a stub to be implemented
  */
-class TaskEntityVersionTest extends editor_Test_ImportTest
+class TaskEntityVersionTest extends ImportTestAbstract
 {
     protected static function setupImport(Config $config): void
     {

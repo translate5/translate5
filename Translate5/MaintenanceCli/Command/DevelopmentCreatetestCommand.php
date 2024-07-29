@@ -148,13 +148,14 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\Test\JsonTestAbstract;
 use MittagQI\Translate5\Test\Import\Config;
 
 /**
  * Testcase for ' . $issue . ' //TODO FOR TEST USAGE: add a description
  * For details see the issue.
  */
-class ' . $name . ' extends editor_Test_JsonTest {
+class ' . $name . ' extends JsonTestAbstract {
 
 //TODO FOR TEST USAGE: check plugin pre conditions
     protected static array $forbiddenPlugins = [

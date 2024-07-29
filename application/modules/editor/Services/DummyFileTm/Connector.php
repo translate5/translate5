@@ -33,6 +33,7 @@ END LICENSE AND COPYRIGHT
  *
  */
 
+use MittagQI\Translate5\Integration\FileBasedInterface;
 use MittagQI\Translate5\LanguageResource\Adapter\UpdatableAdapterInterface;
 
 /**
@@ -45,7 +46,7 @@ use MittagQI\Translate5\LanguageResource\Adapter\UpdatableAdapterInterface;
  * This should be the CSV defaults.
  * The first column must be an id, the second the source and the theird column the target values. Other columns are ignored.
  */
-class editor_Services_DummyFileTm_Connector extends editor_Services_Connector_FilebasedAbstract implements UpdatableAdapterInterface
+class editor_Services_DummyFileTm_Connector extends editor_Services_Connector_Abstract implements UpdatableAdapterInterface, FileBasedInterface
 {
     /**
      * Paging information for search requests
@@ -74,10 +75,6 @@ class editor_Services_DummyFileTm_Connector extends editor_Services_Connector_Fi
         parent::__construct();
     }
 
-    /**
-     * (non-PHPdoc)
-     * @see editor_Services_Connector_FilebasedAbstract::addTm()
-     */
     public function addTm(array $fileinfo = null, array $params = null)
     {
         if (empty($fileinfo)) {
@@ -104,10 +101,6 @@ class editor_Services_DummyFileTm_Connector extends editor_Services_Connector_Fi
         //TODO
     }
 
-    /**
-     * (non-PHPdoc)
-     * @see editor_Services_Connector_FilebasedAbstract::getTm()
-     */
     public function getTm($mime)
     {
         $target = strtolower($this->languageResource->getTargetLangCode());
@@ -160,10 +153,6 @@ class editor_Services_DummyFileTm_Connector extends editor_Services_Connector_Fi
         $row->save();
     }
 
-    /**
-     * (non-PHPdoc)
-     * @see editor_Services_Connector_FilebasedAbstract::query()
-     */
     public function query(editor_Models_Segment $segment)
     {
         $queryString = $this->getQueryStringAndSetAsDefault($segment);
@@ -171,10 +160,6 @@ class editor_Services_DummyFileTm_Connector extends editor_Services_Connector_Fi
         return $this->loopData($this->tagHandler->prepareQuery($queryString));
     }
 
-    /**
-     * (non-PHPdoc)
-     * @see editor_Services_Connector_FilebasedAbstract::search()
-     */
     public function search(string $searchString, $field = 'source', $offset = null)
     {
         $this->searchCount = 0;
@@ -265,10 +250,6 @@ class editor_Services_DummyFileTm_Connector extends editor_Services_Connector_Fi
         $this->searchCount++;
     }
 
-    /**
-     * (non-PHPdoc)
-     * @see editor_Services_Connector_FilebasedAbstract::delete()
-     */
     public function delete()
     {
         $where = [
@@ -281,9 +262,6 @@ class editor_Services_DummyFileTm_Connector extends editor_Services_Connector_Fi
         $this->db->delete($where);
     }
 
-    /**
-     * @see editor_Services_Connector_FilebasedAbstract::getValidFiletypes()
-     */
     public function getValidFiletypes()
     {
         return [
@@ -291,9 +269,6 @@ class editor_Services_DummyFileTm_Connector extends editor_Services_Connector_Fi
         ];
     }
 
-    /**
-     * @see editor_Services_Connector_FilebasedAbstract::getValidFiletypeForExport()
-     */
     public function getValidExportTypes()
     {
         return [

@@ -27,11 +27,12 @@ END LICENSE AND COPYRIGHT
 */
 
 use MittagQI\Translate5\Test\Import\Config;
+use MittagQI\Translate5\Test\JsonTestAbstract;
 
 /**
  * SegmentCommentRoundtripTest imports a SDLXLIFF file with comments, adds new comments and export the file again
  */
-class SegmentCommentRoundtripTest extends editor_Test_JsonTest
+class SegmentCommentRoundtripTest extends JsonTestAbstract
 {
     protected static bool $termtaggerRequired = true;
 

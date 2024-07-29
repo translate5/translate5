@@ -27,6 +27,7 @@ END LICENSE AND COPYRIGHT
 */
 
 use MittagQI\Translate5\Test\Import\Config;
+use MittagQI\Translate5\Test\JsonTestAbstract;
 
 /**
  * Testcase for TRANSLATE-2149 Xliff import deletes part of segment and a tag
@@ -38,7 +39,7 @@ use MittagQI\Translate5\Test\Import\Config;
  *  instead of the correct one:
  *    Text der von extern kommt zu ersetzen “<1>damit wir keine Probleme mit dem Urheberrecht bekommen”.</1>
  */
-class Translate2149Test extends editor_Test_JsonTest
+class Translate2149Test extends JsonTestAbstract
 {
     protected static array $forbiddenPlugins = [
         'editor_Plugins_LockSegmentsBasedOnConfig_Bootstrap',

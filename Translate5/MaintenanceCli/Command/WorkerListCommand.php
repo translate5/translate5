@@ -65,6 +65,13 @@ class WorkerListCommand extends Translate5AbstractCommand
             InputOption::VALUE_NONE,
             'List also done and defunc workers.'
         );
+
+        $this->addOption(
+            'summary',
+            's',
+            InputOption::VALUE_NONE,
+            'List just a summary of worker counts grouped by state and worker type.'
+        );
     }
 
     /**
@@ -109,12 +116,16 @@ class WorkerListCommand extends Translate5AbstractCommand
             'progress' => 'Progress:',
         ];
 
+        $isSummary = $this->input->getOption('summary');
+
         $resultNotListed = [];
-        if ($this->input->getOption('all')) {
+        if ($this->input->getOption('all') || $isSummary) {
             $statesToIgnore = [];
         } else {
             $statesToIgnore = [$worker::STATE_DEFUNCT, $worker::STATE_DONE];
         }
+
+        $summary = [];
 
         $table = $this->io->createTable();
         $table->setHeaders($headlines);
@@ -123,6 +134,15 @@ class WorkerListCommand extends Translate5AbstractCommand
                 settype($resultNotListed[$workerRow['state']], 'integer');
                 $resultNotListed[$workerRow['state']]++;
 
+                continue;
+            }
+
+            if ($isSummary && $workerRow['state'] !== $worker::STATE_RUNNING) {
+                $idx = $workerRow['worker'].'#'.$workerRow['state'];
+                if (!array_key_exists($idx, $summary)) {
+                    $summary[$idx] = 0;
+                }
+                $summary[$idx]++;
                 continue;
             }
 
@@ -146,6 +166,16 @@ class WorkerListCommand extends Translate5AbstractCommand
         }
 
         $table->render();
+
+        if (! empty($summary)) {
+            $table = $this->io->createTable();
+            $table->setHeaders(['Worker', 'State', 'Count']);
+            foreach ($summary as $key => $value) {
+                $key = explode('#', $key);
+                $table->addRow([$key[0], $key[1], $value]);
+            }
+            $table->render();
+        }
 
         if (! empty($resultNotListed)) {
             $this->io->section('Not listed workers:');
