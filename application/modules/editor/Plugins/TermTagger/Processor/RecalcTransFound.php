@@ -177,7 +177,7 @@ class RecalcTransFound
             WHERE `termTbxId` IN ('%s')
               AND `collectionId` IN (" . join(',', $this->collectionIds) . ")
               AND `processStatus` = 'finalized'
-            LIMIT " . count($tbxIdA) ."             
+            LIMIT " . count($tbxIdA) . "             
         ";
 
         // ! Get `termEntryTbxId` and `term` for each term tbx id detected in source and/or target
@@ -490,9 +490,8 @@ class RecalcTransFound
      * Spoof current termTbxId with another termTbxId within segment target for each case
      * when current termTbxId for a target term IS NOT from the termEntry that source term is from
      * but we have same term with another termTbxId that IS from the same termEntry that source term is from
-     *
      */
-    private function spoofTargetTermsTbxIdsIfNeed(array &$tbxIdA, array $srcIdA, string &$target, string $existsSql) : void
+    private function spoofTargetTermsTbxIdsIfNeed(array &$tbxIdA, array $srcIdA, string &$target, string $existsSql): void
     {
         // Get db adapter
         $db = Zend_Db_Table_Abstract::getDefaultAdapter();
@@ -555,6 +554,7 @@ class RecalcTransFound
                                 $oldTbxId = $this->termsByEntry[$termEntryId_was][$idx_was]['termTbxId'];
                                 $newTbxId = $this->termsByEntry[$termEntryId_now][$idx_now]['termTbxId'];
                                 $spoof[$oldTbxId] = $newTbxId;
+
                                 break;
                             }
                         }
@@ -564,7 +564,7 @@ class RecalcTransFound
         }
 
         // If nothing to be spoofed - return
-        if (!count($spoof)) {
+        if (! count($spoof)) {
             return;
         }
 
@@ -576,10 +576,10 @@ class RecalcTransFound
         $target = str_replace($oldTbxIdA, $newTbxIdA, $target);
 
         // Replace in $tbxIdA
-        array_walk($tbxIdA, fn(&$tbxId) => $tbxId = $spoof[$tbxId] ?? $tbxId); unset($tbxId);
+        array_walk($tbxIdA, fn (&$tbxId) => $tbxId = $spoof[$tbxId] ?? $tbxId);
 
         // Replace in $this->trgIdA
-        array_walk($this->trgIdA, fn(&$tbxId) => $tbxId = $spoof[$tbxId] ?? $tbxId);
+        array_walk($this->trgIdA, fn (&$tbxId) => $tbxId = $spoof[$tbxId] ?? $tbxId);
 
         // Unset term data for old tbx ids
         foreach ($oldTbxIdA as $oldTbxId) {
