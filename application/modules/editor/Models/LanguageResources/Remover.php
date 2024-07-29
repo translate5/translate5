@@ -59,13 +59,12 @@ class editor_Models_LanguageResources_Remover
 
     /**
      * Removes a languageResource completely
-     * @param false $forced
-     * @param false $deleteInResource
+     *
      * @throws Zend_Db_Table_Exception
      * @throws ZfExtended_ErrorCodeException
      * @throws ZfExtended_Exception
      */
-    public function remove($forced = false, $deleteInResource = false)
+    public function remove(bool $forced = false, bool $deleteInResource = false)
     {
         // if the current entity is term collection, init the entity as term collection
         if ($this->entity->isTc()) {
