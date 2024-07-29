@@ -103,7 +103,8 @@ class MaintenanceService extends \editor_Services_Connector_Abstract implements 
         parent::connectTo($languageResource, $sourceLang, $targetLang);
     }
 
-    public function update(\editor_Models_Segment $segment, array $options = []): void {
+    public function update(\editor_Models_Segment $segment, array $options = []): void
+    {
         // TODO not used
     }
 
@@ -901,6 +902,5 @@ class MaintenanceService extends \editor_Services_Connector_Abstract implements 
 
     public function checkUpdatedSegment(SegmentModel $segment): void
     {
-        // TODO: Implement checkUpdatedSegment() method.
     }
 }
