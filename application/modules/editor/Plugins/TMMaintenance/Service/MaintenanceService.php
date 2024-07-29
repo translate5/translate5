@@ -31,6 +31,7 @@ declare(strict_types=1);
 namespace MittagQI\Translate5\Plugins\TMMaintenance\Service;
 
 use editor_Models_LanguageResources_LanguageResource as LanguageResource;
+use editor_Models_Segment as SegmentModel;
 use editor_Models_Task as Task;
 use editor_Services_OpenTM2_Connector as T5MemoryConnector;
 use MittagQI\Translate5\LanguageResource\Adapter\UpdatableAdapterInterface;
@@ -102,12 +103,7 @@ class MaintenanceService extends \editor_Services_Connector_Abstract implements 
         parent::connectTo($languageResource, $sourceLang, $targetLang);
     }
 
-    public function update(
-        \editor_Models_Segment $segment,
-        bool $recheckOnUpdate = self::DO_NOT_RECHECK_ON_UPDATE,
-        bool $rescheduleUpdateOnError = self::DO_NOT_RESCHEDULE_UPDATE_ON_ERROR,
-        bool $useSegmentTimestamp = self::DO_NOT_USE_SEGMENT_TIMESTAMP,
-    ): void {
+    public function update(\editor_Models_Segment $segment, array $options = []): void {
         // TODO not used
     }
 
@@ -901,5 +897,10 @@ class MaintenanceService extends \editor_Services_Connector_Abstract implements 
                 'languageResource' => $this->languageResource,
             ]);
         }
+    }
+
+    public function checkUpdatedSegment(SegmentModel $segment): void
+    {
+        // TODO: Implement checkUpdatedSegment() method.
     }
 }
