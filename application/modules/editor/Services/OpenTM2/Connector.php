@@ -365,7 +365,6 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
             $fileName,
             $tmName,
             $saveToDisk,
-            $useSegmentTimestamp
         );
 
         $recheckOnUpdate = $options[UpdatableAdapterInterface::RECHECK_ON_UPDATE] ?? false;
@@ -400,7 +399,6 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
                 $fileName,
                 $tmName,
                 $saveToDisk,
-                $useSegmentTimestamp
             );
 
             if ($successful) {
@@ -425,7 +423,6 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
                 $fileName,
                 $tmName,
                 $saveToDisk,
-                $useSegmentTimestamp
             );
 
             if ($successful) {
