@@ -30,9 +30,12 @@ class editor_Services_DummyFileTm_Resource extends editor_Models_LanguageResourc
 {
     public function __construct(string $id, string $name)
     {
-        $this->id = $id;
-        $this->name = $name;
+        parent::__construct($id, $name, 'internal');
         $this->analysable = true; //is used by match analysis
-        $this->url = 'internal';
+    }
+
+    public function supportsInternalFuzzy(): bool
+    {
+        return true;
     }
 }
