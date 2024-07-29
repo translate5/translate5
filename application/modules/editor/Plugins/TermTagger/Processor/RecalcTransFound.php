@@ -157,28 +157,31 @@ class RecalcTransFound
      *
      * @throws Zend_Db_Statement_Exception
      */
-    protected function preload(array $srcIdA)
+    protected function preload(array $srcIdA, string &$target)
     {
         $db = Zend_Db_Table_Abstract::getDefaultAdapter();
 
         // Reset data arrays
         $this->homonym = $this->trans = $this->trgTextA = [];
 
-        // Get merged list of term tbx ids detected in source and target
+        // ! Get merged list of term tbx ids detected in source and target
         $tbxIdA = array_unique(array_merge($srcIdA, $this->trgIdA));
 
         // Get merged list of source and target fuzzy languages
         $fuzzy = array_merge($this->sourceFuzzyLanguages, $this->targetFuzzyLanguages);
 
-        // Get `termEntryTbxId` and `term` for each term tbx id detected in source and/or target
-        $this->exists = $db->query("
+        // Prepare template for sql query to fetch terms by their tbxIds
+        $existsSql = "
             SELECT `termTbxId`, `termEntryTbxId`, `term`, `status` 
             FROM `terms_term` 
-            WHERE `termTbxId` IN ('" . join("','", $tbxIdA) . "')
+            WHERE `termTbxId` IN ('%s')
               AND `collectionId` IN (" . join(',', $this->collectionIds) . ")
               AND `processStatus` = 'finalized'
-            LIMIT " . count($tbxIdA) . "             
-        ")->fetchAll(PDO::FETCH_UNIQUE);
+            LIMIT " . count($tbxIdA) ."             
+        ";
+
+        // ! Get `termEntryTbxId` and `term` for each term tbx id detected in source and/or target
+        $this->exists = $db->query(sprintf($existsSql, join("','", $tbxIdA)))->fetchAll(PDO::FETCH_UNIQUE);
 
         // Get all terms (from source and target), grouped by their termEntryTbxId
         $this->termsByEntry = $db->query("
@@ -191,6 +194,11 @@ class RecalcTransFound
             ORDER BY FIND_IN_SET(`status`, 'preferredTerm,standardizedTerm') DESC, 
               `status` = 'admittedTerm' ASC  
         ")->fetchAll(PDO::FETCH_GROUP);
+
+        // Spoof current termTbxId with another termTbxId within segment target for cases
+        // when current termTbxId for a target term IS NOT from the termEntry that source term is from
+        // but we have same term with another termTbxId that IS from the same termEntry that source term is from
+        $this->spoofTargetTermsTbxIdsIfNeed($tbxIdA, $srcIdA, $target, $existsSql);
 
         // Foreach source term
         foreach ($srcIdA as $srcId) {
@@ -283,8 +291,10 @@ class RecalcTransFound
         // Get target tbx ids
         $this->trgIdA = $this->termModel->getTermMidsFromSegment($target);
 
-        // Preload data
-        $this->preload($srcIdA);
+        // Preload data and spoof current termTbxId with another termTbxId within segment target for cases
+        // when current termTbxId for a target term IS NOT from the termEntry that source term is from
+        // but we have same term with another termTbxId that IS from the same termEntry that source term is from
+        $this->preload($srcIdA, $target);
 
         // Get [termTbxId => [mark1, mark2, ...]] pairs for all terms detected in segment source text
         // As you can see at the line above it can be, for example, 3 occurrences of the same term
@@ -474,5 +484,109 @@ class RecalcTransFound
             // Append $insert to class list
             return preg_replace('~( class="[^"]*)"~', '$1 ' . $insert . '"', $replace);
         }, $source);
+    }
+
+    /**
+     * Spoof current termTbxId with another termTbxId within segment target for each case
+     * when current termTbxId for a target term IS NOT from the termEntry that source term is from
+     * but we have same term with another termTbxId that IS from the same termEntry that source term is from
+     *
+     */
+    private function spoofTargetTermsTbxIdsIfNeed(array &$tbxIdA, array $srcIdA, string &$target, string $existsSql) : void
+    {
+        // Get db adapter
+        $db = Zend_Db_Table_Abstract::getDefaultAdapter();
+
+        // Array of [oldTbxId => newTbxId] pairs
+        $spoof = [];
+
+        // Arrays to indicate termEntries having at least one term used in source/target
+        $used = [
+            'source' => [],
+            'target' => [],
+        ];
+
+        // Setup 'used' and 'isSource' flags for each term
+        foreach ($this->termsByEntry as $termEntryId => $termA) {
+            foreach ($termA as $idx => $term) {
+                $this->termsByEntry[$termEntryId][$idx]['used'] = in_array($term['termTbxId'], $tbxIdA);
+                $this->termsByEntry[$termEntryId][$idx]['isSource'] = in_array($term['termTbxId'], $srcIdA);
+            }
+        }
+
+        // Foreach termEntry
+        foreach ($this->termsByEntry as $termEntryId => $termA) {
+            // Foreach term inside termEntry
+            foreach ($termA as $term) {
+                // If it's a term used in source or target
+                if ($term['used']) {
+                    // Setup a flag indicating this termEntry has at least one such term
+                    $used[$term['isSource'] ? 'source' : 'target'][$termEntryId] = true;
+                }
+            }
+        }
+
+        // Array of unused target terms grouped by termEntryId, but only for termEntries having at least one used source term
+        $unusedTarget = [];
+
+        // Foreach termEntry having at least one term used in source
+        foreach ($this->termsByEntry as $termEntryId => $termA) {
+            if (isset($used['source'][$termEntryId])) {
+                // Collect unused target terms in a way that will allow us to swap used-flag from one term to another
+                foreach ($termA as $idx => $term) {
+                    if (! $term['isSource'] && ! $term['used']) {
+                        $unusedTarget[$termEntryId][$term->term] = $idx;
+                    }
+                }
+            }
+        }
+
+        // Foreach termEntry that has term(s) used in target, but has no term(s) used in source
+        foreach ($this->termsByEntry as $termEntryId_was => $termA) {
+            if (! isset($used['source'][$termEntryId_was])
+                || isset($used['target'][$termEntryId_was])) {
+                // Foreach term used in target
+                foreach ($termA as $idx_was => $term) {
+                    if (! $term['isSource'] && $term['used']) {
+                        // Check whether we have homonym (in some termEntry having term(s) used in source)
+                        // If yes - mark it as used instead of current term
+                        foreach ($unusedTarget as $termEntryId_now => $termA) {
+                            if (is_int($idx_now = $termA[$term->term] ?? false)) {
+                                $oldTbxId = $this->termsByEntry[$termEntryId_was][$idx_was]['termTbxId'];
+                                $newTbxId = $this->termsByEntry[$termEntryId_now][$idx_now]['termTbxId'];
+                                $spoof[$oldTbxId] = $newTbxId;
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        // If nothing to be spoofed - return
+        if (!count($spoof)) {
+            return;
+        }
+
+        // Shortcuts
+        $oldTbxIdA = array_keys($spoof);
+        $newTbxIdA = array_values($spoof);
+
+        // Replace in segment target
+        $target = str_replace($oldTbxIdA, $newTbxIdA, $target);
+
+        // Replace in $tbxIdA
+        array_walk($tbxIdA, fn(&$tbxId) => $tbxId = $spoof[$tbxId] ?? $tbxId); unset($tbxId);
+
+        // Replace in $this->trgIdA
+        array_walk($this->trgIdA, fn(&$tbxId) => $tbxId = $spoof[$tbxId] ?? $tbxId);
+
+        // Unset term data for old tbx ids
+        foreach ($oldTbxIdA as $oldTbxId) {
+            unset($this->exists[$oldTbxId]);
+        }
+
+        // Append term data for new tbx ids
+        $this->exists += $db->query(sprintf($existsSql, join("','", $newTbxIdA)))->fetchAll(PDO::FETCH_UNIQUE);
     }
 }

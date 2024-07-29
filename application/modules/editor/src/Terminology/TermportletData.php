@@ -93,61 +93,6 @@ class TermportletData
             'termGroups' => $this->getByTaskGuidAndSegment($segment),
         ];
 
-        // Arrays to indicate termEntries having at least one term used in source/target
-        $used = [
-            'source' => [],
-            'target' => [],
-        ];
-
-        // Foreach termEntry
-        foreach ($this->result['termGroups'] as $termEntryId => $termA) {
-            // Foreach term inside termEntry
-            foreach ($termA as $term) {
-                // If it's a term used in source or target
-                if ($term->used) {
-                    // Setup a flag indicating this termEntry has at least one such term
-                    $used[$term->isSource ? 'source' : 'target'][$termEntryId] = true;
-                }
-            }
-        }
-
-        // Array of unused target terms grouped by termEntryId, but only for termEntries having at least one used source term
-        $unusedTarget = [];
-
-        // Foreach termEntry having at least one term used in source
-        foreach ($this->result['termGroups'] as $termEntryId => $termA) {
-            if (isset($used['source'][$termEntryId])) {
-                // Collect unused target terms in a way that will allow us to swap used-flag from one term to another
-                foreach ($termA as $idx => $term) {
-                    if (! $term->isSource && ! $term->used) {
-                        $unusedTarget[$termEntryId][$term->term] = $idx;
-                    }
-                }
-            }
-        }
-
-        // Foreach termEntry that has term(s) used in target, but has no term(s) used in source
-        foreach ($this->result['termGroups'] as $termEntryId_was => $termA) {
-            if (! isset($used['source'][$termEntryId_was])
-                || isset($used['target'][$termEntryId_was])) {
-                // Foreach term used in target
-                foreach ($termA as $idx_was => $term) {
-                    if (! $term->isSource && $term->used) {
-                        // Check whether we have homonym (in some termEntry having term(s) used in source)
-                        // If yes - mark it as used instead of current term
-                        foreach ($unusedTarget as $termEntryId_now => $termA) {
-                            if (is_int($idx_now = $termA[$term->term] ?? false)) {
-                                $this->result['termGroups'][$termEntryId_was][$idx_was]->used = false;
-                                $this->result['termGroups'][$termEntryId_now][$idx_now]->used = true;
-
-                                break;
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
         $this->result['noTerms'] = empty($this->result['termGroups']);
 
         $termEntryIds = [];
