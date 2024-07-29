@@ -74,40 +74,34 @@ class editor_Segment_FieldTags extends editor_TagSequence
 
     /**
      * The task the segments belong to
-     * @var editor_Models_Task
      */
-    private $task;
+    private editor_Models_Task $task;
 
     /**
      * The id of the segment we refer to
-     * @var int
      */
-    private $segmentId;
+    private int $segmentId;
 
     /**
      * The field our fieldtext comes from e.g. 'source', 'target'
-     * @var string
      */
-    private $field;
+    private string $field;
 
     /**
      * The data-index our fieldtext comes from e.g. 'targetEdit'
-     * @var string
      */
-    private $dataField;
+    private string $dataField;
 
     /**
      * The field of the segment's data we will be saved to
-     * @var string
      */
-    private $saveTo;
+    private ?string $saveTo;
 
     /**
      * Special Helper to Track the field-name as used in the TermTagger Code
      * TODO: Check, if this is really neccessary
-     * @var string
      */
-    private $ttName;
+    private ?string $ttName;
 
     public function __construct(editor_Models_Task $task, int $segmentId, ?string $text, string $field, string $dataField, string $additionalSaveTo = null, string $ttName = null)
     {
@@ -116,7 +110,7 @@ class editor_Segment_FieldTags extends editor_TagSequence
         $this->field = $field;
         $this->dataField = $dataField;
         $this->saveTo = $additionalSaveTo;
-        $this->ttName = ($ttName == null) ? $field : $ttName;
+        $this->ttName = ($ttName === null) ? $field : $ttName;
         $this->_setMarkup($text);
     }
 
@@ -194,7 +188,7 @@ class editor_Segment_FieldTags extends editor_TagSequence
      */
     public function isSourceField(): bool
     {
-        return (substr($this->field, 0, 6) == 'source');
+        return str_starts_with($this->field, 'source');
     }
 
     /**
@@ -272,7 +266,6 @@ class editor_Segment_FieldTags extends editor_TagSequence
 
     /**
      * Checks if a internal tag of a certain type is present
-     * @return boolean
      */
     public function hasType(string $type, bool $includeDeleted = false): bool
     {
@@ -363,7 +356,7 @@ class editor_Segment_FieldTags extends editor_TagSequence
 
     /* Serialization API */
 
-    public function jsonSerialize(): mixed
+    public function jsonSerialize(): stdClass
     {
         $data = parent::jsonSerialize();
         $data->segmentId = $this->segmentId;
@@ -380,7 +373,7 @@ class editor_Segment_FieldTags extends editor_TagSequence
     /**
      * Called after the unparsing phase to finalize all tags
      */
-    protected function finalizeUnparse()
+    protected function finalizeUnparse(): void
     {
         $num = count($this->tags);
         $textLength = $this->getFieldTextLength();
@@ -441,10 +434,8 @@ class editor_Segment_FieldTags extends editor_TagSequence
 
     /**
      * Removes all TrackChanges tags, also deletes all contents of del-tags
-     * @param boolean $condenseBlanks
-     * @return boolean
      */
-    private function deleteTrackChangesTags($condenseBlanks = true): bool
+    private function deleteTrackChangesTags(bool $condenseBlanks = true): bool
     {
         $this->evaluateDeletedInserted(); // ensure this is properly set (normally always the case)
         $this->sort(); // making sure we're in order
@@ -472,7 +463,7 @@ class editor_Segment_FieldTags extends editor_TagSequence
                 // removes the del-tags the "hole punching" may created more deleted tags - should not happen though
                 if (! $tag->wasDeleted) {
                     if ($tag->wasInserted) {
-                        $tag->wasInserted = null;
+                        $tag->wasInserted = false;
                     }
                     $newTags[] = $tag;
                 }
@@ -519,7 +510,7 @@ class editor_Segment_FieldTags extends editor_TagSequence
     /**
      * Removes the text-portion from our field-text and our tags
      */
-    private function cutIndicesOut(int $start, int $end)
+    private function cutIndicesOut(int $start, int $end): void
     {
         $dist = $end - $start;
         if ($dist <= 0) {
@@ -562,7 +553,6 @@ class editor_Segment_FieldTags extends editor_TagSequence
 
     /**
      * Retrieves the text with the TrackChanges removed
-     * @param boolean $condenseBlanks
      */
     private function getFieldTextWithoutTrackChanges(bool $condenseBlanks = true): string
     {
@@ -599,7 +589,7 @@ class editor_Segment_FieldTags extends editor_TagSequence
      * Special API to render all internal newline tags as lines
      * This expects TrackChanges Tags to be removed, otherwise the result will contain trackchanges contents
      */
-    private function replaceTagsForLines()
+    private function replaceTagsForLines(): void
     {
         $tags = [];
         foreach ($this->tags as $tag) {
@@ -616,7 +606,7 @@ class editor_Segment_FieldTags extends editor_TagSequence
      * This is the last step of unparsing the tags and deserialization from JSON
      * It is also crucial for evaluating qualities because only non-deleted tags will count
      */
-    private function evaluateDeletedInserted()
+    private function evaluateDeletedInserted(): void
     {
         foreach ($this->tags as $tag) {
             if ($tag->getType() == editor_Segment_Tag::TYPE_TRACKCHANGES) {
@@ -628,7 +618,7 @@ class editor_Segment_FieldTags extends editor_TagSequence
 
     /* Logging API */
 
-    protected function addErrorDetails(array &$errorData)
+    protected function addErrorDetails(array &$errorData): void
     {
         $errorData['text'] = $this->text;
         $errorData['segmentId'] = $this->segmentId;
@@ -641,18 +631,16 @@ class editor_Segment_FieldTags extends editor_TagSequence
 
     /**
      * Debug state of our segment props
-     * @return string
      */
-    public function debugProps()
+    public function debugProps(): string
     {
         return '[ segment:' . $this->segmentId . ' | field:' . $this->field . ' | dataField:' . $this->dataField . ' | saveTo:' . $this->saveTo . ' ]';
     }
 
     /**
      * Debug formatted JSON
-     * @return string
      */
-    public function debugJson()
+    public function debugJson(): string|false
     {
         return json_encode($this->jsonSerialize(), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT);
     }

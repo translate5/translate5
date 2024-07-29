@@ -34,7 +34,7 @@ use editor_Models_Terminology_Models_CollectionAttributeDataType as CollectionAt
  * @property string $sourceLangCode
  * @property string $targetLangCode
  *
- * @method string getId()
+ * @method int|null getId()
  * @method void setId(int $id)
  * @method string getLangResUuid()
  * @method void setLangResUuid(string $guid)
@@ -456,6 +456,7 @@ class editor_Models_LanguageResources_LanguageResource extends ZfExtended_Models
      * @param array $serviceNames : add service name as filter
      * @param array $sourceLang : add source languages as filter
      * @param array $targetLang : add target languages as filter
+     * @param array $serviceTypes : add service type as a filter
      *
      * @return array
      * @throws ReflectionException
@@ -463,9 +464,11 @@ class editor_Models_LanguageResources_LanguageResource extends ZfExtended_Models
     public function loadByUserCustomerAssocs(
         array $serviceNames = [],
         array $sourceLang = [],
-        array $targetLang = []
+        array $targetLang = [],
+        array $serviceTypes = []
     ): array {
         $customers = ZfExtended_Authentication::getInstance()->getUser()?->getCustomersArray();
+
         if (empty($customers)) {
             return [];
         }
@@ -497,6 +500,11 @@ class editor_Models_LanguageResources_LanguageResource extends ZfExtended_Models
         if (! empty($targetLang)) {
             $s->where('l.targetLang IN(?)', $targetLang);
         }
+
+        if (! empty($serviceTypes)) {
+            $s->where('tm.serviceType IN(?)', $serviceTypes);
+        }
+
         $s->group('tm.id');
 
         return $this->mapLanguageCodes($this->db->fetchAll($s)->toArray());

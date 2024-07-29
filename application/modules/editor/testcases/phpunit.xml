@@ -5,12 +5,13 @@
   </extensions>
   <testsuites>
     <testsuite name="segment-tags">
-      <file>editorAPI/SegmentTagsTest.php</file>
-      <file>editorAPI/SegmentTagsCloneTest.php</file>
-      <file>editorAPI/SegmentTagsComparisionTest.php</file>
-      <file>editorAPI/SegmentTagsOverlapTest.php</file>
-      <file>editorAPI/SegmentTagsRepairTest.php</file>
-      <file>editorAPI/TagsRepairTest.php</file>
+      <file>Unit/Segment/SegmentTagsTest.php</file>
+      <file>Unit/Segment/SegmentTagsCloneTest.php</file>
+      <file>Unit/Segment/SegmentTagsComparisionTest.php</file>
+      <file>Unit/Segment/SegmentTagsOverlapTest.php</file>
+      <file>Unit/Segment/SegmentTagsRepairTest.php</file>
+      <file>Unit/Segment/TagsRepairTest.php</file>
+      <file>Unit/Tools/MarkupTest.php</file>
     </testsuite>
     <testsuite name="quality">
       <file>editorAPI/QualityBaseTest.php</file>

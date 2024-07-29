@@ -79,6 +79,11 @@ final class T5Memory extends DockerServiceAbstract
     protected ?string $requiredVersion = '0.5.58';
 
     /**
+     * For now, we want at least one configured version to be of sufficient version
+     */
+    protected bool $allVersionsMustMatch = false;
+
+    /**
      * We must distinguish between t5memory and the old OpenTM2 to provide different service URLs
      * (non-PHPdoc)
      * @see DockerServiceAbstract::checkConfiguredHealthCheckUrl()
@@ -89,12 +94,9 @@ final class T5Memory extends DockerServiceAbstract
         bool $addResult = true,
     ): bool {
         if ($this->isT5MemoryService($serviceUrl)) {
-            // composes to "http://t5memory.:4040/t5memory_service/resources" requesting this
-            // resources url will retrieve a 200 status and the version
-            $healthcheckUrl = rtrim(
-                    $serviceUrl,
-                    '/'
-                ) . '_service/resources';
+            // composes to "http://t5memory.:4040/t5memory_service/resources"
+            // requesting this resources-url will retrieve a 200 status and the version
+            $healthcheckUrl = rtrim($serviceUrl, '/') . '_service/resources';
         }
 
         return parent::checkConfiguredHealthCheckUrl($healthcheckUrl, $serviceUrl, $addResult);
@@ -107,7 +109,7 @@ final class T5Memory extends DockerServiceAbstract
      */
     protected function findVersionInResponseBody(string $responseBody, string $serviceUrl): ?string
     {
-        if (!$this->isT5MemoryService($serviceUrl)) {
+        if (! $this->isT5MemoryService($serviceUrl)) {
             // there is no other version in existence anymore
             return 'OpenTM2-1.3.0';
         }
