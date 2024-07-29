@@ -876,7 +876,14 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         }
 
         if ($resource->getFilebased()) {
-            $this->handleInitialFileUpload($manager);
+            try {
+                $this->handleInitialFileUpload($manager);
+            } catch (ZfExtended_ErrorCodeException $e) {
+                $this->entity->delete();
+
+                throw $e;
+            }
+
             //when there are errors, we cannot set it to true
             if (! $this->validateUpload()) {
                 $this->entity->delete();
