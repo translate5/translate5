@@ -28,7 +28,6 @@ END LICENSE AND COPYRIGHT
 
 use MittagQI\Translate5\Task\Current\NoAccessException;
 use MittagQI\Translate5\Task\TaskContextTrait;
-use MittagQI\ZfExtended\Tools\Markup;
 
 /**
  * Loads segment comments.
