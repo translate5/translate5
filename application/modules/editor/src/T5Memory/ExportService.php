@@ -376,8 +376,12 @@ class ExportService
 
     private function composeFilename(LanguageResource $languageResource, ExportTmFileExtension $extension): string
     {
-        return APPLICATION_PATH
-            . '/../data/TMExport/'
-            . sprintf('%s_%s.%s', $languageResource->getId(), uniqid(), $extension->value);
+        $exportDir = APPLICATION_PATH . '/../data/TMExport/';
+
+        if (! is_dir($exportDir)) {
+            mkdir($exportDir, recursive: true);
+        }
+
+        return $exportDir . sprintf('%s_%s.%s', $languageResource->getId(), uniqid(), $extension->value);
     }
 }

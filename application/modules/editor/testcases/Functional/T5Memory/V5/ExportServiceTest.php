@@ -86,6 +86,8 @@ class ExportServiceTest extends TestCase
             file_get_contents(__DIR__ . '/ExportAllAsOneTmx/expected.tmx'),
             file_get_contents($file)
         );
+
+        unlink($file);
     }
 
     public function testExportSingleTm(): void
@@ -126,6 +128,8 @@ class ExportServiceTest extends TestCase
             file_get_contents(__DIR__ . '/ExportSingleTm/expected.tm'),
             file_get_contents($file)
         );
+
+        unlink($file);
     }
 
     public function testExportAllAsArchive(): void

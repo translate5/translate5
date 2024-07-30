@@ -60,7 +60,7 @@ class ExportService
             }
         }
 
-        rmDir($exportDir);
+        rmdir($exportDir);
     }
 
     public function exportStarted(string $token): bool
@@ -70,12 +70,18 @@ class ExportService
 
     public function composeExportDir(string $token): string
     {
-        return APPLICATION_PATH . '/../data/TMExport/' . $token;
+        $exportDir = APPLICATION_PATH . '/../data/TMExport/';
+
+        if (! is_dir($exportDir)) {
+            mkdir($exportDir);
+        }
+
+        return $exportDir . $token;
     }
 
     public function composeExportFilepath(string $token, string $filename): string
     {
-        return APPLICATION_PATH . "/../data/TMExport/$token/$filename";
+        return "{$this->composeExportDir($token)}/$filename";
     }
 
     public function queueExportWorker(LanguageResource $languageResource, string $mime, string $token): int
