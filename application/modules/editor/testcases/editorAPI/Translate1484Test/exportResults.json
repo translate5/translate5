@@ -12,7 +12,7 @@
             "langageResourceServiceName": "OpenTM2",
             "sourceLang": "en",
             "targetLang": "de",
-            "totalCharacters": "75"
+            "totalCharacters": "70"
         }
     ],
     "UsageLogByCustomer": [
@@ -94,14 +94,6 @@
             "sourceLang": "en",
             "targetLang": "de",
             "repetition": "0",
-            "charactersPerCustomer": "5"
-        },
-        {
-            "langageResourceName": "API Testing::OpenTm2Tm_Translate1484Test",
-            "langageResourceServiceName": "OpenTM2",
-            "sourceLang": "en",
-            "targetLang": "de",
-            "repetition": "1",
             "charactersPerCustomer": "5"
         }
     ],

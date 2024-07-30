@@ -28,6 +28,7 @@ END LICENSE AND COPYRIGHT
 
 use MittagQI\Translate5\ContentProtection\ContentProtector;
 use MittagQI\Translate5\ContentProtection\NumberProtector;
+use MittagQI\Translate5\Integration\FileBasedInterface;
 use MittagQI\Translate5\Task\TaskEventTrigger;
 
 /**
@@ -122,7 +123,7 @@ class editor_Models_Segment_Updater
         //update the segment finish count for the current workflow step
         ZfExtended_Factory::get(editor_Models_TaskProgress::class)->changeSegmentEditableAndFinishCount(
             $this->task,
-            $this->segment->getAutoStateId(),
+            (int) $this->segment->getAutoStateId(),
             $history->getAutoStateId(),
             $this->segment->getId()
         );
@@ -154,7 +155,7 @@ class editor_Models_Segment_Updater
         //update the segment finish count for the current workflow step
         ZfExtended_Factory::get(editor_Models_TaskProgress::class)->changeSegmentEditableAndFinishCount(
             $this->task,
-            $this->segment->getAutoStateId(),
+            (int) $this->segment->getAutoStateId(),
             $history->getAutoStateId(),
             $this->segment->getId()
         );
@@ -277,7 +278,10 @@ class editor_Models_Segment_Updater
         $segment->setMatchRateType((string) $matchrateType);
 
         //if it is tm or term collection and the matchrate is >=100, log the usage
-        if (($languageresource->isTm() || $languageresource->isTc()) && $segment->getMatchRate() >= editor_Services_Connector_FilebasedAbstract::EXACT_MATCH_VALUE) {
+        if (
+            ($languageresource->isTm() || $languageresource->isTc())
+            && $segment->getMatchRate() >= FileBasedInterface::EXACT_MATCH_VALUE
+        ) {
             $this->logAdapterUsageOnSegmentEdit($languageresource);
         }
     }
@@ -311,8 +315,8 @@ class editor_Models_Segment_Updater
                     $this->contentProtector->protect(
                         $text,
                         ! $isEditingTargetInFront,
-                        $this->task->getSourceLang(),
-                        $this->task->getTargetLang(),
+                        (int) $this->task->getSourceLang(),
+                        (int) $this->task->getTargetLang(),
                         ContentProtector::ENTITY_MODE_RESTORE,
                         $isEditingTargetInFront ? NumberProtector::alias() : '',
                     )
@@ -336,7 +340,12 @@ class editor_Models_Segment_Updater
     {
         $manager = ZfExtended_Factory::get('editor_Services_Manager');
         /* @var $manager editor_Services_Manager */
-        $connector = $manager->getConnector($adapter, $this->task->getSourceLang(), $this->task->getTargetLang(), $this->task->getConfig());
+        $connector = $manager->getConnector(
+            $adapter,
+            (int) $this->task->getSourceLang(),
+            (int) $this->task->getTargetLang(),
+            $this->task->getConfig()
+        );
         /* @var $connector editor_Services_Connector */
         $connector->logAdapterUsage($this->segment);
     }

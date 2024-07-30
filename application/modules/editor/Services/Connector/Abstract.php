@@ -299,7 +299,7 @@ abstract class editor_Services_Connector_Abstract
      * Updates translations in the connected service
      * for returning error messages to the GUI use rest_messages
      */
-    public function update(editor_Models_Segment $segment)
+    public function update(editor_Models_Segment $segment, array $options = [])
     {
         //to be implemented if needed
         $this->log(__METHOD__, ' segment ' . $segment->getId());

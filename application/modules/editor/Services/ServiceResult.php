@@ -158,7 +158,6 @@ class editor_Services_ServiceResult
 
     /**
      * Return serialized object
-     * @return string
      */
     public function getSerialized(): string
     {
@@ -231,5 +230,11 @@ class editor_Services_ServiceResult
         }
 
         return $maxMatchRateResult;
+    }
+
+    public function setRawContent(string $source, string $target): void
+    {
+        $this->lastAdded->rawSource = $source;
+        $this->lastAdded->rawTarget = $target;
     }
 }
