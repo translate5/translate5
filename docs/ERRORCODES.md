@@ -800,6 +800,7 @@ https://confluence.translate5.net/display/TAD/EventCodes
 | <a id="E1591"></a>E1591 | Content Protection | You already created an {mapping} mapping for this {index} combination | User attempted to create Input or Output mapping for already existing Rule-Language pair                                                        |
 | <a id="E1593"></a>E1593 | Content Protection | Trans unit has unexpected structure and was excluded from TMX import  | In process of TMX import occurred trans unit that we were not able to process. Please fix unit and import it separately or ask support for help |
 
+
 ## EventCode Design rules / decisions
 - Prefixed with &quot;E&quot; so that a search for the error code through the code is more reliable than just searching for a number
 - No structure in the numbering to prevent discussions is it an error E12XX or E45XX
