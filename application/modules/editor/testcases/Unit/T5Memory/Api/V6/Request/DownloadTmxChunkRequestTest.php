@@ -27,7 +27,15 @@ class DownloadTmxChunkRequestTest extends TestCase
         self::assertSame('http://example.com/tmName/download.tmx', (string) $request->getUri());
         self::assertSame('UTF-8', $request->getHeaderLine('Accept-charset'));
         self::assertSame('application/xml', $request->getHeaderLine('Accept'));
-        self::assertSame(json_encode(['limit' => 10], JSON_PRETTY_PRINT), $request->getBody()->getContents());
+        self::assertSame(
+            json_encode(
+                [
+                    'limit' => 10,
+                ],
+                JSON_PRETTY_PRINT
+            ),
+            $request->getBody()->getContents()
+        );
     }
 
     public function testCreationWithOffset(): void
@@ -38,7 +46,15 @@ class DownloadTmxChunkRequestTest extends TestCase
         self::assertSame('http://example.com/tmName/download.tmx', (string) $request->getUri());
         self::assertSame('UTF-8', $request->getHeaderLine('Accept-charset'));
         self::assertSame('application/xml', $request->getHeaderLine('Accept'));
-        self::assertSame(json_encode(['startFromInternalKey' => '10:1'], JSON_PRETTY_PRINT), $request->getBody()->getContents());
+        self::assertSame(
+            json_encode(
+                [
+                    'startFromInternalKey' => '10:1',
+                ],
+                JSON_PRETTY_PRINT
+            ),
+            $request->getBody()->getContents()
+        );
     }
 
     public function testThrowInvalidArgumentException(): void
