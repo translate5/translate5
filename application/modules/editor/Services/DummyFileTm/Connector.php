@@ -121,12 +121,8 @@ class editor_Services_DummyFileTm_Connector extends editor_Services_Connector_Ab
         return join("\n", $result);
     }
 
-    public function update(
-        editor_Models_Segment $segment,
-        bool $recheckOnUpdate = self::DO_NOT_RECHECK_ON_UPDATE,
-        bool $rescheduleUpdateOnError = self::DO_NOT_RESCHEDULE_UPDATE_ON_ERROR,
-        bool $useSegmentTimestamp = self::DO_NOT_USE_SEGMENT_TIMESTAMP
-    ): void {
+    public function update(editor_Models_Segment $segment, array $options = []): void
+    {
         $source = $this->tagHandler->prepareQuery($this->getQueryString($segment));
         $target = $this->tagHandler->prepareQuery($segment->getTargetEdit());
 
@@ -151,6 +147,11 @@ class editor_Services_DummyFileTm_Connector extends editor_Services_Connector_Ab
         }
 
         $row->save();
+    }
+
+    public function checkUpdatedSegment(editor_Models_Segment $segment): void
+    {
+        // nothing to do here
     }
 
     public function query(editor_Models_Segment $segment)
