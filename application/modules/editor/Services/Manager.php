@@ -421,8 +421,10 @@ class editor_Services_Manager
                     try {
                         $connector->update(
                             $segment,
-                            UpdatableAdapterInterface::RECHECK_ON_UPDATE,
-                            UpdatableAdapterInterface::RESCHEDULE_UPDATE_ON_ERROR
+                            [
+                                UpdatableAdapterInterface::RECHECK_ON_UPDATE => true,
+                                UpdatableAdapterInterface::RESCHEDULE_UPDATE_ON_ERROR => true,
+                            ]
                         );
                     } catch (SegmentUpdateException) {
                         // Ignore the error here as we don't care about the result
