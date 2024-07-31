@@ -1,0 +1,112 @@
+{
+  "logout": "Abmelden",
+  "localeStore": [
+    {
+      "locale": "en",
+      "name": "Englisch"
+    },
+    {
+      "locale": "de",
+      "name": "Deutsch"
+    }
+  ],
+  "modeCombo": [
+    {
+      "name": "Enthält",
+      "value": "contains"
+    },
+    {
+      "name": "Exact match",
+      "value": "exact"
+    }
+  ],
+  "modeComboSourceTarget": [
+    {
+      "name": "Enthält",
+      "value": "contains"
+    },
+    {
+      "name": "Findet nur ganzes Segment",
+      "value": "exact"
+    }
+  ],
+  "selectTm": {
+    "title": "TM auswählen",
+    "name": "Name",
+    "sourceLanguage": "Quellsprache",
+    "targetLanguage": "Zielsprache",
+    "clients": "Kunden",
+    "select": "Auswählen",
+    "close": "Schließen",
+    "emptyText" : "Keine Datensätze verfügbar"
+  },
+  "searchForm": {
+    "tm": "TM",
+    "mode": "Modus",
+    "source": "Quelle",
+    "target": "Ziel",
+    "author": "Ersteller",
+    "additionalInfo": "Zusätzliche Info",
+    "document": "Dokumentname",
+    "creationDateFrom": "Angelegt nach",
+    "creationDateTo": "Angelegt vor",
+    "search": "Suche",
+    "deleteAll": "Alle löschen",
+    "deleteAllTooltip": "Alle Segmente, die zu den aktuellen Sucheinstellungen passen, werden gelöscht",
+    "sourceLanguage": "Quellsprache",
+    "targetLanguage": "Zielsprache"
+  },
+  "createForm": {
+    "title": "Neues erstellen",
+    "sourceText": "Quelle",
+    "targetText": "Ziel",
+    "save": "Speichern",
+    "cancel": "Abbrechen"
+  },
+  "deleteBatch": {
+    "no": "Ja",
+    "yes": "Nein",
+    "warningText": "ACHTUNG: Alle Segmente, die mit den aktuellen Sucheinstellungen gefunden werden, werden gelöscht. Wollen Sie lieber abbrechen?"
+  },
+  "list" : {
+    "title": "Segmente",
+    "totalAmount": "Gesamtzahl der gefundenen Segmente: ",
+    "calculating": "Wird berechnet...",
+    "saving": "Speichert, bitte warten.",
+    "columns": {
+      "sourceText": "Quelle",
+      "targetText": "Ziel",
+      "author": "Ersteller",
+      "additionalInfo": "Zusätzliche Info",
+      "document": "Dokumentname",
+      "creationDate": "Erstellungsdatum",
+      "actions": "Aktionen",
+      "sourceLanguage": "Quellsprache",
+      "targetLanguage": "Zielsprache"
+    },
+    "edit": "Bearbeiten",
+    "editSource": "Bearbeiten Quelle",
+    "editTarget": "Bearbeiten Ziel",
+    "delete": "Löschen",
+    "create": "Neu anlegen",
+    "save": "Speichern (STRG+S)",
+    "cancel": "Abbrechen (ESC)",
+    "saveGoToPrevious": "Speichern und vorheriges bearbeitbares Segment öffnen (STRG + ALT + SHIFT + ENTER)",
+    "saveGoToNext": "Speichern und nächstes bearbeitbares Segment öffnen (STRG + ALT + ENTER)",
+    "closeGoToPrevious": "Nicht speichern und vorheriges bearbeitbares Segment öffnen (STRG + ALT + ↑)",
+    "closeGoToNext": "Nicht speichern und nächstes bearbeitbares Segment öffnen (STRG + ALT + ↓)"
+  },
+  "error": {
+    "title": "Es ist ein Fehler aufgetreten!",
+    "couldNotProcessRequest": "Fehler beim Speichern oder beim Auslesen von Daten. Bitte wenden Sie sich an unseren Support!",
+    "close": "Schließen",
+    "responseFromServer": "Meldung vom Server: ",
+    "wrongTagsOrdering": "Some of the tags used in the segment are in the wrong order (closing tag before opening tag or missing corresponding tag). Please correct the segment and try again."
+  },
+  "deleteSegment": {
+    "title": "Löschen",
+    "text": "Wollen Sie das Segment wirklich löschen?",
+    "yes": "Ja",
+    "no": "Nein"
+  }
+}

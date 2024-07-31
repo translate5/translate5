@@ -1,0 +1,20 @@
+{
+  "name": "editor",
+  "version": "1.0.0",
+  "description": "",
+  "main": "bundle.js",
+  "scripts": {
+    "build": "webpack"
+  },
+  "dependencies": {
+    "@ckeditor/ckeditor5-dev-utils": "^39.1.0",
+    "@ckeditor/ckeditor5-theme-lark": "^40.0.0",
+    "css-loader": "^6.8.1",
+    "js-htmlencode": "^0.3.0",
+    "postcss-loader": "^7.3.3",
+    "raw-loader": "^4.0.2",
+    "style-loader": "^3.3.3",
+    "webpack": "^5.89.0",
+    "webpack-cli": "^5.1.4"
+  }
+}

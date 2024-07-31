@@ -422,7 +422,7 @@ class T5MemoryMigrationCommand extends Translate5AbstractCommand
         Connector $connector,
         LanguageResource $languageResource,
         string $filenameWithPath,
-        string $type
+        string $type,
     ): void {
         if ($this->createEmptyRequested()) {
             return;
