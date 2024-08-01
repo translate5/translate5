@@ -32,5 +32,4 @@ namespace MittagQI\Translate5\EventDispatcher;
 
 interface EventInterface
 {
-
 }
