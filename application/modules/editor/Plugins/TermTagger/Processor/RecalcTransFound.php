@@ -322,7 +322,6 @@ class RecalcTransFound
 
         // Foreach source term tbx id
         foreach ($srcIdA as $srcId) {
-
             // Translation presence status initial value
             $presenceStatus = 'transNotDefined';
 
@@ -338,7 +337,6 @@ class RecalcTransFound
 
             // If source term does exists
             if (isset($this->exists[$srcId])) {
-
                 // Detect translation presence status
                 $presenceStatus = $this->getMarkByTbxId($srcId, false, $thisTransStatus);
 
@@ -359,7 +357,6 @@ class RecalcTransFound
 
                 // If translation was found
                 if ($presenceStatus !== 'transNotDefined') {
-
                     // Get the best target term we have in current termEntry, if we have at least one
                     if (isset($this->trans[$this->exists[$srcId]['termEntryTbxId']])) {
                         $firstA = [array_values($this->trans[$this->exists[$srcId]['termEntryTbxId']])[0]];
