@@ -28,9 +28,30 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\Events;
+namespace MittagQI\Translate5\EventDispatcher;
 
-interface EventInterface
+use Psr\EventDispatcher\EventDispatcherInterface;
+use ZfExtended_EventManager as ZfEventManager;
+use ZfExtended_Factory as ZfFactory;
+
+class EventDispatcher implements EventDispatcherInterface
 {
+    public function __construct(
+        private readonly ZfEventManager $eventManager,
+    ) {
+    }
 
+    public static function create(): self
+    {
+        return new self(ZfFactory::get(ZfEventManager::class, [self::class]));
+    }
+
+    public function dispatch(object $event): object
+    {
+        $this->eventManager->trigger($event::class, argv: [
+            'event' => $event,
+        ]);
+
+        return $event;
+    }
 }

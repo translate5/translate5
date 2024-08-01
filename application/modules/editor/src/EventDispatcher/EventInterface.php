@@ -28,27 +28,9 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\Test\Unit\Events;
+namespace MittagQI\Translate5\EventDispatcher;
 
-use MittagQI\Translate5\Events\EventEmitter;
-use MittagQI\Translate5\Events\EventInterface;
-use PHPUnit\Framework\TestCase;
-
-class EventEmitterTest extends TestCase
+interface EventInterface
 {
-    public function testTrigger(): void
-    {
-        $eventManager = $this->createMock(\ZfExtended_EventManager::class);
 
-        $event = $this->createMock(EventInterface::class);
-
-        $eventManager
-            ->expects(self::once())
-            ->method('trigger')
-            ->with($event::class, null, ['event' => $event]);
-
-        $ee = new EventEmitter($eventManager);
-
-        $ee->trigger($event);
-    }
 }

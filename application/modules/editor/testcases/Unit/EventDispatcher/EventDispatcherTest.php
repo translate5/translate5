@@ -28,27 +28,27 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\Events;
+namespace MittagQI\Translate5\Test\Unit\EventDispatcher;
 
-use ZfExtended_EventManager as ZfEventManager;
-use ZfExtended_Factory as ZfFactory;
+use MittagQI\Translate5\EventDispatcher\EventDispatcher;
+use MittagQI\Translate5\EventDispatcher\EventInterface;
+use PHPUnit\Framework\TestCase;
 
-class EventEmitter
+class EventDispatcherTest extends TestCase
 {
-    public function __construct(
-        private readonly ZfEventManager $eventManager,
-    ) {
-    }
-
-    public static function create(): self
+    public function testTrigger(): void
     {
-        return new self(ZfFactory::get(ZfEventManager::class, [self::class]));
-    }
+        $eventManager = $this->createMock(\ZfExtended_EventManager::class);
 
-    public function trigger(EventInterface $event): void
-    {
-        $this->eventManager->trigger($event::class, argv: [
-            'event' => $event,
-        ]);
+        $event = $this->createMock(EventInterface::class);
+
+        $eventManager
+            ->expects(self::once())
+            ->method('trigger')
+            ->with($event::class, null, ['event' => $event]);
+
+        $dispatcher = new EventDispatcher($eventManager);
+
+        self::assertSame($event, $dispatcher->dispatch($event));
     }
 }

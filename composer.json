@@ -103,9 +103,9 @@
 		"ext-sockets" : "*",
 		"ext-iconv" : "*",
 		"ext-soap" : "*",
-      	"ext-zip": "*",
-      	"ext-fileinfo": "*",
-      	"ext-curl": "*",
+    "ext-zip": "*",
+    "ext-fileinfo": "*",
+    "ext-curl": "*",
 		"ext-posix": "*",
 		"ext-intl": "*",
 		"ext-zlib": "*",
@@ -136,7 +136,8 @@
 		"cesargb/php-log-rotation": "^2.7",
 		"ifsnop/mysqldump-php": "^v2.9",
 		"http-interop/http-factory-guzzle": "^1.2",
-		"microsoft/microsoft-graph": "^2.6.0"
+		"microsoft/microsoft-graph": "^2.6.0",
+		"psr/event-dispatcher": "^1.0"
     },
 	"extra" : {
 		"merge-plugin" : {
