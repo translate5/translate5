@@ -526,7 +526,7 @@ class RecalcTransFound
                         // Check whether we have homonym (in some termEntry having term(s) used in source)
                         // If yes - mark it as used instead of current term
                         foreach ($unusedTarget as $termEntryId_now => $termA) {
-                            if (is_int($idx_now = $termA[$term->term] ?? false)) {
+                            if (is_int($idx_now = $termA[$term['term']] ?? false)) {
                                 $oldTbxId = $this->termsByEntry[$termEntryId_was][$idx_was]['termTbxId'];
                                 $newTbxId = $this->termsByEntry[$termEntryId_now][$idx_now]['termTbxId'];
                                 $spoof[$oldTbxId] = $newTbxId;
