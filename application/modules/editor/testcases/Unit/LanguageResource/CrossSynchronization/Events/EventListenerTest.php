@@ -32,12 +32,12 @@ namespace MittagQI\Translate5\Test\Unit\LanguageResource\CrossSynchronization\Ev
 
 use editor_Models_LanguageResources_CustomerAssoc as Association;
 use editor_Models_LanguageResources_LanguageResource as LanguageResource;
+use MittagQI\Translate5\EventDispatcher\EventDispatcher;
 use MittagQI\Translate5\LanguageResource\CrossSynchronization\CrossLanguageResourceSynchronizationService;
 use MittagQI\Translate5\LanguageResource\CrossSynchronization\CrossSynchronizationConnection;
 use MittagQI\Translate5\LanguageResource\CrossSynchronization\Dto\LanguageResourcePair;
 use MittagQI\Translate5\LanguageResource\CrossSynchronization\Events\ConnectionCreatedEvent;
 use MittagQI\Translate5\LanguageResource\CrossSynchronization\Events\ConnectionDeletedEvent;
-use MittagQI\Translate5\LanguageResource\CrossSynchronization\Events\EventEmitter;
 use MittagQI\Translate5\LanguageResource\CrossSynchronization\Events\EventListener;
 use MittagQI\Translate5\LanguageResource\CrossSynchronization\Events\LanguageResourcesConnectedEvent;
 use MittagQI\Translate5\LanguageResource\CrossSynchronization\SynchronisationDirigent;
@@ -60,15 +60,15 @@ class EventListenerTest extends TestCase
         $el->attachAll();
 
         /** @phpstan-ignore-next-line  */
-        self::assertFalse($em->getListeners(EventEmitter::class, ConnectionDeletedEvent::class)->isEmpty());
+        self::assertFalse($em->getListeners(EventDispatcher::class, ConnectionDeletedEvent::class)->isEmpty());
         /** @phpstan-ignore-next-line  */
-        self::assertFalse($em->getListeners(EventEmitter::class, ConnectionCreatedEvent::class)->isEmpty());
+        self::assertFalse($em->getListeners(EventDispatcher::class, ConnectionCreatedEvent::class)->isEmpty());
         /** @phpstan-ignore-next-line  */
-        self::assertFalse($em->getListeners(EventEmitter::class, LanguageResourcesConnectedEvent::class)->isEmpty());
+        self::assertFalse($em->getListeners(EventDispatcher::class, LanguageResourcesConnectedEvent::class)->isEmpty());
         /** @phpstan-ignore-next-line  */
-        self::assertFalse($em->getListeners(CustomerAssocEvents\EventEmitter::class, CustomerAssocEvents\AssociationCreatedEvent::class)->isEmpty());
+        self::assertFalse($em->getListeners(EventDispatcher::class, CustomerAssocEvents\AssociationCreatedEvent::class)->isEmpty());
         /** @phpstan-ignore-next-line  */
-        self::assertFalse($em->getListeners(CustomerAssocEvents\EventEmitter::class, CustomerAssocEvents\AssociationDeletedEvent::class)->isEmpty());
+        self::assertFalse($em->getListeners(EventDispatcher::class, CustomerAssocEvents\AssociationDeletedEvent::class)->isEmpty());
     }
 
     public function testConnectionDeletedEventHandler(): void
@@ -88,7 +88,7 @@ class EventListenerTest extends TestCase
         $el->attachAll();
 
         /** @phpstan-ignore-next-line  */
-        $closure = $em->getListeners(EventEmitter::class, ConnectionDeletedEvent::class)->top();
+        $closure = $em->getListeners(EventDispatcher::class, ConnectionDeletedEvent::class)->top();
 
         $connection = $this->createMock(CrossSynchronizationConnection::class);
 
@@ -112,7 +112,7 @@ class EventListenerTest extends TestCase
         $el->attachAll();
 
         /** @phpstan-ignore-next-line  */
-        $closure = $em->getListeners(EventEmitter::class, ConnectionCreatedEvent::class)->top();
+        $closure = $em->getListeners(EventDispatcher::class, ConnectionCreatedEvent::class)->top();
 
         $connection = $this->createMock(CrossSynchronizationConnection::class);
 
@@ -136,7 +136,7 @@ class EventListenerTest extends TestCase
         $el->attachAll();
 
         /** @phpstan-ignore-next-line  */
-        $closure = $em->getListeners(EventEmitter::class, LanguageResourcesConnectedEvent::class)->top();
+        $closure = $em->getListeners(EventDispatcher::class, LanguageResourcesConnectedEvent::class)->top();
 
         $source = $this->createMock(LanguageResource::class);
         $target = $this->createMock(LanguageResource::class);
@@ -168,7 +168,7 @@ class EventListenerTest extends TestCase
         $el->attachAll();
 
         /** @phpstan-ignore-next-line  */
-        $closure = $em->getListeners(CustomerAssocEvents\EventEmitter::class, CustomerAssocEvents\AssociationCreatedEvent::class)->top();
+        $closure = $em->getListeners(EventDispatcher::class, CustomerAssocEvents\AssociationCreatedEvent::class)->top();
 
         $association = $this->createMock(Association::class);
 
@@ -192,7 +192,7 @@ class EventListenerTest extends TestCase
         $el->attachAll();
 
         /** @phpstan-ignore-next-line  */
-        $closure = $em->getListeners(CustomerAssocEvents\EventEmitter::class, CustomerAssocEvents\AssociationDeletedEvent::class)->top();
+        $closure = $em->getListeners(EventDispatcher::class, CustomerAssocEvents\AssociationDeletedEvent::class)->top();
 
         $association = $this->createMock(Association::class);
 

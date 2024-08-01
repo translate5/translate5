@@ -33,8 +33,10 @@ namespace MittagQI\Translate5\LanguageResource\CustomerAssoc;
 use editor_Models_LanguageResources_CustomerAssoc as Association;
 use editor_Models_LanguageResources_LanguageResource as LanguageResource;
 use MittagQI\Translate5\Customer\CustomerRepository;
+use MittagQI\Translate5\EventDispatcher\EventDispatcher;
 use MittagQI\Translate5\LanguageResource\CustomerAssoc\DTO\AssociationFormValues;
-use MittagQI\Translate5\LanguageResource\CustomerAssoc\Events\EventEmitter;
+use MittagQI\Translate5\LanguageResource\CustomerAssoc\Events\AssociationCreatedEvent;
+use MittagQI\Translate5\LanguageResource\CustomerAssoc\Events\AssociationDeletedEvent;
 use MittagQI\Translate5\LanguageResource\LanguageResourceRepository;
 use ZfExtended_Factory;
 use ZfExtended_Models_Entity_NotFoundException;
@@ -44,17 +46,17 @@ class CustomerAssocService
     private array $cachedLanguageResources = [];
 
     public function __construct(
-        private EventEmitter $eventEmitter,
-        private CustomerAssocRepository $assocRepository,
-        private CustomerRepository $customerRepository,
-        private LanguageResourceRepository $languageResourceRepository,
+        private readonly EventDispatcher $eventDispatcher,
+        private readonly CustomerAssocRepository $assocRepository,
+        private readonly CustomerRepository $customerRepository,
+        private readonly LanguageResourceRepository $languageResourceRepository,
     ) {
     }
 
     public static function create(): self
     {
         return new self(
-            EventEmitter::create(),
+            EventDispatcher::create(),
             new CustomerAssocRepository(),
             new CustomerRepository(),
             new LanguageResourceRepository(),
@@ -113,7 +115,7 @@ class CustomerAssocService
 
         $this->assocRepository->save($model);
 
-        $this->eventEmitter->triggerAssociationCreatedEvent($model);
+        $this->eventDispatcher->dispatch(new AssociationCreatedEvent($model));
 
         return $model;
     }
@@ -159,7 +161,7 @@ class CustomerAssocService
 
         $this->assocRepository->delete($assoc);
 
-        $this->eventEmitter->triggerAssociationDeleted($clone);
+        $this->eventDispatcher->dispatch(new AssociationDeletedEvent($clone));
     }
 
     private function getLanguageResource(int $languageResourceId): LanguageResource

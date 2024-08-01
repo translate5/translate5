@@ -255,16 +255,16 @@
         },
         {
             "name": "deeplcom/deepl-php",
-            "version": "v1.7.2",
+            "version": "v1.8.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/DeepLcom/deepl-php.git",
-                "reference": "bb52c54794d2d6caf1136f5a579ff96fd1db78b3"
+                "reference": "13e0477593efed3dfb1ad0d75be13970dcd30057"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/DeepLcom/deepl-php/zipball/bb52c54794d2d6caf1136f5a579ff96fd1db78b3",
-                "reference": "bb52c54794d2d6caf1136f5a579ff96fd1db78b3",
+                "url": "https://api.github.com/repos/DeepLcom/deepl-php/zipball/13e0477593efed3dfb1ad0d75be13970dcd30057",
+                "reference": "13e0477593efed3dfb1ad0d75be13970dcd30057",
                 "shasum": ""
             },
             "require": {
@@ -312,9 +312,9 @@
             ],
             "support": {
                 "issues": "https://github.com/DeepLcom/deepl-php/issues",
-                "source": "https://github.com/DeepLcom/deepl-php/tree/v1.7.2"
+                "source": "https://github.com/DeepLcom/deepl-php/tree/v1.8.0"
             },
-            "time": "2024-04-24T09:24:26+00:00"
+            "time": "2024-06-26T11:08:07+00:00"
         },
         {
             "name": "doctrine/annotations",
@@ -1026,21 +1026,21 @@
         },
         {
             "name": "google/cloud-vision",
-            "version": "v1.7.4",
+            "version": "v1.7.6",
             "source": {
                 "type": "git",
                 "url": "https://github.com/googleapis/google-cloud-php-vision.git",
-                "reference": "309f00bff7d53026ef1594aaeb280d257e0490a1"
+                "reference": "ff6a0fb22b5cfe0954165f3d149483fe46ff059e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/googleapis/google-cloud-php-vision/zipball/309f00bff7d53026ef1594aaeb280d257e0490a1",
-                "reference": "309f00bff7d53026ef1594aaeb280d257e0490a1",
+                "url": "https://api.github.com/repos/googleapis/google-cloud-php-vision/zipball/ff6a0fb22b5cfe0954165f3d149483fe46ff059e",
+                "reference": "ff6a0fb22b5cfe0954165f3d149483fe46ff059e",
                 "shasum": ""
             },
             "require": {
-                "google/cloud-core": "^1.43",
-                "google/gax": "^1.19.1",
+                "google/cloud-core": "^1.52.7",
+                "google/gax": "^1.24.0",
                 "php": ">=7.4"
             },
             "require-dev": {
@@ -1077,9 +1077,9 @@
             ],
             "description": "Cloud Vision Client for PHP",
             "support": {
-                "source": "https://github.com/googleapis/google-cloud-php-vision/tree/v1.7.4"
+                "source": "https://github.com/googleapis/google-cloud-php-vision/tree/v1.7.6"
             },
-            "time": "2023-09-15T20:50:36+00:00"
+            "time": "2023-11-02T19:15:44+00:00"
         },
         {
             "name": "google/common-protos",
@@ -1135,37 +1135,36 @@
         },
         {
             "name": "google/gax",
-            "version": "v1.19.1",
+            "version": "v1.25.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/googleapis/gax-php.git",
-                "reference": "30f6b307faa9858bf58d967664467098dbbc354f"
+                "reference": "8f07f56f8d14e784777020cd73cfde518bd7dd33"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/googleapis/gax-php/zipball/30f6b307faa9858bf58d967664467098dbbc354f",
-                "reference": "30f6b307faa9858bf58d967664467098dbbc354f",
+                "url": "https://api.github.com/repos/googleapis/gax-php/zipball/8f07f56f8d14e784777020cd73cfde518bd7dd33",
+                "reference": "8f07f56f8d14e784777020cd73cfde518bd7dd33",
                 "shasum": ""
             },
             "require": {
-                "google/auth": "1.19.1||^1.25.0",
-                "google/common-protos": "^1.3.1||^2.0||^3.0",
-                "google/grpc-gcp": "^0.2",
+                "google/auth": "^1.25.0",
+                "google/common-protos": "^3.0||^4.0",
+                "google/grpc-gcp": "^0.2||^0.3",
                 "google/longrunning": "^0.2",
                 "google/protobuf": "^3.21.4",
                 "grpc/grpc": "^1.13",
-                "guzzlehttp/promises": "^1.3",
-                "guzzlehttp/psr7": "^1.7.0||^2",
-                "php": ">=7.0"
+                "guzzlehttp/promises": "^1.4||^2.0",
+                "guzzlehttp/psr7": "^2.0",
+                "php": ">=7.4"
             },
             "conflict": {
                 "ext-protobuf": "<3.7.0"
             },
             "require-dev": {
-                "phpspec/prophecy": "^1.10",
-                "phpunit/phpunit": "^5.5||^8.5",
-                "squizlabs/php_codesniffer": "3.*",
-                "yoast/phpunit-polyfills": "^1.0"
+                "phpspec/prophecy-phpunit": "^2.0",
+                "phpunit/phpunit": "^9.0",
+                "squizlabs/php_codesniffer": "3.*"
             },
             "type": "library",
             "autoload": {
@@ -1185,9 +1184,9 @@
             ],
             "support": {
                 "issues": "https://github.com/googleapis/gax-php/issues",
-                "source": "https://github.com/googleapis/gax-php/tree/v1.19.1"
+                "source": "https://github.com/googleapis/gax-php/tree/v1.25.0"
             },
-            "time": "2023-03-16T19:58:19+00:00"
+            "time": "2023-11-02T22:05:32+00:00"
         },
         {
             "name": "google/grpc-gcp",
@@ -4070,23 +4069,23 @@
         },
         {
             "name": "phenx/php-font-lib",
-            "version": "0.5.4",
+            "version": "0.5.6",
             "source": {
                 "type": "git",
                 "url": "https://github.com/dompdf/php-font-lib.git",
-                "reference": "dd448ad1ce34c63d09baccd05415e361300c35b4"
+                "reference": "a1681e9793040740a405ac5b189275059e2a9863"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/dompdf/php-font-lib/zipball/dd448ad1ce34c63d09baccd05415e361300c35b4",
-                "reference": "dd448ad1ce34c63d09baccd05415e361300c35b4",
+                "url": "https://api.github.com/repos/dompdf/php-font-lib/zipball/a1681e9793040740a405ac5b189275059e2a9863",
+                "reference": "a1681e9793040740a405ac5b189275059e2a9863",
                 "shasum": ""
             },
             "require": {
                 "ext-mbstring": "*"
             },
             "require-dev": {
-                "symfony/phpunit-bridge": "^3 || ^4 || ^5"
+                "symfony/phpunit-bridge": "^3 || ^4 || ^5 || ^6"
             },
             "type": "library",
             "autoload": {
@@ -4096,7 +4095,7 @@
             },
             "notification-url": "https://packagist.org/downloads/",
             "license": [
-                "LGPL-3.0"
+                "LGPL-2.1-or-later"
             ],
             "authors": [
                 {
@@ -4108,9 +4107,9 @@
             "homepage": "https://github.com/PhenX/php-font-lib",
             "support": {
                 "issues": "https://github.com/dompdf/php-font-lib/issues",
-                "source": "https://github.com/dompdf/php-font-lib/tree/0.5.4"
+                "source": "https://github.com/dompdf/php-font-lib/tree/0.5.6"
             },
-            "time": "2021-12-17T19:44:54+00:00"
+            "time": "2024-01-29T14:45:26+00:00"
         },
         {
             "name": "php-ffmpeg/php-ffmpeg",

@@ -34,8 +34,11 @@ use editor_Models_LanguageResources_CustomerAssoc as CustomerAssoc;
 use editor_Models_LanguageResources_LanguageResource as LanguageResource;
 use editor_Services_Manager;
 use Generator;
+use MittagQI\Translate5\EventDispatcher\EventDispatcher;
 use MittagQI\Translate5\LanguageResource\CrossSynchronization\Dto\LanguageResourcePair;
-use MittagQI\Translate5\LanguageResource\CrossSynchronization\Events\EventEmitter;
+use MittagQI\Translate5\LanguageResource\CrossSynchronization\Events\ConnectionCreatedEvent;
+use MittagQI\Translate5\LanguageResource\CrossSynchronization\Events\ConnectionDeletedEvent;
+use MittagQI\Translate5\LanguageResource\CrossSynchronization\Events\LanguageResourcesConnectedEvent;
 use MittagQI\Translate5\LanguageResource\LanguageResourceRepository;
 use ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey;
 
@@ -52,10 +55,10 @@ class CrossLanguageResourceSynchronizationService
     private array $cachedSyncIntegration = [];
 
     public function __construct(
-        private editor_Services_Manager $serviceManager,
-        private EventEmitter $eventEmitter,
-        private LanguageResourceRepository $languageResourceRepository,
-        private CrossSynchronizationConnectionRepository $connectionRepository,
+        private readonly editor_Services_Manager $serviceManager,
+        private readonly EventDispatcher $eventDispatcher,
+        private readonly LanguageResourceRepository $languageResourceRepository,
+        private readonly CrossSynchronizationConnectionRepository $connectionRepository,
     ) {
     }
 
@@ -63,7 +66,7 @@ class CrossLanguageResourceSynchronizationService
     {
         return new self(
             new editor_Services_Manager(),
-            EventEmitter::create(),
+            EventDispatcher::create(),
             new LanguageResourceRepository(),
             new CrossSynchronizationConnectionRepository(),
         );
@@ -94,7 +97,7 @@ class CrossLanguageResourceSynchronizationService
     ): CrossSynchronizationConnection {
         $connection = $this->connectionRepository->createConnection($source, $target, $customerId);
 
-        $this->eventEmitter->triggerConnectionCreatedEvent($connection);
+        $this->eventDispatcher->dispatch(new ConnectionCreatedEvent($connection));
 
         return $connection;
     }
@@ -121,7 +124,7 @@ class CrossLanguageResourceSynchronizationService
         $clone = clone $connection;
         $this->connectionRepository->deleteConnection($connection);
 
-        $this->eventEmitter->triggerConnectionDeleted($clone);
+        $this->eventDispatcher->dispatch(new ConnectionDeletedEvent($clone));
     }
 
     /**
@@ -207,7 +210,7 @@ class CrossLanguageResourceSynchronizationService
             }
         }
 
-        $this->eventEmitter->triggerLanguageResourcesConnected($source, $target);
+        $this->eventDispatcher->dispatch(new LanguageResourcesConnectedEvent($source, $target));
     }
 
     private function getSyncIntegration(string $serviceType): ?SynchronisationInterface

@@ -33,10 +33,12 @@ namespace MittagQI\Translate5\Test\Unit\LanguageResource\CustomerAssoc;
 use editor_Models_LanguageResources_CustomerAssoc as Association;
 use editor_Models_LanguageResources_LanguageResource as LanguageResource;
 use MittagQI\Translate5\Customer\CustomerRepository;
+use MittagQI\Translate5\EventDispatcher\EventDispatcher;
 use MittagQI\Translate5\LanguageResource\CustomerAssoc\CustomerAssocRepository;
 use MittagQI\Translate5\LanguageResource\CustomerAssoc\CustomerAssocService;
 use MittagQI\Translate5\LanguageResource\CustomerAssoc\DTO\AssociationFormValues;
-use MittagQI\Translate5\LanguageResource\CustomerAssoc\Events\EventEmitter;
+use MittagQI\Translate5\LanguageResource\CustomerAssoc\Events\AssociationCreatedEvent;
+use MittagQI\Translate5\LanguageResource\CustomerAssoc\Events\AssociationDeletedEvent;
 use MittagQI\Translate5\LanguageResource\LanguageResourceRepository;
 use PHPUnit\Framework\TestCase;
 
@@ -44,13 +46,13 @@ class CustomerAssocServiceTest extends TestCase
 {
     public function testUpdateAssociations(): void
     {
-        $eventEmitter = $this->createMock(EventEmitter::class);
+        $eventDispatcher = $this->createMock(EventDispatcher::class);
         $assocRepository = $this->createMock(CustomerAssocRepository::class);
         $customerRepository = $this->createMock(CustomerRepository::class);
         $languageResourceRepository = $this->createMock(LanguageResourceRepository::class);
 
         $service = new CustomerAssocService(
-            $eventEmitter,
+            $eventDispatcher,
             $assocRepository,
             $customerRepository,
             $languageResourceRepository,
@@ -67,12 +69,7 @@ class CustomerAssocServiceTest extends TestCase
         ]);
 
         $assocRepository->method('getByLanguageResource')->willReturn([$assoc, $assocToDelete]);
-        $assocRepository->expects($this->once())->method('delete')->with($assocToDelete);
-
-        $eventEmitter
-            ->expects($this->once())
-            ->method('triggerAssociationDeleted')
-            ->with($this->equalTo($assocToDelete));
+        $assocRepository->expects(self::once())->method('delete')->with($assocToDelete);
 
         $lr = $this->createMock(LanguageResource::class);
         $lr->method('__call')->willReturnMap([
@@ -91,14 +88,24 @@ class CustomerAssocServiceTest extends TestCase
         $newAssoc->setPivotAsDefault(true);
 
         $assocRepository
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('save')
             ->with($newAssoc);
 
-        $eventEmitter
-            ->expects($this->once())
-            ->method('triggerAssociationCreatedEvent')
-            ->with($this->equalTo($newAssoc));
+        $i = 0;
+        $eventDispatcher
+            ->expects(self::exactly(2))
+            ->method('dispatch')
+            ->with(
+                self::callback(
+                    static function ($event) use (&$i) {
+                        return 0 === $i++
+                            ? $event instanceof AssociationDeletedEvent
+                            : $event instanceof AssociationCreatedEvent
+                        ;
+                    }
+                )
+            );
 
         $formValues = new AssociationFormValues(
             1,
@@ -122,13 +129,13 @@ class CustomerAssocServiceTest extends TestCase
 
     public function testAssociate(): void
     {
-        $eventEmitter = $this->createMock(EventEmitter::class);
+        $eventDispatcher = $this->createMock(EventDispatcher::class);
         $assocRepository = $this->createMock(CustomerAssocRepository::class);
         $customerRepository = $this->createMock(CustomerRepository::class);
         $languageResourceRepository = $this->createMock(LanguageResourceRepository::class);
 
         $service = new CustomerAssocService(
-            $eventEmitter,
+            $eventDispatcher,
             $assocRepository,
             $customerRepository,
             $languageResourceRepository,
@@ -151,14 +158,14 @@ class CustomerAssocServiceTest extends TestCase
         $assoc->setPivotAsDefault(true);
 
         $assocRepository
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('save')
             ->with($assoc);
 
-        $eventEmitter
-            ->expects($this->once())
-            ->method('triggerAssociationCreatedEvent')
-            ->with($this->equalTo($assoc));
+        $eventDispatcher
+            ->expects(self::once())
+            ->method('dispatch')
+            ->with(self::isInstanceOf(AssociationCreatedEvent::class));
 
         $service->associate(
             (int) $assoc->getLanguageResourceId(),
@@ -171,13 +178,13 @@ class CustomerAssocServiceTest extends TestCase
 
     public function testAssociateCustomers(): void
     {
-        $eventEmitter = $this->createMock(EventEmitter::class);
+        $eventDispatcher = $this->createMock(EventDispatcher::class);
         $assocRepository = $this->createMock(CustomerAssocRepository::class);
         $customerRepository = $this->createMock(CustomerRepository::class);
         $languageResourceRepository = $this->createMock(LanguageResourceRepository::class);
 
         $service = new CustomerAssocService(
-            $eventEmitter,
+            $eventDispatcher,
             $assocRepository,
             $customerRepository,
             $languageResourceRepository,
@@ -200,14 +207,14 @@ class CustomerAssocServiceTest extends TestCase
         $assoc->setPivotAsDefault(false);
 
         $assocRepository
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('save')
             ->with($assoc);
 
-        $eventEmitter
-            ->expects($this->once())
-            ->method('triggerAssociationCreatedEvent')
-            ->with($this->equalTo($assoc));
+        $eventDispatcher
+            ->expects(self::once())
+            ->method('dispatch')
+            ->with(self::isInstanceOf(AssociationCreatedEvent::class));
 
         $service->associateCustomers(
             (int) $assoc->getLanguageResourceId(),
@@ -217,13 +224,13 @@ class CustomerAssocServiceTest extends TestCase
 
     public function testDelete(): void
     {
-        $eventEmitter = $this->createMock(EventEmitter::class);
+        $eventDispatcher = $this->createMock(EventDispatcher::class);
         $assocRepository = $this->createMock(CustomerAssocRepository::class);
         $customerRepository = $this->createMock(CustomerRepository::class);
         $languageResourceRepository = $this->createMock(LanguageResourceRepository::class);
 
         $service = new CustomerAssocService(
-            $eventEmitter,
+            $eventDispatcher,
             $assocRepository,
             $customerRepository,
             $languageResourceRepository,
@@ -232,27 +239,27 @@ class CustomerAssocServiceTest extends TestCase
         $assoc = $this->createMock(Association::class);
 
         $assocRepository
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('delete')
             ->with($assoc);
 
-        $eventEmitter
-            ->expects($this->once())
-            ->method('triggerAssociationDeleted')
-            ->with($this->equalTo($assoc));
+        $eventDispatcher
+            ->expects(self::once())
+            ->method('dispatch')
+            ->with(self::isInstanceOf(AssociationDeletedEvent::class));
 
         $service->delete($assoc);
     }
 
     public function testSeparateByCustomer(): void
     {
-        $eventEmitter = $this->createMock(EventEmitter::class);
+        $eventDispatcher = $this->createMock(EventDispatcher::class);
         $assocRepository = $this->createMock(CustomerAssocRepository::class);
         $customerRepository = $this->createMock(CustomerRepository::class);
         $languageResourceRepository = $this->createMock(LanguageResourceRepository::class);
 
         $service = new CustomerAssocService(
-            $eventEmitter,
+            $eventDispatcher,
             $assocRepository,
             $customerRepository,
             $languageResourceRepository,
@@ -262,27 +269,27 @@ class CustomerAssocServiceTest extends TestCase
 
         $assocRepository->method('getByCustomer')->willReturn([$assoc]);
         $assocRepository
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('delete')
             ->with($assoc);
 
-        $eventEmitter
-            ->expects($this->once())
-            ->method('triggerAssociationDeleted')
-            ->with($this->equalTo($assoc));
+        $eventDispatcher
+            ->expects(self::once())
+            ->method('dispatch')
+            ->with(self::isInstanceOf(AssociationDeletedEvent::class));
 
         $service->separateByCustomer(1);
     }
 
     public function testSeparateByLanguageResource(): void
     {
-        $eventEmitter = $this->createMock(EventEmitter::class);
+        $eventDispatcher = $this->createMock(EventDispatcher::class);
         $assocRepository = $this->createMock(CustomerAssocRepository::class);
         $customerRepository = $this->createMock(CustomerRepository::class);
         $languageResourceRepository = $this->createMock(LanguageResourceRepository::class);
 
         $service = new CustomerAssocService(
-            $eventEmitter,
+            $eventDispatcher,
             $assocRepository,
             $customerRepository,
             $languageResourceRepository,
@@ -292,27 +299,27 @@ class CustomerAssocServiceTest extends TestCase
 
         $assocRepository->method('getByLanguageResource')->willReturn([$assoc]);
         $assocRepository
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('delete')
             ->with($assoc);
 
-        $eventEmitter
-            ->expects($this->once())
-            ->method('triggerAssociationDeleted')
-            ->with($this->equalTo($assoc));
+        $eventDispatcher
+            ->expects(self::once())
+            ->method('dispatch')
+            ->with(self::isInstanceOf(AssociationDeletedEvent::class));
 
         $service->separateByLanguageResource(1);
     }
 
     public function testSeparate(): void
     {
-        $eventEmitter = $this->createMock(EventEmitter::class);
+        $eventDispatcher = $this->createMock(EventDispatcher::class);
         $assocRepository = $this->createMock(CustomerAssocRepository::class);
         $customerRepository = $this->createMock(CustomerRepository::class);
         $languageResourceRepository = $this->createMock(LanguageResourceRepository::class);
 
         $service = new CustomerAssocService(
-            $eventEmitter,
+            $eventDispatcher,
             $assocRepository,
             $customerRepository,
             $languageResourceRepository,
@@ -322,14 +329,14 @@ class CustomerAssocServiceTest extends TestCase
 
         $assocRepository->method('findByLanguageResourceAndCustomer')->willReturn($assoc);
         $assocRepository
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('delete')
             ->with($assoc);
 
-        $eventEmitter
-            ->expects($this->once())
-            ->method('triggerAssociationDeleted')
-            ->with($this->equalTo($assoc));
+        $eventDispatcher
+            ->expects(self::once())
+            ->method('dispatch')
+            ->with(self::isInstanceOf(AssociationDeletedEvent::class));
 
         $service->separate(1, 1);
     }

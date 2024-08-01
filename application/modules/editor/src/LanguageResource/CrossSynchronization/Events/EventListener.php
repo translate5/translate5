@@ -30,6 +30,7 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\LanguageResource\CrossSynchronization\Events;
 
+use MittagQI\Translate5\EventDispatcher\EventDispatcher;
 use MittagQI\Translate5\LanguageResource\CrossSynchronization\CrossLanguageResourceSynchronizationService;
 use MittagQI\Translate5\LanguageResource\CrossSynchronization\SynchronisationDirigent;
 use MittagQI\Translate5\LanguageResource\CustomerAssoc\Events as CustomerAssocEvents;
@@ -61,28 +62,28 @@ class EventListener
     public function attachAll(): void
     {
         $this->eventManager->attach(
-            EventEmitter::class,
+            EventDispatcher::class,
             ConnectionDeletedEvent::class,
             $this->queueCleanupOnConnectionDeleted()
         );
         $this->eventManager->attach(
-            EventEmitter::class,
+            EventDispatcher::class,
             ConnectionCreatedEvent::class,
             $this->queueConnectionSynchronization()
         );
         $this->eventManager->attach(
-            EventEmitter::class,
+            EventDispatcher::class,
             LanguageResourcesConnectedEvent::class,
             $this->queueDefaultSynchronization()
         );
 
         $this->eventManager->attach(
-            CustomerAssocEvents\EventEmitter::class,
+            EventDispatcher::class,
             CustomerAssocEvents\AssociationCreatedEvent::class,
             $this->addCustomerToConnections()
         );
         $this->eventManager->attach(
-            CustomerAssocEvents\EventEmitter::class,
+            EventDispatcher::class,
             CustomerAssocEvents\AssociationDeletedEvent::class,
             $this->deleteConnectionWhenCustomerAssocDeleted()
         );
