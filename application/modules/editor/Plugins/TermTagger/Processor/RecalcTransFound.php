@@ -322,99 +322,78 @@ class RecalcTransFound
 
         // Foreach source term tbx id
         foreach ($srcIdA as $srcId) {
-            // Get css class
-            $value = $this->getMarkByTbxId($srcId, false, $thisTransStatus);
 
-            // Better target term will be here, if applicable
+            // Translation presence status initial value
+            $presenceStatus = 'transNotDefined';
+
+            // Logic:
+            // 1.source term does not exist in db                                                        => transNotDefined
+            // -.source term does exist in db
+            //   2. but no translation(s) exist in db in termEntry where that source term is from        => transNotDefined
+            //   3. and translation(s) do exist in db in that termEntry, but not used in segment target  => transNotFound
+            //   4. and translation(s) do exist in db in that termEntry, and are used in segment target  => transFound
+
+            // Better target term status will be here, if applicable
             $bestTransStatus = '';
 
-            // If translation was found or such source term does not exists in db at all
-            if ($value === 'transFound' || ! isset($this->exists[$srcId])) {
-                // Do nothing here
+            // If source term does exists
+            if (isset($this->exists[$srcId])) {
 
-                // Else if source term has homonyms among target terms' termEntries
-            } elseif ($this->homonym[$srcId] ?? 0) {
-                // Foreach homonym
-                foreach ($this->homonym[$srcId] as $termEntryId) {
-                    // Get mark for homonym
-                    $value = $this->getMarkByTbxId($termEntryId, true, $thisTransStatus);
+                // Detect translation presence status
+                $presenceStatus = $this->getMarkByTbxId($srcId, false, $thisTransStatus);
 
-                    // If it's 'transFound' - stop homonym walkthrough
-                    if ($value === 'transFound') {
-                        break;
+                // If translation not present, this means we're here due to scenario 2 or 3,
+                // and this means it may make sense to check the homonyms, if any
+                if ($presenceStatus !== 'transFound' && isset($this->homonym[$srcId])) {
+                    // Foreach homonym
+                    foreach ($this->homonym[$srcId] as $termEntryId) {
+                        // Get status for homonym
+                        $presenceStatus = $this->getMarkByTbxId($termEntryId, true, $thisTransStatus);
+
+                        // If it's 'transFound' - stop homonym walkthrough
+                        if ($presenceStatus === 'transFound') {
+                            break;
+                        }
                     }
                 }
 
-                // Else
-            } else {
-                // Get source term's termEntryTbxId
-                $entryId = $this->exists[$srcId]['termEntryTbxId'];
+                // If translation was found
+                if ($presenceStatus !== 'transNotDefined') {
 
-                // If there are no source term translations
-                if (! $transTextA = array_values($this->trans[$entryId] ?? [])) {
-                    // Setup 'transNotDefined'-class
-                    $value = 'transNotDefined';
+                    // Get the best target term we have in current termEntry, if we have at least one
+                    if (isset($this->trans[$this->exists[$srcId]['termEntryTbxId']])) {
+                        $firstA = [array_values($this->trans[$this->exists[$srcId]['termEntryTbxId']])[0]];
+                    } else {
+                        $firstA = [];
+                    }
 
-                    // Else if at least one of target terms is a translation for the current source term
-                } elseif ($transText = array_intersect(
-                    array_column($transTextA, 'term'),
-                    array_column($this->trgTextA, 'text')
-                )[0] ?? 0) {
-                    // Get it's index within $this->trgTextA
-                    $idx = array_search($transText, array_column($this->trgTextA, 'text'));
+                    // Append the best target term we have in each homonym termEntry
+                    foreach ($this->homonym[$srcId] ?? [] as $termEntryId) {
+                        $firstA[] = array_values($this->trans[$termEntryId])[0];
+                    }
 
-                    // Setup 'transFound'-class
-                    $value = 'transFound';
+                    // Wrap $firstA into an array to mame it compatible with further TermModel->sortTerms()
+                    $firstA = [$firstA];
+                    $firstA = $this->termModel->sortTerms($firstA);
+                    $firstA = $firstA[0];
 
-                    // Setup status of a found translation
-                    $thisTransStatus = $this->trgTextA[$idx]['status'];
+                    // Get status of first translation, which is the best translation we have in terminology db
+                    $firstAmongFirst = $firstA[0]['status'];
 
-                    // Remove first found term text from $trgTextA
-                    unset($this->trgTextA[$idx]);
+                    // If used translation is not the best one
+                    if ($thisTransStatus !== $firstAmongFirst) {
+                        // Spoof the $presenceStatus to indicate that the best translation is not found
+                        $presenceStatus = 'transNotFound';
 
-                    // Else if translation for term in segment source is not found in segment target but we have
-                    // translations in terminology db - indicate that with status of best or the only one term we have in db
-                } else {
-                    // Setup
-                    $bestTransStatus = $transTextA[0]['status'];
-                }
-            }
-
-            // If translation was found
-            if ($value === 'transFound') {
-                // Get the best target term we have in current termEntry, if we have at least one
-                if (isset($this->trans[$this->exists[$srcId]['termEntryTbxId']])) {
-                    $firstA = [array_values($this->trans[$this->exists[$srcId]['termEntryTbxId']])[0]];
-                } else {
-                    $firstA = [];
-                }
-
-                // Append the best target term we have in each homonym termEntry
-                foreach ($this->homonym[$srcId] ?? [] as $termEntryId) {
-                    $firstA[] = array_values($this->trans[$termEntryId])[0];
-                }
-
-                // Wrap $firstA into an array to mame it compatible with further TermModel->sortTerms()
-                $firstA = [$firstA];
-                $firstA = $this->termModel->sortTerms($firstA);
-                $firstA = $firstA[0];
-
-                // Get status of first translation, which is the best translation we have in terminology db
-                $firstAmongFirst = $firstA[0]['status'];
-
-                // If used translation is not the best one
-                if ($thisTransStatus !== $firstAmongFirst) {
-                    // Spoof the $value to indicate that the best translation is not found
-                    $value = 'transNotFound';
-
-                    // Indicate the status of the best translation
-                    $bestTransStatus = $firstAmongFirst;
+                        // Indicate the status of the best translation
+                        $bestTransStatus = $firstAmongFirst;
+                    }
                 }
             }
 
             // Append mark for current occurrence of term tag
             $mark[$srcId][] = [
-                'presenceStatus' => $value,
+                'presenceStatus' => $presenceStatus,
                 'bestTransStatus' => $bestTransStatus,
             ];
         }
@@ -543,7 +522,7 @@ class RecalcTransFound
         // Foreach termEntry that has term(s) used in target, but has no term(s) used in source
         foreach ($this->termsByEntry as $termEntryId_was => $termA) {
             if (! isset($used['source'][$termEntryId_was])
-                || isset($used['target'][$termEntryId_was])) {
+                && isset($used['target'][$termEntryId_was])) {
                 // Foreach term used in target
                 foreach ($termA as $idx_was => $term) {
                     if (! $term['isSource'] && $term['used']) {
