@@ -22808,3 +22808,13 @@ parameters:
 			message: "#^PHPDoc tag @param has invalid value \\(string template string\\)\\: Unexpected token \"template\", expected variable at offset 308$#"
 			count: 1
 			path: library/ZfExtended/views/helpers/TemplateApply.php
+
+        -
+			message: "#^Constant APPLICATION_RUNDIR not found\\.$#"
+			count: 3
+			path: application/modules/editor/Plugins/TMMaintenance/public/resources/index.php
+
+        -
+			message: "#^Variable \\$this might not be defined\\.$#"
+			count: 3
+			path: application/modules/editor/Plugins/TMMaintenance/public/resources/index.php

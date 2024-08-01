@@ -38,9 +38,6 @@ abstract class editor_Services_Connector_HttpApiAbstract
      */
     protected $resource;
 
-    /**
-     * @var stdClass|string
-     */
     protected $result;
 
     protected $error = null;

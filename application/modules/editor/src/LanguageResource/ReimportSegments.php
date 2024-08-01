@@ -35,6 +35,7 @@ use editor_Models_Segment;
 use editor_Models_Segment_AutoStates as AutoStates;
 use editor_Models_Segment_Iterator;
 use editor_Models_Task as Task;
+use editor_Services_Connector;
 use editor_Services_Manager;
 use MittagQI\Translate5\LanguageResource\Adapter\Exception\SegmentUpdateException;
 use MittagQI\Translate5\LanguageResource\Adapter\UpdatableAdapterInterface;
@@ -106,7 +107,7 @@ class ReimportSegments
 
         $result = $this->updateSegments(
             $segments,
-            $params[self::USE_SEGMENT_TIMESTAMP] ?? UpdatableAdapterInterface::DO_NOT_USE_SEGMENT_TIMESTAMP
+            $params[self::USE_SEGMENT_TIMESTAMP] ?? false
         );
 
         $this->reopenTask();
@@ -229,10 +230,7 @@ class ReimportSegments
 
         $assoc = ZfExtended_Factory::get(TaskAssociation::class);
 
-        $assoc->loadByTaskGuidAndTm(
-            $this->task->getTaskGuid(),
-            (int) $this->languageResource->getId()
-        );
+        $assoc->loadByTaskGuidAndTm($this->task->getTaskGuid(), (int) $this->languageResource->getId());
 
         // check if the current language resources is updatable before updating
         if (empty($assoc->getSegmentsUpdateable())) {
@@ -241,36 +239,83 @@ class ReimportSegments
 
         $manager = ZfExtended_Factory::get(editor_Services_Manager::class);
 
+        /** @var UpdatableAdapterInterface|editor_Services_Connector $connector */
         $connector = $manager->getConnector($this->languageResource, null, null, $this->task->getConfig());
 
         $emptySegmentsAmount = 0;
         $successfulSegmentsAmount = 0;
         $failedSegmentsIds = [];
+        $firstSegment = null;
+        $lastSegment = null;
+
+        $options = [
+            UpdatableAdapterInterface::USE_SEGMENT_TIMESTAMP => $useSegmentTimestamp,
+            UpdatableAdapterInterface::SAVE_TO_DISK => false,
+        ];
+
         foreach ($segments as $segment) {
-            if ($segment->hasEmptySource() || $segment->hasEmptyTarget()) {
-                $emptySegmentsAmount++;
+            $this->updateSegment(
+                $connector,
+                $segment,
+                $options,
+                $emptySegmentsAmount,
+                $successfulSegmentsAmount,
+                $failedSegmentsIds
+            );
 
-                continue;
+            if (null === $firstSegment) {
+                $firstSegment = $segment;
+                $connector->checkUpdatedSegment($firstSegment);
             }
 
-            try {
-                try {
-                    $connector->update($segment, useSegmentTimestamp: $useSegmentTimestamp);
-                } catch (\ZfExtended_Zendoverwrites_Http_Exception|\editor_Services_Connector_Exception) {
-                    // if the TM is not available (due service restart or whatever)
-                    // we just wait some time and try it again once.
-                    sleep(30);
-                    $connector->update($segment, useSegmentTimestamp: $useSegmentTimestamp);
-                }
-            } catch (SegmentUpdateException) {
-                $failedSegmentsIds[] = (int) $segment->getId();
-
-                continue;
-            }
-
-            $successfulSegmentsAmount++;
+            $lastSegment = $segment;
         }
 
+        // TODO change to direct call for flushing memory to the disk once it is implemented on t5memory side
+        $options[UpdatableAdapterInterface::SAVE_TO_DISK] = true;
+        $this->updateSegment(
+            $connector,
+            $lastSegment,
+            $options,
+            $emptySegmentsAmount,
+            $successfulSegmentsAmount,
+            $failedSegmentsIds
+        );
+
+        $connector->checkUpdatedSegment($lastSegment);
+
         return new ReimportSegmentsResult($emptySegmentsAmount, $successfulSegmentsAmount, $failedSegmentsIds);
+    }
+
+    private function updateSegment(
+        editor_Services_Connector $connector,
+        editor_Models_Segment $segment,
+        array $options,
+        int &$emptySegmentsAmount,
+        int &$successfulSegmentsAmount,
+        array &$failedSegmentsIds,
+    ): void {
+        if ($segment->hasEmptySource() || $segment->hasEmptyTarget()) {
+            $emptySegmentsAmount++;
+
+            return;
+        }
+
+        try {
+            try {
+                $connector->update($segment, $options);
+            } catch (\ZfExtended_Zendoverwrites_Http_Exception|\editor_Services_Connector_Exception) {
+                // if the TM is not available (due service restart or whatever)
+                // we just wait some time and try it again once.
+                sleep(30);
+                $connector->update($segment, $options);
+            }
+        } catch (SegmentUpdateException) {
+            $failedSegmentsIds[] = (int) $segment->getId();
+
+            return;
+        }
+
+        $successfulSegmentsAmount++;
     }
 }
