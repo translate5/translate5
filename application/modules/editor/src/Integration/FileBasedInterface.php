@@ -25,17 +25,11 @@ START LICENSE AND COPYRIGHT
 
 END LICENSE AND COPYRIGHT
 */
+declare(strict_types=1);
 
-/**#@+
- * @author Marc Mittag
- * @package editor
- * @version 1.0
- *
- */
-/**
- * Abstract Base Connector for filebased Resources
- */
-abstract class editor_Services_Connector_FilebasedAbstract extends editor_Services_Connector_Abstract
+namespace MittagQI\Translate5\Integration;
+
+interface FileBasedInterface //extends editor_Services_Connector_Abstract
 {
     /***
      * 100% match value
@@ -76,21 +70,21 @@ abstract class editor_Services_Connector_FilebasedAbstract extends editor_Servic
      * @param array $fileinfo as given from upload (tmp_name, name, type, size)
      * @return boolean
      */
-    abstract public function addTm(array $fileinfo = null, array $params = null);
+    public function addTm(array $fileinfo = null, array $params = null);
 
     /**
      * Adds the given file to the underlying system into an already existing TM
      * @param array $fileinfo as given from upload (tmp_name, name, type, size)
      * @return boolean
      */
-    abstract public function addAdditionalTm(array $fileinfo = null, array $params = null);
+    public function addAdditionalTm(array $fileinfo = null, array $params = null);
 
     /**
      * Gets the TM file content from the underlying system
      * @param string $mime the desired mimetype of the export
      * @return string
      */
-    abstract public function getTm($mime);
+    public function getTm($mime);
 
     /**
      * Returns an associative array of filetypes which can be uploaded to the underlying system.
@@ -99,7 +93,7 @@ abstract class editor_Services_Connector_FilebasedAbstract extends editor_Servic
      *  value: (string[]) mimetype(s)
      * @return array
      */
-    abstract public function getValidFiletypes();
+    public function getValidFiletypes();
 
     /**
      * Returns an associative array of filetypes which can be exported by the underlying system.
@@ -108,14 +102,10 @@ abstract class editor_Services_Connector_FilebasedAbstract extends editor_Servic
      *  value: (string) mimetype
      * @return array
      */
-    abstract public function getValidExportTypes();
+    public function getValidExportTypes();
 
     /**
      * Deletes the connected TM on the configured Resource
      */
-    public function delete()
-    {
-        //to be implemented if needed
-        $this->log(__METHOD__);
-    }
+    public function delete();
 }
