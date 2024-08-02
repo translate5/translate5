@@ -66,8 +66,6 @@ class RecalcTransFound
 
     protected array $trgIdA;
 
-    protected array $trgTextA;
-
     /**
      * @throws Zend_Cache_Exception
      */
@@ -162,7 +160,7 @@ class RecalcTransFound
         $db = Zend_Db_Table_Abstract::getDefaultAdapter();
 
         // Reset data arrays
-        $this->homonym = $this->trans = $this->trgTextA = [];
+        $this->homonym = $this->trans = [];
 
         // ! Get merged list of term tbx ids detected in source and target
         $tbxIdA = array_unique(array_merge($srcIdA, $this->trgIdA));
@@ -172,12 +170,11 @@ class RecalcTransFound
 
         // Prepare template for sql query to fetch terms by their tbxIds
         $existsSql = "
-            SELECT `termTbxId`, `termEntryTbxId`, `term`, `status` 
+            SELECT DISTINCT `termTbxId`, `termEntryTbxId`, `term` 
             FROM `terms_term` 
             WHERE `termTbxId` IN ('%s')
               AND `collectionId` IN (" . join(',', $this->collectionIds) . ")
-              AND `processStatus` = 'finalized'
-            LIMIT " . count($tbxIdA) . "             
+              AND `processStatus` = 'finalized'          
         ";
 
         // ! Get `termEntryTbxId` and `term` for each term tbx id detected in source and/or target
@@ -245,16 +242,6 @@ class RecalcTransFound
                         }
                     }
                 }
-            }
-        }
-
-        // Collect target terms texts
-        foreach ($this->trgIdA as $trgId) {
-            if ($text = $this->exists[$trgId]['term'] ?? 0) {
-                $this->trgTextA[] = [
-                    'text' => $text,
-                    'status' => $this->exists[$trgId]['status'],
-                ];
             }
         }
     }
@@ -510,7 +497,7 @@ class RecalcTransFound
                 // Collect unused target terms in a way that will allow us to swap used-flag from one term to another
                 foreach ($termA as $idx => $term) {
                     if (! $term['isSource'] && ! $term['used']) {
-                        $unusedTarget[$termEntryId][$term->term] = $idx;
+                        $unusedTarget[$termEntryId][$term['term']] = $idx;
                     }
                 }
             }
