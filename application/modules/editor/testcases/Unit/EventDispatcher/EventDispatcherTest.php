@@ -45,7 +45,9 @@ class EventDispatcherTest extends TestCase
         $eventManager
             ->expects(self::once())
             ->method('trigger')
-            ->with($event::class, null, ['event' => $event]);
+            ->with($event::class, null, [
+                'event' => $event,
+            ]);
 
         $dispatcher = new EventDispatcher($eventManager);
 

@@ -45,8 +45,6 @@ use MittagQI\Translate5\LanguageResource\CrossSynchronization\SynchronisationInt
 use MittagQI\Translate5\LanguageResource\CrossSynchronization\SynchronisationType;
 use MittagQI\Translate5\LanguageResource\LanguageResourceRepository;
 use PHPUnit\Framework\TestCase;
-use Zend_EventManager_Event;
-use ZfExtended_EventManager;
 
 class CrossLanguageResourceSynchronizationIntegartionTest extends TestCase
 {
