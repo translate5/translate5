@@ -138,6 +138,7 @@ Ext.define('Editor.view.LanguageResources.SearchGridViewController', {
         me.lastSearch.field = field;
         //needed when searching only one languageResource, otherwise a falsy value
         me.lastSearch.languageResourceid = languageResourceid;
+        me.resultsCounter = 0;
         me.search();
         me.clearTextField(field);
     },
@@ -152,6 +153,7 @@ Ext.define('Editor.view.LanguageResources.SearchGridViewController', {
         if(me.executedRequests.getCount() > 0) {
             return;
         }
+        me.resultsCounter = 0;
         me.search(true);
     },
     /**
@@ -226,7 +228,7 @@ Ext.define('Editor.view.LanguageResources.SearchGridViewController', {
         if(this.executedRequests.getCount() > 0) {
             return;
         }
-        if(view.getHeight() >= view.el.dom.scrollHeight) {
+        if(this.resultsCounter < 20) {
             this.search(true);
         }
     },
@@ -236,6 +238,7 @@ Ext.define('Editor.view.LanguageResources.SearchGridViewController', {
 
         if(resp.rows && resp.rows.length){            
             me.offset.add(languageResourceid, resp.nextOffset);
+            me.resultsCounter += resp.rows.length;
             me.loadDataIntoGrid(resp);
             return;
         }

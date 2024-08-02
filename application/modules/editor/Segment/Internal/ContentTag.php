@@ -54,7 +54,7 @@ final class editor_Segment_Internal_ContentTag extends editor_Tag implements Jso
     public static function fromTag(editor_Tag $tag): editor_Segment_Internal_ContentTag
     {
         $contentTag = new editor_Segment_Internal_ContentTag($tag->getName());
-        $contentTag = $tag->transferProps($contentTag, true);
+        $tag->transferProps($contentTag, true);
         $contentTag->setInnerHTML($tag->renderChildren());
 
         return $contentTag;
@@ -75,49 +75,40 @@ final class editor_Segment_Internal_ContentTag extends editor_Tag implements Jso
         }
     }
 
-    /**
-     * @var string
-     */
-    private $innerHTML = '';
+    private string $innerHTML = '';
 
-    /**
-     * @var int
-     */
-    private $tagIndex = -1;
+    private int $tagIndex = -1;
 
     /**
      * Evaluates if we are a short internal content tag
-     * @return boolean
      */
-    public function isShort()
+    public function isShort(): bool
     {
         return $this->hasClass(self::CSS_CLASS_SHORT);
     }
 
     /**
      * Evaluates if we are a full internal content tag
-     * @return boolean
      */
-    public function isFull()
+    public function isFull(): bool
     {
         return $this->hasClass(self::CSS_CLASS_FULL);
     }
 
     /**
      * Retrieves the index of the internal tag. Only use on short-tags
-     * @return int
      */
-    public function getTagIndex()
+    public function getTagIndex(): int
     {
         return $this->tagIndex;
     }
 
-    public function getText()
+    public function getText(): string
     {
         return strip_tags($this->innerHTML);
     }
 
-    public function getTextLength()
+    public function getTextLength(): int
     {
         return mb_strlen(strip_tags($this->innerHTML));
     }
@@ -148,10 +139,7 @@ final class editor_Segment_Internal_ContentTag extends editor_Tag implements Jso
         }
     }
 
-    /**
-     * @return editor_Segment_Internal_ContentTag
-     */
-    public function clone(bool $withDataAttribs = false, bool $withId = false)
+    public function clone(bool $withDataAttribs = false, bool $withId = false): static
     {
         $tag = parent::clone($withDataAttribs, $withId);
         /* @var $tag editor_Segment_Internal_ContentTag */
@@ -160,15 +148,12 @@ final class editor_Segment_Internal_ContentTag extends editor_Tag implements Jso
         return $tag;
     }
 
-    /**
-     * @return editor_Segment_Internal_ContentTag
-     */
-    protected function createBaseClone()
+    protected function createBaseClone(): static
     {
-        return new editor_Segment_Internal_ContentTag($this->name);
+        return new static($this->name);
     }
 
-    public function jsonSerialize(): mixed
+    public function jsonSerialize(): stdClass
     {
         $data = new stdClass();
         $data->name = $this->getName();
@@ -179,7 +164,7 @@ final class editor_Segment_Internal_ContentTag extends editor_Tag implements Jso
         return $data;
     }
 
-    public function jsonUnserialize(stdClass $data)
+    public function jsonUnserialize(stdClass $data): void
     {
         $this->classes = $data->classes;
         $this->attribs = editor_Tag::decodeAttributes($data->attribs);

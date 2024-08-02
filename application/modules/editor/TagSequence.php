@@ -97,9 +97,8 @@ abstract class editor_TagSequence implements JsonSerializable
      * This is a central part of the rendering logic
      * Note, that for rendering, tags, that potentially contain other tags, must come first, otherwise this will lead to rendering errors
      * The nesting may be corrected with the ::findHolderByOrder API but for rendering this "longer first" logic must apply
-     * @return int
      */
-    public static function compare(editor_Segment_Tag $a, editor_Segment_Tag $b)
+    public static function compare(editor_Segment_Tag $a, editor_Segment_Tag $b): int
     {
         if ($a->startIndex === $b->startIndex) {
             // only tags at the exact same position that do not contain each other will need the order-property evaluated when sorting !
@@ -122,9 +121,8 @@ abstract class editor_TagSequence implements JsonSerializable
     /**
      * Sorting of children of segment tags in the rendering phase: Here the singular tags (where startIndex == endIndex) MUST come first!
      * This is crucial for the text-distribution to work properly (::addSegmentText)
-     * @return number
      */
-    public static function compareChildren(editor_Segment_Tag $a, editor_Segment_Tag $b)
+    public static function compareChildren(editor_Segment_Tag $a, editor_Segment_Tag $b): int
     {
         if ($a->startIndex === $b->startIndex) {
             // only tags at the exact same position that do not contain each other will need the order-property evaluated when sorting !
@@ -243,9 +241,8 @@ abstract class editor_TagSequence implements JsonSerializable
 
     /**
      * We expect the passed text to be identical
-     * @return string
      */
-    public function setTagsByText(string $text)
+    public function setTagsByText(string $text): void
     {
         $textBefore = $this->text;
         $this->setText('');
@@ -291,10 +288,8 @@ abstract class editor_TagSequence implements JsonSerializable
 
     /**
      * Retrieves the tag at a certain index
-     * @param int $index
-     * @return editor_Segment_Tag|null
      */
-    public function getAt($index)
+    public function getAt(int $index): ?editor_Segment_Tag
     {
         if ($index < count($this->tags)) {
             return $this->tags[$index];
@@ -314,7 +309,7 @@ abstract class editor_TagSequence implements JsonSerializable
     /**
      * Removes all tags, so only the raw text will be left
      */
-    public function removeAll()
+    public function removeAll(): void
     {
         $this->tags = [];
         $this->orderIndex = -1;
@@ -328,22 +323,19 @@ abstract class editor_TagSequence implements JsonSerializable
     /**
      * Sorts the items ascending, takes the second index into account when items have the same startIndex
      */
-    public function sort()
+    public function sort(): void
     {
         usort($this->tags, [$this, 'compare']);
     }
 
     /* Serialization API */
 
-    /**
-     * @return string
-     */
-    public function toJson()
+    public function toJson(): false|string
     {
         return json_encode($this->jsonSerialize(), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
     }
 
-    public function jsonSerialize(): mixed
+    public function jsonSerialize(): stdClass
     {
         $data = new stdClass();
         $this->sort();
@@ -503,7 +495,7 @@ abstract class editor_TagSequence implements JsonSerializable
      * Please note that this may fails when multiple tags with the same order have been added
      * @param editor_Segment_Tag[] $holders
      */
-    protected function findHolderByOrder(array &$holders, editor_Segment_Tag $tag): ?editor_Segment_Tag
+    protected function findHolderByOrder(array $holders, editor_Segment_Tag $tag): ?editor_Segment_Tag
     {
         if ($tag->parentOrder > -1) {
             foreach ($holders as $holder) {
@@ -522,7 +514,7 @@ abstract class editor_TagSequence implements JsonSerializable
      * Unparses Segment markup into FieldTags
      * @throws Exception
      */
-    public function unparse(string $html)
+    public function unparse(string $html): void
     {
         // decompose html into a wrapping tag
         $wrapper = $this->unparseHtml($html);
@@ -570,9 +562,9 @@ abstract class editor_TagSequence implements JsonSerializable
             $dom = new ZfExtended_Dom();
             // to make things easier we add a wrapper to hold all tags and only use it's children
             $element = $dom->loadUnicodeElement('<div>' . $html . '</div>');
-            if (static::VALIDATION_MODE && mb_substr($dom->saveHTML($element), 5, -6) != $html) {
+            if (static::VALIDATION_MODE && mb_substr($dom->saveXML($element), 5, -6) != $html) {
                 error_log("\n============== UNPARSED PHP DOM DOES NOT MATCH =============\n");
-                error_log(mb_substr($dom->saveHTML($element), 5, -6));
+                error_log(mb_substr($dom->saveXML($element), 5, -6));
                 error_log("\n========================================\n");
                 error_log($html);
                 error_log("\n========================================\n");
@@ -605,7 +597,7 @@ abstract class editor_TagSequence implements JsonSerializable
     /**
      * Called after the unparsing Phase to finalize the found tags
      */
-    protected function finalizeUnparse()
+    protected function finalizeUnparse(): void
     {
         $num = count($this->tags);
         $textLength = $this->getTextLength();
@@ -650,9 +642,8 @@ abstract class editor_TagSequence implements JsonSerializable
      * Creates a nested structure of Internal tags & text-nodes recursively out of a DOMElement structure
      * This is an alternative implementation using PHP DOM
      * see editor_Tag::USE_DOM_DOCUMENT
-     * @return editor_Segment_Tag
      */
-    protected function fromDomElement(DOMElement $element, int $startIndex)
+    protected function fromDomElement(DOMElement $element, int $startIndex): editor_Segment_Tag
     {
         $children = $element->hasChildNodes() ? $element->childNodes : null;
         $tag = $this->createFromDomElement($element, $startIndex, $children);
@@ -684,7 +675,7 @@ abstract class editor_TagSequence implements JsonSerializable
      * Also removes any internal connections between the tags
      * Joins paired tags, removes obsolete tags
      */
-    protected function consolidate()
+    protected function consolidate(): void
     {
         $this->sort();
         $numTags = count($this->tags);
@@ -757,7 +748,7 @@ abstract class editor_TagSequence implements JsonSerializable
     /**
      * Swaps the order (or rightOrder for paired tags) of two tags, adjusts any connected tags
      */
-    protected function swapOrder(editor_Segment_Tag $tag1, editor_Segment_Tag $tag2, string $propName)
+    protected function swapOrder(editor_Segment_Tag $tag1, editor_Segment_Tag $tag2, string $propName): void
     {
         $cache = $tag1->$propName;
         $tag1->$propName = $tag2->$propName;
@@ -775,7 +766,7 @@ abstract class editor_TagSequence implements JsonSerializable
     /**
      * Helper to set the del/ins properties
      */
-    protected function setContainedTagsProp(int $start, int $end, int $order, string $propName)
+    protected function setContainedTagsProp(int $start, int $end, int $order, string $propName): void
     {
         foreach ($this->tags as $tag) {
             if ($tag->startIndex >= $start && $tag->endIndex <= $end && $tag->getType() != editor_Segment_Tag::TYPE_TRACKCHANGES) {
@@ -789,7 +780,7 @@ abstract class editor_TagSequence implements JsonSerializable
     /**
      * Removes any parentOrder indices that point to non-existing indices
      */
-    protected function fixParentOrders()
+    protected function fixParentOrders(): void
     {
         $orders = [];
         foreach ($this->tags as $tag) {
@@ -834,7 +825,7 @@ abstract class editor_TagSequence implements JsonSerializable
     /**
      * To be extended in inheriting classes
      */
-    protected function addErrorDetails(array &$errorData)
+    protected function addErrorDetails(array &$errorData): void
     {
         $errorData['text'] = $this->text;
     }
@@ -843,9 +834,8 @@ abstract class editor_TagSequence implements JsonSerializable
 
     /**
      * Debug output
-     * @return string
      */
-    public function debug()
+    public function debug(): string
     {
         $newline = "\n";
         $debug = 'TEXT: "' . trim($this->text) . '"' . $newline;

@@ -31,7 +31,7 @@ use editor_Plugins_TermTagger_QualityProvider as QualityProvider;
 /**
  * Represents a termtagger segment tag
  */
-class editor_Plugins_TermTagger_Tag extends editor_Segment_Tag
+final class editor_Plugins_TermTagger_Tag extends editor_Segment_Tag
 {
     /**
      * Central Key to identify term tags & qualities
@@ -102,13 +102,12 @@ class editor_Plugins_TermTagger_Tag extends editor_Segment_Tag
 
     /**
      * The central unique type amongst quality providersKey to identify termtagger-related stuff. Must match editor_Plugins_TermTagger_QualityProvider::$type
-     * @var string
      */
-    protected static $type = self::TYPE;
+    protected static ?string $type = self::TYPE;
 
-    protected static $nodeName = 'div';
+    protected static ?string $nodeName = 'div';
 
-    protected static $identificationClass = self::TYPE;
+    protected static ?string $identificationClass = self::TYPE;
 
     /**
      * Adds the TBX Id to our additional data
@@ -130,7 +129,7 @@ class editor_Plugins_TermTagger_Tag extends editor_Segment_Tag
      * {@inheritDoc}
      * @see editor_Segment_Tag::finalize()
      */
-    public function finalize(editor_TagSequence $tags, editor_Models_task $task)
+    public function finalize(editor_TagSequence $tags, editor_Models_task $task): void
     {
         $this->category = static::getQualityState($this->classes, $tags->isSourceField());
     }

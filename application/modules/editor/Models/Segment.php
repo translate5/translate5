@@ -38,7 +38,7 @@ use MittagQI\Translate5\ContentProtection\ContentProtector;
 /**
  * Segment Entity Object
  *
- * @method string getId()
+ * @method int getId()
  * @method void setId(int $id)
  * @method string getSegmentNrInTask()
  * @method void setSegmentNrInTask(int $nr)
@@ -61,8 +61,8 @@ use MittagQI\Translate5\ContentProtection\ContentProtector;
  * @method string getMatchRate()
  * @method void setMatchRate(int $matchrate)
  * @method string getMatchRateType()
- * @method string getStateId()
- * @method void setStateId(int $id)
+ * @method string|null getStateId()
+ * @method void setStateId(int|null $id)
  * @method string getAutoStateId()
  * @method void setAutoStateId(int $id)
  * @method string getFileOrder()
