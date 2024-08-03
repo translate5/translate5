@@ -588,7 +588,16 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
 
         //set frontend array from the config data
         //the array is used as initial user config store data
-        $php2js->set('app.configData', $config->loadAllMerged('runtimeOptions.frontend.defaultState.%'));
+        $configData = $config->loadAllMerged('runtimeOptions.frontend.defaultState.%');
+
+        // Replace '&lt;' and '&gt;' back to '<' and '>'
+        foreach ($configData as &$row) {
+            if ($row['type'] === ZfExtended_DbConfig_Type_CoreTypes::TYPE_MAP) {
+                $row['value'] = str_replace(['&lt;', '&gt;'], ['<', '>'], $row['value']);
+            }
+        }
+
+        $php2js->set('app.configData', $configData);
     }
 
     /**
