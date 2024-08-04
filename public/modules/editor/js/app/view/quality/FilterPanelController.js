@@ -191,6 +191,11 @@ Ext.define('Editor.view.quality.FilterPanelController', {
         root.expand();
         view.afterLoad();
         view.setHidden(!root.firstChild.hasChildNodes());
+        console.log('debug before update filter:',
+            'controller id:', this.getId(),
+            'controller type:', this.type,
+            'controller view self', this.view,
+            'controller view queried', Ext.ComponentQuery.query('qualityFilterPanel').pop());
         me.delayedChange = new Ext.util.DelayedTask(function(){
             me.delayedChange = null;
             me.updateFilter(true);
@@ -274,6 +279,11 @@ Ext.define('Editor.view.quality.FilterPanelController', {
         var checkedVals = [],
             modeVal = (!newModeVal) ? Editor.app.getController('Quality').getFilterMode() : newModeVal;
         // retrieve all checked filters. When reloading the store, this has to cover the rubrics as well
+        console.log('debug after 250ms update filter:',
+            'controller id:', this.getId(),
+            'controller type:', this.type,
+            'controller view self', this.view,
+            'controller view queried', Ext.ComponentQuery.query('qualityFilterPanel').pop());
         Ext.Array.each(this.getView().getChecked(), function(record){
             // send the rubrics only for a store reload
             if(record.isCategory() || forStoreReload || record.hasNoCategories()){
@@ -299,5 +309,24 @@ Ext.define('Editor.view.quality.FilterPanelController', {
             return (collapsedVals.length === 0) ? (this.currentFilterVal + '|NONE') : (this.currentFilterVal + '|' + collapsedVals.join(','));
         }
         return this.currentFilterVal;
-    }
+    },
+
+    destroy: function() {
+        var me = this,
+            domain = me.compDomain;
+
+        if (domain) {
+            domain.unlisten(me);
+            domain.destroy();
+        }
+        me.compDomain = me.view = null;
+
+        console.log('debug inside controller destroy:',
+            'controller id:', this.getId(),
+            'controller type:', this.type,
+            'controller view self', this.view,
+            'controller view queried', Ext.ComponentQuery.query('qualityFilterPanel').pop());
+
+        me.callSuper();
+    },
 });
