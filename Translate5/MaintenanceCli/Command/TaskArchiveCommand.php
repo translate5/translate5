@@ -102,6 +102,8 @@ class TaskArchiveCommand extends Translate5AbstractCommand
 
         $actions = ZfExtended_Factory::get(editor_Models_Workflow_Action::class);
         $actionEntries = $actions->loadByAction(editor_Workflow_Actions::class, 'deleteOldEndedTasks');
+        $this->io->info('With system config taskLifetimeDays: ' .
+            \Zend_Registry::get('config')->runtimeOptions->taskLifetimeDays);
         foreach ($actionEntries as $actionEntry) {
             if (! empty($actionId) && $actionId != $actionEntry['id']) {
                 continue;
