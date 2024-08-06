@@ -87,13 +87,16 @@ class IntegerProtector extends FloatProtector
 
         $integer = $this->parse($number);
 
+        $firstChar = mb_substr($number, 0, 1);
+        $sign = in_array($firstChar, ['-', '+']) ? $firstChar : '';
+
         return sprintf(
             $this->tagFormat(),
             self::getType(),
             htmlspecialchars($protectionDto->name),
             $number,
-            (string) $integer,
-            $this->getTargetInteger($integer, $protectionDto->outputFormat)
+            $sign . $integer,
+            $sign . $this->getTargetInteger($integer, $protectionDto->outputFormat)
         );
     }
 
@@ -103,10 +106,12 @@ class IntegerProtector extends FloatProtector
 
         $int = $fmt->parse(preg_replace('/[^\d]/u', '', $number), NumberFormatter::TYPE_INT64);
 
+        /** @phpstan-ignore-next-line  */
         if (! is_int($int)) {
             throw new NumberParsingException();
         }
 
+        /** @phpstan-ignore-next-line  */
         return $int;
     }
 
