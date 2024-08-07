@@ -145,8 +145,8 @@ Ext.define('Editor.view.LanguageResources.TmOverviewPanel', {
                     renderer: function(v, meta, rec){
                         var store = Ext.getStore('Editor.store.LanguageResources.Resources'),
                             resource = store.getById(rec.get('resourceId'));
-                        if(resource) {
-                            const resourceName = xt.String.htmlEncode(Ext.String.htmlEncode(resource.get('name')));
+                        if (resource) {
+                            const resourceName = Ext.String.htmlEncode(Ext.String.htmlEncode(resource.get('name')));
                             meta.tdAttr = 'data-qtip="' + resourceName + '"';
                         }
                         return v;

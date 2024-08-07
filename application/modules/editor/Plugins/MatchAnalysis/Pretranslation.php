@@ -28,6 +28,7 @@ END LICENSE AND COPYRIGHT
 
 use editor_Models_LanguageResources_LanguageResource as LanguageResource;
 use editor_Services_Connector as Connector;
+use MittagQI\Translate5\Integration\FileBasedInterface;
 
 class editor_Plugins_MatchAnalysis_Pretranslation
 {
@@ -289,7 +290,7 @@ class editor_Plugins_MatchAnalysis_Pretranslation
             //if the source contains no text but tags only, we set the target to the source directly
             // and the segment is not editable
             $targetResult = $segment->getSource();
-            $segment->setMatchRate(editor_Services_Connector_FilebasedAbstract::CONTEXT_MATCH_VALUE);
+            $segment->setMatchRate(FileBasedInterface::CONTEXT_MATCH_VALUE);
             $matchType[] = $matchrateType::TYPE_SOURCE;
             $segment->setEditable(false);
         }
@@ -404,7 +405,8 @@ class editor_Plugins_MatchAnalysis_Pretranslation
     protected function isResourceLogValid(LanguageResource $languageResource, int $matchRate)
     {
         //check if it is tm or tc, an if the matchrate is >= 100
-        return ($languageResource->isTm() || $languageResource->isTc()) && $matchRate >= editor_Services_Connector_FilebasedAbstract::EXACT_MATCH_VALUE;
+        return ($languageResource->isTm() || $languageResource->isTc())
+            && $matchRate >= FileBasedInterface::EXACT_MATCH_VALUE;
     }
 
     /***

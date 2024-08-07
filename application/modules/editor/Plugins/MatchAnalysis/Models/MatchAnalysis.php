@@ -25,6 +25,8 @@
 
  END LICENSE AND COPYRIGHT
  */
+
+use MittagQI\Translate5\Integration\FileBasedInterface;
 use MittagQI\Translate5\Plugins\MatchAnalysis\Models\Pricing\PresetPrices;
 use MittagQI\Translate5\Plugins\MatchAnalysis\Models\Pricing\PresetRange;
 use ZfExtended_Factory as Factory;
@@ -431,7 +433,7 @@ class editor_Plugins_MatchAnalysis_Models_MatchAnalysis extends ZfExtended_Model
         foreach ($data as $idx => $row) {
             $id = (int) $row['languageResourceid'];
             $lr = $this->getLanguageResourceCached($id);
-            if ($id === 0 && $row['matchRate'] == editor_Services_Connector_FilebasedAbstract::REPETITION_MATCH_VALUE) {
+            if ($id === 0 && $row['matchRate'] == FileBasedInterface::REPETITION_MATCH_VALUE) {
                 $data[$idx]['type'] = editor_Models_Segment_MatchRateType::TYPE_AUTO_PROPAGATED;
                 $data[$idx]['name'] = 'repetition';
             } elseif (empty($lr)) {

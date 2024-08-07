@@ -6640,9 +6640,9 @@ The following task was imported with errors / warnings / notices. Please take ca
                 <source>Der Benutzer hat das Recht, die Sprachressourcen in InstantTranslate &amp; TermPortal zu nutzen, die denselben Kunden zugeordnet sind, denen der Benutzer hier zugeordnet ist.</source>
                 <target>User has the right to use those language resources in InstantTranslate &amp; TermPortal, that are assigned to the same clients, as the user is assigned to here.</target>
             </trans-unit>
-            <trans-unit id='WnVnZXdpZXNlbmUgS3VuZGVuIChCZXRyaWZmdCBSb2xsZW4gUE0sIEluc3RhbnRUcmFuc2xhdGUgdW5kIFRlcm1Qb3J0YWwp'>
-                <source>Zugewiesene Kunden (Betrifft Rollen PM, InstantTranslate und TermPortal)</source>
-                <target>Assigned clients (affect roles PM, InstantTranslate and TermPortal-roles)</target>
+            <trans-unit id='WnVnZXdpZXNlbmUgS3VuZGVuIChCZXRyaWZmdCBSb2xsZW4gUE0sIEluc3RhbnRUcmFuc2xhdGUsIFRNIE1haW50ZW5hbmNlIHVuZCBUZXJtUG9ydGFsKQ'>
+                <source>Zugewiesene Kunden (Betrifft Rollen PM, InstantTranslate, TM Maintenance und TermPortal)</source>
+                <target>Assigned clients (affect roles PM, InstantTranslate, TM Maintenance and TermPortal-roles)</target>
             </trans-unit>
             <trans-unit id='WnVnw6RuZ2xpY2hlIE1hbmFnZW1lbnTDvGJlcnNpY2h0ZW4gZsO8ciBSb2xsZSBQTQ=='>
                 <source>Zugängliche Managementübersichten für Rolle PM</source>
@@ -6731,6 +6731,14 @@ The following task was imported with errors / warnings / notices. Please take ca
             <trans-unit id='UG1saWdodA=='>
                 <source>Pmlight</source>
                 <target>PM Light</target>
+            </trans-unit>
+            <trans-unit id='VE1NYWludGVuYW5jZQ=='>
+                <source>TMMaintenance</source>
+                <target>TM Maintenance (selected clients)</target>
+            </trans-unit>
+            <trans-unit id='VE1NYWludGVuYW5jZV9hbGxDbGllbnRz'>
+                <source>TMMaintenance_allClients</source>
+                <target>TM Maintenance (all clients)</target>
             </trans-unit>
             <trans-unit id='RWRpdG9yLW9ubHktb3ZlcnJpZGU='>
                 <source>Editor-only-override</source>
@@ -9959,6 +9967,18 @@ E-Mail: service@MittagQI.com</pre>
             <trans-unit id='U2VydmVyIGbDvHIgZGVuIGFuZ2VmcmFndGVuIERpZW5zdCBpc3QgbmljaHQgZXJyZWljaGJhci4='>
                 <source>Server für den angefragten Dienst ist nicht erreichbar.</source>
                 <target>Server for the queried service is not reachable.</target>
+            </trans-unit>
+            <trans-unit id='UmVnZWxuYW1lIGV4aXN0aWVydCBiZXJlaXRzIGbDvHIgVHlwIHt0eXBlfQ=='>
+                <source>Regelname existiert bereits für Typ {type}</source>
+                <target>Provided Rule name already exists for type {type}</target>
+            </trans-unit>
+            <trans-unit id='U2llIHZlcndlbmRlbiBkaWVzZSBSZWdlbCBiZXJlaXRzIGbDvHIgZGllc2UgU3ByYWNoZQ=='>
+                <source>Sie verwenden diese Regel bereits für diese Sprache</source>
+                <target>You already use this rule for this language</target>
+            </trans-unit>
+            <trans-unit id='UmVnZWwgbWl0IGRpZXNlciBQcmlvcml0w6R0IGV4aXN0aWVydCBiZXJlaXRz'>
+                <source>Regel mit dieser Priorität existiert bereits</source>
+                <target>Rule with this priority already exists</target>
             </trans-unit>
         </body>
     </file>

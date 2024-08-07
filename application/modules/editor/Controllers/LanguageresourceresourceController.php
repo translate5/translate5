@@ -184,9 +184,8 @@ class editor_LanguageresourceresourceController extends ZfExtended_RestControlle
      */
     protected function handleLanguageCodes(array $languages)
     {
-        $mapper = ZfExtended_Factory::get('editor_Models_LanguageResources_LanguagesMapper');
+        $mapper = ZfExtended_Factory::get(editor_Models_LanguageResources_LanguagesMapper::class);
 
-        /* @var $mapper editor_Models_LanguageResources_LanguagesMapper */
         return $mapper->map($languages);
     }
 

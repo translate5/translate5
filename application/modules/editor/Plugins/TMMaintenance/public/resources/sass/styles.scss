@@ -1,0 +1,21 @@
+.internal-tag {
+  display: inline;
+  background-color: #cfcfcfaa;
+
+  > .full {
+    display: none;
+  }
+
+  &.nbsp, &.char {
+    span.short {
+      display: none;
+    }
+
+    span.full {
+      display: inline;
+    }
+  }
+}
+
+
+.short-tag div.internal-tag.nbsp span.shor

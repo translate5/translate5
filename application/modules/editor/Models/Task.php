@@ -151,6 +151,8 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract
      */
     public const LOG_DIR = 'log';
 
+    public const NON_EXCLUSIVE_STATES = [self::STATE_OPEN, self::STATE_END, self::STATE_UNCONFIRMED];
+
     /**
      * Currently only used for getConfig, should be used for all relevant customer stuff in this class
      */
@@ -991,14 +993,11 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract
 
     /**
      * returns true if current task is in an exclusive state (like import)
-     * @param array $additionalNonExclusive additional states to be handled non exclusive
-     * @return boolean
+     * @param array $additionalNonExclusive additional states to be handled non-exclusive
      */
-    public function isExclusiveState(array $additionalNonExclusive = [])
+    public function isExclusiveState(array $additionalNonExclusive = []): bool
     {
-        $nonExclusiveStates = [self::STATE_OPEN, self::STATE_END, self::STATE_UNCONFIRMED];
-
-        return ! in_array($this->getState(), array_merge($nonExclusiveStates, $additionalNonExclusive));
+        return ! in_array($this->getState(), array_merge(self::NON_EXCLUSIVE_STATES, $additionalNonExclusive));
     }
 
     /**

@@ -192,7 +192,7 @@ class editor_Workflow_Default_Hooks
     {
         $this->doDebug(self::HANDLE_IMPORT_BEFORE);
         $this->workflow->getStepRecalculation()->initWorkflowStep($this->newTask, $this->workflow::STEP_NO_WORKFLOW);
-        $this->newTask->load($this->newTask->getId()); //reload task with new workflowStepName and new calculated workflowStepNr
+        $this->newTask->load((int) $this->newTask->getId()); //reload task with new workflowStepName and new calculated workflowStepNr
         $this->callActions(self::HANDLE_IMPORT_BEFORE, $this->workflow::STEP_NO_WORKFLOW);
     }
 
@@ -353,10 +353,14 @@ class editor_Workflow_Default_Hooks
      * @uses editor_Workflow_Actions::segmentsSetUntouchedState()
      * @uses editor_Workflow_Actions::setDefaultDeadlineDate()
      */
-    protected function callActions($trigger, $step = null, $role = null, $state = null)
+    protected function callActions($trigger, $step = null, $role = null, $state = null): void
     {
-        $actions = ZfExtended_Factory::get('editor_Models_Workflow_Action');
-        /* @var $actions editor_Models_Workflow_Action */
+        $actions = ZfExtended_Factory::get(editor_Models_Workflow_Action::class);
+        if (is_null($actions)) {
+            // @TODO: may some notification or error should be thrown
+            return;
+        }
+
         $debugData = [
             'trigger' => $trigger,
             'step' => $step,
@@ -389,6 +393,12 @@ class editor_Workflow_Default_Hooks
                 call_user_func([$instance, $method], $config->parameters);
             }
         }
+
+        // Trigger afterWorkflowCallAction-event
+        $this->events->trigger('afterWorkflowCallAction', $this, [
+            'entity' => $this,
+            'task' => $this->newTask,
+        ]);
     }
 
     protected function decodeParameters(editor_Workflow_Actions_Config $config, array $action): ?stdClass

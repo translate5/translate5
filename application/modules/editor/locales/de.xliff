@@ -6733,6 +6733,14 @@ ein anderer Benutzer hat im Projektportal {portalLink} die Verantwortung für di
                 <source>% abgeschlossen durch zugewiesene Benutzer im aktuellen Workflowschritt</source>
                 <target>% abgeschlossen durch zugewiesene Benutzer im aktuellen Workflowschritt</target>
             </trans-unit>
+            <trans-unit id='VGVybVBN'>
+                <source>TMMaintenance</source>
+                <target>TM Maintenance (ausgewählte Kunden)</target>
+            </trans-unit>
+            <trans-unit id='VGVybVBNX2FsbENsaWVudHM'>
+                <source>TMMaintenance_allClients</source>
+                <target>TM Maintenance (alle Kunden)</target>
+            </trans-unit>
             <trans-unit id='QWt0dWVsbGVyIFdvcmtmbG93LVNjaHJpdHQ='>
                 <source>Aktueller Workflow-Schritt</source>
                 <target>Aktueller Workflow-Schritt</target>
@@ -8502,9 +8510,9 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
                 <source>Der Benutzer hat das Recht, die Sprachressourcen in InstantTranslate &amp; TermPortal zu nutzen, die denselben Kunden zugeordnet sind, denen der Benutzer hier zugeordnet ist.</source>
                 <target>Der Benutzer hat das Recht, die Sprachressourcen in InstantTranslate &amp; TermPortal zu nutzen, die denselben Kunden zugeordnet sind, denen der Benutzer hier zugeordnet ist.</target>
             </trans-unit>
-            <trans-unit id='WnVnZXdpZXNlbmUgS3VuZGVuIChCZXRyaWZmdCBSb2xsZW4gUE0sIEluc3RhbnRUcmFuc2xhdGUgdW5kIFRlcm1Qb3J0YWwp'>
-                <source>Zugewiesene Kunden (Betrifft Rollen PM, InstantTranslate und TermPortal)</source>
-                <target>Zugewiesene Kunden (Betrifft Rollen PM, InstantTranslate und TermPortal)</target>
+            <trans-unit id='WnVnZXdpZXNlbmUgS3VuZGVuIChCZXRyaWZmdCBSb2xsZW4gUE0sIEluc3RhbnRUcmFuc2xhdGUsIFRNIE1haW50ZW5hbmNlIHVuZCBUZXJtUG9ydGFsKQ'>
+                <source>Zugewiesene Kunden (Betrifft Rollen PM, InstantTranslate, TM Maintenance und TermPortal)</source>
+                <target>Zugewiesene Kunden (Betrifft Rollen PM, InstantTranslate, TM Maintenance und TermPortal)</target>
             </trans-unit>
             <trans-unit id='WnVnw6RuZ2xpY2hlIE1hbmFnZW1lbnTDvGJlcnNpY2h0ZW4gZsO8ciBSb2xsZSBQTQ=='>
                 <source>Zugängliche Managementübersichten für Rolle PM</source>
@@ -9785,6 +9793,18 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
             <trans-unit id='U2VydmVyIGbDvHIgZGVuIGFuZ2VmcmFndGVuIERpZW5zdCBpc3QgbmljaHQgZXJyZWljaGJhci4='>
                 <source>Server für den angefragten Dienst ist nicht erreichbar.</source>
                 <target>Server für den angefragten Dienst ist nicht erreichbar.</target>
+            </trans-unit>
+            <trans-unit id='UmVnZWxuYW1lIGV4aXN0aWVydCBiZXJlaXRzIGbDvHIgVHlwIHt0eXBlfQ=='>
+                <source>Regelname existiert bereits für Typ {type}</source>
+                <target>Regelname existiert bereits für Typ {type}</target>
+            </trans-unit>
+            <trans-unit id='U2llIHZlcndlbmRlbiBkaWVzZSBSZWdlbCBiZXJlaXRzIGbDvHIgZGllc2UgU3ByYWNoZQ=='>
+                <source>Sie verwenden diese Regel bereits für diese Sprache</source>
+                <target>Sie verwenden diese Regel bereits für diese Sprache</target>
+            </trans-unit>
+            <trans-unit id='UmVnZWwgbWl0IGRpZXNlciBQcmlvcml0w6R0IGV4aXN0aWVydCBiZXJlaXRz'>
+                <source>Regel mit dieser Priorität existiert bereits</source>
+                <target>Rule with this priority already exists</target>
             </trans-unit>
         </body>
     </file>
