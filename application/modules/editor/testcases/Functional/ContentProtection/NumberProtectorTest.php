@@ -699,6 +699,16 @@ class NumberProtectorTest extends TestCase
             'string' => 'string KEEP TEXT string',
             'expected' => 'string <number type="keep-content" name="default" source="KEEP TEXT" iso="KEEP TEXT" target="KEEP TEXT"/> string',
         ];
+
+        yield [
+            'string' => '#OVERLAY9_TITLE=In diesem Bereich werfen wir einen Blick in die Zukunft.',
+            'expected' => '<number type="keep-content" name="default" source="#OVERLAY9_TITLE=" iso="#OVERLAY9_TITLE=" target="#OVERLAY9_TITLE="/>In diesem Bereich werfen wir einen Blick in die Zukunft.',
+        ];
+
+        yield [
+            'string' => '#OVERLAY123_BODY=In diesem Bereich werfen wir einen Blick in die Zukunft.',
+            'expected' => '<number type="keep-content" name="default" source="#OVERLAY123_BODY=" iso="#OVERLAY123_BODY=" target="#OVERLAY123_BODY="/>In diesem Bereich werfen wir einen Blick in die Zukunft.',
+        ];
     }
 
     public function replaceContentProvider(): iterable
@@ -865,6 +875,17 @@ class NumberProtectorTest extends TestCase
             'REPLACE TEXT',
             true,
             'OTHER TEXT',
+            0
+        );
+
+        yield new ContentProtectionDto(
+            'keep-content',
+            'default',
+            '/#OVERLAY\d*_(BODY|TITLE)=/',
+            0,
+            null,
+            true,
+            null,
             0
         );
     }
