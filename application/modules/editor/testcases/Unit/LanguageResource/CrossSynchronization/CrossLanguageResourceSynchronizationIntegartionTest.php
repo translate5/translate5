@@ -36,14 +36,14 @@ use editor_Services_Manager;
 use MittagQI\Translate5\EventDispatcher\EventDispatcher;
 use MittagQI\Translate5\LanguageResource\CrossSynchronization\CrossLanguageResourceSynchronizationService;
 use MittagQI\Translate5\LanguageResource\CrossSynchronization\CrossSynchronizationConnection;
-use MittagQI\Translate5\LanguageResource\CrossSynchronization\CrossSynchronizationConnectionRepository;
 use MittagQI\Translate5\LanguageResource\CrossSynchronization\Events\ConnectionCreatedEvent;
 use MittagQI\Translate5\LanguageResource\CrossSynchronization\Events\ConnectionDeletedEvent;
 use MittagQI\Translate5\LanguageResource\CrossSynchronization\Events\LanguageResourcesConnectedEvent;
 use MittagQI\Translate5\LanguageResource\CrossSynchronization\LanguagePair;
 use MittagQI\Translate5\LanguageResource\CrossSynchronization\SynchronisationInterface;
 use MittagQI\Translate5\LanguageResource\CrossSynchronization\SynchronisationType;
-use MittagQI\Translate5\LanguageResource\LanguageResourceRepository;
+use MittagQI\Translate5\Repository\CrossSynchronizationConnectionRepository;
+use MittagQI\Translate5\Repository\LanguageResourceRepository;
 use PHPUnit\Framework\TestCase;
 
 class CrossLanguageResourceSynchronizationIntegartionTest extends TestCase

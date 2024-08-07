@@ -27,10 +27,10 @@ END LICENSE AND COPYRIGHT
 */
 
 use MittagQI\Translate5\LanguageResource\CrossSynchronization\SynchronisationInterface;
-use MittagQI\Translate5\LanguageResource\CrossSynchronization\SynchronizableIntegration;
+use MittagQI\Translate5\LanguageResource\CrossSynchronization\SynchronizableIntegrationInterface;
 use MittagQI\Translate5\Terminology\CrossSynchronization\SynchronisationService;
 
-class editor_Services_TermCollection_Service extends editor_Services_ServiceAbstract implements SynchronizableIntegration
+class editor_Services_TermCollection_Service extends editor_Services_ServiceAbstract implements SynchronizableIntegrationInterface
 {
     public const DEFAULT_COLOR = '19737d';
 

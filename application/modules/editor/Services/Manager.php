@@ -37,7 +37,7 @@ use MittagQI\Translate5\LanguageResource\Adapter\Exception\RescheduleUpdateNeede
 use MittagQI\Translate5\LanguageResource\Adapter\Exception\SegmentUpdateException;
 use MittagQI\Translate5\LanguageResource\Adapter\UpdatableAdapterInterface;
 use MittagQI\Translate5\LanguageResource\CrossSynchronization\SynchronisationInterface;
-use MittagQI\Translate5\LanguageResource\CrossSynchronization\SynchronizableIntegration;
+use MittagQI\Translate5\LanguageResource\CrossSynchronization\SynchronizableIntegrationInterface;
 use MittagQI\Translate5\Service\DetectLanguageInterface;
 use MittagQI\Translate5\Service\HasLanguageDetector;
 
@@ -127,7 +127,7 @@ class editor_Services_Manager
             return null;
         }
 
-        if (! $service instanceof SynchronizableIntegration) {
+        if (! $service instanceof SynchronizableIntegrationInterface) {
             return null;
         }
 
@@ -158,7 +158,7 @@ class editor_Services_Manager
         foreach ($this->getAll() as $serviceType) {
             $service = $this->getService($serviceType);
 
-            if (! $service instanceof SynchronizableIntegration) {
+            if (! $service instanceof SynchronizableIntegrationInterface) {
                 continue;
             }
 

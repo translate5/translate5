@@ -39,7 +39,8 @@ use MittagQI\Translate5\LanguageResource\CrossSynchronization\Dto\LanguageResour
 use MittagQI\Translate5\LanguageResource\CrossSynchronization\Events\ConnectionCreatedEvent;
 use MittagQI\Translate5\LanguageResource\CrossSynchronization\Events\ConnectionDeletedEvent;
 use MittagQI\Translate5\LanguageResource\CrossSynchronization\Events\LanguageResourcesConnectedEvent;
-use MittagQI\Translate5\LanguageResource\LanguageResourceRepository;
+use MittagQI\Translate5\Repository\CrossSynchronizationConnectionRepository;
+use MittagQI\Translate5\Repository\LanguageResourceRepository;
 use ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey;
 
 class CrossLanguageResourceSynchronizationService

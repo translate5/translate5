@@ -42,7 +42,7 @@ use MittagQI\Translate5\LanguageResource\CrossSynchronization\Events\EventListen
 use MittagQI\Translate5\LanguageResource\CrossSynchronization\Events\LanguageResourcesConnectedEvent;
 use MittagQI\Translate5\LanguageResource\CrossSynchronization\SynchronisationDirigent;
 use MittagQI\Translate5\LanguageResource\CustomerAssoc\Events as CustomerAssocEvents;
-use MittagQI\Translate5\LanguageResource\LanguageResourceRepository;
+use MittagQI\Translate5\Repository\LanguageResourceRepository;
 use PHPUnit\Framework\TestCase;
 use Zend_EventManager_Event;
 use Zend_EventManager_SharedEventManager;

@@ -23,7 +23,7 @@ END LICENSE AND COPYRIGHT
 */
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\Customer;
+namespace MittagQI\Translate5\Repository;
 
 use editor_Models_Customer_Customer;
 use editor_Models_Customer_CustomerConfig;

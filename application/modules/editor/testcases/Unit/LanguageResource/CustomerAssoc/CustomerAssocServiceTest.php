@@ -32,14 +32,14 @@ namespace MittagQI\Translate5\Test\Unit\LanguageResource\CustomerAssoc;
 
 use editor_Models_LanguageResources_CustomerAssoc as Association;
 use editor_Models_LanguageResources_LanguageResource as LanguageResource;
-use MittagQI\Translate5\Customer\CustomerRepository;
 use MittagQI\Translate5\EventDispatcher\EventDispatcher;
-use MittagQI\Translate5\LanguageResource\CustomerAssoc\CustomerAssocRepository;
 use MittagQI\Translate5\LanguageResource\CustomerAssoc\CustomerAssocService;
 use MittagQI\Translate5\LanguageResource\CustomerAssoc\DTO\AssociationFormValues;
 use MittagQI\Translate5\LanguageResource\CustomerAssoc\Events\AssociationCreatedEvent;
 use MittagQI\Translate5\LanguageResource\CustomerAssoc\Events\AssociationDeletedEvent;
-use MittagQI\Translate5\LanguageResource\LanguageResourceRepository;
+use MittagQI\Translate5\Repository\CustomerAssocRepository;
+use MittagQI\Translate5\Repository\CustomerRepository;
+use MittagQI\Translate5\Repository\LanguageResourceRepository;
 use PHPUnit\Framework\TestCase;
 
 class CustomerAssocServiceTest extends TestCase

@@ -34,14 +34,15 @@ use editor_Models_Customer_Customer as Customer;
 use MittagQI\Translate5\Customer\Events\EventEmitter;
 use MittagQI\Translate5\LanguageResource\CrossSynchronization\CrossLanguageResourceSynchronizationService;
 use MittagQI\Translate5\LanguageResource\CustomerAssoc\CustomerAssocService;
+use MittagQI\Translate5\Repository\CustomerRepository;
 
 class CustomerService
 {
     public function __construct(
-        private EventEmitter $eventEmitter,
-        private CustomerAssocService $customerAssocService,
-        private CustomerRepository $customerRepository,
-        private CrossLanguageResourceSynchronizationService $synchronizationService
+        private readonly EventEmitter $eventEmitter,
+        private readonly CustomerAssocService $customerAssocService,
+        private readonly CustomerRepository $customerRepository,
+        private readonly CrossLanguageResourceSynchronizationService $synchronizationService
     ) {
     }
 

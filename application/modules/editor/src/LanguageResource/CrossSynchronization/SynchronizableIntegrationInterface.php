@@ -25,7 +25,7 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\LanguageResource\CrossSynchronization;
 
-interface SynchronizableIntegration
+interface SynchronizableIntegrationInterface
 {
     public function getName();
 

@@ -28,9 +28,9 @@ END LICENSE AND COPYRIGHT
 
 use MittagQI\Translate5\LanguageResource\CrossSynchronization\CrossLanguageResourceSynchronizationService;
 use MittagQI\Translate5\LanguageResource\CrossSynchronization\CrossSynchronizationConnection;
-use MittagQI\Translate5\LanguageResource\CrossSynchronization\CrossSynchronizationConnectionRepository;
 use MittagQI\Translate5\LanguageResource\CrossSynchronization\SynchronisationDirigent;
-use MittagQI\Translate5\LanguageResource\LanguageResourceRepository;
+use MittagQI\Translate5\Repository\CrossSynchronizationConnectionRepository;
+use MittagQI\Translate5\Repository\LanguageResourceRepository;
 
 /**
  * Controller for the LanguageResources Associations
