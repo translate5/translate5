@@ -128,6 +128,7 @@ class Models_Installer_Standalone
         $saInstaller->initApplication(); //obsolete in CLI context
         $saInstaller->postInstallation();
         $saInstaller->updateDb(); //this does also cache cleaning!
+        $saInstaller->autoActivatePlugins();
         $saInstaller->checkDb();
         $saInstaller->done();
     }
@@ -157,6 +158,7 @@ class Models_Installer_Standalone
         $saInstaller->initApplication();
         $saInstaller->postInstallation();
         $saInstaller->updateDb(); //this does also cache cleaning!
+        $saInstaller->autoActivatePlugins();
         $saInstaller->checkDb();
         $saInstaller->done();
     }
@@ -462,6 +464,23 @@ class Models_Installer_Standalone
             $db = Zend_Db::factory($config->resources->db);
             $db->query("update Zf_configuration set value = ? where name = 'runtimeOptions.server.name'", $this->hostname);
         }
+    }
+
+    /**
+     * Activate plugins that should be active/enabled by default
+     *
+     * @throws Zend_Db_Statement_Exception
+     * @throws Zend_Exception
+     * @throws ZfExtended_Models_Entity_Exceptions_IntegrityConstraint
+     * @throws ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey
+     */
+    protected function autoActivatePlugins()
+    {
+        /* @var $pluginmanager \ZfExtended_Plugin_Manager */
+        $pluginmanager = \Zend_Registry::get('PluginManager');
+        $pluginmanager->bootstrap();
+        $activated = $pluginmanager->activateEnabledByDefault();
+        echo join("\n", $activated) . "\n";
     }
 
     /**
