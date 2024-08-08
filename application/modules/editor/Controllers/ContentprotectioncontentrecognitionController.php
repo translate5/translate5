@@ -73,6 +73,29 @@ class editor_ContentprotectioncontentrecognitionController extends ZfExtended_Re
         $this->view->total = $this->entity->getTotalCount();
     }
 
+    public function postAction()
+    {
+        try {
+            parent::postAction();
+        } catch (ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey) {
+            ZfExtended_UnprocessableEntity::addCodes([
+                'E1015' => 'Rule name + type pair already exists.',
+            ], 'editor.content-protection');
+
+            throw ZfExtended_UnprocessableEntity::createResponse(
+                'E1015',
+                [
+                    'name' => [
+                        'Regelname existiert bereits für Typ {type}',
+                    ],
+                ],
+                [
+                    'type' => $this->data['type'],
+                ]
+            );
+        }
+    }
+
     public function putAction()
     {
         parent::putAction();
