@@ -30,6 +30,7 @@ namespace Translate5\MaintenanceCli\Command;
 
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
 class PluginEnableCommand extends Translate5AbstractCommand
@@ -46,6 +47,13 @@ class PluginEnableCommand extends Translate5AbstractCommand
         // the full command description shown when running the command with
         // the "--help" option
             ->setHelp('Tool to activate installed translate5 plugins.');
+
+        $this->addOption(
+            '--default-plugins',
+            null,
+            InputOption::VALUE_NONE,
+            'Enable plugins having static $enabledByDefault = true'
+        );
 
         $this->addArgument(
             'plugins',
@@ -65,21 +73,44 @@ class PluginEnableCommand extends Translate5AbstractCommand
         $this->initTranslate5AppOrTest();
         $this->writeTitle('Activated Translate5 Plug-In');
 
-        $pluginmanager = \Zend_Registry::get('PluginManager');
         /* @var $pluginmanager \ZfExtended_Plugin_Manager */
-        $plugins = $this->input->getArgument('plugins');
+        $pluginmanager = \Zend_Registry::get('PluginManager');
 
-        if (empty($plugins)) {
-            $this->io->error('Please specify at least one plug-in');
+        // If we should activate all plugins having static $enabledByDefault === true
+        if ($input->getOption('default-plugins')) {
+            // Activate plugins
+            $log = $pluginmanager->activateEnabledByDefault();
 
-            return 1;
-        }
+            // Print heading
+            $this->io->section(array_shift($log));
 
-        foreach ($plugins as $plugin) {
-            if ($pluginmanager->setActive($plugin, true)) {
-                $this->io->success('Activated plug-in ' . $plugin);
-            } else {
-                $this->io->error('Could not activate plug-in ' . $plugin . '. Wrong plug-in name specified? Call command plugin:list.');
+            // Print activated plugins list
+            foreach ($log as $line) {
+                $this->io->writeln($line);
+            }
+        } else {
+            // Get list of plugins explicitly provided with the command
+            $plugins = $this->input->getArgument('plugins');
+
+            // If list is empty
+            if (empty($plugins)) {
+                // Print error
+                $this->io->error('Please specify at least one plug-in or --default-plugins option');
+
+                // Exit with code 1
+                return 1;
+            }
+
+            // Foreach plugin
+            foreach ($plugins as $plugin) {
+                // Try to activate
+                if ($pluginmanager->setActive($plugin, true)) {
+                    $this->io->success('Activated plug-in ' . $plugin);
+
+                    // Warn if unsuccessful
+                } else {
+                    $this->io->error('Could not activate plug-in ' . $plugin . '. Wrong plug-in name specified? Call command plugin:list.');
+                }
             }
         }
 

@@ -30,6 +30,7 @@
       <file>../Plugins/Okapi/tests/OkapiSegmentationTest.php</file>
     </testsuite>
     <testsuite name="visual">
+      <file>../Plugins/VisualReview/tests/VisualTimecodeTest.php</file>
       <file>../Plugins/VisualReview/tests/VisualHtmlTest.php</file>
       <file>../Plugins/VisualReview/tests/VisualImageTest.php</file>
       <file>../Plugins/VisualReview/tests/VisualPdfTest.php</file>

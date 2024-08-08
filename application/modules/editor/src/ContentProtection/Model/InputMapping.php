@@ -74,7 +74,7 @@ class InputMapping extends ZfExtended_Models_Entity_Abstract
     protected $validatorInstanceClass = InputMappingValidator::class;
 
     /**
-     * @return array{id: int, languageId: int, type: string, name: string}
+     * @return array{id: int, languageId: int, type: string, name: string, enabled: bool, description: string}[]
      */
     public function loadAllForFrontEnd(): array
     {

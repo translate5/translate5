@@ -168,10 +168,13 @@ abstract class editor_Models_Import_FileParser
     /***
      * Get the export class out of the import class file name with replacing the Import with Export
      * folder name. It is expected that the import and export classes are in Import/Export folders accordingly
-     * @return string
      */
     public static function getExportClass(): string
     {
+        if (str_contains(static::class, '\\Import\\')) {
+            return str_replace('\\Import\\', '\\Export\\', static::class);
+        }
+
         return str_replace('_Import_', '_Export_', static::class);
     }
 
@@ -181,7 +184,6 @@ abstract class editor_Models_Import_FileParser
      *  concrete file parser.
      * @param string $fileHead the first 512 bytes of the file to be imported
      * @param string $errorMsg returning by reference a reason why its not parsable
-     * @return boolean
      */
     public static function isParsable(string $fileHead, string &$errorMsg): bool
     {

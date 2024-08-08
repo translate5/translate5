@@ -95,7 +95,7 @@ class editor_Services_ImportWorker extends ZfExtended_Worker_Abstract
             } else {
                 $return = $connector->addAdditionalTm($params['fileinfo'], $params);
             }
-        } catch (Exception $e) {
+        } catch (Throwable $e) {
             $this->log->exception($e);
             $this->languageResource->setStatus(LanguageResourceStatus::AVAILABLE);
             $this->languageResource->save();
