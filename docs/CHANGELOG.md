@@ -21,6 +21,97 @@ All updates are (downwards) compatible! If not this is listed in the important r
 
 
 
+
+## [7.7.0] - 2024-07-31
+
+### Important Notes:
+#### [TRANSLATE-4029](https://jira.translate5.net/browse/TRANSLATE-4029)
+added theme-name as CSS-class inside editor body to be more flexible in client-specific skins.
+
+#### [TRANSLATE-2270](https://jira.translate5.net/browse/TRANSLATE-2270)
+To make plugin work properly it is needed to add an alias in apache config inside the PHP container:
+edit /etc/apache2/sites-enabled/translate5.conf and add the following line
+Alias /editor/plugins/resources/TMMaintenance/ext /var/www/translate5/application/modules/editor/Plugins/TMMaintenance/public/resources/ext
+ 
+
+
+### Added
+**[TRANSLATE-2270](https://jira.translate5.net/browse/TRANSLATE-2270): LanguageResources - Translation Memory Maintenance** <br>
+New plugin TMMaintenance for managing segments in t5memory
+
+
+### Changed
+**[TRANSLATE-4092](https://jira.translate5.net/browse/TRANSLATE-4092): Translate5 CLI - CLI tool for testing SFTP and task archiving config** <br>
+Implement filesystem:external:check and task:archive commands for testing and manual usage of external file systems and the task archiving stuff.
+
+**[TRANSLATE-4079](https://jira.translate5.net/browse/TRANSLATE-4079): LanguageResources - Only one request per concordance search** <br>
+TM-records are now loaded one-by-one until 20 loaded or nothing left
+
+**[TRANSLATE-4069](https://jira.translate5.net/browse/TRANSLATE-4069): t5memory - Add comparing sent and received data during update request to t5memory** <br>
+translate5 - 7.6.6: When updating the segment it is now checked if the received data equals what we expect
+translate5 - 7.7.0: Disable t5memory data check because of to many logs
+
+**[TRANSLATE-4065](https://jira.translate5.net/browse/TRANSLATE-4065): MatchAnalysis & Pretranslation - Use empty TM for internal fuzzy** <br>
+translate5 - 7.6.6: Use empty TM to save internal fuzzy results instead cloning the current one
+translate5 - 7.7.0: Improve logging for removed memory.
+
+**[TRANSLATE-4062](https://jira.translate5.net/browse/TRANSLATE-4062): Workflows - Add archive config to use import date instead task modified date** <br>
+Extend task archiving functionality to filter for created timestamp also, instead only modified timestamp. Configurable in Workflow configuration.
+
+**[TRANSLATE-4011](https://jira.translate5.net/browse/TRANSLATE-4011): Export - Plugin ConnectWorldserver: no state error on task export for re-transfer to Worldserver** <br>
+task is not set to state error on export
+
+
+### Bugfixes
+**[TRANSLATE-4115](https://jira.translate5.net/browse/TRANSLATE-4115): InstantTranslate - InstantTranslate: switch to manual-mode only if several requests took too long** <br>
+FIX: InstantTranslate now switches to manual-mode (not "instant" anymore) only when several requests in a row took longer than the configured threshold
+
+
+
+
+**[TRANSLATE-4113](https://jira.translate5.net/browse/TRANSLATE-4113): Editor general - Improve Logging of Invalid Markup for Sanitization** <br>
+FIX: Improved logging of invalid markup sent from segment editing - not leading to security error anymore
+
+**[TRANSLATE-4097](https://jira.translate5.net/browse/TRANSLATE-4097): Editor general - RootCause: response.getAllResponseHeaders is not a function** <br>
+FIXED: fixed problem popping when maintenance mode is going to be enabled
+
+**[TRANSLATE-4095](https://jira.translate5.net/browse/TRANSLATE-4095): Main back-end mechanisms (Worker, Logging, etc.) - Log cron job calls and add system check** <br>
+Add log entries for each cron job call and a check to the system check if crons are triggered or not.
+
+**[TRANSLATE-4088](https://jira.translate5.net/browse/TRANSLATE-4088): Configuration - In-Context fonts - search by task name throws error** <br>
+FIX: searching in In-Context fonts may lead to exception
+
+**[TRANSLATE-4086](https://jira.translate5.net/browse/TRANSLATE-4086): OpenId Connect - OpenID connect: wrong error handling with empty user info** <br>
+Error handling fix in OpenID connect
+
+**[TRANSLATE-4084](https://jira.translate5.net/browse/TRANSLATE-4084): Editor general - Change level of branding config** <br>
+Branding config can be adjusted via the UI.
+
+**[TRANSLATE-4080](https://jira.translate5.net/browse/TRANSLATE-4080): Okapi integration - FIX: Okapi fails exporting custom subfilters** <br>
+FIX: OKAPI failed to export Files processed with a Filter using a customized Subfilter. This is only a temporary fix until the issue is solved within OKAPI
+
+**[TRANSLATE-4074](https://jira.translate5.net/browse/TRANSLATE-4074): VisualReview / VisualTranslation - Visual does not reflect Pivot language in case target segments are empty** <br>
+FIX: Visual did not show pivot language in case the target segments were empty
+
+**[TRANSLATE-4066](https://jira.translate5.net/browse/TRANSLATE-4066): t5memory - Change save2disk behavior when reimporting task to t5memory** <br>
+TM is now flushed to disk only when reimport is finished
+
+**[TRANSLATE-4048](https://jira.translate5.net/browse/TRANSLATE-4048): LanguageResources - It is possible to create language resource for down server** <br>
+It is now not possible to create a Language resource when the corresponding server is unreachable
+
+**[TRANSLATE-4029](https://jira.translate5.net/browse/TRANSLATE-4029): Editor general - Customer specific theme overwrite is not working** <br>
+Theme name as CSS class in body tag.
+
+**[TRANSLATE-4024](https://jira.translate5.net/browse/TRANSLATE-4024): Configuration - Missing config-type** <br>
+If the type of a certain config can not be detected, "string" will be set as default.
+
+**[TRANSLATE-4023](https://jira.translate5.net/browse/TRANSLATE-4023): Auto-QA - AutoQA portlet should dissappear with no active checks** <br>
+Editor's AutoQA leftside portlet is now hidden if no autoQA enabled for the task
+
+**[TRANSLATE-4020](https://jira.translate5.net/browse/TRANSLATE-4020): VisualReview / VisualTranslation - PDF converter fails to cleanup JOB and thus does not respond with a proper log** <br>
+FIX visual: pdf converter did not write a proper log & failed to clean up the workfiles in the converter container
+
+
 ## [7.6.6] - 2024-07-11
 
 ### Important Notes:
