@@ -34,22 +34,15 @@ use editor_Models_Segment as SegmentModel;
 
 interface UpdatableAdapterInterface
 {
-    public const RECHECK_ON_UPDATE = true;
+    public const RECHECK_ON_UPDATE = 'recheckOnUpdate';
 
-    public const DO_NOT_RECHECK_ON_UPDATE = false;
+    public const RESCHEDULE_UPDATE_ON_ERROR = 'rescheduleUpdateOnError';
 
-    public const RESCHEDULE_UPDATE_ON_ERROR = true;
+    public const USE_SEGMENT_TIMESTAMP = 'useSegmentTimestamp';
 
-    public const DO_NOT_RESCHEDULE_UPDATE_ON_ERROR = false;
+    public const SAVE_TO_DISK = 'saveToDisk';
 
-    public const USE_SEGMENT_TIMESTAMP = true;
+    public function update(SegmentModel $segment, array $options = []): void;
 
-    public const DO_NOT_USE_SEGMENT_TIMESTAMP = false;
-
-    public function update(
-        SegmentModel $segment,
-        bool $recheckOnUpdate = self::DO_NOT_RECHECK_ON_UPDATE,
-        bool $rescheduleUpdateOnError = self::DO_NOT_RESCHEDULE_UPDATE_ON_ERROR,
-        bool $useSegmentTimestamp = self::DO_NOT_USE_SEGMENT_TIMESTAMP,
-    ): void;
+    public function checkUpdatedSegment(SegmentModel $segment): void;
 }

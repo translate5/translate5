@@ -1,3 +1,4 @@
 id,source,target
 num12,"Use commas to separate thousands: £1,150","Verwenden Sie Punkte, um die Tausenderstelle abzutrennen: 1.150€"
 num13,"2,2","2,2"
+num14,"10.170.122","10.170.122"
