@@ -38,7 +38,7 @@ use MittagQI\Translate5\LanguageResource\Adapter\Export\ExportTmFileExtension;
 use MittagQI\Translate5\LanguageResource\Adapter\UpdatableAdapterInterface;
 use MittagQI\Translate5\LanguageResource\Status as LanguageResourceStatus;
 use MittagQI\Translate5\T5Memory\Api\VersionedApiFactory;
-use MittagQI\Translate5\T5Memory\Api\VersionInterfaceFetchingApi;
+use MittagQI\Translate5\T5Memory\Api\VersionFetchingApi;
 use MittagQI\Translate5\T5Memory\Enum\StripFramingTags;
 use MittagQI\Translate5\T5Memory\ExportService;
 use MittagQI\Translate5\T5Memory\PersistenceService;
@@ -103,7 +103,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
         $this->conversionService = TmConversionService::create();
         $this->persistenceService = new PersistenceService();
         $this->httpClient = new Client();
-        $this->versionService = new VersionService(new VersionInterfaceFetchingApi($this->httpClient));
+        $this->versionService = new VersionService(new VersionFetchingApi($this->httpClient));
         $this->exportService = new ExportService(
             $this->logger,
             $this->versionService,
