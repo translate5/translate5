@@ -418,10 +418,13 @@ Ext.define('Editor.controller.TmOverview', {
     },
     handleEditTm: function (view, cell, cellIdx, rec) {
         const win = Ext.widget('editTmWindow');
-        rec.load();
-        win.getViewModel().getStore('customers').load(function () {
-            win.loadRecord(rec);
-            win.show();
+        rec.load({
+            callback: () => {
+                win.getViewModel().getStore('customers').load(function () {
+                    win.loadRecord(rec);
+                    win.show();
+                });
+            }
         });
     },
     handleShowTasks: function (view, cell, cellIdx, rec) {
