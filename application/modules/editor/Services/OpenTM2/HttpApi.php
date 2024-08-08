@@ -26,6 +26,8 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use GuzzleHttp\Client;
+use GuzzleHttp\Exception\RequestException;
 use MittagQI\Translate5\Service\T5Memory;
 use MittagQI\Translate5\T5Memory\DTO\SearchDTO;
 use MittagQI\Translate5\T5Memory\Enum\StripFramingTags;
@@ -48,19 +50,12 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
      */
     protected $languageResource;
 
-    /**
-     * @var editor_Services_OpenTM2_FixLanguageCodes
-     */
-    protected $fixLanguages;
-
-    /**
-     * @var bool true if the used resource is T5Memory, false for OpenTM2
-     */
-    protected bool $isT5Memory = false;
+    protected editor_Services_OpenTM2_FixLanguageCodes $fixLanguages;
 
     public function __construct()
     {
-        $this->fixLanguages = ZfExtended_Factory::get('editor_Services_OpenTM2_FixLanguageCodes');
+        $this->fixLanguages = new editor_Services_OpenTM2_FixLanguageCodes();
+        $this->fixLanguages->setDisabled(true);
     }
 
     /**
@@ -117,13 +112,6 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
 
         $data = new stdClass();
 
-        // TODO T5MEMORY: remove when OpenTM2 is out of production
-        if ($this->isOpenTM2()) {
-            $tmData = $this->fixLanguages->tmxOnUpload($tmData);
-            /* @var $tmxRepairer editor_Services_OpenTM2_FixImportParser */
-            $tmxRepairer = ZfExtended_Factory::get('editor_Services_OpenTM2_FixImportParser');
-            $tmData = $tmxRepairer->convert($tmData);
-        }
         $data->tmxData = base64_encode($tmData);
         $data->framingTags = $stripFramingTags->value;
 
@@ -134,6 +122,114 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
         $http->setRawData($this->jsonEncode($data), self::REQUEST_ENCTYPE);
 
         return $this->processResponse($http->request());
+    }
+
+    public function createMemoryWithFile(string $memory, string $sourceLanguage, string $filePath): ?string
+    {
+        $data = new stdClass();
+        $data->name = $this->addTmPrefix($memory);
+        $data->sourceLang = $this->fixLanguages->key($sourceLanguage);
+
+        $result = $this->sendStreamRequest(
+            rtrim($this->resource->getUrl(), '/') . '/',
+            $this->getStreamFromFile($filePath),
+            basename($filePath),
+            $data
+        );
+
+        return $result ? $data->name : null;
+    }
+
+    public function importMemoryAsFile(string $filePath, string $tmName, StripFramingTags $stripFramingTags): bool
+    {
+        return $this->sendStreamRequest(
+            rtrim($this->resource->getUrl(), '/') . '/' . $tmName . '/importtmx',
+            $this->getStreamFromFile($filePath),
+            basename($filePath),
+            [
+                'framingTags' => $stripFramingTags->value,
+            ]
+        );
+    }
+
+    /**
+     * @throws RuntimeException
+     * @return resource
+     */
+    private function getStreamFromFile(string $filePath)
+    {
+        $stream = fopen($filePath, 'r');
+
+        if (false === $stream) {
+            throw new RuntimeException('Could not open file: ' . $filePath);
+        }
+
+        // Uncomment when compression is implemented in the API
+        //        stream_filter_append($stream, 'zlib.deflate', STREAM_FILTER_READ, [
+        //            "window" => 30,
+        //        ]);
+
+        return $stream;
+    }
+
+    private function sendStreamRequest(string $uri, $stream, string $filename, array|object $data = null): bool
+    {
+        $client = new Client();
+        $multipart = [];
+
+        if (null !== $data) {
+            $multipart[] = [
+                'name' => 'json_data',
+                'contents' => json_encode($data),
+                'headers' => [
+                    'Content-Type' => 'application/json',
+                ],
+            ];
+        }
+
+        $multipart[] = [
+            'name' => 'file',
+            'contents' => $stream,
+            'filename' => $filename,
+        ];
+
+        try {
+            $response = $client->post($uri, [
+                'multipart' => $multipart,
+            ]);
+
+            // trigger this method to set http (yes! :( ) so that self::processResponse can get uri from it.
+            $this->getHttp($uri);
+
+            return $this->processResponse(
+                new Zend_Http_Response(
+                    $response->getStatusCode(),
+                    $response->getHeaders(),
+                    $response->getBody()->getContents()
+                )
+            );
+        } catch (RequestException $e) {
+            return $this->processPsrRequestException($e);
+        }
+    }
+
+    private function processPsrRequestException(RequestException $e): bool
+    {
+        if ($e->hasResponse()) {
+            $response = $e->getResponse();
+            $this->http = ZfExtended_Factory::get('Zend_Http_Client');
+            $this->http->setUri((string) $e->getRequest()->getUri());
+
+            return $this->processResponse(
+                new Zend_Http_Response(
+                    $response->getStatusCode(),
+                    $response->getHeaders(),
+                    $response->getBody()->getContents()
+                )
+            );
+        }
+
+        throw $e;
     }
 
     /**
@@ -225,38 +321,13 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
             if ($mime == "application/xml") {
                 $targetLang = $this->languageResource->getTargetLangCode();
                 $sourceLang = $this->languageResource->getSourceLangCode();
-                $this->result = $this->fixInvalidOpenTM2XML($this->fixLanguages->tmxOnDownload($sourceLang, $targetLang, $this->result));
+                $this->result = $this->fixLanguages->tmxOnDownload($sourceLang, $targetLang, $this->result);
             }
 
             return true;
         }
 
         return $this->processResponse($response);
-    }
-
-    /**
-     * repairs the TMX from OpenTM2 regarding encoded entities and newlines
-     * @throws Zend_Exception
-     */
-    protected function fixInvalidOpenTM2XML(string $tmxData): string
-    {
-        if ($this->isT5Memory) {
-            return $tmxData;
-        }
-
-        /** @var editor_Services_OpenTM2_FixExport $fix */
-        $fix = ZfExtended_Factory::get('editor_Services_OpenTM2_FixExport');
-        $result = $fix->convert($tmxData);
-        if ($fix->getChangeCount() > 0 || $fix->getNewLineCount() > 0) {
-            $logger = Zend_Registry::get('logger');
-            $logger->warn('E1554', 'TMX Export: Entities in {changeCount} text parts repaired (see raw php error log), {newLineCount} new line tags restored.', [
-                'languageResource' => $this->languageResource,
-                'changeCount' => $fix->getChangeCount(),
-                'newLineCount' => $fix->getNewLineCount(),
-            ]);
-        }
-
-        return $result;
     }
 
     /**
@@ -331,50 +402,6 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
         $json->context = $segment->getMid(); // here MID (context was designed for dialog keys/numbers on translateable strings software)
 
         $http = $this->getHttpWithMemory('POST', $tmName, 'fuzzysearch');
-
-        // TODO T5MEMORY: remove when OpenTM2 is out of production
-        if ($this->isOpenTM2() && strtolower($json->targetLang) === 'en-gb') {
-            // TODO REMOVE THIS WHOLE IF AFTER ABOLISHING OPENTM2
-            //between 06.2022 v5.7.4 and 9.2022 v5.7.10 all en-GB segments were stored as en-UK into OpenTM2
-            // with v5.7.10 this was fixed, but now all en-UK results must be fetched separately
-            // and merged into the result
-            // - this is only relevant for targetLanguages = en-GB, source language is not compared on search
-            //   on export this will lead to empty xml:lang fields, which is fixed in FixLanguagesCodes
-            // - only on saving en-UK as source, the source lang is empty string on export and ?? in answer,
-            //   the export is fixed in FixLanguagesCodes, the latter one does not hurt
-
-            //en-UK request first
-            $jsonEnUk = clone $json;
-            $jsonEnUk->targetLang = 'en-UK';
-            $http->setRawData($this->jsonEncode($jsonEnUk), self::REQUEST_ENCTYPE);
-            $resultsUK = [];
-            $resultUK = $this->processResponse($http->request());
-            if ($resultUK) {
-                $resultsUK = clone $this->result;
-                if (! empty($resultsUK->results)) {
-                    foreach ($resultsUK->results as $oneResult) {
-                        $oneResult->targetLang = 'en-GB'; //en-UK is stored as ?? and must be changed
-                    }
-                }
-            }
-
-            //en-GB request
-            $http->setRawData($this->jsonEncode($json), self::REQUEST_ENCTYPE);
-            $resultGB = $this->processResponse($http->request());
-
-            if ($resultUK && $resultsUK->NumOfFoundProposals > 0) {
-                //if no GB results found or there was an error, we use just the UK entries
-                if (! $resultGB || $this->result->NumOfFoundProposals === 0) {
-                    $this->result = $resultsUK;
-                } //merge the results
-                else {
-                    $this->result->NumOfFoundProposals += $resultsUK->NumOfFoundProposals;
-                    $this->result->results = array_merge($this->result->results, $resultsUK->results);
-                }
-            }
-
-            return $resultGB || $resultUK;
-        }
 
         $http->setRawData($this->jsonEncode($json), self::REQUEST_ENCTYPE);
 
@@ -693,23 +720,6 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
         return $this->languageResource;
     }
 
-    public function setResource(editor_Models_LanguageResources_Resource $resource)
-    {
-        parent::setResource($resource);
-        $this->isT5Memory = ! str_contains($resource->getUrl(), '/otmmemoryservice');
-        $this->fixLanguages->setDisabled($this->isT5Memory);
-    }
-
-    /**
-     * returns true if the target system is OpenTM2, false if isT5Memory
-     * @deprecated check all usages and remove them if OpenTM2 is replaced with t5memory
-     * TODO T5MEMORY: remove when OpenTM2 is out of production
-     */
-    public function isOpenTM2(): bool
-    {
-        return ! $this->isT5Memory;
-    }
-
     /**
      * returns true if string is to long for OpenTM2
      * According some research, it seems that the magic border to crash OpenTM2 is on 2048 characters, but:
@@ -738,16 +748,10 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
      */
     private function jsonEncode($data): string
     {
-        $flags = JSON_THROW_ON_ERROR;
-
-        // TODO T5MEMORY: remove when OpenTM2 is out of production
-        if (! $this->isOpenTM2()) {
-            $flags = JSON_THROW_ON_ERROR | JSON_PRETTY_PRINT;
-        }
-
-        // Due to error in proxygen library in t5memory json closing brace should follow a new line symbol (should be "\n}" instead of "}"),
+        // Due to error in proxygen library in t5memory:
+        // json closing brace should follow a new line symbol (should be "\n}" instead of "}"),
         // otherwise such a json won't be parsed correctly
-        return json_encode($data, $flags);
+        return json_encode($data, JSON_THROW_ON_ERROR | JSON_PRETTY_PRINT);
     }
 
     /**
@@ -756,10 +760,6 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
      */
     private function createTimeout(int $seconds): int
     {
-        if ($this->isT5Memory) {
-            return T5Memory::REQUEST_TIMEOUT + $seconds;
-        } else {
-            return $seconds;
-        }
+        return T5Memory::REQUEST_TIMEOUT + $seconds;
     }
 }

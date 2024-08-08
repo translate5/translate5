@@ -136,7 +136,11 @@
 		"cesargb/php-log-rotation": "^2.7",
 		"ifsnop/mysqldump-php": "^v2.9",
 		"http-interop/http-factory-guzzle": "^1.2",
-		"microsoft/microsoft-graph": "^2.6.0"
+		"microsoft/microsoft-graph": "^2.6.0",
+		"guzzlehttp/guzzle": "^7.8",
+		"psr/http-client": "^1.0",
+		"guzzlehttp/psr7": "^2.6",
+		"phar-io/version": "^3.2"
     },
 	"extra" : {
 		"merge-plugin" : {
