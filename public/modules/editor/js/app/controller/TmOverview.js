@@ -417,7 +417,8 @@ Ext.define('Editor.controller.TmOverview', {
         win.load();
     },
     handleEditTm: function (view, cell, cellIdx, rec) {
-        var win = Ext.widget('editTmWindow');
+        const win = Ext.widget('editTmWindow');
+        rec.load();
         win.getViewModel().getStore('customers').load(function () {
             win.loadRecord(rec);
             win.show();
