@@ -9968,6 +9968,18 @@ E-Mail: service@MittagQI.com</pre>
                 <source>Server für den angefragten Dienst ist nicht erreichbar.</source>
                 <target>Server for the queried service is not reachable.</target>
             </trans-unit>
+            <trans-unit id='UmVnZWxuYW1lIGV4aXN0aWVydCBiZXJlaXRzIGbDvHIgVHlwIHt0eXBlfQ=='>
+                <source>Regelname existiert bereits für Typ {type}</source>
+                <target>Provided Rule name already exists for type {type}</target>
+            </trans-unit>
+            <trans-unit id='U2llIHZlcndlbmRlbiBkaWVzZSBSZWdlbCBiZXJlaXRzIGbDvHIgZGllc2UgU3ByYWNoZQ=='>
+                <source>Sie verwenden diese Regel bereits für diese Sprache</source>
+                <target>You already use this rule for this language</target>
+            </trans-unit>
+            <trans-unit id='UmVnZWwgbWl0IGRpZXNlciBQcmlvcml0w6R0IGV4aXN0aWVydCBiZXJlaXRz'>
+                <source>Regel mit dieser Priorität existiert bereits</source>
+                <target>Rule with this priority already exists</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>
