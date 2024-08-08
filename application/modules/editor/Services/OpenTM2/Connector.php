@@ -357,16 +357,12 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
         return file_get_contents($file);
     }
 
-    public function update(
-        editor_Models_Segment $segment,
-        bool $recheckOnUpdate = self::DO_NOT_RECHECK_ON_UPDATE,
-        bool $rescheduleUpdateOnError = self::DO_NOT_RESCHEDULE_UPDATE_ON_ERROR,
-        bool $useSegmentTimestamp = self::DO_NOT_USE_SEGMENT_TIMESTAMP,
-    ): void {
+    public function update(editor_Models_Segment $segment, array $options = []): void
+    {
         $tmName = $this->persistenceService->getWritableMemory($this->languageResource);
 
         if ($this->isReorganizingAtTheMoment($tmName)) {
-            if ($rescheduleUpdateOnError) {
+            if ($options[UpdatableAdapterInterface::RESCHEDULE_UPDATE_ON_ERROR] ?? false) {
                 throw new RescheduleUpdateNeededException();
             }
 
@@ -380,6 +376,9 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
         $source = $this->tagHandler->prepareQuery($this->getQueryString($segment));
         $this->tagHandler->setInputTagMap($this->tagHandler->getTagMap());
         $target = $this->tagHandler->prepareQuery($segment->getTargetEdit(), false);
+        $saveToDisk = $options[UpdatableAdapterInterface::SAVE_TO_DISK] ?? true;
+        $saveToDisk = $saveToDisk && ! $this->isInternalFuzzy();
+        $useSegmentTimestamp = $options[UpdatableAdapterInterface::USE_SEGMENT_TIMESTAMP] ?? false;
 
         $timestamp = $useSegmentTimestamp
             ? $this->api->getDate((int) $segment->getTimestamp())
@@ -393,9 +392,10 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
             $timestamp,
             $fileName,
             $tmName,
-            ! $this->isInternalFuzzy(),
+            $saveToDisk,
         );
 
+        $recheckOnUpdate = $options[UpdatableAdapterInterface::RECHECK_ON_UPDATE] ?? false;
         $dataSent = [
             'source' => $source,
             'target' => $target,
@@ -407,7 +407,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
 
         if ($successful) {
             $this->checkUpdateResponse($dataSent, $this->api->getResult());
-            $this->checkUpdatedSegment($segment, $recheckOnUpdate);
+            $this->checkUpdatedSegmentIfNeeded($segment, $recheckOnUpdate);
 
             return;
         }
@@ -426,12 +426,12 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
                 $timestamp,
                 $fileName,
                 $tmName,
-                ! $this->isInternalFuzzy()
+                $saveToDisk,
             );
 
             if ($successful) {
                 $this->checkUpdateResponse($dataSent, $this->api->getResult());
-                $this->checkUpdatedSegment($segment, $recheckOnUpdate);
+                $this->checkUpdatedSegmentIfNeeded($segment, $recheckOnUpdate);
 
                 return;
             }
@@ -450,12 +450,12 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
                 $timestamp,
                 $fileName,
                 $tmName,
-                ! $this->isInternalFuzzy()
+                $saveToDisk,
             );
 
             if ($successful) {
                 $this->checkUpdateResponse($dataSent, $this->api->getResult());
-                $this->checkUpdatedSegment($segment, $recheckOnUpdate);
+                $this->checkUpdatedSegmentIfNeeded($segment, $recheckOnUpdate);
 
                 return;
             }
@@ -1661,11 +1661,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
         //        }
     }
 
-    /**
-     * Check if segment was updated properly
-     * and if not - add a log record for that for debug purposes
-     */
-    private function checkUpdatedSegment(editor_Models_Segment $segment, bool $recheckOnUpdate): void
+    private function checkUpdatedSegmentIfNeeded(editor_Models_Segment $segment, bool $recheckOnUpdate): void
     {
         if (! in_array(
             $this->getResource()->getUrl(),
@@ -1678,6 +1674,15 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
             return;
         }
 
+        $this->checkUpdatedSegment($segment);
+    }
+
+    /**
+     * Check if segment was updated properly
+     * and if not - add a log record for that for debug purposes
+     */
+    public function checkUpdatedSegment(editor_Models_Segment $segment): void
+    {
         $targetSent = $this->tagHandler->prepareQuery($segment->getTargetEdit(), false);
 
         $result = $this->query($segment);
