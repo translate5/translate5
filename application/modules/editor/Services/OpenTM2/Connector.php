@@ -38,7 +38,7 @@ use MittagQI\Translate5\LanguageResource\Adapter\Export\ExportTmFileExtension;
 use MittagQI\Translate5\LanguageResource\Adapter\UpdatableAdapterInterface;
 use MittagQI\Translate5\LanguageResource\Status as LanguageResourceStatus;
 use MittagQI\Translate5\T5Memory\Api\VersionedApiFactory;
-use MittagQI\Translate5\T5Memory\Api\VersionFetchingApi;
+use MittagQI\Translate5\T5Memory\Api\VersionInterfaceFetchingApi;
 use MittagQI\Translate5\T5Memory\Enum\StripFramingTags;
 use MittagQI\Translate5\T5Memory\ExportService;
 use MittagQI\Translate5\T5Memory\PersistenceService;
@@ -79,11 +79,6 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
      */
     protected $internalTagSupport = true;
 
-    /**
-     * Holds the parent API in case of an fuzzy connector
-     */
-    private ?editor_Services_OpenTM2_HttpApi $parentApi = null;
-
     private TmConversionService $conversionService;
 
     private VersionService $versionService;
@@ -108,7 +103,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
         $this->conversionService = TmConversionService::create();
         $this->persistenceService = new PersistenceService();
         $this->httpClient = new Client();
-        $this->versionService = new VersionService(new VersionFetchingApi($this->httpClient));
+        $this->versionService = new VersionService(new VersionInterfaceFetchingApi($this->httpClient));
         $this->exportService = new ExportService(
             $this->logger,
             $this->versionService,
@@ -194,7 +189,12 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
 
         //initial upload is a TM file
         if ($this->versionService->isLRVersionGreaterThan(self::VERSION_0_6, $this->languageResource)) {
-            $tmName = $this->api->createMemoryWithFile($name, $sourceLang, $fileinfo['tmp_name']);
+            $tmName = $this->api->createMemoryWithFile(
+                $name,
+                $sourceLang,
+                $fileinfo['tmp_name'],
+                $this->getStripFramingTagsValue($params['stripFramingTags'] ?? null)
+            );
         } else {
             $tmName = $this->api->createMemory($name, $sourceLang, file_get_contents($fileinfo['tmp_name']));
         }
@@ -996,7 +996,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
         //INFO: The resources logging requires resource with valid id.
         //$fuzzyLanguageResource->setId(null);
 
-        $connector = ZfExtended_Factory::get(self::class);
+        $connector = new self();
         $connector->connectTo(
             $fuzzyLanguageResource,
             $this->languageResource->getSourceLang(),
@@ -1007,8 +1007,8 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Abstra
         // copy the worker user guid
         $connector->setWorkerUserGuid($this->getWorkerUserGuid());
         $connector->isInternalFuzzy = true;
-        // needed by the fuzzy connector to reorganize the parent TM if neccessary
-        $connector->parentApi = $this->api;
+        // tell version service to not update LR data
+        $connector->versionService->setInternalFuzzy(true);
 
         return $connector;
     }

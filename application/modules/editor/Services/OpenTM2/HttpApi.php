@@ -124,11 +124,16 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
         return $this->processResponse($http->request());
     }
 
-    public function createMemoryWithFile(string $memory, string $sourceLanguage, string $filePath): ?string
-    {
+    public function createMemoryWithFile(
+        string $memory,
+        string $sourceLanguage,
+        string $filePath,
+        StripFramingTags $stripFramingTags
+    ): ?string {
         $data = new stdClass();
         $data->name = $this->addTmPrefix($memory);
         $data->sourceLang = $this->fixLanguages->key($sourceLanguage);
+        $data->framingTags = $stripFramingTags->value;
 
         $result = $this->sendStreamRequest(
             rtrim($this->resource->getUrl(), '/') . '/',

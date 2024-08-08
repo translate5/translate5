@@ -711,7 +711,6 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
      */
     public function downloadAction()
     {
-        //call GET to load entity internally
         $this->entityLoad();
 
         //get type from extension, the part between :ID and extension does not matter

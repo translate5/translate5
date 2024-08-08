@@ -28,19 +28,33 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\Test\Unit\T5Memory\Api\V6\Request;
+namespace MittagQI\Translate5\T5Memory\Api;
 
-use MittagQI\Translate5\T5Memory\Api\V6\Request\DownloadTmRequest;
-use PHPUnit\Framework\TestCase;
+use MittagQI\Translate5\T5Memory\Api\Contract\HasVersionInterface;
+use MittagQI\Translate5\T5Memory\Api\Contract\ResponseExceptionInterface;
+use MittagQI\Translate5\T5Memory\Api\Request\ResourcesRequest;
+use MittagQI\Translate5\T5Memory\Api\Response\ResourcesResponse;
+use Psr\Http\Client\ClientInterface;
 
-class DownloadTmRequestTest extends TestCase
+class VersionInterfaceFetchingApi implements HasVersionInterface
 {
-    public function testCreation(): void
-    {
-        $request = new DownloadTmRequest('http://example.com', 'tmName');
+    public function __construct(
+        private ClientInterface $client
+    ) {
+    }
 
-        $this->assertSame('GET', $request->getMethod());
-        $this->assertSame('http://example.com/tmName/download.tm', (string) $request->getUri());
-        $this->assertSame('application/octet-stream', $request->getHeaderLine('Accept'));
+    public function version(string $baseUrl, bool $suppressExceptions = true): string
+    {
+        $response = $this->client->sendRequest(new ResourcesRequest($baseUrl));
+
+        try {
+            return ResourcesResponse::fromResponse($response)->version;
+        } catch (ResponseExceptionInterface $exception) {
+            if ($suppressExceptions) {
+                return self::FALLBACK_VERSION;
+            }
+
+            throw $exception;
+        }
     }
 }

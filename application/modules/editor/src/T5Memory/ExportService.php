@@ -38,7 +38,7 @@ use LogicException;
 use MittagQI\Translate5\ContentProtection\T5memory\T5NTagSchemaFixFilter;
 use MittagQI\Translate5\ContentProtection\T5memory\TmConversionService;
 use MittagQI\Translate5\LanguageResource\Adapter\Export\ExportTmFileExtension;
-use MittagQI\Translate5\T5Memory\Api\VersionFetchingApi;
+use MittagQI\Translate5\T5Memory\Api\VersionInterfaceFetchingApi;
 use MittagQI\Translate5\T5Memory\Exception\ExportException;
 use Psr\Http\Client\ClientExceptionInterface;
 use Psr\Http\Message\StreamInterface;
@@ -65,7 +65,7 @@ class ExportService
 
         return new self(
             \Zend_Registry::get('logger'),
-            new VersionService(new VersionFetchingApi($httpClient)),
+            new VersionService(new VersionInterfaceFetchingApi($httpClient)),
             TmConversionService::create(),
             new Api\VersionedApiFactory($httpClient),
         );
@@ -281,7 +281,6 @@ class ExportService
         try {
             $reader->open(Psr7StreamWrapper::register($stream));
         } catch (Throwable $e) {
-            dump($e);
             $this->logger->exception($e);
 
             return null;
