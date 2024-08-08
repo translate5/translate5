@@ -185,7 +185,7 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
         if (null !== $data) {
             $multipart[] = [
                 'name' => 'json_data',
-                'contents' => json_encode($data),
+                'contents' => json_encode($data, JSON_PRETTY_PRINT),
                 'headers' => [
                     'Content-Type' => 'application/json',
                 ],
@@ -204,7 +204,7 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
             ]);
 
             // trigger this method to set http (yes! :( ) so that self::processResponse can get uri from it.
-            $this->getHttp($uri);
+            $this->getHttp('POST');
 
             return $this->processResponse(
                 new Zend_Http_Response(
