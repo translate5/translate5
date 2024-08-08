@@ -73,7 +73,7 @@ class Cronjobs
         self::$running = true;
         /* @var $gc ZfExtended_Resource_GarbageCollector */
         $gc = $this->bootstrap->getPluginResource(ZfExtended_Resource_GarbageCollector::class);
-        $gc->cleanUp($gc::ORIGIN_CRON);
+        $gc->cleanUp();
         $this->doCronWorkflow('doCronPeriodical');
         $this->eventTrigger->triggerPeriodical();
         $this->logCall(CronEventTrigger::PERIODICAL);
